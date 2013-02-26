@@ -53,7 +53,7 @@ function event_load()
 	send_command('alias of lua c Linker of')
 	send_command('alias bgf lua c Linker bgf')
 	send_command('alias ahf lua c Linker ahf')
-	send_command('alias gwc lua c Linker gwo')
+	send_command('alias gwc lua c Linker gwc')
 end
 
 -- Destructor
