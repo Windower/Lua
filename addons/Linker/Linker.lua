@@ -3,9 +3,13 @@
 function event_addon_command(command, ...)
     term = table.concat({...}, ' ')
 	if(term == '') then
-		os.execute('start '..rawURLs[command])
+		if(rawURLs[command] ~= nil) then
+			os.execute('start '..rawURLs[command])
+		end
 	else
-		os.execute('start '..string.gsub(searchURLs[command], 'QUERYTERM', term))
+		if(searchURLs[command] ~= nil) then
+			os.execute('start '..string.gsub(searchURLs[command], 'QUERYTERM', term))
+		end
 	end
 end
 
