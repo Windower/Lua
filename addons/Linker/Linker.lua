@@ -14,29 +14,30 @@ end
 function event_load()
 	searchURLs = {}
 	-- FFXI info sites
-	searchURLs.db = 'http://ffxidb.com/search?q=QUERYTERM'
-	searchURLs.ah = 'http://ffxiah.com/search/item?q=QUERYTERM'
-	searchURLs.bgw = 'http://wiki.bluegartr.com/index.php?title=Special:Search&search=QUERYTERM'
-	searchURLs.ge = 'http://ffxi.gamerescape.com/wiki/Special:Search?search=QUERYTERM'
-	searchURLs.wikia = 'http://wiki.ffxiclopedia.org/wiki/index.php?search=QUERYTERM&fulltext=Search'
-	-- Miscallenous links
-	searchURLs.g = 'http://google.com/q=QUERYTERM'
-	searchURLs.wa = 'http://wolframalpha.com/i=QUERYTERM'
+	searchURLs['db'] = 'http://ffxidb.com/search?q=QUERYTERM'
+	searchURLs['ah'] = 'http://ffxiah.com/search/item?q=QUERYTERM'
+	searchURLs['bgw'] = 'http://wiki.bluegartr.com/index.php?title=Special:Search&search=QUERYTERM'
+	searchURLs['ge'] = 'http://ffxi.gamerescape.com/wiki/Special:Search?search=QUERYTERM'
+	searchURLs['wikia'] = 'http://wiki.ffxiclopedia.org/wiki/index.php?search=QUERYTERM&fulltext=Search'
+	-- Miscallenous sites
+	searchURLs['g'] = 'http://google.com/?q=QUERYTERM'
+	searchURLs['wa'] = 'http://wolframalpha.com/?i=QUERYTERM'
 	
 	rawURLs = {}
 	-- FFXI info sites
-	rawURLs.db = 'http://ffxidb.com/'
-	rawURLs.ah = 'http://ffxiah.com/'
-	rawURLs.bgw = 'http://wiki.bluegartr.com/bg/Main_Page'
-	rawURLs.ge = 'http://ffxi.gamerescape.com/wiki/Main_Page'
-	rawURLs.wikia = 'http://wiki.ffxiclopedia.org/wiki/Main_Page'
-	-- FFXI forums
-	rawURLs.of = 'http://forum.square-enix.com/ffxi/forum.php'
-	rawURLs.bgf = 'http://www.bluegartr.com/forum.php'
-	rawURLs.ahf = 'http://www.ffxiah.com/forum'
-	-- Miscallenous links
-	rawURLs.g = 'http://google.com'
-	rawURLs.wa = 'http://wolframalpha.com'
+	rawURLs['db'] = 'http://ffxidb.com/'
+	rawURLs['ah'] = 'http://ffxiah.com/'
+	rawURLs['bgw'] = 'http://wiki.bluegartr.com/bg/Main_Page'
+	rawURLs['ge'] = 'http://ffxi.gamerescape.com/wiki/Main_Page'
+	rawURLs['wikia'] = 'http://wiki.ffxiclopedia.org/wiki/Main_Page'
+	-- FFXI community sites
+	rawURLs['of'] = 'http://forum.square-enix.com/ffxi/forum.php'
+	rawURLs['bgf'] = 'http://www.bluegartr.com/forum.php'
+	rawURLs['ahf'] = 'http://www.ffxiah.com/forum'
+	rawURLs['gwc'] = 'http://guildwork.com'
+	-- Miscallenous sites
+	rawURLs['g'] = 'http://google.com'
+	rawURLs['wa'] = 'http://wolframalpha.com'
 	
 	send_command('alias db lua c Linker db')
 	send_command('alias ah lua c Linker ah')
@@ -48,6 +49,7 @@ function event_load()
 	send_command('alias of lua c Linker of')
 	send_command('alias bgf lua c Linker bgf')
 	send_command('alias ahf lua c Linker ahf')
+	send_command('alias gwc lua c Linker gwo')
 end
 
 -- Destructor
@@ -65,4 +67,5 @@ function event_unload()
 	send_command('unalias of')
 	send_command('unalias bgf')
 	send_command('unalias ahf')
+	send_command('unalias gwc')
 end

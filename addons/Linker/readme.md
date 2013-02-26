@@ -13,6 +13,7 @@ Opens certain links via simple console commands, with an optional search string.
 	//of # Official forums
 	//bgf # BlueGartr forums
 	//ahf # FFXIAH forums
+	//gwc # Guildwork.com
 
 ## Miscellanous sites
 	//g [query] # Google
