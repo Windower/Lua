@@ -1,5 +1,5 @@
-Author: Aureus
-Version: 1.0
+Author: Aureus  
+Version: 1.0  
 Demo addon to show IPC functionality.
 
 Load and use:
