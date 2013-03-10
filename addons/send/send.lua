@@ -14,7 +14,7 @@ end
 function event_ipc_message(msg)
 	broken = split(msg, ' ')
 	
-	if broken:getn() < 2 then return end
+	if #broken < 2 then return end
 	
 	qual = table.remove(broken,1)
 	player = get_player()
@@ -24,16 +24,16 @@ function event_ipc_message(msg)
 		end
 	end
 	if string.char(qual:byte(1)) == '@' then
-		arg = string.char(qual:byte(2, qual:len())
+		arg = string.char(qual:byte(2, qual:len()))
 		if arg:upper() == player["main_job"]:upper() then
 			if broken ~= nil then
 				relevant_msg(table.concat(broken,' '))
 			end
-		elseif arg:upper == 'ALL' then
+		elseif arg:upper() == 'ALL' then
 			if broken ~= nil then
 				relevant_msg(table.concat(broken,' '))
 			end
-		elseif arg:upper == 'OTHERS' then
+		elseif arg:upper() == 'OTHERS' then
 			if broken ~= nil then
 				relevant_msg(table.concat(broken,' '))
 			end
