@@ -4,7 +4,7 @@ function event_addon_command(...)
 	qual = table.remove(broken_init,1)
 	player = get_player()
 	if qual:lower()==player["name"]:lower() then
-		if broken ~= nil then
+		if broken_init ~= nil then
 			relevant_msg(table.concat(broken_init,' '))
 		end
 	else
