@@ -81,7 +81,7 @@ function event_chat_message(isGM, mode, player, message)
 			tell_table[player] = 1
 			recording[player] = {message}
 			if away_msg ~= nil then
-				if ~isGM then
+				if isGM ~= 1 then
 					send_command('input /tell '..player..' '..away_msg)
 				end
 			end
