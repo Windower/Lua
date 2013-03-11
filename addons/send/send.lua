@@ -52,11 +52,11 @@ function event_ipc_message(msg)
 end
 
 function split(msg, match)
-	length = msg:len()
-	splitarr = {}
-	u = 1
+	local length = msg:len()
+	local splitarr = {}
+	local u = 1
 	while u < length do
-		nextanch = msg:find(match,u)
+		local nextanch = msg:find(match,u)
 		if nextanch ~= nil then
 			splitarr[#splitarr+1] = msg:sub(u,nextanch-1)
 			if nextanch~=length then
