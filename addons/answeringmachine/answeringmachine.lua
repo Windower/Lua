@@ -17,8 +17,13 @@ function event_addon_command(...)
 		if broken[1]:upper() == "PLAY" then
 			if broken[2] ~= nil then
 				if tell_table[broken[2]] ~= nil then
-					add_to_chat(5,tell_table[broken[2]]..' messages from '..broken[2])
-					for n = 1,tell_table[broken[2]] do
+					local num = tell_table[broken[2]]
+					if num == 1 then
+						add_to_chat(5,'1 message from '..broken[2])
+					else
+						add_to_chat(5,num..' messages from '..broken[2])
+					end
+					for n = 1,num do
 						local tablekey = recording[broken[2]]
 						add_to_chat(3,broken[2]..'>> '..tablekey[n])
 					end
@@ -26,7 +31,11 @@ function event_addon_command(...)
 			else
 				add_to_chat(3,'Answering Machine>> Playing back all messages')
 				for i,v in pairs(tell_table) do
-					add_to_chat(5,v..' messages from '..i)
+					if v == 1 then
+						add_to_chat(5,'1 message from '..i)
+					else
+						add_to_chat(5,v..' messages from '..i)
+					end
 					for n = 1,v do
 						local tablekey = recording[i]
 						add_to_chat(3,i..'>> '..tablekey[n])
