@@ -49,6 +49,15 @@ function event_addon_command(...)
 			write('am play <name> : Plays current messages, or only messages from <name> if provided')
 			write('am list : Lists the names of people who have sent you tells')
 		end
+		
+		
+		if broken[1]:upper() == "MSG" then
+			local msg_interp = broken
+			msg_interp[1]=nil
+			if msg_interp ~= nil then
+				away_msg=table.concat(msg_interp)
+			end
+		end
 	end
 end
 
@@ -71,16 +80,21 @@ function event_chat_message(isGM, mode, player, message)
 		else
 			tell_table[player] = 1
 			recording[player] = {message}
+			if away_msg ~= nil then
+				if ~isGM then
+					send_command('input /tell '..player..' '..away_msg)
+				end
+			end
 		end
 	end
 end
 
 function split(msg, match)
-	length = msg:len()
-	splitarr = {}
-	u = 1
+	local length = msg:len()
+	local splitarr = {}
+	local u = 1
 	while u < length do
-		nextanch = msg:find(match,u)
+		local nextanch = msg:find(match,u)
 		if nextanch ~= nil then
 			splitarr[#splitarr+1] = msg:sub(u,nextanch-1)
 			if nextanch~=length then
