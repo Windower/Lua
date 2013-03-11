@@ -5,7 +5,7 @@ function event_addon_command(...)
 		if broken[1]:upper() == "CLEAR" then
 			tell_table = {}
 			recording = {}
-			add_to_chat(3,'Answering Machine>> Blanking the recordings')
+			add_to_chat(4,'Answering Machine>> Blanking the recordings')
 		end
 		
 		if broken[1]:upper() == "LIST" then
@@ -25,11 +25,11 @@ function event_addon_command(...)
 					end
 					for n = 1,num do
 						local tablekey = recording[broken[2]]
-						add_to_chat(3,broken[2]..'>> '..tablekey[n])
+						add_to_chat(4,broken[2]..'>> '..tablekey[n])
 					end
 				end
 			else
-				add_to_chat(3,'Answering Machine>> Playing back all messages')
+				add_to_chat(4,'Answering Machine>> Playing back all messages')
 				for i,v in pairs(tell_table) do
 					if v == 1 then
 						add_to_chat(5,'1 message from '..i)
@@ -38,7 +38,7 @@ function event_addon_command(...)
 					end
 					for n = 1,v do
 						local tablekey = recording[i]
-						add_to_chat(3,i..'>> '..tablekey[n])
+						add_to_chat(4,i..'>> '..tablekey[n])
 					end
 				end
 			end
