@@ -22,7 +22,7 @@ end
 function event_emote(senderId,targetId,emoteId,MotionOnly)
 	local player = get_player()
 	if targetId==player["id"] then
-		emoter = get_mob_by_id(senderId)
+		local emoter = get_mob_by_id(senderId)
 		send_command('input /target '..emoter["name"])
 
 		if dancenum[mode..emoteId] ~= nil then
