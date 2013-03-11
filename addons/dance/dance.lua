@@ -9,7 +9,6 @@ end
 
 function event_load()
 	send_command('alias dance lua c dance')
-	player = get_player()
 	mode = "freestyle"
 	dancenum = { mimic29="panic", mimic65="dance1", mimic66="dance2", mimic67="dance3", mimic68="dance4",
 	advance29="dance1", advance65="dance2", advance66="dance3", advance67="dance4", advance68="panic",
@@ -21,6 +20,7 @@ function event_unload()
 end
 
 function event_emote(senderId,targetId,emoteId,MotionOnly)
+	local player = get_player()
 	if targetId==player["id"] then
 		emoter = get_mob_by_id(senderId)
 		send_command('input /target '..emoter["name"])
