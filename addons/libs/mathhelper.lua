@@ -6,3 +6,19 @@ end
 function math.sgn(num)
 	return num/math.abs(num)
 end
+
+function math.even(num)
+	return num%2 == 0
+end
+
+function math.odd(num)
+	return num%2 == 1
+end
+
+function math.sum(val1, val2)
+	return val1+val2
+end
+
+function math.mult(val1, val2)
+	return val1*val2
+end
