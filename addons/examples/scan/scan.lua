@@ -9,7 +9,7 @@ function event_addon_command(...)
 		
 		if broken[1]:upper() == "POSITION" then
 			if broken[3] ~= nil then
-				tb_set_location('text set',broken[2],broken[3])
+				tb_set_location('scan_box',broken[2],broken[3])
 			end
 		end
 	end
@@ -20,8 +20,9 @@ function event_load()
 	tb_create('scan_box')
 	tb_set_bg_color('scan_box',200,30,30,30)
 	tb_set_color('scan_box',255,200,200,200)
-	tb_set_location('text set',900,704)
+	tb_set_location('scan_box',900,704)
 	tb_set_visibility('scan_box',1)
+	tb_set_bg_visibility('scan_box',1)
 	tb_set_text('scan_box','No target / Default')
 end
 
