@@ -9,7 +9,7 @@ function event_addon_command(...)
 		
 		if broken[1]:upper() == "POSITION" then
 			if broken[3] ~= nil then
-				send_command('text set scan_box position '..broken[2]..' '..broken[3])
+				tb_set_location('text set',broken[2],broken[3])
 			end
 		end
 	end
@@ -17,30 +17,26 @@ end
 
 function event_load()
 	send_command('alias scan lua c scan')
-	send_command('load text')
-	send_command('text verbose 0')
-	write('The text plugin has had its verbose level has been set to 0. Only errors will be mentioned')
-	send_command('text create scan_box')
-	send_command('text set scan_box bg 30 30 30 200')
-	send_command('text set scan_box fg 200 200 200 255')
-	send_command('text set scan_box position 900 704')
-	send_command('text set scan_box show')
-	send_command('text set scan_box showbg')
-	send_command('text set scan_box text "No target / Default"')
+	tb_create('scan_box')
+	tb_set_bg_color('scan_box',200,30,30,30)
+	tb_set_color('scan_box',255,200,200,200)
+	tb_set_location('text set',900,704)
+	tb_set_visibility('scan_box',1)
+	tb_set_text('scan_box','No target / Default')
 end
 
 function event_unload()
 	send_command('unalias scan')
-	send_command('text delete scan_box')
+	tb_delete('scan_box')
 end
 
 function event_target_change(targId)
 	local currentmob = get_mob_by_target_id(targId)
 	if currentmob ~= nil then
 		if currentmob['id'] == nil then
-			send_command('text set scan_box text "No target / Default"')
+			tb_set_text('scan_box','No target / Default')
 		else
-			send_command('text set scan_box text "'..'mob_type:'..currentmob['mob_type']..'  model_size:'..currentmob['model_size']..'  targId:'..targId..'  id:'..currentmob['id']..'"')
+			tb_set_text('scan_box','mob_type:'..currentmob['mob_type']..'  model_size:'..currentmob['model_size']..'  targId:'..targId..'  id:'..currentmob['id'])
 		end
 	end
 end
