@@ -31,6 +31,9 @@ function event_addon_command()
 			for u = 1, #statusTable do
 				if statusTable[u]:lower() == priority[i]:lower() then
 					send_command('send @others '..statSpell[priority[i]]..' '..player['name'])
+					if statusTable[u]:lower() == 'doom' then
+						send_command('input /item "Holy Water"'..player['name'])  --Auto Holy water for doom
+					end
 					return
 				end
 			end
