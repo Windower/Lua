@@ -1,23 +1,11 @@
--- Helpers
-
-function log(...)
-	local args = {...}
-	local strtable = {}
-	for i = 1, #args, 1 do
-		strtable[i] = tostring(args[i])
-	end
-	add_to_chat(160, table.concat(strtable, ' '))
-end
-
-function round(num, prec)
-	local mult = 10^(prec or 0)
-	return math.floor(num * mult + 0.5) / mult
-end
+require 'tablehelper'
+require 'debug'
 
 -- Interpreter
 
 function event_addon_command(site, ...)
-	term = table.concat({...}, ' ')
+	local args = T{...}
+	term = args:concat(' ')
 	if((term == '') or (searchURLs[site] == nil and rawURLs[site] ~= nil)) then
 		link = rawURLs[site]
 	elseif(searchURLs[site] ~= nil) then
