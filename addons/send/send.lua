@@ -4,7 +4,7 @@ function event_addon_command(...)
 	qual = table.remove(broken_init,1)
 	player = get_player()
 	if qual:lower()==player["name"]:lower() then
-		if broken_init ~= nil then
+		if broken ~= nil then
 			relevant_msg(table.concat(broken_init,' '))
 		end
 	else
@@ -85,8 +85,12 @@ function relevant_msg(msg)
 	msg:gsub("<sjob>", player['sub_job_full'])
 	
 
-	if msg:sub(1,1)=='/' then
+	if msg:sub(1,2)=='//' then
+		send_command(msg:sub(3))
+	elseif msg:sub(1,1)=='/'
 		send_command('input '..msg)
+	elseif msg:sub(1,3)=='atc' then
+		add_to_chat(55,msg:sub(5))
 	else
 		send_command(msg)
 	end
