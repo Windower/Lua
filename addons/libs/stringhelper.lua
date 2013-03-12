@@ -1,8 +1,8 @@
-function string:at(pos)
-	return self:sub(pos, pos)
+function string.at(str, pos)
+	return str.sub(pos, pos)
 end
 
-function string:split(sep)
+function string.split(str, sep)
 	local res = {}
 	local i = 0
 	while i <= #str do
@@ -22,6 +22,6 @@ function string:split(sep)
 	return res
 end
 
-function string:slice(from, to)
-	return string:sub(from, to)
+function string.slice(str, from, to)
+	return str:sub(from, to)
 end

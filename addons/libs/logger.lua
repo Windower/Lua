@@ -1,4 +1,4 @@
-require('tablehelper')
+require 'tablehelper'
 
 function log(...)
 	local args = T{...}
@@ -7,13 +7,12 @@ function log(...)
 end
 
 function table.print(t)
-	t = T(t)
-	t = t:map(tostring)
+	t = T(t):map(tostring)
 	tstr = ''
 	if #t == 0 then
 		first = true
 		for key, val in pairs(t) do
-			if(first) then
+			if first then
 				first = false
 			else
 				tstr = tstr..', '
@@ -27,8 +26,7 @@ function table.print(t)
 end
 
 function table.vprint(t)
-	t = T(t)
-	t = t:map(tostring)
+	t = T(t):map(tostring)
 	log('{')
 	if #t == 0 then
 		for key, val in pairs(t) do
