@@ -5,12 +5,12 @@ Lua Addons and Scripts
 
 
 
-We require that all pull requests to the Windower/Lua repository be licensed under the BSD license, reproduced below:
+We require that all submissions to the Windower/Lua repository be licensed under the BSD license, reproduced below. Please replace <year> and <your name> with appropriate values.
 
 
 ===
 
-Copyright (c) 2012, Windower
+Copyright (c) <year>, <your name>
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
