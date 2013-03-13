@@ -28,9 +28,7 @@ function event_ipc_message(msg)
 	qual = table.remove(broken,1)
 	player = get_player()
 	if qual:lower()==player["name"]:lower() then
-		if broken ~= nil then
-			relevant_msg(table.concat(broken,' '))
-		end
+		relevant_msg(table.concat(broken,' '))
 	end
 	if string.char(qual:byte(1)) == '@' then
 		arg = string.char(qual:byte(2, qual:len()))
