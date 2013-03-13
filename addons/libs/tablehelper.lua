@@ -63,16 +63,9 @@ end
 -- Applies function fn to all elements of the table and returns the resulting table.
 function table.map(t, fn)
 	local res = T{}
-	if #t == 0 then
-		for key, val in pairs(t) do
-			-- Evaluate fn with the element and store it.
-			res[key] = fn(val)
-		end
-	else
-		for key = 1, #t do
-			-- Evaluate fn with the element and store it.
-			res[key] = fn(t[key])
-		end
+	for key, val in pairs(t) do
+		-- Evaluate fn with the element and store it.
+		res[key] = fn(val)
 	end
 	
 	return res
@@ -81,19 +74,10 @@ end
 -- Returns a table with all elements from t that satisfy the condition fn.
 function table.filter(t, fn)
 	local res = T{}
-	if #t == 0 then
-		for key, val in pairs(t) do
-			-- Only copy if fn(val) evaluates to true
-			if fn(val) then
-				res[key] = val
-			end
-		end
-	else
-		for key = 1, #t do
-			-- Only copy if fn(val) evaluates to true
-			if fn(t[key]) then
-				res[#res+1] = t[key]
-			end
+	for key, val in pairs(t) do
+		-- Only copy if fn(val) evaluates to true
+		if fn(val) then
+			res[key] = val
 		end
 	end
 	
@@ -103,19 +87,10 @@ end
 -- Returns a table with all elements from t whose keys satisfy the condition fn.
 function table.filterkey(t, fn)
 	local res = T{}
-	if #t == 0 then
-		for key, val in pairs(t) do
-			-- Only copy if fn(key) evaluates to true
-			if fn(key) then
-				res[key] = val
-			end
-		end
-	else
-		for key = 1, #t do
-			-- Only copy if fn(key) evaluates to true
-			if fn(key) then
-				res[#res+1] = t[key]
-			end
+	for key, val in pairs(t) do
+		-- Only copy if fn(key) evaluates to true
+		if fn(key) then
+			res[key] = val
 		end
 	end
 	
