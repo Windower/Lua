@@ -1,12 +1,14 @@
 function event_addon_command(...)
-    term = table.concat({...}, ' ')
-	if term == "Send it out" then send_it_out() end;
+    local term = table.concat({...}, ' ')
+	a,b,targeff = string.find(term,'Send it out ([%w]+)')
+	if targeff ~= nil then
+		send_it_out(targeff)
+	end
 end
 
 function event_load()
 	stat_array={}
 	sending=0
-	current_buff=0
 end
 
 function event_incoming_text(original, modified, color)
@@ -16,15 +18,11 @@ function event_incoming_text(original, modified, color)
 		return modified,color
 	end
 	
-	if effect==nil then
-		if current_buff==1 then
-			send_it_out()
-		end
-	else
+	if effect~=nil then
 		if stat_array[effect]==nil then
 			local lines = split(original,'\7')
 			stat_array[effect]={lines[1], color}
-			send_command('wait 4;lua c aoebgone Send it out')
+			send_command('wait .5;lua c aoebgone Send it out '..effect)
 		end
 		current_buff=1
 		local j=stat_array[effect]
@@ -57,31 +55,25 @@ function split(msg, match)
 	return splitarr
 end
 
-function send_it_out()
-	current_buff=0
-	local output=''
-	for n,m in pairs(stat_array) do
-		output = stat_array[n][1]..'\7'
-		for i,v in pairs(stat_array[n]) do
-			write(i)
-			if i > 3 then
-				if i < #stat_array[n]-1 then
-					output = output..', '
-				elseif i == #stat_array[n] then
-					output = output..' and '
-				end
-				output = output..v
-			elseif i==3 then
-				write(output)
-				output = output..v
+function send_it_out(n)
+	output = stat_array[n][1]..'\7'
+	for i,v in pairs(stat_array[n]) do
+		if i > 3 then
+			if i < #stat_array[n]-1 then
+				output = output..', '
+			elseif i == #stat_array[n] then
+				output = output..' and '
 			end
+			output = output..v
+		elseif i==3 then
+			output = output..v
 		end
-		if #stat_array[n]>1 then
-			add_to_chat(stat_array[n][2],output..' gain the effect of '..n..'.')
-		else
-			add_to_chat(stat_array[n][2],output..' gains the effect of '..n..'.')
-		end
-		stat_array[n]=nil
 	end
+	if #stat_array[n]>1 then
+		add_to_chat(stat_array[n][2],output..' gain the effect of '..n..'.')
+	else
+		add_to_chat(stat_array[n][2],output..' gains the effect of '..n..'.')
+	end
+	stat_array[n]=nil
 	sending=1
 end
