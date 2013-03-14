@@ -20,7 +20,11 @@ function event_load()
 					Protect=1800,
 					Shell=1800,
 					Regen=60,
-					Phalanx=180
+					Phalanx=180,
+					Last_Resort=180,
+					Arcane_Circle=240,
+					Berserk=180,
+					Aggressor=180
 				} 
 	-- watchbuffs table can be modified be sure to follow the syntax
 	-- however, because this addon looks for specific things.
@@ -67,7 +71,13 @@ function event_gain_status(id,name)
 		--Check to gain perpetuance and add a timer
 		extend['Perpetuance'] = os.clock()
 	end
-	createTimer(name)
+	l = split(name,' ')
+	if l[2] ~= nil then 
+		write (l[1]..'_'..l[2])
+		createTimer(l[1]..'_'..l[2])
+	else 
+		createTimer(name)
+	end
 end
 
 function event_lose_status(id,name)
@@ -172,6 +182,7 @@ function deleteTimer(mode,effect,target)
 		--It cycles through the created timers table and
 		--if it finds the name of the dropped buff deletes
 		--the table entry as well as removing the timer.
+		write(effect.." "..target)
 		for u = 1, #createdTimers do
 			if createdTimers[u] == effect..' ('..target..')' then
 				send_command('timers d "'..effect..' ('..target..')"')
@@ -189,14 +200,14 @@ function event_incoming_text(old,new,color)
 	--Color 191 for lost buffs. Check against
 	--These colors if it doesn't match just output
 	--the normal message
-	if T{64,56,191}:contains(color) then
+	if T{64,56,191,101}:contains(color) then
 		--This check is to catch casted spells
 		--Stores name of caster, spell cast,
 		--target of the effect and the effect itself
 		a,b,caster,caster_spell,target,target_effect = string.find(old,'(%w+) casts ([%w%s]+)..(%w+) gains the effect of (%w+).')
 		
 		--Check fo buffs wearing off and store name and buff in variables
-		c,d,tWear,eWear = string.find(old,'(%w+)\'s (%w+) effect wears off.')
+		c,d,tWear,eWear = string.find(old,'(%w+)\'s ([%w%s]+) effect wears off.')
 		--Check for gain buffs only (i.e. you have filters on) and store name/buff
 		e,f,tar2,eff2 = string.find(old,'(%w+) gains the effect of (%w+).')
 		if a ~= nil then
@@ -212,7 +223,13 @@ function event_incoming_text(old,new,color)
 		elseif c ~= nil then
 			--if c isn't blank it found the wear off message
 			--so delete the timer
-			deleteTimer(2,eWear,tWear)
+				l = split(eWear,' ')
+				if l[2] ~= nil then 
+					write (l[1]..'_'..l[2]..' '..tWear)
+					deleteTimer(1,l[1]..'_'..l[2],tWear)
+				else
+					deleteTimer(2,eWear,tWear)
+				end
 		elseif e ~= nil then
 			--If e isn't nil you have filters off and 
 			--received a buff cast by another person
@@ -224,4 +241,26 @@ function event_incoming_text(old,new,color)
 		end
 	end
 	return new, color  -- must be here or errors will be thrown
+end
+
+-- Function made by byrth
+function split(msg, match)
+	local length = msg:len()
+	local splitarr = {}
+	local u = 1
+	while u < length do
+		local nextanch = msg:find(match,u)
+		if nextanch ~= nil then
+			splitarr[#splitarr+1] = msg:sub(u,nextanch-match:len())
+			if nextanch~=length then
+				u = nextanch+match:len()
+			else
+				u = length
+			end
+		else
+			splitarr[#splitarr+1] = msg:sub(u,length)
+			u = length
+		end
+	end
+	return splitarr
 end
