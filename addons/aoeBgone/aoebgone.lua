@@ -12,6 +12,10 @@ function event_load()
 end
 
 function event_incoming_text(original, modified, color)
+	local a
+	local b
+	local targetchar
+	local effect
 	a,b,targetchar,effect = string.find(original,'([%w]+) gains the effect of ([%w%s]+).')
 	if sending==1 then 
 		sending=0
@@ -22,17 +26,42 @@ function event_incoming_text(original, modified, color)
 		if stat_array[effect]==nil then
 			local lines = split(original,'\7')
 			stat_array[effect]={lines[1], color}
-			send_command('wait .5;lua c aoebgone Send it out '..effect)
+			send_command('wait 5;lua c aoebgone Send it out '..effect)
+--			write('Lines 1: '..lines[1]..'   Lines 2:'..lines[2])
+--			write('Stat_array 1: '..stat_array[effect][1])
 		end
-		current_buff=1
 		local j=stat_array[effect]
 		j[#j+1]=targetchar
+--		write(effect..'  and line: '..original)
 		
 		modified = ''
 	end
 	
 	return modified, color
 end
+
+function send_it_out(n)
+	output = stat_array[n][1]..'\7'..stat_array[n][3]
+	for i,v in pairs(stat_array[n]) do
+		if i > 3 then
+			if i <= #stat_array[n]-1 then
+				output = output..', '
+			elseif i == #stat_array[n] then
+				output = output..' and '
+			end
+			output = output..v
+		end
+	end
+	write(#stat_array[n])
+	if #stat_array[n]>3 then
+		add_to_chat(stat_array[n][2],output..' gain the effect of '..n..'.')
+	else
+		add_to_chat(stat_array[n][2],output..' gains the effect of '..n..'.')
+	end
+	stat_array[n]=nil
+	sending=1
+end
+
 
 function split(msg, match)
 	local length = msg:len()
@@ -53,27 +82,4 @@ function split(msg, match)
 		end
 	end
 	return splitarr
-end
-
-function send_it_out(n)
-	output = stat_array[n][1]..'\7'
-	for i,v in pairs(stat_array[n]) do
-		if i > 3 then
-			if i < #stat_array[n]-1 then
-				output = output..', '
-			elseif i == #stat_array[n] then
-				output = output..' and '
-			end
-			output = output..v
-		elseif i==3 then
-			output = output..v
-		end
-	end
-	if #stat_array[n]>1 then
-		add_to_chat(stat_array[n][2],output..' gain the effect of '..n..'.')
-	else
-		add_to_chat(stat_array[n][2],output..' gains the effect of '..n..'.')
-	end
-	stat_array[n]=nil
-	sending=1
 end
