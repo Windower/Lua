@@ -73,7 +73,6 @@ function event_gain_status(id,name)
 	end
 	l = split(name,' ')
 	if l[2] ~= nil then 
-		write (l[1]..'_'..l[2])
 		createTimer(l[1]..'_'..l[2])
 	else 
 		createTimer(name)
@@ -182,7 +181,6 @@ function deleteTimer(mode,effect,target)
 		--It cycles through the created timers table and
 		--if it finds the name of the dropped buff deletes
 		--the table entry as well as removing the timer.
-		write(effect.." "..target)
 		for u = 1, #createdTimers do
 			if createdTimers[u] == effect..' ('..target..')' then
 				send_command('timers d "'..effect..' ('..target..')"')
@@ -225,7 +223,6 @@ function event_incoming_text(old,new,color)
 			--so delete the timer
 				l = split(eWear,' ')
 				if l[2] ~= nil then 
-					write (l[1]..'_'..l[2]..' '..tWear)
 					deleteTimer(1,l[1]..'_'..l[2],tWear)
 				else
 					deleteTimer(2,eWear,tWear)
