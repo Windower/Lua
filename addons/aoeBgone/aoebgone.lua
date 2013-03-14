@@ -1,6 +1,6 @@
 function event_addon_command(...)
     local term = table.concat({...}, ' ')
-	a,b,targeff = string.find(term,'Send it out ([%w]+)')
+	a,b,targeff = string.find(term,'Send it out ([%w%s%c]+)5')
 	if targeff ~= nil then
 		send_it_out(targeff)
 	end
@@ -8,7 +8,6 @@ end
 
 function event_load()
 	stat_array={}
-	sending=0
 end
 
 function event_incoming_text(original, modified, color)
@@ -16,22 +15,26 @@ function event_incoming_text(original, modified, color)
 	local b
 	local targetchar
 	local effect
-	a,b,targetchar,effect = string.find(original,'([%w]+) gains the effect of ([%w%s]+).')
-	if sending==1 then 
-		sending=0
-		return modified,color
-	end
+	a,b,targetchar,effect = string.find(original,"([%w]+) gains the effect of ([%w%s%c]+)\46")
 	
 	if effect~=nil then
-		if stat_array[effect]==nil then
-			local lines = split(original,'\7')
-			stat_array[effect]={lines[1], color}
-			send_command('wait 5;lua c aoebgone Send it out '..effect)
+		if stat_array[effect..'send_single'] ~= 1 then
+			if stat_array[effect]==nil then
+				local lines = split(original,'\7')
+				if stat_array[effect]~=nil then
+					write(stat_array[effect])
+				end
+				stat_array[effect]={lines[1], color}
+				send_command('wait 5;lua c aoebgone Send it out '..effect..'5')
+			end
+			local j=stat_array[effect]
+			j[#j+1]=targetchar
+			
+			modified = ''
+		else
+			modified = original
+			stat_array[effect..'send_single'] = nil
 		end
-		local j=stat_array[effect]
-		j[#j+1]=targetchar
-		
-		modified = ''
 	end
 	
 	return modified, color
@@ -49,13 +52,15 @@ function send_it_out(n)
 			output = output..v
 		end
 	end
+	col = stat_array[n][2]
 	if #stat_array[n]>3 then
-		add_to_chat(stat_array[n][2],output..' gain the effect of '..n..'.')
+		stat_array[n]=nil
+		add_to_chat(col,output..' gain the effect of '..n..'.')
 	else
-		add_to_chat(stat_array[n][2],output..' gains the effect of '..n..'.')
+		stat_array[n]=nil
+		stat_array[n..'send_single']=1
+		add_to_chat(col,output..' gains the effect of '..n..'.')
 	end
-	stat_array[n]=nil
-	sending=1
 end
 
 
@@ -78,4 +83,8 @@ function split(msg, match)
 		end
 	end
 	return splitarr
+end
+
+function sanitize(msg, match)
+	
 end
