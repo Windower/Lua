@@ -27,12 +27,9 @@ function event_incoming_text(original, modified, color)
 			local lines = split(original,'\7')
 			stat_array[effect]={lines[1], color}
 			send_command('wait 5;lua c aoebgone Send it out '..effect)
---			write('Lines 1: '..lines[1]..'   Lines 2:'..lines[2])
---			write('Stat_array 1: '..stat_array[effect][1])
 		end
 		local j=stat_array[effect]
 		j[#j+1]=targetchar
---		write(effect..'  and line: '..original)
 		
 		modified = ''
 	end
@@ -52,7 +49,6 @@ function send_it_out(n)
 			output = output..v
 		end
 	end
-	write(#stat_array[n])
 	if #stat_array[n]>3 then
 		add_to_chat(stat_array[n][2],output..' gain the effect of '..n..'.')
 	else
