@@ -142,6 +142,8 @@ function event_incoming_text(old,new,color)
 	if a ~= nil then
 		if caster:lower() == player['name']:lower() then
 			createTimer(target_effect,target)
+		elseif target:lower() == player['name']:lower() then
+			createTimer(target_effect,target)
 		end
 	elseif c ~= nil then
 		deleteTimer(2,eWear,tWear)
