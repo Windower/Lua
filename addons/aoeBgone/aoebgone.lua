@@ -8,6 +8,7 @@ end
 
 function event_load()
 	stat_array={}
+	slow_spells={Protect=1,Shell=1}
 end
 
 function event_incoming_text(original, modified, color)
@@ -25,7 +26,13 @@ function event_incoming_text(original, modified, color)
 					write(stat_array[effect])
 				end
 				stat_array[effect]={lines[1], color}
-				send_command('wait 5;lua c aoebgone Send it out '..effect..'5')
+				local delay = 0
+				if slow_spells[effect]~=nil then
+					delay = 5
+				else
+					delay = 2
+				end
+				send_command('wait '..delay..';lua c aoebgone Send it out '..effect..'5')
 			end
 			local j=stat_array[effect]
 			j[#j+1]=targetchar
@@ -83,8 +90,4 @@ function split(msg, match)
 		end
 	end
 	return splitarr
-end
-
-function sanitize(msg, match)
-	
 end
