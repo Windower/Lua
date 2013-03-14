@@ -4,15 +4,13 @@ Lua supports two different kinds of tables, numerically indexed tables, and stri
 
 require 'mathhelper'
 
-_table_meta = {__index=table}
-
 -- Constructor for T-tables.
 -- t = T{...} for explicit declaration.
 -- t = T(regular_table) to cast to a T-table.
 function T(t)
 	-- Sets the metatable of T to _table_meta, which specifies the table namespace for all T-tables.
 	-- This makes every function that tables have also available for T-tables.
-	return setmetatable(t, _table_meta)
+	return setmetatable(t, {__index=table})
 end
 
 -- Returns true if searchval is in t.
@@ -26,9 +24,15 @@ function table.contains(t, searchval)
 	return false
 end
 
--- Appends to the end of an array table.
+-- Appends an element to the end of an array table.
 function table.append(t, val)
 	t[#t+1] = val
+	return t
+end
+
+-- Appends an array table to the end of another array table.
+function table.extend(t, t_ext)
+	t_ext:map(function (x) t:append(x) end)
 	return t
 end
 
@@ -64,6 +68,17 @@ end
 function table.map(t, fn)
 	local res = T{}
 	for key, val in pairs(t) do
+		-- Evaluate fn with the element and store it.
+		res[key] = fn(val)
+	end
+	
+	return res
+end
+
+-- Analogon to table.map, but for array-tables. Possibility to include nil values.
+function table.arrmap(t, fn)
+	local res = T{}
+	for key, val in ipairs(t) do
 		-- Evaluate fn with the element and store it.
 		res[key] = fn(val)
 	end
@@ -129,6 +144,7 @@ function table.any(t, fn)
 			return true
 		end
 	end
+	
 	return false
 end
 
@@ -139,6 +155,7 @@ function table.all(t, fn)
 			return false
 		end
 	end
+	
 	return true
 end
 
