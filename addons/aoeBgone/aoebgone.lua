@@ -4,11 +4,34 @@ function event_addon_command(...)
 	if targeff ~= nil then
 		send_it_out(targeff)
 	end
+     
+    if term:lower() == 'commamode' then
+        commamode = not commamode
+    end
+     
+    if term:lower() == 'oxford' then
+        oxford = not oxford
+    end
+	
+	if term:lower() == 'help' then
+		write('AoEBgone has 3 possible commands')
+		write('     1. Help --- shows this menu')
+		write('The following are defaulted off:')
+		write('     2. oxford --- Toggle use of oxford comma')
+		write('     3. commamode --- Toggle comma-only mode.')
+	end
 end
 
 function event_load()
 	stat_array={}
 	slow_spells={Protect=1,Shell=1}
+    commamode= false
+    oxford = false
+    send_command('alias aoe lua c aoebgone')
+end
+
+function event_unload()
+	send_command('unalias aoe')
 end
 
 function event_incoming_text(original, modified, color)
@@ -17,7 +40,7 @@ function event_incoming_text(original, modified, color)
 	local targetchar
 	local effect
 	a,b,targetchar,effect = string.find(original,"([%w]+) gains the effect of ([%w%s%c]+)\46")
-	c,d,tar2,eff2 = string.find(original,"([%w]+) receives the effect of ([%w]+).* Roll.\46")
+	c,d,tar2,galo,eff2 = string.find(original,"([%w]+) (%w+)s the effect of ([%w]+).* Roll.\46")
 	if effect~=nil then
 		if stat_array[effect..'send_single'] ~= 1 then
 			if stat_array[effect]==nil then
@@ -45,6 +68,7 @@ function event_incoming_text(original, modified, color)
 	elseif eff2~=nil then
 		g,h,app,total = string.find(original,"The total for %w+(.*) Roll increases to ([%d]+).\46")
 		roll = 1
+		gl = galo
 		if total ~= nil then
 			du = total
 			ap = app
@@ -88,7 +112,16 @@ function send_it_out(n)
 			if i <= #stat_array[n]-1 then
 				output = output..', '
 			elseif i == #stat_array[n] then
-				output = output..' and '
+				 if commamode then
+                    output = output..', '
+                else
+                    if oxford then
+                        if #stat_array[n] >4 then
+                            output = output..','
+                        end
+                    end
+                    output = output..' and '
+                end			
 			end
 			output = output..v
 		end
@@ -98,17 +131,17 @@ function send_it_out(n)
 		if #stat_array[n]>3 then
 			stat_array[n]=nil
 			if total ~= nil then
-				add_to_chat(col,output..' receive the effect of '..n.."'s Roll.")
+				add_to_chat(col,output..' '..gl..' the effect of '..n.."'s Roll.")
 			else
-				add_to_chat(col,output..' receive the effect of '..n.."'s Roll.")
+				add_to_chat(col,output..' '..gl..' the effect of '..n.."'s Roll.")
 			end
 		else
 			stat_array[n]=nil
 			stat_array[n..'send_single']=1
 			if total ~= nil then
-				add_to_chat(col,output..' receives the effect of '..n.."'s Roll.")
+				add_to_chat(col,output..' '..gl..'s the effect of '..n.."'s Roll.")
 			else
-				add_to_chat(col,output..' receives the effect of '..n.."'s Roll.")
+				add_to_chat(col,output..' '..gl..'s the effect of '..n.."'s Roll.")
 			end	
 		end
 		du = nil
