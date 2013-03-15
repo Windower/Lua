@@ -46,6 +46,8 @@ function event_load()
 	extend = T{}
 	first = 0
 	t = 0
+	altbuffs = false
+	send_command('alias btimers lua c btimers')
 end
 
 function event_unload()
@@ -57,13 +59,21 @@ function event_unload()
 	end
 end
 
-function event_addon_command(arg1,arg2,arg3)
+function event_addon_command(...)
+    local term = table.concat({...}, ' ')
+	broken = split(term, ' ')
 	--This is a very important fix added
 	--because if you already had a buff and recast it
 	--it would just delete and create so fast
 	--that sometimes it didn't show back up
-	if arg1 == 'newtimer' then
-		createTimer(arg2,arg3)
+	if broken ~= nil then
+		if broken[1]:lower() == 'newtimer' then
+			createTimer(broken[2],broken[3])
+		end
+		
+		if broken[1]:lower() == 'showalt' then
+			altbuffs = not altbuffs
+		end
 	end
 end
 
@@ -82,7 +92,25 @@ function event_gain_status(id,name)
 end
 
 function event_lose_status(id,name)
-	deleteTimer(1,name)
+	if watchbuffs['name'] ~= nil then
+		deleteTimer(1,name)
+		send_ipc_message(name..' '..player['name']..' delete')
+	end
+end
+
+function event_ipc_message(msg)
+	if altbuffs then
+		broken2 = split(msg, ' ')
+		if broken2 ~= nil then
+			if broken2[3] == nil then
+				if broken2[2] ~= player['name'] then
+					createTimer(broken2[1],broken2[2])
+				end
+			else
+				deleteTimer(2,broken2[1],broken2[2])
+			end
+		end
+	end
 end
 
 function createTimer(name,target)
@@ -166,6 +194,11 @@ function createTimer(name,target)
 		--Calls ihm's custom timer create command
 		--e.g. timers c "Protect (Self)" 1800 down Protect <- last protect 
 		--is what helps the timer distinguish what icon to use.
+		if target == 'Self' then
+			send_ipc_message(name..' '..player['name'])
+		else
+			send_ipc_message(name..' '..target)
+		end
 		send_command('timers c "'..name..' ('..target..')" '..timer..' down '..name)
 		createdTimers[#createdTimers+1] = name..' ('..target..')'
 	end
