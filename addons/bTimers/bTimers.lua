@@ -44,6 +44,7 @@ function event_load()
 	--the First name of a buff, no spaces, and this does not have
 	--gain, barspell, or boost-buffs. I apologize for this.
 	extend = T{}
+	first = 0
 	t = 0
 end
 
@@ -71,6 +72,7 @@ function event_gain_status(id,name)
 		--Check to gain perpetuance and add a timer
 		extend['Perpetuance'] = os.clock()
 	end
+	first = 1
 	l = split(name,' ')
 	if l[2] ~= nil then 
 		createTimer(l[1]..'_'..l[2])
@@ -121,10 +123,13 @@ function createTimer(name,target)
 				e = os.clock()-60
 				if extend['Perpetuance'] ~= nil then
 					if e < extend['Perpetuance'] then
-						if target == 'self' then
-							t = t + 1 
+						if target == 'Self' then
+							
+							if first == 1 then t = 1 else
+							t = t + 1 end
 							if math.even(t) then
 								extend['Perpetuance'] = nil
+								first = 0
 								t = 0
 							end
 						else
