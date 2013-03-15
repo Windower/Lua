@@ -67,8 +67,14 @@ function event_incoming_text(original, modified, color)
 		end
 	elseif eff2~=nil then
 		g,h,app,total = string.find(original,"The total for %w+(.*) Roll increases to ([%d]+).\46")
+		write(original) 
+		n,z,bust = string.find(original,'%w+ uses Double.Up.\46Bust!')
 		roll = 1
 		gl = galo
+		if n ~= nil then
+			busted = 1
+			write('bust')
+		end
 		if total ~= nil then
 			du = total
 			ap = app
@@ -102,8 +108,11 @@ function event_incoming_text(original, modified, color)
 end
 
 function send_it_out(n)
+	write(busted or ' not bust')
 	if du ~= nil then
 		output = stat_array[n][1]..'\7The total for '..n..ap..' Roll increases to '..du..'!\7'..stat_array[n][3]
+	elseif busted ~= nil then
+		output = stat_array[n][1]..' Busted!!\7'..stat_array[n][3]
 	else
 		output = stat_array[n][1]..'\7'..stat_array[n][3]
 	end
@@ -145,6 +154,8 @@ function send_it_out(n)
 			end	
 		end
 		du = nil
+		roll=nil
+		ap = nil
 	else
 		if #stat_array[n]>3 then
 		stat_array[n]=nil
