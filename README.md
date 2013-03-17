@@ -10,7 +10,7 @@ We require that all submissions to the Windower/Lua repository be licensed under
 
 ===
 
-Copyright (c) <year>, <your name>
+Copyright (c) &lt;year&gt;, &lt;your name&gt;
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

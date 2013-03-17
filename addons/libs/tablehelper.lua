@@ -1,5 +1,9 @@
 --[[
-Lua supports two different kinds of tables, numerically indexed tables, and string-indexed tables. String-indexed tables will return 0 as their length with the # operator, regardless of their actual element count. They can be iterated over with the pairs(t) function. Numerically indexed tables can be iterated over with ipairs(t) function. Since they use different functions for iteration, a check if #t == 0 will often be found, and serves to distinguish between the different kinds of tables.
+A few table helper functions, in addition to a new T-table interface, which enables method indexing on tables.
+
+To define a T-table with explicit values use T{...}, to convert an existing table t, use T(t). To access table methods of a T-table t, use t:methodname(args).
+
+Some functions, such as table.map(t, fn), are optimized for arrays. These functions have the same name as the regular functions, but preceded with an "arr", such as table.arrmap(t, fn). These are only needed, if explicit nil handling between keys is required, that is, if nil is an actual value in the table. This case is very rare, and should not normally be needed. Argument lists are an example of their application.
 ]]
 
 require 'mathhelper'
@@ -8,7 +12,7 @@ require 'mathhelper'
 -- t = T{...} for explicit declaration.
 -- t = T(regular_table) to cast to a T-table.
 function T(t)
-	-- Sets the metatable of T to _table_meta, which specifies the table namespace for all T-tables.
+	-- Sets T's metatable's index to the table namespace, which will take effect for all T-tables.
 	-- This makes every function that tables have also available for T-tables.
 	return setmetatable(t, {__index=table})
 end
@@ -78,9 +82,9 @@ end
 -- Analogon to table.map, but for array-tables. Possibility to include nil values.
 function table.arrmap(t, fn)
 	local res = T{}
-	for key, val in ipairs(t) do
+	for key = 1, #t do
 		-- Evaluate fn with the element and store it.
-		res[key] = fn(val)
+		res[key] = fn(t[key])
 	end
 	
 	return res

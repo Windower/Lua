@@ -5,11 +5,21 @@ This library provides a set of functions to aid in debugging.
 require 'tablehelper'
 require 'stringhelper'
 
+function arrstring(...)
+	return T{...}:arrmap(tostring):sconcat()
+end
+
 -- Prints the arguments provided to the FFXI chatlog, in the same color used for Campaign/Bastion alerts and Kupower messages. Can be changed below.
 -- Converts any kind of object type to a string, so it's type-safe.
 -- Concatenates all provided arguments with whitespaces.
 function log(...)
-	add_to_chat(160, T{...}:arrmap(tostring):sconcat())
+	add_to_chat(160, arrstring(...))
+end
+
+function flog(...)
+	local f = io.open(lua_base_path..'lua.log', 'a')
+	f:write(os.date('%Y-%m-%d %H:%M:%S')..'| '..arrstring(...).."\n")
+	f:close()
 end
 
 -- Returns a string representation of a table in explicit Lua syntax: {...}
@@ -56,7 +66,7 @@ function table.tovstring(t, indentlevel)
 	local tstr = ''
 	
 	local indent = (' '):rep(indentlevel*4)
-	tstr = tstr..indent..'{'.."\n"
+	tstr = tstr..'{'.."\n"
 	for key, val in pairs(t) do
 		-- Check for nested tables
 		if type(val) == 'table' then
