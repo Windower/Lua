@@ -76,7 +76,7 @@ function update_cells()
 		local needed_cells = table.concat(salvage_cell_name, '  \n  ')
 		local textbox_cells = string.gsub(needed_cells, '(1  \n  )'or'%d', '')
 		tb_set_text('salvage_box',' Still Need:  \n  '..textbox_cells)
-		io.open(lua_base_path..'../../plugins/ll/salvage.txt',"w"):write('if item is '..pass..' then pass'):close()
+		io.open(lua_base_path..'../../plugins/ll/salvage-'..player..'.txt',"w"):write('if item is '..pass..' then pass'):close()
 	else 
 		tb_set_text('salvage_box', '  Obtained all the cells.  ')
 	end
