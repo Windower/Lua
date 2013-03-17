@@ -31,7 +31,7 @@ function event_load()
 end
 function event_unload()
 	tb_delete('salvage_box')
-	io.open("/Program Files (x86)/Windower4/plugins/ll/salvage.txt","w"):write(''):close()
+	io.open(lua_base_path..'../../plugins/ll/salvage-'..player..'.txt',"w"):write(''):close()
 end
 
 function event_incoming_text(old, new, color)
