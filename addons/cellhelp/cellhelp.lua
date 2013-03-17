@@ -39,13 +39,13 @@ function event_incoming_text(old, new, color)
 	match_drop = old:match ('You find an? ..(.*)..%.')
 	
 	celltest = old:find(player..' obtains an? ')
-	droptest = old:find('You find an? (.*) cell')
+	droptest = old:find('You find an? ..(.*)..%.')
 	
 	if celltest == nil and droptest == nil then 
 		return new,color
 	end	
 	if celltest ~= nil then
-		for i=1, 20 do
+		for i=1, #salvage_cell_name do
 			if match_obt == salvage_cell_name[i] then 
 				a = a+1
 				obtained_cells[#obtained_cells+1] = cells_id[i]
