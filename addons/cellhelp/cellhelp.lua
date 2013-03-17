@@ -38,8 +38,8 @@ function event_incoming_text(old, new, color)
 	match_obt =  old:match(player..' obtains an? ..(.*)..%.')
 	match_drop = old:match ('You find an? ..(.*)..%.')
 	
-	celltest = old:find(player..' obtains (an?) ')
-	droptest = old:find('You find (an?) (.*) cell')
+	celltest = old:find(player..' obtains an? ')
+	droptest = old:find('You find an? (.*) cell')
 	
 	if celltest == nil and droptest == nil then 
 		return new,color
