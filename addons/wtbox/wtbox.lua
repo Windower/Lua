@@ -1,3 +1,4 @@
+--Weakness Tracker v1.0
 function event_load()
 	scrolled = 0
 	currline = 0
@@ -70,10 +71,6 @@ function event_addon_command(...)
 		end
 	end
 end
-	
-function event_unload()
-	add_to_chat(55,'WTBox closing and saving settings')
-end
 
 function wtbox_create()
 	for line in io.lines(lua_base_path..'settings.xml') do
@@ -102,6 +99,7 @@ function wtbox_refresh()
 end
 
 function wtbox_delete()
+	add_to_chat(55,'WTBox closing and saving settings')
 	local f = io.open(lua_base_path..'tmp.txt',"w")
 	f:write("<?xml version=\"1.0\"?>\n")
 	f:write("<!--File Created by wtbox.lua-->\n\n")
