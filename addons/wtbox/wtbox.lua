@@ -1,5 +1,5 @@
 --[[
-wtbox v1.07
+wtbox v1.08
 Copyright (c) 2012, Ricky Gall All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -48,10 +48,9 @@ function event_login()
 end
 
 function event_addon_command(...)
-    local args = table.concat({...}, ' ')
-	local broken = split(args,' ')
-	if broken[1] ~= nil then
-		comm = broken[1]
+    local args = {...}
+	if args[1] ~= nil then
+		comm = args[1]
 		if comm:lower() == 'help' then
 			add_to_chat(55,'WeaknessTrackerBox loaded! You have access to the following commands:')
 			add_to_chat(55,' 1. wtbox bgcolor <alpha> <red> <green> <blue> --Sets the color of the box.')
@@ -65,22 +64,22 @@ function event_addon_command(...)
 		elseif comm:lower() == 'unload' then
 			wtbox_delete()
 		elseif comm:lower() == 'bgcolor' then
-			tb_set_bg_color('wtcbox',broken[2],broken[3],broken[4],broken[5])
-			settings['bgalpha'] = broken[2]
-			settings['bgred'] = broken[3]
-			settings['bggreen'] = broken[4]
-			settings['bgblue'] = broken[5]
+			tb_set_bg_color('wtcbox',args[2],args[3],args[4],args[5])
+			settings['bgalpha'] = args[2]
+			settings['bgred'] = args[3]
+			settings['bggreen'] = args[4]
+			settings['bgblue'] = args[5]
 		elseif comm:lower() == 'pos' then
-			tb_set_location('wtcbox',broken[2],broken[3])
-			settings['posx'] = broken[2]
-			settings['posy'] = broken[3]
+			tb_set_location('wtcbox',args[2],args[3])
+			settings['posx'] = args[2]
+			settings['posy'] = args[3]
 		elseif comm:lower() == 'text' then
-			tb_set_font('wtcbox','Arial',broken[2])
-			tb_set_color('wtcbox',255,broken[3],broken[4],broken[5])
-			settings['textsize'] = broken[2]
-			settings['textred'] = broken[3]
-			settings['textgreen'] = broken[4]
-			settings['textblue'] = broken[5]
+			tb_set_font('wtcbox','Arial',args[2])
+			tb_set_color('wtcbox',255,args[3],args[4],args[5])
+			settings['textsize'] = args[2]
+			settings['textred'] = args[3]
+			settings['textgreen'] = args[4]
+			settings['textblue'] = args[5]
 		elseif comm:lower() == 'reset' then
 			tb_delete('wtcbox')
 			wtbox_create()
