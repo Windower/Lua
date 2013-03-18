@@ -1,5 +1,5 @@
 --[[
-ffocolor v1.0
+ffocolor v1.01
 Copyright (c) 2012, Ricky Gall All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -30,10 +30,9 @@ function event_unload()
 end
 
 function event_addon_command(...)
-    local args = table.concat({...}, ' ')
-	local broken = split(args,' ')
-	if broken[1] ~= nil then
-		comm = broken[1]
+    local args = {...}
+	if args[1] ~= nil then
+		comm = args[1]
 		if comm:lower() == 'help' then
 			add_to_chat(55,'FFOcolor loaded! You have access to the following commands:')
 			add_to_chat(55,' 1. ffocolor hlcolor <color#> --Changes the highlight color')
@@ -45,16 +44,16 @@ function event_addon_command(...)
 			add_to_chat(55,' 7. ffocolor unload --Save settings and close ffocolor.')
 			add_to_chat(55,' 8. ffocolor help --Shows this menu.')
 		elseif comm:lower() == 'talkedc' then
-			settings['talkedc'] = broken[2]
+			settings['talkedc'] = args[2]
 		elseif comm:lower() == 'chattab' then
-			settings['chatTab'] = broken[2]
+			settings['chatTab'] = args[2]
 		elseif comm:lower() == 'hlcolor' then
-			settings['hlcolor'] = broken[2]
+			settings['hlcolor'] = args[2]
 		elseif comm:lower() == 'highlight' then
-			settings['highlight'] = broken[2]
+			settings['highlight'] = args[2]
 		elseif comm:lower() == 'watchname' then
-			names[#names+1] = broken[2]
-			settings['namestowatch'] = settings['namestowatch']..','..broken[2]
+			names[#names+1] = args[2]
+			settings['namestowatch'] = settings['namestowatch']..','..args[2]
 		elseif comm:lower() == 'getcolors' then
 			getcolors()
 		elseif comm:lower() == 'unload' then
@@ -67,12 +66,11 @@ end
 
 function event_incoming_text(old,new,color)
 	if old ~= former then
-		tcol = string.char(31,settings['talkedc'])
-		hcol = string.char(31,settings['hlcolor'])
-		ccol = string.char(31,color)
 		local a,b,txt = string.find(old,'%[%d+:#%w+%](.*):')
-		write(txt or 'txt failed')
 		if b~= nil then
+			tcol = string.char(31,settings['talkedc'])
+			hcol = string.char(31,settings['hlcolor'])
+			ccol = string.char(31,color)
 			for i = 1, #chatTabs do
 				if settings['chatTab']:lower() == chatTabs[i]:lower() then
 					color = tabColor[i]
@@ -88,8 +86,6 @@ function event_incoming_text(old,new,color)
 				playertest = string.find(txt:lower(),'('..names[y]:lower()..')')
 				if playertest ~= nil then break end
 			end
-			write(playertest or 'player test failed')
-			write(nametest or 'name test failed')
 			if nametest ~= nil then
 				if playertest ~= nil then
 					for u = 1, #fulltext do
@@ -142,7 +138,6 @@ function dosettings(arg1)
 			local g,h,key,value = string.find(line,'<(%w+)>([%w%d%p]+)</%1>')
 			if value ~= nil then
 				settings[key] = value
-				write(key..'='..value)
 			end
 		end
 		names = split(settings['namestowatch'],',')
@@ -150,7 +145,6 @@ function dosettings(arg1)
 		local f = io.open(settingsPath..'tmp.txt',"w")
 		f:write("<?xml version=\"1.0\"?>\n")
 		f:write("<!--File Created by FFOColor.lua v1.0-->\n\n")
-		f:write("\tThe numbers you get from that script are what you put in the color tags below\n-->")
 		f:write("\t<settings>\n")
 		f:write("\t\t<chatTab>"..settings['chatTab'].."</chatTab> --Chat tab for ffochat to show up in\n")
 		f:write("\t\t<hlcolor>"..settings['hlcolor'].."</hlcolor> --Color to recolor ffochat text\n")

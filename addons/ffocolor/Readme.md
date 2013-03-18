@@ -1,5 +1,5 @@
 Author: Ricky Gall
-Version: 1.0
+Version: 1.01
 
 Addon to make ffochat show up in one of the 5 in-game chat tabs (say/shout/linkshell/party/tell), while also allowing you to show the text in a certain color to easily distinguish it from the chat that normally shows up in that tab.
 
