@@ -27,6 +27,7 @@ function event_load()
 	tb_set_bg_visibility('salvage_box',1)
 	tb_set_font('salvage_box','Arial',12)
 	tb_set_text('salvage_box',' Still Need:  \n  '..start_cells);
+	io.open(lua_base_path..'../../plugins/ll/salvage-'..player..'.txt',"w"):write(''):close()
 
 end
 function event_unload()
