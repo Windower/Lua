@@ -1,3 +1,26 @@
+function event_load()
+	stat_array={}
+	slow_spells={Protect=4,Shell=4,Regen=4}
+	slow_spells['Blaze Spikes'] = 4
+	slow_spells['Ice Spikes'] = 4
+	slow_spells['Shock Spikes'] = 4
+	slow_spells['Klimaform'] = 4
+    commamode= false
+    oxford = true
+	targetnumber = true
+	colorful = true
+	cancelmulti = true
+	prevline = ''
+	color_arr={p0=2,p1=3,p2=4,p3=6,p4=11,p5=170,
+	a10=6,a11=7,a12=30,a13=206,a14=207,a15=224,
+	a20=9,a21=8,a22=28,a23=38,a24=39,a25=185}
+    send_command('alias aoe lua c aoebgone')
+end
+
+function event_unload()
+	send_command('unalias aoe')
+end
+
 function event_addon_command(...)
     local term = table.concat({...}, ' ')
 	a,b,targeff,gn = string.find(term,'Send it out ([%w%s\39]+)5(%w+)6')
@@ -44,33 +67,11 @@ function event_addon_command(...)
 	end
 end
 
-function event_load()
-	stat_array={}
-	slow_spells={Protect=1,Shell=1}
-    commamode= false
-    oxford = false
-	targetnumber = true
-	colorful = false
-	cancelmulti = true
-	prevline = ''
-	color_arr={p0=2,p1=3,p2=4,p3=6,p4=11,p5=170,
-	a10=6,a11=7,a12=30,a13=206,a14=207,a15=224,
-	a20=9,a21=8,a22=28,a23=38,a24=39,a25=185}
-    send_command('alias aoe lua c aoebgone')
-end
-
-function event_unload()
-	send_command('unalias aoe')
-end
-
 function event_incoming_text(original, modified, color)
 	if cancelmulti then
-		local tempcol = color%255
-		if tempcol>17 then
-			if tempcol~=121 then
-				if original == prevline then
-					modified = ''
-				end
+		if color%255>17 then
+			if original == prevline then
+				modified = ''
 			end
 		end
 		prevline = original
@@ -102,9 +103,9 @@ function event_incoming_text(original, modified, color)
 				stat_array[effect..' pol'] = polarity
 				local delay = 0
 				if slow_spells[effect]~=nil then
-					delay = 5
+					delay = slow_spells[effect]
 				else
-					delay = 1
+					delay = 1.2
 				end
 				send_command('wait '..delay..';lua c aoebgone Send it out '..effect..'5'..gn..'6')
 			end
@@ -141,7 +142,7 @@ function send_it_out(n,modus)
 	end
 	
 	output = output..stat_array[n][3]
-	col = string.char(0x1F,stat_array[n][2])
+	col = string.char(0x1F,stat_array[n][2]%255)
 	colnm = stat_array[n][2]
 	for i,v in pairs(stat_array[n]) do
 		if i > 3 then
