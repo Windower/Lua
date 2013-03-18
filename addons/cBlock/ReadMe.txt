@@ -1,4 +1,4 @@
-CBlock v 1.05
+CBlock v 1.0
 The entire purpose of this addon is to allow you to ignore people in ffochat.
 
 The following commands are available:

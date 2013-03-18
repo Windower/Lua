@@ -1,5 +1,5 @@
 --[[
-cBlock v1.05
+cBlock v1.07
 Copyright (c) 2012, Ricky Gall All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -17,7 +17,7 @@ function event_addon_command(...)
 	c,d,delete = string.find(term,'delete (.*)')
 	if block ~= nil then
 		ignore[#ignore+1] = block:lower()
-		local f = io.open(lua_base_path..'blacklist.txt','a')
+		local f = io.open(settingsFile,'a')
 		f:write(block.."\n")
 		add_to_chat(55,"No longer seeing "..block.." speak in FFOchat.")
 		local q,r = io.close(f)
@@ -29,19 +29,19 @@ function event_addon_command(...)
 			end
 		end
 		add_to_chat(55,"Seeing "..delete.." speak in FFOchat again.")
-		local tmp = io.open(lua_base_path..'tmp.txt',"w")
-		for line in io.lines(lua_base_path..'blacklist.txt') do
+		local tmp = io.open(settingsPath..'tmp.txt',"w")
+		for line in io.lines(settingsFile) do
 			if line ~= delete then
 				tmp:write(line..'\n')
 			end
 		end
 		local q,w = io.close(tmp)
 		if not q then write(w) end
-		local r,es = os.rename(lua_base_path..'blacklist.txt',lua_base_path..'tmp2.txt')
+		local r,es = os.rename(settingsFile,settingsPath..'tmp2.txt')
 		if not r then write(es) end
-		local e,rs = os.rename(lua_base_path..'tmp.txt',lua_base_path..'blacklist.txt')
+		local e,rs = os.rename(settingsPath..'tmp.txt',settingsFile)
 		if not e then write(rs) end
-		local r,es = os.remove(lua_base_path..'tmp2.txt')
+		local r,es = os.remove(settingsPath..'tmp2.txt')
 		if not r then write(es) end
 	end
 end
@@ -60,8 +60,10 @@ end
 function event_load()
 	send_command('alias cBlock lua c cBlock')
 	ignore = {}
-	if not file_exists(lua_base_path..'blacklist.txt') then 
-		local f,err = assert(io.open(lua_base_path.."blacklist.txt","w"))
+	settingsPath = lua_base_path..'data/'
+	settingsFile = settingsPath..'blacklist.txt'
+	if not file_exists(settingsFile) then 
+		local f,err = assert(io.open(settingsPath.."blacklist.txt","w"))
 		io.close(f)
 	else
 		fill_ignore()
@@ -74,7 +76,7 @@ end
 
 function fill_ignore()
 	i = 1
-	for line in io.lines(lua_base_path..'blacklist.txt') do
+	for line in io.lines(settingsFile) do
 		ignore[i] = line
 		i = i + 1
 	end

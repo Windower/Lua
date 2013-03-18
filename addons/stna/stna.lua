@@ -1,5 +1,5 @@
 --[[
-STNA v1.05
+STNA v1.07
 Copyright (c) 2012, Ricky Gall All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -34,6 +34,10 @@ function event_load()
 				'Blindness','Poison','Diseased'
 			}
 	statusTable = T{}
+end
+
+function event_login()
+	player = get_player()
 end
 
 function event_unload()
