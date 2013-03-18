@@ -1,5 +1,5 @@
 --[[
-wtbox v1.05
+wtbox v1.07
 Copyright (c) 2012, Ricky Gall All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -17,8 +17,10 @@ function event_load()
 	wtchats = {'WTBox'}
 	settings = {}
 	player = get_player()
-	if not file_exists(lua_base_path.."settings.xml") then
-		local f = io.open(lua_base_path.."settings.xml","w")
+	settingsPath = lua_base_path..'data/'
+	settingsFile = settingsPath..'settings.xml'
+	if not file_exists(settingsFile) then
+		local f = io.open(settingsFile,"w")
 		f:write("<?xml version=\"1.0\"?>\n")
 		f:write("<!--File Created by wtbox.lua-->\n\n")
 		f:write("\t<settings>\n")
@@ -39,6 +41,10 @@ function event_load()
 	send_command('alias wtbox lua c wtbox')
 	send_command('wtbox help')
 	send_command('wait 3;wtbox create')
+end
+
+function event_login()
+	player = get_player()
 end
 
 function event_addon_command(...)
@@ -85,7 +91,7 @@ function event_addon_command(...)
 end
 
 function wtbox_create()
-	for line in io.lines(lua_base_path..'settings.xml') do
+	for line in io.lines(settingsFile) do
 		local g,h,key,value = string.find(line,'<(%w+)>(%d+)</%1>')
 		if value ~= nil then
 			settings[key] = value
@@ -112,7 +118,7 @@ end
 
 function wtbox_delete()
 	add_to_chat(55,'WTBox closing and saving settings')
-	local f = io.open(lua_base_path..'tmp.txt',"w")
+	local f = io.open(settingsPath..'tmp.txt',"w")
 	f:write("<?xml version=\"1.0\"?>\n")
 	f:write("<!--File Created by wtbox.lua-->\n\n")
 	f:write("\t<settings>\n")
@@ -129,11 +135,11 @@ function wtbox_delete()
 	f:write("\t\t<chatlines>"..settings['chatlines'].."</chatlines>\n")
 	f:write("\t</settings>")
 	io.close(f)
-	local r,es = os.rename(lua_base_path..'settings.xml',lua_base_path..'tmp2.txt')
+	local r,es = os.rename(settingsFile,settingsPath..'tmp2.txt')
 	if not r then write(es) end
-	local e,rs = os.rename(lua_base_path..'tmp.txt',lua_base_path..'settings.xml')
+	local e,rs = os.rename(settingsPath..'tmp.txt',settingsFile)
 	if not e then write(rs) end
-	local r,es = os.remove(lua_base_path..'tmp2.txt')
+	local r,es = os.remove(settingsPath..'tmp2.txt')
 	if not r then write(es) end
 	tb_delete('wtcbox')
 	send_command('unalias wtbox')

@@ -1,5 +1,5 @@
 --[[
-bTimers v1.05
+bTimers v1.07
 Copyright (c) 2012, Ricky Gall All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -50,6 +50,10 @@ function event_load()
 	t = 0
 	altbuffs = false
 	send_command('alias btimers lua c btimers')
+end
+
+function event_login()
+	player = get_player()  
 end
 
 function event_unload()
