@@ -19,6 +19,10 @@ function event_login()
 	startAddon()
 end
 
+function event_logout()
+	dosettings('save')
+end
+
 function event_unload()
 	dosettings('save')
 	add_to_chat(55,"FFOColor unloading and saving settings.")
