@@ -226,6 +226,13 @@ function deleteTimer(mode,effect,target)
 		--It cycles through the created timers table and
 		--if it finds the name of the dropped buff deletes
 		--the table entry as well as removing the timer.
+		if target == nil then
+			target = 'Self'
+		elseif target:lower() == player['name']:lower() then
+			target = 'Self'
+		else
+			target = target
+		end
 		for u = 1, #createdTimers do
 			if createdTimers[u] == effect..' ('..target..')' then
 				send_command('timers d "'..effect..' ('..target..')"')
