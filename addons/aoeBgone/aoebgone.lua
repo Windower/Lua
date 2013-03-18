@@ -59,10 +59,10 @@ function event_addon_command(...)
 		write('AoEBgone has 3 possible commands')
 		write(' 1. Help --- shows this menu')
 		write('The following are defaulted off:')
-		write(' 2. oxford --- Toggle use of oxford comma, Default = False')
+		write(' 2. oxford --- Toggle use of oxford comma, Default = True')
 		write(' 3. commamode --- Toggle comma-only mode, Default = False')
 		write(' 4. targetnumber --- Toggle target number display, Default = True')
-		write(' 5. colorful --- Colors the output by alliance member, Default = False')
+		write(' 5. colorful --- Colors the output by alliance member, Default = True')
 		write(' 6. cancelmulti --- Cancles multiple consecutive identical lines, Default = True')
 	end
 end
