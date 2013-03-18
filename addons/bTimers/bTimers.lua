@@ -1,5 +1,5 @@
 --[[
-bTimers v1.0
+bTimers v1.05
 Copyright (c) 2012, Ricky Gall All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -59,6 +59,7 @@ function event_unload()
 	for u = 1, #createdTimers do
 		send_command('timers d "'..createdTimers[u]..'"')
 	end
+	send_command('unalias btimers')
 end
 
 function event_addon_command(...)

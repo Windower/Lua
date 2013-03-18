@@ -1,5 +1,5 @@
 --[[
-wtbox v1.0
+wtbox v1.05
 Copyright (c) 2012, Ricky Gall All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -136,6 +136,7 @@ function wtbox_delete()
 	local r,es = os.remove(lua_base_path..'tmp2.txt')
 	if not r then write(es) end
 	tb_delete('wtcbox')
+	send_command('unalias wtbox')
 	send_command('lua u wtbox')
 end
 

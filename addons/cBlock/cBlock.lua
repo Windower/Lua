@@ -1,5 +1,5 @@
 --[[
-cBlock v1.0
+cBlock v1.05
 Copyright (c) 2012, Ricky Gall All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -66,6 +66,10 @@ function event_load()
 	else
 		fill_ignore()
 	end	
+end
+
+function event_unload()
+	send_command('unalias cblock')
 end
 
 function fill_ignore()
