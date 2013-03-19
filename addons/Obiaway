@@ -1,4 +1,30 @@
--- Obiaway by ReaperX
+-- Copyright (c) 2013, ReaperX
+-- All rights reserved.
+-- 
+-- Redistribution and use in source and binary forms, with or without
+-- modification, are permitted provided that the following conditions are met:
+-- 
+-- * Redistributions of source code must retain the above copyright
+--   notice, this list of conditions and the following disclaimer.
+-- * Redistributions in binary form must reproduce the above copyright
+--   notice, this list of conditions and the following disclaimer in the
+--   documentation and/or other materials provided with the distribution.
+-- * Neither the name of Obiaway nor the
+-- names of its contributors may be used to endorse or promote products
+-- derived from this software without specific prior written permission.
+
+-- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+-- ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+-- WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+-- DISCLAIMED. IN NO EVENT SHALL ReaperX BE LIABLE FOR ANY
+-- DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+-- (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+-- LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+-- ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+-- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+-- SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-- 
+-- Obiaway v0.1
 -- 
 -- Puts elemental obis away when they are no longer needed due
 -- to day/weather/storm effect change. Uses itemizer.
@@ -7,33 +33,42 @@
 -- 
 -- The advantage of this system compared to moving obis back during 
 -- aftercast is that it avoids excessive inventory movement,
--- so problems due to inventory filling up completely are
--- less likely. Also, timing issues with very fast spells 
--- occur at worst on the first spell but not on subsequent ones.
--- Known problems: 
+-- so malfunctions due to inventory filling up completely are
+-- less likely, and timing issues with very fast spells (spell
+-- fires before obi is moved) occur at worst on the first spell
+-- not but subsequent ones.
+-- Known bugs: 
 -- 1. upon activation, it puts only the first unneeded
 -- obi away. The function remove_unneeded_obis() tries to put all
 -- of them away, but the calls to itemizer are all made instantly
 -- so only the first one is carried out. Usually, only one obi
--- has to be removed per call, so this is not much of a problem. 
--- Still, due to problem 2 or because of manual movement, more
--- than one unneeded obi can be in inventory.
+-- has to be removed per call, so this is not much of a problem.
 -- 2. when weather changes due to zoning, get_obis_in_inventory()
 -- is called before inventory has loaded and returns nothing. 
+--
+-- 3. Obi is not moved when currently equipped.
+-- 
+-- To Do: add function to turn the console_echo's on/off. 
 
 function event_load()
-write("Loaded Obiaway.")
+	write("Loaded Obiaway.")
+	send_command("alias Obiaway lua c Obiaway")
 end
 
 function event_unload()
-write("Unloaded Obiaway.")
+	write("Unloaded Obiaway.")
+	send_command("unalias Obiaway")
+end
+
+function event_addon_command(...)
+	remove_unneeded_obis()
 end
 
 function event_gain_status(id, name)
 end
 
 function event_lose_status(id, name)
-  if id>=178 and id<=185 then
+	if id>=178 and id<=185 then
 		remove_unneeded_obis()
 	end
 end
@@ -50,8 +85,7 @@ function get_obis_in_inventory()
 	obis = {}
 	items = get_items()
 	inv = items.inventory
-	number = items.max_inventory - 1
-	write("number"..number)
+	number = items.max_inventory - 1 -- items.max_inventory returns inventory size +1
 	for i=1,number do 
 	    index = tostring(i)
 		id = inv[index].id
