@@ -6,7 +6,10 @@ To define a T-table with explicit values use T{...}, to convert an existing tabl
 Some functions, such as table.map(t, fn), are optimized for arrays. These functions have the same name as the regular functions, but preceded with an "arr", such as table.arrmap(t, fn). These are only needed, if explicit nil handling between keys is required, that is, if nil is an actual value in the table. This case is very rare, and should not normally be needed. Argument lists are an example of their application.
 ]]
 
-require 'mathhelper'
+_libs = _libs or {}
+_libs.tablehelper = true
+_libs.mathhelper = _libs.mathhelper or require 'mathhelper'
+_libs.functools = _libs.functools or require 'functools'
 
 -- Constructor for T-tables.
 -- t = T{...} for explicit declaration.
@@ -14,8 +17,10 @@ require 'mathhelper'
 function T(t)
 	-- Sets T's metatable's index to the table namespace, which will take effect for all T-tables.
 	-- This makes every function that tables have also available for T-tables.
-	return setmetatable(t, {__index=table})
+	return setmetatable(t, {__index = table})
 end
+
+_libs = T(_libs)
 
 -- Returns true if searchval is in t.
 function table.contains(t, searchval)
@@ -28,6 +33,11 @@ function table.contains(t, searchval)
 	return false
 end
 
+-- Returns if the key searchkey is in t.
+function table.containskey(t, searchkey)
+	return t[searchkey] ~= nil
+end
+
 -- Appends an element to the end of an array table.
 function table.append(t, val)
 	t[#t+1] = val
@@ -35,14 +45,24 @@ function table.append(t, val)
 end
 
 -- Appends an array table to the end of another array table.
-function table.extend(t, t_ext)
-	t_ext:map(function (x) t:append(x) end)
+function table.extend(t, extt)
+	for key, val in pairs(extt) do
+		t[#t+1] = val
+	end
+	
 	return t
 end
 
--- Returns if the key searchkey is in t.
-function table.containskey(t, searchkey)
-	return t[searchkey] ~= nil
+-- Merges two dictionary tables and returns the result. Keys from the new table will overwrite old keys.
+function table.merge(t, merget)
+	if merget == nil then
+		return t
+	end
+	for key, val in pairs(merget) do
+		t[key] = val
+	end
+	
+	return t
 end
 
 -- Returns a partial table sliced from t, equivalent to t[x:y] in certain languages.
@@ -65,80 +85,64 @@ function table.slice(t, from, to)
 		res[#res+1] = t[i]
 	end
 	
-	return res
+	return res;
 end
 
--- Applies function fn to all elements of the table and returns the resulting table.
-function table.map(t, fn)
+-- Replaces t[from, to] with the contents of st and returns the table.
+function table.splice(t, from, to, st)
+	local tcpy = t:copy()
+	
+	for stkey = 1, #st do
+		tkey = from + stkey - 1
+		t[tkey] = st[stkey]
+	end
+	
+	for cpykey = to+1, #tcpy do
+		newkey = cpykey + #st - (to - from) - 1
+		t[newkey] = tcpy[cpykey]
+	end
+	
+	for rmkey = #t - (to - from) + #st, #t do
+		t[rmkey] = nil
+	end
+	
+	t = res
+	
+	return t
+end
+
+-- Returns a reversed table. Only works on arrays.
+function table.reverse(t)
 	local res = T{}
-	for key, val in pairs(t) do
-		-- Evaluate fn with the element and store it.
-		res[key] = fn(val)
+	for key = 1, math.ceil(#t/2) do
+		if key == #t-key then
+			res[key] = t[key]
+		end
+		res[key], res[#t-key+1] = t[#t-key+1], t[key]
 	end
 	
 	return res
 end
 
--- Analogon to table.map, but for array-tables. Possibility to include nil values.
-function table.arrmap(t, fn)
+-- Returns an array removed of all duplicates.
+function table.set(t)
+	local seen = T{}
 	local res = T{}
-	for key = 1, #t do
-		-- Evaluate fn with the element and store it.
-		res[key] = fn(t[key])
-	end
-	
-	return res
-end
-
--- Returns a table with all elements from t that satisfy the condition fn.
-function table.filter(t, fn)
-	local res = T{}
-	for key, val in pairs(t) do
-		-- Only copy if fn(val) evaluates to true
-		if fn(val) then
-			res[key] = val
+	for _, val in ipairs(t) do
+		if seen[val] == nil then
+			res:append(val)
+			seen[val] = true
 		end
 	end
 	
 	return res
 end
 
--- Returns a table with all elements from t whose keys satisfy the condition fn.
-function table.filterkey(t, fn)
-	local res = T{}
-	for key, val in pairs(t) do
-		-- Only copy if fn(key) evaluates to true
-		if fn(key) then
-			res[key] = val
-		end
-	end
-	
-	return res
-end
-
--- Returns the result of applying the function fn to the first two elements of t, then again on the result and the next element from t, until all elements are accumulated.
--- init is an optional initial value to be used. If provided, init and t[1] will be compared first, otherwise t[1] and t[2].
-function table.reduce(t, fn, init)
-	t = T(t)
-	
-	-- Return the initial argument if table is empty
-	if t:isempty() then
-		return init
-	end
-	
-	-- Set the accumulator variable to the init value (which can be nil as well)
-	acc = init
-	for key, val in pairs(t) do
-		-- If the accumulator is nil, which can only happen on the first iteration and if no initial value was provided, set acc to the first value val.
-		if acc == nil then
-			acc = val
-		-- If not, which will hold true for all subsequent values, apply the funtion to the accumulated value and the next table value and store the result.
-		else
-			acc = fn(acc, val)
-		end
-	end
-	
-	return acc
+-- Returns a sorted set.
+function table.sorted(t)
+	local res = T(t)
+	t:sort()
+	return t
 end
 
 -- Return true if any element of t satisfies the condition fn.
@@ -161,6 +165,31 @@ function table.all(t, fn)
 	end
 	
 	return true
+end
+
+-- Returns the values of the table, extracted into an argument list. Like unpack, but works on dictionaries as well.
+function table.extract(t)
+	local res = T{}
+	-- Convert a (possible) dictionary into an array.
+	for key, val in pairs(t) do
+		res:append(val)
+	end
+	
+	return res:unpack()
+end
+
+-- Returns a deepcopy of the table, including metatable and recursed over nested tables.
+function table.copy(t)
+	local res = T{}
+	for key, val in pairs(t) do
+		-- If a value is a table, recursively copy that.
+		if type(val) == 'table' then
+			val = T(val):copy()
+		end
+		res[key] = val
+	end
+	
+	return setmetatable(res, getmetatable(t))
 end
 
 -- Concatenates all elements with a whitespace in between.

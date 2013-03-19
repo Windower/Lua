@@ -1,5 +1,6 @@
 --[[
-Copyright (c) 2013, Ricky Gall All rights reserved.
+bTimers v1.07
+Copyright (c) 2012, Ricky Gall All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
@@ -8,6 +9,7 @@ Redistribution and use in source and binary forms, with or without modification,
     Neither the name of the organization nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 ]]
 require 'tablehelper'  -- Required for various table related features. Made by Arcon
 require 'logger'       -- Made by arcon. Here for debugging purposes
@@ -50,6 +52,10 @@ function event_load()
 	send_command('alias btimers lua c btimers')
 end
 
+function event_login()
+	player = get_player()  
+end
+
 function event_unload()
 	--The following deletes all timers created before unloading
 	--Mostly used for when i was continuously reloading it.
@@ -57,6 +63,7 @@ function event_unload()
 	for u = 1, #createdTimers do
 		send_command('timers d "'..createdTimers[u]..'"')
 	end
+	send_command('unalias btimers')
 end
 
 function event_addon_command(...)
@@ -219,6 +226,13 @@ function deleteTimer(mode,effect,target)
 		--It cycles through the created timers table and
 		--if it finds the name of the dropped buff deletes
 		--the table entry as well as removing the timer.
+		if target == nil then
+			target = 'Self'
+		elseif target:lower() == player['name']:lower() then
+			target = 'Self'
+		else
+			target = target
+		end
 		for u = 1, #createdTimers do
 			if createdTimers[u] == effect..' ('..target..')' then
 				send_command('timers d "'..effect..' ('..target..')"')

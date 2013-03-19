@@ -2,11 +2,14 @@
 A library providing a timing feature.
 ]]
 
+_libs = _libs or {}
+_libs.timeit = true
+
 timeit = {}
 
 -- Creates a new timer object.
 function timeit.new()
-	return setmetatable({t = 0}, {__index=timeit})
+	return setmetatable({t = 0}, {__index = timeit})
 end
 
 -- Starts the timer.

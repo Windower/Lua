@@ -2,6 +2,16 @@
 A few math helper functions.
 ]]
 
+_libs = _libs or {}
+_libs.mathhelper = true
+_libs.tablehelper = _libs.tablehelper or require 'tablehelper'
+
+-- Order of digits in an for higher base math
+math.digitorder = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
+-- Constants
+math.e = math.exp(1)
+
 -- Rounds to prec decimal digits. Accepts negative numbers for precision.
 function math.round(num, prec)
 	local mult = 10^(prec or 0)
@@ -13,22 +23,45 @@ function math.sgn(num)
 	return num/math.abs(num)
 end
 
--- Returns true, if num is even, false otherwise.
-function math.even(num)
-	return num%2 == 0
+-- Returns an arbitrary-base logarithm. Defaults to e.
+function math.log(val, base)
+	if base == nil then
+		base = math.e
+	end
+	return math.log10(val)/math.log10(base)
 end
 
--- Returns true, if num is odd, false otherwise.
-function math.odd(num)
-	return num%2 == 1
+-- Returns a binary string representation of val.
+function math.tobinary(val)
+	return math.tobase(val, 2)
 end
 
--- Adds two numbers.
-function math.sum(val1, val2)
-	return val1+val2
+-- Returns a octal string representation of val.
+function math.tooctal(val)
+	return math.tobase(val, 8)
 end
 
--- Multiplies two numbers.
-function math.mult(val1, val2)
-	return val1*val2
+-- Returns a hex string representation of val.
+function math.tohex(val)
+	return math.tobase(val, 16)
+end
+
+-- Converts a number val to a string in base base.
+function math.tobase(val, base)
+	if base == nil or base == 10 or val == 0 then
+		return tostring(val)
+	end
+	
+	local num = math.abs(val)
+	
+	local str = T{}
+	while num > 0 do
+		str:insert(math.digitorder:at(num % base + 1))
+		num = math.floor(num / base)
+	end
+	if math.sgn(val) == -1 then
+		str:insert('-')
+	end
+	
+	return str:reverse():concat()
 end

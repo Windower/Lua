@@ -1,32 +1,19 @@
-function event_addon_command(...)
-    local term = table.concat({...}, ' ')
-	a,b,targeff = string.find(term,'Send it out ([%w%s%c]+)5')
-	if targeff ~= nil then
-		send_it_out(targeff)
-	end
-     
-    if term:lower() == 'commamode' then
-        commamode = not commamode
-    end
-     
-    if term:lower() == 'oxford' then
-        oxford = not oxford
-    end
-	
-	if term:lower() == 'help' then
-		write('AoEBgone has 3 possible commands')
-		write('     1. Help --- shows this menu')
-		write('The following are defaulted off:')
-		write('     2. oxford --- Toggle use of oxford comma')
-		write('     3. commamode --- Toggle comma-only mode.')
-	end
-end
-
 function event_load()
 	stat_array={}
-	slow_spells={Protect=1,Shell=1}
+	slow_spells={Protect=4,Shell=4,Regen=4}
+	slow_spells['Blaze Spikes'] = 4
+	slow_spells['Ice Spikes'] = 4
+	slow_spells['Shock Spikes'] = 4
+	slow_spells['Klimaform'] = 4
     commamode= false
-    oxford = false
+    oxford = true
+	targetnumber = true
+	colorful = true
+	cancelmulti = true
+	prevline = ''
+	color_arr={p0=2,p1=3,p2=4,p3=6,p4=11,p5=170,
+	a10=6,a11=7,a12=30,a13=206,a14=207,a15=224,
+	a20=9,a21=8,a22=28,a23=38,a24=39,a25=185}
     send_command('alias aoe lua c aoebgone')
 end
 
@@ -34,140 +21,169 @@ function event_unload()
 	send_command('unalias aoe')
 end
 
+function event_addon_command(...)
+    local term = table.concat({...}, ' ')
+	a,b,targeff,gn = string.find(term,'Send it out ([%w%s\39]+)5(%w+)6')
+	
+	
+	if targeff ~= nil then
+		send_it_out(targeff,gn)
+	end
+     
+    if term:lower() == 'commamode' then
+        commamode = not commamode
+		write('Comma Mode flipped!')
+    end
+     
+    if term:lower() == 'oxford' then
+        oxford = not oxford
+		write('Oxford Mode flipped!')
+    end
+     
+    if term:lower() == 'targetnumber' then
+        targetnumber = not targetnumber
+		write('Target Number flipped!')
+    end
+     
+    if term:lower() == 'colorful' then
+        colorful = not colorful
+		write('Colorful mode flipped!')
+    end
+     
+    if term:lower() == 'cancelmulti' then
+        cancelmulti = not canclemulti
+		write('Multi-canceling flipped!')
+    end
+
+	if term:lower() == 'help' then
+		write('AoEBgone has 3 possible commands')
+		write(' 1. Help --- shows this menu')
+		write('The following are defaulted off:')
+		write(' 2. oxford --- Toggle use of oxford comma, Default = True')
+		write(' 3. commamode --- Toggle comma-only mode, Default = False')
+		write(' 4. targetnumber --- Toggle target number display, Default = True')
+		write(' 5. colorful --- Colors the output by alliance member, Default = True')
+		write(' 6. cancelmulti --- Cancles multiple consecutive identical lines, Default = True')
+	end
+end
+
 function event_incoming_text(original, modified, color)
+	if cancelmulti then
+		if color%255>17 then
+			if original == prevline then
+				modified = ''
+			end
+		end
+		prevline = original
+	end
 	local a
 	local b
-	local targetchar
+	local target
+	local polarity = nil
 	local effect
-	a,b,targetchar,effect = string.find(original,"([%w]+) gains the effect of ([%w%s%c]+)\46")
-	c,d,tar2,galo,eff2 = string.find(original,"([%w]+) (%w+)s the effect of ([%w]+).* Roll.\46")
+	local c
+	local d
+	local gn
+	a,b,target,polarity,effect = string.find(original,"([%w]+) (%w+)s the effect of ([%w%s\39]+)\46")
+	if a==nil then
+		c,d,target,effect = string.find(original,"([%w]+)\39s ([%w%s\39]+) effect wears off\46")
+	end
+	if c ~= nil then
+		gn = 'wears'
+	elseif a~=nil then
+		gn = 'adds'
+	end
 	if effect~=nil then
 		if stat_array[effect..'send_single'] ~= 1 then
 			if stat_array[effect]==nil then
-				local lines = split(original,'\7')
-				if stat_array[effect]~=nil then
-					write(stat_array[effect])
-				end
-				stat_array[effect]={lines[1], color}
+				local lines={}
+				lines = split(original,'\7')
+				table.remove(lines,#lines)
+				stat_array[effect]={table.concat(lines,'\7'), color}
+				stat_array[effect..' pol'] = polarity
 				local delay = 0
 				if slow_spells[effect]~=nil then
-					delay = 5
+					delay = slow_spells[effect]
 				else
-					delay = 2
+					delay = 1.2
 				end
-				send_command('wait '..delay..';lua c aoebgone Send it out '..effect..'5')
+				send_command('wait '..delay..';lua c aoebgone Send it out '..effect..'5'..gn..'6')
 			end
 			local j=stat_array[effect]
-			j[#j+1]=targetchar
-			
-			modified = ''
-		else
-			modified = original
-			stat_array[effect..'send_single'] = nil
-		end
-	elseif eff2~=nil then
-		g,h,app,total = string.find(original,"The total for %w+(.*) Roll increases to ([%d]+).\46")
-		write(original) 
-		n,z,bust = string.find(original,'%w+ uses Double.Up.\46Bust!')
-		roll = 1
-		gl = galo
-		if n ~= nil then
-			busted = 1
-			write('bust')
-		end
-		if total ~= nil then
-			du = total
-			ap = app
-		end
-		if stat_array[eff2..'send_single'] ~= 1 then
-			if stat_array[eff2]==nil then
-				local lines = split(original,'\7')
-				if stat_array[eff2]~=nil then
-					write(stat_array[eff2])
-				end
-				stat_array[eff2]={lines[1], color}
-				local delay = 0
-				if slow_spells[eff2]~=nil then
-					delay = 5
-				else
-					delay = 2
-				end
-				send_command('wait '..delay..';lua c aoebgone Send it out '..eff2..'5')
-			end
-			local j=stat_array[eff2]
-			j[#j+1]=tar2
-			
+			j[#j+1]=target
+
 			modified = ''
 		else
 			modified = original
 			stat_array[effect..'send_single'] = nil
 		end
 	end
-	
+
 	return modified, color
 end
 
-function send_it_out(n)
-	write(busted or ' not bust')
-	if du ~= nil then
-		output = stat_array[n][1]..'\7The total for '..n..ap..' Roll increases to '..du..'!\7'..stat_array[n][3]
-	elseif busted ~= nil then
-		output = stat_array[n][1]..' Busted!!\7'..stat_array[n][3]
-	else
-		output = stat_array[n][1]..'\7'..stat_array[n][3]
+function send_it_out(n,modus)
+	output = stat_array[n][1]..'\7'
+	if colorful then
+		party = get_party()
 	end
+	if targetnumber then
+		if #stat_array[n] > 3 then
+			output = output.."\91"..(#stat_array[n]-2).."\93 "
+		end
+	end
+	
+	if colorful then
+		for r,s in pairs(party) do
+			if s['name'] == stat_array[n][3] then
+				output = output..string.char(0x1F,color_arr[r])
+			end
+		end
+	end
+	
+	output = output..stat_array[n][3]
+	col = string.char(0x1F,stat_array[n][2]%255)
+	colnm = stat_array[n][2]
 	for i,v in pairs(stat_array[n]) do
 		if i > 3 then
 			if i <= #stat_array[n]-1 then
-				output = output..', '
+				output = output..col..', '
 			elseif i == #stat_array[n] then
-				 if commamode then
-                    output = output..', '
-                else
-                    if oxford then
-                        if #stat_array[n] >4 then
-                            output = output..','
-                        end
-                    end
-                    output = output..' and '
-                end			
+				if commamode then
+					output = output..col..', '
+				else
+					if oxford then
+						if #stat_array[n] >4 then
+							output = output..col..','
+						end
+					end
+					output = output..col..' and '
+				end	
+			end
+			local textcol
+			if colorful then
+				for r,s in pairs(party) do
+					if s['name'] == v then
+						output = output..string.char(0x1F,color_arr[r])
+					end
+				end
 			end
 			output = output..v
 		end
 	end
-	col = stat_array[n][2]
-	if roll ~= nil then
+	if modus=='wears' then
+		add_to_chat(colnm,output..col..'\39s '..n..' effect wears off.')
+	elseif modus=='adds' then
 		if #stat_array[n]>3 then
-			stat_array[n]=nil
-			if total ~= nil then
-				add_to_chat(col,output..' '..gl..' the effect of '..n.."'s Roll.")
-			else
-				add_to_chat(col,output..' '..gl..' the effect of '..n.."'s Roll.")
-			end
+			add_to_chat(colnm,output..col..' '..stat_array[n..' pol']..' the effect of '..n..'.')
 		else
-			stat_array[n]=nil
 			stat_array[n..'send_single']=1
-			if total ~= nil then
-				add_to_chat(col,output..' '..gl..'s the effect of '..n.."'s Roll.")
-			else
-				add_to_chat(col,output..' '..gl..'s the effect of '..n.."'s Roll.")
-			end	
-		end
-		du = nil
-		roll=nil
-		ap = nil
-	else
-		if #stat_array[n]>3 then
-		stat_array[n]=nil
-		add_to_chat(col,output..' gain the effect of '..n..'.')
-		else
-			stat_array[n]=nil
-			stat_array[n..'send_single']=1
-			add_to_chat(col,output..' gains the effect of '..n..'.')
+			add_to_chat(colnm,output..col..' '..stat_array[n..' pol']..'s the effect of '..n..'.')
 		end
 	end
+	stat_array[n..' pol']=nil
+	stat_array[n]=nil
 end
-
 
 function split(msg, match)
 	local length = msg:len()
