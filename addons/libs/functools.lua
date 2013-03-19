@@ -4,7 +4,7 @@ Adds some tools for functional programming. Amends various other namespaces by f
 
 _libs = _libs or {}
 _libs.functools = true
-_libs.tablehelper = _libs.tablerhelper or require 'tablehelper'
+_libs.tablehelper = _libs.tablehelper or require 'tablehelper'
 
 --[[
 	Purely functional
