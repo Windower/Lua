@@ -1,5 +1,5 @@
 --[[
-wtbox v1.08
+wtbox v1.09
 Copyright (c) 2012, Ricky Gall All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -46,6 +46,10 @@ end
 function event_login()
 	player = get_player()
 end
+
+function event_unload()
+	wtbox_delete()
+end 
 
 function event_addon_command(...)
     local args = {...}
@@ -96,6 +100,10 @@ function wtbox_create()
 			settings[key] = value
 		end
 	end
+	wtbox_set()
+end
+
+function wtbox_set()
 	tb_create('wtcbox')
 	tb_set_text('wtcbox','WTBox')
 	if settings ~= nil then
@@ -147,7 +155,13 @@ end
 
 function event_incoming_text(old,new,color)
 	local c,d,he,stuff = string.find(old,'The fiend appears(.*)vulnerable to ([%w%s]+)!')
+	local aurachange = string.find(old,'The aura of your foe suddenly changes.')
+	local atmaoff = string.find(old,player['name'].."'s Atma effect wears off.")
+	if aurachange ~= nil or atmaoff ~= nil then
+		wtbox_set()
+	end
 	if c ~= nil then
+		
 		if he == ' highly ' then
 			wtchats[#wtchats+1] = "\\cs(255,100,100)"..stuff.." 3!!!\\cr\n"
 		elseif he == ' extremely ' then
