@@ -1,3 +1,5 @@
+Author: Balloon(Cerberus)
+
 Cell Helper, for old Salvage
 
 This addon displays what Pathos cells are still needed in a text box, alters the drop message to display what each Pathos cell does and whether it is still needed, and writes a LL profile (salvage-<playername>.txt when a cell is obtained to pass cells that you have already obtained.
