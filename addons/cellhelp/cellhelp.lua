@@ -66,7 +66,7 @@ function event_incoming_text(old, new, color)
 	match_drop = old:match ('You find an? ..(.*).. %o?i?n')
 	
 	celltest = old:find(player..' obtains an? ')
-	droptest = old:find('yYou find %w+')
+	droptest = old:find('%w+%You find')
 	
 	if celltest == nil and droptest == nil then 
 		return new,color
@@ -85,7 +85,6 @@ function event_incoming_text(old, new, color)
 	end
 
 if droptest ~= nil then
-	write('hello')
 	for i=1, #salvage_cell_name do
 		if match_drop == salvage_cell_name[i]  then
 			new = 'You find a '..string.char(31,158)..salvage_cell_name[i]..' ('..string.char(31,158)..salvage_cell_ident[i]..')'..string.char(31,167)..' /Need/'
