@@ -10,11 +10,12 @@ function event_load()
 	targetnumber = true
 	colorful = true
 	cancelmulti = true
+	criticalhits = true
 	prevline = ''
 	color_arr={p0=2,p1=3,p2=4,p3=6,p4=11,p5=170,
 	a10=6,a11=7,a12=30,a13=206,a14=207,a15=224,
 	a20=9,a21=8,a22=28,a23=38,a24=39,a25=185}
-    send_command('alias aoe lua c aoebgone')
+    send_command('alias aoe lua c aoebgone cmd')
 end
 
 function event_unload()
@@ -23,59 +24,69 @@ end
 
 function event_addon_command(...)
     local term = table.concat({...}, ' ')
-	a,b,targeff,gn = string.find(term,'Send it out ([%w%s\39]+)5(%w+)6')
-	
-	
-	if targeff ~= nil then
-		send_it_out(targeff,gn)
-	end
-     
-    if term:lower() == 'commamode' then
-        commamode = not commamode
-		write('Comma Mode flipped!')
-    end
-     
-    if term:lower() == 'oxford' then
-        oxford = not oxford
-		write('Oxford Mode flipped!')
-    end
-     
-    if term:lower() == 'targetnumber' then
-        targetnumber = not targetnumber
-		write('Target Number flipped!')
-    end
-     
-    if term:lower() == 'colorful' then
-        colorful = not colorful
-		write('Colorful mode flipped!')
-    end
-     
-    if term:lower() == 'cancelmulti' then
-        cancelmulti = not canclemulti
-		write('Multi-canceling flipped!')
-    end
+    local splitarr = split(term,' ')
+	if splitarr[1] == 'cmd' then
+		if splitarr[2] ~= nil then
+			if splitarr[2]:lower() == 'commamode' then
+				commamode = not commamode
+				write('Comma Mode flipped!')
+			end
+			 
+			if splitarr[2]:lower() == 'oxford' then
+				oxford = not oxford
+				write('Oxford Mode flipped!')
+			end
+			 
+			if splitarr[2]:lower() == 'targetnumber' then
+				targetnumber = not targetnumber
+				write('Target Number flipped!')
+			end
+			 
+			if splitarr[2]:lower() == 'colorful' then
+				colorful = not colorful
+				write('Colorful mode flipped!')
+			end
+			 
+			if splitarr[2]:lower() == 'cancelmulti' then
+				cancelmulti = not canclemulti
+				write('Multi-canceling flipped!')
+			end
+			 
+			if splitarr[2]:lower() == 'criticalhits' then
+				criticalhits = not criticalhits
+				write('Critical Hits flipped!')
+			end
 
-	if term:lower() == 'help' then
-		write('AoEBgone has 3 possible commands')
-		write(' 1. Help --- shows this menu')
-		write('The following are defaulted off:')
-		write(' 2. oxford --- Toggle use of oxford comma, Default = True')
-		write(' 3. commamode --- Toggle comma-only mode, Default = False')
-		write(' 4. targetnumber --- Toggle target number display, Default = True')
-		write(' 5. colorful --- Colors the output by alliance member, Default = True')
-		write(' 6. cancelmulti --- Cancles multiple consecutive identical lines, Default = True')
+			if splitarr[2]:lower() == 'help' then
+				write('AoEBgone has 3 possible commands')
+				write(' 1. Help --- shows this menu')
+				write('The following are defaulted off:')
+				write(' 2. oxford --- Toggle use of oxford comma, Default = True')
+				write(' 3. commamode --- Toggle comma-only mode, Default = False')
+				write(' 4. targetnumber --- Toggle target number display, Default = True')
+				write(' 5. colorful --- Colors the output by alliance member, Default = True')
+				write(' 6. cancelmulti --- Cancles multiple consecutive identical lines, Default = True')
+				write(' 7. criticalhits --- Combines critical hits into a single line, Default = True')
+			end
+		end
+	else
+		a,b,targeff,gn = string.find(term,'Send it out ([%w%s\39]+)5(%w+)6')
+		
+		if targeff ~= nil then
+			send_it_out(targeff,gn)
+		end
 	end
 end
 
 function event_incoming_text(original, modified, color)
 	if cancelmulti then
-		if color%255>17 then
+		if color%256>17 then
 			if original == prevline then
 				modified = ''
 			end
 		end
-		prevline = original
 	end
+	prevline = original
 	local a
 	local b
 	local target
@@ -83,10 +94,22 @@ function event_incoming_text(original, modified, color)
 	local effect
 	local c
 	local d
+	local e
+	local f
 	local gn
 	a,b,target,polarity,effect = string.find(original,"([%w]+) (%w+)s the effect of ([%w%s\39]+)\46")
 	if a==nil then
 		c,d,target,effect = string.find(original,"([%w]+)\39s ([%w%s\39]+) effect wears off\46")
+			--write('col:'..color..'   col256:'..(color%256)..'   msg:'..original)
+		if criticalhits then
+			if c==nil then
+			e,f = string.find(original,"scores a critical hit")
+				if e ~= nil then
+					local temp_strarr = split(original,'/7')
+					modified = table.concat(temp_strarr,' ')
+				end
+			end
+		end
 	end
 	if c ~= nil then
 		gn = 'wears'
@@ -142,7 +165,7 @@ function send_it_out(n,modus)
 	end
 	
 	output = output..stat_array[n][3]
-	col = string.char(0x1F,stat_array[n][2]%255)
+	col = string.char(0x1F,stat_array[n][2]%256)
 	colnm = stat_array[n][2]
 	for i,v in pairs(stat_array[n]) do
 		if i > 3 then
