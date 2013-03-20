@@ -27,6 +27,7 @@
 function event_load()
 	a = 0
 	player = get_player()['name']
+	get_ll()
 	salvage_cell_name ={ 
 				'incus cell','castellanus cell','undulatus cell',
 				'cumulus cell','radiatus cell','virga cell',
@@ -53,12 +54,12 @@ function event_load()
 	tb_set_bg_visibility('salvage_box',1)
 	tb_set_font('salvage_box','Arial',12)
 	tb_set_text('salvage_box',' Still Need:  \n  '..start_cells);
-	io.open(lua_base_path..'../../plugins/ll/salvage-'..player..'.txt',"w"):write(''):close()
+	io.open(lua_base_path..'../../plugins/ll/salvage-'..player..'.txt',"w"):write('if item is '..custompass..' then pass\nif item is '..customlot..' then lot\n'):close()
 
 end
 function event_unload()
 	tb_delete('salvage_box')
-	io.open(lua_base_path..'../../plugins/ll/salvage-'..player..'.txt',"w"):write(''):close()
+	--io.open(lua_base_path..'../../plugins/ll/salvage-'..player..'.txt',"w"):write(''):close()
 end
 
 function event_incoming_text(old, new, color)
@@ -97,13 +98,36 @@ if droptest ~= nil then
 	end
 end
 
+function get_ll()
+local ll = io.open(lua_base_path..'../../plugins/ll/salvage-'..player..'-add.txt', 'r')
+	if ll then
+		for l in ll:lines() do
+			if l:find('if (.*)% then lot') then
+				customlot = l:match('if item is (.*)% then lot')
+			end
+			if l:find('if (.*)% then pass') then
+				custompass = l:match('if item is (.*)% then pass')
+			end
+		end
+	end
+	if custompass == nil then
+		write('Add something to the top line of your salvage-add.txt file to pass things other than cells.  Please keep these on one line. Reload after.')
+		custompass=''
+	end
+	if customlot == nil then
+		write('Add something to the second line of your salvage-add.txt file to lot things other than cells. Please keep these on one line. Reload after')
+		customlot=''
+	end
+return customlot,custompass
+end
+
 function update_cells()
 	if a<20 then
 		local pass = table.concat(obtained_cells, ',')
 		local needed_cells = table.concat(salvage_cell_name, '  \n  ')
 		local textbox_cells = string.gsub(needed_cells, '(1  \n  )'or'%d', '')
 		tb_set_text('salvage_box',' Still Need:  \n  '..textbox_cells)
-		io.open(lua_base_path..'../../plugins/ll/salvage-'..player..'.txt',"w"):write('if item is '..pass..' then pass'):close()
+		io.open(lua_base_path..'../../plugins/ll/salvage-'..player..'.txt',"w"):write('if item is '..custompass..' then pass\nif item is '..customlot..' then lot\nif item is '..pass..' then pass'):close()
 	else 
 		tb_set_text('salvage_box', '  Obtained all the cells.  ')
 	end
