@@ -28,8 +28,7 @@ function event_load()
 					Berserk=180,
 					Aggressor=180,
 					Haste_Samba=90,
-					Drain_Samba=90,
-					Drain=10
+					Drain_Samba=90
 				} 
 	-- watchbuffs table can be modified be sure to follow the syntax
 	-- however, because this addon looks for specific things.
