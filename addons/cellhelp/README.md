@@ -6,6 +6,8 @@ This addon displays what Pathos cells are still needed in a text box, alters the
 
 This addon cannot pass things currently in the treasure pool (as LL cannot do that), but any subsequent drop of that cell will be passed. 
 
+In order to lot/pass custom items, please add them to a ll profile called salvage-<playername>-add.txt. 
+
 In order to manually pass a cell you do not need, you can either obtain it, or type "/echo <me> obtains a --incus cell--." replacing the incus cell with the name of the needed cell. include the "--". Manually editing the LL profile will NOT work, as the addon erases everything in the text document, then rewrites it when a cell is obtained.
 
 If some add/pass functionality is added to Luacore then I'll edit this addon to reflect that. 
