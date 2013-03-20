@@ -1,5 +1,5 @@
 --[[
-bTimers v1.07
+bTimers v1.08
 Copyright (c) 2012, Ricky Gall All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -26,7 +26,9 @@ function event_load()
 					Last_Resort=180,
 					Arcane_Circle=240,
 					Berserk=180,
-					Aggressor=180
+					Aggressor=180,
+					Haste_Samba=90,
+					Drain_Samba=90
 				} 
 	-- watchbuffs table can be modified be sure to follow the syntax
 	-- however, because this addon looks for specific things.
@@ -259,7 +261,7 @@ function event_incoming_text(old,new,color)
 		--Check fo buffs wearing off and store name and buff in variables
 		c,d,tWear,eWear = string.find(old,'(%w+)\'s ([%w%s]+) effect wears off.')
 		--Check for gain buffs only (i.e. you have filters on) and store name/buff
-		e,f,tar2,eff2 = string.find(old,'(%w+) gains the effect of (%w+).')
+		e,f,tar2,eff2 = string.find(old,'(%w+) gains the effect of ([%w%s]+).')
 		if a ~= nil then
 			--If a isn't blank it found the message.
 			--The following checks are so that you don't
@@ -285,7 +287,13 @@ function event_incoming_text(old,new,color)
 			--This is just so that if you already
 			--had the buff your timer will refresh.
 			if tar2:lower() == player['name']:lower() then
-				createTimer(eff2,tar2)
+				l = split(eff2,' ')
+				if l[2] ~= nil then 
+					createTimer(l[1]..'_'..l[2],tar2)
+				else 
+					createTimer(eff2,tar2)
+				end
+				--createTimer(eff2,tar2)
 			end
 		end
 	end
