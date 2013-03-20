@@ -1,20 +1,21 @@
 function event_load()
 	stat_array={}
-	slow_spells={Protect=4,Shell=4,Regen=4}
-	slow_spells['Blaze Spikes'] = 4
-	slow_spells['Ice Spikes'] = 4
-	slow_spells['Shock Spikes'] = 4
-	slow_spells['Klimaform'] = 4
+	slow_spells={Protect=5,Shell=5,Regen=5}
+	slow_spells['Blaze Spikes'] = 5
+	slow_spells['Ice Spikes'] = 5
+	slow_spells['Shock Spikes'] = 5
+	slow_spells['Klimaform'] = 5
     commamode= false
     oxford = true
 	targetnumber = true
 	colorful = true
 	cancelmulti = true
 	criticalhits = true
+	allow = 1
 	prevline = ''
-	color_arr={p0=2,p1=3,p2=4,p3=6,p4=11,p5=170,
-	a10=6,a11=7,a12=30,a13=206,a14=207,a15=224,
-	a20=9,a21=8,a22=28,a23=38,a24=39,a25=185}
+	color_arr={p0=2,p1=3,p2=4,p3=5,p4=6,p5=1,
+	a10=2,a11=3,a12=4,a13=5,a14=6,a15=1,
+	a20=2,a21=3,a22=4,a23=5,a24=6,a25=1}
     send_command('alias aoe lua c aoebgone cmd')
 end
 
@@ -70,10 +71,16 @@ function event_addon_command(...)
 			end
 		end
 	else
-		a,b,targeff,gn = string.find(term,'Send it out ([%w%s\39]+)5(%w+)6')
+		local a,b,targeff,gn = string.find(term,'Send it out ([%w%s\39]+)5(%w+)6')
 		
 		if targeff ~= nil then
 			send_it_out(targeff,gn)
+		end
+		
+		if splitarr[1] == 'allow' then
+			--write('Got Here!')
+			prevline = ''
+			allow = 1
 		end
 	end
 end
@@ -83,33 +90,32 @@ function event_incoming_text(original, modified, color)
 		if color%256>17 then
 			if original == prevline then
 				modified = ''
+				if allow == 1 then
+					send_command('wait 1;lua c aoebgone allow')
+					allow = 0
+				end
+			else
+				prevline = original
 			end
 		end
 	end
-	prevline = original
-	local a
-	local b
-	local target
+	
+	local a,b,target,effect,c,d,e,f,gn
 	local polarity = nil
-	local effect
-	local c
-	local d
-	local e
-	local f
-	local gn
 	a,b,target,polarity,effect = string.find(original,"([%w]+) (%w+)s the effect of ([%w%s\39]+)\46")
 	if a==nil then
 		c,d,target,effect = string.find(original,"([%w]+)\39s ([%w%s\39]+) effect wears off\46")
-			--write('col:'..color..'   col256:'..(color%256)..'   msg:'..original)
-		if criticalhits then
-			if c==nil then
-			e,f = string.find(original,"scores a critical hit")
-				if e ~= nil then
-					local temp_strarr = split(original,'/7')
-					modified = table.concat(temp_strarr,' ')
-				end
-			end
-		end
+--		if criticalhits then
+--			if c==nil then
+--				e,f,player = string.find(original,"(%w+) scores a critical hit!")
+--				if e ~= nil then
+--					local temp_strarr = split(original,string.char(7))
+--					modified = table.concat(temp_strarr,' ')
+--				end
+--			end
+--		end
+--		write((color%256)..'  msg: '..original)
+--		if criticalhits then
 	end
 	if c ~= nil then
 		gn = 'wears'
