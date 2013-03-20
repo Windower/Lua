@@ -1,5 +1,5 @@
 --[[
-ffocolor v1.01
+ffocolor v1.05
 Copyright (c) 2012, Ricky Gall All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -66,8 +66,9 @@ end
 
 function event_incoming_text(old,new,color)
 	if old ~= former then
-		local a,b,txt = string.find(old,'%[%d+:#%w+%](.*):')
-		if b~= nil then
+		local a,b,txt = string.find(old,'^[^%w]*%[%d+:#%w+%](.*):')
+		local c = string.find(old,'^[^%w]*%[%d+:#%w+%]') or string.find(old,'^[^%w]*%[FFOChat%]')
+		if b ~= nil then
 			tcol = string.char(31,settings['talkedc'])
 			hcol = string.char(31,settings['hlcolor'])
 			ccol = string.char(31,color)
@@ -126,6 +127,23 @@ function event_incoming_text(old,new,color)
 					end
 					new = new..hcol..fulltext[u]
 				end
+			end
+		elseif c ~= nil then
+			tcol = string.char(31,settings['talkedc'])
+			hcol = string.char(31,settings['hlcolor'])
+			ccol = string.char(31,color)
+			for i = 1, #chatTabs do
+				if settings['chatTab']:lower() == chatTabs[i]:lower() then
+					color = tabColor[i]
+				end
+			end
+			fulltext = split(old,' ')
+			new = ''
+			for u = 1, #fulltext do
+				if u > 1 then
+					new = new..' '
+				end
+				new = new..hcol..fulltext[u]
 			end
 		end
 	end
