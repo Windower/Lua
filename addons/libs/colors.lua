@@ -27,21 +27,24 @@ function string.setcolor(str, newcolor, oldcolor)
 	return string.char(31, newcolor)..str..string.char(31, oldcolor)
 end
 
--- Returns the given string with all color codes stripped from it.
-function string.stripcolor(str)
-	--[[ Specifically, we remove the following:
+-- Returns the given string with all color codes removed from it.
+function string.trim_color(str)
+	--[[ Specifically, we target the following:
 	     - \x1F\x?? : colors in add_to_chat
-	     - \x1E\x01 : color reset (covered by the above case)
-	     - \xEF\x?? : icons
+	     - \x1E\x01 : color reset
 	--]]
 	local chars = T{}
 	local color_next = false -- true if we find a color indicator character
+	local prev_char = nil
 	
 	for i=1, #str do
 		local c = str:sub(i, i)
 		
 		if color_next then
-			-- skip the current character
+			if prev_char:byte(1) == 0x1E and c:byte(1) ~= 0x01 then
+				-- Allow for all \x1E\x?? numbers except \x1E\x01 explicitly
+				chars:append(c)
+			end			
 			color_next = false
 		else
 			if c:byte(1) == 0x1E then
@@ -52,6 +55,8 @@ function string.stripcolor(str)
 				chars:append(c)
 			end
 		end
+		
+		prev_char = c
 	end
 	
 	return table.concat(chars, '')
