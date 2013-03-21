@@ -1,0 +1,60 @@
+ffxi: {
+	chatcolors: {
+		say: 1,				// Menu > Font Colors > Chat > Immediate vicinity ("Say")
+		tell: 4,			// Menu > Font Colors > Chat > Tell target only ("Tell")
+		party: 5,			// Menu > Font Colors > Chat > All party members ("Party")
+		linkshell: 6,		// Menu > Font Colors > Chat > Linkshell group ("Linkshell")
+		emote: 7,			// Menu > Font Colors > Chat > Emotes
+		message: 17,		// Menu > Font Colors > Chat > Messages ("Message")
+		npc: 142,			// Menu > Font Colors > Chat > NPC Conversations
+		shout: 2,			// Menu > Font Colors > Chat > Wide area ("Shout")
+		yell: 3,			// Menu > Font Colors > Chat > Extremely wide area ("Yell")
+		selfheal: 30,		// Menu > Font Colors > For Self > HP/MP you recover
+		selfhurt: 28,		// Menu > Font Colors > For Self > HP/MP you loose
+		selfbuff: 56,		// Menu > Font Colors > For Self > Beneficial effects you are granted
+		selfdebuff: 57,		// Menu > Font Colors > For Self > Detrimental effects you receive
+		selfresist: 59,		// Menu > Font Colors > For Self > Effects you resist
+		selfevade: 29,		// Menu > Font Colors > For Self > Actions you evade
+		otherheal: 22,		// Menu > Font Colors > For Others > HP/MP others recover
+		otherhurt: 20,		// Menu > Font Colors > For Others > HP/MP others loose
+		otherbuff: 60,		// Menu > Font Colors > For Others > Beneficial effects others are granted
+		otherdebuff: 61,	// Menu > Font Colors > For Others > Detrimental effects others receive
+		otherresist: 63,	// Menu > Font Colors > For Others > Effects others resist
+		otherevade: 21,		// Menu > Font Colors > For Others > Actions others evade
+		cfh: 8,				// Menu > Font Colors > System > Calls for help
+		battle: 50,			// Menu > Font Colors > System > Standard battle messages
+		system: 121			// Menu > Font Colors > System > Basic system messages
+	},
+	elements: {
+		days: {
+			Firesday: Fire,
+			Earthsday: Earth,
+			Watersday: Water,
+			Windsday: Wind,
+			Iceday: Ice,
+			Lightningday: Lightning,
+			Lightsday: Light,
+			Darksday: Darkness
+		},
+		storms: {
+			Sandstorm: Earth,
+			Rainstorm: Water,
+			Windstorm: Wind,
+			Firestorm: Fire,
+			Hailstorm: Ice,
+			Thunderstorm: Lightning,
+			Voidstorm: Darkness,
+			Aurorastorm: Light
+		},
+		spirits: {
+			Fire Spirit: Fire,
+			Ice Spirit: Ice,
+			Air Spirit: Wind,
+			Earth Spirit: Earth,
+			Water Spirit: Water,
+			Thunder Spirit: Lightning,
+			Light Spirit: Light,
+			Dark Spirit: Darkness
+		}
+	}
+}
