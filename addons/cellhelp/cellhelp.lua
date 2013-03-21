@@ -111,11 +111,11 @@ local ll = io.open(lua_base_path..'../../plugins/ll/salvage-'..player..'-add.txt
 		end
 	end
 	if custompass == nil then
-		write('Add something to the top line of your salvage-add.txt file to pass things other than cells.  Please keep these on one line. Reload after.')
+		write('Add something to the top line of your salvage-'..player..'-add.txt file to pass things other than cells.  Please keep these on one line. Reload after.')
 		custompass=''
 	end
 	if customlot == nil then
-		write('Add something to the second line of your salvage-add.txt file to lot things other than cells. Please keep these on one line. Reload after')
+		write('Add something to the second line of your salvage-'..player..'-add.txt file to lot things other than cells. Please keep these on one line. Reload after')
 		customlot=''
 	end
 return customlot,custompass
