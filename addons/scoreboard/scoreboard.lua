@@ -328,10 +328,19 @@ end
 function report_summary ()
 	local damage_table, total_damage
 	damage_table, total_damage = get_sorted_player_damage()
+	local max_line_length = 127 -- game constant
 
+	-- We have to make sure not to exceed max line or it can cause a crash
 	local display_table = T{}
+	local line_length = 0
 	for k, v in pairs(damage_table) do
-		display_table:append(string.format("%s %d(%.1f%%)", v[1], v[2], 100 * v[2]/total_damage))
+		formatted_entry = string.format("%s %d(%.1f%%)", v[1], v[2], 100 * v[2]/total_damage)
+		local new_line_length = line_length + formatted_entry:len() + 2 -- 2 is for the sep
+		
+		if new_line_length < max_line_length then
+			display_table:append(formatted_entry)
+			line_length = new_line_length
+		end
 	end
 
 	send_command('input ' .. table.concat(display_table, ', '))
