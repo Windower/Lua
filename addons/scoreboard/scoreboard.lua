@@ -4,7 +4,7 @@ require 'tablehelper'
 require 'stringhelper'
 require 'mathhelper'
 
-------- USER SETTINGS -------
+------- Default values; do not change -------
 
 local x_pos_default = 1500
 local y_pos_default = 500
