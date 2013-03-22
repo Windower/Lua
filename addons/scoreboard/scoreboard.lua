@@ -321,7 +321,7 @@ function update_scoreboard()
 	else
 		dps_lines = table.concat(display_table, '\n')
 	end
-	tb_set_text('scoreboar7d', build_scoreboard_header() .. dps_lines)
+	tb_set_text('scoreboard', build_scoreboard_header() .. dps_lines)
 end
 
 
