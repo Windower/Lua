@@ -1,4 +1,4 @@
---[
+-- Scoreboard addon for Windower4 --
 
 require 'tablehelper'
 require 'stringhelper'
