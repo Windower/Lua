@@ -44,4 +44,4 @@ Limitations:
 
 Known issues:
 * Enspell and Spike damage are not currently parsed
-( User settings not yet storable
+* User settings not yet storable
