@@ -21,7 +21,7 @@ Purpose: To allow chat log customization.
 
 Installation Instructions:
 
-* 1 Download the lua file. (https://raw.github.com/Windower/Lua/master/addons/answeringmachine/answeringmachine.lua)
+* 1 Download the lua file. (https://raw.github.com/Windower/Lua/master/addons/battlemod/battlemod.lua)
 * 2 Place it in the (..\windower4\addons\battlemod\) folder, which you will have to create.
 * 3 Also make a folder named "data" in that directory, ..\windower4\addons\battlemod\data.
 * 4 Start your copy of Windower 4, use //lua l battlemod. This will create a default settings file for you in the data folder.
