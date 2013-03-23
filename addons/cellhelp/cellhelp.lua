@@ -24,7 +24,35 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+function event_addon_command(...)
+    cmd = {...}
+	if cmd[1] ~= nil then
+		if cmd[1]:lower() == "help" then
+			write('cellhelp position: <x> <y> coordinates')
+			write('cellhelp hide: hides the cellhelp box')
+			write('cellhelp show: shows the cellhelp box')
+			write('cellhelp : In order to add custom lot pass rules, add it to your salvage-'..player..'-add.txt file. \n (One line for pass, one for lot)')
+		end
+
+		if cmd[1]:lower() == "position" then
+			if cmd[3] ~= nil then
+				tb_set_location('salvage_box',cmd[2],cmd[3])
+			end
+		end
+		
+		if cmd[1]:lower() == "hide" then
+			tb_set_visibility('salvage_box', false)
+		end
+		
+		if cmd[1]:lower() == "show" then
+			tb_set_visibility('salvage_box', true)
+		end
+	end
+end
+
+
 function event_load()
+	send_command('alias ch lua c cellhelp')
 	a = 0
 	player = get_player()['name']
 	get_ll()
@@ -59,8 +87,16 @@ function event_load()
 end
 function event_unload()
 	tb_delete('salvage_box')
+	end_command('unalias ch')
 	--io.open(lua_base_path..'../../plugins/ll/salvage-'..player..'.txt',"w"):write(''):close()
 end
+
+function event_zone_change(fromId, from, toId, to)
+	if fromId == 72 and toId == 74 or toId == 75 or toId == 76 or toId == 73 then
+		send_command('ll profile salvage-'..player..'.txt')
+	end
+end
+
 
 function event_incoming_text(old, new, color)
 	match_obt =  old:match(player..' obtains an? ..(.*)..%.')
