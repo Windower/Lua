@@ -40,7 +40,7 @@ function event_load()
 	color_arr={p0='\x1F\xF7',p1='\x1F\xCC',p2='\x1F\x9C',p3='\x1F\xEE',p4='\x1F\x05',p5='\x1F\x06',
 	a10='\x1F\xCD',a11='\x1F\x69',a12='\x1F\xA7',a13='\x1F\x26',a14='\x1F\x7D',a15='\x1F\xB9',
 	a20='\x1F\xAF',a21='\x1F\x03',a22='\x1F\xC8',a23='\x1F\xE3',a24='\x1F\xE5',a25='\x1F\xD0',
-	mob='\x1F\xCA', mobdmg='\x1F\x08', mydmg='\x1F\x08', partydmg='\x1F\x08', allydmg='\x1F\x08', otherdmg='\x1F\x08'}
+	mob='\x1F\x45', mobdmg='\x1F\x08', mydmg='\x1F\x08', partydmg='\x1F\x08', allydmg='\x1F\x08', otherdmg='\x1F\x08'}
     send_command('alias bm lua c battlemod cmd')
 	options_load()
 end
@@ -64,7 +64,7 @@ function options_load()
 		g:write('Color p0: 501\nColor p1: 204\nColor p2: 410\nColor p3: 492\nColor p4: 259\nColor p5: 260\n')
 		g:write('Color a10: 205\nColor a11: 359\nColor a12: 167\nColor a13: 038\nColor a14: 125\nColor a15: 185\n')
 		g:write('Color a20: 429\nColor a21: 257\nColor a22: 200\nColor a23: 481\nColor a24: 483\nColor a25: 208\n')
-		g:write('Color mob: 456\nColor mobdmg: 8\nColor mydmg: 8\nColor partydmg: 8\nColor allydmg: 8\nColor otherdmg: 8')
+		g:write('Color mob: 69\nColor mobdmg: 8\nColor mydmg: 8\nColor partydmg: 8\nColor allydmg: 8\nColor otherdmg: 8')
 		g:close()
 		line_full = '\91\36\123user\125\93 \36\123damg\125 \36\123abil\125 \x81\xA8 \36\123targ\125'
 		line_nouser = '\36\123abil\125 \36\123damg\125 \x81\xA8 \36\123targ\125'
@@ -290,7 +290,8 @@ function event_incoming_text(original, modified, color)
 	end
 	
 	if condensebattle then
-		if redcol == 20 or redcol == 21 or redcol == 25 or redcol == 26 or redcol == 28 or redcol == 29 or redcol == 32 or redcol == 33 or redcol == 40 or redcol == 41 or redcol == 163 or redcol == 164 then
+		write(redcol)
+		if redcol == 20 or redcol == 21 or redcol == 25 or redcol == 26 or redcol == 28 or redcol == 29 or redcol == 32 or redcol == 33 or redcol == 40 or redcol == 41 or redcol == 163 or redcol == 164 or redcol == 104 then
 			local takes,a,targ1,dmg1 = string.find(original,"([%w%s\39]+) takes? (%d+) points of damage\46")
 			local uses,a,user1,abil1 = string.find(original,"([%w%s\39]+) uses? (%u[%w%s\39\58]+)\46?\44?")
 			local casts,a,user4,abil2 = string.find(original,"([%w%s\39]+) casts? (%u[%w%s\39\58]+)\46")
@@ -316,16 +317,17 @@ function event_incoming_text(original, modified, color)
 			
 			local col = string.char(0x1F,redcol)
 			if colorful then
-				if redcol == 28 or redcol == 29 or redcol == 32 or redcol == 33 then
+				if redcol == 28 or redcol == 29 or redcol == 32 or redcol == 33 or redcol == 104 then
 					output_arr['targ'] = name_col('',output_arr['targ'],col)
 					if output_arr['user'] ~= '' then
-						output_arr['user'] = color_arr['mob']..output_arr['user']..col
+						output_arr['user'] =  color_arr['mob']..output_arr['user']..col
 					end
 					if output_arr['damg'] ~= '' then
 						output_arr['damg'] = color_arr['mobdmg']..output_arr['damg']..col
 					end
 				else
-					output_arr['targ'] = color_arr['mob']..output_arr['targ']..col
+					output_arr['targ'] =  color_arr['mob']..output_arr['targ']..col
+					--output_arr['targ'] = color_arr['mob']..output_arr['targ']..col
 					if output_arr['user'] ~= '' then
 						output_arr['user'] = name_col('',output_arr['user'],col)
 					end
