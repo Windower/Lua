@@ -15,6 +15,17 @@ function string.at(str, pos)
 	return str:slice(pos, pos)
 end
 
+-- Returns the character at position #str-pos. Defaults to 0 to return the last character.
+function string.last(str, offset)
+	offset = offset or 1
+	return str:at(-offset)
+end
+
+-- Returns true if the string contains a substring.
+function string.contains(str, sub)
+	return str:find(sub, nil, true)
+end
+
 -- Splits a string into a table by a separator pattern. Empty strings are ignored.
 function string.psplit(str, sep, maxsplit)
 	maxsplit = maxsplit or 0
@@ -62,9 +73,19 @@ function string.slice(str, from, to)
 	return str:sub(from or 1, to or #str)
 end
 
+-- Returns an iterator, that goes over every character of the string.
+function string.it(str)
+	return str:gmatch('.')
+end
+
 -- Removes leading and trailing whitespaces and similar characters (tabs, newlines, etc.).
 function string.trim(str)
 	return str:match('^%s*(.-)%s*$')
+end
+
+-- Collapses all types of spaces into exactly one whitespace
+function string.spaces_collapse(str)
+	return str:gsub('%s+', ' '):trim()
 end
 
 -- Removes all characters in chars from str.
@@ -150,4 +171,25 @@ function string.todec(numstr, base)
 	end
 	
 	return acc
+end
+
+-- Checks if a string is in a table.
+function string.isin(str, ...)
+	return T{...}:flatten():contains(str)
+end
+
+-- Checks if a string is empty
+function string.isempty(str)
+	return #str == 0
+end
+
+-- Counts the occurrences of a substring in a string.
+function string.count(str, sub)
+	return str:pcount(sub:gsub('[[%]%%^$*().-+]', '%%%1'))
+end
+
+-- Counts the occurrences of a pattern in a string.
+function string.pcount(str, pat)
+	local _, count = str:gsub(pat, '')
+	return count
 end

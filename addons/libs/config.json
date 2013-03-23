@@ -1,8 +1,0 @@
-logger: {
-	logtofile: false,		// Set to true to output logging to a file
-	defaultfile: lua.log,	// Default file to log to, if logging to file
-	logcolor: 160,			// Regular logging color
-	errorcolor: 167,		// Error logging color
-	warningcolor: 207,		// Warning logging color
-	noticecolor: 121		// Notice logging color
-}

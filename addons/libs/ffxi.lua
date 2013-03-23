@@ -6,18 +6,19 @@ _libs = _libs or {}
 _libs.ffxi = true
 _libs.tablehelper = _libs.tablehelper or require 'tablehelper'
 _libs.stringhelper = _libs.stringhelper or require 'stringhelper'
-_libs.jsonreader = _libs.jsonreader or require 'jsonreader'
+_libs.json = _libs.json or require 'json'
 
-ffxidata = ffxidata or jsonreader.read('ffxidata.json')
+ffxi = T{}
+ffxi.data = ffxi.data or _libs.json.read('../libs/ffxidata.json')
 
 -- Returns ingame time from server time.
 -- TODO: Waiting on server-time interface function.
-function get_time(time)
+function ffxi.get_time(time)
 	return 4
 end
 
 -- Returns the game time from the float-representation.
-function format_time(time)
+function ffxi.format_time(time)
 	time = tostring(math.round(time, 2)):split('.'):print()
 	local hours = time[1]:zfill(2)
 	local minutes = time[2]:zfill(2)
@@ -25,7 +26,7 @@ function format_time(time)
 end
 
 -- Returns the element of the storm effect currently on the player. If none present, returns nil.
-function get_storm()
+function ffxi.get_storm()
 	for storm, element in pairs(ffxi.elements.storms) do
 		if T(get_player()['buffs']):contains(storm) then
 			return element
@@ -34,3 +35,5 @@ function get_storm()
 	
 	return nil
 end
+
+return ffxi

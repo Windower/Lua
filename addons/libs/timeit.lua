@@ -5,7 +5,7 @@ A library providing a timing feature.
 _libs = _libs or {}
 _libs.timeit = true
 
-timeit = {}
+local timeit = {}
 
 -- Creates a new timer object.
 function timeit.new()
@@ -37,3 +37,4 @@ function timeit.check(timer)
 	return tdiff
 end
 
+return timeit
