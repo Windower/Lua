@@ -233,10 +233,11 @@ function event_incoming_text(original, modified, color)
 		if redcol >17 then
 			if original == prevline then
 				a,b = string.find(original,'You buy ')
-				e,b = string.find(original,'You synthesized ')
+				f,b = string.find(original,'You sell ')
+				e,b = string.find(original,'%w+ synthesized ')
 				c,b = string.find(original,' bought ')
 				d,b = string.find(original,'You find a ')
-				if a==nil and c==nil and d==nil and e==nil then
+				if a==nil and c==nil and d==nil and e==nil and f==nil then
 					modified = ''
 					if allow == 1 then
 						send_command('wait 5;lua c battlemod allow')
