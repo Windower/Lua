@@ -49,7 +49,7 @@ function options_load()
 	local f = io.open(lua_base_path..'data/settings.txt', "r")
 	if f == nil then
 		local g = io.open(lua_base_path..'data/settings.txt', "w")
-		g:write('Release Date: 11:46 AM, 3-23-12\46')
+		g:write('Release Date: 14:09 PM, 3-23-12\46')
 		g:write('Author Comment: This document is whitespace sensitive, which means that you need the same number of spaces between things as exist in this initial settings file\46\n')
 		g:write('Author Comment: It looks at the first two words separated by spaces and then takes anything as the value in question if the first two words are relevant\46\n')
 		g:write('Author Comment: If you ever mess it up so that it does not work, you can just delete it and battlemod will regenerate it upon reload\46\n')
@@ -232,10 +232,11 @@ function event_incoming_text(original, modified, color)
 	if cancelmulti then
 		if redcol >17 then
 			if original == prevline then
-				a,b = string.find(original,'You buy the')
+				a,b = string.find(original,'You buy ')
+				e,b = string.find(original,'You synthesized ')
 				c,b = string.find(original,' bought ')
 				d,b = string.find(original,'You find a ')
-				if a==nil and c==nil then
+				if a==nil and c==nil and d==nil and e==nil then
 					modified = ''
 					if allow == 1 then
 						send_command('wait 5;lua c battlemod allow')
