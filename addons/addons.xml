@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<addons>
+  <addon>
+    <name>Example</name>
+    <author>Iryoku</author>
+    <description>
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis dolor est,
+      tristique vitae lacinia quis, vulputate sit amet mi. Duis lacinia, massa
+      at faucibus sagittis.
+    </description>
+    <bugtracker>https://github.com/IryokuChevalier/Lua/issues</bugtracker>
+    <support>http://forums.windower.net/topic/21775-random-question-thread/</support>
+  </addon>
+</addons>
