@@ -49,7 +49,7 @@ function options_load()
 	local f = io.open(lua_base_path..'data/settings.txt', "r")
 	if f == nil then
 		local g = io.open(lua_base_path..'data/settings.txt', "w")
-		g:write('Release Date: 11:06 AM, 3-23-12\46')
+		g:write('Release Date: 11:46 AM, 3-23-12\46')
 		g:write('Author Comment: This document is whitespace sensitive, which means that you need the same number of spaces between things as exist in this initial settings file\46\n')
 		g:write('Author Comment: It looks at the first two words separated by spaces and then takes anything as the value in question if the first two words are relevant\46\n')
 		g:write('Author Comment: If you ever mess it up so that it does not work, you can just delete it and battlemod will regenerate it upon reload\46\n')
@@ -290,7 +290,6 @@ function event_incoming_text(original, modified, color)
 	end
 	
 	if condensebattle then
-		write(redcol)
 		if redcol == 20 or redcol == 21 or redcol == 25 or redcol == 26 or redcol == 28 or redcol == 29 or redcol == 32 or redcol == 33 or redcol == 40 or redcol == 41 or redcol == 163 or redcol == 164 or redcol == 104 then
 			local takes,a,targ1,dmg1 = string.find(original,"([%w%s\39]+) takes? (%d+) points of damage\46")
 			local uses,a,user1,abil1 = string.find(original,"([%w%s\39]+) uses? (%u[%w%s\39\58]+)\46?\44?")
