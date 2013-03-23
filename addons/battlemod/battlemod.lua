@@ -37,10 +37,10 @@ function event_load()
 	line_full = 'Full line is not loading'
 	line_nouser = 'No User line is not loading'
 	line_nodmg = 'No Damage line is not loading'
-	color_arr={p0='\x1F\x02',p1='\x1F\x03',p2='\x1F\x04',p3='\x1F\x05',p4='\x1F\x06',p5='\x1F\x01',
-	a10='\x1F\x02',a11='\x1F\x03',a12='\x1F\x04',a13='\x1F\x05',a14='\x1F\x06',a15='\x1F\x01',
-	a20='\x1F\x02',a21='\x1F\x03',a22='\x1F\x04',a23='\x1F\x05',a24='\x1F\x06',a25='\x1F\x01',
-	mob='\x1F\xA7', mobdmg='\x1F\x08', mydmg='\x1F\x08', partydmg='\x1F\x08', allydmg='\x1F\x08', otherdmg='\x1F\x08'}
+	color_arr={p0='\x1F\xF7',p1='\x1F\xCC',p2='\x1F\x9C',p3='\x1F\xEE',p4='\x1F\x05',p5='\x1F\x06',
+	a10='\x1F\xCD',a11='\x1F\x69',a12='\x1F\xA7',a13='\x1F\x26',a14='\x1F\x7D',a15='\x1F\xB9',
+	a20='\x1F\xAF',a21='\x1F\x03',a22='\x1F\xC8',a23='\x1F\xE3',a24='\x1F\xE5',a25='\x1F\xD0',
+	mob='\x1F\xCA', mobdmg='\x1F\x08', mydmg='\x1F\x08', partydmg='\x1F\x08', allydmg='\x1F\x08', otherdmg='\x1F\x08'}
     send_command('alias bm lua c battlemod cmd')
 	options_load()
 end
@@ -49,7 +49,7 @@ function options_load()
 	local f = io.open(lua_base_path..'data/settings.txt', "r")
 	if f == nil then
 		local g = io.open(lua_base_path..'data/settings.txt', "w")
-		g:write('Release Date: 10:32 AM, 3-23-12\46')
+		g:write('Release Date: 11:06 AM, 3-23-12\46')
 		g:write('Author Comment: This document is whitespace sensitive, which means that you need the same number of spaces between things as exist in this initial settings file\46\n')
 		g:write('Author Comment: It looks at the first two words separated by spaces and then takes anything as the value in question if the first two words are relevant\46\n')
 		g:write('Author Comment: If you ever mess it up so that it does not work, you can just delete it and battlemod will regenerate it upon reload\46\n')
@@ -61,10 +61,10 @@ function options_load()
 		g:write('Output NoUser: \36\123abil\125 \36\123damg\125 \x81\xA8 \36\123targ\125\n')
 		g:write('Output NoDamg: \91\36\123user\125\93 \36\123abil\125 \x81\xA8 \36\123targ\125\n')
 		g:write('Condense Battle: true\nCondense Buffs: true\nComma Mode: false\nOxford Comma: true\nColorful Names: true\nSuper Silence: true\nTarget Number: true\n')
-		g:write('Color p0: 2\nColor p1: 3\nColor p2: 4\nColor p3: 5\nColor p4: 6\nColor p5: 1\n')
-		g:write('Color a10: 2\nColor a11: 3\nColor a12: 4\nColor a13: 5\nColor a14: 6\nColor a15: 1\n')
-		g:write('Color a20: 2\nColor a21: 3\nColor a22: 4\nColor a23: 5\nColor a24: 6\nColor a25: 1\n')
-		g:write('Color mob: 167\nColor mobdmg: 8\nColor mydmg: 8\nColor partydmg: 8\nColor allydmg: 8\nColor otherdmg: 8')
+		g:write('Color p0: 501\nColor p1: 204\nColor p2: 410\nColor p3: 492\nColor p4: 259\nColor p5: 260\n')
+		g:write('Color a10: 205\nColor a11: 359\nColor a12: 167\nColor a13: 038\nColor a14: 125\nColor a15: 185\n')
+		g:write('Color a20: 429\nColor a21: 257\nColor a22: 200\nColor a23: 481\nColor a24: 483\nColor a25: 208\n')
+		g:write('Color mob: 456\nColor mobdmg: 8\nColor mydmg: 8\nColor partydmg: 8\nColor allydmg: 8\nColor otherdmg: 8')
 		g:close()
 		line_full = '\91\36\123user\125\93 \36\123damg\125 \36\123abil\125 \x81\xA8 \36\123targ\125'
 		line_nouser = '\36\123abil\125 \36\123damg\125 \x81\xA8 \36\123targ\125'
