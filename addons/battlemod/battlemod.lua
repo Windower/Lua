@@ -50,7 +50,7 @@ function options_load()
 	local f = io.open(lua_base_path..'data/settings.txt', "r")
 	if f == nil then
 		local g = io.open(lua_base_path..'data/settings.txt', "w")
-		g:write('Release Date: 14:09 PM, 3-23-12\46')
+		g:write('Release Date: 11:31 PM, 3-23-12\46')
 		g:write('Author Comment: This document is whitespace sensitive, which means that you need the same number of spaces between things as exist in this initial settings file\46\n')
 		g:write('Author Comment: It looks at the first two words separated by spaces and then takes anything as the value in question if the first two words are relevant\46\n')
 		g:write('Author Comment: If you ever mess it up so that it does not work, you can just delete it and battlemod will regenerate it upon reload\46\n')
@@ -303,27 +303,43 @@ function event_incoming_text(original, modified, color)
 			
 		end
 	end
-	
 	if condensebattle then
-		if redcol == 20 or redcol == 21 or redcol == 25 or redcol == 26 or redcol == 28 or redcol == 29 or redcol == 32 or redcol == 33 or redcol == 40 or redcol == 41 or redcol == 163 or redcol == 164 or redcol == 104 then
-			local takes,a,targ1,dmg1 = string.find(original,"([%w%s\39\45]+) takes? (%d+) points of damage\46")
-			local uses,a,user1,abil1 = string.find(original,"([%w%s\39\45]+) uses? (%u[%w%s\39\58]+)\46?\44?")
-			local casts,a,user4,abil2 = string.find(original,"([%w%s\39\45]+) casts? (%u[%w%s\39\58]+)\46")
-			local crit,a,user2 = string.find(original,"([%w%s\39\45]+)\39?s? ?r?a?n?g?e?d? ?a?t?t?a?c?k? scores? a critical hit!")
-			local hits,a,user3,targ2,dmg2 = string.find(original,"([%w%s\39\45]+)\39?s? ?r?a?n?g?e?d? ?a?t?t?a?c?k? hits? ([%w%s\39\45]+) for (%d+) points of damage\46")
-			local ranged,a = string.find(original,"ranged attack")
-			local skillchain,a,abil3 = string.find(original,'Skillchain: (%w+)\46')
+		if redcol == 20 or redcol == 21 or redcol == 23 or redcol == 24 or redcol == 25 or redcol == 26 or redcol == 28 or redcol == 29 or redcol == 32 or redcol == 33 or redcol == 40 or redcol == 41 or redcol == 163 or redcol == 164 or redcol == 104 or redcol == 112 or redcol == 114 or redcol==31 then
+			-- Basic initiation messages:
+			local uses,a,user1,abil1 = string.find(original,'([%w%s\39\45]+) uses? (%u[%w%s\39\58]+)%.?,?')
+			local casts,a,user4,abil2 = string.find(original,'([%w%s\39\45]+) casts? (%u[%w%s\39\58]+)%.')
+			
+			-- Defensive/negation
 			local counter,a,targ3,user6 = string.find(original,'([%w%s\39\45]+)\39?s? attack is countered by ([%w%s\39\45]+)\46')
-			local spikes,a,user7,dmg3,targ4 = string.find(original,'([%w%s\39\45]+)\39?s? spikes deal (%d+) points? of damage to ([%w%s\39\45]+)\46')
-			local addeffect,a,targ5,dmg4 = string.find(original,'Additional effect: ([%w%s]+) takes (%d+) additional points? of damage\46')
-			local addeffect2,a,effect = string.find(original,' and is (%w+)\46')
-			local misses,a,user8,targ6 = string.find(original,'([%w%s\39\45]+)\39?s? ?r?a?n?g?e?d? ?a?t?t?a?c?k? misse?s? ([%w%s\39\45]+)\46')
 			local parry,a,user9,targ7 = string.find(original,'([%w%s\39\45]+) parries ([%w%s\39\45]+)\39?s? attack')
 			local dodge,a,user10,targ8 = string.find(original,'([%w%s\39\45]+) dodges ([%w%s\39\45]+)\39?s? attack')
-			local shadow,a,dmg5,targ9,trash = string.find(original,'(%d) of ([%w%s\39\45]+)s absorbs? the damage and disappears.')
+			local shadow,a,dmg5,targ9 = string.find(original,'(%d) of ([%w%s\39\45]+)s absorbs? the damage and disappears%.')
 			
-			output_arr['targ'] = targ1 or targ2 or targ3 or targ4 or targ5 or targ6 or targ7 or targ8 or targ9 or ''
-			output_arr['damg'] = dmg1 or dmg2 or dmg3 or dmg4 or dmg5 or ''
+			-- Stand-alone messages:
+			local spikes,a,user7,dmg3,targ4 = string.find(original,'([%w%s\39\45]+)\39?s? spikes deal (%d+) points? of damage to ([%w%s\39\45]+)%.')
+			local addeffect,a,targ5,dmg4 = string.find(original,'Additional effect: ([%w%s]+) takes (%d+) additional points? of damage%.')
+			local skillchain,a,abil3 = string.find(original,'Skillchain: (%a+)\46')
+			
+			-- Basic result messages
+			local takes,a,targ1,dmg1 = string.find(original,'([%w%s\39\45]+) takes? (%d+) points of damage')
+			local crit,a,user2 = string.find(original,'([%w%s\39\45]+)\39?s? ?r?a?n?g?e?d? ?a?t?t?a?c?k? scores? a critical hit!')
+			local hits,a,user3,targ2,dmg2 = string.find(original,'([%w%s\39\45]+)\39?s? ?r?a?n?g?e?d? ?a?t?t?a?c?k? hits? ([%w%s\39\45]+) for (%d+) points of damage%.')
+			local misses,a,user8,targ6 = string.find(original,'([%w%s\39\45]+)\39?s? ?r?a?n?g?e?d? ?a?t?t?a?c?k? misse?s? ([%w%s\39\45]+)%.')
+			
+			-- Flags
+			local ranged,a = string.find(original,'ranged attack')
+			local addeffect2,a,effect = string.find(original,' and is (%a+)\46')
+			
+			-- JA Specific
+			local step,a,targ10,daze = string.find(original,'([%w%s\39%-]+) i?s?a?r?e? afflicted with [%a]+ [%a]+ %(lv%.(%d)%)%.')
+			
+			-- Healing
+			local reverse,a,targ11,dmg6 = string.find(original,'([%w%s\39%-]+) regains ([%d%a%s]+)%.')
+			local cure,a,targ12,dmg7 = string.find(original,'([%w%s\39%-]+) recovers ([%d%a%s]+)%.')
+			
+			
+			output_arr['targ'] = targ1 or targ2 or targ3 or targ4 or targ5 or targ6 or targ7 or targ8 or targ9 or targ10 or targ11 or targ12 or targ13 or ''
+			output_arr['damg'] = dmg1 or dmg2 or dmg3 or dmg4 or dmg5 or dmg6 or dmg7 or ''
 			output_arr['user'] = user1 or user2 or user3 or user4 or user5 or user6 or user7 or user8 or user9 or user10 or ''
 			output_arr['abil'] = abil1 or abil2 or abil3 or ''
 			
@@ -333,6 +349,9 @@ function event_incoming_text(original, modified, color)
 			
 			if shadow ~= nil then
 				output_arr['damg'] = output_arr['damg']..' shadow'
+			end
+			if step~= nil and daze ~= nil then
+				output_arr['damg'] = 'Lv.'..daze
 			end
 			
 			local col = string.char(0x1F,redcol)
@@ -345,6 +364,9 @@ function event_incoming_text(original, modified, color)
 					if output_arr['damg'] ~= '' then
 						output_arr['damg'] = color_arr['mobdmg']..output_arr['damg']..'\x1E\x01'..col
 					end
+				elseif redcol == 31 then
+					output_arr['targ'] = name_col('',output_arr['targ'],col)
+					output_arr['user'] = name_col('',output_arr['user'],col)
 				else
 					output_arr['targ'] =  color_arr['mob']..output_arr['targ']..'\x1E\x01'..col
 					if output_arr['user'] ~= '' then
@@ -405,7 +427,7 @@ function event_incoming_text(original, modified, color)
 				output_arr['targ']=output_arr['targ']..' \40'..effect..'\41'
 			end
 			
-			if takes~=nil or hits~=nil or spikes ~= nil or addeffect ~=nil or misses ~= nil or parry ~= nil or dodge~=nil or shadow~=nil then
+			if takes~=nil or hits~=nil or spikes ~= nil or addeffect ~=nil or misses ~= nil or parry ~= nil or dodge~=nil or shadow~=nil or step~=nil or reverse ~= nil or cure~=nil then
 				if output_arr['user']=='' then
 					if shadow ~= nil then
 						modified=line_shadow:gsub('$\123(%w+)\125',bounce)
