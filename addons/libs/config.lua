@@ -4,7 +4,6 @@ Functions that facilitate loading, parsing and storing of config files.
 
 _libs = _libs or {}
 _libs.config = true
-_libs.logger = _libs.logger or require 'logger'
 _libs.tablehelper = _libs.tablehelper or require 'tablehelper'
 _libs.stringhelper = _libs.stringhelper or require 'stringhelper'
 local json = require 'json'
@@ -50,7 +49,7 @@ function config.load(filename, confdict)
 	file:set(filepath)
 
 	-- Load addon/script config file (Windower/addon/<addonname>/config.json for addons and Windower/scripts/<name>-config.json).
-	local config_load, err = parse(file)
+	local config_load, err = parse(file, confdict)
 
 	if config_load == nil then
 		if err ~= nil then
@@ -61,11 +60,13 @@ function config.load(filename, confdict)
 		return confdict
 	end
 	
-	return merge_settings(confdict, config_load)
+	return confdict:update(config_load)
 end
 
 -- Resolves to the correct parser and calls the respective subroutine, returns the parsed settings table.
-function parse(file)
+function parse(file, confdict)
+	confdict = confdict or T{}
+	
 	local parsed = T{}
 	local err
 	if file.path:endswith('.json') then
@@ -80,7 +81,7 @@ function parse(file)
 			end
 			return T{}
 		end
-		parsed = settings_table(parsed)
+		parsed = settings_table(parsed, confdict)
 	end
 	
 	-- Determine all characters found in the settings file.
@@ -89,11 +90,12 @@ function parse(file)
 	-- Update the global settings with the per-player defined settings, if they exist. Save the parsed value for later comparison.
 	original = parsed:copy()
 	
-	return merge_settings(parsed['global'], parsed[get_player()['name']:lower()])
+	return parsed['global']:update(parsed[get_player()['name']:lower()])
 end
 
 -- Parses a settings struct from a DOM tree.
-function settings_table(node, key)
+function settings_table(node, confdict, key)
+	confdict = confdict or T{}
 	key = key or 'settings'
 	
 	local t = T{}
@@ -119,9 +121,8 @@ function settings_table(node, key)
 			return num
 		end
 		
-		local arr = val:psplit('%s*,%s*')
-		if #arr > 1 then
-			return arr
+		if confdict:containskey(node.name) and type(confdict[node.name]) == 'table' then
+			return val:psplit('%s*,%s*')
 		end
 		
 		return val
@@ -132,13 +133,19 @@ function settings_table(node, key)
 			comments[key] = child.value
 		elseif child.type == 'tag' then
 			key = child.name:lower()
-			t[child.name:lower()] = settings_table(child, key)
+			local childdict
+			if confdict:containskey(key) then
+				childdict = confdict:copy()
+			else
+				childdict = confdict
+			end
+			t[child.name:lower()] = settings_table(child, childdict, key)
 		end
 	end
 	
 	return t
 end
-
+--[[
 -- Identical to table.update, except for type-correct conversion from strings to tables, if it's a table in the original value.
 function merge_settings(t, t_update)
 	if t_update == nil then
@@ -147,9 +154,9 @@ function merge_settings(t, t_update)
 	
 	for key, val in pairs(t_update) do
 		if t[key] ~= nil and type(t[key]) == 'table' and type(val) == 'table' then
-			t[key] = T(t[key]):update(T(val))
+			t[key] = merge_settings(t[key], val)
 		elseif t[key] ~= nil and type(t[key]) == 'table' then
-			t[key] = T{val}:flatten()
+			t[key] = val:psplit('%s*,%s*')
 		else
 			t[key] = val
 		end
@@ -157,7 +164,7 @@ function merge_settings(t, t_update)
 	
 	return t
 end
-
+]]
 -- Writes the passed config table to the spcified file name.
 -- char defaults to get_player()['name']. Set to "all" to apply to all characters.
 function config.save(t, char)
@@ -180,18 +187,19 @@ function config.save(t, char)
 	if char == 'global' then
 		check = chars
 	else
-		check = chars:filter(functools.negate(functools.equals(loc)))
+		check = chars:filter(functools.equals(char))
 	end
 	
 	for _, char in ipairs(check) do
  		for key, val in pairs(original[char]) do
-			if val == original['global'][key] then
+			if val == original['global'][key] or (type(val) == 'table' and type(original['global'][key]) == 'table' and T(val):equals(T(original['global'][key]))) then
 				original[char][key] = nil
 			end
 		end
 		
 		if original[char]:isempty() then
 			original[char] = nil
+			chars:delete(char)
 		end
 	end
 	
