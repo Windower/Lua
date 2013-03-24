@@ -37,6 +37,7 @@ function event_load()
 	line_full = 'Full line is not loading'
 	line_nouser = 'No User line is not loading'
 	line_nodmg = 'No Damage line is not loading'
+	line_shadow = 'Shadow line is not loading'
 	color_arr={p0='\x1F\xF7',p1='\x1F\xCC',p2='\x1F\x9C',p3='\x1F\xEE',p4='\x1F\x05',p5='\x1F\x06',
 	a10='\x1F\xCD',a11='\x1F\x69',a12='\x1F\xA7',a13='\x1F\x26',a14='\x1F\x7D',a15='\x1F\xB9',
 	a20='\x1F\xAF',a21='\x1F\x03',a22='\x1F\xC8',a23='\x1F\xE3',a24='\x1F\xE5',a25='\x1F\xD0',
@@ -60,6 +61,7 @@ function options_load()
 		g:write('Output Full: \91\36\123user\125\93 \36\123damg\125 \36\123abil\125 \x81\xA8 \36\123targ\125\n')
 		g:write('Output NoUser: \36\123abil\125 \36\123damg\125 \x81\xA8 \36\123targ\125\n')
 		g:write('Output NoDamg: \91\36\123user\125\93 \36\123abil\125 \x81\xA8 \36\123targ\125\n')
+		g:write('Output Shadow: \91\36\123targ\125\93 \36\123abil\125 \36\123damg\125\n')
 		g:write('Condense Battle: true\nCondense Buffs: true\nComma Mode: false\nOxford Comma: true\nColorful Names: true\nSuper Silence: true\nTarget Number: true\n')
 		g:write('Color p0: 501\nColor p1: 204\nColor p2: 410\nColor p3: 492\nColor p4: 259\nColor p5: 260\n')
 		g:write('Color a10: 205\nColor a11: 359\nColor a12: 167\nColor a13: 038\nColor a14: 125\nColor a15: 185\n')
@@ -69,6 +71,7 @@ function options_load()
 		line_full = '\91\36\123user\125\93 \36\123damg\125 \36\123abil\125 \x81\xA8 \36\123targ\125'
 		line_nouser = '\36\123abil\125 \36\123damg\125 \x81\xA8 \36\123targ\125'
 		line_nodmg = '\91\36\123user\125\93 \36\123abil\125 \x81\xA8 \36\123targ\125'
+		line_shadow = '\91\36\123targ\125\93 \36\123abil\125 \36\123damg\125'
 		commamode= false
 		oxford = true
 		targetnumber = true
@@ -98,6 +101,10 @@ function options_load()
 				table.remove(splat,2)
 				table.remove(splat,1)
 				line_nodmg = table.concat(splat,' ')
+			elseif cmd == 'output shadow' then
+				table.remove(splat,2)
+				table.remove(splat,1)
+				line_shadow = table.concat(splat,' ')
 			elseif cmd == 'comma mode' then
 				commamode = str2bool(splat[3])
 			elseif cmd == 'oxford comma' then
@@ -171,6 +178,8 @@ function event_addon_command(...)
 			elseif splitarr[2]:lower() == 'cancelmulti' then
 				cancelmulti = not canclemulti
 				write('Multi-canceling flipped!')
+			elseif splitarr[2]:lower() == 'reload' then
+				options_load()
 			elseif splitarr[2]:lower() == 'condensebattle' then
 				condensebattle = not condensebattle
 				write('Condensed Battle text flipped!')
@@ -202,15 +211,16 @@ function event_addon_command(...)
 				write('Battlemod has 9 commands')
 				write(' 1. help --- shows this menu')
 				write(' 2. colortest --- Shows the 509 possible colors for use with the settings file')
+				write(' 3. reload --- Reloads the settings file')
 				write('Big Toggles:')
-				write(' 3. condensebuffs --- Condenses Area of Effect buffs, Default = True')
-				write(' 4. condensebattle --- Condenses battle logs according to your settings file, Default = True')
-				write(' 5. cancelmulti --- Cancles multiple consecutive identical lines, Default = True')
+				write(' 4. condensebuffs --- Condenses Area of Effect buffs, Default = True')
+				write(' 5. condensebattle --- Condenses battle logs according to your settings file, Default = True')
+				write(' 6. cancelmulti --- Cancles multiple consecutive identical lines, Default = True')
 				write('Sub Toggles:')
-				write(' 6. oxford --- Toggle use of oxford comma, Default = True')
-				write(' 7. commamode --- Toggle comma-only mode, Default = False')
-				write(' 8. targetnumber --- Toggle target number display, Default = True')
-				write(' 9. colorful --- Colors the output by alliance member, Default = True')
+				write(' 7. oxford --- Toggle use of oxford comma, Default = True')
+				write(' 8. commamode --- Toggle comma-only mode, Default = False')
+				write(' 9. targetnumber --- Toggle target number display, Default = True')
+				write(' 10. colorful --- Colors the output by alliance member, Default = True')
 			end
 		end
 	else
@@ -254,9 +264,12 @@ function event_incoming_text(original, modified, color)
 		if redcol == 191 or redcol == 56 or redcol == 64 or redcol==101 or redcol==111 then
 			local a,b,target,effect,c,d,e,f,gn
 			local polarity = nil
-			a,b,target,polarity,effect = string.find(original,"([%w]+) (%w+)s the effect of ([%w%s\39]+)\46")
+			a,b,target,polarity,effect = string.find(original,"([%w%s\39\45]+) (%w+)s the effect of ([%w%s\39]+)\46")
 			if a==nil then
-				c,d,target,effect = string.find(original,"([%w]+)\39s ([%w%s\39]+) effect wears off\46")
+				c,d,target,effect = string.find(original,"([%w%s\39\45]+)\39s ([%w%s\39]+) effect wears off\46")
+			end
+			if target ~= nil then
+				target = the_check(target)
 			end
 			if c ~= nil then
 				gn = 'wears'
@@ -293,57 +306,61 @@ function event_incoming_text(original, modified, color)
 	
 	if condensebattle then
 		if redcol == 20 or redcol == 21 or redcol == 25 or redcol == 26 or redcol == 28 or redcol == 29 or redcol == 32 or redcol == 33 or redcol == 40 or redcol == 41 or redcol == 163 or redcol == 164 or redcol == 104 then
-			local takes,a,targ1,dmg1 = string.find(original,"([%w%s\39]+) takes? (%d+) points of damage\46")
-			local uses,a,user1,abil1 = string.find(original,"([%w%s\39]+) uses? (%u[%w%s\39\58]+)\46?\44?")
-			local casts,a,user4,abil2 = string.find(original,"([%w%s\39]+) casts? (%u[%w%s\39\58]+)\46")
-			local crit,a,user2 = string.find(original,"([%w%s\39]+)\39?s? ?r?a?n?g?e?d? ?a?t?t?a?c?k? scores? a critical hit!")
-			local hits,a,user3,targ2,dmg2 = string.find(original,"([%w%s\39]+)\39?s? ?r?a?n?g?e?d? ?a?t?t?a?c?k? hits? ([%w%s\39]+) for (%d+) points of damage\46")
+			local takes,a,targ1,dmg1 = string.find(original,"([%w%s\39\45]+) takes? (%d+) points of damage\46")
+			local uses,a,user1,abil1 = string.find(original,"([%w%s\39\45]+) uses? (%u[%w%s\39\58]+)\46?\44?")
+			local casts,a,user4,abil2 = string.find(original,"([%w%s\39\45]+) casts? (%u[%w%s\39\58]+)\46")
+			local crit,a,user2 = string.find(original,"([%w%s\39\45]+)\39?s? ?r?a?n?g?e?d? ?a?t?t?a?c?k? scores? a critical hit!")
+			local hits,a,user3,targ2,dmg2 = string.find(original,"([%w%s\39\45]+)\39?s? ?r?a?n?g?e?d? ?a?t?t?a?c?k? hits? ([%w%s\39\45]+) for (%d+) points of damage\46")
 			local ranged,a = string.find(original,"ranged attack")
 			local skillchain,a,abil3 = string.find(original,'Skillchain: (%w+)\46')
-			local counter,a,targ3,user6 = string.find(original,'([%w%s\39]+)\39?s? attack is countered by ([%w%s\39]+)\46')
-			local spikes,a,user7,dmg3,targ4 = string.find(original,'([%w%s\39]+)\39?s? spikes deal (%d+) points? of damage to ([%w%s\39]+)\46')
+			local counter,a,targ3,user6 = string.find(original,'([%w%s\39\45]+)\39?s? attack is countered by ([%w%s\39\45]+)\46')
+			local spikes,a,user7,dmg3,targ4 = string.find(original,'([%w%s\39\45]+)\39?s? spikes deal (%d+) points? of damage to ([%w%s\39\45]+)\46')
 			local addeffect,a,targ5,dmg4 = string.find(original,'Additional effect: ([%w%s]+) takes (%d+) additional points? of damage\46')
 			local addeffect2,a,effect = string.find(original,' and is (%w+)\46')
-			local misses,a,user8,targ6 = string.find(original,'([%w%s\39]+)\39?s? ?r?a?n?g?e?d? ?a?t?t?a?c?k? misse?s? ([%w%s\39]+)\46')
-			local parry,a,user9,targ7 = string.find(original,'([%w%s\39]+) parries ([%w%s\39]+)\39?s? attack')
-			local dodge,a,user10,targ8 = string.find(original,'([%w%s\39]+) dodges ([%w%s\39]+)\39?s? attack')
+			local misses,a,user8,targ6 = string.find(original,'([%w%s\39\45]+)\39?s? ?r?a?n?g?e?d? ?a?t?t?a?c?k? misse?s? ([%w%s\39\45]+)\46')
+			local parry,a,user9,targ7 = string.find(original,'([%w%s\39\45]+) parries ([%w%s\39\45]+)\39?s? attack')
+			local dodge,a,user10,targ8 = string.find(original,'([%w%s\39\45]+) dodges ([%w%s\39\45]+)\39?s? attack')
+			local shadow,a,dmg5,targ9,trash = string.find(original,'(%d) of ([%w%s\39\45]+)s absorbs? the damage and disappears.')
 			
-			output_arr['targ'] = targ1 or targ2 or targ3 or targ4 or targ5 or targ6 or targ7 or targ8 or ''
-			output_arr['damg'] = dmg1 or dmg2 or dmg3 or dmg4 or ''
+			output_arr['targ'] = targ1 or targ2 or targ3 or targ4 or targ5 or targ6 or targ7 or targ8 or targ9 or ''
+			output_arr['damg'] = dmg1 or dmg2 or dmg3 or dmg4 or dmg5 or ''
 			output_arr['user'] = user1 or user2 or user3 or user4 or user5 or user6 or user7 or user8 or user9 or user10 or ''
 			output_arr['abil'] = abil1 or abil2 or abil3 or ''
 			
-			output_arr['user'] = the_check(output_arr['user'])
-			output_arr['targ'] = the_check(output_arr['targ'])
+			output_arr['user'] = the_check(output_arr['user']):gsub('\39s ranged attack','')
+			output_arr['targ'] = the_check(output_arr['targ']):gsub('\39s ranged attack','')
+			output_arr['targ'] = the_check(output_arr['targ']):gsub('\39s shadow','')
+			
+			if shadow ~= nil then
+				output_arr['damg'] = output_arr['damg']..' shadow'
+			end
 			
 			local col = string.char(0x1F,redcol)
 			if colorful then
 				if redcol == 28 or redcol == 29 or redcol == 32 or redcol == 33 or redcol == 104 then
 					output_arr['targ'] = name_col('',output_arr['targ'],col)
 					if output_arr['user'] ~= '' then
-						output_arr['user'] =  color_arr['mob']..output_arr['user']..col
+						output_arr['user'] =  color_arr['mob']..output_arr['user']..'\x1E\x01'..col
 					end
 					if output_arr['damg'] ~= '' then
-						output_arr['damg'] = color_arr['mobdmg']..output_arr['damg']..col
+						output_arr['damg'] = color_arr['mobdmg']..output_arr['damg']..'\x1E\x01'..col
 					end
 				else
-					output_arr['targ'] =  color_arr['mob']..output_arr['targ']..col
-					--output_arr['targ'] = color_arr['mob']..output_arr['targ']..col
+					output_arr['targ'] =  color_arr['mob']..output_arr['targ']..'\x1E\x01'..col
 					if output_arr['user'] ~= '' then
 						output_arr['user'] = name_col('',output_arr['user'],col)
 					end
 					if output_arr['damg'] ~= '' then
 						if redcol== 20 then
-							output_arr['damg'] = color_arr['mydmg']..output_arr['damg']..col
-						end
-						if redcol== 25 then
-							output_arr['damg'] = color_arr['partydmg']..output_arr['damg']..col
-						end
-						if redcol== 40 then
-							output_arr['damg'] = color_arr['otherdmg']..output_arr['damg']..col
-						end
-						if redcol== 163 then
-							output_arr['damg'] = color_arr['allydmg']..output_arr['damg']..col
+							output_arr['damg'] = color_arr['mydmg']..output_arr['damg']..'\x1E\x01'..col
+						elseif redcol== 25 then
+							output_arr['damg'] = color_arr['partydmg']..output_arr['damg']..'\x1E\x01'..col
+						elseif redcol== 40 then
+							output_arr['damg'] = color_arr['otherdmg']..output_arr['damg']..'\x1E\x01'..col
+						elseif redcol== 163 then
+							output_arr['damg'] = color_arr['allydmg']..output_arr['damg']..'\x1E\x01'..col
+						elseif redcol== 21 then
+							output_arr['damg'] = color_arr['mobdmg']..output_arr['damg']..'\x1E\x01'..col
 						end
 					end
 				end
@@ -359,7 +376,11 @@ function event_incoming_text(original, modified, color)
 			end
 			
 			if ranged~=nil then
-				output_arr['abil'] = output_arr['abil']..' RA'
+				if output_arr['abil'] == 'Critical' then
+					output_arr['abil'] = output_arr['abil']..' RA'
+				else
+					output_arr['abil'] = 'RA'
+				end
 			elseif counter~= nil then
 				output_arr['abil']='Counter'
 			elseif parry~= nil then
@@ -368,6 +389,8 @@ function event_incoming_text(original, modified, color)
 				output_arr['abil']='Dodge'
 			elseif spikes~= nil then
 				output_arr['abil']='Spikes'
+			elseif shadow~= nil then
+				output_arr['abil']='Loses'
 			elseif addeffect~= nil then
 				output_arr['abil']='Add\46 Eff\46'
 			elseif output_arr['abil']=='' then
@@ -382,9 +405,13 @@ function event_incoming_text(original, modified, color)
 				output_arr['targ']=output_arr['targ']..' \40'..effect..'\41'
 			end
 			
-			if takes~=nil or hits~=nil or spikes ~= nil or addeffect ~=nil or misses ~= nil or parry ~= nil or dodge~=nil then
+			if takes~=nil or hits~=nil or spikes ~= nil or addeffect ~=nil or misses ~= nil or parry ~= nil or dodge~=nil or shadow~=nil then
 				if output_arr['user']=='' then
-					modified=line_nouser:gsub('$\123(%w+)\125',bounce)
+					if shadow ~= nil then
+						modified=line_shadow:gsub('$\123(%w+)\125',bounce)
+					else
+						modified=line_nouser:gsub('$\123(%w+)\125',bounce)
+					end
 				elseif output_arr['damg'] == '' then
 					modified=line_nodmg:gsub('$\123(%w+)\125',bounce)
 				else
@@ -452,13 +479,13 @@ function send_it_out(n,modus)
 		end
 	end
 	if modus=='wears' then
-		add_to_chat(colnm,output..col..'\39s '..n..' effect wears off.')
+		add_to_chat(colnm,output..'\x1E\x01'..col..'\39s '..n..' effect wears off.')
 	elseif modus=='adds' then
 		if #stat_array[n]>3 then
-			add_to_chat(colnm,output..col..' '..stat_array[n..' pol']..' the effect of '..n..'.')
+			add_to_chat(colnm,output..'\x1E\x01'..col..' '..stat_array[n..' pol']..' the effect of '..n..'.')
 		else
 			stat_array[n..'send_single']=1
-			add_to_chat(colnm,output..col..' '..stat_array[n..' pol']..'s the effect of '..n..'.')
+			add_to_chat(colnm,output..'\x1E\x01'..col..' '..stat_array[n..' pol']..'s the effect of '..n..'.')
 		end
 	end
 	stat_array[n..' pol']=nil
@@ -470,7 +497,7 @@ function name_col(basestr,name,basecol)
 	local modbase = ''
 	for r,s in pairs(party) do
 		if s['name'] == name and colorful then
-			modbase = basestr..color_arr[r]..name..basecol
+			modbase = basestr..color_arr[r]..name..'\x1E\x01'..basecol
 		end
 	end
 	if modbase == '' then

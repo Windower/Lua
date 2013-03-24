@@ -9,6 +9,7 @@ Abbreviation: //bm
 Commands:
 * help - shows a menu of these commands in game
 * colortest - Shows the 509 possible colors for use with the settings file
+* reload - Reloads the settings file
 * condensebuffs - Condenses Area of Effect buffs, Default = True
 * condensebattle - Condenses battle logs according to your settings file, Default = True
 * cancelmulti - Cancles multiple consecutive identical lines, Default = True
