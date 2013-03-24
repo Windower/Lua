@@ -156,6 +156,25 @@ function table.keyset(t)
 	return res
 end
 
+-- Flattens a table by splicing all nested tables in at their respective position.
+function table.flatten(t, recursive)
+	recursive = recursive or true
+	local res = T{}
+	for key, val in ipairs(t) do
+		if type(val) == 'table' then
+			if recursive then
+				res:extend(T(val):flatten(recursive))
+			else
+				res:extend(val)
+			end
+		else
+			res:append(val)
+		end
+	end
+	
+	return res
+end
+
 -- Returns true if all key-value pairs in t_eq equal all key-value pairs in t.
 function table.equals(t, t_eq)
 	local seen = T{}
