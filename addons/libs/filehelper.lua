@@ -9,15 +9,18 @@ _libs.tablehelper = _libs.tablehelper or require 'tablehelper'
 _libs.stringhelper = _libs.stringhelper or require 'stringhelper'
 
 local file = T{}
+local createfile = false
 
 -- Create a new file object. Accepts a variable number of paths, which it will
-function file.new(path)
+function file.new(path, create)
+	create = create or true
+	
 	if path == nil then
 		return setmetatable(T{}, {__index = file})
 	end
 	
 	local f = setmetatable(T{}, {__index = file})
-	f:set(path)
+	f:set(path, create)
 
 	return f
 end
@@ -33,16 +36,10 @@ end
 
 -- Sets the file to a path value.
 function file.set(f, path, create)
-	create = create or false
+	create = create or true
+	createfile = create
 	
 	f.path = path
-
-	if create then
-		if not file.exists(path) then
-			notice('New file: '..path)
-			f:create()
-		end
-	end
 
 	return f
 end
@@ -89,7 +86,11 @@ function file.read(f)
 		end
 
 		if not f:exists() then
-			return nil, 'File \''..f.path..'\' not found, cannot read.'
+			if createfile then
+				return ''
+			else
+				return nil, 'File \''..f.path..'\' not found, cannot read.'
+			end
 		end
 
 		path = f.path
@@ -103,32 +104,8 @@ function file.read(f)
 end
 
 -- Read from file and return lines of the contents in a table.
-function file.lines(f)
-	local path
-	if type(f) == 'string' then
-		if not file.exists(f) then
-			return nil, 'File \''..f..'\' not found, cannot read.'
-		end
-
-		path = f
-	else
-		if f.path == nil then
-			return nil, 'No file path set, cannot write.'
-		end
-
-		if not f:exists() then
-			return nil, 'File \''..f.path..'\' not found, cannot read.'
-		end
-
-		path = f.path
-	end
-
-	local lines = T{}
-	for line in io.lines(lua_base_path..path) do
-		lines:append(line)
-	end
-
-	return lines
+function file.readlines(f)
+	return file.read(f):split('\n')
 end
 
 -- Write to file. Overwrites everything within the file, if present.
@@ -146,10 +123,21 @@ function file.write(f, content)
 		end
 
 		if not f:exists() then
-			return nil, 'File \''..f.path..'\' not found, cannot write.'
+			if createfile then
+				if not file.exists(path) then
+					notice('New file: '..path)
+					f:create()
+				end
+			else
+				return nil, 'File \''..f.path..'\' not found, cannot write.'
+			end
 		end
 
 		path = f.path
+	end
+	
+	if type(content) == 'table' then
+		content = T(content):concat()
 	end
 	
 	local fh = io.open(lua_base_path..path, 'w')
@@ -157,6 +145,11 @@ function file.write(f, content)
 	fh:close()
 
 	return f
+end
+
+-- Write array to file. Overwrites everything within the file, if present
+function file.writelines(f, lines)
+	return file.write(f, T(lines):concat('\n'))
 end
 
 -- Append to file. Sets a newline per default, unless newline is set to false.
@@ -173,27 +166,42 @@ function file.append(f, content, newline)
 			return nil, 'No file path set, cannot write.'
 		end
 
-		if f.path == nil then
-			return nil, 'No file path set, cannot write.'
-		end
-
 		if not f:exists() then
-			return nil, 'File \''..f.path..'\' not found, cannot write.'
+			if createfile then
+				if not file.exists(path) then
+					notice('New file: '..path)
+					f:create()
+				end
+			else
+				return nil, 'File \''..f.path..'\' not found, cannot write.'
+			end
 		end
 
 		path = f.path
 	end
 
 	newline = newline or true
+	if type(content) == 'table' then
+		if newline then
+			content = T(content):concat('\n')
+		else
+			content = T(content):concat()
+		end
+	end
 
 	if newline then
 		content = '\n'..content
 	end
 	local fh = io.open(lua_base_path..path, 'a')
-	fh.write(content)
+	fh:write(content)
 	fh:close()
 
 	return f
+end
+
+-- Append an array of lines to file. Sets a newline per default, unless newline is set to false.
+function file.appendlines(f, lines, newline)
+	return file.append(f, lines:concat('\n'), newline)
 end
 
 return file

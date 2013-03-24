@@ -15,7 +15,7 @@ _libs.filehelper = _libs.filehelper or (files ~= nil)
 _addon = _addon or T{}
 
 local settings = T{}
-local file = files.new()
+local file
 
 -- Set up, based on addon.
 settings.logtofile = settings.logtofile or false
@@ -84,11 +84,14 @@ end
 -- Prints the arguments provided to a file, analogous to log(...) in functionality.
 -- If the first argument ends with '.log', it will print to that output file, otherwise to 'lua.log' in the addon directory.
 function flog(filename, ...)
-	if filename == nil then
-		filename = settings.defaultfile
+	local f
+	if filename ~= nil then
+		f = files.new(filename)
+	elseif filename == nil then
+		f = file
 	end
 	
-	local _, err = file:write(os.date('%Y-%m-%d %H:%M:%S')..'| '..arrstring(...).."\n")
+	local _, err = file:append(os.date('%Y-%m-%d %H:%M:%S')..'| '..arrstring(...).."\n")
 	if err ~= nil then
 		error('File error:', err)
 	end
@@ -196,4 +199,6 @@ function table.vprint(t)
 	T(t):tovstring():split("\n"):arrmap(log)
 end
 
+-- Load logger settings
 settings:update(config.load('../libs/logger.xml'))
+file = files.new(settings.defaultfile, true)
