@@ -264,10 +264,12 @@ function table.set(t)
 	return res
 end
 
--- Returns a sorted set.
-function table.sorted(t)
-	local res = T(t)
-	t:sort()
+-- Backs up old table sorting function.
+table.in_place_sort = table.sort
+
+-- Returns a sorted table.
+function table.sort(t)
+	T(t):in_place_sort()
 	return t
 end
 
