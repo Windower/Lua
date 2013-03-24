@@ -25,7 +25,6 @@ local comments = T{}
 
 local parse
 local settings_table
-local merge_settings
 local settings_xml
 local nest_xml
 
@@ -145,26 +144,7 @@ function settings_table(node, confdict, key)
 	
 	return t
 end
---[[
--- Identical to table.update, except for type-correct conversion from strings to tables, if it's a table in the original value.
-function merge_settings(t, t_update)
-	if t_update == nil then
-		return t
-	end
-	
-	for key, val in pairs(t_update) do
-		if t[key] ~= nil and type(t[key]) == 'table' and type(val) == 'table' then
-			t[key] = merge_settings(t[key], val)
-		elseif t[key] ~= nil and type(t[key]) == 'table' then
-			t[key] = val:psplit('%s*,%s*')
-		else
-			t[key] = val
-		end
-	end
-	
-	return t
-end
-]]
+
 -- Writes the passed config table to the spcified file name.
 -- char defaults to get_player()['name']. Set to "all" to apply to all characters.
 function config.save(t, char)
