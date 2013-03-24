@@ -131,7 +131,7 @@ function table.flatten(t, recursive)
 	for key, val in ipairs(t) do
 		if type(val) == 'table' then
 			if recursive then
-				res:extend(val:flatten(true))
+				res:extend(T(val):flatten(true))
 			else
 				res:extend(val)
 			end
