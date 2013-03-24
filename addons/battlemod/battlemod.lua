@@ -50,7 +50,7 @@ function options_load()
 	local f = io.open(lua_base_path..'data/settings.txt', "r")
 	if f == nil then
 		local g = io.open(lua_base_path..'data/settings.txt', "w")
-		g:write('Release Date: 11:31 PM, 3-23-12\46')
+		g:write('Release Date: 9:14 AM, 3-24-12\46')
 		g:write('Author Comment: This document is whitespace sensitive, which means that you need the same number of spaces between things as exist in this initial settings file\46\n')
 		g:write('Author Comment: It looks at the first two words separated by spaces and then takes anything as the value in question if the first two words are relevant\46\n')
 		g:write('Author Comment: If you ever mess it up so that it does not work, you can just delete it and battlemod will regenerate it upon reload\46\n')
@@ -311,8 +311,8 @@ function event_incoming_text(original, modified, color)
 			
 			-- Defensive/negation
 			local counter,a,targ3,user6 = string.find(original,'([%w%s\39\45]+)\39?s? attack is countered by ([%w%s\39\45]+)\46')
-			local parry,a,user9,targ7 = string.find(original,'([%w%s\39\45]+) parries ([%w%s\39\45]+)\39?s? attack')
-			local dodge,a,user10,targ8 = string.find(original,'([%w%s\39\45]+) dodges ([%w%s\39\45]+)\39?s? attack')
+			local parry,a,user9,targ7 = string.find(original,'([%w%s\39\45]+) parries ([%w%s\39\45]+)%.')
+			local dodge,a,user10,targ8 = string.find(original,'([%w%s\39\45]+) dodges ([%w%s\39\45]+)%.')
 			local shadow,a,dmg5,targ9 = string.find(original,'(%d) of ([%w%s\39\45]+)s absorbs? the damage and disappears%.')
 			
 			-- Stand-alone messages:
@@ -346,6 +346,7 @@ function event_incoming_text(original, modified, color)
 			output_arr['user'] = the_check(output_arr['user']):gsub('\39s ranged attack','')
 			output_arr['targ'] = the_check(output_arr['targ']):gsub('\39s ranged attack','')
 			output_arr['targ'] = the_check(output_arr['targ']):gsub('\39s shadow','')
+			output_arr['targ'] = the_check(output_arr['targ']):gsub('\39s attack','')
 			
 			if shadow ~= nil then
 				output_arr['damg'] = output_arr['damg']..' shadow'
@@ -354,35 +355,34 @@ function event_incoming_text(original, modified, color)
 				output_arr['damg'] = 'Lv.'..daze
 			end
 			
-			local col = string.char(0x1F,redcol)
 			if colorful then
 				if redcol == 28 or redcol == 29 or redcol == 32 or redcol == 33 or redcol == 104 then
-					output_arr['targ'] = name_col('',output_arr['targ'],col)
+					output_arr['targ'] = name_col('',output_arr['targ'])
 					if output_arr['user'] ~= '' then
-						output_arr['user'] =  color_arr['mob']..output_arr['user']..'\x1E\x01'..col
+						output_arr['user'] =  color_arr['mob']..output_arr['user']..'\x1E\x01'
 					end
 					if output_arr['damg'] ~= '' then
-						output_arr['damg'] = color_arr['mobdmg']..output_arr['damg']..'\x1E\x01'..col
+						output_arr['damg'] = color_arr['mobdmg']..output_arr['damg']..'\x1E\x01'
 					end
-				elseif redcol == 31 then
-					output_arr['targ'] = name_col('',output_arr['targ'],col)
-					output_arr['user'] = name_col('',output_arr['user'],col)
+				elseif redcol == 31 or redcol==24 or redcol==23 then
+					output_arr['targ'] = name_col('',output_arr['targ'])
+					output_arr['user'] = name_col('',output_arr['user'])
 				else
-					output_arr['targ'] =  color_arr['mob']..output_arr['targ']..'\x1E\x01'..col
+					output_arr['targ'] =  color_arr['mob']..output_arr['targ']..'\x1E\x01'
 					if output_arr['user'] ~= '' then
-						output_arr['user'] = name_col('',output_arr['user'],col)
+						output_arr['user'] = name_col('',output_arr['user'])
 					end
 					if output_arr['damg'] ~= '' then
 						if redcol== 20 then
-							output_arr['damg'] = color_arr['mydmg']..output_arr['damg']..'\x1E\x01'..col
+							output_arr['damg'] = color_arr['mydmg']..output_arr['damg']..'\x1E\x01'
 						elseif redcol== 25 then
-							output_arr['damg'] = color_arr['partydmg']..output_arr['damg']..'\x1E\x01'..col
+							output_arr['damg'] = color_arr['partydmg']..output_arr['damg']..'\x1E\x01'
 						elseif redcol== 40 then
-							output_arr['damg'] = color_arr['otherdmg']..output_arr['damg']..'\x1E\x01'..col
+							output_arr['damg'] = color_arr['otherdmg']..output_arr['damg']..'\x1E\x01'
 						elseif redcol== 163 then
-							output_arr['damg'] = color_arr['allydmg']..output_arr['damg']..'\x1E\x01'..col
+							output_arr['damg'] = color_arr['allydmg']..output_arr['damg']..'\x1E\x01'
 						elseif redcol== 21 then
-							output_arr['damg'] = color_arr['mobdmg']..output_arr['damg']..'\x1E\x01'..col
+							output_arr['damg'] = color_arr['mobdmg']..output_arr['damg']..'\x1E\x01'
 						end
 					end
 				end
@@ -480,7 +480,7 @@ function send_it_out(n,modus)
 	end
 	local col = string.char(0x1F,stat_array[n][2]%256)
 	local colnm = stat_array[n][2]
-	output = name_col(output,stat_array[n][3],col)
+	output = name_col(output,stat_array[n][3])
 	for i,v in pairs(stat_array[n]) do
 		if i > 3 then
 			if i <= #stat_array[n]-1 then
@@ -497,14 +497,14 @@ function send_it_out(n,modus)
 					output = output..' and '
 				end	
 			end
-			output = name_col(output,v,col)
+			output = name_col(output,v)
 		end
 	end
 	if modus=='wears' then
-		add_to_chat(colnm,output..'\x1E\x01'..col..'\39s '..n..' effect wears off.')
+		add_to_chat(colnm,output..'\x1E\x01'..'\39s '..n..' effect wears off.')
 	elseif modus=='adds' then
 		if #stat_array[n]>3 then
-			add_to_chat(colnm,output..'\x1E\x01'..col..' '..stat_array[n..' pol']..' the effect of '..n..'.')
+			add_to_chat(colnm,output..'\x1E\x01'..' '..stat_array[n..' pol']..' the effect of '..n..'.')
 		else
 			stat_array[n..'send_single']=1
 			add_to_chat(colnm,output..'\x1E\x01'..col..' '..stat_array[n..' pol']..'s the effect of '..n..'.')
@@ -514,12 +514,12 @@ function send_it_out(n,modus)
 	stat_array[n]=nil
 end
 
-function name_col(basestr,name,basecol)
+function name_col(basestr,name)
 	local party = get_party()
 	local modbase = ''
 	for r,s in pairs(party) do
 		if s['name'] == name and colorful then
-			modbase = basestr..color_arr[r]..name..'\x1E\x01'..basecol
+			modbase = basestr..color_arr[r]..name..'\x1E\x01'
 		end
 	end
 	if modbase == '' then
