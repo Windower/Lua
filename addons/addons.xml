@@ -15,4 +15,16 @@
     <name>Linker</name>
     <description>Allows opening links to certain websites from within the game, with an optional search parameter.</description>
   </addon>
+  <addon>
+    <name>AnsweringMachine</name>
+    <description>Stores tells for later recall.</description>
+  </addon>
+  <addon>
+    <name>BattleMod</name>
+    <description>Customizes battle chat messages.</description>
+  </addon>
+  <addon>
+    <name>Send</name>
+    <description>Sends commands between windower instances using IPC.</description>
+  </addon>
 </addons>
