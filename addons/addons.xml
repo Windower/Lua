@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <addons>
   <addon>
     <name>Example</name>
@@ -10,5 +10,9 @@
     </description>
     <bugtracker>https://github.com/IryokuChevalier/Lua/issues</bugtracker>
     <support>http://forums.windower.net/topic/21775-random-question-thread/</support>
+  </addon>
+  <addon>
+    <name>Linker</name>
+    <description>Allows opening links to certain websites from within the game, with an optional search parameter.</description>
   </addon>
 </addons>
