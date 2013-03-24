@@ -25,6 +25,13 @@ settings.errorcolor = settings.errorcolor or 167
 settings.warningcolor = settings.warningcolor or 200
 settings.noticecolor = settings.noticecolor or 160
 
+--[[
+	Local functions
+]]
+
+local arrstring
+local captionlog
+
 -- Returns a concatenated string list, separated by whitespaces, for the chat output function.
 -- Converts any kind of object type to a string, so it's type-safe.
 -- Concatenates all provided arguments with whitespaces.
@@ -67,18 +74,15 @@ function log(...)
 end
 
 function error(...)
-	msg = 'Error'
-	captionlog(msg, settings.errorcolor, ...)
+	captionlog('Error', settings.errorcolor, ...)
 end
 
 function warning(...)
-	msg = 'Warning'
-	captionlog(msg, settings.warningcolor, ...)
+	captionlog('Warning', settings.warningcolor, ...)
 end
 
 function notice(...)
-	msg = 'Notice'
-	captionlog(msg, settings.noticecolor, ...)
+	captionlog('Notice', settings.noticecolor, ...)
 end
 
 -- Prints the arguments provided to a file, analogous to log(...) in functionality.
@@ -199,6 +203,6 @@ function table.vprint(t)
 	T(t):tovstring():split("\n"):arrmap(log)
 end
 
--- Load logger settings
+-- Load logger settings (has to be after the logging functions have been defined, so those work in the config and related files).
 settings:update(config.load('../libs/logger.xml'))
 file = files.new(settings.defaultfile, true)

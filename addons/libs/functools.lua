@@ -126,12 +126,11 @@ end
 -- Flattens a table by splicing all nested tables in at their respective position.
 function table.flatten(t, recursive)
 	recursive = recursive or true
-	
 	local res = T{}
 	for key, val in ipairs(t) do
 		if type(val) == 'table' then
 			if recursive then
-				res:extend(T(val):flatten(true))
+				res:extend(T(val):flatten(recursive))
 			else
 				res:extend(val)
 			end

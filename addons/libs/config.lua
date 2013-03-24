@@ -20,19 +20,37 @@ local original = nil
 local chars = T{}
 local comments = T{}
 
+--[[
+	Local functions
+]]
+
+local parse
+local settings_table
+local merge_settings
+local settings_xml
+local nest_xml
+
 -- Loads a specified file, or alternatively a file 'settings.json' or 'settings.xml' in the current addon folder.
 -- Writes all configs to _config.
-function config.load(filename)
+function config.load(filename, confdict)
+	if type(filename) == 'table' then
+		confdict = filename
+		filename = nil
+	end
+	confdict = confdict or T{}
+	local confdict_mt = getmetatable(confdict)
+	confdict = setmetatable(confdict, {__index=function(t, x) if config[x] ~= nil then return config[x] else return confdict_mt.__index[x] end end})
+	
 	-- Sets paths depending on whether it's a script or addon loading this file.
 	local filepath = filename or files.check('data/settings.json', 'data/settings.xml')
 	if filepath == nil then
 		notice('No settings file found.')
-		return T{}
+		return confdict
 	end
-	local file = files.new(filepath)
+	file:set(filepath)
 
 	-- Load addon/script config file (Windower/addon/<addonname>/config.json for addons and Windower/scripts/<name>-config.json).
-	local config_load, err = config.parse(file)
+	local config_load, err = parse(file)
 
 	if config_load == nil then
 		if err ~= nil then
@@ -40,14 +58,14 @@ function config.load(filename)
 		else
 			error('Unknown error trying to parse file: '..file.path)
 		end
-		return T{}
+		return confdict
 	end
 	
-	return config_load
+	return merge_settings(confdict, config_load)
 end
 
 -- Resolves to the correct parser and calls the respective subroutine, returns the parsed settings table.
-function config.parse(file)
+function parse(file)
 	local parsed = T{}
 	local err
 	if file.path:endswith('.json') then
@@ -62,7 +80,7 @@ function config.parse(file)
 			end
 			return T{}
 		end
-		parsed = xml.settings_table(parsed)
+		parsed = settings_table(parsed)
 	end
 	
 	-- Determine all characters found in the settings file.
@@ -71,11 +89,11 @@ function config.parse(file)
 	-- Update the global settings with the per-player defined settings, if they exist. Save the parsed value for later comparison.
 	original = parsed:copy()
 	
-	return parsed['global']:update(parsed[get_player()['name']:lower()])
+	return merge_settings(parsed['global'], parsed[get_player()['name']:lower()])
 end
 
 -- Parses a settings struct from a DOM tree.
-function xml.settings_table(node, key)
+function settings_table(node, key)
 	key = key or 'settings'
 	
 	local t = T{}
@@ -94,11 +112,16 @@ function xml.settings_table(node, key)
 			return false
 		elseif val:lower() == 'true' then
 			return true
-		else
-			local num = tonumber(val)
-			if num ~= nil then
-				return num
-			end
+		end
+		
+		local num = tonumber(val)
+		if num ~= nil then
+			return num
+		end
+		
+		local arr = val:psplit('%s*,%s*')
+		if #arr > 1 then
+			return arr
 		end
 		
 		return val
@@ -109,7 +132,26 @@ function xml.settings_table(node, key)
 			comments[key] = child.value
 		elseif child.type == 'tag' then
 			key = child.name:lower()
-			t[child.name:lower()] = xml.settings_table(child, key)
+			t[child.name:lower()] = settings_table(child, key)
+		end
+	end
+	
+	return t
+end
+
+-- Identical to table.update, except for type-correct conversion from strings to tables, if it's a table in the original value.
+function merge_settings(t, t_update)
+	if t_update == nil then
+		return t
+	end
+	
+	for key, val in pairs(t_update) do
+		if t[key] ~= nil and type(t[key]) == 'table' and type(val) == 'table' then
+			t[key] = T(t[key]):update(T(val))
+		elseif t[key] ~= nil and type(t[key]) == 'table' then
+			t[key] = T{val}:flatten()
+		else
+			t[key] = val
 		end
 	end
 	
@@ -120,8 +162,8 @@ end
 -- char defaults to get_player()['name']. Set to "all" to apply to all characters.
 function config.save(t, char)
 	if not file:exists() then
---		error('No settings file specified.')
---		return
+		error('No settings file specified.')
+		return
 	end
 	
 	char = (char or get_player()['name']):lower()
@@ -153,17 +195,17 @@ function config.save(t, char)
 		end
 	end
 	
-	file:write(config.settings_xml(t))
+	file:write(settings_xml(original))
 end
 
 -- Converts a settings table to a XML representation.
-function config.settings_xml(settings)
+function settings_xml(settings)
 	local str = '<?xml version="1.1" ?>\n'
 	str = str..'<settings>\n'
 	
 	for char, t in pairs(settings) do
 		str = str..'\t<'..char..'>\n'
-		str = str..config.nest_xml(t, 2)
+		str = str..nest_xml(t, 2)
 		str = str..'\t</'..char..'>\n'
 	end
 	
@@ -171,8 +213,8 @@ function config.settings_xml(settings)
 	return str
 end
 
--- Converts a table to XML without headers using appropriate indentation and comment spacing. Used in config.settings_xml.
-function config.nest_xml(t, indentlevel)
+-- Converts a table to XML without headers using appropriate indentation and comment spacing. Used in settings_xml.
+function nest_xml(t, indentlevel)
 	indentlevel = indentlevel or 0
 	local indent = ('\t'):rep(indentlevel)
 	
@@ -180,7 +222,7 @@ function config.nest_xml(t, indentlevel)
 	local fragments = T{}
 	local maxlength = 0
 	for key, val in pairs(t) do
-		if type(val) == 'table' then
+		if type(val) == 'table' and not T(val):isarray() then
 			fragments:append(indent..'<'..key..'>\n')
 			if comments[key] ~= nil then
 				local c = ('<!-- '..comments[key]:trim()..' -->'):split('\n')
@@ -190,9 +232,12 @@ function config.nest_xml(t, indentlevel)
 					pre = '\t '
 				end
 			end
-			fragments:append(config.nest_xml(val, indentlevel + 1))
+			fragments:append(nest_xml(val, indentlevel + 1))
 			fragments:append(indent..'</'..key..'>\n')
 		else
+			if type(val) == 'table' then
+				val = T(val):sort():concat(', ')
+			end
 			fragments:append(indent..'<'..key..'>'..tostring(val)..'</'..key..'>')
 			local length = #fragments:last() - #indent
 			if length > maxlength then
@@ -204,7 +249,7 @@ function config.nest_xml(t, indentlevel)
 	
 	for frag_key, key in pairs(inlines) do
 		if comments[key] ~= nil then
-			fragments[frag_key] = fragments[frag_key]..('\t'):rep(math.ceil((maxlength - #fragments[frag_key])/4) + 1)..'<!--'..comments[key]..'-->'
+			fragments[frag_key] = fragments[frag_key]..('\t'):rep(math.ceil((maxlength - #fragments[frag_key] - 1)/4) + 1)..'<!--'..comments[key]..'-->'
 		end
 		
 		fragments[frag_key] = fragments[frag_key]..'\n'

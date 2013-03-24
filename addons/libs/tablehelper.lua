@@ -26,6 +26,16 @@ end
 
 _libs = T(_libs)
 
+-- Checks if a table is an array, only having sequential integer keys.
+function table.isarray(t)
+	local count = 0
+	for _, _ in pairs(t) do
+		count = count + 1
+	end
+	
+	return count == #t
+end
+
 -- Returns the last element of an array.
 function table.last(t, offset)
 	if t == nil then
@@ -61,11 +71,11 @@ end
 
 -- Appends an array table to the end of another array table.
 function table.extend(t, t_extend)
-	if type(T_extend) ~= 'table' then
+	if type(t_extend) ~= 'table' then
 		return t:append(t_extend)
 	end
-	for key, val in pairs(t_extend) do
-		t[#t+1] = val
+	for _, val in ipairs(t_extend) do
+		t:append(val)
 	end
 	
 	return t
