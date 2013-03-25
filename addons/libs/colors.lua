@@ -6,10 +6,11 @@ _libs = _libs or {}
 _libs.colors = true
 _libs.tablehelper = _libs.tablehelper or require 'tablehelper'
 _libs.stringhelper = _libs.stringhelper or require 'stringhelper'
-_libs.json = _libs.json or require 'json'
+local json = require 'json'
+_libs.json = _libs.json or (json ~= nil)
 _libs.logger = _libs.logger or require 'logger'
 
-local ffxidata = (ffxi and ffxi.data) or _libs.json.read('../libs/ffxidata.json')
+local ffxidata = (ffxi and ffxi.data) or json.read('../libs/ffxidata.json')
 
 -- Returns str colored as specified by newcolor. If oldcolor is omitted, the string will stay in newcolor.
 function string.setcolor(str, newcolor, oldcolor)
