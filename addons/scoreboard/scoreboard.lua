@@ -1,29 +1,63 @@
--- Scoreboard addon for Windower4 --
+-- Scoreboard addon for Windower4. See readme.md for a complete description.
 
 require 'tablehelper'
 require 'stringhelper'
 require 'mathhelper'
 
-------- Default values; do not change -------
-
-local x_pos_default = 1500
-local y_pos_default = 500
-local player_display_count = 5
+require 'colors' -- a bug in libs is currently forcing us to require this before 'config'
+local config = require 'config'
+local file = require 'filehelper'
 
 -----------------------------
 
-local dps_db = T{}
-local active_party = T{}
-local dps_start_time = 0
-local dps_stop_time  = 0
-local dps_active = false
-local dps_autostart = true
+local settings = nil -- holds a config instance
+local settings_file = 'data/settings.xml'
 
+local player_display_count = 8 -- num of players to display. configured via settings file
+local dps_autostart = true -- configured via settings file
+local dps_autostop = true -- configured via settings file
+
+local dps_db = T{}
 local mob_filter = T{} -- subset of mobs that we're currently displaying damage for
 
- -- this is lame but it keeps the bg table size consistent
-local wait_msg = 'Waiting for results...                 '
+-- DPS clock variables
+local dps_active = false
+local dps_clock = 1 -- avoid div/0
+local dps_clock_prev_time = 0
+local dps_auto_stop_time = 0
 
+local default_settings_file = [[
+<?xml version="1.0" ?>
+<settings>
+	<!--
+	This file controls the settings for the Scoreboard plugin.
+	Settings in the <global> section apply to all characters
+
+	The available settings are:
+		posX - x coordinate for position
+		posY - y coordinate for position
+		numPlayers - The maximum number of players to display damage for
+		bgTransparency - Transparency level for the background. 0-255 range
+		dpsAutostart - Starts DPS clock whenever you or an alli member deals damage
+		dpsAutostop - Stops the DPS clock whenever an enemy is defeated.
+		              Note that if you die, you'll have to stop the clock manually.
+	-->
+	<global>
+		<posX>1500</posX>
+		<posY>300</posY>
+		<bgTransparency>200</bgTransparency>
+		<numPlayers>8</numPlayers>
+		<dpsAutostart>true</dpsAutostart>
+		<dpsAutostop>true</dpsAutostop>
+	</global>
+
+	<!--
+	You may also override specific settings on a per-character basis here.
+	-->
+</settings>
+]]
+
+-- Handle addon args
 function event_addon_command(...)
   local params = {...};
 	
@@ -31,7 +65,7 @@ function event_addon_command(...)
 		return
 	end
 
-	if params[1] ~= nil then
+	if params[1] then
 		if params[1]:lower() == "help" then
 			write('sb help : Shows help message')
 			write('sb pos <x> <y> : Positions the scoreboard')
@@ -43,19 +77,19 @@ function event_addon_command(...)
 			write('sb start : Starts dps clock. Automaticly starts if autostart is on')
 			write('sb stop: Stops dps clock')
 		elseif params[1]:lower() == "pos" then
-			if params[3] ~= nil then
+			if params[3] then
 				tb_set_location('scoreboard', params[2], params[3])
 			end
 		elseif params[1]:lower() == "reset" then
 			initialize()
 		elseif params[1]:lower() == "report" then
 			report_summary()
-		elseif params[1]:lower() == "mobs" then
+		elseif params[1]:lower() == "filters" then
 			local mob_str
 			if mob_filter:isempty() then
-				mob_str = "Scoreboard mobs: All"
+				mob_str = "Scoreboard filters: None (Displaying damage for all mobs)"
 			else
-				mob_str = "Scoreboard mobs: " .. mob_filter:concat(', ')
+				mob_str = "Scoreboard filters: " .. mob_filter:concat(', ')
 			end
 			add_to_chat(55, mob_str)
 		elseif params[1]:lower() == "add" then
@@ -67,12 +101,11 @@ function event_addon_command(...)
 			mob_filter = T{}
 			update_scoreboard()
 		elseif params[1]:lower() == "start" then
-			dps_start_time = os.time()
 			dps_active = true
+			dps_clock_prev_time = 0
 			update_scoreboard()
 			add_to_chat(55, "Scoreboard: Started DPS clock.")
 		elseif params[1]:lower() == "stop" then
-			dps_stop_time = os.time()
 			dps_active = false
 			add_to_chat(55, "Scoreboard: Stopped DPS clock.")
 			update_scoreboard()
@@ -80,31 +113,68 @@ function event_addon_command(...)
 	end
 end
 
+
 -- Resets all data tracking variables
 function initialize()
 
 	dps_db = T{}
-	start_time = os.time()
 
-	dps_db = T{}
-	active_party = T{}
-	dps_start_time = 0
-	dps_stop_time  = 0
 	dps_active = false
 	dps_autostart = true
-
-	tb_set_text('scoreboard',  build_scoreboard_header() .. wait_msg)
+	dps_clock = 1
+	dps_clock_prev_timestamp = 0
+	
+	-- the number of spaces here was counted to keep the table width
+	-- consistent even when there's no data being displayed
+	tb_set_text('scoreboard',  build_scoreboard_header() ..
+							   'Waiting for results...' ..
+							   string.rep(' ', 17))
 end
 
+function update_dps_clock()
+	local now = os.time()
+	if dps_clock_prev_time == 0 then
+		dps_clock_prev_time = now
+	end
+		
+	dps_clock = dps_clock + (now - dps_clock_prev_time)
+	dps_clock_prev_time = now
+end
+
+
+-- Secondary update driver to keep the DPS moving between swings and keep the clock moving.
+function event_time_change(...)
+	-- Simply add time to the clock while dps processing is active.
+	if dps_active then
+		update_dps_clock()
+	end
+	
+	if not dps_db:isempty() then
+		update_scoreboard()
+	end
+end
+
+
 function event_load()
+	-- Write a default settings file if it doesn't exist
+	local f = io.open(lua_base_path .. settings_file, 'r')
+	if not f then
+		f = io.open(lua_base_path .. settings_file, 'w')
+		f:write(default_settings_file)
+	end
+	settings = config.load()
+
+	player_display_count = settings['numplayers'] or player_display_count
+	dps_autostart = settings['autostartdps'] or dps_autostart
+	dps_autostop = settings['autostopdps'] or dps_autostop
+	
 	send_command('alias sb lua c scoreboard')
 	
 	tb_create('scoreboard')
-	tb_set_bg_color('scoreboard', 200, 30, 30, 30)
+	tb_set_bg_color('scoreboard', settings['bgtransparency'], 30, 30, 30)
 	tb_set_font('scoreboard', 'courier', 10)
-	tb_set_bold('scoreboard', false)
 	tb_set_color('scoreboard', 255, 225, 225, 225)
-	tb_set_location('scoreboard', x_pos_default, y_pos_default)
+	tb_set_location('scoreboard', settings['posx'], settings['posy'])
 	tb_set_visibility('scoreboard', 1)
 	tb_set_bg_visibility('scoreboard', 1)
 
@@ -118,13 +188,14 @@ function event_unload()
 end
 
 
+-- Parse lines based on patterns.
+-- Returns true if we accumulated damage, false otherwise
 function parse_line(line)
     local start, stop, player, mob, damage
-	local result = {}
 
 	-- Get medicines out of the way first
     if string.find(line, '^(%w+) uses a .*%.$') then
-		return nil
+		return false
 	end
 	
 	-- Regular melee hits
@@ -177,24 +248,24 @@ function parse_line(line)
 		return true
 	end
 
-    return nil
+    return false
 end
 
 
-function accumulate (mob, player, damage)
-	local mobdb, playerdb
-	
-	if active_party[player] == nil then
+-- Adds the given data to the main DPS table
+function accumulate(mob, player, damage)
+	local active_party = get_active_party()
+	if not active_party[player] then
 		return
 	end
 
 	mob = string.lower(mob:gsub('^[tT]he ', ''))
-	if dps_db[mob] == nil then
+	if not dps_db[mob] then
 		dps_db[mob] = T{}
 	end
 	
 	damage = tonumber(damage)
-	if dps_db[mob][player] == nil then
+	if not dps_db[mob][player] then
 		dps_db[mob][player] = damage
 	else
 		dps_db[mob][player] = damage + dps_db[mob][player] 
@@ -202,7 +273,8 @@ function accumulate (mob, player, damage)
 	
 end
 
-function update_active_party()
+
+function get_active_party()
 	local party_data = get_party()
 	local new_party = {}
 	
@@ -210,20 +282,20 @@ function update_active_party()
 		new_party[member["name"]] = 1
 	end
 	
-	active_party = new_party
+	return new_party
 end
 
 
 -- Returns following two element pair:
--- - table of sorted 2-tuples containing {player, damage}
--- - integer containing the total damage done
+-- 1) table of sorted 2-tuples containing {player, damage}
+-- 2) integer containing the total damage done
 function get_sorted_player_damage()
 	-- In order to sort by damage, we have to first add it all up into a table
 	-- and then build a table of sortable 2-tuples and then finally we can sort...
 	local mob, players
 	local player_total_dmg = T{}
 
-	if dps_db == nil then
+	if not dps_db then
 		return
 	end
 	
@@ -241,7 +313,7 @@ function get_sorted_player_damage()
 
 		if mob_filter:isempty() or filter_contains_mob(mob) then
 			for player, damage in pairs(players) do
-				if player_total_dmg[player] ~= nil then
+				if player_total_dmg[player] then
 					player_total_dmg[player] = player_total_dmg[player] + damage
 				else
 					player_total_dmg[player] = damage
@@ -274,7 +346,7 @@ function build_scoreboard_header()
 	if mob_filter:isempty() then
 		mob_filter_str = "All"
 	else
-		mob_filter_str = "Custom ('//sb mobs' to view)"
+		mob_filter_str = "Custom ('//sb filters' to view)"
 	end
 	
 	local labels
@@ -293,6 +365,8 @@ function build_scoreboard_header()
 	return string.format("Mobs: %-9s\nDPS: %s\n%s", mob_filter_str, dps_status, labels)
 end
 
+
+-- Updates the main display with current filter/damage/dps status
 function update_scoreboard()
 	local damage_table, total_damage
 	damage_table, total_damage = get_sorted_player_damage()
@@ -301,27 +375,16 @@ function update_scoreboard()
 	local player_lines = 0
 	for k, v in pairs(damage_table) do
 		if player_lines < player_display_count then
-			local stop_time
-			if dps_active then
-				stop_time = os.time()
-			else
-				stop_time = dps_stop_time
-			end
-
-			local dps = math.round(v[2]/(stop_time - start_time), 2)
+			local dps = math.round(v[2]/dps_clock, 2)
 			local percent = string.format('(%.1f%%)', 100 * v[2]/total_damage)
 			display_table:append(string.format("%-16s%7d%8s %7.2f", v[1], v[2], percent, dps))
 		end
 		player_lines = player_lines + 1
 	end
 	
-	local dps_lines
-	if dps_db:isempty() then
-		dps_lines = wait_msg
-	else
-		dps_lines = table.concat(display_table, '\n')
+	if not dps_db:isempty() then
+		tb_set_text('scoreboard', build_scoreboard_header() .. table.concat(display_table, '\n'))
 	end
-	tb_set_text('scoreboard', build_scoreboard_header() .. dps_lines)
 end
 
 
@@ -334,6 +397,7 @@ function report_summary ()
 	local display_table = T{}
 	local line_length = 0
 	for k, v in pairs(damage_table) do
+		-- TODO: this algorithm doesn't quite work right but it's close
 		formatted_entry = string.format("%s %d(%.1f%%)", v[1], v[2], 100 * v[2]/total_damage)
 		local new_line_length = line_length + formatted_entry:len() + 2 -- 2 is for the sep
 		
@@ -343,23 +407,42 @@ function report_summary ()
 		end
 	end
 
+	-- Send the report to the current chatmode
 	send_command('input ' .. table.concat(display_table, ', '))
 end
 
 
-function event_incoming_text(original, modified, color)
-	update_active_party()
+function enemy_is_defeated(line)
+	local start, stop, player
 	
-	local success = parse_line(original)
-	if success then
-		if dps_autostart and not dps_active then
-			dps_start_time = os.time()
-			dps_active = true
-			dps_stop_time = 0
-		end
-		update_scoreboard()
+	local active_party = get_active_party()
+	start, stop, player = string.find(line, '^(%w+) defeats .*%.')
+	if player and active_party[player] then
+		return true
+	else
+		return false
 	end
+end
+
+
+function event_incoming_text(original, modified, color)
+	local success = parse_line(original)
 	
+	if success then
+		-- Thanks to damaging log messages often appearing after an enemy is defeated,
+		-- we have to put a little delay in autostop to prevent a quick stop/start
+		if dps_autostart and not dps_active and (os.time() - dps_auto_stop_time) > 2 then
+			dps_active = true
+			dps_clock_prev_time = 0
+		end
+		
+		update_scoreboard()
+		update_dps_clock()
+	elseif enemy_is_defeated(original) and dps_autostop then
+		dps_active = false
+		dps_auto_stop_time = os.time()
+	end
+
 	return modified, color
 end
 
@@ -398,7 +481,7 @@ Magic Burst! <mob> takes <integers> points? of damage.
 Medicine syntax:
 <Player> uses a <medicine name>.
 
-]]--
+]]
 
 
 --[[
@@ -427,4 +510,4 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-]]--
+]]
