@@ -160,6 +160,7 @@ function event_load()
 	if not f then
 		f = io.open(lua_base_path .. settings_file, 'w')
 		f:write(default_settings_file)
+		f:close()
 	end
 	settings = config.load()
 
