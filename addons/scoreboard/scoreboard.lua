@@ -3,6 +3,8 @@
 require 'tablehelper'
 require 'stringhelper'
 require 'mathhelper'
+require 'logger'
+
 local config = require 'config'
 
 -----------------------------
@@ -157,7 +159,18 @@ function event_load()
 	local f = io.open(lua_base_path .. settings_file, 'r')
 	if not f then
 		f = io.open(lua_base_path .. settings_file, 'w')
-		f:write(default_settings_file)
+		if not f then
+			error('Scoreboard: Error generating default settings file.')
+		else
+			f:write(default_settings_file)
+			local result = f:close()
+			if not result then
+				error('Scoreboard: Error generating default settings file.')
+			else
+				add_to_chat(55, 'Scoreboard: Settings file not found; installed default.')
+			end
+		end
+	else
 		f:close()
 	end
 	settings = config.load()
@@ -344,7 +357,7 @@ function build_scoreboard_header()
 	if mob_filter:isempty() then
 		mob_filter_str = "All"
 	else
-		mob_filter_str = "Custom ('//sb filters' to view)"
+		mob_filter_str = table.concat(mob_filter, ", ")
 	end
 	
 	local labels
@@ -360,7 +373,12 @@ function build_scoreboard_header()
 	else
 		dps_status = "Paused"
 	end
-	return string.format("Mobs: %-9s\nDPS: %s\n%s", mob_filter_str, dps_status, labels)
+
+	local dps_clock_str = ''
+	if dps_active or dps_clock > 1 then
+		dps_clock_str = string.format(" (%ds)", dps_clock)
+	end
+	return string.format("DPS: %s%s\nMobs: %-9s\n%s",  dps_status, dps_clock_str, mob_filter_str, labels)
 end
 
 
