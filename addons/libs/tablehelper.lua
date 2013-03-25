@@ -297,8 +297,8 @@ end
 table.in_place_sort = table.sort
 
 -- Returns a sorted table.
-function table.sort(t)
-	T(t):in_place_sort()
+function table.sort(t, ...)
+	T(t):in_place_sort(...)
 	return t
 end
 
