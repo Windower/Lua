@@ -1,5 +1,5 @@
 Author: Suji
-Version: 0.1
+Version: 0.2
 Addon to show alliance DPS and damage in real time.
 Abbreviation: //sb
 
@@ -12,7 +12,14 @@ Notable features:
 * Ability to filter only the mobs you want to see damage for
 * 'Report' command for reporting damage back to your party
 
-All commands are prefixed with "//sb", for example "//sb help".
+DPS accumulation starts whenever someone in your party or alliance damages an enemy.
+It then automatically pauses when someone in your party or alliance kills an enemy.
+Both stopping and starting can be done manually if you prefer and and you can enable
+or disable auto-start/auto-stop in the settings file.
+
+See data/settings.xml for additional configuration options.
+
+All in-game commands are prefixed with "//sb", for example "//sb help".
 Command list:
 * HELP
   Displays the help text
@@ -23,25 +30,27 @@ Command list:
 * REPORT
   Reports the damage to your party. This will go to whatever you have
   your chatmode set to.
-* Filters
+* FILTERS
   Lists the current mob filters that you have set.
 * Add <mob1> <mob2> ...
   Adds mob(s) to the filters. These can all be substrings. Legal lua
   patterns are also allowed.
-* Clear
+* CLEAR
   Clears all mobs from the filter.
-* Start
+* START
   Manually starts the DPS counter. This also happens automatically when
   someone in your group does damage.
-* Stop
-  Stops the DPS counter to keep your DPS estimate accurate.
+* STOP
+  Manually stops the DPS counter to keep your DPS estimate accurate.
   
-For convenience, binding "//sb stop" to a free key is suggested.
-  
-Limitations:
-* There's no way to correctly and automatically stop DPS tracking so users
-  must do this manually for the DPS value to remain accurate.
+Caveats:
+* DPS is an approximation, although I tested it manually and found it to
+  be very accurate.
+* Note that if you die to an enemy, auto-stop will not trigger and your
+  time will continue to bring your DPS down. You must stop manually in this
+  case by using '//sb stop'.
+
 
 Known issues:
 * Enspell and Spike damage are not currently parsed
-* User settings not yet storable
+* Skillchain damage is also not currently parsed
