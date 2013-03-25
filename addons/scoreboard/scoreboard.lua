@@ -3,8 +3,6 @@
 require 'tablehelper'
 require 'stringhelper'
 require 'mathhelper'
-
-require 'colors' -- a bug in libs is currently forcing us to require this before 'config'
 local config = require 'config'
 
 -----------------------------
