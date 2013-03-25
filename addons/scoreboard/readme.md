@@ -53,4 +53,5 @@ Caveats:
 
 Known issues:
 * Enspell and Spike damage are not currently parsed
-* Skillchain damage is also not currently parsed
+* Skillchain damage is not currently parsed
+* AOE damage is not fully attributed properly
