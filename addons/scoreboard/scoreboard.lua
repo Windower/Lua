@@ -42,8 +42,8 @@ local default_settings_file = [[
 		              Note that if you die, you'll have to stop the clock manually.
 	-->
 	<global>
-		<posX>1500</posX>
-		<posY>300</posY>
+		<posX>10</posX>
+		<posY>250</posY>
 		<bgTransparency>200</bgTransparency>
 		<numPlayers>8</numPlayers>
 		<dpsAutostart>true</dpsAutostart>
