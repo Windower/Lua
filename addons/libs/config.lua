@@ -4,6 +4,7 @@ Functions that facilitate loading, parsing and storing of config files.
 
 _libs = _libs or {}
 _libs.config = true
+_libs.logger = _libs.logger or require 'logger'
 _libs.tablehelper = _libs.tablehelper or require 'tablehelper'
 _libs.stringhelper = _libs.stringhelper or require 'stringhelper'
 local json = require 'json'
