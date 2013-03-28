@@ -50,13 +50,14 @@ function options_load()
 	local f = io.open(lua_base_path..'data/settings.txt', "r")
 	if f == nil then
 		local g = io.open(lua_base_path..'data/settings.txt', "w")
-		g:write('Release Date: 9:14 AM, 3-24-12\46')
+		g:write('Release Date: 9:30 AM, 3-28-12\46')
 		g:write('Author Comment: This document is whitespace sensitive, which means that you need the same number of spaces between things as exist in this initial settings file\46\n')
 		g:write('Author Comment: It looks at the first two words separated by spaces and then takes anything as the value in question if the first two words are relevant\46\n')
 		g:write('Author Comment: If you ever mess it up so that it does not work, you can just delete it and battlemod will regenerate it upon reload\46\n')
 		g:write('Author Comment: For the output customization lines, \36\123user\125 denotes a value to be replaced. The options are user, damg, abil, and targ\46\n')
 		g:write('Author Comment: Options for the other modes are either true or false\46\n')
 		g:write('Author Comment: Colors are customizable based on party / alliance position. Use the colortest command to view the available colors\46\n')
+		g:write('Author Comment: If you wish for a color to be unchanged from its normal color, set it to 0\46\n')
 		g:write('File Settings: Fill in below\n')
 		g:write('Output Full: \91\36\123user\125\93 \36\123damg\125 \36\123abil\125 \x81\xA8 \36\123targ\125\n')
 		g:write('Output NoUser: \36\123abil\125 \36\123damg\125 \x81\xA8 \36\123targ\125\n')
@@ -142,15 +143,13 @@ end
 function colconv(str,key)
 	local out
 	strnum = tonumber(str)
-	if strnum == 7 or strnum == 262 then
-		write('You have an invalid color '..key)
-		return string.char(0x1F,1)
-	end
 	if strnum >= 256 and strnum < 509 then
 		strnum = strnum - 254
 		out = string.char(0x1E,strnum)
 	elseif strnum >0 then
 		out = string.char(0x1F,strnum)
+	elseif strnum == 0 then
+		out = string.char(0x1E,0x01)
 	else
 		write('You have an invalid color '..key)
 		out = string.char(0x1F,1)
@@ -193,8 +192,6 @@ function event_addon_command(...)
 								local n = i * 16 + j
 								if n >= 0 and n <= 509 then
 										if n == 253 or n == 507 then -- block \x1E\xFD and \x1F\xFD
-												loc_col = '\031\001'
-										elseif n == 7 or n == 261 then -- block \x1E\x07 and \x1F\x07
 												loc_col = '\031\001'
 										elseif n <= 255 then
 												loc_col = string.char(0x1F, n)
@@ -243,11 +240,13 @@ function event_incoming_text(original, modified, color)
 		if redcol >17 then
 			if original == prevline then
 				a,b = string.find(original,'You buy ')
+				g,b = string.find(original,'You were unable to buy ')
+				h,b = string.find(original,' seems like a ')
 				f,b = string.find(original,'You sell ')
 				e,b = string.find(original,'%w+ synthesized ')
 				c,b = string.find(original,' bought ')
 				d,b = string.find(original,'You find a ')
-				if a==nil and c==nil and d==nil and e==nil and f==nil then
+				if a==nil and c==nil and d==nil and e==nil and f==nil and h==nil and g==nil then
 					modified = ''
 					if allow == 1 then
 						send_command('wait 5;lua c battlemod allow')
