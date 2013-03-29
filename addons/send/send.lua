@@ -7,6 +7,11 @@ function event_addon_command(...)
 		if broken_init ~= nil then
 			relevant_msg(table.concat(broken_init,' '))
 		end
+	elseif qual:lower()=='@all' then
+		if broken_init ~= nil then
+			relevant_msg(table.concat(broken_init,' '))
+		end
+		send_ipc_message(term)
 	else
 		send_ipc_message(term)
 	end
