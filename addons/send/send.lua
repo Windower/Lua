@@ -3,8 +3,8 @@ function event_addon_command(...)
 	broken_init = split(term, ' ')
 	qual = table.remove(broken_init,1)
 	player = get_player()
-	if qual:lower()==player["name"]:lower() then
-		if broken ~= nil then
+	if qual:lower()==player['name']:lower() then
+		if broken_init ~= nil then
 			relevant_msg(table.concat(broken_init,' '))
 		end
 	else
