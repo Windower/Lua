@@ -7,7 +7,7 @@ function event_addon_command(...)
 		if broken_init ~= nil then
 			relevant_msg(table.concat(broken_init,' '))
 		end
-	elseif qual:lower()=='@all' then
+	elseif qual:lower()=='@all' or qual:lower()='@'..player['main_job']:lower() then
 		if broken_init ~= nil then
 			relevant_msg(table.concat(broken_init,' '))
 		end
