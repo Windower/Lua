@@ -466,7 +466,12 @@ function the_check(str)
 end
 
 function send_it_out(n,modus)
-	local output = stat_array[n][1]..'\7'
+	local output
+	if stat_array[n][1]~= '' and stat_array[n][1] ~= nil then
+		output = stat_array[n][1]..'\7'
+	else
+		output = ''
+	end
 	stat_array[n] = eliminate_duplicates(stat_array[n])
 	if targetnumber then
 		if #stat_array[n] > 3 then
