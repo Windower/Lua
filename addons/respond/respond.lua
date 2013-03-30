@@ -37,3 +37,14 @@ function event_chat_message(isGM, mode, player, message)
 		send_command('alias r input /tell '..player)
 	end
 end
+
+function event_incoming_text(original, modified, color)
+	if original:sub(2,8) == 'PrivMsg' then
+		a,b = string.find(original,'>>')
+		local name = original:sub(10,a-1)
+		if current_r ~= name then
+			current_r = name
+			send_command('alias r input /pm '..player)
+		end
+	end
+end

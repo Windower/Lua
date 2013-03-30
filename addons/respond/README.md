@@ -8,7 +8,7 @@ Abbreviation: N/A
 
 Commands: N/A
 
-Purpose: Simply plugin that allows text responses. Specifically, it aliases "input /tell <name>" to 'r' so you can use //r to respond to the last person who sent you a tell.
+Purpose: To allow text responses without the control key. This plugin aliases "input /tell <name>" or "input /pm <name>" to 'r' so you can use //r to respond to the last person who sent you a tell or IRC PM.
 
 Installation Instructions:
 
