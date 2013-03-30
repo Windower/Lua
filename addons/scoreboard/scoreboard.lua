@@ -181,11 +181,15 @@ function event_load()
 	
 	send_command('alias sb lua c scoreboard')
 	
+	local transparency = tonumber(settings['bgtransparency']) or 200
+	local posx = tonumber(settings['posx']) or 10
+	local posy = tonumber(settings['posy']) or 200
+	
 	tb_create('scoreboard')
-	tb_set_bg_color('scoreboard', settings['bgtransparency'], 30, 30, 30)
+	tb_set_bg_color('scoreboard', transparency, 30, 30, 30)
 	tb_set_font('scoreboard', 'courier', 10)
 	tb_set_color('scoreboard', 255, 225, 225, 225)
-	tb_set_location('scoreboard', settings['posx'], settings['posy'])
+	tb_set_location('scoreboard', posx, posy)
 	tb_set_visibility('scoreboard', 1)
 	tb_set_bg_visibility('scoreboard', 1)
 
@@ -208,7 +212,40 @@ function parse_line(line)
     if string.find(line, '^(%w+) uses a .*%.$') then
 		return false
 	end
+
+	-- Ranged squarely; this must come before regular ranged attack parsing
+	-- since 'squarely' would get consumed into the mob name otherwise
+    start, stop, player,
+    mob, damage = string.find(line, "^(%w+)'s ranged attack hits ([^.]-) squarely for (%d+) points? of damage!")
+    if player and mob and damage then
+		accumulate(mob, player, damage)
+        return true
+    end
+
+	-- Ranged normal
+    start, stop, player,
+    mob, damage = string.find(line, "^(%w+)'s ranged attack hits ([^.]-) for (%d+) points? of damage%.")
+    if player and mob and damage then
+		accumulate(mob, player, damage)
+        return true
+    end
+
+	-- Ranged truestrike
+    start, stop, player,
+    mob, damage = string.find(line, "^(%w+)'s ranged attack strikes true, pummeling ([^.]-) for (%d+) points? of damage!")
+    if player and mob and damage then
+		accumulate(mob, player, damage)
+        return true
+    end
 	
+	-- Ranged crit
+    start, stop, player,
+    mob, damage = string.find(line, "^(%w+)'s ranged attack scores a critical hit!\7([^.]-) takes (%d+) points? of damage%.")
+    if player and mob and damage then
+		accumulate(mob, player, damage)
+        return true
+    end
+
 	-- Regular melee hits
     start, stop, player,
     mob, damage = string.find(line, "^(%w+) hits (.*) for (%d+) points? of damage%.")
@@ -233,7 +270,6 @@ function parse_line(line)
 		return true
     end
 	
-
 	-- critical hit
     start, stop, player,
 	mob, damage = string.find(line, "^(%w+) scores a critical hit!\7([^.]-) takes (%d+) points? of damage%.")
@@ -475,6 +511,18 @@ Melee syntax:
 
 Melee miss syntax:
 <Player> misses <mob>.
+
+Ranged normal syntax:
+<Player>'s ranged attack hits <mob> for <integer> points? of damage.
+
+Ranged squarely syntax:
+<Player>'s ranged attack hits <mob> squarely for <integer> points? of damage!
+
+Ranged crit syntax:
+<Player>'s ranged attack scores a critical hit!0x07<mob> takes <integer> points? of damage.
+
+Ranged true strike sytnax:
+<Player>'s ranged attack strikes true, pummeling <mob> for <integer> points? of damage!
 
 Weaponskill syntax:
 <Player> uses <WS Name>.0x07<mob> takes <integers> point(s)? of damage.
