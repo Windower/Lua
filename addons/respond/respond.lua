@@ -41,10 +41,12 @@ end
 function event_incoming_text(original, modified, color)
 	if original:sub(2,8) == 'PrivMsg' then
 		a,b = string.find(original,'>>')
-		local name = original:sub(10,a-1)
-		if current_r ~= name then
-			current_r = name
-			send_command('alias r input /pm '..player)
+		if a~=10 then
+			local name = original:sub(10,a-1)
+			if current_r ~= name then
+				current_r = name
+				send_command('alias r input /pm '..current_r)
+			end
 		end
 	end
 end
