@@ -64,7 +64,8 @@ end
 debug.setmetatable(functools.empty, {
 	__add = functools.apply,
 	__sub = functools.endapply,
-	__concat = functools.pipe
+	__concat = functools.pipe,
+	__unm = functools.negate
 })
 
 --[[

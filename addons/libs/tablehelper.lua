@@ -330,11 +330,11 @@ function table.set(t)
 end
 
 -- Backs up old table sorting function.
-table.in_place_sort = table.sort
+table._bak_sort = table.sort
 
 -- Returns a sorted table.
 function table.sort(t, ...)
-	T(t):in_place_sort(...)
+	T(t):_bak_sort(...)
 	return t
 end
 
@@ -383,6 +383,30 @@ function table.copy(t)
 	end
 	
 	return setmetatable(res, getmetatable(t))
+end
+
+-- Returns an array containing values from start to finish. If no finish is specified, returns table.range(1, start)
+function table.range(start, finish, step)
+	if finish == nil then
+		start, finish = 1, start
+	end
+	
+	step = step or 1
+	
+	local res = T{}
+	for key = start, finish, step do
+		res:append(key)
+	end
+	
+	return res
+end
+
+-- Backs up old table concat function.
+table._bak_concat = table.concat
+
+-- Concatenates all objects of a table. Converts to string, if not already so.
+function table.concat(t, str)
+	return T(t):map(tostring):_bak_concat(str)
 end
 
 -- Concatenates all elements with a whitespace in between.

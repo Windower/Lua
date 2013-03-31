@@ -54,7 +54,7 @@ function json.make_val(str, stripquotes)
 		return str:slice(2, -2)
 	end
 	
-	str = str:gsub('\\x([%w%d][%w%d])', string.char..(tonumber-{16}))
+	str = str:gsub('\\x([%w%d][%w%d])', string.char..tonumber-{16})
 	
 	return tonumber(str) or str
 end
