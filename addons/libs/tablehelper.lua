@@ -15,12 +15,37 @@ _libs.functools = _libs.functools or require 'functools'
 -- t = T{...} for explicit declaration.
 -- t = T(regular_table) to cast to a T-table.
 function T(t)
+	if t == nil then
+		return
+	end
+	
 	-- Sets T's metatable's index to the table namespace, which will take effect for all T-tables.
 	-- This makes every function that tables have also available for T-tables.
-	return setmetatable(t, {__index = table})
+	return setmetatable(t, {__index = table, __add = table.extend})
 end
 
 _libs = T(_libs)
+
+-- Checks if a table is an array, only having sequential integer keys.
+function table.isarray(t)
+	local count = 0
+	for _, _ in pairs(t) do
+		count = count + 1
+	end
+	
+	return count == #t
+end
+
+-- Returns the last element of an array.
+function table.last(t, offset)
+	if t == nil then
+		return nil
+	end
+	
+	offset = offset or 1
+	offset = offset - 1
+	return t[#t-offset]
+end
 
 -- Returns true if searchval is in t.
 function table.contains(t, searchval)
@@ -39,30 +64,160 @@ function table.containskey(t, searchkey)
 end
 
 -- Appends an element to the end of an array table.
-function table.append(t, val)
+function table.append(t, val, bla)
 	t[#t+1] = val
 	return t
 end
 
 -- Appends an array table to the end of another array table.
-function table.extend(t, extt)
-	for key, val in pairs(extt) do
-		t[#t+1] = val
+function table.extend(t, t_extend)
+	if type(t_extend) ~= 'table' then
+		return t:append(t_extend)
+	end
+	for _, val in ipairs(t_extend) do
+		t:append(val)
 	end
 	
 	return t
 end
 
--- Merges two dictionary tables and returns the result. Keys from the new table will overwrite old keys.
-function table.merge(t, merget)
-	if merget == nil then
+-- Removes all elements from a table.
+function table.clear(t)
+	t = T{}
+	
+	return t
+end
+
+-- Merges two dictionary tables and returns the result. Keys from the new table will overwrite keys.
+function table.update(t, t_update, recursive, maxrec, rec)
+	if t_update == nil then
 		return t
 	end
-	for key, val in pairs(merget) do
-		t[key] = val
+	
+	recursive = recursive or false
+	maxrec = maxrec or -1
+	rec = rec or 0
+	
+	for key, val in pairs(t_update) do
+		if t[key] ~= nil and recursive and rec ~= maxrec and type(t[key]) == 'table' and type(val) == 'table' then
+			t[key] = T(t[key]):update(T(val), true, maxrec, rec + 1)
+		else
+			t[key] = val
+		end
 	end
 	
 	return t
+end
+
+-- Merges two dictionary tables and returns the results. Keys from the new table will not overwrite existing keys.
+function table.amend(t, t_amend, recursive, maxrec, rec)
+	if t_amend == nil then
+		return t
+	end
+	
+	recursive = recursive or false
+	maxrec = maxrec or -1
+	rec = rec or 0
+	
+	for key, val in pairs(t_amend) do
+		if t[key] ~= nil and recursive and rec ~= maxrec and type(t[key]) == 'table' and type(val) == 'table' then
+			t[key] = T(t[key]):amend(T(val), true, maxrec, rec + 1)
+		elseif t[key] == nil then
+			t[key] = val
+		end
+	end
+	
+	return t
+end
+
+-- Searches elements of a table for an element. If, instead of an element, a function is provided, will search for the first element to satisfy that function.
+function table.find(t, el)
+	local fn
+	if type(el) ~= 'function' then
+		fn = functools.equals(el)
+	else
+		fn = el
+	end
+	
+	for key, val in pairs(t) do
+		if fn(val) then
+			return key, val
+		end
+	end
+end
+
+-- Returns the keys of a table in an array.
+function table.keyset(t)
+	local res = T{}
+	for key, _ in pairs(t) do
+		res:append(key)
+	end
+	
+	return res
+end
+
+-- Flattens a table by splicing all nested tables in at their respective position.
+function table.flatten(t, recursive)
+	recursive = recursive or true
+	local res = T{}
+	for key, val in ipairs(t) do
+		if type(val) == 'table' then
+			if recursive then
+				res:extend(T(val):flatten(recursive))
+			else
+				res:extend(val)
+			end
+		else
+			res:append(val)
+		end
+	end
+	
+	return res
+end
+
+-- Returns true if all key-value pairs in t_eq equal all key-value pairs in t.
+function table.equals(t, t_eq)
+	local seen = T{}
+	for key, val in pairs(t) do
+		if t_eq[key] ~= val then
+			return false
+		end
+		seen[key] = true
+	end
+	
+	for key, val in pairs(t_eq) do
+		if seen[key] == nil then
+			return false
+		end
+	end
+	
+	return true
+end
+
+-- Removes and returns an element from t.
+function table.delete(t, el)
+	for key, val in pairs(t) do
+		if val == el then
+			if type(key) == 'number' then
+				T(t):remove(key)
+				return
+			else
+				local val = t[key]
+				t[key] = nil
+				return val
+			end
+		end
+	end
+end
+
+-- Searches keys of a table according to a function fn. Returns the key and value, if found.
+-- Searches keys of a table for an element. If, instead of an element, a function is provided, will search for the first element to satisfy that function.
+function table.keyfind(t, fn)
+	for key, val in pairs(t) do
+		if fn(key) then
+			return key, val
+		end
+	end
 end
 
 -- Returns a partial table sliced from t, equivalent to t[x:y] in certain languages.
@@ -138,10 +293,12 @@ function table.set(t)
 	return res
 end
 
--- Returns a sorted set.
-function table.sorted(t)
-	local res = T(t)
-	t:sort()
+-- Backs up old table sorting function.
+table.in_place_sort = table.sort
+
+-- Returns a sorted table.
+function table.sort(t, ...)
+	T(t):in_place_sort(...)
 	return t
 end
 

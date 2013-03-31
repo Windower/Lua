@@ -20,8 +20,31 @@ function functools.curry(fn, ...)
 	end
 end
 
+-- Returns a closure over the argument el that returns true, if its argument equals el.
+function functools.equals(...)
+	local args = T{...}
+	return function(...)
+		return args:equals(T{...})
+	end
+end
+
+-- Returns a negation function of a boolean function.
+function functools.negate(fn)
+	return function(...)
+		return not (true == fn(...))
+	end
+end
+
+-- Returns the identity function.
+function functools.identity()
+	return function(...)
+		return ...
+	end
+end
+
 --[[
 	Logic functions
+Mainly used to pass as arguments.
 ]]
 
 boolean = {}
@@ -33,7 +56,7 @@ end
 
 -- Returns false if element is false.
 function boolean._false(val)
-	return val == true
+	return val == false
 end
 
 -- Returns the negation of a value.
@@ -52,8 +75,13 @@ function boolean._or(val1, val2)
 end
 
 -- Returns true if element exists.
-function boolean._is(val)
+function boolean._exists(val)
 	return val ~= nil
+end
+
+-- Returns true if two values are the same.
+function boolean._is(val1, val2)
+	return val1 ~= val2
 end
 
 --[[
@@ -90,26 +118,6 @@ function table.map(t, fn)
 	for key, val in pairs(t) do
 		-- Evaluate fn with the element and store it.
 		res[key] = fn(val)
-	end
-	
-	return res
-end
-
--- Flattens a table by splicing all nested tables in at their respective position.
-function table.flatten(t, recursive)
-	recursive = recursive or true
-	
-	local res = T{}
-	for key, val in ipairs(t) do
-		if type(val) == 'table' then
-			if recursive then
-				res:extend(val:flatten(true))
-			else
-				res:extend(val)
-			end
-		else
-			res:append(val)
-		end
 	end
 	
 	return res
@@ -184,6 +192,16 @@ end
 --[[
 	String functions.
 ]]
+
+-- Checks for exact string equality.
+function string.eq(str, strcmp)
+	return str == strcmp
+end
+
+-- Checks for case-insensitive string equality.
+function string.ieq(str, strcmp)
+	return str:lower() == strcmp:lower()
+end
 
 -- Applies a function to every character of str, concatenates the result.
 function string.map(str, fn)

@@ -3,10 +3,15 @@ function event_addon_command(...)
 	broken_init = split(term, ' ')
 	qual = table.remove(broken_init,1)
 	player = get_player()
-	if qual:lower()==player["name"]:lower() then
-		if broken ~= nil then
+	if qual:lower()==player['name']:lower() then
+		if broken_init ~= nil then
 			relevant_msg(table.concat(broken_init,' '))
 		end
+	elseif qual:lower()=='@all' or qual:lower()=='@'..player['main_job']:lower() then
+		if broken_init ~= nil then
+			relevant_msg(table.concat(broken_init,' '))
+		end
+		send_ipc_message(term)
 	else
 		send_ipc_message(term)
 	end
@@ -53,18 +58,18 @@ function split(msg, match)
 	local length = msg:len()
 	local splitarr = {}
 	local u = 1
-	while u < length do
+	while u <= length do
 		local nextanch = msg:find(match,u)
 		if nextanch ~= nil then
-			splitarr[#splitarr+1] = msg:sub(u,nextanch-1)
+			splitarr[#splitarr+1] = msg:sub(u,nextanch-match:len())
 			if nextanch~=length then
-				u = nextanch+1
+				u = nextanch+match:len()
 			else
 				u = length
 			end
 		else
 			splitarr[#splitarr+1] = msg:sub(u,length)
-			u = length
+			u = length+1
 		end
 	end
 	return splitarr

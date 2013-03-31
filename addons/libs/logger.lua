@@ -6,22 +6,31 @@ _libs = _libs or {}
 _libs.logger = true
 _libs.tablehelper = _libs.tablehelper or require 'tablehelper'
 _libs.stringhelper = _libs.stringhelper or require 'stringhelper'
-_libs.jsonreader = _libs.jsonreader or require 'jsonreader'
 _libs.colors = _libs.colors or require 'colors'
+local config = require 'config'
+_libs.config = _libs.config or (config ~= nil)
+local files = require 'filehelper'
+_libs.filehelper = _libs.filehelper or (files ~= nil)
 
 _addon = _addon or T{}
 
-_config_load = jsonreader.read('../libs/config.json') or jsonreader.read('../addons/libs/config.json') or T{}
-_config = (_config or T{logger=T{}}):merge(_config_load)
-local config = _config.logger
+local settings = T{}
+local file
 
 -- Set up, based on addon.
-config.logtofile = config.logtofile or false
-config.defaultfile = config.defaultfile or 'lua.log'
-config.logcolor = config.logcolor or 207
-config.errorcolor = config.errorcolor or 167
-config.warningcolor = config.warningcolor or 200
-config.noticecolor = config.noticecolor or 160
+settings.logtofile = settings.logtofile or false
+settings.defaultfile = settings.defaultfile or 'lua.log'
+settings.logcolor = settings.logcolor or 207
+settings.errorcolor = settings.errorcolor or 167
+settings.warningcolor = settings.warningcolor or 200
+settings.noticecolor = settings.noticecolor or 160
+
+--[[
+	Local functions
+]]
+
+local arrstring
+local captionlog
 
 -- Returns a concatenated string list, separated by whitespaces, for the chat output function.
 -- Converts any kind of object type to a string, so it's type-safe.
@@ -40,11 +49,11 @@ function captionlog(msg, msgcolor, ...)
 		caption:append(msg)
 	end
 	if #caption > 0 then
-		if config.logtofile then
+		if settings.logtofile == true then
 			flog(caption:sconcat()..':', ...)
 			return
 		end
-		caption = (caption:sconcat()..':'):setcolor(msgcolor, config.logcolor)..' '
+		caption = (caption:sconcat()..':'):setcolor(msgcolor, settings.logcolor)..' '
 	else
 		caption = ''
 	end
@@ -53,39 +62,43 @@ function captionlog(msg, msgcolor, ...)
 	if select('#', ...) == 0 or T{...}[1] == '' then
 		str = ' '
 	else
-		str = arrstring(...)
+		str = arrstring(...):gsub('\t', (' '):rep(4))
 	end
-	add_to_chat(config.logcolor, caption..''..str)
+	for _, line in ipairs(str:split('\n')) do
+		add_to_chat(settings.logcolor, caption..''..line)
+	end
 end
 
 function log(...)
-	captionlog(nil, config.logcolor, ...)
+	captionlog(nil, settings.logcolor, ...)
 end
 
 function error(...)
-	msg = 'Error'
-	captionlog(msg, config.errorcolor, ...)
+	captionlog('Error', settings.errorcolor, ...)
 end
 
 function warning(...)
-	msg = 'Warning'
-	captionlog(msg, config.warningcolor, ...)
+	captionlog('Warning', settings.warningcolor, ...)
 end
 
 function notice(...)
-	msg = 'Notice'
-	captionlog(msg, config.noticecolor, ...)
+	captionlog('Notice', settings.noticecolor, ...)
 end
 
 -- Prints the arguments provided to a file, analogous to log(...) in functionality.
 -- If the first argument ends with '.log', it will print to that output file, otherwise to 'lua.log' in the addon directory.
 function flog(filename, ...)
-	if filename == nil then
-		filename = config.defaultfile
+	local f
+	if filename ~= nil then
+		f = files.new(filename)
+	elseif filename == nil then
+		f = file
 	end
-	local f = io.open(lua_base_path..filename, 'a')
-	f:write(os.date('%Y-%m-%d %H:%M:%S')..'| '..arrstring(...).."\n")
-	f:close()
+	
+	local _, err = file:append(os.date('%Y-%m-%d %H:%M:%S')..'| '..arrstring(...).."\n")
+	if err ~= nil then
+		error('File error:', err)
+	end
 end
 
 -- Returns a string representation of a table in explicit Lua syntax: {...}
@@ -98,7 +111,7 @@ function table.tostring(t)
 	for key, val in pairs(t) do
 		-- Check for nested tables
 		if type(val) == 'table' then
-			if next(val) then
+			if not val:isempty() then
 				valstr = T(val):tostring()
 			else
 				valstr = '{}'
@@ -138,17 +151,19 @@ end
 ---     ...
 --- }
 function table.tovstring(t, indentlevel)
+	t = T(t)
 	indentlevel = indentlevel or 0
-	-- Convert all values to strings, to make sure everything is ready for string concatenation.
-	local t = T(t)
-	local tstr = ''
+	
+	if t:isempty() then
+		return '{}'
+	end
 	
 	local indent = (' '):rep(indentlevel*4)
-	tstr = tstr..'{'.."\n"
+	local tstr = '{'.."\n"
 	for key, val in pairs(t) do
 		-- Check for nested tables
 		if type(val) == 'table' then
-			if next(val) then
+			if not val:isempty() then
 				valstr = T(val):tovstring(indentlevel+1)
 			else
 				valstr = '{}'
@@ -187,3 +202,7 @@ end
 function table.vprint(t)
 	T(t):tovstring():split("\n"):arrmap(log)
 end
+
+-- Load logger settings (has to be after the logging functions have been defined, so those work in the config and related files).
+settings:update(config.load('../libs/logger.xml'))
+file = files.new(settings.defaultfile, true)
