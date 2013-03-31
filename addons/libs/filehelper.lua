@@ -47,6 +47,7 @@ end
 -- Check if file exists. There's no better way, it would seem.
 function file.exists(f)
 	local path
+	
 	if type(f) == 'string' then
 		path = f
 	else
@@ -68,7 +69,7 @@ end
 
 -- Checks existance of a number of paths, returns the first that exists.
 function file.check(...)
-	return select(2, T{...}:find(file.exists))
+	return (select(2, T{...}:find(file.exists)))
 end
 
 -- Read from file and return string of the contents.
@@ -124,10 +125,8 @@ function file.write(f, content)
 
 		if not f:exists() then
 			if createfile then
-				if not file.exists(path) then
-					notice('New file: '..path)
-					f:create()
-				end
+				notice('New file: '..f.path)
+				f:create()
 			else
 				return nil, 'File \''..f.path..'\' not found, cannot write.'
 			end
@@ -168,10 +167,8 @@ function file.append(f, content, newline)
 
 		if not f:exists() then
 			if createfile then
-				if not file.exists(path) then
-					notice('New file: '..path)
-					f:create()
-				end
+				notice('New file: '..f.path)
+				f:create()
 			else
 				return nil, 'File \''..f.path..'\' not found, cannot write.'
 			end

@@ -53,6 +53,9 @@ function json.make_val(str, stripquotes)
 	elseif stripquotes and (str:enclosed('\'') or str:enclosed('"')) then
 		return str:slice(2, -2)
 	end
+	
+	str = str:gsub('\\x([%w%d][%w%d])', string.char..(tonumber-{16}))
+	
 	return tonumber(str) or str
 end
 
@@ -196,7 +199,7 @@ function json.classify(tokens)
 				else
 					return json.error('Unexpected token \',\'.', line)
 				end
-			elseif type(token) == 'string' and modes:last() == 'new' and scopes:last() == 'object' then
+			elseif type(token):isin('string', 'number') and modes:last() == 'new' and scopes:last() == 'object' then
 				keys:append(token)
 				modes[#modes] = 'key'
 			elseif type(token):isin('boolean', 'number', 'string', 'null') then
@@ -208,17 +211,17 @@ function json.classify(tokens)
 						parsed:last():append(token)
 						modes[#modes] = 'value'
 					else
-						return json.error('Unexpected token "'..token..'".', line)
+						return json.error('Unexpected token \''..token..'\'.', line)
 					end
 				else
-					return json.error('Unexpected token "'..token..'".', line)
+					return json.error('Unexpected token \''..token..'\'.', line)
 				end
 			else
 				return json.error('Unkown token parsed. You should never see this. Token type: '..type(token), line)
 			end
 		end
 	end
-
+	
 	if parsed:isempty() then
 		return json.error('No JSON found.')
 	end

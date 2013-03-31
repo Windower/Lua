@@ -218,13 +218,13 @@ function xml.tokenize(content, line)
 		else
 			if xml.singletons:contains(c) then
 				if c:isin(' ', '\n', '\t', '\r') then
-					if #current > 0 then
+					if current:length() > 0 then
 						tokens:last():append(current)
 						current = ''
 					end
 					
 				elseif c == '=' then
-					if #current > 0 then
+					if current:length() > 0 then
 						tokens:last():append(current)
 					end
 					tokens:last():append('=')
@@ -235,7 +235,7 @@ function xml.tokenize(content, line)
 					mode = 'quote'
 					
 				elseif c == '/' then
-					if current:startswith('<') and #current > 1 then
+					if current:startswith('<') and current:length() > 1 then
 						tokens:last():append(current)
 						current = ''
 					end
@@ -248,7 +248,7 @@ function xml.tokenize(content, line)
 					mode = 'inner'
 					
 				else
-					xml.error('Unexpected token \''..c..'\'.', #tokens)
+					xml.error('Unexpected token \''..c..'\'.', tokens:length())
 				end
 				
 			else
@@ -340,7 +340,10 @@ function xml.classify(tokens, var)
 				if mode == 'tag' then
 					parsed:last(2).children:append(parsed:remove())
 					mode = 'inner'
+--				elseif mode == '' then
+					
 				else
+					add_to_chat(207, tostring(mode))
 					return xml.error('Illegal token inside a tag: '..token, line)
 				end
 				

@@ -53,7 +53,7 @@ function captionlog(msg, msgcolor, ...)
 			flog(caption:sconcat()..':', ...)
 			return
 		end
-		caption = (caption:sconcat()..':'):setcolor(msgcolor, settings.logcolor)..' '
+		caption = (caption:sconcat()..':'):color(msgcolor)..' '
 	else
 		caption = ''
 	end
@@ -65,7 +65,7 @@ function captionlog(msg, msgcolor, ...)
 		str = arrstring(...):gsub('\t', (' '):rep(4))
 	end
 	for _, line in ipairs(str:split('\n')) do
-		add_to_chat(settings.logcolor, caption..''..line)
+		add_to_chat(settings.logcolor, caption..line..'\x1E\x01')
 	end
 end
 
@@ -95,7 +95,7 @@ function flog(filename, ...)
 		f = file
 	end
 	
-	local _, err = file:append(os.date('%Y-%m-%d %H:%M:%S')..'| '..arrstring(...).."\n")
+	local _, err = f:append(os.date('%Y-%m-%d %H:%M:%S')..'| '..arrstring(...))
 	if err ~= nil then
 		error('File error:', err)
 	end

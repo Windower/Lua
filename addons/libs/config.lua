@@ -75,7 +75,7 @@ function parse(file, confdict)
 		parsed, err = xml.read(file)
 		if parsed == nil then
 			if err ~= nil then
-				error('XML error:', err)
+				error(err)
 			else
 				error('XML error: Unkown error.')
 			end
@@ -209,7 +209,7 @@ function nest_xml(t, indentlevel)
 	
 	local inlines = T{}
 	local fragments = T{}
-	local maxlength = 0
+	local maxlength = 0		-- For proper comment indenting
 	for key, val in pairs(t) do
 		if type(val) == 'table' and not T(val):isarray() then
 			fragments:append(indent..'<'..key..'>\n')
@@ -225,9 +225,14 @@ function nest_xml(t, indentlevel)
 			fragments:append(indent..'</'..key..'>\n')
 		else
 			if type(val) == 'table' then
-				val = T(val):sort():concat(', ')
+				val = T(val):sort():format('csv')
 			end
-			fragments:append(indent..'<'..key..'>'..tostring(val)..'</'..key..'>')
+			val = tostring(val)
+			if val == '' then
+				fragments:append(indent..'<'..key..' />')
+			else
+				fragments:append(indent..'<'..key..'>'..val..'</'..key..'>')
+			end
 			local length = #fragments:last() - #indent
 			if length > maxlength then
 				maxlength = length
@@ -238,7 +243,7 @@ function nest_xml(t, indentlevel)
 	
 	for frag_key, key in pairs(inlines) do
 		if comments[key] ~= nil then
-			fragments[frag_key] = fragments[frag_key]..('\t'):rep(math.ceil((maxlength - #fragments[frag_key] - 1)/4) + 1)..'<!--'..comments[key]..'-->'
+			fragments[frag_key] = fragments[frag_key]..('\t'):rep(math.floor((maxlength - fragments[frag_key]:trim():length())/4) + 1)..'<!--'..comments[key]..'-->'
 		end
 		
 		fragments[frag_key] = fragments[frag_key]..'\n'
