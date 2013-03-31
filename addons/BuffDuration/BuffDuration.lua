@@ -20,15 +20,10 @@ local files = require 'filehelper'
 function event_load()
 	player = get_player()  -- Get the player array (Used strictly for comparing name of buffed against character name for (Self)
 	items = 0
-	buffs = T(get_player()['buffs']) -- Need the current buff array for perpetuance/composure Tracking
-	--status = lua_base_path.."../../plugins/resources/status.xml"
-	--local f = files.read('../../plugins/resources/status.xml')
-	--local f = files.readlines('../../plugins/resources/status.xml')
-	--local f = files.new(lua_base_path.."../../plugins/resources/status.xml")
+	buffs = T(get_player()['buffs']) -- Need the current buff array for perpetuance/composure Trackin.
+	
 	local f = files.new('../../plugins/resources/status.xml')
 	local h = files.new('data/Extend.xml')
-	--local h = files.new('Extend.xml')
-	--lua_base_path.."../../plugins/resources/status.xml"
 	
 	buffid = 0
 	buffname = ''
