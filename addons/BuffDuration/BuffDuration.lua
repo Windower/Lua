@@ -21,8 +21,14 @@ function event_load()
 	player = get_player()  -- Get the player array (Used strictly for comparing name of buffed against character name for (Self)
 	items = 0
 	buffs = T(get_player()['buffs']) -- Need the current buff array for perpetuance/composure Tracking
-	local f = files.new('status.xml')
-	local h = files.new('Extend.xml')
+	--status = lua_base_path.."../../plugins/resources/status.xml"
+	--local f = files.read('../../plugins/resources/status.xml')
+	--local f = files.readlines('../../plugins/resources/status.xml')
+	--local f = files.new(lua_base_path.."../../plugins/resources/status.xml")
+	local f = files.new('../../plugins/resources/status.xml')
+	local h = files.new('data/Extend.xml')
+	--local h = files.new('Extend.xml')
+	--lua_base_path.."../../plugins/resources/status.xml"
 	
 	buffid = 0
 	buffname = ''
@@ -113,20 +119,17 @@ function event_gain_status(id,name)
 	end
 	first = 1	
 	for i in ipairs(lines) do		-- Iterates through each line of status.xml to find buff's by ID
-		x = i + 3
+		x = i
 		str = lines[x]
 		if str ~= nil then
-			str1 = lines[x]:split(' ',6)
-			if str1[1] == '<b' then
-				str3 = str1[2]:split('=',2)
-				buffid = tonumber(str3[2]:stripchars('"'))
-				if buffid == tonumber(id) then
-					str5 = str1[6]:split('>',2)
-					str6 = str5[2]:split('<',2)
-					buffname = str6[1]
-					str7 = str1[3]:split('=',2)
-					duration = tonumber(str7[2]:stripchars('"'))
-					createTimer(buffname)
+			str=tostring(str)
+			a,b,c,d = string.find(str,'<b id="(%w+)" duration="(%w+)"') 
+			if c ~= nil then
+				buffid = c
+				duration = d
+				buffname = tostring(str:split('>',2)[2]:split('<',2)[1])
+				if tonumber(buffid) == tonumber(id) then
+					createTimer(tostring(buffname))
 					break
 				end
 			end
@@ -136,26 +139,22 @@ end
 
 function check_bufflist(name)
 	for i in ipairs(lines) do		-- Iterates through each line of status.xml to find buff's by ID
-		x = i + 3
+		x = i
 		str = lines[x]
 		if str ~= nil then
-			str1 = lines[x]:split(' ',6)
-			if str1[1] == '<b' then
-				str5 = str1[6]:split('>',2)
-				str6 = str5[2]:split('<',2)
-				buff = str6[1]
-				str7 = str1[3]:split('=',2)
-				duration = tonumber(str7[2]:stripchars('"'))
-				str3 = str1[2]:split('=',2)
-				buffid = tonumber(str3[2]:stripchars('"'))
-				
+			str=tostring(str)
+			a,b,c,d = string.find(str,'<b id="(%w+)" duration="(%w+)"') 
+			if c ~= nil then
+				buffid = c
+				duration = d
+				buff = tostring(str:split('>',2)[2]:split('<',2)[1])
 				if tostring(buff) == tostring(name) then
 					return true
 				end
 			end
 		end
 	end
-	return false
+	return false	
 end
 
 function event_lose_status(id,name)
@@ -190,8 +189,34 @@ function checkgear(buffid)
 
 	items = get_items()
 	equip = items.equipment
-
-	for i in ipairs(hlines) do		-- Iterates through each line of Extend.xml to find buff's by ID and Gear
+	for i in ipairs(hlines) do		-- Iterates through each line of status.xml to find buff's by ID
+		x = i
+		str = hlines[x]
+		if str ~= nil then
+			str = tostring(str)
+			a,b,c,d,e,f = string.find(str,'<b id="(%w+)" gearid="(%w+)" duration="(%w+)" slot="(%w+)">') 
+			if c ~= nil then
+				extendid = c
+				gearid = d
+				addtime2 = e
+				slot = f
+				gearname = tostring(str:split('>',2)[2]:split('<',2)[1])
+				if tonumber(extendid) == tonumber(buffid) then
+					if items.inventory[tostring(equip[''..slot..''])].id == gearid then
+						addtime = addtime2
+						write('test1')
+					else
+						addtime = 0
+					end
+					break
+				else
+					addtime = 0
+					break
+				end
+			end
+		end
+	end
+	--[[for i in ipairs(hlines) do		-- Iterates through each line of Extend.xml to find buff's by ID and Gear
 		x = i + 4
 		str = hlines[x]
 		if str ~= (nil or '') then
@@ -206,6 +231,7 @@ function checkgear(buffid)
 					gearid = tonumber((str1[3]:split('=',2)[2]):stripchars('"'))	
 					if items.inventory[tostring(equip[''..slot..''])].id == gearid then
 						addtime = addtime2
+						write('test1')
 					else
 						addtime = 0
 					end
@@ -218,7 +244,7 @@ function checkgear(buffid)
 				break
 			end	
 		end
-	end
+	end]]
 end
 
 function createTimer(name,target)
@@ -248,8 +274,9 @@ function createTimer(name,target)
 		end
 		--The following checks if any gear will extend the time of the buff
 		checkgear(buffid)
-		if addtime ~= 0 then
-			timer = duration + addtime
+		if tonumber(addtime) ~= 0 then
+			duration = duration + addtime
+			write('test2' ..duration)
 		else
 			timer = duration
 		end
@@ -317,15 +344,15 @@ function createTimer(name,target)
 		else
 			send_ipc_message(name..' '..target)
 		end
-		if duration > 0 then
+		if tonumber(duration) > 0 then
 			send_command('timers c "'..name..' ('..target..')" '..timer..' down ' ..tostring(buffid):zfill(5))
 			createdTimers[#createdTimers+1] = name..' ('..target..')'
 			
-		elseif duration == 0 then
+		elseif tonumber(duration) == 0 then
 			timer = 1
 			send_command('timers c "'..name..' ('..target..')" '..timer..' down ' ..tostring(buffid):zfill(5))
 			createdTimers[#createdTimers+1] = name..' ('..target..')'
-		elseif duration == -1 then
+		elseif tonumber(duration) == -1 then
 		end
 	end
 end
@@ -385,6 +412,7 @@ function event_incoming_text(old,new,color)
 			--The following checks are so that you don't
 			--catch buffs cast by others on others.
 			--Will catch buffs cast by you or on you.
+			
 			if caster:lower() == player['name']:lower() then
 				createTimer(tostring(target_effect),tostring(target))
 			elseif target:lower() == player['name']:lower() then
