@@ -202,9 +202,8 @@ function checkgear(buffid)
 				slot = f
 				gearname = tostring(str:split('>',2)[2]:split('<',2)[1])
 				if tonumber(extendid) == tonumber(buffid) then
-					if items.inventory[tostring(equip[''..slot..''])].id == gearid then
+					if tonumber(items.inventory[tostring(equip[''..slot..''])].id) == tonumber(gearid) then
 						addtime = addtime2
-						write('test1')
 					else
 						addtime = 0
 					end
@@ -216,35 +215,6 @@ function checkgear(buffid)
 			end
 		end
 	end
-	--[[for i in ipairs(hlines) do		-- Iterates through each line of Extend.xml to find buff's by ID and Gear
-		x = i + 4
-		str = hlines[x]
-		if str ~= (nil or '') then
-			str1 = hlines[x]:split('|',7)
-			if tostring(((str1[1]):trim()):startswith('<b')) then
-				
-				extendid = tonumber(str1[2]:split('=',2)[2]:stripchars('"'))
-				if extendid == buffid then
-					slot = tostring((str1[5]:split('=',2))[2]:stripchars('"'))
-					gearname = tostring((str1[6]:split('=',2))[2]:stripchars('"'))
-					addtime2 = tonumber((str1[4]:split('=',2)[2]):stripchars('"'))
-					gearid = tonumber((str1[3]:split('=',2)[2]):stripchars('"'))	
-					if items.inventory[tostring(equip[''..slot..''])].id == gearid then
-						addtime = addtime2
-						write('test1')
-					else
-						addtime = 0
-					end
-					break
-				else
-					addtime = 0
-					break
-				end
-			else
-				break
-			end	
-		end
-	end]]
 end
 
 function createTimer(name,target)
@@ -276,7 +246,6 @@ function createTimer(name,target)
 		checkgear(buffid)
 		if tonumber(addtime) ~= 0 then
 			duration = duration + addtime
-			write('test2' ..duration)
 		else
 			timer = duration
 		end
