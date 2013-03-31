@@ -27,4 +27,9 @@
     <name>Send</name>
     <description>Sends commands between windower instances using IPC.</description>
   </addon>
+  <addon>
+    <name>Scoreboard</name>
+    <author>Suji</author>
+    <description>Basic in-game damage parser which also displays live DPS.</description>
+  </addon>
 </addons>
