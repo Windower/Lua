@@ -11,7 +11,7 @@ file requierement:
 
 	thers an example in the file already which is:
 	
-	<b id="32" gearid="14094" duration="15" slot="feet">Rogue's Poulaines"</b>
+	<b id="32" gearid="14094" duration="15" slot="feet">Rogue's Poulaines</b>
 	
 	b = nothing, its just a tag, but however must be there
 	id = the id of the buff you would receive from a jobability or spell (these can be found in the status.xml) and must be correct or will not work.
@@ -33,6 +33,12 @@ file requierement:
 
 * In buffDuration.lua more Etendables may be added if they can be extended by perpetuance, lightArts, tabula rasa or composure.
 	perpetuance time extension is 2.5 currently. if you do not have the af3+2 hands you may edit it to 2 to get correct time.
+	
+*Because this addon uses the Timers plugin to create timers if you find errors it is not necessarily from this end, also this means that you can edit Timers settings to place the timers where you want.
+	<customX>200</customX>
+	<customY>350</customY>
+	<customTimerLimit>8</customTimerLimit>
+the above is what you want to edit in Timers to relocate your addon position.
 	
 Abbreviation: //buffDuration
 
