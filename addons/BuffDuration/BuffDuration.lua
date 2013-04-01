@@ -47,9 +47,13 @@ function event_load()
 				}
 	--Feel free to update this buffExtension variable in case you have better composure
 	--or don't have perpetuance gloves. The Light Arts and Rasa sections are only used for regen
-	extendables = T { 	'Regen','Refresh','Blink','Stoneskin','Aquaveil','Haste','Temper','Phalanx','Sandstorm','Rainstorm','Windstorm','Firestorm','Hailstorm','Thunderstorm','Aurorastorm',
+	extendables = T { 	'Regen','Refresh','Blink','Stoneskin','Aquaveil','Haste','Phalanx','Sandstorm','Rainstorm','Windstorm','Firestorm','Hailstorm','Thunderstorm','Aurorastorm',
 						'Voidstorm','Blink','Stoneskin','Aquaveil','Invisible','Deodorize','Sneak','Barfire','Barblizzard','Baraero','Barstone','Barthunder','Barwater','Barpoison','Barparalyze',
 						'Barblind','Barsilence','Barpetrify','Barvirus','Reraise', 'Protect', 'Shell'}
+	extenCompo = T { 	'Regen','Refresh','Blink','Stoneskin','Aquaveil','Haste','Temper','Phalanx','Sandstorm','Rainstorm','Windstorm','Firestorm','Hailstorm','Thunderstorm','Aurorastorm',
+						'Voidstorm','Blink','Stoneskin','Aquaveil','Invisible','Deodorize','Sneak','Barfire','Barblizzard','Baraero','Barstone','Barthunder','Barwater','Barpoison','Barparalyze',
+						'Barblind','Barsilence','Barpetrify','Barvirus','Boost VIT','Boost MND','Boost AGI','Boost CHR','Boost STR','Boost DEX','Boost INT','Enthunder','Enstone','Enaero','Enfire',
+						'Enblizzard','Enwater','Enthunder II','Enstone II','Enaero II','Enfire II','Enblizzard II','Enwater II','Blaze Spikes','Ice Spikes','Shock Spikes'}
 	--This table is used to check if a buff is able to be
 	--extended via perpetuance or composure. If i missed one
 	--feel free to add it. Keep in mind however i only look for
@@ -131,6 +135,11 @@ function event_gain_status(id,name)
 end
 
 function check_bufflist(name)
+	buffs = T(get_player()['buffs'])
+	if buffs:contains(419) then
+		--Check to gain perpetuance and add a timer
+		extend['Composure'] = os.clock()
+	end
 	for i in ipairs(lines) do		-- Iterates through each line of status.xml to find buff's by ID
 		x = i
 		str = lines[x]
@@ -248,8 +257,8 @@ function createTimer(name,target)
 		--Checked here to figure out the time the timer should be set to.
 		--If all checks fail, the timer is set to base time at the beginning
 		--and 5 seconds is subtracted due to lag of the chat log.
+		buffs = T(get_player()['buffs'])
 		if extendables:contains(tostring(name)) then
-			buffs = T(get_player()['buffs'])
 			timer = duration - 5
 			if extend ~= nil then
 				e = os.clock()-60
@@ -290,8 +299,17 @@ function createTimer(name,target)
 						timer = tonumber(duration) * buffExtension['LightArts'] + addtime - 5
 					end
 				end
-			elseif buffs:contains(419) then
-				timer = tonumber(duration) * buffExtension['Composure'] + addtime - 5
+			end
+		end
+		if extenCompo:contains(tostring(name)) then
+			timer = duration - 5
+			if extend ~= nil then
+				e = os.clock()-60
+				if extend['Composure'] ~= nil then
+					if e < extend['Composure'] then	
+						timer = tonumber(duration) * buffExtension['Composure'] + addtime - 5
+					end
+				end
 			end
 		else
 			timer = duration - 5
