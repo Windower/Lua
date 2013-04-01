@@ -12,16 +12,65 @@ _libs.tablehelper = _libs.tablehelper or require 'tablehelper'
 
 functools = {}
 
+-- The empty function.
+function functools.empty()
+end
+
+-- The identity function.
+function functools.identity(...)
+	return ...
+end
+
 -- Returns a partially applied function, depending on the number of arguments provided.
-function functools.curry(fn, ...)
-	local args = T{...}
+function functools.apply(fn, args)
 	return function(...)
-		return fn(args:extend(T{...}):unpack())
+		return fn(T(args):extend(T{...}):unpack())
 	end
 end
 
+-- Returns a partially applied function, with the argument provided at the end.
+function functools.endapply(fn, args)
+	return function(...)
+		return fn(T{...}:extend(args):unpack())
+	end
+end
+
+-- Returns a closure over the argument el that returns true, if its argument equals el.
+function functools.equals(...)
+	local args = T{...}
+	return function(...)
+		return args:equals(T{...})
+	end
+end
+
+-- Returns a negation function of a boolean function.
+function functools.negate(fn)
+	return function(...)
+		return not (true == fn(...))
+	end
+end
+
+-- Returns a function that calls a provided chain of functions in right-to-left order.
+function functools.pipe(fn1, fn2)
+	return function(...)
+		return fn1(fn2(...))
+	end
+end
+
+-- Assigns a metatable on functions to introduce certain function operators.
+-- * fn+{...} partially applies a function to arguments.
+-- * fn-{...} partially applies a function to arguments from the end.
+-- * fn1..fn2 pipes input from fn2 to fn1.
+debug.setmetatable(functools.empty, {
+	__add = functools.apply,
+	__sub = functools.endapply,
+	__concat = functools.pipe,
+	__unm = functools.negate
+})
+
 --[[
 	Logic functions
+Mainly used to pass as arguments.
 ]]
 
 boolean = {}
@@ -33,7 +82,7 @@ end
 
 -- Returns false if element is false.
 function boolean._false(val)
-	return val == true
+	return val == false
 end
 
 -- Returns the negation of a value.
@@ -52,8 +101,13 @@ function boolean._or(val1, val2)
 end
 
 -- Returns true if element exists.
-function boolean._is(val)
+function boolean._exists(val)
 	return val ~= nil
+end
+
+-- Returns true if two values are the same.
+function boolean._is(val1, val2)
+	return val1 ~= val2
 end
 
 --[[
@@ -95,30 +149,10 @@ function table.map(t, fn)
 	return res
 end
 
--- Flattens a table by splicing all nested tables in at their respective position.
-function table.flatten(t, recursive)
-	recursive = recursive or true
-	
-	local res = T{}
-	for key, val in ipairs(t) do
-		if type(val) == 'table' then
-			if recursive then
-				res:extend(val:flatten(true))
-			else
-				res:extend(val)
-			end
-		else
-			res:append(val)
-		end
-	end
-	
-	return res
-end
-
 -- Analogon to table.map, but for array-tables. Possibility to include nil values.
 function table.arrmap(t, fn)
 	local res = T{}
-	for key = 1, #t do
+	for key = 1, T(t):length() do
 		-- Evaluate fn with the element and store it.
 		res[key] = fn(t[key])
 	end
@@ -127,14 +161,20 @@ function table.arrmap(t, fn)
 end
 
 -- Returns a table with all elements from t that satisfy the condition fn, or don't satisfy condition fn, if reverse is set to true. Defaults to false.
-function table.filter(t, fn, reverse)
-	reverse = reverse or false
-	
+function table.filter(t, fn)
 	local res = T{}
-	for key, val in pairs(t) do
-		-- Only copy if fn(val) evaluates to true
-		if not (reverse == fn(val)) then
-			res[key] = val
+	if T(t):isarray() then
+		for _, val in ipairs(t) do
+			if fn(val) then
+				res:append(val)
+			end
+		end
+	else
+		for key, val in pairs(t) do
+			-- Only copy if fn(val) evaluates to true
+			if fn(val) then
+				res[key] = val
+			end
 		end
 	end
 	
@@ -184,6 +224,16 @@ end
 --[[
 	String functions.
 ]]
+
+-- Checks for exact string equality.
+function string.eq(str, strcmp)
+	return str == strcmp
+end
+
+-- Checks for case-insensitive string equality.
+function string.ieq(str, strcmp)
+	return str:lower() == strcmp:lower()
+end
 
 -- Applies a function to every character of str, concatenates the result.
 function string.map(str, fn)

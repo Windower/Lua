@@ -6,27 +6,29 @@ _libs = _libs or {}
 _libs.ffxi = true
 _libs.tablehelper = _libs.tablehelper or require 'tablehelper'
 _libs.stringhelper = _libs.stringhelper or require 'stringhelper'
-_libs.jsonreader = _libs.jsonreader or require 'jsonreader'
+local json = require 'json'
+_libs.json = _libs.json or (json ~= nil)
 
-ffxidata = ffxidata or jsonreader.read('ffxidata.json')
+local ffxi = T{}
+ffxi.data = json.read('../libs/ffxidata.json')
 
 -- Returns ingame time from server time.
 -- TODO: Waiting on server-time interface function.
-function get_time(time)
+function ffxi.get_time(time)
 	return 4
 end
 
 -- Returns the game time from the float-representation.
-function format_time(time)
-	time = tostring(math.round(time, 2)):split('.'):print()
+function ffxi.format_time(time)
+	time = tostring(math.round(time, 2)):split('.')
 	local hours = time[1]:zfill(2)
 	local minutes = time[2]:zfill(2)
 	return hours..':'..minutes
 end
 
 -- Returns the element of the storm effect currently on the player. If none present, returns nil.
-function get_storm()
-	for storm, element in pairs(ffxi.elements.storms) do
+function ffxi.get_storm()
+	for storm, element in pairs(ffxi.data.elements.storms) do
 		if T(get_player()['buffs']):contains(storm) then
 			return element
 		end
@@ -34,3 +36,19 @@ function get_storm()
 	
 	return nil
 end
+
+-- Prints a list of icons and their keys to the chatlog.
+function ffxi.showicons()
+	for key, val in pairs(ffxi.data.chat.icons) do
+		log('Icon', 'ffxi.data.chat.'..key..':', val)
+	end
+end
+
+-- Prints the game colors and their IDs.
+function ffxi.showcolors()
+	for key, val in pairs(ffxi.data.chat.colors) do
+		log('Color', 'ffxi.data.chat.colors.'..key..':', ('Color sample text.'):color(val))
+	end
+end
+
+return ffxi

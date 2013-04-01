@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<addons>
+  <addon>
+    <name>Example</name>
+    <author>Iryoku</author>
+    <description>
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis dolor est,
+      tristique vitae lacinia quis, vulputate sit amet mi. Duis lacinia, massa
+      at faucibus sagittis.
+    </description>
+    <bugtracker>https://github.com/IryokuChevalier/Lua/issues</bugtracker>
+    <support>http://forums.windower.net/topic/21775-random-question-thread/</support>
+  </addon>
+  <addon>
+    <name>AnsweringMachine</name>
+    <description>Stores tells for later recall.</description>
+  </addon>
+  <addon>
+    <name>AutoJoin</name>
+    <description>Automatically joins or declines party invites. Configurable with blacklist/whitelist mode and auto-decline settings.</description>
+	<bugtracker>https://github.com/z16/Lua/issues</bugtracker>
+  </addon>
+  <addon>
+    <name>BattleMod</name>
+    <description>Customizes battle chat messages.</description>
+  </addon>
+  <addon>
+    <name>Linker</name>
+    <description>Allows opening links to certain websites from within the game, with an optional search parameter.</description>
+	<bugtracker>https://github.com/z16/Lua/issues</bugtracker>
+  </addon>
+  <addon>
+    <name>Scoreboard</name>
+    <author>Suji</author>
+    <description>Basic in-game damage parser which also displays live DPS.</description>
+  </addon>
+  <addon>
+    <name>Send</name>
+    <description>Sends commands between windower instances using IPC.</description>
+  </addon>
+</addons>

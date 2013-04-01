@@ -15,6 +15,23 @@ function string.at(str, pos)
 	return str:slice(pos, pos)
 end
 
+-- Returns the character at position pos. Defaults to 1 to return the first character.
+function string.first(str, offset)
+	offset = offset or 1
+	return str:at(offset)
+end
+
+-- Returns the character at position #str-pos. Defaults to 0 to return the last character.
+function string.last(str, offset)
+	offset = offset or 1
+	return str:at(-offset)
+end
+
+-- Returns true if the string contains a substring.
+function string.contains(str, sub)
+	return str:find(sub, nil, true)
+end
+
 -- Splits a string into a table by a separator pattern. Empty strings are ignored.
 function string.psplit(str, sep, maxsplit)
 	maxsplit = maxsplit or 0
@@ -62,9 +79,19 @@ function string.slice(str, from, to)
 	return str:sub(from or 1, to or #str)
 end
 
+-- Returns an iterator, that goes over every character of the string.
+function string.it(str)
+	return str:gmatch('.')
+end
+
 -- Removes leading and trailing whitespaces and similar characters (tabs, newlines, etc.).
 function string.trim(str)
 	return str:match('^%s*(.-)%s*$')
+end
+
+-- Collapses all types of spaces into exactly one whitespace
+function string.spaces_collapse(str)
+	return str:gsub('%s+', ' '):trim()
 end
 
 -- Removes all characters in chars from str.
@@ -102,6 +129,11 @@ function string.endswith(str, substr)
 	return str:slice(-#substr) == substr
 end
 
+-- Returns the length of a string.
+function string.length(str)
+	return #str
+end
+
 -- Checks if string is enclosed in start and finish. If only one argument is provided, it will check for that string both at the beginning and the end.
 function string.enclosed(str, start, finish)
 	finish = finish or start
@@ -116,12 +148,12 @@ end
 
 -- Returns the same string with the first letter capitalized.
 function string.ucfirst(str)
-	return str:at(1):upper()..str:slice(2)
+	return str:first():upper()..str:slice(2)
 end
 
 -- Returns the same string with the first letter of every word capitalized.
 function string.capitalize(str)
-	return str:split(' '):map(string.uc_first):sconcat()
+	return str:split(' '):map(string.ucfirst):sconcat()
 end
 
 -- Returns the string padded with zeroes until the length is len.
@@ -150,4 +182,56 @@ function string.todec(numstr, base)
 	end
 	
 	return acc
+end
+
+-- Checks if a string is in a table.
+function string.isin(str, ...)
+	return T{...}:flatten():contains(str)
+end
+
+-- Checks if a string is empty
+function string.isempty(str)
+	return str:len() == 0
+end
+
+-- Counts the occurrences of a substring in a string.
+function string.count(str, sub)
+	return str:pcount(sub:gsub('[[%]%%^$*().-+]', '%%%1'))
+end
+
+-- Counts the occurrences of a pattern in a string.
+function string.pcount(str, pat)
+	local _, count = str:gsub(pat, '')
+	return count
+end
+
+-- Returns a formatted item list for use in natural language representation of a number of items.
+-- The second argument specifies how the trailing element is handled:
+-- * and: Appends the last element with an and instead of a comma.
+-- * csv: Appends the last element with a comma, like every other element.
+-- * oxford: Appends the last element with a comma, followed by an and.
+-- The third argument specifies an optional output, if the table is empty.
+function table.format(t, trail, subs)
+	t = T(t)
+	local l = t:length()
+	if l == 0 then
+		return subs or ''
+	elseif l == 1 then
+		return t[next(t)]
+	end
+	
+	trail = trail or 'and'
+	
+	local last
+	if trail == 'and' then
+		last = ' and '
+	elseif trail == 'csv' then
+		last = ', '
+	elseif trail == 'oxford' then
+		last = ', and '
+	else
+		warning('Invalid format for table.format: \''..trail..'\'.')
+	end
+	
+	return T(t):slice(1, -1):concat(', ')..last..T(t):last()
 end

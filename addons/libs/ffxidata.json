@@ -1,60 +1,170 @@
-ffxi: {
-	chatcolors: {
-		say: 1,				// Menu > Font Colors > Chat > Immediate vicinity ("Say")
-		tell: 4,			// Menu > Font Colors > Chat > Tell target only ("Tell")
-		party: 5,			// Menu > Font Colors > Chat > All party members ("Party")
-		linkshell: 6,		// Menu > Font Colors > Chat > Linkshell group ("Linkshell")
-		emote: 7,			// Menu > Font Colors > Chat > Emotes
-		message: 17,		// Menu > Font Colors > Chat > Messages ("Message")
-		npc: 142,			// Menu > Font Colors > Chat > NPC Conversations
-		shout: 2,			// Menu > Font Colors > Chat > Wide area ("Shout")
-		yell: 3,			// Menu > Font Colors > Chat > Extremely wide area ("Yell")
-		selfheal: 30,		// Menu > Font Colors > For Self > HP/MP you recover
-		selfhurt: 28,		// Menu > Font Colors > For Self > HP/MP you loose
-		selfbuff: 56,		// Menu > Font Colors > For Self > Beneficial effects you are granted
-		selfdebuff: 57,		// Menu > Font Colors > For Self > Detrimental effects you receive
-		selfresist: 59,		// Menu > Font Colors > For Self > Effects you resist
-		selfevade: 29,		// Menu > Font Colors > For Self > Actions you evade
-		otherheal: 22,		// Menu > Font Colors > For Others > HP/MP others recover
-		otherhurt: 20,		// Menu > Font Colors > For Others > HP/MP others loose
-		otherbuff: 60,		// Menu > Font Colors > For Others > Beneficial effects others are granted
-		otherdebuff: 61,	// Menu > Font Colors > For Others > Detrimental effects others receive
-		otherresist: 63,	// Menu > Font Colors > For Others > Effects others resist
-		otherevade: 21,		// Menu > Font Colors > For Others > Actions others evade
-		cfh: 8,				// Menu > Font Colors > System > Calls for help
-		battle: 50,			// Menu > Font Colors > System > Standard battle messages
-		system: 121			// Menu > Font Colors > System > Basic system messages
+chat: {
+	colorcontrols: {
+		0:				\x1E,
+		1:				\x1F,
+		reset:			\x1E\x01,
 	},
-	elements: {
-		days: {
-			Firesday: Fire,
-			Earthsday: Earth,
-			Watersday: Water,
-			Windsday: Wind,
-			Iceday: Ice,
-			Lightningday: Lightning,
-			Lightsday: Light,
-			Darksday: Darkness
-		},
-		storms: {
-			Sandstorm: Earth,
-			Rainstorm: Water,
-			Windstorm: Wind,
-			Firestorm: Fire,
-			Hailstorm: Ice,
-			Thunderstorm: Lightning,
-			Voidstorm: Darkness,
-			Aurorastorm: Light
-		},
-		spirits: {
-			Fire Spirit: Fire,
-			Ice Spirit: Ice,
-			Air Spirit: Wind,
-			Earth Spirit: Earth,
-			Water Spirit: Water,
-			Thunder Spirit: Lightning,
-			Light Spirit: Light,
-			Dark Spirit: Darkness
-		}
+	colors: {
+		// Configurable game colors
+		say:			\x1F\x01,		// Menu > Font Colors > Chat > Immediate vicinity ("Say")
+		tell:			\x1F\x04,		// Menu > Font Colors > Chat > Tell target only ("Tell")
+		party:			\x1F\x05,		// Menu > Font Colors > Chat > All party members ("Party")
+		linkshell:		\x1F\x06,		// Menu > Font Colors > Chat > Linkshell group ("Linkshell")
+		emote:			\x1F\x07,		// Menu > Font Colors > Chat > Emotes
+		message:		\x1F\x11,		// Menu > Font Colors > Chat > Messages ("Message")
+		npc:			\x1F\x8E,		// Menu > Font Colors > Chat > NPC Conversations
+		shout:			\x1F\x02,		// Menu > Font Colors > Chat > Wide area ("Shout")
+		yell:			\x1F\x03,		// Menu > Font Colors > Chat > Extremely wide area ("Yell")
+		selfheal:		\x1F\x1E,		// Menu > Font Colors > For Self > HP/MP you recover
+		selfhurt:		\x1F\x1C,		// Menu > Font Colors > For Self > HP/MP you loose
+		selfbuff:		\x1F\x38,		// Menu > Font Colors > For Self > Beneficial effects you are granted
+		selfdebuff:		\x1F\x39,		// Menu > Font Colors > For Self > Detrimental effects you receive
+		selfresist:		\x1F\x3B,		// Menu > Font Colors > For Self > Effects you resist
+		selfevade:		\x1F\x1D,		// Menu > Font Colors > For Self > Actions you evade
+		otherheal:		\x1F\x16,		// Menu > Font Colors > For Others > HP/MP others recover
+		otherhurt:		\x1F\x14,		// Menu > Font Colors > For Others > HP/MP others loose
+		otherbuff:		\x1F\x3C,		// Menu > Font Colors > For Others > Beneficial effects others are granted
+		otherdebuff:	\x1F\x3D,		// Menu > Font Colors > For Others > Detrimental effects others receive
+		otherresist:	\x1F\x3F,		// Menu > Font Colors > For Others > Effects others resist
+		otherevade:		\x1F\x15,		// Menu > Font Colors > For Others > Actions others evade
+		cfh:			\x1F\x08,		// Menu > Font Colors > System > Calls for help
+		battle:			\x1F\x32,		// Menu > Font Colors > System > Standard battle messages
+		system:			\x1F\x79,		// Menu > Font Colors > System > Basic system messages
+	},
+	icons: {
+		// FFXI internal icons, all starting with \xEF
+		fire:		\xEF\x1F,		// Elemental fire sign
+		ice:		\xEF\x20,		// Elemental ice sign
+		wind:		\xEF\x21,		// Elemental wind sign
+		earth:		\xEF\x22,		// Elemental earth sign
+		lightning:	\xEF\x23,		// Elemental lightning sign
+		water:		\xEF\x24,		// Elemental water sign
+		light:		\xEF\x25,		// Elemental light sign
+		darkness:	\xEF\x26,		// Elemental darkness sign
+		atstart:	\xEF\x27,		// Auto-translate, green beginning brace
+		atend:		\xEF\x28,		// Auto-translate, red finishing brace
+		on:			\xEF\x29,		// ON sign (as used in menus
+		off:		\xEF\x2A,		// OFF sign
+		oui:		\xEF\x2B,		// ON sign (French)
+		non:		\xEF\x2C,		// OFF sign (French)
+		ein:		\xEF\x2D,		// ON sign (German)
+		aus:		\xEF\x2E,		// OFF sign (German)
+	},
+	
+	// Special characters that could potentially be used
+	chars: {
+		// Various sets of quotes
+		ldquote:	\x81\x65,		// Left single quote
+		rdquote:	\x81\x66,		// Right single quote
+		ldquote:	\x81\x67,		// Left double quote
+		rdquote:	\x81\x68,		// Right double quote
+		lsguille:	\x81\x71,		// Left single guillemet
+		rsguille:	\x81\x72,		// Right single guillemet
+		ldguille:	\x81\x73,		// Left double guillemet
+		rdguille:	\x81\x74,		// Right double guillemet
+		lcbr:		\x81\x75,		// Left corner bracket
+		rcbr:		\x81\x76,		// Right corner bracket
+		lwcbr:		\x81\x75,		// Left white corner bracket
+		rwcbr:		\x81\x76,		// Right white corner bracket
+		
+		// Various sets of braces/brackets/parentheses
+		lbr1:		\x81\x69,		// Left round parenthesis
+		rbr1:		\x81\x6A,		// Right round parenthesis
+		lbr2:		\x81\x6B,		// Left weird bracket
+		rbr2:		\x81\x6C,		// Right weird bracket
+		lbr3:		\x81\x6D,		// Left square bracket
+		rbr3:		\x81\x6E,		// Right square bracket
+		lbr4:		\x81\x6F,		// Left curly brace
+		rbr4:		\x81\x70,		// Right curly brace
+		lbr6:		\x81\x79,		// Left filled bracket
+		rbr6:		\x81\x7A,		// Right filled bracket
+		
+		// Mathematical signs (general)
+		plus:		\x81\x7B,		// Plus
+		minus:		\x81\x7C,		// Minus
+		plusminus:	\x81\x7D,		// Plus/Minus
+		times:		\x81\x7E,		// Times
+		div:		\x81\x80,		// Division
+		eq:			\x81\x81,		// Equality
+		neq:		\x81\x82,		// Inequality
+		lt:			\x81\x83,		// Less than
+		gt:			\x81\x84,		// Greater than
+		lteq:		\x81\x85,		// Less than or equal
+		gteq:		\x81\x86,		// Greater than or equal
+		inf:		\x81\x87,		// Infinity
+		deg:		\x81\x8B,		// Degree
+		root:		\x81\xD8,		// Root sign
+		
+		// Mathematical signs (logical)
+		and:		\x81\x85,		// And
+		or:			\x81\x86,		// Or
+		not:		\x81\x87,		// Not
+		therefore:	\x81\x88,		// Inference
+		implies:	\x81\xC3,		// Right implication
+		equiv:		\x81\xC4,		// Equivalence
+		forall:		\x81\xC5,		// Universal quantifier
+		exists:		\x81\xC6,		// Existential quantifier
+		
+		// Mathematical signs (sets)
+		in:			\x81\xAD,		// In
+		subseteq:	\x81\xAF,		// Subset or equal
+		subset:		\x81\xB1,		// Subset
+		lin:		\x81\xAE,		// Left in
+		lsubseteq:	\x81\xB0,		// Left subset or equal
+		lsubset:	\x81\xB2,		// Left subset
+		union:		\x81\xB3,		// Union
+		intersect:	\x81\xB4,		// Intersection
+		
+		// Financial (TODO)
+//		dollar:		\x81\x,		// Dollar sign
+//		cent:		\x81\x,		// 
+//		pound:		\x81\x,		// 
+//		euro:		\x81\x,		// 
+//		yen:		\x81\x,		// 
+		
+		// Musical
+		sharp:		\x81\xEB,		// Sharp
+		flat:		\x81\xEC,		// Flat
+		note:		\x81\xED,		// Eigth note
+		
+		// Misc
+		male:		\x81\x89,		// Male sign
+		female:		\x81\x8A,		// Female sign
+		at:			\x81\x97,		// @
+		permil:		\x81\xEA,		// Per mil
+		dagger:		\x81\xEE,		// Dagger
+		ddagger:	\x81\xEF,		// Double dagger
+	}
+},
+elements: {
+	days: {
+		Firesday: Fire,
+		Earthsday: Earth,
+		Watersday: Water,
+		Windsday: Wind,
+		Iceday: Ice,
+		Lightningday: Lightning,
+		Lightsday: Light,
+		Darksday: Darkness,
+	},
+	storms: {
+		Sandstorm: Earth,
+		Rainstorm: Water,
+		Windstorm: Wind,
+		Firestorm: Fire,
+		Hailstorm: Ice,
+		Thunderstorm: Lightning,
+		Voidstorm: Darkness,
+		Aurorastorm: Light,
+	},
+	spirits: {
+		Fire Spirit: Fire,
+		Ice Spirit: Ice,
+		Air Spirit: Wind,
+		Earth Spirit: Earth,
+		Water Spirit: Water,
+		Thunder Spirit: Lightning,
+		Light Spirit: Light,
+		Dark Spirit: Darkness,
 	}
 }
