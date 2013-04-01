@@ -91,7 +91,6 @@ function event_addon_command(...)
 	--that sometimes it didn't show back up
 	if broken ~= nil then
 		if tostring(broken[1]):lower() == 'newtimer' then
-			lose_status = 0
 			if broken[4] == nil then
 				createTimer(broken[2],broken[3])
 			else
@@ -106,7 +105,6 @@ function event_addon_command(...)
 end
 
 function event_gain_status(id,name)
-	--lose_status = 1
 	if id == 469 then
 		--Check to gain perpetuance and add a timer
 		extend['Perpetuance'] = os.clock()
@@ -152,26 +150,9 @@ function check_bufflist(name)
 	return false	
 end
 
---[[function event_status_change(old, new)
-	if (new == old) or (new == 'Casting') then
-		lose_status = 1
-	elseif new == ('Idle' or 'Resting' or 'Engaged') then
-		lose_status = 0
-	elseif new == 'Zoning' then
-		lose_status = 1
-	elseif new == 'Dead' then
-		for u = 1, #createdTimers do
-			send_command('timers d "'..createdTimers[u]..'"')
-		end
-	end
-end]]
-
-
 function event_lose_status(id,name)
-	if lose_status == 0 then
-		deleteTimer(1,name)
-		send_ipc_message(name..' '..player['name']..' delete')
-	end
+	deleteTimer(1,name)
+	send_ipc_message(name..' '..player['name']..' delete')
 end
 
 function event_ipc_message(msg)
@@ -339,37 +320,35 @@ function createTimer(name,target)
 end
 
 function deleteTimer(mode,effect,target)
-	if lose_status == 0 then
-		if mode == 1 then 
-			-- This mode is for when a buff drops off you 
-			--(the lose buff triggers faster then the chat message)
-			for u = 1, #createdTimers do
-				if createdTimers[u] == effect..' (Self)' then
-					send_command('timers d "'..effect..' (Self)"')
-					createdTimers:remove(u)
-				end
+	if mode == 1 then 
+		-- This mode is for when a buff drops off you 
+		--(the lose buff triggers faster then the chat message)
+		for u = 1, #createdTimers do
+			if createdTimers[u] == effect..' (Self)' then
+				send_command('timers d "'..effect..' (Self)"')
+				createdTimers:remove(u)
 			end
-		elseif mode == 2 then
-			--This mode triggers when a buff drops off others.
-			--It cycles through the created timers table and
-			--if it finds the name of the dropped buff deletes
-			--the table entry as well as removing the timer.
-			if target == nil then
-				target = 'Self'
-			elseif target:lower() == player['name']:lower() then
-				target = 'Self'
-			else
-				target = target
-			end
-			for u = 1, #createdTimers do
-				if createdTimers[u] == effect..' ('..target..')' then
-					send_command('timers d "'..effect..' ('..target..')"')
-					createdTimers:remove(u)
-				end
-			end
-		else
-			return
 		end
+	elseif mode == 2 then
+		--This mode triggers when a buff drops off others.
+		--It cycles through the created timers table and
+		--if it finds the name of the dropped buff deletes
+		--the table entry as well as removing the timer.
+		if target == nil then
+			target = 'Self'
+		elseif target:lower() == player['name']:lower() then
+			target = 'Self'
+		else
+			target = target
+		end
+		for u = 1, #createdTimers do
+			if createdTimers[u] == effect..' ('..target..')' then
+				send_command('timers d "'..effect..' ('..target..')"')
+				createdTimers:remove(u)
+			end
+		end
+	else
+		return
 	end
 		
 end
