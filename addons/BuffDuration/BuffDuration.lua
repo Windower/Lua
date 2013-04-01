@@ -43,8 +43,8 @@ function event_load()
 	else
 		write('Extend.xml not found')
 	end
-	lines = f:lines()
-	hlines = h:lines()
+	lines = f:readlines()
+	hlines = h:readlines()
 
 	createdTimers = T{}  -- Used as a timer tracker for deletion of timers
 	buffExtension = T{ 
