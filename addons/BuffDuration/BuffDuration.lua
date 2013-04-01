@@ -25,14 +25,6 @@ function event_load()
 	local f = files.new('../../plugins/resources/status.xml')
 	local h = files.new('data/Extend.xml')
 	
-	buffid = 0
-	buffname = ''
-	duration = 0
-	extendid = 0
-	addtime = 0
-	slot = ''
-	gearname =''
-	
 	if f:exists() then
 		write('loaded Status.xml file correctly.')
 	else
@@ -73,6 +65,10 @@ end
 function event_login()
 	player = get_player()
 	items = get_items()	
+	buffs = T(get_player()['buffs'])
+	for u = 1, #buffs do
+		createTimer(buffs[u],player['name'])
+	end
 end
 
 function event_unload()
@@ -87,13 +83,15 @@ end
 
 function event_addon_command(...)
     local term = table.concat({...}, ' ')
-	broken = term:split(' ',3)
+	broken = term:split(' ',4)
+
 	--This is a very important fix added
 	--because if you already had a buff and recast it
 	--it would just delete and create so fast
 	--that sometimes it didn't show back up
 	if broken ~= nil then
 		if tostring(broken[1]):lower() == 'newtimer' then
+			lose_status = 0
 			if broken[4] == nil then
 				createTimer(broken[2],broken[3])
 			else
@@ -108,6 +106,7 @@ function event_addon_command(...)
 end
 
 function event_gain_status(id,name)
+	--lose_status = 1
 	if id == 469 then
 		--Check to gain perpetuance and add a timer
 		extend['Perpetuance'] = os.clock()
@@ -124,7 +123,8 @@ function event_gain_status(id,name)
 				duration = d
 				buffname = tostring(str:split('>',2)[2]:split('<',2)[1])
 				if tonumber(buffid) == tonumber(id) then
-					createTimer(tostring(buffname))
+					createTimer(tostring(name))
+					buffs = T(get_player()['buffs'])
 					break
 				end
 			end
@@ -142,8 +142,8 @@ function check_bufflist(name)
 			if c ~= nil then
 				buffid = c
 				duration = d
-				buff = tostring(str:split('>',2)[2]:split('<',2)[1])
-				if tostring(buff) == tostring(name) then
+				buffn = tostring(str:split('>',2)[2]:split('<',2)[1])
+				if tostring(buffn) == tostring(name) then
 					return true
 				end
 			end
@@ -152,9 +152,26 @@ function check_bufflist(name)
 	return false	
 end
 
+--[[function event_status_change(old, new)
+	if (new == old) or (new == 'Casting') then
+		lose_status = 1
+	elseif new == ('Idle' or 'Resting' or 'Engaged') then
+		lose_status = 0
+	elseif new == 'Zoning' then
+		lose_status = 1
+	elseif new == 'Dead' then
+		for u = 1, #createdTimers do
+			send_command('timers d "'..createdTimers[u]..'"')
+		end
+	end
+end]]
+
+
 function event_lose_status(id,name)
-	deleteTimer(1,buffname)
-	send_ipc_message(buffname..' '..player['name']..' delete')
+	if lose_status == 0 then
+		deleteTimer(1,name)
+		send_ipc_message(name..' '..player['name']..' delete')
+	end
 end
 
 function event_ipc_message(msg)
@@ -180,7 +197,7 @@ function event_ipc_message(msg)
 	end
 end
 
-function checkgear(buffid)
+function checkgear(id)
 
 	items = get_items()
 	equip = items.equipment
@@ -196,7 +213,7 @@ function checkgear(buffid)
 				addtime2 = e
 				slot = f
 				gearname = tostring(str:split('>',2)[2]:split('<',2)[1])
-				if tonumber(extendid) == tonumber(buffid) then
+				if tonumber(extendid) == tonumber(id) then
 					if tonumber(items.inventory[tostring(equip[''..slot..''])].id) == tonumber(gearid) then
 						addtime = addtime2
 					else
@@ -233,7 +250,7 @@ function createTimer(name,target)
 				--when you recast a buff. No way around it.
 				send_command('timers d "'..name..' ('..target..')"')
 				createdTimers:remove(u)
-				send_command('wait 0.1;lua c buffDuration newtimer '..name..' '..target)
+				send_command('wait .1;lua c buffDuration newtimer '..name..' '..target)
 				return
 			end
 		end
@@ -273,7 +290,7 @@ function createTimer(name,target)
 							extend['Perpetuance'] = nil
 						end
 							
-						if tostring(buffname) == 'Regen' then
+						if tostring(name) == 'Regen' then
 							timer = tonumber(duration) * buffExtension['LightArts'] * buffExtension['Perpetuance'] + addtime - 5
 						else
 							timer = tonumber(duration) * buffExtension['Perpetuance'] + addtime - 5
@@ -322,35 +339,37 @@ function createTimer(name,target)
 end
 
 function deleteTimer(mode,effect,target)
-	if mode == 1 then 
-		-- This mode is for when a buff drops off you 
-		--(the lose buff triggers faster then the chat message)
-		for u = 1, #createdTimers do
-			if createdTimers[u] == effect..' (Self)' then
-				send_command('timers d "'..effect..' (Self)"')
-				createdTimers:remove(u)
+	if lose_status == 0 then
+		if mode == 1 then 
+			-- This mode is for when a buff drops off you 
+			--(the lose buff triggers faster then the chat message)
+			for u = 1, #createdTimers do
+				if createdTimers[u] == effect..' (Self)' then
+					send_command('timers d "'..effect..' (Self)"')
+					createdTimers:remove(u)
+				end
 			end
-		end
-	elseif mode == 2 then
-		--This mode triggers when a buff drops off others.
-		--It cycles through the created timers table and
-		--if it finds the name of the dropped buff deletes
-		--the table entry as well as removing the timer.
-		if target == nil then
-			target = 'Self'
-		elseif target:lower() == player['name']:lower() then
-			target = 'Self'
+		elseif mode == 2 then
+			--This mode triggers when a buff drops off others.
+			--It cycles through the created timers table and
+			--if it finds the name of the dropped buff deletes
+			--the table entry as well as removing the timer.
+			if target == nil then
+				target = 'Self'
+			elseif target:lower() == player['name']:lower() then
+				target = 'Self'
+			else
+				target = target
+			end
+			for u = 1, #createdTimers do
+				if createdTimers[u] == effect..' ('..target..')' then
+					send_command('timers d "'..effect..' ('..target..')"')
+					createdTimers:remove(u)
+				end
+			end
 		else
-			target = target
+			return
 		end
-		for u = 1, #createdTimers do
-			if createdTimers[u] == effect..' ('..target..')' then
-				send_command('timers d "'..effect..' ('..target..')"')
-				createdTimers:remove(u)
-			end
-		end
-	else
-		return
 	end
 		
 end
@@ -364,7 +383,7 @@ function event_incoming_text(old,new,color)
 		--This check is to catch casted spells
 		--Stores name of caster, spell cast,
 		--target of the effect and the effect itself
-		a,b,caster,caster_spell,target,target_effect = string.find(old,'(%w+) casts ([%w%s]+)..(%w+) gains the effect of (%w+).')
+		a,b,caster,caster_spell,target,target_effect = string.find(old,'(%w+) casts ([%w%s]+)..(%w+) gains the effect of ([%w%s]+).')
 		
 		--Check fo buffs wearing off and store name and buff in variables
 		c,d,tWear,eWear = string.find(old,'(%w+)\'s ([%w%s]+) effect wears off.')
@@ -376,7 +395,6 @@ function event_incoming_text(old,new,color)
 			--The following checks are so that you don't
 			--catch buffs cast by others on others.
 			--Will catch buffs cast by you or on you.
-			
 			if caster:lower() == player['name']:lower() then
 				createTimer(tostring(target_effect),tostring(target))
 			elseif target:lower() == player['name']:lower() then
@@ -385,6 +403,7 @@ function event_incoming_text(old,new,color)
 		elseif c ~= nil then
 			--if c isn't blank it found the wear off message
 			--so delete the timer
+			
 				if tWear:lower() == player['name']:lower() then
 					deleteTimer(1,eWear,tWear)
 				else
