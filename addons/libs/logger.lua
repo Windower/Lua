@@ -111,8 +111,9 @@ function table.tostring(t)
 	for key, val in pairs(t) do
 		-- Check for nested tables
 		if type(val) == 'table' then
+			val = T(val)
 			if not val:isempty() then
-				valstr = T(val):tostring()
+				valstr = val:tostring()
 			else
 				valstr = '{}'
 			end
@@ -163,8 +164,9 @@ function table.tovstring(t, indentlevel)
 	for key, val in pairs(t) do
 		-- Check for nested tables
 		if type(val) == 'table' then
+			val = T(val)
 			if not val:isempty() then
-				valstr = T(val):tovstring(indentlevel+1)
+				valstr = val:tovstring(indentlevel+1)
 			else
 				valstr = '{}'
 			end
