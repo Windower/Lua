@@ -1,5 +1,7 @@
 Author: Ricky Gall
+
 Version: 1.07
+
 Addon to enable 1 macro status removal with the help of send.
 
 Abbreviation: //stna
