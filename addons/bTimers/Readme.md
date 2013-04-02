@@ -1,5 +1,7 @@
 Author: Ricky Gall
+
 Version: 1.07
+
 A very simple yarnball replacement for use until timers gets finished.
 
 Abbreviation: //btimers
