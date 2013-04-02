@@ -59,7 +59,7 @@ function options_load()
 		g:write('Author Comment: If 2 jobs share a book, you can place the same book number for each job, then put their individual pages.\46\n')
 		g:write('Author Comment: Example:  BLM and SCH both use Macro Book 2:  BLM uses page 3. SCH uses page 1.\46\n')
 		g:write('Author Comment: Put BLM Book: 2,  BLM Page: 3,  SCH Book: 2,  SCH Page: 1.\46\n')
-		g:write('Author Comment: If you wish to disable auto-macro Changing for a specific job, type "disabled".  (e.g. BLM Book: disabled)\n')
+		g:write('Author Comment: If you wish to disable auto-macro Changing for a specific job, type "disabled" instead of a book number.  (e.g. BLM Book: disabled)\n')
 		g:write('Author Comment: The design of the settings file is credited to Byrthnoth as well as the creation of the settings file.\n\n\n')
 		g:write('File Settings: Fill in below\n')
 		g:write('WAR Book: 1\nWAR Page: 1\nMNK Book: 2\nMNK Page: 1\nWHM Book: 3\nWHM Page: 1\nBLM Book: 4\nBLM Page: 1\nRDM Book: 5\nRDM Page: 1\nTHF Book: 6\nTHF Page: 1\n')
@@ -308,9 +308,13 @@ function event_job_change(mjobId, mjob)
 		book = RUN_Book
 		page = RUN_Page
 	end
-	add_to_chat(17, 'Changing macros to Book: ' .. book .. ' and Page: ' .. page .. '.  Job Changed to ' .. job)
-	send_command('input /macro book ' .. book)
-	send_command('input /macro set ' .. page)
+	if ((book == 'disabled') or (page == 'disabled')) then
+		add_to_chat(17, 'Auto Macro Switching Disabled for ' .. job ..'.')
+	else	
+		add_to_chat(17, 'Changing macros to Book: ' .. book .. ' and Page: ' .. page .. '.  Job Changed to ' .. job)
+		send_command('input /macro book ' .. book)
+		send_command('input /macro set ' .. page)
+	end
 end
 
 function event_unload()
