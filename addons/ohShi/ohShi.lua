@@ -268,11 +268,10 @@ function event_incoming_text(old,new,color)
 	local start7,end7,blue1,red1 = string.find(old,'Blue: (%d+)%% / Red: (%d+)%%')
 	local start8,end8,blue2 = string.find(old,'Blue: (%d+)')
 	local start9,end9,red2 = string.find(old,'Red: (%d+)')
-	local start0,end0,player2,rollname1,total1 = string.find(old,'(%w+) uses ([%w%s\']+)Roll.*comes to ([%d]+)')
-	local starta1,enda1,player3,rollname2,total2 = string.find(old,'(%w+) uses Double%-Up..The total for (.*) increases to (%d+)%p')
+	local start0,end0,player2,rollname1,total1 = string.find(old,'(%w+) uses(.*)Roll.*comes to (%d+)%p')
+	local starta1,enda1,player3,rollname2,total2 = string.find(old,'(%w+) uses.*The total for(.*)Roll increases to (%d+)%p')
 	local starta2,enda2,mobname9,total3 = string.find(old,'Treasure Hunter effectiveness against (.*) increases to (%d+)%p')
 	local starta3,enda3,type1,skill = string.find(old,'The fiend appears(.*)vulnerable to ([%w%s]+)!')
-	line = nil
 	text = ''
 	color2 = ''
 	cres = ''
@@ -284,34 +283,54 @@ function event_incoming_text(old,new,color)
 			fi = true
 		end
 		if mobcheck(mobname1) then line = " "..color2..mobname1..' readies '..tpmove..'.'..cres..' ' end
-	elseif mobname2 ~= nil then
+	end
+	
+	if mobname2 ~= nil then
 		if dangercheck(old) then
 			color2 = '\\cs(255,100,100)'
 			cres = '\\cr'
 			fi = true
 		end
 		if mobcheck(mobname2) then line = " "..color2..mobname2..' starts casting '..spell..'.'..cres..' ' end
-	elseif mobname3 ~= nil then
+	end
+	
+	if mobname3 ~= nil then
 		if mobcheck(mobname3) then line = " "..mobname3..' is no longer '..debuff1..'. ' end
-	elseif mobname4 ~= nil then
+	end
+	
+	if mobname4 ~= nil then
 		if mobcheck(mobname4) then line = " "..mobname4..' '..gr..' the effect of '..debuff2..'. ' end
-	elseif mobname5 ~= nil then
+	end
+	
+	if mobname5 ~= nil then
 		if mobcheck(mobname5) then line = " "..mobname5..'\'s '..buff1..' effect wears off. ' end
-	elseif player1 ~= nil then
-		line = " "..player1..'\'s attack devastates the fiend. '
-	elseif blue2 ~= nil and blue1 == nil then
+	end
+	
+	if blue2 ~= nil and blue1 == nil then
 		line = " "..'Blue: '..blue2..'% '
 	elseif red2 ~= nil and blue1 == nil then
 		line = " "..'Red: '..red2..'% '
 	elseif blue1 ~= nil then
 		line = " "..'Blue: '..blue1..'% / Red: '..red1..'% '
-	elseif player2 ~= nil then
-		line = " "..player2..': '..rollname1..'Roll Total: '..total1..' '
-	elseif player3 ~= nil then
-		line = " "..player3..': '..rollname2..' Total: '..total2..' '
-	elseif mobname9 ~= nil then
+	end
+	
+	if player1 ~= nil then
+		line = " "..player1..'\'s attack devastates the fiend. '
+	end
+	
+	if player2 ~= nil then
+		line = " "..player2..': '..rollname1..' Roll Total: '..total1..' '
+	end
+	
+	if player3 ~= nil then
+		line = " "..player3..': '..rollname2..' Roll Total: '..total2..' '
+	end
+	
+	if mobname9 ~= nil then
 		line = ' Treasure Hunter against '..mobname9..': '..total3..' '
-	elseif type1 ~= nil then
+	end
+	
+	if type1 ~= nil then
 		if type1 == ' highly ' then
 			color2 = '\\cs(255,100,100)'
 			cres = '\\cr'
@@ -334,6 +353,7 @@ function event_incoming_text(old,new,color)
 		send_command('wait '..settings['duration']..';ohShi timeout')
 		if fi then flashimage() end
 	end
+	line = nil
 	return new,color
 end
 
@@ -344,7 +364,6 @@ function flashimage()
 	prim_set_color(name,255,255,255,255)
 	prim_set_fit_to_texture(name,false)
 	prim_set_texture(name,lua_base_path..'data/warning.png')
-	--assumes your icons are stored with the name you pass in windower/addons/<youraddon>/data
 	prim_set_repeat(name,1,1)
 	prim_set_visibility(name,true)
 	prim_set_position(name,settings['posx']-30,settings['posy']-10)
