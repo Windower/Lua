@@ -103,20 +103,20 @@ end
 
 -- Returns a string representation of a table in explicit Lua syntax: {...}
 function table.tostring(t)
-	-- Convert all values to strings, to make sure everything is ready for string concatenation.
-	local t = T(t)
-	local tstr = ''
+	t = T(t)
+	if t:isempty() then
+		return '{}'
+	end
+	
+	keys = keys or false
 	
 	-- Iterate over table.
-	for key, val in pairs(t) do
+	local tstr = ''
+	for _, key in ipairs(t:keyset():sort()) do
+		val = t[key]
 		-- Check for nested tables
 		if type(val) == 'table' then
-			val = T(val)
-			if not val:isempty() then
-				valstr = val:tostring()
-			else
-				valstr = '{}'
-			end
+			valstr = T(val):tostring()
 		else
 			if type(val) == 'string' then
 				valstr = val:enclose('"')
@@ -143,33 +143,31 @@ function table.tostring(t)
 end
 
 -- Prints a string representation of a table in explicit Lua syntax: {...}
-function table.print(t)
-	log(T(t):tostring())
+function table.print(t, keys)
+	log(T(t):tostring(keys))
 end
 
 -- Returns a vertical string representation of a table in explicit Lua syntax, with every element in its own line:
 --- {
 ---     ...
 --- }
-function table.tovstring(t, indentlevel)
+function table.tovstring(t, keys, indentlevel)
 	t = T(t)
-	indentlevel = indentlevel or 0
-	
 	if t:isempty() then
 		return '{}'
 	end
 	
+	indentlevel = indentlevel or 0
+	keys = keys or false
+	
 	local indent = (' '):rep(indentlevel*4)
-	local tstr = '{'.."\n"
-	for key, val in pairs(t) do
+	local tstr = '{'..'\n'
+	for _, key in pairs(t:keyset():sort()) do
+		val = t[key]
 		-- Check for nested tables
 		if type(val) == 'table' then
 			val = T(val)
-			if not val:isempty() then
-				valstr = val:tovstring(indentlevel+1)
-			else
-				valstr = '{}'
-			end
+			valstr = val:tovstring(keys, indentlevel+1)
 		else
 			if type(val) == 'string' then
 				valstr = val:enclose('"')
@@ -179,7 +177,7 @@ function table.tovstring(t, indentlevel)
 		end
 		
 		-- Append one line with indent.
-		if tonumber(key) then
+		if not keys and tonumber(key) then
 			tstr = tstr..indent..'    '..valstr
 		else
 			tstr = tstr..indent..'    '..key..'='..valstr
@@ -201,8 +199,8 @@ end
 --- {
 ---     ...
 --- }
-function table.vprint(t)
-	T(t):tovstring():split("\n"):arrmap(log)
+function table.vprint(t, keys)
+	log(T(t):tovstring(keys))
 end
 
 -- Load logger settings (has to be after the logging functions have been defined, so those work in the config and related files).
