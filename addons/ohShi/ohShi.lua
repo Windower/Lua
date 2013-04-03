@@ -1,5 +1,5 @@
 --[[
-ohShi v1.25
+ohShi v1.26
 Copyright (c) 2013, Ricky Gall All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -114,14 +114,14 @@ function event_addon_command(...)
 				add_to_chat(55,'Proper Syntax: //ohShi track <vw/legion/other/abyssea/meebles> <mobname>')
 			end
 		elseif comm:lower() == 'danger' then
-			if args[2] == 'spells' then
+			if args[2] == 'spell' then
 				td = 'spells'
 			elseif args[2] == 'ws' then
 				td = 'weaponskills'
 			end
 			if td ~= nil then
 				local r
-				for r = 2, #args do
+				for r = 3, #args do
 					list = list..args[r]
 					if r < #args then list = list..' ' end
 				end
