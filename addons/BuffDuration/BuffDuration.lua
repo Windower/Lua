@@ -1,5 +1,5 @@
 --[[
-BuffDuration V2.00
+BuffDuration V2.01
 Copyright (c) 2012, Ricky Gall All rights reserved.
 Ammended by Sebastien Gomez
 
@@ -257,57 +257,61 @@ function createTimer(name,target)
 		--Checked here to figure out the time the timer should be set to.
 		--If all checks fail, the timer is set to base time at the beginning
 		--and 5 seconds is subtracted due to lag of the chat log.
+
+		
 		buffs = T(get_player()['buffs'])
-		if extendables:contains(tostring(name)) then
-			timer = duration - 5
-			if extend ~= nil then
-				e = os.clock()-60
-				if extend['Perpetuance'] ~= nil then
-					if e < extend['Perpetuance'] then
-						if target == 'Self' then
-							
-							if first == 1 then 
-								t = 1 
+		if player['main_job_id'] == 20 then
+			if extendables:contains(tostring(name)) then
+				timer = duration - 5
+				if extend ~= nil then
+					e = os.clock()-60
+					if extend['Perpetuance'] ~= nil then
+						if e < extend['Perpetuance'] then
+							if target == 'Self' then
+								
+								if first == 1 then 
+									t = 1 
+								else
+									t = t + 1 
+								end
+								if math.even(t) then
+									extend['Perpetuance'] = nil
+									first = 0
+									t = 0
+								end
 							else
-								t = t + 1 
-							end
-							if math.even(t) then
 								extend['Perpetuance'] = nil
-								first = 0
-								t = 0
 							end
-						else
-							extend['Perpetuance'] = nil
-						end
-							
-						if tostring(name) == 'Regen' then
-							timer = tonumber(duration) * buffExtension['LightArts'] * buffExtension['Perpetuance'] + addtime - 5
-						else
-							timer = tonumber(duration) * buffExtension['Perpetuance'] + addtime - 5
+								
+							if tostring(name) == 'Regen' then
+								timer = tonumber(duration) * buffExtension['LightArts'] * buffExtension['Perpetuance'] + addtime - 5
+							else
+								timer = tonumber(duration) * buffExtension['Perpetuance'] + addtime - 5
+							end
 						end
 					end
 				end
 			elseif buffs:contains(377) then
 				if tostring(name) == 'Regen' then
-					if player['main_job_id'] == 20 then
 						timer = tonumber(duration) * buffExtension['Rasa'] + addtime - 5
-					end
 				end
 			elseif buffs:contains(358) then
 				if tostring(name) == 'Regen' then
-					if player['main_job_id'] == 20 then
 						timer = tonumber(duration) * buffExtension['LightArts'] + addtime - 5
-					end
 				end
+				
+			else
+				timer = duration - 5
 			end
-		end
-		if extenCompo:contains(tostring(name)) then
-			timer = duration - 5
-			if extend ~= nil then
-				e = os.clock()-60
-				if extend['Composure'] ~= nil then
-					if e < extend['Composure'] then	
-						timer = tonumber(duration) * buffExtension['Composure'] + addtime - 5
+		elseif player['main_job_id'] == 5 then
+			if extenCompo:contains(tostring(name)) then
+				timer = duration - 5
+				if extend ~= nil then
+					e = os.clock()-60
+					if extend['Composure'] ~= nil then
+						if e < extend['Composure'] then	
+							timer = tonumber(duration) * buffExtension['Composure'] + addtime - 5
+						end
 					end
 				end
 			end
