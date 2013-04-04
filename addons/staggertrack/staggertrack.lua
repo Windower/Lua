@@ -1,6 +1,6 @@
 --[[
-wtbox v1.09
-Copyright (c) 2012, Ricky Gall All rights reserved.
+Stagger Tracker v1.5
+Copyright (c) 2013, Ricky Gall All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
@@ -14,7 +14,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 function event_load()
 	scrolled = 0
 	currline = 0
-	wtchats = {'WTBox'}
+	staggers = {}
 	settings = {}
 	player = get_player()
 	settingsPath = lua_base_path..'data/'
@@ -22,7 +22,7 @@ function event_load()
 	if not file_exists(settingsFile) then
 		local f = io.open(settingsFile,"w")
 		f:write("<?xml version=\"1.0\"?>\n")
-		f:write("<!--File Created by wtbox.lua-->\n\n")
+		f:write("<!--File Created by strack.lua-->\n\n")
 		f:write("\t<settings>\n")
 		f:write("\t\t<posx>300</posx>\n")
 		f:write("\t\t<posy>300</posy>\n")
@@ -38,9 +38,9 @@ function event_load()
 		f:write("\t</settings>")
 		io.close(f)
 	end
-	send_command('alias wtbox lua c wtbox')
-	send_command('wtbox help')
-	send_command('wait 3;wtbox create')
+	send_command('alias strack lua c staggertrack')
+	send_command('strack help')
+	send_command('wait 1;strack create')
 end
 
 function event_login()
@@ -48,7 +48,7 @@ function event_login()
 end
 
 function event_unload()
-	wtbox_delete()
+	strack_delete()
 end 
 
 function event_addon_command(...)
@@ -56,78 +56,89 @@ function event_addon_command(...)
 	if args[1] ~= nil then
 		comm = args[1]
 		if comm:lower() == 'help' then
-			add_to_chat(55,'WeaknessTrackerBox loaded! You have access to the following commands:')
-			add_to_chat(55,' 1. wtbox bgcolor <alpha> <red> <green> <blue> --Sets the color of the box.')
-			add_to_chat(55,' 2. wtbox text <size> <red> <green> <blue> --Sets text color and size.')
-			add_to_chat(55,' 3. wtbox pos <posx> <posy> --Sets position of box.')
-			add_to_chat(55,' 4. wtbox unload --Save settings and close wtbox.')
-			add_to_chat(55,' 5. wtbox reset --resets the box back to empty.')
-			add_to_chat(55,' 6. wtbox help --Shows this menu.')
+			add_to_chat(55,'Stagger Tracker loaded! You have access to the following commands:')
+			add_to_chat(55,' 1. strack bgcolor <alpha> <red> <green> <blue> --Sets the color of the box.')
+			add_to_chat(55,' 2. strack text <size> <red> <green> <blue> --Sets text color and size.')
+			add_to_chat(55,' 3. strack pos <posx> <posy> --Sets position of box.')
+			add_to_chat(55,' 4. strack unload --Save settings and close strack.')
+			add_to_chat(55,' 5. strack reset --resets the box back to empty.')
+			add_to_chat(55,' 6. strack help --Shows this menu.')
 		elseif comm:lower() == 'create' then
-			wtbox_create()
+			strack_create()
 		elseif comm:lower() == 'unload' then
-			wtbox_delete()
+			send_command('lua u strack')
 		elseif comm:lower() == 'bgcolor' then
-			tb_set_bg_color('wtcbox',args[2],args[3],args[4],args[5])
+			tb_set_bg_color('strack',args[2],args[3],args[4],args[5])
 			settings['bgalpha'] = args[2]
 			settings['bgred'] = args[3]
 			settings['bggreen'] = args[4]
 			settings['bgblue'] = args[5]
 		elseif comm:lower() == 'pos' then
-			tb_set_location('wtcbox',args[2],args[3])
+			tb_set_location('strack',args[2],args[3])
 			settings['posx'] = args[2]
 			settings['posy'] = args[3]
 		elseif comm:lower() == 'text' then
-			tb_set_font('wtcbox','Arial',args[2])
-			tb_set_color('wtcbox',255,args[3],args[4],args[5])
+			tb_set_font('strack','Arial',args[2])
+			tb_set_color('strack',255,args[3],args[4],args[5])
 			settings['textsize'] = args[2]
 			settings['textred'] = args[3]
 			settings['textgreen'] = args[4]
 			settings['textblue'] = args[5]
+		elseif comm == 'timeout' then
+			table.remove(staggers,1)
+			strack_refresh()
 		elseif comm:lower() == 'reset' then
-			tb_delete('wtcbox')
-			wtbox_create()
+			tb_delete('strack')
+			strack_create()
 		else
 			return
 		end
 	end
 end
 
-function wtbox_create()
+function strack_create()
 	for line in io.lines(settingsFile) do
 		local g,h,key,value = string.find(line,'<(%w+)>(%d+)</%1>')
 		if value ~= nil then
 			settings[key] = value
 		end
 	end
-	wtbox_set()
+	strack_set()
 end
 
-function wtbox_set()
-	tb_create('wtcbox')
-	tb_set_text('wtcbox','WTBox')
+function strack_set()
+	tb_create('strack')
+	tb_set_text('strack',' Stagger Track ')
 	if settings ~= nil then
-		tb_set_bg_color('wtcbox',settings['bgalpha'],settings['bgred'],settings['bggreen'],settings['bgblue'])
-		tb_set_bg_visibility('wtcbox',true)
-		tb_set_color('wtcbox',255,settings['textred'],settings['textgreen'],settings['textblue'])
-		tb_set_font('wtcbox','Times New Roman',settings['textsize'])
-		tb_set_location('wtcbox',settings['posx'],settings['posy'])
-		tb_set_visibility('wtcbox',true)
+		tb_set_bg_color('strack',settings['bgalpha'],settings['bgred'],settings['bggreen'],settings['bgblue'])
+		tb_set_bg_visibility('strack',true)
+		tb_set_color('strack',255,settings['textred'],settings['textgreen'],settings['textblue'])
+		tb_set_font('strack','Arial',settings['textsize'])
+		tb_set_location('strack',settings['posx'],settings['posy'])
+		tb_set_visibility('strack',true)
 	end
 end
 
-function wtbox_refresh()
-	text = wtchats[1]..'\n'
-	for u = currline - settings['chatlines'], currline do
-		text = text..wtchats[currline]
+function strack_refresh()
+	text = ''
+	for u = 1, #staggers do
+		text = text..staggers[u]
+		if u < #staggers then
+			text = text..'\n'
+		end
+	end
+	if text == '' then 
+		tb_set_text('strack',' Stagger Track ')
+	else
+		tb_set_text('strack',' Stagger Track \n'..text)
 	end
 end
 
-function wtbox_delete()
-	add_to_chat(55,'WTBox closing and saving settings')
+function strack_delete()
+	add_to_chat(55,'Stagger Track closing and saving settings')
 	local f = io.open(settingsPath..'tmp.txt',"w")
 	f:write("<?xml version=\"1.0\"?>\n")
-	f:write("<!--File Created by wtbox.lua-->\n\n")
+	f:write("<!--File Created by strack.lua-->\n\n")
 	f:write("\t<settings>\n")
 	f:write("\t\t<posx>"..settings['posx'].."</posx>\n")
 	f:write("\t\t<posy>"..settings['posy'].."</posy>\n")
@@ -139,7 +150,6 @@ function wtbox_delete()
 	f:write("\t\t<textred>"..settings['textred'].."</textred>\n")
 	f:write("\t\t<textgreen>"..settings['textgreen'].."</textgreen>\n")
 	f:write("\t\t<textblue>"..settings['textblue'].."</textblue>\n")
-	f:write("\t\t<chatlines>"..settings['chatlines'].."</chatlines>\n")
 	f:write("\t</settings>")
 	io.close(f)
 	local r,es = os.rename(settingsFile,settingsPath..'tmp2.txt')
@@ -148,9 +158,9 @@ function wtbox_delete()
 	if not e then write(rs) end
 	local r,es = os.remove(settingsPath..'tmp2.txt')
 	if not r then write(es) end
-	tb_delete('wtcbox')
-	send_command('unalias wtbox')
-	send_command('lua u wtbox')
+	tb_delete('strack')
+	send_command('unalias strack')
+	send_command('lua u strack')
 end
 
 function event_incoming_text(old,new,color)
@@ -158,30 +168,24 @@ function event_incoming_text(old,new,color)
 	local aurachange = string.find(old,'The aura of your foe suddenly changes.')
 	local atmaoff = string.find(old,player['name'].."'s Atma effect wears off.")
 	if aurachange ~= nil or atmaoff ~= nil then
-		wtbox_set()
+		strack_set()
 	end
 	if c ~= nil then
 		
 		if he == ' highly ' then
-			wtchats[#wtchats+1] = "\\cs(255,100,100)"..stuff.." 3!!!\\cr\n"
+			line = " \\cs(255,100,100)"..stuff.." 3!!!\\cr "
 		elseif he == ' extremely ' then
-			wtchats[#wtchats+1] = "\\cs(255,255,255)"..stuff.." 5!!!!!\\cr\n"
+			line = " \\cs(255,255,255)"..stuff.." 5!!!!!\\cr "
 		else
-			wtchats[#wtchats+1] = "\\cs(100,175,255)"..stuff.."1!\\cr\n"
+			line = " \\cs(100,175,255)"..stuff.." 1!\\cr "
 		end
-		if #wtchats < 7 then
-			i = 2
-		else
-			i = #wtchats - settings['chatlines']
-		end
-		text = wtchats[1]..'\n'
-		for u = i, #wtchats do
-				text = text..wtchats[u] 
-		end
-		currline = #wtchats
-		tb_set_text('wtcbox', text)
-		wtbox_refresh()
 	end
+	if line ~= nil then
+		staggers[#staggers+1] = line
+		strack_refresh()
+		send_command('wait 10;strack timeout')
+	end
+	line = nil
 	return new,color
 end
 
