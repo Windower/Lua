@@ -1,5 +1,5 @@
 **Author:** Ricky Gall  
-**Version:** 1.3  
+**Version:** 1.4  
 **Description:**  
 Replacement for yarnregex for Windower 4 I made for a friend. Uses the chat log so filters must be off. At least until i figure out another way to do it. Keeps track of various event related things. Such as, VW proc messages, mob casting, mob tp moves, TH procs and cor rolls, as well as others. Digi of shiva created the icon and was the driving force behind testing/giving me the idea to do this. Digi also created the default mob list/danger list and chose the name.
 
@@ -16,10 +16,3 @@ Replacement for yarnregex for Windower 4 I made for a friend. Uses the chat log 
  7. ohShi staggeronly (true/false) --Switches on/off stagger only mode.
  8. ohShi unload --Save settings and close ohShi.
  9. ohShi help --Shows this menu.
-
-
-**Requirements:**
-* Data folder in ohShi folder
-* Warning.png in data folder
-* ohShi.lua
-* All files in the libs/ folder: https://github.com/Windower/Lua/tree/master/addons/libs

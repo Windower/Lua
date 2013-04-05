@@ -1,5 +1,5 @@
 --[[
-ohShi v1.3
+ohShi v1.4
 Copyright (c) 2013, Ricky Gall
 All rights reserved.
 
@@ -336,7 +336,8 @@ function event_action(act)
 		--it against your danger words and the user against your moblist.
 		if act['category'] == 7 then
 			local num = tonumber(act['targets'][1]['actions'][1]['param']) - 256
-			local wesk = mobAbilities[num]['english']
+			if num == nil then return end
+			local wesk = mobAbilities[num]['english'] or 'antidisestablishmentarianism'
 			if dangercheck(wesk) then
 				color2 = '\\cs(255,100,100)'
 				cres = '\\cr'
