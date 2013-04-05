@@ -335,7 +335,6 @@ function event_action(act)
 		--due to it being offset, compares it against the abilities table. Then checks
 		--it against your danger words and the user against your moblist.
 		if act['category'] == 7 then
-			add_to_chat(55,''..#act['targets']..' '..#act['targets'][1]['actions'])
 			local num = tonumber(act['targets'][1]['actions'][1]['param']) - 256
 			local wesk = mobAbilities[num]['english']
 			if dangercheck(wesk) then
