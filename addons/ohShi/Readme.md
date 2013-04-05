@@ -11,7 +11,7 @@ Replacement for yarnregex for Windower 4 I made for a friend. Uses the chat log 
  2. ohShi font &lt;size&gt; &lt;name&gt; --Sets text font and size.
  3. ohShi pos &lt;posx&gt; &lt;posy&gt; --Sets position of box.
  4. ohShi duration &lt;seconds&gt; --Sets the timeout on the notices.
- 5. ohShi track &lt;vw/legion/other/abyssea/meeblesdangerous&gt; &lt;mobname&gt; --Adds mob to the tracking list.<br/>--dangerous will cause all tpmoves/spell casting to trigger the warning icon/color
+ 5. ohShi track &lt;vw/legion/other/abyssea/meebles/dangerous&gt; &lt;mobname&gt; --Adds mob to the tracking list.<br/>--dangerous will cause all tpmoves/spell casting to trigger the warning icon/color
  6. ohShi danger &lt;spell/ws&gt; &lt;dangerword&gt; --Adds danger word to list.
  7. ohShi staggeronly (true/false) --Switches on/off stagger only mode.
  8. ohShi unload --Save settings and close ohShi.
