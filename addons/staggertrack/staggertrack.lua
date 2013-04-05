@@ -135,8 +135,8 @@ end
 
 function strack_delete()
 	add_to_chat(55,'Stagger Track closing and saving settings')
-	tempname = 'tmp-'..tostring(math.random(10000000,99999999)..'.txt'
-	temp2 = 'tmp2-'..tostring(math.random(10000000,99999999)..'.txt'
+	tempname = 'tmp-'..tostring(math.random(10000000,99999999))..'.txt'
+	temp2 = 'tmp2-'..tostring(math.random(10000000,99999999))..'.txt'
 	local f = io.open(settingsPath..tempname,"w")
 	f:write("<?xml version=\"1.0\"?>\n")
 	f:write("<!--File Created by strack.lua-->\n\n")
