@@ -78,8 +78,8 @@ function event_load()
 	color2 = ''
 	cres = ''
 	player = get_player()
-	setFile = files.new('data/settings.xml')
-	mobFile = files.new('data/moblist.xml')
+	setFile = files.new('data/ohshi-settings.xml')
+	mobFile = files.new('data/ohshi-moblist.xml')
 	speFile = files.new('../../plugins/resources/spells.xml')
 	jaFile = files.new('../../plugins/resources/abils.xml')
 	maFile = files.new('../libs/resources/mabils.xml')
