@@ -15,8 +15,6 @@ local settings = nil -- holds a config instance
 local settings_file = 'data/settings.xml'
 
 local player_display_count = 8 -- num of players to display. configured via settings file
-local dps_autostart = true -- configured via settings file
-local dps_autostop = true -- configured via settings file
 
 local dps_db = T{}
 local mob_filter = T{} -- subset of mobs that we're currently displaying damage for
@@ -25,7 +23,6 @@ local mob_filter = T{} -- subset of mobs that we're currently displaying damage 
 local dps_active = false
 local dps_clock = 1 -- avoid div/0
 local dps_clock_prev_time = 0
-local dps_auto_stop_time = 0
 
 local default_settings_file = [[
 <?xml version="1.0" ?>
@@ -39,17 +36,12 @@ local default_settings_file = [[
 		posY - y coordinate for position
 		numPlayers - The maximum number of players to display damage for
 		bgTransparency - Transparency level for the background. 0-255 range
-		dpsAutostart - Starts DPS clock whenever you or an alli member deals damage
-		dpsAutostop - Stops the DPS clock whenever an enemy is defeated.
-					  Note that if you die, you'll have to stop the clock manually.
 	-->
 	<global>
 		<posX>10</posX>
 		<posY>250</posY>
 		<bgTransparency>200</bgTransparency>
 		<numPlayers>8</numPlayers>
-		<dpsAutostart>true</dpsAutostart>
-		<dpsAutostop>true</dpsAutostop>
 	</global>
 
 	<!--
@@ -109,7 +101,6 @@ function initialize()
 	dps_db = T{}
 
 	dps_active = false
-	dps_autostart = true
 	dps_clock = 1
 	dps_clock_prev_timestamp = 0
 	
@@ -181,8 +172,6 @@ function event_load()
 	settings = config.load()
 
 	player_display_count = settings['numplayers'] or player_display_count
-	dps_autostart = settings['autostartdps'] or dps_autostart
-	dps_autostop = settings['autostopdps'] or dps_autostop
 	
 	send_command('alias sb lua c scoreboard')
 	
