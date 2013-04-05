@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!--File Created by ohShi.lua-->
+
+	<mobList>
+		<voidwatch>Qilin,Celaeno,Morta,Bismarck,Ig-Alima,Kalasutrax,Ocythoe,Gaunab,Hahava,Cherufe,Botulus Rex,Taweret,Agathos,Goji,Gugalanna,Gasha,Giltine,Mellonia,Kaggen,Akvan,Pil,Belphoebe,Kholomodumo,Aello,Uptala,Sarbaz,Shah,Wazir,Asb,Rukh,Provenance Watcher</voidwatch>
+		<legion>Veiled,Lofty,Soaring,Mired,Paramount</legion>
+		<other>Tiamat,Khimaira,Khrysokhimaira,Cerberus,Dvergr,Bloodthirsty,Hydra,Enraged,Odin</other>
+		<meebles>Goldwing,Silagilith,Surtr,Dreyruk,Samursk,Umagrhk,Izyx,Grannus,Svaha,Melisseus</meebles>
+		<abyssea>Alfard,Orthrus,Carabosse,Glavoid,Isgebind</abyssea>
+		<dangerous>Provenance Watcher,Apademak,Goblin</dangerous>
+	</mobList>
+	<dangerwords>
+		<spells>Death,Meteor,Kaustra,Breakga,Thundaga IV,Thundaja,Firaga IV,Firaja,Aeroga IV,Aeroja,Blizzaga IV,Blizzaja,Stonega IV,Stoneja</spells>
+		<weaponskills>Zantetsuken,Geirrothr,Astral Flow,Chainspell,Beastruction,Mandible Massacre,Oblivion's Mantle,Divesting Gale,Frog,Danse,Raksha Stance,Yama's,Ballistic Kick,Eradicator,Arm Cannon,Gorge,Extreme Purgitation,Slimy Proposal,Rancid Reflux,Provenance Watcher starts,Pawn's Penumbra,Gates,Fulmination,Nerve,Thundris</weaponskills>
+	</dangerwords>
