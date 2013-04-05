@@ -161,7 +161,6 @@ function strack_delete()
 	if not r then write(es) end
 	tb_delete('strack')
 	send_command('unalias strack')
-	send_command('lua u strack')
 end
 
 function event_incoming_text(old,new,color)
