@@ -1,5 +1,5 @@
 --[[
-Stagger Tracker v1.5
+Stagger Tracker v1.51
 Copyright (c) 2013, Ricky Gall All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -66,7 +66,7 @@ function event_addon_command(...)
 		elseif comm:lower() == 'create' then
 			strack_create()
 		elseif comm:lower() == 'unload' then
-			send_command('lua u strack')
+			send_command('lua u staggertrack')
 		elseif comm:lower() == 'bgcolor' then
 			tb_set_bg_color('strack',args[2],args[3],args[4],args[5])
 			settings['bgalpha'] = args[2]
