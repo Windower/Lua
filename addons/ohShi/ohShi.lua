@@ -95,7 +95,7 @@ function event_load()
 	jobAbilities = parse_resources(jaFile:readlines())
 	mobAbilities = parse_resources(maFile:readlines())
 	mlist = fill_moblist(mobFile:readlines())
-	settings = config.load('data/settings.xml')
+	settings = config.load('data/ohshi-settings.xml')
 	send_command('alias ohShi lua c ohshi') --For addon commands
 	if firstrun == 1 then send_command('ohShi help') end --If first run show the help menu
 	send_command('wait 1;ohshi create')
@@ -524,7 +524,7 @@ end
 --Creates the default settings/moblist in case they have been deleted
 function createDefaults(tystr)
 	if tystr == 'settings' then
-		local f1 = files.new('data/settings.xml')
+		local f1 = files.new('data/ohshi-settings.xml')
 		f1:write("<?xml version=\"1.0\"?>")
 		f1:append("<!--File Created by ohShi.lua-->\n")
 		f1:append("\t<settings>")
@@ -536,7 +536,7 @@ function createDefaults(tystr)
 		f1:append("\t</settings>")
 	end 
 	if tystr == 'mobList' then
-		local f2 = files.new('data/moblist.xml')
+		local f2 = files.new('data/ohshi-moblist.xml')
 		f2:write("<?xml version=\"1.0\"?>")
 		f2:append("<!--File Created by ohShi.lua-->\n")
 		f2:append("\t<mobList>")
