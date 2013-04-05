@@ -9,17 +9,12 @@
 		posY - y coordinate for position
 		numPlayers - The maximum number of players to display damage for
 		bgTransparency - Transparency level for the background. 0-255 range
-		dpsAutostart - Starts DPS clock whenever you or an alli member deals damage
-		dpsAutostop - Stops the DPS clock whenever an enemy is defeated.
-		              Note that if you die, you'll have to stop the clock manually.
 	-->
 	<global>
 		<posX>10</posX>
 		<posY>250</posY>
 		<bgTransparency>200</bgTransparency>
 		<numPlayers>8</numPlayers>
-		<autostartDPS>true</autostartDPS>
-		<autostopDPS>true</autostopDPS>
 	</global>
 
 	<!--
