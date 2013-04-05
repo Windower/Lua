@@ -18,7 +18,7 @@ function T(t)
 	if t == nil then
 		return
 	end
-	
+
 	-- Sets T's metatable's index to the table namespace, which will take effect for all T-tables.
 	-- This makes every function that tables have also available for T-tables.
 	return setmetatable(t, {__index = table, __add = table.extend})
@@ -32,7 +32,7 @@ function table.isarray(t)
 	for _, _ in pairs(t) do
 		count = count + 1
 	end
-	
+
 	return count == #t
 end
 
@@ -41,12 +41,12 @@ function table.length(t)
 	if t:isarray() then
 		return #t
 	end
-	
+
 	local count = 0
 	for _, _ in pairs(t) do
 		count = count + 1
 	end
-	
+
 	return count
 end
 
@@ -70,7 +70,7 @@ function table.contains(t, searchval)
 			return true
 		end
 	end
-	
+
 	return false
 end
 
@@ -93,7 +93,7 @@ function table.extend(t, t_extend)
 	for _, val in ipairs(t_extend) do
 		t:append(val)
 	end
-	
+
 	return t
 end
 
@@ -106,21 +106,21 @@ function table.count(t, fn)
 			fn = functools.equals(fn)
 		end
 	end
-	
+
 	count = 0
 	for _, val in pairs(t) do
 		if fn(val) == true then
 			count = count + 1
 		end
 	end
-	
+
 	return count
 end
 
 -- Removes all elements from a table.
 function table.clear(t)
 	t = T{}
-	
+
 	return t
 end
 
@@ -129,11 +129,11 @@ function table.update(t, t_update, recursive, maxrec, rec)
 	if t_update == nil then
 		return t
 	end
-	
+
 	recursive = recursive or false
 	maxrec = maxrec or -1
 	rec = rec or 0
-	
+
 	for key, val in pairs(t_update) do
 		if t[key] ~= nil and recursive and rec ~= maxrec and type(t[key]) == 'table' and type(val) == 'table' then
 			t[key] = T(t[key]):update(T(val), true, maxrec, rec + 1)
@@ -141,7 +141,7 @@ function table.update(t, t_update, recursive, maxrec, rec)
 			t[key] = val
 		end
 	end
-	
+
 	return t
 end
 
@@ -150,11 +150,11 @@ function table.amend(t, t_amend, recursive, maxrec, rec)
 	if t_amend == nil then
 		return t
 	end
-	
+
 	recursive = recursive or false
 	maxrec = maxrec or -1
 	rec = rec or 0
-	
+
 	for key, val in pairs(t_amend) do
 		if t[key] ~= nil and recursive and rec ~= maxrec and type(t[key]) == 'table' and type(val) == 'table' then
 			t[key] = T(t[key]):amend(T(val), true, maxrec, rec + 1)
@@ -162,7 +162,7 @@ function table.amend(t, t_amend, recursive, maxrec, rec)
 			t[key] = val
 		end
 	end
-	
+
 	return t
 end
 
@@ -174,7 +174,7 @@ function table.find(t, el)
 	else
 		fn = el
 	end
-	
+
 	for key, val in pairs(t) do
 		if fn(val) then
 			return key, val
@@ -188,7 +188,7 @@ function table.keyset(t)
 	for key, _ in pairs(t) do
 		res:append(key)
 	end
-	
+
 	return res
 end
 
@@ -207,7 +207,7 @@ function table.flatten(t, recursive)
 			res:append(val)
 		end
 	end
-	
+
 	return res
 end
 
@@ -220,13 +220,13 @@ function table.equals(t, t_eq)
 		end
 		seen[key] = true
 	end
-	
+
 	for key, val in pairs(t_eq) do
 		if seen[key] == nil then
 			return false
 		end
 	end
-	
+
 	return true
 end
 
@@ -262,43 +262,43 @@ function table.slice(t, from, to)
 	from = from or 1
 	if from < 0 then
 		-- Modulo the negative index, to get it back into range.
-		from = from%#t+1
+		from = (from % #t) + 1
 	end
 	to = to or #t
 	if to < 0 then
 		-- Modulo the negative index, to get it back into range.
-		to = (to-1)%#t+1
+		to = (to % #t) + 1
 	end
-	
+
 	-- Copy relevant elements into a blank T-table.
 	local res = T{}
 	for i = from, to do
 		res[#res+1] = t[i]
 	end
-	
+
 	return res;
 end
 
 -- Replaces t[from, to] with the contents of st and returns the table.
 function table.splice(t, from, to, st)
 	local tcpy = t:copy()
-	
+
 	for stkey = 1, #st do
 		tkey = from + stkey - 1
 		t[tkey] = st[stkey]
 	end
-	
+
 	for cpykey = to+1, #tcpy do
 		newkey = cpykey + #st - (to - from) - 1
 		t[newkey] = tcpy[cpykey]
 	end
-	
+
 	for rmkey = #t - (to - from) + #st, #t do
 		t[rmkey] = nil
 	end
-	
+
 	t = res
-	
+
 	return t
 end
 
@@ -311,7 +311,7 @@ function table.reverse(t)
 		end
 		res[key], res[#t-key+1] = t[#t-key+1], t[key]
 	end
-	
+
 	return res
 end
 
@@ -325,7 +325,7 @@ function table.set(t)
 			seen[val] = true
 		end
 	end
-	
+
 	return res
 end
 
@@ -345,7 +345,7 @@ function table.any(t, fn)
 			return true
 		end
 	end
-	
+
 	return false
 end
 
@@ -356,7 +356,7 @@ function table.all(t, fn)
 			return false
 		end
 	end
-	
+
 	return true
 end
 
@@ -367,7 +367,7 @@ function table.extract(t)
 	for key, val in pairs(t) do
 		res:append(val)
 	end
-	
+
 	return res:unpack()
 end
 
@@ -381,7 +381,7 @@ function table.copy(t)
 		end
 		res[key] = val
 	end
-	
+
 	return setmetatable(res, getmetatable(t))
 end
 
@@ -390,14 +390,14 @@ function table.range(start, finish, step)
 	if finish == nil then
 		start, finish = 1, start
 	end
-	
+
 	step = step or 1
-	
+
 	local res = T{}
 	for key = start, finish, step do
 		res:append(key)
 	end
-	
+
 	return res
 end
 

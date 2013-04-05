@@ -134,7 +134,8 @@ chat: {
 		permil:		\x81\xEA,		// Per mil
 		dagger:		\x81\xEE,		// Dagger
 		ddagger:	\x81\xEF,		// Double dagger
-	}
+		rarrow:		\x81\xA8,		// Right arrow
+	},
 },
 elements: {
 	days: {
@@ -166,5 +167,5 @@ elements: {
 		Thunder Spirit: Lightning,
 		Light Spirit: Light,
 		Dark Spirit: Darkness,
-	}
-}
+	},
+},

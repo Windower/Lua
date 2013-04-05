@@ -112,7 +112,8 @@ function table.tostring(t)
 	
 	-- Iterate over table.
 	local tstr = ''
-	for _, key in ipairs(t:keyset():sort()) do
+	local kt = t:keyset():sort()
+	for _, key in ipairs(kt) do
 		val = t[key]
 		-- Check for nested tables
 		if type(val) == 'table' then
@@ -133,7 +134,7 @@ function table.tostring(t)
 		end
 		
 		-- Add comma, unless it's the last value.
-		if next(t, key) ~= nil then
+		if kt:last() ~= key then
 			tstr = tstr..', '
 		end
 	end
@@ -162,7 +163,8 @@ function table.tovstring(t, keys, indentlevel)
 	
 	local indent = (' '):rep(indentlevel*4)
 	local tstr = '{'..'\n'
-	for _, key in pairs(t:keyset():sort()) do
+	local tk = t:keyset():sort()
+	for _, key in pairs(tk) do
 		val = t[key]
 		-- Check for nested tables
 		if type(val) == 'table' then
@@ -184,7 +186,7 @@ function table.tovstring(t, keys, indentlevel)
 		end
 		
 		-- Add comma, unless it's the last value.
-		if next(t, key) ~= nil then
+		if tk:last() ~= key then
 			tstr = tstr..', '
 		end
 		
