@@ -34,7 +34,6 @@ function event_load()
 		f:write('\t\t<textred>255</textred>\n')
 		f:write('\t\t<textgreen>255</textgreen>\n')
 		f:write('\t\t<textblue>255</textblue>\n')
-		f:write("\t\t<chatlines>5</chatlines>\n")
 		f:write("\t</settings>")
 		io.close(f)
 	end
@@ -136,7 +135,9 @@ end
 
 function strack_delete()
 	add_to_chat(55,'Stagger Track closing and saving settings')
-	local f = io.open(settingsPath..'tmp.txt',"w")
+	tempname = 'tmp-'..tostring(math.random(10000000,99999999)..'.txt'
+	temp2 = 'tmp2-'..tostring(math.random(10000000,99999999)..'.txt'
+	local f = io.open(settingsPath..tempname,"w")
 	f:write("<?xml version=\"1.0\"?>\n")
 	f:write("<!--File Created by strack.lua-->\n\n")
 	f:write("\t<settings>\n")
@@ -152,15 +153,14 @@ function strack_delete()
 	f:write("\t\t<textblue>"..settings['textblue'].."</textblue>\n")
 	f:write("\t</settings>")
 	io.close(f)
-	local r,es = os.rename(settingsFile,settingsPath..'tmp2.txt')
+	local r,es = os.rename(settingsFile,settingsPath..temp2)
 	if not r then write(es) end
-	local e,rs = os.rename(settingsPath..'tmp.txt',settingsFile)
+	local e,rs = os.rename(settingsPath..tempname,settingsFile)
 	if not e then write(rs) end
-	local r,es = os.remove(settingsPath..'tmp2.txt')
+	local r,es = os.remove(settingsPath..temp2)
 	if not r then write(es) end
 	tb_delete('strack')
 	send_command('unalias strack')
-	send_command('lua u strack')
 end
 
 function event_incoming_text(old,new,color)
