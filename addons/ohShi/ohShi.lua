@@ -61,7 +61,7 @@ defaults.duration = 7
 defcomm.duration = 'Duration the warning stays on the screen in seconds (default: 7)'
 defaults.staggeronly = 'false'
 defcomm.staggeronly = 'Whether or not the addon will only show VW stagger info/lights (default: false)'
-settings = config.load(defaults)
+settings = config.load('data/ohshi-settings.xml',defaults)
 
 --This function is called when the addon loads. It is used to
 --create all the tables used and populate them. There are also
@@ -77,12 +77,17 @@ function event_load()
 	jobAbilities = {}
 	color2 = ''
 	cres = ''
+	setFName = 'data/ohshi-settings.xml'
+	mobFName = 'data/ohshi-moblist.xml'
+	speFName = '../../plugins/resources/spells.xml'
+	jaFName = '../../plugins/resources/abils.xml'
+	maFName = '../libs/resources/mabils.xml'
 	player = get_player()
-	setFile = files.new('data/ohshi-settings.xml')
-	mobFile = files.new('data/ohshi-moblist.xml')
-	speFile = files.new('../../plugins/resources/spells.xml')
-	jaFile = files.new('../../plugins/resources/abils.xml')
-	maFile = files.new('../libs/resources/mabils.xml')
+	setFile = files.new(setFName)
+	mobFile = files.new(mobFName)
+	speFile = files.new(speFName)
+	jaFile = files.new(jaFName)
+	maFile = files.new(maFName)
 	if not setFile:exists() then
 		firstrun = 1
 		createDefaults('settings')
@@ -95,7 +100,7 @@ function event_load()
 	jobAbilities = parse_resources(jaFile:readlines())
 	mobAbilities = parse_resources(maFile:readlines())
 	mlist = fill_moblist(mobFile:readlines())
-	settings = config.load('data/ohshi-settings.xml')
+	settings = config.load(setFName)
 	send_command('alias ohShi lua c ohshi') --For addon commands
 	if firstrun == 1 then send_command('ohShi help') end --If first run show the help menu
 	send_command('wait 1;ohshi create')
@@ -524,7 +529,7 @@ end
 --Creates the default settings/moblist in case they have been deleted
 function createDefaults(tystr)
 	if tystr == 'settings' then
-		local f1 = files.new('data/ohshi-settings.xml')
+		local f1 = files.new(setFName)
 		f1:write("<?xml version=\"1.0\"?>")
 		f1:append("<!--File Created by ohShi.lua-->\n")
 		f1:append("\t<settings>")
@@ -536,7 +541,7 @@ function createDefaults(tystr)
 		f1:append("\t</settings>")
 	end 
 	if tystr == 'mobList' then
-		local f2 = files.new('data/ohshi-moblist.xml')
+		local f2 = files.new(mobFName)
 		f2:write("<?xml version=\"1.0\"?>")
 		f2:append("<!--File Created by ohShi.lua-->\n")
 		f2:append("\t<mobList>")
@@ -556,7 +561,7 @@ end
 
 --Save the stored moblist to a file on exit.
 function save_moblist()
-	local f, fname = files.new('data/moblist.xml')
+	local f, fname = files.new(mobFName)
 	f:write("<?xml version=\"1.0\"?>")
 	f:append("<!--File Created by ohShi.lua-->\n")
 	f:append("\t<mobList>")
