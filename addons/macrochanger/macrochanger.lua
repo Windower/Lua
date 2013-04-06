@@ -337,14 +337,10 @@ function event_job_change(mjobId, mjob)
 	if ((book == 'disabled') or (page == 'disabled')) then
 		add_to_chat(17, 'Auto Macro Switching Disabled for ' .. job ..'.')
 	else	
-		add_to_chat(17, 'Changing macros to Book: ' .. book .. ' and Page: ' .. page .. '.  Job Changed to ' .. job)
+		add_to_chat(17, '                             Changing macros to Book: ' .. book .. ' and Page: ' .. page .. '.  Job Changed to ' .. job)
 		send_command('input /macro book ' .. book)
 		send_command('input /macro set ' .. page)
 	end
-
-	add_to_chat(17, '                         Changing macros to Book: ' .. book .. ' and Page: ' .. page .. '.  Job Changed to ' .. job)
-	send_command('input /macro book ' .. book)
-	send_command('input /macro set ' .. page)
 end
 
 function event_unload()
