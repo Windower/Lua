@@ -1,6 +1,6 @@
 Author: Sebastien Gomez
 Original Author: Ricky Gall
-Version: 2.00
+Version: 2.02
 A very substancial yarnball replacement for use until timers gets finished or to use permanently.
 
 file requierement:
