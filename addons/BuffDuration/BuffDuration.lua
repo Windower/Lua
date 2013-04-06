@@ -1,7 +1,8 @@
 --[[
-BuffDuration V2.01
+BuffDuration V2.02
 Copyright (c) 2012, Ricky Gall All rights reserved.
 Ammended by Sebastien Gomez
+Troubodar songs included by Mazura of Ragnarok
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
@@ -43,7 +44,8 @@ function event_load()
 					Perpetuance=2.5,
 					LightArts=1.8,
 					Rasa=2.28,
-					Composure=3
+					Composure=3,
+					Troubadour=2
 				}
 	--Feel free to update this buffExtension variable in case you have better composure
 	--or don't have perpetuance gloves. The Light Arts and Rasa sections are only used for regen
@@ -54,6 +56,8 @@ function event_load()
 						'Voidstorm','Blink','Stoneskin','Aquaveil','Invisible','Deodorize','Sneak','Barfire','Barblizzard','Baraero','Barstone','Barthunder','Barwater','Barpoison','Barparalyze',
 						'Barblind','Barsilence','Barpetrify','Barvirus','Boost VIT','Boost MND','Boost AGI','Boost CHR','Boost STR','Boost DEX','Boost INT','Enthunder','Enstone','Enaero','Enfire',
 						'Enblizzard','Enwater','Enthunder II','Enstone II','Enaero II','Enfire II','Enblizzard II','Enwater II','Blaze Spikes','Ice Spikes','Shock Spikes'}
+	extenTroub = T {	'Paeon', 'Ballad', 'Minne', 'Minuet', 'Madrigal', 'Prelude', 'Mambo', 'Aubade', 'Pastoral', 'Fantasia', 'Operetta', 'Capriccio', 'Round', 'Gavotte', 'March', 'Etude', 'Carol',
+						'Hymnus', 'Mazurka', 'Scherzo'}
 	--This table is used to check if a buff is able to be
 	--extended via perpetuance or composure. If i missed one
 	--feel free to add it. Keep in mind however i only look for
@@ -113,6 +117,10 @@ function event_gain_status(id,name)
 		--Check to gain perpetuance and add a timer
 		extend['Perpetuance'] = os.clock()
 	end
+	if id == 348 then
+		--Check to gain Troubadour and add a timer
+		extend['Troubadour'] = os.clock()
+	end
 	first = 1	
 	for i in ipairs(lines) do		-- Iterates through each line of status.xml to find buff's by ID
 		x = i
@@ -137,7 +145,7 @@ end
 function check_bufflist(name)
 	buffs = T(get_player()['buffs'])
 	if buffs:contains(419) then
-		--Check to gain perpetuance and add a timer
+		--Check to gain Composure and add a timer
 		extend['Composure'] = os.clock()
 	end
 	for i in ipairs(lines) do		-- Iterates through each line of status.xml to find buff's by ID
@@ -315,6 +323,18 @@ function createTimer(name,target)
 					end
 				end
 			end
+		elseif player['main_job_id'] == 10 then
+			if extenTroub:contains(tostring(name)) then
+				timer = duration - 5
+				if extend ~=nil then
+					e = os.clock()-80
+					if extend['Troubadour'] ~= nil then
+						if e < extend['Troubadour'] then
+							timer = tonumber(duration) * buffExtension['Troubadour'] + addtime - 5
+						end
+					end
+				end
+			end
 		else
 			timer = duration - 5
 		end
@@ -386,7 +406,7 @@ function event_incoming_text(old,new,color)
 		--target of the effect and the effect itself
 		a,b,caster,caster_spell,target,target_effect = string.find(old,'(%w+) casts ([%w%s]+)..(%w+) gains the effect of ([%w%s]+).')
 		
-		--Check fo buffs wearing off and store name and buff in variables
+		--Check for buffs wearing off and store name and buff in variables
 		c,d,tWear,eWear = string.find(old,'(%w+)\'s ([%w%s]+) effect wears off.')
 		--Check for gain buffs only (i.e. you have filters on) and store name/buff
 		e,f,tar2,eff2 = string.find(old,'(%w+) gains the effect of ([%w%s]+).')
@@ -444,6 +464,3 @@ function split(msg, match)
 	end
 	return splitarr
 end
-
-
-
