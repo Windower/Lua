@@ -6,6 +6,7 @@ _libs = _libs or {}
 _libs.ffxi = true
 _libs.tablehelper = _libs.tablehelper or require 'tablehelper'
 _libs.stringhelper = _libs.stringhelper or require 'stringhelper'
+_libs.functools = _libs.functools or require 'functools'
 local json = require 'json'
 _libs.json = _libs.json or (json ~= nil)
 
@@ -33,7 +34,7 @@ function ffxi.get_storm()
 			return element
 		end
 	end
-	
+
 	return nil
 end
 
@@ -49,6 +50,44 @@ function ffxi.showcolors()
 	for key, val in pairs(ffxi.data.chat.colors) do
 		log('Color', 'ffxi.data.chat.colors.'..key..':', ('Color sample text.'):color(val))
 	end
+end
+
+-- Returns the target's id.
+function ffxi.target_id()
+	return get_mob_by_target_id(get_player()['targets_target_id']).id
+end
+
+-- Returns the target's name.
+function ffxi.target_name()
+	return get_mob_by_target_id(get_player()['targets_target_id']).name
+end
+
+-- Returns a name based on an id.
+function ffxi.id_to_name(id)
+	return get_mob_by_id(id).name
+end
+
+-- Pretty-prints the action packet
+function ffxi.actionprint(p)
+	local function makename(id)
+		return get_mob_by_id(id).name..' ('..id..')'
+	end
+	local str = ''
+
+	local targets = T(p['targets']):map(table.get-{'id'}):sort()
+	str = str..makename(p['actor_id'])..'\tTargets: '..targets:map(makename):format('csv')..'\n'
+	str = str..'\n'
+	for _, target in ipairs(targets) do
+		str = str..'Target: '..makename(target)..'\n'
+		str = str..'\n'
+--		local actions = T(p['targets']):find[2](functools.equals(target)..table.get-{'id'}))['actions']
+--		local actionlines = T{T{}}
+--		for _, action in ipairs(actions) do
+--			action = T(action):tovstring():split('\n'):slice(2, -2):map(string.gsub-{'=', ': '}..string.gsub-{',$', ''}..string.trim):vprint()
+--		end
+	end
+
+	return str
 end
 
 return ffxi

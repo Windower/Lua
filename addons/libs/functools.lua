@@ -31,7 +31,15 @@ end
 -- Returns a partially applied function, with the argument provided at the end.
 function functools.endapply(fn, args)
 	return function(...)
+		if x then T{...}:vprint() end
 		return fn(T{...}:extend(args):unpack())
+	end
+end
+
+-- Returns a function that calls a provided chain of functions in right-to-left order.
+function functools.pipe(fn1, fn2)
+	return function(...)
+		return fn1(fn2(...))
 	end
 end
 
@@ -50,11 +58,18 @@ function functools.negate(fn)
 	end
 end
 
--- Returns a function that calls a provided chain of functions in right-to-left order.
-function functools.pipe(fn1, fn2)
+-- Returns a function that returns a subset of the provided function's elements according to a table slice.
+-- * i == nil:	Returns all elements as a table
+-- * j == nil:	Returns all elements from i until the end
+function functools.slice(fn, i, j)
 	return function(...)
-		return fn1(fn2(...))
+		return T{fn(...)}:slice(i, j):unpack()
 	end
+end
+
+-- Returns the ith element of a function.
+function functools.select(fn, i)
+	return functools.slice(fn, i, i)
 end
 
 -- Assigns a metatable on functions to introduce certain function operators.
@@ -62,10 +77,11 @@ end
 -- * fn-{...} partially applies a function to arguments from the end.
 -- * fn1..fn2 pipes input from fn2 to fn1.
 debug.setmetatable(functools.empty, {
+	__index = functools.select,
 	__add = functools.apply,
 	__sub = functools.endapply,
 	__concat = functools.pipe,
-	__unm = functools.negate
+	__unm = functools.negate,
 })
 
 --[[
@@ -138,6 +154,11 @@ end
 	Table functions
 ]]
 
+-- Returns an attribute of a table.
+function table.get(t, att)
+	return t[att]
+end
+
 -- Applies function fn to all elements of the table and returns the resulting table.
 function table.map(t, fn)
 	local res = T{}
@@ -145,7 +166,7 @@ function table.map(t, fn)
 		-- Evaluate fn with the element and store it.
 		res[key] = fn(val)
 	end
-	
+
 	return res
 end
 
@@ -156,7 +177,7 @@ function table.arrmap(t, fn)
 		-- Evaluate fn with the element and store it.
 		res[key] = fn(t[key])
 	end
-	
+
 	return res
 end
 
@@ -177,14 +198,14 @@ function table.filter(t, fn)
 			end
 		end
 	end
-	
+
 	return res
 end
 
 -- Returns a table with all elements from t whose keys satisfy the condition fn, or don't satisfy condition fn, if reverse is set to true. Defaults to false.
 function table.filterkey(t, fn, reverse)
 	reverse = reverse or false
-	
+
 	local res = T{}
 	for key, val in pairs(t) do
 		-- Only copy if fn(key) evaluates to true
@@ -192,7 +213,7 @@ function table.filterkey(t, fn, reverse)
 			res[key] = val
 		end
 	end
-	
+
 	return res
 end
 
@@ -200,12 +221,12 @@ end
 -- init is an optional initial value to be used. If provided, init and t[1] will be compared first, otherwise t[1] and t[2].
 function table.reduce(t, fn, init)
 	t = T(t)
-	
+
 	-- Return the initial argument if table is empty
 	if t:isempty() then
 		return init
 	end
-	
+
 	-- Set the accumulator variable to the init value (which can be nil as well)
 	local acc = init
 	for key, val in pairs(t) do
@@ -217,7 +238,7 @@ function table.reduce(t, fn, init)
 			acc = fn(acc, val)
 		end
 	end
-	
+
 	return acc
 end
 

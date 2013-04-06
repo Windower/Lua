@@ -233,5 +233,5 @@ function table.format(t, trail, subs)
 		warning('Invalid format for table.format: \''..trail..'\'.')
 	end
 	
-	return T(t):slice(1, -1):concat(', ')..last..T(t):last()
+	return T(t):slice(1, -2):concat(', ')..last..T(t):last()
 end
