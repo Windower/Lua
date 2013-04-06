@@ -30,6 +30,7 @@
   <addon>
     <name>Scoreboard</name>
     <author>Suji</author>
-    <description>Basic in-game damage parser which also displays live DPS.</description>
+    <description>Basic in-game damage parser. It displays live DPS and works even when chat filters are enabled.</description>
+    <support>https://github.com/jerryhebert/Lua/issues</support>
   </addon>
 </addons>
