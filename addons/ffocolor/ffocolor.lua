@@ -275,6 +275,7 @@ function getcolors()
 end
 
 function split(msg, match)
+	if msg == nil then return '' end
 	local length = msg:len()
 	local splitarr = {}
 	local u = 1

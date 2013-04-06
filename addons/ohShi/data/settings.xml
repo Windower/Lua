@@ -1,0 +1,18 @@
+<?xml version="1.1" ?>
+<settings>
+	<global>
+		<staggeronly>false</staggeronly>	<!--Whether or not the addon will only show VW stagger info/lights (default: false)-->
+		<duration>7</duration>			<!--Duration the warning stays on the screen in seconds (default: 7)-->
+		<bggreen>0</bggreen>				<!--Green of the background (default: 0)-->
+		<textsize>12</textsize>			<!--Font size {default: 12)-->
+		<bgblue>0</bgblue>				<!--Blue of the background (default: 0)-->
+		<posx>300</posx>					<!--X value where upper left-hand corner starts-->
+		<posy>300</posy>					<!--Y value where upper left-hand corner starts-->
+		<textred>255</textred>			<!--Red of the background (default: 255)-->
+		<bgalpha>200</bgalpha>			<!--Transparency of the background-->
+		<textfont>Arial</textfont>		<!--Font the text box uses (default: Arial)-->
+		<bgred>0</bgred>					<!--Red of the background (default: 0)-->
+		<textblue>255</textblue>			<!--Blue of the text (default: 255)-->
+		<textgreen>255</textgreen>		<!--Green of the background (default: 255)-->
+	</global>
+</settings>
