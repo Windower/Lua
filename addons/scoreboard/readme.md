@@ -1,5 +1,5 @@
 Author: Suji
-Version: 0.2
+Version: 0.3b
 Addon to show alliance DPS and damage in real time.
 Abbreviation: //sb
 
@@ -9,13 +9,12 @@ total damage and their percent contribution is also displayed.
 
 Notable features:
 * Live DPS
+* You can still parse damage even if you enable chat filters.
 * Ability to filter only the mobs you want to see damage for
 * 'Report' command for reporting damage back to your party
 
-DPS accumulation starts whenever someone in your party or alliance damages an enemy.
-It then automatically pauses when someone in your party or alliance kills an enemy.
-Both stopping and starting can be done manually if you prefer and and you can enable
-or disable auto-start/auto-stop in the settings file.
+DPS accumulation is active whenever anyone in your alliance is currently
+in battle.
 
 See data/settings.xml for additional configuration options.
 
@@ -37,21 +36,16 @@ Command list:
   patterns are also allowed.
 * CLEAR
   Clears all mobs from the filter.
-* START
-  Manually starts the DPS counter. This also happens automatically when
-  someone in your group does damage.
-* STOP
-  Manually stops the DPS counter to keep your DPS estimate accurate.
+
   
 Caveats:
 * DPS is an approximation, although I tested it manually and found it to
   be very accurate.
-* Note that if you die to an enemy, auto-stop will not trigger and your
-  time will continue to bring your DPS down. You must stop manually in this
-  case by using '//sb stop'.
-
-
-Known issues:
-* Enspell and Spike damage are not currently parsed
-* Skillchain damage is not currently parsed
-* AOE damage is not fully attributed properly
+* The methods used in here create some discrepancies with the data reported
+  by KParser. In some cases, Scoreboard will report more damage, which 
+  generally indicates that KParser is not including something (ie, Scoreboard
+  will be more accurate). However, there are cases where KParser is reporting
+  damage that Scoreboard is not, and I'm currently focused on resolving this
+  issue in particular.
+* This addon is still in development. Please report any issues you find to me
+  on FFXIAH or Guildwork (Suji on Phoenix)
