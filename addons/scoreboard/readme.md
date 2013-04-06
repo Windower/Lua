@@ -9,7 +9,7 @@ total damage and their percent contribution is also displayed.
 
 Notable features:
 * Live DPS
-* Since it's based on the action packet, your can filter chat and still parse damage.
+* You can still parse damage even if you enable chat filters.
 * Ability to filter only the mobs you want to see damage for
 * 'Report' command for reporting damage back to your party
 
