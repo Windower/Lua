@@ -50,9 +50,6 @@ local default_settings_file = [[
 </settings>
 ]]
 
-function error(msg)
-	add_to_chat(167, 'Scoreboard error: ' .. msg)
-end
 
 -- Handle addon args
 function event_addon_command(...)
@@ -83,13 +80,14 @@ function event_addon_command(...)
 			
 			if arg then
 				if T{'s', 'l', 'p', 't'}:contains(arg) then
-					if arg2 and not arg2:match('^%w+$') then
+					if arg2 and not arg2:match('^[a-zA-Z]+$') then
 						-- should be a valid player name
 						error('Invalid argument for report t: ' .. arg2)
 						return
 					end
 				else
 					error('Invalid parameter passed to report: ' .. arg)
+					return
 				end
 			end
 			
