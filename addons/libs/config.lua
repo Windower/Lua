@@ -16,7 +16,7 @@ _libs.filehelper = _libs.filehelper or (files ~= nil)
 
 local config = T(config) or T{}
 local file = files.new()
-local original = nil
+local original = T{}
 local chars = T{}
 local comments = T{}
 
@@ -37,7 +37,7 @@ function config.load(filename, confdict)
 		confdict = filename
 		filename = nil
 	end
-	confdict = confdict or T{}
+	confdict = T(confdict) or T{}
 	local confdict_mt = getmetatable(confdict)
 	confdict = setmetatable(confdict, {__index=function(t, x) if x == 'save' then return config['save'] else return confdict_mt.__index[x] end end})
 	
@@ -82,10 +82,14 @@ function parse(file, confdict)
 	-- Determine all characters found in the settings file.
 	chars = parsed:keyset():filter(-functools.equals('global'))
 	
+	if confdict:isempty() then
+		return confdict:update(parsed['global']:update(parsed[get_player()['name']:lower()], true), true)
+	end
+	
 	-- Update the global settings with the per-player defined settings, if they exist. Save the parsed value for later comparison.
-	original = parsed:copy()
-	for char, t in pairs(original) do
-		original[char] = confdict:merge(original[char]):copy()
+	for _, char in ipairs(T{'global'}+chars) do
+		local tmpdict = confdict:copy()
+		original[char] = tmpdict:merge(parsed[char])
 	end
 	
 	return confdict:merge(parsed['global']:update(parsed[get_player()['name']:lower()], true))
