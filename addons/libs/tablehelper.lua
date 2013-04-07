@@ -14,11 +14,15 @@ _libs.functools = _libs.functools or require 'functools'
 -- Constructor for T-tables.
 -- t = T{...} for explicit declaration.
 -- t = T(regular_table) to cast to a T-table.
-function T(t)
+function T(t, ...)
 	if t == nil then
-		return
+		return T{}
 	end
-
+	
+	if type(t) ~= 'table' then
+		return T{t, ...}
+	end
+	
 	-- Sets T's metatable's index to the table namespace, which will take effect for all T-tables.
 	-- This makes every function that tables have also available for T-tables.
 	return setmetatable(t, {__index = table, __add = table.extend})
