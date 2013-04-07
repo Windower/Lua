@@ -50,7 +50,8 @@ function config.load(filename, confdict)
 	file:set(filepath)
 
 	-- Load addon/script config file (Windower/addon/<addonname>/config.json for addons and Windower/scripts/<name>-config.json).
-	local config_load, err = parse(file, confdict)
+	local err
+	confdict, err = parse(file, confdict)
 
 	if err ~= nil then
 		error(err)
@@ -61,8 +62,6 @@ end
 
 -- Resolves to the correct parser and calls the respective subroutine, returns the parsed settings table.
 function parse(file, confdict)
-	confdict = confdict or T{}
-	
 	local parsed = T{}
 	local err
 	if file.path:endswith('.json') then

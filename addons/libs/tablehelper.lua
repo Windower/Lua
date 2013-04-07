@@ -174,7 +174,7 @@ function table.merge(t, t_merge, splitchar, silent)
 	end
 	
 	splitchar = splitchar or ','
-	silent = silent or true
+	silent = silent or false
 
 	for key, val in pairs(t_merge) do
 		if val ~= nil then
