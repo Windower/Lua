@@ -69,7 +69,7 @@ end
 
 function event_addon_command(cmd)
     if cmd == 'test' then
-        vwhl.test()
+        _vwhl.test()
     end
 end
 
