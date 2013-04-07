@@ -129,7 +129,7 @@ function event_addon_command(...)
 			notice(' 6. untrack <vw/legion/other/abyssea/meebles/dangerous> <mobname> --Removes mob from the tracking list.')
 			notice(' 7. danger <spell/ws> <dangerword> --Adds danger word to list.')
 			notice(' 8. staggeronly --Toggles stagger only mode.')
-			notice(' 9. unload') -- <all/one> Save settings all(global) or one(character) and close ohShi.')
+			notice(' 9. unload <all/one> Save settings all(global) or one(character) and close ohShi.')
 			notice('10. help --Shows this menu.')
 		elseif comm == 'create' then
 			ohShi_SetUp()
