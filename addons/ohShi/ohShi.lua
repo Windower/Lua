@@ -65,7 +65,6 @@ defaults.dangerwords = T{}
 defaults.dangerwords['weaponskills'] = T{"Zantetsuken", "Geirrothr", "Astral Flow", "Chainspell", "Beastruction", "Mandible Massacre", "Oblivion's Mantle", "Divesting Gale", "Frog", "Danse", "Raksha Stance", "Yama's", "Ballistic Kick", "Eradicator", "Arm Cannon", "Gorge", "Extreme Purgitation", "Slimy Proposal", "Rancid Reflux", "Provenance Watcher starts", "Pawn's Penumbra", "Gates", "Fulmination", "Nerve", "Thundris"}
 defaults.dangerwords['spells'] = T{"Death", "Meteor", "Kaustra", "Breakga", "Thundaga IV", "Thundaja", "Firaga IV", "Firaja", "Aeroga IV", "Aeroja", "Blizzaga IV", "Blizzaja", "Stonega IV", "Stoneja"}
 settings = config.load(defaults)
-settings:vprint()
 --This function is called when the addon loads. It is used to
 --create all the tables used and populate them. There are also
 --file checks in case settings or moblist.xml are deleted. This
@@ -222,10 +221,7 @@ function event_addon_command(...)
 						list = list..args[q]
 						if q < #args then list = list..' ' end
 					end
-					write(tm)
-					write(list)
 					if not settings.moblist[tm]:contains(list) then
-						settings:vprint()
 						settings.moblist[tm]:append(list)
 						notice('Now tracking '..tm..' mob '..list)
 					else
