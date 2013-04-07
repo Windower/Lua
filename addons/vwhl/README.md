@@ -8,4 +8,4 @@ Moreover, the important informations are highlighted and a number is added to qu
 
 **Commands:**
 
-1. //cblock test --Fills the chat log to show how the messages will appear
+1. //vwhl test --Fills the chat log to show how the messages will appear
