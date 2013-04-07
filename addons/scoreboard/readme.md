@@ -1,5 +1,5 @@
 Author: Suji
-Version: 0.3b
+Version: 0.4b
 Addon to show alliance DPS and damage in real time.
 Abbreviation: //sb
 
@@ -15,8 +15,6 @@ Notable features:
 
 DPS accumulation is active whenever anyone in your alliance is currently
 in battle.
-
-See data/settings.xml for additional configuration options.
 
 All in-game commands are prefixed with "//sb" or "//scoreboard", for
 example: "//sb help".
@@ -51,7 +49,14 @@ Command list:
 * CLEAR
   Clears all mobs from the filter.
 
-  
+The settings file, located in addons/scoreboard/data/settings.xml, contains
+additional configuration options:
+* posX - x coordinate for position
+* posY - y coordinate for position
+* numPlayers - The maximum number of players to display damage for
+* bgTransparency - Transparency level for the background. 0-255 range
+
+
 Caveats:
 * DPS is an approximation, although I tested it manually and found it to
   be very accurate. Because DPS accumulation is based on the game's notion
