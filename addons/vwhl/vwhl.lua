@@ -74,7 +74,13 @@ function event_addon_command(cmd)
 end
 
 function event_incoming_text(original, modified, mode)
-    if modified:match('vulnerable') then
+    --[[todo: fill with vw messages stream id
+    if ( mode != 0 ) then
+        return modified, mode
+    end
+    ]]
+    
+    if modified:match('The fiend appears') then
         if modified:match('extremely vulnerable') then
             modified = modified:gsub('extremely vulnerable', '\30\02extremely vulnerable (5)\30\01')
         elseif modified:match('highly vulnerable') then
@@ -140,7 +146,7 @@ function event_incoming_text(original, modified, mode)
             :gsub('blood pacts', '\30\02blood pacts\30\01')
 
         return '>>> '..modified, 4
-    elseif modified:match('points faibles') then
+    elseif modified:match('L\'un des points faibles') then
         if modified:match('points faibles critiques') then
             modified = modified:gsub('points faibles critiques', '\30\02points faibles critiques (5)\30\01')
         elseif modified:match('points faibles majeurs') then
@@ -215,7 +221,7 @@ function event_incoming_text(original, modified, mode)
             :gsub('pacte de sang', '\30\02pacte de sang\30\01')
 
         return '>>> '..modified, 4
-    elseif modified:match('anfällig') then
+    elseif modified:match('Das Monster ist nun') then
         if modified:match('ganz besonders anfällig') then
             modified = modified:gsub('ganz besonders anfällig', '\30\02ganz besonders anfällig (5)\30\01')
         elseif modified:match('besonders anfällig') then
