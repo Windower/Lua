@@ -1,5 +1,4 @@
 --[[
-ohShi v1.4
 Copyright (c) 2013, Ricky Gall
 All rights reserved.
 
@@ -26,43 +25,47 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
+
+_addon = {}
+_addon.name = 'OhShi'
+_addon.version = '2.0'
+
 --Requiring libraries used in this addon
 --These should be saved in addons/libs
 require 'tablehelper'
+require 'stringhelper'
+require 'logger'
 local config = require 'config'
 local files = require 'filehelper'
 
+
 --Declaring default settings
 local defaults = T{}
-local defcomm = T{}
-defaults.posx = 300
-defcomm.posx = 'X value where upper left-hand corner starts'
-defaults.posy = 300
-defcomm.posy = 'Y value where upper left-hand corner starts'
-defaults.bgalpha = 200
-defcomm.bgalpha = 'Transparency of the background'
-defaults.bgred = 0
-defcomm.bgred = 'Red of the background (default: 0)'
-defaults.bggreen = 0
-defcomm.bggreen = 'Green of the background (default: 0)'
-defaults.bgblue = 0
-defcomm.bgblue = 'Blue of the background (default: 0)'
-defaults.textfont = 'Arial'
-defcomm.textfont = 'Font the text box uses (default: Arial)'
-defaults.textsize = 12
-defcomm.textsize = 'Font size {default: 12)'
-defaults.textred = 255
-defcomm.textred = 'Red of the background (default: 255)'
-defaults.textgreen = 255
-defcomm.textgreen = 'Green of the background (default: 255)'
-defaults.textblue = 255
-defcomm.textblue = 'Blue of the text (default: 255)'
-defaults.duration = 7
-defcomm.duration = 'Duration the warning stays on the screen in seconds (default: 7)'
-defaults.staggeronly = 'false'
-defcomm.staggeronly = 'Whether or not the addon will only show VW stagger info/lights (default: false)'
-settings = config.load('data/ohshi-settings.xml',defaults)
-
+defaults.bggreen = 0				
+defaults.posx = 300					
+defaults.bgalpha = 200			
+defaults.textsize = 12			
+defaults.posy = 300					
+defaults.textfont = 'Arial'		
+defaults.textred = 255			
+defaults.textgreen = 255		
+defaults.staggeronly = false
+defaults.bgred = 0					
+defaults.textblue = 255			
+defaults.duration = 7			
+defaults.bgblue = 0	
+defaults.moblist = T{}
+defaults.moblist['voidwatch'] = T{"Qilin", "Celaeno", "Morta", "Bismarck", "Ig-Alima", "Kalasutrax", "Ocythoe", "Gaunab", "Hahava", "Cherufe", "Botulus Rex", "Taweret", "Agathos", "Goji", "Gugalanna", "Gasha", "Giltine", "Mellonia", "Kaggen", "Akvan", "Pil", "Belphoebe", "Kholomodumo", "Aello", "Uptala", "Sarbaz", "Shah", "Wazir", "Asb", "Rukh", "Provenance Watcher"}
+defaults.moblist['abyssea'] = T{"Alfard", "Orthrus", "Carabosse", "Glavoid", "Isgebind"}
+defaults.moblist['legion'] = T{"Veiled", "Lofty", "Soaring", "Mired", "Paramount"}
+defaults.moblist['meebles'] = T{"Goldwing", "Silagilith", "Surtr", "Dreyruk", "Samursk", "Umagrhk", "Izyx", "Grannus", "Svaha", "Melisseus"}
+defaults.moblist['other'] = T{"Tiamat", "Khimaira", "Khrysokhimaira", "Cerberus", "Dvergr", "Bloodthirsty", "Hydra", "Enraged", "Odin"}
+defaults.moblist['dangerous'] = T{"Provenance Watcher", "Apademak"}
+defaults.dangerwords = T{}
+defaults.dangerwords['weaponskills'] = T{"Zantetsuken", "Geirrothr", "Astral Flow", "Chainspell", "Beastruction", "Mandible Massacre", "Oblivion's Mantle", "Divesting Gale", "Frog", "Danse", "Raksha Stance", "Yama's", "Ballistic Kick", "Eradicator", "Arm Cannon", "Gorge", "Extreme Purgitation", "Slimy Proposal", "Rancid Reflux", "Provenance Watcher starts", "Pawn's Penumbra", "Gates", "Fulmination", "Nerve", "Thundris"}
+defaults.dangerwords['spells'] = T{"Death", "Meteor", "Kaustra", "Breakga", "Thundaga IV", "Thundaja", "Firaga IV", "Firaja", "Aeroga IV", "Aeroja", "Blizzaga IV", "Blizzaja", "Stonega IV", "Stoneja"}
+settings = config.load(defaults)
+settings:vprint()
 --This function is called when the addon loads. It is used to
 --create all the tables used and populate them. There are also
 --file checks in case settings or moblist.xml are deleted. This
@@ -72,38 +75,32 @@ function event_load()
 	tracking = {}
 	mobs = {}
 	prims = {}
-	mlist = {}
 	spells = {}
 	jobAbilities = {}
 	color2 = ''
 	cres = ''
-	setFName = 'data/ohshi-settings.xml'
-	mobFName = 'data/ohshi-moblist.xml'
+	setFName = 'data/settings.xml'
 	speFName = '../../plugins/resources/spells.xml'
 	jaFName = '../../plugins/resources/abils.xml'
 	maFName = '../libs/resources/mabils.xml'
 	player = get_player()
 	setFile = files.new(setFName)
-	mobFile = files.new(mobFName)
 	speFile = files.new(speFName)
 	jaFile = files.new(jaFName)
 	maFile = files.new(maFName)
+	settings = config.load(setFName,defaults)
 	if not setFile:exists() then
 		firstrun = 1
 		createDefaults('settings')
-	end
-	if not mobFile:exists() then
-		createDefaults('mobList')
 	end
 	-- Parse the resources and fill tables with the info.
 	spells = parse_resources(speFile:readlines())
 	jobAbilities = parse_resources(jaFile:readlines())
 	mobAbilities = parse_resources(maFile:readlines())
-	mlist = fill_moblist(mobFile:readlines())
-	settings = config.load(setFName)
 	send_command('alias ohShi lua c ohshi') --For addon commands
 	if firstrun == 1 then send_command('ohShi help') end --If first run show the help menu
 	send_command('wait 1;ohshi create')
+	deleteoldsettings()
 end
 
 --Used when the addon is unloaded to save settings and
@@ -127,106 +124,208 @@ function event_addon_command(...)
 		comm = args[1]:lower()
 		list = ''
 		if comm == 'help' then
-			add_to_chat(55,' ohShi loaded! You have access to the following commands:')
-			add_to_chat(55,' 1. ohShi bgcolor <alpha> <red> <green> <blue> --Sets the color of the box.')
-			add_to_chat(55,' 2. ohShi text <red> <green> <blue> --Sets text color.')
-			add_to_chat(55,' 2. ohShi font <size> <name> --Sets text font and size.')
-			add_to_chat(55,' 3. ohShi pos <posx> <posy> --Sets position of box.')
-			add_to_chat(55,' 4. ohShi duration <seconds> --Sets the timeout on the notices.')
-			add_to_chat(55,' 5. ohShi track <vw/legion/other/abyssea/meebles/dangerous> <mobname> --Adds mob to the tracking list.')
-			add_to_chat(55,'    --using dangerous will cause every tp move/spell to flash the warning')
-			add_to_chat(55,' 6. ohShi danger <spell/ws> <dangerword> --Adds danger word to list.')
-			add_to_chat(55,' 7. ohShi staggeronly (true/false) --Switches on/off stagger only mode.')
-			add_to_chat(55,' 8. ohShi unload <all/one> --Save settings all(global) or one(character - default) and close ohShi.')
-			add_to_chat(55,' 9. ohShi help --Shows this menu.')
+			notice('Addon loaded! You have access to the following commands with the //ohshi alias:')
+			notice(' 1. bgcolor <alpha> <red> <green> <blue> --Sets the color of the box.')
+			notice(' 2. text <red> <green> <blue> --Sets text color.')
+			notice(' 2. font <size> <name> --Sets text font and size.')
+			notice(' 3. pos <posx> <posy> --Sets position of box.')
+			notice(' 4. duration <seconds> --Sets the timeout on the notices.')
+			notice(' 5. track <vw/legion/other/abyssea/meebles/dangerous> <mobname> --Adds mob to the tracking list.')
+			notice(' -- Using dangerous will cause every tp move/spell to flash the warning.')
+			notice(' 6. untrack <vw/legion/other/abyssea/meebles/dangerous> <mobname> --Removes mob from the tracking list.')
+			notice(' 7. danger <spell/ws> <dangerword> --Adds danger word to list.')
+			notice(' 8. staggeronly (true/false) --Switches on/off stagger only mode.')
+			notice(' 9. unload <all/one> --Save settings all(global) or one(character) and close ohShi.')
+			notice('10. help --Shows this menu.')
 		elseif comm == 'create' then
-			ohShi_set()
+			ohShi_SetUp()
 		elseif comm == 'unload' then
 			unloadtype = args[2] or 'one'
 			send_command('lua u ohshi')
 		elseif comm == 'bgcolor' then
-			tb_set_bg_color('ohShi',args[2],args[3],args[4],args[5])
-			settings['bgalpha'] = args[2]
-			settings['bgred'] = args[3]
-			settings['bggreen'] = args[4]
-			settings['bgblue'] = args[5]
-		elseif comm == 'pos' then
-			tb_set_location('ohShi',args[2],args[3])
-			settings['posx'] = args[2]
-			settings['posy'] = args[3]
-		elseif comm == 'text' then
-			tb_set_color('ohShi',255,args[2],args[3],args[4])
-			settings['textred'] = args[2]
-			settings['textgreen'] = args[3]
-			settings['textblue'] = args[4]
-		elseif comm == 'font' then
-			font = ''
-			local p
-			for p = 3, #args do
-				font = font..args[p]
-				if p < #args then font = font..' ' end
-			end
-			settings['textfont'] = font
-			settings['textsize'] = args[2]
-			tb_set_font('ohShi',font,args[2])
-		elseif comm == 'duration' then
-			settings['duration'] = args[2]
-		elseif comm == 'track' then
-			if args[2] == 'vw' then
-				tm = 'voidwatch'
-			elseif args[2] == 'legion' then
-				tm = 'legion'
-			elseif args[2] == 'other' then
-				tm = 'other'
-			elseif args[2] == 'meebles' then
-				tm = 'meebles'
-			elseif args[2] == 'abyssea' then
-				tm = 'abyssea'
-			elseif args[2] == 'dangerous' then
-				tm = 'dangerous'
-			end
-			if tm ~= nil then
-				local q
-				for q = 3, #args do
-					list = list..args[q]
-					if q < #args then list = list..' ' end
-				end
-				mlist[tm] = mlist[tm]..','..list
+			if args[5] ~= nil then
+				tb_set_bg_color('ohShi',args[2],args[3],args[4],args[5])
+				settings['bgalpha'] = args[2]
+				settings['bgred'] = args[3]
+				settings['bggreen'] = args[4]
+				settings['bgblue'] = args[5]
+				notice('Background color changed.')
+				ohShi_Flash()
 			else
-				add_to_chat(55,'Proper Syntax: //ohShi track <vw/legion/other/abyssea/meebles> <mobname>')
+				error('Improper syntax please use //ohshi help to get a list of commands.')
+			end
+		elseif comm == 'pos' then
+			if args[2] ~= nil and args[3]~= nil then
+				tb_set_location('ohShi',args[2],args[3])
+				settings['posx'] = args[2]
+				settings['posy'] = args[3]
+				notice('Position changed posx: '..args[2].." posy: "..args[3])
+				ohShi_Flash()
+			else
+				error('Improper syntax please use //ohshi help to get a list of commands.')
+			end
+		elseif comm == 'text' then
+			if args[4] ~= nil then
+				tb_set_color('ohShi',255,args[2],args[3],args[4])
+				settings['textred'] = args[2]
+				settings['textgreen'] = args[3]
+				settings['textblue'] = args[4]
+				notice('Text color changed.')
+				ohShi_Flash()
+			else
+				error('Improper syntax please use //ohshi help to get a list of commands.')
+			end
+		elseif comm == 'font' then
+			if args[3] ~= nil then
+				font = ''
+				local p
+				for p = 3, #args do
+					font = font..args[p]
+					if p < #args then font = font..' ' end
+				end
+				settings['textfont'] = font
+				settings['textsize'] = args[2]
+				tb_set_font('ohShi',font,args[2])
+				notice('Font changed size: '..args[2]..' font: '..font)
+				ohShi_Flash()
+			else
+				error('Improper syntax please use //ohshi help to get a list of commands.')
+			end
+		elseif comm == 'duration' then
+			if args[2] ~= nil then
+				settings['duration'] = args[2]
+				notice('Duration: '..args[2])
+				tracking[#tracking+1] = ' ohShi settings updated. '
+				ohShi_refresh()
+				send_command('wait '..args[2]..';ohShi timeout 1')
+			else
+				error('Improper syntax please use //ohshi help to get a list of commands.')
+			end
+		elseif comm == 'track' then
+			if args[3] ~= nil then
+				if args[2] == 'vw' then
+					tm = 'voidwatch'
+				elseif args[2] == 'legion' then
+					tm = 'legion'
+				elseif args[2] == 'other' then
+					tm = 'other'
+				elseif args[2] == 'meebles' then
+					tm = 'meebles'
+				elseif args[2] == 'abyssea' then
+					tm = 'abyssea'
+				elseif args[2] == 'dangerous' then
+					tm = 'dangerous'
+				end
+				if tm ~= nil then
+					local q
+					for q = 3, #args do
+						list = list..args[q]
+						if q < #args then list = list..' ' end
+					end
+					write(tm)
+					write(list)
+					if not settings.moblist[tm]:contains(list) then
+						settings:vprint()
+						settings.moblist[tm]:append(list)
+						notice('Now tracking '..tm..' mob '..list)
+					else
+						error('Already tracking '..tm..' mob '..list)
+					end
+				else
+					error('Improper Syntax: //ohShi track <vw/legion/other/abyssea/meebles> <mobname>')
+				end
+			else
+				error('Improper syntax please use //ohshi help to get a list of commands.')
+			end
+		elseif comm == 'untrack' then
+			if args[3] ~= nil then
+				if args[2] == 'vw' then
+					utm = 'voidwatch'
+				elseif args[2] == 'legion' then
+					utm = 'legion'
+				elseif args[2] == 'other' then
+					utm = 'other'
+				elseif args[2] == 'meebles' then
+					utm = 'meebles'
+				elseif args[2] == 'abyssea' then
+					utm = 'abyssea'
+				elseif args[2] == 'dangerous' then
+					utm = 'dangerous'
+				end
+				if utm ~= nil then
+					local q
+					for q = 3, #args do
+						list = list..args[q]
+						if q < #args then list = list..' ' end
+					end
+					if settings.moblist[utm]:contains(list) then
+						settings.moblist[utm]:delete(list)
+						notice('No longer tracking '..args[2]..' mob '..list)
+					else
+						error('You were not tracking '..tm..' mob '..list)
+					end
+				else
+					error('Improper Syntax: //ohShi untrack <vw/legion/other/abyssea/meebles> <mobname>')
+				end
+			else
+				error('Improper syntax please use //ohshi help to get a list of commands.')
 			end
 		elseif comm == 'danger' then
-			if args[2] == 'spell' then
-				td = 'spells'
-			elseif args[2] == 'ws' then
-				td = 'weaponskills'
-			end
-			if td ~= nil then
-				local r
-				for r = 3, #args do
-					list = list..args[r]
-					if r < #args then list = list..' ' end
+			if args[3] ~= nil then 
+				if args[2] == 'spell' then
+					td = 'spells'
+				elseif args[2] == 'ws' then
+					td = 'weaponskills'
 				end
-				mlist[td] = mlist[td]..','..list
+				if td ~= nil then
+					local r
+					for r = 3, #args do
+						list = list..args[r]
+						if r < #args then list = list..' ' end
+					end
+					if not settings.moblist[tm]:contains(list) then
+						settings.moblist[tm]:append(list)
+						notice('Now tracking '..td..' spell '..list)
+					else
+						error('Already tracking '..td..' spell '..list)
+					end
+				else
+					error('Proper Syntax: //ohShi danger <spell/ws> <dangerword>')
+				end
 			else
-				add_to_chat(55,'Proper Syntax: //ohShi danger <spell/ws> <dangerword>')
+				error('Improper syntax please use //ohshi help to get a list of commands.')
 			end
 		elseif comm == 'warnoff' then
 			table.remove(prims,1)
 			prim_delete(args[2])
 		elseif comm == 'timeout' then
-			table.remove(tracking,1)
-			ohShi_refresh()
+			if args[2] == nil then
+				table.remove(tracking,1)
+				ohShi_refresh()
+			else
+				for q = 1, #tracking do
+					if tracking[q] ==  ' ohShi settings updated. ' then
+						table.remove(tracking,q)
+						ohShi_refresh()
+					end
+				end
+			end
 		elseif comm == 'staggeronly' then
-			settings['staggeronly'] = args[2]
+			if args[2] == 'true' or args[2] == 'false' then
+				settings['staggeronly'] = args[2]
+				notice('Stagger only mode: '..args[2])
+			else
+				error('Improper syntax please use //ohshi help to get a list of commands.')
+			end
 		else
+			error('Improper syntax please use //ohshi help to get a list of commands.')
 			return
 		end
 	end
 end
 
 --Set up the tracker text box
-function ohShi_set()
+function ohShi_SetUp()
 	tb_create('ohShi')
 	if firstrun == 1 then 
 		tb_set_text('ohShi','ohShi')
@@ -241,6 +340,14 @@ function ohShi_set()
 	end
 end
 
+--Flashes the ohShi text whenever you change a setting related to
+--the textbox
+function ohShi_Flash()
+	local where = #tracking + 1
+	tracking[where] = ' ohShi settings updated. '
+	ohShi_refresh()
+	send_command('wait 2;ohShi timeout '..where)
+end
 --Function to refresh the list to keep it up to date.
 function ohShi_refresh()
 	text = ''
@@ -255,13 +362,12 @@ end
 
 --Clean up for when the addon is unloading
 function ohShi_delete()
-	add_to_chat(55,'ohShi closing and saving settings')
+	notice('Closing and saving settings.')
 	if unloadtype == 'all' then
 		settings:save('all')
 	else
 		settings:save()
 	end
-	save_moblist()
 	local h
 	for h = 1, #prims do
 		prim_delete(prims[h])
@@ -272,18 +378,17 @@ end
 
 --This function checks the string sent to it against your mob list
 --returns true if it's found and false if not.
-function mobcheck(name)
-	for r,s in pairs(mlist) do
-		local h = split(mlist[r],',')
-		for inc = 1, #h do
-			local z,y,x = string.find(name:lower(),'('..h[inc]:lower()..')')
-			if x ~= nil then
-				if r == 'dangerous' then
+function mobcheck(tr)
+	for category,names in pairs(settings.moblist) do
+		for inc = 1, #settings.moblist[category] do
+			local beg,endi,cap = string.find(tr:lower(),'('..settings.moblist[category][inc]:lower()..')')
+			if cap ~= nil then
+				if category == 'dangerous' then
 					color2 = '\\cs(255,100,100)'
 					cres = '\\cr'
 					fi = true
 				end
-				return true
+			return true
 			end
 		end
 	end
@@ -293,11 +398,10 @@ end
 --This function checks the string sent to it against your danger list
 --returns true if it's found and false if not.
 function dangercheck(ts)
-	for r,s in pairs(mlist) do
-		local h = split(mlist[r],',')
-		for inc = 1, #h do
-			local z,y,x = string.find(ts:lower(),'('..h[inc]:lower()..')')
-			if x ~= nil then
+	for category,names in pairs(settings.dangerwords) do
+		for inc = 1, #settings.dangerwords[category] do
+			local beg,endi,cap = string.find(ts:lower(),'('..settings.dangerwords[category][inc]:lower()..')')
+			if cap ~= nil then
 				return true
 			end
 		end
@@ -305,11 +409,12 @@ function dangercheck(ts)
 	return false
 end
 
+--This event happens when an action packet is received.
 function event_action(act)
 	color2 = '' -- set the color back to 0 in case it carried over
 	cres = '' -- set reset back to 0 in case it carried over
 	--Make sure the stagger only mode isn't on
-	if settings['staggeronly'] ~= 'true' then
+	if not settings.staggeronly then
 		--Category 6 is job abilities. This portion of the function gets the
 		--job ability name by taking the ja_id and checking it against the
 		--job abilities table. After making sure the ability used is a cor roll
@@ -320,8 +425,8 @@ function event_action(act)
 				local rolling = jobAbilities[tonumber(act['param'])]['english']
 				local roller = get_mob_by_id(act['actor_id'])['name']
 				allyroller = false
-				for r,s in pairs(party) do
-					if s['name'] == roller then
+				for pt,member in pairs(party) do
+					if member['name'] == roller then
 						allyroller = true
 						break
 					end
@@ -339,7 +444,7 @@ function event_action(act)
 		--gets the ability id of the tp move being used and (after subtracting 256
 		--due to it being offset, compares it against the abilities table. Then checks
 		--it against your danger words and the user against your moblist.
-		if act['category'] == 7 then
+		if act['category'] == 7 and isMob(tonumber(act['actor_id'])) then
 			local num = tonumber(act['targets'][1]['actions'][1]['param']) - 256
 			if num == nil then return end
 			local wesk = mobAbilities[num]['english'] or 'antidisestablishmentarianism'
@@ -359,7 +464,7 @@ function event_action(act)
 		end
 		
 		--Category 8 is spell casting
-		if act['category'] == 8 and tonumber(act['targets'][1]['actions'][1]['message']) ~= 16 then
+		if act['category'] == 8 and tonumber(act['targets'][1]['actions'][1]['message']) ~= 16 and isMob(tonumber(act['actor_id'])) then
 			--Get the name of the spell by taking the spell id and going through the spells table
 			local spell = spells[tonumber(act['targets'][1]['actions'][1]['param'])]['english']
 			fi = false
@@ -396,6 +501,7 @@ function event_action(act)
 	end
 end
 
+--This event happens whenever text s incoming tot he chatlog
 function event_incoming_text(old,new,color)
 	--<mob> is no longer stunned.
 	local start3,end3,mobname3,debuff1 = string.find(old,'([%w%s]+) is no longer (%w+)%p')
@@ -415,7 +521,7 @@ function event_incoming_text(old,new,color)
 	color2 = ''
 	cres = ''
 	fi = false
-	if staggeronly ~= 'true' then
+	if not settings.staggeronly then
 		if mobname3 ~= nil then
 			if mobcheck(mobname3) then line = " "..mobname3..' is no longer '..debuff1..'. ' end
 		end
@@ -483,47 +589,45 @@ function flashimage()
 	send_command('wait '..settings['duration']..';ohShi warnoff '..name)
 end
 
---This function fills the mob list with the values from the moblist.xml
-function fill_moblist(file_lines)
-	local compTable = {}
-	for i in ipairs(file_lines) do
-		local line2 = file_lines[i]
-		local g,h,key,value = string.find(line2,'<(%w+)>(.+)</%1>')
-		if value ~= nil then
-			compTable[key] = value
-		end
+--Check if the actor is actually an npc rather than a player
+function isMob(id)
+	if get_mob_by_id(id)['is_npc'] == 1 then
+		return true
 	end
-	return compTable
+	return false
 end
 
 --This function is used to parse the windower resources
---to fill tables with ability/spell names/ids
+--to fill tables with ability/spell names/ids.
+--Created by Byrth
 function parse_resources(lines_file)
-	local completed_table = {}
-	local counter = 0
-	for i in ipairs(lines_file) do
-		local str = tostring(lines_file[i])
-		local g,h,key = string.find(str,'<%w+ id="(%d+)" ')
-		if key ~=nil then
-			completed_table[tonumber(key)]={}
-			local q = 1
-			while q <= str:len() do
-				local a,b,ind,val = string.find(str,'(%w+)="([^"]+)"',q)
-				if ind~=nil then
-					completed_table[tonumber(key)][ind] = val:gsub('&quot;','\42'):gsub('&apos;','\39')
-					q = b+1
-				else
-					q = str:len()+1
+		local completed_table = {}
+		local counter = 0
+		for i in ipairs(lines_file) do
+				local str = tostring(lines_file[i])
+				local g,h,typ,key = string.find(str,'<(%w+) id="(%d+)" ')
+				if typ == 's' then
+						g,h,key = string.find(str,'index="(%d+)" ')
 				end
-			end
-			local k,v,english = string.find(str,'>([^<]+)</')
-			if english~=nil then
-				completed_table[tonumber(key)]['english']=english
-			end
+				if key ~=nil then
+						completed_table[tonumber(key)]={}
+						local q = 1
+						while q <= str:len() do
+								local a,b,ind,val = string.find(str,'(%w+)="([^"]+)"',q)
+								if ind~=nil then
+										completed_table[tonumber(key)][ind] = val:gsub('&quot;','\42'):gsub('&apos;','\39')
+										q = b+1
+								else
+										q = str:len()+1
+								end
+						end
+						local k,v,english = string.find(str,'>([^<]+)</')
+						if english~=nil then
+								completed_table[tonumber(key)]['english']=english
+						end
+				end
 		end
-	end
-
-	return completed_table
+		return completed_table
 end
 
 --Creates the default settings/moblist in case they have been deleted
@@ -534,51 +638,24 @@ function createDefaults(tystr)
 		f1:append("<!--File Created by ohShi.lua-->\n")
 		f1:append("\t<settings>")
 		f1:append("\t\t<global>")
-		for r,s in pairs(settings) do
-			f1:append("\t\t\t<"..r..">"..s.."</"..r..">\t<!--"..defcomm[r].."-->")
-		end
 		f1:append("\t\t</global>")
 		f1:append("\t</settings>")
+		settings:save('all')
 	end 
-	if tystr == 'mobList' then
-		local f2 = files.new(mobFName)
-		f2:write("<?xml version=\"1.0\"?>")
-		f2:append("<!--File Created by ohShi.lua-->\n")
-		f2:append("\t<mobList>")
-		f2:append("\t\t<voidwatch>Qilin,Celaeno,Morta,Bismarck,Ig-Alima,Kalasutrax,Ocythoe,Gaunab,Hahava,Cherufe,Botulus Rex,Taweret,Agathos,Goji,Gugalanna,Gasha,Giltine,Mellonia,Kaggen,Akvan,Pil,Belphoebe,Kholomodumo,Aello,Uptala,Sarbaz,Shah,Wazir,Asb,Rukh,Provenance Watcher</voidwatch>")
-		f2:append("\t\t<legion>Veiled,Lofty,Soaring,Mired,Paramount</legion>")
-		f2:append("\t\t<other>Tiamat,Khimaira,Khrysokhimaira,Cerberus,Dvergr,Bloodthirsty,Hydra,Enraged,Odin</other>")
-		f2:append("\t\t<meebles>Goldwing,Silagilith,Surtr,Dreyruk,Samursk,Umagrhk,Izyx,Grannus,Svaha,Melisseus</meebles>")
-		f2:append("\t\t<abyssea>Alfard,Orthrus,Carabosse,Glavoid,Isgebind</abyssea>")
-		f2:append("\t\t<dangerous>Provenance Watcher,Apademak</dangerous>")
-		f2:append("\t</mobList>")
-		f2:append("\t<dangerwords>")
-		f2:append("\t\t<spells>Death,Meteor,Kaustra,Breakga,Thundaga IV,Thundaja,Firaga IV,Firaja,Aeroga IV,Aeroja,Blizzaga IV,Blizzaja,Stonega IV,Stoneja</spells>")
-		f2:append("\t\t<weaponskills>Zantetsuken,Geirrothr,Astral Flow,Chainspell,Beastruction,Mandible Massacre,Oblivion's Mantle,Divesting Gale,Frog,Danse,Raksha Stance,Yama's,Ballistic Kick,Eradicator,Arm Cannon,Gorge,Extreme Purgitation,Slimy Proposal,Rancid Reflux,Provenance Watcher starts,Pawn's Penumbra,Gates,Fulmination,Nerve,Thundris</weaponskills>")
-		f2:append("\t</dangerwords>")
-	end
 end
 
---Save the stored moblist to a file on exit.
-function save_moblist()
-	local f, fname = files.new(mobFName)
-	f:write("<?xml version=\"1.0\"?>")
-	f:append("<!--File Created by ohShi.lua-->\n")
-	f:append("\t<mobList>")
-	f:append("\t\t<voidwatch>"..mlist['voidwatch'].."</voidwatch>")
-	f:append("\t\t<legion>"..mlist['legion'].."</legion>")
-	f:append("\t\t<other>"..mlist['other'].."</other>")
-	f:append("\t\t<meebles>"..mlist['meebles'].."</meebles>")
-	f:append("\t\t<abyssea>"..mlist['abyssea'].."</abyssea>")
-	f:append("\t\t<dangerous>"..mlist['dangerous'].."</dangerous>")
-	f:append("\t</mobList>")
-	f:append("\t<dangerwords>")
-	f:append("\t\t<spells>"..mlist['spells'].."</spells>")
-	f:append("\t\t<weaponskills>"..mlist['weaponskills'].."</weaponskills>")
-	f:append("\t</dangerwords>")
+--This function is only used to delete old unused settings files
+function deleteoldsettings()
+	path = lua_base_path..'data/'
+	local do1,err1 = os.remove(path..'ohshi-settings.xml')
+	local do2,err2 = os.remove(path..'ohshi-moblist.xml')
+	local do3,err3 = os.remove(path..'moblist.xml')
+	if not do1 then end
+	if not do2 then end
+	if not do3 then end
 end
 
---This function was made by byrth. It's used to split strings
+--This function was made by Byrth. It's used to split strings
 --at a specific character and store them in a table
 function split(msg, match)
 	if msg == nil then return '' end
