@@ -29,8 +29,25 @@ end
 _libs = _libs or {}
 _libs.actionhelper = true
 
-local action = {}
 
+local category_strings = {
+	'melee',
+	'ranged_finish',
+	'weaponskill_finish',
+	'spell_finish',
+	'item_finish',
+	'job_ability',
+	'weaponskill_begin',
+	'casting_begin',
+	'item_begin',
+	'unknown',
+	'mob_tp_finish',
+	'ranged_begin',
+	'unknown',
+	'job_ability_unblinkable'
+}
+
+local action = {}
 -- Constructor for Actions.
 -- Usage: action = Action(raw_action)
 function Action(a)
@@ -41,29 +58,11 @@ function Action(a)
 	local new_instance = {}
 	new_instance.raw = a
 	
-	-- Sets Action's metatable's index to the table namespace
 	return setmetatable(new_instance, {__index = action})
 end
 
 
 function action.get_category_string(self)
-	-- This mapping is defined here for now due to this bug:
-	-- https://github.com/Windower/Lua/issues/94
-	local category_strings = {
-		[1] = 'melee',
-		[2] = 'ranged_finish',
-		[3] = 'weaponskill_finish',
-		[4] = 'spell_finish',
-		[5] = 'item_finish',
-		[6] = 'job_ability',
-		[7] = 'weaponskill_begin',
-		[8] = 'casting_begin',
-		[9] = 'item_begin',
-		[11] = 'mob_tp_finish',
-		[12] = 'ranged_begin',
-		[14] = 'job_ability_unblinkable'
-	}
-
 	return category_strings[self.raw['category']]
 end
 
@@ -105,7 +104,6 @@ function Target(t)
 	local new_instance = {}
 	new_instance.raw = t
 	
-	-- Sets Action's metatable's index to the table namespace
 	return setmetatable(new_instance, {__index = target})
 end
 

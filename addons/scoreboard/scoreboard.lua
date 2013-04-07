@@ -50,6 +50,7 @@ local default_settings_file = [[
 </settings>
 ]]
 
+
 -- Handle addon args
 function event_addon_command(...)
   local params = {...};
@@ -74,7 +75,23 @@ function event_addon_command(...)
 		elseif params[1]:lower() == "reset" then
 			initialize()
 		elseif params[1]:lower() == "report" then
-			report_summary()
+			local arg = params[2]
+			local arg2 = params[3]
+			
+			if arg then
+				if T{'s', 'l', 'p', 't'}:contains(arg) then
+					if arg2 and not arg2:match('^[a-zA-Z]+$') then
+						-- should be a valid player name
+						error('Invalid argument for report t: ' .. arg2)
+						return
+					end
+				else
+					error('Invalid parameter passed to report: ' .. arg)
+					return
+				end
+			end
+			
+			report_summary(arg, arg2)
 		elseif params[1]:lower() == "filters" then
 			local mob_str
 			if mob_filter:isempty() then
@@ -201,15 +218,7 @@ function actor_is_party_member(action)
 end
 
 
-local last_action_packet = nil
 function event_action(raw_action)
-	if last_action_packet and T(raw_action):equals(last_action_packet) then
-		last_action_packet = raw_action
-		return
-	else
-		last_action_packet = raw_action
-	end
-	
 	local action = Action(raw_action)
 	local category = action:get_category_string()
 	
@@ -287,7 +296,6 @@ function event_unload()
 	tb_delete('scoreboard')
 end
 
-
 -- Adds the given data to the main DPS table
 function accumulate(mob, player, damage)
 	local active_party = get_active_party()
@@ -306,7 +314,6 @@ function accumulate(mob, player, damage)
 	else
 		dps_db[mob][player] = damage + dps_db[mob][player] 
 	end
-	
 end
 
 
@@ -373,6 +380,21 @@ function get_sorted_player_damage()
 	return sortable, total_damage
 end
 
+-- Convert integer seconds into a "HhMmSs" string
+function seconds_to_hms(seconds)
+	hours = math.floor(seconds / 3600)
+	seconds = seconds - hours * 3600
+
+	minutes = math.floor(seconds / 60)
+	seconds = seconds - minutes * 60
+	
+	local hours_str    = hours > 0 and hours .. "h" or ""
+	local minutes_str  = minutes > 0 and minutes .. "m" or ""
+	local seconds_str  = seconds and seconds .. "s" or ""
+	
+	return hours_str .. minutes_str .. seconds_str
+end
+
 
 -- Returns the string for the scoreboard header with updated info
 -- about current mob filtering and whether or not time is currently
@@ -402,7 +424,7 @@ function build_scoreboard_header()
 
 	local dps_clock_str = ''
 	if dps_active or dps_clock > 1 then
-		dps_clock_str = string.format(" (%ds)", dps_clock)
+		dps_clock_str = string.format(" (%s)", seconds_to_hms(dps_clock))
 	end
 	return string.format("DPS: %s%s\nMobs: %-9s\n%s",  dps_status, dps_clock_str, mob_filter_str, labels)
 end
@@ -430,7 +452,9 @@ function update_scoreboard()
 end
 
 
-function report_summary ()
+function report_summary (...)
+	local chatmode, tell_target = table.unpack({...})
+	
 	local damage_table, total_damage
 	damage_table, total_damage = get_sorted_player_damage()
 	local max_line_length = 127 -- game constant
@@ -454,7 +478,14 @@ function report_summary ()
 	end
 
 	-- Send the report to the current chatmode
-	send_command('input ' .. table.concat(display_table, ', '))
+	local input_cmd = 'input '
+	if chatmode then
+		input_cmd = input_cmd .. '/' .. chatmode .. ' '
+		if tell_target then
+			input_cmd = input_cmd .. tell_target .. ' '
+		end
+	end
+	send_command(input_cmd .. table.concat(display_table, ', '))
 end
 
 
