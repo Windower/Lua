@@ -70,7 +70,7 @@ settings = config.load(defaults)
 --file checks in case settings or moblist.xml are deleted. This
 --is also where the file objects for resources files are created.
 function event_load()
-	error('Auto-save settings are broken atm. Please edit the data/settings.xml with your settings.')
+	notice('Addon Loaded.')
 	firstrun = 0
 	tracking = {}
 	mobs = {}
@@ -86,7 +86,7 @@ function event_load()
 	speFile = files.new(speFName)
 	jaFile = files.new(jaFName)
 	maFile = files.new(maFName)
-	--settings:save()
+	settings:save()
 	-- Parse the resources and fill tables with the info.
 	spells = parse_resources(speFile:readlines())
 	jobAbilities = parse_resources(jaFile:readlines())
@@ -139,10 +139,10 @@ function event_addon_command(...)
 		elseif comm == 'bgcolor' then
 			if args[5] ~= nil then
 				tb_set_bg_color('ohShi',args[2],args[3],args[4],args[5])
-				settings['bgalpha'] = args[2]
-				settings['bgred'] = args[3]
-				settings['bggreen'] = args[4]
-				settings['bgblue'] = args[5]
+				settings['bgalpha'] = tonumber(args[2])
+				settings['bgred'] = tonumber(args[3])
+				settings['bggreen'] = tonumber(args[4])
+				settings['bgblue'] = tonumber(args[5])
 				notice('Background color changed.')
 				ohShi_Flash()
 			else
@@ -151,8 +151,8 @@ function event_addon_command(...)
 		elseif comm == 'pos' then
 			if args[2] ~= nil and args[3]~= nil then
 				tb_set_location('ohShi',args[2],args[3])
-				settings['posx'] = args[2]
-				settings['posy'] = args[3]
+				settings['posx'] = tonumber(args[2])
+				settings['posy'] = tonumber(args[3])
 				notice('Position changed posx: '..args[2].." posy: "..args[3])
 				ohShi_Flash()
 			else
@@ -161,9 +161,9 @@ function event_addon_command(...)
 		elseif comm == 'text' then
 			if args[4] ~= nil then
 				tb_set_color('ohShi',255,args[2],args[3],args[4])
-				settings['textred'] = args[2]
-				settings['textgreen'] = args[3]
-				settings['textblue'] = args[4]
+				settings['textred'] = tonumber(args[2])
+				settings['textgreen'] = tonumber(args[3])
+				settings['textblue'] = tonumber(args[4])
 				notice('Text color changed.')
 				ohShi_Flash()
 			else
@@ -178,7 +178,7 @@ function event_addon_command(...)
 					if p < #args then font = font..' ' end
 				end
 				settings['textfont'] = font
-				settings['textsize'] = args[2]
+				settings['textsize'] = tonumber(args[2])
 				tb_set_font('ohShi',font,args[2])
 				notice('Font changed size: '..args[2]..' font: '..font)
 				ohShi_Flash()
@@ -187,7 +187,7 @@ function event_addon_command(...)
 			end
 		elseif comm == 'duration' then
 			if args[2] ~= nil then
-				settings['duration'] = args[2]
+				settings['duration'] = tonumber(args[2])
 				notice('Duration: '..args[2])
 				tracking[#tracking+1] = ' ohShi settings updated. '
 				ohShi_refresh()
@@ -295,7 +295,7 @@ function event_addon_command(...)
 				ohShi_refresh()
 			else
 				for q = 1, #tracking do
-					if tracking[q] ==  ' ohShi settings updated. ' then
+					if tracking[q] ==  ' ohShi settings updated. ' or tracking[q] == ' ohShi initialized. ' then
 						table.remove(tracking,q)
 						ohShi_refresh()
 					end
@@ -325,13 +325,17 @@ function ohShi_SetUp()
 		tb_set_location('ohShi',settings['posx'],settings['posy'])
 		tb_set_visibility('ohShi',true)
 	end
+	if firstrun == 0 then
+		ohShi_Flash(' ohShi initialized. ')
+	end
 end
 
 --Flashes the ohShi text whenever you change a setting related to
 --the textbox
-function ohShi_Flash()
+function ohShi_Flash(str)
+	str = str or ' ohShi settings updated. '
 	local where = #tracking + 1
-	tracking[where] = ' ohShi settings updated. '
+	tracking[where] = str
 	ohShi_refresh()
 	send_command('wait 2;ohShi timeout '..where)
 end
@@ -349,13 +353,13 @@ end
 
 --Clean up for when the addon is unloading
 function ohShi_delete()
-	--notice('Closing and saving settings.')
-	--[[settings = config.load(settings)
+	notice('Closing and saving settings.')
+	--settings = config.load(settings)
 	if unloadtype == 'all' then
 		settings:save('all')
 	else
 		settings:save()
-	end]]
+	end
 	local h
 	for h = 1, #prims do
 		prim_delete(prims[h])

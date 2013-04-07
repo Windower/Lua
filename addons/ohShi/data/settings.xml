@@ -9,7 +9,7 @@
 			<spells>Aeroga IV, Aeroja, Blizzaga IV, Blizzaja, Breakga, Death, Firaga IV, Firaja, Kaustra, Meteor, Stonega IV, Stoneja, Thundaga IV, Thundaja</spells>
 			<weaponskills>Arm Cannon, Astral Flow, Ballistic Kick, Beastruction, Chainspell, Danse, Divesting Gale, Eradicator, Extreme Purgitation, Frog, Fulmination, Gates, Geirrothr, Gorge, Mandible Massacre, Nerve, Oblivion's Mantle, Pawn's Penumbra, Provenance Watcher starts, Raksha Stance, Rancid Reflux, Slimy Proposal, Thundris, Yama's, Zantetsuken</weaponskills>
 		</dangerwords>
-		<duration>7</duration>
+		<duration>8</duration>
 		<moblist>
 			<abyssea>Alfard, Carabosse, Glavoid, Isgebind, Orthrus</abyssea>
 			<dangerous>Apademak, Provenance Watcher</dangerous>
@@ -18,7 +18,7 @@
 			<other>Bloodthirsty, Cerberus, Dvergr, Enraged, Hydra, Khimaira, Khrysokhimaira, Odin, Tiamat</other>
 			<voidwatch>Aello, Agathos, Akvan, Asb, Belphoebe, Bismarck, Botulus Rex, Celaeno, Cherufe, Gasha, Gaunab, Giltine, Goji, Gugalanna, Hahava, Ig-Alima, Kaggen, Kalasutrax, Kholomodumo, Mellonia, Morta, Ocythoe, Pil, Provenance Watcher, Qilin, Rukh, Sarbaz, Shah, Taweret, Uptala, Wazir</voidwatch>
 		</moblist>
-		<posx>300</posx>
+		<posx>400</posx>
 		<posy>300</posy>
 		<staggeronly>false</staggeronly>
 		<textblue>255</textblue>
