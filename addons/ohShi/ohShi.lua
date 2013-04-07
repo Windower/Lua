@@ -94,7 +94,6 @@ function event_load()
 	if firstrun == 1 then send_command('ohShi help') end --If first run show the help menu
 	send_command('wait 1;ohshi create')
 	deleteoldsettings()
-	settings:vprint()
 end
 
 --Used when the addon is unloaded to save settings and
@@ -354,6 +353,7 @@ end
 --Clean up for when the addon is unloading
 function ohShi_delete()
 	notice('Closing and saving settings.')
+	settings = config.load(settings)
 	if unloadtype == 'all' then
 		settings:save('all')
 	else
