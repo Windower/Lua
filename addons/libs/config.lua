@@ -28,6 +28,7 @@ local parse
 local settings_table
 local settings_xml
 local nest_xml
+local table_diff
 
 -- Loads a specified file, or alternatively a file 'settings.json' or 'settings.xml' in the current addon folder.
 -- Writes all configs to _config.
@@ -38,7 +39,7 @@ function config.load(filename, confdict)
 	end
 	confdict = confdict or T{}
 	local confdict_mt = getmetatable(confdict)
-	confdict = setmetatable(confdict, {__index=function(t, x) if config[x] ~= nil then return config[x] else return confdict_mt.__index[x] end end})
+	confdict = setmetatable(confdict, {__index=function(t, x) if x == 'save' then return config['save'] else return confdict_mt.__index[x] end end})
 	
 	-- Sets paths depending on whether it's a script or addon loading this file.
 	local filepath = filename or files.check('data/settings.json', 'data/settings.xml')
@@ -51,16 +52,11 @@ function config.load(filename, confdict)
 	-- Load addon/script config file (Windower/addon/<addonname>/config.json for addons and Windower/scripts/<name>-config.json).
 	local config_load, err = parse(file, confdict)
 
-	if config_load == nil then
-		if err ~= nil then
-			error(err)
-		else
-			error('Unknown error trying to parse file: '..file.path)
-		end
-		return confdict
+	if err ~= nil then
+		error(err)
 	end
 	
-	return confdict:update(config_load)
+	return confdict
 end
 
 -- Resolves to the correct parser and calls the respective subroutine, returns the parsed settings table.
@@ -85,12 +81,15 @@ function parse(file, confdict)
 	end
 	
 	-- Determine all characters found in the settings file.
-	chars = parsed:keyset():filter(functools.negate(functools.equals('global')))
+	chars = parsed:keyset():filter(-functools.equals('global'))
 	
 	-- Update the global settings with the per-player defined settings, if they exist. Save the parsed value for later comparison.
 	original = parsed:copy()
+	for char, t in pairs(original) do
+		original[char] = confdict:merge(original[char]):copy()
+	end
 	
-	return parsed['global']:update(parsed[get_player()['name']:lower()])
+	return confdict:merge(parsed['global']:update(parsed[get_player()['name']:lower()], true))
 end
 
 -- Parses a settings struct from a DOM tree.
@@ -108,7 +107,7 @@ function settings_table(node, confdict, key)
 		return t
 	end
 	
-	if #node.children == 1 and node.children[1].type == 'text' then
+	if node.children:length() == 1 and node.children[1].type == 'text' then
 		local val = node.children[1].value
 		if val:lower() == 'false' then
 			return false
@@ -164,19 +163,10 @@ function config.save(t, char)
 	
 	original[char]:update(t)
 	
-	local check
 	if char == 'global' then
-		check = chars
+		original = original:filterkey('global')
 	else
-		check = chars:filter(functools.equals(char))
-	end
-	
-	for _, char in ipairs(check) do
- 		for key, val in pairs(original[char]) do
-			if val == original['global'][key] or (type(val) == 'table' and type(original['global'][key]) == 'table' and T(val):equals(T(original['global'][key]))) then
-				original[char][key] = nil
-			end
-		end
+		original[char] = table_diff(original['global'], original[char]) or T{}
 		
 		if original[char]:isempty() then
 			original[char] = nil
@@ -187,14 +177,50 @@ function config.save(t, char)
 	file:write(settings_xml(original))
 end
 
+-- Returns the table containing only elements from t_new that are different from t and not nil.
+function table_diff(t, t_new)
+	local res = T{}
+	local cmp
+	
+	for key, val in pairs(t_new) do
+		cmp = t[key]
+		if cmp ~= nil then
+			if type(cmp) ~= type(val) then
+				warning('Mismatched setting types for key \''..key..'\':', type(cmp), type(val))
+			else
+				if type(val) == 'table' then
+					val = T(val)
+					cmp = T(cmp)
+					if val:isarray() and cmp:isarray() then
+						if not val:equals(cmp) then
+							res[key] = val
+						end
+					else
+						res[key] = table_diff(cmp, val)
+					end
+				elseif cmp ~= val then
+					res[key] = val
+				end
+			end
+		end
+	end
+	
+	if res:isempty() then
+		return nil
+	end
+	
+	return res
+end
+
 -- Converts a settings table to a XML representation.
 function settings_xml(settings)
 	local str = '<?xml version="1.1" ?>\n'
 	str = str..'<settings>\n'
 	
-	for char, t in pairs(settings) do
+	chars = settings:keyset():filter(-functools.equals('global')):sort()
+	for _, char in ipairs(T{'global'}+chars) do
 		str = str..'\t<'..char..'>\n'
-		str = str..nest_xml(t, 2)
+		str = str..nest_xml(settings[char], 2)
 		str = str..'\t</'..char..'>\n'
 	end
 	
@@ -210,7 +236,10 @@ function nest_xml(t, indentlevel)
 	local inlines = T{}
 	local fragments = T{}
 	local maxlength = 0		-- For proper comment indenting
-	for key, val in pairs(t) do
+	keys = t:keyset():sort()
+	local val
+	for _, key in ipairs(keys) do
+		val = t[key]
 		if type(val) == 'table' and not T(val):isarray() then
 			fragments:append(indent..'<'..key..'>\n')
 			if comments[key] ~= nil then
@@ -233,17 +262,17 @@ function nest_xml(t, indentlevel)
 			else
 				fragments:append(indent..'<'..key..'>'..val..'</'..key..'>')
 			end
-			local length = #fragments:last() - #indent
+			local length = fragments:last():length() - indent:length()
 			if length > maxlength then
 				maxlength = length
 			end
-			inlines[#fragments] = key
+			inlines[fragments:length()] = key
 		end
 	end
 	
 	for frag_key, key in pairs(inlines) do
 		if comments[key] ~= nil then
-			fragments[frag_key] = fragments[frag_key]..('\t'):rep(math.floor((maxlength - fragments[frag_key]:trim():length())/4) + 1)..'<!--'..comments[key]..'-->'
+			fragments[frag_key] = fragments[frag_key]..('\t'):rep(math.ceil((maxlength - fragments[frag_key]:trim():length())/4) + 1)..'<!--'..comments[key]..'-->'
 		end
 		
 		fragments[frag_key] = fragments[frag_key]..'\n'

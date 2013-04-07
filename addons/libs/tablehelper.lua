@@ -80,7 +80,7 @@ function table.containskey(t, searchkey)
 end
 
 -- Appends an element to the end of an array table.
-function table.append(t, val, bla)
+function table.append(t, val)
 	t[#t+1] = val
 	return t
 end
@@ -135,7 +135,7 @@ function table.update(t, t_update, recursive, maxrec, rec)
 	rec = rec or 0
 
 	for key, val in pairs(t_update) do
-		if t[key] ~= nil and recursive and rec ~= maxrec and type(t[key]) == 'table' and type(val) == 'table' then
+		if t[key] ~= nil and recursive and rec ~= maxrec and type(t[key]) == 'table' and type(val) == 'table' and not val:isarray() then
 			t[key] = T(t[key]):update(T(val), true, maxrec, rec + 1)
 		else
 			t[key] = val
@@ -155,11 +155,64 @@ function table.amend(t, t_amend, recursive, maxrec, rec)
 	maxrec = maxrec or -1
 	rec = rec or 0
 
+	local cmp
 	for key, val in pairs(t_amend) do
-		if t[key] ~= nil and recursive and rec ~= maxrec and type(t[key]) == 'table' and type(val) == 'table' then
+		if t[key] ~= nil and recursive and rec ~= maxrec and type(t[key]) == 'table' and type(val) == 'table' and not val:isarray() then
 			t[key] = T(t[key]):amend(T(val), true, maxrec, rec + 1)
 		elseif t[key] == nil then
 			t[key] = val
+		end
+	end
+
+	return t
+end
+
+-- Merges two tables like update would, but retains type-information and tries to work around conflicts.
+function table.merge(t, t_merge, splitchar, silent)
+	if t_merge == nil then
+		return t
+	end
+	
+	splitchar = splitchar or ','
+	silent = silent or false
+
+	for key, val in pairs(t_merge) do
+		if val ~= nil then
+			if type(t[key]) == 'table' and type(val) == 'table' then
+				t[key] = T(t[key]):merge(T(val))
+			elseif type(t[key]) ~= type(val) then
+				if type(t[key]) == 'table' then
+					if type(val) == 'string' then
+						t[key] = val:split(splitchar):map(string.trim)
+					elseif not silent then
+						notice('Could not safely merge values:', key, t[key], val)
+					end
+				elseif type(t[key]) == 'number' then
+					local testdec = tonumber(val)
+					local testhex = tonumber(val, 16)
+					if testdec then
+						t[key] = testdec
+					elseif testhex then
+						t[key] = testhex
+					elseif not silent then
+						notice('Could not safely merge values:', key, t[key], val)
+					end
+				elseif type(t[key] == 'boolean') then
+					if val == 'true' then
+						t[key] = true
+					elseif val == 'false' then
+						t[key] = false
+					elseif not silent then
+						notice('Could not safely merge values:', key, t[key], val)
+					end
+				elseif type(t[key] == 'string') then
+					t[key] = val
+				elseif not silent then
+					notice('Could not safely merge values:', key, t[key], val)
+				end
+			else
+				t[key] = val
+			end
 		end
 	end
 

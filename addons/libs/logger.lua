@@ -14,16 +14,17 @@ _libs.filehelper = _libs.filehelper or (files ~= nil)
 
 _addon = _addon or T{}
 
-local settings = T{}
+local logger = T{}
+logger.settings = T{}
 local file
 
 -- Set up, based on addon.
-settings.logtofile = settings.logtofile or false
-settings.defaultfile = settings.defaultfile or 'lua.log'
-settings.logcolor = settings.logcolor or 207
-settings.errorcolor = settings.errorcolor or 167
-settings.warningcolor = settings.warningcolor or 200
-settings.noticecolor = settings.noticecolor or 160
+logger.settings.logtofile = logger.settings.logtofile or false
+logger.settings.defaultfile = logger.settings.defaultfile or 'lua.log'
+logger.settings.logcolor = logger.settings.logcolor or 207
+logger.settings.errorcolor = logger.settings.errorcolor or 167
+logger.settings.warningcolor = logger.settings.warningcolor or 200
+logger.settings.noticecolor = logger.settings.noticecolor or 160
 
 --[[
 	Local functions
@@ -49,7 +50,7 @@ function captionlog(msg, msgcolor, ...)
 		caption:append(msg)
 	end
 	if #caption > 0 then
-		if settings.logtofile == true then
+		if logger.settings.logtofile == true then
 			flog(caption:sconcat()..':', ...)
 			return
 		end
@@ -65,24 +66,24 @@ function captionlog(msg, msgcolor, ...)
 		str = arrstring(...):gsub('\t', (' '):rep(4))
 	end
 	for _, line in ipairs(str:split('\n')) do
-		add_to_chat(settings.logcolor, caption..line..'\x1E\x01')
+		add_to_chat(logger.settings.logcolor, caption..line..'\x1E\x01')
 	end
 end
 
 function log(...)
-	captionlog(nil, settings.logcolor, ...)
+	captionlog(nil, logger.settings.logcolor, ...)
 end
 
 function error(...)
-	captionlog('Error', settings.errorcolor, ...)
+	captionlog('Error', logger.settings.errorcolor, ...)
 end
 
 function warning(...)
-	captionlog('Warning', settings.warningcolor, ...)
+	captionlog('Warning', logger.settings.warningcolor, ...)
 end
 
 function notice(...)
-	captionlog('Notice', settings.noticecolor, ...)
+	captionlog('Notice', logger.settings.noticecolor, ...)
 end
 
 -- Prints the arguments provided to a file, analogous to log(...) in functionality.
@@ -206,5 +207,5 @@ function table.vprint(t, keys)
 end
 
 -- Load logger settings (has to be after the logging functions have been defined, so those work in the config and related files).
-settings:update(config.load('../libs/logger.xml'))
-file = files.new(settings.defaultfile, true)
+logger.settings = config.load('../libs/logger.xml', logger.settings)
+file = files.new(logger.settings.defaultfile, true)

@@ -31,7 +31,6 @@ end
 -- Returns a partially applied function, with the argument provided at the end.
 function functools.endapply(fn, args)
 	return function(...)
-		if x then T{...}:vprint() end
 		return fn(T{...}:extend(args):unpack())
 	end
 end
@@ -183,6 +182,10 @@ end
 
 -- Returns a table with all elements from t that satisfy the condition fn, or don't satisfy condition fn, if reverse is set to true. Defaults to false.
 function table.filter(t, fn)
+	if type(fn) ~= 'function' then
+		fn = functools.equals(fn)
+	end
+	
 	local res = T{}
 	if T(t):isarray() then
 		for _, val in ipairs(t) do
@@ -203,13 +206,15 @@ function table.filter(t, fn)
 end
 
 -- Returns a table with all elements from t whose keys satisfy the condition fn, or don't satisfy condition fn, if reverse is set to true. Defaults to false.
-function table.filterkey(t, fn, reverse)
-	reverse = reverse or false
-
+function table.filterkey(t, fn)
+	if type(fn) ~= 'function' then
+		fn = functools.equals(fn)
+	end
+	
 	local res = T{}
 	for key, val in pairs(t) do
 		-- Only copy if fn(key) evaluates to true
-		if not (reverse == fn(key)) then
+		if fn(key) then
 			res[key] = val
 		end
 	end
