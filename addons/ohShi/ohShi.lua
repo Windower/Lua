@@ -177,7 +177,7 @@ function event_addon_command(...)
 					font = font..args[p]
 					if p < #args then font = font..' ' end
 				end
-				settings['textfont'] = tonumber(font)
+				settings['textfont'] = font
 				settings['textsize'] = tonumber(args[2])
 				tb_set_font('ohShi',font,args[2])
 				notice('Font changed size: '..args[2]..' font: '..font)
