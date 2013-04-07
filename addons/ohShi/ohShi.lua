@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon = {}
 _addon.name = 'OhShi'
-_addon.version = '2.015'
+_addon.version = '2.1'
 
 --Requiring libraries used in this addon
 --These should be saved in addons/libs
@@ -70,7 +70,7 @@ settings = config.load(defaults)
 --file checks in case settings or moblist.xml are deleted. This
 --is also where the file objects for resources files are created.
 function event_load()
-	notice('Addon Loaded.')
+	notice('Version '.._addon.version..' Loaded.')
 	firstrun = 0
 	tracking = {}
 	mobs = {}
@@ -118,7 +118,7 @@ function event_addon_command(...)
 		comm = args[1]:lower()
 		list = ''
 		if comm == 'help' then
-			notice('Addon loaded! You have access to the following commands with the //ohshi alias:')
+			notice('Version '.._addon.version..' loaded! You have access to the following commands with the //ohshi alias:')
 			notice(' 1. bgcolor <alpha> <red> <green> <blue> --Sets the color of the box.')
 			notice(' 2. text <red> <green> <blue> --Sets text color.')
 			notice(' 2. font <size> <name> --Sets text font and size.')
@@ -129,7 +129,7 @@ function event_addon_command(...)
 			notice(' 6. untrack <vw/legion/other/abyssea/meebles/dangerous> <mobname> --Removes mob from the tracking list.')
 			notice(' 7. danger <spell/ws> <dangerword> --Adds danger word to list.')
 			notice(' 8. staggeronly --Toggles stagger only mode.')
-			notice(' 9. unload') -- <all/one> Save settings all(global) or one(character) and close ohShi.')
+			notice(' 9. unload <all/one> Save settings all(global) or one(character) and close ohShi.')
 			notice('10. help --Shows this menu.')
 		elseif comm == 'create' then
 			ohShi_SetUp()
