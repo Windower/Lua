@@ -127,7 +127,7 @@ function event_addon_command(...)
 			notice(' -- Using dangerous will cause every tp move/spell to flash the warning.')
 			notice(' 6. untrack <vw/legion/other/abyssea/meebles/dangerous> <mobname> --Removes mob from the tracking list.')
 			notice(' 7. danger <spell/ws> <dangerword> --Adds danger word to list.')
-			notice(' 8. staggeronly (true/false) --Switches on/off stagger only mode.')
+			notice(' 8. staggeronly --Toggles stagger only mode.')
 			notice(' 9. unload <all/one> --Save settings all(global) or one(character) and close ohShi.')
 			notice('10. help --Shows this menu.')
 		elseif comm == 'create' then
@@ -301,12 +301,8 @@ function event_addon_command(...)
 				end
 			end
 		elseif comm == 'staggeronly' then
-			if args[2] == 'true' or args[2] == 'false' then
-				settings['staggeronly'] = args[2]
-				notice('Stagger only mode: '..args[2])
-			else
-				error('Improper syntax please use //ohshi help to get a list of commands.')
-			end
+				settings['staggeronly'] = not settings.staggeronly
+				notice('Stagger only mode: '..tostring(settings.staggeronly))
 		else
 			error('Improper syntax please use //ohshi help to get a list of commands.')
 			return
