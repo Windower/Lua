@@ -34,12 +34,11 @@ local table_diff
 -- Writes all configs to _config.
 function config.load(filename, confdict)
 	if type(filename) == 'table' then
-		confdict = filename
-		filename = nil
+		confdict, filename = filename, nil
 	end
 	confdict = T(confdict) or T{}
 	local confdict_mt = getmetatable(confdict)
-	confdict = setmetatable(confdict, {__index=function(t, x) if x == 'save' then return config['save'] else return confdict_mt.__index[x] end end})
+	confdict = setmetatable(confdict, {__index = function(t, x) if x == 'save' then return config['save'] else return confdict_mt.__index[x] end end})
 	
 	-- Sets paths depending on whether it's a script or addon loading this file.
 	local filepath = filename or files.check('data/settings.json', 'data/settings.xml')
@@ -81,15 +80,18 @@ function parse(file, confdict)
 	
 	-- Determine all characters found in the settings file.
 	chars = parsed:keyset():filter(-functools.equals('global'))
+	original = T{}
 	
 	if confdict:isempty() then
+		for _, char in ipairs(T{'global'}+chars) do
+			original[char] = confdict:copy():update(parsed[char], true)
+		end
 		return confdict:update(parsed['global']:update(parsed[get_player()['name']:lower()], true), true)
 	end
 	
 	-- Update the global settings with the per-player defined settings, if they exist. Save the parsed value for later comparison.
 	for _, char in ipairs(T{'global'}+chars) do
-		local tmpdict = confdict:copy()
-		original[char] = tmpdict:merge(parsed[char])
+		original[char] = confdict:copy():merge(parsed[char])
 	end
 	
 	return confdict:merge(parsed['global']:update(parsed[get_player()['name']:lower()], true))
