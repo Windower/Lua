@@ -38,7 +38,6 @@ require 'logger'
 local config = require 'config'
 local files = require 'filehelper'
 
-
 --Declaring default settings
 local defaults = T{}
 defaults.bggreen = 0				
@@ -65,6 +64,7 @@ defaults.dangerwords = T{}
 defaults.dangerwords['weaponskills'] = T{"Zantetsuken", "Geirrothr", "Astral Flow", "Chainspell", "Beastruction", "Mandible Massacre", "Oblivion's Mantle", "Divesting Gale", "Frog", "Danse", "Raksha Stance", "Yama's", "Ballistic Kick", "Eradicator", "Arm Cannon", "Gorge", "Extreme Purgitation", "Slimy Proposal", "Rancid Reflux", "Provenance Watcher starts", "Pawn's Penumbra", "Gates", "Fulmination", "Nerve", "Thundris"}
 defaults.dangerwords['spells'] = T{"Death", "Meteor", "Kaustra", "Breakga", "Thundaga IV", "Thundaja", "Firaga IV", "Firaja", "Aeroga IV", "Aeroja", "Blizzaga IV", "Blizzaja", "Stonega IV", "Stoneja"}
 settings = config.load(defaults)
+
 --This function is called when the addon loads. It is used to
 --create all the tables used and populate them. There are also
 --file checks in case settings or moblist.xml are deleted. This
@@ -78,20 +78,14 @@ function event_load()
 	jobAbilities = {}
 	color2 = ''
 	cres = ''
-	setFName = 'data/settings.xml'
 	speFName = '../../plugins/resources/spells.xml'
 	jaFName = '../../plugins/resources/abils.xml'
 	maFName = '../libs/resources/mabils.xml'
 	player = get_player()
-	setFile = files.new(setFName)
 	speFile = files.new(speFName)
 	jaFile = files.new(jaFName)
 	maFile = files.new(maFName)
-	settings = config.load(setFName,defaults)
-	if not setFile:exists() then
-		firstrun = 1
-		createDefaults('settings')
-	end
+	settings:save()
 	-- Parse the resources and fill tables with the info.
 	spells = parse_resources(speFile:readlines())
 	jobAbilities = parse_resources(jaFile:readlines())
@@ -100,6 +94,7 @@ function event_load()
 	if firstrun == 1 then send_command('ohShi help') end --If first run show the help menu
 	send_command('wait 1;ohshi create')
 	deleteoldsettings()
+	settings:vprint()
 end
 
 --Used when the addon is unloaded to save settings and
@@ -256,7 +251,7 @@ function event_addon_command(...)
 					end
 					if settings.moblist[utm]:contains(list) then
 						settings.moblist[utm]:delete(list)
-						notice('No longer tracking '..args[2]..' mob '..list)
+						notice('No longer tracking '..utm..' mob '..list)
 					else
 						error('You were not tracking '..tm..' mob '..list)
 					end
@@ -279,8 +274,8 @@ function event_addon_command(...)
 						list = list..args[r]
 						if r < #args then list = list..' ' end
 					end
-					if not settings.moblist[tm]:contains(list) then
-						settings.moblist[tm]:append(list)
+					if not settings.dangerwords[td]:contains(list) then
+						settings.dangerwords[td]:append(list)
 						notice('Now tracking '..td..' spell '..list)
 					else
 						error('Already tracking '..td..' spell '..list)
@@ -633,8 +628,7 @@ function createDefaults(tystr)
 		f1:write("<?xml version=\"1.0\"?>")
 		f1:append("<!--File Created by ohShi.lua-->\n")
 		f1:append("\t<settings>")
-		f1:append("\t\t<global>")
-		f1:append("\t\t</global>")
+		f1:append("\t<global/>")
 		f1:append("\t</settings>")
 		settings:save('all')
 	end 
