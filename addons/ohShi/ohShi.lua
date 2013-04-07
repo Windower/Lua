@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon = {}
 _addon.name = 'OhShi'
-_addon.version = '2.0'
+_addon.version = '2.015'
 
 --Requiring libraries used in this addon
 --These should be saved in addons/libs
@@ -70,6 +70,7 @@ settings = config.load(defaults)
 --file checks in case settings or moblist.xml are deleted. This
 --is also where the file objects for resources files are created.
 function event_load()
+	error('Auto-save settings are broken atm. Please edit the data/settings.xml with your settings.')
 	firstrun = 0
 	tracking = {}
 	mobs = {}
@@ -85,7 +86,7 @@ function event_load()
 	speFile = files.new(speFName)
 	jaFile = files.new(jaFName)
 	maFile = files.new(maFName)
-	settings:save()
+	--settings:save()
 	-- Parse the resources and fill tables with the info.
 	spells = parse_resources(speFile:readlines())
 	jobAbilities = parse_resources(jaFile:readlines())
@@ -128,7 +129,7 @@ function event_addon_command(...)
 			notice(' 6. untrack <vw/legion/other/abyssea/meebles/dangerous> <mobname> --Removes mob from the tracking list.')
 			notice(' 7. danger <spell/ws> <dangerword> --Adds danger word to list.')
 			notice(' 8. staggeronly --Toggles stagger only mode.')
-			notice(' 9. unload <all/one> --Save settings all(global) or one(character) and close ohShi.')
+			notice(' 9. unload') -- <all/one> Save settings all(global) or one(character) and close ohShi.')
 			notice('10. help --Shows this menu.')
 		elseif comm == 'create' then
 			ohShi_SetUp()
@@ -348,13 +349,13 @@ end
 
 --Clean up for when the addon is unloading
 function ohShi_delete()
-	notice('Closing and saving settings.')
-	settings = config.load(settings)
+	--notice('Closing and saving settings.')
+	--[[settings = config.load(settings)
 	if unloadtype == 'all' then
 		settings:save('all')
 	else
 		settings:save()
-	end
+	end]]
 	local h
 	for h = 1, #prims do
 		prim_delete(prims[h])
@@ -618,7 +619,7 @@ function parse_resources(lines_file)
 end
 
 --Creates the default settings/moblist in case they have been deleted
-function createDefaults(tystr)
+--[[function createDefaults(tystr)
 	if tystr == 'settings' then
 		local f1 = files.new(setFName)
 		f1:write("<?xml version=\"1.0\"?>")
@@ -628,7 +629,7 @@ function createDefaults(tystr)
 		f1:append("\t</settings>")
 		settings:save('all')
 	end 
-end
+end]]
 
 --This function is only used to delete old unused settings files
 function deleteoldsettings()
