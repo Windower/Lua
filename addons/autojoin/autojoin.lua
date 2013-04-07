@@ -23,6 +23,7 @@ defaults = T{}
 defaults.mode = 'whitelist'
 defaults.whitelist = T{}
 defaults.blacklist = T{}
+defaults.autodecline = false
 
 -- Statuses which prevents joining.
 statusblock = T{
@@ -52,16 +53,17 @@ modes = T{'whitelist', 'blacklist'}
 
 -- Invite handler
 function event_party_invite(senderId, sender, something)
+	if settings.autodecline and settings.blacklist:contains(sender) then
+		send_command('input /decline')
+		notice('Blacklisted invite from '..sender..' blocked.')
+		return
+	end
+	
 	if settings.mode == 'whitelist' and settings.whitelist:contains(sender)
 	or settings.mode == 'blacklist' and not settings.blacklist:contains(sender) then
 		pool = false
 		try = true
 		send_command('wait 1; lua i autojoin try_join')
-	end
-	
-	if settings.blacklist:contains(sender) then
-		send_command('input /decline')
-		notice('Blacklisted invite from '..sender..' blocked.')
 	end
 end
 
