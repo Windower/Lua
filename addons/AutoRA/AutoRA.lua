@@ -27,37 +27,34 @@
 require 'buff'
 
 function event_load()
-	
-	version = '1.0.0'
-	SA_Set = ' '
-	TA_Set = ' '
-	SATA_Set = ' '
-	TP_Set = ' '
-	Idle_Set = ' '
-	add_to_chat(17, 'SATACast v' .. version .. ' loaded.     Author:  Banggugyangu')
-	add_to_chat(17, 'Attempting to load settings from file.')
-	SA_Up = 0
-	TA_Up = 0
-	options_load()
+
+	auto = 0
+	delay = '0'
+	send_command('unbind ^d')
+	send_command('unbind !d')
+	send_command('bind ^d ara start')
+	send_command('bind !d ara stop')
+	send_command('alias ara lua c autora')
+	setDelay()
 	
 end
 
-function options_load()
+function setDelay()
 	local f = io.open(lua_base_path..'data/settings.txt', "r")
 	if f == nil then
 		local g = io.open(lua_base_path..'data/settings.txt', "w")
 		g:write('Release Date: 11:50 PM, 4-06-13\46\n')
 		g:write('Author Comment: This document is whitespace sensitive, which means that you need the same number of spaces between things as exist in this initial settings file\46\n')
 		g:write('Author Comment: It looks at the first two words separated by spaces and then takes anything as the value in question if the first two words are relevant\46\n')
-		g:write('Author Comment: If you ever mess it up so that it does not work, you can just delete it and SATACast will regenerate it upon reload\46\n')
-		g:write('Author Comment: For the output customization lines, simply place the name of the spellcast set for each setting exactly how it is spelled in spellcast.\n')
+		g:write('Author Comment: If you ever mess it up so that it does not work, you can just delete it and AutoRA will regenerate it upon reload\46\n')
+		g:write('Author Comment: Rimply add the combined delay of your ammo and ranged weapon in the "RA Delay:" line.\n')
 		g:write('Author Comment: The design of the settings file is credited to Byrthnoth as well as the creation of the settings file.\n\n\n\n')
 		g:write('Fill In Settings Below:\n')
-		g:write('SA Set: SneakAttack\nTA Set: TrickAttack\nSATA Set: SATA\nTP Set: TP\nIdle Set: Movement\n')
+		g:write('RA Delay: \n')
 		g:close()
 		
 		write('Default settings file created')
-		add_to_chat(13,'SATACast created a settings file and loaded!')
+		add_to_chat(13,'AutoRA created a settings file and loaded!')
 	else
 		f:close()
 		for curline in io.lines(lua_base_path..'data/settings.txt') do
@@ -66,20 +63,39 @@ function options_load()
 			if splat[2] ~=nil then
 				cmd = (splat[1]..' '..splat[2]):gsub(':',''):lower()
 			end
-			if cmd == 'sa set' then
-				SA_Set = splat[3]
-			elseif cmd == 'ta set' then
-				TA_Set = splat[3]
-			elseif cmd == 'sata set' then
-				SATA_Set = splat[3]
-			elseif cmd == 'tp set' then
-				TP_Set = splat[3]
-			elseif cmd == 'idle set' then
-				Idle_Set = ' '
+			if cmd == 'ra delay' then
+				delay = splat[3]
 			end
 		end
-		add_to_chat(12,'SATACast read from a settings file and loaded!')
+		add_to_chat(12,'AutoRA read from a settings file and loaded!')
 	end
+	delay = (delay/90)
+end
+	
+function start()
+
+	auto = 1
+	shoot()
+
+end
+
+function stop()
+
+	auto = 0
+	
+end
+
+function shoot()
+	local player = get_player()
+	if ((auto == 1) and (player.status:lower() == 'engaged' ) ) then
+		
+		send_command('input /shoot')
+		send_command('wait '..delay..'; input //ara shoot')
+		
+	elseif ((auto == 0) or (player.status:lower() == 'idle' ) ) then
+		send_command('input /shoot')
+	end
+	
 end
 
 function split(msg, match)
@@ -103,32 +119,24 @@ function split(msg, match)
 	return splitarr
 end
 
-function event_action(act)
-	local self = get_player()
-	if (isBuffActive('Sneak_Attack') and isBuffActive('Trick_Attack') and (self.status:lower() == 'engaged') ) then
-		if SA_Up == 0 and TA_Up == 0 then
-			send_command('sc set ' .. SATA_Set)
-			SA_Up = 1
-			TA_Up = 1
-		else
-		end
-	elseif (isBuffActive('Sneak_Attack') and (self.status:lower() == 'engaged') ) then
-		if SA_Up == 0 then
-			send_command('sc set ' .. SA_Set)
-			SA_Up = 1
-		else
-		end
-	elseif (isBuffActive('Trick_Attack') and (self.status:lower() == 'engaged') ) then
-		if TA_Up == 0 then
-			send_command('sc set ' .. TA_Set)
-			TA_Up = 1
-		else
-		end
-	elseif not isBuffActive('Sneak_Attack') then
-		SA_Up = 0
-	elseif not isBuffActive('Trick_Attack') then
-		TA_Up = 0
+function event_addon_command(...)
+    local term = table.concat({...}, ' ')
+    local splitarr = split(term,' ')
+	if splitarr[1]:lower() == 'start' then
+		start()
+	elseif splitarr[1]:lower() == 'stop' then
+		stop()
+	elseif splitarr[1]:lower() == 'shoot' then
+		shoot()
+	elseif splitarr[1]:lower() == 'help' then
+		add_to_chat(17, 'AutoRA  v'..version..'commands:')
+		add_to_chat(17, '//ara [options]')
+		add_to_chat(17, '    start  - Starts auto attack with ranged weapon')
+		add_to_chat(17, '    stop   - Stops auto attack with ranged weapon')
+		add_to_chat(17, '    help   - Displays this help text')
+		add_to_chat(17, ' ')
+		add_to_chat(17, 'AutoRA will only automate ranged attacks if your status is "Engaged".  Otherwise it will always fire a single ranged attack.')
+		add_to_chat(17, 'To start auto ranged attacks without commands use the key:  Ctrl+d')
+		add_to_chat(17, 'To stop auto ranged attacks in the same manner:  Atl+d')
 	end
 end
-		
-	
