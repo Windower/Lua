@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon = {}
 _addon.name = 'OhShi'
-_addon.version = '2.11'
+_addon.version = '2.12'
 
 --Requiring libraries used in this addon
 --These should be saved in addons/libs
@@ -438,10 +438,8 @@ function event_action(act)
 		--it against your danger words and the user against your moblist.
 		if act['category'] == 7 and isMob(tonumber(act['actor_id'])) then
 			local num = tonumber(act['targets'][1]['actions'][1]['param']) - 256
-			if num == nil then return end
-			flog('log.lua',num)
-			local wesk = mobAbilities[num]['english'] or 'antidisestablishmentarianism'
-			flog('log.lua',wesk)
+			if num < 1 then return end
+			local wesk = mobAbilities[num]['english']
 			if dangercheck(wesk) then
 				color2 = '\\cs(255,100,100)'
 				cres = '\\cr'
@@ -459,8 +457,10 @@ function event_action(act)
 		
 		--Category 8 is spell casting
 		if act['category'] == 8 and tonumber(act['targets'][1]['actions'][1]['message']) ~= 16 and isMob(tonumber(act['actor_id'])) then
+			local num = tonumber(act['targets'][1]['actions'][1]['param'])
+			if num <= 0 then return end
 			--Get the name of the spell by taking the spell id and going through the spells table
-			local spell = spells[tonumber(act['targets'][1]['actions'][1]['param'])]['english']
+			local spell = spells[num]['english']
 			fi = false
 			doanyway = 0
 			--Check spell against danger words.
@@ -585,10 +585,7 @@ end
 
 --Check if the actor is actually an npc rather than a player
 function isMob(id)
-	if get_mob_by_id(id)['is_npc'] then
-		return true
-	end
-	return false
+	return get_mob_by_id(id)['is_npc']
 end
 
 --This function is used to parse the windower resources
@@ -628,19 +625,6 @@ function parse_resources(lines_file)
 		return completed_table
 end
 
---Creates the default settings/moblist in case they have been deleted
---[[function createDefaults(tystr)
-	if tystr == 'settings' then
-		local f1 = files.new(setFName)
-		f1:write("<?xml version=\"1.0\"?>")
-		f1:append("<!--File Created by ohShi.lua-->\n")
-		f1:append("\t<settings>")
-		f1:append("\t<global/>")
-		f1:append("\t</settings>")
-		settings:save('all')
-	end 
-end]]
-
 --This function is only used to delete old unused settings files
 function deleteoldsettings()
 	path = lua_base_path..'data/'
@@ -675,22 +659,3 @@ function split(msg, match)
 	end
 	return splitarr
 end
-
---[[ this is not used atm
-function open_temp_file(template)
-	local handle
-	local fname
-	assert(string.match(template, "@@@"), 
-		"ERROR open_temp_file: template must contain \"%%%\".")
-	while true do
-		fname = string.gsub(template, "@@@", tostring(math.random(10000000,99999999)))
-		handle = io.open(fname, "r")
-		if not handle then
-			handle = io.open(fname, "w")
-			break
-		end
-		io.close(handle)
-		io.write(".")   -- Shows collision, comment out except for diagnostics
-	end
-	return handle, fname
-end]]
