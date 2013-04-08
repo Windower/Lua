@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon = {}
 _addon.name = 'OhShi'
-_addon.version = '2.11'
+_addon.version = '2.12'
 
 --Requiring libraries used in this addon
 --These should be saved in addons/libs
@@ -438,10 +438,8 @@ function event_action(act)
 		--it against your danger words and the user against your moblist.
 		if act['category'] == 7 and isMob(tonumber(act['actor_id'])) then
 			local num = tonumber(act['targets'][1]['actions'][1]['param']) - 256
-			if num == nil then return end
-			flog('log.lua',num)
-			local wesk = mobAbilities[num]['english'] or 'antidisestablishmentarianism'
-			flog('log.lua',wesk)
+			if num < 1 then return end
+			local wesk = mobAbilities[num]['english']
 			if dangercheck(wesk) then
 				color2 = '\\cs(255,100,100)'
 				cres = '\\cr'
@@ -459,8 +457,10 @@ function event_action(act)
 		
 		--Category 8 is spell casting
 		if act['category'] == 8 and tonumber(act['targets'][1]['actions'][1]['message']) ~= 16 and isMob(tonumber(act['actor_id'])) then
+			local num = tonumber(act['targets'][1]['actions'][1]['param'])
+			if num <= 0 then return end
 			--Get the name of the spell by taking the spell id and going through the spells table
-			local spell = spells[tonumber(act['targets'][1]['actions'][1]['param'])]['english']
+			local spell = spells[num]['english']
 			fi = false
 			doanyway = 0
 			--Check spell against danger words.
