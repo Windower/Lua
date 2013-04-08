@@ -133,7 +133,7 @@ function event_gain_status(id,name)
 				duration = d
 				buffname = tostring(str:split('>',2)[2]:split('<',2)[1])
 				if tonumber(buffid) == tonumber(id) then
-					createTimer(tostring(name))
+					createTimer(tostring(buffname))
 					buffs = T(get_player()['buffs'])
 					break
 				end
@@ -168,8 +168,24 @@ function check_bufflist(name)
 end
 
 function event_lose_status(id,name)
-	deleteTimer(1,name)
-	send_ipc_message(name..' '..player['name']..' delete')
+	for i in ipairs(lines) do
+		x = i
+		str = lines[x]
+		if str ~= nil then
+			str=tostring(str)
+			a,b,c,d = string.find(str,'<b id="(%w+)" duration="(%w+)"')
+			if c ~= nil then
+				buffid = c
+				duration = d
+				buffn = tostring(str:split('>',2)[2]:split('<',2)[1])
+				if tonumber(buffid) == tonumber(id) then
+					deleteTimer(1,buffn)
+					send_ipc_message(buffn..' '..player['name']..' delete')
+					break
+				end
+			end
+		end
+	end
 end
 
 function event_ipc_message(msg)
