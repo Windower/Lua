@@ -11,22 +11,14 @@ require 'logger'
 require 'actionhelper'
 local config = require 'config'
 
+require 'display'
+require 'model'
 -----------------------------
 
-local settings = nil -- holds a config instance
-local settings_file = 'data/settings.xml'
+settings = nil -- holds a config instance
+settings_file = 'data/settings.xml'
 
-local player_display_count = 8 -- num of players to display. configured via settings file
-
-local dps_db = T{}
-local mob_filter = T{} -- subset of mobs that we're currently displaying damage for
-
--- DPS clock variables
-local dps_active = false
-local dps_clock = 1 -- avoid div/0
-local dps_clock_prev_time = 0
-
-local default_settings_file = [[
+default_settings_file = [[
 <?xml version="1.0" ?>
 <settings>
 	<!--
@@ -66,7 +58,7 @@ function event_addon_command(...)
 			write('sb help : Shows help message')
 			write('sb pos <x> <y> : Positions the scoreboard')
 			write('sb reset : Reset damage')
-			write('sb report : Reports damage to current chatmode')
+			write('sb report [<target>] : Reports damage. Can take standard chatmode target options.')
 			write('sb filters  : Shows current filter settings')
 			write('sb add <mob1> <mob2> ... : Add mob patterns to the filter (substrings ok)')
 			write('sb clear : Clears mob filter')
@@ -87,7 +79,7 @@ function event_addon_command(...)
 			local arg2 = params[3]
 			
 			if arg then
-				if T{'s', 'l', 'p', 't'}:contains(arg) then
+				if T{'s', 'l', 'p', 't', 'say', 'linkshell', 'party', 'tell'}:contains(arg) then
 					if arg2 and not arg2:match('^[a-zA-Z]+$') then
 						-- should be a valid player name
 						error('Invalid argument for report t: ' .. arg2)
@@ -99,7 +91,7 @@ function event_addon_command(...)
 				end
 			end
 			
-			report_summary(arg, arg2)
+			display_report_summary(arg, arg2)
 		elseif params[1]:lower() == "filters" then
 			local mob_str
 			if mob_filter:isempty() then
@@ -112,66 +104,32 @@ function event_addon_command(...)
 			for i=2, #params do
 				mob_filter:append(params[i])
 			end
-			update_scoreboard()
+			display_update()
 		elseif params[1]:lower() == "clear" then
 			mob_filter = T{}
-			update_scoreboard()
+			display_update()
 		end
 	end
 end
 
 
--- Resets all data tracking variables
+-- Resets application state
 function initialize()
-	dps_db = T{}
-
-	dps_active = false
-	dps_clock = 1
-	dps_clock_prev_timestamp = 0
-	
-	-- the number of spaces here was counted to keep the table width
-	-- consistent even when there's no data being displayed
-	tb_set_text('scoreboard',  build_scoreboard_header() ..
-							   'Waiting for results...' ..
-							   string.rep(' ', 17))
-end
-
-
-function update_dps_clock()
-	if get_player()['in_combat'] then
-		local now = os.time()
-
-		if dps_clock_prev_time == 0 then
-			dps_clock_prev_time = now
-		end
-
-		dps_clock = dps_clock + (now - dps_clock_prev_time)
-		dps_clock_prev_time = now
-
-		dps_active = true
-	else
-		dps_active = false
-		dps_clock_prev_time = 0
-	end
+	model_init()
+	display_init()
 end
 
 
 -- Secondary update driver to keep the DPS moving between swings and keep the clock moving.
 function event_time_change(...)
 	update_dps_clock()
-	
-	if not dps_db:isempty() then
-		update_scoreboard()
-	end
+	display_update()
 end
 
 
-function event_status_change(old, new)
+function event_status_change(...)
 	update_dps_clock()
-	
-	if not dps_db:isempty() then
-		update_scoreboard()
-	end
+	display_update()
 end
 
 
@@ -215,6 +173,7 @@ function event_load()
 	initialize()
 end
 
+
 -- Returns all mob IDs for anyone in your alliance, including their pets.
 function get_ally_mob_ids()
 	local allies = T{}
@@ -231,6 +190,7 @@ function get_ally_mob_ids()
 	
 	return allies
 end
+
 
 -- Returns true iff is someone (or a pet of someone) in your alliance.
 function mob_is_ally(mob_id)
@@ -313,7 +273,7 @@ function event_action(raw_action)
 		end
 	end
 	
-	update_scoreboard()
+	display_update()
 	update_dps_clock()
 end
 
@@ -322,185 +282,6 @@ function event_unload()
 	send_command('unalias sb')
 	tb_delete('scoreboard')
 end
-
-
--- Adds the given data to the main DPS table
-function accumulate(mob, player, damage)
-	mob = string.lower(mob:gsub('^[tT]he ', ''))
-	if not dps_db[mob] then
-		dps_db[mob] = T{}
-	end
-	
-	damage = tonumber(damage)
-	if not dps_db[mob][player] then
-		dps_db[mob][player] = damage
-	else
-		dps_db[mob][player] = damage + dps_db[mob][player] 
-	end
-end
-
-
--- Returns following two element pair:
--- 1) table of sorted 2-tuples containing {player, damage}
--- 2) integer containing the total damage done
-function get_sorted_player_damage()
-	-- In order to sort by damage, we have to first add it all up into a table
-	-- and then build a table of sortable 2-tuples and then finally we can sort...
-	local mob, players
-	local player_total_dmg = T{}
-
-	if not dps_db then
-		return
-	end
-	
-	local function filter_contains_mob(mob_name)
-		for _, mob_pattern in ipairs(mob_filter) do
-			if mob_name:lower():find(mob_pattern:lower()) then
-				return true
-			end
-		end
-		return false
-	end
-	
-	for mob, players in pairs(dps_db) do
-		-- If the filter isn't active, include all mobs
-
-		if mob_filter:isempty() or filter_contains_mob(mob) then
-			for player, damage in pairs(players) do
-				if player_total_dmg[player] then
-					player_total_dmg[player] = player_total_dmg[player] + damage
-				else
-					player_total_dmg[player] = damage
-				end
-			end
-		end
-	end
-	
-	local sortable = T{}
-	local total_damage = 0
-	for player, damage in pairs(player_total_dmg) do
-		total_damage = total_damage + damage
-		sortable:append({player, damage})
-	end
-
-	local function cmp(a, b) 
-		return a[2] > b[2]
-	end
-	table.sort(sortable, cmp)
-	
-	return sortable, total_damage
-end
-
-
--- Convert integer seconds into a "HhMmSs" string
-function seconds_to_hms(seconds)
-	hours = math.floor(seconds / 3600)
-	seconds = seconds - hours * 3600
-
-	minutes = math.floor(seconds / 60)
-	seconds = seconds - minutes * 60
-	
-	local hours_str    = hours > 0 and hours .. "h" or ""
-	local minutes_str  = minutes > 0 and minutes .. "m" or ""
-	local seconds_str  = seconds and seconds .. "s" or ""
-	
-	return hours_str .. minutes_str .. seconds_str
-end
-
-
--- Returns the string for the scoreboard header with updated info
--- about current mob filtering and whether or not time is currently
--- contributing to the DPS value.
-function build_scoreboard_header()
-	local mob_filter_str
-	
-	if mob_filter:isempty() then
-		mob_filter_str = "All"
-	else
-		mob_filter_str = table.concat(mob_filter, ", ")
-	end
-	
-	local labels
-	if dps_db:isempty() then
-		labels = "\n"
-	else
-		labels = string.format("%23s%7s%8s\n", "Tot", "Pct", "DPS")
-	end
-	
-	local dps_status
-	if dps_active then
-		dps_status = "Active"
-	else
-		dps_status = "Paused"
-	end
-
-	local dps_clock_str = ''
-	if dps_active or dps_clock > 1 then
-		dps_clock_str = string.format(" (%s)", seconds_to_hms(dps_clock))
-	end
-	return string.format("DPS: %s%s\nMobs: %-9s\n%s",  dps_status, dps_clock_str, mob_filter_str, labels)
-end
-
-
--- Updates the main display with current filter/damage/dps status
-function update_scoreboard()
-	local damage_table, total_damage
-	damage_table, total_damage = get_sorted_player_damage()
-	
-	local display_table = T{}
-	local player_lines = 0
-	for k, v in pairs(damage_table) do
-		if player_lines < player_display_count then
-			local dps = math.round(v[2]/dps_clock, 2)
-			local percent = string.format('(%.1f%%)', 100 * v[2]/total_damage)
-			display_table:append(string.format("%-16s%7d%8s %7.2f", v[1], v[2], percent, dps))
-		end
-		player_lines = player_lines + 1
-	end
-	
-	if not dps_db:isempty() then
-		tb_set_text('scoreboard', build_scoreboard_header() .. table.concat(display_table, '\n'))
-	end
-end
-
-
-function report_summary (...)
-	local chatmode, tell_target = table.unpack({...})
-	
-	local damage_table, total_damage
-	damage_table, total_damage = get_sorted_player_damage()
-	local max_line_length = 127 -- game constant
-
-	-- We have to make sure not to exceed max line or it can cause a crash
-	local display_table = T{}
-	local line_length = 0
-	for k, v in pairs(damage_table) do
-		-- TODO: this algorithm doesn't quite work right but it's close
-		formatted_entry = string.format("%s %d(%.1f%%)", v[1], v[2], 100 * v[2]/total_damage)
-		local new_line_length = line_length + formatted_entry:len() + 2 -- 2 is for the sep
-		
-		if new_line_length < max_line_length then
-			display_table:append(formatted_entry)
-			line_length = new_line_length
-		else
-			-- If we don't break here, a subsequent player could fit but that would result
-			-- in out-of-order damage reporting
-			break
-		end
-	end
-
-	-- Send the report to the current chatmode
-	local input_cmd = 'input '
-	if chatmode then
-		input_cmd = input_cmd .. '/' .. chatmode .. ' '
-		if tell_target then
-			input_cmd = input_cmd .. tell_target .. ' '
-		end
-	end
-
-	send_command(input_cmd .. table.concat(display_table, ', '))
-end
-
 
 
 --[[
