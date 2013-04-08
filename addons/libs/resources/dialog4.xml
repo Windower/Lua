@@ -559,7 +559,7 @@
 	<dtd id="557" english="${target} receives ${number} piece of alexandrite." color="1"/>
 	<dtd id="558" english="You defeated a designated target.${lb}(Progress: ${number}/${number})" color="1"/>
 	<dtd id="559" english="You have successfully completed the training regime." color="1"/>
-	<dtd id="560" english="${actor} uses ${ability}. Finishing move now ${number}." color="101"/>
+	<dtd id="560" english="${actor} uses ${ability}. Finishing move now ${number}." color="101" prefix="FM"/>
 	<dtd id="561" english="Unable to perform that action.${lb}Your have already earned the maximum number of finishing moves." color="122"/>
 	<dtd id="562" english="The status parameters of ${target} have increased." color="1"/>
 	<dtd id="563" english="${actor} destroys ${target}." color="1"/>
