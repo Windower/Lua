@@ -6,45 +6,45 @@ dps_clock = 1 -- avoid div/0
 dps_clock_prev_time = 0
 
 function model_init()
-  dps_db = T{}
+    dps_db = T{}
 
-	dps_active = false
-	dps_clock = 1
-	dps_clock_prev_timestamp = 0
+    dps_active = false
+    dps_clock = 1
+    dps_clock_prev_timestamp = 0
 end
 
 function update_dps_clock()
-	if get_player()['in_combat'] then
-		local now = os.time()
+    if get_player()['in_combat'] then
+        local now = os.time()
 
-		if dps_clock_prev_time == 0 then
-			dps_clock_prev_time = now
-		end
+        if dps_clock_prev_time == 0 then
+            dps_clock_prev_time = now
+        end
 
-		dps_clock = dps_clock + (now - dps_clock_prev_time)
-		dps_clock_prev_time = now
+        dps_clock = dps_clock + (now - dps_clock_prev_time)
+        dps_clock_prev_time = now
 
-		dps_active = true
-	else
-		dps_active = false
-		dps_clock_prev_time = 0
-	end
+        dps_active = true
+    else
+        dps_active = false
+        dps_clock_prev_time = 0
+    end
 end
 
 
 -- Adds the given data to the main DPS table
 function accumulate(mob, player, damage)
-	mob = string.lower(mob:gsub('^[tT]he ', ''))
-	if not dps_db[mob] then
-		dps_db[mob] = T{}
-	end
+    mob = string.lower(mob:gsub('^[tT]he ', ''))
+    if not dps_db[mob] then
+        dps_db[mob] = T{}
+    end
 	
-	damage = tonumber(damage)
-	if not dps_db[mob][player] then
-		dps_db[mob][player] = damage
-	else
-		dps_db[mob][player] = damage + dps_db[mob][player] 
-	end
+    damage = tonumber(damage)
+    if not dps_db[mob][player] then
+        dps_db[mob][player] = damage
+    else
+        dps_db[mob][player] = damage + dps_db[mob][player] 
+    end
 end
 
 
