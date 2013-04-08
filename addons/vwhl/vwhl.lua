@@ -1,5 +1,5 @@
 --[[
-vwhl - voidwatch highlighter v1.20130407
+vwhl - voidwatch highlighter v1.20130408
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -74,12 +74,10 @@ function event_addon_command(cmd)
 end
 
 function event_incoming_text(original, modified, mode)
-    --[[todo: fill with vw messages stream id
-    if ( mode != 0 ) then
+    if mode ~= 148 then
         return modified, mode
     end
-    ]]
-    
+
     if modified:match('The fiend appears') then
         if modified:match('extremely vulnerable') then
             modified = modified:gsub('extremely vulnerable', '\30\02extremely vulnerable (5)\30\01')
@@ -127,7 +125,7 @@ function event_incoming_text(original, modified, mode)
             :gsub('puppetmaster', '\30\02puppetmaster\30\01')
             :gsub('dancer', '\30\02dancer\30\01')
             :gsub('scholar', '\30\02scholar\30\01')
-            :gsub('hand-to-hand', '\30\02hand-to-hand\30\01')
+            :gsub('hand%-to%-hand', '\30\02hand-to-hand\30\01')
             :gsub('dagger', '\30\02dagger\30\01')
             :gsub('scythe', '\30\02scythe\30\01')
             :gsub('polearm', '\30\02polearm\30\01')
@@ -145,7 +143,7 @@ function event_incoming_text(original, modified, mode)
             :gsub('special attacks', '\30\02special attacks\30\01')
             :gsub('blood pacts', '\30\02blood pacts\30\01')
 
-        return '>>> '..modified, 4
+        return '>>> '..modified, 12
     elseif modified:match('L\'un des points faibles') then
         if modified:match('points faibles critiques') then
             modified = modified:gsub('points faibles critiques', '\30\02points faibles critiques (5)\30\01')
@@ -220,7 +218,7 @@ function event_incoming_text(original, modified, mode)
             :gsub('attaque spéciale', '\30\02attaque spéciale\30\01')
             :gsub('pacte de sang', '\30\02pacte de sang\30\01')
 
-        return '>>> '..modified, 4
+        return '>>> '..modified, 12
     elseif modified:match('Das Monster ist nun') then
         if modified:match('ganz besonders anfällig') then
             modified = modified:gsub('ganz besonders anfällig', '\30\02ganz besonders anfällig (5)\30\01')
@@ -231,8 +229,8 @@ function event_incoming_text(original, modified, mode)
         end
 
         modified = modified
-            :gsub('(%w+)-Elementarschaden', '\30\02%1\30\01-Elementarschaden')
-            :gsub('(%w+)-Magie', '\30\02%1\30\01-Magie')
+            :gsub('(%w+)%-Elementarschaden', '\30\02%1\30\01-Elementarschaden')
+            :gsub('(%w+)%-Magie', '\30\02%1\30\01-Magie')
             :gsub('Weißmagie', '\30\02Weißmagie\30\01')
             :gsub('Schwarzmagie', '\30\02Schwarzmagie\30\01')
             :gsub('Ninjutsu', '\30\02Ninjutsu\30\01')
@@ -282,7 +280,7 @@ function event_incoming_text(original, modified, mode)
             :gsub('Spezialattacken', '\30\02Spezialattacken\30\01')
             :gsub('Blutsbünde', '\30\02Blutsbünde\30\01')
 
-        return '>>> '..modified, 4
+        return '>>> '..modified, 12
     end
 
     return modified, mode
