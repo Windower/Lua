@@ -585,10 +585,7 @@ end
 
 --Check if the actor is actually an npc rather than a player
 function isMob(id)
-	if get_mob_by_id(id)['is_npc'] then
-		return true
-	end
-	return false
+	return get_mob_by_id(id)['is_npc']
 end
 
 --This function is used to parse the windower resources
@@ -628,19 +625,6 @@ function parse_resources(lines_file)
 		return completed_table
 end
 
---Creates the default settings/moblist in case they have been deleted
---[[function createDefaults(tystr)
-	if tystr == 'settings' then
-		local f1 = files.new(setFName)
-		f1:write("<?xml version=\"1.0\"?>")
-		f1:append("<!--File Created by ohShi.lua-->\n")
-		f1:append("\t<settings>")
-		f1:append("\t<global/>")
-		f1:append("\t</settings>")
-		settings:save('all')
-	end 
-end]]
-
 --This function is only used to delete old unused settings files
 function deleteoldsettings()
 	path = lua_base_path..'data/'
@@ -675,22 +659,3 @@ function split(msg, match)
 	end
 	return splitarr
 end
-
---[[ this is not used atm
-function open_temp_file(template)
-	local handle
-	local fname
-	assert(string.match(template, "@@@"), 
-		"ERROR open_temp_file: template must contain \"%%%\".")
-	while true do
-		fname = string.gsub(template, "@@@", tostring(math.random(10000000,99999999)))
-		handle = io.open(fname, "r")
-		if not handle then
-			handle = io.open(fname, "w")
-			break
-		end
-		io.close(handle)
-		io.write(".")   -- Shows collision, comment out except for diagnostics
-	end
-	return handle, fname
-end]]
