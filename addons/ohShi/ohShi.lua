@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon = {}
 _addon.name = 'OhShi'
-_addon.version = '2.1'
+_addon.version = '2.11'
 
 --Requiring libraries used in this addon
 --These should be saved in addons/libs
@@ -64,7 +64,6 @@ defaults.dangerwords = T{}
 defaults.dangerwords['weaponskills'] = T{"Zantetsuken", "Geirrothr", "Astral Flow", "Chainspell", "Beastruction", "Mandible Massacre", "Oblivion's Mantle", "Divesting Gale", "Frog", "Danse", "Raksha Stance", "Yama's", "Ballistic Kick", "Eradicator", "Arm Cannon", "Gorge", "Extreme Purgitation", "Slimy Proposal", "Rancid Reflux", "Provenance Watcher starts", "Pawn's Penumbra", "Gates", "Fulmination", "Nerve", "Thundris"}
 defaults.dangerwords['spells'] = T{"Death", "Meteor", "Kaustra", "Breakga", "Thundaga IV", "Thundaja", "Firaga IV", "Firaja", "Aeroga IV", "Aeroja", "Blizzaga IV", "Blizzaja", "Stonega IV", "Stoneja"}
 settings = config.load(defaults)
-
 --This function is called when the addon loads. It is used to
 --create all the tables used and populate them. There are also
 --file checks in case settings or moblist.xml are deleted. This
@@ -340,6 +339,7 @@ function ohShi_Flash(str)
 	send_command('wait 2;ohShi timeout '..where)
 end
 --Function to refresh the list to keep it up to date.
+
 function ohShi_refresh()
 	text = ''
 	for inc = 1, #tracking do
@@ -439,7 +439,9 @@ function event_action(act)
 		if act['category'] == 7 and isMob(tonumber(act['actor_id'])) then
 			local num = tonumber(act['targets'][1]['actions'][1]['param']) - 256
 			if num == nil then return end
+			flog('log.lua',num)
 			local wesk = mobAbilities[num]['english'] or 'antidisestablishmentarianism'
+			flog('log.lua',wesk)
 			if dangercheck(wesk) then
 				color2 = '\\cs(255,100,100)'
 				cres = '\\cr'
@@ -480,7 +482,7 @@ function event_action(act)
 		end
 		
 		--This is used in tracking treasure hunter procs.
-		if act['targets'][1]['actions'][1]['has_add_effect'] then
+		if act['targets'][1]['actions'][1]['has_add_effect'] and isMob(tonumber(act['targets'][1]['id'])) then
 			if act['targets'][1]['actions'][1]['add_effect_message'] == 603 then
 				thmob = get_mob_by_id(act['targets'][1]['id'])['name']
 				thlev = act['targets'][1]['actions'][1]['add_effect_param']
@@ -583,7 +585,7 @@ end
 
 --Check if the actor is actually an npc rather than a player
 function isMob(id)
-	if get_mob_by_id(id)['is_npc'] == 1 then
+	if get_mob_by_id(id)['is_npc'] then
 		return true
 	end
 	return false
@@ -593,7 +595,7 @@ end
 --to fill tables with ability/spell names/ids.
 --Created by Byrth
 function parse_resources(lines_file)
-		local completed_table = {}
+		local completed_table = T{}
 		local counter = 0
 		for i in ipairs(lines_file) do
 				local str = tostring(lines_file[i])
@@ -602,19 +604,23 @@ function parse_resources(lines_file)
 						g,h,key = string.find(str,'index="(%d+)" ')
 				end
 				if key ~=nil then
-						completed_table[tonumber(key)]={}
+						completed_table[tonumber(key)] = T{}
 						local q = 1
 						while q <= str:len() do
-								local a,b,ind,val = string.find(str,'(%w+)="([^"]+)"',q)
+								local a,b,ind,val = string.find(str,'(%w+)="(.-)"',q)
 								if ind~=nil then
+									if ind~='id' and ind~='index' then
+										completed_table[tonumber(key)][ind] = T{}
 										completed_table[tonumber(key)][ind] = val:gsub('&quot;','\42'):gsub('&apos;','\39')
-										q = b+1
-								else
-										q = str:len()+1
-								end
+									end
+									q = b+1
+							else
+									q = str:len()+1
+							end
 						end
 						local k,v,english = string.find(str,'>([^<]+)</')
 						if english~=nil then
+								completed_table[tonumber(key)][ind] = T{}
 								completed_table[tonumber(key)]['english']=english
 						end
 				end
