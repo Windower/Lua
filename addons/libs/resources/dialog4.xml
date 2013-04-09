@@ -155,7 +155,7 @@
 	<dtd id="153" english="${actor} uses ${ability}.${lb}${actor} fails to steal from ${target}." color="101"/>
 	<dtd id="154" english="${target} is out of range." color="122"/>
 	<dtd id="155" english="You cannot perform that action on the specified target." color="1"/>
-	<dtd id="156" english="${actor} uses ${ability}.${lb}No effect on ${target}." color="1"/>
+	<dtd id="156" english="${actor} uses ${ability}.${lb}No effect on ${target}." color="104"/>
 	<dtd id="157" english="${actor} uses Barrage.${lb}${target} takes ${number} points of damage." color="D"/>
 	<dtd id="158" english="${actor} uses ${ability}, but misses." color="104"/>
 	<dtd id="159" english="${actor} uses ${weapon_skill}.${lb}${target}'s ${status} effect disappears!" color="H"/>
@@ -302,9 +302,9 @@
 	<dtd id="300" english="Skillchain: Detonation.${lb}${target} takes ${number} points of damage." color="D"/>
 	<dtd id="301" english="Skillchain: Impaction.${lb}${target} takes ${number} points of damage." color="D"/>
 	<dtd id="302" english="Skillchain: Cosmic Elucidation.${lb}${target} takes ${number} points of damage." color="D"/>
-	<dtd id="303" english="${actor} uses Divine Seal." color="1"/>
-	<dtd id="304" english="${actor} uses Elemental Seal." color="1"/>
-	<dtd id="305" english="${actor} uses Trick Attack." color="1"/>
+	<dtd id="303" english="${actor} uses Divine Seal." color="101"/>
+	<dtd id="304" english="${actor} uses Elemental Seal." color="101"/>
+	<dtd id="305" english="${actor} uses Trick Attack." color="101"/>
 	<dtd id="306" english="${actor} uses ${ability}.${lb}${target} recovers ${number} HP." color="H" prefix="HP"/>
 	<dtd id="307" english="That action requires a two-handed weapon." color="1"/>
 	<dtd id="308" english="Unable to use the ${item}.${lb}${target}'s inventory is full." color="1"/>
@@ -322,7 +322,7 @@
 	<dtd id="320" english="${actor} uses ${ability}.${lb}${target} receives the effect of ${status}." color="101"/>
 	<dtd id="321" english="${actor} uses ${ability}.${lb}${target}'s ${status} effect wears off." color="191"/>
 	<dtd id="322" english="${actor} uses ${ability}.${lb}${target}'s ${status} effect wears off." color="191"/>
-	<dtd id="323" english="${actor} uses ${ability}.${lb}No effect on ${target}." color="1"/>
+	<dtd id="323" english="${actor} uses ${ability}.${lb}No effect on ${target}." color="104"/>
 	<dtd id="324" english="${actor} uses ${ability}, but misses ${target}." color="104"/>
 	<dtd id="325" english="You are charmed by an enemy and unable to act." color="1"/>
 	<dtd id="326" english="${actor} readies ${ability}." color="1"/>
@@ -452,7 +452,7 @@
 	<dtd id="450" english="WATCH${number} ${target}:${number}" color="1"/>
 	<dtd id="451" english="${actor} uses ${ability}.${lb}${target} regains ${number} MP." color="H" prefix="MP"/>
 	<dtd id="452" english="${actor} uses ${ability}.${lb}${target} regains ${number} TP." color="H" prefix="TP"/>
-	<dtd id="453" english="${actor} uses ${ability}.${lb}${actor} steals the effect of ${status} from ${target}." color="1"/>
+	<dtd id="453" english="${actor} uses ${ability}.${lb}${actor} steals the effect of ${status} from ${target}." color="101"/>
 	<dtd id="454" english="${actor} casts ${spell}.${lb}${number} TP drained from ${target}." color="1" prefix="TP"/>
 	<dtd id="455" english="Debug : Fishing skill check: ${item} : ???${number}" color="1"/>
 	<dtd id="456" english="Debug : Level Restriction on.${lb}PetType ${number}/ID ${number}" color="1"/>
@@ -594,8 +594,8 @@
 	<dtd id="592" english="${target} attempts to counter ${actor}'s attack, but misses." color="M"/>
 	<dtd id="593" english="${actor} uses ${ability}.${lb}${actor} steals an ${item} from ${target}.${lb}Additional effect: ${target} is afflicted with Attack Down." color="101"/>
 	<dtd id="594" english="${actor} uses ${ability}.${lb}${actor} steals an ${item} from ${target}.${lb}Additional effect: ${target} is afflicted with Defense Down." color="101"/>
-	<dtd id="595" english="${actor} uses ${ability}.${lb}${actor} steals an ${item} from ${target}.${lb}Additional effect: ${target} is afflicted with Magic Atk.${lb}Down." color="101"/>
-	<dtd id="596" english="${actor} uses ${ability}.${lb}${actor} steals an ${item} from ${target}.${lb}Additional effect: ${target} is afflicted with Magic Def.${lb}Down." color="101"/>
+	<dtd id="595" english="${actor} uses ${ability}.${lb}${actor} steals an ${item} from ${target}.${lb}Additional effect: ${target} is afflicted with Magic Atk. Down." color="101"/>
+	<dtd id="596" english="${actor} uses ${ability}.${lb}${actor} steals an ${item} from ${target}.${lb}Additional effect: ${target} is afflicted with Magic Def. Down." color="101"/>
 	<dtd id="597" english="${actor} uses ${ability}.${lb}${actor} steals an ${item} from ${target}.${lb}Additional effect: ${target} is afflicted with Evasion Down." color="101"/>
 	<dtd id="598" english="${actor} uses ${ability}.${lb}${actor} steals an ${item} from ${target}.${lb}Additional effect: ${target} is afflicted with Accuracy Down." color="101"/>
 	<dtd id="599" english="${actor} uses ${ability}.${lb}${actor} steals an ${item} from ${target}.${lb}Additional effect: ${target} is afflicted with Slow." color="101"/>
@@ -607,7 +607,7 @@
 	<dtd id="605" english="Additional effect: ${target} falls to the ground." color="1"/>
 	<dtd id="606" english="${actor}'s absorbs ${target}'s counter.${lb}${actor} recovers ${number} HP." color="H" prefix="HP"/>
 	<dtd id="607" english="${actor} uses ${weapon_skill}.${lb}${number} of ${target}'s status ailments disappears!" color="1"/>
-	<dtd id="608" english="${actor} uses ${ability}.${lb}Treasure Hunter effectiveness against ${target} increases to ${number}." color="1"/>
+	<dtd id="608" english="${actor} uses ${ability}.${lb}Treasure Hunter effectiveness against ${target} increases to ${number}." color="101"/>
 	<dtd id="609" english="Prowess attained: Increased treasure casket discovery." color="1"/>
 	<dtd id="610" english="Prowess attained: Increased combat and magic skill gain." color="1"/>
 	<dtd id="611" english="Prowess attained: Increased crystal yield." color="1"/>
