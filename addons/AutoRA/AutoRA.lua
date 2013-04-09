@@ -24,12 +24,14 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-require 'buff'
+require 'timer'
 
 function event_load()
 
-	auto = 0
-	delay = '0'
+	version = '1.0.1'
+	delay = 0
+	RW_delay = 0
+	Ammo_Delay = 0
 	send_command('unbind ^d')
 	send_command('unbind !d')
 	send_command('bind ^d ara start')
@@ -39,6 +41,7 @@ function event_load()
 	
 end
 
+--Function Designer:  Byrth
 function setDelay()
 	local f = io.open(lua_base_path..'data/settings.txt', "r")
 	if f == nil then
@@ -64,40 +67,36 @@ function setDelay()
 				cmd = (splat[1]..' '..splat[2]):gsub(':',''):lower()
 			end
 			if cmd == 'ra delay' then
-				delay = splat[3]
-			end
+				RW_delay = tonumber(splat[3])
+			elseif cmd == 'ammo delay' then
+				Ammo_Delay = tonumber(splat[3])
 		end
 		add_to_chat(12,'AutoRA read from a settings file and loaded!')
 	end
-	delay = (delay/90)
+	delay = ((RW_delay + Ammo_delay)/90)
 end
 	
 function start()
-
-	auto = 1
-	shoot()
-
+	player = get_player()
+	if (player.status:lower() == 'engaged' ) then
+		timer.Create('timerShoot', delay, 0, shoot)
+	elseif (player.status:lower() == 'idle' ) then
+		shoot()
+	end
 end
 
 function stop()
-
-	auto = 0
-	
+	timer.RemoveTimer('timerShoot')
 end
 
 function shoot()
-	local player = get_player()
-	if ((auto == 1) and (player.status:lower() == 'engaged' ) ) then
-		
-		send_command('input /shoot')
-		send_command('wait '..delay..'; input //ara shoot')
-		
-	elseif ((auto == 0) or (player.status:lower() == 'idle' ) ) then
-		send_command('input /shoot')
+	send_command('input /shoot <t>')
+	if player.status:lower() == 'idle' and (IsTimer('timerShoot')) then
+		timer.RemoveTimer('timerShoot')
 	end
-	
 end
 
+--Function Author:  Byrth
 function split(msg, match)
 	local length = msg:len()
 	local splitarr = {}
@@ -119,6 +118,7 @@ function split(msg, match)
 	return splitarr
 end
 
+--Function Designer:  Byrth
 function event_addon_command(...)
     local term = table.concat({...}, ' ')
     local splitarr = split(term,' ')
