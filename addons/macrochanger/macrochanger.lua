@@ -85,7 +85,7 @@ function options_load()
 		g:write('Release Date: 9:00 PM, 4-01-13\46\n')
 		g:write('Author Comment: This document is whitespace sensitive, which means that you need the same number of spaces between things as exist in this initial settings file\46\n')
 		g:write('Author Comment: It looks at the first two words separated by spaces and then takes anything as the value in question if the first two words are relevant\46\n')
-		g:write('Author Comment: If you ever mess it up so that it does not work, you can just delete it and battlemod will regenerate it upon reload\46\n')
+		g:write('Author Comment: If you ever mess it up so that it does not work, you can just delete it and MacroChanger will regenerate it upon reload\46\n')
 		g:write('Author Comment: For the output customization lines, simply place the book and page number that you would like to change to upon a job change.\46\n')
 		g:write('Author Comment: If 2 jobs share a book, you can place the same book number for each job, then put their individual pages.\46\n')
 		g:write('Author Comment: Example:  BLM and SCH both use Macro Book 2:  BLM uses page 3. SCH uses page 1.\46\n')
@@ -145,7 +145,7 @@ function options_load()
 		RUN_Book = '20'
 		RUN_Page = '1'
 		write('Default settings file created')
-		add_to_chat(12,'Battlemod created a settings file and loaded!')
+		add_to_chat(12,'MacroChanger created a settings file and loaded!')
 	else
 		f:close()
 		for curline in io.lines(lua_base_path..'data/settings.txt') do
