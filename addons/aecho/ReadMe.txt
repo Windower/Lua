@@ -1,16 +1,6 @@
-**Author:** Ricky Gall  
-**Version:** 1.0 
-**Description:**  
 Watches buffs/debuffs and sends messages to alts when you gain certain
 ones. Also, automatically uses echo drops if you get silenced.
 
-**Abbreviation:** //aecho
-
-**Commands:**
- There are no commands for aecho.
-
-**Additional Comments:**
- 
 Can watch more or less buffs just by changing the watchbuffs table.
 
 Also, this program assumes you have send. If not, then you can just remove the following parts that use it:
