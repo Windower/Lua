@@ -1,12 +1,14 @@
 -- Scoreboard addon for Windower4. See readme.md for a complete description.
 
+_addon = _addon or {}
+_addon.name = 'Scoreboard'
+_addon.version = 0.4
+
 require 'tablehelper'
 require 'stringhelper'
 require 'mathhelper'
 require 'logger'
-
 require 'actionhelper'
-
 local config = require 'config'
 
 -----------------------------
@@ -38,8 +40,8 @@ local default_settings_file = [[
 		bgTransparency - Transparency level for the background. 0-255 range
 	-->
 	<global>
-		<posX>10</posX>
-		<posY>250</posY>
+		<posX>600</posX>
+		<posY>100</posY>
 		<bgTransparency>200</bgTransparency>
 		<numPlayers>8</numPlayers>
 	</global>
@@ -70,7 +72,13 @@ function event_addon_command(...)
 			write('sb clear : Clears mob filter')
 		elseif params[1]:lower() == "pos" then
 			if params[3] then
-				tb_set_location('scoreboard', params[2], params[3])
+				local posx, posy = tonumber(params[2]), tonumber(params[3])
+				tb_set_location('scoreboard', posx, posy)
+				if posx ~= settings.posx or posy ~= settings.posy then
+					settings.posx = posx
+					settings.posy = posy
+					settings:save()
+				end
 			end
 		elseif params[1]:lower() == "reset" then
 			initialize()
@@ -187,7 +195,7 @@ function event_load()
 		f:close()
 	end
 	settings = config.load()
-
+	
 	player_display_count = settings['numplayers'] or player_display_count
 	
 	send_command('alias sb lua c scoreboard')
@@ -207,80 +215,99 @@ function event_load()
 	initialize()
 end
 
+-- Returns all mob IDs for anyone in your alliance, including their pets.
+function get_ally_mob_ids()
+	local allies = T{}
+	local party = get_party()
 
-function actor_is_party_member(action)
-	local party = get_active_party()
-	if party[action:get_actor_name()] then
-		return true
-	else
-		return false
+	for _, member in pairs(party) do
+		if member.mob then
+			allies:append(member.mob.id)
+			if member.mob.pet_target_id > 0 then
+				allies:append(get_mob_by_target_id(member.mob.pet_target_id).id)
+			end
+		end
 	end
+	
+	return allies
+end
+
+-- Returns true iff is someone (or a pet of someone) in your alliance.
+function mob_is_ally(mob_id)
+	-- get zone-local ids of all allies and their pets
+	return get_ally_mob_ids():contains(mob_id)
 end
 
 
 function event_action(raw_action)
 	local action = Action(raw_action)
 	local category = action:get_category_string()
-	
-	if not actor_is_party_member(action) and category == 'melee' then
-		for target in action:get_targets() do
-			for subaction in target:get_actions() do
-				if subaction.has_spike_effect then
-					accumulate(action:get_actor_name(), target:get_name(), subaction.spike_effect_param)
+
+	if mob_is_ally(action.raw.actor_id) then
+		if category == 'melee' then
+			for target in action:get_targets() do
+				for subaction in target:get_actions() do
+					-- hit, crit
+					if subaction.message == 1 or subaction.message == 67 then
+						accumulate(target:get_name(), action:get_actor_name(), subaction.param)
+						if subaction.has_add_effect and T{163, 229}:contains(subaction.add_effect_message) then
+							accumulate(target:get_name(), action:get_actor_name(), subaction.add_effect_param)
+						end
+					end
+				end
+			end
+		elseif category == 'weaponskill_finish' then
+			for target in action:get_targets() do
+				for subaction in target:get_actions() do
+					accumulate(target:get_name(), action:get_actor_name(), subaction.param)
+
+					-- skillchains
+					if subaction.has_add_effect then
+						accumulate(target:get_name(), action:get_actor_name(), subaction.add_effect_param)
+					end
+				end
+			end
+		elseif category == 'spell_finish' then
+			for target in action:get_targets() do
+				for subaction in target:get_actions() do
+					if subaction.message == 2 then
+						accumulate(target:get_name(), action:get_actor_name(), subaction.param)
+					end
+				end
+			end
+		elseif category == 'ranged_finish' then
+			for target in action:get_targets() do
+				for subaction in target:get_actions() do
+					-- ranged, crit, squarely, truestrike
+					if T{352, 353, 576, 577}:contains(subaction.message) then
+						accumulate(target:get_name(), action:get_actor_name(), subaction.param)
+						
+						-- holy bolts etc
+						if subaction.has_add_effect and T{163, 229}:contains(subaction.add_effect_message) then
+							accumulate(target:get_name(), action:get_actor_name(), subaction.add_effect_param)
+						end
+					end
+				end
+			end
+		elseif category == 'job_ability' or category == 'job_ability_unblinkable' then
+			for target in action:get_targets() do
+				for subaction in target:get_actions() do
+					-- sange(77), generic damage ja(110), barrage(157), other generic dmg ja (317), stun ja (522)
+					if T{77, 110, 157, 317, 522}:contains(subaction.message) then
+						accumulate(target:get_name(), action:get_actor_name(), subaction.param)
+					end
 				end
 			end
 		end
 	elseif category == 'melee' then
+		-- This is some non-ally action packet. We need to see if they are hitting someone
+		-- in this alliance, and if so, accumulate any damage from spikes/counters/etc.
 		for target in action:get_targets() do
-			for subaction in target:get_actions() do
-				-- hit, crit
-				if subaction.message == 1 or subaction.message == 67 then
-					accumulate(target:get_name(), action:get_actor_name(), subaction.param)
-					if subaction.has_add_effect and T{163, 229}:contains(subaction.add_effect_message) then
-						accumulate(target:get_name(), action:get_actor_name(), subaction.add_effect_param)
+			if mob_is_ally(target.id) then
+				for subaction in target:get_actions() do
+					if subaction.has_spike_effect then
+						accumulate(action:get_actor_name(), target:get_name(), subaction.spike_effect_param)
 					end
-				end
-			end
-		end
-	elseif category == 'weaponskill_finish' then
-		for target in action:get_targets() do
-			for subaction in target:get_actions() do
-				accumulate(target:get_name(), action:get_actor_name(), subaction.param)
-
-				-- skillchains
-				if subaction.has_add_effect then
-					accumulate(target:get_name(), action:get_actor_name(), subaction.add_effect_param)
-				end
-			end
-		end
-	elseif category == 'spell_finish' then
-		for target in action:get_targets() do
-			for subaction in target:get_actions() do
-				if subaction.message == 2 then
-					accumulate(target:get_name(), action:get_actor_name(), subaction.param)
-				end
-			end
-		end
-	elseif category == 'ranged_finish' then
-		for target in action:get_targets() do
-			for subaction in target:get_actions() do
-				-- ranged, crit, squarely, truestrike
-				if T{352, 353, 576, 577}:contains(subaction.message) then
-					accumulate(target:get_name(), action:get_actor_name(), subaction.param)
-					
-					-- holy bolts etc
-					if subaction.has_add_effect and T{163, 229}:contains(subaction.add_effect_message) then
-						accumulate(target:get_name(), action:get_actor_name(), subaction.add_effect_param)
-					end
-				end
-			end
-		end
-	elseif category == 'job_ability' or category == 'job_ability_unblinkable' then
-		for target in action:get_targets() do
-			for subaction in target:get_actions() do
-				-- sange(77), generic damage ja(110), barrage(157), other generic dmg ja (317), stun ja (522)
-				if T{77, 110, 157, 317, 522}:contains(subaction.message) then
-					accumulate(target:get_name(), action:get_actor_name(), subaction.param)
 				end
 			end
 		end
@@ -296,13 +323,9 @@ function event_unload()
 	tb_delete('scoreboard')
 end
 
+
 -- Adds the given data to the main DPS table
 function accumulate(mob, player, damage)
-	local active_party = get_active_party()
-	if not active_party[player] then
-		return
-	end
-
 	mob = string.lower(mob:gsub('^[tT]he ', ''))
 	if not dps_db[mob] then
 		dps_db[mob] = T{}
@@ -314,18 +337,6 @@ function accumulate(mob, player, damage)
 	else
 		dps_db[mob][player] = damage + dps_db[mob][player] 
 	end
-end
-
-
-function get_active_party()
-	local party_data = get_party()
-	local new_party = {}
-	
-	for _, member in pairs(party_data) do
-		new_party[member["name"]] = 1
-	end
-	
-	return new_party
 end
 
 
@@ -379,6 +390,7 @@ function get_sorted_player_damage()
 	
 	return sortable, total_damage
 end
+
 
 -- Convert integer seconds into a "HhMmSs" string
 function seconds_to_hms(seconds)
@@ -485,6 +497,7 @@ function report_summary (...)
 			input_cmd = input_cmd .. tell_target .. ' '
 		end
 	end
+
 	send_command(input_cmd .. table.concat(display_table, ', '))
 end
 

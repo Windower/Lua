@@ -59,4 +59,8 @@
   	<name>STNA</name>
   	<description>One-button status removal for dual boxing.</description>
   </addon>
+  <addon>
+  	<name>vwhl</name>
+  	<description>Redirects vw nm's vulnerabilities to the "tell" stream so that they can be held using the chat filters' function and highlights the important info. Supports EN, FR, DE clients.</description>
+  </addon>
 </addons>

@@ -16,7 +16,7 @@ _libs.filehelper = _libs.filehelper or (files ~= nil)
 
 local config = T(config) or T{}
 local file = files.new()
-local original = nil
+local original = T{}
 local chars = T{}
 local comments = T{}
 
@@ -34,12 +34,11 @@ local table_diff
 -- Writes all configs to _config.
 function config.load(filename, confdict)
 	if type(filename) == 'table' then
-		confdict = filename
-		filename = nil
+		confdict, filename = filename, nil
 	end
-	confdict = confdict or T{}
+	confdict = T(confdict) or T{}
 	local confdict_mt = getmetatable(confdict)
-	confdict = setmetatable(confdict, {__index=function(t, x) if x == 'save' then return config['save'] else return confdict_mt.__index[x] end end})
+	confdict = setmetatable(confdict, {__index = function(t, x) if x == 'save' then return config['save'] else return confdict_mt.__index[x] end end})
 	
 	-- Sets paths depending on whether it's a script or addon loading this file.
 	local filepath = filename or files.check('data/settings.json', 'data/settings.xml')
@@ -50,7 +49,8 @@ function config.load(filename, confdict)
 	file:set(filepath)
 
 	-- Load addon/script config file (Windower/addon/<addonname>/config.json for addons and Windower/scripts/<name>-config.json).
-	local config_load, err = parse(file, confdict)
+	local err
+	confdict, err = parse(file, confdict)
 
 	if err ~= nil then
 		error(err)
@@ -61,8 +61,6 @@ end
 
 -- Resolves to the correct parser and calls the respective subroutine, returns the parsed settings table.
 function parse(file, confdict)
-	confdict = confdict or T{}
-	
 	local parsed = T{}
 	local err
 	if file.path:endswith('.json') then
@@ -82,11 +80,18 @@ function parse(file, confdict)
 	
 	-- Determine all characters found in the settings file.
 	chars = parsed:keyset():filter(-functools.equals('global'))
+	original = T{}
+	
+	if confdict:isempty() then
+		for _, char in ipairs(T{'global'}+chars) do
+			original[char] = confdict:copy():update(parsed[char], true)
+		end
+		return confdict:update(parsed['global']:update(parsed[get_player()['name']:lower()], true), true)
+	end
 	
 	-- Update the global settings with the per-player defined settings, if they exist. Save the parsed value for later comparison.
-	original = parsed:copy()
-	for char, t in pairs(original) do
-		original[char] = confdict:merge(original[char]):copy()
+	for _, char in ipairs(T{'global'}+chars) do
+		original[char] = confdict:copy():merge(parsed[char])
 	end
 	
 	return confdict:merge(parsed['global']:update(parsed[get_player()['name']:lower()], true))

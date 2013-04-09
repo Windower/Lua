@@ -5,6 +5,7 @@ A few math helper functions.
 _libs = _libs or {}
 _libs.mathhelper = true
 _libs.tablehelper = _libs.tablehelper or require 'tablehelper'
+_libs.stringhelper = _libs.stringhelper or require 'stringhelper'
 
 -- Order of digits in an for higher base math
 math.digitorder = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'

@@ -340,10 +340,7 @@ function xml.classify(tokens, var)
 				if mode == 'tag' then
 					parsed:last(2).children:append(parsed:remove())
 					mode = 'inner'
---				elseif mode == '' then
-					
 				else
-					add_to_chat(207, tostring(mode))
 					return xml.error('Illegal token inside a tag: '..token, line)
 				end
 				
