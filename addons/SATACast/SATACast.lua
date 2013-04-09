@@ -28,7 +28,7 @@ require 'buff'
 
 function event_load()
 	
-	version = '1.0.0'
+	version = '1.0.1'
 	SA_Set = ' '
 	TA_Set = ' '
 	SATA_Set = ' '
@@ -36,12 +36,11 @@ function event_load()
 	Idle_Set = ' '
 	add_to_chat(17, 'SATACast v' .. version .. ' loaded.     Author:  Banggugyangu')
 	add_to_chat(17, 'Attempting to load settings from file.')
-	SA_Up = 0
-	TA_Up = 0
 	options_load()
 	
 end
 
+--Function Designer:  Byrth
 function options_load()
 	local f = io.open(lua_base_path..'data/settings.txt', "r")
 	if f == nil then
@@ -82,6 +81,7 @@ function options_load()
 	end
 end
 
+--Function Author:  Byrth
 function split(msg, match)
 	local length = msg:len()
 	local splitarr = {}
@@ -102,33 +102,13 @@ function split(msg, match)
 	end
 	return splitarr
 end
-
-function event_action(act)
-	local self = get_player()
-	if (isBuffActive('Sneak_Attack') and isBuffActive('Trick_Attack') and (self.status:lower() == 'engaged') ) then
-		if SA_Up == 0 and TA_Up == 0 then
-			send_command('sc set ' .. SATA_Set)
-			SA_Up = 1
-			TA_Up = 1
-		else
-		end
-	elseif (isBuffActive('Sneak_Attack') and (self.status:lower() == 'engaged') ) then
-		if SA_Up == 0 then
-			send_command('sc set ' .. SA_Set)
-			SA_Up = 1
-		else
-		end
-	elseif (isBuffActive('Trick_Attack') and (self.status:lower() == 'engaged') ) then
-		if TA_Up == 0 then
-			send_command('sc set ' .. TA_Set)
-			TA_Up = 1
-		else
-		end
-	elseif not isBuffActive('Sneak_Attack') then
-		SA_Up = 0
-	elseif not isBuffActive('Trick_Attack') then
-		TA_Up = 0
-	end
-end
 		
-	
+function event_lose_status(id, name)
+	local self = get_player()
+	if name == ('Sneak Attack' or 'Trick Attack') then
+		if self.status:lower() == 'engaged' then
+			send_command('sc set ' .. TP_Set)
+		elseif self.status:lower() == 'idle' then
+			send_command('sc set ' .. Idle_Set)
+		end
+end
