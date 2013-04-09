@@ -29,7 +29,7 @@
 	<dtd id="27" english="Debug Message: Cannot execute command.${lb}No (BTCALC) command in ATEL source." color="1"/>
 	<dtd id="28" english="${actor} uses an ${item}." color="90"/>
 	<dtd id="29" english="${actor} is paralyzed." color="122"/>
-	<dtd id="30" english="${target} anticipates the attack." color="1"/>
+	<dtd id="30" english="${target} anticipates the attack." color="29"/>
 	<dtd id="31" english="${number} of ${target}'s shadows absorbs the damage and disappears." color="29"/>
 	<dtd id="32" english="${target} dodges the attack." color="29"/>
 	<dtd id="33" english="${actor}'s attack is countered by ${target}.${lb}${actor} takes ${number} points of damage." color="D"/>
