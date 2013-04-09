@@ -359,14 +359,13 @@ function table.splice(t, from, to, st)
 	return t
 end
 
--- Returns a reversed table. Only works on arrays.
+-- Returns a reversed array.
 function table.reverse(t)
+	t = t:copy()
 	local res = T{}
-	for key = 1, math.ceil(#t/2) do
-		if key == #t-key then
-			res[key] = t[key]
-		end
-		res[key], res[#t-key+1] = t[#t-key+1], t[key]
+	
+	for _ = 1, #t do
+		res:append(t:remove())
 	end
 
 	return res
@@ -458,6 +457,11 @@ function table.range(start, finish, step)
 	return res
 end
 
+-- Splits an array into an array of arrays of fixed length.
+function table.chunks(t, size)
+	return table.range(math.ceil(t:length()/size)):map(function(i) return t:slice(size*(i - 1) + 1, size*i) end)
+end
+
 -- Backs up old table concat function.
 table._bak_concat = table.concat
 
@@ -479,6 +483,16 @@ end
 -- Multiply all elements of a table.
 function table.mult(t)
 	return T(t):reduce(math.mult, 1)
+end
+
+-- Returns the minimum element of the table.
+function table.min(t)
+	return T(t):reduce(math.min)
+end
+
+-- Returns the maximum element of the table.
+function table.min(t)
+	return T(t):reduce(math.max)
 end
 
 -- Check if table is empty.

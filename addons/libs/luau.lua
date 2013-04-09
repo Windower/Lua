@@ -14,3 +14,4 @@ files = require 'filehelper'
 config = require 'config'
 xml = require 'xml'
 json = require 'json'
+collectgarbage()

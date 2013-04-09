@@ -156,9 +156,21 @@ function string.capitalize(str)
 	return str:split(' '):map(string.ucfirst):sconcat()
 end
 
+-- Takes a padding character pad and pads the string str to the left of it, until len is reached. pad defaults to a space.
+function string.lpad(str, pad, len)
+	pad = pad or ' '
+	return (pad:rep(len)..str):slice(-len)
+end
+
+-- Takes a padding character pad and pads the string str to the right of it, until len is reached. pad defaults to a space.
+function string.rpad(str, pad, len)
+	pad = pad or ' '
+	return (str..pad:rep(len)):slice(1, len)
+end
+
 -- Returns the string padded with zeroes until the length is len.
 function string.zfill(str, len)
-	return (('0'):rep(len)..str):slice(-len)
+	return str:lpad('0', len)
 end
 
 -- Converts a string in base base to a number.

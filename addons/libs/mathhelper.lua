@@ -24,12 +24,15 @@ function math.sgn(num)
 	return num/math.abs(num)
 end
 
+-- Backs up the old log function.
+math._bak_log = math.log
+
 -- Returns an arbitrary-base logarithm. Defaults to e.
 function math.log(val, base)
 	if base == nil then
 		base = math.e
 	end
-	return math.log10(val)/math.log10(base)
+	return math._bak_log(val)/math._bak_log(base)
 end
 
 -- Returns a binary string representation of val.

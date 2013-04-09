@@ -24,14 +24,14 @@ end
 -- Returns a partially applied function, depending on the number of arguments provided.
 function functools.apply(fn, args)
 	return function(...)
-		return fn(T(args):extend(T{...}):unpack())
+		return fn(T(args):copy():extend(T{...}):unpack())
 	end
 end
 
 -- Returns a partially applied function, with the argument provided at the end.
 function functools.endapply(fn, args)
 	return function(...)
-		return fn(T{...}:extend(args):unpack())
+		return fn(T{...}:extend(T(args):copy()):unpack())
 	end
 end
 
