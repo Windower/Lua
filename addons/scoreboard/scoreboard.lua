@@ -182,6 +182,7 @@ end
 
 function event_unload()
     send_command('unalias sb')
+    display_destroy()
 end
 
 
