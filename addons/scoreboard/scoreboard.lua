@@ -134,7 +134,7 @@ function event_status_change(...)
 end
 
 
-function event_load()
+function event_login(...)
     -- Write a default settings file if it doesn't exist
     local f = io.open(lua_base_path .. settings_file, 'r')
     if not f then
