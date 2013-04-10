@@ -135,6 +135,18 @@ end
 
 
 function event_login(...)
+    event_load()
+end
+
+
+function event_load(...)
+    -- Bail out until player name is set. The config library depends on player name
+    -- being defined to process settings properly.
+    local player_name = get_player()['name']
+    if player_name == '' then
+        return
+    end
+
     -- Write a default settings file if it doesn't exist
     local f = io.open(lua_base_path .. settings_file, 'r')
     if not f then
