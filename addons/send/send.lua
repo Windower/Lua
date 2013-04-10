@@ -78,6 +78,10 @@ end
 
 function relevant_msg(msg)
 	local player = get_player()
+    st,en,item,tar = string.find(msg,'/item ([%w%s]+) <(%w+)>')
+    if item ~= nil then
+        msg = '/item "'..item..'" <'..tar..'>'
+    end
 	msg:gsub("<me>", player['name'])
 	msg:gsub("<hp>", tostring(player['hp']))
 	msg:gsub("<mp>", tostring(player['mp']))
