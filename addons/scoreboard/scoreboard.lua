@@ -120,15 +120,16 @@ function initialize()
 end
 
 
--- Secondary update driver to keep the DPS moving between swings and keep the clock moving.
+-- Keep updates flowing
 function event_time_change(...)
-    update_dps_clock()
+    model_update()
     display_update()
 end
 
 
+-- Keep updates flowing
 function event_status_change(...)
-    update_dps_clock()
+    model_update()
     display_update()
 end
 
@@ -153,24 +154,22 @@ function event_load()
         f:close()
     end
     settings = config.load()
-	
-    player_display_count = settings['numplayers'] or player_display_count
-	
+
+    local player_display_count = settings['numplayers'] or player_display_count
     send_command('alias sb lua c scoreboard')
-	
+
     local transparency = tonumber(settings['bgtransparency']) or 200
     local posx = tonumber(settings['posx']) or 10
     local posy = tonumber(settings['posy']) or 200
-	
-    tb_create('scoreboard')
-    tb_set_bg_color('scoreboard', transparency, 30, 30, 30)
-    tb_set_font('scoreboard', 'courier', 10)
-    tb_set_color('scoreboard', 255, 225, 225, 225)
-    tb_set_location('scoreboard', posx, posy)
-    tb_set_visibility('scoreboard', 1)
-    tb_set_bg_visibility('scoreboard', 1)
+
+    display_create(posx, posy, transparency, player_display_count)
 
     initialize()
+end
+
+
+function event_unload()
+    send_command('unalias sb')
 end
 
 
@@ -274,13 +273,7 @@ function event_action(raw_action)
     end
 	
     display_update()
-    update_dps_clock()
-end
-
-
-function event_unload()
-    send_command('unalias sb')
-    tb_delete('scoreboard')
+    model_update()
 end
 
 
