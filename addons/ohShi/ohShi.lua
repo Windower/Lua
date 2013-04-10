@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon = {}
 _addon.name = 'OhShi'
-_addon.version = '2.12'
+_addon.version = '2.15'
 
 --Requiring libraries used in this addon
 --These should be saved in addons/libs
@@ -69,19 +69,15 @@ settings = config.load(defaults)
 --file checks in case settings or moblist.xml are deleted. This
 --is also where the file objects for resources files are created.
 function event_load()
-    notice('Version '.._addon.version..' Loaded.')
-    firstrun = 0
+    notice('Version '.._addon.version..' Loaded. Type //ohshi help for list of commands.')
     tracking = {}
-    mobs = {}
     prims = {}
     spells = {}
     jobAbilities = {}
-    color2 = ''
-    cres = ''
+    mobAbilities = {}
     speFName = '../../plugins/resources/spells.xml'
     jaFName = '../../plugins/resources/abils.xml'
     maFName = '../libs/resources/mabils.xml'
-    player = get_player()
     speFile = files.new(speFName)
     jaFile = files.new(jaFName)
     maFile = files.new(maFName)
@@ -91,7 +87,6 @@ function event_load()
     jobAbilities = parse_resources(jaFile:readlines())
     mobAbilities = parse_resources(maFile:readlines())
     send_command('alias ohShi lua c ohshi') --For addon commands
-    if firstrun == 1 then send_command('ohShi help') end --If first run show the help menu
     send_command('wait 1;ohshi create')
     deleteoldsettings()
 end
@@ -103,19 +98,13 @@ function event_unload()
     ohShi_delete()
 end
 
---This is a backup in case you are not logged in or
---log out and back in while the addon is loaded
-function event_login()
-    player = get_player()
-end
-
 --This function is used to process addon commands
 --like //ohshi help and the like.
 function event_addon_command(...)
     local args = {...}
     if args[1] ~= nil then
         comm = args[1]:lower()
-        list = ''
+        local list,td,utm,tm = ''
         if comm == 'help' then
             notice('Version '.._addon.version..' loaded! You have access to the following commands with the //ohshi alias:')
             notice(' 1. bgcolor <alpha> <red> <green> <blue> --Sets the color of the box.')
@@ -170,7 +159,7 @@ function event_addon_command(...)
             end
         elseif comm == 'font' then
             if args[3] ~= nil then
-                font = ''
+                local font = ''
                 local p
                 for p = 3, #args do
                     font = font..args[p]
@@ -221,6 +210,7 @@ function event_addon_command(...)
                     else
                         error('Already tracking '..tm..' mob '..list)
                     end
+                    tm = nil
                 else
                     error('Improper Syntax: //ohShi track <vw/legion/other/abyssea/meebles> <mobname>')
                 end
@@ -254,6 +244,7 @@ function event_addon_command(...)
                     else
                         error('You were not tracking '..tm..' mob '..list)
                     end
+                    utm = nil
                 else
                     error('Improper Syntax: //ohShi untrack <vw/legion/other/abyssea/meebles> <mobname>')
                 end
@@ -313,9 +304,6 @@ end
 --Set up the tracker text box
 function ohShi_SetUp()
     tb_create('ohShi')
-    if firstrun == 1 then 
-        tb_set_text('ohShi','ohShi')
-    end
     if settings ~= nil then
         tb_set_bg_color('ohShi',settings['bgalpha'],settings['bgred'],settings['bggreen'],settings['bgblue'])
         tb_set_bg_visibility('ohShi',true)
@@ -324,9 +312,7 @@ function ohShi_SetUp()
         tb_set_location('ohShi',settings['posx'],settings['posy'])
         tb_set_visibility('ohShi',true)
     end
-    if firstrun == 0 then
-        ohShi_Flash(' ohShi initialized. ')
-    end
+    ohShi_Flash(' ohShi initialized. ')
 end
 
 --Flashes the ohShi text whenever you change a setting related to
@@ -337,11 +323,12 @@ function ohShi_Flash(str)
     tracking[where] = str
     ohShi_refresh()
     send_command('wait 2;ohShi timeout '..where)
+    str = nil
 end
 --Function to refresh the list to keep it up to date.
 
 function ohShi_refresh()
-    text = ''
+    local text = ''
     for inc = 1, #tracking do
         text = text..tracking[inc]
         if inc < #tracking then
@@ -361,8 +348,10 @@ function ohShi_delete()
         settings:save()
     end
     local h
-    for h = 1, #prims do
-        prim_delete(prims[h])
+    if prims ~= nil then
+        for h = 1, #prims do
+            prim_delete(prims[h])
+        end
     end
     tb_delete('ohShi')
     send_command('unalias ohShi')
@@ -371,6 +360,7 @@ end
 --This function checks the string sent to it against your mob list
 --returns true if it's found and false if not.
 function mobcheck(tr)
+    local category,names,inc
     for category,names in pairs(settings.moblist) do
         for inc = 1, #settings.moblist[category] do
             local beg,endi,cap = string.find(tr:lower(),'('..settings.moblist[category][inc]:lower()..')')
@@ -390,6 +380,7 @@ end
 --This function checks the string sent to it against your danger list
 --returns true if it's found and false if not.
 function dangercheck(ts)
+    local category,names,inc
     for category,names in pairs(settings.dangerwords) do
         for inc = 1, #settings.dangerwords[category] do
             local beg,endi,cap = string.find(ts:lower(),'('..settings.dangerwords[category][inc]:lower()..')')
@@ -403,8 +394,10 @@ end
 
 --This event happens when an action packet is received.
 function event_action(act)
-    color2 = '' -- set the color back to 0 in case it carried over
-    cres = '' -- set reset back to 0 in case it carried over
+    local color2 = '' -- set the color back to 0 in case it carried over
+    local cres = '' -- set reset back to 0 in case it carried over
+    local fi = false
+    local doanyway = 0
     --Make sure the stagger only mode isn't on
     if not settings.staggeronly then
         --Category 6 is job abilities. This portion of the function gets the
@@ -416,7 +409,7 @@ function event_action(act)
                 local party = get_party()
                 local rolling = jobAbilities[tonumber(act['param'])]['english']
                 local roller = get_mob_by_id(act['actor_id'])['name']
-                allyroller = false
+                local allyroller = false
                 for pt,member in pairs(party) do
                     if member['name'] == roller then
                         allyroller = true
@@ -461,8 +454,6 @@ function event_action(act)
             if num <= 0 then return end
             --Get the name of the spell by taking the spell id and going through the spells table
             local spell = spells[num]['english']
-            fi = false
-            doanyway = 0
             --Check spell against danger words.
             if dangercheck(spell) then
                 color2 = '\\cs(255,100,100)'
@@ -484,8 +475,8 @@ function event_action(act)
         --This is used in tracking treasure hunter procs.
         if act['targets'][1]['actions'][1]['has_add_effect'] and isMob(tonumber(act['targets'][1]['id'])) then
             if act['targets'][1]['actions'][1]['add_effect_message'] == 603 then
-                thmob = get_mob_by_id(act['targets'][1]['id'])['name']
-                thlev = act['targets'][1]['actions'][1]['add_effect_param']
+                local thmob = get_mob_by_id(act['targets'][1]['id'])['name']
+                local thlev = act['targets'][1]['actions'][1]['add_effect_param']
                 tracking[#tracking+1] = ' '..thmob..'\'s Treasure Hunter:'..thlev..' '
                 ohShi_refresh()
                 send_command('wait '..settings['duration']..';ohShi timeout')
@@ -563,6 +554,9 @@ function event_incoming_text(old,new,color)
         send_command('wait '..settings['duration']..';ohShi timeout')
         if fi then flashimage() end
     end
+    color2 = nil
+    cres = nil
+    type2 = nil
     line = nil
     return new,color
 end
@@ -570,7 +564,7 @@ end
 --This function is used to flash the warning image
 --when a danger tp/spell is used.
 function flashimage()
-    name = 'ohShi'..tostring(math.random(10000000,99999999))
+    local name = 'ohShi'..tostring(math.random(10000000,99999999))
     prims[#prims+1] = name
     prim_create(name)
     prim_set_color(name,255,255,255,255)
@@ -628,7 +622,7 @@ end
 
 --This function is only used to delete old unused settings files
 function deleteoldsettings()
-    path = lua_base_path..'data/'
+    local path = lua_base_path..'data/'
     local do1,err1 = os.remove(path..'ohshi-settings.xml')
     local do2,err2 = os.remove(path..'ohshi-moblist.xml')
     local do3,err3 = os.remove(path..'moblist.xml')
