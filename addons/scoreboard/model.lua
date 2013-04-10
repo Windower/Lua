@@ -1,34 +1,27 @@
+require 'dpsclock'
+
 dps_db = T{}
 
 -- DPS clock variables
-dps_active = false
-dps_clock = 1 -- avoid div/0
-dps_clock_prev_time = 0
+dps_clock = DPSClock:new()
+
+local function update_dps_clock()
+    if get_player()['in_combat'] then
+        dps_clock:advance()
+    else
+        dps_clock:pause()
+    end
+end
+
+
+function model_update()
+    update_dps_clock()
+end
+
 
 function model_init()
     dps_db = T{}
-
-    dps_active = false
-    dps_clock = 1
-    dps_clock_prev_timestamp = 0
-end
-
-function update_dps_clock()
-    if get_player()['in_combat'] then
-        local now = os.time()
-
-        if dps_clock_prev_time == 0 then
-            dps_clock_prev_time = now
-        end
-
-        dps_clock = dps_clock + (now - dps_clock_prev_time)
-        dps_clock_prev_time = now
-
-        dps_active = true
-    else
-        dps_active = false
-        dps_clock_prev_time = 0
-    end
+    dps_clock:reset()
 end
 
 
