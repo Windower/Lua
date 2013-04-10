@@ -1,5 +1,5 @@
 mob_filter = T{} -- subset of mobs that we're currently displaying damage for
-player_display_count = 8 -- num of players to display. configured via settings file
+local player_display_count = 8 -- num of players to display. configured via settings file
 
 
 -- Returns the string for the scoreboard header with updated info
@@ -22,15 +22,15 @@ local function build_scoreboard_header()
     end
 	
     local dps_status
-    if dps_active then
+    if dps_clock:is_active() then
         dps_status = "Active"
     else
         dps_status = "Paused"
     end
 
     local dps_clock_str = ''
-    if dps_active or dps_clock > 1 then
-        dps_clock_str = string.format(" (%s)", seconds_to_hms(dps_clock))
+    if dps_clock:is_active() or dps_clock.clock > 1 then
+        dps_clock_str = string.format(" (%s)", dps_clock:to_string())
     end
     
     return string.format("DPS: %s%s\nMobs: %-9s\n%s",  dps_status, dps_clock_str, mob_filter_str, labels)
@@ -98,7 +98,7 @@ local function update_scoreboard()
     local player_lines = 0
     for k, v in pairs(damage_table) do
         if player_lines < player_display_count then
-            local dps = math.round(v[2]/dps_clock, 2)
+            local dps = math.round(v[2]/dps_clock.clock, 2)
             local percent = string.format('(%.1f%%)', 100 * v[2]/total_damage)
             display_table:append(string.format("%-16s%7d%8s %7.2f", v[1], v[2], percent, dps))
         end
@@ -108,22 +108,6 @@ local function update_scoreboard()
     if not dps_db:isempty() then
         tb_set_text('scoreboard', build_scoreboard_header() .. table.concat(display_table, '\n'))
     end
-end
-
-
--- Convert integer seconds into a "HhMmSs" string
-local function seconds_to_hms(seconds)
-    hours = math.floor(seconds / 3600)
-    seconds = seconds - hours * 3600
-
-    minutes = math.floor(seconds / 60)
-    seconds = seconds - minutes * 60
-	
-    local hours_str    = hours > 0 and hours .. "h" or ""
-    local minutes_str  = minutes > 0 and minutes .. "m" or ""
-    local seconds_str  = seconds and seconds .. "s" or ""
-	
-    return hours_str .. minutes_str .. seconds_str
 end
 
 
@@ -164,6 +148,7 @@ function display_report_summary (...)
     send_command(input_cmd .. table.concat(display_table, ', '))
 end
 
+
 function display_init()
     -- the number of spaces here was counted to keep the table width
     -- consistent even when there's no data being displayed
@@ -175,6 +160,24 @@ end
 
 function display_update()
     update_scoreboard()
+end
+
+
+function display_create(posx, posy, transparency, display_count)
+    player_display_count = display_count
+    
+    tb_create('scoreboard')
+    tb_set_bg_color('scoreboard', transparency, 30, 30, 30)
+    tb_set_font('scoreboard', 'courier', 10)
+    tb_set_color('scoreboard', 255, 225, 225, 225)
+    tb_set_location('scoreboard', posx, posy)
+    tb_set_visibility('scoreboard', 1)
+    tb_set_bg_visibility('scoreboard', 1)
+end
+
+
+function display_destroy()
+    tb_delete('scoreboard')
 end
 
 
