@@ -2,7 +2,7 @@
 
 _addon = _addon or {}
 _addon.name = 'Scoreboard'
-_addon.version = 0.4
+_addon.version = 0.5
 
 require 'tablehelper'
 require 'stringhelper'
@@ -229,7 +229,7 @@ function event_action(raw_action)
         elseif category == 'spell_finish' then
             for target in action:get_targets() do
                 for subaction in target:get_actions() do
-                    if subaction.message == 2 then
+                    if T{2, 252, 265, 650}:contains(subaction.message) then
                         accumulate(target:get_name(), action:get_actor_name(), subaction.param)
                     end
                 end
