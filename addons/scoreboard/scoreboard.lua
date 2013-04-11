@@ -158,7 +158,7 @@ function event_load(...)
         posy = 200,
         bgtransparency = 200,
         numplayers = 8,
-        font = 'Dejavu Sans Mono',
+        font = 'courier',
         fontsize = 10
     })
 
