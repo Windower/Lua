@@ -31,11 +31,11 @@ xml.escapes = T{
 -- Only used internally to index the xml.unescapes table.
 function xml.entity_unescape(_, entity)
 	if entity:startswith('#x') then
-		return string.char(tonumber(s:slice(3), 16))
+		return string.char(tonumber(entity:slice(3), 16))
 	elseif entity:startswith('#') then
-		return string.char(tonumber(s:slice(2)))
+		return string.char(tonumber(entity:slice(2)))
 	else
-		return s
+		return entity
 	end
 end
 
@@ -180,7 +180,7 @@ function xml.tokenize(content, line)
 		
 		if mode == 'quote' then
 			if c == quote then
-				tokens:last():append(xml.pcdata(current))
+				tokens:last():append('"'..xml.pcdata(current)..'"')
 				current = ''
 				mode = 'tag'
 			else
@@ -191,7 +191,7 @@ function xml.tokenize(content, line)
 			current = current..c
 			if c == '>' and current:endswith('-->' ) then
 				if current:slice(5, -4):contains('--') then
-					return xml.error('Invalid token \'--\' within comment.', #tokens)
+					return xml.error('Invalid token \'--\' within comment.', tokens:line())
 				end
 				tokens:last():append(current)
 				current = ''
@@ -260,14 +260,14 @@ function xml.tokenize(content, line)
 						mode = 'cdata'
 					end
 				else
-					return xml.error('Unexpected character \''..c..'\'.', #tokens)
+					return xml.error('Unexpected character \''..c..'\'.', tokens:length())
 				end
 			end
 		end
 	end
 	
 	for line, array in ipairs(tokens) do
-		tokens[line] = array:filter(functools.negate(string.isempty))
+		tokens[line] = array:filter(-string.isempty)
 	end
 	
 	return tokens
@@ -302,8 +302,8 @@ function xml.classify(tokens, var)
 	local mode = 'inner'
 	local parsed = T{dom.new()}
 	local name = nil
-	for _, lines in ipairs(tokens) do
-		for line, token in pairs(lines) do
+	for line, intokens in ipairs(tokens) do
+		for _, token in ipairs(intokens) do
 			if token:startswith('<![CDATA[') then
 				parsed:last().children:append(dom.new(T{type = 'text', value = token:slice(10, -4)}))
 				
@@ -366,7 +366,7 @@ function xml.classify(tokens, var)
 					mode = 'eq'
 					
 				elseif mode == 'value' then
-					parsed:last().children:append(dom.new(T{type = 'attribute', name = name, namespace = namespace, value = token}))
+					parsed:last().children:append(dom.new(T{type = 'attribute', name = name, namespace = namespace, value = token:slice(2,-2)}))
 					name = nil
 					namespace = ''
 					mode = 'tag'

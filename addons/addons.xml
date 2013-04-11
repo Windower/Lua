@@ -17,7 +17,7 @@
   </addon>
   <addon>
     <name>AnsweringMachine</name>
-    <description>Stores tells for later recall.</description>
+    <description>Stores tells that you receive for later recall.</description>
   </addon>
   <addon>
     <name>AutoJoin</name>
@@ -40,6 +40,10 @@
   <addon>
   	<name>OhShi</name>
   	<description>Keeps track of various event related things. Such as, VW proc messages, mob casting, mob tp moves, TH procs and cor rolls, as well as others.</description>
+  </addon>
+  <addon>
+  	<name>Respond</name>
+  	<description>Respond to tells and FFOchat PMs using //r.</description>
   </addon>
   <addon>
     <name>Scoreboard</name>
