@@ -1,4 +1,6 @@
-DPSClock = {
+-- Object to encapsulate DPS Clock functionality
+
+local DPSClock = {
     clock = 0,
     prev_time = 0,
     active = false
@@ -61,6 +63,7 @@ function DPSClock:to_string()
     return hours_str .. minutes_str .. seconds_str
 end
 
+return DPSClock
 
 --[[
 Copyright (c) 2013, Jerry Hebert
