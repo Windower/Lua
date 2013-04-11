@@ -8,13 +8,13 @@ local Display = {
 }
 
 local valid_fonts = T{
-    'Fixedsys',
-    'Lucida Console',
-    'Courier',
-    'Courier New',
-    'MS Mincho',
-    'Consolas',
-    'Dejavu Sans Mono'
+    'fixedsys',
+    'lucida console',
+    'courier',
+    'courier new',
+    'ms mincho',
+    'consolas',
+    'dejavu sans mono'
 }
 
 function Display:set_position(posx, posy)
@@ -33,9 +33,9 @@ function Display:new (settings)
     tb_create(self.tb_name)
     tb_set_bg_color(self.tb_name, self.settings.bgtransparency, 30, 30, 30)
     
-    if not valid_fonts:contains(self.settings.font) then
+    if not valid_fonts:contains(self.settings.font:lower()) then
         error('Invalid font specified: ' .. self.settings.font)
-        tb_set_font(self.tb_name, 'Dejavu Sans Mono', self.settings.fontsize)
+        tb_set_font(self.tb_name, 'courier', self.settings.fontsize)
     else
         tb_set_font(self.tb_name, self.settings.font, self.settings.fontsize)
     end
