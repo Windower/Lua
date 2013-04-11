@@ -63,7 +63,7 @@
 	<dtd id="61" english="You cannot have the same job as both main and support jobs." color="1"/>
 	<dtd id="62" english="The ${item} fails to activate." color="1"/>
 	<dtd id="63" english="${actor} misses ${target}." color="M"/>
-	<dtd id="64" english="${target} is no longer ${status}." color="1"/>
+	<dtd id="64" english="${target} is no longer ${status}." color="191"/>
 	<dtd id="65" english="You are not carrying any Petras.${lb}You cannot use the ${item}." color="1"/>
 	<dtd id="66" english="Debug: Resisted spell!" color="69"/>
 	<dtd id="67" english="${actor} scores a critical hit!${lb}${target} takes ${number} points of damage." color="D"/>
@@ -203,7 +203,7 @@
 	<dtd id="201" english="Current time: (${time})" color="1"/>
 	<dtd id="202" english="Time left: (${time})" color="209"/>
 	<dtd id="203" english="${target} is ${status}." color="122"/>
-	<dtd id="204" english="${target} is no longer ${status}." color="1"/>
+	<dtd id="204" english="${target} is no longer ${status}." color="191"/>
 	<dtd id="205" english="${target} gains the effect of ${status}." color="56"/>
 	<dtd id="206" english="${target}'s ${status} effect wears off." color="191"/>
 	<dtd id="207" english="HP / HPMax:${number}/${number}" color="1"/>
@@ -219,7 +219,7 @@
 	<dtd id="217" english="You cannot see ${target}." color="1"/>
 	<dtd id="218" english="You move and interrupt your aim." color="122"/>
 	<dtd id="219" english="You cannot see ${target}." color="122"/>
-	<dtd id="220" english="You move and interrupt your aim." color="1"/>
+	<dtd id="220" english="You move and interrupt your aim." color="122"/>
 	<dtd id="221" english="${actor} uses ${weapon_skill}.${lb}${target}'s pet is released." color="56"/>
 	<dtd id="222" english="${target} isn't selling anything." color="1"/>
 	<dtd id="223" english="Skillchain: ${number} points of damage." color="D"/>
@@ -349,7 +349,7 @@
 	<dtd id="347" english="You must have pet food equipped to use that command." color="1"/>
 	<dtd id="348" english="You cannot call wyverns here." color="1"/>
 	<dtd id="349" english="You cannot call beasts here." color="1"/>
-	<dtd id="350" english="${target} is no longer ${status}." color="1"/>
+	<dtd id="350" english="${target} is no longer ${status}." color="191"/>
 	<dtd id="351" english="The remedy removes ${target}'s status ailments." color="1"/>
 	<dtd id="352" english="${actor}'s ranged attack hits ${target} for ${number} points of damage." color="D"/>
 	<dtd id="353" english="${actor}'s ranged attack scores a critical hit!${lb}${target} takes ${number} points of damage." color="D"/>
@@ -530,7 +530,7 @@
 	<dtd id="528" english="${actor} uses ${ability}.${lb}Enmity is transferred to ${actor}'s pet." color="101"/>
 	<dtd id="529" english="${actor} uses ${ability}.${lb}${target} is chainbound." color="101"/>
 	<dtd id="530" english="${target}'s petrification counter is now down to ${number}." color="1"/>
-	<dtd id="531" english="${target} is no longer ${status}." color="1"/>
+	<dtd id="531" english="${target} is no longer ${status}." color="191"/>
 	<dtd id="532" english="${actor} uses ${ability}.${lb}${target} receives the effect of Sneak and Invisible." color="101"/>
 	<dtd id="533" english="${actor} casts ${spell}.${lb}${target}'s Accuracy is drained." color="1"/>
 	<dtd id="534" english="${actor} casts ${spell}.${lb}${target}'s Attack is drained." color="1"/>
