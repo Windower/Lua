@@ -1,4 +1,6 @@
-DPSClock = {
+-- Object to encapsulate DPS Clock functionality
+
+local DPSClock = {
     clock = 0,
     prev_time = 0,
     active = false
