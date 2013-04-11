@@ -3,7 +3,8 @@ require 'dpsclock'
 dps_db = T{}
 
 -- DPS clock variables
-dps_clock = require 'dpsclock':new()
+--dps_clock = require 'dpsclock':new()
+dps_clock = DPSClock:new()
 
 local function update_dps_clock()
     if get_player()['in_combat'] then
