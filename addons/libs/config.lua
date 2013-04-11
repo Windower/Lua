@@ -16,7 +16,7 @@ _libs.filehelper = _libs.filehelper or (files ~= nil)
 
 local config = T(config) or T{}
 local file = files.new()
-local original = T{}
+local original = T{['global'] = T{}}
 local chars = T{}
 local comments = T{}
 
@@ -47,9 +47,11 @@ function config.load(filename, confdict, overwrite)
 	confdict = setmetatable(confdict, {__index = function(t, x) if x == 'save' then return config['save'] else return confdict_mt.__index[x] end end})
 	
 	-- Sets paths depending on whether it's a script or addon loading this file.
-	local filepath = filename or files.check('data/settings.json', 'data/settings.xml')
+	local filepath = filename or files.check('data/settings.xml')
 	if filepath == nil then
-		notice('No settings file found.')
+		file:set('data/settings.xml', true)
+		original['global'] = confdict:copy()
+		confdict:save()
 		return confdict
 	end
 	file:set(filepath)
@@ -159,11 +161,6 @@ end
 -- Writes the passed config table to the spcified file name.
 -- char defaults to get_player()['name']. Set to "all" to apply to all characters.
 function config.save(t, char)
-	if not file:exists() then
-		error('No settings file specified.')
-		return
-	end
-	
 	char = (char or get_player()['name']):lower()
 	if char == 'all' then
 		char = 'global'
@@ -230,6 +227,11 @@ function settings_xml(settings)
 	
 	chars = settings:keyset():filter(-functools.equals('global')):sort()
 	for _, char in ipairs(T{'global'}+chars) do
+		if char == 'global' and comments['settings'] ~= nil then
+			str = str..'\t<!--\n'
+			str = str..'\t\t'..comments['settings']..'\n'
+			str = str..'\t-->\n'
+		end
 		str = str..'\t<'..char..'>\n'
 		str = str..nest_xml(settings[char], 2)
 		str = str..'\t</'..char..'>\n'
@@ -283,13 +285,22 @@ function nest_xml(t, indentlevel)
 	
 	for frag_key, key in pairs(inlines) do
 		if comments[key] ~= nil then
-			fragments[frag_key] = fragments[frag_key]..('\t'):rep(math.ceil((maxlength - fragments[frag_key]:trim():length())/4) + 1)..'<!--'..comments[key]..'-->'
+			fragments[frag_key] = fragments[frag_key]..(' '):rep(maxlength - fragments[frag_key]:trim():length() + 1)..'<!--'..comments[key]..'-->'
 		end
 		
 		fragments[frag_key] = fragments[frag_key]..'\n'
 	end
 	
 	return fragments:concat()
+end
+
+-- Resets all data. Always use when loading within a library.
+function config.reset()
+	config = T(config) or T{}
+	file = files.new()
+	original = T{['global'] = T{}}
+	chars = T{}
+	comments = T{}
 end
 
 return config
