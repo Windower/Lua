@@ -205,14 +205,23 @@ function event_load()
 	pool = false
 	try = false
 	
+	initialize()
+
+	send_command('alias autojoin lua c autojoin')
+	send_command('alias aj autojoin')
+end
+
+function event_login()
+	initialize()
+end
+
+-- Only runs once logged in, to get proper settings.
+function initialize()
 	-- Load settings from file
 	settings = config.load(defaults)
 	settings.whitelist = settings.whitelist:map(string.ucfirst..string.lower)
 	settings.blacklist = settings.blacklist:map(string.ucfirst..string.lower)
 	settings:save()
-
-	send_command('alias autojoin lua c autojoin')
-	send_command('alias aj autojoin')
 end
 
 -- Destructor
