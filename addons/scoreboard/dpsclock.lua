@@ -61,6 +61,7 @@ function DPSClock:to_string()
     return hours_str .. minutes_str .. seconds_str
 end
 
+return DPSClock
 
 --[[
 Copyright (c) 2013, Jerry Hebert
