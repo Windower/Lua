@@ -157,7 +157,9 @@ function event_load(...)
         posx = 10,
         posy = 200,
         bgtransparency = 200,
-        numplayers = 8
+        numplayers = 8,
+        font = 'Dejavu Sans Mono',
+        fontsize = 10
     })
 
     send_command('alias sb lua c scoreboard')

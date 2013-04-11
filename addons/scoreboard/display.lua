@@ -7,6 +7,16 @@ local Display = {
     tb_name = 'scoreboard'
 }
 
+local valid_fonts = T{
+    'Fixedsys',
+    'Lucida Console',
+    'Courier',
+    'Courier New',
+    'MS Mincho',
+    'Consolas',
+    'Dejavu Sans Mono'
+}
+
 function Display:set_position(posx, posy)
     self.settings.posx = posx
     self.settings.posy = posy
@@ -22,7 +32,14 @@ function Display:new (settings)
 
     tb_create(self.tb_name)
     tb_set_bg_color(self.tb_name, self.settings.bgtransparency, 30, 30, 30)
-    tb_set_font(self.tb_name, 'courier', 10)
+    
+    if not valid_fonts:contains(self.settings.font) then
+        error('Invalid font specified: ' .. self.settings.font)
+        tb_set_font(self.tb_name, 'Dejavu Sans Mono', self.settings.fontsize)
+    else
+        tb_set_font(self.tb_name, self.settings.font, self.settings.fontsize)
+    end
+    
     tb_set_color(self.tb_name, 255, 225, 225, 225)
     tb_set_location(self.tb_name, self.settings.posx, self.settings.posy)
     tb_set_visibility(self.tb_name, self.visible)

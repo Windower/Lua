@@ -61,8 +61,12 @@ additional configuration options:
 * posY - y coordinate for position
 * numPlayers - The maximum number of players to display damage for
 * bgTransparency - Transparency level for the background. 0-255 range
-
-
+* font - The font for the Scoreboard. This defaults to Dejavu Sans Mono but it
+         it may be changed to one of the following fonts:
+         Fixedsys, Lucida Console, Courier, Courier New, MS Mincho,
+         Consolas, Dejavu Sans Mono.
+* fontsize - Size of Scoreboard's font
+ 
 Caveats:
 * DPS is an approximation, although I tested it manually and found it to
   be very accurate. Because DPS accumulation is based on the game's notion
