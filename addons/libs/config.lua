@@ -32,11 +32,17 @@ local table_diff
 
 -- Loads a specified file, or alternatively a file 'settings.json' or 'settings.xml' in the current addon folder.
 -- Writes all configs to _config.
-function config.load(filename, confdict)
+function config.load(filename, confdict, overwrite)
 	if type(filename) == 'table' then
-		confdict, filename = filename, nil
+		confdict, filename, overwrite = filename, nil, confdict
+	elseif type(filename) == 'boolean' then
+		filename, overwrite = nil, filename
+	elseif type(confdict) == 'boolean' then
+		confdict, overwrite = nil, confdict
 	end
 	confdict = T(confdict) or T{}
+	overwrite = overwrite or false
+	
 	local confdict_mt = getmetatable(confdict)
 	confdict = setmetatable(confdict, {__index = function(t, x) if x == 'save' then return config['save'] else return confdict_mt.__index[x] end end})
 	
@@ -50,7 +56,7 @@ function config.load(filename, confdict)
 
 	-- Load addon/script config file (Windower/addon/<addonname>/config.json for addons and Windower/scripts/<name>-config.json).
 	local err
-	confdict, err = parse(file, confdict)
+	confdict, err = parse(file, confdict, overwrite)
 
 	if err ~= nil then
 		error(err)
@@ -60,7 +66,7 @@ function config.load(filename, confdict)
 end
 
 -- Resolves to the correct parser and calls the respective subroutine, returns the parsed settings table.
-function parse(file, confdict)
+function parse(file, confdict, update)
 	local parsed = T{}
 	local err
 	if file.path:endswith('.json') then
@@ -82,7 +88,7 @@ function parse(file, confdict)
 	chars = parsed:keyset():filter(-functools.equals('global'))
 	original = T{}
 	
-	if confdict:isempty() then
+	if update or confdict:isempty() then
 		for _, char in ipairs(T{'global'}+chars) do
 			original[char] = confdict:copy():update(parsed[char], true)
 		end
