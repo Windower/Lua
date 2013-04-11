@@ -1,17 +1,82 @@
-mob_filter = T{} -- subset of mobs that we're currently displaying damage for
-local player_display_count = 8 -- num of players to display. configured via settings file
+-- Display object
+
+local Display = {
+    visible = true,
+    settings = nil,
+    filter = T{},
+    tb_name = 'scoreboard'
+}
+
+function Display:set_position(posx, posy)
+    self.settings.posx = posx
+    self.settings.posy = posy
+    tb_set_location(self.tb_name, posx, posy)
+end
+
+
+function Display:new (settings)
+    local repr = {}
+    self.settings = settings
+    setmetatable(repr, self)
+    self.__index = self
+
+    tb_create(self.tb_name)
+    tb_set_bg_color(self.tb_name, self.settings.bgtransparency, 30, 30, 30)
+    tb_set_font(self.tb_name, 'courier', 10)
+    tb_set_color(self.tb_name, 255, 225, 225, 225)
+    tb_set_location(self.tb_name, self.settings.posx, self.settings.posy)
+    tb_set_visibility(self.tb_name, self.visible)
+    tb_set_bg_visibility(self.tb_name, 1)
+
+    return repr
+end
+
+
+function Display:toggle_visible()
+    local old_visibility = self.visible
+    self.visible = not self.visible
+
+    if not old_visibility then
+        self:update()
+    end
+
+    tb_set_visibility(self.tb_name, self.visible)
+end
+
+
+function Display:clear_filters()
+    self.filter = T{}
+    self:update()
+end
+
+
+function Display:add_filter(mob_pattern)
+    if mob_pattern then self.filter:append(mob_pattern) end
+end
+
+
+function Display:report_filters()
+    local mob_str
+    if self.filter:isempty() then
+        mob_str = "Scoreboard filters: None (Displaying damage for all mobs)"
+    else
+        mob_str = "Scoreboard filters: " .. self.filter:concat(', ')
+    end
+    add_to_chat(55, mob_str)
+
+end
 
 
 -- Returns the string for the scoreboard header with updated info
 -- about current mob filtering and whether or not time is currently
 -- contributing to the DPS value.
-local function build_scoreboard_header()
+function Display:build_scoreboard_header()
     local mob_filter_str
 	
-    if mob_filter:isempty() then
+    if self.filter:isempty() then
         mob_filter_str = "All"
     else
-        mob_filter_str = table.concat(mob_filter, ", ")
+        mob_filter_str = table.concat(self.filter, ", ")
     end
 	
     local labels
@@ -40,7 +105,7 @@ end
 -- Returns following two element pair:
 -- 1) table of sorted 2-tuples containing {player, damage}
 -- 2) integer containing the total damage done
-local function get_sorted_player_damage()
+function Display:get_sorted_player_damage()
     -- In order to sort by damage, we have to first add it all up into a table
     -- and then build a table of sortable 2-tuples and then finally we can sort...
     local mob, players
@@ -51,7 +116,7 @@ local function get_sorted_player_damage()
     end
 	
     local function filter_contains_mob(mob_name)
-        for _, mob_pattern in ipairs(mob_filter) do
+        for _, mob_pattern in ipairs(self.filter) do
             if mob_name:lower():find(mob_pattern:lower()) then
                 return true
             end
@@ -62,7 +127,7 @@ local function get_sorted_player_damage()
     for mob, players in pairs(dps_db) do
         -- If the filter isn't active, include all mobs
 
-        if mob_filter:isempty() or filter_contains_mob(mob) then
+        if self.filter:isempty() or filter_contains_mob(mob) then
             for player, damage in pairs(players) do
                 if player_total_dmg[player] then
                     player_total_dmg[player] = player_total_dmg[player] + damage
@@ -90,14 +155,19 @@ end
 
 
 -- Updates the main display with current filter/damage/dps status
-local function update_scoreboard()
+function Display:update()
+    if not self.visible then
+        -- no need build a display while it's hidden
+        return
+    end
+
     local damage_table, total_damage
-    damage_table, total_damage = get_sorted_player_damage()
+    damage_table, total_damage = self:get_sorted_player_damage()
 	
     local display_table = T{}
     local player_lines = 0
     for k, v in pairs(damage_table) do
-        if player_lines < player_display_count then
+        if player_lines < self.settings.numplayers then
             local dps = math.round(v[2]/dps_clock.clock, 2)
             local percent = string.format('(%.1f%%)', 100 * v[2]/total_damage)
             display_table:append(string.format("%-16s%7d%8s %7.2f", v[1], v[2], percent, dps))
@@ -106,16 +176,16 @@ local function update_scoreboard()
     end
 	
     if not dps_db:isempty() then
-        tb_set_text('scoreboard', build_scoreboard_header() .. table.concat(display_table, '\n'))
+        tb_set_text(self.tb_name, self:build_scoreboard_header() .. table.concat(display_table, '\n'))
     end
 end
 
 
-function display_report_summary (...)
+function Display:report_summary (...)
     local chatmode, tell_target = table.unpack({...})
 	
     local damage_table, total_damage
-    damage_table, total_damage = get_sorted_player_damage()
+    damage_table, total_damage = self:get_sorted_player_damage()
     local max_line_length = 127 -- game constant
 
     -- We have to make sure not to exceed max line or it can cause a crash
@@ -149,37 +219,21 @@ function display_report_summary (...)
 end
 
 
-function display_init()
+function Display:init()
     -- the number of spaces here was counted to keep the table width
     -- consistent even when there's no data being displayed
-    tb_set_text('scoreboard',  build_scoreboard_header() ..
+    tb_set_text(self.tb_name,  self:build_scoreboard_header() ..
                                'Waiting for results...' ..
                                string.rep(' ', 17))
 end
 
 
-function display_update()
-    update_scoreboard()
+function Display:destroy()
+    tb_delete(self.tb_name)
 end
 
 
-function display_create(posx, posy, transparency, display_count)
-    player_display_count = display_count
-    
-    tb_create('scoreboard')
-    tb_set_bg_color('scoreboard', transparency, 30, 30, 30)
-    tb_set_font('scoreboard', 'courier', 10)
-    tb_set_color('scoreboard', 255, 225, 225, 225)
-    tb_set_location('scoreboard', posx, posy)
-    tb_set_visibility('scoreboard', 1)
-    tb_set_bg_visibility('scoreboard', 1)
-end
-
-
-function display_destroy()
-    tb_delete('scoreboard')
-end
-
+return Display
 
 --[[
 Copyright (c) 2013, Jerry Hebert
