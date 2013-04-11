@@ -1,5 +1,5 @@
 Author: Suji
-Version: 0.5b
+Version: 0.6b
 Addon to show alliance DPS and damage in real time.
 Abbreviation: //sb
 
@@ -61,7 +61,7 @@ additional configuration options:
 * posY - y coordinate for position
 * numPlayers - The maximum number of players to display damage for
 * bgTransparency - Transparency level for the background. 0-255 range
-* font - The font for the Scoreboard. This defaults to Dejavu Sans Mono but it
+* font - The font for the Scoreboard. This defaults to Courier but it
          it may be changed to one of the following fonts:
          Fixedsys, Lucida Console, Courier, Courier New, MS Mincho,
          Consolas, Dejavu Sans Mono.
