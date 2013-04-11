@@ -2,7 +2,7 @@
 
 _addon = _addon or {}
 _addon.name = 'Scoreboard'
-_addon.version = 0.5
+_addon.version = 0.6
 
 require 'tablehelper'
 require 'stringhelper'
@@ -11,39 +11,15 @@ require 'logger'
 require 'actionhelper'
 local config = require 'config'
 
-require 'display'
+local Display = require 'display'
+local display = nil
+
 require 'model'
+
 -----------------------------
 
-settings = nil -- holds a config instance
+local settings = nil -- holds a config instance
 settings_file = 'data/settings.xml'
-
-default_settings_file = [[
-<?xml version="1.0" ?>
-<settings>
-	<!--
-	This file controls the settings for the Scoreboard plugin.
-	Settings in the <global> section apply to all characters
-
-	The available settings are:
-		posX - x coordinate for position
-		posY - y coordinate for position
-		numPlayers - The maximum number of players to display damage for
-		bgTransparency - Transparency level for the background. 0-255 range
-	-->
-	<global>
-		<posX>600</posX>
-		<posY>100</posY>
-		<bgTransparency>200</bgTransparency>
-		<numPlayers>8</numPlayers>
-	</global>
-
-	<!--
-	You may also override specific settings on a per-character basis here.
-	-->
-</settings>
-]]
-
 
 -- Handle addon args
 function event_addon_command(...)
@@ -59,13 +35,15 @@ function event_addon_command(...)
             write('sb pos <x> <y> : Positions the scoreboard')
             write('sb reset : Reset damage')
             write('sb report [<target>] : Reports damage. Can take standard chatmode target options.')
-            write('sb filters  : Shows current filter settings')
-            write('sb add <mob1> <mob2> ... : Add mob patterns to the filter (substrings ok)')
-            write('sb clear : Clears mob filter')
+            write('sb filter show  : Shows current filter settings')
+            write('sb filter add <mob1> <mob2> ... : Add mob patterns to the filter (substrings ok)')
+            write('sb filter clear : Clears mob filter')
+            write('sb visible : Toggles scoreboard visibility')
         elseif params[1]:lower() == "pos" then
             if params[3] then
                 local posx, posy = tonumber(params[2]), tonumber(params[3])
-                tb_set_location('scoreboard', posx, posy)
+                display:set_position(posx, posy)
+                
                 if posx ~= settings.posx or posy ~= settings.posy then
                     settings.posx = posx
                     settings.posy = posy
@@ -91,23 +69,33 @@ function event_addon_command(...)
                 end
             end
 
-            display_report_summary(arg, arg2)
+            display:report_summary(arg, arg2)
         elseif params[1]:lower() == "filters" then
-            local mob_str
-            if mob_filter:isempty() then
-                mob_str = "Scoreboard filters: None (Displaying damage for all mobs)"
-            else
-                mob_str = "Scoreboard filters: " .. mob_filter:concat(', ')
-            end
-                add_to_chat(55, mob_str)
+            notice("'//sb filters' is deprecated. Please use '//sb filter show' in the future. See //sb help")
+            display:report_filters()
         elseif params[1]:lower() == "add" then
+            notice("'//sb add ...' is deprecated. Please use '//sb filter add ...' in the future. See //sb help")
             for i=2, #params do
-                mob_filter:append(params[i])
+                display:add_filter(params[i])
             end
-            display_update()
+            display:update()
         elseif params[1]:lower() == "clear" then
-            mob_filter = T{}
-            display_update()
+            notice("'//sb clear' is deprecated. Please use '//sb filter clear' in the future. See //sb help")
+            display:clear_filters()
+        elseif params[1]:lower() == "visible" then
+            display:toggle_visible()
+        elseif params[1]:lower() == 'filter' then
+            if params[2]:lower() == 'add' then
+                for i=3, #params do
+                    display:add_filter(params[i])
+                end
+            elseif params[2]:lower() == 'clear' then
+                display:clear_filters()
+            elseif params[2]:lower() == 'show' then
+                display:report_filters()
+            else
+                error('Invalid argument to //sb filter')
+            end
         end
     end
 end
@@ -116,21 +104,21 @@ end
 -- Resets application state
 function initialize()
     model_init()
-    display_init()
+    display:init()
 end
 
 
 -- Keep updates flowing
 function event_time_change(...)
     model_update()
-    display_update()
+    display:update()
 end
 
 
 -- Keep updates flowing
 function event_status_change(...)
     model_update()
-    display_update()
+    display:update()
 end
 
 
@@ -152,37 +140,35 @@ function event_load(...)
     if not f then
         f = io.open(lua_base_path .. settings_file, 'w')
         if not f then
-            error('Scoreboard: Error generating default settings file.')
+            error('Error generating default settings file.')
         else
             f:write(default_settings_file)
             local result = f:close()
             if not result then
-                error('Scoreboard: Error generating default settings file.')
+                error('Error generating default settings file.')
             else
-                add_to_chat(55, 'Scoreboard: Settings file not found; installed default.')
+                add_to_chat(55, 'Settings file not found; installed default.')
             end
         end
     else
         f:close()
     end
-    settings = config.load()
+    settings = config.load({
+        posx = 10,
+        posy = 200,
+        bgtransparency = 200,
+        numplayers = 8
+    })
 
-    local player_display_count = settings['numplayers'] or player_display_count
     send_command('alias sb lua c scoreboard')
-
-    local transparency = tonumber(settings['bgtransparency']) or 200
-    local posx = tonumber(settings['posx']) or 10
-    local posy = tonumber(settings['posy']) or 200
-
-    display_create(posx, posy, transparency, player_display_count)
-
+    display = Display:new(settings)
     initialize()
 end
 
 
 function event_unload()
     send_command('unalias sb')
-    display_destroy()
+    display:destroy()
 end
 
 
@@ -285,7 +271,7 @@ function event_action(raw_action)
         end
     end
 	
-    display_update()
+    display:update()
     model_update()
 end
 
