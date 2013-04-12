@@ -109,6 +109,7 @@ function event_load()
 end
 
 function event_unload()
+	
 end
 
 function event_incoming_text(old, new, color)
@@ -167,7 +168,7 @@ end
 function event_outgoing_text(original, modified)
 	if original:find('/jobability \"Double') and luckyroll == 1 and override == 0 then
 		modified=''
-		add_to_chat(55,'You have either lucky Roll or 11. Reuse Doubleup to double up again')
+		add_to_chat(55,'You have either a lucky Roll or  an 11. Reuse Double-Up to Double-up again.')
 		luckyroll=0
 		return modified
 	end
