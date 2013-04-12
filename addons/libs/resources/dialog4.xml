@@ -284,7 +284,7 @@
 	<dtd id="282" english="${target} evades." color="69"/>
 	<dtd id="283" english="No effect on ${target}." color="67"/>
 	<dtd id="284" english="${target} resists the effects of the spell!" color="69"/>
-	<dtd id="285" english="${target}'s attacks are enhanced." color="1"/>
+	<dtd id="285" english="${target}'s attacks are enhanced." color="101"/>
 	<dtd id="286" english="${target} is fortified against undead." color="101"/>
 	<dtd id="287" english="${target} is fortified against arcana." color="101"/>
 	<dtd id="288" english="Skillchain: Light.${lb}${target} takes ${number} points of damage." color="D"/>
