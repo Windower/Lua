@@ -61,7 +61,7 @@
 	<dtd id="59" english="You do not have access to specified job yet." color="1"/>
 	<dtd id="60" english="You do not have access to support jobs yet." color="1"/>
 	<dtd id="61" english="You cannot have the same job as both main and support jobs." color="1"/>
-	<dtd id="62" english="The ${item} fails to activate." color="1"/>
+	<dtd id="62" english="The ${item} fails to activate." color="121"/>
 	<dtd id="63" english="${actor} misses ${target}." color="M"/>
 	<dtd id="64" english="${target} is no longer ${status}." color="191"/>
 	<dtd id="65" english="You are not carrying any Petras.${lb}You cannot use the ${item}." color="1"/>
