@@ -182,8 +182,8 @@ function get_ally_mob_ids()
     for _, member in pairs(party) do
         if member.mob then
             allies:append(member.mob.id)
-            if member.mob.pet_target_id > 0 then
-                allies:append(get_mob_by_target_id(member.mob.pet_target_id).id)
+            if member.mob.pet_index > 0 then
+                allies:append(get_mob_by_index(member.mob.pet_index).id)
             end
         end
     end
