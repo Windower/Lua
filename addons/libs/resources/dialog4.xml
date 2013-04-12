@@ -558,7 +558,7 @@
 	<dtd id="556" english="Level Sync will be deactivated in ${number} seconds.${lb}The Level Sync designee is incapable of receiving experience points." color="1"/>
 	<dtd id="557" english="${target} receives ${number} piece of alexandrite." color="1"/>
 	<dtd id="558" english="You defeated a designated target.${lb}(Progress: ${number}/${number})" color="1"/>
-	<dtd id="559" english="You have successfully completed the training regime." color="1"/>
+	<dtd id="559" english="You have successfully completed the training regime." color="122"/>
 	<dtd id="560" english="${actor} uses ${ability}. Finishing move now ${number}." color="101" units="FM"/>
 	<dtd id="561" english="Unable to perform that action.${lb}Your have already earned the maximum number of finishing moves." color="122"/>
 	<dtd id="562" english="The status parameters of ${target} have increased." color="1"/>
@@ -636,7 +636,7 @@
 
 	<dtd id="641" english="Additional effect: 1 of ${target}'s attributes is drained." color="1"/>
 	<dtd id="642" english="${actor} casts ${spell}.${lb}${actor} absorbs ${number} of ${target}'s status benefits." color="1"/>
-	<dtd id="643" english="Your current training regime will begin anew!" color="1"/>
+	<dtd id="643" english="Your current training regime will begin anew!" color="122"/>
 	<dtd id="644" english="${actor} uses ${ability}.${lb}${number} of ${target}'s status effects are removed." color="H"/>
 	<dtd id="645" english="${actor} uses ${ability}.${lb}${target} is ${status}." color="65"/>
 	<dtd id="646" english="${actor} uses ${ability}.${lb}${target} falls to the ground." color="1"/>
