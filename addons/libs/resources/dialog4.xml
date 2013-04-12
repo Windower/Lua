@@ -41,7 +41,7 @@
 	<dtd id="39" english="You need the Dual Wield ability to equip the ${item} as a sub-weapon." color="1"/>
 	<dtd id="40" english="You cannot use ${spell} in this area." color="1"/>
 	<dtd id="41" english="${actor}: Status ailment check (${number})Cannot rest at this time." color="1"/>
-	<dtd id="42" english="${actor} casts ${spell} on ${target}." color="1"/>
+	<dtd id="42" english="${actor} casts ${spell} on ${target}." color="56"/>
 	<dtd id="43" english="${actor} readies ${weapon_skill}." color="110"/>
 	<dtd id="44" english="${target}'s spikes deal ${number} points of damage to ${actor}." color="D"/>
 	<dtd id="45" english="${actor} learns &quot;${weapon_skill}&quot;!" color="1"/>
@@ -113,7 +113,7 @@
 	<dtd id="111" english="You cannot use ${item} while medicated." color="1"/>
 	<dtd id="112" english="${target}'s doom counter is now down to ${number}." color="1"/>
 	<dtd id="113" english="${actor} casts ${spell}.${lb}${target} falls to the ground." color="1"/>
-	<dtd id="114" english="${actor} casts ${spell} on ${target}, but the spell fails to take effect." color="1"/>
+	<dtd id="114" english="${actor} casts ${spell} on ${target}, but the spell fails to take effect." color="69"/>
 	<dtd id="115" english="${actor} uses ${ability}.${lb}Attacks are enhanced but defense weakens." color="101"/>
 	<dtd id="116" english="${actor} uses ${ability}.${lb}${target}'s attacks are enhanced." color="101"/>
 	<dtd id="117" english="${actor} uses ${ability}.${lb}Defense is enhanced but attacks weaken." color="101"/>
