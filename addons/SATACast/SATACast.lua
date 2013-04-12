@@ -28,12 +28,13 @@ require 'buff'
 
 function event_load()
 	
-	version = '1.0.1'
+	version = '1.0.2'
 	SA_Set = ' '
 	TA_Set = ' '
 	SATA_Set = ' '
 	TP_Set = ' '
 	Idle_Set = ' '
+	send_command('alias scast lua c satacast')
 	add_to_chat(17, 'SATACast v' .. version .. ' loaded.     Author:  Banggugyangu')
 	add_to_chat(17, 'Attempting to load settings from file.')
 	options_load()
@@ -56,7 +57,7 @@ function options_load()
 		g:close()
 		
 		write('Default settings file created')
-		add_to_chat(13,'SATACast created a settings file and loaded!')
+		add_to_chat(17,'SATACast created a settings file and loaded!')
 	else
 		f:close()
 		for curline in io.lines(lua_base_path..'data/settings.txt') do
@@ -77,7 +78,7 @@ function options_load()
 				Idle_Set = ' '
 			end
 		end
-		add_to_chat(12,'SATACast read from a settings file and loaded!')
+		add_to_chat(17,'SATACast read from a settings file and loaded!')
 	end
 end
 
@@ -111,4 +112,19 @@ function event_lose_status(id, name)
 		elseif self.status:lower() == 'idle' then
 			send_command('sc set ' .. Idle_Set)
 		end
+	end
+end
+
+--Function Designer:  Byrth
+function event_addon_command(...)
+    local term = table.concat({...}, ' ')
+    local splitarr = split(term,' ')
+	if splitarr[1]:lower() == 'reload' then
+		options_load()
+	elseif splitarr[1]:lower() == 'help' then
+		add_to_chat(17, 'SATACast  v'..version..'commands:')
+		add_to_chat(17, '//scast [options]')
+		add_to_chat(17, '    reload  - Reloads settings')
+		add_to_chat(17, '    help   - Displays this help text')
+	end
 end
