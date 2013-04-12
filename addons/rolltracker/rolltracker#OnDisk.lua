@@ -98,7 +98,7 @@ function event_load()
 				['Bolter\'s']={2,3,12,4,6,7,8,9,5,10,25,'-8','% Movement Speed'},
 				['Caster\'s']={6,15,7,8,9,10,5,11,12,13,20,'-10','% Fast Cast'},
 				['Tactician\'s']={1,1,1,1,3,1,1,0,2,2,4,'-1','Regain'},
-				['Miser\'s']={3,5,7,9,20,11,2,13,15,17,25,'','Save TP'},
+				['Miser\'s']={3,5,7,9,20,11,2,13,15,17,25,'Save TP'},
 				['Ninja']={'','','','','','','','','','','','','Evasion Bonus'},
 				['Scholar\'s']={'','','','','','','','','','','','','Conserve MP'},
 				['Allies\'']={6,7,17,9,11,13,15,17,17,5,17,'','% Skillchain Damage'},
@@ -157,6 +157,10 @@ function event_action(act)
 		end
 	end
 end
+end
+
+function getmembers()
+
 end
 			
 	
