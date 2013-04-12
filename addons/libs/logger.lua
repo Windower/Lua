@@ -209,3 +209,4 @@ end
 -- Load logger settings (has to be after the logging functions have been defined, so those work in the config and related files).
 logger.settings = config.load('../libs/logger.xml', logger.settings)
 file = files.new(logger.settings.defaultfile, true)
+config.reset()
