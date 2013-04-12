@@ -250,7 +250,7 @@
 	<dtd id="248" english="${actor}'s attack has no effect on ${target}." color="1"/>
 	<dtd id="249" english="${target}'s strength is impossible to gauge!" color="191"/>
 	<dtd id="250" english="Reraise takes effect!" color="1"/>
-	<dtd id="251" english="The effect of ${status} is about to wear off." color="1"/>
+	<dtd id="251" english="The effect of ${status} is about to wear off." color="123"/>
 	<dtd id="252" english="${actor} casts ${spell}.${lb}Magic Burst!${lb}${target} takes ${number} points of damage." color="D"/>
 	<dtd id="253" english="EXP chain #${number}!${lb}${actor} gains ${number} experience points." color="1"/>
 	<dtd id="254" english="Current enmity: ${number}" color="1"/>
