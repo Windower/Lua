@@ -105,7 +105,7 @@
 	<dtd id="103" english="${actor} uses ${weapon_skill}.${lb}${target} recovers ${number} HP." color="H" units="HP"/>
 	<dtd id="104" english="Unable to use item.${lb}You do not meet the level requirement." color="1"/>
 	<dtd id="105" english="${actor} gains ${number} experience points." color="1"/>
-	<dtd id="106" english="${actor} is intimidated by ${target}'s presence." color="1"/>
+	<dtd id="106" english="${actor} is intimidated by ${target}'s presence." color="122"/>
 	<dtd id="107" english="${target} is temporarily unable to access support job abilities." color="1"/>
 	<dtd id="108" english="${actor} uses ${ability}.${lb}Pet's powers increase!" color="101"/>
 	<dtd id="109" english="${actor} uses ${weapon_skill}.${lb}Pet's powers increase!" color="56"/>
@@ -131,7 +131,7 @@
 	<dtd id="129" english="${actor} uses ${ability}.${lb}${actor} mugs ${gil} from ${target}." color="101"/>
 	<dtd id="130" english="${target} is ${status} for making an equipment change." color="1"/>
 	<dtd id="131" english="${actor} uses ${ability}.${lb}${target} is fortified against undead." color="101"/>
-	<dtd id="132" english="${target}'s spikes drain ${number} HP from ${actor}." color="22" units="HP"/>
+	<dtd id="132" english="${target}'s spikes drain ${number} HP from ${actor}." color="H" units="HP"/>
 	<dtd id="133" english="${actor} uses ${ability}.${lb}${actor} steals ${number} Petra from ${target}." color="1"/>
 	<dtd id="134" english="${actor} uses ${ability}.${lb}${target} is fortified against arcana." color="101"/>
 	<dtd id="135" english="${actor} uses ${weapon_skill} on ${target}." color="56"/>
@@ -160,11 +160,11 @@
 	<dtd id="158" english="${actor} uses ${ability}, but misses." color="104"/>
 	<dtd id="159" english="${actor} uses ${weapon_skill}.${lb}${target}'s ${status} effect disappears!" color="H"/>
 	<dtd id="160" english="Additional effect: ${status}." color="34"/>
-	<dtd id="161" english="Additional effect: ${number} HP drained from ${target}." color="22" units="HP"/>
-	<dtd id="162" english="Additional effect: ${number} MP drained from ${target}." color="22" units="MP"/>
+	<dtd id="161" english="Additional effect: ${number} HP drained from ${target}." color="H" units="HP"/>
+	<dtd id="162" english="Additional effect: ${number} MP drained from ${target}." color="H" units="MP"/>
 	<dtd id="163" english="Additional effect: ${number} points of damage." color="D"/>
 	<dtd id="164" english="Additional effect: ${status}." color="34"/>
-	<dtd id="165" english="Additional effect: ${number} TP drained from ${target}." color="22" units="TP"/>
+	<dtd id="165" english="Additional effect: ${number} TP drained from ${target}." color="H" units="TP"/>
 	<dtd id="166" english="Additional effect: ${actor} gains the effect of ${status}." color="56"/>
 	<dtd id="167" english="Additional effect: ${actor} recovers ${number} HP." color="H" units="HP"/>
 	<dtd id="168" english="Additional effect: ${target}'s ${status} effect disappears!" color="1"/>
@@ -186,7 +186,7 @@
 	<dtd id="184" english="${actor}:ALLIANCE SUM=${number}/LEV=${number}" color="1"/>
 	<dtd id="185" english="${actor} uses ${weapon_skill}.${lb}${target} takes ${number} points of damage." color="D"/>
 	<dtd id="186" english="${actor} uses ${weapon_skill}.${lb}${target} gains the effect of ${status}." color="56"/>
-	<dtd id="187" english="${actor} uses ${weapon_skill}.${lb}${number} HP drained from ${target}." color="22" units="HP"/>
+	<dtd id="187" english="${actor} uses ${weapon_skill}.${lb}${number} HP drained from ${target}." color="H" units="HP"/>
 	<dtd id="188" english="${actor} uses ${weapon_skill}, but misses ${target}." color="M"/>
 	<dtd id="189" english="${actor} uses ${weapon_skill}.${lb}No effect on ${target}." color="69"/>
 	<dtd id="190" english="${actor} cannot use that weapon ability." color="1"/>
@@ -224,10 +224,10 @@
 	<dtd id="222" english="${target} isn't selling anything." color="1"/>
 	<dtd id="223" english="Skillchain: ${number} points of damage." color="D"/>
 	<dtd id="224" english="${actor} uses ${weapon_skill}.${lb}${target} recovers ${number} MP." color="H" units="MP"/>
-	<dtd id="225" english="${actor} uses ${weapon_skill}.${lb}${number} MP drained from ${target}." color="22" units="MP"/>
-	<dtd id="226" english="${actor} uses ${weapon_skill}.${lb}${number} TP drained from ${target}." color="22" units="TP"/>
-	<dtd id="227" english="${actor} casts ${spell}.${lb}${number} HP drained from ${target}." color="22" units="HP"/>
-	<dtd id="228" english="${actor} casts ${spell}.${lb}${number} MP drained from ${target}." color="22" units="MP"/>
+	<dtd id="225" english="${actor} uses ${weapon_skill}.${lb}${number} MP drained from ${target}." color="H" units="MP"/>
+	<dtd id="226" english="${actor} uses ${weapon_skill}.${lb}${number} TP drained from ${target}." color="H" units="TP"/>
+	<dtd id="227" english="${actor} casts ${spell}.${lb}${number} HP drained from ${target}." color="H" units="HP"/>
+	<dtd id="228" english="${actor} casts ${spell}.${lb}${number} MP drained from ${target}." color="H" units="MP"/>
 	<dtd id="229" english="Additional effect: ${target} takes ${number} additional points of damage." color="D"/>
 	<dtd id="230" english="${actor} casts ${spell}.${lb}${target} gains the effect of ${status}." color="56"/>
 	<dtd id="231" english="${actor} uses ${weapon_skill}.${lb}${number} of ${target}'s effects disappears!" color="56"/>
@@ -273,14 +273,14 @@
 	<dtd id="271" english="${actor} casts ${spell}.${lb}Magic Burst!${lb}${target} is ${status}." color="1"/>
 	<dtd id="272" english="Magic Burst!${lb}${target} is ${status}." color="1"/>
 	<dtd id="273" english="${target} vanishes!" color="64"/>
-	<dtd id="274" english="${actor} casts ${spell}.${lb}Magic Burst!${lb}${number} HP drained from ${target}." color="22" units="HP"/>
-	<dtd id="275" english="${actor} casts ${spell}.${lb}Magic Burst!${lb}${number} MP drained from ${target}." color="22" units="MP"/>
+	<dtd id="274" english="${actor} casts ${spell}.${lb}Magic Burst!${lb}${number} HP drained from ${target}." color="H" units="HP"/>
+	<dtd id="275" english="${actor} casts ${spell}.${lb}Magic Burst!${lb}${number} MP drained from ${target}." color="H" units="MP"/>
 	<dtd id="276" english="${target} recovers ${number} MP." color="H" units="MP"/>
 	<dtd id="277" english="${target} is ${status}." color="122"/>
 	<dtd id="278" english="${target} receives the effect of ${status}." color="57"/>
 	<dtd id="279" english="${target} is ${status}." color="122"/>
 	<dtd id="280" english="${target} gains the effect of ${status}." color="56"/>
-	<dtd id="281" english="${number} HP drained from ${target}." color="22" units="HP"/>
+	<dtd id="281" english="${number} HP drained from ${target}." color="H" units="HP"/>
 	<dtd id="282" english="${target} evades." color="69"/>
 	<dtd id="283" english="No effect on ${target}." color="67"/>
 	<dtd id="284" english="${target} resists the effects of the spell!" color="69"/>
@@ -365,7 +365,7 @@
 	<dtd id="363" english="${target}'s TP is reduced to ${number}." color="1"/>
 	<dtd id="364" english="${actor} uses ${ability}.${lb}All of ${target}'s status parameters are boosted." color="101"/>
 	<dtd id="365" english="All of ${target}'s status parameters are boosted." color="101"/>
-	<dtd id="366" english="${number} MP drained from ${target}." color="1" units="MP"/>
+	<dtd id="366" english="${number} MP drained from ${target}." color="H" units="MP"/>
 	<dtd id="367" english="${target} recovers ${number} HP." color="H" units="HP"/>
 	<dtd id="368" english="${actor} earns a merit points!${lb}(Total: ${number})" color="1"/>
 	<dtd id="369" english="${actor} uses ${weapon_skill}.${lb}${number} of ${target}'s attributes is drained." color="H" units="buffs"/>
@@ -453,7 +453,7 @@
 	<dtd id="451" english="${actor} uses ${ability}.${lb}${target} regains ${number} MP." color="H" units="MP"/>
 	<dtd id="452" english="${actor} uses ${ability}.${lb}${target} regains ${number} TP." color="H" units="TP"/>
 	<dtd id="453" english="${actor} uses ${ability}.${lb}${actor} steals the effect of ${status} from ${target}." color="101"/>
-	<dtd id="454" english="${actor} casts ${spell}.${lb}${number} TP drained from ${target}." color="1" units="TP"/>
+	<dtd id="454" english="${actor} casts ${spell}.${lb}${number} TP drained from ${target}." color="H" units="TP"/>
 	<dtd id="455" english="Debug : Fishing skill check: ${item} : ???${number}" color="1"/>
 	<dtd id="456" english="Debug : Level Restriction on.${lb}PetType ${number}/ID ${number}" color="1"/>
 	<dtd id="457" english="Debug : Level restriction off.${lb}PetType ${number}/ID ${number}" color="1"/>
