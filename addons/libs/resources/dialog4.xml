@@ -19,7 +19,7 @@
 	<dtd id="17" english="Unable to cast spells at this time." color="122"/>
 	<dtd id="18" english="Unable to cast spells at this time." color="122"/>
 	<dtd id="19" english="${actor} calls for help!" color="1"/>
-	<dtd id="20" english="${target} falls to the ground." color="1"/>
+	<dtd id="20" english="${target} falls to the ground." color="56"/>
 	<dtd id="21" english="No experience points gained." color="1"/>
 	<dtd id="22" english="You cannot call for help at this time." color="1"/>
 	<dtd id="23" english="${actor} learns a new spell!" color="91"/>
@@ -112,7 +112,7 @@
 	<dtd id="110" english="${actor} uses ${ability}.${lb}${target} takes ${number} points of damage." color="D"/>
 	<dtd id="111" english="You cannot use ${item} while medicated." color="1"/>
 	<dtd id="112" english="${target}'s doom counter is now down to ${number}." color="1"/>
-	<dtd id="113" english="${actor} casts ${spell}.${lb}${target} falls to the ground." color="1"/>
+	<dtd id="113" english="${actor} casts ${spell}.${lb}${target} falls to the ground." color="56"/>
 	<dtd id="114" english="${actor} casts ${spell} on ${target}, but the spell fails to take effect." color="69"/>
 	<dtd id="115" english="${actor} uses ${ability}.${lb}Attacks are enhanced but defense weakens." color="101"/>
 	<dtd id="116" english="${actor} uses ${ability}.${lb}${target}'s attacks are enhanced." color="101"/>
@@ -604,7 +604,7 @@
 	<dtd id="602" english="${actor} uses ${ability}.${lb}${target} receives the effect of ${ability}." color="101"/>
 	<dtd id="603" english="Additional effect: Treasure Hunter effectiveness against ${target} increases to ${number}." color="1"/>
 	<dtd id="604" english="${actor} eats a ${item}, but finds nothing inside..." color="1"/>
-	<dtd id="605" english="Additional effect: ${target} falls to the ground." color="1"/>
+	<dtd id="605" english="Additional effect: ${target} falls to the ground." color="56"/>
 	<dtd id="606" english="${actor}'s absorbs ${target}'s counter.${lb}${actor} recovers ${number} HP." color="H" units="HP"/>
 	<dtd id="607" english="${actor} uses ${weapon_skill}.${lb}${number} of ${target}'s status ailments disappears!" color="H"/>
 	<dtd id="608" english="${actor} uses ${ability}.${lb}Treasure Hunter effectiveness against ${target} increases to ${number}." color="101"/>
@@ -639,7 +639,7 @@
 	<dtd id="643" english="Your current training regime will begin anew!" color="122"/>
 	<dtd id="644" english="${actor} uses ${ability}.${lb}${number} of ${target}'s status effects are removed." color="H"/>
 	<dtd id="645" english="${actor} uses ${ability}.${lb}${target} is ${status}." color="65"/>
-	<dtd id="646" english="${actor} uses ${ability}.${lb}${target} falls to the ground." color="1"/>
+	<dtd id="646" english="${actor} uses ${ability}.${lb}${target} falls to the ground." color="56"/>
 	<dtd id="647" english="${actor} casts ${ability}.${lb}${target}'s ${status} effect disappears!" color="1"/>
 	<dtd id="648" english="${actor} leads the casting of ${spell}.${lb}${target} takes ${number} points of damage." color="D"/>
 	<dtd id="649" english="A member of another party is readying ${spell} against your target.${lb}You cannot cast the same spell at this time." color="1"/>
