@@ -82,8 +82,8 @@
 	<dtd id="80" english="Debug: ${target} uses Triple Attack(${number}%)." color="1"/>
 	<dtd id="81" english="Debug: Battle Debug No.${lb}(${number}) used on ${target}." color="1"/>
 	<dtd id="82" english="${actor} casts ${spell}.${lb}${target} is ${status}!" color="57"/>
-	<dtd id="83" english="${actor} casts ${spell}.${lb}${actor} successfully removes ${target}'s ${status}." color="1"/>
-	<dtd id="84" english="${actor} is paralyzed." color="1"/>
+	<dtd id="83" english="${actor} casts ${spell}.${lb}${actor} successfully removes ${target}'s ${status}." color="191"/>
+	<dtd id="84" english="${actor} is paralyzed." color="122"/>
 	<dtd id="85" english="${actor} casts ${spell}.${lb}${target} resists the spell." color="69"/>
 	<dtd id="86" english="${actor} casts ${spell}, but ${target} is outside the area of effect." color="1"/>
 	<dtd id="87" english="Unable to use job ability." color="122"/>
@@ -122,7 +122,7 @@
 	<dtd id="120" english="${actor} uses ${ability}.${lb}${target}'s accuracy is enhanced." color="101"/>
 	<dtd id="121" english="${actor} uses ${ability}.${lb}${target}'s evasion is enhanced." color="101"/>
 	<dtd id="122" english="${actor} uses ${ability}.${lb}${actor} recovers ${number} HP." color="H" units="HP"/>
-	<dtd id="123" english="${actor} uses ${ability}.${lb}${actor} successfully removes ${target}'s ${status}." color="H"/>
+	<dtd id="123" english="${actor} uses ${ability}.${lb}${actor} successfully removes ${target}'s ${status}." color="191"/>
 	<dtd id="124" english="${actor} achieves Gate Breach status!" color="1"/>
 	<dtd id="125" english="${actor} uses ${ability}.${lb}${actor} steals an ${item} from ${target}." color="101"/>
 	<dtd id="126" english="${actor} uses ${ability}.${lb}${actor}'s movement speed increases." color="101"/>
