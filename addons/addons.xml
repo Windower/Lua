@@ -69,10 +69,12 @@
   </addon>
   <addon>
   	<name>CellHelp</name>
+  	<author>Balloon</author>
   	<description> Salvage Autolotter (With Cell Description on drop).</description>
   </addon>
   <addon>
   	<name>RollTracker</name>
+  	<author>Balloon</author>
   	<description>Instantly reports Rolls and Double-ups, gives information about buffs received and prevents Doubling up on Lucky and 11</description>
   </addon> 	
   </addons>
