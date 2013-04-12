@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<addons>
+  <addon>
+    <name>Example</name>
+    <author>Iryoku</author>
+    <description>
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis dolor est,
+      tristique vitae lacinia quis, vulputate sit amet mi. Duis lacinia, massa
+      at faucibus sagittis.
+    </description>
+    <bugtracker>https://github.com/IryokuChevalier/Lua/issues</bugtracker>
+    <support>http://forums.windower.net/topic/21775-random-question-thread/</support>
+  </addon>
+  <addon>
+  	<name>AEcho</name>
+  	<description>Automatically uses echo drops when you get silenced. Also, uses send to send a message to an alt that you got debuffed.</description>
+  </addon>
+  <addon>
+    <name>AnsweringMachine</name>
+    <description>Stores tells that you receive for later recall.</description>
+  </addon>
+  <addon>
+    <name>AutoJoin</name>
+    <description>Automatically joins or declines party invites. Configurable with blacklist/whitelist mode and auto-decline settings.</description>
+	<bugtracker>https://github.com/z16/Lua/issues</bugtracker>
+  </addon>
+  <addon>
+    <name>BattleMod</name>
+    <description>Customizes battle chat messages.</description>
+  </addon>
+  <addon>
+  	<name>FFOColor</name>
+  	<description>Allows you to show FFOChat text in one of the 5 game chat channels. As well as specify colors for the text</description>
+  </addon>
+  <addon>
+    <name>Linker</name>
+    <description>Allows opening links to certain websites from within the game, with an optional search parameter.</description>
+	<bugtracker>https://github.com/z16/Lua/issues</bugtracker>
+  </addon>
+  <addon>
+  	<name>OhShi</name>
+  	<description>Keeps track of various event related things. Such as, VW proc messages, mob casting, mob tp moves, TH procs and cor rolls, as well as others.</description>
+  </addon>
+  <addon>
+  	<name>Respond</name>
+  	<description>Respond to tells and FFOchat PMs using //r.</description>
+  </addon>
+  <addon>
+    <name>Scoreboard</name>
+    <author>Suji</author>
+    <description>Basic in-game damage parser. It displays live DPS and works even when chat filters are enabled.</description>
+    <support>https://github.com/jerryhebert/Lua/issues</support>
+  </addon>
+  <addon>
+    <name>Send</name>
+    <description>Sends commands between windower instances using IPC.</description>
+  </addon>
+  <addon>
+  	<name>StaggerTrack</name>
+  	<description>Catches voidwatch weakness messages and prints them to a textbox in case you miss them in the battle spam.</description>
+  </addon>
+  <addon>
+  	<name>STNA</name>
+  	<description>One-button status removal for dual boxing.</description>
+  </addon>
+  <addon>
+  	<name>vwhl</name>
+  	<description>Redirects vw nm's vulnerabilities to the "tell" stream so that they can be held using the chat filters' function and highlights the important info. Supports EN, FR, DE clients.</description>
+  </addon>
+  <addon>
+  	<name>CellHelp</name>
+  	<description> Salvage Autolotter (With Cell Description on drop).</description>
+  </addon>
+  <addon>
+  	<name>RollTracker</name>
+  	<description>Instantly reports Rolls and Double-ups, gives information about buffs received and prevents Doubling up on Lucky and 11</description>
+  </addon> 	
+  </addons>
