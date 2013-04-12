@@ -374,10 +374,10 @@
 	<dtd id="372" english="Limit chain #${number}!${lb}${actor} gains ${number} limit points." color="131"/>
 	<dtd id="373" english="${actor} hits ${target}.${lb}${target} recovers ${number} hit points!" color="H"/>
 	<dtd id="374" english="Striking ${target}'s armor causes ${actor} to become ${status}." color="1"/>
-	<dtd id="375" english="${actor} uses an ${item}.${lb}${target} receives the effect of ${status}." color="1"/>
-	<dtd id="376" english="${actor} uses an ${item}.${lb}${target} obtains an ${item}." color="1"/>
-	<dtd id="377" english="${actor} uses an ${item}.${lb}${target} obtains ${item}." color="1"/>
-	<dtd id="378" english="${actor} uses an ${item}.${lb}${target}'s ${status} effect disappears!" color="1"/>
+	<dtd id="375" english="${actor} uses an ${item}.${lb}${target} receives the effect of ${status}." color="81"/>
+	<dtd id="376" english="${actor} uses an ${item}.${lb}${target} obtains an ${item}." color="81"/>
+	<dtd id="377" english="${actor} uses an ${item}.${lb}${target} obtains ${item}." color="81"/>
+	<dtd id="378" english="${actor} uses an ${item}.${lb}${target}'s ${status} effect disappears!" color="81"/>
 	<dtd id="379" english="${actor} uses ${ability}.${lb}Magic Burst!${lb}${target} takes ${number} points of damage." color="D"/>
 	<dtd id="380" english="Your ?Unknown Parameter (Type: B0) 0? modification has risen to level ${number}." color="1"/>
 	<dtd id="381" english="Your ?Unknown Parameter (Type: B0) 0? modification has dropped to level ${number}." color="1"/>
@@ -398,20 +398,20 @@
 	<dtd id="396" english="Skillchain: Scission.${lb}${target} recovers ${number} hit points!" color="H"/>
 	<dtd id="397" english="Skillchain: Detonation.${lb}${target} recovers ${number} hit points!" color="H"/>
 	<dtd id="398" english="Skillchain: Impaction.${lb}${target} recovers ${number} hit points!" color="H"/>
-	<dtd id="399" english="${actor} uses an ${item}.${lb}All of ${target}'s Petras vanish!" color="H"/>
-	<dtd id="400" english="${actor} uses an ${item}.${lb}${number} of ${target}'s status ailments disappears!" color="1"/>
-	<dtd id="401" english="${actor} uses an ${item}.${lb}${number} of ${target}'s effects disappears!" color="1"/>
+	<dtd id="399" english="${actor} uses an ${item}.${lb}All of ${target}'s Petras vanish!" color="1"/>
+	<dtd id="400" english="${actor} uses an ${item}.${lb}${number} of ${target}'s status ailments disappears!" color="81"/>
+	<dtd id="401" english="${actor} uses an ${item}.${lb}${number} of ${target}'s effects disappears!" color="81"/>
 	<dtd id="402" english="${actor} uses ${weapon_skill}.${lb}${target}'s magic defense is enhanced." color="56"/>
 	<dtd id="403" english="${number} of ${target}'s attributes is drained." color="1"/>
 	<dtd id="404" english="${number} status effect is drained from ${target}." color="1"/>
 	<dtd id="405" english="${actor} uses ${weapon_skill}.${lb}${number} of ${target}'s effects disappears!" color="56"/>
 	<dtd id="406" english="${actor} uses ${weapon_skill}.${lb}${target} falls to the ground." color="56"/>
-	<dtd id="407" english="${actor} uses an ${item}.${lb}${target}'s TP is reduced." color="1"/>
+	<dtd id="407" english="${actor} uses an ${item}.${lb}${target}'s TP is reduced." color="81"/>
 	<dtd id="408" english="${actor} uses an ${item}.${lb}No effect on ${target}." color="69"/>
 	<dtd id="409" english="${actor} uses ${weapon_skill}.${lb}${target}'s TP is increased to ${number}." color="H" units="TP"/>
 	<dtd id="410" english="No target available.${lb}Unable to use item." color="1"/>
 	<dtd id="411" english="${actor} attempts to use the ${item}, but lacks the required number of Ballista Points.${lb}You currently have ${number} Ballista points." color="1"/>
-	<dtd id="412" english="${actor} uses an ${item}.${lb}${target} receives the effect of ${status}." color="1"/>
+	<dtd id="412" english="${actor} uses an ${item}.${lb}${target} receives the effect of ${status}." color="81"/>
 	<dtd id="413" english="${actor} uses an ${item}.${lb}${target} takes ${number} points of damage." color="D"/>
 	<dtd id="414" english="${actor} uses ${ability}.${lb}${target} receives the effect of Magic Attack Boost and Magic Defense Boost." color="101"/>
 	<dtd id="415" english="${target} receives the effect of Magic Attack Boost and Magic Defense Boost." color="101"/>
