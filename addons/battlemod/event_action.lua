@@ -291,7 +291,7 @@ function event_action(act)
 					elseif addmsg ==603 then
 						abil = 'Treasure Hunter Level'
 					else
-						abil = 'Add. Eff. '
+						abil = 'Add. Eff.'
 					end
 										
 					if condensebattle then
