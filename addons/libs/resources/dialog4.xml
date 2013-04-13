@@ -646,11 +646,11 @@
 	<dtd id="650" english="${actor} leads the casting of ${spell}.${lb}Magic Burst!${lb}${target} takes ${number} points of damage." color="D"/>
 	<dtd id="651" english="${actor} leads the casting of ${spell}.${lb}${target} recovers ${number} hit points!" color="H"/>
 	<dtd id="652" english="Additional effect: ${target} loses ${number} TP." color="1" units="TP"/>
-	<dtd id="653" english="${actor} casts ${spell}.${lb}?${target} resists the spell.${lb}?Immunobreak!" color="69"/>
-	<dtd id="654" english="?${target} resists the spell.${lb}?Immunobreak!" color="69"/>
-	<dtd id="655" english="${actor} casts ${spell}.${lb}?${target} completely resists the spell." color="69"/>
-	<dtd id="656" english="?${target} completely resists the spell." color="69"/>
-	<dtd id="657" english="${actor} uses ${ability}.${lb}?All enmity is transferred to ${target}." color="101"/>
+	<dtd id="653" english="${actor} casts ${spell}.${lb}${target} resists the spell.${lb}Immunobreak!" color="69"/>
+	<dtd id="654" english="${target} resists the spell.${lb}Immunobreak!" color="69"/>
+	<dtd id="655" english="${actor} casts ${spell}.${lb}${target} completely resists the spell." color="69"/>
+	<dtd id="656" english="${target} completely resists the spell." color="69"/>
+	<dtd id="657" english="${actor} uses ${ability}.${lb}All enmity is transferred to ${target}." color="101"/>
 	<dtd id="658" english="${actor} uses ${ability}, but misses ${target}." color="104"/>
 	<dtd id="659" english="No effect on ${target}." color="1"/>
 	<dtd id="660" english="The same effect is already active on that luopan!" color="1"/>
