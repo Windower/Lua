@@ -368,7 +368,6 @@ end
 function event_addon_command(...)
     local term = table.concat({...}, ' ')
     local splitarr = split(term,' ')
-	write(term)
 	if splitarr[1] == 'cmd' then
 		if splitarr[2] ~= nil then
 			if splitarr[2]:lower() == 'commamode' then
