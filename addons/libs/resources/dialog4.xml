@@ -310,8 +310,8 @@
 	<dtd id="308" english="Unable to use the ${item}.${lb}${target}'s inventory is full." color="1"/>
 	<dtd id="309" english="${actor} casts ${spell} on ${target}." color="56"/>
 	<dtd id="310" english="${actor}'s ${skill} skill drops 0.${number} points!" color="1"/>
-	<dtd id="311" english="${actor} covers ${target}." color="1"/>
-	<dtd id="312" english="${actor}'s attempt to cover has no effect." color="1"/>
+	<dtd id="311" english="${actor} covers ${target}." color="101"/>
+	<dtd id="312" english="${actor}'s attempt to cover has no effect." color="101"/>
 	<dtd id="313" english="${target} is out of range.${lb}Unable to cast ${spell}." color="123"/>
 	<dtd id="314" english="${target}'s level is currently restricted to ${number}.${lb}Equipment affected by the level restriction will be adjusted accordingly." color="1"/>
 	<dtd id="315" english="${actor} already has a pet." color="1"/>
