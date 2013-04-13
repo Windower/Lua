@@ -143,11 +143,10 @@ function event_action(act)
 				if roller == roll_id[i] then
 					for n=1, #act['targets'] do
 						for z in pairs(get_party()) do
-							if act['targets'][n]['id'] == get_party()[z]['mob']['id'] then	
-								if get_party()[z]['mob']['id'] == nil then
-									break
+							if get_party()[z]['mob'] ~= nil then
+								if act['targets'][n]['id'] == get_party()[z]['mob']['id'] then	
+									effected_member[n]=get_party()[z]['name']
 								end
-								effected_member[n]=get_party()[z]['name']
 							end
 						end
 					end
