@@ -70,6 +70,7 @@ function setDelay()
 				RW_delay = tonumber(splat[3])
 			elseif cmd == 'ammo delay' then
 				Ammo_Delay = tonumber(splat[3])
+			end
 		end
 		add_to_chat(12,'AutoRA read from a settings file and loaded!')
 	end
