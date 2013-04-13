@@ -33,7 +33,7 @@
 	<dtd id="31" english="${number} of ${target}'s shadows absorbs the damage and disappears." color="29"/>
 	<dtd id="32" english="${target} dodges the attack." color="29"/>
 	<dtd id="33" english="${actor}'s attack is countered by ${target}.${lb}${actor} takes ${number} points of damage." color="D"/>
-	<dtd id="34" english="${actor} does not have enough MP to cast ${spell}." color="1"/>
+	<dtd id="34" english="${actor} does not have enough MP to cast ${spell}." color="122"/>
 	<dtd id="35" english="${actor} lacks the ninja tools to cast ${spell}." color="122"/>
 	<dtd id="36" english="You lose sight of ${target}." color="122"/>
 	<dtd id="37" english="You are too far from the battle to gain experience." color="1"/>
