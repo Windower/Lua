@@ -157,7 +157,12 @@ function event_action(act)
 				if dialog[act['targets'][i]['actions'][n]['message']]['units'] ~= nil and condensebattle then
 					number = number..' '..dialog[act['targets'][i]['actions'][n]['message']]['units']
 				elseif dialog[act['targets'][i]['actions'][n]['message']]['color'] == 'H' and condensebattle then
-					status = color_arr['statuscol']..statuses[number]['english']..string.char(0x1E,0x01)
+					if statuses[number] then
+						status = color_arr['statuscol']..statuses[number]['english']..string.char(0x1E,0x01)
+					elseif debugging then
+						write('status_debug: '..number)
+						status = color_arr['statuscol']..statuses[number]['english']..string.char(0x1E,0x01)
+					end
 				end
 			end
 			
