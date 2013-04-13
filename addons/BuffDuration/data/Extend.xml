@@ -2,6 +2,81 @@
 
 <Extend>
 
+  <!-- Feel free to add in other gear up here, for other JA's etc-->
+  
   <b id="32" gearid="14094" duration="15" slot="feet">Rogue's Poulaines</b>
-
+  
+  <!--March-->
+  <b id="214" gearid="17360" duration="36" slot="range">Langeleik</b>
+  <b id="214" gearid="11113" duration="12" slot="hands">Ad. Mnchtte. +2</b>
+  <b id="214" gearid="17853" duration="24" slot="range">Iron Ram Horn</b>
+  <b id="214" gearid="17349" duration="24" slot="range">Faerie Piccolo</b>
+  <b id="214" gearid="17836" duration="12" slot="range">Kingdom Horn</b>
+  <b id="214" gearid="17835" duration="12" slot="range">San D'Orian Horn</b>
+  <b id="214" gearid="17367" duration="12" slot="range">Ryl.Spr. Horn</b>
+  
+  <!--Minuet-->
+  <b id="198" gearid="11093" duration="12" slot="body">Aoidos' Hngrln. +2</b>
+  <b id="198" gearid="18832" duration="36" slot="range">Apollo's Flute</b>
+  <b id="198" gearid="17846" duration="24" slot="range">Cornette +2</b>
+  <b id="198" gearid="17369" duration="24" slot="range">Cornette +1</b>
+  <b id="198" gearid="17344" duration="12" slot="range">Cornette</b>
+  
+  <!--Ballad-->
+  <b id="196" gearid="11133" duration="12" slot="legs">Aoidos' Rhing. +2</b>
+  <b id="196" gearid="18831" duration="12" slot="range">Crooner's Cithara</b>
+  
+  <!--Madrigal-->
+  <b id="199" gearid="11073" duration="12" slot="head">Aoidos' Calot +2</b>
+  <b id="199" gearid="18833" duration="36" slot="range">Cantabank's Horn</b>
+  <b id="199" gearid="17845" duration="24" slot="range">Traversiere +2</b>
+  <b id="199" gearid="17375" duration="24" slot="range">Traversiere +1</b>
+  <b id="199" gearid="17348" duration="12" slot="range">Traversiere</b>
+  
+  <!--Scherzo-->
+  <b id="222" gearid="17363" duration="12" slot="range">Mass Chalemie</b>
+  <b id="222" gearid="11153" duration="12" slot="feet">Aoido's Cothrn. +2</b>
+  
+  <!--Mazurka-->
+  <b id="219" gearid="18834" duration="36" slot="range">Vihuela</b>
+  <b id="219" gearid="17838" duration="24" slot="range">Harlequin's Horn</b>
+  
+  
+  
+  
+  <!-- DON'T TOUCH THIS PART -->
+  
+  <!--Custom ID for 'all enhancing magic'-->
+  <b id="1000" gearid="16204" duration="10" slot="back">Estoqueur's Cape</b>
+  <b id="1000" gearid="11148" duration="20" slot="feet">Estq. Houseaux +2</b>
+  <b id="1000" gearid="11248" duration="10" slot="feet">Estq. Houseaux +1</b>
+  <!--Custom ID for 'composure set bonus'-->
+  <b id="1001" gearid="11068" duration="1" slot="head">Estq. Chappel +2</b>
+  <b id="1001" gearid="11088" duration="1" slot="body">Estq. Sayon +2</b>
+  <b id="1001" gearid="11108" duration="1" slot="hands">Estq. Ganthrt. +2</b>
+  <b id="1001" gearid="11128" duration="1" slot="legs">Estqr. Fuseau +2</b>
+  <b id="1001" gearid="11148" duration="1" slot="feet">Estq. Houseaux +2</b>
+  <!--Custom ID for 'all song duration'-->
+  <b id="2000" gearid="18342" duration="24" slot="range">Gjallarhorn</b>
+  <b id="2000" gearid="18577" duration="24" slot="range">Gjallarhorn</b>
+  <b id="2000" gearid="18578" duration="24" slot="range">Gjallarhorn</b>
+  <b id="2000" gearid="18579" duration="36" slot="range">Gjallarhorn</b>
+  <b id="2000" gearid="18580" duration="36" slot="range">Gjallarhorn</b>
+  <b id="2000" gearid="18572" duration="48" slot="range">Gjallarhorn</b>
+  <b id="2000" gearid="18840" duration="48" slot="range">Gjallarhorn</b>
+  <b id="2000" gearid="18575" duration="30" slot="range">Daurbabla</b>
+  <b id="2000" gearid="18576" duration="36" slot="range">Daurbabla</b>
+  <b id="2000" gearid="18571" duration="36" slot="range">Daurbabla</b>
+  <b id="2000" gearid="18839" duration="36" slot="range">Daurbabla</b>
+  <b id="2000" gearid="18571" duration="36" slot="range">Daurbabla</b>
+  <b id="2000" gearid="19000" duration="12" slot="main">Carnwenhan</b>
+  <b id="2000" gearid="19069" duration="24" slot="main">Carnwenhan</b>
+  <b id="2000" gearid="19089" duration="36" slot="main">Carnwenhan</b>
+  <b id="2000" gearid="19921" duration="48" slot="main">Carnwenhan</b>
+  <b id="2000" gearid="19719" duration="48" slot="main">Carnwenhan</b>
+  <b id="2000" gearid="19928" duration="60" slot="main">Carnwenhan</b>
+  <b id="2000" gearid="19957" duration="60" slot="main">Carnwenhan</b>
+  <b id="2000" gearid="11618" duration="12" slot="neck">Aoidos' Matinee</b>
+  <b id="2000" gearid="11093" duration="12" slot="body">Aoidos' Hngrln. +2</b>
+  <b id="2000" gearid="28074" duration="12" slot="legs">Mdk. Shalwar +1</b>
 </Extend>
