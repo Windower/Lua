@@ -368,30 +368,31 @@ end
 function event_addon_command(...)
     local term = table.concat({...}, ' ')
     local splitarr = split(term,' ')
+	write(term)
 	if splitarr[1] == 'cmd' then
 		if splitarr[2] ~= nil then
 			if splitarr[2]:lower() == 'commamode' then
 				commamode = not commamode
-				add_to_chat(122,'Comma Mode flipped! - '..bool2str(commamode))
+				add_to_chat(121,'Comma Mode flipped! - '..tostring(commamode))
 			elseif splitarr[2]:lower() == 'oxford' then
 				oxford = not oxford
-				add_to_chat(122,'Oxford Mode flipped! - '..bool2str(oxford))
+				add_to_chat(121,'Oxford Mode flipped! - '..tostring(oxford))
 			elseif splitarr[2]:lower() == 'targetnumber' then
 				targetnumber = not targetnumber
-				add_to_chat(122,'Target Number flipped! - '..bool2str(targetnumber))
+				add_to_chat(121,'Target Number flipped! - '..tostring(targetnumber))
 			elseif splitarr[2]:lower() == 'cancelmulti' then
 				cancelmulti = not cancelmulti
-				add_to_chat(122,'Multi-canceling flipped! - '..bool2str(cancelmulti))
+				add_to_chat(121,'Multi-canceling flipped! - '..tostring(cancelmulti))
 			elseif splitarr[2]:lower() == 'reload' then
 				options_load()
 			elseif splitarr[2]:lower() == 'unload' then
 				send_command('lua u battlemod')
 			elseif splitarr[2]:lower() == 'condensebattle' then
 				condensebattle = not condensebattle
-				add_to_chat(122,'Condensed Battle text flipped! - '..bool2str(condensebattle))
+				add_to_chat(121,'Condensed Battle text flipped! - '..tostring(condensebattle))
 			elseif splitarr[2]:lower() == 'condensebuffs' then
 				condensebuffs = not condensebuffs
-				add_to_chat(122,'Condensed Buffs text flipped! - '..bool2str(condensebuffs))
+				add_to_chat(121,'Condensed Buffs text flipped! - '..tostring(condensebuffs))
 			elseif splitarr[2]:lower() == 'cg' then
 				collectgarbage()
 			elseif splitarr[2]:lower() == 'colortest' then
