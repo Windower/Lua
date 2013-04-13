@@ -28,7 +28,7 @@ require 'timer'
 
 function event_load()
 
-	version = '1.0.1'
+	version = '1.0.2'
 	delay = 0
 	RW_delay = 0
 	Ammo_Delay = 0
@@ -128,6 +128,8 @@ function event_addon_command(...)
 		stop()
 	elseif splitarr[1]:lower() == 'shoot' then
 		shoot()
+	elseif splitarr[1]:lower() == 'reload' then
+		options_load()
 	elseif splitarr[1]:lower() == 'help' then
 		add_to_chat(17, 'AutoRA  v'..version..'commands:')
 		add_to_chat(17, '//ara [options]')
