@@ -136,7 +136,7 @@
 	<dtd id="134" english="${actor} uses ${ability}.${lb}${target} is fortified against arcana." color="101"/>
 	<dtd id="135" english="${actor} uses ${weapon_skill} on ${target}." color="56"/>
 	<dtd id="136" english="${actor} uses ${ability}.${lb}${target} is now under ${actor}'s control." color="101"/>
-	<dtd id="137" english="${actor} uses ${ability}.${lb}${actor} fails to charm ${target}." color="101"/>
+	<dtd id="137" english="${actor} uses ${ability}.${lb}${actor} fails to charm ${target}." color="69"/>
 	<dtd id="138" english="${actor} uses ${ability}.${lb}${target} seems friendlier." color="101"/>
 	<dtd id="139" english="${actor} uses ${ability}, but finds nothing." color="101"/>
 	<dtd id="140" english="${actor} uses ${ability}, and finds a ${item}." color="101"/>
@@ -152,7 +152,7 @@
 	<dtd id="150" english="${actor} uses ${ability}.${lb}${target} is fortified against dragons." color="101"/>
 	<dtd id="151" english="${target} is fortified against dragons." color="101"/>
 	<dtd id="152" english="Additional effect: ${actor} recovers ${number} MP." color="H" units="MP"/>
-	<dtd id="153" english="${actor} uses ${ability}.${lb}${actor} fails to steal from ${target}." color="101"/>
+	<dtd id="153" english="${actor} uses ${ability}.${lb}${actor} fails to steal from ${target}." color="69"/>
 	<dtd id="154" english="${target} is out of range." color="122"/>
 	<dtd id="155" english="You cannot perform that action on the specified target." color="1"/>
 	<dtd id="156" english="${actor} uses ${ability}.${lb}No effect on ${target}." color="104"/>
@@ -243,7 +243,7 @@
 	<dtd id="241" english="${actor} hides!" color="1"/>
 	<dtd id="242" english="${actor} uses ${weapon_skill}.${lb}${target} is ${status}." color="56"/>
 	<dtd id="243" english="${actor} uses ${weapon_skill}.${lb}${target} receives the effect of ${status}." color="57"/>
-	<dtd id="244" english="${actor} fails to mug ${target}." color="1"/>
+	<dtd id="244" english="${actor} fails to mug ${target}." color="69"/>
 	<dtd id="245" english="${actor} uses Eagle Eye Shot, but misses ${target}." color="M"/>
 	<dtd id="246" english="${target} is full." color="1"/>
 	<dtd id="247" english="${actor} can't eat the ${item}." color="1"/>
@@ -431,8 +431,8 @@
 	<dtd id="429" english="The same roll is already active on ${actor}." color="1"/>
 	<dtd id="430" english="${actor} casts ${spell}.${lb}1 of ${target}'s attributes is drained." color="1"/>
 	<dtd id="431" english="${actor} casts ${spell}.${lb}${target}'s TP is reduced." color="1" units="TP"/>
-	<dtd id="432" english="${actor} casts ${spell}.${lb}${target} receives the effect of Accuracy Boost and Evasion Boost." color="1"/>
-	<dtd id="433" english="${actor} casts ${spell}.${lb}${target} receives the effect of Magic Attack Boost and Magic Defense Boost." color="1"/>
+	<dtd id="432" english="${actor} casts ${spell}.${lb}${target} receives the effect of Accuracy Boost and Evasion Boost." color="101"/>
+	<dtd id="433" english="${actor} casts ${spell}.${lb}${target} receives the effect of Magic Attack Boost and Magic Defense Boost." color="101"/>
 	<dtd id="434" english="You cannot customize a activated automaton." color="1"/>
 	<dtd id="435" english="${actor} uses ${ability}!${lb}${target}'s abilities are recharged." color="H"/>
 	<dtd id="436" english="${target}'s abilities are recharged." color="1"/>
@@ -556,7 +556,7 @@
 	<dtd id="554" english="Level Sync will be deactivated in ${number} seconds.${lb}The Level Sync designee has fallen below level 10." color="1"/>
 	<dtd id="555" english="Level Sync will be deactivated in ${number} seconds.${lb}A party member has undergone a job change." color="1"/>
 	<dtd id="556" english="Level Sync will be deactivated in ${number} seconds.${lb}The Level Sync designee is incapable of receiving experience points." color="1"/>
-	<dtd id="557" english="${target} receives ${number} piece of alexandrite." color="1"/>
+	<dtd id="557" english="${target} receives ${number} piece of alexandrite." color="101"/>
 	<dtd id="558" english="You defeated a designated target.${lb}(Progress: ${number}/${number})" color="1"/>
 	<dtd id="559" english="You have successfully completed the training regime." color="122"/>
 	<dtd id="560" english="${actor} uses ${ability}. Finishing move now ${number}." color="101" units="FM"/>
@@ -602,12 +602,12 @@
 	<dtd id="600" english="${actor} eats a ${item}.${lb}${actor} finds a ${item} inside!" color="1"/>
 	<dtd id="601" english="Objective fulfilled!${lb}Please report to a Dominion Sergeant to collect your reward." color="1"/>
 	<dtd id="602" english="${actor} uses ${ability}.${lb}${target} receives the effect of ${ability}." color="101"/>
-	<dtd id="603" english="Additional effect: Treasure Hunter effectiveness against ${target} increases to ${number}." color="1"/>
+	<dtd id="603" english="Additional effect: Treasure Hunter effectiveness against ${target} increases to ${number}." color="501"/>
 	<dtd id="604" english="${actor} eats a ${item}, but finds nothing inside..." color="1"/>
 	<dtd id="605" english="Additional effect: ${target} falls to the ground." color="56"/>
 	<dtd id="606" english="${actor}'s absorbs ${target}'s counter.${lb}${actor} recovers ${number} HP." color="H" units="HP"/>
 	<dtd id="607" english="${actor} uses ${weapon_skill}.${lb}${number} of ${target}'s status ailments disappears!" color="H"/>
-	<dtd id="608" english="${actor} uses ${ability}.${lb}Treasure Hunter effectiveness against ${target} increases to ${number}." color="101"/>
+	<dtd id="608" english="${actor} uses ${ability}.${lb}Treasure Hunter effectiveness against ${target} increases to ${number}." color="501"/>
 	<dtd id="609" english="Prowess attained: Increased treasure casket discovery." color="1"/>
 	<dtd id="610" english="Prowess attained: Increased combat and magic skill gain." color="1"/>
 	<dtd id="611" english="Prowess attained: Increased crystal yield." color="1"/>
