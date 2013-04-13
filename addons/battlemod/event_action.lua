@@ -215,7 +215,7 @@ function event_action(act)
 			end
 			
 			-- Construct the message to be sent out --
-			if prepstr ~= '' then
+			if prepstr ~= '' and prepstr then
 				if forcemsg == nil then
 					if aggregate ~= true then
 						if check_filter(actor_table,party_table,target_table,act['category'],msg) then
