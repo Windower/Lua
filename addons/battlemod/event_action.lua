@@ -41,6 +41,7 @@ function event_action(act)
 					actor,target,flipped = flip(actor,target)
 				elseif act['targets'][i]['actions'][n]['message'] == 31 then abil = 'Disappears'
 					actor,target,flipped = flip(actor,target)
+					number = act['targets'][i]['actions'][n]['param']
 				elseif act['targets'][i]['actions'][n]['message'] == 67 then abil = 'Crits'
 					number = act['targets'][i]['actions'][n]['param']
 				elseif debugging and not act['targets'][i]['actions'][n]['has_spike_effect'] then
