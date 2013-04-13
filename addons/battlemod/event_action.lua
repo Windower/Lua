@@ -32,7 +32,7 @@ function event_action(act)
 				elseif  act['targets'][i]['actions'][n]['reaction'] == 12 then abil = 'Blocks'
 					actor,target,flipped = flip(actor,target)
 					number = act['targets'][i]['actions'][n]['param']
-				elseif act['targets'][i]['actions'][n]['message'] == 1 then abil = 'Hits'
+				elseif act['targets'][i]['actions'][n]['message'] == 1 then abil = 'Hit'
 					number = act['targets'][i]['actions'][n]['param']
 				elseif act['targets'][i]['actions'][n]['message'] == 15 then abil = 'Misses'
 				elseif act['targets'][i]['actions'][n]['message'] == 32 then abil = 'Dodges'
@@ -42,7 +42,7 @@ function event_action(act)
 				elseif act['targets'][i]['actions'][n]['message'] == 31 then abil = 'Disappears'
 					actor,target,flipped = flip(actor,target)
 					number = act['targets'][i]['actions'][n]['param']
-				elseif act['targets'][i]['actions'][n]['message'] == 67 then abil = 'Crits'
+				elseif act['targets'][i]['actions'][n]['message'] == 67 then abil = 'Crit'
 					number = act['targets'][i]['actions'][n]['param']
 				elseif debugging and not act['targets'][i]['actions'][n]['has_spike_effect'] then
 					number = act['targets'][i]['actions'][n]['param']
@@ -50,8 +50,8 @@ function event_action(act)
 				end
 			elseif act['category'] == 2 then -- Ranged attacks
 				number = act['targets'][i]['actions'][n]['param']
-				if act['targets'][i]['actions'][n]['message'] == 352 then abil = 'RA Hits'
-				elseif act['targets'][i]['actions'][n]['message'] == 353 then abil = 'RA Crits'
+				if act['targets'][i]['actions'][n]['message'] == 352 then abil = 'RA'
+				elseif act['targets'][i]['actions'][n]['message'] == 353 then abil = 'Crit RA'
 				elseif act['targets'][i]['actions'][n]['message'] == 354 then abil = 'RA Misses'
 					number = nil
 				elseif act['targets'][i]['actions'][n]['message'] == 576 then abil = 'RA Hits Squarely'
