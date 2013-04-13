@@ -46,9 +46,9 @@
 	<dtd id="44" english="${target}'s spikes deal ${number} points of damage to ${actor}." color="D"/>
 	<dtd id="45" english="${actor} learns &quot;${weapon_skill}&quot;!" color="1"/>
 	<dtd id="46" english="Debug Message: Current POP number: (${number})" color="1"/>
-	<dtd id="47" english="${actor} cannot cast ${spell}." color="1"/>
-	<dtd id="48" english="${spell} cannot be cast on ${target}." color="1"/>
-	<dtd id="49" english="${actor} is unable to cast spells." color="1"/>
+	<dtd id="47" english="${actor} cannot cast ${spell}." color="122"/>
+	<dtd id="48" english="${spell} cannot be cast on ${target}." color="122"/>
+	<dtd id="49" english="${actor} is unable to cast spells." color="122"/>
 	<dtd id="50" english="${actor} earns a merit points!${lb}(Total: ${number})" color="1"/>
 	<dtd id="51" english="--Out of sight--" color="1"/>
 	<dtd id="52" english="${target} gives up chasing ${actor}.${lb}---Find Path Error---" color="1"/>
