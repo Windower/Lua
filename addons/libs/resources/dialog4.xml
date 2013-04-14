@@ -600,7 +600,7 @@
 	<dtd id="598" english="${actor} uses ${ability}.${lb}${actor} steals a ${item} from ${target}.${lb}Additional effect: ${target} is afflicted with Accuracy Down." color="101"/>
 	<dtd id="599" english="${actor} uses ${ability}.${lb}${actor} steals a ${item} from ${target}.${lb}Additional effect: ${target} is afflicted with Slow." color="101"/>
 	<dtd id="600" english="${actor} eats a ${item}.${lb}${actor} finds a ${item} inside!" color="1"/>
-	<dtd id="601" english="Objective fulfilled!${lb}Please report to a Dominion Sergeant to collect your reward." color="1"/>
+	<dtd id="601" english="Objective fulfilled!${lb}Please report to a Dominion Sergeant to collect your reward." color="122"/>
 	<dtd id="602" english="${actor} uses ${ability}.${lb}${target} receives the effect of ${ability}." color="101"/>
 	<dtd id="603" english="Additional effect: Treasure Hunter effectiveness against ${target} increases to ${number}." color="501"/>
 	<dtd id="604" english="${actor} eats a ${item}, but finds nothing inside..." color="1"/>
