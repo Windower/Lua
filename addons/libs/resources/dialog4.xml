@@ -557,7 +557,7 @@
 	<dtd id="555" english="Level Sync will be deactivated in ${number} seconds.${lb}A party member has undergone a job change." color="1"/>
 	<dtd id="556" english="Level Sync will be deactivated in ${number} seconds.${lb}The Level Sync designee is incapable of receiving experience points." color="1"/>
 	<dtd id="557" english="${target} receives ${number} piece of alexandrite." color="101"/>
-	<dtd id="558" english="You defeated a designated target.${lb}(Progress: ${number}/${number})" color="1"/>
+	<dtd id="558" english="You defeated a designated target.${lb}(Progress: ${number}/${number2})" color="122"/>
 	<dtd id="559" english="You have successfully completed the training regime." color="122"/>
 	<dtd id="560" english="${actor} uses ${ability}. Finishing move now ${number}." color="101" units="FM"/>
 	<dtd id="561" english="Unable to perform that action.${lb}Your have already earned the maximum number of finishing moves." color="122"/>
@@ -608,31 +608,31 @@
 	<dtd id="606" english="${actor}'s absorbs ${target}'s counter.${lb}${actor} recovers ${number} HP." color="H" units="HP"/>
 	<dtd id="607" english="${actor} uses ${weapon_skill}.${lb}${number} of ${target}'s status ailments disappears!" color="H"/>
 	<dtd id="608" english="${actor} uses ${ability}.${lb}Treasure Hunter effectiveness against ${target} increases to ${number}." color="501"/>
-	<dtd id="609" english="Prowess attained: Increased treasure casket discovery." color="1"/>
-	<dtd id="610" english="Prowess attained: Increased combat and magic skill gain." color="1"/>
-	<dtd id="611" english="Prowess attained: Increased crystal yield." color="1"/>
-	<dtd id="612" english="Prowess attained: Treasure Hunter bonus." color="1"/>
-	<dtd id="613" english="Prowess attained: Increased attack speed." color="1"/>
-	<dtd id="614" english="Prowess attained: Increased HP and MP." color="1"/>
-	<dtd id="615" english="Prowess attained: Enhanced accuracy and ranged accuracy." color="1"/>
-	<dtd id="616" english="Prowess attained: Enhanced attack and ranged attack." color="1"/>
-	<dtd id="617" english="Prowess attained: Enhanced magic accuracy and magic attack." color="1"/>
-	<dtd id="618" english="Prowess attained: Enhanced &quot;Cure&quot; potency." color="1"/>
-	<dtd id="619" english="Prowess attained: Increased weapon skill damage." color="1"/>
-	<dtd id="620" english="Prowess attained: &quot;Killer&quot; effects bonus." color="1"/>
+	<dtd id="609" english="Prowess attained: Increased treasure casket discovery." color="122"/>
+	<dtd id="610" english="Prowess attained: Increased combat and magic skill gain." color="122"/>
+	<dtd id="611" english="Prowess attained: Increased crystal yield." color="122"/>
+	<dtd id="612" english="Prowess attained: Treasure Hunter bonus." color="122"/>
+	<dtd id="613" english="Prowess attained: Increased attack speed." color="122"/>
+	<dtd id="614" english="Prowess attained: Increased HP and MP." color="122"/>
+	<dtd id="615" english="Prowess attained: Enhanced accuracy and ranged accuracy." color="122"/>
+	<dtd id="616" english="Prowess attained: Enhanced attack and ranged attack." color="122"/>
+	<dtd id="617" english="Prowess attained: Enhanced magic accuracy and magic attack." color="122"/>
+	<dtd id="618" english="Prowess attained: Enhanced &quot;Cure&quot; potency." color="122"/>
+	<dtd id="619" english="Prowess attained: Increased weapon skill damage." color="122"/>
+	<dtd id="620" english="Prowess attained: &quot;Killer&quot; effects bonus." color="122"/>
 
-	<dtd id="625" english="Prowess boosted: Increased treasure casket discovery." color="1"/>
-	<dtd id="626" english="Prowess boosted: Increased combat and magic skill gain." color="1"/>
-	<dtd id="627" english="Prowess boosted: Increased crystal yield." color="1"/>
-	<dtd id="628" english="Prowess boosted: Treasure Hunter bonus." color="1"/>
-	<dtd id="629" english="Prowess boosted: Increased attack speed." color="1"/>
-	<dtd id="630" english="Prowess boosted: Increased HP and MP." color="1"/>
-	<dtd id="631" english="Prowess boosted: Enhanced accuracy and ranged accuracy." color="1"/>
-	<dtd id="632" english="Prowess boosted: Enhanced attack and ranged attack." color="1"/>
-	<dtd id="633" english="Prowess boosted: Enhanced magic accuracy and magic attack." color="1"/>
-	<dtd id="634" english="Prowess boosted: Enhanced &quot;Cure&quot; potency." color="1"/>
-	<dtd id="635" english="Prowess boosted: Increased weapon skill damage." color="1"/>
-	<dtd id="636" english="Prowess boosted: &quot;Killer&quot; effects bonus." color="1"/>
+	<dtd id="625" english="Prowess boosted: Increased treasure casket discovery." color="122"/>
+	<dtd id="626" english="Prowess boosted: Increased combat and magic skill gain." color="122"/>
+	<dtd id="627" english="Prowess boosted: Increased crystal yield." color="122"/>
+	<dtd id="628" english="Prowess boosted: Treasure Hunter bonus." color="122"/>
+	<dtd id="629" english="Prowess boosted: Increased attack speed." color="122"/>
+	<dtd id="630" english="Prowess boosted: Increased HP and MP." color="122"/>
+	<dtd id="631" english="Prowess boosted: Enhanced accuracy and ranged accuracy." color="122"/>
+	<dtd id="632" english="Prowess boosted: Enhanced attack and ranged attack." color="122"/>
+	<dtd id="633" english="Prowess boosted: Enhanced magic accuracy and magic attack." color="122"/>
+	<dtd id="634" english="Prowess boosted: Enhanced &quot;Cure&quot; potency." color="122"/>
+	<dtd id="635" english="Prowess boosted: Increased weapon skill damage." color="122"/>
+	<dtd id="636" english="Prowess boosted: &quot;Killer&quot; effects bonus." color="122"/>
 
 	<dtd id="641" english="Additional effect: 1 of ${target}'s attributes is drained." color="1"/>
 	<dtd id="642" english="${actor} casts ${spell}.${lb}${actor} absorbs ${number} of ${target}'s status benefits." color="1"/>
