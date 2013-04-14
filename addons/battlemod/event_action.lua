@@ -320,7 +320,7 @@ function event_action(act)
 			
 			-- Need to add battlemod battle condensation to this --
 			
-			if act['targets'][i]['actions'][n]['has_spike_effect'] then -- and act['category']==1 and spkmsg ~= 0 then
+			if act['targets'][i]['actions'][n]['has_spike_effect'] and act['category']==1 and spkmsg ~= 0 then
 				number = act['targets'][i]['actions'][n]['spike_effect_param']
 				if condensebattle then
 					if spkmsg > 0 then
