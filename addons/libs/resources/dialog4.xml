@@ -590,7 +590,7 @@
 	<dtd id="588" english="${target} regains ${number} MP." color="H" units="MP"/>
 	<dtd id="589" english="${target} have been healed of ${number} status ailments." color="1"/>
 	<dtd id="590" english="You can now perform ${weapon_skill}." color="1"/>
-	<dtd id="591" english="${actor} uses ${ability}.${lb}${target} is afflicted with Bewildered Daze (lv.${number})." color="101"/>
+	<dtd id="591" english="${actor} uses ${ability}.${lb}${target} is afflicted with Bewildered Daze (lv.${number})." color="101" units="lv."/>
 	<dtd id="592" english="${target} attempts to counter ${actor}'s attack, but misses." color="M"/>
 	<dtd id="593" english="${actor} uses ${ability}.${lb}${actor} steals a ${item} from ${target}.${lb}Additional effect: ${target} is afflicted with Attack Down." color="101"/>
 	<dtd id="594" english="${actor} uses ${ability}.${lb}${actor} steals a ${item} from ${target}.${lb}Additional effect: ${target} is afflicted with Defense Down." color="101"/>
