@@ -70,7 +70,7 @@ function event_action(act)
 				else
 					weapon_skill = color_arr['wscol']..jobabilities[act['param']+768]['english']..string.char(0x1E,0x01)
 				end
-			elseif act['category'] == 4 then
+			elseif act['category'] == 4 then -- Magic
 				number = act['targets'][i]['actions'][n]['param']
 				if nf(spells[act['param']],'english') then
 					spell= color_arr['spellcol']..nf(spells[act['param']],'english')..string.char(0x1E,0x01)
@@ -83,10 +83,13 @@ function event_action(act)
 				elseif statuses[act['targets'][i]['actions'][n]['param']] ~= nil then
 					status = color_arr['statuscol']..statuses[act['targets'][i]['actions'][n]['param']]['english']..string.char(0x1E,0x01)
 				end
-			elseif act['category'] == 5 then
+			elseif act['category'] == 5 then -- Item use
 				item = color_arr['itemcol']..items[act['param']]['enl']..string.char(0x1E,0x01)
 				number = act['targets'][i]['actions'][n]['param']
-			elseif act['category'] == 6 then
+				if statuses[act['targets'][i]['actions'][n]['param']] then
+					status = statuses[act['targets'][i]['actions'][n]['param']]['english']
+				end
+			elseif act['category'] == 6 then -- JA use
 				ability = color_arr['abilcol']..jobabilities[act['param']]['english']..string.char(0x1E,0x01)
 				number = act['targets'][i]['actions'][n]['param']
 				if act['targets'][i]['actions'][n]['param']~=0 then
@@ -94,7 +97,7 @@ function event_action(act)
 				else
 					status = ability
 				end
-			elseif act['category'] == 7 then
+			elseif act['category'] == 7 then -- Ready WS / TP move / Pet TP move
 				wsparm = act['targets'][i]['actions'][n]['param']
 				if actor_table['is_npc'] then
 					if actor_table['id']%4096 > 2048 then -- If the NPC is a pet
@@ -109,14 +112,14 @@ function event_action(act)
 				else
 					weapon_skill = color_arr['wscol']..jobabilities[wsparm+768]['english']..string.char(0x1E,0x01) --- Nil concat error somehow.
 				end
-			elseif act['category'] == 8 then
+			elseif act['category'] == 8 then -- Begin casting
 				spell = color_arr['spellcol']..spells[act['targets'][i]['actions'][n]['param']]['english']..string.char(0x1E,0x01)
-			elseif act['category'] == 9 then
+			elseif act['category'] == 9 then -- Begin using item
 				if act['param'] ~= 115 then
 					item = nf(items[act['targets'][i]['actions'][n]['param']],'enl')
 					if item then item = color_arr['itemcol']..item..string.char(0x1E,0x01) end
 				end
-			elseif act['category'] == 11 then
+			elseif act['category'] == 11 then -- Monster TP moves
 				weapon_skill = mabils[act['param']-256]['english']
 				if weapon_skill == '.' then
 					weapon_skill = 'Special Attack'
