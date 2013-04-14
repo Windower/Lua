@@ -141,6 +141,13 @@ function event_action(act)
 				if act['targets'][1]['actions'][1]['message'] == 522 then
 					target = target..' (stunned)'
 				end
+			elseif act['category'] == 15 then
+				ability = color_arr['abilcol']..jobabilities[act['param']]['english']..string.char(0x1E,0x01)
+				status = nf(statuses[act['targets'][i]['actions'][n]['param']],'english')
+				if status ~= nil then
+					status = color_arr['statuscol']..status..string.char(0x1E,0x01)
+				end
+				number = act['targets'][i]['actions'][n]['param']
 			end
 			
 			-- Sets the common field "abil" based on the applicable abilities.
