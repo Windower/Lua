@@ -1,7 +1,8 @@
 --[[
-Copyright (c) 2013, Sebastien Gomez
+Copyright (c) 2013, Ricky Gall
 All rights reserved.
-Troubadour songs included by Mazura of Ragnarok
+Ammended by Sebastien Gomez
+Troubodar songs included by Mazura of Ragnarok
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
@@ -29,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon = {}
 _addon.name = 'BuffDuration'
-_addon.version = '3.0'
+_addon.version = '2.1'
 
 require 'tablehelper'  -- Required for various table related features. Made by Arcon
 require 'logger'       -- Made by arcon. Here for debugging purposes
@@ -56,11 +57,14 @@ function event_load()
 	end
 	lines = f:readlines()
 	hlines = h:readlines()
-	
+
 	createdTimers = T{}  -- Used as a timer tracker for deletion of timers
 	buffExtension = T{ 
+					Perpetuance=2.5,
 					LightArts=1.8,
 					Rasa=2.28,
+					Composure=3,
+					Troubadour=2
 				}
 	--Feel free to update this buffExtension variable in case you have better composure
 	--or don't have perpetuance gloves. The Light Arts and Rasa sections are only used for regen
@@ -71,12 +75,8 @@ function event_load()
 						'Voidstorm','Blink','Stoneskin','Aquaveil','Invisible','Deodorize','Sneak','Barfire','Barblizzard','Baraero','Barstone','Barthunder','Barwater','Barpoison','Barparalyze',
 						'Barblind','Barsilence','Barpetrify','Barvirus','Boost VIT','Boost MND','Boost AGI','Boost CHR','Boost STR','Boost DEX','Boost INT','Enthunder','Enstone','Enaero','Enfire',
 						'Enblizzard','Enwater','Enthunder II','Enstone II','Enaero II','Enfire II','Enblizzard II','Enwater II','Blaze Spikes','Ice Spikes','Shock Spikes'}
-	
-	
 	extenTroub = T {	'Paeon', 'Ballad', 'Minne', 'Minuet', 'Madrigal', 'Prelude', 'Mambo', 'Aubade', 'Pastoral', 'Fantasia', 'Operetta', 'Capriccio', 'Round', 'Gavotte', 'March', 'Etude', 'Carol',
 						'Hymnus', 'Mazurka', 'Scherzo'}
-	extenMarcat = T {	'Scherzo', 'Hymnus', 'Mazurka'}
-	extenSoulV = T {	'Scherzo', 'Hymnus', 'Mazurka'}
 	--This table is used to check if a buff is able to be
 	--extended via perpetuance or composure. If i missed one
 	--feel free to add it. Keep in mind however i only look for
@@ -108,17 +108,52 @@ function event_unload()
 	send_command('unalias buffDuration')
 end
 
-function event_lose_status(id,name)
-	for i in ipairs(lines) do
+function event_addon_command(...)
+    local term = table.concat({...}, ' ')
+	broken = term:split(' ',4)
+
+	--This is a very important fix added
+	--because if you already had a buff and recast it
+	--it would just delete and create so fast
+	--that sometimes it didn't show back up
+	if broken ~= nil then
+		if tostring(broken[1]):lower() == 'newtimer' then
+			if broken[4] == nil then
+				createTimer(broken[2],broken[3])
+			else
+				createTimer(broken[2]..' '..broken[3],broken[4])
+			end
+		end
+		
+		if broken[1]:lower() == 'showalt' then
+			altbuffs = not altbuffs
+		end
+	end
+end
+
+function event_gain_status(id,name)
+	if id == 469 then
+		--Check to gain perpetuance and add a timer
+		extend['Perpetuance'] = os.clock()
+	end
+	if id == 348 then
+		--Check to gain Troubadour and add a timer
+		extend['Troubadour'] = os.clock()
+	end
+	first = 1	
+	for i in ipairs(lines) do		-- Iterates through each line of status.xml to find buff's by ID
 		x = i
 		str = lines[x]
 		if str ~= nil then
 			str=tostring(str)
-			a,b,buffid,d = string.find(str,'<b id="(%w+)" duration="(%w+)"')
-			if buffid ~= nil then
-				buffn = tostring(str:split('>',2)[2]:split('<',2)[1])
+			a,b,c,d = string.find(str,'<b id="(%w+)" duration="(%w+)"') 
+			if c ~= nil then
+				buffid = c
+				duration = d
+				buffname = tostring(str:split('>',2)[2]:split('<',2)[1])
 				if tonumber(buffid) == tonumber(id) then
-					deleteTimer(1,buffn)
+					createTimer(tostring(buffname))
+					buffs = T(get_player()['buffs'])
 					break
 				end
 			end
@@ -126,227 +161,79 @@ function event_lose_status(id,name)
 	end
 end
 
-function event_action_message(actor_id,target_id,actor_target_index,target_target_index,message_id,param_1,param_2,param_3)
-	if message_id == 206 then 
-		target = get_mob_by_id(target_id).name
-		
-		for i in ipairs(lines) do		-- Iterates through each line of status.xml to find buff's by ID
-			x = i
-			str = lines[x]
-			if str ~= nil then
-				str=tostring(str)
-				a1,b1,buffid,duration = string.find(str,'<b id="(%w+)" duration="(%w+)"') 
-				if buffid ~= nil then
-					if tonumber(buffid) == tonumber(param_1) then
-						buffname = tostring(str:split('>',2)[2]:split('<',2)[1])
-						break
-					end
-				end
-			end
-		end
-		if target == nil then
-			target = 'Self'
-		elseif target:lower() == player['name']:lower() then
-			target = 'Self'
-		else
-			target = target
-		end
-		deleteTimer(2,buffname,target)		
-	end
-end
-
-function event_action(act)
-	a = act.param
-	cat = act.category
-	b = T(act.targets)
-	c1 = T(b[1])
-	d1 = T(c1.actions[1])
-	e = d1.param
-	
-	player = get_player()
-	items = get_items()	
-	equip = items.equipment
+function check_bufflist(name)
 	buffs = T(get_player()['buffs'])
-	
-	if (cat == 4) or (cat == 6) then
-		mob = get_mob_by_id(act.actor_id)
-		actor = mob.name
-		if actor:lower() == player.name:lower() then
-			for i in ipairs(lines) do		-- Iterates through each line of status.xml to find buff's by ID
-				x = i
-				str = lines[x]
-				if str ~= nil then
-					str=tostring(str)
-					a1,b1,buffid,duration = string.find(str,'<b id="(%w+)" duration="(%w+)"') 
-					if buffid ~= nil then
-						buffname = tostring(str:split('>',2)[2]:split('<',2)[1])
-						if tonumber(e) > 0 then
-							if tonumber(buffid) == tonumber(e) then
-								target = get_mob_by_id(c1.id).name
-								--[[if target == nil then
-									target = 'Self'
-								elseif target:lower() == player['name']:lower() then
-									target = 'Self'
-								else
-									target = target
-								end]]
-								--single buff casting (only 1 person hit)
-								if act.target_count == 1 then
-									target = get_mob_by_id(c1.id).name
-									if target == nil then
-										target = 'Self'
-									elseif target:lower() == player['name']:lower() then
-										target = 'Self'
-									else
-										target = target
-									end
-								elseif act.target_count > 1 then
-									--write('test1 '..tostring(party.p0.name))
-									target = 'AoE'								
-								end
-								buffs = T(get_player()['buffs'])
-								addtimeM = 1
-								addtimeM2 = 0
-	--  ------------------------------------------------------------------------------------------------------------------------------------
-	--  SCH BUFFS
-								if buffs:contains(469) then
-									--Check for perpetuance
-									if extendables:contains(tostring(buffname)) then
-										--check if buff is extendable via perpetuance
-										if tonumber(items.inventory[equip['hands']].id) == tonumber(11123) then
-											--check for "Savant's Bracers +2"
-											addtimeM = 2.5
-										elseif tonumber(items.inventory[equip['hands']].id) == tonumber(11223) then
-											--check for "Savant's Bracers +1"
-											addtimeM = 2.25
-										else
-											addtimeM = 2
-										end
-									end
-									if tostring(buffname) == 'Regen' then
-										--If spell is regen* then add lightarts to extension
-										addtimeM = addtimeM * buffExtension['LightArts']
-									else
-										addtimeM = addtimeM
-									end
-								elseif tostring(buffname) == 'Regen' then
-									--If spell is regen* then check for rasa or lightarts for extension
-									if buffs:contains(377) then
-										--Rasa
-										addtimeM = buffExtension['Rasa']
-									elseif buffs:contains(358) then
-										--LightArts
-										addtimeM = buffExtension['LightArts']
-									elseif buffs:contains(401) then
-										--Addendum: White 
-										addtimeM = buffExtension['LightArts']
-									end
-	--  ------------------------------------------------------------------------------------------------------------------------------------
-	--  RDM BUFFS
-								elseif buffs:contains(419) then
-									--Check for Composure
-									if extenCompo:contains(tostring(buffname)) then
-										--check if buff is extendable via composure
-										if target == 'Self' then 
-											--If target is self then set composure Multiplier to 3
-											addtimeM = 3
-										elseif target:lower() ~= player.name:lower() then
-											--if target is someone else set composure multiplier bassed on +2 gear equiped at time of spell completion
-											gearset = 0
-											if equip['head'] ~= 0 then
-												if tonumber(items.inventory[equip['head']].id) == tonumber(11068) then
-													gearset = gearset + 1
-												end
-											end
-											if equip['body'] ~= 0 then
-												if tonumber(items.inventory[equip['body']].id) == tonumber(11088) then
-													gearset = gearset + 1
-												end
-											end
-											if equip['hands'] ~= 0 then
-												if tonumber(items.inventory[equip['hands']].id) == tonumber(11108) then
-													gearset = gearset + 1
-												end
-											end
-											if equip['legs'] ~= 0 then
-												if tonumber(items.inventory[equip['legs']].id) == tonumber(11128) then
-													gearset = gearset + 1
-												end
-											end
-											if equip['feet'] ~= 0 then
-												if tonumber(items.inventory[equip['feet']].id) == tonumber(11148) then
-													gearset = gearset + 1
-													addtimeM2 = addtimeM2 + 0.2
-												elseif tonumber(items.inventory[equip['feet']].id) == tonumber(11248) then
-													addtimeM2 = addtimeM2 + 0.1
-												end
-											end
-											if equip['back'] ~= 0 then
-												if tonumber(items.inventory[equip['legs']].id) == tonumber(16204) then
-													addtimeM2 = addtimeM2 + 0.1
-												end
-											end
-											if gearset == (0 or 1) then
-												addtimeM = 1
-											elseif gearset == 2 then
-												addtimeM = 1.1
-											elseif gearset == 3 then
-												addtimeM = 1.2
-											elseif gearset == 4 then
-												addtimeM = 1.35
-											elseif gearset == 5 then
-												addtimeM = 1.5
-											end
-										end
-									end
-	--  ------------------------------------------------------------------------------------------------------------------------------------
-	--  BARD BUFFS
-								elseif buffs:contains(348) then
-									if extenTroub:contains(tostring(buffname)) then
-										--Troubadour
-										addtimeM = 2
-										if buffs:contains(231) then
-											if extenMarcat:contains(tostring(buffname)) then
-												--Marcato
-												addtimeM = addtime + 1.5
-											end
-										end
-									end
-								elseif buffs:contains(52) then
-									if extenSoulV:contains(tostring(buffname)) then
-										--Soul Voice
-										addtimeM = 2
-										if buffs:contains(348) then
-											--Troubadour
-											addtimeM = addtimeM + 2
-										end
-									end
-								elseif buffs:contains(231) then
-									if extenMarcat:contains(tostring(buffname)) then
-										--Marcato
-										addtimeM = 1.5
-									end
-								end
-							duration = tonumber(duration) * (addtimeM + addtimeM2)
-							if checkgear(buffid) > 0 then 
-								duration = duration + tonumber(checkgear(buffid))
-							end
-							createTimer(tostring(buffname), tostring(target), tonumber(duration))
-							end
-						end
-					end
+	if buffs:contains(419) then
+		--Check to gain Composure and add a timer
+		extend['Composure'] = os.clock()
+	end
+	for i in ipairs(lines) do		-- Iterates through each line of status.xml to find buff's by ID
+		x = i
+		str = lines[x]
+		if str ~= nil then
+			str=tostring(str)
+			a,b,c,d = string.find(str,'<b id="(%w+)" duration="(%w+)"') 
+			if c ~= nil then
+				buffid = c
+				duration = d
+				buffn = tostring(str:split('>',2)[2]:split('<',2)[1])
+				if tostring(buffn) == tostring(name) then
+					return true
+				end
+			end
+		end
+	end
+	return false	
+end
+
+function event_lose_status(id,name)
+	for i in ipairs(lines) do
+		x = i
+		str = lines[x]
+		if str ~= nil then
+			str=tostring(str)
+			a,b,c,d = string.find(str,'<b id="(%w+)" duration="(%w+)"')
+			if c ~= nil then
+				buffid = c
+				duration = d
+				buffn = tostring(str:split('>',2)[2]:split('<',2)[1])
+				if tonumber(buffid) == tonumber(id) then
+					deleteTimer(1,buffn)
+					send_ipc_message(buffn..' '..player['name']..' delete')
+					break
 				end
 			end
 		end
 	end
 end
 
+function event_ipc_message(msg)
+	if altbuffs then
+		broken2 = msg:split(' ',3)
+		if broken2 ~= nil then
+			if broken2[3] == nil then
+				if tostring(broken2[2]) ~= player['name'] then
+					createTimer(broken2[1],broken2[2])
+				end
+			elseif broken2[3] ~= nil then
+				if tostring(broken2[3]) ~= player['name'] then
+					createTimer(broken2[1]..' '..broken2[2],broken2[3])
+				end
+			else
+				if broken2[3] == nil then
+					deleteTimer(2,broken2[1],broken2[2])
+				elseif broken2[3] ~= nil then
+					deleteTimer(2,broken2[1]..' '..broken2[2], broken2[3])
+				end
+			end
+		end
+	end
+end
 
 function checkgear(id)
 
 	items = get_items()
 	equip = items.equipment
-	addtime = 0
 	for i in ipairs(hlines) do		-- Iterates through each line of status.xml to find buff's by ID
 		x = i
 		str = hlines[x]
@@ -360,37 +247,153 @@ function checkgear(id)
 				slot = f
                 gearname = tostring(str:split('>',2)[2]:split('<',2)[1])
 				if tonumber(extendid) == tonumber(id) then
-					if equip[slot] ~= 0 then
-						if tonumber(items.inventory[equip[slot] ].id) == tonumber(gearid) then
-							addtime = addtime + addtime2
-							return addtime
-						else
-							addtime = addtime
-							return addtime
-						end
+                    if equip[slot] == 0 then return end
+					if tonumber(items.inventory[equip[slot]].id) == tonumber(gearid) then
+						addtime = addtime2
+					else
+						addtime = 0
 					end
+					break
 				else
-					addtime = addtime
-					return addtime
+					addtime = 0
+					break
 				end
 			end
 		end
 	end
 end
 
-function createTimer(buffname, target, duration)
-
-	--duration = checkgear(buffid) + duration
-
-	if tonumber(duration) > 0 then
-		send_command('timers c "'..buffname..' ('..target..')" '..duration..' down ' ..tostring(buffid):zfill(5))
-		createdTimers[#createdTimers+1] = buffname..' ('..target..')'
+function createTimer(name,target)
+	if check_bufflist(name) == true then
+		--Check current target and if it either doesn't exist,
+		--or is your current character's name, change it to self
+		--otherwise keep it what it is.
+		if target == nil then
+			target = 'Self'
+		elseif target:lower() == player['name']:lower() then
+			target = 'Self'
+		else
+			target = target
+		end
+		for u = 1, #createdTimers do
+			if createdTimers[u] == name..' ('..target..')' then
+				--This loops through the created timers table to see if 
+				--the one currently being created exists. It then proceeds
+				--to delete that timer and table entry and run a createtimer
+				--again. This is what causes the blinking timer you see sometimes
+				--when you recast a buff. No way around it.
+				send_command('timers d "'..name..' ('..target..')"')
+				createdTimers:remove(u)
+				send_command('wait .1;lua c buffDuration newtimer '..name..' '..target)
+				return
+			end
+		end
+		--The following checks if any gear will extend the time of the buff
+		checkgear(buffid)
+		if tonumber(addtime) ~= nil and tonumber(addtime) ~= 0 then
+			duration = duration + addtime
+		else
+			timer = duration
+		end
 		
-	elseif tonumber(duration) == 0 then
-		timer = 1
-		send_command('timers c "'..buffname..' ('..target..')" '..timer..' down ' ..tostring(buffid):zfill(5))
-		createdTimers[#createdTimers+1] = buffname..' ('..target..')'
-	elseif tonumber(duration) == -1 then
+		--The following section is used for extensions of buff timers
+		--Perpetuance, Light Arts, Tabula Rasa, and Composure are all 
+		--Checked here to figure out the time the timer should be set to.
+		--If all checks fail, the timer is set to base time at the beginning
+		--and 5 seconds is subtracted due to lag of the chat log.
+
+		
+		buffs = T(get_player()['buffs'])
+		if player['main_job_id'] == 20 then
+			if extendables:contains(tostring(name)) then
+				timer = duration - 5
+				if extend ~= nil then
+					e = os.clock()-60
+					if extend['Perpetuance'] ~= nil then
+						if e < extend['Perpetuance'] then
+							if target == 'Self' then
+								
+								if first == 1 then 
+									t = 1 
+								else
+									t = t + 1 
+								end
+								if math.even(t) then
+									extend['Perpetuance'] = nil
+									first = 0
+									t = 0
+								end
+							else
+								extend['Perpetuance'] = nil
+							end
+								
+							if tostring(name) == 'Regen' then
+								timer = tonumber(duration) * buffExtension['LightArts'] * buffExtension['Perpetuance'] + addtime - 5
+							else
+								timer = tonumber(duration) * buffExtension['Perpetuance'] + addtime - 5
+							end
+						end
+					end
+				end
+			elseif buffs:contains(377) then
+				if tostring(name) == 'Regen' then
+						timer = tonumber(duration) * buffExtension['Rasa'] + addtime - 5
+				end
+			elseif buffs:contains(358) then
+				if tostring(name) == 'Regen' then
+						timer = tonumber(duration) * buffExtension['LightArts'] + addtime - 5
+				end
+				
+			else
+				timer = duration - 5
+			end
+		elseif player['main_job_id'] == 5 then
+			if extenCompo:contains(tostring(name)) then
+				timer = duration - 5
+				if extend ~= nil then
+					e = os.clock()-60
+					if extend['Composure'] ~= nil then
+						if e < extend['Composure'] then	
+							timer = tonumber(duration) * buffExtension['Composure'] + addtime - 5
+						end
+					end
+				end
+			end
+		elseif player['main_job_id'] == 10 then
+			if extenTroub:contains(tostring(name)) then
+				timer = duration - 5
+				if extend ~=nil then
+					e = os.clock()-80
+					if extend['Troubadour'] ~= nil then
+						if e < extend['Troubadour'] then
+							timer = tonumber(duration) * buffExtension['Troubadour'] + addtime - 5
+						end
+					end
+				end
+			end
+		else
+			timer = duration - 5
+		end
+		
+		--This is where the timer is actually created
+		--Calls ihm's custom timer create command
+		--e.g. timers c "Protect (Self)" 1800 down Protect <- last protect 
+		--is what helps the timer distinguish what icon to use.
+		if target == 'Self' then
+			send_ipc_message(name..' '..player['name'])
+		else
+			send_ipc_message(name..' '..target)
+		end
+		if tonumber(duration) > 0 then
+			send_command('timers c "'..name..' ('..target..')" '..timer..' down ' ..tostring(buffid):zfill(5))
+			createdTimers[#createdTimers+1] = name..' ('..target..')'
+			
+		elseif tonumber(duration) == 0 then
+			timer = 1
+			send_command('timers c "'..name..' ('..target..')" '..timer..' down ' ..tostring(buffid):zfill(5))
+			createdTimers[#createdTimers+1] = name..' ('..target..')'
+		elseif tonumber(duration) == -1 then
+		end
 	end
 end
 
@@ -401,9 +404,6 @@ function deleteTimer(mode,effect,target)
 		for u = 1, #createdTimers do
 			if createdTimers[u] == effect..' (Self)' then
 				send_command('timers d "'..effect..' (Self)"')
-				createdTimers:remove(u)
-			elseif createdTimers[u] == effect..' (AoE)' then
-				send_command('timers d "'..effect..' (AoE)"')
 				createdTimers:remove(u)
 			end
 		end
@@ -427,7 +427,76 @@ function deleteTimer(mode,effect,target)
 		end
 	else
 		return
-	end	
+	end
+		
 end
 
+function event_incoming_text(old,new,color)
+	--Colors 56 and 64 are for gained buffs
+	--Color 191 for lost buffs. Check against
+	--These colors if it doesn't match just output
+	--the normal message
+	if T{64,56,191,101}:contains(color) then
+		--This check is to catch casted spells
+		--Stores name of caster, spell cast,
+		--target of the effect and the effect itself
+		a,b,caster,caster_spell,target,target_effect = string.find(old,'(%w+) casts ([%w%s]+)..(%w+) gains the effect of ([%w%s]+).')
+		
+		--Check for buffs wearing off and store name and buff in variables
+		c,d,tWear,eWear = string.find(old,'(%w+)\'s ([%w%s]+) effect wears off.')
+		--Check for gain buffs only (i.e. you have filters on) and store name/buff
+		e,f,tar2,eff2 = string.find(old,'(%w+) gains the effect of ([%w%s]+).')
 
+		if a ~= nil then
+			--If a isn't blank it found the message.
+			--The following checks are so that you don't
+			--catch buffs cast by others on others.
+			--Will catch buffs cast by you or on you.
+			if caster:lower() == player['name']:lower() then
+				createTimer(tostring(target_effect),tostring(target))
+			elseif target:lower() == player['name']:lower() then
+				createTimer(tostring(target_effect),tostring(target))
+			end
+		elseif c ~= nil then
+			--if c isn't blank it found the wear off message
+			--so delete the timer
+			
+				if tWear:lower() == player['name']:lower() then
+					deleteTimer(1,eWear,tWear)
+				else
+					deleteTimer(2,eWear,tWear)
+				end
+		elseif e ~= nil then
+			--If e isn't nil you have filters off and 
+			--received a buff cast by another person
+			--This is just so that if you already
+			--had the buff your timer will refresh.
+			if tar2:lower() == player['name']:lower() then
+				createTimer(eff2,tar2)
+			end
+		end
+	end
+	return new, color  -- must be here or errors will be thrown
+end
+
+-- Function made by byrth
+function split(msg, match)
+	local length = msg:len()
+	local splitarr = {}
+	local u = 1
+	while u < length do
+		local nextanch = msg:find(match,u)
+		if nextanch ~= nil then
+			splitarr[#splitarr+1] = msg:sub(u,nextanch-match:len())
+			if nextanch~=length then
+				u = nextanch+match:len()
+			else
+				u = length
+			end
+		else
+			splitarr[#splitarr+1] = msg:sub(u,length)
+			u = length
+		end
+	end
+	return splitarr
+end
