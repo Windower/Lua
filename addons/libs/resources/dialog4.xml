@@ -70,7 +70,7 @@
 	<dtd id="68" english="Debug: Casting interrupted!" color="1"/>
 	<dtd id="69" english="${target} blocks ${actor}'s attack with his shield." color="1"/>
 	<dtd id="70" english="${target} parries ${actor}'s attack with his weapon." color="29"/>
-	<dtd id="71" english="${actor} cannot perform that action." color="1"/>
+	<dtd id="71" english="${actor} cannot perform that action." color="122"/>
 	<dtd id="72" english="That action cannot be performed on ${target}." color="1"/>
 	<dtd id="73" english="Debug: ${target}'s status is now ${status}." color="1"/>
 	<dtd id="74" english="Debug: ${target} recovers from ${status}." color="H"/>
@@ -127,7 +127,7 @@
 	<dtd id="125" english="${actor} uses ${ability}.${lb}${actor} steals a ${item} from ${target}." color="101"/>
 	<dtd id="126" english="${actor} uses ${ability}.${lb}${actor}'s movement speed increases." color="101"/>
 	<dtd id="127" english="${actor} uses ${ability}.${lb}${target} is ${status}." color="101"/>
-	<dtd id="128" english="${target} is ${status} and cannot perform that action." color="1"/>
+	<dtd id="128" english="${target} is ${status} and cannot perform that action." color="122"/>
 	<dtd id="129" english="${actor} uses ${ability}.${lb}${actor} mugs ${gil} from ${target}." color="101"/>
 	<dtd id="130" english="${target} is ${status} for making a equipment change." color="1"/>
 	<dtd id="131" english="${actor} uses ${ability}.${lb}${target} is fortified against undead." color="101"/>
@@ -154,7 +154,7 @@
 	<dtd id="152" english="Additional effect: ${actor} recovers ${number} MP." color="H" units="MP"/>
 	<dtd id="153" english="${actor} uses ${ability}.${lb}${actor} fails to steal from ${target}." color="69"/>
 	<dtd id="154" english="${target} is out of range." color="122"/>
-	<dtd id="155" english="You cannot perform that action on the specified target." color="1"/>
+	<dtd id="155" english="You cannot perform that action on the specified target." color="122"/>
 	<dtd id="156" english="${actor} uses ${ability}.${lb}No effect on ${target}." color="104"/>
 	<dtd id="157" english="${actor} uses Barrage.${lb}${target} takes ${number} points of damage." color="D"/>
 	<dtd id="158" english="${actor} uses ${ability}, but misses." color="104"/>
