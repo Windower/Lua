@@ -47,7 +47,9 @@ function event_load()
 	blocked_colors = T{20,21,22,23,24,25,26,28,29,31,32,33,35,36,40,41,42,43,44,50,51,52,56,57,59,60,69,64,65,67,69,81,85,90,91,100,101,102,104,105,106,110,111,112,114,122,163,164,168,171,175,177,183,185,186,191}
 	passed_messages = T{4,5,6,17,18,20,34,35,36,48,64,78,87,88,89,90,116,154,170,171,172,173,174,175,176,177,178,191,192,198,204,206,217,218,234,249,313,328,350,531,561,575}
 	agg_messages = T{75,93,116,131,134,144,146,148,150,206,230,236,237,319,364,414,420,422,424,425,426,570,668}
-
+	color_redundant = T{26,33,41,71,72,89,94,109,114,164,173,181,184,186,70,84,104,127,128,129,130,131,132,133,134,135,136,137,138,139,140,64,86,91,106,111,175,178,183,81,101,16,65,87,92,107,112,174,176,182,82,102,67,68,69,170,189,15,208,18,25,32,40,163,185,23,24,27,34,35,42,43,162,165,187,188,30,31,14,205,144,145,146,147,148,149,150,151,152,153,190,13,9,253,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,284,285,286,287,292,293,294,295,300,301,301,303,308,309,310,311,316,317,318,319,324,325,326,327,332,333,334,335,340,341,342,343,344,345,346,347,348,349,350,351,355,357,358,360,361,363,366,369,372,374,375,378,381,384,395,406,409,412,415,416,418,421,424,437,450,453,456,458,459,462,479,490,493,496,499,500,502,505,507,508,10,51,52,55,58,62,66,80,83,85,88,90,93,100,103,105,108,110,113,122,168,169,171,172,177,179,180,12,11}
+	black_colors = T{352,354,356,388,390,400,402,430,432,442,444,472,474,484,486}
+	
 	speFile = file.new('../../plugins/resources/spells.xml')
 	jaFile = file.new('../../plugins/resources/abils.xml')
 	statusFile = file.new('../../plugins/resources/status.xml')
@@ -343,8 +345,7 @@ function filterload(job)
 end
 
 function event_login(name)
-	local temp_player = get_player()
-	filterload(main_job)
+	send_command('wait 10;bm reload')
 end
 
 function colconv(str,key)
@@ -395,22 +396,23 @@ function event_addon_command(...)
 			elseif splitarr[2]:lower() == 'cg' then
 				collectgarbage()
 			elseif splitarr[2]:lower() == 'colortest' then
-				for i = 0, 32 do
-					local line = ''
-					for j = 1, 16 do
-						local n = i * 16 + j
-						if n >= 0 and n <= 509 then
-							if n == 253 or n == 507 then -- block \x1E\xFD and \x1F\xFD
-									loc_col = '\031\001'
-							elseif n <= 255 then
-									loc_col = string.char(0x1F, n)
-							else
-									loc_col = string.char(0x1E, n - 254)
-							end
-							line = line..loc_col..string.format('%03d ', n)
+				local counter = 0
+				local line = ''
+				for n = 0, 509 do
+					if n >= 0 and n <= 509 and not color_redundant:contains(n) and not black_colors:contains(n) then
+						if n <= 255 then
+								loc_col = string.char(0x1F, n)
+						else
+								loc_col = string.char(0x1E, n - 254)
 						end
+						line = line..loc_col..string.format('%03d ', n)
+						counter = counter +1
 					end
-					add_to_chat(1, line)
+					if counter == 16 or n == 509 then
+						add_to_chat(1, line)
+						counter = 0
+						line = ''
+					end
 				end
 				add_to_chat(122,'Colors Tested!')
 			elseif splitarr[2]:lower() == 'help' then
