@@ -30,7 +30,7 @@ function event_addon_command(...)
 	if cmd[1] ~= nil then
 		if cmd[1]:lower() == "help" then
 			write('To stop rolltracker stopping rolls type: //rolltracker autostop')
-			write('To restart rolltracker stopping doubleup type //rolltracker Doubleup')
+			write('To restart rolltracker stopping doubleup type //rolltracker Doubleup')	
 		end
 
 		if cmd[1]:lower() == "autostop" then
@@ -42,7 +42,8 @@ function event_addon_command(...)
 			override=0
 			write('Enable Autostoppping Doubleup')
 		end
-		
+	
+
 	end
 end 
 
@@ -59,8 +60,7 @@ function event_load()
 				109, 110, 111, 112,
 				113, 114, 115, 116,
 				117, 118, 119, 120,
-				121, 122, 303, 302,
-				303, 304, 305
+				121, 122, 303, 302, 304, 305
 			}
 	roll_name={}
 	roll_ident={[97]=' ', ['98']='Fighter\'s',['99']='MNK',['100']='WHM',
@@ -76,6 +76,7 @@ function event_load()
 	roll_luck={ 0,5,3,3,5,4,5,3,4,4,2,4,2,4,4,5,2,5,3,3,2,3,2,3,4,5,5,3,2,4 }
 	roll_bonus={}
 	rollnum=''
+	
 	roll_buff={
 				['Chaos']={6,8,9,25,11,13,16,3,17,19,31,"-4", '% Attack!'},
 				['Fighter\'s']={ 2,2,3,4,12,5,6,7,1,9,18,'-4','% Double-Attack!'},
@@ -98,24 +99,29 @@ function event_load()
 				['Bolter\'s']={2,3,12,4,6,7,8,9,5,10,25,'-8','% Movement Speed'},
 				['Caster\'s']={6,15,7,8,9,10,5,11,12,13,20,'-10','% Fast Cast'},
 				['Tactician\'s']={1,1,1,1,3,1,1,0,2,2,4,'-1','Regain'},
-				['Miser\'s']={3,5,7,9,20,11,2,13,15,17,25,'','Save TP'},
-				['Ninja']={'','','','','','','','','','','','','Evasion Bonus'},
-				['Scholar\'s']={'','','','','','','','','','','','','Conserve MP'},
-				['Allies\'']={6,7,17,9,11,13,15,17,17,5,17,'','% Skillchain Damage'},
-				['Companion\'s']={'','','','','','','','','','','','','Pet: Regen and Regain'},
-				['Avenger\'s']={'','','','','','','','','','','','','Counter Rate'},
+				['Miser\'s']={3,5,7,9,20,11,2,13,15,17,25,'Save TP'},
+				['Ninja']={'?','?','?','?','?','?','?','?','?','?','?','?','Evasion Bonus'},
+				['Scholar\'s']={'?','?','?','?','?','?','?','?','?','?','?','?','Conserve MP'},
+				['Allies\'']={6,7,17,9,11,13,15,17,17,5,17,'?','% Skillchain Damage'},
+				['Companion\'s']={'?','?','?','?','?','?','?','?','?','?','?','?','Pet: Regen and Regain'},
+				['Avenger\'s']={'?','?','?','?','?','?','?','?','?','?','?','?','Counter Rate'},
 				}
 				
 end
 
 function event_unload()
-	
 end
 
 function event_incoming_text(old, new, color)
 	match_roll =  old:match(player..' uses (.*)%\'?s? Roll. The')
 	match_doubleup = old:find (player..' uses Double')
 	match_du= old:match('The total for (.*)%\'?s? Roll increases to')
+	battlemod_compat = old:find('(.*)'..player..'(.*)'..' (.*)%\'?s? Roll(.*)% (%d)')
+	if get_player()['main_job'] == 'COR' then
+		if battlemod_compat ~= nil then
+			new=''
+		end
+	end
 	
 	if match_roll ~=nil  then
 		new= ''
@@ -137,8 +143,10 @@ function event_action(act)
 				if roller == roll_id[i] then
 					for n=1, #act['targets'] do
 						for z in pairs(get_party()) do
-							if act['targets'][n]['id'] == get_party()[z]['mob']['id'] then
-								effected_member[n]=get_party()[z]['name']
+							if get_party()[z]['mob'] ~= nil then
+								if act['targets'][n]['id'] == get_party()[z]['mob']['id'] then	
+									effected_member[n]=get_party()[z]['name']
+								end
 							end
 						end
 					end
@@ -158,13 +166,17 @@ function event_action(act)
 	end
 end
 end
+
+function getmembers()
+
+end
 			
 	
 
 function event_outgoing_text(original, modified)
 	if original:find('/jobability \"Double') and luckyroll == 1 and override == 0 then
 		modified=''
-		add_to_chat(55,'You have either a lucky Roll or  an 11. Reuse Double-Up to Double-up again.')
+		add_to_chat(55,'You either have a lucky Roll or have rolled an 11. Reuse Double-Up to continue to double-up.')
 		luckyroll=0
 		return modified
 	end
