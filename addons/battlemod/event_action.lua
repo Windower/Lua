@@ -18,7 +18,7 @@ function event_action(act)
 
 	for i,v in pairs(act['targets']) do
 		for n,m in pairs(act['targets'][i]['actions']) do			
-			local prepstr,abil,add_eff_str,spike_str,forcemsg,wsparm,status,number,spell,ability,weapon_skill,item
+			local prepstr,abil,add_eff_str,spike_str,forcemsg,wsparm,status,number,spell,ability,weapon_skill,item,gil
 			
 			local flipped = false
 			local target_table = get_mob_by_id(act['targets'][i]['id'])
@@ -63,7 +63,8 @@ function event_action(act)
 				a,b = string.find(dialog[act['targets'][i]['actions'][n]['message']]['english'],'$\123ability\125') -- Jump registers as a weaponskill and doesn't use an offset.
 				if a then
 					ability = color_arr['wscol']..jobabilities[act['param']]['english']..string.char(0x1E,0x01)
-					if items[act['targets'][i]['actions'][n]['param']] then
+					gil = act['targets'][i]['actions'][n]['param']
+					if items[act['targets'][i]['actions'][n]['param']] then -- What the hell is this for?
 						item = color_arr['itemcol']..items[act['targets'][i]['actions'][n]['param']]['enl']..string.char(0x1E,0x01)
 					end
 				else
@@ -224,7 +225,7 @@ function event_action(act)
 			
 			-- Avoid nil field errors using " or ''" with all the gsubs.
 			if prepstr then
-				prepstr = prepstr:gsub('$\123lb\125','\7'):gsub('$\123actor\125',actor or ''):gsub('$\123spell\125',spell or ''):gsub('$\123ability\125',ability or ''):gsub('$\123abil\125',abil or ''):gsub('$\123number\125',number or ''):gsub('$\123weapon_skill\125',weapon_skill or ''):gsub('$\123status\125',status or ''):gsub('$\123item\125',item or '')
+				prepstr = prepstr:gsub('$\123lb\125','\7'):gsub('$\123actor\125',actor or ''):gsub('$\123spell\125',spell or ''):gsub('$\123ability\125',ability or ''):gsub('$\123abil\125',abil or ''):gsub('$\123number\125',number or ''):gsub('$\123weapon_skill\125',weapon_skill or ''):gsub('$\123status\125',status or ''):gsub('$\123item\125',item or ''):gsub('$\123gil\125',gil or '')
 			end
 			
 			-- Construct the message to be sent out --
