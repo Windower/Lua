@@ -283,7 +283,7 @@ function event_action(act)
 			local addmsg = act['targets'][i]['actions'][n]['add_effect_message']
 			
 			if act['targets'][i]['actions'][n]['has_add_effect'] and act['targets'][i]['actions'][n]['add_effect_message'] ~= 0 then
-				if act['category'] == 1 or act['category'] == 2 or act['category'] == 3 or act['category'] == 11 or debugging then
+				if act['category'] == 1 or act['category'] == 2 or act['category'] == 3 or act['category'] == 4 or act['category'] == 11 or debugging then
 					if addmsg == 152 or addmsg == 161 or addmsg == 162 or addmsg == 163 or addmsg == 167 or addmsg == 229 or addmsg == 384 or addmsg == 603 or addmsg == 652 or addmsg > 287 and addmsg < 303 then
 						number = act['targets'][i]['actions'][n]['add_effect_param']
 					else
