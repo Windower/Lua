@@ -398,15 +398,15 @@ function event_addon_command(...)
 			elseif splitarr[2]:lower() == 'colortest' then
 				local counter = 0
 				local line = ''
-				for n = 0, 509 do
-					if n >= 0 and n <= 509 and not color_redundant:contains(n) and not black_colors:contains(n) then
+				for n = 1, 509 do
+					if not color_redundant:contains(n) and not black_colors:contains(n) then
 						if n <= 255 then
-								loc_col = string.char(0x1F, n)
+							loc_col = string.char(0x1F, n)
 						else
-								loc_col = string.char(0x1E, n - 254)
+							loc_col = string.char(0x1E, n - 254)
 						end
 						line = line..loc_col..string.format('%03d ', n)
-						counter = counter +1
+						counter = counter + 1
 					end
 					if counter == 16 or n == 509 then
 						add_to_chat(1, line)
