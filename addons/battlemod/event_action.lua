@@ -57,6 +57,7 @@ function event_action(act)
 					number = nil
 				elseif act['targets'][i]['actions'][n]['message'] == 576 then abil = 'RA Hits Squarely'
 				elseif act['targets'][i]['actions'][n]['message'] == 577 then abil = 'RA Strikes True'
+				elseif act['targets'][i]['actions'][n]['message'] == 157 then abil = 'Barrage'
 				end
 			elseif act['category'] == 3 then -- Weapon Skills
 				number = act['targets'][i]['actions'][n]['param']
@@ -66,6 +67,9 @@ function event_action(act)
 					gil = act['targets'][i]['actions'][n]['param']
 					if items[act['targets'][i]['actions'][n]['param']] then -- What the hell is this for?
 						item = color_arr['itemcol']..items[act['targets'][i]['actions'][n]['param']]['enl']..string.char(0x1E,0x01)
+					end
+					if statuses[act['targets'][i]['actions'][n]['param']] then
+						status = statuses[act['targets'][i]['actions'][n]['param']]['english']
 					end
 				else
 					weapon_skill = color_arr['wscol']..jobabilities[act['param']+768]['english']..string.char(0x1E,0x01)
@@ -202,15 +206,12 @@ function event_action(act)
 					else ---- Can remove once I don't see it anymore ----
 						prepstr = dialog[act['targets'][i]['actions'][n]['message']]['english']
 					end
-				else
+				elseif dialog[act['targets'][i]['actions'][n]['message']] or debugging then -- Shouldn't really be necessary.
 					prepstr = dialog[act['targets'][i]['actions'][n]['message']]['english']
 				end
 			elseif act['category'] == 12 then -- Handles category 12 cases
-				if act['param']==24931 then -- Initiation of the ranged attack
-					prepstr = ''
-				elseif act['param'] == 28787 then -- Interruption of the ranged attack
-					prepstr = dialog[218]['english'] -- 220 is the same message
-					forcemsg = 218
+				if act['param']==24931 or act['param']==24931 then -- Initiation or interruption of the ranged attack
+					prepstr = nil
 				elseif debugging then
 					write('debug12: '..act['param'])
 				end
