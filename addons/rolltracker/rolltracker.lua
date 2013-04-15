@@ -62,7 +62,7 @@ function event_load()
 				117, 118, 119, 120,
 				121, 122, 303, 302, 304, 305
 			}
-	player_color={string.char(31, 167),string.char(31, 209),string.char(31, 204),string.char(31,189),string.char(31,3),string.char(31,158)}
+	player_color={['p0']=string.char(31, 167),['p1']=string.char(31, 209),['p2']=string.char(31, 204),['p3']=string.char(31,189),['p4']=string.char(31,3),['p5']=string.char(31,158)}
 	roll_ident={[97]=' ', ['98']='Fighter\'s',['99']='MNK',['100']='WHM',
 						['101']='Wizard\'s',['102']='Warlock\'s',['103']='Rogue\'s',
 						['104']='Gallant\'s',['105']='Chaos',['106']='Beast',
@@ -109,30 +109,20 @@ function event_load()
 				
 end
 
-function event_unload()
-end
 
 function event_incoming_text(old, new, color)
-	match_roll =  old:match(player..' uses (.*)%\'?s? Roll. The')
 	match_doubleup = old:find (player..' uses Double')
-	match_du= old:match('The total for (.*)%\'?s? Roll increases to')
-	battlemod_compat = old:find('(.*)'..player..'(.*)'..' (.*)%\'?s? Roll(.*)% (%d)')
-	if get_player()['main_job'] == 'COR' then
-		if battlemod_compat ~= nil then
-			new=''
-		end
-	end
-	
-	if match_roll ~=nil  then
-		new= ''
-	end
-	
-	if match_doubleup ~= nil then 
+	battlemod_compat = old:find(player..'.*% Roll.* %d')
+	not_party = old:find ('%('..'%w+'..'%)')
+	if battlemod_compat or match_doubleup and not_party~=nil then
 		new=''
+	end
+	if not_party then
+		new=old
 	end
 	return new, color
 end
-		 	 
+
 function event_action(act)
 	if act['actor_id'] == get_player()['id'] then
 		if act['category']==6 then
@@ -145,7 +135,7 @@ function event_action(act)
 						for z in pairs(get_party()) do
 							if get_party()[z]['mob'] ~= nil then
 								if act['targets'][n]['id'] == get_party()[z]['mob']['id'] then	
-									effected_member[n]=player_color[n]..get_party()[z]['name']
+									effected_member[n]=player_color[z]..get_party()[z]['name']
 								end
 							end
 						end
@@ -167,9 +157,6 @@ function event_action(act)
 end
 end
 
-function getmembers()
-
-end
 			
 	
 
