@@ -21,10 +21,10 @@
   </addon>
   <addon>
     <name>AutoJoin</name>
-	<author>Arcon</author>
+    <author>Arcon</author>
     <description>Automatically joins or declines party invites. Configurable with blacklist/whitelist mode and auto-decline settings.</description>
     <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
-	<support>IRC: irc.ffochat.com, #lua</support>
+    <support>IRC: irc.ffochat.com, #lua</support>
   </addon>
   <addon>
     <name>BattleMod</name>
@@ -36,10 +36,10 @@
   </addon>
   <addon>
     <name>Linker</name>
-	<author>Arcon</author>
+    <author>Arcon</author>
     <description>Allows opening links to certain websites from within the game, with an optional search parameter.</description>
     <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
-	<support>IRC: irc.ffochat.com, #lua</support>
+    <support>IRC: irc.ffochat.com, #lua</support>
   </addon>
   <addon>
     <name>OhShi</name>
