@@ -107,6 +107,7 @@ function event_action(act)
 					if actor_table['id']%4096 > 2048 then -- If the NPC is a pet
 						if jobabilities[wsparm] or debugging then -- Just covering it up until I figure out why it is happening.
 							ability = color_arr['abilcol']..jobabilities[wsparm]['english']..string.char(0x1E,0x01)
+							weapon_skill = color_arr['abilcol']..jobabilities[wsparm]['english']..string.char(0x1E,0x01)
 						end
 					else
 						if wsparm > 256 then -- Accounts for TP moves that don't show up in the logs, like the Geyser eruption
