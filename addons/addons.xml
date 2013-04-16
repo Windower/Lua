@@ -42,6 +42,10 @@
   	<description>Keeps track of various event related things. Such as, VW proc messages, mob casting, mob tp moves, TH procs and cor rolls, as well as others.</description>
   </addon>
   <addon>
+  	<name>reive</name>
+  	<description>tracks exp, bayld, momentum scores and bonuses during a reive.</description>
+  </addon>
+  <addon>
     <name>Scoreboard</name>
     <author>Suji</author>
     <description>Basic in-game damage parser. It displays live DPS and works even when chat filters are enabled.</description>
