@@ -32,14 +32,15 @@ require 'tablehelper'
 local config = require 'config'
 
 local _reive = {}
-_reive['tb_name']        = 'addon:gr:reive'
-_reive['reset_on_start'] = false
-_reive['visible']        = false
-_reive['stats']          = {}
-_reive['stats']['exp']     = 0
-_reive['stats']['bayld']   = 0
-_reive['stats']['scores']  = T{}
-_reive['stats']['bonuses'] = {}
+_reive.tb_name        = 'addon:gr:reive'
+_reive.track          = false
+_reive.reset_on_start = false
+_reive.visible        = false
+_reive.stats          = {}
+_reive.stats.exp      = 0
+_reive.stats.bayld    = 0
+_reive.stats.scores   = T{}
+_reive.stats.bonuses  = {}
 
 _reive.defaults = {}
 _reive.defaults.reset_on_start = false
@@ -134,25 +135,27 @@ function _reive:test(...)
 end
 
 function _reive:start(...)
-    if _reive['reset_on_start'] == true then
+    if _reive.reset_on_start == true then
         _reive:reset()
     end
 
+    _reive.track = true
     add_to_chat(0, '\30\03The Reive has begun!\30\01')
     _reive:show()
 end
 
 function _reive:stop(...)
-    _reive['stats']['scores']  = T{}
-    _reive['stats']['bonuses'] = {}
+    _reive.stats.scores  = T{}
+    _reive.stats.bonuses = {}
 
+    _reive.track = false
     add_to_chat(0, '\30\03The Reive has ended\30\01')
     _reive:hide()
     _reive:status()
 end
 
 function _reive:refresh(...)
-    if _reive['visible'] == false then
+    if _reive.visible == false then
         return
     end
 
@@ -160,15 +163,15 @@ function _reive:refresh(...)
     local text        =
         ' \\cs('..reiveColors.title.r..', '..reiveColors.title.g..', '..reiveColors.title.b..')--== REIVE ==--\\cr \n'..
         ' \\cs('..reiveColors.label.r..', '..reiveColors.label.g..', '..reiveColors.label.b..')Bayld:\\cr'..
-        ' \\cs('..reiveColors.value.r..', '..reiveColors.value.g..', '..reiveColors.value.b..')'.._reive['stats']['bayld']..'\\cr \n'..
+        ' \\cs('..reiveColors.value.r..', '..reiveColors.value.g..', '..reiveColors.value.b..')'.._reive.stats.bayld..'\\cr \n'..
         ' \\cs('..reiveColors.label.r..', '..reiveColors.label.g..', '..reiveColors.label.b..')EXP:\\cr'..
-        ' \\cs('..reiveColors.value.r..', '..reiveColors.value.g..', '..reiveColors.value.b..')'.._reive['stats']['exp']..'\\cr '
+        ' \\cs('..reiveColors.value.r..', '..reiveColors.value.g..', '..reiveColors.value.b..')'.._reive.stats.exp..'\\cr '
 
     local scoresColors = _reive.settings.colors.score
     local scores       = '';
 
-    if #_reive['stats']['scores'] > 0 then
-        for index, score in pairs(_reive['stats']['scores']:slice(math.max(1, #_reive['stats']['scores']-_reive.settings.max_scores + 1), #_reive['stats']['scores'])) do
+    if #_reive.stats.scores > 0 then
+        for index, score in pairs(_reive.stats.scores:slice(math.max(1, #_reive.stats.scores-_reive.settings.max_scores + 1), #_reive.stats.scores)) do
             scores = scores..
                 '\n \\cs('..scoresColors.label.r..', '..scoresColors.label.g..', '..scoresColors.label.b..')'..score..'\\cr  '
         end
@@ -181,7 +184,7 @@ function _reive:refresh(...)
     local bonusesColors = _reive.settings.colors.bonus
     local bonuses       = '';
 
-    for bonus, amount in pairs(_reive['stats']['bonuses']) do
+    for bonus, amount in pairs(_reive.stats.bonuses) do
         bonuses = bonuses..
             '\n \\cs('..bonusesColors.label.r..', '..bonusesColors.label.g..', '..bonusesColors.label.b..')'..bonus..':\\cr'..
             ' \\cs('..bonusesColors.value.r..', '..bonusesColors.value.g..', '..bonusesColors.value.b..')'..amount..'\\cr '
@@ -191,28 +194,28 @@ function _reive:refresh(...)
         text = text..'\n \\cs('..bonusesColors.title.r..', '..bonusesColors.title.g..', '..bonusesColors.title.b..')--== MOMENTUM BONUSES ==--\\cr '..bonuses
     end
 
-    tb_set_text(_reive['tb_name'], text)
+    tb_set_text(_reive.tb_name, text)
 end
 
 function _reive:reset(...)
-    _reive['stats']['exp']   = 0
-    _reive['stats']['bayld'] = 0
+    _reive.stats.exp   = 0
+    _reive.stats.bayld = 0
     _reive:refresh()
 end
 
 function _reive:show(...)
-    _reive['visible'] = true
-    tb_set_visibility(_reive['tb_name'], true)
+    _reive.visible = true
+    tb_set_visibility(_reive.tb_name, true)
     _reive:refresh()
 end
 
 function _reive:hide(...)
-    _reive['visible'] = false
-    tb_set_visibility(_reive['tb_name'], false)
+    _reive.visible = false
+    tb_set_visibility(_reive.tb_name, false)
 end
 
 function _reive:toggle(...)
-    if _reive['visible'] then
+    if _reive.visible then
         _reive:hide()
     else 
         _reive:show()
@@ -220,7 +223,7 @@ function _reive:toggle(...)
 end
 
 function _reive:status(...)
-    add_to_chat(0, '\30\03[EXP\30\01 \30\02'.._reive['stats']['exp']..'\30\01\30\03] [Bayld\30\01 \30\02'.._reive['stats']['bayld']..'\30\01\30\03]\30\01')
+    add_to_chat(0, '\30\03[EXP\30\01 \30\02'.._reive.stats.exp..'\30\01\30\03] [Bayld\30\01 \30\02'.._reive.stats.bayld..'\30\01\30\03]\30\01')
 end
 
 function event_load()
@@ -229,15 +232,15 @@ function event_load()
     local background = _reive.settings.colors.background
 
     send_command('alias reive lua c reive')
-    tb_create(_reive['tb_name'])
-    tb_set_location(_reive['tb_name'], _reive.settings.position.x, _reive.settings.position.y)
-    tb_set_bg_color(_reive['tb_name'], background.a, background.r, background.g, background.b)
-    tb_set_color(_reive['tb_name'], _reive.settings.font.a, 147, 161, 161)
-    tb_set_font(_reive['tb_name'], _reive.settings.font.family, _reive.settings.font.size)
-    tb_set_bold(_reive['tb_name'], _reive.settings.font.bold)
-    tb_set_italic(_reive['tb_name'], _reive.settings.font.italic)
-    tb_set_text(_reive['tb_name'], '')
-    tb_set_bg_visibility(_reive['tb_name'], true)
+    tb_create(_reive.tb_name)
+    tb_set_location(_reive.tb_name, _reive.settings.position.x, _reive.settings.position.y)
+    tb_set_bg_color(_reive.tb_name, background.a, background.r, background.g, background.b)
+    tb_set_color(_reive.tb_name, _reive.settings.font.a, 147, 161, 161)
+    tb_set_font(_reive.tb_name, _reive.settings.font.family, _reive.settings.font.size)
+    tb_set_bold(_reive.tb_name, _reive.settings.font.bold)
+    tb_set_italic(_reive.tb_name, _reive.settings.font.italic)
+    tb_set_text(_reive.tb_name, '')
+    tb_set_bg_visibility(_reive.tb_name, true)
 
     if T(get_player()['buffs']):contains(511) then
         _reive:start()
@@ -246,7 +249,7 @@ end
 
 function event_unload()
     send_command('unalias reive')
-    tb_delete(_reive['tb_name'])
+    tb_delete(_reive.tb_name)
 end
 
 function event_gain_status(id, name)
@@ -268,7 +271,7 @@ function event_incoming_text(original, modified, mode)
         match = original:match('Reive momentum score: ([%s%w]+)%.')
 
         if match then
-            _reive['stats']['scores']:append(match)
+            _reive.stats.scores:append(match)
             _reive:refresh()
 
             return modified, mode
@@ -277,11 +280,11 @@ function event_incoming_text(original, modified, mode)
         match = original:match('Momentum bonus: ([%s%w]+)!')
 
         if match then
-            if type(_reive['stats']['bonuses'][match]) == 'nil' then
-                _reive['stats']['bonuses'][match] = 0
+            if type(_reive.stats.bonuses[match]) == 'nil' then
+                _reive.stats.bonuses[match] = 0
             end
 
-            _reive['stats']['bonuses'][match] = _reive['stats']['bonuses'][match] + 1
+            _reive.stats.bonuses[match] = _reive.stats.bonuses[match] + 1
             _reive:refresh()
 
             return modified, mode
@@ -289,15 +292,15 @@ function event_incoming_text(original, modified, mode)
 
         match = original:match('obtained (%d+) bayld!')
 
-        if match then
-            _reive['stats']['bayld'] = _reive['stats']['bayld'] + match
+        if match and _reive.track then
+            _reive.stats.bayld = _reive.stats.bayld + match
             _reive:refresh()
         end
-    elseif mode == 131 then
+    elseif mode == 131 and _reive.track then
         match = original:match('gains (%d+) limit points%.')
 
         if match then
-            _reive['stats']['exp'] = _reive['stats']['exp'] + match
+            _reive.stats.exp = _reive.stats.exp + match
             _reive:refresh()
 
             return modified, mode
@@ -306,7 +309,7 @@ function event_incoming_text(original, modified, mode)
         match = original:match('gains (%d+) experience points%.')
 
         if match then
-            _reive['stats']['exp'] = _reive['stats']['exp'] + match
+            _reive.stats.exp = _reive.stats.exp + match
             _reive:refresh()
 
             return modified, mode
