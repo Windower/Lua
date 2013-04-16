@@ -212,8 +212,11 @@ function _reive:hide(...)
 end
 
 function _reive:toggle(...)
-    _reive['visible'] = not _reive['visible']
-    tb_set_visibility(_reive['tb_name'], _reive['visible'])
+    if _reive['visible'] then
+        _reive:hide()
+    else 
+        _reive:show()
+    end
 end
 
 function _reive:status(...)
