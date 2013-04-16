@@ -6,7 +6,7 @@
 This plugin tracks exp, bayld, momentum scores and bonuses during a reive.
 There is only one configuration file called settings.xml in the data folder of the plugin.
 
-![screenshot](https://raw.github.com/giulianoriccio/Lua/blob/master/addons/reive/ss.gif)
+![screenshot](https://raw.github.com/giulianoriccio/Lua/master/addons/reive/ss.gif)
 
 **Abbreviation:** //reive
 
