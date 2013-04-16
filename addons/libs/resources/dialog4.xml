@@ -209,11 +209,11 @@
 	<dtd id="207" english="HP / HPMax:${number}/${number}" color="1"/>
 	<dtd id="208" english="MP / MPMax:${number}/${number}" color="1"/>
 	<dtd id="209" english="TP:${number}%" color="1" units="TP"/>
-	<dtd id="210" english="${actor} cannot charm ${target}!" color="1"/>
-	<dtd id="211" english="It would be very difficult for ${actor} to charm ${target}." color="1"/>
-	<dtd id="212" english="It would be difficult for ${actor} to charm ${target}." color="1"/>
-	<dtd id="213" english="${actor} might be able to charm ${target}." color="1"/>
-	<dtd id="214" english="${actor} should be able to charm ${target}." color="1"/>
+	<dtd id="210" english="${actor} cannot charm ${target}!" color="191"/>
+	<dtd id="211" english="It would be very difficult for ${actor} to charm ${target}." color="191"/>
+	<dtd id="212" english="It would be difficult for ${actor} to charm ${target}." color="191"/>
+	<dtd id="213" english="${actor} might be able to charm ${target}." color="191"/>
+	<dtd id="214" english="${actor} should be able to charm ${target}." color="191"/>
 	<dtd id="215" english="That action requires a pet." color="1"/>
 	<dtd id="216" english="You do not have a appropriate ranged weapon equipped." color="1"/>
 	<dtd id="217" english="You cannot see ${target}." color="122"/>
