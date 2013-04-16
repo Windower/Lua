@@ -252,12 +252,12 @@ function event_addon_command(...)
 	end
 	if params[1] then
 		if params[1]:lower() == "help" then
-			write('ch2 help : Shows help message')
-			write('ch2 pos <x> <y> : Positions the list')
-			write('ch2 hide : Hides the box')
-			write('ch2 show : Shows the box')
-			write('ch2 set [set id] : Loads set from settings file. Default is set1')
-			write('ch2 mode [lots/nolots] : If mode is changed to nolots, ll will not lot cells automatically.')
+			write('ch help : Shows help message')
+			write('ch pos <x> <y> : Positions the list')
+			write('ch hide : Hides the box')
+			write('ch show : Shows the box')
+			write('ch set [set id] : Loads set from settings file. Default is set1')
+			write('ch mode [lots/nolots] : If mode is changed to nolots, ll will not lot cells automatically.')
 		elseif params[1]:lower() == "pos" then
 			if params[3] then
 				local posx, posy = tonumber(params[2]), tonumber(params[3])

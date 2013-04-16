@@ -17,5 +17,6 @@ Otherwise you will see errors.
 To do:
 * Support for more than 4 people
 * Remove (or create a toggle) for the Item Counter.
+* Adjust player tags so that <pass> and <lot> are available within for each player. Should also resolve the existing pass tag error messages.
 Known Issues:
 * Pass tag errors
