@@ -67,7 +67,7 @@ function event_load()
 						['101']='Wizard\'s',['102']='Warlock\'s',['103']='Rogue\'s',
 						['104']='Gallant\'s',['105']='Chaos',['106']='Beast',
 						['107']='Choral',['108']='Hunter\'s',['109']='Samurai\'s',
-						['110']='Ninja\'s',['111']='Drachen',['112']='Evoker\'s',
+						['110']='Ninja',['111']='Drachen',['112']='Evoker\'s',
 						['113']='Magus\'',['114']='Corsair\'s',['115']='Puppet',
 						['116']='Dancer\'s',['117']='Scholar\'s',['118']='Bolter\'s',
 						['119']='Caster\'s', ['120']='Courser\'s', ['121']='Blitzer\'s',
@@ -113,12 +113,14 @@ end
 function event_incoming_text(old, new, color)
 	match_doubleup = old:find (player..' uses Double')
 	battlemod_compat = old:find(player..'.*% Roll.* %d')
-	not_party = old:find ('%('..'%w+'..'%)')
-	if battlemod_compat or match_doubleup and not_party~=nil then
-		new=''
-	end
-	if not_party then
-		new=old
+	not_party = old:find ('%('..'%w+'..'%)')	
+	if get_player()['main_job'] == 'COR' then
+		if battlemod_compat or match_doubleup and not_party~=nil then
+			new=''
+		end
+		if not_party then
+			new=old
+		end
 	end
 	return new, color
 end
