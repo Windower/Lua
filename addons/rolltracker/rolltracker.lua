@@ -67,7 +67,7 @@ function event_load()
 						['101']='Wizard\'s',['102']='Warlock\'s',['103']='Rogue\'s',
 						['104']='Gallant\'s',['105']='Chaos',['106']='Beast',
 						['107']='Choral',['108']='Hunter\'s',['109']='Samurai\'s',
-						['110']='Ninja\'s',['111']='Drachen',['112']='Evoker\'s',
+						['110']='Ninja',['111']='Drachen',['112']='Evoker\'s',
 						['113']='Magus\'',['114']='Corsair\'s',['115']='Puppet',
 						['116']='Dancer\'s',['117']='Scholar\'s',['118']='Bolter\'s',
 						['119']='Caster\'s', ['120']='Courser\'s', ['121']='Blitzer\'s',
