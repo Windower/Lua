@@ -101,6 +101,19 @@ function event_action(act)
 				else
 					status = ability
 				end
+				if act['param'] == 53 then -- Gauge handling
+					if act['targets'][i]['actions'][n]['message'] == 210 then
+						number = 'Cannot charm'
+					elseif act['targets'][i]['actions'][n]['message'] == 211 then
+						number = number..' very difficult'
+					elseif act['targets'][i]['actions'][n]['message'] == 212 then
+						number = number..' difficult'
+					elseif act['targets'][i]['actions'][n]['message'] == 213 then
+						number = number..' might be able'
+					elseif act['targets'][i]['actions'][n]['message'] == 214 then
+						number = number..' should be able'
+					end
+				end
 			elseif act['category'] == 7 then -- Ready WS / TP move / Pet TP move
 				wsparm = act['targets'][i]['actions'][n]['param']
 				if actor_table['is_npc'] then
@@ -191,7 +204,9 @@ function event_action(act)
 					-- Handles for Category 1,2,3,4,6, and 14
 					a,b = string.find(dialog[act['targets'][i]['actions'][n]['message']]['english'],'$\123number\125')
 					if a == nil then -- Distinguishes between Status effects and Damage/Healing.
-						number = nil
+						if act['category'] ~= 3 or act['param'] ~= 53 then -- passes Gauge messages through. There must be a better way to do this.
+							number = nil
+						end
 					end
 					if condensebattle then
 						if abil and number and target and actor then

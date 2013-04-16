@@ -486,7 +486,7 @@ function event_action_message(actor_id,index,actor_target_index,target_target_in
 		
 		if message_id > 169 and message_id <179 then
 			if param_1 == 4294967296 then
-				skill = 'too weak to be worthwhile.'
+				skill = 'like level -1' -- Or too weak to be worthwhile?
 				if debugging then
 					write(param_1..' '..param_2..' '..param_3)
 				end
