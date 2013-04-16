@@ -100,7 +100,7 @@ function Display:build_scoreboard_header()
     if dps_db:isempty() then
         labels = "\n"
     else
-        labels = string.format("%23s%7s%8s\n", "Tot", "Pct", "DPS")
+        labels = string.format("%23s%7s%9s\n", "Tot", "Pct", "DPS")
     end
 	
     local dps_status
@@ -114,8 +114,8 @@ function Display:build_scoreboard_header()
     if dps_clock:is_active() or dps_clock.clock > 1 then
         dps_clock_str = string.format(" (%s)", dps_clock:to_string())
     end
-    
-    return string.format("DPS: %s%s\nMobs: %-9s\n%s",  dps_status, dps_clock_str, mob_filter_str, labels)
+    local dps_chunk = string.format("DPS: %s%s", dps_status, dps_clock_str)
+    return string.format("%s%s\nMobs: %-9s\n%s", dps_chunk, string.rep(" ", 29 - dps_chunk:len()) .. "//sb help", mob_filter_str, labels)
 end
 
 
