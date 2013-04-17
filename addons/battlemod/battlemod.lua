@@ -35,7 +35,7 @@ require 'event_action'
 require 'generic_helpers'
 
 function event_load()
-	debugging = false
+	debugging = true
 	allow = true
 	prevline = ''
 
@@ -47,7 +47,7 @@ function event_load()
 	line_aoebuff = 'AoE Buff line is not loading'
 	line_roll = 'Roll line is not loading'
 	skillchain_arr = {'Light:','Darkness:','Gravitation:','Fragmentation:','Distortion:','Fusion:','Compression:','Liquefaction:','Induration:','Reverberation:','Transfixion:','Scission:','Detonation:','Impaction:'}
-	ratings_arr = {'TW','EP','DC','EM','T','VT','IT'}
+	ratings_arr = {'TW','EP','EP','DC','EM','T','VT','IT'}
 	rcol = string.char(0x1E,0x01)
 	blocked_colors = T{20,21,22,23,24,25,26,28,29,31,32,33,35,36,37,40,41,42,43,44,50,51,52,56,57,59,60,69,64,65,67,69,81,85,90,91,100,101,102,104,105,106,110,111,112,114,122,163,164,168,171,175,177,183,185,186,191,291} -- 37 and 291 might be unique colors, but they are not gsubbable.
 	passed_messages = T{4,5,6,16,17,18,20,34,35,36,40,48,64,78,87,88,89,90,116,154,170,171,172,173,174,175,176,177,178,191,192,198,204,206,217,218,234,249,313,328,350,336,531,558,561,575,601,609,610,611,612,613,614,615,616,617,618,619,620,625,626,627,628,629,630,631,632,633,634,635,636,643}
