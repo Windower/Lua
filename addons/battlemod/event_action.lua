@@ -36,9 +36,9 @@ function event_action(act)
 					actor,actor_table,target,target_table,flipped = flip(actor,actor_table,target,target_table,flipped)
 				elseif  act['targets'][i]['actions'][n]['reaction'] == 12 then abil = 'Block'
 					actor,actor_table,target,target_table,flipped = flip(actor,actor_table,target,target_table,flipped)
-					number = act['targets'][i]['actions'][n]['param']
+					effect_val = act['targets'][i]['actions'][n]['param']
 				elseif msg_ID == 1 then abil = 'Hit'
-					number = act['targets'][i]['actions'][n]['param']
+					effect_val = act['targets'][i]['actions'][n]['param']
 				elseif msg_ID == 15 then abil = 'Miss'
 				elseif msg_ID == 32 then abil = 'Dodges'
 					actor,actor_table,target,target_table,flipped = flip(actor,actor_table,target,target_table,flipped)
@@ -46,20 +46,20 @@ function event_action(act)
 					actor,actor_table,target,target_table,flipped = flip(actor,actor_table,target,target_table,flipped)
 				elseif msg_ID == 31 then
 					actor,actor_table,target,target_table,flipped = flip(actor,actor_table,target,target_table,flipped)
-					number = act['targets'][i]['actions'][n]['param']
+					effect_val = act['targets'][i]['actions'][n]['param']
 					abil = 'Disappears'
 				elseif msg_ID == 67 then abil = 'Crit'
-					number = act['targets'][i]['actions'][n]['param']
+					effect_val = act['targets'][i]['actions'][n]['param']
 				elseif debugging and not act['targets'][i]['actions'][n]['has_spike_effect'] then
-					number = act['targets'][i]['actions'][n]['param']
+					effect_val = act['targets'][i]['actions'][n]['param']
 					write('debug_cat1: '..act['targets'][i]['actions'][n]['param']..' '..msg_ID)
 				end
 			elseif act['category'] == 2 then -- Ranged attacks
-				number = act['targets'][i]['actions'][n]['param']
+				effect_val = act['targets'][i]['actions'][n]['param']
 				if msg_ID == 352 then abil = 'RA'
 				elseif msg_ID == 353 then abil = 'Crit RA'
 				elseif msg_ID == 354 then abil = 'RA Misses'
-					number = nil
+					effect_val = nil
 				elseif msg_ID == 576 then abil = 'RA Hits Squarely'
 				elseif msg_ID == 577 then abil = 'RA Strikes True'
 				elseif msg_ID == 157 then abil = 'Barrage'
