@@ -113,9 +113,13 @@ end
 function event_incoming_text(old, new, color)
 	match_doubleup = old:find (player..' uses Double')
 	battlemod_compat = old:find(player..'.*% Roll.* %d')
+	obtained_roll = old:find('.* receives the effect of .* Roll.')
 	not_party = old:find ('%('..'%w+'..'%)')	
 	if get_player()['main_job'] == 'COR' then
 		if battlemod_compat or match_doubleup and not_party~=nil then
+			new=''
+		end
+		if obtained_roll ~= nil then
 			new=''
 		end
 		if not_party then
