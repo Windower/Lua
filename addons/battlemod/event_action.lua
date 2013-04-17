@@ -4,6 +4,7 @@ function event_action(act)
 	local persistantcolor = 1
 	local aggregate = false
 	local eventual_send = false
+	local spell,ability,weapon_skill,item
 	
 	local msg = act['targets'][1]['actions'][1]['message']
 	if agg_messages:contains(msg) and condensebuffs then
@@ -17,14 +18,18 @@ function event_action(act)
 	actor = namecol(actor,actor_table,party_table)
 
 	for i,v in pairs(act['targets']) do
-		for n,m in pairs(act['targets'][i]['actions']) do			
-			local prepstr,abil,add_eff_str,spike_str,forcemsg,wsparm,status,number,spell,ability,weapon_skill,item,gil
+		for n,m in pairs(act['targets'][i]['actions']) do
+			local msg_ID = act['targets'][i]['actions'][n]['message']
+			if not nf(dialog[msg_ID],'english') then return end
+			
+			local prepstr,abil,add_eff_str,spike_str,forcemsg,wsparm,status,number,gil,abil_ID,effect_val
 			
 			local flipped = false
 			local target_table = get_mob_by_id(act['targets'][i]['id'])
 			local target = target_table['name']
 			target = namecol(target,target_table,party_table)
-		
+			
+			
 			if act['category'] == 1 then -- Melee swings
 				if act['targets'][i]['actions'][n]['reaction'] == 11 then
 					abil = 'Parries'
@@ -32,213 +37,152 @@ function event_action(act)
 				elseif  act['targets'][i]['actions'][n]['reaction'] == 12 then abil = 'Block'
 					actor,actor_table,target,target_table,flipped = flip(actor,actor_table,target,target_table,flipped)
 					number = act['targets'][i]['actions'][n]['param']
-				elseif act['targets'][i]['actions'][n]['message'] == 1 then abil = 'Hit'
+				elseif msg_ID == 1 then abil = 'Hit'
 					number = act['targets'][i]['actions'][n]['param']
-				elseif act['targets'][i]['actions'][n]['message'] == 15 then abil = 'Miss'
-				elseif act['targets'][i]['actions'][n]['message'] == 32 then abil = 'Dodges'
+				elseif msg_ID == 15 then abil = 'Miss'
+				elseif msg_ID == 32 then abil = 'Dodges'
 					actor,actor_table,target,target_table,flipped = flip(actor,actor_table,target,target_table,flipped)
-				elseif act['targets'][i]['actions'][n]['message'] == 106 then abil = 'Intimidates'
+				elseif msg_ID == 106 then abil = 'Intimidates'
 					actor,actor_table,target,target_table,flipped = flip(actor,actor_table,target,target_table,flipped)
-				elseif act['targets'][i]['actions'][n]['message'] == 31 then
+				elseif msg_ID == 31 then
 					actor,actor_table,target,target_table,flipped = flip(actor,actor_table,target,target_table,flipped)
 					number = act['targets'][i]['actions'][n]['param']
 					abil = 'Disappears'
-				elseif act['targets'][i]['actions'][n]['message'] == 67 then abil = 'Crit'
+				elseif msg_ID == 67 then abil = 'Crit'
 					number = act['targets'][i]['actions'][n]['param']
 				elseif debugging and not act['targets'][i]['actions'][n]['has_spike_effect'] then
 					number = act['targets'][i]['actions'][n]['param']
-					write('debug_cat1: '..act['targets'][i]['actions'][n]['param']..' '..act['targets'][i]['actions'][n]['message'])
+					write('debug_cat1: '..act['targets'][i]['actions'][n]['param']..' '..msg_ID)
 				end
 			elseif act['category'] == 2 then -- Ranged attacks
 				number = act['targets'][i]['actions'][n]['param']
-				if act['targets'][i]['actions'][n]['message'] == 352 then abil = 'RA'
-				elseif act['targets'][i]['actions'][n]['message'] == 353 then abil = 'Crit RA'
-				elseif act['targets'][i]['actions'][n]['message'] == 354 then abil = 'RA Misses'
+				if msg_ID == 352 then abil = 'RA'
+				elseif msg_ID == 353 then abil = 'Crit RA'
+				elseif msg_ID == 354 then abil = 'RA Misses'
 					number = nil
-				elseif act['targets'][i]['actions'][n]['message'] == 576 then abil = 'RA Hits Squarely'
-				elseif act['targets'][i]['actions'][n]['message'] == 577 then abil = 'RA Strikes True'
-				elseif act['targets'][i]['actions'][n]['message'] == 157 then abil = 'Barrage'
+				elseif msg_ID == 576 then abil = 'RA Hits Squarely'
+				elseif msg_ID == 577 then abil = 'RA Strikes True'
+				elseif msg_ID == 157 then abil = 'Barrage'
 				end
-			elseif act['category'] == 3 then -- Weapon Skills
-				number = act['targets'][i]['actions'][n]['param']
-				a,b = string.find(dialog[act['targets'][i]['actions'][n]['message']]['english'],'$\123ability\125') -- Jump registers as a weaponskill and doesn't use an offset.
-				if a then
-					ability = color_arr['wscol']..jobabilities[act['param']]['english']..string.char(0x1E,0x01)
-					gil = act['targets'][i]['actions'][n]['param']
-					if items[act['targets'][i]['actions'][n]['param']] then -- What the hell is this for?
-						item = color_arr['itemcol']..items[act['targets'][i]['actions'][n]['param']]['enl']..string.char(0x1E,0x01)
-					end
-					if statuses[act['targets'][i]['actions'][n]['param']] then
-						status = statuses[act['targets'][i]['actions'][n]['param']]['english']
-					end
-				else
-					weapon_skill = color_arr['wscol']..jobabilities[act['param']+768]['english']..string.char(0x1E,0x01)
-				end
-			elseif act['category'] == 4 then -- Magic
-				number = act['targets'][i]['actions'][n]['param']
-				if nf(spells[act['param']],'english') then
-					spell= color_arr['spellcol']..nf(spells[act['param']],'english')..string.char(0x1E,0x01)
-				end
-
-				if act['targets'][i]['actions'][n]['message'] == 93 or act['targets'][i]['actions'][n]['message'] == 273 then
-					status=color_arr['statuscol']..'Vanish'..string.char(0x1E,0x01)
-				elseif act['targets'][i]['actions'][n]['param'] == 0 or act['targets'][i]['actions'][n]['param'] == 255 then
-					status = color_arr['statuscol']..'No effect'..string.char(0x1E,0x01)
-				elseif statuses[act['targets'][i]['actions'][n]['param']] ~= nil then
-					status = color_arr['statuscol']..statuses[act['targets'][i]['actions'][n]['param']]['english']..string.char(0x1E,0x01)
-				end
-			elseif act['category'] == 5 then -- Item use
-				item = color_arr['itemcol']..items[act['param']]['enl']..string.char(0x1E,0x01)
-				number = act['targets'][i]['actions'][n]['param']
-				if statuses[act['targets'][i]['actions'][n]['param']] then
-					status = statuses[act['targets'][i]['actions'][n]['param']]['english']
-				end
-			elseif act['category'] == 6 then -- JA use
-				ability = color_arr['abilcol']..jobabilities[act['param']]['english']..string.char(0x1E,0x01)
-				number = act['targets'][i]['actions'][n]['param']
-				if act['targets'][i]['actions'][n]['param']~=0 then
-					status = nf(statuses[act['targets'][i]['actions'][n]['param']],'english')
-				else
-					status = ability
-				end
-				if act['param'] == 53 then -- Gauge handling
-					if act['targets'][i]['actions'][n]['message'] == 210 then
-						number = 'Cannot charm'
-					elseif act['targets'][i]['actions'][n]['message'] == 211 then
-						number = number..' very difficult'
-					elseif act['targets'][i]['actions'][n]['message'] == 212 then
-						number = number..' difficult'
-					elseif act['targets'][i]['actions'][n]['message'] == 213 then
-						number = number..' might be able'
-					elseif act['targets'][i]['actions'][n]['message'] == 214 then
-						number = number..' should be able'
-					end
-				end
-			elseif act['category'] == 7 then -- Ready WS / TP move / Pet TP move
-				wsparm = act['targets'][i]['actions'][n]['param']
-				if actor_table['is_npc'] then
-					if actor_table['id']%4096 > 2048 then -- If the NPC is a pet
-						if jobabilities[wsparm] or debugging then -- Just covering it up until I figure out why it is happening.
-							ability = color_arr['abilcol']..jobabilities[wsparm]['english']..string.char(0x1E,0x01)
-							weapon_skill = color_arr['abilcol']..jobabilities[wsparm]['english']..string.char(0x1E,0x01)
-						end
-					else
-						if wsparm > 256 then -- Accounts for TP moves that don't show up in the logs, like the Geyser eruption
-							weapon_skill = color_arr['mobwscol']..mabils[wsparm-256]['english']..string.char(0x1E,0x01)
-						end
-					end
-				else
-					weapon_skill = color_arr['wscol']..jobabilities[wsparm+768]['english']..string.char(0x1E,0x01) --- Nil concat error somehow.
-				end
-			elseif act['category'] == 8 then -- Begin casting
-				spell = color_arr['spellcol']..spells[act['targets'][i]['actions'][n]['param']]['english']..string.char(0x1E,0x01)
-			elseif act['category'] == 9 then -- Begin using item
-				if act['param'] ~= 115 then
-					item = nf(items[act['targets'][i]['actions'][n]['param']],'enl')
-					if item then item = color_arr['itemcol']..item..string.char(0x1E,0x01) end
-				end
-			elseif act['category'] == 11 then -- Monster TP moves
-				weapon_skill = mabils[act['param']-256]['english']
-				if weapon_skill == '.' then
-					weapon_skill = 'Special Attack'
-				end
-				weapon_skill = color_arr['mobwscol']..weapon_skill..string.char(0x1E,0x01)
-				number = act['targets'][i]['actions'][n]['param']
-				if nf(statuses[act['targets'][i]['actions'][n]['param']],'english') then
-					status = color_arr['statuscol']..nf(statuses[act['targets'][i]['actions'][n]['param']],'english')..string.char(0x1E,0x01)
-				end
-			elseif act['category'] == 13 then
-				ability = color_arr['abilcol']..jobabilities[act['param']]['english']..string.char(0x1E,0x01)
-				number = act['targets'][i]['actions'][n]['param']
-				if statuses[act['targets'][i]['actions'][n]['param']] ~= nil then
-					status = color_arr['statuscol']..statuses[act['targets'][i]['actions'][n]['param']]['english']..string.char(0x1E,0x01)
-				end
-			elseif act['category'] == 14 then
-				ability = color_arr['abilcol']..jobabilities[act['param']]['english']..string.char(0x1E,0x01)
-				status = nf(statuses[act['targets'][i]['actions'][n]['param']],'english')
-				if status ~= nil then
-					status = color_arr['statuscol']..status..string.char(0x1E,0x01)
-				end
-				number = act['targets'][i]['actions'][n]['param']
-				if act['targets'][1]['actions'][1]['message'] == 522 then
-					target = target..' (stunned)'
-				end
-			elseif act['category'] == 15 then
-				ability = color_arr['abilcol']..jobabilities[act['param']]['english']..string.char(0x1E,0x01)
-				status = nf(statuses[act['targets'][i]['actions'][n]['param']],'english')
-				if status ~= nil then
-					status = color_arr['statuscol']..status..string.char(0x1E,0x01)
-				end
-				number = act['targets'][i]['actions'][n]['param']
+			elseif T{7,8,9}:contains(act['category']) then -- 12 and 10 don't really count because their params are meaningless. 1 and 2 need manual ability sorting
+				abil_ID = act['targets'][i]['actions'][n]['param']
+			elseif T{3,4,5,6,11,13,14,15}:contains(act['category']) then
+				abil_ID = act['param']
+				effect_val = act['targets'][i]['actions'][n]['param']
 			end
 			
+			
+			local fields = fieldsearch(dialog[msg_ID]['english'])
+			
+			if table.contains(fields,'spell') then
+				spell = color_arr['spellcol']..spells[abil_ID]['english']..string.char(0x1E,0x01)
+			elseif table.contains(fields,'item') then
+				item = color_arr['itemcol']..items[abil_ID]['enl']..string.char(0x1E,0x01)
+			elseif table.contains(fields,'ability') then
+				if abil_ID == 53 then -- Gauge handling
+					if msg_ID == 210 then
+						ability = 'Gauge (Cannot charm - '
+					elseif msg_ID == 211 then
+						ability = 'Gauge (Very Difficult - '
+					elseif msg_ID == 212 then
+						ability = 'Gauge (Difficult - '
+					elseif msg_ID == 213 then
+						ability = 'Gauge (Might be able - '
+					elseif msg_ID == 214 then
+						ability = 'Gauge (Should be able - '
+					end
+					ability = color_arr['abilcol']..ability..effect_val..')'..string.char(0x1E,0x01)
+				else
+					ability = color_arr['abilcol']..jobabilities[abil_ID]['english']..string.char(0x1E,0x01)
+				end
+			elseif table.contains(fields,'weapon_skill') then
+				if actor_table['is_npc'] then
+					weapon_skill = mabils[abil_ID-256]['english']
+					if weapon_skill == '.' then
+						weapon_skill = 'Special Attack'
+					end
+					weapon_skill = color_arr['mobwscol']..weapon_skill..string.char(0x1E,0x01)
+				else
+					weapon_skill = color_arr['wscol']..jobabilities[abil_ID+768]['english']..string.char(0x1E,0x01)
+				end
+			end
+			
+			if table.contains(fields,'status') then
+				if act['targets'][i]['actions'][n]['param'] == 0 or act['targets'][i]['actions'][n]['param'] == 255 then
+					status = color_arr['statuscol']..'No effect'..string.char(0x1E,0x01)
+--				elseif statuses[act['targets'][i]['actions'][n]['param']] ~= nil then
+--					status = color_arr['statuscol']..statuses[act['targets'][i]['actions'][n]['param']]['english']..string.char(0x1E,0x01)
+				else
+					status = color_arr['statuscol']..statuses[effect_val]['english']..string.char(0x1E,0x01)
+				end
+			elseif table.contains(fields,'number') then
+				number = effect_val
+				if dialog[msg_ID]['units'] and condensebattle then
+					number = number..' '..dialog[msg_ID]['units']
+				end
+			elseif table.contains(fields,'gil') then
+				gil = effect_val..' gil'
+			end
+			
+			-- Special Message Handling
+			if msg_ID == 93 or msg_ID == 273 then
+				status=color_arr['statuscol']..'Vanish'..string.char(0x1E,0x01)
+			elseif msg_ID == 522 and condensebattle then
+				target = target..' (stunned)'
+			elseif T{158,188,245,324,592,658}:contains(msg_ID) and condensebattle then
+				-- When you miss a WS or JA. Relevant for condensed battle.
+				number = 'Miss'
+			end
+		
 			-- Sets the common field "abil" based on the applicable abilities.
 			-- Only one should be valid at any given time.
 			if not abil then
-				abil = weapon_skill or ability or spell
+				abil = weapon_skill or ability or spell or item
 			end
 			
-			if act['targets'][i]['actions'][n]['message'] == 158 or act['targets'][i]['actions'][n]['message'] == 188 or act['targets'][i]['actions'][n]['message'] == 245 or act['targets'][i]['actions'][n]['message'] == 324 or act['targets'][i]['actions'][n]['message'] == 592 or act['targets'][i]['actions'][n]['message'] == 658 then
-			-- When you miss a WS or JA. Relevant for condensed battle.
-				number = 'Miss'
-			elseif act['targets'][i]['actions'][n]['message'] == 31 and number and condensebattle then
-				number = number..' Shadow' -- Error here, number was nil.
-			elseif act['targets'][i]['actions'][n]['message'] ~= 0 and number then
-				if dialog[act['targets'][i]['actions'][n]['message']]['units'] ~= nil and condensebattle then
-					number = number..' '..dialog[act['targets'][i]['actions'][n]['message']]['units']
-				elseif dialog[act['targets'][i]['actions'][n]['message']]['color'] == 'H' and condensebattle then
-					if statuses[number] then
-						status = color_arr['statuscol']..statuses[number]['english']..string.char(0x1E,0x01)
-					elseif debugging then
-						write('status_debug: '..number)
-						status = color_arr['statuscol']..statuses[number]['english']..string.char(0x1E,0x01)
-					end
-				end
-			end
+			--elseif msg_ID ~= 0 and number then
+			--	if dialog[msg_ID]['color'] == 'H' and condensebattle then
+			--		if statuses[number] then
+			--			status = color_arr['statuscol']..statuses[number]['english']..string.char(0x1E,0x01)
+			--		elseif debugging then
+			--			write('status_debug: '..number)
+			--			status = color_arr['statuscol']..statuses[number]['english']..string.char(0x1E,0x01)
+			--		end
+			--	end
 			
-			-- Below Here
-
-			if act['targets'][i]['actions'][n]['message'] ~= 0 then
-				if dialog[act['targets'][i]['actions'][n]['message']]['color'] == 'M' or dialog[act['targets'][i]['actions'][n]['message']]['color'] == 'D' or dialog[act['targets'][i]['actions'][n]['message']]['color'] == 'H' or act['targets'][i]['actions'][n]['reaction'] == 11 or act['targets'][i]['actions'][n]['reaction'] == 12 or act['targets'][i]['actions'][n]['message'] == 31 or act['targets'][i]['actions'][n]['message'] == 32 or act['category']==6 or act['category']==14 then
+			if msg_ID ~= 0 then
+				if dialog[msg_ID]['color'] == 'M' or dialog[msg_ID]['color'] == 'D' or dialog[msg_ID]['color'] == 'H' or act['targets'][i]['actions'][n]['reaction'] == 11 or act['targets'][i]['actions'][n]['reaction'] == 12 or msg_ID == 31 or msg_ID == 32 or act['category']==6 or act['category']==14 then
 					-- Misses, Damage, Healing, Parrying, Dodge, Guard/Block, and Utsusemi
 					-- Handles for Category 1,2,3,4,6, and 14
-					a,b = string.find(dialog[act['targets'][i]['actions'][n]['message']]['english'],'$\123number\125')
+					a,b = string.find(dialog[msg_ID]['english'],'$\123number\125')
 					if a == nil then -- Distinguishes between Status effects and Damage/Healing.
 						number = nil
 					end
 					if condensebattle then
 						if abil and number and target and actor then
 							prepstr = line_full
+						elseif abil and status and target and actor then
+							prepstr = line_aoebuff
 						elseif not number then
 							prepstr = line_nonumber
 						elseif not actor then
 							prepstr = line_noactor
 						elseif debugging then ---- Can remove once I don't see it anymore ----
 							write(number..' '..abil..' '..target..' '..actor)
-							prepstr = dialog[act['targets'][i]['actions'][n]['message']]['english']
+							prepstr = dialog[msg_ID]['english']
 						end
 					else ---- Can remove once I don't see it anymore ----
-						prepstr = dialog[act['targets'][i]['actions'][n]['message']]['english']
+						prepstr = dialog[msg_ID]['english']
 					end
-				elseif dialog[act['targets'][i]['actions'][n]['message']] or debugging then -- Shouldn't really be necessary.
-					prepstr = dialog[act['targets'][i]['actions'][n]['message']]['english']
+				elseif dialog[msg_ID] or debugging then -- Shouldn't really be necessary.
+					prepstr = dialog[msg_ID]['english']
 				end
-			elseif act['category'] == 12 then -- Handles category 12 cases
-				if act['param']==24931 or act['param']==24931 then -- Initiation or interruption of the ranged attack
-					prepstr = nil
-				elseif debugging then
-					write('debug12: '..act['param'])
-				end
-			elseif act['category'] == 8 then -- Handles category 8 cases where the message is 0 (interruption)
-				prepstr = dialog[16]['english']
-				forcemsg = 16
 			else
-				if act['targets'][i]['actions'][n]['message'] ~= 0 and debugging then
-					write('debug4: '..act['category']..' '..dialog[act['targets'][i]['actions'][n]['message']]) --- Debug message. Can be removed eventually.
+				if msg_ID ~= 0 and debugging then
+					write('debug4: '..act['category']..' '..dialog[msg_ID]) --- Debug message. Can be removed eventually.
 				elseif act['targets'][i]['actions'][n]['spike_effect_message'] == 0 and debugging then
 					write('debug4: '..act['category'])
 				end
-				prepstr = ''
 			end
 			
 			-- Avoid nil field errors using " or ''" with all the gsubs.
@@ -247,12 +191,12 @@ function event_action(act)
 			end
 			
 			-- Construct the message to be sent out --
-			if prepstr ~= '' and prepstr then
+			if prepstr then
 				if forcemsg == nil then
 					if aggregate ~= true then
 						if check_filter(actor_table,party_table,target_table,act['category'],msg) then
-							if dialog[act['targets'][i]['actions'][n]['message']]['color'] ~= nil then
-								add_to_chat(colorfilt(dialog[act['targets'][i]['actions'][n]['message']]['color'],target_table['is_npc'],target_table['id']==party_table['p0']['mob']['id']),string.char(0x1F,0xFE,0x1E,0x01)..prepstr:gsub('$\123target\125',target or '')..string.char(127,49))
+							if dialog[msg_ID]['color'] ~= nil then
+								add_to_chat(colorfilt(dialog[msg_ID]['color'],target_table['is_npc'],target_table['id']==party_table['p0']['mob']['id']),string.char(0x1F,0xFE,0x1E,0x01)..prepstr:gsub('$\123target\125',target or '')..string.char(127,49))
 							elseif debugging then
 								add_to_chat(1,string.char(0x1F,0xFE,0x1E,0x01)..prepstr:gsub('$\123target\125',target or '')..string.char(127,49))
 							end
@@ -260,7 +204,7 @@ function event_action(act)
 					elseif i==1 then
 						if condensebattle then
 							eventual_send = check_filter(actor_table,party_table,target_table,act['category'],msg)
-							if act['targets'][i]['actions'][n]['message']>419 and act['targets'][i]['actions'][n]['message']<430 then
+							if msg_ID>419 and msg_ID<430 then
 								if act['targets'][i]['actions'][n]['param'] == 12 then -- Bust is always 12
 									number = 'Bust!'
 								end
@@ -271,7 +215,7 @@ function event_action(act)
 						else
 							persistantmessage = prepstr
 						end
-						persistantcolor = dialog[act['targets'][i]['actions'][n]['message']]['color']
+						persistantcolor = dialog[msg_ID]['color']
 						persistanttarget = target
 						if act['target_count'] == 1 and check_filter(actor_table,party_table,target_table,act['category'],msg) then
 							add_to_chat(persistantcolor,persistantmessage)
@@ -427,35 +371,41 @@ function colorfilt(col,is_npc,is_me)
 	--Used to convert situational colors from the resources into real colors
 	--Depends on whether the target is an NPC or player and whether it is you
 	-- Returns a color code for add_to_chat()
-	if col == "D" then
-		if is_npc==true then
+	if col == "D" then -- Damage
+		if is_me then
+			return 28
+		else
 			return 20
-		else
-			if is_me then
-				return 28
-			else
-				return 32
-			end
 		end
-	elseif col == "M" then
-		if is_npc==true then
+	elseif col == "M" then -- Misses
+		if is_me then
+			return 29
+		else
 			return 21
-		else
-			if is_me then
-				return 21
-			else
-				return 26
-			end
 		end
-	elseif col == "H" then
-		if is_npc==true then
-			return 31
+	elseif col == "H" then -- Healing
+		if is_me then
+			return 30
 		else
-			if is_me then
-				return 31
-			else
-				return 24
-			end
+			return 22
+		end
+	elseif col == "B" then -- Beneficial effects
+		if is_me then
+			return 56
+		else
+			return 60
+		end
+	elseif col == "DB" then -- Detrimental effects (I don't know how I'd split these)
+		if is_me then
+			return 57
+		else
+			return 61
+		end
+	elseif col == "R" then -- Resists
+		if is_me then
+			return 59
+		else
+			return 63
 		end
 	else
 		return col
@@ -535,4 +485,10 @@ end
 
 function flip(p1,p1t,p2,p2t,cond)
 	return p2,p2t,p1,p1t,not cond
+end
+
+function fieldsearch(message)
+	fieldarr = {}
+	string.gsub(message,"{(.-)}", function(a) if a ~= '${actor}' and a ~= '${target}' then fieldarr[#fieldarr+1] = a end end)
+	return fieldarr
 end

@@ -13,7 +13,7 @@
 	<dtd id="11" english="${actor} falls to level ${number}." color="1"/>
 	<dtd id="12" english="Cannot attack.${lb}Your target is already claimed." color="1"/>
 	<dtd id="13" english="Debug Message: ${actor}: ${target} is now invincible." color="1"/>
-	<dtd id="14" english="${actor}'s attack is countered by ${target}.${lb}${number} of ${actor}'s shadows absorbs the damage and disappears." color="29"/>
+	<dtd id="14" english="${actor}'s attack is countered by ${target}.${lb}${number} of ${actor}'s shadows absorbs the damage and disappears." color="29" units="Shadow"/>
 	<dtd id="15" english="${actor} misses ${target}." color="M"/>
 	<dtd id="16" english="${actor}'s casting is interrupted." color="122"/>
 	<dtd id="17" english="Unable to cast spells at this time." color="122"/>
@@ -30,7 +30,7 @@
 	<dtd id="28" english="${actor} uses a ${item}." color="90"/>
 	<dtd id="29" english="${actor} is paralyzed." color="122"/>
 	<dtd id="30" english="${target} anticipates the attack." color="29"/>
-	<dtd id="31" english="${number} of ${target}'s shadows absorbs the damage and disappears." color="29"/>
+	<dtd id="31" english="${number} of ${target}'s shadows absorbs the damage and disappears." color="29" units="Shadow"/>
 	<dtd id="32" english="${target} dodges the attack." color="29"/>
 	<dtd id="33" english="${actor}'s attack is countered by ${target}.${lb}${actor} takes ${number} points of damage." color="D"/>
 	<dtd id="34" english="${actor} does not have enough MP to cast ${spell}." color="122"/>
@@ -39,7 +39,7 @@
 	<dtd id="37" english="You are too far from the battle to gain experience." color="1"/>
 	<dtd id="38" english="${target}'s ${skill} skill rises 0.${number} points." color="1"/>
 	<dtd id="39" english="You need the Dual Wield ability to equip the ${item} as a sub-weapon." color="1"/>
-	<dtd id="40" english="You cannot use ${spell} in this area." color="1"/>
+	<dtd id="40" english="You cannot use ${spell} in this area." color="56"/>
 	<dtd id="41" english="${actor}: Status ailment check (${number})Cannot rest at this time." color="1"/>
 	<dtd id="42" english="${actor} casts ${spell} on ${target}." color="56"/>
 	<dtd id="43" english="${actor} readies ${weapon_skill}." color="110"/>
@@ -315,7 +315,7 @@
 	<dtd id="313" english="${target} is out of range.${lb}Unable to cast ${spell}." color="123"/>
 	<dtd id="314" english="${target}'s level is currently restricted to ${number}.${lb}Equipment affected by the level restriction will be adjusted accordingly." color="1"/>
 	<dtd id="315" english="${actor} already has a pet." color="1"/>
-	<dtd id="316" english="That action cannot be used in this area." color="1"/>
+	<dtd id="316" english="That action cannot be used in this area." color="56"/>
 	<dtd id="317" english="${actor} uses ${ability}.${lb}${target} takes ${number} points of damage." color="D"/>
 	<dtd id="318" english="${actor} uses ${ability}.${lb}${target} recovers ${number} HP." color="H" units="HP"/>
 	<dtd id="319" english="${actor} uses ${ability}.${lb}${target} gains the effect of ${status}." color="101"/>
@@ -534,7 +534,7 @@
 	<dtd id="532" english="${actor} uses ${ability}.${lb}${target} receives the effect of Sneak and Invisible." color="101"/>
 	<dtd id="533" english="${actor} casts ${spell}.${lb}${target}'s Accuracy is drained." color="1"/>
 	<dtd id="534" english="${actor} casts ${spell}.${lb}${target}'s Attack is drained." color="1"/>
-	<dtd id="535" english="${target} retaliates.${lb}${number} of ${actor}'s shadows absorbs the damage and disappears." color="29"/>
+	<dtd id="535" english="${target} retaliates.${lb}${number} of ${actor}'s shadows absorbs the damage and disappears." color="29" units="Shadow"/>
 	<dtd id="536" english="${target} retaliates.${lb}${actor} takes ${number} points of damage." color="D"/>
 	<dtd id="537" english="${target}'s TP is increased to ${number}%." color="1" units="TP"/>
 	<dtd id="538" english="A protective energy absorbs the malice of your enemy!" color="1"/>
