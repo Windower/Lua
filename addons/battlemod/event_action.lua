@@ -287,32 +287,30 @@ function event_action(act)
 			
 			if act['targets'][i]['actions'][n]['has_spike_effect'] and act['category']==1 and spkmsg ~= 0 then
 				number = act['targets'][i]['actions'][n]['spike_effect_param']
-				if condensebattle then
-					if spkmsg > 0 then
-						if spkmsg == 14 then
-							abil = 'Shadow from Counter'
-						elseif spkmsg == 33 or spkmsg == 606 then
-							abil = 'Counter'
-							actor,actor_table,target,target_table,flipped = flip(actor,actor_table,target,target_table,flipped)
-						elseif spkmsg == 592 then
-							abil = 'Counter Missed'
-							actor,actor_table,target,target_table,flipped = flip(actor,actor_table,target,target_table,flipped)
-						elseif spkmsg == 536 then
-							abil = 'Retaliates'
-							actor,actor_table,target,target_table,flipped = flip(actor,actor_table,target,target_table,flipped)
-						elseif spkmsg == 535 then
-							abil = 'Shadow from Retaliation'
-						else
-							abil = 'Spikes'
-							actor,actor_table,target,target_table,flipped = flip(actor,actor_table,target,target_table,flipped)
-						end
-						
-						a,b = string.find(dialog[spkmsg]['english'],'$\123number\125')
-						if a then
-							spike_str = line_full:gsub('$\123actor\125',actor or ''):gsub('$\123target\125',target or ''):gsub('$\123lb\125','\7'):gsub('$\123abil\125',abil or ''):gsub('$\123number\125',number or '')
-						else
-							spike_str = line_nonumber:gsub('$\123actor\125',actor or ''):gsub('$\123target\125',target or ''):gsub('$\123lb\125','\7'):gsub('$\123abil\125',abil or '')
-						end
+				if condensebattle and spkmsg > 0 then
+					if spkmsg == 14 then
+						abil = 'Shadow from Counter'
+					elseif spkmsg == 33 or spkmsg == 606 then
+						abil = 'Counter'
+						actor,actor_table,target,target_table,flipped = flip(actor,actor_table,target,target_table,flipped)
+					elseif spkmsg == 592 then
+						abil = 'Counter Missed'
+						actor,actor_table,target,target_table,flipped = flip(actor,actor_table,target,target_table,flipped)
+					elseif spkmsg == 536 then
+						abil = 'Retaliates'
+						actor,actor_table,target,target_table,flipped = flip(actor,actor_table,target,target_table,flipped)
+					elseif spkmsg == 535 then
+						abil = 'Shadow from Retaliation'
+					else
+						abil = 'Spikes'
+						actor,actor_table,target,target_table,flipped = flip(actor,actor_table,target,target_table,flipped)
+					end
+					
+					a,b = string.find(dialog[spkmsg]['english'],'$\123number\125')
+					if a then
+						spike_str = line_full:gsub('$\123actor\125',actor or ''):gsub('$\123target\125',target or ''):gsub('$\123lb\125','\7'):gsub('$\123abil\125',abil or ''):gsub('$\123number\125',number or '')
+					else
+						spike_str = line_nonumber:gsub('$\123actor\125',actor or ''):gsub('$\123target\125',target or ''):gsub('$\123lb\125','\7'):gsub('$\123abil\125',abil or '')
 					end
 				else
 					if spkmsg > 0 then
