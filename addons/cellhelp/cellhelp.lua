@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon = _addon or {}
-_addon.name = 'cellhelpv2'
+_addon.name = 'cellhelp'
 _addon.version = 0.1
 
 
@@ -43,143 +43,77 @@ local default_settings_file = [[
 <?xml version="1.0" ?>
 <settings>
 	<global>
-		<posX>1150</posX>
-		<posY>250</posY>
+		<posx>1150</posx>
+		<posy>250</posy>
 		<mode>lots</mode>
 		<set1>
-			<player1>Krizz</player1>
-			<p1pass>0</p1pass>
-			<player2></player2>
-			<p2pass>0</p2pass>
-			<player3></player3>
-			<p3pass>0</p3pass>
-			<player4></player4>
-			<p4pass>0</p4pass>
+			<player1>
+				<name></name>
+				<pass></pass>
+				<lot></lot>
+			</player1>
 			<incus>
-				<player1>1</player1>
-				<player2>2</player2>
-				<player3>3</player3>
-				<player4>4</player4>
+				<player1>4</player1>
 			</incus>
 			<castellanus>
-				<player1>1</player1>
-				<player2>2</player2>
-				<player3>3</player3>
-				<player4>4</player4>
+				<player1>4</player1>
 			</castellanus>
 			<undulatus>
-				<player1>1</player1>
-				<player2>2</player2>
-				<player3>3</player3>
-				<player4>4</player4>
+				<player1>4</player1>
 			</undulatus>
 			<cumulus>
-				<player1>1</player1>
-				<player2>2</player2>
-				<player3>3</player3>
-				<player4>4</player4>
+				<player1>4</player1>
 			</cumulus>
 			<radiatus>
-				<player1>1</player1>
-				<player2>2</player2>
-				<player3>3</player3>
-				<player4>4</player4>
+				<player1>4</player1>
 			</radiatus>
 			<virga>
-				<player1>1</player1>
-				<player2>2</player2>
-				<player3>3</player3>
-				<player4>4</player4>
+				<player1>4</player1>
 			</virga>
 			<cirrocumulus>
-				<player1>1</player1>
-				<player2>2</player2>
-				<player3>3</player3>
-				<player4>4</player4>
+				<player1>4</player1>
 			</cirrocumulus>
 			<stratus>
-				<player1>1</player1>
-				<player2>2</player2>
-				<player3>3</player3>
-				<player4>4</player4>
+				<player1>4</player1>
 			</stratus>
 			<duplicatus>
-				<player1>1</player1>
-				<player2>2</player2>
-				<player3>3</player3>
-				<player4>4</player4>
+				<player1>4</player1>
 			</duplicatus>
 			<opacus>
-				<player1>1</player1>
-				<player2>2</player2>
-				<player3>3</player3>
-				<player4>4</player4>
+				<player1>4</player1>
 			</opacus>
 			<praecipitatio>
-				<player1>1</player1>
-				<player2>2</player2>
-				<player3>3</player3>
-				<player4>4</player4>
+				<player1>4</player1>
 			</praecipitatio>
 			<humilus>
-				<player1>1</player1>
-				<player2>2</player2>
-				<player3>3</player3>
-				<player4>4</player4>
+				<player1>4</player1>
 			</humilus>
 			<spissatus>
-				<player1>1</player1>
-				<player2>2</player2>
-				<player3>3</player3>
-				<player4>4</player4>
+				<player1>4</player1>
 			</spissatus>
 			<pannus>
-				<player1>1</player1>
-				<player2>2</player2>
-				<player3>3</player3>
-				<player4>4</player4>
+				<player1>4</player1>
 			</pannus>
 			<fractus>
-				<player1>1</player1>
-				<player2>2</player2>
-				<player3>3</player3>
-				<player4>4</player4>
+				<player1>4</player1>
 			</fractus>
 			<congestus>
-				<player1>1</player1>
-				<player2>2</player2>
-				<player3>3</player3>
-				<player4>4</player4>
+				<player1>4</player1>
 			</congestus>
 			<nimbus>
-				<player1>1</player1>
-				<player2>2</player2>
-				<player3>3</player3>
-				<player4>4</player4>
+				<player1>4</player1>
 			</nimbus>
 			<velum>
-				<player1>1</player1>
-				<player2>2</player2>
-				<player3>3</player3>
-				<player4>4</player4>
+				<player1>4</player1>
 			</velum>
 			<pileus>
-				<player1>1</player1>
-				<player2>2</player2>
-				<player3>3</player3>
-				<player4>4</player4>
+				<player1>4</player1>
 			</pileus>
 			<mediocris>
-				<player1>1</player1>
-				<player2>2</player2>
-				<player3>3</player3>
-				<player4>4</player4>
+				<player1>4</player1>
 			</mediocris>
 			<alex>
 				<player1>0</player1>
-				<player2>0</player2>
-				<player3>0</player3>
-				<player4>0</player4>
 			</alex>
 		</set1>
 	</global>
@@ -189,6 +123,9 @@ local default_settings_file = [[
 local settingtab = nil
 local settings_file = 'data\\settings.xml'
 local settingtab = config.load(settings_file)
+if settingtab == nil then
+	write('No settings file found. Ensure you have a file at data\\settings.xml')
+end
 --variables
 	lotorder = ''
 	set = "set1"
@@ -219,14 +156,12 @@ local settingtab = config.load(settings_file)
 
 
 function settings_create()
---	write('settings_create function')
-
 --	get player's name
 	player = get_player()['name']
 --	dynamic players from settings
 	for i=1, #players do
 		playernumber = players[i]
-		players[players[i]] = settingtab[set][players[i]]
+		players[players[i]] = settingtab[set][playernumber]['name']
 		if players[players[i]] == player then
 			player_num = players[i]
 		end
@@ -245,7 +180,6 @@ function settings_create()
 end
 
 function event_addon_command(...)
---	write('event_addon_command function')
 	local params = {...};
 	if #params < 1 then
 		return
@@ -297,7 +231,6 @@ function event_addon_command(...)
 end
 
 function event_load()
---	write('event_load function')
 	send_command('alias ch lua c cellhelpv2')
 	player = get_player()['name']
 	write('CellHelp loaded.  CellHelp Authors: Cerberus.Balloon and Bahamut.Krizz')
@@ -311,18 +244,17 @@ function event_load()
 end 
 
 function event_login()
---	write('event_login function')
 	player = get_player()['name']
 
 end
 
 function orderlots()
---	write('orderlots functions')
 	lotorder = ""
+--	for i,v in pairs(cell_lots) do write(i..' - '..v) end
 	for i=1, #salvage_cell_name_short  do 
 		if salvage_cell_name_short[i] ~= 'alex' and cell_lots[salvage_cell_name_short[i]] ~= 0 then
 			item = salvage_cell_name_short[i]
-			lotorder = (lotorder..salvage_cell_name_short[i]..': '..cell_lots[item]..' \n')
+			lotorder = (lotorder..item..': '..cell_lots[item]..' \n')
 	    elseif salvage_cell_name_short[i] == 'alex' and cell_lots[salvage_cell_name_short[i]] ~= 0 then
 	    	item = salvage_cell_name_short[i]
 	    	lotorder = (lotorder..item..' \n')
@@ -333,7 +265,6 @@ function orderlots()
 end
 
 function lightluggage()
---	write('lightluggage function')
 	llprofile = ""
 	ll_lots = ""
 	ll_pass = ""
@@ -350,22 +281,18 @@ function lightluggage()
 	end
 	llprofile = (llprofile..'if item is '..ll_lots..' then lot \n')
 	llprofile = (llprofile..'if item is '..ll_pass..' then pass \n')
-
-	if player_num == 'player1' and settingtab[set]['p1pass'] ~= 0 then
-		llprofile = (llprofile.."if item is "..settingtab[set]['p1pass'].." then pass \n")
-	elseif player_num == 'player2' and settingtab[set]['p2pass'] ~= 0 then
-		llprofile = (llprofile.."if item is "..settingtab[set]['p2pass'].." then pass \n")	
-	elseif player_num == 'player3' and settingtab[set]['p3pass'] ~= 0 then
-		llprofile = (llprofile.."if item is "..settingtab[set]['p3pass'].." then pass \n")	
-	elseif player_num == 'player4' and settingtab[set]['p4pass'] ~= 0 then
-		llprofile = (llprofile.."if item is "..settingtab[set]['p4pass'].." then pass \n")
+	
+	if settingtab[set][player_num]['pass'] ~= 0 then
+		llprofile = (llprofile.."if item is "..settingtab[set][player_num]['pass'].." then pass \n")
+	end
+	if settingtab[set][player_num]['lot'] ~= 0 then
+		llprofile = (llprofile.."if item is "..settingtab[set][player_num]['lot'].." then lot \n")
 	end
 	
 	io.open(lua_base_path..'../../plugins/ll/salvage-'..player..'.txt',"w"):write(llprofile):close()
 end
 
 function initialize()
---	write('initialize function')
 	tb_create('salvage_box')
 	tb_set_bg_color('salvage_box',200,30,30,30)
 	tb_set_color('salvage_box',255,200,200,200)
@@ -378,7 +305,6 @@ end
 
 
 function event_incoming_text(original, new, color)
---	write('event_incoming_text function')
 	a,b,name,cell = string.find(original,'(%w+) obtains an? ..(%w+) cell..\46')
 	if cell ~= nil then
 		if name == player then
