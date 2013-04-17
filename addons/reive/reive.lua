@@ -40,7 +40,7 @@ _reive.stats          = {}
 _reive.stats.exp      = 0
 _reive.stats.bayld    = 0
 _reive.stats.scores   = T{}
-_reive.stats.bonuses  = {}
+_reive.stats.bonuses  = T{}
 
 _reive.defaults = {}
 _reive.defaults.reset_on_start = false
@@ -146,7 +146,7 @@ end
 
 function _reive:stop(...)
     _reive.stats.scores  = T{}
-    _reive.stats.bonuses = {}
+    _reive.stats.bonuses = T{}
 
     _reive.track = false
     add_to_chat(0, '\30\03The Reive has ended\30\01')
@@ -171,20 +171,22 @@ function _reive:refresh(...)
     local scores       = '';
 
     if #_reive.stats.scores > 0 then
-        for index, score in pairs(_reive.stats.scores:slice(math.max(1, #_reive.stats.scores-_reive.settings.max_scores + 1), #_reive.stats.scores)) do
+        local base = math.max(0, #_reive.stats.scores - _reive.settings.max_scores)
+
+        for index, score in pairs(_reive.stats.scores:slice(base + 1, #_reive.stats.scores)) do
             scores = scores..
-                '\n \\cs('..scoresColors.label.r..', '..scoresColors.label.g..', '..scoresColors.label.b..')'..score..'\\cr  '
+                '\n \\cs('..scoresColors.label.r..', '..scoresColors.label.g..', '..scoresColors.label.b..')'..(base + index)..'. '..score..'\\cr  '
         end
 
-        if #scores > 0 then
-            text = text..'\n \\cs('..scoresColors.title.r..', '..scoresColors.title.g..', '..scoresColors.title.b..')--== MOMENTUM SCORES ==--\\cr '..scores
-        end
+        text = text..'\n \\cs('..scoresColors.title.r..', '..scoresColors.title.g..', '..scoresColors.title.b..')--== MOMENTUM SCORES ==--\\cr '..scores
     end
 
     local bonusesColors = _reive.settings.colors.bonus
     local bonuses       = '';
 
-    for bonus, amount in pairs(_reive.stats.bonuses) do
+    for index, bonus in pairs(_reive.stats.bonuses:keyset():sort()) do
+        local amount = _reive.stats.bonuses[bonus]
+
         bonuses = bonuses..
             '\n \\cs('..bonusesColors.label.r..', '..bonusesColors.label.g..', '..bonusesColors.label.b..')'..bonus..':\\cr'..
             ' \\cs('..bonusesColors.value.r..', '..bonusesColors.value.g..', '..bonusesColors.value.b..')'..amount..'\\cr '
@@ -217,7 +219,7 @@ end
 function _reive:toggle(...)
     if _reive.visible then
         _reive:hide()
-    else 
+    else
         _reive:show()
     end
 end
