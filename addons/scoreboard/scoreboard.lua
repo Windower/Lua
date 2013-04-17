@@ -258,6 +258,22 @@ function event_action(raw_action)
                     end
                 end
             end
+        elseif category == 'avatar_tp_finish' then
+            for target in action:get_targets() do
+                for subaction in target:get_actions() do
+                    if subaction.message == 317 then
+                        accumulate(target:get_name(), action:get_actor_name(), subaction.param)
+                    end
+                end
+            end
+        elseif category == 'mob_tp_finish' then
+            for target in action:get_targets() do
+                for subaction in target:get_actions() do
+                    if subaction.message == 185 or subaction.message == 264 then
+                        accumulate(target:get_name(), action:get_actor_name(), subaction.param)
+                    end
+                end
+            end        
         end
     elseif category == 'melee' then
         -- This is some non-ally action packet. We need to see if they are hitting someone
