@@ -486,9 +486,9 @@ function event_action_message(actor_id,index,actor_target_index,target_target_in
 		
 		if message_id > 169 and message_id <179 then
 			if param_1 == 4294967296 then
-				skill = 'like level -1'..' ('..ratings_arr[param_3]..')'
+				skill = 'like level -1'..' ('..ratings_arr[param_2]..')'
 			else
-				skill = 'like level '..param_1..' ('..ratings_arr[param_3]..')'
+				skill = 'like level '..param_1..' ('..ratings_arr[param_2]..')'
 			end
 			if debugging then write(param_1..'   '..param_2..'   '..param_3) end
 		end
