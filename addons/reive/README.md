@@ -1,6 +1,6 @@
 **Author:** Giuliano Riccio
 
-**Version:** v 1.20130416
+**Version:** v 1.20130417
 
 **Description:**  
 This plugin tracks exp, bayld, momentum scores and bonuses during a reive.
@@ -21,6 +21,24 @@ There is only one configuration file called settings.xml in the data folder of t
 **TODO**
 
 - [ ] Allow the user to change the settings using the console
+
+#changelog
+## v1.20130417
+* **add:** the user can decide which bonuses will appear in the window. new voices added to the settings.xml file:
+```xml
+    <track>
+        <abilities_recovery>true</abilities_recovery>
+        <hp_mp_boost>true</hp_mp_boost>
+        <hp_recovery>true</hp_recovery>
+        <mp_recovery>true</mp_recovery>
+        <status_recovery>true</status_recovery>
+        <stoneskin>true</stoneskin>
+        <tp_recovery>true</tp_recovery>
+    </track>
+```
+
+## v1.20130416
+* first release
 
 #global
 * **reset_on_start:** **true** or **false**, will set exp and bayld to 0 at the begin of each reive
