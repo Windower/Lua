@@ -42,61 +42,90 @@ _reive.stats.bayld    = 0
 _reive.stats.scores   = T{}
 _reive.stats.bonuses  = T{}
 
+_reive.bonuses_map = {
+    ['HP recovery']                 = 'hp_recovery',
+    ['MP recovery']                 = 'mp_recovery',
+    ['TP recovery']                 = 'tp_recovery',
+    ['Status ailment recovery']     = 'status_recovery',
+    ['Stoneskin']                   = 'stoneskin',
+    ['Ability cast recovery']       = 'abilities_recovery',
+    ['Increased maximum MP and HP'] = 'hp_mp_boost'
+}
+
+_reive.settings = {}
 _reive.defaults = {}
 _reive.defaults.reset_on_start = false
 _reive.defaults.max_scores = 5
+
+_reive.defaults.track = {}
+_reive.defaults.track.hp_recovery        = true
+_reive.defaults.track.mp_recovery        = true
+_reive.defaults.track.tp_recovery        = true
+_reive.defaults.track.status_recovery    = true
+_reive.defaults.track.stoneskin          = true
+_reive.defaults.track.abilities_recovery = true
+_reive.defaults.track.hp_mp_boost        = true
+
 _reive.defaults.position = {}
 _reive.defaults.position.x = 0
 _reive.defaults.position.y = 350
+
 _reive.defaults.font = {}
 _reive.defaults.font.family = 'Arial'
 _reive.defaults.font.size   = 10
 _reive.defaults.font.italic = false
 _reive.defaults.font.bold   = false
 _reive.defaults.font.a      = 255
+
 _reive.defaults.colors = {}
 _reive.defaults.colors.background = {}
 _reive.defaults.colors.background.r = 0
 _reive.defaults.colors.background.g = 43
 _reive.defaults.colors.background.b = 54
 _reive.defaults.colors.background.a = 200
+
 _reive.defaults.colors.reive = {}
 _reive.defaults.colors.reive.title = {}
 _reive.defaults.colors.reive.title.r = 220
 _reive.defaults.colors.reive.title.g = 50
 _reive.defaults.colors.reive.title.b = 47
+
 _reive.defaults.colors.reive.label = {}
 _reive.defaults.colors.reive.label.r = 38
 _reive.defaults.colors.reive.label.g = 139
 _reive.defaults.colors.reive.label.b = 210
+
 _reive.defaults.colors.reive.value = {}
 _reive.defaults.colors.reive.value.r = 147
 _reive.defaults.colors.reive.value.g = 161
 _reive.defaults.colors.reive.value.b = 161
+
 _reive.defaults.colors.score = {}
 _reive.defaults.colors.score.title = {}
 _reive.defaults.colors.score.title.r = 220
 _reive.defaults.colors.score.title.g = 50
 _reive.defaults.colors.score.title.b = 47
+
 _reive.defaults.colors.score.label = {}
 _reive.defaults.colors.score.label.r = 42
 _reive.defaults.colors.score.label.g = 161
 _reive.defaults.colors.score.label.b = 152
+
 _reive.defaults.colors.bonus = {}
 _reive.defaults.colors.bonus.title = {}
 _reive.defaults.colors.bonus.title.r = 220
 _reive.defaults.colors.bonus.title.g = 50
 _reive.defaults.colors.bonus.title.b = 47
+
 _reive.defaults.colors.bonus.label = {}
 _reive.defaults.colors.bonus.label.r = 133
 _reive.defaults.colors.bonus.label.g = 153
 _reive.defaults.colors.bonus.label.b = 0
+
 _reive.defaults.colors.bonus.value = {}
 _reive.defaults.colors.bonus.value.r = 147
 _reive.defaults.colors.bonus.value.g = 161
 _reive.defaults.colors.bonus.value.b = 161
-
-_reive.settings = {}
 
 function event_addon_command(cmd)
     if cmd == 'test' then
@@ -185,11 +214,13 @@ function _reive:refresh(...)
     local bonuses       = '';
 
     for index, bonus in pairs(_reive.stats.bonuses:keyset():sort()) do
-        local amount = _reive.stats.bonuses[bonus]
+        if type(_reive.bonuses_map[bonus]) == 'nil' or _reive.settings.track[_reive.bonuses_map[bonus]] == true then
+            local amount = _reive.stats.bonuses[bonus]
 
-        bonuses = bonuses..
-            '\n \\cs('..bonusesColors.label.r..', '..bonusesColors.label.g..', '..bonusesColors.label.b..')'..bonus..':\\cr'..
-            ' \\cs('..bonusesColors.value.r..', '..bonusesColors.value.g..', '..bonusesColors.value.b..')'..amount..'\\cr '
+            bonuses = bonuses..
+                '\n \\cs('..bonusesColors.label.r..', '..bonusesColors.label.g..', '..bonusesColors.label.b..')'..bonus..':\\cr'..
+                ' \\cs('..bonusesColors.value.r..', '..bonusesColors.value.g..', '..bonusesColors.value.b..')'..amount..'\\cr '
+        end
     end
 
     if #bonuses > 0 then
