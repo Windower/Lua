@@ -68,6 +68,10 @@
     <bugtracker>https://github.com/banggugyangu/Lua/issues</bugtracker>
   </addon>
   <addon>
+  	<name>reive</name>
+  	<description>tracks exp, bayld, momentum scores and bonuses during a reive.</description>
+  </addon>
+  <addon>
     <name>Scoreboard</name>
     <author>Suji</author>
     <description>Basic in-game damage parser. It displays live DPS and works even when chat filters are enabled.</description>
