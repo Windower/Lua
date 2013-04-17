@@ -68,5 +68,14 @@
 			<y>350</y>
 		</position>
 		<reset_on_start>false</reset_on_start>
+		<track>
+			<abilities_recovery>true</abilities_recovery>
+			<hp_mp_boost>true</hp_mp_boost>
+			<hp_recovery>true</hp_recovery>
+			<mp_recovery>true</mp_recovery>
+			<status_recovery>true</status_recovery>
+			<stoneskin>true</stoneskin>
+			<tp_recovery>true</tp_recovery>
+		</track>
 	</global>
 </settings>
