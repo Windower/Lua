@@ -2,7 +2,7 @@
 
 _addon = _addon or {}
 _addon.name = 'Scoreboard'
-_addon.version = 0.6
+_addon.version = 0.7
 
 require 'tablehelper'
 require 'stringhelper'
