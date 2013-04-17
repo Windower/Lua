@@ -270,8 +270,8 @@
 	<dtd id="268" english="${actor} casts ${spell}.${lb}Magic Burst!${lb}${target} receives the effect of ${status}." color="57"/>
 	<dtd id="269" english="Magic Burst!${lb}${target} receives the effect of ${status}." color="57"/>
 	<dtd id="270" english="${target} is ${status}." color="122"/>
-	<dtd id="271" english="${actor} casts ${spell}.${lb}Magic Burst!${lb}${target} is ${status}." color="1"/>
-	<dtd id="272" english="Magic Burst!${lb}${target} is ${status}." color="1"/>
+	<dtd id="271" english="${actor} casts ${spell}.${lb}Magic Burst!${lb}${target} is ${status}." color="56"/>
+	<dtd id="272" english="Magic Burst!${lb}${target} is ${status}." color="56"/>
 	<dtd id="273" english="${target} vanishes!" color="64"/>
 	<dtd id="274" english="${actor} casts ${spell}.${lb}Magic Burst!${lb}${number} HP drained from ${target}." color="H" units="HP"/>
 	<dtd id="275" english="${actor} casts ${spell}.${lb}Magic Burst!${lb}${number} MP drained from ${target}." color="H" units="MP"/>

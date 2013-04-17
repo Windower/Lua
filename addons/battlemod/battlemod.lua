@@ -23,9 +23,14 @@
 --ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+-- Libs --
 file = require 'filehelper'
 config = require 'config'
 require 'tablehelper'
+
+-- Battlemod Files --
 require 'event_action'
 require 'generic_helpers'
 
@@ -43,7 +48,7 @@ function event_load()
 	line_roll = 'Roll line is not loading'
 	skillchain_arr = {'Light:','Darkness:','Gravitation:','Fragmentation:','Distortion:','Fusion:','Compression:','Liquefaction:','Induration:','Reverberation:','Transfixion:','Scission:','Detonation:','Impaction:'}
 	ratings_arr = {'TW','EP','DC','EM','T','VT','IT'}
-    send_command('alias bm lua c battlemod cmd')
+	rcol = string.char(0x1E,0x01)
 	blocked_colors = T{20,21,22,23,24,25,26,28,29,31,32,33,35,36,37,40,41,42,43,44,50,51,52,56,57,59,60,69,64,65,67,69,81,85,90,91,100,101,102,104,105,106,110,111,112,114,122,163,164,168,171,175,177,183,185,186,191,291} -- 37 and 291 might be unique colors, but they are not gsubbable.
 	passed_messages = T{4,5,6,16,17,18,20,34,35,36,40,48,64,78,87,88,89,90,116,154,170,171,172,173,174,175,176,177,178,191,192,198,204,206,217,218,234,249,313,328,350,336,531,558,561,575,601,609,610,611,612,613,614,615,616,617,618,619,620,625,626,627,628,629,630,631,632,633,634,635,636,643}
 	agg_messages = T{75,93,116,131,134,144,146,148,150,186,206,230,236,237,243,319,364,414,420,422,424,425,426,570,668} -- 243 added recently
@@ -73,7 +78,8 @@ function event_load()
 	for i,v in pairs(parse_resources(itemsWFile:readlines())) do
 		items[i]=v
 	end
-		
+	
+    send_command('alias bm lua c battlemod cmd')
 	options_load()
 	collectgarbage()
 end
@@ -358,7 +364,7 @@ function colconv(str,key)
 	elseif strnum >0 then
 		out = string.char(0x1F,strnum)
 	elseif strnum == 0 then
-		out = string.char(0x1E,0x01)
+		out = rcol
 	else
 		write('You have an invalid color '..key)
 		out = string.char(0x1F,1)
@@ -503,28 +509,17 @@ function event_action_message(actor_id,index,actor_target_index,target_target_in
 			spell = nf(spells[param_1],'english')
 		end
 		
-		if status == nil then status = '' else
-			status = color_arr['statuscol']..status..string.char(0x1E,0x01)
-		end
-		if spell == nil then spell = '' else
-			spell = color_arr['spellcol']..spell..string.char(0x1E,0x01)
-		end
-		if target == nil then target = '' else
-			target = namecol(target,target_table,party_table)
-		end
-		if actor == nil then actor = '' else
-			actor = namecol(actor,actor_table,party_table)
-		end
-		if skill == nil then skill = '' else
-			skill = color_arr['abilcol']..skill..string.char(0x1E,0x01)
-		end
+		if status then status = color_arr['statuscol']..status..rcol end
+		if spell then spell = color_arr['spellcol']..spell..rcol end
+		if target then target = namecol(target,target_table,party_table) end
+		if actor then actor = namecol(actor,actor_table,party_table) end
+		if skill then skill = color_arr['abilcol']..skill..rcol end
 		
 		if actor ~= nil then
 			local outstr = dialog[message_id]['english']:gsub('$\123actor\125',actor or ''):gsub('$\123status\125',status or ''):gsub('$\123target\125',target or ''):gsub('$\123spell\125',spell or ''):gsub('$\123skill\125',skill or ''):gsub('$\123number\125',number or ''):gsub('$\123number2\125',number2 or ''):gsub('$\123lb\125','\7')
 			add_to_chat(dialog[message_id]['color'],string.char(0x1F,0xFE,0x1E,0x01)..outstr..string.char(127,49))
 		end
 	elseif message_id == 62 or message_id == 251 then
-	-- Message 16 is "casting is interrupted" :: This is redundant with event_action, so I'm ignoring it.
 	-- 62 is "fails to activate" but it is color 121 so I cannot block it because I would also accidentally block a lot of system messages. Thus I have to ignore it.
 	-- Message 251 is "about to wear off" but it is color 123 so I cannot block it because I would also block "you failed to swap that gear, idiot!" messages. Thus I have to ignore it.
 	elseif message_id == 202 then

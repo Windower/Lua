@@ -22,7 +22,7 @@ function event_action(act)
 			local msg_ID = act['targets'][i]['actions'][n]['message']
 			if not nf(dialog[msg_ID],'english') then return end
 			
-			local prepstr,abil,add_eff_str,spike_str,forcemsg,wsparm,status,number,gil,abil_ID,effect_val
+			local prepstr,abil,add_eff_str,spike_str,wsparm,status,number,gil,abil_ID,effect_val
 			
 			local flipped = false
 			local target_table = get_mob_by_id(act['targets'][i]['id'])
@@ -75,9 +75,13 @@ function event_action(act)
 			local fields = fieldsearch(dialog[msg_ID]['english'])
 			
 			if table.contains(fields,'spell') then
-				spell = color_arr['spellcol']..spells[abil_ID]['english']..string.char(0x1E,0x01)
+				spell = spells[abil_ID]['english']
+				if T{252,265,268,269,271,272,274,275,650}:contains(msg_ID) then
+					spell = 'Magic Burst '..spell
+				end
+				spell = color_arr['spellcol']..spell..rcol
 			elseif table.contains(fields,'item') then
-				item = color_arr['itemcol']..items[abil_ID]['enl']..string.char(0x1E,0x01)
+				item = color_arr['itemcol']..items[abil_ID]['enl']..rcol
 			elseif table.contains(fields,'ability') then
 				if abil_ID == 53 then -- Gauge handling
 					if msg_ID == 210 then
@@ -91,29 +95,31 @@ function event_action(act)
 					elseif msg_ID == 214 then
 						ability = 'Gauge (Should be able - '
 					end
-					ability = color_arr['abilcol']..ability..effect_val..')'..string.char(0x1E,0x01)
+					ability = ability..effect_val..')'
 				else
-					ability = color_arr['abilcol']..jobabilities[abil_ID]['english']..string.char(0x1E,0x01)
+					ability = jobabilities[abil_ID]['english']
 				end
+				if msg_ID == 379 then ability = 'Magic Burst '..ability end
+				ability = color_arr['abilcol']..ability..rcol
 			elseif table.contains(fields,'weapon_skill') then
 				if actor_table['is_npc'] then
 					weapon_skill = mabils[abil_ID-256]['english']
 					if weapon_skill == '.' then
 						weapon_skill = 'Special Attack'
 					end
-					weapon_skill = color_arr['mobwscol']..weapon_skill..string.char(0x1E,0x01)
+					weapon_skill = color_arr['mobwscol']..weapon_skill..rcol
 				else
-					weapon_skill = color_arr['wscol']..jobabilities[abil_ID+768]['english']..string.char(0x1E,0x01)
+					weapon_skill = color_arr['wscol']..jobabilities[abil_ID+768]['english']..rcol
 				end
 			end
 			
 			if table.contains(fields,'status') then
 				if act['targets'][i]['actions'][n]['param'] == 0 or act['targets'][i]['actions'][n]['param'] == 255 then
-					status = color_arr['statuscol']..'No effect'..string.char(0x1E,0x01)
+					status = color_arr['statuscol']..'No effect'..rcol
 --				elseif statuses[act['targets'][i]['actions'][n]['param']] ~= nil then
---					status = color_arr['statuscol']..statuses[act['targets'][i]['actions'][n]['param']]['english']..string.char(0x1E,0x01)
+--					status = color_arr['statuscol']..statuses[act['targets'][i]['actions'][n]['param']]['english']..rcol
 				else
-					status = color_arr['statuscol']..statuses[effect_val]['english']..string.char(0x1E,0x01)
+					status = color_arr['statuscol']..statuses[effect_val]['english']..rcol
 				end
 			elseif table.contains(fields,'number') then
 				number = effect_val
@@ -126,7 +132,7 @@ function event_action(act)
 			
 			-- Special Message Handling
 			if msg_ID == 93 or msg_ID == 273 then
-				status=color_arr['statuscol']..'Vanish'..string.char(0x1E,0x01)
+				status=color_arr['statuscol']..'Vanish'..rcol
 			elseif msg_ID == 522 and condensebattle then
 				target = target..' (stunned)'
 			elseif T{158,188,245,324,592,658}:contains(msg_ID) and condensebattle then
@@ -143,10 +149,10 @@ function event_action(act)
 			--elseif msg_ID ~= 0 and number then
 			--	if dialog[msg_ID]['color'] == 'H' and condensebattle then
 			--		if statuses[number] then
-			--			status = color_arr['statuscol']..statuses[number]['english']..string.char(0x1E,0x01)
+			--			status = color_arr['statuscol']..statuses[number]['english']..rcol
 			--		elseif debugging then
 			--			write('status_debug: '..number)
-			--			status = color_arr['statuscol']..statuses[number]['english']..string.char(0x1E,0x01)
+			--			status = color_arr['statuscol']..statuses[number]['english']..rcol
 			--		end
 			--	end
 			
@@ -192,52 +198,48 @@ function event_action(act)
 			
 			-- Construct the message to be sent out --
 			if prepstr then
-				if forcemsg == nil then
-					if aggregate ~= true then
-						if check_filter(actor_table,party_table,target_table,act['category'],msg) then
-							if dialog[msg_ID]['color'] ~= nil then
-								add_to_chat(colorfilt(dialog[msg_ID]['color'],target_table['is_npc'],target_table['id']==party_table['p0']['mob']['id']),string.char(0x1F,0xFE,0x1E,0x01)..prepstr:gsub('$\123target\125',target or '')..string.char(127,49))
-							elseif debugging then
-								add_to_chat(1,string.char(0x1F,0xFE,0x1E,0x01)..prepstr:gsub('$\123target\125',target or '')..string.char(127,49))
-							end
+				if aggregate ~= true then
+					if check_filter(actor_table,party_table,target_table,act['category'],msg) then
+						if dialog[msg_ID]['color'] ~= nil then
+							add_to_chat(colorfilt(dialog[msg_ID]['color'],target_table['id']==party_table['p0']['mob']['id']),string.char(0x1F,0xFE,0x1E,0x01)..prepstr:gsub('$\123target\125',target or '')..string.char(127,49))
+						elseif debugging then
+							add_to_chat(1,string.char(0x1F,0xFE,0x1E,0x01)..prepstr:gsub('$\123target\125',target or '')..string.char(127,49))
 						end
-					elseif i==1 then
-						if condensebattle then
-							eventual_send = check_filter(actor_table,party_table,target_table,act['category'],msg)
-							if msg_ID>419 and msg_ID<430 then
-								if act['targets'][i]['actions'][n]['param'] == 12 then -- Bust is always 12
-									number = 'Bust!'
-								end
-								persistantmessage = line_roll:gsub('$\123status\125',status or ''):gsub('$\123actor\125',actor or ''):gsub('$\123number\125',number or ''):gsub('$\123abil\125',abil or '')
-							else
-								persistantmessage = line_aoebuff:gsub('$\123status\125',status or ''):gsub('$\123actor\125',actor or ''):gsub('$\123abil\125',abil or '')
+					end
+				elseif i==1 then
+					if condensebattle then
+						eventual_send = check_filter(actor_table,party_table,target_table,act['category'],msg)
+						if msg_ID>419 and msg_ID<430 then
+							if act['targets'][i]['actions'][n]['param'] == 12 then -- Bust is always 12
+								number = 'Bust!'
 							end
+							persistantmessage = line_roll:gsub('$\123status\125',status or ''):gsub('$\123actor\125',actor or ''):gsub('$\123number\125',number or ''):gsub('$\123abil\125',abil or '')
 						else
-							persistantmessage = prepstr
-						end
-						persistantcolor = dialog[msg_ID]['color']
-						persistanttarget = target
-						if act['target_count'] == 1 and check_filter(actor_table,party_table,target_table,act['category'],msg) then
-							add_to_chat(persistantcolor,persistantmessage)
+							persistantmessage = line_aoebuff:gsub('$\123status\125',status or ''):gsub('$\123actor\125',actor or ''):gsub('$\123abil\125',abil or '')
 						end
 					else
-						-- Applies the proper connectors to the target series
-						if i < act['target_count'] then
+						persistantmessage = prepstr
+					end
+					persistantcolor = dialog[msg_ID]['color']
+					persistanttarget = target
+					if act['target_count'] == 1 and check_filter(actor_table,party_table,target_table,act['category'],msg) then
+						add_to_chat(persistantcolor,persistantmessage)
+					end
+				else
+					-- Applies the proper connectors to the target series
+					if i < act['target_count'] then
+						persistanttarget = persistanttarget..', '
+					else
+						if commamode then
 							persistanttarget = persistanttarget..', '
 						else
-							if commamode then
-								persistanttarget = persistanttarget..', '
-							else
-								if oxford and act['target_count'] >2 then
-									persistanttarget = persistanttarget..','
-								end
-								persistanttarget = persistanttarget..' and '
-							end	
-						end
-						persistanttarget = persistanttarget..target
+							if oxford and act['target_count'] >2 then
+								persistanttarget = persistanttarget..','
+							end
+							persistanttarget = persistanttarget..' and '
+						end	
 					end
-				elseif check_filter(actor_table,party_table,target_table,act['category'],msg) then
-					add_to_chat(dialog[forcemsg]['color'],string.char(0x1F,0xFE,0x1E,0x01)..prepstr..string.char(0x1E,0x01))
+					persistanttarget = persistanttarget..target
 				end
 			end
 			
@@ -274,7 +276,7 @@ function event_action(act)
 				end
 			end
 			if add_eff_str ~= nil and check_filter(actor_table,party_table,target_table,act['category'],addmsg) then
-				add_to_chat(colorfilt(dialog[addmsg]['color'],target_table['is_npc'],target_table['id']==party_table['p0']['id']),string.char(0x1F,0xFE,0x1E,0x01)..add_eff_str..string.char(127,49))
+				add_to_chat(colorfilt(dialog[addmsg]['color'],target_table['id']==party_table['p0']['id']),string.char(0x1F,0xFE,0x1E,0x01)..add_eff_str..string.char(127,49))
 			end
 			
 			number = nil
@@ -319,7 +321,7 @@ function event_action(act)
 				end
 			end
 			if spike_str ~= nil and check_filter(actor_table,party_table,target_table,spkmsg) then
-				add_to_chat(colorfilt(dialog[spkmsg]['color'],target_table['is_npc'],target_table['id']==party_table['p0']['id']),string.char(0x1F,0xFE,0x1E,0x01)..spike_str..string.char(127,49))
+				add_to_chat(colorfilt(dialog[spkmsg]['color'],target_table['id']==party_table['p0']['id']),string.char(0x1F,0xFE,0x1E,0x01)..spike_str..string.char(127,49))
 			end
 			
 			if flipped then actor,actor_table,target,target_table,flipped = flip(actor,actor_table,target,target_table,flipped) end
@@ -344,33 +346,34 @@ function namecol(player,player_table,party_table)
 		if player_table['id']%4096>2048 then
 			for i,v in pairs(party_table) do
 				if nf(v['mob'],'pet_index') == player_table['index'] then
-					player = color_arr[i]..player..string.char(0x1E,0x01)
+					player = color_arr[i]..player..rcol
 					break
 				end
 			end
 		else
-			player = color_arr['mob']..player..string.char(0x1E,0x01)
+			player = color_arr['mob']..player..rcol
 		end
 	else
 		for i,v in pairs(party_table) do
 			if nf(v['mob'],'id') == player_table['id'] then
-				player = color_arr[i]..player..string.char(0x1E,0x01)
+				player = color_arr[i]..player..rcol
 				break
 			end
 		end
 	end
 	if player~= nil then -- when you zone into an area, sometimes you can get no player value.
-		if player:sub(-2,-1) ~= string.char(0x1E,0x01) then
-			player = color_arr['other']..player..string.char(0x1E,0x01)
+		if player:sub(-2,-1) ~= rcol then
+			player = color_arr['other']..player..rcol
 		end
 	end
 	return player
 end
 
-function colorfilt(col,is_npc,is_me)
+function colorfilt(col,is_me)
 	--Used to convert situational colors from the resources into real colors
-	--Depends on whether the target is an NPC or player and whether it is you
+	--Depends on whether or not the target is you, the same as using in-game colors
 	-- Returns a color code for add_to_chat()
+	-- Does not currently support a Debuff/Buff distinction
 	if col == "D" then -- Damage
 		if is_me then
 			return 28
