@@ -335,7 +335,7 @@
 	<dtd id="333" english="${actor} casts ${spell}.${lb}${target}'s INT is drained." color="34"/>
 	<dtd id="334" english="${actor} casts ${spell}.${lb}${target}'s MND is drained." color="34"/>
 	<dtd id="335" english="${actor} casts ${spell}.${lb}${target}'s CHR is drained." color="34"/>
-	<dtd id="336" english="No effect on that pet." color="1"/>
+	<dtd id="336" english="No effect on that pet." color="59"/>
 	<dtd id="337" english="You do not have the necessary item equipped to call a beast." color="1"/>
 	<dtd id="338" english="You cannot summon avatars here." color="1"/>
 	<dtd id="339" english="Your chocobo senses a hostile presence and refuses to come to your side." color="1"/>

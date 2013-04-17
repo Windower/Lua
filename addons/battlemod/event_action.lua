@@ -204,9 +204,7 @@ function event_action(act)
 					-- Handles for Category 1,2,3,4,6, and 14
 					a,b = string.find(dialog[act['targets'][i]['actions'][n]['message']]['english'],'$\123number\125')
 					if a == nil then -- Distinguishes between Status effects and Damage/Healing.
-						if act['category'] ~= 3 or act['param'] ~= 53 then -- passes Gauge messages through. There must be a better way to do this.
-							number = nil
-						end
+						number = nil
 					end
 					if condensebattle then
 						if abil and number and target and actor then
