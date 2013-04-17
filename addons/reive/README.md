@@ -27,21 +27,13 @@ There is only one configuration file called settings.xml in the data folder of t
 * **add:** the user can decide which bonuses will appear in the window. new voices added to the settings.xml file:
 ```xml
     <track>
-
         <abilities_recovery>true</abilities_recovery>
-
         <hp_mp_boost>true</hp_mp_boost>
-
         <hp_recovery>true</hp_recovery>
-
         <mp_recovery>true</mp_recovery>
-
         <status_recovery>true</status_recovery>
-
         <stoneskin>true</stoneskin>
-
         <tp_recovery>true</tp_recovery>
-
     </track>
 ```
 
