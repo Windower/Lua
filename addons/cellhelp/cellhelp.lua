@@ -150,7 +150,7 @@ function event_addon_command(...)
 end
 
 function event_load()
-	send_command('alias ch lua c cellhelpv2')
+	send_command('alias ch lua c cellhelp')
 	player = get_player()['name']
 	write('CellHelp loaded.  CellHelp Authors: Cerberus.Balloon and Bahamut.Krizz')
 	mode = settingtab["mode"]
