@@ -15,16 +15,16 @@ _libs.filehelper = _libs.filehelper or (files ~= nil)
 _addon = _addon or T{}
 
 local logger = T{}
-logger.settings = T{}
+logger.defaults = T{}
 local file
 
 -- Set up, based on addon.
-logger.settings.logtofile = logger.settings.logtofile or false
-logger.settings.defaultfile = logger.settings.defaultfile or 'lua.log'
-logger.settings.logcolor = logger.settings.logcolor or 207
-logger.settings.errorcolor = logger.settings.errorcolor or 167
-logger.settings.warningcolor = logger.settings.warningcolor or 200
-logger.settings.noticecolor = logger.settings.noticecolor or 160
+logger.defaults.logtofile = false
+logger.defaults.defaultfile = 'lua.log'
+logger.defaults.logcolor = 207
+logger.defaults.errorcolor = 167
+logger.defaults.warningcolor = 200
+logger.defaults.noticecolor = 160
 
 --[[
 	Local functions
@@ -207,6 +207,6 @@ function table.vprint(t, keys)
 end
 
 -- Load logger settings (has to be after the logging functions have been defined, so those work in the config and related files).
-logger.settings = config.load('../libs/logger.xml', logger.settings)
+logger.settings = config.load('../libs/logger.xml', logger.defaults)
 file = files.new(logger.settings.defaultfile, true)
 config.reset()
