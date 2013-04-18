@@ -30,7 +30,7 @@ local settings_xml
 local nest_xml
 local table_diff
 
--- Loads a specified file, or alternatively a file 'settings.json' or 'settings.xml' in the current addon folder.
+-- Loads a specified file, or alternatively a file 'settings.xml' in the current addon/data folder.
 -- Writes all configs to _config.
 function config.load(filename, confdict, overwrite)
 	if type(filename) == 'table' then
@@ -131,10 +131,6 @@ function settings_table(node, confdict, key)
 		local num = tonumber(val)
 		if num ~= nil then
 			return num
-		end
-		
-		if confdict:containskey(node.name) and type(confdict[node.name]) == 'table' then
-			return val:psplit('%s*,%s*')
 		end
 		
 		return val
