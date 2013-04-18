@@ -144,6 +144,8 @@ function table.tostring(t)
 	return '{'..tstr..'}'
 end
 
+_meta.T.__tostring = table.tostring
+
 -- Prints a string representation of a table in explicit Lua syntax: {...}
 function table.print(t, keys)
 	log(T(t):tostring(keys))

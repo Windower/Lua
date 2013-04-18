@@ -10,7 +10,6 @@ _libs.mathhelper = _libs.mathhelper or require 'mathhelper'
 
 debug.getmetatable('').__index = string
 debug.getmetatable('').__unm = functools.negate..functools.equals
---debug.getmetatable('').__unm = function(...) log(#T{...}) end
 
 -- Returns the character at position pos. Negative positions are counted from the opposite end.
 function string.at(str, pos)

@@ -11,24 +11,27 @@ _libs.tablehelper = true
 _libs.mathhelper = _libs.mathhelper or require 'mathhelper'
 _libs.functools = _libs.functools or require 'functools'
 
+--[[
+	Signaturs
+]]
+
+_meta = _meta or {}
+_meta.T = {}
+_meta.T.__index = table
+
 -- Constructor for T-tables.
 -- t = T{...} for explicit declaration.
 -- t = T(regular_table) to cast to a T-table.
-function T(t, ...)
-	if t == nil then
-		return T{}
-	end
-	
-	if type(t) ~= 'table' then
-		return T{t, ...}
-	end
+function T(t)
+	t = t or {}
 	
 	-- Sets T's metatable's index to the table namespace, which will take effect for all T-tables.
 	-- This makes every function that tables have also available for T-tables.
-	return setmetatable(t, {__index = table, __add = table.extend, __tostring=table.tostring})
+	return setmetatable(t, _meta.T)
 end
 
 _libs = T(_libs)
+_meta = T(_meta)
 
 -- Checks if a table is an array, only having sequential integer keys.
 function table.isarray(t)
@@ -100,6 +103,8 @@ function table.extend(t, t_extend)
 
 	return t
 end
+
+_meta.T.__add = table.extend
 
 -- Returns the number of element in the table that satisfy fn. If fn is not a function, counts the number of occurrences of fn.
 function table.count(t, fn)
