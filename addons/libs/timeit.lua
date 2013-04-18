@@ -46,7 +46,7 @@ function timeit.benchmark(rep, ...)
 	local args = T{...}
 	if type(rep) == 'function' then
 		args:insert(1, rep)
-		rep = 100
+		rep = 1000
 	end
 	
 	local fns = T{}
@@ -63,14 +63,17 @@ function timeit.benchmark(rep, ...)
 		fns = args:chunks(2):map(function(x) return x[1]+x[2] end)
 	end
 	
-	local timer = timeit.new()
+	local single_timer = timeit.new()
+	local total_timer = timeit.new()
 	
 	local times = T{}
+	total_timer:start()
 	for _, fn in ipairs(fns) do
-		timer:start()
+		single_timer:start()
 		for _ = 1, rep do fn() end
-		times:append(timer:stop()/rep)
+		times:append(single_timer:stop()/rep)
 	end
+	local total = total_timer:stop()
 	
 	local bktimes = times:copy()
 	times:sort()
@@ -88,6 +91,7 @@ function timeit.benchmark(rep, ...)
 			log(string.format(str..', ~%d%% slower than function %d', place, i, times[place]/10^unit, 100*times[place]/times:first(), math.round(100*(times[place]/times:first() - 1)), indices:first()))
 		end
 	end
+	log(string.format('Total running time: %2.2fs', total))
 	
 	fns = nil
 	times = nil
