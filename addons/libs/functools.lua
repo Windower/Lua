@@ -43,10 +43,9 @@ function functools.pipe(fn1, fn2)
 end
 
 -- Returns a closure over the argument el that returns true, if its argument equals el.
-function functools.equals(...)
-	local args = T{...}
-	return function(...)
-		return args:equals(T{...})
+function functools.equals(el)
+	return function(cmp)
+		return el == cmp
 	end
 end
 

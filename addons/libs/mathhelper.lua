@@ -7,6 +7,8 @@ _libs.mathhelper = true
 _libs.tablehelper = _libs.tablehelper or require 'tablehelper'
 _libs.stringhelper = _libs.stringhelper or require 'stringhelper'
 
+debug.setmetatable(0, {__index=math})
+
 -- Order of digits in an for higher base math
 math.digitorder = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
