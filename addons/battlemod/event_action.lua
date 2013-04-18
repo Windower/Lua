@@ -107,7 +107,7 @@ function event_action(act)
 						if abil_ID ~= 1531 then
 							weapon_skill = mabils[abil_ID-256]['english']
 						end
-					elseif act['category'] == 3 then
+					elseif act['category'] == 3 or abil_ID<257 then
 						weapon_skill = jobabilities[abil_ID+768]['english']
 					end
 					if weapon_skill == '.' then
