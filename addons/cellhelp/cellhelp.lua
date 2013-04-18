@@ -81,8 +81,9 @@ function settings_create()
 	for i=1, #players do
 		playernumber = players[i]
 		players[players[i]] = settingtab[set][playernumber]['name']
-		if players[players[i]] == player then
+		if players[players[i]] == player and players[players[i]] ~= "" then
 			player_num = players[i]
+		else player_num = 'player1'
 		end
 	end
 
@@ -163,8 +164,7 @@ function event_load()
 end 
 
 function event_login()
-	player = get_player()['name']
-
+	settings_create()
 end
 
 function orderlots()
