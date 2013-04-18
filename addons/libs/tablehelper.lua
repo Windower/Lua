@@ -256,7 +256,7 @@ end
 
 -- Flattens a table by splicing all nested tables in at their respective position.
 function table.flatten(t, recursive)
-	recursive = recursive or true
+	recursive = true and (recursive ~= false)
 	local res = T{}
 	for key, val in ipairs(t) do
 		if type(val) == 'table' then

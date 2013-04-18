@@ -4,16 +4,16 @@ File handler.
 
 _libs = _libs or {}
 _libs.filehelper = true
-_libs.logger = _libs.logger or require 'logger'
 _libs.tablehelper = _libs.tablehelper or require 'tablehelper'
 _libs.stringhelper = _libs.stringhelper or require 'stringhelper'
+_libs.logger = _libs.logger or require 'logger'
 
 local file = T{}
 local createfile = false
 
 -- Create a new file object. Accepts a variable number of paths, which it will
 function file.new(path, create)
-	create = create or true
+	create = true and (create ~= false)
 	
 	if path == nil then
 		return setmetatable(T{}, {__index = file})
@@ -36,7 +36,7 @@ end
 
 -- Sets the file to a path value.
 function file.set(f, path, create)
-	create = create or true
+	create = true and (create ~= false)
 	createfile = create
 	
 	f.path = path
@@ -177,7 +177,7 @@ function file.append(f, content, newline)
 		path = f.path
 	end
 
-	newline = newline or true
+	newline = true and (newline ~= false)
 	if type(content) == 'table' then
 		if newline then
 			content = T(content):concat('\n')

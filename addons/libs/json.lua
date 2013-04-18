@@ -39,7 +39,7 @@ end
 -- Object and error groupings will be eliminated during the classifying process.
 -- If stripquotes is set to true, quote characters delimiting strings will be stripped.
 function json.make_val(str, stripquotes)
-	stripquotes = stripquotes or true
+	stripquotes = true and (stripquotes ~= false)
 
 	str = str:trim()
 	if str == '' then
