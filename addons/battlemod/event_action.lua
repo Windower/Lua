@@ -103,7 +103,11 @@ function event_action(act)
 				ability = color_arr['abilcol']..ability..rcol
 			elseif table.contains(fields,'weapon_skill') then
 				if actor_table['is_npc'] then
-					weapon_skill = mabils[abil_ID-256]['english']
+					if act['category'] ~=3 and mabils[abil_ID-256] then
+						weapon_skill = mabils[abil_ID-256]['english']
+					elseif act['category'] == 3 then
+						weapon_skill = jobabilities[abil_ID+768]['english']
+					end
 					if weapon_skill == '.' then
 						weapon_skill = 'Special Attack'
 					end
