@@ -10,7 +10,6 @@ _libs = _libs or {}
 _libs.tablehelper = true
 _libs.mathhelper = _libs.mathhelper or require 'mathhelper'
 _libs.functools = _libs.functools or require 'functools'
-_libs.logger = _libs.logger or require 'logger'
 
 -- Constructor for T-tables.
 -- t = T{...} for explicit declaration.
