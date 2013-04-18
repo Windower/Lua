@@ -44,7 +44,7 @@ function config.load(filename, confdict, overwrite)
 	overwrite = overwrite or false
 	
 	local confdict_mt = getmetatable(confdict)
-	confdict = setmetatable(confdict, {__index = function(t, x) if x == 'save' then return config['save'] else return confdict_mt.__index[x] end end})
+	confdict = setmetatable(confdict, {__index = function(t, x) if config[x] ~= nil then return config[x] else return confdict_mt.__index[x] end end})
 	
 	-- Sets paths depending on whether it's a script or addon loading this file.
 	local filepath = filename or files.check('data/settings.xml')
@@ -229,7 +229,12 @@ function settings_xml(settings)
 	for _, char in ipairs(T{'global'}+chars) do
 		if char == 'global' and comments['settings'] ~= nil then
 			str = str..'\t<!--\n'
-			str = str..'\t\t'..comments['settings']..'\n'
+			local comment_lines = comments['settings']:split('\n')
+			for line, comment in ipairs(comment_lines) do
+				if line < #comment_lines then
+					str = str..'\t\t'..comment:trim()..'\n'
+				end
+			end
 			str = str..'\t-->\n'
 		end
 		str = str..'\t<'..char..'>\n'
