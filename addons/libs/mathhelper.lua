@@ -49,7 +49,7 @@ end
 
 -- Returns a hex string representation of val.
 function math.tohex(val)
-	return '0x'..math.tobase(val, 16)
+	return math.tobase(val, 16)
 end
 
 -- Converts a number val to a string in base base.
