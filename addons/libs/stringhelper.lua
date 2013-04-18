@@ -8,7 +8,7 @@ _libs.tablehelper = _libs.tablehelper or require 'tablehelper'
 _libs.functools = _libs.functools or require 'functools'
 _libs.mathhelper = _libs.mathhelper or require 'mathhelper'
 
-debug.getmetatable("").__index = string
+debug.getmetatable('').__index = string
 
 -- Returns the character at position pos. Negative positions are counted from the opposite end.
 function string.at(str, pos)
@@ -32,14 +32,14 @@ function string.contains(str, sub)
 	return str:find(sub, nil, true)
 end
 
--- Splits a string into a table by a separator pattern. Empty strings are ignored.
+-- Splits a string into a table by a separator pattern.
 function string.psplit(str, sep, maxsplit)
 	maxsplit = maxsplit or 0
 	
 	return str:split(sep, maxsplit, false)
 end
 
--- Splits a string into a table by a separator string. Empty strings are ignored.
+-- Splits a string into a table by a separator string.
 function string.split(str, sep, maxsplit, pattern)
 	maxsplit = maxsplit or 0
 	if pattern == nil then
@@ -48,20 +48,17 @@ function string.split(str, sep, maxsplit, pattern)
 	
 	local res = T{}
 	local i = 1
-	while i <= #str do
+	while i <= #str + 1 do
 		-- Find the next occurence of sep.
 		local startpos, endpos = str:find(sep, i, pattern)
 		-- If found, get the substring and append it to the table.
 		if startpos ~= nil then
 			matchstr = string.slice(str, i, startpos-1)
-			-- Ignore empty string
-			if #matchstr > 0 then
-				res:append(matchstr)
-				-- If maximum number of splits reached, return
-				if #res == maxsplit - 1 then
-					res:append(str:slice(endpos + 1))
-					break
-				end
+			res:append(matchstr)
+			-- If maximum number of splits reached, return
+			if #res == maxsplit - 1 then
+				res:append(str:slice(endpos + 1))
+				break
 			end
 			i = endpos + 1
 		-- If not found, no more separaters to split, append the remaining string.
@@ -203,7 +200,7 @@ end
 
 -- Checks if a string is empty
 function string.isempty(str)
-	return str:len() == 0
+	return str == ''
 end
 
 -- Counts the occurrences of a substring in a string.
