@@ -31,6 +31,14 @@
     <description>Customizes battle chat messages.</description>
   </addon>
   <addon>
+    <name>Cell Help</name>
+    <description>Tracks cells that are needed, displays your position in the lot order, and creates the appropriate LL profiles.</description>
+  </addon>
+  <addon>
+    <name>Dynamis Helper</name>
+    <description>Displays a timer when a mob is procced, tracks currency obtained, and can create a LL to lot all currency.</description>
+  </addon>
+  <addon>
     <name>FFOColor</name>
     <description>Allows you to show FFOChat text in one of the 5 game chat channels. As well as specify colors for the text</description>
   </addon>
