@@ -120,7 +120,7 @@ function event_action(act)
 					weapon_skill = color_arr['wscol']..jobabilities[abil_ID+768]['english']..rcol
 				end
 			end
-			
+
 			if table.contains(fields,'status') then
 				if act['targets'][i]['actions'][n]['param'] == 0 or act['targets'][i]['actions'][n]['param'] == 255 then
 					status = color_arr['statuscol']..'No effect'..rcol
@@ -156,15 +156,6 @@ function event_action(act)
 				abil = weapon_skill or ability or spell or item
 			end
 			
-			--elseif msg_ID ~= 0 and number then
-			--	if dialog[msg_ID]['color'] == 'H' and condensebattle then
-			--		if statuses[number] then
-			--			status = color_arr['statuscol']..statuses[number]['english']..rcol
-			--		elseif debugging then
-			--			write('status_debug: '..number)
-			--			status = color_arr['statuscol']..statuses[number]['english']..rcol
-			--		end
-			--	end
 			
 			if msg_ID ~= 0 then
 				if dialog[msg_ID]['color'] == 'M' or dialog[msg_ID]['color'] == 'D' or dialog[msg_ID]['color'] == 'H' or act['targets'][i]['actions'][n]['reaction'] == 11 or act['targets'][i]['actions'][n]['reaction'] == 12 or msg_ID == 31 or msg_ID == 32 or act['category']==6 or act['category']==14 then
@@ -235,7 +226,8 @@ function event_action(act)
 					persistantcolor = colorfilt(dialog[msg_ID]['color'],target_table['id']==party_table['p0']['mob']['id'])
 					persistanttarget = target
 					if act['target_count'] == 1 and check_filter(actor_table,party_table,target_table,act['category'],msg) then
-						add_to_chat(persistantcolor,persistantmessage:gsub('$\123target\125',persistanttarget or ''))
+						persistantmessage = persistantmessage:gsub('$\123target\125',persistanttarget)
+						add_to_chat(persistantcolor,persistantmessage)
 					end
 				else
 					-- Applies the proper connectors to the target series
