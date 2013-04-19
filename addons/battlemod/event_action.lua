@@ -102,17 +102,26 @@ function event_action(act)
 				if msg_ID == 379 then ability = 'Magic Burst '..ability end
 				ability = color_arr['abilcol']..ability..rcol
 			elseif table.contains(fields,'weapon_skill') then
-				if actor_table['is_npc'] then
-					if act['category'] ~=3 and mabils[abil_ID-256] then
-						if abil_ID ~= 1531 then
-							weapon_skill = mabils[abil_ID-256]['english']
-						end
-					elseif act['category'] == 3 or abil_ID<257 then
-						weapon_skill = jobabilities[abil_ID+768]['english']
-					end
+				if abil_ID > 255 and abil_ID ~= 1531 then -- WZ_RECOVER_ALL is used by chests in Limbus
+					weapon_skill = mabils[abil_ID-256]['english']
 					if weapon_skill == '.' then
 						weapon_skill = 'Special Attack'
 					end
+				elseif abil_ID < 256 then
+					weapon_skill = jobabilities[abil_ID+768]['english']
+				end
+--				if actor_table['is_npc'] then
+--					if act['category'] ~=3 and mabils[abil_ID-256] then
+--						if abil_ID ~= 1531 then
+--							weapon_skill = mabils[abil_ID-256]['english']
+--						end
+--					elseif act['category'] == 3 or abil_ID<257 then
+--						weapon_skill = jobabilities[abil_ID+768]['english']
+--					end
+				if weapon_skill == '.' then
+					weapon_skill = 'Special Attack'
+				end
+				if actor['is_npc'] then
 					weapon_skill = color_arr['mobwscol']..(weapon_skill or '')..rcol
 				else
 					weapon_skill = color_arr['wscol']..jobabilities[abil_ID+768]['english']..rcol
