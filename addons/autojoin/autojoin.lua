@@ -76,16 +76,10 @@ function event_incoming_text(original, modified, color)
 	return modified, color
 end
 
-bullshit_stack_balancer = true
 -- Check outgoing text for joins or declines.
 function event_outgoing_text(original, modified)
 	if original:isin('/decline', '/join') then
 		reset()
-	end
-	
-	bullshit_stack_balancer = not bullshit_stack_balancer
-	if bullshit_stack_balancer then
-		return modified
 	end
 end
 
