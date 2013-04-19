@@ -35,7 +35,7 @@ require 'event_action'
 require 'generic_helpers'
 
 function event_load()
-	debugging = true
+	debugging = false
 	allow = true
 	prevline = ''
 
