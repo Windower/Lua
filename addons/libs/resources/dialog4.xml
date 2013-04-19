@@ -375,8 +375,8 @@
 	<dtd id="373" english="${actor} hits ${target}.${lb}${target} recovers ${number} hit points!" color="H"/>
 	<dtd id="374" english="Striking ${target}'s armor causes ${actor} to become ${status}." color="1"/>
 	<dtd id="375" english="${actor} uses a ${item}.${lb}${target} receives the effect of ${status}." color="81"/>
-	<dtd id="376" english="${actor} uses a ${item}.${lb}${target} obtains a ${item}." color="81"/>
-	<dtd id="377" english="${actor} uses a ${item}.${lb}${target} obtains ${item}." color="81"/>
+	<dtd id="376" english="${actor} uses a ${item}.${lb}${target} obtains a ${item2}." color="81"/>
+	<dtd id="377" english="${actor} uses a ${item}.${lb}${target} obtains ${item2}." color="81"/>
 	<dtd id="378" english="${actor} uses a ${item}.${lb}${target}'s ${status} effect disappears!" color="81"/>
 	<dtd id="379" english="${actor} uses ${ability}.${lb}Magic Burst!${lb}${target} takes ${number} points of damage." color="D"/>
 	<dtd id="380" english="Your ?Unknown Parameter (Type: B0) 0? modification has risen to level ${number}." color="1"/>

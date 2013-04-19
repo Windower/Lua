@@ -81,9 +81,7 @@ function event_action(act)
 				end
 				spell = color_arr['spellcol']..spell..rcol
 			elseif table.contains(fields,'item') then
-				if items[abil_ID] then -- This should not be required
-					item = color_arr['itemcol']..items[abil_ID]['enl']..rcol
-				end
+				item = color_arr['itemcol']..items[abil_ID]['enl']..rcol
 			elseif table.contains(fields,'ability') then
 				if abil_ID == 53 then -- Gauge handling
 					if msg_ID == 210 then
@@ -134,6 +132,8 @@ function event_action(act)
 				if dialog[msg_ID]['units'] and condensebattle then
 					number = number..' '..dialog[msg_ID]['units']
 				end
+			elseif table.contains(fields,'item2') then -- For when you use an item to obtain items i.e. Janus Guard
+				item2 = color_arr['itemcol']..items[effect_val]['enl']..rcol
 			elseif table.contains(fields,'gil') then
 				gil = effect_val..' gil'
 			end
@@ -194,7 +194,7 @@ function event_action(act)
 			
 			-- Avoid nil field errors using " or ''" with all the gsubs.
 			if prepstr then
-				prepstr = prepstr:gsub('$\123lb\125','\7'):gsub('$\123actor\125',actor or ''):gsub('$\123spell\125',spell or ''):gsub('$\123ability\125',ability or ''):gsub('$\123abil\125',abil or ''):gsub('$\123number\125',number or ''):gsub('$\123weapon_skill\125',weapon_skill or ''):gsub('$\123status\125',status or ''):gsub('$\123item\125',item or ''):gsub('$\123gil\125',gil or '')
+				prepstr = prepstr:gsub('$\123lb\125','\7'):gsub('$\123actor\125',actor or ''):gsub('$\123spell\125',spell or ''):gsub('$\123ability\125',ability or ''):gsub('$\123abil\125',abil or ''):gsub('$\123number\125',number or ''):gsub('$\123weapon_skill\125',weapon_skill or ''):gsub('$\123status\125',status or ''):gsub('$\123item\125',item or ''):gsub('$\123item2\125',item2 or ''):gsub('$\123gil\125',gil or '')
 			end
 			
 			-- Construct the message to be sent out --
