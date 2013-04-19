@@ -124,7 +124,7 @@ function event_action(act)
 				if actor['is_npc'] then
 					weapon_skill = color_arr['mobwscol']..(weapon_skill or '')..rcol
 				else
-					weapon_skill = color_arr['wscol']..jobabilities[abil_ID+768]['english']..rcol
+					weapon_skill = color_arr['wscol']..(weapon_skill or '')..rcol
 				end
 			end
 
