@@ -70,7 +70,7 @@ function event_load()
 	dialog = parse_resources(dialogFile:readlines())
 	mabils = parse_resources(mabilsFile:readlines())
 	statuses = parse_resources(statusFile:readlines())
-	items = parse_resources(itemsGFile:readlines()))
+	items = parse_resources(itemsGFile:readlines())
 
 	for i,v in pairs(parse_resources(itemsAFile:readlines())) do
 		table.insert(items,i,v)

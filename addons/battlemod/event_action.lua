@@ -81,7 +81,9 @@ function event_action(act)
 				end
 				spell = color_arr['spellcol']..spell..rcol
 			elseif table.contains(fields,'item') then
-				item = color_arr['itemcol']..items[abil_ID]['enl']..rcol
+				if items[abil_ID] then -- This should not be required
+					item = color_arr['itemcol']..items[abil_ID]['enl']..rcol
+				end
 			elseif table.contains(fields,'ability') then
 				if abil_ID == 53 then -- Gauge handling
 					if msg_ID == 210 then
@@ -466,7 +468,7 @@ function party_id(actor_table,party_table)
 		if actor_table['id']%4096 > 2048 then -- Pet check
 			if party_table['p0']['mob']['pet_index'] == actor_table['index'] then
 				filtertype = 'my_pet'
-			elseif party_table['p0']['pet_index'] ~= actor_table['index'] then
+			elseif party_table['p0']['mob']['pet_index'] ~= actor_table['index'] then
 				filtertype = 'other_pets'
 			end
 		elseif filter['monsters'] then
