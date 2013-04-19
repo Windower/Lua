@@ -55,6 +55,7 @@
 				</title>
 			</score>
 		</colors>
+		<first_run>true</first_run>
 		<font>
 			<a>255</a>
 			<bold>false</bold>
@@ -77,5 +78,6 @@
 			<stoneskin>true</stoneskin>
 			<tp_recovery>true</tp_recovery>
 		</track>
+		<v>1.20130419</v>
 	</global>
 </settings>
