@@ -31,11 +31,11 @@
     <description>Customizes battle chat messages.</description>
   </addon>
   <addon>
-    <name>Cell Help</name>
+    <name>CellHelp</name>
     <description>Tracks cells that are needed, displays your position in the lot order, and creates the appropriate LL profiles.</description>
   </addon>
   <addon>
-    <name>Dynamis Helper</name>
+    <name>DynamisHelper</name>
     <description>Displays a timer when a mob is procced, tracks currency obtained, and can create a LL to lot all currency.</description>
   </addon>
   <addon>
