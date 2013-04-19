@@ -327,7 +327,7 @@ function event_action(act)
 					end
 				end
 			end
-			if spike_str ~= nil and check_filter(actor_table,party_table,target_table,spkmsg) then
+			if spike_str ~= nil and check_filter(actor_table,party_table,target_table,act['category'],spkmsg) then
 				add_to_chat(colorfilt(dialog[spkmsg]['color'],target_table['id']==party_table['p0']['mob']['id']),string.char(0x1F,0xFE,0x1E,0x01)..spike_str..string.char(127,49))
 			end
 			
