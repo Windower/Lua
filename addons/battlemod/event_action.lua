@@ -427,6 +427,8 @@ function check_filter(actor_table,party_table,target_table,category,msg)
 		or category == 1 and filter[actor_type]['melee']
 		or category == 2 and filter[actor_type]['ranged']
 		or category == 12 and filter[actor_type]['ranged']
+		or category == 5 and filter[actor_type]['items']
+		or category == 9 and filter[actor_type]['uses']
 		or nf(dialog[msg],'color')=='D' and filter[actor_type]['damage']
 		or nf(dialog[msg],'color')=='M' and filter[actor_type]['misses']
 		or nf(dialog[msg],'color')=='H' and filter[actor_type]['healing']
@@ -439,6 +441,9 @@ function check_filter(actor_table,party_table,target_table,category,msg)
 		if filter[actor_type][target_type]['all']
 		or category == 1 and filter[actor_type][target_type]['melee']
 		or category == 2 and filter[actor_type][target_type]['ranged']
+		or category == 12 and filter[actor_type]['ranged']
+		or category == 5 and filter[actor_type]['items']
+		or category == 9 and filter[actor_type]['uses']
 		or nf(dialog[msg],'color')=='D' and filter[actor_type][target_type]['damage']
 		or nf(dialog[msg],'color')=='M' and filter[actor_type][target_type]['misses']
 		or nf(dialog[msg],'color')=='H' and filter[actor_type][target_type]['healing']
@@ -495,4 +500,14 @@ function fieldsearch(message)
 	fieldarr = {}
 	string.gsub(message,"{(.-)}", function(a) if a ~= '${actor}' and a ~= '${target}' then fieldarr[#fieldarr+1] = a end end)
 	return fieldarr
+end
+
+function ammo_number()
+	local inv = get_items()
+	for i,v in pairs(inv['inventory']) do
+		if v['slot_id'] == 4 then
+			return v['count']
+		end
+	end
+	return nil
 end

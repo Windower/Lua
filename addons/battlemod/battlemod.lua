@@ -129,14 +129,16 @@ function options_load()
 <settings>
     <global>
         <me> <!-- You're doing something -->
-            <melee>false</melee>
-            <ranged>false</ranged>
-            <damage>false</damage>
-            <healing>false</healing>
-            <misses>false</misses>
-            <readies>false</readies>
-            <casting>false</casting>
-            <all>false</all>
+            <melee>false</melee>  <!-- Prevents your melee ("white") damage from appearing -->
+            <ranged>false</ranged> <!-- Prevents your ranged damage from appearing -->
+            <damage>false</damage> <!-- Prevents your damage from appearing -->
+            <healing>false</healing> <!-- Prevents your healing from appearing -->
+            <misses>false</misses> <!-- Prevents your misses from appearing -->
+            <items>false</items> <!-- Prevents your "Jim used an item. Jim gains the effect of Reraise." messages from appearing -->
+            <uses>false</uses> <!-- Prevents your "Jim uses an item." messages from appearing -->
+            <readies>false</readies> <!-- Prevents your "Jim readies ____" messages from appearing -->
+            <casting>false</casting> <!-- Prevents your "Jim begins casting ____" messages from appearing -->
+            <all>false</all> <!-- Prevents all of your messages from appearing -->
         </me>
         <party> <!-- A party member is doing something -->
             <melee>false</melee>
@@ -144,6 +146,8 @@ function options_load()
             <damage>false</damage>
             <healing>false</healing>
             <misses>false</misses>
+            <items>false</items>
+            <uses>false</uses>
             <readies>false</readies>
             <casting>false</casting>
             <all>false</all>
@@ -154,6 +158,8 @@ function options_load()
             <damage>false</damage>
             <healing>false</healing>
             <misses>false</misses>
+            <items>false</items>
+            <uses>false</uses>
             <readies>false</readies>
             <casting>false</casting>
             <all>false</all>
@@ -164,6 +170,8 @@ function options_load()
             <damage>false</damage>
             <healing>false</healing>
             <misses>false</misses>
+            <items>false</items>
+            <uses>false</uses>
             <readies>false</readies>
             <casting>false</casting>
             <all>false</all>
@@ -516,9 +524,10 @@ function event_action_message(actor_id,index,actor_target_index,target_target_in
 			local outstr = dialog[message_id]['english']:gsub('$\123actor\125',actor or ''):gsub('$\123status\125',status or ''):gsub('$\123target\125',target or ''):gsub('$\123spell\125',spell or ''):gsub('$\123skill\125',skill or ''):gsub('$\123number\125',number or ''):gsub('$\123number2\125',number2 or ''):gsub('$\123lb\125','\7')
 			add_to_chat(dialog[message_id]['color'],string.char(0x1F,0xFE,0x1E,0x01)..outstr..string.char(127,49))
 		end
-	elseif message_id == 62 or message_id == 251 or message_id==313 then
+	elseif T{62,251,308, 313}:contains(message_id) == 62 or message_id == 251 or message_id==313 then
 	-- 62 is "fails to activate" but it is color 121 so I cannot block it because I would also accidentally block a lot of system messages. Thus I have to ignore it.
 	-- Message 251 is "about to wear off" but it is color 123 so I cannot block it because I would also block "you failed to swap that gear, idiot!" messages. Thus I have to ignore it.
+	-- Message 308 is "your inventory is full" but it is color 123.
 	-- Message 313 is the red "target is out of range" message but it is color 123 so I cannot block it because I would also block "you failed to swap that gear, idiot!" messages. Thus I have to ignore it.
 	elseif message_id == 202 then
 		if debugging then write('debug_EAM#'..message_id..': '..dialog[message_id]['english']..' '..param_1..'   '..param_2..'   '..param_3) end
