@@ -344,7 +344,7 @@ function namecol(player,player_table,party_table)
 	-- Returns a name colored relative to color_arr
 	if not player then 	player = '' end
 	if player_table['is_npc']==true then
-		if player_table['id']%4096>2048 then
+		if player_table['id']%4096>2047 then
 			for i,v in pairs(party_table) do
 				if nf(v['mob'],'pet_index') == player_table['index'] then
 					player = color_arr[i]..player..rcol
@@ -457,7 +457,7 @@ function party_id(actor_table,party_table)
 	-- Returns "me", "party", "alliance", "others", "monsters", "my_pet", or "other_pets"
 	local partypos, filtertype
 	if actor_table['is_npc']==true then
-		if actor_table['id']%4096 > 2048 then -- Pet check
+		if actor_table['id']%4096 > 2047 then -- Pet check
 			if party_table['p0']['mob']['pet_index'] == actor_table['index'] then
 				filtertype = 'my_pet'
 			elseif party_table['p0']['mob']['pet_index'] ~= actor_table['index'] then
