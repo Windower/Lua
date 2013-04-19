@@ -70,15 +70,16 @@ function event_load()
 	dialog = parse_resources(dialogFile:readlines())
 	mabils = parse_resources(mabilsFile:readlines())
 	statuses = parse_resources(statusFile:readlines())
-	items = parse_resources(itemsGFile:readlines())
-	
+	items = parse_resources(itemsGFile:readlines()))
+
 	for i,v in pairs(parse_resources(itemsAFile:readlines())) do
-		items[i]=v
+		table.insert(items,i,v)
 	end
 	for i,v in pairs(parse_resources(itemsWFile:readlines())) do
-		items[i]=v
+		table.insert(items,i,v)
 	end
 	
+
     send_command('alias bm lua c battlemod cmd')
 	options_load()
 	collectgarbage()
