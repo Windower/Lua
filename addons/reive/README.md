@@ -1,6 +1,6 @@
 **Author:** Giuliano Riccio
 
-**Version:** v 1.20130417
+**Version:** v 1.20130419
 
 **Description:**
 This plugin tracks exp, bayld, momentum scores and bonuses during a reive.
@@ -12,17 +12,26 @@ There is only one configuration file called settings.xml in the data folder of t
 
 **Commands:**
 
-* //reive test --Fills the chat log to show how the plugin will work. Reload the plugin after the test with (//lua r reive)
-* //reive reset --Sets gained exp and bayld to 0
-* //reive show --Shows the tracking window
-* //reive hide --Hides the tracking window
-* //reive toggle --Toggles the tracking window
+* reive test -- fills the chat log to show how the plugin will work. reload the plugin after the test (lua r reive)
+* reive reset -- sets gained exp and bayld to 0
+* reive show -- shows the tracking window
+* reive hide -- hides the tracking window
+* reive toggle -- toggles the tracking window
+* reive max-scores amount -- sets the max amount of scores to show in the window
+* reive reset-on-start reset -- specifies if the exp and bayld will be reset at the begin of a reive
+* reive track score visible -- specifies the visibility of a score in the window
+* reive position [[-h]|[-x x] [-y y]] -- sets the horizontal and vertical position of the window relative to the upper-left corner
+* reive font [[-h]|[-f font] [-s size] [-a alpha] [-b[ bold]] [-i[ italic]]] -- sets the style of the font used in the window
+* reive color [[-h]|[-o objects] [-d] [-r red] [-g green] [-b blue] [-a alpha]] -- sets the colors used by the plugin
 
 **TODO**
 
-- [ ] Allow the user to change the settings using the console
+- [x] allow the user to change the settings using the console
 
 #changelog
+## v1.20130419
+* **add:** the user can change the settings from the console or the text box
+
 ## v1.20130417
 * **add:** the user can decide which bonuses will appear in the window
 
@@ -51,7 +60,7 @@ There is only one configuration file called settings.xml in the data folder of t
 * **size:** the size of the text
 * **bold:** **true** or **false**, makes the text bold
 * **italic:** **true** or **false**, makes the text italic
-* **a:** the text transparency from 0 (invisible) to 255 (visible)
+* **a:** the text transparency from 0 (transparent) to 255 (opaque)
 
 ## colors
 ### background
