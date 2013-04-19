@@ -101,11 +101,11 @@ function options_load()
 		<targetnumber>true</targetnumber>
 		
 		
-		<line_full>[${actor}] ${number} ${abil} ¨ ${target}</line_full>
-		<line_noactor>${abil} ${number} ¨ ${target}</line_noactor>
-		<line_nonumber>[${actor}] ${abil} ¨ ${target}</line_nonumber>
-		<line_aoebuff>${actor} ${abil} ¨ ${target} (${status})</line_aoebuff>
-		<line_roll>${actor} ${abil} ¨ ${target} ª ${number}</line_roll>
+		<line_full>[${actor}] ${number} ${abil} ]]..string.char(129,168)..[[ ${target}</line_full>
+		<line_noactor>${abil} ${number} ]]..string.char(129,168)..[[ ${target}</line_noactor>
+		<line_nonumber>[${actor}] ${abil} ]]..string.char(129,168)..[[ ${target}</line_nonumber>
+		<line_aoebuff>${actor} ${abil} ]]..string.char(129,168)..[[ ${target} (${status})</line_aoebuff>
+		<line_roll>${actor} ${abil} ]]..string.char(129,168)..[[ ${target} ]]..string.char(129,170)..[[ ${number}</line_roll>
 	</global>
 </settings>
 ]])
@@ -116,11 +116,7 @@ function options_load()
 	for i,v in pairs(settingtab) do
 		_G[i] = v
 	end
-	local tempplayer = get_player()
-	if tempplayer~=nil then
-		filterload(tempplayer['main_job'])
-	else
-		if not file.exists('data/filters/filters.xml') then
+	if not file.exists('data/filters/filters.xml') then
 			filterFile:write([[
 <?xml version="1.0" ?>
 <!-- Filters are customizable based on the action user. So if you filter other pets, you're going
@@ -271,8 +267,13 @@ function options_load()
 </settings>
 ]])
 			write('Default filters xml file created')
-		end
-		filter = config.load('data/filters/filters.xml',true)
+	end
+	
+	local tempplayer = get_player()
+	if tempplayer then
+		filterload(tempplayer['main_job'])
+	else
+		filterload('DEFAULT')
 	end
 	
 	if not file.exists('data/colors.xml') then
