@@ -144,6 +144,8 @@ function event_action(act)
 			elseif T{158,188,245,324,592,658}:contains(msg_ID) and condensebattle then
 				-- When you miss a WS or JA. Relevant for condensed battle.
 				number = 'Miss'
+			elseif nf(dialog[msg_ID],'color') =='R'	and condensebattle then
+				status = 'Resist'
 			end
 		
 			-- Sets the common field "abil" based on the applicable abilities.
@@ -228,7 +230,7 @@ function event_action(act)
 					else
 						persistantmessage = prepstr
 					end
-					persistantcolor = colorfilt(dialog[msg_ID]['color'],target_table['id']==party_table['p0']['id'])
+					persistantcolor = colorfilt(dialog[msg_ID]['color'],target_table['id']==party_table['p0']['mob']['id'])
 					persistanttarget = target
 					if act['target_count'] == 1 and check_filter(actor_table,party_table,target_table,act['category'],msg) then
 						add_to_chat(persistantcolor,persistantmessage:gsub('$\123target\125',persistanttarget or ''))
@@ -284,11 +286,10 @@ function event_action(act)
 				end
 			end
 			if add_eff_str ~= nil and check_filter(actor_table,party_table,target_table,act['category'],addmsg) then
-				add_to_chat(colorfilt(dialog[addmsg]['color'],target_table['id']==party_table['p0']['id']),string.char(0x1F,0xFE,0x1E,0x01)..add_eff_str..string.char(127,49))
+				add_to_chat(colorfilt(dialog[addmsg]['color'],target_table['id']==party_table['p0']['mob']['id']),string.char(0x1F,0xFE,0x1E,0x01)..add_eff_str..string.char(127,49))
 			end
 			
 			number = nil
-			if flipped then actor,actor_table,target,target_table,flipped = flip(actor,actor_table,target,target_table,flipped) end
 			local spkmsg = act['targets'][i]['actions'][n]['spike_effect_message']
 			
 			-- Need to add battlemod battle condensation to this --
@@ -327,7 +328,7 @@ function event_action(act)
 				end
 			end
 			if spike_str ~= nil and check_filter(actor_table,party_table,target_table,spkmsg) then
-				add_to_chat(colorfilt(dialog[spkmsg]['color'],target_table['id']==party_table['p0']['id']),string.char(0x1F,0xFE,0x1E,0x01)..spike_str..string.char(127,49))
+				add_to_chat(colorfilt(dialog[spkmsg]['color'],target_table['id']==party_table['p0']['mob']['id']),string.char(0x1F,0xFE,0x1E,0x01)..spike_str..string.char(127,49))
 			end
 			
 			if flipped then actor,actor_table,target,target_table,flipped = flip(actor,actor_table,target,target_table,flipped) end
