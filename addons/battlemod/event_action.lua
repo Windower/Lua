@@ -231,7 +231,7 @@ function event_action(act)
 					persistantcolor = colorfilt(dialog[msg_ID]['color'],target_table['id']==party_table['p0']['id'])
 					persistanttarget = target
 					if act['target_count'] == 1 and check_filter(actor_table,party_table,target_table,act['category'],msg) then
-						add_to_chat(persistantcolor,persistantmessage)
+						add_to_chat(persistantcolor,persistantmessage:gsub('$\123target\125',persistanttarget or ''))
 					end
 				else
 					-- Applies the proper connectors to the target series
