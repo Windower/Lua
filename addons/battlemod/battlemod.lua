@@ -70,15 +70,10 @@ function event_load()
 	dialog = parse_resources(dialogFile:readlines())
 	mabils = parse_resources(mabilsFile:readlines())
 	statuses = parse_resources(statusFile:readlines())
-	items = parse_resources(itemsGFile:readlines())
-
-	for i,v in pairs(parse_resources(itemsAFile:readlines())) do
-		table.insert(items,i,v)
-	end
-	for i,v in pairs(parse_resources(itemsWFile:readlines())) do
-		table.insert(items,i,v)
-	end
-	
+	items = table.range(65535)
+	items:update(parse_resources(itemsGFile:readlines()))
+	items:update(parse_resources(itemsAFile:readlines()))
+	items:update(parse_resources(itemsWFile:readlines()))
 
     send_command('alias bm lua c battlemod cmd')
 	options_load()
