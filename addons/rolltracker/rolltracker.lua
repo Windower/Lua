@@ -166,10 +166,11 @@ end
 end
 
 function bust_rate(num)
-	if num <= 5 or 11 then
+	if num <= 5 or num == 11 then
 		bustrate = ''
+	else 
+		bustrate = '\7  [Chance to Bust]: '..string.format("%.1f",(num-5)*16.67)..'%'
 	end
-	bustrate = '\7  [Chance to Bust]: '..string.format("%.1f",(num-5)*16.67)..'%'
 	return bustrate
 end
 	
