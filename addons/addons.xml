@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<addons>
+  <addon>
+    <name>Example</name>
+    <author>Iryoku</author>
+    <description>
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis dolor est,
+      tristique vitae lacinia quis, vulputate sit amet mi. Duis lacinia, massa
+      at faucibus sagittis.
+    </description>
+    <bugtracker>https://github.com/IryokuChevalier/Lua/issues</bugtracker>
+    <support>http://forums.windower.net/topic/21775-random-question-thread/</support>
+  </addon>
+  <addon>
+    <name>AEcho</name>
+  	<description>Automatically uses echo drops when you get silenced. Also, uses send to send a message to an alt that you got debuffed.</description>
+  </addon>
+  <addon>
+    <name>AnsweringMachine</name>
+    <description>Stores tells that you receive for later recall.</description>
+  </addon>
+  <addon>
+    <name>AutoJoin</name>
+    <author>Arcon</author>
+    <description>Automatically joins or declines party invites. Configurable with blacklist/whitelist mode and auto-decline settings.</description>
+    <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
+    <support>IRC: irc.ffochat.com, #lua</support>
+  </addon>
+  <addon>
+    <name>AutoRA</name>
+    <author>Banggugyangu</author>
+    <description>Cuases Ranged Attacks to behave the same as melee Auto-Attack.</description>
+    <bugtracker>https://github.com/banggugyangu/Lua/issues</bugtracker>
+  </addon>
+  <addon>
+    <name>BattleMod</name>
+    <description>Customizes battle chat messages.</description>
+  </addon>
+  <addon>
+    <name>CellHelp</name>
+    <description>Tracks cells that are needed, displays your position in the lot order, and creates the appropriate LL profiles.</description>
+  </addon>
+  <addon>
+    <name>DynamisHelper</name>
+    <description>Displays a timer when a mob is procced, tracks currency obtained, and can create a LL to lot all currency.</description>
+  </addon>
+  <addon>
+    <name>FFOColor</name>
+    <description>Allows you to show FFOChat text in one of the 5 game chat channels. As well as specify colors for the text</description>
+  </addon>
+  <addon>
+    <name>Linker</name>
+    <author>Arcon</author>
+    <description>Allows opening links to certain websites from within the game, with an optional search parameter.</description>
+    <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
+    <support>IRC: irc.ffochat.com, #lua</support>
+  </addon>
+  <addon>
+    <name>MacroChanger</name>
+    <author>Banggugyangu</author>
+    <description>Automatically switches Macro Book and Page according to job changes.</description>
+    <bugtracker>https://github.com/banggugyangu/Lua/issues</bugtracker>
+  </addon>
+  <addon>
+    <name>OhShi</name>
+    <description>Keeps track of various event related things. Such as, VW proc messages, mob casting, mob tp moves, TH procs and cor rolls, as well as others.</description>
+  </addon>
+  <addon>
+    <name>Respond</name>
+    <description>Respond to tells and FFOchat PMs using //r.</description>
+  </addon>
+  <addon>
+    <name>SATACast</name>
+    <author>Banggugyangu</author>
+    <description>Informs Spellcast about changes to Sneak Attack and Trick Attack status.</description>
+    <bugtracker>https://github.com/banggugyangu/Lua/issues</bugtracker>
+  </addon>
+  <addon>
+  	<name>reive</name>
+  	<description>tracks exp, bayld, momentum scores and bonuses during a reive.</description>
+  </addon>
+  <addon>
+    <name>Scoreboard</name>
+    <author>Suji</author>
+    <description>Basic in-game damage parser. It displays live DPS and works even when chat filters are enabled.</description>
+    <support>https://github.com/jerryhebert/Lua/issues</support>
+  </addon>
+  <addon>
+    <name>Send</name>
+    <description>Sends commands between windower instances using IPC.</description>
+  </addon>
+  <addon>
+    <name>StaggerTrack</name>
+    <description>Catches voidwatch weakness messages and prints them to a textbox in case you miss them in the battle spam.</description>
+  </addon>
+  <addon>
+    <name>STNA</name>
+    <description>One-button status removal for dual boxing.</description>
+  </addon>
+  <addon>
+    <name>vwhl</name>
+    <description>Redirects vw nm's vulnerabilities to the "tell" stream so that they can be held using the chat filters' function and highlights the important info. Supports EN, FR, DE clients.</description>
+  </addon>
+</addons>
