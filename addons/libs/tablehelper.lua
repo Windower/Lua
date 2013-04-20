@@ -16,18 +16,37 @@ _libs.functools = _libs.functools or require 'functools'
 ]]
 
 _meta = _meta or {}
-_meta.T = {}
+_meta.T = _meta.T or {}
 _meta.T.__index = table
+_meta.T.__class = 'Table'
+
+_meta.N = {}
+_meta.N.__class = 'Nil'
 
 -- Constructor for T-tables.
 -- t = T{...} for explicit declaration.
 -- t = T(regular_table) to cast to a T-table.
 function T(t)
 	t = t or {}
+	if class(t) == 'Set' then
+		local res = T{}
+		
+		for el in pairs(s) do
+			res:append(s)
+		end
+		
+		t = res
+	end
 	
 	-- Sets T's metatable's index to the table namespace, which will take effect for all T-tables.
 	-- This makes every function that tables have also available for T-tables.
 	return setmetatable(t, _meta.T)
+end
+
+function class(o)
+	local mt = getmetatable(o)
+	
+	return mt and mt.__class or type(o)
 end
 
 _libs = T(_libs)
@@ -128,7 +147,9 @@ end
 
 -- Removes all elements from a table.
 function table.clear(t)
-	t = T{}
+	for key in pairs(t) do
+		t[key] = nil
+	end
 
 	return t
 end
@@ -194,7 +215,7 @@ function table.merge(t, t_merge, splitchar, silent)
 					if type(val) == 'string' then
 						t[key] = val:split(splitchar):map(string.trim)
 					elseif not silent then
-						notice('Could not safely merge values:', key, t[key], val)
+						notice('Could not safely merge values (key '..key..'):', t[key], '|', val, '|')
 					end
 				elseif type(t[key]) == 'number' then
 					local testdec = tonumber(val)
@@ -204,7 +225,7 @@ function table.merge(t, t_merge, splitchar, silent)
 					elseif testhex then
 						t[key] = testhex
 					elseif not silent then
-						notice('Could not safely merge values:', key, t[key], val)
+						notice('Could not safely merge values (key '..key..'):', t[key], '|', val, '|')
 					end
 				elseif type(t[key] == 'boolean') then
 					if val == 'true' then
@@ -212,12 +233,12 @@ function table.merge(t, t_merge, splitchar, silent)
 					elseif val == 'false' then
 						t[key] = false
 					elseif not silent then
-						notice('Could not safely merge values:', key, t[key], val)
+						notice('Could not safely merge values (key '..key..'):', t[key], '|', val, '|')
 					end
 				elseif type(t[key] == 'string') then
 					t[key] = val
 				elseif not silent then
-					notice('Could not safely merge values:', key, t[key], val)
+					notice('Could not safely merge values (key '..key..'):', t[key], '|', val, '|')
 				end
 			else
 				t[key] = val
@@ -395,7 +416,7 @@ table._bak_sort = table.sort
 
 -- Returns a sorted table.
 function table.sort(t, ...)
-	T(t):_bak_sort(...)
+	table._bak_sort(t, ...)
 	return t
 end
 
