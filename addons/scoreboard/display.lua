@@ -24,8 +24,8 @@ function Display:set_position(posx, posy)
 end
 
 
-function Display:new (settings)
-    local repr = {}
+function Display:new (settings, db)
+    local repr = {db = db}
     self.settings = settings
     setmetatable(repr, self)
     self.__index = self
@@ -97,7 +97,7 @@ function Display:build_scoreboard_header()
     end
 	
     local labels
-    if dps_db:isempty() then
+    if self.db:isempty() then
         labels = "\n"
     else
         labels = string.format("%23s%7s%9s\n", "Tot", "Pct", "DPS")
@@ -128,7 +128,7 @@ function Display:get_sorted_player_damage()
     local mob, players
     local player_total_dmg = T{}
 
-    if not dps_db then
+    if not self.db then
         return
     end
 	
@@ -141,7 +141,7 @@ function Display:get_sorted_player_damage()
         return false
     end
 	
-    for mob, players in pairs(dps_db) do
+    for mob, players in pairs(self.db.dps_db) do
         -- If the filter isn't active, include all mobs
 
         if self.filter:isempty() or filter_contains_mob(mob) then
@@ -185,14 +185,21 @@ function Display:update()
     local player_lines = 0
     for k, v in pairs(damage_table) do
         if player_lines < self.settings.numplayers then
-            local dps = math.round(v[2]/dps_clock.clock, 2)
+            local dps
+            if dps_clock.clock == 0 then
+                dps = "N/A"
+            else
+                dps = string.format("%.2f", math.round(v[2]/dps_clock.clock, 2))
+            end
             local percent = string.format('(%.1f%%)', 100 * v[2]/total_damage)
-            display_table:append(string.format("%-16s%7d%8s %7.2f", v[1], v[2], percent, dps))
+            display_table:append(string.format("%-16s%7d%8s %7s", v[1], v[2], percent, dps))
         end
         player_lines = player_lines + 1
     end
 	
-    if not dps_db:isempty() then
+    if self.db:isempty() then
+        self:init()
+    else
         tb_set_text(self.tb_name, self:build_scoreboard_header() .. table.concat(display_table, '\n'))
     end
 end
