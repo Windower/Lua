@@ -81,9 +81,11 @@ function settings_create()
 	for i=1, #players do
 		playernumber = players[i]
 		players[players[i]] = settingtab[set][playernumber]['name']
-		if players[players[i]] == player and players[players[i]] ~= "" then
+		if players[players[i]] == player then
 			player_num = players[i]
-		else player_num = 'player1'
+			if player_num == nil or player_num == '' then
+				player_num = 'player1'
+			end
 		end
 	end
 
