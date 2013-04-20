@@ -288,7 +288,7 @@ end
 -- windower events
 
 function event_load()
-    config.load(_reive.settings)
+    config.load(_reive.settings, true)
 
     local background = _reive.settings.colors.background
 
