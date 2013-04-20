@@ -48,7 +48,6 @@ aliases = T{
 addstrs = T{'a', 'add', '+'}
 rmstrs = T{'r', 'rm', 'remove', '-'}
 
---log(('blist'):isin(T{'blist'}))
 modes = T{'whitelist', 'blacklist'}
 
 -- Invite handler
@@ -78,7 +77,7 @@ end
 
 -- Check outgoing text for joins or declines.
 function event_outgoing_text(original, modified)
-	if original:isin('/decline', '/join') then
+	if original:isin({'/decline', '/join'}) then
 		reset()
 	end
 end
