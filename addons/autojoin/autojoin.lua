@@ -68,7 +68,7 @@ end
 
 -- Check incoming text for the treasure pool warning.
 function event_incoming_text(original, modified, color)
-	if original:stripformat() == 'Caution: All unclaimed treasure will be lost if you join a party.' then
+	if original:strip_format() == 'Caution: All unclaimed treasure will be lost if you join a party.' then
 		pool = true
 	end
 	
