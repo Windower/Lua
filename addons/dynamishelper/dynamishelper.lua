@@ -106,7 +106,7 @@ function event_addon_command(...)
    			write('dh help : Shows help message')
   			write('dh timer [on/off] : Displays a timer each time a mob is staggered.')
    			write('dh tracker [on/off/reset/pos x y] : Tracks the amount of currency obtained.')
-			write('dh proc [on/off] : Displays the current proc for the targeted mob.')
+			write('dh proc [on/off/pos x y] : Displays the current proc for the targeted mob.')
    			write('dh ll create : Creates and loads a light luggage profile that will automatically lot all currency.')
 		elseif params[1]:lower() == "timer" then
    			if params[2]:lower() == "on" or params[2]:lower() == "off" then
@@ -137,7 +137,7 @@ function event_addon_command(...)
      					initializebox()
     				end		
     	    		else write("Invalid tracker option.")
-    			end
+    		end
 	  	elseif params[1]:lower() == "ll" then
    			if params[2]:lower() == "create" then
 	    			player = get_player()['name']
@@ -145,7 +145,8 @@ function event_addon_command(...)
     				send_command('ll profile dynamis-'..player..'.txt')
    				else write("Invalid light luggage option.")
    			end
-   		elseif params[1]:lower() == "proc" then
+   			elseif params[1]:lower() == "proc" then
+   			trposx, trposy = tonumber(params[3]), tonumber(params[4])
    			if params[2]:lower() == "on" then
    					proc = params[2]
    					write('Proc feature enabled.')
@@ -153,6 +154,9 @@ function event_addon_command(...)
     				proc = params[2]
     				tb_set_visibility('proc_box',false)
     				write('Proc feature disabled.')
+    		elseif params[2]:lower() == "pos" then
+   					pposx, pposy = tonumber(params[3]), tonumber(params[4])
+   					initializeproc()
    			end
  		end
  	end
