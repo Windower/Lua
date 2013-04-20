@@ -103,7 +103,7 @@ function json.tokenize(content)
 				end
 				tokens[line]:append(c)
 			-- If a quote character is found, start a quoting session, see alternative condition.
-			elseif c:isin('\'', '"') and current == nil then
+			elseif c == '"' or c == '\'' and current == nil then
 				quote = c
 				current = c
 			-- Otherwise, just append
@@ -199,10 +199,10 @@ function json.classify(tokens)
 				else
 					return json.error('Unexpected token \',\'.', line)
 				end
-			elseif type(token):isin('string', 'number') and modes:last() == 'new' and scopes:last() == 'object' then
+			elseif type(token):isin({'string', 'number'}) and modes:last() == 'new' and scopes:last() == 'object' then
 				keys:append(token)
 				modes[#modes] = 'key'
-			elseif type(token):isin('boolean', 'number', 'string', 'null') then
+			elseif type(token):isin({'boolean', 'number', 'string', 'null'}) then
 				if modes:last() == 'colon' then
 					parsed:last()[keys:remove()] = token
 					modes[#modes] = 'value'

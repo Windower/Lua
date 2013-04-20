@@ -45,7 +45,7 @@ function captionlog(msg, msgcolor, ...)
 	local caption = _addon and _addon.name or ''
 	
 	if msg ~= nil then
-		caption = caption..msg
+		caption = caption..' '..msg
 	end
 	
 	if #caption > 0 then

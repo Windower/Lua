@@ -4,12 +4,14 @@ A few math helper functions.
 
 _libs = _libs or {}
 _libs.mathhelper = true
-_libs.tablehelper = _libs.tablehelper or require 'tablehelper'
-_libs.stringhelper = _libs.stringhelper or require 'stringhelper'
+
+_raw = _raw or {}
+_raw.math = _raw.math or {}
+_raw.math = setmetatable(_raw.math, {__index=math})
 
 debug.setmetatable(0, {__index=math})
 
--- Order of digits in an for higher base math
+-- Order of digits for higher base math
 math.digitorder = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 -- Constants
@@ -23,18 +25,18 @@ end
 
 -- Returns the sign of num, -1 for a negative number, +1 for a positive number and 0 for 0.
 function math.sgn(num)
-	return num/math.abs(num)
+	return num > 0 and 1 or num < 0 and -1 or 0
 end
 
 -- Backs up the old log function.
-math._bak_log = math.log
+_raw.math.log = math.log
 
 -- Returns an arbitrary-base logarithm. Defaults to e.
 function math.log(val, base)
 	if base == nil then
 		base = math.e
 	end
-	return math._bak_log(val)/math._bak_log(base)
+	return _raw.math.log(val)/_raw.math.log(base)
 end
 
 -- Returns a binary string representation of val.
@@ -60,14 +62,25 @@ function math.tobase(val, base)
 	
 	local num = math.abs(val)
 	
-	local str = T{}
+	local res = {}
+	local key = 1
+	local pos
 	while num > 0 do
-		str:insert(math.digitorder:at(num % base + 1))
+		pos = num % base + 1
+		res[key] = math.digitorder:sub(pos, pos)
 		num = math.floor(num / base)
-	end
-	if math.sgn(val) == -1 then
-		str:insert('-')
+		key = key + 1
 	end
 	
-	return str:reverse():concat()
+	local str = ''
+	local n = key - 1
+	for key = 1, n do
+		str = str..res[n - key + 1]
+	end
+	
+	if val < 0 then
+		str = '-'..str
+	end
+	
+	return str
 end
