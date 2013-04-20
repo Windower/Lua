@@ -653,9 +653,9 @@
 	<dtd id="657" english="${actor} uses ${ability}.${lb}All enmity is transferred to ${target}." color="101"/>
 	<dtd id="658" english="${actor} uses ${ability}, but misses ${target}." color="104"/>
 	<dtd id="659" english="No effect on ${target}." color="R"/>
-	<dtd id="660" english="The same effect is already active on that luopan!" color="1"/>
-	<dtd id="661" english="${actor} has already placed a luopan.${lb}Unable to use ability." color="1"/>
-	<dtd id="662" english="This action requires a luopan." color="1"/>
+	<dtd id="660" english="The same effect is already active on that luopan!" color="122"/>
+	<dtd id="661" english="${actor} has already placed a luopan.${lb}Unable to use ability." color="122"/>
+	<dtd id="662" english="This action requires a luopan." color="122"/>
 	<dtd id="663" english="${actor} uses ${ability}.${lb}The luopan's HP consumption rate has been reduced." color="101"/>
 	<dtd id="664" english="${actor} uses ${ability}.${lb}The effects of the luopan and its HP consumption rate have increased." color="101"/>
 	<dtd id="665" english="${actor} has a pet.${lb}Unable to use ability." color="1"/>
