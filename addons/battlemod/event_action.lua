@@ -50,19 +50,33 @@ function event_action(act)
 					abil = 'Disappears'
 				elseif msg_ID == 67 then abil = 'Crit'
 					effect_val = act['targets'][i]['actions'][n]['param']
+				elseif msg_ID == 373 then abil = 'Absorbs'
+					effect_val = act['targets'][i]['actions'][n]['param']
 				elseif debugging and not act['targets'][i]['actions'][n]['has_spike_effect'] then
 					effect_val = act['targets'][i]['actions'][n]['param']
 					write('debug_cat1: '..act['targets'][i]['actions'][n]['param']..' '..msg_ID)
 				end
 			elseif act['category'] == 2 then -- Ranged attacks
 				effect_val = act['targets'][i]['actions'][n]['param']
-				if msg_ID == 352 then abil = 'RA'
-				elseif msg_ID == 353 then abil = 'Crit RA'
-				elseif msg_ID == 354 then abil = 'RA Misses'
-					effect_val = nil
-				elseif msg_ID == 576 then abil = 'RA Hits Squarely'
-				elseif msg_ID == 577 then abil = 'RA Strikes True'
-				elseif msg_ID == 157 then abil = 'Barrage'
+				if ammonumber then
+					if msg_ID == 352 then abil = 'RA '..ammo_number()
+					elseif msg_ID == 353 then abil = 'Crit RA '..ammo_number()
+					elseif msg_ID == 354 then abil = 'RA Misses '..ammo_number()
+						effect_val = nil
+					elseif msg_ID == 576 then abil = 'RA Hits Squarely '..ammo_number()
+					elseif msg_ID == 577 then abil = 'RA Strikes True '..ammo_number()
+					elseif msg_ID == 157 then abil = 'Barrage '..ammo_number()
+					elseif msg_ID == 382 then abil = 'Absorbs RA'
+					end
+				else
+					if msg_ID == 352 then abil = 'RA'
+					elseif msg_ID == 353 then abil = 'Crit RA'
+					elseif msg_ID == 354 then abil = 'RA Misses'
+						effect_val = nil
+					elseif msg_ID == 576 then abil = 'RA Hits Squarely'
+					elseif msg_ID == 577 then abil = 'RA Strikes True'
+					elseif msg_ID == 157 then abil = 'Barrage'
+					end
 				end
 			elseif T{7,8,9}:contains(act['category']) then -- 12 and 10 don't really count because their params are meaningless. 1 and 2 need manual ability sorting
 				abil_ID = act['targets'][i]['actions'][n]['param']
@@ -514,7 +528,7 @@ end
 function ammo_number()
 	local inv = get_items()
 	for i,v in pairs(inv['inventory']) do
-		if v['slot_id'] == 4 then
+		if v['slot_id'] == 63 then
 			return v['count']
 		end
 	end

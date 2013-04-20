@@ -340,7 +340,7 @@
 	<dtd id="338" english="You cannot summon avatars here." color="1"/>
 	<dtd id="339" english="Your chocobo senses a hostile presence and refuses to come to your side." color="1"/>
 	<dtd id="340" english="You must equip your main weapon first to use Dual Wield." color="1"/>
-	<dtd id="341" english="${actor} casts ${spell}.${lb}${target}'s ${status} effect disappears!" color="H/>
+	<dtd id="341" english="${actor} casts ${spell}.${lb}${target}'s ${status} effect disappears!" color="H"/>
 	<dtd id="342" english="${actor} casts ${spell}.${lb}${target}'s ${status} effect disappears!" color="H"/>
 	<dtd id="343" english="${target}'s ${status} effect disappears!" color="81"/>
 	<dtd id="344" english="${target}'s ${status} effect disappears!" color="81"/>
