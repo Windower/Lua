@@ -96,7 +96,7 @@ function start()
 end
 
 function stop()
-	timer.RemoveTimer('timerShoot')
+	auto = 0
 end
 
 function shoot()
