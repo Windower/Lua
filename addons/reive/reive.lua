@@ -288,7 +288,7 @@ end
 -- windower events
 
 function event_load()
-    config.load(_reive.settings)
+    config.load(_reive.settings, true)
 
     local background = _reive.settings.colors.background
 
@@ -795,7 +795,7 @@ function event_addon_command(...)
 
                 if errors:length() == 0 then
                     for key, object in pairs(objects) do
-                        local indexes = object:split('.')
+                        local indexes = T(object:split('.'))
 
                         if indexes:length() == 2 then
                             if r == -1 then
