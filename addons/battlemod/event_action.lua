@@ -169,8 +169,14 @@ function event_action(act)
 			elseif T{158,188,245,324,592,658}:contains(msg_ID) and condensebattle then
 				-- When you miss a WS or JA. Relevant for condensed battle.
 				number = 'Miss'
-			elseif nf(dialog[msg_ID],'color') =='R'	and condensebattle then
-				status = 'Resist'
+			elseif msg_ID == 653 or msg_ID == 654 then
+				status = color_arr['statuscol']..'Immunobreak'..rcol
+			elseif msg_ID == 655 or msg_ID == 656 then
+				status = color_arr['statuscol']..'Completely Resists'..rcol
+			elseif msg_ID == 85 or msg_ID == 284 then
+				status = color_arr['statuscol']..'Resists'..rcol
+			elseif T{75,156,189,248,283,312,323,336,355,408,422,423,425,659}:contains(msg_ID) then
+				status = color_arr['statuscol']..'No Effect'..rcol -- The status code for "No Effect" is 255, so it might actually work without this line
 			end
 		
 			-- Sets the common field "abil" based on the applicable abilities.
