@@ -16,6 +16,58 @@ function event_action(act)
 	local actor = actor_table['name']
 	if actor == nil then return end
 	actor = namecol(actor,actor_table,party_table)
+	
+	if condensebattle and condensedamage and act['category'] == 1 and act['target_count'] == 1 and #act['targets'][1]['actions']>1 then
+		local number,misses,ae,aestatus,th = 0,0,0,'',0
+		local abil,col
+		local target_table = get_mob_by_id(act['targets'][1]['id'])
+		local target = target_table['name']
+		target = namecol(target,target_table,party_table)
+		
+		for i,v in pairs(act['targets'][1]['actions']) do
+			number = number + act['targets'][1]['actions'][i]['param']
+			if act['targets'][1]['actions'][i]['message'] == 15 then
+				misses = misses +1
+			end
+			if act['targets'][1]['actions'][i]['has_add_effect'] then
+				local addmsg = act['targets'][1]['actions'][i]['add_effect_message']
+				a,b = string.find(addmsg,'$\123status\125')
+				if a then
+					aestatus = aestatus..' '..statuses[act['targets'][1]['actions'][i]['add_effect_param']]['english']
+				elseif addmsg == 603 then
+					th = act['targets'][1]['actions'][i]['add_effect_param']
+				else
+					ae = ae + act['targets'][1]['actions'][i]['add_effect_param']
+				end
+			end
+		end
+		
+		if number > 0 then
+			abil = color_arr['abilcol']..'Damage ('..#act['targets'][1]['actions']..' Swings)'..rcol
+			col = 'D'
+		else
+			number = misses
+			abil = color_arr['abilcol']..'Misses'..rcol
+			col = 'M'
+		end
+		
+		local outstr = line_full:gsub('$\123lb\125','\7'):gsub('$\123actor\125',actor or ''):gsub('$\123target\125',target or ''):gsub('$\123abil\125',abil or ''):gsub('$\123number\125',number or '')
+		add_to_chat(colorfilt(col,target_table['id']==party_table['p0']['mob']['id']),string.char(0x1F,0xFE,0x1E,0x01)..outstr..string.char(127,49))
+		
+		if ae ~= 0 then
+			abil = 'Add. Eff.'
+			outstr = line_full:gsub('$\123lb\125','\7'):gsub('$\123actor\125',actor or ''):gsub('$\123target\125',target or ''):gsub('$\123abil\125',abil or ''):gsub('$\123number\125',ae or '')
+		end
+		if th ~= 0 then
+			abil = 'Treasure Hunter Level'
+			outstr = line_full:gsub('$\123lb\125','\7'):gsub('$\123actor\125',actor or ''):gsub('$\123target\125',target or ''):gsub('$\123abil\125',abil or ''):gsub('$\123number\125',th or '')
+		end
+		if aestatus ~= 0 then
+			abil = 'Add. Eff.'
+			outstr = line_full:gsub('$\123lb\125','\7'):gsub('$\123actor\125',actor or ''):gsub('$\123target\125',target or ''):gsub('$\123abil\125',abil or ''):gsub('$\123number\125',aestatus or '')
+		end
+		return
+	end
 
 	for i,v in pairs(act['targets']) do
 		for n,m in pairs(act['targets'][i]['actions']) do
@@ -58,25 +110,13 @@ function event_action(act)
 				end
 			elseif act['category'] == 2 then -- Ranged attacks
 				effect_val = act['targets'][i]['actions'][n]['param']
-				if ammonumber then
-					if msg_ID == 352 then abil = 'RA '..ammo_number()
-					elseif msg_ID == 353 then abil = 'Crit RA '..ammo_number()
-					elseif msg_ID == 354 then abil = 'RA Misses '..ammo_number()
-						effect_val = nil
-					elseif msg_ID == 576 then abil = 'RA Hits Squarely '..ammo_number()
-					elseif msg_ID == 577 then abil = 'RA Strikes True '..ammo_number()
-					elseif msg_ID == 157 then abil = 'Barrage '..ammo_number()
-					elseif msg_ID == 382 then abil = 'Absorbs RA'
-					end
-				else
-					if msg_ID == 352 then abil = 'RA'
-					elseif msg_ID == 353 then abil = 'Crit RA'
-					elseif msg_ID == 354 then abil = 'RA Misses'
-						effect_val = nil
-					elseif msg_ID == 576 then abil = 'RA Hits Squarely'
-					elseif msg_ID == 577 then abil = 'RA Strikes True'
-					elseif msg_ID == 157 then abil = 'Barrage'
-					end
+				if msg_ID == 352 then abil = 'RA'
+				elseif msg_ID == 353 then abil = 'Crit RA'
+				elseif msg_ID == 354 then abil = 'RA Misses'
+					effect_val = nil
+				elseif msg_ID == 576 then abil = 'RA Hits Squarely'
+				elseif msg_ID == 577 then abil = 'RA Strikes True'
+				elseif msg_ID == 157 then abil = 'Barrage'
 				end
 			elseif T{7,8,9}:contains(act['category']) then -- 12 and 10 don't really count because their params are meaningless. 1 and 2 need manual ability sorting
 				abil_ID = act['targets'][i]['actions'][n]['param']
@@ -529,14 +569,4 @@ function fieldsearch(message)
 	fieldarr = {}
 	string.gsub(message,"{(.-)}", function(a) if a ~= '${actor}' and a ~= '${target}' then fieldarr[#fieldarr+1] = a end end)
 	return fieldarr
-end
-
-function ammo_number()
-	local inv = get_items()
-	for i,v in pairs(inv['inventory']) do
-		if v['slot_id'] == 63 then
-			return v['count']
-		end
-	end
-	return nil
 end
