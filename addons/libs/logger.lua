@@ -4,27 +4,19 @@ This library provides a set of functions to aid in debugging.
 
 _libs = _libs or {}
 _libs.logger = true
-_libs.tablehelper = _libs.tablehelper or require 'tablehelper'
 _libs.stringhelper = _libs.stringhelper or require 'stringhelper'
 _libs.colors = _libs.colors or require 'colors'
-local config = require 'config'
-_libs.config = _libs.config or (config ~= nil)
-local files = require 'filehelper'
-_libs.filehelper = _libs.filehelper or (files ~= nil)
 
-_addon = _addon or T{}
-
-local logger = T{}
-logger.settings = T{}
-local file
+local logger = {}
+logger.defaults = {}
 
 -- Set up, based on addon.
-logger.settings.logtofile = logger.settings.logtofile or false
-logger.settings.defaultfile = logger.settings.defaultfile or 'lua.log'
-logger.settings.logcolor = logger.settings.logcolor or 207
-logger.settings.errorcolor = logger.settings.errorcolor or 167
-logger.settings.warningcolor = logger.settings.warningcolor or 200
-logger.settings.noticecolor = logger.settings.noticecolor or 160
+logger.defaults.logtofile = false
+logger.defaults.defaultfile = 'lua.log'
+logger.defaults.logcolor = 207
+logger.defaults.errorcolor = 167
+logger.defaults.warningcolor = 200
+logger.defaults.noticecolor = 160
 
 --[[
 	Local functions
@@ -37,34 +29,40 @@ local captionlog
 -- Converts any kind of object type to a string, so it's type-safe.
 -- Concatenates all provided arguments with whitespaces.
 function arrstring(...)
-	return T{...}:arrmap(tostring):sconcat()
+	local str = ''
+	local args = {...}
+	for i = 1, select('#', ...) do
+		if i > 1 then
+			str = str..' '
+		end
+		str = str..tostring(args[i])
+	end
+	return str
 end
 
 -- Prints the arguments provided to the FFXI chatlog, in the same color used for Campaign/Bastion alerts and Kupower messages. Can be changed below.
 function captionlog(msg, msgcolor, ...)
-	local caption = T{}
-	if _addon.name ~= nil then
-		caption:append(_addon.name)
-	end
+	local caption = _addon and _addon.name or ''
+	
 	if msg ~= nil then
-		caption:append(msg)
+		caption = caption..' '..msg
 	end
+	
 	if #caption > 0 then
 		if logger.settings.logtofile == true then
-			flog(caption:sconcat()..':', ...)
+			flog(nil, caption..':', ...)
 			return
 		end
-		caption = (caption:sconcat()..':'):color(msgcolor)..' '
-	else
-		caption = ''
+		caption = (caption..':'):color(msgcolor)..' '
 	end
 	
 	local str = ''
-	if select('#', ...) == 0 or T{...}[1] == '' then
+	if select('#', ...) == 0 or ... == '' then
 		str = ' '
 	else
 		str = arrstring(...):gsub('\t', (' '):rep(4))
 	end
+	
 	for _, line in ipairs(str:split('\n')) do
 		add_to_chat(logger.settings.logcolor, caption..line..'\x1E\x01')
 	end
@@ -89,23 +87,24 @@ end
 -- Prints the arguments provided to a file, analogous to log(...) in functionality.
 -- If the first argument ends with '.log', it will print to that output file, otherwise to 'lua.log' in the addon directory.
 function flog(filename, ...)
-	local f
-	if filename ~= nil then
-		f = files.new(filename)
-	elseif filename == nil then
-		f = file
-	end
+	filename = filename or logger.settings.defaultfile
 	
-	local _, err = f:append(os.date('%Y-%m-%d %H:%M:%S')..'| '..arrstring(...))
-	if err ~= nil then
-		error('File error:', err)
+	local fh, err = io.open(lua_base_path..filename, 'a')
+	if fh == nil then
+		if err ~= nil then
+			error('File error:', err)
+		else
+			error('File error:', 'Unknown error.')
+		end
+	else
+		fh:write(os.date('%Y-%m-%d %H:%M:%S')..'| '..arrstring(...)..'\n')
+		fh:close()
 	end
 end
 
 -- Returns a string representation of a table in explicit Lua syntax: {...}
 function table.tostring(t)
-	t = T(t)
-	if t:isempty() then
+	if next(t) == nil then
 		return '{}'
 	end
 	
@@ -113,15 +112,20 @@ function table.tostring(t)
 	
 	-- Iterate over table.
 	local tstr = ''
-	local kt = t:keyset():sort()
-	for _, key in ipairs(kt) do
+	local kt = {}
+	for key in pairs(t) do
+		kt[#kt+1] = key
+	end
+	table.sort(kt)
+	
+	for i, key in ipairs(kt) do
 		val = t[key]
 		-- Check for nested tables
 		if type(val) == 'table' then
-			valstr = T(val):tostring()
+			valstr = table.tostring(val)
 		else
 			if type(val) == 'string' then
-				valstr = val:enclose('"')
+				valstr = '"'..val..'"'
 			else
 				valstr = tostring(val)
 			end
@@ -135,7 +139,7 @@ function table.tostring(t)
 		end
 		
 		-- Add comma, unless it's the last value.
-		if kt:last() ~= key then
+		if next(kt, i) ~= nil then
 			tstr = tstr..', '
 		end
 	end
@@ -144,9 +148,13 @@ function table.tostring(t)
 	return '{'..tstr..'}'
 end
 
+_meta = _meta or {}
+_meta.T = _meta.T or {}
+_meta.T.__tostring = table.tostring
+
 -- Prints a string representation of a table in explicit Lua syntax: {...}
 function table.print(t, keys)
-	log(T(t):tostring(keys))
+	log(table.tostring(t, keys))
 end
 
 -- Returns a vertical string representation of a table in explicit Lua syntax, with every element in its own line:
@@ -154,8 +162,7 @@ end
 ---     ...
 --- }
 function table.tovstring(t, keys, indentlevel)
-	t = T(t)
-	if t:isempty() then
+	if next(t) == nil then
 		return '{}'
 	end
 	
@@ -163,17 +170,21 @@ function table.tovstring(t, keys, indentlevel)
 	keys = keys or false
 	
 	local indent = (' '):rep(indentlevel*4)
-	local tstr = '{'..'\n'
-	local tk = t:keyset():sort()
-	for _, key in pairs(tk) do
+	local tstr = '{\n'
+	local kt = {}
+	for key in pairs(t) do
+		kt[#kt+1] = key
+	end
+	table.sort(kt)
+	
+	for i, key in pairs(kt) do
 		val = t[key]
 		-- Check for nested tables
 		if type(val) == 'table' then
-			val = T(val)
-			valstr = val:tovstring(keys, indentlevel+1)
+			valstr = table.tovstring(val, keys, indentlevel+1)
 		else
 			if type(val) == 'string' then
-				valstr = val:enclose('"')
+				valstr = '"'..val..'"'
 			else
 				valstr = tostring(val)
 			end
@@ -187,7 +198,7 @@ function table.tovstring(t, keys, indentlevel)
 		end
 		
 		-- Add comma, unless it's the last value.
-		if tk:last() ~= key then
+		if next(kt, i) ~= nil then
 			tstr = tstr..', '
 		end
 		
@@ -203,9 +214,27 @@ end
 ---     ...
 --- }
 function table.vprint(t, keys)
-	log(T(t):tovstring(keys))
+	log(table.tovstring(t, keys))
 end
 
 -- Load logger settings (has to be after the logging functions have been defined, so those work in the config and related files).
-logger.settings = config.load('../libs/logger.xml', logger.settings)
-file = files.new(logger.settings.defaultfile, true)
+-- This checks if the config library has been loaded, if so, it will reload it to wipe the settings. Otherwise it will unload after it's done.
+local loaded = _libs.config ~= nil
+
+if loaded then
+	local old_config = package.loaded.config
+	package.loaded.config = nil
+end
+
+local config = require 'config'
+
+logger.settings = config.load('../libs/logger.xml', logger.defaults)
+
+config = nil
+package.loaded.config = nil
+
+if loaded then
+	package.loaded.config = old_config
+end
+
+collectgarbage()

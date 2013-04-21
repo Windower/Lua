@@ -16,7 +16,7 @@ _libs.filehelper = _libs.filehelper or (files ~= nil)
 
 local config = T(config) or T{}
 local file = files.new()
-local original = nil
+local original = T{['global'] = T{}}
 local chars = T{}
 local comments = T{}
 
@@ -30,27 +30,35 @@ local settings_xml
 local nest_xml
 local table_diff
 
--- Loads a specified file, or alternatively a file 'settings.json' or 'settings.xml' in the current addon folder.
+-- Loads a specified file, or alternatively a file 'settings.xml' in the current addon/data folder.
 -- Writes all configs to _config.
-function config.load(filename, confdict)
+function config.load(filename, confdict, overwrite)
 	if type(filename) == 'table' then
-		confdict = filename
-		filename = nil
+		confdict, filename, overwrite = filename, nil, confdict
+	elseif type(filename) == 'boolean' then
+		filename, overwrite = nil, filename
+	elseif type(confdict) == 'boolean' then
+		confdict, overwrite = nil, confdict
 	end
-	confdict = confdict or T{}
+	confdict = T(confdict) or T{}
+	overwrite = overwrite or false
+	
 	local confdict_mt = getmetatable(confdict)
-	confdict = setmetatable(confdict, {__index=function(t, x) if x == 'save' then return config['save'] else return confdict_mt.__index[x] end end})
+	confdict = setmetatable(confdict, {__index = function(t, x) if config[x] ~= nil then return config[x] else return confdict_mt.__index[x] end end})
 	
 	-- Sets paths depending on whether it's a script or addon loading this file.
-	local filepath = filename or files.check('data/settings.json', 'data/settings.xml')
+	local filepath = filename or files.check('data/settings.xml')
 	if filepath == nil then
-		notice('No settings file found.')
+		file:set('data/settings.xml', true)
+		original['global'] = confdict:copy()
+		confdict:save()
 		return confdict
 	end
 	file:set(filepath)
 
 	-- Load addon/script config file (Windower/addon/<addonname>/config.json for addons and Windower/scripts/<name>-config.json).
-	local config_load, err = parse(file, confdict)
+	local err
+	confdict, err = parse(file, confdict, overwrite)
 
 	if err ~= nil then
 		error(err)
@@ -60,9 +68,7 @@ function config.load(filename, confdict)
 end
 
 -- Resolves to the correct parser and calls the respective subroutine, returns the parsed settings table.
-function parse(file, confdict)
-	confdict = confdict or T{}
-	
+function parse(file, confdict, update)
 	local parsed = T{}
 	local err
 	if file.path:endswith('.json') then
@@ -82,11 +88,18 @@ function parse(file, confdict)
 	
 	-- Determine all characters found in the settings file.
 	chars = parsed:keyset():filter(-functools.equals('global'))
+	original = T{}
+	
+	if update or confdict:isempty() then
+		for _, char in ipairs(T{'global'}+chars) do
+			original[char] = confdict:copy():update(parsed[char], true)
+		end
+		return confdict:update(parsed['global']:update(parsed[get_player()['name']:lower()], true), true)
+	end
 	
 	-- Update the global settings with the per-player defined settings, if they exist. Save the parsed value for later comparison.
-	original = parsed:copy()
-	for char, t in pairs(original) do
-		original[char] = confdict:merge(original[char]):copy()
+	for _, char in ipairs(T{'global'}+chars) do
+		original[char] = confdict:copy():merge(parsed[char])
 	end
 	
 	return confdict:merge(parsed['global']:update(parsed[get_player()['name']:lower()], true))
@@ -120,10 +133,6 @@ function settings_table(node, confdict, key)
 			return num
 		end
 		
-		if confdict:containskey(node.name) and type(confdict[node.name]) == 'table' then
-			return val:psplit('%s*,%s*')
-		end
-		
 		return val
 	end
 	
@@ -148,11 +157,6 @@ end
 -- Writes the passed config table to the spcified file name.
 -- char defaults to get_player()['name']. Set to "all" to apply to all characters.
 function config.save(t, char)
-	if not file:exists() then
-		error('No settings file specified.')
-		return
-	end
-	
 	char = (char or get_player()['name']):lower()
 	if char == 'all' then
 		char = 'global'
@@ -219,6 +223,16 @@ function settings_xml(settings)
 	
 	chars = settings:keyset():filter(-functools.equals('global')):sort()
 	for _, char in ipairs(T{'global'}+chars) do
+		if char == 'global' and comments['settings'] ~= nil then
+			str = str..'\t<!--\n'
+			local comment_lines = comments['settings']:split('\n')
+			for line, comment in ipairs(comment_lines) do
+				if line < #comment_lines then
+					str = str..'\t\t'..comment:trim()..'\n'
+				end
+			end
+			str = str..'\t-->\n'
+		end
 		str = str..'\t<'..char..'>\n'
 		str = str..nest_xml(settings[char], 2)
 		str = str..'\t</'..char..'>\n'
@@ -272,13 +286,22 @@ function nest_xml(t, indentlevel)
 	
 	for frag_key, key in pairs(inlines) do
 		if comments[key] ~= nil then
-			fragments[frag_key] = fragments[frag_key]..('\t'):rep(math.ceil((maxlength - fragments[frag_key]:trim():length())/4) + 1)..'<!--'..comments[key]..'-->'
+			fragments[frag_key] = fragments[frag_key]..(' '):rep(maxlength - fragments[frag_key]:trim():length() + 1)..'<!--'..comments[key]..'-->'
 		end
 		
 		fragments[frag_key] = fragments[frag_key]..'\n'
 	end
 	
 	return fragments:concat()
+end
+
+-- Resets all data. Always use when loading within a library.
+function config.reset()
+	config = T(config) or T{}
+	file = files.new()
+	original = T{['global'] = T{}}
+	chars = T{}
+	comments = T{}
 end
 
 return config

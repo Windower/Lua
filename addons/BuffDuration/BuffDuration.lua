@@ -1,18 +1,37 @@
 --[[
-BuffDuration V2.02
-Copyright (c) 2012, Ricky Gall All rights reserved.
+Copyright (c) 2013, Ricky Gall
+All rights reserved.
 Ammended by Sebastien Gomez
-Troubodar songs included by Mazura of Ragnarok
+Troubadour songs included by Mazura of Ragnarok
 
-Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
 
-    Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-    Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-    Neither the name of the organization nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+    * Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+    * Neither the name of <addon name> nor the
+    names of its contributors may be used to endorse or promote products
+    derived from this software without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL <your name> BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
+
+_addon = {}
+_addon.name = 'BuffDuration'
+_addon.version = '2.1'
+
 require 'tablehelper'  -- Required for various table related features. Made by Arcon
 require 'logger'       -- Made by arcon. Here for debugging purposes
 require 'stringhelper' -- Required to parse the other files. Probably made by Arcon
@@ -45,7 +64,11 @@ function event_load()
 					LightArts=1.8,
 					Rasa=2.28,
 					Composure=3,
-					Troubadour=2
+					Troubadour=2,
+					Marcato=1.5,
+					SoulVoice=2,
+					ComposureOthers=1,
+					Enhance=1.2
 				}
 	--Feel free to update this buffExtension variable in case you have better composure
 	--or don't have perpetuance gloves. The Light Arts and Rasa sections are only used for regen
@@ -58,6 +81,12 @@ function event_load()
 						'Enblizzard','Enwater','Enthunder II','Enstone II','Enaero II','Enfire II','Enblizzard II','Enwater II','Blaze Spikes','Ice Spikes','Shock Spikes'}
 	extenTroub = T {	'Paeon', 'Ballad', 'Minne', 'Minuet', 'Madrigal', 'Prelude', 'Mambo', 'Aubade', 'Pastoral', 'Fantasia', 'Operetta', 'Capriccio', 'Round', 'Gavotte', 'March', 'Etude', 'Carol',
 						'Hymnus', 'Mazurka', 'Scherzo'}
+	extenEnhan = T { 	'Regen','Refresh','Blink','Stoneskin','Aquaveil','Haste','Temper','Phalanx','Sandstorm','Rainstorm','Windstorm','Firestorm','Hailstorm','Thunderstorm','Aurorastorm',
+						'Voidstorm','Blink','Stoneskin','Aquaveil','Invisible','Deodorize','Sneak','Barfire','Barblizzard','Baraero','Barstone','Barthunder','Barwater','Barpoison','Barparalyze',
+						'Barblind','Barsilence','Barpetrify','Barvirus','Boost VIT','Boost MND','Boost AGI','Boost CHR','Boost STR','Boost DEX','Boost INT','Enthunder','Enstone','Enaero','Enfire',
+						'Enblizzard','Enwater','Enthunder II','Enstone II','Enaero II','Enfire II','Enblizzard II','Enwater II','Blaze Spikes','Ice Spikes','Shock Spikes','Protect','Shell','Reraise'}
+	extenMarcat = T {	'Scherzo', 'Hymnus', 'Mazurka'}
+	extenSoulV = T {	'Scherzo', 'Hymnus', 'Mazurka'}
 	--This table is used to check if a buff is able to be
 	--extended via perpetuance or composure. If i missed one
 	--feel free to add it. Keep in mind however i only look for
@@ -121,7 +150,7 @@ function event_gain_status(id,name)
 		--Check to gain Troubadour and add a timer
 		extend['Troubadour'] = os.clock()
 	end
-	first = 1	
+	first = 1
 	for i in ipairs(lines) do		-- Iterates through each line of status.xml to find buff's by ID
 		x = i
 		str = lines[x]
@@ -133,7 +162,7 @@ function event_gain_status(id,name)
 				duration = d
 				buffname = tostring(str:split('>',2)[2]:split('<',2)[1])
 				if tonumber(buffid) == tonumber(id) then
-					createTimer(tostring(name))
+					createTimer(tostring(buffname))
 					buffs = T(get_player()['buffs'])
 					break
 				end
@@ -168,8 +197,24 @@ function check_bufflist(name)
 end
 
 function event_lose_status(id,name)
-	deleteTimer(1,name)
-	send_ipc_message(name..' '..player['name']..' delete')
+	for i in ipairs(lines) do
+		x = i
+		str = lines[x]
+		if str ~= nil then
+			str=tostring(str)
+			a,b,c,d = string.find(str,'<b id="(%w+)" duration="(%w+)"')
+			if c ~= nil then
+				buffid = c
+				duration = d
+				buffn = tostring(str:split('>',2)[2]:split('<',2)[1])
+				if tonumber(buffid) == tonumber(id) and not extenTroub:contains(tostring(name)) then
+					deleteTimer(1,buffn)
+					send_ipc_message(buffn..' '..player['name']..' delete')
+					break
+				end
+			end
+		end
+	end
 end
 
 function event_ipc_message(msg)
@@ -199,6 +244,7 @@ function checkgear(id)
 
 	items = get_items()
 	equip = items.equipment
+	addtime = 0
 	for i in ipairs(hlines) do		-- Iterates through each line of status.xml to find buff's by ID
 		x = i
 		str = hlines[x]
@@ -210,17 +256,17 @@ function checkgear(id)
 				gearid = d
 				addtime2 = e
 				slot = f
-				gearname = tostring(str:split('>',2)[2]:split('<',2)[1])
+                gearname = tostring(str:split('>',2)[2]:split('<',2)[1])
 				if tonumber(extendid) == tonumber(id) then
-					if tonumber(items.inventory[tostring(equip[''..slot..''])].id) == tonumber(gearid) then
-						addtime = addtime2
-					else
-						addtime = 0
+					if equip[slot] ~= 0 then
+						if tonumber(items.inventory[equip[slot]].id) == tonumber(gearid) then
+							addtime = addtime + addtime2
+						else
+							addtime = addtime
+						end
 					end
-					break
 				else
-					addtime = 0
-					break
+					addtime = addtime
 				end
 			end
 		end
@@ -254,11 +300,11 @@ function createTimer(name,target)
 		end
 		--The following checks if any gear will extend the time of the buff
 		checkgear(buffid)
-		if tonumber(addtime) ~= 0 then
-			duration = duration + addtime
-		else
-			timer = duration
-		end
+		--if tonumber(addtime) ~= nil and tonumber(addtime) ~= 0 then
+			--duration = duration + addtime
+		--else
+			--timer = duration
+		--end
 		
 		--The following section is used for extensions of buff timers
 		--Perpetuance, Light Arts, Tabula Rasa, and Composure are all 
@@ -266,11 +312,10 @@ function createTimer(name,target)
 		--If all checks fail, the timer is set to base time at the beginning
 		--and 5 seconds is subtracted due to lag of the chat log.
 
-		
+		mod_duration = tonumber(duration) + addtime
 		buffs = T(get_player()['buffs'])
 		if player['main_job_id'] == 20 then
 			if extendables:contains(tostring(name)) then
-				timer = duration - 5
 				if extend ~= nil then
 					e = os.clock()-60
 					if extend['Perpetuance'] ~= nil then
@@ -292,53 +337,64 @@ function createTimer(name,target)
 							end
 								
 							if tostring(name) == 'Regen' then
-								timer = tonumber(duration) * buffExtension['LightArts'] * buffExtension['Perpetuance'] + addtime - 5
+								mod_duration = mod_duration * buffExtension['LightArts'] * buffExtension['Perpetuance']
 							else
-								timer = tonumber(duration) * buffExtension['Perpetuance'] + addtime - 5
+								mod_duration = mod_duration * buffExtension['Perpetuance']
 							end
 						end
 					end
 				end
 			elseif buffs:contains(377) then
 				if tostring(name) == 'Regen' then
-						timer = tonumber(duration) * buffExtension['Rasa'] + addtime - 5
+						mod_duration = mod_duration * buffExtension['Rasa']
 				end
 			elseif buffs:contains(358) then
 				if tostring(name) == 'Regen' then
-						timer = tonumber(duration) * buffExtension['LightArts'] + addtime - 5
+						mod_duration = mod_duration * buffExtension['LightArts']
 				end
-				
-			else
-				timer = duration - 5
 			end
 		elseif player['main_job_id'] == 5 then
+			--Get Current composure others, enhancing durations
+			checkgear(1000) --Global %boost to enhancing magic
+			buffExtension['Enhance'] = 1 + addtime/100
+			
+			checkgear(1001)
+			CompGearTable={1,1.1,1.2,1.35,1.5}
+			buffExtension['ComposureOthers'] = CompGearTable[addtime]
 			if extenCompo:contains(tostring(name)) then
-				timer = duration - 5
 				if extend ~= nil then
 					e = os.clock()-60
 					if extend['Composure'] ~= nil then
-						if e < extend['Composure'] then	
-							timer = tonumber(duration) * buffExtension['Composure'] + addtime - 5
+						if e < extend['Composure'] then
+							if target == 'Self' then
+								mod_duration = mod_duration * buffExtension['Composure']
+							else
+								mod_duration = mod_duration * buffExtension['ComposureOthers']
+							end
 						end
 					end
+				end
+			end
+			if extenEnhan:contains(tostring(name)) then
+				if extend ~= nil then
+					mod_duration = mod_duration * buffExtension['Enhance']
 				end
 			end
 		elseif player['main_job_id'] == 10 then
+			checkgear(2000)
+			mod_duration = mod_duration + addtime
 			if extenTroub:contains(tostring(name)) then
-				timer = duration - 5
-				if extend ~=nil then
+				if extend ~= nil then
 					e = os.clock()-80
 					if extend['Troubadour'] ~= nil then
 						if e < extend['Troubadour'] then
-							timer = tonumber(duration) * buffExtension['Troubadour'] + addtime - 5
+							mod_duration = mod_duration * buffExtension['Troubadour']
 						end
 					end
 				end
 			end
-		else
-			timer = duration - 5
 		end
-		
+		timer = mod_duration - 5
 		--This is where the timer is actually created
 		--Calls ihm's custom timer create command
 		--e.g. timers c "Protect (Self)" 1800 down Protect <- last protect 

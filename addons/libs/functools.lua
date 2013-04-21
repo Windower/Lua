@@ -24,14 +24,14 @@ end
 -- Returns a partially applied function, depending on the number of arguments provided.
 function functools.apply(fn, args)
 	return function(...)
-		return fn(T(args):extend(T{...}):unpack())
+		return fn(T(args):copy():extend(T{...}):unpack())
 	end
 end
 
 -- Returns a partially applied function, with the argument provided at the end.
 function functools.endapply(fn, args)
 	return function(...)
-		return fn(T{...}:extend(args):unpack())
+		return fn(T{...}:extend(T(args):copy()):unpack())
 	end
 end
 
@@ -43,10 +43,9 @@ function functools.pipe(fn1, fn2)
 end
 
 -- Returns a closure over the argument el that returns true, if its argument equals el.
-function functools.equals(...)
-	local args = T{...}
-	return function(...)
-		return args:equals(T{...})
+function functools.equals(el)
+	return function(cmp)
+		return el == cmp
 	end
 end
 

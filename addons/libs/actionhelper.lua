@@ -43,7 +43,7 @@ local category_strings = {
 	'unknown',
 	'mob_tp_finish',
 	'ranged_begin',
-	'unknown',
+	'avatar_tp_finish',
 	'job_ability_unblinkable'
 }
 
