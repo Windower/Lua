@@ -15,7 +15,7 @@ function event_addon_command(...)
 end
 
 function event_outgoing_text(original, modified)
-    for char in modified:gmatch('<(%a+)>') do
+    for char in modified:gmatch('<([%a%d]+)>') do
         if type(_chars[char]) ~= 'nil' then
             modified = modified:gsub('<'..char..'>', _chars[char])
         end
