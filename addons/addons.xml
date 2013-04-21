@@ -38,6 +38,7 @@
   </addon>
   <addon>
     <name>CellHelp</name>
+	<author>Krizz and Balloon</author>
     <description>Tracks cells that are needed, displays your position in the lot order, and creates the appropriate LL profiles.</description>
   </addon>
   <addon>
@@ -78,6 +79,11 @@
     <author>Banggugyangu</author>
     <description>Informs Spellcast about changes to Sneak Attack and Trick Attack status.</description>
     <bugtracker>https://github.com/banggugyangu/Lua/issues</bugtracker>
+  </addon>
+  <addon>
+	<name>RollTracker</name>
+	<author>Balloon</author>
+	<description>Simplifies Cor rolls, tells you the bonus they give, stops you from doubling up on lucky rolls and reports your chance to bust.</description>
   </addon>
   <addon>
   	<name>reive</name>
