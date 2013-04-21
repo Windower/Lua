@@ -129,7 +129,7 @@ _reive.defaults.colors.bonus.value.r = 147
 _reive.defaults.colors.bonus.value.g = 161
 _reive.defaults.colors.bonus.value.b = 161
 
-_reive.settings = _reive.defaults:copy()
+_reive.settings = T{}
 
 -- plugin functions
 
@@ -288,7 +288,7 @@ end
 -- windower events
 
 function event_load()
-    config.load(_reive.settings)
+    _reive.settings = config.load(_reive.defaults)
 
     local background = _reive.settings.colors.background
 
