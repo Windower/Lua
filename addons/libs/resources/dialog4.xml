@@ -245,7 +245,7 @@
 	<dtd id="243" english="${actor} uses ${weapon_skill}.${lb}${target} receives the effect of ${status}." color="57"/>
 	<dtd id="244" english="${actor} fails to mug ${target}." color="69"/>
 	<dtd id="245" english="${actor} uses Eagle Eye Shot, but misses ${target}." color="M"/>
-	<dtd id="246" english="${target} is full." color="1"/>
+	<dtd id="246" english="${target} is full." color="122"/>
 	<dtd id="247" english="${actor} can't eat the ${item}." color="1"/>
 	<dtd id="248" english="${actor}'s attack has no effect on ${target}." color="R"/>
 	<dtd id="249" english="${target}'s strength is impossible to gauge!" color="191"/>
