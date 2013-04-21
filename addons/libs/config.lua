@@ -40,7 +40,7 @@ function config.load(filename, confdict, overwrite)
 	elseif type(confdict) == 'boolean' then
 		confdict, overwrite = nil, confdict
 	end
-	confdict = T(confdict) or T{}
+	confdict = T(confdict):copy()
 	overwrite = overwrite or false
 	
 	local confdict_mt = getmetatable(confdict)
@@ -63,6 +63,8 @@ function config.load(filename, confdict, overwrite)
 	if err ~= nil then
 		error(err)
 	end
+	
+	collectgarbage()
 	
 	return confdict
 end
@@ -102,7 +104,7 @@ function parse(file, confdict, update)
 		original[char] = confdict:copy():merge(parsed[char])
 	end
 	
-	return confdict:copy():merge(parsed['global']:update(parsed[get_player()['name']:lower()], true))
+	return confdict:merge(parsed['global']:update(parsed[get_player()['name']:lower()], true))
 end
 
 -- Parses a settings struct from a DOM tree.
