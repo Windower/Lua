@@ -133,7 +133,7 @@ _reive.settings = _reive.defaults:copy()
 
 -- plugin functions
 
-function _reive:parseOptions(args)
+function _reive.parseOptions(args)
     local options = T{}
 
 	while #args > 0 do
@@ -153,8 +153,8 @@ function _reive:parseOptions(args)
     return options
 end
 
-function _reive:test(...)
-    _reive:start()
+function _reive.test(...)
+    _reive.start()
     add_to_chat(121, 'Reive momentum score: HP recovery.')
     add_to_chat(121, 'Momentum bonus: Ability cast recovery!')
     add_to_chat(121, 'Reive momentum score: Damage taken.')
@@ -175,27 +175,27 @@ function _reive:test(...)
     add_to_chat(131, 'Player gains 426 limit points.')
 end
 
-function _reive:start(...)
+function _reive.start(...)
     if _reive.reset_on_start == true then
-        _reive:reset()
+        _reive.reset()
     end
 
     _reive.track = true
     add_to_chat(0, '\30\03The Reive has begun!\30\01')
-    _reive:show()
+    _reive.show()
 end
 
-function _reive:stop(...)
+function _reive.stop(...)
     _reive.stats.scores  = T{}
     _reive.stats.bonuses = T{}
 
     _reive.track = false
     add_to_chat(0, '\30\03The Reive has ended\30\01')
-    _reive:hide()
-    _reive:status()
+    _reive.hide()
+    _reive.status()
 end
 
-function _reive:refresh(...)
+function _reive.refresh(...)
     if _reive.visible == false then
         return
     end
@@ -242,36 +242,36 @@ function _reive:refresh(...)
     tb_set_text(_reive.tb_name, text)
 end
 
-function _reive:reset(...)
+function _reive.reset(...)
     _reive.stats.exp   = 0
     _reive.stats.bayld = 0
-    _reive:refresh()
+    _reive.refresh()
 end
 
-function _reive:show(...)
+function _reive.show(...)
     _reive.visible = true
     tb_set_visibility(_reive.tb_name, true)
-    _reive:refresh()
+    _reive.refresh()
 end
 
-function _reive:hide(...)
+function _reive.hide(...)
     _reive.visible = false
     tb_set_visibility(_reive.tb_name, false)
 end
 
-function _reive:toggle(...)
+function _reive.toggle(...)
     if _reive.visible then
-        _reive:hide()
+        _reive.hide()
     else
-        _reive:show()
+        _reive.show()
     end
 end
 
-function _reive:status(...)
+function _reive.status(...)
     add_to_chat(0, '\30\03[EXP\30\01 \30\02'.._reive.stats.exp..'\30\01\30\03] [Bayld\30\01 \30\02'.._reive.stats.bayld..'\30\01\30\03]\30\01')
 end
 
-function _reive:first_run(...)
+function _reive.first_run(...)
     if ( type(_reive.settings.v) ~= 'nil' and _reive.settings.v >= tonumber(_reive.v) and _reive.settings.first_run == false ) then
         return
     end
@@ -288,7 +288,7 @@ end
 -- windower events
 
 function event_load()
-    config.load(_reive.settings, true)
+    config.load(_reive.settings)
 
     local background = _reive.settings.colors.background
 
@@ -304,7 +304,7 @@ function event_load()
     tb_set_bg_visibility(_reive.tb_name, true)
 
     if T(get_player()['buffs']):contains(511) then
-        _reive:start()
+        _reive.start()
     end
 end
 
@@ -314,18 +314,18 @@ function event_unload()
 end
 
 function event_login()
-    _reive:first_run()
+    _reive.first_run()
 end
 
 function event_gain_status(id, name)
     if id == 511 then
-        _reive:start()
+        _reive.start()
     end
 end
 
 function event_lose_status(id, name)
     if id == 511 then
-        _reive:stop()
+        _reive.stop()
     end
 end
 
@@ -337,7 +337,7 @@ function event_incoming_text(original, modified, mode)
 
         if match then
             _reive.stats.scores:append(match)
-            _reive:refresh()
+            _reive.refresh()
 
             return modified, mode
         end
@@ -350,7 +350,7 @@ function event_incoming_text(original, modified, mode)
             end
 
             _reive.stats.bonuses[match] = _reive.stats.bonuses[match] + 1
-            _reive:refresh()
+            _reive.refresh()
 
             return modified, mode
         end
@@ -359,14 +359,14 @@ function event_incoming_text(original, modified, mode)
 
         if match and _reive.track then
             _reive.stats.bayld = _reive.stats.bayld + match
-            _reive:refresh()
+            _reive.refresh()
         end
     elseif mode == 131 and _reive.track then
         match = original:match('gains (%d+) limit points%.')
 
         if match then
             _reive.stats.exp = _reive.stats.exp + match
-            _reive:refresh()
+            _reive.refresh()
 
             return modified, mode
         end
@@ -375,7 +375,7 @@ function event_incoming_text(original, modified, mode)
 
         if match then
             _reive.stats.exp = _reive.stats.exp + match
-            _reive:refresh()
+            _reive.refresh()
 
             return modified, mode
         end
@@ -409,15 +409,15 @@ function event_addon_command(...)
         messages:append('help >> reive font [[-h]|[-f \30\02font\30\01] [-s \30\02size\30\01] [-a \30\02alpha\30\01] [-b[ \30\02bold\30\01]] [-i[ \30\02italic\30\01]]] -- sets the style of the font used in the window')
         messages:append('help >> reive color [[-h]|[-o \30\02objects\30\01] [-d] [-r \30\02red\30\01] [-g \30\02green\30\01] [-b \30\02blue\30\01] [-a \30\02alpha\30\01]] -- sets the colors used by the plugin')
     elseif cmd == 'test' then
-        _reive:test()
+        _reive.test()
     elseif cmd == 'reset' then
-        _reive:reset()
+        _reive.reset()
     elseif cmd == 'show' then
-        _reive:show()
+        _reive.show()
     elseif cmd == 'hide' then
-        _reive:hide()
+        _reive.hide()
     elseif cmd == 'toggle' then
-        _reive:toggle()
+        _reive.toggle()
     elseif cmd == 'max-scores' then
         local max_scores
 
@@ -439,7 +439,7 @@ function event_addon_command(...)
         if errors:length() == 0 then
             _reive.settings.max_scores = max_scores
 
-            _reive:refresh()
+            _reive.refresh()
             _reive.settings:save('all')
         end
     elseif cmd == 'reset-on-start' then
@@ -465,7 +465,7 @@ function event_addon_command(...)
         if errors:length() == 0 then
             _reive.settings.reset_on_start = reset_on_start
 
-            _reive:refresh()
+            _reive.refresh()
             _reive.settings:save('all')
         end
     elseif cmd == 'track' then
@@ -501,14 +501,14 @@ function event_addon_command(...)
             if errors:length() == 0 then
                 _reive.settings.track[object] = visible
 
-                _reive:refresh()
+                _reive.refresh()
                 _reive.settings:save('all')
             end
         else
             errors:append('track >> track expects \'score\' to be one of the following values: '..validObjects:concat(', '))
         end
     else
-        local options = _reive:parseOptions(args)
+        local options = _reive.parseOptions(args)
 
         if cmd == 'position' then
             if options:containskey('h') or options:length() == 0 then
@@ -850,7 +850,7 @@ function event_addon_command(...)
                         end
                     end
 
-                    _reive:refresh()
+                    _reive.refresh()
                     _reive.settings:save('all')
                 end
             end
