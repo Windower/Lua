@@ -135,6 +135,7 @@ function event_action(act)
 			roller = act['param']
 			rollnum = act['targets'][1]['actions'][1]['param']
 			effected_member={}
+			bust_rate(rollnum)
 			for i=1, #roll_id do
 				if roller == roll_id[i] then
 					for n=1, #act['targets'] do
@@ -150,11 +151,12 @@ function event_action(act)
 					luckyroll=0
 					if rollnum == roll_luck[i] or rollnum == 11 then 
 						luckyroll = 1
-						add_to_chat(1, '['..#effected_member..'] '..effected_write..string.char(31,1)..' >>> '..roll_ident[tostring(roller)]..' Roll ('..rollnum..')'..string.char(31,158)..' (Lucky!)'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')')
+						add_to_chat(1, '['..#effected_member..'] '..effected_write..string.char(31,1)..' >>> '..roll_ident[tostring(roller)]..' Roll ('..rollnum..')'..string.char(31,158)..' (Lucky!)'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
 					elseif rollnum==12 then
 						add_to_chat(1, string.char(31,167)..'Bust! ('..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')')
 					else
-						add_to_chat(1, '['..#effected_member..'] '..effected_write..string.char(31,1)..' >>> '..roll_ident[tostring(roller)]..' Roll ('..rollnum..')'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')')
+						add_to_chat(1, '['..#effected_member..'] '..effected_write..string.char(31,1)..' >>> '..roll_ident[tostring(roller)]..' Roll ('..rollnum..')'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
+						
 
 				end
 			end
@@ -163,7 +165,14 @@ function event_action(act)
 end
 end
 
-			
+function bust_rate(num)
+	if num <= 5 or num == 11 then
+		bustrate = ''
+	else 
+		bustrate = '\7  [Chance to Bust]: '..string.format("%.1f",(num-5)*16.67)..'%'
+	end
+	return bustrate
+end
 	
 
 function event_outgoing_text(original, modified)
