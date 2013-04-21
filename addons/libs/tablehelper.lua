@@ -247,7 +247,7 @@ function table.merge(t, t_merge, splitchar, silent)
 					notice('Could not safely merge values (key '..key..'):', oldval, '|', val, '|')
 				end
 			else
-				oldval = val
+				t[key] = val
 			end
 		end
 	end
