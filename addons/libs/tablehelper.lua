@@ -31,20 +31,37 @@ _meta.N.__class = 'Nil'
 -- t = T{...} for explicit declaration.
 -- t = T(regular_table) to cast to a T-table.
 function T(t)
-	t = t or {}
 	if class(t) == 'Set' then
 		local res = T{}
 		
-		for el in pairs(s) do
-			res:append(s)
+		local key = 1
+		for el in pairs(t) do
+			if type(el) == 'table' then
+				res[key] = table.copy(el)
+			else
+				res[key] = el
+			end
+			key = key + 1
 		end
+	elseif class(t) == 'List' then
+		local res = T{}
 		
-		t = res
+		local key = 1
+		for _, el in ipairs(t) do
+			if type(el) == 'table' then
+				res[key] = table.copy(el)
+			else
+				res[key] = el
+			end
+			key = key + 1
+		end
+	else
+		res = t or {}
 	end
 	
 	-- Sets T's metatable's index to the table namespace, which will take effect for all T-tables.
 	-- This makes every function that tables have also available for T-tables.
-	return setmetatable(t, _meta.T)
+	return setmetatable(res, _meta.T)
 end
 
 function N()
@@ -106,12 +123,13 @@ end
 
 -- Returns if the key searchkey is in t.
 function table.containskey(t, searchkey)
-	return t[searchkey] ~= nil
+	return rawget(t, searchkey) ~= nil
 end
 
 -- Appends an element to the end of an array table.
 function table.append(t, val)
 	t[#t+1] = val
+	
 	return t
 end
 
@@ -132,16 +150,12 @@ _meta.T.__add = table.extend
 -- Returns the number of element in the table that satisfy fn. If fn is not a function, counts the number of occurrences of fn.
 function table.count(t, fn)
 	if type(fn) ~= 'function' then
-		if type(fn) == nil then
-			fn = boolean.exists
-		else
-			fn = functools.equals(fn)
-		end
+		fn = functools.equals(fn)
 	end
 
 	count = 0
 	for _, val in pairs(t) do
-		if fn(val) == true then
+		if fn(val) then
 			count = count + 1
 		end
 	end
@@ -353,7 +367,7 @@ end
 
 -- Returns a reversed array.
 function table.reverse(t)
-	local res = T{}
+	local res = {}
 	
 	local n = #t
 	local rkey = n
@@ -362,10 +376,11 @@ function table.reverse(t)
 		rkey = rkey - 1
 	end
 
-	return res
+	return setmetatable(res, getmetatable(t) or _meta.T)
 end
 
 -- Returns an array removed of all duplicates.
+-- DEPRECATED: User S(t) instead
 function table.set(t)
 	local seen = {}
 	local res = {}
@@ -382,7 +397,7 @@ function table.set(t)
 end
 
 -- Backs up old table sorting function.
-_raw.table.sort = table.sort
+_raw.table.sort = _raw.table.sort or table.sort
 
 -- Returns a sorted table.
 function table.sort(t, ...)
@@ -392,7 +407,7 @@ end
 
 -- Return true if any element of t satisfies the condition fn.
 function table.any(t, fn)
-	for key, val in pairs(t) do
+	for _, val in pairs(t) do
 		if(fn(val) == true) then
 			return true
 		end
@@ -403,7 +418,7 @@ end
 
 -- Return true if all elements of t satisfy the condition fn.
 function table.all(t, fn)
-	for key, val in pairs(t) do
+	for _, val in pairs(t) do
 		if(fn(val) ~= true) then
 			return false
 		end
