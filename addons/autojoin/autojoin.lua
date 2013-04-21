@@ -17,6 +17,8 @@ require 'luau'
 
 _addon = T{}
 _addon.name = 'AutoJoin'
+_addon.command = 'autojoin'
+_addon.short_command = 'aj'
 _addon.version = 0.9
 
 defaults = T{}
@@ -46,13 +48,11 @@ aliases = T{
 addstrs = T{'a', 'add', '+'}
 rmstrs = T{'r', 'rm', 'remove', '-'}
 
---log(('blist'):isin(T{'blist'}))
 modes = T{'whitelist', 'blacklist'}
-
--- AutoJoin
 
 -- Invite handler
 function event_party_invite(senderId, sender, something)
+	reset()
 	if settings.autodecline and settings.blacklist:contains(sender) then
 		send_command('input /decline')
 		notice('Blacklisted invite from '..sender..' blocked.')
@@ -61,7 +61,6 @@ function event_party_invite(senderId, sender, something)
 	
 	if settings.mode == 'whitelist' and settings.whitelist:contains(sender)
 	or settings.mode == 'blacklist' and not settings.blacklist:contains(sender) then
-		pool = false
 		try = true
 		send_command('wait 1; lua i autojoin try_join')
 	end
@@ -69,7 +68,7 @@ end
 
 -- Check incoming text for the treasure pool warning.
 function event_incoming_text(original, modified, color)
-	if original:stripformat() == 'Caution: All unclaimed treasure will be lost if you join a party.' then
+	if original:strip_format() == 'Caution: All unclaimed treasure will be lost if you join a party.' then
 		pool = true
 	end
 	
@@ -78,15 +77,19 @@ end
 
 -- Check outgoing text for joins or declines.
 function event_outgoing_text(original, modified)
-	if original:isin('/decline', '/join') then
-		try = false
+	if original:isin({'/decline', '/join'}) then
+		reset()
 	end
 end
 
 -- Resets status on zoning.
 function event_zone_change(...)
-	try = false
+	reset()
+end
+
+function reset()
 	pool = false
+	try = false
 end
 
 -- Attempts a join, given certain conditions are met
@@ -156,7 +159,7 @@ function event_addon_command(command, ...)
 		elseif mode == 'status' then
 			log('Currently in '..settings.mode..' mode.')
 		else
-			error('Invalid mode: ', args[1])
+			error('Invalid mode:', args[1])
 			return
 		end
 		
@@ -188,8 +191,8 @@ function event_addon_command(command, ...)
 	-- Print current settings status
 	elseif command == 'status' then
 		log('Mode:', settings.mode)
-		log('Whitelist:', settings.whitelist:format('csv'))
-		log('Blacklist:', settings.blacklist:format('csv'))
+		if settings.whitelist:isempty() then log('Whitelist:', '(empty)') else log('Whitelist:', settings.whitelist:format('csv')) end
+		if settings.blacklist:isempty() then log('Blacklist:', '(empty)') else log('Blacklist:', settings.blacklist:format('csv')) end
 		log('Auto-decline:', settings.autodecline)
 	
 	-- Unknown command handler
@@ -201,11 +204,10 @@ end
 -- Constructor
 
 function event_load()
-	-- Treasure pool warning flag
-	pool = false
-	try = false
+	reset()
 	
 	initialize()
+	settings:save()
 
 	send_command('alias autojoin lua c autojoin')
 	send_command('alias aj autojoin')
@@ -221,7 +223,6 @@ function initialize()
 	settings = config.load(defaults)
 	settings.whitelist = settings.whitelist:map(string.ucfirst..string.lower)
 	settings.blacklist = settings.blacklist:map(string.ucfirst..string.lower)
-	settings:save()
 end
 
 -- Destructor

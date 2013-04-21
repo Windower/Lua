@@ -43,7 +43,7 @@ end
 
 function event_unload()
     dosettings('save')
-    add_to_chat(55,"FFOColor unloading and saving settings.")
+    add_to_chat(55, "FFOColor unloading and saving settings.")
     send_command('unalias ffocolor')
 end
 
@@ -84,7 +84,7 @@ end
 
 function event_incoming_text(old,new,color)
     if old ~= former then
-        local a,b,txt = string.find(old,'^[^%w]*%[%d+:#%w+%](.*):')
+        local a,b,txt = string.find(old,'^[^%w]*%[%d+:#[%w_]+%](.*):')
         local c = string.find(old,'^[^%w]*%[%d+:#%w+%]') or string.find(old,'^[^%w]*%[FFOChat%]')
         if b ~= nil then
             tcol = string.char(31,settings['talkedc'])

@@ -1,46 +1,43 @@
-require 'dpsclock'
-
-dps_db = T{}
-
--- DPS clock variables
---dps_clock = require 'dpsclock':new()
-dps_clock = DPSClock:new() --small fix to stop errors overnight
-
-local function update_dps_clock()
-    if get_player()['in_combat'] then
-        dps_clock:advance()
-    else
-        dps_clock:pause()
-    end
-end
+require 'tablehelper'
 
 
-function model_update()
-    update_dps_clock()
-end
-
-
-function model_init()
+local DamageDB = {
     dps_db = T{}
-    dps_clock:reset()
+}
+
+
+function DamageDB:new (o)
+    o = o or {}
+    setmetatable(o, self)
+    self.__index = self
+    
+    return o
+end
+
+function DamageDB:isempty()
+    return self.dps_db:isempty()
+end
+
+function DamageDB:init()
+    self.dps_db = T{}
 end
 
 
 -- Adds the given data to the main DPS table
-function accumulate(mob, player, damage)
-    mob = string.lower(mob:gsub('^[tT]he ', ''))
-    if not dps_db[mob] then
-        dps_db[mob] = T{}
+function DamageDB:accumulate(mob, player, damage)
+    if not self.dps_db[mob] then
+        self.dps_db[mob] = T{}
     end
 	
     damage = tonumber(damage)
-    if not dps_db[mob][player] then
-        dps_db[mob][player] = damage
+    if not self.dps_db[mob][player] then
+        self.dps_db[mob][player] = damage
     else
-        dps_db[mob][player] = damage + dps_db[mob][player] 
+        self.dps_db[mob][player] = damage + self.dps_db[mob][player] 
     end
 end
 
+return DamageDB
 
 --[[
 Copyright (c) 2013, Jerry Hebert

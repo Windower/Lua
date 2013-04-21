@@ -28,12 +28,16 @@ require 'buff'
 
 function event_load()
 	
-	version = '1.0.1'
+	version = '1.1.0'
 	SA_Set = ' '
 	TA_Set = ' '
 	SATA_Set = ' '
 	TP_Set = ' '
+	TH_Set = ' '
 	Idle_Set = ' '
+	TH_ON = 0
+	TP_ON = 0
+	send_command('alias scast lua c satacast')
 	add_to_chat(17, 'SATACast v' .. version .. ' loaded.     Author:  Banggugyangu')
 	add_to_chat(17, 'Attempting to load settings from file.')
 	options_load()
@@ -52,11 +56,11 @@ function options_load()
 		g:write('Author Comment: For the output customization lines, simply place the name of the spellcast set for each setting exactly how it is spelled in spellcast.\n')
 		g:write('Author Comment: The design of the settings file is credited to Byrthnoth as well as the creation of the settings file.\n\n\n\n')
 		g:write('Fill In Settings Below:\n')
-		g:write('SA Set: SneakAttack\nTA Set: TrickAttack\nSATA Set: SATA\nTP Set: TP\nIdle Set: Movement\n')
+		g:write('SA Set: SneakAttack\nTA Set: TrickAttack\nSATA Set: SATA\nTP Set: TP\nTH Set: TreasureHunter\nIdle Set: Movement\n')
 		g:close()
 		
 		write('Default settings file created')
-		add_to_chat(13,'SATACast created a settings file and loaded!')
+		add_to_chat(17,'SATACast created a settings file and loaded!')
 	else
 		f:close()
 		for curline in io.lines(lua_base_path..'data/settings.txt') do
@@ -73,11 +77,13 @@ function options_load()
 				SATA_Set = splat[3]
 			elseif cmd == 'tp set' then
 				TP_Set = splat[3]
+			elseif cmd == 'th set' then
+				TH_Set = splat[3]
 			elseif cmd == 'idle set' then
-				Idle_Set = ' '
+				Idle_Set = splat[3]
 			end
 		end
-		add_to_chat(12,'SATACast read from a settings file and loaded!')
+		add_to_chat(17,'SATACast read from a settings file and loaded!')
 	end
 end
 
@@ -111,4 +117,47 @@ function event_lose_status(id, name)
 		elseif self.status:lower() == 'idle' then
 			send_command('sc set ' .. Idle_Set)
 		end
+	end
+end
+
+function event_action(act)
+	local actor = act.actor_id
+	local category = act.category
+	local actor = act.actor_id
+	local category = act.category
+	local param = act.param
+	local player = get_player()
+	
+	if player.status:lower() == 'engaged' then
+		if actor == (player.id or player.target_id) then
+			if category == 1 then
+				if TH_ON == 0 then
+					send_command('sc set ' .. TH_Set)
+					TH_ON = 1
+				elseif TH_ON == 1 then
+					if TP_ON == 0 then
+						send_command('sc set ' .. TP_Set)
+						TP_ON = 1
+					elseif TP_ON == 1 then
+					end
+				end
+			end
+		end
+	elseif player.status:lower() == 'idle' then
+		TH_ON = 0
+	end
+end
+
+--Function Designer:  Byrth
+function event_addon_command(...)
+    local term = table.concat({...}, ' ')
+    local splitarr = split(term,' ')
+	if splitarr[1]:lower() == 'reload' then
+		options_load()
+	elseif splitarr[1]:lower() == 'help' then
+		add_to_chat(17, 'SATACast  v'..version..'commands:')
+		add_to_chat(17, '//scast [options]')
+		add_to_chat(17, '    reload  - Reloads settings')
+		add_to_chat(17, '    help   - Displays this help text')
+	end
 end
