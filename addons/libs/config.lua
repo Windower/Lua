@@ -102,7 +102,7 @@ function parse(file, confdict, update)
 		original[char] = confdict:copy():merge(parsed[char])
 	end
 	
-	return confdict:merge(parsed['global']:update(parsed[get_player()['name']:lower()], true))
+	return confdict:copy():merge(parsed['global']:update(parsed[get_player()['name']:lower()], true))
 end
 
 -- Parses a settings struct from a DOM tree.

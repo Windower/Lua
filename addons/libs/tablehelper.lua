@@ -233,7 +233,7 @@ function table.merge(t, t_merge, splitchar, silent)
 					elseif not silent then
 						notice('Could not safely merge values (key '..key..'):', oldval, '|', val, '|')
 					end
-				elseif type(oldval == 'boolean') then
+				elseif type(oldval) == 'boolean' then
 					if val == 'true' then
 						t[key] = true
 					elseif val == 'false' then
@@ -241,7 +241,7 @@ function table.merge(t, t_merge, splitchar, silent)
 					elseif not silent then
 						notice('Could not safely merge values (key '..key..'):', oldval, '|', val, '|')
 					end
-				elseif type(oldval == 'string') then
+				elseif type(oldval) == 'string' then
 					t[key] = val
 				elseif not silent then
 					notice('Could not safely merge values (key '..key..'):', oldval, '|', val, '|')
