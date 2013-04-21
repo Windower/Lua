@@ -25,6 +25,7 @@ local comments = T{}
 ]]
 
 local parse
+local merge
 local settings_table
 local settings_xml
 local nest_xml
@@ -101,10 +102,74 @@ function parse(file, confdict, update)
 	
 	-- Update the global settings with the per-player defined settings, if they exist. Save the parsed value for later comparison.
 	for _, char in ipairs(T{'global'}+chars) do
-		original[char] = confdict:copy():merge(parsed[char])
+		original[char] = merge(confdict:copy(), parsed[char], char)
 	end
 	
-	return confdict:merge(parsed['global']:update(parsed[get_player()['name']:lower()], true))
+	return merge(confdict, parsed['global']:update(parsed[get_player()['name']:lower()], true))
+end
+
+-- Merges two tables like update would, but retains type-information and tries to work around conflicts.
+function merge(t, t_merge, path)
+	if t_merge == nil then
+		return t
+	end
+	
+	path = (type(path) == 'string' and T{path}) or path
+
+	local oldval
+	local err
+	for key, val in pairs(t_merge) do
+		err = false
+		oldval = t[key]
+		if type(oldval) == 'table' and type(val) == 'table' then
+			if path then
+				t[key] = merge(oldval, val, path:copy()+key)
+			else
+				t[key] = merge(oldval, val, nil)
+			end
+		elseif type(oldval) ~= type(val) then
+			if type(oldval) == 'table' then
+				if type(val) == 'string' then
+					t[key] = table.map(val:split(','), string.trim)
+				else
+					err = true
+				end
+			elseif type(oldval) == 'number' then
+				local testdec = tonumber(val)
+				local testhex = tonumber(val, 16)
+				if testdec then
+					t[key] = testdec
+				elseif testhex then
+					t[key] = testhex
+				else
+					err = true
+				end
+			elseif type(oldval) == 'boolean' then
+				if val == 'true' then
+					t[key] = true
+				elseif val == 'false' then
+					t[key] = false
+				else
+					err = true
+				end
+			elseif type(oldval) == 'string' then
+				t[key] = val
+			else
+				err = true
+			end
+		else
+			t[key] = val
+		end
+		
+		if err then
+			if path then
+				notice('Could not safely merge values for \''..path:concat('/')..'/'..key..'\', '..type(oldval)..' expected (default: '..tostring(oldval)..'), got '..type(val)..' ('..tostring(val)..').')
+			end
+			t[key] = val
+		end
+	end
+
+	return t
 end
 
 -- Parses a settings struct from a DOM tree.
