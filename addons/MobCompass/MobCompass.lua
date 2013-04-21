@@ -116,6 +116,9 @@ end
 
 function event_unload()
 	loop = 1
+	tb_delete(box_name)
+	tb_delete(box_name2)
+	tb_delete(box_name3)
 end
 
 function event_login()
