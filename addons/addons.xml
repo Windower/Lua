@@ -101,4 +101,8 @@
     <name>vwhl</name>
     <description>Redirects vw nm's vulnerabilities to the "tell" stream so that they can be held using the chat filters' function and highlights the important info. Supports EN, FR, DE clients.</description>
   </addon>
+  <addon>
+	<name>MobCompass</name>
+	<description>A compass to show your position relative to the target (not players) for geo and has a setup for Sneak attack</description>
+  </addon>
 </addons>
