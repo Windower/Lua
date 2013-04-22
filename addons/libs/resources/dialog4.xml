@@ -25,7 +25,7 @@
 	<dtd id="23" english="${actor} learns a new spell!" color="91"/>
 	<dtd id="24" english="${target} recovers ${number} HP." color="H"  units="HP"/>
 	<dtd id="25" english="${target} recovers ${number} MP." color="H"  units="MP"/>
-	<dtd id="26" english="${target} recovers ${number} HP and MP." color="H"  units="HP and some MP"/>
+	<dtd id="26" english="${target} recovers ${number} HP and MP." color="H" />
 	<dtd id="27" english="Debug Message: Cannot execute command.${lb}No (BTCALC) command in ATEL source." color="1"/>
 	<dtd id="28" english="${actor} uses a ${item}." color="90"/>
 	<dtd id="29" english="${actor} is paralyzed." color="122"/>
@@ -245,7 +245,7 @@
 	<dtd id="243" english="${actor} uses ${weapon_skill}.${lb}${target} receives the effect of ${status}." color="57"/>
 	<dtd id="244" english="${actor} fails to mug ${target}." color="69"/>
 	<dtd id="245" english="${actor} uses Eagle Eye Shot, but misses ${target}." color="M"/>
-	<dtd id="246" english="${target} is full." color="1"/>
+	<dtd id="246" english="${target} is full." color="122"/>
 	<dtd id="247" english="${actor} can't eat the ${item}." color="1"/>
 	<dtd id="248" english="${actor}'s attack has no effect on ${target}." color="R"/>
 	<dtd id="249" english="${target}'s strength is impossible to gauge!" color="191"/>
@@ -561,7 +561,7 @@
 	<dtd id="559" english="You have successfully completed the training regime." color="122"/>
 	<dtd id="560" english="${actor} uses ${ability}. Finishing move now ${number}." color="101" units="FM"/>
 	<dtd id="561" english="Unable to perform that action.${lb}Your have already earned the maximum number of finishing moves." color="122"/>
-	<dtd id="562" english="The status parameters of ${target} have increased." color="1"/>
+	<dtd id="562" english="The status parameters of ${target} have increased." color="122"/>
 	<dtd id="563" english="${actor} destroys ${target}." color="1"/>
 	<dtd id="564" english="${target} were destroyed." color="1"/>
 	<dtd id="565" english="${target} obtains ${gil}." color="1"/>
