@@ -17,8 +17,9 @@ _meta.L.__index = function(l, x) if list[x] ~= nil then return list[x] else retu
 _meta.L.__class = 'List'
 
 function L(t)
+	local l
 	if class(t) == 'Set' then
-		local l = L{}
+		l = L{}
 		
 		for el in pairs(t) do
 			l:append(el)
