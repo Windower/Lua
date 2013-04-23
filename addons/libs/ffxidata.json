@@ -361,10 +361,6 @@ chat: {
         bright:  \x84\xb2, // ┤
         bbottom: \x84\xb3, // ┴
         bmiddle: \x84\xb4, // ┼
-        bleft:   \x84\xb5, // ├
-        btop:    \x84\xb6,
-        bright:  \x84\xb7,
-        bbottom: \x84\xb8,
 
         // sup numbers 1-4
         sup0: \x85\x7a,
