@@ -19,7 +19,7 @@ function event_action(act)
 	
 	if condensebattle and condensedamage and act['category'] == 1 and act['target_count'] == 1 and #act['targets'][1]['actions']>1 then
 		local number,misses,ae,aestatus,th = 0,0,0,'',0
-		local abil,col,abil_ID
+		local abil,col,abil_ID,effect_val
 		local target_table = get_mob_by_id(act['targets'][1]['id'])
 		local target = target_table['name']
 		target = namecol(target,target_table,party_table)
