@@ -190,7 +190,7 @@ function lightluggage()
 	ll_pass = ""
 	for i=1, #salvage_cell_name_short  do 
 		if salvage_cell_name_short[i] ~= nil then
-			if cell_lots[salvage_cell_name_short[i]] == 1 and mode == "lots" then
+			if cell_lots[salvage_cell_name_short[i]] == 1 then
 	   		ll_lots = (ll_lots..cells_id[i]..',')
 	   		elseif cell_lots[salvage_cell_name_short[i]] == 0 then
 	   			if salvage_cell_name_short[i] ~= "alex" then
@@ -199,7 +199,9 @@ function lightluggage()
 	   		end
 	   	end
 	end
-	llprofile = (llprofile..'if item is '..ll_lots..' then lot \n')
+	if mode == "lots" then
+		llprofile = (llprofile..'if item is '..ll_lots..' then lot \n')
+	end
 	llprofile = (llprofile..'if item is '..ll_pass..' then pass \n')
 	
 	if settingtab[set][player_num]['pass'] ~= 0 then
