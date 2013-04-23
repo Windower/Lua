@@ -54,40 +54,40 @@ chat: {
 	// Special characters that could potentially be used
 	chars: {
         // punctuation
-        comma: \x81\x41,
-        period: \x81\x42,
-        colon: \x81\x46,
-        semicolon: \x81\x47,
-        query: \x81\x48,
+        comma:       \x81\x41,
+        period:      \x81\x42,
+        colon:       \x81\x46,
+        semicolon:   \x81\x47,
+        query:       \x81\x48,
         exclamation: \x81\x49,
-        macron: \x81\x50, // ¯
-        zero: \x81\x5a,
-        bar: \x81\x5b, // ―
-        emdash: \x81\x5c, // —
-        endash: \x81\x5d, // –
-        slash: \x81\x5e, 
-        bslash: \x81\x5f,
-        cdots: \x81\x63, // … centered vertically
-        dots: \x81\x64, // .. centered vertically
+        macron:      \x81\x50, // ¯
+        zero:        \x81\x5a,
+        bar:         \x81\x5b, // ―
+        emdash:      \x81\x5c, // —
+        endash:      \x81\x5d, // –
+        slash:       \x81\x5e, 
+        bslash:      \x81\x5f,
+        cdots:       \x81\x63, // … centered vertically
+        dots:        \x81\x64, // .. centered vertically
 
         // tipography
-        tilde: \x81\x3e, // ~
-        wave: \x81\x60, // 〜
-        ditto: \x81\x56, // 〃
-        amp: \x81\x95,
-        asterisk: \x81\x96,
-        at: \x81\x97,
+        tilde:      \x81\x3e, // ~
+        wave:       \x81\x60, // 〜
+        ditto:      \x81\x56, // 〃
+        amp:        \x81\x95,
+        asterisk:   \x81\x96,
+        at:         \x81\x97,
         underscore: \x81\x51,
-        dagger: \x81\xee, // †
-        ddagger: \x81\xef, // ‡
-        parallel: \x81\x61, // ||
-        pipe: \x81\x62, // |
-        hash: \x81\x94,
-        section: \x81\x98, // §
-        ref: \x81\xa6, // ※
-        post: \x81\xa7, // 〶
-        tie: \x81\xd1, // ⁀
-        para: \x81\xf7, // ¶
+        dagger:     \x81\xee, // †
+        ddagger:    \x81\xef, // ‡
+        parallel:   \x81\x61, // ||
+        pipe:       \x81\x62, // |
+        hash:       \x81\x94,
+        section:    \x81\x98, // §
+        ref:        \x81\xa6, // ※
+        post:       \x81\xa7, // 〶
+        tie:        \x81\xd1, // ⁀
+        para:       \x81\xf7, // ¶
 
         // quotes
         lsquo: \x81\x65, // ‘
@@ -96,75 +96,75 @@ chat: {
         rdquo: \x81\x68, // ”
 
         // brackets
-        lpar: \x81\x69, // (
-        rpar: \x81\x6a, // )
-        ltort: \x81\x6b, // 〔
-        rtort: \x81\x6c, // 〕
-        lbrack: \x81\x6d, // [
-        rbrack: \x81\x6e, // ]
-        lbrace: \x81\x6f, // {
-        rbrace: \x81\x70, // }
-        lang: \x81\x71, // 〈
-        rang: \x81\x72, // 〉
-        ldangle: \x81\x73, // 《
-        rdangle: \x81\x74, // 》
-        lcorner: \x81\x75, // 「
-        rcorner: \x81\x76, // 」
+        lpar:     \x81\x69, // (
+        rpar:     \x81\x6a, // )
+        ltort:    \x81\x6b, // 〔
+        rtort:    \x81\x6c, // 〕
+        lbrack:   \x81\x6d, // [
+        rbrack:   \x81\x6e, // ]
+        lbrace:   \x81\x6f, // {
+        rbrace:   \x81\x70, // }
+        lang:     \x81\x71, // 〈
+        rang:     \x81\x72, // 〉
+        ldangle:  \x81\x73, // 《
+        rdangle:  \x81\x74, // 》
+        lcorner:  \x81\x75, // 「
+        rcorner:  \x81\x76, // 」
         lwcorner: \x81\x77, // 『
         rwcorner: \x81\x78, // 』
-        lblent: \x81\x79, // 【
-        rblent: \x81\x7a, // 】
-        laquo: \x85\x6b, // «
-        raquo: \x85\x7b, // »
+        lblent:   \x81\x79, // 【
+        rblent:   \x81\x7a, // 】
+        laquo:    \x85\x6b, // «
+        raquo:    \x85\x7b, // »
 
         // math signs (general)
-        plus: \x81\x7b,
-        minus: \x81\x7c,
+        plus:      \x81\x7b,
+        minus:     \x81\x7c,
         plusminus: \x81\x7d, // ±
-        times: \x81\x7e, // ×
-        div: \x81\x80, // ÷
-        eq: \x81\x81,
-        neq: \x81\x82, // ≠
-        lt: \x81\x83,
-        gt: \x81\x84,
-        leq: \x81\x85, // ≦
-        geq: \x81\x86, // ≧
-        ll: \x81\xd6, // ≪
-        gg: \x81\xd7, // ≫
-        root: \x81\xd8, // √
-        inf: \x81\x87, // ∞
-        proportional: \x81\xe5, // ∝
-        ninf: \x81\xd9, // open infinity in the middle
-        nearlyeq: \x81\xd5, // ≓
+        times:     \x81\x7e, // ×
+        div:       \x81\x80, // ÷
+        eq:        \x81\x81, // =
+        neq:       \x81\x82, // ≠
+        lt:        \x81\x83,
+        gt:        \x81\x84,
+        leq:       \x81\x85, // ≦
+        geq:       \x81\x86, // ≧
+        ll:        \x81\xd6, // ≪
+        gg:        \x81\xd7, // ≫
+        root:      \x81\xd8, // √
+        inf:       \x81\x87, // ∞
+        prop:      \x81\xe5, // ∝
+        ninf:      \x81\xd9, // open infinity in the middle
+        nearlyeq:  \x81\xd5, // ≓
 
         // math signs (sets)
-        in: \x81\xac, // ∈
-        ni: \x81\xad, // ∋
-        subseteq: \x81\xae, // ⊆
-        supseteq: \x81\xb0, // ⊇
-        subset: \x81\xb1, // ⊂
-        supset: \x81\xb2, // ⊃
-        union: \x81\xb3, // ∪
+        in:        \x81\xac, // ∈
+        ni:        \x81\xad, // ∋
+        subseteq:  \x81\xae, // ⊆
+        supseteq:  \x81\xb0, // ⊇
+        subset:    \x81\xb1, // ⊂
+        supset:    \x81\xb2, // ⊃
+        union:     \x81\xb3, // ∪
         intersect: \x81\xb4, // ∩
 
         // math signs (analysis)
-        nabla: \x81\xd3, // ∇
-        integral: \x81\xe7, // ∫
+        nabla:     \x81\xd3, // ∇
+        integral:  \x81\xe7, // ∫
         dintegral: \x81\xe8, // ∫∫
 
         // math signs (logical)
-        there4: \x81\x88, // ∴
-        bc: \x81\xe6, // ∵
-        min: \x81\xb5, // ∧
-        max: \x81\xb6, // ∨
-        neg: \x81\xb7, // ¬
+        there4:  \x81\x88, // ∴
+        bc:      \x81\xe6, // ∵
+        min:     \x81\xb5, // ∧
+        max:     \x81\xb6, // ∨
+        neg:     \x81\xb7, // ¬
         implies: \x81\xc3, // ⇒
-        iff: \x81\xc4, // ⇔
+        iff:     \x81\xc4, // ⇔
         foreach: \x81\xc5, // ∀
-        exists: \x81\xc6, // ∃
-        bot: \x81\xd0, // ⊥
-        part: \x81\xd2, // ∂
-        equiv: \x81\xd4, // ≡
+        exists:  \x81\xc6, // ∃
+        bot:     \x81\xd0, // ⊥
+        part:    \x81\xd2, // ∂
+        equiv:   \x81\xd4, // ≡
 
         // fractions
         1div4: \x85\x7c, // ¼
@@ -172,28 +172,28 @@ chat: {
         3div4: \x85\x7e, // ¾
 
         // geometry
-        degree: \x81\x8b, // °
-        arcmin: \x81\x8c, // ′
-        arcsec: \x81\x8d, // ″
-        angle: \x81\xc7, // ∠
-        rangle: \x87\x98, // ∟
+        degree:     \x81\x8b, // °
+        arcmin:     \x81\x8c, // ′
+        arcsec:     \x81\x8d, // ″
+        angle:      \x81\xc7, // ∠
+        rangle:     \x87\x98, // ∟
         lrtriangle: \x87\x99, // ◿ 
 
         // polygons
-        bstar: \x81\x99, // ★
-        wstar: \x81\x9a, // ☆
-        brhombus : \x81\x9e, // black rhombus
-        wrhombus : \x81\x9f, // white rhombus
-        bsquare : \x81\xa0, // black square
-        wsquare : \x81\xa1, // white square
-        btriangle : \x81\xa2, // black triagle
-        wtriangle : \x81\xa3, // white triangle
+        bstar:        \x81\x99, // ★
+        wstar:        \x81\x9a, // ☆
+        brhombus :    \x81\x9e, // black rhombus
+        wrhombus :    \x81\x9f, // white rhombus
+        bsquare :     \x81\xa0, // black square
+        wsquare :     \x81\xa1, // white square
+        btriangle :   \x81\xa2, // black triagle
+        wtriangle :   \x81\xa3, // white triangle
         bustriangle : \x81\xa4, // black upside triangle
         wustriangle : \x81\xa5, // white upside triangle
 
         // circles
-        bcircle: \x81\x9b, // black circle
-        wcircle: \x81\x9c, // white circle
+        bcircle:   \x81\x9b, // black circle
+        wcircle:   \x81\x9c, // white circle
         circlejot: \x81\x9d, // circle in circle
 
         // arrows
@@ -204,25 +204,25 @@ chat: {
 
         // financial
         dollar: \x81\x90, // $
-        cent: \x81\x91, // ¢
-        pound: \x81\x92, // £
-        euro: \x85\x40, // €
-        yen: \x85\x65, // ¥
+        cent:   \x81\x91, // ¢
+        pound:  \x81\x92, // £
+        euro:   \x85\x40, // €
+        yen:    \x85\x65, // ¥
 
         // musical
         sharp: \x81\xeb, // ♯
-        flat: \x81\xec, // ♭
-        note: \x81\xed, // ♪
+        flat:  \x81\xec, // ♭
+        note:  \x81\xed, // ♪
 
         // misc
-        male: \x81\x89, // ♂
-        female: \x81\x8a, // ♀
+        male:    \x81\x89, // ♂
+        female:  \x81\x8a, // ♀
         percent: \x81\x93,
-        permil: \x81\xea, // ‰
-        circle: \x81\xf8,
+        permil:  \x81\xea, // ‰
+        circle:  \x81\xf8,
         cdegree: \x81\x8e, // °C
-        tm: \x85\x59, // ™
-        copy: \x85\x69, // ©
+        tm:      \x85\x59, // ™
+        copy:    \x85\x69, // ©
 
         // a-zA-Z0-9 jp style
         0: \x82\x4f,
@@ -289,81 +289,81 @@ chat: {
         z: \x82\x9a,
 
         // greek alphabet
-        Alpha: \x83\x97,
-        Beta: \x83\x98,
-        Gamma: \x83\x99,
-        Delta: \x83\x9a,
+        Alpha:   \x83\x97,
+        Beta:    \x83\x98,
+        Gamma:   \x83\x99,
+        Delta:   \x83\x9a,
         Epsilon: \x83\x9b,
-        Zeta: \x83\x9c,
-        Eta: \x83\x9d,
-        Theta: \x83\x9e,
-        Iota: \x83\xa7,
-        Kappa: \x83\xa8,
-        Lambda: \x83\xa9,
-        Mu: \x83\xaa,
-        Nu: \x83\xab,
-        Xi: \x83\xac,
+        Zeta:    \x83\x9c,
+        Eta:     \x83\x9d,
+        Theta:   \x83\x9e,
+        Iota:    \x83\xa7,
+        Kappa:   \x83\xa8,
+        Lambda:  \x83\xa9,
+        Mu:      \x83\xaa,
+        Nu:      \x83\xab,
+        Xi:      \x83\xac,
         Omicron: \x83\xad,
-        Pi: \x83\xae,
-        Rho: \x83\xaf,
-        Sigma: \x83\xb0,
-        Tau: \x83\xb1,
+        Pi:      \x83\xae,
+        Rho:     \x83\xaf,
+        Sigma:   \x83\xb0,
+        Tau:     \x83\xb1,
         Upsilon: \x83\xb2,
-        Phi: \x83\xb3,
-        Chi: \x83\xb4,
-        Psi: \x83\xb5,
-        Omega: \x83\xb6,
-        alpha: \x83\xb7,
-        beta: \x83\xb8,
-        gamma: \x83\xb9,
-        delta: \x83\xba,
+        Phi:     \x83\xb3,
+        Chi:     \x83\xb4,
+        Psi:     \x83\xb5,
+        Omega:   \x83\xb6,
+        alpha:   \x83\xb7,
+        beta:    \x83\xb8,
+        gamma:   \x83\xb9,
+        delta:   \x83\xba,
         epsilon: \x83\xbb,
-        zeta: \x83\xbc,
-        eta: \x83\xbd,
-        theta: \x83\xbe,
-        iota: \x83\xc7,
-        kappa: \x83\xc8,
-        lambda: \x83\xc9,
-        mu: \x83\xca,
-        nu: \x83\xcb,
-        xi: \x83\xcc,
+        zeta:    \x83\xbc,
+        eta:     \x83\xbd,
+        theta:   \x83\xbe,
+        iota:    \x83\xc7,
+        kappa:   \x83\xc8,
+        lambda:  \x83\xc9,
+        mu:      \x83\xca,
+        nu:      \x83\xcb,
+        xi:      \x83\xcc,
         omicron: \x83\xcd,
-        pi: \x83\xce,
-        rho: \x83\xcf,
-        sigma: \x83\xd0,
-        tau: \x83\xd1,
+        pi:      \x83\xce,
+        rho:     \x83\xcf,
+        sigma:   \x83\xd0,
+        tau:     \x83\xd1,
         upsilon: \x83\xd2,
-        phi: \x83\xd3,
-        chi: \x83\xd4,
-        psi: \x83\xd5,
-        omega: \x83\xd6,
+        phi:     \x83\xd3,
+        chi:     \x83\xd4,
+        psi:     \x83\xd5,
+        omega:   \x83\xd6,
 
         // lines
-        hline: \x84\x92, // ─
-        vline: \x84\x93, // │
-        tl: \x84\x94, // ┌
-        tr: \x84\x95, // ┐
-        br: \x84\x96, // ┘
-        bl: \x84\x97, // └
-        left: \x84\x98, // ├
-        top: \x84\x99, // ┬
-        right: \x84\x9a, // ┤
-        bottom: \x84\x9b, // ┴
-        middle: \x84\x9c, // ┼
-        bhline: \x84\xaa, // ─
-        bvline: \x84\xab, // │
-        btl: \x84\xab, // ┌
-        btr: \x84\xac, // ┐
-        bbr: \x84\xad, // ┘
-        bbl: \x84\xae, // └
-        bleft: \x84\xb0, // ├
-        btop: \x84\xb1, // ┬
-        bright: \x84\xb2, // ┤
+        hline:   \x84\x92, // ─
+        vline:   \x84\x93, // │
+        tl:      \x84\x94, // ┌
+        tr:      \x84\x95, // ┐
+        br:      \x84\x96, // ┘
+        bl:      \x84\x97, // └
+        left:    \x84\x98, // ├
+        top:     \x84\x99, // ┬
+        right:   \x84\x9a, // ┤
+        bottom:  \x84\x9b, // ┴
+        middle:  \x84\x9c, // ┼
+        bhline:  \x84\xaa, // ─
+        bvline:  \x84\xab, // │
+        btl:     \x84\xab, // ┌
+        btr:     \x84\xac, // ┐
+        bbr:     \x84\xad, // ┘
+        bbl:     \x84\xae, // └
+        bleft:   \x84\xb0, // ├
+        btop:    \x84\xb1, // ┬
+        bright:  \x84\xb2, // ┤
         bbottom: \x84\xb3, // ┴
         bmiddle: \x84\xb4, // ┼
-        bleft: \x84\xb5, // ├
-        btop: \x84\xb6,
-        bright: \x84\xb7,
+        bleft:   \x84\xb5, // ├
+        btop:    \x84\xb6,
+        bright:  \x84\xb7,
         bbottom: \x84\xb8,
 
         // sup numbers 1-4
@@ -373,15 +373,15 @@ chat: {
         sup3: \x85\x73,
 
         // circled numbers 1-20
-        circle1: \x87\x40,
-        circle2: \x87\x41,
-        circle3: \x87\x42,
-        circle4: \x87\x43,
-        circle5: \x87\x44,
-        circle6: \x87\x45,
-        circle7: \x87\x46,
-        circle8: \x87\x47,
-        circle9: \x87\x48,
+        circle1:  \x87\x40,
+        circle2:  \x87\x41,
+        circle3:  \x87\x42,
+        circle4:  \x87\x43,
+        circle5:  \x87\x44,
+        circle6:  \x87\x45,
+        circle7:  \x87\x46,
+        circle8:  \x87\x47,
+        circle9:  \x87\x48,
         circle10: \x87\x49,
         circle11: \x87\x4a,
         circle12: \x87\x4b,
@@ -395,27 +395,27 @@ chat: {
         circle20: \x87\x53,
 
         // roman numerals 1-10
-        roman1: \x87\x54,
-        roman2: \x87\x55,
-        roman3: \x87\x56,
-        roman4: \x87\x57,
-        roman5: \x87\x58,
-        roman6: \x87\x59,
-        roman7: \x87\x5a,
-        roman8: \x87\x5b,
-        roman9: \x87\x5c,
+        roman1:  \x87\x54,
+        roman2:  \x87\x55,
+        roman3:  \x87\x56,
+        roman4:  \x87\x57,
+        roman5:  \x87\x58,
+        roman6:  \x87\x59,
+        roman7:  \x87\x5a,
+        roman8:  \x87\x5b,
+        roman9:  \x87\x5c,
         roman10: \x87\x5d,
 
-        // acronyms
-        mm: \x87\x6f,
-        cm: \x87\x70,
-        km: \x87\x71,
-        mg: \x87\x72,
-        kg: \x87\x73,
-        cc: \x87\x74,
-        m2: \x87\x75,
-        no: \x87\x82,
-        kk: \x87\x83,
+        // abbreviations 
+        mm:  \x87\x6f,
+        cm:  \x87\x70,
+        km:  \x87\x71,
+        mg:  \x87\x72,
+        kg:  \x87\x73,
+        cc:  \x87\x74,
+        m2:  \x87\x75,
+        no:  \x87\x82,
+        kk:  \x87\x83,
         tel: \x87\x84
 	},
 },
