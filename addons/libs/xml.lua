@@ -27,6 +27,8 @@ xml.escapes = T{
 	['\''] = 'apos'
 }
 
+local spaces = {' ', '\n', '\t', '\r'}
+
 -- Takes a numbered XML entity as second argument and converts it to the corresponding symbol.
 -- Only used internally to index the xml.unescapes table.
 function xml.entity_unescape(_, entity)
@@ -217,7 +219,7 @@ function xml.tokenize(content, line)
 			
 		else
 			if xml.singletons:contains(c) then
-				if c:isin(' ', '\n', '\t', '\r') then
+				if c:isin(spaces) then
 					if current:length() > 0 then
 						tokens:last():append(current)
 						current = ''
@@ -413,7 +415,7 @@ function xml.realize(node, indentlevel)
 	for _, child in ipairs(node.children) do
 		if child.type == 'attribute' then
 			attributes:append(child)
-		elseif child.type:isin('tag', 'text', 'comment') then
+		elseif child.type ~= 'attribute' then
 			children:append(child)
 			childtypes[child.type] = true
 		else
@@ -441,7 +443,7 @@ function xml.realize(node, indentlevel)
 	
 	local innerindent = '\t'..indent
 	for _, child in ipairs(children) do
-		if child.type:isin('text') then
+		if child.type == 'text' then
 			str = str..innerindent..child.value:xml_escape()..'\n'
 		elseif child.type == 'comment' then
 			str = str..innerindent..'<!--'..child.value:xml_escape()..'-->\n'

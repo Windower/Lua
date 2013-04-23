@@ -2,7 +2,7 @@
 
 _addon = _addon or {}
 _addon.name = 'Scoreboard'
-_addon.version = 0.6
+_addon.version = 0.8
 
 require 'tablehelper'
 require 'stringhelper'
@@ -13,13 +13,14 @@ local config = require 'config'
 
 local Display = require 'display'
 local display = nil
+dps_clock = require 'dpsclock':new() -- global for now
+dps_db    = require 'model':new() -- global for now
 
-require 'model'
-
------------------------------
+-------------------------------------------------------
 
 local settings = nil -- holds a config instance
 settings_file = 'data/settings.xml'
+
 
 -- Handle addon args
 function event_addon_command(...)
@@ -31,6 +32,7 @@ function event_addon_command(...)
 
     if params[1] then
         if params[1]:lower() == "help" then
+            write('Scoreboard v' .. _addon.version .. '. Author: Suji')
             write('sb help : Shows help message')
             write('sb pos <x> <y> : Positions the scoreboard')
             write('sb reset : Reset damage')
@@ -103,21 +105,32 @@ end
 
 -- Resets application state
 function initialize()
-    model_init()
     display:init()
+    dps_clock:reset()
+    dps_db:init()
 end
+
+
+local function update_dps_clock()
+    if get_player()['in_combat'] then
+        dps_clock:advance()
+    else
+        dps_clock:pause()
+    end
+end
+
 
 
 -- Keep updates flowing
 function event_time_change(...)
-    model_update()
+    update_dps_clock()
     display:update()
 end
 
 
 -- Keep updates flowing
 function event_status_change(...)
-    model_update()
+    update_dps_clock()
     display:update()
 end
 
@@ -135,24 +148,6 @@ function event_load(...)
         return
     end
 
-    -- Write a default settings file if it doesn't exist
-    local f = io.open(lua_base_path .. settings_file, 'r')
-    if not f then
-        f = io.open(lua_base_path .. settings_file, 'w')
-        if not f then
-            error('Error generating default settings file.')
-        else
-            f:write(default_settings_file)
-            local result = f:close()
-            if not result then
-                error('Error generating default settings file.')
-            else
-                add_to_chat(55, 'Settings file not found; installed default.')
-            end
-        end
-    else
-        f:close()
-    end
     settings = config.load({
         posx = 10,
         posy = 200,
@@ -163,7 +158,7 @@ function event_load(...)
     })
 
     send_command('alias sb lua c scoreboard')
-    display = Display:new(settings)
+    display = Display:new(settings, dps_db)
     initialize()
 end
 
@@ -203,15 +198,20 @@ function event_action(raw_action)
     local action = Action(raw_action)
     local category = action:get_category_string()
 
+    if not get_player()['in_combat'] then
+        -- nothing to do
+        return
+    end
+    
     if mob_is_ally(action.raw.actor_id) then
         if category == 'melee' then
             for target in action:get_targets() do
                 for subaction in target:get_actions() do
                     -- hit, crit
                     if subaction.message == 1 or subaction.message == 67 then
-                        accumulate(target:get_name(), action:get_actor_name(), subaction.param)
+                        dps_db:accumulate(target:get_name(), action:get_actor_name(), subaction.param)
                         if subaction.has_add_effect and T{163, 229}:contains(subaction.add_effect_message) then
-                            accumulate(target:get_name(), action:get_actor_name(), subaction.add_effect_param)
+                            dps_db:accumulate(target:get_name(), action:get_actor_name(), subaction.add_effect_param)
                         end
                     end
                 end
@@ -219,11 +219,11 @@ function event_action(raw_action)
         elseif category == 'weaponskill_finish' then
             for target in action:get_targets() do
                 for subaction in target:get_actions() do
-                    accumulate(target:get_name(), action:get_actor_name(), subaction.param)
+                    dps_db:accumulate(target:get_name(), action:get_actor_name(), subaction.param)
 
                     -- skillchains
                     if subaction.has_add_effect then
-                        accumulate(target:get_name(), action:get_actor_name(), subaction.add_effect_param)
+                        dps_db:accumulate(target:get_name(), action:get_actor_name(), subaction.add_effect_param)
                     end
                 end
             end
@@ -231,7 +231,7 @@ function event_action(raw_action)
             for target in action:get_targets() do
                 for subaction in target:get_actions() do
                     if T{2, 252, 265, 650}:contains(subaction.message) then
-                        accumulate(target:get_name(), action:get_actor_name(), subaction.param)
+                        dps_db:accumulate(target:get_name(), action:get_actor_name(), subaction.param)
                     end
                 end
             end
@@ -240,11 +240,11 @@ function event_action(raw_action)
                 for subaction in target:get_actions() do
                     -- ranged, crit, squarely, truestrike
                     if T{352, 353, 576, 577}:contains(subaction.message) then
-                        accumulate(target:get_name(), action:get_actor_name(), subaction.param)
+                        dps_db:accumulate(target:get_name(), action:get_actor_name(), subaction.param)
 
                         -- holy bolts etc
                         if subaction.has_add_effect and T{163, 229}:contains(subaction.add_effect_message) then
-                            accumulate(target:get_name(), action:get_actor_name(), subaction.add_effect_param)
+                            dps_db:accumulate(target:get_name(), action:get_actor_name(), subaction.add_effect_param)
                         end
                     end
                 end
@@ -254,10 +254,26 @@ function event_action(raw_action)
                 for subaction in target:get_actions() do
                     -- sange(77), generic damage ja(110), barrage(157), other generic dmg ja (317), stun ja (522)
                     if T{77, 110, 157, 317, 522}:contains(subaction.message) then
-                        accumulate(target:get_name(), action:get_actor_name(), subaction.param)
+                        dps_db:accumulate(target:get_name(), action:get_actor_name(), subaction.param)
                     end
                 end
             end
+        elseif category == 'avatar_tp_finish' then
+            for target in action:get_targets() do
+                for subaction in target:get_actions() do
+                    if subaction.message == 317 then
+                        dps_db:accumulate(target:get_name(), action:get_actor_name(), subaction.param)
+                    end
+                end
+            end
+        elseif category == 'mob_tp_finish' then
+            for target in action:get_targets() do
+                for subaction in target:get_actions() do
+                    if subaction.message == 185 or subaction.message == 264 then
+                        dps_db:accumulate(target:get_name(), action:get_actor_name(), subaction.param)
+                    end
+                end
+            end        
         end
     elseif category == 'melee' then
         -- This is some non-ally action packet. We need to see if they are hitting someone
@@ -266,7 +282,7 @@ function event_action(raw_action)
             if mob_is_ally(target.id) then
                 for subaction in target:get_actions() do
                     if subaction.has_spike_effect then
-                        accumulate(action:get_actor_name(), target:get_name(), subaction.spike_effect_param)
+                        dps_db:accumulate(action:get_actor_name(), target:get_name(), subaction.spike_effect_param)
                     end
                 end
             end
@@ -274,7 +290,7 @@ function event_action(raw_action)
     end
 	
     display:update()
-    model_update()
+    update_dps_clock()
 end
 
 

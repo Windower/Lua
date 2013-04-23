@@ -12,7 +12,7 @@ _libs.logger = _libs.logger or require 'logger'
 
 local chat = ((ffxi and ffxi.data and ffxi.data.chat) or json.read('../libs/ffxidata.json')).chat
 local colors = chat.colors
-local colorcontrols = chat.colorcontrols
+local color_controls = chat.colorcontrols
 
 --[[
 	Local functions.
@@ -27,9 +27,9 @@ function make_color(col)
 			warning('Invalid color number '..col..'. Only numbers between 0 and 512 permitted.')
 			col = ''
 		elseif col < 256 then
-			col = colorcontrols[1]..string.char(col)
+			col = color_controls[1]..string.char(col)
 		else
-			col = colorcontrols[2]..string.char(col % 256)
+			col = color_controls[2]..string.char(col % 256)
 		end
 	else
 		if col:length() > 2 then
@@ -51,7 +51,7 @@ function string.color(str, newcolor, resetcolor)
 		return str
 	end
 	
-	resetcolor = resetcolor or colorcontrols['reset']
+	resetcolor = resetcolor or color_controls['reset']
 	
 	newcolor = make_color(newcolor)
 	resetcolor = make_color(resetcolor)
@@ -60,17 +60,17 @@ function string.color(str, newcolor, resetcolor)
 end
 
 -- Strips a string of all colors.
-function string.stripcolors(str)
+function string.strip_colors(str)
 	return (str:gsub('[\x1E\x1F].', ''))
 end
 
 -- Strips a string of auto-translate tags.
-function string.stripautotrans(str)
+function string.strip_auto_translate(str)
 	return (str:gsub('\xEF[\x27\x28]', ''))
 end
 
 -- Strips a string of all colors and auto-translate tags.
-function string.stripformat(str)
+function string.strip_format(str)
 	return (str:gsub('[\x1E\x1F\x7F].', ''):gsub('\xEF[\x27\x28]', ''))
 end
 

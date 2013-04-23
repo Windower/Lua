@@ -43,10 +43,9 @@ function functools.pipe(fn1, fn2)
 end
 
 -- Returns a closure over the argument el that returns true, if its argument equals el.
-function functools.equals(...)
-	local args = T{...}
-	return function(...)
-		return args:equals(T{...})
+function functools.equals(el)
+	return function(cmp)
+		return el == cmp
 	end
 end
 
@@ -225,16 +224,14 @@ end
 -- Returns the result of applying the function fn to the first two elements of t, then again on the result and the next element from t, until all elements are accumulated.
 -- init is an optional initial value to be used. If provided, init and t[1] will be compared first, otherwise t[1] and t[2].
 function table.reduce(t, fn, init)
-	t = T(t)
-
 	-- Return the initial argument if table is empty
-	if t:isempty() then
+	if not next(t) then
 		return init
 	end
 
 	-- Set the accumulator variable to the init value (which can be nil as well)
 	local acc = init
-	for key, val in pairs(t) do
+	for _, val in pairs(t) do
 		-- If the accumulator is nil, which can only happen on the first iteration and if no initial value was provided, set acc to the first value val.
 		if acc == nil then
 			acc = val

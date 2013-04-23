@@ -25,12 +25,13 @@ local comments = T{}
 ]]
 
 local parse
+local merge
 local settings_table
 local settings_xml
 local nest_xml
 local table_diff
 
--- Loads a specified file, or alternatively a file 'settings.json' or 'settings.xml' in the current addon folder.
+-- Loads a specified file, or alternatively a file 'settings.xml' in the current addon/data folder.
 -- Writes all configs to _config.
 function config.load(filename, confdict, overwrite)
 	if type(filename) == 'table' then
@@ -40,11 +41,11 @@ function config.load(filename, confdict, overwrite)
 	elseif type(confdict) == 'boolean' then
 		confdict, overwrite = nil, confdict
 	end
-	confdict = T(confdict) or T{}
+	confdict = T(confdict):copy()
 	overwrite = overwrite or false
 	
 	local confdict_mt = getmetatable(confdict)
-	confdict = setmetatable(confdict, {__index = function(t, x) if x == 'save' then return config['save'] else return confdict_mt.__index[x] end end})
+	confdict = setmetatable(confdict, {__index = function(t, x) if config[x] ~= nil then return config[x] else return confdict_mt.__index[x] end end})
 	
 	-- Sets paths depending on whether it's a script or addon loading this file.
 	local filepath = filename or files.check('data/settings.xml')
@@ -63,6 +64,8 @@ function config.load(filename, confdict, overwrite)
 	if err ~= nil then
 		error(err)
 	end
+	
+	collectgarbage()
 	
 	return confdict
 end
@@ -99,10 +102,74 @@ function parse(file, confdict, update)
 	
 	-- Update the global settings with the per-player defined settings, if they exist. Save the parsed value for later comparison.
 	for _, char in ipairs(T{'global'}+chars) do
-		original[char] = confdict:copy():merge(parsed[char])
+		original[char] = merge(confdict:copy(), parsed[char], char)
 	end
 	
-	return confdict:merge(parsed['global']:update(parsed[get_player()['name']:lower()], true))
+	return merge(confdict, parsed['global']:update(parsed[get_player()['name']:lower()], true))
+end
+
+-- Merges two tables like update would, but retains type-information and tries to work around conflicts.
+function merge(t, t_merge, path)
+	if t_merge == nil then
+		return t
+	end
+	
+	path = (type(path) == 'string' and T{path}) or path
+
+	local oldval
+	local err
+	for key, val in pairs(t_merge) do
+		err = false
+		oldval = t[key]
+		if type(oldval) == 'table' and type(val) == 'table' then
+			if path then
+				t[key] = merge(oldval, val, path:copy()+key)
+			else
+				t[key] = merge(oldval, val, nil)
+			end
+		elseif type(oldval) ~= type(val) then
+			if type(oldval) == 'table' then
+				if type(val) == 'string' then
+					t[key] = table.map(val:split(','), string.trim)
+				else
+					err = true
+				end
+			elseif type(oldval) == 'number' then
+				local testdec = tonumber(val)
+				local testhex = tonumber(val, 16)
+				if testdec then
+					t[key] = testdec
+				elseif testhex then
+					t[key] = testhex
+				else
+					err = true
+				end
+			elseif type(oldval) == 'boolean' then
+				if val == 'true' then
+					t[key] = true
+				elseif val == 'false' then
+					t[key] = false
+				else
+					err = true
+				end
+			elseif type(oldval) == 'string' then
+				t[key] = val
+			else
+				err = true
+			end
+		else
+			t[key] = val
+		end
+		
+		if err then
+			if path then
+				notice('Could not safely merge values for \''..path:concat('/')..'/'..key..'\', '..type(oldval)..' expected (default: '..tostring(oldval)..'), got '..type(val)..' ('..tostring(val)..').')
+			end
+			t[key] = val
+		end
+	end
+
+	return t
 end
 
 -- Parses a settings struct from a DOM tree.
@@ -131,10 +198,6 @@ function settings_table(node, confdict, key)
 		local num = tonumber(val)
 		if num ~= nil then
 			return num
-		end
-		
-		if confdict:containskey(node.name) and type(confdict[node.name]) == 'table' then
-			return val:psplit('%s*,%s*')
 		end
 		
 		return val
@@ -229,7 +292,12 @@ function settings_xml(settings)
 	for _, char in ipairs(T{'global'}+chars) do
 		if char == 'global' and comments['settings'] ~= nil then
 			str = str..'\t<!--\n'
-			str = str..'\t\t'..comments['settings']..'\n'
+			local comment_lines = comments['settings']:split('\n')
+			for line, comment in ipairs(comment_lines) do
+				if line < #comment_lines then
+					str = str..'\t\t'..comment:trim()..'\n'
+				end
+			end
 			str = str..'\t-->\n'
 		end
 		str = str..'\t<'..char..'>\n'

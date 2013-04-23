@@ -23,14 +23,18 @@
 --ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+-- Libs --
 file = require 'filehelper'
 config = require 'config'
 require 'tablehelper'
+
+-- Battlemod Files --
 require 'event_action'
 require 'generic_helpers'
 
 function event_load()
-	debugging = false
 	allow = true
 	prevline = ''
 
@@ -43,11 +47,11 @@ function event_load()
 	line_roll = 'Roll line is not loading'
 	skillchain_arr = {'Light:','Darkness:','Gravitation:','Fragmentation:','Distortion:','Fusion:','Compression:','Liquefaction:','Induration:','Reverberation:','Transfixion:','Scission:','Detonation:','Impaction:'}
 	ratings_arr = {'TW','EP','DC','EM','T','VT','IT'}
-    send_command('alias bm lua c battlemod cmd')
-	blocked_colors = T{20,21,22,23,24,25,26,28,29,31,32,33,35,36,40,41,42,43,44,50,51,52,56,57,59,60,69,64,65,67,69,81,85,90,91,100,101,102,104,105,106,110,111,112,114,122,163,164,168,171,175,177,183,185,186,191}
-	passed_messages = T{4,5,6,17,18,20,34,35,36,48,64,78,87,88,89,90,116,154,170,171,172,173,174,175,176,177,178,191,192,198,204,206,217,218,234,249,313,328,350,531,558,561,575,601,609,610,611,612,613,614,615,616,617,618,619,620,625,626,627,628,629,630,631,632,633,634,635,636,643}
-	agg_messages = T{75,93,116,131,134,144,146,148,150,186,206,230,236,237,319,364,414,420,422,424,425,426,570,668} -- 186 added recently
-	color_redundant = T{26,33,41,71,72,89,94,109,114,164,173,181,184,186,70,84,104,127,128,129,130,131,132,133,134,135,136,137,138,139,140,64,86,91,106,111,175,178,183,81,101,16,65,87,92,107,112,174,176,182,82,102,67,68,69,170,189,15,208,18,25,32,40,163,185,23,24,27,34,35,42,43,162,165,187,188,30,31,14,205,144,145,146,147,148,149,150,151,152,153,190,13,9,253,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,284,285,286,287,292,293,294,295,300,301,301,303,308,309,310,311,316,317,318,319,324,325,326,327,332,333,334,335,340,341,342,343,344,345,346,347,348,349,350,351,355,357,358,360,361,363,366,369,372,374,375,378,381,384,395,406,409,412,415,416,418,421,424,437,450,453,456,458,459,462,479,490,493,496,499,500,502,505,507,508,10,51,52,55,58,62,66,80,83,85,88,90,93,100,103,105,108,110,113,122,168,169,171,172,177,179,180,12,11}
+	rcol = string.char(0x1E,0x01)
+	blocked_colors = T{20,21,22,23,24,25,26,28,29,30,31,32,33,35,36,40,41,42,43,44,50,51,52,56,57,59,60,63,68,69,64,65,67,69,81,85,90,91,100,101,102,104,105,106,110,111,112,114,122,163,164,168,171,175,177,183,185,186,191}
+	passed_messages = T{4,5,6,16,17,18,20,34,35,36,40,48,64,78,87,88,89,90,116,154,170,171,172,173,174,175,176,177,178,191,192,198,204,206,217,218,234,246,249,328,350,336,531,558,561,575,601,609,562,610,611,612,613,614,615,616,617,618,619,620,625,626,627,628,629,630,631,632,633,634,635,636,643,660,661,662}
+	agg_messages = T{75,93,116,131,134,144,146,148,150,186,206,230,236,237,243,319,364,414,420,422,424,425,426,570,668} -- 243 added recently
+	color_redundant = T{26,33,41,71,72,89,94,109,114,164,173,181,184,186,70,84,104,127,128,129,130,131,132,133,134,135,136,137,138,139,140,64,86,91,106,111,175,178,183,81,101,16,65,87,92,107,112,174,176,182,82,102,67,68,69,170,189,15,208,18,25,32,40,163,185,23,24,27,34,35,42,43,162,165,187,188,30,31,14,205,144,145,146,147,148,149,150,151,152,153,190,13,9,253,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,284,285,286,287,292,293,294,295,300,301,301,303,308,309,310,311,316,317,318,319,324,325,326,327,332,333,334,335,340,341,342,343,344,345,346,347,348,349,350,351,355,357,358,360,361,363,366,369,372,374,375,378,381,384,395,406,409,412,415,416,418,421,424,437,450,453,456,458,459,462,479,490,493,496,499,500,502,505,507,508,10,51,52,55,58,62,66,80,83,85,88,90,93,100,103,105,108,110,113,122,168,169,171,172,177,179,180,12,11,37,291} -- 37 and 291 might be unique colors, but they are not gsubbable.
 	black_colors = T{352,354,356,388,390,400,402,430,432,442,444,472,474,484,486}
 	
 	speFile = file.new('../../plugins/resources/spells.xml')
@@ -65,15 +69,12 @@ function event_load()
 	dialog = parse_resources(dialogFile:readlines())
 	mabils = parse_resources(mabilsFile:readlines())
 	statuses = parse_resources(statusFile:readlines())
-	items = parse_resources(itemsGFile:readlines())
-	
-	for i,v in pairs(parse_resources(itemsAFile:readlines())) do
-		items[i]=v
-	end
-	for i,v in pairs(parse_resources(itemsWFile:readlines())) do
-		items[i]=v
-	end
-		
+	items = table.range(65535)
+	items:update(parse_resources(itemsGFile:readlines()))
+	items:update(parse_resources(itemsAFile:readlines()))
+	items:update(parse_resources(itemsWFile:readlines()))
+
+    send_command('alias bm lua c battlemod cmd')
 	options_load()
 	collectgarbage()
 end
@@ -99,11 +100,11 @@ function options_load()
 		<targetnumber>true</targetnumber>
 		
 		
-		<line_full>[${actor}] ${number} ${abil} ¨ ${target}</line_full>
-		<line_noactor>${abil} ${number} ¨ ${target}</line_noactor>
-		<line_nonumber>[${actor}] ${abil} ¨ ${target}</line_nonumber>
-		<line_aoebuff>${actor} ${abil} ¨ ${target} (${status})</line_aoebuff>
-		<line_roll>${actor} ${abil} ¨ ${target} ª ${number}</line_roll>
+		<line_full>[${actor}] ${number} ${abil} ]]..string.char(129,168)..[[ ${target}</line_full>
+		<line_noactor>${abil} ${number} ]]..string.char(129,168)..[[ ${target}</line_noactor>
+		<line_nonumber>[${actor}] ${abil} ]]..string.char(129,168)..[[ ${target}</line_nonumber>
+		<line_aoebuff>${actor} ${abil} ]]..string.char(129,168)..[[ ${target} (${status})</line_aoebuff>
+		<line_roll>${actor} ${abil} ]]..string.char(129,168)..[[ ${target} ]]..string.char(129,170)..[[ ${number}</line_roll>
 	</global>
 </settings>
 ]])
@@ -114,11 +115,7 @@ function options_load()
 	for i,v in pairs(settingtab) do
 		_G[i] = v
 	end
-	local tempplayer = get_player()
-	if tempplayer~=nil then
-		filterload(tempplayer['main_job'])
-	else
-		if not file.exists('data/filters/filters.xml') then
+	if not file.exists('data/filters/filters.xml') then
 			filterFile:write([[
 <?xml version="1.0" ?>
 <!-- Filters are customizable based on the action user. So if you filter other pets, you're going
@@ -131,14 +128,16 @@ function options_load()
 <settings>
     <global>
         <me> <!-- You're doing something -->
-            <melee>false</melee>
-            <ranged>false</ranged>
-            <damage>false</damage>
-            <healing>false</healing>
-            <misses>false</misses>
-            <readies>false</readies>
-            <casting>false</casting>
-            <all>false</all>
+            <melee>false</melee>  <!-- Prevents your melee ("white") damage from appearing -->
+            <ranged>false</ranged> <!-- Prevents your ranged damage from appearing -->
+            <damage>false</damage> <!-- Prevents your damage from appearing -->
+            <healing>false</healing> <!-- Prevents your healing from appearing -->
+            <misses>false</misses> <!-- Prevents your misses from appearing -->
+            <items>false</items> <!-- Prevents your "Jim used an item. Jim gains the effect of Reraise." messages from appearing -->
+            <uses>false</uses> <!-- Prevents your "Jim uses an item." messages from appearing -->
+            <readies>false</readies> <!-- Prevents your "Jim readies ____" messages from appearing -->
+            <casting>false</casting> <!-- Prevents your "Jim begins casting ____" messages from appearing -->
+            <all>false</all> <!-- Prevents all of your messages from appearing -->
         </me>
         <party> <!-- A party member is doing something -->
             <melee>false</melee>
@@ -146,6 +145,8 @@ function options_load()
             <damage>false</damage>
             <healing>false</healing>
             <misses>false</misses>
+            <items>false</items>
+            <uses>false</uses>
             <readies>false</readies>
             <casting>false</casting>
             <all>false</all>
@@ -156,6 +157,8 @@ function options_load()
             <damage>false</damage>
             <healing>false</healing>
             <misses>false</misses>
+            <items>false</items>
+            <uses>false</uses>
             <readies>false</readies>
             <casting>false</casting>
             <all>false</all>
@@ -166,6 +169,8 @@ function options_load()
             <damage>false</damage>
             <healing>false</healing>
             <misses>false</misses>
+            <items>false</items>
+            <uses>false</uses>
             <readies>false</readies>
             <casting>false</casting>
             <all>false</all>
@@ -269,8 +274,13 @@ function options_load()
 </settings>
 ]])
 			write('Default filters xml file created')
-		end
-		filter = config.load('data/filters/filters.xml',true)
+	end
+	
+	local tempplayer = get_player()
+	if tempplayer then
+		filterload(tempplayer['main_job'])
+	else
+		filterload('DEFAULT')
 	end
 	
 	if not file.exists('data/colors.xml') then
@@ -358,7 +368,7 @@ function colconv(str,key)
 	elseif strnum >0 then
 		out = string.char(0x1F,strnum)
 	elseif strnum == 0 then
-		out = string.char(0x1E,0x01)
+		out = rcol
 	else
 		write('You have an invalid color '..key)
 		out = string.char(0x1F,1)
@@ -486,12 +496,9 @@ function event_action_message(actor_id,index,actor_target_index,target_target_in
 		
 		if message_id > 169 and message_id <179 then
 			if param_1 == 4294967296 then
-				skill = 'too weak to be worthwhile.'
-				if debugging then
-					write(param_1..' '..param_2..' '..param_3)
-				end
+				skill = 'like level -1'..' ('..ratings_arr[param_2+1]..')'
 			else
-				skill = 'like level '..param_1
+				skill = 'like level '..param_1..' ('..ratings_arr[param_2+1]..')'
 			end
 			if debugging then write(param_1..'   '..param_2..'   '..param_3) end
 		end
@@ -506,28 +513,21 @@ function event_action_message(actor_id,index,actor_target_index,target_target_in
 			spell = nf(spells[param_1],'english')
 		end
 		
-		if status == nil then status = '' else
-			status = color_arr['statuscol']..status..string.char(0x1E,0x01)
-		end
-		if spell == nil then spell = '' else
-			spell = color_arr['spellcol']..spell..string.char(0x1E,0x01)
-		end
-		if target == nil then target = '' else
-			target = namecol(target,target_table,party_table)
-		end
-		if actor == nil then actor = '' else
-			actor = namecol(actor,actor_table,party_table)
-		end
-		if skill == nil then skill = '' else
-			skill = color_arr['abilcol']..skill..string.char(0x1E,0x01)
-		end
+		if status then status = color_arr['statuscol']..status..rcol end
+		if spell then spell = color_arr['spellcol']..spell..rcol end
+		if target then target = namecol(target,target_table,party_table) end
+		if actor then actor = namecol(actor,actor_table,party_table) end
+		if skill then skill = color_arr['abilcol']..skill..rcol end
 		
-		local outstr = dialog[message_id]['english']:gsub('$\123actor\125',actor or ''):gsub('$\123status\125',status or ''):gsub('$\123target\125',target or ''):gsub('$\123spell\125',spell or ''):gsub('$\123skill\125',skill or ''):gsub('$\123number\125',number or ''):gsub('$\123number2\125',number2 or ''):gsub('$\123lb\125','\7')
-		add_to_chat(dialog[message_id]['color'],string.char(0x1F,0xFE,0x1E,0x01)..outstr..string.char(127,49))
-	elseif message_id == 16 or message_id == 62 or message_id == 251 then
-	-- Message 16 is "casting is interrupted" :: This is redundant with event_action, so I'm ignoring it.
+		if actor ~= nil then
+			local outstr = dialog[message_id]['english']:gsub('$\123actor\125',actor or ''):gsub('$\123status\125',status or ''):gsub('$\123target\125',target or ''):gsub('$\123spell\125',spell or ''):gsub('$\123skill\125',skill or ''):gsub('$\123number\125',number or ''):gsub('$\123number2\125',number2 or ''):gsub('$\123lb\125','\7')
+			add_to_chat(dialog[message_id]['color'],string.char(0x1F,0xFE,0x1E,0x01)..outstr..string.char(127,49))
+		end
+	elseif T{62,251,308, 313}:contains(message_id) == 62 or message_id == 251 or message_id==313 then
 	-- 62 is "fails to activate" but it is color 121 so I cannot block it because I would also accidentally block a lot of system messages. Thus I have to ignore it.
 	-- Message 251 is "about to wear off" but it is color 123 so I cannot block it because I would also block "you failed to swap that gear, idiot!" messages. Thus I have to ignore it.
+	-- Message 308 is "your inventory is full" but it is color 123.
+	-- Message 313 is the red "target is out of range" message but it is color 123 so I cannot block it because I would also block "you failed to swap that gear, idiot!" messages. Thus I have to ignore it.
 	elseif message_id == 202 then
 		if debugging then write('debug_EAM#'..message_id..': '..dialog[message_id]['english']..' '..param_1..'   '..param_2..'   '..param_3) end
 	elseif debugging then 
