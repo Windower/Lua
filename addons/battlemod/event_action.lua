@@ -137,22 +137,7 @@ function event_action(act)
 			elseif table.contains(fields,'item') then
 				item = color_arr['itemcol']..items[abil_ID]['enl']..rcol
 			elseif table.contains(fields,'ability') then
-				if abil_ID == 53 then -- Gauge handling
-					if msg_ID == 210 then
-						ability = 'Gauge (Cannot charm - '
-					elseif msg_ID == 211 then
-						ability = 'Gauge (Very Difficult - '
-					elseif msg_ID == 212 then
-						ability = 'Gauge (Difficult - '
-					elseif msg_ID == 213 then
-						ability = 'Gauge (Might be able - '
-					elseif msg_ID == 214 then
-						ability = 'Gauge (Should be able - '
-					end
-					ability = ability..effect_val..')'
-				else
-					ability = jobabilities[abil_ID]['english']
-				end
+				ability = jobabilities[abil_ID]['english']
 				if msg_ID == 379 then ability = 'Magic Burst '..ability end
 				ability = color_arr['abilcol']..ability..rcol
 			elseif table.contains(fields,'weapon_skill') then
@@ -181,6 +166,23 @@ function event_action(act)
 					weapon_skill = color_arr['wscol']..(weapon_skill or '')..rcol
 				end
 			end
+			
+			
+			if abil_ID == 53 then -- Gauge handling
+				if msg_ID == 210 then
+					ability = 'Gauge (Cannot charm - '
+				elseif msg_ID == 211 then
+					ability = 'Gauge (Very Difficult - '
+				elseif msg_ID == 212 then
+					ability = 'Gauge (Difficult - '
+				elseif msg_ID == 213 then
+					ability = 'Gauge (Might be able - '
+				elseif msg_ID == 214 then
+					ability = 'Gauge (Should be able - '
+				end
+				ability = ability..effect_val..')'
+			end
+			
 
 			if table.contains(fields,'status') then
 				if act['targets'][i]['actions'][n]['param'] == 0 or act['targets'][i]['actions'][n]['param'] == 255 then
