@@ -41,7 +41,14 @@ end
 -- Prints a list of icons and their keys to the chatlog.
 function ffxi.showicons()
 	for key, val in pairs(ffxi.data.chat.icons) do
-		log('Icon', 'ffxi.data.chat.'..key..':', val)
+		log('Icon', 'ffxi.data.chat.icons.'..key..':', val)
+	end
+end
+
+-- Prints a list of chars and their keys to the chatlog.
+function ffxi.showchars()
+	for key, val in pairs(ffxi.data.chat.chars) do
+		log('Icon', 'ffxi.data.chat.chars.'..key..':', val)
 	end
 end
 
