@@ -168,7 +168,7 @@ function event_action(act)
 			end
 			
 			
-			if abil_ID == 53 then -- Gauge handling
+			if abil_ID == 53 and act['category'] == 3 then -- Gauge handling
 				if msg_ID == 210 then
 					ability = 'Gauge (Cannot charm - '
 				elseif msg_ID == 211 then
