@@ -174,7 +174,9 @@ function orderlots()
 	for i=1, #salvage_cell_name_short  do 
 		if salvage_cell_name_short[i] ~= 'alex' and cell_lots[salvage_cell_name_short[i]] ~= 0 then
 			item = salvage_cell_name_short[i]
-			lotorder = (lotorder..item..': '..cell_lots[item]..' \n ')
+			if cell_lots[item] ~= nil and cell_lots[item] ~= 0
+				lotorder = (lotorder..item..': '..cell_lots[item]..' \n ')
+			end
 	    elseif salvage_cell_name_short[i] == 'alex' and cell_lots[salvage_cell_name_short[i]] ~= 0 then
 	    	item = salvage_cell_name_short[i]
 	    	lotorder = (lotorder..item..' \n ')
