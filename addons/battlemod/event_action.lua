@@ -299,7 +299,7 @@ function event_action(act)
 			
 			if act['targets'][i]['actions'][n]['has_add_effect'] and act['targets'][i]['actions'][n]['add_effect_message'] ~= 0 then
 				if act['category'] == 1 or act['category'] == 2 or act['category'] == 3 or act['category'] == 4 or act['category'] == 11 then
-					if t{152,161,162,163,167,229,603,652}:contains(addmsg) or addmsg > 287 and addmsg < 303 or addmsg > 383 and addmsg < 399 then
+					if T{152,161,162,163,167,229,603,652}:contains(addmsg) or addmsg > 287 and addmsg < 303 or addmsg > 383 and addmsg < 399 then
 						number = act['targets'][i]['actions'][n]['add_effect_param']
 					else
 						number = nf(statuses[act['targets'][i]['actions'][n]['add_effect_param']],'english')
