@@ -72,6 +72,10 @@
     <description>Catches voidwatch weakness messages and prints them to a textbox in case you miss them in the battle spam.</description>
   </addon>
   <addon>
+    <name>THTracker</name>
+    <description>Displays the last TH level reached.</description>
+  </addon>
+  <addon>
     <name>STNA</name>
     <description>One-button status removal for dual boxing.</description>
   </addon>
