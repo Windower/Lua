@@ -463,12 +463,13 @@ function event_incoming_text(original, modified, color)
 		if original == prevline and cancelmulti then
 			a,b = string.find(original,'You buy ')
 			g,b = string.find(original,'You were unable to buy ')
+			i,b = string.find(original,'Your tell was not received')
 			h,b = string.find(original,' seems like a ')
 			f,b = string.find(original,'You sell ')
 			e,b = string.find(original,'%w+ synthesized ')
 			c,b = string.find(original,' bought ')
 			d,b = string.find(original,'You find a ')
-			if a==nil and c==nil and d==nil and e==nil and f==nil and h==nil and g==nil then
+			if a==nil and c==nil and d==nil and e==nil and f==nil and h==nil and g==nil and i==nil then
 				modified = ''
 				if allow then
 					send_command('wait 5;lua c battlemod flip allow')
