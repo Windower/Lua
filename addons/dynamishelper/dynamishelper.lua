@@ -173,16 +173,7 @@ function event_incoming_text(original, new, color)
     	end
 	end
  	if tracker == 'on' then
- 		a,b,item = string.find(original,"%w+ obtains an? ..(%w+ %w+ %w+ %w+)..\46")
- 		if item == nil then
-	 		a,b,item = string.find(original,"%w+ obtains an? ..(%w+ %w+ %w+)..\46")
-	 		if item == nil then
-	 			a,b,item = string.find(original,"%w+ obtains an? ..(%w+%-%w+ %w+)..\46")
-	 	 		if item == nil then
-	 				a,b,item = string.find(original,"%w+ obtains an? ..(%w+ %w+)..\46")
-	 			end
-	 		end
- 		end
+ 		a,b,item = string.find(original,"%w+ obtains an? ..(.*)..\46")
  		if item ~= nil then
  			item = item:lower()
  			for i=1, #Currency do
