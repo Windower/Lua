@@ -159,8 +159,13 @@ function event_action(act)
 				else
 					weapon_skill = color_arr['wscol']..(weapon_skill or '')..rcol
 				end
+			elseif msg_ID == 303 then
+				ability = 'Divine Seal'
+			elseif msg_ID == 304 then
+				ability = 'Elemental Seal'
+			elseif msg_ID == 305 then
+				ability = 'Trick Attack'
 			end
-			
 			
 			if abil_ID == 53 and act['category'] == 6 then -- Gauge handling
 				if msg_ID == 210 then
@@ -202,7 +207,7 @@ function event_action(act)
 				target = target..' (stunned)'
 			elseif T{158,188,245,324,592,658}:contains(msg_ID) and condensebattle then
 				-- When you miss a WS or JA. Relevant for condensed battle.
-				number = 'Miss'
+				number = 'Miss' --- This probably doesn't work due to the if a==nil statement below.
 			elseif msg_ID == 653 or msg_ID == 654 then
 				status = color_arr['statuscol']..'Immunobreak'..rcol
 			elseif msg_ID == 655 or msg_ID == 656 then
@@ -225,7 +230,7 @@ function event_action(act)
 					-- Misses, Damage, Healing, Parrying, Dodge, Guard/Block, and Utsusemi
 					-- Handles for Category 1,2,3,4,6, and 14
 					a,b = string.find(dialog[msg_ID]['english'],'$\123number\125')
-					if a == nil then -- Distinguishes between Status effects and Damage/Healing.
+					if a == nil and type(number) ~= string then -- Distinguishes between Status effects and Damage/Healing.
 						number = nil
 					end
 					if condensebattle then
