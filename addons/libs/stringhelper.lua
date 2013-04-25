@@ -46,23 +46,27 @@ function string.split(str, sep, maxsplit, pattern)
 	end
 	
 	local res = {}
+	local key = 0
 	local i = 1
+	local startpos, endpos
+	local match
 	while i <= #str + 1 do
 		-- Find the next occurence of sep.
-		local startpos, endpos = str:find(sep, i, pattern)
+		startpos, endpos = str:find(sep, i, pattern)
 		-- If found, get the substring and append it to the table.
-		if startpos ~= nil then
-			matchstr = string.slice(str, i, startpos-1)
-			res[#res+1] = matchstr
+		if startpos then
+			match = string.slice(str, i, startpos - 1)
+			key = key + 1
+			res[key] = match
 			-- If maximum number of splits reached, return
-			if #res == maxsplit - 1 then
-				res[#res+1] = str:slice(endpos + 1)
+			if key == maxsplit - 1 then
+				res[key + 1] = str:slice(endpos + 1)
 				break
 			end
 			i = endpos + 1
 		-- If not found, no more separaters to split, append the remaining string.
 		else
-			res[#res+1] = str:slice(i)
+			res[key + 1] = str:slice(i)
 			break
 		end
 	end
