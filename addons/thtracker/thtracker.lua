@@ -47,6 +47,8 @@ end
 		posx = settingtab['posx']
 		posy = settingtab['posy']
 	end	
+	
+local name = nil
 
 function event_load()
 	send_command('alias th lua c thtracker')
@@ -81,15 +83,24 @@ function event_addon_command(...)
 end
 
 function event_incoming_text(original, new, color)
-	name = nil
 	count = 0
 	a,b,name,count = string.find(original,'Additional effect: Treasure Hunter effectiveness against the (.*)%s? increases to (%d+)\46')
+	a,b,deadmob = string.find(original,'%w+ defeats the (.*)\46')
 	if name ~= nil and count ~= 0 then
+		mob = name
 		thoutput = ' '
-		thoutput = (name..'\n TH: '..count)
+		thoutput = (' '..name..'\n TH: '..count)
 		thbox()
 		tb_set_text('th_box', thoutput);
 		tb_set_visibility('th_box',see)
+	end
+	if deadmob ~= nil and mob ~= nil then
+		if mob == deadmob then
+			tb_set_text('th_box', '')
+			name = nil
+			deadmob = nil
+			thoutput = nil
+		end
 	end
 end
 
