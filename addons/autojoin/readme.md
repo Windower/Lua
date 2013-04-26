@@ -2,7 +2,7 @@ Author:Stjepan Bakrac
 
 # AutoJoin
 
-Once loaded, will automatically join part and alliance invites. If you're in a CS, it will wait until it's finished and then join (unless the invite time expires). It will also wait in similar situations, such as being dead and unable to act. It will not process the invite at all if the treasure pool is not empty. This feature may be extended in the future, once access to treasure pool information is exposed in Lua, in which case it could automatically join once the pool empties.
+Once loaded, will automatically join party and alliance invites. If you're in a CS, it will wait until it's finished and then join (unless the invite time expires). It will also wait in similar situations, such as being dead and unable to act. It will not process the invite at all if the treasure pool is not empty. This feature may be extended in the future, once access to treasure pool information is exposed in Lua, in which case it could automatically join once the pool empties.
 
 ### Modes
 
