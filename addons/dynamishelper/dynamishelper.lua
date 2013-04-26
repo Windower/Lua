@@ -98,20 +98,20 @@ end
 function event_addon_command(...)
 --	 write('event_addon_command function')
 	local params = {...};
- 	if #params < 1 then
-		return
-	end
-	if params[1] then
- 		if params[1]:lower() == "help" then
-   			write('dh help : Shows help message')
-  			write('dh timer [on/off] : Displays a timer each time a mob is staggered.')
-   			write('dh tracker [on/off/reset/pos x y] : Tracks the amount of currency obtained.')
-			write('dh proc [on/off/pos x y] : Displays the current proc for the targeted mob.')
-   			write('dh ll create : Creates and loads a light luggage profile that will automatically lot all currency.')
-		elseif params[1]:lower() == "timer" then
-   			if params[2]:lower() == "on" or params[2]:lower() == "off" then
+	if #params < 1 then
+		return	end
+		if params[1] then
+			if params[1]:lower() == "help" then
+   				write('dh help : Shows help message')
+  				write('dh timer [on/off] : Displays a timer each time a mob is staggered.')
+   				write('dh tracker [on/off/reset/pos x y] : Tracks the amount of currency obtained.')
+				write('dh proc [on/off/pos x y] : Displays the current proc for the targeted mob.')
+   				write('dh ll create : Creates and loads a light luggage profile that will automatically lot all currency.')
+			elseif params[1]:lower() == "timer" then
+   				if params[2]:lower() == "on" or params[2]:lower() == "off" then
     				timer = params[2]
-   			else write("Invalid timer option.")
+					write('Timer feature is '..timer)
+   				else write("Invalid timer option.")
    			end
 		elseif params[1]:lower() == "tracker" then
    			if params[2]:lower() == "on" then
@@ -120,47 +120,47 @@ function event_addon_command(...)
 				tb_set_visibility('dynamis_box',true)
     			write('Tracker enabled')
    			elseif params[2]:lower() == "off" then
-    				tracker = "off"
-    				tb_set_visibility('dynamis_box',false)
-    				write('Tracker disabled')
+    			tracker = "off"
+    			tb_set_visibility('dynamis_box',false)
+    			write('Tracker disabled')
    			elseif params[2]:lower() == "reset" then
-	 			for i=1, #Currency do
-     					Currency[Currency[i]] = 0
-     				end
-      				obtainedf()
-      				initializebox()
-      				write('Tracker reset')
-		   	elseif params[2]:lower() == "pos" then
-    				if params[3] then
-     					trposx, trposy = tonumber(params[3]), tonumber(params[4])
-     					obtainedf()
-     					initializebox()
-    				end		
-    	    		else write("Invalid tracker option.")
+				for i=1, #Currency do
+     				Currency[Currency[i]] = 0
+     			end
+      			obtainedf()
+     	 		initializebox()
+      			write('Tracker reset')
+   			elseif params[2]:lower() == "pos" then
+    			if params[3] then
+     				trposx, trposy = tonumber(params[3]), tonumber(params[4])
+     				obtainedf()
+     				initializebox()
+    			else write("Invalid tracker option.")
+    			end
     		end
-	  	elseif params[1]:lower() == "ll" then
+  		elseif params[1]:lower() == "ll" then
    			if params[2]:lower() == "create" then
-	    			player = get_player()['name']
-    				io.open(lua_base_path..'../../plugins/ll/dynamis-'..player..'.txt',"w"):write('if item is 1452, 1453, 1455, 1456, 1449, 1450 then lot'):close()
-    				send_command('ll profile dynamis-'..player..'.txt')
-   				else write("Invalid light luggage option.")
+    			player = get_player()['name']
+    			io.open(lua_base_path..'../../plugins/ll/dynamis-'..player..'.txt',"w"):write('if item is 1452, 1453, 1455, 1456, 1449, 1450 then lot'):close()
+    			send_command('ll profile dynamis-'..player..'.txt')
+   			else write("Invalid light luggage option.")
    			end
-   			elseif params[1]:lower() == "proc" then
-   			trposx, trposy = tonumber(params[3]), tonumber(params[4])
+  	 elseif params[1]:lower() == "proc" then
    			if params[2]:lower() == "on" then
-   					proc = params[2]
-   					write('Proc feature enabled.')
+   				proc = params[2]
+   				write('Proc feature enabled.')
    			elseif params[2]:lower() == "off" then
-    				proc = params[2]
-    				tb_set_visibility('proc_box',false)
-    				write('Proc feature disabled.')
+   		 		proc = params[2]
+    			tb_set_visibility('proc_box',false)
+    			write('Proc feature disabled.')
     		elseif params[2]:lower() == "pos" then
-   					pposx, pposy = tonumber(params[3]), tonumber(params[4])
-   					initializeproc()
+   				pposx, pposy = tonumber(params[3]), tonumber(params[4])
+   				initializeproc()
    			end
- 		end
- 	end
- end
+		end
+	end
+end
+
 
 function event_incoming_text(original, new, color)
 --	write('event_incoming_text function')
@@ -173,16 +173,7 @@ function event_incoming_text(original, new, color)
     	end
 	end
  	if tracker == 'on' then
- 		a,b,item = string.find(original,"%w+ obtains an? ..(%w+ %w+ %w+ %w+)..\46")
- 		if item == nil then
-	 		a,b,item = string.find(original,"%w+ obtains an? ..(%w+ %w+ %w+)..\46")
-	 		if item == nil then
-	 			a,b,item = string.find(original,"%w+ obtains an? ..(%w+%-%w+ %w+)..\46")
-	 	 		if item == nil then
-	 				a,b,item = string.find(original,"%w+ obtains an? ..(%w+ %w+)..\46")
-	 			end
-	 		end
- 		end
+ 		a,b,item = string.find(original,"%w+ obtains an? ..(.*)..\46")
  		if item ~= nil then
  			item = item:lower()
  			for i=1, #Currency do
