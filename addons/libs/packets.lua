@@ -3,6 +3,11 @@ A list of deciphered packets and their meaning, with a short description.
 When size is 0x00 it means the size is either unknown or varies.
 ]]
 
+_libs = _libs or {}
+_libs.packets = true
+
+p = {}
+
 -- Client packets
 p[0x00A] = {name='Client Connect',      size=0x2E, description='(unencrypted/uncompressed) First packet sent when connecting to new zone.'}
 p[0x00D] = {name='Client Leave',        size=0x04, description='Last packet sent from client before it leaves the zone.'}
@@ -92,4 +97,4 @@ p[0x0F6] = {name='Widescan Mark',       size=0x04, description='Marks the start 
 p[0x105] = {name='Data Download 4',     size=0x16, description='The data that is sent to the client when it is "Downloading data...".'}
 p[0x108] = {name='Data Download 5',     size=0x00, description='The data that is sent to the client when it is "Downloading data...".'}
 
-setmetatable(p, {index={name='Unknown', size=0x00, description='No data available.'}})
+return setmetatable(p, {index={name='Unknown', size=0x00, description='No data available.'}})
