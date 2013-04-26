@@ -60,41 +60,23 @@ function ffxi.showcolors()
 end
 
 -- Returns the target's id.
-function ffxi.target_id()
-	return get_mob_by_target_id(get_player()['targets_target_id']).id
+function ffxi.target_id(default)
+	return get_mob_by_index(get_player()['target_index'])['id'] or default
 end
 
 -- Returns the target's name.
-function ffxi.target_name()
-	return get_mob_by_target_id(get_player()['targets_target_id']).name
+function ffxi.target_name(default)
+	return get_mob_by_index(get_player()['target_index'])['name'] or default
 end
 
 -- Returns a name based on an id.
 function ffxi.id_to_name(id)
-	return get_mob_by_id(id).name
+	return get_mob_by_id(id)['name']
 end
 
--- Pretty-prints the action packet
-function ffxi.actionprint(p)
-	local function makename(id)
-		return get_mob_by_id(id).name..' ('..id..')'
-	end
-	local str = ''
-
-	local targets = T(p['targets']):map(table.get-{'id'}):sort()
-	str = str..makename(p['actor_id'])..'\tTargets: '..targets:map(makename):format('csv')..'\n'
-	str = str..'\n'
-	for _, target in ipairs(targets) do
-		str = str..'Target: '..makename(target)..'\n'
-		str = str..'\n'
---		local actions = T(p['targets']):find[2](functools.equals(target)..table.get-{'id'}))['actions']
---		local actionlines = T{T{}}
---		for _, action in ipairs(actions) do
---			action = T(action):tovstring():split('\n'):slice(2, -2):map(string.gsub-{'=', ': '}..string.gsub-{',$', ''}..string.trim):vprint()
---		end
-	end
-
-	return str
+-- Returns a name based on an index.
+function ffxi.index_to_name(index)
+	return get_mob_by_index(index)['name']
 end
 
 return ffxi
