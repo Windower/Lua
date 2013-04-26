@@ -201,11 +201,12 @@ function lightluggage()
 	   		end
 	   	end
 	end
-	if mode == "lots" then
+	if mode == "lots" and ll_lots ~= "" then
 		llprofile = (llprofile..'if item is '..ll_lots..' then lot \n')
 	end
-	llprofile = (llprofile..'if item is '..ll_pass..' then pass \n')
-	
+	if ll_pass ~= "" then
+		llprofile = (llprofile..'if item is '..ll_pass..' then pass \n')
+	end
 	if settingtab[set][player_num]['pass'] ~= 0 then
 		llprofile = (llprofile.."if item is "..settingtab[set][player_num]['pass'].." then pass \n")
 	end
