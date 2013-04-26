@@ -153,7 +153,7 @@ function list.flatten(l, rec)
 	local res = {}
 	local key = 1
 	local flat
-	for key, val in ipairs(t) do
+	for key, val in ipairs(l) do
 		if type(val) == 'table' then
 			if rec then
 				flat = list.flatten(val, rec)
@@ -175,6 +175,14 @@ function list.flatten(l, rec)
 
 	res.n = key
 	return setmetatable(res, _meta.L)
+end
+
+function list.it(l)
+	local key = 0
+	return function()
+		key = key + 1
+		return l[key]
+	end
 end
 
 function list.equals(l1, l2)
