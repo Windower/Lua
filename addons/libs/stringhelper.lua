@@ -6,6 +6,9 @@ _libs = _libs or {}
 _libs.stringhelper = true
 _libs.functools = _libs.functools or require 'functools'
 
+_meta = _meta or {}
+_meta.T = _meta.T or {}
+
 debug.getmetatable('').__index = string
 debug.getmetatable('').__unm = functools.negate..functools.equals
 
@@ -40,6 +43,17 @@ end
 
 -- Splits a string into a table by a separator string.
 function string.split(str, sep, maxsplit, pattern)
+	if sep == '' then
+		local res = {}
+		local key = 0
+		for c in str:gmatch('.') do
+			key = key + 1
+			res[key] = c
+		end
+		
+		return setmetatable(res, _meta.T)
+	end
+	
 	maxsplit = maxsplit or 0
 	if pattern == nil then
 		pattern = true
@@ -71,7 +85,7 @@ function string.split(str, sep, maxsplit, pattern)
 		end
 	end
 	
-	return res
+	return setmetatable(res, _meta.T)
 end
 
 -- Alias to string.sub, with some syntactic sugar.
