@@ -38,64 +38,56 @@ local config = require 'config'
 file = require 'filehelper'
 
 local settingtab = nil
-local settings_file = 'data\\settings.xml'
-local settingtab = config.load(settings_file)
-if settingtab == nil then
-	write('No settings file found. Ensure you have a file at data\\settings.xml')
-end
+local settings_file = 'data/settings.xml'
 
 function event_load()
-
 	info = get_ffxi_info()
 	player = get_player()
 
-	box_name = 'direction'
-	box_name2 = 'direction2'
-	box_name3 = 'direction3'
-	tb_create(box_name)
-	tb_create(box_name2)
-	tb_create(box_name3)
+	defaults = {}
+	defaults.geomode = {}
+	defaults.thfmode = {}
+	defaults.bg_red = 0
+	defaults.bg_blue = 0
+	defaults.bg_green = 0
+	defaults.txt_red = 255
+	defaults.txt_blue = 0
+	defaults.txt_green = 0
+	defaults.txt_bold = true
+	defaults.x_pos = 260
+	defaults.y_pos = 550
+	defaults.defaultmode = 'geo'
+	defaults.geomode.showbuff = true
+	defaults.thfmode.showangle = 'always'
+	settingtab = config.load(defaults)
+	
+	if settingtab == nil then
+		write('No settings file found. Ensure you have a file at data/settings.xml')
+	end
+	
+	box_name = T()
+	local i = 1
+	
+	for i = 1, 3 do 
+		box_name[i] = 'd'..i
+		tb_create(box_name[i])
+		tb_set_bg_color(box_name[i], 0, settingtab['bg_red'], settingtab['bg_green'], settingtab['bg_blue'])
+		tb_set_bg_visibility(box_name[i], true)
+		tb_set_bold(box_name[i], settingtab['txt_bold'])
+		tb_set_right_justified(box_name[i], false)
+		tb_set_color(box_name[i], 0, settingtab['txt_red'], settingtab['txt_green'], settingtab['txt_blue'])
+		checktext = T()
+		checktext[i] = ''
+		if i < 3 then
+			tb_set_location(box_name[i], settingtab['x_pos'], settingtab['y_pos'])
+		else
+			tb_set_location(box_name[i], settingtab['x_pos'], settingtab['y_pos'] - 20)
+		end
+	end
 
-	a = 0
-	r = settingtab['bg_red']
-	g = settingtab['bg_green']
-	b = settingtab['bg_blue']
-	r1 = settingtab['txt_red']
-	g1 = settingtab['txt_green']
-	b1 = settingtab['txt_blue']
-	x_pos = settingtab['x_pos']
-	y_pos = settingtab['y_pos']
-	bold = settingtab['txt_bold']
 	mode = tostring(settingtab['defaultmode'])
 	showbuff = settingtab.geomode.showbuff
 	showangle = tostring(settingtab.thfmode.showangle)
-	
-	--geo compass
-	tb_set_bg_color(box_name, a, r, g, b)
-	tb_set_bg_visibility(box_name, true)
-	tb_set_bold(box_name, bold)
-	tb_set_location(box_name, x_pos, y_pos)
-	tb_set_right_justified(box_name, false)
-	tb_set_color(box_name, a, r1, g1, b1)
-	--geo showbuff
-	tb_set_bg_color(box_name2, a, r, g, b)
-	tb_set_bg_visibility(box_name2, true)
-	tb_set_bold(box_name2, bold)
-	tb_set_location(box_name2, x_pos, (y_pos))
-	tb_set_right_justified(box_name2, false)
-	tb_set_color(box_name2, a, r1, g1, b1)
-	--thf SA compass
-	tb_set_bg_color(box_name3, a, r, g, b)
-	tb_set_bg_visibility(box_name3, true)
-	tb_set_bold(box_name3, bold)
-	tb_set_location(box_name3, x_pos, (y_pos - 20))
-	tb_set_right_justified(box_name3, false)
-	tb_set_color(box_name3, a, r1, g1, b1)
-
-	checktext1 = ''
-	checktext2 = ''
-	checktext3 = ''
-	checka = 0
 	loop = 1
 	
 	send_command('alias mobcompass lua c mobcompass')
@@ -116,9 +108,10 @@ end
 
 function event_unload()
 	loop = 1
-	tb_delete(box_name)
-	tb_delete(box_name2)
-	tb_delete(box_name3)
+	local i = 1
+	for i = 1,3 do
+		tb_delete(box_name[i])
+	end
 end
 
 function event_login()
@@ -128,6 +121,10 @@ end
 
 function event_logout(name)
 	loop = 1
+	local i = 1
+	for i = 1, 3 do
+		set_tb(0,'',i)
+	end
 end
 
 function event_addon_command(...)
@@ -192,97 +189,93 @@ function get_target()
 	--Player info
 	player = T(get_player())
 	P = T(get_mob_by_id(player.id))
-	Px = P.x_pos
-	Py = P.y_pos
+	local Px = P.x_pos
+	local Py = P.y_pos
+	local tb_text = T()
 	
 	-- Target info
 	target = T(get_mob_by_index(player.target_index))
 	target_id = target.id
+	local i = 1
+	for i = 1,3 do
+		tb_text[i] = ''
+	end
 	
 	if (target_id ~= 0) and (target_id ~= nil) and (target_id ~= player.id) and (target.is_npc == true) then
-		a = 255
 		
-		Mx = target.x_pos
-		My = target.y_pos
-		
-		angle = calc_standard_angle(Px, Py, Mx, My)
-		direction = angle_to_direction(angle)
-		
-		target_name = target.name
-		text = direction..' '..angle..' °'
-		
-		Mfacing = target.facing
-		angle2 = calc_behind(Mfacing, Px, Py, Mx, My)
-		text3 = is_sa(angle2)
-		
+		local Mx = target.x_pos
+		local My = target.y_pos
+						
 		if mode == 'geo' then
-			text2 = ''
-			set_tb2(0,tostring(text2))
+			local angle = calc_standard_angle(Px, Py, Mx, My)
+			local direction = angle_to_direction(angle)
+			tb_text[1] = direction..' '..angle..' °'
 			
-			set_tb(255,tostring(text))
-			if showbuff == true then
-				if direction == 'N' then
-					text5 = 'buff = Recast'
-				elseif direction == 'NE' then
-					text5 = 'buff = Recast + Macc'
-				elseif direction == 'E' then
-					text5 = 'buff = Macc'
-				elseif direction == 'SE' then
-					text5 = 'buff = Macc + MCR'
-				elseif direction == 'S' then
-					text5 = 'buff = MCR'
-				elseif direction == 'SW' then
-					text5 = 'buff = MCR + Matt'
-				elseif direction == 'W' then
-					text5 = 'buff = Matt'
-				elseif direction == 'NW' then
-					text5 = 'buff = Matt + Recast'
-				else
-					text5 = 'buff = ...'
-				end
-				set_tb3(255,tostring(text5))
+			tb_text[2] = ''
+			
+			set_tb(0,tostring(tb_text[2]),2)
+			set_tb(255,tostring(tb_text[1]),1)
+			
+			if showbuff and direction == 'N' then
+				tb_text[3] = 'buff = Recast'
+			elseif showbuff and direction == 'NE' then
+				tb_text[3] = 'buff = Recast + Macc'
+			elseif showbuff and direction == 'E' then
+				tb_text[3] = 'buff = Macc'
+			elseif showbuff and direction == 'SE' then
+				tb_text[3] = 'buff = Macc + MCR'
+			elseif showbuff and direction == 'S' then
+				tb_text[3] = 'buff = MCR'
+			elseif showbuff and direction == 'SW' then
+				tb_text[3] = 'buff = MCR + Matt'
+			elseif showbuff and direction == 'W' then
+				tb_text[3] = 'buff = Matt'
+			elseif showbuff and direction == 'NW' then
+				tb_text[3] = 'buff = Matt + Recast'
 			else
-				text3 = ''
-				set_tb3(0,tostring(text5))
+				tb_text[3] = 'buff = ...'
 			end
-		elseif mode == 'thf' then
-			text = ''
-			set_tb(0,tostring(text))
-			text5 = ''
-			set_tb3(0,tostring(text5))
+			set_tb(255,tostring(tb_text[3]),3)
 			
-			if showangle == 'always' then
-				if text3 == 'BAD' then
-					text2 = 'SA: '..text3..' | Behind: '..angle2..' °'
-				elseif text3 == 'OK' then
-					text2 = 'SA: '..text3.. ' | Behind: '..angle2..' °'
-				end
-			elseif showangle == 'behind' then
-				if text3 == 'BAD' then
-					text2 = 'SA: '..text3
-				elseif text3 == 'OK' then
-					text2 = 'SA: '..text3.. ' | Behind: '..angle2..' °'
-				end
-			elseif showangle == 'never' then
-				text2 = 'SA: '..text3
+			if showbuff == false then 
+				tb_text[3] = ''
+				set_tb(0,tostring(tb_text[3]),3)
 			end
-			set_tb2(255,tostring(text2))
+			
+		elseif mode == 'thf' then
+			local Mfacing = target.facing
+			local angle2 = calc_behind(Mfacing, Px, Py, Mx, My)
+			tb_text[2] = is_sa(angle2)
+			
+			tb_text[1] = ''
+			set_tb(0,tostring(tb_text[1]),1)
+			tb_text[3] = ''
+			set_tb(0,tostring(tb_text[3]),3)
+			
+			if showangle == 'always' and tb_text[2] == 'BAD' then
+				tb_text[2] = 'SA: '..tb_text[2]..' | Behind: '..angle2..' °'
+			elseif showangle == 'always' and tb_text[2] == 'OK' then
+				tb_text[2] = 'SA: '..tb_text[2].. ' | Behind: '..angle2..' °'
+			elseif showangle == 'behind' and tb_text[2] == 'BAD' then
+				tb_text[2] = 'SA: '..tb_text[2]
+			elseif tb_text[2] == 'OK' and tb_text[2] == 'BAD' then
+				tb_text[2] = 'SA: '..tb_text[2].. ' | Behind: '..angle2..' °'
+			elseif showangle == 'never' then
+				tb_text[2] = 'SA: '..tb_text[2]
+			end
+			set_tb(255,tostring(tb_text[2]),2)
 		end
 		
 	elseif (target_id == 0) or (target_id == nil) or (target_id == player.id) or (target.is_npc == false) then
-		a = 0
-		text = ''
-		text2 = ''
-		text5 = ''
-		set_tb(a,tostring(text))
-		set_tb2(a,tostring(text2))
-		set_tb3(a,tostring(text5))
+		for i = 1,3 do
+			tb_text[i] = ''
+			set_tb(0,tostring(tb_text[i]),i)
+		end
 	end
-		
-	checka = a
-	checktext1 = text
-	checktext2 = text2
-	checktext3 = text5
+	
+	for i = 1,3 do
+		checktext[i] = tb_text[i]
+	end
 	
 	if loop == 0 then
 		send_command('@wait 0.1;lua i MobCompass get_target')
@@ -290,39 +283,25 @@ function get_target()
 	
 end
 
-function set_tb(alpha,text)
-	tb_set_bg_color(box_name, alpha, r, g, b)
-	tb_set_color(box_name, alpha, r1, g1, b1)
-	if checktext1 ~= text then
-		tb_set_text(box_name, text)
-	end
-end
-
-function set_tb2(alpha,text2)
-	tb_set_bg_color(box_name2, alpha, r, g, b)
-	tb_set_color(box_name2, alpha, r1, g1, b1)
-	if checktext2 ~= text2 then
-		tb_set_text(box_name2, text2)
-	end
-end
-
-function set_tb3(alpha,text5)
-	tb_set_bg_color(box_name3, alpha, r, g, b)
-	tb_set_color(box_name3, alpha, r1, g1, b1)
-	if checktext3 ~= text5 then
-		tb_set_text(box_name3, text5)
+function set_tb(alpha,text,tb_number)	
+	tb_number = tonumber(tb_number)
+	tb_set_bg_color(box_name[tb_number], alpha,settingtab['bg_red'], settingtab['bg_green'], settingtab['bg_blue'])
+	tb_set_color(box_name[tb_number], alpha,settingtab['txt_red'], settingtab['txt_green'], settingtab['txt_blue'])
+	if checktext[tb_number] ~= text then
+		tb_set_text(box_name[tb_number], text)
 	end
 end
 
 function calc_standard_angle(Px, Py, Mx, My)
 
-	Px = tonumber(Px)
-	Py = tonumber(Py)
-	Mx = tonumber(Mx)
-	My = tonumber(My)
+	local angle = 0
+	local Px = tonumber(Px)
+	local Py = tonumber(Py)
+	local Mx = tonumber(Mx)
+	local My = tonumber(My)
 	
-	PM = (Px - Mx) / (Py - My)
-	PM_angle = math.atan(PM) * 180/math.pi
+	local PM = (Px - Mx) / (Py - My)
+	local PM_angle = math.atan(PM) * 180/math.pi
 
 	if (Px > Mx) and (Py > My) then
 		
@@ -358,8 +337,8 @@ end
 
 function angle_to_direction(angle)
 
-	angle = tonumber(angle)
-	direction = ''
+	local angle = tonumber(angle)
+	local direction = ''
 	
 	if (angle <= 11.25) and (angle >= 0) then
 		direction = 'N'
@@ -403,9 +382,14 @@ end
 
 function calc_behind(Mfacing, Px, Py, Mx, My)
 	
-	Mfacing = (Mfacing * 180/math.pi):round(2)
+	local Px = tonumber(Px)
+	local Py = tonumber(Py)
+	local Mx = tonumber(Mx)
+	local My = tonumber(My)
+	
+	local Mfacing = (Mfacing * 180/math.pi):round(2)
 		
-	SA_Angle = calc_standard_angle(Px, Py, Mx, My) - 90
+	local SA_Angle = calc_standard_angle(Px, Py, Mx, My) - 90
 	if SA_Angle < 0 then
 		SA_Angle = 360 + SA_Angle
 	end
@@ -423,7 +407,7 @@ function calc_behind(Mfacing, Px, Py, Mx, My)
 end
 
 function is_sa(angle2) 
-	sa = ''
+	local sa = ''
 	if (angle2 >= 0) and (angle2 < 45) then
 		sa = 'OK'	
 	elseif (angle2 < 0) and (angle2 > -45) then
