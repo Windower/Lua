@@ -129,7 +129,7 @@ function event_action(act)
 	local player = get_player()
 	
 	if player.status:lower() == 'engaged' then
-		if actor == (player.id or player.target_id) then
+		if actor == (player.id or player.index) then
 			if category == 1 then
 				if TH_ON == 0 then
 					send_command('sc set ' .. TH_Set)

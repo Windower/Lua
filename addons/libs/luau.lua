@@ -5,6 +5,8 @@ LuaU - A utility tool for making Lua usable within FFXI. Loads several libraries
 require 'logger'
 require 'stringhelper'
 require 'tablehelper'
+require 'lists'
+require 'sets'
 require 'mathhelper'
 require 'functools'
 require 'colors'

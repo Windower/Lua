@@ -104,7 +104,7 @@
 	<dtd id="102" english="${actor} uses ${ability}.${lb}${target} recovers ${number} HP." color="H" units="HP"/>
 	<dtd id="103" english="${actor} uses ${weapon_skill}.${lb}${target} recovers ${number} HP." color="H" units="HP"/>
 	<dtd id="104" english="Unable to use item.${lb}You do not meet the level requirement." color="1"/>
-	<dtd id="105" english="${actor} gains ${number} experience points." color="1"/>
+	<dtd id="105" english="${actor} gains ${number} experience points." color="131"/>
 	<dtd id="106" english="${actor} is intimidated by ${target}'s presence." color="122"/>
 	<dtd id="107" english="${target} is temporarily unable to access support job abilities." color="1"/>
 	<dtd id="108" english="${actor} uses ${ability}.${lb}Pet's powers increase!" color="101"/>
@@ -252,7 +252,7 @@
 	<dtd id="250" english="Reraise takes effect!" color="1"/>
 	<dtd id="251" english="The effect of ${status} is about to wear off." color="123"/>
 	<dtd id="252" english="${actor} casts ${spell}.${lb}Magic Burst!${lb}${target} takes ${number} points of damage." color="D"/>
-	<dtd id="253" english="EXP chain #${number}!${lb}${actor} gains ${number} experience points." color="1"/>
+	<dtd id="253" english="EXP chain #${number}!${lb}${actor} gains ${number} experience points." color="131"/>
 	<dtd id="254" english="Current enmity: ${number}" color="1"/>
 	<dtd id="255" english="DEBUG: ${target}}${number}% chance of success." color="1"/>
 	<dtd id="256" english="In this flower pot: Seeds sown: ${item}" color="1"/>
