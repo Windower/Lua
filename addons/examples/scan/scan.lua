@@ -32,7 +32,7 @@ function event_unload()
 end
 
 function event_target_change(targId)
-	local currentmob = get_mob_by_target_id(targId)
+	local currentmob = get_mob_by_index(targId)
 	if currentmob ~= nil then
 		if currentmob['id'] == nil then
 			tb_set_text('scan_box','No target / Default')
