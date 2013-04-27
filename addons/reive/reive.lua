@@ -35,7 +35,6 @@ local _reive = T{}
 _reive.v              = '1.20130419'
 _reive.tb_name        = 'addon:gr:reive'
 _reive.track          = false
-_reive.reset_on_start = false
 _reive.visible        = false
 _reive.stats          = T{}
 _reive.stats.exp      = 0
@@ -176,7 +175,7 @@ function _reive.test(...)
 end
 
 function _reive.start(...)
-    if _reive.reset_on_start == true then
+    if _reive.settings.reset_on_start == true then
         _reive.reset()
     end
 
