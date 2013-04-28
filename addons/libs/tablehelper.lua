@@ -380,7 +380,7 @@ function table.reverse(t)
 end
 
 -- Returns an array removed of all duplicates.
--- DEPRECATED: User S(t) instead
+-- DEPRECATED: Use S(t) instead
 function table.set(t)
 	local seen = {}
 	local res = {}

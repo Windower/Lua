@@ -26,7 +26,7 @@ function event_load()
 	tb_set_font('daze_box','Arial',10)
 	daze_tab = {}
 	local targId=get_player()
-	currentmob = get_mob_by_target_id(targId['targets_target_id'])
+	currentmob = get_mob_by_index(targId['target_index'])
 	update_box()
 end
 
@@ -36,7 +36,7 @@ function event_unload()
 end
 
 function event_target_change(targId)
-	currentmob = get_mob_by_target_id(targId)
+	currentmob = get_mob_by_index(targId)
 	update_box()
 end
 

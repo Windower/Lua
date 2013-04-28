@@ -121,7 +121,6 @@ function make_nested(node)
 		if val.type == 'attribute' then
 			res[val['name']] = val['value']
 		else
-			if x then log(value);x = false end
 			res['en'] = value
 		end
 	end

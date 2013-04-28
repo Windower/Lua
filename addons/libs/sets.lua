@@ -15,7 +15,7 @@ _meta.S.__class = 'Set'
 
 function S(t)
 	t = t or {}
-	s = {}
+	local s = {}
 	
 	if class(t) == 'List' then
 		for _, val in ipairs(t) do

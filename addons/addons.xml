@@ -13,7 +13,8 @@
   </addon>
   <addon>
     <name>AEcho</name>
-  	<description>Automatically uses echo drops when you get silenced. Also, uses send to send a message to an alt that you got debuffed.</description>
+    <description>Automatically uses echo drops when you get silenced. Also, uses send to send a message to an alt that you got debuffed.</description>
+    <bugtracker>https://github.com/nitrous24/Lua/issues?page=1</bugtracker>
   </addon>
   <addon>
     <name>AnsweringMachine</name>
@@ -37,6 +38,10 @@
     <description>Customizes battle chat messages.</description>
   </addon>
   <addon>
+    <name>cBlock</name>
+    <description>Blacklist addon for FFOChat.</description>
+  </addon>
+  <addon>
     <name>CellHelp</name>
 	<author>Krizz and Balloon</author>
     <description>Tracks cells that are needed, displays your position in the lot order, and creates the appropriate LL profiles.</description>
@@ -46,12 +51,21 @@
     <description>This plugin lets you input special chars using simple tags (ex.: &lt;note&gt; for ♪).</description>
   </addon>
   <addon>
+  	<name>Daze</name>
+  	<description>Records what daze effects are on the monster you're fighting.</description>
+  </addon>
+  <addon>
     <name>DynamisHelper</name>
     <description>Displays a timer when a mob is procced, tracks currency obtained, and can create a LL to lot all currency.</description>
   </addon>
   <addon>
+    <name>eval</name>
+    <description>Allows developers to run arbitrary lua code in the console.</description>
+  </addon>
+  <addon>
     <name>FFOColor</name>
     <description>Allows you to show FFOChat text in one of the 5 game chat channels. As well as specify colors for the text</description>
+    <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>	
   </addon>
   <addon>
     <name>Linker</name>
@@ -67,18 +81,25 @@
     <bugtracker>https://github.com/banggugyangu/Lua/issues</bugtracker>
   </addon>
   <addon>
+	<name>MobCompass</name>
+	<description>A compass to show your position relative to the target (not players) for geo and has a setup for Sneak attack</description>
+  </addon>
+  <addon>
+    <name>obiaway</name>
+    <description>Automatically remove elemental obis based on day/weather/storm conditions.</description>
+  </addon>
+  <addon>
     <name>OhShi</name>
     <description>Keeps track of various event related things. Such as, VW proc messages, mob casting, mob tp moves, TH procs and cor rolls, as well as others.</description>
+    <bugtracker>https://github.com/nitrous24/Lua/issues?page=1</bugtracker>
+  </addon>
+  <addon>
+    <name>PetSchool</name>
+    <description>A helper addon for PUPs using spellcast, it informs spellcast of pet casting (healing or nuking).</description>
   </addon>
   <addon>
     <name>Respond</name>
     <description>Respond to tells and FFOchat PMs using //r.</description>
-  </addon>
-  <addon>
-    <name>SATACast</name>
-    <author>Banggugyangu</author>
-    <description>Informs Spellcast about changes to Sneak Attack and Trick Attack status.</description>
-    <bugtracker>https://github.com/banggugyangu/Lua/issues</bugtracker>
   </addon>
   <addon>
 	<name>RollTracker</name>
@@ -88,6 +109,12 @@
   <addon>
   	<name>reive</name>
   	<description>tracks exp, bayld, momentum scores and bonuses during a reive.</description>
+  </addon>
+  <addon>
+    <name>SATACast</name>
+    <author>Banggugyangu</author>
+    <description>Informs Spellcast about changes to Sneak Attack and Trick Attack status.</description>
+    <bugtracker>https://github.com/banggugyangu/Lua/issues</bugtracker>
   </addon>
   <addon>
     <name>Scoreboard</name>
@@ -102,13 +129,27 @@
   <addon>
     <name>StaggerTrack</name>
     <description>Catches voidwatch weakness messages and prints them to a textbox in case you miss them in the battle spam.</description>
+    <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>
   </addon>
   <addon>
     <name>STNA</name>
     <description>One-button status removal for dual boxing.</description>
+    <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>
+  </addon>
+  <addon>
+    <name>TargetInfo</name>
+    <author>Arcon</author>
+    <description>Displays information about your current target in memory.</description>
+    <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
+    <support>IRC: irc.ffochat.com, #lua</support>
   </addon>
   <addon>
     <name>vwhl</name>
     <description>Redirects vw nm's vulnerabilities to the "tell" stream so that they can be held using the chat filters' function and highlights the important info. Supports EN, FR, DE clients.</description>
+  </addon>
+  <addon>
+    <name>StratHelper</name>
+    <author>Ihm</author>
+    <description>A simple helper addon for Spellcast for Scholar Stratagems. It will automatically calculate the number of stratagems you have and push them into spellcast variables.</description>
   </addon>
 </addons>
