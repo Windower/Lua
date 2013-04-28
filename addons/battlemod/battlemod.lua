@@ -468,10 +468,11 @@ function event_incoming_text(original, modified, color)
 			f,b = string.find(original,'You sell ')
 			e,b = string.find(original,'%w+ synthesized ')
 			c,b = string.find(original,' bought ')
-			d,b = string.find(original,'You find a ')
+			d,b = string.find(original,'You find ')
 			j,b = string.find(original,'You must wait longer ')
 			k,b = string.find(original,'You throw away a ')
-			if a==nil and c==nil and d==nil and e==nil and f==nil and h==nil and g==nil and i==nil and j==nil and k==nil then
+			l,b = string.find(original,'You obtain ')
+			if a==nil and c==nil and d==nil and e==nil and f==nil and h==nil and g==nil and i==nil and j==nil and k==nil and l==nil then
 				modified = ''
 				if allow then
 					send_command('wait 5;lua c battlemod flip allow')
