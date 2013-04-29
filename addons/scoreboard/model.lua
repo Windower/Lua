@@ -1,8 +1,14 @@
-require 'tablehelper'
-
+local Player = require 'player'
 
 local DamageDB = {
-    dps_db = T{}
+    db = T{}
+}
+
+DamageDB.player_stat_fields = T{
+    'acc', 'racc', 'crit', 'rcrit',
+    'mmin', 'mmax', 'mavg',
+    'rmin', 'rmax', 'ravg',
+    'wsmin', 'wsmax', 'wsavg'
 }
 
 
@@ -14,27 +20,66 @@ function DamageDB:new (o)
     return o
 end
 
+
+-- Returns the corresponding Player instance. Will create it if necessary.
+function DamageDB:_get_player(mob, player_name)
+    if not self.db[mob] then
+        self.db[mob] = T{}
+    end
+    
+    if not self.db[mob][player_name] then
+        self.db[mob][player_name] = Player:new{name = player_name}
+    end
+    
+    return self.db[mob][player_name]
+end
+
+
+function DamageDB:new (o)
+    o = o or {}
+    setmetatable(o, self)
+    self.__index = self
+    
+    return o
+end
+
 function DamageDB:isempty()
-    return self.dps_db:isempty()
-end
-
-function DamageDB:init()
-    self.dps_db = T{}
+    return self.db:isempty()
 end
 
 
--- Adds the given data to the main DPS table
-function DamageDB:accumulate(mob, player, damage)
-    if not self.dps_db[mob] then
-        self.dps_db[mob] = T{}
-    end
-	
-    damage = tonumber(damage)
-    if not self.dps_db[mob][player] then
-        self.dps_db[mob][player] = damage
-    else
-        self.dps_db[mob][player] = damage + self.dps_db[mob][player] 
-    end
+function DamageDB:reset()
+    self.db = T{}
+end
+
+
+function DamageDB:_incr_field(mob, player_name, field)
+    local player = self:_get_player(mob, player_name)
+    player[field] = player[field] + 1
+end
+
+
+function DamageDB:incr_hits(mob, player)     self:_incr_field(mob, player, 'm_hits') end
+function DamageDB:incr_misses(mob, player)   self:_incr_field(mob, player, 'm_misses') end
+function DamageDB:incr_crits(mob, player)    self:_incr_field(mob, player, 'm_crits') end
+function DamageDB:incr_r_hits(mob, player)   self:_incr_field(mob, player, 'r_hits') end
+function DamageDB:incr_r_misses(mob, player) self:_incr_field(mob, player, 'r_misses') end
+function DamageDB:incr_r_crits(mob, player)  self:_incr_field(mob, player, 'r_crits') end
+
+
+function DamageDB:add_damage(mob, player_name, damage)
+    local player = self:_get_player(mob, player_name)
+    player:add_damage(damage)
+end
+
+
+function DamageDB:add_ws_damage(mob, player_name, damage)
+    local player = self:_get_player(mob, player_name)
+    player:add_ws_damage(0, damage)
+end
+
+function DamageDB:iter()
+    -- need to write this
 end
 
 return DamageDB
