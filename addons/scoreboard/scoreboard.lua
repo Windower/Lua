@@ -2,7 +2,7 @@
 
 _addon = _addon or {}
 _addon.name = 'Scoreboard'
-_addon.version = 0.8
+_addon.version = 0.9
 
 require 'tablehelper'
 require 'stringhelper'
@@ -19,8 +19,6 @@ dps_db    = require 'model':new() -- global for now
 -------------------------------------------------------
 
 local settings = nil -- holds a config instance
-settings_file = 'data/settings.xml'
-
 
 -- Handle addon args
 function event_addon_command(...)
@@ -41,6 +39,8 @@ function event_addon_command(...)
             write('sb filter add <mob1> <mob2> ... : Add mob patterns to the filter (substrings ok)')
             write('sb filter clear : Clears mob filter')
             write('sb visible : Toggles scoreboard visibility')
+            write('sb stat <stat> [<player>]: Shows specific damage stats. Respects filters. If player isn\'t specified, ' ..
+                  'stats for everyone are displayed. \'//sb stat\' to see valid stats.')
         elseif params[1]:lower() == "pos" then
             if params[3] then
                 local posx, posy = tonumber(params[2]), tonumber(params[3])
@@ -53,7 +53,7 @@ function event_addon_command(...)
                 end
             end
         elseif params[1]:lower() == "reset" then
-            initialize()
+            reset()
         elseif params[1]:lower() == "report" then
             local arg = params[2]
             local arg2 = params[3]
@@ -98,16 +98,30 @@ function event_addon_command(...)
             else
                 error('Invalid argument to //sb filter')
             end
+        elseif params[1]:lower() == 'stat' then
+            if not params[2] then
+                error('Must pass a stat specifier to //sb stat. Valid arguments: ' ..
+                      dps_db.player_stat_fields:tostring():stripchars('{}"'))
+            else
+                local stat = params[2]:lower()
+                if dps_db.player_stat_fields:contains(stat) then
+                    local player = params[3]
+                    if player and player:match('^[a-zA-Z]+$') then
+                        player = player:lower():ucfirst()
+                    end
+                    display:show_stat(stat, player)
+                end
+            end
         end
     end
 end
 
 
 -- Resets application state
-function initialize()
-    display:init()
+function reset()
+    display:reset()
     dps_clock:reset()
-    dps_db:init()
+    dps_db:reset()
 end
 
 
@@ -159,7 +173,7 @@ function event_load(...)
 
     send_command('alias sb lua c scoreboard')
     display = Display:new(settings, dps_db)
-    initialize()
+    reset()
 end
 
 
@@ -194,7 +208,7 @@ function mob_is_ally(mob_id)
 end
 
 
-function event_action(raw_action)
+function event_action_aux(raw_action)
     local action = Action(raw_action)
     local category = action:get_category_string()
 
@@ -209,21 +223,35 @@ function event_action(raw_action)
                 for subaction in target:get_actions() do
                     -- hit, crit
                     if subaction.message == 1 or subaction.message == 67 then
-                        dps_db:accumulate(target:get_name(), action:get_actor_name(), subaction.param)
-                        if subaction.has_add_effect and T{163, 229}:contains(subaction.add_effect_message) then
-                            dps_db:accumulate(target:get_name(), action:get_actor_name(), subaction.add_effect_param)
+                        dps_db:add_damage(target:get_name(), action:get_actor_name(), subaction.param)
+                        dps_db:incr_hits(target:get_name(), action:get_actor_name())
+                        
+                        if subaction.message == 67 then
+                            -- slightly redundant but owell :(
+                            dps_db:incr_crits(target:get_name(), action:get_actor_name())
                         end
+                        
+                        if subaction.has_add_effect and T{163, 229}:contains(subaction.add_effect_message) then
+                            dps_db:add_damage(target:get_name(), action:get_actor_name(), subaction.add_effect_param)
+                        end
+                    elseif subaction.message == 15 or subaction.message == 63 then
+                        dps_db:incr_misses(target:get_name(), action:get_actor_name())
                     end
                 end
             end
         elseif category == 'weaponskill_finish' then
+            -- TODO: need to map whatever id into the actual ws name
+        
             for target in action:get_targets() do
                 for subaction in target:get_actions() do
-                    dps_db:accumulate(target:get_name(), action:get_actor_name(), subaction.param)
+                    dps_db:add_ws_damage(target:get_name(), action:get_actor_name(), subaction.param)
 
                     -- skillchains
                     if subaction.has_add_effect then
-                        dps_db:accumulate(target:get_name(), action:get_actor_name(), subaction.add_effect_param)
+                        local actor_name = action:get_actor_name()
+                        local sc_name = string.format("Skillchain(%s%s)", actor_name:sub(1, 3),
+                                                      actor_name:len() > 3 and '.' or '')
+                        dps_db:add_damage(target:get_name(), sc_name, subaction.add_effect_param)
                     end
                 end
             end
@@ -231,7 +259,7 @@ function event_action(raw_action)
             for target in action:get_targets() do
                 for subaction in target:get_actions() do
                     if T{2, 252, 265, 650}:contains(subaction.message) then
-                        dps_db:accumulate(target:get_name(), action:get_actor_name(), subaction.param)
+                        dps_db:add_damage(target:get_name(), action:get_actor_name(), subaction.param)
                     end
                 end
             end
@@ -240,12 +268,18 @@ function event_action(raw_action)
                 for subaction in target:get_actions() do
                     -- ranged, crit, squarely, truestrike
                     if T{352, 353, 576, 577}:contains(subaction.message) then
-                        dps_db:accumulate(target:get_name(), action:get_actor_name(), subaction.param)
+                        dps_db:add_damage(target:get_name(), action:get_actor_name(), subaction.param)
 
+                        if subaction.message == 353 then
+                            dps_db:incr_r_crits(target:get_name(), action:get_actor_name(), subaction.param)
+                        end
+                        
                         -- holy bolts etc
                         if subaction.has_add_effect and T{163, 229}:contains(subaction.add_effect_message) then
-                            dps_db:accumulate(target:get_name(), action:get_actor_name(), subaction.add_effect_param)
+                            dps_db:add_damage(target:get_name(), action:get_actor_name(), subaction.add_effect_param)
                         end
+                    elseif subaction.message == 354 then
+                        dps_db:incr_r_misses(target:get_name(), action:get_actor_name())
                     end
                 end
             end
@@ -254,7 +288,7 @@ function event_action(raw_action)
                 for subaction in target:get_actions() do
                     -- sange(77), generic damage ja(110), barrage(157), other generic dmg ja (317), stun ja (522)
                     if T{77, 110, 157, 317, 522}:contains(subaction.message) then
-                        dps_db:accumulate(target:get_name(), action:get_actor_name(), subaction.param)
+                        dps_db:add_damage(target:get_name(), action:get_actor_name(), subaction.param)
                     end
                 end
             end
@@ -262,7 +296,7 @@ function event_action(raw_action)
             for target in action:get_targets() do
                 for subaction in target:get_actions() do
                     if subaction.message == 317 then
-                        dps_db:accumulate(target:get_name(), action:get_actor_name(), subaction.param)
+                        dps_db:add_damage(target:get_name(), action:get_actor_name(), subaction.param)
                     end
                 end
             end
@@ -270,7 +304,7 @@ function event_action(raw_action)
             for target in action:get_targets() do
                 for subaction in target:get_actions() do
                     if subaction.message == 185 or subaction.message == 264 then
-                        dps_db:accumulate(target:get_name(), action:get_actor_name(), subaction.param)
+                        dps_db:add_damage(target:get_name(), action:get_actor_name(), subaction.param)
                     end
                 end
             end        
@@ -282,7 +316,7 @@ function event_action(raw_action)
             if mob_is_ally(target.id) then
                 for subaction in target:get_actions() do
                     if subaction.has_spike_effect then
-                        dps_db:accumulate(action:get_actor_name(), target:get_name(), subaction.spike_effect_param)
+                        dps_db:add_damage(action:get_actor_name(), target:get_name(), subaction.spike_effect_param)
                     end
                 end
             end
@@ -292,6 +326,7 @@ function event_action(raw_action)
     display:update()
     update_dps_clock()
 end
+event_action = event_action_aux
 
 
 --[[
