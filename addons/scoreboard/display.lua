@@ -119,6 +119,20 @@ function Display:build_scoreboard_header()
 end
 
 
+function Display:_filter_contains_mob(mob_name)
+    if self.filter:isempty() then
+        return true
+    end
+    
+    for _, mob_pattern in ipairs(self.filter) do
+        if mob_name:lower():find(mob_pattern:lower()) then
+            return true
+        end
+    end
+    return false
+end
+
+    
 -- Returns following two element pair:
 -- 1) table of sorted 2-tuples containing {player, damage}
 -- 2) integer containing the total damage done
@@ -128,28 +142,20 @@ function Display:get_sorted_player_damage()
     local mob, players
     local player_total_dmg = T{}
 
-    if not self.db then
-        return
+    if self.db:isempty() then
+        return {}, 0
     end
 	
-    local function filter_contains_mob(mob_name)
-        for _, mob_pattern in ipairs(self.filter) do
-            if mob_name:lower():find(mob_pattern:lower()) then
-                return true
-            end
-        end
-        return false
-    end
-	
-    for mob, players in pairs(self.db.dps_db) do
+                     -- TODO: this is waiting on self.db:iter()
+    for mob, players in pairs(self.db.db) do
         -- If the filter isn't active, include all mobs
 
-        if self.filter:isempty() or filter_contains_mob(mob) then
-            for player, damage in pairs(players) do
-                if player_total_dmg[player] then
-                    player_total_dmg[player] = player_total_dmg[player] + damage
+        if self:_filter_contains_mob(mob) then
+            for player_name, player in pairs(players) do
+                if player_total_dmg[player_name] then
+                    player_total_dmg[player_name] = player_total_dmg[player_name] + player.damage
                 else
-                    player_total_dmg[player] = damage
+                    player_total_dmg[player_name] = player.damage
                 end
             end
         end
@@ -191,14 +197,20 @@ function Display:update()
             else
                 dps = string.format("%.2f", math.round(v[2]/dps_clock.clock, 2))
             end
-            local percent = string.format('(%.1f%%)', 100 * v[2]/total_damage)
+            
+            local percent
+            if total_damage > 0 then
+                percent = string.format('(%.1f%%)', 100 * v[2]/total_damage)
+            else
+                percent = '(0%)'
+            end
             display_table:append(string.format("%-16s%7d%8s %7s", v[1], v[2], percent, dps))
         end
         player_lines = player_lines + 1
     end
 	
     if self.db:isempty() then
-        self:init()
+        self:reset()
     else
         tb_set_text(self.tb_name, self:build_scoreboard_header() .. table.concat(display_table, '\n'))
     end
@@ -243,7 +255,30 @@ function Display:report_summary (...)
 end
 
 
-function Display:init()
+function Display:show_stat(stat, player_filter)
+    -- this feels like it should be in the db module
+
+    local Player = require 'player'
+    local mega_players = T{}
+    for mob, players in pairs(self.db.db) do
+        if self:_filter_contains_mob(mob) then
+            for name, player in pairs(players) do
+                if (player_filter and player_filter == name) or not player_filter then
+                    if not mega_players[name] then
+                        mega_players[name] = Player:new{name = name}
+                    end
+                    mega_players[name]:merge(player)
+                end
+            end
+        end
+    end
+    
+    local stat_total = T{}
+    mega_players:vprint()
+end
+
+
+function Display:reset()
     -- the number of spaces here was counted to keep the table width
     -- consistent even when there's no data being displayed
     tb_set_text(self.tb_name,  self:build_scoreboard_header() ..
