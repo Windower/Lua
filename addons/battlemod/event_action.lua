@@ -89,7 +89,6 @@ function event_action(act)
 					abil = 'Parries'
 					actor,actor_table,target,target_table,flipped = flip(actor,actor_table,target,target_table,flipped)
 				elseif  act['targets'][i]['actions'][n]['reaction'] == 12 then abil = 'Block'
-					actor,actor_table,target,target_table,flipped = flip(actor,actor_table,target,target_table,flipped)
 					effect_val = act['targets'][i]['actions'][n]['param']
 				elseif msg_ID == 1 then abil = 'Hit'
 					effect_val = act['targets'][i]['actions'][n]['param']
@@ -98,10 +97,11 @@ function event_action(act)
 					actor,actor_table,target,target_table,flipped = flip(actor,actor_table,target,target_table,flipped)
 				elseif msg_ID == 106 then abil = 'Intimidates'
 					actor,actor_table,target,target_table,flipped = flip(actor,actor_table,target,target_table,flipped)
-				elseif msg_ID == 31 then
+				elseif msg_ID == 31 then abil = 'Disappears'
 					actor,actor_table,target,target_table,flipped = flip(actor,actor_table,target,target_table,flipped)
 					effect_val = act['targets'][i]['actions'][n]['param']
-					abil = 'Disappears'
+				elseif msg_ID == 30 then abil = 'Anticipates'
+					actor,actor_table,target,target_table,flipped = flip(actor,actor_table,target,target_table,flipped)
 				elseif msg_ID == 67 then abil = 'Crit'
 					effect_val = act['targets'][i]['actions'][n]['param']
 				elseif msg_ID == 373 then abil = 'Absorbs'
@@ -119,6 +119,7 @@ function event_action(act)
 				elseif msg_ID == 576 then abil = 'RA Hits Squarely'
 				elseif msg_ID == 577 then abil = 'RA Strikes True'
 				elseif msg_ID == 157 then abil = 'Barrage'
+				elseif msg_ID == 77 then abil = 'Sange'
 				end
 			elseif T{7,8,9}:contains(act['category']) then -- 12 and 10 don't really count because their params are meaningless. 1 and 2 need manual ability sorting
 				abil_ID = act['targets'][i]['actions'][n]['param']
@@ -136,12 +137,12 @@ function event_action(act)
 					spell = 'Magic Burst '..spell
 				end
 				spell = color_arr['spellcol']..spell..rcol
-			elseif table.contains(fields,'item') then
-				item = color_arr['itemcol']..items[abil_ID]['enl']..rcol
 			elseif table.contains(fields,'ability') then
 				ability = jobabilities[abil_ID]['english']
 				if msg_ID == 379 then ability = 'Magic Burst '..ability end
 				ability = color_arr['abilcol']..ability..rcol
+			elseif table.contains(fields,'item') then
+				item = color_arr['itemcol']..items[abil_ID]['enl']..rcol
 			elseif table.contains(fields,'weapon_skill') then
 				if abil_ID > 255 and abil_ID ~= 1531 then -- WZ_RECOVER_ALL is used by chests in Limbus
 					weapon_skill = mabils[abil_ID-256]['english']
@@ -151,8 +152,10 @@ function event_action(act)
 				elseif abil_ID < 256 then
 					weapon_skill = jobabilities[abil_ID+768]['english']
 				end
-				if weapon_skill == '.' then
-					weapon_skill = 'Special Attack'
+				if msg_ID == 188 then
+					weapon_skill = weapon_skill..' (Miss)'
+				elseif msg_ID == 189 then
+					weapon_skill = weapon_skill..' (No Effect)'
 				end
 				if actor['is_npc'] then
 					weapon_skill = color_arr['mobwscol']..(weapon_skill or '')..rcol
@@ -165,6 +168,10 @@ function event_action(act)
 				ability = 'Elemental Seal'
 			elseif msg_ID == 305 then
 				ability = 'Trick Attack'
+			elseif msg_ID == 311 then
+				ability = 'Cover'
+			elseif msg_ID == 312 then
+				ability = 'Cover (No Effect)'
 			end
 			
 			if abil_ID == 53 and act['category'] == 6 then -- Gauge handling
@@ -194,6 +201,8 @@ function event_action(act)
 				if dialog[msg_ID]['units'] and condensebattle then
 					number = number..' '..dialog[msg_ID]['units']
 				end
+			elseif not item and table.contains(fields,'item') then
+				item = color_arr['itemcol']..items[effect_val]['enl']..rcol
 			elseif table.contains(fields,'item2') then -- For when you use an item to obtain items i.e. Janus Guard
 				item2 = color_arr['itemcol']..items[effect_val]['enl']..rcol
 			elseif table.contains(fields,'gil') then
@@ -226,7 +235,7 @@ function event_action(act)
 			
 			
 			if msg_ID ~= 0 then
-				if dialog[msg_ID]['color'] == 'M' or dialog[msg_ID]['color'] == 'D' or dialog[msg_ID]['color'] == 'H' or act['targets'][i]['actions'][n]['reaction'] == 11 or act['targets'][i]['actions'][n]['reaction'] == 12 or msg_ID == 31 or msg_ID == 32 or act['category']==6 or act['category']==14 then
+				if dialog[msg_ID]['color'] == 'M' or dialog[msg_ID]['color'] == 'D' or dialog[msg_ID]['color'] == 'H' or act['targets'][i]['actions'][n]['reaction'] == 11 or act['targets'][i]['actions'][n]['reaction'] == 12 or msg_ID == 31 or msg_ID == 32 or T{6,7,8,9,14,15}:contains(act['category']) then
 					-- Misses, Damage, Healing, Parrying, Dodge, Guard/Block, and Utsusemi
 					-- Handles for Category 1,2,3,4,6, and 14
 					a,b = string.find(dialog[msg_ID]['english'],'$\123number\125')
@@ -234,7 +243,12 @@ function event_action(act)
 						number = nil
 					end
 					if condensebattle then
-						if abil and number and target and actor then
+						if not abil then
+							abil = 'AoE'
+						end
+						if abil == 'Steal' or abil == 'Despoil' or abil == 'Scavenge' or abil == 'Mug' then
+							prepstr = dialog[msg_ID]['english']
+						elseif abil and number and target and actor then
 							prepstr = line_full
 						elseif abil and status and target and actor then
 							prepstr = line_aoebuff
@@ -243,7 +257,7 @@ function event_action(act)
 						elseif not actor then
 							prepstr = line_noactor
 						end
-					else ---- Can remove once I don't see it anymore ----
+					else
 						prepstr = dialog[msg_ID]['english']
 					end
 				elseif dialog[msg_ID] then -- Default case?

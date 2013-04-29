@@ -468,8 +468,11 @@ function event_incoming_text(original, modified, color)
 			f,b = string.find(original,'You sell ')
 			e,b = string.find(original,'%w+ synthesized ')
 			c,b = string.find(original,' bought ')
-			d,b = string.find(original,'You find a ')
-			if a==nil and c==nil and d==nil and e==nil and f==nil and h==nil and g==nil and i==nil then
+			d,b = string.find(original,'You find ')
+			j,b = string.find(original,'You must wait longer ')
+			k,b = string.find(original,'You throw away a ')
+			l,b = string.find(original,'You obtain ')
+			if a==nil and c==nil and d==nil and e==nil and f==nil and h==nil and g==nil and i==nil and j==nil and k==nil and l==nil then
 				modified = ''
 				if allow then
 					send_command('wait 5;lua c battlemod flip allow')
@@ -524,7 +527,7 @@ function event_action_message(actor_id,index,actor_target_index,target_target_in
 			local outstr = dialog[message_id]['english']:gsub('$\123actor\125',actor or ''):gsub('$\123status\125',status or ''):gsub('$\123target\125',target or ''):gsub('$\123spell\125',spell or ''):gsub('$\123skill\125',skill or ''):gsub('$\123number\125',number or ''):gsub('$\123number2\125',number2 or ''):gsub('$\123lb\125','\7')
 			add_to_chat(dialog[message_id]['color'],string.char(0x1F,0xFE,0x1E,0x01)..outstr..string.char(127,49))
 		end
-	elseif T{62,251,308, 313}:contains(message_id) == 62 or message_id == 251 or message_id==313 then
+	elseif T{62,94,251,308,313}:contains(message_id) then
 	-- 62 is "fails to activate" but it is color 121 so I cannot block it because I would also accidentally block a lot of system messages. Thus I have to ignore it.
 	-- Message 251 is "about to wear off" but it is color 123 so I cannot block it because I would also block "you failed to swap that gear, idiot!" messages. Thus I have to ignore it.
 	-- Message 308 is "your inventory is full" but it is color 123.
