@@ -242,6 +242,7 @@ function checkzone()
 	currentzone = get_ffxi_info()['zone']:lower()
 		if currentzone == 'silver sea remnants' or currentzone == 'zhayolm remnants' or currentzone == 'bhaflau remnants' or currentzone == 'arrapago remnants' then
 			send_command('timers c Remaining 6000 up')
+		else send_command('timers d Remaining')
 		end
 end
 
@@ -274,6 +275,6 @@ end
 
 function event_unload()
 	tb_delete('salvage_box')
-
+	send_command('timers d Remaining')
 	send_command('unalias ch2')
 end 
