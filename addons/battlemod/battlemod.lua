@@ -448,7 +448,8 @@ function event_addon_command(...)
 				prevline = ''
 			end
 		elseif splitarr[1] == 'wearsoff' then
-			local stat = splitarr[2]
+			local trash = table.remove(splitarr,1)
+			local stat = table.concat(splitarr,' ')
 			local len = #wearing[stat]
 			local targets = table.remove(wearing[stat],1)
 			for i,v in pairs(wearing[stat]) do
