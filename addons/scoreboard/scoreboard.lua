@@ -14,11 +14,25 @@ local config = require 'config'
 local Display = require 'display'
 local display = nil
 dps_clock = require 'dpsclock':new() -- global for now
-dps_db    = require 'model':new() -- global for now
+dps_db    = require 'damagedb':new() -- global for now
 
 -------------------------------------------------------
 
 local settings = nil -- holds a config instance
+
+-- Accepts msg as a string or a table
+function sb_output(msg)
+    local prefix = 'SB: '
+    local color  = settings['sbcolor']
+    
+    if type(msg) == 'table' then
+        for _, line in ipairs(msg) do
+            add_to_chat(color, prefix .. line)
+        end
+    else
+        add_to_chat(color, prefix .. msg)
+    end
+end
 
 -- Handle addon args
 function event_addon_command(...)
@@ -30,17 +44,18 @@ function event_addon_command(...)
 
     if params[1] then
         if params[1]:lower() == "help" then
-            write('Scoreboard v' .. _addon.version .. '. Author: Suji')
-            write('sb help : Shows help message')
-            write('sb pos <x> <y> : Positions the scoreboard')
-            write('sb reset : Reset damage')
-            write('sb report [<target>] : Reports damage. Can take standard chatmode target options.')
-            write('sb filter show  : Shows current filter settings')
-            write('sb filter add <mob1> <mob2> ... : Add mob patterns to the filter (substrings ok)')
-            write('sb filter clear : Clears mob filter')
-            write('sb visible : Toggles scoreboard visibility')
-            write('sb stat <stat> [<player>]: Shows specific damage stats. Respects filters. If player isn\'t specified, ' ..
-                  'stats for everyone are displayed. \'//sb stat\' to see valid stats.')
+            sb_output('Scoreboard v' .. _addon.version .. '. Author: Suji')
+            sb_output('sb help : Shows help message')
+            sb_output('sb pos <x> <y> : Positions the scoreboard')
+            sb_output('sb reset : Reset damage')
+            sb_output('sb report [<target>] : Reports damage. Can take standard chatmode target options.')
+            sb_output('sb filter show  : Shows current filter settings')
+            sb_output('sb filter add <mob1> <mob2> ... : Add mob patterns to the filter (substrings ok)')
+            sb_output('sb filter clear : Clears mob filter')
+            sb_output('sb visible : Toggles scoreboard visibility')
+            sb_output('sb stat <stat> [<player>]: Shows specific damage stats. Respects filters. If player isn\'t specified, ' ..
+                  'stats for everyone are displayed. Valid stats are:')
+            sb_output(dps_db.player_stat_fields:tostring():stripchars('{}"'))
         elseif params[1]:lower() == "pos" then
             if params[3] then
                 local posx, posy = tonumber(params[2]), tonumber(params[3])
@@ -73,26 +88,29 @@ function event_addon_command(...)
 
             display:report_summary(arg, arg2)
         elseif params[1]:lower() == "filters" then
-            notice("'//sb filters' is deprecated. Please use '//sb filter show' in the future. See //sb help")
+            sb_output("'//sb filters' is deprecated. Please use '//sb filter show' in the future. See //sb help")
             display:report_filters()
         elseif params[1]:lower() == "add" then
-            notice("'//sb add ...' is deprecated. Please use '//sb filter add ...' in the future. See //sb help")
+            sb_output("'//sb add ...' is deprecated. Please use '//sb filter add ...' in the future. See //sb help")
             for i=2, #params do
-                display:add_filter(params[i])
+                dps_db:add_filter(params[i])
             end
             display:update()
         elseif params[1]:lower() == "clear" then
-            notice("'//sb clear' is deprecated. Please use '//sb filter clear' in the future. See //sb help")
-            display:clear_filters()
+            sb_output("'//sb clear' is deprecated. Please use '//sb filter clear' in the future. See //sb help")
+            dps_db:clear_filters()
+            display:update()
         elseif params[1]:lower() == "visible" then
             display:toggle_visible()
         elseif params[1]:lower() == 'filter' then
             if params[2]:lower() == 'add' then
                 for i=3, #params do
-                    display:add_filter(params[i])
+                    dps_db:add_filter(params[i])
                 end
+                display:update()
             elseif params[2]:lower() == 'clear' then
-                display:clear_filters()
+                dps_db:clear_filters()
+                display:update()
             elseif params[2]:lower() == 'show' then
                 display:report_filters()
             else
@@ -168,7 +186,8 @@ function event_load(...)
         bgtransparency = 200,
         numplayers = 8,
         font = 'courier',
-        fontsize = 10
+        fontsize = 10,
+        sbcolor = 204
     })
 
     send_command('alias sb lua c scoreboard')
@@ -223,14 +242,13 @@ function event_action_aux(raw_action)
                 for subaction in target:get_actions() do
                     -- hit, crit
                     if subaction.message == 1 or subaction.message == 67 then
-                        dps_db:add_damage(target:get_name(), action:get_actor_name(), subaction.param)
-                        dps_db:incr_hits(target:get_name(), action:get_actor_name())
-                        
                         if subaction.message == 67 then
-                            -- slightly redundant but owell :(
-                            dps_db:incr_crits(target:get_name(), action:get_actor_name())
+                            dps_db:add_m_crit(target:get_name(), action:get_actor_name(), subaction.param)
+                        else
+                            dps_db:add_m_hit(target:get_name(), action:get_actor_name(), subaction.param)
                         end
                         
+                        -- enspells etc
                         if subaction.has_add_effect and T{163, 229}:contains(subaction.add_effect_message) then
                             dps_db:add_damage(target:get_name(), action:get_actor_name(), subaction.add_effect_param)
                         end
@@ -244,7 +262,7 @@ function event_action_aux(raw_action)
         
             for target in action:get_targets() do
                 for subaction in target:get_actions() do
-                    dps_db:add_ws_damage(target:get_name(), action:get_actor_name(), subaction.param)
+                    dps_db:add_ws_damage(target:get_name(), action:get_actor_name(), subaction.param, action.raw.param)
 
                     -- skillchains
                     if subaction.has_add_effect then
@@ -268,11 +286,11 @@ function event_action_aux(raw_action)
                 for subaction in target:get_actions() do
                     -- ranged, crit, squarely, truestrike
                     if T{352, 353, 576, 577}:contains(subaction.message) then
-                        dps_db:add_damage(target:get_name(), action:get_actor_name(), subaction.param)
-
                         if subaction.message == 353 then
-                            dps_db:incr_r_crits(target:get_name(), action:get_actor_name(), subaction.param)
-                        end
+                            dps_db:add_r_crit(target:get_name(), action:get_actor_name(), subaction.param)
+                        else
+                            dps_db:add_r_hit(target:get_name(), action:get_actor_name(), subaction.param)
+                        end                    
                         
                         -- holy bolts etc
                         if subaction.has_add_effect and T{163, 229}:contains(subaction.add_effect_message) then
