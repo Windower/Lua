@@ -40,7 +40,7 @@ function Player:new (o)
     }
     attrs.name = o.name
     o = attrs
-    if o.name:match('^Skillchain(') then
+    if o.name:match('^Skillchain%(') then
         o.is_sc = true
     else
         o.is_sc = false
