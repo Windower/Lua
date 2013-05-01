@@ -3,7 +3,6 @@
 local Display = {
     visible = true,
     settings = nil,
-    filter = T{},
     tb_name = 'scoreboard'
 }
 
@@ -61,23 +60,14 @@ function Display:toggle_visible()
 end
 
 
-function Display:clear_filters()
-    self.filter = T{}
-    self:update()
-end
-
-
-function Display:add_filter(mob_pattern)
-    if mob_pattern then self.filter:append(mob_pattern) end
-end
-
-
 function Display:report_filters()
     local mob_str
-    if self.filter:isempty() then
+    local filters = self.db:get_filters()
+    
+    if filters:isempty() then
         mob_str = "Scoreboard filters: None (Displaying damage for all mobs)"
     else
-        mob_str = "Scoreboard filters: " .. self.filter:concat(', ')
+        mob_str = "Scoreboard filters: " .. filters:concat(', ')
     end
     add_to_chat(55, mob_str)
 
@@ -89,11 +79,12 @@ end
 -- contributing to the DPS value.
 function Display:build_scoreboard_header()
     local mob_filter_str
-	
-    if self.filter:isempty() then
+    local filters = self.db:get_filters()
+
+    if filters:isempty() then
         mob_filter_str = "All"
     else
-        mob_filter_str = table.concat(self.filter, ", ")
+        mob_filter_str = table.concat(filters, ", ")
     end
 	
     local labels
@@ -118,20 +109,6 @@ function Display:build_scoreboard_header()
     return string.format("%s%s\nMobs: %-9s\n%s", dps_chunk, string.rep(" ", 29 - dps_chunk:len()) .. "//sb help", mob_filter_str, labels)
 end
 
-
-function Display:_filter_contains_mob(mob_name)
-    if self.filter:isempty() then
-        return true
-    end
-    
-    for _, mob_pattern in ipairs(self.filter) do
-        if mob_name:lower():find(mob_pattern:lower()) then
-            return true
-        end
-    end
-    return false
-end
-
     
 -- Returns following two element pair:
 -- 1) table of sorted 2-tuples containing {player, damage}
@@ -146,17 +123,13 @@ function Display:get_sorted_player_damage()
         return {}, 0
     end
 	
-                     -- TODO: this is waiting on self.db:iter()
-    for mob, players in pairs(self.db.db) do
+    for mob, players in self.db:iter() do
         -- If the filter isn't active, include all mobs
-
-        if self:_filter_contains_mob(mob) then
-            for player_name, player in pairs(players) do
-                if player_total_dmg[player_name] then
-                    player_total_dmg[player_name] = player_total_dmg[player_name] + player.damage
-                else
-                    player_total_dmg[player_name] = player.damage
-                end
+        for player_name, player in pairs(players) do
+            if player_total_dmg[player_name] then
+                player_total_dmg[player_name] = player_total_dmg[player_name] + player.damage
+            else
+                player_total_dmg[player_name] = player.damage
             end
         end
     end
@@ -255,27 +228,85 @@ function Display:report_summary (...)
 end
 
 
-function Display:show_stat(stat, player_filter)
-    -- this feels like it should be in the db module
+-- This is a closure around a hash-based dispatcher. Some conveniences are
+-- defined for the actual stat display functions.
+Display.show_stat = (function()
+    local stat_display = {}
+    
+    local function format_title(msg)
+        local line_length = 40
+        local msg_length  = msg:len()
+        local border_len = math.floor(line_length / 2 - msg_length / 2)
+        
+        return string.rep(' ', border_len) .. msg .. string.rep(' ', border_len)
+    end
+    
+    stat_display['acc'] = function (stats, filters)
+        local lines = T{}
+        for name, acc_pair in pairs(stats) do
+            lines:append(string.format("%-20s %.2f%% (%d sample%s)", name, 100 * acc_pair[1], acc_pair[2],
+                                                                  acc_pair[2] == 1 and "" or "s"))
+        end
+        
+        if #lines > 0 then
+            sb_output(format_title('-= Accuracy (' .. filters .. ') =-'))
+            sb_output(lines)
+        end
+    end
 
-    local Player = require 'player'
-    local mega_players = T{}
-    for mob, players in pairs(self.db.db) do
-        if self:_filter_contains_mob(mob) then
-            for name, player in pairs(players) do
-                if (player_filter and player_filter == name) or not player_filter then
-                    if not mega_players[name] then
-                        mega_players[name] = Player:new{name = name}
-                    end
-                    mega_players[name]:merge(player)
-                end
-            end
+    stat_display['racc'] = function (stats, filters)
+        local lines = T{}
+        for name, racc_pair in pairs(stats) do
+            lines:append(string.format("%-20s %.2f%% (%d sample%s)", name, 100 * racc_pair[1], racc_pair[2],
+                                                                     racc_pair[2] == 1 and "" or "s"))
+        end
+        
+        if #lines > 0 then
+            sb_output(format_title('-= Ranged Accuracy (' .. filters .. ') =-'))
+            sb_output(lines)
+        end
+    end
+
+    stat_display['crit'] = function (stats, filters)
+        local lines = T{}
+        for name, crit_pair in pairs(stats) do
+            lines:append(string.format("%-20s %.2f%% (%d sample%s)", name, 100 * crit_pair[1], crit_pair[2],
+                                                                     crit_pair[2] == 1 and "" or "s"))
+        end
+        
+        if #lines > 0 then
+            sb_output(format_title('Melee Crit. Rate (' .. filters .. ')'))
+            sb_output(lines)
+        end
+    end
+ 
+    stat_display['rcrit'] = function (stats, filters)
+        local lines = T{}
+        for name, crit_pair in pairs(stats) do
+            lines:append(string.format("%-20s %.2f%% (%d sample%s)", name, 100 * crit_pair[1], crit_pair[2],
+                                                                     crit_pair[2] == 1 and "" or "s"))
+        end
+        
+        if #lines > 0 then
+            sb_output(format_title('Ranged Crit. Rate (' .. filters .. ')'))
+            sb_output(lines)
         end
     end
     
-    local stat_total = T{}
-    mega_players:vprint()
-end
+    return function (self, stat, player_filter)
+        local stats = self.db:query_stat(stat, player_filter)
+        local filters = self.db:get_filters()
+        local filter_str
+        
+        if filters:isempty() then
+            filter_str = 'All mobs'
+        else
+            filter_str = filters:concat(', ')
+        end
+        
+        stat_display[stat](stats, filter_str)
+    end
+end)()
 
 
 function Display:reset()
