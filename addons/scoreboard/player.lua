@@ -4,13 +4,14 @@ Object to encapsulate Player battle data
 For each mob fought, a separate player instance will be stored. Therefore
 there will be multiple Player instances for each actual player in the game.
 This allows for easier mob filtering. 
---]]
+]]
 
 local Player = {}
 
 function Player:new (o)
     o = o or {}
     
+    assert(o.name, "Must pass a name to player constructor")
     -- attrs should be defined in Player above but due to interpreter bug it's here for now
     local attrs = {
         clock = nil,    -- specific DPS clock for this player
@@ -37,11 +38,12 @@ function Player:new (o)
         jobabils = 0,   -- total damage from JAs
         spells = 0      -- total damage from spells
     }
-    if o.name then
-        attrs.name = o.name
-        o = attrs
+    attrs.name = o.name
+    o = attrs
+    if o.name:match('^Skillchain(') then
+        o.is_sc = true
     else
-        o = attrs
+        o.is_sc = false
     end
     
     setmetatable(o, self)
@@ -66,118 +68,70 @@ function Player:add_ws_damage(ws_id, damage)
 end
 
 
+function Player:add_m_hit(damage)
+    -- increment hits
+    self.m_hits = self.m_hits + 1
+
+    -- update min/max/avg melee values
+    self.m_min = math.min(self.m_min, damage)
+    self.m_max = math.max(self.m_max, damage)
+    self.m_avg = self.m_avg * (self.m_hits - 1)/self.m_hits + damage/self.m_hits
+        
+    -- accumulate damage
+    self.damage = self.damage + damage 
+end
+
+
+function Player:add_m_crit(damage)
+    -- increment crits
+    self.m_crits = self.m_crits + 1
+
+    -- update min/max/avg melee values
+    self.m_crit_min = math.min(self.m_crit_min, damage)
+    self.m_crit_max = math.max(self.m_crit_max, damage)
+    self.m_crit_avg = self.m_crit_avg * (self.m_crits - 1)/self.m_crits + damage/self.m_crits
+        
+    -- accumulate damage
+    self.damage = self.damage + damage 
+end
+
+function Player:incr_m_misses() self.m_misses = self.m_misses + 1 end
+
+
+function Player:add_r_hit(damage)
+    -- increment hits
+    self.r_hits = self.r_hits + 1
+
+    -- update min/max/avg melee values
+    self.r_min = math.min(self.r_min, damage)
+    self.r_max = math.max(self.r_max, damage)
+    self.r_avg = self.r_avg * (self.r_hits - 1)/self.r_hits + damage/self.r_hits
+        
+    -- accumulate damage
+    self.damage = self.damage + damage 
+end
+
+
+function Player:add_r_crit(damage)
+    -- increment crits
+    self.r_crits = self.r_crits + 1
+
+    -- update min/max/avg melee values
+    self.r_crit_min = math.min(self.r_crit_min, damage)
+    self.r_crit_max = math.max(self.r_crit_max, damage)
+    self.r_crit_avg = self.r_crit_avg * (self.r_crits - 1)/self.r_crits + damage/self.r_crits
+        
+    -- accumulate damage
+    self.damage = self.damage + damage 
+end
+
+
+function Player:incr_r_misses() self.r_misses = self.r_misses + 1 end
+
 -- Returns the name of this player
-function Player:get_name()
-    return self.name
-end
+function Player:get_name() return self.name end
 
 
--- Returns player accuracy as a percentage
-function Player:acc()
-    notice('got called in :acc()')
-    if self.m_hits > 0 then
-        return self.m_hits / (self.m_hits + self.m_misses)
-    else
-        return 0
-    end
-end
-
-
--- Merge another player instance into ourself
-function Player:merge(other)
-    self.damage = self.damage + other.damage
-
-    for ws_id, values in pairs(other.ws) do
-        if self.ws[ws_id] then
-            for _, value in ipairs(values) do
-                self.ws[ws_id]:append(value)
-            end
-        else
-            self.ws[ws_id] = table.copy(values)
-        end
-    end
-    
-    self.m_hits   = self.m_hits + other.m_hits
-    self.m_misses = self.m_misses + other.m_misses
-    self.m_min    = math.min(self.m_min, other.m_min)
-    self.m_max    = math.max(self.m_max, other.m_max)
-    
-    local total_m_hits = self.m_hits + other.m_hits
-    if total_m_hits > 0 then
-        self.m_avg    = self.m_avg  * self.m_hits/total_m_hits +
-                        other.m_avg * other.m_hits/total_m_hits
-    else
-        self.m_avg = 0
-    end
-    
-    self.m_crits   = self.m_crits + other.m_crits
-    self.m_crit_min = math.min(self.m_crit_min, other.m_crit_min)
-    self.m_crit_max = math.max(self.m_crit_max, other.m_crit_max)
-
-    local total_m_crits  = self.m_crits + other.m_crits
-    if total_m_crits > 0 then
-        self.m_crit_avg = self.m_crit_avg  * self.m_crits / total_m_crits +
-                          other.m_crit_avg * other.m_crits / total_m_crits
-    else
-        self.m_crit_avg = 0
-    end
-    
-    self.r_hits   = self.r_hits + other.r_hits
-    self.r_misses = self.r_misses + other.r_misses
-    self.r_min    = math.min(self.r_min, other.r_min)
-    self.r_max    = math.max(self.r_max, other.r_max)
-
-    local total_r_hits = self.r_hits + other.r_hits
-    if total_r_hits > 0 then
-        self.r_avg    = self.r_avg  * self.r_hits/total_r_hits +
-                        other.r_avg * other.r_hits/total_r_hits
-    else
-        self.r_avg = 0
-    end
-    
-    self.r_crits    = self.r_crits + other.r_crits
-    self.r_crit_min = math.min(self.r_crit_min, other.r_crit_min)
-    self.r_crit_max = math.max(self.r_crit_max, other.r_crit_max)
-
-    local total_r_crits  = self.r_crits + other.r_crits
-    if total_r_crits > 0 then
-        self.r_crit_avg = self.r_crit_avg  * self.r_crits / total_r_crits +
-                          other.r_crit_avg * other.r_crits / total_r_crits
-    else
-        self.r_crit_avg = 0
-    end
-    
-    self.jobabils = self.jobabils + other.jobabils
-    self.spells   = self.spells + other.spells
-end
-
-
--- Returns ranged accuracy as a percentage
-function Player:ranged_acc()
-    if self.r_hits > 0 then
-        return self.r_hits / (self.r_hits + self.r_misses)
-    else
-        return 0
-    end
-end
-
-
-function Player:crit()
-    if self.m_hits > 0 then
-        return self.m_crits / self.m_hits
-    else
-        return 0
-    end
-end
-
-
-function Player:ranged_crit()
-    if self.r_hits > 0 then
-        return self.r_crits / self.r_hits
-    else
-        return 0
-    end
-end
 
 return Player
 
