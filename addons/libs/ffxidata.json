@@ -1,7 +1,7 @@
 chat: {
     colorcontrols: {
-        0:           \x1E,
         1:           \x1F,
+        2:           \x1E,
         reset:       \x1E\x01,
     },
     colors: {
