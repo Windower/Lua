@@ -44,7 +44,7 @@
 	<dtd id="42" english="${actor} casts ${spell} on ${target}." color="56"/>
 	<dtd id="43" english="${actor} readies ${weapon_skill}." color="110"/>
 	<dtd id="44" english="${target}'s spikes deal ${number} points of damage to ${actor}." color="D"/>
-	<dtd id="45" english="${actor} learns &quot;${weapon_skill}&quot;!" color="1"/>
+	<dtd id="45" english="${actor} learns &quot;${weapon_skill}&quot;!" color="81"/>
 	<dtd id="46" english="Debug Message: Current POP number: (${number})" color="1"/>
 	<dtd id="47" english="${actor} cannot cast ${spell}." color="122"/>
 	<dtd id="48" english="${spell} cannot be cast on ${target}." color="122"/>
@@ -418,7 +418,7 @@
 	<dtd id="416" english="${actor} uses ${weapon_skill}.${lb}${target} receives the effect of Magic Attack Boost and Magic Defense Boost." color="56"/>
 	<dtd id="417" english="${actor} uses ${ability}.${lb}${number} of ${target}'s attributes is drained." color="101"/>
 	<dtd id="418" english="${actor} uses ${weapon_skill} on ${target}.${lb}${target}'s target switches to ${actor}!" color="56"/>
-	<dtd id="419" english="${target} learns ${spell}!" color="1"/>
+	<dtd id="419" english="${target} learns ${spell}!" color="81"/>
 	<dtd id="420" english="${actor} uses ${ability}. The total comes to ${number}!${lb}${target} receives the effect of ${ability}." color="101"/>
 	<dtd id="421" english="${target} receives the effect of ${ability}." color="101"/>
 	<dtd id="422" english="${actor} uses ${ability}.${lb}The total comes to ${number}!${lb}No effect on ${target}." color="R"/>
@@ -441,7 +441,7 @@
 	<dtd id="439" english="${actor} uses ${ability}!${lb}All of ${target}'s abilities are recharged.${lb}${target} regains MP." color="H"/>
 	<dtd id="440" english="All of ${target}'s abilities are recharged.${lb}${target} regains MP." color="H"/>
 	<dtd id="441" english="${actor} uses ${ability}.${lb}${target} receives the effect of ${ability}." color="101"/>
-	<dtd id="442" english="${actor} learns a new ability!" color="1"/>
+	<dtd id="442" english="${actor} learns a new ability!" color="81"/>
 	<dtd id="443" english="You cannot learn ${ability}.${lb}You do not meet the job or level requirements." color="1"/>
 	<dtd id="444" english="You already know ${ability}." color="1"/>
 	<dtd id="445" english="You cannot use items at this time." color="1"/>
