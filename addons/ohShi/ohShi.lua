@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon = {}
 _addon.name = 'OhShi'
-_addon.version = '2.15'
+_addon.version = '2.16'
 
 --Requiring libraries used in this addon
 --These should be saved in addons/libs
@@ -109,16 +109,16 @@ function event_addon_command(...)
             notice('Version '.._addon.version..' loaded! You have access to the following commands with the //ohshi alias:')
             notice(' 1. bgcolor <alpha> <red> <green> <blue> --Sets the color of the box.')
             notice(' 2. text <red> <green> <blue> --Sets text color.')
-            notice(' 2. font <size> <name> --Sets text font and size.')
-            notice(' 3. pos <posx> <posy> --Sets position of box.')
-            notice(' 4. duration <seconds> --Sets the timeout on the notices.')
-            notice(' 5. track <vw/legion/other/abyssea/meebles/dangerous> <mobname> --Adds mob to the tracking list.')
+            notice(' 3. font <size> <name> --Sets text font and size.')
+            notice(' 4. pos <posx> <posy> --Sets position of box.')
+            notice(' 5. duration <seconds> --Sets the timeout on the notices.')
+            notice(' 6. track <vw/legion/other/abyssea/meebles/dangerous> <mobname> --Adds mob to the tracking list.')
             notice(' -- Using dangerous will cause every tp move/spell to flash the warning.')
-            notice(' 6. untrack <vw/legion/other/abyssea/meebles/dangerous> <mobname> --Removes mob from the tracking list.')
-            notice(' 7. danger <spell/ws> <dangerword> --Adds danger word to list.')
-            notice(' 8. staggeronly --Toggles stagger only mode.')
-            notice(' 9. unload <all/one> Save settings all(global - default) or one(character) and close ohShi.')
-            notice('10. help --Shows this menu.')
+            notice(' 7. untrack <vw/legion/other/abyssea/meebles/dangerous> <mobname> --Removes mob from the tracking list.')
+            notice(' 8. danger <spell/ws> <dangerword> --Adds danger word to list.')
+            notice(' 9. staggeronly --Toggles stagger only mode.')
+            notice('10. unload <all/one> Save settings all(global - default) or one(character) and close ohShi.')
+            notice('11. help --Shows this menu.')
         elseif comm == 'create' then
             ohShi_SetUp()
         elseif comm == 'unload' then
