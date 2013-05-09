@@ -80,31 +80,32 @@ function event_load()
 	roll_buff={
 				['Chaos']={6,8,9,25,11,13,16,3,17,19,31,"-4", '% Attack!'},
 				['Fighter\'s']={ 2,2,3,4,12,5,6,7,1,9,18,'-4','% Double-Attack!'},
-				['Wizard\'s']={2,3,4,4,10,5,6,7,1,7,12, "-4", 'MAB'},
-				['Evoker\'s']={1,1,1,1,3,2,2,2,1,3,4,'-1', 'Refresh!'},
+				['Wizard\'s']={2,3,4,4,10,5,6,7,1,7,12, "-4", ' MAB'},
+				['Evoker\'s']={1,1,1,1,3,2,2,2,1,3,4,'-1', ' Refresh!'},
 				['Rogue\'s']={2,2,3,4,12,5,6,6,1,8,19,'-6', '% Critical Hit Rate!'},
 				['Corsair\'s']={10, 11, 11, 12, 20, 13, 15, 16, 8, 17, 24, '-6', '% Experience Bonus'},
-				['Hunter\'s']={10,13,15,40,18,20,25,5,27,30,50,'-?', 'Accuracy Bonus'},
-				['Magus\'s']={5,20,6,8,9,3,10,13,14,15,25,'-8','Magic Defense Bonus'},
+				['Hunter\'s']={10,13,15,40,18,20,25,5,27,30,50,'-?', ' Accuracy Bonus'},
+				['Magus\'s']={5,20,6,8,9,3,10,13,14,15,25,'-8',' Magic Defense Bonus'},
 				['Healer\'s']={3,4,12,5,6,7,1,8,9,10,16,'-4','% Cure Potency'},
-				['Drachen']={10,13,15,40,18,20,25,5,28,30,50,'-8','Pet: Accuracy Bonus'},
+				['Drachen']={10,13,15,40,18,20,25,5,28,30,50,'-8',' Pet: Accuracy Bonus'},
 				['Choral']={8,42,11,15,19,4,23,27,31,35,50,'+25', '- Spell Interruption Rate'},
-				['Monk\'s']={8,10,32,12,14,15,4,20,22,24,40,'-?', 'Subtle Blow'},
+				['Monk\'s']={8,10,32,12,14,15,4,20,22,24,40,'-?', ' Subtle Blow'},
 				['Beast']={6,8,9,25,11,13,16,3,17,19,31,'-10', '% Pet: Attack Bonus'},
 				['Samurai']={7,32,10,12,14,4,16,20,22,24,40,'-10','Store TP Bonus'},
-				['Warlock\'s']={2,3,4,12,15,6,7,1,8,9,15,'-5','Magic Accuracy Bonus'},
-				['Puppet']={4,5,18,7,9,10,2,11,13,15,22,'-8','Pet: Magic Attack Bonus'},
+				['Warlock\'s']={2,3,4,12,15,6,7,1,8,9,15,'-5',' Magic Accuracy Bonus'},
+				['Puppet']={4,5,18,7,9,10,2,11,13,15,22,'-8',' Pet: Magic Attack Bonus'},
 				['Gallant\'s']={4,5,15,6,7,8,3,9,10,11,20,'-10','% Defense Bonus'},
 				['Dancer\'s']={3,4,12,5,6,7,1,8,9,10,16,'-4','Regen'},
 				['Bolter\'s']={2,3,12,4,6,7,8,9,5,10,25,'-8','% Movement Speed'},
 				['Caster\'s']={6,15,7,8,9,10,5,11,12,13,20,'-10','% Fast Cast'},
-				['Tactician\'s']={1,1,1,1,3,1,1,0,2,2,4,'-1','Regain'},
-				['Miser\'s']={3,5,7,9,20,11,2,13,15,17,25,'Save TP'},
-				['Ninja']={'?','?','?','?','?','?','?','?','?','?','?','?','Evasion Bonus'},
-				['Scholar\'s']={'?','?','?','?','?','?','?','?','?','?','?','?','Conserve MP'},
+				['Tactician\'s']={1,1,1,1,3,1,1,0,2,2,4,'-1',' Regain'},
+				['Miser\'s']={3,5,7,9,20,11,2,13,15,17,25,'-?',' Save TP'},
+				['Ninja']={'?','?','?','?','?','?','?','?','?','?','?','?',' Evasion Bonus'},
+				['Scholar\'s']={'?','?','?','?','?','?','?','?','?','?','?','?',' Conserve MP'},
 				['Allies\'']={6,7,17,9,11,13,15,17,17,5,17,'?','% Skillchain Damage'},
-				['Companion\'s']={'?','?','?','?','?','?','?','?','?','?','?','?','Pet: Regen and Regain'},
-				['Avenger\'s']={'?','?','?','?','?','?','?','?','?','?','?','?','Counter Rate'},
+				['Companion\'s']={'?','?','?','?','?','?','?','?','?','?','?','?',' Pet: Regen and Regain'},
+				['Avenger\'s']={'?','?','?','?','?','?','?','?','?','?','?','?',' Counter Rate'},
+				['Blitzer\'s']={2,3.4,4.5,11.3,5.3,6.4,7.2,8.3,1.5,10.2,12.1,'-?', '% Attack delay reduction'}
 				}
 				
 end
@@ -178,7 +179,7 @@ end
 function event_outgoing_text(original, modified)
 	if original:find('/jobability \"Double') and luckyroll == 1 and override == 0 then
 		modified=''
-		add_to_chat(55,'You either have a lucky Roll or have rolled an 11. Reuse Double-Up to continue to double-up.')
+		add_to_chat(159,'You either have a lucky Roll or have rolled an 11. Reuse Double-Up to continue to double-up.')
 		luckyroll=0
 		return modified
 	end

@@ -148,6 +148,12 @@ function event_addon_command(...)
 				lightluggage()
 			else write('Invalid mode option')
 			end
+		elseif params[1]:lower() == "timer" then
+			if params[2] == "start" then
+				send_command('timers c Remaining 6000 up')
+			elseif params[2] == "stop" then
+				send_command('timers d Remaining')
+			end
 		end			
 	end
 end
@@ -167,6 +173,10 @@ end
 
 function event_login()
 	settings_create()
+end
+
+function event_zone_change(from_id, from, to_id, to)
+	checkzone()
 end
 
 function orderlots()
@@ -228,6 +238,13 @@ function initialize()
 	tb_set_text('salvage_box',' Lot order:  \n'..lotorder);
 end
 
+function checkzone()
+	currentzone = get_ffxi_info()['zone']:lower()
+		if currentzone == 'silver sea remnants' or currentzone == 'zhayolm remnants' or currentzone == 'bhaflau remnants' or currentzone == 'arrapago remnants' then
+			send_command('timers c Remaining 6000 up')
+		else send_command('timers d Remaining')
+		end
+end
 
 function event_incoming_text(original, new, color)
 	a,b,name,cell = string.find(original,'(%w+) obtains an? ..(%w+) cell..\46')
@@ -258,6 +275,6 @@ end
 
 function event_unload()
 	tb_delete('salvage_box')
-
+	send_command('timers d Remaining')
 	send_command('unalias ch2')
 end 

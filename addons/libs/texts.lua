@@ -62,6 +62,7 @@ function texts.new(settings, str)
 	t._data.text.green = 255
 	t._data.text.blue = 255
 	t._data.text.content = ''
+	t._data.padding = 0
 	t._texts = {}
 	t._defaults = {}
 	t._textorder = {}
@@ -90,51 +91,11 @@ function texts.new(settings, str)
 	tb_set_bg_visibility(t._name, true)
 	tb_set_color(t._name, t._data.text.alpha, t._data.text.red, t._data.text.green, t._data.text.blue)
 	tb_set_font(t._name, t._data.text.font, t._data.text.size)
+	tb_set_bg_border_size(t._name, t._data.padding)
 	tb_set_visibility(t._name, t._data.visible)
 	
 	if str then
-		local i = 1
-		local startpos, endpos
-		local match
-		local rndname
-		local key = 1
-		local innerstart, innerend
-		local defaultmatch
-		while i <= #str do
-			startpos, endpos = str:find('%${.-}', i)
-			if startpos then
-				-- Match before the tag.
-				match = str:sub(i, startpos - 1)
-				rndname = t._name..'_'..key
-				t._textorder[key] = rndname
-				t._texts[rndname] = match
-				key = key + 1
-				
-				-- Match the tag.
-				match = str:sub(startpos + 2, endpos - 1)
-				innerstart, innerend = match:find('^.-|')
-				if innerstart then
-					defaultmatch = match:sub(innerend + 1)
-					match = match:sub(1, innerend - 1)
-				else
-					defaultmatch = ''
-				end
-				t._textorder[key] = match
-				t._texts[match] = defaultmatch
-				t._defaults[match] = defaultmatch
-				key = key + 1
-				
-				i = endpos + 1
-			else
-				match = str:sub(i)
-				rndname = t._name..'_'..key
-				t._textorder[key] = rndname
-				t._texts[rndname] = match
-				break
-			end
-		end
-
-		texts.update(t)
+		texts.append(t, str)
 	else
 		tb_set_text(t._name, '')
 	end
@@ -176,6 +137,57 @@ function texts.update(t, attr)
 	
 	tb_set_text(t._name, str)
 	t._data.text.content = str
+end
+
+-- Appends new text tokens to be displayed. Supports variables.
+function texts.append(t, str)
+	local i = 1
+	local startpos, endpos
+	local match
+	local rndname
+	local key = #t._textorder + 1
+	local innerstart, innerend
+	local defaultmatch
+	while i <= #str do
+		startpos, endpos = str:find('%${.-}', i)
+		if startpos then
+			-- Match before the tag.
+			match = str:sub(i, startpos - 1)
+			rndname = t._name..'_'..key
+			t._textorder[key] = rndname
+			t._texts[rndname] = match
+			key = key + 1
+			
+			-- Match the tag.
+			match = str:sub(startpos + 2, endpos - 1)
+			innerstart, innerend = match:find('^.-|')
+			if innerstart then
+				defaultmatch = match:sub(innerend + 1)
+				match = match:sub(1, innerend - 1)
+			else
+				defaultmatch = ''
+			end
+			t._textorder[key] = match
+			t._texts[match] = defaultmatch
+			t._defaults[match] = defaultmatch
+			key = key + 1
+			
+			i = endpos + 1
+		else
+			match = str:sub(i)
+			rndname = t._name..'_'..key
+			t._textorder[key] = rndname
+			t._texts[rndname] = match
+			break
+		end
+	end
+
+	texts.update(t)
+end
+
+-- Appends new text tokens with a line break. Supports variables.
+function texts.appendline(t, str)
+	t:append('\n'..str)
 end
 
 -- Makes the primitive visible.
@@ -246,6 +258,14 @@ function texts.size(t, size)
 	end
 	tb_set_font(t._name, t._data.text.font, size)
 	t._data.text.size = size
+end
+
+function texts.pad(t, padding)
+	if not padding then
+		return t._data.padding
+	end
+	tb_set_bg_border_size(t._name, padding)
+	t._data.padding = padding
 end
 
 function texts.color(red, green, blue)
