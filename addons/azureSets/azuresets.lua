@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon = {}
 _addon.name = 'AzureSets'
-_addon.version = '0.1'
+_addon.version = '1.1'
 
 require 'tablehelper'
 require 'stringhelper'
@@ -42,71 +42,17 @@ defaults.spellsets.default = T{ }
 defaults.language = 'english'
 
 function initialize()
-    player = T(get_player())
-    if player.name ~= '' then
-        log('Version '.._addon.version..' loaded! Use //aset help to get a list of commands.')
-        speFile = files.new('data/bluespells.xml')
-        spells = T{}
-        spells = parse_resources(speFile:readlines())
-        spellpoints = 0
-        setpointsmax = T{ [1] = 10,
-                         [11] = 15,
-                         [21] = 20,
-                         [31] = 25,
-                         [41] = 30,
-                         [51] = 35,
-                         [61] = 40,
-                         [71] = 45,
-                         [81] = 50,
-                         [91] = 55
-                        }
-
-        spellnummax = T{  [1] = 6,
-                         [11] = 8,
-                         [21] = 10,
-                         [31] = 12,
-                         [41] = 14,
-                         [51] = 16,
-                         [61] = 18,
-                         [71] = 20
-                        }
-        local dec = 0
-        if player.main_job_id == 16 then
-            dec = player.main_job_level
-        elseif player.sub_job_id == 16 then
-            dec = player.sub_job_level
-        end
-        while dec > 0 do
-            if spellnummax:containskey(dec) then
-                spellsmax = spellnummax[dec]
-                break
-            end
-            dec = dec - 1
-        end
-        
-        if player.main_job_id == 16 then
-            dec = player.main_job_level
-        elseif player.sub_job_id == 16 then
-            dec = player.sub_job_level
-        end
-        while dec > 0 do
-            if setpointsmax:containskey(dec) then
-                spellpoints = setpointsmax[dec]
-                break
-            end
-            dec = dec - 1
-        end
-        settings = config.load(defaults,true)
-        spellpoints = spellpoints + settings.assimilation
-        maxpoints = spellpoints
-        get_current_spellset()
-        log(spellpoints..' points remaining.')
-    end
+    get_current_spellset()
 end
 
 function event_load()
     send_command('alias azureset lua c azureSets')
     send_command('alias aset lua c azureSets')
+    log('Version '.._addon.version..' loaded! Use //aset help to get a list of commands.')
+    speFile = files.new('data/bluespells.xml')
+    spells = T{}
+    spells = parse_resources(speFile:readlines())
+    settings = config.load(defaults,true)
     initialize()
 end
 
@@ -125,8 +71,15 @@ function event_unload()
     send_command('unalias aset')
 end
 
+function event_job_change(mjob_id, mjob, mjob_lvl, sjob_id, sjob, sjob_lvl)
+    write(mjob_id)
+    if mjob_id == 16 then
+        initialize()
+    end
+end
+
 function set_spells(spellset)
-    if player.main_job_id ~= 16 and player.sub_job_id ~= 16 then return nil end
+    if get_player()['main_job_id'] ~= 16 and get_player()['sub_job_id'] ~= 16 then return nil end
     if settings.spellsets[spellset] == nil then return end
     if settings.spellsets[spellset]:equals(get_current_spellset()) then
         log(spellset:gsub('^%l', string.upper)..' was already equipped.')
@@ -153,15 +106,16 @@ function set_spells_from_spellset(spellset,slot)
         end
     end
     if tonumber(slot) < 20 then
-        send_command('@wait 1;lua i azuresets set_spells_from_spellset '..spellset..' '..slot+1)
+        send_command('@wait .5;lua i azuresets set_spells_from_spellset '..spellset..' '..slot+1)
     else
         log(spellset:gsub('^%l', string.upper)..' was equipped.')
+        send_command('timers c "Blue Magic Cooldown" 60 up')
     end
     
 end
 
 function set_single_spell(spell,slot)
-    if player.main_job_id ~= 16 and player.sub_job_id ~= 16 then return nil end
+    if get_player()['main_job_id'] ~= 16 and get_player()['sub_job_id'] ~= 16 then return nil end
     
     local tmpTable = T(get_current_spellset())
     for key,val in pairs(tmpTable) do
@@ -184,10 +138,10 @@ function set_single_spell(spell,slot)
 end
 
 function get_current_spellset()
-    if player.main_job_id ~= 16 and player.sub_job_id ~= 16 then return nil end
+    if get_player()['main_job_id'] ~= 16 and get_player()['sub_job_id'] ~= 16 then return nil end
     local spellTable = T{}
     local tmpTable = T{}
-    if player.main_job_id == 16 then
+    if get_player()['main_job_id'] == 16 then
         local tmpTable = T(get_mjob_data()['spells'])
         local i,id
         for i = 1, #tmpTable do
@@ -200,7 +154,6 @@ function get_current_spellset()
                     if tmpTable[i] == spells[id]['index'] - 512 then
                     if i < 10 then t = '0' end
                         spellTable['slot'..t..i] = spells[id][settings['language']:lower()]
-                        spellpoints = spellpoints - spells[id]['setpoints']
                     end
                 end
             end
@@ -211,7 +164,7 @@ end
 
 --[[ Not yet implemented
 function remove_one_spell(spell)
-    if player.main_job_id ~= 16 and player.sub_job_id ~= 16 then return nil end
+    if get_player()['main_job_id'] ~= 16 and get_player()['sub_job_id'] ~= 16 then return nil end
     local st,en,loc
     local tmpTable = T(get_current_spellset())
     for key,val in pairs(tmpTable) do
@@ -246,7 +199,7 @@ function save_set(setname)
 end
 
 function event_addon_command(...)
-    if player.main_job_id ~= 16 and player.sub_job_id ~= 16 then
+    if get_player()['main_job_id'] ~= 16 and get_player()['sub_job_id'] ~= 16 then
         error('You are not on Blue Mage.')
         return nil 
     end
