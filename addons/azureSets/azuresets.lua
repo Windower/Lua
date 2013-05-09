@@ -72,7 +72,6 @@ function event_unload()
 end
 
 function event_job_change(mjob_id, mjob, mjob_lvl, sjob_id, sjob, sjob_lvl)
-    write(mjob_id)
     if mjob_id == 16 then
         initialize()
     end
