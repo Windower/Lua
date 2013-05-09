@@ -1,0 +1,30 @@
+<?xml version="1.1" ?>
+<settings>
+	<global>
+		<assimilation>5</assimilation>
+		<language>English</language>
+		<spellsets>
+			<default />
+			<warsub>
+				<slot01>Magic Fruit</slot01>
+				<slot02>Battery Charge</slot02>
+				<slot03>Occultation</slot03>
+				<slot04>Amorphic Spikes</slot04>
+				<slot05>Head Butt</slot05>
+				<slot06>Actinic Burst</slot06>
+				<slot07>Winds of Promy.</slot07>
+				<slot08>Empty Thrash</slot08>
+				<slot09>Heavy Strike</slot09>
+				<slot10>Acrid Stream</slot10>
+				<slot11>Demoralizing Roar</slot11>
+				<slot12>Quad. Continuum</slot12>
+				<slot13>Delta Thrust</slot13>
+				<slot14>Barbed Crescent</slot14>
+				<slot15>Blazing Bound</slot15>
+				<slot16>Animating Wail</slot16>
+				<slot17>Mortal Ray</slot17>
+				<slot18>Dream Flower</slot18>
+			</warsub>
+		</spellsets>
+	</global>
+</settings>

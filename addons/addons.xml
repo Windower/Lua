@@ -34,6 +34,11 @@
     <bugtracker>https://github.com/banggugyangu/Lua/issues</bugtracker>
   </addon>
   <addon>
+    <name>AzureSets</name>
+    <description>Automated blue magic spell setting.</description>
+    <bugtracker>https://github.com/nitrous24/Lua/issues?page=1</bugtracker>
+  </addon>
+  <addon>
     <name>BattleMod</name>
     <description>Customizes battle chat messages.</description>
   </addon>
