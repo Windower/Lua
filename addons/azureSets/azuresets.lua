@@ -199,7 +199,7 @@ end
 
 function event_addon_command(...)
     if get_player()['main_job_id'] ~= 16 --[[and get_player()['sub_job_id'] ~= 16]] then
-        error('You are not on Blue Mage.')
+        error('You are not on (main) Blue Mage.')
         return nil 
     end
     local args = T{...}
