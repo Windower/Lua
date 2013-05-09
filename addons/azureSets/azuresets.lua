@@ -99,7 +99,7 @@ function set_spells_from_spellset(spellset,slot)
     if tempname ~= nil then
         for id = 1, #spells do
             if spells[id][settings['language']:lower()] == tempname then
-                set_blue_magic_spell(spells[id]['index']-512, tonumber(slot))
+                set_blue_magic_spell(spells[id]['index'], tonumber(slot))
                 break
             end
         end
@@ -129,7 +129,7 @@ function set_single_spell(spell,slot)
         if spells[id][settings['language']:lower()] == spell then
             --This is where single spell setting code goes.
             --Need to set by spell index rather than name.
-            set_blue_magic_spell(spells[id]['index']-512, tonumber(slot))
+            set_blue_magic_spell(spells[id]['index'], tonumber(slot))
             tmpTable['slot'..slot] = spell
         end
     end
@@ -150,7 +150,7 @@ function get_current_spellset()
                     tmpTable[i] = tmpTable[i] * (0-1)
                 end
                 for id = 1, #spells do
-                    if tmpTable[i] == spells[id]['index'] - 512 then
+                    if tmpTable[i] == spells[id]['index'] then
                     if i < 10 then t = '0' end
                         spellTable['slot'..t..i] = spells[id][settings['language']:lower()]
                     end
