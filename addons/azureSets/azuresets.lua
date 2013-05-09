@@ -78,7 +78,7 @@ function event_job_change(mjob_id, mjob, mjob_lvl, sjob_id, sjob, sjob_lvl)
 end
 
 function set_spells(spellset)
-    if get_player()['main_job_id'] ~= 16 and get_player()['sub_job_id'] ~= 16 then return nil end
+    if get_player()['main_job_id'] ~= 16 --[[and get_player()['sub_job_id'] ~= 16]] then return nil end
     if settings.spellsets[spellset] == nil then return end
     if settings.spellsets[spellset]:equals(get_current_spellset()) then
         log(spellset:gsub('^%l', string.upper)..' was already equipped.')
@@ -114,7 +114,7 @@ function set_spells_from_spellset(spellset,slot)
 end
 
 function set_single_spell(spell,slot)
-    if get_player()['main_job_id'] ~= 16 and get_player()['sub_job_id'] ~= 16 then return nil end
+    if get_player()['main_job_id'] ~= 16 --[[and get_player()['sub_job_id'] ~= 16]] then return nil end
     
     local tmpTable = T(get_current_spellset())
     for key,val in pairs(tmpTable) do
@@ -137,7 +137,7 @@ function set_single_spell(spell,slot)
 end
 
 function get_current_spellset()
-    if get_player()['main_job_id'] ~= 16 and get_player()['sub_job_id'] ~= 16 then return nil end
+    if get_player()['main_job_id'] ~= 16 --[[and get_player()['sub_job_id'] ~= 16]] then return nil end
     local spellTable = T{}
     local tmpTable = T{}
     if get_player()['main_job_id'] == 16 then
@@ -198,7 +198,7 @@ function save_set(setname)
 end
 
 function event_addon_command(...)
-    if get_player()['main_job_id'] ~= 16 and get_player()['sub_job_id'] ~= 16 then
+    if get_player()['main_job_id'] ~= 16 --[[and get_player()['sub_job_id'] ~= 16]] then
         error('You are not on Blue Mage.')
         return nil 
     end
@@ -239,7 +239,7 @@ function event_addon_command(...)
             notice('Version '.._addon.version..' loaded! You have access to the following commands with the //aset alias:')
             notice(' 1. removeall - Unsets all spells.')
             notice(' 2. spellset <setname> -- Set (setname)\'s spells.')
-            notice(' 3. add &lt;slot&gt; &lt;spell&gt; -- Set (spell) to slot (slot (number)).')
+            notice(' 3. add <slot> <spell> -- Set (spell) to slot (slot (number)).')
             notice(' 4. save <setname> -- Saves current spellset as (setname)')
             notice(' 5. help --Shows this menu.')
         end
