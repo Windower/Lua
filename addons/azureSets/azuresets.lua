@@ -141,6 +141,7 @@ function set_single_spell(spell,slot)
             --This is where single spell setting code goes.
             --Need to set by spell index rather than name.
             set_blue_magic_spell(spells[id]['index'], tonumber(slot))
+            send_command('timers c "Blue Magic Cooldown" 60 up')
             tmpTable['slot'..slot] = spell
         end
     end
