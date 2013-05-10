@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon = {}
 _addon.name = 'AzureSets'
-_addon.version = '1.11'
+_addon.version = '1.15'
 
 require 'tablehelper'
 require 'stringhelper'
@@ -39,6 +39,17 @@ local defaults = T{}
 defaults.assimilation = 0
 defaults.spellsets = T{}
 defaults.spellsets.default = T{ }
+defaults.spellsets.vw1 = T{slot01='Firespit', slot02='Heat Breath', slot03='Thermal Pulse', slot04='Blastbomb',
+slot05='Infrasonics', slot06='Frost Breath', slot07='Ice Break', slot08='Cold Wave',
+slot09='Sandspin', slot10='Magnetite Cloud', slot11='Cimicine Discharge', slot12='Bad Breath', 
+slot13='Acrid Stream', slot14='Maelstrom', slot15='Corrosive Ooze', slot16='Cursed Sphere', 
+slot17='Awful Eye'
+}
+defaults.spellsets.vw2 = T{slot01='Hecatomb Wave', slot02='Mysterious Light', slot03='Leafstorm', slot04='Reaving Wind',
+slot05='Temporal Shift', slot06='Mind Blast', slot07='Blitzstrahl', slot08='Charged Whisker',
+slot09='Blank Gaze', slot10='Radiant Breath', slot11='Light of Penance', slot12='Actinic Burst',
+slot13='Death Ray', slot14='Eyes On Me', slot15='Sandspray'
+}
 defaults.language = 'english'
 
 function initialize()
@@ -81,7 +92,7 @@ function set_spells(spellset)
     if get_player()['main_job_id'] ~= 16 --[[and get_player()['sub_job_id'] ~= 16]] then return nil end
     if settings.spellsets[spellset] == nil then return end
     if settings.spellsets[spellset]:equals(get_current_spellset()) then
-        log(spellset:gsub('^%l', string.upper)..' was already equipped.')
+        log(spellset..' was already equipped.')
         return
     end
     reset_blue_magic_spells()
@@ -107,7 +118,7 @@ function set_spells_from_spellset(spellset,slot)
     if tonumber(slot) < 20 then
         send_command('@wait .5;lua i azuresets set_spells_from_spellset '..spellset..' '..slot+1)
     else
-        log(spellset:gsub('^%l', string.upper)..' was equipped.')
+        log(spellset..' was equipped.')
         send_command('timers c "Blue Magic Cooldown" 60 up')
     end
     
@@ -130,6 +141,7 @@ function set_single_spell(spell,slot)
             --This is where single spell setting code goes.
             --Need to set by spell index rather than name.
             set_blue_magic_spell(spells[id]['index'], tonumber(slot))
+            send_command('timers c "Blue Magic Cooldown" 60 up')
             tmpTable['slot'..slot] = spell
         end
     end
@@ -189,10 +201,32 @@ function remove_all_spells(trigger)
 end
 
 function save_set(setname)
+    if setname == 'default' then 
+        error('Please choose a name other than default.') 
+        return 
+    end
     local curSpells = T(get_current_spellset())
     settings.spellsets[setname] = curSpells
     settings:save('all')
     notice('Set '..setname..' saved.')
+end
+
+function get_spellset_list()
+    log("Listing sets:")
+    for key,_ in pairs(settings.spellsets) do
+        if key ~= 'default' then
+            local it = 0
+            for i = 1, #settings.spellsets[key] do
+                it = it + 1
+            end
+            log("\t"..key..' '..settings.spellsets[key]:length()..' spells.')
+        end
+    end
+end
+
+function get_spellset_content(spellset)
+    log('Getting '..spellset..'\'s spell list:')
+    settings.spellsets[spellset]:vprint()
 end
 
 function event_addon_command(...)
@@ -231,15 +265,24 @@ function event_addon_command(...)
             if args[1] ~= nil then
                 set_spells(args[1])
             end
-        elseif comm == 'list' then
+        elseif comm == 'currentlist' then
             get_current_spellset():vprint()
+        elseif comm == 'setlist' then
+            get_spellset_list()
+        elseif comm == 'spelllist' then
+            if args[1] ~= nil then
+                get_spellset_content(args[1])
+            end
         elseif comm == 'help' then
-            notice('Version '.._addon.version..' loaded! You have access to the following commands with the //aset alias:')
-            notice(' 1. removeall - Unsets all spells.')
-            notice(' 2. spellset <setname> -- Set (setname)\'s spells.')
-            notice(' 3. add <slot> <spell> -- Set (spell) to slot (slot (number)).')
-            notice(' 4. save <setname> -- Saves current spellset as (setname)')
-            notice(' 5. help --Shows this menu.')
+            log('Version '.._addon.version..' loaded! You have access to the following commands with the //aset alias:')
+            log(' 1. removeall - Unsets all spells.')
+            log(' 2. spellset <setname> -- Set (setname)\'s spells.')
+            log(' 3. add <slot> <spell> -- Set (spell) to slot (slot (number)).')
+            log(' 4. save <setname> -- Saves current spellset as (setname)')
+            log(' 5. currentlist -- Lists currently set spells.')
+            log(' 6. setlist -- Lists all spellsets.')
+            log(' 7. spelllist <setname> -- List spells in (setname)')
+            log(' 8. help --Shows this menu.')
         end
     end
 end
