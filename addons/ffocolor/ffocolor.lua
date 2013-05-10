@@ -84,7 +84,7 @@ end
 
 function event_incoming_text(old,new,color)
     if old ~= former then
-        local a,b,txt = string.find(old,'^[^%w]*%[%d+:#[%w_]+%](.*):')
+        local a,b,txt = string.find(old,'^[^%w]*%[%d+:#[%w_]+%](.-):')
         local c = string.find(old,'^[^%w]*%[%d+:#%w+%]') or string.find(old,'^[^%w]*%[FFOChat%]')
         if b ~= nil then
             tcol = string.char(31,settings['talkedc'])
