@@ -39,13 +39,13 @@ local defaults = T{}
 defaults.assimilation = 0
 defaults.spellsets = T{}
 defaults.spellsets.default = T{ }
-defaults.spellsets.VW1 = T{slot01='Firespit', slot02='Heat Breath', slot03='Thermal Pulse', slot04='Blastbomb',
+defaults.spellsets.vw1 = T{slot01='Firespit', slot02='Heat Breath', slot03='Thermal Pulse', slot04='Blastbomb',
 slot05='Infrasonics', slot06='Frost Breath', slot07='Ice Break', slot08='Cold Wave',
 slot09='Sandspin', slot10='Magnetite Cloud', slot11='Cimicine Discharge', slot12='Bad Breath', 
 slot13='Acrid Stream', slot14='Maelstrom', slot15='Corrosive Ooze', slot16='Cursed Sphere', 
 slot17='Awful Eye'
 }
-defaults.spellsets.VW2 = T{slot01='Hecatomb Wave', slot02='Mysterious Light', slot03='Leafstorm', slot04='Reaving Wind',
+defaults.spellsets.vw2 = T{slot01='Hecatomb Wave', slot02='Mysterious Light', slot03='Leafstorm', slot04='Reaving Wind',
 slot05='Temporal Shift', slot06='Mind Blast', slot07='Blitzstrahl', slot08='Charged Whisker',
 slot09='Blank Gaze', slot10='Radiant Breath', slot11='Light of Penance', slot12='Actinic Burst',
 slot13='Death Ray', slot14='Eyes On Me', slot15='Sandspray'
@@ -265,11 +265,11 @@ function event_addon_command(...)
             if args[1] ~= nil then
                 set_spells(args[1])
             end
-        elseif comm == 'listsets' then
-            get_spellset_list()
-        elseif comm == 'list' then
+        elseif comm == 'currentlist' then
             get_current_spellset():vprint()
-        elseif comm == 'getsetlist' then
+        elseif comm == 'setlist' then
+            get_spellset_list()
+        elseif comm == 'spelllist' then
             if args[1] ~= nil then
                 get_spellset_content(args[1])
             end
@@ -279,9 +279,9 @@ function event_addon_command(...)
             notice(' 2. spellset <setname> -- Set (setname)\'s spells.')
             notice(' 3. add <slot> <spell> -- Set (spell) to slot (slot (number)).')
             notice(' 4. save <setname> -- Saves current spellset as (setname)')
-            notice(' 5. list -- Lists currently set spells.')
-            notice(' 6. listsets -- Lists all spellsets.')
-            notice(' 7. getsetlist <setname> -- List spells in (setname)')
+            notice(' 5. currentlist -- Lists currently set spells.')
+            notice(' 6. setlist -- Lists all spellsets.')
+            notice(' 7. spelllist <setname> -- List spells in (setname)')
             notice(' 8. help --Shows this menu.')
         end
     end
