@@ -274,15 +274,15 @@ function event_addon_command(...)
                 get_spellset_content(args[1])
             end
         elseif comm == 'help' then
-            notice('Version '.._addon.version..' loaded! You have access to the following commands with the //aset alias:')
-            notice(' 1. removeall - Unsets all spells.')
-            notice(' 2. spellset <setname> -- Set (setname)\'s spells.')
-            notice(' 3. add <slot> <spell> -- Set (spell) to slot (slot (number)).')
-            notice(' 4. save <setname> -- Saves current spellset as (setname)')
-            notice(' 5. currentlist -- Lists currently set spells.')
-            notice(' 6. setlist -- Lists all spellsets.')
-            notice(' 7. spelllist <setname> -- List spells in (setname)')
-            notice(' 8. help --Shows this menu.')
+            log('Version '.._addon.version..' loaded! You have access to the following commands with the //aset alias:')
+            log(' 1. removeall - Unsets all spells.')
+            log(' 2. spellset <setname> -- Set (setname)\'s spells.')
+            log(' 3. add <slot> <spell> -- Set (spell) to slot (slot (number)).')
+            log(' 4. save <setname> -- Saves current spellset as (setname)')
+            log(' 5. currentlist -- Lists currently set spells.')
+            log(' 6. setlist -- Lists all spellsets.')
+            log(' 7. spelllist <setname> -- List spells in (setname)')
+            log(' 8. help --Shows this menu.')
         end
     end
 end
