@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon = {}
 _addon.name = 'AzureSets'
-_addon.version = '1.1'
+_addon.version = '1.11'
 
 require 'tablehelper'
 require 'stringhelper'
@@ -145,14 +145,12 @@ function get_current_spellset()
         local i,id
         for i = 1, #tmpTable do
             local t = ''
-            if tmpTable[i] ~= 0 then
-                if tmpTable[i] < 0 then
-                    tmpTable[i] = tmpTable[i] * (0-1)
-                end
+            if tonumber(tmpTable[i]) ~= 512 then
                 for id = 1, #spells do
-                    if tmpTable[i] == spells[id]['index'] then
-                    if i < 10 then t = '0' end
+                    if tonumber(tmpTable[i]) == tonumber(spells[id]['index']) then
+                        if i < 10 then t = '0' end
                         spellTable['slot'..t..i] = spells[id][settings['language']:lower()]
+                        break
                     end
                 end
             end
