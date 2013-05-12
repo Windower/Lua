@@ -25,7 +25,7 @@
     <author>Arcon</author>
     <description>Automatically joins or declines party invites. Configurable with blacklist/whitelist mode and auto-decline settings.</description>
     <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
-    <support>IRC: irc.ffochat.com, #lua</support>
+    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
   </addon>
   <addon>
     <name>AutoRA</name>
@@ -77,7 +77,7 @@
     <author>Arcon</author>
     <description>Allows opening links to certain websites from within the game, with an optional search parameter.</description>
     <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
-    <support>IRC: irc.ffochat.com, #lua</support>
+    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
   </addon>
   <addon>
     <name>MacroChanger</name>
@@ -125,7 +125,7 @@
     <name>Scoreboard</name>
     <author>Suji</author>
     <description>Basic in-game damage parser. It displays live DPS and works even when chat filters are enabled.</description>
-    <support>https://github.com/jerryhebert/Lua/issues</support>
+    <bugtracker>https://github.com/jerryhebert/Lua/issues</bugtracker>
   </addon>
   <addon>
     <name>Send</name>
@@ -146,7 +146,7 @@
     <author>Arcon</author>
     <description>Displays information about your current target in memory.</description>
     <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
-    <support>IRC: irc.ffochat.com, #lua</support>
+    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
   </addon>
   <addon>
     <name>vwhl</name>
