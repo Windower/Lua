@@ -112,8 +112,11 @@
 	<description>Simplifies Cor rolls, tells you the bonus they give, stops you from doubling up on lucky rolls and reports your chance to bust.</description>
   </addon>
   <addon>
+    <author>Giuliano Riccio (Zohno@Phoenix)</author>
   	<name>reive</name>
   	<description>tracks exp, bayld, momentum scores and bonuses during a reive.</description>
+    <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
     <name>SATACast</name>
@@ -149,8 +152,12 @@
     <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
   </addon>
   <addon>
+  <addon>
+    <author>Giuliano Riccio (Zohno@Phoenix)</author>
     <name>vwhl</name>
     <description>Redirects vw nm's vulnerabilities to the "tell" stream so that they can be held using the chat filters' function and highlights the important info. Supports EN, FR, DE clients.</description>
+    <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
     <name>StratHelper</name>
