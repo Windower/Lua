@@ -17,12 +17,12 @@ There is only one configuration file called settings.xml in the data folder of t
 * reive show -- shows the tracking window
 * reive hide -- hides the tracking window
 * reive toggle -- toggles the tracking window
-* reive max-scores amount -- sets the max amount of scores to show in the window
-* reive reset-on-start reset -- specifies if the exp and bayld will be reset at the begin of a reive
-* reive track score visible -- specifies the visibility of a score in the window
-* reive position [[-h]|[-x x] [-y y]] -- sets the horizontal and vertical position of the window relative to the upper-left corner
-* reive font [[-h]|[-f font] [-s size] [-a alpha] [-b[ bold]] [-i[ italic]]] -- sets the style of the font used in the window
-* reive color [[-h]|[-o objects] [-d] [-r red] [-g green] [-b blue] [-a alpha]] -- sets the colors used by the plugin
+* reive max-scores &lt;amount&gt; -- sets the max amount of scores to show in the window
+* reive reset-on-start &lt;reset&gt; -- specifies if the exp and bayld will be reset at the begin of a reive
+* reive track &lt;score&gt; &lt;visible&gt; -- specifies the visibility of a score in the window
+* reive position [[-h]|[-x &lt;x&gt;] [-y &lt;y&gt;]] -- sets the horizontal and vertical position of the window relative to the upper-left corner
+* reive font [[-h]|[-f &lt;font&gt;] [-s &lt;size&gt;] [-a &lt;alpha&gt;] [-b[ &lt;bold&gt;]] [-i[ &lt;italic&gt;]]] -- sets the style of the font used in the window
+* reive color [[-h]|[-o &lt;objects&gt;] [-d] [-r &lt;red&gt;] [-g &lt;green&gt;] [-b &lt;blue&gt;] [-a &lt;alpha&gt;]] -- sets the colors used by the plugin
 
 **TODO**
 
