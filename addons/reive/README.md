@@ -1,6 +1,6 @@
 **Author:** Giuliano Riccio
 
-**Version:** v 1.20130520
+**Version:** v 1.20130514
 
 **Description:**
 This plugin tracks exp, bayld, momentum scores and bonuses during a reive.
@@ -29,7 +29,7 @@ There is only one configuration file called settings.xml in the data folder of t
 - [x] allow the user to change the settings using the console
 
 #changelog
-## v1.20130520
+## v1.20130514
 * **change:** current/total bayld/exp will be shown at the same time. "reset_on_start" has no use anymore and has been removed
 
 ## v1.20130419

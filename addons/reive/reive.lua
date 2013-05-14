@@ -1,5 +1,5 @@
 --[[
-reive v1.20130520
+reive v1.20130514
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -32,7 +32,7 @@ require 'stringhelper'
 local config = require 'config'
 
 local _reive = T{}
-_reive.v              = '1.20130520'
+_reive.v              = '1.20130514'
 _reive.tb_name        = 'addon:gr:reive'
 _reive.track          = false
 _reive.visible        = false
