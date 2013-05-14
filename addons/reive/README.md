@@ -1,6 +1,6 @@
 **Author:** Giuliano Riccio
 
-**Version:** v 1.20130419
+**Version:** v 1.20130520
 
 **Description:**
 This plugin tracks exp, bayld, momentum scores and bonuses during a reive.
@@ -14,6 +14,7 @@ There is only one configuration file called settings.xml in the data folder of t
 
 * reive test -- fills the chat log to show how the plugin will work. reload the plugin after the test (lua r reive)
 * reive reset -- sets gained exp and bayld to 0
+* reive full-reset -- sets gained exp/total exp and bayld/total bayld to 0
 * reive show -- shows the tracking window
 * reive hide -- hides the tracking window
 * reive toggle -- toggles the tracking window
@@ -29,6 +30,9 @@ There is only one configuration file called settings.xml in the data folder of t
 - [x] allow the user to change the settings using the console
 
 #changelog
+## v1.20130520
+* **change:** current/total bayld/exp will be shown at the same time. "reset_on_start" has no use anymore and has been removed
+
 ## v1.20130419
 * **add:** the user can change the settings from the console or the text box
 
@@ -39,7 +43,6 @@ There is only one configuration file called settings.xml in the data folder of t
 * first release
 
 #global
-* **reset_on_start:** **true** or **false**, will set exp and bayld to 0 at the begin of each reive
 * **max_scores:** sets the max amount of momentum scores to show in the window
 
 ##track
