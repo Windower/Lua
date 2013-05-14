@@ -68,7 +68,6 @@
 			<x>0</x>
 			<y>350</y>
 		</position>
-		<reset_on_start>false</reset_on_start>
 		<track>
 			<abilities_recovery>true</abilities_recovery>
 			<hp_mp_boost>true</hp_mp_boost>
@@ -78,6 +77,6 @@
 			<stoneskin>true</stoneskin>
 			<tp_recovery>true</tp_recovery>
 		</track>
-		<v>1.20130419</v>
+		<v>1.20130520</v>
 	</global>
 </settings>
