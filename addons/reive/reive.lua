@@ -413,7 +413,6 @@ function event_addon_command(...)
         messages:append('help >> reive hide -- hides the tracking window')
         messages:append('help >> reive toggle -- toggles the tracking window')
         messages:append('help >> reive max-scores \30\02amount\30\01 -- sets the max amount of scores to show in the window')
-        messages:append('help >> reive reset-on-start \30\02reset\30\01 -- specifies if the exp and bayld will be reset at the begin of a reive')
         messages:append('help >> reive track \30\02score\30\01 \30\02visible\30\01 -- specifies the visibility of a score in the window')
         messages:append('help >> reive position [[-h]|[-x \30\02x\30\01] [-y \30\02y\30\01]] -- sets the horizontal and vertical position of the window relative to the upper-left corner')
         messages:append('help >> reive font [[-h]|[-f \30\02font\30\01] [-s \30\02size\30\01] [-a \30\02alpha\30\01] [-b[ \30\02bold\30\01]] [-i[ \30\02italic\30\01]]] -- sets the style of the font used in the window')
@@ -450,32 +449,6 @@ function event_addon_command(...)
 
         if errors:length() == 0 then
             _reive.settings.max_scores = max_scores
-
-            _reive.refresh()
-            _reive.settings:save('all')
-        end
-    elseif cmd == 'reset-on-start' then
-        local reset_on_start
-
-        if type(args[1]) == 'nil' then
-            messages:append('reset-on-start >> specifies if the exp and bayld will be reset at the begin of a reive')
-            messages:append('reset-on-start >> usage: reive reset-on-start \30\02reset\30\01')
-            messages:append('reset-on-start >> positional arguments:')
-            messages:append('reset-on-start >>   reset    reset exp and bayld at the begin of a reive (true/false/1/0)')
-        elseif args[1] == 'default' then
-            reset_on_start = _reive.defaults.reset_on_start
-        elseif args[1] == 'true' or args[1] == '1' or args[2] == 'default' then
-            reset_on_start = true
-        elseif args[1] == 'false' or args[1] == '0' then
-            reset_on_start = false
-        end
-
-        if type(reset_on_start) ~= "boolean" then
-            errors:append('reset-on-start >> reset-on-start expects \'reset\' to be a boolean (\'true\' or \'false\'), a number (\'1\' or \'0\') or \'default\' (without quotes)')
-        end
-
-        if errors:length() == 0 then
-            _reive.settings.reset_on_start = reset_on_start
 
             _reive.refresh()
             _reive.settings:save('all')
