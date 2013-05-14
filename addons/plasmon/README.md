@@ -3,7 +3,7 @@
 **Version:** v 1.20130515
 
 **Description:**
-This plugin tracks plasm, killed mobs and dropped airlixir during a delve.
+This plugin tracks plasm, killed mobs and dropped airlixirs during a delve.
 There is only one configuration file called settings.xml in the data folder of the plugin.
 
 **Abbreviation:** //delve
