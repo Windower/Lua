@@ -103,6 +103,13 @@
     <description>A helper addon for PUPs using spellcast, it informs spellcast of pet casting (healing or nuking).</description>
   </addon>
   <addon>
+    <author>Giuliano Riccio (Zohno@Phoenix)</author>
+    <name>plasmon</name>
+    <description>tracks plasm, killed mobs and dropped airlixirs during a delve.</description>
+    <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
+  </addon>
+  <addon>
     <name>Respond</name>
     <description>Respond to tells and FFOchat PMs using //r.</description>
   </addon>
@@ -113,8 +120,8 @@
   </addon>
   <addon>
     <author>Giuliano Riccio (Zohno@Phoenix)</author>
-  	<name>reive</name>
-  	<description>tracks exp, bayld, momentum scores and bonuses during a reive.</description>
+    <name>reive</name>
+    <description>tracks exp, bayld, momentum scores and bonuses during a reive.</description>
     <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
