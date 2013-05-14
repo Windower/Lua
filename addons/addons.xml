@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <addons>
   <addon>
     <name>Example</name>
@@ -151,7 +151,6 @@
     <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
   </addon>
-  <addon>
   <addon>
     <author>Giuliano Riccio (Zohno@Phoenix)</author>
     <name>vwhl</name>
