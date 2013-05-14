@@ -1,5 +1,5 @@
 --[[
-reive v1.20130419
+reive v1.20130514
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -32,13 +32,15 @@ require 'stringhelper'
 local config = require 'config'
 
 local _reive = T{}
-_reive.v              = '1.20130419'
+_reive.v              = '1.20130514'
 _reive.tb_name        = 'addon:gr:reive'
 _reive.track          = false
 _reive.visible        = false
 _reive.stats          = T{}
 _reive.stats.exp      = 0
 _reive.stats.bayld    = 0
+_reive.stats.totExp   = 0
+_reive.stats.totBayld = 0
 _reive.stats.scores   = T{}
 _reive.stats.bonuses  = T{}
 
@@ -55,7 +57,7 @@ _reive.bonuses_map = {
 _reive.defaults = T{}
 _reive.defaults.v              = 0
 _reive.defaults.first_run      = true
-_reive.defaults.reset_on_start = false
+_reive.defaults.reset_on_start = false -- deprecated
 _reive.defaults.max_scores     = 5
 
 _reive.defaults.track = T{}
@@ -152,7 +154,7 @@ function _reive.parseOptions(args)
     return options
 end
 
-function _reive.test(...)
+function _reive.test()
     _reive.start()
     add_to_chat(121, 'Reive momentum score: HP recovery.')
     add_to_chat(121, 'Momentum bonus: Ability cast recovery!')
@@ -174,17 +176,14 @@ function _reive.test(...)
     add_to_chat(131, 'Player gains 426 limit points.')
 end
 
-function _reive.start(...)
-    if _reive.settings.reset_on_start == true then
-        _reive.reset()
-    end
-
+function _reive.start()
+	_reive.reset()
     _reive.track = true
     add_to_chat(0, '\30\03The Reive has begun!\30\01')
     _reive.show()
 end
 
-function _reive.stop(...)
+function _reive.stop()
     _reive.stats.scores  = T{}
     _reive.stats.bonuses = T{}
 
@@ -194,7 +193,7 @@ function _reive.stop(...)
     _reive.status()
 end
 
-function _reive.refresh(...)
+function _reive.refresh()
     if _reive.visible == false then
         return
     end
@@ -203,9 +202,9 @@ function _reive.refresh(...)
     local text        =
         ' \\cs('..reiveColors.title.r..', '..reiveColors.title.g..', '..reiveColors.title.b..')--== REIVE ==--\\cr \n'..
         ' \\cs('..reiveColors.label.r..', '..reiveColors.label.g..', '..reiveColors.label.b..')Bayld:\\cr'..
-        ' \\cs('..reiveColors.value.r..', '..reiveColors.value.g..', '..reiveColors.value.b..')'.._reive.stats.bayld..'\\cr \n'..
+        ' \\cs('..reiveColors.value.r..', '..reiveColors.value.g..', '..reiveColors.value.b..')'.._reive.stats.bayld..'/'.._reive.stats.totBayld..'\\cr \n'..
         ' \\cs('..reiveColors.label.r..', '..reiveColors.label.g..', '..reiveColors.label.b..')EXP:\\cr'..
-        ' \\cs('..reiveColors.value.r..', '..reiveColors.value.g..', '..reiveColors.value.b..')'.._reive.stats.exp..'\\cr '
+        ' \\cs('..reiveColors.value.r..', '..reiveColors.value.g..', '..reiveColors.value.b..')'.._reive.stats.exp..'/'.._reive.stats.totExp..'\\cr '
 
     local scoresColors = _reive.settings.colors.score
     local scores       = '';
@@ -241,24 +240,31 @@ function _reive.refresh(...)
     tb_set_text(_reive.tb_name, text)
 end
 
-function _reive.reset(...)
+function _reive.reset()
     _reive.stats.exp   = 0
     _reive.stats.bayld = 0
     _reive.refresh()
 end
 
-function _reive.show(...)
+function _reive.fullReset()
+    _reive.stats.totExp   = 0
+    _reive.stats.totBayld = 0
+	_reive.reset()
+    _reive.refresh()
+end
+
+function _reive.show()
     _reive.visible = true
     tb_set_visibility(_reive.tb_name, true)
     _reive.refresh()
 end
 
-function _reive.hide(...)
+function _reive.hide()
     _reive.visible = false
     tb_set_visibility(_reive.tb_name, false)
 end
 
-function _reive.toggle(...)
+function _reive.toggle()
     if _reive.visible then
         _reive.hide()
     else
@@ -266,17 +272,19 @@ function _reive.toggle(...)
     end
 end
 
-function _reive.status(...)
-    add_to_chat(0, '\30\03[EXP\30\01 \30\02'.._reive.stats.exp..'\30\01\30\03] [Bayld\30\01 \30\02'.._reive.stats.bayld..'\30\01\30\03]\30\01')
+function _reive.status()
+    add_to_chat(0, '\30\03[EXP\30\01 \30\02'.._reive.stats.exp..'/'.._reive.stats.totExp..'\30\01\30\03] [Bayld\30\01 \30\02'.._reive.stats.bayld..'/'.._reive.stats.totBayld..'\30\01\30\03]\30\01')
 end
 
-function _reive.first_run(...)
+function _reive.first_run()
     if ( type(_reive.settings.v) ~= 'nil' and _reive.settings.v >= tonumber(_reive.v) and _reive.settings.first_run == false ) then
         return
     end
+
     add_to_chat(55, 'hi '..get_player()['name']:lower()..',')
     add_to_chat(55, 'thank you for using reive v'.._reive.v)
-    add_to_chat(55, 'in this new version i\'ve added the ability to change the add-on\'s settings directly from the console or your text box. for more info type \30\02//reive help\30\01')
+    add_to_chat(55, 'in this new version the addon will show both current and total gained bayld and exp in the "current/total" format.')
+    add_to_chat(55, 'as of this now the "reset_on_start" parameter has no use anymore and has been removed.')
     add_to_chat(55, '- zohno@phoenix')
 
     _reive.settings.v = _reive.v
@@ -357,14 +365,16 @@ function event_incoming_text(original, modified, mode)
         match = original:match('obtained (%d+) bayld!')
 
         if match and _reive.track then
-            _reive.stats.bayld = _reive.stats.bayld + match
+            _reive.stats.bayld    = _reive.stats.bayld + match
+            _reive.stats.totBayld = _reive.stats.totBayld + match
             _reive.refresh()
         end
     elseif mode == 131 and _reive.track then
         match = original:match('gains (%d+) limit points%.')
 
         if match then
-            _reive.stats.exp = _reive.stats.exp + match
+            _reive.stats.exp    = _reive.stats.exp + match
+            _reive.stats.totExp = _reive.stats.totExp + match
             _reive.refresh()
 
             return modified, mode
@@ -398,11 +408,11 @@ function event_addon_command(...)
     if cmd == 'help' then
         messages:append('help >> reive test -- fills the chat log to show how the plugin will work. reload the plugin after the test (lua r reive)')
         messages:append('help >> reive reset -- sets gained exp and bayld to 0')
+        messages:append('help >> reive full-reset -- sets gained exp/total exp and bayld/total bayld to 0')
         messages:append('help >> reive show -- shows the tracking window')
         messages:append('help >> reive hide -- hides the tracking window')
         messages:append('help >> reive toggle -- toggles the tracking window')
         messages:append('help >> reive max-scores \30\02amount\30\01 -- sets the max amount of scores to show in the window')
-        messages:append('help >> reive reset-on-start \30\02reset\30\01 -- specifies if the exp and bayld will be reset at the begin of a reive')
         messages:append('help >> reive track \30\02score\30\01 \30\02visible\30\01 -- specifies the visibility of a score in the window')
         messages:append('help >> reive position [[-h]|[-x \30\02x\30\01] [-y \30\02y\30\01]] -- sets the horizontal and vertical position of the window relative to the upper-left corner')
         messages:append('help >> reive font [[-h]|[-f \30\02font\30\01] [-s \30\02size\30\01] [-a \30\02alpha\30\01] [-b[ \30\02bold\30\01]] [-i[ \30\02italic\30\01]]] -- sets the style of the font used in the window')
@@ -411,6 +421,8 @@ function event_addon_command(...)
         _reive.test()
     elseif cmd == 'reset' then
         _reive.reset()
+    elseif cmd == 'full-reset' then
+        _reive.fullReset()
     elseif cmd == 'show' then
         _reive.show()
     elseif cmd == 'hide' then
@@ -437,32 +449,6 @@ function event_addon_command(...)
 
         if errors:length() == 0 then
             _reive.settings.max_scores = max_scores
-
-            _reive.refresh()
-            _reive.settings:save('all')
-        end
-    elseif cmd == 'reset-on-start' then
-        local reset_on_start
-
-        if type(args[1]) == 'nil' then
-            messages:append('reset-on-start >> specifies if the exp and bayld will be reset at the begin of a reive')
-            messages:append('reset-on-start >> usage: reive reset-on-start \30\02reset\30\01')
-            messages:append('reset-on-start >> positional arguments:')
-            messages:append('reset-on-start >>   reset    reset exp and bayld at the begin of a reive (true/false/1/0)')
-        elseif args[1] == 'default' then
-            reset_on_start = _reive.defaults.reset_on_start
-        elseif args[1] == 'true' or args[1] == '1' or args[2] == 'default' then
-            reset_on_start = true
-        elseif args[1] == 'false' or args[1] == '0' then
-            reset_on_start = false
-        end
-
-        if type(reset_on_start) ~= "boolean" then
-            errors:append('reset-on-start >> reset-on-start expects \'reset\' to be a boolean (\'true\' or \'false\'), a number (\'1\' or \'0\') or \'default\' (without quotes)')
-        end
-
-        if errors:length() == 0 then
-            _reive.settings.reset_on_start = reset_on_start
 
             _reive.refresh()
             _reive.settings:save('all')

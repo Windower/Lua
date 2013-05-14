@@ -2,17 +2,11 @@
 <settings>
 	<global>
 		<colors>
-			<background>
-				<a>200</a>
-				<b>54</b>
-				<g>43</g>
-				<r>0</r>
-			</background>
-			<bonus>
+			<airlixir>
 				<label>
-					<b>0</b>
-					<g>153</g>
-					<r>133</r>
+					<b>152</b>
+					<g>161</g>
+					<r>42</r>
 				</label>
 				<title>
 					<b>47</b>
@@ -24,8 +18,14 @@
 					<g>161</g>
 					<r>147</r>
 				</value>
-			</bonus>
-			<reive>
+			</airlixir>
+			<background>
+				<a>200</a>
+				<b>54</b>
+				<g>43</g>
+				<r>0</r>
+			</background>
+			<delve>
 				<label>
 					<b>210</b>
 					<g>139</g>
@@ -41,19 +41,7 @@
 					<g>161</g>
 					<r>147</r>
 				</value>
-			</reive>
-			<score>
-				<label>
-					<b>152</b>
-					<g>161</g>
-					<r>42</r>
-				</label>
-				<title>
-					<b>47</b>
-					<g>50</g>
-					<r>220</r>
-				</title>
-			</score>
+			</delve>
 		</colors>
 		<first_run>true</first_run>
 		<font>
@@ -63,20 +51,10 @@
 			<italic>false</italic>
 			<size>10</size>
 		</font>
-		<max_scores>5</max_scores>
 		<position>
 			<x>0</x>
 			<y>350</y>
 		</position>
-		<track>
-			<abilities_recovery>true</abilities_recovery>
-			<hp_mp_boost>true</hp_mp_boost>
-			<hp_recovery>true</hp_recovery>
-			<mp_recovery>true</mp_recovery>
-			<status_recovery>true</status_recovery>
-			<stoneskin>true</stoneskin>
-			<tp_recovery>true</tp_recovery>
-		</track>
-		<v>1.20130520</v>
+		<v>0</v>
 	</global>
 </settings>
