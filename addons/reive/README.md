@@ -19,7 +19,6 @@ There is only one configuration file called settings.xml in the data folder of t
 * reive hide -- hides the tracking window
 * reive toggle -- toggles the tracking window
 * reive max-scores &lt;amount&gt; -- sets the max amount of scores to show in the window
-* reive reset-on-start &lt;reset&gt; -- specifies if the exp and bayld will be reset at the begin of a reive
 * reive track &lt;score&gt; &lt;visible&gt; -- specifies the visibility of a score in the window
 * reive position [[-h]|[-x &lt;x&gt;] [-y &lt;y&gt;]] -- sets the horizontal and vertical position of the window relative to the upper-left corner
 * reive font [[-h]|[-f &lt;font&gt;] [-s &lt;size&gt;] [-a &lt;alpha&gt;] [-b[ &lt;bold&gt;]] [-i[ &lt;italic&gt;]]] -- sets the style of the font used in the window
