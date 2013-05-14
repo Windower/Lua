@@ -285,6 +285,7 @@ function _reive.first_run()
     add_to_chat(55, 'thank you for using reive v'.._reive.v)
     add_to_chat(55, 'in this new version the addon will show both current and total gained bayld and exp in the "current/total" format.')
     add_to_chat(55, 'as of this now the "reset_on_start" parameter has no use anymore and has been removed.')
+    add_to_chat(55, '- zohno@phoenix')
 
     _reive.settings.v = _reive.v
     _reive.settings.first_run = false
