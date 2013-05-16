@@ -122,4 +122,4 @@ end
 
 function event_zone_change(fromId, from, toId, to)
 	log("Zone change, FromID: "..fromId..", From: "..from..", ToID: "..toId..", To: "..to)
-end
+end.

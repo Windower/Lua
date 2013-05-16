@@ -317,4 +317,4 @@ function parse_resources(lines_file)
         end
     end
     return completed_table
-end
+end.

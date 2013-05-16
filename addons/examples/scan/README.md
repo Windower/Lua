@@ -10,3 +10,4 @@ Commands:
 
 Purpose:
 Allows you to display the quantities you want in game. This addon is designed to be edited and used for debugging or whathaveyou
+.

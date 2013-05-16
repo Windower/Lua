@@ -153,3 +153,4 @@ function event_addon_command(...)
 		add_to_chat(17, 'To stop auto ranged attacks in the same manner:  Atl+d')
 	end
 end
+.

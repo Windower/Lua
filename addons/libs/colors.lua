@@ -74,4 +74,4 @@ function string.strip_format(str)
 	return (str:gsub('[\x1E\x1F\x7F].', ''):gsub('\xEF[\x27\x28]', ''))
 end
 
-return chat
+return chat.

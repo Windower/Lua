@@ -17,4 +17,4 @@ Addon to enable 1 macro status removal with the help of send.
  6. Silence
  7. Blindness
  8. Poison
- 9. Diseased
+ 9. Diseased.

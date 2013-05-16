@@ -100,4 +100,4 @@ function timeit.benchmark(rep, ...)
 	return bktimes
 end
 
-return timeit
+return timeit.

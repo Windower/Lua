@@ -584,4 +584,4 @@ end
 
 function event_unload()
 	send_command('unalias bm')
-end
+end.

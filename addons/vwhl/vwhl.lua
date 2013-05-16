@@ -284,4 +284,4 @@ function event_incoming_text(original, modified, mode)
     end
 
     return modified, mode
-end
+end.

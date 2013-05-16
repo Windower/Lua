@@ -8,3 +8,4 @@ If at any time your strat value is incorrect, then wait until all your stratagem
 The variables to use in spellcast are:
 `_SCH_Strats_Current` for the current number of strats available
 `_SCH_Strats_Max` for the maximum number of strats available to you
+.

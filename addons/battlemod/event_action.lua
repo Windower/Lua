@@ -553,4 +553,4 @@ function conjunctions(pre,post,target_count,current)
 		pre = pre..' and '
 	end
 	return pre..post
-end
+end.

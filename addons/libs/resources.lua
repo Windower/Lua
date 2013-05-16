@@ -129,4 +129,4 @@ function make_nested(node)
 end
 
 
-return resources
+return resources.

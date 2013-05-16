@@ -5,4 +5,4 @@ Addon to evaluate lua code via windower commands
 Abbreviation: //eval
 
 Use //eval to run arbitrary lua code.  For example, try:  
-//eval write(get_player()['name'])
+//eval write(get_player()['name']).

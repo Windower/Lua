@@ -262,3 +262,4 @@ end
 function string.map(str, fn)
 	return (str:gsub('.', fn))
 end
+.

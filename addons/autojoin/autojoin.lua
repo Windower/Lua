@@ -229,4 +229,4 @@ end
 function event_unload()
 	send_command('unalias autojoin')
 	send_command('unalias aj')
-end
+end.

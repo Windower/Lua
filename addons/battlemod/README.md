@@ -45,4 +45,4 @@ Known Issues:
 * Using //bm colortest and then expanding your chat log on small window size clients (640x480) can cause crashes. (Your guess is as good as mine)  
 * AoE buffs only use the first message response, so if it has no effect on the user then it will appear to have no effect on everyone even if it did.  
 * The settings files are much larger and more complicated than v1. (Sorry, it's because there's more options)  
-* This plugin bypasses and renders invalid all chat filters.  
+* This plugin bypasses and renders invalid all chat filters.  .

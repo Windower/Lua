@@ -66,4 +66,4 @@ end
 function event_unload()
 	tb_delete('targetid')
 	send_command('unalias targetidpos')
-end
+end.

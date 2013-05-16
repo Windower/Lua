@@ -11,4 +11,4 @@ end
 function event_addon_command(...)
     inp = table.concat({...}, ' ')
 	assert(loadstring(inp))()
-end
+end.

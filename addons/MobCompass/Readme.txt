@@ -35,4 +35,4 @@ Until the windower Devs solve the issue of a [wait|sleep|pause] function this ad
 
 please be aware this is being worked on and hopefully will fix the freeze i occasionally get when using the compass.
 
-hope you enjoy.
+hope you enjoy..

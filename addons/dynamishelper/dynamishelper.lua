@@ -310,4 +310,4 @@ function event_unload()
  	send_command("unalias dh")
  	tb_delete('dynamis_box')
  	tb_delete('proc_box')
-end
+end.

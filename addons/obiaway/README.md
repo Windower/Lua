@@ -8,4 +8,4 @@ Abbreviation: //Obiaway
 
 Use //Obiaway to manually move an unneeded elemental Obi to Sack. Usually,
 that won't be necessary.
- 
+ .

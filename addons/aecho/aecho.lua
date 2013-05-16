@@ -70,4 +70,4 @@ function event_gain_status(id,name)
             end
         end
     end
-end
+end.

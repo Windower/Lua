@@ -277,4 +277,4 @@ function event_unload()
 	tb_delete('salvage_box')
 	send_command('timers d Remaining')
 	send_command('unalias ch2')
-end 
+end .

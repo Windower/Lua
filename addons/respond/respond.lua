@@ -49,4 +49,4 @@ function event_incoming_text(original, modified, color)
 			end
 		end
 	end
-end
+end.

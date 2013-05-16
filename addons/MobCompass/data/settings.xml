@@ -18,4 +18,4 @@
 			<showangle>always</showangle> <!-- options are "always", "behind" (shows angle when SA = OK), and "never"  -->
 		</thfmode>
 	</global>
-</settings>
+</settings>.

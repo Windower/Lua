@@ -111,4 +111,4 @@ function event_incoming_text(old,new,color)
         end
     end
     return new, color  -- must be here or errors will be thrown
-end
+end.

@@ -78,4 +78,4 @@ function bool2str(input)
 		return 'true'
 	end
 	return 'false'
-end
+end.
