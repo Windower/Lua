@@ -51,6 +51,7 @@ _plasmon.stats.totAirlixirs2 = 0
 _plasmon.defaults = T{}
 _plasmon.defaults.v         = 0
 _plasmon.defaults.first_run = true
+_plasmon.defaults.light     = false
 
 _plasmon.defaults.position = T{}
 _plasmon.defaults.position.x = 0
@@ -109,7 +110,7 @@ _plasmon.settings = T{}
 function _plasmon.parseOptions(args)
     local options = T{}
 
-	while #args > 0 do
+    while #args > 0 do
         if not args[1]:match('^-%a') then
             break
         end
@@ -121,7 +122,7 @@ function _plasmon.parseOptions(args)
         else
             options[option] = true
         end
-	end
+    end
 
     return options
 end
@@ -143,14 +144,17 @@ function _plasmon.test()
     add_to_chat(121, 'You find an airlixir +1 on the Mob')
     add_to_chat(121, 'You find an airlixir +2 on the Mob')
     add_to_chat(121, 'Your time has expired for this battle. Now exiting...')
-	_plasmon.show()
+    _plasmon.show()
 end
 
 function _plasmon.start()
-	_plasmon.reset()
+    _plasmon.reset()
     _plasmon.track = true
     add_to_chat(0, '\30\03The Delve has begun!\30\01')
-    _plasmon.show()
+
+    if _plasmon.settings.light == false then
+        _plasmon.show()
+    end
 end
 
 function _plasmon.stop()
@@ -183,7 +187,7 @@ function _plasmon.refresh()
         ' \\cs('..airlixirColors.value.r..', '..airlixirColors.value.g..', '..airlixirColors.value.b..')'.._plasmon.stats.airlixirs1..'/'.._plasmon.stats.totAirlixirs1..'\\cr \n',
         ' \\cs('..airlixirColors.label.r..', '..airlixirColors.label.g..', '..airlixirColors.label.b..')Airlixir +2:\\cr',
         ' \\cs('..airlixirColors.value.r..', '..airlixirColors.value.g..', '..airlixirColors.value.b..')'.._plasmon.stats.airlixirs2..'/'.._plasmon.stats.totAirlixirs2..'\\cr'
-	}
+    }
 
     tb_set_text(_plasmon.tb_name, text:concat(''))
 end
@@ -203,7 +207,7 @@ function _plasmon.fullReset()
     _plasmon.stats.totAirlixirs  = 0
     _plasmon.stats.totAirlixirs1 = 0
     _plasmon.stats.totAirlixirs2 = 0
-	_plasmon.reset()
+    _plasmon.reset()
     _plasmon.refresh()
 end
 
@@ -237,8 +241,8 @@ function _plasmon.first_run()
 
     add_to_chat(55, 'hi '..get_player()['name']:lower()..',')
     add_to_chat(55, 'thank you for using plasmon v'.._plasmon.v)
-    add_to_chat(55, 'this is the first release so you may find some bugs here and there!')
-    add_to_chat(55, 'good delveing :)')
+    add_to_chat(55, 'in this update i\'ve added a light mode. when enabled the window will be kept hidden and only the summary will be shown at the end of the run.')
+    add_to_chat(55, 'use "plasmon light true/false" to enable or disable it.')
     add_to_chat(55, '- zohno@phoenix')
 
     _plasmon.settings.v = _plasmon.v
@@ -277,70 +281,70 @@ end
 function event_incoming_text(original, modified, mode)
     local match
 
-	match = original:match('Now permeating the mists surrounding the fracture%.')
+    match = original:match('Now permeating the mists surrounding the fracture%.')
 
-	if match then
-		_plasmon.start()
+    if match then
+        _plasmon.start()
 
-		return modified, mode
-	end
+        return modified, mode
+    end
 
-	match = original:match('Your time has expired for this battle%. Now exiting%.%.%.')
+    match = original:match('Your time has expired for this battle%. Now exiting%.%.%.')
 
-	if match and _plasmon.track then
-		_plasmon.stop()
+    if match and _plasmon.track then
+        _plasmon.stop()
 
-		return modified, mode
-	end
+        return modified, mode
+    end
 
-	match = original:match('You receive (%d+) corpuscles of mweya plasm%.')
+    match = original:match('You receive (%d+) corpuscles of mweya plasm%.')
 
-	if match and _plasmon.track then
-		_plasmon.stats.plasm    = _plasmon.stats.plasm + match
-		_plasmon.stats.totPlasm = _plasmon.stats.totPlasm + match
-		
-		if match ~= 50 or match ~= 500 or match ~= 750 then
-			mobs = match / 50
-		else
-			mobs = 1
-		end
-		
-		_plasmon.stats.mobs     = _plasmon.stats.mobs + mobs
-		_plasmon.stats.totMobs  = _plasmon.stats.totMobs + mobs
-		_plasmon.refresh()
+    if match and _plasmon.track then
+        _plasmon.stats.plasm    = _plasmon.stats.plasm + match
+        _plasmon.stats.totPlasm = _plasmon.stats.totPlasm + match
 
-		return modified, mode
-	end
+        if match ~= 50 or match ~= 500 or match ~= 750 then
+            mobs = match / 50
+        else
+            mobs = 1
+        end
 
-	match = original:match('You find an airlixir %+1')
+        _plasmon.stats.mobs     = _plasmon.stats.mobs + mobs
+        _plasmon.stats.totMobs  = _plasmon.stats.totMobs + mobs
+        _plasmon.refresh()
 
-	if match and _plasmon.track then
-		_plasmon.stats.airlixirs1    = _plasmon.stats.airlixirs1 + 1
-		_plasmon.stats.totAirlixirs1 = _plasmon.stats.totAirlixirs1 + 1
-		_plasmon.refresh()
+        return modified, mode
+    end
 
-		return modified, mode
-	end
+    match = original:match('You find an airlixir %+1')
 
-	match = original:match('You find an airlixir %+2')
+    if match and _plasmon.track then
+        _plasmon.stats.airlixirs1    = _plasmon.stats.airlixirs1 + 1
+        _plasmon.stats.totAirlixirs1 = _plasmon.stats.totAirlixirs1 + 1
+        _plasmon.refresh()
 
-	if match and _plasmon.track then
-		_plasmon.stats.airlixirs2    = _plasmon.stats.airlixirs2 + 1
-		_plasmon.stats.totAirlixirs2 = _plasmon.stats.totAirlixirs2 + 1
-		_plasmon.refresh()
+        return modified, mode
+    end
 
-		return modified, mode
-	end
+    match = original:match('You find an airlixir %+2')
 
-	match = original:match('You find an airlixir')
+    if match and _plasmon.track then
+        _plasmon.stats.airlixirs2    = _plasmon.stats.airlixirs2 + 1
+        _plasmon.stats.totAirlixirs2 = _plasmon.stats.totAirlixirs2 + 1
+        _plasmon.refresh()
 
-	if match and _plasmon.track then
-		_plasmon.stats.airlixirs    = _plasmon.stats.airlixirs + 1
-		_plasmon.stats.totAirlixirs = _plasmon.stats.totAirlixirs + 1
-		_plasmon.refresh()
+        return modified, mode
+    end
 
-		return modified, mode
-	end
+    match = original:match('You find an airlixir')
+
+    if match and _plasmon.track then
+        _plasmon.stats.airlixirs    = _plasmon.stats.airlixirs + 1
+        _plasmon.stats.totAirlixirs = _plasmon.stats.totAirlixirs + 1
+        _plasmon.refresh()
+
+        return modified, mode
+    end
 
     return modified, mode
 end
@@ -350,7 +354,7 @@ function event_addon_command(...)
     local messages = T{}
     local errors   = T{}
 
-	if args[1] == nil then
+    if args[1] == nil then
         send_command('plasmon help')
         return
     end
@@ -364,6 +368,7 @@ function event_addon_command(...)
         messages:append('help >> plasmon show -- shows the tracking window')
         messages:append('help >> plasmon hide -- hides the tracking window')
         messages:append('help >> plasmon toggle -- toggles the tracking window')
+        messages:append('help >> plasmon light [\30\02enabled\30\01] -- defines the light mode status')
         messages:append('help >> plasmon position [[-h]|[-x \30\02x\30\01] [-y \30\02y\30\01]] -- sets the horizontal and vertical position of the window relative to the upper-left corner')
         messages:append('help >> plasmon font [[-h]|[-f \30\02font\30\01] [-s \30\02size\30\01] [-a \30\02alpha\30\01] [-b[ \30\02bold\30\01]] [-i[ \30\02italic\30\01]]] -- sets the style of the font used in the window')
         messages:append('help >> plasmon color [[-h]|[-o \30\02objects\30\01] [-d] [-r \30\02red\30\01] [-g \30\02green\30\01] [-b \30\02blue\30\01] [-a \30\02alpha\30\01]] -- sets the colors used by the plugin')
@@ -379,6 +384,40 @@ function event_addon_command(...)
         _plasmon.hide()
     elseif cmd == 'toggle' then
         _plasmon.toggle()
+    elseif cmd == 'light' then
+        if type(args[1]) == 'nil' then
+            messages:append('light >> defines the light mode status. when enabled, the window will be kept hidden and only the summary will be show after the run')
+            messages:append('light >> usage: plasmon light \30\02enabled\30\01')
+            messages:append('light >> positional arguments:')
+            messages:append('light >>   enabled    define light mode status')
+        else
+            local light
+
+            if args[1] == 'default' then
+                light = _reive.defaults.light
+            elseif args[1] == 'true' or args[1] == '1' then
+                light = true
+            elseif args[1] == 'false' or args[1] == '0' then
+                light = false
+            end
+
+            if light == true then
+                _plasmon.hide()
+            elseif _plasmon.track == true then
+                _plasmon.show()
+            end
+
+            if type(light) ~= "boolean" then
+                errors:append('light >> light expects \'enabled\' to be a boolean (\'true\' or \'false\'), a number (\'1\' or \'0\') or \'default\' (without quotes)')
+            end
+
+            if errors:length() == 0 then
+                _plasmon.settings.light = light
+
+                _plasmon.refresh()
+                _plasmon.settings:save('all')
+            end
+        end
     else
         local options = _plasmon.parseOptions(args)
 
