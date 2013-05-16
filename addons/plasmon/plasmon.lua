@@ -394,7 +394,7 @@ function event_addon_command(...)
             local light
 
             if args[1] == 'default' then
-                light = _reive.defaults.light
+                light = _plasmon.defaults.light
             elseif args[1] == 'true' or args[1] == '1' then
                 light = true
             elseif args[1] == 'false' or args[1] == '0' then
