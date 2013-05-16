@@ -94,6 +94,7 @@ function options_load()
 	 Options for other modes are either "true" or "false". Other values will not be interpreted.-->
 <settings>
 	<global>
+		<condensedamage>true</condensedamage>
 		<condensebattle>true</condensebattle>
 		<condensebuffs>true</condensebuffs>
 		<cancelmulti>true</cancelmulti>
@@ -406,6 +407,9 @@ function event_addon_command(...)
 			elseif splitarr[2]:lower() == 'condensebuffs' then
 				condensebuffs = not condensebuffs
 				add_to_chat(121,'Condensed Buffs text flipped! - '..tostring(condensebuffs))
+			elseif splitarr[2]:lower() == 'condensedamage' then
+				condensedamage = not condensedamage
+				add_to_chat(121,'Condensed Damage text flipped! - '..tostring(condensedamage))
 			elseif splitarr[2]:lower() == 'cg' then
 				collectgarbage()
 			elseif splitarr[2]:lower() == 'colortest' then
@@ -429,18 +433,19 @@ function event_addon_command(...)
 				end
 				add_to_chat(122,'Colors Tested!')
 			elseif splitarr[2]:lower() == 'help' then
-				write('Battlemod has 9 commands')
+				write('Battlemod has 10 commands')
 				write(' 1. help --- shows this menu')
 				write(' 2. colortest --- Shows the 509 possible colors for use with the settings file')
 				write(' 3. reload --- Reloads the settings file')
 				write('Big Toggles:')
 				write(' 4. condensebuffs --- Condenses Area of Effect buffs, Default = True')
 				write(' 5. condensebattle --- Condenses battle logs according to your settings file, Default = True')
-				write(' 6. cancelmulti --- Cancles multiple consecutive identical lines, Default = True')
+				write(' 6. condensedamage --- Condenses damage messages within attack rounds, Default = True')
+				write(' 7. cancelmulti --- Cancles multiple consecutive identical lines, Default = True')
 				write('Sub Toggles:')
-				write(' 7. oxford --- Toggle use of oxford comma, Default = True')
-				write(' 8. commamode --- Toggle comma-only mode, Default = False')
-				write(' 9. targetnumber --- Toggle target number display, Default = True')
+				write(' 8. oxford --- Toggle use of oxford comma, Default = True')
+				write(' 9. commamode --- Toggle comma-only mode, Default = False')
+				write(' 10. targetnumber --- Toggle target number display, Default = True')
 			end
 		end
 	else
