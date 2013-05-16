@@ -75,8 +75,6 @@ function event_load()
 	items:update(parse_resources(itemsAFile:readlines()))
 	items:update(parse_resources(itemsWFile:readlines()))
 	
-	write(type(jobabilities[380]))
-
     send_command('alias bm lua c battlemod cmd')
 	options_load()
 	collectgarbage()
