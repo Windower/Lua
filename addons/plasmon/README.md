@@ -6,22 +6,18 @@
 This plugin tracks plasm, killed mobs and dropped airlixirs during a delve.
 There is only one configuration file called settings.xml in the data folder of the plugin.
 
-**Abbreviation:** //delve
+**Abbreviation:** //plasmon
 
 **Commands:**
 
-* delve test -- fills the chat log to show how the plugin will work. reload the plugin after the test (lua r delve)
-* delve reset -- sets gained exp and bayld to 0
-* delve show -- shows the tracking window
-* delve hide -- hides the tracking window
-* delve toggle -- toggles the tracking window
-* delve position [[-h]|[-x x] [-y y]] -- sets the horizontal and vertical position of the window relative to the upper-left corner
-* delve font [[-h]|[-f font] [-s size] [-a alpha] [-b[ bold]] [-i[ italic]]] -- sets the style of the font used in the window
-* delve color [[-h]|[-o objects] [-d] [-r red] [-g green] [-b blue] [-a alpha]] -- sets the colors used by the plugin
-
-**TODO**
-
-- [x] allow the user to change the settings using the console
+* plasmon test -- fills the chat log to show how the plugin will work. reload the plugin after the test (lua r plasmon)
+* plasmon reset -- sets gained exp and bayld to 0
+* plasmon show -- shows the tracking window
+* plasmon hide -- hides the tracking window
+* plasmon toggle -- toggles the tracking window
+* plasmon position [[-h]|[-x x] [-y y]] -- sets the horizontal and vertical position of the window relative to the upper-left corner
+* plasmon font [[-h]|[-f font] [-s size] [-a alpha] [-b[ bold]] [-i[ italic]]] -- sets the style of the font used in the window
+* plasmon color [[-h]|[-o objects] [-d] [-r red] [-g green] [-b blue] [-a alpha]] -- sets the colors used by the plugin
 
 #changelog
 ## v1.20130515
