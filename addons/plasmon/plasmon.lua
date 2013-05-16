@@ -1,5 +1,5 @@
 --[[
-plasmon v1.20130515
+plasmon v1.20130516
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -32,7 +32,7 @@ require 'stringhelper'
 local config = require 'config'
 
 local _plasmon = T{}
-_plasmon.v                   = '1.20130515'
+_plasmon.v                   = '1.20130516'
 _plasmon.tb_name             = 'addon:gr:plasmon'
 _plasmon.track               = false
 _plasmon.visible             = false
@@ -132,6 +132,7 @@ function _plasmon.test()
     add_to_chat(121, 'You find an airlixir on the Mob')
     add_to_chat(121, 'You receive 50 corpuscles of mweya plasm.')
     add_to_chat(121, 'You receive 50 corpuscles of mweya plasm.')
+    add_to_chat(121, 'You receive 150 corpuscles of mweya plasm.')
     add_to_chat(121, 'You receive 50 corpuscles of mweya plasm.')
     add_to_chat(121, 'You find an airlixir on the Mob')
     add_to_chat(121, 'You receive 500 corpuscles of mweya plasm.')
@@ -297,8 +298,15 @@ function event_incoming_text(original, modified, mode)
 	if match and _plasmon.track then
 		_plasmon.stats.plasm    = _plasmon.stats.plasm + match
 		_plasmon.stats.totPlasm = _plasmon.stats.totPlasm + match
-		_plasmon.stats.mobs     = _plasmon.stats.mobs + 1
-		_plasmon.stats.totMobs  = _plasmon.stats.totMobs + 1
+		
+		if match ~= 50 or match ~= 500 or match ~= 750 then
+			mobs = match / 50
+		else
+			mobs = 1
+		end
+		
+		_plasmon.stats.mobs     = _plasmon.stats.mobs + mobs
+		_plasmon.stats.totMobs  = _plasmon.stats.totMobs + mobs
 		_plasmon.refresh()
 
 		return modified, mode
