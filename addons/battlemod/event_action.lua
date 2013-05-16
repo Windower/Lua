@@ -14,58 +14,6 @@ function event_action(act)
 	local actor = actor_table['name']
 	if actor == nil then return end
 	actor = namecol(actor,actor_table,party_table)
-	
---	if condensebattle and condensedamage and act['category'] == 1 and act['target_count'] == 1 and #act['targets'][1]['actions']>1 then
---		local number,misses,ae,aestatus,th = 0,0,0,'',0
---		local abil,col,abil_ID,effect_val
---		local target_table = get_mob_by_id(act['targets'][1]['id'])
---		local target = target_table['name']
---		target = namecol(target,target_table,party_table)
---		
---		for i,v in pairs(act['targets'][1]['actions']) do
---			number = number + act['targets'][1]['actions'][i]['param']
---			if act['targets'][1]['actions'][i]['message'] == 15 then
---				misses = misses+1
---			end
---			if act['targets'][1]['actions'][i]['has_add_effect'] then
---				local addmsg = act['targets'][1]['actions'][i]['add_effect_message']
---				a,b = string.find(addmsg,'$\123status\125')
---				if a then
---					aestatus = aestatus..' '..statuses[act['targets'][1]['actions'][i]['add_effect_param']]['english']
---				elseif addmsg == 603 then
---					th = act['targets'][1]['actions'][i]['add_effect_param']
---				else
---					ae = ae + act['targets'][1]['actions'][i]['add_effect_param']
---				end
---			end
---		end
-		
---		if number > 0 then
---			abil = color_arr['abilcol']..'Damage ('..#act['targets'][1]['actions']..' Swings)'..rcol
---			col = 'D'
---		else
---			number = misses
---			abil = color_arr['abilcol']..'Misses'..rcol
---			col = 'M'
---		end
-		
---		local outstr = line_full:gsub('$\123lb\125','\7'):gsub('$\123actor\125',actor or ''):gsub('$\123target\125',target or ''):gsub('$\123abil\125',abil or ''):gsub('$\123number\125',number or '')
---		add_to_chat(colorfilt(col,target_table['id']==party_table['p0']['mob']['id']),string.char(0x1F,0xFE,0x1E,0x01)..outstr..string.char(127,49))
-		
---		if ae ~= 0 then
---			abil = 'Add. Eff.'
---			outstr = line_full:gsub('$\123lb\125','\7'):gsub('$\123actor\125',actor or ''):gsub('$\123target\125',target or ''):gsub('$\123abil\125',abil or ''):gsub('$\123number\125',ae or '')
---		end
---		if th ~= 0 then
---			abil = 'Treasure Hunter Level'
---			outstr = line_full:gsub('$\123lb\125','\7'):gsub('$\123actor\125',actor or ''):gsub('$\123target\125',target or ''):gsub('$\123abil\125',abil or ''):gsub('$\123number\125',th or '')
---		end
---		if aestatus ~= 0 then
---			abil = 'Add. Eff.'
---			outstr = line_full:gsub('$\123lb\125','\7'):gsub('$\123actor\125',actor or ''):gsub('$\123target\125',target or ''):gsub('$\123abil\125',abil or ''):gsub('$\123number\125',aestatus or '')
---		end
---		return
---	end
 
 	for i,v in pairs(act['targets']) do
 		--local shadows,parries,misses,hits = 0,0,0,0
@@ -365,6 +313,7 @@ function event_action(act)
 						else
 							abil = 'AE'
 						end
+						if abil and condensedamage then abil = abil..' ['..act['targets'][i]['actions'][n]['addcount']..']' end
 					else
 						add_eff_str = dialog[addmsg]['english']
 					end
@@ -399,6 +348,7 @@ function event_action(act)
 						abil = 'Spikes'
 						actor,actor_table,target,target_table,flipped = flip(actor,actor_table,target,target_table,flipped)
 					end
+					if abil and condensedamage then abil = abil..' ['..act['targets'][i]['actions'][n]['spikecount']..']' end
 					
 					a,b = string.find(dialog[spkmsg]['english'],'$\123number\125')
 					if a then
