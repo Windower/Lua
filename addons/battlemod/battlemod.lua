@@ -429,7 +429,7 @@ function event_addon_command(...)
 				end
 				add_to_chat(122,'Colors Tested!')
 			elseif splitarr[2]:lower() == 'help' then
-				write('Battlemod has 10 commands')
+				write('Battlemod has 9 commands')
 				write(' 1. help --- shows this menu')
 				write(' 2. colortest --- Shows the 509 possible colors for use with the settings file')
 				write(' 3. reload --- Reloads the settings file')
@@ -496,7 +496,8 @@ function event_incoming_text(original, modified, color)
 			j,b = string.find(original,'You must wait longer ')
 			k,b = string.find(original,'You throw away a ')
 			l,b = string.find(original,'You obtain ')
-			if a==nil and c==nil and d==nil and e==nil and f==nil and h==nil and g==nil and i==nil and j==nil and k==nil and l==nil then
+			m,b = string.find(original,'was lost')
+			if a==nil and c==nil and d==nil and e==nil and f==nil and h==nil and g==nil and i==nil and j==nil and k==nil and l==nil and m==nil then
 				modified = ''
 				if allow then
 					send_command('wait 5;lua c battlemod flip allow')

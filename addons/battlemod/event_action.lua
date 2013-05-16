@@ -15,61 +15,104 @@ function event_action(act)
 	if actor == nil then return end
 	actor = namecol(actor,actor_table,party_table)
 	
-	if condensebattle and condensedamage and act['category'] == 1 and act['target_count'] == 1 and #act['targets'][1]['actions']>1 then
-		local number,misses,ae,aestatus,th = 0,0,0,'',0
-		local abil,col,abil_ID,effect_val
-		local target_table = get_mob_by_id(act['targets'][1]['id'])
-		local target = target_table['name']
-		target = namecol(target,target_table,party_table)
+--	if condensebattle and condensedamage and act['category'] == 1 and act['target_count'] == 1 and #act['targets'][1]['actions']>1 then
+--		local number,misses,ae,aestatus,th = 0,0,0,'',0
+--		local abil,col,abil_ID,effect_val
+--		local target_table = get_mob_by_id(act['targets'][1]['id'])
+--		local target = target_table['name']
+--		target = namecol(target,target_table,party_table)
+--		
+--		for i,v in pairs(act['targets'][1]['actions']) do
+--			number = number + act['targets'][1]['actions'][i]['param']
+--			if act['targets'][1]['actions'][i]['message'] == 15 then
+--				misses = misses+1
+--			end
+--			if act['targets'][1]['actions'][i]['has_add_effect'] then
+--				local addmsg = act['targets'][1]['actions'][i]['add_effect_message']
+--				a,b = string.find(addmsg,'$\123status\125')
+--				if a then
+--					aestatus = aestatus..' '..statuses[act['targets'][1]['actions'][i]['add_effect_param']]['english']
+--				elseif addmsg == 603 then
+--					th = act['targets'][1]['actions'][i]['add_effect_param']
+--				else
+--					ae = ae + act['targets'][1]['actions'][i]['add_effect_param']
+--				end
+--			end
+--		end
 		
-		for i,v in pairs(act['targets'][1]['actions']) do
-			number = number + act['targets'][1]['actions'][i]['param']
-			if act['targets'][1]['actions'][i]['message'] == 15 then
-				misses = misses +1
-			end
-			if act['targets'][1]['actions'][i]['has_add_effect'] then
-				local addmsg = act['targets'][1]['actions'][i]['add_effect_message']
-				a,b = string.find(addmsg,'$\123status\125')
-				if a then
-					aestatus = aestatus..' '..statuses[act['targets'][1]['actions'][i]['add_effect_param']]['english']
-				elseif addmsg == 603 then
-					th = act['targets'][1]['actions'][i]['add_effect_param']
-				else
-					ae = ae + act['targets'][1]['actions'][i]['add_effect_param']
-				end
-			end
-		end
+--		if number > 0 then
+--			abil = color_arr['abilcol']..'Damage ('..#act['targets'][1]['actions']..' Swings)'..rcol
+--			col = 'D'
+--		else
+--			number = misses
+--			abil = color_arr['abilcol']..'Misses'..rcol
+--			col = 'M'
+--		end
 		
-		if number > 0 then
-			abil = color_arr['abilcol']..'Damage ('..#act['targets'][1]['actions']..' Swings)'..rcol
-			col = 'D'
-		else
-			number = misses
-			abil = color_arr['abilcol']..'Misses'..rcol
-			col = 'M'
-		end
+--		local outstr = line_full:gsub('$\123lb\125','\7'):gsub('$\123actor\125',actor or ''):gsub('$\123target\125',target or ''):gsub('$\123abil\125',abil or ''):gsub('$\123number\125',number or '')
+--		add_to_chat(colorfilt(col,target_table['id']==party_table['p0']['mob']['id']),string.char(0x1F,0xFE,0x1E,0x01)..outstr..string.char(127,49))
 		
-		local outstr = line_full:gsub('$\123lb\125','\7'):gsub('$\123actor\125',actor or ''):gsub('$\123target\125',target or ''):gsub('$\123abil\125',abil or ''):gsub('$\123number\125',number or '')
-		add_to_chat(colorfilt(col,target_table['id']==party_table['p0']['mob']['id']),string.char(0x1F,0xFE,0x1E,0x01)..outstr..string.char(127,49))
-		
-		if ae ~= 0 then
-			abil = 'Add. Eff.'
-			outstr = line_full:gsub('$\123lb\125','\7'):gsub('$\123actor\125',actor or ''):gsub('$\123target\125',target or ''):gsub('$\123abil\125',abil or ''):gsub('$\123number\125',ae or '')
-		end
-		if th ~= 0 then
-			abil = 'Treasure Hunter Level'
-			outstr = line_full:gsub('$\123lb\125','\7'):gsub('$\123actor\125',actor or ''):gsub('$\123target\125',target or ''):gsub('$\123abil\125',abil or ''):gsub('$\123number\125',th or '')
-		end
-		if aestatus ~= 0 then
-			abil = 'Add. Eff.'
-			outstr = line_full:gsub('$\123lb\125','\7'):gsub('$\123actor\125',actor or ''):gsub('$\123target\125',target or ''):gsub('$\123abil\125',abil or ''):gsub('$\123number\125',aestatus or '')
-		end
-		return
-	end
+--		if ae ~= 0 then
+--			abil = 'Add. Eff.'
+--			outstr = line_full:gsub('$\123lb\125','\7'):gsub('$\123actor\125',actor or ''):gsub('$\123target\125',target or ''):gsub('$\123abil\125',abil or ''):gsub('$\123number\125',ae or '')
+--		end
+--		if th ~= 0 then
+--			abil = 'Treasure Hunter Level'
+--			outstr = line_full:gsub('$\123lb\125','\7'):gsub('$\123actor\125',actor or ''):gsub('$\123target\125',target or ''):gsub('$\123abil\125',abil or ''):gsub('$\123number\125',th or '')
+--		end
+--		if aestatus ~= 0 then
+--			abil = 'Add. Eff.'
+--			outstr = line_full:gsub('$\123lb\125','\7'):gsub('$\123actor\125',actor or ''):gsub('$\123target\125',target or ''):gsub('$\123abil\125',abil or ''):gsub('$\123number\125',aestatus or '')
+--		end
+--		return
+--	end
 
 	for i,v in pairs(act['targets']) do
 		--local shadows,parries,misses,hits = 0,0,0,0
 		--local damage,add_eff_damage,counter_damage,spike_damage = 0,0,0,0
+		
+		if condensedamage then
+			local messages = {}
+			local addmessages = {}
+			local spikemessages = {}
+			for n,m in pairs(act['targets'][i]['actions']) do
+				local msg = act['targets'][i]['actions'][n]['message']
+				if messages[msg] then
+					local address = messages[msg]['address']
+					act['targets'][i]['actions'][address]['param'] = act['targets'][i]['actions'][address]['param'] + act['targets'][i]['actions'][n]['param']
+					act['targets'][i]['actions'][address]['count'] = act['targets'][i]['actions'][address]['count'] + 1
+					act['targets'][i]['actions'][n]['message'] = 0
+				else
+					messages[msg] = {}
+					messages[msg]['address'] = n
+					act['targets'][i]['actions'][n]['count'] = 1
+				end
+				
+				local addmsg = act['targets'][i]['actions'][n]['add_effect_message']
+				if addmessages[addmsg] then
+					local address = addmessages[addmsg]['address']
+					act['targets'][i]['actions'][address]['add_effect_param'] = act['targets'][i]['actions'][address]['add_effect_param'] + act['targets'][i]['actions'][n]['add_effect_param']
+					act['targets'][i]['actions'][address]['addcount'] = act['targets'][i]['actions'][address]['addcount'] + 1
+					act['targets'][i]['actions'][n]['add_effect_message'] = 0
+				else
+					addmessages[addmsg] = {}
+					addmessages[addmsg]['address'] = n
+					act['targets'][i]['actions'][n]['addcount'] = 1
+				end
+				
+				local spikemsg = act['targets'][i]['actions'][n]['spike_effect_message']
+				if spikemessages[spikemsg] then
+					local address = spikemessages[spikemsg]['address']
+					act['targets'][i]['actions'][address]['spike_effect_param'] = act['targets'][i]['actions'][address]['spike_effect_param'] + act['targets'][i]['actions'][n]['spike_effect_param']
+					act['targets'][i]['actions'][address]['spikecount'] = act['targets'][i]['actions'][address]['spikecount'] + 1
+					act['targets'][i]['actions'][n]['spike_effect_message'] = 0
+				else
+					spikemessages[spikemsg] = {}
+					spikemessages[spikemsg]['address'] = n
+					act['targets'][i]['actions'][n]['spikecount'] = 1
+				end
+			end
+		end
 		
 		for n,m in pairs(act['targets'][i]['actions']) do
 			local msg_ID = act['targets'][i]['actions'][n]['message']
@@ -110,6 +153,7 @@ function event_action(act)
 					effect_val = act['targets'][i]['actions'][n]['param']
 					write('debug_cat1: '..act['targets'][i]['actions'][n]['param']..' '..msg_ID)
 				end
+				if abil and condensedamage then abil = abil..' ['..act['targets'][i]['actions'][n]['count']..']' end
 			elseif act['category'] == 2 then -- Ranged attacks
 				effect_val = act['targets'][i]['actions'][n]['param']
 				if msg_ID == 352 then abil = 'RA'
@@ -175,16 +219,11 @@ function event_action(act)
 			end
 			
 			if abil_ID == 53 and act['category'] == 6 then -- Gauge handling
-				if msg_ID == 210 then
-					ability = 'Gauge (Cannot charm - '
-				elseif msg_ID == 211 then
-					ability = 'Gauge (Very Difficult - '
-				elseif msg_ID == 212 then
-					ability = 'Gauge (Difficult - '
-				elseif msg_ID == 213 then
-					ability = 'Gauge (Might be able - '
-				elseif msg_ID == 214 then
-					ability = 'Gauge (Should be able - '
+				if msg_ID == 210 then ability = 'Gauge (Cannot charm - '
+				elseif msg_ID == 211 then ability = 'Gauge (Very Difficult - '
+				elseif msg_ID == 212 then ability = 'Gauge (Difficult - '
+				elseif msg_ID == 213 then ability = 'Gauge (Might be able - '
+				elseif msg_ID == 214 then ability = 'Gauge (Should be able - '
 				end
 				ability = ability..effect_val..')'
 			end
@@ -243,10 +282,9 @@ function event_action(act)
 						number = nil
 					end
 					if condensebattle then
-						if not abil then
-							abil = 'AoE'
-						end
-						if abil == 'Steal' or abil == 'Despoil' or abil == 'Scavenge' or abil == 'Mug' then
+						if not abil then abil = 'AoE' end
+						
+						if T{'Steal','Despoil','Scavenge','Mug'}:contains(abil) then
 							prepstr = dialog[msg_ID]['english']
 						elseif abil and number and target and actor then
 							prepstr = line_full
@@ -257,7 +295,7 @@ function event_action(act)
 						elseif not actor then
 							prepstr = line_noactor
 						end
-					else
+					else -- Handles exceptions and people that don't condense battle messages
 						prepstr = dialog[msg_ID]['english']
 					end
 				elseif dialog[msg_ID] then -- Default case?
@@ -299,16 +337,7 @@ function event_action(act)
 						add_to_chat(persistantcolor,persistantmessage)
 					end
 				else
-					-- Applies the proper connectors to the target series
-					if i < act['target_count'] or commamode then
-						persistanttarget = persistanttarget..', '
-					else
-						if oxford and act['target_count'] >2 then
-							persistanttarget = persistanttarget..','
-						end
-						persistanttarget = persistanttarget..' and '
-					end
-					persistanttarget = persistanttarget..target
+					persistanttarget = conjunctions(persistanttarget,target,act['target_count'],i)
 				end
 			end
 			
@@ -332,9 +361,9 @@ function event_action(act)
 						elseif addmsg > 384 and addmsg < 399 then
 							abil = skillchain_arr[addmsg-384]
 						elseif addmsg ==603 then
-							abil = 'Treasure Hunter Level'
+							abil = 'TH'
 						else
-							abil = 'Add. Eff.'
+							abil = 'AE'
 						end
 					else
 						add_eff_str = dialog[addmsg]['english']
@@ -560,4 +589,16 @@ function fieldsearch(message)
 	fieldarr = {}
 	string.gsub(message,"{(.-)}", function(a) if a ~= '${actor}' and a ~= '${target}' then fieldarr[#fieldarr+1] = a end end)
 	return fieldarr
+end
+
+function conjunctions(pre,post,target_count,current)
+	if current < target_count or commamode then
+		pre = pre..', '
+	else
+		if oxford and target_count >2 then
+			pre = pre..','
+		end
+		pre = pre..' and '
+	end
+	return pre..post
 end
