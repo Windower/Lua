@@ -764,4 +764,4 @@ function event_addon_command(...)
     for key, message in pairs(messages) do
         add_to_chat(55,'lua:addon:plasmon:'..message)
     end
-end.
+end

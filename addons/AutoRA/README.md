@@ -15,4 +15,4 @@ ara [options]
 	stop   - Stops Ranged Attacking (Identical to ALT + D)
 	shoot  - Fires a ranged attack
 	reload - Reloads settings
-	help   - Shows Version info and available commands.
+	help   - Shows Version info and available commands

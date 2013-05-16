@@ -384,4 +384,4 @@ function event_addon_command(...)
 			add_to_chat(17, '   Resets to what is stored in settings upon unloading of addon.  To Permanently change, please change the option in the settings file.')
 		end
 	end
-end.
+end

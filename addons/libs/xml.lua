@@ -482,4 +482,4 @@ function table.to_xml(t, indentlevel)
 	return str
 end
 
-return xml.
+return xml

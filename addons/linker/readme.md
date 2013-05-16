@@ -24,4 +24,3 @@ Opens certain links via simple console commands, with an optional search string.
 //web g [query] # Google
 //web wa [query] # Wolfram|Alpha
 ```
-.

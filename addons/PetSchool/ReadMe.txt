@@ -25,4 +25,4 @@ Commands:
 
 //ps [options]
 	reload - Reloads Settings
-	help   - Displays Version information and commands.
+	help   - Displays Version information and commands

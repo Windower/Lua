@@ -135,4 +135,3 @@ function set.tostring(s)
 end
 
 _meta.S.__tostring = set.tostring
-.

@@ -7,4 +7,3 @@
 		<whitelist />                    <!-- When in whitelist mode, it will only accept invites from these people. -->
 	</global>
 </settings>
-.

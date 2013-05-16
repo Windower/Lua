@@ -10,4 +10,4 @@ The available chars depend on the data gathered by the windower team (https://gi
 
 * //chars -- will show the available characters
 
-![screenshot](https://raw.github.com/giulianoriccio/Lua/master/addons/chars/chars.gif).
+![screenshot](https://raw.github.com/giulianoriccio/Lua/master/addons/chars/chars.gif)

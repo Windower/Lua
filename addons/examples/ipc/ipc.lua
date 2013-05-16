@@ -14,4 +14,4 @@ end
 
 function event_ipc_message(msg)
 	add_to_chat(5, msg)
-end.
+end

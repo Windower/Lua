@@ -372,4 +372,3 @@ function config.reset()
 end
 
 return config
-.

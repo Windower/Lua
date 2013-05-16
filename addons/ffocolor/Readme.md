@@ -13,4 +13,4 @@ Addon to make ffochat show up in one of the 5 in-game chat tabs (say/shout/links
  5. //ffocolor watchname &lt;name&gt; -- Track another name
  6. //ffocolor getcolors -- Show a list of color codes. Be aware this is 255 lines of text
  7. //ffocolor unload --Save settings and close ffocolor.
- 8. //ffocolor help --Shows this menu..
+ 8. //ffocolor help --Shows this menu.

@@ -23,4 +23,4 @@ v1.1 - v1.15
  * Added //aset list into the help menu given in game (it worked before but i forgot to include it)
   
 v1.0 - v1.1  
- * Fixed issue with saving sets..
+ * Fixed issue with saving sets.

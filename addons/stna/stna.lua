@@ -113,4 +113,4 @@ function event_lose_status(id,name)
 			return
 		end
 	end
-end.
+end

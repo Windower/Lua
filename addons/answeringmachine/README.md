@@ -13,4 +13,3 @@ Commands:
 
 Purpose:
 To record tells received while you are afk and play them back at your leisure.
-.

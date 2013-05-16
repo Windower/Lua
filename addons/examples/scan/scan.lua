@@ -61,4 +61,4 @@ function split(msg, match)
 		end
 	end
 	return splitarr
-end.
+end

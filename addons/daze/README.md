@@ -9,4 +9,4 @@ Commands:
 * help : Lists commands in game.
 
 Purpose:
-To record what dazes are active on the monster you are fighting..
+To record what dazes are active on the monster you are fighting.

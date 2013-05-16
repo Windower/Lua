@@ -228,4 +228,3 @@ function file.appendlines(f, lines, newline)
 end
 
 return file
-.

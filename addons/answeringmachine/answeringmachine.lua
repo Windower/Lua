@@ -126,4 +126,4 @@ function uc_first(msg)
 	local first_char = msg:sub(1,1)
 	local rest = msg:sub(2,length)
 	return first_char:upper()..rest:lower()
-end.
+end

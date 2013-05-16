@@ -25,4 +25,3 @@ v1.08 - v1.09:
 * Changed the way //strack reset works so your settings that you have changed stay.  
 * Added check for atma wearing that will reset the list.  
 * With the above 2 checks the //strack reset command is not needed but i left it in anyway  
-.

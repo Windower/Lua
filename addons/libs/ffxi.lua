@@ -80,4 +80,3 @@ function ffxi.index_to_name(index)
 end
 
 return ffxi
-.

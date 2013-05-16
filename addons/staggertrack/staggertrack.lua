@@ -239,4 +239,3 @@ function split(msg, match)
 	end
 	return splitarr
 end
-.

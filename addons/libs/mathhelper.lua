@@ -84,4 +84,3 @@ function math.tobase(val, base)
 	
 	return str
 end
-.

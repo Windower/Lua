@@ -255,4 +255,4 @@ function table.format(t, trail, subs)
 	end
 	
 	return t:slice(1, -2):concat(', ')..last..t:last()
-end.
+end

@@ -6,4 +6,3 @@ Load and use:
 //ipc my message here
 
 to display that message in the chatlog of all other window instances with the ipc addon loaded
-.

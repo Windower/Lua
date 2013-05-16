@@ -26,4 +26,3 @@ Replacement for yarnregex for Windower 4 I made for a friend. Uses the chat log 
  *Fixed magic messages due to the spell resources being different
  *Added confirmation and boxflash on settings change
  *Settings file updated. moblist.xml deprecated
-.

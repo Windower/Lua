@@ -22,4 +22,4 @@ function event_outgoing_text(original, modified)
     end
     
     return modified
-end.
+end

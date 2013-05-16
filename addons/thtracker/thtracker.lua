@@ -118,4 +118,4 @@ function event_unload()
 	tb_delete('th_box')
 
 	send_command('unalias th')
-end .
+end 

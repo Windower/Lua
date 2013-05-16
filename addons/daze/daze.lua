@@ -126,4 +126,4 @@ function update_box()
 			tb_set_text('daze_box','No dazes present')
 		end
 	end
-end.
+end

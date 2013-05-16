@@ -18,4 +18,4 @@
 		<line_aoebuff>${actor} ${abil} ¨ ${target} (${status})</line_aoebuff>
 		<line_roll>${actor} ${abil} ¨ ${target} ª ${number}</line_roll>
 	</global>
-</settings>.
+</settings>
