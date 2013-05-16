@@ -19,10 +19,6 @@ There is only one configuration file called settings.xml in the data folder of t
 * plasmon font [[-h]|[-f font] [-s size] [-a alpha] [-b[ bold]] [-i[ italic]]] -- sets the style of the font used in the window
 * plasmon color [[-h]|[-o objects] [-d] [-r red] [-g green] [-b blue] [-a alpha]] -- sets the colors used by the plugin
 
-**TODO**
-
-- [x] allow the user to change the settings using the console
-
 #changelog
 ## v1.20130515
 * first release, please report any bug you may find :)
