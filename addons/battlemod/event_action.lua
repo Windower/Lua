@@ -101,7 +101,7 @@ function event_action(act)
 					effect_val = act['targets'][i]['actions'][n]['param']
 					write('debug_cat1: '..act['targets'][i]['actions'][n]['param']..' '..msg_ID)
 				end
-				if abil and condensedamage then abil = abil..' ['..act['targets'][i]['actions'][n]['count']..']' end
+				if abil and condensedamage and not act['targets'][i]['actions'][n]['count'] == 1 then abil = abil..' ['..act['targets'][i]['actions'][n]['count']..']' end
 			elseif act['category'] == 2 then -- Ranged attacks
 				effect_val = act['targets'][i]['actions'][n]['param']
 				if msg_ID == 352 then abil = 'RA'
@@ -313,7 +313,7 @@ function event_action(act)
 						else
 							abil = 'AE'
 						end
-						if abil and condensedamage and act['category'] == 1 then abil = abil..' ['..act['targets'][i]['actions'][n]['addcount']..']' end
+						if abil and condensedamage and act['category'] == 1 and not act['targets'][i]['actions'][n]['addcount'] == 1 then abil = abil..' ['..act['targets'][i]['actions'][n]['addcount']..']' end
 					else
 						add_eff_str = dialog[addmsg]['english']
 					end
@@ -348,7 +348,7 @@ function event_action(act)
 						abil = 'Spikes'
 						actor,actor_table,target,target_table,flipped = flip(actor,actor_table,target,target_table,flipped)
 					end
-					if abil and condensedamage then abil = abil..' ['..act['targets'][i]['actions'][n]['spikecount']..']' end
+					if abil and condensedamage and not act['targets'][i]['actions'][n]['spikecount'] == 1 then abil = abil..' ['..act['targets'][i]['actions'][n]['spikecount']..']' end
 					
 					a,b = string.find(dialog[spkmsg]['english'],'$\123number\125')
 					if a then
