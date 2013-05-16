@@ -1,6 +1,6 @@
 **Author:** Giuliano Riccio
 
-**Version:** v 1.20130515
+**Version:** v 1.20130516
 
 **Description:**
 This plugin tracks plasm, killed mobs and dropped airlixirs during a delve.
@@ -15,18 +15,25 @@ There is only one configuration file called settings.xml in the data folder of t
 * plasmon show -- shows the tracking window
 * plasmon hide -- hides the tracking window
 * plasmon toggle -- toggles the tracking window
-* plasmon position [[-h]|[-x x] [-y y]] -- sets the horizontal and vertical position of the window relative to the upper-left corner
-* plasmon font [[-h]|[-f font] [-s size] [-a alpha] [-b[ bold]] [-i[ italic]]] -- sets the style of the font used in the window
-* plasmon color [[-h]|[-o objects] [-d] [-r red] [-g green] [-b blue] [-a alpha]] -- sets the colors used by the plugin
+* plasmon light &lt;enabled&gt; -- defines the light mode status
+* plasmon position [[-h]|[-x &lt;x&gt;] [-y &lt;y&gt;]] -- sets the horizontal and vertical position of the window relative to the upper-left corner
+* plasmon font [[-h]|[-f &lt;font&gt;] [-s &lt;size&gt;] [-a &lt;alpha&gt;] [-b[ &lt;bold&gt;]] [-i[ &lt;italic&gt;]]] -- sets the style of the font used in the window
+* plasmon color [[-h]|[-o &lt;objects&gt;] [-d] [-r &lt;red&gt;] [-g &lt;green&gt;] [-b &lt;blue&gt;] [-a &lt;alpha&gt;]] -- sets the colors used by the plugin
 
 #changelog
+## v1.20130516
+* **add:** a "light mode" has been added. while active, the window will be kept hidden and only a summary will be shown at the end of the run
+
 ## v1.20130515
 * first release, please report any bug you may find :)
 
 #config
+## light
+* **enabled:** **true** or **false**, the light mode status
+
 ## position
-* **x:** horizontal position of the window from top left
-* **y:** vertical position of the window from top left
+* **x:** the horizontal position of the window from top left
+* **y:** the vertical position of the window from top left
 
 ## font
 * **family:** the name of the font to use

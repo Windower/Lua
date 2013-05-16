@@ -63,6 +63,7 @@
 			<italic>false</italic>
 			<size>10</size>
 		</font>
+		<light>false</light>
 		<max_scores>5</max_scores>
 		<position>
 			<x>0</x>
@@ -77,6 +78,6 @@
 			<stoneskin>true</stoneskin>
 			<tp_recovery>true</tp_recovery>
 		</track>
-		<v>1.20130520</v>
+		<v>0</v>
 	</global>
 </settings>
