@@ -313,7 +313,7 @@ function event_action(act)
 						else
 							abil = 'AE'
 						end
-						if abil and condensedamage then abil = abil..' ['..act['targets'][i]['actions'][n]['addcount']..']' end
+						if abil and condensedamage and act['category'] == 1 then abil = abil..' ['..act['targets'][i]['actions'][n]['addcount']..']' end
 					else
 						add_eff_str = dialog[addmsg]['english']
 					end
