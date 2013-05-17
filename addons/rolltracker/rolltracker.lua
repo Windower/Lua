@@ -50,6 +50,7 @@ end
 function event_load()
 	send_command('alias rolltracker lua c rolltracker')
 	override=0
+	
 	player=get_player()['name']
 	luckyroll = 0
 	roll_id ={ 
@@ -132,38 +133,42 @@ end
 
 function event_action(act)
 	id = act['actor_id']
-		if act['category']==6 then
-			roller = act['param']
-			rollnum = act['targets'][1]['actions'][1]['param']
-			effected_member={}
-			number = #effected_member
-			bust_rate(rollnum)
-			for i=1, #roll_id do
-				if roller == roll_id[i] then
-					for n=1, #act['targets'] do
-						for z in pairs(get_party()) do
-							if get_party()[z]['mob'] ~= nil then
-								if act['targets'][n]['id'] == get_party()[z]['mob']['id'] then	
-									effected_member[n]=player_color[z]..get_party()[z]['name']
+	if act['category']==6 then
+		roller = act['param']
+		rollnum = act['targets'][1]['actions'][1]['param']
+		effected_member={}
+		number = #effected_member
+		bust_rate(rollnum)
+		for i=1, #act['targets'] do
+			if act['targets'][i]['id'] == get_player()['id'] then
+				for i=1, #roll_id do
+					if roller == roll_id[i] then
+						for n=1, #act['targets'] do
+							for z in pairs(get_party()) do
+								if get_party()[z]['mob'] ~= nil then
+									if act['targets'][n]['id'] == get_party()[z]['mob']['id'] then	
+										effected_member[n]=player_color[z]..get_party()[z]['name']
+									end
 								end
 							end
 						end
-					end
-					local effected_write = table.concat(effected_member, ', ')
-					luckyroll=0
-					if #effected_member > 0 then
-						if rollnum == roll_luck[i] or rollnum == 11 then 
-							luckyroll = 1
-							add_to_chat(1, '['..#effected_member..'] '..effected_write..string.char(31,1)..' >>> '..roll_ident[tostring(roller)]..' Roll ('..rollnum..')'..string.char(31,158)..' (Lucky!)'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
-						elseif rollnum==12 and #effected_member > 0 then
-							add_to_chat(1, string.char(31,167)..'Bust! ('..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')')
-						else
-							add_to_chat(1, '['..#effected_member..'] '..effected_write..string.char(31,1)..' >>> '..roll_ident[tostring(roller)]..' Roll ('..rollnum..')'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
+						local effected_write = table.concat(effected_member, ', ')
+						luckyroll=0
+						if #effected_member > 0 then
+							if rollnum == roll_luck[i] or rollnum == 11 then 
+								luckyroll = 1
+								add_to_chat(1, '['..#effected_member..'] '..effected_write..string.char(31,1)..' >>> '..roll_ident[tostring(roller)]..' Roll ('..rollnum..')'..string.char(31,158)..' (Lucky!)'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
+							elseif rollnum==12 and #effected_member > 0 then
+								add_to_chat(1, string.char(31,167)..'Bust! ('..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')')
+							else
+								add_to_chat(1, '['..#effected_member..'] '..effected_write..string.char(31,1)..' >>> '..roll_ident[tostring(roller)]..' Roll ('..rollnum..')'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
+							end
 						end
 					end
+				end
 			end
 		end
-end
+	end
 end
 
 function bust_rate(num)
