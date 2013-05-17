@@ -421,13 +421,7 @@ function table.undomify(node, types)
 		local val = children[1] or ''
 		if node_type == 'set' then
 			res.children = val:split(','):map(string.trim):filter(-'')
-			res.value = S(res.children)
-			res.it = function()
-				local key
-				return function()
-					return next(res, key)
-				end
-			end
+			res.value = S(children)
 		elseif node_type == 'list' then
 			res.value = val:split(','):map(string.trim):filter(-'')
 			res.children = res.value
@@ -435,13 +429,21 @@ function table.undomify(node, types)
 			res.value = tonumber(val)
 			res.children = L{res.value}
 		elseif node_type == 'boolean' then
-			res.value = res.children[1]
+			res.value = val == 'true'
 			res.children = L{res.value}
 		end
 	end
 	
 	if res.children == nil then
 		res.children = children
+	end
+	
+	res.get = function(t, val)
+		for child in t.children:it() do
+			if child.name == val then
+				return child
+			end
+		end
 	end
 	
 	res.name = node.name
