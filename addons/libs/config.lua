@@ -7,8 +7,6 @@ _libs.config = true
 _libs.logger = _libs.logger or require 'logger'
 _libs.tablehelper = _libs.tablehelper or require 'tablehelper'
 _libs.stringhelper = _libs.stringhelper or require 'stringhelper'
-local json = require 'json'
-_libs.json = _libs.json or (json ~= nil)
 local xml = require 'xml'
 _libs.xml = _libs.xml or (xml ~= nil)
 local files = require 'filehelper'
@@ -47,7 +45,7 @@ function config.load(filename, confdict, overwrite)
 	local confdict_mt = getmetatable(confdict)
 	confdict = setmetatable(confdict, {__index = function(t, x) if config[x] ~= nil then return config[x] else return confdict_mt.__index[x] end end})
 	
-	-- Sets paths depending on whether it's a script or addon loading this file.
+	-- Load addon config file (Windower/addon/<addonname>/data/settings.xml).
 	local filepath = filename or files.check('data/settings.xml')
 	if filepath == nil then
 		file:set('data/settings.xml', true)
@@ -57,7 +55,6 @@ function config.load(filename, confdict, overwrite)
 	end
 	file:set(filepath)
 
-	-- Load addon/script config file (Windower/addon/<addonname>/config.json for addons and Windower/scripts/<name>-config.json).
 	local err
 	confdict, err = parse(file, confdict, overwrite)
 
@@ -120,17 +117,20 @@ function merge(t, t_merge, path)
 	local err
 	for key, val in pairs(t_merge) do
 		err = false
-		oldval = t[key]
+		oldval = rawget(t, key)
 		if type(oldval) == 'table' and type(val) == 'table' then
-			if path then
-				t[key] = merge(oldval, val, path:copy()+key)
-			else
-				t[key] = merge(oldval, val, nil)
-			end
+			local res = merge(oldval, val, path and path:copy()+key or nil)
+			t[key] = setmetatable(res, getmetatable(res) or _meta.T)
 		elseif type(oldval) ~= type(val) then
 			if type(oldval) == 'table' then
 				if type(val) == 'string' then
-					t[key] = table.map(val:split(','), string.trim)
+					local res = list.map(val:split(','), string.trim)
+					if class and class(oldval) == 'Set' then
+						res = S(res)
+					elseif class and class(oldval) == 'Table' then
+						res = T(res)
+					end
+					t[key] = res
 				else
 					err = true
 				end
@@ -317,16 +317,16 @@ function nest_xml(t, indentlevel)
 	local inlines = T{}
 	local fragments = T{}
 	local maxlength = 0		-- For proper comment indenting
-	keys = t:keyset():sort()
+	keys = t:sort():keyset()
 	local val
 	for _, key in ipairs(keys) do
-		val = t[key]
+		val = rawget(t, key)
 		if type(val) == 'table' and not T(val):isarray() then
 			fragments:append(indent..'<'..key..'>\n')
 			if comments[key] ~= nil then
 				local c = ('<!-- '..comments[key]:trim()..' -->'):split('\n')
 				local pre = ''
-				for _, cstr in pairs(c) do
+				for cstr in c.it() do
 					fragments:append(indent..pre..cstr:trim()..'\n')
 					pre = '\t '
 				end
@@ -352,7 +352,7 @@ function nest_xml(t, indentlevel)
 	end
 	
 	for frag_key, key in pairs(inlines) do
-		if comments[key] ~= nil then
+		if rawget(comments, key) ~= nil then
 			fragments[frag_key] = fragments[frag_key]..(' '):rep(maxlength - fragments[frag_key]:trim():length() + 1)..'<!--'..comments[key]..'-->'
 		end
 		
@@ -372,4 +372,3 @@ function config.reset()
 end
 
 return config
-
