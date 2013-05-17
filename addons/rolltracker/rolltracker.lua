@@ -177,7 +177,7 @@ end
 	
 
 function event_outgoing_text(original, modified)
-	if original:find('/jobability \"Double') and luckyroll == 1 and override == 0 and id == get_player()['id'] then
+	if original:find('/jobability \"Double.*Up') and luckyroll == 1 and override == 0 and id == get_player()['id'] then
 		modified=''
 		add_to_chat(159,'You either have a lucky Roll or have rolled an 11. Reuse Double-Up to continue to double-up.')
 		luckyroll=0
