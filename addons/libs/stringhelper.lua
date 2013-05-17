@@ -74,18 +74,21 @@ function string.split(str, sep, maxsplit, pattern)
 			res[key] = match
 			-- If maximum number of splits reached, return
 			if key == maxsplit - 1 then
-				res[key + 1] = str:slice(endpos + 1)
+				key = key + 1
+				res[key] = str:slice(endpos + 1)
 				break
 			end
 			i = endpos + 1
 		-- If not found, no more separaters to split, append the remaining string.
 		else
-			res[key + 1] = str:slice(i)
+			key = key + 1
+			res[key] = str:slice(i)
 			break
 		end
 	end
 	
-	return setmetatable(res, _meta.T)
+	res.n = key
+	return setmetatable(res, _meta.L)
 end
 
 -- Alias to string.sub, with some syntactic sugar.
