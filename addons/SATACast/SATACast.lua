@@ -160,3 +160,4 @@ function event_addon_command(...)
 		add_to_chat(17, '    help   - Displays this help text')
 	end
 end
+
