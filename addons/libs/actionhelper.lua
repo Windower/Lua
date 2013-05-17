@@ -58,7 +58,7 @@ function Action(a)
 	local new_instance = {}
 	new_instance.raw = a
 	
-	return setmetatable(new_instance, {__index = action})
+	return setmetatable(new_instance, {__index = function(t, k) if rawget(t, k) ~= nil then return t[k] else return action[k] end end})
 end
 
 
@@ -161,4 +161,3 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
-
