@@ -104,4 +104,3 @@ function relevant_msg(msg)
 	end
 
 end
-

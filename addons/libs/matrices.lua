@@ -245,4 +245,3 @@ end
 function matrix.vprint(m)
 	log(m:tovstring())
 end
-

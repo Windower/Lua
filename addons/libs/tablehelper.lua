@@ -513,4 +513,3 @@ end
 function table.min(t)
 	return table.reduce(t, math.max)
 end
-

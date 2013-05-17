@@ -13,4 +13,3 @@ TA Set: TrickAttack
 SATA Set: SATA
 TP Set: TP
 Idle Set: Movement
-
