@@ -113,10 +113,20 @@ function table.tostring(t)
 	-- Iterate over table.
 	local tstr = ''
 	local kt = {}
+	k = 0
 	for key in pairs(t) do
-		kt[#kt+1] = key
+		k = k + 1
+		kt[k] = key
 	end
-	table.sort(kt)
+	table.sort(kt, function(x, y)
+		if type(x) == 'number' and type(y) == 'string' then
+			return true
+		elseif type(x) == 'string' and type(y) == 'number' then
+			return false
+		end
+		
+		return x<y
+	end)
 	
 	for i, key in ipairs(kt) do
 		val = t[key]
@@ -154,7 +164,11 @@ _meta.T.__tostring = table.tostring
 
 -- Prints a string representation of a table in explicit Lua syntax: {...}
 function table.print(t, keys)
-	log(table.tostring(t, keys))
+	if t.tostring then
+		log(t:tostring(keys))
+	else
+		log(table.tostring(t, keys))
+	end
 end
 
 -- Returns a vertical string representation of a table in explicit Lua syntax, with every element in its own line:
@@ -172,10 +186,20 @@ function table.tovstring(t, keys, indentlevel)
 	local indent = (' '):rep(indentlevel*4)
 	local tstr = '{\n'
 	local kt = {}
+	k = 0
 	for key in pairs(t) do
-		kt[#kt+1] = key
+		k = k + 1
+		kt[k] = key
 	end
-	table.sort(kt)
+	table.sort(kt, function(x, y)
+		if type(x) == 'number' and type(y) == 'string' then
+			return true
+		elseif type(x) == 'string' and type(y) == 'number' then
+			return false
+		end
+		
+		return x<y
+	end)
 	
 	for i, key in pairs(kt) do
 		val = t[key]
@@ -202,7 +226,7 @@ function table.tovstring(t, keys, indentlevel)
 			tstr = tstr..', '
 		end
 		
-		tstr = tstr.."\n"
+		tstr = tstr..'\n'
 	end
 	tstr = tstr..indent..'}'
 	
@@ -214,7 +238,11 @@ end
 ---     ...
 --- }
 function table.vprint(t, keys)
-	log(table.tovstring(t, keys))
+	if t.tovstring then
+		log(t:tovstring(keys))
+	else
+		log(table.tovstring(t, keys))
+	end
 end
 
 -- Load logger settings (has to be after the logging functions have been defined, so those work in the config and related files).
@@ -238,4 +266,3 @@ if loaded then
 end
 
 collectgarbage()
-
