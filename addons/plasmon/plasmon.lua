@@ -1,5 +1,5 @@
 --[[
-plasmon v1.20130516
+plasmon v1.20130517
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -28,11 +28,11 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-require 'stringhelper'
+require 'colors'
 local config = require 'config'
 
 local _plasmon = T{}
-_plasmon.v                   = '1.20130516'
+_plasmon.v                   = '1.20130517'
 _plasmon.tb_name             = 'addon:gr:plasmon'
 _plasmon.track               = false
 _plasmon.visible             = false
@@ -241,8 +241,7 @@ function _plasmon.first_run()
 
     add_to_chat(55, 'hi '..get_player()['name']:lower()..',')
     add_to_chat(55, 'thank you for using plasmon v'.._plasmon.v)
-    add_to_chat(55, 'in this update i\'ve added a light mode. when enabled the window will be kept hidden and only the summary will be shown at the end of the run.')
-    add_to_chat(55, 'use "plasmon light true/false" to enable or disable it.')
+    add_to_chat(55, 'this update should fix the bug that kept the addon from counting airlixirs. please let me know if you are still experiencing any problem.')
     add_to_chat(55, '- zohno@phoenix')
 
     _plasmon.settings.v = _plasmon.v
@@ -280,6 +279,8 @@ end
 
 function event_incoming_text(original, modified, mode)
     local match
+    
+    original = original:strip_format()
 
     match = original:match('Now permeating the mists surrounding the fracture%.')
 
