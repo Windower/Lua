@@ -5,6 +5,7 @@ Small implementation of a fully-featured XML reader.
 _libs = _libs or {}
 _libs.xml = true
 _libs.tablehelper = _libs.tablehelper or require 'tablehelper'
+_libs.lists = _libs.lists or require 'lists'
 _libs.stringhelper = _libs.stringhelper or require 'stringhelper'
 local files = require 'filehelper'
 _libs.filehelper = _libs.filehelper or files ~= nil
@@ -284,9 +285,9 @@ end
 -- Returns the name of the element and the namespace, if present.
 function xml.get_namespace(token)
 	local splits = token:split(':')
-	if #splits > 2 then
+	if splits:length() > 2 then
 		return
-	elseif #splits == 2 then
+	elseif splits:length() == 2 then
 		return splits[2], splits[1]
 	end
 	return token
@@ -388,6 +389,74 @@ function xml.classify(tokens, var)
 	end
 	
 	return roots[1]
+end
+
+-- Returns a non-shitty XML representation:
+-- Tree of nodes, each node can be a tag or a value. A tag has a name, list of attributes and children.
+-- In case of a node, the following is provided:
+-- * type node.value:       Value of node. Only provided if type was set.
+-- * list node.children:    List of child nodes (tag or text nodes)
+-- * string node.name:      Name of the tag
+-- * iterator node.it:      Function that iterates over all children
+-- * table node.attributes: Dictionary containing all attributes
+function table.undomify(node, types)
+	local node_type = types and types[node.name] or nil
+	local res = T{}
+	res.attributes = T{}
+	local children = L{}
+	local ctype
+	
+	for _, child in ipairs(node.children) do
+		ctype = child.type
+		if ctype == 'attribute' then
+			res.attributes[child.name] = child.value
+		elseif ctype == 'tag' then
+			children:append(child:undomify(types))
+		elseif ctype == 'text' then
+			children:append(child.value)
+		end
+	end
+	
+	if node_type then
+		local val = children[1] or ''
+		if node_type == 'set' then
+			res.children = val:split(','):map(string.trim):filter(-'')
+			res.value = S(res.children)
+			res.it = function()
+				local key
+				return function()
+					return next(res, key)
+				end
+			end
+		elseif node_type == 'list' then
+			res.value = val:split(','):map(string.trim):filter(-'')
+			res.children = res.value
+		elseif node_type == 'number' then
+			res.value = tonumber(val)
+			res.children = L{res.value}
+		elseif node_type == 'boolean' then
+			res.value = res.children[1]
+			res.children = L{res.value}
+		end
+	end
+	
+	if res.children == nil then
+		res.children = children
+	end
+	
+	if res.it == nil then
+		res.it = function()
+			local key = 0
+			return function()
+				key = key + 1
+				return res.children[key]
+			end
+		end
+	end
+	
+	res.name = node.name
+	
+	return res
 end
 
 -- Returns a namespace-formatted string of a DOM node.
