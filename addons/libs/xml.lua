@@ -444,16 +444,6 @@ function table.undomify(node, types)
 		res.children = children
 	end
 	
-	if res.it == nil then
-		res.it = function()
-			local key = 0
-			return function()
-				key = key + 1
-				return res.children[key]
-			end
-		end
-	end
-	
 	res.name = node.name
 	
 	return setmetatable(res, {__index = function(t, k)
