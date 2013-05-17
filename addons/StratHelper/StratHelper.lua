@@ -108,3 +108,4 @@ end
 function reset_strats()
 	reinit()
 end
+
