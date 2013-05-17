@@ -456,7 +456,9 @@ function table.undomify(node, types)
 	
 	res.name = node.name
 	
-	return res
+	return setmetatable(res, {__index = function(t, k)
+		return t.children[k]
+	end})
 end
 
 -- Returns a namespace-formatted string of a DOM node.
