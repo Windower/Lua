@@ -435,7 +435,8 @@ end
 function table.it(t)
 	local key
 	return function()
-		return next(t, key)
+		key = next(t, key)
+		return rawget(t, key)
 	end
 end
 
