@@ -68,7 +68,7 @@ function event_load()
 						['104']='Gallant\'s',['105']='Chaos',['106']='Beast',
 						['107']='Choral',['108']='Hunter\'s',['109']='Samurai',
 						['110']='Ninja',['111']='Drachen',['112']='Evoker\'s',
-						['113']='Magus\'',['114']='Corsair\'s',['115']='Puppet',
+						['113']='Magus\'s',['114']='Corsair\'s',['115']='Puppet',
 						['116']='Dancer\'s',['117']='Scholar\'s',['118']='Bolter\'s',
 						['119']='Caster\'s', ['120']='Courser\'s', ['121']='Blitzer\'s',
 						['122']='Tactician\'s',['303']='Miser\'s',['302']='Allies\'', ['304']='Companion\'s',['305']='Avenger\'s'
@@ -106,6 +106,7 @@ function event_load()
 				['Companion\'s']={'?','?','?','?','?','?','?','?','?','?','?','?',' Pet: Regen and Regain'},
 				['Avenger\'s']={'?','?','?','?','?','?','?','?','?','?','?','?',' Counter Rate'},
 				['Blitzer\'s']={2,3.4,4.5,11.3,5.3,6.4,7.2,8.3,1.5,10.2,12.1,'-?', '% Attack delay reduction'}
+				['Courser\'s']={'?','?','?','?','?','?','?','?','?','?','?','?',' Snapshot'}
 				}
 				
 end
