@@ -59,7 +59,7 @@ function event_action(act)
 				send_command('sc var set ' .. scvar_strats_current .. ' ' .. strat_cur)
 			elseif strat_ids:contains(act.param) then
 				strat_max_calc()
-				if get_player()['buffs']:contains(377) == false then
+				if T(get_player()['buffs']):contains(377) == false then
 					strat_cur = strat_cur - 1
 					send_command('sc var set ' .. scvar_strats_current .. ' ' .. strat_cur)
 				end
