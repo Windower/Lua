@@ -526,6 +526,7 @@ _raw.table.concat = table.concat
 
 -- Concatenates all objects of a table. Converts to string, if not already so.
 function table.concat(t, str)
+	str = str or ''
 	local res = ''
 	
 	for _, val in pairs(t) do
