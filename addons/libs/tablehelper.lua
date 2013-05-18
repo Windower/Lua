@@ -526,7 +526,17 @@ _raw.table.concat = table.concat
 
 -- Concatenates all objects of a table. Converts to string, if not already so.
 function table.concat(t, str)
-	return _raw.table.concat(table.map(t, tostring), str)
+	str = str or ''
+	local res = ''
+	
+	for key, val in pairs(t) do
+		res = res..tostring(val)
+		if next(t, key) then
+			res = res..str
+		end
+	end
+	
+	return res
 end
 
 -- Concatenates all elements with a whitespace in between.
