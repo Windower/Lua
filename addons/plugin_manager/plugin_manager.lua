@@ -43,6 +43,9 @@ function event_load()
 	general_array = {}
 	general_array['addon'] = {}
 	general_array['plugin'] = {}
+	common_array = {}
+	common_array['addon'] = {}
+	common_array['plugin'] = {}
 	load_settings()
 	if get_player().name ~= '' then
 		unload_plugins()
@@ -52,12 +55,14 @@ end
 
 function load_settings()
 	--local settingsFile = file.new('data/settings.xml',true)
+	local length = 0
 	if not file.exists('data/settings.xml') then
 		write('plugin_manager is missing its settings file.')
 	else
 		local settingtab = xml.read('data/settings.xml'):undomify()
 		for child in settingtab:it() do
 		-- Global/Names layer
+			length = length + 1
 			loader_array[child.name] = {}
 			loader_array[child.name]['addon'] = T{}
 			loader_array[child.name]['plugin'] = T{}
@@ -91,6 +96,37 @@ function load_settings()
 				end
 			end
 		end
+		
+		local firstrun = ''
+		for n,m in pairs(general_array['plugin']) do
+			local counter = 0
+			for i,v in pairs(loader_array) do
+				if loader_array[i]['plugin']:contains(n) then
+					counter = counter + 1
+				end
+			end
+			if counter == length then
+				if general_array['plugin'][n] then
+					firstrun = firstrun..'load '..n..';wait 0.1;'
+					general_array['plugin'][n] = false
+				end
+			end
+		end
+		for n,m in pairs(general_array['addon']) do
+			local counter = 0
+			for i,v in pairs(loader_array) do
+				if loader_array[i]['addon']:contains(n) then
+					counter = counter + 1
+				end
+			end
+			if counter == length then
+				if general_array['addon'][n] then
+					firstrun = firstrun..'lua l '..n..';wait 0.1;'
+					general_array['addon'][n] = false
+				end
+			end
+		end
+		send_command(firstrun)
 	end
 end
 
@@ -127,7 +163,7 @@ function unload_plugins()
 	for i,v in pairs(general_array['addon']) do
 		local sendit = false
 		for n,m in pairs(loader_array) do
-			if m['addon']:contains(i) then
+			if m['addon']:contains(i) and v then
 				sendit = true
 			end
 		end
