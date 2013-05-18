@@ -183,3 +183,17 @@ function set.reduce(s, fn, init)
 	
 	return acc
 end
+
+function set.concat(s, str)
+	str = str or ''
+	local res = ''
+	
+	for el in pairs(s) do
+		res = res..tostring(s)
+		if next(s, el) then
+			res = res..str
+		end
+	end
+	
+	return res
+end

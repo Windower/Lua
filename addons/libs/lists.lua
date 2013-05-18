@@ -100,6 +100,20 @@ function list.count(l, fn)
 	return count
 end
 
+function list.concat(l, str)
+	str = str or ''
+	local res = ''
+	
+	for key = 1, l.n do
+		res = res..tostring(rawget(l, key))
+		if key < l.n then
+			res = res..str
+		end
+	end
+	
+	return res
+end
+
 function list.clear(l)
 	for key in ipairs(l) do
 		l[key] = nil
