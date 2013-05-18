@@ -1,6 +1,6 @@
 **Author:** Giuliano Riccio
 
-**Version:** v 1.20130514
+**Version:** v 1.20130516
 
 **Description:**
 This plugin tracks exp, bayld, momentum scores and bonuses during a reive.
@@ -18,17 +18,17 @@ There is only one configuration file called settings.xml in the data folder of t
 * reive show -- shows the tracking window
 * reive hide -- hides the tracking window
 * reive toggle -- toggles the tracking window
+* reive light &lt;enabled&gt; -- defines the light mode status
 * reive max-scores &lt;amount&gt; -- sets the max amount of scores to show in the window
 * reive track &lt;score&gt; &lt;visible&gt; -- specifies the visibility of a score in the window
 * reive position [[-h]|[-x &lt;x&gt;] [-y &lt;y&gt;]] -- sets the horizontal and vertical position of the window relative to the upper-left corner
 * reive font [[-h]|[-f &lt;font&gt;] [-s &lt;size&gt;] [-a &lt;alpha&gt;] [-b[ &lt;bold&gt;]] [-i[ &lt;italic&gt;]]] -- sets the style of the font used in the window
 * reive color [[-h]|[-o &lt;objects&gt;] [-d] [-r &lt;red&gt;] [-g &lt;green&gt;] [-b &lt;blue&gt;] [-a &lt;alpha&gt;]] -- sets the colors used by the plugin
 
-**TODO**
-
-- [x] allow the user to change the settings using the console
-
 #changelog
+## v1.20130516
+* **add:** a "light mode" has been added. while active, the window will be kept hidden and only a summary will be shown at the end of the run
+
 ## v1.20130514
 * **change:** current/total bayld/exp will be shown at the same time. "reset_on_start" has no use anymore and has been removed
 
@@ -113,3 +113,4 @@ There is only one configuration file called settings.xml in the data folder of t
 * **r:** the amount of red from 0 to 255
 * **g:** the amount of green from 0 to 255
 * **b:** the amount of blue from 0 to 255
+

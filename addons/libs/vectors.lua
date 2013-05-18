@@ -164,3 +164,4 @@ end
 function vector.vprint(v)
 	log(v:tovstring())
 end
+

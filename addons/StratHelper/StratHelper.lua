@@ -53,10 +53,16 @@ end
 function event_action(act)
 	if act.actor_id == get_player()['id'] then
 		if act.category == 6 then
-			if strat_ids:contains(act.param) then
-				strat_max_calc()
-				strat_cur = strat_cur - 1
+			if act.param == 210 then
+				clock_current = os.clock()
+				strat_cur = strat_max
 				send_command('sc var set ' .. scvar_strats_current .. ' ' .. strat_cur)
+			elseif strat_ids:contains(act.param) then
+				strat_max_calc()
+				if get_player()['buffs']:contains(377) == false then
+					strat_cur = strat_cur - 1
+					send_command('sc var set ' .. scvar_strats_current .. ' ' .. strat_cur)
+				end
 				if loop_active == false then
 					loop_active = true
 					clock_current = os.clock()
@@ -102,6 +108,9 @@ function strat_loop()
 		send_command('@wait 0.5; lua i StratHelper strat_loop')
 	else
 		loop_active = false
+	end
+	if strat_cur > strat_max then
+		strat_cur = strat_max
 	end
 end
 

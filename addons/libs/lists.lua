@@ -109,6 +109,27 @@ function list.clear(l)
 	return l
 end
 
+function list.with(l, attr, val)
+	for _, el in ipairs(l) do
+		if type(el) == 'table' and rawget(el, attr) == val then
+			return el
+		end
+	end
+end
+
+function list.iwith(l, attr, val)
+	local cel
+	val = val:lower()
+	for _, el in ipairs(l) do
+		if type(el) == 'table' then
+			cel = rawget(el, attr)
+			if type(cel) == 'string' and cel:lower() == val then
+				return el
+			end
+		end
+	end
+end
+
 function list.map(l, fn)
 	local res = {}
 	

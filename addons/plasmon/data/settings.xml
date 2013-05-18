@@ -51,6 +51,7 @@
 			<italic>false</italic>
 			<size>10</size>
 		</font>
+		<light>false</light>
 		<position>
 			<x>0</x>
 			<y>350</y>
@@ -58,3 +59,4 @@
 		<v>0</v>
 	</global>
 </settings>
+

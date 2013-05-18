@@ -1,10 +1,6 @@
 PetSchool v 1.0.0
 
-<<<<<<< HEAD
 PetSchool is a simple helper addon for Spellcast.  I created this because before lua, I had to make really strange XML's for both Spellcast and Autoexec to let spellcast know when sneak attack and trick attack were no longer in effect (landed or wore).  This addon is merely a middleman that tells spellcast when it wears and switches to your appropriate gear sets.  Another function of this addon is to inform spellcast when Treasure Hunter has been initially placed on the mob.
-=======
-PetSchool is a simple helper addon for Spellcast.  This Addon merely informs spellcast of your pet casting spells either on a mob or on a player.
->>>>>>> New Addon:  PetSchool
 
 To install, have the PetSchool folder containing this readme, the PetSchool.lua, and a "data" folder in your "addons" folder for windower v4.
 

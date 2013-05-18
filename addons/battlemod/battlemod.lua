@@ -75,8 +75,6 @@ function event_load()
 	items:update(parse_resources(itemsAFile:readlines()))
 	items:update(parse_resources(itemsWFile:readlines()))
 	
-	write(type(jobabilities[380]))
-
     send_command('alias bm lua c battlemod cmd')
 	options_load()
 	collectgarbage()
@@ -94,6 +92,7 @@ function options_load()
 	 Options for other modes are either "true" or "false". Other values will not be interpreted.-->
 <settings>
 	<global>
+		<condensedamage>true</condensedamage>
 		<condensebattle>true</condensebattle>
 		<condensebuffs>true</condensebuffs>
 		<cancelmulti>true</cancelmulti>
@@ -406,6 +405,9 @@ function event_addon_command(...)
 			elseif splitarr[2]:lower() == 'condensebuffs' then
 				condensebuffs = not condensebuffs
 				add_to_chat(121,'Condensed Buffs text flipped! - '..tostring(condensebuffs))
+			elseif splitarr[2]:lower() == 'condensedamage' then
+				condensedamage = not condensedamage
+				add_to_chat(121,'Condensed Damage text flipped! - '..tostring(condensedamage))
 			elseif splitarr[2]:lower() == 'cg' then
 				collectgarbage()
 			elseif splitarr[2]:lower() == 'colortest' then
@@ -436,11 +438,12 @@ function event_addon_command(...)
 				write('Big Toggles:')
 				write(' 4. condensebuffs --- Condenses Area of Effect buffs, Default = True')
 				write(' 5. condensebattle --- Condenses battle logs according to your settings file, Default = True')
-				write(' 6. cancelmulti --- Cancles multiple consecutive identical lines, Default = True')
+				write(' 6. condensedamage --- Condenses damage messages within attack rounds, Default = True')
+				write(' 7. cancelmulti --- Cancles multiple consecutive identical lines, Default = True')
 				write('Sub Toggles:')
-				write(' 7. oxford --- Toggle use of oxford comma, Default = True')
-				write(' 8. commamode --- Toggle comma-only mode, Default = False')
-				write(' 9. targetnumber --- Toggle target number display, Default = True')
+				write(' 8. oxford --- Toggle use of oxford comma, Default = True')
+				write(' 9. commamode --- Toggle comma-only mode, Default = False')
+				write(' 10. targetnumber --- Toggle target number display, Default = True')
 			end
 		end
 	else
@@ -496,7 +499,8 @@ function event_incoming_text(original, modified, color)
 			j,b = string.find(original,'You must wait longer ')
 			k,b = string.find(original,'You throw away a ')
 			l,b = string.find(original,'You obtain ')
-			if a==nil and c==nil and d==nil and e==nil and f==nil and h==nil and g==nil and i==nil and j==nil and k==nil and l==nil then
+			m,b = string.find(original,'was lost')
+			if a==nil and c==nil and d==nil and e==nil and f==nil and h==nil and g==nil and i==nil and j==nil and k==nil and l==nil and m==nil then
 				modified = ''
 				if allow then
 					send_command('wait 5;lua c battlemod flip allow')

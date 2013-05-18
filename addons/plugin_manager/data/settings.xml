@@ -1,0 +1,58 @@
+<settings>
+	<global>
+		<!-- This will be used for all the characters that you don't make a specific set of plugins/addons for -->
+		<plugin>Attainment</plugin>
+		<plugin>AutoExec</plugin>
+		<plugin>Bidder</plugin>
+		<plugin>Binder</plugin>
+		<plugin>BlinkMeNot</plugin>
+		<plugin>Cancel</plugin>
+		<plugin>ChatLink</plugin>
+		<plugin>ConsoleBG</plugin>
+		<plugin>Distance</plugin>
+		<plugin>DrawDistance</plugin>
+		<plugin>Find</plugin>
+		<plugin>GearCollector</plugin>
+		<plugin>Itemizer</plugin>
+		<plugin>jazero</plugin>
+		<plugin>LightLuggage</plugin>
+		<plugin>PetTP</plugin>
+		<plugin>Silence</plugin>
+		<plugin>Spellcast</plugin>
+		<plugin>SSOrganizer</plugin>
+		<plugin>StatusTimer</plugin>
+		<plugin>Timestamp</plugin>
+		<plugin>TParty</plugin>
+		<plugin>Timers</plugin>
+	</global>
+	<YourName> <!-- This is just an example. You need to replace "YourName" to the left and below with the character name that you want the set of plugins to work for. -->
+		<plugin>AutoExec</plugin>
+		<plugin>Bidder</plugin>
+		<plugin>Binder</plugin>
+		<plugin>Cancel</plugin>
+		<plugin>ChatLink</plugin>
+		<plugin>ConsoleBG</plugin>
+		<plugin>Distance</plugin>
+		<plugin>DrawDistance</plugin>
+		<plugin>FFOChat</plugin>
+		<plugin>Find</plugin>
+		<plugin>GearCollector</plugin>
+		<plugin>Itemizer</plugin>
+		<plugin>jazero</plugin>
+		<plugin>LightLuggage</plugin>
+		<plugin>Logger</plugin>
+		<plugin>PetTP</plugin>
+		<plugin>Silence</plugin>
+		<plugin>Spellcast</plugin>
+		<plugin>SSOrganizer</plugin>
+		<plugin>StatusTimer</plugin>
+		<plugin>Timestamp</plugin>
+		<plugin>TParty</plugin>
+		<plugin>Timers</plugin>
+		<plugin>Guildwork</plugin>
+		
+		<addon>send</addon>
+		<addon>battlemod</addon>
+		<addon>ffocolor</addon>
+	</YourName>
+</settings>

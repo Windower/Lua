@@ -56,6 +56,12 @@ function functools.negate(fn)
 	end
 end
 
+-- Evaluates a function and returns a value as well as store it in a variable of the provided name.
+function functools.tee(str, val)
+	_G[str] = val
+	return val
+end
+
 -- Returns a function that returns a subset of the provided function's elements according to a table slice.
 -- * i == nil:	Returns all elements as a table
 -- * j == nil:	Returns all elements from i until the end
@@ -81,6 +87,8 @@ debug.setmetatable(functools.empty, {
 	__concat = functools.pipe,
 	__unm = functools.negate,
 })
+
+debug.getmetatable('').__mod = functools.tee
 
 --[[
 	Logic functions
@@ -130,22 +138,22 @@ end
 
 -- Returns true, if num is even, false otherwise.
 function math.even(num)
-	return num%2 == 0
+	return num % 2 == 0
 end
 
 -- Returns true, if num is odd, false otherwise.
 function math.odd(num)
-	return num%2 == 1
+	return num % 2 == 1
 end
 
 -- Adds two numbers.
 function math.sum(val1, val2)
-	return val1+val2
+	return val1 + val2
 end
 
 -- Multiplies two numbers.
 function math.mult(val1, val2)
-	return val1*val2
+	return val1 * val2
 end
 
 --[[
@@ -154,7 +162,7 @@ end
 
 -- Returns an attribute of a table.
 function table.get(t, att)
-	return t[att]
+	return rawget(t, att)
 end
 
 -- Applies function fn to all elements of the table and returns the resulting table.
@@ -171,7 +179,7 @@ end
 -- Analogon to table.map, but for array-tables. Possibility to include nil values.
 function table.arrmap(t, fn)
 	local res = T{}
-	for key = 1, T(t):length() do
+	for key = 1, #t do
 		-- Evaluate fn with the element and store it.
 		res[key] = fn(t[key])
 	end

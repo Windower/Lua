@@ -331,3 +331,4 @@ function texts.destroy(t)
 end
 
 return texts
+
