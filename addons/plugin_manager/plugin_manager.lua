@@ -34,6 +34,7 @@ function event_addon_command(...)
 	local cmd = table.concat({...},' ')
 	if cmd == 'load' then
 		load_plugins()
+		
 	end
 end
 
@@ -43,8 +44,10 @@ function event_load()
 	general_array['addon'] = {}
 	general_array['plugin'] = {}
 	load_settings()
-	unload_plugins()
-	send_command('wait 5;lua c plugin_manager load')
+	if get_player().name ~= '' then
+		unload_plugins()
+		send_command('wait 5;lua c plugin_manager load')
+	end
 end
 
 function load_settings()
