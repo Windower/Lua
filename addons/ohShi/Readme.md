@@ -1,5 +1,5 @@
 **Author:** Ricky Gall  
-**Version:** 2.16 
+**Version:** 2.161 
 **Description:**  
 Replacement for yarnregex for Windower 4 I made for a friend. Uses the chat log so filters must be off. At least until i figure out another way to do it. Keeps track of various event related things. Such as, VW proc messages, mob casting, mob tp moves, TH procs and cor rolls, as well as others. Digi of shiva created the icon and was the driving force behind testing/giving me the idea to do this. Digi also created the default mob list/danger list and chose the name.
 
