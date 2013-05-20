@@ -55,8 +55,13 @@ function findAll.search(query)
         end
     end
 
-    query              = query:lower()
-    local newItemIds   = S{}
+    if query == '' then
+        return
+    end
+
+    query = query:lower()
+
+    local newItemIds = S{}
 
     for characterName, storages in pairs(findAll.globalStorages) do
         for storageName, storage in pairs(storages) do
@@ -255,11 +260,5 @@ function event_addon_command(...)
         write('you have to be logged in to use this addon')
     end
 
-    local query = T{...}:concat(' ')
-
-    if query == '' then
-        findAll.update()
-    else
-        findAll.search(T{...}:concat(' '))
-    end
+    findAll.search(T{...}:concat(' '))
 end
