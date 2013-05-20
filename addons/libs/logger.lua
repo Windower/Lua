@@ -5,7 +5,8 @@ This library provides a set of functions to aid in debugging.
 _libs = _libs or {}
 _libs.logger = true
 _libs.stringhelper = _libs.stringhelper or require 'stringhelper'
-_libs.colors = _libs.colors or require 'colors'
+chat = require 'colors'
+_libs.colors = _libs.colors or (chat ~= nil)
 
 local logger = {}
 logger.defaults = {}
@@ -42,10 +43,14 @@ end
 
 -- Prints the arguments provided to the FFXI chatlog, in the same color used for Campaign/Bastion alerts and Kupower messages. Can be changed below.
 function captionlog(msg, msgcolor, ...)
-	local caption = _addon and _addon.name or ''
+	local caption = _addon and _addon.name
 	
 	if msg ~= nil then
-		caption = caption..' '..msg
+		if caption then
+			caption = caption..' '..msg
+		else
+			caption = msg
+		end
 	end
 	
 	if #caption > 0 then
@@ -64,7 +69,7 @@ function captionlog(msg, msgcolor, ...)
 	end
 	
 	for _, line in ipairs(str:split('\n')) do
-		add_to_chat(logger.settings.logcolor, caption..line..'\x1E\x01')
+		add_to_chat(logger.settings.logcolor, caption..line..chat.colorcontrols.reset)
 	end
 end
 
