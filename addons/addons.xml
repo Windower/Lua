@@ -73,6 +73,13 @@
     <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>	
   </addon>
   <addon>
+    <author>Giuliano Riccio (Zohno@Phoenix)</author>
+    <name>findAll</name>
+    <description>This plugin searches for items stored on all of your characters. Check the addon's page for more instructions (http://goo.gl/HHj14).</description>
+    <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
+  </addon>
+  <addon>
     <name>Linker</name>
     <author>Arcon</author>
     <description>Allows opening links to certain websites from within the game, with an optional search parameter.</description>
