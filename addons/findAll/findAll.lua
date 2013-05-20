@@ -31,8 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 require 'lists'
 require 'sets'
 
---local json = require 'json'
-local json = require 'JSON'
+local json = require 'json'
 local file = require 'filehelper'
 
 local findAll = {}
@@ -192,8 +191,7 @@ function findAll.update()
         storagesFile:create()
     end
 
-    --findAll.globalStorages = json.read(findAll.storagesPath)
-    findAll.globalStorages = json:decode(storagesFile:read())
+    findAll.globalStorages = json.read(storagesFile)
 
     if findAll.globalStorages == nil then
         findAll.globalStorages = {}
