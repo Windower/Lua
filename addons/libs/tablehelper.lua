@@ -235,8 +235,10 @@ end
 -- Returns the keys of a table in an array.
 function table.keyset(t)
 	local res = {}
+	local i = 0
 	for key, _ in pairs(t) do
-		res[#res + 1] = key
+		i = i + 1
+		res[i] = key
 	end
 
 	return T(res)
@@ -397,6 +399,29 @@ function table.set(t)
 	return setmetatable(res, getmetatable(t) or _meta.T)
 end
 
+-- Finds a table entry based on an attribute.
+function table.with(t, attr, val)
+	for _, el in pairs(t) do
+		if type(el) == 'table' and rawget(el, attr) == val then
+			return el
+		end
+	end
+end
+
+-- Finds a table entry based on an attribute, case-insensitive.
+function table.iwith(t, attr, val)
+	local cel
+	val = val:lower()
+	for _, el in pairs(t) do
+		if type(el == 'table') then
+			cel = rawget(el, attr)
+			if type(cel == 'string') and cel:lower() == val then
+				return el
+			end
+		end
+	end
+end
+
 -- Backs up old table sorting function.
 _raw.table.sort = _raw.table.sort or table.sort
 
@@ -404,6 +429,26 @@ _raw.table.sort = _raw.table.sort or table.sort
 function table.sort(t, ...)
 	_raw.table.sort(t, ...)
 	return setmetatable(t, getmetatable(t) or _meta.T)
+end
+
+-- Returns an iterator over the table.
+function table.it(t)
+	local key
+	return function()
+		key = next(t, key)
+		return rawget(t, key)
+	end
+end
+
+-- Returns a table keyed by a specified index of a subtable. Requires a table of tables, and key must be a valid key in every table. Only produces the correct result, if the key is unique.
+function table.rekey(t, key)
+	local res = {}
+	
+	for _, value in pairs(t) do
+		res[value[key]] = value
+	end
+	
+	return setmetatable(res, getmetatable(t) or _meta.T)
 end
 
 -- Return true if any element of t satisfies the condition fn.
@@ -481,7 +526,17 @@ _raw.table.concat = table.concat
 
 -- Concatenates all objects of a table. Converts to string, if not already so.
 function table.concat(t, str)
-	return _raw.table.concat(table.map(t, tostring), str)
+	str = str or ''
+	local res = ''
+	
+	for key, val in pairs(t) do
+		res = res..tostring(val)
+		if next(t, key) then
+			res = res..str
+		end
+	end
+	
+	return res
 end
 
 -- Concatenates all elements with a whitespace in between.

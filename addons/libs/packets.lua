@@ -98,3 +98,4 @@ p[0x105] = {name='Data Download 4',     size=0x16, description='The data that is
 p[0x108] = {name='Data Download 5',     size=0x00, description='The data that is sent to the client when it is "Downloading data...".'}
 
 return setmetatable(p, {index={name='Unknown', size=0x00, description='No data available.'}})
+

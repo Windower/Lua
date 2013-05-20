@@ -99,6 +99,11 @@ function file.read(f)
 	content = fh:read('*all*')
 	fh:close()
 
+	-- Remove byte order mark for UTF-8, if present
+	if content:startswith(string.char(0xEF, 0xBB, 0xBF)) then
+		return content:sub(4)
+	end
+	
 	return content
 end
 

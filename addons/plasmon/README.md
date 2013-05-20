@@ -83,3 +83,4 @@ There is only one configuration file called settings.xml in the data folder of t
 * **r:** the amount of red from 0 to 255
 * **g:** the amount of green from 0 to 255
 * **b:** the amount of blue from 0 to 255
+

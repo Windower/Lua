@@ -100,6 +100,20 @@ function list.count(l, fn)
 	return count
 end
 
+function list.concat(l, str)
+	str = str or ''
+	local res = ''
+	
+	for key = 1, l.n do
+		res = res..tostring(rawget(l, key))
+		if key < l.n then
+			res = res..str
+		end
+	end
+	
+	return res
+end
+
 function list.clear(l)
 	for key in ipairs(l) do
 		l[key] = nil
@@ -107,6 +121,27 @@ function list.clear(l)
 	
 	l.n = 0
 	return l
+end
+
+function list.with(l, attr, val)
+	for _, el in ipairs(l) do
+		if type(el) == 'table' and rawget(el, attr) == val then
+			return el
+		end
+	end
+end
+
+function list.iwith(l, attr, val)
+	local cel
+	val = val:lower()
+	for _, el in ipairs(l) do
+		if type(el) == 'table' then
+			cel = rawget(el, attr)
+			if type(cel) == 'string' and cel:lower() == val then
+				return el
+			end
+		end
+	end
 end
 
 function list.map(l, fn)

@@ -50,6 +50,7 @@ end
 function event_load()
 	send_command('alias rolltracker lua c rolltracker')
 	override=0
+	
 	player=get_player()['name']
 	luckyroll = 0
 	roll_id ={ 
@@ -68,7 +69,7 @@ function event_load()
 						['104']='Gallant\'s',['105']='Chaos',['106']='Beast',
 						['107']='Choral',['108']='Hunter\'s',['109']='Samurai',
 						['110']='Ninja',['111']='Drachen',['112']='Evoker\'s',
-						['113']='Magus\'',['114']='Corsair\'s',['115']='Puppet',
+						['113']='Magus\'s',['114']='Corsair\'s',['115']='Puppet',
 						['116']='Dancer\'s',['117']='Scholar\'s',['118']='Bolter\'s',
 						['119']='Caster\'s', ['120']='Courser\'s', ['121']='Blitzer\'s',
 						['122']='Tactician\'s',['303']='Miser\'s',['302']='Allies\'', ['304']='Companion\'s',['305']='Avenger\'s'
@@ -76,7 +77,6 @@ function event_load()
 	roll_luck={ 0,5,3,3,5,4,5,3,4,4,2,4,2,4,4,5,2,5,3,3,2,3,2,3,4,5,5,3,2,4 }
 	roll_bonus={}
 	rollnum=''
-	
 	roll_buff={
 				['Chaos']={6,8,9,25,11,13,16,3,17,19,31,"-4", '% Attack!'},
 				['Fighter\'s']={ 2,2,3,4,12,5,6,7,1,9,18,'-4','% Double-Attack!'},
@@ -105,18 +105,19 @@ function event_load()
 				['Allies\'']={6,7,17,9,11,13,15,17,17,5,17,'?','% Skillchain Damage'},
 				['Companion\'s']={'?','?','?','?','?','?','?','?','?','?','?','?',' Pet: Regen and Regain'},
 				['Avenger\'s']={'?','?','?','?','?','?','?','?','?','?','?','?',' Counter Rate'},
-				['Blitzer\'s']={2,3.4,4.5,11.3,5.3,6.4,7.2,8.3,1.5,10.2,12.1,'-?', '% Attack delay reduction'}
+				['Blitzer\'s']={2,3.4,4.5,11.3,5.3,6.4,7.2,8.3,1.5,10.2,12.1,'-?', '% Attack delay reduction'},
+				['Courser\'s']={'?','?','?','?','?','?','?','?','?','?','?','?',' Snapshot'}
 				}
 				
 end
 
 
 function event_incoming_text(old, new, color)
-	match_doubleup = old:find (player..' uses Double')
-	battlemod_compat = old:find(player..'.*% Roll.* %d')
+	match_doubleup = old:find (' uses Double')
+	battlemod_compat = old:find('.*% Roll.* %d')
 	obtained_roll = old:find('.* receives the effect of .* Roll.')
 	not_party = old:find ('%('..'%w+'..'%)')	
-	if get_player()['main_job'] == 'COR' then
+	if effected_member ~= nil and #effected_member > 0 then
 		if battlemod_compat or match_doubleup and not_party~=nil then
 			new=''
 		end
@@ -126,44 +127,48 @@ function event_incoming_text(old, new, color)
 		if not_party then
 			new=old
 		end
+		return new, color
 	end
-	return new, color
 end
 
 function event_action(act)
-	if act['actor_id'] == get_player()['id'] then
-		if act['category']==6 then
-			roller = act['param']
-			rollnum = act['targets'][1]['actions'][1]['param']
-			effected_member={}
-			bust_rate(rollnum)
-			for i=1, #roll_id do
-				if roller == roll_id[i] then
-					for n=1, #act['targets'] do
-						for z in pairs(get_party()) do
-							if get_party()[z]['mob'] ~= nil then
-								if act['targets'][n]['id'] == get_party()[z]['mob']['id'] then	
-									effected_member[n]=player_color[z]..get_party()[z]['name']
+	id = act['actor_id']
+	if act['category']==6 then
+		roller = act['param']
+		rollnum = act['targets'][1]['actions'][1]['param']
+		effected_member={}
+		number = #effected_member
+		bust_rate(rollnum)
+		for i=1, #act['targets'] do
+			if act['targets'][i]['id'] == get_player()['id'] then
+				for i=1, #roll_id do
+					if roller == roll_id[i] then
+						for n=1, #act['targets'] do
+							for z in pairs(get_party()) do
+								if get_party()[z]['mob'] ~= nil then
+									if act['targets'][n]['id'] == get_party()[z]['mob']['id'] then	
+										effected_member[n]=player_color[z]..get_party()[z]['name']
+									end
 								end
 							end
 						end
+						local effected_write = table.concat(effected_member, ', ')
+						luckyroll=0
+						if #effected_member > 0 then
+							if rollnum == roll_luck[i] or rollnum == 11 then 
+								luckyroll = 1
+								add_to_chat(1, '['..#effected_member..'] '..effected_write..string.char(31,1)..' >>> '..roll_ident[tostring(roller)]..' Roll ('..rollnum..')'..string.char(31,158)..' (Lucky!)'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
+							elseif rollnum==12 and #effected_member > 0 then
+								add_to_chat(1, string.char(31,167)..'Bust! ('..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')')
+							else
+								add_to_chat(1, '['..#effected_member..'] '..effected_write..string.char(31,1)..' >>> '..roll_ident[tostring(roller)]..' Roll ('..rollnum..')'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
+							end
+						end
 					end
-					local effected_write = table.concat(effected_member, ', ')
-					luckyroll=0
-					if rollnum == roll_luck[i] or rollnum == 11 then 
-						luckyroll = 1
-						add_to_chat(1, '['..#effected_member..'] '..effected_write..string.char(31,1)..' >>> '..roll_ident[tostring(roller)]..' Roll ('..rollnum..')'..string.char(31,158)..' (Lucky!)'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
-					elseif rollnum==12 then
-						add_to_chat(1, string.char(31,167)..'Bust! ('..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')')
-					else
-						add_to_chat(1, '['..#effected_member..'] '..effected_write..string.char(31,1)..' >>> '..roll_ident[tostring(roller)]..' Roll ('..rollnum..')'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
-						
-
 				end
 			end
 		end
 	end
-end
 end
 
 function bust_rate(num)
@@ -177,12 +182,13 @@ end
 	
 
 function event_outgoing_text(original, modified)
-	if original:find('/jobability \"Double') and luckyroll == 1 and override == 0 then
+	if original:find('/jobability \"Double.*Up') and luckyroll == 1 and override == 0 and id == get_player()['id'] then
 		modified=''
 		add_to_chat(159,'You either have a lucky Roll or have rolled an 11. Reuse Double-Up to continue to double-up.')
 		luckyroll=0
 		return modified
 	end
 end
+
 
 

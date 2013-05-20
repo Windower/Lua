@@ -35,7 +35,7 @@ function make_color(col)
 		if col:length() > 2 then
 			local cl = col
 			col = colors[col]
-			if col == 'nil' then
+			if col == nil then
 				warning('Color \''..cl..'\' not found.')
 				col = ''
 			end

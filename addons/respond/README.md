@@ -17,3 +17,4 @@ Installation Instructions:
 * 3 Also make a folder named "data" in that directory, ..\windower4\addons\respond\data.
 * 4 Start your copy of Windower 4, use //lua l respond. 
 * 5 If you like the plugin and want it to load every time you play, add "lua l respond" to the bottom of your init.txt script.
+

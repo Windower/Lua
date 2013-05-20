@@ -110,6 +110,11 @@
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
+    <name>plugin_manager</name>
+    <author>Byrth</author>
+    <description>Allows you to specify which plugins and addons will be used with which characters.</description>
+  </addon>
+  <addon>
     <name>Respond</name>
     <description>Respond to tells and FFOchat PMs using //r.</description>
   </addon>
@@ -171,3 +176,4 @@
     <description>A simple helper addon for Spellcast for Scholar Stratagems. It will automatically calculate the number of stratagems you have and push them into spellcast variables.</description>
   </addon>
 </addons>
+
