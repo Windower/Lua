@@ -140,7 +140,6 @@ function event_incoming_text(old, new, color)
 	battlemod_compat = old:find('.*% Roll.* %d')
 	obtained_roll = old:find('.* receives the effect of .* Roll.')
 	not_party = old:find ('%('..'%w+'..'%)')	
-	if effected_member ~= nil and #effected_member > 0 then
 		if battlemod_compat or match_doubleup and not_party~=nil then
 			new=''
 		end
@@ -151,7 +150,6 @@ function event_incoming_text(old, new, color)
 			new=old
 		end
 		return new, color
-	end
 end
 
 function event_action(act)
