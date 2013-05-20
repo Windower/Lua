@@ -25,6 +25,15 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+_addon = {}
+_addon.name = 'RollTracker'
+_addon.version = '1.0'
+
+config = require 'config'
+settings={}
+xml=lua_base_path..'data/settings.xml'
+
+
 function event_addon_command(...)
     cmd = {...}
 	if cmd[1] ~= nil then
@@ -42,6 +51,8 @@ function event_addon_command(...)
 			override=0
 			write('Enable Autostoppping Doubleup')
 		end
+		
+		
 	
 
 	end
@@ -49,8 +60,8 @@ end
 
 function event_load()
 	send_command('alias rolltracker lua c rolltracker')
-	override=0
-	
+	settingscreate()
+	override= settings['Autostop']
 	player=get_player()['name']
 	luckyroll = 0
 	roll_id ={ 
@@ -180,6 +191,15 @@ function bust_rate(num)
 	return bustrate
 end
 	
+function settingscreate()
+	for line in io.lines(xml) do
+		local g,h,key, value = string.find(line,'<(%w+)>(%d+)</%1>')
+			if value ~= nil then
+				settings[key] = value
+			end
+	end
+end
+
 
 function event_outgoing_text(original, modified)
 	if original:find('/jobability \"Double.*Up') and luckyroll == 1 and override == 0 and id == get_player()['id'] then
