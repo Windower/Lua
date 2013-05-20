@@ -119,9 +119,16 @@ function findAll.search(query)
         end
     end
 
-    local noResults = true
+    local noResults   = true
+    local sortedNames = findAll.globalStorages:keyset():sort()
+                                                       :reverse()
 
-    for characterName, storages in pairs(findAll.globalStorages) do
+    sortedNames = sortedNames:append(sortedNames:remove(sortedNames:find(get_player().name)))
+                             :reverse()
+
+    for _, characterName in pairs(sortedNames) do
+        storages = findAll.globalStorages[characterName]
+
         for _, storageName in pairs(findAll.storagesOrder) do
             local results = L{}
 
