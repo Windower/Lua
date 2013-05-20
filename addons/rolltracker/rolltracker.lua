@@ -30,8 +30,7 @@ _addon.name = 'RollTracker'
 _addon.version = '1.0'
 
 config = require 'config'
-settings={}
-xml=lua_base_path..'data/settings.xml'
+settings=config.load()
 
 
 function event_addon_command(...)
@@ -191,14 +190,6 @@ function bust_rate(num)
 	return bustrate
 end
 	
-function settingscreate()
-	for line in io.lines(xml) do
-		local g,h,key, value = string.find(line,'<(%w+)>(%d+)</%1>')
-			if value ~= nil then
-				settings[key] = value
-			end
-	end
-end
 
 
 function event_outgoing_text(original, modified)
