@@ -59,7 +59,6 @@ end
 
 function event_load()
 	send_command('alias rolltracker lua c rolltracker')
-	settingscreate()
 	override= settings['Autostop']
 	player=get_player()['name']
 	luckyroll = 0
