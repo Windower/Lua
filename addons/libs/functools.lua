@@ -177,6 +177,7 @@ function table.map(t, fn)
 end
 
 -- Analogon to table.map, but for array-tables. Possibility to include nil values.
+-- DEPRECATED: Use Lists instead
 function table.arrmap(t, fn)
 	local res = T{}
 	for key = 1, #t do
