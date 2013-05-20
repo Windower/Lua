@@ -32,6 +32,9 @@ _addon.version = '1.0'
 config = require 'config'
 settings=config.load()
 
+defaults = {}
+defaults.autostop = 0
+
 
 function event_addon_command(...)
     cmd = {...}
@@ -117,9 +120,20 @@ function event_load()
 				['Blitzer\'s']={2,3.4,4.5,11.3,5.3,6.4,7.2,8.3,1.5,10.2,12.1,'-?', '% Attack delay reduction'},
 				['Courser\'s']={'?','?','?','?','?','?','?','?','?','?','?','?',' Snapshot'}
 				}
+	if get_ffxi_info()['logged_in'] then
+        initialize()
+    end
 				
 end
 
+
+function event_login()
+    initialize()
+end
+
+function initialize()
+    settings = config.load(defaults)
+end
 
 function event_incoming_text(old, new, color)
 	match_doubleup = old:find (' uses Double')
