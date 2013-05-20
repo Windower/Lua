@@ -127,7 +127,7 @@ function findAll.search(query)
                              :reverse()
 
     for _, characterName in pairs(sortedNames) do
-        storages = findAll.globalStorages[characterName]
+        local storages = findAll.globalStorages[characterName]
 
         for _, storageName in pairs(findAll.storagesOrder) do
             local results = L{}
