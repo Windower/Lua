@@ -13,12 +13,12 @@ If you notice that this time is too short please create an issue report in the b
 **Commands:**
 
 * findall -- forces an update of the list
-* findall <query> -- looks for any item whose name (long or short) contains the specified value
+* findall &lt;query&gt; -- looks for any item whose name (long or short) contains the specified value
 
 **TODO**
 
-- [ ] Use IPC to notify the addon about any change to the character's items list to reduce the amount of file rescans
-- [ ] Use IPC to synchronize the list between PCs in LAN or Internet (requires IPC update)
+- Use IPC to notify the addon about any change to the character's items list to reduce the amount of file rescans
+- Use IPC to synchronize the list between PCs in LAN or Internet (requires IPC update)
 
 #changelog
 ## v1.20130520
