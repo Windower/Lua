@@ -25,6 +25,17 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+_addon = {}
+_addon.name = 'RollTracker'
+_addon.version = '1.0'
+
+config = require 'config'
+settings=config.load()
+
+defaults = {}
+defaults.autostop = 0
+
+
 function event_addon_command(...)
     cmd = {...}
 	if cmd[1] ~= nil then
@@ -42,6 +53,8 @@ function event_addon_command(...)
 			override=0
 			write('Enable Autostoppping Doubleup')
 		end
+		
+		
 	
 
 	end
@@ -49,8 +62,7 @@ end
 
 function event_load()
 	send_command('alias rolltracker lua c rolltracker')
-	override=0
-	
+	override= settings['Autostop']
 	player=get_player()['name']
 	luckyroll = 0
 	roll_id ={ 
@@ -108,16 +120,26 @@ function event_load()
 				['Blitzer\'s']={2,3.4,4.5,11.3,5.3,6.4,7.2,8.3,1.5,10.2,12.1,'-?', '% Attack delay reduction'},
 				['Courser\'s']={'?','?','?','?','?','?','?','?','?','?','?','?',' Snapshot'}
 				}
+	if get_ffxi_info()['logged_in'] then
+        initialize()
+    end
 				
 end
 
+
+function event_login()
+    initialize()
+end
+
+function initialize()
+    settings = config.load(defaults)
+end
 
 function event_incoming_text(old, new, color)
 	match_doubleup = old:find (' uses Double')
 	battlemod_compat = old:find('.*% Roll.* %d')
 	obtained_roll = old:find('.* receives the effect of .* Roll.')
 	not_party = old:find ('%('..'%w+'..'%)')	
-	if effected_member ~= nil and #effected_member > 0 then
 		if battlemod_compat or match_doubleup and not_party~=nil then
 			new=''
 		end
@@ -128,7 +150,6 @@ function event_incoming_text(old, new, color)
 			new=old
 		end
 		return new, color
-	end
 end
 
 function event_action(act)
@@ -180,6 +201,7 @@ function bust_rate(num)
 	return bustrate
 end
 	
+
 
 function event_outgoing_text(original, modified)
 	if original:find('/jobability \"Double.*Up') and luckyroll == 1 and override == 0 and id == get_player()['id'] then
