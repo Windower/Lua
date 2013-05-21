@@ -1,5 +1,5 @@
 --[[
-findAll v1.20130520
+findAll v1.20130521
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -54,11 +54,24 @@ function findAll.search(query)
         end
     end
 
-    if query == '' then
+    if query:length() == 0 then
         return
     end
 
-    query = query:lower()
+    local characterFilters = S{}
+    local terms            = ''
+
+    for _, queryElement in ipairs(query) do
+        if queryElement:find('^:%a+$') then
+            characterFilters:add(queryElement:match('^:(%a+)$'):lower():gsub("^%l", string.upper))
+        else
+            terms = queryElement
+        end
+    end
+
+    if characterFilters:length() == 0 and terms == '' then
+        return
+    end
 
     local newItemIds = S{}
 
@@ -112,12 +125,14 @@ function findAll.search(query)
     local resultsItems = S{}
 
     for id, names in pairs(findAll.itemNames) do
-        if findAll.itemNames[id].name:find(query)
-            or findAll.itemNames[id].longName:find(query)
+        if findAll.itemNames[id].name:find(terms)
+            or findAll.itemNames[id].longName:find(terms)
         then
             resultsItems:add(id)
         end
     end
+
+    add_to_chat(55, 'lua:addon:findAll >> searching: '..query:concat(' '))
 
     local noResults   = true
     local sortedNames = findAll.globalStorages:keyset():sort()
@@ -126,34 +141,44 @@ function findAll.search(query)
     sortedNames = sortedNames:append(sortedNames:remove(sortedNames:find(get_player().name)))
                              :reverse()
 
-    for _, characterName in pairs(sortedNames) do
-        local storages = findAll.globalStorages[characterName]
+    for _, characterName in ipairs(sortedNames) do
+        if characterFilters:length() == 0 or characterFilters:length() > 0 and characterFilters:contains(characterName) then
+            local storages = findAll.globalStorages[characterName]
 
-        for _, storageName in pairs(findAll.storagesOrder) do
-            local results = L{}
+            for _, storageName in ipairs(findAll.storagesOrder) do
+                local results = L{}
 
-            for id, quantity in pairs(storages[storageName]) do
-                if resultsItems:contains(id) then
-                    results:append(
-                        '\30\03'..characterName..'/'..storageName..':\30\01 '..
-                        findAll.itemNames[id].name:gsub(query, '\30\02'..query..'\30\01')..
-                        (quantity > 1 and ' \30\03('..quantity..')\30\01' or '')
-                    )
+                for id, quantity in pairs(storages[storageName]) do
+                    if resultsItems:contains(id) then
+                        results:append(
+                            '\30\03'..characterName..'/'..storageName..':\30\01 '..
+                            findAll.itemNames[id].name:gsub(terms, '\30\02'..terms..'\30\01')..
+                            (quantity > 1 and ' \30\03('..quantity..')\30\01' or '')
+                        )
 
-                    noResults = false
+                        noResults = false
+                    end
                 end
-            end
 
-            results:sort()
+                results:sort()
 
-            for _, result in ipairs(results) do
-                add_to_chat(55, result)
+                for _, result in ipairs(results) do
+                    add_to_chat(55, result)
+                end
             end
         end
     end
 
     if noResults then
-        add_to_chat(55, 'lua:addon:findAll >> you have no items that match \''..query..'\'')
+        if terms ~= '' then
+            if characterFilters:length() == 0 then
+                add_to_chat(55, 'lua:addon:findAll >> you have no items that match \''..terms..'\'')
+            else
+                add_to_chat(55, 'lua:addon:findAll >> you have no items that match \''..terms..'\' on the specified characters')
+            end
+        else
+            add_to_chat(55, 'lua:addon:findAll >> you have no items on the specified characters')
+        end
     end
 
     collectgarbage()
@@ -254,6 +279,10 @@ function event_login()
     findAll.loadTimestamp = os.time();
 end
 
+function event_zone_change()
+    findAll.loadTimestamp = os.time();
+end
+
 function event_logout()
     if not findAll.update() then
         add_to_chat(38, 'lua:addon:findAll >> findAll wasn\'t ready')
@@ -265,5 +294,16 @@ function event_addon_command(...)
         write('you have to be logged in to use this addon')
     end
 
-    findAll.search(T{...}:concat(' '))
+    local params = L{...}
+    local query  = L{}
+
+    while params:length() > 0 and params[1]:match('^:%a+$') do
+        query:append(params:remove(1))
+    end
+
+    if params:length() > 0 then
+        query:append(params:concat(' '))
+    end
+
+    findAll.search(query)
 end
