@@ -62,7 +62,7 @@ end
 
 function event_load()
 	send_command('alias rolltracker lua c rolltracker')
-	override= settings['Autostop']
+	override= settings['autostop']
 	player=get_player()['name']
 	luckyroll = 0
 	roll_id ={ 
@@ -159,7 +159,7 @@ function event_action(act)
 		rollnum = act['targets'][1]['actions'][1]['param']
 		effected_member={}
 		number = #effected_member
-		bust_rate(rollnum)
+		bust_rate(rollnum, id)
 		for i=1, #act['targets'] do
 			if act['targets'][i]['id'] == get_player()['id'] then
 				for i=1, #roll_id do
@@ -192,8 +192,8 @@ function event_action(act)
 	end
 end
 
-function bust_rate(num)
-	if num <= 5 or num == 11 then
+function bust_rate(num, main)
+	if num <= 5 or num == 11 or main ~= get_player()['id'] then
 		bustrate = ''
 	else 
 		bustrate = '\7  [Chance to Bust]: '..string.format("%.1f",(num-5)*16.67)..'%'
