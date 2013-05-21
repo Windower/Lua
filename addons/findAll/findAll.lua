@@ -1,5 +1,5 @@
 --[[
-findAll v1.20130520
+findAll v1.20130521
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -251,6 +251,10 @@ function event_unload()
 end
 
 function event_login()
+    findAll.loadTimestamp = os.time();
+end
+
+function event_zone_change()
     findAll.loadTimestamp = os.time();
 end
 
