@@ -15,7 +15,10 @@ The list is updated everytime you look for an item or on logout.
 **Commands:**
 
 * findall -- forces an update of the list
-* findall &lt;query&gt; -- looks for any item whose name (long or short) contains the specified value
+* findall &lt;query&gt; -- looks for any item whose name (long or short) contains the specified value  
+**example1:** findall thaumas -- searches for "thaumas" on all of your characters  
+**example2:** findall :alpha :beta thaumas -- searches for "thaumas" on "alpha" and "beta" characters  
+**example3:** findall :omega -- shows all the items stored on "omega"
 
 **TODO**
 
@@ -23,5 +26,8 @@ The list is updated everytime you look for an item or on logout.
 - Use IPC to synchronize the list between PCs in LAN or Internet (requires IPC update)
 
 #changelog
+## v1.20130521
+* added characters filter
+
 ## v1.20130520
 * first release
