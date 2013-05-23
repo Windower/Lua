@@ -111,8 +111,8 @@ function findall.search(query)
                             and new_item_ids:contains(id)
                         then
                             findall.item_names[id] = {
-                                ['name']      = name:lower(),
-                                ['long_name'] = long_name:lower()
+                                ['name']      = name:lower():gsub('♂', '\x81\x89'):gsub('♀', '\x81\x8A'),
+                                ['long_name'] = long_name:lower():gsub('♂', '\x81\x89'):gsub('♀', '\x81\x8A')
                             }
                         end
                     end
