@@ -41,7 +41,7 @@ findall.deferral_time          = 20
 findall.item_names             = T{}
 findall.global_storages        = {}
 findall.storages_path          = 'data/storages.json'
-findall.storages_order         = L{'inventory', 'safe', 'storage', 'locker', 'satchel', 'sack'}
+findall.storages_order         = L{'temporary', 'inventory', 'safe', 'storage', 'locker', 'satchel', 'sack'}
 findall.storage_slips_order    = L{'slip 01', 'slip 02', 'slip 03', 'slip 04', 'slip 05', 'slip 06', 'slip 07', 'slip 08', 'slip 09', 'slip 10', 'slip 11', 'slip 12', 'slip 13', 'slip 14'}
 findall.merged_storages_orders = L{}:extend(findall.storages_order):extend(findall.storage_slips_order)
 findall.resources              = {
@@ -254,13 +254,15 @@ function findall.update()
         local storages_json = L{}
 
         for storage_name, storage in pairs(storages) do
-            local items_json = L{}
+            if storages ~= 'temporary' then
+                local items_json = L{}
 
-            for id, quantity in pairs(storage) do
-                items_json:append('"'..id..'":'..quantity)
+                for id, quantity in pairs(storage) do
+                    items_json:append('"'..id..'":'..quantity)
+                end
+
+                storages_json:append('"'..storage_name..'":{'..items_json:concat(',')..'}')
             end
-
-            storages_json:append('"'..storage_name..'":{'..items_json:concat(',')..'}')
         end
 
         characters_json:append('"'..character_name..'":{'..storages_json:concat(',')..'}')
