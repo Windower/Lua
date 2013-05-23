@@ -76,7 +76,7 @@ function event_load()
 				121, 122, 303, 302, 304, 305
 			}
 	player_color={['p0']=string.char(31, 167),['p1']=string.char(31, 209),['p2']=string.char(31, 204),['p3']=string.char(31,189),['p4']=string.char(31,3),['p5']=string.char(31,158)}
-	roll_ident={[97]=' ', ['98']='Fighter\'s',['99']='MNK',['100']='WHM',
+	roll_ident={[97]=' ', ['98']='Fighter\'s',['99']='Monk\'s',['100']='Healer\'s',
 						['101']='Wizard\'s',['102']='Warlock\'s',['103']='Rogue\'s',
 						['104']='Gallant\'s',['105']='Chaos',['106']='Beast',
 						['107']='Choral',['108']='Hunter\'s',['109']='Samurai',
@@ -180,7 +180,7 @@ function event_action(act)
 								luckyroll = 1
 								add_to_chat(1, '['..#effected_member..'] '..effected_write..string.char(31,1)..' >>> '..roll_ident[tostring(roller)]..' Roll ('..rollnum..')'..string.char(31,158)..' (Lucky!)'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
 							elseif rollnum==12 and #effected_member > 0 then
-								add_to_chat(1, string.char(31,167)..'Bust! ('..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')')
+								add_to_chat(1, string.char(31,167)..'['..#effected_member..']'..effected_write..' >>> Bust! ('..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')')
 							else
 								add_to_chat(1, '['..#effected_member..'] '..effected_write..string.char(31,1)..' >>> '..roll_ident[tostring(roller)]..' Roll ('..rollnum..')'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
 							end
