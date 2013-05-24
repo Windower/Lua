@@ -43,6 +43,10 @@ function list.append(l, el)
 	l[l.n] = el
 end
 
+function list.last(l, i)
+	return l[l.n - (i and i - 1 or 0)]
+end
+
 function list.insert(l, i, el)
 	l.n = l.n + 1
 	table.insert(l, i, el)
@@ -51,13 +55,13 @@ end
 function list.remove(l, i)
 	i = i or l.n
 	local res = l[i]
-	if res == nil then
-		return nil
+	
+	for key = i, l.n do
+		l[key] = l[key + 1]
 	end
 	
 	l.n = l.n - 1
-	
-	return table.remove(l, i)
+	return res
 end
 
 function list.extend(l1, l2)
@@ -171,7 +175,7 @@ end
 
 function list.reduce(l, fn, init)
 	local acc = init
-	for _, val in ipairs(t) do
+	for _, val in ipairs(l) do
 		if acc == nil then
 			acc = val
 		else
@@ -187,21 +191,26 @@ function list.flatten(l, rec)
 	
 	local res = {}
 	local key = 1
+	local val
 	local flat
-	for key, val in ipairs(l) do
+	local n2
+	for k1 = 1, l.n do
+		val = l[key]
 		if type(val) == 'table' then
 			if rec then
 				flat = list.flatten(val, rec)
-				list.extend(res, flat)
-				key = key + flat.n
+				n2 = flat.n
+				for k2 = 1, n2 do
+					res[key + k2] = flat[k2]
+				end
+				key = key + n2
 			else
-				list.extend(res, val)
-				if class(val) == 'List' then
-					key = key + val.n
-				else
-					key = key + #val
+				n2 = #val
+				for k2 = 1, n2 do
+					res[key + k2] = val[k2]
 				end
 			end
+			key = key + n2
 		else
 			res[key] = val
 			key = key + 1
@@ -216,7 +225,7 @@ function list.it(l)
 	local key = 0
 	return function()
 		key = key + 1
-		return l[key]
+		return l[key], key
 	end
 end
 
@@ -278,6 +287,17 @@ function list.reverse(l)
 		rkey = rkey - 1
 	end
 
+	return setmetatable(res, _meta.L)
+end
+
+function list.range(n)
+	local res = {}
+	
+	for key = 1, n do
+		res[key] = key
+	end
+	
+	res.n = n
 	return setmetatable(res, _meta.L)
 end
 

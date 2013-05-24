@@ -212,6 +212,8 @@ function event_action(act)
 				status = color_arr['statuscol']..'Completely Resists'..rcol
 			elseif msg_ID == 85 or msg_ID == 284 then
 				status = color_arr['statuscol']..'Resists'..rcol
+			elseif msg_ID == 674 then -- Scavenge
+				number = act['targets'][i]['actions'][n]['add_effect_param']..' '..color_arr['itemcol']..items[effect_val]['enl']..rcol
 			elseif T{75,156,189,248,283,312,323,336,355,408,422,423,425,659}:contains(msg_ID) then
 				status = color_arr['statuscol']..'No Effect'..rcol -- The status code for "No Effect" is 255, so it might actually work without this line
 			end

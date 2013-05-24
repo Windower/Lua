@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<settings>
+  <!--
+	This controls the settings for the Roll Tracker Plugin. 
+	The only avaliable setting at the moment is
+		Autostop: 0: Automatically stops rolls on lucky numbers, and displays the message (Currently the default option)
+		Autostop: 1: Disables the stop functionality. 
+	-->
+	<global>
+		<Autostop>0</Autostop>
+	</global>
+</settings>
