@@ -499,7 +499,7 @@ function event_incoming_text(original, modified, color)
 			d,b = string.find(original,'You find ')
 			j,b = string.find(original,'You must wait longer ')
 			k,b = string.find(original,'You throw away a ')
-			l,b = string.find(original,'You obtain ')
+			l,b = string.find(original,' obtain')
 			m,b = string.find(original,'was lost')
 			n,b = string.find(original,' roll ')
 			if a==nil and c==nil and d==nil and e==nil and f==nil and h==nil and g==nil and i==nil and j==nil and k==nil and l==nil and m==nil and n==nil then
