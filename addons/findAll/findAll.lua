@@ -209,7 +209,7 @@ function findall.get_storages()
         end
     end
 
-    local slip_storages = slips.get_player_items()
+    --[[local slip_storages = slips.get_player_items()
 
     for _, slip_id in ipairs(slips.storages) do
         local slip_name     = 'slip '..tostring(slips.get_slip_number_by_id(slip_id)):lpad('0', 2)
@@ -218,7 +218,7 @@ function findall.get_storages()
         for _, id in ipairs(slip_storages[slip_id]) do
             storages[slip_name][tostring(id)] = 1
         end
-    end
+    end]]
 
     return storages
 end
