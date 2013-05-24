@@ -8,7 +8,7 @@ This plugin shows the slips' items highlighting in green those that are actually
 
 **commands:**
 
-* porter &lt;slip&gt;[ &lt;page&gt;] -- shows the specified slip or slip's page if specified
+* porter &lt;slip&gt;[ &lt;page&gt;] -- shows the specified slip or slip's page
 
 #### v1.20130524
 * first release
