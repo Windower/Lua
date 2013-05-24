@@ -25,6 +25,17 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+_addon = {}
+_addon.name = 'RollTracker'
+_addon.version = '1.0'
+
+config = require 'config'
+settings=config.load()
+
+defaults = {}
+defaults.autostop = 0
+
+
 function event_addon_command(...)
     cmd = {...}
 	if cmd[1] ~= nil then
@@ -42,6 +53,8 @@ function event_addon_command(...)
 			override=0
 			write('Enable Autostoppping Doubleup')
 		end
+		
+		
 	
 
 	end
@@ -49,8 +62,7 @@ end
 
 function event_load()
 	send_command('alias rolltracker lua c rolltracker')
-	override=0
-	
+	override= settings['autostop']
 	player=get_player()['name']
 	luckyroll = 0
 	roll_id ={ 
@@ -64,7 +76,7 @@ function event_load()
 				121, 122, 303, 302, 304, 305
 			}
 	player_color={['p0']=string.char(31, 167),['p1']=string.char(31, 209),['p2']=string.char(31, 204),['p3']=string.char(31,189),['p4']=string.char(31,3),['p5']=string.char(31,158)}
-	roll_ident={[97]=' ', ['98']='Fighter\'s',['99']='MNK',['100']='WHM',
+	roll_ident={[97]=' ', ['98']='Fighter\'s',['99']='Monk\'s',['100']='Healer\'s',
 						['101']='Wizard\'s',['102']='Warlock\'s',['103']='Rogue\'s',
 						['104']='Gallant\'s',['105']='Chaos',['106']='Beast',
 						['107']='Choral',['108']='Hunter\'s',['109']='Samurai',
@@ -108,16 +120,26 @@ function event_load()
 				['Blitzer\'s']={2,3.4,4.5,11.3,5.3,6.4,7.2,8.3,1.5,10.2,12.1,'-?', '% Attack delay reduction'},
 				['Courser\'s']={'?','?','?','?','?','?','?','?','?','?','?','?',' Snapshot'}
 				}
+	if get_ffxi_info()['logged_in'] then
+        initialize()
+    end
 				
 end
 
+
+function event_login()
+    initialize()
+end
+
+function initialize()
+    settings = config.load(defaults)
+end
 
 function event_incoming_text(old, new, color)
 	match_doubleup = old:find (' uses Double')
 	battlemod_compat = old:find('.*% Roll.* %d')
 	obtained_roll = old:find('.* receives the effect of .* Roll.')
 	not_party = old:find ('%('..'%w+'..'%)')	
-	if effected_member ~= nil and #effected_member > 0 then
 		if battlemod_compat or match_doubleup and not_party~=nil then
 			new=''
 		end
@@ -128,7 +150,6 @@ function event_incoming_text(old, new, color)
 			new=old
 		end
 		return new, color
-	end
 end
 
 function event_action(act)
@@ -138,7 +159,7 @@ function event_action(act)
 		rollnum = act['targets'][1]['actions'][1]['param']
 		effected_member={}
 		number = #effected_member
-		bust_rate(rollnum)
+		bust_rate(rollnum, id)
 		for i=1, #act['targets'] do
 			if act['targets'][i]['id'] == get_player()['id'] then
 				for i=1, #roll_id do
@@ -159,7 +180,7 @@ function event_action(act)
 								luckyroll = 1
 								add_to_chat(1, '['..#effected_member..'] '..effected_write..string.char(31,1)..' >>> '..roll_ident[tostring(roller)]..' Roll ('..rollnum..')'..string.char(31,158)..' (Lucky!)'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
 							elseif rollnum==12 and #effected_member > 0 then
-								add_to_chat(1, string.char(31,167)..'Bust! ('..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')')
+								add_to_chat(1, string.char(31,167)..'['..#effected_member..']'..effected_write..' >>> Bust! ('..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')')
 							else
 								add_to_chat(1, '['..#effected_member..'] '..effected_write..string.char(31,1)..' >>> '..roll_ident[tostring(roller)]..' Roll ('..rollnum..')'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
 							end
@@ -171,8 +192,8 @@ function event_action(act)
 	end
 end
 
-function bust_rate(num)
-	if num <= 5 or num == 11 then
+function bust_rate(num, main)
+	if num <= 5 or num == 11 or main ~= get_player()['id'] then
 		bustrate = ''
 	else 
 		bustrate = '\7  [Chance to Bust]: '..string.format("%.1f",(num-5)*16.67)..'%'
@@ -180,6 +201,7 @@ function bust_rate(num)
 	return bustrate
 end
 	
+
 
 function event_outgoing_text(original, modified)
 	if original:find('/jobability \"Double.*Up') and luckyroll == 1 and override == 0 and id == get_player()['id'] then

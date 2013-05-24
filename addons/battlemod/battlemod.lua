@@ -49,8 +49,8 @@ function event_load()
 	skillchain_arr = {'Light:','Darkness:','Gravitation:','Fragmentation:','Distortion:','Fusion:','Compression:','Liquefaction:','Induration:','Reverberation:','Transfixion:','Scission:','Detonation:','Impaction:'}
 	ratings_arr = {'TW','EP','DC','EM','T','VT','IT'}
 	rcol = string.char(0x1E,0x01)
-	blocked_colors = T{20,21,22,23,24,25,26,28,29,30,31,32,33,35,36,37,40,41,42,43,44,50,51,52,56,57,59,60,63,68,69,64,65,67,69,81,85,90,91,100,101,102,104,105,106,110,111,112,114,122,163,164,168,170,171,175,177,183,185,186,191}
-	passed_messages = T{4,5,6,16,17,18,20,34,35,36,40,47,48,49,64,78,87,88,89,90,116,154,170,171,172,173,174,175,176,177,178,191,192,198,204,215,217,218,234,246,249,328,350,336,531,558,561,575,601,609,562,610,611,612,613,614,615,616,617,618,619,620,625,626,627,628,629,630,631,632,633,634,635,636,643,660,661,662}
+	blocked_colors = T{20,21,22,23,24,25,26,28,29,30,31,32,33,35,36,37,40,41,42,43,44,50,51,52,56,57,59,60,61,63,68,69,64,65,67,69,81,85,90,91,100,101,102,104,105,106,107,110,111,112,114,122,127,162,163,164,166,168,170,171,174,175,177,182,183,185,186,191}
+	passed_messages = T{4,5,6,16,17,18,20,34,35,36,40,47,48,49,64,78,87,88,89,90,112,116,154,170,171,172,173,174,175,176,177,178,191,192,198,204,215,217,218,234,246,249,328,350,336,531,558,561,575,601,609,562,610,611,612,613,614,615,616,617,618,619,620,625,626,627,628,629,630,631,632,633,634,635,636,643,660,661,662}
 	agg_messages = T{75,93,116,131,134,144,146,148,150,186,206,230,236,237,243,319,320,364,414,420,422,424,425,426,441,570,602,668} -- 320, 441, 602 added recently
 	color_redundant = T{26,33,41,71,72,89,94,109,114,164,173,181,184,186,70,84,104,127,128,129,130,131,132,133,134,135,136,137,138,139,140,64,86,91,106,111,175,178,183,81,101,16,65,87,92,107,112,174,176,182,82,102,67,68,69,170,189,15,208,18,25,32,40,163,185,23,24,27,34,35,42,43,162,165,187,188,30,31,14,205,144,145,146,147,148,149,150,151,152,153,190,13,9,253,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,284,285,286,287,292,293,294,295,300,301,301,303,308,309,310,311,316,317,318,319,324,325,326,327,332,333,334,335,340,341,342,343,344,345,346,347,348,349,350,351,355,357,358,360,361,363,366,369,372,374,375,378,381,384,395,406,409,412,415,416,418,421,424,437,450,453,456,458,459,462,479,490,493,496,499,500,502,505,507,508,10,51,52,55,58,62,66,80,83,85,88,90,93,100,103,105,108,110,113,122,168,169,171,172,177,179,180,12,11,37,291} -- 37 and 291 might be unique colors, but they are not gsubbable.
 	black_colors = T{352,354,356,388,390,400,402,430,432,442,444,472,474,484,486}
@@ -473,6 +473,7 @@ function event_addon_command(...)
 			end
 			local outstr = dialog[206]['english']:gsub('$\123target\125',targets):gsub('$\123status\125',stat)
 			add_to_chat(191,string.char(0x1F,0xFE,0x1E,0x01)..outstr..string.char(127,49))
+			wearing[stat] = nil
 		end
 	end
 end
@@ -498,9 +499,10 @@ function event_incoming_text(original, modified, color)
 			d,b = string.find(original,'You find ')
 			j,b = string.find(original,'You must wait longer ')
 			k,b = string.find(original,'You throw away a ')
-			l,b = string.find(original,'You obtain ')
+			l,b = string.find(original,' obtain')
 			m,b = string.find(original,'was lost')
-			if a==nil and c==nil and d==nil and e==nil and f==nil and h==nil and g==nil and i==nil and j==nil and k==nil and l==nil and m==nil then
+			n,b = string.find(original,' roll ')
+			if a==nil and c==nil and d==nil and e==nil and f==nil and h==nil and g==nil and i==nil and j==nil and k==nil and l==nil and m==nil and n==nil then
 				modified = ''
 				if allow then
 					send_command('wait 5;lua c battlemod flip allow')
@@ -548,10 +550,10 @@ function event_action_message(actor_id,index,actor_target_index,target_target_in
 			if debugging then write(param_1..'   '..param_2..'   '..param_3) end
 		end
 		
-		if message_id == 558 then
-			number = param_1
+		if message_id == 558  then
 			number2 = param_2
 		end
+		number = param_1
 		
 		if param_1 ~= 0 then
 			status = nf(statuses[param_1],'english')
