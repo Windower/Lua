@@ -405,7 +405,7 @@
 	<dtd id="403" english="${number} of ${target}'s attributes is drained." color="1"/>
 	<dtd id="404" english="${number} status effect is drained from ${target}." color="1"/>
 	<dtd id="405" english="${actor} uses ${weapon_skill}.${lb}${number} of ${target}'s effects disappears!" color="56"/>
-	<dtd id="406" english="${actor} uses ${weapon_skill}.${lb}${target} falls to the ground." color="56"/>
+	<dtd id="406" english="${actor} uses ${weapon_skill}.${lb}${target} falls to the ground." color="166"/>
 	<dtd id="407" english="${actor} uses a ${item}.${lb}${target}'s TP is reduced." color="81"/>
 	<dtd id="408" english="${actor} uses a ${item}.${lb}No effect on ${target}." color="R"/>
 	<dtd id="409" english="${actor} uses ${weapon_skill}.${lb}${target}'s TP is increased to ${number}." color="H" units="TP"/>
