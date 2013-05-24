@@ -4,16 +4,35 @@ function event_action(act)
 	local aggregate = false
 	local eventual_send = false
 	
-	local msg = act['targets'][1]['actions'][1]['message']
-	if agg_messages:contains(msg) and condensebuffs then
-		aggregate = true -- checks if the first message is one of the multi-target indicating messages
-	end
-	
 	local party_table = get_party()
 	local actor_table = get_mob_by_id(act['actor_id'])
 	local actor = actor_table['name']
 	if actor == nil then return end
 	actor = namecol(actor,actor_table,party_table)
+	
+	local msg = act['targets'][1]['actions'][1]['message']
+	if agg_messages:contains(msg) and condensebuffs then
+		aggregate = true -- checks if the first message is one of the multi-target indicating messages
+		local messages = {}
+		for n,m in pairs(act['targets']) do
+			local target_table = get_mob_by_id(act['targets'][i]['id'])
+			local target = target_table['name']
+			target = namecol(target,target_table,party_table)
+			
+			local msg = act['targets'][n]['actions'][1]['message']
+			if message[msg] then
+				if check_filter(actor_table,party_table,target_table,act['category'],msg) then
+					local address = messages[msg]['address']
+					act['targets'][address]['target'] = act['targets'][address]['target']..', '..target
+					act['targets'][n]['actions'][1]['message'] = 0
+				end
+			else
+				messages[msg] = {}
+				messages[msg]['address'] = n
+				act['targets'][n]['target'] = target
+			end
+		end
+	end
 
 	for i,v in pairs(act['targets']) do
 		--local shadows,parries,misses,hits = 0,0,0,0
@@ -67,12 +86,19 @@ function event_action(act)
 			if not nf(dialog[msg_ID],'english') then return end
 			
 			local prepstr,abil,add_eff_str,spike_str,wsparm,status,number,gil,abil_ID,effect_val
-			local spell,ability,weapon_skill,item
+			local spell,ability,weapon_skill,item,target_table,target
 			
 			local flipped = false
-			local target_table = get_mob_by_id(act['targets'][i]['id'])
-			local target = target_table['name']
-			target = namecol(target,target_table,party_table)
+			
+			if aggregate and msg_ID ~= 0 then
+				target = act['targets'][i]['targets']
+			elseif aggregate then
+				target = ' '
+			else
+				target_table = get_mob_by_id(act['targets'][i]['id'])
+				target = target_table['name']
+				target = namecol(target,target_table,party_table)
+			end
 			
 			
 			if act['category'] == 1 then -- Melee swings
@@ -234,7 +260,8 @@ function event_action(act)
 						number = nil
 					end
 					if condensebattle then
-						if not abil then abil = 'AoE' end
+						-- TEST REMOVAL
+						--if not abil then abil = 'AoE' end
 						
 						if T{'Steal','Despoil','Scavenge','Mug'}:contains(abil) then
 							prepstr = dialog[msg_ID]['english']
