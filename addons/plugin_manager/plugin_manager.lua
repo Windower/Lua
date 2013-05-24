@@ -63,13 +63,13 @@ function load_settings()
 		for child in settingtab:it() do
 		-- Global/Names layer
 			length = length + 1
-			loader_array[child.name] = {}
-			loader_array[child.name]['addon'] = T{}
-			loader_array[child.name]['plugin'] = T{}
+			loader_array[child.name:lower()] = {}
+			loader_array[child.name:lower()]['addon'] = T{}
+			loader_array[child.name:lower()]['plugin'] = T{}
 			for child2 in child:it() do
 				if child2.name == 'addon' or child2.name == 'plugin' then
 				-- Addon/Plugin layer <name>children[1]</name>
-					loader_array[child.name][child2.name][#loader_array[child.name][child2.name]+1] = child2.children[1]:lower()
+					loader_array[child.name:lower()][child2.name][#loader_array[child.name:lower()][child2.name]+1] = child2.children[1]:lower()
 					if not general_array[child2.name][child2.children[1]:lower()] then
 						general_array[child2.name][child2.children[1]:lower()] = true
 					end
@@ -132,8 +132,8 @@ end
 
 function load_plugins()
 	local working_array,commandstr = {},'wait 5;'
-	if loader_array[get_player().name] then
-		working_array = loader_array[get_player().name]
+	if loader_array[get_player().name:lower()] then
+		working_array = loader_array[get_player().name:lower()]
 	else
 		working_array = loader_array['global']
 	end
