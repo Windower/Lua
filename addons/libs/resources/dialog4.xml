@@ -190,7 +190,7 @@
 	<dtd id="188" english="${actor} uses ${weapon_skill}, but misses ${target}." color="M"/>
 	<dtd id="189" english="${actor} uses ${weapon_skill}.${lb}No effect on ${target}." color="R"/>
 	<dtd id="190" english="${actor} cannot use that weapon ability." color="1"/>
-	<dtd id="191" english="${actor} is unable to use weapon skills." color="1"/>
+	<dtd id="191" english="${actor} is unable to use weapon skills." color="122"/>
 	<dtd id="192" english="${actor} does not have enough TP." color="122"/>
 	<dtd id="193" english="${weapon_skill} cannot be used against that target." color="1"/>
 	<dtd id="194" english="${actor} uses ${weapon_skill}.${lb}${target} gains the effect of ${status}." color="56"/>
