@@ -10,26 +10,43 @@ function event_action(act)
 	if actor == nil then return end
 	actor = namecol(actor,actor_table,party_table)
 	
-	local msg = act['targets'][1]['actions'][1]['message']
-	if agg_messages:contains(msg) and condensebuffs then
+	if agg_messages:contains(act['targets'][1]['actions'][1]['message']) and condensebuffs then
 		aggregate = true -- checks if the first message is one of the multi-target indicating messages
 		local messages = {}
+		for n,m in pairs(act['targets']) do
+			local msg = act['targets'][n]['actions'][1]['message']
+			local target_table = get_mob_by_id(act['targets'][i]['id'])
+			local target = target_table['name']
+			target = namecol(target,target_table,party_table)
+			if messages[msg] then
+				if check_filter(actor_table,party_table,target_table,act['category'],msg) then
+					local address = messages[msg]['address']
+					act['targets'][address]['count'] = act['targets'][address]['count'] + 1
+				end
+			else
+				messages[msg] = {}
+				messages[msg]['address'] = n
+				act['targets'][address]['count'] = 1
+			end
+		end
+		
 		for n,m in pairs(act['targets']) do
 			local target_table = get_mob_by_id(act['targets'][i]['id'])
 			local target = target_table['name']
 			target = namecol(target,target_table,party_table)
 			
 			local msg = act['targets'][n]['actions'][1]['message']
-			if message[msg] then
+			if messages[msg]['address'] ~= n then
 				if check_filter(actor_table,party_table,target_table,act['category'],msg) then
 					local address = messages[msg]['address']
-					act['targets'][address]['target'] = act['targets'][address]['target']..', '..target
+					conjunctions(persistanttarget,target,act['target_count'],i)
+					act['targets'][address]['count2'] = act['targets'][address]['count2'] +1
+					act['targets'][address]['target'] = conjunctions(act['targets'][address]['target'],target,act['targets'][address]['count'],act['targets'][address]['count2'])
 					act['targets'][n]['actions'][1]['message'] = 0
 				end
 			else
-				messages[msg] = {}
-				messages[msg]['address'] = n
 				act['targets'][n]['target'] = target
+				act['targets'][address]['count2'] = 1
 			end
 		end
 	end
