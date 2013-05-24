@@ -1,5 +1,5 @@
 **author:** Giuliano Riccio  
-**version:** v 1.20130521
+**version:** v 1.20130524
 
 ###description 
 This plugin searches for items stored on all of your characters. To build the initial list, you must login and logout (or input the "findall" command) at least once with each of them.  
@@ -25,8 +25,11 @@ The list is updated everytime you look for an item or on logout.
 - Use IPC to synchronize the list between PCs in LAN or Internet (requires IPC update)
 
 ###changelog
+#### v1.20130524
+* **add:** added temp items support
+
 #### v1.20130521
-* added characters filter
+* **add:** added characters filter
 
 #### v1.20130520
 * first release
