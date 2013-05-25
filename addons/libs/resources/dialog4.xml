@@ -584,8 +584,8 @@
 	<dtd id="582" english="${actor} obtains ${gil}." color="1"/>
 	<dtd id="583" english="Trial ${number}: ${number} objective remains." color="1"/>
 	<dtd id="584" english="You have completed Trial ${number}.${lb}Report your success to a Magian Moogle." color="1"/>
-	<dtd id="585" english="${actor} uses ${ability}.${lb}${target}'s enmity towards ${actor} is ${number}%." color="101" units="%"/>
-	<dtd id="586" english="Towards ${target} is ${number}%." color="101" units="%"/>
+	<dtd id="585" english="${actor} uses ${ability}.${lb}${target}'s enmity towards ${actor} is ${number}%." color="101" units="%%"/>
+	<dtd id="586" english="Towards ${target} is ${number}%." color="101" units="%%"/>
 	<dtd id="587" english="${target} regains ${number} HP." color="H" units="HP"/>
 	<dtd id="588" english="${target} regains ${number} MP." color="H" units="MP"/>
 	<dtd id="589" english="${target} have been healed of ${number} status ailments." color="1"/>
