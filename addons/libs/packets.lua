@@ -18,6 +18,12 @@ packets.outgoing = {}
 	Packet database. Feel free to correct/amend it wherever it's lacking.
 ]]
 
+for n=1,0x1FF,1 do
+	packets.outgoing[n] = {name='Unknown', size=0x00, description='No data available.'}
+	packets.incoming[n] = {name='Unknown', size=0x00, description='No data available.'}
+end
+
+
 -- Client packets (outgoing)
 packets.outgoing[0x00A] = {name='Client Connect',      size=0x2E, description='(unencrypted/uncompressed) First packet sent when connecting to new zone.'}
 packets.outgoing[0x00D] = {name='Client Leave',        size=0x04, description='Last packet sent from client before it leaves the zone.'}
@@ -183,4 +189,4 @@ function P(id, data, mode)
 	return res
 end
 
-return setmetatable(packets, {index={name='Unknown', size=0x00, description='No data available.'}}), fields
+return packets, fields
