@@ -1,5 +1,5 @@
 --[[
-porter v1.20130524
+porter v1.20130525
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -41,6 +41,91 @@ porter.resources   = {
     ['general'] = '../../plugins/resources/items_general.xml'
 }
 
+function porter.load_resources()
+    local slips_items_ids = T()
+    for _, slip in  pairs(slips.items) do
+        slips_items_ids:extend(slip)
+    end
+
+    slips_items_ids = S(slips_items_ids)
+
+    for kind, resource_path in pairs(porter.resources) do
+        resource = io.open(lua_base_path..resource_path, 'r')
+
+        if resource ~= nil then
+            while true do
+                local line = resource:read()
+
+                if line == nil then
+                    break
+                end
+
+                local id, name = line:match('id="(%d+)".+>([^<]+)<')
+
+                if id ~= nil then
+                    id = tonumber(id, 10)
+
+                    if slips_items_ids:contains(id) then
+                        porter.items_names[id] = name:lower()
+                    end
+                end
+            end
+        else
+            write(kind..' resource file not found')
+        end
+
+        resource:close()
+    end
+end
+
+function porter.show_slip(slip_number, slip_page)
+    if porter.items_names:length() == 0 then
+        porter.load_resources()
+    end
+    
+    local player_items = slips.get_player_items()
+    
+    if slip_number ~= nil then
+        slips_storage = L{slips.get_slip_id(slip_number)}
+    else
+        slips_storage = slips.storages
+    end
+
+    for _, slip_id in ipairs(slips_storage) do
+        local slip                  = slips.get_slip_by_id(slip_id)
+        local player_slip_items     = S(player_items[slip_id])
+        local printable_slip_number = tostring(slips.get_slip_number_by_id(slip_id)):lpad('0', 2)
+
+        if slip_number ~= nil
+            or slip_number == nil and player_slip_items:length() > 0
+        then
+            local slip_items
+
+            if slip_number == nil or slip_page == nil then
+                slip_items = slip
+            else
+                local offset = (slip_page - 1) * 16 + 1
+
+                if offset < 1 or offset > slip:length() then
+                    add_to_chat(55, 'lua:addon:porter >> slip '..tostring(slip_number):lpad('0', 2)..' has no page '..slip_page..', kupo.')
+
+                    return
+                end
+
+                slip_items = slip:slice(offset, offset + 15)
+            end
+
+            for item_position, item_id in ipairs(slip_items) do
+                add_to_chat(
+                    55,
+                    '\30\03'..'slip '..printable_slip_number..'/page '..(slip_page and slip_page or tostring(math.ceil(item_position / 16))):lpad('0', 2)..':\30\01 '..
+                    '\30'..(player_slip_items:contains(item_id) and '\02' or '\05')..porter.items_names[item_id]..'\30\01'
+                )
+            end
+        end
+    end
+end
+
 function event_load()
     send_command('alias porter lua c porter')
 end
@@ -49,84 +134,18 @@ function event_unload()
     send_command('unalias porter')
 end
 
-function event_addon_command(slip_number, slip_page)
-    if slip_number == nil then
-        add_to_chat(55, 'lua:addon:porter >> which slip do you want to see, kupo?')
-        
-        return
-    end
-    
-    slip_number = tonumber(slip_number, 10)
-    
-    if slip_number < 1 or slip_number > slips.storages:length() then
-        add_to_chat(55, 'lua:addon:porter >> that slip doesn\'t exist, kupo!')
-        
-        return
-    end
-    
-    local player_items      = slips.get_player_items()
-    local slip              = slips.get_slip(slip_number)
-    local slip_id           = slips.get_slip_id(slip_number)
-    local player_slip_items = S(player_items[slip_id])
+function event_addon_command(slip_number, slip_page)    
+    if slip_number ~= nil then
+        slip_number = tonumber(slip_number, 10)
 
-    if porter.items_names:length() == 0 then
-        local slips_items_ids = T()
-        for _, slip in  pairs(slips.items) do
-            slips_items_ids:extend(slip)
-        end
-
-        slips_items_ids = S(slips_items_ids)
-
-        for kind, resource_path in pairs(porter.resources) do
-            resource = io.open(lua_base_path..resource_path, 'r')
-
-            if resource ~= nil then
-                while true do
-                    local line = resource:read()
-
-                    if line == nil then
-                        break
-                    end
-
-                    local id, name = line:match('id="(%d+)".+>([^<]+)<')
-
-                    if id ~= nil then
-                        id = tonumber(id, 10)
-
-                        if slips_items_ids:contains(id) then
-                            porter.items_names[id] = name:lower()
-                        end
-                    end
-                end
-            else
-                write(kind..' resource file not found')
-            end
-
-            resource:close()
-        end
-    end
-
-    local slip_items
-
-    if slip_page == nil then
-        slip_items = slip
-    else
-        local offset = (slip_page - 1) * 16 + 1
-
-        if offset < 1 or offset > slip:length() then
-            add_to_chat(55, 'lua:addon:porter >> slip '..tostring(slip_number):lpad('0', 2)..' has no page '..slip_page..', kupo.')
-
+        if slip_number < 1 or slip_number > slips.storages:length() then
+            add_to_chat(55, 'lua:addon:porter >> that slip doesn\'t exist, kupo!')
+            
             return
         end
-
-        slip_items = slip:slice(offset, offset + 15)
+    else
+        slip_page = nil
     end
-
-    for item_position, item_id in ipairs(slip_items) do
-        add_to_chat(
-            55,
-            '\30\03'..'slip '..tostring(slip_number):lpad('0', 2)..'/page '..(slip_page and slip_page or tostring(math.ceil(item_position / 16))):lpad('0', 2)..':\30\01 '..
-            '\30'..(player_slip_items:contains(item_id) and '\02' or '\05')..porter.items_names[item_id]..'\30\01'
-        )
-    end
+    
+    porter.show_slip(slip_number, slip_page)
 end
