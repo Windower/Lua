@@ -43,7 +43,7 @@ function event_addon_command(...)
         add_to_chat(55, '<'..code..'>: '..char)
     end
 
-	add_to_chat(55, 'type <j:whatever you want, even punctuation> to replace each character to japanese one where available')
+    add_to_chat(55, 'type <j:whatever you want, even punctuation> to replace each character to japanese one where available')
 end
 
 function event_outgoing_text(original, modified)
