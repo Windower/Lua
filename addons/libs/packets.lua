@@ -5,6 +5,7 @@ When size is 0x00 it means the size is either unknown or varies.
 
 _libs = _libs or {}
 _libs.packets = true
+_libs.lists = _libs.lists or require 'lists'
 
 p = {}
 
