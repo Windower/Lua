@@ -1,5 +1,5 @@
 --[[
-porter v1.20130525
+porter v1.20130525.1
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -78,10 +78,12 @@ function porter.load_resources()
     end
 end
 
-function porter.show_slip(slip_number, slip_page)
+function porter.show_slip(slip_number, slip_page, owned_only)
     if porter.items_names:length() == 0 then
         porter.load_resources()
     end
+    
+    owned_only = owned_only or false
     
     local player_items = slips.get_player_items()
     
@@ -116,11 +118,15 @@ function porter.show_slip(slip_number, slip_page)
             end
 
             for item_position, item_id in ipairs(slip_items) do
-                add_to_chat(
-                    55,
-                    '\30\03'..'slip '..printable_slip_number..'/page '..(slip_page and slip_page or tostring(math.ceil(item_position / 16))):lpad('0', 2)..':\30\01 '..
-                    '\30'..(player_slip_items:contains(item_id) and '\02' or '\05')..porter.items_names[item_id]..'\30\01'
-                )
+                local is_contained = player_slip_items:contains(item_id)
+                
+                if owned_only == false or owned_only == true and is_contained == true then
+                    add_to_chat(
+                        55,
+                        '\30\03'..'slip '..printable_slip_number..'/page '..(slip_page and slip_page or tostring(math.ceil(item_position / 16))):lpad('0', 2)..':\30\01 '..
+                        '\30'..(is_contained and '\02' or '\05')..porter.items_names[item_id]..'\30\01'
+                    )
+                end
             end
         end
     end
@@ -134,7 +140,19 @@ function event_unload()
     send_command('unalias porter')
 end
 
-function event_addon_command(slip_number, slip_page)    
+function event_addon_command(slip_number, slip_page, owned_only)
+    if tonumber(slip_number) == nil and slip_number == 'owned' then
+        slip_number = nil
+        owned_only  = true
+    elseif tonumber(slip_number) ~= nil and tonumber(slip_page) == nil and slip_page == 'owned' then
+        slip_page  = nil
+        owned_only = true
+    elseif tonumber(slip_number) ~= nil and tonumber(slip_page) ~= nil and owned_only == 'owned' then
+        owned_only = true
+    else
+        owned_only = false
+    end
+
     if slip_number ~= nil then
         slip_number = tonumber(slip_number, 10)
 
@@ -147,5 +165,5 @@ function event_addon_command(slip_number, slip_page)
         slip_page = nil
     end
     
-    porter.show_slip(slip_number, slip_page)
+    porter.show_slip(slip_number, slip_page, owned_only)
 end
