@@ -26,6 +26,9 @@ There is only one configuration file called settings.xml in the data folder of t
 * reive color [[-h]|[-o &lt;objects&gt;] [-d] [-r &lt;red&gt;] [-g &lt;green&gt;] [-b &lt;blue&gt;] [-a &lt;alpha&gt;]] -- sets the colors used by the plugin
 
 #changelog
+## v1.20130525
+* **fix:** fixed a bug that prevented the addon from tracking correctly the total gained exp.
+
 ## v1.20130516
 * **add:** a "light mode" has been added. while active, the window will be kept hidden and only a summary will be shown at the end of the run
 
