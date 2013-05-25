@@ -87,6 +87,7 @@ p[0x061] = {name='Char Stats',          size=0x2A, description='Packet contains 
 p[0x062] = {name='Skills Update',       size=0x80, description='Packet that shows your weapon and magic skill stats.'}
 p[0x0B4] = {name='Seek AnonResp',       size=0x0C, description='Server response sent after you put up party or anon flag.'}
 p[0x0C9] = {name='Show Equip',          size=0x4C, description='Shows another player your equipment after using the Check command.'}
+p[0x0CC] = {name='Linkshell Message',   size=0x58, description='/lsmes text and headers.'}
 p[0x0CA] = {name='Show Bazaar Message', size=0x4A, description='Shows another players bazaar message after using the Check command.'}
 p[0x0D2] = {name='Found Item',          size=0x1E, description='This command shows an item found on defeated mob.'}
 p[0x0DD] = {name='Alliance Update',     size=0x16, description='Alliance/party member info - zone, HP%, HP% etc.'}
@@ -97,5 +98,52 @@ p[0x0F6] = {name='Widescan Mark',       size=0x04, description='Marks the start 
 p[0x105] = {name='Data Download 4',     size=0x16, description='The data that is sent to the client when it is "Downloading data...".'}
 p[0x108] = {name='Data Download 5',     size=0x00, description='The data that is sent to the client when it is "Downloading data...".'}
 
-return setmetatable(p, {index={name='Unknown', size=0x00, description='No data available.'}})
+-- C type information
+local function make_val(ctype, ...)
+	if ctype == 'unsigned int' or ctype == 'unsigned short' or ctype == 'unsigned char' or ctype == 'unsigned long' then
+		return tonumber(data:reverse():map(string.zfill-{2}..math.tohex..string.byte), 16)
+	else
+		return data
+	end
+end
 
+-- Specific field data for packets.
+local f = {}
+
+f[0x0DF] = L{
+	{length=4, ctype='unsigned int', field='id'}, -- 4-7
+	{length=4, ctype='unsigned int', field='hp'}, -- 8-11
+	{length=4, ctype='unsigned int', field='mp'}, -- 12-15
+	{length=4, ctype='unsigned int', field='tp'}, -- 16-19
+	{length=2, ctype='unsigned short', field='_unknown_20_21'},
+	{length=2, ctype='unsigned short', field='_unknown_22_23'},
+	{length=2, ctype='unsigned short', field='_unknown_24_25'},
+	{length=2, ctype='unsigned short', field='_unknown_26_27'}
+}
+
+function P(id, data)
+	local res = {}
+	res._id = id
+	res._size = 2*math.floor(data:byte(2)/2)
+	res._raw = data
+	res._seq = data:byte(3,3) + data:byte(4, 4)*2^8
+	res._data = data:sub(5)
+
+	if not f[id] then
+		return res
+	end
+	
+	local temp
+	local val
+	local pos = 5
+	for pt in f[id]:it() do
+		temp = pos
+		pos = pos + pt.length
+		val = data:sub(temp, pos - 1)
+		res[pt.field] = make_val(val, pt.ctype)
+	end
+
+	return res
+end
+
+return setmetatable(p, {index={name='Unknown', size=0x00, description='No data available.'}})
