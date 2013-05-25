@@ -101,7 +101,7 @@ p[0x108] = {name='Data Download 5',     size=0x00, description='The data that is
 -- C type information
 local function make_val(ctype, ...)
 	if ctype == 'unsigned int' or ctype == 'unsigned short' or ctype == 'unsigned char' or ctype == 'unsigned long' then
-		return tonumber(data:reverse():map(string.zfill-{2}..math.tohex..string.byte), 16)
+		return tonumber(L{...}:reverse():map(string.zfill-{2}..math.tohex..string.byte), 16)
 	else
 		return data
 	end
@@ -132,15 +132,14 @@ function P(id, data)
 	if not f[id] then
 		return res
 	end
-	
+
 	local temp
 	local val
 	local pos = 5
 	for pt in f[id]:it() do
 		temp = pos
 		pos = pos + pt.length
-		val = data:sub(temp, pos - 1)
-		res[pt.field] = make_val(val, pt.ctype)
+		res[pt.field] = make_val(pt.ctype, data:byte(temp, pos - 1))
 	end
 
 	return res
