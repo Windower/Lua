@@ -43,15 +43,7 @@ end
 
 -- Prints the arguments provided to the FFXI chatlog, in the same color used for Campaign/Bastion alerts and Kupower messages. Can be changed below.
 function captionlog(msg, msgcolor, ...)
-	local caption = _addon and _addon.name
-	
-	if msg ~= nil then
-		if caption then
-			caption = caption..' '..msg
-		else
-			caption = msg
-		end
-	end
+	local caption = table.concat({_addon and _addon.name, msg}, ' ')
 	
 	if #caption > 0 then
 		if logger.settings.logtofile == true then
