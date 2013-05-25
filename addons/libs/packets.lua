@@ -6,6 +6,9 @@ When size is 0x00 it means the size is either unknown or varies.
 _libs = _libs or {}
 _libs.packets = true
 _libs.lists = _libs.lists or require 'lists'
+_libs.mathhelper = _libs.mathhelper or require 'mathhelper'
+_libs.stringhelper = _libs.stringhelper or require 'stringhelper'
+_libs.functools = _libs.functools or require 'functools'
 
 local packets = {}
 packets.incoming = {}
@@ -15,7 +18,7 @@ packets.outgoing = {}
 	Packet database. Feel free to correct/amend it wherever it's lacking.
 ]]
 
--- Client packets
+-- Client packets (outgoing)
 packets.outgoing[0x00A] = {name='Client Connect',      size=0x2E, description='(unencrypted/uncompressed) First packet sent when connecting to new zone.'}
 packets.outgoing[0x00D] = {name='Client Leave',        size=0x04, description='Last packet sent from client before it leaves the zone.'}
 packets.outgoing[0x015] = {name='Standard Client',     size=0x10, description='Packet contains data that is sent almost every time (i.e your character\'s position).'}
@@ -54,7 +57,7 @@ packets.outgoing[0x105] = {name='View Bazaar',         size=0x06, description='S
 packets.outgoing[0x106] = {name='Buy Bazaar Item',     size=0x06, description='Buy an item from somebody\'s bazaar.'}
 packets.outgoing[0x10A] = {name='Set Price',           size=0x06, description='Set the price on a bazaar item.'}
 
--- Server packets
+-- Server packets (incoming)
 packets.incoming[0x009] = {name='Standard Message',    size=0x08, description='A standardized message send from FFXI.'}
 packets.incoming[0x00A] = {name='Data Download 1',     size=0x82, description='Info about character and zone around it.'}
 packets.incoming[0x00B] = {name='Zone Response',       size=0x0E, description='Response from the server confirming client can zone.'}
@@ -157,9 +160,9 @@ end
 
 function P(id, data, mode)
 	local res = {}
+	res._raw = data
 	res._id = id
 	res._size = 2*math.floor(data:byte(2)/2)
-	res._raw = data
 	res._seq = data:byte(3,3) + data:byte(4, 4)*2^8
 	res._data = data:sub(5)
 	res._hex = data:sub(5):map(string.zfill-{2}..math.tohex..string.byte)
