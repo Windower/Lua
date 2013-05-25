@@ -75,7 +75,7 @@
   <addon>
     <author>Giuliano Riccio (Zohno@Phoenix)</author>
     <name>findAll</name>
-    <description>This plugin searches for items stored on all of your characters. Click "about" for more instructions.</description>
+    <description>searches for items stored on all of your characters. Click "about" for more instructions.</description>
     <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
