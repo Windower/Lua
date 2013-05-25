@@ -110,7 +110,7 @@ function event_load()
 				['Dancer\'s']={3,4,12,5,6,7,1,8,9,10,16,'-4','Regen'},
 				['Bolter\'s']={2,3,12,4,6,7,8,9,5,10,25,'-8','% Movement Speed'},
 				['Caster\'s']={6,15,7,8,9,10,5,11,12,13,20,'-10','% Fast Cast'},
-				['Tactician\'s']={1,1,1,1,3,1,1,0,2,2,4,'-1',' Regain'},
+				['Tactician\'s']={2,2,2,2,4,2,2,1,3,3,5,'-1',' Regain'},
 				['Miser\'s']={3,5,7,9,20,11,2,13,15,17,25,'-?',' Save TP'},
 				['Ninja']={'?','?','?','?','?','?','?','?','?','?','?','?',' Evasion Bonus'},
 				['Scholar\'s']={'?','?','?','?','?','?','?','?','?','?','?','?',' Conserve MP'},
@@ -206,7 +206,7 @@ end
 function event_outgoing_text(original, modified)
 	if original:find('/jobability \"Double.*Up') and luckyroll == 1 and override == 0 and id == get_player()['id'] then
 		modified=''
-		add_to_chat(159,'You either have a lucky Roll or have rolled an 11. Reuse Double-Up to continue to double-up.')
+		add_to_chat(159,'Attempting to Doubleup on a Lucky Roll: Re-double up to continue.')
 		luckyroll=0
 		return modified
 	end
