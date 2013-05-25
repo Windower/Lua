@@ -8,10 +8,13 @@ This plugin shows the slips' items highlighting in green those that are actually
 
 **commands:**
 
-* porter[ &lt;slip&gt;[ &lt;page&gt;]] -- shows the specified slip or slip's page. if no parameter is specified all the owned slips will be shown.
+* porter[ &lt;slip&gt;[ &lt;page&gt;]] [owned] -- shows the specified slip or slip's page. if no parameter is specified all the owned slips will be shown.
+
+#### v1.20130525.1
+* **add**: added the "owned" param. if present, only the owned items will be shown.
 
 #### v1.20130525
-* **change**: if no parameter is specified all the owned slips will be shown
+* **change**: if no parameter is specified all the owned slips will be shown.
 
 #### v1.20130524
 * first release
