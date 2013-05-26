@@ -1,5 +1,5 @@
-**author:** Giuliano Riccio  
-**version:** v 1.20130525
+**Author:** Giuliano Riccio  
+**Version:** v 1.20130525
 
 # Porter #
 This addon shows the slips' items highlighting those that are stored.
