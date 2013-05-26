@@ -6,7 +6,7 @@ This addon tracks plasm, killed mobs and dropped airlixirs during a delve.
 
 ## Commands ##
 ### help ###
-shows the help text
+shows the help text.
 
 ```
 plasmon help
