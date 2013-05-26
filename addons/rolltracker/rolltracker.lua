@@ -65,6 +65,7 @@ function event_load()
 	override= settings['autostop']
 	player=get_player()['name']
 	luckyroll = 0
+	symbolnum={ '\x87\x40', '\x87\x41', '\x87\x42', '\x87\x43', '\x87\x44', '\x87\x45', '\x87\x46', '\x87\x47', '\x87\x48', '\x87\x49', '\x87\x4A'}
 	roll_id ={ 
 				97, 98, 99,
 				100, 101, 102,
@@ -76,7 +77,7 @@ function event_load()
 				121, 122, 303, 302, 304, 305
 			}
 	player_color={['p0']=string.char(31, 167),['p1']=string.char(31, 209),['p2']=string.char(31, 204),['p3']=string.char(31,189),['p4']=string.char(31,3),['p5']=string.char(31,158)}
-	roll_ident={[97]=' ', ['98']='Fighter\'s',['99']='MNK',['100']='WHM',
+	roll_ident={[97]=' ', ['98']='Fighter\'s',['99']='Monk\'s',['100']='Healer\'s',
 						['101']='Wizard\'s',['102']='Warlock\'s',['103']='Rogue\'s',
 						['104']='Gallant\'s',['105']='Chaos',['106']='Beast',
 						['107']='Choral',['108']='Hunter\'s',['109']='Samurai',
@@ -107,10 +108,10 @@ function event_load()
 				['Warlock\'s']={2,3,4,12,15,6,7,1,8,9,15,'-5',' Magic Accuracy Bonus'},
 				['Puppet']={4,5,18,7,9,10,2,11,13,15,22,'-8',' Pet: Magic Attack Bonus'},
 				['Gallant\'s']={4,5,15,6,7,8,3,9,10,11,20,'-10','% Defense Bonus'},
-				['Dancer\'s']={3,4,12,5,6,7,1,8,9,10,16,'-4','Regen'},
+				['Dancer\'s']={3,4,12,5,6,7,1,8,9,10,16,'-4',' Regen'},
 				['Bolter\'s']={2,3,12,4,6,7,8,9,5,10,25,'-8','% Movement Speed'},
 				['Caster\'s']={6,15,7,8,9,10,5,11,12,13,20,'-10','% Fast Cast'},
-				['Tactician\'s']={1,1,1,1,3,1,1,0,2,2,4,'-1',' Regain'},
+				['Tactician\'s']={2,2,2,2,4,2,2,1,3,3,5,'-1',' Regain'},
 				['Miser\'s']={3,5,7,9,20,11,2,13,15,17,25,'-?',' Save TP'},
 				['Ninja']={'?','?','?','?','?','?','?','?','?','?','?','?',' Evasion Bonus'},
 				['Scholar\'s']={'?','?','?','?','?','?','?','?','?','?','?','?',' Conserve MP'},
@@ -137,7 +138,7 @@ end
 
 function event_incoming_text(old, new, color)
 	match_doubleup = old:find (' uses Double')
-	battlemod_compat = old:find('.*% Roll.* %d')
+	battlemod_compat = old:find('.*% Roll.*'..string.char(129,168))
 	obtained_roll = old:find('.* receives the effect of .* Roll.')
 	not_party = old:find ('%('..'%w+'..'%)')	
 		if battlemod_compat or match_doubleup and not_party~=nil then
@@ -178,11 +179,11 @@ function event_action(act)
 						if #effected_member > 0 then
 							if rollnum == roll_luck[i] or rollnum == 11 then 
 								luckyroll = 1
-								add_to_chat(1, '['..#effected_member..'] '..effected_write..string.char(31,1)..' >>> '..roll_ident[tostring(roller)]..' Roll ('..rollnum..')'..string.char(31,158)..' (Lucky!)'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
+								add_to_chat(1, '['..#effected_member..'] '..effected_write..string.char(31,1)..' >>> '..roll_ident[tostring(roller)]..' Roll ('..symbolnum[rollnum]..')'..string.char(31,158)..' (Lucky!)'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
 							elseif rollnum==12 and #effected_member > 0 then
-								add_to_chat(1, string.char(31,167)..'Bust! ('..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')')
+								add_to_chat(1, string.char(31,167)..'['..#effected_member..']'..effected_write..' >>> Bust! ('..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')')
 							else
-								add_to_chat(1, '['..#effected_member..'] '..effected_write..string.char(31,1)..' >>> '..roll_ident[tostring(roller)]..' Roll ('..rollnum..')'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
+								add_to_chat(1, '['..#effected_member..'] '..effected_write..string.char(31,1)..' >>> '..roll_ident[tostring(roller)]..' Roll ('..symbolnum[rollnum]..')'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
 							end
 						end
 					end
@@ -206,7 +207,7 @@ end
 function event_outgoing_text(original, modified)
 	if original:find('/jobability \"Double.*Up') and luckyroll == 1 and override == 0 and id == get_player()['id'] then
 		modified=''
-		add_to_chat(159,'You either have a lucky Roll or have rolled an 11. Reuse Double-Up to continue to double-up.')
+		add_to_chat(159,'Attempting to Doubleup on a Lucky Roll: Re-double up to continue.')
 		luckyroll=0
 		return modified
 	end

@@ -1,5 +1,5 @@
 --[[
-reive v1.20130516
+reive v1.20130525
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -32,7 +32,7 @@ require 'stringhelper'
 local config = require 'config'
 
 local _reive = T{}
-_reive.v              = '1.20130516'
+_reive.v              = '1.20130525'
 _reive.tb_name        = 'addon:gr:reive'
 _reive.track          = false
 _reive.visible        = false
@@ -289,8 +289,8 @@ function _reive.first_run()
 
     add_to_chat(55, 'hi '..get_player()['name']:lower()..',')
     add_to_chat(55, 'thank you for using reive v'.._reive.v)
-    add_to_chat(55, 'in this update i\'ve added a light mode. when enabled the window will be kept hidden and only the summary will be shown at the end of the run.')
-    add_to_chat(55, 'use "reive light true/false" to enable or disable it.')
+    add_to_chat(55, 'in this update i\'ve fixed a bug that prevented the addon from tracking correctly the total gained exp.')
+    add_to_chat(55, 'i\'m sorry for any inconvenience this may have caused.')
     add_to_chat(55, '- zohno@phoenix')
 
     _reive.settings.v = _reive.v
@@ -389,7 +389,8 @@ function event_incoming_text(original, modified, mode)
         match = original:match('gains (%d+) experience points%.')
 
         if match then
-            _reive.stats.exp = _reive.stats.exp + match
+            _reive.stats.exp    = _reive.stats.exp + match
+            _reive.stats.totExp = _reive.stats.totExp + match
             _reive.refresh()
 
             return modified, mode

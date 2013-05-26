@@ -75,7 +75,7 @@
   <addon>
     <author>Giuliano Riccio (Zohno@Phoenix)</author>
     <name>findAll</name>
-    <description>This plugin searches for items stored on all of your characters. Click "about" for more instructions.</description>
+    <description>searches for items stored on all of your characters. Click "about" for more instructions.</description>
     <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
@@ -120,6 +120,13 @@
     <name>plugin_manager</name>
     <author>Byrth</author>
     <description>Allows you to specify which plugins and addons will be used with which characters.</description>
+  </addon>
+  <addon>
+    <author>Giuliano Riccio (Zohno@Phoenix)</author>
+    <name>porter</name>
+    <description>shows the slips' items highlighting in green those that are actually stored.</description>
+    <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
     <name>Respond</name>

@@ -37,7 +37,7 @@ end
 -- Splits a string into a table by a separator pattern.
 function string.psplit(str, sep, maxsplit)
 	maxsplit = maxsplit or 0
-	
+
 	return str:split(sep, maxsplit, false)
 end
 
@@ -50,15 +50,15 @@ function string.split(str, sep, maxsplit, pattern)
 			key = key + 1
 			res[key] = c
 		end
-		
+
 		return setmetatable(res, _meta.T)
 	end
-	
+
 	maxsplit = maxsplit or 0
 	if pattern == nil then
 		pattern = true
 	end
-	
+
 	local res = {}
 	local key = 0
 	local i = 1
@@ -86,7 +86,7 @@ function string.split(str, sep, maxsplit, pattern)
 			break
 		end
 	end
-	
+
 	res.n = key
 	return setmetatable(res, _meta.L)
 end
@@ -151,11 +151,11 @@ end
 -- Returns the same string with the first letter of every word capitalized.
 function string.capitalize(str)
 	local res = {}
-	
+
 	for _, val in ipairs(str:split(' ')) do
 		res[#res + 1] = val:ucfirst()
 	end
-	
+
 	return table.concat(res, ' ')
 end
 
@@ -188,14 +188,14 @@ function string.todec(numstr, base)
 			break
 		end
 	end
-	
+
 	local index = base^(#numstr-1)
 	local acc = 0
 	for c in numstr:gmatch('.') do
 		acc = acc + digits[c]*index
 		index = index/base
 	end
-	
+
 	return acc
 end
 
@@ -206,7 +206,7 @@ function string.isin(str, t)
 			return true
 		end
 	end
-	
+
 	return false
 end
 
@@ -217,7 +217,7 @@ end
 
 -- Returns a string with Lua pattern characters escaped.
 function string.escape(str)
-	return str:gsub('[[%]%%^$*().-+]', '%%%1')
+	return str:gsub('[[%]%%^$*()%.%+?-]', '%%%1')
 end
 
 -- Counts the occurrences of a substring in a string.
@@ -243,9 +243,9 @@ function table.format(t, trail, subs)
 	elseif l == 1 then
 		return t[next(t)]
 	end
-	
+
 	trail = trail or 'and'
-	
+
 	local last
 	if trail == 'and' then
 		last = ' and '
@@ -256,6 +256,6 @@ function table.format(t, trail, subs)
 	else
 		warning('Invalid format for table.format: \''..trail..'\'.')
 	end
-	
+
 	return t:slice(1, -2):concat(', ')..last..t:last()
 end

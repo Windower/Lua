@@ -13,7 +13,7 @@ list = {}
 
 _meta = _meta or {}
 _meta.L = {}
-_meta.L.__index = function(l, x) if list[x] ~= nil then return list[x] else return T(l)[x] end end
+_meta.L.__index = function(l, k) if list[k] ~= nil then return list[k] else return T(l)[k] end end
 _meta.L.__class = 'List'
 
 function L(t)
@@ -150,11 +150,12 @@ end
 
 function list.map(l, fn)
 	local res = {}
-	
+
 	for key, val in ipairs(l) do
 		res[key] = fn(val)
 	end
-	
+
+	res.n = l.n
 	return setmetatable(res, _meta.L)
 end
 
@@ -162,7 +163,9 @@ function list.filter(l, fn)
 	local res = {}
 	
 	local key = 0
-	for _, val in ipairs(l) do
+	local val
+	for okey = 1, l.n do
+		val = rawget(l, okey)
 		if fn(val) == true then
 			key = key + 1
 			res[key] = val
@@ -245,24 +248,25 @@ end
 
 function list.slice(l, from, to)
 	local n = l.n
-	
+
 	from = from or 1
 	if from < 0 then
 		from = (from % n) + 1
 	end
-	
+
 	to = to or n
 	if to < 0 then
 		to = (to % n) + 1
 	end
-	
+
 	local res = {}
-	local key = 1
+	local key = 0
 	for i = from, to do
-		res[key] = l[i]
 		key = key + 1
+		res[key] = l[i]
 	end
-	
+
+	res.n = key
 	return setmetatable(res, _meta.L)
 end
 
@@ -287,6 +291,7 @@ function list.reverse(l)
 		rkey = rkey - 1
 	end
 
+	res.n = n
 	return setmetatable(res, _meta.L)
 end
 
