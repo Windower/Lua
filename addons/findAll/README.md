@@ -3,8 +3,8 @@
 
 # FindAll #
 
-This addon searches items stored on all your characters. To build the initial list, you must login and logout (or input the "findall" command) at least once with each of them.\\
-The list is stored on the machine on which the addon is executed, being updated everytime you look for an item or on logout, so this will not work the best if you use multiple PCs, at least until IPC will let them communicate over LAN or Internet (in development).\\
+This addon searches items stored on all your characters. To build the initial list, you must login and logout (or input the "findall" command) at least once with each of them.  
+The list is stored on the machine on which the addon is executed, being updated everytime you look for an item or on logout, so this will not work the best if you use multiple PCs, at least until IPC will let them communicate over LAN or Internet (in development).  
 The addon has a deferral time of 20 seconds when it's loaded, you are logging in or zoning to give the game enough time to load all the items.  
 If you notice that this time is too short, please create an issue report in the bug tracker.
 
