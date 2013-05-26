@@ -6,7 +6,7 @@ This addon tracks exp, bayld, momentum scores and bonuses during a reive.
 
 ## Commands ##
 ### help ###
-Shows the help text  
+Shows the help text.  
 ```
 reive help
 ```
