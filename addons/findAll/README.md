@@ -10,7 +10,7 @@ If you notice that this time is too short, please create an issue report in the 
 
 ## Commands ##
 ### findall ###
-Dorces an update of the list
+Forces a list update
 
 ```
 findall
