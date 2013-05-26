@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <addons>
   <addon>
     <name>Example</name>
@@ -30,7 +30,7 @@
   <addon>
     <name>AutoRA</name>
     <author>Banggugyangu</author>
-    <description>Cuases Ranged Attacks to behave the same as melee Auto-Attack.</description>
+    <description>Causes Ranged Attacks to behave the same as melee Auto-Attack.</description>
     <bugtracker>https://github.com/banggugyangu/Lua/issues</bugtracker>
   </addon>
   <addon>
@@ -48,16 +48,19 @@
   </addon>
   <addon>
     <name>CellHelp</name>
-	<author>Krizz and Balloon</author>
+    <author>Krizz and Balloon</author>
     <description>Tracks cells that are needed, displays your position in the lot order, and creates the appropriate LL profiles.</description>
   </addon>
   <addon>
+    <author>Giuliano Riccio (Zohno@Phoenix)</author>
     <name>chars</name>
-    <description>This plugin lets you input special chars using simple tags (ex.: &lt;note&gt; for ♪).</description>
+    <description>Lets you input special chars using simple tags (ex.: &lt;note&gt; for ♪).</description>
+    <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
-  	<name>Daze</name>
-  	<description>Records what daze effects are on the monster you're fighting.</description>
+    <name>Daze</name>
+    <description>Records what daze effects are on the monster you're fighting.</description>
   </addon>
   <addon>
     <name>DynamisHelper</name>
@@ -70,12 +73,12 @@
   <addon>
     <name>FFOColor</name>
     <description>Allows you to show FFOChat text in one of the 5 game chat channels. As well as specify colors for the text</description>
-    <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>	
+    <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>    
   </addon>
   <addon>
     <author>Giuliano Riccio (Zohno@Phoenix)</author>
     <name>findAll</name>
-    <description>searches for items stored on all of your characters. Click "about" for more instructions.</description>
+    <description>Searches items stored on all your characters. Click "about" for more instructions.</description>
     <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
@@ -93,8 +96,8 @@
     <bugtracker>https://github.com/banggugyangu/Lua/issues</bugtracker>
   </addon>
   <addon>
-	<name>MobCompass</name>
-	<description>A compass to show your position relative to the target (not players) for geo and has a setup for Sneak attack</description>
+    <name>MobCompass</name>
+    <description>A compass to show your position relative to the target (not players) for geo and has a setup for Sneak attack</description>
   </addon>
   <addon>
     <name>obiaway</name>
@@ -124,7 +127,14 @@
   <addon>
     <author>Giuliano Riccio (Zohno@Phoenix)</author>
     <name>porter</name>
-    <description>shows the slips' items highlighting in green those that are actually stored.</description>
+    <description>Shows the slips' items highlighting those that are stored.</description>
+    <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
+  </addon>
+  <addon>
+    <author>Giuliano Riccio (Zohno@Phoenix)</author>
+    <name>reive</name>
+    <description>Tracks exp, bayld, momentum scores and bonuses during a reive.</description>
     <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
@@ -133,16 +143,9 @@
     <description>Respond to tells and FFOchat PMs using //r.</description>
   </addon>
   <addon>
-	<name>RollTracker</name>
-	<author>Balloon</author>
-	<description>Simplifies Cor rolls, tells you the bonus they give, stops you from doubling up on lucky rolls and reports your chance to bust.</description>
-  </addon>
-  <addon>
-    <author>Giuliano Riccio (Zohno@Phoenix)</author>
-    <name>reive</name>
-    <description>tracks exp, bayld, momentum scores and bonuses during a reive.</description>
-    <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
-    <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
+    <name>RollTracker</name>
+    <author>Balloon</author>
+    <description>Simplifies Cor rolls, tells you the bonus they give, stops you from doubling up on lucky rolls and reports your chance to bust.</description>
   </addon>
   <addon>
     <name>SATACast</name>
@@ -171,6 +174,11 @@
     <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>
   </addon>
   <addon>
+    <name>StratHelper</name>
+    <author>Ihm</author>
+    <description>A simple helper addon for Spellcast for Scholar Stratagems. It will automatically calculate the number of stratagems you have and push them into spellcast variables.</description>
+  </addon>
+  <addon>
     <name>TargetInfo</name>
     <author>Arcon</author>
     <description>Displays information about your current target in memory.</description>
@@ -180,14 +188,8 @@
   <addon>
     <author>Giuliano Riccio (Zohno@Phoenix)</author>
     <name>vwhl</name>
-    <description>Redirects vw nm's vulnerabilities to the "tell" stream so that they can be held using the chat filters' function and highlights the important info. Supports EN, FR, DE clients.</description>
+    <description>Redirects the nm's weaknesses (VW or Abyssea) to the "tell" stream so that they can be held using the chat filters' function and highlights the important info.</description>
     <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
-  <addon>
-    <name>StratHelper</name>
-    <author>Ihm</author>
-    <description>A simple helper addon for Spellcast for Scholar Stratagems. It will automatically calculate the number of stratagems you have and push them into spellcast variables.</description>
-  </addon>
 </addons>
-
