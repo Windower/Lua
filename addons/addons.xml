@@ -52,8 +52,11 @@
     <description>Tracks cells that are needed, displays your position in the lot order, and creates the appropriate LL profiles.</description>
   </addon>
   <addon>
+    <author>Giuliano Riccio (Zohno@Phoenix)</author>
     <name>chars</name>
-    <description>Lets you input special chars using simple tags (ex.: &lt;note&gt; for ?).</description>
+    <description>Lets you input special chars using simple tags (ex.: &lt;note&gt; for ♪).</description>
+    <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
     <name>Daze</name>
