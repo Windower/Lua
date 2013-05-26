@@ -19,7 +19,7 @@ chars
 ## Changelog ##
 
 ### v1.20130525 ###
-* **fix:** ''<j:_text_>'' pattern wasn't working with some special chars.
+* **fix:** ```<j:text>``` pattern wasn't working with some special chars.
 
 ###  v1.20130521 ###
 * **add:** added the pattern to write using alphanumeric japanese characters.
