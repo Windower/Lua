@@ -25,4 +25,4 @@ porter[ <slip>[ <page>]] [owned]
 * **change**: If no parameter is specified all the owned slips will be shown.
 
 ### v1.20130524
-* First release
+* First release.
