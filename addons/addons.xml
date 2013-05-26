@@ -185,7 +185,7 @@
   <addon>
     <author>Giuliano Riccio (Zohno@Phoenix)</author>
     <name>vwhl</name>
-    <description>redirects the nm's weaknesses (VW or Abyssea) to the "tell" stream so that they can be held using the chat filters' function and highlights the important info.</description>
+    <description>Redirects the nm's weaknesses (VW or Abyssea) to the "tell" stream so that they can be held using the chat filters' function and highlights the important info.</description>
     <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
