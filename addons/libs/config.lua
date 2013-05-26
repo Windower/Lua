@@ -341,7 +341,7 @@ function nest_xml(t, indentlevel)
 			if comments[key] ~= nil then
 				local c = ('<!-- '..comments[key]:trim()..' -->'):split('\n')
 				local pre = ''
-				for cstr in c.it() do
+				for cstr in c:it() do
 					fragments:append(indent..pre..cstr:trim()..'\n')
 					pre = '\t '
 				end
@@ -371,7 +371,7 @@ function nest_xml(t, indentlevel)
 	
 	for frag_key, key in pairs(inlines) do
 		if rawget(comments, key) ~= nil then
-			fragments[frag_key] = fragments[frag_key]..(' '):rep(maxlength - fragments[frag_key]:trim():length() + 1)..'<!--'..comments[key]..'-->'
+			fragments[frag_key] = fragments[frag_key]..(' '):rep(maxlength - fragments[frag_key]:trim():length() + 1)..'<!-- '..comments[key]..' -->'
 		end
 		
 		fragments[frag_key] = fragments[frag_key]..'\n'
