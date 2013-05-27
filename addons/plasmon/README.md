@@ -1,5 +1,5 @@
 **Author:** Giuliano Riccio  
-**Version:** v 1.20130517
+**Version:** v 1.20130528
 
 # Plasmon #
 This addon tracks plasm, killed mobs and dropped airlixirs during a delve.
