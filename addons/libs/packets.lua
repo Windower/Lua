@@ -6,6 +6,9 @@ When size is 0x00 it means the size is either unknown or varies.
 _libs = _libs or {}
 _libs.packets = true
 _libs.lists = _libs.lists or require 'lists'
+_libs.mathhelper = _libs.mathhelper or require 'mathhelper'
+_libs.stringhelper = _libs.stringhelper or require 'stringhelper'
+_libs.functools = _libs.functools or require 'functools'
 
 local packets = {}
 packets.incoming = {}
@@ -15,7 +18,14 @@ packets.outgoing = {}
 	Packet database. Feel free to correct/amend it wherever it's lacking.
 ]]
 
--- Client packets
+local dummy = {name='Unknown', size=0x00, description='No data available.'}
+
+for key = 1, 0x1FF do
+	packets.outgoing[key] = dummy
+	packets.incoming[key] = dummy
+end
+
+-- Client packets (outgoing)
 packets.outgoing[0x00A] = {name='Client Connect',      size=0x2E, description='(unencrypted/uncompressed) First packet sent when connecting to new zone.'}
 packets.outgoing[0x00D] = {name='Client Leave',        size=0x04, description='Last packet sent from client before it leaves the zone.'}
 packets.outgoing[0x015] = {name='Standard Client',     size=0x10, description='Packet contains data that is sent almost every time (i.e your character\'s position).'}
@@ -54,7 +64,7 @@ packets.outgoing[0x105] = {name='View Bazaar',         size=0x06, description='S
 packets.outgoing[0x106] = {name='Buy Bazaar Item',     size=0x06, description='Buy an item from somebody\'s bazaar.'}
 packets.outgoing[0x10A] = {name='Set Price',           size=0x06, description='Set the price on a bazaar item.'}
 
--- Server packets
+-- Server packets (incoming)
 packets.incoming[0x009] = {name='Standard Message',    size=0x08, description='A standardized message send from FFXI.'}
 packets.incoming[0x00A] = {name='Data Download 1',     size=0x82, description='Info about character and zone around it.'}
 packets.incoming[0x00B] = {name='Zone Response',       size=0x0E, description='Response from the server confirming client can zone.'}
@@ -130,6 +140,15 @@ lengths['int'] = 4
 lengths['long'] = 8
 lengths['float'] = 4
 lengths['double'] = 8
+lengths = setmetatable(lengths, {__index = function(t, k)
+	local type, number = k:match('(.-) *%[(%d+)%]')
+	if type then
+		local length = rawget(t, type)
+		if length then
+			return length*tonumber(number)
+		end
+	end
+end})
 
 -- Specific field data for p.
 local fields = {}
@@ -137,14 +156,23 @@ fields.incoming = {}
 fields.outgoing = {}
 
 fields.incoming[0x0DF] = L{
-	{ctype='unsigned int', field='id'}, -- 4-7
-	{ctype='unsigned int', field='hp'}, -- 8-11
-	{ctype='unsigned int', field='mp'}, -- 12-15
-	{ctype='unsigned int', field='tp'}, -- 16-19
+	{ctype='unsigned int', field='id'},               -- 4-7
+	{ctype='unsigned int', field='hp'},               -- 8-11
+	{ctype='unsigned int', field='mp'},               -- 12-15
+	{ctype='unsigned int', field='tp'},               -- 16-19
 	{ctype='unsigned short', field='_unknown_20_21'},
 	{ctype='unsigned short', field='_unknown_22_23'},
 	{ctype='unsigned short', field='_unknown_24_25'},
-	{ctype='unsigned short', field='_unknown_26_27'}
+	{ctype='unsigned short', field='_unknown_26_27'},
+}
+
+fields.incoming[0x0CC] = L{
+	{ctype='int', field='_unknown_4_7'},
+	{ctype='char[128]', field='lsmes'},               -- 8-135
+	{ctype='int', field='_unknown_136_139'},
+	{ctype='char[16]', field='player_name'},          -- 140-155
+	{ctype='int', field='permissions'},               -- 156-159
+	{ctype='char[16]', field='linkshell_name'},       -- 160-175, 6-bit packed
 }
 
 function Pin(id, data)
@@ -157,9 +185,9 @@ end
 
 function P(id, data, mode)
 	local res = {}
+	res._raw = data
 	res._id = id
 	res._size = 2*math.floor(data:byte(2)/2)
-	res._raw = data
 	res._seq = data:byte(3,3) + data:byte(4, 4)*2^8
 	res._data = data:sub(5)
 	res._hex = data:sub(5):map(string.zfill-{2}..math.tohex..string.byte)
@@ -180,4 +208,4 @@ function P(id, data, mode)
 	return res
 end
 
-return setmetatable(packets, {index={name='Unknown', size=0x00, description='No data available.'}}), fields
+return packets, fields
