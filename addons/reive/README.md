@@ -1,119 +1,126 @@
-**Author:** Giuliano Riccio
+**Author:** Giuliano Riccio  
+**Version:** v 1.20130525
 
-**Version:** v 1.20130516
+# Reive #
+This addon tracks exp, bayld, momentum scores and bonuses during a reive.
 
-**Description:**
-This plugin tracks exp, bayld, momentum scores and bonuses during a reive.
-There is only one configuration file called settings.xml in the data folder of the plugin.
+## Commands ##
+### help ###
+Shows the help text.  
+```
+reive help
+```
 
-![screenshot](https://raw.github.com/giulianoriccio/Lua/master/addons/reive/ss.gif)
+### test ###
+Fills the chat log with some messages to show how the plugin will work.  
+```
+reive test
+```
 
-**Abbreviation:** //reive
+### reset ###
+Sets gained exp and bayld to 0.  
+```
+reive reset
+```
 
-**Commands:**
+### full-reset ###
+Sets gained exp/total exp and bayld/total bayld to 0.  
+```
+reive full-reset
+```
 
-* reive test -- fills the chat log to show how the plugin will work. reload the plugin after the test (lua r reive)
-* reive reset -- sets gained exp and bayld to 0
-* reive full-reset -- sets gained exp/total exp and bayld/total bayld to 0
-* reive show -- shows the tracking window
-* reive hide -- hides the tracking window
-* reive toggle -- toggles the tracking window
-* reive light &lt;enabled&gt; -- defines the light mode status
-* reive max-scores &lt;amount&gt; -- sets the max amount of scores to show in the window
-* reive track &lt;score&gt; &lt;visible&gt; -- specifies the visibility of a score in the window
-* reive position [[-h]|[-x &lt;x&gt;] [-y &lt;y&gt;]] -- sets the horizontal and vertical position of the window relative to the upper-left corner
-* reive font [[-h]|[-f &lt;font&gt;] [-s &lt;size&gt;] [-a &lt;alpha&gt;] [-b[ &lt;bold&gt;]] [-i[ &lt;italic&gt;]]] -- sets the style of the font used in the window
-* reive color [[-h]|[-o &lt;objects&gt;] [-d] [-r &lt;red&gt;] [-g &lt;green&gt;] [-b &lt;blue&gt;] [-a &lt;alpha&gt;]] -- sets the colors used by the plugin
+### show ###
+Shows the tracking window.  
+```
+reive show
+```
 
-#changelog
-## v1.20130525
-* **fix:** fixed a bug that prevented the addon from tracking correctly the total gained exp.
+### hide ###
+Hides the tracking window.  
+```
+reive hide
+```
 
-## v1.20130516
-* **add:** a "light mode" has been added. while active, the window will be kept hidden and only a summary will be shown at the end of the run
+### toggle ###
+Toggles the tracking window's visibility.  
+```
+reive toggle
+```
 
-## v1.20130514
-* **change:** current/total bayld/exp will be shown at the same time. "reset_on_start" has no use anymore and has been removed
+### light ###
+Enables or disabled light mode. when enabled, the addon will never show the window and just print a summary in the chat box at the end of the run. if the _enabled_ parameter is not specified, the help text will be shown.  
+```
+reive light <enabled>
+```
+* **enabled:** specifies the status of the light mode. **default**, **false** or **0** mean disabled. **true** or **1** mean enabled.
 
-## v1.20130419
-* **add:** the user can change the settings from the console or the text box
+### max-scores ###
+Sets the max amount of scores to show in the window. if the _amount_ parameter is not specified, the help text will be shown.  
+```
+reive max-scores <amount>
+```
+* **amount:** specifies the max amount of status scores that will be show. by default this value is 5. setting this value to 0 will hide the scores section.
 
-## v1.20130417
-* **add:** the user can decide which bonuses will appear in the window
+### track ###
+Specifies the visibility of a bonus in the window.  
+```
+reive track <bonus> <visible>
+```
+* **bonus:** specifies the item which will have its visibility changed. the accepted values are **abilities-recovery**, **hp-mp-boost**, **hp-recovery**, **mp-recovery**, **status-recovery**, **stoneskin**, **tp-recovery**.
+* **visible:** specifies the visibility of the bonus. **false** or **0** mean disabled. **default**, **true** or **1** mean enabled.
 
-## v1.20130416
-* first release
+### position ###
+Sets the horizontal and vertical position of the window relative to the upper-left corner. if the no parameter is specified, the help text will be shown.  
+```
+reive position [[-h]|[-x <x>] [-y <y>]]
+```
+* **-h:** shows the help text.
+* **-x _x_:** specifies the horizontal position of the window.
+* **-y _y_:** specifies the vertical position of the window.
 
-#global
-* **max_scores:** sets the max amount of momentum scores to show in the window
+### font ###
+Sets the style of the font used in the window. if the no parameter is specified, the help text will be shown.  
+```
+reive font [[-h]|[-f <font>] [-s <size>] [-a <alpha>] [-b[ <bold>]] [-i[ <italic>]]]
+```
+* **-h:** shows the help text.
+* **-f _font_:** specifies the text's font.
+* **-s _size_:** specifies the text's size.
+* **-a _alpha_:** specifies the text's transparency. the value must be set between 0 (transparent) and 255 (opaque), inclusive.
+* **-b[ _bold_]:** specifies if the text should be rendered bold. **default**, **false** or **0** mean disabled. **true**, **1** or no value mean enabled.
+* **-i[ _italic_]:** specifies if the text should be rendered italic. **default**, **false** or **0** mean disabled. **true**, **1** or no value mean enabled.
 
-##track
-* **hp_mp_boost**: **true** or **false**, tracks the momentum bonus "Ability cast recovery"
-* **hp_recovery**: **true** or **false**, tracks the momentum bonus "HP recovery"
-* **mp_recovery**: **true** or **false**, tracks the momentum bonus "MP recovery"
-* **tp_recovery**: **true** or **false**, tracks the momentum bonus "TP recovery"
-* **abilities_recovery**: **true** or **false**, tracks the momentum bonus "Ability cast recovery"
-* **status_recovery**: **true** or **false**, tracks the momentum bonus "Status ailment recovery"
-* **stoneskin**: **true** or **false**, tracks the momentum bonus "Stoneskin"
+### color ###
+Sets the colors of the various elements present in the addon's window. if the no parameter is specified, the help text will be shown.  
+```
+reive color [[-h]|[-o <objects>] [-d] [-r <red>] [-g <green>] [-b <blue>] [-a <alpha>]]
+```
+* **-h:** shows the help text.
+* **-o _objects_:** specifies the item/s which will have its/their color changed. if this parameter is missing all the objects will be changed. the accepted values are **all**, **background**, **bg**, **title**, **label**, **value**, **reive**, **reive.title**, **reive.label**, **reive.value**, **score**, **score.title**, **score.label**, **bonus**, **bonus.title**, **bonus.label**, **bonus.value**.
+* **-d:** sets the red, green, blue and alpha values of the specified objects to their default values.
+* **-r _red_:** specifies the intensity of the red color. the value must be set between 0 and 255, inclusive, where 0 is less intense and 255 is most intense.
+* **-g _green_:** specifies the intensity of the greencolor. the value must be set between 0 and 255, inclusive, where 0 is less intense and 255 is most intense.
+* **-b _blue_:** specifies the intensity of the blue color. the value must be set between 0 and 255, inclusive, where 0 is less intense and 255 is most intense.
+* **-a _alpha_:** specifies the text's transparency. the value must be set between 0 (transparent) and 255 (opaque), inclusive.
 
-## position
-* **x:** horizontal position of the window from top left
-* **y:** vertical position of the window from top left
+----
 
-## font
-* **family:** the name of the font to use
-* **size:** the size of the text
-* **bold:** **true** or **false**, makes the text bold
-* **italic:** **true** or **false**, makes the text italic
-* **a:** the text transparency from 0 (transparent) to 255 (opaque)
+## Changelog ##
 
-## colors
-### background
-* **r:** the amount of red from 0 to 255
-* **g:** the amount of green from 0 to 255
-* **b:** the amount of blue from 0 to 255
-* **a:** the background transparency from 0 (transparent) to 255 (opaque)
+### v1.20130525 ###
+* **fix:** Fixed a bug that prevented the addon from tracking correctly the total gained exp.
 
-### reive
-#### title
-* **r:** the amount of red from 0 to 255
-* **g:** the amount of green from 0 to 255
-* **b:** the amount of blue from 0 to 255
+### v1.20130516 ###
+* **add:** A "light mode" has been added. while active, the window will be kept hidden and only a summary will be shown at the end of the run.
 
-#### label
-* **r:** the amount of red from 0 to 255
-* **g:** the amount of green from 0 to 255
-* **b:** the amount of blue from 0 to 255
+### v1.20130514 ###
+* **change:** Current/total bayld/exp will be shown at the same time. "reset_on_start" has no use anymore and has been removed.
 
-#### value
-* **r:** the amount of red from 0 to 255
-* **g:** the amount of green from 0 to 255
-* **b:** the amount of blue from 0 to 255
+### v1.20130419 ###
+* **add:** The user can change the settings from the console or the text box.
 
-### score
-#### title
-* **r:** the amount of red from 0 to 255
-* **g:** the amount of green from 0 to 255
-* **b:** the amount of blue from 0 to 255
+### v1.20130417 ###
+* **add:** The user can decide which bonuses will appear in the window.
 
-#### label
-* **r:** the amount of red from 0 to 255
-* **g:** the amount of green from 0 to 255
-* **b:** the amount of blue from 0 to 255
-
-### bonus
-#### title
-* **r:** the amount of red from 0 to 255
-* **g:** the amount of green from 0 to 255
-* **b:** the amount of blue from 0 to 255
-
-#### label
-* **r:** the amount of red from 0 to 255
-* **g:** the amount of green from 0 to 255
-* **b:** the amount of blue from 0 to 255
-
-#### value
-* **r:** the amount of red from 0 to 255
-* **g:** the amount of green from 0 to 255
-* **b:** the amount of blue from 0 to 255
-
+### v1.20130416 ###
+* First release.

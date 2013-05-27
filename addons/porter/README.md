@@ -1,20 +1,28 @@
-**author:** Giuliano Riccio  
-**version:** v 1.20130525
+**Author:** Giuliano Riccio  
+**Version:** v 1.20130525
 
-###description 
-This plugin shows the slips' items highlighting in green those that are actually stored.
+# Porter #
+This addon shows the slips' items highlighting those that are stored.
 
-**abbreviation:** //porter
+## Commands ##
+### porter ###
+Shows the specified slip or slip's page. if "owned" is specified, only the owned items will be shown. if no parameter is specified, all the owned slips will be shown.
 
-**commands:**
+```
+porter[ <slip>[ <page>]] [owned]
+```
+* **_slip_:** the number of the slip you want to show.
+* **_page_:** the page of the slip you want to show.
+* **owned:** shows only the items you own.
 
-* porter[ &lt;slip&gt;[ &lt;page&gt;]] [owned] -- shows the specified slip or slip's page. if no parameter is specified all the owned slips will be shown.
+----
 
-#### v1.20130525.1
-* **add**: added the "owned" param. if present, only the owned items will be shown.
+##changelog##
+### v1.20130525.1
+* **add**: Added the "owned" param. if present, only the owned items will be shown.
 
-#### v1.20130525
-* **change**: if no parameter is specified all the owned slips will be shown.
+### v1.20130525
+* **change**: If no parameter is specified all the owned slips will be shown.
 
-#### v1.20130524
-* first release
+### v1.20130524
+* First release.

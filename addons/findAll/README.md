@@ -1,35 +1,63 @@
-**author:** Giuliano Riccio  
-**version:** v 1.20130524
+**Author:** Giuliano Riccio  
+**Version:** v 1.20130524
 
-###description 
-This plugin searches for items stored on all of your characters. To build the initial list, you must login and logout (or input the "findall" command) at least once with each of them.  
-The list is stored on the machine on which the addon is executed so this will not work the best if you use multiple PCs, at least until IPC will let multiple machines communicate over LAN or IP (in development).  
-The addon has a deferral time of 20 seconds when being loaded or when logging in to give the game enough time to download all the items.  
+# FindAll #
+
+This addon searches items stored on all your characters. To build the initial list, you must login and logout (or input the "findall" command) at least once with each of them.  
+The list is stored on the machine on which the addon is executed, being updated everytime you look for an item or on logout, so this will not work the best if you use multiple PCs, at least until IPC will let them communicate over LAN or Internet (in development).  
+The addon has a deferral time of 20 seconds when it's loaded, you are logging in or zoning to give the game enough time to load all the items.  
 If you notice that this time is too short, please create an issue report in the bug tracker.
 
-The list is updated everytime you look for an item or on logout.
+## Commands ##
+### findall ###
+Forces a list update
 
-**abbreviation:** //findall
+```
+findall
+```
 
-**commands:**
+### Search ###
+Looks for any item whose name (long or short) contains the specified value on the specified characters.
 
-* findall -- forces an update of the list
-* findall &lt;query&gt; -- looks for any item whose name (long or short) contains the specified value on the specified characters
-**example1:** findall thaumas -- searches for "thaumas" on all of your characters  
-**example2:** findall :alpha :beta thaumas -- searches for "thaumas" on "alpha" and "beta" characters  
-**example3:** findall :omega -- shows all the items stored on "omega"
+```
+findall [:<character1>[ :...]] <query>
+```
+* **_character1_:** the name of the characters to use for the search.
+* **...:** variable list of character names.
+* **_query_** the word you are looking for.
 
-###todo
+### Examples ###
+Search for "thaumas" on all your characters.
 
-- Use IPC to notify the addon about any change to the character's items list to reduce the amount of file rescans
-- Use IPC to synchronize the list between PCs in LAN or Internet (requires IPC update)
+```
+findall thaumas
+```
+Search for "thaumas" on "alpha" and "beta" characters.
 
-###changelog
-#### v1.20130524
-* **add:** added temp items support
+```
+findall :alpha :beta thaumas
+```
+Show all the items stored on "omega".
 
-#### v1.20130521
-* **add:** added characters filter
+```
+findall :omega
+```
 
-#### v1.20130520
-* first release
+----
+
+##TODO##
+
+- Use IPC to notify the addon about any change to the character's items list to reduce the amount of file rescans.
+- Use IPC to synchronize the list between PCs in LAN or Internet (requires IPC update).
+
+----
+
+##Changelog##
+### v1.20130524 ###
+* **add:** Added temp items support.
+
+### v1.20130521 ###
+* **add:** Added characters filter.
+
+### v1.20130520 ###
+* First release.

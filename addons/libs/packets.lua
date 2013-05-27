@@ -18,11 +18,12 @@ packets.outgoing = {}
 	Packet database. Feel free to correct/amend it wherever it's lacking.
 ]]
 
-for n=1,0x1FF,1 do
-	packets.outgoing[n] = {name='Unknown', size=0x00, description='No data available.'}
-	packets.incoming[n] = {name='Unknown', size=0x00, description='No data available.'}
-end
+local dummy = {name='Unknown', size=0x00, description='No data available.'}
 
+for key = 1, 0x1FF do
+	packets.outgoing[key] = dummy
+	packets.incoming[key] = dummy
+end
 
 -- Client packets (outgoing)
 packets.outgoing[0x00A] = {name='Client Connect',      size=0x2E, description='(unencrypted/uncompressed) First packet sent when connecting to new zone.'}
@@ -139,6 +140,15 @@ lengths['int'] = 4
 lengths['long'] = 8
 lengths['float'] = 4
 lengths['double'] = 8
+lengths = setmetatable(lengths, {__index = function(t, k)
+	local type, number = k:match('(.-) *%[(%d+)%]')
+	if type then
+		local length = rawget(t, type)
+		if length then
+			return length*tonumber(number)
+		end
+	end
+end})
 
 -- Specific field data for p.
 local fields = {}
@@ -146,14 +156,23 @@ fields.incoming = {}
 fields.outgoing = {}
 
 fields.incoming[0x0DF] = L{
-	{ctype='unsigned int', field='id'}, -- 4-7
-	{ctype='unsigned int', field='hp'}, -- 8-11
-	{ctype='unsigned int', field='mp'}, -- 12-15
-	{ctype='unsigned int', field='tp'}, -- 16-19
+	{ctype='unsigned int', field='id'},               -- 4-7
+	{ctype='unsigned int', field='hp'},               -- 8-11
+	{ctype='unsigned int', field='mp'},               -- 12-15
+	{ctype='unsigned int', field='tp'},               -- 16-19
 	{ctype='unsigned short', field='_unknown_20_21'},
 	{ctype='unsigned short', field='_unknown_22_23'},
 	{ctype='unsigned short', field='_unknown_24_25'},
-	{ctype='unsigned short', field='_unknown_26_27'}
+	{ctype='unsigned short', field='_unknown_26_27'},
+}
+
+fields.incoming[0x0CC] = L{
+	{ctype='int', field='_unknown_4_7'},
+	{ctype='char[128]', field='lsmes'},               -- 8-135
+	{ctype='int', field='_unknown_136_139'},
+	{ctype='char[16]', field='player_name'},          -- 140-155
+	{ctype='int', field='permissions'},               -- 156-159
+	{ctype='char[16]', field='linkshell_name'},       -- 160-175, 6-bit packed
 }
 
 function Pin(id, data)
