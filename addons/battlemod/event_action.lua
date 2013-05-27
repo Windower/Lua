@@ -186,11 +186,11 @@ function event_action(act)
 				if T{252,265,268,269,271,272,274,275,650}:contains(msg_ID) then
 					spell = 'Magic Burst '..spell
 				end
-				spell = color_arr['spellcol']..spell..rcol
+				spell = color_it(spell,color_arr['spellcol'])
 			elseif table.contains(fields,'ability') then
 				ability = jobabilities[abil_ID]['english']
 				if msg_ID == 379 then ability = 'Magic Burst '..ability end
-				ability = color_arr['abilcol']..ability..rcol
+				ability = color_it(ability,color_arr['abilcol'])
 			elseif table.contains(fields,'item') then
 				item = color_arr['itemcol']..items[abil_ID]['enl']..rcol
 			elseif table.contains(fields,'weapon_skill') then
@@ -208,9 +208,9 @@ function event_action(act)
 					weapon_skill = weapon_skill..' (No Effect)'
 				end
 				if actor_table['is_npc'] then
-					weapon_skill = color_arr['mobwscol']..(weapon_skill or '')..rcol
+					weapon_skill = color_it(weapon_skill or '',color_arr['mobwscol'])
 				else
-					weapon_skill = color_arr['wscol']..(weapon_skill or '')..rcol
+					weapon_skill = color_it(weapon_skill or '',color_arr['wscol'])
 				end
 			elseif msg_ID == 303 then
 				ability = 'Divine Seal'
@@ -237,9 +237,9 @@ function event_action(act)
 
 			if table.contains(fields,'status') then
 				if act['targets'][i]['actions'][n]['param'] == 0 or act['targets'][i]['actions'][n]['param'] == 255 then
-					status = color_arr['statuscol']..'No effect'..rcol
+					status = color_it('No effect',color_arr['statuscol'])
 				else
-					status = color_arr['statuscol']..(enLog[effect_val] or statuses[effect_val]['english'])..rcol
+					status = color_it((enLog[effect_val] or statuses[effect_val]['english']),color_arr['statuscol'])
 				end
 			elseif table.contains(fields,'number') then
 				number = effect_val
@@ -247,31 +247,31 @@ function event_action(act)
 					number = number..' '..dialog[msg_ID]['units']
 				end
 			elseif not item and table.contains(fields,'item') then
-				item = color_arr['itemcol']..items[effect_val]['enl']..rcol
+				item = color_it(items[effect_val]['enl'],color_arr['itemcol'])
 			elseif table.contains(fields,'item2') then -- For when you use an item to obtain items i.e. Janus Guard
-				item2 = color_arr['itemcol']..items[effect_val]['enl']..rcol
+				item2 = color_it(items[effect_val]['enl'],color_arr['itemcol'])
 			elseif table.contains(fields,'gil') then
 				gil = effect_val..' gil'
 			end
 			
 			-- Special Message Handling
 			if msg_ID == 93 or msg_ID == 273 then
-				status=color_arr['statuscol']..'Vanish'..rcol
+				status=color_it('Vanish',color_arr['statuscol'])
 			elseif msg_ID == 522 and condensebattle then
 				target = target..' (stunned)'
 			elseif T{158,188,245,324,592,658}:contains(msg_ID) and condensebattle then
 				-- When you miss a WS or JA. Relevant for condensed battle.
 				number = 'Miss' --- This probably doesn't work due to the if a==nil statement below.
 			elseif msg_ID == 653 or msg_ID == 654 then
-				status = color_arr['statuscol']..'Immunobreak'..rcol
+				status = color_it('Immunobreak',color_arr['statuscol'])
 			elseif msg_ID == 655 or msg_ID == 656 then
-				status = color_arr['statuscol']..'Completely Resists'..rcol
+				status = color_it('Completely Resists',color_arr['statuscol'])
 			elseif msg_ID == 85 or msg_ID == 284 then
-				status = color_arr['statuscol']..'Resists'..rcol
+				status = color_it('Resists',color_arr['statuscol'])
 			elseif msg_ID == 674 then -- Scavenge
-				number = act['targets'][i]['actions'][n]['add_effect_param']..' '..color_arr['itemcol']..items[effect_val]['enl']..rcol
+				number = act['targets'][i]['actions'][n]['add_effect_param']..' '..color_it(items[effect_val]['enl'],color_arr['itemcol'])
 			elseif T{75,156,189,248,283,312,323,336,355,408,422,423,425,659}:contains(msg_ID) then
-				status = color_arr['statuscol']..'No Effect'..rcol -- The status code for "No Effect" is 255, so it might actually work without this line
+				status = color_it('No effect',color_arr['statuscol']) -- The status code for "No Effect" is 255, so it might actually work without this line
 			end
 		
 			-- Sets the common field "abil" based on the applicable abilities.
@@ -422,7 +422,7 @@ function namecol(player,player_table,party_table)
 		if player_table['id']%4096>2047 then
 			for i,v in pairs(party_table) do
 				if nf(v['mob'],'pet_index') == player_table['index'] then
-					player = color_arr[i]..player..rcol
+					player = color_it(player,color_arr[i])
 					break
 				end
 			end
@@ -432,14 +432,14 @@ function namecol(player,player_table,party_table)
 	else
 		for i,v in pairs(party_table) do
 			if nf(v['mob'],'id') == player_table['id'] then
-				player = color_arr[i]..player..rcol
+				player = color_it(player,color_arr[i])
 				break
 			end
 		end
 	end
 	if player~= nil then -- when you zone into an area, sometimes you can get no player value.
 		if player:sub(-2,-1) ~= rcol then
-			player = color_arr['other']..player..rcol
+			player = color_it(player,color_arr['other'])
 		end
 	end
 	return player
@@ -587,4 +587,9 @@ function conjunctions(pre,post,target_count,current)
 		pre = pre..' and '
 	end
 	return pre..post
+end
+
+function color_it(to_color,color)
+	local colarr = split(to_color,' ')
+	return color..table.concat(colarr,rcol..' '..color)..rcol
 end

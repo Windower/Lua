@@ -151,7 +151,7 @@ function options_load()
 		<line_nonumber>[${actor}] ${abil} ]]..string.char(129,168)..[[ ${target}</line_nonumber>
 		<line_noabil>AOE ${number} ]]..string.char(129,168)..[[ ${target}</line_noabil>
 		<line_aoebuff>${actor} ${abil} ]]..string.char(129,168)..[[ ${target} (${status})</line_aoebuff>
-		<line_roll>${actor} ${abil} ]]..string.char(129,168)..[[ ${target} ]]..string.char(129,170)..[[ ${number}</line_roll>
+		<line_roll>${actor} ${abil} ]]..string.char(129,168)..[[ ${target} ]]..string.char(129,170)..[[ ${number}</line_roll>
 	</global>
 </settings>
 ]])
@@ -573,7 +573,7 @@ end
 function event_action_message(actor_id,index,actor_target_index,target_target_index,message_id,param_1,param_2,param_3)
     -- Consider a way to condense "Wears off" messages?
 	if message_id == 206 then -- Wears off messages
-		local status = color_arr['statuscol']..(enLog[param_1] or statuses[param_1]['english'])..rcol
+		local status = color_it((enLog[param_1] or statuses[param_1]['english']),color_arr['statuscol'])
 		local target_table = get_mob_by_id(index)
 		local party_table = get_party()
 		local target = target_table['name']
@@ -613,11 +613,11 @@ function event_action_message(actor_id,index,actor_target_index,target_target_in
 			spell = nf(spells[param_1],'english')
 		end
 		
-		if status then status = color_arr['statuscol']..status..rcol end
-		if spell then spell = color_arr['spellcol']..spell..rcol end
+		if status then status = color_it(status,color_arr['statuscol']) end
+		if spell then spell = color_it(spell,color_arr['spellcol']) end
 		if target then target = namecol(target,target_table,party_table) end
 		if actor then actor = namecol(actor,actor_table,party_table) end
-		if skill then skill = color_arr['abilcol']..skill..rcol end
+		if skill then skill = color_it(skill,color_arr['abilcol']) end
 		
 		if actor ~= nil then
 			local outstr = dialog[message_id]['english']:gsub('$\123actor\125',actor or ''):gsub('$\123status\125',status or ''):gsub('$\123target\125',target or ''):gsub('$\123spell\125',spell or ''):gsub('$\123skill\125',skill or ''):gsub('$\123number\125',number or ''):gsub('$\123number2\125',number2 or ''):gsub('$\123lb\125','\7')
