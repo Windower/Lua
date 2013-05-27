@@ -91,8 +91,8 @@ function event_load()
 	message_map[186] = T{194,242,243}-- Receives: Weapon skill, Target, Status
 	message_map['Receives'] = T{203,205,266,270,272,277,279,280,267,269,278}
 	message_map[426] = T{427} -- Loses
-	no_effect_map = T{248,355,189,75,408,156,0,0,0,0,156,0,156,156,156,156}
-	receives_map = T{0,0,186,82,375,116,0,0,0,0,116,0,116,116,116,116}
+	no_effect_map = T{248,355,189,75,408,156,0,0,0,0,189,0,189,156,156}
+	receives_map = T{0,0,186,82,375,116,0,0,0,0,186,0,186,116,116}
 	
 	speFile = file.new('../../plugins/resources/spells.xml')
 	jaFile = file.new('../../plugins/resources/abils.xml')
