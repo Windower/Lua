@@ -4,21 +4,68 @@ function event_action(act)
 	local aggregate = false
 	local eventual_send = false
 	
-	local msg = act['targets'][1]['actions'][1]['message']
-	if agg_messages:contains(msg) and condensebuffs then
-		aggregate = true -- checks if the first message is one of the multi-target indicating messages
-	end
-	
 	local party_table = get_party()
 	local actor_table = get_mob_by_id(act['actor_id'])
 	local actor = actor_table['name']
 	if actor == nil then return end
 	actor = namecol(actor,actor_table,party_table)
+	
+	
+	if agg_messages:contains(act['targets'][1]['actions'][1]['message']) and condensebuffs then
+		aggregate = true -- checks if the first message is one of the multi-target indicating messages
+		local messages = {}
+		for n,m in pairs(act['targets']) do
+			local msg = act['targets'][n]['actions'][1]['message']
+			if condensebattle then
+				for i,v in pairs(message_map) do
+					if table.contains(message_map[i],msg) then
+						act['targets'][n]['actions'][1]['message'] = i
+						msg = i
+					end
+				end
+				if msg == 'No effect' then
+					msg = no_effect_map[act['category']]
+					act['targets'][n]['actions'][1]['message'] = msg
+				elseif msg == 'Receives' then
+					msg = receives_map[act['category']]
+					act['targets'][n]['actions'][1]['message'] = msg
+				end
+			end
+			local target_table = get_mob_by_id(act['targets'][n]['id'])
+			if messages[msg] then
+				if check_filter(actor_table,party_table,target_table,act['category'],msg) then
+					local address = messages[msg]['address']
+					act['targets'][address]['count'] = act['targets'][address]['count'] + 1
+				end
+			else
+				messages[msg] = {}
+				messages[msg]['address'] = n
+				act['targets'][n]['count'] = 1
+			end
+		end
+		
+		for n,m in pairs(act['targets']) do
+			local target_table = get_mob_by_id(act['targets'][n]['id'])
+			local target = target_table['name']
+			target = namecol(target,target_table,party_table)
+			
+			local msg = act['targets'][n]['actions'][1]['message']
+			if messages[msg]['address'] ~= n then
+				if check_filter(actor_table,party_table,target_table,act['category'],msg) then
+					local address = messages[msg]['address']
+					act['targets'][address]['count2'] = act['targets'][address]['count2'] + 1
+					act['targets'][address]['target'] = conjunctions(act['targets'][address]['target'],target,act['targets'][address]['count'],act['targets'][address]['count2'])
+					act['targets'][n]['actions'][1]['message'] = 0
+				end
+			else
+				act['targets'][n]['target'] = target
+				act['targets'][n]['count2'] = 1
+			end
+		end
+	end
 
 	for i,v in pairs(act['targets']) do
-		--local shadows,parries,misses,hits = 0,0,0,0
-		--local damage,add_eff_damage,counter_damage,spike_damage = 0,0,0,0
-		
+	
 		if condensedamage then
 			local messages = {}
 			local addmessages = {}
@@ -63,17 +110,27 @@ function event_action(act)
 		end
 		
 		for n,m in pairs(act['targets'][i]['actions']) do
-			local msg_ID = act['targets'][i]['actions'][n]['message']
-			if not nf(dialog[msg_ID],'english') then return end
+			local prepstr,abil,add_eff_str,spike_str,wsparm,status,number,gil,abil_ID,effect_val,msg_ID
+			local spell,ability,weapon_skill,item,target_table,target
 			
-			local prepstr,abil,add_eff_str,spike_str,wsparm,status,number,gil,abil_ID,effect_val
-			local spell,ability,weapon_skill,item
+			target_table = get_mob_by_id(act['targets'][i]['id'])
 			
 			local flipped = false
-			local target_table = get_mob_by_id(act['targets'][i]['id'])
-			local target = target_table['name']
-			target = namecol(target,target_table,party_table)
+			if check_filter(actor_table,party_table,target_table,act['category'],msg) then
+				msg_ID = act['targets'][i]['actions'][n]['message']
+			else
+				msg_ID = 0
+			end
+			if not nf(dialog[msg_ID],'english') then return end
 			
+			if aggregate and msg_ID ~= 0 then
+				target = act['targets'][i]['target']
+			elseif aggregate then
+				target = ' '
+			else
+				target = target_table['name']
+				target = namecol(target,target_table,party_table)
+			end
 			
 			if act['category'] == 1 then -- Melee swings
 				if act['targets'][i]['actions'][n]['reaction'] == 11 then
@@ -122,7 +179,6 @@ function event_action(act)
 				effect_val = act['targets'][i]['actions'][n]['param']
 			end
 			
-			
 			local fields = fieldsearch(dialog[msg_ID]['english'])
 			
 			if table.contains(fields,'spell') then
@@ -151,7 +207,7 @@ function event_action(act)
 				elseif msg_ID == 189 then
 					weapon_skill = weapon_skill..' (No Effect)'
 				end
-				if actor['is_npc'] then
+				if actor_table['is_npc'] then
 					weapon_skill = color_arr['mobwscol']..(weapon_skill or '')..rcol
 				else
 					weapon_skill = color_arr['wscol']..(weapon_skill or '')..rcol
@@ -183,7 +239,7 @@ function event_action(act)
 				if act['targets'][i]['actions'][n]['param'] == 0 or act['targets'][i]['actions'][n]['param'] == 255 then
 					status = color_arr['statuscol']..'No effect'..rcol
 				else
-					status = color_arr['statuscol']..statuses[effect_val]['english']..rcol
+					status = color_arr['statuscol']..(enLog[effect_val] or statuses[effect_val]['english'])..rcol
 				end
 			elseif table.contains(fields,'number') then
 				number = effect_val
@@ -224,9 +280,8 @@ function event_action(act)
 				abil = weapon_skill or ability or spell or item
 			end
 			
-			
 			if msg_ID ~= 0 then
-				if dialog[msg_ID]['color'] == 'M' or dialog[msg_ID]['color'] == 'D' or dialog[msg_ID]['color'] == 'H' or act['targets'][i]['actions'][n]['reaction'] == 11 or act['targets'][i]['actions'][n]['reaction'] == 12 or msg_ID == 31 or msg_ID == 32 or T{6,7,8,9,14,15}:contains(act['category']) then
+				if dialog[msg_ID]['color'] == 'M' or dialog[msg_ID]['color'] == 'D' or dialog[msg_ID]['color'] == 'H' or act['targets'][i]['actions'][n]['reaction'] == 11 or act['targets'][i]['actions'][n]['reaction'] == 12 or msg_ID == 31 or msg_ID == 32 or T{6,7,8,9,14,15}:contains(act['category']) or aggregate then
 					-- Misses, Damage, Healing, Parrying, Dodge, Guard/Block, and Utsusemi
 					-- Handles for Category 1,2,3,4,6, and 14
 					a,b = string.find(dialog[msg_ID]['english'],'$\123number\125')
@@ -234,10 +289,16 @@ function event_action(act)
 						number = nil
 					end
 					if condensebattle then
-						if not abil then abil = 'AoE' end
+						-- TEST REMOVAL
+						--if not abil then abil = 'AoE' end
 						
 						if T{'Steal','Despoil','Scavenge','Mug'}:contains(abil) then
 							prepstr = dialog[msg_ID]['english']
+						elseif msg_ID>419 and msg_ID<430 then
+							if act['targets'][i]['actions'][n]['param'] == 12 then -- Bust is always 12
+								number = 'Bust!'
+							end
+							prepstr = line_roll
 						elseif abil and number and target and actor then
 							prepstr = line_full
 						elseif abil and status and target and actor then
@@ -246,6 +307,8 @@ function event_action(act)
 							prepstr = line_nonumber
 						elseif not actor then
 							prepstr = line_noactor
+						elseif not abil then
+							prepstr = line_noabil -- TEST STATEMENT
 						end
 					else -- Handles exceptions and people that don't condense battle messages
 						prepstr = dialog[msg_ID]['english']
@@ -256,43 +319,12 @@ function event_action(act)
 			end
 			
 			-- Avoid nil field errors using " or ''" with all the gsubs.
-			if prepstr then
-				prepstr = prepstr:gsub('$\123lb\125','\7'):gsub('$\123actor\125',actor or ''):gsub('$\123spell\125',spell or ''):gsub('$\123ability\125',ability or ''):gsub('$\123abil\125',abil or ''):gsub('$\123number\125',number or ''):gsub('$\123weapon_skill\125',weapon_skill or ''):gsub('$\123status\125',status or ''):gsub('$\123item\125',item or ''):gsub('$\123item2\125',item2 or ''):gsub('$\123gil\125',gil or '')
-			end
-			
 			-- Construct the message to be sent out --
 			if prepstr then
-				if not aggregate then
-					if check_filter(actor_table,party_table,target_table,act['category'],msg) and dialog[msg_ID]['color'] ~= nil then
-						add_to_chat(colorfilt(dialog[msg_ID]['color'],target_table['id']==party_table['p0']['mob']['id']),string.char(0x1F,0xFE,0x1E,0x01)..prepstr:gsub('$\123target\125',target or '')..string.char(127,49))
-					end
-				elseif i==1 then
-					if condensebattle then
-						eventual_send = check_filter(actor_table,party_table,target_table,act['category'],msg)
-						if msg_ID>419 and msg_ID<430 then
-							if act['targets'][i]['actions'][n]['param'] == 12 then -- Bust is always 12
-								number = 'Bust!'
-							end
-							persistantmessage = line_roll:gsub('$\123status\125',status or ''):gsub('$\123actor\125',actor or ''):gsub('$\123number\125',number or ''):gsub('$\123abil\125',abil or '')
-						elseif status then
-							persistantmessage = line_aoebuff:gsub('$\123status\125',status or ''):gsub('$\123actor\125',actor or ''):gsub('$\123abil\125',abil or '')
-						else
-							persistantmessage = line_nonumber:gsub('$\123actor\125',actor or ''):gsub('$\123abil\125',abil or '')
-						end
-					else
-						persistantmessage = prepstr
-					end
-					persistantcolor = colorfilt(dialog[msg_ID]['color'],target_table['id']==party_table['p0']['mob']['id'])
-					persistanttarget = target
-					if act['target_count'] == 1 and check_filter(actor_table,party_table,target_table,act['category'],msg) then
-						persistantmessage = persistantmessage:gsub('$\123target\125',persistanttarget)
-						add_to_chat(persistantcolor,persistantmessage)
-					end
-				else
-					persistanttarget = conjunctions(persistanttarget,target,act['target_count'],i)
-				end
+				prepstr = prepstr:gsub('$\123lb\125','\7'):gsub('$\123actor\125',actor or ''):gsub('$\123spell\125',spell or ''):gsub('$\123ability\125',ability or ''):gsub('$\123abil\125',abil or ''):gsub('$\123number\125',number or ''):gsub('$\123weapon_skill\125',weapon_skill or ''):gsub('$\123status\125',status or ''):gsub('$\123item\125',item or ''):gsub('$\123item2\125',item2 or ''):gsub('$\123gil\125',gil or '')
+				add_to_chat(colorfilt(dialog[msg_ID]['color'],target_table['id']==party_table['p0']['mob']['id']),string.char(0x1F,0xFE,0x1E,0x01)..prepstr:gsub('$\123target\125',target or '')..string.char(127,49))
 			end
-			
+						
 			number = nil
 			if flipped then actor,actor_table,target,target_table,flipped = flip(actor,actor_table,target,target_table,flipped) end
 			local addmsg = act['targets'][i]['actions'][n]['add_effect_message']
@@ -302,8 +334,8 @@ function event_action(act)
 					if T{152,161,162,163,167,229,603,652}:contains(addmsg) or addmsg > 287 and addmsg < 303 or addmsg > 383 and addmsg < 399 then
 						number = act['targets'][i]['actions'][n]['add_effect_param']
 					else
-						number = nf(statuses[act['targets'][i]['actions'][n]['add_effect_param']],'english')
-						status = nf(statuses[act['targets'][i]['actions'][n]['add_effect_param']],'english')
+						number = enLog[act['targets'][i]['actions'][n]['add_effect_param']] or nf(statuses[act['targets'][i]['actions'][n]['add_effect_param']],'english')
+						status = enLog[act['targets'][i]['actions'][n]['add_effect_param']] or nf(statuses[act['targets'][i]['actions'][n]['add_effect_param']],'english')
 					end
 							
 					if condensebattle then
