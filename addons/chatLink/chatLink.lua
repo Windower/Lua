@@ -44,7 +44,7 @@ function event_unload()
 end
 
 function event_incoming_text(original, modified, mode)
-    for link in modified:gmatch('(%a[%w%+%.-]://[^%s]-)') do
+    for link in modified:gmatch('(%a[%w%+%.-]-://[^%s]-)') do
         table.insert(chatLink.links, link)
 
         modified = modified:gsub(link:escape(link), '['..(#chatLink.links)..']'..link, 1)
