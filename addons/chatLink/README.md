@@ -1,4 +1,4 @@
-**Author:** Giuliano Riccio/Aureus
+**Author:** Giuliano Riccio/Aureus  
 **Version:** v 1.20130527
 
 # ChatLink #
