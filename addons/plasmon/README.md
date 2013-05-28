@@ -64,7 +64,7 @@ plasmon position [[-h]|[-x <x>] [-y <y>]]
 * **-h:** shows the help text.
 * **-x _x_:** specifies the horizontal position of the window.
 * **-y _y_:** specifies the vertical position of the window.
-* 
+
 ### font ###
 sets the style of the font used in the window. if the no parameter is specified, the help text will be shown.
 
