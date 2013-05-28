@@ -12,7 +12,6 @@ Switches between military and ampm modes.
 ```
 usage: timestamp ampm [<enabled>]
 ```
-* **ampm:** copies the link to the clipboard.
 * **_enabled_:** the number associated to the link.
 
 ----
