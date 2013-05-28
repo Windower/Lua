@@ -10,9 +10,9 @@ Based on Timestamp plugin developed by Aureus.
 Switches between military and ampm modes.
 
 ```
-usage: timestamp ampm [<enabled>]
+timestamp ampm [<enabled>]
 ```
-* **_enabled_:** defines the status of the ampm mode. **0**, **false** or **default** mean disabled. **1** or **true** mean enabled. if not specified, **true** will be assumed.
+* **_enabled_:** defines the status of the ampm mode. **0**, **false** or **default** mean disabled. **1** or **true** mean enabled. If not specified, **true** will be assumed.
 
 ----
 
