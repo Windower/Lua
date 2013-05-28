@@ -88,6 +88,6 @@ function event_incoming_chunk(id, data)
 	if id == 221 then
 		modmember={}
 		members={}
-		send_command('wait 0.1; packet start')
+		send_command('wait 0.1; namelights start')
 	end
 end
