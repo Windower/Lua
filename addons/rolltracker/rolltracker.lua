@@ -175,11 +175,11 @@ function event_action(act)
 						if #effected_member > 0 then
 							if rollnum == roll_luck[i] or rollnum == 11 then 
 								luckyroll = 1
-								add_to_chat(1, '['..#effected_member..'] '..effected_write..string.char(31,1)..' '..symbolnum['implies']..' '..roll_ident[tostring(roller)]..' Roll ('..symbolnum['circle'..rollnum]..')'..string.char(31,158)..' (Lucky!)'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
+								add_to_chat(1, '['..#effected_member..'] '..effected_write..string.char(31,1)..' '..symbolnum['implies']..' '..roll_ident[tostring(roller)]..' Roll '..symbolnum['circle'..rollnum]..string.char(31,158)..' (Lucky!)'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
 							elseif rollnum==12 and #effected_member > 0 then
 								add_to_chat(1, string.char(31,167)..'['..#effected_member..']'..effected_write..' '..symbolnum['implies']..'('..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')')
 							else
-								add_to_chat(1, '['..#effected_member..'] '..effected_write..string.char(31,1)..' '..symbolnum['implies']..' '..roll_ident[tostring(roller)]..' Roll ('..symbolnum['circle'..rollnum]..')'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
+								add_to_chat(1, '['..#effected_member..'] '..effected_write..string.char(31,1)..' '..symbolnum['implies']..' '..roll_ident[tostring(roller)]..' Roll ('..symbolnum['circle'..rollnum]..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
 							end
 						end
 					end
