@@ -35,6 +35,7 @@ settings=config.load()
 defaults = {}
 defaults.autostop = 0
 
+local symbolnum = require('json').read('../libs/ffxidata.json').chat.chars
 
 function event_addon_command(...)
     cmd = {...}
@@ -63,9 +64,7 @@ end
 function event_load()
 	send_command('alias rolltracker lua c rolltracker')
 	override= settings['autostop']
-	player=get_player()['name']
 	luckyroll = 0
-	symbolnum={ '\x87\x40', '\x87\x41', '\x87\x42', '\x87\x43', '\x87\x44', '\x87\x45', '\x87\x46', '\x87\x47', '\x87\x48', '\x87\x49', '\x87\x4A'}
 	roll_id ={ 
 				97, 98, 99,
 				100, 101, 102,
@@ -88,8 +87,6 @@ function event_load()
 						['122']='Tactician\'s',['303']='Miser\'s',['302']='Allies\'', ['304']='Companion\'s',['305']='Avenger\'s'
 			}
 	roll_luck={ 0,5,3,3,5,4,5,3,4,4,2,4,2,4,4,5,2,5,3,3,2,3,2,3,4,5,5,3,2,4 }
-	roll_bonus={}
-	rollnum=''
 	roll_buff={
 				['Chaos']={6,8,9,25,11,13,16,3,17,19,31,"-4", '% Attack!'},
 				['Fighter\'s']={ 2,2,3,4,12,5,6,7,1,9,18,'-4','% Double-Attack!'},
@@ -138,7 +135,7 @@ end
 
 function event_incoming_text(old, new, color)
 	match_doubleup = old:find (' uses Double')
-	battlemod_compat = old:find('.*% Roll.*'..string.char(129,168))
+	battlemod_compat = old:find('.*Roll.*'..string.char(129,168))
 	obtained_roll = old:find('.* receives the effect of .* Roll.')
 	not_party = old:find ('%('..'%w+'..'%)')	
 		if battlemod_compat or match_doubleup and not_party~=nil then
@@ -159,7 +156,6 @@ function event_action(act)
 		roller = act['param']
 		rollnum = act['targets'][1]['actions'][1]['param']
 		effected_member={}
-		number = #effected_member
 		bust_rate(rollnum, id)
 		for i=1, #act['targets'] do
 			if act['targets'][i]['id'] == get_player()['id'] then
@@ -179,11 +175,11 @@ function event_action(act)
 						if #effected_member > 0 then
 							if rollnum == roll_luck[i] or rollnum == 11 then 
 								luckyroll = 1
-								add_to_chat(1, '['..#effected_member..'] '..effected_write..string.char(31,1)..' >>> '..roll_ident[tostring(roller)]..' Roll ('..symbolnum[rollnum]..')'..string.char(31,158)..' (Lucky!)'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
+								add_to_chat(1, '['..#effected_member..'] '..effected_write..string.char(31,1)..' >>> '..roll_ident[tostring(roller)]..' Roll ('..symbolnum['circle'..rollnum]..')'..string.char(31,158)..' (Lucky!)'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
 							elseif rollnum==12 and #effected_member > 0 then
 								add_to_chat(1, string.char(31,167)..'['..#effected_member..']'..effected_write..' >>> Bust! ('..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')')
 							else
-								add_to_chat(1, '['..#effected_member..'] '..effected_write..string.char(31,1)..' >>> '..roll_ident[tostring(roller)]..' Roll ('..symbolnum[rollnum]..')'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
+								add_to_chat(1, '['..#effected_member..'] '..effected_write..string.char(31,1)..' >>> '..roll_ident[tostring(roller)]..' Roll ('..symbolnum['circle'..rollnum]..')'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
 							end
 						end
 					end
