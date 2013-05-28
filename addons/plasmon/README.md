@@ -1,5 +1,5 @@
 **Author:** Giuliano Riccio  
-**Version:** v 1.20130517
+**Version:** v 1.20130528
 
 # Plasmon #
 This addon tracks plasm, killed mobs and dropped airlixirs during a delve.
@@ -96,8 +96,12 @@ plasmon color [[-h]|[-o <objects>] [-d] [-r <red>] [-g <green>] [-b <blue>] [-a 
 
 ## Changelog ##
 
+### v1.20130528 ###
+* **add:** added a recovery mode in case of crash/reload.
+* **fix:** fixed the mob kill count.
+
 ### v1.20130517 ###
-* **add:** fixed a bug that kept the addon from counting airlixirs.
+* **fix:** fixed a bug that kept the addon from counting airlixirs.
 
 ### v1.20130516 ###
 * **change:** a "light mode" has been added. while active, the window will be kept hidden and only a summary will be shown at the end of the run.

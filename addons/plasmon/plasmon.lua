@@ -1,5 +1,5 @@
 --[[
-plasmon v1.20130517
+plasmon v1.20130528
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -32,10 +32,11 @@ require 'colors'
 local config = require 'config'
 
 local _plasmon = T{}
-_plasmon.v                   = '1.20130517'
+_plasmon.v                   = '1.20130528'
 _plasmon.tb_name             = 'addon:gr:plasmon'
 _plasmon.track               = false
 _plasmon.visible             = false
+_plasmon.recovery_mode       = false
 _plasmon.stats               = T{}
 _plasmon.stats.plasm         = 0
 _plasmon.stats.totPlasm      = 0
@@ -128,22 +129,22 @@ function _plasmon.parseOptions(args)
 end
 
 function _plasmon.test()
-    add_to_chat(121, 'Now permeating the mists surrounding the fracture.')
-    add_to_chat(121, 'You receive 50 corpuscles of mweya plasm.')
+    add_to_chat(148, 'Now permeating the mists surrounding the fracture.')
+    add_to_chat(148, 'You receive 50 corpuscles of mweya plasm.')
     add_to_chat(121, 'You find an airlixir on the Mob')
-    add_to_chat(121, 'You receive 50 corpuscles of mweya plasm.')
-    add_to_chat(121, 'You receive 50 corpuscles of mweya plasm.')
-    add_to_chat(121, 'You receive 150 corpuscles of mweya plasm.')
-    add_to_chat(121, 'You receive 50 corpuscles of mweya plasm.')
+    add_to_chat(148, 'You receive 50 corpuscles of mweya plasm.')
+    add_to_chat(148, 'You receive 50 corpuscles of mweya plasm.')
+    add_to_chat(148, 'You receive 150 corpuscles of mweya plasm.')
+    add_to_chat(148, 'You receive 50 corpuscles of mweya plasm.')
     add_to_chat(121, 'You find an airlixir on the Mob')
-    add_to_chat(121, 'You receive 500 corpuscles of mweya plasm.')
+    add_to_chat(148, 'You receive 500 corpuscles of mweya plasm.')
     add_to_chat(121, 'You find an airlixir on the Mob')
     add_to_chat(121, 'You find an airlixir on the Mob')
     add_to_chat(121, 'You find an airlixir on the Mob')
     add_to_chat(121, 'You find an airlixir on the Mob')
     add_to_chat(121, 'You find an airlixir +1 on the Mob')
     add_to_chat(121, 'You find an airlixir +2 on the Mob')
-    add_to_chat(121, 'Your time has expired for this battle. Now exiting...')
+    add_to_chat(146, 'Your time has expired for this battle. Now exiting...')
     _plasmon.show()
 end
 
@@ -151,6 +152,10 @@ function _plasmon.start()
     _plasmon.reset()
     _plasmon.track = true
     add_to_chat(0, '\30\03The Delve has begun!\30\01')
+    
+    if _plasmon.recovery_mode then
+        _plasmon.recovery_mode = false
+    end
 
     if _plasmon.settings.light == false then
         _plasmon.show()
@@ -241,7 +246,7 @@ function _plasmon.first_run()
 
     add_to_chat(55, 'hi '..get_player()['name']:lower()..',')
     add_to_chat(55, 'thank you for using plasmon v'.._plasmon.v)
-    add_to_chat(55, 'this update should fix the bug that kept the addon from counting airlixirs. please let me know if you are still experiencing any problem.')
+    add_to_chat(55, 'i\'ve fixed the mob kill count and added a "recovery mode" in case of crash/reload.')
     add_to_chat(55, '- zohno@phoenix')
 
     _plasmon.settings.v = _plasmon.v
@@ -266,6 +271,10 @@ function event_load()
     tb_set_italic(_plasmon.tb_name, _plasmon.settings.font.italic)
     tb_set_text(_plasmon.tb_name, '')
     tb_set_bg_visibility(_plasmon.tb_name, true)
+    
+    if get_ffxi_info().zone_id == 271 then
+        _plasmon.recovery_mode = true
+    end
 end
 
 function event_unload()
@@ -275,6 +284,10 @@ end
 
 function event_login()
     _plasmon.first_run()
+    
+    if get_ffxi_info().zone_id == 271 then
+        _plasmon.recovery_mode = true
+    end
 end
 
 function event_incoming_text(original, modified, mode)
@@ -282,69 +295,91 @@ function event_incoming_text(original, modified, mode)
     
     original = original:strip_format()
 
-    match = original:match('Now permeating the mists surrounding the fracture%.')
+    if _plasmon.track or _plasmon.recovery_mode then
+        if mode == 148 then
+            match = original:match('You receive (%d+) corpuscles of mweya plasm%.')
 
-    if match then
-        _plasmon.start()
+            if match then
+                if _plasmon.recovery_mode then
+                    _plasmon.start()
+                end
+                
+                match = tonumber(match, 10)
 
-        return modified, mode
-    end
+                _plasmon.stats.plasm    = _plasmon.stats.plasm + match
+                _plasmon.stats.totPlasm = _plasmon.stats.totPlasm + match
 
-    match = original:match('Your time has expired for this battle%. Now exiting%.%.%.')
+                if match ~= 50 and match ~= 500 and match ~= 750 then
+                    mobs = match / 50
+                else
+                    mobs = 1
+                end
 
-    if match and _plasmon.track then
-        _plasmon.stop()
+                _plasmon.stats.mobs    = _plasmon.stats.mobs + mobs
+                _plasmon.stats.totMobs = _plasmon.stats.totMobs + mobs
+                _plasmon.refresh()
 
-        return modified, mode
-    end
+                return modified, mode
+            end
+        elseif mode == 121 then
+            match = original:match('You find an airlixir %+1')
 
-    match = original:match('You receive (%d+) corpuscles of mweya plasm%.')
+            if match then
+                if _plasmon.recovery_mode then
+                    _plasmon.start()
+                end
+                
+                _plasmon.stats.airlixirs1    = _plasmon.stats.airlixirs1 + 1
+                _plasmon.stats.totAirlixirs1 = _plasmon.stats.totAirlixirs1 + 1
+                _plasmon.refresh()
 
-    if match and _plasmon.track then
-        _plasmon.stats.plasm    = _plasmon.stats.plasm + match
-        _plasmon.stats.totPlasm = _plasmon.stats.totPlasm + match
+                return modified, mode
+            end
 
-        if match ~= 50 or match ~= 500 or match ~= 750 then
-            mobs = match / 50
-        else
-            mobs = 1
+            match = original:match('You find an airlixir %+2')
+
+            if match then
+                if _plasmon.recovery_mode then
+                    _plasmon.start()
+                end
+                
+                _plasmon.stats.airlixirs2    = _plasmon.stats.airlixirs2 + 1
+                _plasmon.stats.totAirlixirs2 = _plasmon.stats.totAirlixirs2 + 1
+                _plasmon.refresh()
+
+                return modified, mode
+            end
+
+            match = original:match('You find an airlixir')
+
+            if match then
+                if _plasmon.recovery_mode then
+                    _plasmon.start()
+                end
+                
+                _plasmon.stats.airlixirs    = _plasmon.stats.airlixirs + 1
+                _plasmon.stats.totAirlixirs = _plasmon.stats.totAirlixirs + 1
+                _plasmon.refresh()
+
+                return modified, mode
+            end
+        elseif mode == 146 then
+            match = original:match('Your time has expired for this battle%. Now exiting%.%.%.')
+
+            if match then
+                _plasmon.stop()
+
+                return modified, mode
+            end
         end
+    elseif mode == 148 then
+        match = original:match('Now permeating the mists surrounding the fracture%.')
 
-        _plasmon.stats.mobs     = _plasmon.stats.mobs + mobs
-        _plasmon.stats.totMobs  = _plasmon.stats.totMobs + mobs
-        _plasmon.refresh()
+        if match then
+            _plasmon.start()
 
-        return modified, mode
-    end
-
-    match = original:match('You find an airlixir %+1')
-
-    if match and _plasmon.track then
-        _plasmon.stats.airlixirs1    = _plasmon.stats.airlixirs1 + 1
-        _plasmon.stats.totAirlixirs1 = _plasmon.stats.totAirlixirs1 + 1
-        _plasmon.refresh()
-
-        return modified, mode
-    end
-
-    match = original:match('You find an airlixir %+2')
-
-    if match and _plasmon.track then
-        _plasmon.stats.airlixirs2    = _plasmon.stats.airlixirs2 + 1
-        _plasmon.stats.totAirlixirs2 = _plasmon.stats.totAirlixirs2 + 1
-        _plasmon.refresh()
-
-        return modified, mode
-    end
-
-    match = original:match('You find an airlixir')
-
-    if match and _plasmon.track then
-        _plasmon.stats.airlixirs    = _plasmon.stats.airlixirs + 1
-        _plasmon.stats.totAirlixirs = _plasmon.stats.totAirlixirs + 1
-        _plasmon.refresh()
-
-        return modified, mode
+            return modified, mode
+        end
     end
 
     return modified, mode
