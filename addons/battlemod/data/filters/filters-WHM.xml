@@ -137,7 +137,7 @@
 				<ranged>false</ranged>
 				<damage>false</damage>
 				<healing>false</healing>
-				<misses>false</misses>
+				<misses>true</misses>
 				<readies>false</readies>
 				<casting>false</casting>
 				<all>false</all>
