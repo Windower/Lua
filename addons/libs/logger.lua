@@ -5,7 +5,8 @@ This library provides a set of functions to aid in debugging.
 _libs = _libs or {}
 _libs.logger = true
 _libs.stringhelper = _libs.stringhelper or require 'stringhelper'
-_libs.colors = _libs.colors or require 'colors'
+chat = require 'colors'
+_libs.colors = _libs.colors or (chat ~= nil)
 
 local logger = {}
 logger.defaults = {}
@@ -42,11 +43,7 @@ end
 
 -- Prints the arguments provided to the FFXI chatlog, in the same color used for Campaign/Bastion alerts and Kupower messages. Can be changed below.
 function captionlog(msg, msgcolor, ...)
-	local caption = _addon and _addon.name or ''
-	
-	if msg ~= nil then
-		caption = caption..' '..msg
-	end
+	local caption = table.concat({_addon and _addon.name, msg}, ' ')
 	
 	if #caption > 0 then
 		if logger.settings.logtofile == true then
@@ -64,7 +61,7 @@ function captionlog(msg, msgcolor, ...)
 	end
 	
 	for _, line in ipairs(str:split('\n')) do
-		add_to_chat(logger.settings.logcolor, caption..line..'\x1E\x01')
+		add_to_chat(logger.settings.logcolor, caption..line..chat.colorcontrols.reset)
 	end
 end
 
@@ -113,10 +110,20 @@ function table.tostring(t)
 	-- Iterate over table.
 	local tstr = ''
 	local kt = {}
+	k = 0
 	for key in pairs(t) do
-		kt[#kt+1] = key
+		k = k + 1
+		kt[k] = key
 	end
-	table.sort(kt)
+	table.sort(kt, function(x, y)
+		if type(x) == 'number' and type(y) == 'string' then
+			return true
+		elseif type(x) == 'string' and type(y) == 'number' then
+			return false
+		end
+		
+		return x<y
+	end)
 	
 	for i, key in ipairs(kt) do
 		val = t[key]
@@ -154,7 +161,11 @@ _meta.T.__tostring = table.tostring
 
 -- Prints a string representation of a table in explicit Lua syntax: {...}
 function table.print(t, keys)
-	log(table.tostring(t, keys))
+	if t.tostring then
+		log(t:tostring(keys))
+	else
+		log(table.tostring(t, keys))
+	end
 end
 
 -- Returns a vertical string representation of a table in explicit Lua syntax, with every element in its own line:
@@ -172,10 +183,20 @@ function table.tovstring(t, keys, indentlevel)
 	local indent = (' '):rep(indentlevel*4)
 	local tstr = '{\n'
 	local kt = {}
+	k = 0
 	for key in pairs(t) do
-		kt[#kt+1] = key
+		k = k + 1
+		kt[k] = key
 	end
-	table.sort(kt)
+	table.sort(kt, function(x, y)
+		if type(x) == 'number' and type(y) == 'string' then
+			return true
+		elseif type(x) == 'string' and type(y) == 'number' then
+			return false
+		end
+		
+		return x<y
+	end)
 	
 	for i, key in pairs(kt) do
 		val = t[key]
@@ -202,7 +223,7 @@ function table.tovstring(t, keys, indentlevel)
 			tstr = tstr..', '
 		end
 		
-		tstr = tstr.."\n"
+		tstr = tstr..'\n'
 	end
 	tstr = tstr..indent..'}'
 	
@@ -214,7 +235,11 @@ end
 ---     ...
 --- }
 function table.vprint(t, keys)
-	log(table.tovstring(t, keys))
+	if t.tovstring then
+		log(t:tovstring(keys))
+	else
+		log(table.tovstring(t, keys))
+	end
 end
 
 -- Load logger settings (has to be after the logging functions have been defined, so those work in the config and related files).

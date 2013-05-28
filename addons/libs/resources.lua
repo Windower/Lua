@@ -72,7 +72,7 @@ function resources.status()
 		return T{}
 	end
 	
-	status = dom.children:map(make_nested)
+	status = dom.children:map(make_nested):rekey('index')
 	dom = nil
 	collectgarbage()
 	
@@ -121,13 +121,11 @@ function make_nested(node)
 		if val.type == 'attribute' then
 			res[val['name']] = val['value']
 		else
-			if x then log(value);x = false end
 			res['en'] = value
 		end
 	end
 	
 	return res
 end
-
 
 return resources

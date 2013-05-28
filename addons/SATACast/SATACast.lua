@@ -24,7 +24,6 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-require 'buff'
 
 function event_load()
 	
@@ -129,7 +128,7 @@ function event_action(act)
 	local player = get_player()
 	
 	if player.status:lower() == 'engaged' then
-		if actor == (player.id or player.target_id) then
+		if actor == (player.id or player.index) then
 			if category == 1 then
 				if TH_ON == 0 then
 					send_command('sc set ' .. TH_Set)
@@ -161,3 +160,4 @@ function event_addon_command(...)
 		add_to_chat(17, '    help   - Displays this help text')
 	end
 end
+

@@ -148,6 +148,12 @@ function event_addon_command(...)
 				lightluggage()
 			else write('Invalid mode option')
 			end
+		elseif params[1]:lower() == "timer" then
+			if params[2] == "start" then
+				send_command('timers c Remaining 6000 up')
+			elseif params[2] == "stop" then
+				send_command('timers d Remaining')
+			end
 		end			
 	end
 end
@@ -169,12 +175,18 @@ function event_login()
 	settings_create()
 end
 
+function event_zone_change(from_id, from, to_id, to)
+	checkzone()
+end
+
 function orderlots()
 	lotorder = " "
 	for i=1, #salvage_cell_name_short  do 
 		if salvage_cell_name_short[i] ~= 'alex' and cell_lots[salvage_cell_name_short[i]] ~= 0 then
 			item = salvage_cell_name_short[i]
-			lotorder = (lotorder..item..': '..cell_lots[item]..' \n ')
+			if cell_lots[item] ~= nil and cell_lots[item] ~= 0 then
+				lotorder = (lotorder..item..': '..cell_lots[item]..' \n ')
+			end
 	    elseif salvage_cell_name_short[i] == 'alex' and cell_lots[salvage_cell_name_short[i]] ~= 0 then
 	    	item = salvage_cell_name_short[i]
 	    	lotorder = (lotorder..item..' \n ')
@@ -190,7 +202,7 @@ function lightluggage()
 	ll_pass = ""
 	for i=1, #salvage_cell_name_short  do 
 		if salvage_cell_name_short[i] ~= nil then
-			if cell_lots[salvage_cell_name_short[i]] == 1 and mode == "lots" then
+			if cell_lots[salvage_cell_name_short[i]] == 1 then
 	   		ll_lots = (ll_lots..cells_id[i]..',')
 	   		elseif cell_lots[salvage_cell_name_short[i]] == 0 then
 	   			if salvage_cell_name_short[i] ~= "alex" then
@@ -199,9 +211,12 @@ function lightluggage()
 	   		end
 	   	end
 	end
-	llprofile = (llprofile..'if item is '..ll_lots..' then lot \n')
-	llprofile = (llprofile..'if item is '..ll_pass..' then pass \n')
-	
+	if mode == "lots" and ll_lots ~= "" then
+		llprofile = (llprofile..'if item is '..ll_lots..' then lot \n')
+	end
+	if ll_pass ~= "" then
+		llprofile = (llprofile..'if item is '..ll_pass..' then pass \n')
+	end
 	if settingtab[set][player_num]['pass'] ~= 0 then
 		llprofile = (llprofile.."if item is "..settingtab[set][player_num]['pass'].." then pass \n")
 	end
@@ -223,6 +238,13 @@ function initialize()
 	tb_set_text('salvage_box',' Lot order:  \n'..lotorder);
 end
 
+function checkzone()
+	currentzone = get_ffxi_info()['zone']:lower()
+		if currentzone == 'silver sea remnants' or currentzone == 'zhayolm remnants' or currentzone == 'bhaflau remnants' or currentzone == 'arrapago remnants' then
+			send_command('timers c Remaining 6000 up')
+		else send_command('timers d Remaining')
+		end
+end
 
 function event_incoming_text(original, new, color)
 	a,b,name,cell = string.find(original,'(%w+) obtains an? ..(%w+) cell..\46')
@@ -253,6 +275,6 @@ end
 
 function event_unload()
 	tb_delete('salvage_box')
-
+	send_command('timers d Remaining')
 	send_command('unalias ch2')
 end 

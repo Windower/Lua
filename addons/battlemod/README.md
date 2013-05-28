@@ -15,11 +15,11 @@ Commands:
 * unload - unloads Battlemod
 * condensebuffs - Condenses Area of Effect buffs, Default = True
 * condensebattle - Condenses battle logs according to your settings file, Default = True
+* condensedamage - Condenses similar damage messages within an attack round, Default = True
 * cancelmulti - Cancles multiple consecutive identical lines, Default = True
 * oxford - Toggle use of oxford comma, Default = True
 * commamode - Toggle comma-only mode, Default = False
 * targetnumber - Toggle target number display, Default = True
-* colorful - Colors the output by alliance member, Default = True
 
 Purpose: To allow chat log customization.
 

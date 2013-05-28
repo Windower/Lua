@@ -5,6 +5,7 @@ Small implementation of a JSON file reader.
 _libs = _libs or {}
 _libs.json = true
 _libs.tablehelper = _libs.tablehelper or require 'tablehelper'
+_libs.lists = _libs.lists or require 'lists'
 _libs.stringhelper = _libs.stringhelper or require 'stringhelper'
 local files = require 'filehelper'
 _libs.filehelper = _libs.filehelper or (files ~= nil)
@@ -73,16 +74,43 @@ end
 function json.tokenize(content)
 	-- Tokenizer. Reads the string by characters and finds word boundaries, returning an array of tokens to be interpreted.
 	local current = nil
-	local tokens = T{T{}}
+	local tokens = L{L{}}
 	local quote = nil
 	local comment = false
 	local line = 1
+	
+	content = content:trim()
+	local length = #content
+	if content:sub(length, length) == ',' then
+		content = content:sub(1, length - 1)
+		length = length - 1
+	end
+	
+	local first = content:sub(1, 1)
+	local last = content:sub(length, length)
+	if first ~= '[' and first ~= '{' then
+		return json.error('Invalid JSON format. Document needs to start with \'{\' (object) or \'[\' (array).')
+	end
+	
+	if not (first == '[' and last == ']' or first == '{' and last == '}') then
+		return json.error('Invalid JSON format. Document starts with \''..first..'\' but ends with \''..last..'\'.')
+	end
+	
+	local root
+	if first == '[' then
+		root = 'array'
+	else
+		root = 'object'
+	end
+	
+	content = content:sub(2, length - 1)
+	
 	for c in content:it() do
 		-- Only useful for a line count, to produce more accurate debug messages.
-		if c == "\n" then
+		if c == '\n' then
 			line = line + 1
 			comment = false
-			tokens:append(T{})
+			tokens:append(L{})
 		end
 
 		-- If the quote character is set, don't parse but syntax, but instead just append to the string until the same quote character is encountered.
@@ -111,6 +139,9 @@ function json.tokenize(content)
 				-- Ignore comments. Not JSON conformant.
 				if c == '/' and current ~= nil and current:last() == '/' then
 					current = current:slice(1, -2)
+					if current == '' then
+						current = nil
+					end
 					comment = true
 				else
 					current = current or ''
@@ -119,28 +150,39 @@ function json.tokenize(content)
 			end
 		end
 	end
-	
-	return tokens
+
+	return tokens, root
 end
 
---
-function json.classify(tokens)
+-- Takes a list of tokens and analyzes it to construct a valid Lua object from it.
+function json.classify(tokens, root)
+	if tokens == nil then
+		return tokens, root
+	end
+	
+	local scopes = L{root}
+	
 	-- Scopes and their domains:
 	-- * 'object': Object scope, delimited by '{' and '}' as well as global scope
 	-- * 'array': Array scope, delimited by '[' and ']'
-	local scopes = T{'object'}
 	-- Possible modes and triggers:
 	-- * 'new': After an opening brace, bracket, comma or at the start, expecting a new element
 	-- * 'key': After reading a key
 	-- * 'colon': After reading a colon
 	-- * 'value': After reading or having scoped a value (either an object, or an array for the latter)
-	local modes = T{'new'}
+	local modes = L{'new'}
 
-	local parsed = T{T{}}
-	local keys = T{}
+	local parsed
+	if root == 'object' then
+		parsed = L{T{}}
+	else
+		parsed = L{L{}}
+	end
+	
+	local keys = L{}
 	-- Classifier. Iterates through the tokens and assigns meaning to them. Determines scoping and creates objects and arrays.
-	for line, array in pairs(tokens) do
-		for pos, token in pairs(array) do
+	for array, line in tokens:it() do
+		for token, pos in array:it() do
 			if token == '{' then
 				if modes:last() == 'colon' or modes:last() == 'new' and scopes:last() == 'array' then
 					parsed:append(T{})
@@ -202,7 +244,7 @@ function json.classify(tokens)
 			elseif type(token):isin({'string', 'number'}) and modes:last() == 'new' and scopes:last() == 'object' then
 				keys:append(token)
 				modes[#modes] = 'key'
-			elseif type(token):isin({'boolean', 'number', 'string', 'null'}) then
+			elseif type(token):isin({'boolean', 'number', 'string', 'nil'}) then
 				if modes:last() == 'colon' then
 					parsed:last()[keys:remove()] = token
 					modes[#modes] = 'value'
@@ -221,7 +263,7 @@ function json.classify(tokens)
 			end
 		end
 	end
-	
+
 	if parsed:isempty() then
 		return json.error('No JSON found.')
 	end

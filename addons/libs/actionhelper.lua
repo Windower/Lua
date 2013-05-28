@@ -58,7 +58,7 @@ function Action(a)
 	local new_instance = {}
 	new_instance.raw = a
 	
-	return setmetatable(new_instance, {__index = action})
+	return setmetatable(new_instance, {__index = function(t, k) if rawget(t, k) ~= nil then return t[k] else return action[k] end end})
 end
 
 

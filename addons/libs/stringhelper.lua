@@ -6,6 +6,9 @@ _libs = _libs or {}
 _libs.stringhelper = true
 _libs.functools = _libs.functools or require 'functools'
 
+_meta = _meta or {}
+_meta.T = _meta.T or {}
+
 debug.getmetatable('').__index = string
 debug.getmetatable('').__unm = functools.negate..functools.equals
 
@@ -34,40 +37,58 @@ end
 -- Splits a string into a table by a separator pattern.
 function string.psplit(str, sep, maxsplit)
 	maxsplit = maxsplit or 0
-	
+
 	return str:split(sep, maxsplit, false)
 end
 
 -- Splits a string into a table by a separator string.
 function string.split(str, sep, maxsplit, pattern)
+	if sep == '' then
+		local res = {}
+		local key = 0
+		for c in str:gmatch('.') do
+			key = key + 1
+			res[key] = c
+		end
+
+		return setmetatable(res, _meta.T)
+	end
+
 	maxsplit = maxsplit or 0
 	if pattern == nil then
 		pattern = true
 	end
-	
+
 	local res = {}
+	local key = 0
 	local i = 1
+	local startpos, endpos
+	local match
 	while i <= #str + 1 do
 		-- Find the next occurence of sep.
-		local startpos, endpos = str:find(sep, i, pattern)
+		startpos, endpos = str:find(sep, i, pattern)
 		-- If found, get the substring and append it to the table.
-		if startpos ~= nil then
-			matchstr = string.slice(str, i, startpos-1)
-			res[#res+1] = matchstr
+		if startpos then
+			match = string.slice(str, i, startpos - 1)
+			key = key + 1
+			res[key] = match
 			-- If maximum number of splits reached, return
-			if #res == maxsplit - 1 then
-				res[#res+1] = str:slice(endpos + 1)
+			if key == maxsplit - 1 then
+				key = key + 1
+				res[key] = str:slice(endpos + 1)
 				break
 			end
 			i = endpos + 1
 		-- If not found, no more separaters to split, append the remaining string.
 		else
-			res[#res+1] = str:slice(i)
+			key = key + 1
+			res[key] = str:slice(i)
 			break
 		end
 	end
-	
-	return res
+
+	res.n = key
+	return setmetatable(res, _meta.L)
 end
 
 -- Alias to string.sub, with some syntactic sugar.
@@ -130,11 +151,11 @@ end
 -- Returns the same string with the first letter of every word capitalized.
 function string.capitalize(str)
 	local res = {}
-	
+
 	for _, val in ipairs(str:split(' ')) do
 		res[#res + 1] = val:ucfirst()
 	end
-	
+
 	return table.concat(res, ' ')
 end
 
@@ -167,14 +188,14 @@ function string.todec(numstr, base)
 			break
 		end
 	end
-	
+
 	local index = base^(#numstr-1)
 	local acc = 0
 	for c in numstr:gmatch('.') do
 		acc = acc + digits[c]*index
 		index = index/base
 	end
-	
+
 	return acc
 end
 
@@ -185,7 +206,7 @@ function string.isin(str, t)
 			return true
 		end
 	end
-	
+
 	return false
 end
 
@@ -196,7 +217,7 @@ end
 
 -- Returns a string with Lua pattern characters escaped.
 function string.escape(str)
-	return str:gsub('[[%]%%^$*().-+]', '%%%1')
+	return str:gsub('[[%]%%^$*()%.%+?-]', '%%%1')
 end
 
 -- Counts the occurrences of a substring in a string.
@@ -222,9 +243,9 @@ function table.format(t, trail, subs)
 	elseif l == 1 then
 		return t[next(t)]
 	end
-	
+
 	trail = trail or 'and'
-	
+
 	local last
 	if trail == 'and' then
 		last = ' and '
@@ -235,7 +256,6 @@ function table.format(t, trail, subs)
 	else
 		warning('Invalid format for table.format: \''..trail..'\'.')
 	end
-	
-	if x then t:vprint() end
+
 	return t:slice(1, -2):concat(', ')..last..t:last()
 end

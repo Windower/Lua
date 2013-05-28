@@ -25,7 +25,7 @@
 	<dtd id="23" english="${actor} learns a new spell!" color="91"/>
 	<dtd id="24" english="${target} recovers ${number} HP." color="H"  units="HP"/>
 	<dtd id="25" english="${target} recovers ${number} MP." color="H"  units="MP"/>
-	<dtd id="26" english="${target} recovers ${number} HP and MP." color="H"  units="HP and some MP"/>
+	<dtd id="26" english="${target} recovers ${number} HP and MP." color="H" />
 	<dtd id="27" english="Debug Message: Cannot execute command.${lb}No (BTCALC) command in ATEL source." color="1"/>
 	<dtd id="28" english="${actor} uses a ${item}." color="90"/>
 	<dtd id="29" english="${actor} is paralyzed." color="122"/>
@@ -44,7 +44,7 @@
 	<dtd id="42" english="${actor} casts ${spell} on ${target}." color="56"/>
 	<dtd id="43" english="${actor} readies ${weapon_skill}." color="110"/>
 	<dtd id="44" english="${target}'s spikes deal ${number} points of damage to ${actor}." color="D"/>
-	<dtd id="45" english="${actor} learns &quot;${weapon_skill}&quot;!" color="1"/>
+	<dtd id="45" english="${actor} learns &quot;${weapon_skill}&quot;!" color="81"/>
 	<dtd id="46" english="Debug Message: Current POP number: (${number})" color="1"/>
 	<dtd id="47" english="${actor} cannot cast ${spell}." color="122"/>
 	<dtd id="48" english="${spell} cannot be cast on ${target}." color="122"/>
@@ -104,14 +104,14 @@
 	<dtd id="102" english="${actor} uses ${ability}.${lb}${target} recovers ${number} HP." color="H" units="HP"/>
 	<dtd id="103" english="${actor} uses ${weapon_skill}.${lb}${target} recovers ${number} HP." color="H" units="HP"/>
 	<dtd id="104" english="Unable to use item.${lb}You do not meet the level requirement." color="1"/>
-	<dtd id="105" english="${actor} gains ${number} experience points." color="1"/>
+	<dtd id="105" english="${actor} gains ${number} experience points." color="131"/>
 	<dtd id="106" english="${actor} is intimidated by ${target}'s presence." color="122"/>
 	<dtd id="107" english="${target} is temporarily unable to access support job abilities." color="1"/>
 	<dtd id="108" english="${actor} uses ${ability}.${lb}Pet's powers increase!" color="101"/>
 	<dtd id="109" english="${actor} uses ${weapon_skill}.${lb}Pet's powers increase!" color="56"/>
 	<dtd id="110" english="${actor} uses ${ability}.${lb}${target} takes ${number} points of damage." color="D"/>
 	<dtd id="111" english="You cannot use ${item} while medicated." color="1"/>
-	<dtd id="112" english="${target}'s doom counter is now down to ${number}." color="1"/>
+	<dtd id="112" english="${target}'s doom counter is now down to ${number}." color="101"/>
 	<dtd id="113" english="${actor} casts ${spell}.${lb}${target} falls to the ground." color="56"/>
 	<dtd id="114" english="${actor} casts ${spell} on ${target}, but the spell fails to take effect." color="69"/>
 	<dtd id="115" english="${actor} uses ${ability}.${lb}Attacks are enhanced but defense weakens." color="101"/>
@@ -190,7 +190,7 @@
 	<dtd id="188" english="${actor} uses ${weapon_skill}, but misses ${target}." color="M"/>
 	<dtd id="189" english="${actor} uses ${weapon_skill}.${lb}No effect on ${target}." color="R"/>
 	<dtd id="190" english="${actor} cannot use that weapon ability." color="1"/>
-	<dtd id="191" english="${actor} is unable to use weapon skills." color="1"/>
+	<dtd id="191" english="${actor} is unable to use weapon skills." color="122"/>
 	<dtd id="192" english="${actor} does not have enough TP." color="122"/>
 	<dtd id="193" english="${weapon_skill} cannot be used against that target." color="1"/>
 	<dtd id="194" english="${actor} uses ${weapon_skill}.${lb}${target} gains the effect of ${status}." color="56"/>
@@ -252,7 +252,7 @@
 	<dtd id="250" english="Reraise takes effect!" color="1"/>
 	<dtd id="251" english="The effect of ${status} is about to wear off." color="123"/>
 	<dtd id="252" english="${actor} casts ${spell}.${lb}Magic Burst!${lb}${target} takes ${number} points of damage." color="D"/>
-	<dtd id="253" english="EXP chain #${number}!${lb}${actor} gains ${number} experience points." color="1"/>
+	<dtd id="253" english="EXP chain #${number}!${lb}${actor} gains ${number} experience points." color="131"/>
 	<dtd id="254" english="Current enmity: ${number}" color="1"/>
 	<dtd id="255" english="DEBUG: ${target}}${number}% chance of success." color="1"/>
 	<dtd id="256" english="In this flower pot: Seeds sown: ${item}" color="1"/>
@@ -405,7 +405,7 @@
 	<dtd id="403" english="${number} of ${target}'s attributes is drained." color="1"/>
 	<dtd id="404" english="${number} status effect is drained from ${target}." color="1"/>
 	<dtd id="405" english="${actor} uses ${weapon_skill}.${lb}${number} of ${target}'s effects disappears!" color="56"/>
-	<dtd id="406" english="${actor} uses ${weapon_skill}.${lb}${target} falls to the ground." color="56"/>
+	<dtd id="406" english="${actor} uses ${weapon_skill}.${lb}${target} falls to the ground." color="166"/>
 	<dtd id="407" english="${actor} uses a ${item}.${lb}${target}'s TP is reduced." color="81"/>
 	<dtd id="408" english="${actor} uses a ${item}.${lb}No effect on ${target}." color="R"/>
 	<dtd id="409" english="${actor} uses ${weapon_skill}.${lb}${target}'s TP is increased to ${number}." color="H" units="TP"/>
@@ -418,7 +418,7 @@
 	<dtd id="416" english="${actor} uses ${weapon_skill}.${lb}${target} receives the effect of Magic Attack Boost and Magic Defense Boost." color="56"/>
 	<dtd id="417" english="${actor} uses ${ability}.${lb}${number} of ${target}'s attributes is drained." color="101"/>
 	<dtd id="418" english="${actor} uses ${weapon_skill} on ${target}.${lb}${target}'s target switches to ${actor}!" color="56"/>
-	<dtd id="419" english="${target} learns ${spell}!" color="1"/>
+	<dtd id="419" english="${target} learns ${spell}!" color="81"/>
 	<dtd id="420" english="${actor} uses ${ability}. The total comes to ${number}!${lb}${target} receives the effect of ${ability}." color="101"/>
 	<dtd id="421" english="${target} receives the effect of ${ability}." color="101"/>
 	<dtd id="422" english="${actor} uses ${ability}.${lb}The total comes to ${number}!${lb}No effect on ${target}." color="R"/>
@@ -441,7 +441,7 @@
 	<dtd id="439" english="${actor} uses ${ability}!${lb}All of ${target}'s abilities are recharged.${lb}${target} regains MP." color="H"/>
 	<dtd id="440" english="All of ${target}'s abilities are recharged.${lb}${target} regains MP." color="H"/>
 	<dtd id="441" english="${actor} uses ${ability}.${lb}${target} receives the effect of ${ability}." color="101"/>
-	<dtd id="442" english="${actor} learns a new ability!" color="1"/>
+	<dtd id="442" english="${actor} learns a new ability!" color="81"/>
 	<dtd id="443" english="You cannot learn ${ability}.${lb}You do not meet the job or level requirements." color="1"/>
 	<dtd id="444" english="You already know ${ability}." color="1"/>
 	<dtd id="445" english="You cannot use items at this time." color="1"/>
@@ -561,7 +561,7 @@
 	<dtd id="559" english="You have successfully completed the training regime." color="122"/>
 	<dtd id="560" english="${actor} uses ${ability}. Finishing move now ${number}." color="101" units="FM"/>
 	<dtd id="561" english="Unable to perform that action.${lb}Your have already earned the maximum number of finishing moves." color="122"/>
-	<dtd id="562" english="The status parameters of ${target} have increased." color="1"/>
+	<dtd id="562" english="The status parameters of ${target} have increased." color="122"/>
 	<dtd id="563" english="${actor} destroys ${target}." color="1"/>
 	<dtd id="564" english="${target} were destroyed." color="1"/>
 	<dtd id="565" english="${target} obtains ${gil}." color="1"/>
@@ -584,8 +584,8 @@
 	<dtd id="582" english="${actor} obtains ${gil}." color="1"/>
 	<dtd id="583" english="Trial ${number}: ${number} objective remains." color="1"/>
 	<dtd id="584" english="You have completed Trial ${number}.${lb}Report your success to a Magian Moogle." color="1"/>
-	<dtd id="585" english="${actor} uses ${ability}.${lb}${target}'s enmity towards ${actor} is ${number}%." color="101"/>
-	<dtd id="586" english="Towards ${target} is ${number}%." color="1"/>
+	<dtd id="585" english="${actor} uses ${ability}.${lb}${target}'s enmity towards ${actor} is ${number}%." color="101" units="%%"/>
+	<dtd id="586" english="Towards ${target} is ${number}%." color="101" units="%%"/>
 	<dtd id="587" english="${target} regains ${number} HP." color="H" units="HP"/>
 	<dtd id="588" english="${target} regains ${number} MP." color="H" units="MP"/>
 	<dtd id="589" english="${target} have been healed of ${number} status ailments." color="1"/>
@@ -666,4 +666,8 @@
 	<dtd id="670" english="${actor} uses ${ability}.${lb}${target} can now absorb magic damage of a certain element." color="101"/>
 	<dtd id="671" english="${actor} uses ${ability}.${lb}${target} now has enhanced resistance." color="101"/>
 	<dtd id="672" english="${actor} uses ${ability}.${lb}${target} receives the effect of Gambit, reducing defense against magic of a certain element." color="101"/>
+	<dtd id="673" english="${actor} obtains ${number} corpuscles of menace plasm." color="101"/>
+	<dtd id="674" english="${actor} uses ${ability}, and finds ${number} ${item}." color="101"/>
+	<dtd id="675" english="${actor} readies ${weapon_skill}." color="110"/>
+	<dtd id="676" english="${target}'s movement speed increases." color="101"/>
 </messagesd>

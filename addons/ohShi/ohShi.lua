@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon = {}
 _addon.name = 'OhShi'
-_addon.version = '2.15'
+_addon.version = '2.161'
 
 --Requiring libraries used in this addon
 --These should be saved in addons/libs
@@ -109,16 +109,16 @@ function event_addon_command(...)
             notice('Version '.._addon.version..' loaded! You have access to the following commands with the //ohshi alias:')
             notice(' 1. bgcolor <alpha> <red> <green> <blue> --Sets the color of the box.')
             notice(' 2. text <red> <green> <blue> --Sets text color.')
-            notice(' 2. font <size> <name> --Sets text font and size.')
-            notice(' 3. pos <posx> <posy> --Sets position of box.')
-            notice(' 4. duration <seconds> --Sets the timeout on the notices.')
-            notice(' 5. track <vw/legion/other/abyssea/meebles/dangerous> <mobname> --Adds mob to the tracking list.')
+            notice(' 3. font <size> <name> --Sets text font and size.')
+            notice(' 4. pos <posx> <posy> --Sets position of box.')
+            notice(' 5. duration <seconds> --Sets the timeout on the notices.')
+            notice(' 6. track <vw/legion/other/abyssea/meebles/dangerous> <mobname> --Adds mob to the tracking list.')
             notice(' -- Using dangerous will cause every tp move/spell to flash the warning.')
-            notice(' 6. untrack <vw/legion/other/abyssea/meebles/dangerous> <mobname> --Removes mob from the tracking list.')
-            notice(' 7. danger <spell/ws> <dangerword> --Adds danger word to list.')
-            notice(' 8. staggeronly --Toggles stagger only mode.')
-            notice(' 9. unload <all/one> Save settings all(global - default) or one(character) and close ohShi.')
-            notice('10. help --Shows this menu.')
+            notice(' 7. untrack <vw/legion/other/abyssea/meebles/dangerous> <mobname> --Removes mob from the tracking list.')
+            notice(' 8. danger <spell/ws> <dangerword> --Adds danger word to list.')
+            notice(' 9. staggeronly --Toggles stagger only mode.')
+            notice('10. unload <all/one> Save settings all(global - default) or one(character) and close ohShi.')
+            notice('11. help --Shows this menu.')
         elseif comm == 'create' then
             ohShi_SetUp()
         elseif comm == 'unload' then
@@ -363,7 +363,7 @@ function mobcheck(tr)
     local category,names,inc
     for category,names in pairs(settings.moblist) do
         for inc = 1, #settings.moblist[category] do
-            local beg,endi,cap = string.find(tr:lower(),'('..settings.moblist[category][inc]:lower()..')')
+            local beg,endi,cap = string.find(settings.moblist[category][inc]:lower(),'('..tr:lower()..')')
             if cap ~= nil then
                 if category == 'dangerous' then
                     color2 = '\\cs(255,100,100)'
@@ -383,7 +383,7 @@ function dangercheck(ts)
     local category,names,inc
     for category,names in pairs(settings.dangerwords) do
         for inc = 1, #settings.dangerwords[category] do
-            local beg,endi,cap = string.find(ts:lower(),'('..settings.dangerwords[category][inc]:lower()..')')
+            local beg,endi,cap = string.find(settings.dangerwords[category][inc]:lower(),'('..ts:lower()..')')
             if cap ~= nil then
                 return true
             end
@@ -405,6 +405,7 @@ function event_action(act)
         --job abilities table. After making sure the ability used is a cor roll
         --it puts the roll and total in the tracker.
         if act['category'] == 6 then
+            if tonumber(act['param']) < 1 or tonumber(act['param']) > 1083 then return end
             if jobAbilities[tonumber(act['param'])]['type'] == 'CorsairRoll' then
                 local party = get_party()
                 local rolling = jobAbilities[tonumber(act['param'])]['english']
@@ -491,9 +492,9 @@ function event_incoming_text(old,new,color)
     --<mob> is no longer stunned.
     local start3,end3,mobname3,debuff1 = string.find(old,'([%w%s]+) is no longer (%w+)%p')
     --<mob> <gains/receives> the effect of <buff/debuff>
-    local start4,end4,mobname4,gr,debuff2 = string.find(old,'([%w%s]+) (%w+) the effect of ([%w%s]+)')
+    local start4,end4,mobname4,gr,debuff2 = string.find(old,'([%w%s\']+) (%w+) the effect of ([%w%s\']+)%p')
     --<mob>'s <buff/debuff> effect wears off
-    local start5,end5,mobname5,buff1 = string.find(old,'([%w%s]+)\'s (%w+) effect wears off%p')
+    local start5,end5,mobname5,buff1 = string.find(old,'([%w%s\']+) (%w+) effect wears off%p')
     --<player>'s attack devastates the fiend
     local start6,end6,player1 = string.find(old,'(%w+)\'s attack devastates the fiend%p')
     --The following 3 are used for light tracking only blue/red are tracked
@@ -508,15 +509,15 @@ function event_incoming_text(old,new,color)
     fi = false
     if not settings.staggeronly then
         if mobname3 ~= nil then
-            if mobcheck(mobname3) then line = " "..mobname3..' is no longer '..debuff1..'. ' end
+            if mobcheck(mobname3) then line = " "..color2..mobname3..' is no longer '..debuff1..'. '..cres end
         end
         
         if mobname4 ~= nil then
-            if mobcheck(mobname4) then line = " "..mobname4..' '..gr..' the effect of '..debuff2..'. ' end
+            if mobcheck(mobname4) then line = " "..color2..mobname4..' '..gr..' the effect of '..debuff2..'. '..cres end
         end
         
         if mobname5 ~= nil then
-            if mobcheck(mobname5) then line = " "..mobname5..'\'s '..buff1..' effect wears off. ' end
+            if mobcheck(mobname5) then line = " "..color2..mobname5..' '..buff1..' effect wears off. '..cres end
         end
     end
     if blue2 ~= nil and blue1 == nil then
@@ -654,3 +655,4 @@ function split(msg, match)
     end
     return splitarr
 end
+

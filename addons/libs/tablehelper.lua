@@ -31,20 +31,38 @@ _meta.N.__class = 'Nil'
 -- t = T{...} for explicit declaration.
 -- t = T(regular_table) to cast to a T-table.
 function T(t)
-	t = t or {}
+	local res
 	if class(t) == 'Set' then
-		local res = T{}
+		res = T{}
 		
-		for el in pairs(s) do
-			res:append(s)
+		local key = 1
+		for el in pairs(t) do
+			if type(el) == 'table' then
+				res[key] = table.copy(el)
+			else
+				res[key] = el
+			end
+			key = key + 1
 		end
+	elseif class(t) == 'List' then
+		res = T{}
 		
-		t = res
+		local key = 1
+		for _, el in ipairs(t) do
+			if type(el) == 'table' then
+				res[key] = table.copy(el)
+			else
+				res[key] = el
+			end
+			key = key + 1
+		end
+	else
+		res = t or {}
 	end
 	
 	-- Sets T's metatable's index to the table namespace, which will take effect for all T-tables.
 	-- This makes every function that tables have also available for T-tables.
-	return setmetatable(t, _meta.T)
+	return setmetatable(res, _meta.T)
 end
 
 function N()
@@ -106,12 +124,13 @@ end
 
 -- Returns if the key searchkey is in t.
 function table.containskey(t, searchkey)
-	return t[searchkey] ~= nil
+	return rawget(t, searchkey) ~= nil
 end
 
 -- Appends an element to the end of an array table.
 function table.append(t, val)
 	t[#t+1] = val
+	
 	return t
 end
 
@@ -132,16 +151,12 @@ _meta.T.__add = table.extend
 -- Returns the number of element in the table that satisfy fn. If fn is not a function, counts the number of occurrences of fn.
 function table.count(t, fn)
 	if type(fn) ~= 'function' then
-		if type(fn) == nil then
-			fn = boolean.exists
-		else
-			fn = functools.equals(fn)
-		end
+		fn = functools.equals(fn)
 	end
 
 	count = 0
 	for _, val in pairs(t) do
-		if fn(val) == true then
+		if fn(val) then
 			count = count + 1
 		end
 	end
@@ -201,60 +216,6 @@ function table.amend(t, t_amend, recursive, maxrec, rec)
 	return t
 end
 
--- Merges two tables like update would, but retains type-information and tries to work around conflicts.
-function table.merge(t, t_merge, splitchar, silent)
-	if t_merge == nil then
-		return t
-	end
-	
-	splitchar = splitchar or ','
-	silent = silent or false
-
-	local oldval
-	for key, val in pairs(t_merge) do
-		oldval = t[key]
-		if val ~= nil then
-			if type(oldval) == 'table' and type(val) == 'table' then
-				t[key] = table.merge(oldval, val)
-			elseif type(oldval) ~= type(val) then
-				if type(oldval) == 'table' then
-					if type(val) == 'string' then
-						t[key] = table.map(val:split(splitchar), string.trim)
-					elseif not silent then
-						notice('Could not safely merge values (key '..key..'):', oldval, '|', val, '|')
-					end
-				elseif type(oldval) == 'number' then
-					local testdec = tonumber(val)
-					local testhex = tonumber(val, 16)
-					if testdec then
-						t[key] = testdec
-					elseif testhex then
-						t[key] = testhex
-					elseif not silent then
-						notice('Could not safely merge values (key '..key..'):', oldval, '|', val, '|')
-					end
-				elseif type(oldval) == 'boolean' then
-					if val == 'true' then
-						t[key] = true
-					elseif val == 'false' then
-						t[key] = false
-					elseif not silent then
-						notice('Could not safely merge values (key '..key..'):', oldval, '|', val, '|')
-					end
-				elseif type(oldval) == 'string' then
-					t[key] = val
-				elseif not silent then
-					notice('Could not safely merge values (key '..key..'):', oldval, '|', val, '|')
-				end
-			else
-				t[key] = val
-			end
-		end
-	end
-
-	return t
-end
-
 -- Searches elements of a table for an element. If, instead of an element, a function is provided, will search for the first element to satisfy that function.
 function table.find(t, el)
 	local fn
@@ -274,8 +235,10 @@ end
 -- Returns the keys of a table in an array.
 function table.keyset(t)
 	local res = {}
+	local i = 0
 	for key, _ in pairs(t) do
-		res[#res + 1] = key
+		i = i + 1
+		res[i] = key
 	end
 
 	return T(res)
@@ -407,7 +370,7 @@ end
 
 -- Returns a reversed array.
 function table.reverse(t)
-	local res = T{}
+	local res = {}
 	
 	local n = #t
 	local rkey = n
@@ -416,10 +379,11 @@ function table.reverse(t)
 		rkey = rkey - 1
 	end
 
-	return res
+	return setmetatable(res, getmetatable(t) or _meta.T)
 end
 
 -- Returns an array removed of all duplicates.
+-- DEPRECATED: Use S(t) instead
 function table.set(t)
 	local seen = {}
 	local res = {}
@@ -435,8 +399,31 @@ function table.set(t)
 	return setmetatable(res, getmetatable(t) or _meta.T)
 end
 
+-- Finds a table entry based on an attribute.
+function table.with(t, attr, val)
+	for _, el in pairs(t) do
+		if type(el) == 'table' and rawget(el, attr) == val then
+			return el
+		end
+	end
+end
+
+-- Finds a table entry based on an attribute, case-insensitive.
+function table.iwith(t, attr, val)
+	local cel
+	val = val:lower()
+	for _, el in pairs(t) do
+		if type(el == 'table') then
+			cel = rawget(el, attr)
+			if type(cel == 'string') and cel:lower() == val then
+				return el
+			end
+		end
+	end
+end
+
 -- Backs up old table sorting function.
-_raw.table.sort = table.sort
+_raw.table.sort = _raw.table.sort or table.sort
 
 -- Returns a sorted table.
 function table.sort(t, ...)
@@ -444,9 +431,29 @@ function table.sort(t, ...)
 	return setmetatable(t, getmetatable(t) or _meta.T)
 end
 
+-- Returns an iterator over the table.
+function table.it(t)
+	local key
+	return function()
+		key = next(t, key)
+		return rawget(t, key)
+	end
+end
+
+-- Returns a table keyed by a specified index of a subtable. Requires a table of tables, and key must be a valid key in every table. Only produces the correct result, if the key is unique.
+function table.rekey(t, key)
+	local res = {}
+	
+	for _, value in pairs(t) do
+		res[value[key]] = value
+	end
+	
+	return setmetatable(res, getmetatable(t) or _meta.T)
+end
+
 -- Return true if any element of t satisfies the condition fn.
 function table.any(t, fn)
-	for key, val in pairs(t) do
+	for _, val in pairs(t) do
 		if(fn(val) == true) then
 			return true
 		end
@@ -457,7 +464,7 @@ end
 
 -- Return true if all elements of t satisfy the condition fn.
 function table.all(t, fn)
-	for key, val in pairs(t) do
+	for _, val in pairs(t) do
 		if(fn(val) ~= true) then
 			return false
 		end
@@ -519,7 +526,17 @@ _raw.table.concat = table.concat
 
 -- Concatenates all objects of a table. Converts to string, if not already so.
 function table.concat(t, str)
-	return _raw.table.concat(table.map(t, tostring), str)
+	str = str or ''
+	local res = ''
+	
+	for key, val in pairs(t) do
+		res = res..tostring(val)
+		if next(t, key) then
+			res = res..str
+		end
+	end
+	
+	return res
 end
 
 -- Concatenates all elements with a whitespace in between.

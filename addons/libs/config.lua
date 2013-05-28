@@ -7,14 +7,12 @@ _libs.config = true
 _libs.logger = _libs.logger or require 'logger'
 _libs.tablehelper = _libs.tablehelper or require 'tablehelper'
 _libs.stringhelper = _libs.stringhelper or require 'stringhelper'
-local json = require 'json'
-_libs.json = _libs.json or (json ~= nil)
 local xml = require 'xml'
 _libs.xml = _libs.xml or (xml ~= nil)
 local files = require 'filehelper'
 _libs.filehelper = _libs.filehelper or (files ~= nil)
 
-local config = T(config) or T{}
+local config = {}
 local file = files.new()
 local original = T{['global'] = T{}}
 local chars = T{}
@@ -25,6 +23,7 @@ local comments = T{}
 ]]
 
 local parse
+local merge
 local settings_table
 local settings_xml
 local nest_xml
@@ -46,17 +45,16 @@ function config.load(filename, confdict, overwrite)
 	local confdict_mt = getmetatable(confdict)
 	confdict = setmetatable(confdict, {__index = function(t, x) if config[x] ~= nil then return config[x] else return confdict_mt.__index[x] end end})
 	
-	-- Sets paths depending on whether it's a script or addon loading this file.
+	-- Load addon config file (Windower/addon/<addonname>/data/settings.xml).
 	local filepath = filename or files.check('data/settings.xml')
 	if filepath == nil then
-		file:set('data/settings.xml', true)
+		file:set(filename or 'data/settings.xml', true)
 		original['global'] = confdict:copy()
 		confdict:save()
 		return confdict
 	end
 	file:set(filepath)
 
-	-- Load addon/script config file (Windower/addon/<addonname>/config.json for addons and Windower/scripts/<name>-config.json).
 	local err
 	confdict, err = parse(file, confdict, overwrite)
 
@@ -89,11 +87,11 @@ function parse(file, confdict, update)
 	end
 	
 	-- Determine all characters found in the settings file.
-	chars = parsed:keyset():filter(-functools.equals('global'))
+	chars = parsed:keyset():filter(-'global')
 	original = T{}
 	
 	if update or confdict:isempty() then
-		for _, char in ipairs(T{'global'}+chars) do
+		for char in (L{'global'}+chars):it() do
 			original[char] = confdict:copy():update(parsed[char], true)
 		end
 		return confdict:update(parsed['global']:update(parsed[get_player()['name']:lower()], true), true)
@@ -101,10 +99,94 @@ function parse(file, confdict, update)
 	
 	-- Update the global settings with the per-player defined settings, if they exist. Save the parsed value for later comparison.
 	for _, char in ipairs(T{'global'}+chars) do
-		original[char] = confdict:copy():merge(parsed[char])
+		original[char] = merge(confdict:copy(), parsed[char], char)
 	end
 	
-	return confdict:merge(parsed['global']:update(parsed[get_player()['name']:lower()], true))
+	return merge(confdict, parsed['global']:update(parsed[get_player()['name']:lower()], true))
+end
+
+-- Merges two tables like update would, but retains type-information and tries to work around conflicts.
+function merge(t, t_merge, path)
+	if t_merge == nil then
+		return t
+	end
+	
+	path = (type(path) == 'string' and T{path}) or path
+
+	local oldval
+	local err
+	for key, val in pairs(t_merge) do
+		if not rawget(t, key) then
+			if type(val) == 'table' then
+				t[key] = T(val)
+			else
+				t[key] = val
+			end
+		end
+		
+		err = false
+		oldval = rawget(t, key)
+		if type(oldval) == 'table' and type(val) == 'table' then
+			local res = merge(oldval, val, path and path:copy()+key or nil)
+			if class(oldval) == 'table' or class(oldval) == 'Table' then
+				t[key] = setmetatable(res, _meta.T)
+			elseif class(oldval) == 'List' then
+				t[key] = L(res)
+			elseif class(oldval) == 'Set' then
+				t[key] = S(res)
+			else
+				notice('This is supposed to happen. A new data structure has not yet been added to config.lua')
+				t[key] = setmetatable(res, _meta.T)
+			end
+		elseif type(oldval) ~= type(val) then
+			if type(oldval) == 'table' then
+				if type(val) == 'string' then
+					local res = list.map(val:split(','), string.trim)
+					if class and class(oldval) == 'Set' then
+						res = S(res)
+					elseif class and class(oldval) == 'Table' then
+						res = T(res)
+					end
+					t[key] = res
+				else
+					err = true
+				end
+			elseif type(oldval) == 'number' then
+				local testdec = tonumber(val)
+				local testhex = tonumber(val, 16)
+				if testdec then
+					t[key] = testdec
+				elseif testhex then
+					t[key] = testhex
+				else
+					err = true
+				end
+			elseif type(oldval) == 'boolean' then
+				if val == 'true' then
+					t[key] = true
+				elseif val == 'false' then
+					t[key] = false
+				else
+					err = true
+				end
+			elseif type(oldval) == 'string' then
+				t[key] = val
+			else
+				err = true
+			end
+		else
+			t[key] = val
+		end
+		
+		if err then
+			if path then
+				notice('Could not safely merge values for \''..path:concat('/')..'/'..key..'\', '..type(oldval)..' expected (default: '..tostring(oldval)..'), got '..type(val)..' ('..tostring(val)..').')
+			end
+			t[key] = val
+		end
+	end
+
+	return t
 end
 
 -- Parses a settings struct from a DOM tree.
@@ -140,7 +222,7 @@ function settings_table(node, confdict, key)
 	
 	for _, child in ipairs(node.children) do
 		if child.type == 'comment' then
-			comments[key] = child.value
+			comments[key] = child.value:trim()
 		elseif child.type == 'tag' then
 			key = child.name:lower()
 			local childdict
@@ -224,14 +306,12 @@ function settings_xml(settings)
 	str = str..'<settings>\n'
 	
 	chars = settings:keyset():filter(-functools.equals('global')):sort()
-	for _, char in ipairs(T{'global'}+chars) do
+	for char in (L{'global'}+chars):it() do
 		if char == 'global' and comments['settings'] ~= nil then
 			str = str..'\t<!--\n'
 			local comment_lines = comments['settings']:split('\n')
-			for line, comment in ipairs(comment_lines) do
-				if line < #comment_lines then
-					str = str..'\t\t'..comment:trim()..'\n'
-				end
+			for comment in comment_lines:it() do
+				str = str..'\t\t'..comment:trim()..'\n'
 			end
 			str = str..'\t-->\n'
 		end
@@ -255,13 +335,13 @@ function nest_xml(t, indentlevel)
 	keys = t:keyset():sort()
 	local val
 	for _, key in ipairs(keys) do
-		val = t[key]
-		if type(val) == 'table' and not T(val):isarray() then
+		val = rawget(t, key)
+		if type(val) == 'table' and not (class(val) == 'List' or T(val):isarray()) then
 			fragments:append(indent..'<'..key..'>\n')
 			if comments[key] ~= nil then
 				local c = ('<!-- '..comments[key]:trim()..' -->'):split('\n')
 				local pre = ''
-				for _, cstr in pairs(c) do
+				for cstr in c:it() do
 					fragments:append(indent..pre..cstr:trim()..'\n')
 					pre = '\t '
 				end
@@ -269,14 +349,17 @@ function nest_xml(t, indentlevel)
 			fragments:append(nest_xml(val, indentlevel + 1))
 			fragments:append(indent..'</'..key..'>\n')
 		else
-			if type(val) == 'table' then
-				val = T(val):sort():format('csv')
+			if class(val) == 'List' then
+				val = val:format('csv')
+			elseif type(val) == 'table' then
+				val = T(val):format('csv')
+			else
+				val = tostring(val)
 			end
-			val = tostring(val)
 			if val == '' then
 				fragments:append(indent..'<'..key..' />')
 			else
-				fragments:append(indent..'<'..key..'>'..val..'</'..key..'>')
+				fragments:append(indent..'<'..key..'>'..val:xml_escape()..'</'..key..'>')
 			end
 			local length = fragments:last():length() - indent:length()
 			if length > maxlength then
@@ -287,8 +370,8 @@ function nest_xml(t, indentlevel)
 	end
 	
 	for frag_key, key in pairs(inlines) do
-		if comments[key] ~= nil then
-			fragments[frag_key] = fragments[frag_key]..(' '):rep(maxlength - fragments[frag_key]:trim():length() + 1)..'<!--'..comments[key]..'-->'
+		if rawget(comments, key) ~= nil then
+			fragments[frag_key] = fragments[frag_key]..(' '):rep(maxlength - fragments[frag_key]:trim():length() + 1)..'<!-- '..comments[key]..' -->'
 		end
 		
 		fragments[frag_key] = fragments[frag_key]..'\n'

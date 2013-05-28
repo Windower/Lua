@@ -1,0 +1,24 @@
+<?xml version="1.1" ?>
+<settings>
+	<global>
+		<bg>
+			<alpha>102</alpha>
+			<blue>0</blue>
+			<green>0</green>
+			<red>0</red>
+		</bg>
+		<pos>
+			<x>0</x>
+			<y>0</y>
+		</pos>
+		<text>
+			<alpha>255</alpha>
+			<blue>255</blue>
+			<font>Arial</font>
+			<green>255</green>
+			<red>255</red>
+			<size>12</size>
+		</text>
+	</global>
+</settings>
+

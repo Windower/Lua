@@ -1,5 +1,5 @@
 Author: Suji
-Version: 0.8b
+Version: 0.9b
 Addon to show alliance DPS and damage in real time.
 Abbreviation: //sb
 
@@ -55,6 +55,13 @@ Command list:
   Toggles the visibility of the scoreboard. Data will continue to
   accumulate even while it is hidden.
 
+* STAT <statname> [<player>]
+  View specific parser stats. This will respect the current filter settings.
+  Valid stats are: acc, racc, crit, rcrit
+  Examples:
+  //sb stat acc            Shows accuracy for everyone
+  //sb stat crit Flippant  Only show crit rate for Flippant
+
 The settings file, located in addons/scoreboard/data/settings.xml, contains
 additional configuration options:
 * posX - x coordinate for position
@@ -82,3 +89,8 @@ Caveats:
 
 * This addon is still in development. Please report any issues or feedback to
   to me (Suji on Phoenix) on FFXIAH or Guildwork.
+
+Thanks to Flippant for all of the helpful feedback and comments and to Zumi
+for encouraging me to write this in the first place.
+
+
