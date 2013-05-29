@@ -81,7 +81,7 @@ plasmon font [[-h]|[-f <font>] [-s <size>] [-a <alpha>] [-b [<bold>]] [-i [<ital
 * **-h:** shows the help text.
 * **-f _font_:** specifies the text's font.
 * **-s _size_:** specifies the text's size.
-* **-a _alpha_:** specifies the text's transparency. the value must be set between 0 (transparent) and 255 (opaque), inclusive.
+* **-a _alpha_:** specifies the text's transparency. The value must be set between 0 (transparent) and 255 (opaque), inclusive.
 * **-b [ _bold_ ]:** specifies if the text should be rendered bold. **default**, **false** or **0** mean disabled. **true**, **1** or no value mean enabled.
 * **-i [ _italic_ ]:** specifies if the text should be rendered italic. **default**, **false** or **0** mean disabled. **true**, **1** or no value mean enabled.
 
@@ -92,12 +92,12 @@ Sets the colors of the various elements present in the addon's window. If no par
 plasmon color [[-h]|[-o <objects>] [-d] [-r <red>] [-g <green>] [-b <blue>] [-a <alpha>]]
 ```
 * **-h:** shows the help text.
-* **-o _objects_:** specifies the item/s which will have its/their color changed. if this parameter is missing all the objects will be changed. the accepted values are **all**, **background**, **bg**, **title**, **label**, **value**, **plasmon**, **plasmon.title**, **plasmon.label**, **plasmon.value**, **airlixir**, **airlixir.title**, **airlixir.label**, **airlixir.value**.
+* **-o _objects_:** specifies the item/s which will have its/their color changed. If this parameter is missing all the objects will be changed. the accepted values are **all**, **background**, **bg**, **title**, **label**, **value**, **plasmon**, **plasmon.title**, **plasmon.label**, **plasmon.value**, **airlixir**, **airlixir.title**, **airlixir.label**, **airlixir.value**.
 * **-d:** sets the red, green, blue and alpha values of the specified objects to their default values.
-* **-r _red_:** specifies the intensity of the red color. the value must be set between 0 and 255, inclusive, where 0 is less intense and 255 is most intense.
-* **-g _green_:** specifies the intensity of the greencolor. the value must be set between 0 and 255, inclusive, where 0 is less intense and 255 is most intense.
-* **-b _blue_:** specifies the intensity of the blue color. the value must be set between 0 and 255, inclusive, where 0 is less intense and 255 is most intense.
-* **-a _alpha_:** specifies the text's transparency. the value must be set between 0 (transparent) and 255 (opaque), inclusive.
+* **-r _red_:** specifies the intensity of the red color. The value must be set between 0 and 255, inclusive, where 0 is less intense and 255 is most intense.
+* **-g _green_:** specifies the intensity of the greencolor. The value must be set between 0 and 255, inclusive, where 0 is less intense and 255 is most intense.
+* **-b _blue_:** specifies the intensity of the blue color. The value must be set between 0 and 255, inclusive, where 0 is less intense and 255 is most intense.
+* **-a _alpha_:** specifies the text's transparency. The value must be set between 0 (transparent) and 255 (opaque), inclusive.
 
 ----
 
