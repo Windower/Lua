@@ -28,7 +28,6 @@ members={}
 modmember={}
 color={}
 config = require 'config'
-settings=config.load()
 
 defaults = {}
 defaults.colors = {}
@@ -53,11 +52,9 @@ defaults.colors.a25 = 208
 
 function event_load()
 	send_command('alias highlight lua c highlight')
-	local colortab = config.load('data/settings.xml',true)
 	for i,v in pairs(colortab.colors) do
 		color[i]= colconv(v,i)
 	end
-	get_party_members()
 	if get_ffxi_info()['logged_in'] then
         initialize()
     end
@@ -69,6 +66,11 @@ end
 
 function initialize()
     settings = config.load(defaults)
+	for i,v in pairs(settings.colors) do
+		color[i]= colconv(v,i)
+	end
+	
+	get_party_members()
 end
 
 function event_incoming_text(original, modified, color)
