@@ -58,7 +58,11 @@ function event_action(act)
 					act['targets'][n]['actions'][1]['message'] = 0
 				end
 			else
-				act['targets'][n]['target'] = target
+				if act['targets'][n]['count'] > 1 then
+					act['targets'][n]['target'] = '\123'..act['targets'][n]['count']..'\125 '..target
+				else
+					act['targets'][n]['target'] = target
+				end
 				act['targets'][n]['count2'] = 1
 			end
 		end
