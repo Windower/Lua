@@ -1,4 +1,5 @@
 require 'luau'
+texts = require 'texts'
 
 -- Config
 
@@ -9,6 +10,9 @@ _addon.shortcommand = 'ti'
 _addon.ver = 0.9
 
 defaults = {}
+defaults.showhexid = true
+defaults.showfullid = false
+defaults.showspeed = false
 defaults.pos = {}
 defaults.pos.x = 0
 defaults.pos.y = 0
@@ -25,18 +29,20 @@ defaults.text.blue = 0
 defaults.text.alpha = 255
 defaults.text.size = 12
 
+text = {}
+
 function setID(index)
 	local mob = get_mob_by_index(index)
 	local id = mob['id']
 	if id and id > 0 then
-		tb_set_visibility('targetid', true)
+		text:show()
 		if mob['is_npc'] then
-			tb_set_text('targetid', id:tohex():slice(-3))
+			text:text(id:tohex():slice(-3))
 		else
-			tb_set_visibility('targetid', false)
+			text:hide()
 		end
 	else
-		tb_set_visibility('targetid', false)
+		text:hide()
 	end
 end
 
@@ -50,20 +56,18 @@ end
 
 function event_load()
 	settings = config.load(defaults)
+	settings:save()
 
-	tb_create('targetid')
-	tb_set_location('targetid', settings.pos.x, settings.pos.y)
-	tb_set_bg_color('targetid', settings.bg.alpha, settings.bg.red, settings.bg.green, settings.bg.blue)
-	tb_set_bg_visibility('targetid', true)
-	tb_set_color('targetid', settings.text.alpha, settings.text.red, settings.text.green, settings.text.blue)
-	tb_set_font('targetid', settings.text.font, settings.text.size)
+	text = texts.new(settings)
 
 	setID(get_player()['target_index'])
+	
+	send_command('alias targetinfo')
 end
 
 -- Destructor
 
 function event_unload()
-	tb_delete('targetid')
-	send_command('unalias targetidpos')
+	text:destroy()
+	send_command('unalias targetid')
 end
