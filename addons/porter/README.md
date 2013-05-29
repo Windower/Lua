@@ -19,8 +19,8 @@ porter [<slip> [<page>]] [owned]
 
 ##changelog##
 ### v1.20130529
-* **fix**: Fixed parameters validation
-* **change**: Aligned to Windower's addon development guidelines
+* **fix**: Fixed parameters validation.
+* **change**: Aligned to Windower's addon development guidelines.
 
 ### v1.20130525.1
 * **add**: Added the "owned" param. if present, only the owned items will be shown.
