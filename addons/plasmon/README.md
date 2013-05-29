@@ -73,7 +73,7 @@ plasmon position [[-h]|[-x <x>] [-y <y>]]
 * **-y _y_:** specifies the vertical position of the window.
 
 ### font ###
-Sets the style of the font used in the window. If the no parameter is specified, the help text will be shown.
+Sets the style of the font used in the window. If no parameter is specified, the help text will be shown.
 
 ```
 plasmon font [[-h]|[-f <font>] [-s <size>] [-a <alpha>] [-b [<bold>]] [-i [<italic>]]]
@@ -86,7 +86,7 @@ plasmon font [[-h]|[-f <font>] [-s <size>] [-a <alpha>] [-b [<bold>]] [-i [<ital
 * **-i [ _italic_ ]:** specifies if the text should be rendered italic. **default**, **false** or **0** mean disabled. **true**, **1** or no value mean enabled.
 
 ### color ###
-Sets the colors of the various elements present in the addon's window. If the no parameter is specified, the help text will be shown.
+Sets the colors of the various elements present in the addon's window. If no parameter is specified, the help text will be shown.
 
 ```
 plasmon color [[-h]|[-o <objects>] [-d] [-r <red>] [-g <green>] [-b <blue>] [-a <alpha>]]
