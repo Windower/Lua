@@ -383,7 +383,7 @@ function table.reverse(t)
 end
 
 -- Returns an array removed of all duplicates.
--- DEPRECATED: Use S(t) instead
+-- DEPRECATED: Use S(t) or L(S(t)) instead.
 function table.set(t)
 	local seen = {}
 	local res = {}
@@ -397,6 +397,18 @@ function table.set(t)
 	end
 
 	return setmetatable(res, getmetatable(t) or _meta.T)
+end
+
+-- Gets a list of arguments and creates a table with key: value pairs alternating the arguments.
+function table.dict(...)
+	local res = type(...) == 'table' and (...) or {}
+
+	local start = type(...) == 'table' and 2 or 1
+	for k = start, select('#', ...), 2 do
+		res[select(k, ...)] = select(k + 1, ...)
+	end
+
+	return setmetatable(res, _meta.T)
 end
 
 -- Finds a table entry based on an attribute.

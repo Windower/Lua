@@ -9,11 +9,12 @@ require 'lists'
 require 'sets'
 require 'mathhelper'
 require 'functools'
-require 'colors'
 require 'actionhelper'
+chat = require 'chat'
 ffxi = require 'ffxi'
 files = require 'filehelper'
 config = require 'config'
 xml = require 'xml'
 json = require 'json'
+
 collectgarbage()

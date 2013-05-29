@@ -93,6 +93,7 @@ function event_load()
 	message_map[426] = T{427} -- Loses
 	no_effect_map = T{248,355,189,75,408,156,0,0,0,0,189,0,189,156,156}
 	receives_map = T{0,0,186,82,375,116,0,0,0,0,186,0,186,116,116}
+	stat_ignore = T{66,69,70,71,444,445,446}
 	
 	speFile = file.new('../../plugins/resources/spells.xml')
 	jaFile = file.new('../../plugins/resources/abils.xml')
@@ -578,12 +579,16 @@ function event_action_message(actor_id,index,actor_target_index,target_target_in
 		local party_table = get_party()
 		local target = target_table['name']
 		
-		if not wearing[status] then
+		if not wearing[status] and not (stat_ignore:contains(param_1)) then
 			wearing[status] = {}
 			wearing[status][1] = namecol(target,target_table,party_table)
-			send_command('wait 1;lua c battlemod wearsoff '..status)
-		else
+			send_command('wait 0.5;lua c battlemod wearsoff '..status)
+		elseif not (stat_ignore:contains(param_1)) then
 			wearing[status][#wearing[status]+1] = namecol(target,target_table,party_table)
+		else
+			wearing[status] = {}
+			wearing[status][1] = namecol(target,target_table,party_table)
+			send_command('lua c battlemod wearsoff '..status)
 		end
 	elseif passed_messages:contains(message_id) then
 		local status,actor,target,spell,skill,number,number2

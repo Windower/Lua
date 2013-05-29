@@ -1,19 +1,17 @@
--- DEPRECATED!
--- See chat.lua instead
-
 --[[
 A few functions that add an interface for color editing.
 ]]
 
 _libs = _libs or {}
-_libs.colors = true
+_libs.chat = true
 _libs.tablehelper = _libs.tablehelper or require 'tablehelper'
+_libs.sets = _libs.sets or require 'sets'
 _libs.stringhelper = _libs.stringhelper or require 'stringhelper'
 local json = require 'json'
 _libs.json = _libs.json or (json ~= nil)
 _libs.logger = _libs.logger or require 'logger'
 
-local chat = ((ffxi and ffxi.data and ffxi.data.chat) or json.read('../libs/ffxidata.json')).chat
+local chat = (ffxi and ffxi.data and ffxi.data.chat) or json.read('../libs/ffxidata.json').chat
 local colors = chat.colors
 local color_controls = chat.colorcontrols
 
@@ -48,18 +46,18 @@ function make_color(col)
 	return col
 end
 
--- Returns str colored as specified by newcolor. If oldcolor is omitted, the string will stay in newcolor.
-function string.color(str, newcolor, resetcolor)
-	if newcolor == nil then
+-- Returns str colored as specified by newcolor. If oldcolor is omitted, the string color will reset.
+function string.color(str, new_color, reset_color)
+	if new_color == nil then
 		return str
 	end
-	
-	resetcolor = resetcolor or color_controls['reset']
-	
-	newcolor = make_color(newcolor)
-	resetcolor = make_color(resetcolor)
-	
-	return str:enclose(newcolor, resetcolor)
+
+	reset_color = reset_color or color_controls['reset']
+
+	new_color = make_color(new_color)
+	reset_color = make_color(reset_color)
+
+	return str:enclose(new_color, reset_color)
 end
 
 -- Strips a string of all colors.
@@ -76,5 +74,25 @@ end
 function string.strip_format(str)
 	return (str:gsub('[\x1E\x1F\x7F].', ''):gsub('\xEF[\x27\x28]', ''))
 end
+
+--[[
+	The following functions are for text object strings, since they behave differently than chatlog strings.
+]]
+
+-- Returns str colored as specified by (new_alpha, new_red, ...). If reset values are omitted, the string color will reset.
+function string.text_color(str, new_red, new_green, new_blue, reset_red, reset_green, reset_blue)
+	if reset_blue then
+		return '\\cs('..new_red..', '..new_green..', '..new_blue..')'..str..'\\cs('..reset_red..', '..reset_green..', '..reset_blue..')'
+	end
+	
+	return '\\cs('..new_red..', '..new_green..', '..new_blue..')'..str..'\\cr'
+end
+
+-- Returns a color string in console format.
+function chat.make_text_color(red, green, blue)
+	return '\\cs('..red..', '..green..', '..blue..')'
+end
+
+chat.text_color_reset = '\\cr'
 
 return chat
