@@ -31,28 +31,14 @@ config = require 'config'
 settings=config.load()
 
 function event_load()
-	send_command('alias namelights lua c highlight')
-	local colortab = config.load('data/colors.xml',true)
-	for i,v in pairs(colortab) do
+	send_command('alias highlight lua c highlight')
+	local colortab = config.load('data/settings.xml',true)
+	for i,v in pairs(colortab.colors) do
 		color[i]= colconv(v,i)
 	end
-		for member in pairs(get_party()) do
-			members[member] = get_party()[member]['name']
-			modmember[member]=color[member]..get_party()[member]['name']..'\x1E\x01'
-		end
+	
+	get_party_members()
 
-end
-
-function event_addon_command(...)
-    cmd = {...}
-	if cmd[1] ~= nil then
-		if cmd[1]:lower() == "start" then
-			for member in pairs(get_party()) do
-				members[member] = get_party()[member]['name']
-				modmember[member]=color[member]..get_party()[member]['name']..'\x1E\x01'
-			end
-		end
-	end
 end
 
 function event_incoming_text(original, modified, color)
@@ -84,10 +70,17 @@ function colconv(str,key)
 	return out
 end
 	
+function get_party_members()
+	for member in pairs(get_party()) do
+		members[member] = get_party()[member]['name']
+		modmember[member]=color[member]..get_party()[member]['name']..'\x1E\x01'
+	end
+end
+
 function event_incoming_chunk(id, data)
 	if id == 221 then
 		modmember={}
 		members={}
-		send_command('wait 0.1; highlight start')
+		send_command('wait 0.1; lua i highlights get_party_members')
 	end
 end

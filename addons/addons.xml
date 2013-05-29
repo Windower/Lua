@@ -182,7 +182,7 @@
   </addon>
   <addon>
     <name>Highlight</name>
-    <description>Highlights when someone is talking about someone in party with coloured text. Uses the same colours as battlemod</description>
+    <description>Highlights party members names when mentioned in the chatlog.</description>
     <author>Balloon</author>
 	<bugtracker>https://github.com/Podginator/Lua/issues</bugtracker>
 	<support>Podginator@gmail.com</support>
