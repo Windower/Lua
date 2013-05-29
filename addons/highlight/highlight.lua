@@ -53,9 +53,6 @@ defaults.colors.a25 = 208
 
 function event_load()
 	send_command('alias highlight lua c highlight')
-	for i,v in pairs(colortab.colors) do
-		color[i]= colconv(v,i)
-	end
 	if get_ffxi_info()['logged_in'] then
         initialize()
     end
@@ -67,10 +64,6 @@ end
 
 function initialize()
     settings = config.load(defaults)
-	for i,v in pairs(settings.colors) do
-		color[i]= colconv(v,i)
-	end
-	
 	get_party_members()
 end
 
@@ -88,7 +81,8 @@ end
 function get_party_members()
 	for member in pairs(get_party()) do
 		members[member] = get_party()[member]['name']
-		modmember[member] = get_party()[member]['name']:color(settings.colors[member])	end
+		modmember[member] = get_party()[member]['name']:color(settings.colors[member])
+	end
 end
 
 function event_incoming_chunk(id, data)
