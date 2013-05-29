@@ -1,5 +1,5 @@
 **Author:** Giuliano Riccio  
-**Version:** v 1.20130524
+**Version:** v 1.20130529
 
 # FindAll #
 
@@ -53,6 +53,10 @@ findall :omega
 ----
 
 ##Changelog##
+### v1.20130529 ###
+* **fix:** Escaped patterns in search terms.
+* **change**: Aligned to Windower's addon development guidelines.
+
 ### v1.20130524 ###
 * **add:** Added temp items support.
 

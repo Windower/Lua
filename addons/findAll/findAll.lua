@@ -29,30 +29,34 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
 require 'lists'
+require 'logger'
 require 'sets'
 
-local json  = require 'json'
-local file  = require 'filehelper'
-local slips = require 'slips'
+_addon = {}
+_addon.name    = 'findAll'
+_addon.version = '1.20130529'
 
-local findall = {}
-findall.load_timestamp         = os.time()
-findall.deferral_time          = 20
-findall.item_names             = T{}
-findall.global_storages        = {}
-findall.storages_path          = 'data/storages.json'
-findall.storages_order         = L{'temporary', 'inventory', 'safe', 'storage', 'locker', 'satchel', 'sack'}
-findall.storage_slips_order    = L{'slip 01', 'slip 02', 'slip 03', 'slip 04', 'slip 05', 'slip 06', 'slip 07', 'slip 08', 'slip 09', 'slip 10', 'slip 11', 'slip 12', 'slip 13', 'slip 14'}
-findall.merged_storages_orders = L{}:extend(findall.storages_order):extend(findall.storage_slips_order)
-findall.resources              = {
+json  = require 'json'
+file  = require 'filehelper'
+slips = require 'slips'
+
+load_timestamp         = os.time()
+deferral_time          = 20
+item_names             = T{}
+global_storages        = {}
+storages_path          = 'data/storages.json'
+storages_order         = L{'temporary', 'inventory', 'safe', 'storage', 'locker', 'satchel', 'sack'}
+storage_slips_order    = L{'slip 01', 'slip 02', 'slip 03', 'slip 04', 'slip 05', 'slip 06', 'slip 07', 'slip 08', 'slip 09', 'slip 10', 'slip 11', 'slip 12', 'slip 13', 'slip 14'}
+merged_storages_orders = L{}:extend(storages_order):extend(storage_slips_order)
+resources              = {
     ['armor']   = '../../plugins/resources/items_armor.xml',
     ['weapons'] = '../../plugins/resources/items_weapons.xml',
     ['general'] = '../../plugins/resources/items_general.xml'
 }
 
-function findall.search(query)
-    if findall.global_storages ~= nil then
-        if not findall.update() then
+function search(query)
+    if global_storages ~= nil then
+        if not update() then
             return
         end
     end
@@ -78,12 +82,12 @@ function findall.search(query)
 
     local new_item_ids = S{}
 
-    for character_name, storages in pairs(findall.global_storages) do
+    for character_name, storages in pairs(global_storages) do
         for storage_name, storage in pairs(storages) do
             for id, quantity in pairs(storage) do
                 id = tostring(id)
 
-                if findall.item_names[id] == nil then
+                if item_names[id] == nil then
                     new_item_ids:add(tostring(id))
                 end
             end
@@ -91,7 +95,7 @@ function findall.search(query)
     end
 
     if new_item_ids:length() > 0 then
-        for kind, resource_path in pairs(findall.resources) do
+        for kind, resource_path in pairs(resources) do
             resource = io.open(lua_base_path..resource_path, 'r')
 
             if resource ~= nil then
@@ -107,10 +111,10 @@ function findall.search(query)
                     if id ~= nil then
                         id = tostring(id)
 
-                        if findall.item_names[id] == nil
+                        if item_names[id] == nil
                             and new_item_ids:contains(id)
                         then
-                            findall.item_names[id] = {
+                            item_names[id] = {
                                 ['name']      = name:lower():gsub('♂', '\x81\x89'):gsub('♀', '\x81\x8A'),
                                 ['long_name'] = long_name:lower():gsub('♂', '\x81\x89'):gsub('♀', '\x81\x8A')
                             }
@@ -118,7 +122,7 @@ function findall.search(query)
                     end
                 end
             else
-                write(kind..' resource file not found')
+                error(kind..' resource file not found.')
             end
 
             resource:close()
@@ -127,18 +131,18 @@ function findall.search(query)
 
     local results_items = S{}
 
-    for id, names in pairs(findall.item_names) do
-        if findall.item_names[id].name:find(terms)
-            or findall.item_names[id].long_name:find(terms)
+    for id, names in pairs(item_names) do
+        if item_names[id].name:find(terms:escape())
+            or item_names[id].long_name:find(terms:escape())
         then
             results_items:add(id)
         end
     end
 
-    add_to_chat(55, 'lua:addon:findAll >> searching: '..query:concat(' '))
+    log('Searching: '..query:concat(' '))
 
     local no_results   = true
-    local sorted_names = findall.global_storages:keyset():sort()
+    local sorted_names = global_storages:keyset():sort()
                                                        :reverse()
 
     sorted_names = sorted_names:append(sorted_names:remove(sorted_names:find(get_player().name)))
@@ -146,9 +150,9 @@ function findall.search(query)
 
     for _, character_name in ipairs(sorted_names) do
         if character_filters:length() == 0 or character_filters:length() > 0 and character_filters:contains(character_name) then
-            local storages = findall.global_storages[character_name]
+            local storages = global_storages[character_name]
 
-            for _, storage_name in ipairs(findall.merged_storages_orders) do
+            for _, storage_name in ipairs(merged_storages_orders) do
                 local results = L{}
 
                 if storages[storage_name] ~= nil then
@@ -156,7 +160,7 @@ function findall.search(query)
                         if results_items:contains(id) then
                             results:append(
                                 '\30\03'..character_name..'/'..storage_name..':\30\01 '..
-                                findall.item_names[id].name:gsub(terms, '\30\02'..terms..'\30\01')..
+                                item_names[id].name:gsub(terms:escape(), '\30\02'..terms..'\30\01')..
                                 (quantity > 1 and ' \30\03('..quantity..')\30\01' or '')
                             )
 
@@ -177,23 +181,23 @@ function findall.search(query)
     if no_results then
         if terms ~= '' then
             if character_filters:length() == 0 then
-                add_to_chat(55, 'lua:addon:findAll >> you have no items that match \''..terms..'\'')
+                log('You have no items that match \''..terms..'\'.')
             else
-                add_to_chat(55, 'lua:addon:findAll >> you have no items that match \''..terms..'\' on the specified characters')
+                log('You have no items that match \''..terms..'\' on the specified characters.')
             end
         else
-            add_to_chat(55, 'lua:addon:findAll >> you have no items on the specified characters')
+            log('You have no items on the specified characters.')
         end
     end
 
     collectgarbage()
 end
 
-function findall.get_storages()
+function get_storages()
     local items    = get_items()
     local storages = {}
 
-    for _, storage_name in ipairs(findall.storages_order) do
+    for _, storage_name in ipairs(storages_order) do
         storages[storage_name] = T{}
 
         for _, data in ipairs(items[storage_name]) do
@@ -223,34 +227,38 @@ function findall.get_storages()
     return storages
 end
 
-function findall.update()
-    local time_difference = os.time() - findall.load_timestamp
+function update()
+    if not get_ffxi_info().logged_in then
+        write('you have to be logged in to use this addon')
+    end
+    
+    local time_difference = os.time() - load_timestamp
 
-    if time_difference < findall.deferral_time then
-        add_to_chat(55, 'lua:addon:findAll >> findAll will be available in '..(findall.deferral_time - time_difference)..' seconds')
+    if time_difference < deferral_time then
+        warning('findAll will be available in '..(deferral_time - time_difference)..' seconds.')
 
         return false
     end
 
     local player_name   = get_player().name
-    local storages_file = file.new(findall.storages_path)
+    local storages_file = file.new(storages_path)
 
     if not storages_file:exists() then
         storages_file:create()
     end
 
-    findall.global_storages = json.read(storages_file)
+    global_storages = json.read(storages_file)
 
-    if findall.global_storages == nil then
-        findall.global_storages = {}
+    if global_storages == nil then
+        global_storages = {}
     end
 
-    findall.global_storages[player_name] = findall.get_storages()
+    global_storages[player_name] = get_storages()
 
     -- build json string
     local characters_json = L{}
 
-    for character_name, storages in pairs(findall.global_storages) do
+    for character_name, storages in pairs(global_storages) do
         local storages_json = L{}
 
         for storage_name, storage in pairs(storages) do
@@ -279,7 +287,7 @@ function event_load()
     send_command('alias findall lua c findall')
 
     if get_ffxi_info().logged_in then
-        findall.update()
+        update()
     end
 end
 
@@ -287,31 +295,27 @@ function event_unload()
     send_command('unalias findall')
 
     if get_ffxi_info().logged_in then
-        if not findall.update() then
-            add_to_chat(38, 'lua:addon:findAll >> findAll wasn\'t ready')
+        if not update() then
+            error('findAll wasn\'t ready.')
         end
     end
 end
 
 function event_login()
-    findall.load_timestamp = os.time();
+    load_timestamp = os.time();
 end
 
 function event_zone_change()
-    findall.load_timestamp = os.time();
+    load_timestamp = os.time();
 end
 
 function event_logout()
-    if not findall.update() then
-        add_to_chat(38, 'lua:addon:findAll >> findAll wasn\'t ready')
+    if not update() then
+        error('findAll wasn\'t ready.')
     end
 end
 
 function event_addon_command(...)
-    if not get_ffxi_info().logged_in then
-        write('you have to be logged in to use this addon')
-    end
-
     local params = L{...}
     local query  = L{}
 
@@ -323,5 +327,5 @@ function event_addon_command(...)
         query:append(params:concat(' '))
     end
 
-    findall.search(query)
+    search(query)
 end
