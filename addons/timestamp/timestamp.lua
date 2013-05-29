@@ -32,7 +32,7 @@ require 'colors'
 require 'logger'
 require 'tablehelper'
 
-local config = require 'config'
+config = require 'config'
 
 _addon = {}
 _addon.name = 'timestamp'
@@ -123,7 +123,7 @@ end
 
 function event_addon_command(...)
     local args = {...}
-    
+
     if args[1] == nil then
         send_command('timestamp help')
 
@@ -160,7 +160,7 @@ function event_addon_command(...)
     elseif cmd == 'color' then
         if args[1] == nil then
             error('Please specify the new color.')
-        elseif args[1] == 'help' then    
+        elseif args[1] == 'help' then
             log('Sets the timestamp\'s color.')
             log('Usage: timestamp color [help|<color>]')
             log('Positional arguments:')
@@ -168,7 +168,7 @@ function event_addon_command(...)
             log('\x81\xa1 <color>: defines the timestamp\'s color. The value must be between 0 and 511, inclusive.')
         else
             local color = tonumber(args[1], 10)
-            
+
             if color == nil or color < 0 or color >= 512 then
                 error('Please specify a valid color.')
             else
