@@ -146,6 +146,8 @@
     <name>RollTracker</name>
     <author>Balloon</author>
     <description>Simplifies Cor rolls, tells you the bonus they give, stops you from doubling up on lucky rolls and reports your chance to bust.</description>
+	<bugtracker>https://github.com/Podginator/Lua/issues</bugtracker>
+	<support>Podginator@gmail.com</support>
   </addon>
   <addon>
     <name>SATACast</name>
@@ -182,6 +184,8 @@
     <name>Highlight</name>
     <description>Highlights when someone is talking about someone in party with coloured text. Uses the same colours as battlemod</description>
     <author>Balloon</author>
+	<bugtracker>https://github.com/Podginator/Lua/issues</bugtracker>
+	<support>Podginator@gmail.com</support>
   </addon>
   <addon>
     <name>TargetInfo</name>
