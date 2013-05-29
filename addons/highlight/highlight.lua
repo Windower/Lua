@@ -30,15 +30,44 @@ color={}
 config = require 'config'
 settings=config.load()
 
+defaults = {}
+defaults.colors.p0 = 501
+defaults.colors.p1 = 204
+defaults.colors.p2 = 410
+defaults.colors.p3 = 492
+defaults.colors.p4 = 259
+defaults.colors.p5 = 260
+defaults.colors.a10 = 205
+defaults.colors.a11 = 359
+defaults.colors.a12 = 167
+defaults.colors.a13 = 038
+defaults.colors.a14 = 125
+defaults.colors.a15 = 185
+defaults.colors.a20 = 429
+defaults.colors.a21 = 257
+defaults.colors.a22 = 200
+defaults.colors.a23 = 481
+defaults.colors.a24 = 483
+defaults.colors.a25 = 208
+
 function event_load()
 	send_command('alias highlight lua c highlight')
 	local colortab = config.load('data/settings.xml',true)
 	for i,v in pairs(colortab.colors) do
 		color[i]= colconv(v,i)
 	end
-	
 	get_party_members()
+	if get_ffxi_info()['logged_in'] then
+        initialize()
+    end
+end
 
+function event_login()
+    initialize()
+end
+
+function initialize()
+    settings = config.load(defaults)
 end
 
 function event_incoming_text(original, modified, color)
