@@ -248,7 +248,7 @@ function config.save(t, char)
 		chars:append(char)
 		original[char] = T{}
 	end
-	
+
 	original[char]:update(t)
 	
 	if char == 'global' then
@@ -262,7 +262,8 @@ function config.save(t, char)
 		end
 	end
 	
-	file:write(settings_xml(original))
+	local wot = settings_xml(original)
+	file:write(wot)
 end
 
 -- Returns the table containing only elements from t_new that are different from t and not nil.
@@ -307,9 +308,9 @@ function settings_xml(settings)
 	
 	chars = settings:keyset():filter(-functools.equals('global')):sort()
 	for char in (L{'global'}+chars):it() do
-		if char == 'global' and comments['settings'] ~= nil then
+		if char == 'global' and rawget(comments, 'settings') ~= nil then
 			str = str..'\t<!--\n'
-			local comment_lines = comments['settings']:split('\n')
+			local comment_lines = rawget(comments, 'settings'):split('\n')
 			for comment in comment_lines:it() do
 				str = str..'\t\t'..comment:trim()..'\n'
 			end
@@ -338,8 +339,8 @@ function nest_xml(t, indentlevel)
 		val = rawget(t, key)
 		if type(val) == 'table' and not (class(val) == 'List' or T(val):isarray()) then
 			fragments:append(indent..'<'..key..'>\n')
-			if comments[key] ~= nil then
-				local c = ('<!-- '..comments[key]:trim()..' -->'):split('\n')
+			if rawget(comments, key) ~= nil then
+				local c = ('<!-- '..rawget(comments, key):trim()..' -->'):split('\n')
 				local pre = ''
 				for cstr in c:it() do
 					fragments:append(indent..pre..cstr:trim()..'\n')
