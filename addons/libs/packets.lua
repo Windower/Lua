@@ -124,23 +124,23 @@ local function make_val(ctype, ...)
 	end
 end
 
-local lengths = {}
-lengths['bool'] = 1
-lengths['unsigned char'] = 1
-lengths['unsigned short'] = 2
-lengths['unsigned int'] = 4
-lengths['unsigned long'] = 8
-lengths['signed char'] = 1
-lengths['signed short'] = 2
-lengths['signed int'] = 4
-lengths['signed long'] = 8
-lengths['char'] = 1
-lengths['short'] = 2
-lengths['int'] = 4
-lengths['long'] = 8
-lengths['float'] = 4
-lengths['double'] = 8
-lengths = setmetatable(lengths, {__index = function(t, k)
+packets.lengths = {}
+packets.lengths['bool'] = 1
+packets.lengths['unsigned char'] = 1
+packets.lengths['unsigned short'] = 2
+packets.lengths['unsigned int'] = 4
+packets.lengths['unsigned long'] = 8
+packets.lengths['signed char'] = 1
+packets.lengths['signed short'] = 2
+packets.lengths['signed int'] = 4
+packets.lengths['signed long'] = 8
+packets.lengths['char'] = 1
+packets.lengths['short'] = 2
+packets.lengths['int'] = 4
+packets.lengths['long'] = 8
+packets.lengths['float'] = 4
+packets.lengths['double'] = 8
+packets.lengths = setmetatable(packets.lengths, {__index = function(t, k)
 	local type, number = k:match('(.-) *%[(%d+)%]')
 	if type then
 		local length = rawget(t, type)
@@ -151,28 +151,28 @@ lengths = setmetatable(lengths, {__index = function(t, k)
 end})
 
 -- Specific field data for p.
-local fields = {}
-fields.incoming = {}
-fields.outgoing = {}
+packets.fields = {}
+packets.fields.incoming = {}
+packets.fields.outgoing = {}
 
-fields.incoming[0x0DF] = L{
-	{ctype='unsigned int', field='id'},               -- 4-7
-	{ctype='unsigned int', field='hp'},               -- 8-11
-	{ctype='unsigned int', field='mp'},               -- 12-15
-	{ctype='unsigned int', field='tp'},               -- 16-19
-	{ctype='unsigned short', field='_unknown_20_21'},
-	{ctype='unsigned short', field='_unknown_22_23'},
-	{ctype='unsigned short', field='_unknown_24_25'},
-	{ctype='unsigned short', field='_unknown_26_27'},
+packets.fields.incoming[0x0DF] = L{
+	{ctype='unsigned int',   label='ID'},                -- 4-7
+	{ctype='unsigned int',   label='HP'},                -- 8-11
+	{ctype='unsigned int',   label='MP'},                -- 12-15
+	{ctype='unsigned int',   label='TP'},                -- 16-19
+	{ctype='unsigned short', label='_unknown_20_21'},
+	{ctype='unsigned short', label='_unknown_22_23'},
+	{ctype='unsigned short', label='_unknown_24_25'},
+	{ctype='unsigned short', label='_unknown_26_27'},
 }
 
-fields.incoming[0x0CC] = L{
-	{ctype='int', field='_unknown_4_7'},
-	{ctype='char[128]', field='lsmes'},               -- 8-135
-	{ctype='int', field='_unknown_136_139'},
-	{ctype='char[16]', field='player_name'},          -- 140-155
-	{ctype='int', field='permissions'},               -- 156-159
-	{ctype='char[16]', field='linkshell_name'},       -- 160-175, 6-bit packed
+packets.fields.incoming[0x0CC] = L{
+	{ctype='int',            label='_unknown_4_7'},
+	{ctype='char[128]',      label='Message'},           -- 8-135
+	{ctype='int',            label='_unknown_136_139'},
+	{ctype='char[16]',       label='Player Name'},       -- 140-155
+	{ctype='int',            label='Permissions'},       -- 156-159
+	{ctype='char[16]',       label='Linkshell Name'},    -- 160-175, 6-bit packed
 }
 
 function Pin(id, data)
@@ -186,26 +186,28 @@ end
 function P(id, data, mode)
 	local res = {}
 	res._raw = data
+	res._name = packets[mode][id].name
+	res._description = packets[mode][id].description
 	res._id = id
-	res._size = 2*math.floor(data:byte(2)/2)
-	res._seq = data:byte(3,3) + data:byte(4, 4)*2^8
+	res._size = 4*math.floor(data:byte(2)/2)
+	res._sequence = data:byte(3,3) + data:byte(4, 4)*2^8
 	res._data = data:sub(5)
-	res._hex = data:sub(5):map(string.zfill-{2}..math.tohex..string.byte)
+	res._hex = data:map(string.zfill-{2}..math.tohex..string.byte)
 
-	if not fields[mode][id] then
+	if not packets.fields[mode][id] then
 		return res
 	end
 
 	local temp
 	local val
 	local pos = 5
-	for pt in fields[mode][id]:it() do
+	for pt in packets.fields[mode][id]:it() do
 		temp = pos
-		pos = pos + lengths[pt.ctype]
-		res[pt.field] = make_val(pt.ctype, data:byte(temp, pos - 1))
+		pos = pos + packets.lengths[pt.ctype]
+		res[pt.label] = make_val(pt.ctype, data:byte(temp, pos - 1))
 	end
-
+	
 	return res
 end
 
-return packets, fields
+return packets
