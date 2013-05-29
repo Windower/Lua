@@ -76,14 +76,14 @@ plasmon position [[-h]|[-x <x>] [-y <y>]]
 Sets the style of the font used in the window. If the no parameter is specified, the help text will be shown.
 
 ```
-plasmon font [[-h]|[-f <font>] [-s <size>] [-a <alpha>] [-b[ <bold>]] [-i[ <italic>]]]
+plasmon font [[-h]|[-f <font>] [-s <size>] [-a <alpha>] [-b [<bold>]] [-i [<italic>]]]
 ```
 * **-h:** shows the help text.
 * **-f _font_:** specifies the text's font.
 * **-s _size_:** specifies the text's size.
 * **-a _alpha_:** specifies the text's transparency. the value must be set between 0 (transparent) and 255 (opaque), inclusive.
-* **-b[ _bold_]:** specifies if the text should be rendered bold. **default**, **false** or **0** mean disabled. **true**, **1** or no value mean enabled.
-* **-i[ _italic_]:** specifies if the text should be rendered italic. **default**, **false** or **0** mean disabled. **true**, **1** or no value mean enabled.
+* **-b [_bold_]:** specifies if the text should be rendered bold. **default**, **false** or **0** mean disabled. **true**, **1** or no value mean enabled.
+* **-i [_italic_]:** specifies if the text should be rendered italic. **default**, **false** or **0** mean disabled. **true**, **1** or no value mean enabled.
 
 ### color ###
 Sets the colors of the various elements present in the addon's window. If the no parameter is specified, the help text will be shown.
