@@ -10,7 +10,7 @@ Based on Timestamp plugin developed by Aureus.
 Shows the help text
 
 ```
-usage: timestamp [<command>] help
+timestamp [<command>] help
 ```
 * **_command_:** defines the name of the command you need help with
 
@@ -18,7 +18,7 @@ usage: timestamp [<command>] help
 Sets the timestamp's format.
 
 ```
-usage: timestamp format [help|<color>]
+timestamp format [help|<color>]
 ```
 * **help:** shows the help text.
 * **_format_:** defines the timestamp's format. The available constants are: **year**, **y**, **year_short**, **month**, **m**, **month_short**, **month_long**, **day**, **d**, **day_short**, **day_long**, **hour**, **h**, **hour24**, **hour12**, **minute**, **min**, **second**, **s**, **sec**, **ampm**, **timezone**, **tz**, **timezone_sep**, **tz_sep**, **time**, **date**, **datetime**, **iso8601**, **rfc2822**, **rfc822**, **rfc1036**, **rfc1123**, **rfc3339**
@@ -27,7 +27,7 @@ usage: timestamp format [help|<color>]
 Sets the timestamp's color.
 
 ```
-usage: timestamp color [help|<color>]
+timestamp color [help|<color>]
 ```
 * **help:** shows the help text.
 * **_color_:** defines the timestamp's color. The value must be between 0 and 511, inclusive.
