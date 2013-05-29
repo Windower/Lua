@@ -246,7 +246,7 @@ function show_report()
 end
 
 function first_run()
-    if ( type(settings.v) ~= 'nil' and settings.v >= tonumber(_addon.version) and settings.first_run == false ) then
+    if type(settings.v) ~= 'nil' and settings.v >= tonumber(_addon.version) and settings.first_run == false then
         return
     end
 
