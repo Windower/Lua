@@ -96,7 +96,7 @@ defaults.format = '${time}'
 settings = {}
 
 function get_string(format)
-	local formatted_string = format:gsub('%${([%l%d_]+)}', function(match) if constants[match] ~= nil then return os.date(constants[match]) else return match end end, 1)
+    local formatted_string = format:gsub('%${([%l%d_]+)}', function(match) if constants[match] ~= nil then return os.date(constants[match]) else return match end end, 1)
 
     return formatted_string
 end
