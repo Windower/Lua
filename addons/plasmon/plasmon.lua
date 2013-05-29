@@ -1,5 +1,5 @@
 --[[
-plasmon v1.20130528
+plasmon v1.20130529
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -31,84 +31,87 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 require 'chat'
 local config = require 'config'
 
-local _plasmon = T{}
-_plasmon.v                   = '1.20130528'
-_plasmon.tb_name             = 'addon:gr:plasmon'
-_plasmon.track               = false
-_plasmon.visible             = false
-_plasmon.recovery_mode       = false
-_plasmon.stats               = T{}
-_plasmon.stats.plasm         = 0
-_plasmon.stats.totPlasm      = 0
-_plasmon.stats.mobs          = 0
-_plasmon.stats.totMobs       = 0
-_plasmon.stats.airlixirs     = 0
-_plasmon.stats.totAirlixirs  = 0
-_plasmon.stats.airlixirs1    = 0
-_plasmon.stats.totAirlixirs1 = 0
-_plasmon.stats.airlixirs2    = 0
-_plasmon.stats.totAirlixirs2 = 0
+_addon = {}
+_addon.name    = 'plasmon'
+_addon.version = '1.20130529'
 
-_plasmon.defaults = T{}
-_plasmon.defaults.v         = 0
-_plasmon.defaults.first_run = true
-_plasmon.defaults.light     = false
+tb_name       = 'addon:gr:plasmon'
+track         = false
+visible       = false
+recovery_mode = false
 
-_plasmon.defaults.position = T{}
-_plasmon.defaults.position.x = 0
-_plasmon.defaults.position.y = 350
+stats               = T{}
+stats.plasm         = 0
+stats.totPlasm      = 0
+stats.mobs          = 0
+stats.totMobs       = 0
+stats.airlixirs     = 0
+stats.totAirlixirs  = 0
+stats.airlixirs1    = 0
+stats.totAirlixirs1 = 0
+stats.airlixirs2    = 0
+stats.totAirlixirs2 = 0
 
-_plasmon.defaults.font = T{}
-_plasmon.defaults.font.family = 'Arial'
-_plasmon.defaults.font.size   = 10
-_plasmon.defaults.font.a      = 255
-_plasmon.defaults.font.bold   = false
-_plasmon.defaults.font.italic = false
+defaults = T{}
+defaults.v         = 0
+defaults.first_run = true
+defaults.light     = false
 
-_plasmon.defaults.colors = T{}
-_plasmon.defaults.colors.background = T{}
-_plasmon.defaults.colors.background.r = 0
-_plasmon.defaults.colors.background.g = 43
-_plasmon.defaults.colors.background.b = 54
-_plasmon.defaults.colors.background.a = 200
+defaults.position = T{}
+defaults.position.x = 0
+defaults.position.y = 350
 
-_plasmon.defaults.colors.delve = T{}
-_plasmon.defaults.colors.delve.title = T{}
-_plasmon.defaults.colors.delve.title.r = 220
-_plasmon.defaults.colors.delve.title.g = 50
-_plasmon.defaults.colors.delve.title.b = 47
+defaults.font = T{}
+defaults.font.family = 'Arial'
+defaults.font.size   = 10
+defaults.font.a      = 255
+defaults.font.bold   = false
+defaults.font.italic = false
 
-_plasmon.defaults.colors.delve.label = T{}
-_plasmon.defaults.colors.delve.label.r = 38
-_plasmon.defaults.colors.delve.label.g = 139
-_plasmon.defaults.colors.delve.label.b = 210
+defaults.colors = T{}
+defaults.colors.background = T{}
+defaults.colors.background.r = 0
+defaults.colors.background.g = 43
+defaults.colors.background.b = 54
+defaults.colors.background.a = 200
 
-_plasmon.defaults.colors.delve.value = T{}
-_plasmon.defaults.colors.delve.value.r = 147
-_plasmon.defaults.colors.delve.value.g = 161
-_plasmon.defaults.colors.delve.value.b = 161
+defaults.colors.delve = T{}
+defaults.colors.delve.title = T{}
+defaults.colors.delve.title.r = 220
+defaults.colors.delve.title.g = 50
+defaults.colors.delve.title.b = 47
 
-_plasmon.defaults.colors.airlixir = T{}
-_plasmon.defaults.colors.airlixir.title = T{}
-_plasmon.defaults.colors.airlixir.title.r = 220
-_plasmon.defaults.colors.airlixir.title.g = 50
-_plasmon.defaults.colors.airlixir.title.b = 47
+defaults.colors.delve.label = T{}
+defaults.colors.delve.label.r = 38
+defaults.colors.delve.label.g = 139
+defaults.colors.delve.label.b = 210
 
-_plasmon.defaults.colors.airlixir.label = T{}
-_plasmon.defaults.colors.airlixir.label.r = 42
-_plasmon.defaults.colors.airlixir.label.g = 161
-_plasmon.defaults.colors.airlixir.label.b = 152
+defaults.colors.delve.value = T{}
+defaults.colors.delve.value.r = 147
+defaults.colors.delve.value.g = 161
+defaults.colors.delve.value.b = 161
 
-_plasmon.defaults.colors.airlixir.value = T{}
-_plasmon.defaults.colors.airlixir.value.r = 147
-_plasmon.defaults.colors.airlixir.value.g = 161
-_plasmon.defaults.colors.airlixir.value.b = 161
+defaults.colors.airlixir = T{}
+defaults.colors.airlixir.title = T{}
+defaults.colors.airlixir.title.r = 220
+defaults.colors.airlixir.title.g = 50
+defaults.colors.airlixir.title.b = 47
 
-_plasmon.settings = T{}
+defaults.colors.airlixir.label = T{}
+defaults.colors.airlixir.label.r = 42
+defaults.colors.airlixir.label.g = 161
+defaults.colors.airlixir.label.b = 152
+
+defaults.colors.airlixir.value = T{}
+defaults.colors.airlixir.value.r = 147
+defaults.colors.airlixir.value.g = 161
+defaults.colors.airlixir.value.b = 161
+
+settings = T{}
 
 -- plugin functions
 
-function _plasmon.parseOptions(args)
+function parseOptions(args)
     local options = T{}
 
     while #args > 0 do
@@ -128,7 +131,7 @@ function _plasmon.parseOptions(args)
     return options
 end
 
-function _plasmon.test()
+function test()
     add_to_chat(148, 'Now permeating the mists surrounding the fracture.')
     add_to_chat(148, 'You receive 50 corpuscles of mweya plasm.')
     add_to_chat(121, 'You find an airlixir on the Mob')
@@ -145,148 +148,149 @@ function _plasmon.test()
     add_to_chat(121, 'You find an airlixir +1 on the Mob')
     add_to_chat(121, 'You find an airlixir +2 on the Mob')
     add_to_chat(146, 'Your time has expired for this battle. Now exiting...')
-    _plasmon.show()
+    show_window()
 end
 
-function _plasmon.start()
-    _plasmon.reset()
-    _plasmon.track = true
-    add_to_chat(0, '\30\03The Delve has begun!\30\01')
+function start_tracking()
+    reset_stats()
+    log('The Delve has begun!')
     
-    if _plasmon.recovery_mode then
-        _plasmon.recovery_mode = false
+    track = true
+    
+    if recovery_mode then
+        recovery_mode = false
     end
 
-    if _plasmon.settings.light == false then
-        _plasmon.show()
+    if settings.light == false then
+        show_window()
     end
 end
 
-function _plasmon.stop()
-    _plasmon.stats.scores  = T{}
-    _plasmon.stats.bonuses = T{}
-
-    _plasmon.track = false
-    add_to_chat(0, '\30\03The Delve has ended\30\01')
-    _plasmon.hide()
-    _plasmon.status()
+function stop_tracking()
+    stats.scores  = T{}
+    stats.bonuses = T{}
+    track         = false
+    
+    log('The Delve has ended.')
+    hide_window()
+    show_report()
 end
 
-function _plasmon.refresh()
-    if _plasmon.visible == false then
+function refresh_window()
+    if visible == false then
         return
     end
 
-    local delveColors    = _plasmon.settings.colors.delve
-    local airlixirColors = _plasmon.settings.colors.airlixir
+    local delveColors    = settings.colors.delve
+    local airlixirColors = settings.colors.airlixir
     local text           = T{
         ' \\cs('..delveColors.title.r..', '..delveColors.title.g..', '..delveColors.title.b..')--== DELVE ==--\\cr \n',
         ' \\cs('..delveColors.label.r..', '..delveColors.label.g..', '..delveColors.label.b..')Plasm:\\cr',
-        ' \\cs('..delveColors.value.r..', '..delveColors.value.g..', '..delveColors.value.b..')'.._plasmon.stats.plasm..'/'.._plasmon.stats.totPlasm..'\\cr \n',
+        ' \\cs('..delveColors.value.r..', '..delveColors.value.g..', '..delveColors.value.b..')'..stats.plasm..'/'..stats.totPlasm..'\\cr \n',
         ' \\cs('..delveColors.label.r..', '..delveColors.label.g..', '..delveColors.label.b..')Mobs:\\cr',
-        ' \\cs('..delveColors.value.r..', '..delveColors.value.g..', '..delveColors.value.b..')'.._plasmon.stats.mobs..'/'.._plasmon.stats.totMobs..'\\cr \n',
+        ' \\cs('..delveColors.value.r..', '..delveColors.value.g..', '..delveColors.value.b..')'..stats.mobs..'/'..stats.totMobs..'\\cr \n',
         ' \\cs('..airlixirColors.title.r..', '..airlixirColors.title.g..', '..airlixirColors.title.b..')--== AIRLIXIRS ==--\\cr \n',
         ' \\cs('..airlixirColors.label.r..', '..airlixirColors.label.g..', '..airlixirColors.label.b..')Airlixir:\\cr',
-        ' \\cs('..airlixirColors.value.r..', '..airlixirColors.value.g..', '..airlixirColors.value.b..')'.._plasmon.stats.airlixirs..'/'.._plasmon.stats.totAirlixirs..'\\cr \n',
+        ' \\cs('..airlixirColors.value.r..', '..airlixirColors.value.g..', '..airlixirColors.value.b..')'..stats.airlixirs..'/'..stats.totAirlixirs..'\\cr \n',
         ' \\cs('..airlixirColors.label.r..', '..airlixirColors.label.g..', '..airlixirColors.label.b..')Airlixir +1:\\cr',
-        ' \\cs('..airlixirColors.value.r..', '..airlixirColors.value.g..', '..airlixirColors.value.b..')'.._plasmon.stats.airlixirs1..'/'.._plasmon.stats.totAirlixirs1..'\\cr \n',
+        ' \\cs('..airlixirColors.value.r..', '..airlixirColors.value.g..', '..airlixirColors.value.b..')'..stats.airlixirs1..'/'..stats.totAirlixirs1..'\\cr \n',
         ' \\cs('..airlixirColors.label.r..', '..airlixirColors.label.g..', '..airlixirColors.label.b..')Airlixir +2:\\cr',
-        ' \\cs('..airlixirColors.value.r..', '..airlixirColors.value.g..', '..airlixirColors.value.b..')'.._plasmon.stats.airlixirs2..'/'.._plasmon.stats.totAirlixirs2..'\\cr'
+        ' \\cs('..airlixirColors.value.r..', '..airlixirColors.value.g..', '..airlixirColors.value.b..')'..stats.airlixirs2..'/'..stats.totAirlixirs2..'\\cr'
     }
 
-    tb_set_text(_plasmon.tb_name, text:concat(''))
+    tb_set_text(tb_name, text:concat(''))
 end
 
-function _plasmon.reset()
-    _plasmon.stats.plasm      = 0
-    _plasmon.stats.mobs       = 0
-    _plasmon.stats.airlixirs  = 0
-    _plasmon.stats.airlixirs1 = 0
-    _plasmon.stats.airlixirs2 = 0
-    _plasmon.refresh()
+function reset_stats()
+    stats.plasm      = 0
+    stats.mobs       = 0
+    stats.airlixirs  = 0
+    stats.airlixirs1 = 0
+    stats.airlixirs2 = 0
+    refresh_window()
 end
 
-function _plasmon.fullReset()
-    _plasmon.stats.totPlasm      = 0
-    _plasmon.stats.totMobs       = 0
-    _plasmon.stats.totAirlixirs  = 0
-    _plasmon.stats.totAirlixirs1 = 0
-    _plasmon.stats.totAirlixirs2 = 0
-    _plasmon.reset()
-    _plasmon.refresh()
+function full_reset_stats()
+    stats.totPlasm      = 0
+    stats.totMobs       = 0
+    stats.totAirlixirs  = 0
+    stats.totAirlixirs1 = 0
+    stats.totAirlixirs2 = 0
+    reset_stats()
+    refresh_window()
 end
 
-function _plasmon.show()
-    _plasmon.visible = true
-    tb_set_visibility(_plasmon.tb_name, true)
-    _plasmon.refresh()
+function show_window()
+    visible = true
+    tb_set_visibility(tb_name, true)
+    refresh_window()
 end
 
-function _plasmon.hide()
-    _plasmon.visible = false
-    tb_set_visibility(_plasmon.tb_name, false)
+function hide_window()
+    visible = false
+    tb_set_visibility(tb_name, false)
 end
 
-function _plasmon.toggle()
-    if _plasmon.visible then
-        _plasmon.hide()
+function toggle_window()
+    if visible then
+        hide_window()
     else
-        _plasmon.show()
+        show_window()
     end
 end
 
-function _plasmon.status()
-    add_to_chat(0, '\30\03[Plasm\30\01 \30\02'.._plasmon.stats.plasm..'/'.._plasmon.stats.totPlasm..'\30\01\30\03] [Mobs\30\01 \30\02'.._plasmon.stats.mobs..'/'.._plasmon.stats.totMobs..'\30\01\30\03] [Airlixir\30\01 \30\02'.._plasmon.stats.airlixirs..'/'.._plasmon.stats.totAirlixirs..'\30\01\30\03 | +1\30\01 \30\02'.._plasmon.stats.airlixirs1..'/'.._plasmon.stats.totAirlixirs1..'\30\01\30\03 | +2\30\01 \30\02'.._plasmon.stats.airlixirs2..'/'.._plasmon.stats.totAirlixirs2..'\30\01\30\03]\30\01')
+function show_report()
+    add_to_chat(0, '\30\03[Plasm\30\01 \30\02'..stats.plasm..'/'..stats.totPlasm..'\30\01\30\03] [Mobs\30\01 \30\02'..stats.mobs..'/'..stats.totMobs..'\30\01\30\03] [Airlixir\30\01 \30\02'..stats.airlixirs..'/'..stats.totAirlixirs..'\30\01\30\03 | +1\30\01 \30\02'..stats.airlixirs1..'/'..stats.totAirlixirs1..'\30\01\30\03 | +2\30\01 \30\02'..stats.airlixirs2..'/'..stats.totAirlixirs2..'\30\01\30\03]\30\01')
 end
 
-function _plasmon.first_run()
-    if ( type(_plasmon.settings.v) ~= 'nil' and _plasmon.settings.v >= tonumber(_plasmon.v) and _plasmon.settings.first_run == false ) then
+function first_run()
+    if ( type(settings.v) ~= 'nil' and settings.v >= tonumber(_addon.version) and settings.first_run == false ) then
         return
     end
 
-    add_to_chat(55, 'hi '..get_player()['name']:lower()..',')
-    add_to_chat(55, 'thank you for using plasmon v'.._plasmon.v)
-    add_to_chat(55, 'i\'ve fixed the mob kill count and added a "recovery mode" in case of crash/reload.')
-    add_to_chat(55, '- zohno@phoenix')
+    --[[log('Hi '..get_player()['name']:lower()..',')
+    log('Thank you for using plasmon v'.._addon.version)
+    log('I\'ve fixed the mob kill count and added a "recovery mode" in case of crash/reload.')
+    log('- zohno@phoenix')]]
 
-    _plasmon.settings.v = _plasmon.v
-    _plasmon.settings.first_run = false
-    _plasmon.settings:save('all')
+    settings.v = _addon.version
+    settings.first_run = false
+    settings:save('all')
 end
 
 -- windower events
 
 function event_load()
-    _plasmon.settings = config.load(_plasmon.defaults)
+    settings = config.load(defaults)
 
-    local background = _plasmon.settings.colors.background
+    local background = settings.colors.background
 
     send_command('alias plasmon lua c plasmon')
-    tb_create(_plasmon.tb_name)
-    tb_set_location(_plasmon.tb_name, _plasmon.settings.position.x, _plasmon.settings.position.y)
-    tb_set_bg_color(_plasmon.tb_name, background.a, background.r, background.g, background.b)
-    tb_set_color(_plasmon.tb_name, _plasmon.settings.font.a, 147, 161, 161)
-    tb_set_font(_plasmon.tb_name, _plasmon.settings.font.family, _plasmon.settings.font.size)
-    tb_set_bold(_plasmon.tb_name, _plasmon.settings.font.bold)
-    tb_set_italic(_plasmon.tb_name, _plasmon.settings.font.italic)
-    tb_set_text(_plasmon.tb_name, '')
-    tb_set_bg_visibility(_plasmon.tb_name, true)
+    tb_create(tb_name)
+    tb_set_location(tb_name, settings.position.x, settings.position.y)
+    tb_set_bg_color(tb_name, background.a, background.r, background.g, background.b)
+    tb_set_color(tb_name, settings.font.a, 147, 161, 161)
+    tb_set_font(tb_name, settings.font.family, settings.font.size)
+    tb_set_bold(tb_name, settings.font.bold)
+    tb_set_italic(tb_name, settings.font.italic)
+    tb_set_text(tb_name, '')
+    tb_set_bg_visibility(tb_name, true)
     
     if get_ffxi_info().zone_id == 271 then
-        _plasmon.recovery_mode = true
+        recovery_mode = true
     end
 end
 
 function event_unload()
     send_command('unalias plasmon')
-    tb_delete(_plasmon.tb_name)
+    tb_delete(tb_name)
 end
 
 function event_login()
-    _plasmon.first_run()
+    first_run()
     
     if get_ffxi_info().zone_id == 271 then
-        _plasmon.recovery_mode = true
+        recovery_mode = true
     end
 end
 
@@ -295,19 +299,19 @@ function event_incoming_text(original, modified, mode)
     
     original = original:strip_format()
 
-    if _plasmon.track or _plasmon.recovery_mode then
+    if track or recovery_mode then
         if mode == 148 then
             match = original:match('You receive (%d+) corpuscles of mweya plasm%.')
 
             if match then
-                if _plasmon.recovery_mode then
-                    _plasmon.start()
+                if recovery_mode then
+                    start_tracking()
                 end
                 
                 match = tonumber(match, 10)
 
-                _plasmon.stats.plasm    = _plasmon.stats.plasm + match
-                _plasmon.stats.totPlasm = _plasmon.stats.totPlasm + match
+                stats.plasm    = stats.plasm + match
+                stats.totPlasm = stats.totPlasm + match
 
                 if match ~= 50 and match ~= 500 and match ~= 750 then
                     mobs = match / 50
@@ -315,9 +319,9 @@ function event_incoming_text(original, modified, mode)
                     mobs = 1
                 end
 
-                _plasmon.stats.mobs    = _plasmon.stats.mobs + mobs
-                _plasmon.stats.totMobs = _plasmon.stats.totMobs + mobs
-                _plasmon.refresh()
+                stats.mobs    = stats.mobs + mobs
+                stats.totMobs = stats.totMobs + mobs
+                refresh_window()
 
                 return modified, mode
             end
@@ -325,13 +329,13 @@ function event_incoming_text(original, modified, mode)
             match = original:match('You find an airlixir %+1')
 
             if match then
-                if _plasmon.recovery_mode then
-                    _plasmon.start()
+                if recovery_mode then
+                    start_tracking()
                 end
                 
-                _plasmon.stats.airlixirs1    = _plasmon.stats.airlixirs1 + 1
-                _plasmon.stats.totAirlixirs1 = _plasmon.stats.totAirlixirs1 + 1
-                _plasmon.refresh()
+                stats.airlixirs1    = stats.airlixirs1 + 1
+                stats.totAirlixirs1 = stats.totAirlixirs1 + 1
+                refresh_window()
 
                 return modified, mode
             end
@@ -339,13 +343,13 @@ function event_incoming_text(original, modified, mode)
             match = original:match('You find an airlixir %+2')
 
             if match then
-                if _plasmon.recovery_mode then
-                    _plasmon.start()
+                if recovery_mode then
+                    start_tracking()
                 end
                 
-                _plasmon.stats.airlixirs2    = _plasmon.stats.airlixirs2 + 1
-                _plasmon.stats.totAirlixirs2 = _plasmon.stats.totAirlixirs2 + 1
-                _plasmon.refresh()
+                stats.airlixirs2    = stats.airlixirs2 + 1
+                stats.totAirlixirs2 = stats.totAirlixirs2 + 1
+                refresh_window()
 
                 return modified, mode
             end
@@ -353,13 +357,13 @@ function event_incoming_text(original, modified, mode)
             match = original:match('You find an airlixir')
 
             if match then
-                if _plasmon.recovery_mode then
-                    _plasmon.start()
+                if recovery_mode then
+                    start_tracking()
                 end
                 
-                _plasmon.stats.airlixirs    = _plasmon.stats.airlixirs + 1
-                _plasmon.stats.totAirlixirs = _plasmon.stats.totAirlixirs + 1
-                _plasmon.refresh()
+                stats.airlixirs    = stats.airlixirs + 1
+                stats.totAirlixirs = stats.totAirlixirs + 1
+                refresh_window()
 
                 return modified, mode
             end
@@ -367,7 +371,7 @@ function event_incoming_text(original, modified, mode)
             match = original:match('Your time has expired for this battle%. Now exiting%.%.%.')
 
             if match then
-                _plasmon.stop()
+                stop_tracking()
 
                 return modified, mode
             end
@@ -376,7 +380,7 @@ function event_incoming_text(original, modified, mode)
         match = original:match('Now permeating the mists surrounding the fracture%.')
 
         if match then
-            _plasmon.start()
+            start_tracking()
 
             return modified, mode
         end
@@ -398,39 +402,40 @@ function event_addon_command(...)
     local cmd = args:remove(1):lower()
 
     if cmd == 'help' then
-        messages:append('help >> plasmon test -- fills the chat log to show how the plugin will work. reload the plugin after the test (lua r plasmon)')
-        messages:append('help >> plasmon reset -- sets gained exp and bayld to 0')
-        messages:append('help >> plasmon full-reset -- sets gained exp/total exp and bayld/total bayld to 0')
-        messages:append('help >> plasmon show -- shows the tracking window')
-        messages:append('help >> plasmon hide -- hides the tracking window')
-        messages:append('help >> plasmon toggle -- toggles the tracking window')
-        messages:append('help >> plasmon light [\30\02enabled\30\01] -- defines the light mode status')
-        messages:append('help >> plasmon position [[-h]|[-x \30\02x\30\01] [-y \30\02y\30\01]] -- sets the horizontal and vertical position of the window relative to the upper-left corner')
-        messages:append('help >> plasmon font [[-h]|[-f \30\02font\30\01] [-s \30\02size\30\01] [-a \30\02alpha\30\01] [-b[ \30\02bold\30\01]] [-i[ \30\02italic\30\01]]] -- sets the style of the font used in the window')
-        messages:append('help >> plasmon color [[-h]|[-o \30\02objects\30\01] [-d] [-r \30\02red\30\01] [-g \30\02green\30\01] [-b \30\02blue\30\01] [-a \30\02alpha\30\01]] -- sets the colors used by the plugin')
+        log('\x81\xa1 plasmon help -- shows the help text.')
+        log('\x81\xa1 plasmon test -- fills the chat log with some messages to show how the plugin will work.')
+        log('\x81\xa1 plasmon reset -- sets current gained plasm, monster kill count and dropped airlixirs to 0.')
+        log('\x81\xa1 plasmon full-reset --  sets both current and total gained plasm, monster kill count and dropped airlixirs to 0.')
+        log('\x81\xa1 plasmon show -- shows the tracking window.')
+        log('\x81\xa1 plasmon hide -- hides the tracking window.')
+        log('\x81\xa1 plasmon toggle -- toggles the tracking window\'s visibility.')
+        log('\x81\xa1 plasmon light [<enabled>] -- enables or disabled light mode. When enabled, the addon will never show the window and just print a summary in the chat box at the end of the run. If the enabled parameter is not specified, the help text will be shown.')
+        log('\x81\xa1 plasmon position [[-h]|[-x <x>] [-y <y>]] -- sets the horizontal and vertical position of the window relative to the upper-left corner. If no parameter is specified, the help text will be shown.')
+        log('\x81\xa1 plasmon font [[-h]|[-f <font>] [-s <size>] [-a <alpha>] [-b [<bold>]] [-i [<italic>]]] -- sets the style of the font used in the window. If the no parameter is specified, the help text will be shown.')
+        log('\x81\xa1 plasmon color [[-h]|[-o <objects>] [-d] [-r <red>] [-g <green>] [-b <blue>] [-a <alpha>]] -- sets the colors of the various elements present in the addon\'s window. If no parameter is specified, the help text will be shown.')
     elseif cmd == 'test' then
-        _plasmon.test()
+        test()
     elseif cmd == 'reset' then
-        _plasmon.reset()
+        reset_stats()
     elseif cmd == 'full-reset' then
-        _plasmon.fullReset()
+        full_reset_stats()
     elseif cmd == 'show' then
-        _plasmon.show()
+        show_window()
     elseif cmd == 'hide' then
-        _plasmon.hide()
+        hide_window()
     elseif cmd == 'toggle' then
-        _plasmon.toggle()
+        toggle_window()
     elseif cmd == 'light' then
         if type(args[1]) == 'nil' then
-            messages:append('light >> defines the light mode status. when enabled, the window will be kept hidden and only the summary will be show after the run')
-            messages:append('light >> usage: plasmon light \30\02enabled\30\01')
-            messages:append('light >> positional arguments:')
-            messages:append('light >>   enabled    define light mode status')
+            log('Enables or disabled light mode. when enabled, the addon will never show the window and just print a summary in the chat box at the end of the run. If the enabled parameter is not specified, the help text will be shown.')
+            log('Usage: plasmon light <enabled>')
+            log('Positional arguments:')
+            log('\x81\xa1 <enabled>    specifies the status of the light mode. "default", "false" or "0" mean disabled. "true" or "1" mean enabled.')
         else
             local light
 
             if args[1] == 'default' then
-                light = _plasmon.defaults.light
+                light = defaults.light
             elseif args[1] == 'true' or args[1] == '1' then
                 light = true
             elseif args[1] == 'false' or args[1] == '0' then
@@ -438,156 +443,158 @@ function event_addon_command(...)
             end
 
             if light == true then
-                _plasmon.hide()
-            elseif _plasmon.track == true then
-                _plasmon.show()
+                hide_window()
+            elseif track == true then
+                show_window()
             end
 
             if type(light) ~= "boolean" then
-                errors:append('light >> light expects \'enabled\' to be a boolean (\'true\' or \'false\'), a number (\'1\' or \'0\') or \'default\' (without quotes)')
+                error('Please specify a valid status')
             end
 
             if errors:length() == 0 then
-                _plasmon.settings.light = light
+                settings.light = light
 
-                _plasmon.refresh()
-                _plasmon.settings:save('all')
+                refresh_window()
+                settings:save('all')
             end
         end
     else
-        local options = _plasmon.parseOptions(args)
+        local options = parseOptions(args)
 
         if cmd == 'position' then
             if options:containskey('h') or options:length() == 0 then
-                messages:append('position >> sets the horizontal and vertical position of the window relative to the upper-left corner')
-                messages:append('position >> usage: plasmon position [[-h]|[-x \30\02x\30\01] [-y \30\02y\30\01]]')
-                messages:append('position >> optional arguments:')
-                messages:append('position >>   -h    show this message and exit')
-                messages:append('position >>   -x    the horizontal position of the window relative to the upper-left corner')
-                messages:append('position >>   -y    the vertical position of the window relative to the upper-left corner')
+                log('Sets the horizontal and vertical position of the window relative to the upper-left corner. If the no parameter is specified, the help text will be shown.')
+                log('Usage: plasmon position [[-h]|[-x <x>] [-y <y>]]')
+                log('Optional arguments:')
+                log('\x81\xa1 -h       shows the help text.')
+                log('\x81\xa1 -x <x>   specifies the horizontal position of the window.')
+                log('\x81\xa1 -y <y>   specifies the vertical position of the window.')
             elseif options:length() > 0 then
-                local x = _plasmon.settings.position.x
-                local y = _plasmon.settings.position.y
+                local x = settings.position.x
+                local y = settings.position.y
 
                 for key, value in pairs(options) do
                     if key == 'x' then
                         if options['x'] == 'default' then
-                            x = _plasmon.defaults.position.x
+                            x = defaults.position.x
                         else
                             x = tonumber(options['x'])
 
                             if type(x) ~= "number" then
-                                errors:append('position >> position expects \'x\' to be a number or \'default\' (without quotes)')
+                                error('Please specify a valid horizontal position.')
                             end
                         end
                     elseif key == 'y' then
                         if options['y'] == 'default' then
-                            y = _plasmon.defaults.position.y
+                            y = defaults.position.y
                         else
                             y = tonumber(options['y'])
 
                             if type(y) ~= "number" then
-                                errors:append('position >> position expects \'y\' to be a number or \'default\' (without quotes)')
+                                error('Please specify a valid vertical position.')
                             end
                         end
 
                     else
-                        errors:append('position >> '..key..' is not a recognized parameter')
+                        error('"'..key..'" is not a recognized parameter')
                     end
                 end
 
                 if errors:length() == 0 then
-                    _plasmon.settings.position.x = x
-                    _plasmon.settings.position.y = y
+                    settings.position.x = x
+                    settings.position.y = y
 
-                    tb_set_location(_plasmon.tb_name, x, y)
-                    _plasmon.settings:save('all')
+                    tb_set_location(tb_name, x, y)
+                    settings:save('all')
+                    notice('The window\'s position has been set.')
                 end
             end
         elseif cmd == 'font' then
             if options:containskey('h') or options:length() == 0 then
-                messages:append('font >> sets the style of the font used in the window')
-                messages:append('font >> usage: plasmon font [[-h]|[-f \30\02font\30\01] [-s \30\02size\30\01] [-a \30\02alpha\30\01] [-b[ \30\02bold\30\01]] [-i[ \30\02italic\30\01]]]')
-                messages:append('font >> optional arguments:')
-                messages:append('font >>   -h    show this message and exit')
-                messages:append('font >>   -f    the name of the font to use')
-                messages:append('font >>   -s    the size of the text')
-                messages:append('font >>   -a    the text transparency between 0 (transparent) and 255 (opaque)')
-                messages:append('font >>   -b    makes the text bold (null/true/false/1/0/default)')
-                messages:append('font >>   -i    makes the text italic (null/true/false/1/0/default)')
+                log('Sets the style of the font used in the window. If the no parameter is specified, the help text will be shown.')
+                log('Usage: plasmon font [[-h]|[-f <font>] [-s <size>] [-a <alpha>] [-b [<bold>]] [-i [<italic>]]]')
+                log('Optional arguments:')
+                log('\x81\xa1 -h               shows the help text.')
+                log('\x81\xa1 -f <font>        specifies the text\'s font.')
+                log('\x81\xa1 -s <size>        specifies the text\'s size.')
+                log('\x81\xa1 -a <alpha>       specifies the text\'s transparency. the value must be set between 0 (transparent) and 255 (opaque), inclusive.')
+                log('\x81\xa1 -b [<bold>]      specifies if the text should be rendered bold. "default", "false" or "0" mean disabled. "true", "1" or no value mean enabled.')
+                log('\x81\xa1 -i [<italic>]    specifies if the text should be rendered italic. "default", "false" or "0" mean disabled. "true", "1" or no value mean enabled.')
             elseif options:length() > 0 then
-                local family = _plasmon.settings.font.family
-                local size   = _plasmon.settings.font.size
-                local bold   = _plasmon.settings.font.bold
-                local italic = _plasmon.settings.font.italic
-                local a      = _plasmon.settings.font.a
+                local family = settings.font.family
+                local size   = settings.font.size
+                local bold   = settings.font.bold
+                local italic = settings.font.italic
+                local a      = settings.font.a
 
                 for key, value in pairs(options) do
                     if key == 'f' then
                         if options['f'] == 'default' then
-                            family = _plasmon.defaults.font.family
+                            family = defaults.font.family
                         else
                             family = options['f']
                         end
                     elseif key == 's' then
                         if options['s'] == 'default' then
-                            size = _plasmon.defaults.position.size
+                            size = defaults.position.size
                         else
                             size = tonumber(options['s'])
 
                             if type(size) ~= "number" then
-                                errors:append('font >> font expects \'size\' to be a number or \'default\' (without quotes)')
+                                error('Please specify a valid font size.')
                             end
                         end
                     elseif key == 'b' then
                         if options['b'] == 'default' then
-                            bold = _plasmon.defaults.position.bold
+                            bold = defaults.position.bold
                         elseif options['b'] == true or options['b'] == '1' or options['b'] == 'true' or options['b'] == 'null' then
                             bold = true
                         elseif options['b'] == '0' or options['b'] == 'false' then
                             bold = false
                         else
-                            errors:append('font >> font expects \'bold\' to be null (\'true\'), a boolean (\'true\' or \'false\'), a number (\'1\' or \'0\') or \'default\' (without quotes)')
+                            error('Please specify a valid bold status.')
                         end
                     elseif key == 'i' then
                         if options['i'] == 'default' then
-                            italic = _plasmon.defaults.position.italic
+                            italic = defaults.position.italic
                         elseif options['b'] == true or options['i'] == '1' or options['i'] == 'true' or options['i'] == 'null' then
                             italic = true
                         elseif options['i'] == '0' or options['i'] == 'false' then
                             italic = false
                         else
-                            errors:append('font >> font expects \'italic\' to be a number (\'0\' or \'1\'), a boolean (\'false\' or \'true\') or \'default\' (without quotes)')
+                            error('Please specify a valid italic status.')
                         end
                     elseif key == 'a' then
                         if options['a'] == 'default' then
-                            a = _plasmon.defaults.position.a
+                            a = defaults.position.a
                         else
                             a = tonumber(options['a'])
 
                             if type(a) ~= "number" then
-                                errors:append('font >> font expects \'a\' to be a number or \'default\' (without quotes)')
+                            error('Please specify a valid alpha value.')
                             else
                                 a = math.min(255, math.max(0, a))
                             end
                         end
                     else
-                        errors:append('font >> '..key..' is not a recognized parameter')
+                        error('"'..key..'" is not a recognized parameter')
                     end
                 end
 
                 if errors:length() == 0 then
-                    _plasmon.settings.font.family = family
-                    _plasmon.settings.font.size   = size
-                    _plasmon.settings.font.bold   = bold
-                    _plasmon.settings.font.italic = italic
-                    _plasmon.settings.font.a      = a
+                    settings.font.family = family
+                    settings.font.size   = size
+                    settings.font.bold   = bold
+                    settings.font.italic = italic
+                    settings.font.a      = a
 
-                    tb_set_color(_plasmon.tb_name, a, 147, 161, 161)
-                    tb_set_font(_plasmon.tb_name, family, size)
-                    tb_set_bold(_plasmon.tb_name, bold)
-                    tb_set_italic(_plasmon.tb_name, italic)
-                    _plasmon.settings:save('all')
+                    tb_set_color(tb_name, a, 147, 161, 161)
+                    tb_set_font(tb_name, family, size)
+                    tb_set_bold(tb_name, bold)
+                    tb_set_italic(tb_name, italic)
+                    settings:save('all')
+                    notice('The font\'s style has been set.')
                 end
             end
         elseif cmd == 'color' then
@@ -598,16 +605,16 @@ function event_addon_command(...)
             }
 
             if options:containskey('h') or options:length() == 0 then
-                messages:append('color >> sets the colors used by the plugin')
-                messages:append('color >> usage: plasmon color [[-h]|[-o \30\02objects\30\01] [-d] [-r \30\02red\30\01] [-g \30\02green\30\01] [-b \30\02blue\30\01] [-a \30\02alpha\30\01]]')
-                messages:append('color >> optional arguments:')
-                messages:append('color >>   -h    show this message and exit')
-                messages:append('color >>   -o    the objects that will have their color changed. accepted values are: '..validObjects:concat(', '))
-                messages:append('color >>   -d    sets the default r, g, b, a values for the specified objects')
-                messages:append('color >>   -r    the amount of red between 0 and 255')
-                messages:append('color >>   -g    the amount of green between 0 and 255')
-                messages:append('color >>   -b    the amount of blue between 0 and 255')
-                messages:append('color >>   -a    the transparency between 0 (transparent) and 255 (opaque). applies only to background')
+                log('Sets the colors of the various elements present in the addon\'s window. If the no parameter is specified, the help text will be shown.')
+                log('Usage: plasmon color [[-h]|[-o <objects>] [-d] [-r <red>] [-g <green>] [-b <blue>] [-a <alpha>]]')
+                log('Optional arguments:')
+                log('\x81\xa1 -h             shows the help text.')
+                log('\x81\xa1 -o <objects>   specifies the item/s which will have its/their color changed. If this parameter is missing all the objects will be changed. The accepted values are: "'..validObjects:concat('", "')..'"')
+                log('\x81\xa1 -d             sets the red, green, blue and alpha values of the specified objects to their default values.')
+                log('\x81\xa1 -r <red>       specifies the intensity of the red color. The value must be set between 0 and 255, inclusive, where 0 is less intense and 255 is most intense.')
+                log('\x81\xa1 -g <green>     specifies the intensity of the greencolor. The value must be set between 0 and 255, inclusive, where 0 is less intense and 255 is most intense.')
+                log('\x81\xa1 -b <blue>      specifies the intensity of the blue color. The value must be set between 0 and 255, inclusive, where 0 is less intense and 255 is most intense.')
+                log('\x81\xa1 -a <alpha>     specifies the text\'s transparency. The value must be set between 0 (transparent) and 255 (opaque), inclusive.')
             elseif options:length() > 0 then
                 local r = -1
                 local g = -1
@@ -660,7 +667,7 @@ function event_addon_command(...)
                             objects = T{'airlixir.value'}
                         end
                     else
-                        errors:append('color >> color expects \'o\' to be one of the following values: '..validObjects:concat(', '))
+                        error('Please specify a valid objecr or set of objects.')
                     end
                 else
                     objects = T{
@@ -679,7 +686,7 @@ function event_addon_command(...)
                                 r = tonumber(options['r'])
 
                                 if type(r) ~= "number" then
-                                    errors:append('color >> color expects \'r\' to be a number or \'default\' (without quotes)')
+                                    error('Please specify a valid red value.')
                                 else
                                     r = math.min(255, math.max(0, r))
                                 end
@@ -691,7 +698,7 @@ function event_addon_command(...)
                                 g = tonumber(options['g'])
 
                                 if type(g) ~= "number" then
-                                    errors:append('color >> color expects \'g\' to be a number or \'default\' (without quotes)')
+                                    error('Please specify a valid green value.')
                                 else
                                     g = math.min(255, math.max(0, g))
                                 end
@@ -703,7 +710,7 @@ function event_addon_command(...)
                                 b = tonumber(options['b'])
 
                                 if type(b) ~= "number" then
-                                    errors:append('color >> color expects \'b\' to be a number or \'default\' (without quotes)')
+                                    error('Please specify a valid blue value.')
                                 else
                                     b = math.min(255, math.max(0, b))
                                 end
@@ -715,14 +722,14 @@ function event_addon_command(...)
                                 a = tonumber(options['a'])
 
                                 if type(a) ~= "number" then
-                                    errors:append('color >> color expects \'a\' to be a number or \'default\' (without quotes)')
+                                    error('Please specify a valid alpha value.')
                                 else
                                     a = math.min(255, math.max(0, a))
                                 end
                             end
                         elseif key == 'o' then
                         else
-                            errors:append('color >> '..key..' is not a recognized parameter')
+                            error('"'..key..'" is not a recognized parameter.')
                         end
                     end
                 end
@@ -733,71 +740,64 @@ function event_addon_command(...)
 
                         if indexes:length() == 2 then
                             if r == -1 then
-                                _plasmon.settings.colors[indexes[1]][indexes[2]].r = _plasmon.defaults.colors[indexes[1]][indexes[2]].r
+                                settings.colors[indexes[1]][indexes[2]].r = defaults.colors[indexes[1]][indexes[2]].r
                             else
-                                _plasmon.settings.colors[indexes[1]][indexes[2]].r = r
+                                settings.colors[indexes[1]][indexes[2]].r = r
                             end
 
                             if g == -1 then
-                                _plasmon.settings.colors[indexes[1]][indexes[2]].g = _plasmon.defaults.colors[indexes[1]][indexes[2]].g
+                                settings.colors[indexes[1]][indexes[2]].g = defaults.colors[indexes[1]][indexes[2]].g
                             else
-                                _plasmon.settings.colors[indexes[1]][indexes[2]].g = g
+                                settings.colors[indexes[1]][indexes[2]].g = g
                             end
 
                             if b == -1 then
-                                _plasmon.settings.colors[indexes[1]][indexes[2]].b = _plasmon.defaults.colors[indexes[1]][indexes[2]].b
+                                settings.colors[indexes[1]][indexes[2]].b = defaults.colors[indexes[1]][indexes[2]].b
                             else
-                                _plasmon.settings.colors[indexes[1]][indexes[2]].b = b
+                                settings.colors[indexes[1]][indexes[2]].b = b
                             end
                         elseif indexes:length() == 1 then
                             if r == -1 then
-                                _plasmon.settings.colors[indexes[1]].r = _plasmon.defaults.colors[indexes[1]].r
+                                settings.colors[indexes[1]].r = defaults.colors[indexes[1]].r
                             else
-                                _plasmon.settings.colors[indexes[1]].r = r
+                                settings.colors[indexes[1]].r = r
                             end
 
                             if g == -1 then
-                                _plasmon.settings.colors[indexes[1]].g = _plasmon.defaults.colors[indexes[1]].g
+                                settings.colors[indexes[1]].g = defaults.colors[indexes[1]].g
                             else
-                                _plasmon.settings.colors[indexes[1]].g = g
+                                settings.colors[indexes[1]].g = g
                             end
 
                             if b == -1 then
-                                _plasmon.settings.colors[indexes[1]].b = _plasmon.defaults.colors[indexes[1]].b
+                                settings.colors[indexes[1]].b = defaults.colors[indexes[1]].b
                             else
-                                _plasmon.settings.colors[indexes[1]].b = b
+                                settings.colors[indexes[1]].b = b
                             end
 
                             if a == -1 then
-                                _plasmon.settings.colors[indexes[1]].a = _plasmon.defaults.colors[indexes[1]].a
+                                settings.colors[indexes[1]].a = defaults.colors[indexes[1]].a
                             else
-                                _plasmon.settings.colors[indexes[1]].a = a
+                                settings.colors[indexes[1]].a = a
                             end
 
                             tb_set_bg_color(
-                                _plasmon.tb_name,
-                                _plasmon.settings.colors[indexes[1]].a,
-                                _plasmon.settings.colors[indexes[1]].r,
-                                _plasmon.settings.colors[indexes[1]].g,
-                                _plasmon.settings.colors[indexes[1]].b
+                                tb_name,
+                                settings.colors[indexes[1]].a,
+                                settings.colors[indexes[1]].r,
+                                settings.colors[indexes[1]].g,
+                                settings.colors[indexes[1]].b
                             )
                         end
                     end
 
-                    _plasmon.refresh()
-                    _plasmon.settings:save('all')
+                    refresh_window()
+                    settings:save('all')
+                    notice('The objects\' color has been set.')
                 end
             end
         else
             send_command('plasmon help')
         end
-    end
-
-    for key, message in pairs(errors) do
-        add_to_chat(38, 'lua:addon:plasmon:'..message)
-    end
-
-    for key, message in pairs(messages) do
-        add_to_chat(55,'lua:addon:plasmon:'..message)
     end
 end

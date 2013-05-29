@@ -1,54 +1,61 @@
 **Author:** Giuliano Riccio  
-**Version:** v 1.20130528
+**Version:** v 1.20130529
 
 # Plasmon #
 This addon tracks plasm, killed mobs and dropped airlixirs during a delve.
 
 ## Commands ##
 ### help ###
-shows the help text.
+Shows the help text.
 
 ```
 plasmon help
 ```
 
 ### test ###
-fills the chat log with some messages to show how the plugin will work.
+Fills the chat log with some messages to show how the plugin will work.
 
 ```
 plasmon test
 ```
 
 ### reset ###
-sets gained exp and bayld to 0.
+sets current gained plasm, monster kill count and dropped airlixirs to 0.
 
 ```
 plasmon reset
 ```
 
+### full-reset ###
+sets both current and total gained plasm, monster kill count and dropped airlixirs to 0.
+
+```
+plasmon full-reset
+```
+
 ### show ###
-shows the tracking window.
+Shows the tracking window.
 
 ```
 plasmon show
 ```
 
 ### hide ###
-hides the tracking window.
+Hides the tracking window.
 
 ```
 plasmon hide
 ```
 
 ### toggle ###
-toggles the tracking window's visibility.
+Toggles the tracking window's visibility.
 
 ```
 plasmon toggle
 ```
 
 ### light ###
-enables or disabled light mode. when enabled, the addon will never show the window and just print a summary in the chat box at the end of the run. if the _enabled_ parameter is not specified, the help text will be shown.
+Enables or disabled light mode. When enabled, the addon will never show the window and just print a summary in the chat box at the end of the run. If the _enabled_ parameter is not specified, the help text will be shown.
 
 ```
 plasmon light <enabled>
@@ -56,7 +63,7 @@ plasmon light <enabled>
 * **enabled:** specifies the status of the light mode. **default**, **false** or **0** mean disabled. **true** or **1** mean enabled.
 
 ### position ###
-sets the horizontal and vertical position of the window relative to the upper-left corner. if the no parameter is specified, the help text will be shown.
+Sets the horizontal and vertical position of the window relative to the upper-left corner. If no parameter is specified, the help text will be shown.
 
 ```
 plasmon position [[-h]|[-x <x>] [-y <y>]]
@@ -66,7 +73,7 @@ plasmon position [[-h]|[-x <x>] [-y <y>]]
 * **-y _y_:** specifies the vertical position of the window.
 
 ### font ###
-sets the style of the font used in the window. if the no parameter is specified, the help text will be shown.
+Sets the style of the font used in the window. If the no parameter is specified, the help text will be shown.
 
 ```
 plasmon font [[-h]|[-f <font>] [-s <size>] [-a <alpha>] [-b[ <bold>]] [-i[ <italic>]]]
@@ -79,7 +86,7 @@ plasmon font [[-h]|[-f <font>] [-s <size>] [-a <alpha>] [-b[ <bold>]] [-i[ <ital
 * **-i[ _italic_]:** specifies if the text should be rendered italic. **default**, **false** or **0** mean disabled. **true**, **1** or no value mean enabled.
 
 ### color ###
-sets the colors of the various elements present in the addon's window. if the no parameter is specified, the help text will be shown.
+Sets the colors of the various elements present in the addon's window. If the no parameter is specified, the help text will be shown.
 
 ```
 plasmon color [[-h]|[-o <objects>] [-d] [-r <red>] [-g <green>] [-b <blue>] [-a <alpha>]]
@@ -96,15 +103,18 @@ plasmon color [[-h]|[-o <objects>] [-d] [-r <red>] [-g <green>] [-b <blue>] [-a 
 
 ## Changelog ##
 
+### v1.20130529 ###
+* **change**: Aligned to Windower's addon development guidelines.
+
 ### v1.20130528 ###
-* **add:** added a recovery mode in case of crash/reload.
-* **fix:** fixed the mob kill count.
+* **add:** Added a recovery mode in case of crash/reload.
+* **fix:** Fixed the mob kill count.
 
 ### v1.20130517 ###
-* **fix:** fixed a bug that kept the addon from counting airlixirs.
+* **fix:** Fixed a bug that kept the addon from counting airlixirs.
 
 ### v1.20130516 ###
-* **change:** a "light mode" has been added. while active, the window will be kept hidden and only a summary will be shown at the end of the run.
+* **change:** A "light mode" has been added. while active, the window will be kept hidden and only a summary will be shown at the end of the run.
 
 ### v1.20130515###
-* first release.
+* First release.
