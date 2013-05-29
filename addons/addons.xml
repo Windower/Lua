@@ -179,6 +179,11 @@
     <description>A simple helper addon for Spellcast for Scholar Stratagems. It will automatically calculate the number of stratagems you have and push them into spellcast variables.</description>
   </addon>
   <addon>
+    <name>Highlight</name>
+    <description>Highlights when someone is talking about someone in party with coloured text. Uses the same colours as battlemod</description>
+    <author>Balloon</author>
+  </addon>
+  <addon>
     <name>TargetInfo</name>
     <author>Arcon</author>
     <description>Displays information about your current target in memory.</description>
