@@ -20,7 +20,7 @@ findall
 Looks for any item whose name (long or short) contains the specified value on the specified characters.
 
 ```
-findall [:<character1>[ :...]] <query>
+findall [:<character1> [:...]] <query>
 ```
 * **_character1_:** the name of the characters to use for the search.
 * **...:** variable list of character names.
