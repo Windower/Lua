@@ -34,6 +34,10 @@ require 'stringhelper'
 
 slips = require 'slips'
 
+_addon = {}
+_addon.name    = 'porter'
+_addon.version = '1.20130529'
+
 item_names = L{}
 resources  = {
     ['armor']   = '../../plugins/resources/items_armor.xml',
@@ -153,7 +157,7 @@ function event_addon_command(slip_number, slip_page, owned_only)
         if slip_number == 'owned' then
             slip_number = nil
             owned_only  = true
-        else
+        elseif slip_number ~= nil then
             error('That\'s not a valid slip number, kupo!')
         
             return
