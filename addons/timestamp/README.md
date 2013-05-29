@@ -21,7 +21,7 @@ Sets the timestamp's format.
 timestamp format [help|<color>]
 ```
 * **help:** shows the help text.
-* **_format_:** defines the timestamp's format. The available constants are: **year**, **y**, **year_short**, **month**, **m**, **month_short**, **month_long**, **day**, **d**, **day_short**, **day_long**, **hour**, **h**, **hour24**, **hour12**, **minute**, **min**, **second**, **s**, **sec**, **ampm**, **timezone**, **tz**, **timezone_sep**, **tz_sep**, **time**, **date**, **datetime**, **iso8601**, **rfc2822**, **rfc822**, **rfc1036**, **rfc1123**, **rfc3339**
+* **_format_:** defines the timestamp's format. The available constants are: **${year}**, **${y}**, **${year_short}**, **${month}**, **${m}**, **${month_short}**, **${month_long}**, **${day}**, **${d}**, **${day_short}**, **${day_long}**, **${hour}**, **${h}**, **${hour24}**, **${hour12}**, **${minute}**, **${min}**, **${second}**, **${s}**, **${sec}**, **${ampm}**, **${timezone}**, **${tz}**, **${timezone_sep}**, **${tz_sep}**, **${time}**, **${date}**, **${datetime}**, **${iso8601}**, **${rfc2822}**, **${rfc822}**, **${rfc1036}**, **${rfc1123}**, **${rfc3339}**
 
 ### color ###
 Sets the timestamp's color.
