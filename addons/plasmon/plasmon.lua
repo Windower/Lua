@@ -113,7 +113,7 @@ settings = T{}
 
 -- plugin functions
 
-function parseOptions(args)
+function parse_options(args)
     local options = T{}
 
     while #args > 0 do
@@ -462,7 +462,7 @@ function event_addon_command(...)
             end
         end
     else
-        local options = parseOptions(args)
+        local options = parse_options(args)
 
         if cmd == 'position' then
             if options:containskey('h') or options:length() == 0 then
