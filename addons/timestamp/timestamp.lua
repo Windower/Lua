@@ -35,7 +35,7 @@ require 'tablehelper'
 config = require 'config'
 
 _addon = {}
-_addon.name = 'timestamp'
+_addon.name    = 'timestamp'
 _addon.version = '1.20130529'
 
 function timezone(separator)
