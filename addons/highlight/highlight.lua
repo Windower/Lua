@@ -31,6 +31,7 @@ config = require 'config'
 settings=config.load()
 
 defaults = {}
+defaults.colors = {}
 defaults.colors.p0 = 501
 defaults.colors.p1 = 204
 defaults.colors.p2 = 410
