@@ -24,9 +24,10 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+chat = require 'chat'
+ 
 members={}
 modmember={}
-color={}
 config = require 'config'
 
 defaults = {}
@@ -83,30 +84,11 @@ function event_incoming_text(original, modified, color)
 	end
 	return modified
 end
-
-function colconv(str,key)
-	-- Used in the options_load() function. Taken from Battlemod
-	local out
-	strnum = tonumber(str)
-	if strnum >= 256 and strnum < 509 then
-		strnum = strnum - 254
-		out = string.char(0x1E,strnum)
-	elseif strnum >0 then
-		out = string.char(0x1F,strnum)
-	elseif strnum == 0 then
-		out = rcol
-	else
-		write('You have an invalid color '..key)
-		out = string.char(0x1F,1)
-	end
-	return out
-end
 	
 function get_party_members()
 	for member in pairs(get_party()) do
 		members[member] = get_party()[member]['name']
-		modmember[member]=color[member]..get_party()[member]['name']..'\x1E\x01'
-	end
+		modmember[member] = get_party()[member]['name']:color(settings.colors[member])	end
 end
 
 function event_incoming_chunk(id, data)
