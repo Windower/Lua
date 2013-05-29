@@ -42,17 +42,17 @@ track         = false
 visible       = false
 recovery_mode = false
 
-stats               = T{}
-stats.plasm         = 0
-stats.totPlasm      = 0
-stats.mobs          = 0
-stats.totMobs       = 0
-stats.airlixirs     = 0
-stats.totAirlixirs  = 0
-stats.airlixirs1    = 0
-stats.totAirlixirs1 = 0
-stats.airlixirs2    = 0
-stats.totAirlixirs2 = 0
+stats                = T{}
+stats.plasm          = 0
+stats.tot_plasm      = 0
+stats.mobs           = 0
+stats.tot_mobs       = 0
+stats.airlixirs      = 0
+stats.tot_airlixirs  = 0
+stats.airlixirs1     = 0
+stats.tot_airlixirs1 = 0
+stats.airlixirs2     = 0
+stats.tot_airlixirs2 = 0
 
 defaults = T{}
 defaults.v         = 0
@@ -183,21 +183,21 @@ function refresh_window()
         return
     end
 
-    local delveColors    = settings.colors.delve
-    local airlixirColors = settings.colors.airlixir
-    local text           = T{
-        ' \\cs('..delveColors.title.r..', '..delveColors.title.g..', '..delveColors.title.b..')--== DELVE ==--\\cr \n',
-        ' \\cs('..delveColors.label.r..', '..delveColors.label.g..', '..delveColors.label.b..')Plasm:\\cr',
-        ' \\cs('..delveColors.value.r..', '..delveColors.value.g..', '..delveColors.value.b..')'..stats.plasm..'/'..stats.totPlasm..'\\cr \n',
-        ' \\cs('..delveColors.label.r..', '..delveColors.label.g..', '..delveColors.label.b..')Mobs:\\cr',
-        ' \\cs('..delveColors.value.r..', '..delveColors.value.g..', '..delveColors.value.b..')'..stats.mobs..'/'..stats.totMobs..'\\cr \n',
-        ' \\cs('..airlixirColors.title.r..', '..airlixirColors.title.g..', '..airlixirColors.title.b..')--== AIRLIXIRS ==--\\cr \n',
-        ' \\cs('..airlixirColors.label.r..', '..airlixirColors.label.g..', '..airlixirColors.label.b..')Airlixir:\\cr',
-        ' \\cs('..airlixirColors.value.r..', '..airlixirColors.value.g..', '..airlixirColors.value.b..')'..stats.airlixirs..'/'..stats.totAirlixirs..'\\cr \n',
-        ' \\cs('..airlixirColors.label.r..', '..airlixirColors.label.g..', '..airlixirColors.label.b..')Airlixir +1:\\cr',
-        ' \\cs('..airlixirColors.value.r..', '..airlixirColors.value.g..', '..airlixirColors.value.b..')'..stats.airlixirs1..'/'..stats.totAirlixirs1..'\\cr \n',
-        ' \\cs('..airlixirColors.label.r..', '..airlixirColors.label.g..', '..airlixirColors.label.b..')Airlixir +2:\\cr',
-        ' \\cs('..airlixirColors.value.r..', '..airlixirColors.value.g..', '..airlixirColors.value.b..')'..stats.airlixirs2..'/'..stats.totAirlixirs2..'\\cr'
+    local delve_colors    = settings.colors.delve
+    local airlixir_colors = settings.colors.airlixir
+    local text            = T{
+        ' \\cs('..delve_colors.title.r..', '..delve_colors.title.g..', '..delve_colors.title.b..')--== DELVE ==--\\cr \n',
+        ' \\cs('..delve_colors.label.r..', '..delve_colors.label.g..', '..delve_colors.label.b..')Plasm:\\cr',
+        ' \\cs('..delve_colors.value.r..', '..delve_colors.value.g..', '..delve_colors.value.b..')'..stats.plasm..'/'..stats.tot_plasm..'\\cr \n',
+        ' \\cs('..delve_colors.label.r..', '..delve_colors.label.g..', '..delve_colors.label.b..')Mobs:\\cr',
+        ' \\cs('..delve_colors.value.r..', '..delve_colors.value.g..', '..delve_colors.value.b..')'..stats.mobs..'/'..stats.tot_mobs..'\\cr \n',
+        ' \\cs('..airlixir_colors.title.r..', '..airlixir_colors.title.g..', '..airlixir_colors.title.b..')--== AIRLIXIRS ==--\\cr \n',
+        ' \\cs('..airlixir_colors.label.r..', '..airlixir_colors.label.g..', '..airlixir_colors.label.b..')Airlixir:\\cr',
+        ' \\cs('..airlixir_colors.value.r..', '..airlixir_colors.value.g..', '..airlixir_colors.value.b..')'..stats.airlixirs..'/'..stats.tot_airlixirs..'\\cr \n',
+        ' \\cs('..airlixir_colors.label.r..', '..airlixir_colors.label.g..', '..airlixir_colors.label.b..')Airlixir +1:\\cr',
+        ' \\cs('..airlixir_colors.value.r..', '..airlixir_colors.value.g..', '..airlixir_colors.value.b..')'..stats.airlixirs1..'/'..stats.tot_airlixirs1..'\\cr \n',
+        ' \\cs('..airlixir_colors.label.r..', '..airlixir_colors.label.g..', '..airlixir_colors.label.b..')Airlixir +2:\\cr',
+        ' \\cs('..airlixir_colors.value.r..', '..airlixir_colors.value.g..', '..airlixir_colors.value.b..')'..stats.airlixirs2..'/'..stats.tot_airlixirs2..'\\cr'
     }
 
     tb_set_text(tb_name, text:concat(''))
@@ -213,11 +213,11 @@ function reset_stats()
 end
 
 function full_reset_stats()
-    stats.totPlasm      = 0
-    stats.totMobs       = 0
-    stats.totAirlixirs  = 0
-    stats.totAirlixirs1 = 0
-    stats.totAirlixirs2 = 0
+    stats.tot_plasm      = 0
+    stats.tot_mobs       = 0
+    stats.tot_airlixirs  = 0
+    stats.tot_airlixirs1 = 0
+    stats.tot_airlixirs2 = 0
     reset_stats()
     refresh_window()
 end
@@ -242,7 +242,7 @@ function toggle_window()
 end
 
 function show_report()
-    add_to_chat(0, '\30\03[Plasm\30\01 \30\02'..stats.plasm..'/'..stats.totPlasm..'\30\01\30\03] [Mobs\30\01 \30\02'..stats.mobs..'/'..stats.totMobs..'\30\01\30\03] [Airlixir\30\01 \30\02'..stats.airlixirs..'/'..stats.totAirlixirs..'\30\01\30\03 | +1\30\01 \30\02'..stats.airlixirs1..'/'..stats.totAirlixirs1..'\30\01\30\03 | +2\30\01 \30\02'..stats.airlixirs2..'/'..stats.totAirlixirs2..'\30\01\30\03]\30\01')
+    log('[Plasm \30\02'..stats.plasm..'/'..stats.tot_plasm..'\30\01] [Mobs \30\02'..stats.mobs..'/'..stats.tot_mobs..'\30\01] [Airlixir \30\02'..stats.airlixirs..'/'..stats.tot_airlixirs..'\30\01 | +1 \30\02'..stats.airlixirs1..'/'..stats.tot_airlixirs1..'\30\01 | +2 \30\02'..stats.airlixirs2..'/'..stats.tot_airlixirs2..'\30\01]')
 end
 
 function first_run()
@@ -312,8 +312,8 @@ function event_incoming_text(original, modified, mode)
                 
                 match = tonumber(match, 10)
 
-                stats.plasm    = stats.plasm + match
-                stats.totPlasm = stats.totPlasm + match
+                stats.plasm     = stats.plasm + match
+                stats.tot_plasm = stats.tot_plasm + match
 
                 if match ~= 50 and match ~= 500 and match ~= 750 then
                     mobs = match / 50
@@ -321,8 +321,8 @@ function event_incoming_text(original, modified, mode)
                     mobs = 1
                 end
 
-                stats.mobs    = stats.mobs + mobs
-                stats.totMobs = stats.totMobs + mobs
+                stats.mobs     = stats.mobs + mobs
+                stats.tot_mobs = stats.tot_mobs + mobs
                 refresh_window()
 
                 return modified, mode
@@ -336,7 +336,7 @@ function event_incoming_text(original, modified, mode)
                 end
                 
                 stats.airlixirs1    = stats.airlixirs1 + 1
-                stats.totAirlixirs1 = stats.totAirlixirs1 + 1
+                stats.tot_airlixirs1 = stats.tot_airlixirs1 + 1
                 refresh_window()
 
                 return modified, mode
@@ -349,8 +349,8 @@ function event_incoming_text(original, modified, mode)
                     start_tracking()
                 end
                 
-                stats.airlixirs2    = stats.airlixirs2 + 1
-                stats.totAirlixirs2 = stats.totAirlixirs2 + 1
+                stats.airlixirs2     = stats.airlixirs2 + 1
+                stats.tot_airlixirs2 = stats.tot_airlixirs2 + 1
                 refresh_window()
 
                 return modified, mode
@@ -363,8 +363,8 @@ function event_incoming_text(original, modified, mode)
                     start_tracking()
                 end
                 
-                stats.airlixirs    = stats.airlixirs + 1
-                stats.totAirlixirs = stats.totAirlixirs + 1
+                stats.airlixirs     = stats.airlixirs + 1
+                stats.tot_airlixirs = stats.tot_airlixirs + 1
                 refresh_window()
 
                 return modified, mode
