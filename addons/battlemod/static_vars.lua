@@ -45,6 +45,68 @@ receives_map = T{0,0,186,82,375,116,0,0,0,0,186,0,186,116,116}
 stat_ignore = T{66,69,70,71,444,445,446}
 enfeebling = T{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,155,156,157,158,159,167,168,174,175,177,186,189,192,193,194,223,259,260,261,262,263,264,298,378,379,380,386,387,388,389,390,391,392,393,394,395,396,397,398,399,400,404,448,449,450,451,452,473,540,557,558,559,560,561,562,563,564,565,566,567}
 
+color_arr = {}
+filter = {}
+wearing = {}
+line_full = '[${actor}] ${number} ${abil} '..string.char(129,168)..' ${target}'
+line_noactor = '${abil} ${number} '..string.char(129,168)..' ${target}'
+line_nonumber = '[${actor}] ${abil} '..string.char(129,168)..' ${target}'
+line_noabil = 'AOE ${number} '..string.char(129,168)..' ${target}'
+line_aoebuff = '${actor} ${abil} '..string.char(129,168)..' ${target} (${status})'
+line_roll = '${actor} ${abil} '..string.char(129,168)..'${target}'..string.char(129,170)..' ${number}'
+
+message_map = {}
+for n=1,700,1 do
+	message_map[n] = T{}
+end
+message_map[85] = T{284} -- resist
+message_map[653] = T{654} -- immunobreak
+message_map[655] = T{656} -- complete resist
+message_map[93] = T{273} -- vanishes
+--	message_map[75] =  -- no effect spell
+message_map[156] = T{156,323,422,425} -- no effect ability
+--	message_map[189] = -- no effect ws
+--	message_map[408] = -- no effect item
+message_map[248] = T{355} -- no ability of any kind
+message_map['No effect'] = T{283,423,659} -- generic "no effect" messages for sorting by category
+message_map[432] = T{433} -- Receives: Spell, Target
+message_map[82] = T{230,236,237,268,271} -- Receives: Spell, Target, Status
+message_map[116] = T{131,134,144,146,148,150,364,414,416,441,602,668,285,145,147,149,151,286,287,365,415,421} -- Receives: Ability, Target
+message_map[127]=T{319,320,645} -- Receives: Ability, Target, Status
+message_map[420]=T{424} -- Receives: Ability, Target, Status, Number
+message_map[375] = T{412}-- Receives: Item, Target, Status
+--	message_map[166] =  -- receives additional effect
+message_map[186] = T{194,242,243}-- Receives: Weapon skill, Target, Status
+message_map['Receives'] = T{203,205,266,270,272,277,279,280,267,269,278}
+message_map[426] = T{427} -- Loses
+
+
+speFile = file.new('../../plugins/resources/spells.xml')
+jaFile = file.new('../../plugins/resources/abils.xml')
+statusFile = file.new('../../plugins/resources/status.xml')
+dialogFile = file.new('../../addons/libs/resources/dialog4.xml')
+mabilsFile = file.new('../../addons/libs/resources/mabils.xml')
+itemsGFile = file.new('../../plugins/resources/items_general.xml')
+itemsAFile = file.new('../../plugins/resources/items_armor.xml')
+itemsWFile = file.new('../../plugins/resources/items_weapons.xml')
+
+jobabilities = parse_resources(jaFile:readlines())
+spells = parse_resources(speFile:readlines())
+statuses = parse_resources(statusFile:readlines())
+dialog = parse_resources(dialogFile:readlines())
+mabils = parse_resources(mabilsFile:readlines())
+statuses = parse_resources(statusFile:readlines())
+items = table.range(65535)
+items:update(parse_resources(itemsGFile:readlines()))
+items:update(parse_resources(itemsAFile:readlines()))
+items:update(parse_resources(itemsWFile:readlines()))
+
+enLog = {}
+for i,v in pairs({0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,134,135,155,156,157,168,176,177,259,260,261,262,263,264,309,474}) do
+	enLog[v] = statuses[v]['enLog']
+end
+
+
 default_filters = [[
 <?xml version="1.0" ?>
 <!-- Filters are customizable based on the action user. So if you filter other pets, you're going
