@@ -450,7 +450,7 @@ function event_addon_command(...)
             log('Enables or disabled light mode. When enabled, the addon will never show the window and just print a summary in the chat box at the end of the run. Ff the enabled parameter is not specified, the help text will be shown.')
             log('Usage: reive light <enabled>')
             log('Positional arguments:')
-            log('  <enabled>    specifies the status of the light mode. "default", "false" or "0" mean disabled. "true" or "1" mean enabled.')
+            log('\x81\xa1 <enabled>    specifies the status of the light mode. "default", "false" or "0" mean disabled. "true" or "1" mean enabled.')
         else
             local light
 
@@ -487,7 +487,7 @@ function event_addon_command(...)
             log('Sets the max amount of scores to show in the window. If the amount parameter is not specified, the help text will be shown.')
             log('Usage: reive max-scores <amount>')
             log('Positional arguments:')
-            log('  <amount>    specifies the max amount of status scores that will be show. By default this value is 5. Setting this value to 0 will hide the scores section.')
+            log('\x81\xa1 <amount>    specifies the max amount of status scores that will be show. By default this value is 5. Setting this value to 0 will hide the scores section.')
         elseif args[1] == 'default' then
             max_scores = defaults.max_scores
         else
@@ -522,8 +522,8 @@ function event_addon_command(...)
             log('Specifies the visibility of a bonus in the window.')
             log('Usage: reive track <bonus> <visible>')
             log('Positional arguments:')
-            log('  <bonus>      specifies the item which will have its visibility changed. The accepted values are : '..validObjects:concat(', '))
-            log('  <visible>    specifies the visibility of the bonus. "false" or "0" mean disabled. "default", "true" or "1" mean enabled.')
+            log('\x81\xa1 <bonus>      specifies the item which will have its visibility changed. The accepted values are : '..validObjects:concat(', '))
+            log('\x81\xa1 <visible>    specifies the visibility of the bonus. "false" or "0" mean disabled. "default", "true" or "1" mean enabled.')
         elseif validObjects:contains(args[1]) then
             object = args[1]:gsub('-', '_')
 
@@ -553,9 +553,9 @@ function event_addon_command(...)
                 log('Sets the horizontal and vertical position of the window relative to the upper-left corner. If no parameter is specified, the help text will be shown.')
                 log('Usage: reive position [[-h]|[-x <x>] [-y <y>]]')
                 log('Optional arguments:')
-                log('  -h        shows the help text.')
-                log('  -x <x>    specifies the horizontal position of the window.')
-                log('  -y <y>    specifies the vertical position of the window.')
+                log('\x81\xa1 -h        shows the help text.')
+                log('\x81\xa1 -x <x>    specifies the horizontal position of the window.')
+                log('\x81\xa1 -y <y>    specifies the vertical position of the window.')
             elseif options:length() > 0 then
                 local x = settings.position.x
                 local y = settings.position.y
