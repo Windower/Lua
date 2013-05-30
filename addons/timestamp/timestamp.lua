@@ -179,6 +179,6 @@ function event_addon_command(...)
             end
         end
     else
-        error('"'..cmd..'" is not a valid command.')
+        send_command('reive help')
     end
 end
