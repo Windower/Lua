@@ -17,5 +17,8 @@ vwhl test
 
 ## Changelog ##
 
+### v1.20130529###
+* **change**: Aligned to Windower's addon development guidelines.
+
 ### v1.20130407###
 * First release.
