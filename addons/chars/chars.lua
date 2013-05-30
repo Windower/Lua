@@ -64,12 +64,12 @@ function event_outgoing_text(original, modified)
             end
         end
 
-        modified = modified:gsub('<j:'..str..'>', table.concat(jString), 1)
+        modified = modified:gsub('<j:'..str:escape()..'>', table.concat(jString), 1)
     end
 
     for char in modified:gmatch('<([%w]+)>') do
         if type(chars[char]) ~= 'nil' then
-            modified = modified:gsub('<'..char..'>', chars[char], 1)
+            modified = modified:gsub('<'..char:escape()..'>', chars[char], 1)
         end
     end
 
