@@ -59,6 +59,13 @@
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
+    <author>Ikonic</author>
+    <name>ChatPorter</name>
+    <description>Displays tell, party, and linkshell chat to alternate character.  Also, allows you to reply from either character.</description>
+    <bugtracker>https://github.com/Icinoki/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Ragnarok/Ikonic</support>
+  </addon>
+  <addon>
     <name>Daze</name>
     <description>Records what daze effects are on the monster you're fighting.</description>
   </addon>
