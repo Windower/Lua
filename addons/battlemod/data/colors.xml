@@ -38,6 +38,7 @@
 		<wscol>0</wscol>
 		<mobwscol>0</mobwscol>
 		<statuscol>0</statuscol>
+		<enfeebcol>475</enfeebcol>
 		<itemcol>256</itemcol>
 	
 	</global>

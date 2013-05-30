@@ -33,6 +33,7 @@ require 'tablehelper'
 -- Battlemod Files --
 require 'event_action'
 require 'generic_helpers'
+require 'static_vars'
 
 function event_load()
 	version = '2.15'
@@ -49,21 +50,6 @@ function event_load()
 	line_noabil = 'AOE ${number} '..string.char(129,168)..' ${target}'
 	line_aoebuff = '${actor} ${abil} '..string.char(129,168)..' ${target} (${status})'
 	line_roll = '${actor} ${abil} '..string.char(129,168)..'${target}'..string.char(129,170)..' ${number}'
-	skillchain_arr = {'Light:','Darkness:','Gravitation:','Fragmentation:','Distortion:','Fusion:','Compression:','Liquefaction:','Induration:','Reverberation:','Transfixion:','Scission:','Detonation:','Impaction:'}
-	ratings_arr = {'TW','EP','DC','EM','T','VT','IT'}
-	rcol = string.char(0x1E,0x01)
-	blocked_colors = T{20,21,22,23,24,25,26,28,29,30,31,32,33,35,36,37,40,41,42,43,44,50,51,52,56,57,59,60,61,63,68,69,64,65,67,69,81,85,90,91,100,101,102,104,105,106,107,110,111,112,114,122,127,162,163,164,166,168,170,171,174,175,177,182,183,185,186,191}
-	passed_messages = T{4,5,6,16,17,18,20,34,35,36,40,47,48,49,64,78,87,88,89,90,112,116,154,170,171,172,173,174,175,176,177,178,191,192,198,204,215,217,218,234,246,249,328,350,336,531,558,561,575,601,609,562,610,611,612,613,614,615,616,617,618,619,620,625,626,627,628,629,630,631,632,633,634,635,636,643,660,661,662}
-	agg_messages = T{85,653,655,75,156,189,248,323,355,408,422,425,82,93,116,127,131,134,151,144,146,148,150,166,186,194,230,236,237,242,243,268,271,319,320,364,375,412,414,416,420,424,426,432,433,441,602,645,668}
-	color_redundant = T{26,33,41,71,72,89,94,109,114,164,173,181,184,186,70,84,104,127,128,129,130,131,132,133,134,135,136,137,138,139,140,64,86,91,106,111,175,178,183,81,101,16,65,87,92,107,112,174,176,182,82,102,67,68,69,170,189,15,208,18,25,32,40,163,185,23,24,27,34,35,42,43,162,165,187,188,30,31,14,205,144,145,146,147,148,149,150,151,152,153,190,13,9,253,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,284,285,286,287,292,293,294,295,300,301,301,303,308,309,310,311,316,317,318,319,324,325,326,327,332,333,334,335,340,341,342,343,344,345,346,347,348,349,350,351,355,357,358,360,361,363,366,369,372,374,375,378,381,384,395,406,409,412,415,416,418,421,424,437,450,453,456,458,459,462,479,490,493,496,499,500,502,505,507,508,10,51,52,55,58,62,66,80,83,85,88,90,93,100,103,105,108,110,113,122,168,169,171,172,177,179,180,12,11,37,291} -- 37 and 291 might be unique colors, but they are not gsubbable.
-	black_colors = T{352,354,356,388,390,400,402,430,432,442,444,472,474,484,486}
-
---	resists = {85,284}
---	immunobreaks = {653,654}
---	complete_resists = {655,656}
---	no_effects = {75,156,189,248,323,355,408,422,425,283,423,659}
---	receives = {82,116,127,131,134,151,144,146,148,150,166,186,194,230,236,237,242,243,268,271,319,320,364,375,412,414,416,420,424,426,432,433,441,602,645,668,203,205,266,270,272,277,279,280,285,145,147,149,151,267,269,278,286,287,365,415,421,427}
---	vanishes = {93,273}
 	
 	message_map = {}
 	for n=1,700,1 do
@@ -93,11 +79,7 @@ function event_load()
 	message_map[186] = T{194,242,243}-- Receives: Weapon skill, Target, Status
 	message_map['Receives'] = T{203,205,266,270,272,277,279,280,267,269,278}
 	message_map[426] = T{427} -- Loses
-	no_effect_map = T{248,355,189,75,408,156,0,0,0,0,189,0,189,156,156}
-	receives_map = T{0,0,186,82,375,116,0,0,0,0,186,0,186,116,116}
-	stat_ignore = T{66,69,70,71,444,445,446}
 	
-	enfeebling = T{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,155,156,157,158,159,167,168,174,175,177,186,189,192,193,194,223,259,260,261,262,263,264,298,378,379,380,386,387,388,389,390,391,392,393,394,395,396,397,398,399,400,404,448,449,450,451,452,473,540,557,558,559,560,561,562,563,564,565,566,567}
 	
 	speFile = file.new('../../plugins/resources/spells.xml')
 	jaFile = file.new('../../plugins/resources/abils.xml')
@@ -135,31 +117,7 @@ function options_load()
 	local colorsFile=file.new('data/colors.xml',true)
 	
 	if not file.exists('data/settings.xml') then
-		settingsFile:write([[
-<?xml version="1.0" ?>
-<!-- For the output customization lines, ${actor} denotes a value to be replaced. The options are actor, number, abil, and target.
-	 Options for other modes are either "true" or "false". Other values will not be interpreted.-->
-<settings>
-	<global>
-		<condensedamage>true</condensedamage>
-		<condensebattle>true</condensebattle>
-		<condensebuffs>true</condensebuffs>
-		<cancelmulti>true</cancelmulti>
-		<oxford>true</oxford>
-		<commamode>false</commamode>
-		<supersilence>true</supersilence>
-		<targetnumber>true</targetnumber>
-		
-		
-		<line_full>[${actor}] ${number} ${abil} ]]..string.char(129,168)..[[ ${target}</line_full>
-		<line_noactor>${abil} ${number} ]]..string.char(129,168)..[[ ${target}</line_noactor>
-		<line_nonumber>[${actor}] ${abil} ]]..string.char(129,168)..[[ ${target}</line_nonumber>
-		<line_noabil>AOE ${number} ]]..string.char(129,168)..[[ ${target}</line_noabil>
-		<line_aoebuff>${actor} ${abil} ]]..string.char(129,168)..[[ ${target} (${status})</line_aoebuff>
-		<line_roll>${actor} ${abil} ]]..string.char(129,168)..[[ ${target} ]]..string.char(129,170)..[[ ${number}</line_roll>
-	</global>
-</settings>
-]])
+		settingsFile:write(default_settings)
 		write('Default settings xml file created')
 	end
 	
@@ -168,163 +126,7 @@ function options_load()
 		_G[i] = v
 	end
 	if not file.exists('data/filters/filters.xml') then
-			filterFile:write([[
-<?xml version="1.0" ?>
-<!-- Filters are customizable based on the action user. So if you filter other pets, you're going
-     to eliminate all messages initiated by everyone's pet but your own.
-     True means "filter this"
-     False means "don't filter this"
-	 
-	 Generally, the outer tag is the actor and the inner tag is the action.
-	 If the monster is the actor, then the inner tag is the target and the tag beyond that is the action.-->
-<settings>
-    <global>
-        <me> <!-- You're doing something -->
-            <melee>false</melee>  <!-- Prevents your melee ("white") damage from appearing -->
-            <ranged>false</ranged> <!-- Prevents your ranged damage from appearing -->
-            <damage>false</damage> <!-- Prevents your damage from appearing -->
-            <healing>false</healing> <!-- Prevents your healing from appearing -->
-            <misses>false</misses> <!-- Prevents your misses from appearing -->
-            <items>false</items> <!-- Prevents your "Jim used an item. Jim gains the effect of Reraise." messages from appearing -->
-            <uses>false</uses> <!-- Prevents your "Jim uses an item." messages from appearing -->
-            <readies>false</readies> <!-- Prevents your "Jim readies ____" messages from appearing -->
-            <casting>false</casting> <!-- Prevents your "Jim begins casting ____" messages from appearing -->
-            <all>false</all> <!-- Prevents all of your messages from appearing -->
-        </me>
-        <party> <!-- A party member is doing something -->
-            <melee>false</melee>
-            <ranged>false</ranged>
-            <damage>false</damage>
-            <healing>false</healing>
-            <misses>false</misses>
-            <items>false</items>
-            <uses>false</uses>
-            <readies>false</readies>
-            <casting>false</casting>
-            <all>false</all>
-        </party>
-        <alliance> <!-- An alliance member is doing something -->
-            <melee>false</melee>
-            <ranged>false</ranged>
-            <damage>false</damage>
-            <healing>false</healing>
-            <misses>false</misses>
-            <items>false</items>
-            <uses>false</uses>
-            <readies>false</readies>
-            <casting>false</casting>
-            <all>false</all>
-        </alliance>
-        <others> <!-- Some guy nearby is doing something -->
-            <melee>false</melee>
-            <ranged>false</ranged>
-            <damage>false</damage>
-            <healing>false</healing>
-            <misses>false</misses>
-            <items>false</items>
-            <uses>false</uses>
-            <readies>false</readies>
-            <casting>false</casting>
-            <all>false</all>
-        </others>
-        <my_pet> <!-- Your pet is doing something -->
-            <melee>false</melee>
-            <ranged>false</ranged>
-            <damage>false</damage>
-            <healing>false</healing>
-            <misses>false</misses>
-            <readies>false</readies>
-            <casting>false</casting>
-            <all>false</all>
-        </my_pet>
-        <other_pets> <!-- Someone else's pet is doing something -->
-            <melee>false</melee>
-            <ranged>false</ranged>
-            <damage>false</damage>
-            <healing>false</healing>
-            <misses>false</misses>
-            <readies>false</readies>
-            <casting>false</casting>
-            <all>false</all>
-        </other_pets>
-		
-		
-        <monsters> <!-- Monster is doing something with one of the below targets -->
-			<me> <!-- He's targeting you! -->
-				<melee>false</melee>
-				<ranged>false</ranged>
-				<damage>false</damage>
-				<healing>false</healing>
-				<misses>false</misses>
-				<readies>false</readies>
-				<casting>false</casting>
-				<all>false</all>
-			</me>
-			<party> <!-- He's targeting a party member -->
-				<melee>false</melee>
-				<ranged>false</ranged>
-				<damage>false</damage>
-				<healing>false</healing>
-				<misses>false</misses>
-				<readies>false</readies>
-				<casting>false</casting>
-				<all>false</all>
-			</party>
-			<alliance> <!-- He's targeting an alliance member -->
-				<melee>false</melee>
-				<ranged>false</ranged>
-				<damage>false</damage>
-				<healing>false</healing>
-				<misses>false</misses>
-				<readies>false</readies>
-				<casting>false</casting>
-				<all>false</all>
-			</alliance>
-			<others> <!-- He's targeting some guy nearby -->
-				<melee>false</melee>
-				<ranged>false</ranged>
-				<damage>false</damage>
-				<healing>false</healing>
-				<misses>false</misses>
-				<readies>false</readies>
-				<casting>false</casting>
-				<all>false</all>
-			</others>
-			<my_pet> <!-- He's targeting your pet -->
-				<melee>false</melee>
-				<ranged>false</ranged>
-				<damage>false</damage>
-				<healing>false</healing>
-				<misses>false</misses>
-				<readies>false</readies>
-				<casting>false</casting>
-				<all>false</all>
-			</my_pet>
-			<other_pets> <!-- He's targeting someone else's pet -->
-				<melee>false</melee>
-				<ranged>false</ranged>
-				<damage>false</damage>
-				<healing>false</healing>
-				<misses>false</misses>
-				<readies>false</readies>
-				<casting>false</casting>
-				<all>false</all>
-			</other_pets>
-			
-			<monsters> <!-- He's targeting himself or another monster -->
-				<melee>false</melee>
-				<ranged>false</ranged>
-				<damage>false</damage>
-				<healing>false</healing>
-				<misses>false</misses>
-				<readies>false</readies>
-				<casting>false</casting>
-				<all>false</all>
-			</monsters>
-        </monsters>
-    </global>
-</settings>
-]])
+			filterFile:write(default_filters)
 			write('Default filters xml file created')
 	end
 	
@@ -336,52 +138,7 @@ function options_load()
 	end
 	
 	if not file.exists('data/colors.xml') then
-		colorsFile:write([[
-<? xml version="1.0" ?>
-<!-- Colors are customizable based on party / alliance position. Use the colortest command to view the available colors.
-	 If you wish for a color to be unchanged from its normal color, set it to 0. -->
-<settings>
-	<global>
-		<mob>69</mob>
-		<other>8</other>
-		
-		<p0>501</p0>
-		<p1>204</p1>
-		<p2>410</p2>
-		<p3>492</p3>
-		<p4>259</p4>
-		<p5>260</p5>
-		
-		<a10>205</a10>
-		<a11>359</a11>
-		<a12>167</a12>
-		<a13>038</a13>
-		<a14>125</a14>
-		<a15>185</a15>
-		
-		<a20>429</a20>
-		<a21>257</a21>
-		<a22>200</a22>
-		<a23>481</a23>
-		<a24>483</a24>
-		<a25>208</a25>
-		
-		<mobdmg>0</mobdmg>
-		<mydmg>0</mydmg>
-		<partydmg>0</partydmg>
-		<allydmg>0</allydmg>
-		<otherdmg>0</otherdmg>
-		
-		<spellcol>0</spellcol>
-		<abilcol>0</abilcol>
-		<wscol>0</wscol>
-		<mobwscol>0</mobwscol>
-		<statuscol>0</statuscol>
-		<enfeebcol>501</enfeebcol>
-		<itemcol>256</itemcol>
-	</global>
-</settings>
-]])
+		colorsFile:write(default_colors)
 		write('Default colors xml file created')
 	end
 	
@@ -409,24 +166,6 @@ end
 
 function event_login(name)
 	send_command('wait 10;bm reload')
-end
-
-function colconv(str,key)
-	-- Used in the options_load() function
-	local out
-	strnum = tonumber(str)
-	if strnum >= 256 and strnum < 509 then
-		strnum = strnum - 254
-		out = string.char(0x1E,strnum)
-	elseif strnum >0 then
-		out = string.char(0x1F,strnum)
-	elseif strnum == 0 then
-		out = rcol
-	else
-		write('You have an invalid color '..key)
-		out = string.char(0x1F,1)
-	end
-	return out
 end
 
 function event_addon_command(...)
@@ -500,9 +239,6 @@ function event_addon_command(...)
 	else
 		if splitarr[1] == 'flip' then
 			_G[splitarr[2]] = not _G[splitarr[2]]
-			if splitarr[2] == 'allow' then
-				prevline = ''
-			end
 		elseif splitarr[1] == 'wearsoff' then
 			local trash = table.remove(splitarr,1)
 			local stat = table.concat(splitarr,' ')
@@ -523,7 +259,7 @@ function event_addon_command(...)
 				targets = '['..len..'] '..targets
 			end
 			local outstr = dialog[206]['english']:gsub('$\123target\125',targets):gsub('$\123status\125',stat)
-			add_to_chat(191,string.char(0x1F,191)..outstr..string.char(127,49))
+			add_to_chat(1,string.char(0x1F,191)..outstr..string.char(127,49))
 			wearing[stat] = nil
 		end
 	end
@@ -547,7 +283,7 @@ function event_incoming_text(original, modified, color)
 	end
 	
 	if redcol == 121 and cancelmulti then
-		a,z = string.find(original,'Equipment changed.')
+		a,z = string.find(original,'Equipment changed')
 		
 		if a and not block_equip then
 			send_command('wait 1;lua c battlemod flip block_equip')
@@ -558,12 +294,13 @@ function event_incoming_text(original, modified, color)
 	end
 	
 	if redcol == 123 and cancelmulti then
-		a,z = string.find(original,'You were unable to change your equipped items.')
+		a,z = string.find(original,'You were unable to change your equipped items')
+		b,z = string.find(original,'You cannot use that command while viewing the chat log')
 		
-		if a and not block_cannot then
+		if (a or b) and not block_cannot then
 			send_command('wait 1;lua c battlemod flip block_cannot')
 			block_cannot = true
-		elseif a and block_cannot then
+		elseif (a or b) and block_cannot then
 			modified = ''
 		end
 	end
@@ -624,7 +361,13 @@ function event_action_message(actor_id,index,actor_target_index,target_target_in
 			spell = nf(spells[param_1],'english')
 		end
 		
-		if status then status = color_it(status,color_arr['statuscol']) end
+		if status then
+			if enfeebling:contains(param_1) then
+				status = color_it(status,color_arr['enfeebcol'])
+			else 
+				status = color_it(status,color_arr['statuscol'])
+			end
+		end
 		if spell then spell = color_it(spell,color_arr['spellcol']) end
 		if target then target = namecol(target,target_table,party_table) end
 		if actor then actor = namecol(actor,actor_table,party_table) end

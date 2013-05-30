@@ -5,7 +5,11 @@
      False means "don't filter this"
 	 
 	 Generally, the outer tag is the actor and the inner tag is the action.
-	 If the monster is the actor, then the inner tag is the target and the tag beyond that is the action.-->
+	 If the monster is the actor, then the inner tag is the target and the tag beyond that is the action.
+	 
+	 Unlike the other filters which work by user, <target> filters based on the target and forces actions
+	 to appear rather than blocking them when set to true. If you wanted all actions that target you to
+	 appear, for instance, you would set <target> to true for the <me> category. -->
 <settings>
     <global>
         <me> <!-- You're doing something -->
@@ -19,6 +23,8 @@
             <readies>false</readies>
             <casting>false</casting>
             <all>false</all>
+			
+			<target>true</target> <!-- True = SHOW all actions where I am the target. -->
         </me>
         <party> <!-- A party member is doing something -->
             <melee>false</melee>
@@ -31,6 +37,8 @@
             <readies>false</readies>
             <casting>false</casting>
             <all>false</all>
+			
+			<target>false</target>
         </party>
         <alliance> <!-- An alliance member is doing something -->
             <melee>false</melee>
@@ -43,6 +51,8 @@
             <readies>false</readies>
             <casting>false</casting>
             <all>false</all>
+			
+			<target>false</target>
         </alliance>
         <others> <!-- Some guy nearby is doing something -->
             <melee>false</melee>
@@ -55,6 +65,8 @@
             <readies>false</readies>
             <casting>false</casting>
             <all>false</all>
+			
+			<target>false</target>
         </others>
         <my_pet> <!-- Your pet is doing something -->
             <melee>false</melee>
@@ -65,6 +77,8 @@
             <readies>false</readies>
             <casting>false</casting>
             <all>false</all>
+			
+			<target>false</target>
         </my_pet>
         <other_pets> <!-- Someone else's pet is doing something -->
             <melee>false</melee>
@@ -75,6 +89,8 @@
             <readies>false</readies>
             <casting>false</casting>
             <all>false</all>
+			
+			<target>false</target>
         </other_pets>
 		
 		
@@ -88,6 +104,8 @@
 				<readies>false</readies>
 				<casting>false</casting>
 				<all>false</all>
+			
+				<target>false</target>
 			</me>
 			<party> <!-- He's targeting a party member -->
 				<melee>false</melee>
@@ -98,6 +116,8 @@
 				<readies>false</readies>
 				<casting>false</casting>
 				<all>false</all>
+			
+				<target>false</target>
 			</party>
 			<alliance> <!-- He's targeting an alliance member -->
 				<melee>false</melee>
@@ -108,6 +128,8 @@
 				<readies>false</readies>
 				<casting>false</casting>
 				<all>false</all>
+			
+				<target>false</target>
 			</alliance>
 			<others> <!-- He's targeting some guy nearby -->
 				<melee>false</melee>
@@ -118,6 +140,8 @@
 				<readies>false</readies>
 				<casting>false</casting>
 				<all>false</all>
+			
+				<target>false</target>
 			</others>
 			<my_pet> <!-- He's targeting your pet -->
 				<melee>false</melee>
@@ -128,6 +152,8 @@
 				<readies>false</readies>
 				<casting>false</casting>
 				<all>false</all>
+			
+				<target>false</target>
 			</my_pet>
 			<other_pets> <!-- He's targeting someone else's pet -->
 				<melee>false</melee>
@@ -138,6 +164,8 @@
 				<readies>false</readies>
 				<casting>false</casting>
 				<all>false</all>
+			
+				<target>false</target>
 			</other_pets>
 			
 			<monsters> <!-- He's targeting himself or another monster -->
@@ -149,6 +177,8 @@
 				<readies>false</readies>
 				<casting>false</casting>
 				<all>false</all>
+			
+				<target>false</target>
 			</monsters>
         </monsters>
     </global>
