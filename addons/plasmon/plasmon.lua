@@ -574,7 +574,7 @@ function event_addon_command(...)
                             a = tonumber(options['a'])
 
                             if type(a) ~= "number" then
-                            error('Please specify a valid alpha value.')
+                                error('Please specify a valid alpha value.')
                             else
                                 a = math.min(255, math.max(0, a))
                             end
