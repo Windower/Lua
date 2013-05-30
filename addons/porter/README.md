@@ -1,5 +1,5 @@
 **Author:** Giuliano Riccio  
-**Version:** v 1.20130525
+**Version:** v 1.20130529
 
 # Porter #
 This addon shows the slips' items highlighting those that are stored.
@@ -9,7 +9,7 @@ This addon shows the slips' items highlighting those that are stored.
 Shows the specified slip or slip's page. if "owned" is specified, only the owned items will be shown. if no parameter is specified, all the owned slips will be shown.
 
 ```
-porter[ <slip>[ <page>]] [owned]
+porter [<slip> [<page>]] [owned]
 ```
 * **_slip_:** the number of the slip you want to show.
 * **_page_:** the page of the slip you want to show.
@@ -18,6 +18,10 @@ porter[ <slip>[ <page>]] [owned]
 ----
 
 ##changelog##
+### v1.20130529
+* **fix**: Fixed parameters validation.
+* **change**: Aligned to Windower's addon development guidelines.
+
 ### v1.20130525.1
 * **add**: Added the "owned" param. if present, only the owned items will be shown.
 

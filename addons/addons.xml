@@ -186,6 +186,13 @@
     <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
   </addon>
   <addon>
+    <name>timestamp</name>
+    <author>Giuliano Riccio/Aureus</author>
+    <description>Prefixes any chat message with a timestamp. Based on Timestamp plugin developed by Aureus.</description>
+    <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
+  </addon>
+  <addon>
     <author>Giuliano Riccio (Zohno@Phoenix)</author>
     <name>vwhl</name>
     <description>Redirects the nm's weaknesses (VW or Abyssea) to the "tell" stream so that they can be held using the chat filters' function and highlights the important info.</description>
