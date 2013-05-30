@@ -1,5 +1,5 @@
 --[[
-vwhl - voidwatch highlighter v1.20130408
+vwhl - voidwatch highlighter v1.20130529
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -28,9 +28,11 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-local _vwhl = {}
+_addon = {}
+_addon.name    = 'vwhl'
+_addon.version = '1.20130529'
 
-function _vwhl:test(...)
+function test()
     add_to_chat(0, 'The fiend appears extremely vulnerable to club weapon skills!')
     add_to_chat(0, 'The fiend appears highly vulnerable to light elemental blood pacts!')
     add_to_chat(0, 'The fiend appears highly vulnerable to staff weapon skills!')
@@ -69,7 +71,7 @@ end
 
 function event_addon_command(cmd)
     if cmd == 'test' then
-        _vwhl.test()
+        test()
     end
 end
 
