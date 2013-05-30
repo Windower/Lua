@@ -186,7 +186,7 @@
     <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
   </addon>
   <addon>
-    <name>Timestamp</name>
+    <name>timestamp</name>
     <author>Giuliano Riccio/Aureus</author>
     <description>Prefixes any chat message with a timestamp. Based on Timestamp plugin developed by Aureus.</description>
     <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
