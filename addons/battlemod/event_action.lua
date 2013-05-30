@@ -10,27 +10,25 @@ function event_action(act)
 	if actor == nil then return end
 	actor = namecol(actor,actor_table,party_table)
 	
+	
 	if agg_messages:contains(act['targets'][1]['actions'][1]['message']) and condensebuffs then
 		aggregate = true -- checks if the first message is one of the multi-target indicating messages
-		local messages = {}		
+		local messages = {}
 		for n,m in pairs(act['targets']) do
 			local msg = act['targets'][n]['actions'][1]['message']
 			if condensebattle then
-				if table.contains(resists,msg) then
-					act['targets'][n]['actions'][1]['message'] = 85
-					msg = 85
-				elseif table.contains(immunobreaks,msg) then
-					act['targets'][n]['actions'][1]['message'] = 653
-					msg = 653
-				elseif table.contains(complete_resists,msg) then
-					act['targets'][n]['actions'][1]['message'] = 655
-					msg = 655
-				elseif table.contains(no_effects,msg) then
-					act['targets'][n]['actions'][1]['message'] = 75
-					msg = 75
-				elseif table.contains(receives,msg) then
-					act['targets'][n]['actions'][1]['message'] = 82
-					msg = 82
+				for i,v in pairs(message_map) do
+					if table.contains(message_map[i],msg) then
+						act['targets'][n]['actions'][1]['message'] = i
+						msg = i
+					end
+				end
+				if msg == 'No effect' then
+					msg = no_effect_map[act['category']]
+					act['targets'][n]['actions'][1]['message'] = msg
+				elseif msg == 'Receives' then
+					msg = receives_map[act['category']]
+					act['targets'][n]['actions'][1]['message'] = msg
 				end
 			end
 			local target_table = get_mob_by_id(act['targets'][n]['id'])
@@ -55,12 +53,16 @@ function event_action(act)
 			if messages[msg]['address'] ~= n then
 				if check_filter(actor_table,party_table,target_table,act['category'],msg) then
 					local address = messages[msg]['address']
-					act['targets'][address]['count2'] = act['targets'][address]['count2'] +1
+					act['targets'][address]['count2'] = act['targets'][address]['count2'] + 1
 					act['targets'][address]['target'] = conjunctions(act['targets'][address]['target'],target,act['targets'][address]['count'],act['targets'][address]['count2'])
 					act['targets'][n]['actions'][1]['message'] = 0
 				end
 			else
-				act['targets'][n]['target'] = target
+				if act['targets'][n]['count'] > 1 then
+					act['targets'][n]['target'] = '\123'..act['targets'][n]['count']..'\125 '..target
+				else
+					act['targets'][n]['target'] = target
+				end
 				act['targets'][n]['count2'] = 1
 			end
 		end
@@ -188,11 +190,11 @@ function event_action(act)
 				if T{252,265,268,269,271,272,274,275,650}:contains(msg_ID) then
 					spell = 'Magic Burst '..spell
 				end
-				spell = color_arr['spellcol']..spell..rcol
+				spell = color_it(spell,color_arr['spellcol'])
 			elseif table.contains(fields,'ability') then
 				ability = jobabilities[abil_ID]['english']
 				if msg_ID == 379 then ability = 'Magic Burst '..ability end
-				ability = color_arr['abilcol']..ability..rcol
+				ability = color_it(ability,color_arr['abilcol'])
 			elseif table.contains(fields,'item') then
 				item = color_arr['itemcol']..items[abil_ID]['enl']..rcol
 			elseif table.contains(fields,'weapon_skill') then
@@ -209,10 +211,10 @@ function event_action(act)
 				elseif msg_ID == 189 then
 					weapon_skill = weapon_skill..' (No Effect)'
 				end
-				if actor['is_npc'] then
-					weapon_skill = color_arr['mobwscol']..(weapon_skill or '')..rcol
+				if actor_table['is_npc'] then
+					weapon_skill = color_it(weapon_skill or '',color_arr['mobwscol'])
 				else
-					weapon_skill = color_arr['wscol']..(weapon_skill or '')..rcol
+					weapon_skill = color_it(weapon_skill or '',color_arr['wscol'])
 				end
 			elseif msg_ID == 303 then
 				ability = 'Divine Seal'
@@ -239,9 +241,11 @@ function event_action(act)
 
 			if table.contains(fields,'status') then
 				if act['targets'][i]['actions'][n]['param'] == 0 or act['targets'][i]['actions'][n]['param'] == 255 then
-					status = color_arr['statuscol']..'No effect'..rcol
+					status = color_it('No effect',color_arr['statuscol'])
+				elseif enfeebling:contains(act['targets'][i]['actions'][n]['param']) then
+					status = color_it((enLog[effect_val] or statuses[effect_val]['english']),color_arr['enfeebcol'])
 				else
-					status = color_arr['statuscol']..statuses[effect_val]['english']..rcol
+					status = color_it((enLog[effect_val] or statuses[effect_val]['english']),color_arr['statuscol'])
 				end
 			elseif table.contains(fields,'number') then
 				number = effect_val
@@ -249,31 +253,31 @@ function event_action(act)
 					number = number..' '..dialog[msg_ID]['units']
 				end
 			elseif not item and table.contains(fields,'item') then
-				item = color_arr['itemcol']..items[effect_val]['enl']..rcol
+				item = color_it(items[effect_val]['enl'],color_arr['itemcol'])
 			elseif table.contains(fields,'item2') then -- For when you use an item to obtain items i.e. Janus Guard
-				item2 = color_arr['itemcol']..items[effect_val]['enl']..rcol
+				item2 = color_it(items[effect_val]['enl'],color_arr['itemcol'])
 			elseif table.contains(fields,'gil') then
 				gil = effect_val..' gil'
 			end
 			
 			-- Special Message Handling
 			if msg_ID == 93 or msg_ID == 273 then
-				status=color_arr['statuscol']..'Vanish'..rcol
+				status=color_it('Vanish',color_arr['statuscol'])
 			elseif msg_ID == 522 and condensebattle then
 				target = target..' (stunned)'
 			elseif T{158,188,245,324,592,658}:contains(msg_ID) and condensebattle then
 				-- When you miss a WS or JA. Relevant for condensed battle.
 				number = 'Miss' --- This probably doesn't work due to the if a==nil statement below.
 			elseif msg_ID == 653 or msg_ID == 654 then
-				status = color_arr['statuscol']..'Immunobreak'..rcol
+				status = color_it('Immunobreak',color_arr['statuscol'])
 			elseif msg_ID == 655 or msg_ID == 656 then
-				status = color_arr['statuscol']..'Completely Resists'..rcol
+				status = color_it('Completely Resists',color_arr['statuscol'])
 			elseif msg_ID == 85 or msg_ID == 284 then
-				status = color_arr['statuscol']..'Resists'..rcol
+				status = color_it('Resists',color_arr['statuscol'])
 			elseif msg_ID == 674 then -- Scavenge
-				number = act['targets'][i]['actions'][n]['add_effect_param']..' '..color_arr['itemcol']..items[effect_val]['enl']..rcol
+				number = act['targets'][i]['actions'][n]['add_effect_param']..' '..color_it(items[effect_val]['enl'],color_arr['itemcol'])
 			elseif T{75,156,189,248,283,312,323,336,355,408,422,423,425,659}:contains(msg_ID) then
-				status = color_arr['statuscol']..'No Effect'..rcol -- The status code for "No Effect" is 255, so it might actually work without this line
+				status = color_it('No effect',color_arr['statuscol']) -- The status code for "No Effect" is 255, so it might actually work without this line
 			end
 		
 			-- Sets the common field "abil" based on the applicable abilities.
@@ -309,6 +313,8 @@ function event_action(act)
 							prepstr = line_nonumber
 						elseif not actor then
 							prepstr = line_noactor
+						elseif not abil then
+							prepstr = line_noabil -- TEST STATEMENT
 						end
 					else -- Handles exceptions and people that don't condense battle messages
 						prepstr = dialog[msg_ID]['english']
@@ -324,7 +330,7 @@ function event_action(act)
 				prepstr = prepstr:gsub('$\123lb\125','\7'):gsub('$\123actor\125',actor or ''):gsub('$\123spell\125',spell or ''):gsub('$\123ability\125',ability or ''):gsub('$\123abil\125',abil or ''):gsub('$\123number\125',number or ''):gsub('$\123weapon_skill\125',weapon_skill or ''):gsub('$\123status\125',status or ''):gsub('$\123item\125',item or ''):gsub('$\123item2\125',item2 or ''):gsub('$\123gil\125',gil or '')
 				add_to_chat(colorfilt(dialog[msg_ID]['color'],target_table['id']==party_table['p0']['mob']['id']),string.char(0x1F,0xFE,0x1E,0x01)..prepstr:gsub('$\123target\125',target or '')..string.char(127,49))
 			end
-						
+			
 			number = nil
 			if flipped then actor,actor_table,target,target_table,flipped = flip(actor,actor_table,target,target_table,flipped) end
 			local addmsg = act['targets'][i]['actions'][n]['add_effect_message']
@@ -334,8 +340,8 @@ function event_action(act)
 					if T{152,161,162,163,167,229,603,652}:contains(addmsg) or addmsg > 287 and addmsg < 303 or addmsg > 383 and addmsg < 399 then
 						number = act['targets'][i]['actions'][n]['add_effect_param']
 					else
-						number = nf(statuses[act['targets'][i]['actions'][n]['add_effect_param']],'english')
-						status = nf(statuses[act['targets'][i]['actions'][n]['add_effect_param']],'english')
+						number = enLog[act['targets'][i]['actions'][n]['add_effect_param']] or nf(statuses[act['targets'][i]['actions'][n]['add_effect_param']],'english')
+						status = enLog[act['targets'][i]['actions'][n]['add_effect_param']] or nf(statuses[act['targets'][i]['actions'][n]['add_effect_param']],'english')
 					end
 							
 					if condensebattle then
@@ -422,7 +428,7 @@ function namecol(player,player_table,party_table)
 		if player_table['id']%4096>2047 then
 			for i,v in pairs(party_table) do
 				if nf(v['mob'],'pet_index') == player_table['index'] then
-					player = color_arr[i]..player..rcol
+					player = color_it(player,color_arr[i])
 					break
 				end
 			end
@@ -432,14 +438,14 @@ function namecol(player,player_table,party_table)
 	else
 		for i,v in pairs(party_table) do
 			if nf(v['mob'],'id') == player_table['id'] then
-				player = color_arr[i]..player..rcol
+				player = color_it(player,color_arr[i])
 				break
 			end
 		end
 	end
 	if player~= nil then -- when you zone into an area, sometimes you can get no player value.
 		if player:sub(-2,-1) ~= rcol then
-			player = color_arr['other']..player..rcol
+			player = color_it(player,color_arr['other'])
 		end
 	end
 	return player
@@ -587,4 +593,9 @@ function conjunctions(pre,post,target_count,current)
 		pre = pre..' and '
 	end
 	return pre..post
+end
+
+function color_it(to_color,color)
+	local colarr = split(to_color,' ')
+	return color..table.concat(colarr,rcol..' '..color)..rcol
 end

@@ -3,6 +3,7 @@
 	 Options for other modes are either "true" or "false". Other values will not be interpreted.-->
 <settings>
 	<global>
+		<condensedamage>true</condensedamage>
 		<condensebattle>true</condensebattle>
 		<condensebuffs>true</condensebuffs>
 		<cancelmulti>true</cancelmulti>
@@ -15,6 +16,7 @@
 		<line_full>[${actor}] ${number} ${abil} ¨ ${target}</line_full>
 		<line_noactor>${abil} ${number} ¨ ${target}</line_noactor>
 		<line_nonumber>[${actor}] ${abil} ¨ ${target}</line_nonumber>
+		<line_noabil>AOE ${number} ¨ ${target}</line_noabil>
 		<line_aoebuff>${actor} ${abil} ¨ ${target} (${status})</line_aoebuff>
 		<line_roll>${actor} ${abil} ¨ ${target} ª ${number}</line_roll>
 	</global>
