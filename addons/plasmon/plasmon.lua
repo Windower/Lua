@@ -669,7 +669,7 @@ function event_addon_command(...)
                             objects = T{'airlixir.value'}
                         end
                     else
-                        error('Please specify a valid objecr or set of objects.')
+                        error('Please specify a valid object or set of objects.')
                     end
                 else
                     objects = T{
