@@ -24,32 +24,34 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+file = require 'filehelper'
 chat = require 'chat'
  
 members={}
 modmember={}
+color={}
 config = require 'config'
 
 defaults = {}
-defaults.colors = {}
-defaults.colors.p0 = 501
-defaults.colors.p1 = 204
-defaults.colors.p2 = 410
-defaults.colors.p3 = 492
-defaults.colors.p4 = 259
-defaults.colors.p5 = 260
-defaults.colors.a10 = 205
-defaults.colors.a11 = 359
-defaults.colors.a12 = 167
-defaults.colors.a13 = 038
-defaults.colors.a14 = 125
-defaults.colors.a15 = 185
-defaults.colors.a20 = 429
-defaults.colors.a21 = 257
-defaults.colors.a22 = 200
-defaults.colors.a23 = 481
-defaults.colors.a24 = 483
-defaults.colors.a25 = 208
+defaults = {}
+defaults.p0 = 501
+defaults.p1 = 204
+defaults.p2 = 410
+defaults.p3 = 492
+defaults.p4 = 259
+defaults.p5 = 260
+defaults.a10 = 205
+defaults.a11 = 359
+defaults.a12 = 167
+defaults.a13 = 038
+defaults.a14 = 125
+defaults.a15 = 185
+defaults.a20 = 429
+defaults.a21 = 257
+defaults.a22 = 200
+defaults.a23 = 481
+defaults.a24 = 483
+defaults.a25 = 208
 
 function event_load()
 	send_command('alias highlight lua c highlight')
@@ -63,7 +65,15 @@ function event_login()
 end
 
 function initialize()
-    settings = config.load(defaults)
+    if file.exists('../battlemod/data/colors.xml') then
+		settings=config.load('../battlemod/data/colors.xml', defaults)
+		write('Colors loaded from battlemod')
+	else
+		settings=config.load(defaults)
+	end
+	for i,v in pairs(settings) do
+		color[i]= colconv(v,i)
+	end
 	get_party_members()
 end
 
@@ -81,8 +91,25 @@ end
 function get_party_members()
 	for member in pairs(get_party()) do
 		members[member] = get_party()[member]['name']
-		modmember[member] = get_party()[member]['name']:color(settings.colors[member])
+		modmember[member]=color[member]..get_party()[member]['name']..'\x1E\x01'	end
+end
+
+function colconv(str,key)
+	-- Used in the options_load() function. Taken from Battlemod
+	local out
+	strnum = tonumber(str)
+	if strnum >= 256 and strnum < 509 then
+		strnum = strnum - 254
+		out = string.char(0x1E,strnum)
+	elseif strnum >0 then
+		out = string.char(0x1F,strnum)
+	elseif strnum == 0 then
+		out = rcol
+	else
+		write('You have an invalid color '..key)
+		out = string.char(0x1F,1)
 	end
+	return out
 end
 
 function event_incoming_chunk(id, data)
