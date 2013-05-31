@@ -59,6 +59,13 @@
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
+    <author>Ikonic</author>
+    <name>ChatPorter</name>
+    <description>Displays tell, party, and linkshell chat to alternate character.  Also, allows you to reply from either character.</description>
+    <bugtracker>https://github.com/Icinoki/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Ragnarok/Ikonic</support>
+  </addon>
+  <addon>
     <name>Daze</name>
     <description>Records what daze effects are on the monster you're fighting.</description>
   </addon>
@@ -184,6 +191,13 @@
     <description>Displays information about your current target in memory.</description>
     <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
+  </addon>
+  <addon>
+    <name>timestamp</name>
+    <author>Giuliano Riccio/Aureus</author>
+    <description>Prefixes any chat message with a timestamp. Based on Timestamp plugin developed by Aureus.</description>
+    <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
     <author>Giuliano Riccio (Zohno@Phoenix)</author>

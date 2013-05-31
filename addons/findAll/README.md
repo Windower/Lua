@@ -1,5 +1,5 @@
 **Author:** Giuliano Riccio  
-**Version:** v 1.20130524
+**Version:** v 1.20130529
 
 # FindAll #
 
@@ -20,7 +20,7 @@ findall
 Looks for any item whose name (long or short) contains the specified value on the specified characters.
 
 ```
-findall [:<character1>[ :...]] <query>
+findall [:<character1> [:...]] <query>
 ```
 * **_character1_:** the name of the characters to use for the search.
 * **...:** variable list of character names.
@@ -53,6 +53,10 @@ findall :omega
 ----
 
 ##Changelog##
+### v1.20130529 ###
+* **fix:** Escaped patterns in search terms.
+* **change**: Aligned to Windower's addon development guidelines.
+
 ### v1.20130524 ###
 * **add:** Added temp items support.
 
