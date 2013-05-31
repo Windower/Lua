@@ -1,3 +1,30 @@
+--Copyright (c) 2013, Byrthnoth
+--All rights reserved.
+
+--Redistribution and use in source and binary forms, with or without
+--modification, are permitted provided that the following conditions are met:
+
+--    * Redistributions of source code must retain the above copyright
+--      notice, this list of conditions and the following disclaimer.
+--    * Redistributions in binary form must reproduce the above copyright
+--      notice, this list of conditions and the following disclaimer in the
+--      documentation and/or other materials provided with the distribution.
+--    * Neither the name of <addon name> nor the
+--      names of its contributors may be used to endorse or promote products
+--      derived from this software without specific prior written permission.
+
+--THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+--ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+--WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+--DISCLAIMED. IN NO EVENT SHALL <your name> BE LIABLE FOR ANY
+--DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+--(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+--LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+--ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+--(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+--SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
 function event_action(act)
 	local persistantmessage,persistanttarget = '',''
 	local persistantcolor = 1
@@ -59,7 +86,11 @@ function event_action(act)
 				end
 			else
 				if act['targets'][n]['count'] > 1 then
+<<<<<<< HEAD
 					act['targets'][n]['target'] = '\123'..act['targets'][n]['count']..'\125 '..target
+=======
+					act['targets'][n]['target'] = '['..act['targets'][n]['count']..'] '..target
+>>>>>>> origin/ByrthBranch
 				else
 					act['targets'][n]['target'] = target
 				end
@@ -242,8 +273,15 @@ function event_action(act)
 			if table.contains(fields,'status') then
 				if act['targets'][i]['actions'][n]['param'] == 0 or act['targets'][i]['actions'][n]['param'] == 255 then
 					status = color_it('No effect',color_arr['statuscol'])
+<<<<<<< HEAD
 				else
 					status = color_it((enLog[effect_val] or statuses[effect_val]['english']),color_arr['statuscol'])
+=======
+				elseif enfeebling:contains(act['targets'][i]['actions'][n]['param']) then
+					status = color_it(statuses[effect_val]['english'],color_arr['enfeebcol'])
+				else -- status = color_it((enLog[effect_val] or statuses[effect_val]['english']),color_arr['statuscol'])
+					status = color_it(statuses[effect_val]['english'],color_arr['statuscol'])
+>>>>>>> origin/ByrthBranch
 				end
 			elseif table.contains(fields,'number') then
 				number = effect_val
@@ -501,6 +539,8 @@ function check_filter(actor_table,party_table,target_table,category,msg)
 	actor_type = party_id(actor_table,party_table)
 	target_type = party_id(target_table,party_table)
 	
+	if filter[target_type]['target'] then return true end
+	
 	if actor_type ~= 'monsters' then
 		if filter[actor_type]['all']
 		or category == 1 and filter[actor_type]['melee']
@@ -571,10 +611,6 @@ function party_id(actor_table,party_table)
 	return filtertype
 end
 
-function flip(p1,p1t,p2,p2t,cond)
-	return p2,p2t,p1,p1t,not cond
-end
-
 function fieldsearch(message)
 	fieldarr = {}
 	string.gsub(message,"{(.-)}", function(a) if a ~= '${actor}' and a ~= '${target}' then fieldarr[#fieldarr+1] = a end end)
@@ -591,9 +627,12 @@ function conjunctions(pre,post,target_count,current)
 		pre = pre..' and '
 	end
 	return pre..post
+<<<<<<< HEAD
 end
 
 function color_it(to_color,color)
 	local colarr = split(to_color,' ')
 	return color..table.concat(colarr,rcol..' '..color)..rcol
+=======
+>>>>>>> origin/ByrthBranch
 end
