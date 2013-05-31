@@ -177,22 +177,22 @@ function event_addon_command(...)
 			local trash = table.remove(splitarr,1)
 			local stat = table.concat(splitarr,' ')
 			local len = #wearing[stat]
-			local targets = table.remove(wearing[stat],1)
+			local targets = table.remove(wearing[stat],1)..string.char(0x1F,191)
 			for i,v in pairs(wearing[stat]) do
 				if i < #wearing[stat] or commamode then
-					targets = targets..', '
+					targets = targets..string.char(0x1F,191)..', '
 				else
 					if oxford and #wearing[stat] >2 then
-						targets = targets..','
+						targets = targets..string.char(0x1F,191)..','
 					end
-					targets = targets..' and '
+					targets = targets..string.char(0x1F,191)..' and '
 				end
 				targets = targets..v
 			end
 			if targetnumber and len > 1 then
 				targets = '['..len..'] '..targets
 			end
-			local outstr = dialog[206]['english']:gsub('$\123target\125',targets):gsub('$\123status\125',stat)
+			local outstr = dialog[206]['english']:gsub('$\123target\125',targets..string.char(0x1F,191)):gsub('$\123status\125',stat..string.char(0x1F,191))
 			add_to_chat(1,string.char(0x1F,191)..outstr..string.char(127,49))
 			wearing[stat] = nil
 		end
@@ -230,11 +230,12 @@ function event_incoming_text(original, modified, color)
 	if redcol == 123 and cancelmulti then
 		a,z = string.find(original,'You were unable to change your equipped items')
 		b,z = string.find(original,'You cannot use that command while viewing the chat log')
+		c,z = string.find(original,'You must close the currently open window to use that command')
 		
-		if (a or b) and not block_cannot then
+		if (a or b or c) and not block_cannot then
 			send_command('wait 1;lua c battlemod flip block_cannot')
 			block_cannot = true
-		elseif (a or b) and block_cannot then
+		elseif (a or b or c) and block_cannot then
 			modified = ''
 		end
 	end
@@ -298,7 +299,9 @@ function event_action_message(actor_id,index,actor_target_index,target_target_in
 		if status then
 			if enfeebling:contains(param_1) then
 				status = color_it(status,color_arr['enfeebcol'])
-			else 
+			elseif color_arr['statuscol'] == string.char(0x1E,0x01) then
+				status = color_it(status,string.char(0x1F,191))
+			else
 				status = color_it(status,color_arr['statuscol'])
 			end
 		end

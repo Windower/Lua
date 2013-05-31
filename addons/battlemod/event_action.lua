@@ -86,7 +86,7 @@ function event_action(act)
 				end
 			else
 				if act['targets'][n]['count'] > 1 then
-					act['targets'][n]['target'] = '\123'..act['targets'][n]['count']..'\125 '..target
+					act['targets'][n]['target'] = '['..act['targets'][n]['count']..'] '..target
 				else
 					act['targets'][n]['target'] = target
 				end
