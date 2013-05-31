@@ -36,96 +36,9 @@ require 'generic_helpers'
 require 'static_vars'
 
 function event_load()
-<<<<<<< HEAD
-	allow = true
-	prevline = ''
-
-	color_arr = {}
-	filter = {}
-	wearing = {}
-	line_full = 'Full line is not loading'
-	line_noactor = 'No Actor line is not loading'
-	line_nonumber = 'No Number line is not loading'
-	line_noabil = 'No Abil line is not loading'
-	line_aoebuff = 'AoE Buff line is not loading'
-	line_roll = 'Roll line is not loading'
-	skillchain_arr = {'Light:','Darkness:','Gravitation:','Fragmentation:','Distortion:','Fusion:','Compression:','Liquefaction:','Induration:','Reverberation:','Transfixion:','Scission:','Detonation:','Impaction:'}
-	ratings_arr = {'TW','EP','DC','EM','T','VT','IT'}
-	rcol = string.char(0x1E,0x01)
-	blocked_colors = T{20,21,22,23,24,25,26,28,29,30,31,32,33,35,36,37,40,41,42,43,44,50,51,52,56,57,59,60,61,63,68,69,64,65,67,69,81,85,90,91,100,101,102,104,105,106,107,110,111,112,114,122,127,162,163,164,166,168,170,171,174,175,177,182,183,185,186,191}
-	passed_messages = T{4,5,6,16,17,18,20,34,35,36,40,47,48,49,64,78,87,88,89,90,112,116,154,170,171,172,173,174,175,176,177,178,191,192,198,204,215,217,218,234,246,249,328,350,336,531,558,561,575,601,609,562,610,611,612,613,614,615,616,617,618,619,620,625,626,627,628,629,630,631,632,633,634,635,636,643,660,661,662}
-	agg_messages = T{85,653,655,75,156,189,248,323,355,408,422,425,82,93,116,127,131,134,151,144,146,148,150,166,186,194,230,236,237,242,243,268,271,319,320,364,375,412,414,416,420,424,426,432,433,441,602,645,668}
-	color_redundant = T{26,33,41,71,72,89,94,109,114,164,173,181,184,186,70,84,104,127,128,129,130,131,132,133,134,135,136,137,138,139,140,64,86,91,106,111,175,178,183,81,101,16,65,87,92,107,112,174,176,182,82,102,67,68,69,170,189,15,208,18,25,32,40,163,185,23,24,27,34,35,42,43,162,165,187,188,30,31,14,205,144,145,146,147,148,149,150,151,152,153,190,13,9,253,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,284,285,286,287,292,293,294,295,300,301,301,303,308,309,310,311,316,317,318,319,324,325,326,327,332,333,334,335,340,341,342,343,344,345,346,347,348,349,350,351,355,357,358,360,361,363,366,369,372,374,375,378,381,384,395,406,409,412,415,416,418,421,424,437,450,453,456,458,459,462,479,490,493,496,499,500,502,505,507,508,10,51,52,55,58,62,66,80,83,85,88,90,93,100,103,105,108,110,113,122,168,169,171,172,177,179,180,12,11,37,291} -- 37 and 291 might be unique colors, but they are not gsubbable.
-	black_colors = T{352,354,356,388,390,400,402,430,432,442,444,472,474,484,486}
-
---	resists = {85,284}
---	immunobreaks = {653,654}
---	complete_resists = {655,656}
---	no_effects = {75,156,189,248,323,355,408,422,425,283,423,659}
---	receives = {82,116,127,131,134,151,144,146,148,150,166,186,194,230,236,237,242,243,268,271,319,320,364,375,412,414,416,420,424,426,432,433,441,602,645,668,203,205,266,270,272,277,279,280,285,145,147,149,151,267,269,278,286,287,365,415,421,427}
---	vanishes = {93,273}
-	
-	message_map = {}
-	for n=1,700,1 do
-		message_map[n] = T{}
-	end
-	message_map[85] = T{284} -- resist
-	message_map[653] = T{654} -- immunobreak
-	message_map[655] = T{656} -- complete resist
-	message_map[93] = T{273} -- vanishes
---	message_map[75] =  -- no effect spell
-	message_map[156] = T{156,323,422,425} -- no effect ability
---	message_map[189] = -- no effect ws
---	message_map[408] = -- no effect item
-	message_map[248] = T{355} -- no ability of any kind
-	message_map['No effect'] = T{283,423,659} -- generic "no effect" messages for sorting by category
-	
-	message_map[432] = T{433} -- Receives: Spell, Target
-	message_map[82] = T{230,236,237,268,271} -- Receives: Spell, Target, Status
-	
-	message_map[116] = T{131,134,144,146,148,150,364,414,416,441,602,668,285,145,147,149,151,286,287,365,415,421} -- Receives: Ability, Target
-	message_map[127]=T{319,320,645} -- Receives: Ability, Target, Status
-	
-	message_map[420]=T{424} -- Receives: Ability, Target, Status, Number
-	
-	message_map[375] = T{412}-- Receives: Item, Target, Status
---	message_map[166] =  -- receives additional effect
-	message_map[186] = T{194,242,243}-- Receives: Weapon skill, Target, Status
-	message_map['Receives'] = T{203,205,266,270,272,277,279,280,267,269,278}
-	message_map[426] = T{427} -- Loses
-	no_effect_map = T{248,355,189,75,408,156,0,0,0,0,189,0,189,156,156}
-	receives_map = T{0,0,186,82,375,116,0,0,0,0,186,0,186,116,116}
-	stat_ignore = T{66,69,70,71,444,445,446}
-	
-	speFile = file.new('../../plugins/resources/spells.xml')
-	jaFile = file.new('../../plugins/resources/abils.xml')
-	statusFile = file.new('../../plugins/resources/status.xml')
-	dialogFile = file.new('../../addons/libs/resources/dialog4.xml')
-	mabilsFile = file.new('../../addons/libs/resources/mabils.xml')
-	itemsGFile = file.new('../../plugins/resources/items_general.xml')
-	itemsAFile = file.new('../../plugins/resources/items_armor.xml')
-	itemsWFile = file.new('../../plugins/resources/items_weapons.xml')
-	
-	jobabilities = parse_resources(jaFile:readlines())
-	spells = parse_resources(speFile:readlines())
-	statuses = parse_resources(statusFile:readlines())
-	dialog = parse_resources(dialogFile:readlines())
-	mabils = parse_resources(mabilsFile:readlines())
-	statuses = parse_resources(statusFile:readlines())
-	items = table.range(65535)
-	items:update(parse_resources(itemsGFile:readlines()))
-	items:update(parse_resources(itemsAFile:readlines()))
-	items:update(parse_resources(itemsWFile:readlines()))
-=======
 	version = '2.15'
 	block_equip = false
 	block_cannot = false
->>>>>>> origin/ByrthBranch
-	
-	enLog = {}
-	for i,v in pairs({0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,134,135,155,156,157,168,176,177,259,260,261,262,263,264,309,474}) do
-		enLog[v] = statuses[v]['enLog']
-	end
 	
     send_command('alias bm lua c battlemod cmd')
 	options_load()
@@ -138,35 +51,7 @@ function options_load()
 	local colorsFile=file.new('data/colors.xml',true)
 	
 	if not file.exists('data/settings.xml') then
-<<<<<<< HEAD
-		settingsFile:write([[
-<?xml version="1.0" ?>
-<!-- For the output customization lines, ${actor} denotes a value to be replaced. The options are actor, number, abil, and target.
-	 Options for other modes are either "true" or "false". Other values will not be interpreted.-->
-<settings>
-	<global>
-		<condensedamage>true</condensedamage>
-		<condensebattle>true</condensebattle>
-		<condensebuffs>true</condensebuffs>
-		<cancelmulti>true</cancelmulti>
-		<oxford>true</oxford>
-		<commamode>false</commamode>
-		<supersilence>true</supersilence>
-		<targetnumber>true</targetnumber>
-		
-		
-		<line_full>[${actor}] ${number} ${abil} ]]..string.char(129,168)..[[ ${target}</line_full>
-		<line_noactor>${abil} ${number} ]]..string.char(129,168)..[[ ${target}</line_noactor>
-		<line_nonumber>[${actor}] ${abil} ]]..string.char(129,168)..[[ ${target}</line_nonumber>
-		<line_noabil>AOE ${number} ]]..string.char(129,168)..[[ ${target}</line_noabil>
-		<line_aoebuff>${actor} ${abil} ]]..string.char(129,168)..[[ ${target} (${status})</line_aoebuff>
-		<line_roll>${actor} ${abil} ]]..string.char(129,168)..[[ ${target} ]]..string.char(129,170)..[[ ${number}</line_roll>
-	</global>
-</settings>
-]])
-=======
 		settingsFile:write(default_settings)
->>>>>>> origin/ByrthBranch
 		write('Default settings xml file created')
 	end
 	
@@ -361,35 +246,24 @@ end
 function event_action_message(actor_id,index,actor_target_index,target_target_index,message_id,param_1,param_2,param_3)
     -- Consider a way to condense "Wears off" messages?
 	if message_id == 206 then -- Wears off messages
-<<<<<<< HEAD
-		local status = color_it((enLog[param_1] or statuses[param_1]['english']),color_arr['statuscol'])
-=======
 		local status
->>>>>>> origin/ByrthBranch
 		local target_table = get_mob_by_id(index)
 		local party_table = get_party()
 		local target = target_table['name']
 		
-<<<<<<< HEAD
-=======
 		if enfeebling:contains(param_1) then
 			status = color_it(statuses[param_1]['english'],color_arr['enfeebcol'])
 		else
 			status = color_it(statuses[param_1]['english'],color_arr['statuscol'])
 		end
 		
->>>>>>> origin/ByrthBranch
 		if not wearing[status] and not (stat_ignore:contains(param_1)) then
 			wearing[status] = {}
 			wearing[status][1] = namecol(target,target_table,party_table)
 			send_command('wait 0.5;lua c battlemod wearsoff '..status)
 		elseif not (stat_ignore:contains(param_1)) then
 			wearing[status][#wearing[status]+1] = namecol(target,target_table,party_table)
-<<<<<<< HEAD
-		else
-=======
 		else -- This handles the stat_ignore values, which are things like Utsusemi, Sneak, Invis, etc. that you don't want to see on a delay
->>>>>>> origin/ByrthBranch
 			wearing[status] = {}
 			wearing[status][1] = namecol(target,target_table,party_table)
 			send_command('lua c battlemod wearsoff '..status)
@@ -422,9 +296,6 @@ function event_action_message(actor_id,index,actor_target_index,target_target_in
 			spell = nf(spells[param_1],'english')
 		end
 		
-<<<<<<< HEAD
-		if status then status = color_it(status,color_arr['statuscol']) end
-=======
 		if status then
 			if enfeebling:contains(param_1) then
 				status = color_it(status,color_arr['enfeebcol'])
@@ -434,7 +305,6 @@ function event_action_message(actor_id,index,actor_target_index,target_target_in
 				status = color_it(status,color_arr['statuscol'])
 			end
 		end
->>>>>>> origin/ByrthBranch
 		if spell then spell = color_it(spell,color_arr['spellcol']) end
 		if target then target = namecol(target,target_table,party_table) end
 		if actor then actor = namecol(actor,actor_table,party_table) end

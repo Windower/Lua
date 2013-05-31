@@ -86,11 +86,7 @@ function event_action(act)
 				end
 			else
 				if act['targets'][n]['count'] > 1 then
-<<<<<<< HEAD
-					act['targets'][n]['target'] = '\123'..act['targets'][n]['count']..'\125 '..target
-=======
 					act['targets'][n]['target'] = '['..act['targets'][n]['count']..'] '..target
->>>>>>> origin/ByrthBranch
 				else
 					act['targets'][n]['target'] = target
 				end
@@ -273,15 +269,10 @@ function event_action(act)
 			if table.contains(fields,'status') then
 				if act['targets'][i]['actions'][n]['param'] == 0 or act['targets'][i]['actions'][n]['param'] == 255 then
 					status = color_it('No effect',color_arr['statuscol'])
-<<<<<<< HEAD
-				else
-					status = color_it((enLog[effect_val] or statuses[effect_val]['english']),color_arr['statuscol'])
-=======
 				elseif enfeebling:contains(act['targets'][i]['actions'][n]['param']) then
 					status = color_it(statuses[effect_val]['english'],color_arr['enfeebcol'])
 				else -- status = color_it((enLog[effect_val] or statuses[effect_val]['english']),color_arr['statuscol'])
 					status = color_it(statuses[effect_val]['english'],color_arr['statuscol'])
->>>>>>> origin/ByrthBranch
 				end
 			elseif table.contains(fields,'number') then
 				number = effect_val
@@ -366,7 +357,7 @@ function event_action(act)
 				prepstr = prepstr:gsub('$\123lb\125','\7'):gsub('$\123actor\125',actor or ''):gsub('$\123spell\125',spell or ''):gsub('$\123ability\125',ability or ''):gsub('$\123abil\125',abil or ''):gsub('$\123number\125',number or ''):gsub('$\123weapon_skill\125',weapon_skill or ''):gsub('$\123status\125',status or ''):gsub('$\123item\125',item or ''):gsub('$\123item2\125',item2 or ''):gsub('$\123gil\125',gil or '')
 				add_to_chat(colorfilt(dialog[msg_ID]['color'],target_table['id']==party_table['p0']['mob']['id']),string.char(0x1F,0xFE,0x1E,0x01)..prepstr:gsub('$\123target\125',target or '')..string.char(127,49))
 			end
-						
+			
 			number = nil
 			if flipped then actor,actor_table,target,target_table,flipped = flip(actor,actor_table,target,target_table,flipped) end
 			local addmsg = act['targets'][i]['actions'][n]['add_effect_message']
@@ -627,12 +618,4 @@ function conjunctions(pre,post,target_count,current)
 		pre = pre..' and '
 	end
 	return pre..post
-<<<<<<< HEAD
-end
-
-function color_it(to_color,color)
-	local colarr = split(to_color,' ')
-	return color..table.concat(colarr,rcol..' '..color)..rcol
-=======
->>>>>>> origin/ByrthBranch
 end
