@@ -341,7 +341,7 @@ end
 function settings_xml(meta)
 	local str = '<?xml version="1.1" ?>\n'
 	str = str..'<settings>\n'
-	settings = meta.original
+	local settings = meta.original
 
 	meta.chars = settings:keyset():filter(-'global'):sort()
 	for char in (L{'global'}+meta.chars):it() do
