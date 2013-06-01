@@ -87,6 +87,10 @@ end
 
 -- Returns str colored as specified by (new_alpha, new_red, ...). If reset values are omitted, the string color will reset.
 function string.text_color(str, new_red, new_green, new_blue, reset_red, reset_green, reset_blue)
+	if str == '' then
+		return str
+	end
+
 	if reset_blue then
 		return '\\cs('..new_red..', '..new_green..', '..new_blue..')'..str..'\\cs('..reset_red..', '..reset_green..', '..reset_blue..')'
 	end
