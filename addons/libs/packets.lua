@@ -152,6 +152,7 @@ packets.lengths = setmetatable(packets.lengths, {__index = function(t, k)
 	end
 end})
 
+-- Type identifiers as declared in Lua
 local pack_ids = {}
 pack_ids['bool'] = 'b'
 pack_ids['unsigned char'] = 'b'
@@ -183,21 +184,51 @@ packets.fields = {}
 packets.fields.incoming = {}
 packets.fields.outgoing = {}
 
+for key = 0x000, 0x1FF do
+	packets.fields.incoming[key] = L{}
+	packets.fields.outgoing[key] = L{}
+end
+
+packets.fields.incoming[0x00E] = L{
+	{ctype='unsigned int',   label='ID'},                --   4-  7
+	{ctype='unsigned short', label='Index'},             --   8-  9
+	{ctype='unsigned char',  label='Mask'},              --  10- 10
+	{ctype='unsigned char',  label='Rotation'},          --  11- 11
+	{ctype='float',          label='X Position'},        --  12- 15
+	{ctype='float',          label='Z Position'},        --  16- 19
+	{ctype='float',          label='Y Position'},        --  20- 23
+	{ctype='unsigned short', label='_unknown1'},         --  24- 25
+	{ctype='unsigned short', label='_unknown2'},         --  26- 27
+	{ctype='unsigned short', label='_unknown3'},         --  28- 29
+	{ctype='unsigned char',  label='HP %'},              --  30- 28
+	{ctype='unsigned char',  label='Animation'},         --  31- 31
+	{ctype='unsigned short', label='Status'},            --  32- 33
+	{ctype='unsigned short', label='_unknown4'},         --  34- 35
+	{ctype='unsigned int',   label='_unknown5'},         --  36- 39
+	{ctype='unsigned int',   label='_unknown6'},         --  40- 43
+	{ctype='unsigned int',   label='Claimer ID'},        --  44- 47
+	{ctype='unsigned short', label='_unknown7'},         --  48- 49
+	{ctype='unsigned short', label='Model'},             --  50- 51
+-- This value can't be displayed properly yet, since the array length varies.
+-- Will need to implement a workaround for that.
+--	{ctype='char[24]',         label='Name'},              --  52- 75
+}
+
 packets.fields.incoming[0x0DF] = L{
-	{ctype='unsigned int',   label='ID'},                -- 4-7
-	{ctype='unsigned int',   label='HP'},                -- 8-11
-	{ctype='unsigned int',   label='MP'},                -- 12-15
-	{ctype='unsigned int',   label='TP'},                -- 16-19
-	{ctype='unsigned short', label='_unknown_20_21'},
-	{ctype='unsigned short', label='_unknown_22_23'},
-	{ctype='unsigned short', label='_unknown_24_25'},
-	{ctype='unsigned short', label='_unknown_26_27'},
+	{ctype='unsigned int',   label='ID'},                --   4-  7
+	{ctype='unsigned int',   label='HP'},                --   8- 11
+	{ctype='unsigned int',   label='MP'},                --  12- 15
+	{ctype='unsigned int',   label='TP'},                --  16- 19
+	{ctype='unsigned short', label='_unknown1'},         --  20- 21
+	{ctype='unsigned short', label='_unknown2'},         --  22- 23
+	{ctype='unsigned short', label='_unknown3'},         --  24- 25
+	{ctype='unsigned short', label='_unknown4'},         --  26- 27
 }
 
 packets.fields.incoming[0x0CC] = L{
-	{ctype='int',            label='_unknown_4_7'},
-	{ctype='char[128]',      label='Message'},           -- 8-135
-	{ctype='int',            label='_unknown_136_139'},
+	{ctype='int',            label='_unknown1'},         --   4-  7
+	{ctype='char[128]',      label='Message'},           --   8-135
+	{ctype='int',            label='_unknown2'},         -- 136-139
 	{ctype='char[16]',       label='Player Name'},       -- 140-155
 	{ctype='int',            label='Permissions'},       -- 156-159
 	{ctype='char[16]',       label='Linkshell Name'},    -- 160-175, 6-bit packed
@@ -222,23 +253,20 @@ function P(id, data, mode)
 	res._data = data:sub(5)
 	res._hex = data:map(string.zfill-{2}..math.tohex..string.byte)
 
-	if not packets.fields[mode][id] then
+	local fields = packets.fields[mode][id]
+	if #fields == 0 then
 		return res
 	end
 
-	local keys = L{}
-	local pack_str = '<'
-	for pt in packets.fields[mode][id]:it() do
-		keys:append(pt.label)
-		pack_str = pack_str..pack_ids[pt.ctype]
-	end
+	local keys = fields:map(table.get-{'label'})
+	local pack_str = '<'..fields:map(table.get+{pack_ids}..table.get-{'ctype'}):concat()
 
 	for key, val in ipairs({res._data:unpack(pack_str)}) do
 		if key > 1 then
 			res[keys[key - 1]] = val
 		end
 	end
-	
+
 	return res
 end
 
