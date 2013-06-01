@@ -30,7 +30,6 @@ local nest_xml
 local table_diff
 
 -- Loads a specified file, or alternatively a file 'settings.xml' in the current addon/data folder.
--- Writes all configs to _config.
 function config.load(filename, confdict, overwrite)
 	if type(filename) == 'table' then
 		confdict, filename, overwrite = filename, nil, confdict
@@ -39,12 +38,19 @@ function config.load(filename, confdict, overwrite)
 	elseif type(confdict) == 'boolean' then
 		confdict, overwrite = nil, confdict
 	end
+
 	confdict = T(confdict):copy()
 	overwrite = overwrite or false
-	
+
 	local confdict_mt = getmetatable(confdict)
-	confdict = setmetatable(confdict, {__index = function(t, x) if config[x] ~= nil then return config[x] else return confdict_mt.__index[x] end end})
-	
+	confdict = setmetatable(confdict, {__index = function(t, k)
+		if config[k] ~= nil then
+			return config[k]
+		elseif confdict_mt then
+			return confdict_mt.__index[k]
+		end
+	end})
+
 	-- Load addon config file (Windower/addon/<addonname>/data/settings.xml).
 	local filepath = filename or files.check('data/settings.xml')
 	if filepath == nil then
@@ -115,7 +121,15 @@ function merge(t, t_merge, path)
 
 	local oldval
 	local err
-	for key, val in pairs(t_merge) do
+	
+	local keys = {}
+	for key in pairs(t) do
+		keys[key:lower()] = key
+	end
+	
+	local key
+	for lkey, val in pairs(t_merge) do
+		key = keys[lkey]
 		if not rawget(t, key) then
 			if type(val) == 'table' then
 				t[key] = T(val)
@@ -135,7 +149,7 @@ function merge(t, t_merge, path)
 			elseif class(oldval) == 'Set' then
 				t[key] = S(res)
 			else
-				notice('This is supposed to happen. A new data structure has not yet been added to config.lua')
+				notice('This is not supposed to happen. A new data structure has not yet been added to config.lua')
 				t[key] = setmetatable(res, _meta.T)
 			end
 		elseif type(oldval) ~= type(val) then
