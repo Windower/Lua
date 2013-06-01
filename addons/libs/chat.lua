@@ -92,10 +92,10 @@ function string.text_color(str, new_red, new_green, new_blue, reset_red, reset_g
 	end
 
 	if reset_blue then
-		return chat.make_text_color(new_red, new_greem, new_blue)..str..chat.make_text_color(reset_red, reset_greem, reset_blue)
+		return chat.make_text_color(new_red, new_green, new_blue)..str..chat.make_text_color(reset_red, reset_green, reset_blue)
 	end
 	
-	return chat.make_text_color(new_red, new_greem, new_blue)..str..'\\cr'
+	return chat.make_text_color(new_red, new_green, new_blue)..str..'\\cr'
 end
 
 -- Returns a color string in console format.
