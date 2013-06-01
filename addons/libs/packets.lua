@@ -10,6 +10,8 @@ _libs.mathhelper = _libs.mathhelper or require 'mathhelper'
 _libs.stringhelper = _libs.stringhelper or require 'stringhelper'
 _libs.functools = _libs.functools or require 'functools'
 
+require 'pack'
+
 local packets = {}
 packets.incoming = {}
 packets.outgoing = {}
@@ -150,6 +152,32 @@ packets.lengths = setmetatable(packets.lengths, {__index = function(t, k)
 	end
 end})
 
+local pack_ids = {}
+pack_ids['bool'] = 'b'
+pack_ids['unsigned char'] = 'b'
+pack_ids['unsigned short'] = 'H'
+pack_ids['unsigned int'] = 'I'
+pack_ids['unsigned long'] = 'L'
+pack_ids['signed char'] = 'c'
+pack_ids['signed short'] = 'h'
+pack_ids['signed int'] = 'i'
+pack_ids['signed long'] = 'L'
+pack_ids['char'] = 'c'
+pack_ids['short'] = 'h'
+pack_ids['int'] = 'i'
+pack_ids['long'] = 'l'
+pack_ids['float'] = 'f'
+pack_ids['double'] = 'd'
+pack_ids = setmetatable(pack_ids, {__index = function(t, k)
+	local type, number = k:match('(.-) *%[(%d+)%]')
+	if type then
+		local pack_id = rawget(t, type)
+		if pack_id then
+			return pack_id..number
+		end
+	end
+end})
+
 -- Specific field data for p.
 packets.fields = {}
 packets.fields.incoming = {}
@@ -198,13 +226,17 @@ function P(id, data, mode)
 		return res
 	end
 
-	local temp
-	local val
-	local pos = 5
+	local keys = L{}
+	local pack_str = '<'
 	for pt in packets.fields[mode][id]:it() do
-		temp = pos
-		pos = pos + packets.lengths[pt.ctype]
-		res[pt.label] = make_val(pt.ctype, data:byte(temp, pos - 1))
+		keys:append(pt.label)
+		pack_str = pack_str..pack_ids[pt.ctype]
+	end
+
+	for key, val in ipairs({res._data:unpack(pack_str)}) do
+		if key > 1 then
+			res[keys[key - 1]] = val
+		end
 	end
 	
 	return res
