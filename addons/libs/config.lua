@@ -130,73 +130,80 @@ function merge(t, t_merge, path)
 	local key
 	for lkey, val in pairs(t_merge) do
 		key = keys[lkey]
-		if not rawget(t, key) then
+		if key == nil then
 			if type(val) == 'table' then
-				t[key] = T(val)
+				t[key] = setmetatable(val, _meta.T)
 			else
 				t[key] = val
 			end
-		end
-		
-		err = false
-		oldval = rawget(t, key)
-		if type(oldval) == 'table' and type(val) == 'table' then
-			local res = merge(oldval, val, path and path:copy()+key or nil)
-			if class(oldval) == 'table' or class(oldval) == 'Table' then
-				t[key] = setmetatable(res, _meta.T)
-			elseif class(oldval) == 'List' then
-				t[key] = L(res)
-			elseif class(oldval) == 'Set' then
-				t[key] = S(res)
-			else
-				notice('This is not supposed to happen. A new data structure has not yet been added to config.lua')
-				t[key] = setmetatable(res, _meta.T)
-			end
-		elseif type(oldval) ~= type(val) then
-			if type(oldval) == 'table' then
-				if type(val) == 'string' then
-					local res = list.map(val:split(','), string.trim)
-					if class and class(oldval) == 'Set' then
-						res = S(res)
-					elseif class and class(oldval) == 'Table' then
-						res = T(res)
-					end
-					t[key] = res
-				else
-					err = true
-				end
-			elseif type(oldval) == 'number' then
-				local testdec = tonumber(val)
-				local testhex = tonumber(val, 16)
-				if testdec then
-					t[key] = testdec
-				elseif testhex then
-					t[key] = testhex
-				else
-					err = true
-				end
-			elseif type(oldval) == 'boolean' then
-				if val == 'true' then
-					t[key] = true
-				elseif val == 'false' then
-					t[key] = false
-				else
-					err = true
-				end
-			elseif type(oldval) == 'string' then
-				t[key] = val
-			else
-				err = true
-			end
+
 		else
-			t[key] = val
-		end
-		
-		if err then
-			if path then
-				notice('Could not safely merge values for \''..path:concat('/')..'/'..key..'\', '..type(oldval)..' expected (default: '..tostring(oldval)..'), got '..type(val)..' ('..tostring(val)..').')
+			err = false
+			oldval = rawget(t, key)
+			if type(oldval) == 'table' and type(val) == 'table' then
+				local res = merge(oldval, val, path and path:copy()+key or nil)
+				if class(oldval) == 'table' or class(oldval) == 'Table' then
+					t[key] = setmetatable(res, _meta.T)
+				elseif class(oldval) == 'List' then
+					t[key] = L(res)
+				elseif class(oldval) == 'Set' then
+					t[key] = S(res)
+				else
+					notice('This is not supposed to happen. A new data structure has not yet been added to config.lua')
+					t[key] = setmetatable(res, _meta.T)
+				end
+
+			elseif type(oldval) ~= type(val) then
+				if type(oldval) == 'table' then
+					if type(val) == 'string' then
+						local res = list.map(val:split(','), string.trim)
+						if class and class(oldval) == 'Set' then
+							res = S(res)
+						elseif class and class(oldval) == 'Table' then
+							res = T(res)
+						end
+						t[key] = res
+					else
+						err = true
+					end
+
+				elseif type(oldval) == 'number' then
+					local testdec = tonumber(val)
+					local testhex = tonumber(val, 16)
+					if testdec then
+						t[key] = testdec
+					elseif testhex then
+						t[key] = testhex
+					else
+						err = true
+					end
+
+				elseif type(oldval) == 'boolean' then
+					if val == 'true' then
+						t[key] = true
+					elseif val == 'false' then
+						t[key] = false
+					else
+						err = true
+					end
+
+				elseif type(oldval) == 'string' then
+					t[key] = val
+
+				else
+					err = true
+				end
+
+			else
+				t[key] = val
 			end
-			t[key] = val
+
+			if err then
+				if path then
+					warning('Could not safely merge values for \''..path:concat('/')..'/'..key..'\', '..type(oldval)..' expected (default: '..tostring(oldval)..'), got '..type(val)..' ('..tostring(val)..').')
+				end
+				t[key] = val
+			end
 		end
 	end
 
