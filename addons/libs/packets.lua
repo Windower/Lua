@@ -170,11 +170,15 @@ pack_ids['long'] = 'l'
 pack_ids['float'] = 'f'
 pack_ids['double'] = 'd'
 pack_ids = setmetatable(pack_ids, {__index = function(t, k)
-	local type, number = k:match('(.-) *%[(%d+)%]')
+	local type, number = k:match('(.-)%s*%[(%d+)%]')
 	if type then
 		local pack_id = rawget(t, type)
 		if pack_id then
-			return pack_id..number
+			if type == 'char' then
+				return 'A'..number
+			else
+				return pack_id..number
+			end
 		end
 	end
 end})
@@ -211,7 +215,7 @@ packets.fields.incoming[0x00E] = L{
 	{ctype='unsigned short', label='Model'},             --  50- 51
 -- This value can't be displayed properly yet, since the array length varies.
 -- Will need to implement a workaround for that.
---	{ctype='char[24]',         label='Name'},              --  52- 75
+	{ctype='char[16]',       label='Name'},              --  52- 75
 }
 
 packets.fields.incoming[0x0DF] = L{
@@ -259,10 +263,10 @@ function P(id, data, mode)
 	end
 
 	local keys = fields:map(table.get-{'label'})
-	local pack_str = '<'..fields:map(table.get+{pack_ids}..table.get-{'ctype'}):concat()
+	local pack_str = '<'..fields:map(function (ct) return pack_ids[ct] end..table.get-{'ctype'}):concat()
 
 	for key, val in ipairs({res._data:unpack(pack_str)}) do
-		if key > 1 then
+		if key > 1 and keys[key - 1] then
 			res[keys[key - 1]] = val
 		end
 	end
