@@ -220,6 +220,51 @@ function string.escape(str)
 	return str:gsub('[[%]%%^$*()%.%+?-]', '%%%1')
 end
 
+-- Returns a case-insensitive pattern for a given (non-pattern) string. For patterns, see string.ipattern.
+function string.istring(str)
+	return (str:gsub('%a', function(c) return '['..c:upper()..c:lower()..']' end))
+end
+
+-- Returns a case-insensitive pattern for a given pattern.
+function string.ipattern(str)
+	local res = ''
+	local percent = false
+	local val
+	for c in str:it() do
+		if c == '%' then
+			percent = not percent
+			res = res..c
+		elseif not percent then
+			val = string.byte(c)
+			if val > 64 and val <= 90 or val > 96 and val <= 122 then
+				res = res..'['..c:upper()..c:lower()..']'
+			else
+				res = res..c
+			end
+		else
+			percent = false
+			res = res..c
+		end
+	end
+
+	return res
+end
+
+-- A string.match wrapper for case-insensitive patterns.
+function string.imatch(str, pattern)
+	return str:match(pattern:ipattern())
+end
+
+-- A string.gmatch wrapper for case-insensitive patterns.
+function string.igmatch(str, pattern)
+	return str:gmatch(pattern:ipattern())
+end
+
+-- A string.gsub wrapper for case-insensitive patterns.
+function string.igsub(str, pattern, replace)
+	return str:gsub(pattern:ipattern(), replace)
+end
+
 -- Counts the occurrences of a substring in a string.
 function string.count(str, sub)
 	return str:pcount(sub:escape())
