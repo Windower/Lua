@@ -4,7 +4,6 @@ Functions that facilitate loading, parsing and storing of config files.
 
 _libs = _libs or {}
 _libs.config = true
-_libs.logger = _libs.logger or require 'logger'
 _libs.tablehelper = _libs.tablehelper or require 'tablehelper'
 _libs.stringhelper = _libs.stringhelper or require 'stringhelper'
 local xml = require 'xml'
@@ -143,12 +142,12 @@ function merge(t, t_merge, path)
 
 	local key
 	for lkey, val in pairs(t_merge) do
-		key = keys[lkey]
+		key = keys[lkey:lower()]
 		if key == nil then
 			if type(val) == 'table' then
-				t[key] = setmetatable(val, _meta.T)
+				t[lkey] = setmetatable(val, _meta.T)
 			else
-				t[key] = val
+				t[lkey] = val
 			end
 
 		else
