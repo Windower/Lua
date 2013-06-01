@@ -145,6 +145,8 @@ function texts.update(t, attr)
 
 	tb_set_text(t._name, str)
 	t._settings.text.content = str
+	
+	return str
 end
 
 -- Unsets all variables.
