@@ -72,6 +72,7 @@
   <addon>
     <name>DynamisHelper</name>
     <description>Displays a timer when a mob is procced, tracks currency obtained, and can create a LL to lot all currency.</description>
+	<support>http://www.ffxiah.com/player/Bahamut/Krizz</support>
   </addon>
   <addon>
     <name>eval</name>
@@ -155,6 +156,12 @@
     <description>Simplifies Cor rolls, tells you the bonus they give, stops you from doubling up on lucky rolls and reports your chance to bust.</description>
   </addon>
   <addon>
+    <name>salvage2</name>
+    <author>Krizz</author>
+    <description>Displays pathos that have not been removed in Salvage 2. Displays zone timer.</description>
+	<support>http://www.ffxiah.com/player/Bahamut/Krizz</support>
+  </addon>
+  <addon>
     <name>SATACast</name>
     <author>Banggugyangu</author>
     <description>Informs Spellcast about changes to Sneak Attack and Trick Attack status.</description>
@@ -191,6 +198,12 @@
     <description>Displays information about your current target in memory.</description>
     <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
+  </addon>
+  <addon>
+    <name>thtracker</name>
+    <author>Krizz</author>
+    <description>Displays latest TH level from chat.</description>
+    <support>http://www.ffxiah.com/player/Bahamut/Krizz</support>
   </addon>
   <addon>
     <name>timestamp</name>
