@@ -26,14 +26,18 @@
 
 file = require 'filehelper'
 chat = require 'chat'
+require 'stringhelper'
  
 members={}
 modmember={}
+nicknames={}
 color={}
+player=get_player()['name']
 config = require 'config'
 
 defaults = {}
-defaults = {}
+defaults.mob=69
+defaults.other=8
 defaults.p0 = 501
 defaults.p1 = 204
 defaults.p2 = 410
@@ -52,6 +56,16 @@ defaults.a22 = 200
 defaults.a23 = 481
 defaults.a24 = 483
 defaults.a25 = 208
+defaults.mobdmg=0
+defaults.mydmg=0
+defaults.partydmg=0
+defaults.allydmg=0
+defaults.otherdmg=0
+defaults.spellcol=0
+defaults.abilcol=0
+defaults.wscol=0
+defaults.statuscol=0
+defaults.itemcol=256
 
 function event_load()
 	send_command('alias highlight lua c highlight')
@@ -66,10 +80,14 @@ end
 
 function initialize()
     if file.exists('../battlemod/data/colors.xml') then
-		settings=config.load('../battlemod/data/colors.xml', defaults)
+		settings=config.load('../battlemod/data/colors.xml', true)
 		write('Colors loaded from battlemod')
 	else
 		settings=config.load(defaults)
+	end
+		nicknames=config.load('/data/nicknames.xml')
+	for i, v in pairs(nicknames) do
+		nicknames[i] = string.split(v, ',')
 	end
 	for i,v in pairs(settings) do
 		color[i]= colconv(v,i)
@@ -77,22 +95,61 @@ function initialize()
 	get_party_members()
 end
 
+function event_chat_message(is_gm, mode, player, message)
+	if mode == 3 then
+		--write('INCOMING TELL!')
+	end
+end
+
+function event_party_invite(sender_id, sender, region)
+	--write('PARTY INVITATION')
+end
+
 function event_incoming_text(original, modified, color)
+
+	local me_party = original:find('%('..player..'%)')
+	local me_linkshell = original:find('<'..player..'>')
+	local me_say = original:find(player..' :')
+	local me_tell = '%w+>>'
+	local other_party = original:find('%(.*%)')
+	local other_linkshell = original:find('<.*>')
+	local other_say = original:find('.* :')
+	local not_bm = original:find('.* '..string.char(129,168)..'.*')
+
 	for names in modified:gmatch('([%w]+)') do
         for name in pairs(members) do
 			if original:lower():gmatch('.*'..members[name]) then
-				modified = modified:gsub(members[name], modmember[name]):gsub(members[name]:lower(), modmember[name]):gsub(members[name]:upper(), modmember[name])
+				modified = modified:igsub(members[name], modmember[name])
 			end
         end
+		
+		for k,v in pairs(nicknames) do
+			for z=1, #v do	
+				modified = modified:igsub(nicknames[k][z]..'([^%a])', function (c) return k:capitalize()..c end):igsub(nicknames[k][z]..'$', k:capitalize())
+			end	
+		end
+		
 	end
+	if not_bm == nil then
+		if other_party ~= nil or other_linkshell ~= nil then
+			if me_party == nil and me_linkshell == nil and me_say == nil then
+				if modified:match(player) then
+					--write('YOU ARE BEING TALKED ABOUT.')
+				end
+			end
+		end
+	end
+	
 	return modified
 end
 	
+	
 function get_party_members()
-	for member in pairs(get_party()) do
-		members[member] = get_party()[member]['name']
-		modmember[member]=color[member]..get_party()[member]['name']..'\x1E\x01'	end
+	for member, member_tb in pairs(get_party()) do
+		members[member] = member_tb['name']
+		modmember[member]=color[member]..member_tb['name']..'\x1E\x01'	end
 end
+
 
 function colconv(str,key)
 	-- Used in the options_load() function. Taken from Battlemod
@@ -112,10 +169,11 @@ function colconv(str,key)
 	return out
 end
 
+
 function event_incoming_chunk(id, data)
 	if id == 221 then
 		modmember={}
 		members={}
-		send_command('wait 0.1; lua i highlights get_party_members')
+		send_command('wait 0.5; lua i highlights get_party_members')
 	end
 end
