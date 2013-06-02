@@ -36,7 +36,7 @@ require 'generic_helpers'
 require 'static_vars'
 
 function event_load()
-	version = '2.16'
+	version = '2.17'
 	block_equip = false
 	block_cannot = false
 	
@@ -209,7 +209,14 @@ end
 function event_incoming_text(original, modified, color)
 	local redcol = color%256
 	
-	if redcol == 127 then
+	if redcol == 36 then
+		a,z = string.find(original,' defeats ')
+		if a then
+			if original:sub(1,4) ~= string.char(0x1F,0xFE,0x1E,0x01) then
+				return '',color
+			end
+		end
+	elseif redcol == 127 then
 		a,z = string.find(original,' corpuscules of ')
 		b,z = string.find(original,' experience points')
 		if a or b then
@@ -217,13 +224,7 @@ function event_incoming_text(original, modified, color)
 				return '',color
 			end
 		end
-	elseif blocked_colors:contains(redcol) then
-		if original:sub(1,4) ~= string.char(0x1F,0xFE,0x1E,0x01) then
-			return '',color
-		end
-	end
-	
-	if redcol == 121 and cancelmulti then
+	elseif redcol == 121 and cancelmulti then
 		a,z = string.find(original,'Equipment changed')
 		
 		if a and not block_equip then
@@ -232,9 +233,7 @@ function event_incoming_text(original, modified, color)
 		elseif a and block_equip then
 			modified = ''
 		end
-	end
-	
-	if redcol == 123 and cancelmulti then
+	elseif redcol == 123 and cancelmulti then
 		a,z = string.find(original,'You were unable to change your equipped items')
 		b,z = string.find(original,'You cannot use that command while viewing the chat log')
 		c,z = string.find(original,'You must close the currently open window to use that command')
@@ -244,6 +243,10 @@ function event_incoming_text(original, modified, color)
 			block_cannot = true
 		elseif (a or b or c) and block_cannot then
 			modified = ''
+		end
+	elseif blocked_colors:contains(redcol) then
+		if original:sub(1,4) ~= string.char(0x1F,0xFE,0x1E,0x01) then
+			return '',color
 		end
 	end
 	
