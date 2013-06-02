@@ -218,8 +218,13 @@ function texts.hide(t)
 end
 
 -- Returns whether or not the text object is visible.
-function texts.visible(t)
-	return t._settings.visible
+function texts.visible(t, visible)
+	if not visible then
+		return t._settings.visible
+	end
+
+	tb_set_vsibility(t._name, visible)
+	t._settings.visible = visible
 end
 
 -- Sets the text. This will ignore the defined text patterns.
