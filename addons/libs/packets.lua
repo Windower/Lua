@@ -193,6 +193,20 @@ for key = 0x000, 0x1FF do
 	packets.fields.outgoing[key] = L{}
 end
 
+packets.fields.incoming[0x00B] = L{
+	{ctype='unsigned int',   label='Type'},              --   4-  7
+--	{ctype='unsigned int',   label='IP'},                --   8- 11
+	{ctype='unsigned char',  label='IP1'},               --   8-  8
+	{ctype='unsigned char',  label='IP2'},               --   9-  9
+	{ctype='unsigned char',  label='IP3'},               --  10- 10
+	{ctype='unsigned char',  label='IP4'},               --  11- 11
+	{ctype='unsigned short', label='Port'},              --  12- 15
+	{ctype='unsigned short', label='_unknown1'},         --  16- 17
+	{ctype='unsigned int',   label='_unknown2'},         --  18- 21
+	{ctype='unsigned int',   label='_unknown3'},         --  22- 25
+	{ctype='unsigned int',   label='_unknown4'},         --  26- 29
+}
+
 packets.fields.incoming[0x00E] = L{
 	{ctype='unsigned int',   label='ID'},                --   4-  7
 	{ctype='unsigned short', label='Index'},             --   8-  9
