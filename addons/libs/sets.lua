@@ -30,6 +30,10 @@ function S(t)
 	return setmetatable(s, _meta.S)
 end
 
+function set.empty(s)
+	return next(s) == nil
+end
+
 function set.length(s)
 	local count = 0
 	
