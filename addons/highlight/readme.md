@@ -1,6 +1,6 @@
 
 ##Description
-This addon highlights the names of teh people in your party, and highlights their name when it appears in chat. 
+This addon highlights the names of the people in your party, and highlights their name when it appears in chat. 
 
 The colors you select in this file will override any colours specified by other addons, for instance, Rolltracker and Battlemod
 
