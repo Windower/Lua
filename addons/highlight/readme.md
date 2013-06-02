@@ -1,6 +1,6 @@
-Author: Thomas Rogers / Balloon - Cerberus
-Addon: Highlight
-Version: 0.5
+* Author: Thomas Rogers / Balloon - Cerberus
+* Addon: Highlight
+* Version: 0.5
 
 ##Description
 This addon highlights the names of teh people in your party, and highlights their name when it appears in chat. 
