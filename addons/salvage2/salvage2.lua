@@ -127,11 +127,13 @@ function checkzone()
 	if currentzone == 'silver sea remnants' or currentzone == 'zhayolm remnants' or currentzone == 'bhaflau remnants' or currentzone == 'arrapago remnants' then
 		send_command('timers c Remaining 6000 up')
 		settings_create()
+		initialize()
 		tb_set_visibility('salvage_box2', true)
 	else
 		send_command('timers d Remaining')
-		tb_set_visibility('salvage_box2', false)
 		settings_create()
+		initialize()
+		tb_set_visibility('salvage_box2', false)
 	end
 end
 
