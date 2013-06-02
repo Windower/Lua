@@ -36,7 +36,7 @@ require 'generic_helpers'
 require 'static_vars'
 
 function event_load()
-	version = '2.15'
+	version = '2.16'
 	block_equip = false
 	block_cannot = false
 	
@@ -46,6 +46,13 @@ function event_load()
 end
 
 function options_load()
+	if not dir_exists(lua_base_path..'data/') then
+		create_dir(lua_base_path..'data/')
+	end
+	if not dir_exists(lua_base_path..'data/filters/') then
+		create_dir(lua_base_path..'data/filters/')
+	end
+	 
 	local settingsFile = file.new('data/settings.xml',true)
 	local filterFile=file.new('data/filters/filters.xml',true)
 	local colorsFile=file.new('data/colors.xml',true)
@@ -55,32 +62,32 @@ function options_load()
 		write('Default settings xml file created')
 	end
 	
-	local settingtab = config.load('data/settings.xml',true)
+	local settingtab = config.load('data/settings.xml',default_settings_table)
+	config.save(settingtab)
+	
 	for i,v in pairs(settingtab) do
 		_G[i] = v
 	end
-	if not file.exists('data/filters/filters.xml') then
-			filterFile:write(default_filters)
-			write('Default filters xml file created')
-	end
 	
+	if not file.exists('data/filters/filters.xml') then
+		filterFile:write(default_filters)
+		write('Default filters xml file created')
+	end
 	local tempplayer = get_player()
 	if tempplayer then
 		filterload(tempplayer['main_job'])
 	else
 		filterload('DEFAULT')
 	end
-	
 	if not file.exists('data/colors.xml') then
 		colorsFile:write(default_colors)
 		write('Default colors xml file created')
 	end
-	
-	local colortab = config.load('data/colors.xml',true)
+	local colortab = config.load('data/colors.xml',default_color_table)
+	config.save(colortab)
 	for i,v in pairs(colortab) do
 		color_arr[i] = colconv(v,i)
 	end
-		
 	write('Battlemod v'..version..' loaded.')
 end
 
@@ -90,10 +97,10 @@ end
 
 function filterload(job)	
 	if file.exists('data/filters/filters-'..job..'.xml') then
-		filter = config.load('data/filters/filters-'..job..'.xml',true)
+		filter = config.load('data/filters/filters-'..job..'.xml',default_filter_table,false)
 		add_to_chat(12,'Loaded '..job..' Battlemod filters')
 	else
-		filter = config.load('data/filters/filters.xml',true)
+		filter = config.load('data/filters/filters.xml',default_filter_table,false)
 		add_to_chat(12,'Loaded default Battlemod filters')
 	end
 end
@@ -253,6 +260,8 @@ function event_action_message(actor_id,index,actor_target_index,target_target_in
 		
 		if enfeebling:contains(param_1) then
 			status = color_it(statuses[param_1]['english'],color_arr['enfeebcol'])
+		elseif color_arr['statuscol'] == rcol then
+			status = color_it(statuses[param_1]['english'],string.char(0x1F,191))
 		else
 			status = color_it(statuses[param_1]['english'],color_arr['statuscol'])
 		end
@@ -299,12 +308,11 @@ function event_action_message(actor_id,index,actor_target_index,target_target_in
 		if status then
 			if enfeebling:contains(param_1) then
 				status = color_it(status,color_arr['enfeebcol'])
-			elseif color_arr['statuscol'] == string.char(0x1E,0x01) then
-				status = color_it(status,string.char(0x1F,191))
 			else
 				status = color_it(status,color_arr['statuscol'])
 			end
 		end
+
 		if spell then spell = color_it(spell,color_arr['spellcol']) end
 		if target then target = namecol(target,target_table,party_table) end
 		if actor then actor = namecol(actor,actor_table,party_table) end
