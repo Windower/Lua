@@ -268,11 +268,11 @@ function xml.tokenize(content, line)
 			end
 		end
 	end
-	
+
 	for array, line in tokens:it() do
 		tokens[line] = array:filter(-'')
 	end
-	
+
 	return tokens
 end
 
