@@ -120,7 +120,7 @@ function add_name(mode, ...)
 		end
 	end
 	settings:save()
-	if not success:isempty() then
+	if not success:empty() then
 		log('Added '..success:format()..' to the '..aliases[mode]..'.')
 	end
 end
@@ -138,7 +138,7 @@ function rm_name(mode, ...)
 		end
 	end
 	settings:save()
-	if not success:isempty() then
+	if not success:empty() then
 		log('Removed '..success:format()..' from the '..aliases[mode]..'.')
 	end
 end
@@ -169,7 +169,7 @@ function event_addon_command(command, ...)
 		names = args:slice(2):map(string.ucfirst..string.lower)
 		
 		-- If no operator provided
-		if args:isempty() then
+		if args:empty() then
 			log(mode:ucfirst()..':', settings[mode]:format('csv'))
 		else
 			if args[1]:isin(addstrs) then
@@ -213,8 +213,8 @@ function event_addon_command(command, ...)
 	-- Print current settings status
 	elseif command == 'status' then
 		log('Mode:', settings.mode)
-		log('Whitelist:', settings.whitelist:isempty() and '(empty)' or settings.whitelist:format('csv'))
-		log('Blacklist:', settings.blacklist:isempty() and '(empty)' or settings.blacklist:format('csv'))
+		log('Whitelist:', settings.whitelist:empty() and '(empty)' or settings.whitelist:format('csv'))
+		log('Blacklist:', settings.blacklist:empty() and '(empty)' or settings.blacklist:format('csv'))
 		log('Auto-decline:', settings.autodecline)
 	
 	-- Unknown command handler
