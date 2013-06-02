@@ -64,11 +64,11 @@ function xml.read(file)
 	if type(file) == 'string' then
 		file = files.new(file)
 	end
-	
+
 	if not file:exists() then
 		return xml.error('File not found: '..file.path)
 	end
-	
+
 	return xml.parse(file:read())
 end
 
@@ -269,8 +269,8 @@ function xml.tokenize(content, line)
 		end
 	end
 	
-	for line, array in ipairs(tokens) do
-		tokens[line] = array:filter(-string.isempty)
+	for array, line in tokens:it() do
+		tokens[line] = array:filter(-'')
 	end
 	
 	return tokens

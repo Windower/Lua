@@ -211,7 +211,7 @@ function string.isin(str, t)
 end
 
 -- Checks if a string is empty
-function string.isempty(str)
+function string.empty(str)
 	return str == ''
 end
 

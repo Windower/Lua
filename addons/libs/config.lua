@@ -108,7 +108,7 @@ function parse(confdict, overwrite)
 	meta.chars = parsed:keyset():filter(-'global')
 	meta.original = T{}
 
-	if overwrite or confdict:isempty() then
+	if overwrite or confdict:empty() then
 		for char in (L{'global'}+meta.chars):it() do
 			meta.original[char] = confdict:copy():update(parsed[char], true)
 		end
@@ -293,7 +293,7 @@ function config.save(t, char)
 		meta.original.global:amend(meta.original[char])
 		meta.original[char] = table_diff(meta.original['global'], meta.original[char]) or T{}
 
-		if meta.original[char]:isempty() then
+		if meta.original[char]:empty() then
 			meta.original[char] = nil
 			meta.chars:delete(char)
 		end
@@ -330,7 +330,7 @@ function table_diff(t, t_new)
 		end
 	end
 
-	if res:isempty() then
+	if res:empty() then
 		return nil
 	end
 

@@ -32,6 +32,10 @@ function L(t)
 	return setmetatable(l, _meta.L)
 end
 
+function list.empty(l)
+	return l.n == 0
+end
+
 function list.length(l)
 	return l.n
 end

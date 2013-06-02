@@ -557,7 +557,13 @@ function table.sconcat(t)
 end
 
 -- Check if table is empty.
+-- DEPRECATED: Use table.empty instead.
 function table.isempty(t)
+	return next(t) == nil
+end
+
+-- Check if table is empty.
+function table.empty(t)
 	return next(t) == nil
 end
 
