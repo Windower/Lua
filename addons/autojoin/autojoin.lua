@@ -15,7 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 require 'luau'
 
-_addon = T{}
+_addon = _addon or {}
 _addon.name = 'AutoJoin'
 _addon.command = 'autojoin'
 _addon.short_command = 'aj'
