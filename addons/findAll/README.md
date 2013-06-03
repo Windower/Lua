@@ -1,5 +1,5 @@
 **Author:** Giuliano Riccio  
-**Version:** v 1.20130529
+**Version:** v 1.20130603
 
 # FindAll #
 
@@ -20,11 +20,12 @@ findall
 Looks for any item whose name (long or short) contains the specified value on the specified characters.
 
 ```
-findall [:<character1> [:...]] <query>
+findall [:<character1> [:...]] <query> [-e<filename>|--export=<filename>]
 ```
 * **_character1_:** the name of the characters to use for the search.
 * **...:** variable list of character names.
 * **_query_** the word you are looking for.
+* **-e<filename>** or **--export=<filename>** exports the results to a csv file. The file will be created in the data folder.
 
 ### Examples ###
 Search for "thaumas" on all your characters.
@@ -53,6 +54,10 @@ findall :omega
 ----
 
 ##Changelog##
+### v1.20130603 ###
+* **add**: Added export function
+* **change**: Leave the case of items' names untouched
+
 ### v1.20130529 ###
 * **fix:** Escaped patterns in search terms.
 * **change**: Aligned to Windower's addon development guidelines.
