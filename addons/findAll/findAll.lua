@@ -1,5 +1,5 @@
 --[[
-findAll v1.20130524
+findAll v1.20130603
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -34,7 +34,7 @@ require 'sets'
 
 _addon = {}
 _addon.name    = 'findAll'
-_addon.version = '1.20130529'
+_addon.version = '1.20130603'
 
 json  = require 'json'
 file  = require 'filehelper'
