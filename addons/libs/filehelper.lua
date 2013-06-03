@@ -3,7 +3,8 @@ File handler.
 ]]
 
 _libs = _libs or {}
-_libs.filehelper = true
+_libs.filehelper   = true
+_libs.logger       = _libs.logger or require 'logger'
 _libs.stringhelper = _libs.stringhelper or require 'stringhelper'
 
 local file = {}
