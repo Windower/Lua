@@ -54,7 +54,7 @@ resources              = {
     ['general'] = '../../plugins/resources/items_general.xml'
 }
 
-function search(query)
+function search(query, export)
     if global_storages ~= nil then
         if not update() then
             return
@@ -115,8 +115,8 @@ function search(query)
                             and new_item_ids:contains(id)
                         then
                             item_names[id] = {
-                                ['name']      = name:lower():gsub('♂', '\x81\x89'):gsub('♀', '\x81\x8A'),
-                                ['long_name'] = long_name:lower():gsub('♂', '\x81\x89'):gsub('♀', '\x81\x8A')
+                                ['name']      = name:gsub('♂', '\x81\x89'):gsub('♀', '\x81\x8A'),
+                                ['long_name'] = long_name:gsub('♂', '\x81\x89'):gsub('♀', '\x81\x8A')
                             }
                         end
                     end
@@ -130,10 +130,12 @@ function search(query)
     end
 
     local results_items = S{}
+    local terms_pattern = terms:escape():gsub('%a', function(char) return string.format("[%s%s]", char:lower(), char:upper()) end)
 
     for id, names in pairs(item_names) do
-        if item_names[id].name:find(terms:escape())
-            or item_names[id].long_name:find(terms:escape())
+        
+        if item_names[id].name:find(terms_pattern)
+            or item_names[id].long_name:find(terms_pattern)
         then
             results_items:add(id)
         end
@@ -143,10 +145,22 @@ function search(query)
 
     local no_results   = true
     local sorted_names = global_storages:keyset():sort()
-                                                       :reverse()
+                                                 :reverse()
 
     sorted_names = sorted_names:append(sorted_names:remove(sorted_names:find(get_player().name)))
                                :reverse()
+
+    local export_file
+
+    if export ~= nil then
+        export_file = io.open(lua_base_path..'data/'..export, 'w')
+        
+        if export_file == nil then
+            error('The file "'..export..'" cannot be created.')
+        else
+            export_file:write('"char";"storage";"item";"quantity"\n')
+        end
+    end
 
     for _, character_name in ipairs(sorted_names) do
         if character_filters:length() == 0 or character_filters:length() > 0 and character_filters:contains(character_name) then
@@ -160,9 +174,13 @@ function search(query)
                         if results_items:contains(id) then
                             results:append(
                                 '\30\03'..character_name..'/'..storage_name..':\30\01 '..
-                                item_names[id].name:gsub(terms:escape(), '\30\02'..terms..'\30\01')..
+                                item_names[id].name:gsub('('..terms_pattern..')', '\30\02%1\30\01')..
                                 (quantity > 1 and ' \30\03('..quantity..')\30\01' or '')
                             )
+                            
+                            if export_file ~= nil then
+                                export_file:write('"'..character_name..'";"'..storage_name..'";"'..item_names[id].name..'";"'..quantity..'"\n')
+                            end
 
                             no_results = false
                         end
@@ -176,6 +194,11 @@ function search(query)
                 end
             end
         end
+    end
+    
+    if export_file ~= nil then
+        export_file:close()
+        log('The results have been saved to "'..export..'"')
     end
 
     if no_results then
@@ -237,7 +260,7 @@ function update()
     if time_difference < deferral_time then
         warning('findAll will be available in '..(deferral_time - time_difference)..' seconds.')
 
-        return false
+        --return false
     end
 
     local player_name   = get_player().name
@@ -318,14 +341,29 @@ end
 function event_addon_command(...)
     local params = L{...}
     local query  = L{}
+    local export = nil
 
     while params:length() > 0 and params[1]:match('^:%a+$') do
         query:append(params:remove(1))
     end
 
     if params:length() > 0 then
+        export = params[params:length()]:match('^--export=(.+)$') or params[params:length()]:match('^-e(.+)$')
+
+        if export ~= nil then
+            export = export:gsub('%.csv$', '')..'.csv'
+            
+            params:remove(params:length())
+
+            if export:match('['..('\\/:*?"<>|'):escape()..']') then
+                export = nil
+
+                error('The filename cannot contain any of the following characters: \\ / : * ? " < > |')
+            end
+        end
+
         query:append(params:concat(' '))
     end
 
-    search(query)
+    search(query, export)
 end
