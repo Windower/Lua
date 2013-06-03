@@ -36,6 +36,7 @@ local config = require 'config'
 _addon = {}
 _addon.name    = 'plasmon'
 _addon.version = '1.20130529'
+_addon.command = 'plasmon'
 
 tb_name       = 'addon:gr:plasmon'
 track         = false
@@ -156,9 +157,9 @@ end
 function start_tracking()
     reset_stats()
     log('The Delve has begun!')
-    
+
     track = true
-    
+
     if recovery_mode then
         recovery_mode = false
     end
@@ -172,7 +173,7 @@ function stop_tracking()
     stats.scores  = T{}
     stats.bonuses = T{}
     track         = false
-    
+
     log('The Delve has ended.')
     hide_window()
     show_report()
@@ -260,14 +261,11 @@ function first_run()
     settings:save('all')
 end
 
--- windower events
-
-function event_load()
+function initialize()
     settings = config.load(defaults)
 
     local background = settings.colors.background
 
-    send_command('alias plasmon lua c plasmon')
     tb_create(tb_name)
     tb_set_location(tb_name, settings.position.x, settings.position.y)
     tb_set_bg_color(tb_name, background.a, background.r, background.g, background.b)
@@ -277,28 +275,46 @@ function event_load()
     tb_set_italic(tb_name, settings.font.italic)
     tb_set_text(tb_name, '')
     tb_set_bg_visibility(tb_name, true)
-    
+
     if get_ffxi_info().zone_id == 271 then
         recovery_mode = true
+    end
+end
+
+function dispose()
+    tb_delete(tb_name)
+end
+
+-- windower events
+
+function event_load()
+    if _addon.command then
+        send_command('alias '.._addon.command..' lua c '.._addon.name)
+    end
+
+    if get_ffxi_info()['logged_in'] then
+        initialize()
     end
 end
 
 function event_unload()
+    dispose()
+
     send_command('unalias plasmon')
-    tb_delete(tb_name)
 end
 
 function event_login()
+    initialize()
     first_run()
-    
-    if get_ffxi_info().zone_id == 271 then
-        recovery_mode = true
-    end
+end
+
+function event_logout()
+    dispose()
 end
 
 function event_incoming_text(original, modified, mode)
     local match
-    
+
     original = original:strip_format()
 
     if track or recovery_mode then
@@ -309,7 +325,7 @@ function event_incoming_text(original, modified, mode)
                 if recovery_mode then
                     start_tracking()
                 end
-                
+
                 match = tonumber(match, 10)
 
                 stats.plasm     = stats.plasm + match
@@ -334,7 +350,7 @@ function event_incoming_text(original, modified, mode)
                 if recovery_mode then
                     start_tracking()
                 end
-                
+
                 stats.airlixirs1    = stats.airlixirs1 + 1
                 stats.tot_airlixirs1 = stats.tot_airlixirs1 + 1
                 refresh_window()
@@ -348,7 +364,7 @@ function event_incoming_text(original, modified, mode)
                 if recovery_mode then
                     start_tracking()
                 end
-                
+
                 stats.airlixirs2     = stats.airlixirs2 + 1
                 stats.tot_airlixirs2 = stats.tot_airlixirs2 + 1
                 refresh_window()
@@ -362,7 +378,7 @@ function event_incoming_text(original, modified, mode)
                 if recovery_mode then
                     start_tracking()
                 end
-                
+
                 stats.airlixirs     = stats.airlixirs + 1
                 stats.tot_airlixirs = stats.tot_airlixirs + 1
                 refresh_window()
