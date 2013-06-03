@@ -1,5 +1,5 @@
 --[[
-reive v1.20130529
+reive v1.20130603
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -35,7 +35,7 @@ local config = require 'config'
 
 _addon = {}
 _addon.name    = 'reive'
-_addon.version = '1.20130529'
+_addon.version = '1.20130603'
 
 tb_name = 'addon:gr:reive'
 track   = false
@@ -293,11 +293,11 @@ function first_run()
         return
     end
 
-    --[[log('Hi '..get_player()['name']:lower()..',')
+    log('Hi '..get_player()['name']:lower()..',')
     log('thank you for using reive v'.._addon.version)
-    log('in this update i\'ve fixed a bug that prevented the addon from tracking correctly the total gained exp.')
+    log('With this update I\'ve fixed an issue that prevented the addon to start tracking info.')
     log('I\'m sorry for any inconvenience this may have caused.')
-    log('- zohno@phoenix')]]
+    log('- Zohno@Phoenix')
 
     settings.v         = _addon.version
     settings.first_run = false
@@ -336,13 +336,13 @@ function event_login()
     first_run()
 end
 
-function event_gain_show_report(id, name)
+function event_gain_status(id, name)
     if id == 511 then
         start_tracking()
     end
 end
 
-function event_lose_show_report(id, name)
+function event_lose_status(id, name)
     if id == 511 then
         stop_tracking()
     end
@@ -377,7 +377,7 @@ function event_incoming_text(original, modified, mode)
         match = original:match('obtained (%d+) bayld!')
 
         if match and track then
-            stats.bayld    = stats.bayld + match
+            stats.bayld     = stats.bayld + match
             stats.tot_bayld = stats.tot_bayld + match
             refresh()
         end
@@ -385,7 +385,7 @@ function event_incoming_text(original, modified, mode)
         match = original:match('gains (%d+) limit points%.')
 
         if match then
-            stats.exp    = stats.exp + match
+            stats.exp     = stats.exp + match
             stats.tot_exp = stats.tot_exp + match
             refresh()
 
@@ -396,7 +396,7 @@ function event_incoming_text(original, modified, mode)
 
 
         if match then
-            stats.exp    = stats.exp + match
+            stats.exp     = stats.exp + match
             stats.tot_exp = stats.tot_exp + match
             refresh()
 
