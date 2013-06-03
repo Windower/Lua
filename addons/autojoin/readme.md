@@ -1,4 +1,6 @@
-Author:Stjepan Bakrac
+Author: Stjepan Bakrac
+Addon: AutoJoin
+Version: 0.9
 
 # AutoJoin
 
@@ -49,4 +51,3 @@ Shows the current mode, the people on the blacklist and whitelist, as well as if
 ```
 
 Saves current settings for all characters. This will overwrite all user-defined settings. Nothing is needed to save settings for the current character, that happens automatically any setting is changed.
-

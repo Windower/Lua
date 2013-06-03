@@ -24,7 +24,7 @@ local make_atom
 
 -- Returns the abilities, indexed by ingame ID.
 function resources.abils()
-	if not abils:isempty() then
+	if not abils:empty() then
 		return abils
 	end
 	
@@ -43,7 +43,7 @@ end
 
 -- Returns the spells, indexed by ingame ID.
 function resources.spells()
-	if not spells:isempty() then
+	if not spells:empty() then
 		return spells
 	end
 	
@@ -62,7 +62,7 @@ end
 
 -- Returns the statuses, indexed by ingame ID.
 function resources.status()
-	if not status:isempty() then
+	if not status:empty() then
 		return status
 	end
 	
@@ -81,7 +81,7 @@ end
 
 -- Returns the items, indexed by ingame ID.
 function resources.items()
-	if not items:isempty() then
+	if not items:empty() then
 		return items
 	end
 	

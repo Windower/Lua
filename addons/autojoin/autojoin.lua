@@ -15,7 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 require 'luau'
 
-_addon = T{}
+_addon = _addon or {}
 _addon.name = 'AutoJoin'
 _addon.command = 'autojoin'
 _addon.short_command = 'aj'
@@ -109,9 +109,9 @@ end
 
 -- Adds names to a given list type.
 function add_name(mode, ...)
-	local names = T{...}
-	local success = T{}
-	for _, name in ipairs(names) do
+	local names = L{...}
+	local success = S{}
+	for name in names.it() do
 		if not settings[mode]:contains(name) then
 			settings[mode]:append(name)
 			success:append(name)
@@ -120,7 +120,7 @@ function add_name(mode, ...)
 		end
 	end
 	settings:save()
-	if not success:isempty() then
+	if not success:empty() then
 		log('Added '..success:format()..' to the '..aliases[mode]..'.')
 	end
 end
@@ -138,7 +138,7 @@ function rm_name(mode, ...)
 		end
 	end
 	settings:save()
-	if not success:isempty() then
+	if not success:empty() then
 		log('Removed '..success:format()..' from the '..aliases[mode]..'.')
 	end
 end
@@ -146,7 +146,7 @@ end
 -- Interpreter
 
 function event_addon_command(command, ...)
-	command = command or 'status'
+	command = command and command:lower() or 'status'
 	local args = T{...}
 	
 	-- Mode switch
@@ -169,7 +169,7 @@ function event_addon_command(command, ...)
 		names = args:slice(2):map(string.ucfirst..string.lower)
 		
 		-- If no operator provided
-		if args:isempty() then
+		if args:empty() then
 			log(mode:ucfirst()..':', settings[mode]:format('csv'))
 		else
 			if args[1]:isin(addstrs) then
@@ -181,6 +181,28 @@ function event_addon_command(command, ...)
 				notice('Invalid operator specified. Specify add or remove.')
 			end
 		end
+		
+	-- Auto-decline settings
+	elseif command:isin({'decline', 'autodecline', 'auto-decline'}) then
+		if args[1] ~= nil then
+			local decline = args[1]:lower()
+			local check = false
+			if decline == 'true' then
+				settings.autodecline = true
+				check = true
+			elseif decline == 'false' then
+				settings.autodecline = false
+				check = true
+			else
+				log('Invalid command for autodecline. Specify true or false.')
+			end
+
+			if check then
+				log('Set auto-decline to '..tostring(settings.autodecline)..'.')
+			end
+		else
+			log('Auto-decline is currently '..(settings.autodecline and 'on' or 'off')..'.')
+		end
 	
 	-- Save settings. This is only needed for global or cross-character settings, as current-chracter settings will be saved every time something is changed.
 	elseif command == 'save' then
@@ -191,8 +213,8 @@ function event_addon_command(command, ...)
 	-- Print current settings status
 	elseif command == 'status' then
 		log('Mode:', settings.mode)
-		if settings.whitelist:isempty() then log('Whitelist:', '(empty)') else log('Whitelist:', settings.whitelist:format('csv')) end
-		if settings.blacklist:isempty() then log('Blacklist:', '(empty)') else log('Blacklist:', settings.blacklist:format('csv')) end
+		log('Whitelist:', settings.whitelist:empty() and '(empty)' or settings.whitelist:format('csv'))
+		log('Blacklist:', settings.blacklist:empty() and '(empty)' or settings.blacklist:format('csv'))
 		log('Auto-decline:', settings.autodecline)
 	
 	-- Unknown command handler

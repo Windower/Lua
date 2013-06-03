@@ -50,6 +50,8 @@
     <name>CellHelp</name>
     <author>Krizz and Balloon</author>
     <description>Tracks cells that are needed, displays your position in the lot order, and creates the appropriate LL profiles.</description>
+	<bugtracker>https://github.com/tehkrizz/Lua/issues</bugtracker>
+	<support>http://www.ffxiah.com/player/Bahamut/Krizz</support>
   </addon>
   <addon>
     <author>Giuliano Riccio (Zohno@Phoenix)</author>
@@ -59,12 +61,21 @@
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
+    <author>Ikonic</author>
+    <name>ChatPorter</name>
+    <description>Displays tell, party, and linkshell chat to alternate character.  Also, allows you to reply from either character.</description>
+    <bugtracker>https://github.com/Icinoki/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Ragnarok/Ikonic</support>
+  </addon>
+  <addon>
     <name>Daze</name>
     <description>Records what daze effects are on the monster you're fighting.</description>
   </addon>
   <addon>
     <name>DynamisHelper</name>
     <description>Displays a timer when a mob is procced, tracks currency obtained, and can create a LL to lot all currency.</description>
+	<bugtracker>https://github.com/tehkrizz/Lua/issues</bugtracker>
+	<support>http://www.ffxiah.com/player/Bahamut/Krizz</support>
   </addon>
   <addon>
     <name>eval</name>
@@ -146,6 +157,15 @@
     <name>RollTracker</name>
     <author>Balloon</author>
     <description>Simplifies Cor rolls, tells you the bonus they give, stops you from doubling up on lucky rolls and reports your chance to bust.</description>
+	<bugtracker>https://github.com/Podginator/Lua/issues</bugtracker>
+	<support>Podginator@gmail.com</support>
+  </addon>
+  <addon>
+    <name>salvage2</name>
+    <author>Krizz</author>
+    <description>Displays pathos that have not been removed in Salvage 2. Displays zone timer.</description>
+	<bugtracker>https://github.com/tehkrizz/Lua/issues</bugtracker>
+	<support>http://www.ffxiah.com/player/Bahamut/Krizz</support>
   </addon>
   <addon>
     <name>SATACast</name>
@@ -179,11 +199,25 @@
     <description>A simple helper addon for Spellcast for Scholar Stratagems. It will automatically calculate the number of stratagems you have and push them into spellcast variables.</description>
   </addon>
   <addon>
+    <name>Highlight</name>
+    <description>Highlights party members names when mentioned in the chatlog.</description>
+    <author>Balloon</author>
+	<bugtracker>https://github.com/Podginator/Lua/issues</bugtracker>
+	<support>Podginator@gmail.com</support>
+  </addon>
+  <addon>
     <name>TargetInfo</name>
     <author>Arcon</author>
     <description>Displays information about your current target in memory.</description>
     <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
+  </addon>
+  <addon>
+    <name>thtracker</name>
+    <author>Krizz</author>
+    <description>Displays latest TH level from chat.</description>
+	<bugtracker>https://github.com/tehkrizz/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Bahamut/Krizz</support>
   </addon>
   <addon>
     <name>timestamp</name>

@@ -10,6 +10,8 @@ _libs.mathhelper = _libs.mathhelper or require 'mathhelper'
 _libs.stringhelper = _libs.stringhelper or require 'stringhelper'
 _libs.functools = _libs.functools or require 'functools'
 
+require 'pack'
+
 local packets = {}
 packets.incoming = {}
 packets.outgoing = {}
@@ -150,26 +152,101 @@ packets.lengths = setmetatable(packets.lengths, {__index = function(t, k)
 	end
 end})
 
+-- Type identifiers as declared in Lua
+local pack_ids = {}
+pack_ids['bool'] = 'b'
+pack_ids['unsigned char'] = 'b'
+pack_ids['unsigned short'] = 'H'
+pack_ids['unsigned int'] = 'I'
+pack_ids['unsigned long'] = 'L'
+pack_ids['signed char'] = 'c'
+pack_ids['signed short'] = 'h'
+pack_ids['signed int'] = 'i'
+pack_ids['signed long'] = 'L'
+pack_ids['char'] = 'c'
+pack_ids['short'] = 'h'
+pack_ids['int'] = 'i'
+pack_ids['long'] = 'l'
+pack_ids['float'] = 'f'
+pack_ids['double'] = 'd'
+pack_ids = setmetatable(pack_ids, {__index = function(t, k)
+	local type, number = k:match('(.-)%s*%[(%d+)%]')
+	if type then
+		local pack_id = rawget(t, type)
+		if pack_id then
+			if type == 'char' then
+				return 'A'..number
+			else
+				return pack_id..number
+			end
+		end
+	end
+end})
+
 -- Specific field data for p.
 packets.fields = {}
 packets.fields.incoming = {}
 packets.fields.outgoing = {}
 
+for key = 0x000, 0x1FF do
+	packets.fields.incoming[key] = L{}
+	packets.fields.outgoing[key] = L{}
+end
+
+packets.fields.incoming[0x00B] = L{
+	{ctype='unsigned int',   label='Type'},              --   4-  7
+--	{ctype='unsigned int',   label='IP'},                --   8- 11
+	{ctype='unsigned char',  label='IP1'},               --   8-  8
+	{ctype='unsigned char',  label='IP2'},               --   9-  9
+	{ctype='unsigned char',  label='IP3'},               --  10- 10
+	{ctype='unsigned char',  label='IP4'},               --  11- 11
+	{ctype='unsigned short', label='Port'},              --  12- 15
+	{ctype='unsigned short', label='_unknown1'},         --  16- 17
+	{ctype='unsigned int',   label='_unknown2'},         --  18- 21
+	{ctype='unsigned int',   label='_unknown3'},         --  22- 25
+	{ctype='unsigned int',   label='_unknown4'},         --  26- 29
+}
+
+packets.fields.incoming[0x00E] = L{
+	{ctype='unsigned int',   label='ID'},                --   4-  7
+	{ctype='unsigned short', label='Index'},             --   8-  9
+	{ctype='unsigned char',  label='Mask'},              --  10- 10
+	{ctype='unsigned char',  label='Rotation'},          --  11- 11
+	{ctype='float',          label='X Position'},        --  12- 15
+	{ctype='float',          label='Z Position'},        --  16- 19
+	{ctype='float',          label='Y Position'},        --  20- 23
+	{ctype='unsigned short', label='_unknown1'},         --  24- 25
+	{ctype='unsigned short', label='_unknown2'},         --  26- 27
+	{ctype='unsigned short', label='_unknown3'},         --  28- 29
+	{ctype='unsigned char',  label='HP %'},              --  30- 28
+	{ctype='unsigned char',  label='Animation'},         --  31- 31
+	{ctype='unsigned short', label='Status'},            --  32- 33
+	{ctype='unsigned short', label='_unknown4'},         --  34- 35
+	{ctype='unsigned int',   label='_unknown5'},         --  36- 39
+	{ctype='unsigned int',   label='_unknown6'},         --  40- 43
+	{ctype='unsigned int',   label='Claimer ID'},        --  44- 47
+	{ctype='unsigned short', label='_unknown7'},         --  48- 49
+	{ctype='unsigned short', label='Model'},             --  50- 51
+-- This value can't be displayed properly yet, since the array length varies.
+-- Will need to implement a workaround for that.
+	{ctype='char[16]',       label='Name'},              --  52- 75
+}
+
 packets.fields.incoming[0x0DF] = L{
-	{ctype='unsigned int',   label='ID'},                -- 4-7
-	{ctype='unsigned int',   label='HP'},                -- 8-11
-	{ctype='unsigned int',   label='MP'},                -- 12-15
-	{ctype='unsigned int',   label='TP'},                -- 16-19
-	{ctype='unsigned short', label='_unknown_20_21'},
-	{ctype='unsigned short', label='_unknown_22_23'},
-	{ctype='unsigned short', label='_unknown_24_25'},
-	{ctype='unsigned short', label='_unknown_26_27'},
+	{ctype='unsigned int',   label='ID'},                --   4-  7
+	{ctype='unsigned int',   label='HP'},                --   8- 11
+	{ctype='unsigned int',   label='MP'},                --  12- 15
+	{ctype='unsigned int',   label='TP'},                --  16- 19
+	{ctype='unsigned short', label='_unknown1'},         --  20- 21
+	{ctype='unsigned short', label='_unknown2'},         --  22- 23
+	{ctype='unsigned short', label='_unknown3'},         --  24- 25
+	{ctype='unsigned short', label='_unknown4'},         --  26- 27
 }
 
 packets.fields.incoming[0x0CC] = L{
-	{ctype='int',            label='_unknown_4_7'},
-	{ctype='char[128]',      label='Message'},           -- 8-135
-	{ctype='int',            label='_unknown_136_139'},
+	{ctype='int',            label='_unknown1'},         --   4-  7
+	{ctype='char[128]',      label='Message'},           --   8-135
+	{ctype='int',            label='_unknown2'},         -- 136-139
 	{ctype='char[16]',       label='Player Name'},       -- 140-155
 	{ctype='int',            label='Permissions'},       -- 156-159
 	{ctype='char[16]',       label='Linkshell Name'},    -- 160-175, 6-bit packed
@@ -194,19 +271,20 @@ function P(id, data, mode)
 	res._data = data:sub(5)
 	res._hex = data:map(string.zfill-{2}..math.tohex..string.byte)
 
-	if not packets.fields[mode][id] then
+	local fields = packets.fields[mode][id]
+	if #fields == 0 then
 		return res
 	end
 
-	local temp
-	local val
-	local pos = 5
-	for pt in packets.fields[mode][id]:it() do
-		temp = pos
-		pos = pos + packets.lengths[pt.ctype]
-		res[pt.label] = make_val(pt.ctype, data:byte(temp, pos - 1))
+	local keys = fields:map(table.get-{'label'})
+	local pack_str = '<'..fields:map(function (ct) return pack_ids[ct] end..table.get-{'ctype'}):concat()
+
+	for key, val in ipairs({res._data:unpack(pack_str)}) do
+		if key > 1 and keys[key - 1] then
+			res[keys[key - 1]] = val
+		end
 	end
-	
+
 	return res
 end
 

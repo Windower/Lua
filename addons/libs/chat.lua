@@ -11,6 +11,10 @@ local json = require 'json'
 _libs.json = _libs.json or (json ~= nil)
 _libs.logger = _libs.logger or require 'logger'
 
+local res, err = json.read('../libs/ffxidata.json')
+if err then
+	error(err)
+end
 local chat = (ffxi and ffxi.data and ffxi.data.chat) or json.read('../libs/ffxidata.json').chat
 local colors = chat.colors
 local color_controls = chat.colorcontrols
@@ -24,16 +28,16 @@ local make_color
 -- Returns a color from a given input.
 function make_color(col)
 	if type(col) == 'number' then
-		if col < 0 or col >= 512 then
-			warning('Invalid color number '..col..'. Only numbers between 0 and 512 permitted.')
+		if col <= 0x000 or col == 0x100 or col == 0x101 or col > 0x1FF then
+			warning('Invalid color number '..col..'. Only numbers between 1 and 511 permitted, except 256 and 257.')
 			col = ''
-		elseif col < 256 then
+		elseif col <= 0xFF then
 			col = color_controls[1]..string.char(col)
 		else
-			col = color_controls[2]..string.char(col % 256)
+			col = color_controls[2]..string.char(col - 256)
 		end
 	else
-		if col:length() > 2 then
+		if #col > 2 then
 			local cl = col
 			col = colors[col]
 			if col == nil then
@@ -46,13 +50,15 @@ function make_color(col)
 	return col
 end
 
+local invalids = S{0, 256, 257}
+
 -- Returns str colored as specified by newcolor. If oldcolor is omitted, the string color will reset.
 function string.color(str, new_color, reset_color)
-	if new_color == nil then
+	if new_color == nil or invalids:contains(new_color) then
 		return str
 	end
 
-	reset_color = reset_color or color_controls['reset']
+	reset_color = reset_color or color_controls.reset
 
 	new_color = make_color(new_color)
 	reset_color = make_color(reset_color)
@@ -81,16 +87,25 @@ end
 
 -- Returns str colored as specified by (new_alpha, new_red, ...). If reset values are omitted, the string color will reset.
 function string.text_color(str, new_red, new_green, new_blue, reset_red, reset_green, reset_blue)
+	if str == '' then
+		return str
+	end
+
 	if reset_blue then
-		return '\\cs('..new_red..', '..new_green..', '..new_blue..')'..str..'\\cs('..reset_red..', '..reset_green..', '..reset_blue..')'
+		return chat.make_text_color(new_red, new_green, new_blue)..str..chat.make_text_color(reset_red, reset_green, reset_blue)
 	end
 	
-	return '\\cs('..new_red..', '..new_green..', '..new_blue..')'..str..'\\cr'
+	return chat.make_text_color(new_red, new_green, new_blue)..str..'\\cr'
 end
 
 -- Returns a color string in console format.
 function chat.make_text_color(red, green, blue)
 	return '\\cs('..red..', '..green..', '..blue..')'
+end
+
+-- Returns a string stripped of console formatting information.
+function string.text_strip_format(str)
+	return (str:gsub('\\cs%(%s*%d+,%s*%d+,%s*%d+%s*%)(.-)', ''):gsub('\\cr', ''))
 end
 
 chat.text_color_reset = '\\cr'

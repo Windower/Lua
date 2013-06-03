@@ -264,7 +264,7 @@ function json.classify(tokens, root)
 		end
 	end
 
-	if parsed:isempty() then
+	if parsed:empty() then
 		return json.error('No JSON found.')
 	end
 	if #parsed > 1 then
