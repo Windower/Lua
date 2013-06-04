@@ -256,7 +256,7 @@ function first_run()
     log('Hi '..get_player()['name']:lower()..',')
     log('Thank you for using plasmon v'.._addon.version)
     log('I\'ve added a 45 minutes timer to track the time left inside a fracture. It requires Timers plugin\'s custom timers function.')
-    log('- zohno@phoenix')]]
+    log('- zohno@phoenix')
 
     settings.v = _addon.version
     settings.first_run = false
