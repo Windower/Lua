@@ -537,14 +537,25 @@ end
 _raw.table.concat = table.concat
 
 -- Concatenates all objects of a table. Converts to string, if not already so.
-function table.concat(t, str)
+function table.concat(t, str, from, to)
 	str = str or ''
 	local res = ''
-	
-	for key, val in pairs(t) do
-		res = res..tostring(val)
-		if next(t, key) then
-			res = res..str
+
+	if from or to then
+		from = from or 1
+		to = to or #t
+		for key = from, to do
+			res = res..tostring(val)
+			if key < to then
+				res = res..str
+			end
+		end
+	else
+		for key, val in pairs(t) do
+			res = res..tostring(val)
+			if next(t, key) then
+				res = res..str
+			end
 		end
 	end
 	
