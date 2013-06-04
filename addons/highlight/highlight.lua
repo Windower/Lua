@@ -28,6 +28,10 @@ file = require 'filehelper'
 chat = require 'chat'
 require 'stringhelper'
  
+_addon = {}
+_addon.name = 'Highlight'
+_addon.version = '0.5' 
+ 
 members={}
 modmember={}
 nicknames={}
@@ -69,6 +73,7 @@ defaults.itemcol=256
 
 function event_load()
 	send_command('alias highlight lua c highlight')
+	write(_addon['name']..': Version:'.._addon['version'])
 	if get_ffxi_info()['logged_in'] then
         initialize()
     end
