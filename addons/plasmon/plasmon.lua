@@ -1,5 +1,5 @@
 --[[
-plasmon v1.20130529
+plasmon v1.20130604
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -35,7 +35,7 @@ local config = require 'config'
 
 _addon = {}
 _addon.name    = 'plasmon'
-_addon.version = '1.20130529'
+_addon.version = '1.20130604'
 _addon.command = 'plasmon'
 
 tb_name       = 'addon:gr:plasmon'
@@ -150,13 +150,14 @@ function test()
     add_to_chat(121, 'You find an airlixir on the Mob')
     add_to_chat(121, 'You find an airlixir +1 on the Mob')
     add_to_chat(121, 'You find an airlixir +2 on the Mob')
-    add_to_chat(146, 'Your time has expired for this battle. Now exiting...')
+    --add_to_chat(146, 'Your time has expired for this battle. Now exiting...')
     show_window()
 end
 
 function start_tracking()
     reset_stats()
     log('The Delve has begun!')
+    send_command('timers create Delve 2700 down ../../../addons/plasmon/icon')
 
     track = true
 
@@ -175,6 +176,7 @@ function stop_tracking()
     track         = false
 
     log('The Delve has ended.')
+    send_command('timers delete Delve')
     hide_window()
     show_report()
 end
@@ -251,9 +253,9 @@ function first_run()
         return
     end
 
-    --[[log('Hi '..get_player()['name']:lower()..',')
+    log('Hi '..get_player()['name']:lower()..',')
     log('Thank you for using plasmon v'.._addon.version)
-    log('I\'ve fixed the mob kill count and added a "recovery mode" in case of crash/reload.')
+    log('I\'ve added a 45 minutes timer to track the time left inside a fracture. It requires Timers plugin\'s custom timers function.')
     log('- zohno@phoenix')]]
 
     settings.v = _addon.version
@@ -283,6 +285,7 @@ end
 
 function dispose()
     tb_delete(tb_name)
+    send_command('timers delete Delve')
 end
 
 -- windower events
