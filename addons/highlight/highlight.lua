@@ -130,7 +130,7 @@ function event_incoming_text(original, modified, color)
 		
 		for k,v in pairs(nicknames) do
 			for z=1, #v do	
-				modified = modified:igsub('[^%a]'..nicknames[k][z]..'([^%a])', function (pre app) return pre..k:capitalize()..app end):igsub('([^%a])'..nicknames[k][z]..'$', function(space) return space..k:capitalize() end)			end	
+				modified = modified:igsub('([^%a])'..nicknames[k][z]..'([^%a])', function (pre, app) return pre..k:capitalize()..app end):igsub('([^%a])'..nicknames[k][z]..'$', function(space) return space..k:capitalize() end)			end	
 		end
 		
 	end
