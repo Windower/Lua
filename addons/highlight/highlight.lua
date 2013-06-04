@@ -30,12 +30,14 @@ require 'stringhelper'
  
 _addon = {}
 _addon.name = 'Highlight'
-_addon.version = '0.5' 
+_addon.version = '0.7' 
  
 members={}
+mulenames={}
 modmember={}
 nicknames={}
 color={}
+mulecolor={}
 player=get_player()['name']
 config = require 'config'
 
@@ -91,12 +93,24 @@ function initialize()
 		settings=config.load(defaults)
 	end
 		nicknames=config.load('/data/nicknames.xml')
+		mules=config.load('/data/mules.xml')
+		
 	for i, v in pairs(nicknames) do
 		nicknames[i] = string.split(v, ',')
 	end
+	
+	for mule, name in pairs(mules) do
+		mulenames[mule]=name
+	end
+	
 	for i,v in pairs(settings) do
 		color[i]= colconv(v,i)
 	end
+	
+	for i,v in pairs(mules) do
+		mulecolor[i]=colconv(v,i)
+	end
+	
 	get_party_members()
 end
 
@@ -111,7 +125,6 @@ function event_party_invite(sender_id, sender, region)
 end
 
 function event_incoming_text(original, modified, color)
-
 	local me_party = original:find('%('..player..'%)')
 	local me_linkshell = original:find('<'..player..'>')
 	local me_say = original:find(player..' :')
@@ -120,7 +133,7 @@ function event_incoming_text(original, modified, color)
 	local other_linkshell = original:find('<.*>')
 	local other_say = original:find('.* :')
 	local not_bm = original:find('.* '..string.char(129,168)..'.*')
-
+	
 	for names in modified:gmatch('([%w]+)') do
         for name in pairs(members) do
 			if original:lower():gmatch('.*'..members[name]) then
@@ -130,8 +143,12 @@ function event_incoming_text(original, modified, color)
 		
 		for k,v in pairs(nicknames) do
 			for z=1, #v do	
-				modified = modified:igsub('([^%a])'..nicknames[k][z]..'([^%a])', function (pre, app) return pre..k:capitalize()..app end):igsub('([^%a])'..nicknames[k][z]..'$', function(space) return space..k:capitalize() end)			end	
+				modified = modified:igsub('([^%a])'..nicknames[k][z]..'([^%a])', function (pre, app) return pre..colconv(name, mule)..k:capitalize()..app end):igsub('([^%a])'..nicknames[k][z]..'$', function(space) return space..colconv(name, mule)..k:capitalize() end)			end	
 		end
+		
+		for mule, color in pairs(mulenames) do
+				modified = modified:igsub('([^%a])'..mule..'([^%a])', function (pre, app) return '\x1E\x01'..mulecolor[mule]..pre..mule:capitalize()..'\x1E\x01'..app end):igsub('([^%a])'..mule..'$', function(space) return '\x1E\x01'..mulecolor[mule]..space..mule:capitalize()..'\x1E\x01' end)		
+		end	
 		
 	end
 	if not_bm == nil then
@@ -147,13 +164,13 @@ function event_incoming_text(original, modified, color)
 	return modified
 end
 	
-	
-function get_party_members()
-	for member, member_tb in pairs(get_party()) do
-		members[member] = member_tb['name']
-		modmember[member]=color[member]..member_tb['name']..'\x1E\x01'	end
+function event_incoming_chunk(id, data)
+	if id == 221 then
+		modmember={}
+		members={}
+		send_command('wait 0.1; lua i highlight get_party_members')
+	end
 end
-
 
 function colconv(str,key)
 	-- Used in the options_load() function. Taken from Battlemod
@@ -174,10 +191,8 @@ function colconv(str,key)
 end
 
 
-function event_incoming_chunk(id, data)
-	if id == 221 then
-		modmember={}
-		members={}
-		send_command('wait 0.1; lua i highlight get_party_members')
-	end
+function get_party_members()
+	for member, member_tb in pairs(get_party()) do
+		members[member] = member_tb['name']
+		modmember[member]=color[member]..member_tb['name']..'\x1E\x01'	end
 end
