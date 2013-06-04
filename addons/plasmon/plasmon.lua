@@ -150,7 +150,7 @@ function test()
     add_to_chat(121, 'You find an airlixir on the Mob')
     add_to_chat(121, 'You find an airlixir +1 on the Mob')
     add_to_chat(121, 'You find an airlixir +2 on the Mob')
-    --add_to_chat(146, 'Your time has expired for this battle. Now exiting...')
+    add_to_chat(146, 'Your time has expired for this battle. Now exiting...')
     show_window()
 end
 
