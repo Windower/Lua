@@ -28,6 +28,10 @@ file = require 'filehelper'
 chat = require 'chat'
 require 'stringhelper'
  
+_addon = {}
+_addon.name = 'Highlight'
+_addon.version = '0.5' 
+ 
 members={}
 modmember={}
 nicknames={}
@@ -69,6 +73,7 @@ defaults.itemcol=256
 
 function event_load()
 	send_command('alias highlight lua c highlight')
+	write(_addon['name']..': Version:'.._addon['version'])
 	if get_ffxi_info()['logged_in'] then
         initialize()
     end
@@ -125,8 +130,7 @@ function event_incoming_text(original, modified, color)
 		
 		for k,v in pairs(nicknames) do
 			for z=1, #v do	
-				modified = modified:igsub(nicknames[k][z]..'([^%a])', function (c) return k:capitalize()..c end):igsub(nicknames[k][z]..'$', k:capitalize())
-			end	
+				modified = modified:igsub('([^%a])'..nicknames[k][z]..'([^%a])', function (pre, app) return pre..k:capitalize()..app end):igsub('([^%a])'..nicknames[k][z]..'$', function(space) return space..k:capitalize() end)			end	
 		end
 		
 	end
