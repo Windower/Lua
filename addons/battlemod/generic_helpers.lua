@@ -54,6 +54,7 @@ function split(msg, match)
 end
 
 function parse_resources(lines_file)
+	local ignore_fields = S{'german','french','japanese','index','recast','fr','frl','de','del','jp','jpl'}
 	local completed_table = {}
 	local counter = 0
 	for i in ipairs(lines_file) do
@@ -68,10 +69,12 @@ function parse_resources(lines_file)
 			while q <= str:len() do
 				local a,b,ind,val = string.find(str,'(%w+)="([^"]+)"',q)
 				if ind~=nil then
-					if val == "true" or val == "false" then
-						completed_table[tonumber(key)][ind] = str2bool(val)
-					else
-						completed_table[tonumber(key)][ind] = val:gsub('&quot;','\42'):gsub('&apos;','\39')
+					if not ignore_fields[ind] then
+						if val == "true" or val == "false" then
+							completed_table[tonumber(key)][ind] = str2bool(val)
+						else
+							completed_table[tonumber(key)][ind] = val:gsub('&quot;','\42'):gsub('&apos;','\39')
+						end
 					end
 					q = b+1
 				else
