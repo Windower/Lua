@@ -178,6 +178,6 @@ function event_incoming_chunk(id, data)
 	if id == 221 then
 		modmember={}
 		members={}
-		send_command('wait 0.1; lua i highlights get_party_members')
+		send_command('wait 0.1; lua i highlight get_party_members')
 	end
 end
