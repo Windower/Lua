@@ -250,6 +250,11 @@ function string.ipattern(str)
 	return res
 end
 
+-- A string.find wrapper for case-insensitive patterns.
+function string.ifind(str, pattern)
+	return str:find(pattern:ipattern())
+end
+
 -- A string.match wrapper for case-insensitive patterns.
 function string.imatch(str, pattern)
 	return str:match(pattern:ipattern())
