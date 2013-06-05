@@ -1,5 +1,5 @@
 --[[
-findAll v1.20130603
+findAll v1.20130605
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -34,7 +34,7 @@ require 'sets'
 
 _addon = {}
 _addon.name    = 'findAll'
-_addon.version = '1.20130603'
+_addon.version = '1.20130605'
 
 json  = require 'json'
 file  = require 'filehelper'
@@ -130,11 +130,14 @@ function search(query, export)
     end
 
     local results_items = S{}
-    local terms_pattern = terms:escape():gsub('%a', function(char) return string.format("[%s%s]", char:lower(), char:upper()) end)
+    local terms_pattern = ''
+
+    if terms ~= '' then
+        terms_pattern = terms:escape():gsub('%a', function(char) return string.format("[%s%s]", char:lower(), char:upper()) end)
+    end
 
     for id, names in pairs(item_names) do
-        
-        if item_names[id].name:find(terms_pattern)
+        if terms_pattern == '' or item_names[id].name:find(terms_pattern)
             or item_names[id].long_name:find(terms_pattern)
         then
             results_items:add(id)
@@ -172,11 +175,18 @@ function search(query, export)
                 if storages[storage_name] ~= nil then
                     for id, quantity in pairs(storages[storage_name]) do
                         if results_items:contains(id) then
-                            results:append(
-                                '\30\03'..character_name..'/'..storage_name..':\30\01 '..
-                                item_names[id].name:gsub('('..terms_pattern..')', '\30\02%1\30\01')..
-                                (quantity > 1 and ' \30\03('..quantity..')\30\01' or '')
-                            )
+                            if terms_pattern ~= '' then
+                                results:append(
+                                    '\30\03'..character_name..'/'..storage_name..':\30\01 '..
+                                    item_names[id].name:gsub('('..terms_pattern..')', '\30\02%1\30\01')..
+                                    (quantity > 1 and ' \30\03('..quantity..')\30\01' or '')
+                                )
+                            else
+                                results:append(
+                                    '\30\03'..character_name..'/'..storage_name..':\30\01 '..item_names[id].name..
+                                    (quantity > 1 and ' \30\03('..quantity..')\30\01' or '')
+                                )
+                            end
                             
                             if export_file ~= nil then
                                 export_file:write('"'..character_name..'";"'..storage_name..'";"'..item_names[id].name..'";"'..quantity..'"\n')
