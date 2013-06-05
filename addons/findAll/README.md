@@ -54,8 +54,11 @@ findall :omega
 ----
 
 ##Changelog##
+### v1.20130605 ###
+* **fix**: Fixed weird results names in search results.
+
 ### v1.20130603 ###
-* **add**: Added export function
+* **add**: Added export function.
 * **change**: Leave the case of items' names untouched
 
 ### v1.20130529 ###
