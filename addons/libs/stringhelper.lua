@@ -210,14 +210,31 @@ function string.isin(str, t)
 	return false
 end
 
--- Checks if a string is empty
+-- Checks if a string is empty.
 function string.empty(str)
 	return str == ''
+end
+
+-- Returns a slug of a string.
+function string.slug(str)
+	return str
+		:gsub(' I', '1')
+		:gsub(' II', '2')
+		:gsub(' III', '3')
+		:gsub(' IV', '4')
+		:gsub(' V', '5')
+		:gsub('[^%a]', '')
+		:lower()
 end
 
 -- Returns a string with Lua pattern characters escaped.
 function string.escape(str)
 	return str:gsub('[[%]%%^$*()%.%+?-]', '%%%1')
+end
+
+-- Returns a Lua pattern from a wildcard string (with ? and * as placeholders for one and many characters respectively).
+function string.wildcard(str)
+	return str:gsub('[[%]%%^$()%+?-]', '%%%1'):gsub('*', '.*'):gsub('?', '.')
 end
 
 -- Returns a case-insensitive pattern for a given (non-pattern) string. For patterns, see string.ipattern.
