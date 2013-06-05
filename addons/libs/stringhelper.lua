@@ -223,7 +223,7 @@ function string.slug(str)
 		:gsub(' III', '3')
 		:gsub(' IV', '4')
 		:gsub(' V', '5')
-		:gsub('[^%a]', '')
+		:gsub('[^%w]', '')
 		:lower()
 end
 
