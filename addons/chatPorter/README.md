@@ -1,4 +1,4 @@
-#ChatPorter v1.21  
+#ChatPorter v1.3  
 ####written by Ragnarok.Ikonic  
 
 Displays tell, party, and linkshell chat to alternate character.  
@@ -33,3 +33,4 @@ Currently only tested and supporting two characters.
 * v1.13 5/29/13 More cleaning of code, added some color functions, variable formatting.  
 * v1.2  5/31/13 Added settings.xml data and ability to change/use it.  
 * v1.21 5/31/13 Added code to change colors and option to list colors.  
+* v1.3  6/06/13 Added textboxes and user settings for l/p/t chat.  Redid help options.  
