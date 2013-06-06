@@ -210,14 +210,31 @@ function string.isin(str, t)
 	return false
 end
 
--- Checks if a string is empty
+-- Checks if a string is empty.
 function string.empty(str)
 	return str == ''
+end
+
+-- Returns a slug of a string.
+function string.slug(str)
+	return str
+		:gsub(' I', '1')
+		:gsub(' II', '2')
+		:gsub(' III', '3')
+		:gsub(' IV', '4')
+		:gsub(' V', '5')
+		:gsub('[^%w]', '')
+		:lower()
 end
 
 -- Returns a string with Lua pattern characters escaped.
 function string.escape(str)
 	return str:gsub('[[%]%%^$*()%.%+?-]', '%%%1')
+end
+
+-- Returns a Lua pattern from a wildcard string (with ? and * as placeholders for one and many characters respectively).
+function string.wildcard(str)
+	return str:gsub('[[%]%%^$()%+?-]', '%%%1'):gsub('*', '.*'):gsub('?', '.')
 end
 
 -- Returns a case-insensitive pattern for a given (non-pattern) string. For patterns, see string.ipattern.
@@ -250,6 +267,11 @@ function string.ipattern(str)
 	return res
 end
 
+-- A string.find wrapper for case-insensitive patterns.
+function string.ifind(str, pattern)
+	return str:find(pattern:ipattern())
+end
+
 -- A string.match wrapper for case-insensitive patterns.
 function string.imatch(str, pattern)
 	return str:match(pattern:ipattern())
@@ -273,6 +295,16 @@ end
 -- Counts the occurrences of a pattern in a string.
 function string.pcount(str, pat)
 	return string.gsub[2](str, pat, '')
+end
+
+-- Returns a plural version of a string, if the provided table contains more than one element.
+-- Defaults to appending an s, but accepts an option string as second argument which it will the string with.
+function string.plural(str, t, replace)
+	if #t > 1 then
+		return replace or str..'s'
+	end
+
+	return str
 end
 
 -- Returns a formatted item list for use in natural language representation of a number of items.

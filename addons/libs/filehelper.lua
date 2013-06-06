@@ -3,8 +3,7 @@ File handler.
 ]]
 
 _libs = _libs or {}
-_libs.filehelper   = true
-_libs.logger       = _libs.logger or require 'logger'
+_libs.filehelper = true
 _libs.stringhelper = _libs.stringhelper or require 'stringhelper'
 
 local file = {}
@@ -110,33 +109,33 @@ function file.create_path(f)
 		path = f
 	else
 		if f.path == nil then
-			error('No file path set, cannot create directories.')
-			return
+			return nil, 'No file path set, cannot create directories.'
 		end
 
 		path = f.path:match('(.*)[/\\].-')
 
 		if not path then
-			return
+			return nil, 'File path already in addon directory: '..lua_base_path..path
 		end
 	end
 
 	new_path = lua_base_path
 	for dir in path:psplit('[/\\]'):filter(-''):it() do
 		new_path = new_path..'/'..dir
+
 		if not dir_exists(new_path) then
 			local res, err = create_dir(new_path)
 			if not res then
 				if err ~= nil then
-					error(err, new_path)
-				else
-					error('Unknown error trying to create path '..new_path)
+					return nil, err..': '..new_path
 				end
 
-				return
+				return nil, 'Unknown error trying to create path '..new_path
 			end
 		end
 	end
+
+	return new_path
 end
 
 -- Read from file and return lines of the contents in a table.

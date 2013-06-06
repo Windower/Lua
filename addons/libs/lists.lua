@@ -108,11 +108,13 @@ function list.count(l, fn)
 	return count
 end
 
-function list.concat(l, str)
+function list.concat(l, str, from, to)
 	str = str or ''
+	from = from or 1
+	to = to or l.n
 	local res = ''
 	
-	for key = 1, l.n do
+	for key = from, to do
 		res = res..tostring(rawget(l, key))
 		if key < l.n then
 			res = res..str

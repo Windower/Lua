@@ -29,6 +29,7 @@
 file = require 'filehelper'
 config = require 'config'
 require 'tablehelper'
+require 'sets'
 
 -- Battlemod Files --
 require 'event_action'

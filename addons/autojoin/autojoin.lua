@@ -19,16 +19,16 @@ _addon = _addon or {}
 _addon.name = 'AutoJoin'
 _addon.command = 'autojoin'
 _addon.short_command = 'aj'
-_addon.version = 0.9
+_addon.version = 0.901
 
 defaults = T{}
 defaults.mode = 'whitelist'
-defaults.whitelist = T{}
-defaults.blacklist = T{}
+defaults.whitelist = S{}
+defaults.blacklist = S{}
 defaults.autodecline = false
 
 -- Statuses which prevents joining.
-statusblock = T{
+statusblock = S{
 	'Dead', 'Event', 'Charmed'
 }
 
@@ -109,37 +109,30 @@ end
 
 -- Adds names to a given list type.
 function add_name(mode, ...)
-	local names = L{...}
-	local success = S{}
-	for name in names.it() do
-		if not settings[mode]:contains(name) then
-			settings[mode]:append(name)
-			success:append(name)
-		else
-			notice('User '..name..' already on '..mode..'.')
-		end
+	local names = S{...}
+	local duplicates = names * settings[mode]
+	if not duplicates:empty() then
+		notice(('User'):plural(duplicates)..' '..duplicates:format()..' already on '..aliases[mode]..'.')
+	end
+	local new = names - settings[mode]
+	if not new:empty() then
+		settings[mode] = settings[mode] + new
+		log('Added '..new:format()..' to the '..aliases[mode]..'.')
 	end
 	settings:save()
-	if not success:empty() then
-		log('Added '..success:format()..' to the '..aliases[mode]..'.')
-	end
 end
 
 -- Removes names from a given list type.
 function rm_name(mode, ...)
-	local names = T{...}
-	local success = T{}
-	for _, name in ipairs(names) do
-		if settings[mode]:contains(name) then
-			settings[mode]:delete(name)
-			success:append(name)
-		else
-			notice('User '..name..' not found on '..mode..'.')
-		end
+	local names = S{...}
+	local dummy = names - settings[mode]
+	if not dummy:empty() then
+		notice(('User'):plural(dummy)..' '..dummy:format()..' not found on '..aliases[mode]..'.')
 	end
-	settings:save()
-	if not success:empty() then
-		log('Removed '..success:format()..' from the '..aliases[mode]..'.')
+	local remove = names * settings[mode]
+	if not remove:empty() then
+		settings[mode] = settings[mode] - remove
+		log('Removed '..remove:format()..' from the '..aliases[mode]..'.')
 	end
 end
 

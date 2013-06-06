@@ -6,6 +6,7 @@ _libs = _libs or {}
 _libs.config = true
 _libs.tablehelper = _libs.tablehelper or require 'tablehelper'
 _libs.stringhelper = _libs.stringhelper or require 'stringhelper'
+_libs.logger = _libs.logger or require 'logger'
 local xml = require 'xml'
 _libs.xml = _libs.xml or (xml ~= nil)
 local files = require 'filehelper'
