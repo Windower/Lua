@@ -78,6 +78,13 @@
 	<support>http://www.ffxiah.com/player/Bahamut/Krizz</support>
   </addon>
   <addon>
+    <author>Giuliano Riccio (Zohno@Phoenix)</author>
+    <name>enternity</name>
+    <description>Enters "Enter" automatically when prompted during a cutscene or when talking to NPCs. It will not skip choice dialog boxes.</description>
+    <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
+  </addon>
+  <addon>
     <name>eval</name>
     <description>Allows developers to run arbitrary lua code in the console.</description>
   </addon>
@@ -221,8 +228,8 @@
   </addon>
   <addon>
     <name>timestamp</name>
-    <author>Giuliano Riccio/Aureus</author>
-    <description>Prefixes any chat message with a timestamp. Based on Timestamp plugin developed by Aureus.</description>
+    <author>Giuliano Riccio (Zohno@Phoenix)</author>
+    <description>Prefixes any chat message with a timestamp. Based on Timestamp plugin.</description>
     <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
