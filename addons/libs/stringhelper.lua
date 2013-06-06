@@ -297,6 +297,16 @@ function string.pcount(str, pat)
 	return string.gsub[2](str, pat, '')
 end
 
+-- Returns a plural version of a string, if the provided table contains more than one element.
+-- Defaults to appending an s, but accepts an option string as second argument which it will the string with.
+function string.plural(str, t, replace)
+	if #t > 1 then
+		return replace or str..'s'
+	end
+
+	return str
+end
+
 -- Returns a formatted item list for use in natural language representation of a number of items.
 -- The second argument specifies how the trailing element is handled:
 -- * and: Appends the last element with an and instead of a comma. [Default]

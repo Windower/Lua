@@ -10,7 +10,7 @@ set = {}
 
 _meta = _meta or {}
 _meta.S = {}
-_meta.S.__index = function(s, x) if set[x] ~= nil then return set[x] else return T(s)[x] end end
+_meta.S.__index = function(s, x) if set[x] ~= nil then return set[x] else return table[x] end end
 _meta.S.__class = 'Set'
 
 function S(t)
@@ -200,4 +200,30 @@ function set.concat(s, str)
 	end
 	
 	return res
+end
+
+function set.format(s, trail, subs)
+	local l
+	if s:empty() then
+		return subs or ''
+	elseif #s == 1 then
+		return next(s)
+	else
+		l = L(s)
+	end
+
+	trail = trail or 'and'
+
+	local last
+	if trail == 'and' then
+		last = ' and '
+	elseif trail == 'csv' then
+		last = ', '
+	elseif trail == 'oxford' then
+		last = ', and '
+	else
+		warning('Invalid format for table.format: \''..trail..'\'.')
+	end
+
+	return l:slice(1, -2):concat(', ')..last..l:last()
 end
