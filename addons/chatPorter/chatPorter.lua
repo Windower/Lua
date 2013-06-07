@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon = {}
 _addon.name = 'ChatPorter'
-_addon.version = '1.3'
+_addon.version = '1.31'
 _addon.author = 'Ragnarok.Ikonic'
 
 require 'tablehelper'
@@ -83,7 +83,6 @@ defaults.tell.x = 150
 defaults.tell.y = 100
 
 settings = T{}
-dummysettings = T{}
 
 showlinkshell = T{}
 showparty = T{}
@@ -100,7 +99,6 @@ playerResolution.y = get_windower_settings().y_res
 
 function event_load()
 	settings = config.load(defaults)
-	dummysettings = settings
 	tb_create("showlinkshell")
 	tb_create("showparty")
 	tb_create("showtell")
@@ -122,10 +120,6 @@ function event_load()
 end
 
 function event_unload()
-	if settings ~= dummysettings then
-		settings:save('all') -- all characters
---		settings:save() -- current character only
-	end
 	tb_delete("showlinkshell")
 	tb_delete("showparty")
 	tb_delete("showtell")
@@ -154,6 +148,7 @@ end
 
 function event_addon_command(...)
 	local args = {...}
+	local dummysettings = table.copy(settings)
 	if args[1] ~= nil then
 		comm = args[1]:lower()
         if comm == 'help' then
@@ -296,15 +291,20 @@ function event_addon_command(...)
 			end
 			if comm == "linkshell" or comm == "party" or comm == "tell" then
 				show(comm)
---				write(comm)
+				if tostring(com3) ~= tostring(dummysettings[comm][com2]) then
+--					settings:save('all') -- all characters
+					settings:save() -- current character only
+					add_to_chat(55,"Saving "..string.color('ChatPorter',204,55).." settings.")
+				end
 			end
-
 		elseif comm:lower() == 'vprint' then
 			settings:vprint()
         elseif comm:lower() == 'print' then
 			for key, value in pairs(settings) do 
 				log(key, value)
 			end
+		elseif comm:lower() == 'dummy' then
+			dummysettings:vprint()
 
 		else
 			add_to_chat(160, "  Not a valid ".._addon.name.." v".._addon.version.." command.  "..string.color('//cp help',204,160).." for a list of valid commands.")
