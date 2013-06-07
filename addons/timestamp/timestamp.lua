@@ -1,5 +1,5 @@
 --[[
-timestamp v1.20130529
+timestamp v1.20130607
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -36,7 +36,7 @@ config = require 'config'
 
 _addon = {}
 _addon.name    = 'timestamp'
-_addon.version = '1.20130529'
+_addon.version = '1.20130607'
 
 function timezone(separator)
     local now  = os.time()
@@ -96,7 +96,7 @@ defaults.format = '${time}'
 settings = {}
 
 function get_string(format)
-    local formatted_string = format:gsub('%${([%l%d_]+)}', function(match) if constants[match] ~= nil then return os.date(constants[match]) else return match end end, 1)
+    local formatted_string = format:gsub('%${([%l%d_]+)}', function(match) if constants[match] ~= nil then return os.date(constants[match]) else return match end end)
 
     return formatted_string
 end
