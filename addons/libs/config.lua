@@ -61,7 +61,7 @@ function config.load(filename, confdict, overwrite)
 
 	-- Load addon config file (Windower/addon/<addonname>/data/settings.xml).
 	local filepath = filename or 'data/settings.xml'
-	if not file.exists(filepath) then
+	if not files.exists(filepath) then
 		meta.file:set(filename or 'data/settings.xml', true)
 		meta.original['global'] = confdict:copy()
 		confdict:save()
