@@ -253,6 +253,10 @@ function event_action(act)
 					ability = 'Cover'
 				elseif msg_ID == 312 then
 					ability = 'Cover (No Effect)'
+				elseif msg_ID == 241 then
+					ability = 'Hide'
+				elseif msg_ID == 240 then
+					ability = 'Hide (Fail)'
 				end
 				
 				if abil_ID == 53 and act['category'] == 6 then -- Gauge handling
