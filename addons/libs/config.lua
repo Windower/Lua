@@ -60,8 +60,8 @@ function config.load(filename, confdict, overwrite)
 	settings_map[confdict] = meta
 
 	-- Load addon config file (Windower/addon/<addonname>/data/settings.xml).
-	local filepath = filename or files.check('data/settings.xml')
-	if filepath == nil then
+	local filepath = filename or 'data/settings.xml'
+	if not file.exists(filepath) then
 		meta.file:set(filename or 'data/settings.xml', true)
 		meta.original['global'] = confdict:copy()
 		confdict:save()
