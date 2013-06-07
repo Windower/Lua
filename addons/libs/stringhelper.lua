@@ -300,7 +300,7 @@ end
 -- Returns a plural version of a string, if the provided table contains more than one element.
 -- Defaults to appending an s, but accepts an option string as second argument which it will the string with.
 function string.plural(str, t, replace)
-	if #t > 1 then
+	if type(t) == 'number' and t > 1 or #t > 1 then
 		return replace or str..'s'
 	end
 
