@@ -10,7 +10,7 @@ modification, are permitted provided that the following conditions are met:
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name of chatPorter nor the
+    * Neither the name of ChatPorter nor the
       names of its contributors may be used to endorse or promote products
       derived from this software without specific prior written permission.
 
@@ -139,6 +139,7 @@ function event_unload()
 end
 
 function event_login(name)
+	settings = config.load(defaults)
 	LSname = get_player().linkshell;
 	playerName = get_player().name;
 --	add_to_chat(160,"Refreshing data...")
@@ -183,13 +184,13 @@ function event_addon_command(...)
 				add_to_chat(160,'  '..string.color('//cp [l|p|t] show',204,160)..' : Toggles l|p|t textboxes from showing.')
 				add_to_chat(160,'  '..string.color('//cp [l|p|t] lines #',204,160)..' : Sets # of lines to show in textbox.')
 				add_to_chat(160,'  '..string.color('//cp [l|p|t] [fontname|fn] *',204,160)..' : Sets fontname for textbox.')
-				add_to_chat(160,'  '..string.color('//cp [l|p|t] fontsize|fs #',204,160)..' : Sets fontsize for textbox.')
+				add_to_chat(160,'  '..string.color('//cp [l|p|t] [fontsize|fs] #',204,160)..' : Sets fontsize for textbox.')
 				add_to_chat(160,'  '..string.color('//cp [l|p|t] x #',204,160)..' : Sets x coordinate for textbox (acceptable values: 10-'.. playerResolution.x-10 ..').')
 				add_to_chat(160,'  '..string.color('//cp [l|p|t] y #',204,160)..' : Sets y coordinate for textbox (acceptable values: 10-'.. playerResolution.y-10 ..').')
-				add_to_chat(160,'  '..string.color('//cp [l|p|t] alpha|a #',204,160)..' : Sets alpha (transparency) for textbox (acceptable values: 1-255; 0=fully transparent, 255=fully visible).')
-				add_to_chat(160,'  '..string.color('//cp [l|p|t] red|r #',204,160)..' : Sets red value for RGB color of text in textbox.')
-				add_to_chat(160,'  '..string.color('//cp [l|p|t] green|g #',204,160)..' : Sets green value for RGB color of text in textbox.')
-				add_to_chat(160,'  '..string.color('//cp [l|p|t] blue|b] #',204,160)..' : Sets blue value for RGB color of text in textbox.')
+				add_to_chat(160,'  '..string.color('//cp [l|p|t] [alpha|a] #',204,160)..' : Sets alpha (transparency) for textbox (acceptable values: 1-255; 0=fully transparent, 255=fully visible).')
+				add_to_chat(160,'  '..string.color('//cp [l|p|t] [red|r] #',204,160)..' : Sets red value for RGB color of text in textbox.')
+				add_to_chat(160,'  '..string.color('//cp [l|p|t] [green|g] #',204,160)..' : Sets green value for RGB color of text in textbox.')
+				add_to_chat(160,'  '..string.color('//cp [l|p|t] [blue|b] #',204,160)..' : Sets blue value for RGB color of text in textbox.')
 			end
 		elseif comm == 'status' then
             showStatus()
@@ -545,6 +546,8 @@ possible port to ffochat LSchannel
 
 add stuff to save based on character
 add stuff to use settings based on character
+
+allow cp to pass restricted characters, need to delimit them
 
 ]]--
 

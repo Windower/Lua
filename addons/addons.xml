@@ -43,6 +43,13 @@
     <description>Customizes battle chat messages.</description>
   </addon>
   <addon>
+    <name>Blist</name>
+    <author>Ikonic</author>
+    <description>More detailed blist with tiered display options.  Allows for blist to be active on any or all of several chat types.</description>
+    <bugtracker>https://github.com/Icinoki/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Ragnarok/Ikonic</support>
+  </addon>
+  <addon>
     <name>cBlock</name>
     <description>Blacklist addon for FFOChat.</description>
   </addon>
@@ -61,7 +68,7 @@
   <addon>
     <author>Ikonic</author>
     <name>ChatPorter</name>
-    <description>Displays tell, party, and linkshell chat to alternate character.  Also, allows you to reply from either character.</description>
+    <description>Displays tell, party, and linkshell chat to alternate character and optional textbox.  Also, allows you to reply from either character.</description>
     <bugtracker>https://github.com/Icinoki/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Ragnarok/Ikonic</support>
   </addon>
