@@ -26,6 +26,7 @@
 
 file = require 'filehelper'
 chat = require 'chat'
+require 'tablehelper'
 require 'stringhelper'
  
 _addon = {}
@@ -147,7 +148,8 @@ function event_incoming_text(original, modified, color)
 		end
 		
 		for mule, color in pairs(mulenames) do
-				modified = modified:igsub('([^%a])'..mule..'([^%a])', function (pre, app) return '\x1E\x01'..mulecolor[mule]..pre..mule:capitalize()..'\x1E\x01'..app end):igsub('([^%a])'..mule..'$', function(space) return '\x1E\x01'..mulecolor[mule]..space..mule:capitalize()..'\x1E\x01' end)		
+			--	modified = modified:igsub('([^%a])'..mule..'([^%a])', function (pre, app) return '\x1E\x01'..mulecolor[mule]..pre..mule:capitalize()..'\x1E\x01'..app end):igsub('([^%a])'..mule..'$', function(space) return '\x1E\x01'..mulecolor[mule]..space..mule:capitalize()..'\x1E\x01' end)
+			modified = modified:igsub(mule, mulecolor[mule]..mule:capitalize()..'\x1E\x01')			
 		end	
 		
 	end
@@ -193,6 +195,9 @@ end
 
 function get_party_members()
 	for member, member_tb in pairs(get_party()) do
-		members[member] = member_tb['name']
-		modmember[member]=color[member]..member_tb['name']..'\x1E\x01'	end
+		if not table.containskey(mulenames, member_tb['name']:lower()) then
+			members[member] = member_tb['name']
+			modmember[member]=color[member]..member_tb['name']..'\x1E\x01'
+		end
+end
 end
