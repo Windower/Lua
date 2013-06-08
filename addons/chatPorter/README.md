@@ -1,12 +1,13 @@
 #ChatPorter v1.31  
 ####written by Ragnarok.Ikonic  
 
-Displays tell, party, and linkshell chat to alternate character.  
+Displays tell, party, and linkshell chat to alternate character and optional textbox.  
+Also, allows you to reply from either character.  
 
 Requires two characters to both be using addon for it to work.  
 Currently only tested and supporting two characters.  
 
-//ChatPorter and //cp are both valid commands.
+####//ChatPorter and //cp are both valid commands.
 //cp help         : Lists help menu.  
 //cp status       : Shows current configuration.  
 //cp textbox      : Shows current textbox configurations.
@@ -29,7 +30,7 @@ Currently only tested and supporting two characters.
 //cp help detail: Shows detailed ChatPorter commands.  
 //cp help textbox: Shows detailed textbox commands.  
 
-ChatPorter detailed commands:  
+####ChatPorter detailed commands:  
 //l2 message      : Sends message from second character to linkshell.  
 //p2 message      : Sends message from second character to party.  
 //t2 name message : Sends message from second character to name in tell.  
@@ -37,19 +38,19 @@ ChatPorter detailed commands:
 //f# message      : Sends message from second character to FFOChat channel #.  Works for 1-5.  
 //cp f# message   : Same as f#, but for any #.  
 
-ChatPorter textbox commands:  
+####ChatPorter textbox commands:  
 //cp [l|p|t] [toggle|displaychat]: Toggles linkshell|party|tell messages from showing or not.  
 //cp [l|p|t] color #: Sets color of l|p|t text (acceptable values of 1-255).  
 //cp [l|p|t] show: Toggles l|p|t textboxes from showing.  
 //cp [l|p|t] lines #: Sets # of lines to show in textbox.  
 //cp [l|p|t] [fontname|fn] *: Sets fontname for textbox.  
-//cp [l|p|t] fontsize|fs #: Sets fontsize for textbox.  
+//cp [l|p|t] [fontsize|fs] #: Sets fontsize for textbox.  
 //cp [l|p|t] x #: Sets x coordinate for textbox (acceptable values: 10-[screen resolution-10]).  
 //cp [l|p|t] y #: Sets y coordinate for textbox (acceptable values: 10-[screen resolution-10]).  
-//cp [l|p|t] alpha|a #: Sets alpha (transparency) for textbox (acceptable values: 1-255; 0=fully transparent, 255=fully visible).  
-//cp [l|p|t] red|r #: Sets red value for RGB color of text in textbox.  
-//cp [l|p|t] green|g #: Sets green value for RGB color of text in textbox.  
-//cp [l|p|t] blue|b] #: Sets blue value for RGB color of text in textbox.  
+//cp [l|p|t] [alpha|a] #: Sets alpha (transparency) for textbox (acceptable values: 1-255; 0=fully transparent, 255=fully visible).  
+//cp [l|p|t] [red|r] #: Sets red value for RGB color of text in textbox.  
+//cp [l|p|t] [green|g] #: Sets green value for RGB color of text in textbox.  
+//cp [l|p|t] [blue|b] #: Sets blue value for RGB color of text in textbox.  
 
 ###Changelog:  
 * v0.0  5/20/13 Created addon.  
