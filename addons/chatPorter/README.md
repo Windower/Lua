@@ -1,4 +1,4 @@
-#ChatPorter v1.31  
+#ChatPorter v1.32  
 ####written by Ragnarok.Ikonic  
 
 Displays tell, party, and linkshell chat to alternate character and optional textbox.  
@@ -53,13 +53,14 @@ Currently only tested and supporting two characters.
 //cp [l|p|t] [blue|b] #: Sets blue value for RGB color of text in textbox.  
 
 ###Changelog:  
-* v0.0  5/20/13 Created addon.  
-* v1.0  5/22/13 Testing, variable setup, boolean conversion, added toggles.  
-* v1.1  5/25/13 Added l2/p2/t2/r2 options to chat on 2nd char from 1st.  
-* v1.11 5/25/13 Added support for FFOChat replying.  
-* v1.12 5/29/13 Removed testing code, removed unused functions.  
-* v1.13 5/29/13 More cleaning of code, added some color functions, variable formatting.  
-* v1.2  5/31/13 Added settings.xml data and ability to change/use it.  
-* v1.21 5/31/13 Added code to change colors and option to list colors.  
-* v1.3  6/06/13 Added textboxes and user settings for l/p/t chat.  Redid help options.  
-* v1.31 6/07/13 Settings can now be set for each character and are only saved when a change is made.  
+* v0.0  05/20/13 Created addon.  
+* v1.0  05/22/13 Testing, variable setup, boolean conversion, added toggles.  
+* v1.1  05/25/13 Added l2/p2/t2/r2 options to chat on 2nd char from 1st.  
+* v1.11 05/25/13 Added support for FFOChat replying.  
+* v1.12 05/29/13 Removed testing code, removed unused functions.  
+* v1.13 05/29/13 More cleaning of code, added some color functions, variable formatting.  
+* v1.2  05/31/13 Added settings.xml data and ability to change/use it.  
+* v1.21 05/31/13 Added code to change colors and option to list colors.  
+* v1.3  06/06/13 Added textboxes and user settings for l/p/t chat.  Redid help options.  
+* v1.31 06/07/13 Settings can now be set for each character and are only saved when a change is made.  
+* v1.32 06/09/13 Fixed bug where textboxes would vanish on first run through.  Added clear option for textboxes.  Fixed issue of textbox settings not always saving.  

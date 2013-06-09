@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon = {}
 _addon.name = 'ChatPorter'
-_addon.version = '1.31'
+_addon.version = '1.32'
 _addon.author = 'Ragnarok.Ikonic'
 
 require 'tablehelper'
@@ -123,7 +123,6 @@ function event_unload()
 	tb_delete("showlinkshell")
 	tb_delete("showparty")
 	tb_delete("showtell")
-
 	send_command('unalias ChatPorter')
 	send_command('unalias cp')
 	send_command('unalias l2')
@@ -140,6 +139,9 @@ end
 
 function event_login(name)
 	settings = config.load(defaults)
+	show("linkshell")
+	show("party")
+	show("tell")
 	LSname = get_player().linkshell;
 	playerName = get_player().name;
 --	add_to_chat(160,"Refreshing data...")
@@ -182,6 +184,7 @@ function event_addon_command(...)
 				add_to_chat(160,'  '..string.color('//cp [l|p|t] [toggle|displaychat]',204,160)..' : Toggles linkshell|party|tell messages from showing or not.')
 				add_to_chat(160,'  '..string.color('//cp [l|p|t] color #',204,160)..' : Sets color of l|p|t text (acceptable values of 1-255).')
 				add_to_chat(160,'  '..string.color('//cp [l|p|t] show',204,160)..' : Toggles l|p|t textboxes from showing.')
+				add_to_chat(160,'  '..string.color('//cp [l|p|t] clear',204,160)..' : Clears l|p|t textbox.')
 				add_to_chat(160,'  '..string.color('//cp [l|p|t] lines #',204,160)..' : Sets # of lines to show in textbox.')
 				add_to_chat(160,'  '..string.color('//cp [l|p|t] [fontname|fn] *',204,160)..' : Sets fontname for textbox.')
 				add_to_chat(160,'  '..string.color('//cp [l|p|t] [fontsize|fs] #',204,160)..' : Sets fontsize for textbox.')
@@ -204,6 +207,7 @@ function event_addon_command(...)
 		elseif S({'l2','p2','t2','r2'}):contains(comm) or comm:match('^f%d%d?$') then
 			com2 = table.remove(args,1)
 			com2mess = table.sconcat(args)
+			com2mess = string.gsub(com2mess,"\n","\\\92\110")
 			if comm == 'l2' then
 				send_ipc_message(specialChar.."l2:"..LSname..specialChar..playerName..specialChar..com2mess)
 			elseif comm == 'p2' then
@@ -236,6 +240,8 @@ function event_addon_command(...)
 			elseif com2 == "show" then
 				settings[comm][com2] = not settings[comm][com2]
 				add_to_chat(160,"  Setting "..comm.." textbox to display: "..string.color(onOffPrint(settings[comm][com2]),204,160))
+			elseif com2 == "clear" then
+				_G['show'..comm] = {}
 			elseif com2 == "fontname" or com2 == "fn" then
 				if com3 ~= nil then
 					com3 = table.slice(args,3)
@@ -282,7 +288,11 @@ function event_addon_command(...)
 				end
 				if (com3num ~= nil) and (com3num >= 1 and com3num <= 255) then
 					settings[comm][com2] = com3num
-					add_to_chat(160,"  Setting "..com2.." value for "..comm.." textbox: "..string.color(tostring(com3num),204,160))
+					if com2 == "color" then
+						add_to_chat(160,"  Setting "..com2.." for "..comm..": "..string.color(tostring(com3num),204,160))
+					else
+						add_to_chat(160,"  Setting "..com2.." value for "..comm.." textbox: "..string.color(tostring(com3num),204,160))
+					end
 				else
 					settings[comm][com2] = defaults[comm][com2]
 					add_to_chat(160,"  Invalid "..com2.." value; acceptable values: 1-255.  Setting default.")
@@ -292,8 +302,11 @@ function event_addon_command(...)
 			end
 			if comm == "linkshell" or comm == "party" or comm == "tell" then
 				show(comm)
-				if tostring(com3) ~= tostring(dummysettings[comm][com2]) then
+				if com3 ~= nil and tostring(com3) ~= tostring(dummysettings[comm][com2]) then
 --					settings:save('all') -- all characters
+					settings:save() -- current character only
+					add_to_chat(55,"Saving "..string.color('ChatPorter',204,55).." settings.")
+				elseif com2 == "show" or com2 == "toggle" or com2 == "displaychat" then
 					settings:save() -- current character only
 					add_to_chat(55,"Saving "..string.color('ChatPorter',204,55).." settings.")
 				end
@@ -306,6 +319,8 @@ function event_addon_command(...)
 			end
 		elseif comm:lower() == 'dummy' then
 			dummysettings:vprint()
+		elseif comm:lower() == 'pt' then
+			showparty:vprint()
 
 		else
 			add_to_chat(160, "  Not a valid ".._addon.name.." v".._addon.version.." command.  "..string.color('//cp help',204,160).." for a list of valid commands.")
@@ -427,15 +442,19 @@ function show(tbName)
 		table.remove(_G["show"..tbName],1)
 	end
 	tb_set_bg_color("show"..tbName, 200, 30, 30, 30)
-	tb_set_bg_visibility("show"..tbName, true)
+	if #_G['show'..tbName] == 0 then
+		tb_set_bg_visibility("show"..tbName, false)
+	else
+		tb_set_bg_visibility("show"..tbName, true)
+	end
 	tb_set_color("show"..tbName, settings[tbName].alpha, settings[tbName].red, settings[tbName].green, settings[tbName].blue)
 	tb_set_font("show"..tbName, settings[tbName].fontname, settings[tbName].fontsize)
 	tb_set_location("show"..tbName, settings[tbName].x, settings[tbName].y)
 	tb_set_visibility("show"..tbName, settings[tbName].show)
-	if #_G['show'..tbName] < settings[tbName].lines then 
+	if #_G['show'..tbName] <= settings[tbName].lines then
 		start = 1
 	else
-		start = 9-settings[tbName].lines
+			start = #_G['show'..tbName]-settings[tbName].lines+1
 	end
 	tb_set_text("show"..tbName, " " ..table.concat(table.slice(_G['show'..tbName], start, #_G['show'..tbName]), '\n '))
 end
@@ -543,9 +562,6 @@ end
 
 --[[
 possible port to ffochat LSchannel
-
-add stuff to save based on character
-add stuff to use settings based on character
 
 allow cp to pass restricted characters, need to delimit them
 
