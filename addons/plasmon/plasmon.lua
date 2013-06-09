@@ -1,5 +1,5 @@
 --[[
-plasmon v1.20130604
+plasmon v1.20130609
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -35,7 +35,7 @@ local config = require 'config'
 
 _addon = {}
 _addon.name    = 'plasmon'
-_addon.version = '1.20130604'
+_addon.version = '1.20130609'
 _addon.command = 'plasmon'
 
 tb_name       = 'addon:gr:plasmon'
@@ -334,7 +334,7 @@ function event_incoming_text(original, modified, mode)
                 stats.plasm     = stats.plasm + match
                 stats.tot_plasm = stats.tot_plasm + match
 
-                if match ~= 50 and match ~= 500 and match ~= 750 then
+                if match ~= 50 and match % 500 ~= 0 and match % 750 ~= 0 and match % 10000 ~= 0 then
                     mobs = match / 50
                 else
                     mobs = 1
@@ -397,7 +397,7 @@ function event_incoming_text(original, modified, mode)
                 return modified, mode
             end
         end
-    elseif mode == 148 then
+    elseif mode == 148 or mode == 151 then
         match = original:match('Now permeating the mists surrounding the fracture%.')
 
         if match then
