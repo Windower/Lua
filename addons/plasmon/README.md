@@ -1,5 +1,5 @@
 **Author:** Giuliano Riccio  
-**Version:** v 1.20130604
+**Version:** v 1.20130609
 
 # Plasmon #
 This addon tracks plasm, killed mobs and dropped airlixirs during a delve.
@@ -102,6 +102,9 @@ plasmon color [[-h]|[-o <objects>] [-d] [-r <red>] [-g <green>] [-b <blue>] [-a 
 ----
 
 ## Changelog ##
+
+### v1.20130609 ###
+* **fix**: Fix for ally leaders and mobs counting.
 
 ### v1.20130604 ###
 * **add**: Added a 45 minutes timer. Requires Timers plugin's custom timers function.
