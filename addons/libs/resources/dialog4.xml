@@ -350,7 +350,7 @@
 	<dtd id="348" english="You cannot call wyverns here." color="1"/>
 	<dtd id="349" english="You cannot call beasts here." color="1"/>
 	<dtd id="350" english="${target} is no longer ${status}." color="191"/>
-	<dtd id="351" english="The remedy removes ${target}'s status ailments." color="1"/>
+	<dtd id="351" english="The remedy removes ${target}'s status ailments." color="191"/>
 	<dtd id="352" english="${actor}'s ranged attack hits ${target} for ${number} points of damage." color="D"/>
 	<dtd id="353" english="${actor}'s ranged attack scores a critical hit!${lb}${target} takes ${number} points of damage." color="D"/>
 	<dtd id="354" english="${actor}'s ranged attack misses." color="M"/>
