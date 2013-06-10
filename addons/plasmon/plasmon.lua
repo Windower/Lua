@@ -1,5 +1,5 @@
 --[[
-plasmon v1.20130609
+plasmon v1.20130610
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -35,7 +35,7 @@ local config = require 'config'
 
 _addon = {}
 _addon.name    = 'plasmon'
-_addon.version = '1.20130609'
+_addon.version = '1.20130610'
 _addon.command = 'plasmon'
 
 tb_name       = 'addon:gr:plasmon'
@@ -59,6 +59,7 @@ defaults = T{}
 defaults.v         = 0
 defaults.first_run = true
 defaults.light     = false
+defaults.timer     = true
 
 defaults.position = T{}
 defaults.position.x = 0
@@ -157,7 +158,7 @@ end
 function start_tracking()
     reset_stats()
     log('The Delve has begun!')
-    send_command('timers create Delve 2700 down ../../../addons/plasmon/icon')
+    start_timer()
 
     track = true
 
@@ -176,9 +177,17 @@ function stop_tracking()
     track         = false
 
     log('The Delve has ended.')
-    send_command('timers delete Delve')
+    stop_timer()
     hide_window()
     show_report()
+end
+
+function start_timer()
+    send_command('timers create Delve 2700 down ../../../addons/plasmon/icon')
+end
+
+function stop_timer()
+    send_command('timers delete Delve')
 end
 
 function refresh_window()
@@ -255,7 +264,7 @@ function first_run()
 
     log('Hi '..get_player()['name']:lower()..',')
     log('Thank you for using plasmon v'.._addon.version)
-    log('In this update I\'ve fixed a bug that prevented the addon to start correctly for ally leaders and added another fix for the mob counting.')
+    log('In this update I\'ve added a function to enable/disable the fracture timer for people who don\'t like to feel under pressure. :D')
     log('- zohno@phoenix')
 
     settings.v = _addon.version
@@ -430,7 +439,8 @@ function event_addon_command(...)
         log('\x81\xa1 plasmon show -- shows the tracking window.')
         log('\x81\xa1 plasmon hide -- hides the tracking window.')
         log('\x81\xa1 plasmon toggle -- toggles the tracking window\'s visibility.')
-        log('\x81\xa1 plasmon light [<enabled>] -- enables or disabled light mode. When enabled, the addon will never show the window and just print a summary in the chat box at the end of the run. If the enabled parameter is not specified, the help text will be shown.')
+        log('\x81\xa1 plasmon light [<enabled>] -- enables or disables light mode. When enabled, the addon will never show the window and just print a summary in the chat box at the end of the run. If the enabled parameter is not specified, the help text will be shown.')
+        log('\x81\xa1 plasmon timer [<enabled>] -- enables or disables the timer. When enabled, the addon will start a 45 minutes timer when entering a fracture. If the enabled parameter is not specified, the help text will be shown.')
         log('\x81\xa1 plasmon position [[-h]|[-x <x>] [-y <y>]] -- sets the horizontal and vertical position of the window relative to the upper-left corner. If no parameter is specified, the help text will be shown.')
         log('\x81\xa1 plasmon font [[-h]|[-f <font>] [-s <size>] [-a <alpha>] [-b [<bold>]] [-i [<italic>]]] -- sets the style of the font used in the window. If the no parameter is specified, the help text will be shown.')
         log('\x81\xa1 plasmon color [[-h]|[-o <objects>] [-d] [-r <red>] [-g <green>] [-b <blue>] [-a <alpha>]] -- sets the colors of the various elements present in the addon\'s window. If no parameter is specified, the help text will be shown.')
@@ -448,7 +458,7 @@ function event_addon_command(...)
         toggle_window()
     elseif cmd == 'light' then
         if type(args[1]) == 'nil' then
-            log('Enables or disabled light mode. when enabled, the addon will never show the window and just print a summary in the chat box at the end of the run. If the enabled parameter is not specified, the help text will be shown.')
+            log('Enables or disables light mode. When enabled, the addon will never show the window and just print a summary in the chat box at the end of the run. If the enabled parameter is not specified, the help text will be shown.')
             log('Usage: plasmon light <enabled>')
             log('Positional arguments:')
             log('\x81\xa1 <enabled>    specifies the status of the light mode. "default", "false" or "0" mean disabled. "true" or "1" mean enabled.')
@@ -475,6 +485,40 @@ function event_addon_command(...)
 
             if errors:length() == 0 then
                 settings.light = light
+
+                refresh_window()
+                settings:save('all')
+            end
+        end
+    elseif cmd == 'timer' then
+        if type(args[1]) == 'nil' then
+            log('Enables or disables the timer. When enabled, the addon will start a 45 minutes timer when entering a fracture. If the enabled parameter is not specified, the help text will be shown.')
+            log('Usage: plasmon timer <enabled>')
+            log('Positional arguments:')
+            log('\x81\xa1 <enabled>    specifies the status of the timer. "false" or "0" mean disabled. "default", "true" or "1" mean enabled.')
+        else
+            local timer
+
+            if args[1] == 'true' or args[1] == '1' then
+                timer = true
+            elseif args[1] == 'false' or args[1] == '0' then
+                timer = false
+            end
+
+            if args[1] == 'default' then
+                timer = defaults.timer
+            elseif timer == true then
+                start_timer()()
+            elseif track == true then
+                stop_timer()
+            end
+
+            if type(timer) ~= "boolean" then
+                error('Please specify a valid status')
+            end
+
+            if errors:length() == 0 then
+                settings.timer = timer
 
                 refresh_window()
                 settings:save('all')
