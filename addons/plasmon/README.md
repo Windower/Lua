@@ -66,7 +66,7 @@ plasmon light <enabled>
 Enables or disables the timer. When enabled, the addon will never show the window and just print a summary in the chat box at the end of the run. If the _enabled_ parameter is not specified, the help text will be shown.
 
 ```
-plasmon light <enabled>
+plasmon timer <enabled>
 ```
 * **enabled:** specifies the status of the light mode. **default**, **false** or **0** mean disabled. **true** or **1** mean enabled.
 
