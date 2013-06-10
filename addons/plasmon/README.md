@@ -68,7 +68,7 @@ Enables or disables the timer. When enabled, the addon will never show the windo
 ```
 plasmon timer <enabled>
 ```
-* **enabled:** specifies the status of the timer. **default**, **false** or **0** mean disabled. **true** or **1** mean enabled.
+* **enabled:** specifies the status of the timer. **false** or **0** mean disabled. **default**, **true** or **1** mean enabled.
 
 ### position ###
 Sets the horizontal and vertical position of the window relative to the upper-left corner. If no parameter is specified, the help text will be shown.
