@@ -1,5 +1,5 @@
 **Author:** Giuliano Riccio  
-**Version:** v 1.20130609
+**Version:** v 1.20130610
 
 # Plasmon #
 This addon tracks plasm, killed mobs and dropped airlixirs during a delve.
@@ -55,7 +55,15 @@ plasmon toggle
 ```
 
 ### light ###
-Enables or disabled light mode. When enabled, the addon will never show the window and just print a summary in the chat box at the end of the run. If the _enabled_ parameter is not specified, the help text will be shown.
+Enables or disables light mode. When enabled, the addon will never show the window and just print a summary in the chat box at the end of the run. If the _enabled_ parameter is not specified, the help text will be shown.
+
+```
+plasmon light <enabled>
+```
+* **enabled:** specifies the status of the light mode. **default**, **false** or **0** mean disabled. **true** or **1** mean enabled.
+
+### timer ###
+Enables or disables the timer. When enabled, the addon will never show the window and just print a summary in the chat box at the end of the run. If the _enabled_ parameter is not specified, the help text will be shown.
 
 ```
 plasmon light <enabled>
@@ -102,6 +110,9 @@ plasmon color [[-h]|[-o <objects>] [-d] [-r <red>] [-g <green>] [-b <blue>] [-a 
 ----
 
 ## Changelog ##
+
+### v1.20130610 ###
+* **add**: Added a function to enable/disable the fracture timer.
 
 ### v1.20130609 ###
 * **fix**: Fix for ally leaders and mobs counting.
