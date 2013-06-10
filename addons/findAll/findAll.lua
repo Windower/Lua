@@ -1,5 +1,5 @@
 --[[
-findAll v1.20130605
+findAll v1.20130610
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -34,7 +34,7 @@ require 'sets'
 
 _addon = {}
 _addon.name    = 'findAll'
-_addon.version = '1.20130605'
+_addon.version = '1.20130610'
 
 json  = require 'json'
 file  = require 'filehelper'
@@ -179,6 +179,7 @@ function search(query, export)
                                 results:append(
                                     '\30\03'..character_name..'/'..storage_name..':\30\01 '..
                                     item_names[id].name:gsub('('..terms_pattern..')', '\30\02%1\30\01')..
+                                    (item_names[id].name:match(terms_pattern) and '' or ' ['..item_names[id].long_name:gsub('('..terms_pattern..')', '\30\02%1\30\01')..']')..
                                     (quantity > 1 and ' \30\03('..quantity..')\30\01' or '')
                                 )
                             else
@@ -246,7 +247,7 @@ function get_storages()
         end
     end
 
-    --[[local slip_storages = slips.get_player_items()
+    local slip_storages = slips.get_player_items()
 
     for _, slip_id in ipairs(slips.storages) do
         local slip_name     = 'slip '..tostring(slips.get_slip_number_by_id(slip_id)):lpad('0', 2)
@@ -255,7 +256,7 @@ function get_storages()
         for _, id in ipairs(slip_storages[slip_id]) do
             storages[slip_name][tostring(id)] = 1
         end
-    end]]
+    end
 
     return storages
 end
@@ -270,7 +271,7 @@ function update()
     if time_difference < deferral_time then
         warning('findAll will be available in '..(deferral_time - time_difference)..' seconds.')
 
-        --return false
+        return false
     end
 
     local player_name   = get_player().name
@@ -295,7 +296,7 @@ function update()
         local storages_json = L{}
 
         for storage_name, storage in pairs(storages) do
-            if storages ~= 'temporary' then
+            if storage_name ~= 'temporary' and not storage_name:match('^slip') then
                 local items_json = L{}
 
                 for id, quantity in pairs(storage) do

@@ -1,5 +1,5 @@
 **Author:** Giuliano Riccio  
-**Version:** v 1.20130603
+**Version:** v 1.20130610
 
 # FindAll #
 
@@ -54,6 +54,10 @@ findall :omega
 ----
 
 ##Changelog##
+### v1.20130610 ###
+* **add**: Added slips as searchable storages for the current character.
+* **add**: The search results will show the long name if the short one doesn't contain the inputted search terms.
+
 ### v1.20130605 ###
 * **fix**: Fixed weird results names in search results.
 
