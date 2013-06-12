@@ -83,8 +83,7 @@ function event_load()
 end
 
 function event_login()
-    initialize()
-	send_command('wait 2; lua r highlight')
+	send_command('wait 2; lua i highlight initialize')
 end
 
 function initialize()
