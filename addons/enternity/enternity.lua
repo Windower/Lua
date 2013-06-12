@@ -1,5 +1,5 @@
 --[[
-enternity v1.20130606
+enternity v1.20130607
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -30,10 +30,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon = {}
 _addon.name    = 'enternity'
-_addon.version = '1.20130606'
+_addon.version = '1.20130607'
 
 function event_incoming_text(original, modified, mode)
-    if (mode == 150 or mode == 151) and original:match(string.char(0x7F, 0x31)) then
-        send_command('wait .75;setkey enter down;wait .2;setkey enter up')
-    end
+	if (mode == 150 or mode == 151) then
+		modified = modified:gsub(string.char(0x7F, 0x31), '')
+	end
+
+	return modified, mode
 end
