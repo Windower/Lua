@@ -201,4 +201,8 @@ function get_party_members()
 			modmember[member]=color[member]..member_tb['name']..chat.colorcontrols.reset
 		end
 	end
+<<<<<<< HEAD
 end
+=======
+end
+>>>>>>> b7d8060010e35c04e666efbfea8368acebbfca30

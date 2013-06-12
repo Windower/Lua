@@ -1,5 +1,5 @@
 --[[
-porter v1.20130525.1
+porter v1.20130529
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -28,20 +28,24 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
+require 'logger'
 require 'sets'
 require 'stringhelper'
 
-local slips = require 'slips'
+slips = require 'slips'
 
-local porter = {}
-porter.items_names = L{}
-porter.resources   = {
+_addon = {}
+_addon.name    = 'porter'
+_addon.version = '1.20130529'
+
+item_names = L{}
+resources  = {
     ['armor']   = '../../plugins/resources/items_armor.xml',
     ['weapons'] = '../../plugins/resources/items_weapons.xml',
     ['general'] = '../../plugins/resources/items_general.xml'
 }
 
-function porter.load_resources()
+function load_resources()
     local slips_items_ids = T()
     for _, slip in  pairs(slips.items) do
         slips_items_ids:extend(slip)
@@ -49,7 +53,7 @@ function porter.load_resources()
 
     slips_items_ids = S(slips_items_ids)
 
-    for kind, resource_path in pairs(porter.resources) do
+    for kind, resource_path in pairs(resources) do
         resource = io.open(lua_base_path..resource_path, 'r')
 
         if resource ~= nil then
@@ -66,21 +70,21 @@ function porter.load_resources()
                     id = tonumber(id, 10)
 
                     if slips_items_ids:contains(id) then
-                        porter.items_names[id] = name:lower()
+                        item_names[id] = name:lower()
                     end
                 end
             end
         else
-            write(kind..' resource file not found')
+            error(kind..' resource file not found')
         end
 
         resource:close()
     end
 end
 
-function porter.show_slip(slip_number, slip_page, owned_only)
-    if porter.items_names:length() == 0 then
-        porter.load_resources()
+function show_slip(slip_number, slip_page, owned_only)
+    if item_names:length() == 0 then
+        load_resources()
     end
     
     owned_only = owned_only or false
@@ -88,6 +92,12 @@ function porter.show_slip(slip_number, slip_page, owned_only)
     local player_items = slips.get_player_items()
     
     if slip_number ~= nil then
+        if slip_number < 1 or slip_number > slips.storages:length() then
+            error('That slip doesn\'t exist, kupo!')
+            
+            return
+        end
+        
         slips_storage = L{slips.get_slip_id(slip_number)}
     else
         slips_storage = slips.storages
@@ -109,7 +119,7 @@ function porter.show_slip(slip_number, slip_page, owned_only)
                 local offset = (slip_page - 1) * 16 + 1
 
                 if offset < 1 or offset > slip:length() then
-                    add_to_chat(55, 'lua:addon:porter >> slip '..tostring(slip_number):lpad('0', 2)..' has no page '..slip_page..', kupo.')
+                    error('Slip '..tostring(slip_number):lpad('0', 2)..' has no page '..slip_page..', kupo.')
 
                     return
                 end
@@ -119,12 +129,12 @@ function porter.show_slip(slip_number, slip_page, owned_only)
 
             for item_position, item_id in ipairs(slip_items) do
                 local is_contained = player_slip_items:contains(item_id)
-                
+
                 if owned_only == false or owned_only == true and is_contained == true then
                     add_to_chat(
                         55,
-                        '\30\03'..'slip '..printable_slip_number..'/page '..(slip_page and slip_page or tostring(math.ceil(item_position / 16))):lpad('0', 2)..':\30\01 '..
-                        '\30'..(is_contained and '\02' or '\05')..porter.items_names[item_id]..'\30\01'
+                        '\30\03'..'slip '..printable_slip_number..'/page '..tostring(slip_page and slip_page or math.ceil(item_position / 16)):lpad('0', 2)..':\30\01 '..
+                        '\30'..(is_contained and '\02' or '\05')..item_names[item_id]..'\30\01'
                     )
                 end
             end
@@ -141,29 +151,39 @@ function event_unload()
 end
 
 function event_addon_command(slip_number, slip_page, owned_only)
-    if tonumber(slip_number) == nil and slip_number == 'owned' then
-        slip_number = nil
-        owned_only  = true
-    elseif tonumber(slip_number) ~= nil and tonumber(slip_page) == nil and slip_page == 'owned' then
-        slip_page  = nil
-        owned_only = true
-    elseif tonumber(slip_number) ~= nil and tonumber(slip_page) ~= nil and owned_only == 'owned' then
-        owned_only = true
-    else
-        owned_only = false
-    end
+    if tonumber(slip_number) == nil then
+        slip_page = nil
 
-    if slip_number ~= nil then
-        slip_number = tonumber(slip_number, 10)
-
-        if slip_number < 1 or slip_number > slips.storages:length() then
-            add_to_chat(55, 'lua:addon:porter >> that slip doesn\'t exist, kupo!')
-            
+        if slip_number == 'owned' then
+            slip_number = nil
+            owned_only  = true
+        elseif slip_number ~= nil then
+            error('That\'s not a valid slip number, kupo!')
+        
             return
         end
     else
-        slip_page = nil
+        slip_number = tonumber(slip_number, 10)
+        
+        if tonumber(slip_page) == nil then
+            if slip_page == 'owned' then
+                slip_page   = nil
+                owned_only  = true
+            elseif slip_page ~= nil then
+                error('That\'s not a valid page number, kupo!')
+            
+                return
+            end
+        else
+            slip_page = tonumber(slip_page, 10)
+            
+            if owned_only == 'owned' then
+                owned_only = true
+            else
+                owned_only = nil
+            end
+        end
     end
     
-    porter.show_slip(slip_number, slip_page, owned_only)
+    show_slip(slip_number, slip_page, owned_only)
 end

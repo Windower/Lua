@@ -43,6 +43,13 @@
     <description>Customizes battle chat messages.</description>
   </addon>
   <addon>
+    <name>Blist</name>
+    <author>Ikonic</author>
+    <description>More detailed blist with tiered display options.  Allows for blist to be active on any or all of several chat types.</description>
+    <bugtracker>https://github.com/Icinoki/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Ragnarok/Ikonic</support>
+  </addon>
+  <addon>
     <name>cBlock</name>
     <description>Blacklist addon for FFOChat.</description>
   </addon>
@@ -50,6 +57,8 @@
     <name>CellHelp</name>
     <author>Krizz and Balloon</author>
     <description>Tracks cells that are needed, displays your position in the lot order, and creates the appropriate LL profiles.</description>
+	<bugtracker>https://github.com/tehkrizz/Lua/issues</bugtracker>
+	<support>http://www.ffxiah.com/player/Bahamut/Krizz</support>
   </addon>
   <addon>
     <author>Giuliano Riccio (Zohno@Phoenix)</author>
@@ -59,12 +68,28 @@
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
+    <author>Ikonic</author>
+    <name>ChatPorter</name>
+    <description>Displays tell, party, and linkshell chat to alternate character and optional textbox.  Also, allows you to reply from either character.</description>
+    <bugtracker>https://github.com/Icinoki/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Ragnarok/Ikonic</support>
+  </addon>
+  <addon>
     <name>Daze</name>
     <description>Records what daze effects are on the monster you're fighting.</description>
   </addon>
   <addon>
     <name>DynamisHelper</name>
     <description>Displays a timer when a mob is procced, tracks currency obtained, and can create a LL to lot all currency.</description>
+	<bugtracker>https://github.com/tehkrizz/Lua/issues</bugtracker>
+	<support>http://www.ffxiah.com/player/Bahamut/Krizz</support>
+  </addon>
+  <addon>
+    <author>Giuliano Riccio (Zohno@Phoenix)</author>
+    <name>enternity</name>
+    <description>Enters "Enter" automatically when prompted during a cutscene or when talking to NPCs. It will not skip choice dialog boxes.</description>
+    <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
     <name>eval</name>
@@ -150,6 +175,13 @@
 	<support>Podginator@gmail.com</support>
   </addon>
   <addon>
+    <name>salvage2</name>
+    <author>Krizz</author>
+    <description>Displays pathos that have not been removed in Salvage 2. Displays zone timer.</description>
+	<bugtracker>https://github.com/tehkrizz/Lua/issues</bugtracker>
+	<support>http://www.ffxiah.com/player/Bahamut/Krizz</support>
+  </addon>
+  <addon>
     <name>SATACast</name>
     <author>Banggugyangu</author>
     <description>Informs Spellcast about changes to Sneak Attack and Trick Attack status.</description>
@@ -193,6 +225,20 @@
     <description>Displays information about your current target in memory.</description>
     <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
+  </addon>
+  <addon>
+    <name>thtracker</name>
+    <author>Krizz</author>
+    <description>Displays latest TH level from chat.</description>
+	<bugtracker>https://github.com/tehkrizz/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Bahamut/Krizz</support>
+  </addon>
+  <addon>
+    <name>timestamp</name>
+    <author>Giuliano Riccio (Zohno@Phoenix)</author>
+    <description>Prefixes any chat message with a timestamp. Based on Timestamp plugin.</description>
+    <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
     <author>Giuliano Riccio (Zohno@Phoenix)</author>

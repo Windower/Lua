@@ -25,6 +25,7 @@ end
 
 -- Creates a new file. Creates path, if necessary.
 function file.create(f)
+	f:create_path()
 	local fh = io.open(lua_base_path..f.path, 'w')
 	fh:write('')
 	fh:close()
@@ -56,18 +57,12 @@ function file.exists(f)
 		path = f.path
 	end
 
-	local fh = io.open(lua_base_path..path, 'r')
-	if fh ~= nil then
-		fh:close()
-		return true
-	end
-
-	return false
+	return file_exists(lua_base_path..path)
 end
 
 -- Checks existance of a number of paths, returns the first that exists.
 function file.check(...)
-	return (select(2, T{...}:find(file.exists)))
+	return table.find[2]({...}, file.exists)
 end
 
 -- Read from file and return string of the contents.
@@ -103,8 +98,44 @@ function file.read(f)
 	if content:startswith(string.char(0xEF, 0xBB, 0xBF)) then
 		return content:sub(4)
 	end
-	
+
 	return content
+end
+
+-- Creates a directory.
+function file.create_path(f)
+	local path
+	if type(f) == 'string' then
+		path = f
+	else
+		if f.path == nil then
+			return nil, 'No file path set, cannot create directories.'
+		end
+
+		path = f.path:match('(.*)[/\\].-')
+
+		if not path then
+			return nil, 'File path already in addon directory: '..lua_base_path..path
+		end
+	end
+
+	new_path = lua_base_path
+	for dir in path:psplit('[/\\]'):filter(-''):it() do
+		new_path = new_path..'/'..dir
+
+		if not dir_exists(new_path) then
+			local res, err = create_dir(new_path)
+			if not res then
+				if err ~= nil then
+					return nil, err..': '..new_path
+				end
+
+				return nil, 'Unknown error trying to create path '..new_path
+			end
+		end
+	end
+
+	return new_path
 end
 
 -- Read from file and return lines of the contents in a table.

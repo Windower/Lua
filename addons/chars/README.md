@@ -1,5 +1,5 @@
 **Author:** Giuliano Riccio  
-**Version:** v 1.20130525
+**Version:** v 1.20130529
 
 # Chars #
 This addon lets you input special chars using simple tags (ex.: ```<note>``` for ♪). Using the pattern ```<j:text>``` any alphanumeric character will be replaced with its japanese version. The available characters depend on the data gathered by the windower team (https://github.com/Windower/Lua/blob/master/addons/libs/ffxidata.json).
@@ -17,6 +17,9 @@ chars
 ----
 
 ## Changelog ##
+
+### v1.20130529 ###
+* **change**: Aligned to Windower's addon development guidelines.
 
 ### v1.20130525 ###
 * **fix:** ```<j:text>``` pattern wasn't working with some special chars.
