@@ -33,7 +33,7 @@ _addon.name    = 'enternity'
 _addon.version = '1.20130606'
 
 function event_incoming_text(original, modified, mode)
-    if (mode == 150 or mode == 151) and original:match('\x7f\x31') then
+    if (mode == 150 or mode == 151) and original:match(string.char(0x7F, 0x31)) then
         send_command('wait .75;setkey enter down;wait .2;setkey enter up')
     end
 end

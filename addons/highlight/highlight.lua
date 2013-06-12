@@ -150,6 +150,7 @@ function event_incoming_text(original, modified, color)
 		for mule, color in pairs(mulenames) do
 			--	modified = modified:igsub('([^%a])'..mule..'([^%a])', function (pre, app) return '\x1E\x01'..mulecolor[mule]..pre..mule:capitalize()..'\x1E\x01'..app end):igsub('([^%a])'..mule..'$', function(space) return '\x1E\x01'..mulecolor[mule]..space..mule:capitalize()..'\x1E\x01' end)
 			modified = modified:igsub(mule, mulecolor[mule]..mule:capitalize()..'\x1E\x01')			
+			modified = modified:igsub(mule, mulecolor[mule]..mule:capitalize()..chat.colorcontrols.reset)
 		end	
 		
 	end
@@ -197,7 +198,7 @@ function get_party_members()
 	for member, member_tb in pairs(get_party()) do
 		if not table.containskey(mulenames, member_tb['name']:lower()) then
 			members[member] = member_tb['name']
-			modmember[member]=color[member]..member_tb['name']..'\x1E\x01'
+			modmember[member]=color[member]..member_tb['name']..chat.colorcontrols.reset
 		end
-end
+	end
 end
