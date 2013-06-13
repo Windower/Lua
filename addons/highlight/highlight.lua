@@ -83,7 +83,7 @@ function event_load()
 end
 
 function event_login()
-    initialize()
+	send_command('wait 2; lua i highlight initialize')
 end
 
 function initialize()
@@ -95,23 +95,23 @@ function initialize()
 	end
 		nicknames=config.load('/data/nicknames.xml')
 		mules=config.load('/data/mules.xml')
-		
+
 	for i, v in pairs(nicknames) do
 		nicknames[i] = string.split(v, ',')
 	end
-	
+
 	for mule, name in pairs(mules) do
 		mulenames[mule]=name
 	end
-	
+
 	for i,v in pairs(settings) do
 		color[i]= colconv(v,i)
 	end
-	
+
 	for i,v in pairs(mules) do
 		mulecolor[i]=colconv(v,i)
 	end
-	
+
 	get_party_members()
 end
 
@@ -134,25 +134,25 @@ function event_incoming_text(original, modified, color)
 	local other_linkshell = original:find('<.*>')
 	local other_say = original:find('.* :')
 	local not_bm = original:find('.* '..string.char(129,168)..'.*')
-	
+
 	for names in modified:gmatch('([%w]+)') do
         for name in pairs(members) do
 			if original:lower():gmatch('.*'..members[name]) then
 				modified = modified:igsub(members[name], modmember[name])
 			end
         end
-		
+
 		for k,v in pairs(nicknames) do
 			for z=1, #v do	
 				modified = modified:igsub('([^%a])'..nicknames[k][z]..'([^%a])', function (pre, app) return pre..k:capitalize()..app end):igsub('([^%a])'..nicknames[k][z]..'$', function(space) return space..k:capitalize() end)			end	
 		end
-		
+
 		for mule, color in pairs(mulenames) do
 			--	modified = modified:igsub('([^%a])'..mule..'([^%a])', function (pre, app) return '\x1E\x01'..mulecolor[mule]..pre..mule:capitalize()..'\x1E\x01'..app end):igsub('([^%a])'..mule..'$', function(space) return '\x1E\x01'..mulecolor[mule]..space..mule:capitalize()..'\x1E\x01' end)
 			modified = modified:igsub(mule, mulecolor[mule]..mule:capitalize()..'\x1E\x01')			
 			modified = modified:igsub(mule, mulecolor[mule]..mule:capitalize()..chat.colorcontrols.reset)
 		end	
-		
+
 	end
 	if not_bm == nil then
 		if other_party ~= nil or other_linkshell ~= nil then
@@ -163,10 +163,10 @@ function event_incoming_text(original, modified, color)
 			end
 		end
 	end
-	
+
 	return modified
 end
-	
+
 function event_incoming_chunk(id, data)
 	if id == 221 then
 		modmember={}
