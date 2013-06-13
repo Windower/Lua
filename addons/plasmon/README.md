@@ -1,5 +1,5 @@
 **Author:** Giuliano Riccio  
-**Version:** v 1.20130610
+**Version:** v 1.20130613
 
 # Plasmon #
 This addon tracks plasm, killed mobs and dropped airlixirs during a delve.
@@ -110,6 +110,9 @@ plasmon color [[-h]|[-o <objects>] [-d] [-r <red>] [-g <green>] [-b <blue>] [-a 
 ----
 
 ## Changelog ##
+
+### v1.20130613 ###
+* **add**: Stop tracking on zone change.
 
 ### v1.20130610 ###
 * **add**: Added a function to enable/disable the fracture timer.

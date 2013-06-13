@@ -1,5 +1,5 @@
 --[[
-plasmon v1.20130610
+plasmon v1.20130613
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -35,7 +35,7 @@ local config = require 'config'
 
 _addon = {}
 _addon.name    = 'plasmon'
-_addon.version = '1.20130610'
+_addon.version = '1.20130613'
 _addon.command = 'plasmon'
 
 tb_name       = 'addon:gr:plasmon'
@@ -322,6 +322,12 @@ end
 
 function event_logout()
     dispose()
+end
+
+function event_zone_change(from_id, from, to_id, to)
+    if from_id == 271 and track then
+        stop_tracking()
+    end
 end
 
 function event_incoming_text(original, modified, mode)
