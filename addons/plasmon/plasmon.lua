@@ -262,10 +262,10 @@ function first_run()
         return
     end
 
-    log('Hi '..get_player()['name']:lower()..',')
+    --[[log('Hi '..get_player()['name']:lower()..',')
     log('Thank you for using plasmon v'.._addon.version)
     log('In this update I\'ve added a function to enable/disable the fracture timer for people who don\'t like to feel under pressure. :D')
-    log('- zohno@phoenix')
+    log('- zohno@phoenix')]]
 
     settings.v = _addon.version
     settings.first_run = false
