@@ -350,7 +350,7 @@
 	<dtd id="348" english="You cannot call wyverns here." color="1"/>
 	<dtd id="349" english="You cannot call beasts here." color="1"/>
 	<dtd id="350" english="${target} is no longer ${status}." color="191"/>
-	<dtd id="351" english="The remedy removes ${target}'s status ailments." color="1"/>
+	<dtd id="351" english="The remedy removes ${target}'s status ailments." color="191"/>
 	<dtd id="352" english="${actor}'s ranged attack hits ${target} for ${number} points of damage." color="D"/>
 	<dtd id="353" english="${actor}'s ranged attack scores a critical hit!${lb}${target} takes ${number} points of damage." color="D"/>
 	<dtd id="354" english="${actor}'s ranged attack misses." color="M"/>
@@ -362,7 +362,7 @@
 	<dtd id="360" english="${actor} uses ${weapon_skill}.${lb}All of ${target}'s abilities are recharged." color="56"/>
 	<dtd id="361" english="All of ${target}'s abilities are recharged." color="1"/>
 	<dtd id="362" english="${actor} uses ${weapon_skill}.${lb}${target}'s TP is reduced to ${number}." color="56" units="TP"/>
-	<dtd id="363" english="${target}'s TP is reduced to ${number}." color="1"/>
+	<dtd id="363" english="${target}'s TP is reduced to ${number}." color="56" units="TP" />
 	<dtd id="364" english="${actor} uses ${ability}.${lb}All of ${target}'s status parameters are boosted." color="101"/>
 	<dtd id="365" english="All of ${target}'s status parameters are boosted." color="101"/>
 	<dtd id="366" english="${number} MP drained from ${target}." color="H" units="MP"/>
@@ -435,7 +435,7 @@
 	<dtd id="433" english="${actor} casts ${spell}.${lb}${target} receives the effect of Magic Attack Boost and Magic Defense Boost." color="101"/>
 	<dtd id="434" english="You cannot customize a activated automaton." color="1"/>
 	<dtd id="435" english="${actor} uses ${ability}!${lb}${target}'s abilities are recharged." color="H"/>
-	<dtd id="436" english="${target}'s abilities are recharged." color="1"/>
+	<dtd id="436" english="${target}'s abilities are recharged." color="100"/>
 	<dtd id="437" english="${actor} uses ${ability}!${lb}${target}'s abilities are recharged.${lb}${target}'s TP is increased." color="H"/>
 	<dtd id="438" english="${target}'s abilities are recharged.${lb}${target}'s TP is increased." color="H"/>
 	<dtd id="439" english="${actor} uses ${ability}!${lb}All of ${target}'s abilities are recharged.${lb}${target} regains MP." color="H"/>
