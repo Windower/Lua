@@ -36,7 +36,7 @@ local config = require 'config'
 
 _addon = {}
 _addon.name = 'gametime'
-_addon.version = '0.31'
+_addon.version = '0.4'
 _addon.command = 'gametime'
 
 tb_name	= 'addon:gr:gametime'
@@ -160,23 +160,30 @@ function default_settings()
 end
 
 function event_time_change(old, new)
-	gt.basetime = new + 1
-	gt.basetime = gt.basetime - 1
-	gt.time = tostring(gt.basetime):split(".")
-	gt.hours = gt.time[1]
-	gt.minutes = gt.time[2]
-	gt.second = tostring(gt.minutes):slice(3,3)
-	gt.second = gt.second:zfill(1)
-	gt.minutes = tostring(gt.minutes):slice(1,2)
-	if gt.seconds == nil then
-		gt.minutes = '00'
-	else
-		if (gt.second+1 > 5) then
-			gt.minutes = gt.minutes+1
-		end
-	end
-	gt.minutes = tostring(gt.minutes):zfill(2)
-	tb_set_text(gt.gtt,gt.hours..':'..gt.minutes)
+	-- gt.basetime = new + 1
+	-- gt.basetime = gt.basetime - 1
+	-- gt.time = tostring(gt.basetime):split(".")
+	-- gt.hours = gt.time[1]
+	-- gt.minutes = gt.time[2]
+	-- gt.second = tostring(gt.minutes):slice(3,3)
+	-- gt.second = gt.second:zfill(1)
+	-- gt.minutes = tostring(gt.minutes):slice(1,2)
+	-- if gt.seconds == nil then
+		-- gt.minutes = '00'
+	-- else
+		-- if (gt.second+1 > 5) then
+			-- gt.minutes = gt.minutes+1
+		-- end
+	-- end
+	--log(gt.time[1]..':'..gt.time[2])
+	--gt.minutes = tostring(gt.minutes):zfill(2)
+	--^old method, will remove next update.
+	gt.basetime = get_ffxi_info()["time"]
+	gt.basetime = gt.basetime * 100
+	gt.basetime = math.round(gt.basetime)
+	gt.basetime = tostring(gt.basetime):zfill(4)
+	gt.time = T{gt.basetime:slice(1,(#gt.basetime-2)),gt.basetime:slice((#gt.basetime-1),#gt.basetime)}
+	tb_set_text(gt.gtt,gt.time[1]..':'..gt.time[2])
 	event_day_change(get_ffxi_info()["day"])
 end
 
