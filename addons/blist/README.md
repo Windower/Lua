@@ -1,4 +1,4 @@
-#Blist v1.0  
+#Blist v1.1  
 ####written by Ragnarok.Ikonic  
 
 More detailed blist with tiered display options.  Allows for blist to be active on any or all of several chat types.  
@@ -22,3 +22,4 @@ More detailed blist with tiered display options.  Allows for blist to be active 
 ###Changelog:  
 * v0.0  06/08/13 Created addon.  
 * v1.0  06/08/13 Public release.  
+* v1.1  06/15/13 Added 'bl qa name' command, fixed some type-mismatch errors, and added command to tell all characters to update whenever a members.xml change was made.  
