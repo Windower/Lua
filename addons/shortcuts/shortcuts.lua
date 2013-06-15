@@ -27,6 +27,7 @@
 
 
 file = require 'filehelper'
+require 'sets'
 require 'helper_functions'
 
 require 'resources'
