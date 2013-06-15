@@ -1,7 +1,7 @@
 #Shortcuts v0.1 (beta)
 ####written by Byrth
 
-Applys the spellcast shortcuts and target completion to single slash commands,  
+Applies the spellcast shortcuts and target completion to single slash commands,  
 including emotes and checks. This addon is part of a larger "replacing spellcast"  
 project, but its feature stands on its own so it has been released now.  
 
