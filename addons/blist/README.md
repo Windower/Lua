@@ -18,6 +18,7 @@ More detailed blist with tiered display options.  Allows for blist to be active 
     muted  = message comes through, but in a different color  
   reason  = reason why you are adding said person to blist  
 //bl delete|remove name  : Removes a user from your blist.  
+//bl qa name [reason] : Adds a user to your blist w/o requiring extra details (reason is optional).  
 
 ###Changelog:  
 * v0.0  06/08/13 Created addon.  
