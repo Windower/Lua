@@ -35,11 +35,12 @@ function valid_target(targ,flag)
 		local mob_array = get_mob_array()
 		local targar = T{}
 		for i,v in pairs(mob_array) do
-			a,b = string.find(v['name']:lower(),targ:lower())
-			if a then
+			if string.find(v['name']:lower(),targ:lower()) then
 				-- Handling for whether it's a monster or not
 				if v['is_npc'] then
-					table.append(targar,'<t>')
+					if not targar:contains('<t>') then
+						table.append(targar,'<t>')
+					end
 				else
 					table.append(targar,v['name'])
 				end
@@ -58,7 +59,15 @@ function valid_target(targ,flag)
 			if targar:contains(targ) then
 				spell_targ = targ
 			else
-				spell_targ = targar[1]
+				for i,v in pairs(targar) do
+					if v:lower():find('^'..targ:lower()) then
+						spell_targ = v
+						break
+					end
+				end
+				if not spell_targ then
+					spell_targ = targar[1]
+				end
 			end
 		end
 	end
