@@ -123,7 +123,7 @@ function event_incoming_text(original, modified, mode)
         elseif mode ~= 151 then
             local timeString = ('['..get_string(settings.format)..']'):color(settings.color)..' '
 
-            return timeString..modified:gsub('\x07', '\n'):gsub('\n([^\n])', '\n'..timeString..'%1'), mode
+            return timeString..modified:gsub('\x07', '\n'):gsub('^\n', ''):gsub('\n([^\n])', '\n'..timeString..'%1'), mode
         end
     end
 
