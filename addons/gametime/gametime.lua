@@ -36,7 +36,7 @@ local config = require 'config'
 
 _addon = {}
 _addon.name = 'gametime'
-_addon.version = '0.4'
+_addon.version = '0.5'
 _addon.command = 'gametime'
 
 tb_name	= 'addon:gr:gametime'
