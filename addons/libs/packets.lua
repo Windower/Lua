@@ -152,7 +152,7 @@ packets.lengths = setmetatable(packets.lengths, {__index = function(t, k)
 	end
 end})
 
--- Type identifiers as declared in Lua
+-- Type identifiers as declared in lpack.c
 local pack_ids = {}
 pack_ids['bool'] = 'b'
 pack_ids['unsigned char'] = 'b'
@@ -193,20 +193,25 @@ for key = 0x000, 0x1FF do
 	packets.fields.outgoing[key] = L{}
 end
 
+-- Zone Response
 packets.fields.incoming[0x00B] = L{
 	{ctype='unsigned int',   label='Type'},              --   4-  7
---	{ctype='unsigned int',   label='IP'},                --   8- 11
+--	{ctype='unsigned char[4]',   label='IP'},                --   8- 11
 	{ctype='unsigned char',  label='IP1'},               --   8-  8
 	{ctype='unsigned char',  label='IP2'},               --   9-  9
 	{ctype='unsigned char',  label='IP3'},               --  10- 10
 	{ctype='unsigned char',  label='IP4'},               --  11- 11
 	{ctype='unsigned short', label='Port'},              --  12- 15
 	{ctype='unsigned short', label='_unknown1'},         --  16- 17
-	{ctype='unsigned int',   label='_unknown2'},         --  18- 21
-	{ctype='unsigned int',   label='_unknown3'},         --  22- 25
-	{ctype='unsigned int',   label='_unknown4'},         --  26- 29
+	{ctype='unsigned short', label='_unknown2'},         --  18- 19
+	{ctype='unsigned short', label='_unknown3'},         --  20- 21
+	{ctype='unsigned short', label='_unknown4'},         --  22- 23
+	{ctype='unsigned short', label='_unknown5'},         --  24- 25
+	{ctype='unsigned short', label='_unknown6'},         --  26- 27
+	{ctype='unsigned short', label='_unknown7'},         --  28- 29
 }
 
+-- NPC Update
 packets.fields.incoming[0x00E] = L{
 	{ctype='unsigned int',   label='ID'},                --   4-  7
 	{ctype='unsigned short', label='Index'},             --   8-  9
@@ -232,6 +237,7 @@ packets.fields.incoming[0x00E] = L{
 	{ctype='char[16]',       label='Name'},              --  52- 75
 }
 
+-- Char Update
 packets.fields.incoming[0x0DF] = L{
 	{ctype='unsigned int',   label='ID'},                --   4-  7
 	{ctype='unsigned int',   label='HP'},                --   8- 11
@@ -243,6 +249,7 @@ packets.fields.incoming[0x0DF] = L{
 	{ctype='unsigned short', label='_unknown4'},         --  26- 27
 }
 
+-- LS Message
 packets.fields.incoming[0x0CC] = L{
 	{ctype='int',            label='_unknown1'},         --   4-  7
 	{ctype='char[128]',      label='Message'},           --   8-135

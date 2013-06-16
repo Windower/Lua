@@ -28,7 +28,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-require 'colors'
+require 'chat'
 require 'logger'
 require 'tablehelper'
 
@@ -36,21 +36,17 @@ config = require 'config'
 
 _addon = {}
 _addon.name    = 'timestamp'
-_addon.version = '1.20130607'
+_addon.command = 'timestamp'
+_addon.version = '1.3'
 
-function timezone(separator)
+function timezone()
     local now  = os.time()
     local h, m = math.modf(os.difftime(now, os.time(os.date('!*t', now))) / 3600)
 
-    if separator == nil or separator == false then
-        return string.format("%+.4d", 100 * h + 60 * m)
-    else
-        return string.format("%+.2d:%.2d", h, 60 * m)
-    end
+    return string.format('%+.4d', 100 * h + 60 * m), string.format('%+.2d:%.2d', h, 60 * m)
 end
 
-tz     = timezone()
-tz_sep = timezone(true)
+tz, tz_sep = timezone()
 
 constants = T{
     ['year']         = '%Y',
@@ -91,7 +87,10 @@ constants = T{
 
 defaults = {}
 defaults.color  = 508
-defaults.format = '${time}'
+defaults.format = '[${time}]'
+
+-- Lead bytes in multi-byte chars
+lead_bytes = S{0x1E, 0x1F, 0xF7, 0xEF, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89}
 
 settings = {}
 
@@ -102,9 +101,19 @@ function get_string(format)
 end
 
 function event_load()
-    settings = config.load(defaults)
-
     send_command('alias timestamp lua c timestamp')
+
+    if get_ffxi_info().logged_in then
+        initialize()
+    end
+end
+
+function event_login()
+    initialize()
+end
+
+function initialize()
+    settings = config.load(defaults)
 end
 
 function event_unload()
@@ -112,43 +121,39 @@ function event_unload()
 end
 
 function event_incoming_text(original, modified, mode)
-    if modified ~= '' and not modified:find('^[%s]+$') then        
-        --[[if mode == 205 then -- lsmes is indented automatically. redirect to 0 and use ls color.
-            modified = modified::color('linkshell')
-            mode     = 1
-        end]] -- no matter what i do the indentation is still there.
-        
-        if mode == 150 then -- 150 automatically indents new lines. 151 works as 150 but with not indentation. redirect to 151 and manually add the ideographic space.
-            return modified:gsub('\x07', '\n\x81\x40'), 151
-        elseif mode ~= 151 then
-            local timeString = ('['..get_string(settings.format)..']'):color(settings.color)..' '
-
-            return timeString..modified:gsub('\x07', '\n'):gsub('^\n', ''):gsub('\n([^\n])', '\n'..timeString..'%1'), mode
-        end
-    end
-
-    return modified, mode
-end
-
-function event_addon_command(...)
-    local args = {...}
-
-    if args[1] == nil then
-        send_command('timestamp help')
-
+    if modified == '' or mode == 150 or mode == 151 then
         return
     end
 
-    local cmd = table.remove(args, 1):lower()
+    local timeString = (os.date((settings.format:gsub('%${([%l%d_]+)}', constants)))):color(settings.color)..' '
+
+    local res = timeString
+    local prev = 0
+    local buffer = ''
+    for c in modified:it() do
+        res = res..buffer..c
+        buffer = ''
+        b = string.byte(c)
+        if (b == 0x0A or b == 0x07) and not (lead_bytes % prev) then
+            buffer = timeString
+        end
+        prev = b
+    end
+
+    return res, mode
+end
+
+function event_addon_command(...)
+    local cmd = (...) and (...):lower() or 'help'
+    local args = {select(2, ...)}
 
     if cmd == 'help' then
         log('\x81\xa1 timestamp [<command>] help -- shows the help text.')
         log('\x81\xa1 timestamp color <color> -- sets the timestamp\'s color.')
         log('\x81\xa1 timestamp format <format> -- sets the timestamp\'s format.')
 
-        return
     elseif cmd == 'format' then
-        if args[1] == nil then
+        if not args[1] then
             error('Please specify the new timestamp\'s format.')
         elseif args[1] == 'help' then
             log('Sets the timestamp\'s format.')
@@ -157,17 +162,18 @@ function event_addon_command(...)
             log('\x81\xa1 help: shows the help text.')
             log('\x81\xa1 <format>: defines the timestamp\'s format. The available constants are:')
 
-            for _, key in ipairs(constants:keyset():sort()) do
+            for key in constants:keyset():sort():it() do
                 log('  ${'..key..'}: '..get_string('${'..key..'}'))
             end
         else
             settings.format = args[1]
 
-            settings:save('all')
-            notice('The new timestamp\'s format has been set ('..get_string(settings.format)..').')
+            settings:save()
+            log('The new timestamp format has been saved ('..get_string(settings.format)..').')
         end
+
     elseif cmd == 'color' then
-        if args[1] == nil then
+        if not args[1] then
             error('Please specify the new color.')
         elseif args[1] == 'help' then
             log('Sets the timestamp\'s color.')
@@ -176,18 +182,20 @@ function event_addon_command(...)
             log('\x81\xa1 help: shows the help text.')
             log('\x81\xa1 <color>: defines the timestamp\'s color. The value must be between 0 and 511, inclusive.')
         else
-            local color = tonumber(args[1], 10)
+            local color = tonumber(args[1])
 
-            if color == nil or color < 0 or color >= 512 then
+            if not color or color < 0x00 or color > 0xFF then
                 error('Please specify a valid color.')
             else
                 settings.color = color
 
-                settings:save('all')
-                notice('The new color has been set.')
+                settings:save()
+                log('The new timestamp color has been saved ('..color..').')
             end
         end
-    else
-        send_command('reive help')
+
+    elseif cmd == 'save' then
+        settings:save('all')
+
     end
 end
