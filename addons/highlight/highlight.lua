@@ -193,7 +193,7 @@ end
  
  
 function get_party_members()
-	if settings.highlight == 'Yes' then
+	if settings.highlighting == 'Yes' then
 		for member, member_tb in pairs(get_party()) do
 			if not table.containskey(mulenames, member_tb['name']:lower()) then
 				members[member] = member_tb['name']
