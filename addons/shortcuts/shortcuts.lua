@@ -68,7 +68,7 @@ function event_outgoing_text(original,modified)
 		return modified
 	elseif command == '/hide' then
 		return modified
-	elseif command_list[command] and validabils[(spell or ''):lower():gsub(' ','')] and valid_target(splitline[#splitline]) then
+	elseif command_list[command] and validabils[(spell or ''):lower():gsub(' ',''):gsub('[^%w]','')] and valid_target(splitline[#splitline]) then
 		return modified
 	elseif command_list[command] then
 		return interp_text(splitline,1,modified)
