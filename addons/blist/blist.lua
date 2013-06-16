@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon = {}
 _addon.name = 'Blist'
-_addon.version = '1.0'
+_addon.version = '1.1'
 _addon.author = 'Ragnarok.Ikonic'
 
 require 'tablehelper'
@@ -94,6 +94,7 @@ function event_addon_command(...)
 			add_to_chat(160,'  '..string.color('    muted',204,160)..' = message comes through, but in a different color')
 			add_to_chat(160,'  '..string.color('  reason',204,160)..' = reason why you are adding said person to blist')
 			add_to_chat(160,'  '..string.color('//bl delete|remove name',204,160)..' : Removes a user from your blist.')
+			add_to_chat(160,'  '..string.color('//bl qa name [reason]',204,160)..' : Adds a user to your blist w/o requiring extra details (reason is optional).')
 		elseif comm == 'status' then
             showStatus()
 		elseif comm == 'list' then
@@ -122,8 +123,12 @@ function event_addon_command(...)
 				com2 = args[2] -- name
 				com3 = tonumber(args[3]) -- temptime
 				com4 = args[4]:lower() -- hidetype
-				com5 = table.slice(args,5)
-				com5mess = tostring(table.sconcat(com5))
+				if args[5] ~= nil then
+					com5 = table.slice(args,5)
+					com5mess = tostring(table.sconcat(com5))
+				else
+					com5mess = nil
+				end
 
 				local addTemp = T{}
 				addTemp[com2] = {}
@@ -133,13 +138,43 @@ function event_addon_command(...)
 				addTemp[com2].hidetype = com4
 			
 				members = members:update(addTemp)
-				members:save('all') -- current character only
+				members:save('all')
+				send_ipc_message("blist reload members")
+				add_to_chat(160,"Updating "..string.color(args[2],56,160).." entry on "..string.color(_addon.name,55,160)..".")
+			end
+		elseif comm == "qa" then
+			if type(args[2]:match("(%a+)")) ~= "string" then
+				add_to_chat(160,"Invalid format; use the following: "..string.color("//bl qa <name> %[reason%]",204,160))
+			else
+				com2 = args[2] -- name
+				if args[3] ~= nil then
+					com3 = table.slice(args,3)
+					com3mess = tostring(table.sconcat(com3))
+				else
+					com3mess = nil
+				end
+
+				local addTemp = T{}
+				addTemp[com2] = {}
+				addTemp[com2].reason = com3mess
+				addTemp[com2].date = os.date("%x", date)
+				addTemp[com2].temptime = 0
+				addTemp[com2].hidetype = "hard"
+			
+				members = members:update(addTemp)
+				members:save('all')
+				send_ipc_message("blist reload members")
 				add_to_chat(160,"Updating "..string.color(args[2],56,160).." entry on "..string.color(_addon.name,55,160)..".")
 			end
 		elseif comm == "remove" or comm == "delete" then
-			add_to_chat(160,"Removing "..string.color(args[2],56,160).." from "..string.color(_addon.name,55,160)..".")
-			members[args[2]].hidetype = "delete"
-			members:save('all') -- current character only
+			if members[args[2]] ~= nil then
+				add_to_chat(160,"Removing "..string.color(args[2],56,160).." from "..string.color(_addon.name,55,160)..".")
+				members[args[2]].hidetype = "delete"
+				members:save('all')
+				send_ipc_message("blist reload members")
+			else
+				add_to_chat(160,"User "..string.color(args[2],56,160).." not in "..string.color(_addon.name,55,160).." database; cannot remove.")
+			end
 		elseif comm == "mutedcolor" or comm == "color" then
 			com2num = tonumber(args[2])
 			if (com2num ~= nil) and (com2num >= 1 and com2num <= 255) then
@@ -203,6 +238,13 @@ function onOffPrint(bleh)
 	return bleh;
 end
 
+function event_ipc_message(msg)
+	if msg == "blist reload members" then
+		members = config.load("data/members.xml",members)
+--		add_to_chat(160, "Reloading members database.")
+	end
+end
+
 function event_incoming_text(original, modified, mode)
 	local name = "blist"
 	if settings.useblist == true then
@@ -236,6 +278,7 @@ function event_incoming_text(original, modified, mode)
 			if nowTime > convertedT then
 				members[name:lower()].hidetype = "delete"
 				members:save('all')
+				send_ipc_message("blist reload members")
 			end
 			
 --			write("mode: "..mode)
@@ -250,10 +293,10 @@ function event_incoming_text(original, modified, mode)
 			else
 				members[name:lower()].hidetype = "hard"
 				members:save('all')
+				send_ipc_message("blist reload members")
 				modified = ''
 			end
 		end
 		return modified
 	end
 end
-

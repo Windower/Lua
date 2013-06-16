@@ -1,4 +1,4 @@
-#Blist v1.0  
+#Blist v1.1  
 ####written by Ragnarok.Ikonic  
 
 More detailed blist with tiered display options.  Allows for blist to be active on any or all of several chat types.  
@@ -18,7 +18,9 @@ More detailed blist with tiered display options.  Allows for blist to be active 
     muted  = message comes through, but in a different color  
   reason  = reason why you are adding said person to blist  
 //bl delete|remove name  : Removes a user from your blist.  
+//bl qa name [reason] : Adds a user to your blist w/o requiring extra details (reason is optional).  
 
 ###Changelog:  
 * v0.0  06/08/13 Created addon.  
 * v1.0  06/08/13 Public release.  
+* v1.1  06/15/13 Added 'bl qa name' command, fixed some type-mismatch errors, and added command to tell all characters to update whenever a members.xml change was made.  
