@@ -134,7 +134,7 @@ function event_incoming_text(original, modified, mode)
         res = res..buffer..c
         buffer = ''
         b = string.byte(c)
-        if (b == 0x0A or b == 0x07) and not (lead_bytes % prev) then
+        if (b == 0x0A or b == 0x07) and not (lead_bytes:contains(prev)) then
             buffer = timeString
         end
         prev = b
