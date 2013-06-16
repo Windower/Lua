@@ -120,7 +120,7 @@ end
 
 function event_incoming_text(original, modified, mode)
     if modified ~= '' and not modified:find('^[%s]+$') then
-        if mode == 144 then -- 144 works as 150 but the enter prompt are ignored.
+        if mode == 144 then -- 144 works as 150 but the enter prompts are ignored.
             mode     = 150
             modified = modified:gsub('\x7f\x31$', '')
         end
