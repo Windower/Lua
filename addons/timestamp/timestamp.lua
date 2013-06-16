@@ -1,5 +1,5 @@
 --[[
-timestamp v1.20130607
+timestamp v1.20130616
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -112,10 +112,19 @@ function event_unload()
 end
 
 function event_incoming_text(original, modified, mode)
-    if modified ~= '' and not ((mode == 150 or mode == 151) and (modified:find('\x7f\x31$') ~= nil or modified:find('\x7f\x34$') ~= nil)) then
-        local timeString = ('['..get_string(settings.format)..']'):color(settings.color)..' '
+    if modified ~= '' and not modified:find('^[%s]+$') then        
+        --[[if mode == 205 then -- lsmes is indented automatically. redirect to 0 and use ls color.
+            modified = modified::color('linkshell')
+            mode     = 1
+        end]] -- no matter what i do the indentation is still there.
+        
+        if mode == 150 then -- 150 automatically indents new lines. 151 works as 150 but with not indentation. redirect to 151 and manually add the ideographic space.
+            return modified:gsub('\x07', '\n\x81\x40'), 151
+        elseif mode ~= 151 then
+            local timeString = ('['..get_string(settings.format)..']'):color(settings.color)..' '
 
-        return timeString..modified:gsub('\x07', '\x07'..timeString)
+            return timeString..modified:gsub('\x07', '\n'):gsub('\n([^\n])', '\n'..timeString..'%1'), mode
+        end
     end
 
     return modified, mode

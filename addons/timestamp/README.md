@@ -1,5 +1,5 @@
 **Author:** Giuliano Riccio  
-**Version:** v 1.20130607
+**Version:** v 1.20130616
 
 # Timestamp #
 This addon prefixes any chat message with a timestamp.
@@ -35,6 +35,9 @@ timestamp color [help|<color>]
 ----
 
 ## Changelog ##
+
+### v1.20130616 ###
+* **fix:** Fixed some indentation issues.
 
 ### v1.20130607 ###
 * **fix:** Fixed custom timestamp formatting.
