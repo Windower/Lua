@@ -344,7 +344,7 @@ function event_incoming_text(original, modified, mode)
                     start_tracking()
                 end
 
-                match = tonumber(match, 10)
+                match = tonumber(match)
 
                 stats.plasm     = stats.plasm + match
                 stats.tot_plasm = stats.tot_plasm + match
