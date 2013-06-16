@@ -133,7 +133,7 @@ function event_incoming_text(original, modified, mode)
         if mode ~= 151 then
             local timeString = ('['..get_string(settings.format)..']'):color(settings.color)..' '
 
-            modified = timeString..modified:gsub('^[\x07\n]+', ''):gsub('([^'..lead_bytes_pattern..'])\n+$', '%1'):gsub('([^'..lead_bytes_pattern..'])[\x07\n]', '%1\n'..timeString)
+            modified = timeString..modified:gsub('^[\x07\n]+', ''):gsub('([^'..lead_bytes_pattern..'])[\x07\n]+$', '%1'):gsub('([^'..lead_bytes_pattern..'])[\x07\n]', '%1\n'..timeString)
         end
     end
 
