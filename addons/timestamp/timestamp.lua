@@ -125,7 +125,7 @@ function event_incoming_text(original, modified, mode)
             modified = modified:gsub('\x7f\x31$', '')
         end
 
-        if mode == 150 then -- 144/150 automatically indents new lines. 151 works the same way but with no indentation. redirect to 151 and manually add the ideographic space.
+        if mode == 150 then -- 150 automatically indents new lines. 151 works the same way but with no indentation. redirect to 151 and manually add the ideographic space.
             mode     = 151
             modified = modified:gsub('([^'..lead_bytes_pattern..'])[\x07\n]', '%1\n\x81\x40')
         end
