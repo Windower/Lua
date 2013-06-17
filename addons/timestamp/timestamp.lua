@@ -37,6 +37,7 @@ config = require 'config'
 _addon = {}
 _addon.name    = 'timestamp'
 _addon.version = '1.20130616'
+_addon.command = 'timestamp'
 
 function timezone()
     local now  = os.time()
@@ -103,7 +104,9 @@ function initialize()
 end
 
 function event_load()
-    send_command('alias timestamp lua c timestamp')
+    if _addon.command then
+        send_command('alias '.._addon.command..' lua c '.._addon.name)
+    end
 
     if get_ffxi_info().logged_in then
         initialize()
