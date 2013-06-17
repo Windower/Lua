@@ -36,7 +36,7 @@ local config = require 'config'
 
 _addon = {}
 _addon.name = 'gametime'
-_addon.version = '0.4'
+_addon.version = '0.5'
 _addon.command = 'gametime'
 
 tb_name	= 'addon:gr:gametime'
@@ -47,35 +47,47 @@ gt.days = {}
 gt.days[1] = {}
 gt.days[1][1] = 'Firesday'
 gt.days[1][2] = 'Fi '
-gt.days[1][3] = '(255, 0, 0)'
+gt.days[1][10] = '(255, 0, 0)'
+gt.days[1][3] = 'Fire '
 gt.days[2] = {}
 gt.days[2][1] = 'Earthsday'
 gt.days[2][2] = 'Ea '
-gt.days[2][3] = '(255, 225, 0)'
+gt.days[2][10] = '(255, 225, 0)'
+gt.days[2][3] = 'Earth '
 gt.days[3] = {}
 gt.days[3][1] = 'Watersday'
 gt.days[3][2] = 'Wa '
-gt.days[3][3] = '(0, 0, 255)'
+gt.days[3][10] = '(0, 0, 255)'
+gt.days[3][3] = 'Water '
 gt.days[4] = {}
 gt.days[4][1] = 'Windsday'
 gt.days[4][2] = 'Wi '
-gt.days[4][3] = '(0, 255, 0)'
+gt.days[4][10] = '(0, 255, 0)'
+gt.days[4][3] = 'Wind '
 gt.days[5] = {}
 gt.days[5][1] = 'Iceday'
 gt.days[5][2] = 'Ic '
-gt.days[5][3] = '(128, 128, 255)'
+gt.days[5][10] = '(128, 128, 255)'
+gt.days[5][3] = 'Ice '
 gt.days[6] = {}
 gt.days[6][1] = 'Lightningday'
 gt.days[6][2] = 'Lg '
-gt.days[6][3] = '(255, 128, 128)'
+gt.days[6][10] = '(255, 128, 128)'
+gt.days[6][3] = 'Lightning '
 gt.days[7] = {}
 gt.days[7][1] = 'Lightsday'
 gt.days[7][2] = 'Lt '
-gt.days[7][3] = '(255, 255, 255)'
+gt.days[7][10] = '(255, 255, 255)'
+gt.days[7][3] = 'Light '
 gt.days[8] = {}
 gt.days[8][1] = 'Darksday'
 gt.days[8][2] = 'Dk '
-gt.days[8][3] = '(128, 128, 128)'
+gt.days[8][10] = '(128, 128, 128)'
+gt.days[8][3] = 'Dark '
+
+gt.WeekReport = ''
+gt.MoonPct = ''
+gt.MoonPhase = ''
 
 
 local defaults = T{}
@@ -103,7 +115,10 @@ local defaults = T{}
 	defaults.days.bg_colorg = 0
 	defaults.days.bg_colorb = 0
 	defaults.days.axis = 'horizontal'
-	defaults.days.text_alpha = '100'
+	defaults.days.text_alpha = 100
+	defaults.days.change = true
+	defaults.moon = T{}
+	defaults.moon.change = true
 	settings = config.load(defaults)
 	
 function event_load()
@@ -120,6 +135,8 @@ function event_load()
 	end
 	
 	gt.mode = settings.mode
+	event_day_change(get_ffxi_info()["day"])
+	event_moon_pct_change(get_ffxi_info()["moon_pct"])
 end
 
 function event_unload()
@@ -127,6 +144,14 @@ function event_unload()
 	send_command('unalias gt')
 	tb_delete('gametime_time')
 	tb_delete('gametime_day')
+end
+
+function event_login()
+	event_load()
+end
+
+function event_logout()
+	event_unload()
 end
 
 function cb_time()
@@ -184,7 +209,6 @@ function event_time_change(old, new)
 	gt.basetime = tostring(gt.basetime):zfill(4)
 	gt.time = T{gt.basetime:slice(1,(#gt.basetime-2)),gt.basetime:slice((#gt.basetime-1),#gt.basetime)}
 	tb_set_text(gt.gtt,gt.time[1]..':'..gt.time[2])
-	event_day_change(get_ffxi_info()["day"])
 end
 
 function event_day_change(day)
@@ -212,71 +236,106 @@ function event_day_change(day)
 	while dpos < 8 do
 		dpos = dpos + 1
 		dval = dlist[dpos]
-		daystring = ''..daystring..gt.delimiter..' \\cs'..gt.days[(dval+0)][3]..gt.days[(dval+0)][settings.mode]
+		daystring = ''..daystring..gt.delimiter..' \\cs'..gt.days[(dval+0)][10]..gt.days[(dval+0)][settings.mode]
 	end
-	tb_set_text(gt.gtd,daystring)
+	gt.WeekReport = daystring
+	tb_set_text(gt.gtd,gt.MoonPhase..' ('..gt.MoonPct..'%);'..gt.WeekReport)
+	event_moon_change(get_ffxi_info()["moon"])
+end
+
+function event_moon_change(moon)
+	gt.MoonPhase = moon
+	tb_set_text(gt.gtd,gt.MoonPhase..' ('..gt.MoonPct..'%);'..gt.WeekReport)
+	if settings.moon.change == true then
+		log('Gametime: Day: '..get_ffxi_info()["day"]..'; Moon: '..gt.MoonPhase..' ('..gt.MoonPct..'%);')
+	end
+end
+
+function event_moon_pct_change(pct)
+	gt.MoonPct = pct
+	tb_set_text(gt.gtd,gt.MoonPhase..' ('..gt.MoonPct..'%);'..gt.WeekReport)
 end
 
 function event_addon_command(...)
 	local args	= T({...})
 	if args[1] == nil or args[1] == "help" then
+		log('Use //gametime or //gt as follows:')
 		log('Positioning:')
-		log('//gametime timex <pos> //gametime timey <pos> //gametime daysx <pos> //gametime daysy <pos>')
+		log('//gt [timex/timey/daysx/daysy] <pos> :: example: //gt timex 125')
+		log('//gt [time/days] reset :: example: //gt days reset')
 		log('Visibility:')
-		log('//gametime time show //gametime time hide')
-		log('//gametime days show //gametime days hide')
-		log('//gaimetime axis horizontal //gametime axis vertical')
-		log('//gametime mode 1 or 2 :: Mode 1 uses full day names. Mode 2 uses 2 letter abbreviations.')
-		log('//gametime save :: saves your settings')
-		log('//gametime time alpha 1-255 :: sets transarency of Gametime\'s clock')
-		log('//gametime days alpha 1-255 :: sets transparency of Gametime\'s day-display')
-		elseif args[1] == 'timex' then
-		tb_set_location(gt.gtt,args[2],settings.time.y)
-		settings.time.x = args[2]
+		log('//gt [time/days] [show/hide] :: example //gt time hide')
+		log('//gt axis [horizontal/vertical] :: week display axis')
+		log('//gt [time/days] alpha 1-255. :: Sets the transparency. Lowest numbers = more transparent.')
+		log('//gt mode 1-3 :: Fullday; Abbreviated; Element names')
+		-- log('Log Reporting -- Day and Moon Phase (Not Moon %) change') not implemented yet
+		-- log('//gt [days/moon] change [true/false]')
+		-- log('Positioning:')
+		-- log('//gt timex <pos> //gt timey <pos> //gt daysx <pos> //gt daysy <pos>')
+		-- log('//gt time reset //gt days reset :: resets reset both coordinates.')
+		-- log('Visibility:')
+		-- log('//gt time show //gt time hide')
+		-- log('//gt days show //gt days hide')
+		-- log('//gt axis horizontal //gt axis vertical :: changes the display axis of gamedays.')
+		-- log('//gt mode 1-3 :: 1: Fullday names; 2: Short names; 3: Element names.')
+		-- log('//gt time alpha 1-255 :: sets transarency of Gametime\'s clock')
+		-- log('//gt days alpha 1-255 :: sets transparency of Gametime\'s day-display')
+		log('Remember to //gt save when you\'re happy with your settings.')
+	elseif args[1] == 'timex' then
+			tb_set_location(gt.gtt,args[2],settings.time.y)
+			settings.time.x = args[2]
 	elseif args[1] == 'timey' then
-		tb_set_location(gt.gtt,settings.time.x,args[2])
-		settings.time.y = args[2]
+			tb_set_location(gt.gtt,settings.time.x,args[2])
+			settings.time.y = args[2]
 	elseif args[1] == 'daysx' then
-		tb_set_location(gt.gtd,args[2],settings.days.y)
-		settings.days.x = args[2]
+			tb_set_location(gt.gtd,args[2],settings.days.y)
+			settings.days.x = args[2]
 	elseif args[1] == 'daysy' then
-		tb_set_location(gt.gtd,settings.days.x,args[2])
-		settings.days.y = args[2]
+			tb_set_location(gt.gtd,settings.days.x,args[2])
+			settings.days.y = args[2]
 	elseif args[1] == 'time' then
 		if args[2] == 'alpha' then
 			inalpha = tostring(args[3]):zfill(3)
 			inalpha = inalpha+0
-			if (inalpha > 5 and inalpha < 257) then
+			if (inalpha > 0 and inalpha < 256) then
 				tb_set_bg_color(gt.gtt,inalpha,settings.time.bg_colorr,settings.time.bg_colorg,settings.time.bg_colorb)
 				tb_set_color(gt.gtt,inalpha,settings.time.colorr,settings.time.colorg,settings.time.colorb)
 				settings.time.bg_alpha = inalpha
 				settings.time.alpha = inalpha
-				log('Gametime: Time transparency set to '..math.round(100-(inalpha/2.55),0)..'%')
+				log('Gametime: Time transparency set to '..inalpha..' ('..math.round(100-(inalpha/2.55),0)..'%).')
 			end
 		elseif args[2] == 'hide' then
 			tb_set_visibility(gt.gtt,false)
 			settings.time.visible = false
+			log('Gametime: Time display hidden.')
+		elseif args[2] == 'reset' then
+			tb_set_location(gt.gtt,0,0)
 		else
 			tb_set_visibility(gt.gtt,true)
 			settings.time.visible = true
+			log('Gametime: Showing time display.')
 		end
 	elseif args[1] == 'days' then
 		if args[2] == 'alpha' then
 			inalpha = tostring(args[3]):zfill(3)
 			inalpha = inalpha+0
-			if (inalpha > 5 and inalpha < 257) then
+			if (inalpha > 0 and inalpha < 256) then
 				tb_set_bg_color(gt.gtd,inalpha,settings.days.bg_colorr,settings.days.bg_colorg,settings.days.bg_colorb)
 				tb_set_color(gt.gtd,inalpha,settings.days.bg_colorr,settings.days.bg_colorg,settings.days.bg_colorb)
 				settings.days.bg_alpha = inalpha
 				settings.days.alpha = inalpha
-				log('Gametime: Days transparency set to '..math.round(100-(inalpha/2.55),0)..'%')
+				log('Gametime: Days transparency set to '..inalpha..' ('..math.round(100-(inalpha/2.55),0)..'%).')
 			end
 		elseif args[2] == 'hide' then
 			tb_set_visibility(gt.gtd,false)
 			settings.days.visible = false
+			log('Gametime: Days display hidden.')
+		elseif args[2] == 'reset' then
+			tb_set_location(gt.gtd,100,0)
 		else
 			tb_set_visibility(gt.gtd,true)
 			settings.days.visible = true
+			log('Gametime: Showing days display.')
 		end
 	elseif args[1] == 'axis' then
 		if args[2] == 'vertical' then
@@ -284,13 +343,15 @@ function event_addon_command(...)
 		else
 			gt.delimiter = " "
 		end
+		log('Gametime: Week display axis set.')
 	elseif args[1] == 'mode' then
 		inmode = tostring(args[2]):zfill(1)
-		inmode = inmode + 1
-		if inmode > 2 then
-			settings.mode = 2
+		inmode = inmode+0
+		if inmode > 3 then
+			return
 		else
-			settings.mode = 1
+			settings.mode = inmode
+			log('Gametime: mode updated')
 		end
 	elseif args[1] == 'save' then
 		settings:save('all')
