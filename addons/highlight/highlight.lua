@@ -1,9 +1,9 @@
 --Copyright (c) 2013, Thomas Rogers2
 --All rights reserved.
-
+ 
 --Redistribution and use in source and binary forms, with or without
 --modification, are permitted provided that the following conditions are met:
-
+ 
 --    * Redistributions of source code must retain the above copyright
 --      notice, this list of conditions and the following disclaimer.
 --    * Redistributions in binary form must reproduce the above copyright
@@ -12,7 +12,7 @@
 --   * Neither the name of highlight nor the
 --      names of its contributors may be used to endorse or promote products
 --      derived from this software without specific prior written permission.
-
+ 
 --THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 --ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 --WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -23,7 +23,7 @@
 --ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+ 
 file = require 'filehelper'
 chat = require 'chat'
 require 'tablehelper'
@@ -39,12 +39,10 @@ modmember={}
 nicknames={}
 color={}
 mulecolor={}
-player=get_player()['name']
-config = require 'config'
 
+config = require 'config'
+ 
 defaults = {}
-defaults.mob=69
-defaults.other=8
 defaults.p0 = 501
 defaults.p1 = 204
 defaults.p2 = 410
@@ -63,68 +61,64 @@ defaults.a22 = 200
 defaults.a23 = 481
 defaults.a24 = 483
 defaults.a25 = 208
-defaults.mobdmg=0
-defaults.mydmg=0
-defaults.partydmg=0
-defaults.allydmg=0
-defaults.otherdmg=0
-defaults.spellcol=0
-defaults.abilcol=0
-defaults.wscol=0
-defaults.statuscol=0
-defaults.itemcol=256
-
+  	
+settings=config.load('/data/settings.xml')
+ 
 function event_load()
+	player=get_player()['name']
 	send_command('alias highlight lua c highlight')
 	write(_addon['name']..': Version:'.._addon['version'])
 	if get_ffxi_info()['logged_in'] then
         initialize()
+		player=get_player()['name']
     end
 end
-
+ 
 function event_login()
 	send_command('wait 2; lua i highlight initialize')
+	player=get_player()['name']
 end
-
+ 
 function initialize()
     if file.exists('../battlemod/data/colors.xml') then
-		settings=config.load('../battlemod/data/colors.xml', true)
+		color=config.load('../battlemod/data/colors.xml', true)
 		write('Colors loaded from battlemod')
 	else
-		settings=config.load(defaults)
+		color=config.load('/data/colors.xml',defaults)
 	end
 		nicknames=config.load('/data/nicknames.xml')
 		mules=config.load('/data/mules.xml')
-
+		settings=config.load('/data/settings.xml')
+ 
 	for i, v in pairs(nicknames) do
 		nicknames[i] = string.split(v, ',')
 	end
-
+ 
 	for mule, name in pairs(mules) do
 		mulenames[mule]=name
 	end
-
-	for i,v in pairs(settings) do
+ 
+	for i,v in pairs(color) do
 		color[i]= colconv(v,i)
 	end
-
+ 
 	for i,v in pairs(mules) do
 		mulecolor[i]=colconv(v,i)
 	end
-
+ 
 	get_party_members()
 end
-
+ 
 function event_chat_message(is_gm, mode, player, message)
 	if mode == 3 then
 		--write('INCOMING TELL!')
 	end
 end
-
+ 
 function event_party_invite(sender_id, sender, region)
 	--write('PARTY INVITATION')
 end
-
+ 
 function event_incoming_text(original, modified, color)
 	local me_party = original:find('%('..player..'%)')
 	local me_linkshell = original:find('<'..player..'>')
@@ -134,25 +128,29 @@ function event_incoming_text(original, modified, color)
 	local other_linkshell = original:find('<.*>')
 	local other_say = original:find('.* :')
 	local not_bm = original:find('.* '..string.char(129,168)..'.*')
-
-	for names in modified:gmatch('([%w]+)') do
+ 
+	for names in modified:gmatch('([%p]?[%w]+[%p]?)') do
+	
         for name in pairs(members) do
 			if original:lower():gmatch('.*'..members[name]) then
 				modified = modified:igsub(members[name], modmember[name])
 			end
         end
-
+ 
 		for k,v in pairs(nicknames) do
 			for z=1, #v do	
 				modified = modified:igsub('([^%a])'..nicknames[k][z]..'([^%a])', function (pre, app) return pre..k:capitalize()..app end):igsub('([^%a])'..nicknames[k][z]..'$', function(space) return space..k:capitalize() end)			end	
 		end
-
+ 
 		for mule, color in pairs(mulenames) do
-			--	modified = modified:igsub('([^%a])'..mule..'([^%a])', function (pre, app) return '\x1E\x01'..mulecolor[mule]..pre..mule:capitalize()..'\x1E\x01'..app end):igsub('([^%a])'..mule..'$', function(space) return '\x1E\x01'..mulecolor[mule]..space..mule:capitalize()..'\x1E\x01' end)
-			modified = modified:igsub(mule, mulecolor[mule]..mule:capitalize()..'\x1E\x01')			
+			--	modified = modified:igsub('([^%a])'..mule..'([^%a])', function (pre, app) return '\x1E\x01'..mulecolor[mule]..pre..mule:capitalize()..'\x1E\x01'..app end):igsub('([^%a])'..mule..'$', function(space) return '\x1E\x01'..mulecolor[mule]..space..mule:capitalize()..'\x1E\x01' end)	
 			modified = modified:igsub(mule, mulecolor[mule]..mule:capitalize()..chat.colorcontrols.reset)
 		end	
-
+ 
+		if settings.highlighting ~= 'Yes' then
+			modified = modified:gsub('%(['..string.char(0x1e, 0x1f)..'].(%w+)'..'['..string.char(0x1e, 0x1f)..'].%)(.*)', function(name, rest) return '('..name..')'..rest end)			
+			modified = modified:gsub('<['..string.char(0x1e, 0x1f)..'].(%w+)'..'['..string.char(0x1e, 0x1f)..'].>(.*)', function(name, rest) return '<'..name..'>'..rest end)	
+		end
 	end
 	if not_bm == nil then
 		if other_party ~= nil or other_linkshell ~= nil then
@@ -163,10 +161,10 @@ function event_incoming_text(original, modified, color)
 			end
 		end
 	end
-
+ 
 	return modified
 end
-
+ 
 function event_incoming_chunk(id, data)
 	if id == 221 then
 		modmember={}
@@ -174,7 +172,7 @@ function event_incoming_chunk(id, data)
 		send_command('wait 0.1; lua i highlight get_party_members')
 	end
 end
-
+ 
 function colconv(str,key)
 	-- Used in the options_load() function. Taken from Battlemod
 	local out
@@ -192,13 +190,18 @@ function colconv(str,key)
 	end
 	return out
 end
-
-
+ 
+ 
 function get_party_members()
-	for member, member_tb in pairs(get_party()) do
-		if not table.containskey(mulenames, member_tb['name']:lower()) then
-			members[member] = member_tb['name']
-			modmember[member]=color[member]..member_tb['name']..chat.colorcontrols.reset
+	if settings.highlighting == 'Yes' then
+		for member, member_tb in pairs(get_party()) do
+			if not table.containskey(mulenames, member_tb['name']:lower()) then
+				members[member] = member_tb['name']
+				modmember[member]=color[member]..member_tb['name']..chat.colorcontrols.reset
+			end
 		end
-	end
+	else 
+		members['p0'] = player
+		modmember['p0'] = color['p0']..player..chat.colorcontrols.reset
+	end	
 end

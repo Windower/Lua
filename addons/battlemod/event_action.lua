@@ -210,6 +210,9 @@ function event_action(act)
 					effect_val = act['targets'][i]['actions'][n]['param']
 				end
 				
+				if act['category'] == 6 and abil_ID > 140 and abil_ID < 149 then -- Force a message for maneuvers.
+					msg_ID = 100
+				end
 				local fields = fieldsearch(dialog[msg_ID]['english'])
 				
 				if table.contains(fields,'spell') then

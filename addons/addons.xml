@@ -201,6 +201,11 @@
     <bugtracker>https://github.com/jerryhebert/Lua/issues</bugtracker>
   </addon>
   <addon>
+    <name>Shortcuts</name>
+    <author>Byrth</author>
+    <description>Applys spellcast-like command completion (interpretation and target completion) to single slash commands. Includes emotes, /check, and /pcmd.</description>
+  </addon>
+  <addon>
     <name>Send</name>
     <description>Sends commands between windower instances using IPC.</description>
   </addon>
