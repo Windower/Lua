@@ -584,7 +584,6 @@ function party_id(actor_table,party_table)
 	local partypos, filtertype
 	if actor_table['is_npc']==true then
 		if actor_table['id']%4096 > 2047 then -- Pet check
-			write('there')
 			if party_table['p0']['mob']['pet_index'] == actor_table['index'] then
 				filtertype = 'my_pet'
 			elseif party_table['p0']['mob']['pet_index'] ~= actor_table['index'] then
