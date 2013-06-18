@@ -35,6 +35,7 @@ require 'ambiguous_names'
 require 'targets'
 
 function event_load()
+	lastword = 'MAUSMAUSMAUSMAUSMAUSMAUSMAUSMAUS'
 	collectgarbage()
 end
 
@@ -43,10 +44,10 @@ function event_outgoing_text(original,modified)
 	local command = splitline[1]
 	
 	local a,b,spell = string.find(original,'"(.-)"')
-	
+
 	if ignore_list[command] then
 		return modified
-	elseif command2_list[command] and not valid_target(splitline[#splitline],true) then
+	elseif command2_list[command] and not valid_target(splitline[#splitline],true) and not splitline[#splitline]:lower() == lastword:lower() then
 		
 		if command2_list[command]==true then -- no excluded second commands
 			local temptarg = valid_target(splitline[#splitline]) or target_make({validtarget={['Player']=true,['Enemy']=true,['Self']=true}})
@@ -58,6 +59,7 @@ function event_outgoing_text(original,modified)
 			for i,v in pairs(splitline) do
 				if command2_list[command]:contains(v) then
 					tempcmd = tempcmd..' '..v
+					lastword = v
 					passback = v
 				end
 			end
@@ -68,10 +70,14 @@ function event_outgoing_text(original,modified)
 					temptarg = ''
 				else
 					temptarg = splitline[#splitline]
+					lastword = temptarg
 				end
 			elseif not temptarg then
 				temptarg = target_make({validtarget={['Player']=true,['Enemy']=true,['Self']=true}})
+				lastword = temptarg
 			end
+			add_to_chat(5,tempcmd..' '..temptarg)
+			
 			send_command(tempcmd..' '..temptarg)
 			return ''
 		end
