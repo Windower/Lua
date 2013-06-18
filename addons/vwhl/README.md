@@ -1,5 +1,5 @@
 **Author:** Giuliano Riccio  
-**Version:** v 1.20130407
+**Version:** v 1.20130529
 
 # VWHL #
 This addon redirects the nm's weaknesses (VW or Abyssea) to the "tell" stream so that they can be held in the chat log using the chat filters' hold function (Config > Chat Filters > "Enter" on "Tell" until you get the green "hold" icon).
@@ -16,6 +16,9 @@ vwhl test
 ----
 
 ## Changelog ##
+
+### v1.20130529###
+* **change**: Aligned to Windower's addon development guidelines.
 
 ### v1.20130407###
 * First release.

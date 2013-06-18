@@ -383,7 +383,7 @@ function table.reverse(t)
 end
 
 -- Returns an array removed of all duplicates.
--- DEPRECATED: Use S(t) instead
+-- DEPRECATED: Use S(t) or L(S(t)) instead.
 function table.set(t)
 	local seen = {}
 	local res = {}
@@ -397,6 +397,18 @@ function table.set(t)
 	end
 
 	return setmetatable(res, getmetatable(t) or _meta.T)
+end
+
+-- Gets a list of arguments and creates a table with key: value pairs alternating the arguments.
+function table.dict(...)
+	local res = type(...) == 'table' and (...) or {}
+
+	local start = type(...) == 'table' and 2 or 1
+	for k = start, select('#', ...), 2 do
+		res[select(k, ...)] = select(k + 1, ...)
+	end
+
+	return setmetatable(res, _meta.T)
 end
 
 -- Finds a table entry based on an attribute.
@@ -436,7 +448,7 @@ function table.it(t)
 	local key
 	return function()
 		key = next(t, key)
-		return rawget(t, key)
+		return rawget(t, key), key
 	end
 end
 
@@ -525,14 +537,25 @@ end
 _raw.table.concat = table.concat
 
 -- Concatenates all objects of a table. Converts to string, if not already so.
-function table.concat(t, str)
+function table.concat(t, str, from, to)
 	str = str or ''
 	local res = ''
-	
-	for key, val in pairs(t) do
-		res = res..tostring(val)
-		if next(t, key) then
-			res = res..str
+
+	if from or to then
+		from = from or 1
+		to = to or #t
+		for key = from, to do
+			res = res..tostring(val)
+			if key < to then
+				res = res..str
+			end
+		end
+	else
+		for key, val in pairs(t) do
+			res = res..tostring(val)
+			if next(t, key) then
+				res = res..str
+			end
 		end
 	end
 	
@@ -545,7 +568,13 @@ function table.sconcat(t)
 end
 
 -- Check if table is empty.
+-- DEPRECATED: Use table.empty instead.
 function table.isempty(t)
+	return next(t) == nil
+end
+
+-- Check if table is empty.
+function table.empty(t)
 	return next(t) == nil
 end
 

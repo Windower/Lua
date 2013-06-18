@@ -24,6 +24,8 @@
             <damage>false</damage>
             <healing>false</healing>
             <misses>false</misses>
+            <items>false</items>
+            <uses>true</uses>
             <readies>false</readies>
             <casting>false</casting>
             <all>false</all>
@@ -34,6 +36,8 @@
             <damage>true</damage>
             <healing>true</healing>
             <misses>true</misses>
+            <items>false</items>
+            <uses>true</uses>
             <readies>false</readies>
             <casting>false</casting>
             <all>false</all>
@@ -44,6 +48,8 @@
             <damage>true</damage>
             <healing>true</healing>
             <misses>true</misses>
+            <items>true</items>
+            <uses>true</uses>
             <readies>false</readies>
             <casting>false</casting>
             <all>true</all>

@@ -210,14 +210,81 @@ function string.isin(str, t)
 	return false
 end
 
--- Checks if a string is empty
-function string.isempty(str)
+-- Checks if a string is empty.
+function string.empty(str)
 	return str == ''
+end
+
+-- Returns a slug of a string.
+function string.slug(str)
+	return str
+		:gsub(' I', '1')
+		:gsub(' II', '2')
+		:gsub(' III', '3')
+		:gsub(' IV', '4')
+		:gsub(' V', '5')
+		:gsub('[^%w]', '')
+		:lower()
 end
 
 -- Returns a string with Lua pattern characters escaped.
 function string.escape(str)
 	return str:gsub('[[%]%%^$*()%.%+?-]', '%%%1')
+end
+
+-- Returns a Lua pattern from a wildcard string (with ? and * as placeholders for one and many characters respectively).
+function string.wildcard(str)
+	return str:gsub('[[%]%%^$()%+?-]', '%%%1'):gsub('*', '.*'):gsub('?', '.')
+end
+
+-- Returns a case-insensitive pattern for a given (non-pattern) string. For patterns, see string.ipattern.
+function string.istring(str)
+	return (str:gsub('%a', function(c) return '['..c:upper()..c:lower()..']' end))
+end
+
+-- Returns a case-insensitive pattern for a given pattern.
+function string.ipattern(str)
+	local res = ''
+	local percent = false
+	local val
+	for c in str:it() do
+		if c == '%' then
+			percent = not percent
+			res = res..c
+		elseif not percent then
+			val = string.byte(c)
+			if val > 64 and val <= 90 or val > 96 and val <= 122 then
+				res = res..'['..c:upper()..c:lower()..']'
+			else
+				res = res..c
+			end
+		else
+			percent = false
+			res = res..c
+		end
+	end
+
+	return res
+end
+
+-- A string.find wrapper for case-insensitive patterns.
+function string.ifind(str, pattern)
+	return str:find(pattern:ipattern())
+end
+
+-- A string.match wrapper for case-insensitive patterns.
+function string.imatch(str, pattern)
+	return str:match(pattern:ipattern())
+end
+
+-- A string.gmatch wrapper for case-insensitive patterns.
+function string.igmatch(str, pattern)
+	return str:gmatch(pattern:ipattern())
+end
+
+-- A string.gsub wrapper for case-insensitive patterns.
+function string.igsub(str, pattern, replace)
+	return str:gsub(pattern:ipattern(), replace)
 end
 
 -- Counts the occurrences of a substring in a string.
@@ -228,6 +295,16 @@ end
 -- Counts the occurrences of a pattern in a string.
 function string.pcount(str, pat)
 	return string.gsub[2](str, pat, '')
+end
+
+-- Returns a plural version of a string, if the provided table contains more than one element.
+-- Defaults to appending an s, but accepts an option string as second argument which it will the string with.
+function string.plural(str, t, replace)
+	if type(t) == 'number' and t > 1 or #t > 1 then
+		return replace or str..'s'
+	end
+
+	return str
 end
 
 -- Returns a formatted item list for use in natural language representation of a number of items.

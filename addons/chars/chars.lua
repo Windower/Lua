@@ -1,5 +1,5 @@
 --[[
-chars v1.20130521
+chars v1.20130529
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -28,6 +28,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
+require 'logger'
+
+_addon = {}
+_addon.name    = 'chars'
+_addon.version = '1.20130529'
+
 local chars = require('json').read('../libs/ffxidata.json').chat.chars
 
 function event_load()
@@ -40,10 +46,10 @@ end
 
 function event_addon_command(...)
     for code, char in pairs(chars) do
-        add_to_chat(55, '<'..code..'>: '..char)
+        log('<'..code..'>: '..char)
     end
 
-    add_to_chat(55, 'Using the pattern <j:text> any alphanumeric character will be replaced with its japanese version')
+    log('Using the pattern <j:text> any alphanumeric character will be replaced with its japanese version')
 end
 
 function event_outgoing_text(original, modified)
@@ -58,12 +64,12 @@ function event_outgoing_text(original, modified)
             end
         end
 
-        modified = modified:gsub('<j:'..str..'>', table.concat(jString), 1)
+        modified = modified:gsub('<j:'..str:escape()..'>', table.concat(jString), 1)
     end
 
     for char in modified:gmatch('<([%w]+)>') do
         if type(chars[char]) ~= 'nil' then
-            modified = modified:gsub('<'..char..'>', chars[char], 1)
+            modified = modified:gsub('<'..char:escape()..'>', chars[char], 1)
         end
     end
 

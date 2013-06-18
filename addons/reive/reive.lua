@@ -1,5 +1,5 @@
 --[[
-reive v1.20130525
+reive v1.20130603
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -28,23 +28,28 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
+require 'logger'
 require 'stringhelper'
+
 local config = require 'config'
 
-local _reive = T{}
-_reive.v              = '1.20130525'
-_reive.tb_name        = 'addon:gr:reive'
-_reive.track          = false
-_reive.visible        = false
-_reive.stats          = T{}
-_reive.stats.exp      = 0
-_reive.stats.bayld    = 0
-_reive.stats.totExp   = 0
-_reive.stats.totBayld = 0
-_reive.stats.scores   = T{}
-_reive.stats.bonuses  = T{}
+_addon = {}
+_addon.name    = 'reive'
+_addon.version = '1.20130603'
 
-_reive.bonuses_map = {
+tb_name = 'addon:gr:reive'
+track   = false
+visible = false
+
+stats           = T{}
+stats.exp       = 0
+stats.bayld     = 0
+stats.tot_exp   = 0
+stats.tot_bayld = 0
+stats.scores    = T{}
+stats.bonuses   = T{}
+
+bonuses_map = {
     ['HP recovery']                 = 'hp_recovery',
     ['MP recovery']                 = 'mp_recovery',
     ['TP recovery']                 = 'tp_recovery',
@@ -54,88 +59,88 @@ _reive.bonuses_map = {
     ['Increased maximum MP and HP'] = 'hp_mp_boost'
 }
 
-_reive.defaults = T{}
-_reive.defaults.v              = 0
-_reive.defaults.first_run      = true
-_reive.defaults.reset_on_start = false -- deprecated
-_reive.defaults.max_scores     = 5
-_reive.defaults.light          = false
+defaults = T{}
+defaults.v              = 0
+defaults.first_run      = true
+defaults.reset_on_start = false -- deprecated
+defaults.max_scores     = 5
+defaults.light          = false
 
-_reive.defaults.track = T{}
-_reive.defaults.track.hp_recovery        = true
-_reive.defaults.track.mp_recovery        = true
-_reive.defaults.track.tp_recovery        = true
-_reive.defaults.track.status_recovery    = true
-_reive.defaults.track.stoneskin          = true
-_reive.defaults.track.abilities_recovery = true
-_reive.defaults.track.hp_mp_boost        = true
+defaults.track = T{}
+defaults.track.hp_recovery        = true
+defaults.track.mp_recovery        = true
+defaults.track.tp_recovery        = true
+defaults.track.status_recovery    = true
+defaults.track.stoneskin          = true
+defaults.track.abilities_recovery = true
+defaults.track.hp_mp_boost        = true
 
-_reive.defaults.position = T{}
-_reive.defaults.position.x = 0
-_reive.defaults.position.y = 350
+defaults.position = T{}
+defaults.position.x = 0
+defaults.position.y = 350
 
-_reive.defaults.font = T{}
-_reive.defaults.font.family = 'Arial'
-_reive.defaults.font.size   = 10
-_reive.defaults.font.a      = 255
-_reive.defaults.font.bold   = false
-_reive.defaults.font.italic = false
+defaults.font = T{}
+defaults.font.family = 'Arial'
+defaults.font.size   = 10
+defaults.font.a      = 255
+defaults.font.bold   = false
+defaults.font.italic = false
 
-_reive.defaults.colors = T{}
-_reive.defaults.colors.background = T{}
-_reive.defaults.colors.background.r = 0
-_reive.defaults.colors.background.g = 43
-_reive.defaults.colors.background.b = 54
-_reive.defaults.colors.background.a = 200
+defaults.colors = T{}
+defaults.colors.background = T{}
+defaults.colors.background.r = 0
+defaults.colors.background.g = 43
+defaults.colors.background.b = 54
+defaults.colors.background.a = 200
 
-_reive.defaults.colors.reive = T{}
-_reive.defaults.colors.reive.title = T{}
-_reive.defaults.colors.reive.title.r = 220
-_reive.defaults.colors.reive.title.g = 50
-_reive.defaults.colors.reive.title.b = 47
+defaults.colors.reive = T{}
+defaults.colors.reive.title = T{}
+defaults.colors.reive.title.r = 220
+defaults.colors.reive.title.g = 50
+defaults.colors.reive.title.b = 47
 
-_reive.defaults.colors.reive.label = T{}
-_reive.defaults.colors.reive.label.r = 38
-_reive.defaults.colors.reive.label.g = 139
-_reive.defaults.colors.reive.label.b = 210
+defaults.colors.reive.label = T{}
+defaults.colors.reive.label.r = 38
+defaults.colors.reive.label.g = 139
+defaults.colors.reive.label.b = 210
 
-_reive.defaults.colors.reive.value = T{}
-_reive.defaults.colors.reive.value.r = 147
-_reive.defaults.colors.reive.value.g = 161
-_reive.defaults.colors.reive.value.b = 161
+defaults.colors.reive.value = T{}
+defaults.colors.reive.value.r = 147
+defaults.colors.reive.value.g = 161
+defaults.colors.reive.value.b = 161
 
-_reive.defaults.colors.score = T{}
-_reive.defaults.colors.score.title = T{}
-_reive.defaults.colors.score.title.r = 220
-_reive.defaults.colors.score.title.g = 50
-_reive.defaults.colors.score.title.b = 47
+defaults.colors.score = T{}
+defaults.colors.score.title = T{}
+defaults.colors.score.title.r = 220
+defaults.colors.score.title.g = 50
+defaults.colors.score.title.b = 47
 
-_reive.defaults.colors.score.label = T{}
-_reive.defaults.colors.score.label.r = 42
-_reive.defaults.colors.score.label.g = 161
-_reive.defaults.colors.score.label.b = 152
+defaults.colors.score.label = T{}
+defaults.colors.score.label.r = 42
+defaults.colors.score.label.g = 161
+defaults.colors.score.label.b = 152
 
-_reive.defaults.colors.bonus = T{}
-_reive.defaults.colors.bonus.title = T{}
-_reive.defaults.colors.bonus.title.r = 220
-_reive.defaults.colors.bonus.title.g = 50
-_reive.defaults.colors.bonus.title.b = 47
+defaults.colors.bonus = T{}
+defaults.colors.bonus.title = T{}
+defaults.colors.bonus.title.r = 220
+defaults.colors.bonus.title.g = 50
+defaults.colors.bonus.title.b = 47
 
-_reive.defaults.colors.bonus.label = T{}
-_reive.defaults.colors.bonus.label.r = 133
-_reive.defaults.colors.bonus.label.g = 153
-_reive.defaults.colors.bonus.label.b = 0
+defaults.colors.bonus.label = T{}
+defaults.colors.bonus.label.r = 133
+defaults.colors.bonus.label.g = 153
+defaults.colors.bonus.label.b = 0
 
-_reive.defaults.colors.bonus.value = T{}
-_reive.defaults.colors.bonus.value.r = 147
-_reive.defaults.colors.bonus.value.g = 161
-_reive.defaults.colors.bonus.value.b = 161
+defaults.colors.bonus.value = T{}
+defaults.colors.bonus.value.r = 147
+defaults.colors.bonus.value.g = 161
+defaults.colors.bonus.value.b = 161
 
-_reive.settings = T{}
+settings = T{}
 
 -- plugin functions
 
-function _reive.parseOptions(args)
+function parse_options(args)
     local options = T{}
 
     while #args > 0 do
@@ -155,8 +160,8 @@ function _reive.parseOptions(args)
     return options
 end
 
-function _reive.test()
-    _reive.start()
+function test()
+    start_tracking()
     add_to_chat(121, 'Reive momentum score: HP recovery.')
     add_to_chat(121, 'Momentum bonus: Ability cast recovery!')
     add_to_chat(121, 'Reive momentum score: Damage taken.')
@@ -175,170 +180,171 @@ function _reive.test()
     add_to_chat(121, 'Player obtained 329 bayld!')
     add_to_chat(121, 'Player obtained 405 bayld!')
     add_to_chat(131, 'Player gains 426 limit points.')
-    _reive.stop()
-    _reive.show()
+    stop_tracking()
+    show_window()
 end
 
-function _reive.start()
-    _reive.reset()
-    _reive.track = true
-    add_to_chat(0, '\30\03The Reive has begun!\30\01')
+function start_tracking()
+    reset_stats()
+    log('The Reive has begun!')
+    
+    track = true
 
-    if _reive.settings.light == false then
-        _reive.show()
+    if settings.light == false then
+        show_window()
     end
 end
 
-function _reive.stop()
-    _reive.stats.scores  = T{}
-    _reive.stats.bonuses = T{}
-
-    _reive.track = false
-    add_to_chat(0, '\30\03The Reive has ended\30\01')
-    _reive.hide()
-    _reive.status()
+function stop_tracking()
+    stats.scores  = T{}
+    stats.bonuses = T{}
+    track         = false
+    
+    log('The Reive has ended.')
+    hide_window()
+    show_report()
 end
 
-function _reive.refresh()
-    if _reive.visible == false then
+function refresh()
+    if visible == false then
         return
     end
 
-    local reiveColors = _reive.settings.colors.reive
-    local text        =
-        ' \\cs('..reiveColors.title.r..', '..reiveColors.title.g..', '..reiveColors.title.b..')--== REIVE ==--\\cr \n'..
-        ' \\cs('..reiveColors.label.r..', '..reiveColors.label.g..', '..reiveColors.label.b..')Bayld:\\cr'..
-        ' \\cs('..reiveColors.value.r..', '..reiveColors.value.g..', '..reiveColors.value.b..')'.._reive.stats.bayld..'/'.._reive.stats.totBayld..'\\cr \n'..
-        ' \\cs('..reiveColors.label.r..', '..reiveColors.label.g..', '..reiveColors.label.b..')EXP:\\cr'..
-        ' \\cs('..reiveColors.value.r..', '..reiveColors.value.g..', '..reiveColors.value.b..')'.._reive.stats.exp..'/'.._reive.stats.totExp..'\\cr '
+    local reive_colors = settings.colors.reive
+    local text         =
+        ' \\cs('..reive_colors.title.r..', '..reive_colors.title.g..', '..reive_colors.title.b..')--== REIVE ==--\\cr \n'..
+        ' \\cs('..reive_colors.label.r..', '..reive_colors.label.g..', '..reive_colors.label.b..')Bayld:\\cr'..
+        ' \\cs('..reive_colors.value.r..', '..reive_colors.value.g..', '..reive_colors.value.b..')'..stats.bayld..'/'..stats.tot_bayld..'\\cr \n'..
+        ' \\cs('..reive_colors.label.r..', '..reive_colors.label.g..', '..reive_colors.label.b..')EXP:\\cr'..
+        ' \\cs('..reive_colors.value.r..', '..reive_colors.value.g..', '..reive_colors.value.b..')'..stats.exp..'/'..stats.tot_exp..'\\cr '
 
-    local scoresColors = _reive.settings.colors.score
-    local scores       = '';
+    local scores_colors = settings.colors.score
+    local scores        = '';
 
-    if #_reive.stats.scores > 0 then
-        local base = math.max(0, #_reive.stats.scores - _reive.settings.max_scores)
+    if #stats.scores > 0 then
+        local base = math.max(0, #stats.scores - settings.max_scores)
 
-        for index, score in pairs(_reive.stats.scores:slice(base + 1, #_reive.stats.scores)) do
+        for index, score in pairs(stats.scores:slice(base + 1, #stats.scores)) do
             scores = scores..
-                '\n \\cs('..scoresColors.label.r..', '..scoresColors.label.g..', '..scoresColors.label.b..')'..(base + index)..'. '..score..'\\cr  '
+                '\n \\cs('..scores_colors.label.r..', '..scores_colors.label.g..', '..scores_colors.label.b..')'..(base + index)..'. '..score..'\\cr  '
         end
 
-        text = text..'\n \\cs('..scoresColors.title.r..', '..scoresColors.title.g..', '..scoresColors.title.b..')--== MOMENTUM SCORES ==--\\cr '..scores
+        text = text..'\n \\cs('..scores_colors.title.r..', '..scores_colors.title.g..', '..scores_colors.title.b..')--== MOMENTUM SCORES ==--\\cr '..scores
     end
 
-    local bonusesColors = _reive.settings.colors.bonus
-    local bonuses       = '';
+    local bonuses_colors = settings.colors.bonus
+    local bonuses        = '';
 
-    for index, bonus in pairs(_reive.stats.bonuses:keyset():sort()) do
-        if type(_reive.bonuses_map[bonus]) == 'nil' or _reive.settings.track[_reive.bonuses_map[bonus]] == true then
-            local amount = _reive.stats.bonuses[bonus]
+    for index, bonus in pairs(stats.bonuses:keyset():sort()) do
+        if type(bonuses_map[bonus]) == 'nil' or settings.track[bonuses_map[bonus]] == true then
+            local amount = stats.bonuses[bonus]
 
             bonuses = bonuses..
-                '\n \\cs('..bonusesColors.label.r..', '..bonusesColors.label.g..', '..bonusesColors.label.b..')'..bonus..':\\cr'..
-                ' \\cs('..bonusesColors.value.r..', '..bonusesColors.value.g..', '..bonusesColors.value.b..')'..amount..'\\cr '
+                '\n \\cs('..bonuses_colors.label.r..', '..bonuses_colors.label.g..', '..bonuses_colors.label.b..')'..bonus..':\\cr'..
+                ' \\cs('..bonuses_colors.value.r..', '..bonuses_colors.value.g..', '..bonuses_colors.value.b..')'..amount..'\\cr '
         end
     end
 
     if #bonuses > 0 then
-        text = text..'\n \\cs('..bonusesColors.title.r..', '..bonusesColors.title.g..', '..bonusesColors.title.b..')--== MOMENTUM BONUSES ==--\\cr '..bonuses
+        text = text..'\n \\cs('..bonuses_colors.title.r..', '..bonuses_colors.title.g..', '..bonuses_colors.title.b..')--== MOMENTUM BONUSES ==--\\cr '..bonuses
     end
 
-    tb_set_text(_reive.tb_name, text)
+    tb_set_text(tb_name, text)
 end
 
-function _reive.reset()
-    _reive.stats.exp   = 0
-    _reive.stats.bayld = 0
-    _reive.refresh()
+function reset_stats()
+    stats.exp   = 0
+    stats.bayld = 0
+    refresh()
 end
 
-function _reive.fullReset()
-    _reive.stats.totExp   = 0
-    _reive.stats.totBayld = 0
-    _reive.reset()
-    _reive.refresh()
+function full_reset_stats()
+    stats.tot_exp   = 0
+    stats.tot_bayld = 0
+    reset_stats()
+    refresh()
 end
 
-function _reive.show()
-    _reive.visible = true
-    tb_set_visibility(_reive.tb_name, true)
-    _reive.refresh()
+function show_window()
+    visible = true
+    tb_set_visibility(tb_name, true)
+    refresh()
 end
 
-function _reive.hide()
-    _reive.visible = false
-    tb_set_visibility(_reive.tb_name, false)
+function hide_window()
+    visible = false
+    tb_set_visibility(tb_name, false)
 end
 
-function _reive.toggle()
-    if _reive.visible then
-        _reive.hide()
+function toggle_window()
+    if visible then
+        hide_window()
     else
-        _reive.show()
+        show_window()
     end
 end
 
-function _reive.status()
-    add_to_chat(0, '\30\03[EXP\30\01 \30\02'.._reive.stats.exp..'/'.._reive.stats.totExp..'\30\01\30\03] [Bayld\30\01 \30\02'.._reive.stats.bayld..'/'.._reive.stats.totBayld..'\30\01\30\03]\30\01')
+function show_report()
+    log('[EXP \30\02'..stats.exp..'/'..stats.tot_exp..'\30\01] [Bayld \30\02'..stats.bayld..'/'..stats.tot_bayld..'\30\01]')
 end
 
-function _reive.first_run()
-    if ( type(_reive.settings.v) ~= 'nil' and _reive.settings.v >= tonumber(_reive.v) and _reive.settings.first_run == false ) then
+function first_run()
+    if type(settings.v) ~= 'nil' and settings.v >= tonumber(_addon.version) and settings.first_run == false then
         return
     end
 
-    add_to_chat(55, 'hi '..get_player()['name']:lower()..',')
-    add_to_chat(55, 'thank you for using reive v'.._reive.v)
-    add_to_chat(55, 'in this update i\'ve fixed a bug that prevented the addon from tracking correctly the total gained exp.')
-    add_to_chat(55, 'i\'m sorry for any inconvenience this may have caused.')
-    add_to_chat(55, '- zohno@phoenix')
+    log('Hi '..get_player()['name']:lower()..',')
+    log('thank you for using reive v'.._addon.version)
+    log('With this update I\'ve fixed an issue that prevented the addon to start tracking info.')
+    log('I\'m sorry for any inconvenience this may have caused.')
+    log('- Zohno@Phoenix')
 
-    _reive.settings.v = _reive.v
-    _reive.settings.first_run = false
-    _reive.settings:save('all')
+    settings.v         = _addon.version
+    settings.first_run = false
+    settings:save('all')
 end
 
 -- windower events
 
 function event_load()
-    _reive.settings = config.load(_reive.defaults)
+    settings = config.load(defaults)
 
-    local background = _reive.settings.colors.background
+    local background = settings.colors.background
 
     send_command('alias reive lua c reive')
-    tb_create(_reive.tb_name)
-    tb_set_location(_reive.tb_name, _reive.settings.position.x, _reive.settings.position.y)
-    tb_set_bg_color(_reive.tb_name, background.a, background.r, background.g, background.b)
-    tb_set_color(_reive.tb_name, _reive.settings.font.a, 147, 161, 161)
-    tb_set_font(_reive.tb_name, _reive.settings.font.family, _reive.settings.font.size)
-    tb_set_bold(_reive.tb_name, _reive.settings.font.bold)
-    tb_set_italic(_reive.tb_name, _reive.settings.font.italic)
-    tb_set_text(_reive.tb_name, '')
-    tb_set_bg_visibility(_reive.tb_name, true)
+    tb_create(tb_name)
+    tb_set_location(tb_name, settings.position.x, settings.position.y)
+    tb_set_bg_color(tb_name, background.a, background.r, background.g, background.b)
+    tb_set_color(tb_name, settings.font.a, 147, 161, 161)
+    tb_set_font(tb_name, settings.font.family, settings.font.size)
+    tb_set_bold(tb_name, settings.font.bold)
+    tb_set_italic(tb_name, settings.font.italic)
+    tb_set_text(tb_name, '')
+    tb_set_bg_visibility(tb_name, true)
 
     if T(get_player()['buffs']):contains(511) then
-        _reive.start()
+        start_tracking()
     end
 end
 
 function event_unload()
     send_command('unalias reive')
-    tb_delete(_reive.tb_name)
+    tb_delete(tb_name)
 end
 
 function event_login()
-    _reive.first_run()
+    first_run()
 end
 
 function event_gain_status(id, name)
     if id == 511 then
-        _reive.start()
+        start_tracking()
     end
 end
 
 function event_lose_status(id, name)
     if id == 511 then
-        _reive.stop()
+        stop_tracking()
     end
 end
 
@@ -349,8 +355,8 @@ function event_incoming_text(original, modified, mode)
         match = original:match('Reive momentum score: ([%s%w]+)%.')
 
         if match then
-            _reive.stats.scores:append(match)
-            _reive.refresh()
+            stats.scores:append(match)
+            refresh()
 
             return modified, mode
         end
@@ -358,40 +364,41 @@ function event_incoming_text(original, modified, mode)
         match = original:match('Momentum bonus: ([%s%w]+)!')
 
         if match then
-            if type(_reive.stats.bonuses[match]) == 'nil' then
-                _reive.stats.bonuses[match] = 0
+            if type(stats.bonuses[match]) == 'nil' then
+                stats.bonuses[match] = 0
             end
 
-            _reive.stats.bonuses[match] = _reive.stats.bonuses[match] + 1
-            _reive.refresh()
+            stats.bonuses[match] = stats.bonuses[match] + 1
+            refresh()
 
             return modified, mode
         end
 
         match = original:match('obtained (%d+) bayld!')
 
-        if match and _reive.track then
-            _reive.stats.bayld    = _reive.stats.bayld + match
-            _reive.stats.totBayld = _reive.stats.totBayld + match
-            _reive.refresh()
+        if match and track then
+            stats.bayld     = stats.bayld + match
+            stats.tot_bayld = stats.tot_bayld + match
+            refresh()
         end
-    elseif mode == 131 and _reive.track then
+    elseif mode == 131 and track then
         match = original:match('gains (%d+) limit points%.')
 
         if match then
-            _reive.stats.exp    = _reive.stats.exp + match
-            _reive.stats.totExp = _reive.stats.totExp + match
-            _reive.refresh()
+            stats.exp     = stats.exp + match
+            stats.tot_exp = stats.tot_exp + match
+            refresh()
 
             return modified, mode
         end
 
         match = original:match('gains (%d+) experience points%.')
 
+
         if match then
-            _reive.stats.exp    = _reive.stats.exp + match
-            _reive.stats.totExp = _reive.stats.totExp + match
-            _reive.refresh()
+            stats.exp     = stats.exp + match
+            stats.tot_exp = stats.tot_exp + match
+            refresh()
 
             return modified, mode
         end
@@ -413,41 +420,42 @@ function event_addon_command(...)
     local cmd = args:remove(1):lower()
 
     if cmd == 'help' then
-        messages:append('help >> reive test -- fills the chat log to show how the plugin will work. reload the plugin after the test (lua r reive)')
-        messages:append('help >> reive reset -- sets gained exp and bayld to 0')
-        messages:append('help >> reive full-reset -- sets gained exp/total exp and bayld/total bayld to 0')
-        messages:append('help >> reive show -- shows the tracking window')
-        messages:append('help >> reive hide -- hides the tracking window')
-        messages:append('help >> reive toggle -- toggles the tracking window')
-        messages:append('help >> reive light [\30\02enabled\30\01] -- defines the light mode status')
-        messages:append('help >> reive max-scores \30\02amount\30\01 -- sets the max amount of scores to show in the window')
-        messages:append('help >> reive track \30\02score\30\01 \30\02visible\30\01 -- specifies the visibility of a score in the window')
-        messages:append('help >> reive position [[-h]|[-x \30\02x\30\01] [-y \30\02y\30\01]] -- sets the horizontal and vertical position of the window relative to the upper-left corner')
-        messages:append('help >> reive font [[-h]|[-f \30\02font\30\01] [-s \30\02size\30\01] [-a \30\02alpha\30\01] [-b[ \30\02bold\30\01]] [-i[ \30\02italic\30\01]]] -- sets the style of the font used in the window')
-        messages:append('help >> reive color [[-h]|[-o \30\02objects\30\01] [-d] [-r \30\02red\30\01] [-g \30\02green\30\01] [-b \30\02blue\30\01] [-a \30\02alpha\30\01]] -- sets the colors used by the plugin')
+        log('reive help -- shows the help text.')
+        log('reive test -- fills the chat log with some messages to show how the plugin will work.')
+        log('reive reset -- sets gained exp and bayld to 0.')
+        log('reive full-reset -- sets both current and total gained exp and bayld to 0.')
+        log('reive show -- shows the tracking window.')
+        log('reive hide -- hides the tracking window.')
+        log('reive toggle -- toggles the tracking window\'s visibility.')
+        log('reive light [<enabled>] -- enables or disabled light mode. When enabled, the addon will never show the window and just print a summary in the chat box at the end of the run. If the enabled parameter is not specified, the help text will be shown.')
+        log('reive max-scores <amount> -- sets the max amount of scores to show in the window. if the amount parameter is not specified, the help text will be shown.')
+        log('reive track <score> <visible> -- specifies the visibility of a bonus in the window.')
+        log('reive position [[-h]|[-x <x>] [-y <y>]] -- sets the horizontal and vertical position of the window relative to the upper-left corner. If the no parameter is specified, the help text will be shown.')
+        log('reive font [[-h]|[-f <font>] [-s <size>] [-a <alpha>] [-b [<bold>]] [-i [<italic>]]] -- sets the style of the font used in the window. if the no parameter is specified, the help text will be shown.')
+        log('reive color [[-h]|[-o <objects>] [-d] [-r <red>] [-g <green>] [-b <blue>] [-a <alpha>]] -- sets the colors of the various elements present in the addon\'s window. If the no parameter is specified, the help text will be shown.')
     elseif cmd == 'test' then
-        _reive.test()
+        test()
     elseif cmd == 'reset' then
-        _reive.reset()
+        reset_stats()
     elseif cmd == 'full-reset' then
-        _reive.fullReset()
+        full_reset_stats()
     elseif cmd == 'show' then
-        _reive.show()
+        show_window()
     elseif cmd == 'hide' then
-        _reive.hide()
+        hide_window()
     elseif cmd == 'toggle' then
-        _reive.toggle()
+        toggle_window()
     elseif cmd == 'light' then
         if type(args[1]) == 'nil' then
-            messages:append('light >> defines the light mode status. when enabled, the window will be kept hidden and only the summary will be show after the run')
-            messages:append('light >> usage: reive light \30\02enabled\30\01')
-            messages:append('light >> positional arguments:')
-            messages:append('light >>   enabled    define light mode status')
+            log('Enables or disabled light mode. When enabled, the addon will never show the window and just print a summary in the chat box at the end of the run. Ff the enabled parameter is not specified, the help text will be shown.')
+            log('Usage: reive light <enabled>')
+            log('Positional arguments:')
+            log('\x81\xa1 <enabled>    specifies the status of the light mode. "default", "false" or "0" mean disabled. "true" or "1" mean enabled.')
         else
             local light
 
             if args[1] == 'default' then
-                light = _reive.defaults.light
+                light = defaults.light
             elseif args[1] == 'true' or args[1] == '1' then
                 light = true
             elseif args[1] == 'false' or args[1] == '0' then
@@ -455,45 +463,47 @@ function event_addon_command(...)
             end
 
             if light == true then
-                _reive.hide()
-            elseif _reive.track == true then
-                _reive.show()
+                hide_window()
+            elseif track == true then
+                show_window()
             end
 
             if type(light) ~= "boolean" then
-                errors:append('light >> light expects \'enabled\' to be a boolean (\'true\' or \'false\'), a number (\'1\' or \'0\') or \'default\' (without quotes)')
+                error('Please specify a valid status')
             end
 
             if errors:length() == 0 then
-                _reive.settings.light = light
+                settings.light = light
 
-                _reive.refresh()
-                _reive.settings:save('all')
+                refresh()
+                settings:save('all')
+                notice('The light mode has been set.')
             end
         end
     elseif cmd == 'max-scores' then
         local max_scores
 
         if type(args[1]) == 'nil' then
-            messages:append('max-scores >> sets the max amount of scores to show in the window')
-            messages:append('max-scores >> usage: reive max-scores \30\02amount\30\01')
-            messages:append('max-scores >> positional arguments:')
-            messages:append('max-scores >>   amount    the max amount of scores to show')
+            log('Sets the max amount of scores to show in the window. If the amount parameter is not specified, the help text will be shown.')
+            log('Usage: reive max-scores <amount>')
+            log('Positional arguments:')
+            log('\x81\xa1 <amount>    specifies the max amount of status scores that will be show. By default this value is 5. Setting this value to 0 will hide the scores section.')
         elseif args[1] == 'default' then
-            max_scores = _reive.defaults.max_scores
+            max_scores = defaults.max_scores
         else
             max_scores = tonumber(args[1])
         end
 
         if type(max_scores) ~= "number" then
-            errors:append('max-scores >> max-scores expects \'amount\' to be a number or \'default\' (without quotes)')
+            error('Please specify a valid amount of scores.')
         end
 
         if errors:length() == 0 then
-            _reive.settings.max_scores = max_scores
+            settings.max_scores = max_scores
 
-            _reive.refresh()
-            _reive.settings:save('all')
+            refresh()
+            settings:save('all')
+            notice('The max amount of scores has been set.')
         end
     elseif cmd == 'track' then
         local object
@@ -509,11 +519,11 @@ function event_addon_command(...)
         }
 
         if type(args[1]) == 'nil' then
-            messages:append('track >> specifies the visibility of a score in the window')
-            messages:append('track >> usage: reive track \30\02score\30\01 \30\02visible\30\01')
-            messages:append('track >> positional arguments:')
-            messages:append('track >>   score    the name of the score. accepted values are: '..validObjects:concat(', '))
-            messages:append('track >>   visible  the visibility of the score (true/false/1/0/default)')
+            log('Specifies the visibility of a bonus in the window.')
+            log('Usage: reive track <bonus> <visible>')
+            log('Positional arguments:')
+            log('\x81\xa1 <bonus>      specifies the item which will have its visibility changed. The accepted values are : '..validObjects:concat(', '))
+            log('\x81\xa1 <visible>    specifies the visibility of the bonus. "false" or "0" mean disabled. "default", "true" or "1" mean enabled.')
         elseif validObjects:contains(args[1]) then
             object = args[1]:gsub('-', '_')
 
@@ -522,152 +532,155 @@ function event_addon_command(...)
             elseif args[2] == 'false' or args[2] == '0' then
                 visible = false
             else
-                errors:append('track >> track expects \'visible\' to be a boolean (\'true\' or \'false\'), a number (\'1\' or \'0\') or \'default\' (without quotes)')
+                error('Please specify a valid visible status.')
             end
 
             if errors:length() == 0 then
-                _reive.settings.track[object] = visible
+                settings.track[object] = visible
 
-                _reive.refresh()
-                _reive.settings:save('all')
+                refresh()
+                settings:save('all')
+                notice('The bonus\' visibility has been set.')
             end
         else
-            errors:append('track >> track expects \'score\' to be one of the following values: '..validObjects:concat(', '))
+            error('Please specify a valid bonus.')
         end
     else
-        local options = _reive.parseOptions(args)
+        local options = parse_options(args)
 
         if cmd == 'position' then
             if options:containskey('h') or options:length() == 0 then
-                messages:append('position >> sets the horizontal and vertical position of the window relative to the upper-left corner')
-                messages:append('position >> usage: reive position [[-h]|[-x \30\02x\30\01] [-y \30\02y\30\01]]')
-                messages:append('position >> optional arguments:')
-                messages:append('position >>   -h    show this message and exit')
-                messages:append('position >>   -x    the horizontal position of the window relative to the upper-left corner')
-                messages:append('position >>   -y    the vertical position of the window relative to the upper-left corner')
+                log('Sets the horizontal and vertical position of the window relative to the upper-left corner. If no parameter is specified, the help text will be shown.')
+                log('Usage: reive position [[-h]|[-x <x>] [-y <y>]]')
+                log('Optional arguments:')
+                log('\x81\xa1 -h        shows the help text.')
+                log('\x81\xa1 -x <x>    specifies the horizontal position of the window.')
+                log('\x81\xa1 -y <y>    specifies the vertical position of the window.')
             elseif options:length() > 0 then
-                local x = _reive.settings.position.x
-                local y = _reive.settings.position.y
+                local x = settings.position.x
+                local y = settings.position.y
 
                 for key, value in pairs(options) do
                     if key == 'x' then
                         if options['x'] == 'default' then
-                            x = _reive.defaults.position.x
+                            x = defaults.position.x
                         else
                             x = tonumber(options['x'])
 
                             if type(x) ~= "number" then
-                                errors:append('position >> position expects \'x\' to be a number or \'default\' (without quotes)')
+                                error('Please specify a valid horizontal position.')
                             end
                         end
                     elseif key == 'y' then
                         if options['y'] == 'default' then
-                            y = _reive.defaults.position.y
+                            y = defaults.position.y
                         else
                             y = tonumber(options['y'])
 
                             if type(y) ~= "number" then
-                                errors:append('position >> position expects \'y\' to be a number or \'default\' (without quotes)')
+                                error('Please specify a valid vertical position.')
                             end
                         end
 
                     else
-                        errors:append('position >> '..key..' is not a recognized parameter')
+                        error('"'..key..'" is not a recognized parameter')
                     end
                 end
 
                 if errors:length() == 0 then
-                    _reive.settings.position.x = x
-                    _reive.settings.position.y = y
+                    settings.position.x = x
+                    settings.position.y = y
 
-                    tb_set_location(_reive.tb_name, x, y)
-                    _reive.settings:save('all')
+                    tb_set_location(tb_name, x, y)
+                    settings:save('all')
+                    notice('The window\'s position has been set.')
                 end
             end
         elseif cmd == 'font' then
             if options:containskey('h') or options:length() == 0 then
-                messages:append('font >> sets the style of the font used in the window')
-                messages:append('font >> usage: reive font [[-h]|[-f \30\02font\30\01] [-s \30\02size\30\01] [-a \30\02alpha\30\01] [-b[ \30\02bold\30\01]] [-i[ \30\02italic\30\01]]]')
-                messages:append('font >> optional arguments:')
-                messages:append('font >>   -h    show this message and exit')
-                messages:append('font >>   -f    the name of the font to use')
-                messages:append('font >>   -s    the size of the text')
-                messages:append('font >>   -a    the text transparency between 0 (transparent) and 255 (opaque)')
-                messages:append('font >>   -b    makes the text bold (null/true/false/1/0/default)')
-                messages:append('font >>   -i    makes the text italic (null/true/false/1/0/default)')
+                log('Sets the style of the font used in the window. if the no parameter is specified, the help text will be shown.')
+                log('Usage: reive font [[-h]|[-f <font>] [-s <size>] [-a <alpha>] [-b [<bold>]] [-i [<italic>]]]')
+                log('Optional arguments:')
+                log('\x81\xa1 -h               shows the help text.')
+                log('\x81\xa1 -f <font>        specifies the text\'s font.')
+                log('\x81\xa1 -s <size>        specifies the text\'s size.')
+                log('\x81\xa1 -a <alpha>       specifies the text\'s transparency. the value must be set between 0 (transparent) and 255 (opaque), inclusive.')
+                log('\x81\xa1 -b [<bold>]      specifies if the text should be rendered bold. "default", "false" or "0" mean disabled. "true", "1" or no value mean enabled.')
+                log('\x81\xa1 -i [<italic>]    specifies if the text should be rendered italic. "default", "false" or "0" mean disabled. "true", "1" or no value mean enabled.')
             elseif options:length() > 0 then
-                local family = _reive.settings.font.family
-                local size   = _reive.settings.font.size
-                local bold   = _reive.settings.font.bold
-                local italic = _reive.settings.font.italic
-                local a      = _reive.settings.font.a
+                local family = settings.font.family
+                local size   = settings.font.size
+                local bold   = settings.font.bold
+                local italic = settings.font.italic
+                local a      = settings.font.a
 
                 for key, value in pairs(options) do
                     if key == 'f' then
                         if options['f'] == 'default' then
-                            family = _reive.defaults.font.family
+                            family = defaults.font.family
                         else
                             family = options['f']
                         end
                     elseif key == 's' then
                         if options['s'] == 'default' then
-                            size = _reive.defaults.position.size
+                            size = defaults.position.size
                         else
                             size = tonumber(options['s'])
 
                             if type(size) ~= "number" then
-                                errors:append('font >> font expects \'size\' to be a number or \'default\' (without quotes)')
+                                error('Please specify a valid font size.')
                             end
                         end
                     elseif key == 'b' then
                         if options['b'] == 'default' then
-                            bold = _reive.defaults.position.bold
+                            bold = defaults.position.bold
                         elseif options['b'] == true or options['b'] == '1' or options['b'] == 'true' or options['b'] == 'null' then
                             bold = true
                         elseif options['b'] == '0' or options['b'] == 'false' then
                             bold = false
                         else
-                            errors:append('font >> font expects \'bold\' to be null (\'true\'), a boolean (\'true\' or \'false\'), a number (\'1\' or \'0\') or \'default\' (without quotes)')
+                            error('Please specify a valid bold status.')
                         end
                     elseif key == 'i' then
                         if options['i'] == 'default' then
-                            italic = _reive.defaults.position.italic
+                            italic = defaults.position.italic
                         elseif options['b'] == true or options['i'] == '1' or options['i'] == 'true' or options['i'] == 'null' then
                             italic = true
                         elseif options['i'] == '0' or options['i'] == 'false' then
                             italic = false
                         else
-                            errors:append('font >> font expects \'italic\' to be a number (\'0\' or \'1\'), a boolean (\'false\' or \'true\') or \'default\' (without quotes)')
+                            error('Please specify a valid italic status.')
                         end
                     elseif key == 'a' then
                         if options['a'] == 'default' then
-                            a = _reive.defaults.position.a
+                            a = defaults.position.a
                         else
                             a = tonumber(options['a'])
 
                             if type(a) ~= "number" then
-                                errors:append('font >> font expects \'a\' to be a number or \'default\' (without quotes)')
+                                error('Please specify a valid alpha value.')
                             else
                                 a = math.min(255, math.max(0, a))
                             end
                         end
                     else
-                        errors:append('font >> '..key..' is not a recognized parameter')
+                        error('"'..key..'" is not a recognized parameter')
                     end
                 end
 
                 if errors:length() == 0 then
-                    _reive.settings.font.family = family
-                    _reive.settings.font.size   = size
-                    _reive.settings.font.bold   = bold
-                    _reive.settings.font.italic = italic
-                    _reive.settings.font.a      = a
+                    settings.font.family = family
+                    settings.font.size   = size
+                    settings.font.bold   = bold
+                    settings.font.italic = italic
+                    settings.font.a      = a
 
-                    tb_set_color(_reive.tb_name, a, 147, 161, 161)
-                    tb_set_font(_reive.tb_name, family, size)
-                    tb_set_bold(_reive.tb_name, bold)
-                    tb_set_italic(_reive.tb_name, italic)
-                    _reive.settings:save('all')
+                    tb_set_color(tb_name, a, 147, 161, 161)
+                    tb_set_font(tb_name, family, size)
+                    tb_set_bold(tb_name, bold)
+                    tb_set_italic(tb_name, italic)
+                    settings:save('all')
+                    notice('The font\'s style has been set.')
                 end
             end
         elseif cmd == 'color' then
@@ -679,16 +692,16 @@ function event_addon_command(...)
             }
 
             if options:containskey('h') or options:length() == 0 then
-                messages:append('color >> sets the colors used by the plugin')
-                messages:append('color >> usage: reive color [[-h]|[-o \30\02objects\30\01] [-d] [-r \30\02red\30\01] [-g \30\02green\30\01] [-b \30\02blue\30\01] [-a \30\02alpha\30\01]]')
-                messages:append('color >> optional arguments:')
-                messages:append('color >>   -h    show this message and exit')
-                messages:append('color >>   -o    the objects that will have their color changed. accepted values are: '..validObjects:concat(', '))
-                messages:append('color >>   -d    sets the default r, g, b, a values for the specified objects')
-                messages:append('color >>   -r    the amount of red between 0 and 255')
-                messages:append('color >>   -g    the amount of green between 0 and 255')
-                messages:append('color >>   -b    the amount of blue between 0 and 255')
-                messages:append('color >>   -a    the transparency between 0 (transparent) and 255 (opaque). applies only to background')
+                log('Sets the colors of the various elements present in the addon\'s window. If the no parameter is specified, the help text will be shown.')
+                log('Usage: reive color [[-h]|[-o <objects>] [-d] [-r <red>] [-g <green>] [-b <blue>] [-a <alpha>]]')
+                log('Optional arguments:')
+                log('\x81\xa1 -h             shows the help text.')
+                log('\x81\xa1 -o <objects>   specifies the item/s which will have its/their color changed. If this parameter is missing all the objects will be changed. The accepted values are: "'..validObjects:concat('", "')..'"')
+                log('\x81\xa1 -d             sets the red, green, blue and alpha values of the specified objects to their default values.')
+                log('\x81\xa1 -r <red>       specifies the intensity of the red color. The value must be set between 0 and 255, inclusive, where 0 is less intense and 255 is most intense.')
+                log('\x81\xa1 -g <green>     specifies the intensity of the greencolor. The value must be set between 0 and 255, inclusive, where 0 is less intense and 255 is most intense.')
+                log('\x81\xa1 -b <blue>      specifies the intensity of the blue color. The value must be set between 0 and 255, inclusive, where 0 is less intense and 255 is most intense.')
+                log('\x81\xa1 -a <alpha>     specifies the text\'s transparency. The value must be set between 0 (transparent) and 255 (opaque), inclusive.')
             elseif options:length() > 0 then
                 local r = -1
                 local g = -1
@@ -752,7 +765,7 @@ function event_addon_command(...)
                             objects = T{'bonus.value'}
                         end
                     else
-                        errors:append('color >> color expects \'o\' to be one of the following values: '..validObjects:concat(', '))
+                        error('Please specify a valid object or set of objects.')
                     end
                 else
                     objects = T{
@@ -772,7 +785,7 @@ function event_addon_command(...)
                                 r = tonumber(options['r'])
 
                                 if type(r) ~= "number" then
-                                    errors:append('color >> color expects \'r\' to be a number or \'default\' (without quotes)')
+                                    error('Please specify a valid red value.')
                                 else
                                     r = math.min(255, math.max(0, r))
                                 end
@@ -784,7 +797,7 @@ function event_addon_command(...)
                                 g = tonumber(options['g'])
 
                                 if type(g) ~= "number" then
-                                    errors:append('color >> color expects \'g\' to be a number or \'default\' (without quotes)')
+                                    error('Please specify a valid green value.')
                                 else
                                     g = math.min(255, math.max(0, g))
                                 end
@@ -796,7 +809,7 @@ function event_addon_command(...)
                                 b = tonumber(options['b'])
 
                                 if type(b) ~= "number" then
-                                    errors:append('color >> color expects \'b\' to be a number or \'default\' (without quotes)')
+                                    error('Please specify a valid blue value.')
                                 else
                                     b = math.min(255, math.max(0, b))
                                 end
@@ -808,14 +821,14 @@ function event_addon_command(...)
                                 a = tonumber(options['a'])
 
                                 if type(a) ~= "number" then
-                                    errors:append('color >> color expects \'a\' to be a number or \'default\' (without quotes)')
+                                    error('Please specify a valid alpha value.')
                                 else
                                     a = math.min(255, math.max(0, a))
                                 end
                             end
                         elseif key == 'o' then
                         else
-                            errors:append('color >> '..key..' is not a recognized parameter')
+                            error('"'..key..'" is not a recognized parameter.')
                         end
                     end
                 end
@@ -826,71 +839,64 @@ function event_addon_command(...)
 
                         if indexes:length() == 2 then
                             if r == -1 then
-                                _reive.settings.colors[indexes[1]][indexes[2]].r = _reive.defaults.colors[indexes[1]][indexes[2]].r
+                                settings.colors[indexes[1]][indexes[2]].r = defaults.colors[indexes[1]][indexes[2]].r
                             else
-                                _reive.settings.colors[indexes[1]][indexes[2]].r = r
+                                settings.colors[indexes[1]][indexes[2]].r = r
                             end
 
                             if g == -1 then
-                                _reive.settings.colors[indexes[1]][indexes[2]].g = _reive.defaults.colors[indexes[1]][indexes[2]].g
+                                settings.colors[indexes[1]][indexes[2]].g = defaults.colors[indexes[1]][indexes[2]].g
                             else
-                                _reive.settings.colors[indexes[1]][indexes[2]].g = g
+                                settings.colors[indexes[1]][indexes[2]].g = g
                             end
 
                             if b == -1 then
-                                _reive.settings.colors[indexes[1]][indexes[2]].b = _reive.defaults.colors[indexes[1]][indexes[2]].b
+                                settings.colors[indexes[1]][indexes[2]].b = defaults.colors[indexes[1]][indexes[2]].b
                             else
-                                _reive.settings.colors[indexes[1]][indexes[2]].b = b
+                                settings.colors[indexes[1]][indexes[2]].b = b
                             end
                         elseif indexes:length() == 1 then
                             if r == -1 then
-                                _reive.settings.colors[indexes[1]].r = _reive.defaults.colors[indexes[1]].r
+                                settings.colors[indexes[1]].r = defaults.colors[indexes[1]].r
                             else
-                                _reive.settings.colors[indexes[1]].r = r
+                                settings.colors[indexes[1]].r = r
                             end
 
                             if g == -1 then
-                                _reive.settings.colors[indexes[1]].g = _reive.defaults.colors[indexes[1]].g
+                                settings.colors[indexes[1]].g = defaults.colors[indexes[1]].g
                             else
-                                _reive.settings.colors[indexes[1]].g = g
+                                settings.colors[indexes[1]].g = g
                             end
 
                             if b == -1 then
-                                _reive.settings.colors[indexes[1]].b = _reive.defaults.colors[indexes[1]].b
+                                settings.colors[indexes[1]].b = defaults.colors[indexes[1]].b
                             else
-                                _reive.settings.colors[indexes[1]].b = b
+                                settings.colors[indexes[1]].b = b
                             end
 
                             if a == -1 then
-                                _reive.settings.colors[indexes[1]].a = _reive.defaults.colors[indexes[1]].a
+                                settings.colors[indexes[1]].a = defaults.colors[indexes[1]].a
                             else
-                                _reive.settings.colors[indexes[1]].a = a
+                                settings.colors[indexes[1]].a = a
                             end
 
                             tb_set_bg_color(
-                                _reive.tb_name,
-                                _reive.settings.colors[indexes[1]].a,
-                                _reive.settings.colors[indexes[1]].r,
-                                _reive.settings.colors[indexes[1]].g,
-                                _reive.settings.colors[indexes[1]].b
+                                tb_name,
+                                settings.colors[indexes[1]].a,
+                                settings.colors[indexes[1]].r,
+                                settings.colors[indexes[1]].g,
+                                settings.colors[indexes[1]].b
                             )
                         end
                     end
 
-                    _reive.refresh()
-                    _reive.settings:save('all')
+                    refresh()
+                    settings:save('all')
+                    notice('The objects\' color has been set.')
                 end
             end
         else
             send_command('reive help')
         end
-    end
-
-    for key, message in pairs(errors) do
-        add_to_chat(38, 'lua:addon:reive:'..message)
-    end
-
-    for key, message in pairs(messages) do
-        add_to_chat(55,'lua:addon:reive:'..message)
     end
 end
