@@ -540,9 +540,10 @@ function check_filter(actor_table,party_table,target_table,category,msg)
 	-- Returns true (don't filter) or false (filter), boolean
 	actor_type = party_id(actor_table,party_table)
 	target_type = party_id(target_table,party_table)
+	
 	if filter[target_type]['target'] then return true end
 	
-	if actor_type ~= 'monsters' then
+	if actor_type ~= 'monsters' and actor_type ~= 'enemies' then
 		if filter[actor_type]['all']
 		or category == 1 and filter[actor_type]['melee']
 		or category == 2 and filter[actor_type]['ranged']
@@ -557,7 +558,6 @@ function check_filter(actor_table,party_table,target_table,category,msg)
 		then
 			return false
 		end
-		
 	else
 		if filter[actor_type][target_type]['all']
 		or category == 1 and filter[actor_type][target_type]['melee']
@@ -584,12 +584,20 @@ function party_id(actor_table,party_table)
 	local partypos, filtertype
 	if actor_table['is_npc']==true then
 		if actor_table['id']%4096 > 2047 then -- Pet check
+			write('there')
 			if party_table['p0']['mob']['pet_index'] == actor_table['index'] then
 				filtertype = 'my_pet'
 			elseif party_table['p0']['mob']['pet_index'] ~= actor_table['index'] then
 				filtertype = 'other_pets'
 			end
-		elseif filter['monsters'] then
+		elseif filter['enemies'] ~= nil then -- For people without xmls that include enemies
+			filtertype = 'monsters'
+			for i,v in pairs(party_table) do
+				if actor_table['claim_id'] == v['id'] then
+					filtertype = 'enemies'
+				end
+			end
+		else
 			filtertype = 'monsters'
 		end
 	else
@@ -609,7 +617,7 @@ function party_id(actor_table,party_table)
 			filtertype='alliance'
 		end
 	end
-	
+
 	return filtertype
 end
 

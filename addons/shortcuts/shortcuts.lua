@@ -54,13 +54,20 @@ function event_outgoing_text(original,modified)
 			return ''
 		else
 			local tempcmd = 'input '..command
+			local passback
 			for i,v in pairs(splitline) do
 				if command2_list[command]:contains(v) then
 					tempcmd = tempcmd..' '..v
+					passback = true
 				end
 			end
 
-			local temptarg = valid_target(splitline[#splitline]) or target_make({validtarget={['Player']=true,['Enemy']=true,['Self']=true}})
+			local temptarg = valid_target(splitline[#splitline])
+			if passback then
+				temptarg = splitline[#splitline]
+			elseif not temptarg then
+				temptarg = target_make({validtarget={['Player']=true,['Enemy']=true,['Self']=true}})
+			end
 			send_command(tempcmd..' '..temptarg)
 			return ''
 		end
