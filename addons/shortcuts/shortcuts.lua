@@ -75,9 +75,7 @@ function event_outgoing_text(original,modified)
 			elseif not temptarg then
 				temptarg = target_make({validtarget={['Player']=true,['Enemy']=true,['Self']=true}})
 				lastword = temptarg
-			end
-			add_to_chat(5,tempcmd..' '..temptarg)
-			
+			end			
 			send_command(tempcmd..' '..temptarg)
 			return ''
 		end
