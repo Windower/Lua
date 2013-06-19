@@ -29,6 +29,7 @@ file = require 'filehelper'
 require 'tablehelper'
 xml = require 'xml'
 
+_addon = {}
 _addon.version = '0.5'
 _addon.name = 'Plugin Manager'
 _addon.commands = {'pm','plugin_manager'}

@@ -1,3 +1,5 @@
+
+_addon = {}
 _addon.commands = {'answeringmachine','am'}
 _addon.name = 'AnsweringMachine'
 _addon.version = '1.0'

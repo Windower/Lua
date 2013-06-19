@@ -1,3 +1,5 @@
+
+_addon = {}
 _addon.version = '0.1'
 _addon.name = 'Daze'
 _addon.commands = {'daze'}
