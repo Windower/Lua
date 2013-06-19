@@ -2,11 +2,16 @@
 <settings>
   <!--
 	This controls the settings for the Roll Tracker Plugin. 
-	The only avaliable setting at the moment is
+		::::Autostop:::: 
 		Autostop: 0: Automatically stops rolls on lucky numbers, and displays the message (Currently the default option)
 		Autostop: 1: Disables the stop functionality. 
+		::::[Chance to Bust]::::
+		bust: 0 Doesn't display chance to bust
+		bust: 1 Displays chance to bust (the default option)
+		
 	-->
 	<global>
 		<Autostop>0</Autostop>
+		<bust>1</bust>
 	</global>
 </settings>

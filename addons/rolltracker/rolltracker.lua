@@ -1,4 +1,4 @@
---Copyright (c) 2013, Thomas Rogers / Balloon - Cerberus
+--Copyright (c) 2013, Thomas Rogers
 --All rights reserved.
 
 --Redistribution and use in source and binary forms, with or without
@@ -27,10 +27,11 @@
 
 _addon = {}
 _addon.name = 'RollTracker'
-_addon.version = '1.0'
+_addon.version = '1.1'
 
 config = require 'config'
 settings=config.load()
+chat = require 'chat'
 
 defaults = {}
 defaults.autostop = 0
@@ -38,8 +39,11 @@ defaults.autostop = 0
 local symbolnum = require('json').read('../libs/ffxidata.json').chat.chars
 
 function event_addon_command(...)
-    cmd = {...}
+    
+	cmd = {...}
+	
 	if cmd[1] ~= nil then
+		
 		if cmd[1]:lower() == "help" then
 			write('To stop rolltracker stopping rolls type: //rolltracker autostop')
 			write('To restart rolltracker stopping doubleup type //rolltracker Doubleup')	
@@ -55,9 +59,6 @@ function event_addon_command(...)
 			write('Enable Autostoppping Doubleup')
 		end
 		
-		
-	
-
 	end
 end 
 
@@ -65,8 +66,7 @@ function event_load()
 	send_command('alias rolltracker lua c rolltracker')
 	override= settings['autostop']
 	luckyroll = 0
-	roll_id ={ 
-				97, 98, 99,
+	roll_id ={  97, 98, 99,
 				100, 101, 102,
 				103, 104, 105,
 				106, 107, 108,
@@ -75,7 +75,7 @@ function event_load()
 				117, 118, 119, 120,
 				121, 122, 303, 302, 304, 305
 			}
-	player_color={['p0']=string.char(31, 167),['p1']=string.char(31, 209),['p2']=string.char(31, 204),['p3']=string.char(31,189),['p4']=string.char(31,3),['p5']=string.char(31,158)}
+	player_color={['p0']=string.char(0x1E, 247),['p1']=string.char(0x1F, 204),['p2']=string.char(0x1E, 156),['p3']=string.char(0x1E,238),['p4']=string.char(0x1E,5),['p5']=string.char(0x1E,6)}
 	roll_ident={[97]=' ', ['98']='Fighter\'s',['99']='Monk\'s',['100']='Healer\'s',
 						['101']='Wizard\'s',['102']='Warlock\'s',['103']='Rogue\'s',
 						['104']='Gallant\'s',['105']='Chaos',['106']='Beast',
@@ -101,7 +101,7 @@ function event_load()
 				['Choral']={8,42,11,15,19,4,23,27,31,35,50,'+25', '- Spell Interruption Rate'},
 				['Monk\'s']={8,10,32,12,14,15,4,20,22,24,40,'-?', ' Subtle Blow'},
 				['Beast']={6,8,9,25,11,13,16,3,17,19,31,'-10', '% Pet: Attack Bonus'},
-				['Samurai']={7,32,10,12,14,4,16,20,22,24,40,'-10','Store TP Bonus'},
+				['Samurai']={7,32,10,12,14,4,16,20,22,24,40,'-10',' Store TP Bonus'},
 				['Warlock\'s']={2,3,4,12,15,6,7,1,8,9,15,'-5',' Magic Accuracy Bonus'},
 				['Puppet']={4,5,18,7,9,10,2,11,13,15,22,'-8',' Pet: Magic Attack Bonus'},
 				['Gallant\'s']={4,5,15,6,7,8,3,9,10,11,20,'-10','% Defense Bonus'},
@@ -165,7 +165,7 @@ function event_action(act)
 							for z in pairs(get_party()) do
 								if get_party()[z]['mob'] ~= nil then
 									if act['targets'][n]['id'] == get_party()[z]['mob']['id'] then	
-										effected_member[n]=player_color[z]..get_party()[z]['name']
+										effected_member[n]=player_color[z]..get_party()[z]['name']..chat.colorcontrols.reset
 									end
 								end
 							end
@@ -175,11 +175,11 @@ function event_action(act)
 						if #effected_member > 0 then
 							if rollnum == roll_luck[i] or rollnum == 11 then 
 								luckyroll = 1
-								add_to_chat(1, '['..#effected_member..'] '..effected_write..string.char(31,1)..' '..symbolnum['implies']..' '..roll_ident[tostring(roller)]..' Roll '..symbolnum['circle'..rollnum]..string.char(31,158)..' (Lucky!)'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
+								add_to_chat(1, effected_write..chat.colorcontrols.reset..' '..symbolnum['implies']..' '..roll_ident[tostring(roller)]..' Roll '..symbolnum['circle'..rollnum]..string.char(31,158)..' (Lucky!)'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
 							elseif rollnum==12 and #effected_member > 0 then
-								add_to_chat(1, string.char(31,167)..'['..#effected_member..']'..effected_write..' '..symbolnum['implies']..' ('..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')')
+								add_to_chat(1, string.char(31,167)..'Bust! '..chat.colorcontrols.reset..symbolnum['implies']..' '..effected_write..' '..symbolnum['implies']..' ('..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')')
 							else
-								add_to_chat(1, '['..#effected_member..'] '..effected_write..string.char(31,1)..' '..symbolnum['implies']..' '..roll_ident[tostring(roller)]..' Roll '..symbolnum['circle'..rollnum]..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
+								add_to_chat(1, effected_write..chat.colorcontrols.reset..' '..symbolnum['implies']..' '..roll_ident[tostring(roller)]..' Roll '..symbolnum['circle'..rollnum]..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
 							end
 						end
 					end
@@ -190,7 +190,7 @@ function event_action(act)
 end
 
 function bust_rate(num, main)
-	if num <= 5 or num == 11 or main ~= get_player()['id'] then
+	if num <= 5 or num == 11 or main ~= get_player()['id'] or settings.bust == 0 then
 		bustrate = ''
 	else 
 		bustrate = '\7  [Chance to Bust]: '..string.format("%.1f",(num-5)*16.67)..'%'
