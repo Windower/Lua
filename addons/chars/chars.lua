@@ -31,8 +31,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 require 'logger'
 
 _addon = {}
-_addon.name    = 'chars'
-_addon.version = '1.20130529'
+_addon.name     = 'chars'
+_addon.version  = '1.20130529'
+_addon.commands = 'chars'
 
 local chars = require('json').read('../libs/ffxidata.json').chat.chars
 

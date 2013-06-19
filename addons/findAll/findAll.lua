@@ -28,13 +28,15 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
+require 'chat'
 require 'lists'
 require 'logger'
 require 'sets'
 
 _addon = {}
-_addon.name    = 'findAll'
-_addon.version = '1.20130610'
+_addon.name     = 'findAll'
+_addon.version  = '1.20130610'
+_addon.commands = 'findAll'
 
 json  = require 'json'
 file  = require 'filehelper'
@@ -84,11 +86,13 @@ function search(query, export)
 
     for character_name, storages in pairs(global_storages) do
         for storage_name, storage in pairs(storages) do
-            for id, quantity in pairs(storage) do
-                id = tostring(id)
+            if storage_name ~= 'gil' then
+                for id, quantity in pairs(storage) do
+                    id = tostring(id)
 
-                if item_names[id] == nil then
-                    new_item_ids:add(tostring(id))
+                    if item_names[id] == nil then
+                        new_item_ids:add(tostring(id))
+                    end
                 end
             end
         end
@@ -115,8 +119,8 @@ function search(query, export)
                             and new_item_ids:contains(id)
                         then
                             item_names[id] = {
-                                ['name']      = name:gsub('♂', '\x81\x89'):gsub('♀', '\x81\x8A'),
-                                ['long_name'] = long_name:gsub('♂', '\x81\x89'):gsub('♀', '\x81\x8A')
+                                ['name']      = name:gsub('♂', string.char(0x81, 0x89)):gsub('♀', string.char(0x81, 0x8A)),
+                                ['long_name'] = long_name:gsub('♂', string.char(0x81, 0x89)):gsub('♀', string.char(0x81, 0x8A))
                             }
                         end
                     end
@@ -157,7 +161,7 @@ function search(query, export)
 
     if export ~= nil then
         export_file = io.open(lua_base_path..'data/'..export, 'w')
-        
+
         if export_file == nil then
             error('The file "'..export..'" cannot be created.')
         else
@@ -172,23 +176,23 @@ function search(query, export)
             for _, storage_name in ipairs(merged_storages_orders) do
                 local results = L{}
 
-                if storages[storage_name] ~= nil then
+                if storage_name~= 'gil' and storages[storage_name] ~= nil then
                     for id, quantity in pairs(storages[storage_name]) do
                         if results_items:contains(id) then
                             if terms_pattern ~= '' then
                                 results:append(
-                                    '\30\03'..character_name..'/'..storage_name..':\30\01 '..
-                                    item_names[id].name:gsub('('..terms_pattern..')', '\30\02%1\30\01')..
-                                    (item_names[id].name:match(terms_pattern) and '' or ' ['..item_names[id].long_name:gsub('('..terms_pattern..')', '\30\02%1\30\01')..']')..
-                                    (quantity > 1 and ' \30\03('..quantity..')\30\01' or '')
+                                    (character_name..'/'..storage_name..':'):color(259)..' '..
+                                    item_names[id].name:gsub('('..terms_pattern..')', ('%1'):color(258))..
+                                    (item_names[id].name:match(terms_pattern) and '' or ' ['..item_names[id].long_name:gsub('('..terms_pattern..')', ('%1'):color(258))..']')..
+                                    (quantity > 1 and ' '..('('..quantity..')'):color(259) or '')
                                 )
                             else
                                 results:append(
-                                    '\30\03'..character_name..'/'..storage_name..':\30\01 '..item_names[id].name..
-                                    (quantity > 1 and ' \30\03('..quantity..')\30\01' or '')
+                                    (character_name..'/'..storage_name..':'):color(259)..' '..item_names[id].name..
+                                    (quantity > 1 and ' '..('('..quantity..')'):color(259) or '')
                                 )
                             end
-                            
+
                             if export_file ~= nil then
                                 export_file:write('"'..character_name..'";"'..storage_name..'";"'..item_names[id].name..'";"'..quantity..'"\n')
                             end
@@ -206,7 +210,7 @@ function search(query, export)
             end
         end
     end
-    
+
     if export_file ~= nil then
         export_file:close()
         log('The results have been saved to "'..export..'"')
@@ -230,6 +234,8 @@ end
 function get_storages()
     local items    = get_items()
     local storages = {}
+
+    storages.gil = items.gil
 
     for _, storage_name in ipairs(storages_order) do
         storages[storage_name] = T{}
@@ -265,11 +271,11 @@ function update()
     if not get_ffxi_info().logged_in then
         write('you have to be logged in to use this addon')
     end
-    
+
     local time_difference = os.time() - load_timestamp
 
     if time_difference < deferral_time then
-        warning('findAll will be available in '..(deferral_time - time_difference)..' seconds.')
+        notice('findAll will be available in '..(deferral_time - time_difference)..' seconds.')
 
         return false
     end
@@ -296,7 +302,9 @@ function update()
         local storages_json = L{}
 
         for storage_name, storage in pairs(storages) do
-            if storage_name ~= 'temporary' and not storage_name:match('^slip') then
+            if storage_name == 'gil' then
+                storages_json:append('"'..storage_name..'":'..storage)
+            elseif storage_name ~= 'temporary' and not storage_name:match('^slip') then
                 local items_json = L{}
 
                 for id, quantity in pairs(storage) do
@@ -363,7 +371,7 @@ function event_addon_command(...)
 
         if export ~= nil then
             export = export:gsub('%.csv$', '')..'.csv'
-            
+
             params:remove(params:length())
 
             if export:match('['..('\\/:*?"<>|'):escape()..']') then
