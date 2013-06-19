@@ -1,3 +1,7 @@
+_addon.commands = {'answeringmachine','am'}
+_addon.name = 'AnsweringMachine'
+_addon.version = '1.0'
+
 function event_addon_command(...)
 	term = table.concat({...}, ' ')
 	local broken = split(term, ' ')

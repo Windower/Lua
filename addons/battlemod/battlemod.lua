@@ -36,6 +36,10 @@ require 'event_action'
 require 'generic_helpers'
 require 'static_vars'
 
+_addon.version = '2.17'
+_addon.name = 'BattleMod'
+_addon.commands = {'bm','battlemod'}
+
 function event_load()
 	version = '2.17'
 	block_equip = false

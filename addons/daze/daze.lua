@@ -1,3 +1,7 @@
+_addon.version = '0.1'
+_addon.name = 'Daze'
+_addon.commands = {'daze'}
+
 function event_addon_command(...)
     term = table.concat({...}, ' ')
 	local broken = split(term, ' ')

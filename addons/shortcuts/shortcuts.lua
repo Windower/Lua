@@ -34,6 +34,10 @@ require 'resources'
 require 'ambiguous_names'
 require 'targets'
 
+_addon.version = '0.2'
+_addon.name = 'Shortcuts'
+_addon.commands = {'shortcuts'}
+
 function event_load()
 	lastsent = 'MAUSMAUSMAUSMAUSMAUSMAUSMAUSMAUS'
 	collectgarbage()
