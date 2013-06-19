@@ -153,7 +153,7 @@ function slips.get_player_items()
 
                     local bit = math.floor((bitmask / 2 ^ (bit_position % 8)) % 2)
 
-                    if bit ~= 0 then
+                    if bit ~= 0 and slips.items[item.id] then
                         slips_items[item.id]:append(slips.items[item.id][bit_position + 1])
                     end
                 end
