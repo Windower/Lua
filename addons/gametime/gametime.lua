@@ -9,7 +9,7 @@
     -- * Redistributions in binary form must reproduce the above copyright
       -- notice, this list of conditions and the following disclaimer in the
       -- documentation and/or other materials provided with the distribution.
-    -- * Neither the name of <addon name> nor the
+    -- * Neither the name of Gametime nor the
       -- names of its contributors may be used to endorse or promote products
       -- derived from this software without specific prior written permission.
 
@@ -447,10 +447,12 @@ function event_addon_command(...)
 	elseif args[1] == 'axis' then
 		if args[2] == 'vertical' then
 			gt.delimiter = "\n"
+		log('Week display axis set to vertical.')
 		else
 			gt.delimiter = " "
+		log('Week display axis set to horizontal.')
 		end
-		log('Week display axis set.')
+		event_day_change(get_ffxi_info()["day"])
 	elseif args[1] == 'mode' then
 		inmode = tostring(args[2]):zfill(1)
 		inmode = inmode+0
@@ -460,6 +462,7 @@ function event_addon_command(...)
 			settings.mode = inmode
 			log('mode updated')
 		end
+		event_day_change(get_ffxi_info()["day"])
 	elseif args[1] == 'save' then
 		settings:save('all')
 		log('Settings saved.')
