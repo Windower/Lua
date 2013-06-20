@@ -256,7 +256,6 @@ function event_outgoing_text(original, modified)
 		end
 		
 		if gooff=='yes' or test==1 then
-			write('goesoff')
 			modified=original
 			test=0
 		else
