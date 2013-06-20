@@ -33,9 +33,9 @@ _addon.name    = 'enternity'
 _addon.version = '1.20130607'
 
 function event_incoming_text(original, modified, mode)
-	if (mode == 150 or mode == 151) then
-		modified = modified:gsub(string.char(0x7F, 0x31), '')
-	end
+    if (mode == 150 or mode == 151) then
+        modified = modified:gsub(string.char(0x7F, 0x31), '')
+    end
 
-	return modified, mode
+    return modified, mode
 end
