@@ -34,6 +34,7 @@ settings=config.load()
 chat = require 'chat'
 
 defaults = {}
+defaults.bust = 1
 defaults.autostop = 0
 
 local symbolnum = require('json').read('../libs/ffxidata.json').chat.chars
