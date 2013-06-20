@@ -147,12 +147,14 @@ function event_action(act)
 			target_table = get_mob_by_id(act['targets'][i]['id'])
 
 			local flipped = false
-			if check_filter(actor_table,party_table,target_table,act['category'],act['targets'][i]['actions'][n]['message']) then
+			if act['category'] == 6 and act['param'] > 140 and act['param'] < 149 then -- Force a message for maneuvers.
+				msg_ID = 100
+			elseif check_filter(actor_table,party_table,target_table,act['category'],act['targets'][i]['actions'][n]['message']) then
 				msg_ID = act['targets'][i]['actions'][n]['message']
 			else
 				msg_ID = 0
 			end
-				
+			
 			if aggregate then
 				target = act['targets'][i]['target']
 			else
@@ -210,9 +212,6 @@ function event_action(act)
 					effect_val = act['targets'][i]['actions'][n]['param']
 				end
 				
-				if act['category'] == 6 and abil_ID > 140 and abil_ID < 149 then -- Force a message for maneuvers.
-					msg_ID = 100
-				end
 				local fields = fieldsearch(dialog[msg_ID]['english'])
 				
 				if table.contains(fields,'spell') then
