@@ -2,6 +2,6 @@
 <settings>
 	<global>
 		<color>508</color>
-		<format>${time}</format>
+		<format>[${time}]</format>
 	</global>
 </settings>
