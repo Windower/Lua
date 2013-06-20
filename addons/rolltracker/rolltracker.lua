@@ -30,7 +30,7 @@ _addon.name = 'RollTracker'
 _addon.version = '1.1'
 
 config = require 'config'
-settings=config.load()
+settings=config.load(defaults)
 chat = require 'chat'
 
 defaults = {}
