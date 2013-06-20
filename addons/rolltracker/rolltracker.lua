@@ -32,10 +32,12 @@ _addon.version = '1.1'
 config = require 'config'
 settings=config.load(defaults)
 chat = require 'chat'
-
+require 'tablehelper'
 defaults = {}
-defaults.bust = 1
 defaults.autostop = 0
+defaults.bust = 1
+defaults.effected = 1
+defaults.fold = 1
 
 local symbolnum = require('json').read('../libs/ffxidata.json').chat.chars
 
@@ -50,6 +52,17 @@ function event_addon_command(...)
 			write('To restart rolltracker stopping doubleup type //rolltracker Doubleup')	
 		end
 
+		if cmd[1]:lower() == "test" then
+			for buffs, integers in pairs(get_player()['buffs']) do
+				if integers ~= 255 then
+					add_to_chat(1,integers)
+				end
+				if table.contains(buff_id, integers) then
+					write('equal value detected')
+				end
+			end
+		end
+		
 		if cmd[1]:lower() == "autostop" then
 			override=1
 			write('Disabled Autostopping Double Up')
@@ -64,6 +77,7 @@ function event_addon_command(...)
 end 
 
 function event_load()
+
 	send_command('alias rolltracker lua c rolltracker')
 	override= settings['autostop']
 	luckyroll = 0
@@ -76,6 +90,14 @@ function event_load()
 				117, 118, 119, 120,
 				121, 122, 303, 302, 304, 305
 			}
+	buff_id = { 309, 310, 311,
+				312, 313, 314,
+				315, 316, 317,
+				318, 319, 320,
+				321, 322, 323, 324,
+				325, 326, 327, 328,
+				329, 330, 331, 332,
+				333, 334, 335, 336, 337, 338}
 	player_color={['p0']=string.char(0x1E, 247),['p1']=string.char(0x1F, 204),['p2']=string.char(0x1E, 156),['p3']=string.char(0x1E,238),['p4']=string.char(0x1E,5),['p5']=string.char(0x1E,6)}
 	roll_ident={[97]=' ', ['98']='Fighter\'s',['99']='Monk\'s',['100']='Healer\'s',
 						['101']='Wizard\'s',['102']='Warlock\'s',['103']='Rogue\'s',
@@ -172,15 +194,22 @@ function event_action(act)
 							end
 						end
 						local effected_write = table.concat(effected_member, ', ')
+						if settings.effected == 1 then 
+							effectednumber = '['..#effected_member..'] '
+						else
+							effectednumber = '' 
+						end
+						
 						luckyroll=0
+						
 						if #effected_member > 0 then
 							if rollnum == roll_luck[i] or rollnum == 11 then 
 								luckyroll = 1
-								add_to_chat(1, effected_write..chat.colorcontrols.reset..' '..symbolnum['implies']..' '..roll_ident[tostring(roller)]..' Roll '..symbolnum['circle'..rollnum]..string.char(31,158)..' (Lucky!)'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
+								add_to_chat(1, effectednumber..effected_write..chat.colorcontrols.reset..' '..symbolnum['implies']..' '..roll_ident[tostring(roller)]..' Roll '..symbolnum['circle'..rollnum]..string.char(31,158)..' (Lucky!)'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
 							elseif rollnum==12 and #effected_member > 0 then
-								add_to_chat(1, string.char(31,167)..'Bust! '..chat.colorcontrols.reset..symbolnum['implies']..' '..effected_write..' '..symbolnum['implies']..' ('..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')')
+								add_to_chat(1, string.char(31,167)..effectednumber..'Bust! '..chat.colorcontrols.reset..symbolnum['implies']..' '..effected_write..' '..symbolnum['implies']..' ('..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')')
 							else
-								add_to_chat(1, effected_write..chat.colorcontrols.reset..' '..symbolnum['implies']..' '..roll_ident[tostring(roller)]..' Roll '..symbolnum['circle'..rollnum]..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
+								add_to_chat(1, effectednumber..effected_write..chat.colorcontrols.reset..' '..symbolnum['implies']..' '..roll_ident[tostring(roller)]..' Roll '..symbolnum['circle'..rollnum]..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
 							end
 						end
 					end
@@ -198,8 +227,8 @@ function bust_rate(num, main)
 	end
 	return bustrate
 end
-	
 
+test=0
 
 function event_outgoing_text(original, modified)
 	if original:find('/jobability \"Double.*Up') and luckyroll == 1 and override == 0 and id == get_player()['id'] then
@@ -208,7 +237,35 @@ function event_outgoing_text(original, modified)
 		luckyroll=0
 		return modified
 	end
+	
+	if original:find('/jobability \"Fold') and settings.fold == 1 then
+		a=0
+		
+		for buffs, integers in pairs(get_player()['buffs']) do
+			if table.contains(buff_id, integers) then
+				a=a+1
+			end
+			
+			if table.contains(buff_id, integers) then
+				if integers == 309 or a==2 then
+					gooff='yes'
+				else
+					gooff='no'
+				end
+			end
+		end
+		
+		if gooff=='yes' or test==1 then
+			write('goesoff')
+			modified=original
+			test=0
+		else
+			add_to_chat(159,'No \'Bust\'. Fold again to continue.')
+			modified=''
+			test=1
+		end
+		
+		return modified
+	end
+	
 end
-
-
-
