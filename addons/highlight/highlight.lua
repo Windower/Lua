@@ -1,4 +1,4 @@
---Copyright (c) 2013, Thomas Rogers2
+--Copyright (c) 2013, Thomas Rogers
 --All rights reserved.
  
 --Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,7 @@ require 'stringhelper'
  
 _addon = {}
 _addon.name = 'Highlight'
-_addon.version = '0.7' 
+_addon.version = '0.8' 
  
 members={}
 mulenames={}
@@ -61,8 +61,15 @@ defaults.a22 = 200
 defaults.a23 = 481
 defaults.a24 = 483
 defaults.a25 = 208
-  	
-settings=config.load('/data/settings.xml')
+
+
+settingdefaults= {}
+settingsdefaults.highlighting = 'Yes'
+
+
+local symbols = require('json').read('../libs/ffxidata.json').chat.chars
+	
+settings=config.load('/data/settings.xml', settingdefaults)
  
 function event_load()
 	player=get_player()['name']
@@ -128,6 +135,7 @@ function event_incoming_text(original, modified, color)
 	local other_linkshell = original:find('<.*>')
 	local other_say = original:find('.* :')
 	local not_bm = original:find('.* '..string.char(129,168)..'.*')
+	local not_rt = original:find('.* '..symbols['implies']..'.*')
  
 	for names in modified:gmatch('([%p]?[%w]+[%p]?)') do
 	
@@ -151,16 +159,20 @@ function event_incoming_text(original, modified, color)
 			modified = modified:gsub('%(['..string.char(0x1e, 0x1f)..'].(%w+)'..'['..string.char(0x1e, 0x1f)..'].%)(.*)', function(name, rest) return '('..name..')'..rest end)			
 			modified = modified:gsub('<['..string.char(0x1e, 0x1f)..'].(%w+)'..'['..string.char(0x1e, 0x1f)..'].>(.*)', function(name, rest) return '<'..name..'>'..rest end)	
 		end
-	end
-	if not_bm == nil then
+		
+		if not_bm == nil and not_rt == nil then
 		if other_party ~= nil or other_linkshell ~= nil then
 			if me_party == nil and me_linkshell == nil and me_say == nil then
 				if modified:match(player) then
-					--write('YOU ARE BEING TALKED ABOUT.')
+			--		return modified, 4
 				end
 			end
 		end
 	end
+		
+	end
+	
+	
  
 	return modified
 end
