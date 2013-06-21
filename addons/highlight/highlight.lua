@@ -69,7 +69,7 @@ settingsdefaults.highlighting = 'Yes'
 
 local symbols = require('json').read('../libs/ffxidata.json').chat.chars
 	
-settings=config.load('/data/settings.xml', settingdefaults)
+settings=config.load(settingdefaults)
  
 function event_load()
 	player=get_player()['name']
@@ -95,7 +95,7 @@ function initialize()
 	end
 		nicknames=config.load('/data/nicknames.xml')
 		mules=config.load('/data/mules.xml')
-		settings=config.load('/data/settings.xml', settingdefaults)
+		settings=config.load(settingdefaults)
  
 	for i, v in pairs(nicknames) do
 		nicknames[i] = string.split(v, ',')
