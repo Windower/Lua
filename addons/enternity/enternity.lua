@@ -28,12 +28,22 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
+require 'sets'
+
 _addon = {}
 _addon.name    = 'enternity'
 _addon.version = '1.20130620'
 
+blist = S{'Geomantic Reservoir'}
+
 function event_incoming_text(original, modified, mode)
     if (mode == 150 or mode == 151) and not original:find(string.char(0x1e, 0x02)) then
+        for name in pairs(blist) do
+            if original:find(name) then
+                return modified, mode
+            end
+        end
+        
         modified = modified:gsub(string.char(0x7F, 0x31), '')
     end
 
