@@ -80,6 +80,7 @@ function event_load()
 end
  
 function event_login()
+	settings=config.load(settingdefaults)
 	send_command('wait 2; lua i highlight initialize')
 end
  
