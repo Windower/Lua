@@ -10,6 +10,7 @@ Enters "Enter" automatically when prompted during a cutscene or when talking to 
 ##Changelog##
 ### v1.20130620 ###
 * **fix:** Sentences that contain items will not be skipped.
+* **fix:** Added NPCs exceptions.
 
 ### v1.20130607 ###
 * **change:** Changed from artificial button press to ignoring the stop. Allows to type text freely while it goes through cutscenes.
