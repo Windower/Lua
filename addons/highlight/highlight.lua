@@ -95,7 +95,7 @@ function initialize()
 	end
 		nicknames=config.load('/data/nicknames.xml')
 		mules=config.load('/data/mules.xml')
-		settings=config.load('/data/settings.xml')
+		settings=config.load('/data/settings.xml', settingdefaults)
  
 	for i, v in pairs(nicknames) do
 		nicknames[i] = string.split(v, ',')
@@ -164,7 +164,7 @@ function event_incoming_text(original, modified, color)
 		if other_party ~= nil or other_linkshell ~= nil then
 			if me_party == nil and me_linkshell == nil and me_say == nil then
 				if modified:match(player) then
-			--		return modified, 4
+				--	return modified, 4
 				end
 			end
 		end
