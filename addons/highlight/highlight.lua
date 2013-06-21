@@ -63,8 +63,8 @@ defaults.a24 = 483
 defaults.a25 = 208
 
 
-settingdefaults= {}
-settingsdefaults.highlighting = 'Yes'
+settingdefaults = {}
+settingdefaults.highlighting = 'Yes'
 
 
 local symbols = require('json').read('../libs/ffxidata.json').chat.chars
