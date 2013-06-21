@@ -147,7 +147,7 @@ function event_action(act)
 			target_table = get_mob_by_id(act['targets'][i]['id'])
 
 			local flipped = false
-			if act['category'] == 6 and act['param'] > 140 and act['param'] < 149 then -- Force a message for maneuvers.
+			if act['category'] == 6 and act['param'] > 140 and act['param'] < 149 and act['targets'][1]['actions'][1]['message'] == 0 then -- Force a message for maneuvers.
 				msg_ID = 100
 			elseif check_filter(actor_table,party_table,target_table,act['category'],act['targets'][i]['actions'][n]['message']) then
 				msg_ID = act['targets'][i]['actions'][n]['message']
