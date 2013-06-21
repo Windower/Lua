@@ -36,6 +36,11 @@ require 'event_action'
 require 'generic_helpers'
 require 'static_vars'
 
+_addon = {}
+_addon.version = '2.17'
+_addon.name = 'BattleMod'
+_addon.commands = {'bm','battlemod'}
+
 function event_load()
 	version = '2.17'
 	block_equip = false
@@ -218,7 +223,7 @@ function event_incoming_text(original, modified, color)
 			end
 		end
 	elseif redcol == 127 then
-		a,z = string.find(original,' corpuscules of ')
+		a,z = string.find(original,' corpuscles of ')
 		b,z = string.find(original,' experience points')
 		if a or b then
 			if original:sub(1,4) ~= string.char(0x1F,0xFE,0x1E,0x01) then

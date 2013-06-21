@@ -34,41 +34,65 @@ require 'resources'
 require 'ambiguous_names'
 require 'targets'
 
+_addon = {}
+_addon.version = '0.2'
+_addon.name = 'Shortcuts'
+_addon.commands = {'shortcuts'}
+
 function event_load()
+	lastsent = 'MAUSMAUSMAUSMAUSMAUSMAUSMAUSMAUS'
 	collectgarbage()
 end
 
 function event_outgoing_text(original,modified)
+	if original == lastsent then
+		lastsent = ''
+		return modified
+	end
+
 	local splitline = split(original,' ')
 	local command = splitline[1]
 	
 	local a,b,spell = string.find(original,'"(.-)"')
-	
+
 	if ignore_list[command] then
+		lastsent = ''
 		return modified
 	elseif command2_list[command] and not valid_target(splitline[#splitline],true) then
 		
 		if command2_list[command]==true then -- no excluded second commands
 			local temptarg = valid_target(splitline[#splitline]) or target_make({validtarget={['Player']=true,['Enemy']=true,['Self']=true}})
-			send_command('input '..command..' '..temptarg)
+			lastsent = command..' '..temptarg
+			send_command('input '..lastsent)
 			return ''
 		else
-			local tempcmd = 'input '..command
+			local tempcmd = command
+			local passback
 			for i,v in pairs(splitline) do
 				if command2_list[command]:contains(v) then
 					tempcmd = tempcmd..' '..v
+					passback = v
 				end
 			end
 
-			local temptarg = valid_target(splitline[#splitline]) or target_make({validtarget={['Player']=true,['Enemy']=true,['Self']=true}})
-			send_command(tempcmd..' '..temptarg)
+			local temptarg = valid_target(splitline[#splitline])
+			if passback then
+				if temptarg == splitline[#splitline] or pass_through_targs:contains(temptarg) then
+					temptarg = splitline[#splitline]
+				elseif passback == splitline[#splitline] then
+					temptarg = ''
+				elseif not temptarg then
+					temptarg = splitline[#splitline]
+				end
+			elseif not temptarg then
+				temptarg = target_make({validtarget={['Player']=true,['Enemy']=true,['Self']=true}})
+			end
+			lastsent = tempcmd..' '..temptarg
+			send_command('input '..lastsent)
 			return ''
 		end
-	elseif command2_list[command] and valid_target(splitline[#splitline],true) then
-		return modified
-	elseif command == '/hide' then
-		return modified
-	elseif command_list[command] and validabils[(spell or ''):lower():gsub(' ',''):gsub('[^%w]','')] and valid_target(splitline[#splitline]) then
+	elseif (command2_list[command] and valid_target(splitline[#splitline],true)) or (command == '/hide') or (command_list[command] and validabils[(spell or ''):lower():gsub(' ',''):gsub('[^%w]','')] and valid_target(splitline[#splitline])) then
+		lastsent = ''
 		return modified
 	elseif command_list[command] then
 		return interp_text(splitline,1,modified)
@@ -77,6 +101,7 @@ function event_outgoing_text(original,modified)
 	end
 	
 	-- Should never reach this point
+	lastsent = ''
 	return modified
 end
 
@@ -103,8 +128,10 @@ function interp_text(splitline,offset,modified)
 		elseif validabils[strippedabil].typ == 'ambig_names' then
 			r_line, s_type = ambig(strippedabil)
 		end
-		send_command('input '..r_line['prefix']..' "'..r_line['english']..'" '..(temptarg or target_make(r_line)))
+		lastsent = r_line['prefix']..' "'..r_line['english']..'" '..(temptarg or target_make(r_line))
+		send_command('input '..lastsent)
 		return ''
 	end
+	lastsent = ''
 	return modified
 end

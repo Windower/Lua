@@ -24,6 +24,11 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+_addon = {}
+_addon.name = 'Respond'
+_addon.version = '1.1'
+_addon.commands = {'respond'}
+
 function event_addon_command(...)
 end
 
@@ -32,9 +37,9 @@ function event_load()
 end
 
 function event_chat_message(isGM, mode, player, message)
-	if mode==3 and r~=player then
-		r=player
-		send_command('alias r input /tell '..player)
+	if mode==3 and current_r~=player then
+		current_r=player
+		send_command('alias r input /tell '..current_r)
 	end
 end
 

@@ -28,6 +28,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
+require 'chat'
 require 'logger'
 require 'sets'
 require 'stringhelper'
@@ -35,8 +36,9 @@ require 'stringhelper'
 slips = require 'slips'
 
 _addon = {}
-_addon.name    = 'porter'
-_addon.version = '1.20130529'
+_addon.name     = 'porter'
+_addon.version  = '1.20130529'
+_addon.commands = 'porter'
 
 item_names = L{}
 resources  = {
@@ -86,18 +88,18 @@ function show_slip(slip_number, slip_page, owned_only)
     if item_names:length() == 0 then
         load_resources()
     end
-    
+
     owned_only = owned_only or false
-    
+
     local player_items = slips.get_player_items()
-    
+
     if slip_number ~= nil then
         if slip_number < 1 or slip_number > slips.storages:length() then
             error('That slip doesn\'t exist, kupo!')
-            
+
             return
         end
-        
+
         slips_storage = L{slips.get_slip_id(slip_number)}
     else
         slips_storage = slips.storages
@@ -133,8 +135,8 @@ function show_slip(slip_number, slip_page, owned_only)
                 if owned_only == false or owned_only == true and is_contained == true then
                     add_to_chat(
                         55,
-                        '\30\03'..'slip '..printable_slip_number..'/page '..tostring(slip_page and slip_page or math.ceil(item_position / 16)):lpad('0', 2)..':\30\01 '..
-                        '\30'..(is_contained and '\02' or '\05')..item_names[item_id]..'\30\01'
+                        ('slip '..printable_slip_number..'/page '..tostring(slip_page and slip_page or math.ceil(item_position / 16)):lpad('0', 2)..':'):color(259)..' '..
+                        item_names[item_id]:color(is_contained and 258 or 261)
                     )
                 end
             end
@@ -159,24 +161,24 @@ function event_addon_command(slip_number, slip_page, owned_only)
             owned_only  = true
         elseif slip_number ~= nil then
             error('That\'s not a valid slip number, kupo!')
-        
+
             return
         end
     else
         slip_number = tonumber(slip_number, 10)
-        
+
         if tonumber(slip_page) == nil then
             if slip_page == 'owned' then
                 slip_page   = nil
                 owned_only  = true
             elseif slip_page ~= nil then
                 error('That\'s not a valid page number, kupo!')
-            
+
                 return
             end
         else
             slip_page = tonumber(slip_page, 10)
-            
+
             if owned_only == 'owned' then
                 owned_only = true
             else
@@ -184,6 +186,6 @@ function event_addon_command(slip_number, slip_page, owned_only)
             end
         end
     end
-    
+
     show_slip(slip_number, slip_page, owned_only)
 end

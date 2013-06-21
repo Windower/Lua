@@ -9,7 +9,7 @@
     -- * Redistributions in binary form must reproduce the above copyright
       -- notice, this list of conditions and the following disclaimer in the
       -- documentation and/or other materials provided with the distribution.
-    -- * Neither the name of <addon name> nor the
+    -- * Neither the name of Gametime nor the
       -- names of its contributors may be used to endorse or promote products
       -- derived from this software without specific prior written permission.
 
@@ -35,8 +35,8 @@ local ffxi = require 'ffxi'
 local config = require 'config'
 
 _addon = {}
-_addon.name = 'gametime'
-_addon.version = '0.5'
+_addon.rname = 'gametime'
+_addon.version = '0.52'
 _addon.command = 'gametime'
 
 tb_name	= 'addon:gr:gametime'
@@ -120,6 +120,84 @@ local defaults = T{}
 	defaults.moon = T{}
 	defaults.moon.change = true
 	settings = config.load(defaults)
+
+	
+
+	Cycles = T{}
+	Cycles.selbina = T{}
+	Cycles.selbina.rname = "Ships between Mhaura and Selbina"
+	Cycles.selbina.route = T{}
+	Cycles.selbina.route[1] = "Arrives in Mhaura and Selbina|22:40"
+	Cycles.selbina.route[2] = "Arrives in Mhaura and Selbina|6:40"
+	Cycles.selbina.route[3] = "Arrives in Mhaura and Selbina|14:40"
+
+	Cycles.bibiki = T{}
+	Cycles.bibiki.rname = "Ship departing Bibiki Bay for Purgonorgo Isle"
+	Cycles.bibiki.route = T{}
+	Cycles.bibiki.route[1] = "Arrives in Bibiki|4:50"
+	Cycles.bibiki.route[2] = "Arrives in Bibiki|16:50"
+
+	Cycles.nashmau = T{}
+	Cycles.nashmau.rname = "Aht Urhgan / Nashmau Ship"
+	Cycles.nashmau.route = T{}
+	Cycles.nashmau.route[1] = "Arrives in Whitegate and Nashmau|05:00"
+	Cycles.nashmau.route[2] = "Arrives in Whitegate and Nashmau|13:00"
+	Cycles.nashmau.route[3] = "Arrives in Whitegate and Nashmau|21:00"
+	
+	Cycles.whitegate = T{}
+	Cycles.whitegate.rname = "Aht Urhgan / whitegate Ship"
+	Cycles.whitegate.route = T{}
+	Cycles.whitegate.route[1] = "Arrives in Whitegate and Mhaura|10:40"
+	Cycles.whitegate.route[2] = "Arrives in Whitegate and Mhaura|18:40"
+	Cycles.whitegate.route[3] = "Arrives in Whitegate and Mhaura|2:40"
+
+	Cycles.windurst = T{}
+	Cycles.windurst.rname = "Ship between Windurst and Jeuno"
+	Cycles.windurst.route = {T}
+	Cycles.windurst.route[1] = "Arrives in Windurst|4:47"
+	Cycles.windurst.route[2] = "Arrives in Jeuno|7:41"
+	Cycles.windurst.route[3] = "Arrives in Windurst|10:47"
+	Cycles.windurst.route[4] = "Arrives in Jeuno|13:41"
+	Cycles.windurst.route[5] = "Arrives in Windurst|16:47"
+	Cycles.windurst.route[6] = "Arrives in Jeuno|19:41"
+	Cycles.windurst.route[7] = "Arrives in Windurst|22:47"
+	Cycles.windurst.route[8] = "Arrives in Jeuno|1:41"
+
+	Cycles.bastok = T{}
+	Cycles.bastok.rname = "Ship between Bastok and Jeuno"
+	Cycles.bastok.route = {T}
+	Cycles.bastok.route[1] = "Arrives in Bastok|0:13"
+	Cycles.bastok.route[2] = "Arrives in Jeuno|3:11"
+	Cycles.bastok.route[3] = "Arrives in Bastok|6:13"
+	Cycles.bastok.route[4] = "Arrives in Jeuno|9:11"
+	Cycles.bastok.route[5] = "Arrives in Bastok|12:13"
+	Cycles.bastok.route[6] = "Arrives in Jeuno|15:11"
+	Cycles.bastok.route[7] = "Arrives in Bastok|18:13"
+	Cycles.bastok.route[8] = "Arrives in Jeuno|21:41"
+
+	Cycles.sandy = T{}
+	Cycles.sandy.rname = "Ship between San d'Oria and Jeuno"
+	Cycles.sandy.route = {T}
+	Cycles.sandy.route[1] = "Arrives in San d'Oria|7:10"
+	Cycles.sandy.route[2] = "Arrives in Jeuno|6:11"
+	Cycles.sandy.route[3] = "Arrives in San d'Oria|9:10"
+	Cycles.sandy.route[4] = "Arrives in Jeuno|12:11"
+	Cycles.sandy.route[5] = "Arrives in San d'Oria|15:10"
+	Cycles.sandy.route[6] = "Arrives in Jeuno|18:11"
+	Cycles.sandy.route[7] = "Arrives in San d'Oria|21:10"
+	Cycles.sandy.route[8] = "Arrives in Jeuno|00:41"
+	
+	Cycles.kazham = T{}
+	Cycles.kazham.rname = "Ship between Kazham and Jeuno"
+	Cycles.kazham.route = {T}
+	Cycles.kazham.route[1] = "Arrives in Kazham|1:48"
+	Cycles.kazham.route[2] = "Arrives in Jeuno|4:49"
+	Cycles.kazham.route[3] = "Arrives in Kazham|7:48"
+	Cycles.kazham.route[4] = "Arrives in Jeuno|10:49"
+	Cycles.kazham.route[5] = "Arrives in Kazham|13:48"
+	Cycles.kazham.route[6] = "Arrives in Jeuno|14:49"
+	Cycles.kazham.route[7] = "Arrives in Kazham|19:48"
+	Cycles.kazham.route[8] = "Arrives in Jeuno|20:49"
 	
 function event_load()
 	send_command('alias gametime lua command gametime')
@@ -135,6 +213,7 @@ function event_load()
 	end
 	
 	gt.mode = settings.mode
+	event_time_change(get_ffxi_info()["time"])
 	event_day_change(get_ffxi_info()["day"])
 	event_moon_pct_change(get_ffxi_info()["moon_pct"])
 end
@@ -144,6 +223,22 @@ function event_unload()
 	send_command('unalias gt')
 	tb_delete('gametime_time')
 	tb_delete('gametime_day')
+end
+
+function getroutes(route)
+	for ckey, cval in pairs(Cycles) do
+		if route == nil or ckey == route then
+			log('\30\02'..Cycles[ckey].rname..' (shortcode: //gt route '..ckey..')')
+			for ri = 1, #Cycles[ckey].route do
+				ro = Cycles[ckey].route[ri]:split('|')
+				rtime = timeconvert(ro[2])
+				rdelay = math.round(rtime-gt.dectime,2)
+				if rdelay < 0 then rdelay = rdelay + 24 end
+				rdelay = 2.4 * rdelay
+				log(ro[1]..' @ '..ro[2]..'  \30\02Arrival in '..(timeconvert2(rdelay))..'')
+			end
+		end
+	end
 end
 
 function event_login()
@@ -185,30 +280,26 @@ function default_settings()
 end
 
 function event_time_change(old, new)
-	-- gt.basetime = new + 1
-	-- gt.basetime = gt.basetime - 1
-	-- gt.time = tostring(gt.basetime):split(".")
-	-- gt.hours = gt.time[1]
-	-- gt.minutes = gt.time[2]
-	-- gt.second = tostring(gt.minutes):slice(3,3)
-	-- gt.second = gt.second:zfill(1)
-	-- gt.minutes = tostring(gt.minutes):slice(1,2)
-	-- if gt.seconds == nil then
-		-- gt.minutes = '00'
-	-- else
-		-- if (gt.second+1 > 5) then
-			-- gt.minutes = gt.minutes+1
-		-- end
-	-- end
-	--log(gt.time[1]..':'..gt.time[2])
-	--gt.minutes = tostring(gt.minutes):zfill(2)
-	--^old method, will remove next update.
 	gt.basetime = get_ffxi_info()["time"]
 	gt.basetime = gt.basetime * 100
 	gt.basetime = math.round(gt.basetime)
 	gt.basetime = tostring(gt.basetime):zfill(4)
-	gt.time = T{gt.basetime:slice(1,(#gt.basetime-2)),gt.basetime:slice((#gt.basetime-1),#gt.basetime)}
+	gt.hour = gt.basetime:slice(1,(#gt.basetime-2))
+	gt.minute = gt.basetime:slice((#gt.basetime-1),#gt.basetime)
+	-- gt.time = T{gt.basetime:slice(1,(#gt.basetime-2)),gt.basetime:slice((#gt.basetime-1),#gt.basetime)}
+	gt.time = T{gt.hour,gt.minute}
+	gt.dectime = timeconvert(gt.time[1]..':'..gt.time[2])
 	tb_set_text(gt.gtt,gt.time[1]..':'..gt.time[2])
+end
+
+function timeconvert(basetime)
+	basetable = basetime:split(':')
+	return basetable[1]..'.'..math.round(basetable[2] * (100/60))
+end
+
+function timeconvert2(basetime)
+	basetable = tostring(basetime):split('.')
+	return basetable[1]..':'..tostring(math.round(tostring(basetable[2]):slice(1,2) / (100/60))):zfill(2)
 end
 
 function event_day_change(day)
@@ -238,6 +329,9 @@ function event_day_change(day)
 		dval = dlist[dpos]
 		daystring = ''..daystring..gt.delimiter..' \\cs'..gt.days[(dval+0)][10]..gt.days[(dval+0)][settings.mode]
 	end
+	
+	gt.day = day
+	
 	gt.WeekReport = daystring
 	tb_set_text(gt.gtd,gt.MoonPhase..' ('..gt.MoonPct..'%);'..gt.WeekReport)
 	event_moon_change(get_ffxi_info()["moon"])
@@ -247,7 +341,7 @@ function event_moon_change(moon)
 	gt.MoonPhase = moon
 	tb_set_text(gt.gtd,gt.MoonPhase..' ('..gt.MoonPct..'%);'..gt.WeekReport)
 	if settings.moon.change == true then
-		log('Gametime: Day: '..get_ffxi_info()["day"]..'; Moon: '..gt.MoonPhase..' ('..gt.MoonPct..'%);')
+		log('Day: '..gt.day..'; Moon: '..gt.MoonPhase..' ('..gt.MoonPct..'%);')
 	end
 end
 
@@ -268,6 +362,8 @@ function event_addon_command(...)
 		log('//gt axis [horizontal/vertical] :: week display axis')
 		log('//gt [time/days] alpha 1-255. :: Sets the transparency. Lowest numbers = more transparent.')
 		log('//gt mode 1-3 :: Fullday; Abbreviated; Element names')
+		log('//gt route :: Displays route names.')
+		log('//gt route [route name] :: Displays arrival time for route.')
 		-- log('Log Reporting -- Day and Moon Phase (Not Moon %) change') not implemented yet
 		-- log('//gt [days/moon] change [true/false]')
 		-- log('Positioning:')
@@ -281,6 +377,17 @@ function event_addon_command(...)
 		-- log('//gt time alpha 1-255 :: sets transarency of Gametime\'s clock')
 		-- log('//gt days alpha 1-255 :: sets transparency of Gametime\'s day-display')
 		log('Remember to //gt save when you\'re happy with your settings.')
+	elseif args[1] == 'routes' or args[1] == 'route' then
+		if args[2] == nil then
+			local ckeys = ''
+			for ckey, cval in pairs(Cycles) do
+				ckeys = ckeys..', '..ckey
+			end
+			ckeys = ckeys:slice(3,#ckeys)
+			log('Use //gt route [shortcode] ('..ckeys..')')
+		else
+			getroutes(args[2])
+		end
 	elseif args[1] == 'timex' then
 			tb_set_location(gt.gtt,args[2],settings.time.y)
 			settings.time.x = args[2]
@@ -302,18 +409,18 @@ function event_addon_command(...)
 				tb_set_color(gt.gtt,inalpha,settings.time.colorr,settings.time.colorg,settings.time.colorb)
 				settings.time.bg_alpha = inalpha
 				settings.time.alpha = inalpha
-				log('Gametime: Time transparency set to '..inalpha..' ('..math.round(100-(inalpha/2.55),0)..'%).')
+				log('Time transparency set to '..inalpha..' ('..math.round(100-(inalpha/2.55),0)..'%).')
 			end
 		elseif args[2] == 'hide' then
 			tb_set_visibility(gt.gtt,false)
 			settings.time.visible = false
-			log('Gametime: Time display hidden.')
+			log('Time display hidden.')
 		elseif args[2] == 'reset' then
 			tb_set_location(gt.gtt,0,0)
 		else
 			tb_set_visibility(gt.gtt,true)
 			settings.time.visible = true
-			log('Gametime: Showing time display.')
+			log('Showing time display.')
 		end
 	elseif args[1] == 'days' then
 		if args[2] == 'alpha' then
@@ -324,26 +431,28 @@ function event_addon_command(...)
 				tb_set_color(gt.gtd,inalpha,settings.days.bg_colorr,settings.days.bg_colorg,settings.days.bg_colorb)
 				settings.days.bg_alpha = inalpha
 				settings.days.alpha = inalpha
-				log('Gametime: Days transparency set to '..inalpha..' ('..math.round(100-(inalpha/2.55),0)..'%).')
+				log('Days transparency set to '..inalpha..' ('..math.round(100-(inalpha/2.55),0)..'%).')
 			end
 		elseif args[2] == 'hide' then
 			tb_set_visibility(gt.gtd,false)
 			settings.days.visible = false
-			log('Gametime: Days display hidden.')
+			log('Days display hidden.')
 		elseif args[2] == 'reset' then
 			tb_set_location(gt.gtd,100,0)
 		else
 			tb_set_visibility(gt.gtd,true)
 			settings.days.visible = true
-			log('Gametime: Showing days display.')
+			log('Showing days display.')
 		end
 	elseif args[1] == 'axis' then
 		if args[2] == 'vertical' then
 			gt.delimiter = "\n"
+		log('Week display axis set to vertical.')
 		else
 			gt.delimiter = " "
+		log('Week display axis set to horizontal.')
 		end
-		log('Gametime: Week display axis set.')
+		event_day_change(get_ffxi_info()["day"])
 	elseif args[1] == 'mode' then
 		inmode = tostring(args[2]):zfill(1)
 		inmode = inmode+0
@@ -351,10 +460,11 @@ function event_addon_command(...)
 			return
 		else
 			settings.mode = inmode
-			log('Gametime: mode updated')
+			log('mode updated')
 		end
+		event_day_change(get_ffxi_info()["day"])
 	elseif args[1] == 'save' then
 		settings:save('all')
-		log('Gametime: Settings saved.')
+		log('Settings saved.')
 	end
 end

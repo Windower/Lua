@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <addons>
   <addon>
     <name>Example</name>
@@ -110,7 +110,7 @@
   <addon>
     <author>Omnys@Valefor</author>
     <name>Gametime</name>
-    <description>An in-combat clock and "game-week" display beginning with current day.</description>
+    <description>Displays game time, game-week, moon information, and travel times.</description>
     <bugtracker>https://github.com/thatdudegrim/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Valefor/Omnys</support>
   </addon>

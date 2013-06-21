@@ -147,12 +147,14 @@ function event_action(act)
 			target_table = get_mob_by_id(act['targets'][i]['id'])
 
 			local flipped = false
-			if check_filter(actor_table,party_table,target_table,act['category'],act['targets'][i]['actions'][n]['message']) then
+			if act['category'] == 6 and act['param'] > 140 and act['param'] < 149 then -- Force a message for maneuvers.
+				msg_ID = 100
+			elseif check_filter(actor_table,party_table,target_table,act['category'],act['targets'][i]['actions'][n]['message']) then
 				msg_ID = act['targets'][i]['actions'][n]['message']
 			else
 				msg_ID = 0
 			end
-				
+			
 			if aggregate then
 				target = act['targets'][i]['target']
 			else
@@ -210,9 +212,6 @@ function event_action(act)
 					effect_val = act['targets'][i]['actions'][n]['param']
 				end
 				
-				if act['category'] == 6 and abil_ID > 140 and abil_ID < 149 then -- Force a message for maneuvers.
-					msg_ID = 100
-				end
 				local fields = fieldsearch(dialog[msg_ID]['english'])
 				
 				if table.contains(fields,'spell') then
@@ -540,9 +539,10 @@ function check_filter(actor_table,party_table,target_table,category,msg)
 	-- Returns true (don't filter) or false (filter), boolean
 	actor_type = party_id(actor_table,party_table)
 	target_type = party_id(target_table,party_table)
+	
 	if filter[target_type]['target'] then return true end
 	
-	if actor_type ~= 'monsters' then
+	if actor_type ~= 'monsters' and actor_type ~= 'enemies' then
 		if filter[actor_type]['all']
 		or category == 1 and filter[actor_type]['melee']
 		or category == 2 and filter[actor_type]['ranged']
@@ -557,7 +557,6 @@ function check_filter(actor_table,party_table,target_table,category,msg)
 		then
 			return false
 		end
-		
 	else
 		if filter[actor_type][target_type]['all']
 		or category == 1 and filter[actor_type][target_type]['melee']
@@ -589,7 +588,14 @@ function party_id(actor_table,party_table)
 			elseif party_table['p0']['mob']['pet_index'] ~= actor_table['index'] then
 				filtertype = 'other_pets'
 			end
-		elseif filter['monsters'] then
+		elseif filter['enemies'] ~= nil then -- For people without xmls that include enemies
+			filtertype = 'monsters'
+			for i,v in pairs(party_table) do
+				if actor_table['claim_id'] == v['id'] then
+					filtertype = 'enemies'
+				end
+			end
+		else
 			filtertype = 'monsters'
 		end
 	else
@@ -609,7 +615,7 @@ function party_id(actor_table,party_table)
 			filtertype='alliance'
 		end
 	end
-	
+
 	return filtertype
 end
 
