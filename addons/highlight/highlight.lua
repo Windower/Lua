@@ -68,8 +68,7 @@ settingsdefaults.highlighting = 'Yes'
 
 
 local symbols = require('json').read('../libs/ffxidata.json').chat.chars
-	
-settings=config.load(settingdefaults)
+
  
 function event_load()
 	player=get_player()['name']
@@ -77,13 +76,11 @@ function event_load()
 	write(_addon['name']..': Version:'.._addon['version'])
 	if get_ffxi_info()['logged_in'] then
         initialize()
-		player=get_player()['name']
     end
 end
  
 function event_login()
 	send_command('wait 2; lua i highlight initialize')
-	player=get_player()['name']
 end
  
 function initialize()
@@ -101,6 +98,8 @@ function initialize()
 		nicknames[i] = string.split(v, ',')
 	end
  
+	player=get_player()['name']
+	
 	for mule, name in pairs(mules) do
 		mulenames[mule]=name
 	end
