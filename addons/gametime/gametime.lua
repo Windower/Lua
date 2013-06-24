@@ -57,7 +57,7 @@ gt.days[2][3] = 'Earth '
 gt.days[3] = {}
 gt.days[3][1] = 'Watersday'
 gt.days[3][2] = 'Wa '
-gt.days[3][10] = '(0, 0, 255)'
+gt.days[3][10] = '(100, 100, 255)'
 gt.days[3][3] = 'Water '
 gt.days[4] = {}
 gt.days[4][1] = 'Windsday'
@@ -67,7 +67,7 @@ gt.days[4][3] = 'Wind '
 gt.days[5] = {}
 gt.days[5][1] = 'Iceday'
 gt.days[5][2] = 'Ic '
-gt.days[5][10] = '(128, 128, 255)'
+gt.days[5][10] = '(150, 200, 255)'
 gt.days[5][3] = 'Ice '
 gt.days[6] = {}
 gt.days[6][1] = 'Lightningday'
@@ -333,7 +333,8 @@ function event_day_change(day)
 	gt.day = day
 	
 	gt.WeekReport = daystring
-	tb_set_text(gt.gtd,gt.MoonPhase..' ('..gt.MoonPct..'%);'..gt.WeekReport)
+	tb_set_color(gt.gtd,settings.days.alpha,255,255,255)
+	tb_set_text(gt.gtd,' \\cs'..gt.days[1][10]..gt.MoonPhase..' ('..gt.MoonPct..'%);'..gt.WeekReport)
 	event_moon_change(get_ffxi_info()["moon"])
 end
 
@@ -411,6 +412,10 @@ function event_addon_command(...)
 				settings.time.alpha = inalpha
 				log('Time transparency set to '..inalpha..' ('..math.round(100-(inalpha/2.55),0)..'%).')
 			end
+		elseif args[2] == 'x' or args[2] == 'posx' then
+			send_command('gt timex '..args[3])
+		elseif args[2] == 'y' or args[2] == 'posy' then
+			send_command('gt timey '..args[3])
 		elseif args[2] == 'hide' then
 			tb_set_visibility(gt.gtt,false)
 			settings.time.visible = false
@@ -428,11 +433,15 @@ function event_addon_command(...)
 			inalpha = inalpha+0
 			if (inalpha > 0 and inalpha < 256) then
 				tb_set_bg_color(gt.gtd,inalpha,settings.days.bg_colorr,settings.days.bg_colorg,settings.days.bg_colorb)
-				tb_set_color(gt.gtd,inalpha,settings.days.bg_colorr,settings.days.bg_colorg,settings.days.bg_colorb)
+				tb_set_color(gt.gtd,inalpha,255,255,255)
 				settings.days.bg_alpha = inalpha
 				settings.days.alpha = inalpha
 				log('Days transparency set to '..inalpha..' ('..math.round(100-(inalpha/2.55),0)..'%).')
 			end
+		elseif args[2] == 'x' or args[2] == 'posx' then
+			send_command('gt daysx '..args[3])
+		elseif args[2] == 'y' or args[2] == 'posy' then
+			send_command('gt timey '..args[3])
 		elseif args[2] == 'hide' then
 			tb_set_visibility(gt.gtd,false)
 			settings.days.visible = false
