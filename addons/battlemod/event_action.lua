@@ -232,6 +232,22 @@ function event_action(act)
 						if weapon_skill == '.' then
 							weapon_skill = 'Special Attack'
 						end
+						if mabils[abil_ID-256]['actorstatus'] and tpstatuses then
+							local tempar = split(mabils[abil_ID-256]['actorstatus'],',')
+							actor = actor..' ~'
+							for q,w in pairs(tempar) do
+								actor = actor..statuses[tonumber(w)]['english']..' '
+							end
+							actor = actor..'~ '
+						end
+						if mabils[abil_ID-256]['targetstatus'] and tpstatuses then
+							local tempar = split(mabils[abil_ID-256]['targetstatus'],',')
+							target = target..' ~'
+							for q,w in pairs(tempar) do
+								target = target..statuses[tonumber(w)]['english']..' '
+							end
+							target = target..'~ '
+						end
 					elseif abil_ID < 256 then
 						weapon_skill = jobabilities[abil_ID+768]['english']
 					end
