@@ -137,12 +137,9 @@ function event_incoming_text(original, modified, color)
 	local not_bm = original:find('.* '..string.char(129,168)..'.*')
 	local not_rt = original:find('.* '..symbols['implies']..'.*')
  
-	for names in modified:gmatch('([%p]?[%w]+[%p]?)') do
-	
+	for names in modified:gmatch('([%w]+)') do
         for name in pairs(members) do
-			if original:lower():gmatch('.*'..members[name]) then
 				modified = modified:igsub(members[name], modmember[name])
-			end
         end
  
 		for k,v in pairs(nicknames) do
@@ -151,29 +148,15 @@ function event_incoming_text(original, modified, color)
 		end
  
 		for mule, color in pairs(mulenames) do
-			--	modified = modified:igsub('([^%a])'..mule..'([^%a])', function (pre, app) return '\x1E\x01'..mulecolor[mule]..pre..mule:capitalize()..'\x1E\x01'..app end):igsub('([^%a])'..mule..'$', function(space) return '\x1E\x01'..mulecolor[mule]..space..mule:capitalize()..'\x1E\x01' end)	
 			modified = modified:igsub(mule, mulecolor[mule]..mule:capitalize()..chat.colorcontrols.reset)
 		end	
  
-		if settings.highlighting ~= 'Yes' then
+	if settings.highlighting ~= 'Yes' then
 			modified = modified:gsub('%(['..string.char(0x1e, 0x1f)..'].(%w+)'..'['..string.char(0x1e, 0x1f)..'].%)(.*)', function(name, rest) return '('..name..')'..rest end)			
 			modified = modified:gsub('<['..string.char(0x1e, 0x1f)..'].(%w+)'..'['..string.char(0x1e, 0x1f)..'].>(.*)', function(name, rest) return '<'..name..'>'..rest end)	
-		end
-		
-		if not_bm == nil and not_rt == nil then
-		if other_party ~= nil or other_linkshell ~= nil then
-			if me_party == nil and me_linkshell == nil and me_say == nil then
-				if modified:match(player) then
-				--	return modified, 4
-				end
-			end
-		end
-	end
-		
+	end	
 	end
 	
-	
- 
 	return modified
 end
  
@@ -181,7 +164,7 @@ function event_incoming_chunk(id, data)
 	if id == 221 then
 		modmember={}
 		members={}
-		send_command('wait 0.1; lua i highlight get_party_members')
+		send_command('wait 0.2; lua i highlight get_party_members')
 	end
 end
  
