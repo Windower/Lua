@@ -116,30 +116,12 @@ function initialize()
 	get_party_members()
 end
  
-function event_chat_message(is_gm, mode, player, message)
-	if mode == 3 then
-		--write('INCOMING TELL!')
-	end
-end
- 
-function event_party_invite(sender_id, sender, region)
-	--write('PARTY INVITATION')
-end
  
 function event_incoming_text(original, modified, color)
-	local me_party = original:find('%('..player..'%)')
-	local me_linkshell = original:find('<'..player..'>')
-	local me_say = original:find(player..' :')
-	local me_tell = '%w+>>'
-	local other_party = original:find('%(.*%)')
-	local other_linkshell = original:find('<.*>')
-	local other_say = original:find('.* :')
-	local not_bm = original:find('.* '..string.char(129,168)..'.*')
-	local not_rt = original:find('.* '..symbols['implies']..'.*')
  
 	for names in modified:gmatch('([%w]+)') do
         for name in pairs(members) do
-				modified = modified:igsub(members[name], modmember[name])
+			modified = modified:igsub(members[name], modmember[name])
         end
  
 		for k,v in pairs(nicknames) do
@@ -152,8 +134,8 @@ function event_incoming_text(original, modified, color)
 		end	
  
 	if settings.highlighting ~= 'Yes' then
-			modified = modified:gsub('%(['..string.char(0x1e, 0x1f)..'].(%w+)'..'['..string.char(0x1e, 0x1f)..'].%)(.*)', function(name, rest) return '('..name..')'..rest end)			
-			modified = modified:gsub('<['..string.char(0x1e, 0x1f)..'].(%w+)'..'['..string.char(0x1e, 0x1f)..'].>(.*)', function(name, rest) return '<'..name..'>'..rest end)	
+		modified = modified:gsub('%(['..string.char(0x1e, 0x1f)..'].(%w+)'..'['..string.char(0x1e, 0x1f)..'].%)(.*)', function(name, rest) return '('..name..')'..rest end)			
+		modified = modified:gsub('<['..string.char(0x1e, 0x1f)..'].(%w+)'..'['..string.char(0x1e, 0x1f)..'].>(.*)', function(name, rest) return '<'..name..'>'..rest end)	
 	end	
 	end
 	
@@ -164,7 +146,7 @@ function event_incoming_chunk(id, data)
 	if id == 221 then
 		modmember={}
 		members={}
-		send_command('wait 0.2; lua i highlight get_party_members')
+		send_command('wait 0.4; lua i highlight get_party_members')
 	end
 end
  
