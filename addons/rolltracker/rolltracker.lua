@@ -160,7 +160,7 @@ function event_incoming_text(old, new, color)
 	match_doubleup = old:find (' uses Double')
 	battlemod_compat = old:find('.*Roll.*'..string.char(129,168))
 	obtained_roll = old:find('.* receives the effect of .* Roll.')
-	not_party = old:find ('%('..'%w+'..'%)')	
+	not_party = old:find ('%('..'%w+'..'%).* Roll ')	
 		if battlemod_compat or match_doubleup and not_party~=nil then
 			new=''
 		end
