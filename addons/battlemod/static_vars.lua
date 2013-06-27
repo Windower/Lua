@@ -51,7 +51,7 @@ p0=501,p1=204,p2=410,p3=492,p4=259,p5=260,
 a10=205,a11=359,a12=167,a13=038,a14=125,a15=185,
 a20=429,a21=257,a22=200,a23=481,a24=483,a25=208,
 mobdmg=0,mydmg=0,partydmg=0,allydmg=0,otherdmg=0,
-spellcol=0,abilcol=0,wscol=0,mobwscol=0,statuscol=191,itemcol=256,enfeebcol=475}
+spellcol=0,abilcol=0,wscol=0,mobwscol=0,mobspellcol=0,statuscol=191,itemcol=256,enfeebcol=475}
 
 filter = {}
 wearing = {}
@@ -357,6 +357,7 @@ default_colors = [[
 		<otherdmg>0</otherdmg>
 		
 		<spellcol>0</spellcol>
+		<mobspellcol>0</mobspellcol>
 		<abilcol>0</abilcol>
 		<wscol>0</wscol>
 		<mobwscol>0</mobwscol>
