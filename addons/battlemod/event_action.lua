@@ -219,7 +219,11 @@ function event_action(act)
 					if T{252,265,268,269,271,272,274,275,650}:contains(msg_ID) then
 						spell = 'Magic Burst '..spell
 					end
-					spell = color_it(spell,color_arr['spellcol'])
+					if actor_table['is_npc'] then
+						spell = color_it(spell or '',color_arr['mobspellcol'])
+					else
+						spell = color_it(spell or '',color_arr['spellcol'])
+					end
 				elseif table.contains(fields,'ability') then
 					ability = jobabilities[abil_ID]['english']
 					if msg_ID == 379 then ability = 'Magic Burst '..ability end
