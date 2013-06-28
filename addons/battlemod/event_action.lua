@@ -220,9 +220,9 @@ function event_action(act)
 						spell = 'Magic Burst '..spell
 					end
 					if actor_table['is_npc'] then
-						spell = color_it(spell or '',color_arr['mobspellcol'])
+						spell = spell and color_it(spell, color_arr['mobspellcol']) or ''
 					else
-						spell = color_it(spell or '',color_arr['spellcol'])
+						spell = spell and color_it(spell, color_arr['spellcol']) or ''
 					end
 				elseif table.contains(fields,'ability') then
 					ability = jobabilities[abil_ID]['english']
@@ -261,9 +261,9 @@ function event_action(act)
 						weapon_skill = weapon_skill..' (No Effect)'
 					end
 					if actor_table['is_npc'] then
-						weapon_skill = color_it(weapon_skill or '',color_arr['mobwscol'])
+						weapon_skill = weapon_skill and color_it(weapon_skill, color_arr['mobwscol']) or ''
 					else
-						weapon_skill = color_it(weapon_skill or '',color_arr['wscol'])
+						weapon_skill = weapon_skill and color_it(weapon_skill, color_arr['wscol']) or ''
 					end
 				elseif msg_ID == 303 then
 					ability = 'Divine Seal'
