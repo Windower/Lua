@@ -49,41 +49,64 @@ gt.days[1][1] = 'Firesday'
 gt.days[1][2] = 'Fi '
 gt.days[1][10] = '(255, 0, 0)'
 gt.days[1][3] = 'Fire '
+--Mini mode
+gt.days[1][4] = '° '
+
 gt.days[2] = {}
 gt.days[2][1] = 'Earthsday'
 gt.days[2][2] = 'Ea '
 gt.days[2][10] = '(255, 225, 0)'
 gt.days[2][3] = 'Earth '
+--Mini mode
+gt.days[2][4] = '° '
+
 gt.days[3] = {}
 gt.days[3][1] = 'Watersday'
 gt.days[3][2] = 'Wa '
 gt.days[3][10] = '(100, 100, 255)'
 gt.days[3][3] = 'Water '
+--Mini mode
+gt.days[3][4] = '° '
+
 gt.days[4] = {}
 gt.days[4][1] = 'Windsday'
 gt.days[4][2] = 'Wi '
 gt.days[4][10] = '(0, 255, 0)'
 gt.days[4][3] = 'Wind '
+--Mini mode
+gt.days[4][4] = '° '
+
 gt.days[5] = {}
 gt.days[5][1] = 'Iceday'
 gt.days[5][2] = 'Ic '
 gt.days[5][10] = '(150, 200, 255)'
 gt.days[5][3] = 'Ice '
+--Mini mode
+gt.days[5][4] = '° '
+
 gt.days[6] = {}
 gt.days[6][1] = 'Lightningday'
 gt.days[6][2] = 'Lg '
 gt.days[6][10] = '(255, 128, 128)'
 gt.days[6][3] = 'Lightning '
+--Mini mode
+gt.days[6][4] = '° '
+
 gt.days[7] = {}
 gt.days[7][1] = 'Lightsday'
 gt.days[7][2] = 'Lt '
 gt.days[7][10] = '(255, 255, 255)'
 gt.days[7][3] = 'Light '
+--Mini mode
+gt.days[7][4] = '° '
+
 gt.days[8] = {}
 gt.days[8][1] = 'Darksday'
 gt.days[8][2] = 'Dk '
 gt.days[8][10] = '(128, 128, 128)'
 gt.days[8][3] = 'Dark '
+--Mini mode
+gt.days[8][4] = '° '
 
 gt.WeekReport = ''
 gt.MoonPct = ''
@@ -101,15 +124,21 @@ local defaults = T{}
 	defaults.time.colorr = 255
 	defaults.time.colorg = 255
 	defaults.time.colorb = 255
+	defaults.time.font_size = 12
+	defaults.time.font = 'tahoma'
 	defaults.time.bg_alpha = 25
 	defaults.time.bg_colorr = 100
 	defaults.time.bg_colorg = 100
 	defaults.time.bg_colorb = 100
+	
 	defaults.days = T{}
 	defaults.days.visible = true
 	defaults.days.x = 100
 	defaults.days.y = 0
 	defaults.days.alpha = 75
+	defaults.days.font_size = 12
+	defaults.days.font = 'tahoma'
+	
 	defaults.days.bg_alpha = 100
 	defaults.days.bg_colorr = 0
 	defaults.days.bg_colorg = 0
@@ -260,6 +289,8 @@ function cb_time()
 	tb_set_location(gt.gtt,settings.time.x,settings.time.y)
 	tb_set_text(gt.gtt,'Loading. . .')
 	tb_set_visibility(gt.gtt,settings.time.visible)
+	--Set font type and size for time
+	tb_set_font(gt.gtt,settings.time.font,settings.time.font_size)
 end
 
 function cb_day()
@@ -273,6 +304,11 @@ function cb_day()
 	tb_set_location(gt.gtd,settings.days.x,settings.days.y)
 	tb_set_text(gt.gtd,'')
 	tb_set_visibility(gt.gtd,settings.days.visible)
+	--Set font type and size for days 
+	tb_set_font(gt.gtd,settings.days.font,settings.days.font_size)
+	
+	
+	
 end
 
 function default_settings()
@@ -358,11 +394,18 @@ function event_addon_command(...)
 		log('Positioning:')
 		log('//gt [timex/timey/daysx/daysy] <pos> :: example: //gt timex 125')
 		log('//gt [time/days] reset :: example: //gt days reset')
+		
+		log('Text features:')
+		log('//gt timeSize <size> :: example: //gt timeSize 10')
+		log('//gt timeFont <fontName> :: example: //gt timeFont Verdana')
+		log('//gt daySize <size> :: example: //gt daySize 10')
+		log('//gt dayFont <fontName> :: example: //gt dayFont Verdana')
+		
 		log('Visibility:')
 		log('//gt [time/days] [show/hide] :: example //gt time hide')
 		log('//gt axis [horizontal/vertical] :: week display axis')
 		log('//gt [time/days] alpha 1-255. :: Sets the transparency. Lowest numbers = more transparent.')
-		log('//gt mode 1-3 :: Fullday; Abbreviated; Element names')
+		log('//gt mode 1-4 :: Fullday; Abbreviated; Element names; Compact')
 		log('//gt route :: Displays route names.')
 		log('//gt route [route name] :: Displays arrival time for route.')
 		-- log('Log Reporting -- Day and Moon Phase (Not Moon %) change') not implemented yet
@@ -389,6 +432,37 @@ function event_addon_command(...)
 		else
 			getroutes(args[2])
 		end
+	
+	
+	
+	---CLI Arguments for Time font Size
+	elseif args[1] == 'timeSize' then
+			tb_set_font(gt.gtt,settings.time.font,args[2])
+			settings.time.font_size = args[2]
+			
+			
+			
+	---CLI Arguments for Time font type
+	elseif args[1] == 'timeFont' then
+			tb_set_font(gt.gtt,args[2],settings.time.font_size)
+			settings.time.font = args[2]
+
+			
+			
+	---CLI Arguments for Day font Size
+	elseif args[1] == 'daySize' then
+			tb_set_font(gt.gtd,settings.time.font,args[2])
+			settings.days.font_size = args[2]
+			
+			
+			
+	---CLI Arguments for Day font type
+	elseif args[1] == 'dayFont' then
+			tb_set_font(gt.gtd,args[2],settings.time.font_size)
+			settings.days.font = args[2]				
+	
+	
+	
 	elseif args[1] == 'timex' then
 			tb_set_location(gt.gtt,args[2],settings.time.y)
 			settings.time.x = args[2]
@@ -465,7 +539,7 @@ function event_addon_command(...)
 	elseif args[1] == 'mode' then
 		inmode = tostring(args[2]):zfill(1)
 		inmode = inmode+0
-		if inmode > 3 then
+		if inmode > 4 then
 			return
 		else
 			settings.mode = inmode
