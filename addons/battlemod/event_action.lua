@@ -219,7 +219,11 @@ function event_action(act)
 					if T{252,265,268,269,271,272,274,275,650}:contains(msg_ID) then
 						spell = 'Magic Burst '..spell
 					end
-					spell = color_it(spell,color_arr['spellcol'])
+					if actor_table['is_npc'] then
+						spell = spell and color_it(spell, color_arr['mobspellcol']) or ''
+					else
+						spell = spell and color_it(spell, color_arr['spellcol']) or ''
+					end
 				elseif table.contains(fields,'ability') then
 					ability = jobabilities[abil_ID]['english']
 					if msg_ID == 379 then ability = 'Magic Burst '..ability end
@@ -257,9 +261,9 @@ function event_action(act)
 						weapon_skill = weapon_skill..' (No Effect)'
 					end
 					if actor_table['is_npc'] then
-						weapon_skill = color_it(weapon_skill or '',color_arr['mobwscol'])
+						weapon_skill = weapon_skill and color_it(weapon_skill, color_arr['mobwscol']) or ''
 					else
-						weapon_skill = color_it(weapon_skill or '',color_arr['wscol'])
+						weapon_skill = weapon_skill and color_it(weapon_skill, color_arr['wscol']) or ''
 					end
 				elseif msg_ID == 303 then
 					ability = 'Divine Seal'

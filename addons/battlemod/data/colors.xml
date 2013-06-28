@@ -34,6 +34,7 @@
 		<otherdmg>0</otherdmg>
 		
 		<spellcol>0</spellcol>
+		<mobspellcol>0</mobspellcol>
 		<abilcol>0</abilcol>
 		<wscol>0</wscol>
 		<mobwscol>0</mobwscol>
