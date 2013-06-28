@@ -413,13 +413,6 @@ function event_addon_command(...)
 		-- log('Positioning:')
 		-- log('//gt timex <pos> //gt timey <pos> //gt daysx <pos> //gt daysy <pos>')
 		-- log('//gt time reset //gt days reset :: resets reset both coordinates.')
-		
-		--log('Text features:')
-		--log('//gt timeSize <size> :: example: //gt timeSize 10')
-		--log('//gt timeFont <fontName> :: example: //gt timeFont Verdana')
-		--log('//gt daySize <size> :: example: //gt daySize 10')
-		--log('//gt dayFont <fontName> :: example: //gt dayFont Verdana')
-			
 		-- log('Visibility:')
 		-- log('//gt time show //gt time hide')
 		-- log('//gt days show //gt days hide')
@@ -459,14 +452,14 @@ function event_addon_command(...)
 	---CLI Arguments for Day font Size
 	elseif args[1] == 'daySize' then
 			tb_set_font(gt.gtd,settings.time.font,args[2])
-			settings.time.font_size = args[2]
+			settings.days.font_size = args[2]
 			
 			
 			
 	---CLI Arguments for Day font type
 	elseif args[1] == 'dayFont' then
 			tb_set_font(gt.gtd,args[2],settings.time.font_size)
-			settings.time.font = args[2]				
+			settings.days.font = args[2]				
 	
 	
 	
