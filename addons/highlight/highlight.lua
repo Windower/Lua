@@ -164,6 +164,8 @@ function event_incoming_text(original, modified, color)
 	local me_linkshell = original:find('<'..player..'>')
 	local me_ffochat = original:find('%[%d:#%w+%]'..player..'(%[?%w-%]?):')
 	local other_ffochat = original:find('%[%d:#%w+%]%w+(%[?%w-%]?):')
+	local obt = original:find(player..' obtains')
+	local experience = (player..' gains')
 	local me_say = original:find(player..' :')
 	local me_tell = '%w+>>'
 	local other_party = original:find('%(.*%)')
@@ -195,7 +197,7 @@ function event_incoming_text(original, modified, color)
 
 	if not_bm == nil and not_rt == nil and color ~= 4 then
 		if other_party ~= nil or other_linkshell ~= nil or other_ffochat ~=nil then
-			if me_party == nil and me_linkshell == nil and me_say == nil and me_ffochat == nil then
+			if me_party == nil and me_linkshell == nil and me_say == nil and me_ffochat == nil and obt == nil and experience == nil then
 				if modified:match(player) then
 					table.insert(previousmentions,1,'['..string.sub(os.date(), 10).."]>> "..original	)
 				end
