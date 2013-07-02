@@ -284,8 +284,8 @@ function event_action_aux(raw_action)
         elseif category == 'ranged_finish' then
             for target in action:get_targets() do
                 for subaction in target:get_actions() do
-                    -- ranged, crit, squarely, truestrike
-                    if T{352, 353, 576, 577}:contains(subaction.message) then
+                    -- barrage(157), ranged, crit, squarely, truestrike
+                    if T{157, 352, 353, 576, 577}:contains(subaction.message) then
                         if subaction.message == 353 then
                             dps_db:add_r_crit(target:get_name(), action:get_actor_name(), subaction.param)
                         else
@@ -304,8 +304,8 @@ function event_action_aux(raw_action)
         elseif category == 'job_ability' or category == 'job_ability_unblinkable' then
             for target in action:get_targets() do
                 for subaction in target:get_actions() do
-                    -- sange(77), generic damage ja(110), barrage(157), other generic dmg ja (317), stun ja (522)
-                    if T{77, 110, 157, 317, 522}:contains(subaction.message) then
+                    -- sange(77), generic damage ja(110), other generic dmg ja (317), stun ja (522)
+                    if T{77, 110, 317, 522}:contains(subaction.message) then
                         dps_db:add_damage(target:get_name(), action:get_actor_name(), subaction.param)
                     end
                 end
