@@ -236,7 +236,6 @@ function event_action_aux(raw_action)
         return
     end
     
-    write(action.raw.actor_id)
     if mob_is_ally(action.raw.actor_id) then
         if category == 'melee' then
             for target in action:get_targets() do
@@ -285,8 +284,6 @@ function event_action_aux(raw_action)
         elseif category == 'ranged_finish' then
             for target in action:get_targets() do
                 for subaction in target:get_actions() do
-                    write(subaction.message)
-
                     -- barrage(157), ranged, crit, squarely, truestrike
                     if T{157, 352, 353, 576, 577}:contains(subaction.message) then
                         if subaction.message == 353 then
