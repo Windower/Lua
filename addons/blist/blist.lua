@@ -313,8 +313,3 @@ function event_incoming_text(original, modified, mode)
 		return modified
 	end
 end
-
---[[
-doesn't work on emotes (might be a case issue)
-
-]]--
