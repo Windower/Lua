@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
 -- Blackboard object (wrapper to text box)
--- Gestisce la stampa a video della lista alliance
+-- Manage the textbox alliance list
 local Alliance = require 'Alliance'
 require 'logger'
 
