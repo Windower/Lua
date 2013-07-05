@@ -1,0 +1,21 @@
+<?xml version="1.1" ?>
+<settings>
+	<global>
+		<BG_red>0</BG_red>
+		<BG_blue>0</BG_blue>
+		<BG_green>0</BG_green>
+		<Txt_red>255</Txt_red>
+		<Txt_blue>0</Txt_blue>
+		<Txt_green>0</Txt_green>
+		<txt_bold>true</txt_bold>		
+		<x_pos>260</x_pos>
+		<y_pos>550</y_pos>
+		<defaultmode>geo</defaultmode><!-- options are "geo" or "thf"  -->
+		<geomode>
+			<showbuff>true</showbuff>
+		</geomode>
+		<thfmode>
+			<showangle>always</showangle> <!-- options are "always", "behind" (shows angle when SA = OK), and "never"  -->
+		</thfmode>
+	</global>
+</settings>

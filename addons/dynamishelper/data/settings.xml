@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<settings>
+	<global>
+		<timer>on</timer>
+		<tracker>off</tracker>
+		<trposx>1000</trposx>
+		<trposy>250</trposy>
+		<proc>off</proc>
+		<pposx>900</pposx>
+		<pposy>250</pposy>
+ 	</global>
+</settings>

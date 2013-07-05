@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<settings>
+  <!--
+	This file controls the settings for the Scoreboard plugin.
+	Settings in the <global> section apply to all characters
+
+	The available settings are:
+		posX - x coordinate for position
+		posY - y coordinate for position
+		numPlayers - The maximum number of players to display damage for
+		bgTransparency - Transparency level for the background. 0-255 range
+	-->
+	<global>
+		<posX>10</posX>
+		<posY>250</posY>
+		<bgTransparency>200</bgTransparency>
+		<numPlayers>8</numPlayers>
+	</global>
+
+	<!--
+	You may also override specific settings on a per-character basis here.
+	-->
+</settings>
+

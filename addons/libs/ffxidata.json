@@ -1,0 +1,451 @@
+{
+	chat: {
+		colorcontrols: {
+			1:           \x1F,
+			2:           \x1E,
+			reset:       \x1E\x01,
+		},
+		colors: {
+			// Configurable game colors
+			say:         \x1F\x01,        // Menu > Font Colors > Chat > Immediate vicinity ("Say")
+			tell:        \x1F\x04,        // Menu > Font Colors > Chat > Tell target only ("Tell")
+			party:       \x1F\x05,        // Menu > Font Colors > Chat > All party members ("Party")
+			linkshell:   \x1F\x06,        // Menu > Font Colors > Chat > Linkshell group ("Linkshell")
+			emote:       \x1F\x07,        // Menu > Font Colors > Chat > Emotes
+			message:     \x1F\x11,        // Menu > Font Colors > Chat > Messages ("Message")
+			npc:         \x1F\x8E,        // Menu > Font Colors > Chat > NPC Conversations
+			shout:       \x1F\x02,        // Menu > Font Colors > Chat > Wide area ("Shout")
+			yell:        \x1F\x03,        // Menu > Font Colors > Chat > Extremely wide area ("Yell")
+			selfheal:    \x1F\x1E,        // Menu > Font Colors > For Self > HP/MP you recover
+			selfhurt:    \x1F\x1C,        // Menu > Font Colors > For Self > HP/MP you loose
+			selfbuff:    \x1F\x38,        // Menu > Font Colors > For Self > Beneficial effects you are granted
+			selfdebuff:  \x1F\x39,        // Menu > Font Colors > For Self > Detrimental effects you receive
+			selfresist:  \x1F\x3B,        // Menu > Font Colors > For Self > Effects you resist
+			selfevade:   \x1F\x1D,        // Menu > Font Colors > For Self > Actions you evade
+			otherheal:   \x1F\x16,        // Menu > Font Colors > For Others > HP/MP others recover
+			otherhurt:   \x1F\x14,        // Menu > Font Colors > For Others > HP/MP others loose
+			otherbuff:   \x1F\x3C,        // Menu > Font Colors > For Others > Beneficial effects others are granted
+			otherdebuff: \x1F\x3D,        // Menu > Font Colors > For Others > Detrimental effects others receive
+			otherresist: \x1F\x3F,        // Menu > Font Colors > For Others > Effects others resist
+			otherevade:  \x1F\x15,        // Menu > Font Colors > For Others > Actions others evade
+			cfh:         \x1F\x08,        // Menu > Font Colors > System > Calls for help
+			battle:      \x1F\x32,        // Menu > Font Colors > System > Standard battle messages
+			system:      \x1F\x79,        // Menu > Font Colors > System > Basic system messages
+		},
+		icons: {
+			// FFXI internal icons, all starting with \xEF
+			fire:        \xEF\x1F,        // Elemental fire sign
+			ice:         \xEF\x20,        // Elemental ice sign
+			wind:        \xEF\x21,        // Elemental wind sign
+			earth:       \xEF\x22,        // Elemental earth sign
+			lightning:   \xEF\x23,        // Elemental lightning sign
+			water:       \xEF\x24,        // Elemental water sign
+			light:       \xEF\x25,        // Elemental light sign
+			darkness:    \xEF\x26,        // Elemental darkness sign
+			atstart:     \xEF\x27,        // Auto-translate, green beginning brace
+			atend:       \xEF\x28,        // Auto-translate, red finishing brace
+			on:          \xEF\x29,        // ON sign (as used in menus
+			off:         \xEF\x2A,        // OFF sign
+			oui:         \xEF\x2B,        // ON sign (French)
+			non:         \xEF\x2C,        // OFF sign (French)
+			ein:         \xEF\x2D,        // ON sign (German)
+			aus:         \xEF\x2E,        // OFF sign (German)
+		},
+
+		// Special characters that could potentially be used
+		chars: {
+			// Punctuation
+			comma:       \x81\x41,
+			period:      \x81\x42,
+			colon:       \x81\x46,
+			semicolon:   \x81\x47,
+			query:       \x81\x48,
+			exclamation: \x81\x49,
+			macron:      \x81\x50, // ¯
+			zero:        \x81\x5A,
+			bar:         \x81\x5B, // ―
+			emdash:      \x81\x5C, // —
+			endash:      \x81\x5D, // –
+			slash:       \x81\x5E,
+			bslash:      \x81\x5F,
+			cdots:       \x81\x63, // … centered vertically
+			dots:        \x81\x64, // .. centered vertically
+
+			// Typography
+			tilde:       \x81\x3E, // ~
+			wave:        \x81\x60, // 〜
+			ditto:       \x81\x56, // 〃
+			amp:         \x81\x95,
+			asterisk:    \x81\x96,
+			at:          \x81\x97,
+			underscore:  \x81\x51,
+			dagger:      \x81\xEE, // †
+			ddagger:     \x81\xEF, // ‡
+			parallel:    \x81\x61, // ||
+			pipe:        \x81\x62, // |
+			hash:        \x81\x94,
+			section:     \x81\x98, // §
+			ref:         \x81\xA6, // ※
+			post:        \x81\xA7, // 〶
+			tie:         \x81\xD1, // ⁀
+			para:        \x81\xF7, // ¶
+
+			// Quotes
+			lsquo:       \x81\x65, // ‘
+			rsquo:       \x81\x66, // ’
+			ldquo:       \x81\x67, // “
+			rdquo:       \x81\x68, // ”
+
+			// Brackets
+			lpar:        \x81\x69, // (
+			rpar:        \x81\x6A, // )
+			ltort:       \x81\x6B, // 〔
+			rtort:       \x81\x6C, // 〕
+			lbrack:      \x81\x6D, // [
+			rbrack:      \x81\x6E, // ]
+			lbrace:      \x81\x6F, // {
+			rbrace:      \x81\x70, // }
+			lang:        \x81\x71, // 〈
+			rang:        \x81\x72, // 〉
+			ldangle:     \x81\x73, // 《
+			rdangle:     \x81\x74, // 》
+			lcorner:     \x81\x75, // 「
+			rcorner:     \x81\x76, // 」
+			lwcorner:    \x81\x77, // 『
+			rwcorner:    \x81\x78, // 』
+			lblent:      \x81\x79, // 【
+			rblent:      \x81\x7A, // 】
+			laquo:       \x85\x6B, // «
+			raquo:       \x85\x7B, // »
+
+			// Math (General)
+			plus:        \x81\x7B,
+			minus:       \x81\x7C,
+			plusminus:   \x81\x7D, // ±
+			times:       \x81\x7E, // ×
+			div:         \x81\x80, // ÷
+			eq:          \x81\x81, // =
+			neq:         \x81\x82, // ≠
+			lt:          \x81\x83,
+			gt:          \x81\x84,
+			leq:         \x81\x85, // ≦
+			geq:         \x81\x86, // ≧
+			ll:          \x81\xD6, // ≪
+			gg:          \x81\xD7, // ≫
+			root:        \x81\xD8, // √
+			inf:         \x81\x87, // ∞
+			prop:        \x81\xE5, // ∝
+			ninf:        \x81\xD9, // open infinity in the middle
+			nearlyeq:    \x81\xD5, // ≓
+
+			// Math (Sets)
+			in:          \x81\xAC, // ∈
+			ni:          \x81\xAD, // ∋
+			subseteq:    \x81\xAE, // ⊆
+			supseteq:    \x81\xB0, // ⊇
+			subset:      \x81\xB1, // ⊂
+			supset:      \x81\xB2, // ⊃
+			union:       \x81\xB3, // ∪
+			intersect:   \x81\xB4, // ∩
+
+			// Math (Analysis)
+			nabla:       \x81\xD3, // ∇
+			integral:    \x81\xE7, // ∫
+			dintegral:   \x81\xE8, // ∫∫
+
+			// Math (Logical)
+			therefore:   \x81\x88, // ∴
+			bc:          \x81\xE6, // ∵
+			min:         \x81\xB5, // ∧
+			max:         \x81\xB6, // ∨
+			neg:         \x81\xB7, // ¬
+			implies:     \x81\xC3, // ⇒
+			iff:         \x81\xC4, // ⇔
+			foreach:     \x81\xC5, // ∀
+			exists:      \x81\xC6, // ∃
+			bot:         \x81\xD0, // ⊥
+			part:        \x81\xD2, // ∂
+			equiv:       \x81\xD4, // ≡
+
+			// Math (Fractions)
+			1div4:       \x85\x7C, // ¼
+			1div2:       \x85\x7D, // ½
+			3div4:       \x85\x7E, // ¾
+
+			// Math (Geometry)
+			degree:      \x81\x8B, // °
+			arcmin:      \x81\x8C, // ′
+			arcsec:      \x81\x8D, // ″
+			angle:       \x81\xC7, // ∠
+			rangle:      \x87\x98, // ∟
+			lrtriangle:  \x87\x99, // ◿
+
+			// Polygons
+			bstar:       \x81\x99, // ★
+			wstar:       \x81\x9A, // ☆
+			brhombus:    \x81\x9E, // black rhombus
+			wrhombus:    \x81\x9F, // white rhombus
+			bsquare:     \x81\xA0, // black square
+			wsquare:     \x81\xA1, // white square
+			btriangle:   \x81\xA2, // black triagle
+			wtriangle:   \x81\xA3, // white triangle
+			bustriangle: \x81\xA4, // black upside triangle
+			wustriangle: \x81\xA5, // white upside triangle
+
+			// Circles
+			bcircle:     \x81\x9B, // black circle
+			wcircle:     \x81\x9C, // white circle
+			circlejot:   \x81\x9D, // circle in circle
+
+			// Arrows
+			rarr:        \x81\xA8, // →
+			larr:        \x81\xA9, // ←
+			uarr:        \x81\xAA, // ↑
+			darr:        \x81\xAB, // ↓
+
+			// Financial
+			dollar:      \x81\x90, // $
+			cent:        \x81\x91, // ¢
+			pound:       \x81\x92, // £
+			euro:        \x85\x40, // €
+			yen:         \x85\x65, // ¥
+
+			// Musical
+			sharp:       \x81\xEB, // ♯
+			flat:        \x81\xEC, // ♭
+			note:        \x81\xED, // ♪
+
+			// Misc
+			male:        \x81\x89, // ♂
+			female:      \x81\x8A, // ♀
+			percent:     \x81\x93,
+			permil:      \x81\xEA, // ‰
+			circle:      \x81\xF8,
+			cdegree:     \x81\x8E, // °C
+			tm:          \x85\x59, // ™
+			copy:        \x85\x69, // ©
+
+			// Alphanumeric characters (Japanese)
+			j0:           \x82\x4F,
+			j1:           \x82\x50,
+			j2:           \x82\x51,
+			j3:           \x82\x52,
+			j4:           \x82\x53,
+			j5:           \x82\x54,
+			j6:           \x82\x55,
+			j7:           \x82\x56,
+			j8:           \x82\x57,
+			j9:           \x82\x58,
+			jA:           \x82\x60,
+			jB:           \x82\x61,
+			jC:           \x82\x62,
+			jD:           \x82\x63,
+			jE:           \x82\x64,
+			jF:           \x82\x65,
+			jG:           \x82\x66,
+			jH:           \x82\x67,
+			jI:           \x82\x68,
+			jJ:           \x82\x69,
+			jK:           \x82\x6A,
+			jL:           \x82\x6B,
+			jM:           \x82\x6C,
+			jN:           \x82\x6D,
+			jO:           \x82\x6E,
+			jP:           \x82\x6F,
+			jQ:           \x82\x70,
+			jR:           \x82\x71,
+			jS:           \x82\x72,
+			jT:           \x82\x73,
+			jU:           \x82\x74,
+			jV:           \x82\x75,
+			jW:           \x82\x76,
+			jX:           \x82\x77,
+			jY:           \x82\x78,
+			jZ:           \x82\x79,
+			ja:           \x82\x81,
+			jb:           \x82\x82,
+			jc:           \x82\x83,
+			jd:           \x82\x84,
+			je:           \x82\x85,
+			jf:           \x82\x86,
+			jg:           \x82\x87,
+			jh:           \x82\x88,
+			ji:           \x82\x89,
+			jj:           \x82\x8A,
+			jk:           \x82\x8B,
+			jl:           \x82\x8C,
+			jm:           \x82\x8D,
+			jn:           \x82\x8E,
+			jo:           \x82\x8F,
+			jp:           \x82\x90,
+			jq:           \x82\x91,
+			jr:           \x82\x92,
+			js:           \x82\x93,
+			jt:           \x82\x94,
+			ju:           \x82\x95,
+			jv:           \x82\x96,
+			jw:           \x82\x97,
+			jx:           \x82\x98,
+			jy:           \x82\x99,
+			jz:           \x82\x9A,
+
+			// Greek letters
+			Alpha:       \x83\x97,
+			Beta:        \x83\x98,
+			Gamma:       \x83\x99,
+			Delta:       \x83\x9A,
+			Epsilon:     \x83\x9B,
+			Zeta:        \x83\x9C,
+			Eta:         \x83\x9D,
+			Theta:       \x83\x9E,
+			Iota:        \x83\xA7,
+			Kappa:       \x83\xA8,
+			Lambda:      \x83\xA9,
+			Mu:          \x83\xAA,
+			Nu:          \x83\xAB,
+			Xi:          \x83\xAC,
+			Omicron:     \x83\xAD,
+			Pi:          \x83\xAE,
+			Rho:         \x83\xAF,
+			Sigma:       \x83\xB0,
+			Tau:         \x83\xB1,
+			Upsilon:     \x83\xB2,
+			Phi:         \x83\xB3,
+			Chi:         \x83\xB4,
+			Psi:         \x83\xB5,
+			Omega:       \x83\xB6,
+			alpha:       \x83\xB7,
+			beta:        \x83\xB8,
+			gamma:       \x83\xB9,
+			delta:       \x83\xBA,
+			epsilon:     \x83\xBB,
+			zeta:        \x83\xBC,
+			eta:         \x83\xBD,
+			theta:       \x83\xBE,
+			iota:        \x83\xC7,
+			kappa:       \x83\xC8,
+			lambda:      \x83\xC9,
+			mu:          \x83\xCA,
+			nu:          \x83\xCB,
+			xi:          \x83\xCC,
+			omicron:     \x83\xCD,
+			pi:          \x83\xCE,
+			rho:         \x83\xCF,
+			sigma:       \x83\xD0,
+			tau:         \x83\xD1,
+			upsilon:     \x83\xD2,
+			phi:         \x83\xD3,
+			chi:         \x83\xD4,
+			psi:         \x83\xD5,
+			omega:       \x83\xD6,
+
+			// lines
+			hline:       \x84\x92, // ─
+			vline:       \x84\x93, // │
+			tl:          \x84\x94, // ┌
+			tr:          \x84\x95, // ┐
+			br:          \x84\x96, // ┘
+			bl:          \x84\x97, // └
+			left:        \x84\x98, // ├
+			top:         \x84\x99, // ┬
+			right:       \x84\x9A, // ┤
+			bottom:      \x84\x9B, // ┴
+			middle:      \x84\x9C, // ┼
+			bhline:      \x84\xAA, // ─
+			bvline:      \x84\xAB, // │
+			btl:         \x84\xAB, // ┌
+			btr:         \x84\xAC, // ┐
+			bbr:         \x84\xAD, // ┘
+			bbl:         \x84\xAE, // └
+			bleft:       \x84\xB0, // ├
+			btop:        \x84\xB1, // ┬
+			bright:      \x84\xB2, // ┤
+			bbottom:     \x84\xB3, // ┴
+			bmiddle:     \x84\xB4, // ┼
+
+			// sup numbers 1-4
+			sup0:        \x85\x7A,
+			sup1:        \x85\x79,
+			sup2:        \x85\x72,
+			sup3:        \x85\x73,
+
+			// circled numbers 1-20
+			circle1:     \x87\x40,
+			circle2:     \x87\x41,
+			circle3:     \x87\x42,
+			circle4:     \x87\x43,
+			circle5:     \x87\x44,
+			circle6:     \x87\x45,
+			circle7:     \x87\x46,
+			circle8:     \x87\x47,
+			circle9:     \x87\x48,
+			circle10:    \x87\x49,
+			circle11:    \x87\x4A,
+			circle12:    \x87\x4B,
+			circle13:    \x87\x4C,
+			circle14:    \x87\x4D,
+			circle15:    \x87\x4E,
+			circle16:    \x87\x4F,
+			circle17:    \x87\x50,
+			circle18:    \x87\x51,
+			circle19:    \x87\x52,
+			circle20:    \x87\x53,
+
+			// roman numerals 1-10
+			roman1:      \x87\x54,
+			roman2:      \x87\x55,
+			roman3:      \x87\x56,
+			roman4:      \x87\x57,
+			roman5:      \x87\x58,
+			roman6:      \x87\x59,
+			roman7:      \x87\x5A,
+			roman8:      \x87\x5B,
+			roman9:      \x87\x5C,
+			roman10:     \x87\x5D,
+
+			// abbreviations
+			mm:          \x87\x6F,
+			cm:          \x87\x70,
+			km:          \x87\x71,
+			mg:          \x87\x72,
+			kg:          \x87\x73,
+			cc:          \x87\x74,
+			m2:          \x87\x75,
+			no:          \x87\x82,
+			kk:          \x87\x83,
+			tel:         \x87\x84
+		},
+	},
+	elements: {
+		days: {
+			Firesday: Fire,
+			Earthsday: Earth,
+			Watersday: Water,
+			Windsday: Wind,
+			Iceday: Ice,
+			Lightningday: Lightning,
+			Lightsday: Light,
+			Darksday: Darkness,
+		},
+		storms: {
+			Sandstorm: Earth,
+			Rainstorm: Water,
+			Windstorm: Wind,
+			Firestorm: Fire,
+			Hailstorm: Ice,
+			Thunderstorm: Lightning,
+			Voidstorm: Darkness,
+			Aurorastorm: Light,
+		},
+		spirits: {
+			Fire Spirit: Fire,
+			Ice Spirit: Ice,
+			Air Spirit: Wind,
+			Earth Spirit: Earth,
+			Water Spirit: Water,
+			Thunder Spirit: Lightning,
+			Light Spirit: Light,
+			Dark Spirit: Darkness,
+		},
+	},
+}
