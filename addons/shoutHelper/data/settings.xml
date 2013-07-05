@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<settings>
+  <!--
+	This file controls the settings for the Scoreboard plugin.
+	Settings in the <global> section apply to all characters
+
+	The available settings are:
+		posX - x coordinate for position
+		posY - y coordinate for position
+		bgTransparency - Transparency level for the background. 0-255 range
+	-->
+	<global>
+		<posX>300</posX>
+		<posY>140</posY>
+		<bgTransparency>200</bgTransparency>
+	</global>
+
+	<!--
+	You may also override specific settings on a per-character basis here.
+	-->
+</settings>
