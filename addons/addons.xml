@@ -206,6 +206,12 @@
     <description>Applys spellcast-like command completion (interpretation and target completion) to single slash commands. Includes emotes, /check, and /pcmd.</description>
   </addon>
   <addon>
+  	<name>ShoutHelper</name>
+  	<author>Jandel</author>
+  	<description>Help managing party job in an alliance shout. Displays a in-game editable list (initially empty) in which one can set job and players</description>
+  	<support>http://www.ffxiah.com/player/Ragnarok/Jandel</support>
+  </addon>
+  <addon>
     <name>Send</name>
     <description>Sends commands between windower instances using IPC.</description>
   </addon>
