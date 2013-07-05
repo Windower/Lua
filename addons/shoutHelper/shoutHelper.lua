@@ -62,12 +62,13 @@ function event_addon_command(...)
     end
     if params[1] then
 	if params[1]:lower() == "help" then
-		--Idea di helper
+		--Idea of helper
 	    local color = '204' -- !!there is a function in scoreboard for add_to_chat
             add_to_chat(color, 'SH: ShoutHelper v' .. _addon.version .. '. Author: Jandel')
             add_to_chat(color, 'SH: sh help : Shows help message')
-            add_to_chat(color, 'SH: sh pos <x> <y> : Positions the list')--????
+            add_to_chat(color, 'SH: sh pos <x> <y> : Positions the list')
             add_to_chat(color, 'SH: sh clear : Reset list.')--????(cancella la lista corrente)
+            --the following two line are commented because there's no function implemented
             --add_to_chat(color, 'SH: sh save <filename> : Save alliance settings. If the file already exists it will overwrite it.')
             --add_to_chat(color, 'SH: sh load <filename>  : Load the <filename> alliance settings.')
             add_to_chat(color, "SH: sh set <party> <job1> <job2> ... : Add a job to the party. pt1 is for first party, pt2 and pt3 for second and third party. ".."Won\'t add jobs if the party list is full")
@@ -89,18 +90,18 @@ function event_addon_command(...)
         elseif params[1]:lower() == "clear" then
             lavagna:reset()
 	--elseif params[1]:lower() == "save" then
-            --if --[[il nome del file non è lecito (compreso stringa vuota)]] --then
+            --if --[[the filename isn't legit(emplty string too)]] --then
 		--error('Invalid name')
 		--return
             --end
-	    -- funzione che salva l'xml
+	    -- TODO function that create&save xml
 	    --log('This function needs to be implemented')
 	--elseif params[1]:lower() == "load" then
-            --if --[[il nome del file non è lecito (compreso stringa vuota)]] --then
+            --if --[[the filename isn't legit(emplty string too)] --then
 		--error('Invalid name')
 		--return
             --end
-	    -- funzione che carica l'xml
+	    -- TODO function that load xml
 	    --log('This function needs to be implemented')
 	elseif params[1]:lower() == "set" then --add jobs to party list
 	    local party = params[2]
@@ -156,7 +157,7 @@ function event_addon_command(...)
 	    else
 		lavagna:show()
 	    end
-	else --valutare se lasciare invalid command oppure non fa niente (levo else)
+	else --I don't know if leave the error message or "do nothing" (deleting else) in case the command isn't legit
 	    error('Invalid command')
 	end
     end
