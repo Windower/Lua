@@ -1,0 +1,59 @@
+una finestra tipo scoreboard
+--> un comando per creare i party
+	//set pt1 <listajob>
+	//set pt2 WAR
+--> un comando per aggiungere le persone (mette nel primo slot libero)
+	//add whm Netstar
+	//add war fassbinder
+--> un comando per rimuovere le persone
+	//rm nomeplayer
+--> un comando automatico per aggiungere il nome della persona al pt corrispondente (gestire job change/il job non è presente nella lista)+avanti
+--> un comando automatico per rimuovere le persone (quelle che lasciano il pt vengono cancellate dalla lista)
+--> un comando per salvare la lista dei party creata (senza le persone)
+--> un comando per caricare la lista dei parti creata in precedenza (XML file, così il file si può creare fuori dal game e poi salvarlo nella cartella)
+--> riga automatica per lo shout: lo shout lo fa il player ma quello scritto nello shout lo fa il plugin. Il player lo richiama con il comando lua
+--> manda un tell ai leader dei pt quando ci sono dei player nelle vicinanze che devono joinare (???)
+------------------------------------------------------------------------------------------------------------------------------------------------
+Gestione Visibilità
+	1) la box del plugin non è visibile fino a che non si fa un set o un load 'filename'
+	2) la box del plugin è visibile con una scritta "waiting for input" o una roba simile
+	-->NOTA: in entrambi i casi, se si compie un'azione sulla lista (set/add/rm ecc) la box diventa visibile (?)
+
+in libs ci sono 2 librerie:
+config che serve per leggere e settare il file di configurazione
+xml.lua che legge documenti xml
+------------------------------------------------------------------------------------------------------------------------------------------------
+Versioning
+0.1 - funzione che crea la lavagna funzionante (crea con il set, show/hide e clear)
+0.2 - funzione che aggiunge/rimuove i player (manualmente)
+0.3 - file save/load
+0.4 - setta i job checkando il playerjob dell'ally
+------------------------------------------------------------------------------------------------------------------------------------------------
+La lavagna stampa i job tipo display di scoreboard per mettere tutto in colonna
+SERVE UNA STRUTTURA PER POTER AGGIORNARE IL GIUSTO JOB
+Party 1 (in grassetto)
+[job]   <player>
+[job]   <player>
+[job]   <player>
+[job]   <player>
+[job]   <player>
+[job]   <player>
+Party 2 (in grassetto)
+[job]   <player>
+[job]   <player>
+[job]   <player>
+[job]   <player>
+[job]   <player>
+[job]   <player>
+Party 3 (in grassetto)
+[job]   <player>
+[job]   <player>
+[job]   <player>
+[job]   <player>
+[job]   <player>
+[job]   <player>
+
+lista = {party1={} party2={} party3={}}
+lista = {party1={WHM="ppl" PLD="ppl" WAR="ppl" DD="ppl" } party2={} party3={}}
+se c'è add war e sono rimasti solo slot DD, deve mettere il war nello slot dd
+
