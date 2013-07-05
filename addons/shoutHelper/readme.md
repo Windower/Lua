@@ -3,8 +3,9 @@ Version: 0.2
 Addon to help manage alliance while shouting.
 Abbreviation: //sh
 
-This addon allows to create a virtual alliance list in game.
-It will allow to create a job list and assign a job to the player
+This addon allows you to create a virtual alliance list in game. Why using the old piece of paper
+or switching to a file .txt to manage your alliance shout?
+This addon will allow you to create a job list and assign a player to the wanted job
 Example:
 Alliance
 PARTY 1
@@ -25,8 +26,7 @@ PARTY 3
 [JOB]
 ...
 
-All in-game commands are prefixed with "//sh", for
-example: "//sh help".
+All in-game commands are prefixed with "//sh", for example: "//sh help".
 
 Command list:
 * HELP
@@ -52,7 +52,7 @@ Command list:
 
 * DEL [<party>] <job>
   removes a job from the job list. <party> is optional and if is not given, the first
-  instance of the given job will be deleted
+  occurrence of the given job will be deleted
 
 * VISIBLE
   Toggles the visibility of the scoreboard. Data will continue to
@@ -87,5 +87,5 @@ Caveats:
 * This addon is still in development. Please report any issues or feedback to
   to me (Jandel on Ragnarok) on FFXIAH or Guildwork.
 
-Thanks to Grievesk for encouraging me to write this addons.
+Thanks to Grievesk for encouraging me to write this addons :)
 
