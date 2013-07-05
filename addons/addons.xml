@@ -208,7 +208,7 @@
   <addon>
   	<name>ShoutHelper</name>
   	<author>Jandel</author>
-  	<description>Help managing party job in an alliance shout. Displays a in-game editable list in which one can set job and players</description>
+  	<description>Help managing party job in an alliance shout. Displays a in-game editable list (initially empty) in which one can set job and players</description>
   	<support>http://www.ffxiah.com/player/Ragnarok/Jandel</support>
   </addon>
   <addon>
