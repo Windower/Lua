@@ -29,9 +29,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -- Object Alliance
 --[[
 Concept
-lista = {party1={} party2={} party3={}}
-lista = {party1={WHM="ppl" PLD="ppl" WAR="ppl" DD="ppl" } party2={} party3={}}
-se c'Ã¨ add war e sono rimasti solo slot DD, deve mettere il war nello slot dd
+list = {party1={} party2={} party3={}}
+list = {party1={WHM="ppl" PLD="ppl" WAR="ppl" DD="ppl" } party2={} party3={}}
+if there's "add war" and only DD slots are left, it has to put the war in the DD slot
 ]]
 local Alliance = {}
 
@@ -177,7 +177,7 @@ function Alliance:setParty3(jobs)
 end
 
 --delete a job inside the ally
-function Alliance:deleteJob(job, party) --si deve riscalare anche la lista player TODO
+function Alliance:deleteJob(job, party) --it rescale the player list too
     job = job:lower()
     -- party slot not given
     if (party == nil ) then
@@ -219,7 +219,7 @@ function Alliance:deleteJob(job, party) --si deve riscalare anche la lista playe
     end
 end
 
---restituisce il primo pt che trova che contiene il job
+--returns the first party table that contains the given job
 function Alliance:findJob(job)
     local party = nil
     for i=1, #self.party1 do
@@ -256,7 +256,7 @@ function Alliance:findJob(job)
     end
 end
 
---restituisce la stringa che rappresenta il party
+--returns the string representing the party
 function Alliance:printAlly()
     local s = ''
     if(#self.party1 > 0) then
@@ -312,8 +312,8 @@ end
 function Alliance:addPlayer(job, name)
     local party = self:findFreeSlot(job)
     local rightJob = true
-    --se party è null il job non è stato trovato
-    --vuol dire che il job cercato non c'è (si cerca mnk e ci sono slot DD)
+    --if party is null the job wasn't found
+    --it means the there isn't the given job (example: one's looking for mnk and only slot DD are left)
     if not party and job then
         if DDlist:contains(job:lower()) then
             party = self:findFreeSlot('dd')
@@ -355,8 +355,7 @@ function Alliance:addPlayer(job, name)
             self.party3[pos] = {job, name}
         end
     end
-    --se mi trovo qui vuol dire che non è entrato in nessuno degli if
-    --vuol dire che il job cercato non c'è
+    --if I'm here it means it the given job is missing
 end
 
 --find the first free party slot (job is optional)
@@ -367,11 +366,11 @@ function Alliance:findFreeSlot(job)
         local jobName = slot[1]
         local name = slot[2]
         if ((not job) and name == nil) then 
-            --il job non è stato dato, sto cercando la prima pos libera per qualsiasi job
+            --no job given, I'm looking for the first free slot in party
             party = {1, i}
             return party
         elseif (job and name == nil) then
-            --il job è stato dato, cerco la prima pos libera per quel job
+            --the job is given, I'm looking for the first free slot for the given job
             job = job:lower()
             if(jobName == job)then
                 party = {1, i}
@@ -384,11 +383,11 @@ function Alliance:findFreeSlot(job)
         local jobName = slot[1]
         local name = slot[2]
         if ((not job) and name == nil) then 
-            --il job non è stato dato, sto cercando la prima pos libera per qualsiasi job
+            --no job given, I'm looking for the first free slot in party
             party = {2, i}
             return party
         elseif (job and name == nil) then
-            --il job è stato dato, cerco la prima pos libera per quel job
+            --the job is given, I'm looking for the first free slot for the given job
             job = job:lower()
             if(jobName == job)then
                 party = {2, i}
@@ -401,11 +400,11 @@ function Alliance:findFreeSlot(job)
         local jobName = slot[1]
         local name = slot[2]
         if ((not job) and name == nil) then 
-            --il job non è stato dato, sto cercando la prima pos libera per qualsiasi job
+            --no job given, I'm looking for the first free slot in party
             party = {3, i}
             return party
         elseif (job and name == nil) then
-            --il job è stato dato, cerco la prima pos libera per quel job
+            --the job is given, I'm looking for the first free slot for the given job
             job = job:lower()
             if(jobName == job)then
                 party = {3, i}
