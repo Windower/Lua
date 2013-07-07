@@ -421,7 +421,7 @@
  <m id="417" english="Dark Nova"/>
  <m id="418" english="Crystal Shield" actorstatus="40"/>
  <m id="419" english="Heavy Strike"/>
- <m id="420" english="Ice Break" targetstatus="12"/>
+ <m id="420" english="Ice Break" targetstatus="11"/>
  <m id="421" english="Thunder Break" targetstatus="10"/>
  <m id="422" english="Crystal Rain"/>
  <m id="423" english="Crystal Weapon"/>
@@ -1395,7 +1395,7 @@
  <m id="1391" english="Berserk" actorstatus="56"/>
  <m id="1392" english="Crystal Shield" actorstatus="40"/>
  <m id="1393" english="Heavy Strike"/>
- <m id="1394" english="Ice Break" targetstatus="12"/>
+ <m id="1394" english="Ice Break" targetstatus="11"/>
  <m id="1395" english="Thunder Break" targetstatus="10"/>
  <m id="1396" english="Crystal Rain"/>
  <m id="1397" english="Crystal Weapon"/>
@@ -1772,7 +1772,7 @@
  <m id="1768" english="Tourbillion" targetstatus="149"/>
  <m id="1769" english="Dreadstorm" targetstatus="28"/>
  <m id="1770" english="Fossilizing Breath" targetstatus="7"/>
- <m id="1771" english="Plague Swipe" targetstatus="31"/>
+ <m id="1771" english="Plague Swipe" targetstatus="31,135"/>
  <m id="1772" english="Fulmination" targetstatus="4,10"/>
  <m id="1773" english="."/>
  <m id="1774" english="."/>
