@@ -147,7 +147,7 @@ function event_action(act)
 			target_table = get_mob_by_id(act['targets'][i]['id'])
 
 			local flipped = false
-			if act['category'] == 6 and act['param'] > 140 and act['param'] < 149 then -- Force a message for maneuvers.
+			if act['category'] == 6 and act['param'] > 140 and act['param'] < 149 and act['targets'][1]['actions'][1]['message'] == 0 then -- Force a message for maneuvers.
 				msg_ID = 100
 			elseif check_filter(actor_table,party_table,target_table,act['category'],act['targets'][i]['actions'][n]['message']) then
 				msg_ID = act['targets'][i]['actions'][n]['message']
@@ -219,7 +219,11 @@ function event_action(act)
 					if T{252,265,268,269,271,272,274,275,650}:contains(msg_ID) then
 						spell = 'Magic Burst '..spell
 					end
-					spell = color_it(spell,color_arr['spellcol'])
+					if actor_table['is_npc'] then
+						spell = spell and color_it(spell, color_arr['mobspellcol']) or ''
+					else
+						spell = spell and color_it(spell, color_arr['spellcol']) or ''
+					end
 				elseif table.contains(fields,'ability') then
 					ability = jobabilities[abil_ID]['english']
 					if msg_ID == 379 then ability = 'Magic Burst '..ability end
@@ -232,6 +236,22 @@ function event_action(act)
 						if weapon_skill == '.' then
 							weapon_skill = 'Special Attack'
 						end
+						if mabils[abil_ID-256]['actorstatus'] and tpstatuses then
+							local tempar = split(mabils[abil_ID-256]['actorstatus'],',')
+							actor = actor..' ~'
+							for q,w in pairs(tempar) do
+								actor = actor..statuses[tonumber(w)]['english']..' '
+							end
+							actor = actor..'~ '
+						end
+						if mabils[abil_ID-256]['targetstatus'] and tpstatuses then
+							local tempar = split(mabils[abil_ID-256]['targetstatus'],',')
+							target = target..' ~'
+							for q,w in pairs(tempar) do
+								target = target..statuses[tonumber(w)]['english']..' '
+							end
+							target = target..'~ '
+						end
 					elseif abil_ID < 256 then
 						weapon_skill = jobabilities[abil_ID+768]['english']
 					end
@@ -241,9 +261,9 @@ function event_action(act)
 						weapon_skill = weapon_skill..' (No Effect)'
 					end
 					if actor_table['is_npc'] then
-						weapon_skill = color_it(weapon_skill or '',color_arr['mobwscol'])
+						weapon_skill = weapon_skill and color_it(weapon_skill, color_arr['mobwscol']) or ''
 					else
-						weapon_skill = color_it(weapon_skill or '',color_arr['wscol'])
+						weapon_skill = weapon_skill and color_it(weapon_skill, color_arr['wscol']) or ''
 					end
 				elseif msg_ID == 303 then
 					ability = 'Divine Seal'

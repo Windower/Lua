@@ -1,4 +1,4 @@
---Copyright (c) 2013, Thomas Rogers2
+--Copyright (c) 2013, Thomas Rogers
 --All rights reserved.
  
 --Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,7 @@ require 'stringhelper'
  
 _addon = {}
 _addon.name = 'Highlight'
-_addon.version = '0.7' 
+_addon.version = '1.0' 
  
 members={}
 mulenames={}
@@ -39,6 +39,7 @@ modmember={}
 nicknames={}
 color={}
 mulecolor={}
+previousmentions={}
 
 config = require 'config'
  
@@ -61,8 +62,14 @@ defaults.a22 = 200
 defaults.a23 = 481
 defaults.a24 = 483
 defaults.a25 = 208
-  	
-settings=config.load('/data/settings.xml')
+
+
+settingdefaults = {}
+settingdefaults.highlighting = 'Yes'
+
+
+local symbols = require('json').read('../libs/ffxidata.json').chat.chars
+
  
 function event_load()
 	player=get_player()['name']
@@ -70,13 +77,53 @@ function event_load()
 	write(_addon['name']..': Version:'.._addon['version'])
 	if get_ffxi_info()['logged_in'] then
         initialize()
-		player=get_player()['name']
     end
 end
  
+ 
+function event_addon_command(...)
+    
+	cmd = {...}
+	
+	if cmd[1] ~= nil then
+		
+		if cmd[1]:lower() == "help" then
+			write('To view your last mentions type //highlight view <last number>')
+		end
+		
+		
+		if cmd[1]:lower() == 'write' then
+			io.open(lua_base_path..'/logs/'..player..'.txt',"a"):write('\n =='..string.sub(os.date(),0,8)..'== \n'..table.concat(previousmentions, '\n')):close()
+		end
+
+		
+		if cmd[1]:lower() == "view" and cmd[2] == nil then 
+			add_to_chat(4, "==Recent Mentions==")
+			if #previousmentions > 20 then
+				for i=1, 20 do
+					add_to_chat(4, previousmentions[i])
+				end
+			else 
+				for i=1, #previousmentions do
+					add_to_chat(4, previousmentions[i])
+				end
+			end
+		elseif cmd[1]:lower() == "view" and cmd[2] ~=nil then
+			if tonumber(cmd[2]) > #previousmentions then
+				write('Not that many mentions, type //highlight view to show them all')
+			else
+				add_to_chat(4, '==Last '..cmd[2]..' Mentions==')
+				for i=1, tonumber(cmd[2]) do
+					add_to_chat(4, previousmentions[i])
+				end
+			end
+		end
+	end
+end
+ 
 function event_login()
+	settings=config.load(settingdefaults)
 	send_command('wait 2; lua i highlight initialize')
-	player=get_player()['name']
 end
  
 function initialize()
@@ -88,12 +135,14 @@ function initialize()
 	end
 		nicknames=config.load('/data/nicknames.xml')
 		mules=config.load('/data/mules.xml')
-		settings=config.load('/data/settings.xml')
+		settings=config.load(settingdefaults)
  
 	for i, v in pairs(nicknames) do
 		nicknames[i] = string.split(v, ',')
 	end
  
+	player=get_player()['name']
+	
 	for mule, name in pairs(mules) do
 		mulenames[mule]=name
 	end
@@ -109,32 +158,23 @@ function initialize()
 	get_party_members()
 end
  
-function event_chat_message(is_gm, mode, player, message)
-	if mode == 3 then
-		--write('INCOMING TELL!')
-	end
-end
- 
-function event_party_invite(sender_id, sender, region)
-	--write('PARTY INVITATION')
-end
  
 function event_incoming_text(original, modified, color)
 	local me_party = original:find('%('..player..'%)')
 	local me_linkshell = original:find('<'..player..'>')
+	local me_ffochat = original:find('%[%d:#%w+%]'..player..'(%[?%w-%]?):')
+	local other_ffochat = original:find('%[%d:#%w+%]%w+(%[?%w-%]?):')
 	local me_say = original:find(player..' :')
 	local me_tell = '%w+>>'
 	local other_party = original:find('%(.*%)')
 	local other_linkshell = original:find('<.*>')
 	local other_say = original:find('.* :')
 	local not_bm = original:find('.* '..string.char(129,168)..'.*')
- 
-	for names in modified:gmatch('([%p]?[%w]+[%p]?)') do
-	
+	local not_rt = original:find('.* '..symbols['implies']..'.*')
+
+	for names in modified:gmatch('([%w]+)') do
         for name in pairs(members) do
-			if original:lower():gmatch('.*'..members[name]) then
-				modified = modified:igsub(members[name], modmember[name])
-			end
+			modified = modified:igsub(members[name], modmember[name])
         end
  
 		for k,v in pairs(nicknames) do
@@ -143,25 +183,26 @@ function event_incoming_text(original, modified, color)
 		end
  
 		for mule, color in pairs(mulenames) do
-			--	modified = modified:igsub('([^%a])'..mule..'([^%a])', function (pre, app) return '\x1E\x01'..mulecolor[mule]..pre..mule:capitalize()..'\x1E\x01'..app end):igsub('([^%a])'..mule..'$', function(space) return '\x1E\x01'..mulecolor[mule]..space..mule:capitalize()..'\x1E\x01' end)	
 			modified = modified:igsub(mule, mulecolor[mule]..mule:capitalize()..chat.colorcontrols.reset)
 		end	
  
 		if settings.highlighting ~= 'Yes' then
 			modified = modified:gsub('%(['..string.char(0x1e, 0x1f)..'].(%w+)'..'['..string.char(0x1e, 0x1f)..'].%)(.*)', function(name, rest) return '('..name..')'..rest end)			
 			modified = modified:gsub('<['..string.char(0x1e, 0x1f)..'].(%w+)'..'['..string.char(0x1e, 0x1f)..'].>(.*)', function(name, rest) return '<'..name..'>'..rest end)	
-		end
+		end	
 	end
-	if not_bm == nil then
-		if other_party ~= nil or other_linkshell ~= nil then
-			if me_party == nil and me_linkshell == nil and me_say == nil then
+	
+
+	if not_bm == nil and not_rt == nil and color ~= 4 then
+		if other_party ~= nil or other_linkshell ~= nil or other_ffochat ~=nil then
+			if me_party == nil and me_linkshell == nil and me_say == nil and me_ffochat == nil then
 				if modified:match(player) then
-					--write('YOU ARE BEING TALKED ABOUT.')
+					table.insert(previousmentions,1,'['..string.sub(os.date(), 10).."]>> "..original	)
 				end
 			end
 		end
 	end
- 
+
 	return modified
 end
  
@@ -169,7 +210,7 @@ function event_incoming_chunk(id, data)
 	if id == 221 then
 		modmember={}
 		members={}
-		send_command('wait 0.1; lua i highlight get_party_members')
+		send_command('wait 0.4; lua i highlight get_party_members')
 	end
 end
  
