@@ -1,5 +1,5 @@
 **Author:** Ricky Gall  
-**Version:** 2.161 
+**Version:** 2.17 
 **Description:**  
 Replacement for yarnregex for Windower 4 I made for a friend. Uses the chat log so filters must be off. At least until i figure out another way to do it. Keeps track of various event related things. Such as, VW proc messages, mob casting, mob tp moves, TH procs and cor rolls, as well as others. Digi of shiva created the icon and was the driving force behind testing/giving me the idea to do this. Digi also created the default mob list/danger list and chose the name.
 
@@ -14,9 +14,10 @@ Replacement for yarnregex for Windower 4 I made for a friend. Uses the chat log 
  6. track &lt;vw/legion/other/abyssea/meebles/dangerous&gt; &lt;mobname&gt; --Add mob to tracking list. <br/>--dangerous will cause all tpmoves/spell casting to trigger the warning icon/color
  7. untrack &lt;vw/legion/other/abyssea/meebles/dangerous&gt; &lt;mobname&gt; --Remove mob from tracking list.
  8. danger &lt;spell/ws&gt; &lt;dangerword&gt; --Adds danger word to list.
- 9. staggeronly (true/false) --Switches on/off stagger only mode.
- 10. unload --Save settings and close ohShi.
- 11. help --Shows this menu.
+ 9. staggeronly --Toggles stagger only mode.
+ 10. showrolls --Toggles rolltracking mode.
+ 11. unload --Save settings and close ohShi.
+ 12. help --Shows this menu.
  
 **Changes:**
 *v2.1
