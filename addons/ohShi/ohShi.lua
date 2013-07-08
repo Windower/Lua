@@ -224,7 +224,7 @@ function event_addon_command(...)
                             if q < #args then list = list..' ' end
                         end
                         if not settings.moblist[tm]:contains(list) then
-                            settings.moblist[tm]:append(list)
+                            settings.moblist[tm]:add(list)
                             notice('Now tracking '..tm..' mob '..list)
                         else
                             error('Already tracking '..tm..' mob '..list)
@@ -258,7 +258,7 @@ function event_addon_command(...)
                             if q < #args then list = list..' ' end
                         end
                         if settings.moblist[utm]:contains(list) then
-                            settings.moblist[utm]:delete(list)
+                            settings.moblist[utm]:remove(list)
                             notice('No longer tracking '..utm..' mob '..list)
                         else
                             error('You were not tracking '..tm..' mob '..list)
@@ -284,7 +284,7 @@ function event_addon_command(...)
                             if r < #args then list = list..' ' end
                         end
                         if not settings.dangerwords[td]:contains(list) then
-                            settings.dangerwords[td]:append(list)
+                            settings.dangerwords[td]:add(list)
                             notice('Now tracking '..td..' spell '..list)
                         else
                             error('Already tracking '..td..' spell '..list)
@@ -366,18 +366,26 @@ function ohShi_delete()
     send_command('unalias ohShi')
 end
 
+function test()
+    for category,_ in pairs(settings.moblist) do
+        settings.moblist[category]:vprint()
+    end
+end
+
 --This function checks the string sent to it against your mob list
 --returns true if it's found and false if not.
 function mobcheck(tr)
-    local category,names,inc
-    for category,names in pairs(settings.moblist) do
-        if settings.moblist[category]:contains(tr) then
-            if category == 'dangerous' then
-                color2 = '\\cs(255,100,100)'
-                cres = '\\cr'
-                fi = true
+    for category,_ in pairs(settings.moblist) do
+        for name,_ in pairs(settings.moblist[category]) do
+        
+            if tr:contains(name) then
+                if category == 'dangerous' then
+                    color2 = '\\cs(255,100,100)'
+                    cres = '\\cr'
+                    fi = true
+                end
+                return true
             end
-            return true
         end
     end
     return false
@@ -386,10 +394,13 @@ end
 --This function checks the string sent to it against your danger list
 --returns true if it's found and false if not.
 function dangercheck(ts)
-    local category,names,inc
-    for category,names in pairs(settings.dangerwords) do
-        if settings.dangerwords[category]:contains(ts) then
-            return true
+    for category,_ in pairs(settings.dangerwords) do
+        for name,_ in pairs(settings.dangerwords[category]) do
+            if ts:contains(name) then
+                if settings.dangerwords[category]:contains(ts) then
+                    return true
+                end
+            end
         end
     end
     return false
@@ -397,10 +408,6 @@ end
 
 --This event happens when an action packet is received.
 function event_action(act)
-    local color2 = '' -- set the color back to 0 in case it carried over
-    local cres = '' -- set reset back to 0 in case it carried over
-    local fi = false
-    local doanyway = 0
     --Make sure the stagger only mode isn't on
     if not settings.staggeronly then
         --Category 6 is job abilities. This portion of the function gets the
@@ -435,6 +442,10 @@ function event_action(act)
         --due to it being offset, compares it against the abilities table. Then checks
         --it against your danger words and the user against your moblist.
         if act['category'] == 7 and isMob(tonumber(act['actor_id'])) then
+            color2 = '' -- set the color back to 0 in case it carried over
+            cres = '' -- set reset back to 0 in case it carried over
+            fi = false
+            doanyway = 0
             local num = tonumber(act['targets'][1]['actions'][1]['param']) - 256
             if num < 1 then return end
             local wesk = mobAbilities[num]['english']
@@ -455,6 +466,10 @@ function event_action(act)
         
         --Category 8 is spell casting
         if act['category'] == 8 and tonumber(act['targets'][1]['actions'][1]['message']) ~= 16 and isMob(tonumber(act['actor_id'])) then
+            color2 = '' -- set the color back to 0 in case it carried over
+            cres = '' -- set reset back to 0 in case it carried over
+            fi = false
+            doanyway = 0
             local num = tonumber(act['targets'][1]['actions'][1]['param'])
             if num <= 0 then return end
             --Get the name of the spell by taking the spell id and going through the spells table

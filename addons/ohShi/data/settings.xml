@@ -6,17 +6,17 @@
 		<bggreen>0</bggreen>
 		<bgred>0</bgred>
 		<dangerwords>
-			<spells>Meteor, Death, Aeroga IV, Stonega IV, Firaja, Firaga IV, Breakga, cure, Stoneja, Thundaga IV, Blizzaja, Blizzaga IV, Kaustra, Thundaja, Aeroja</spells>
-			<weaponskills>Ballistic Kick, Divesting Gale, Nerve, Chainspell, Mandible Massacre, Provenance Watcher starts, Danse, Geirrothr, Oblivion&apos;s Mantle, Extreme Purgitation, Astral Flow, Gates, Eradicator, Thundris, Beastruction, Raksha Stance, Rancid Reflux, Zantetsuken, Gorge, Fulmination, Slimy Proposal, Pawn&apos;s Penumbra, Yama&apos;s, Frog, Arm Cannon</weaponskills>
+			<spells>Firaja, Blizzaja, Aeroga IV, Firaga IV, Blizzaga IV, Thundaja, Stoneja, Meteor, Aeroja, Breakga, Kaustra, Stonega IV, cure, Thundaga IV, Death</spells>
+			<weaponskills>Zantetsuken, Provenance Watcher starts, Astral Flow, Oblivion&apos;s Mantle, Eradicator, Extreme Purgitation, Gorge, Frog, Pawn&apos;s Penumbra, Raksha Stance, Rancid Reflux, Beastruction, Thundris, Slimy Proposal, Yama&apos;s, Chainspell, Danse, Mandible Massacre, Ballistic Kick, Geirrothr, Gates, Nerve, Fulmination, Divesting Gale, Arm Cannon</weaponskills>
 		</dangerwords>
 		<duration>7</duration>
 		<moblist>
-			<abyssea>Alfard, Orthrus, Glavoid, Isgebind, Carabosse</abyssea>
-			<dangerous>Apademak, Provenance Watcher</dangerous>
-			<legion>Lofty, Veiled, Mired, Soaring, Paramount</legion>
-			<meebles>Samursk, Goldwing, Umagrhk, Melisseus, Izyx, Grannus, Surtr, Silagilith, Dreyruk, Svaha</meebles>
-			<other>Tiamat, Hydra, Khrysokhimaira, Bloodthirsty, Khimaira, Enraged, Dvergr, Cerberus, Odin</other>
-			<voidwatch>Gasha, Kaggen, Mellonia, Asb, Akvan, Cherufe, Ig-Alima, Wazir, Agathos, Morta, Ocythoe, Kalasutrax, Gaunab, Giltine, Bismarck, Uptala, Celaeno, Gugalanna, Botulus Rex, Rukh, Goji, Hahava, Pil, Taweret, Sarbaz, Shah, Aello, Provenance Watcher, Belphoebe, Qilin, Kholomodumo</voidwatch>
+			<abyssea>Isgebind, Orthrus, Carabosse, Alfard, Glavoid</abyssea>
+			<dangerous>Mandragora, Apademak, Provenance Watcher</dangerous>
+			<legion>Mired, Lofty, Veiled, Paramount, Soaring</legion>
+			<meebles>Izyx, Melisseus, Goldwing, Surtr, Grannus, Umagrhk, Silagilith, Dreyruk, Svaha, Samursk</meebles>
+			<other>Odin, Cerberus, Enraged, Bloodthirsty, Tiamat, Dvergr, Hydra, Khrysokhimaira, Khimaira</other>
+			<voidwatch>Wazir, Akvan, Gugalanna, Kholomodumo, Cherufe, Kaggen, Hahava, Taweret, Kalasutrax, Ocythoe, Gaunab, Gasha, Aello, Asb, Provenance Watcher, Botulus Rex, Rukh, Shah, Pil, Qilin, Sarbaz, Agathos, Celaeno, Goji, Ig-Alima, Belphoebe, Morta, Mellonia, Giltine, Bismarck, Uptala</voidwatch>
 		</moblist>
 		<posx>300</posx>
 		<posy>300</posy>
