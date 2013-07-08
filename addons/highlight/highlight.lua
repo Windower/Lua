@@ -159,7 +159,7 @@ end
  
  
 function event_incoming_text(original, modified, color)
-	if S{6,5,8,7,1,13,14,15,11}:contains(color) then
+
 		for names in modified:gmatch('%w+') do
 			for name in pairs(members) do
 				modified = modified:igsub(members[name], modmember[name])
@@ -189,7 +189,6 @@ function event_incoming_text(original, modified, color)
 			end
 		end
 	
-	end
 	return modified
 end
  
