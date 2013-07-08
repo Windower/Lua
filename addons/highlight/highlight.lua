@@ -154,26 +154,13 @@ function initialize()
 	for i,v in pairs(mules) do
 		mulecolor[i]=colconv(v,i)
 	end
- 
 	get_party_members()
 end
  
  
 function event_incoming_text(original, modified, color)
-	local me_party = original:find('%('..player..'%)')
-	local me_linkshell = original:find('<'..player..'>')
-	local me_ffochat = original:find('%[%d:#%w+%]'..player..'(%[?%w-%]?):')
-	local other_ffochat = original:find('%[%d:#%w+%]%w+(%[?%w-%]?):')
-	local me_say = original:find(player..' :')
-	local me_tell = '%w+>>'
-	local other_party = original:find('%(.*%)')
-	local other_linkshell = original:find('<.*>')
-	local other_say = original:find('.* :')
-	local not_bm = original:find('.* '..string.char(129,168)..'.*')
-	local not_rt = original:find('.* '..symbols['implies']..'.*')
-
-	if S{6,5,8,7,1,13,14,15,11}:contains(color)
-		for names in modified:gmatch('([%w]+)') do
+	if S{6,5,8,7,1,13,14,15,11}:contains(color) then
+		for names in modified:gmatch('%w+') do
 			for name in pairs(members) do
 				modified = modified:igsub(members[name], modmember[name])
 			end
@@ -192,12 +179,14 @@ function event_incoming_text(original, modified, color)
 				modified = modified:gsub('<['..string.char(0x1e, 0x1f)..'].(%w+)'..'['..string.char(0x1e, 0x1f)..'].>(.*)', function(name, rest) return '<'..name..'>'..rest end)	
 			end	
 	end
-	
-		if not_bm == nil and not_rt == nil and color ~= 4 then
-			if other_party ~= nil or other_linkshell ~= nil or other_ffochat ~=nil then
-				if me_party == nil and me_linkshell == nil and me_say == nil and me_ffochat == nil then
+		--Not rolltracker and not battlemod
+		if original:match('.* '..string.char(129,168)..'.*') == nil and original:match('.* '..symbols['implies']..'.*') == nil and color ~= 4 then
+			--Chat modes not empty
+			if original:match('^%(.*%)') ~= nil or original:match('^<.*>') ~= nil or original:match('^%[%d:#%w+%]%w+(%[?%w-%]?):') ~=nil then
+				--Not myself
+				if original:match('^%('..player..'%)') == nil and original:match('^<'..player..'>') == nil and original:match('^'..player..' :') == nil and original:match('^%[%d:#%w+%]'..player..'(%[?%w-%]?):') == nil then
 					if modified:match(player) then
-						table.insert(previousmentions,1,'['..string.sub(os.date(), 10).."]>> "..original	)
+						table.insert(previousmentions,1,'['..string.sub(os.date(), 10).."]>> "colconv(mode)..original	)
 					end
 				end
 			end
