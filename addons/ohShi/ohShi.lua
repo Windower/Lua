@@ -366,12 +366,6 @@ function ohShi_delete()
     send_command('unalias ohShi')
 end
 
-function test()
-    for category,_ in pairs(settings.moblist) do
-        settings.moblist[category]:vprint()
-    end
-end
-
 --This function checks the string sent to it against your mob list
 --returns true if it's found and false if not.
 function mobcheck(tr)
