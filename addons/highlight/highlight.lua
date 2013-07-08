@@ -177,11 +177,11 @@ function event_incoming_text(original, modified, color)
 			end	
 	end
 		--Not rolltracker and not battlemod
-		if original:match('.* '..string.char(129,168)..'.*') == nil and original:match('.* '..symbols['implies']..'.*') == nil and color ~= 4 then
+		if not original:match('.* '..string.char(129,168)..'.*') and not original:match('.* '..symbols['implies']..'.*') and color ~= 4 then
 			--Chat modes not empty
-			if original:match('^%(.*%)') ~= nil or original:match('^<.*>') ~= nil or original:match('^%[%d:#%w+%]%w+(%[?%w-%]?):') ~=nil then
+			if original:match('^%(.*%)') or original:match('^<.*>') or original:match('^%[%d:#%w+%]%w+(%[?%w-%]?):') then
 				--Not myself
-				if original:match('^%('..player..'%)') == nil and original:match('^<'..player..'>') == nil and original:match('^'..player..' :') == nil and original:match('^%[%d:#%w+%]'..player..'(%[?%w-%]?):') == nil then
+				if not original:match('^%('..player..'%)') and not original:match('^<'..player..'>') and not original:match('^'..player..' :') and not original:match('^%[%d:#%w+%]'..player..'(%[?%w-%]?):') then
 					if modified:match(player) then
 						table.insert(previousmentions,1,'['..string.sub(os.date(), 10).."]>> "..colconv(color)..original	)
 					end
