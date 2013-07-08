@@ -172,7 +172,7 @@ function event_incoming_text(original, modified, color)
 	local not_bm = original:find('.* '..string.char(129,168)..'.*')
 	local not_rt = original:find('.* '..symbols['implies']..'.*')
 
-	if color == 6 or color == 5 or color == 8 or color==7 or color == 1 or color == 14 or color == 15 or color == 11 then
+	if color == 6 or color == 5 or color == 8 or color==7 or color == 1 or color == 13 or color == 14 or color == 15 or color == 11 then
 		for names in modified:gmatch('([%w]+)') do
 			for name in pairs(members) do
 				modified = modified:igsub(members[name], modmember[name])
