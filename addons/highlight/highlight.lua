@@ -164,16 +164,13 @@ function event_incoming_text(original, modified, color)
 			for name in pairs(members) do
 				modified = modified:igsub(members[name], modmember[name])
 			end
-	 
 			for k,v in pairs(nicknames) do
 				for z=1, #v do	
 					modified = modified:igsub('([^%a])'..nicknames[k][z]..'([^%a])', function (pre, app) return pre..k:capitalize()..app end):igsub('([^%a])'..nicknames[k][z]..'$', function(space) return space..k:capitalize() end)			end	
 			end
-	 
 			for mule, color in pairs(mulenames) do
 				modified = modified:igsub(mule, mulecolor[mule]..mule:capitalize()..chat.colorcontrols.reset)
 			end	
-	 
 			if settings.highlighting ~= 'Yes' then
 				modified = modified:gsub('%(['..string.char(0x1e, 0x1f)..'].(%w+)'..'['..string.char(0x1e, 0x1f)..'].%)(.*)', function(name, rest) return '('..name..')'..rest end)			
 				modified = modified:gsub('<['..string.char(0x1e, 0x1f)..'].(%w+)'..'['..string.char(0x1e, 0x1f)..'].>(.*)', function(name, rest) return '<'..name..'>'..rest end)	
@@ -186,14 +183,13 @@ function event_incoming_text(original, modified, color)
 				--Not myself
 				if original:match('^%('..player..'%)') == nil and original:match('^<'..player..'>') == nil and original:match('^'..player..' :') == nil and original:match('^%[%d:#%w+%]'..player..'(%[?%w-%]?):') == nil then
 					if modified:match(player) then
-						table.insert(previousmentions,1,'['..string.sub(os.date(), 10).."]>> "colconv(mode)..original	)
+						table.insert(previousmentions,1,'['..string.sub(os.date(), 10).."]>> "..colconv(color)..original	)
 					end
 				end
 			end
 		end
 	
 	end
-
 	return modified
 end
  
