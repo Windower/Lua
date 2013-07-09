@@ -40,7 +40,7 @@ nicknames={}
 color={}
 mulecolor={}
 previousmentions={}
-
+ 
 config = require 'config'
  
 defaults = {}
@@ -62,18 +62,19 @@ defaults.a22 = 200
 defaults.a23 = 481
 defaults.a24 = 483
 defaults.a25 = 208
-
-
+ 
+ 
 settingdefaults = {}
 settingdefaults.highlighting = 'Yes'
-
-
+ 
+ 
 local symbols = require('json').read('../libs/ffxidata.json').chat.chars
-
+ 
  
 function event_load()
-	player=get_player()['name']
-	send_command('alias highlight lua c highlight')
+    send_count = 0 
+    called_count = 0
+    send_command('alias highlight lua c highlight')
 	write(_addon['name']..': Version:'.._addon['version'])
 	if get_ffxi_info()['logged_in'] then
         initialize()
@@ -92,10 +93,11 @@ function event_addon_command(...)
 		end
 		
 		
+		
 		if cmd[1]:lower() == 'write' then
 			io.open(lua_base_path..'/logs/'..player..'.txt',"a"):write('\n =='..string.sub(os.date(),0,8)..'== \n'..table.concat(previousmentions, '\n')):close()
 		end
-
+ 
 		
 		if cmd[1]:lower() == "view" and cmd[2] == nil then 
 			add_to_chat(4, "==Recent Mentions==")
@@ -159,7 +161,7 @@ end
  
  
 function event_incoming_text(original, modified, color)
-
+ 
 		for names in modified:gmatch('%w+') do
 			for name in pairs(members) do
 				modified = modified:igsub(members[name], modmember[name])
@@ -196,7 +198,8 @@ function event_incoming_chunk(id, data)
 	if id == 221 then
 		modmember={}
 		members={}
-		send_command('wait 0.4; lua i highlight get_party_members')
+        send_count = send_count + 1
+		send_command('wait 0.1; lua i highlight get_party_members')
 	end
 end
  
@@ -219,7 +222,14 @@ function colconv(str,key)
 end
  
  
+called_count = 0
 function get_party_members()
+    called_count = called_count + 1
+    if called_count ~= send_count then
+        return
+    end
+    called_count = 0
+    send_count = 0
 	if settings.highlighting == 'Yes' then
 		for member, member_tb in pairs(get_party()) do
 			if not table.containskey(mulenames, member_tb['name']:lower()) then
