@@ -1012,7 +1012,7 @@
  <m id="1008" english="Turbofan" targetstatus="6"/>
  <m id="1009" english="Smoke Discharger" targetstatus="5"/>
  <m id="1010" english="High-Tension Discharger" targetstatus="10"/>
- <m id="1011" english="Hydro Canon" targetstatus="3"/>
+ <m id="1011" english="Hydro Cannon" targetstatus="3"/>
  <m id="1012" english="Nuclear Waste"/>
  <m id="1013" english="Chemical Bomb" targetstatus="13,194"/>
  <m id="1014" english="Particle Shield" actorstatus="93"/>
@@ -1902,7 +1902,7 @@
  <m id="1898" english="Delta Thrust" targetstatus="31"/>
  <m id="1899" english="Torpefying Charge" targetstatus="4"/>
  <m id="1900" english="Grim Glower" targetstatus="7"/>
- <m id="1901" english="Calcifiying Mist" targetstatus="18"/>
+ <m id="1901" english="Calcifying Mist" targetstatus="18"/>
  <m id="1902" english="Insipid Nip"/>
  <m id="1903" english="Pandemic Nip"/>
  <m id="1904" english="Bombilation"/>
@@ -2561,7 +2561,7 @@
  <m id="2557" english="Dunur Strike"/>
  <m id="2558" english="Yawn" targetstatus="2"/>
  <m id="2559" english="Wing Slap" targetstatus="10"/>
- <m id="2560" english="Beak Lunger"/>
+ <m id="2560" english="Beak Lunge"/>
  <m id="2561" english="Frigid Shuffle" targetstatus="4"/>
  <m id="2562" english="Wing Whirl"/>
  <m id="2563" english="Whiteout" targetstatus="2,20"/>
@@ -2798,7 +2798,7 @@
  <m id="2794" english="Tegmina Buffet" targetstatus="130"/>
  <m id="2795" english="Mending Halation"/>
  <m id="2796" english="Radial Arcana"/>
- <m id="2797" english="."/>
+ <m id="2797" english="#1261"/>
  <m id="2798" english="."/>
  <m id="2799" english="."/>
  <m id="2800" english="."/>
