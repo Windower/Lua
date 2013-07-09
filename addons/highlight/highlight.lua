@@ -225,7 +225,7 @@ end
 called_count = 0
 function get_party_members()
     called_count = called_count + 1
-    if called_count ~= send_count then
+    if called_count ~= send_count and send_count ~= 0 then
         return
     end
     called_count = 0
