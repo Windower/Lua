@@ -141,7 +141,7 @@ thunderii={absolute=false,spell_ID=165,abil_ID=625,funct=smn_sub,info=T{4,5,8,20
 function ambig(key)
 	local abil_type
 	if ambig_names[key] == nil then
-		--write(tostring(key))
+		write('Shortcuts Bug: '..tostring(key))
 		return
 	end
 	if ambig_names[key].absolute then
