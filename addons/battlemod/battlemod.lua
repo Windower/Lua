@@ -104,10 +104,10 @@ end
 function filterload(job)	
 	if file.exists('data/filters/filters-'..job..'.xml') then
 		filter = config.load('data/filters/filters-'..job..'.xml',default_filter_table,false)
-		add_to_chat(12,'Loaded '..job..' Battlemod filters')
+		add_to_chat(4,'Loaded '..job..' Battlemod filters')
 	else
 		filter = config.load('data/filters/filters.xml',default_filter_table,false)
-		add_to_chat(12,'Loaded default Battlemod filters')
+		add_to_chat(4,'Loaded default Battlemod filters')
 	end
 end
 
