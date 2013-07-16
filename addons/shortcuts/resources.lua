@@ -37,7 +37,7 @@ r_spells = parse_resources(speFile:readlines())
 validabils = T{}
 
 function make_abil(abil,t,i)
-	if abil:sub(1,1) == '#' or string.find(abil:lower(),'magic') then return end
+	if abil:sub(1,1) == '#' or string.find(abil:lower(),'magic'..string.char(0x40)) then return end
 	ind = strip(abil)
 	if not rawget(validabils,ind) then
 		validabils[ind] = {}
@@ -102,7 +102,7 @@ command2_list = {['/kick']=true,['/assist']=true,['/alliancecmd']=T{'kick','add'
 	['/smile']=T{'motion'},['/stagger']=T{'motion'},['/stare']=T{'motion'},['/sulk']=T{'motion'},['/surprised']=T{'motion'},['/think']=T{'motion'},['/toss']=T{'motion'},['/upset']=T{'motion'},['/welcome']=T{'motion'},
 	['/check']=true,['/c']=true,['/breaklinkshell']=true,['/target']=true,['/ta']=true}
 
-ignore_list = {['/equip']=true,['/raw']=true,['/fish']=true,['/dig']=true,['/range']=true}
+ignore_list = {['/equip']=true,['/raw']=true,['/fish']=true,['/dig']=true,['/range']=true,['/map']=true}
 
 pass_through_targs = T{'<t>','<me>','<ft>','<scan>','<bt>','<lastst>','<r>','<pet>','<p0>','<p1>','<p2>','<p3>','<p4>',
 	'<p5>','<a10>','<a11>','<a12>','<a13>','<a14>','<a15>','<a20>','<a21>','<a22>','<a23>','<a24>','<a25>'}
