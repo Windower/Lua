@@ -161,7 +161,8 @@ end
  
  
 function event_incoming_text(original, modified, color)
- 
+	
+	if not original:match('%[.*%] .* '..string.char(129,168)..'.*') and not original:match('.* '..symbols['implies']..'.*') then
 		for names in modified:gmatch('%w+') do
 			for name in pairs(members) do
 				modified = modified:igsub(members[name], modmember[name])
@@ -177,6 +178,8 @@ function event_incoming_text(original, modified, color)
 				modified = modified:gsub('%(['..string.char(0x1e, 0x1f)..'].(%w+)'..'['..string.char(0x1e, 0x1f)..'].%)(.*)', function(name, rest) return '('..name..')'..rest end)			
 				modified = modified:gsub('<['..string.char(0x1e, 0x1f)..'].(%w+)'..'['..string.char(0x1e, 0x1f)..'].>(.*)', function(name, rest) return '<'..name..'>'..rest end)	
 			end	
+	end
+	
 	end
 		--Not rolltracker and not battlemod
 		if not original:match('.* '..string.char(129,168)..'.*') and not original:match('.* '..symbols['implies']..'.*') and color ~= 4 then
