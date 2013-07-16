@@ -199,7 +199,7 @@ function event_incoming_chunk(id, data)
 		modmember={}
 		members={}
         send_count = send_count + 1
-		send_command('wait 0.1; lua i highlight get_party_members')
+		send_command('@wait 0.1; lua i highlight get_party_members')
 	end
 end
  
