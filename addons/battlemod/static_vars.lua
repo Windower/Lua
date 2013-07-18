@@ -84,12 +84,12 @@ message_map['No effect'] = T{283,423,659} -- generic "no effect" messages for so
 message_map[432] = T{433} -- Receives: Spell, Target
 message_map[82] = T{230,236,237,268,271} -- Receives: Spell, Target, Status
 message_map[116] = T{131,134,144,146,148,150,364,414,416,441,602,668,285,145,147,149,151,286,287,365,415,421} -- Receives: Ability, Target
-message_map[127]=T{319,320,645,266,267} -- Receives: Ability, Target, Status
+message_map[127]=T{319,320,645} -- Receives: Ability, Target, Status
 message_map[420]=T{424} -- Receives: Ability, Target, Status, Number
 message_map[375] = T{412}-- Receives: Item, Target, Status
 --	message_map[166] =  -- receives additional effect
 message_map[186] = T{194,242,243}-- Receives: Weapon skill, Target, Status
-message_map['Receives'] = T{203,205,270,272,277,279,280,267,269,278} -- 266
+message_map['Receives'] = T{203,205,270,272,277,279,280,266,267,269,278} -- 266
 message_map[426] = T{427} -- Loses
 
 
