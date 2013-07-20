@@ -145,8 +145,8 @@ function ambig(key)
 		return
 	end
 	if ambig_names[key].absolute then
-		if spell_ID then return r_spells[ambig_names[key].spell_ID]
-		elseif abil_ID then return r_abilities[ambig_names[key].abil_ID]
+		if ambig_names[key].spell_ID then return r_spells[ambig_names[key].spell_ID]
+		elseif ambig_names[key].abil_ID then return r_abilities[ambig_names[key].abil_ID]
 		end
 	else
 		abil_type=ambig_names[key]['funct'](get_player(),ambig_names[key].info)
