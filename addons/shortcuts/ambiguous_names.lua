@@ -89,6 +89,8 @@ netherspikes={absolute=true,abil_id=1009},
 carnalnightmare={absolute=true,abil_id=1010},
 aegisschism={absolute=true,abil_id=1011},
 dancingchains={absolute=true,abil_id=1012},
+
+berserk={absolute=true,spell_ID=31},
  
 fireiv={absolute=false,spell_ID=147,abil_ID=549,funct=smn_unsub,info=60},
 stoneiv={absolute=false,spell_ID=162,abil_ID=565,funct=smn_unsub,info=60},
