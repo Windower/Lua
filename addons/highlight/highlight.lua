@@ -198,10 +198,9 @@ function event_incoming_text(original, modified, color)
 end
  
 function event_incoming_chunk(id, data)
-	if id == 221 then
+	if id == 0x0C8 then
 		modmember={}
 		members={}
-        send_count = send_count + 1
 		send_command('@wait 0.1; lua i highlight get_party_members')
 	end
 end
@@ -224,15 +223,9 @@ function colconv(str,key)
 	return out
 end
  
- 
-called_count = 0
+
 function get_party_members()
-    called_count = called_count + 1
-    if called_count ~= send_count and send_count ~= 0 then
-        return
-    end
-    called_count = 0
-    send_count = 0
+
 	if settings.highlighting == 'Yes' then
 		for member, member_tb in pairs(get_party()) do
 			if not table.containskey(mulenames, member_tb['name']:lower()) then
