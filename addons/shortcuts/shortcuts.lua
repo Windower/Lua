@@ -40,13 +40,25 @@ _addon.name = 'Shortcuts'
 _addon.commands = {'shortcuts'}
 
 function event_load()
+	if dir_exists('../addons/shortcuts/data/') then
+		logging = false
+		logfile = io.open('../addons/shortcuts/data/NormalLog'..tostring(os.clock())..'.log','w+')
+		logfile:write('\n\n','SHORTCUTS LOGGER HEADER: ',tostring(os.clock()),'\n')
+	end
 	counter = 0
 	debugging = false
 	lastsent = 'MAUSMAUSMAUSMAUSMAUSMAUSMAUSMAUS'
 	collectgarbage()
 end
 
+function event_unload()
+	if logging then	logfile:close()	end
+end
+
 function event_outgoing_text(original,modified)
+--	if logging then
+--		logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\nModified: ',modified)
+--	end
 	if counter>0 then
 		local dtime = os.clock() - timestamp
 		if dtime > 0.2 then
@@ -55,9 +67,9 @@ function event_outgoing_text(original,modified)
 			counter = counter +1
 		end
 		if counter == 36 then
-			if dir_exists('../addons/shortcuts/data/') then
-				f = io.open('../addons/shortcuts/data/'..tostring(os.clock())..'.log','w+')
-				f:write('Probable infinite loop detected in Shortcuts: '..tostring(lastsent)..'\n')
+			if logging then
+				f = io.open('../addons/shortcuts/data/loopdetect'..tostring(os.clock())..'.log','w+')
+				f:write('Probable infinite loop detected in Shortcuts: ',tostring(lastsent),'\n',tostring(os.clock()),'Original: ',tostring(original))
 				f:close()
 			end
 			add_to_chat(8,'Probable infinite loop detected in Shortcuts: '..tostring(lastsent)..'\7Please tell Byrth what you were doing')
@@ -98,6 +110,7 @@ function command_logic(original,modified)
 			local temptarg = valid_target(splitline[#splitline]) or target_make({validtarget={['Player']=true,['Enemy']=true,['Self']=true}})
 			lastsent = command..' '..temptarg
 			if debugging then add_to_chat(8,tostring(counter)..' input '..lastsent) end
+			if logging then logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\n(113) ',lastsent) 	end
 			send_command('@input '..lastsent)
 			return ''
 		else
@@ -124,11 +137,13 @@ function command_logic(original,modified)
 			end
 			lastsent = tempcmd..' '..temptarg
 			if debugging then add_to_chat(8,tostring(counter)..' input '..lastsent) end
+			if logging then logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\n(140) ',lastsent) 	end
 			send_command('@input '..lastsent)
 			return ''
 		end
 	elseif (command2_list[command] and valid_target(splitline[#splitline],true)) or (command == '/hide') or (command_list[command] and validabils[(spell or ''):lower():gsub(' ',''):gsub('[^%w]','')] and valid_target(splitline[#splitline])) then
 		lastsent = ''
+		if logging then logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\n(146) BLANK') 	end
 		return modified
 	elseif command_list[command] then
 		return interp_text(splitline,1,modified)
@@ -162,6 +177,7 @@ function interp_text(splitline,offset,modified)
 		end
 		lastsent = r_line['prefix']..' "'..r_line['english']..'" '..(temptarg or target_make(r_line))
 		if debugging then add_to_chat(8,tostring(counter)..' input '..lastsent) end
+		if logging then logfile:write('\n\n',tostring(os.clock()),'Original: ',table.concat(splitline,' '),'\n(180) ',lastsent) 	end
 		send_command('@input '..lastsent)
 		return ''
 	end
