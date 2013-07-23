@@ -98,7 +98,7 @@ function command_logic(original,modified)
 			local temptarg = valid_target(splitline[#splitline]) or target_make({validtarget={['Player']=true,['Enemy']=true,['Self']=true}})
 			lastsent = command..' '..temptarg
 			if debugging then add_to_chat(8,tostring(counter)..' input '..lastsent) end
-			send_command('input '..lastsent)
+			send_command('@input '..lastsent)
 			return ''
 		else
 			local tempcmd = command
@@ -124,7 +124,7 @@ function command_logic(original,modified)
 			end
 			lastsent = tempcmd..' '..temptarg
 			if debugging then add_to_chat(8,tostring(counter)..' input '..lastsent) end
-			send_command('input '..lastsent)
+			send_command('@input '..lastsent)
 			return ''
 		end
 	elseif (command2_list[command] and valid_target(splitline[#splitline],true)) or (command == '/hide') or (command_list[command] and validabils[(spell or ''):lower():gsub(' ',''):gsub('[^%w]','')] and valid_target(splitline[#splitline])) then
@@ -162,7 +162,7 @@ function interp_text(splitline,offset,modified)
 		end
 		lastsent = r_line['prefix']..' "'..r_line['english']..'" '..(temptarg or target_make(r_line))
 		if debugging then add_to_chat(8,tostring(counter)..' input '..lastsent) end
-		send_command('input '..lastsent)
+		send_command('@input '..lastsent)
 		return ''
 	end
 	lastsent = ''

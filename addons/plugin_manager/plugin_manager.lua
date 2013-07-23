@@ -53,7 +53,7 @@ function event_load()
 	load_settings()
 	if get_player().name ~= '' then
 		unload_plugins()
-		send_command('wait 5;lua c plugin_manager load')
+		send_command('@wait 5;lua c plugin_manager load')
 	end
 end
 

@@ -39,7 +39,7 @@ end
 function event_chat_message(isGM, mode, player, message)
 	if mode==3 and current_r~=player then
 		current_r=player
-		send_command('alias r input /tell '..current_r)
+		send_command('@alias r input /tell '..current_r)
 	end
 end
 
@@ -50,7 +50,7 @@ function event_incoming_text(original, modified, color)
 			local name = original:sub(10,a-1)
 			if current_r ~= name then
 				current_r = name
-				send_command('alias r input /pm '..current_r)
+				send_command('@alias r input /pm '..current_r)
 			end
 		end
 	end
