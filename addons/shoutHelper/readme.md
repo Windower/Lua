@@ -35,8 +35,11 @@ Command list:
 * POS <x> <y>
   Positions the alliance list to the given coordinates
 
-* Clear
-  Clears the alliance list.
+* Clear [<party>]
+  Clears the alliance list if no <party> is given. It will clear all the jobs
+  only on <party> list if <party> is given.
+  <party> formats are 'party1', 'pt1', '1', 'party2', 'pt2', '2',
+  'party3', 'pt3', '3'
 
 * SET <party> <job1> <job2> ...
   Insert the <job> into the <party> list.
@@ -87,5 +90,5 @@ Caveats:
 * This addon is still in development. Please report any issues or feedback to
   to me (Jandel on Ragnarok) on FFXIAH or Guildwork.
 
-Thanks to Grievesk for encouraging me to write this addons :)
+Thanks to Grievesk for encouraging me to write this addon :)
 
