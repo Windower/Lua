@@ -67,7 +67,7 @@ function event_addon_command(...)
             add_to_chat(color, 'SH: ShoutHelper v' .. _addon.version .. '. Author: Jandel')
             add_to_chat(color, 'SH: sh help : Shows help message')
             add_to_chat(color, 'SH: sh pos <x> <y> : Positions the list')
-            add_to_chat(color, 'SH: sh clear : Reset list.')--????(cancella la lista corrente)
+            add_to_chat(color, 'SH: sh clear [<party>]: Reset list (if no party is given, it will reset all alliance).')
             --the following two line are commented because there's no function implemented
             --add_to_chat(color, 'SH: sh save <filename> : Save alliance settings. If the file already exists it will overwrite it.')
             --add_to_chat(color, 'SH: sh load <filename>  : Load the <filename> alliance settings.')
@@ -88,7 +88,7 @@ function event_addon_command(...)
                 end
             end
         elseif params[1]:lower() == "clear" then
-            lavagna:reset()
+            lavagna:reset(params[2])
 	--elseif params[1]:lower() == "save" then
             --if --[[the filename isn't legit(emplty string too)]] --then
 		--error('Invalid name')
