@@ -22,7 +22,7 @@ function event_addon_command(...)
 end
 
 function event_load()
-	send_command('alias daze lua c daze')
+	send_command('@alias daze lua c daze')
 	tb_create('daze_box')
 	tb_set_bg_color('daze_box',200,30,30,30)
 	tb_set_color('daze_box',255,200,200,200)
@@ -37,7 +37,7 @@ function event_load()
 end
 
 function event_unload()
-	send_command('unalias daze')
+	send_command('@unalias daze')
 	tb_delete('daze_box')
 end
 

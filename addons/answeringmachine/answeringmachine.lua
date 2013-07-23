@@ -79,13 +79,13 @@ function event_addon_command(...)
 end
 
 function event_load()
-	send_command('alias am lua c answeringmachine')
+	send_command('@alias am lua c answeringmachine')
 	tell_table = {}
 	recording = {}
 end
 
 function event_unload()
-	send_command('unalias am')
+	send_command('@unalias am')
 end
 
 function event_chat_message(isGM, mode, player, message)
@@ -99,7 +99,7 @@ function event_chat_message(isGM, mode, player, message)
 			recording[player:upper()] = {message}
 			if away_msg ~= nil then
 				if isGM ~= 1 then
-					send_command('input /tell '..player..' '..away_msg)
+					send_command('@input /tell '..player..' '..away_msg)
 				end
 			end
 		end

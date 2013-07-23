@@ -421,7 +421,7 @@
  <m id="417" english="Dark Nova"/>
  <m id="418" english="Crystal Shield" actorstatus="40"/>
  <m id="419" english="Heavy Strike"/>
- <m id="420" english="Ice Break" targetstatus="12"/>
+ <m id="420" english="Ice Break" targetstatus="11"/>
  <m id="421" english="Thunder Break" targetstatus="10"/>
  <m id="422" english="Crystal Rain"/>
  <m id="423" english="Crystal Weapon"/>
@@ -1012,7 +1012,7 @@
  <m id="1008" english="Turbofan" targetstatus="6"/>
  <m id="1009" english="Smoke Discharger" targetstatus="5"/>
  <m id="1010" english="High-Tension Discharger" targetstatus="10"/>
- <m id="1011" english="Hydro Canon" targetstatus="3"/>
+ <m id="1011" english="Hydro Cannon" targetstatus="3"/>
  <m id="1012" english="Nuclear Waste"/>
  <m id="1013" english="Chemical Bomb" targetstatus="13,194"/>
  <m id="1014" english="Particle Shield" actorstatus="93"/>
@@ -1395,7 +1395,7 @@
  <m id="1391" english="Berserk" actorstatus="56"/>
  <m id="1392" english="Crystal Shield" actorstatus="40"/>
  <m id="1393" english="Heavy Strike"/>
- <m id="1394" english="Ice Break" targetstatus="12"/>
+ <m id="1394" english="Ice Break" targetstatus="11"/>
  <m id="1395" english="Thunder Break" targetstatus="10"/>
  <m id="1396" english="Crystal Rain"/>
  <m id="1397" english="Crystal Weapon"/>
@@ -1772,7 +1772,7 @@
  <m id="1768" english="Tourbillion" targetstatus="149"/>
  <m id="1769" english="Dreadstorm" targetstatus="28"/>
  <m id="1770" english="Fossilizing Breath" targetstatus="7"/>
- <m id="1771" english="Plague Swipe" targetstatus="31"/>
+ <m id="1771" english="Plague Swipe" targetstatus="31,135"/>
  <m id="1772" english="Fulmination" targetstatus="4,10"/>
  <m id="1773" english="."/>
  <m id="1774" english="."/>
@@ -1902,7 +1902,7 @@
  <m id="1898" english="Delta Thrust" targetstatus="31"/>
  <m id="1899" english="Torpefying Charge" targetstatus="4"/>
  <m id="1900" english="Grim Glower" targetstatus="7"/>
- <m id="1901" english="Calcifiying Mist" targetstatus="18"/>
+ <m id="1901" english="Calcifying Mist" targetstatus="18"/>
  <m id="1902" english="Insipid Nip"/>
  <m id="1903" english="Pandemic Nip"/>
  <m id="1904" english="Bombilation"/>
@@ -2561,7 +2561,7 @@
  <m id="2557" english="Dunur Strike"/>
  <m id="2558" english="Yawn" targetstatus="2"/>
  <m id="2559" english="Wing Slap" targetstatus="10"/>
- <m id="2560" english="Beak Lunger"/>
+ <m id="2560" english="Beak Lunge"/>
  <m id="2561" english="Frigid Shuffle" targetstatus="4"/>
  <m id="2562" english="Wing Whirl"/>
  <m id="2563" english="Whiteout" targetstatus="2,20"/>
@@ -2796,70 +2796,70 @@
  <m id="2792" english="Deadening Haze" targetstatus="6"/>
  <m id="2793" english="Sensilla Blades"/>
  <m id="2794" english="Tegmina Buffet" targetstatus="130"/>
- <m id="2795" english="#1259"/>
- <m id="2796" english="#1260"/>
+ <m id="2795" english="Mending Halation"/>
+ <m id="2796" english="Radial Arcana"/>
  <m id="2797" english="#1261"/>
- <m id="2798" english="#1262"/>
- <m id="2799" english="#1263"/>
- <m id="2800" english="#1264"/>
- <m id="2801" english="#1265"/>
- <m id="2802" english="#1266"/>
- <m id="2803" english="#1267"/>
- <m id="2804" english="#1268"/>
- <m id="2805" english="#1269"/>
- <m id="2806" english="#1270"/>
- <m id="2807" english="#1271"/>
- <m id="2808" english="#1272"/>
- <m id="2809" english="#1273"/>
- <m id="2810" english="#1274"/>
- <m id="2811" english="#1275"/>
- <m id="2812" english="#1276"/>
- <m id="2813" english="#1277"/>
- <m id="2814" english="#1278"/>
- <m id="2815" english="#1279"/>
- <m id="2816" english="#1280"/>
- <m id="2817" english="#1281"/>
- <m id="2818" english="#1282"/>
- <m id="2819" english="#1283"/>
- <m id="2820" english="#1284"/>
- <m id="2821" english="#1285"/>
- <m id="2822" english="#1286"/>
- <m id="2823" english="#1287"/>
- <m id="2824" english="#1288"/>
- <m id="2825" english="#1289"/>
- <m id="2826" english="#1290"/>
- <m id="2827" english="#1291"/>
- <m id="2828" english="#1292"/>
- <m id="2829" english="#1293"/>
- <m id="2830" english="#1294"/>
- <m id="2831" english="#1295"/>
- <m id="2832" english="#1296"/>
- <m id="2833" english="#1297"/>
- <m id="2834" english="#1298"/>
- <m id="2835" english="#1299"/>
- <m id="2836" english="#1300"/>
- <m id="2837" english="#1301"/>
- <m id="2838" english="#1302"/>
- <m id="2839" english="#1303"/>
- <m id="2840" english="#1304"/>
- <m id="2841" english="#1305"/>
- <m id="2842" english="#1306"/>
- <m id="2843" english="#1307"/>
- <m id="2844" english="#1308"/>
- <m id="2845" english="#1309"/>
- <m id="2846" english="#1310"/>
- <m id="2847" english="#1311"/>
- <m id="2848" english="#1312"/>
- <m id="2849" english="#1313"/>
- <m id="2850" english="#1314"/>
- <m id="2851" english="#1315"/>
- <m id="2852" english="#1316"/>
- <m id="2853" english="#1317"/>
- <m id="2854" english="#1318"/>
- <m id="2855" english="#1319"/>
- <m id="2856" english="#1320"/>
- <m id="2857" english="#1321"/>
- <m id="2858" english="#1322"/>
+ <m id="2798" english="."/>
+ <m id="2799" english="."/>
+ <m id="2800" english="."/>
+ <m id="2801" english="Root of the Problem"/>
+ <m id="2802" english="Potted Plant"/>
+ <m id="2803" english="Uproot"/>
+ <m id="2804" english="Canopierce"/>
+ <m id="2805" english="Firefly Fandango"/>
+ <m id="2806" english="Tiiimbeeer"/>
+ <m id="2807" english="Molting Plumage"/>
+ <m id="2808" english="Pentapeck"/>
+ <m id="2809" english="Swooping Frenzy"/>
+ <m id="2810" english="From the Skies"/>
+ <m id="2811" english="."/>
+ <m id="2812" english="."/>
+ <m id="2813" english="."/>
+ <m id="2814" english="."/>
+ <m id="2815" english="."/>
+ <m id="2816" english="Crashing Thunder"/>
+ <m id="2817" english="Reverberating Cry"/>
+ <m id="2818" english="Brownout"/>
+ <m id="2819" english="Reverse Current"/>
+ <m id="2820" english="Sparkstorm"/>
+ <m id="2821" english="Static Prison"/>
+ <m id="2822" english="."/>
+ <m id="2823" english="."/>
+ <m id="2824" english="."/>
+ <m id="2825" english="Velkkan Ambush"/>
+ <m id="2826" english="Galumph"/>
+ <m id="2827" english="Coming Through"/>
+ <m id="2828" english="Merciless Mauling"/>
+ <m id="2829" english="Croctastrophy"/>
+ <m id="2830" english="."/>
+ <m id="2831" english="Battle Trance"/>
+ <m id="2832" english="."/>
+ <m id="2833" english="."/>
+ <m id="2834" english="."/>
+ <m id="2835" english="Baneful Blades"/>
+ <m id="2836" english="Wildwood Indignation"/>
+ <m id="2837" english="Dryad's Kiss"/>
+ <m id="2838" english="Infected Illusion"/>
+ <m id="2839" english="Depraved Dandia"/>
+ <m id="2840" english="Matriarchal Fiat"/>
+ <m id="2841" english="Tickling Tendrils"/>
+ <m id="2842" english="Stink Bomb"/>
+ <m id="2843" english="Nectarous Deluge"/>
+ <m id="2844" english="Nepenthic Plunge"/>
+ <m id="2845" english="Infaunal Flop"/>
+ <m id="2846" english="."/>
+ <m id="2847" english="Ignis"/>
+ <m id="2848" english="Gelus"/>
+ <m id="2849" english="Flabra"/>
+ <m id="2850" english="Tellus"/>
+ <m id="2851" english="Sulpor"/>
+ <m id="2852" english="Unda"/>
+ <m id="2853" english="Lux"/>
+ <m id="2854" english="Tenebrae"/>
+ <m id="2855" english="Vallation"/>
+ <m id="2856" english="Pflug"/>
+ <m id="2857" english="Lunge"/>
+ <m id="2858" english="Gambit"/>
  <m id="2859" english="#1323"/>
  <m id="2860" english="#1324"/>
  <m id="2861" english="#1325"/>

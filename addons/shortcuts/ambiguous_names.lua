@@ -89,6 +89,8 @@ netherspikes={absolute=true,abil_id=1009},
 carnalnightmare={absolute=true,abil_id=1010},
 aegisschism={absolute=true,abil_id=1011},
 dancingchains={absolute=true,abil_id=1012},
+
+berserk={absolute=true,spell_ID=31},
  
 fireiv={absolute=false,spell_ID=147,abil_ID=549,funct=smn_unsub,info=60},
 stoneiv={absolute=false,spell_ID=162,abil_ID=565,funct=smn_unsub,info=60},
@@ -140,9 +142,13 @@ thunderii={absolute=false,spell_ID=165,abil_ID=625,funct=smn_sub,info=T{4,5,8,20
  
 function ambig(key)
 	local abil_type
+	if ambig_names[key] == nil then
+		write('Shortcuts Bug: '..tostring(key))
+		return
+	end
 	if ambig_names[key].absolute then
-		if spell_ID then return r_spells[ambig_names[key].spell_ID]
-		elseif abil_ID then return r_abilities[ambig_names[key].abil_ID]
+		if ambig_names[key].spell_ID then return r_spells[ambig_names[key].spell_ID]
+		elseif ambig_names[key].abil_ID then return r_abilities[ambig_names[key].abil_ID]
 		end
 	else
 		abil_type=ambig_names[key]['funct'](get_player(),ambig_names[key].info)

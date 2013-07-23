@@ -40,7 +40,7 @@ nicknames={}
 color={}
 mulecolor={}
 previousmentions={}
-
+ 
 config = require 'config'
  
 defaults = {}
@@ -62,18 +62,19 @@ defaults.a22 = 200
 defaults.a23 = 481
 defaults.a24 = 483
 defaults.a25 = 208
-
-
+ 
+ 
 settingdefaults = {}
 settingdefaults.highlighting = 'Yes'
-
-
+ 
+ 
 local symbols = require('json').read('../libs/ffxidata.json').chat.chars
-
+ 
  
 function event_load()
-	player=get_player()['name']
-	send_command('alias highlight lua c highlight')
+    send_count = 0 
+    called_count = 0
+    send_command('alias highlight lua c highlight')
 	write(_addon['name']..': Version:'.._addon['version'])
 	if get_ffxi_info()['logged_in'] then
         initialize()
@@ -92,10 +93,11 @@ function event_addon_command(...)
 		end
 		
 		
+		
 		if cmd[1]:lower() == 'write' then
 			io.open(lua_base_path..'/logs/'..player..'.txt',"a"):write('\n =='..string.sub(os.date(),0,8)..'== \n'..table.concat(previousmentions, '\n')):close()
 		end
-
+ 
 		
 		if cmd[1]:lower() == "view" and cmd[2] == nil then 
 			add_to_chat(4, "==Recent Mentions==")
@@ -154,63 +156,52 @@ function initialize()
 	for i,v in pairs(mules) do
 		mulecolor[i]=colconv(v,i)
 	end
- 
 	get_party_members()
 end
  
  
 function event_incoming_text(original, modified, color)
-	local me_party = original:find('%('..player..'%)')
-	local me_linkshell = original:find('<'..player..'>')
-	local me_ffochat = original:find('%[%d:#%w+%]'..player..'(%[?%w-%]?):')
-	local other_ffochat = original:find('%[%d:#%w+%]%w+(%[?%w-%]?):')
-	local me_say = original:find(player..' :')
-	local me_tell = '%w+>>'
-	local other_party = original:find('%(.*%)')
-	local other_linkshell = original:find('<.*>')
-	local other_say = original:find('.* :')
-	local not_bm = original:find('.* '..string.char(129,168)..'.*')
-	local not_rt = original:find('.* '..symbols['implies']..'.*')
-
-	for names in modified:gmatch('([%w]+)') do
-        for name in pairs(members) do
-			modified = modified:igsub(members[name], modmember[name])
-        end
- 
-		for k,v in pairs(nicknames) do
-			for z=1, #v do	
-				modified = modified:igsub('([^%a])'..nicknames[k][z]..'([^%a])', function (pre, app) return pre..k:capitalize()..app end):igsub('([^%a])'..nicknames[k][z]..'$', function(space) return space..k:capitalize() end)			end	
-		end
- 
-		for mule, color in pairs(mulenames) do
-			modified = modified:igsub(mule, mulecolor[mule]..mule:capitalize()..chat.colorcontrols.reset)
-		end	
- 
-		if settings.highlighting ~= 'Yes' then
-			modified = modified:gsub('%(['..string.char(0x1e, 0x1f)..'].(%w+)'..'['..string.char(0x1e, 0x1f)..'].%)(.*)', function(name, rest) return '('..name..')'..rest end)			
-			modified = modified:gsub('<['..string.char(0x1e, 0x1f)..'].(%w+)'..'['..string.char(0x1e, 0x1f)..'].>(.*)', function(name, rest) return '<'..name..'>'..rest end)	
-		end	
+	
+	if not original:match('%[.*%] .* '..string.char(129,168)..'.*') and not original:match('.* '..symbols['implies']..'.*') then
+		for names in modified:gmatch('%w+') do
+			for name in pairs(members) do
+				modified = modified:igsub(members[name], modmember[name])
+			end
+			for k,v in pairs(nicknames) do
+				for z=1, #v do	
+					modified = modified:igsub('([^%a])'..nicknames[k][z]..'([^%a])', function (pre, app) return pre..k:capitalize()..app end):igsub('([^%a])'..nicknames[k][z]..'$', function(space) return space..k:capitalize() end)			end	
+			end
+			for mule, color in pairs(mulenames) do
+				modified = modified:igsub(mule, mulecolor[mule]..mule:capitalize()..chat.colorcontrols.reset)
+			end	
+			if settings.highlighting ~= 'Yes' then
+				modified = modified:gsub('%(['..string.char(0x1e, 0x1f)..'].(%w+)'..'['..string.char(0x1e, 0x1f)..'].%)(.*)', function(name, rest) return '('..name..')'..rest end)			
+				modified = modified:gsub('<['..string.char(0x1e, 0x1f)..'].(%w+)'..'['..string.char(0x1e, 0x1f)..'].>(.*)', function(name, rest) return '<'..name..'>'..rest end)	
+			end	
 	end
 	
-
-	if not_bm == nil and not_rt == nil and color ~= 4 then
-		if other_party ~= nil or other_linkshell ~= nil or other_ffochat ~=nil then
-			if me_party == nil and me_linkshell == nil and me_say == nil and me_ffochat == nil then
-				if modified:match(player) then
-					table.insert(previousmentions,1,'['..string.sub(os.date(), 10).."]>> "..original	)
+	end
+		--Not rolltracker and not battlemod
+		if not original:match('.* '..string.char(129,168)..'.*') and not original:match('.* '..symbols['implies']..'.*') and color ~= 4 then
+			--Chat modes not empty
+			if original:match('^%(.*%)') or original:match('^<.*>') or original:match('^%[%d:#%w+%]%w+(%[?%w-%]?):') then
+				--Not myself
+				if not original:match('^%('..player..'%)') and not original:match('^<'..player..'>') and not original:match('^'..player..' :') and not original:match('^%[%d:#%w+%]'..player..'(%[?%w-%]?):') then
+					if modified:match(player) then
+						table.insert(previousmentions,1,'['..string.sub(os.date(), 10).."]>> "..colconv(color)..original	)
+					end
 				end
 			end
 		end
-	end
-
+	
 	return modified
 end
  
 function event_incoming_chunk(id, data)
-	if id == 221 then
+	if id == 0x0C8 then
 		modmember={}
 		members={}
-		send_command('wait 0.4; lua i highlight get_party_members')
+		send_command('@wait 0.1; lua i highlight get_party_members')
 	end
 end
  
@@ -232,8 +223,9 @@ function colconv(str,key)
 	return out
 end
  
- 
+
 function get_party_members()
+
 	if settings.highlighting == 'Yes' then
 		for member, member_tb in pairs(get_party()) do
 			if not table.containskey(mulenames, member_tb['name']:lower()) then

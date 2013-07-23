@@ -28,13 +28,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon = {}
 _addon.name = 'OhShi'
-_addon.version = '2.161'
+_addon.version = '2.17'
 
 --Requiring libraries used in this addon
 --These should be saved in addons/libs
 require 'tablehelper'
 require 'stringhelper'
 require 'logger'
+require 'sets'
 local config = require 'config'
 local files = require 'filehelper'
 
@@ -47,22 +48,23 @@ defaults.textsize = 12
 defaults.posy = 300                    
 defaults.textfont = 'Arial'        
 defaults.textred = 255            
-defaults.textgreen = 255        
-defaults.staggeronly = false
+defaults.textgreen = 255
+defaults.staggeronly = false  
+defaults.showrolls = true
 defaults.bgred = 0                    
 defaults.textblue = 255            
 defaults.duration = 7            
 defaults.bgblue = 0    
 defaults.moblist = T{}
-defaults.moblist['voidwatch'] = T{"Qilin", "Celaeno", "Morta", "Bismarck", "Ig-Alima", "Kalasutrax", "Ocythoe", "Gaunab", "Hahava", "Cherufe", "Botulus Rex", "Taweret", "Agathos", "Goji", "Gugalanna", "Gasha", "Giltine", "Mellonia", "Kaggen", "Akvan", "Pil", "Belphoebe", "Kholomodumo", "Aello", "Uptala", "Sarbaz", "Shah", "Wazir", "Asb", "Rukh", "Provenance Watcher"}
-defaults.moblist['abyssea'] = T{"Alfard", "Orthrus", "Carabosse", "Glavoid", "Isgebind"}
-defaults.moblist['legion'] = T{"Veiled", "Lofty", "Soaring", "Mired", "Paramount"}
-defaults.moblist['meebles'] = T{"Goldwing", "Silagilith", "Surtr", "Dreyruk", "Samursk", "Umagrhk", "Izyx", "Grannus", "Svaha", "Melisseus"}
-defaults.moblist['other'] = T{"Tiamat", "Khimaira", "Khrysokhimaira", "Cerberus", "Dvergr", "Bloodthirsty", "Hydra", "Enraged", "Odin"}
-defaults.moblist['dangerous'] = T{"Provenance Watcher", "Apademak"}
+defaults.moblist['voidwatch'] = S{"Qilin", "Celaeno", "Morta", "Bismarck", "Ig-Alima", "Kalasutrax", "Ocythoe", "Gaunab", "Hahava", "Cherufe", "Botulus Rex", "Taweret", "Agathos", "Goji", "Gugalanna", "Gasha", "Giltine", "Mellonia", "Kaggen", "Akvan", "Pil", "Belphoebe", "Kholomodumo", "Aello", "Uptala", "Sarbaz", "Shah", "Wazir", "Asb", "Rukh", "Provenance Watcher"}
+defaults.moblist['abyssea'] = S{"Alfard", "Orthrus", "Carabosse", "Glavoid", "Isgebind"}
+defaults.moblist['legion'] = S{"Veiled", "Lofty", "Soaring", "Mired", "Paramount"}
+defaults.moblist['meebles'] = S{"Goldwing", "Silagilith", "Surtr", "Dreyruk", "Samursk", "Umagrhk", "Izyx", "Grannus", "Svaha", "Melisseus"}
+defaults.moblist['other'] = S{"Tiamat", "Khimaira", "Khrysokhimaira", "Cerberus", "Dvergr", "Bloodthirsty", "Hydra", "Enraged", "Odin"}
+defaults.moblist['dangerous'] = S{"Provenance Watcher", "Apademak"}
 defaults.dangerwords = T{}
-defaults.dangerwords['weaponskills'] = T{"Zantetsuken", "Geirrothr", "Astral Flow", "Chainspell", "Beastruction", "Mandible Massacre", "Oblivion's Mantle", "Divesting Gale", "Frog", "Danse", "Raksha Stance", "Yama's", "Ballistic Kick", "Eradicator", "Arm Cannon", "Gorge", "Extreme Purgitation", "Slimy Proposal", "Rancid Reflux", "Provenance Watcher starts", "Pawn's Penumbra", "Gates", "Fulmination", "Nerve", "Thundris"}
-defaults.dangerwords['spells'] = T{"Death", "Meteor", "Kaustra", "Breakga", "Thundaga IV", "Thundaja", "Firaga IV", "Firaja", "Aeroga IV", "Aeroja", "Blizzaga IV", "Blizzaja", "Stonega IV", "Stoneja"}
+defaults.dangerwords['weaponskills'] = S{"Zantetsuken", "Geirrothr", "Astral Flow", "Chainspell", "Beastruction", "Mandible Massacre", "Oblivion's Mantle", "Divesting Gale", "Frog", "Danse", "Raksha Stance", "Yama's", "Ballistic Kick", "Eradicator", "Arm Cannon", "Gorge", "Extreme Purgitation", "Slimy Proposal", "Rancid Reflux", "Provenance Watcher starts", "Pawn's Penumbra", "Gates", "Fulmination", "Nerve", "Thundris"}
+defaults.dangerwords['spells'] = S{"Death", "Meteor", "Kaustra", "Breakga", "Thundaga IV", "Thundaja", "Firaga IV", "Firaja", "Aeroga IV", "Aeroja", "Blizzaga IV", "Blizzaja", "Stonega IV", "Stoneja"}
 settings = config.load(defaults)
 --This function is called when the addon loads. It is used to
 --create all the tables used and populate them. There are also
@@ -117,165 +119,14 @@ function event_addon_command(...)
             notice(' 7. untrack <vw/legion/other/abyssea/meebles/dangerous> <mobname> --Removes mob from the tracking list.')
             notice(' 8. danger <spell/ws> <dangerword> --Adds danger word to list.')
             notice(' 9. staggeronly --Toggles stagger only mode.')
-            notice('10. unload <all/one> Save settings all(global - default) or one(character) and close ohShi.')
-            notice('11. help --Shows this menu.')
+            notice('10. showrolls --Toggles roll tracking mode.')
+            notice('11. unload <all/one> Save settings all(global - default) or one(character) and close ohShi.')
+            notice('12. help --Shows this menu.')
         elseif comm == 'create' then
             ohShi_SetUp()
         elseif comm == 'unload' then
             unloadtype = args[2] or 'all'
             send_command('lua u ohshi')
-        elseif comm == 'bgcolor' then
-            if args[5] ~= nil then
-                tb_set_bg_color('ohShi',args[2],args[3],args[4],args[5])
-                settings['bgalpha'] = tonumber(args[2])
-                settings['bgred'] = tonumber(args[3])
-                settings['bggreen'] = tonumber(args[4])
-                settings['bgblue'] = tonumber(args[5])
-                notice('Background color changed.')
-                ohShi_Flash()
-            else
-                error('Improper syntax please use //ohshi help to get a list of commands.')
-            end
-        elseif comm == 'pos' then
-            if args[2] ~= nil and args[3]~= nil then
-                tb_set_location('ohShi',args[2],args[3])
-                settings['posx'] = tonumber(args[2])
-                settings['posy'] = tonumber(args[3])
-                notice('Position changed posx: '..args[2].." posy: "..args[3])
-                ohShi_Flash()
-            else
-                error('Improper syntax please use //ohshi help to get a list of commands.')
-            end
-        elseif comm == 'text' then
-            if args[4] ~= nil then
-                tb_set_color('ohShi',255,args[2],args[3],args[4])
-                settings['textred'] = tonumber(args[2])
-                settings['textgreen'] = tonumber(args[3])
-                settings['textblue'] = tonumber(args[4])
-                notice('Text color changed.')
-                ohShi_Flash()
-            else
-                error('Improper syntax please use //ohshi help to get a list of commands.')
-            end
-        elseif comm == 'font' then
-            if args[3] ~= nil then
-                local font = ''
-                local p
-                for p = 3, #args do
-                    font = font..args[p]
-                    if p < #args then font = font..' ' end
-                end
-                settings['textfont'] = font
-                settings['textsize'] = tonumber(args[2])
-                tb_set_font('ohShi',font,args[2])
-                notice('Font changed size: '..args[2]..' font: '..font)
-                ohShi_Flash()
-            else
-                error('Improper syntax please use //ohshi help to get a list of commands.')
-            end
-        elseif comm == 'duration' then
-            if args[2] ~= nil then
-                settings['duration'] = tonumber(args[2])
-                notice('Duration: '..args[2])
-                tracking[#tracking+1] = ' ohShi settings updated. '
-                ohShi_refresh()
-                send_command('wait '..args[2]..';ohShi timeout 1')
-            else
-                error('Improper syntax please use //ohshi help to get a list of commands.')
-            end
-        elseif comm == 'track' then
-            if args[3] ~= nil then
-                if args[2] == 'vw' then
-                    tm = 'voidwatch'
-                elseif args[2] == 'legion' then
-                    tm = 'legion'
-                elseif args[2] == 'other' then
-                    tm = 'other'
-                elseif args[2] == 'meebles' then
-                    tm = 'meebles'
-                elseif args[2] == 'abyssea' then
-                    tm = 'abyssea'
-                elseif args[2] == 'dangerous' then
-                    tm = 'dangerous'
-                end
-                if tm ~= nil then
-                    local q
-                    for q = 3, #args do
-                        list = list..args[q]
-                        if q < #args then list = list..' ' end
-                    end
-                    if not settings.moblist[tm]:contains(list) then
-                        settings.moblist[tm]:append(list)
-                        notice('Now tracking '..tm..' mob '..list)
-                    else
-                        error('Already tracking '..tm..' mob '..list)
-                    end
-                    tm = nil
-                else
-                    error('Improper Syntax: //ohShi track <vw/legion/other/abyssea/meebles> <mobname>')
-                end
-            else
-                error('Improper syntax please use //ohshi help to get a list of commands.')
-            end
-        elseif comm == 'untrack' then
-            if args[3] ~= nil then
-                if args[2] == 'vw' then
-                    utm = 'voidwatch'
-                elseif args[2] == 'legion' then
-                    utm = 'legion'
-                elseif args[2] == 'other' then
-                    utm = 'other'
-                elseif args[2] == 'meebles' then
-                    utm = 'meebles'
-                elseif args[2] == 'abyssea' then
-                    utm = 'abyssea'
-                elseif args[2] == 'dangerous' then
-                    utm = 'dangerous'
-                end
-                if utm ~= nil then
-                    local q
-                    for q = 3, #args do
-                        list = list..args[q]
-                        if q < #args then list = list..' ' end
-                    end
-                    if settings.moblist[utm]:contains(list) then
-                        settings.moblist[utm]:delete(list)
-                        notice('No longer tracking '..utm..' mob '..list)
-                    else
-                        error('You were not tracking '..tm..' mob '..list)
-                    end
-                    utm = nil
-                else
-                    error('Improper Syntax: //ohShi untrack <vw/legion/other/abyssea/meebles> <mobname>')
-                end
-            else
-                error('Improper syntax please use //ohshi help to get a list of commands.')
-            end
-        elseif comm == 'danger' then
-            if args[3] ~= nil then 
-                if args[2] == 'spell' then
-                    td = 'spells'
-                elseif args[2] == 'ws' then
-                    td = 'weaponskills'
-                end
-                if td ~= nil then
-                    local r
-                    for r = 3, #args do
-                        list = list..args[r]
-                        if r < #args then list = list..' ' end
-                    end
-                    if not settings.dangerwords[td]:contains(list) then
-                        settings.dangerwords[td]:append(list)
-                        notice('Now tracking '..td..' spell '..list)
-                    else
-                        error('Already tracking '..td..' spell '..list)
-                    end
-                else
-                    error('Proper Syntax: //ohShi danger <spell/ws> <dangerword>')
-                end
-            else
-                error('Improper syntax please use //ohshi help to get a list of commands.')
-            end
         elseif comm == 'warnoff' then
             table.remove(prims,1)
             prim_delete(args[2])
@@ -291,9 +142,167 @@ function event_addon_command(...)
                     end
                 end
             end
-        elseif comm == 'staggeronly' then
-                settings['staggeronly'] = not settings.staggeronly
-                notice('Stagger only mode: '..tostring(settings.staggeronly))
+        elseif S{'text','font','post','duration','track','untrack','danger','staggeronly','showrolls'}:contains(comm) then
+            if comm == 'bgcolor' then
+                if args[5] ~= nil then
+                    tb_set_bg_color('ohShi',args[2],args[3],args[4],args[5])
+                    settings['bgalpha'] = tonumber(args[2])
+                    settings['bgred'] = tonumber(args[3])
+                    settings['bggreen'] = tonumber(args[4])
+                    settings['bgblue'] = tonumber(args[5])
+                    notice('Background color changed.')
+                    ohShi_Flash()
+                else
+                    error('Improper syntax please use //ohshi help to get a list of commands.')
+                end
+            elseif comm == 'pos' then
+                if args[2] ~= nil and args[3]~= nil then
+                    tb_set_location('ohShi',args[2],args[3])
+                    settings['posx'] = tonumber(args[2])
+                    settings['posy'] = tonumber(args[3])
+                    notice('Position changed posx: '..args[2].." posy: "..args[3])
+                    ohShi_Flash()
+                else
+                    error('Improper syntax please use //ohshi help to get a list of commands.')
+                end
+            elseif comm == 'text' then
+                if args[4] ~= nil then
+                    tb_set_color('ohShi',255,args[2],args[3],args[4])
+                    settings['textred'] = tonumber(args[2])
+                    settings['textgreen'] = tonumber(args[3])
+                    settings['textblue'] = tonumber(args[4])
+                    notice('Text color changed.')
+                    ohShi_Flash()
+                else
+                    error('Improper syntax please use //ohshi help to get a list of commands.')
+                end
+            elseif comm == 'font' then
+                if args[3] ~= nil then
+                    local font = ''
+                    local p
+                    for p = 3, #args do
+                        font = font..args[p]
+                        if p < #args then font = font..' ' end
+                    end
+                    settings['textfont'] = font
+                    settings['textsize'] = tonumber(args[2])
+                    tb_set_font('ohShi',font,args[2])
+                    notice('Font changed size: '..args[2]..' font: '..font)
+                    ohShi_Flash()
+                else
+                    error('Improper syntax please use //ohshi help to get a list of commands.')
+                end
+            elseif comm == 'duration' then
+                if args[2] ~= nil then
+                    settings['duration'] = tonumber(args[2])
+                    notice('Duration: '..args[2])
+                    tracking[#tracking+1] = ' ohShi settings updated. '
+                    ohShi_refresh()
+                    send_command('wait '..args[2]..';ohShi timeout 1')
+                else
+                    error('Improper syntax please use //ohshi help to get a list of commands.')
+                end
+            elseif comm == 'track' then
+                if args[3] ~= nil then
+                    if args[2] == 'vw' then
+                        tm = 'voidwatch'
+                    elseif args[2] == 'legion' then
+                        tm = 'legion'
+                    elseif args[2] == 'other' then
+                        tm = 'other'
+                    elseif args[2] == 'meebles' then
+                        tm = 'meebles'
+                    elseif args[2] == 'abyssea' then
+                        tm = 'abyssea'
+                    elseif args[2] == 'dangerous' then
+                        tm = 'dangerous'
+                    end
+                    if tm ~= nil then
+                        local q
+                        for q = 3, #args do
+                            list = list..args[q]
+                            if q < #args then list = list..' ' end
+                        end
+                        if not settings.moblist[tm]:contains(list) then
+                            settings.moblist[tm]:add(list)
+                            notice('Now tracking '..tm..' mob '..list)
+                        else
+                            error('Already tracking '..tm..' mob '..list)
+                        end
+                        tm = nil
+                    else
+                        error('Improper Syntax: //ohShi track <vw/legion/other/abyssea/meebles> <mobname>')
+                    end
+                else
+                    error('Improper syntax please use //ohshi help to get a list of commands.')
+                end
+            elseif comm == 'untrack' then
+                if args[3] ~= nil then
+                    if args[2] == 'vw' then
+                        utm = 'voidwatch'
+                    elseif args[2] == 'legion' then
+                        utm = 'legion'
+                    elseif args[2] == 'other' then
+                        utm = 'other'
+                    elseif args[2] == 'meebles' then
+                        utm = 'meebles'
+                    elseif args[2] == 'abyssea' then
+                        utm = 'abyssea'
+                    elseif args[2] == 'dangerous' then
+                        utm = 'dangerous'
+                    end
+                    if utm ~= nil then
+                        local q
+                        for q = 3, #args do
+                            list = list..args[q]
+                            if q < #args then list = list..' ' end
+                        end
+                        if settings.moblist[utm]:contains(list) then
+                            settings.moblist[utm]:remove(list)
+                            notice('No longer tracking '..utm..' mob '..list)
+                        else
+                            error('You were not tracking '..tm..' mob '..list)
+                        end
+                        utm = nil
+                    else
+                        error('Improper Syntax: //ohShi untrack <vw/legion/other/abyssea/meebles> <mobname>')
+                    end
+                else
+                    error('Improper syntax please use //ohshi help to get a list of commands.')
+                end
+            elseif comm == 'danger' then
+                if args[3] ~= nil then 
+                    if args[2] == 'spell' then
+                        td = 'spells'
+                    elseif args[2] == 'ws' then
+                        td = 'weaponskills'
+                    end
+                    if td ~= nil then
+                        local r
+                        for r = 3, #args do
+                            list = list..args[r]
+                            if r < #args then list = list..' ' end
+                        end
+                        if not settings.dangerwords[td]:contains(list) then
+                            settings.dangerwords[td]:add(list)
+                            notice('Now tracking '..td..' spell '..list)
+                        else
+                            error('Already tracking '..td..' spell '..list)
+                        end
+                    else
+                        error('Proper Syntax: //ohShi danger <spell/ws> <dangerword>')
+                    end
+                else
+                    error('Improper syntax please use //ohshi help to get a list of commands.')
+                end
+            elseif comm == 'staggeronly' then
+                    settings['staggeronly'] = not settings.staggeronly
+                    notice('Stagger only mode: '..tostring(settings.staggeronly))
+            elseif comm == 'showrolls' then
+                    settings['showrolls'] = not settings.showrolls
+                    notice('Roll Tracking mode: '..tostring(settings.showrolls))
+            end
+            settings:save('all')
         else
             error('Improper syntax please use //ohshi help to get a list of commands.')
             return
@@ -360,17 +369,16 @@ end
 --This function checks the string sent to it against your mob list
 --returns true if it's found and false if not.
 function mobcheck(tr)
-    local category,names,inc
-    for category,names in pairs(settings.moblist) do
-        for inc = 1, #settings.moblist[category] do
-            local beg,endi,cap = string.find(settings.moblist[category][inc]:lower(),'('..tr:lower()..')')
-            if cap ~= nil then
+    for category,_ in pairs(settings.moblist) do
+        for name,_ in pairs(settings.moblist[category]) do
+        
+            if tr:contains(name) then
                 if category == 'dangerous' then
                     color2 = '\\cs(255,100,100)'
                     cres = '\\cr'
                     fi = true
                 end
-            return true
+                return true
             end
         end
     end
@@ -380,12 +388,12 @@ end
 --This function checks the string sent to it against your danger list
 --returns true if it's found and false if not.
 function dangercheck(ts)
-    local category,names,inc
-    for category,names in pairs(settings.dangerwords) do
-        for inc = 1, #settings.dangerwords[category] do
-            local beg,endi,cap = string.find(settings.dangerwords[category][inc]:lower(),'('..ts:lower()..')')
-            if cap ~= nil then
-                return true
+    for category,_ in pairs(settings.dangerwords) do
+        for name,_ in pairs(settings.dangerwords[category]) do
+            if ts:contains(name) then
+                if settings.dangerwords[category]:contains(ts) then
+                    return true
+                end
             end
         end
     end
@@ -394,43 +402,44 @@ end
 
 --This event happens when an action packet is received.
 function event_action(act)
-    local color2 = '' -- set the color back to 0 in case it carried over
-    local cres = '' -- set reset back to 0 in case it carried over
-    local fi = false
-    local doanyway = 0
     --Make sure the stagger only mode isn't on
     if not settings.staggeronly then
         --Category 6 is job abilities. This portion of the function gets the
         --job ability name by taking the ja_id and checking it against the
         --job abilities table. After making sure the ability used is a cor roll
         --it puts the roll and total in the tracker.
-        if act['category'] == 6 then
-            if tonumber(act['param']) < 1 or tonumber(act['param']) > 1083 then return end
-            if jobAbilities[tonumber(act['param'])]['type'] == 'CorsairRoll' then
-                local party = get_party()
-                local rolling = jobAbilities[tonumber(act['param'])]['english']
-                local roller = get_mob_by_id(act['actor_id'])['name']
-                local allyroller = false
-                for pt,member in pairs(party) do
-                    if member['name'] == roller then
-                        allyroller = true
-                        break
+        if settings.showrolls then
+            if act['category'] == 6 then
+                if tonumber(act['param']) < 1 or tonumber(act['param']) > 1083 then return end
+                if jobAbilities[tonumber(act['param'])]['type'] == 'CorsairRoll' then
+                    local party = get_party()
+                    local rolling = jobAbilities[tonumber(act['param'])]['english']
+                    local roller = get_mob_by_id(act['actor_id'])['name']
+                    local allyroller = false
+                    for pt,member in pairs(party) do
+                        if member['name'] == roller then
+                            allyroller = true
+                            break
+                        end
                     end
-                end
-                if allyroller then
-                    local total = act['targets'][1]['actions'][1]['param']
-                    tracking[#tracking+1] = ' '..roller..'\'s '..rolling..' Total: '..total..' '
-                    ohShi_refresh()
-                    send_command('wait '..settings['duration']..';ohShi timeout')
+                    if allyroller then
+                        local total = act['targets'][1]['actions'][1]['param']
+                        tracking[#tracking+1] = ' '..roller..'\'s '..rolling..' Total: '..total..' '
+                        ohShi_refresh()
+                        send_command('wait '..settings['duration']..';ohShi timeout')
+                    end
                 end
             end
         end
-        
         --Category 7 is weapon skill readying for players and npcs. The following
         --gets the ability id of the tp move being used and (after subtracting 256
         --due to it being offset, compares it against the abilities table. Then checks
         --it against your danger words and the user against your moblist.
         if act['category'] == 7 and isMob(tonumber(act['actor_id'])) then
+            color2 = '' -- set the color back to 0 in case it carried over
+            cres = '' -- set reset back to 0 in case it carried over
+            fi = false
+            doanyway = 0
             local num = tonumber(act['targets'][1]['actions'][1]['param']) - 256
             if num < 1 then return end
             local wesk = mobAbilities[num]['english']
@@ -451,6 +460,10 @@ function event_action(act)
         
         --Category 8 is spell casting
         if act['category'] == 8 and tonumber(act['targets'][1]['actions'][1]['message']) ~= 16 and isMob(tonumber(act['actor_id'])) then
+            color2 = '' -- set the color back to 0 in case it carried over
+            cres = '' -- set reset back to 0 in case it carried over
+            fi = false
+            doanyway = 0
             local num = tonumber(act['targets'][1]['actions'][1]['param'])
             if num <= 0 then return end
             --Get the name of the spell by taking the spell id and going through the spells table

@@ -35,21 +35,55 @@ require 'ambiguous_names'
 require 'targets'
 
 _addon = {}
-_addon.version = '0.2'
+_addon.version = '0.3'
 _addon.name = 'Shortcuts'
 _addon.commands = {'shortcuts'}
 
 function event_load()
+	counter = 0
+	debugging = false
 	lastsent = 'MAUSMAUSMAUSMAUSMAUSMAUSMAUSMAUS'
 	collectgarbage()
 end
 
 function event_outgoing_text(original,modified)
+	if counter>0 then
+		local dtime = os.clock() - timestamp
+		if dtime > 0.2 then
+			counter = 0
+		else
+			counter = counter +1
+		end
+		if counter == 36 then
+			if dir_exists('../addons/shortcuts/data/') then
+				f = io.open('../addons/shortcuts/data/'..tostring(os.clock())..'.log','w+')
+				f:write('Probable infinite loop detected in Shortcuts: '..tostring(lastsent)..'\n')
+				f:close()
+			end
+			add_to_chat(8,'Probable infinite loop detected in Shortcuts: '..tostring(lastsent)..'\7Please tell Byrth what you were doing')
+			timestamp = os.clock()
+			counter = 0
+			return modified
+		end
+	else
+		counter = 1
+		timestamp = os.clock()
+	end
+	
 	if original == lastsent then
 		lastsent = ''
 		return modified
 	end
 
+	return command_logic(original,modified)
+end
+
+function event_unhandled_command(...)
+	local combined = table.concat({...},' ')
+	command_logic(combined,combined)
+end
+
+function command_logic(original,modified)
 	local splitline = split(original,' ')
 	local command = splitline[1]
 	
@@ -63,7 +97,8 @@ function event_outgoing_text(original,modified)
 		if command2_list[command]==true then -- no excluded second commands
 			local temptarg = valid_target(splitline[#splitline]) or target_make({validtarget={['Player']=true,['Enemy']=true,['Self']=true}})
 			lastsent = command..' '..temptarg
-			send_command('input '..lastsent)
+			if debugging then add_to_chat(8,tostring(counter)..' input '..lastsent) end
+			send_command('@input '..lastsent)
 			return ''
 		else
 			local tempcmd = command
@@ -88,7 +123,8 @@ function event_outgoing_text(original,modified)
 				temptarg = target_make({validtarget={['Player']=true,['Enemy']=true,['Self']=true}})
 			end
 			lastsent = tempcmd..' '..temptarg
-			send_command('input '..lastsent)
+			if debugging then add_to_chat(8,tostring(counter)..' input '..lastsent) end
+			send_command('@input '..lastsent)
 			return ''
 		end
 	elseif (command2_list[command] and valid_target(splitline[#splitline],true)) or (command == '/hide') or (command_list[command] and validabils[(spell or ''):lower():gsub(' ',''):gsub('[^%w]','')] and valid_target(splitline[#splitline])) then
@@ -99,10 +135,6 @@ function event_outgoing_text(original,modified)
 	else
 		return interp_text(splitline,0,modified)
 	end
-	
-	-- Should never reach this point
-	lastsent = ''
-	return modified
 end
 
 function interp_text(splitline,offset,modified)
@@ -129,7 +161,8 @@ function interp_text(splitline,offset,modified)
 			r_line, s_type = ambig(strippedabil)
 		end
 		lastsent = r_line['prefix']..' "'..r_line['english']..'" '..(temptarg or target_make(r_line))
-		send_command('input '..lastsent)
+		if debugging then add_to_chat(8,tostring(counter)..' input '..lastsent) end
+		send_command('@input '..lastsent)
 		return ''
 	end
 	lastsent = ''
