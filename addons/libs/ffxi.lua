@@ -2,16 +2,16 @@
 A few functions to interface ingame structures and values.
 ]]
 
+local ffxi = {}
+
 _libs = _libs or {}
-_libs.ffxi = true
+_libs.ffxi = ffxi
 _libs.tablehelper = _libs.tablehelper or require 'tablehelper'
 _libs.stringhelper = _libs.stringhelper or require 'stringhelper'
 _libs.functools = _libs.functools or require 'functools'
-local json = require 'json'
-_libs.json = _libs.json or (json ~= nil)
+_libs.json = _libs.json or require 'json'
 
-local ffxi = T{}
-ffxi.data = json.read('../libs/ffxidata.json')
+ffxi.data = _libs.json.read('../libs/ffxidata.json')
 
 -- Returns ingame time from server time.
 -- TODO: Waiting on server-time interface function.
@@ -80,4 +80,3 @@ function ffxi.index_to_name(index)
 end
 
 return ffxi
-

@@ -2,10 +2,10 @@
 A library to facilitate text primitive creation and manipulation.
 ]]
 
-_libs = _libs or {}
-_libs.texts = true
-
 local texts = {}
+
+_libs = _libs or {}
+_libs.texts = texts
 
 _meta.Text = _meta.Text or {}
 _meta.Text.__class = 'Text'
@@ -16,7 +16,7 @@ _meta.Text.__newindex = function(t, k, v)
 		if val == k then
 			break
 		end
-		
+
 		if key == l then
 			t._textorder[l + 1] = k
 			t._defaults[k] = ''
@@ -87,7 +87,7 @@ function texts.new(t, settings, str)
 		t._settings.text.content = ''
 		t._settings.padding = 0
 	end
-	
+
 	t._texts = {}
 	t._defaults = {}
 	t._textorder = {}
@@ -96,7 +96,7 @@ function texts.new(t, settings, str)
 		if t2 == nil then
 			return
 		end
-		
+
 		for key, val in pairs(t1) do
 			if t2[key] ~= nil then
 				if type(val) == 'table' then
@@ -145,7 +145,7 @@ function texts.update(t, attr)
 
 	tb_set_text(t._name, str)
 	t._settings.text.content = str
-	
+
 	return str
 end
 
