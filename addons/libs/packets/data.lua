@@ -67,6 +67,7 @@ data.incoming[0x028] = {name='Action',              description='Packet sent whe
 data.incoming[0x029] = {name='EXP Gain',            description='Packet sent after you defeat a mob and do not gain XP.'}
 data.incoming[0x02A] = {name='Resting Message',     description='Packet sent when you rest in Abyssea.'}
 data.incoming[0x02D] = {name='EXP Gain (kill)',     description='Packet sent after you defeat a mob and gain XP.'}
+data.incoming[0x030] = {name='Synth Animation',     description='Generates the synthesis animation'}
 data.incoming[0x036] = {name='NPC Chat',            description='Dialog from NPC\'s.'}
 data.incoming[0x037] = {name='Update Char',         description='Updates a characters stats and animation.'}
 data.incoming[0x03C] = {name='Shop',                description='Displays items in a vendors shop.'}

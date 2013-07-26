@@ -264,6 +264,16 @@ fields.incoming[0x02A] = L{
 	{ctype='unsigned int',      label='_unknown1',          const=0x06000000},  --   28 -  31
 }
 
+-- Synth Animation
+fields.incoming[0x030] = L{
+	{ctype='unsigned int',      label='Player ID',          fn=id},             --    4 -  7
+	{ctype='unsigned short',    label='Index',              fn=index},          --    8 -  9
+	{ctype='unsigned short',    label='Effect'},                                --   10 -  11
+	{ctype='unsigned char',     label='_unknown1',          const=0x00},        --   12 -  12  -- Labeled "param" on DSP, but unclear what it's a param for
+	{ctype='unsigned char',     label='Animation'},                             --   13 -  13
+	{ctype='unsigned char',     label='_unknown2',          const=0x00},        --   14 -  15  -- Appears to just be trash.
+}
+
 -- Pet Stat
 fields.incoming[0x044] = L{
 -- Packet 0x044 is sent twice in sequence when stats. This can be caused by anything from
