@@ -78,17 +78,20 @@ function event_chat_message(is_gm, mode, player, message)
 				word = true
 			end
 		end
-		if word == true then
-			if settings.mode == 'blacklist' then
-				if settings.blacklist:contains(player) then
-					return
-				else
-					try_invite(player)
-				end
-			elseif settings.mode == 'whitelist' then
-				if settings.whitelist:contains(player) then
-					try_invite(player)
-				end
+		-- if keyword is not found, return
+		if word == false then
+			return
+		end
+		
+		if settings.mode == 'blacklist' then
+			if settings.blacklist:contains(player) then
+				return
+			else
+				try_invite(player)
+			end
+		elseif settings.mode == 'whitelist' then
+			if settings.whitelist:contains(player) then
+				try_invite(player)
 			end
 		end
 	end
