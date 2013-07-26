@@ -1,5 +1,5 @@
 --[[
-timestamp v1.20130616
+timestamp v1.3.1
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -35,12 +35,12 @@ require 'tablehelper'
 config = require 'config'
 
 _addon = {}
-_addon.name     = 'timestamp'
-_addon.version  = '1.20130616'
-_addon.commands = {'timestamp', 'ts'}
+_addon.name    = 'Timestamp'
+_addon.command = 'timestamp'
+_addon.version = '1.3.1'
 
 function timezone()
-    local now  = os.time()
+    local now = os.time()
     local h, m = math.modf(os.difftime(now, os.time(os.date('!*t', now))) / 3600)
 
     return string.format('%+.4d', 100 * h + 60 * m), string.format('%+.2d:%.2d', h, 60 * m)
@@ -85,27 +85,26 @@ constants = T{
     ['rfc3339']      = '%Y-%m-%dT%H:%M:%S'..tz_sep
 }
 
-lead_bytes_pattern = string.char(0x1E, 0x1F, 0xF7, 0xEF, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89)
-
 defaults = {}
 defaults.color  = 508
 defaults.format = '[${time}]'
 
+-- Lead bytes in multi-byte chars
+lead_bytes = S{0x1E, 0x1F, 0xF7, 0xEF, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89}:map(string.char)
+
+-- Modes to redirect to fix indentation
+-- Note: Possibly unnecessary (not used atm)
+redirect = setmetatable({}, {__index = function(t, k)
+    return k
+end})
+redirect[6] = 205
+redirect[14] = 205
+redirect[152] = 190
+
 settings = {}
-
-function get_string(format)
-    local formatted_string = format:gsub('%${([%l%d_]+)}', function(match) if constants[match] ~= nil then return os.date(constants[match]) else return match end end)
-
-    return formatted_string
-end
-
-function initialize()
-    settings = config.load(defaults)
-end
 
 function event_load()
     send_command('alias timestamp lua c timestamp')
-    send_command('alias ts lua c timestamp')
 
     if get_ffxi_info().logged_in then
         initialize()
@@ -116,69 +115,92 @@ function event_login()
     initialize()
 end
 
+function initialize()
+    settings = config.load(defaults)
+end
+
 function event_unload()
     send_command('unalias timestamp')
-    send_command('unalias ts')
 end
 
 function event_incoming_text(original, modified, mode)
-    if modified ~= '' and not modified:find('^[%s]+$') then
-        if mode == 144 then -- 144 works as 150 but the enter prompts are ignored.
-            mode     = 150
-            modified = modified:gsub(string.char(0x7f, 0x31)..'$', '')
-        end
+    if mode == 150 or mode == 151 then
+        return
+    end
 
-        if mode == 150 then -- 150 automatically indents new lines. 151 works the same way but with no indentation. redirect to 151 and manually add the ideographic space.
-            mode     = 151
-            modified = modified:gsub('([^'..lead_bytes_pattern..'])['..string.char(0x07)..'\n]', '%1\n'..string.char(0x81, 0x40))
-        end
+    local timeString = (os.date((settings.format:gsub('%${([%l%d_]+)}', constants)))):color(settings.color)..' '
 
-        if mode ~= 151 then
-            local timeString = get_string(settings.format):color(settings.color)..' '
-
-            modified = timeString..modified:gsub('^['..string.char(0x07)..'\n]+', ''):gsub('([^'..lead_bytes_pattern..'])['..string.char(0x07)..'\n]+$', '%1'):gsub('([^'..lead_bytes_pattern..'])['..string.char(0x07)..'\n]', '%1\n'..timeString)
+    local res = ''
+    local pos = 0
+    local prev = ''
+    local lines = L{}
+    for c in modified:it() do
+        if (c == '\007' or c == '\010') and not lead_bytes:contains(prev) then
+            lines:append(res)
+            res = ''
+            prev = ''
+        else
+            res = res..c
+            prev = c
         end
     end
 
-    return modified, mode
+    -- Not necessary, but avoids one garbage send on all chat-related lines
+    if #lines == 1 and res == '' then
+        return timeString..lines[1], mode
+    end
+
+    for line in lines:it() do
+        add_to_chat(mode, line == '' and ' ' or line)
+    end
+
+    if res == '' then
+        return '', mode
+    end
+
+    return timeString..res, mode
 end
 
 function event_addon_command(...)
-    local cmd  = (...) and (...):lower() or 'help'
+    local cmd = (...) and (...):lower() or 'help'
     local args = {select(2, ...)}
 
+    local block = string.char(0x81, 0xA1)
     if cmd == 'help' then
-        log(chat.chars.wsquare..' timestamp [<command>] help -- shows the help text.')
-        log(chat.chars.wsquare..' timestamp color <color> -- sets the timestamp\'s color.')
-        log(chat.chars.wsquare..' timestamp format <format> -- sets the timestamp\'s format.')
+        log(block, 'timestamp [<command>] help -- shows the help text.')
+        log(block, 'timestamp color <color> -- sets the timestamp\'s color.')
+        log(block, 'timestamp format <format> -- sets the timestamp\'s format.')
+
     elseif cmd == 'format' then
         if not args[1] then
-            error('Please specify the new timestamp\'s format.')
+            error('Please specify the new timestamp format.')
         elseif args[1] == 'help' then
-            log('Sets the timestamp\'s format.')
+            log('Sets the timestamp format.')
             log('Usage: timestamp format [help|<format>]')
             log('Positional arguments:')
-            log(chat.chars.wsquare..' help: shows the help text.')
-            log(chat.chars.wsquare..' <format>: defines the timestamp\'s format. The available constants are:')
+            log(block, 'help: shows the help text.')
+            log(block, '<format>: defines the timestamp format. The available constants are:')
 
             for key in constants:keyset():sort():it() do
-                log('  ${'..key..'}: '..get_string('${'..key..'}'))
+                local key_string = '${'..key..'}'
+                log('  '..key_string..': '..key_string:keysub(constants))
             end
         else
-            settings.format = args[1]
+            settings.format = table.concat(args, ' ')
 
             settings:save()
-            log('The new timestamp\'s format has been saved ('..get_string(settings.format)..').')
+            log('The new timestamp format has been saved: '..settings.format)
         end
+
     elseif cmd == 'color' then
         if not args[1] then
-            error('Please specify the new timestamp\'s color.')
+            error('Please specify the new color.')
         elseif args[1] == 'help' then
-            log('Sets the timestamp\'s color.')
+            log('Sets the timestamp color.')
             log('Usage: timestamp color [help|<color>]')
             log('Positional arguments:')
-            log(chat.chars.wsquare..' help: shows the help text.')
-            log(chat.chars.wsquare..' <color>: defines the timestamp\'s color. The value must be between 0 and 511, inclusive.')
+            log(block, 'help: shows the help text.')
+            log(block, '<color>: defines the timestamp color. The value must be between 0 and 511, inclusive.')
         else
             local color = tonumber(args[1])
 
@@ -188,12 +210,12 @@ function event_addon_command(...)
                 settings.color = color
 
                 settings:save()
-                log('The new timestamp\'s color has been saved ('..color..').')
+                log('The new timestamp color has been saved: '..color)
             end
         end
+
     elseif cmd == 'save' then
         settings:save('all')
-    else
-        send_command('timestamp help')
+
     end
 end
