@@ -43,15 +43,7 @@ local function item(val)
 end
 
 local timezone
-local function time(ts)-- Cancel
-fields.outgoing[0x0F1] = L{
-	{ctype='unsigned char',     label='Buff ID'},                               --    4 -   4
-	{ctype='unsigned char',     label='_unknown1'},                             --    5 -   5
-	{ctype='unsigned char',     label='_unknown2'},                             --    6 -   6
-	{ctype='unsigned char',     label='_unknown3'},                             --    7 -   7
-}
-
-
+local function time(ts)
 	if not timezone then
 		local now = os.time()
 		local h, m = math.modf(os.difftime(now, os.time(os.date('!*t', now))) / 3600)
