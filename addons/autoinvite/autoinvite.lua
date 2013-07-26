@@ -61,7 +61,7 @@ aliases = T{
 
 -- Aliases to access the add and item_to_remove routines.
 addstrs = T{'a', 'add', '+'}
-rmstrs = T{'r', 'rm', 'item_to_remove', '-'}
+rmstrs = T{'r', 'rm', 'remove', '-'}
 
 -- Aliases for tellback mode.
 on = T{'on', 'yes', 'true'}
@@ -71,11 +71,29 @@ modes = T{'whitelist', 'blacklist'}
 
 -- Check for keyword
 function event_chat_message(is_gm, mode, player, message)
+	local word = false
 	if mode == 3 then
 		for item,_ in pairs(settings.keywords) do
 			if string.find(string.lower(message), string.lower(item)) then
-				try_invite(player)
-				return
+				word = true
+			end
+		end
+		if word == true then
+			if settings.mode == 'blacklist' then
+				if settings.blacklist:contains(player) then
+					log('player in blacklist, returning')
+					return
+				else
+					log('trying to send invite, player not on blacklist')
+					try_invite(player)
+				end
+			elseif settings.mode == 'whitelist' then
+				if settings.whitelist:contains(player) then
+					log('player on whitelist, trying to invite')
+					try_invite(player)
+				end
+			else
+				error('Invalid mode: you must be in either blacklist or whitelist mode.')
 			end
 		end
 	end
@@ -137,6 +155,7 @@ function remove_item(mode, ...)
 		settings[mode] = settings[mode] - item_to_remove
 		log('Removed '..item_to_remove:format()..' from the '..aliases[mode]..'.')
 	end
+	settings:save()
 end
 
 function event_addon_command(command, ...)
@@ -173,22 +192,18 @@ function event_addon_command(command, ...)
 			return
 		end
 		
-	-- List management
 	elseif command:isin(aliases:keyset()) then
 		mode = aliases[command]
 		names = args:slice(2):map(string.ucfirst..string.lower)
-		
-		-- If no operator provided
 		if args:empty() then
 			log(mode:ucfirst()..':', settings[mode]:format('csv'))
 		else
 			if args[1]:isin(addstrs) then
 				add_item(mode, names:unpack())
 			elseif args[1]:isin(rmstrs) then
-				item_to_remove_item(mode, names:unpack())
-			-- If no qualifier provided
+				remove_item(mode, names:unpack())
 			else
-				notice('Invalid operator specified. Specify add or item_to_remove.')
+				notice('Invalid operator specified. Specify add or remove.')
 			end
 		end
 		
@@ -204,6 +219,7 @@ function event_addon_command(command, ...)
 	else
 		warning('Unkown command \''..command..'\', ignored.')
 	end
+	settings:save()
 end
 
 function event_load()	
@@ -228,4 +244,5 @@ end
 function event_unload()
 	send_command('unalias autoinvite')
 	send_command('unalias ai')
+	settings:save()
 end
