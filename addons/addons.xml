@@ -266,4 +266,11 @@
     <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
+  <addon>
+    <author>r3g1stry</author>
+    <name>autoinvite</name>
+    <description>Automatically invites players when sent a tell with a specified keyword.</description>
+    <bugtracker>https://github.com/r3g1stry/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/user/R3G1STRY</support>
+  </addon>
 </addons>
