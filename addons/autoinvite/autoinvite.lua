@@ -81,19 +81,14 @@ function event_chat_message(is_gm, mode, player, message)
 		if word == true then
 			if settings.mode == 'blacklist' then
 				if settings.blacklist:contains(player) then
-					log('player in blacklist, returning')
 					return
 				else
-					log('trying to send invite, player not on blacklist')
 					try_invite(player)
 				end
 			elseif settings.mode == 'whitelist' then
 				if settings.whitelist:contains(player) then
-					log('player on whitelist, trying to invite')
 					try_invite(player)
 				end
-			else
-				error('Invalid mode: you must be in either blacklist or whitelist mode.')
 			end
 		end
 	end
