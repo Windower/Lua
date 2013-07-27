@@ -16,7 +16,7 @@ _meta.S.__class = 'Set'
 function S(t)
 	t = t or {}
 	local s = {}
-	
+
 	if class(t) == 'List' then
 		for _, val in ipairs(t) do
 			s[val] = true
@@ -26,7 +26,7 @@ function S(t)
 			s[val] = true
 		end
 	end
-	
+
 	return setmetatable(s, _meta.S)
 end
 
@@ -36,30 +36,56 @@ end
 
 function set.length(s)
 	local count = 0
-	
+
 	for _ in pairs(s) do
 		count = count + 1
 	end
-	
+
 	return count
 end
 
 _meta.S.__len = set.length
 
+function set.flat(s)
+	for el in pairs(s) do
+		if type(el) == 'table' then
+			return false
+		end
+	end
+
+	return true
+end
+
+function set.equals(s1, s2)
+	for el in pairs(s1) do
+		if not rawget(s2, el) then
+			return false
+		end
+	end
+
+	for el in pairs(s2) do
+		if not rawget(s1, el) then
+			return false
+		end
+	end
+
+	return true
+end
+
 function set.union(s1, s2)
 	if type(s2) ~= 'table' then
 		s2 = S{s2}
 	end
-	
+
 	s = {}
-	
+
 	for el in pairs(s1) do
 		s[el] = true
 	end
 	for el in pairs(s2) do
 		s[el] = true
 	end
-	
+
 	return setmetatable(s, _meta.S)
 end
 
@@ -70,7 +96,7 @@ function set.intersection(s1, s2)
 	for el in pairs(s1) do
 		s[el] = rawget(s2, el)
 	end
-	
+
 	return setmetatable(s, _meta.S)
 end
 
@@ -80,13 +106,13 @@ function set.diff(s1, s2)
 	if type(s2) ~= 'table' then
 		s2 = S(s2)
 	end
-	
+
 	s = {}
-	
+
 	for el in pairs(s1) do
 		s[el] = (not rawget(s2, el) and true) or nil
 	end
-	
+
 	return setmetatable(s, _meta.S)
 end
 
@@ -100,7 +126,7 @@ function set.sdiff(s1, s2)
 	for el in pairs(s2) do
 		s[el] = (not rawget(s1, el) and true) or nil
 	end
-	
+
 	return setmetatable(s, _meta.S)
 end
 
@@ -111,11 +137,11 @@ function set.contains(s, el)
 end
 
 function set.add(s, el)
-	s[el] = true
+	rawset(s, el, true)
 end
 
 function set.remove(s, el)
-	s[el] = nil
+	rawset(s, el, nil)
 end
 
 function set.it(s)
@@ -126,8 +152,26 @@ function set.it(s)
 	end
 end
 
-function set.next(s, el)
-	return next(s, el) or next(s)
+function set.clear(s)
+	for el in pairs(s) do
+		rawset(s, el, nil)
+	end
+
+	return s
+end
+
+function set.copy(s)
+	local res = {}
+
+	for el in pairs(s) do
+		res[el] = true
+	end
+
+	return setmetatable(res, _meta.S)
+end
+
+function set.reassign(s, sn)
+	return s:clear():union(sn)
 end
 
 function set.tostring(s)
@@ -138,7 +182,7 @@ function set.tostring(s)
 			res = res..', '
 		end
 	end
-	
+
 	return res..'}'
 end
 
@@ -153,17 +197,25 @@ function set.tovstring(s)
 		end
 		res = res..'\n'
 	end
-	
+
 	return res..'}'
+end
+
+function set.sort(s, ...)
+	if _libs.lists then
+		return L(s):sort(...)
+	end
+
+	return T(s):sort(...)
 end
 
 function set.map(s, fn)
 	local res = {}
-	
+
 	for el in pairs(s) do
 		res[fn(el)] = true
 	end
-	
+
 	return setmetatable(res, _meta.S)
 end
 
@@ -172,7 +224,7 @@ function set.filter(s, fn)
 	for el in pairs(s) do
 		res[el] = fn(el) == true or nil
 	end
-	
+
 	return setmetatable(res, _meta.S)
 end
 
@@ -185,21 +237,21 @@ function set.reduce(s, fn, init)
 			acc = fn(acc, el)
 		end
 	end
-	
+
 	return acc
 end
 
 function set.concat(s, str)
 	str = str or ''
 	local res = ''
-	
+
 	for el in pairs(s) do
 		res = res..tostring(s)
 		if next(s, el) then
 			res = res..str
 		end
 	end
-	
+
 	return res
 end
 
@@ -208,9 +260,11 @@ function set.format(s, trail, subs)
 	if s:empty() then
 		return subs or ''
 	elseif #s == 1 then
-		return next(s)
-	else
+		return '{'..tostring(next(s))..'}'
+	elseif _libs.lists then
 		l = L(s)
+	else
+		l = T(s)
 	end
 
 	trail = trail or 'and'

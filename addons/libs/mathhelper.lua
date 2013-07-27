@@ -36,32 +36,42 @@ function math.log(val, base)
 	if base == nil then
 		base = math.e
 	end
+
 	return _raw.math.log(val)/_raw.math.log(base)
 end
 
+-- DEPRECATED:
+-- These functions have been renamed to drop the 'to'. See below.
+function math.tobinary(val) return math.base(val, 2) end
+function math.tooctal(val) return math.base(val, 8) end
+function math.tohex(val) return math.base(val, 16) end
+function math.tobase(val, base) return math.base(val, base) end
+
 -- Returns a binary string representation of val.
-function math.tobinary(val)
-	return math.tobase(val, 2)
+function math.binary(val)
+	return math.base(val, 2)
 end
 
 -- Returns a octal string representation of val.
-function math.tooctal(val)
-	return math.tobase(val, 8)
+function math.octal(val)
+	return math.base(val, 8)
 end
 
 -- Returns a hex string representation of val.
-function math.tohex(val)
-	return math.tobase(val, 16)
+function math.hex(val)
+	return math.base(val, 16)
 end
 
 -- Converts a number val to a string in base base.
-function math.tobase(val, base)
+function math.base(val, base)
 	if base == nil or base == 10 or val == 0 then
 		return tostring(val)
+	elseif base == 1 then
+		return ('1'):rep(val)
 	end
-	
+
 	local num = math.abs(val)
-	
+
 	local res = {}
 	local key = 1
 	local pos
@@ -71,17 +81,16 @@ function math.tobase(val, base)
 		num = math.floor(num / base)
 		key = key + 1
 	end
-	
+
 	local str = ''
 	local n = key - 1
 	for key = 1, n do
 		str = str..res[n - key + 1]
 	end
-	
+
 	if val < 0 then
 		str = '-'..str
 	end
-	
+
 	return str
 end
-

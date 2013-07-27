@@ -2,29 +2,30 @@
 File handler.
 ]]
 
+local files = {}
+
 _libs = _libs or {}
-_libs.filehelper = true
+_libs.filehelper = files
 _libs.stringhelper = _libs.stringhelper or require 'stringhelper'
 
-local file = {}
 local createfile = false
 
 -- Create a new file object. Accepts a variable number of paths, which it will
-function file.new(path, create)
+function files.new(path, create)
 	create = true and (create ~= false)
-	
+
 	if path == nil then
-		return setmetatable(T{}, {__index = file})
+		return setmetatable(T{}, {__index = files})
 	end
-	
-	local f = setmetatable(T{}, {__index = file})
+
+	local f = setmetatable(T{}, {__index = files})
 	f:set(path, create)
 
 	return f
 end
 
 -- Creates a new file. Creates path, if necessary.
-function file.create(f)
+function files.create(f)
 	f:create_path()
 	local fh = io.open(lua_base_path..f.path, 'w')
 	fh:write('')
@@ -34,19 +35,19 @@ function file.create(f)
 end
 
 -- Sets the file to a path value.
-function file.set(f, path, create)
+function files.set(f, path, create)
 	create = true and (create ~= false)
 	createfile = create
-	
+
 	f.path = path
 
 	return f
 end
 
 -- Check if file exists. There's no better way, it would seem.
-function file.exists(f)
+function files.exists(f)
 	local path
-	
+
 	if type(f) == 'string' then
 		path = f
 	else
@@ -61,15 +62,15 @@ function file.exists(f)
 end
 
 -- Checks existance of a number of paths, returns the first that exists.
-function file.check(...)
-	return table.find[2]({...}, file.exists)
+function files.check(...)
+	return table.find[2]({...}, files.exists)
 end
 
 -- Read from file and return string of the contents.
-function file.read(f)
+function files.read(f)
 	local path
 	if type(f) == 'string' then
-		if not file.exists(f) then
+		if not files.exists(f) then
 			return nil, 'File \''..f..'\' not found, cannot read.'
 		end
 
@@ -103,7 +104,7 @@ function file.read(f)
 end
 
 -- Creates a directory.
-function file.create_path(f)
+function files.create_path(f)
 	local path
 	if type(f) == 'string' then
 		path = f
@@ -139,15 +140,15 @@ function file.create_path(f)
 end
 
 -- Read from file and return lines of the contents in a table.
-function file.readlines(f)
-	return file.read(f):split('\n')
+function files.readlines(f)
+	return files.read(f):split('\n')
 end
 
 -- Return an iterator over the lines of a file.
-function file.it(f)
+function files.it(f)
 	local path
 	if type(f) == 'string' then
-		if not file.exists(f) then
+		if not files.exists(f) then
 			return nil, 'File \''..f..'\' not found, cannot read.'
 		end
 
@@ -176,10 +177,10 @@ function file.it(f)
 end
 
 -- Write to file. Overwrites everything within the file, if present.
-function file.write(f, content)
+function files.write(f, content, flush)
 	local path
 	if type(f) == 'string' then
-		if not file.exists(f) then
+		if not files.exists(f) then
 			return nil, 'File \''..f..'\' not found, cannot write.'
 		end
 
@@ -200,28 +201,31 @@ function file.write(f, content)
 
 		path = f.path
 	end
-	
+
 	if type(content) == 'table' then
 		content = table.concat(content)
 	end
-	
+
 	local fh = io.open(lua_base_path..path, 'w')
 	fh:write(content)
+	if flush then
+		fh:flush()
+	end
 	fh:close()
 
 	return f
 end
 
 -- Write array to file. Overwrites everything within the file, if present
-function file.writelines(f, lines)
-	return file.write(f, table.concat(lines, '\n'))
+function files.writelines(f, lines)
+	return files.write(f, table.concat(lines, '\n'))
 end
 
 -- Append to file. Sets a newline per default, unless newline is set to false.
-function file.append(f, content, newline)
+function files.append(f, content, flush)
 	local path
 	if type(f) == 'string' then
-		if not file.exists(f) then
+		if not files.exists(f) then
 			return nil, 'File \''..f..'\' not found, cannot write.'
 		end
 
@@ -243,24 +247,19 @@ function file.append(f, content, newline)
 		path = f.path
 	end
 
-	newline = true and (newline ~= false)
-	local sep = newline and '\n' or ''
-	
-	if type(content) == 'table' then
-		content = table.concat(content, sep)
-	end
-
-	content = sep..content
 	local fh = io.open(lua_base_path..path, 'a')
 	fh:write(content)
+	if flush then
+		fh:flush()
+	end
 	fh:close()
 
 	return f
 end
 
 -- Append an array of lines to file. Sets a newline per default, unless newline is set to false.
-function file.appendlines(f, lines, newline)
-	return file.append(f, table.concat(lines, '\n'), newline)
+function files.appendlines(f, lines, newline)
+	return files.append(f, table.concat(lines, '\n'), newline)
 end
 
-return file
+return files

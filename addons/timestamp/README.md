@@ -1,5 +1,5 @@
 **Author:** Giuliano Riccio  
-**Version:** v 1.20130616
+**Version:** v 1.3.1
 
 # Timestamp #
 This addon prefixes any chat message with a timestamp.

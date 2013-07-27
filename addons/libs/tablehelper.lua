@@ -34,7 +34,7 @@ function T(t)
 	local res
 	if class(t) == 'Set' then
 		res = T{}
-		
+
 		local key = 1
 		for el in pairs(t) do
 			if type(el) == 'table' then
@@ -46,7 +46,7 @@ function T(t)
 		end
 	elseif class(t) == 'List' then
 		res = T{}
-		
+
 		local key = 1
 		for _, el in ipairs(t) do
 			if type(el) == 'table' then
@@ -59,7 +59,7 @@ function T(t)
 	else
 		res = t or {}
 	end
-	
+
 	-- Sets T's metatable's index to the table namespace, which will take effect for all T-tables.
 	-- This makes every function that tables have also available for T-tables.
 	return setmetatable(res, _meta.T)
@@ -71,12 +71,12 @@ end
 
 function class(o)
 	local mt = getmetatable(o)
-	
+
 	return mt and mt.__class or type(o)
 end
 
-_libs = T(_libs)
-_meta = T(_meta)
+_libs = _libs
+_meta = _meta
 
 -- Checks if a table is an array, only having sequential integer keys.
 function table.isarray(t)
@@ -130,8 +130,6 @@ end
 -- Appends an element to the end of an array table.
 function table.append(t, val)
 	t[#t+1] = val
-	
-	return t
 end
 
 -- Appends an array table to the end of another array table.
@@ -167,7 +165,7 @@ end
 -- Removes all elements from a table.
 function table.clear(t)
 	for key in pairs(t) do
-		t[key] = nil
+		rawset(t, key, nil)
 	end
 
 	return t
@@ -235,19 +233,32 @@ end
 -- Returns the keys of a table in an array.
 function table.keyset(t)
 	local res = {}
+	if _libs.sets then
+		for key in pairs(t) do
+			res[key] = true
+		end
+
+		return setmetatable(res, _meta.S)
+	end
+
+	local res = {}
 	local i = 0
-	for key, _ in pairs(t) do
+	for key in pairs(t) do
 		i = i + 1
 		res[i] = key
 	end
 
-	return T(res)
+	if _libs.lists then
+		res.n = i
+	end
+
+	return setmetatable(res, _libs.lists and _meta.L or _meta.T)
 end
 
 -- Flattens a table by splicing all nested tables in at their respective position.
 function table.flatten(t, recursive)
 	recursive = true and (recursive ~= false)
-	
+
 	local res = {}
 	local key = 1
 	local flat = {}
@@ -273,7 +284,7 @@ end
 -- Returns true if all key-value pairs in t_eq equal all key-value pairs in t.
 function table.equals(t, t_eq)
 	local seen = {}
-	
+
 	for key, val in pairs(t) do
 		if t_eq[key] ~= val then
 			return false
@@ -319,7 +330,7 @@ end
 -- Negative indices will be used to access the table from the other end.
 function table.slice(t, from, to)
 	local n  = #t
-	
+
 	from = from or 1
 	if from < 0 then
 		-- Modulo the negative index, to get it back into range.
@@ -371,7 +382,7 @@ end
 -- Returns a reversed array.
 function table.reverse(t)
 	local res = {}
-	
+
 	local n = #t
 	local rkey = n
 	for key = 1, n do
@@ -455,11 +466,11 @@ end
 -- Returns a table keyed by a specified index of a subtable. Requires a table of tables, and key must be a valid key in every table. Only produces the correct result, if the key is unique.
 function table.rekey(t, key)
 	local res = {}
-	
+
 	for _, value in pairs(t) do
 		res[value[key]] = value
 	end
-	
+
 	return setmetatable(res, getmetatable(t) or _meta.T)
 end
 
@@ -483,6 +494,11 @@ function table.all(t, fn)
 	end
 
 	return true
+end
+
+-- Wrapper around unpack(t). Returns table elements as a list of values. Only works on arrays.
+function table.unpack(t)
+	return unpack(t)
 end
 
 -- Returns the values of the table, extracted into an argument list. Like unpack, but works on dictionaries as well.
@@ -510,6 +526,11 @@ function table.copy(t)
 	end
 
 	return setmetatable(res, getmetatable(t))
+end
+
+-- Returns the first table, reassigned to the second one.
+function table.reassign(t, tn)
+	return t:clear():update(tn)
 end
 
 -- Returns an array containing values from start to finish. If no finish is specified, returns table.range(1, start)
@@ -558,7 +579,7 @@ function table.concat(t, str, from, to)
 			end
 		end
 	end
-	
+
 	return res
 end
 
@@ -574,8 +595,23 @@ function table.isempty(t)
 end
 
 -- Check if table is empty.
-function table.empty(t)
-	return next(t) == nil
+-- If rec is true, it counts empty nested empty tables as empty as well.
+function table.empty(t, rec)
+	if not rec then
+		return next(t) == nil
+	end
+
+    for _, val in pairs(t) do
+        if type(val) ~= 'table' then
+            return false;
+        else
+            if not table.empty(val, true) then
+                return false;
+            end
+        end
+    end
+    
+	return true
 end
 
 -- Sum up all elements of a table.
