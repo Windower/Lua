@@ -1,5 +1,5 @@
 --[[
-timestamp v1.20130607
+timestamp v1.20130616
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -28,29 +28,25 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-require 'colors'
+require 'chat'
 require 'logger'
 require 'tablehelper'
 
 config = require 'config'
 
 _addon = {}
-_addon.name    = 'timestamp'
-_addon.version = '1.20130607'
+_addon.name     = 'timestamp'
+_addon.version  = '1.20130616'
+_addon.commands = {'timestamp', 'ts'}
 
-function timezone(separator)
+function timezone()
     local now  = os.time()
     local h, m = math.modf(os.difftime(now, os.time(os.date('!*t', now))) / 3600)
 
-    if separator == nil or separator == false then
-        return string.format("%+.4d", 100 * h + 60 * m)
-    else
-        return string.format("%+.2d:%.2d", h, 60 * m)
-    end
+    return string.format('%+.4d', 100 * h + 60 * m), string.format('%+.2d:%.2d', h, 60 * m)
 end
 
-tz     = timezone()
-tz_sep = timezone(true)
+tz, tz_sep = timezone()
 
 constants = T{
     ['year']         = '%Y',
@@ -89,9 +85,11 @@ constants = T{
     ['rfc3339']      = '%Y-%m-%dT%H:%M:%S'..tz_sep
 }
 
+lead_bytes_pattern = string.char(0x1E, 0x1F, 0xF7, 0xEF, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89)
+
 defaults = {}
 defaults.color  = 508
-defaults.format = '${time}'
+defaults.format = '[${time}]'
 
 settings = {}
 
@@ -101,84 +99,101 @@ function get_string(format)
     return formatted_string
 end
 
-function event_load()
+function initialize()
     settings = config.load(defaults)
+end
 
+function event_load()
     send_command('alias timestamp lua c timestamp')
+    send_command('alias ts lua c timestamp')
+
+    if get_ffxi_info().logged_in then
+        initialize()
+    end
+end
+
+function event_login()
+    initialize()
 end
 
 function event_unload()
     send_command('unalias timestamp')
+    send_command('unalias ts')
 end
 
 function event_incoming_text(original, modified, mode)
-    if modified ~= '' and not ((mode == 150 or mode == 151) and (modified:find('\x7f\x31$') ~= nil or modified:find('\x7f\x34$') ~= nil)) then
-        local timeString = ('['..get_string(settings.format)..']'):color(settings.color)..' '
+    if modified ~= '' and not modified:find('^[%s]+$') then
+        if mode == 144 then -- 144 works as 150 but the enter prompts are ignored.
+            mode     = 150
+            modified = modified:gsub(string.char(0x7f, 0x31)..'$', '')
+        end
 
-        return timeString..modified:gsub('\x07', '\x07'..timeString)
+        if mode == 150 then -- 150 automatically indents new lines. 151 works the same way but with no indentation. redirect to 151 and manually add the ideographic space.
+            mode     = 151
+            modified = modified:gsub('([^'..lead_bytes_pattern..'])['..string.char(0x07)..'\n]', '%1\n'..string.char(0x81, 0x40))
+        end
+
+        if mode ~= 151 then
+            local timeString = get_string(settings.format):color(settings.color)..' '
+
+            modified = timeString..modified:gsub('^['..string.char(0x07)..'\n]+', ''):gsub('([^'..lead_bytes_pattern..'])['..string.char(0x07)..'\n]+$', '%1'):gsub('([^'..lead_bytes_pattern..'])['..string.char(0x07)..'\n]', '%1\n'..timeString)
+        end
     end
 
     return modified, mode
 end
 
 function event_addon_command(...)
-    local args = {...}
-
-    if args[1] == nil then
-        send_command('timestamp help')
-
-        return
-    end
-
-    local cmd = table.remove(args, 1):lower()
+    local cmd  = (...) and (...):lower() or 'help'
+    local args = {select(2, ...)}
 
     if cmd == 'help' then
-        log('\x81\xa1 timestamp [<command>] help -- shows the help text.')
-        log('\x81\xa1 timestamp color <color> -- sets the timestamp\'s color.')
-        log('\x81\xa1 timestamp format <format> -- sets the timestamp\'s format.')
-
-        return
+        log(chat.chars.wsquare..' timestamp [<command>] help -- shows the help text.')
+        log(chat.chars.wsquare..' timestamp color <color> -- sets the timestamp\'s color.')
+        log(chat.chars.wsquare..' timestamp format <format> -- sets the timestamp\'s format.')
     elseif cmd == 'format' then
-        if args[1] == nil then
+        if not args[1] then
             error('Please specify the new timestamp\'s format.')
         elseif args[1] == 'help' then
             log('Sets the timestamp\'s format.')
             log('Usage: timestamp format [help|<format>]')
             log('Positional arguments:')
-            log('\x81\xa1 help: shows the help text.')
-            log('\x81\xa1 <format>: defines the timestamp\'s format. The available constants are:')
+            log(chat.chars.wsquare..' help: shows the help text.')
+            log(chat.chars.wsquare..' <format>: defines the timestamp\'s format. The available constants are:')
 
-            for _, key in ipairs(constants:keyset():sort()) do
+            for key in constants:keyset():sort():it() do
                 log('  ${'..key..'}: '..get_string('${'..key..'}'))
             end
         else
             settings.format = args[1]
 
-            settings:save('all')
-            notice('The new timestamp\'s format has been set ('..get_string(settings.format)..').')
+            settings:save()
+            log('The new timestamp\'s format has been saved ('..get_string(settings.format)..').')
         end
     elseif cmd == 'color' then
-        if args[1] == nil then
-            error('Please specify the new color.')
+        if not args[1] then
+            error('Please specify the new timestamp\'s color.')
         elseif args[1] == 'help' then
             log('Sets the timestamp\'s color.')
             log('Usage: timestamp color [help|<color>]')
             log('Positional arguments:')
-            log('\x81\xa1 help: shows the help text.')
-            log('\x81\xa1 <color>: defines the timestamp\'s color. The value must be between 0 and 511, inclusive.')
+            log(chat.chars.wsquare..' help: shows the help text.')
+            log(chat.chars.wsquare..' <color>: defines the timestamp\'s color. The value must be between 0 and 511, inclusive.')
         else
-            local color = tonumber(args[1], 10)
+            local color = tonumber(args[1])
 
-            if color == nil or color < 0 or color >= 512 then
+            if not color or color < 0x00 or color > 0xFF then
                 error('Please specify a valid color.')
             else
                 settings.color = color
 
-                settings:save('all')
-                notice('The new color has been set.')
+                settings:save()
+                log('The new timestamp\'s color has been saved ('..color..').')
             end
         end
+    elseif cmd == 'save' then
+        settings:save('all')
     else
-        send_command('reive help')
+        send_command('timestamp help')
     end
 end

@@ -1,5 +1,5 @@
 --[[
-plasmon v1.20130610
+plasmon v1.20130613
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -34,9 +34,9 @@ require 'logger'
 local config = require 'config'
 
 _addon = {}
-_addon.name    = 'plasmon'
-_addon.version = '1.20130610'
-_addon.command = 'plasmon'
+_addon.name     = 'plasmon'
+_addon.version  = '1.20130613'
+_addon.commands = 'plasmon'
 
 tb_name       = 'addon:gr:plasmon'
 track         = false
@@ -254,7 +254,7 @@ function toggle_window()
 end
 
 function show_report()
-    log('[Plasm \30\02'..stats.plasm..'/'..stats.tot_plasm..'\30\01] [Mobs \30\02'..stats.mobs..'/'..stats.tot_mobs..'\30\01] [Airlixir \30\02'..stats.airlixirs..'/'..stats.tot_airlixirs..'\30\01 | +1 \30\02'..stats.airlixirs1..'/'..stats.tot_airlixirs1..'\30\01 | +2 \30\02'..stats.airlixirs2..'/'..stats.tot_airlixirs2..'\30\01]')
+    log('[Plasm '..(stats.plasm..'/'..stats.tot_plasm):color(258)..'] [Mobs '..(stats.mobs..'/'..stats.tot_mobs):color(258)..'] [Airlixir '..(stats.airlixirs..'/'..stats.tot_airlixirs):color(258)..' | +1 '..(stats.airlixirs1..'/'..stats.tot_airlixirs1):color(258)..' | +2 '..(stats.airlixirs2..'/'..stats.tot_airlixirs2):color(258)..']')
 end
 
 function first_run()
@@ -262,10 +262,10 @@ function first_run()
         return
     end
 
-    log('Hi '..get_player()['name']:lower()..',')
+    --[[log('Hi '..get_player()['name']:lower()..',')
     log('Thank you for using plasmon v'.._addon.version)
     log('In this update I\'ve added a function to enable/disable the fracture timer for people who don\'t like to feel under pressure. :D')
-    log('- zohno@phoenix')
+    log('- zohno@phoenix')]]
 
     settings.v = _addon.version
     settings.first_run = false
@@ -300,8 +300,8 @@ end
 -- windower events
 
 function event_load()
-    if _addon.command then
-        send_command('alias '.._addon.command..' lua c '.._addon.name)
+    if _addon.commands then
+        send_command('alias '.._addon.commands..' lua c '.._addon.name)
     end
 
     if get_ffxi_info()['logged_in'] then
@@ -324,6 +324,12 @@ function event_logout()
     dispose()
 end
 
+function event_zone_change(from_id, from, to_id, to)
+    if from_id == 271 and track then
+        stop_tracking()
+    end
+end
+
 function event_incoming_text(original, modified, mode)
     local match
 
@@ -338,8 +344,7 @@ function event_incoming_text(original, modified, mode)
                     start_tracking()
                 end
 
-                match = tonumber(match, 10)
-
+                match           = tonumber(match)
                 stats.plasm     = stats.plasm + match
                 stats.tot_plasm = stats.tot_plasm + match
 
@@ -420,9 +425,7 @@ function event_incoming_text(original, modified, mode)
 end
 
 function event_addon_command(...)
-    local args     = T({...})
-    local messages = T{}
-    local errors   = T{}
+    local args = T({...})
 
     if args[1] == nil then
         send_command('plasmon help')
@@ -432,18 +435,18 @@ function event_addon_command(...)
     local cmd = args:remove(1):lower()
 
     if cmd == 'help' then
-        log('\x81\xa1 plasmon help -- shows the help text.')
-        log('\x81\xa1 plasmon test -- fills the chat log with some messages to show how the plugin will work.')
-        log('\x81\xa1 plasmon reset -- sets current gained plasm, monster kill count and dropped airlixirs to 0.')
-        log('\x81\xa1 plasmon full-reset --  sets both current and total gained plasm, monster kill count and dropped airlixirs to 0.')
-        log('\x81\xa1 plasmon show -- shows the tracking window.')
-        log('\x81\xa1 plasmon hide -- hides the tracking window.')
-        log('\x81\xa1 plasmon toggle -- toggles the tracking window\'s visibility.')
-        log('\x81\xa1 plasmon light [<enabled>] -- enables or disables light mode. When enabled, the addon will never show the window and just print a summary in the chat box at the end of the run. If the enabled parameter is not specified, the help text will be shown.')
-        log('\x81\xa1 plasmon timer [<enabled>] -- enables or disables the timer. When enabled, the addon will start a 45 minutes timer when entering a fracture. If the enabled parameter is not specified, the help text will be shown.')
-        log('\x81\xa1 plasmon position [[-h]|[-x <x>] [-y <y>]] -- sets the horizontal and vertical position of the window relative to the upper-left corner. If no parameter is specified, the help text will be shown.')
-        log('\x81\xa1 plasmon font [[-h]|[-f <font>] [-s <size>] [-a <alpha>] [-b [<bold>]] [-i [<italic>]]] -- sets the style of the font used in the window. If the no parameter is specified, the help text will be shown.')
-        log('\x81\xa1 plasmon color [[-h]|[-o <objects>] [-d] [-r <red>] [-g <green>] [-b <blue>] [-a <alpha>]] -- sets the colors of the various elements present in the addon\'s window. If no parameter is specified, the help text will be shown.')
+        log(chat.chars.wsquare..' plasmon help -- shows the help text.')
+        log(chat.chars.wsquare..' plasmon test -- fills the chat log with some messages to show how the plugin will work.')
+        log(chat.chars.wsquare..' plasmon reset -- sets current gained plasm, monster kill count and dropped airlixirs to 0.')
+        log(chat.chars.wsquare..' plasmon full-reset --  sets both current and total gained plasm, monster kill count and dropped airlixirs to 0.')
+        log(chat.chars.wsquare..' plasmon show -- shows the tracking window.')
+        log(chat.chars.wsquare..' plasmon hide -- hides the tracking window.')
+        log(chat.chars.wsquare..' plasmon toggle -- toggles the tracking window\'s visibility.')
+        log(chat.chars.wsquare..' plasmon light [<enabled>] -- enables or disables light mode. When enabled, the addon will never show the window and just print a summary in the chat box at the end of the run. If the enabled parameter is not specified, the help text will be shown.')
+        log(chat.chars.wsquare..' plasmon timer [<enabled>] -- enables or disables the timer. When enabled, the addon will start a 45 minutes timer when entering a fracture. If the enabled parameter is not specified, the help text will be shown.')
+        log(chat.chars.wsquare..' plasmon position [[-h]|[-x <x>] [-y <y>]] -- sets the horizontal and vertical position of the window relative to the upper-left corner. If no parameter is specified, the help text will be shown.')
+        log(chat.chars.wsquare..' plasmon font [[-h]|[-f <font>] [-s <size>] [-a <alpha>] [-b [<bold>]] [-i [<italic>]]] -- sets the style of the font used in the window. If the no parameter is specified, the help text will be shown.')
+        log(chat.chars.wsquare..' plasmon color [[-h]|[-o <objects>] [-d] [-r <red>] [-g <green>] [-b <blue>] [-a <alpha>]] -- sets the colors of the various elements present in the addon\'s window. If no parameter is specified, the help text will be shown.')
     elseif cmd == 'test' then
         test()
     elseif cmd == 'reset' then
@@ -461,7 +464,7 @@ function event_addon_command(...)
             log('Enables or disables light mode. When enabled, the addon will never show the window and just print a summary in the chat box at the end of the run. If the enabled parameter is not specified, the help text will be shown.')
             log('Usage: plasmon light <enabled>')
             log('Positional arguments:')
-            log('\x81\xa1 <enabled>    specifies the status of the light mode. "default", "false" or "0" mean disabled. "true" or "1" mean enabled.')
+            log(chat.chars.wsquare..' <enabled>    specifies the status of the light mode. "default", "false" or "0" mean disabled. "true" or "1" mean enabled.')
         else
             local light
 
@@ -481,21 +484,21 @@ function event_addon_command(...)
 
             if type(light) ~= "boolean" then
                 error('Please specify a valid status')
+
+                return
             end
 
-            if errors:length() == 0 then
-                settings.light = light
+            settings.light = light
 
-                refresh_window()
-                settings:save('all')
-            end
+            refresh_window()
+            settings:save('all')
         end
     elseif cmd == 'timer' then
         if type(args[1]) == 'nil' then
             log('Enables or disables the timer. When enabled, the addon will start a 45 minutes timer when entering a fracture. If the enabled parameter is not specified, the help text will be shown.')
             log('Usage: plasmon timer <enabled>')
             log('Positional arguments:')
-            log('\x81\xa1 <enabled>    specifies the status of the timer. "false" or "0" mean disabled. "default", "true" or "1" mean enabled.')
+            log(chat.chars.wsquare..' <enabled>    specifies the status of the timer. "false" or "0" mean disabled. "default", "true" or "1" mean enabled.')
         else
             local timer
 
@@ -515,14 +518,14 @@ function event_addon_command(...)
 
             if type(timer) ~= "boolean" then
                 error('Please specify a valid status')
+
+                return
             end
 
-            if errors:length() == 0 then
-                settings.timer = timer
+            settings.timer = timer
 
-                refresh_window()
-                settings:save('all')
-            end
+            refresh_window()
+            settings:save('all')
         end
     else
         local options = parse_options(args)
@@ -532,9 +535,9 @@ function event_addon_command(...)
                 log('Sets the horizontal and vertical position of the window relative to the upper-left corner. If the no parameter is specified, the help text will be shown.')
                 log('Usage: plasmon position [[-h]|[-x <x>] [-y <y>]]')
                 log('Optional arguments:')
-                log('\x81\xa1 -h       shows the help text.')
-                log('\x81\xa1 -x <x>   specifies the horizontal position of the window.')
-                log('\x81\xa1 -y <y>   specifies the vertical position of the window.')
+                log(chat.chars.wsquare..' -h       shows the help text.')
+                log(chat.chars.wsquare..' -x <x>   specifies the horizontal position of the window.')
+                log(chat.chars.wsquare..' -y <y>   specifies the vertical position of the window.')
             elseif options:length() > 0 then
                 local x = settings.position.x
                 local y = settings.position.y
@@ -548,6 +551,8 @@ function event_addon_command(...)
 
                             if type(x) ~= "number" then
                                 error('Please specify a valid horizontal position.')
+
+                                return
                             end
                         end
                     elseif key == 'y' then
@@ -558,34 +563,36 @@ function event_addon_command(...)
 
                             if type(y) ~= "number" then
                                 error('Please specify a valid vertical position.')
+
+                                return
                             end
                         end
 
                     else
                         error('"'..key..'" is not a recognized parameter')
+
+                        return
                     end
                 end
 
-                if errors:length() == 0 then
-                    settings.position.x = x
-                    settings.position.y = y
+                settings.position.x = x
+                settings.position.y = y
 
-                    tb_set_location(tb_name, x, y)
-                    settings:save('all')
-                    notice('The window\'s position has been set.')
-                end
+                tb_set_location(tb_name, x, y)
+                settings:save('all')
+                log('The window\'s position has been set.')
             end
         elseif cmd == 'font' then
             if options:containskey('h') or options:length() == 0 then
                 log('Sets the style of the font used in the window. If the no parameter is specified, the help text will be shown.')
                 log('Usage: plasmon font [[-h]|[-f <font>] [-s <size>] [-a <alpha>] [-b [<bold>]] [-i [<italic>]]]')
                 log('Optional arguments:')
-                log('\x81\xa1 -h               shows the help text.')
-                log('\x81\xa1 -f <font>        specifies the text\'s font.')
-                log('\x81\xa1 -s <size>        specifies the text\'s size.')
-                log('\x81\xa1 -a <alpha>       specifies the text\'s transparency. the value must be set between 0 (transparent) and 255 (opaque), inclusive.')
-                log('\x81\xa1 -b [<bold>]      specifies if the text should be rendered bold. "default", "false" or "0" mean disabled. "true", "1" or no value mean enabled.')
-                log('\x81\xa1 -i [<italic>]    specifies if the text should be rendered italic. "default", "false" or "0" mean disabled. "true", "1" or no value mean enabled.')
+                log(chat.chars.wsquare..' -h               shows the help text.')
+                log(chat.chars.wsquare..' -f <font>        specifies the text\'s font.')
+                log(chat.chars.wsquare..' -s <size>        specifies the text\'s size.')
+                log(chat.chars.wsquare..' -a <alpha>       specifies the text\'s transparency. the value must be set between 0 (transparent) and 255 (opaque), inclusive.')
+                log(chat.chars.wsquare..' -b [<bold>]      specifies if the text should be rendered bold. "default", "false" or "0" mean disabled. "true", "1" or no value mean enabled.')
+                log(chat.chars.wsquare..' -i [<italic>]    specifies if the text should be rendered italic. "default", "false" or "0" mean disabled. "true", "1" or no value mean enabled.')
             elseif options:length() > 0 then
                 local family = settings.font.family
                 local size   = settings.font.size
@@ -608,6 +615,8 @@ function event_addon_command(...)
 
                             if type(size) ~= "number" then
                                 error('Please specify a valid font size.')
+
+                                return
                             end
                         end
                     elseif key == 'b' then
@@ -619,6 +628,8 @@ function event_addon_command(...)
                             bold = false
                         else
                             error('Please specify a valid bold status.')
+
+                            return
                         end
                     elseif key == 'i' then
                         if options['i'] == 'default' then
@@ -629,6 +640,8 @@ function event_addon_command(...)
                             italic = false
                         else
                             error('Please specify a valid italic status.')
+
+                            return
                         end
                     elseif key == 'a' then
                         if options['a'] == 'default' then
@@ -638,29 +651,31 @@ function event_addon_command(...)
 
                             if type(a) ~= "number" then
                                 error('Please specify a valid alpha value.')
+
+                                return
                             else
                                 a = math.min(255, math.max(0, a))
                             end
                         end
                     else
                         error('"'..key..'" is not a recognized parameter')
+
+                        return
                     end
                 end
 
-                if errors:length() == 0 then
-                    settings.font.family = family
-                    settings.font.size   = size
-                    settings.font.bold   = bold
-                    settings.font.italic = italic
-                    settings.font.a      = a
+                settings.font.family = family
+                settings.font.size   = size
+                settings.font.bold   = bold
+                settings.font.italic = italic
+                settings.font.a      = a
 
-                    tb_set_color(tb_name, a, 147, 161, 161)
-                    tb_set_font(tb_name, family, size)
-                    tb_set_bold(tb_name, bold)
-                    tb_set_italic(tb_name, italic)
-                    settings:save('all')
-                    notice('The font\'s style has been set.')
-                end
+                tb_set_color(tb_name, a, 147, 161, 161)
+                tb_set_font(tb_name, family, size)
+                tb_set_bold(tb_name, bold)
+                tb_set_italic(tb_name, italic)
+                settings:save('all')
+                log('The font\'s style has been set.')
             end
         elseif cmd == 'color' then
             local validObjects = T{
@@ -673,13 +688,13 @@ function event_addon_command(...)
                 log('Sets the colors of the various elements present in the addon\'s window. If the no parameter is specified, the help text will be shown.')
                 log('Usage: plasmon color [[-h]|[-o <objects>] [-d] [-r <red>] [-g <green>] [-b <blue>] [-a <alpha>]]')
                 log('Optional arguments:')
-                log('\x81\xa1 -h             shows the help text.')
-                log('\x81\xa1 -o <objects>   specifies the item/s which will have its/their color changed. If this parameter is missing all the objects will be changed. The accepted values are: "'..validObjects:concat('", "')..'"')
-                log('\x81\xa1 -d             sets the red, green, blue and alpha values of the specified objects to their default values.')
-                log('\x81\xa1 -r <red>       specifies the intensity of the red color. The value must be set between 0 and 255, inclusive, where 0 is less intense and 255 is most intense.')
-                log('\x81\xa1 -g <green>     specifies the intensity of the greencolor. The value must be set between 0 and 255, inclusive, where 0 is less intense and 255 is most intense.')
-                log('\x81\xa1 -b <blue>      specifies the intensity of the blue color. The value must be set between 0 and 255, inclusive, where 0 is less intense and 255 is most intense.')
-                log('\x81\xa1 -a <alpha>     specifies the text\'s transparency. The value must be set between 0 (transparent) and 255 (opaque), inclusive.')
+                log(chat.chars.wsquare..' -h             shows the help text.')
+                log(chat.chars.wsquare..' -o <objects>   specifies the item/s which will have its/their color changed. If this parameter is missing all the objects will be changed. The accepted values are: "'..validObjects:concat('", "')..'"')
+                log(chat.chars.wsquare..' -d             sets the red, green, blue and alpha values of the specified objects to their default values.')
+                log(chat.chars.wsquare..' -r <red>       specifies the intensity of the red color. The value must be set between 0 and 255, inclusive, where 0 is less intense and 255 is most intense.')
+                log(chat.chars.wsquare..' -g <green>     specifies the intensity of the greencolor. The value must be set between 0 and 255, inclusive, where 0 is less intense and 255 is most intense.')
+                log(chat.chars.wsquare..' -b <blue>      specifies the intensity of the blue color. The value must be set between 0 and 255, inclusive, where 0 is less intense and 255 is most intense.')
+                log(chat.chars.wsquare..' -a <alpha>     specifies the text\'s transparency. The value must be set between 0 (transparent) and 255 (opaque), inclusive.')
             elseif options:length() > 0 then
                 local r = -1
                 local g = -1
@@ -733,6 +748,8 @@ function event_addon_command(...)
                         end
                     else
                         error('Please specify a valid object or set of objects.')
+
+                        return
                     end
                 else
                     objects = T{
@@ -752,6 +769,8 @@ function event_addon_command(...)
 
                                 if type(r) ~= "number" then
                                     error('Please specify a valid red value.')
+
+                                    return
                                 else
                                     r = math.min(255, math.max(0, r))
                                 end
@@ -764,6 +783,8 @@ function event_addon_command(...)
 
                                 if type(g) ~= "number" then
                                     error('Please specify a valid green value.')
+
+                                    return
                                 else
                                     g = math.min(255, math.max(0, g))
                                 end
@@ -776,6 +797,8 @@ function event_addon_command(...)
 
                                 if type(b) ~= "number" then
                                     error('Please specify a valid blue value.')
+
+                                    return
                                 else
                                     b = math.min(255, math.max(0, b))
                                 end
@@ -788,6 +811,8 @@ function event_addon_command(...)
 
                                 if type(a) ~= "number" then
                                     error('Please specify a valid alpha value.')
+
+                                    return
                                 else
                                     a = math.min(255, math.max(0, a))
                                 end
@@ -795,71 +820,71 @@ function event_addon_command(...)
                         elseif key == 'o' then
                         else
                             error('"'..key..'" is not a recognized parameter.')
+
+                            return
                         end
                     end
                 end
 
-                if errors:length() == 0 then
-                    for key, object in pairs(objects) do
-                        local indexes = T(object:split('.'))
+                for key, object in pairs(objects) do
+                    local indexes = T(object:split('.'))
 
-                        if indexes:length() == 2 then
-                            if r == -1 then
-                                settings.colors[indexes[1]][indexes[2]].r = defaults.colors[indexes[1]][indexes[2]].r
-                            else
-                                settings.colors[indexes[1]][indexes[2]].r = r
-                            end
-
-                            if g == -1 then
-                                settings.colors[indexes[1]][indexes[2]].g = defaults.colors[indexes[1]][indexes[2]].g
-                            else
-                                settings.colors[indexes[1]][indexes[2]].g = g
-                            end
-
-                            if b == -1 then
-                                settings.colors[indexes[1]][indexes[2]].b = defaults.colors[indexes[1]][indexes[2]].b
-                            else
-                                settings.colors[indexes[1]][indexes[2]].b = b
-                            end
-                        elseif indexes:length() == 1 then
-                            if r == -1 then
-                                settings.colors[indexes[1]].r = defaults.colors[indexes[1]].r
-                            else
-                                settings.colors[indexes[1]].r = r
-                            end
-
-                            if g == -1 then
-                                settings.colors[indexes[1]].g = defaults.colors[indexes[1]].g
-                            else
-                                settings.colors[indexes[1]].g = g
-                            end
-
-                            if b == -1 then
-                                settings.colors[indexes[1]].b = defaults.colors[indexes[1]].b
-                            else
-                                settings.colors[indexes[1]].b = b
-                            end
-
-                            if a == -1 then
-                                settings.colors[indexes[1]].a = defaults.colors[indexes[1]].a
-                            else
-                                settings.colors[indexes[1]].a = a
-                            end
-
-                            tb_set_bg_color(
-                                tb_name,
-                                settings.colors[indexes[1]].a,
-                                settings.colors[indexes[1]].r,
-                                settings.colors[indexes[1]].g,
-                                settings.colors[indexes[1]].b
-                            )
+                    if indexes:length() == 2 then
+                        if r == -1 then
+                            settings.colors[indexes[1]][indexes[2]].r = defaults.colors[indexes[1]][indexes[2]].r
+                        else
+                            settings.colors[indexes[1]][indexes[2]].r = r
                         end
-                    end
 
-                    refresh_window()
-                    settings:save('all')
-                    notice('The objects\' color has been set.')
+                        if g == -1 then
+                            settings.colors[indexes[1]][indexes[2]].g = defaults.colors[indexes[1]][indexes[2]].g
+                        else
+                            settings.colors[indexes[1]][indexes[2]].g = g
+                        end
+
+                        if b == -1 then
+                            settings.colors[indexes[1]][indexes[2]].b = defaults.colors[indexes[1]][indexes[2]].b
+                        else
+                            settings.colors[indexes[1]][indexes[2]].b = b
+                        end
+                    elseif indexes:length() == 1 then
+                        if r == -1 then
+                            settings.colors[indexes[1]].r = defaults.colors[indexes[1]].r
+                        else
+                            settings.colors[indexes[1]].r = r
+                        end
+
+                        if g == -1 then
+                            settings.colors[indexes[1]].g = defaults.colors[indexes[1]].g
+                        else
+                            settings.colors[indexes[1]].g = g
+                        end
+
+                        if b == -1 then
+                            settings.colors[indexes[1]].b = defaults.colors[indexes[1]].b
+                        else
+                            settings.colors[indexes[1]].b = b
+                        end
+
+                        if a == -1 then
+                            settings.colors[indexes[1]].a = defaults.colors[indexes[1]].a
+                        else
+                            settings.colors[indexes[1]].a = a
+                        end
+
+                        tb_set_bg_color(
+                            tb_name,
+                            settings.colors[indexes[1]].a,
+                            settings.colors[indexes[1]].r,
+                            settings.colors[indexes[1]].g,
+                            settings.colors[indexes[1]].b
+                        )
+                    end
                 end
+
+                refresh_window()
+                settings:save('all')
+                log('The objects\' color has been set.')
             end
         else
             send_command('plasmon help')

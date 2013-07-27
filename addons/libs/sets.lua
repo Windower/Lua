@@ -121,7 +121,8 @@ end
 function set.it(s)
 	local key = nil
 	return function()
-		return next(s, key)
+		key = next(s, key)
+		return key
 	end
 end
 

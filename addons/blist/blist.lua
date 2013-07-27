@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon = {}
 _addon.name = 'Blist'
-_addon.version = '1.0'
+_addon.version = '1.2'
 _addon.author = 'Ragnarok.Ikonic'
 
 require 'tablehelper'
@@ -69,7 +69,7 @@ end
 
 function event_login(name)
 	settings = config.load(defaults)
-	add_to_chat(160,"Loading "..string.color(_addon.name,55,160).." for "..get_player().name..".")
+	add_to_chat(160,"Loading "..string.color(_addon.name,55,160).." settings for "..get_player().name..".")
 end
 
 function event_addon_command(...)
@@ -94,6 +94,7 @@ function event_addon_command(...)
 			add_to_chat(160,'  '..string.color('    muted',204,160)..' = message comes through, but in a different color')
 			add_to_chat(160,'  '..string.color('  reason',204,160)..' = reason why you are adding said person to blist')
 			add_to_chat(160,'  '..string.color('//bl delete|remove name',204,160)..' : Removes a user from your blist.')
+			add_to_chat(160,'  '..string.color('//bl qa name [reason]',204,160)..' : Adds a user to your blist w/o requiring extra details (reason is optional).')
 		elseif comm == 'status' then
             showStatus()
 		elseif comm == 'list' then
@@ -122,8 +123,12 @@ function event_addon_command(...)
 				com2 = args[2] -- name
 				com3 = tonumber(args[3]) -- temptime
 				com4 = args[4]:lower() -- hidetype
-				com5 = table.slice(args,5)
-				com5mess = tostring(table.sconcat(com5))
+				if args[5] ~= nil then
+					com5 = table.slice(args,5)
+					com5mess = tostring(table.sconcat(com5))
+				else
+					com5mess = nil
+				end
 
 				local addTemp = T{}
 				addTemp[com2] = {}
@@ -133,13 +138,43 @@ function event_addon_command(...)
 				addTemp[com2].hidetype = com4
 			
 				members = members:update(addTemp)
-				members:save('all') -- current character only
+				members:save('all')
+				send_ipc_message("blist reload members")
 				add_to_chat(160,"Updating "..string.color(args[2],56,160).." entry on "..string.color(_addon.name,55,160)..".")
 			end
+		elseif comm == "qa" then
+			if type(args[2]:match("(%a+)")) ~= "string" then
+				add_to_chat(160,"Invalid format; use the following: "..string.color("//bl qa <name> %[reason%]",204,160))
+			else
+				com2 = args[2] -- name
+				if args[3] ~= nil then
+					com3 = table.slice(args,3)
+					com3mess = tostring(table.sconcat(com3))
+				else
+					com3mess = nil
+				end
+
+				local addTemp = T{}
+				addTemp[com2] = {}
+				addTemp[com2].reason = com3mess
+				addTemp[com2].date = os.date("%x", date)
+				addTemp[com2].temptime = 0
+				addTemp[com2].hidetype = "hard"
+			
+				members = members:update(addTemp)
+				members:save('all')
+				send_ipc_message("blist reload members")
+				add_to_chat(160,"Updating "..string.color(string.ucfirst(args[2]),56,160).." entry on "..string.color(_addon.name,55,160)..".")
+			end
 		elseif comm == "remove" or comm == "delete" then
-			add_to_chat(160,"Removing "..string.color(args[2],56,160).." from "..string.color(_addon.name,55,160)..".")
-			members[args[2]].hidetype = "delete"
-			members:save('all') -- current character only
+			if members[args[2]] ~= nil then
+				add_to_chat(160,"Removing "..string.color(args[2],56,160).." from "..string.color(_addon.name,55,160)..".")
+				members[args[2]].hidetype = "delete"
+				members:save('all')
+				send_ipc_message("blist reload members")
+			else
+				add_to_chat(160,"User "..string.color(args[2],56,160).." not in "..string.color(_addon.name,55,160).." database; cannot remove.")
+			end
 		elseif comm == "mutedcolor" or comm == "color" then
 			com2num = tonumber(args[2])
 			if (com2num ~= nil) and (com2num >= 1 and com2num <= 255) then
@@ -160,6 +195,10 @@ function event_addon_command(...)
 				settings:save() -- current character only
 				add_to_chat(55,"Saving "..string.color(_addon.name,204,55).." settings.")
 			end
+			
+		elseif comm == "settings" then
+			settings:vprint()
+			
 		else
 			add_to_chat(160, "  Not a valid ".._addon.name.." v".._addon.version.." command.  "..string.color('//bl help',204,160).." for a list of valid commands.")
 			return
@@ -203,57 +242,74 @@ function onOffPrint(bleh)
 	return bleh;
 end
 
+function event_ipc_message(msg)
+	if msg == "blist reload members" then
+		members = config.load("data/members.xml",members)
+--		add_to_chat(160, "Reloading members database.")
+	end
+end
+
 function event_incoming_text(original, modified, mode)
-	local name = "blist"
 	if settings.useblist == true then
+		name = "blist"
 		if mode == 14 and settings.linkshell == true then -- linkshell (others)
-			a,z,name = string.find(original,'<(%a+)>')
+			a,z,name = string.find(original,'<(%a+)> ')
 		elseif mode == 13 and settings.party == true then -- party (others)
-			a,z,name = string.find(original,'%((%a+)%)')
+			a,z,name = string.find(original,'%((%a+)%) ')
 		elseif mode == 12 and settings.tell == true then -- tell (in)
-			a,z,name = string.find(original,'(%a+)>>')
-		elseif mode == 7 and settings.emote == true then -- emotes
+			a,z,name = string.find(original,'(%a+)>> ')
+		elseif (mode == 15 or mode == 7) and settings.emote == true then -- emote
 			a,z,name = string.find(original,'(%a+) ')
 		elseif mode == 1 and settings.say == true then -- say
 			a,z,name = string.find(original,'(%a+) ')
 		elseif mode == 2 and settings.shout == true then -- shout
 			a,z,name = string.find(original,'(%a+) ')
 		elseif mode == 121 and settings.bazaar == true then -- bazaar
-			a,z,name = string.find(original,'(%a+) ')
+			a,z,name,filler = string.find(original,'(%a+) (.*) bazaar%.')
 		elseif mode == 208 and settings.examine == true then -- examine
-			a,z,name = string.find(original,'(%a+) ')
+			a,z,name = string.find(original,'(%a+) examines you%.')
+		else
+			name = "blist"
 		end
-
-		if name ~= "blist" and name ~= nil and members[name:lower()] ~= nil then
+		if name ~= nil then
+			name = name:lower()
+		else
+			name = "blist"
+		end
+		
+		if name ~= "blist" and 
+		name ~= nil and 
+		members[name] ~= nil and
+		members[name].hidetype ~= "delete" then
 			local pattern = "(%d+)%/(%d+)%/(%d+)"
-			local xmonth, xday, xyear = members[name:lower()].date:match(pattern)
-			local blah = tonumber(members[name:lower()].temptime)
+			local xmonth, xday, xyear = members[name].date:match(pattern)
+			local blah = tonumber(members[name].temptime)
 			if #xyear < 4 then
 				xyear = tonumber("20"..tostring(xyear))
 			end
 			local convertedT = os.time({year = xyear, month = xmonth, day = xday+blah})
 			local nowTime = os.time()
-			if nowTime > convertedT then
-				members[name:lower()].hidetype = "delete"
+			if nowTime > convertedT and members[name].temptime ~= 0 then
+				members[name].hidetype = "delete"
 				members:save('all')
+				send_ipc_message("blist reload members")
 			end
 			
---			write("mode: "..mode)
-			if members[name:lower()].hidetype == "delete" then
+			if members[name].hidetype == "delete" then
 				modified = original
-			elseif members[name:lower()].hidetype == "hard" or #members[name:lower()].hidetype == 0 then
+			elseif members[name].hidetype == "hard" or #members[name].hidetype == 0 then
 				modified = ''
-			elseif members[name:lower()].hidetype == "soft" then
-				modified = _addon.name.." blocked message from "..name.."."
-			elseif members[name:lower()].hidetype == "muted" then
+			elseif members[name].hidetype == "soft" then
+				modified = _addon.name.." blocked message from "..string.ucfirst(name).."."
+			elseif members[name].hidetype == "muted" then
 				modified = string.color(original:trim(),settings.mutedcolor)
 			else
-				members[name:lower()].hidetype = "hard"
+				members[name].hidetype = "hard"
 				members:save('all')
+				send_ipc_message("blist reload members")
 				modified = ''
 			end
 		end
 		return modified
 	end
 end
-

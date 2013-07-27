@@ -243,23 +243,6 @@ function table.vprint(t, keys)
 end
 
 -- Load logger settings (has to be after the logging functions have been defined, so those work in the config and related files).
--- This checks if the config library has been loaded, if so, it will reload it to wipe the settings. Otherwise it will unload after it's done.
-local loaded = _libs.config ~= nil
-
-if loaded then
-	local old_config = package.loaded.config
-	package.loaded.config = nil
-end
-
 local config = require 'config'
 
 logger.settings = config.load('../libs/logger.xml', logger.defaults)
-
-config = nil
-package.loaded.config = nil
-
-if loaded then
-	package.loaded.config = old_config
-end
-
-collectgarbage()

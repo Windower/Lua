@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <addons>
   <addon>
     <name>Example</name>
@@ -108,6 +108,13 @@
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
+    <author>Omnys@Valefor</author>
+    <name>Gametime</name>
+    <description>Displays game time, game-week, moon information, and travel times.</description>
+    <bugtracker>https://github.com/thatdudegrim/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Valefor/Omnys</support>
+  </addon>
+  <addon>
     <name>Linker</name>
     <author>Arcon</author>
     <description>Allows opening links to certain websites from within the game, with an optional search parameter.</description>
@@ -194,6 +201,18 @@
     <bugtracker>https://github.com/jerryhebert/Lua/issues</bugtracker>
   </addon>
   <addon>
+    <name>Shortcuts</name>
+    <author>Byrth</author>
+    <description>Applys spellcast-like command completion (interpretation and target completion) to single slash commands. Includes emotes, /check, and /pcmd.</description>
+  </addon>
+  <addon>
+  	<name>ShoutHelper</name>
+  	<author>Jandel</author>
+  	<description>Help managing party job in an alliance shout. Displays a in-game editable list (initially empty) in which one can set job and players</description>
+  	<bugtracker>https://github.com/Jandella/Lua/issues</bugtracker>
+  	<support>http://www.ffxiah.com/player/Ragnarok/Jandel</support>
+  </addon>
+  <addon>
     <name>Send</name>
     <description>Sends commands between windower instances using IPC.</description>
   </addon>
@@ -246,5 +265,12 @@
     <description>Redirects the nm's weaknesses (VW or Abyssea) to the "tell" stream so that they can be held using the chat filters' function and highlights the important info.</description>
     <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
+  </addon>
+  <addon>
+    <author>r3g1stry</author>
+    <name>autoinvite</name>
+    <description>Automatically invites players when sent a tell with a specified keyword.</description>
+    <bugtracker>https://github.com/r3g1stry/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/user/R3G1STRY</support>
   </addon>
 </addons>
