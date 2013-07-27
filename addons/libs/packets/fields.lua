@@ -260,7 +260,7 @@ fields.incoming[0x02A] = L{
 fields.incoming[0x030] = L{
 	{ctype='unsigned int',      label='Player ID',          fn=id},             --    4 -  7
 	{ctype='unsigned short',    label='Index',              fn=index},          --    8 -  9
-	{ctype='unsigned short',    label='Effect'},                                --   10 -  11  -- 11 00 is wind, 12 00 is fire, 13 00 is earth, 16 00 is light, 17 00 is dark
+	{ctype='unsigned short',    label='Effect'},                                --   10 -  11  -- 10 00 is water, 11 00 is wind, 12 00 is fire, 13 00 is earth, 14 00 is lightning, 15 00 is ice, 16 00 is light, 17 00 is dark
 	{ctype='unsigned char',     label='Param'},                                 --   12 -  12  -- 00 is NQ, 01 is break, 02 is HQ
 	{ctype='unsigned char',     label='Animation'},                             --   13 -  13  -- Always C2 for me.
 	{ctype='unsigned char',     label='_unknown1',          const=0x00},        --   14 -  15  -- Appears to just be trash.
