@@ -64,7 +64,7 @@ data.incoming[0x021] = {name='Trade Requested',     description='Sent when someb
 data.incoming[0x022] = {name='Trade Action',        description='Sent whenever something happens with the trade window.'}
 data.incoming[0x025] = {name='Item Accepted',       description='Sent when the server will allow you to trade an item.'}
 data.incoming[0x028] = {name='Action',              description='Packet sent when an NPC is attacking.'}
-data.incoming[0x029] = {name='EXP Gain',            description='Packet sent after you defeat a mob and do not gain XP.'}
+data.incoming[0x029] = {name='Action Message',      description='Packet sent for simple battle-related messages.'}
 data.incoming[0x02A] = {name='Resting Message',     description='Packet sent when you rest in Abyssea.'}
 data.incoming[0x02D] = {name='EXP Gain (kill)',     description='Packet sent after you defeat a mob and gain XP.'}
 data.incoming[0x030] = {name='Synth Animation',     description='Generates the synthesis animation'}
