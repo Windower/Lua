@@ -1,18 +1,22 @@
 --[[
-Functions that facilitate loading, parsing and storing of config files.
+Functions that facilitate loading, parsing, manipulating and storing of config files.
 ]]
 
+local config = {}
+
 _libs = _libs or {}
-_libs.config = true
+_libs.config = config
 _libs.tablehelper = _libs.tablehelper or require 'tablehelper'
 _libs.stringhelper = _libs.stringhelper or require 'stringhelper'
-_libs.logger = _libs.logger or require 'logger'
-local xml = require 'xml'
-_libs.xml = _libs.xml or (xml ~= nil)
-local files = require 'filehelper'
-_libs.filehelper = _libs.filehelper or (files ~= nil)
+_libs.xml = _libs.xml or require 'xml'
+_libs.filehelper = _libs.filehelper or require 'filehelper'
 
-local config = {}
+if not _libs.logger then
+	error = write
+	warning = write
+	notice = write
+	log = write
+end
 
 -- Map for different config loads.
 local settings_map = T{}
@@ -52,7 +56,7 @@ function config.load(filename, confdict, overwrite)
 
 	-- Settings member variables, in separate struct
 	local meta = {}
-	meta.file = files.new()
+	meta.file = _libs.filehelper.new()
 	meta.original = T{['global'] = T{}}
 	meta.chars = T{}
 	meta.comments = T{}
@@ -61,7 +65,7 @@ function config.load(filename, confdict, overwrite)
 
 	-- Load addon config file (Windower/addon/<addonname>/data/settings.xml).
 	local filepath = filename or 'data/settings.xml'
-	if not files.exists(filepath) then
+	if not _libs.filehelper.exists(filepath) then
 		meta.file:set(filename or 'data/settings.xml', true)
 		meta.original['global'] = confdict:copy()
 		confdict:save()
@@ -91,7 +95,7 @@ function parse(confdict, overwrite)
 		parsed = json.read(meta.file)
 
 	elseif meta.file.path:endswith('.xml') then
-		parsed, err = xml.read(meta.file)
+		parsed, err = _libs.xml.read(meta.file)
 
 		if parsed == nil then
 			if err ~= nil then
@@ -106,11 +110,11 @@ function parse(confdict, overwrite)
 	end
 
 	-- Determine all characters found in the settings file.
-	meta.chars = parsed:keyset():filter(-'global')
+	meta.chars = parsed:keyset() - S{'global'}
 	meta.original = T{}
 
 	if overwrite or confdict:empty() then
-		for char in (L{'global'}+meta.chars):it() do
+		for char in (meta.chars + S{'global'}):it() do
 			meta.original[char] = confdict:copy():update(parsed[char], true)
 		end
 
@@ -118,7 +122,7 @@ function parse(confdict, overwrite)
 	end
 
 	-- Update the global settings with the per-player defined settings, if they exist. Save the parsed value for later comparison.
-	for _, char in ipairs(T{'global'}+meta.chars) do
+	for char in (meta.chars + S{'global'}):it() do
 		meta.original[char] = merge(confdict:copy(), parsed[char], char)
 	end
 
@@ -127,10 +131,6 @@ end
 
 -- Merges two tables like update would, but retains type-information and tries to work around conflicts.
 function merge(t, t_merge, path)
-	if t_merge == nil then
-		return t
-	end
-
 	path = (type(path) == 'string' and T{path}) or path
 
 	local oldval
@@ -228,34 +228,35 @@ end
 function settings_table(node, confdict, key)
 	confdict = confdict or T{}
 	key = key or 'settings'
-	
+
 	local t = T{}
 	if node.type ~= 'tag' then
 		return t
 	end
-	
+
 	if not node.children:all(function (n) return n.type == 'tag' or n.type == 'comment' end) and not (#node.children == 1 and node.children[1].type == 'text') then
 		error('Malformatted settings file.')
 		return t
 	end
-	
-	if node.children:length() == 1 and node.children[1].type == 'text' then
+
+	-- TODO: Type checking necessary? merge should take care of that.
+	if #node.children == 1 and node.children[1].type == 'text' then
 		local val = node.children[1].value
 		if val:lower() == 'false' then
 			return false
 		elseif val:lower() == 'true' then
 			return true
 		end
-		
+
 		local num = tonumber(val)
 		if num ~= nil then
 			return num
 		end
-		
+
 		return val
 	end
-	
-	for _, child in ipairs(node.children) do
+
+	for child in node.children:it() do
 		if child.type == 'comment' then
 			meta.comments[key] = child.value:trim()
 		elseif child.type == 'tag' then
@@ -269,7 +270,7 @@ function settings_table(node, confdict, key)
 			t[child.name:lower()] = settings_table(child, childdict, key)
 		end
 	end
-	
+
 	return t
 end
 
@@ -292,9 +293,9 @@ function config.save(t, char)
 		meta.original = meta.original:filterkey('global')
 	else
 		meta.original.global:amend(meta.original[char])
-		meta.original[char] = table_diff(meta.original['global'], meta.original[char]) or T{}
+		meta.original[char] = table_diff(meta.original['global'], meta.original[char])
 
-		if meta.original[char]:empty() then
+		if meta.original[char]:empty(true) then
 			meta.original[char] = nil
 			meta.chars:delete(char)
 		end
@@ -307,18 +308,20 @@ end
 function table_diff(t, t_new)
 	local res = T{}
 	local cmp
-	
+
 	for key, val in pairs(t_new) do
 		cmp = t[key]
 		if cmp ~= nil then
-			if type(cmp) ~= type(val) then
+			if class(cmp) ~= class(val) then
 				warning('Mismatched setting types for key \''..key..'\':', type(cmp), type(val))
 			else
 				if type(val) == 'table' then
-					val = T(val)
-					cmp = T(cmp)
-					if val:isarray() and cmp:isarray() then
-						if not val:equals(cmp) then
+					if class(val) == 'Set' or class(val) == 'List' then
+						if not cmp:equals(val) then
+							res[key] = val
+						end
+					elseif table.isarray(val) and table.isarray(cmp) then
+						if not table.equals(cmp, val) then
 							res[key] = val
 						end
 					else
@@ -331,10 +334,6 @@ function table_diff(t, t_new)
 		end
 	end
 
-	if res:empty() then
-		return nil
-	end
-
 	return res
 end
 
@@ -344,7 +343,7 @@ function settings_xml(meta)
 	str = str..'<settings>\n'
 	local settings = meta.original
 
-	meta.chars = settings:keyset():filter(-'global'):sort()
+	meta.chars = (settings:keyset() - S{'global'}):sort()
 	for char in (L{'global'}+meta.chars):it() do
 		if char == 'global' and rawget(meta.comments, 'settings') ~= nil then
 			str = str..'\t<!--\n'
@@ -393,6 +392,8 @@ function nest_xml(t, meta, indentlevel)
 		else
 			if class(val) == 'List' then
 				val = val:format('csv')
+			elseif class(val) == 'Set' then
+				val = val:sort():format('csv')
 			elseif type(val) == 'table' then
 				val = T(val):format('csv')
 			else

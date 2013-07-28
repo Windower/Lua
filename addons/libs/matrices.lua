@@ -113,7 +113,7 @@ function matrix.det(m)
 	for i, val in ipairs(m[1]) do
 		acc = acc + (-1)^i * m:exclude(1, i):det()
 	end
-	
+
 	return acc
 end
 
@@ -145,7 +145,7 @@ function matrix.add(m1, m2)
 			res[i][j] = val + m2[i][j]
 		end
 	end
-	
+
 	res.rows, res.cols = m1.rows, m1.cols
 	return setmetatable(res, _meta.M)
 end
@@ -161,7 +161,7 @@ function matrix.subtract(m1, m2)
 			res[i][j] = val - m2[i][j]
 		end
 	end
-	
+
 	res.rows, res.cols = m1.rows, m1.cols
 	return setmetatable(res, _meta.M)
 end
@@ -171,7 +171,7 @@ _meta.M.__sub = matrix.subtract
 -- Return a matrix multiplied by another matrix or vector.
 function matrix.multiply(m1, m2)
 	local res = {}
-	
+
 	local cols = {}
 	for i, col in ipairs(m2[1]) do
 		cols[i] = {}
@@ -181,7 +181,7 @@ function matrix.multiply(m1, m2)
 			cols[j][i] = val
 		end
 	end
-	
+
 	local acc
 	for i, row in ipairs(m1) do
 		res[i] = {}
@@ -190,7 +190,7 @@ function matrix.multiply(m1, m2)
 			for j, val in ipairs(col) do
 				 acc = acc + m1[i][c]*m2[j][c]
 			end
-			
+
 			res[i][c] = acc
 		end
 	end
@@ -209,7 +209,7 @@ function matrix.tostring(m)
 			str = str..', '
 		end
 		str = str..'['
-		
+
 		for j, val in ipairs(row) do
 			if j > 1 then
 				str = str..', '
@@ -238,11 +238,10 @@ function matrix.tovstring(m)
 			str = str..tostring(val)
 		end
 	end
-	
+
 	return str
 end
 
 function matrix.vprint(m)
 	log(m:tovstring())
 end
-

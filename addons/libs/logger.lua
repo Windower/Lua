@@ -44,7 +44,7 @@ end
 -- Prints the arguments provided to the FFXI chatlog, in the same color used for Campaign/Bastion alerts and Kupower messages. Can be changed below.
 function captionlog(msg, msgcolor, ...)
 	local caption = table.concat({_addon and _addon.name, msg}, ' ')
-	
+
 	if #caption > 0 then
 		if logger.settings.logtofile == true then
 			flog(nil, caption..':', ...)
@@ -52,14 +52,14 @@ function captionlog(msg, msgcolor, ...)
 		end
 		caption = (caption..':'):color(msgcolor)..' '
 	end
-	
+
 	local str = ''
 	if select('#', ...) == 0 or ... == '' then
 		str = ' '
 	else
 		str = arrstring(...):gsub('\t', (' '):rep(4))
 	end
-	
+
 	for _, line in ipairs(str:split('\n')) do
 		add_to_chat(logger.settings.logcolor, caption..line..chat.colorcontrols.reset)
 	end
@@ -85,7 +85,7 @@ end
 -- If the first argument ends with '.log', it will print to that output file, otherwise to 'lua.log' in the addon directory.
 function flog(filename, ...)
 	filename = filename or logger.settings.defaultfile
-	
+
 	local fh, err = io.open(lua_base_path..filename, 'a')
 	if fh == nil then
 		if err ~= nil then
@@ -104,9 +104,9 @@ function table.tostring(t)
 	if next(t) == nil then
 		return '{}'
 	end
-	
+
 	keys = keys or false
-	
+
 	-- Iterate over table.
 	local tstr = ''
 	local kt = {}
@@ -121,10 +121,10 @@ function table.tostring(t)
 		elseif type(x) == 'string' and type(y) == 'number' then
 			return false
 		end
-		
+
 		return x<y
 	end)
-	
+
 	for i, key in ipairs(kt) do
 		val = t[key]
 		-- Check for nested tables
@@ -137,20 +137,20 @@ function table.tostring(t)
 				valstr = tostring(val)
 			end
 		end
-		
+
 		-- Append to the string.
 		if tonumber(key) then
 			tstr = tstr..valstr
 		else
 			tstr = tstr..key..'='..valstr
 		end
-		
+
 		-- Add comma, unless it's the last value.
 		if next(kt, i) ~= nil then
 			tstr = tstr..', '
 		end
 	end
-	
+
 	-- Output the result, enclosed in braces.
 	return '{'..tstr..'}'
 end
@@ -176,10 +176,10 @@ function table.tovstring(t, keys, indentlevel)
 	if next(t) == nil then
 		return '{}'
 	end
-	
+
 	indentlevel = indentlevel or 0
 	keys = keys or false
-	
+
 	local indent = (' '):rep(indentlevel*4)
 	local tstr = '{\n'
 	local kt = {}
@@ -194,10 +194,10 @@ function table.tovstring(t, keys, indentlevel)
 		elseif type(x) == 'string' and type(y) == 'number' then
 			return false
 		end
-		
+
 		return x<y
 	end)
-	
+
 	for i, key in pairs(kt) do
 		val = t[key]
 		-- Check for nested tables
@@ -210,23 +210,23 @@ function table.tovstring(t, keys, indentlevel)
 				valstr = tostring(val)
 			end
 		end
-		
+
 		-- Append one line with indent.
 		if not keys and tonumber(key) then
 			tstr = tstr..indent..'    '..valstr
 		else
 			tstr = tstr..indent..'    '..key..'='..valstr
 		end
-		
+
 		-- Add comma, unless it's the last value.
 		if next(kt, i) ~= nil then
 			tstr = tstr..', '
 		end
-		
+
 		tstr = tstr..'\n'
 	end
 	tstr = tstr..indent..'}'
-	
+
 	return tstr
 end
 

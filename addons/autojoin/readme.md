@@ -1,6 +1,6 @@
 Author: Stjepan Bakrac
 Addon: AutoJoin
-Version: 0.9
+Version: 0.9.1.0
 
 # AutoJoin
 

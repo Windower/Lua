@@ -40,6 +40,7 @@
   </addon>
   <addon>
     <name>BattleMod</name>
+    <author>Byrth</author>
     <description>Customizes battle chat messages.</description>
   </addon>
   <addon>
@@ -113,6 +114,11 @@
     <description>Displays game time, game-week, moon information, and travel times.</description>
     <bugtracker>https://github.com/thatdudegrim/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Valefor/Omnys</support>
+  </addon>
+  <addon>
+    <name>GearSwap</name>
+    <author>Byrth</author>
+    <description>Changes gear in response to player actions.</description>
   </addon>
   <addon>
     <name>Linker</name>

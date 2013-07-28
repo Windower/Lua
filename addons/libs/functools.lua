@@ -56,12 +56,6 @@ function functools.negate(fn)
 	end
 end
 
--- Evaluates a function and returns a value as well as store it in a variable of the provided name.
-function functools.tee(str, val)
-	_G[str] = val
-	return val
-end
-
 -- Returns a function that returns a subset of the provided function's elements according to a table slice.
 -- * i == nil:	Returns all elements as a table
 -- * j == nil:	Returns all elements from i until the end
@@ -87,8 +81,6 @@ debug.setmetatable(functools.empty, {
 	__concat = functools.pipe,
 	__unm = functools.negate,
 })
-
-debug.getmetatable('').__mod = functools.tee
 
 --[[
 	Logic functions
@@ -160,6 +152,11 @@ end
 	Table functions
 ]]
 
+-- Accesses a table key. Invoked metamethods.
+function table.index(t, key)
+	return t[key]
+end
+
 -- Returns an attribute of a table.
 function table.get(t, att)
 	return rawget(t, att)
@@ -193,7 +190,7 @@ function table.filter(t, fn)
 	if type(fn) ~= 'function' then
 		fn = functools.equals(fn)
 	end
-	
+
 	local res = T{}
 	if T(t):isarray() then
 		for _, val in ipairs(t) do
@@ -218,7 +215,7 @@ function table.filterkey(t, fn)
 	if type(fn) ~= 'function' then
 		fn = functools.equals(fn)
 	end
-	
+
 	local res = T{}
 	for key, val in pairs(t) do
 		-- Only copy if fn(key) evaluates to true
