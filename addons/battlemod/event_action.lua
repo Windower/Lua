@@ -33,6 +33,10 @@ function event_action(act)
 	
 	local party_table = get_party()
 	local actor_table = get_mob_by_id(act['actor_id'])
+	if actor_table == nil then
+		write(tostring(act)..' error')
+		return
+	end
 	local actor = actor_table['name']
 	if actor == nil then return end
 	actor = namecol(actor,actor_table,party_table)
@@ -238,19 +242,23 @@ function event_action(act)
 						end
 						if mabils[abil_ID-256]['actorstatus'] and tpstatuses then
 							local tempar = split(mabils[abil_ID-256]['actorstatus'],',')
-							actor = actor..' ~'
+							actor = actor..' ~'..statuses[tonumber(tempar[1])]['english']
 							for q,w in pairs(tempar) do
-								actor = actor..statuses[tonumber(w)]['english']..' '
+								if q ~= 1 then
+									actor = actor..', '..statuses[tonumber(w)]['english']
+								end
 							end
-							actor = actor..'~ '
+							actor = actor..'~'
 						end
 						if mabils[abil_ID-256]['targetstatus'] and tpstatuses then
 							local tempar = split(mabils[abil_ID-256]['targetstatus'],',')
-							target = target..' ~'
+							target = target..' ~'..statuses[tonumber(tempar[1])]['english']
 							for q,w in pairs(tempar) do
-								target = target..statuses[tonumber(w)]['english']..' '
+								if q~= 1 then
+									target = target..', '..statuses[tonumber(w)]['english']
+								end
 							end
-							target = target..'~ '
+							target = target..'~'
 						end
 					elseif abil_ID < 256 then
 						weapon_skill = jobabilities[abil_ID+768]['english']

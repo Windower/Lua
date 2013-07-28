@@ -306,7 +306,7 @@
 	<dtd id="304" english="${actor} uses Elemental Seal." color="101"/>
 	<dtd id="305" english="${actor} uses Trick Attack." color="101"/>
 	<dtd id="306" english="${actor} uses ${ability}.${lb}${target} recovers ${number} HP." color="H" units="HP"/>
-	<dtd id="307" english="That action requires a two-handed weapon." color="1"/>
+	<dtd id="307" english="That action requires a two-handed weapon." color="122"/>
 	<dtd id="308" english="Unable to use the ${item}.${lb}${target}'s inventory is full." color="1"/>
 	<dtd id="309" english="${actor} casts ${spell} on ${target}." color="56"/>
 	<dtd id="310" english="${actor}'s ${skill} skill drops 0.${number} points!" color="1"/>
@@ -314,7 +314,7 @@
 	<dtd id="312" english="${actor}'s attempt to cover has no effect." color="R"/>
 	<dtd id="313" english="${target} is out of range.${lb}Unable to cast ${spell}." color="123"/>
 	<dtd id="314" english="${target}'s level is currently restricted to ${number}.${lb}Equipment affected by the level restriction will be adjusted accordingly." color="1"/>
-	<dtd id="315" english="${actor} already has a pet." color="1"/>
+	<dtd id="315" english="${actor} already has a pet." color="122"/>
 	<dtd id="316" english="That action cannot be used in this area." color="56"/>
 	<dtd id="317" english="${actor} uses ${ability}.${lb}${target} takes ${number} points of damage." color="D"/>
 	<dtd id="318" english="${actor} uses ${ability}.${lb}${target} recovers ${number} HP." color="H" units="HP"/>

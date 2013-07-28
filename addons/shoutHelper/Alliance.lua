@@ -308,6 +308,17 @@ function Alliance:deleteAll()
     self.party3 = {}
 end
 
+--delete the party
+function Alliance:delete(party)
+    if party == "party1" then
+        self.party1 = {}
+    elseif party == "party2" then
+        self.party2 = {}
+    elseif party == "party3" then
+        self.party3 = {}
+    end
+end
+
 --sets one player to the first <job> slot free
 function Alliance:addPlayer(job, name)
     local party = self:findFreeSlot(job)
@@ -460,27 +471,27 @@ function Alliance:save()
     --TODO (now creates only a string xml)
     local a = '<?xml version="1.0" ?>\n'
     a = a..'<alliance>\n'
-    a = a..'\t<party tag="1">\n'
+    a = a..'\t<party1>\n'
     for i=1, #self.party1 do
         slot = self.party1[i]
         job = slot[1]
-        a = a..'\t\t<job>'..job:upper()..'</job>\n'
+        a = a..'\t\t<job'..i..'>'..job:upper()..'</job'..i..'>\n'
     end
-    a = a..'\t</party>\n'
-    a = a..'\t<party tag="2">\n'
+    a = a..'\t</party1>\n'
+    a = a..'\t<party2>\n'
     for i=1, #self.party2 do
         slot = self.party2[i]
         job = slot[1]
-        a = a..'\t\t<job>'..job:upper()..'</job>\n'
+        a = a..'\t\t<job'..i..'>'..job:upper()..'</job'..i..'>\n'
     end
-    a = a..'\t</party>\n'
-    a = a..'\t<party tag="3">\n'
+    a = a..'\t</party2>\n'
+    a = a..'\t<party3>\n'
     for i=1, #self.party3 do
         slot = self.party3[i]
         job = slot[1]
-        a = a..'\t\t<job>'..job:upper()..'</job>\n'
+        a = a..'\t\t<job'..i..'>'..job:upper()..'</job'..i..'>\n'
     end
-    a = a..'\t</party>\n'
+    a = a..'\t</party3>\n'
     a = a..'</alliance>\n'
 end
 

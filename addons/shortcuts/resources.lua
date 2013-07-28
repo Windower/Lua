@@ -36,7 +36,24 @@ r_spells = parse_resources(speFile:readlines())
 -- Convert the spells and job abilities into a referenceable list of aliases --
 validabils = T{}
 
+if logging then
+	f = io.open('../addons/shortcuts/data/'..tostring(os.clock())..'_all_duplicates.log','w+')
+	counter = 0
+end
+
+
+-----------------------------------------------------------------------------------
+--Name: make_abil()
+--Args:
+---- abil (string): ability name to be stripped
+---- t (string): type of ability (Magic or Ability)
+---- i (number): index id
+-----------------------------------------------------------------------------------
+--Returns:
+---- Nothing, adds a new line to validabils or modifies it.
+-----------------------------------------------------------------------------------
 function make_abil(abil,t,i)
+	if abil:sub(1,1) == '#' or string.find(abil:lower(),'magic'..string.char(0x40)) then return end
 	ind = strip(abil)
 	if not rawget(validabils,ind) then
 		validabils[ind] = {}
@@ -44,12 +61,18 @@ function make_abil(abil,t,i)
 		validabils[ind].index = i
 	else
 --		write(tostring(validabils[ind]))
+		if logging then
+			f:write('Original: '..tostring(abil)..' '..tostring(validabils[ind].typ)..' '..tostring(validabils[ind].index)..'\nSecondary: '..tostring(abil)..' '..tostring(t)..' '..tostring(i)..'\n\n')
+			counter = counter +1
+		end
 		validabils[ind] = {}
 		validabils[ind].typ = 'ambig_names'
 		validabils[ind].index = ind
 	end
 end
 
+
+-- Iterate through spells.xml and make validabils.
 for i,v in pairs(r_spells) do
 	v['validtarget'] = {Self=false,Player=false,Party=false,Ally=false,NPC=false,Enemy=false}
 	local potential_targets = split(v['targets'],', ')
@@ -66,6 +89,7 @@ for i,v in pairs(r_spells) do
 	end
 end
 
+-- Iterate through abils.xml and make validabils.
 for i,v in pairs(r_abilities) do
 	v['validtarget'] = {Self=false,Player=false,Party=false,Ally=false,NPC=false,Enemy=false}
 	local potential_targets = split(v['targets'],', ')
@@ -82,10 +106,24 @@ for i,v in pairs(r_abilities) do
 	end
 end
 
+if logging then
+	f:write('Counter: '..tostring(counter))
+	f:close()
+end
+
+--f = io.open('../addons/pr/data/'..tostring(os.clock())..'.log','w+')
+--for i,v in pairs(validabils) do
+--	f:write(tostring(i)..' '..tostring(v)..'\n')
+--end
+
+-- Constants used in the rest of the addon.
+
+-- List of valid prefixes to be interpreted. The values currently have no use.
 command_list = {['/ja']='Ability',['/jobability']='Ability',['/so']='Magic',['/song']='Magic',['/ma']='Magic',['/magic']='Magic',['/nin']='Magic',['/ninjutsu']='Magic',
-	['/ra']='Ranged Attack',['/range']='Ranged Attack',['/throw']='Ranged Attack',['/shoot']='Ranged Attack',['/ms']='Weapon Skill',['/monsterskill']='Weapon Skill',
+	['/ra']='Ranged Attack',['/range']='Ranged Attack',['/throw']='Ranged Attack',['/shoot']='Ranged Attack',['/ms']='Weapon Skill',['/monsterskill']='Ability',
 	['/ws']='Weapon Skill',['/weaponskill']='Weapon Skill',['/item']='Ability',['/pet']='Ability'}
 
+-- List of other commands that might use name completion.
 command2_list = {['/kick']=true,['/assist']=true,['/alliancecmd']=T{'kick','add','leader','breakup','leave','looter'},['/partycmd']=T{'kick','add','leader','breakup','leave','looter'},
 	['/acmd']=T{'kick','add','leader','breakup','leave','looter'},['/pcmd']=T{'kick','add','leader','breakup','leave','looter'},
 	['/wave']=T{'motion'},['/poke']=T{'motion'},['/dance']=T{'motion'},['/dance1']=T{'motion'},['/dance2']=T{'motion'},['/dance3']=T{'motion'},['/dance4']=T{'motion'},['/amazed']=T{'motion'},
@@ -96,10 +134,11 @@ command2_list = {['/kick']=true,['/assist']=true,['/alliancecmd']=T{'kick','add'
 	['/smile']=T{'motion'},['/stagger']=T{'motion'},['/stare']=T{'motion'},['/sulk']=T{'motion'},['/surprised']=T{'motion'},['/think']=T{'motion'},['/toss']=T{'motion'},['/upset']=T{'motion'},['/welcome']=T{'motion'},
 	['/check']=true,['/c']=true,['/breaklinkshell']=true,['/target']=true,['/ta']=true}
 
-ignore_list = {['/equip']=true,['/raw']=true,['/fish']=true}
+-- List of commands to be ignored
+ignore_list = {['/equip']=true,['/raw']=true,['/fish']=true,['/dig']=true,['/range']=true,['/map']=true,['/hide']=true}
 
+-- Targets to ignore and just pass through
 pass_through_targs = T{'<t>','<me>','<ft>','<scan>','<bt>','<lastst>','<r>','<pet>','<p0>','<p1>','<p2>','<p3>','<p4>',
 	'<p5>','<a10>','<a11>','<a12>','<a13>','<a14>','<a15>','<a20>','<a21>','<a22>','<a23>','<a24>','<a25>'}
 
--- Globals --
-player = {}
+language = 'english' -- get_ffxi_info()['language']:lower()

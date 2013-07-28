@@ -25,14 +25,33 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+-----------------------------------------------------------------------------------
+--Name: parse_resources()
+--Args:
+---- lines_file (table of strings) - Table loaded with readlines() from an opened file
+-----------------------------------------------------------------------------------
+--Returns:
+---- Table of subtables indexed by their id (or index).
+---- Subtables contain the child text nodes/attributes of each resources line.
+----
+---- Child text nodes are given the key "english".
+---- Attributes keyed by the attribute name, for example:
+---- <a id="1500" a="1" b="5" c="10">15</a>
+---- turns into:
+---- completed_table[1500]['a']==1
+---- completed_table[1500]['b']==5
+---- completed_table[1500]['c']==10
+---- completed_table[1500]['english']==15
+----
+---- There is also currently a field blacklist (ignore_fields) for the sake of memory bloat.
+-----------------------------------------------------------------------------------
 function parse_resources(lines_file)
 	local ignore_fields = S{'german','french','japanese','index','fr','frl','de','del','jp','jpl'}
 	local completed_table = {}
-	local counter = 0
 	for i in ipairs(lines_file) do
 		local str = tostring(lines_file[i])
 		local g,h,typ,key = string.find(str,'<(%w+) id="(%d+)" ')
-		if typ == 's' then
+		if typ == 's' then -- Packets and .dats refer to the spell index instead of ID
 			g,h,key = string.find(str,'index="(%d+)" ')
 		end
 		if key ~=nil then
@@ -53,8 +72,8 @@ function parse_resources(lines_file)
 					q = str:len()+1
 				end
 			end
-			local k,v,english = string.find(str,'>([^<]+)</')
-			if english~=nil then
+			local k,v,english = string.find(str,'>([^<]+)</') -- Look for a Child Text Node
+			if english~=nil then -- key it to 'english' if it exists
 				completed_table[tonumber(key)]['english']=english
 			end
 		end
@@ -63,6 +82,14 @@ function parse_resources(lines_file)
 	return completed_table
 end
 
+-----------------------------------------------------------------------------------
+--Name: str2bool()
+--Args:
+---- input (string) - Value that might be true or false
+-----------------------------------------------------------------------------------
+--Returns:
+---- boolean or nil. Defaults to nil if input is not true or false.
+-----------------------------------------------------------------------------------
 function str2bool(input)
 	-- Used in the options_load() function
 	if input:lower() == 'true' then
@@ -74,6 +101,15 @@ function str2bool(input)
 	end
 end
 
+-----------------------------------------------------------------------------------
+--Name: split()
+--Args:
+---- msg (string): message to be subdivided
+---- match (string/char): marker for subdivision
+-----------------------------------------------------------------------------------
+--Returns:
+---- Table containing string(s)
+-----------------------------------------------------------------------------------
 function split(msg, match)
 	local length = msg:len()
 	local splitarr = T{}
@@ -95,7 +131,32 @@ function split(msg, match)
 	return splitarr
 end
 
+-----------------------------------------------------------------------------------
+--Name: strip()
+--Args:
+---- name (string): Name to be slugged
+-----------------------------------------------------------------------------------
+--Returns:
+---- string with a gsubbed version of name that converts numbers to Roman numerals
+-------- removes non-letter/numbers, and forces it to lower case.
+-----------------------------------------------------------------------------------
 function strip(name)
-	return name:gsub('4','iv'):gsub('3','iii'):gsub('2','ii'):gsub('1','i'):gsub('8','viii'):gsub('7','vii'):gsub('6','vi'):gsub('5','v'):gsub('[^%a]',''):lower()
+	return name:gsub('4','iv'):gsub('9','ix'):gsub('0','p'):gsub('3','iii'):gsub('2','ii'):gsub('1','i'):gsub('8','viii'):gsub('7','vii'):gsub('6','vi'):gsub('5','v'):gsub('[^%a]',''):lower()
 end
 
+-----------------------------------------------------------------------------------
+--Name: percent_strip()
+--Args:
+---- line (string): string to be checked for % signs and stripped
+-----------------------------------------------------------------------------------
+--Returns:
+---- line, without any trailing %s.
+-----------------------------------------------------------------------------------
+function percent_strip(line)
+	local line_len = #line
+	while line:byte(line_len) == 37 do
+		line = line:sub(1,line_len-1)
+		line_len = line_len -1
+	end
+	return line
+end

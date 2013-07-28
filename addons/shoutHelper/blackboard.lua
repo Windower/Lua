@@ -122,8 +122,24 @@ function Blackboard:update()
     end
 end
 
-function Blackboard:reset()
-    self.ally:deleteAll()
+function Blackboard:reset(party)
+    if not party then
+        self.ally:deleteAll()
+    else
+        local ptBool = (party == ('party1')) or (party == ('pt1')) or (party == ('1'))
+        if(ptBool) then
+            party = 'party1'
+        end
+        ptBool = (party == ('party2')) or (party == ('pt2')) or (party == ('2'))
+        if(ptBool) then
+            party = 'party2'
+        end
+        ptBool = (party == ('party3')) or (party == ('pt3')) or (party == ('3'))
+        if(ptBool) then
+            party = 'party3'
+        end
+        self.ally:delete(party)
+    end
     self:update()
 end
 

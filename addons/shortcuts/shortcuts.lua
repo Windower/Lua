@@ -24,7 +24,12 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
+-- debugging = true
+-- if dir_exists('../addons/shortcuts/data/') then
+-- 	logging = false
+--	logfile = io.open('../addons/shortcuts/data/NormalLog'..tostring(os.clock())..'.log','w+')
+--	logfile:write('\n\n','SHORTCUTS LOGGER HEADER: ',tostring(os.clock()),'\n')
+-- end
 
 file = require 'filehelper'
 require 'sets'
@@ -35,78 +40,193 @@ require 'ambiguous_names'
 require 'targets'
 
 _addon = {}
-_addon.version = '0.2'
+_addon.version = '0.4'
 _addon.name = 'Shortcuts'
 _addon.commands = {'shortcuts'}
 
+-----------------------------------------------------------------------------------
+--Name: event_load()
+--Args:
+---- None
+-----------------------------------------------------------------------------------
+--Returns:
+---- None, simply a routine that runs once at the load (after the entire document
+---- is loaded and treated as a script)
+-----------------------------------------------------------------------------------
 function event_load()
+	counter = 0
 	lastsent = 'MAUSMAUSMAUSMAUSMAUSMAUSMAUSMAUS'
 	collectgarbage()
 end
 
+-----------------------------------------------------------------------------------
+--Name: event_unload()
+--Args:
+---- None
+-----------------------------------------------------------------------------------
+--Returns:
+---- None, simply a routine that runs once at unload.
+-----------------------------------------------------------------------------------
+function event_unload()
+	if logging then	logfile:close()	end
+end
+
+
+-----------------------------------------------------------------------------------
+--Name: event_outgoing_text()
+--Args:
+---- original (string): Original command entered by the player
+---- modified (string): Modified command with changes upstream of the addon
+-----------------------------------------------------------------------------------
+--Returns:
+---- string, changed command
+-----------------------------------------------------------------------------------
 function event_outgoing_text(original,modified)
+	if logging then
+		logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\nModified: ',modified)
+	end
+	
+	if counter>0 and debugging then --- Subroutine designed to detect and eliminate infinite loops.
+		local dtime = os.clock() - timestamp
+		if dtime > 0.2 then
+			counter = 0
+		else
+			counter = counter +1
+		end
+		if counter == 36 then
+			if logging then
+				f = io.open('../addons/shortcuts/data/loopdetect'..tostring(os.clock())..'.log','w+')
+				f:write('Probable infinite loop detected in Shortcuts: ',tostring(lastsent),'\n',tostring(os.clock()),'Original: ',tostring(original))
+				f:close()
+			end
+			add_to_chat(8,'Probable infinite loop detected in Shortcuts: '..tostring(lastsent)..'\7Please tell Byrth what you were doing')
+			timestamp = os.clock()
+			counter = 0
+			return modified
+		end
+	elseif debugging then
+		counter = 1
+		timestamp = os.clock()
+	end
+	
+	-- If it's the command that was just sent, blank lastsent and pass it through with only the changes applied by other addons
 	if original == lastsent then
 		lastsent = ''
 		return modified
 	end
+	
+	-- Otherwise, dump the inputs into command_logic()
+	return command_logic(original,modified)
+end
 
+-----------------------------------------------------------------------------------
+--Name: event_unhandled_command()
+--Args:
+---- table of strings: //entries split on ' '
+-----------------------------------------------------------------------------------
+--Returns:
+---- None, but can generate text output through command_logic()
+-----------------------------------------------------------------------------------
+function event_unhandled_command(...)
+	local combined = table.concat({...},' ') -- concat it back together...
+	command_logic(combined,combined) -- and then dump it into command_logic()
+end
+
+
+-----------------------------------------------------------------------------------
+--Name: command_logic(original,modified)
+--Args:
+---- original (string): Full line entry from event unhandled command/outgoing text
+---- modified (string): Modified line if from event_outgoing_text, otherwise the
+---- same as original
+-----------------------------------------------------------------------------------
+--Returns:
+---- string (sometimes '') depending what the logic says to do.
+-----------------------------------------------------------------------------------
+function command_logic(original,modified)
 	local splitline = split(original,' ')
-	local command = splitline[1]
+	local command = splitline[1] -- Treat the first word as a command.
 	
 	local a,b,spell = string.find(original,'"(.-)"')
 
-	if ignore_list[command] then
+	if ignore_list[command] then -- If the command is legitimate and on the blacklist, return it unaltered.
 		lastsent = ''
 		return modified
 	elseif command2_list[command] and not valid_target(splitline[#splitline],true) then
+		-- If the command is legitimate and requires target completion but not ability interpretation
 		
-		if command2_list[command]==true then -- no excluded second commands
-			local temptarg = valid_target(splitline[#splitline]) or target_make({validtarget={['Player']=true,['Enemy']=true,['Self']=true}})
-			lastsent = command..' '..temptarg
-			send_command('input '..lastsent)
+		if command2_list[command]==true then -- If there are not any excluded secondary commands
+			local temptarg = valid_target(splitline[#splitline]) or target_make({['Player']=true,['Enemy']=true,['Self']=true}) -- Complete the target or make one.
+			lastsent = command..' '..temptarg -- Push the command and target together and send it out.
+			if debugging then add_to_chat(8,tostring(counter)..' input '..lastsent) end
+			if logging then logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\n(162) ',lastsent) 	end
+			send_command('@input '..lastsent)
 			return ''
-		else
+		else -- If there are excluded secondary commands (like /pcmd add <name>)
 			local tempcmd = command
 			local passback
-			for i,v in pairs(splitline) do
+			for i,v in pairs(splitline) do -- Iterate over the potential secondary arguments.
+			-- I'm not sure when there could be more than one secondary argument, but it's ready if it happens.
 				if command2_list[command]:contains(v) then
 					tempcmd = tempcmd..' '..v
 					passback = v
 				end
 			end
-
+			
 			local temptarg = valid_target(splitline[#splitline])
 			if passback then
 				if temptarg == splitline[#splitline] or pass_through_targs:contains(temptarg) then
+					-- If the final entry is a valid target, pass it through.
 					temptarg = splitline[#splitline]
 				elseif passback == splitline[#splitline] then
+					-- If the final entry is the passed through secondary command, just send it out without a target
 					temptarg = ''
 				elseif not temptarg then
+					-- Default to using the raw entry
 					temptarg = splitline[#splitline]
 				end
-			elseif not temptarg then
-				temptarg = target_make({validtarget={['Player']=true,['Enemy']=true,['Self']=true}})
+			elseif not temptarg then -- Make a target if the temptarget isn't valid
+				temptarg = target_make({['Player']=true,['Enemy']=true,['Self']=true})
 			end
 			lastsent = tempcmd..' '..temptarg
-			send_command('input '..lastsent)
+			if debugging then add_to_chat(8,tostring(counter)..' input '..lastsent) end
+			if logging then logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\n(193) ',lastsent) 	end
+			send_command('@input '..lastsent)
 			return ''
 		end
-	elseif (command2_list[command] and valid_target(splitline[#splitline],true)) or (command == '/hide') or (command_list[command] and validabils[(spell or ''):lower():gsub(' ',''):gsub('[^%w]','')] and valid_target(splitline[#splitline])) then
+	elseif (command2_list[command] and valid_target(splitline[#splitline],true)) then 
+		-- If the submitted command does not require ability interpretation and is fine already, send it out.
 		lastsent = ''
+		if logging then logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\n(146) Legitimate command') 	end
 		return modified
+	elseif (command_list[command] and convert_spell(spell or '') and valid_target(splitline[#splitline])) then
+		-- If the submitted ability is already properly formatted, send it out. Fixes capitalization and minor differences.
+		lastsent = ''
+		if logging then logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\n(146) Legitimate command') 	end
+		return command..' "'..convert_spell(spell)..'" '..splitline[#splitline]
 	elseif command_list[command] then
+		-- If there is a valid command, then pass the text with an offset of 1 to the text interpretation function
 		return interp_text(splitline,1,modified)
 	else
+		-- If there is not a valid command, then pass the text with an offset of 0 to the text interpretation function
 		return interp_text(splitline,0,modified)
 	end
-	
-	-- Should never reach this point
-	lastsent = ''
-	return modified
 end
 
+
+-----------------------------------------------------------------------------------
+--Name: interp_text()
+--Args:
+---- splitline (table of strings): entire entry, split on spaces.
+---- original (string): Full line entry from event unhandled command/outgoing text
+---- modified (string): Modified line if from event_outgoing_text, otherwise the
+---- same as original
+-----------------------------------------------------------------------------------
+--Returns:
+---- string (sometimes '') depending what the logic says to do.
+---- Sends a command if the command needs to be changed.
+-----------------------------------------------------------------------------------
 function interp_text(splitline,offset,modified)
-	player = get_player()
 	local temptarg
 	if #splitline > 1 then
 		temptarg = valid_target(splitline[#splitline])
@@ -120,7 +240,7 @@ function interp_text(splitline,offset,modified)
 
 	if validabils[strippedabil] then -- If the ability exists, do this.
 		local r_line, s_type
-			
+		
 		if validabils[strippedabil].typ == 'r_spells' then
 			r_line = r_spells[validabils[strippedabil].index]
 		elseif validabils[strippedabil].typ == 'r_abilities' then
@@ -128,10 +248,42 @@ function interp_text(splitline,offset,modified)
 		elseif validabils[strippedabil].typ == 'ambig_names' then
 			r_line, s_type = ambig(strippedabil)
 		end
-		lastsent = r_line['prefix']..' "'..r_line['english']..'" '..(temptarg or target_make(r_line))
-		send_command('input '..lastsent)
+		lastsent = r_line['prefix']..' "'..r_line['english']..'" '..(temptarg or target_make(r_line['validtarget']))
+		if debugging then add_to_chat(8,tostring(counter)..' input '..lastsent) end
+		if logging then logfile:write('\n\n',tostring(os.clock()),'Original: ',table.concat(splitline,' '),'\n(180) ',lastsent) 	end
+		send_command('@input '..lastsent)
 		return ''
 	end
 	lastsent = ''
 	return modified
+end
+
+
+-----------------------------------------------------------------------------------
+--Name: convert_spell()
+--Args:
+---- spell (string): Proposed spell
+-----------------------------------------------------------------------------------
+--Returns:
+---- Either false, or a corrected spell name.
+-----------------------------------------------------------------------------------
+function convert_spell(spell)
+	local name_line = validabils[(spell or ''):lower():gsub(' ',''):gsub('[^%w]','')]
+	
+	if name_line then
+		if name_line.typ == 'r_spells' then
+			r_line = r_spells[name_line.index]
+		elseif name_line.typ == 'r_abilities' then
+			r_line = r_abilities[name_line.index]
+		elseif name_line.typ == 'ambig_names' then
+			r_line, s_type = ambig(strip(spell))
+		end
+		if r_line then
+			return r_line[language]
+		else
+			return false
+		end
+	else
+		return false
+	end
 end
