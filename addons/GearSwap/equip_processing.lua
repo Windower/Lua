@@ -13,10 +13,14 @@ function equip_sets(swap_type,val1,val2)
 	
 	if debugging >= 2 then add_to_chat(1,swap_type) end
 	if logging then
-		logfile:write('\n\n',tostring(os.clock),'(15) equip_sets: ',tostring(swap_type))
-		if val1.name then	logfile:write(' : ',val1.name)	end
+		logit(logfile,'\n\n'..tostring(os.clock)..'(15) equip_sets: '..tostring(swap_type))
+		if val1 then
+			if val1.name then
+				logit(logfile,' : '..val1.english)
+			end
+		end
 		if val2 then
-			if val2.type then	logfile:write(' : ',val2.type)	end
+			if val2.type then	logit(logfile,' : '..val2.type)	end
 		end
 	end
 
@@ -68,11 +72,11 @@ function equip_sets(swap_type,val1,val2)
 		elseif v == 0 then
 			failure_reason = 'KOed'
 		end
-		if failure_reason ~= '' and logging then logfile:write('\n\n',tostring(os.clock),'(69) failure_reason: ',tostring(failure_reason)) end
 		if _global.debug_mode and failure_reason ~= '' then
 			add_to_chat(8,'Cannot change gear right now: '..failure_reason)
 		end
 	end
+	
 	
 	if failure_reason == '' then
 		for i,v in pairs(equip_next) do
@@ -82,6 +86,8 @@ function equip_sets(swap_type,val1,val2)
 			sent_out_equip[i] = v -- re-make the equip_next table with the name sent_out_equip as the equipment is sent out.
 			--end
 		end
+	elseif logging then
+		logit(logfile,'\n\n'..tostring(os.clock)..'(69) failure_reason: '..tostring(failure_reason))
 	end
 	send_check(_global.force_send)
 end

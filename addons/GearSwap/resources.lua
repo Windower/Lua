@@ -115,6 +115,7 @@ _global.cancel_spell = false
 _global.debug_mode = false
 _global.show_swaps = false
 
+gearswap_disabled = false
 midaction = false
 sent_out_equip = {}
 equip_list = {}

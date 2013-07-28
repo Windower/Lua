@@ -170,3 +170,19 @@ function table.reassign(targ,new)
 	end
 	return targ
 end
+
+
+
+-----------------------------------------------------------------------------------
+--Name: logit()
+--Args:
+---- logfile (file): File to be logged to
+---- str (string): String to be logged.
+-----------------------------------------------------------------------------------
+--Returns:
+---- none
+-----------------------------------------------------------------------------------
+function logit(file,str)
+	file:write(str)
+	file:flush()
+end

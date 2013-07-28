@@ -20,7 +20,7 @@ function event_load()
 	if dir_exists('../addons/GearSwap/data/logs') then
 		logging = false
 		logfile = io.open('../addons/GearSwap/data/logs/NormalLog'..tostring(os.clock())..'.log','w+')
-		logfile:write('GearSwap LOGGER HEADER\n')
+		logit(logfile,'GearSwap LOGGER HEADER\n')
 	end
 	
 	send_command('@alias gs lua c gearswap')
@@ -30,6 +30,13 @@ function event_load()
 	
 	if player['main_job'] then
 		user_env = load_user_files()
+		if not user_env then
+			gearswap_disabled = true
+			sets = nil
+		else
+			gearswap_disabled = false
+			sets = user_env.get_sets()
+		end
 		sets = user_env.get_sets()
 		if debugging then send_command('@unload spellcast;') end
 	end
@@ -49,11 +56,13 @@ end
 
 function event_addon_command(...)
 	local command = table.concat({...},' ')
-	if logging then	logfile:write('\n\n',tostring(os.clock),command) end
+	if logging then	logit(logfile,'\n\n'..tostring(os.clock)..command) end
 	local splitup = split(command,' ')
 	if splitup[1] == 'c' and #splitup > 1 then
+		if gearswap_disabled then return end
 		equip_sets('self_command',_raw.table.concat(splitup,' ',2,#splitup))
 	elseif splitup[1] == 'equip' and not midaction then
+		if gearswap_disabled then return end
 		equip_sets('equip_command',user_env.sets[_raw.table.concat(splitup,' ',2,#splitup)])
 	elseif strip(splitup[1]) == 'debugmode' then
 		_global.debug_mode = not _global.debug_mode
@@ -81,6 +90,7 @@ function refresh()
 end
 
 function event_outgoing_text(original,modified)
+	if gearswap_disabled then return modified end
 	local splitline = split(modified,' ')
 	local command = splitline[1]
 	
@@ -90,7 +100,7 @@ function event_outgoing_text(original,modified)
 	if command == '/raw' then
 		return _raw.table.concat(splitline,' ',2,#splitline)
 	elseif command_list[command] and temptarg and validabils[abil:lower()] and not midaction then
-		if logging then	logfile:write('\n\n',tostring(os.clock),'(93) Original: ',original) end
+		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) Original: '..original) end
 		refresh_globals()
 			
 		midaction = true
@@ -119,21 +129,23 @@ function event_outgoing_text(original,modified)
 
 		return '' -- Makes an infinite loop with Spellcast. They fight to the death.
 	elseif midaction and validabils[tostring(abil):lower()] then
-		if logging then	logfile:write('\n\n',tostring(os.clock),'(122) Canceled: ',original) end
+		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(122) Canceled: '..original) end
 		return ''
 	end
 	return modified
 end
 
 function event_incoming_text(original,modified,mode)
+	if gearswap_disabled then return modified, color end
 	if original == '...A command error occurred.' or original == 'You can only use that command during battle.' then
-		if logging then	logfile:write('\n\n',tostring(os.clock),'(130) Client canceled command detected: ',mode,' ',original) end
+		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(130) Client canceled command detected: '..mode..' '..original) end
 		equip_sets('aftercast',{name='Invalid Spell'},{type='Recast'})
 	end
 	return modified,color
 end
 
 function event_incoming_chunk(id,data)
+	if gearswap_disabled then return end
 	cur_ID = data:byte(3,4)
 	if prev_ID == nil then
 		prev_ID = cur_ID
@@ -141,7 +153,7 @@ function event_incoming_chunk(id,data)
 	persistant_sequence[data:byte(3,4)] = true  ---------------------- TEMPORARY TO INVESTIGATE LAG ISSUES IN DELVE
 	if data:byte(3,4) ~= 0x00 then
 		if not persistant_sequence[data:byte(3,4)-1] then
-			if logging then	logfile:write('\n\n',tostring(os.clock),'(140) Packet dropped or out of order: '..cur_ID..' '..prev_ID) end
+			if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(140) Packet dropped or out of order: '..cur_ID..' '..prev_ID) end
 		end
 	end
 	prev_ID = cur_ID
@@ -168,6 +180,7 @@ function event_outgoing_chunk(id,data)
 end
 
 function event_action(act)
+	if gearswap_disabled then return end
 	refresh_player()
 	local prefix = ''
 	
@@ -182,7 +195,7 @@ function event_action(act)
 	local spell = get_spell(act)
 	local category = act['category']
 	
-	if logging then	logfile:write('\n\n',tostring(os.clock),'(178) Event Action: ',tostring(spell.name),' ',tostring(act['category'])) end
+	if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(178) Event Action: '..tostring(spell.english)..' '..tostring(act['category'])) end
 	
 	if jas[category] then
 		equip_sets(prefix..'aftercast',spell,{type=get_action_type(category)})
@@ -198,8 +211,9 @@ function event_action(act)
 end
 
 function event_action_message(actor_id,target_id,actor_index,target_index,message_id,param_1,param_2,param_3)
+	if gearswap_disabled then return end
 	if unable_to_use:contains(message_id) then
-		if logging then	logfile:write('\n\n',tostring(os.clock),'(195) Event Action Message: ',tostring(message_id),' Interrupt') end
+		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(195) Event Action Message: '..tostring(message_id)..' Interrupt') end
 		equip_sets('aftercast',{name='Interrupt'},{type='Recast'})
 	end
 	if message_id == 512 or message_id == 513 then -- Does not seem to be needed.
@@ -208,14 +222,17 @@ function event_action_message(actor_id,target_id,actor_index,target_index,messag
 end
 
 function event_status_change(old,new)
-	equip_sets('status_change',old,{type=new})
+	if gearswap_disabled then return end
+	equip_sets('status_change',new,{type='Status Change',old=old})
 end
 
 function event_gain_status(id,name)
+	if gearswap_disabled then return end
 	equip_sets('buff_change',name,{type='gain'})
 end
 
 function event_lose_status(id,name)
+	if gearswap_disabled then return end
 	equip_sets('buff_change',name,{type='loss'})
 end
 
@@ -223,14 +240,26 @@ function event_job_change(mjob_id, mjob, mjob_lvl, sjob_id, sjob, sjob_lvl)
 	refresh_globals()
 	user_env = {}
 	user_env = load_user_files()
-	sets = user_env.get_sets()
+	if not user_env then
+		gearswap_disabled = true
+		sets = nil
+	else
+		gearswap_disabled = false
+		sets = user_env.get_sets()
+	end
 end
 
 function event_login(name)
 	refresh_globals()
 	user_env = {}
 	user_env = load_user_files()
-	sets = user_env.get_sets()
+	if not user_env then
+		gearswap_disabled = true
+		sets = nil
+	else
+		gearswap_disabled = false
+		sets = user_env.get_sets()
+	end
 end
 
 function event_day_change(day)

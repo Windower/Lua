@@ -55,13 +55,7 @@ function load_user_files()
 	-- If the file cannot be loaded, print the error and load the default.
 	if funct == nil then 
 		write('User file problem: '..err)
-		funct,err = loadfile(lua_base_path..'/default.lua')
-		if funct == nil then
-			error('Default file appears to have been deleted.')
-			return nil
-		else
-			write('Loaded the default Lua file.')
-		end
+		return nil
 	else
 		write('Loaded your '..player.main_job..' Lua file!')
 	end
@@ -72,6 +66,7 @@ function load_user_files()
 	local status, plugin = pcall(funct)
 	if not status then
 		error('Plugin failed to load: '..plugin)
+		return nil
 	end
 	
 	return user_env
