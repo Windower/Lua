@@ -58,12 +58,14 @@ function event_addon_command(...)
 	local command = table.concat({...},' ')
 	if logging then	logit(logfile,'\n\n'..tostring(os.clock)..command) end
 	local splitup = split(command,' ')
-	if splitup[1] == 'c' and #splitup > 1 then
+	if splitup[1]:lower() == 'c' and #splitup > 1 then
 		if gearswap_disabled then return end
 		equip_sets('self_command',_raw.table.concat(splitup,' ',2,#splitup))
-	elseif splitup[1] == 'equip' and not midaction then
+	elseif splitup[1]:lower() == 'equip' and not midaction then
 		if gearswap_disabled then return end
 		equip_sets('equip_command',user_env.sets[_raw.table.concat(splitup,' ',2,#splitup)])
+	elseif splitup[1]:lower() == 'reload' then
+		refresh_user_env()
 	elseif strip(splitup[1]) == 'debugmode' then
 		_global.debug_mode = not _global.debug_mode
 		write('Debug Mode set to '..tostring(_global.debug_mode)..'.')
@@ -87,6 +89,19 @@ end
 
 function refresh()
 	refresh_ffxi_info()
+end
+
+function refresh_user_env()
+	refresh_globals()
+	user_env = {}
+	user_env = load_user_files()
+	if not user_env then
+		gearswap_disabled = true
+		sets = nil
+	else
+		gearswap_disabled = false
+		sets = user_env.get_sets()
+	end
 end
 
 function event_outgoing_text(original,modified)
@@ -216,9 +231,6 @@ function event_action_message(actor_id,target_id,actor_index,target_index,messag
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(195) Event Action Message: '..tostring(message_id)..' Interrupt') end
 		equip_sets('aftercast',{name='Interrupt'},{type='Recast'})
 	end
-	if message_id == 512 or message_id == 513 then -- Does not seem to be needed.
-		set_equip(send_out_equip[1],(0x01))
-	end
 end
 
 function event_status_change(old,new)
@@ -237,29 +249,11 @@ function event_lose_status(id,name)
 end
 
 function event_job_change(mjob_id, mjob, mjob_lvl, sjob_id, sjob, sjob_lvl)
-	refresh_globals()
-	user_env = {}
-	user_env = load_user_files()
-	if not user_env then
-		gearswap_disabled = true
-		sets = nil
-	else
-		gearswap_disabled = false
-		sets = user_env.get_sets()
-	end
+	refresh_user_env()
 end
 
 function event_login(name)
-	refresh_globals()
-	user_env = {}
-	user_env = load_user_files()
-	if not user_env then
-		gearswap_disabled = true
-		sets = nil
-	else
-		gearswap_disabled = false
-		sets = user_env.get_sets()
-	end
+	send_command('@wait 2;lua i gearswap refresh_user_env;')
 end
 
 function event_day_change(day)
