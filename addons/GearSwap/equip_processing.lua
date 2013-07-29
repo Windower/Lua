@@ -120,7 +120,7 @@ function to_id_set(inventory,equip_list)
 	for n,m in pairs(inventory) do
 		if m['id'] ~= 0 then -- 0 codes for an empty slot
 			if (m['flags'] == 0 or m['flags'] == 5) and r_items[m['id']]['jobs'] then -- Make sure the item isn't being bazaared, isn't already equipped, and can be equipped by specific jobs (unlike pearlsacks).
-				if get_wearable(jobs,player.main_job,tonumber('0x'..r_items[m['id']]['jobs'])) and (tonumber(r_items[m['id']]['level'])<=player.main_job_level) and get_wearable(dat_races,player.race,tonumber('0x'..r_items[m['id']]['races'])) then
+				if get_wearable(jobs[player.main_job],tonumber('0x'..r_items[m['id']]['jobs'])) and (tonumber(r_items[m['id']]['level'])<=player.main_job_level) and get_wearable(dat_races[player.race],tonumber('0x'..r_items[m['id']]['races'])) then
 					for i,v in pairs(equip_list) do
 						if not ret_list[slot_map[i]] then
 							if r_items[m['id']]['enl']:lower() == v:lower() or r_items[m['id']]['english']:lower() == v:lower() then
@@ -134,11 +134,11 @@ function to_id_set(inventory,equip_list)
 				else
 					for i,v in pairs(equip_list) do
 						if r_items[m['id']]['enl']:lower() == v:lower() or r_items[m['id']]['english']:lower() == v:lower() then
-							if not get_wearable(jobs,player.main_job,tonumber('0x'..r_items[m['id']]['jobs'])) then
+							if not get_wearable(jobs[player.main_job],tonumber('0x'..r_items[m['id']]['jobs'])) then
 								equip_list[i] = v..' (cannot be worn by this job)'
 							elseif not (tonumber(r_items[m['id']]['level'])<=player.main_job_level) then
 								equip_list[i] = v..' (job level is too low)'
-							elseif not get_wearable(dat_races,player.race,tonumber('0x'..r_items[m['id']]['races'])) then
+							elseif not get_wearable(dat_races[player.race],tonumber('0x'..r_items[m['id']]['races'])) then
 								equip_list[i] = v..' (cannot be worn by your race)'
 							end
 							break
@@ -263,6 +263,6 @@ function unify_slots(equipment)
 end
 
 
-function get_wearable(tab,ind,val)
-	return ((val%(tab[ind]*2))/tab[ind] >= 1) -- Cut off the bits above it with modulus, then cut off the bits below it with division and >= 1
+function get_wearable(player_val,val)
+	return ((val%(player_val*2))/player_val >= 1) -- Cut off the bits above it with modulus, then cut off the bits below it with division and >= 1
 end

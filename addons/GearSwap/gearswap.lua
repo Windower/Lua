@@ -14,11 +14,11 @@ _addon.version = '0.5'
 _addon.commands = {'gs','gearswap'}
 
 function event_load()
-	debugging = 0
+	debugging = 1
 	
 	
 	if dir_exists('../addons/GearSwap/data/logs') then
-		logging = false
+		logging = true
 		logfile = io.open('../addons/GearSwap/data/logs/NormalLog'..tostring(os.clock())..'.log','w+')
 		logit(logfile,'GearSwap LOGGER HEADER\n')
 	end
@@ -26,9 +26,9 @@ function event_load()
 	send_command('@alias gs lua c gearswap')
 	refresh_globals()
 	_global.force_send = false
-	language = get_ffxi_info()['language']
+	language = world.language
 	
-	if player['main_job'] then
+	if world.logged_in then
 		user_env = load_user_files()
 		if not user_env then
 			gearswap_disabled = true
@@ -37,21 +37,13 @@ function event_load()
 			gearswap_disabled = false
 			sets = user_env.get_sets()
 		end
-		sets = user_env.get_sets()
-		if debugging then send_command('@unload spellcast;') end
+		if debugging >= 1 then send_command('@unload spellcast;') end
 	end
-	collectgarbage()
 end
 
 function event_unload()
 	if logging then	logfile:close() end
 	send_command('@unalias gs')
-	for i,v in pairs(_G) do
-		if v ~= event_unload and v ~= pairs and v~=_G and v~=collectgarbage then
-			_G[i] = nil
-		end
-	end
-	collectgarbage()
 end
 
 function event_addon_command(...)
