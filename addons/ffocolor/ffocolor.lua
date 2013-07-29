@@ -44,7 +44,7 @@ defaults.chatColor = 207
 function initialize()
     settings = config.load(defaults)
     settings:save()
-    chatColors = T{say=1,shout=2,tell=4,party=5,linkshell=6,none=settings.normal}
+    chatColors = T{say=1,shout=2,tell=4,party=5,linkshell=6,none=settings.chatColor}
 end
 
 function event_load()
@@ -113,7 +113,7 @@ function event_incoming_text(old,new,color)
     local sta,ea,txt = string.find(new,'([^%w]*%[%d+:#[%w_]+%].-:)')
     local stb = string.find(new,'[^%w]*%[%d+:#%w+%]') or string.find(new,'^[^%w]*%[FFOChat%]')
     if sta ~= nil then
-        if settings.chattab ~= nil then
+        if settings.chatTab ~= nil then
             color = chatColors[settings.chatTab]
         end
         new = new:gsub('\r\n','')
