@@ -1,5 +1,5 @@
 **Author:** Ricky Gall  
-**Version:** 1.0 
+**Version:** 2.0 
 **Description:**  
 Watches buffs/debuffs and sends messages to alts when you gain certain
 ones. Also, automatically uses echo drops if you get silenced.
@@ -7,18 +7,10 @@ ones. Also, automatically uses echo drops if you get silenced.
 **Abbreviation:** //aecho
 
 **Commands:**
- There are no commands for aecho.
-
-**Additional Comments:**
- 
-Can watch more or less buffs just by changing the watchbuffs table.
-
-Also, this program assumes you have send. If not, then you can just remove the following parts that use it:
-
-		send_command('send @others atc '..player["name"]..' - '..name)
-	else
-		send_command('send @others atc '..player["name"]..' - '..name)
-
-Removing those 3 lines will make it so it only automatically uses echo drops if you get silenced.
-
-If you don't want to use the atc part you can easily change the atc to input /echo. so it looks like send @others input /echo '..player["name"]..  and it'll work perfectly fine just echoing on your alt. I'm not a fan of the /echo color so i changed it to a shinier gold.
+ 1. aecho watch &lt;buffname&gt; --adds buffname to the tracker
+ 2. aecho unwatch &lt;buffname&gt; --removes buffname from the tracker
+ 3. aecho trackalt --Toggles alt buff/debuff messages on main (this requires send addon)
+ 4. aecho sitrack --When sneak/invis begin wearing passes this message to your alts
+ 5. aecho list --lists buffs being tracked
+ 6. aecho toggle --Toggles off automatic echo drop usage (in case you need this off. does not remain off across loads.)
+       
