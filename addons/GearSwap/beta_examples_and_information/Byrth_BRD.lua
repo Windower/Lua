@@ -114,7 +114,7 @@ function aftercast(spell,action)
 	equip(sets['aftercast_Idle'])
 end
 
-function status_change(old,new)
+function status_change(new,tab)
 	if T{'Idle','Resting'}:contains(new) then
 		equip(sets['aftercast_Idle'])
 	end

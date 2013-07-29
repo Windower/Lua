@@ -144,7 +144,7 @@ end
 
 function event_incoming_text(original,modified,mode)
 	if gearswap_disabled then return modified, color end
-	if original == '...A command error occurred.' or original == 'You can only use that command during battle.' then
+	if original == '...A command error occurred.' or original == 'You can only use that command during battle.' or original == 'You cannot use that command here.' then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(130) Client canceled command detected: '..mode..' '..original) end
 		equip_sets('aftercast',{name='Invalid Spell'},{type='Recast'})
 	end

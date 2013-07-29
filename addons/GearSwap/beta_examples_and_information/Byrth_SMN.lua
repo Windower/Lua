@@ -117,7 +117,7 @@ function aftercast(spell,action)
 	end
 end
 
-function status_change(old,new)
+function status_change(new,action)
 	if new=='Idle' then
 		send_command('@gs c Idle')
 	elseif new=='Resting' then
@@ -125,7 +125,7 @@ function status_change(old,new)
 	end
 end
 
-function buff_change(status,gain_or_loss)
+function buff_change(status,action)
 end
 
 function pet_midcast(spell,action)

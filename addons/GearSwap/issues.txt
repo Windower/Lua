@@ -11,3 +11,4 @@ Issues:
 * Change it so status_change() doesn't fire when you disengage from NPCs.
 * Change it so status_change() passes the old/new status in a less nonsensical way.
 * Change mob_array.type so that it matches validtarget.
+* event_status_change() is currently broken in 4.1 LuaCore, so it doesn't really work.
