@@ -5,12 +5,4 @@
 		<buffs>Silence, Perpetuance, Ebullience, Penury, Celerity, Parsimony, Light Arts, Paralyze, Petrified, Dark Arts, Rapture, Immanence, Manifestation, Accession, Slow, Addendum: Black, Stun, Alacrity, Addendum: White, Sleep</buffs>
 		<sitrack>true</sitrack>
 	</global>
-	<atima>
-		<buffs>Silence, Perpetuance, Ebullience, Penury, Celerity, Parsimony, Light Arts, Paralyze, Petrified, Immanence, Dark Arts, Rapture, Manifestation, Slow, Accession, Addendum: Black, Stun, sublimation: complete, Alacrity, Addendum: White, Sleep</buffs>
-	</atima>
-	<nitroustaru>
-		<alttrack>true</alttrack>
-		<buffs>Silence, Perpetuance, Ebullience, Penury, Celerity, Parsimony, Light Arts, Immanence, Paralyze, Petrified, Doom, Dark Arts, Rapture, Sublimation: Complete, Manifestation, Accession, Slow, Addendum: Black, Stun, Alacrity, Addendum: White, Sleep</buffs>
-		<sitrack>true</sitrack>
-	</nitroustaru>
 </settings>
