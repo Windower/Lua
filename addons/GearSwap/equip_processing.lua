@@ -15,7 +15,7 @@ function equip_sets(swap_type,val1,val2)
 	if logging then
 		logit(logfile,'\n\n'..tostring(os.clock)..'(15) equip_sets: '..tostring(swap_type))
 		if val1 then
-			if val1.name then
+			if val1.english then
 				logit(logfile,' : '..val1.english)
 			end
 		end
@@ -120,6 +120,9 @@ function to_id_set(inventory,equip_list)
 	for n,m in pairs(inventory) do
 		if m['id'] ~= 0 then -- 0 codes for an empty slot
 			if (m['flags'] == 0 or m['flags'] == 5) and r_items[m['id']]['jobs'] then -- Make sure the item isn't being bazaared, isn't already equipped, and can be equipped by specific jobs (unlike pearlsacks).
+				if (jobs[player.main_job] == nil or dat_races[player.race] == nil) and debugging >0 then -- for Cair's bug
+					write('Get Wearable nil snafoodle with '..r_items[m['id']]['english']..' '..player.main_job..' '..player.race)
+				end
 				if get_wearable(jobs[player.main_job],tonumber('0x'..r_items[m['id']]['jobs'])) and (tonumber(r_items[m['id']]['level'])<=player.main_job_level) and get_wearable(dat_races[player.race],tonumber('0x'..r_items[m['id']]['races'])) then
 					for i,v in pairs(equip_list) do
 						if not ret_list[slot_map[i]] then

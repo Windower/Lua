@@ -89,6 +89,7 @@ end
 -------- of buffs with that name active.
 -----------------------------------------------------------------------------------
 function refresh_player()
+	local oldplayer = player
 	table.reassign(player,get_player())
 	for i,v in pairs(player['vitals']) do
 		player[i]=v
@@ -97,7 +98,7 @@ function refresh_player()
 	
 	local player_mob_table = get_mob_by_id(player['id'])
 	
-	if player_mob_table['race']~= nil then player.race = mob_table_races[player_mob_table['race']] end
+	if player_mob_table['race']~= nil then player.race = mob_table_races[player_mob_table['race']%256] end
 	
 	local items = get_items()
 	local cur_equip = items['equipment'] -- i = 'head', 'feet', etc.; v = inventory ID (0~80)

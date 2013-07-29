@@ -26,7 +26,7 @@ function event_load()
 	send_command('@alias gs lua c gearswap')
 	refresh_globals()
 	_global.force_send = false
-	language = world.language
+	language = world.language:lower()
 	
 	if world.logged_in then
 		user_env = load_user_files()
@@ -117,11 +117,11 @@ function event_outgoing_text(original,modified)
 			
 		if command_list[command] == 'Magic' then
 			r_line = r_spells[validabils[abil:lower()]['Magic']]
-			r_line.name = r_line[language]
+			r_line.name = r_line['english']
 			s_type = command_list[r_spells[validabils[abil:lower()]['Magic']]['prefix']]
 		elseif command_list[command] == 'Ability' then
 			r_line = r_abilities[validabils[abil:lower()]['Ability']]
-			r_line.name = r_line[language]
+			r_line.name = r_line['english']
 			s_type = command_list[r_abilities[validabils[abil:lower()]['Ability']]['prefix']]
 		elseif debugging then
 			write('this case should never be hit '..command)
@@ -377,7 +377,7 @@ function get_spell(act)
 		end
 	end
 	
-	spell.name = spell[language]
+	spell.name = spell['english']
 	return spell
 end
 
