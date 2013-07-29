@@ -208,7 +208,7 @@ end
 
 function event_status_change(old,new)
 	if gearswap_disabled or old == 'Event' then return end
-	equip_sets('status_change',new,{type='Status Change',old=old})
+	equip_sets('status_change',new,old)
 end
 
 function event_gain_status(id,name)
