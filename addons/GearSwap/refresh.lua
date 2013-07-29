@@ -98,7 +98,7 @@ function refresh_player()
 	
 	local player_mob_table = get_mob_by_id(player['id'])
 	
-	if player_mob_table['race']~= nil then player.race = mob_table_races[player_mob_table['race']%256] end
+	if player_mob_table['race']~= nil then player.race = mob_table_races[player_mob_table['race']] end
 	
 	local items = get_items()
 	local cur_equip = items['equipment'] -- i = 'head', 'feet', etc.; v = inventory ID (0~80)
@@ -215,4 +215,26 @@ function get_buff_active(bufflist)
 		end
 	end
 	return buffarr
+end
+
+
+-----------------------------------------------------------------------------------
+--Name: refresh_user_env()
+--Args:
+---- none
+-----------------------------------------------------------------------------------
+--Returns:
+---- none, but loads user files if they exist.
+-----------------------------------------------------------------------------------
+function refresh_user_env()
+	refresh_globals()
+	user_env = {}
+	user_env = load_user_files()
+	if not user_env then
+		gearswap_disabled = true
+		sets = nil
+	else
+		gearswap_disabled = false
+		sets = user_env.get_sets()
+	end
 end

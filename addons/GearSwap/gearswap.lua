@@ -70,30 +70,11 @@ function event_addon_command(...)
 end
 
 function midact()
-	if action_sent then
-		action_sent = false
-	else
-		if debugging >= 1 then add_to_chat(1,'Had for force the command to send. Something is wrong.') end
+	if not action_sent then
+		if debugging >= 1 then add_to_chat(1,'Had for force the command to send.') end
 		send_check(true)
-		action_sent = false
 	end
-end
-
-function refresh()
-	refresh_ffxi_info()
-end
-
-function refresh_user_env()
-	refresh_globals()
-	user_env = {}
-	user_env = load_user_files()
-	if not user_env then
-		gearswap_disabled = true
-		sets = nil
-	else
-		gearswap_disabled = false
-		sets = user_env.get_sets()
-	end
+	action_sent = false
 end
 
 function event_outgoing_text(original,modified)
@@ -226,7 +207,7 @@ function event_action_message(actor_id,target_id,actor_index,target_index,messag
 end
 
 function event_status_change(old,new)
-	if gearswap_disabled then return end
+	if gearswap_disabled or old == 'Event' then return end
 	equip_sets('status_change',new,{type='Status Change',old=old})
 end
 
@@ -249,7 +230,7 @@ function event_login(name)
 end
 
 function event_day_change(day)
-	send_command('@wait 0.5;lua invoke gearswap refresh')
+	send_command('@wait 0.5;lua invoke gearswap refresh_ffxi_info')
 end
 
 function event_weather_change(weather)

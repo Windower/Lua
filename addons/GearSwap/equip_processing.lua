@@ -227,6 +227,7 @@ function send_check(val)
 			_global.verify_equip = false
 			_global.force_send = false
 			action_sent = true
+			if logging then logit(logfile,'Command Sent: '..assemblecommand..'\n') end
 			send_command(assemblecommand)
 		end
 	elseif _global.cancel_spell then
