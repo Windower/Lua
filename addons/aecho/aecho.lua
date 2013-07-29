@@ -35,8 +35,6 @@ require 'stringhelper'
 require 'logger'
 require 'sets'
 local config = require 'config'
-local files = require 'filehelper'
-local chat = require 'chat'
 local defaults = T{}
 defaults.buffs = S{	"light arts","addendum: white","penury","celerity","accession","perpetuance","rapture",
                     "dark arts","addendum: black","parsimony","alacrity",",manifestation","ebullience","immanence",
