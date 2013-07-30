@@ -28,7 +28,9 @@ end
 ---- variables.
 -----------------------------------------------------------------------------------
 function load_user_files()
-	if user_env.file_unload then user_env.file_unload() end
+	if user_env then
+		if user_env.file_unload then user_env.file_unload() end
+	end
 	local user_env = {gearswap = _G, _global = _global,
 		-- Player functions
 		equip = equip, verify_equip=verify_equip, cancel_spell=cancel_spell,
@@ -40,6 +42,7 @@ function load_user_files()
 		tostring = tostring, tonumber = tonumber, pairs = pairs,
 		ipairs = ipairs, write=write, add_to_chat=add_to_chat,
 		send_command=send_command,register_event=register_event,
+		require=require,next=next,
 		
 		-- Player environment things
 		buffactive=buffactive,
@@ -68,9 +71,11 @@ function load_user_files()
 	-- Verify that funct contains functions.
 	local status, plugin = pcall(funct)
 	if not status then
-		error('Plugin failed to load: '..plugin)
+		error('Plugin failed to load: \n'..plugin)
 		return nil
 	end
+	
+	user_env.get_sets()
 	
 	return user_env
 end
@@ -237,6 +242,6 @@ function refresh_user_env()
 		sets = nil
 	else
 		gearswap_disabled = false
-		sets = user_env.get_sets()
+		sets = user_env.sets
 	end
 end

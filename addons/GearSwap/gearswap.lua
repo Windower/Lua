@@ -29,14 +29,7 @@ function event_load()
 	language = world.language:lower()
 	
 	if world.logged_in then
-		user_env = load_user_files()
-		if not user_env then
-			gearswap_disabled = true
-			sets = nil
-		else
-			gearswap_disabled = false
-			sets = user_env.get_sets()
-		end
+		refresh_user_env()
 		if debugging >= 1 then send_command('@unload spellcast;') end
 	end
 end
