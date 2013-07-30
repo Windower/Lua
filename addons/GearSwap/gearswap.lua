@@ -91,7 +91,6 @@ function event_outgoing_text(original,modified)
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) Original: '..original) end
 		refresh_globals()
 			
-		midaction = true
 		send_command('@wait 1;lua invoke gearswap midact')
 		
 		local r_line, s_type
@@ -164,6 +163,29 @@ end
 function event_outgoing_chunk(id,data)
 	if id == 0x015 then
 		lastbyte = data:byte(7,8)
+	end
+	if id == 0x01A then -- Action packet
+		local abil_name
+		actor_id = data:byte(8,8)*256^3+data:byte(7,7)*256^2+data:byte(6,6)*256+data:byte(5,5)
+		index = data:byte(10,10)*256+data:byte(9,9)
+		category = data:byte(12,12)*256+data:byte(11,11)
+		param = data:byte(14,14)*256+data:byte(13,13)
+		_unknown1 = data:byte(16,16)*256+data:byte(15,15)
+		local actor_name = get_mob_by_id(actor_id)['name']
+		local target_name = get_mob_by_index(index)['name']
+		if category == 3 then
+			abil_name = r_spells[param]['english']
+		elseif category == 7 then
+			abil_name = r_abilities[param+768]['english']
+		elseif category == 9 then
+			abil_name = r_abilities[param]['english']
+		elseif category == 16 then
+			abil_name = 'Ranged Attack'
+		end
+		if logging then logit(logfile,'\n\nActor: '..tostring(actor_name)..'  Target: '..tostring(target_name)..'  Category: '..tostring(category)..'  param: '..tostring(abil_name or param))
+		if abil_name then
+			midaction = true
+		end
 	end
 end
 
