@@ -182,7 +182,7 @@ function event_outgoing_chunk(id,data)
 		elseif category == 16 then
 			abil_name = 'Ranged Attack'
 		end
-		if logging then logit(logfile,'\n\nActor: '..tostring(actor_name)..'  Target: '..tostring(target_name)..'  Category: '..tostring(category)..'  param: '..tostring(abil_name or param))
+		if logging then logit(logfile,'\n\nActor: '..tostring(actor_name)..'  Target: '..tostring(target_name)..'  Category: '..tostring(category)..'  param: '..tostring(abil_name or param)) end
 		if abil_name then
 			midaction = true
 		end
