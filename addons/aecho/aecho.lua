@@ -67,7 +67,7 @@ function event_unload()
 end
 
 function event_gain_status(id,name)
-    if settings.buffs:lower():contains(name:lower()) then
+    if settings.buffs:map(lower):contains(name:lower()) then
         if name:lower() == 'silence' and autoecho then
             send_command('input /item "Echo Drops" '..get_player()["name"])
         end
