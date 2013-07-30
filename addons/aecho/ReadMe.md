@@ -1,5 +1,5 @@
 **Author:** Ricky Gall  
-**Version:** 2.0 
+**Version:** 2.01 
 **Description:**  
 Watches buffs/debuffs and sends messages to alts when you gain certain
 ones. Also, automatically uses echo drops if you get silenced.
