@@ -81,7 +81,7 @@ function event_outgoing_text(original,modified)
 	if gearswap_disabled then return modified end
 	local splitline = split(modified,' ')
 	local command = splitline[1]
-	
+
 	local a,b,abil = string.find(original,'"(.-)"')
 	local temptarg = valid_target(splitline[#splitline])
 	
@@ -208,17 +208,17 @@ end
 
 function event_status_change(old,new)
 	if gearswap_disabled or old == 'Event' then return end
-	equip_sets('status_change',old,new)
+	equip_sets('status_change',new,old)
 end
 
 function event_gain_status(id,name)
 	if gearswap_disabled then return end
-	equip_sets('buff_change',name,{type='gain'})
+	equip_sets('buff_change',name,'gain')
 end
 
 function event_lose_status(id,name)
 	if gearswap_disabled then return end
-	equip_sets('buff_change',name,{type='loss'})
+	equip_sets('buff_change',name,'loss')
 end
 
 function event_job_change(mjob_id, mjob, mjob_lvl, sjob_id, sjob, sjob_lvl)

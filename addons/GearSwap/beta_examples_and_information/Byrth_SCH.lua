@@ -54,7 +54,7 @@ function get_sets()
 		back="Merciful Cape",waist="Goading Belt",legs="Auspex Slops",feet="Scholar's Loafers"}
 		
 	
-	sets.midcast_Cure = {main="Chatoyant Staff",neck="Phalaina Locket",body="Heka's Kalasiris",hands="Bokwus Gloves",legs="Nares Trews"}
+	sets.midcast_Cure = {main="Arka IV",body="Heka's Kalasiris",hands="Augur's Gloves",legs="Nares Trews"}
 	
 	sets.midcast_Helix = {main="Chatoyant Staff",sub="Wizzan Grip",ammo="Snow Sachet",
 		head="Nares Cap",neck="Stoicheion Medal",ear1="Hecate's Earring",ear2="Novio Earring",
@@ -93,7 +93,6 @@ function precast(spell,action)
 			add_to_chat(8,'--------- Elemental Seal is down ---------')
 		end
 	elseif spell.english == 'Stun' then
-		cast_delay(0.1)
 		if spell.target.name == 'Paramount Mantis' or spell.target.name == 'Tojil' then
 			equip(sets['precast_Stun_MAcc'])
 		else
@@ -108,11 +107,13 @@ function precast(spell,action)
 			send_command('@input /t '..stuntarg..' ---- Byrth Stunned!!! ---- ')
 		end
 		--force_send()
-	else
+	elseif spell.english ~= 'Embrava' and action.type == 'Magic' then
 		equip(sets['precast_FastCast'])
-		cast_delay(0.5)
 	end
 
+	if spell.english == 'Reraise III' then
+		verify_equip()
+	end
 	if (buffactive.alacrity or buffactive.celerity) and world.weather_element == spell.element then
 		equip({feet='Argute Loafers +2'})
 	end
@@ -166,7 +167,6 @@ end
 
 function aftercast(spell,action)
 	equip(sets['aftercast_Idle'])
-
 	if spell.english == 'Sleep' or spell.english == 'Sleepga' then
 		send_command('@wait 55;input /echo ------- '..spell.english..' is wearing off in 5 seconds -------')
 	elseif spell.english == 'Sleep II' or spell.english == 'Sleepga II' then
@@ -176,7 +176,7 @@ function aftercast(spell,action)
 	end
 end
 
-function status_change(new,tab)
+function status_change(new,old)
 	if new == 'Resting' then
 		equip(sets['Resting'])
 	else
