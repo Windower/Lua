@@ -129,6 +129,7 @@ alliance = {}
 player.equipment = {}
 pet = {isvalid=false}
 st_flag = true
+current_job_file = nil
 
 
 persistant_sequence = {}  ---------------------- TEMPORARY TO INVESTIGATE LAG ISSUES IN DELVE

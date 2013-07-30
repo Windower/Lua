@@ -28,6 +28,7 @@ end
 ---- variables.
 -----------------------------------------------------------------------------------
 function load_user_files()
+	if user_env.file_unload then user_env.file_unload() end
 	local user_env = {gearswap = _G, _global = _global,
 		-- Player functions
 		equip = equip, verify_equip=verify_equip, cancel_spell=cancel_spell,
@@ -55,8 +56,10 @@ function load_user_files()
 	-- If the file cannot be loaded, print the error and load the default.
 	if funct == nil then 
 		write('User file problem: '..err)
+		current_job_file = nil
 		return nil
 	else
+		current_job_file = player.main_job
 		write('Loaded your '..player.main_job..' Lua file!')
 	end
 	
@@ -228,7 +231,6 @@ end
 -----------------------------------------------------------------------------------
 function refresh_user_env()
 	refresh_globals()
-	user_env = {}
 	user_env = load_user_files()
 	if not user_env then
 		gearswap_disabled = true

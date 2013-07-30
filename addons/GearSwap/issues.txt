@@ -1,5 +1,5 @@
 Issues:
-* Need to detect/correct for Encumberment (Pathos), Charmed status, Traded, Dbox'ed, AH Dialog, and Crafting.
+* Need to detect/correct for Encumberment (Pathos), Traded, Dbox'ed, AH Dialog, and Crafting.
 * Event status fix. Dead status fix. Zoning status fix.
 * Need a Spellcast -> Lua converter before release.
 * Need to check whether require '' works within user documents.

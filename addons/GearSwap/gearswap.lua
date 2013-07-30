@@ -10,7 +10,7 @@ require 'refresh'
 
 _addon = {}
 _addon.name = 'GearSwap'
-_addon.version = '0.5'
+_addon.version = '0.501'
 _addon.commands = {'gs','gearswap'}
 
 function event_load()
@@ -244,7 +244,9 @@ function event_lose_status(id,name)
 end
 
 function event_job_change(mjob_id, mjob, mjob_lvl, sjob_id, sjob, sjob_lvl)
-	refresh_user_env()
+	if mjob ~= current_job_file then
+		refresh_user_env()
+	end
 end
 
 function event_login(name)
