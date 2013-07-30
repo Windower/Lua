@@ -67,12 +67,14 @@ function event_unload()
 end
 
 function event_gain_status(id,name)
-    if settings.buffs:map(lower):contains(name:lower()) then
-        if name:lower() == 'silence' and autoecho then
-            send_command('input /item "Echo Drops" '..get_player()["name"])
-        end
-        if settings.alttrack then
-            send_command('send @others atc '..get_player()["name"]..' - '..name)
+    for key,val in pairs(settings.buffs) do
+        if key:lower() ==name:lower() then
+            if name:lower() == 'silence' and autoecho then
+                send_command('input /item "Echo Drops" '..get_player()["name"])
+            end
+            if settings.alttrack then
+                send_command('send @others atc '..get_player()["name"]..' - '..name)
+            end
         end
     end
 end
