@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon = {}
 _addon.name = 'AEcho'
-_addon.version = '2.0'
+_addon.version = '2.01'
 
 require 'tablehelper'
 require 'stringhelper'
@@ -37,7 +37,7 @@ require 'sets'
 local config = require 'config'
 local defaults = T{}
 defaults.buffs = S{	"light arts","addendum: white","penury","celerity","accession","perpetuance","rapture",
-                    "dark arts","addendum: black","parsimony","alacrity",",manifestation","ebullience","immanence",
+                    "dark arts","addendum: black","parsimony","alacrity","manifestation","ebullience","immanence",
                     "stun","petrified","silence","stun","sleep","slow","paralyze"
                 }
 defaults.alttrack = true
@@ -67,7 +67,7 @@ function event_unload()
 end
 
 function event_gain_status(id,name)
-    if settings.buffs:contains(name:lower()) then
+    if settings.buffs:lower():contains(name:lower()) then
         if name:lower() == 'silence' and autoecho then
             send_command('input /item "Echo Drops" '..get_player()["name"])
         end

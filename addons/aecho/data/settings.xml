@@ -2,7 +2,7 @@
 <settings>
 	<global>
 		<alttrack>true</alttrack>
-		<buffs>Silence, Perpetuance, Ebullience, Penury, Celerity, Parsimony, Light Arts, Paralyze, Petrified, Dark Arts, Rapture, Immanence, Manifestation, Accession, Slow, Addendum: Black, Stun, Alacrity, Addendum: White, Sleep</buffs>
+		<buffs>addendum: white, paralyze, petrified, sleep, perpetuance, ebullience, rapture, alacrity, penury, light arts, addendum: black, manifestation, stun, accession, celerity, parsimony, silence, dark arts, immanence, slow</buffs>
 		<sitrack>true</sitrack>
 	</global>
 </settings>
