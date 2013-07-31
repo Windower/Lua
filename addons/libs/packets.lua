@@ -150,6 +150,14 @@ function packets.new(id, mode, values)
 	return packet
 end
 
+-- Returns binary data from a packet
+function packets.build(packet)
+	local fields = packets.fields[packet._mode][packet._id]
+	local pack_string = fields:map(table.index+{pack_ids}..table.get-{'ctype'}):concat()
+    return pack_string:pack(fields:map(table.get+{packet}..table.get-{'label'}):unpack())
+end
+
+-- Injects a packet built with packets.new
 function packets.inject(packet)
 	local fields = packets.fields[packet._mode][packet._id]
 	if not fields then
@@ -157,8 +165,7 @@ function packets.inject(packet)
 		return
 	end
 
-	local pack_string = fields:map(table.index+{pack_ids}..table.get-{'ctype'}):concat()
-	packet._data = pack_string:pack(fields:map(table.get+{packet}..table.get-{'label'}):unpack())
+	packet._data = packets.build(packet)
 
 	log(packet._data:hex(' '))
 	if packet._mode == 'incoming' then
