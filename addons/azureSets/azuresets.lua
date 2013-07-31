@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon = {}
 _addon.name = 'AzureSets'
-_addon.version = '1.15'
+_addon.version = '1.151'
 
 require 'tablehelper'
 require 'stringhelper'
