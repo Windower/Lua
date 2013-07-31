@@ -107,8 +107,8 @@ function packets.parse(id, mode, data)
 	local pack_str = '<'..fields:map((function(ct) return pack_ids[ct] end)..table.get-{'ctype'}):concat()
 
 	for key, val in ipairs({res._data:unpack(pack_str)}) do
-		if key > 1 and keys[key - 1] then
-			res[keys[key - 1]] = val
+		if keys[key] then
+			res[keys[key]] = val
 		end
 	end
 
@@ -162,9 +162,9 @@ function packets.inject(packet)
 
 	log(packet._data:hex(' '))
 	if packet._mode == 'incoming' then
-		log(_dev.inject_incoming(packet._id, packet._data):hex())
+		log(windower.packets.inject_incoming(packet._id, packet._data):hex())
 	elseif packet._mode == 'outgoing' then
-		log(_dev.inject_outgoing(packet._id, packet._data):hex())
+		log(windower.packets.inject_outgoing(packet._id, packet._data):hex())
 	else
 		error('Error sending packet, no mode specified. Please specify \'incoming\' or \'outgoing\'.')
 	end
