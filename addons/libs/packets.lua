@@ -91,6 +91,7 @@ end
 function packets.parse(id, mode, data)
 	local res = {}
 	res._raw = data
+    res._mode = mode
 	res._name = packets[mode][id].name
 	res._description = packets[mode][id].description
 	res._id = id
