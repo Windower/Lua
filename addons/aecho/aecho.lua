@@ -28,46 +28,111 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon = {}
 _addon.name = 'AEcho'
-_addon.version = '1.0'
-function event_load()
-    player = get_player()
-    watchbuffs = {	"Light Arts",
-                    "Addendum: White",
-                    "Penury",
-                    "Celerity",
-                    "Accession",
-                    "Perpetuance",
-                    "Rapture",
-                    "Dark Arts",
-                    "Addendum: Black",
-                    "Parsimony",
-                    "Alacrity",
-                    "Manifestation",
-                    "Ebullience",
-                    "Immanence",
-                    "Stun",
-                    "Petrified",
-                    "Silence",
-                    "Stun",
-                    "Sleep",
-                    "Slow",
-                    "Paralyze"
+_addon.version = '2.01'
+
+require 'tablehelper'
+require 'stringhelper'
+require 'logger'
+require 'sets'
+local config = require 'config'
+local defaults = T{}
+defaults.buffs = S{	"light arts","addendum: white","penury","celerity","accession","perpetuance","rapture",
+                    "dark arts","addendum: black","parsimony","alacrity","manifestation","ebullience","immanence",
+                    "stun","petrified","silence","stun","sleep","slow","paralyze"
                 }
+defaults.alttrack = true
+defaults.sitrack = true
+
+
+
+function initialize()
+    settings = config.load(defaults)
+    settings:save()
+    autoecho = true
+end
+
+function event_load()
+    send_command('alias aecho lua c aecho')
+    if get_ffxi_info()['logged_in'] then
+        initialize()
+    end
 end
 
 function event_login()
-    player = get_player()
+    initialize()
+end
+
+function event_unload()
+    send_command('unalias aecho')
 end
 
 function event_gain_status(id,name)
-    for u = 1, #watchbuffs do
-        if watchbuffs[u]:lower() == name:lower() then
-            if name:upper() == 'SILENCE' then
-                send_command('input /item "Echo Drops" '..player["name"])
-                send_command('send @others atc '..player["name"]..' - '..name)
-            else
-                send_command('send @others atc '..player["name"]..' - '..name)
+    for key,val in pairs(settings.buffs) do
+        if key:lower() ==name:lower() then
+            if name:lower() == 'silence' and autoecho then
+                send_command('input /item "Echo Drops" '..get_player()["name"])
             end
+            if settings.alttrack then
+                send_command('send @others atc '..get_player()["name"]..' - '..name)
+            end
+        end
+    end
+end
+
+function event_incoming_text(old,new,color)
+    if settings.sitrack then
+        local sta,ea,txt = string.find(new,'The effect of ([%w]+) is about to wear off.')
+        if sta ~= nil then 
+            send_command('@send @others atc '..get_player()['name']..' - '..txt..' wearing off.')
+        end
+    end
+    return new,color
+end
+function event_addon_command(...)
+    local args = {...}
+    if args[1] ~= nil then
+        local comm = args[1]:lower()
+        if comm == 'help' then
+            notice('You have access to the following commands:')
+            notice(' 1. aecho watch <buffname> --adds buffname to the tracker')
+            notice(' 2. aecho unwatch <buffname> --removes buffname from the tracker')
+            notice(' 3. aecho trackalt --Toggles alt buff/debuff messages on main (this requires send addon)')
+            notice(' 4. aecho sitrack --When sneak/invis begin wearing passes this message to your alts')
+            notice(' 5. aecho list --lists buffs being tracked')
+            notice(' 6. aecho toggle --Toggles off automatic echo drop usage (in case you need this off. does not remain off across loads.)')
+        elseif S{'watch','trackalt','unwatch','sitrack'}:contains(comm) then
+            local list = ''
+            local spacer = ''
+            if comm == 'watch' then
+                for i = 2, #args do
+                    if i > 2 then spacer = ' ' end
+                    list = list..spacer..args[i]
+                end
+                if settings.buffs[list] == nil then
+                    settings.buffs:add(list:lower())
+                    notice(list..' added to buffs list.')
+                end
+            elseif comm == 'unwatch' then
+                for i = 2, #args do
+                    if i > 2 then spacer = ' ' end
+                    list = list..spacer..args[i]
+                end
+                if settings.buffs[list] ~= nil then
+                    settings.buffs:remove(list:lower())
+                    notice(list..' removed from buffs list.')
+                end
+            elseif comm == 'trackalt' then
+                settings.alttrack = not settings.alttrack
+            elseif comm == 'sitrack' then
+                settings.sitrack = not settings.sitrack
+            end
+            settings:save()
+        elseif comm == 'list' then
+            settings.buffs:print()
+        elseif comm == 'toggle' then
+            autoecho = not autoecho
+        else
+            return
         end
     end
 end
