@@ -287,8 +287,8 @@ function P(id, data, mode)
 	local pack_str = '<'..fields:map(function (ct) return pack_ids[ct] end..table.get-{'ctype'}):concat()
 
 	for key, val in ipairs({res._data:unpack(pack_str)}) do
-		if keys[key] then
-			res[keys[key]] = val
+		if key > 1 and keys[key - 1] then
+			res[keys[key - 1]] = val
 		end
 	end
 
