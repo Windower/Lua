@@ -19,7 +19,9 @@
 ---- There is also currently a field blacklist (ignore_fields) for the sake of memory bloat.
 -----------------------------------------------------------------------------------
 function parse_resources(lines_file)
-	local ignore_fields = S{'german','french','japanese','index','fr','frl','de','del','jp','jpl'}
+	local ignore_fields = S{'index'}
+	local convert_fields = {fr='french',frl='french_log',de='german',del='german_log',jp='japanese',jpl='japanese_log'}
+	
 	local completed_table = {}
 	for i in ipairs(lines_file) do
 		local str = tostring(lines_file[i])
@@ -34,6 +36,9 @@ function parse_resources(lines_file)
 				local a,b,ind,val = string.find(str,'(%w+)="([^"]+)"',q)
 				if ind~=nil then
 					if not ignore_fields[ind] then
+						if convert_fields[ind] then
+							ind = convert_fields[ind]
+						end
 						if val == "true" or val == "false" then
 							completed_table[tonumber(key)][ind] = str2bool(val)
 						else
@@ -160,13 +165,19 @@ end
 ---- The "targ" table is blanked, and then the values from "new" are assigned to it
 ---- In the event that new is not passed, targ is not filled with anything.
 -----------------------------------------------------------------------------------
-function table.reassign(targ,new)
+function table.reassign(targ,new,weak)
 	if new == nil then new = {} end
-	for i,v in pairs(targ) do
-		targ[i] = nil
-	end
-	for i,v in pairs(new) do
-		targ[i] = v
+	if weak then
+		for i,v in pairs(new) do
+			if targ[i] == nil then targ[i] = v end
+		end
+	else
+		for i,v in pairs(targ) do
+			targ[i] = nil
+		end
+		for i,v in pairs(new) do
+			targ[i] = v
+		end
 	end
 	return targ
 end

@@ -28,6 +28,9 @@ end
 ---- variables.
 -----------------------------------------------------------------------------------
 function load_user_files()
+	if user_env then
+		if user_env.file_unload then user_env.file_unload() end
+	end
 	local user_env = {gearswap = _G, _global = _global,
 		-- Player functions
 		equip = equip, verify_equip=verify_equip, cancel_spell=cancel_spell,
@@ -39,6 +42,7 @@ function load_user_files()
 		tostring = tostring, tonumber = tonumber, pairs = pairs,
 		ipairs = ipairs, write=write, add_to_chat=add_to_chat,
 		send_command=send_command,register_event=register_event,
+		require=require,next=next,
 		
 		-- Player environment things
 		buffactive=buffactive,
@@ -55,8 +59,10 @@ function load_user_files()
 	-- If the file cannot be loaded, print the error and load the default.
 	if funct == nil then 
 		write('User file problem: '..err)
+		current_job_file = nil
 		return nil
 	else
+		current_job_file = player.main_job
 		write('Loaded your '..player.main_job..' Lua file!')
 	end
 	
@@ -65,9 +71,11 @@ function load_user_files()
 	-- Verify that funct contains functions.
 	local status, plugin = pcall(funct)
 	if not status then
-		error('Plugin failed to load: '..plugin)
+		error('Plugin failed to load: \n'..plugin)
 		return nil
 	end
+	
+	user_env.get_sets()
 	
 	return user_env
 end
@@ -89,6 +97,7 @@ end
 -------- of buffs with that name active.
 -----------------------------------------------------------------------------------
 function refresh_player()
+	local oldplayer = player
 	table.reassign(player,get_player())
 	for i,v in pairs(player['vitals']) do
 		player[i]=v
@@ -97,7 +106,7 @@ function refresh_player()
 	
 	local player_mob_table = get_mob_by_id(player['id'])
 	
-	if player_mob_table['race']~= nil then player.race = mob_table_races[player_mob_table['race']%256] end  --- FIX WHEN FIXED IN WINDOWER
+	if player_mob_table['race']~= nil then player.race = mob_table_races[player_mob_table['race']] end
 	
 	local items = get_items()
 	local cur_equip = items['equipment'] -- i = 'head', 'feet', etc.; v = inventory ID (0~80)
@@ -214,4 +223,25 @@ function get_buff_active(bufflist)
 		end
 	end
 	return buffarr
+end
+
+
+-----------------------------------------------------------------------------------
+--Name: refresh_user_env()
+--Args:
+---- none
+-----------------------------------------------------------------------------------
+--Returns:
+---- none, but loads user files if they exist.
+-----------------------------------------------------------------------------------
+function refresh_user_env()
+	refresh_globals()
+	user_env = load_user_files()
+	if not user_env then
+		gearswap_disabled = true
+		sets = nil
+	else
+		gearswap_disabled = false
+		sets = user_env.sets
+	end
 end

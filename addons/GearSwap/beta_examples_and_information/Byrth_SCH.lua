@@ -176,7 +176,7 @@ function aftercast(spell,action)
 	end
 end
 
-function status_change(old,new)
+function status_change(new,old)
 	if new == 'Resting' then
 		equip(sets['Resting'])
 	else

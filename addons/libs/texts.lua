@@ -3,6 +3,7 @@ A library to facilitate text primitive creation and manipulation.
 ]]
 
 local texts = {}
+local saved_texts = {}
 
 _libs = _libs or {}
 _libs.texts = texts
@@ -125,6 +126,9 @@ function texts.new(t, settings, str)
 		tb_set_text(t._name, '')
 	end
 
+    -- Cache for deletion
+    saved_texts[#saved_texts + 1] = t
+
 	return setmetatable(t, _meta.Text)
 end
 
@@ -219,11 +223,11 @@ end
 
 -- Returns whether or not the text object is visible.
 function texts.visible(t, visible)
-	if not visible then
+	if visible == nil then
 		return t._settings.visible
 	end
 
-	tb_set_vsibility(t._name, visible)
+	tb_set_visibility(t._name, visible)
 	t._settings.visible = visible
 end
 
@@ -254,7 +258,7 @@ function texts.pos(t, x, y)
 end
 
 function texts.x_pos(t, x)
-	if not x then
+	if x then
 		return t._settings.pos.x
 	end
 
@@ -360,7 +364,50 @@ end
 
 function texts.destroy(t)
 	tb_delete(t._name)
-	t = nil
 end
+
+-- Destroy all text objects when the addon unloads
+local function destroy_texts()
+    for _, t in pairs(saved_texts) do
+        t:destroy()
+    end
+end
+
+-- Handle drag and drop
+local function handle_mouse(type, x, y, blocked)
+    if blocked then
+        return
+    end
+
+    if type == 0x200 then
+        if dragged_text then
+            local t = dragged_text[1]
+            t:pos(x - dragged_text[2], y - dragged_text[3])
+        end
+        return true
+
+    elseif type == 0x201 then
+        for _, t in pairs(saved_texts) do
+            local x_pos, y_pos = tb_get_location(t._name)
+            local x_off, y_off = tb_get_extents(t._name)
+
+            if (x_pos <= x and x <= x_pos + x_off
+                or x_pos >= x and x >= x_pos + x_off)
+            and (y_pos <= y and y <= y_pos + y_off
+                or y_pos >= y and y >= y_pos + y_off) then
+                dragged_text = {t, x - x_pos, y - y_pos}
+            end
+        end
+        return true
+
+    elseif type == 0x202 then
+        dragged_text = nil
+        return true
+
+    end
+end
+
+register_event('unload', destroy_texts)
+event_mouse = handle_mouse
 
 return texts

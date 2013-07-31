@@ -10,15 +10,15 @@ require 'refresh'
 
 _addon = {}
 _addon.name = 'GearSwap'
-_addon.version = '0.5'
+_addon.version = '0.501'
 _addon.commands = {'gs','gearswap'}
 
 function event_load()
-	debugging = 0
+	debugging = 1
 	
 	
 	if dir_exists('../addons/GearSwap/data/logs') then
-		logging = false
+		logging = true
 		logfile = io.open('../addons/GearSwap/data/logs/NormalLog'..tostring(os.clock())..'.log','w+')
 		logit(logfile,'GearSwap LOGGER HEADER\n')
 	end
@@ -26,32 +26,17 @@ function event_load()
 	send_command('@alias gs lua c gearswap')
 	refresh_globals()
 	_global.force_send = false
-	language = get_ffxi_info()['language']
+	language = world.language:lower()
 	
-	if player['main_job'] then
-		user_env = load_user_files()
-		if not user_env then
-			gearswap_disabled = true
-			sets = nil
-		else
-			gearswap_disabled = false
-			sets = user_env.get_sets()
-		end
-		sets = user_env.get_sets()
-		if debugging then send_command('@unload spellcast;') end
+	if world.logged_in then
+		refresh_user_env()
+		if debugging >= 1 then send_command('@unload spellcast;') end
 	end
-	collectgarbage()
 end
 
 function event_unload()
 	if logging then	logfile:close() end
 	send_command('@unalias gs')
-	for i,v in pairs(_G) do
-		if v ~= event_unload and v ~= pairs and v~=_G and v~=collectgarbage then
-			_G[i] = nil
-		end
-	end
-	collectgarbage()
 end
 
 function event_addon_command(...)
@@ -78,37 +63,18 @@ function event_addon_command(...)
 end
 
 function midact()
-	if action_sent then
-		action_sent = false
-	else
-		if debugging >= 1 then add_to_chat(1,'Had for force the command to send. Something is wrong.') end
+	if not action_sent then
+		if debugging >= 1 then add_to_chat(1,'Had for force the command to send.') end
 		send_check(true)
-		action_sent = false
 	end
-end
-
-function refresh()
-	refresh_ffxi_info()
-end
-
-function refresh_user_env()
-	refresh_globals()
-	user_env = {}
-	user_env = load_user_files()
-	if not user_env then
-		gearswap_disabled = true
-		sets = nil
-	else
-		gearswap_disabled = false
-		sets = user_env.get_sets()
-	end
+	action_sent = false
 end
 
 function event_outgoing_text(original,modified)
 	if gearswap_disabled then return modified end
 	local splitline = split(modified,' ')
 	local command = splitline[1]
-	
+
 	local a,b,abil = string.find(original,'"(.-)"')
 	local temptarg = valid_target(splitline[#splitline])
 	
@@ -118,18 +84,17 @@ function event_outgoing_text(original,modified)
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) Original: '..original) end
 		refresh_globals()
 			
-		midaction = true
 		send_command('@wait 1;lua invoke gearswap midact')
 		
 		local r_line, s_type
 			
 		if command_list[command] == 'Magic' then
 			r_line = r_spells[validabils[abil:lower()]['Magic']]
-			r_line.name = r_line[language]
+			r_line.name = r_line['english']
 			s_type = command_list[r_spells[validabils[abil:lower()]['Magic']]['prefix']]
 		elseif command_list[command] == 'Ability' then
 			r_line = r_abilities[validabils[abil:lower()]['Ability']]
-			r_line.name = r_line[language]
+			r_line.name = r_line['english']
 			s_type = command_list[r_abilities[validabils[abil:lower()]['Ability']]['prefix']]
 		elseif debugging then
 			write('this case should never be hit '..command)
@@ -152,7 +117,7 @@ end
 
 function event_incoming_text(original,modified,mode)
 	if gearswap_disabled then return modified, color end
-	if original == '...A command error occurred.' or original == 'You can only use that command during battle.' then
+	if original == '...A command error occurred.' or original == 'You can only use that command during battle.' or original == 'You cannot use that command here.' then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(130) Client canceled command detected: '..mode..' '..original) end
 		equip_sets('aftercast',{name='Invalid Spell'},{type='Recast'})
 	end
@@ -191,6 +156,29 @@ end
 function event_outgoing_chunk(id,data)
 	if id == 0x015 then
 		lastbyte = data:byte(7,8)
+	end
+	if id == 0x01A then -- Action packet
+		local abil_name
+		actor_id = data:byte(8,8)*256^3+data:byte(7,7)*256^2+data:byte(6,6)*256+data:byte(5,5)
+		index = data:byte(10,10)*256+data:byte(9,9)
+		category = data:byte(12,12)*256+data:byte(11,11)
+		param = data:byte(14,14)*256+data:byte(13,13)
+		_unknown1 = data:byte(16,16)*256+data:byte(15,15)
+		local actor_name = get_mob_by_id(actor_id)['name']
+		local target_name = get_mob_by_index(index)['name']
+		if category == 3 then
+			abil_name = r_spells[param]['english']
+		elseif category == 7 then
+			abil_name = r_abilities[param+768]['english']
+		elseif category == 9 then
+			abil_name = r_abilities[param]['english']
+		elseif category == 16 then
+			abil_name = 'Ranged Attack'
+		end
+		if logging then logit(logfile,'\n\nActor: '..tostring(actor_name)..'  Target: '..tostring(target_name)..'  Category: '..tostring(category)..'  param: '..tostring(abil_name or param)) end
+		if abil_name then
+			midaction = true
+		end
 	end
 end
 
@@ -234,22 +222,24 @@ function event_action_message(actor_id,target_id,actor_index,target_index,messag
 end
 
 function event_status_change(old,new)
-	if gearswap_disabled then return end
-	equip_sets('status_change',new,{type='Status Change',old=old})
+	if gearswap_disabled or old == 'Event' then return end
+	equip_sets('status_change',new,old)
 end
 
 function event_gain_status(id,name)
 	if gearswap_disabled then return end
-	equip_sets('buff_change',name,{type='gain'})
+	equip_sets('buff_change',name,'gain')
 end
 
 function event_lose_status(id,name)
 	if gearswap_disabled then return end
-	equip_sets('buff_change',name,{type='loss'})
+	equip_sets('buff_change',name,'loss')
 end
 
 function event_job_change(mjob_id, mjob, mjob_lvl, sjob_id, sjob, sjob_lvl)
-	refresh_user_env()
+	if mjob ~= current_job_file then
+		refresh_user_env()
+	end
 end
 
 function event_login(name)
@@ -257,7 +247,7 @@ function event_login(name)
 end
 
 function event_day_change(day)
-	send_command('@wait 0.5;lua invoke gearswap refresh')
+	send_command('@wait 0.5;lua invoke gearswap refresh_ffxi_info')
 end
 
 function event_weather_change(weather)
@@ -385,7 +375,7 @@ function get_spell(act)
 		end
 	end
 	
-	spell.name = spell[language]
+	spell.name = spell['english']
 	return spell
 end
 

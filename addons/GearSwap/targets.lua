@@ -4,7 +4,13 @@ function valid_target(targ)
 	if not spelltarget then spelltarget = {} end
 	
 	local spell_targ
-	if pass_through_targs:contains(targ) then
+	if st_targs:contains(targ) then
+		st_flag = true
+		spell_targ = nil
+	elseif st_flag then
+		st_flag = false
+		spell_targ = nil
+	elseif pass_through_targs:contains(targ) then
 		local j = get_mob_by_target(targ)
 		
 		if j == nil then

@@ -232,7 +232,7 @@ function interp_text(splitline,offset,modified)
 		temptarg = valid_target(splitline[#splitline])
 	end
 	local abil
-	
+
 	if temptarg then abil = _raw.table.concat(splitline,' ',1+offset,#splitline-1)
 	else abil = _raw.table.concat(splitline,' ',1+offset,#splitline) end
 
