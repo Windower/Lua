@@ -36,7 +36,6 @@ require 'logger'
 local config = require 'config'
 local files = require 'filehelper'
 local defaults = T{}
-defaults.assimilation = 0
 defaults.spellsets = T{}
 defaults.spellsets.default = T{ }
 defaults.spellsets.vw1 = T{slot01='Firespit', slot02='Heat Breath', slot03='Thermal Pulse', slot04='Blastbomb',
@@ -50,7 +49,6 @@ slot05='Temporal Shift', slot06='Mind Blast', slot07='Blitzstrahl', slot08='Char
 slot09='Blank Gaze', slot10='Radiant Breath', slot11='Light of Penance', slot12='Actinic Burst',
 slot13='Death Ray', slot14='Eyes On Me', slot15='Sandspray'
 }
-defaults.language = 'english'
 
 function initialize()
     get_current_spellset()
@@ -59,7 +57,6 @@ end
 function event_load()
     send_command('alias azureset lua c azureSets')
     send_command('alias aset lua c azureSets')
-    log('Version '.._addon.version..' loaded! Use //aset help to get a list of commands.')
     speFile = files.new('data/bluespells.xml')
     spells = T{}
     spells = parse_resources(speFile:readlines())
@@ -71,13 +68,7 @@ function event_login()
     initialize()
 end
 
-function event_logout()
-    player = nil
-end
-
 function event_unload()
-    notice('Saving settings and unloading.')
-    settings:save('all')
     send_command('unalias azureset')
     send_command('unalias aset')
 end
@@ -92,7 +83,7 @@ function set_spells(spellset)
     if get_player()['main_job_id'] ~= 16 --[[and get_player()['sub_job_id'] ~= 16]] then return nil end
     if settings.spellsets[spellset] == nil then return end
     if settings.spellsets[spellset]:equals(get_current_spellset()) then
-        log(spellset..' was already equipped.')
+        error(spellset..' was already equipped.')
         return
     end
     reset_blue_magic_spells()
@@ -118,8 +109,8 @@ function set_spells_from_spellset(spellset,slot)
     if tonumber(slot) < 20 then
         send_command('@wait .5;lua i azuresets set_spells_from_spellset '..spellset..' '..slot+1)
     else
-        log(spellset..' was equipped.')
-        send_command('timers c "Blue Magic Cooldown" 60 up')
+        log(spellset..' has been equipped.')
+        send_command('@timers c "Blue Magic Cooldown" 60 up')
     end
     
 end
@@ -141,7 +132,7 @@ function set_single_spell(spell,slot)
             --This is where single spell setting code goes.
             --Need to set by spell index rather than name.
             set_blue_magic_spell(spells[id]['index'], tonumber(slot))
-            send_command('timers c "Blue Magic Cooldown" 60 up')
+            send_command('@timers c "Blue Magic Cooldown" 60 up')
             tmpTable['slot'..slot] = spell
         end
     end
@@ -226,7 +217,7 @@ end
 
 function get_spellset_content(spellset)
     log('Getting '..spellset..'\'s spell list:')
-    settings.spellsets[spellset]:vprint()
+    settings.spellsets[spellset]:print()
 end
 
 function event_addon_command(...)
@@ -239,17 +230,6 @@ function event_addon_command(...)
         local comm = table.remove(args,1):lower()
         if comm == 'removeall' then
             remove_all_spells('trigger')
-        --[[elseif comm == 'remove' then
-            local combined = table.concat(args,' ')
-            for id = 1, #spells do
-                if spells[id][settings['language']:lower()] == combined then
-                    remove_one_spell(combined)
-                    break
-                end
-                if id == #spells then
-                    error('The spell '..combined..' does not exist.')
-                end
-            end]]
         elseif comm == 'add' then
             if args[2] ~= nil then
                 local slot = table.remove(args,1)
@@ -266,7 +246,7 @@ function event_addon_command(...)
                 set_spells(args[1])
             end
         elseif comm == 'currentlist' then
-            get_current_spellset():vprint()
+            get_current_spellset():print()
         elseif comm == 'setlist' then
             get_spellset_list()
         elseif comm == 'spelllist' then
@@ -274,7 +254,7 @@ function event_addon_command(...)
                 get_spellset_content(args[1])
             end
         elseif comm == 'help' then
-            log('Version '.._addon.version..' loaded! You have access to the following commands with the //aset alias:')
+            log('You have access to the following commands with the //aset alias:')
             log(' 1. removeall - Unsets all spells.')
             log(' 2. spellset <setname> -- Set (setname)\'s spells.')
             log(' 3. add <slot> <spell> -- Set (spell) to slot (slot (number)).')
