@@ -100,7 +100,7 @@ function set_spells_from_spellset(spellset,slot)
     local tempname = settings.spellsets[spellset]['slot'..islot]
     if tempname ~= nil then
         for id = 1, #spells do
-            if spells[id]['english']:lower() == tempname then
+            if spells[id]['english']:lower() == tempname:lower() then
                 set_blue_magic_spell(spells[id]['index'], tonumber(slot))
                 break
             end
