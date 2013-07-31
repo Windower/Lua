@@ -100,7 +100,7 @@ function set_spells_from_spellset(spellset,slot)
     local tempname = settings.spellsets[spellset]['slot'..islot]
     if tempname ~= nil then
         for id = 1, #spells do
-            if spells[id][settings['language']:lower()] == tempname then
+            if spells[id]['english']:lower() == tempname:lower() then
                 set_blue_magic_spell(spells[id]['index'], tonumber(slot))
                 break
             end
@@ -120,7 +120,7 @@ function set_single_spell(spell,slot)
     
     local tmpTable = T(get_current_spellset())
     for key,val in pairs(tmpTable) do
-        if tmpTable[key] == spell then 
+        if tmpTable[key]:lower() == spell then 
             error('That spell is already set.')
             return
         end
@@ -128,7 +128,7 @@ function set_single_spell(spell,slot)
     if tonumber(slot) < 10 then slot = '0'..slot end
     --insert spell add code here
     for id = 1, #spells do
-        if spells[id][settings['language']:lower()] == spell then
+        if spells[id]['english']:lower() == spell then
             --This is where single spell setting code goes.
             --Need to set by spell index rather than name.
             set_blue_magic_spell(spells[id]['index'], tonumber(slot))
@@ -152,7 +152,7 @@ function get_current_spellset()
                 for id = 1, #spells do
                     if tonumber(tmpTable[i]) == tonumber(spells[id]['index']) then
                         if i < 10 then t = '0' end
-                        spellTable['slot'..t..i] = spells[id][settings['language']:lower()]
+                        spellTable['slot'..t..i] = spells[id]['english']:lower()
                         break
                     end
                 end
@@ -174,7 +174,7 @@ function remove_one_spell(spell)
     end
     --insert spell add code here
     for id = 1, #spells do
-        if spells[id][settings['language']:lower()] == spell then
+        if spells[id]['english']:lower()] == spell then
             --This is where single spell removing code goes.
             --Need to remove by spell index rather than name.
             log('Removing '..spell..' from slot '..tonumber(loc)..'.')
@@ -234,7 +234,7 @@ function event_addon_command(...)
             if args[2] ~= nil then
                 local slot = table.remove(args,1)
                 local spell = args:sconcat()
-                set_single_spell(spell,slot)
+                set_single_spell(spell:lower(),slot)
             end
         elseif comm == 'save' then
             if args[1] ~= nil then
