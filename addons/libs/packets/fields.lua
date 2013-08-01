@@ -225,10 +225,10 @@ fields.incoming[0x00E] = L{
 -- Incoming Chat
 fields.incoming[0x017] = L{
 	{ctype='unsigned char',     label='Mode'},                                  --    4 -   4   Chat mode.
-	{ctype='bool',              label='is_GM'},                                 --    5 -   5   1 for GM or 0 for not
+	{ctype='bool',              label='GM'},                                    --    5 -   5   1 for GM or 0 for not
 	{ctype='unsigned short',    label='Zone ID',            fn=zone},           --    6 -   7   Zone ID, used for Yell
 	{ctype='char[16]',          label='Sender Name'},                           --    8 -  22   Name
-	{ctype='char[231]',         label='Message'},                               --   23 - 253   Message, occasionally terminated by spare 00 bytes.
+	{ctype='char*',             label='Message'},                               --   23 - 253   Message, occasionally terminated by spare 00 bytes.
 }
 
 -- Item Assign

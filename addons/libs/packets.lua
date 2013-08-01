@@ -33,21 +33,21 @@ end
 
 -- Type identifiers as declared in lpack.c
 local pack_ids = {}
-pack_ids['bool'] = 'B'
-pack_ids['unsigned char'] = 'b'
-pack_ids['unsigned short'] = 'H'
-pack_ids['unsigned int'] = 'I'
-pack_ids['unsigned long'] = 'L'
-pack_ids['signed char'] = 'c'
-pack_ids['signed short'] = 'h'
-pack_ids['signed int'] = 'i'
-pack_ids['signed long'] = 'L'
-pack_ids['char'] = 'c'
-pack_ids['short'] = 'h'
-pack_ids['int'] = 'i'
-pack_ids['long'] = 'l'
-pack_ids['float'] = 'f'
-pack_ids['double'] = 'd'
+pack_ids['bool']            = 'B'
+pack_ids['unsigned char']   = 'b'
+pack_ids['unsigned short']  = 'H'
+pack_ids['unsigned int']    = 'I'
+pack_ids['unsigned long']   = 'L'
+pack_ids['signed char']     = 'c'
+pack_ids['signed short']    = 'h'
+pack_ids['signed int']      = 'i'
+pack_ids['signed long']     = 'L'
+pack_ids['char']            = 'c'
+pack_ids['short']           = 'h'
+pack_ids['int']             = 'i'
+pack_ids['long']            = 'l'
+pack_ids['float']           = 'f'
+pack_ids['double']          = 'd'
 pack_ids = setmetatable(pack_ids, {__index = function(t, k)
 	local type, number = k:match('(.-)%s*%[(%d+)%]')
 	if type then
@@ -60,6 +60,18 @@ pack_ids = setmetatable(pack_ids, {__index = function(t, k)
 			end
 		end
 	end
+
+    type = k:match('(.-)%s*%*')
+    if type then
+        local pack_id = rawget(t, type)
+        if pack_id then
+            if type == 'char' then
+                return 'S*'
+            else
+                return pack_id..'*'
+            end
+        end
+    end
 end})
 
 -- Constructor for packets (both injected and parsed).
@@ -105,7 +117,7 @@ function packets.parse(id, mode, data)
 	end
 
 	local keys = fields:map(table.get-{'label'})
-	local pack_str = '<'..fields:map((function(ct) return pack_ids[ct] end)..table.get-{'ctype'}):concat()
+	local pack_str = '<'..fields:map(table.index+{pack_ids}..table.get-{'ctype'}):concat()
 
 	for key, val in ipairs({res._data:unpack(pack_str)}) do
 		if keys[key] then
@@ -154,8 +166,19 @@ end
 -- Returns binary data from a packet
 function packets.build(packet)
 	local fields = packets.fields[packet._mode][packet._id]
-	local pack_string = fields:map(table.index+{pack_ids}..table.get-{'ctype'}):concat()
-    return pack_string:pack(fields:map(table.get+{packet}..table.get-{'label'}):unpack())
+	if not fields then
+		error('Packet 0x'..packet._id:hex():zfill(3)..' not recognized, unable to build.')
+		return
+	end
+
+    -- 'b2H' for the 4 byte header: unsigned char, unsigned char, short
+	local pack_string = 'b2H'..fields:map(table.index+{pack_ids}..table.get-{'ctype'}):concat()
+    return pack_string:pack(
+        packet._id % 0x100,                                             -- ID
+        packet._size/2 + math.floor(packet._id / 0x100),                -- size
+        0,                                                              -- sequence (filled out later)
+        fields:map(table.get+{packet}..table.get-{'label'}):unpack()    -- remaining arguments
+    ):rpad('\0', packet._size)                                          -- Fll with trailing nulls if necessary
 end
 
 -- Injects a packet built with packets.new
@@ -166,13 +189,13 @@ function packets.inject(packet)
 		return
 	end
 
-	packet._data = packets.build(packet)
+	packet._raw = packets.build(packet)
+    packet._data = packet._raw:sub(5)
 
-	log(packet._data:hex(' '))
 	if packet._mode == 'incoming' then
-		log(windower.packets.inject_incoming(packet._id, packet._data):hex())
+		windower.packets.inject_incoming(packet._id, packet._data):hex()
 	elseif packet._mode == 'outgoing' then
-		log(windower.packets.inject_outgoing(packet._id, packet._data):hex())
+		windower.packets.inject_outgoing(packet._id, packet._data):hex()
 	else
 		error('Error sending packet, no mode specified. Please specify \'incoming\' or \'outgoing\'.')
 	end
