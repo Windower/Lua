@@ -90,7 +90,7 @@ end
 
 function list.append(l, el)
 	l.n = l.n + 1
-	rawset(l, l.n, el)
+	return rawset(l, l.n, el)
 end
 
 function list.last(l, i)

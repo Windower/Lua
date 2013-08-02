@@ -130,6 +130,7 @@ end
 -- Appends an element to the end of an array table.
 function table.append(t, val)
 	t[#t+1] = val
+    return t;
 end
 
 -- Appends an array table to the end of another array table.
