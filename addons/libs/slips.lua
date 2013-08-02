@@ -133,7 +133,7 @@ function slips.player_has_item(id)
 end
 
 function slips.get_player_items()
-    local slips_items = L{}
+    local slips_items = T{}
 
     for _, slip_id in ipairs(slips.storages) do
         slips_items[slip_id] = L{}
