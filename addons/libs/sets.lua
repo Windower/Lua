@@ -152,11 +152,11 @@ function set.find(s, fn)
 end
 
 function set.add(s, el)
-	rawset(s, el, true)
+	return rawset(s, el, true)
 end
 
 function set.remove(s, el)
-	rawset(s, el, nil)
+	return rawset(s, el, nil)
 end
 
 function set.it(s)
