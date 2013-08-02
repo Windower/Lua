@@ -1,5 +1,5 @@
 --[[
-reive v1.20130603
+reive v1.20130802
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -36,7 +36,7 @@ local config = require 'config'
 
 _addon = {}
 _addon.name     = 'reive'
-_addon.version  = '1.20130603'
+_addon.version  = '1.20130802'
 _addon.commands = 'reive'
 
 tb_name = 'addon:gr:reive'
@@ -237,7 +237,7 @@ function refresh()
     local bonuses_colors = settings.colors.bonus
     local bonuses        = '';
 
-    for index, bonus in pairs(stats.bonuses:keyset():sort()) do
+    for index, bonus in ipairs(stats.bonuses:keyset():sort()) do
         if type(bonuses_map[bonus]) == 'nil' or settings.track[bonuses_map[bonus]] == true then
             local amount = stats.bonuses[bonus]
 
