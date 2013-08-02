@@ -5,6 +5,7 @@ A library providing sets as a data structure.
 _libs = _libs or {}
 _libs.sets = true
 _libs.tablehelper = _libs.tablehelper or require 'tablehelper'
+_libs.functools = _libs.functools or require 'functools'
 
 set = {}
 
@@ -72,6 +73,8 @@ function set.equals(s1, s2)
 	return true
 end
 
+_meta.S.__eq = set.equals
+
 function set.union(s1, s2)
 	if type(s2) ~= 'table' then
 		s2 = S{s2}
@@ -134,6 +137,18 @@ _meta.S.__pow = set.sdiff
 
 function set.contains(s, el)
 	return rawget(s, el) == true
+end
+
+function set.find(s, fn)
+    if type(fn) ~= 'function' then
+        fn = functools.equals(fn)
+    end
+    
+    for el in pairs(s) do
+        if fn(el) then
+            return el
+        end
+    end
 end
 
 function set.add(s, el)

@@ -215,12 +215,9 @@ function table.amend(t, t_amend, recursive, maxrec, rec)
 end
 
 -- Searches elements of a table for an element. If, instead of an element, a function is provided, will search for the first element to satisfy that function.
-function table.find(t, el)
-	local fn
-	if type(el) ~= 'function' then
-		fn = functools.equals(el)
-	else
-		fn = el
+function table.find(t, fn)
+	if type(fn) ~= 'function' then
+		fn = functools.equals(fn)
 	end
 
 	for key, val in pairs(t) do
