@@ -32,42 +32,48 @@ defaults.text.size = 12
 text = {}
 
 function setID(index)
-	local mob = get_mob_by_index(index)
-	local id = mob['id']
-	if id and id > 0 then
-		text:show()
-		if mob['is_npc'] then
-			text:text(id:tohex():slice(-3))
-		else
-			text:hide()
-		end
-	else
-		text:hide()
-	end
+    if index == 0 then
+        text:hide()        
+        return
+    end
+
+    local mob = get_mob_by_index(index)
+    local id = mob['id']
+
+    if id and id > 0 then
+        text:show()
+        if mob['is_npc'] then
+            text:text(id:tohex():slice(-3))
+        else
+            text:hide()
+        end
+    else
+        text:hide()
+    end
 end
 
 -- Events
 
 function event_target_change(target_index)
-	setID(target_index)
+    setID(target_index)
 end
 
 -- Constructor
 
 function event_load()
-	settings = config.load(defaults)
-	settings:save()
+    settings = config.load(defaults)
+    settings:save()
 
-	text = texts.new(settings)
+    text = texts.new(settings)
 
-	setID(get_player()['target_index'])
-	
-	send_command('alias targetinfo')
+    setID(get_player()['target_index'])
+    
+    send_command('alias targetinfo')
 end
 
 -- Destructor
 
 function event_unload()
-	text:destroy()
-	send_command('unalias targetid')
+    text:destroy()
+    send_command('unalias targetid')
 end
