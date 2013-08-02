@@ -73,6 +73,7 @@ additional configuration options:
          Fixedsys, Lucida Console, Courier, Courier New, MS Mincho,
          Consolas, Dejavu Sans Mono.
 * fontsize - Size of Scoreboard's font
+* sbcolor - Color of scoreboard's chat log output
  
 Caveats:
 * DPS is an approximation, although I tested it manually and found it to

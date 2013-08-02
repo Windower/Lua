@@ -2,17 +2,18 @@
 Small implementation of a fully-featured XML reader.
 ]]
 
+local xml = {}
+
 _libs = _libs or {}
-_libs.xml = true
+_libs.xml = xml
 _libs.tablehelper = _libs.tablehelper or require 'tablehelper'
 _libs.lists = _libs.lists or require 'lists'
+_libs.sets = _libs.sets or require 'sets'
 _libs.stringhelper = _libs.stringhelper or require 'stringhelper'
-local files = require 'filehelper'
-_libs.filehelper = _libs.filehelper or files ~= nil
+_libs.filehelper = _libs.filehelper or require 'filehelper'
 
-local xml = {}
 -- Define singleton XML characters that can delimit inner tag strings.
-xml.singletons = '=" \n\r\t/>?'
+xml.singletons = '=" \n\r\t/>'
 xml.unescapes = T{
 	amp = '&',
 	gt = '>',
@@ -28,15 +29,15 @@ xml.escapes = T{
 	['\''] = 'apos'
 }
 
-local spaces = {' ', '\n', '\t', '\r'}
+local spaces = S{' ', '\n', '\t', '\r'}
 
 -- Takes a numbered XML entity as second argument and converts it to the corresponding symbol.
 -- Only used internally to index the xml.unescapes table.
 function xml.entity_unescape(_, entity)
 	if entity:startswith('#x') then
-		return string.char(tonumber(entity:slice(3), 16))
+		return string.char(tonumber(entity:sub(3), 16))
 	elseif entity:startswith('#') then
-		return string.char(tonumber(entity:slice(2)))
+		return string.char(tonumber(entity:sub(2)))
 	else
 		return entity
 	end
@@ -53,7 +54,7 @@ function string.xml_escape(str)
 		end
 		return c
 	end
-	
+
 	return str:gsub('.', xml_sub)
 end
 
@@ -62,7 +63,7 @@ xml.entities = setmetatable(xml.unescapes, {__index=xml.entity_unescape})
 -- Takes a filename and tries to parse the XML in it, after a validity check.
 function xml.read(file)
 	if type(file) == 'string' then
-		file = files.new(file)
+		file = _libs.filehelper.new(file)
 	end
 
 	if not file:exists() then
@@ -102,11 +103,13 @@ function xml.parse(content)
 	local index = 0
 	local mode = 'outer'
 	local line = 1
+    
+    -- Parse XML header
 	for c in content:it() do
 		if c == '\n' then
 			line = line + 1
 		end
-		
+
 		index = index + 1
 		if mode == 'quote' then
 			tag = tag..c
@@ -114,7 +117,7 @@ function xml.parse(content)
 				quote = nil
 				mode = 'inner'
 			end
-		
+
 		elseif mode == 'outer' then
 			if not c:match('%s') then
 				if c == '<' then
@@ -124,7 +127,7 @@ function xml.parse(content)
 					return xml.error('Malformatted XML headers.')
 				end
 			end
-			
+
 		elseif mode == 'inner' then
 			tag = tag..c
 			if c == '\'' or c == '"' then
@@ -145,16 +148,16 @@ function xml.parse(content)
 			end
 		end
 	end
-	
+
 	if not xml.validate_headers(headers) then
 		return xml.error('Invalid XML headers.')
 	end
-	
-	local tokens, err = xml.tokenize(content:slice(index):trim(), line)
+
+	local tokens, err = xml.tokenize(content:sub(index):trim(), line)
 	if tokens == nil then
 		return nil, err
 	end
-	
+
 	return xml.classify(tokens, headers)
 end
 
@@ -172,44 +175,44 @@ function xml.tokenize(content, line)
 	for i = 1, line do
 		tokens:append(T{})
 	end
-	
+
 	local quote = nil
 	local mode = 'inner'
-	for c in content:slice(startpos):it() do
+	for c in content:it() do
 		-- Only useful for a line count, to produce more accurate debug messages.
-		if c == "\n" then
+		if c == '\n' then
 			tokens:append(T{})
 		end
-		
+
 		if mode == 'quote' then
 			if c == quote then
-				tokens:last():append('"'..xml.pcdata(current)..'"')
+				tokens:last():append('"'..current..'"')
 				current = ''
 				mode = 'tag'
 			else
 				current = current..c
 			end
-			
+
 		elseif mode == 'comment' then
 			current = current..c
 			if c == '>' and current:endswith('-->' ) then
-				if current:slice(5, -4):contains('--') then
-					return xml.error('Invalid token \'--\' within comment.', tokens:line())
+				if current:sub(5, -4):contains('--') then
+					return xml.error('Invalid token \'--\' within comment.', #tokens)
 				end
 				tokens:last():append(current)
 				current = ''
 				mode = 'inner'
 			end
-			
+
 		elseif mode == 'inner' then
 			if c == '<' then
-				tokens:last():append(xml.pcdata(current))
+				tokens:last():append(current:trim())
 				current = '<'
 				mode = 'tag'
 			else
 				current = current..c
 			end
-			
+
 		elseif mode == 'cdata' then
 			current = current..c
 			if c == '>' and current:endswith(']]>') then
@@ -217,43 +220,43 @@ function xml.tokenize(content, line)
 				current = ''
 				mode = 'inner'
 			end
-			
+
 		else
 			if xml.singletons:contains(c) then
-				if c:isin(spaces) then
-					if current:length() > 0 then
+				if spaces:contains(c) then
+					if #current > 0 then
 						tokens:last():append(current)
 						current = ''
 					end
-					
+
 				elseif c == '=' then
-					if current:length() > 0 then
+					if #current > 0 then
 						tokens:last():append(current)
 					end
 					tokens:last():append('=')
 					current = ''
-					
+
 				elseif c == '"' or c == '\'' then
 					quote = c
 					mode = 'quote'
-					
+
 				elseif c == '/' then
 					if current:startswith('<') and current:length() > 1 then
 						tokens:last():append(current)
 						current = ''
 					end
 					current = current..c
-					
+
 				elseif c == '>' then
 					current = current..c
 					tokens:last():append(current)
 					current = ''
 					mode = 'inner'
-					
+
 				else
-					xml.error('Unexpected token \''..c..'\'.', tokens:length())
+					return xml.error('Unexpected token \''..c..'\'.', tokens:length())
 				end
-				
+
 			else
 				if c:match('[%w%d-_%.%:![%]]') ~= nil then
 					current = current..c
@@ -279,15 +282,15 @@ end
 -- Definition of a DOM object.
 local dom = T{}
 function dom.new(t)
-	return T{type='', name='', namespace=nil, value=nil, children=T{}}:update(t)
+	return T{type='', name='', namespace=nil, value=nil, children=L{}}:update(t)
 end
 
 -- Returns the name of the element and the namespace, if present.
 function xml.get_namespace(token)
 	local splits = token:split(':')
-	if splits:length() > 2 then
+	if #splits > 2 then
 		return
-	elseif splits:length() == 2 then
+	elseif #splits == 2 then
 		return splits[2], splits[1]
 	end
 	return token
@@ -298,47 +301,47 @@ function xml.classify(tokens, var)
 	if tokens == nil then
 		return nil, var
 	end
-	
+
 	-- This doesn't do anything yet.
 	local headers = var
-	
+
 	local mode = 'inner'
 	local parsed = T{dom.new()}
 	local name = nil
 	for line, intokens in ipairs(tokens) do
 		for _, token in ipairs(intokens) do
 			if token:startswith('<![CDATA[') then
-				parsed:last().children:append(dom.new(T{type = 'text', value = token:slice(10, -4)}))
-				
+				parsed:last().children:append(dom.new({type = 'text', value = token:sub(10, -4)}))
+
 			elseif token:startswith('<!--') then
-				parsed:last().children:append(dom.new(T{type = 'comment', value = token:slice(5, -4)}))
-				
+				parsed:last().children:append(dom.new({type = 'comment', value = token:sub(5, -4)}))
+
 			elseif token:startswith('</') then
-				if token:slice(3, -2) == parsed:last(1).name then
+				if token:sub(3, -2) == parsed:last(1).name then
 					parsed:last(2).children:append(parsed:remove())
 				else
 					return xml.error('Mismatched tag ending: '..token, line)
 				end
-				
+
 			elseif token:startswith('<') then
 				if token:endswith('>') then
-					name, namespace = xml.get_namespace(token:slice(2, -2))
+					name, namespace = xml.get_namespace(token:sub(2, -2))
 				else
-					name, namespace = xml.get_namespace(token:slice(2))
+					name, namespace = xml.get_namespace(token:sub(2))
 				end
 				if name == nil then
 					return xml.error('Invalid namespace definition.', line)
 				end
 				namespace = namespace or ''
 
-				parsed:append(dom.new(T{type = 'tag', name = name, namespace = namespace}))
+				parsed:append(dom.new({type = 'tag', name = name, namespace = namespace}))
 				name, namespace = nil, nil
 				if token:endswith('>') then
 					mode = 'inner'
 				else
 					mode = 'tag'
 				end
-				
+
 			elseif token:endswith('/>') then
 				if mode == 'tag' then
 					parsed:last(2).children:append(parsed:remove())
@@ -346,19 +349,19 @@ function xml.classify(tokens, var)
 				else
 					return xml.error('Illegal token inside a tag: '..token, line)
 				end
-				
+
 			elseif token:endswith('>') then
 				if mode ~= 'tag' then
 					return xml.error('Unexpected token \'>\'.', line)
 				end
 				mode = 'inner'
-				
+
 			elseif token == '=' then
 				if mode ~= 'eq' then
 					return xml.error('Unexpected \'=\'.')
 				end
 				mode = 'value'
-				
+
 			else
 				if mode == 'tag' then
 					if parsed:last().children:find(function (el) return el.type == 'attribute' and el.name == token end) ~= nil then
@@ -367,27 +370,35 @@ function xml.classify(tokens, var)
 					name, namespace = xml.get_namespace(token)
 					namespace = tmpnamespace or parsed:last(1).namespace
 					mode = 'eq'
-					
+
 				elseif mode == 'value' then
-					parsed:last().children:append(dom.new(T{type = 'attribute', name = name, namespace = namespace, value = token:slice(2,-2)}))
+					parsed:last().children:append(dom.new({
+                        type = 'attribute',
+                        name = name,
+                        namespace = namespace,
+                        value = xml.attribute(token:sub(2,-2))
+                    }))
 					name = nil
 					namespace = ''
 					mode = 'tag'
-					
+
 				elseif mode == 'inner' then
-					parsed:last().children:append(dom.new(T{type = 'text', value = token}))
+					parsed:last().children:append(dom.new({
+                        type = 'text',
+                        value = xml.pcdata(token)
+                    }))
 				end
 			end
 		end
 	end
-	
+
 	local roots = parsed:remove().children
 	if #roots > 1 then
 		return xml.error('Multiple root elements not allowed.')
 	elseif #roots == 0 then
 		return xml.error('Missing root element not allowed.')
 	end
-	
+
 	return roots[1]
 end
 
@@ -405,7 +416,7 @@ function table.undomify(node, types)
 	res.attributes = T{}
 	local children = L{}
 	local ctype
-	
+
 	for _, child in ipairs(node.children) do
 		ctype = child.type
 		if ctype == 'attribute' then
@@ -416,7 +427,7 @@ function table.undomify(node, types)
 			children:append(child.value)
 		end
 	end
-	
+
 	if node_type then
 		local val = children[1] or ''
 		if node_type == 'set' then
@@ -433,11 +444,11 @@ function table.undomify(node, types)
 			res.children = L{res.value}
 		end
 	end
-	
+
 	if res.children == nil then
 		res.children = children
 	end
-	
+
 	res.get = function(t, val)
 		for child in t.children:it() do
 			if child.name == val then
@@ -445,9 +456,9 @@ function table.undomify(node, types)
 			end
 		end
 	end
-	
+
 	res.name = node.name
-	
+
 	return setmetatable(res, {__index = function(t, k)
 		return t.children[k]
 	end})
@@ -458,7 +469,7 @@ function xml.make_namespace_name(node)
 	if node.namespace ~= '' then
 		return node.namespace..':'..node.name
 	end
-	
+
 	return node.name
 end
 
@@ -467,11 +478,11 @@ function xml.realize(node, indentlevel)
 	if node.type ~= 'tag' then
 		return xml.error('Only DOM objects of type \'tag\' can be realized to XML.')
 	end
-	
+
 	indentlevel = indentlevel or 0
 	local indent = ('\t'):rep(indentlevel)
 	local str = indent..'<'..xml.make_namespace_name(node)
-	
+
 	local attributes = T{}
 	local children = T{}
 	local childtypes = T{}
@@ -485,7 +496,7 @@ function xml.realize(node, indentlevel)
 			return xml.error('Unknown type \''..child.type..'\'.')
 		end
 	end
-	
+
 	if #attributes ~= 0 then
 		for _, attribute in ipairs(attributes) do
 			local nsstring = ''
@@ -497,26 +508,30 @@ function xml.realize(node, indentlevel)
 			str = str..' '..nsstring..'="'..attribute.value:xml_escape()..'"'
 		end
 	end
-	
+
 	if #children == 0 then
 		str = str..' />\n'
 		return str
 	end
 	str = str..'>\n'
-	
+
 	local innerindent = '\t'..indent
 	for _, child in ipairs(children) do
 		if child.type == 'text' then
-			str = str..innerindent..child.value:xml_escape()..'\n'
+            if child.value:match('%s%s') or child.value:match('^%s') or child.value:match('%s$') then
+                str = str..innerindent..'<![CDATA['..child.value..']]>\n'
+			else
+                str = str..innerindent..child.value:xml_escape()..'\n'
+            end
 		elseif child.type == 'comment' then
 			str = str..innerindent..'<!--'..child.value:xml_escape()..'-->\n'
 		else
-			str = str..indent..xml.realize(child, indentlevel + 1)..'\n'
+			str = str..indent..xml.realize(child, indentlevel + 1)
 		end
 	end
-	
+
 	str = str..indent..'</'..node.name..'>\n'
-	
+
 	return str
 end
 
@@ -524,7 +539,7 @@ end
 function table.to_xml(t, indentlevel)
 	indentlevel = indentlevel or 0
 	local indent = ('\t'):rep(indentlevel)
-	
+
 	local str = ''
 	for key, val in pairs(t) do
 		if type(key) == 'number' then
@@ -541,7 +556,7 @@ function table.to_xml(t, indentlevel)
 			str = str..indent..'<'..key..'>'..val:xml_escape()..'</'..key..'>\n'
 		end
 	end
-	
+
 	return str
 end
 

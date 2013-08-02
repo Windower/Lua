@@ -33,6 +33,7 @@ function event_action(act)
 	
 	local party_table = get_party()
 	local actor_table = get_mob_by_id(act['actor_id'])
+
 	local actor = actor_table['name']
 	if actor == nil then return end
 	actor = namecol(actor,actor_table,party_table)
@@ -147,12 +148,14 @@ function event_action(act)
 			target_table = get_mob_by_id(act['targets'][i]['id'])
 
 			local flipped = false
-			if check_filter(actor_table,party_table,target_table,act['category'],act['targets'][i]['actions'][n]['message']) then
+			if act['category'] == 6 and act['param'] > 140 and act['param'] < 149 and act['targets'][1]['actions'][1]['message'] == 0 then -- Force a message for maneuvers.
+				msg_ID = 100
+			elseif check_filter(actor_table,party_table,target_table,act['category'],act['targets'][i]['actions'][n]['message']) then
 				msg_ID = act['targets'][i]['actions'][n]['message']
 			else
 				msg_ID = 0
 			end
-				
+			
 			if aggregate then
 				target = act['targets'][i]['target']
 			else
@@ -217,7 +220,11 @@ function event_action(act)
 					if T{252,265,268,269,271,272,274,275,650}:contains(msg_ID) then
 						spell = 'Magic Burst '..spell
 					end
-					spell = color_it(spell,color_arr['spellcol'])
+					if actor_table['is_npc'] then
+						spell = spell and color_it(spell, color_arr['mobspellcol']) or ''
+					else
+						spell = spell and color_it(spell, color_arr['spellcol']) or ''
+					end
 				elseif table.contains(fields,'ability') then
 					ability = jobabilities[abil_ID]['english']
 					if msg_ID == 379 then ability = 'Magic Burst '..ability end
@@ -230,6 +237,26 @@ function event_action(act)
 						if weapon_skill == '.' then
 							weapon_skill = 'Special Attack'
 						end
+						if mabils[abil_ID-256]['actorstatus'] and tpstatuses then
+							local tempar = split(mabils[abil_ID-256]['actorstatus'],',')
+							actor = actor..' ~'..statuses[tonumber(tempar[1])]['english']
+							for q,w in pairs(tempar) do
+								if q ~= 1 then
+									actor = actor..', '..statuses[tonumber(w)]['english']
+								end
+							end
+							actor = actor..'~'
+						end
+						if mabils[abil_ID-256]['targetstatus'] and tpstatuses then
+							local tempar = split(mabils[abil_ID-256]['targetstatus'],',')
+							target = target..' ~'..statuses[tonumber(tempar[1])]['english']
+							for q,w in pairs(tempar) do
+								if q~= 1 then
+									target = target..', '..statuses[tonumber(w)]['english']
+								end
+							end
+							target = target..'~'
+						end
 					elseif abil_ID < 256 then
 						weapon_skill = jobabilities[abil_ID+768]['english']
 					end
@@ -239,9 +266,9 @@ function event_action(act)
 						weapon_skill = weapon_skill..' (No Effect)'
 					end
 					if actor_table['is_npc'] then
-						weapon_skill = color_it(weapon_skill or '',color_arr['mobwscol'])
+						weapon_skill = weapon_skill and color_it(weapon_skill, color_arr['mobwscol']) or ''
 					else
-						weapon_skill = color_it(weapon_skill or '',color_arr['wscol'])
+						weapon_skill = weapon_skill and color_it(weapon_skill, color_arr['wscol']) or ''
 					end
 				elseif msg_ID == 303 then
 					ability = 'Divine Seal'
@@ -537,9 +564,10 @@ function check_filter(actor_table,party_table,target_table,category,msg)
 	-- Returns true (don't filter) or false (filter), boolean
 	actor_type = party_id(actor_table,party_table)
 	target_type = party_id(target_table,party_table)
+	
 	if filter[target_type]['target'] then return true end
 	
-	if actor_type ~= 'monsters' then
+	if actor_type ~= 'monsters' and actor_type ~= 'enemies' then
 		if filter[actor_type]['all']
 		or category == 1 and filter[actor_type]['melee']
 		or category == 2 and filter[actor_type]['ranged']
@@ -554,7 +582,6 @@ function check_filter(actor_table,party_table,target_table,category,msg)
 		then
 			return false
 		end
-		
 	else
 		if filter[actor_type][target_type]['all']
 		or category == 1 and filter[actor_type][target_type]['melee']
@@ -586,7 +613,14 @@ function party_id(actor_table,party_table)
 			elseif party_table['p0']['mob']['pet_index'] ~= actor_table['index'] then
 				filtertype = 'other_pets'
 			end
-		elseif filter['monsters'] then
+		elseif filter['enemies'] ~= nil then -- For people without xmls that include enemies
+			filtertype = 'monsters'
+			for i,v in pairs(party_table) do
+				if actor_table['claim_id'] == v['id'] then
+					filtertype = 'enemies'
+				end
+			end
+		else
 			filtertype = 'monsters'
 		end
 	else
@@ -606,7 +640,7 @@ function party_id(actor_table,party_table)
 			filtertype='alliance'
 		end
 	end
-	
+
 	return filtertype
 end
 

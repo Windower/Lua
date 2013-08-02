@@ -2,20 +2,16 @@
 A few functions that add an interface for color editing.
 ]]
 
+local chat = {}
+
 _libs = _libs or {}
-_libs.chat = true
+_libs.chat = chat
 _libs.tablehelper = _libs.tablehelper or require 'tablehelper'
 _libs.sets = _libs.sets or require 'sets'
 _libs.stringhelper = _libs.stringhelper or require 'stringhelper'
-local json = require 'json'
-_libs.json = _libs.json or (json ~= nil)
-_libs.logger = _libs.logger or require 'logger'
+_libs.json = _libs.json or require 'json'
 
-local res, err = json.read('../libs/ffxidata.json')
-if err then
-	error(err)
-end
-local chat = (ffxi and ffxi.data and ffxi.data.chat) or json.read('../libs/ffxidata.json').chat
+chat = table.update(chat, (ffxi and ffxi.data and ffxi.data.chat) or _libs.json.read('../libs/ffxidata.json').chat)
 local colors = chat.colors
 local color_controls = chat.colorcontrols
 
@@ -46,7 +42,7 @@ function make_color(col)
 			end
 		end
 	end
-	
+
 	return col
 end
 
@@ -68,17 +64,17 @@ end
 
 -- Strips a string of all colors.
 function string.strip_colors(str)
-	return (str:gsub('[\x1E\x1F].', ''))
+	return (str:gsub('['..string.char(0x1E, 0x1F, 0x7F)..'].', ''))
 end
 
 -- Strips a string of auto-translate tags.
 function string.strip_auto_translate(str)
-	return (str:gsub('\xEF[\x27\x28]', ''))
+	return (str:gsub(string.char(0xEF)..'['..string.char(0x27, 0x28)..']', ''))
 end
 
 -- Strips a string of all colors and auto-translate tags.
 function string.strip_format(str)
-	return (str:gsub('[\x1E\x1F\x7F].', ''):gsub('\xEF[\x27\x28]', ''))
+	return str:strip_colors():strip_auto_translate()
 end
 
 --[[
@@ -94,7 +90,7 @@ function string.text_color(str, new_red, new_green, new_blue, reset_red, reset_g
 	if reset_blue then
 		return chat.make_text_color(new_red, new_green, new_blue)..str..chat.make_text_color(reset_red, reset_green, reset_blue)
 	end
-	
+
 	return chat.make_text_color(new_red, new_green, new_blue)..str..'\\cr'
 end
 

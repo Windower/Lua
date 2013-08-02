@@ -13,21 +13,45 @@ list = {}
 
 _meta = _meta or {}
 _meta.L = {}
-_meta.L.__index = function(l, k) if list[k] ~= nil then return list[k] else return T(l)[k] end end
+_meta.L.__index = function(l, k)
+	if type(k) == 'number' and k < 0 then
+		k = l.n + k + 1
+		return rawget(l[k])
+	end
+	if list[k] ~= nil then
+		return list[k]
+	else
+		return T(l)[k]
+	end
+end
+_meta.L.__newindex = function(l, k, v)
+	if type(k) == 'number' then
+		if k < 0 then
+			k = l.n + k + 1
+		end
+		if k >= 1 and k <= l.n then
+			rawset(l, k, v)
+		elseif warning then
+			warning('Trying to assign outside of list range ('..l.n..'):', k)
+		end
+	elseif warning then
+		warning('Trying to assign to non-numerical list index:', k)
+	end
+end
 _meta.L.__class = 'List'
 
 function L(t)
 	local l
 	if class(t) == 'Set' then
 		l = L{}
-		
+
 		for el in pairs(t) do
 			l:append(el)
 		end
 	else
 		l = t or {}
 	end
-	
+
 	l.n = #l
 	return setmetatable(l, _meta.L)
 end
@@ -40,15 +64,37 @@ function list.length(l)
 	return l.n
 end
 
-_meta.L.__len = list.length
+function list.flat(l)
+	for key = 1, l.n do
+		if type(l[key]) == 'table' then
+			return false
+		end
+	end
+
+	return true
+end
+
+function list.equals(l1, l2)
+	if l1.n ~= l2.n then
+		return false
+	end
+
+	for key = 1, l.n do
+		if l1[key] ~= l2[key] then
+			return false
+		end
+	end
+
+	return true
+end
 
 function list.append(l, el)
 	l.n = l.n + 1
-	l[l.n] = el
+	rawset(l, l.n, el)
 end
 
 function list.last(l, i)
-	return l[l.n - (i and i - 1 or 0)]
+	return rawget(l, l.n - ((i or 1) - 1))
 end
 
 function list.insert(l, i, el)
@@ -59,11 +105,11 @@ end
 function list.remove(l, i)
 	i = i or l.n
 	local res = l[i]
-	
+
 	for key = i, l.n do
 		l[key] = l[key + 1]
 	end
-	
+
 	l.n = l.n - 1
 	return res
 end
@@ -72,12 +118,14 @@ function list.extend(l1, l2)
 	local n1 = l1.n
 	local n2 = l2.n
 	for k = 1, n2 do
-		l1[n1 + k] = l2[k]
+		rawset(l1, n1 + k, l2[k])
 	end
-	
+
 	l1.n = n1 + n2
 	return l1
 end
+
+_meta.L.__add = list.extend
 
 function list.contains(l, el)
 	for _, val in ipairs(l) do
@@ -85,7 +133,7 @@ function list.contains(l, el)
 			return true
 		end
 	end
-	
+
 	return false
 end
 
@@ -104,7 +152,7 @@ function list.count(l, fn)
 			end
 		end
 	end
-	
+
 	return count
 end
 
@@ -113,22 +161,22 @@ function list.concat(l, str, from, to)
 	from = from or 1
 	to = to or l.n
 	local res = ''
-	
+
 	for key = from, to do
 		res = res..tostring(rawget(l, key))
 		if key < l.n then
 			res = res..str
 		end
 	end
-	
+
 	return res
 end
 
 function list.clear(l)
 	for key in ipairs(l) do
-		l[key] = nil
+		rawset(l, key, nil)
 	end
-	
+
 	l.n = 0
 	return l
 end
@@ -167,7 +215,7 @@ end
 
 function list.filter(l, fn)
 	local res = {}
-	
+
 	local key = 0
 	local val
 	for okey = 1, l.n do
@@ -177,7 +225,7 @@ function list.filter(l, fn)
 			res[key] = val
 		end
 	end
-	
+
 	res.n = key
 	return setmetatable(res, _meta.L)
 end
@@ -191,20 +239,20 @@ function list.reduce(l, fn, init)
 			acc = fn(acc, val)
 		end
 	end
-	
+
 	return acc
 end
 
 function list.flatten(l, rec)
 	rec = true and (rec ~= false)
-	
+
 	local res = {}
-	local key = 1
+	local key = 0
 	local val
 	local flat
 	local n2
 	for k1 = 1, l.n do
-		val = l[key]
+		val = l[k1]
 		if type(val) == 'table' then
 			if rec then
 				flat = list.flatten(val, rec)
@@ -212,17 +260,20 @@ function list.flatten(l, rec)
 				for k2 = 1, n2 do
 					res[key + k2] = flat[k2]
 				end
-				key = key + n2
 			else
-				n2 = #val
+                if class(val) == 'List' then
+                    n2 = val.n
+                else
+                    n2 = #val
+                end
 				for k2 = 1, n2 do
 					res[key + k2] = val[k2]
 				end
 			end
 			key = key + n2
 		else
-			res[key] = val
 			key = key + 1
+			res[key] = val
 		end
 	end
 
@@ -242,13 +293,13 @@ function list.equals(l1, l2)
 	if l1.n ~= l2.n then
 		return false
 	end
-	
+
 	for key, val in ipairs(l1) do
 		if val ~= l2[key] then
 			return false
 		end
 	end
-	
+
 	return true
 end
 
@@ -280,6 +331,37 @@ function list.splice(l1, from, to, l2)
 	-- TODO
 end
 
+function list.clear(l)
+	for key = 1, l.n do
+		rawset(l, key, nil)
+	end
+
+	l.n = 0
+	return l
+end
+
+function list.copy(l)
+	local res = {}
+
+	for key = 1, l.n do
+		res[key] = val
+	end
+
+	res.n = l.n
+	return setmetatable(res, _meta.L)
+end
+
+function list.reassign(l, ln)
+	l:clear()
+
+	for key = 1, ln.n do
+		rawset(l, key, ln[key])
+	end
+
+	l.n = ln.n
+	return l
+end
+
 _raw.table.sort = _raw.table.sort or table.sort
 
 function list.sort(l, ...)
@@ -289,7 +371,7 @@ end
 
 function list.reverse(l)
 	local res = {}
-	
+
 	local n = l.n
 	local rkey = n
 	for key = 1, n do
@@ -303,11 +385,11 @@ end
 
 function list.range(n)
 	local res = {}
-	
+
 	for key = 1, n do
 		res[key] = key
 	end
-	
+
 	res.n = n
 	return setmetatable(res, _meta.L)
 end
@@ -334,14 +416,14 @@ end
 
 function list.tostring(l)
 	local str = '['
-	
+
 	for key, val in ipairs(l) do
 		if key > 1 then
 			str = str..', '
 		end
 		str = str..tostring(val)
 	end
-	
+
 	return str..']'
 end
 

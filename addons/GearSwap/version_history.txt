@@ -1,0 +1,9 @@
+-------------------------------------------------
+Gearswap 0.503 - event_status_change() handling changed so people don't swap gear when disengaging from NPCs or crafting.
+-------------------------------------------------
+Gearswap 0.502 - require unmasked and documented.
+-------------------------------------------------
+Gearswap 0.501 - file_unload user function added.
+-------------------------------------------------
+Gearswap 0.500 - Initial beta release
+-------------------------------------------------

@@ -29,6 +29,10 @@ file = require 'filehelper'
 require 'tablehelper'
 xml = require 'xml'
 
+_addon = {}
+_addon.version = '0.5'
+_addon.name = 'Plugin Manager'
+_addon.commands = {'pm','plugin_manager'}
 
 function event_addon_command(...)
 	local cmd = table.concat({...},' ')
@@ -49,7 +53,7 @@ function event_load()
 	load_settings()
 	if get_player().name ~= '' then
 		unload_plugins()
-		send_command('wait 5;lua c plugin_manager load')
+		send_command('@wait 5;lua c plugin_manager load')
 	end
 end
 

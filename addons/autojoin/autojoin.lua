@@ -18,10 +18,10 @@ require 'luau'
 _addon = _addon or {}
 _addon.name = 'AutoJoin'
 _addon.command = 'autojoin'
-_addon.short_command = 'aj'
-_addon.version = 0.901
+_addon.commands = {'aj'}
+_addon.version = '0.9.1.0'
 
-defaults = T{}
+defaults = {}
 defaults.mode = 'whitelist'
 defaults.whitelist = S{}
 defaults.blacklist = S{}
@@ -44,48 +44,48 @@ aliases = T{
 	blacklist	= 'blacklist'
 }
 
--- Alias to access the add and remove routines.
-addstrs = T{'a', 'add', '+'}
-rmstrs = T{'r', 'rm', 'remove', '-'}
-
-modes = T{'whitelist', 'blacklist'}
+-- String-sets for quick aceess.
+addstrs = S{'a', 'add', '+'}
+rmstrs = S{'r', 'rm', 'remove', '-'}
+decstrs = S{'decline', 'autodecline', 'auto-decline'}
+aliasstrs = aliases:keyset()
 
 -- Invite handler
-function event_party_invite(senderId, sender, something)
+register_event('party invite', function(senderId, sender, something)
 	reset()
 	if settings.autodecline and settings.blacklist:contains(sender) then
 		send_command('input /decline')
 		notice('Blacklisted invite from '..sender..' blocked.')
 		return
 	end
-	
+
 	if settings.mode == 'whitelist' and settings.whitelist:contains(sender)
 	or settings.mode == 'blacklist' and not settings.blacklist:contains(sender) then
 		try = true
 		send_command('wait 1; lua i autojoin try_join')
 	end
-end
+end);
 
 -- Check incoming text for the treasure pool warning.
 function event_incoming_text(original, modified, color)
 	if original:strip_format() == 'Caution: All unclaimed treasure will be lost if you join a party.' then
 		pool = true
 	end
-	
+
 	return modified, color
 end
 
 -- Check outgoing text for joins or declines.
 function event_outgoing_text(original, modified)
-	if original:isin({'/decline', '/join'}) then
+	if original == '/decline' or original == '/join' then
 		reset()
 	end
 end
 
 -- Resets status on zoning.
-function event_zone_change(...)
+register_event('zone change', function(...)
 	reset()
-end
+end)
 
 function reset()
 	pool = false
@@ -97,12 +97,12 @@ function try_join()
 	if pool or not try then
 		return
 	end
-	
+
 	if statusblock:contains(get_player()['status_id']) then
 		send_command('wait 1; lua i autojoin try_join')
 		return
 	end
-	
+
 	send_command('input /join')
 	try = false
 end
@@ -138,15 +138,15 @@ end
 
 -- Interpreter
 
-function event_addon_command(command, ...)
+register_event('addon command', function(command, ...)
 	command = command and command:lower() or 'status'
 	local args = T{...}
-	
+
 	-- Mode switch
 	if command == 'mode' then
 		-- If no mode provided, print status.
 		local mode = args[1] or 'status'
-		if mode:isin(aliases:keyset()) then
+		if aliasstrs:contains(mode) then
 			settings.mode = aliases[mode]
 			log('Mode switched to '..settings.mode..'.')
 		elseif mode == 'status' then
@@ -155,28 +155,28 @@ function event_addon_command(command, ...)
 			error('Invalid mode:', args[1])
 			return
 		end
-		
+
 	-- List management
-	elseif command:isin(aliases:keyset()) then
+	elseif aliasstrs:contains(command) then
 		mode = aliases[command]
 		names = args:slice(2):map(string.ucfirst..string.lower)
-		
+
 		-- If no operator provided
 		if args:empty() then
 			log(mode:ucfirst()..':', settings[mode]:format('csv'))
 		else
-			if args[1]:isin(addstrs) then
+			if addstrs:contains(args[1]) then
 				add_name(mode, names:unpack())
-			elseif args[1]:isin(rmstrs) then
+			elseif rmstrs:contains(args[1]) then
 				rm_name(mode, names:unpack())
 			-- If no qualifier provided
 			else
 				notice('Invalid operator specified. Specify add or remove.')
 			end
 		end
-		
+
 	-- Auto-decline settings
-	elseif command:isin({'decline', 'autodecline', 'auto-decline'}) then
+	elseif decstrs:contains(command) then
 		if args[1] ~= nil then
 			local decline = args[1]:lower()
 			local check = false
@@ -192,45 +192,42 @@ function event_addon_command(command, ...)
 
 			if check then
 				log('Set auto-decline to '..tostring(settings.autodecline)..'.')
+                settings:save()
 			end
 		else
 			log('Auto-decline is currently '..(settings.autodecline and 'on' or 'off')..'.')
 		end
-	
+
 	-- Save settings. This is only needed for global or cross-character settings, as current-chracter settings will be saved every time something is changed.
 	elseif command == 'save' then
 		local profile = args[1] or 'all'
 		settings:save(profile)
 		log('Settings saved.')
-		
+
 	-- Print current settings status
 	elseif command == 'status' then
 		log('Mode:', settings.mode)
 		log('Whitelist:', settings.whitelist:empty() and '(empty)' or settings.whitelist:format('csv'))
 		log('Blacklist:', settings.blacklist:empty() and '(empty)' or settings.blacklist:format('csv'))
 		log('Auto-decline:', settings.autodecline)
-	
+
 	-- Unknown command handler
 	else
 		warning('Unkown command \''..command..'\', ignored.')
 	end
-end
+end)
 
 -- Constructor
 
-function event_load()
+register_event('load', function()
 	reset()
-	
-	initialize()
-	settings:save()
 
-	send_command('alias autojoin lua c autojoin')
-	send_command('alias aj autojoin')
-end
-
-function event_login()
 	initialize()
-end
+end)
+
+register_event('login', function()
+	initialize()
+end)
 
 -- Only runs once logged in, to get proper settings.
 function initialize()
@@ -238,10 +235,5 @@ function initialize()
 	settings = config.load(defaults)
 	settings.whitelist = settings.whitelist:map(string.ucfirst..string.lower)
 	settings.blacklist = settings.blacklist:map(string.ucfirst..string.lower)
-end
-
--- Destructor
-function event_unload()
-	send_command('unalias autojoin')
-	send_command('unalias aj')
+	settings:save()
 end

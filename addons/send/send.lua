@@ -1,3 +1,9 @@
+
+_addon = {}
+_addon.version = '1.0'
+_addon.name = 'Send'
+_addon.commands = {'send'}
+
 function event_addon_command(...)
     term = table.concat({...}, ' ')
 	broken_init = split(term, ' ')

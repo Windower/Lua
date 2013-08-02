@@ -27,14 +27,27 @@
 
 -- Target Processing --
 
+-----------------------------------------------------------------------------------
+--Name: valid_target(targ,flag)
+--Args:
+---- targ (string): The proposed target
+---- flag (boolean): sets a more stringent criteria for target. It has to be a
+----    match to a player in the mob_array.
+-----------------------------------------------------------------------------------
+--Returns:
+---- A string or false.
+-----------------------------------------------------------------------------------
 function valid_target(targ,flag)
 	local spell_targ
+	-- If the target is whitelisted, pass it through.
 	if pass_through_targs:contains(targ) then
 		return targ
 	elseif targ then
+	-- If the target exists, scan the mob array for it
 		local mob_array = get_mob_array()
 		local targar = T{}
 		for i,v in pairs(mob_array) do
+			targ = percent_strip(targ)
 			if string.find(v['name']:lower(),targ:lower()) then
 				-- Handling for whether it's a monster or not
 				if v['is_npc'] then
@@ -48,45 +61,47 @@ function valid_target(targ,flag)
 				table.append(targar,'<lastst>')
 			end
 		end
-				
-		if flag then
-			if targar:contains(targ) then
-				spell_targ = targ
-			else
-				spell_targ = false
+		
+		-- If flag is set, push out the target only if it is in the targ array.
+		if targar:contains(targ) then
+			spell_targ = targ
+		elseif flag then
+			spell_targ = false
+		else
+			-- If targ starts an element of the monster array, use it.
+			for i,v in pairs(targar) do
+				if v:lower():find('^'..targ:lower()) then
+					spell_targ = v
+					break
+				end
 			end
-		elseif targar then
-			if targar:contains(targ) then
-				spell_targ = targ
-			else
-				for i,v in pairs(targar) do
-					if v:lower():find('^'..targ:lower()) then
-						spell_targ = v
-						break
-					end
-				end
-				if not spell_targ then
-					spell_targ = targar[1]
-				end
+			-- Otherwise, just use whatever the first match is.
+			if not spell_targ then
+				spell_targ = targar[1]
 			end
 		end
 	end
 	return spell_targ
 end
 
-function target_make(targarr)
-	local spell_targ = '<me>'
-	-- <me>, <t>, <bt>, <ft>, <r>, <ht>, <pet>, <scan>
-	-- <p0~5>, <a10~15>, <a20~25>
-	-- <st>, <stpt>, <stal>, <stnpc>, <stpc>, <lastst>
-	-- http://wiki.ffxiclopedia.org/wiki/Macro#Selecting_a_Target_.28Pronouns.29
-	
-	local targets = targarr['validtarget']
+
+-----------------------------------------------------------------------------------
+--Name: target_make(targarr)
+--Args:
+---- targarr (table of booleans): Keyed to potential targets
+-----------------------------------------------------------------------------------
+--Returns:
+---- Created valid target, defaulting to '<me>'
+-----------------------------------------------------------------------------------
+function target_make(targets)
+	----------------------------------------------------------------------------------------------
+	-- Should add additional filtering here to tell whether or not <t> will return a valid target.
+	----------------------------------------------------------------------------------------------
 	if targets['Player'] or targets['Party'] or targets['Ally'] or targets['Enemy'] or targets['NPC'] then
-		spell_targ = '<t>'
-	elseif targets['Self'] then
-		spell_targ = '<me>'
+		return '<t>'
+--	elseif targets['Self'] then
+--		spell_targ = '<me>'
 	end
 
-	return spell_targ
+	return '<me>'
 end

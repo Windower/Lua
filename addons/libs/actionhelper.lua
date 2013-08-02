@@ -29,7 +29,6 @@ end
 _libs = _libs or {}
 _libs.actionhelper = true
 
-
 local category_strings = {
 	'melee',
 	'ranged_finish',
@@ -57,27 +56,24 @@ function Action(a)
 
 	local new_instance = {}
 	new_instance.raw = a
-	
+
 	return setmetatable(new_instance, {__index = function(t, k) if rawget(t, k) ~= nil then return t[k] else return action[k] end end})
 end
-
 
 function action.get_category_string(self)
 	return category_strings[self.raw['category']]
 end
 
-
 -- Returns the name of this actor if there is one
 function action.get_actor_name(self)
 	local mob = get_mob_by_id(self.raw['actor_id'])
-	
+
 	if mob then
 		return mob['name']
 	else
 		return nil
 	end
 end
-
 
 -- Returns an iterator for this action's targets
 function action.get_targets(self)
@@ -92,7 +88,6 @@ function action.get_targets(self)
 	end
 end
 
-
 local target = {}
 
 -- Constructor for target wrapper
@@ -103,10 +98,9 @@ function Target(t)
 
 	local new_instance = {}
 	new_instance.raw = t
-	
+
 	return setmetatable(new_instance, {__index = target})
 end
-
 
 -- Returns an iterator for this target's subactions
 function target.get_actions(self)
@@ -121,18 +115,16 @@ function target.get_actions(self)
 	end
 end
 
-
 -- Returns the name of this target if there is one
 function target.get_name(self)
 	local mob = get_mob_by_id(self.raw['id'])
-	
+
 	if mob then
 		return mob['name']
 	else
 		return nil
 	end
 end
-
 
 --[[
 Copyright (c) 2013, Suji

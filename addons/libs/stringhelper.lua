@@ -7,7 +7,6 @@ _libs.stringhelper = true
 _libs.functools = _libs.functools or require 'functools'
 
 _meta = _meta or {}
-_meta.T = _meta.T or {}
 
 debug.getmetatable('').__index = string
 debug.getmetatable('').__unm = functools.negate..functools.equals
@@ -35,15 +34,15 @@ function string.contains(str, sub)
 end
 
 -- Splits a string into a table by a separator pattern.
-function string.psplit(str, sep, maxsplit)
+function string.psplit(str, sep, maxsplit, include)
 	maxsplit = maxsplit or 0
 
-	return str:split(sep, maxsplit, false)
+	return str:split(sep, maxsplit, include, false)
 end
 
 -- Splits a string into a table by a separator string.
-function string.split(str, sep, maxsplit, pattern)
-	if sep == '' then
+function string.split(str, sep, maxsplit, include, pattern)
+	if not sep or sep == '' then
 		local res = {}
 		local key = 0
 		for c in str:gmatch('.') do
@@ -51,7 +50,12 @@ function string.split(str, sep, maxsplit, pattern)
 			res[key] = c
 		end
 
-		return setmetatable(res, _meta.T)
+        if _meta.L then
+            res.n = key
+            return setmetatable(res, _meta.L)
+        end
+
+		return setmetatable(res, _meta.T and _meta.T or nil)
 	end
 
 	maxsplit = maxsplit or 0
@@ -69,31 +73,74 @@ function string.split(str, sep, maxsplit, pattern)
 		startpos, endpos = str:find(sep, i, pattern)
 		-- If found, get the substring and append it to the table.
 		if startpos then
-			match = string.slice(str, i, startpos - 1)
+			match = str:sub(i, startpos - 1)
 			key = key + 1
 			res[key] = match
+
+            if include then
+                key = key + 1
+                res[key] = str:sub(startpos, endpos)
+            end
+
 			-- If maximum number of splits reached, return
 			if key == maxsplit - 1 then
 				key = key + 1
-				res[key] = str:slice(endpos + 1)
+				res[key] = str:sub(endpos + 1)
 				break
 			end
 			i = endpos + 1
-		-- If not found, no more separaters to split, append the remaining string.
+		-- If not found, no more separators to split, append the remaining string.
 		else
 			key = key + 1
-			res[key] = str:slice(i)
+			res[key] = str:sub(i)
 			break
 		end
 	end
 
-	res.n = key
-	return setmetatable(res, _meta.L)
+    if _meta.L then
+        res.n = key
+        return setmetatable(res, _meta.L)
+    end
+
+    return setmetatable(res, _meta.T and _meta.T or nil)
 end
 
 -- Alias to string.sub, with some syntactic sugar.
 function string.slice(str, from, to)
 	return str:sub(from or 1, to or #str)
+end
+
+-- Casts a little endian encoded number from a data string.
+function string.number_cast(str)
+    local res = 0
+
+    local length = #str
+    for c in ipairs({string.byte(str)}) do
+        length = length - 1
+        res = res + c * 0x100^length
+    end
+
+    return res
+end
+
+-- Returns a monowidth hex representation of each character of a string, optionally with a separator between chars.
+function string.hex(str, sep, from, to)
+    return str:slice(from, to):split():map(string.zfill-{2}..math.hex..string.byte):concat(sep or '')
+end
+
+-- Returns a monowidth binary representation of every char of the string, optionally with a separator between chars.
+function string.binary(str, sep, from, to)
+    return str:slice(from, to):split():map(string.zfill-{8}..math.binary..string.byte):concat(sep or '')
+end
+
+-- Returns a string parsed from a hex-represented string.
+function string.parse_hex(str)
+    return (str:gsub('%s*0x', ''):gsub('[^%w]', ''):gsub('%w%w', string.char..tonumber-{16}))
+end
+
+-- Returns a string parsed from a binary-represented string.
+function string.parse_binary(str)
+    return (str:gsub('%s*0b', ''):gsub('[^%w]', ''):gsub(('[01]'):rep(8), string.char..tonumber-{2}))
 end
 
 -- Returns an iterator, that goes over every character of the string.
@@ -113,7 +160,12 @@ end
 
 -- Removes all characters in chars from str.
 function string.stripchars(str, chars)
-	return str:gsub('['..chars..']', '')
+	return (str:gsub('['..chars:escape()..']', ''))
+end
+
+-- Returns the length of a string.
+function string.length(str)
+	return #str
 end
 
 -- Checks it the string starts with the specified substring.
@@ -126,15 +178,20 @@ function string.endswith(str, substr)
 	return str:sub(-#substr) == substr
 end
 
--- Returns the length of a string.
-function string.length(str)
-	return #str
-end
-
 -- Checks if string is enclosed in start and finish. If only one argument is provided, it will check for that string both at the beginning and the end.
 function string.enclosed(str, start, finish)
 	finish = finish or start
 	return str:startswith(start) and str:endswith(finish)
+end
+
+-- Returns a string with another string prepended.
+function string.prepend(str, pre)
+	return pre..str
+end
+
+-- Returns a string with another string appended.
+function string.append(str, post)
+	return str..post
 end
 
 -- Encloses a string in start and finish. If only one argument is provided, it will enclose it with that string both at the beginning and the end.
@@ -200,6 +257,7 @@ function string.todec(numstr, base)
 end
 
 -- Checks if a string is in a table.
+-- DEPRECATED: Use (table|list|set).contains instead
 function string.isin(str, t)
 	for _, arg in pairs(t) do
 		if arg == str then
@@ -234,7 +292,27 @@ end
 
 -- Returns a Lua pattern from a wildcard string (with ? and * as placeholders for one and many characters respectively).
 function string.wildcard(str)
-	return str:gsub('[[%]%%^$()%+?-]', '%%%1'):gsub('*', '.*'):gsub('?', '.')
+	return (str:gsub('[[%]%%^$()%+-.]', '%%%1'):gsub('*', '.*'):gsub('?', '.'))
+end
+
+-- A string.find wrapper for wildcard patterns.
+function string.wcfind(str, pattern)
+	return str:find(pattern:wildcard())
+end
+
+-- A string.match wrapper for wildcard patterns.
+function string.wcmatch(str, pattern)
+	return str:match(pattern:wildcard())
+end
+
+-- A string.gmatch wrapper for wildcard patterns.
+function string.wcgmatch(str, pattern)
+	return str:gmatch(pattern:wildcard())
+end
+
+-- A string.gsub wrapper for wildcard patterns.
+function string.wcgsub(str, pattern, replace)
+	return str:gsub(pattern:wildcard(), replace)
 end
 
 -- Returns a case-insensitive pattern for a given (non-pattern) string. For patterns, see string.ipattern.
@@ -285,6 +363,31 @@ end
 -- A string.gsub wrapper for case-insensitive patterns.
 function string.igsub(str, pattern, replace)
 	return str:gsub(pattern:ipattern(), replace)
+end
+
+-- A string.find wrapper for case-insensitive wildcard patterns.
+function string.iwcfind(str, pattern)
+	return str:wcfind(pattern:ipattern())
+end
+
+-- A string.match wrapper for case-insensitive wildcard patterns.
+function string.iwcmatch(str, pattern)
+	return str:wcmatch(pattern:ipattern())
+end
+
+-- A string.gmatch wrapper for case-insensitive wildcard patterns.
+function string.iwcgmatch(str, pattern)
+	return str:wcgmatch(pattern:ipattern())
+end
+
+-- A string.gsub wrapper for case-insensitive wildcard patterns.
+function string.iwcgsub(str, pattern, replace)
+	return str:wcgsub(pattern:ipattern(), replace)
+end
+
+-- Returns a string with all instances of ${str} replaced with either a table or function lookup.
+function string.keysub(str, sub)
+    return str:gsub('${(.-)}', sub)
 end
 
 -- Counts the occurrences of a substring in a string.

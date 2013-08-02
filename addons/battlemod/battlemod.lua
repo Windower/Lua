@@ -36,12 +36,16 @@ require 'event_action'
 require 'generic_helpers'
 require 'static_vars'
 
+_addon = {}
+_addon.version = '2.18'
+_addon.name = 'BattleMod'
+_addon.commands = {'bm','battlemod'}
+
 function event_load()
-	version = '2.17'
 	block_equip = false
 	block_cannot = false
 	
-    send_command('alias bm lua c battlemod cmd')
+    send_command('@alias bm lua c battlemod cmd')
 	options_load()
 	collectgarbage()
 end
@@ -89,25 +93,27 @@ function options_load()
 	for i,v in pairs(colortab) do
 		color_arr[i] = colconv(v,i)
 	end
-	write('Battlemod v'..version..' loaded.')
+	write('Battlemod v'.._addon.version..' loaded.')
 end
 
 function event_job_change(mjob_id,mjob,mjob_lvl,sjob_id,sjob,sjob_lvl)
 	filterload(mjob)
 end
 
-function filterload(job)	
+function filterload(job)
+	if current_job == job then return end
 	if file.exists('data/filters/filters-'..job..'.xml') then
 		filter = config.load('data/filters/filters-'..job..'.xml',default_filter_table,false)
-		add_to_chat(12,'Loaded '..job..' Battlemod filters')
+		add_to_chat(4,'Loaded '..job..' Battlemod filters')
 	else
 		filter = config.load('data/filters/filters.xml',default_filter_table,false)
-		add_to_chat(12,'Loaded default Battlemod filters')
+		add_to_chat(4,'Loaded default Battlemod filters')
 	end
+	current_job = job
 end
 
 function event_login(name)
-	send_command('wait 10;bm reload')
+	send_command('@wait 10;bm reload')
 end
 
 function event_addon_command(...)
@@ -130,7 +136,7 @@ function event_addon_command(...)
 			elseif splitarr[2]:lower() == 'reload' then
 				options_load()
 			elseif splitarr[2]:lower() == 'unload' then
-				send_command('lua u battlemod')
+				send_command('@lua u battlemod')
 			elseif splitarr[2]:lower() == 'condensebattle' then
 				condensebattle = not condensebattle
 				add_to_chat(121,'Condensed Battle text flipped! - '..tostring(condensebattle))
@@ -218,7 +224,7 @@ function event_incoming_text(original, modified, color)
 			end
 		end
 	elseif redcol == 127 then
-		a,z = string.find(original,' corpuscules of ')
+		a,z = string.find(original,' corpuscles of ')
 		b,z = string.find(original,' experience points')
 		if a or b then
 			if original:sub(1,4) ~= string.char(0x1F,0xFE,0x1E,0x01) then
@@ -229,7 +235,7 @@ function event_incoming_text(original, modified, color)
 		a,z = string.find(original,'Equipment changed')
 		
 		if a and not block_equip then
-			send_command('wait 1;lua c battlemod flip block_equip')
+			send_command('@wait 1;lua c battlemod flip block_equip')
 			block_equip = true
 		elseif a and block_equip then
 			modified = ''
@@ -240,7 +246,7 @@ function event_incoming_text(original, modified, color)
 		c,z = string.find(original,'You must close the currently open window to use that command')
 		
 		if (a or b or c) and not block_cannot then
-			send_command('wait 1;lua c battlemod flip block_cannot')
+			send_command('@wait 1;lua c battlemod flip block_cannot')
 			block_cannot = true
 		elseif (a or b or c) and block_cannot then
 			modified = ''
@@ -273,13 +279,13 @@ function event_action_message(actor_id,index,actor_target_index,target_target_in
 		if not wearing[status] and not (stat_ignore:contains(param_1)) then
 			wearing[status] = {}
 			wearing[status][1] = namecol(target,target_table,party_table)
-			send_command('wait 0.5;lua c battlemod wearsoff '..status)
+			send_command('@wait 0.5;lua c battlemod wearsoff '..status)
 		elseif not (stat_ignore:contains(param_1)) then
 			wearing[status][#wearing[status]+1] = namecol(target,target_table,party_table)
 		else -- This handles the stat_ignore values, which are things like Utsusemi, Sneak, Invis, etc. that you don't want to see on a delay
 			wearing[status] = {}
 			wearing[status][1] = namecol(target,target_table,party_table)
-			send_command('lua c battlemod wearsoff '..status)
+			send_command('@lua c battlemod wearsoff '..status)
 		end
 	elseif passed_messages:contains(message_id) then
 		local status,actor,target,spell,skill,number,number2
@@ -341,5 +347,5 @@ function event_action_message(actor_id,index,actor_target_index,target_target_in
 end
 
 function event_unload()
-	send_command('unalias bm')
+	send_command('@unalias bm')
 end

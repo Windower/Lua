@@ -33,7 +33,7 @@ function nf(field,subfield)
 end
 
 function split(msg, match)
-	local length = msg:len()
+	local length = #msg
 	local splitarr = {}
 	local u = 1
 	while u <= length do
@@ -43,7 +43,7 @@ function split(msg, match)
 			if nextanch~=length then
 				u = nextanch+match:len()
 			else
-				u = length
+				u = length+1
 			end
 		else
 			splitarr[#splitarr+1] = msg:sub(u,length)
@@ -70,7 +70,7 @@ function parse_resources(lines_file)
 				local a,b,ind,val = string.find(str,'(%w+)="([^"]+)"',q)
 				if ind~=nil then
 					if not ignore_fields[ind] then
-						if val == "true" or val == "false" then
+						if str2bool(val) then
 							completed_table[tonumber(key)][ind] = str2bool(val)
 						else
 							completed_table[tonumber(key)][ind] = val:gsub('&quot;','\42'):gsub('&apos;','\39')

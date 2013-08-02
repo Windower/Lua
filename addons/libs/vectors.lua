@@ -53,7 +53,7 @@ function vector.length(v)
 	for _, val in ipairs(v) do
 		length = length + val^2
 	end
-	
+
 	return math.sqrt(length)
 end
 
@@ -73,7 +73,7 @@ function vector.dot(v1, v2)
 	for i, val1 in ipairs(v1) do
 		res = res + val1*v2[i]
 	end
-	
+
 	return res
 end
 
@@ -85,7 +85,7 @@ function vector.cross(v1, v2)
 	res[1] = v1[2]*v2[3] - v1[3]*v2[2]
 	res[2] = v1[3]*v2[1] - v1[1]*v2[3]
 	res[3] = v1[1]*v2[2] - v1[2]*v2[1]
-	
+
 	res.n = 3
 	return setmetatable(res, _meta.V)
 end
@@ -143,7 +143,7 @@ function vector.tostring(v)
 		end
 		str = str..tostring(val)
 	end
-	
+
 	return str..')'
 end
 
@@ -157,11 +157,10 @@ function vector.tovstring(v)
 		end
 		str = str..tostring(val)
 	end
-	
+
 	return str
 end
 
 function vector.vprint(v)
 	log(v:tovstring())
 end
-
