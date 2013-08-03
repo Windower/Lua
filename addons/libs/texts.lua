@@ -408,6 +408,6 @@ local function handle_mouse(type, x, y, blocked)
 end
 
 register_event('unload', destroy_texts)
-event_mouse = handle_mouse
+register_event('mouse',handle_mouse)
 
 return texts
