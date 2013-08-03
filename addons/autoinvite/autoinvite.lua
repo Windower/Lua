@@ -59,11 +59,11 @@ aliases = T{
 	keywords	= 'keywords'	
 }
 
--- Aliases to access the add and item_to_remove routines.
+-- Aliases to access add and remove
 addstrs = T{'a', 'add', '+'}
 rmstrs = T{'r', 'rm', 'remove', '-'}
 
--- Aliases for tellback mode.
+-- Aliases for tellback status
 on = T{'on', 'yes', 'true'}
 off = T{'off', 'no', 'false'}
 
@@ -100,8 +100,8 @@ end
 -- Attempts to send an invite
 function try_invite(player)
 	if get_party()['p5'] then
-		notice(player.. 'cannot be invited - party is full')
-		if settings.tell_back == 'on' then
+		notice(player..'cannot be invited - party is full.')
+		if settings.tellback == 'on' then
 			send_command('input /t '..player..' Party is currently full.')
 		end
 		return
@@ -109,7 +109,7 @@ function try_invite(player)
 	
 	if statusblock:contains(get_player()['status_id']) then
 		notice(player.. 'cannot be invited - you cannot send an invite at this time (dead, charmed, event).')
-		if settings.tell_back == 'on' then
+		if settings.tellback == 'on' then
 			send_command('input /t '..player..' An invite cannot be sent at this time (dead, charmed, event).')
 		end
 		return
@@ -189,7 +189,8 @@ function event_addon_command(command, ...)
 			error('Invalid status:', args[1])
 			return
 		end
-		
+	
+	-- Handles adding/removing from lists.
 	elseif command:isin(aliases:keyset()) then
 		mode = aliases[command]
 		names = args:slice(2):map(string.ucfirst..string.lower)
@@ -205,7 +206,7 @@ function event_addon_command(command, ...)
 			end
 		end
 		
-	-- Print current settings status
+	-- Prints current settings status
 	elseif command == 'status' then
 		log('Mode:', settings.mode)
 		log('Tell Back:', settings.tellback)
