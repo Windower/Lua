@@ -388,6 +388,16 @@ fields.incoming[0x067] = L{
 	{ctype='unsigned int',      label='Player ID',          fn=id},             --    7 -  10
 }
 
+-- LS Message
+fields.incoming[0x0CC] = L{
+	{ctype='int',               label='_unknown1'},                             --    4 -   7
+	{ctype='char[128]',         label='Message'},                               --    8 - 135
+	{ctype='int',               label='_unknown2'},                             --  136 - 139
+	{ctype='char[16]',          label='Player Name'},                           --  140 - 155
+	{ctype='int',               label='Permissions'},                           --  156 - 159
+	{ctype='char[16]',          label='Linkshell Name'},                        --  160 - 175   6-bit packed
+}
+
 -- Char Update
 fields.incoming[0x0DF] = L{
 	{ctype='unsigned int',      label='ID',                 fn=id},             --    4 -   7
@@ -401,14 +411,18 @@ fields.incoming[0x0DF] = L{
 	{ctype='unsigned short',    label='_unknown2'},                             --   26 -  27
 }
 
--- LS Message
-fields.incoming[0x0CC] = L{
-	{ctype='int',               label='_unknown1'},                             --    4 -   7
-	{ctype='char[128]',         label='Message'},                               --    8 - 135
-	{ctype='int',               label='_unknown2'},                             --  136 - 139
-	{ctype='char[16]',          label='Player Name'},                           --  140 - 155
-	{ctype='int',               label='Permissions'},                           --  156 - 159
-	{ctype='char[16]',          label='Linkshell Name'},                        --  160 - 175   6-bit packed
+-- Widescan Mob
+fields.incoming[0x0F4] = L{
+	{ctype='unsigned float',    label='X Position'},                            --    4 -   7 -- May be reversed with Y position
+	{ctype='unsigned float',    label='Y Position'},                            --    8 -  11
+	{ctype='char[16]',          label='Name'},                                  --   12 -  27 -- May not extend all the way to 27. Up to 25 has been observed
+}
+
+-- Widescan Mark
+fields.incoming[0x0F6] = L{
+	{ctype='unsigned char',     label='flags'},                                 --    4 -   4 -- 1 for the start of a widescan list. 2 for the end of the list.
+	{ctype='unsigned char',     label='_unknown1'},                             --    5 -   5 -- No observed non-0 values
+	{ctype='unsigned short',    label='_unknown2'},                             --    6 -   7 -- No observed non-0 values
 }
 
 -- Reraise Activation

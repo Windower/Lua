@@ -33,7 +33,12 @@ function event_action(act)
 	
 	local party_table = get_party()
 	local actor_table = get_mob_by_id(act['actor_id'])
-
+	
+	if actor_table == nil then
+		return
+	elseif actor_table['name'] == nil or actor_table['is_npc'] == nil then
+		return
+	end
 	local actor = actor_table['name']
 	if actor == nil then return end
 	actor = namecol(actor,actor_table,party_table)
