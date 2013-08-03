@@ -37,12 +37,11 @@ require 'generic_helpers'
 require 'static_vars'
 
 _addon = {}
-_addon.version = '2.17'
+_addon.version = '2.18'
 _addon.name = 'BattleMod'
 _addon.commands = {'bm','battlemod'}
 
 function event_load()
-	version = '2.17'
 	block_equip = false
 	block_cannot = false
 	
@@ -94,14 +93,15 @@ function options_load()
 	for i,v in pairs(colortab) do
 		color_arr[i] = colconv(v,i)
 	end
-	write('Battlemod v'..version..' loaded.')
+	write('Battlemod v'.._addon.version..' loaded.')
 end
 
 function event_job_change(mjob_id,mjob,mjob_lvl,sjob_id,sjob,sjob_lvl)
 	filterload(mjob)
 end
 
-function filterload(job)	
+function filterload(job)
+	if current_job == job then return end
 	if file.exists('data/filters/filters-'..job..'.xml') then
 		filter = config.load('data/filters/filters-'..job..'.xml',default_filter_table,false)
 		add_to_chat(4,'Loaded '..job..' Battlemod filters')
@@ -109,6 +109,7 @@ function filterload(job)
 		filter = config.load('data/filters/filters.xml',default_filter_table,false)
 		add_to_chat(4,'Loaded default Battlemod filters')
 	end
+	current_job = job
 end
 
 function event_login(name)

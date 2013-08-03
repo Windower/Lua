@@ -82,6 +82,7 @@ end
 ---- string, changed command
 -----------------------------------------------------------------------------------
 function event_outgoing_text(original,modified)
+	original = convert_auto_trans(original)
 	if logging then
 		logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\nModified: ',modified)
 	end

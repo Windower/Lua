@@ -76,11 +76,12 @@ function event_outgoing_text(original,modified)
 	local command = splitline[1]
 
 	local a,b,abil = string.find(original,'"(.-)"')
+	if abil then abil = abil:lower() end
 	local temptarg = valid_target(splitline[#splitline])
 	
 	if command == '/raw' then
 		return _raw.table.concat(splitline,' ',2,#splitline)
-	elseif command_list[command] and temptarg and validabils[abil:lower()] and not midaction then
+	elseif command_list[command] and temptarg and validabils[abil] and not midaction then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) Original: '..original) end
 		refresh_globals()
 			
@@ -103,11 +104,30 @@ function event_outgoing_text(original,modified)
 		_global.storedtarget = temptarg
 		
 		r_line = aftercast_cost(r_line)
-			
+		
 		storedcommand = r_line['prefix']..' "'..r_line['english']..'" '
 		equip_sets('precast',r_line,{type=s_type})
 
 		return '' -- Makes an infinite loop with Spellcast. They fight to the death.
+	elseif command_list[command] and temptarg  and not midaction then
+		if command_list[command] == 'Ranged Attack' then
+			if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) Original: '..original) end
+			refresh_globals()
+
+			rline = {name='Ranged Attack',english='Ranged Attack',prefix='/range',element='None',targets='Enemy',skill='Ability',mpcost=0,tpcost=-1,casttime=0,recast=0,validtarget={Self=false,Player=false,Party=false,Ally=false,NPC=false,Enemy=true}}
+			send_command('@wait 1;lua invoke gearswap midact')
+			
+			_global.storedtarget = temptarg
+			
+			r_line = aftercast_cost(rline)
+				
+			storedcommand = r_line['prefix']..' '
+			equip_sets('precast',r_line,{type="Ranged Attack"})
+
+			return '' -- Makes an infinite loop with Spellcast. They fight to the death.
+		elseif debugging then
+			write('(100) this case should never be hit '..command)
+		end
 	elseif midaction and validabils[tostring(abil):lower()] then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(122) Canceled: '..original) end
 		return ''
@@ -222,7 +242,8 @@ function event_action_message(actor_id,target_id,actor_index,target_index,messag
 end
 
 function event_status_change(old,new)
-	if gearswap_disabled or old == 'Event' then return end
+	if gearswap_disabled or T{'Event','Other','Zoning'}:contains(old) or T{'Event','Other','Zoning'}:contains(new) then return end
+	-- Event may not be a real status yet. This is a blacklist to prevent people from swapping out of crafting gear or when disengaging from NPCs.
 	equip_sets('status_change',new,old)
 end
 
@@ -312,7 +333,7 @@ function cast_delay(delay)
 end
 
 function get_spell(act)
-	local spell, abil_ID, effect_val
+	local spell, abil_ID, effect_val = {}
 	local msg_ID = act['targets'][1]['actions'][1]['message']
 	
 	if T{7,8,9}:contains(act['category']) then
@@ -383,6 +404,9 @@ function aftercast_cost(rline)
 	if rline == nil then
 		return {tpaftercast = player['tp'],mpaftercast = tonumber(player['mp']),mppaftercast = tonumber(player['mpp'])}
 	end
+	if not rline['mpcost'] then rline['mpcost'] = 0 end
+	if not rline['tpcost'] then rline['tpcost'] = -1 end
+	
 	if tonumber(rline['tpcost']) == -1 or not rline['tpcost'] then rline['tpaftercast'] = player['tp'] else
 	rline['tpaftercast'] = player['tp'] - tonumber(rline['tpcost']) end
 	

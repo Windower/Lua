@@ -238,7 +238,6 @@ function texts.text(t, str)
 	end
 
 	str = tostring(str)
-
 	tb_set_text(t._name, str)
 	t._settings.text.content = str
 end
@@ -383,9 +382,8 @@ local function handle_mouse(type, x, y, blocked)
         if dragged_text then
             local t = dragged_text[1]
             t:pos(x - dragged_text[2], y - dragged_text[3])
+            return true
         end
-        return true
-
     elseif type == 0x201 then
         for _, t in pairs(saved_texts) do
             local x_pos, y_pos = tb_get_location(t._name)
@@ -396,18 +394,20 @@ local function handle_mouse(type, x, y, blocked)
             and (y_pos <= y and y <= y_pos + y_off
                 or y_pos >= y and y >= y_pos + y_off) then
                 dragged_text = {t, x - x_pos, y - y_pos}
+                return true
             end
         end
-        return true
 
     elseif type == 0x202 then
-        dragged_text = nil
-        return true
-
+        if dragged_text then
+            dragged_text = nil
+            return true
+        end
     end
+    return false
 end
 
 register_event('unload', destroy_texts)
-event_mouse = handle_mouse
+register_event('mouse',handle_mouse)
 
 return texts
