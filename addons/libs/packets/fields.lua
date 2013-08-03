@@ -137,6 +137,13 @@ fields.outgoing[0x0F1] = L{
 	{ctype='unsigned char',     label='_unknown3'},                             --    7 -   7
 }
 
+-- Widescan
+fields.outgoing[0x0F4] = L{
+	{ctype='unsigned char',     label='Flags'},                                 --    4 -   4  -- 1 when requesting widescan information. No other values observed.
+	{ctype='unsigned char',     label='_unknown1'},                             --    5 -   5
+	{ctype='unsigned short',    label='_unknown2'},                             --    6 -   7
+}
+
 -- Job Change
 fields.outgoing[0x100] = L{
 	{ctype='unsigned char',     label='Main Job ID'},                           --    4 -   4
