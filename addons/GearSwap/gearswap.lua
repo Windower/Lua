@@ -43,12 +43,18 @@ function event_addon_command(...)
 	local command = table.concat({...},' ')
 	if logging then	logit(logfile,'\n\n'..tostring(os.clock)..command) end
 	local splitup = split(command,' ')
-	if splitup[1]:lower() == 'c' and #splitup > 1 then
+	if splitup[1]:lower() == 'c' then
 		if gearswap_disabled then return end
-		equip_sets('self_command',_raw.table.concat(splitup,' ',2,#splitup))
+		if splitup[2] then equip_sets('self_command',_raw.table.concat(splitup,' ',2,#splitup))
+		else
+			add_to_chat(123,'GearSwap: No self command passed.')
+		end
 	elseif splitup[1]:lower() == 'equip' and not midaction then
 		if gearswap_disabled then return end
-		equip_sets('equip_command',user_env.sets[_raw.table.concat(splitup,' ',2,#splitup)])
+		if user_env.sets[_raw.table.concat(splitup,' ',2,#splitup)] then equip_sets('equip_command',user_env.sets[_raw.table.concat(splitup,' ',2,#splitup)])
+		else
+			add_to_chat(123,'GearSwap: Equip command cannot be completed. That set does not exist.')
+		end
 	elseif splitup[1]:lower() == 'reload' then
 		refresh_user_env()
 	elseif strip(splitup[1]) == 'debugmode' then
@@ -64,7 +70,7 @@ end
 
 function midact()
 	if not action_sent then
-		if debugging >= 1 then add_to_chat(1,'Had to force the command to send.') end
+		if debugging >= 1 then add_to_chat(123,'GearSwap: Had to force the command to send.') end
 		send_check(true)
 	end
 	action_sent = false
@@ -282,46 +288,56 @@ end
 
 
 function debug_mode(boolean)
-	if boolean then _global.debug_mode = boolean
-	else
+	if boolean == true or boolean == false then _global.debug_mode = boolean
+	elseif boolean == nil then
 		_global.debug_mode = true
+	else
+		add_to_chat(123,'GearSwap: debug_mode was passed an invalid value')
 	end
 end
 
 
 function show_swaps(boolean)
-	if boolean then _global.show_swaps = boolean
-	else
+	if boolean == true or boolean == false then _global.show_swaps = boolean
+	elseif boolean == nil then
 		_global.show_swaps = true
+	else
+		add_to_chat(123,'GearSwap: show_swaps was passed an invalid value')
 	end
 end
 
 
 function verify_equip(boolean)
-	if boolean then _global.verify_equip = boolean
-	else
+	if boolean == true or boolean == false then _global.verify_equip = boolean
+	elseif boolean == nil then
 		_global.verify_equip = true
+	else
+		add_to_chat(123,'GearSwap: verify_equip was passed an invalid value')
 	end
 end
 
 
 function cancel_spell(boolean)
-	if boolean then _global.cancel_spell = boolean
-	else
+	if boolean == true or boolean == false then _global.cancel_spell = boolean
+	elseif boolean == nil then
 		_global.cancel_spell = true
+	else
+		add_to_chat(123,'GearSwap: cancel_spell was passed an invalid value')
 	end
 end
 
 function force_send(boolean)
-	if boolean then _global.force_send = boolean
-	else
+	if boolean == true or boolean == false then _global.force_send = boolean
+	elseif boolean == nil then
 		_global.force_send = true
+	else
+		add_to_chat(123,'GearSwap: force_send was passed an invalid value')
 	end
 end
 
 function change_target(name)
-	if name then _global.storedtarget = name else
-		add_to_chat(123,'Name is nil or false')
+	if name and type(name)=='string' then _global.storedtarget = name else
+		add_to_chat(123,'GearSwap: change_target was passed an invalid value')
 	end
 end
 
@@ -329,17 +345,27 @@ function cast_delay(delay)
 	if tonumber(delay) then
 		_global.cast_delay = tonumber(delay)
 	else
-		add_to_chat(123,'Cast delay is not a number')
+		add_to_chat(123,'GearSwap: Cast delay is not a number')
 	end
 end
 
 function set_combine(set1,set2)
+	if set1 == nil then add_to_chat(123,'GearSwap: set_combine error, Set 1 is nil') end
+	if set2 == nil then add_to_chat(123,'GearSwap: set_combine error, Set 2 is nil') end
 	local set3 = {}
 	for i,v in pairs(set1) do
-		set3[default_slot_map[slot_map[i]]] = v
+		if slot_map[i] then
+			set3[default_slot_map[slot_map[i]]] = v
+		else
+			add_to_chat(123,'GearSwap: set_combine error, Set 1 contains an unrecognized slot name ('..i..')')
+		end
 	end
 	for i,v in pairs(set2) do
-		set3[default_slot_map[slot_map[i]]] = v
+		if slot_map[i] then
+			set3[default_slot_map[slot_map[i]]] = v
+		else
+			add_to_chat(123,'Gearswap: set_combine error, Set 2 contains an unrecognized slot name ('..i..')')
+		end
 	end
 	return set3
 end
