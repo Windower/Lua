@@ -12,10 +12,10 @@ _libs.xml = _libs.xml or require 'xml'
 _libs.filehelper = _libs.filehelper or require 'filehelper'
 
 if not _libs.logger then
-	error = write
-	warning = write
-	notice = write
-	log = write
+	error = print
+	warning = print
+	notice = print
+	log = print
 end
 
 -- Map for different config loads.
@@ -46,7 +46,7 @@ function config.load(filename, confdict, overwrite)
 	overwrite = overwrite or false
 
 	local confdict_mt = getmetatable(confdict)
-	confdict = setmetatable(confdict, {__index = function(t, k)
+	confdict = setmetatable(confdict, {__class = 'Settings', __index = function(t, k)
 		if config[k] ~= nil then
 			return config[k]
 		elseif confdict_mt then

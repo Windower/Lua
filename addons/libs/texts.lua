@@ -54,62 +54,72 @@ math.randomseed(os.clock())
 --           -- This unsets the name and returns it to its default:
 --           -- The target's name is (None), its ID is 17784938.
 --
---           -- To avoid mismatched attributes, like the name and ID in this case, you can also pass it a table:
+--           -- To avoid mismatched attributes, like the name and ID in this case, you can also pass a table to update:
 --           t:update(mob)
 --           -- Since the mob object contains both a "name" and "id" attribute, and both are used in the text object, it will update those with the respective values. The extra values are ignored.
-function texts.new(t, settings, str)
-	if class(t) ~= 'Text' then
-		t, settings, str = nil, t, settings
+function texts.new(str, settings, root_settings)
+	if type(str) ~= 'string' then
+		str, settings, root_settings = nil, str, settings
 	end
-	if type(settings) ~= 'table' then
-		settings, str = str, settings
-	end
+    -- Sets the settings table to the provided settings, if not separately provided and the settings are a valid settings table
+    if not _libs.config then
+        root_settings = nil
+    else
+        root_settings =
+            root_settings and class(root_settings) == 'Settings' and
+                root_settings
+            or settings and class(settings) == 'Settings' and
+                settings
+            or
+                nil
+    end
 
-	if t == nil then
-		t = {}
-		t._name = 'text_gensym_'..tostring(math.random()):sub(3)
-		t._settings = {}
-		t._settings.pos = {}
-		t._settings.pos.x = 0
-		t._settings.pos.y = 0
-		t._settings.bg = {}
-		t._settings.bg.alpha = 255
-		t._settings.bg.red = 0
-		t._settings.bg.green = 0
-		t._settings.bg.blue = 0
-		t._settings.visible = false
-		t._settings.text = {}
-		t._settings.text.size = 12
-		t._settings.text.font = 'Arial'
-		t._settings.text.alpha = 255
-		t._settings.text.red = 255
-		t._settings.text.green = 255
-		t._settings.text.blue = 255
-		t._settings.text.content = ''
-		t._settings.padding = 0
-	end
+    t = {}
+    t._name = 'text_gensym_'..tostring(math.random()):sub(3)
+    t._settings = settings or {}
+    t._root_settings = root_settings
+
+    local default_settings = {}
+    default_settings.pos = {}
+    default_settings.pos.x = 0
+    default_settings.pos.y = 0
+    default_settings.bg = {}
+    default_settings.bg.alpha = 255
+    default_settings.bg.red = 0
+    default_settings.bg.green = 0
+    default_settings.bg.blue = 0
+    default_settings.visible = false
+    default_settings.text = {}
+    default_settings.text.size = 12
+    default_settings.text.font = 'Arial'
+    default_settings.text.alpha = 255
+    default_settings.text.red = 255
+    default_settings.text.green = 255
+    default_settings.text.blue = 255
+    default_settings.text.content = ''
+    default_settings.padding = 0
 
 	t._texts = {}
 	t._defaults = {}
 	t._textorder = {}
 
-	local function update(t1, t2)
-		if t2 == nil then
-			return
-		end
-
-		for key, val in pairs(t1) do
-			if t2[key] ~= nil then
-				if type(val) == 'table' then
-					update(val, t2[key])
-				else
-					t1[key] = t2[key]
-				end
-			end
-		end
+	local function amend(settings, text)
+        for key, val in pairs(text) do
+            local sval = rawget(settings, key)
+            if sval == nil then
+                rawset(settings, key, val)
+            else
+                if type(sval) == 'table' and type(val) == 'table' then
+                    amend(sval, val)
+                end
+            end
+        end
 	end
 
-	update(t._settings, settings)
+	amend(t._settings, default_settings)
+    if t._root_settings then
+        config.save(t._root_settings)
+    end
 
 	tb_create(t._name)
 	tb_set_location(t._name, t._settings.pos.x, t._settings.pos.y)
@@ -384,6 +394,7 @@ local function handle_mouse(type, x, y, blocked)
             t:pos(x - dragged_text[2], y - dragged_text[3])
             return true
         end
+
     elseif type == 0x201 then
         for _, t in pairs(saved_texts) do
             local x_pos, y_pos = tb_get_location(t._name)
@@ -400,14 +411,18 @@ local function handle_mouse(type, x, y, blocked)
 
     elseif type == 0x202 then
         if dragged_text then
+            if dragged_text[1]._root_settings then
+                config.save(dragged_text[1]._root_settings)
+            end
             dragged_text = nil
             return true
         end
     end
+
     return false
 end
 
 register_event('unload', destroy_texts)
-register_event('mouse',handle_mouse)
+register_event('mouse', handle_mouse)
 
 return texts
