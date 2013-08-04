@@ -200,7 +200,7 @@ fields.incoming[0x00D] = L{
 	{ctype='unsigned short',    label='Main'},                                  --   74 -  75
 	{ctype='unsigned short',    label='Sub'},                                   --   76 -  77
 	{ctype='unsigned short',    label='Ranged'},                                --   78 -  79
-	{ctype='char[16]',          label='Character Name'},                        --   80 -  95
+	{ctype='char*',             label='Character Name'},                        --   80 -  95
 }
 
 -- NPC Update
