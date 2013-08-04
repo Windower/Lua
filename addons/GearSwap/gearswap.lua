@@ -82,8 +82,11 @@ function event_outgoing_text(original,modified)
 	local command = splitline[1]
 
 	local a,b,abil = string.find(original,'"(.-)"')
-	if abil then abil = abil:lower()
-	else if #split == 3 then abil = split[2]:lower() end
+	if abil then
+		abil = abil:lower()
+	elseif #split == 3 then
+		abil = split[2]:lower()
+	end
 	
 	local temptarg = valid_target(splitline[#splitline])
 	
@@ -123,7 +126,7 @@ function event_outgoing_text(original,modified)
 		equip_sets('precast',r_line,{type=s_type})
 
 		return ''
-	elseif command_list[command] == 'Ranged Attack' and temptarg  and not midaction then
+	elseif command_list[command] == 'Ranged Attack' and temptarg and not midaction then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) Original: '..original) end
 		refresh_globals()
 
