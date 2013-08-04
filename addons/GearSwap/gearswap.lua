@@ -84,7 +84,7 @@ function event_outgoing_text(original,modified)
 	local a,b,abil = string.find(original,'"(.-)"')
 	if abil then
 		abil = abil:lower()
-	elseif #split == 3 then
+	elseif #splitline == 3 then
 		abil = split[2]:lower()
 	end
 	
