@@ -30,10 +30,12 @@ function equip_sets(swap_type,val1,val2)
 
 	if swap_type == 'precast' then
 		val1.target = spelltarget
-		user_env.precast(val1,val2) -- User defined function to determine the precast set
+		if type(user_env.precast) == 'function' then user_env.precast(val1,val2) -- User defined function to determine the precast set
+		elseif user_env.precast then add_to_chat(123,'GearSwap: precast() exists but is not a function') end
 	elseif swap_type == 'midcast' then
 		val1.target = spelltarget
-		user_env.midcast(val1,val2) -- User defined function to determine the midcast set
+		if type(user_env.midcast) == 'function' then user_env.midcast(val1,val2) -- User defined function to determine the midcast set
+		elseif user_env.midcast then add_to_chat(123,'GearSwap: midcast() exists but is not a function') end
 	elseif swap_type == 'aftercast' then
 		if not val1 then val1 = {}
 			add_to_chat(8,'val1 error')
@@ -41,21 +43,27 @@ function equip_sets(swap_type,val1,val2)
 		val1.target = spelltarget
 		midaction = false
 		spelltarget = nil
-		user_env.aftercast(val1,val2) -- User defined function to determine the aftercast set
+		if type(user_env.aftercast) == 'function' then user_env.aftercast(val1,val2) -- User defined function to determine the aftercast set
+		elseif user_env.aftercast then add_to_chat(123,'GearSwap: aftercast() exists but is not a function') end
 	elseif swap_type == 'pet_midcast' then
 		val1.target = spelltarget
-		user_env.pet_midcast(val1,val2) -- User defined function to determine the midcast set
+		if type(user_env.pet_midcast) == 'function' then user_env.pet_midcast(val1,val2) -- User defined function to determine the midcast set
+		elseif user_env.pet_midcast then add_to_chat(123,'GearSwap: pet_midcast() exists but is not a function') end
 	elseif swap_type == 'pet_aftercast' then
 		val1.target = spelltarget
-		user_env.pet_aftercast(val1,val2) -- User defined function to determine the aftercast set
+		if type(user_env.pet_aftercast) == 'function' then user_env.pet_aftercast(val1,val2) -- User defined function to determine the aftercast set
+		elseif user_env.pet_aftercast then add_to_chat(123,'GearSwap: pet_aftercast() exists but is not a function') end
 	elseif swap_type == 'status_change' then
-		user_env.status_change(val1,val2) -- User defined function to determine if sets should change following status change
+		if type(user_env.status_change) == 'function' then user_env.status_change(val1,val2) -- User defined function to determine if sets should change following status change
+		elseif user_env.status_change then add_to_chat(123,'GearSwap: status_change() exists but is not a function') end
 	elseif swap_type == 'buff_change' then
-		user_env.buff_change(val1,val2) -- User defined function to determine if sets should change following buff change
+		if type(user_env.buff_change) == 'function' then user_env.buff_change(val1,val2) -- User defined function to determine if sets should change following buff change
+		elseif user_env.buff_change then add_to_chat(123,'GearSwap: buff_change() exists but is not a function') end
 	elseif swap_type == 'equip_command' then
 		equip(val1)
 	elseif swap_type == 'self_command' then
-		user_env.self_command(val1)
+		if type(user_env.self_command) == 'function' then user_env.self_command(val1)
+		elseif user_env.self_command then add_to_chat(123,'GearSwap: self_command() exists but is not a function') end
 	elseif swap_type == 'delayed' then
 		equip(stored_equip_list)
 	end
