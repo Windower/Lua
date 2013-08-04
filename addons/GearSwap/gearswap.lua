@@ -82,7 +82,9 @@ function event_outgoing_text(original,modified)
 	local command = splitline[1]
 
 	local a,b,abil = string.find(original,'"(.-)"')
-	if abil then abil = abil:lower() end
+	if abil then abil = abil:lower()
+	else if #split == 3 then abil = split[2]:lower() end
+	
 	local temptarg = valid_target(splitline[#splitline])
 	
 	if command == '/raw' then
@@ -120,26 +122,22 @@ function event_outgoing_text(original,modified)
 		storedcommand = r_line['prefix']..' "'..r_line[language]..'" '
 		equip_sets('precast',r_line,{type=s_type})
 
-		return '' -- Makes an infinite loop with Spellcast. They fight to the death.
-	elseif command_list[command] and temptarg  and not midaction then
-		if command_list[command] == 'Ranged Attack' then
-			if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) Original: '..original) end
-			refresh_globals()
+		return ''
+	elseif command_list[command] == 'Ranged Attack' and temptarg  and not midaction then
+		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) Original: '..original) end
+		refresh_globals()
 
-			rline = ranged_line
-			send_command('@wait 1;lua invoke gearswap midact')
+		rline = ranged_line
+		send_command('@wait 1;lua invoke gearswap midact')
+		
+		_global.storedtarget = temptarg
+		
+		r_line = aftercast_cost(rline)
 			
-			_global.storedtarget = temptarg
-			
-			r_line = aftercast_cost(rline)
-				
-			storedcommand = r_line['prefix']..' '
-			equip_sets('precast',r_line,{type="Ranged Attack"})
+		storedcommand = r_line['prefix']..' '
+		equip_sets('precast',r_line,{type="Ranged Attack"})
 
-			return '' -- Makes an infinite loop with Spellcast. They fight to the death.
-		elseif debugging then
-			write('(100) this case should never be hit '..command)
-		end
+		return ''
 	elseif midaction and validabils[language][tostring(abil):lower()] then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(122) Canceled: '..original) end
 		return ''
