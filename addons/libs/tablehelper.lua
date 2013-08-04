@@ -25,7 +25,7 @@ _meta.T.__index = table
 _meta.T.__class = 'Table'
 
 _meta.N = {}
-_meta.N.__class = 'Nil'
+_meta.N.__class = 'nil'
 
 -- Constructor for T-tables.
 -- t = T{...} for explicit declaration.
