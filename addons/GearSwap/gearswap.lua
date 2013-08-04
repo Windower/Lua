@@ -10,7 +10,7 @@ require 'refresh'
 
 _addon = {}
 _addon.name = 'GearSwap'
-_addon.version = '0.501'
+_addon.version = '0.504'
 _addon.commands = {'gs','gearswap'}
 
 function event_load()
@@ -64,7 +64,7 @@ end
 
 function midact()
 	if not action_sent then
-		if debugging >= 1 then add_to_chat(1,'Had for force the command to send.') end
+		if debugging >= 1 then add_to_chat(1,'Had to force the command to send.') end
 		send_check(true)
 	end
 	action_sent = false
@@ -242,8 +242,9 @@ function event_action_message(actor_id,target_id,actor_index,target_index,messag
 end
 
 function event_status_change(old,new)
-	if gearswap_disabled or T{'Event','Other','Zoning'}:contains(old) or T{'Event','Other','Zoning'}:contains(new) then return end
+	if gearswap_disabled or T{'Event','Other','Zoning','Dead'}:contains(old) or T{'Event','Other','Zoning','Dead'}:contains(new) then return end
 	-- Event may not be a real status yet. This is a blacklist to prevent people from swapping out of crafting gear or when disengaging from NPCs.
+	if old == '' then old = 'Idle' end
 	equip_sets('status_change',new,old)
 end
 
