@@ -126,7 +126,7 @@ function event_outgoing_text(original,modified)
 			if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) Original: '..original) end
 			refresh_globals()
 
-			rline = {name='Ranged Attack',english='Ranged Attack',prefix='/range',element='None',targets='Enemy',skill='Ability',mpcost=0,tpcost=-1,casttime=0,recast=0,validtarget={Self=false,Player=false,Party=false,Ally=false,NPC=false,Enemy=true}}
+			rline = ranged_line
 			send_command('@wait 1;lua invoke gearswap midact')
 			
 			_global.storedtarget = temptarg
@@ -254,7 +254,7 @@ function event_action_message(actor_id,target_id,actor_index,target_index,messag
 		equip_sets('aftercast',r_items[param_1],{type='Failure'})
 	elseif unable_to_use:contains(message_id) then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(195) Event Action Message: '..tostring(message_id)..' Interrupt') end
-		equip_sets('aftercast',{name='Interrupt'},{type='Recast'})
+		equip_sets('aftercast',{name='Interrupt',type='Interrupt'},{type='Recast'})
 	end
 end
 

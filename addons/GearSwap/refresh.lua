@@ -28,6 +28,12 @@ end
 ---- variables.
 -----------------------------------------------------------------------------------
 function load_user_files()
+	if not file_exists(lua_base_path..'data/'..player['name']..'_'..player.main_job..'.lua') then
+		user_env = nil
+		current_job_file = nil
+		return
+	end
+	
 	if user_env then
 		if type(user_env.file_unload)=='function' then user_env.file_unload()
 		elseif user_env.file_unload then
@@ -63,7 +69,7 @@ function load_user_files()
 	if funct == nil then 
 		write('User file problem: '..err)
 		current_job_file = nil
-		return nil
+		return
 	else
 		current_job_file = player.main_job
 		write('Loaded your '..player.main_job..' Lua file!')
@@ -78,7 +84,11 @@ function load_user_files()
 		return nil
 	end
 	
-	user_env.get_sets()
+	if type(user_env.get_sets) == 'function' then
+		user_env.get_sets()
+	elseif user_env.get_sets then
+		add_to_chat(123,'GearSwap: get_sets() is defined but is not a function.')
+	end
 	
 end
 
