@@ -293,6 +293,12 @@ function event_action_message(actor_id,index,actor_target_index,target_target_in
 		local target_table = get_mob_by_id(index)
 		local party_table = get_party()
 		
+		if actor_table == nil then
+			return
+		elseif actor_table['name'] == nil or actor_table['is_npc'] == nil then
+			return
+		end
+		
 		local actor = actor_table['name']
 		local target = target_table['name']
 		
