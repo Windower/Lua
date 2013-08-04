@@ -15,13 +15,20 @@ r_mabils = parse_resources(r_mabilsFile:readlines())
 
 
 -- Convert the spells and job abilities into a referenceable list of aliases --
-validabils = T{}
+validabils = {}
+validabils['english'] = T{}
+validabils['french'] = T{}
+validabils['german'] = T{}
+validabils['japanese'] = T{}
 
-function make_abil(abil,t,i)
-	if not rawget(validabils,abil:lower()) then
-		validabils[abil:lower()] = {}
+function make_abil(abil,lang,t,i)
+	if not abil[lang] then return end
+	local temptab = validabils[lang]
+	local sp = abil[lang]:lower()
+	if not rawget(temptab,sp) then
+		temptab[sp] = {}
 	end
-	validabils[abil:lower()][t] = i
+	temptab[sp][t] = i
 end
 
 for i,v in pairs(r_spells) do
@@ -30,12 +37,20 @@ for i,v in pairs(r_spells) do
 	for n,m in pairs(potential_targets) do
 		v['validtarget'][m] = true
 	end
+	if not v.tpcost or v.tpcost == -1 then v.tpcost = 0 end
+	if not v.mpcost or v.mpcost == -1 then v.mpcost = 0 end
 	
-	make_abil(v['english'],'Magic',i)
+	make_abil(v,'english','Magic',i)
+	make_abil(v,'german','Magic',i)
+	make_abil(v,'french','Magic',i)
+	make_abil(v,'japanese','Magic',i)
 	if v['alias'] then
 		local struck = split(v['alias'],'|')
 		for n,m in pairs(struck) do
-			make_abil(m,'Magic',i)
+			make_abil(m,'english','Magic',i)
+			make_abil(m,'german','Magic',i)
+			make_abil(m,'french','Magic',i)
+			make_abil(m,'japanese','Magic',i)
 		end
 	end
 end
@@ -46,14 +61,22 @@ for i,v in pairs(r_abilities) do
 	for n,m in pairs(potential_targets) do
 		v['validtarget'][m] = true
 	end
+	if not v.tpcost or v.tpcost == -1 then v.tpcost = 0 end
+	if not v.mpcost or v.mpcost == -1 then v.mpcost = 0 end
 	
-	make_abil(v['english'],'Ability',i)
-	if v['alias'] then
-		local struck = split(v['alias'],'|')
-		for n,m in pairs(struck) do
-			make_abil(m,'Ability',i)
-		end
-	end
+	make_abil(v,'english','Ability',i)
+	make_abil(v,'german','Ability',i)
+	make_abil(v,'french','Ability',i)
+	make_abil(v,'japanese','Ability',i)
+--	if v['alias'] then
+--		local struck = split(v['alias'],'|')
+--		for n,m in pairs(struck) do
+--			make_abil(m,'english','Ability',i)
+--			make_abil(m,'german','Ability',i)
+--			make_abil(m,'french','Ability',i)
+--			make_abil(m,'japanese','Ability',i)
+--		end
+--	end
 end
 
 -- Item processing --
@@ -61,11 +84,29 @@ r_items = table.range(65535)
 r_items:update(parse_resources(r_itemsGFile:readlines()))
 r_items:update(parse_resources(r_itemsAFile:readlines()))
 r_items:update(parse_resources(r_itemsWFile:readlines()))
-en_item_names = {}
+item_names = {}
+item_names['english'] = T{}
+item_names['german'] = T{}
+item_names['french'] = T{}
+item_names['japanese'] = T{}
 
 for i,v in pairs(r_items) do
-	if v['enl'] then
-		en_item_names[v['enl']] = i
+	if type(v) == 'table' then
+		v.prefix = '/item'
+		v.element = 'None'
+		v.type = 'Item'
+		v.validtarget = {Self=true,Player=true,Party=true,Ally=true,NPC=true,Enemy=true}
+		v.targets = "Self, Player, Party, Ally, NPC, Enemy"
+		v.mpcost = 0
+		v.tpcost = 0
+		v.recast = 0
+		v.casttime = 0
+		v.skill = 'Item'
+		
+		make_abil(v,'english','Item',i)
+		make_abil(v,'german','Item',i)
+		make_abil(v,'french','Item',i)
+		make_abil(v,'japanese','Item',i)
 	end
 end
 
@@ -98,7 +139,7 @@ dat_races = {HumeM=0x0002,HumeF=0x0004,ElvaanM=0x0008,ElvaanF=0x0010,TaruM=0x002
 jas = {false,false,false,false,false,true,false,false,false,false,false,false,false,true,true,false}--6,14,15}
 readies = {false,false,false,false,false,false,true,true,true,false,false,true,false,false,false,false}--{7,8,9,12}
 uses = {false,true,true,true,true,false,false,false,false,false,false,false,true,false,false,false}--{2,3,4,5,13}
-unable_to_use = T{17,18,55,56,87,88,89,90,104,191,308,313,325,410,428,561,574,579,580,581,661,665,4,5,12,16,34,35,40,47,48,49,62,71,72,76,78,84,91,92,94,95,96,106,111,128,154,155,190,192,193,198,199,215,216,217,218,219,220,233,246,247,307,315,316,328,337,338,346,347,348,349,356,411,443,444,445,446,514,516,517,518,524,525,547,568,569,575,649,660,662,666} -- Probably don't need some of these (event action)
+unable_to_use = T{17,18,55,56,87,88,89,90,104,191,308,313,325,410,428,561,574,579,580,581,661,665,4,5,12,16,34,35,40,47,48,49,71,72,76,78,84,91,92,94,95,96,106,111,128,154,155,190,192,193,198,199,215,216,217,218,219,220,233,246,247,307,315,316,328,337,338,346,347,348,349,356,411,443,444,445,446,514,516,517,518,524,525,547,568,569,575,649,660,662,666} -- Probably don't need some of these (event action)
 pass_through_targs = T{'<t>','<me>','<ft>','<scan>','<bt>','<lastst>','<r>','<pet>','<p0>','<p1>','<p2>','<p3>','<p4>',
 	'<p5>','<a10>','<a11>','<a12>','<a13>','<a14>','<a15>','<a20>','<a21>','<a22>','<a23>','<a24>','<a25>'}
 st_targs = T{'<stnpc>','<stal>','<stpc>','<stpt>'}
@@ -128,7 +169,7 @@ player = {}
 alliance = {}
 player.equipment = {}
 pet = {isvalid=false}
-st_flag = true
+st_flag = false
 current_job_file = nil
 
 

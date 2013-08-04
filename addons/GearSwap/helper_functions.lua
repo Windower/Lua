@@ -20,7 +20,7 @@
 -----------------------------------------------------------------------------------
 function parse_resources(lines_file)
 	local ignore_fields = S{'index'}
-	local convert_fields = {fr='french',frl='french_log',de='german',del='german_log',jp='japanese',jpl='japanese_log'}
+	local convert_fields = {enl='english_log',fr='french',frl='french_log',de='german',del='german_log',jp='japanese',jpl='japanese_log'}
 	
 	local completed_table = {}
 	for i in ipairs(lines_file) do

@@ -2,9 +2,7 @@ Issues:
 * Need to detect/correct for Encumberment (Pathos), Traded, Dbox'ed, AH Dialog, and Crafting.
 * Event status fix. Dead status fix. Zoning status fix.
 * Need a Spellcast -> Lua converter before release.
-* Need to check whether require '' works within user documents.
 * Need to check whether register_event() works within user documents.
-* Need to confirm all the variables exist at precast/midcast/aftercast the way that I think they do.
 * Need to decide what the heck I'm doing with the second argument to user functions.
 * Need to detect when it's not possible to cast (Sleep, Stun, Break, Terror, Charm, etc.) and reset midaction
 * Change mob_array.type so that it matches validtarget.

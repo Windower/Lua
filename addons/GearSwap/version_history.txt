@@ -1,4 +1,6 @@
 -------------------------------------------------
+Gearswap 0.600 - added item handling and add/documented require
+-------------------------------------------------
 Gearswap 0.505 - added and documented set_combine()
 -------------------------------------------------
 Gearswap 0.504 - "fixed" reraise crash error. Likely indicates an underlying problem in LuaCore that should be addressed

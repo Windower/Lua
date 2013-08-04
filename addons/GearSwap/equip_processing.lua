@@ -92,7 +92,7 @@ function equip_sets(swap_type,val1,val2)
 	
 	if failure_reason == '' then
 		for i,v in pairs(equip_next) do
-			--if debugging >= 2 then add_to_chat(8,tostring(v)..' '..tostring(i)..' item: '..tostring(r_items[items['inventory'][v]['id']]['enl'])) else
+			--if debugging >= 2 then add_to_chat(8,tostring(v)..' '..tostring(i)..' item: '..tostring(r_items[items['inventory'][v]['id']][language..'_log'])) else
 			----inject_packet(is_outgoing, data)
 			set_equip(v,i)
 			sent_out_equip[i] = v -- re-make the equip_next table with the name sent_out_equip as the equipment is sent out.
@@ -135,7 +135,7 @@ function to_id_set(inventory,equip_list)
 				if get_wearable(jobs[player.main_job],tonumber('0x'..r_items[m['id']]['jobs'])) and (tonumber(r_items[m['id']]['level'])<=player.main_job_level) and get_wearable(dat_races[player.race],tonumber('0x'..r_items[m['id']]['races'])) then
 					for i,v in pairs(equip_list) do
 						if not ret_list[slot_map[i]] then
-							if r_items[m['id']]['enl']:lower() == v:lower() or r_items[m['id']]['english']:lower() == v:lower() then
+							if r_items[m['id']][language..'_log']:lower() == v:lower() or r_items[m['id']][language]:lower() == v:lower() then
 								-- I need to add the ability to interpret extdata and specify which item based on it at some point.
 								equip_list[i] = ''
 								ret_list[slot_map[i]] = m['slot_id']
@@ -145,7 +145,7 @@ function to_id_set(inventory,equip_list)
 					end
 				else
 					for i,v in pairs(equip_list) do
-						if r_items[m['id']]['enl']:lower() == v:lower() or r_items[m['id']]['english']:lower() == v:lower() then
+						if r_items[m['id']][language..'_log']:lower() == v:lower() or r_items[m['id']][language]:lower() == v:lower() then
 							if not get_wearable(jobs[player.main_job],tonumber('0x'..r_items[m['id']]['jobs'])) then
 								equip_list[i] = v..' (cannot be worn by this job)'
 							elseif not (tonumber(r_items[m['id']]['level'])<=player.main_job_level) then
@@ -159,7 +159,7 @@ function to_id_set(inventory,equip_list)
 				end
 			elseif m['flags'] > 0 then
 				for i,v in pairs(equip_list) do
-					if r_items[m['id']]['enl']:lower() == v:lower() or r_items[m['id']]['english']:lower() == v:lower() then
+					if r_items[m['id']][language..'_log']:lower() == v:lower() or r_items[m['id']][language]:lower() == v:lower() then
 						if m['flags'] == 5 then
 							equip_list[i] = ''
 						elseif m['flags'] == 25 then
@@ -202,9 +202,9 @@ function to_names_set(id_id,inventory)
 			if inventory[v]['id'] == 0 then
 				equip_package[i]='empty'
 			elseif type(i) ~= 'string' then
-				equip_package[default_slot_map[i]] = r_items[inventory[v]['id']]['english']
+				equip_package[default_slot_map[i]] = r_items[inventory[v]['id']][language]
 			else
-				equip_package[i]=r_items[inventory[v]['id']]['english']
+				equip_package[i]=r_items[inventory[v]['id']][language]
 			end
 		else
 			equip_package[i]='empty'

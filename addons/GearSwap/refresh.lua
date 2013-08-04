@@ -29,9 +29,12 @@ end
 -----------------------------------------------------------------------------------
 function load_user_files()
 	if user_env then
-		if user_env.file_unload then user_env.file_unload() end
+		if type(user_env.file_unload)=='function' then user_env.file_unload()
+		elseif user_env.file_unload then
+			add_to_chat(123,'GearSwap: file_unload() is not a function')
+		end
 	end
-	local user_env = {gearswap = _G, _global = _global,
+	user_env = {gearswap = _G, _global = _global,
 		-- Player functions
 		equip = equip, verify_equip=verify_equip, cancel_spell=cancel_spell,
 		force_send=force_send, change_target=change_target, cast_delay=cast_delay,
@@ -77,7 +80,6 @@ function load_user_files()
 	
 	user_env.get_sets()
 	
-	return user_env
 end
 
 
@@ -97,7 +99,6 @@ end
 -------- of buffs with that name active.
 -----------------------------------------------------------------------------------
 function refresh_player()
-	local oldplayer = player
 	table.reassign(player,get_player())
 	for i,v in pairs(player['vitals']) do
 		player[i]=v
@@ -214,7 +215,7 @@ function get_buff_active(bufflist)
 	buffarr = {}
 	for i,v in pairs(bufflist) do
 		if r_status[v] then -- For some reason we always have buff 255 active, which doesn't have an entry.
-			local buff = r_status[v]['english']:lower()
+			local buff = r_status[v][language]:lower()
 			if buffarr[buff] then
 				buffarr[buff] = buffarr[buff] +1
 			else
@@ -236,7 +237,7 @@ end
 -----------------------------------------------------------------------------------
 function refresh_user_env()
 	refresh_globals()
-	user_env = load_user_files()
+	load_user_files()
 	if not user_env then
 		gearswap_disabled = true
 		sets = nil

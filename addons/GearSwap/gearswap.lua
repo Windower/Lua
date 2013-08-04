@@ -1,3 +1,4 @@
+language = 'english'
 file = require 'filehelper'
 require 'sets'
 require 'stringhelper'
@@ -10,7 +11,7 @@ require 'refresh'
 
 _addon = {}
 _addon.name = 'GearSwap'
-_addon.version = '0.504'
+_addon.version = '0.600'
 _addon.commands = {'gs','gearswap'}
 
 function event_load()
@@ -26,7 +27,6 @@ function event_load()
 	send_command('@alias gs lua c gearswap')
 	refresh_globals()
 	_global.force_send = false
-	language = world.language:lower()
 	
 	if world.logged_in then
 		refresh_user_env()
@@ -87,7 +87,7 @@ function event_outgoing_text(original,modified)
 	
 	if command == '/raw' then
 		return _raw.table.concat(splitline,' ',2,#splitline)
-	elseif command_list[command] and temptarg and validabils[abil] and not midaction then
+	elseif command_list[command] and temptarg and validabils[language][abil] and not midaction then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) Original: '..original) end
 		refresh_globals()
 			
@@ -96,13 +96,19 @@ function event_outgoing_text(original,modified)
 		local r_line, s_type
 			
 		if command_list[command] == 'Magic' then
-			r_line = r_spells[validabils[abil:lower()]['Magic']]
-			r_line.name = r_line['english']
-			s_type = command_list[r_spells[validabils[abil:lower()]['Magic']]['prefix']]
+			r_line = r_spells[validabils[language][abil:lower()]['Magic']]
+			r_line.name = r_line[language]
+			s_type = 'Magic' -- command_list[r_spells[validabils[language][abil:lower()]['Magic']]['prefix']]
 		elseif command_list[command] == 'Ability' then
-			r_line = r_abilities[validabils[abil:lower()]['Ability']]
-			r_line.name = r_line['english']
-			s_type = command_list[r_abilities[validabils[abil:lower()]['Ability']]['prefix']]
+			r_line = r_abilities[validabils[language][abil:lower()]['Ability']]
+			r_line.name = r_line[language]
+			s_type = 'Ability' -- command_list[r_abilities[validabils[language][abil:lower()]['Ability']]['prefix']]
+		elseif command_list[command] == 'Item' then
+			r_line = r_items[validabils[language][abil:lower()]['Item']]
+			r_line.name = r_line[language]
+			r_line.prefix = '/item'
+			r_line.type = 'Item'
+			s_type = 'Item'
 		elseif debugging then
 			write('this case should never be hit '..command)
 		end
@@ -111,7 +117,7 @@ function event_outgoing_text(original,modified)
 		
 		r_line = aftercast_cost(r_line)
 		
-		storedcommand = r_line['prefix']..' "'..r_line['english']..'" '
+		storedcommand = r_line['prefix']..' "'..r_line[language]..'" '
 		equip_sets('precast',r_line,{type=s_type})
 
 		return '' -- Makes an infinite loop with Spellcast. They fight to the death.
@@ -134,7 +140,7 @@ function event_outgoing_text(original,modified)
 		elseif debugging then
 			write('(100) this case should never be hit '..command)
 		end
-	elseif midaction and validabils[tostring(abil):lower()] then
+	elseif midaction and validabils[language][tostring(abil):lower()] then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(122) Canceled: '..original) end
 		return ''
 	end
@@ -193,11 +199,11 @@ function event_outgoing_chunk(id,data)
 		local actor_name = get_mob_by_id(actor_id)['name']
 		local target_name = get_mob_by_index(index)['name']
 		if category == 3 then
-			abil_name = r_spells[param]['english']
+			abil_name = r_spells[param][language]
 		elseif category == 7 then
-			abil_name = r_abilities[param+768]['english']
+			abil_name = r_abilities[param+768][language]
 		elseif category == 9 then
-			abil_name = r_abilities[param]['english']
+			abil_name = r_abilities[param][language]
 		elseif category == 16 then
 			abil_name = 'Ranged Attack'
 		end
@@ -224,14 +230,17 @@ function event_action(act)
 	local spell = get_spell(act)
 	local category = act['category']
 	
-	if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(178) Event Action: '..tostring(spell.english)..' '..tostring(act['category'])) end
+	if logging then	
+		if spell then logit(logfile,'\n\n'..tostring(os.clock)..'(178) Event Action: '..tostring(spell.english)..' '..tostring(act['category']))
+		else logit(logfile,'\n\nNil spell detected') end
+	end
 	
 	if jas[category] then
 		equip_sets(prefix..'aftercast',spell,{type=get_action_type(category)})
 	elseif readies[category] then
-		if act['param'] == 28787 then ----------- NEED TO ADD BETTER HANDLING FOR THIS -----------------------------
+		if act['param'] == 28787 and not category == 9 then ----------- NEED TO ADD BETTER HANDLING FOR THIS ----------------------------- Why?
 			equip_sets(prefix..'aftercast',spell,{type='Failure'})
-		else
+		elseif act['param'] ~= 28787 then
 			equip_sets(prefix..'midcast',spell,{type=get_action_type(category)})
 		end
 	elseif uses[category] then
@@ -241,7 +250,9 @@ end
 
 function event_action_message(actor_id,target_id,actor_index,target_index,message_id,param_1,param_2,param_3)
 	if gearswap_disabled then return end
-	if unable_to_use:contains(message_id) then
+	if message_id == 62 then
+		equip_sets('aftercast',r_items[param_1],{type='Failure'})
+	elseif unable_to_use:contains(message_id) then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(195) Event Action Message: '..tostring(message_id)..' Interrupt') end
 		equip_sets('aftercast',{name='Interrupt'},{type='Recast'})
 	end
@@ -390,7 +401,7 @@ function get_spell(act)
 				spell = r_spells[abil_ID]
 			elseif T{3,6,7,13,14,15}:contains(act['category']) then
 				spell = r_abilities[abil_ID] -- May have to correct for charmed pets some day, but I'm not sure there are any monsters with TP moves that give no message.
-			elseif T{}:contains(act['category']) then
+			elseif T{5,9}:contains(act['category']) then
 				spell = r_items[abil_ID]
 			else
 				spell = {none=tostring(msg_ID)} -- Debugging
@@ -399,7 +410,7 @@ function get_spell(act)
 		end
 		
 		
-		local fields = fieldsearch(dialog[msg_ID]['english'])
+		local fields = fieldsearch(dialog[msg_ID][language])
 		
 		if table.contains(fields,'spell') then
 			spell = r_spells[abil_ID]
@@ -434,7 +445,7 @@ function get_spell(act)
 		end
 	end
 	
-	spell.name = spell['english']
+	spell.name = spell[language]
 	return spell
 end
 
@@ -443,9 +454,9 @@ function aftercast_cost(rline)
 		return {tpaftercast = player['tp'],mpaftercast = tonumber(player['mp']),mppaftercast = tonumber(player['mpp'])}
 	end
 	if not rline['mpcost'] then rline['mpcost'] = 0 end
-	if not rline['tpcost'] then rline['tpcost'] = -1 end
+	if not rline['tpcost'] then rline['tpcost'] = 0 end
 	
-	if tonumber(rline['tpcost']) == -1 or not rline['tpcost'] then rline['tpaftercast'] = player['tp'] else
+	if tonumber(rline['tpcost']) == 0 or not rline['tpcost'] then rline['tpaftercast'] = player['tp'] else
 	rline['tpaftercast'] = player['tp'] - tonumber(rline['tpcost']) end
 	
 	if tonumber(rline['mpcost']) == 0 then
