@@ -333,6 +333,17 @@ function cast_delay(delay)
 	end
 end
 
+function set_combine(set1,set2)
+	local set3 = {}
+	for i,v in pairs(set1) do
+		set3[default_slot_map[slot_map[i]]] = v
+	end
+	for i,v in pairs(set2) do
+		set3[default_slot_map[slot_map[i]]] = v
+	end
+	return set3
+end
+
 function get_spell(act)
 	local spell, abil_ID, effect_val = {}
 	local msg_ID = act['targets'][1]['actions'][1]['message']

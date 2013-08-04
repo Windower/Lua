@@ -1,4 +1,6 @@
 -------------------------------------------------
+Gearswap 0.505 - added and documented set_combine()
+-------------------------------------------------
 Gearswap 0.504 - "fixed" reraise crash error. Likely indicates an underlying problem in LuaCore that should be addressed
 -------------------------------------------------
 Gearswap 0.503 - event_status_change() handling changed so people don't swap gear when disengaging from NPCs or crafting.

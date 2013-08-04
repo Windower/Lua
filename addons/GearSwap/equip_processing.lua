@@ -18,9 +18,13 @@ function equip_sets(swap_type,val1,val2)
 			if val1.english then
 				logit(logfile,' : '..val1.english)
 			end
+		else
+			logit(logfile,' : nil-or-false')
 		end
 		if val2 then
 			if val2.type then	logit(logfile,' : '..val2.type)	end
+		else
+			logit(logfile,' : nil-or-false')
 		end
 	end
 

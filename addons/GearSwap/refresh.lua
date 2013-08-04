@@ -35,7 +35,7 @@ function load_user_files()
 		-- Player functions
 		equip = equip, verify_equip=verify_equip, cancel_spell=cancel_spell,
 		force_send=force_send, change_target=change_target, cast_delay=cast_delay,
-		print_set=print_set,
+		print_set=print_set,set_combine=set_combine,
 		
 		-- Library functions
 		string=string, math=math, sets=sets, table=table, T=T, S=S,
