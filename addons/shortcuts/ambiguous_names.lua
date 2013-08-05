@@ -40,6 +40,7 @@ function smn_sub(player_array,info) -- Determines ambiguous black magic that can
 		return 'Ability' -- Returns the SMN ability if it's a SMN main without a sub that has access to the spell
 	elseif player_array['main_job_id'] == 15 and (info:contains(player_array['sub_job_id'])) then
 		local pet_array = get_mob_by_index(get_mob_by_id(player_array.id)['pet_index'])
+		if not pet_array then return 'Magic' end
 		local recasts = get_ability_recasts()
 		if info:contains(pet_array['name']) and info:contains('Ward') and recasts[174]<=10 then
 			return 'Ability' -- Returns the SMN ability if it's a SMN main with an appropriate avatar summoned.
@@ -93,6 +94,7 @@ function blu_sub(player_array,info,mob_ID) -- Determines ambiguous blue magic th
 		return 'Ability' -- Returns the BST ability if it's BST/not-BLU using the spell
 	elseif player_array['main_job_id'] == 9 and player_array['sub_job_id'] == 16 and player_array['pet_index']~=0 then
 		local pet_array = get_mob_by_index(get_mob_by_id(player_array.id)['pet_index'])
+		if not pet_array then return 'Magic' end
 		local recasts = get_ability_recasts()
 		if pet_array['tp'] then -- Temp fix until pet TP is added.
 			if pet_array['tp'] >= 100 and recasts[255] <= 5400 then -- If your pet has TP and Ready's recast is less than 1.5 minutes
