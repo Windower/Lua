@@ -219,13 +219,13 @@ end
 -- Takes a padding character pad and pads the string str to the left of it, until len is reached. pad defaults to a space.
 function string.lpad(str, pad, len)
 	pad = pad or ' '
-	return (pad:rep(len)..str):sub(-len)
+	return (pad:rep(len)..str):sub(-(len > #str and len or #str))
 end
 
 -- Takes a padding character pad and pads the string str to the right of it, until len is reached. pad defaults to a space.
 function string.rpad(str, pad, len)
 	pad = pad or ' '
-	return (str..pad:rep(len)):sub(1, len)
+	return (str..pad:rep(len)):sub(1, -(len > #str and len or #str))
 end
 
 -- Returns the string padded with zeroes until the length is len.
@@ -287,7 +287,7 @@ end
 
 -- Returns a string with Lua pattern characters escaped.
 function string.escape(str)
-	return str:gsub('[[%]%%^$*()%.%+?-]', '%%%1')
+	return (str:gsub('[[%]%%^$*()%.%+?-]', '%%%1'))
 end
 
 -- Returns a Lua pattern from a wildcard string (with ? and * as placeholders for one and many characters respectively).
