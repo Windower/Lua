@@ -78,6 +78,7 @@ end
 
 function event_outgoing_text(original,modified)
 	if gearswap_disabled then return modified end
+	modified = modifid:gsub(' <wait %d+>','')
 	local splitline = split(modified,' ')
 	local command = splitline[1]
 
