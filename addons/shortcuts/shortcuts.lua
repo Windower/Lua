@@ -24,12 +24,13 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
--- debugging = true
--- if dir_exists('../addons/shortcuts/data/') then
--- 	logging = false
---	logfile = io.open('../addons/shortcuts/data/NormalLog'..tostring(os.clock())..'.log','w+')
---	logfile:write('\n\n','SHORTCUTS LOGGER HEADER: ',tostring(os.clock()),'\n')
--- end
+debugging = false
+if dir_exists('../addons/shortcuts/data/') then
+	logging = false
+	logfile = io.open('../addons/shortcuts/data/NormalLog'..tostring(os.clock())..'.log','w+')
+	logfile:write('\n\n','SHORTCUTS LOGGER HEADER: ',tostring(os.clock()),'\n')
+	logfile:flush()
+end
 
 file = require 'filehelper'
 require 'sets'
@@ -83,8 +84,10 @@ end
 -----------------------------------------------------------------------------------
 function event_outgoing_text(original,modified)
 	original = convert_auto_trans(original)
+	original = original:gsub(' <wait %d+>','')
 	if logging then
 		logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\nModified: ',modified)
+		logfile:flush()
 	end
 	
 	if counter>0 and debugging then --- Subroutine designed to detect and eliminate infinite loops.
@@ -98,6 +101,7 @@ function event_outgoing_text(original,modified)
 			if logging then
 				f = io.open('../addons/shortcuts/data/loopdetect'..tostring(os.clock())..'.log','w+')
 				f:write('Probable infinite loop detected in Shortcuts: ',tostring(lastsent),'\n',tostring(os.clock()),'Original: ',tostring(original))
+				f:flush()
 				f:close()
 			end
 			add_to_chat(8,'Probable infinite loop detected in Shortcuts: '..tostring(lastsent)..'\7Please tell Byrth what you were doing')
@@ -160,7 +164,10 @@ function command_logic(original,modified)
 			local temptarg = valid_target(splitline[#splitline]) or target_make({['Player']=true,['Enemy']=true,['Self']=true}) -- Complete the target or make one.
 			lastsent = command..' '..temptarg -- Push the command and target together and send it out.
 			if debugging then add_to_chat(8,tostring(counter)..' input '..lastsent) end
-			if logging then logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\n(162) ',lastsent) 	end
+			if logging then
+				logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\n(162) ',lastsent) 	
+				logfile:flush()
+			end
 			send_command('@input '..lastsent)
 			return ''
 		else -- If there are excluded secondary commands (like /pcmd add <name>)
@@ -191,19 +198,28 @@ function command_logic(original,modified)
 			end
 			lastsent = tempcmd..' '..temptarg
 			if debugging then add_to_chat(8,tostring(counter)..' input '..lastsent) end
-			if logging then logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\n(193) ',lastsent) 	end
+			if logging then
+				logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\n(193) ',lastsent)
+				logfile:flush()
+			end
 			send_command('@input '..lastsent)
 			return ''
 		end
 	elseif (command2_list[command] and valid_target(splitline[#splitline],true)) then 
 		-- If the submitted command does not require ability interpretation and is fine already, send it out.
 		lastsent = ''
-		if logging then logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\n(146) Legitimate command') 	end
+		if logging then
+			logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\n(146) Legitimate command')
+			logfile:flush()
+		end
 		return modified
 	elseif (command_list[command] and convert_spell(spell or '') and valid_target(splitline[#splitline])) then
 		-- If the submitted ability is already properly formatted, send it out. Fixes capitalization and minor differences.
 		lastsent = ''
-		if logging then logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\n(146) Legitimate command') 	end
+		if logging then
+			logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\n(146) Legitimate command')
+			logfile:flush()
+		end
 		return command..' "'..convert_spell(spell)..'" '..splitline[#splitline]
 	elseif command_list[command] then
 		-- If there is a valid command, then pass the text with an offset of 1 to the text interpretation function
@@ -251,7 +267,10 @@ function interp_text(splitline,offset,modified)
 		end
 		lastsent = r_line['prefix']..' "'..r_line['english']..'" '..(temptarg or target_make(r_line['validtarget']))
 		if debugging then add_to_chat(8,tostring(counter)..' input '..lastsent) end
-		if logging then logfile:write('\n\n',tostring(os.clock()),'Original: ',table.concat(splitline,' '),'\n(180) ',lastsent) 	end
+		if logging then
+			logfile:write('\n\n',tostring(os.clock()),'Original: ',table.concat(splitline,' '),'\n(180) ',lastsent)
+			logfile:flush()
+		end
 		send_command('@input '..lastsent)
 		return ''
 	end
