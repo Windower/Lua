@@ -85,7 +85,7 @@ function event_outgoing_text(original,modified)
 	if abil then
 		abil = abil:lower()
 	elseif #splitline == 3 then
-		abil = split[2]:lower()
+		abil = splitline[2]:lower()
 	end
 	
 	local temptarg = valid_target(splitline[#splitline])
