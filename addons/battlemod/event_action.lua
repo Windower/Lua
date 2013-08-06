@@ -567,6 +567,7 @@ end
 function check_filter(actor_table,party_table,target_table,category,msg)
 	-- This determines whether the message should be displayed or filtered
 	-- Returns true (don't filter) or false (filter), boolean
+	if actor_table == nil or party_table == nil or target_table == nil then return false end
 	actor_type = party_id(actor_table,party_table)
 	target_type = party_id(target_table,party_table)
 	
