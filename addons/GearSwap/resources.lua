@@ -74,11 +74,6 @@ r_items = table.range(65535)
 r_items:update(parse_resources(r_itemsGFile:readlines()))
 r_items:update(parse_resources(r_itemsAFile:readlines()))
 r_items:update(parse_resources(r_itemsWFile:readlines()))
-item_names = {}
-item_names['english'] = T{}
-item_names['german'] = T{}
-item_names['french'] = T{}
-item_names['japanese'] = T{}
 
 for i,v in pairs(r_items) do
 	if type(v) == 'table' then

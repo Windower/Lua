@@ -1,6 +1,6 @@
 function get_sets()
 	sets = {}
-	
+
 	-- Precast Sets
 	sets['precast_Elemental Siphon'] = {main="Soulscourge",sub="Vox Grip",
 		head="Marduk's Tiara +1",neck="Caller's Pendant",rear="Smn. Earring",
@@ -15,7 +15,7 @@ function get_sets()
 	sets.precast_BP = {hands="Smn. Bracers +2",back="Tiresias' cape",legs="Smn. Spats +2",feet="Smn. Pigaches +2"}
 	
 	sets['precast_Mana Cede'] = {hands="Call. Bracers +2"}
-				
+	
 	sets.precast_FC = {head="Nahtirah Hat",neck="Orunmila's Torque",ear1="Loquac. Earring",body="Marduk's Jubbah +1",
 		hands="Mdk. Dastanas +1",ring2="Prolix Ring",back="Swith Cape",waist="Siegel Sash",legs="Orvail Pants",
 		feet="Rostrum Pumps"}
@@ -72,8 +72,8 @@ function get_sets()
 	
 	sets.aftercast_Avatar_Spirit = {main="Soulscourge",sub="Vox grip",ammo="Dashavatara Sash",
 		head="Caller's Horn +2",neck="Caller's Pendant",ear2="Smn. Earring",
-		body="Anhur Robe",hands="Smn. Bracers +2",ring1="Evoker's Ring",ring2="Fervor Ring",
-		back="Astute Cape",legs="Smn. spats +2",feet="Caller's Pgch. +2"}
+		body="Caller's Doublet +2",hands="Smn. Bracers +2",ring1="Evoker's Ring",ring2="Fervor Ring",
+		back="Astute Cape",legs="Smn. spats +2",feet="Rubeus Boots"}
 				
 	sets.aftercast_Resting = {main="Numen Staff",sub="Ariesian Grip",ammo="Mana Ampulla",
 		head="Caller's Horn +2",neck="Eidolon Pendant",ear1="Relaxing Earring",ear2="Antivenom Earring",
@@ -92,6 +92,9 @@ end
 
 function precast(spell,action)
 	verify_equip()
+	if spell.name == 'Holy Water' then
+		equip({ammo="Pebble"})
+	end
 	if action.type == 'Magic' then
 		equip(sets.precast_FC)
 		if string.find(spell.english,'Cur') then
@@ -110,20 +113,22 @@ function midcast(spell,action)
 		equip(sets.midcast_Cur)
 	elseif spell.english=='Stoneskin' then
 		equip(sets.midcast_Stoneskin)
+	else -- Bloodpacts don't have a midcast, so don't worry about them.
+		idle()
 	end
 end
 
 function aftercast(spell,action)
-	if spell.type then
-		if not string.find(spell.type,'BloodPact') then
-			send_command('@wait 1;gs c Idle')
-		end
+	if not spell.type or not string.find(spell.type,'BloodPact') then
+		-- Don't want to swap away too quickly if I'm about to put BP damage gear on
+		-- Need to wait 1 in order to allow pet information to update on Release.
+		send_command('@wait 1;gs c Idle')
 	end
 end
 
 function status_change(new,action)
 	if new=='Idle' then
-		send_command('@gs c Idle')
+		idle()
 	elseif new=='Resting' then
 		equip(sets['aftercast_Resting'])
 	end
@@ -154,26 +159,26 @@ function pet_midcast(spell,action)
 end
 
 function pet_aftercast(spell,action)
-	send_command('@gs c Idle')
-end
-
-function buff_change(buff,gain_or_loss)
-
+	idle()
 end
 
 function self_command(command)
 	if command == 'Idle' then
-		equip(sets.aftercast_None)
-		if pet.isvalid then
-			if string.find(pet.name,'Spirit') then
-				equip(sets.aftercast_Avatar_Spirit)
-			elseif buffactive["Avatar's Favor"] then
-				equip(sets.aftercast_Favor)
-			else
-				equip(sets.aftercast_Perp_Base)
-				if sets['aftercast_Avatar_'..pet.name] then
-					equip(sets['aftercast_Avatar_'..pet.name])
-				end
+		idle()
+	end
+end
+
+function idle()
+	equip(sets.aftercast_None)
+	if pet.isvalid then
+		if string.find(pet.name,'Spirit') then
+			equip(sets.aftercast_Avatar_Spirit)
+		elseif buffactive["Avatar's Favor"] then
+			equip(sets.aftercast_Favor)
+		else
+			equip(sets.aftercast_Perp_Base)
+			if sets['aftercast_Avatar_'..pet.name] then
+				equip(sets['aftercast_Avatar_'..pet.name])
 			end
 		end
 	end

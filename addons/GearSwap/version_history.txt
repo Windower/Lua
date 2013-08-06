@@ -1,4 +1,6 @@
 -------------------------------------------------
+Gearswap 0.602 - minor refactoring, moved things around, added a little more protection to send_command()
+-------------------------------------------------
 Gearswap 0.601 - improved the equip command to handle multiple set layers
 -------------------------------------------------
 Gearswap 0.600 - added item handling and add/documented require

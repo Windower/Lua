@@ -50,7 +50,7 @@ function load_user_files()
 		string=string, math=math, sets=sets, table=table, T=T, S=S,
 		tostring = tostring, tonumber = tonumber, pairs = pairs,
 		ipairs = ipairs, write=write, add_to_chat=add_to_chat,
-		send_command=send_command,register_event=register_event,
+		send_command=send_cmd_user,register_event=register_event,
 		require=require,next=next,
 		
 		-- Player environment things

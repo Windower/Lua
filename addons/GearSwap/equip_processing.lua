@@ -104,28 +104,6 @@ function equip_sets(swap_type,val1,val2)
 	send_check(_global.force_send)
 end
 
-function equip(...)
-	local gearsets = {...}
-	for i in ipairs(gearsets) do
-		local temp_set = unify_slots(gearsets[i])
-		for n,m in pairs(temp_set) do
-			rawset(equip_list,n,m)
-		end
-	end
-end
-
-function print_set(set,title)
-	if title then
-		add_to_chat(1,'------------------------- '..title..' -------------------------')
-	else
-		add_to_chat(1,'----------------------------------------------------------------')
-	end
-	for i,v in pairs(set) do
-		add_to_chat(8,tostring(i)..' '..tostring(v))
-	end
-	add_to_chat(1,'----------------------------------------------------------------')
-end
-
 function to_id_set(inventory,equip_list)
 	local ret_list = {}
 	
