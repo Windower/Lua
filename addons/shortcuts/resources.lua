@@ -141,4 +141,8 @@ ignore_list = {['/equip']=true,['/raw']=true,['/fish']=true,['/dig']=true,['/ran
 pass_through_targs = T{'<t>','<me>','<ft>','<scan>','<bt>','<lastst>','<r>','<pet>','<p0>','<p1>','<p2>','<p3>','<p4>',
 	'<p5>','<a10>','<a11>','<a12>','<a13>','<a14>','<a15>','<a20>','<a21>','<a22>','<a23>','<a24>','<a25>','<stpc>','<stal>','<stnpc>','<stpt>'}
 
+targ_reps = {t='<t>',me='<me>',ft='<ft>',scan='<scan>',bt='<bt>',lastst='<lastst>',r='<r>',pet='<pet>',p0='<p0>',p1='<p1>',p2='<p2>',p3='<p3>',p4='<p4>',
+	p5='<p5>',a10='<a10>',a11='<a11>',a12='<a12>',a13='<a13>',a14='<a14>',a15='<a15>',a20='<a20>',a21='<a21>',a22='<a22>',a23='<a23>',a24='<a24>',a25='<a25>',
+	stpc='<stpc>',stal='<stal>',stnpc='<stnpc>',stpt='<stpt>'}
+	
 language = 'english' -- get_ffxi_info()['language']:lower()

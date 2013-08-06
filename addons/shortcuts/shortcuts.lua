@@ -41,7 +41,7 @@ require 'ambiguous_names'
 require 'targets'
 
 _addon = {}
-_addon.version = '0.4'
+_addon.version = '0.5'
 _addon.name = 'Shortcuts'
 _addon.commands = {'shortcuts'}
 
@@ -151,17 +151,21 @@ end
 function command_logic(original,modified)
 	local splitline = split(original,' ')
 	local command = splitline[1] -- Treat the first word as a command.
-	
+	local potential_targ = splitline[#splitline]
 	local a,b,spell = string.find(original,'"(.-)"')
-
+	
+	if targ_reps[potential_targ] then
+		potential_targ = targ_reps[potential_targ]
+	end
+	
 	if ignore_list[command] then -- If the command is legitimate and on the blacklist, return it unaltered.
 		lastsent = ''
 		return modified
-	elseif command2_list[command] and not valid_target(splitline[#splitline],true) then
+	elseif command2_list[command] and not valid_target(potential_targ,true) then
 		-- If the command is legitimate and requires target completion but not ability interpretation
 		
 		if command2_list[command]==true then -- If there are not any excluded secondary commands
-			local temptarg = valid_target(splitline[#splitline]) or target_make({['Player']=true,['Enemy']=true,['Self']=true}) -- Complete the target or make one.
+			local temptarg = valid_target(potential_targ) or target_make({['Player']=true,['Enemy']=true,['Self']=true}) -- Complete the target or make one.
 			lastsent = command..' '..temptarg -- Push the command and target together and send it out.
 			if debugging then add_to_chat(8,tostring(counter)..' input '..lastsent) end
 			if logging then
@@ -181,17 +185,17 @@ function command_logic(original,modified)
 				end
 			end
 			
-			local temptarg = valid_target(splitline[#splitline])
+			local temptarg = valid_target(potential_targ)
 			if passback then
-				if temptarg == splitline[#splitline] or pass_through_targs:contains(temptarg) then
+				if temptarg == potential_targ or pass_through_targs:contains(temptarg) then
 					-- If the final entry is a valid target, pass it through.
-					temptarg = splitline[#splitline]
-				elseif passback == splitline[#splitline] then
+					temptarg = potential_targ
+				elseif passback == potential_targ then
 					-- If the final entry is the passed through secondary command, just send it out without a target
 					temptarg = ''
 				elseif not temptarg then
 					-- Default to using the raw entry
-					temptarg = splitline[#splitline]
+					temptarg = potential_targ
 				end
 			elseif not temptarg then -- Make a target if the temptarget isn't valid
 				temptarg = target_make({['Player']=true,['Enemy']=true,['Self']=true})
@@ -205,7 +209,7 @@ function command_logic(original,modified)
 			send_command('@input '..lastsent)
 			return ''
 		end
-	elseif (command2_list[command] and valid_target(splitline[#splitline],true)) then 
+	elseif (command2_list[command] and valid_target(potential_targ,true)) then 
 		-- If the submitted command does not require ability interpretation and is fine already, send it out.
 		lastsent = ''
 		if logging then
@@ -213,14 +217,14 @@ function command_logic(original,modified)
 			logfile:flush()
 		end
 		return modified
-	elseif (command_list[command] and convert_spell(spell or '') and valid_target(splitline[#splitline])) then
+	elseif (command_list[command] and convert_spell(spell or '') and valid_target(potential_targ)) then
 		-- If the submitted ability is already properly formatted, send it out. Fixes capitalization and minor differences.
 		lastsent = ''
 		if logging then
 			logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\n(146) Legitimate command')
 			logfile:flush()
 		end
-		return command..' "'..convert_spell(spell)..'" '..splitline[#splitline]
+		return command..' "'..convert_spell(spell)..'" '..potential_targ
 	elseif command_list[command] then
 		-- If there is a valid command, then pass the text with an offset of 1 to the text interpretation function
 		return interp_text(splitline,1,modified)
@@ -246,7 +250,11 @@ end
 function interp_text(splitline,offset,modified)
 	local temptarg
 	if #splitline > 1 then
-		temptarg = valid_target(splitline[#splitline])
+		local potential_targ = splitline[#splitline]
+		if targ_reps[potential_targ] then
+			potential_targ = targ_reps[potential_targ]
+		end
+		temptarg = valid_target(potential_targ)
 	end
 	local abil
 

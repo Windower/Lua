@@ -1,0 +1,1 @@
+Make Shortcuts accept me, t, etc. without the <>s
