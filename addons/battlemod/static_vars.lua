@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 skillchain_arr = {'Light:','Darkness:','Gravitation:','Fragmentation:','Distortion:','Fusion:','Compression:','Liquefaction:','Induration:','Reverberation:','Transfixion:','Scission:','Detonation:','Impaction:'}
-ratings_arr = {'TW','EP','DC','EM','T','VT','IT'}
+ratings_arr = {'TW','EEP','EP','DC','EM','T','VT','IT'}
 current_job = 'NONE'
 rcol = string.char(0x1E,0x01)
 blocked_colors = T{20,21,22,23,24,25,26,27,28,29,30,31,32,33,35,37,40,41,42,43,44,50,51,52,56,57,59,60,61,63,68,69,64,65,67,69,81,85,90,91,100,101,102,104,105,106,107,110,111,112,114,122,127,162,163,164,165,166,168,170,171,174,175,177,181,182,183,185,186,188,191} -- Recently added: 27 (MP drain), 165 (alliance drain?), 188 (absorb damage alliance)
