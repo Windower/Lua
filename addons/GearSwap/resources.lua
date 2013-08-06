@@ -120,7 +120,7 @@ dat_races = {HumeM=0x0002,HumeF=0x0004,ElvaanM=0x0008,ElvaanF=0x0010,TaruM=0x002
 jas = {false,false,false,false,false,true,false,false,false,false,false,false,false,true,true,false}--6,14,15}
 readies = {false,false,false,false,false,false,true,true,true,false,false,true,false,false,false,false}--{7,8,9,12}
 uses = {false,true,true,true,true,false,false,false,false,false,false,false,true,false,false,false}--{2,3,4,5,13}
-unable_to_use = T{17,18,55,56,87,88,89,90,104,191,308,313,325,410,428,561,574,579,580,581,661,665,4,5,12,16,34,35,40,47,48,49,71,72,76,78,84,91,92,94,95,96,106,111,128,154,155,190,192,193,198,199,215,216,217,218,219,220,233,246,247,307,315,316,328,337,338,346,347,348,349,356,411,443,444,445,446,514,516,517,518,524,525,547,568,569,575,649,660,662,666} -- Probably don't need some of these (event action)
+unable_to_use = T{17,18,55,56,87,88,89,90,104,191,308,313,325,410,428,561,574,579,580,581,661,665,4,5,12,16,34,35,40,47,48,49,71,72,76,78,84,91,92,94,95,96,106,111,128,154,155,190,192,193,198,199,215,216,217,218,219,220,233,246,247,307,315,316,328,337,338,346,347,348,349,356,411,443,444,445,446,514,516,517,518,523,524,525,547,568,569,575,649,660,662,666} -- Probably don't need some of these (event action)
 pass_through_targs = T{'<t>','<me>','<ft>','<scan>','<bt>','<lastst>','<r>','<pet>','<p0>','<p1>','<p2>','<p3>','<p4>',
 	'<p5>','<a10>','<a11>','<a12>','<a13>','<a14>','<a15>','<a20>','<a21>','<a22>','<a23>','<a24>','<a25>'}
 st_targs = T{'<stnpc>','<stal>','<stpc>','<stpt>'}

@@ -522,7 +522,7 @@
 	<dtd id="520" english="${actor} uses ${ability}.${lb}${target} is afflicted with Sluggish Daze (lv.${number})." color="101" units="lv."/>
 	<dtd id="521" english="${actor} uses ${ability}.${lb}${target} is afflicted with Weakened Daze (lv.${number})." color="101" units="lv."/>
 	<dtd id="522" english="${actor} uses ${ability}.${lb}${target} takes ${number} points of damage and is stunned." color="D"/>
-	<dtd id="523" english="The same effect is already active on ${actor}." color="1"/>
+	<dtd id="523" english="The same effect is already active on ${actor}." color="122"/>
 	<dtd id="524" english="You have not earned enough finishing moves to perform that action." color="1"/>
 	<dtd id="525" english="${ability} can only be performed during battle." color="1"/>
 	<dtd id="526" english="${actor} uses ${ability}.${lb}Enmity is stolen from ${target}." color="101"/>
