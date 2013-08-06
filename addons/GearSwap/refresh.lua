@@ -175,6 +175,33 @@ function refresh_ffxi_info()
 			world.area = v
 		end
 	end
+	world.real_weather = info.weather
+	world.real_weather_element = info.weather_element
+	if buffactive['voidstorm'] then
+		world.weather = 'dark'
+		world.weather_element = 'dark'
+	elseif buffactive['aurorastorm'] then
+		world.weather = 'light'
+		world.weather_element = 'light'
+	elseif buffactive['firestorm'] then
+		world.weather = 'fire'
+		world.weather_element = 'fire'
+	elseif buffactive['sandstorm'] then
+		world.weather = 'earth'
+		world.weather_element = 'earth'
+	elseif buffactive['rainstorm'] then
+		world.weather = 'water'
+		world.weather_element = 'water'
+	elseif buffactive['windstorm'] then
+		world.weather = 'wind'
+		world.weather_element = 'wind'
+	elseif buffactive['hailstorm'] then
+		world.weather = 'ice'
+		world.weather_element = 'ice'
+	elseif buffactive['thunderstorm'] then
+		world.weather = 'thunder'
+		world.weather_element = 'thunder'
+	end
 end
 
 
