@@ -25,13 +25,15 @@ function make_abil(abil,lang,t,i)
 	if not abil[lang] then return end
 	local temptab = validabils[lang]
 	local sp = abil[lang]:lower()
+	
 	if not rawget(temptab,sp) then
 		temptab[sp] = {}
 	end
 	temptab[sp][t] = i
 end
 
-for i,v in pairs(r_spells) do
+function make_entry(v,typ,i)
+	if not v.targets then v.targets = 'None' end
 	v['validtarget'] = {Self=false,Player=false,Party=false,Ally=false,NPC=false,Enemy=false}
 	local potential_targets = split(v['targets'],', ')
 	for n,m in pairs(potential_targets) do
@@ -39,44 +41,32 @@ for i,v in pairs(r_spells) do
 	end
 	if not v.tpcost or v.tpcost == -1 then v.tpcost = 0 end
 	if not v.mpcost or v.mpcost == -1 then v.mpcost = 0 end
-	
-	make_abil(v,'english','Magic',i)
-	make_abil(v,'german','Magic',i)
-	make_abil(v,'french','Magic',i)
-	make_abil(v,'japanese','Magic',i)
-	if v['alias'] then
-		local struck = split(v['alias'],'|')
-		for n,m in pairs(struck) do
-			make_abil(m,'english','Magic',i)
-			make_abil(m,'german','Magic',i)
-			make_abil(m,'french','Magic',i)
-			make_abil(m,'japanese','Magic',i)
+	if not v.prefix then
+		if typ == 'Magic' then v.prefix = '/ma'
+		elseif typ == 'Ability' then v.prefix = '/ja'
+		elseif typ == 'Item' then v.prefix = '/item'
 		end
 	end
+	if not v.element then v.element = 'None' end
+	if not v.type then v.type = typ end
+	if not v.recast then v.recast = 0 end
+	if not v.casttime then v.casttime = 0 end
+	if not v.skill then v.skill = typ end
+	
+	make_abil(v,'english',typ,i)
+	make_abil(v,'german',typ,i)
+	make_abil(v,'french',typ,i)
+	make_abil(v,'japanese',typ,i)
+	
+	return v
+end
+
+for i,v in pairs(r_spells) do
+	v = make_entry(v,'Magic',i)
 end
 
 for i,v in pairs(r_abilities) do
-	v['validtarget'] = {Self=false,Player=false,Party=false,Ally=false,NPC=false,Enemy=false}
-	local potential_targets = split(v['targets'],', ')
-	for n,m in pairs(potential_targets) do
-		v['validtarget'][m] = true
-	end
-	if not v.tpcost or v.tpcost == -1 then v.tpcost = 0 end
-	if not v.mpcost or v.mpcost == -1 then v.mpcost = 0 end
-	
-	make_abil(v,'english','Ability',i)
-	make_abil(v,'german','Ability',i)
-	make_abil(v,'french','Ability',i)
-	make_abil(v,'japanese','Ability',i)
---	if v['alias'] then
---		local struck = split(v['alias'],'|')
---		for n,m in pairs(struck) do
---			make_abil(m,'english','Ability',i)
---			make_abil(m,'german','Ability',i)
---			make_abil(m,'french','Ability',i)
---			make_abil(m,'japanese','Ability',i)
---		end
---	end
+	v = make_entry(v,'Ability',i)
 end
 
 -- Item processing --
@@ -92,21 +82,9 @@ item_names['japanese'] = T{}
 
 for i,v in pairs(r_items) do
 	if type(v) == 'table' then
-		v.prefix = '/item'
-		v.element = 'None'
-		v.type = 'Item'
-		v.validtarget = {Self=true,Player=true,Party=true,Ally=true,NPC=true,Enemy=true}
-		v.targets = "Self, Player, Party, Ally, NPC, Enemy"
-		v.mpcost = 0
-		v.tpcost = 0
-		v.recast = 0
-		v.casttime = 0
-		v.skill = 'Item'
-		
-		make_abil(v,'english','Item',i)
-		make_abil(v,'german','Item',i)
-		make_abil(v,'french','Item',i)
-		make_abil(v,'japanese','Item',i)
+		if v.targets ~= 'None' then
+			v = make_entry(v,'Item',i)
+		end
 	end
 end
 
