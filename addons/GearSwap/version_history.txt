@@ -1,4 +1,6 @@
 -------------------------------------------------
+Gearswap 0.601 - improved the equip command to handle multiple set layers
+-------------------------------------------------
 Gearswap 0.600 - added item handling and add/documented require
 -------------------------------------------------
 Gearswap 0.505 - added and documented set_combine()

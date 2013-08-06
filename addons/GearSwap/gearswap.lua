@@ -11,7 +11,7 @@ require 'refresh'
 
 _addon = {}
 _addon.name = 'GearSwap'
-_addon.version = '0.600'
+_addon.version = '0.601'
 _addon.commands = {'gs','gearswap'}
 
 function event_load()
@@ -51,10 +51,24 @@ function event_addon_command(...)
 		end
 	elseif splitup[1]:lower() == 'equip' and not midaction then
 		if gearswap_disabled then return end
-		if user_env.sets[_raw.table.concat(splitup,' ',2,#splitup)] then equip_sets('equip_command',user_env.sets[_raw.table.concat(splitup,' ',2,#splitup)])
-		else
-			add_to_chat(123,'GearSwap: Equip command cannot be completed. That set does not exist.')
+		local set_split = split(_raw.table.concat(splitup,' ',2,#splitup):gsub('[%[%]\']',''),'%.')
+		local n = 1
+		local tempset = user_env.sets
+		while n <= #set_split do
+			if tempset[set_split[n]] then
+				tempset = tempset[set_split[n]]
+				if n == #set_split then
+					equip_sets('equip_command',tempset)
+					break
+				else
+					n = n+1
+				end
+			else
+				add_to_chat(123,'GearSwap: Equip command cannot be completed. That set does not exist.')
+				break
+			end
 		end
+		
 	elseif splitup[1]:lower() == 'reload' then
 		refresh_user_env()
 	elseif strip(splitup[1]) == 'debugmode' then
@@ -78,7 +92,6 @@ end
 
 function event_outgoing_text(original,modified)
 	if gearswap_disabled then return modified end
-	modified = modified:gsub(' <wait %d+>','')
 	local splitline = split(modified,' ')
 	local command = splitline[1]
 
