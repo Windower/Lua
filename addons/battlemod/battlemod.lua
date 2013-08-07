@@ -79,8 +79,12 @@ function options_load()
 		write('Default filters xml file created')
 	end
 	local tempplayer = get_player()
-	if tempplayer then
-		filterload(tempplayer['main_job'])
+	if tempplayer
+		if tempplayer['main_job'] ~= 'NONE' then
+			filterload(tempplayer['main_job'])
+		else
+			filterload('DEFAULT')
+		end
 	else
 		filterload('DEFAULT')
 	end
