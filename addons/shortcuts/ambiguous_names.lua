@@ -52,8 +52,9 @@ function smn_sub(player_array,info) -- Determines ambiguous black magic that can
 end
 
 function blu_unsub(player_array,info,mob_ID) -- Determines ambiguous blue magic that cannot be subbed. Defaults to spells on BLU.
-	if mob_ID and player_array.race then
-		if player_array.race == 0 then 
+	local race = get_mob_by_id(player_array.id).race
+	if mob_ID and race then
+		if race == 0 then 
 			return 'Monster'
 		end
 	end
@@ -65,8 +66,9 @@ function blu_unsub(player_array,info,mob_ID) -- Determines ambiguous blue magic 
 end
 
 function abil_mob(player_array,info,mob_ID) -- Determines ambiguity between monster TP moves and abilities
-	if mob_ID and player_array.race then
-		if player_array.race == 0 then 
+	local race = get_mob_by_id(player_array.id).race
+	if mob_ID and race then
+		if race == 0 then 
 			return 'Monster'
 		end
 	end
@@ -74,8 +76,9 @@ function abil_mob(player_array,info,mob_ID) -- Determines ambiguity between mons
 end
 
 function magic_mob(player_array,info,mob_ID) -- Determines ambiguity between monster TP moves and magic
-	if mob_ID and player_array.race then
-		if player_array.race == 0 then 
+	local race = get_mob_by_id(player_array.id).race
+	if mob_ID and race then
+		if race == 0 then 
 			return 'Monster'
 		end
 	end
@@ -83,8 +86,9 @@ function magic_mob(player_array,info,mob_ID) -- Determines ambiguity between mon
 end
  
 function blu_sub(player_array,info,mob_ID) -- Determines ambiguous blue magic that can be subbed. Defaults to BST ability
-	if mob_ID and player_array.race then
-		if player_array.race == 0 then 
+	local race = get_mob_by_id(player_array.id).race
+	if mob_ID and race then
+		if race == 0 then 
 			return 'Monster'
 		end
 	end
