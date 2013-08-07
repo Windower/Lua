@@ -670,4 +670,7 @@
 	<dtd id="674" english="${actor} uses ${ability}, and finds ${number} ${item}." color="101"/>
 	<dtd id="675" english="${actor} readies ${weapon_skill}." color="110"/>
 	<dtd id="676" english="${target}'s movement speed increases." color="101"/>
+	<dtd id="677" english="You are now able to shapeshift into a new monster!" color="91"/>
+	<dtd id="678" english="You have learned a new sentience!" color="91"/>
+	<dtd id="679" english="${actor} will return to the Feretory in: $(number}." color="101"/>
 </messagesd>
