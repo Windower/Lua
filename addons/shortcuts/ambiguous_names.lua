@@ -269,6 +269,7 @@ function ambig(key)
 		elseif abil_type == 'Magic' then
 			return r_spells[ambig_names[key].spell_ID],abil_type
 		elseif abil_type == 'Monster' then
+			if r_abilities[ambig_names[key].mob_ID].prefix ~= '/monsterskill' then r_abilities[ambig_names[key].mob_ID].prefix = '/monsterskill' end
 			return r_abilities[ambig_names[key].mob_ID],abil_type
 		end
 	end
