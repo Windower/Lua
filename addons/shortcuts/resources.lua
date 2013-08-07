@@ -120,7 +120,7 @@ end
 
 -- List of valid prefixes to be interpreted. The values currently have no use.
 command_list = {['/ja']='Ability',['/jobability']='Ability',['/so']='Magic',['/song']='Magic',['/ma']='Magic',['/magic']='Magic',['/nin']='Magic',['/ninjutsu']='Magic',
-	['/ra']='Ranged Attack',['/range']='Ranged Attack',['/throw']='Ranged Attack',['/shoot']='Ranged Attack',['/ms']='Weapon Skill',['/monsterskill']='Ability',
+	['/ra']='Ranged Attack',['/range']='Ranged Attack',['/throw']='Ranged Attack',['/shoot']='Ranged Attack',['/ms']='Weapon Skill',['/monsterskill']='Ability',['/ms']='Ability',
 	['/ws']='Weapon Skill',['/weaponskill']='Weapon Skill',['/item']='Ability',['/pet']='Ability'}
 
 -- List of other commands that might use name completion.
