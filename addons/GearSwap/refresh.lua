@@ -275,7 +275,13 @@ end
 function refresh_user_env()
 	refresh_globals()
 	load_user_files()
-	if not user_env then
+	if player then
+		if player.job == 'NONE' or get_mob_by_id[player.id].race == 0 then
+			gearswap_disabled = true
+			sets = nil
+			user_env = nil
+		end
+	elseif not user_env then
 		gearswap_disabled = true
 		sets = nil
 	else
