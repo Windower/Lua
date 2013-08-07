@@ -83,10 +83,10 @@ end
 ---- string, changed command
 -----------------------------------------------------------------------------------
 function event_outgoing_text(original,modified)
-	original = convert_auto_trans(original)
-	original = original:gsub(' <wait %d+>','')
+	local temp_org = convert_auto_trans(original)
+	temp_org = temp_org:gsub(' <wait %d+>','')
 	if logging then
-		logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\nModified: ',modified)
+		logfile:write('\n\n',tostring(os.clock()),'temp_org: ',temp_org,'\nModified: ',modified)
 		logfile:flush()
 	end
 	
@@ -100,7 +100,7 @@ function event_outgoing_text(original,modified)
 		if counter == 36 then
 			if logging then
 				f = io.open('../addons/shortcuts/data/loopdetect'..tostring(os.clock())..'.log','w+')
-				f:write('Probable infinite loop detected in Shortcuts: ',tostring(lastsent),'\n',tostring(os.clock()),'Original: ',tostring(original))
+				f:write('Probable infinite loop detected in Shortcuts: ',tostring(lastsent),'\n',tostring(os.clock()),'temp_org: ',tostring(temp_org))
 				f:flush()
 				f:close()
 			end
@@ -121,7 +121,7 @@ function event_outgoing_text(original,modified)
 	end
 	
 	-- Otherwise, dump the inputs into command_logic()
-	return command_logic(original,modified)
+	return command_logic(temp_org,modified)
 end
 
 -----------------------------------------------------------------------------------

@@ -79,6 +79,7 @@ function event_action(act)
 		
 		for n,m in pairs(act['targets']) do
 			local target_table = get_mob_by_id(act['targets'][n]['id'])
+			if not target_table then return end
 			local target = target_table['name']
 			target = namecol(target,target_table,party_table)
 			
@@ -151,6 +152,7 @@ function event_action(act)
 			local spell,ability,weapon_skill,item,target_table,target
 			
 			target_table = get_mob_by_id(act['targets'][i]['id'])
+			if not target_table then return end
 
 			local flipped = false
 			if act['category'] == 6 and act['param'] > 140 and act['param'] < 149 and act['targets'][1]['actions'][1]['message'] == 0 then -- Force a message for maneuvers.

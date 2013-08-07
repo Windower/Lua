@@ -94,11 +94,11 @@ end
 function event_outgoing_text(original,modified)
 	if gearswap_disabled then return modified end
 	
-	modified = convert_auto_trans(modified)
-	local splitline = split(modified,' ')
+	local temp_mod = convert_auto_trans(modified)
+	local splitline = split(temp_mod,' ')
 	local command = splitline[1]
 
-	local a,b,abil = string.find(modified,'"(.-)"')
+	local a,b,abil = string.find(temp_mod,'"(.-)"')
 	if abil then
 		abil = abil:lower()
 	elseif #splitline == 3 then
@@ -110,7 +110,7 @@ function event_outgoing_text(original,modified)
 	if command == '/raw' then
 		return _raw.table.concat(splitline,' ',2,#splitline)
 	elseif command_list[command] and temptarg and validabils[language][abil] and not midaction then
-		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) modified: '..modified) end
+		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) temp_mod: '..temp_mod) end
 		refresh_globals()
 			
 		send_command('@wait 1;lua invoke gearswap midact')
@@ -144,7 +144,7 @@ function event_outgoing_text(original,modified)
 
 		return ''
 	elseif command_list[command] == 'Ranged Attack' and temptarg and not midaction then
-		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) modified: '..modified) end
+		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) temp_mod: '..temp_mod) end
 		refresh_globals()
 
 		rline = ranged_line
@@ -159,7 +159,7 @@ function event_outgoing_text(original,modified)
 
 		return ''
 	elseif midaction and validabils[language][tostring(abil):lower()] then
-		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(122) Canceled: '..modified) end
+		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(122) Canceled: '..temp_mod) end
 		return ''
 	end
 	return modified
