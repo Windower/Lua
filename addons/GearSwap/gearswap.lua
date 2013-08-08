@@ -69,7 +69,13 @@ function event_addon_command(...)
 				break
 			end
 		end
-		
+	elseif splitup[1]:lower() == 'disable' then
+		gearswap_disabled = not gearswap_disabled
+		if gearswap_diabled then
+			write('GearSwap Disabled')
+		else
+			write('GearSwap Enabled')
+		end
 	elseif splitup[1]:lower() == 'reload' then
 		refresh_user_env()
 	elseif strip(splitup[1]) == 'debugmode' then
