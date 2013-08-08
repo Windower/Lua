@@ -71,7 +71,7 @@ function event_addon_command(...)
 		end
 	elseif splitup[1]:lower() == 'disable' then
 		gearswap_disabled = not gearswap_disabled
-		if gearswap_diabled then
+		if gearswap_disabled then
 			write('GearSwap Disabled')
 		else
 			write('GearSwap Enabled')
