@@ -28,17 +28,18 @@ end
 ---- variables.
 -----------------------------------------------------------------------------------
 function load_user_files()
-	if not file_exists(lua_base_path..'data/'..player['name']..'_'..player.main_job..'.lua') then
-		user_env = nil
-		current_job_file = nil
-		return
-	end
-	
 	if user_env then
 		if type(user_env.file_unload)=='function' then user_env.file_unload()
 		elseif user_env.file_unload then
 			add_to_chat(123,'GearSwap: file_unload() is not a function')
 		end
+	end
+	user_env = nil
+	
+	if not file_exists(lua_base_path..'data/'..player['name']..'_'..player.main_job..'.lua') then
+		user_env = nil
+		current_job_file = nil
+		return
 	end
 	user_env = {gearswap = _G, _global = _global,
 		-- Player functions

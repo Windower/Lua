@@ -233,7 +233,8 @@ function event_outgoing_chunk(id,data)
 end
 
 function event_action(act)
-	if gearswap_disabled then return end
+	if gearswap_disabled or act_category == 1 then return end
+	
 	refresh_player()
 	local prefix = ''
 	
@@ -241,7 +242,7 @@ function event_action(act)
 		prefix = 'pet_'
 	end
 	
-	if (player['id'] ~= act['actor_id'] and pet['id']~=act['actor_id']) or act['category'] == 1 then
+	if (player['id'] ~= act['actor_id'] and pet['id']~=act['actor_id']) then
 		return -- If the action is not being used by the player, the pet, or is a melee attack then abort processing.
 	end
 	
