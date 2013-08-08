@@ -63,6 +63,7 @@ data.incoming[0x020] = {name='Item Update',         description='Info about item
 data.incoming[0x021] = {name='Trade Requested',     description='Sent when somebody offers to trade with you.'}
 data.incoming[0x022] = {name='Trade Action',        description='Sent whenever something happens with the trade window.'}
 data.incoming[0x025] = {name='Item Accepted',       description='Sent when the server will allow you to trade an item.'}
+data.incoming[0x026] = {name='Count to 80',         description='It counts to 80 and does not have any obvious function. May have something to do with populating inventory.'}
 data.incoming[0x028] = {name='Action',              description='Packet sent when an NPC is attacking.'}
 data.incoming[0x029] = {name='Action Message',      description='Packet sent for simple battle-related messages.'}
 data.incoming[0x02A] = {name='Resting Message',     description='Packet sent when you rest in Abyssea.'}
@@ -95,7 +96,7 @@ data.incoming[0x0AC] = {name='Ability List',        description='Packet that sho
 data.incoming[0x0B4] = {name='Seek AnonResp',       description='Server response sent after you put up party or anon flag.'}
 data.incoming[0x0C9] = {name='Show Equip',          description='Shows another player your equipment after using the Check command.'}
 data.incoming[0x0CC] = {name='Linkshell Message',   description='/lsmes text and headers.'}
-data.incoming[0x0CA] = {name='Show Bazaar Message', description='Shows another players bazaar message after using the Check command.'}
+data.incoming[0x0CA] = {name='Bazaar Message',      description='Shows another players bazaar message after using the Check command or sets your own on zoning.'}
 data.incoming[0x0D2] = {name='Found Item',          description='This command shows an item found on defeated mob.'}
 data.incoming[0x0DD] = {name='Alliance Update',     description='Alliance/party member info - zone, HP%, HP% etc.'}
 data.incoming[0x0DF] = {name='Char Update',         description='A packet sent from server which updates character HP, MP and TP.'}

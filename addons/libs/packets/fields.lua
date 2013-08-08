@@ -54,6 +54,14 @@ local function time(ts)
 	return os.date('%Y-%m-%dT%H:%M:%S'..timezone)
 end
 
+-- Client Leave
+fields.outgoing[0x00D] = L{
+	{ctype='unsigned char',     label='_unknown1'},                             --    4 -   4 -- Always 00?
+	{ctype='unsigned char',     label='_unknown2'},                             --    5 -   5 -- Always 00?
+	{ctype='unsigned char',     label='_unknown3'},                             --    6 -   6 -- Always 00?
+	{ctype='unsigned char',     label='_unknown4'},                             --    7 -   7 -- Always 00?
+}
+
 -- Standard Client
 fields.outgoing[0x015] = L{
 	{ctype='float',             label='X Position'},                            --    4 -   7
@@ -89,6 +97,18 @@ fields.outgoing[0x03A] = L{
 	{ctype='unsigned short',    label='_unknown2'},                             --    6 -   7
 }
 
+-- Equip
+fields.outgoing[0x050] = L{
+	{ctype='unsigned char',     label='Inventory ID'},                          --    4 -   4
+	{ctype='unsigned char',     label='Equip Slot'},                            --    5 -   5
+	{ctype='unsigned char',     label='_unknown1'},                             --    6 -   6
+	{ctype='unsigned char',     label='_unknown2'},                             --    7 -   7
+}
+
+-- Conquest (0x02 length)
+fields.outgoing[0x05A] = L{
+}
+
 -- Dialogue options
 fields.outgoing[0x05B] = L{
 	{ctype='unsigned int',      label='Player ID',          fn=id},             --    4 -   7
@@ -102,15 +122,7 @@ fields.outgoing[0x05B] = L{
 	{ctype='unsigned char',     label='_unknown5'},                             --   19 -  19
 }
 
--- Equip
-fields.outgoing[0x050] = L{
-	{ctype='unsigned char',     label='Inventory ID'},                          --    4 -   4
-	{ctype='unsigned char',     label='Equip Slot'},                            --    5 -   5
-	{ctype='unsigned char',     label='_unknown1'},                             --    6 -   6
-	{ctype='unsigned char',     label='_unknown2'},                             --    7 -   7
-}
-
--- Equipment Screen (0x02 length)
+-- Equipment Screen (0x02 length) -- Also observed when zoning
 fields.outgoing[0x061] = L{
 }
 
@@ -238,6 +250,62 @@ fields.incoming[0x017] = L{
 	{ctype='char*',             label='Message'},                               --   23 - 253   Message, occasionally terminated by spare 00 bytes.
 }
 
+-- Job Info
+fields.incoming[0x01B] = L{
+	{ctype='char[13]',          label='_unknown1'},                             --    4 -  16   Flags and junk, probably
+	{ctype='unsigned char',     label='WAR Level'},                             --   17 -  17
+	{ctype='unsigned char',     label='MNK Level'},                             --   18 -  18
+	{ctype='unsigned char',     label='WHM Level'},                             --   19 -  19
+	{ctype='unsigned char',     label='BLM Level'},                             --   20 -  20
+	{ctype='unsigned char',     label='RDM Level'},                             --   21 -  21
+	{ctype='unsigned char',     label='THF Level'},                             --   22 -  22
+	{ctype='unsigned char',     label='PLD Level'},                             --   23 -  23
+	{ctype='unsigned char',     label='DRK Level'},                             --   24 -  24
+	{ctype='unsigned char',     label='BST Level'},                             --   25 -  25
+	{ctype='unsigned char',     label='BRD Level'},                             --   26 -  26
+	{ctype='unsigned char',     label='RNG Level'},                             --   27 -  27
+	{ctype='unsigned char',     label='SAM Level'},                             --   28 -  28
+	{ctype='unsigned char',     label='NIN Level'},                             --   29 -  29
+	{ctype='unsigned char',     label='DRG Level'},                             --   30 -  30
+	{ctype='unsigned char',     label='SMN Level'},                             --   31 -  31
+	{ctype='unsigned short',    label='Base STR'},                              --   32 -  33
+	{ctype='unsigned short',    label='Base DEX'},                              --   34 -  35
+	{ctype='unsigned short',    label='Base VIT'},                              --   36 -  37
+	{ctype='unsigned short',    label='Base AGI'},                              --   38 -  39
+	{ctype='unsigned short',    label='Base INT'},                              --   40 -  41
+	{ctype='unsigned short',    label='Base MND'},                              --   42 -  43
+	{ctype='unsigned short',    label='Base CHR'},                              --   44 -  45
+	{ctype='char[14]',          label='_unknown2'},                             --   46 -  59   Flags and junk? Hard to say. All 0s observed.
+	{ctype='unsigned int',      label='Maximum HP'},                            --   60 -  63
+	{ctype='unsigned int',      label='Maximum MP'},                            --   64 -  67
+	{ctype='unsigned int',      label='Flags'},                                 --   68 -  71   Looks like a bunch of flags. Observed value if 01 00 00 00
+	{ctype='unsigned char',     label='_unknown4'},                             --   72 -  72   Potential flag to signal the starts of the stats section? Observed value of 01
+	{ctype='unsigned char',     label='WAR Level'},                             --   73 -  73
+	{ctype='unsigned char',     label='MNK Level'},                             --   74 -  74
+	{ctype='unsigned char',     label='WHM Level'},                             --   75 -  75
+	{ctype='unsigned char',     label='BLM Level'},                             --   76 -  76
+	{ctype='unsigned char',     label='RDM Level'},                             --   77 -  77
+	{ctype='unsigned char',     label='THF Level'},                             --   78 -  78
+	{ctype='unsigned char',     label='PLD Level'},                             --   79 -  79
+	{ctype='unsigned char',     label='DRK Level'},                             --   80 -  80
+	{ctype='unsigned char',     label='BST Level'},                             --   81 -  81
+	{ctype='unsigned char',     label='BRD Level'},                             --   82 -  82
+	{ctype='unsigned char',     label='RNG Level'},                             --   83 -  83
+	{ctype='unsigned char',     label='SAM Level'},                             --   84 -  84
+	{ctype='unsigned char',     label='NIN Level'},                             --   85 -  85
+	{ctype='unsigned char',     label='DRG Level'},                             --   86 -  86
+	{ctype='unsigned char',     label='SMN Level'},                             --   87 -  87
+	{ctype='unsigned char',     label='BLU Level'},                             --   88 -  88
+	{ctype='unsigned char',     label='COR Level'},                             --   89 -  89
+	{ctype='unsigned char',     label='PUP Level'},                             --   90 -  90
+	{ctype='unsigned char',     label='DNC Level'},                             --   91 -  91
+	{ctype='unsigned char',     label='SCH Level'},                             --   92 -  92
+	{ctype='unsigned char',     label='GEO Level'},                             --   93 -  93
+	{ctype='unsigned char',     label='RUN Level'},                             --   94 -  94
+	{ctype='unsigned char',     label='_unknown5'},                             --   95 -  95   Potential flag to signal the end of the stats section? Observed value of 01
+	{ctype='unsigned int',      label='_unknown6'},                             --   96 -  99   Observed value of 00 00 00 00
+}
+
 -- Item Assign
 fields.incoming[0x01F] = L{
 	{ctype='unsigned short',    label='_unknown1'},                             --    4 -   5
@@ -261,6 +329,13 @@ fields.incoming[0x02A] = L{
 	{ctype='unsigned short',    label='Player Index',       fn=index},          --   24 -  25
 	{ctype='unsigned short',    label='Message ID'},                            --   26 -  27   The high bit is occasionally set, though the reason for it is unclear.
 	{ctype='unsigned int',      label='_unknown1',          const=0x06000000},  --   28 -  31
+}
+
+-- Count to 80
+fields.incoming[0x026] = L{
+	{ctype='unsigned char',     label='_unknown1'           const=0x00},        --    4 -   4
+	{ctype='unsigned char',     label='Counter'},                               --    5 -   5   Varies sequentially between 0x01 and 0x50
+	{ctype='char[22]',          label='_unknown2'           const=0},           --    6 -  27
 }
 
 -- Synth Animation
@@ -348,10 +423,18 @@ fields.incoming[0x044] = L{
 
 -- Data Download 2
 fields.incoming[0x04F] = L{
-	{ctype='unsigned char',     label='_unknown1'},                             --    4 -   4
-	{ctype='unsigned char',     label='_unknown2'},                             --    5 -   5
-	{ctype='unsigned char',     label='_unknown3'},                             --    6 -   6
+	{ctype='unsigned char',     label='_unknown1'},                             --    4 -   4   Can contain inventory size (0x51)
+	{ctype='unsigned char',     label='_unknown2'},                             --    5 -   5   Can contain inventory size (0x51)
+	{ctype='unsigned char',     label='_unknown3'},                             --    6 -   6   Can contain inventory size (0x51)
 	{ctype='unsigned char',     label='_unknown4'},                             --    7 -   7
+}
+
+-- Data Download 2
+fields.incoming[0x04F] = L{
+	{ctype='unsigned char',     label='_unknown1'},                             --    4 -   4   Always 00?
+	{ctype='unsigned char',     label='_unknown2'},                             --    5 -   5   Always 00?
+	{ctype='unsigned char',     label='_unknown3'},                             --    6 -   6   Always 00?
+	{ctype='unsigned char',     label='_unknown4'},                             --    7 -   7   Always 00?
 }
 
 -- Equip
@@ -373,8 +456,8 @@ fields.incoming[0x051] = L{
 	{ctype='unsigned short',     label='_unknown5',         const=0x50},        --   14 -  15
 	{ctype='unsigned short',     label='_unknown6',         const=0x60},        --   16 -  17
 	{ctype='unsigned short',     label='_unknown7',         const=0x70},        --   18 -  19
-	{ctype='unsigned short',     label='_unknown8',         const=0x80},        --   20 -  21
-	{ctype='unsigned short',     label='_unknown9'},                            --   22 -  23
+	{ctype='unsigned short',     label='_unknown8',         const=0x80},        --   20 -  21   Observed to occasionally be FF FF. Significance is unclear
+	{ctype='unsigned short',     label='_unknown9'},                            --   22 -  23   Observed to occasionally be FF FF. Significance is unclear
 }
 
 -- Weather Change
@@ -383,6 +466,42 @@ fields.incoming[0x057] = L{
 	{ctype='unsigned char',     label='Weather ID'},                            --    8 -   8
 	{ctype='unsigned char',     label='_unknown1'},                             --    9 -   9
 	{ctype='unsigned short',    label='_unknown2'},                             --   10 -  11
+}
+
+-- Char Stats
+fields.incoming[0x061] = L{
+	{ctype='unsigned int',      label='_unknown1'},                             --    4 -   7
+	{ctype='unsigned int',      label='_unknown2'},                             --    8 -  11
+	{ctype='unsigned char',     label='_unknown3'},                             --   12 -  12   Observed to be 17
+	{ctype='unsigned char',     label='_unknown4'},                             --   13 -  13   Observed to be 01
+	{ctype='unsigned char',     label='_unknown5'},                             --   14 -  14   Observed to be 17
+	{ctype='unsigned char',     label='_unknown6'},                             --   15 -  15   Observed to be 01
+	{ctype='unsigned short',    label='_unknown7'},                             --   16 -  17   Observed to be 00 00
+	{ctype='unsigned short',    label='_unknown8'},                             --   18 -  19   Observed to be C2 01
+	{ctype='unsigned short',    label='Base STR'},                              --   20 -  21
+	{ctype='unsigned short',    label='Base DEX'},                              --   22 -  23
+	{ctype='unsigned short',    label='Base VIT'},                              --   24 -  25
+	{ctype='unsigned short',    label='Base AGI'},                              --   26 -  27
+	{ctype='unsigned short',    label='Base INT'},                              --   28 -  29
+	{ctype='unsigned short',    label='Base MND'},                              --   30 -  31
+	{ctype='unsigned short',    label='Base CHR'},                              --   32 -  33
+	{ctype='unsigned int',      label='_unknown9'},                             --   34 -  37   All 0s observed.
+	{ctype='unsigned int',      label='_unknown10'},                            --   38 -  41   All 0s observed.
+	{ctype='unsigned int',      label='_unknown11'},                            --   42 -  45   All 0s observed.
+	{ctype='unsigned short',    label='_unknown12'},                            --   46 -  47   All 0s observed.
+	{ctype='unsigned short',    label='_unknown13'},                            --   48 -  49   13 00 observed.
+	{ctype='unsigned short',    label='_unknown14'},                            --   50 -  51   14 00 observed.
+	{ctype='unsigned int',      label='_unknown15'},                            --   52 -  55   All 0s observed.
+	{ctype='unsigned int',      label='_unknown16'},                            --   56 -  59   All 0s observed.
+	{ctype='unsigned int',      label='_unknown17'},                            --   60 -  63   All 0s observed.
+	{ctype='unsigned int',      label='_unknown18'},                            --   64 -  67   All 0s observed.
+	{ctype='unsigned short',    label='_unknown19'},                            --   68 -  69   Observed to be C6 01, the same as bytes 144-145 of Bazaar Message
+	{ctype='unsigned short',    label='_unknown20'},                            --   70 -  71
+	{ctype='unsigned int',      label='_unknown21'},                            --   72 -  75   Looks like it might be flags. F0 0F 01 01 observed.
+	{ctype='unsigned short',    label='_unknown22'},                            --   76 -  77
+	{ctype='unsigned short',    label='_unknown23'},                            --   78 -  79
+	{ctype='unsigned short',    label='_unknown24'},                            --   80 -  81
+	{ctype='unsigned short',    label='_unknown25'},                            --   82 -  83   00 00 observed.
 }
 
 -- Unnamed 0x067
@@ -405,17 +524,46 @@ fields.incoming[0x0CC] = L{
 	{ctype='char[16]',          label='Linkshell Name'},                        --  160 - 175   6-bit packed
 }
 
+-- Bazaar Message
+fields.incoming[0x0CA] = L{
+	{ctype='int',               label='_unknown1'},                             --    4 -   7   Could be characters starting the line - FD 02 02 18 observed
+	{ctype='unsigned short',    label='_unknown2'},                             --    8 -   9   Could also be characters starting the line - 01 FD observed
+	{ctype='char[118]',         label='Bazaar Message'},                        --   10 - 127   Terminated with a vertical tab
+	{ctype='char[16]',          label='Player Name'},                           --  128 - 143
+	{ctype='unsigned short',    label='_unknown3'},                             --  144 - 145   C6 01 observed. Not player index.
+	{ctype='unsigned short',    label='_unknown4'},                             --  146 - 147   00 00 observed.
+}
+
 -- Char Update
 fields.incoming[0x0DF] = L{
 	{ctype='unsigned int',      label='ID',                 fn=id},             --    4 -   7
 	{ctype='unsigned int',      label='HP'},                                    --    8 -  11
 	{ctype='unsigned int',      label='MP'},                                    --   12 -  15
 	{ctype='unsigned int',      label='TP'},                                    --   16 -  19   Truncated, does not include the decimal value.
-	{ctype='unsigned short',    label='Player Index'},                          --   20 -  21
+	{ctype='unsigned short',    label='Player Index'},      fn=index},          --   20 -  21
 	{ctype='unsigned char',     label='HPP'},                                   --   22 -  22
 	{ctype='unsigned char',     label='MPP'},                                   --   23 -  23
 	{ctype='unsigned short',    label='_unknown1'},                             --   24 -  25
 	{ctype='unsigned short',    label='_unknown2'},                             --   26 -  27
+}
+
+-- Char Info
+fields.incoming[0x0E2] = L{
+	{ctype='unsigned int',      label='ID',                 fn=id},             --    4 -   7
+	{ctype='unsigned int',      label='HP'},                                    --    8 -  11
+	{ctype='unsigned int',      label='MP'},                                    --   12 -  15
+	{ctype='unsigned int',      label='TP'},                                    --   16 -  19
+	{ctype='unsigned int',      label='_unknown1'},                             --   20 -  23   Looks like it could be flags for something.
+	{ctype='unsigned short',    label='Player Index'},      fn=index},          --   24 -  25
+	{ctype='unsigned char',     label='_unknown2'},                             --   26 -  26
+	{ctype='unsigned char',     label='_unknown3'},                             --   27 -  27
+	{ctype='unsigned char',     label='_unknown4'},                             --   28 -  28
+	{ctype='unsigned char',     label='HPP'},                                   --   29 -  29
+	{ctype='unsigned char',     label='MPP'},                                   --   30 -  30
+	{ctype='unsigned char',     label='_unknown5'},                             --   31 -  31
+	{ctype='unsigned char',     label='_unknown6'},                             --   32 -  32
+	{ctype='unsigned char',     label='_unknown7'},                             --   32 -  33   Could be an initialization for the name. 0x01 observed.
+	{ctype='char[10]',          label='Player Name'},                           --   34 -  34   Maybe a base stat
 }
 
 -- Widescan Mob
