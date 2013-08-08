@@ -280,8 +280,10 @@ function refresh_user_env()
 			gearswap_disabled = true
 			sets = nil
 			user_env = nil
+			return
 		end
-	elseif not user_env then
+	end
+	if not user_env then
 		gearswap_disabled = true
 		sets = nil
 	else
