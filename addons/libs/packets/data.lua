@@ -83,6 +83,7 @@ data.incoming[0x050] = {name='Equip',               description='Updates the cha
 data.incoming[0x051] = {name='Data Download 3',     description='Info about equipment and appearance.'}
 data.incoming[0x052] = {name='NPC Release',         description='Allows your PC to move after interacting with an NPC.'}
 data.incoming[0x053] = {name='Logout Time',         description='The annoying message that tells how much time till you logout.'}
+data.incoming[0x056] = {name='Quest/Mission Log',   description='Updates your quest and mission log on zone and when appropriate.'}
 data.incoming[0x057] = {name='Weather Change',      description='Updates the weather effect when the weather changes.'}
 data.incoming[0x058] = {name='Lock Target',         description='Locks your target.'}
 data.incoming[0x05A] = {name='Server Emote',        description='This packet is the server\'s response to a client /emote p.'}

@@ -252,7 +252,13 @@ fields.incoming[0x017] = L{
 
 -- Job Info
 fields.incoming[0x01B] = L{
-	{ctype='char[13]',          label='_unknown1'},                             --    4 -  16   Flags and junk, probably
+	{ctype='unsigned int',      label='_unknown1'},                             --    4 -   7   Observed value of 05
+	{ctype='unsigned char',     label='Main Job ID'},                           --    8 -   8
+	{ctype='unsigned char',     label='Flag or Main Job Level?'},               --    9 -   9
+	{ctype='unsigned char',     label='Flag or Sub Job Level?'},                --   10 -  10
+	{ctype='unsigned char',     label='Sub Job ID'},                            --   11 -  11
+	{ctype='unsigned int',      label='_unknown2'},                             --   12 -  15   Flags -- FF FF FF 00 observed
+	{ctype='unsigned char',     label='_unknown3'},                             --   16 -  16   Flag or List Start
 	{ctype='unsigned char',     label='WAR Level'},                             --   17 -  17
 	{ctype='unsigned char',     label='MNK Level'},                             --   18 -  18
 	{ctype='unsigned char',     label='WHM Level'},                             --   19 -  19
@@ -275,11 +281,11 @@ fields.incoming[0x01B] = L{
 	{ctype='unsigned short',    label='Base INT'},                              --   40 -  41
 	{ctype='unsigned short',    label='Base MND'},                              --   42 -  43
 	{ctype='unsigned short',    label='Base CHR'},                              --   44 -  45
-	{ctype='char[14]',          label='_unknown2'},                             --   46 -  59   Flags and junk? Hard to say. All 0s observed.
+	{ctype='char[14]',          label='_unknown4'},                             --   46 -  59   Flags and junk? Hard to say. All 0s observed.
 	{ctype='unsigned int',      label='Maximum HP'},                            --   60 -  63
 	{ctype='unsigned int',      label='Maximum MP'},                            --   64 -  67
 	{ctype='unsigned int',      label='Flags'},                                 --   68 -  71   Looks like a bunch of flags. Observed value if 01 00 00 00
-	{ctype='unsigned char',     label='_unknown4'},                             --   72 -  72   Potential flag to signal the starts of the stats section? Observed value of 01
+	{ctype='unsigned char',     label='_unknown5'},                             --   72 -  72   Potential flag to signal the list start. Observed value of 01
 	{ctype='unsigned char',     label='WAR Level'},                             --   73 -  73
 	{ctype='unsigned char',     label='MNK Level'},                             --   74 -  74
 	{ctype='unsigned char',     label='WHM Level'},                             --   75 -  75
@@ -302,7 +308,7 @@ fields.incoming[0x01B] = L{
 	{ctype='unsigned char',     label='SCH Level'},                             --   92 -  92
 	{ctype='unsigned char',     label='GEO Level'},                             --   93 -  93
 	{ctype='unsigned char',     label='RUN Level'},                             --   94 -  94
-	{ctype='unsigned char',     label='_unknown5'},                             --   95 -  95   Potential flag to signal the end of the stats section? Observed value of 01
+	{ctype='unsigned char',     label='Current Monster Level'},                 --   95 -  95
 	{ctype='unsigned int',      label='_unknown6'},                             --   96 -  99   Observed value of 00 00 00 00
 }
 
@@ -350,7 +356,7 @@ fields.incoming[0x030] = L{
 
 -- Pet Stat
 fields.incoming[0x044] = L{
--- Packet 0x044 is sent twice in sequence when stats. This can be caused by anything from
+-- Packet 0x044 is sent twice in sequence when stats could change. This can be caused by anything from
 -- using a Maneuver on PUP to changing job. The two packets are the same length. The first
 -- contains information about your main job. The second contains information about your
 -- subjob and has the Subjob flag flipped. Below is mostly for PUP.
@@ -470,14 +476,14 @@ fields.incoming[0x057] = L{
 
 -- Char Stats
 fields.incoming[0x061] = L{
-	{ctype='unsigned int',      label='_unknown1'},                             --    4 -   7
-	{ctype='unsigned int',      label='_unknown2'},                             --    8 -  11
-	{ctype='unsigned char',     label='_unknown3'},                             --   12 -  12   Observed to be 17
-	{ctype='unsigned char',     label='_unknown4'},                             --   13 -  13   Observed to be 01
-	{ctype='unsigned char',     label='_unknown5'},                             --   14 -  14   Observed to be 17
-	{ctype='unsigned char',     label='_unknown6'},                             --   15 -  15   Observed to be 01
-	{ctype='unsigned short',    label='_unknown7'},                             --   16 -  17   Observed to be 00 00
-	{ctype='unsigned short',    label='_unknown8'},                             --   18 -  19   Observed to be C2 01
+	{ctype='unsigned int',      label='Maximum HP'},                            --    4 -   7
+	{ctype='unsigned int',      label='Maximum MP'},                            --    8 -  11
+	{ctype='unsigned char',     label='Main Job ID'},                           --   12 -  12
+	{ctype='unsigned char',     label='Main Job Level'},                        --   13 -  13
+	{ctype='unsigned char',     label='Sub Job ID'},                            --   14 -  14
+	{ctype='unsigned char',     label='Sub Job Level'},                         --   15 -  15
+	{ctype='unsigned short',    label='EXP into current level'},                --   16 -  17
+	{ctype='unsigned short',    label='EXP for next level'},                    --   18 -  19
 	{ctype='unsigned short',    label='Base STR'},                              --   20 -  21
 	{ctype='unsigned short',    label='Base DEX'},                              --   22 -  23
 	{ctype='unsigned short',    label='Base VIT'},                              --   24 -  25
@@ -485,16 +491,23 @@ fields.incoming[0x061] = L{
 	{ctype='unsigned short',    label='Base INT'},                              --   28 -  29
 	{ctype='unsigned short',    label='Base MND'},                              --   30 -  31
 	{ctype='unsigned short',    label='Base CHR'},                              --   32 -  33
-	{ctype='unsigned int',      label='_unknown9'},                             --   34 -  37   All 0s observed.
-	{ctype='unsigned int',      label='_unknown10'},                            --   38 -  41   All 0s observed.
-	{ctype='unsigned int',      label='_unknown11'},                            --   42 -  45   All 0s observed.
-	{ctype='unsigned short',    label='_unknown12'},                            --   46 -  47   All 0s observed.
-	{ctype='unsigned short',    label='_unknown13'},                            --   48 -  49   13 00 observed.
-	{ctype='unsigned short',    label='_unknown14'},                            --   50 -  51   14 00 observed.
-	{ctype='unsigned int',      label='_unknown15'},                            --   52 -  55   All 0s observed.
-	{ctype='unsigned int',      label='_unknown16'},                            --   56 -  59   All 0s observed.
-	{ctype='unsigned int',      label='_unknown17'},                            --   60 -  63   All 0s observed.
-	{ctype='unsigned int',      label='_unknown18'},                            --   64 -  67   All 0s observed.
+	{ctype='unsigned short',    label='Added STR'},                             --   34 -  35
+	{ctype='unsigned short',    label='Added DEX'},                             --   36 -  37
+	{ctype='unsigned short',    label='Added VIT'},                             --   38 -  39
+	{ctype='unsigned short',    label='Added AGI'},                             --   40 -  41
+	{ctype='unsigned short',    label='Added INT'},                             --   42 -  43
+	{ctype='unsigned short',    label='Added MND'},                             --   44 -  45
+	{ctype='unsigned short',    label='Added CHR'},                             --   46 -  47
+	{ctype='unsigned short',    label='Attack'},                                --   48 -  49
+	{ctype='unsigned short',    label='Defense'},                               --   50 -  51
+	{ctype='unsigned short',    label='Fire Resistance'},                       --   52 -  53
+	{ctype='unsigned short',    label='Wind Resistance'},                       --   54 -  55
+	{ctype='unsigned short',    label='Thunder Resistance'},                    --   56 -  57
+	{ctype='unsigned short',    label='Light Resistance'},                      --   58 -  59
+	{ctype='unsigned short',    label='Ice Resistance'},                        --   60 -  61
+	{ctype='unsigned short',    label='Earth Resistance'},                      --   62 -  63
+	{ctype='unsigned short',    label='Water Resistance'},                      --   64 -  65
+	{ctype='unsigned short',    label='Dark Resistance'},                       --   66 -  67
 	{ctype='unsigned short',    label='_unknown19'},                            --   68 -  69   Observed to be C6 01, the same as bytes 144-145 of Bazaar Message
 	{ctype='unsigned short',    label='_unknown20'},                            --   70 -  71
 	{ctype='unsigned int',      label='_unknown21'},                            --   72 -  75   Looks like it might be flags. F0 0F 01 01 observed.
