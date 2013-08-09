@@ -339,9 +339,9 @@ fields.incoming[0x02A] = L{
 
 -- Count to 80
 fields.incoming[0x026] = L{
-	{ctype='unsigned char',     label='_unknown1'           const=0x00},        --    4 -   4
+	{ctype='unsigned char',     label='_unknown1',          const=0x00},        --    4 -   4
 	{ctype='unsigned char',     label='Counter'},                               --    5 -   5   Varies sequentially between 0x01 and 0x50
-	{ctype='char[22]',          label='_unknown2'           const=0},           --    6 -  27
+	{ctype='char[22]',          label='_unknown2',          const=0},           --    6 -  27
 }
 
 -- Synth Animation
@@ -553,7 +553,7 @@ fields.incoming[0x0DF] = L{
 	{ctype='unsigned int',      label='HP'},                                    --    8 -  11
 	{ctype='unsigned int',      label='MP'},                                    --   12 -  15
 	{ctype='unsigned int',      label='TP'},                                    --   16 -  19   Truncated, does not include the decimal value.
-	{ctype='unsigned short',    label='Player Index'},      fn=index},          --   20 -  21
+	{ctype='unsigned short',    label='Player Index',       fn=index},          --   20 -  21
 	{ctype='unsigned char',     label='HPP'},                                   --   22 -  22
 	{ctype='unsigned char',     label='MPP'},                                   --   23 -  23
 	{ctype='unsigned short',    label='_unknown1'},                             --   24 -  25
@@ -567,7 +567,7 @@ fields.incoming[0x0E2] = L{
 	{ctype='unsigned int',      label='MP'},                                    --   12 -  15
 	{ctype='unsigned int',      label='TP'},                                    --   16 -  19
 	{ctype='unsigned int',      label='_unknown1'},                             --   20 -  23   Looks like it could be flags for something.
-	{ctype='unsigned short',    label='Player Index'},      fn=index},          --   24 -  25
+	{ctype='unsigned short',    label='Player Index',       fn=index},          --   24 -  25
 	{ctype='unsigned char',     label='_unknown2'},                             --   26 -  26
 	{ctype='unsigned char',     label='_unknown3'},                             --   27 -  27
 	{ctype='unsigned char',     label='_unknown4'},                             --   28 -  28
