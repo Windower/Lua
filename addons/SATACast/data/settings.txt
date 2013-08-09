@@ -1,0 +1,16 @@
+Release Date: 9:00 PM, 4-01-13.
+Author Comment: This document is whitespace sensitive, which means that you need the same number of spaces between things as exist in this initial settings file.
+Author Comment: It looks at the first two words separated by spaces and then takes anything as the value in question if the first two words are relevant.
+Author Comment: If you ever mess it up so that it does not work, you can just delete it and SATACast will regenerate it upon reload.
+Author Comment: For the output customization lines, simply place the name of the spellcast set for each setting exactly how it is spelled in spellcast.
+Author Comment: The design of the settings file is credited to Byrthnoth as well as the creation of the settings file.
+
+
+
+Fill In Settings Below:
+SA Set: SneakAttack
+TA Set: TrickAttack
+SATA Set: SATA
+TP Set: TP
+Idle Set: Movement
+

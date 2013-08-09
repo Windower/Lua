@@ -1,0 +1,3076 @@
+﻿<?xml version="1.0"?>
+
+<mabils>
+ <m id="0" english="#0"/>
+ <m id="1" english="Foot Kick"/>
+ <m id="2" english="Dust Cloud" targetstatus="5"/>
+ <m id="3" english="Whirl Claws"/>
+ <m id="4" english="Lamb Chop"/>
+ <m id="5" english="Rage" actorstatus="55"/>
+ <m id="6" english="Sheep Charge"/>
+ <m id="7" english="Sheep Bleat"/>
+ <m id="8" english="Sheep Song" targetstatus="2"/>
+ <m id="9" english="Rage" actorstatus="55"/>
+ <m id="10" english="Ram Charge"/>
+ <m id="11" english="Rumble" targetstatus="148"/>
+ <m id="12" english="Great Bleat" targetstatus="144"/>
+ <m id="13" english="Petribreath" targetstatus="7"/>
+ <m id="14" english="Roar" targetstatus="4"/>
+ <m id="15" english="Razor Fang"/>
+ <m id="16" english="Ranged Attack"/>
+ <m id="17" english="Claw Cyclone"/>
+ <m id="18" english="Sheep Charge"/>
+ <m id="19" english="Sandblast" targetstatus="5"/>
+ <m id="20" english="Sandpit" targetstatus="11"/>
+ <m id="21" english="Venom Spray" targetstatus="3"/>
+ <m id="22" english="Pit Ambush"/>
+ <m id="23" english="Mandibular Bite"/>
+ <m id="24" english="Sonic Wave" targetstatus="149"/>
+ <m id="25" english="Stomping"/>
+ <m id="26" english="Back Kick"/>
+ <m id="27" english="Spinning Tail"/>
+ <m id="28" english="Cold Stare" targetstatus="6"/>
+ <m id="29" english="Whistle" actorstatus="83"/>
+ <m id="30" english="Berserk" actorstatus="56"/>
+ <m id="31" english="Healing Breeze"/>
+ <m id="32" english="Vicious Claw"/>
+ <m id="33" english="Stone Throw" targetstatus="4"/>
+ <m id="34" english="Spinning Claw"/>
+ <m id="35" english="Claw Storm"/>
+ <m id="36" english="Blank Gaze"/>
+ <m id="37" english="Whistle Call"/>
+ <m id="38" english="Eye Scratch" targetstatus="5"/>
+ <m id="39" english="Magic Fruit"/>
+ <m id="40" english="Drill Branch" targetstatus="5"/>
+ <m id="41" english="Pinecone Bomb" targetstatus="2"/>
+ <m id="42" english="Leafstorm"/>
+ <m id="43" english="Entangle" targetstatus="11"/>
+ <m id="44" english="Head Butt" targetstatus="10"/>
+ <m id="45" english="Dream Flower" targetstatus="2"/>
+ <m id="46" english="Wild Oats" targetstatus="138"/>
+ <m id="47" english="Hundred Fists" targetstatus="46"/>
+ <m id="48" english="Photosynthesis" actorstatus="42"/>
+ <m id="49" english="Leaf Dagger" targetstatus="3"/>
+ <m id="50" english="Scream" targetstatus="141"/>
+ <m id="51" english="Substitute"/>
+ <m id="52" english="Frogkick"/>
+ <m id="53" english="Spore" targetstatus="4"/>
+ <m id="54" english="Queasyshroom" targetstatus="3"/>
+ <m id="55" english="Numbshroom" targetstatus="4"/>
+ <m id="56" english="Shakeshroom" targetstatus="8"/>
+ <m id="57" english="Counterspore"/>
+ <m id="58" english="Silence Gas" targetstatus="6"/>
+ <m id="59" english="Dark Spore" targetstatus="5"/>
+ <m id="60" english="Impale" targetstatus="4"/>
+ <m id="61" english="Vampiric Lash"/>
+ <m id="62" english="Somersault"/>
+ <m id="63" english="Bad Breath" targetstatus="3,4,5,6,11,12,13"/>
+ <m id="64" english="Sweet Breath" targetstatus="2"/>
+ <m id="65" english="Needleshot"/>
+ <m id="66" english="1000 Needles"/>
+ <m id="67" english="Wild Carrot"/>
+ <m id="68" english="Photosynthesis" actorstatus="42"/>
+ <m id="69" english="Random Kiss"/>
+ <m id="70" english="Absorbing Kiss"/>
+ <m id="71" english="Deep Kiss"/>
+ <m id="72" english="Drill Branch" targetstatus="5"/>
+ <m id="73" english="Pinecone Bomb" targetstatus="2"/>
+ <m id="74" english="Shuffle"/>
+ <m id="75" english="Leafstorm" targetstatus="13"/>
+ <m id="76" english="Entangle" targetstatus="11"/>
+ <m id="77" english="Double Down"/>
+ <m id="78" english="Sharp Sting"/>
+ <m id="79" english="Pollen"/>
+ <m id="80" english="Final Sting"/>
+ <m id="81" english="Noisy Buzz"/>
+ <m id="82" english="Power Attack"/>
+ <m id="83" english="Hi-Freq Field" targetstatus="148"/>
+ <m id="84" english="Rhino Attack"/>
+ <m id="85" english="Rhino Guard" targetstatus="92"/>
+ <m id="86" english="Vulcanian Impact"/>
+ <m id="87" english="Spoil" targetstatus="136"/>
+ <m id="88" english="Sticky Thread" targetstatus="13"/>
+ <m id="89" english="Poison Breath" targetstatus="3"/>
+ <m id="90" english="Cocoon" actorstatus="93"/>
+ <m id="91" english="Velocious Blade"/>
+ <m id="92" english="Numbing Breath" targetstatus="4"/>
+ <m id="93" english="Cold Breath" targetstatus="11"/>
+ <m id="94" english="Mandible Bite"/>
+ <m id="95" english="Poison Sting" targetstatus="3"/>
+ <m id="96" english="Stunning Tail" targetstatus="10"/>
+ <m id="97" english="Death Scissors"/>
+ <m id="98" english="Wild Rage"/>
+ <m id="99" english="Earth Pounder" targetstatus="137"/>
+ <m id="100" english="Sharp Strike" actorstatus="91"/>
+ <m id="101" english="Heavy Blow"/>
+ <m id="102" english="Heavy Whisk"/>
+ <m id="103" english="Bionic Boost" actorstatus="61"/>
+ <m id="104" english="Flying Hip Press"/>
+ <m id="105" english="Earthshock" targetstatus="10"/>
+ <m id="106" english="Double Claw"/>
+ <m id="107" english="Grapple"/>
+ <m id="108" english="Filamented Hold" targetstatus="13"/>
+ <m id="109" english="Spinning Top"/>
+ <m id="110" english="Tail Blow" targetstatus="10"/>
+ <m id="111" english="Fireball"/>
+ <m id="112" english="Blockhead"/>
+ <m id="113" english="Brain Crush" targetstatus="6"/>
+ <m id="114" english="Baleful Gaze" targetstatus="7"/>
+ <m id="115" english="Plaguebreath" targetstatus="3"/>
+ <m id="116" english="Infrasonics" targetstatus="148"/>
+ <m id="117" english="Secretion" actorstatus="92"/>
+ <m id="118" english="Ripper Fang"/>
+ <m id="119" english="Backlash Tail"/>
+ <m id="120" english="Foul Breath" targetstatus="8"/>
+ <m id="121" english="Frost Breath" targetstatus="4"/>
+ <m id="122" english="Thunderbolt" targetstatus="10"/>
+ <m id="123" english="Chomp Rush" targetstatus="13"/>
+ <m id="124" english="Scythe Tail" targetstatus="10"/>
+ <m id="125" english="Chameleon Skin"/>
+ <m id="126" english="Tail Roll"/>
+ <m id="127" english="Tusk"/>
+ <m id="128" english="Scutum" actorstatus="93"/>
+ <m id="129" english="Bone Crunch" targetstatus="31"/>
+ <m id="130" english="Awful Eye" targetstatus="136"/>
+ <m id="131" english="Heavy Bellow" targetstatus="10"/>
+ <m id="132" english="Vanity Dive"/>
+ <m id="133" english="Empty Beleaguer"/>
+ <m id="134" english="Mirage" actorstatus="92"/>
+ <m id="135" english="Aura of Persistence" actorstatus="93"/>
+ <m id="136" english="Ultrasonics" targetstatus="148"/>
+ <m id="137" english="Sonic Boom" targetstatus="147"/>
+ <m id="138" english="Blood Drain"/>
+ <m id="139" english="Jet Stream"/>
+ <m id="140" english="Smite of Fury"/>
+ <m id="141" english="Flurry of Rage"/>
+ <m id="142" english="Whispers of Ire"/>
+ <m id="143" english="Blind Vortex" targetstatus="5"/>
+ <m id="144" english="Giga Scream"/>
+ <m id="145" english="Dread Dive" targetstatus="10"/>
+ <m id="146" english="Feather Barrier" actorstatus="92"/>
+ <m id="147" english="Stormwind"/>
+ <m id="148" english="Smite of Rage"/>
+ <m id="149" english="Dire Whorl" targetstatus="10"/>
+ <m id="150" english="Hammer Beak"/>
+ <m id="151" english="Poison Pick" targetstatus="3"/>
+ <m id="152" english="Sound Vacuum" targetstatus="6"/>
+ <m id="153" english="Tail Rod"/>
+ <m id="154" english="Sound Blast" targetstatus="140"/>
+ <m id="155" english="Baleful Gaze" targetstatus="7"/>
+ <m id="156" english="Ranged Attack"/>
+ <m id="157" english="Eagle Eye Shot"/>
+ <m id="158" english="Suction" targetstatus="10"/>
+ <m id="159" english="Acid Mist" targetstatus="147"/>
+ <m id="160" english="Sand Breath" targetstatus="5"/>
+ <m id="161" english="Drainkiss"/>
+ <m id="162" english="Regeneration" actorstatus="42"/>
+ <m id="163" english="Scission Thrust"/>
+ <m id="164" english="TP Drainkiss"/>
+ <m id="165" english="MP Drainkiss"/>
+ <m id="166" english="Sonic Blade"/>
+ <m id="167" english="Brain Drain" targetstatus="140"/>
+ <m id="168" english="Full-force Blow"/>
+ <m id="169" english="Gastric Bomb" targetstatus="147"/>
+ <m id="170" english="Sandspin" targetstatus="146"/>
+ <m id="171" english="Tremors" targetstatus="137"/>
+ <m id="172" english="MP Absorption"/>
+ <m id="173" english="Sound Vacuum" targetstatus="6"/>
+ <m id="174" english="Buff Drain"/>
+ <m id="175" english="Fluid Spread"/>
+ <m id="176" english="Fluid Toss"/>
+ <m id="177" english="Digest"/>
+ <m id="178" english="Soporific" targetstatus="2"/>
+ <m id="179" english="Palsy Pollen" targetstatus="4"/>
+ <m id="180" english="Gloeosuccus" targetstatus="13"/>
+ <m id="181" english="Death Ray"/>
+ <m id="182" english="Hex Eye" targetstatus="4"/>
+ <m id="183" english="Petro Gaze" targetstatus="7"/>
+ <m id="184" english="Catharsis"/>
+ <m id="185" english="Microquake"/>
+ <m id="186" english="Bubble Shower" targetstatus="136"/>
+ <m id="187" english="Bubble Curtain" actorstatus="41"/>
+ <m id="188" english="Big Scissors"/>
+ <m id="189" english="Scissor Guard" actorstatus="93"/>
+ <m id="190" english="Intimidate" targetstatus="13"/>
+ <m id="191" english="Percussive Foin"/>
+ <m id="192" english="Metallic Body" actorstatus="37"/>
+ <m id="193" english="Intimidate" targetstatus="13"/>
+ <m id="194" english="Aqua Ball" targetstatus="136"/>
+ <m id="195" english="Splash Breath"/>
+ <m id="196" english="Screwdriver"/>
+ <m id="197" english="Water Wall" actorstatus="93"/>
+ <m id="198" english="Water Shield" actorstatus="92"/>
+ <m id="199" english="Aqua Lens"/>
+ <m id="200" english="Tentacle"/>
+ <m id="201" english="Gravity Wheel" targetstatus="12"/>
+ <m id="202" english="Ink Jet" targetstatus="5"/>
+ <m id="203" english="Hard Membrane" actorstatus="92"/>
+ <m id="204" english="Cross Attack"/>
+ <m id="205" english="Regeneration" actorstatus="42"/>
+ <m id="206" english="Maelstrom" targetstatus="136"/>
+ <m id="207" english="Whirlwind" targetstatus="138"/>
+ <m id="208" english="Psychomancy"/>
+ <m id="209" english="Howling" targetstatus="4"/>
+ <m id="210" english="Poison Breath" targetstatus="3"/>
+ <m id="211" english="Rot Gas" targetstatus="8"/>
+ <m id="212" english="Dirty Claw"/>
+ <m id="213" english="Shadow Claw" targetstatus="5"/>
+ <m id="214" english="Methane Breath"/>
+ <m id="215" english="Mind Wall" actorstatus="152"/>
+ <m id="216" english="Grave Reel"/>
+ <m id="217" english="Ectosmash"/>
+ <m id="218" english="Fear Touch" targetstatus="13"/>
+ <m id="219" english="Terror Touch" targetstatus="147"/>
+ <m id="220" english="Curse" targetstatus="20"/>
+ <m id="221" english="Dark Sphere" targetstatus="5"/>
+ <m id="222" english="Hell Slash"/>
+ <m id="223" english="Horror Cloud" targetstatus="13"/>
+ <m id="224" english="Petrifactive Breath" targetstatus="7"/>
+ <m id="225" english="Frenzied Rage" actorstatus="91"/>
+ <m id="226" english="Pounce"/>
+ <m id="227" english="Charged Whisker"/>
+ <m id="228" english="Black Cloud" targetstatus="5"/>
+ <m id="229" english="Blood Saber"/>
+ <m id="230" english="Whip Tongue"/>
+ <m id="231" english="Transmogrification"/>
+ <m id="232" english="Acid Breath" targetstatus="136"/>
+ <m id="233" english="Stinking Gas" targetstatus="138"/>
+ <m id="234" english="Undead Mold" targetstatus="8"/>
+ <m id="235" english="Call of the Grave" targetstatus="140"/>
+ <m id="236" english="Abyss Blast" targetstatus="5"/>
+ <m id="237" english="Rampant Gnaw" targetstatus="4"/>
+ <m id="238" english="Big Horn"/>
+ <m id="239" english="Snort"/>
+ <m id="240" english="Rabid Dance" actorstatus="92"/>
+ <m id="241" english="Lowing" targetstatus="31"/>
+ <m id="242" english="Triclip"/>
+ <m id="243" english="Back Swish"/>
+ <m id="244" english="Mow" targetstatus="3"/>
+ <m id="245" english="Frightful Roar" targetstatus="149"/>
+ <m id="246" english="Mortal Ray" targetstatus="15"/>
+ <m id="247" english="Unblest Armor" actorstatus="41"/>
+ <m id="248" english="Gas Shell" targetstatus="3"/>
+ <m id="249" english="Venom Shell" targetstatus="3"/>
+ <m id="250" english="Palsynyxis" targetstatus="4"/>
+ <m id="251" english="Painful Whip" targetstatus="4"/>
+ <m id="252" english="Suctorial Tentacle" targetstatus="3"/>
+ <m id="253" english="Self-Destruct"/>
+ <m id="254" english="Berserk" actorstatus="56"/>
+ <m id="255" english="Self-Destruct"/>
+ <m id="256" english="Heat Wave" targetstatus="128"/>
+ <m id="257" english="Smite of Rage"/>
+ <m id="258" english="Whirl of Rage" targetstatus="10"/>
+ <m id="259" english="Toxic Spit" targetstatus="3"/>
+ <m id="260" english="Geist Wall"/>
+ <m id="261" english="Numbing Noise" targetstatus="10"/>
+ <m id="262" english="Nimble Snap"/>
+ <m id="263" english="Cyclotail"/>
+ <m id="264" english="Double Ray"/>
+ <m id="265" english="Spinning Attack"/>
+ <m id="266" english="Spectral Barrier" actorstatus="152"/>
+ <m id="267" english="Mysterious Light" targetstatus="12"/>
+ <m id="268" english="Mind Drain" targetstatus="141"/>
+ <m id="269" english="Battery Charge"/>
+ <m id="270" english="Berserk" actorstatus="56"/>
+ <m id="271" english="Freeze Rush"/>
+ <m id="272" english="Cold Wave" targetstatus="129"/>
+ <m id="273" english="Hypothermal Combustion"/>
+ <m id="274" english="Memento Mori" actorstatus="190"/>
+ <m id="275" english="Silence Seal" targetstatus="6"/>
+ <m id="276" english="Envoutement" targetstatus="20"/>
+ <m id="277" english="Danse Macabre" targetstatus="17"/>
+ <m id="278" english="Kartstrahl" targetstatus="2"/>
+ <m id="279" english="Blitzstrahl" targetstatus="10"/>
+ <m id="280" english="Panzerfaust"/>
+ <m id="281" english="Berserk" actorstatus="68"/>
+ <m id="282" english="Panzerschreck"/>
+ <m id="283" english="Typhoon"/>
+ <m id="284" english="Tremorous Tread" targetstatus="10"/>
+ <m id="285" english="Gravity Field" targetstatus="13"/>
+ <m id="286" english="Empty Seed"/>
+ <m id="287" english="Meltdown"/>
+ <m id="288" english="Camisado"/>
+ <m id="289" english="Somnolence" targetstatus="12"/>
+ <m id="290" english="Noctoshield" actorstatus="116"/>
+ <m id="291" english="Ultimate Terror"/>
+ <m id="292" english="Blindeye" targetstatus="5"/>
+ <m id="293" english="Eyes On Me"/>
+ <m id="294" english="Hypnosis" targetstatus="2"/>
+ <m id="295" english="Mind Break" targetstatus="145"/>
+ <m id="296" english="Binding Wave" targetstatus="11"/>
+ <m id="297" english="Airy Shield" actorstatus="151"/>
+ <m id="298" english="Pet Charm" targetstatus="17"/>
+ <m id="299" english="Magic Barrier" actorstatus="152"/>
+ <m id="300" english="Dream Shroud" actorstatus="190,191"/>
+ <m id="301" english="Level 5 Petrify" targetstatus="7"/>
+ <m id="302" english="Nightmare" targetstatus="19"/>
+ <m id="303" english="Soul Drain"/>
+ <m id="304" english="Hecatomb Wave" targetstatus="5"/>
+ <m id="305" english="Electromagnetic Field"/>
+ <m id="306" english="Reactive Armor" actorstatus="34"/>
+ <m id="307" english="Demonic Howl" targetstatus="13"/>
+ <m id="308" english="Condemnation" targetstatus="10"/>
+ <m id="309" english="Quadrastrike"/>
+ <m id="310" english="Quadrastrike"/>
+ <m id="311" english="Sling Bomb"/>
+ <m id="312" english="Formation Attack"/>
+ <m id="313" english="Refueling" actorstatus="33"/>
+ <m id="314" english="Circle of Flames" targetstatus="12"/>
+ <m id="315" english="Self-Destruct"/>
+ <m id="316" english="Self-Destruct"/>
+ <m id="317" english="Self-Destruct"/>
+ <m id="318" english="Self-Destruct"/>
+ <m id="319" english="Self-Destruct"/>
+ <m id="320" english="Back Heel"/>
+ <m id="321" english="Jettatura" targetstatus="28"/>
+ <m id="322" english="Nihility Song"/>
+ <m id="323" english="Choke Breath" targetstatus="4,6"/>
+ <m id="324" english="Fantod" actorstatus="45"/>
+ <m id="325" english="Blow" targetstatus="10"/>
+ <m id="326" english="Cacodemonia" targetstatus="9"/>
+ <m id="327" english="Beatdown" targetstatus="11"/>
+ <m id="328" english="Uppercut"/>
+ <m id="329" english="Hekaton Punch"/>
+ <m id="330" english="Blank Gaze" targetstatus="4"/>
+ <m id="331" english="Antiphase" targetstatus="6"/>
+ <m id="332" english="Death Trap" targetstatus="3,10"/>
+ <m id="333" english="Mortal Ray" targetstatus="15"/>
+ <m id="334" english="Goblin Rush"/>
+ <m id="335" english="Bomb Toss"/>
+ <m id="336" english="Bomb Toss"/>
+ <m id="337" english="Berserk" actorstatus="56"/>
+ <m id="338" english="Vulcanian Impact"/>
+ <m id="339" english="Heat Wave" targetstatus="128"/>
+ <m id="340" english="Hellstorm"/>
+ <m id="341" english="Self-Destruct"/>
+ <m id="342" english="Berserk" actorstatus="56"/>
+ <m id="343" english="Arctic Impact"/>
+ <m id="344" english="Cold Wave" targetstatus="129"/>
+ <m id="345" english="Hiemal Storm"/>
+ <m id="346" english="Hypothermal Combustion"/>
+ <m id="347" english="Lateral Slash" targetstatus="149"/>
+ <m id="348" english="Throat Stab"/>
+ <m id="349" english="Aerial Wheel" targetstatus="10"/>
+ <m id="350" english="Shoulder Attack"/>
+ <m id="351" english="Slam Dunk" targetstatus="11"/>
+ <m id="352" english="Arm Block" actorstatus="93"/>
+ <m id="353" english="Battle Dance" targetstatus="137"/>
+ <m id="354" english="Nether Blast"/>
+ <m id="355" english="Ore Toss"/>
+ <m id="356" english="Head Butt" targetstatus="10"/>
+ <m id="357" english="Shell Bash" targetstatus="10"/>
+ <m id="358" english="Shell Guard" actorstatus="93"/>
+ <m id="359" english="Hellspin"/>
+ <m id="360" english="Ruinous Omen"/>
+ <m id="361" english="Feather Storm" targetstatus="3"/>
+ <m id="362" english="Double Kick" targetstatus="10"/>
+ <m id="363" english="Parry" actorstatus="93"/>
+ <m id="364" english="Sweep" targetstatus="10"/>
+ <m id="365" english="Snowball"/>
+ <m id="366" english="Helldive"/>
+ <m id="367" english="Wing Cutter"/>
+ <m id="368" english="(Vulture 1)"/>
+ <m id="369" english="(Vulture 2)"/>
+ <m id="370" english="(Vulture 3)"/>
+ <m id="371" english="(Vulture 4)"/>
+ <m id="372" english="Wild Horn"/>
+ <m id="373" english="Thunderbolt" targetstatus="10"/>
+ <m id="374" english="Kick Out" targetstatus="5"/>
+ <m id="375" english="Shock Wave"/>
+ <m id="376" english="Flame Armor" actorstatus="34"/>
+ <m id="377" english="Howl" actorstatus="68"/>
+ <m id="378" english="Meteor"/>
+ <m id="379" english="Burst"/>
+ <m id="380" english="Flame Arrow"/>
+ <m id="381" english="Firebomb"/>
+ <m id="382" english="Blastbomb" targetstatus="11"/>
+ <m id="383" english="Fountain"/>
+ <m id="384" english="Touchdown"/>
+ <m id="385" english="Recoil Dive"/>
+ <m id="386" english="Flame Breath"/>
+ <m id="387" english="Poison Breath" targetstatus="3"/>
+ <m id="388" english="Wind Breath"/>
+ <m id="389" english="Body Slam"/>
+ <m id="390" english="Heavy Stomp" targetstatus="6"/>
+ <m id="391" english="Chaos Blade" targetstatus="9"/>
+ <m id="392" english="Petro Eyes" targetstatus="7"/>
+ <m id="393" english="Voidsong"/>
+ <m id="394" english="Thornsong" actorstatus="153">
+ <m id="395" english="Lodesong" targetstatus="12"/>
+ <m id="396" english="Blaster" targetstatus="4"/>
+ <m id="397" english="Chaotic Eye" targetstatus="6"/>
+ <m id="398" english="Double Whammy"/>
+ <m id="399" english="Scurvy" targetstatus="31"/>
+ <m id="400" english="Guilded Torpor" targetstatus="2"/>
+ <m id="401" english="Calamitous Collapse"/>
+ <m id="402" english="Catapult"/>
+ <m id="403" english="Cursed Sphere"/>
+ <m id="404" english="Venom" targetstatus="3"/>
+ <m id="405" english="Snow Cloud" targetstatus="4"/>
+ <m id="406" english="Lightning Roar"/>
+ <m id="407" english="Ice Roar"/>
+ <m id="408" english="Impact Roar"/>
+ <m id="409" english="Grand Slam"/>
+ <m id="410" english="Power Attack"/>
+ <m id="411" english="Power Attack"/>
+ <m id="412" english="Kick Back"/>
+ <m id="413" english="Implosion"/>
+ <m id="414" english="Implosion"/>
+ <m id="415" english="Umbra Smash"/>
+ <m id="416" english="Giga Slash"/>
+ <m id="417" english="Dark Nova"/>
+ <m id="418" english="Crystal Shield" actorstatus="40"/>
+ <m id="419" english="Heavy Strike"/>
+ <m id="420" english="Ice Break" targetstatus="11"/>
+ <m id="421" english="Thunder Break" targetstatus="10"/>
+ <m id="422" english="Crystal Rain"/>
+ <m id="423" english="Crystal Weapon"/>
+ <m id="424" english="Crystal Weapon"/>
+ <m id="425" english="Crystal Weapon"/>
+ <m id="426" english="Crystal Weapon"/>
+ <m id="427" english="Bludgeon"/>
+ <m id="428" english="Deal Out"/>
+ <m id="429" english="Sprout Spin"/>
+ <m id="430" english="Slumber Powder" targetstatus="2"/>
+ <m id="431" english="Sprout Smack" targetstatus="13"/>
+ <m id="432" english="Mighty Strikes" actorstatus="44"/>
+ <m id="433" english="Benediction"/>
+ <m id="434" english="Hundred Fists" actorstatus="46"/>
+ <m id="435" english="Manafont" actorstatus="47"/>
+ <m id="436" english="Chainspell" actorstatus="48"/>
+ <m id="437" english="Perfect Dodge" actorstatus="49"/>
+ <m id="438" english="Invincible" actorstatus="50"/>
+ <m id="439" english="Blood Weapon" actorstatus="51"/>
+ <m id="440" english="Soul Voice" actorstatus="52"/>
+ <m id="441" english="Berserk" actorstatus="56"/>
+ <m id="442" english="Defender" actorstatus="57"/>
+ <m id="443" english="Aggressor" actorstatus="58"/>
+ <m id="444" english="Boost" actorstatus="45"/>
+ <m id="445" english="Focus" actorstatus="59"/>
+ <m id="446" english="Dodge" actorstatus="60"/>
+ <m id="447" english="Chakra"/>
+ <m id="448" english="Counterstance" actorstatus="61"/>
+ <m id="449" english="Hide" actorstatus="76"/>
+ <m id="450" english="Bash" targetstatus="10"/>
+ <m id="451" english="Sentinel" actorstatus="62"/>
+ <m id="452" english="Last Resort" actorstatus="64"/>
+ <m id="453" english="Souleater" actorstatus="63"/>
+ <m id="454" english="Charm" targetstatus="17"/>
+ <m id="455" english="Eagle Eye Shot"/>
+ <m id="456" english="Eagle Eye Shot"/>
+ <m id="457" english="Sharpshot" actorstatus="72"/>
+ <m id="458" english="Camouflage" actorstatus="77"/>
+ <m id="459" english="Barrage" actorstatus="73"/>
+ <m id="460" english="Shadowbind" targetstatus="11"/>
+ <m id="461" english="Venom Breath" targetstatus="3"/>
+ <m id="462" english="Jump"/>
+ <m id="463" english="Critical Bite"/>
+ <m id="464" english="Venom Sting" targetstatus="3"/>
+ <m id="465" english="Stasis" targetstatus="4"/>
+ <m id="466" english="Venom Storm" targetstatus="3"/>
+ <m id="467" english="Earthbreaker" targetstatus="10"/>
+ <m id="468" english="Evasion" actorstatus="92"/>
+ <m id="469" english="Impale" targetstatus="4"/>
+ <m id="470" english="Drain Whip" targetstatus="4"/>
+ <m id="471" english="Bad Breath" targetstatus="3,4,5,6,11,12,13"/>
+ <m id="472" english="Sweet Breath" targetstatus="2"/>
+ <m id="473" english="Death Trap" targetstatus="3,10"/>
+ <m id="474" english="Meikyo Shisui" actorstatus="54"/>
+ <m id="475" english="Mijin Gakure"/>
+ <m id="476" english="Call Wyvern"/>
+ <m id="477" english="Jump"/>
+ <m id="478" english="Astral Flow" actorstatus="55"/>
+ <m id="479" english="Eagle Eye Shot"/>
+ <m id="480" english="Eagle Eye Shot"/>
+ <m id="481" english="Eagle Eye Shot"/>
+ <m id="482" english="Eagle Eye Shot"/>
+ <m id="483" english="Eagle Eye Shot"/>
+ <m id="484" english="Familiar" targetstatus="17"/>
+ <m id="485" english="Quadratic Continuum"/>
+ <m id="486" english="Quadratic Continuum"/>
+ <m id="487" english="Quadratic Continuum"/>
+ <m id="488" english="Spirit Absorption"/>
+ <m id="489" english="Spirit Absorption"/>
+ <m id="490" english="Spirit Absorption"/>
+ <m id="491" english="Vanity Drive"/>
+ <m id="492" english="Vanity Drive"/>
+ <m id="493" english="Vanity Drive"/>
+ <m id="494" english="Stygian Flatus" targetstatus="4"/>
+ <m id="495" english="Stygian Flatus" targetstatus="4"/>
+ <m id="496" english="Promyvion Barrier" actorstatus="93"/>
+ <m id="497" english="Promyvion Barrier" actorstatus="93"/>
+ <m id="498" english="Promyvion Barrier" actorstatus="93"/>
+ <m id="499" english="Fission"/>
+ <m id="500" english="Level 5 Petrify" targetstatus="7"/>
+ <m id="501" english="Howl" actorstatus="68"/>
+ <m id="502" english="Howl" actorstatus="68"/>
+ <m id="503" english="Howl" actorstatus="68"/>
+ <m id="504" english="Howl" actorstatus="68"/>
+ <m id="505" english="Howl" actorstatus="68"/>
+ <m id="506" english="Howl" actorstatus="68"/>
+ <m id="507" english="Howl" actorstatus="68"/>
+ <m id="508" english="Howl" actorstatus="68"/>
+ <m id="509" english="Howl" actorstatus="68"/>
+ <m id="510" english="Howl" actorstatus="68"/>
+ <m id="511" english="Bow"/>
+ <m id="512" english="Jumping Strike"/>
+ <m id="513" english="Flying Punch"/>
+ <m id="514" english="Jumping Thrust"/>
+ <m id="515" english="Hydroball" targetstatus="136"/>
+ <m id="516" english="Hydroball" targetstatus="136"/>
+ <m id="517" english="Hydroball" targetstatus="136"/>
+ <m id="518" english="Bubble Armor" actorstatus="41"/>
+ <m id="519" english="Bubble Armor" actorstatus="41"/>
+ <m id="520" english="Bubble Armor" actorstatus="41"/>
+ <m id="521" english="Hydro Shot"/>
+ <m id="522" english="Hydro Shot"/>
+ <m id="523" english="Hydro Shot"/>
+ <m id="524" english="Spinning Fin" targetstatus="10"/>
+ <m id="525" english="Spinning Fin" targetstatus="10"/>
+ <m id="526" english="Spinning Fin" targetstatus="10"/>
+ <m id="527" english="Words of Bane" targetstatus="9"/>
+ <m id="528" english="Sigh" actorstatus="92"/>
+ <m id="529" english="Light of Penance" targetstatus="5,11"/>
+ <m id="530" english="Lateral Slash" targetstatus="149"/>
+ <m id="531" english="Vertical Slash" targetstatus="146"/>
+ <m id="532" english="Throat Stab"/>
+ <m id="533" english="Spikeball" targetstatus="3"/>
+ <m id="534" english="Shoulder Slam"/>
+ <m id="535" english="Magnetite Cloud" targetstatus="12"/>
+ <m id="536" english="Sandstorm" targetstatus="5"/>
+ <m id="537" english="Sand Veil" actorstatus="92"/>
+ <m id="538" english="Sand Shield" actorstatus="93"/>
+ <m id="539" english="Sand Trap" targetstatus="7"/>
+ <m id="540" english="Jamming Wave" targetstatus="6"/>
+ <m id="541" english="Deadly Hold"/>
+ <m id="542" english="Tail Swing" targetstatus="11"/>
+ <m id="543" english="Tail Smash"/>
+ <m id="544" english="Heat Breath"/>
+ <m id="545" english="Riddle" targetstatus="145"/>
+ <m id="546" english="Great Sandstorm" targetstatus="5"/>
+ <m id="547" english="Great Whirlwind" targetstatus="130"/>
+ <m id="548" english="Tortoise Song"/>
+ <m id="549" english="Head Butt" targetstatus="146"/>
+ <m id="550" english="Tortoise Stomp" targetstatus="149"/>
+ <m id="551" english="Harden Shell" actorstatus="93"/>
+ <m id="552" english="Earth Breath"/>
+ <m id="553" english="Aqua Breath"/>
+ <m id="554" english="Sickle Slash"/>
+ <m id="555" english="Acid Spray" targetstatus="3"/>
+ <m id="556" english="Spider Web" targetstatus="13"/>
+ <m id="557" english="Dispelling Wind"/>
+ <m id="558" english="Deadly Drive"/>
+ <m id="559" english="Wind Wall" actorstatus="92"/>
+ <m id="560" english="Fang Rush"/>
+ <m id="561" english="Dread Shriek" targetstatus="4"/>
+ <m id="562" english="Tail Crush" targetstatus="3"/>
+ <m id="563" english="Blizzard Breath"/>
+ <m id="564" english="Thunder Breath"/>
+ <m id="565" english="Radiant Breath" targetstatus="6,13"/>
+ <m id="566" english="Chaos Breath"/>
+ <m id="567" english="Fire Blade" actorstatus="94"/>
+ <m id="568" english="Frost Blade" actorstatus="95"/>
+ <m id="569" english="Wind Blade" actorstatus="96"/>
+ <m id="570" english="Earth Blade" actorstatus="97"/>
+ <m id="571" english="Lightning Blade" actorstatus="98"/>
+ <m id="572" english="Water Blade" actorstatus="99"/>
+ <m id="573" english="Great Wheel"/>
+ <m id="574" english="Light Blade"/>
+ <m id="575" english="Moonlit Charge" targetstatus="5"/>
+ <m id="576" english="Crescent Fang" targetstatus="4"/>
+ <m id="577" english="Lunar Cry" targetstatus="146,148"/>
+ <m id="578" english="Ecliptic Growl"/>
+ <m id="579" english="Lunar Roar"/>
+ <m id="580" english="Eclipse Bite"/>
+ <m id="581" english="Ecliptic Howl" actorstatus="90,92"/>
+ <m id="582" english="Howling Moon"/>
+ <m id="583" english="Howling Moon"/>
+ <m id="584" english="Punch"/>
+ <m id="585" english="Fire II"/>
+ <m id="586" english="Burning Strike"/>
+ <m id="587" english="Double Punch"/>
+ <m id="588" english="Crimson Roar" actorstatus="68"/>
+ <m id="589" english="Fire IV"/>
+ <m id="590" english="Flaming Crush"/>
+ <m id="591" english="Meteor Strike"/>
+ <m id="592" english="Inferno"/>
+ <m id="593" english="Rock Throw" targetstatus="13"/>
+ <m id="594" english="Stone II"/>
+ <m id="595" english="Rock Buster" targetstatus="11"/>
+ <m id="596" english="Megalith Throw" targetstatus="13"/>
+ <m id="597" english="Earthen Ward" actorstatus="37"/>
+ <m id="598" english="Stone IV"/>
+ <m id="599" english="Mountain Buster" targetstatus="11"/>
+ <m id="600" english="Geocrush" targetstatus="10"/>
+ <m id="601" english="Earthen Fury"/>
+ <m id="602" english="Barracuda Dive"/>
+ <m id="603" english="Water II"/>
+ <m id="604" english="Tail Whip" targetstatus="12"/>
+ <m id="605" english="Spring Water"/>
+ <m id="606" english="Slowga" targetstatus="13"/>
+ <m id="607" english="Water IV"/>
+ <m id="608" english="Spinning Dive"/>
+ <m id="609" english="Grand Fall"/>
+ <m id="610" english="Tidal Wave"/>
+ <m id="611" english="Claw"/>
+ <m id="612" english="Aero II"/>
+ <m id="613" english="Whispering Wind"/>
+ <m id="614" english="Hastega" actorstatus="33"/>
+ <m id="615" english="Aerial Armor" actorstatus="36"/>
+ <m id="616" english="Aero IV"/>
+ <m id="617" english="Predator Claws"/>
+ <m id="618" english="Wind Blade"/>
+ <m id="619" english="Aerial Blast"/>
+ <m id="620" english="Axe Kick"/>
+ <m id="621" english="Blizzard II"/>
+ <m id="622" english="Frost Armor" actorstatus="35"/>
+ <m id="623" english="Sleepga" targetstatus="2"/>
+ <m id="624" english="Double Slap"/>
+ <m id="625" english="Blizzard IV"/>
+ <m id="626" english="Rush"/>
+ <m id="627" english="Heavenly Strike"/>
+ <m id="628" english="Diamond Dust"/>
+ <m id="629" english="Shock Strike" targetstatus="10"/>
+ <m id="630" english="Thunder II"/>
+ <m id="631" english="Rolling Thunder" actorstatus="98"/>
+ <m id="632" english="Thunderspark" targetstatus="4"/>
+ <m id="633" english="Lightning Armor" actorstatus="38"/>
+ <m id="634" english="Thunder IV"/>
+ <m id="635" english="Chaotic Strike" targetstatus="10"/>
+ <m id="636" english="Thunderstorm"/>
+ <m id="637" english="Judgment Bolt"/>
+ <m id="638" english="Healing Breath"/>
+ <m id="639" english="Healing Breath II"/>
+ <m id="640" english="Healing Breath III"/>
+ <m id="641" english="Remove Poison"/>
+ <m id="642" english="Remove Blindness"/>
+ <m id="643" english="Remove Paralysis"/>
+ <m id="644" english="Flame Breath"/>
+ <m id="645" english="Frost Breath"/>
+ <m id="646" english="Gust Breath"/>
+ <m id="647" english="Sand Breath"/>
+ <m id="648" english="Lightning Breath"/>
+ <m id="649" english="Hydro Breath"/>
+ <m id="650" english="Healing Ruby"/>
+ <m id="651" english="Poison Nails" targetstatus="3"/>
+ <m id="652" english="Shining Ruby" actorstatus="40,41"/>
+ <m id="653" english="Glittering Ruby"/>
+ <m id="654" english="Meteorite"/>
+ <m id="655" english="Healing Ruby II"/>
+ <m id="656" english="Searing Light"/>
+ <m id="657" english="Inferno"/>
+ <m id="658" english="Earthen Fury"/>
+ <m id="659" english="Tidal Wave"/>
+ <m id="660" english="Aerial Blast"/>
+ <m id="661" english="Diamond Dust"/>
+ <m id="662" english="Judgment Bolt"/>
+ <m id="663" english="Searing Light"/>
+ <m id="664" english="Everyone's Grudge"/>
+ <m id="665" english="Everyone's Rancor"/>
+ <m id="666" english="Blind Vortex" targetstatus="5"/>
+ <m id="667" english="Giga Scream"/>
+ <m id="668" english="Dread Dive" targetstatus="10"/>
+ <m id="669" english="Feather Barrier" actorstatus="92"/>
+ <m id="670" english="Stormwind"/>
+ <m id="671" english="Drill Branch" targetstatus="5"/>
+ <m id="672" english="Pinecone Bomb" targetstatus="2"/>
+ <m id="673" english="Leafstorm"/>
+ <m id="674" english="Entangle" targetstatus="11"/>
+ <m id="675" english="Cross Reaver"/>
+ <m id="676" english="Havoc Spiral" targetstatus="2"/>
+ <m id="677" english="Dominion Slash" targetstatus="6"/>
+ <m id="678" english="Shield Strike" targetstatus="10"/>
+ <m id="679" english="Amon Drive" targetstatus="3,4,7"/>
+ <m id="680" english="Ark Guardian: Tarutaru"/>
+ <m id="681" english="Dragonfall" targetstatus="11"/>
+ <m id="682" english="Circle Blade"/>
+ <m id="683" english="Swift Blade"/>
+ <m id="684" english="Rampage"/>
+ <m id="685" english="Calamity"/>
+ <m id="686" english="Spirits Within"/>
+ <m id="687" english="Vorpal Blade"/>
+ <m id="688" english="Spinning Scythe"/>
+ <m id="689" english="Guillotine" targetstatus="6"/>
+ <m id="690" english="Tachi: Yukikaze" targetstatus="5"/>
+ <m id="691" english="Tachi: Gekko" targetstatus="6"/>
+ <m id="692" english="Tachi: Kasha" targetstatus="4"/>
+ <m id="693" english="Flame Blast"/>
+ <m id="694" english="Flame Blast"/>
+ <m id="695" english="Hurricane Wing" targetstatus="5"/>
+ <m id="696" english="Spike Flail"/>
+ <m id="697" english="Dragon Breath"/>
+ <m id="698" english="Touchdown"/>
+ <m id="699" english="Flame Blast"/>
+ <m id="700" english="Hurricane Wing" targetstatus="5"/>
+ <m id="701" english="Absolute Terror" targetstatus="28"/>
+ <m id="702" english="Horrid Roar"/>
+ <m id="703" english="Sickle Slash"/>
+ <m id="704" english="Acid Spray" targetstatus="3"/>
+ <m id="705" english="Spider Web" targetstatus="13"/>
+ <m id="706" english="Tarutaru Warp II"/>
+ <m id="707" english="Eald1"/>
+ <m id="708" english="Eald1"/>
+ <m id="709" english="Eald1"/>
+ <m id="710" english="Eald1"/>
+ <m id="711" english="Eald1"/>
+ <m id="712" english="Red Lotus Blade"/>
+ <m id="713" english="Flat Blade" targetstatus="10"/>
+ <m id="714" english="Savage Blade"/>
+ <m id="715" english="Royal Bash" targetstatus="10"/>
+ <m id="716" english="Royal Savior" actorstatus="40"/>
+ <m id="717" english="Red Lotus Blade"/>
+ <m id="718" english="Spirits Within"/>
+ <m id="719" english="Vorpal Blade"/>
+ <m id="720" english="Berserk-Ruf" actorstatus="68"/>
+ <m id="721" english="Warp"/>
+ <m id="722" english="Warp"/>
+ <m id="723" english="Power Slash"/>
+ <m id="724" english="Freezebite"/>
+ <m id="725" english="Ground Strike"/>
+ <m id="726" english="Abyssal Drain"/>
+ <m id="727" english="Abyssal Strike" targetstatus="10"/>
+ <m id="728" english="Electrocharge"/>
+ <m id="729" english="Stellar Burst" targetstatus="6"/>
+ <m id="730" english="Vortex" targetstatus="28"/>
+ <m id="731" english="Shockwave" targetstatus="2"/>
+ <m id="732" english="Eald2 Warp In"/>
+ <m id="733" english="Eald2 Warp Out"/>
+ <m id="734" english="Gaea Stream: Eta"/>
+ <m id="735" english="Uranos Cascade: Eta"/>
+ <m id="736" english="Cronos Sling: Eta"/>
+ <m id="737" english="Phase Shift" targetstatus="10,11"/>
+ <m id="738" english="Gaea Stream: Theta"/>
+ <m id="739" english="Uranos Cascade: Theta"/>
+ <m id="740" english="Cronos Sling: Theta"/>
+ <m id="741" english="Phase Shift" targetstatus="10,11"/>
+ <m id="742" english="Gaea Stream: Lambda"/>
+ <m id="743" english="Uranos Cascade: Lambda"/>
+ <m id="744" english="Cronos Sling: Lambda"/>
+ <m id="745" english="Phase Shift" targetstatus="10,11"/>
+ <m id="746" english="#746"/>
+ <m id="747" english="#747"/>
+ <m id="748" english="#748"/>
+ <m id="749" english="#749"/>
+ <m id="750" english="Omega Javelin" targetstatus="7"/>
+ <m id="751" english="#751"/>
+ <m id="752" english="Mighty Strikes" actorstatus="44"/>
+ <m id="753" english="Hundred Fists" actorstatus="46"/>
+ <m id="754" english="Benediction"/>
+ <m id="755" english="Manafont" actorstatus="47"/>
+ <m id="756" english="Chainspell" actorstatus="48"/>
+ <m id="757" english="Perfect Dodge" actorstatus="49"/>
+ <m id="758" english="Invincible" actorstatus="50"/>
+ <m id="759" english="Blood Weapon" actorstatus="51"/>
+ <m id="760" english="Familiar" targetstatus="17"/>
+ <m id="761" english="Call Beast"/>
+ <m id="762" english="Soul Voice" actorstatus="52"/>
+ <m id="763" english="Eagle Eye Shot"/>
+ <m id="764" english="Meikyo Shisui" actorstatus="54"/>
+ <m id="765" english="Mijin Gakure"/>
+ <m id="766" english="Call Wyvern"/>
+ <m id="767" english="Astral Flow" actorstatus="55"/>
+ <m id="768" english="Warp Out"/>
+ <m id="769" english="Warp In"/>
+ <m id="770" english="Arbor Storm" targetstatus="12"/>
+ <m id="771" english="Combo"/>
+ <m id="772" english="Tackle"/>
+ <m id="773" english="One-Inch Punch"/>
+ <m id="774" english="Backhand Blow" targetstatus="10"/>
+ <m id="775" english="Spinning Attack"/>
+ <m id="776" english="Howling Fist"/>
+ <m id="777" english="Dragon Kick"/>
+ <m id="778" english="Asuran Fists"/>
+ <m id="779" english="Heavy Strike"/>
+ <m id="780" english="Maat's Bash" targetstatus="10"/>
+ <m id="781" english="Fireball 1"/>
+ <m id="782" english="Fireball 2"/>
+ <m id="783" english="Hurricane Wing" targetstatus="5"/>
+ <m id="784" english="Spike Flail"/>
+ <m id="785" english="Dragon Breath"/>
+ <m id="786" english="Landing: to the surface"/>
+ <m id="787" english="Giant fireball: Flying"/>
+ <m id="788" english="Great wing gust: Flying"/>
+ <m id="789" english="Absolute Terror" targetstatus="28"/>
+ <m id="790" english="Horrid Roar"/>
+ <m id="791" english="Tortoise Song"/>
+ <m id="792" english="Head Butt" targetstatus="146"/>
+ <m id="793" english="Tortoise Stomp" targetstatus="149"/>
+ <m id="794" english="Harden Shell" actorstatus="93"/>
+ <m id="795" english="Earth Breath"/>
+ <m id="796" english="Aqua Breath"/>
+ <m id="797" english="#797"/>
+ <m id="798" english="(Sabotender Dustdevil)"/>
+ <m id="799" english="(Sabotender Duststop)"/>
+ <m id="800" english="Fanatic Dance" targetstatus="14"/>
+ <m id="801" english="Aerial Wheel" targetstatus="10"/>
+ <m id="802" english="Shoulder Attack"/>
+ <m id="803" english="Slam Dunk" targetstatus="11"/>
+ <m id="804" english="Arm Block" actorstatus="93"/>
+ <m id="805" english="Battle Dance" targetstatus="137"/>
+ <m id="806" english="Howl" targetstatus="68"/>
+ <m id="807" english="Bow"/>
+ <m id="808" english="Jump"/>
+ <m id="809" english="Eagle Eye Shot"/>
+ <m id="810" english="Fanatic Dance" targetstatus="14"/>
+ <m id="811" english="Doom" targetstatus="15"/>
+ <m id="812" english="Feather Storm" targetstatus="3"/>
+ <m id="813" english="Double Kick" targetstatus="10"/>
+ <m id="814" english="Parry" actorstatus="93"/>
+ <m id="815" english="Sweep" targetstatus="10"/>
+ <m id="816" english="Howl" actorstatus="68"/>
+ <m id="817" english="Doom" targetstatus="15"/>
+ <m id="818" english="The Wrath of Gu'Dha" targetstatus="12"/>
+ <m id="819" english="Ore Toss"/>
+ <m id="820" english="Head Butt" targetstatus="10"/>
+ <m id="821" english="Shell Bash" targetstatus="10"/>
+ <m id="822" english="Shell Guard" actorstatus="93"/>
+ <m id="823" english="Howl" actorstatus="68"/>
+ <m id="824" english="The Wrath of Gu'Dha" targetstatus="12"/>
+ <m id="825" english="Frypan" targetstatus="10"/>
+ <m id="826" english="Smokebomb" targetstatus="5"/>
+ <m id="827" english="Smokebomb" targetstatus="5"/>
+ <m id="828" english="Crispy Candle"/>
+ <m id="829" english="Crispy Candle"/>
+ <m id="830" english="Paralysis Shower" targetstatus="4"/>
+ <m id="831" english="Paralysis Shower" targetstatus="4"/>
+ <m id="832" english="Goblin Rush"/>
+ <m id="833" english="Bomb Toss"/>
+ <m id="834" english="Bomb Toss"/>
+ <m id="835" english="Eagle Eye Shot"/>
+ <m id="836" english="Frypan" targetstatus="10"/>
+ <m id="837" english="Smokebomb" targetstatus="5"/>
+ <m id="838" english="Smokebomb" targetstatus="5"/>
+ <m id="839" english="Crispy Candle"/>
+ <m id="840" english="Crispy Candle"/>
+ <m id="841" english="Paralysis Shower" targetstatus="4"/>
+ <m id="842" english="Paralysis Shower" targetstatus="4"/>
+ <m id="843" english="Goblin Dice"/>
+ <m id="844" english="Goblin Dice"/>
+ <m id="845" english="Goblin Dice"/>
+ <m id="846" english="Goblin Dice"/>
+ <m id="847" english="Goblin Dice"/>
+ <m id="848" english="Goblin Dice"/>
+ <m id="849" english="Goblin Dice"/>
+ <m id="850" english="Goblin Dice"/>
+ <m id="851" english="Goblin Dice"/>
+ <m id="852" english="Goblin Dice"/>
+ <m id="853" english="Goblin Dice"/>
+ <m id="854" english="Seismostomp" targetstatus="10"/>
+ <m id="855" english="Numbing Glare" targetstatus="4"/>
+ <m id="856" english="Seismostomp" targetstatus="10"/>
+ <m id="857" english="Tormentful Glare" targetstatus="9"/>
+ <m id="858" english="Seismostomp" targetstatus="10"/>
+ <m id="859" english="Torpid Glare" targetstatus="2"/>
+ <m id="860" english="Seismostomp" targetstatus="10"/>
+ <m id="861" english="Lead Breath" targetstatus="12"/>
+ <m id="862" english="Lead Breath" targetstatus="12"/>
+ <m id="863" english="Frag Bomb"/>
+ <m id="864" english="10,000 Needles"/>
+ <m id="865" english="Eagle Eye Shot"/>
+ <m id="866" english="Eagle Eye Shot"/>
+ <m id="867" english="Ore Toss"/>
+ <m id="868" english="#868"/>
+ <m id="869" english="#869"/>
+ <m id="870" english="#870"/>
+ <m id="871" english="Dynamic Implosion" targetstatus="10"/>
+ <m id="872" english="Transfusion"/>
+ <m id="873" english="Manastrom"/>
+ <m id="874" english="Dynamic Assault"/>
+ <m id="875" english="Violent Rupture" targetstatus="12"/>
+ <m id="876" english="Oblivion Smash" targetstatus="5,6,11,12"/>
+ <m id="877" english="Oblivion Smash" targetstatus="5,6,11,12"/>
+ <m id="878" english="Tera Slash" targetstatus="0"/>
+ <m id="879" english="Tera Slash" targetstatus="0"/>
+ <m id="880" english="Blindeye" targetstatus="5"/>
+ <m id="881" english="Eyes On Me"/>
+ <m id="882" english="Hypnosis" targetstatus="2"/>
+ <m id="883" english="Mind Break" targetstatus="145"/>
+ <m id="884" english="Binding Wave" targetstatus="11"/>
+ <m id="885" english="Airy Shield" actorstatus="151"/>
+ <m id="886" english="Pet Charm" targetstatus="17"/>
+ <m id="887" english="Magic Barrier" actorstatus="152"/>
+ <m id="888" english="Level 5 Petrify" targetstatus="7"/>
+ <m id="889" english="Soul Drain"/>
+ <m id="890" english="Hecatomb Wave" targetstatus="5"/>
+ <m id="891" english="Demonic Howl" targetstatus="13"/>
+ <m id="892" english="Condemnation" targetstatus="10"/>
+ <m id="893" english="Quadrastrike"/>
+ <m id="894" english="Quadrastrike"/>
+ <m id="895" english="Eagle Eye Shot"/>
+ <m id="896" english="Hecatomb Wave" targetstatus="5"/>
+ <m id="897" english="Eagle Eye Shot"/>
+ <m id="898" english="Ranged Attack"/>
+ <m id="899" english="Subsonics" targetstatus="149"/>
+ <m id="900" english="Marrow Drain"/>
+ <m id="901" english="Slipstream" targetstatus="146"/>
+ <m id="902" english="Turbulence"/>
+ <m id="903" english="Broadside Barrage" targetstatus="140,141"/>
+ <m id="904" english="Blind Side Barrage" targetstatus="136,138"/>
+ <m id="905" english="Damnation Dive"/>
+ <m id="906" english="Inferno"/>
+ <m id="907" english="Earthen Fury"/>
+ <m id="908" english="Tidal Wave"/>
+ <m id="909" english="Aerial Blast"/>
+ <m id="910" english="Diamond Dust"/>
+ <m id="911" english="Judgment Bolt"/>
+ <m id="912" english="Flame Breath"/>
+ <m id="913" english="Poison Breath" targetstatus="3"/>
+ <m id="914" english="Wind Breath"/>
+ <m id="915" english="Body Slam"/>
+ <m id="916" english="Heavy Stomp" targetstatus="6"/>
+ <m id="917" english="Chaos Blade" targetstatus="9"/>
+ <m id="918" english="Petro Eyes" targetstatus="7"/>
+ <m id="919" english="Voidsong"/>
+ <m id="920" english="Thornsong" actorstatus="153"/>
+ <m id="921" english="Lodesong" targetstatus="12"/>
+ <m id="922" english="Flame Breath"/>
+ <m id="923" english="Poison Breath" targetstatus="3"/>
+ <m id="924" english="Wind Breath"/>
+ <m id="925" english="Body Slam"/>
+ <m id="926" english="Heavy Stomp" targetstatus="6"/>
+ <m id="927" english="Chaos Blade" targetstatus="9"/>
+ <m id="928" english="Petro Eyes" targetstatus="7"/>
+ <m id="929" english="Voidsong"/>
+ <m id="930" english="Thornsong" actorstatus="153"/>
+ <m id="931" english="Lodesong" targetstatus="12"/>
+ <m id="932" english="Final Heaven"/>
+ <m id="933" english="Mercy Stroke"/>
+ <m id="934" english="Knights of Round"/>
+ <m id="935" english="Scourge"/>
+ <m id="936" english="Onslaught"/>
+ <m id="937" english="Metatron Torment"/>
+ <m id="938" english="Catastrophe"/>
+ <m id="939" english="Geirskogul"/>
+ <m id="940" english="Blade: Metsu"/>
+ <m id="941" english="Tachi: Kaiten"/>
+ <m id="942" english="Randgrith"/>
+ <m id="943" english="Gate of Tartarus"/>
+ <m id="944" english="Namas"/>
+ <m id="945" english="Coronach"/>
+ <m id="946" english="Ranged Attack"/>
+ <m id="947" english="Ranged Attack"/>
+ <m id="948" english="Ranged Attack"/>
+ <m id="949" english="Ranged Attack"/>
+ <m id="950" english="Ranged Attack"/>
+ <m id="951" english="Arrow Squall"/>
+ <m id="952" english="Arrow Squall"/>
+ <m id="953" english="Ranged Attack"/>
+ <m id="954" english="Ranged Attack"/>
+ <m id="955" english="Ranged Attack"/>
+ <m id="956" english="Ranged Attack"/>
+ <m id="957" english="Ranged Attack"/>
+ <m id="958" english="Ranged Attack"/>
+ <m id="959" english="Infernal Roulette"/>
+ <m id="960" english="Infernal Roulette"/>
+ <m id="961" english="Empty Cutter"/>
+ <m id="962" english="Vacuous Osculation" targetstatus="3,31"/>
+ <m id="963" english="Hexagon Belt" actorstatus="93"/>
+ <m id="964" english="Auroral Drape" targetstatus="5,6"/>
+ <m id="965" english="Memory of Fire"/>
+ <m id="966" english="Memory of Ice"/>
+ <m id="967" english="Memory of Wind"/>
+ <m id="968" english="Memory of Light"/>
+ <m id="969" english="Memory of Earth"/>
+ <m id="970" english="Memory of Lightning"/>
+ <m id="971" english="Memory of Water"/>
+ <m id="972" english="Memory of Dark"/>
+ <m id="973" english="Brain Spike" targetstatus="4"/>
+ <m id="974" english="Empty Thrash"/>
+ <m id="975" english="Promyvion Brume" targetstatus="3"/>
+ <m id="976" english="Murk" targetstatus="13"/>
+ <m id="977" english="Material Fend" targetstatus="92"/>
+ <m id="978" english="Carousel"/>
+ <m id="979" english="Pile Pitch" targetstatus="11"/>
+ <m id="980" english="Guided Missile" targetstatus="11"/>
+ <m id="981" english="Hyper Pulse" targetstatus="11,12"/>
+ <m id="982" english="Target Analysis"/>
+ <m id="983" english="Discharger" actorstatus="38,152"/>
+ <m id="984" english="Ion Efflux" targetstatus="4"/>
+ <m id="985" english="Rear Lasers" targetstatus="7"/>
+ <m id="986" english="Empty Cutter"/>
+ <m id="987" english="Negative Whirl" targetstatus="13"/>
+ <m id="988" english="Stygian Vapor" targetstatus="31"/>
+ <m id="989" english="Winds of Promyvion"/>
+ <m id="990" english="Spirit Absorption"/>
+ <m id="991" english="Binary Absorption"/>
+ <m id="992" english="Trinary Absorption"/>
+ <m id="993" english="Spirit Tap"/>
+ <m id="994" english="Binary Tap"/>
+ <m id="995" english="Trinary Tap"/>
+ <m id="996" english="Shadow Spread" targetstatus="2,5,9"/>
+ <m id="997" english="Vanity Strike" targetstatus="10"/>
+ <m id="998" english="Wanion"/>
+ <m id="999" english="Occultation" actorstatus="36"/>
+ <m id="1000" english="Empty Crush"/>
+ <m id="1001" english="Special Attack"/>
+ <m id="1002" english="Lamentation" targetstatus="134"/>
+ <m id="1003" english="Wire Cutter"/>
+ <m id="1004" english="Antimatter"/>
+ <m id="1005" english="Equalizer"/>
+ <m id="1006" english="Flame Thrower" targetstatus="31"/>
+ <m id="1007" english="Cryojet" targetstatus="4"/>
+ <m id="1008" english="Turbofan" targetstatus="6"/>
+ <m id="1009" english="Smoke Discharger" targetstatus="5"/>
+ <m id="1010" english="High-Tension Discharger" targetstatus="10"/>
+ <m id="1011" english="Hydro Cannon" targetstatus="3"/>
+ <m id="1012" english="Nuclear Waste"/>
+ <m id="1013" english="Chemical Bomb" targetstatus="13,194"/>
+ <m id="1014" english="Particle Shield" actorstatus="93"/>
+ <m id="1015" english="Empty Cutter"/>
+ <m id="1016" english="Negative Whirl" targetstatus="13"/>
+ <m id="1017" english="Winds of Promyvion"/>
+ <m id="1018" english="Impalement" targetstatus="13"/>
+ <m id="1019" english="Empty Thrash"/>
+ <m id="1020" english="Promyvion Brume" targetstatus="3"/>
+ <m id="1021" english="Inferno Blast"/>
+ <m id="1022" english="Inferno Blast"/>
+ <m id="1023" english="Tebbad Wing" targetstatus="31"/>
+ <m id="1024" english="Spike Flail"/>
+ <m id="1025" english="Fiery Breath"/>
+ <m id="1026" english="Touchdown"/>
+ <m id="1027" english="Inferno Blast"/>
+ <m id="1028" english="Tebbad Wing" targetstatus="31"/>
+ <m id="1029" english="Absolute Terror" targetstatus="28"/>
+ <m id="1030" english="Horrid Roar"/>
+ <m id="1031" english="Sleet Blast"/>
+ <m id="1032" english="Sleet Blast"/>
+ <m id="1033" english="Gregale Wing" targetstatus="4"/>
+ <m id="1034" english="Spike Flail"/>
+ <m id="1035" english="Glacial Breath"/>
+ <m id="1036" english="Touchdown"/>
+ <m id="1037" english="Sleet Blast"/>
+ <m id="1038" english="Gregale Wing" targetstatus="4"/>
+ <m id="1039" english="Absolute Terror" targetstatus="28"/>
+ <m id="1040" english="Horrid Roar"/>
+ <m id="1041" english="Ocher Blast"/>
+ <m id="1042" english="Ocher Blast"/>
+ <m id="1043" english="Typhoon Wing" targetstatus="5"/>
+ <m id="1044" english="Spike Flail"/>
+ <m id="1045" english="Geotic Breath"/>
+ <m id="1046" english="Touchdown"/>
+ <m id="1047" english="Ocher Blast"/>
+ <m id="1048" english="Bai Wing" targetstatus="13"/>
+ <m id="1049" english="Absolute Terror" targetstatus="28"/>
+ <m id="1050" english="Horrid Roar"/>
+ <m id="1051" english="Dark Matter Blast"/>
+ <m id="1052" english="Dark Matter Blast"/>
+ <m id="1053" english="Cyclone Wing" targetstatus="2"/>
+ <m id="1054" english="Spike Flail"/>
+ <m id="1055" english="Sable Breath"/>
+ <m id="1056" english="Touchdown"/>
+ <m id="1057" english="Dark Matter Blast"/>
+ <m id="1058" english="Cyclone Wing" targetstatus="2"/>
+ <m id="1059" english="Absolute Terror" targetstatus="28"/>
+ <m id="1060" english="Horrid Roar"/>
+ <m id="1061" english="Mucus Spread" targetstatus="13"/>
+ <m id="1062" english="WZ_SLIME_04"/>
+ <m id="1063" english="Epoxy Spread" targetstatus="11"/>
+ <m id="1064" english="WZ_EYES_04"/>
+ <m id="1065" english="WZ_CRAWL_03"/>
+ <m id="1066" english="Gerjis' Grip" targetstatus="10"/>
+ <m id="1067" english="WZ_BEES_04"/>
+ <m id="1068" english="Debilitating Drone"/>
+ <m id="1069" english="WZ_TRSAP_03"/>
+ <m id="1070" english="Final Retribution" targetstatus="10"/>
+ <m id="1071" english="Eagle Eye Shot"/>
+ <m id="1072" english="Ink Jet" targetstatus="5"/>
+ <m id="1073" english="Gala Macabre" targetstatus="17"/>
+ <m id="1074" english="Hoof Volley"/>
+ <m id="1075" english="Counterstance" actorstatus="61"/>
+ <m id="1076" english="Extremely Bad Breath" targetstatus="0"/>
+ <m id="1077" english="Contagion Transfer"/>
+ <m id="1078" english="Contamination"/>
+ <m id="1079" english="Toxic Pick" targetstatus="3"/>
+ <m id="1080" english="Frenzied Rage" actorstatus="91"/>
+ <m id="1081" english="Charm" targetstatus="17"/>
+ <m id="1082" english="Infernal Pestilence" targetstatus="8"/>
+ <m id="1083" english="Bane"/>
+ <m id="1084" english="Crossthrash"/>
+ <m id="1085" english="Knife Edge Circle" targetstatus="3,10"/>
+ <m id="1086" english="Train Fall"/>
+ <m id="1087" english="."/>
+ <m id="1088" english="."/>
+ <m id="1089" english="."/>
+ <m id="1090" english="."/>
+ <m id="1091" english="Dual Strike" targetstatus="10"/>
+ <m id="1092" english="Siphon Discharge"/>
+ <m id="1093" english="Mantle Pierce" targetstatus="12"/>
+ <m id="1094" english="Ink Cloud" targetstatus="5"/>
+ <m id="1095" english="Molluscous Mutation" targetstatus="93"/>
+ <m id="1096" english="Saline Coat" targetstatus="191"/>
+ <m id="1097" english="Aerial Collision" targetstatus="149"/>
+ <m id="1098" english="Vapor Spray"/>
+ <m id="1099" english="Spine Lash" targetstatus="31"/>
+ <m id="1100" english="Voiceless Storm" targetstatus="6"/>
+ <m id="1101" english="Tidal Dive" targetstatus="11,12"/>
+ <m id="1102" english="Plasma Charge" actorstatus="38"/>
+ <m id="1103" english="Chthonian Ray" targetstatus="15"/>
+ <m id="1104" english="Apocalyptic Ray" targetstatus="15"/>
+ <m id="1105" english="Viscid Secretion"/>
+ <m id="1106" english="Wild Ginseng"/>
+ <m id="1107" english="Hungry Crunch"/>
+ <m id="1108" english="Mighty Snort"/>
+ <m id="1109" english="Tail Thrust"/>
+ <m id="1110" english="Temporal Shift" targetstatus="10"/>
+ <m id="1111" english="Sinuate Rush"/>
+ <m id="1112" english="Rapid Molt"/>
+ <m id="1113" english="Ichor Stream" targetstatus="3"/>
+ <m id="1114" english="Vitriolic Barrage" targetstatus="3"/>
+ <m id="1115" english="Primal Drill" targetstatus="11"/>
+ <m id="1116" english="Concussive Oscillation" targetstatus="12"/>
+ <m id="1117" english="Ion Shower" targetstatus="10"/>
+ <m id="1118" english="Torrential Torment"/>
+ <m id="1119" english="Asthenic Fog" targetstatus="133"/>
+ <m id="1120" english="Luminous Drape" targetstatus="17"/>
+ <m id="1121" english="Fluorescence" targetstatus="45"/>
+ <m id="1122" english="Wing Thrust" targetstatus="13"/>
+ <m id="1123" english="Auroral Wind" targetstatus="6"/>
+ <m id="1124" english="Impact Stream" targetstatus="10,149"/>
+ <m id="1125" english="Depuration"/>
+ <m id="1126" english="Crystalline Cocoon" actorstatus="40,41"/>
+ <m id="1127" english="Glacier Splitter" targetstatus="4"/>
+ <m id="1128" english="Disseverment" targetstatus="3"/>
+ <m id="1129" english="Biotic Boomerang" targetstatus="31"/>
+ <m id="1130" english="Medusa Javelin" targetstatus="7"/>
+ <m id="1131" english="Sideswipe" targetstatus="31"/>
+ <m id="1132" english="."/>
+ <m id="1133" english="Eagle Eye Shot"/>
+ <m id="1134" english="Amatsu: Torimai"/>
+ <m id="1135" english="Amatsu: Kazakiri"/>
+ <m id="1136" english="Amatsu: Yukiarashi" targetstatus="5"/>
+ <m id="1137" english="Amatsu: Tsukioboro" targetstatus="6"/>
+ <m id="1138" english="Amatsu: Hanaikusa" targetstatus="4"/>
+ <m id="1139" english="Amatsu: Tsukikage"/>
+ <m id="1140" english="."/>
+ <m id="1141" english="Oisoya"/>
+ <m id="1142" english="."/>
+ <m id="1143" english="."/>
+ <m id="1144" english="."/>
+ <m id="1145" english="Soul Accretion"/>
+ <m id="1146" english="."/>
+ <m id="1147" english="Explosive Impulse"/>
+ <m id="1148" english="Ocher Blast"/>
+ <m id="1149" english="Ocher Blast"/>
+ <m id="1150" english="Typhoon Wing" targetstatus="5"/>
+ <m id="1151" english="Spike Flail"/>
+ <m id="1152" english="Geotic Breath"/>
+ <m id="1153" english="Touchdown"/>
+ <m id="1154" english="Ocher Blast"/>
+ <m id="1155" english="Bai Wing" targetstatus="13"/>
+ <m id="1156" english="Absolute Terror" targetstatus="28"/>
+ <m id="1157" english="Horrid Roar"/>
+ <m id="1158" english="Marionette Dice"/>
+ <m id="1159" english="Marionette Dice"/>
+ <m id="1160" english="Marionette Dice"/>
+ <m id="1161" english="Marionette Dice"/>
+ <m id="1162" english="Marionette Dice"/>
+ <m id="1163" english="Marionette Dice"/>
+ <m id="1164" english="Marionette Dice"/>
+ <m id="1165" english="Marionette Dice"/>
+ <m id="1166" english="Marionette Dice"/>
+ <m id="1167" english="Marionette Dice"/>
+ <m id="1168" english="Marionette Dice"/>
+ <m id="1169" english="Marionette Dice"/>
+ <m id="1170" english="Marionette Dice"/>
+ <m id="1171" english="Marionette Dice"/>
+ <m id="1172" english="Warcry" actorstatus="68"/>
+ <m id="1173" english="Counterstance" actorstatus="61"/>
+ <m id="1174" english="Steal"/>
+ <m id="1175" english="Shield Bash" targetstatus="10"/>
+ <m id="1176" english="Weapon Bash" targetstatus="10"/>
+ <m id="1177" english="Sic"/>
+ <m id="1178" english="Barrage" actorstatus="73"/>
+ <m id="1179" english="."/>
+ <m id="1180" english="Meditate"/>
+ <m id="1181" english="Jump"/>
+ <m id="1182" english="Blood Pact"/>
+ <m id="1183" english="Aetheral Toxin" targetstatus="134"/>
+ <m id="1184" english="Edge of Death"/>
+ <m id="1185" english="Actinic Burst" targetstatus="156"/>
+ <m id="1186" english="Core Meltdown"/>
+ <m id="1187" english="Hexidiscs"/>
+ <m id="1188" english="Vorpal Blade"/>
+ <m id="1189" english="Damnation Dive"/>
+ <m id="1190" english="Sickle Slash"/>
+ <m id="1191" english="Vertical Cleave"/>
+ <m id="1192" english="Efflorescent Foetor" targetstatus="5,6"/>
+ <m id="1193" english="Stupor Spores" targetstatus="2"/>
+ <m id="1194" english="Viscid Nectar" targetstatus="13"/>
+ <m id="1195" english="Morning Glory"/>
+ <m id="1196" english="Axial Bloom" targetstatus="11"/>
+ <m id="1197" english="Nutrient Absorption"/>
+ <m id="1198" english="Palsy Pollen" targetstatus="4,12"/>
+ <m id="1199" english="Toxic Spit" targetstatus="3"/>
+ <m id="1200" english="Filamented Hold" targetstatus="13"/>
+ <m id="1201" english="Marionette Dice"/>
+ <m id="1202" english="Self-Destruct"/>
+ <m id="1203" english="Self-Destruct"/>
+ <m id="1204" english="."/>
+ <m id="1205" english="Shield Bash" targetstatus="10"/>
+ <m id="1206" english="Shield Bash" targetstatus="10"/>
+ <m id="1207" english="Reactor Cool" actorstatus="93,35"/>
+ <m id="1208" english="."/>
+ <m id="1209" english="Optic Induration" targetstatus="7"/>
+ <m id="1210" english="Static Filament" targetstatus="10"/>
+ <m id="1211" english="Decayed Filament" targetstatus="3"/>
+ <m id="1212" english="Reactor Overheat" targetstatus="31"/>
+ <m id="1213" english="Reactor Overload" targetstatus="6"/>
+ <m id="1214" english="Self-Destruct"/>
+ <m id="1215" english="Cattlepult"/>
+ <m id="1216" english="Cattlepult"/>
+ <m id="1217" english="Cattlepult"/>
+ <m id="1218" english="#1218"/>
+ <m id="1219" english="Bull Rush"/>
+ <m id="1220" english="Red Lotus Blade"/>
+ <m id="1221" english="Flat Blade" targetstatus="10"/>
+ <m id="1222" english="Savage Blade"/>
+ <m id="1223" english="Royal Bash" targetstatus="10"/>
+ <m id="1224" english="Royal Savior" actorstatus="40"/>
+ <m id="1225" english="Red Lotus Blade"/>
+ <m id="1226" english="Spirits Within"/>
+ <m id="1227" english="Vorpal Blade"/>
+ <m id="1228" english="Berserk-Ruf" actorstatus="68"/>
+ <m id="1229" english="Hundred Fists" actorstatus="46"/>
+ <m id="1230" english="Benediction"/>
+ <m id="1231" english="Prishe Item 1"/>
+ <m id="1232" english="Prishe Item 2"/>
+ <m id="1233" english="Nullifying Dropkick"/>
+ <m id="1234" english="Auroral Uppercut"/>
+ <m id="1235" english="Chains of Apathy" targetstatus="28"/>
+ <m id="1236" english="Chains of Arrogance" targetstatus="28"/>
+ <m id="1237" english="Chains of Cowardice" targetstatus="28"/>
+ <m id="1238" english="Chains of Rage" targetstatus="28"/>
+ <m id="1239" english="Chains of Envy" targetstatus="28"/>
+ <m id="1240" english="Malevolent Blessing" targetstatus="9"/>
+ <m id="1241" english="Pestilent Penance" targetstatus="31"/>
+ <m id="1242" english="Empty Salvation"/>
+ <m id="1243" english="Infernal Deliverance" targetstatus="10"/>
+ <m id="1244" english="Malevolent Blessing" targetstatus="9"/>
+ <m id="1245" english="Pestilent Penance" targetstatus="31"/>
+ <m id="1246" english="Empty Salvation"/>
+ <m id="1247" english="Infernal Deliverance" targetstatus="10"/>
+ <m id="1248" english="Wheel of Impregnability" actorstatus="150"/>
+ <m id="1249" english="Bastion of Twilight" actorstatus="152"/>
+ <m id="1250" english="Winds of Oblivion" targetstatus="16"/>
+ <m id="1251" english="Seal of Quiescence" targetstatus="29"/>
+ <m id="1252" english="Luminous Lance" targetstatus="10"/>
+ <m id="1253" english="Rejuvenation"/>
+ <m id="1254" english="Revelation"/>
+ <m id="1255" english="Slam Dunk" targetstatus="11"/>
+ <m id="1256" english="Howl" targetstatus="68"/>
+ <m id="1257" english="Ore Toss"/>
+ <m id="1258" english="Howl" targetstatus="68"/>
+ <m id="1259" english="Double Kick"/>
+ <m id="1260" english="Howl" targetstatus="68"/>
+ <m id="1261" english="Goblin Rush"/>
+ <m id="1262" english="Goblin Dice"/>
+ <m id="1263" english="Provoke"/>
+ <m id="1264" english="Howling Moon"/>
+ <m id="1265" english="Armor Buster" targetstatus="12"/>
+ <m id="1266" english="Energy Screen" actorstatus="150"/>
+ <m id="1267" english="Mana Screen" actorstatus="152"/>
+ <m id="1268" english="Dissipation"/>
+ <m id="1269" english="Guided Missile II" targetstatus="11"/>
+ <m id="1270" english="Colossal Blow"/>
+ <m id="1271" english="Laser Shower" targetstatus="149"/>
+ <m id="1272" english="Floodlight" targetstatus="5,6,156"/>
+ <m id="1273" english="Hyper Pulse" targetstatus="11,12"/>
+ <m id="1274" english="Stun Cannon" targetstatus="4"/>
+ <m id="1275" english="WZ_RECOVER_ALL"/>
+ <m id="1276" english="Pod Ejection"/>
+ <m id="1277" english="Pile Pitch" targetstatus="11"/>
+ <m id="1278" english="Guided Missile" targetstatus="11"/>
+ <m id="1279" english="Hyper Pulse" targetstatus="11,12"/>
+ <m id="1280" english="Target Analysis"/>
+ <m id="1281" english="Discharger" actorstatus="38,152"/>
+ <m id="1282" english="Ion Efflux" targetstatus="4"/>
+ <m id="1283" english="Rear Lasers" targetstatus="7"/>
+ <m id="1284" english="Citadel Buster"/>
+ <m id="1285" english="Blighted Gloom"/>
+ <m id="1286" english="Trample" targetstatus="11"/>
+ <m id="1287" english="Tempest Wing"/>
+ <m id="1288" english="Touchdown"/>
+ <m id="1289" english="Sweeping Flail"/>
+ <m id="1290" english="Prodigious Spike"/>
+ <m id="1291" english="Impulsion" targetstatus="5,7"/>
+ <m id="1292" english="Absolute Terror" targetstatus="28"/>
+ <m id="1293" english="Horrible Roar"/>
+ <m id="1294" english="."/>
+ <m id="1295" english="Megaflare"/>
+ <m id="1296" english="Gigaflare"/>
+ <m id="1297" english="Teraflare"/>
+ <m id="1298" english="Camisado"/>
+ <m id="1299" english="Blessed Radiance" actorstatus="50" targetstatus="156"/>
+ <m id="1300" english="Regeneration" actorstatus="42"/>
+ <m id="1301" english="Eagle Eye Shot"/>
+ <m id="1302" english="Smite of Fury"/>
+ <m id="1303" english="Flurry of Rage"/>
+ <m id="1304" english="Whispers of Ire"/>
+ <m id="1305" english="Sonic Wave" targetstatus="149"/>
+ <m id="1306" english="Stomping"/>
+ <m id="1307" english="Cold Stare" targetstatus="6"/>
+ <m id="1308" english="Whistle" actorstatus="92"/>
+ <m id="1309" english="Berserk" actorstatus="56"/>
+ <m id="1310" english="Healing Breeze"/>
+ <m id="1311" english="Foot Kick"/>
+ <m id="1312" english="Dust Cloud" targetstatus="5"/>
+ <m id="1313" english="Whirl Claws"/>
+ <m id="1314" english="Wild Carrot"/>
+ <m id="1315" english="Gas Shell" targetstatus="3,31"/>
+ <m id="1316" english="Venom Shell" targetstatus="3,12"/>
+ <m id="1317" english="Palsynyxis" targetstatus="4"/>
+ <m id="1318" english="Painful Whip" targetstatus="4"/>
+ <m id="1319" english="Suctorial Tentacle" targetstatus="3"/>
+ <m id="1320" english="Helldive"/>
+ <m id="1321" english="Wing Cutter"/>
+ <m id="1322" english="Broadside Barrage" targetstatus="140,141"/>
+ <m id="1323" english="Blind Side Barrage" targetstatus="136,138"/>
+ <m id="1324" english="Damnation Dive"/>
+ <m id="1325" english="Sticky Thread" targetstatus="13"/>
+ <m id="1326" english="Poison Breath" targetstatus="3"/>
+ <m id="1327" english="Cocoon" actorstatus="93"/>
+ <m id="1328" english="Head Butt" targetstatus="10"/>
+ <m id="1329" english="Dream Flower" targetstatus="19"/>
+ <m id="1330" english="Wild Oats" targetstatus="138"/>
+ <m id="1331" english="Leaf Dagger" targetstatus="3"/>
+ <m id="1332" english="Scream" targetstatus="28,138"/>
+ <m id="1333" english="Bubble Shower" targetstatus="136"/>
+ <m id="1334" english="Bubble Curtain" actorstatus="41"/>
+ <m id="1335" english="Big Scissors"/>
+ <m id="1336" english="Scissor Guard" actorstatus="93"/>
+ <m id="1337" english="Metallic Body" actorstatus="191"/>
+ <m id="1338" english="Toxic Spit" targetstatus="3"/>
+ <m id="1339" english="Geist Wall"/>
+ <m id="1340" english="Numbing Noise" targetstatus="10"/>
+ <m id="1341" english="Nimble Snap"/>
+ <m id="1342" english="Cyclotail"/>
+ <m id="1343" english="Hammer Beak"/>
+ <m id="1344" english="Poison Pick" targetstatus="3"/>
+ <m id="1345" english="Sound Vacuum" targetstatus="29"/>
+ <m id="1346" english="Sound Blast" targetstatus="140"/>
+ <m id="1347" english="Baleful Gaze" targetstatus="7"/>
+ <m id="1348" english="Miasmic Breath" targetstatus="3"/>
+ <m id="1349" english="Miasmic Breath" targetstatus="3"/>
+ <m id="1350" english="Fragrant Breath" targetstatus="17"/>
+ <m id="1351" english="Fragrant Breath" targetstatus="17"/>
+ <m id="1352" english="Putrid Breath"/>
+ <m id="1353" english="Putrid Breath"/>
+ <m id="1354" english="Extremely Bad Breath" targetstatus="0"/>
+ <m id="1355" english="Vampiric Lash"/>
+ <m id="1356" english="Gouging Branch"/>
+ <m id="1357" english="Gloeosuccus" targetstatus="13"/>
+ <m id="1358" english="Gloeosuccus" targetstatus="13"/>
+ <m id="1359" english="Soporific" targetstatus="19"/>
+ <m id="1360" english="Palsy Pollen" targetstatus="4"/>
+ <m id="1361" english="Blow" targetstatus="3"/>
+ <m id="1362" english="Uppercut"/>
+ <m id="1363" english="Attractant" targetstatus="17"/>
+ <m id="1364" english="Mephitic Spore"/>
+ <m id="1365" english="Frogkick"/>
+ <m id="1366" english="Cursed Sphere"/>
+ <m id="1367" english="Venom" targetstatus="3"/>
+ <m id="1368" english="Debilitating Drone"/>
+ <m id="1369" english="2000 Needles"/>
+ <m id="1370" english="4000 Needles"/>
+ <m id="1371" english="Needleshot"/>
+ <m id="1372" english="Heat Breath"/>
+ <m id="1373" english="Riddle" targetstatus="145"/>
+ <m id="1374" english="Great Sandstorm" targetstatus="5"/>
+ <m id="1375" english="Great Whirlwind" targetstatus="130"/>
+ <m id="1376" english="Choke Breath" targetstatus="4,6"/>
+ <m id="1377" english="Sheep Bleat" targetstatus="13"/>
+ <m id="1378" english="Sheep Song" targetstatus="2"/>
+ <m id="1379" english="Sheep Charge"/>
+ <m id="1380" english="Trebuchet"/>
+ <m id="1381" english="Power Attack"/>
+ <m id="1382" english="Lightning Roar"/>
+ <m id="1383" english="Impact Roar"/>
+ <m id="1384" english="Grand Slam"/>
+ <m id="1385" english="Eagle Eye Shot"/>
+ <m id="1386" english="Whirl of Rage" targetstatus="6,10,12"/>
+ <m id="1387" english="Smite of Rage"/>
+ <m id="1388" english="Hypothermal Combustion"/>
+ <m id="1389" english="Freeze Rush"/>
+ <m id="1390" english="Cold Wave" targetstatus="129"/>
+ <m id="1391" english="Berserk" actorstatus="56"/>
+ <m id="1392" english="Crystal Shield" actorstatus="40"/>
+ <m id="1393" english="Heavy Strike"/>
+ <m id="1394" english="Ice Break" targetstatus="11"/>
+ <m id="1395" english="Thunder Break" targetstatus="10"/>
+ <m id="1396" english="Crystal Rain"/>
+ <m id="1397" english="Crystal Weapon"/>
+ <m id="1398" english="Crystal Weapon"/>
+ <m id="1399" english="Crystal Weapon"/>
+ <m id="1400" english="Crystal Weapon"/>
+ <m id="1401" english="Blind Vortex" targetstatus="5"/>
+ <m id="1402" english="Giga Scream"/>
+ <m id="1403" english="Dread Dive" targetstatus="10"/>
+ <m id="1404" english="Feather Barrier" actorstatus="92"/>
+ <m id="1405" english="Stormwind" targetstatus="6"/>
+ <m id="1406" english="Ultrasonics" targetstatus="148"/>
+ <m id="1407" english="Blood Drain"/>
+ <m id="1408" english="Subsonics" targetstatus="149"/>
+ <m id="1409" english="Marrow Drain"/>
+ <m id="1410" english="Sonic Boom" targetstatus="147"/>
+ <m id="1411" english="Jet Stream"/>
+ <m id="1412" english="Slipstream" targetstatus="146"/>
+ <m id="1413" english="Turbulence"/>
+ <m id="1414" english="Tentacle"/>
+ <m id="1415" english="Ink Jet" targetstatus="5"/>
+ <m id="1416" english="Hard Membrane" actorstatus="92"/>
+ <m id="1417" english="Cross Attack"/>
+ <m id="1418" english="Regeneration" actorstatus="42"/>
+ <m id="1419" english="Maelstrom" targetstatus="136"/>
+ <m id="1420" english="Whirlwind" targetstatus="138"/>
+ <m id="1421" english="Roar" targetstatus="4"/>
+ <m id="1422" english="Razor Fang"/>
+ <m id="1423" english="Claw Cyclone"/>
+ <m id="1424" english="Predatory Glare" targetstatus="10"/>
+ <m id="1425" english="Crossthrash"/>
+ <m id="1426" english="Ripper Fang"/>
+ <m id="1427" english="#1427"/>
+ <m id="1428" english="Foul Breath" targetstatus="8"/>
+ <m id="1429" english="Frost Breath" targetstatus="4"/>
+ <m id="1430" english="Thunderbolt" targetstatus="10"/>
+ <m id="1431" english="Chomp Rush" targetstatus="13"/>
+ <m id="1432" english="Scythe Tail" targetstatus="10"/>
+ <m id="1433" english="Double Claw"/>
+ <m id="1434" english="Grapple"/>
+ <m id="1435" english="Filamented Hold" targetstatus="13"/>
+ <m id="1436" english="Spinning Top"/>
+ <m id="1437" english="Gnash"/>
+ <m id="1438" english="Vile Belch" targetstatus="6,31"/>
+ <m id="1439" english="Hypnic Lamp" targetstatus="2"/>
+ <m id="1440" english="Seismic Tail"/>
+ <m id="1441" english="Seaspray" targetstatus="13"/>
+ <m id="1442" english="Leeching Current"/>
+ <m id="1443" english="Pecking Flurry"/>
+ <m id="1444" english="Snatch Morsel"/>
+ <m id="1445" english="Feather Tickle"/>
+ <m id="1446" english="Wisecrack" targetstatus="17"/>
+ <m id="1447" english="Barrier Tusk" actorstatus="93"/>
+ <m id="1448" english="Onrush"/>
+ <m id="1449" english="Stampede"/>
+ <m id="1450" english="Flailing Trunk"/>
+ <m id="1451" english="Voracious Trunk"/>
+ <m id="1452" english="Proboscis Shower"/>
+ <m id="1453" english="Abrasive Tantara" targetstatus="16"/>
+ <m id="1454" english="Deafening Tantara" targetstatus="6"/>
+ <m id="1455" english="Frenetic Rip"/>
+ <m id="1456" english="Bugle Call" actorstatus="33" targetstatus="135"/>
+ <m id="1457" english="Yawn" targetstatus="2"/>
+ <m id="1458" english="Wing Slap" targetstatus="10"/>
+ <m id="1459" english="Beak Lunge"/>
+ <m id="1460" english="Frigid Shuffle" targetstatus="4"/>
+ <m id="1461" english="Wing Whirl"/>
+ <m id="1462" english="Crosswind"/>
+ <m id="1463" english="#1463"/>
+ <m id="1464" english="Wind Shear"/>
+ <m id="1465" english="Obfuscate" targetstatus="156"/>
+ <m id="1466" english="Zephyr Mantle" actorstatus="36"/>
+ <m id="1467" english="Ill Wind"/>
+ <m id="1468" english="White Wind"/>
+ <m id="1469" english="Kibosh" targetstatus="16"/>
+ <m id="1470" english="Cutpurse"/>
+ <m id="1471" english="Sandspray" targetstatus="5"/>
+ <m id="1472" english="Faze" targetstatus="28"/>
+ <m id="1473" english="Bowshot"/>
+ <m id="1474" english="Deadeye" targetstatus="149,167"/>
+ <m id="1475" english="Forceful Blow"/>
+ <m id="1476" english="Somersault Kick"/>
+ <m id="1477" english="Firespit"/>
+ <m id="1478" english="Warm-Up" actorstatus="90,92"/>
+ <m id="1479" english="Javelin Throw"/>
+ <m id="1480" english="Axe Throw"/>
+ <m id="1481" english="Vorpal Blade"/>
+ <m id="1482" english="Groundburst"/>
+ <m id="1483" english="."/>
+ <m id="1484" english="."/>
+ <m id="1485" english="Potent Lunge"/>
+ <m id="1486" english="Overthrow"/>
+ <m id="1487" english="Rock Smash" targetstatus="7"/>
+ <m id="1488" english="Diamondhide" actorstatus="37"/>
+ <m id="1489" english="Enervation" targetstatus="149,167"/>
+ <m id="1490" english="Quake Stomp" actorstatus="45"/>
+ <m id="1491" english="Zarraqa"/>
+ <m id="1492" english="Zarbzan"/>
+ <m id="1493" english="Healing Stomp" actorstatus="42"/>
+ <m id="1494" english="."/>
+ <m id="1495" english="."/>
+ <m id="1496" english="Gusting Gouge"/>
+ <m id="1497" english="Hysteric Barrage"/>
+ <m id="1498" english="Dukkeripen"/>
+ <m id="1499" english="Dukkeripen"/>
+ <m id="1500" english="Dukkeripen"/>
+ <m id="1501" english="Dukkeripen"/>
+ <m id="1502" english="Tail Slap" targetstatus="10"/>
+ <m id="1503" english="Hypnotic Sway" targetstatus="16"/>
+ <m id="1504" english="Swift Shot"/>
+ <m id="1505" english="Arrow Deluge"/>
+ <m id="1506" english="Belly Dance" targetstatus="17"/>
+ <m id="1507" english="."/>
+ <m id="1508" english="."/>
+ <m id="1509" english="Gusting Gouge"/>
+ <m id="1510" english="Hysteric Barrage"/>
+ <m id="1511" english="Dukkeripen"/>
+ <m id="1512" english="Dukkeripen"/>
+ <m id="1513" english="Dukkeripen"/>
+ <m id="1514" english="Dukkeripen"/>
+ <m id="1515" english="Tail Slap" targetstatus="10"/>
+ <m id="1516" english="Torrent"/>
+ <m id="1517" english="Swift Shot"/>
+ <m id="1518" english="Arrow Deluge"/>
+ <m id="1519" english="Rising Swell"/>
+ <m id="1520" english="."/>
+ <m id="1521" english="."/>
+ <m id="1522" english="Spinal Cleave"/>
+ <m id="1523" english="Mangle"/>
+ <m id="1524" english="Leaping Cleave"/>
+ <m id="1525" english="Hex Palm"/>
+ <m id="1526" english="Animating Wail" actorstatus="33"/>
+ <m id="1527" english="Fortifying Wail" actorstatus="40"/>
+ <m id="1528" english="Unblest Jambiya"/>
+ <m id="1529" english="Lava Spit"/>
+ <m id="1530" english="Sulfurous Breath"/>
+ <m id="1531" english="Scorching Lash"/>
+ <m id="1532" english="Ululation" targetstatus="4"/>
+ <m id="1533" english="Magma Hoplon" actorstatus="34,37"/>
+ <m id="1534" english="Gates of Hades" targetstatus="128"/>
+ <m id="1535" english="Incinerate"/>
+ <m id="1536" english="Nullsong"/>
+ <m id="1537" english="Vampiric Root"/>
+ <m id="1538" english="Perdition" targetstatus="0"/>
+ <m id="1539" english="Malediction"/>
+ <m id="1540" english="Piercing Shriek"/>
+ <m id="1541" english="Rushing Slash"/>
+ <m id="1542" english="Decussate"/>
+ <m id="1543" english="Tyrannic Blare"/>
+ <m id="1544" english="Miasma" targetstatus="3,13,31"/>
+ <m id="1545" english="Vorpal Wheel"/>
+ <m id="1546" english="Sledgehammer" targetstatus="7"/>
+ <m id="1547" english="Head Snatch"/>
+ <m id="1548" english="Haymaker" targetstatus="16"/>
+ <m id="1549" english="Incessant Fists"/>
+ <m id="1550" english="Arcane Stomp"/>
+ <m id="1551" english="Pleiades Ray" targetstatus="3,4,5,6,11,13,31"/>
+ <m id="1552" english="Petrifaction" targetstatus="7"/>
+ <m id="1553" english="Shadow Thrust"/>
+ <m id="1554" english="Tail Slap" targetstatus="10"/>
+ <m id="1555" english="."/>
+ <m id="1556" english="Pinning Shot" targetstatus="11"/>
+ <m id="1557" english="Calcifying Deluge" targetstatus="7"/>
+ <m id="1558" english="Gorgon Dance" targetstatus="7"/>
+ <m id="1559" english="Amber Scutum" actorstatus="93"/>
+ <m id="1560" english="Vitriolic Spray" targetstatus="128"/>
+ <m id="1561" english="Thermal Pulse" targetstatus="156"/>
+ <m id="1562" english="Cannonball"/>
+ <m id="1563" english="Heat Barrier" actorstatus="34"/>
+ <m id="1564" english="Vitriolic Shower" targetstatus="128"/>
+ <m id="1565" english="Amplification" actorstatus="190,191"/>
+ <m id="1566" english="Boiling Point" targetstatus="167"/>
+ <m id="1567" english="Xenoglossia" actorstatus="230"/>
+ <m id="1568" english="Amorphic Spikes"/>
+ <m id="1569" english="Amorphic Scythe"/>
+ <m id="1570" english="Synergism"/>
+ <m id="1571" english="Metastasis"/>
+ <m id="1572" english="Pyric Blast" targetstatus="31"/>
+ <m id="1573" english="Polar Bulwark" actorstatus="152"/>
+ <m id="1574" english="Polar Blast" targetstatus="4"/>
+ <m id="1575" english="Pyric Bulwark" actorstatus="150"/>
+ <m id="1576" english="Barofield" targetstatus="12"/>
+ <m id="1577" english="."/>
+ <m id="1578" english="Trembling"/>
+ <m id="1579" english="Serpentine Tail"/>
+ <m id="1580" english="Nerve Gas" targetstatus="3,9"/>
+ <m id="1581" english="Feeble Bleat" targetstatus="4"/>
+ <m id="1582" english="Mine Blast"/>
+ <m id="1583" english="Rushing Slash"/>
+ <m id="1584" english="Rushing Stab"/>
+ <m id="1585" english="Sandblast" targetstatus="5"/>
+ <m id="1586" english="Sandpit" targetstatus="11"/>
+ <m id="1587" english="Venom Spray" targetstatus="3"/>
+ <m id="1588" english="Pit Ambush"/>
+ <m id="1589" english="Mandibular Bite"/>
+ <m id="1590" english="Sharp Sting"/>
+ <m id="1591" english="Frenzy Pollen" actorstatus="46"/>
+ <m id="1592" english="Final Sting"/>
+ <m id="1593" english="Sling Bomb"/>
+ <m id="1594" english="Formation Attack"/>
+ <m id="1595" english="Refueling" actorstatus="33"/>
+ <m id="1596" english="Circle of Flames" targetstatus="12"/>
+ <m id="1597" english="Self-Destruct"/>
+ <m id="1598" english="Stellar Burst" targetstatus="6"/>
+ <m id="1599" english="Self-Destruct"/>
+ <m id="1600" english="Omega Javelin" targetstatus="7"/>
+ <m id="1601" english="Self-Destruct"/>
+ <m id="1602" english="Tail Roll"/>
+ <m id="1603" english="Tusk"/>
+ <m id="1604" english="Scutum" actorstatus="93"/>
+ <m id="1605" english="Bone Crunch" targetstatus="31"/>
+ <m id="1606" english="Awful Eye" targetstatus="136"/>
+ <m id="1607" english="Heavy Bellow" targetstatus="10"/>
+ <m id="1608" english="Intimidate" targetstatus="13"/>
+ <m id="1609" english="Aqua Ball" targetstatus="136"/>
+ <m id="1610" english="Splash Breath"/>
+ <m id="1611" english="Screwdriver"/>
+ <m id="1612" english="Water Wall" actorstatus="93"/>
+ <m id="1613" english="Water Shield" actorstatus="92"/>
+ <m id="1614" english="Recoil Dive"/>
+ <m id="1615" english="Suction" targetstatus="10"/>
+ <m id="1616" english="Acid Mist" targetstatus="147"/>
+ <m id="1617" english="Sand Breath" targetstatus="5"/>
+ <m id="1618" english="Drainkiss"/>
+ <m id="1619" english="Regeneration" actorstatus="42"/>
+ <m id="1620" english="TP Drainkiss"/>
+ <m id="1621" english="MP Drainkiss"/>
+ <m id="1622" english="Brain Drain" targetstatus="140"/>
+ <m id="1623" english="Triclip"/>
+ <m id="1624" english="Back Swish"/>
+ <m id="1625" english="Mow" targetstatus="3"/>
+ <m id="1626" english="Frightful Roar" targetstatus="149"/>
+ <m id="1627" english="Mortal Ray" targetstatus="15"/>
+ <m id="1628" english="Unblest Armor" actorstatus="41"/>
+ <m id="1629" english="Full-force Blow"/>
+ <m id="1630" english="Gastric Bomb" targetstatus="147"/>
+ <m id="1631" english="Sandspin" targetstatus="146"/>
+ <m id="1632" english="Tremors" targetstatus="137"/>
+ <m id="1633" english="Spirit Vacuum"/>
+ <m id="1634" english="Sound Vacuum" targetstatus="6"/>
+ <m id="1635" english="Provoke"/>
+ <m id="1636" english="."/>
+ <m id="1637" english="Spirit Surge" actorstatus="126"/>
+ <m id="1638" english="Potent Lunge"/>
+ <m id="1639" english="Overthrow"/>
+ <m id="1640" english="Rock Smash" targetstatus="7"/>
+ <m id="1641" english="Diamondhide" actorstatus="37"/>
+ <m id="1642" english="Enervation" targetstatus="149,167"/>
+ <m id="1643" english="Quake Stomp" actorstatus="45"/>
+ <m id="1644" english="Healing Stomp" actorstatus="42"/>
+ <m id="1645" english="."/>
+ <m id="1646" english="."/>
+ <m id="1647" english="Camisado"/>
+ <m id="1648" english="Somnolence" targetstatus="12"/>
+ <m id="1649" english="Noctoshield" actorstatus="116"/>
+ <m id="1650" english="Ultimate Terror"/>
+ <m id="1651" english="Dream Shroud" actorstatus="190,191"/>
+ <m id="1652" english="Nightmare" targetstatus="19"/>
+ <m id="1653" english="Cacodemonia" targetstatus="9"/>
+ <m id="1654" english="Nether Blast"/>
+ <m id="1655" english="Ruinous Omen"/>
+ <m id="1656" english="Hypnogenesis"/>
+ <m id="1657" english="Stunbolt" targetstatus="10"/>
+ <m id="1658" english="Great Wheel"/>
+ <m id="1659" english="."/>
+ <m id="1660" english="Blessed Radiance" actorstatus="50" targetstatus="156"/>
+ <m id="1661" english="Sweeping Somnolence"/>
+ <m id="1662" english="Nether Tempest"/>
+ <m id="1663" english="Daydream" targetstatus="17"/>
+ <m id="1664" english="Rushing Drub"/>
+ <m id="1665" english="Forceful Blow"/>
+ <m id="1666" english="Somersault Kick"/>
+ <m id="1667" english="Firespit"/>
+ <m id="1668" english="Warm-Up" actorstatus="90,92"/>
+ <m id="1669" english="Stave Toss"/>
+ <m id="1670" english="Groundburst"/>
+ <m id="1671" english="."/>
+ <m id="1672" english="."/>
+ <m id="1673" english="Pole Swing"/>
+ <m id="1674" english="Tidal Slash"/>
+ <m id="1675" english="Eagle Eye Shot"/>
+ <m id="1676" english="Eagle Eye Shot"/>
+ <m id="1677" english="Azure Lore" actorstatus="163"/>
+ <m id="1678" english="Wild Card"/>
+ <m id="1679" english="Overdrive" actorstatus="166"/>
+ <m id="1680" english="Shibaraku" targetstatus="10"/>
+ <m id="1681" english="."/>
+ <m id="1682" english="."/>
+ <m id="1683" english="."/>
+ <m id="1684" english="Chimera Ripper"/>
+ <m id="1685" english="String Clipper"/>
+ <m id="1686" english="Arcuballista"/>
+ <m id="1687" english="Slapstick"/>
+ <m id="1688" english="Shield Bash" targetstatus="10"/>
+ <m id="1689" english="Provoke"/>
+ <m id="1690" english="Shock Absorber" actorstatus="37"/>
+ <m id="1691" english="Flashbulb" targetstatus="156"/>
+ <m id="1692" english="Mana Converter"/>
+ <m id="1693" english="Ranged Attack"/>
+ <m id="1694" english="Belly Dance" targetstatus="17"/>
+ <m id="1695" english="Magma Fan"/>
+ <m id="1696" english="Erratic Flutter" actorstatus="33"/>
+ <m id="1697" english="Proboscis"/>
+ <m id="1698" english="Erosion Dust" targetstatus="134"/>
+ <m id="1699" english="Exuviation"/>
+ <m id="1700" english="Fire Break"/>
+ <m id="1701" english="Frog Song" targetstatus="17"/>
+ <m id="1702" english="Magic Hammer"/>
+ <m id="1703" english="Water Bomb" targetstatus="6"/>
+ <m id="1704" english="Frog Cheer" actorstatus="190"/>
+ <m id="1705" english="Providence"/>
+ <m id="1706" english="Frog Chorus" targetstatus="17"/>
+ <m id="1707" english="Mind Blast" targetstatus="4"/>
+ <m id="1708" english="Immortal Mind" actorstatus="190,191"/>
+ <m id="1709" english="Immortal Shield" actorstatus="152"/>
+ <m id="1710" english="Mind Purge"/>
+ <m id="1711" english="Tribulation" targetstatus="5,135"/>
+ <m id="1712" english="Immortal Anathema" targetstatus="9"/>
+ <m id="1713" english="Reprobation"/>
+ <m id="1714" english="Eclosion"/>
+ <m id="1715" english="."/>
+ <m id="1716" english="."/>
+ <m id="1717" english="."/>
+ <m id="1718" english="."/>
+ <m id="1719" english="."/>
+ <m id="1720" english="."/>
+ <m id="1721" english="Deathgnash"/>
+ <m id="1722" english="Abominable Belch" targetstatus="4,6,31"/>
+ <m id="1723" english="."/>
+ <m id="1724" english="Boreas Mantle"/>
+ <m id="1725" english="."/>
+ <m id="1726" english="Nullifying Dropkick"/>
+ <m id="1727" english="Auroral Uppercut"/>
+ <m id="1728" english="Wisecrack" targetstatus="17"/>
+ <m id="1729" english="Fighter's Roll" actorstatus="310"/>
+ <m id="1730" english="Rogue's Roll" actorstatus="315"/>
+ <m id="1731" english="Gallant's Roll" actorstatus="316"/>
+ <m id="1732" english="Chaos Roll" actorstatus="317"/>
+ <m id="1733" english="Hunter's Roll" actorstatus="320"/>
+ <m id="1734" english="Ninja Roll" actorstatus="322"/>
+ <m id="1735" english="Double-Up"/>
+ <m id="1736" english="Fire Maneuver" actorstatus="300"/>
+ <m id="1737" english="Ice Maneuver" actorstatus="301"/>
+ <m id="1738" english="Wind Maneuver" actorstatus="302"/>
+ <m id="1739" english="Earth Maneuver" actorstatus="303"/>
+ <m id="1740" english="Thunder Maneuver" actorstatus="304"/>
+ <m id="1741" english="Water Maneuver" actorstatus="305"/>
+ <m id="1742" english="Hane Fubuki" targetstatus="3"/>
+ <m id="1743" english="Hiden Sokyaku" targetstatus="10"/>
+ <m id="1744" english="Shiko no Mitate" actorstatus="93"/>
+ <m id="1745" english="Happobarai" targetstatus="10"/>
+ <m id="1746" english="Rinpyotosha" actorstatus="68"/>
+ <m id="1747" english="Grating Tantara" targetstatus="16"/>
+ <m id="1748" english="Stifling Tantara" targetstatus="6"/>
+ <m id="1749" english="Reward"/>
+ <m id="1750" english="Azure Lore" actorstatus="163"/>
+ <m id="1751" english="Wild Card"/>
+ <m id="1752" english="Overdrive" actorstatus="166"/>
+ <m id="1753" english="Fire Shot"/>
+ <m id="1754" english="Ice Shot"/>
+ <m id="1755" english="Wind Shot"/>
+ <m id="1756" english="Earth Shot"/>
+ <m id="1757" english="Thunder Shot"/>
+ <m id="1758" english="Water Shot"/>
+ <m id="1759" english="Light Shot"/>
+ <m id="1760" english="Dark Shot"/>
+ <m id="1761" english="."/>
+ <m id="1762" english="."/>
+ <m id="1763" english="."/>
+ <m id="1764" english="Hundred Fists" actorstatus="46"/>
+ <m id="1765" english="Eraser"/>
+ <m id="1766" english="Tenebrous Mist"/>
+ <m id="1767" english="Thunderstrike" targetstatus="10"/>
+ <m id="1768" english="Tourbillion" targetstatus="149"/>
+ <m id="1769" english="Dreadstorm" targetstatus="28"/>
+ <m id="1770" english="Fossilizing Breath" targetstatus="7"/>
+ <m id="1771" english="Plague Swipe" targetstatus="31,135"/>
+ <m id="1772" english="Fulmination" targetstatus="4,10"/>
+ <m id="1773" english="."/>
+ <m id="1774" english="."/>
+ <m id="1775" english="Reactive Shield" actorstatus="34"/>
+ <m id="1776" english="Roller Chain" targetstatus="11"/>
+ <m id="1777" english="Choke Chain" targetstatus="6,16"/>
+ <m id="1778" english="Reinforcements"/>
+ <m id="1779" english="Biomagnet"/>
+ <m id="1780" english="Astral Gate"/>
+ <m id="1781" english="Warp"/>
+ <m id="1782" english="Artificial Gravity" targetstatus="12"/>
+ <m id="1783" english="Antigravity"/>
+ <m id="1784" english="Rail Cannon"/>
+ <m id="1785" english="Restoral"/>
+ <m id="1786" english="Armature" actorstatus="40"/>
+ <m id="1787" english="Artificial Gravity" targetstatus="12"/>
+ <m id="1788" english="Antigravity"/>
+ <m id="1789" english="Rail Cannon"/>
+ <m id="1790" english="Artificial Gravity" targetstatus="12"/>
+ <m id="1791" english="Antigravity"/>
+ <m id="1792" english="Rail Cannon"/>
+ <m id="1793" english="Artificial Gravity" targetstatus="12"/>
+ <m id="1794" english="Antigravity"/>
+ <m id="1795" english="Rail Cannon"/>
+ <m id="1796" english="Restoral"/>
+ <m id="1797" english="Heavy Armature" actorstatus="33,36,40"/>
+ <m id="1798" english="Diffusion Ray"/>
+ <m id="1799" english="Inertia Stream" targetstatus="11"/>
+ <m id="1800" english="Discharge" targetstatus="4"/>
+ <m id="1801" english="Mortal Revolution" targetstatus="10"/>
+ <m id="1802" english="Homing Missile"/>
+ <m id="1803" english="Discoid"/>
+ <m id="1804" english="Brainjack" targetstatus="17"/>
+ <m id="1805" english="Restoral"/>
+ <m id="1806" english="Restoral"/>
+ <m id="1807" english="Heavy Armature" actorstatus="33,36,40"/>
+ <m id="1808" english="Heavy Armature" actorstatus="33,36,40"/>
+ <m id="1809" english="Cannibal Blade"/>
+ <m id="1810" english="Daze" targetstatus="10"/>
+ <m id="1811" english="Knockout" targetstatus="148"/>
+ <m id="1812" english="Economizer"/>
+ <m id="1813" english="Tribulation" targetstatus="5,135"/>
+ <m id="1814" english="Dismemberment" targetstatus="3"/>
+ <m id="1815" english="Dire Straight"/>
+ <m id="1816" english="Earthshatter"/>
+ <m id="1817" english="Sinker Drill"/>
+ <m id="1818" english="Detonating Grip"/>
+ <m id="1819" english="Overthrow"/>
+ <m id="1820" english="Rock Smash" targetstatus="7"/>
+ <m id="1821" english="Diamondhide" actorstatus="37"/>
+ <m id="1822" english="Enervation" targetstatus="149,167"/>
+ <m id="1823" english="Quake Stomp" actorstatus="45"/>
+ <m id="1824" english="Potent Lunge"/>
+ <m id="1825" english="Hammer-Go-Round"/>
+ <m id="1826" english="Hammerblow"/>
+ <m id="1827" english="Drop Hammer" targetstatus="11"/>
+ <m id="1828" english="Seismohammer" targetstatus="7"/>
+ <m id="1829" english="Venomous Tail"/>
+ <m id="1830" english="Grim Reaper" targetstatus="15"/>
+ <m id="1831" english="."/>
+ <m id="1832" english="Victory Beacon" targetstatus="146"/>
+ <m id="1833" english="Salamander Flame"/>
+ <m id="1834" english="Typhonic Arrow"/>
+ <m id="1835" english="Meteoric Impact" targetstatus="7"/>
+ <m id="1836" english="Scouring Bubbles"/>
+ <m id="1837" english="."/>
+ <m id="1838" english="Fire Angon"/>
+ <m id="1839" english="Batterhorn"/>
+ <m id="1840" english="Clobber"/>
+ <m id="1841" english="Granite Skin" actorstatus="37"/>
+ <m id="1842" english="Blazing Angon" targetstatus="149"/>
+ <m id="1843" english="Batterhorn"/>
+ <m id="1844" english="Clobber"/>
+ <m id="1845" english="Demoralizing Roar" targetstatus="147"/>
+ <m id="1846" english="Boiling Blood" actorstatus="33,91"/>
+ <m id="1847" english="Granite Skin" actorstatus="37"/>
+ <m id="1848" english="Crippling Slam" targetstatus="4"/>
+ <m id="1849" english="Mijin Gakure"/>
+ <m id="1850" english="Bloodrake"/>
+ <m id="1851" english="Decollation"/>
+ <m id="1852" english="Nosferatu's Kiss"/>
+ <m id="1853" english="Heliovoid"/>
+ <m id="1854" english="Wings of Gehenna" targetstatus="10"/>
+ <m id="1855" english="Eternal Damnation" targetstatus="15"/>
+ <m id="1856" english="Nocturnal Servitude" targetstatus="17"/>
+ <m id="1857" english="Hellsnap" targetstatus="10"/>
+ <m id="1858" english="Hellclap" targetstatus="12"/>
+ <m id="1859" english="Cackle" targetstatus="167,174,175"/>
+ <m id="1860" english="Necrobane" targetstatus="4,9"/>
+ <m id="1861" english="Necropurge" targetstatus="9"/>
+ <m id="1862" english="Bilgestorm" targetstatus="146,147,149"/>
+ <m id="1863" english="Thundris Shriek" targetstatus="28"/>
+ <m id="1864" english="Ofnir" targetstatus="149"/>
+ <m id="1865" english="Valfodr" targetstatus="6,9"/>
+ <m id="1866" english="Yggr" actorstatus="22"/>
+ <m id="1867" english="Gagnrath" targetstatus="28"/>
+ <m id="1868" english="Sanngetall" targetstatus="28"/>
+ <m id="1869" english="Geirrothr" targetstatus="10,11"/>
+ <m id="1870" english="Zantetsuken" targetstatus="0"/>
+ <m id="1871" english="."/>
+ <m id="1872" english="."/>
+ <m id="1873" english="."/>
+ <m id="1874" english="Proboscis Shower"/>
+ <m id="1875" english="."/>
+ <m id="1876" english="Replicator" actorstatus="36"/>
+ <m id="1877" english="Liar's Dice"/>
+ <m id="1878" english="Victory Beacon" targetstatus="146"/>
+ <m id="1879" english="Salamander Flame"/>
+ <m id="1880" english="Typhonic Arrow"/>
+ <m id="1881" english="Meteoric Impact" targetstatus="7"/>
+ <m id="1882" english="Scouring Bubbles"/>
+ <m id="1883" english="Doom" targetstatus="15"/>
+ <m id="1884" english="Peacebreaker"/>
+ <m id="1885" english="Radiant Sacrament" targetstatus="167"/>
+ <m id="1886" english="Mega Holy"/>
+ <m id="1887" english="Perfect Defense" actorstatus="283"/>
+ <m id="1888" english="Divine Spear" targetstatus="146"/>
+ <m id="1889" english="Gospel of the Lost"/>
+ <m id="1890" english="Void of Repentance" targetstatus="28"/>
+ <m id="1891" english="Divine Judgement"/>
+ <m id="1892" english="."/>
+ <m id="1893" english="."/>
+ <m id="1894" english="Snatch Morsel"/>
+ <m id="1895" english="1000 Needles"/>
+ <m id="1896" english="Aqua Fortis" targetstatus="3"/>
+ <m id="1897" english="Regurgitation" targetstatus="11"/>
+ <m id="1898" english="Delta Thrust" targetstatus="31"/>
+ <m id="1899" english="Torpefying Charge" targetstatus="4"/>
+ <m id="1900" english="Grim Glower" targetstatus="7"/>
+ <m id="1901" english="Calcifying Mist" targetstatus="18"/>
+ <m id="1902" english="Insipid Nip"/>
+ <m id="1903" english="Pandemic Nip"/>
+ <m id="1904" english="Bombilation"/>
+ <m id="1905" english="Cimicine Discharge" targetstatus="13"/>
+ <m id="1906" english="Emetic Discharge"/>
+ <m id="1907" english="Seedspray" targetstatus="149"/>
+ <m id="1908" english="Viscid Emission" targetstatus="16"/>
+ <m id="1909" english="Rotten Stench" targetstatus="146,174"/>
+ <m id="1910" english="Floral Bouquet" targetstatus="2"/>
+ <m id="1911" english="Bloody Caress"/>
+ <m id="1912" english="Bloody Caress"/>
+ <m id="1913" english="Soothing Aroma" targetstatus="17"/>
+ <m id="1914" english="Fevered Pitch" targetstatus="10,149"/>
+ <m id="1915" english="Call of the Moon" targetstatus="22"/>
+ <m id="1916" english="Call of the Moon" targetstatus="22"/>
+ <m id="1917" english="Plenilune Embrace" actorstatus="91,190"/>
+ <m id="1918" english="Plenilune Embrace" actorstatus="91,190"/>
+ <m id="1919" english="Nox Blast"/>
+ <m id="1920" english="Asuran Claws"/>
+ <m id="1921" english="Cacophony" actorstatus="190,191"/>
+ <m id="1922" english="Sudden Lunge" targetstatus="10"/>
+ <m id="1923" english="Noisome Powder" targetstatus="147"/>
+ <m id="1924" english="Nepenthean Hum" targetstatus="16"/>
+ <m id="1925" english="Spiral Spin" targetstatus="146"/>
+ <m id="1926" english="Spiral Burst"/>
+ <m id="1927" english="Fuscous Ooze" targetstatus="12,177"/>
+ <m id="1928" english="Purulent Ooze" targetstatus="135,144"/>
+ <m id="1929" english="Corrosive Ooze" targetstatus="147,149"/>
+ <m id="1930" english="Mucilaginous Ooze" targetstatus="13,177"/>
+ <m id="1931" english="Dustvoid"/>
+ <m id="1932" english="Slaverous Gale" targetstatus="13,31"/>
+ <m id="1933" english="Aeolian Void" targetstatus="5,6"/>
+ <m id="1934" english="Extreme Purgation"/>
+ <m id="1935" english="Desiccation"/>
+ <m id="1936" english="Doomvoid"/>
+ <m id="1937" english="Zephyr Arrow" targetstatus="11"/>
+ <m id="1938" english="Lethe Arrows" targetstatus="11,16"/>
+ <m id="1939" english="Spring Breeze" targetstatus="2"/>
+ <m id="1940" english="Summer Breeze" actorstatus="170"/>
+ <m id="1941" english="Autumn Breeze"/>
+ <m id="1942" english="Winter Breeze" targetstatus="10"/>
+ <m id="1943" english="Cyclonic Turmoil"/>
+ <m id="1944" english="Cyclonic Torrent" targetstatus="29"/>
+ <m id="1945" english="Orcish Counterstance" actorstatus="61"/>
+ <m id="1946" english="Berserker Dance" actorstatus="33"/>
+ <m id="1947" english="Diamond Shell"/>
+ <m id="1948" english="Ore Lob"/>
+ <m id="1949" english="Feathered Furore"/>
+ <m id="1950" english="Dark Invocation"/>
+ <m id="1951" english="Disorienting Waul" targetstatus="16"/>
+ <m id="1952" english="Microspores"/>
+ <m id="1953" english="Blink of Peril"/>
+ <m id="1954" english="Petal Pirouette"/>
+ <m id="1955" english="."/>
+ <m id="1956" english="."/>
+ <m id="1957" english="."/>
+ <m id="1958" english="."/>
+ <m id="1959" english="."/>
+ <m id="1960" english="Nocturnal Combustion"/>
+ <m id="1961" english="Berserk" actorstatus="56"/>
+ <m id="1962" english="Penumbral Impact"/>
+ <m id="1963" english="Dark Wave" targetstatus="135"/>
+ <m id="1964" english="Tartarean Storm"/>
+ <m id="1965" english="Hell Scissors"/>
+ <m id="1966" english="Hurricane Breath"/>
+ <m id="1967" english="Ore Toss"/>
+ <m id="1968" english="Head Butt" targetstatus="10"/>
+ <m id="1969" english="Shell Bash" targetstatus="10"/>
+ <m id="1970" english="Shell Guard" actorstatus="93"/>
+ <m id="1971" english="Howl" actorstatus="68"/>
+ <m id="1972" english="The Wrath of Gu'Dha" targetstatus="12"/>
+ <m id="1973" english="Poison Breath" targetstatus="3"/>
+ <m id="1974" english="Poison Sting" targetstatus="3"/>
+ <m id="1975" english="Venom" targetstatus="3"/>
+ <m id="1976" english="Queasyshroom" targetstatus="3"/>
+ <m id="1977" english="Diamond Shell"/>
+ <m id="1978" english="Ore Lob"/>
+ <m id="1979" english="Paralyzing Blast" targetstatus="4"/>
+ <m id="1980" english="Silencing Blast" targetstatus="6"/>
+ <m id="1981" english="Binding Blast" targetstatus="11"/>
+ <m id="1982" english="Bloody Tomahawk"/>
+ <m id="1983" english="Volant Angon"/>
+ <m id="1984" english="Warden of Terror" targetstatus="28"/>
+ <m id="1985" english="Call to Arms"/>
+ <m id="1986" english="Mighty Strikes" actorstatus="44"/>
+ <m id="1987" english="Hundred Fists" actorstatus="46"/>
+ <m id="1988" english="Benediction"/>
+ <m id="1989" english="Manafont" actorstatus="47"/>
+ <m id="1990" english="Chainspell" actorstatus="48"/>
+ <m id="1991" english="Perfect Dodge" actorstatus="49"/>
+ <m id="1992" english="Invincible" actorstatus="50"/>
+ <m id="1993" english="Blood Weapon" actorstatus="51"/>
+ <m id="1994" english="Familiar" targetstatus="17"/>
+ <m id="1995" english="Soul Voice" actorstatus="52"/>
+ <m id="1996" english="Eagle Eye Shot"/>
+ <m id="1997" english="Meikyo Shisui" actorstatus="54"/>
+ <m id="1998" english="Mijin Gakure"/>
+ <m id="1999" english="Spirit Surge" actorstatus="126"/>
+ <m id="2000" english="Astral Flow" actorstatus="55"/>
+ <m id="2001" english="Azure Lore" actorstatus="163"/>
+ <m id="2002" english="Wild Card"/>
+ <m id="2003" english="Overdrive" actorstatus="166"/>
+ <m id="2004" english="Trance" actorstatus="376"/>
+ <m id="2005" english="Tabula Rasa" actorstatus="377"/>
+ <m id="2006" english="."/>
+ <m id="2007" english="Tornado Edge" targetstatus="144,145,189"/>
+ <m id="2008" english="Shoulder Charge" targetstatus="149"/>
+ <m id="2009" english="Skull Smash" targetstatus="10"/>
+ <m id="2010" english="Shell Charge" targetstatus="16"/>
+ <m id="2011" english="Skull Smash" targetstatus="10"/>
+ <m id="2012" english="Shell Charge" targetstatus="16"/>
+ <m id="2013" english="Kamaitachi"/>
+ <m id="2014" english="Shirahadori" targetstatus="11"/>
+ <m id="2015" english="Rising Dragon"/>
+ <m id="2016" english="Bear Killer"/>
+ <m id="2017" english="Uriel Blade" targetstatus="156"/>
+ <m id="2018" english="Spine Chiller" targetstatus="28"/>
+ <m id="2019" english="Prominence"/>
+ <m id="2020" english="Arrow of Apathy"/>
+ <m id="2021" english="Cruel Riposte"/>
+ <m id="2022" english="Glory Slash" targetstatus="10"/>
+ <m id="2023" english="Napalm Tomahawk"/>
+ <m id="2024" english="Iainuki"/>
+ <m id="2025" english="Oppressive Embrace" targetstatus="20,28"/>
+ <m id="2026" english="Reverie Frolic" targetstatus="134,146,174"/>
+ <m id="2027" english="Tartarus Torpor" targetstatus="2"/>
+ <m id="2028" english="Death Knell" targetstatus="15"/>
+ <m id="2029" english="Bloody Quarrel"/>
+ <m id="2030" english="Leonine Legflail"/>
+ <m id="2031" english="Soulfetter Arrow"/>
+ <m id="2032" english="Heavy Artillery"/>
+ <m id="2033" english="Immortal Shield" actorstatus="152"/>
+ <m id="2034" english="Restoral"/>
+ <m id="2035" english="Restoral"/>
+ <m id="2036" english="Restoral"/>
+ <m id="2037" english="Restoral"/>
+ <m id="2038" english="Basilisk Cannon"/>
+ <m id="2039" english="Beaked Bomber"/>
+ <m id="2040" english="."/>
+ <m id="2041" english="."/>
+ <m id="2042" english="."/>
+ <m id="2043" english="Bone Crusher" targetstatus="10"/>
+ <m id="2044" english="Armor Piercer" targetstatus="149"/>
+ <m id="2045" english="Magic Mortar"/>
+ <m id="2046" english="Light Arts" actorstatus="358"/>
+ <m id="2047" english="Dark Arts" actorstatus="359"/>
+ <m id="2048" english="Curing Waltz"/>
+ <m id="2049" english="Healing Waltz"/>
+ <m id="2050" english="Drain Samba" actorstatus="368"/>
+ <m id="2051" english="Haste Samba" actorstatus="370"/>
+ <m id="2052" english="Quickstep" targetstatus="386"/>
+ <m id="2053" english="Box Step" targetstatus="392"/>
+ <m id="2054" english="Stutter Step" targetstatus="396"/>
+ <m id="2055" english="Building Flourish" actorstatus="375"/>
+ <m id="2056" english="Desperate Flourish" targetstatus="12"/>
+ <m id="2057" english="Reverse Flourish"/>
+ <m id="2058" english="Parsimony" actorstatus="361"/>
+ <m id="2059" english="Alacrity" actorstatus="363"/>
+ <m id="2060" english="Manifestation" actorstatus="367"/>
+ <m id="2061" english="Ebullience" actorstatus="365"/>
+ <m id="2062" english="Curing Waltz II"/>
+ <m id="2063" english="Curing Waltz III"/>
+ <m id="2064" english="Curing Waltz IV"/>
+ <m id="2065" english="Drain Samba II" actorstatus="368"/>
+ <m id="2066" english="Drain Samba III" actorstatus="368"/>
+ <m id="2067" english="Animated Flourish"/>
+ <m id="2068" english="Violent Flourish" targetstatus="10"/>
+ <m id="2069" english="Wild Flourish"/>
+ <m id="2070" english="."/>
+ <m id="2071" english="Mine Blast"/>
+ <m id="2072" english="."/>
+ <m id="2073" english="."/>
+ <m id="2074" english="."/>
+ <m id="2075" english="."/>
+ <m id="2076" english="."/>
+ <m id="2077" english="."/>
+ <m id="2078" english="Wrath of Zeus" targetstatus="6"/>
+ <m id="2079" english="Lightning Spear" targetstatus="16"/>
+ <m id="2080" english="Acheron Kick"/>
+ <m id="2081" english="Damsel Memento"/>
+ <m id="2082" english="Rampant Stance" targetstatus="10"/>
+ <m id="2083" english="."/>
+ <m id="2084" english="Extreme Purgation"/>
+ <m id="2085" english="."/>
+ <m id="2086" english="."/>
+ <m id="2087" english="."/>
+ <m id="2088" english="."/>
+ <m id="2089" english="."/>
+ <m id="2090" english="."/>
+ <m id="2091" english="."/>
+ <m id="2092" english="Glacial Bellow"/>
+ <m id="2093" english="Daunting Hurl" targetstatus="28"/>
+ <m id="2094" english="Scatter Shell"/>
+ <m id="2095" english="Tear Grenade" targetstatus="5,6"/>
+ <m id="2096" english="Sticky Grenade" targetstatus="12"/>
+ <m id="2097" english="."/>
+ <m id="2098" english="."/>
+ <m id="2099" english="."/>
+ <m id="2100" english="."/>
+ <m id="2101" english="."/>
+ <m id="2102" english="Tabula Rasa" actorstatus="377"/>
+ <m id="2103" english="Strap Cutter" targetstatus="177"/>
+ <m id="2104" english="Wind Shear"/>
+ <m id="2105" english="Stave Toss"/>
+ <m id="2106" english="."/>
+ <m id="2107" english="."/>
+ <m id="2108" english="Unblest Jambiya"/>
+ <m id="2109" english="Goddess's Shield"/>
+ <m id="2110" english="Mine Blast"/>
+ <m id="2111" english="Moribund Hack" targetstatus="4"/>
+ <m id="2112" english="Damsel Memento"/>
+ <m id="2113" english="Scintillant Lance"/>
+ <m id="2114" english="Grace of Hera"/>
+ <m id="2115" english="Noxious Spray" targetstatus="3"/>
+ <m id="2116" english="Hellborn Yawp" targetstatus="5"/>
+ <m id="2117" english="Veil of Chaos" targetstatus="16"/>
+ <m id="2118" english="Torment of Gu'Dha" targetstatus="7"/>
+ <m id="2119" english="Vorticose Sands" targetstatus="6"/>
+ <m id="2120" english="Paroxysm"/>
+ <m id="2121" english="Reviviscence"/>
+ <m id="2122" english="Diamond Shell"/>
+ <m id="2123" english="Invincible" actorstatus="50"/>
+ <m id="2124" english="Monocular Scowl"/>
+ <m id="2125" english="Double Kick" targetstatus="10"/>
+ <m id="2126" english="Mijin Gakure"/>
+ <m id="2127" english="Charm" targetstatus="17"/>
+ <m id="2128" english="Orbital Earthrend"/>
+ <m id="2129" english="Tongue Lash" targetstatus="28"/>
+ <m id="2130" english="Cobra Clamp"/>
+ <m id="2131" english="Fatal Scream" targetstatus="15"/>
+ <m id="2132" english="Dirty Breath" targetstatus="20"/>
+ <m id="2133" english="Lethal Triclip" targetstatus="144"/>
+ <m id="2134" english="Accursed Armor" actorstatus="153"/>
+ <m id="2135" english="Amnesic Blast" targetstatus="16"/>
+ <m id="2136" english="Oppressive Glare" targetstatus="20,28"/>
+ <m id="2137" english="Ritual Bind" targetstatus="4,11"/>
+ <m id="2138" english="Moribund Hack" targetstatus="4"/>
+ <m id="2139" english="Mine Blast"/>
+ <m id="2140" english="."/>
+ <m id="2141" english="."/>
+ <m id="2142" english="."/>
+ <m id="2143" english="."/>
+ <m id="2144" english="."/>
+ <m id="2145" english="."/>
+ <m id="2146" english="."/>
+ <m id="2147" english="."/>
+ <m id="2148" english="."/>
+ <m id="2149" english="."/>
+ <m id="2150" english="Roar" targetstatus="4"/>
+ <m id="2151" english="Charged Whisker"/>
+ <m id="2152" english="."/>
+ <m id="2153" english="."/>
+ <m id="2154" english="Demonic Flower"/>
+ <m id="2155" english="Phantasmal Dance" targetstatus="11"/>
+ <m id="2156" english="Thunderous Yowl" targetstatus="9,31"/>
+ <m id="2157" english="Feather Maelstrom" targetstatus="16,135"/>
+ <m id="2158" english="Saucepan" targetstatus="251"/>
+ <m id="2159" english="."/>
+ <m id="2160" english="Seed of Deception"/>
+ <m id="2161" english="Seed of Deference" targetstatus="17"/>
+ <m id="2162" english="Seed of Nihility"/>
+ <m id="2163" english="Seed of Judgment"/>
+ <m id="2164" english="Shackling Clout"/>
+ <m id="2165" english="Dark Orb"/>
+ <m id="2166" english="Dark Mist" targetstatus="12"/>
+ <m id="2167" english="Triumphant Roar" actorstatus="91"/>
+ <m id="2168" english="Terror Eye" targetstatus="28"/>
+ <m id="2169" english="Bloody Claw"/>
+ <m id="2170" english="Shadow Burst"/>
+ <m id="2171" english="Tail Lash"/>
+ <m id="2172" english="Bloody Beak"/>
+ <m id="2173" english="Feral Peck"/>
+ <m id="2174" english="Warped Wail" targetstatus="144,145"/>
+ <m id="2175" english="Reaving Wind"/>
+ <m id="2176" english="Storm Wing" targetstatus="6"/>
+ <m id="2177" english="Calamitous Wind"/>
+ <m id="2178" english="."/>
+ <m id="2179" english="Severing Fang" targetstatus="149"/>
+ <m id="2180" english="Sub-zero Smash" targetstatus="4"/>
+ <m id="2181" english="Aqua Blast"/>
+ <m id="2182" english="Frozen Mist" actorstatus="37" targetstatus="28"/>
+ <m id="2183" english="Hydro Wave"/>
+ <m id="2184" english="Ice Guillotine" targetstatus="4,16,144"/>
+ <m id="2185" english="Aqua Cannon" targetstatus="149"/>
+ <m id="2186" english="Thorned Stance" actorstatus="93"/>
+ <m id="2187" english="Sensual Dance" actorstatus="91" targetstatus="147,175"/>
+ <m id="2188" english="Dancer's Fury"/>
+ <m id="2189" english="Whirling Edge"/>
+ <m id="2190" english="Rousing Samba" actorstatus="169"/>
+ <m id="2191" english="Vivifying Waltz"/>
+ <m id="2192" english="Regal Scratch"/>
+ <m id="2193" english="Mewing Lullaby" targetstatus="2"/>
+ <m id="2194" english="Eerie Eye" targetstatus="6,16"/>
+ <m id="2195" english="Divine Favor"/>
+ <m id="2196" english="Level ? Holy"/>
+ <m id="2197" english="Level ? Holy"/>
+ <m id="2198" english="Level ? Holy"/>
+ <m id="2199" english="Level ? Holy"/>
+ <m id="2200" english="Level ? Holy"/>
+ <m id="2201" english="Level ? Holy"/>
+ <m id="2202" english="Soul Vacuum"/>
+ <m id="2203" english="Soul Infusion"/>
+ <m id="2204" english="."/>
+ <m id="2205" english="Mog Bomb"/>
+ <m id="2206" english="Mog Shrapnel"/>
+ <m id="2207" english="Flowerpot" targetstatus="10,11,16"/>
+ <m id="2208" english="."/>
+ <m id="2209" english="Bill Toss" targetstatus="28"/>
+ <m id="2210" english="Washtub" targetstatus="10,16"/>
+ <m id="2211" english="Crystalline Flare" targetstatus="5,10"/>
+ <m id="2212" english="King Cobra Clamp"/>
+ <m id="2213" english="Wasp Sting" targetstatus="3"/>
+ <m id="2214" english="Dancing Edge"/>
+ <m id="2215" english="Bistillot Blast"/>
+ <m id="2216" english="Songbird Swoop"/>
+ <m id="2217" english="Vunkerl Herb Tonic"/>
+ <m id="2218" english="Stag's Cry"/>
+ <m id="2219" english="Stag's Call"/>
+ <m id="2220" english="Gyre Strike"/>
+ <m id="2221" english="Stag's Charge"/>
+ <m id="2222" english="Orcsbane"/>
+ <m id="2223" english="Temblor Blade"/>
+ <m id="2224" english="Inferno"/>
+ <m id="2225" english="Tidal Wave"/>
+ <m id="2226" english="Earthen Fury"/>
+ <m id="2227" english="Diamond Dust"/>
+ <m id="2228" english="Judgment Bolt"/>
+ <m id="2229" english="Aerial Blast"/>
+ <m id="2230" english="Salvation Scythe"/>
+ <m id="2231" english="Salvation Scythe"/>
+ <m id="2232" english="Divine Malison"/>
+ <m id="2233" english="Divine Malison"/>
+ <m id="2234" english="Fire Overload" targetstatus="8"/>
+ <m id="2235" english="Ice Overload" targetstatus="4"/>
+ <m id="2236" english="Wind Overload"/>
+ <m id="2237" english="Earth Overload" targetstatus="13"/>
+ <m id="2238" english="Lightning Overload" targetstatus="10"/>
+ <m id="2239" english="Water Overload" targetstatus="3"/>
+ <m id="2240" english="Light Overload"/>
+ <m id="2241" english="Dark Overload"/>
+ <m id="2242" english="."/>
+ <m id="2243" english="."/>
+ <m id="2244" english="."/>
+ <m id="2245" english="."/>
+ <m id="2246" english="."/>
+ <m id="2247" english="."/>
+ <m id="2248" english="."/>
+ <m id="2249" english="."/>
+ <m id="2250" english="."/>
+ <m id="2251" english="."/>
+ <m id="2252" english="."/>
+ <m id="2253" english="Hypothermal Combustion"/>
+ <m id="2254" english="."/>
+ <m id="2255" english="Corpse Breath" targetstatus="5"/>
+ <m id="2256" english="Venom Shower" targetstatus="3,149"/>
+ <m id="2257" english="Mega Scissors"/>
+ <m id="2258" english="Cytokinesis"/>
+ <m id="2259" english="."/>
+ <m id="2260" english="Gravitic Horn"/>
+ <m id="2261" english="Quake Blast"/>
+ <m id="2262" english="Norn Arrows" targetstatus="177"/>
+ <m id="2263" english="Dexter Wing"/>
+ <m id="2264" english="Sinister Wing" targetstatus="146,174"/>
+ <m id="2265" english="Chaos Blast" targetstatus="144,145,189"/>
+ <m id="2266" english="Abyssic Buster"/>
+ <m id="2267" english="Dancing Tail" targetstatus="3"/>
+ <m id="2268" english="Dancing Tail" targetstatus="3"/>
+ <m id="2269" english="Chilling Roar" targetstatus="28"/>
+ <m id="2270" english="Chilling Roar" targetstatus="28"/>
+ <m id="2271" english="Soul Douse" targetstatus="15"/>
+ <m id="2272" english="Soul Douse" targetstatus="15"/>
+ <m id="2273" english="Dark Star" targetstatus="149,167"/>
+ <m id="2274" english="Dark Star" targetstatus="149,167"/>
+ <m id="2275" english="Altair Bullet"/>
+ <m id="2276" english="Savage Swordhand" targetstatus="16"/>
+ <m id="2277" english="Lithic Ray" targetstatus="7,134"/>
+ <m id="2278" english="Minax Glare" targetstatus="28,149"/>
+ <m id="2279" english="Vicious Kick"/>
+ <m id="2280" english="Boon Void"/>
+ <m id="2281" english="Cruel Slash"/>
+ <m id="2282" english="Spell Wall"/>
+ <m id="2283" english="Implosion"/>
+ <m id="2284" english="Umbral Orb"/>
+ <m id="2285" english="Cross Smash"/>
+ <m id="2286" english="Blighting Blitz"/>
+ <m id="2287" english="Spawn Shadow"/>
+ <m id="2288" english="Soma Wall"/>
+ <m id="2289" english="Doom Arc"/>
+ <m id="2290" english="."/>
+ <m id="2291" english="."/>
+ <m id="2292" english="Fluid Spread"/>
+ <m id="2293" english="Fluid Toss"/>
+ <m id="2294" english="Dissolve"/>
+ <m id="2295" english="Mucus Spread" targetstatus="13"/>
+ <m id="2296" english="Epoxy Spread" targetstatus="11"/>
+ <m id="2297" english="."/>
+ <m id="2298" english="."/>
+ <m id="2299" english="."/>
+ <m id="2300" english="Ofnir" targetstatus="149"/>
+ <m id="2301" english="Valfodr" targetstatus="6,9"/>
+ <m id="2302" english="Yggr" actorstatus="22"/>
+ <m id="2303" english="Gagnrath" targetstatus="28"/>
+ <m id="2304" english="Sanngetall" targetstatus="28"/>
+ <m id="2305" english="Geirrothr" targetstatus="10,11"/>
+ <m id="2306" english="Acrid Stream" targetstatus="149"/>
+ <m id="2307" english="Rime Spray" targetstatus="129"/>
+ <m id="2308" english="Blazing Bound"/>
+ <m id="2309" english="Molting Burst"/>
+ <m id="2310" english="Diabolic Claw" targetstatus="167"/>
+ <m id="2311" english="Stygian Cyclone" targetstatus="6"/>
+ <m id="2312" english="Deathly Diminuendo" targetstatus="9,135"/>
+ <m id="2313" english="Hellish Crescendo" targetstatus="4"/>
+ <m id="2314" english="Afflicting Gaze" targetstatus="11,31"/>
+ <m id="2315" english="Stygian Sphere"/>
+ <m id="2316" english="Malign Invocation" targetstatus="16"/>
+ <m id="2317" english="Shadow Wreck"/>
+ <m id="2318" english="Thousand Spears"/>
+ <m id="2319" english="Tainting Breath" targetstatus="17"/>
+ <m id="2320" english="Mercurial Strike"/>
+ <m id="2321" english="Mercurial Strike"/>
+ <m id="2322" english="Colossal Slam" targetstatus="20"/>
+ <m id="2323" english="Phaeosynthesis" actorstatus="42,92"/>
+ <m id="2324" english="Pandora's Curse" targetstatus="135"/>
+ <m id="2325" english="Pandora's Gift"/>
+ <m id="2326" english="."/>
+ <m id="2327" english="."/>
+ <m id="2328" english="."/>
+ <m id="2329" english="Testudo Tremor" targetstatus="10,12"/>
+ <m id="2330" english="Ecliptic Meteor" targetstatus="4,5,135"/>
+ <m id="2331" english="Inspirit"/>
+ <m id="2332" english="Debonair Rush"/>
+ <m id="2333" english="Iridal Pierce"/>
+ <m id="2334" english="Lunar Revolution"/>
+ <m id="2335" english="Great Divide" targetstatus="10"/>
+ <m id="2336" english="Darkling Blade"/>
+ <m id="2337" english="Demonic Shear"/>
+ <m id="2338" english="Quietus Sphere" targetstatus="0"/>
+ <m id="2339" english="."/>
+ <m id="2340" english="."/>
+ <m id="2341" english="."/>
+ <m id="2342" english="."/>
+ <m id="2343" english="Tepal Twist" targetstatus="144"/>
+ <m id="2344" english="Bloom Fouette" targetstatus="145"/>
+ <m id="2345" english="Petalback Spin" targetstatus="3,4,5,6,16,31"/>
+ <m id="2346" english="Mortal Blast" targetstatus="0"/>
+ <m id="2347" english="Heat Breath"/>
+ <m id="2348" english="Gorge"/>
+ <m id="2349" english="Disgorge"/>
+ <m id="2350" english="Carousel"/>
+ <m id="2351" english="Agaricus" targetstatus="13,31"/>
+ <m id="2352" english="Terminal Sting"/>
+ <m id="2353" english="Booming Bleat"/>
+ <m id="2354" english="Vacant Gaze"/>
+ <m id="2355" english="Blaster" targetstatus="4"/>
+ <m id="2356" english="Wild Carrot"/>
+ <m id="2357" english="Spiral Spin" targetstatus="146"/>
+ <m id="2358" english="Noisome Powder" targetstatus="147"/>
+ <m id="2359" english="Stag's Cry"/>
+ <m id="2360" english="."/>
+ <m id="2361" english="."/>
+ <m id="2362" english="."/>
+ <m id="2363" english="Turbine Cyclone"/>
+ <m id="2364" english="Seismic Impact" targetstatus="13,28"/>
+ <m id="2365" english="Incinerator" targetstatus="128"/>
+ <m id="2366" english="Arm Cannon"/>
+ <m id="2367" english="Ballistic Kick" targetstatus="177"/>
+ <m id="2368" english="Scapula Beam"/>
+ <m id="2369" english="Eradicator" targetstatus="1"/>
+ <m id="2370" english="Auger Smash"/>
+ <m id="2371" english="Area Bombardment"/>
+ <m id="2372" english="Cauterizing Field"/>
+ <m id="2373" english="Benthic Typhoon" targetstatus="149,167"/>
+ <m id="2374" english="Pelagic Tempest" targetstatus="28,132"/>
+ <m id="2375" english="Osmosis"/>
+ <m id="2376" english="Vacuole Discharge" targetstatus="4"/>
+ <m id="2377" english="Nucleic Implosion"/>
+ <m id="2378" english="Interference"/>
+ <m id="2379" english="Dark Arrivisme"/>
+ <m id="2380" english="Banneret Charge"/>
+ <m id="2381" english="Besieger's Bane" targetstatus="20,28,135"/>
+ <m id="2382" english="Hadal Summons" targetstatus="128"/>
+ <m id="2383" english="Mayhem Lantern" targetstatus="91,132"/>
+ <m id="2384" english="Ruinous Scythe" targetstatus="144"/>
+ <m id="2385" english="Psyche Suction"/>
+ <m id="2386" english="Vermilion Wind"/>
+ <m id="2387" english="Tyrant Tusk" targetstatus="0,135"/>
+ <m id="2388" english="Somnial Durance" targetstatus="19,130"/>
+ <m id="2389" english="Mud Stream" targetstatus="11,13,131,167"/>
+ <m id="2390" english="Rancor Smash" targetstatus="16"/>
+ <m id="2391" english="Melancholy Jig" targetstatus="15"/>
+ <m id="2392" english="Forlorn Impact" targetstatus="4"/>
+ <m id="2393" english="Essence Jack" targetstatus="28"/>
+ <m id="2394" english="."/>
+ <m id="2395" english="."/>
+ <m id="2396" english="."/>
+ <m id="2397" english="."/>
+ <m id="2398" english="."/>
+ <m id="2399" english="."/>
+ <m id="2400" english="."/>
+ <m id="2401" english="."/>
+ <m id="2402" english="."/>
+ <m id="2403" english="."/>
+ <m id="2404" english="."/>
+ <m id="2405" english="."/>
+ <m id="2406" english="."/>
+ <m id="2407" english="."/>
+ <m id="2408" english="Cosmic Breath" targetstatus="31,147"/>
+ <m id="2409" english="Cataclysmic Vortex" targetstatus="144"/>
+ <m id="2410" english="Gyre Charge" targetstatus="4"/>
+ <m id="2411" english="Mighty Guard" actorstatus="170"/>
+ <m id="2412" english="Atomic Ray"/>
+ <m id="2413" english="Dark Matter" targetstatus="28"/>
+ <m id="2414" english="Protostar"/>
+ <m id="2415" english="Supernova" targetstatus="15"/>
+ <m id="2416" english="."/>
+ <m id="2417" english="."/>
+ <m id="2418" english="."/>
+ <m id="2419" english="Dark Thorn" actorstatus="34,37"/>
+ <m id="2420" english="Petaline Tempest" targetstatus="145,146,189"/>
+ <m id="2421" english="Durance Whip" targetstatus="5,16,135"/>
+ <m id="2422" english="Subjugating Slash"/>
+ <m id="2423" english="Fatal Allure" targetstatus="17"/>
+ <m id="2424" english="Moonlight Veil" targetstatus="28"/>
+ <m id="2425" english="."/>
+ <m id="2426" english="."/>
+ <m id="2427" english="."/>
+ <m id="2428" english="Dark Flare"/>
+ <m id="2429" english="Dark Freeze" targetstatus="28"/>
+ <m id="2430" english="Dark Tornado"/>
+ <m id="2431" english="Dark Quake" targetstatus="11,16"/>
+ <m id="2432" english="Dark Burst"/>
+ <m id="2433" english="Dark Flood" targetstatus="177"/>
+ <m id="2434" english="Dark Moon" targetstatus="1"/>
+ <m id="2435" english="Dark Sun" targetstatus="0"/>
+ <m id="2436" english="Royal Decree" targetstatus="260"/>
+ <m id="2437" english="Virulent Haze" targetstatus="21,128"/>
+ <m id="2438" english="Cyclonic Blight" targetstatus="2,10"/>
+ <m id="2439" english="Torment Tusk" targetstatus="0,135"/>
+ <m id="2440" english="Baleful Roar"/>
+ <m id="2441" english="Infinite Terror" targetstatus="28"/>
+ <m id="2442" english="Lithic Breath" targetstatus="1,7"/>
+ <m id="2443" english="Tarsal Slam"/>
+ <m id="2444" english="Enthrall" targetstatus="14"/>
+ <m id="2445" english="Acheron Flame" targetstatus="128"/>
+ <m id="2446" english="Terra Wing" targetstatus="7"/>
+ <m id="2447" english="Dread Wind" targetstatus="28">
+ <m id="2448" english="??? Needles"/>
+ <m id="2449" english="White Wind"/>
+ <m id="2450" english="Smokebomb" targetstatus="5"/>
+ <m id="2451" english="Paralysis Shower" targetstatus="4"/>
+ <m id="2452" english="Cosmic Breath" targetstatus="31,147"/>
+ <m id="2453" english="Cataclysmic Vortex" targetstatus="144"/>
+ <m id="2454" english="Trance" actorstatus="376"/>
+ <m id="2455" english="."/>
+ <m id="2456" english="."/>
+ <m id="2457" english="."/>
+ <m id="2458" english="Yaksha Stance"/>
+ <m id="2459" english="Yaksha: Damnation"/>
+ <m id="2460" english="Yaksha: Bliss" targetstatus="147,175"/>
+ <m id="2461" english="Yaksha: Oblivion"/>
+ <m id="2462" english="Raksha Stance"/>
+ <m id="2463" english="Raksha: Judgment" targetstatus="6,11,16"/>
+ <m id="2464" english="Raksha: Illusion" targetstatus="4,9"/>
+ <m id="2465" english="Raksha: Vengeance" targetstatus="1,473"/>
+ <m id="2466" english="."/>
+ <m id="2467" english="."/>
+ <m id="2468" english="."/>
+ <m id="2469" english="Rending Talons"/>
+ <m id="2470" english="Shrieking Gale"/>
+ <m id="2471" english="Wings of Woe" targetstatus="6,31"/>
+ <m id="2472" english="Wings of Agony" targetstatus="2,4"/>
+ <m id="2473" english="Typhoean Rage" targetstatus="177,473"/>
+ <m id="2474" english="Ravenous Wail"/>
+ <m id="2475" english="Incinerator" targetstatus="128"/>
+ <m id="2476" english="Arm Cannon" targetstatus="144,145"/>
+ <m id="2477" english="Ballistic Kick" targetstatus="177"/>
+ <m id="2478" english="Cauterizing Field"/>
+ <m id="2479" english="Searing Tempest" targetstatus="128"/>
+ <m id="2480" english="Blinding Fulgor" targetstatus="156"/>
+ <m id="2481" english="Spectral Floe" targetstatus="28"/>
+ <m id="2482" english="Scouring Spate" targetstatus="4"/>
+ <m id="2483" english="Anvil Lightning" targetstatus="10"/>
+ <m id="2484" english="Silent Storm" targetstatus="6"/>
+ <m id="2485" english="Entomb" targetstatus="7"/>
+ <m id="2486" english="Tenebral Crush"/>
+ <m id="2487" english="String Shredder"/>
+ <m id="2488" english="Armor Shatterer" targetstatus="149"/>
+ <m id="2489" english="Heat Capacitor"/>
+ <m id="2490" english="Barrage Turbine" actorstatus="73"/>
+ <m id="2491" english="Disruptor"/>
+ <m id="2492" english="."/>
+ <m id="2493" english="."/>
+ <m id="2494" english="."/>
+ <m id="2495" english="Slicing Sickle" targetstatus="149"/>
+ <m id="2496" english="Raptorial Claw" targetstatus="167"/>
+ <m id="2497" english="Phlegm Expulsion" targetstatus="4,13,16"/>
+ <m id="2498" english="Macerating Bile" targetstatus="135"/>
+ <m id="2499" english="Preying Posture" actorstatus="90,91,172,190"/>
+ <m id="2500" english="Death Prophet" targetstatus="0"/>
+ <m id="2501" english="Sakra Storm" targetstatus="4,20,473"/>
+ <m id="2502" english="Kaleidoscopic Fury" targetstatus="134"/>
+ <m id="2503" english="Telsonic Tempest"/>
+ <m id="2504" english="Preternatural Gleam" targetstatus="4,29"/>
+ <m id="2505" english="Chupa Blossom"/>
+ <m id="2506" english="Hell Slash"/>
+ <m id="2507" english="Horror Cloud" targetstatus="13"/>
+ <m id="2508" english="Black Cloud" targetstatus="5"/>
+ <m id="2509" english="Blood Saber"/>
+ <m id="2510" english="Malediction"/>
+ <m id="2511" english="Crepuscule Blade" targetstatus="9,135"/>
+ <m id="2512" english="Deathly Glare" targetstatus="0"/>
+ <m id="2513" english="Blighted Bouquet" targetstatus="29,135"/>
+ <m id="2514" english="Booming Bombination" targetstatus="149,167"/>
+ <m id="2515" english="Gush o' Goo" targetstatus="11,177"/>
+ <m id="2516" english="."/>
+ <m id="2517" english="."/>
+ <m id="2518" english="Flank Opening" targetstatus="149"/>
+ <m id="2519" english="Tabbiyaa Gambit"/>
+ <m id="2520" english="Shah Mat" targetstatus="15,28"/>
+ <m id="2521" english="Benediction"/>
+ <m id="2522" english="Reactive Shield" targetstatus="34"/>
+ <m id="2523" english="Shock Absorber" actorstatus="37"/>
+ <m id="2524" english="Replicator" targetstatus="36"/>
+ <m id="2525" english="."/>
+ <m id="2526" english="."/>
+ <m id="2527" english="."/>
+ <m id="2528" english="Diluvial Wake" targetstatus="149,167"/>
+ <m id="2529" english="Kurnugi Collapse" targetstatus="146,174"/>
+ <m id="2530" english="Searing Halitus" targetstatus="128"/>
+ <m id="2531" english="Divesting Gale" targetstatus="177,473"/>
+ <m id="2532" english="Bolt of Perdition" targetstatus="16,29"/>
+ <m id="2533" english="Crippling Rime"/>
+ <m id="2534" english="Oblivion's Mantle" targetstatus="1,15"/>
+ <m id="2535" english="."/>
+ <m id="2536" english="."/>
+ <m id="2537" english="."/>
+ <m id="2538" english="."/>
+ <m id="2539" english="."/>
+ <m id="2540" english="."/>
+ <m id="2541" english="."/>
+ <m id="2542" english="Gnash 'n Guttle" targetstatus="144"/>
+ <m id="2543" english="Sloughy Sputum" targetstatus="12,133"/>
+ <m id="2544" english="Chymous Reek" targetstatus="10,130"/>
+ <m id="2545" english="Rancid Reflux" targetstatus="12,144"/>
+ <m id="2546" english="Crowning Flatus" targetstatus="10"/>
+ <m id="2547" english="Slimy Proposal" targetstatus="14"/>
+ <m id="2548" english="Just Desserts" targetstatus="10,133"/>
+ <m id="2549" english="Pawn's Penumbra"/>
+ <m id="2550" english="Beleaguerment"/>
+ <m id="2551" english="Unchivalrous Stab"/>
+ <m id="2552" english="Discordant Gambit"/>
+ <m id="2553" english="Immolating Claw" targetstatus="31"/>
+ <m id="2554" english="Yama's Judgment" targetstatus="15"/>
+ <m id="2555" english="Keraunos Quill" targetstatus="4,177"/>
+ <m id="2556" english="Bilrost Squall"/>
+ <m id="2557" english="Dunur Strike"/>
+ <m id="2558" english="Yawn" targetstatus="2"/>
+ <m id="2559" english="Wing Slap" targetstatus="10"/>
+ <m id="2560" english="Beak Lunge"/>
+ <m id="2561" english="Frigid Shuffle" targetstatus="4"/>
+ <m id="2562" english="Wing Whirl"/>
+ <m id="2563" english="Whiteout" targetstatus="2,20"/>
+ <m id="2564" english="Keratinous Crush"/>
+ <m id="2565" english="Accurst Spear" targetstatus="20"/>
+ <m id="2566" english="Eldritch Wind" targetstatus="21,31"/>
+ <m id="2567" english="Rhinowrecker"/>
+ <m id="2568" english="Cloudscourge" targetstatus="28"/>
+ <m id="2569" english="Louring Skies" targetstatus="4,11"/>
+ <m id="2570" english="Exponential Burst" targetstatus="167"/>
+ <m id="2571" english="Sudden Lunge" targetstatus="10"/>
+ <m id="2572" english="Jettatura" targetstatus="28"/>
+ <m id="2573" english="Aqua Breath"/>
+ <m id="2574" english="Royal Decree" targetstatus="260"/>
+ <m id="2575" english="Grace of Hera"/>
+ <m id="2576" english="."/>
+ <m id="2577" english="."/>
+ <m id="2578" english="."/>
+ <m id="2579" english="."/>
+ <m id="2580" english="."/>
+ <m id="2581" english="."/>
+ <m id="2582" english="."/>
+ <m id="2583" english="Prismatic Breath" targetstatus="168"/>
+ <m id="2584" english="Acicular Brand"/>
+ <m id="2585" english="Orogenesis" targetstatus="12,130,148"/>
+ <m id="2586" english="Phason Beam" targetstatus="167"/>
+ <m id="2587" english="Diffractive Break" targetstatus="6,16,437"/>
+ <m id="2588" english="Euhedral Swat" targetstatus="147,149"/>
+ <m id="2589" english="."/>
+ <m id="2590" english="."/>
+ <m id="2591" english="."/>
+ <m id="2592" english="."/>
+ <m id="2593" english="."/>
+ <m id="2594" english="."/>
+ <m id="2595" english="."/>
+ <m id="2596" english="Prismatic Breath" targetstatus="168"/>
+ <m id="2597" english="Acicular Brand"/>
+ <m id="2598" english="Orogenesis" targetstatus="12,130,148"/>
+ <m id="2599" english="Phason Beam" targetstatus="167"/>
+ <m id="2600" english="Diffractive Break" targetstatus="6,16,437"/>
+ <m id="2601" english="Euhedral Swat" targetstatus="147,149"/>
+ <m id="2602" english="Crystallite Shower" targetstatus="13,21,134"/>
+ <m id="2603" english="Graviton Crux" actorstatus="153"/>
+ <m id="2604" english="Crystal Bolide" targetstatus="28,260"/>
+ <m id="2605" english="Fragor Maximus" actorstatus="22" targetstatus="1"/>
+ <m id="2606" english="."/>
+ <m id="2607" english="."/>
+ <m id="2608" english="."/>
+ <m id="2609" english="."/>
+ <m id="2610" english="."/>
+ <m id="2611" english="."/>
+ <m id="2612" english="Echolocation" targetstatus="6"/>
+ <m id="2613" english="Deep Sea Dirge" targetstatus="16"/>
+ <m id="2614" english="Caudal Capacitor" targetstatus="10"/>
+ <m id="2615" english="Baleen Gurge"/>
+ <m id="2616" english="Depth Charge" targetstatus="28"/>
+ <m id="2617" english="Blowhole Blast" targetstatus="4"/>
+ <m id="2618" english="Waterspout"/>
+ <m id="2619" english="Angry Seas" targetstatus="12,177"/>
+ <m id="2620" english="Thar She Blows" targetstatus="0"/>
+ <m id="2621" english="."/>
+ <m id="2622" english="."/>
+ <m id="2623" english="."/>
+ <m id="2624" english="Night Stalker"/>
+ <m id="2625" english="Atropine Spore" targetstatus="2,4,6"/>
+ <m id="2626" english="Frond Fatale" targetstatus="14"/>
+ <m id="2627" english="Full Bloom" targetstatus="37"/>
+ <m id="2628" english="Deracinator" targetstatus="11,16,473"/>
+ <m id="2629" english="Beautiful Death" targetstatus="14,15"/>
+ <m id="2630" english="Exorender"/>
+ <m id="2631" english="Tropic Tenor"/>
+ <m id="2632" english="Dark Recital" targetstatus="4"/>
+ <m id="2633" english="Usurping Scepter"/>
+ <m id="2634" english="Gen'ei Ryodan" targetstatus="10"/>
+ <m id="2635" english="Grapeshot"/>
+ <m id="2636" english="Pirate Pummel" targetstatus="128"/>
+ <m id="2637" english="Powder Keg" targetstatus="149,167"/>
+ <m id="2638" english="Walk the Plank" targetstatus="11"/>
+ <m id="2639" english="Knuckle Sandwich" targetstatus="1"/>
+ <m id="2640" english="Imperial Authority" targetstatus="10"/>
+ <m id="2641" english="Sixth Element"/>
+ <m id="2642" english="Shield Subverter"/>
+ <m id="2643" english="Shining Summer Samba" targetstatus="149,167"/>
+ <m id="2644" english="Lovely Miracle Waltz" targetstatus="28"/>
+ <m id="2645" english="Neo Crystal Jig" targetstatus="147,175"/>
+ <m id="2646" english="Super Crusher Jig"/>
+ <m id="2647" english="Eternal Vana Illusion"/>
+ <m id="2648" english="Final Eternal Heart" targetstatus="0"/>
+ <m id="2649" english="Shah's Decree" targetstatus="135,260"/>
+ <m id="2650" english="False Promises" targetstatus="14"/>
+ <m id="2651" english="Frog Song" targetstatus="17"/>
+ <m id="2652" english="Frog Chorus" targetstatus="17"/>
+ <m id="2653" english="Level 3 Petrify" targetstatus="7"/>
+ <m id="2654" english="Citadel Siege" targetstatus="0"/>
+ <m id="2655" english="Catastrophic Malfunction"/>
+ <m id="2656" english="Zantetsuken Kai"/>
+ <m id="2657" english="Electrocharge"/>
+ <m id="2658" english="Rear Lasers" targetstatus="7"/>
+ <m id="2659" english="Meeble Warble" targetstatus="6"/>
+ <m id="2660" english="Thrashing Assault" targetstatus="149"/>
+ <m id="2661" english="Drill Claw" targetstatus="144"/>
+ <m id="2662" english="Puncturing Frenzy"/>
+ <m id="2663" english="."/>
+ <m id="2664" english="."/>
+ <m id="2665" english="."/>
+ <m id="2666" english="Soulshattering Roar" targetstatus="28"/>
+ <m id="2667" english="Calcifying Claw" targetstatus="7"/>
+ <m id="2668" english="Divesting Stampede" targetstatus="149,167"/>
+ <m id="2669" english="Bonebreaking Barrage" targetstatus="12,144"/>
+ <m id="2670" english="Beastruction" targetstatus="12,177"/>
+ <m id="2671" english="Metamorphic Blast" targetstatus="131"/>
+ <m id="2672" english="Enervating Grasp" targetstatus="4,11,149"/>
+ <m id="2673" english="Orogenic Storm" targetstatus="5,6,13,148"/>
+ <m id="2674" english="Subduction" targetstatus="12"/>
+ <m id="2675" english="Tectonic Shift" targetstatus="177"/>
+ <m id="2676" english="Unrelenting Brand" actorstatus="34" targetstatus="20"/>
+ <m id="2677" english="Searing Effulgence" targetstatus="134"/>
+ <m id="2678" english="Blazing Shriek" targetstatus="4"/>
+ <m id="2679" english="Volcanic Wrath" targetstatus="128,144"/>
+ <m id="2680" english="Tarichutoxin" targetstatus="3"/>
+ <m id="2681" english="Caliginosity" targetstatus="135,147"/>
+ <m id="2682" english="."/>
+ <m id="2683" english="Mighty Strikes" actorstatus="44"/>
+ <m id="2684" english="Invincible" actorstatus="50"/>
+ <m id="2685" english="Eagle Eye Shot"/>
+ <m id="2686" english="Chainspell" actorstatus="48"/>
+ <m id="2687" english="Benediction"/>
+ <m id="2688" english="Manafont" actorstatus="47"/>
+ <m id="2689" english="Nature's Meditation" actorstatus="150"/>
+ <m id="2690" english="Sensilla Blades"/>
+ <m id="2691" english="Tegmina Buffet" targetstatus="130"/>
+ <m id="2692" english="Sanguinary Slash" targetstatus="144"/>
+ <m id="2693" english="Orthopterror" targetstatus="28"/>
+ <m id="2694" english="Tempestuous Upheaval"/>
+ <m id="2695" english="Slice 'n' Dice" targetstatus="130"/>
+ <m id="2696" english="Blackout" targetstatus="4,6,11"/>
+ <m id="2697" english="Smouldering Swarm" targetstatus="128"/>
+ <m id="2698" english="."/>
+ <m id="2699" english="."/>
+ <m id="2700" english="."/>
+ <m id="2701" english="Impenetrable Carapace" targetstatus="152"/>
+ <m id="2702" english="Rending Deluge"/>
+ <m id="2703" english="Sundering Snip" targetstatus="149,167"/>
+ <m id="2704" english="Viscid Spindrift" targetstatus="12,147,175"/>
+ <m id="2705" english="Riptide Eupnea"/>
+ <m id="2706" english="."/>
+ <m id="2707" english="."/>
+ <m id="2708" english="."/>
+ <m id="2709" english="Cranial Thrust" targetstatus="144"/>
+ <m id="2710" english="Tail Thwack" targetstatus="149"/>
+ <m id="2711" english="Embalming Earth" targetstatus="13"/>
+ <m id="2712" english="Scalding Breath" targetstatus="128"/>
+ <m id="2713" english="Debilitating Spout" targetstatus="20"/>
+ <m id="2714" english="Paralyzing Triad" targetstatus="4"/>
+ <m id="2715" english="Crepuscular Grasp" targetstatus="11,135"/>
+ <m id="2716" english="Necrotic Brume" targetstatus="4,5,20"/>
+ <m id="2717" english="Terminal Bloom"/>
+ <m id="2718" english="Foul Waters" targetstatus="12"/>
+ <m id="2719" english="Pestilent Plume" targetstatus="5,31,167"/>
+ <m id="2720" english="Deadening Haze" targetstatus="6"/>
+ <m id="2721" english="Venomous Vapor"/>
+ <m id="2722" english="Consecration" targetstatus="10"/>
+ <m id="2723" english="Sacred Caper" targetstatus="28,131"/>
+ <m id="2724" english="Phototrophic Blessing"/>
+ <m id="2725" english="Phototrophic Wrath"/>
+ <m id="2726" english="Deific Gambol"/>
+ <m id="2727" english="Ancestral Banishment"/>
+ <m id="2728" english="Heartfelt Aura"/>
+ <m id="2729" english="Impairing Glister"/>
+ <m id="2730" english="Crippling Gleam"/>
+ <m id="2731" english="."/>
+ <m id="2732" english="Glutinous Dart" targetstatus="13"/>
+ <m id="2733" english="Death Spin" targetstatus="149"/>
+ <m id="2734" english="Velkkan Pygmachia"/>
+ <m id="2735" english="Saurian Slide"/>
+ <m id="2736" english="Jungle Wallop"/>
+ <m id="2737" english="."/>
+ <m id="2738" english="Glutinous Dart" targetstatus="13"/>
+ <m id="2739" english="Death Spin" targetstatus="149"/>
+ <m id="2740" english="Velkkan Pygmachia"/>
+ <m id="2741" english="Saurian Swamp"/>
+ <m id="2742" english="Jungle Hoodoo"/>
+ <m id="2743" english="."/>
+ <m id="2744" english="."/>
+ <m id="2745" english="."/>
+ <m id="2746" english="Mandibular Lashing" targetstatus="10"/>
+ <m id="2747" english="Vespine Hurricane" targetstatus="149,167"/>
+ <m id="2748" english="Stinger Volley" targetstatus="4,20"/>
+ <m id="2749" english="Droning Whirlwind"/>
+ <m id="2750" english="Incisive Denouement"/>
+ <m id="2751" english="Incisive Apotheosis"/>
+ <m id="2752" english="."/>
+ <m id="2753" english="."/>
+ <m id="2754" english="."/>
+ <m id="2755" english="Protolithic Puncture"/>
+ <m id="2756" english="Aquatic Lance"/>
+ <m id="2757" english="Pelagic Cleaver"/>
+ <m id="2758" english="Carcharian Verve" actorstatus="91,93,191"/>
+ <m id="2759" english="Tidal Guillotine" targetstatus="0"/>
+ <m id="2760" english="Marine Mayhem" targetstatus="0"/>
+ <m id="2761" english="."/>
+ <m id="2762" english="."/>
+ <m id="2763" english="."/>
+ <m id="2764" english="Blistering Roar" targetstatus="28"/>
+ <m id="2765" english="Searing Serration"/>
+ <m id="2766" english="Volcanic Stasis" targetstatus="10"/>
+ <m id="2767" english="Tyrannical Blow" targetstatus="31"/>
+ <m id="2768" english="Batholithic Shell" actorstatus="33,34,37,91,190"/>
+ <m id="2769" english="Pyroclastic Surge" targetstatus="21"/>
+ <m id="2770" english="Incinerating Lahar" targetstatus="1"/>
+ <m id="2771" english="."/>
+ <m id="2772" english="."/>
+ <m id="2773" english="."/>
+ <m id="2774" english="Retinal Glare" targetstatus="156"/>
+ <m id="2775" english="Sylvan Slumber" targetstatus="2"/>
+ <m id="2776" english="Crushing Gaze" targetstatus="12,13"/>
+ <m id="2777" english="Vaskania" targetstatus="9"/>
+ <m id="2778" english="."/>
+ <m id="2779" english="."/>
+ <m id="2780" english="."/>
+ <m id="2781" english="Flesh Syphon"/>
+ <m id="2782" english="Umbral Expunction"/>
+ <m id="2783" english="Sticky Situation" targetstatus="6,13,31"/>
+ <m id="2784" english="Abdominal Assault" targetstatus="12"/>
+ <m id="2785" english="Mandibular Massacre" targetstatus="4,15"/>
+ <m id="2786" english="."/>
+ <m id="2787" english="Whirling Inferno" targetstatus="20"/>
+ <m id="2788" english="Benumbing Blaze" targetstatus="4"/>
+ <m id="2789" english="Concentric Pulse"/>
+ <m id="2790" english="Foul Waters" targetstatus="12"/>
+ <m id="2791" english="Pestilent Plume" targetstatus="5,31,167"/>
+ <m id="2792" english="Deadening Haze" targetstatus="6"/>
+ <m id="2793" english="Sensilla Blades"/>
+ <m id="2794" english="Tegmina Buffet" targetstatus="130"/>
+ <m id="2795" english="Mending Halation"/>
+ <m id="2796" english="Radial Arcana"/>
+ <m id="2797" english="#1261"/>
+ <m id="2798" english="."/>
+ <m id="2799" english="."/>
+ <m id="2800" english="."/>
+ <m id="2801" english="Root of the Problem"/>
+ <m id="2802" english="Potted Plant"/>
+ <m id="2803" english="Uproot"/>
+ <m id="2804" english="Canopierce"/>
+ <m id="2805" english="Firefly Fandango"/>
+ <m id="2806" english="Tiiimbeeer"/>
+ <m id="2807" english="Molting Plumage"/>
+ <m id="2808" english="Pentapeck"/>
+ <m id="2809" english="Swooping Frenzy"/>
+ <m id="2810" english="From the Skies"/>
+ <m id="2811" english="."/>
+ <m id="2812" english="."/>
+ <m id="2813" english="."/>
+ <m id="2814" english="."/>
+ <m id="2815" english="."/>
+ <m id="2816" english="Crashing Thunder"/>
+ <m id="2817" english="Reverberating Cry"/>
+ <m id="2818" english="Brownout"/>
+ <m id="2819" english="Reverse Current"/>
+ <m id="2820" english="Sparkstorm"/>
+ <m id="2821" english="Static Prison"/>
+ <m id="2822" english="."/>
+ <m id="2823" english="."/>
+ <m id="2824" english="."/>
+ <m id="2825" english="Velkkan Ambush"/>
+ <m id="2826" english="Galumph"/>
+ <m id="2827" english="Coming Through"/>
+ <m id="2828" english="Merciless Mauling"/>
+ <m id="2829" english="Croctastrophy"/>
+ <m id="2830" english="."/>
+ <m id="2831" english="Battle Trance"/>
+ <m id="2832" english="."/>
+ <m id="2833" english="."/>
+ <m id="2834" english="."/>
+ <m id="2835" english="Baneful Blades"/>
+ <m id="2836" english="Wildwood Indignation"/>
+ <m id="2837" english="Dryad's Kiss"/>
+ <m id="2838" english="Infected Illusion"/>
+ <m id="2839" english="Depraved Dandia"/>
+ <m id="2840" english="Matriarchal Fiat"/>
+ <m id="2841" english="Tickling Tendrils"/>
+ <m id="2842" english="Stink Bomb"/>
+ <m id="2843" english="Nectarous Deluge"/>
+ <m id="2844" english="Nepenthic Plunge"/>
+ <m id="2845" english="Infaunal Flop"/>
+ <m id="2846" english="."/>
+ <m id="2847" english="Ignis"/>
+ <m id="2848" english="Gelus"/>
+ <m id="2849" english="Flabra"/>
+ <m id="2850" english="Tellus"/>
+ <m id="2851" english="Sulpor"/>
+ <m id="2852" english="Unda"/>
+ <m id="2853" english="Lux"/>
+ <m id="2854" english="Tenebrae"/>
+ <m id="2855" english="Vallation"/>
+ <m id="2856" english="Pflug"/>
+ <m id="2857" english="Lunge"/>
+ <m id="2858" english="Gambit"/>
+ <m id="2859" english="#1323"/>
+ <m id="2860" english="#1324"/>
+ <m id="2861" english="#1325"/>
+ <m id="2862" english="#1326"/>
+ <m id="2863" english="#1327"/>
+ <m id="2864" english="#1328"/>
+ <m id="2865" english="#1329"/>
+ <m id="2866" english="#1330"/>
+ <m id="2867" english="#1331"/>
+ <m id="2868" english="#1332"/>
+ <m id="2869" english="#1333"/>
+ <m id="2870" english="#1334"/>
+ <m id="2871" english="#1335"/>
+ <m id="2872" english="#1336"/>
+ <m id="2873" english="#1337"/>
+ <m id="2874" english="#1338"/>
+ <m id="2875" english="#1339"/>
+ <m id="2876" english="#1340"/>
+ <m id="2877" english="#1341"/>
+ <m id="2878" english="#1342"/>
+ <m id="2879" english="#1343"/>
+ <m id="2880" english="#1344"/>
+ <m id="2881" english="#1345"/>
+ <m id="2882" english="#1346"/>
+ <m id="2883" english="#1347"/>
+ <m id="2884" english="#1348"/>
+ <m id="2885" english="#1349"/>
+ <m id="2886" english="#1350"/>
+ <m id="2887" english="#1351"/>
+ <m id="2888" english="#1352"/>
+ <m id="2889" english="#1353"/>
+ <m id="2890" english="#1354"/>
+ <m id="2891" english="#1355"/>
+ <m id="2892" english="#1356"/>
+ <m id="2893" english="#1357"/>
+ <m id="2894" english="#1358"/>
+ <m id="2895" english="#1359"/>
+ <m id="2896" english="#1360"/>
+ <m id="2897" english="#1361"/>
+ <m id="2898" english="#1362"/>
+ <m id="2899" english="#1363"/>
+ <m id="2900" english="#1364"/>
+ <m id="2901" english="#1365"/>
+ <m id="2902" english="#1366"/>
+ <m id="2903" english="#1367"/>
+ <m id="2904" english="#1368"/>
+ <m id="2905" english="#1369"/>
+ <m id="2906" english="#1370"/>
+ <m id="2907" english="#1371"/>
+ <m id="2908" english="#1372"/>
+ <m id="2909" english="#1373"/>
+ <m id="2910" english="#1374"/>
+ <m id="2911" english="#1375"/>
+ <m id="2912" english="#1376"/>
+ <m id="2913" english="#1377"/>
+ <m id="2914" english="#1378"/>
+ <m id="2915" english="#1379"/>
+ <m id="2916" english="#1380"/>
+ <m id="2917" english="#1381"/>
+ <m id="2918" english="#1382"/>
+ <m id="2919" english="#1383"/>
+ <m id="2920" english="#1384"/>
+ <m id="2921" english="#1385"/>
+ <m id="2922" english="#1386"/>
+ <m id="2923" english="#1387"/>
+ <m id="2924" english="#1388"/>
+ <m id="2925" english="#1389"/>
+ <m id="2926" english="#1390"/>
+ <m id="2927" english="#1391"/>
+ <m id="2928" english="#1392"/>
+ <m id="2929" english="#1393"/>
+ <m id="2930" english="#1394"/>
+ <m id="2931" english="#1395"/>
+ <m id="2932" english="#1396"/>
+ <m id="2933" english="#1397"/>
+ <m id="2934" english="#1398"/>
+ <m id="2935" english="#1399"/>
+ <m id="2936" english="#1400"/>
+ <m id="2937" english="#1401"/>
+ <m id="2938" english="#1402"/>
+ <m id="2939" english="#1403"/>
+ <m id="2940" english="#1404"/>
+ <m id="2941" english="#1405"/>
+ <m id="2942" english="#1406"/>
+ <m id="2943" english="#1407"/>
+ <m id="2944" english="#1408"/>
+ <m id="2945" english="#1409"/>
+ <m id="2946" english="#1410"/>
+ <m id="2947" english="#1411"/>
+ <m id="2948" english="#1412"/>
+ <m id="2949" english="#1413"/>
+ <m id="2950" english="#1414"/>
+ <m id="2951" english="#1415"/>
+ <m id="2952" english="#1416"/>
+ <m id="2953" english="#1417"/>
+ <m id="2954" english="#1418"/>
+ <m id="2955" english="#1419"/>
+ <m id="2956" english="#1420"/>
+ <m id="2957" english="#1421"/>
+ <m id="2958" english="#1422"/>
+ <m id="2959" english="#1423"/>
+ <m id="2960" english="#1424"/>
+ <m id="2961" english="#1425"/>
+ <m id="2962" english="#1426"/>
+ <m id="2963" english="#1427"/>
+ <m id="2964" english="#1428"/>
+ <m id="2965" english="#1429"/>
+ <m id="2966" english="#1430"/>
+ <m id="2967" english="#1431"/>
+ <m id="2968" english="#1432"/>
+ <m id="2969" english="#1433"/>
+ <m id="2970" english="#1434"/>
+ <m id="2971" english="#1435"/>
+ <m id="2972" english="#1436"/>
+ <m id="2973" english="#1437"/>
+ <m id="2974" english="#1438"/>
+ <m id="2975" english="#1439"/>
+ <m id="2976" english="#1440"/>
+ <m id="2977" english="#1441"/>
+ <m id="2978" english="#1442"/>
+ <m id="2979" english="#1443"/>
+ <m id="2980" english="#1444"/>
+ <m id="2981" english="#1445"/>
+ <m id="2982" english="#1446"/>
+ <m id="2983" english="#1447"/>
+ <m id="2984" english="#1448"/>
+ <m id="2985" english="#1449"/>
+ <m id="2986" english="#1450"/>
+ <m id="2987" english="#1451"/>
+ <m id="2988" english="#1452"/>
+ <m id="2989" english="#1453"/>
+ <m id="2990" english="#1454"/>
+ <m id="2991" english="#1455"/>
+ <m id="2992" english="#1456"/>
+ <m id="2993" english="#1457"/>
+ <m id="2994" english="#1458"/>
+ <m id="2995" english="#1459"/>
+ <m id="2996" english="#1460"/>
+ <m id="2997" english="#1461"/>
+ <m id="2998" english="#1462"/>
+ <m id="2999" english="#1463"/>
+ <m id="3000" english="#1464"/>
+ <m id="3001" english="#1465"/>
+ <m id="3002" english="#1466"/>
+ <m id="3003" english="#1467"/>
+ <m id="3004" english="#1468"/>
+ <m id="3005" english="#1469"/>
+ <m id="3006" english="#1470"/>
+ <m id="3007" english="#1471"/>
+ <m id="3008" english="#1472"/>
+ <m id="3009" english="#1473"/>
+ <m id="3010" english="#1474"/>
+ <m id="3011" english="#1475"/>
+ <m id="3012" english="#1476"/>
+ <m id="3013" english="#1477"/>
+ <m id="3014" english="#1478"/>
+ <m id="3015" english="#1479"/>
+ <m id="3016" english="#1480"/>
+ <m id="3017" english="#1481"/>
+ <m id="3018" english="#1482"/>
+ <m id="3019" english="#1483"/>
+ <m id="3020" english="#1484"/>
+ <m id="3021" english="#1485"/>
+ <m id="3022" english="#1486"/>
+ <m id="3023" english="#1487"/>
+ <m id="3024" english="#1488"/>
+ <m id="3025" english="#1489"/>
+ <m id="3026" english="#1490"/>
+ <m id="3027" english="#1491"/>
+ <m id="3028" english="#1492"/>
+ <m id="3029" english="#1493"/>
+ <m id="3030" english="#1494"/>
+ <m id="3031" english="#1495"/>
+ <m id="3032" english="#1496"/>
+ <m id="3033" english="#1497"/>
+ <m id="3034" english="#1498"/>
+ <m id="3035" english="#1499"/>
+ <m id="3036" english="#1500"/>
+ <m id="3037" english="#1501"/>
+ <m id="3038" english="#1502"/>
+ <m id="3039" english="#1503"/>
+ <m id="3040" english="#1504"/>
+ <m id="3041" english="#1505"/>
+ <m id="3042" english="#1506"/>
+ <m id="3043" english="#1507"/>
+ <m id="3044" english="#1508"/>
+ <m id="3045" english="#1509"/>
+ <m id="3046" english="#1510"/>
+ <m id="3047" english="#1511"/>
+ <m id="3048" english="#1512"/>
+ <m id="3049" english="#1513"/>
+ <m id="3050" english="#1514"/>
+ <m id="3051" english="#1515"/>
+ <m id="3052" english="#1516"/>
+ <m id="3053" english="#1517"/>
+ <m id="3054" english="#1518"/>
+ <m id="3055" english="#1519"/>
+ <m id="3056" english="#1520"/>
+ <m id="3057" english="#1521"/>
+ <m id="3058" english="#1522"/>
+ <m id="3059" english="#1523"/>
+ <m id="3060" english="#1524"/>
+ <m id="3061" english="#1525"/>
+ <m id="3062" english="#1526"/>
+ <m id="3063" english="#1527"/>
+ <m id="3064" english="#1528"/>
+ <m id="3065" english="#1529"/>
+ <m id="3066" english="#1530"/>
+ <m id="3067" english="#1531"/>
+ <m id="3068" english="#1532"/>
+ <m id="3069" english="#1533"/>
+ <m id="3070" english="#1534"/>
+ <m id="3071" english="#1535"/>
+</mabils>

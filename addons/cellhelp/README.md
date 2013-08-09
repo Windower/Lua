@@ -1,18 +1,39 @@
-Author: Balloon(Cerberus)
+Authors: Balloon, Krizz
+
+Version: 2.0
+
+Date: 20130429
 
 Cell Helper, for old Salvage
 
-This addon displays what Pathos cells are still needed in a text box, alters the drop message to display what each Pathos cell does and whether it is still needed, and writes a LL profile (salvage-Playername.txt when a cell is obtained to pass cells that you have already obtained.
+Abbreviation: //ch
 
-This addon cannot pass things currently in the treasure pool (as LL cannot do that), but any subsequent drop of that cell will be passed. 
+Commands:
+* help - Shows a menu of commands in game
+* pos <x> <y> - Positions the Lot Order box. Default location is 1000,250.
+* hide - Hides the Lot Order box
+* show - Shows the Lot Order box
+* set [set id] - Loads set from settings file. Default is set1.
+* mode [lots/nolots] - If set to nolots, ll will not lot cells. Default is lots.
+* timer [start/stop] - Will start or stop the 100 minute zone timer.
 
-In order to lot/pass custom items, please add them to a ll profile called salvage-Playername-add.txt. 
+Other Information:
+* If you need to remove a cell from the Lot Order box, type in "/echo [You] obtains a --[cellname] cell--." You must have the dashes around the cellname, and the period at the end.
+* If you have gear you want to pass or lot, add it in the appropriate tags for your player. If not, leave the value as 0. Otherwise you will see errors.
+* As with the base LL, items already in the pool cannot be lotted/passed when the profile is loaded.
 
-In order to manually pass a cell you do not need, you can either obtain it, or type "/echo Playername obtains a --incus cell--." replacing the incus cell with the name of the needed cell. include the "--". Manually editing the LL profile will NOT work, as the addon erases everything in the text document, then rewrites it when a cell is obtained.
 
-If some add/pass functionality is added to Luacore then I'll edit this addon to reflect that. 
+To do:
+* Support for more than 4 people
+* Remove (or create a toggle) for the Item Counter.
+* Enable xml creation if settings file is not found.
+* Change zone comparison to use zone IDs.
+* Ability to add cell back to list.
+* Box parameter settings.
+* Interface adjustments. Icons?
 
-Current bugs: While it will say which cells you have, it will also add /Have/ to everything that is dropped, even outside of salvage. I will fix this soon.
-
+Known Issues:
+* Pass tag errors
+* Cellhelp shows itself again after hide.
 
 

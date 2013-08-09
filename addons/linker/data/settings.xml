@@ -1,0 +1,59 @@
+<?xml version="1.1" ?>
+<settings>
+	<!--
+		URL settings for Linker. If you want to add a site to open without a
+		search feature, add a new DOM node under the <raw> tag:
+		
+		<command>url</command>
+		
+		Once you do and reload Linker, you will be able to open the URL
+		provided by typing the following Windower command:
+		
+		web command
+		
+		If you want the site to be searchable, you need to define a searchable
+		URL under the <search> section, with the search keyword replaced with
+		${query}. Once you do that and restart Linker, you can search as
+		follows:
+		
+		web command query
+		
+		"query" is the search term. It supports all of the features the
+		regular search of that site provides. For example, searching on FFXIDB
+		allows for wildcards, meaning you can search for "Estoq*body" and it
+		will find "Estoqueur's seal: body". This means that you can also do
+		that in the chat log:
+		
+		web db estoq*body
+		
+		That command will bring you to this page: http://ffxidb.com/items/3134
+		
+		Note when adding new URLs:
+		Remember to replace & in URLs with &amp; to be XML-comform.
+	-->
+	<global>
+		<raw>
+			<ah>http://ffxiah.com/</ah>
+			<ahf>http://www.ffxiah.com/forum</ahf>
+			<bg>http://wiki.bluegartr.com/bg/Main_Page</bg>
+			<bgf>http://www.bluegartr.com/forum.php</bgf>
+			<db>http://ffxidb.com/</db>
+			<g>http://google.com</g>
+			<ge>http://ffxi.gamerescape.com/wiki/Main_Page</ge>
+			<gw>http://guildwork.com</gw>
+			<of>http://forum.square-enix.com/ffxi/forum.php</of>
+			<wa>http://wolframalpha.com</wa>
+			<wikia>http://wiki.ffxiclopedia.org/wiki/Main_Page</wikia>
+			<win>http://windower.net</win>
+		</raw>
+		<search>
+			<ah>http://ffxiah.com/search/item?q=${query}</ah>
+			<bg>http://wiki.bluegartr.com/index.php?title=Special:Search&amp;search=${query}</bg>
+			<db>http://ffxidb.com/search?q=${query}</db>
+			<g>http://google.com/?q=${query}</g>
+			<ge>http://ffxi.gamerescape.com/wiki/Special:Search?search=${query}</ge>
+			<wa>http://wolframalpha.com/?i=${query}</wa>
+			<wikia>http://wiki.ffxiclopedia.org/wiki/index.php?search=${query}&amp;fulltext=Search</wikia>
+		</search>
+	</global>
+</settings>

@@ -1,0 +1,31 @@
+<?xml version="1.1" ?>
+<settings>
+	<global>
+		<bgalpha>200</bgalpha>
+		<bgblue>0</bgblue>
+		<bggreen>0</bggreen>
+		<bgred>0</bgred>
+		<dangerwords>
+			<spells>Firaja, Blizzaja, Aeroga IV, Firaga IV, Blizzaga IV, Thundaja, Stoneja, Meteor, Aeroja, Breakga, Kaustra, Stonega IV, cure, Thundaga IV, Death</spells>
+			<weaponskills>Zantetsuken, Provenance Watcher starts, Astral Flow, Oblivion&apos;s Mantle, Eradicator, Extreme Purgitation, Gorge, Frog, Pawn&apos;s Penumbra, Raksha Stance, Rancid Reflux, Beastruction, Thundris, Slimy Proposal, Yama&apos;s, Chainspell, Danse, Mandible Massacre, Ballistic Kick, Geirrothr, Gates, Nerve, Fulmination, Divesting Gale, Arm Cannon</weaponskills>
+		</dangerwords>
+		<duration>7</duration>
+		<moblist>
+			<abyssea>Isgebind, Orthrus, Carabosse, Alfard, Glavoid</abyssea>
+			<dangerous>Mandragora, Apademak, Provenance Watcher</dangerous>
+			<legion>Mired, Lofty, Veiled, Paramount, Soaring</legion>
+			<meebles>Izyx, Melisseus, Goldwing, Surtr, Grannus, Umagrhk, Silagilith, Dreyruk, Svaha, Samursk</meebles>
+			<other>Odin, Cerberus, Enraged, Bloodthirsty, Tiamat, Dvergr, Hydra, Khrysokhimaira, Khimaira</other>
+			<voidwatch>Wazir, Akvan, Gugalanna, Kholomodumo, Cherufe, Kaggen, Hahava, Taweret, Kalasutrax, Ocythoe, Gaunab, Gasha, Aello, Asb, Provenance Watcher, Botulus Rex, Rukh, Shah, Pil, Qilin, Sarbaz, Agathos, Celaeno, Goji, Ig-Alima, Belphoebe, Morta, Mellonia, Giltine, Bismarck, Uptala</voidwatch>
+		</moblist>
+		<posx>300</posx>
+		<posy>300</posy>
+		<showrolls>true</showrolls>
+		<staggeronly>false</staggeronly>
+		<textblue>255</textblue>
+		<textfont>Arial</textfont>
+		<textgreen>255</textgreen>
+		<textred>255</textred>
+		<textsize>12</textsize>
+	</global>
+</settings>

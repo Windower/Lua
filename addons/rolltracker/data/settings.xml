@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<settings>
+  <!--
+	This controls the settings for the Roll Tracker Plugin. 
+		::::Autostop:::: 
+		Autostop: 0: Automatically stops rolls on lucky numbers, and displays the message (Currently the default option)
+		Autostop: 1: Disables the stop functionality. 
+		::::[Chance to Bust]::::
+		bust: 0 Doesn't display chance to bust
+		bust: 1 Displays chance to bust (the default option)
+		::::[Effected Members Number]::::
+		effected: 0 doesn't show up
+		effected:1 shows up
+		::::Fold Stopper::::
+		fold 0: Doesn't stop fold
+		fold 1: Stops fold when no busts and 1 roll is active.
+	-->
+	<global>
+		<Autostop>0</Autostop>
+		<bust>1</bust>
+		<effected>1</effected>
+		<fold>1</fold>
+	</global>
+</settings>

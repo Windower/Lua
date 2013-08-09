@@ -5,6 +5,7 @@ Small implementation of a fully-featured XML reader.
 _libs = _libs or {}
 _libs.xml = true
 _libs.tablehelper = _libs.tablehelper or require 'tablehelper'
+_libs.lists = _libs.lists or require 'lists'
 _libs.stringhelper = _libs.stringhelper or require 'stringhelper'
 local files = require 'filehelper'
 _libs.filehelper = _libs.filehelper or files ~= nil
@@ -27,15 +28,17 @@ xml.escapes = T{
 	['\''] = 'apos'
 }
 
+local spaces = {' ', '\n', '\t', '\r'}
+
 -- Takes a numbered XML entity as second argument and converts it to the corresponding symbol.
 -- Only used internally to index the xml.unescapes table.
 function xml.entity_unescape(_, entity)
 	if entity:startswith('#x') then
-		return string.char(tonumber(s:slice(3), 16))
+		return string.char(tonumber(entity:slice(3), 16))
 	elseif entity:startswith('#') then
-		return string.char(tonumber(s:slice(2)))
+		return string.char(tonumber(entity:slice(2)))
 	else
-		return s
+		return entity
 	end
 end
 
@@ -61,11 +64,11 @@ function xml.read(file)
 	if type(file) == 'string' then
 		file = files.new(file)
 	end
-	
+
 	if not file:exists() then
 		return xml.error('File not found: '..file.path)
 	end
-	
+
 	return xml.parse(file:read())
 end
 
@@ -180,7 +183,7 @@ function xml.tokenize(content, line)
 		
 		if mode == 'quote' then
 			if c == quote then
-				tokens:last():append(xml.pcdata(current))
+				tokens:last():append('"'..xml.pcdata(current)..'"')
 				current = ''
 				mode = 'tag'
 			else
@@ -191,7 +194,7 @@ function xml.tokenize(content, line)
 			current = current..c
 			if c == '>' and current:endswith('-->' ) then
 				if current:slice(5, -4):contains('--') then
-					return xml.error('Invalid token \'--\' within comment.', #tokens)
+					return xml.error('Invalid token \'--\' within comment.', tokens:line())
 				end
 				tokens:last():append(current)
 				current = ''
@@ -217,14 +220,14 @@ function xml.tokenize(content, line)
 			
 		else
 			if xml.singletons:contains(c) then
-				if c:isin(' ', '\n', '\t', '\r') then
-					if #current > 0 then
+				if c:isin(spaces) then
+					if current:length() > 0 then
 						tokens:last():append(current)
 						current = ''
 					end
 					
 				elseif c == '=' then
-					if #current > 0 then
+					if current:length() > 0 then
 						tokens:last():append(current)
 					end
 					tokens:last():append('=')
@@ -235,7 +238,7 @@ function xml.tokenize(content, line)
 					mode = 'quote'
 					
 				elseif c == '/' then
-					if current:startswith('<') and #current > 1 then
+					if current:startswith('<') and current:length() > 1 then
 						tokens:last():append(current)
 						current = ''
 					end
@@ -248,7 +251,7 @@ function xml.tokenize(content, line)
 					mode = 'inner'
 					
 				else
-					xml.error('Unexpected token \''..c..'\'.', #tokens)
+					xml.error('Unexpected token \''..c..'\'.', tokens:length())
 				end
 				
 			else
@@ -260,16 +263,16 @@ function xml.tokenize(content, line)
 						mode = 'cdata'
 					end
 				else
-					return xml.error('Unexpected character \''..c..'\'.', #tokens)
+					return xml.error('Unexpected character \''..c..'\'.', tokens:length())
 				end
 			end
 		end
 	end
-	
-	for line, array in ipairs(tokens) do
-		tokens[line] = array:filter(functools.negate(string.isempty))
+
+	for array, line in tokens:it() do
+		tokens[line] = array:filter(-'')
 	end
-	
+
 	return tokens
 end
 
@@ -282,9 +285,9 @@ end
 -- Returns the name of the element and the namespace, if present.
 function xml.get_namespace(token)
 	local splits = token:split(':')
-	if #splits > 2 then
+	if splits:length() > 2 then
 		return
-	elseif #splits == 2 then
+	elseif splits:length() == 2 then
 		return splits[2], splits[1]
 	end
 	return token
@@ -302,8 +305,8 @@ function xml.classify(tokens, var)
 	local mode = 'inner'
 	local parsed = T{dom.new()}
 	local name = nil
-	for _, lines in ipairs(tokens) do
-		for line, token in pairs(lines) do
+	for line, intokens in ipairs(tokens) do
+		for _, token in ipairs(intokens) do
 			if token:startswith('<![CDATA[') then
 				parsed:last().children:append(dom.new(T{type = 'text', value = token:slice(10, -4)}))
 				
@@ -366,7 +369,7 @@ function xml.classify(tokens, var)
 					mode = 'eq'
 					
 				elseif mode == 'value' then
-					parsed:last().children:append(dom.new(T{type = 'attribute', name = name, namespace = namespace, value = token}))
+					parsed:last().children:append(dom.new(T{type = 'attribute', name = name, namespace = namespace, value = token:slice(2,-2)}))
 					name = nil
 					namespace = ''
 					mode = 'tag'
@@ -386,6 +389,68 @@ function xml.classify(tokens, var)
 	end
 	
 	return roots[1]
+end
+
+-- Returns a non-shitty XML representation:
+-- Tree of nodes, each node can be a tag or a value. A tag has a name, list of attributes and children.
+-- In case of a node, the following is provided:
+-- * type node.value:       Value of node. Only provided if type was set.
+-- * list node.children:    List of child nodes (tag or text nodes)
+-- * string node.name:      Name of the tag
+-- * iterator node.it:      Function that iterates over all children
+-- * table node.attributes: Dictionary containing all attributes
+function table.undomify(node, types)
+	local node_type = types and types[node.name] or nil
+	local res = T{}
+	res.attributes = T{}
+	local children = L{}
+	local ctype
+	
+	for _, child in ipairs(node.children) do
+		ctype = child.type
+		if ctype == 'attribute' then
+			res.attributes[child.name] = child.value
+		elseif ctype == 'tag' then
+			children:append(child:undomify(types))
+		elseif ctype == 'text' then
+			children:append(child.value)
+		end
+	end
+	
+	if node_type then
+		local val = children[1] or ''
+		if node_type == 'set' then
+			res.children = val:split(','):map(string.trim):filter(-'')
+			res.value = S(children)
+		elseif node_type == 'list' then
+			res.value = val:split(','):map(string.trim):filter(-'')
+			res.children = res.value
+		elseif node_type == 'number' then
+			res.value = tonumber(val)
+			res.children = L{res.value}
+		elseif node_type == 'boolean' then
+			res.value = val == 'true'
+			res.children = L{res.value}
+		end
+	end
+	
+	if res.children == nil then
+		res.children = children
+	end
+	
+	res.get = function(t, val)
+		for child in t.children:it() do
+			if child.name == val then
+				return child
+			end
+		end
+	end
+	
+	res.name = node.name
+	
+	return setmetatable(res, {__index = function(t, k)
+		return t.children[k]
+	end})
 end
 
 -- Returns a namespace-formatted string of a DOM node.
@@ -413,7 +478,7 @@ function xml.realize(node, indentlevel)
 	for _, child in ipairs(node.children) do
 		if child.type == 'attribute' then
 			attributes:append(child)
-		elseif child.type:isin('tag', 'text', 'comment') then
+		elseif child.type ~= 'attribute' then
 			children:append(child)
 			childtypes[child.type] = true
 		else
@@ -441,7 +506,7 @@ function xml.realize(node, indentlevel)
 	
 	local innerindent = '\t'..indent
 	for _, child in ipairs(children) do
-		if child.type:isin('text') then
+		if child.type == 'text' then
 			str = str..innerindent..child.value:xml_escape()..'\n'
 		elseif child.type == 'comment' then
 			str = str..innerindent..'<!--'..child.value:xml_escape()..'-->\n'

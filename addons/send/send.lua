@@ -1,3 +1,9 @@
+
+_addon = {}
+_addon.version = '1.0'
+_addon.name = 'Send'
+_addon.commands = {'send'}
+
 function event_addon_command(...)
     term = table.concat({...}, ' ')
 	broken_init = split(term, ' ')
@@ -55,6 +61,7 @@ function event_ipc_message(msg)
 end
 
 function split(msg, match)
+	if msg == nil then return '' end
 	local length = msg:len()
 	local splitarr = {}
 	local u = 1
@@ -77,6 +84,10 @@ end
 
 function relevant_msg(msg)
 	local player = get_player()
+    st,en,item,tar = string.find(msg,'/item ([%w%s]+) <(%w+)>')
+    if item ~= nil then
+        msg = '/item "'..item..'" <'..tar..'>'
+    end
 	msg:gsub("<me>", player['name'])
 	msg:gsub("<hp>", tostring(player['hp']))
 	msg:gsub("<mp>", tostring(player['mp']))
@@ -99,3 +110,4 @@ function relevant_msg(msg)
 	end
 
 end
+

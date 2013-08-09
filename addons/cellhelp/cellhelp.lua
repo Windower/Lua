@@ -1,4 +1,4 @@
---Copyright (c) 2013, Thomas Rogers / Balloon - Cerberus
+--Copyright (c) 2013, Thomas Rogers / Balloon - Cerberus and Krizz
 --All rights reserved.
 
 --Redistribution and use in source and binary forms, with or without
@@ -9,14 +9,14 @@
 --    * Redistributions in binary form must reproduce the above copyright
 --      notice, this list of conditions and the following disclaimer in the
 --      documentation and/or other materials provided with the distribution.
---   * Neither the name of cellhelp nor the
+--    * Neither the name of cellhelp nor the
 --      names of its contributors may be used to endorse or promote products
 --      derived from this software without specific prior written permission.
 
 --THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 --ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 --WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
---DISCLAIMED. IN NO EVENT SHALL THOMAS ROGERS BE LIABLE FOR ANY
+--DISCLAIMED. IN NO EVENT SHALL THOMAS ROGERS OR KRIZZ BE LIABLE FOR ANY
 --DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 --(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 --LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
@@ -24,147 +24,257 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-function event_addon_command(...)
-    cmd = {...}
-	if cmd[1] ~= nil then
-		if cmd[1]:lower() == "help" then
-			write('cellhelp position: <x> <y> coordinates')
-			write('cellhelp hide: hides the cellhelp box')
-			write('cellhelp show: shows the cellhelp box')
-			write('cellhelp : In order to add custom lot pass rules, add it to your salvage-'..player..'-add.txt file. \n (One line for pass, one for lot)')
-		end
+_addon = _addon or {}
+_addon.name = 'cellhelp'
+_addon.version = 0.1
 
-		if cmd[1]:lower() == "position" then
-			if cmd[3] ~= nil then
-				tb_set_location('salvage_box',cmd[2],cmd[3])
+
+local config = require 'config'
+
+
+require 'tablehelper'
+require 'stringhelper'
+require 'mathhelper'
+require 'logger'
+require 'actionhelper'
+-----------------------------
+
+local settingtab = nil
+local settings_file = 'data\\settings.xml'
+local settingtab = config.load(settings_file)
+if settingtab == nil then
+	write('No settings file found. Ensure you have a file at data\\settings.xml')
+end
+--variables
+	lotorder = ''
+	set = "set1"
+	mode = "lot"
+	posx = 1000
+	posy = 250
+	if settingtab['posx'] ~= nil then
+		posx = settingtab['posx']
+		posy = settingtab['posy']
+	end	
+	itemcount = 0
+	salvage_cell_name = {
+		'incus cell','castellanus cell','undulatus cell','cumulus cell','radiatus cell','virga cell','cirrocumulus cell','stratus cell','duplicatus cell','opacus cell', 'praecipitatio cell', 'humilus cell','spissatus cell', 'pannus cell', 'fractus cell','congestus cell',  'nimbus cell', 'velum cell','pileus cell', 'mediocris cell'
+	}
+	salvage_cell_name_short = {
+		'incus','castellanus','undulatus','cumulus','radiatus','virga','cirrocumulus','stratus','duplicatus','opacus', 'praecipitatio', 'humilus','spissatus', 'pannus', 'fractus','congestus','nimbus','velum','pileus', 'mediocris', 'alex'
+	}
+	salvage_cell_ident = { 
+		'Weapons and Shields', 'Head and Neck', 'Ranged and Ammo', 'Body', 'Hand', 'Earring and Ring', 'Back and Waist', 'Legs and Feet', 'Support Job','Job and Weaponskill', 'Magic', 'HP', 'MP', 'STR', 'DEX', 'VIT', 'AGI', 'INT', 'MND', 'CHR'
+	} 
+	cells_id = { 
+		'5365','5366','5371','5367','5368','5372','5370','5369','5373','5374','5375','5383','5384','5376','5377','5378','5379','5380','5381','5382','2488,5735,5736'
+	}
+	cell_lots ={
+		'incus','castellanus','undulatus','cumulus','radiatus','virga','cirrocumulus','stratus','duplicatus','opacus', 'praecipitatio', 'humilus','spissatus', 'pannus', 'fractus','congestus','nimbus','velum','pileus', 'mediocris','alex'
+	}
+	players = {'player1', 'player2', 'player3', 'player4'}
+
+
+function settings_create()
+--	get player's name
+	player = get_player()['name']
+--	dynamic players from settings
+	for i=1, #players do
+		playernumber = players[i]
+		players[players[i]] = settingtab[set][playernumber]['name']
+		if players[players[i]] == player then
+			player_num = players[i]
+			if player_num == nil or player_num == '' then
+				player_num = 'player1'
 			end
 		end
-		
-		if cmd[1]:lower() == "hide" then
-			tb_set_visibility('salvage_box', false)
-		end
-		
-		if cmd[1]:lower() == "show" then
-			tb_set_visibility('salvage_box', true)
-		end
 	end
+
+--  set lot positions
+	for i=1, #salvage_cell_name_short  do 
+			if salvage_cell_name_short[i] ~= nil then
+	    		item = salvage_cell_name_short[i]
+	    		cell_lots[item] = settingtab[set][item][player_num]
+	    	end
+	end
+--	Populate lot order
+	orderlots()
+	
 end
 
+function event_addon_command(...)
+	local params = {...};
+	if #params < 1 then
+		return
+	end
+	if params[1] then
+		if params[1]:lower() == "help" then
+			write('ch help : Shows help message')
+			write('ch pos <x> <y> : Positions the list')
+			write('ch hide : Hides the box')
+			write('ch show : Shows the box')
+			write('ch set [set id] : Loads set from settings file. Default is set1')
+			write('ch mode [lots/nolots] : If mode is changed to nolots, ll will not lot cells automatically.')
+		elseif params[1]:lower() == "pos" then
+			if params[3] then
+				local posx, posy = tonumber(params[2]), tonumber(params[3])
+				tb_set_location('salvage_box', posx, posy)
+			end
+		elseif params[1]:lower() == "start" then
+			initialize()
+		elseif params[1]:lower() == "hide" then
+			tb_set_visibility('salvage_box', false)
+		elseif params[1]:lower() == "show" then
+			tb_set_visibility('salvage_box', true)
+		elseif params[1]:lower() == "set" then
+			if params[2] then
+				set = params[2]:lower()
+				--Set variables from settings file
+				settings_create()
+				--Populate lot order
+				orderlots()
+				--Populate initial LL
+				lightluggage()
+				send_command('ll profile salvage-'..player..'.txt')
+				initialize()
+			end
+		elseif params[1]:lower() == "mode" then
+			if params[2] == "lots" then
+				mode = params[2]:lower()
+				write('Mode changed to: Cast lots')
+				lightluggage()
+			elseif params[2] == "nolots" then
+				mode = params[2]:lower()
+				write('Mode changed to: Do not cast lots')
+				lightluggage()
+			else write('Invalid mode option')
+			end
+		elseif params[1]:lower() == "timer" then
+			if params[2] == "start" then
+				send_command('timers c Remaining 6000 up')
+			elseif params[2] == "stop" then
+				send_command('timers d Remaining')
+			end
+		end			
+	end
+end
 
 function event_load()
 	send_command('alias ch lua c cellhelp')
-	a = 0
 	player = get_player()['name']
-	get_ll()
-	salvage_cell_name ={ 
-				'incus cell','castellanus cell','undulatus cell',
-				'cumulus cell','radiatus cell','virga cell',
-				'cirrocumulus cell','stratus cell','duplicatus cell',
-				'opacus cell', 'praecipitatio cell', 'humilus cell',
-				'spissatus cell', 'pannus cell', 'fractus cell',
-				'congestus cell',  'nimbus cell', 'velum cell',
-				'pileus cell', 'mediocris cell'
-			}
-	salvage_cell_ident = { 
-				'Weapons and Shields', 'Head and Neck', 'Ranged and Ammo', 'Body', 'Hand', 'Earring and Ring', 'Back and Waist', 'Legs and Feet', 'Support Job','Job and Weaponskill', 'Magic', 'HP', 'MP', 'STR', 'DEX', 'VIT', 'AGI', 'INT', 'MND', 'CHR'
-				} 
-	cells_id = { 
-				'5365','5366','5371','5367','5368','5372','5370','5369','5373','5374','5375','5383','5384','5376','5377','5378','5379','5380','5381','5382'
-				}
-	cells_id_concat = table.concat(cells_id, ',')
-	obtained_cells = {}
-	start_cells = table.concat(salvage_cell_name, '  \n  ')
+	write('CellHelp loaded.  CellHelp Authors: Cerberus.Balloon and Bahamut.Krizz')
+	mode = settingtab["mode"]
+	--Initial lot setting
+	settings_create()
+	--Populate initial LL
+	lightluggage()
+	send_command('ll profile salvage-'..player..'.txt')
+	initialize()
+end 
+
+function event_login()
+	settings_create()
+end
+
+function event_zone_change(from_id, from, to_id, to)
+	checkzone()
+end
+
+function orderlots()
+	lotorder = " "
+	for i=1, #salvage_cell_name_short  do 
+		if salvage_cell_name_short[i] ~= 'alex' and cell_lots[salvage_cell_name_short[i]] ~= 0 then
+			item = salvage_cell_name_short[i]
+			if cell_lots[item] ~= nil and cell_lots[item] ~= 0 then
+				lotorder = (lotorder..item..': '..cell_lots[item]..' \n ')
+			end
+	    elseif salvage_cell_name_short[i] == 'alex' and cell_lots[salvage_cell_name_short[i]] ~= 0 then
+	    	item = salvage_cell_name_short[i]
+	    	lotorder = (lotorder..item..' \n ')
+	    end
+	end
+		--Temporary Item Counter to see if items are registering with filter.
+		lotorder = (lotorder.."\n Item Counter: "..itemcount)
+end
+
+function lightluggage()
+	llprofile = ""
+	ll_lots = ""
+	ll_pass = ""
+	for i=1, #salvage_cell_name_short  do 
+		if salvage_cell_name_short[i] ~= nil then
+			if cell_lots[salvage_cell_name_short[i]] == 1 then
+	   		ll_lots = (ll_lots..cells_id[i]..',')
+	   		elseif cell_lots[salvage_cell_name_short[i]] == 0 then
+	   			if salvage_cell_name_short[i] ~= "alex" then
+			   		ll_pass = (ll_pass..cells_id[i]..',')
+			   	end
+	   		end
+	   	end
+	end
+	if mode == "lots" and ll_lots ~= "" then
+		llprofile = (llprofile..'if item is '..ll_lots..' then lot \n')
+	end
+	if ll_pass ~= "" then
+		llprofile = (llprofile..'if item is '..ll_pass..' then pass \n')
+	end
+	if settingtab[set][player_num]['pass'] ~= 0 then
+		llprofile = (llprofile.."if item is "..settingtab[set][player_num]['pass'].." then pass \n")
+	end
+	if settingtab[set][player_num]['lot'] ~= 0 then
+		llprofile = (llprofile.."if item is "..settingtab[set][player_num]['lot'].." then lot \n")
+	end
+	
+	io.open(lua_base_path..'../../plugins/ll/salvage-'..player..'.txt',"w"):write(llprofile):close()
+end
+
+function initialize()
 	tb_create('salvage_box')
 	tb_set_bg_color('salvage_box',200,30,30,30)
 	tb_set_color('salvage_box',255,200,200,200)
-	tb_set_location('salvage_box',200,130)
+	tb_set_location('salvage_box',posx,posy)
 	tb_set_visibility('salvage_box',1)
 	tb_set_bg_visibility('salvage_box',1)
 	tb_set_font('salvage_box','Arial',12)
-	tb_set_text('salvage_box',' Still Need:  \n  '..start_cells);
-	io.open(lua_base_path..'../../plugins/ll/salvage-'..player..'.txt',"w"):write('if item is '..custompass..' then pass\nif item is '..customlot..' then lot\n'):close()
-
+	tb_set_text('salvage_box',' Lot order:  \n'..lotorder);
 end
+
+function checkzone()
+	currentzone = get_ffxi_info()['zone']:lower()
+		if currentzone == 'silver sea remnants' or currentzone == 'zhayolm remnants' or currentzone == 'bhaflau remnants' or currentzone == 'arrapago remnants' then
+			send_command('timers c Remaining 6000 up')
+		else send_command('timers d Remaining')
+		end
+end
+
+function event_incoming_text(original, new, color)
+	a,b,name,cell = string.find(original,'(%w+) obtains an? ..(%w+) cell..\46')
+	if cell ~= nil then
+		if name == player then
+			cell_lots[cell] = 0
+			itemcount = itemcount + 1
+		elseif name ~= player and cell_lots[cell] > 1 then
+			cell_lots[cell] = cell_lots[cell] - 1
+		end
+		-- Populate lot order	
+		orderlots()
+		-- Update lightluggage
+		lightluggage()
+		-- Update textbox
+		initialize()
+		return new, color
+	end
+	
+	a,b,cell2 = string.find(original,'You find an? ..(%w+)..')
+	if cell2 ~= nil then
+		if cell_lots[cell2] ~= 0 and cell_lots[cell2] ~= nil then
+			new = 'You find a '..string.char(31,158)..cell2..' cell.'..string.char(31,167)..' /Need/'
+		end
+		return new, color
+	end
+end	
+
 function event_unload()
 	tb_delete('salvage_box')
-	end_command('unalias ch')
-	--io.open(lua_base_path..'../../plugins/ll/salvage-'..player..'.txt',"w"):write(''):close()
-end
-
-function event_zone_change(fromId, from, toId, to)
-	if fromId == 72 and toId == 74 or toId == 75 or toId == 76 or toId == 73 then
-		send_command('ll profile salvage-'..player..'.txt')
-	end
-end
-
-
-function event_incoming_text(old, new, color)
-	match_obt =  old:match(player..' obtains an? ..(.*)..%.')
-	match_drop = old:match ('You find an? ..(.*).. %o?i?n')
-	
-	celltest = old:find(player..' obtains an? ')
-	droptest = old:find('%w+%You find')
-	
-	if celltest == nil and droptest == nil then 
-		return new,color
-	end	
-	if celltest ~= nil then
-		for i=1, #salvage_cell_name do
-			if match_obt == salvage_cell_name[i] then 
-				a = a+1
-				obtained_cells[#obtained_cells+1] = cells_id[i]
-				salvage_cell_name[i]='1'
-				update_cells()
-				return new,color, a
-			end
-		end
-		return new,color
-	end
-
-if droptest ~= nil then
-	for i=1, #salvage_cell_name do
-		if match_drop == salvage_cell_name[i]  then
-			new = 'You find a '..string.char(31,158)..salvage_cell_name[i]..' ('..string.char(31,158)..salvage_cell_ident[i]..')'..string.char(31,167)..' /Need/'
-		return new,color
-		else 
-			new = old..' /Have/'
-		end	
-	end	
-	return new,color		
-	end
-end
-
-function get_ll()
-local ll = io.open(lua_base_path..'../../plugins/ll/salvage-'..player..'-add.txt', 'r')
-	if ll then
-		for l in ll:lines() do
-			if l:find('if (.*)% then lot') then
-				customlot = l:match('if item is (.*)% then lot')
-			end
-			if l:find('if (.*)% then pass') then
-				custompass = l:match('if item is (.*)% then pass')
-			end
-		end
-	end
-	if custompass == nil then
-		write('Add something to the top line of your salvage-'..player..'-add.txt file to pass things other than cells.  Please keep these on one line. Reload after.')
-		custompass=''
-	end
-	if customlot == nil then
-		write('Add something to the second line of your salvage-'..player..'-add.txt file to lot things other than cells. Please keep these on one line. Reload after')
-		customlot=''
-	end
-return customlot,custompass
-end
-
-function update_cells()
-	if a<20 then
-		local pass = table.concat(obtained_cells, ',')
-		local needed_cells = table.concat(salvage_cell_name, '  \n  ')
-		local textbox_cells = string.gsub(needed_cells, '(1  \n  )'or'%d', '')
-		tb_set_text('salvage_box',' Still Need:  \n  '..textbox_cells)
-		io.open(lua_base_path..'../../plugins/ll/salvage-'..player..'.txt',"w"):write('if item is '..custompass..' then pass\nif item is '..customlot..' then lot\nif item is '..pass..' then pass'):close()
-	else 
-		tb_set_text('salvage_box', '  Obtained all the cells.  ')
-	end
-end
+	send_command('timers d Remaining')
+	send_command('unalias ch2')
+end 

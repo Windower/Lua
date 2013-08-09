@@ -1,6 +1,7 @@
 Lua
 ===
-Lua Addons and Scripts
+Lua Addons and Scripts  
+Lua documentation can be found at the Windower Development wiki: http://dev.windower.net/doku.php?id=lua:start
 
 Licensing
 ---------

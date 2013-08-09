@@ -25,136 +25,94 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+-- Libs --
+file = require 'filehelper'
+config = require 'config'
+require 'tablehelper'
+require 'sets'
+
+-- Battlemod Files --
+require 'event_action'
+require 'generic_helpers'
+require 'static_vars'
+
+_addon = {}
+_addon.version = '2.17'
+_addon.name = 'BattleMod'
+_addon.commands = {'bm','battlemod'}
+
 function event_load()
-	stat_array={}
-	slow_spells={Protect=5,Shell=5,Regen=5}
-	slow_spells['Blaze Spikes'] = 5
-	slow_spells['Ice Spikes'] = 5
-	slow_spells['Shock Spikes'] = 5
-	slow_spells['Klimaform'] = 5
-	allow = 1
-	prevline = ''
-	line_full = 'Full line is not loading'
-	line_nouser = 'No User line is not loading'
-	line_nodmg = 'No Damage line is not loading'
-	line_shadow = 'Shadow line is not loading'
-	color_arr={p0='\x1F\xF7',p1='\x1F\xCC',p2='\x1F\x9C',p3='\x1F\xEE',p4='\x1F\x05',p5='\x1F\x06',
-	a10='\x1F\xCD',a11='\x1F\x69',a12='\x1F\xA7',a13='\x1F\x26',a14='\x1F\x7D',a15='\x1F\xB9',
-	a20='\x1F\xAF',a21='\x1F\x03',a22='\x1F\xC8',a23='\x1F\xE3',a24='\x1F\xE5',a25='\x1F\xD0',
-	mob='\x1F\x45', mobdmg='\x1F\x08', mydmg='\x1F\x08', partydmg='\x1F\x08', allydmg='\x1F\x08', otherdmg='\x1F\x08'}
-    send_command('alias bm lua c battlemod cmd')
+	version = '2.17'
+	block_equip = false
+	block_cannot = false
+	
+    send_command('@alias bm lua c battlemod cmd')
 	options_load()
+	collectgarbage()
 end
 
 function options_load()
-	local f = io.open(lua_base_path..'data/settings.txt', "r")
-	if f == nil then
-		local g = io.open(lua_base_path..'data/settings.txt', "w")
-		g:write('Release Date: 9:30 AM, 3-28-12\46')
-		g:write('Author Comment: This document is whitespace sensitive, which means that you need the same number of spaces between things as exist in this initial settings file\46\n')
-		g:write('Author Comment: It looks at the first two words separated by spaces and then takes anything as the value in question if the first two words are relevant\46\n')
-		g:write('Author Comment: If you ever mess it up so that it does not work, you can just delete it and battlemod will regenerate it upon reload\46\n')
-		g:write('Author Comment: For the output customization lines, \36\123user\125 denotes a value to be replaced. The options are user, damg, abil, and targ\46\n')
-		g:write('Author Comment: Options for the other modes are either true or false\46\n')
-		g:write('Author Comment: Colors are customizable based on party / alliance position. Use the colortest command to view the available colors\46\n')
-		g:write('Author Comment: If you wish for a color to be unchanged from its normal color, set it to 0\46\n')
-		g:write('File Settings: Fill in below\n')
-		g:write('Output Full: \91\36\123user\125\93 \36\123damg\125 \36\123abil\125 \x81\xA8 \36\123targ\125\n')
-		g:write('Output NoUser: \36\123abil\125 \36\123damg\125 \x81\xA8 \36\123targ\125\n')
-		g:write('Output NoDamg: \91\36\123user\125\93 \36\123abil\125 \x81\xA8 \36\123targ\125\n')
-		g:write('Output Shadow: \91\36\123targ\125\93 \36\123abil\125 \36\123damg\125\n')
-		g:write('Condense Battle: true\nCondense Buffs: true\nComma Mode: false\nOxford Comma: true\nColorful Names: true\nSuper Silence: true\nTarget Number: true\n')
-		g:write('Color p0: 501\nColor p1: 204\nColor p2: 410\nColor p3: 492\nColor p4: 259\nColor p5: 260\n')
-		g:write('Color a10: 205\nColor a11: 359\nColor a12: 167\nColor a13: 038\nColor a14: 125\nColor a15: 185\n')
-		g:write('Color a20: 429\nColor a21: 257\nColor a22: 200\nColor a23: 481\nColor a24: 483\nColor a25: 208\n')
-		g:write('Color mob: 69\nColor mobdmg: 8\nColor mydmg: 8\nColor partydmg: 8\nColor allydmg: 8\nColor otherdmg: 8')
-		g:close()
-		line_full = '\91\36\123user\125\93 \36\123damg\125 \36\123abil\125 \x81\xA8 \36\123targ\125'
-		line_nouser = '\36\123abil\125 \36\123damg\125 \x81\xA8 \36\123targ\125'
-		line_nodmg = '\91\36\123user\125\93 \36\123abil\125 \x81\xA8 \36\123targ\125'
-		line_shadow = '\91\36\123targ\125\93 \36\123abil\125 \36\123damg\125'
-		commamode= false
-		oxford = true
-		targetnumber = true
-		colorful = true
-		cancelmulti = true
-		condensebattle = true
-		condensebuffs = true
-		write('Default settings file created')
-		add_to_chat(12,'Battlemod created a settings file and loaded!')
-	else
-		f:close()
-		for curline in io.lines(lua_base_path..'data/settings.txt') do
-			local splat = split(curline,' ')
-			local cmd = ''
-			if splat[2] ~=nil then
-				cmd = (splat[1]..' '..splat[2]):gsub(':',''):lower()
-			end
-			if cmd == 'output full' then
-				table.remove(splat,2)
-				table.remove(splat,1)
-				line_full = table.concat(splat,' ')
-			elseif cmd == 'output nouser' then
-				table.remove(splat,2)
-				table.remove(splat,1)
-				line_nouser = table.concat(splat,' ')
-			elseif cmd == 'output nodamg' then
-				table.remove(splat,2)
-				table.remove(splat,1)
-				line_nodmg = table.concat(splat,' ')
-			elseif cmd == 'output shadow' then
-				table.remove(splat,2)
-				table.remove(splat,1)
-				line_shadow = table.concat(splat,' ')
-			elseif cmd == 'comma mode' then
-				commamode = str2bool(splat[3])
-			elseif cmd == 'oxford comma' then
-				oxford = str2bool(splat[3])
-			elseif cmd == 'colorful names' then
-				colorful = str2bool(splat[3])
-			elseif cmd == 'super silence' then
-				cancelmulti = str2bool(splat[3])
-			elseif cmd == 'target number' then
-				targetnumber = str2bool(splat[3])
-			elseif cmd == 'condense battle' then
-				condensebattle = str2bool(splat[3])
-			elseif cmd == 'condense buffs' then
-				condensebuffs = str2bool(splat[3])
-			elseif splat[1]:lower() == 'color' then
-				color_arr[splat[2]:gsub(':',''):lower()] = colconv(splat[3],splat[2]:gsub(':',''))
-			end
-		end
-		add_to_chat(12,'Battlemod read from a settings file and loaded!')
+	if not dir_exists(lua_base_path..'data/') then
+		create_dir(lua_base_path..'data/')
 	end
-	output_arr = {}
+	if not dir_exists(lua_base_path..'data/filters/') then
+		create_dir(lua_base_path..'data/filters/')
+	end
+	 
+	local settingsFile = file.new('data/settings.xml',true)
+	local filterFile=file.new('data/filters/filters.xml',true)
+	local colorsFile=file.new('data/colors.xml',true)
+	
+	if not file.exists('data/settings.xml') then
+		settingsFile:write(default_settings)
+		write('Default settings xml file created')
+	end
+	
+	local settingtab = config.load('data/settings.xml',default_settings_table)
+	config.save(settingtab)
+	
+	for i,v in pairs(settingtab) do
+		_G[i] = v
+	end
+	
+	if not file.exists('data/filters/filters.xml') then
+		filterFile:write(default_filters)
+		write('Default filters xml file created')
+	end
+	local tempplayer = get_player()
+	if tempplayer then
+		filterload(tempplayer['main_job'])
+	else
+		filterload('DEFAULT')
+	end
+	if not file.exists('data/colors.xml') then
+		colorsFile:write(default_colors)
+		write('Default colors xml file created')
+	end
+	local colortab = config.load('data/colors.xml',default_color_table)
+	config.save(colortab)
+	for i,v in pairs(colortab) do
+		color_arr[i] = colconv(v,i)
+	end
+	write('Battlemod v'..version..' loaded.')
 end
 
-function str2bool(input)
-	if input:lower() == 'true' then
-		return true
-	elseif input:lower() == 'false' then
-		return false
+function event_job_change(mjob_id,mjob,mjob_lvl,sjob_id,sjob,sjob_lvl)
+	filterload(mjob)
+end
+
+function filterload(job)	
+	if file.exists('data/filters/filters-'..job..'.xml') then
+		filter = config.load('data/filters/filters-'..job..'.xml',default_filter_table,false)
+		add_to_chat(4,'Loaded '..job..' Battlemod filters')
 	else
-		write('This setting is not a suitable boolean value\46 Please use true or false: '..input)
-		return false
+		filter = config.load('data/filters/filters.xml',default_filter_table,false)
+		add_to_chat(4,'Loaded default Battlemod filters')
 	end
 end
 
-function colconv(str,key)
-	local out
-	strnum = tonumber(str)
-	if strnum >= 256 and strnum < 509 then
-		strnum = strnum - 254
-		out = string.char(0x1E,strnum)
-	elseif strnum >0 then
-		out = string.char(0x1F,strnum)
-	elseif strnum == 0 then
-		out = string.char(0x1E,0x01)
-	else
-		write('You have an invalid color '..key)
-		out = string.char(0x1F,1)
-	end
-	return out
+function event_login(name)
+	send_command('@wait 10;bm reload')
 end
 
 function event_addon_command(...)
@@ -164,406 +122,229 @@ function event_addon_command(...)
 		if splitarr[2] ~= nil then
 			if splitarr[2]:lower() == 'commamode' then
 				commamode = not commamode
-				write('Comma Mode flipped!')
+				add_to_chat(121,'Comma Mode flipped! - '..tostring(commamode))
 			elseif splitarr[2]:lower() == 'oxford' then
 				oxford = not oxford
-				write('Oxford Mode flipped!')
+				add_to_chat(121,'Oxford Mode flipped! - '..tostring(oxford))
 			elseif splitarr[2]:lower() == 'targetnumber' then
 				targetnumber = not targetnumber
-				write('Target Number flipped!')
-			elseif splitarr[2]:lower() == 'colorful' then
-				colorful = not colorful
-				write('Colorful mode flipped!')
+				add_to_chat(121,'Target Number flipped! - '..tostring(targetnumber))
 			elseif splitarr[2]:lower() == 'cancelmulti' then
-				cancelmulti = not canclemulti
-				write('Multi-canceling flipped!')
+				cancelmulti = not cancelmulti
+				add_to_chat(121,'Multi-canceling flipped! - '..tostring(cancelmulti))
 			elseif splitarr[2]:lower() == 'reload' then
 				options_load()
+			elseif splitarr[2]:lower() == 'unload' then
+				send_command('@lua u battlemod')
 			elseif splitarr[2]:lower() == 'condensebattle' then
 				condensebattle = not condensebattle
-				write('Condensed Battle text flipped!')
+				add_to_chat(121,'Condensed Battle text flipped! - '..tostring(condensebattle))
 			elseif splitarr[2]:lower() == 'condensebuffs' then
 				condensebuffs = not condensebuffs
-				write('Condensed Buffs text flipped!')
+				add_to_chat(121,'Condensed Buffs text flipped! - '..tostring(condensebuffs))
+			elseif splitarr[2]:lower() == 'condensedamage' then
+				condensedamage = not condensedamage
+				add_to_chat(121,'Condensed Damage text flipped! - '..tostring(condensedamage))
+			elseif splitarr[2]:lower() == 'cg' then
+				collectgarbage()
 			elseif splitarr[2]:lower() == 'colortest' then
-				for i = 0, 32 do
-						local line = ''
-						for j = 1, 16 do
-								local n = i * 16 + j
-								if n >= 0 and n <= 509 then
-										if n == 253 or n == 507 then -- block \x1E\xFD and \x1F\xFD
-												loc_col = '\031\001'
-										elseif n <= 255 then
-												loc_col = string.char(0x1F, n)
-										else
-												loc_col = string.char(0x1E, n - 254)
-										end
-										line = line..loc_col..string.format('%03d ', n)
-								end
+				local counter = 0
+				local line = ''
+				for n = 1, 509 do
+					if not color_redundant:contains(n) and not black_colors:contains(n) then
+						if n <= 255 then
+							loc_col = string.char(0x1F, n)
+						else
+							loc_col = string.char(0x1E, n - 254)
 						end
+						line = line..loc_col..string.format('%03d ', n)
+						counter = counter + 1
+					end
+					if counter == 16 or n == 509 then
 						add_to_chat(1, line)
+						counter = 0
+						line = ''
+					end
 				end
-				write('Colors Tested!')
+				add_to_chat(122,'Colors Tested!')
 			elseif splitarr[2]:lower() == 'help' then
-				write('Battlemod has 9 commands')
+				write('Battlemod has 10 commands')
 				write(' 1. help --- shows this menu')
 				write(' 2. colortest --- Shows the 509 possible colors for use with the settings file')
 				write(' 3. reload --- Reloads the settings file')
 				write('Big Toggles:')
 				write(' 4. condensebuffs --- Condenses Area of Effect buffs, Default = True')
 				write(' 5. condensebattle --- Condenses battle logs according to your settings file, Default = True')
-				write(' 6. cancelmulti --- Cancles multiple consecutive identical lines, Default = True')
+				write(' 6. condensedamage --- Condenses damage messages within attack rounds, Default = True')
+				write(' 7. cancelmulti --- Cancles multiple consecutive identical lines, Default = True')
 				write('Sub Toggles:')
-				write(' 7. oxford --- Toggle use of oxford comma, Default = True')
-				write(' 8. commamode --- Toggle comma-only mode, Default = False')
-				write(' 9. targetnumber --- Toggle target number display, Default = True')
-				write(' 10. colorful --- Colors the output by alliance member, Default = True')
+				write(' 8. oxford --- Toggle use of oxford comma, Default = True')
+				write(' 9. commamode --- Toggle comma-only mode, Default = False')
+				write(' 10. targetnumber --- Toggle target number display, Default = True')
 			end
 		end
 	else
-		local a,b,targeff,gn = string.find(term,'Send it out ([%w%s\39]+)5(%w+)6')
-		
-		if targeff ~= nil then
-			send_it_out(targeff,gn)
-		end
-		
-		if splitarr[1] == 'allow' then
-			prevline = ''
-			allow = 1
+		if splitarr[1] == 'flip' then
+			_G[splitarr[2]] = not _G[splitarr[2]]
+		elseif splitarr[1] == 'wearsoff' then
+			local trash = table.remove(splitarr,1)
+			local stat = table.concat(splitarr,' ')
+			local len = #wearing[stat]
+			local targets = table.remove(wearing[stat],1)..string.char(0x1F,191)
+			for i,v in pairs(wearing[stat]) do
+				if i < #wearing[stat] or commamode then
+					targets = targets..string.char(0x1F,191)..', '
+				else
+					if oxford and #wearing[stat] >2 then
+						targets = targets..string.char(0x1F,191)..','
+					end
+					targets = targets..string.char(0x1F,191)..' and '
+				end
+				targets = targets..v
+			end
+			if targetnumber and len > 1 then
+				targets = '['..len..'] '..targets
+			end
+			local outstr = dialog[206]['english']:gsub('$\123target\125',targets..string.char(0x1F,191)):gsub('$\123status\125',stat..string.char(0x1F,191))
+			add_to_chat(1,string.char(0x1F,191)..outstr..string.char(127,49))
+			wearing[stat] = nil
 		end
 	end
 end
 
 function event_incoming_text(original, modified, color)
 	local redcol = color%256
-	if cancelmulti then
-		if redcol >17 then
-			if original == prevline then
-				a,b = string.find(original,'You buy ')
-				g,b = string.find(original,'You were unable to buy ')
-				h,b = string.find(original,' seems like a ')
-				f,b = string.find(original,'You sell ')
-				e,b = string.find(original,'%w+ synthesized ')
-				c,b = string.find(original,' bought ')
-				d,b = string.find(original,'You find a ')
-				if a==nil and c==nil and d==nil and e==nil and f==nil and h==nil and g==nil then
-					modified = ''
-					if allow == 1 then
-						send_command('wait 5;lua c battlemod allow')
-						allow = 0
-					end
-				end
-			else
-				prevline = original
+	
+	if redcol == 36 then
+		a,z = string.find(original,' defeats ')
+		if a then
+			if original:sub(1,4) ~= string.char(0x1F,0xFE,0x1E,0x01) then
+				return '',color
 			end
+		end
+	elseif redcol == 127 then
+		a,z = string.find(original,' corpuscles of ')
+		b,z = string.find(original,' experience points')
+		if a or b then
+			if original:sub(1,4) ~= string.char(0x1F,0xFE,0x1E,0x01) then
+				return '',color
+			end
+		end
+	elseif redcol == 121 and cancelmulti then
+		a,z = string.find(original,'Equipment changed')
+		
+		if a and not block_equip then
+			send_command('@wait 1;lua c battlemod flip block_equip')
+			block_equip = true
+		elseif a and block_equip then
+			modified = ''
+		end
+	elseif redcol == 123 and cancelmulti then
+		a,z = string.find(original,'You were unable to change your equipped items')
+		b,z = string.find(original,'You cannot use that command while viewing the chat log')
+		c,z = string.find(original,'You must close the currently open window to use that command')
+		
+		if (a or b or c) and not block_cannot then
+			send_command('@wait 1;lua c battlemod flip block_cannot')
+			block_cannot = true
+		elseif (a or b or c) and block_cannot then
+			modified = ''
+		end
+	elseif blocked_colors:contains(redcol) then
+		if original:sub(1,4) ~= string.char(0x1F,0xFE,0x1E,0x01) then
+			return '',color
 		end
 	end
 	
-	if condensebuffs then
-		if redcol == 191 or redcol == 56 or redcol == 64 or redcol==101 or redcol==111 then
-			local a,b,target,effect,c,d,e,f,gn
-			local polarity = nil
-			a,b,target,polarity,effect = string.find(original,"([%w%s\39\45]+) (%w+)s the effect of ([%w%s\39]+)\46")
-			if a==nil then
-				c,d,target,effect = string.find(original,"([%w%s\39\45]+)\39s ([%w%s\39]+) effect wears off\46")
-			end
-			if target ~= nil then
-				target = the_check(target)
-			end
-			if c ~= nil then
-				gn = 'wears'
-			elseif a~=nil then
-				gn = 'adds'
-			end
-			if effect~=nil then
-				if stat_array[effect..'send_single'] ~= 1 then
-					if stat_array[effect]==nil then
-						local lines={}
-						lines = split(original,'\7')
-						table.remove(lines,#lines)
-						stat_array[effect]={table.concat(lines,'\7'), color}
-						stat_array[effect..' pol'] = polarity
-						local delay = 0
-						if slow_spells[effect]~=nil then
-							delay = slow_spells[effect]
-						else
-							delay = 1.2
-						end
-						send_command('wait '..delay..';lua c battlemod Send it out '..effect..'5'..gn..'6')
-					end
-					stat_array[effect][#stat_array[effect]+1] = target
-
-					modified = ''
-				else
-					modified = original
-					stat_array[effect..'send_single'] = nil
-				end
-			end
-			
-		end
-	end
-	if condensebattle then
-		if redcol == 20 or redcol == 21 or redcol == 23 or redcol == 24 or redcol == 25 or redcol == 26 or redcol == 28 or redcol == 29 or redcol == 32 or redcol == 33 or redcol == 40 or redcol == 41 or redcol == 163 or redcol == 164 or redcol == 104 or redcol == 112 or redcol == 114 or redcol==31 then
-			-- Basic initiation messages:
-			local uses,a,user1,abil1 = string.find(original,'([%w%s\39\45]+) uses? (%u[%w%s\39\58]+)%.?,?')
-			local casts,a,user4,abil2 = string.find(original,'([%w%s\39\45]+) casts? (%u[%w%s\39\58]+)%.')
-			
-			-- Defensive/negation
-			local counter,a,targ3,user6 = string.find(original,'([%w%s\39\45]+)\39?s? attack is countered by ([%w%s\39\45]+)\46')
-			local parry,a,user9,targ7 = string.find(original,'([%w%s\39\45]+) parries ([%w%s\39\45]+)%.')
-			local dodge,a,user10,targ8 = string.find(original,'([%w%s\39\45]+) dodges ([%w%s\39\45]+)%.')
-			local shadow,a,dmg5,targ9 = string.find(original,'(%d) of ([%w%s\39\45]+)s absorbs? the damage and disappears%.')
-			
-			-- Stand-alone messages:
-			local spikes,a,user7,dmg3,targ4 = string.find(original,'([%w%s\39\45]+)\39?s? spikes deal (%d+) points? of damage to ([%w%s\39\45]+)%.')
-			local addeffect,a,targ5,dmg4 = string.find(original,'Additional effect: ([%w%s]+) takes (%d+) additional points? of damage%.')
-			local skillchain,a,abil3 = string.find(original,'Skillchain: (%a+)\46')
-			
-			-- Basic result messages
-			local takes,a,targ1,dmg1 = string.find(original,'([%w%s\39\45]+) takes? (%d+) points of damage')
-			local crit,a,user2 = string.find(original,'([%w%s\39\45]+)\39?s? ?r?a?n?g?e?d? ?a?t?t?a?c?k? scores? a critical hit!')
-			local hits,a,user3,targ2,dmg2 = string.find(original,'([%w%s\39\45]+)\39?s? ?r?a?n?g?e?d? ?a?t?t?a?c?k? hits? ([%w%s\39\45]+) for (%d+) points of damage%.')
-			local misses,a,user8,targ6 = string.find(original,'([%w%s\39\45]+)\39?s? ?r?a?n?g?e?d? ?a?t?t?a?c?k? misse?s? ([%w%s\39\45]+)%.')
-			
-			-- Flags
-			local ranged,a = string.find(original,'ranged attack')
-			local addeffect2,a,effect = string.find(original,' and is (%a+)\46')
-			
-			-- JA Specific
-			local step,a,targ10,daze = string.find(original,'([%w%s\39%-]+) i?s?a?r?e? afflicted with [%a]+ [%a]+ %(lv%.(%d)%)%.')
-			
-			-- Healing
-			local reverse,a,targ11,dmg6 = string.find(original,'([%w%s\39%-]+) regains ([%d%a%s]+)%.')
-			local cure,a,targ12,dmg7 = string.find(original,'([%w%s\39%-]+) recovers ([%d%a%s]+)%.')
-			
-			
-			output_arr['targ'] = targ1 or targ2 or targ3 or targ4 or targ5 or targ6 or targ7 or targ8 or targ9 or targ10 or targ11 or targ12 or targ13 or ''
-			output_arr['damg'] = dmg1 or dmg2 or dmg3 or dmg4 or dmg5 or dmg6 or dmg7 or ''
-			output_arr['user'] = user1 or user2 or user3 or user4 or user5 or user6 or user7 or user8 or user9 or user10 or ''
-			output_arr['abil'] = abil1 or abil2 or abil3 or ''
-			
-			output_arr['user'] = the_check(output_arr['user']):gsub('\39s ranged attack','')
-			output_arr['targ'] = the_check(output_arr['targ']):gsub('\39s ranged attack','')
-			output_arr['targ'] = the_check(output_arr['targ']):gsub('\39s shadow','')
-			output_arr['targ'] = the_check(output_arr['targ']):gsub('\39s attack','')
-			
-			if shadow ~= nil then
-				output_arr['damg'] = output_arr['damg']..' shadow'
-			end
-			if step~= nil and daze ~= nil then
-				output_arr['damg'] = 'Lv.'..daze
-			end
-			
-			if colorful then
-				if redcol == 28 or redcol == 29 or redcol == 32 or redcol == 33 or redcol == 104 then
-					output_arr['targ'] = name_col('',output_arr['targ'])
-					if output_arr['user'] ~= '' then
-						output_arr['user'] =  color_arr['mob']..output_arr['user']..'\x1E\x01'
-					end
-					if output_arr['damg'] ~= '' then
-						output_arr['damg'] = color_arr['mobdmg']..output_arr['damg']..'\x1E\x01'
-					end
-				elseif redcol == 31 or redcol==24 or redcol==23 then
-					output_arr['targ'] = name_col('',output_arr['targ'])
-					output_arr['user'] = name_col('',output_arr['user'])
-				else
-					output_arr['targ'] =  color_arr['mob']..output_arr['targ']..'\x1E\x01'
-					if output_arr['user'] ~= '' then
-						output_arr['user'] = name_col('',output_arr['user'])
-					end
-					if output_arr['damg'] ~= '' then
-						if redcol== 20 then
-							output_arr['damg'] = color_arr['mydmg']..output_arr['damg']..'\x1E\x01'
-						elseif redcol== 25 then
-							output_arr['damg'] = color_arr['partydmg']..output_arr['damg']..'\x1E\x01'
-						elseif redcol== 40 then
-							output_arr['damg'] = color_arr['otherdmg']..output_arr['damg']..'\x1E\x01'
-						elseif redcol== 163 then
-							output_arr['damg'] = color_arr['allydmg']..output_arr['damg']..'\x1E\x01'
-						elseif redcol== 21 then
-							output_arr['damg'] = color_arr['mobdmg']..output_arr['damg']..'\x1E\x01'
-						end
-					end
-				end
-			end
-			if misses~=nil then
-				if output_arr['abil'] ~= '' then
-					output_arr['abil'] = output_arr['abil']..' Miss'
-				else
-					output_arr['abil'] = 'Miss'
-				end
-			elseif crit~=nil then
-				output_arr['abil'] = 'Critical'
-			end
-			
-			if ranged~=nil then
-				if output_arr['abil'] == 'Critical' then
-					output_arr['abil'] = output_arr['abil']..' RA'
-				else
-					output_arr['abil'] = 'RA'
-				end
-			elseif counter~= nil then
-				output_arr['abil']='Counter'
-			elseif parry~= nil then
-				output_arr['abil']='Parry'
-			elseif dodge~= nil then
-				output_arr['abil']='Dodge'
-			elseif spikes~= nil then
-				output_arr['abil']='Spikes'
-			elseif shadow~= nil then
-				output_arr['abil']='Loses'
-			elseif addeffect~= nil then
-				output_arr['abil']='Add\46 Eff\46'
-			elseif output_arr['abil']=='' then
-				if output_arr['user'] == '' then
-					output_arr['abil']=output_arr['abil']..'AoE'
-				else
-					output_arr['abil']=output_arr['abil']..'Hit'
-				end
-			end
-			
-			if addeffect2 ~= nil then
-				output_arr['targ']=output_arr['targ']..' \40'..effect..'\41'
-			end
-			
-			if takes~=nil or hits~=nil or spikes ~= nil or addeffect ~=nil or misses ~= nil or parry ~= nil or dodge~=nil or shadow~=nil or step~=nil or reverse ~= nil or cure~=nil then
-				if output_arr['user']=='' then
-					if shadow ~= nil then
-						modified=line_shadow:gsub('$\123(%w+)\125',bounce)
-					else
-						modified=line_nouser:gsub('$\123(%w+)\125',bounce)
-					end
-				elseif output_arr['damg'] == '' then
-					modified=line_nodmg:gsub('$\123(%w+)\125',bounce)
-				else
-					modified=line_full:gsub('$\123(%w+)\125',bounce)
-				end
-			end
-			
-			output_arr = {}
-		end
-	end
 	return modified,color
 end
 
-function bounce(word)
-	if output_arr[word]~=nil then
-		return output_arr[word]
-	else
-		return '$'..word
-	end
-end
-
-function the_check(str)
-	local outstr
-	local a,b = string.find(str:lower(),'the ')
-	if a==1 then
-		outstr = str:sub(b+1,str:len())
-	else
-		outstr = str
-	end
-	return outstr
-end
-
-function send_it_out(n,modus)
-	local output
-	if stat_array[n][1]~= '' and stat_array[n][1] ~= nil then
-		output = stat_array[n][1]..'\7'
-	else
-		output = ''
-	end
-	stat_array[n] = eliminate_duplicates(stat_array[n])
-	if targetnumber then
-		if #stat_array[n] > 3 then
-			output = output.."\91"..(#stat_array[n]-2).."\93 "
-		end
-	end
-	
-	if colorful then
-		party = get_party()
-	end
-	local col = string.char(0x1F,stat_array[n][2]%256)
-	local colnm = stat_array[n][2]
-	output = name_col(output,stat_array[n][3])
-	for i,v in pairs(stat_array[n]) do
-		if i > 3 then
-			if i <= #stat_array[n]-1 then
-				output = output..', '
-			elseif i == #stat_array[n] then
-				if commamode then
-					output = output..', '
-				else
-					if oxford then
-						if #stat_array[n] >4 then
-							output = output..','
-						end
-					end
-					output = output..' and '
-				end	
-			end
-			output = name_col(output,v)
-		end
-	end
-	if modus=='wears' then
-		add_to_chat(colnm,output..'\x1E\x01'..'\39s '..n..' effect wears off.')
-	elseif modus=='adds' then
-		if #stat_array[n]>3 then
-			add_to_chat(colnm,output..'\x1E\x01'..' '..stat_array[n..' pol']..' the effect of '..n..'.')
+function event_action_message(actor_id,index,actor_target_index,target_target_index,message_id,param_1,param_2,param_3)
+    -- Consider a way to condense "Wears off" messages?
+	if message_id == 206 then -- Wears off messages
+		local status
+		local target_table = get_mob_by_id(index)
+		local party_table = get_party()
+		local target = target_table['name']
+		
+		if enfeebling:contains(param_1) then
+			status = color_it(statuses[param_1]['english'],color_arr['enfeebcol'])
+		elseif color_arr['statuscol'] == rcol then
+			status = color_it(statuses[param_1]['english'],string.char(0x1F,191))
 		else
-			stat_array[n..'send_single']=1
-			add_to_chat(colnm,output..'\x1E\x01'..col..' '..stat_array[n..' pol']..'s the effect of '..n..'.')
+			status = color_it(statuses[param_1]['english'],color_arr['statuscol'])
 		end
-	end
-	stat_array[n..' pol']=nil
-	stat_array[n]=nil
-end
-
-function name_col(basestr,name)
-	local party = get_party()
-	local modbase = ''
-	for r,s in pairs(party) do
-		if s['name'] == name and colorful then
-			modbase = basestr..color_arr[r]..name..'\x1E\x01'
+		
+		if not wearing[status] and not (stat_ignore:contains(param_1)) then
+			wearing[status] = {}
+			wearing[status][1] = namecol(target,target_table,party_table)
+			send_command('@wait 0.5;lua c battlemod wearsoff '..status)
+		elseif not (stat_ignore:contains(param_1)) then
+			wearing[status][#wearing[status]+1] = namecol(target,target_table,party_table)
+		else -- This handles the stat_ignore values, which are things like Utsusemi, Sneak, Invis, etc. that you don't want to see on a delay
+			wearing[status] = {}
+			wearing[status][1] = namecol(target,target_table,party_table)
+			send_command('@lua c battlemod wearsoff '..status)
 		end
-	end
-	if modbase == '' then
-		modbase = basestr..name
-	end
-	return modbase
-end
-
-function split(msg, match)
-	local length = msg:len()
-	local splitarr = {}
-	local u = 1
-	while u <= length do
-		local nextanch = msg:find(match,u)
-		if nextanch ~= nil then
-			splitarr[#splitarr+1] = msg:sub(u,nextanch-match:len())
-			if nextanch~=length then
-				u = nextanch+match:len()
+	elseif passed_messages:contains(message_id) then
+		local status,actor,target,spell,skill,number,number2
+		local actor_table = get_mob_by_id(actor_id)
+		local target_table = get_mob_by_id(index)
+		local party_table = get_party()
+		
+		local actor = actor_table['name']
+		local target = target_table['name']
+		
+		if message_id > 169 and message_id <179 then
+			if param_1 == 4294967296 then
+				skill = 'like level -1'..' ('..ratings_arr[param_2+1]..')'
 			else
-				u = length
+				skill = 'like level '..param_1..' ('..ratings_arr[param_2+1]..')'
 			end
-		else
-			splitarr[#splitarr+1] = msg:sub(u,length)
-			u = length+1
+			if debugging then write(param_1..'   '..param_2..'   '..param_3) end
 		end
-	end
-	return splitarr
-end
+		
+		if message_id == 558  then
+			number2 = param_2
+		end
+		number = param_1
+		
+		if param_1 ~= 0 then
+			status = (enLog[param_1] or nf(statuses[param_1],'english'))
+			spell = nf(spells[param_1],'english')
+		end
+		
+		if status then
+			if enfeebling:contains(param_1) then
+				status = color_it(status,color_arr['enfeebcol'])
+			else
+				status = color_it(status,color_arr['statuscol'])
+			end
+		end
 
-function eliminate_duplicates(tab)
-	for i,v in pairs(tab) do
-		for n,q in pairs(tab) do
-			if tab[i] == tab[n] and i ~= n then
-				table.remove(tab,n)
-			end
+		if spell then spell = color_it(spell,color_arr['spellcol']) end
+		if target then target = namecol(target,target_table,party_table) end
+		if actor then actor = namecol(actor,actor_table,party_table) end
+		if skill then skill = color_it(skill,color_arr['abilcol']) end
+		
+		if actor ~= nil then
+			local outstr = dialog[message_id]['english']:gsub('$\123actor\125',actor or ''):gsub('$\123status\125',status or ''):gsub('$\123target\125',target or ''):gsub('$\123spell\125',spell or ''):gsub('$\123skill\125',skill or ''):gsub('$\123number\125',number or ''):gsub('$\123number2\125',number2 or ''):gsub('$\123lb\125','\7')
+			add_to_chat(dialog[message_id]['color'],string.char(0x1F,0xFE,0x1E,0x01)..outstr..string.char(127,49))
 		end
+	elseif T{62,94,251,308,313}:contains(message_id) then
+	-- 62 is "fails to activate" but it is color 121 so I cannot block it because I would also accidentally block a lot of system messages. Thus I have to ignore it.
+	-- Message 251 is "about to wear off" but it is color 123 so I cannot block it because I would also block "you failed to swap that gear, idiot!" messages. Thus I have to ignore it.
+	-- Message 308 is "your inventory is full" but it is color 123.
+	-- Message 313 is the red "target is out of range" message but it is color 123 so I cannot block it because I would also block "you failed to swap that gear, idiot!" messages. Thus I have to ignore it.
+	elseif T{38,202}:contains(message_id) then
+	-- 38 is the Skill Up message, which (interestingly) uses all the number params.
+	-- 202 is the Time Remaining message, which (interestingly) uses all the number params.
+		if debugging then write('debug_EAM#'..message_id..': '..dialog[message_id]['english']..' '..param_1..'   '..param_2..'   '..param_3) end
+	elseif debugging then 
+		write('debug_EAM#'..message_id..': '..dialog[message_id]['english'])
 	end
-	return tab
 end
 
 function event_unload()
-	send_command('unalias aoe')
+	send_command('@unalias bm')
 end

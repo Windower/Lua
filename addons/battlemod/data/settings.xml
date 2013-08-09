@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<!-- For the output customization lines, ${actor} denotes a value to be replaced. The options are actor, number, abil, and target.
+	 Options for other modes are either "true" or "false". Other values will not be interpreted.-->
+<settings>
+	<global>
+		<condensedamage>true</condensedamage>
+		<condensebattle>true</condensebattle>
+		<condensebuffs>true</condensebuffs>
+		<cancelmulti>true</cancelmulti>
+		<oxford>true</oxford>
+		<commamode>false</commamode>
+		<supersilence>true</supersilence>
+		<targetnumber>true</targetnumber>
+		
+		
+		<line_full>[${actor}] ${number} ${abil} ¨ ${target}</line_full>
+		<line_noactor>${abil} ${number} ¨ ${target}</line_noactor>
+		<line_nonumber>[${actor}] ${abil} ¨ ${target}</line_nonumber>
+		<line_noabil>AOE ${number} ¨ ${target}</line_noabil>
+		<line_aoebuff>${actor} ${abil} ¨ ${target} (${status})</line_aoebuff>
+		<line_roll>${actor} ${abil} ¨ ${target} ª ${number}</line_roll>
+	</global>
+</settings>

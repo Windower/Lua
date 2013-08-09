@@ -2,7 +2,7 @@ Author: Byrth
 Version: 1.0
 Answering Machine with basic functionality
 
-Abbreviation: //am
+Abbreviation: //am, //answeringmachine
 
 Commands:
 * list : Lists the number of messages recorded from each person that has sent you a tell.
@@ -13,3 +13,4 @@ Commands:
 
 Purpose:
 To record tells received while you are afk and play them back at your leisure.
+

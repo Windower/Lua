@@ -1,0 +1,673 @@
+<?xml version="1.0"?>
+<messagesd>
+	<dtd id="1" english="${actor} hits ${target} for ${number} points of damage." color="D"/>
+	<dtd id="2" english="${actor} casts ${spell}.${lb}${target} takes ${number} points of damage." color="D"/>
+	<dtd id="3" english="${actor} starts casting ${spell}." color="50"/>
+	<dtd id="4" english="${target} is out of range." color="122"/>
+	<dtd id="5" english="Unable to see ${target}." color="122"/>
+	<dtd id="6" english="${actor} defeats ${target}." color="36"/>
+	<dtd id="7" english="${actor} casts ${spell}.${lb}${target} recovers ${number} HP." color="H" units="HP"/>
+	<dtd id="8" english="${actor} gains ${number} experience points." color="131"/>
+	<dtd id="9" english="${actor} attains level ${number}!" color="131"/>
+	<dtd id="10" english="${actor} loses ${number} experience points." color="1"/>
+	<dtd id="11" english="${actor} falls to level ${number}." color="1"/>
+	<dtd id="12" english="Cannot attack.${lb}Your target is already claimed." color="1"/>
+	<dtd id="13" english="Debug Message: ${actor}: ${target} is now invincible." color="1"/>
+	<dtd id="14" english="${actor}'s attack is countered by ${target}.${lb}${number} of ${actor}'s shadows absorbs the damage and disappears." color="29" units="Shadow"/>
+	<dtd id="15" english="${actor} misses ${target}." color="M"/>
+	<dtd id="16" english="${actor}'s casting is interrupted." color="122"/>
+	<dtd id="17" english="Unable to cast spells at this time." color="122"/>
+	<dtd id="18" english="Unable to cast spells at this time." color="122"/>
+	<dtd id="19" english="${actor} calls for help!" color="1"/>
+	<dtd id="20" english="${target} falls to the ground." color="56"/>
+	<dtd id="21" english="No experience points gained." color="1"/>
+	<dtd id="22" english="You cannot call for help at this time." color="1"/>
+	<dtd id="23" english="${actor} learns a new spell!" color="91"/>
+	<dtd id="24" english="${target} recovers ${number} HP." color="H"  units="HP"/>
+	<dtd id="25" english="${target} recovers ${number} MP." color="H"  units="MP"/>
+	<dtd id="26" english="${target} recovers ${number} HP and MP." color="H" />
+	<dtd id="27" english="Debug Message: Cannot execute command.${lb}No (BTCALC) command in ATEL source." color="1"/>
+	<dtd id="28" english="${actor} uses a ${item}." color="90"/>
+	<dtd id="29" english="${actor} is paralyzed." color="122"/>
+	<dtd id="30" english="${target} anticipates the attack." color="M"/>
+	<dtd id="31" english="${number} of ${target}'s shadows absorbs the damage and disappears." color="29" units="Shadow"/>
+	<dtd id="32" english="${target} dodges the attack." color="29"/>
+	<dtd id="33" english="${actor}'s attack is countered by ${target}.${lb}${actor} takes ${number} points of damage." color="D"/>
+	<dtd id="34" english="${actor} does not have enough MP to cast ${spell}." color="122"/>
+	<dtd id="35" english="${actor} lacks the ninja tools to cast ${spell}." color="122"/>
+	<dtd id="36" english="You lose sight of ${target}." color="122"/>
+	<dtd id="37" english="You are too far from the battle to gain experience." color="1"/>
+	<dtd id="38" english="${target}'s ${skill} skill rises 0.${number} points." color="1"/>
+	<dtd id="39" english="You need the Dual Wield ability to equip the ${item} as a sub-weapon." color="1"/>
+	<dtd id="40" english="You cannot use ${spell} in this area." color="56"/>
+	<dtd id="41" english="${actor}: Status ailment check (${number})Cannot rest at this time." color="1"/>
+	<dtd id="42" english="${actor} casts ${spell} on ${target}." color="56"/>
+	<dtd id="43" english="${actor} readies ${weapon_skill}." color="110"/>
+	<dtd id="44" english="${target}'s spikes deal ${number} points of damage to ${actor}." color="D"/>
+	<dtd id="45" english="${actor} learns &quot;${weapon_skill}&quot;!" color="81"/>
+	<dtd id="46" english="Debug Message: Current POP number: (${number})" color="1"/>
+	<dtd id="47" english="${actor} cannot cast ${spell}." color="122"/>
+	<dtd id="48" english="${spell} cannot be cast on ${target}." color="122"/>
+	<dtd id="49" english="${actor} is unable to cast spells." color="122"/>
+	<dtd id="50" english="${actor} earns a merit points!${lb}(Total: ${number})" color="1"/>
+	<dtd id="51" english="--Out of sight--" color="1"/>
+	<dtd id="52" english="${target} gives up chasing ${actor}.${lb}---Find Path Error---" color="1"/>
+	<dtd id="53" english="${target}'s ${skill} skill reaches level ${number}." color="1"/>
+	<dtd id="54" english="${actor} gains ${number} Besieged points." color="1"/>
+	<dtd id="55" english="Unable to use item." color="1"/>
+	<dtd id="56" english="Unable to use item." color="1"/>
+	<dtd id="57" english="Job changed." color="1"/>
+	<dtd id="58" english="Invalid job number." color="1"/>
+	<dtd id="59" english="You do not have access to specified job yet." color="1"/>
+	<dtd id="60" english="You do not have access to support jobs yet." color="1"/>
+	<dtd id="61" english="You cannot have the same job as both main and support jobs." color="1"/>
+	<dtd id="62" english="The ${item} fails to activate." color="121"/>
+	<dtd id="63" english="${actor} misses ${target}." color="M"/>
+	<dtd id="64" english="${target} is no longer ${status}." color="191"/>
+	<dtd id="65" english="You are not carrying any Petras.${lb}You cannot use the ${item}." color="1"/>
+	<dtd id="66" english="Debug: Resisted spell!" color="R"/>
+	<dtd id="67" english="${actor} scores a critical hit!${lb}${target} takes ${number} points of damage." color="D"/>
+	<dtd id="68" english="Debug: Casting interrupted!" color="1"/>
+	<dtd id="69" english="${target} blocks ${actor}'s attack with his shield." color="1"/>
+	<dtd id="70" english="${target} parries ${actor}'s attack with his weapon." color="29"/>
+	<dtd id="71" english="${actor} cannot perform that action." color="122"/>
+	<dtd id="72" english="That action cannot be performed on ${target}." color="1"/>
+	<dtd id="73" english="Debug: ${target}'s status is now ${status}." color="1"/>
+	<dtd id="74" english="Debug: ${target} recovers from ${status}." color="H"/>
+	<dtd id="75" english="${actor}'s ${spell} has no effect on ${target}." color="R"/>
+	<dtd id="76" english="No valid target within area of effect." color="1"/>
+	<dtd id="77" english="${actor} uses Sange.${lb}${target} takes ${number} points of damage." color="D"/>
+	<dtd id="78" english="${target} is too far away." color="122"/>
+	<dtd id="79" english="Debug: ${target} uses Double Attack(${number}%)." color="1"/>
+	<dtd id="80" english="Debug: ${target} uses Triple Attack(${number}%)." color="1"/>
+	<dtd id="81" english="Debug: Battle Debug No.${lb}(${number}) used on ${target}." color="1"/>
+	<dtd id="82" english="${actor} casts ${spell}.${lb}${target} is ${status}!" color="57"/>
+	<dtd id="83" english="${actor} casts ${spell}.${lb}${actor} successfully removes ${target}'s ${status}." color="191"/>
+	<dtd id="84" english="${actor} is paralyzed." color="122"/>
+	<dtd id="85" english="${actor} casts ${spell}.${lb}${target} resists the spell." color="R"/>
+	<dtd id="86" english="${actor} casts ${spell}, but ${target} is outside the area of effect." color="1"/>
+	<dtd id="87" english="Unable to use job ability." color="122"/>
+	<dtd id="88" english="Unable to use job ability." color="122"/>
+	<dtd id="89" english="Unable to use weapon skill." color="122"/>
+	<dtd id="90" english="Unable to use weapon skill." color="122"/>
+	<dtd id="91" english="${actor} does not have any ${item}." color="1"/>
+	<dtd id="92" english="Cannot use the ${item} on ${target}." color="1"/>
+	<dtd id="93" english="${actor} casts ${spell}.${lb}${target} vanishes." color="64"/>
+	<dtd id="94" english="You must wait longer to perform that action." color="1"/>
+	<dtd id="95" english="You cannot learn ${spell}.${lb}You do not meet the job or level requirements." color="1"/>
+	<dtd id="96" english="You already know ${spell}." color="1"/>
+	<dtd id="97" english="${target} was defeated by ${actor}." color="38"/>
+	<dtd id="98" english="You obtain a ${item} from ${target}." color="127"/>
+	<dtd id="99" english="${actor}}${target}: ${number}, ${number}" color="1"/>
+	<dtd id="100" english="${actor} uses ${ability}." color="101"/>
+	<dtd id="101" english="${actor} uses ${weapon_skill}." color="56"/>
+	<dtd id="102" english="${actor} uses ${ability}.${lb}${target} recovers ${number} HP." color="H" units="HP"/>
+	<dtd id="103" english="${actor} uses ${weapon_skill}.${lb}${target} recovers ${number} HP." color="H" units="HP"/>
+	<dtd id="104" english="Unable to use item.${lb}You do not meet the level requirement." color="1"/>
+	<dtd id="105" english="${actor} gains ${number} experience points." color="131"/>
+	<dtd id="106" english="${actor} is intimidated by ${target}'s presence." color="122"/>
+	<dtd id="107" english="${target} is temporarily unable to access support job abilities." color="1"/>
+	<dtd id="108" english="${actor} uses ${ability}.${lb}Pet's powers increase!" color="101"/>
+	<dtd id="109" english="${actor} uses ${weapon_skill}.${lb}Pet's powers increase!" color="56"/>
+	<dtd id="110" english="${actor} uses ${ability}.${lb}${target} takes ${number} points of damage." color="D"/>
+	<dtd id="111" english="You cannot use ${item} while medicated." color="1"/>
+	<dtd id="112" english="${target}'s doom counter is now down to ${number}." color="101"/>
+	<dtd id="113" english="${actor} casts ${spell}.${lb}${target} falls to the ground." color="56"/>
+	<dtd id="114" english="${actor} casts ${spell} on ${target}, but the spell fails to take effect." color="69"/>
+	<dtd id="115" english="${actor} uses ${ability}.${lb}Attacks are enhanced but defense weakens." color="101"/>
+	<dtd id="116" english="${actor} uses ${ability}.${lb}${target}'s attacks are enhanced." color="101"/>
+	<dtd id="117" english="${actor} uses ${ability}.${lb}Defense is enhanced but attacks weaken." color="101"/>
+	<dtd id="118" english="${actor} uses ${ability}.${lb}Accuracy is enhanced but evasion is impaired." color="101"/>
+	<dtd id="119" english="${actor} uses ${ability} on ${target}." color="101"/>
+	<dtd id="120" english="${actor} uses ${ability}.${lb}${target}'s accuracy is enhanced." color="101"/>
+	<dtd id="121" english="${actor} uses ${ability}.${lb}${target}'s evasion is enhanced." color="101"/>
+	<dtd id="122" english="${actor} uses ${ability}.${lb}${actor} recovers ${number} HP." color="H" units="HP"/>
+	<dtd id="123" english="${actor} uses ${ability}.${lb}${actor} successfully removes ${target}'s ${status}." color="191"/>
+	<dtd id="124" english="${actor} achieves Gate Breach status!" color="1"/>
+	<dtd id="125" english="${actor} uses ${ability}.${lb}${actor} steals a ${item} from ${target}." color="101"/>
+	<dtd id="126" english="${actor} uses ${ability}.${lb}${actor}'s movement speed increases." color="101"/>
+	<dtd id="127" english="${actor} uses ${ability}.${lb}${target} is ${status}." color="101"/>
+	<dtd id="128" english="${target} is ${status} and cannot perform that action." color="122"/>
+	<dtd id="129" english="${actor} uses ${ability}.${lb}${actor} mugs ${gil} from ${target}." color="101"/>
+	<dtd id="130" english="${target} is ${status} for making a equipment change." color="1"/>
+	<dtd id="131" english="${actor} uses ${ability}.${lb}${target} is fortified against undead." color="101"/>
+	<dtd id="132" english="${target}'s spikes drain ${number} HP from ${actor}." color="H" units="HP"/>
+	<dtd id="133" english="${actor} uses ${ability}.${lb}${actor} steals ${number} Petra from ${target}." color="1"/>
+	<dtd id="134" english="${actor} uses ${ability}.${lb}${target} is fortified against arcana." color="101"/>
+	<dtd id="135" english="${actor} uses ${weapon_skill} on ${target}." color="56"/>
+	<dtd id="136" english="${actor} uses ${ability}.${lb}${target} is now under ${actor}'s control." color="101"/>
+	<dtd id="137" english="${actor} uses ${ability}.${lb}${actor} fails to charm ${target}." color="69"/>
+	<dtd id="138" english="${actor} uses ${ability}.${lb}${target} seems friendlier." color="101"/>
+	<dtd id="139" english="${actor} uses ${ability}, but finds nothing." color="101"/>
+	<dtd id="140" english="${actor} uses ${ability}, and finds a ${item}." color="101"/>
+	<dtd id="141" english="${actor} uses ${ability}.${lb}${target} is ${status}." color="101"/>
+	<dtd id="142" english="${actor} uses ${weapon_skill}.${lb}${target} receives the effect of Accuracy Down and Evasion Down." color="56"/>
+	<dtd id="143" english="${actor} uses ${ability}.${lb}Ranged attacks become more accurate." color="101"/>
+	<dtd id="144" english="${actor} uses ${ability}.${lb}${target} receives the effect of Accuracy Down and Evasion Down." color="101"/>
+	<dtd id="145" english="${target} receives the effect of Accuracy Down and Evasion Down." color="101"/>
+	<dtd id="146" english="${actor} uses ${ability}.${lb}${target} receives the effect of Accuracy Boost and Evasion Boost." color="101"/>
+	<dtd id="147" english="${target} receives the effect of Accuracy Boost and Evasion Boost." color="101"/>
+	<dtd id="148" english="${actor} uses ${ability}.${lb}${target} is fortified against demons." color="101"/>
+	<dtd id="149" english="${target} is fortified against demons." color="101"/>
+	<dtd id="150" english="${actor} uses ${ability}.${lb}${target} is fortified against dragons." color="101"/>
+	<dtd id="151" english="${target} is fortified against dragons." color="101"/>
+	<dtd id="152" english="Additional effect: ${actor} recovers ${number} MP." color="H" units="MP"/>
+	<dtd id="153" english="${actor} uses ${ability}.${lb}${actor} fails to steal from ${target}." color="69"/>
+	<dtd id="154" english="${target} is out of range." color="122"/>
+	<dtd id="155" english="You cannot perform that action on the specified target." color="122"/>
+	<dtd id="156" english="${actor} uses ${ability}.${lb}No effect on ${target}." color="R"/>
+	<dtd id="157" english="${actor} uses Barrage.${lb}${target} takes ${number} points of damage." color="D"/>
+	<dtd id="158" english="${actor} uses ${ability}, but misses." color="M"/>
+	<dtd id="159" english="${actor} uses ${weapon_skill}.${lb}${target}'s ${status} effect disappears!" color="H"/>
+	<dtd id="160" english="Additional effect: ${status}." color="34"/>
+	<dtd id="161" english="Additional effect: ${number} HP drained from ${target}." color="H"/>
+	<dtd id="162" english="Additional effect: ${number} MP drained from ${target}." color="H"/>
+	<dtd id="163" english="Additional effect: ${number} points of damage." color="D"/>
+	<dtd id="164" english="Additional effect: ${status}." color="34"/>
+	<dtd id="165" english="Additional effect: ${number} TP drained from ${target}." color="H"/>
+	<dtd id="166" english="Additional effect: ${actor} gains the effect of ${status}." color="56"/>
+	<dtd id="167" english="Additional effect: ${actor} recovers ${number} HP." color="H" units="HP"/>
+	<dtd id="168" english="Additional effect: ${target}'s ${status} effect disappears!" color="101"/>
+	<dtd id="169" english="Additional effect: Warp!" color="1"/>
+	<dtd id="170" english="${target} seems ${skill}.${lb}It seems to have high evasion and defense." color="191"/>
+	<dtd id="171" english="${target} seems ${skill}.${lb}It seems to have high evasion." color="191"/>
+	<dtd id="172" english="${target} seems ${skill}.${lb}It seems to have high evasion but low defense." color="191"/>
+	<dtd id="173" english="${target} seems ${skill}.${lb}It seems to have high defense." color="191"/>
+	<dtd id="174" english="${target} seems ${skill}." color="191"/>
+	<dtd id="175" english="${target} seems ${skill}.${lb}It seems to have low defense." color="191"/>
+	<dtd id="176" english="${target} seems ${skill}.${lb}It seems to have low evasion but high defense." color="191"/>
+	<dtd id="177" english="${target} seems ${skill}.${lb}It seems to have low evasion." color="191"/>
+	<dtd id="178" english="${target} seems ${skill}.${lb}It seems to have low evasion and defense." color="191"/>
+	<dtd id="179" english="${target}: hit-eva(${number}) =} ${number}%" color="1"/>
+	<dtd id="180" english="str-vit(${number}) dmg-adj(${number})" color="1"/>
+	<dtd id="181" english="atk-def(${number}) ofs-adj%(${number})" color="1"/>
+	<dtd id="182" english="${target}: MonNo(${number})-Lev(${number})" color="1"/>
+	<dtd id="183" english="HIT-EVA(${number}) ATK-DEF(${number})" color="1"/>
+	<dtd id="184" english="${actor}:ALLIANCE SUM=${number}/LEV=${number}" color="1"/>
+	<dtd id="185" english="${actor} uses ${weapon_skill}.${lb}${target} takes ${number} points of damage." color="D"/>
+	<dtd id="186" english="${actor} uses ${weapon_skill}.${lb}${target} gains the effect of ${status}." color="56"/>
+	<dtd id="187" english="${actor} uses ${weapon_skill}.${lb}${number} HP drained from ${target}." color="H" units="HP"/>
+	<dtd id="188" english="${actor} uses ${weapon_skill}, but misses ${target}." color="M"/>
+	<dtd id="189" english="${actor} uses ${weapon_skill}.${lb}No effect on ${target}." color="R"/>
+	<dtd id="190" english="${actor} cannot use that weapon ability." color="1"/>
+	<dtd id="191" english="${actor} is unable to use weapon skills." color="122"/>
+	<dtd id="192" english="${actor} does not have enough TP." color="122"/>
+	<dtd id="193" english="${weapon_skill} cannot be used against that target." color="1"/>
+	<dtd id="194" english="${actor} uses ${weapon_skill}.${lb}${target} gains the effect of ${status}." color="56"/>
+	<dtd id="195" english="${target}: TOTAL ALLIANCE SUM=${number}/LEV=${number}" color="1"/>
+	<dtd id="196" english="Skillchain!${lb}${target} takes ${number} points of damage." color="D"/>
+	<dtd id="197" english="${actor} uses ${weapon_skill}, but ${target} resists.${lb}${target} takes ${number} points of damage." color="D"/>
+	<dtd id="198" english="${target} is too far away." color="122"/>
+	<dtd id="199" english="That action requires a shield." color="1"/>
+	<dtd id="200" english="Time left until next use: (${time})" color="1"/>
+	<dtd id="201" english="Current time: (${time})" color="1"/>
+	<dtd id="202" english="Time left: (${time})" color="209"/>
+	<dtd id="203" english="${target} is ${status}." color="122"/>
+	<dtd id="204" english="${target} is no longer ${status}." color="191"/>
+	<dtd id="205" english="${target} gains the effect of ${status}." color="56"/>
+	<dtd id="206" english="${target}'s ${status} effect wears off." color="191"/>
+	<dtd id="207" english="HP / HPMax:${number}/${number}" color="1"/>
+	<dtd id="208" english="MP / MPMax:${number}/${number}" color="1"/>
+	<dtd id="209" english="TP:${number}%" color="1" units="TP"/>
+	<dtd id="210" english="${actor} cannot charm ${target}!" color="191"/>
+	<dtd id="211" english="It would be very difficult for ${actor} to charm ${target}." color="191"/>
+	<dtd id="212" english="It would be difficult for ${actor} to charm ${target}." color="191"/>
+	<dtd id="213" english="${actor} might be able to charm ${target}." color="191"/>
+	<dtd id="214" english="${actor} should be able to charm ${target}." color="191"/>
+	<dtd id="215" english="That action requires a pet." color="1"/>
+	<dtd id="216" english="You do not have a appropriate ranged weapon equipped." color="1"/>
+	<dtd id="217" english="You cannot see ${target}." color="122"/>
+	<dtd id="218" english="You move and interrupt your aim." color="122"/>
+	<dtd id="219" english="You cannot see ${target}." color="122"/>
+	<dtd id="220" english="You move and interrupt your aim." color="122"/>
+	<dtd id="221" english="${actor} uses ${weapon_skill}.${lb}${target}'s pet is released." color="56"/>
+	<dtd id="222" english="${target} isn't selling anything." color="1"/>
+	<dtd id="223" english="Skillchain: ${number} points of damage." color="D"/>
+	<dtd id="224" english="${actor} uses ${weapon_skill}.${lb}${target} recovers ${number} MP." color="H"/>
+	<dtd id="225" english="${actor} uses ${weapon_skill}.${lb}${number} MP drained from ${target}." color="H"/>
+	<dtd id="226" english="${actor} uses ${weapon_skill}.${lb}${number} TP drained from ${target}." color="H"/>
+	<dtd id="227" english="${actor} casts ${spell}.${lb}${number} HP drained from ${target}." color="H" units="HP"/>
+	<dtd id="228" english="${actor} casts ${spell}.${lb}${number} MP drained from ${target}." color="H" units="MP"/>
+	<dtd id="229" english="Additional effect: ${target} takes ${number} additional points of damage." color="D"/>
+	<dtd id="230" english="${actor} casts ${spell}.${lb}${target} gains the effect of ${status}." color="56"/>
+	<dtd id="231" english="${actor} uses ${weapon_skill}.${lb}${number} of ${target}'s effects disappears!" color="56"/>
+	<dtd id="232" english="${target} is drawn in!" color="1"/>
+	<dtd id="233" english="You are ineligible to attack that target." color="1"/>
+	<dtd id="234" english="Auto-targeting ${target}." color="122"/>
+	<dtd id="235" english="That is someone's pet." color="1"/>
+	<dtd id="236" english="${actor} casts ${spell}.${lb}${target} is ${status}." color="57"/>
+	<dtd id="237" english="${actor} casts ${spell}.${lb}${target} receives the effect of ${status}." color="57"/>
+	<dtd id="238" english="${actor} uses ${weapon_skill}.${lb}${target} recovers ${number} HP." color="H" units="HP"/>
+	<dtd id="239" english="Size: ${number}" color="1"/>
+	<dtd id="240" english="${actor} tries to hide, but is spotted by ${target}." color="110"/>
+	<dtd id="241" english="${actor} hides!" color="1"/>
+	<dtd id="242" english="${actor} uses ${weapon_skill}.${lb}${target} is ${status}." color="56"/>
+	<dtd id="243" english="${actor} uses ${weapon_skill}.${lb}${target} receives the effect of ${status}." color="57"/>
+	<dtd id="244" english="${actor} fails to mug ${target}." color="69"/>
+	<dtd id="245" english="${actor} uses Eagle Eye Shot, but misses ${target}." color="M"/>
+	<dtd id="246" english="${target} is full." color="122"/>
+	<dtd id="247" english="${actor} can't eat the ${item}." color="1"/>
+	<dtd id="248" english="${actor}'s attack has no effect on ${target}." color="R"/>
+	<dtd id="249" english="${target}'s strength is impossible to gauge!" color="191"/>
+	<dtd id="250" english="Reraise takes effect!" color="1"/>
+	<dtd id="251" english="The effect of ${status} is about to wear off." color="123"/>
+	<dtd id="252" english="${actor} casts ${spell}.${lb}Magic Burst!${lb}${target} takes ${number} points of damage." color="D"/>
+	<dtd id="253" english="EXP chain #${number}!${lb}${actor} gains ${number} experience points." color="131"/>
+	<dtd id="254" english="Current enmity: ${number}" color="1"/>
+	<dtd id="255" english="DEBUG: ${target}}${number}% chance of success." color="1"/>
+	<dtd id="256" english="In this flower pot: Seeds sown: ${item}" color="1"/>
+	<dtd id="257" english="Crystal used: none" color="1"/>
+	<dtd id="258" english="Crystal used: ${item}" color="1"/>
+	<dtd id="259" english="First crystal used: ${item} Second crystal used: ${item}" color="1"/>
+	<dtd id="260" english="First crystal used: none Second crystal used: ${item}" color="1"/>
+	<dtd id="261" english="First crystal used: ${item} Second crystal used: none" color="1"/>
+	<dtd id="262" english="First crystal used: none Second crystal used: none" color="1"/>
+	<dtd id="263" english="${target} recovers ${number} HP." color="H" units="HP"/>
+	<dtd id="264" english="${target} takes ${number} points of damage." color="D"/>
+	<dtd id="265" english="Magic Burst!${lb}${target} takes ${number} points of damage." color="D"/>
+	<dtd id="266" english="${target} gains the effect of ${status}." color="56"/>
+	<dtd id="267" english="${target} receives the effect of ${status}." color="57"/>
+	<dtd id="268" english="${actor} casts ${spell}.${lb}Magic Burst!${lb}${target} receives the effect of ${status}." color="57"/>
+	<dtd id="269" english="Magic Burst!${lb}${target} receives the effect of ${status}." color="57"/>
+	<dtd id="270" english="${target} is ${status}." color="122"/>
+	<dtd id="271" english="${actor} casts ${spell}.${lb}Magic Burst!${lb}${target} is ${status}." color="56"/>
+	<dtd id="272" english="Magic Burst!${lb}${target} is ${status}." color="56"/>
+	<dtd id="273" english="${target} vanishes!" color="64"/>
+	<dtd id="274" english="${actor} casts ${spell}.${lb}Magic Burst!${lb}${number} HP drained from ${target}." color="H" units="HP"/>
+	<dtd id="275" english="${actor} casts ${spell}.${lb}Magic Burst!${lb}${number} MP drained from ${target}." color="H" units="MP"/>
+	<dtd id="276" english="${target} recovers ${number} MP." color="H" units="MP"/>
+	<dtd id="277" english="${target} is ${status}." color="122"/>
+	<dtd id="278" english="${target} receives the effect of ${status}." color="57"/>
+	<dtd id="279" english="${target} is ${status}." color="122"/>
+	<dtd id="280" english="${target} gains the effect of ${status}." color="56"/>
+	<dtd id="281" english="${number} HP drained from ${target}." color="H" units="HP"/>
+	<dtd id="282" english="${target} evades." color="69"/>
+	<dtd id="283" english="No effect on ${target}." color="R"/>
+	<dtd id="284" english="${target} resists the effects of the spell!" color="R"/>
+	<dtd id="285" english="${target}'s attacks are enhanced." color="101"/>
+	<dtd id="286" english="${target} is fortified against undead." color="101"/>
+	<dtd id="287" english="${target} is fortified against arcana." color="101"/>
+	<dtd id="288" english="Skillchain: Light.${lb}${target} takes ${number} points of damage." color="D"/>
+	<dtd id="289" english="Skillchain: Darkness.${lb}${target} takes ${number} points of damage." color="D"/>
+	<dtd id="290" english="Skillchain: Gravitation.${lb}${target} takes ${number} points of damage." color="D"/>
+	<dtd id="291" english="Skillchain: Fragmentation.${lb}${target} takes ${number} points of damage." color="D"/>
+	<dtd id="292" english="Skillchain: Distortion.${lb}${target} takes ${number} points of damage." color="D"/>
+	<dtd id="293" english="Skillchain: Fusion.${lb}${target} takes ${number} points of damage." color="D"/>
+	<dtd id="294" english="Skillchain: Compression.${lb}${target} takes ${number} points of damage." color="D"/>
+	<dtd id="295" english="Skillchain: Liquefaction.${lb}${target} takes ${number} points of damage." color="D"/>
+	<dtd id="296" english="Skillchain: Induration.${lb}${target} takes ${number} points of damage." color="D"/>
+	<dtd id="297" english="Skillchain: Reverberation.${lb}${target} takes ${number} points of damage." color="D"/>
+	<dtd id="298" english="Skillchain: Transfixion.${lb}${target} takes ${number} points of damage." color="D"/>
+	<dtd id="299" english="Skillchain: Scission.${lb}${target} takes ${number} points of damage." color="D"/>
+	<dtd id="300" english="Skillchain: Detonation.${lb}${target} takes ${number} points of damage." color="D"/>
+	<dtd id="301" english="Skillchain: Impaction.${lb}${target} takes ${number} points of damage." color="D"/>
+	<dtd id="302" english="Skillchain: Cosmic Elucidation.${lb}${target} takes ${number} points of damage." color="D"/>
+	<dtd id="303" english="${actor} uses Divine Seal." color="101"/>
+	<dtd id="304" english="${actor} uses Elemental Seal." color="101"/>
+	<dtd id="305" english="${actor} uses Trick Attack." color="101"/>
+	<dtd id="306" english="${actor} uses ${ability}.${lb}${target} recovers ${number} HP." color="H" units="HP"/>
+	<dtd id="307" english="That action requires a two-handed weapon." color="122"/>
+	<dtd id="308" english="Unable to use the ${item}.${lb}${target}'s inventory is full." color="1"/>
+	<dtd id="309" english="${actor} casts ${spell} on ${target}." color="56"/>
+	<dtd id="310" english="${actor}'s ${skill} skill drops 0.${number} points!" color="1"/>
+	<dtd id="311" english="${actor} covers ${target}." color="101"/>
+	<dtd id="312" english="${actor}'s attempt to cover has no effect." color="R"/>
+	<dtd id="313" english="${target} is out of range.${lb}Unable to cast ${spell}." color="123"/>
+	<dtd id="314" english="${target}'s level is currently restricted to ${number}.${lb}Equipment affected by the level restriction will be adjusted accordingly." color="1"/>
+	<dtd id="315" english="${actor} already has a pet." color="122"/>
+	<dtd id="316" english="That action cannot be used in this area." color="56"/>
+	<dtd id="317" english="${actor} uses ${ability}.${lb}${target} takes ${number} points of damage." color="D"/>
+	<dtd id="318" english="${actor} uses ${ability}.${lb}${target} recovers ${number} HP." color="H" units="HP"/>
+	<dtd id="319" english="${actor} uses ${ability}.${lb}${target} gains the effect of ${status}." color="101"/>
+	<dtd id="320" english="${actor} uses ${ability}.${lb}${target} receives the effect of ${status}." color="101"/>
+	<dtd id="321" english="${actor} uses ${ability}.${lb}${target}'s ${status} ." color="191"/>
+	<dtd id="322" english="${actor} uses ${ability}.${lb}${target}'s ${status} effect wears off." color="191"/>
+	<dtd id="323" english="${actor} uses ${ability}.${lb}No effect on ${target}." color="R"/>
+	<dtd id="324" english="${actor} uses ${ability}, but misses ${target}." color="M"/>
+	<dtd id="325" english="You are charmed by a enemy and unable to act." color="1"/>
+	<dtd id="326" english="${actor} readies ${ability}." color="100"/>
+	<dtd id="327" english="${actor} starts casting ${spell} on ${target}." color="50"/>
+	<dtd id="328" english="${target} is too far away." color="122"/>
+	<dtd id="329" english="${actor} casts ${spell}.${lb}${target}'s STR is drained." color="34"/>
+	<dtd id="330" english="${actor} casts ${spell}.${lb}${target}'s DEX is drained." color="34"/>
+	<dtd id="331" english="${actor} casts ${spell}.${lb}${target}'s VIT is drained." color="34"/>
+	<dtd id="332" english="${actor} casts ${spell}.${lb}${target}'s AGI is drained." color="34"/>
+	<dtd id="333" english="${actor} casts ${spell}.${lb}${target}'s INT is drained." color="34"/>
+	<dtd id="334" english="${actor} casts ${spell}.${lb}${target}'s MND is drained." color="34"/>
+	<dtd id="335" english="${actor} casts ${spell}.${lb}${target}'s CHR is drained." color="34"/>
+	<dtd id="336" english="No effect on that pet." color="R"/>
+	<dtd id="337" english="You do not have the necessary item equipped to call a beast." color="1"/>
+	<dtd id="338" english="You cannot summon avatars here." color="1"/>
+	<dtd id="339" english="Your chocobo senses a hostile presence and refuses to come to your side." color="1"/>
+	<dtd id="340" english="You must equip your main weapon first to use Dual Wield." color="1"/>
+	<dtd id="341" english="${actor} casts ${spell}.${lb}${target}'s ${status} effect disappears!" color="H"/>
+	<dtd id="342" english="${actor} casts ${spell}.${lb}${target}'s ${status} effect disappears!" color="H"/>
+	<dtd id="343" english="${target}'s ${status} effect disappears!" color="81"/>
+	<dtd id="344" english="${target}'s ${status} effect disappears!" color="81"/>
+	<dtd id="345" english="You cannot heal while you have a avatar summoned." color="1"/>
+	<dtd id="346" english="You must summon a avatar to use that command." color="1"/>
+	<dtd id="347" english="You must have pet food equipped to use that command." color="1"/>
+	<dtd id="348" english="You cannot call wyverns here." color="1"/>
+	<dtd id="349" english="You cannot call beasts here." color="1"/>
+	<dtd id="350" english="${target} is no longer ${status}." color="191"/>
+	<dtd id="351" english="The remedy removes ${target}'s status ailments." color="191"/>
+	<dtd id="352" english="${actor}'s ranged attack hits ${target} for ${number} points of damage." color="D"/>
+	<dtd id="353" english="${actor}'s ranged attack scores a critical hit!${lb}${target} takes ${number} points of damage." color="D"/>
+	<dtd id="354" english="${actor}'s ranged attack misses." color="M"/>
+	<dtd id="355" english="${actor}'s ranged attack has no effect on ${target}." color="R"/>
+	<dtd id="356" english="Cannot execute command.${lb}Your inventory is full." color="1"/>
+	<dtd id="357" english="${target} regains ${number} HP." color="H" units="HP"/>
+	<dtd id="358" english="${target} regains ${number} MP." color="H" units="MP"/>
+	<dtd id="359" english="${target} narrowly escapes impending doom." color="1"/>
+	<dtd id="360" english="${actor} uses ${weapon_skill}.${lb}All of ${target}'s abilities are recharged." color="56"/>
+	<dtd id="361" english="All of ${target}'s abilities are recharged." color="1"/>
+	<dtd id="362" english="${actor} uses ${weapon_skill}.${lb}${target}'s TP is reduced to ${number}." color="56" units="TP"/>
+	<dtd id="363" english="${target}'s TP is reduced to ${number}." color="56" units="TP" />
+	<dtd id="364" english="${actor} uses ${ability}.${lb}All of ${target}'s status parameters are boosted." color="101"/>
+	<dtd id="365" english="All of ${target}'s status parameters are boosted." color="101"/>
+	<dtd id="366" english="${number} MP drained from ${target}." color="H" units="MP"/>
+	<dtd id="367" english="${target} recovers ${number} HP." color="H" units="HP"/>
+	<dtd id="368" english="${actor} earns a merit points!${lb}(Total: ${number})" color="1"/>
+	<dtd id="369" english="${actor} uses ${weapon_skill}.${lb}${number} of ${target}'s attributes is drained." color="H" units="buffs"/>
+	<dtd id="370" english="${actor} uses ${weapon_skill}.${lb}${number} status effect is drained from ${target}." color="56"/>
+	<dtd id="371" english="${actor} gains ${number} limit points." color="131"/>
+	<dtd id="372" english="Limit chain #${number}!${lb}${actor} gains ${number} limit points." color="131"/>
+	<dtd id="373" english="${actor} hits ${target}.${lb}${target} recovers ${number} hit points!" color="H"/>
+	<dtd id="374" english="Striking ${target}'s armor causes ${actor} to become ${status}." color="1"/>
+	<dtd id="375" english="${actor} uses a ${item}.${lb}${target} receives the effect of ${status}." color="81"/>
+	<dtd id="376" english="${actor} uses a ${item}.${lb}${target} obtains a ${item2}." color="81"/>
+	<dtd id="377" english="${actor} uses a ${item}.${lb}${target} obtains ${item2}." color="81"/>
+	<dtd id="378" english="${actor} uses a ${item}.${lb}${target}'s ${status} effect disappears!" color="81"/>
+	<dtd id="379" english="${actor} uses ${ability}.${lb}Magic Burst!${lb}${target} takes ${number} points of damage." color="D"/>
+	<dtd id="380" english="Your ?Unknown Parameter (Type: B0) 0? modification has risen to level ${number}." color="1"/>
+	<dtd id="381" english="Your ?Unknown Parameter (Type: B0) 0? modification has dropped to level ${number}." color="1"/>
+	<dtd id="382" english="${actor}'s ranged attack hits ${target}.${lb}${target} recovers ${number} hit points!" color="H"/>
+	<dtd id="383" english="${target}'s spikes restore ${number} HP to ${actor}." color="1" units="HP"/>
+	<dtd id="384" english="Additional effect: ${target} recovers ${number} HP." color="H" units="HP"/>
+	<dtd id="385" english="Skillchain: Light.${lb}${target} recovers ${number} hit points!" color="H"/>
+	<dtd id="386" english="Skillchain: Darkness.${lb}${target} recovers ${number} hit points!" color="H"/>
+	<dtd id="387" english="Skillchain: Gravitation.${lb}${target} recovers ${number} hit points!" color="H"/>
+	<dtd id="388" english="Skillchain: Fragmentation.${lb}${target} recovers ${number} hit points!" color="H"/>
+	<dtd id="389" english="Skillchain: Distortion.${lb}${target} recovers ${number} hit points!" color="H"/>
+	<dtd id="390" english="Skillchain: Fusion.${lb}${target} recovers ${number} hit points!" color="H"/>
+	<dtd id="391" english="Skillchain: Compression.${lb}${target} recovers ${number} hit points!" color="H"/>
+	<dtd id="392" english="Skillchain: Liquefaction.${lb}${target} recovers ${number} hit points!" color="H"/>
+	<dtd id="393" english="Skillchain: Induration.${lb}${target} recovers ${number} hit points!" color="H"/>
+	<dtd id="394" english="Skillchain: Reverberation.${lb}${target} recovers ${number} hit points!" color="H"/>
+	<dtd id="395" english="Skillchain: Transfixion.${lb}${target} recovers ${number} hit points!" color="H"/>
+	<dtd id="396" english="Skillchain: Scission.${lb}${target} recovers ${number} hit points!" color="H"/>
+	<dtd id="397" english="Skillchain: Detonation.${lb}${target} recovers ${number} hit points!" color="H"/>
+	<dtd id="398" english="Skillchain: Impaction.${lb}${target} recovers ${number} hit points!" color="H"/>
+	<dtd id="399" english="${actor} uses a ${item}.${lb}All of ${target}'s Petras vanish!" color="1"/>
+	<dtd id="400" english="${actor} uses a ${item}.${lb}${number} of ${target}'s status ailments disappears!" color="81"/>
+	<dtd id="401" english="${actor} uses a ${item}.${lb}${number} of ${target}'s effects disappears!" color="81"/>
+	<dtd id="402" english="${actor} uses ${weapon_skill}.${lb}${target}'s magic defense is enhanced." color="56"/>
+	<dtd id="403" english="${number} of ${target}'s attributes is drained." color="1"/>
+	<dtd id="404" english="${number} status effect is drained from ${target}." color="1"/>
+	<dtd id="405" english="${actor} uses ${weapon_skill}.${lb}${number} of ${target}'s effects disappears!" color="56"/>
+	<dtd id="406" english="${actor} uses ${weapon_skill}.${lb}${target} falls to the ground." color="166"/>
+	<dtd id="407" english="${actor} uses a ${item}.${lb}${target}'s TP is reduced." color="81"/>
+	<dtd id="408" english="${actor} uses a ${item}.${lb}No effect on ${target}." color="R"/>
+	<dtd id="409" english="${actor} uses ${weapon_skill}.${lb}${target}'s TP is increased to ${number}." color="H" units="TP"/>
+	<dtd id="410" english="No target available.${lb}Unable to use item." color="1"/>
+	<dtd id="411" english="${actor} attempts to use the ${item}, but lacks the required number of Ballista Points.${lb}You currently have ${number} Ballista points." color="1"/>
+	<dtd id="412" english="${actor} uses a ${item}.${lb}${target} receives the effect of ${status}." color="81"/>
+	<dtd id="413" english="${actor} uses a ${item}.${lb}${target} takes ${number} points of damage." color="D"/>
+	<dtd id="414" english="${actor} uses ${ability}.${lb}${target} receives the effect of Magic Attack Boost and Magic Defense Boost." color="101"/>
+	<dtd id="415" english="${target} receives the effect of Magic Attack Boost and Magic Defense Boost." color="101"/>
+	<dtd id="416" english="${actor} uses ${weapon_skill}.${lb}${target} receives the effect of Magic Attack Boost and Magic Defense Boost." color="56"/>
+	<dtd id="417" english="${actor} uses ${ability}.${lb}${number} of ${target}'s attributes is drained." color="101"/>
+	<dtd id="418" english="${actor} uses ${weapon_skill} on ${target}.${lb}${target}'s target switches to ${actor}!" color="56"/>
+	<dtd id="419" english="${target} learns ${spell}!" color="81"/>
+	<dtd id="420" english="${actor} uses ${ability}. The total comes to ${number}!${lb}${target} receives the effect of ${ability}." color="101"/>
+	<dtd id="421" english="${target} receives the effect of ${ability}." color="101"/>
+	<dtd id="422" english="${actor} uses ${ability}.${lb}The total comes to ${number}!${lb}No effect on ${target}." color="R"/>
+	<dtd id="423" english="No effect on ${target}." color="R"/>
+	<dtd id="424" english="${actor} uses Double-Up.${lb}The total for ${ability} increases to ${number}!${lb}${target} receives the effect of ${ability}." color="101"/>
+	<dtd id="425" english="${actor} uses Double-Up.${lb}The total for ${ability} increases to ${number}!${lb}No effect on ${target}." color="R"/>
+	<dtd id="426" english="${actor} uses Double-Up.${lb}Bust!${lb}${target} loses the effect of ${ability}." color="101"/>
+	<dtd id="427" english="${target} loses the effect of ${ability}." color="101"/>
+	<dtd id="428" english="There are no rolls eligible for Double-Up.${lb}Unable to use ability." color="1"/>
+	<dtd id="429" english="The same roll is already active on ${actor}." color="1"/>
+	<dtd id="430" english="${actor} casts ${spell}.${lb}1 of ${target}'s attributes is drained." color="1"/>
+	<dtd id="431" english="${actor} casts ${spell}.${lb}${target}'s TP is reduced." color="56" />
+	<dtd id="432" english="${actor} casts ${spell}.${lb}${target} receives the effect of Accuracy Boost and Evasion Boost." color="101"/>
+	<dtd id="433" english="${actor} casts ${spell}.${lb}${target} receives the effect of Magic Attack Boost and Magic Defense Boost." color="101"/>
+	<dtd id="434" english="You cannot customize a activated automaton." color="1"/>
+	<dtd id="435" english="${actor} uses ${ability}!${lb}${target}'s abilities are recharged." color="101"/>
+	<dtd id="436" english="${target}'s abilities are recharged." color="111"/>
+	<dtd id="437" english="${actor} uses ${ability}!${lb}${target}'s abilities are recharged.${lb}${target}'s TP is increased." color="101"/>
+	<dtd id="438" english="${target}'s abilities are recharged.${lb}${target}'s TP is increased." color="111"/>
+	<dtd id="439" english="${actor} uses ${ability}!${lb}All of ${target}'s abilities are recharged.${lb}${target} regains MP." color="101"/>
+	<dtd id="440" english="All of ${target}'s abilities are recharged.${lb}${target} regains MP." color="111"/>
+	<dtd id="441" english="${actor} uses ${ability}.${lb}${target} receives the effect of ${ability}." color="101"/>
+	<dtd id="442" english="${actor} learns a new ability!" color="81"/>
+	<dtd id="443" english="You cannot learn ${ability}.${lb}You do not meet the job or level requirements." color="1"/>
+	<dtd id="444" english="You already know ${ability}." color="1"/>
+	<dtd id="445" english="You cannot use items at this time." color="1"/>
+	<dtd id="446" english="You cannot attack that target." color="1"/>
+	<dtd id="447" english="You are provoked and unable to change your target." color="1"/>
+	<dtd id="448" english="Time allowed in Dynamis has been extended by ${number} minute." color="1"/>
+	<dtd id="449" english="---== WARNING ==---- Time remaining in Dynamis: ${number} minute." color="1"/>
+	<dtd id="450" english="WATCH${number} ${target}:${number}" color="1"/>
+	<dtd id="451" english="${actor} uses ${ability}.${lb}${target} regains ${number} MP." color="H" />
+	<dtd id="452" english="${actor} uses ${ability}.${lb}${target} regains ${number} TP." color="H" />
+	<dtd id="453" english="${actor} uses ${ability}.${lb}${actor} steals the effect of ${status} from ${target}." color="101"/>
+	<dtd id="454" english="${actor} casts ${spell}.${lb}${number} TP drained from ${target}." color="H"/>
+	<dtd id="455" english="Debug : Fishing skill check: ${item} : ???${number}" color="1"/>
+	<dtd id="456" english="Debug : Level Restriction on.${lb}PetType ${number}/ID ${number}" color="1"/>
+	<dtd id="457" english="Debug : Level restriction off.${lb}PetType ${number}/ID ${number}" color="1"/>
+	<dtd id="458" english="Debug : Dif - Now } ${number} RATE ${number}/10" color="1"/>
+	<dtd id="459" english="Self-destruct check: skipping calculation of ${target}'s self-destruct process md_no${number}/cmd_arg${number}!" color="1"/>
+	<dtd id="460" english="EXP Check: ${actor} } ${target} XP:${number}/LvUp${number}" color="1"/>
+	<dtd id="461" english="${target}:STR ${number}/${number}" color="1"/>
+	<dtd id="462" english="${target}:DEX ${number}/${number}" color="1"/>
+	<dtd id="463" english="${target}:VIT ${number}/${number}" color="1"/>
+	<dtd id="464" english="${target}:AGI ${number}/${number}" color="1"/>
+	<dtd id="465" english="${target}:INT ${number}/${number}" color="1"/>
+	<dtd id="466" english="${target}:MND ${number}/${number}" color="1"/>
+	<dtd id="467" english="${target}:CHR ${number}/${number}" color="1"/>
+	<dtd id="468" english="Wyvern: JobLv${${number}} TaskLv${${number}}" color="1"/>
+	<dtd id="469" english="ID: Master${${number}} Pet${${number}}" color="1"/>
+	<dtd id="470" english="Wyvern routine type: Master${${number}} Pet${${number}}" color="1"/>
+	<dtd id="471" english="Avatar type: Master${${number}} Pet${${number}}" color="1"/>
+	<dtd id="472" english="Avatar MP: Master${${number}} Pet${${number}}" color="1"/>
+	<dtd id="473" english="Avatar HP: Master${${number}} Pet${${number}}" color="1"/>
+	<dtd id="474" english="Avatar level: Master${${number}} Pet${${number}}" color="1"/>
+	<dtd id="475" english="Avatar No.: Master${${number}} Pet${${number}}" color="1"/>
+	<dtd id="476" english="Probability of ${target} dropping ${item}: ${number}/10" color="1"/>
+	<dtd id="477" english="Unable to target ${target}.${lb}You have not received the level cap status." color="1"/>
+	<dtd id="478" english="Height differential between ${actor} and ${target}: ${number}mm." color="1"/>
+	<dtd id="479" english="Damage taken." color="1"/>
+	<dtd id="480" english="Number of Targets (${number}) Damage (${number})" color="1"/>
+	<dtd id="481" english="Overall: Number of Attacks (${number}) Misses (${number})" color="1"/>
+	<dtd id="482" english="Number of Targets (${number}) Damage (${number})" color="1"/>
+	<dtd id="483" english="Ranged Attack: Number of Attacks (${number}) Misses (${number})" color="1"/>
+	<dtd id="484" english="Number of Targets (${number}) Damage (${number})" color="1"/>
+	<dtd id="485" english="JA: Number of Attacks (${number}) Misses (${number})" color="1"/>
+	<dtd id="486" english="Number of Targets (${number}) Damage (${number})" color="1"/>
+	<dtd id="487" english="Weapon Skill: Number of Attacks (${number}) Misses (${number})" color="1"/>
+	<dtd id="488" english="Number of Targets (${number}) Damage(${number})" color="1"/>
+	<dtd id="489" english="Spell: Number of Attacks (${number}) Misses (${number})" color="1"/>
+	<dtd id="490" english="Number of Targets (${number}) Damage(${number})" color="1"/>
+	<dtd id="491" english="AA: Number of Attacks (${number}) Misses (${number})" color="1"/>
+	<dtd id="492" english="Time: ${number}" color="1"/>
+	<dtd id="493" english="${actor}'s log" color="1"/>
+	<dtd id="494" english="??????:${number} ??????:${number}" color="1"/>
+	<dtd id="495" english="${actor}???:${skill}}????${number}%" color="1"/>
+	<dtd id="496" english="${actor}???:${skill}}?????${number}%" color="1"/>
+	<dtd id="497" english="??????${actor} : ??+${number}/??+${number}%" color="1"/>
+	<dtd id="498" english="????? ${actor} } ${target}" color="1"/>
+	<dtd id="499" english="Hate : ${actor}}${target} ${number}/${number}" color="1"/>
+	<dtd id="50" english="????to?? ${actor}:CODE ${number}/${number}" color="1"/>
+	<dtd id="501" english="StatusGet(${target}:${number}/${number})" color="1"/>
+	<dtd id="502" english="StatusSet(${target}:${number}/${number})" color="1"/>
+	<dtd id="503" english="${target}: Skillchain Element ${number}(${number})" color="1"/>
+	<dtd id="504" english="${target}:???????????(${number}?????${number}%)" color="1"/>
+	<dtd id="505" english="${target}:????????(${number})???????(${number})?" color="1"/>
+	<dtd id="506" english="${target}:????????(${number})???????(${number})?" color="1"/>
+	<dtd id="507" english="${target}:??????????=${number}/?????????=${number}" color="1"/>
+	<dtd id="508" english="${target}:??????${number}%,PS${number}" color="1"/>
+	<dtd id="509" english="${target}:${ ${number}/${number} }" color="1"/>
+	<dtd id="510" english="DEBUG:${target}}${skill} = ${number}%" color="1"/>
+	<dtd id="511" english="DEBUG:${target}}${number}%?????(${number})?" color="1"/>
+	<dtd id="512" english="You must have a two-handed weapon equipped in the main weapon slot in order to equip a grip." color="1"/>
+	<dtd id="513" english="This grip is not compatible with the two-handed weapon you currently have equipped." color="1"/>
+	<dtd id="514" english="You do not have the proper items equipped to use the ${item}." color="1"/>
+	<dtd id="515" english="${actor} has successfully recorded the target's image onto a ${item}." color="1"/>
+	<dtd id="516" english="${actor} was unable to capture the target's image." color="1"/>
+	<dtd id="517" english="The ${item} cannot be used on that target." color="1"/>
+	<dtd id="518" english="The ${item} cannot be used while under the effect of Invisible or Sneak." color="1"/>
+	<dtd id="519" english="${actor} uses ${ability}.${lb}${target} is afflicted with Lethargic Daze (lv.${number})." color="101" units="lv."/>
+	<dtd id="520" english="${actor} uses ${ability}.${lb}${target} is afflicted with Sluggish Daze (lv.${number})." color="101" units="lv."/>
+	<dtd id="521" english="${actor} uses ${ability}.${lb}${target} is afflicted with Weakened Daze (lv.${number})." color="101" units="lv."/>
+	<dtd id="522" english="${actor} uses ${ability}.${lb}${target} takes ${number} points of damage and is stunned." color="D"/>
+	<dtd id="523" english="The same effect is already active on ${actor}." color="1"/>
+	<dtd id="524" english="You have not earned enough finishing moves to perform that action." color="1"/>
+	<dtd id="525" english="${ability} can only be performed during battle." color="1"/>
+	<dtd id="526" english="${actor} uses ${ability}.${lb}Enmity is stolen from ${target}." color="101"/>
+	<dtd id="527" english="${actor} uses ${ability}.${lb}Ranged attack power and speed are increased.${lb}Melee attack power and speed are reduced." color="101"/>
+	<dtd id="528" english="${actor} uses ${ability}.${lb}Enmity is transferred to ${actor}'s pet." color="101"/>
+	<dtd id="529" english="${actor} uses ${ability}.${lb}${target} is chainbound." color="101"/>
+	<dtd id="530" english="${target}'s petrification counter is now down to ${number}." color="101"/>
+	<dtd id="531" english="${target} is no longer ${status}." color="191"/>
+	<dtd id="532" english="${actor} uses ${ability}.${lb}${target} receives the effect of Sneak and Invisible." color="101"/>
+	<dtd id="533" english="${actor} casts ${spell}.${lb}${target}'s Accuracy is drained." color="1"/>
+	<dtd id="534" english="${actor} casts ${spell}.${lb}${target}'s Attack is drained." color="1"/>
+	<dtd id="535" english="${target} retaliates.${lb}${number} of ${actor}'s shadows absorbs the damage and disappears." color="29" units="Shadow"/>
+	<dtd id="536" english="${target} retaliates.${lb}${actor} takes ${number} points of damage." color="D"/>
+	<dtd id="537" english="${target}'s TP is increased to ${number}%." color="H" units="TP"/>
+	<dtd id="538" english="A protective energy absorbs the malice of your enemy!" color="1"/>
+	<dtd id="539" english="${actor} uses ${weapon_skill}.${lb}${target} regains HP." color="H" units="HP"/>
+	<dtd id="540" english="Level Sync activated.${lb}Your level has been restricted to ${number}.${lb}Equipment affected by the level restriction will be adjusted accordingly.${lb}Experience points will become unavailable for all party members should the Level Sync designee stray too far from the enemy." color="1"/>
+	<dtd id="541" english="Level Sync could not be activated.${lb}The designated player is below level 10." color="1"/>
+	<dtd id="542" english="Level Sync could not be activated.${lb}The designated player is in a different area." color="1"/>
+	<dtd id="543" english="Level Sync could not be activated.${lb}One or more party members are currently under the effect of a status which prevents synchronization." color="1"/>
+	<dtd id="544" english="Level synchronization will be removed in ${number} seconds." color="1"/>
+	<dtd id="545" english="No experience points gained...${lb}The Level Sync designee is either too far from the enemy, or unconscious." color="1"/>
+	<dtd id="546" english="Your ${status} effect duration has been extended." color="1"/>
+	<dtd id="547" english="This ability can only be used on targets under the effect of a helix." color="1"/>
+	<dtd id="548" english="The party member you have selected is incapable of receiving experience points, and as such cannot be a Level Sync designee." color="1"/>
+	<dtd id="549" english="No experience points gained...${lb}The Level Sync designee is incapable of receiving experience points." color="1"/>
+	<dtd id="550" english="Level Sync will be deactivated in ${number} seconds.${lb}One or more party members have received the effect of a status which prevents synchronization." color="1"/>
+	<dtd id="551" english="Level Sync will be deactivated in ${number} seconds.${lb}The party leader or the Level Sync designee has left the area." color="1"/>
+	<dtd id="552" english="Level Sync will be deactivated in ${number} seconds.${lb}Less than two party members fulfill the requirements for Level Sync." color="1"/>
+	<dtd id="553" english="Level Sync will be deactivated in ${number} seconds.${lb}The party leader has removed synchronization, or the Level Sync designee has left the party." color="1"/>
+	<dtd id="554" english="Level Sync will be deactivated in ${number} seconds.${lb}The Level Sync designee has fallen below level 10." color="1"/>
+	<dtd id="555" english="Level Sync will be deactivated in ${number} seconds.${lb}A party member has undergone a job change." color="1"/>
+	<dtd id="556" english="Level Sync will be deactivated in ${number} seconds.${lb}The Level Sync designee is incapable of receiving experience points." color="1"/>
+	<dtd id="557" english="${target} receives ${number} piece of alexandrite." color="101"/>
+	<dtd id="558" english="You defeated a designated target.${lb}(Progress: ${number}/${number2})" color="122"/>
+	<dtd id="559" english="You have successfully completed the training regime." color="122"/>
+	<dtd id="560" english="${actor} uses ${ability}. Finishing move now ${number}." color="101" units="FM"/>
+	<dtd id="561" english="Unable to perform that action.${lb}Your have already earned the maximum number of finishing moves." color="122"/>
+	<dtd id="562" english="The status parameters of ${target} have increased." color="122"/>
+	<dtd id="563" english="${actor} destroys ${target}." color="1"/>
+	<dtd id="564" english="${target} were destroyed." color="1"/>
+	<dtd id="565" english="${target} obtains ${gil}." color="1"/>
+	<dtd id="566" english="${target} obtains ${number} tab.${lb}(Total: ${number})" color="1"/>
+	<dtd id="567" english="${actor} stowed away a ${item} in ?Unknown Parameter (Type: 90) 91?his/her] tattered Maze Monger pouch." color="1"/>
+	<dtd id="568" english="Your tattered Maze Monger pouch already contains a ${item} and cannot hold another." color="1"/>
+	<dtd id="569" english="Your current status prevents you from using that ability." color="1"/>
+	<dtd id="570" english="${actor} casts ${spell}.${lb}${number} of ${target}'s status ailments disappears!" color="81"/>
+	<dtd id="571" english="${number} of ${target}'s status ailments disappears!" color="81"/>
+	<dtd id="572" english="${actor} casts ${spell}.${lb}${actor} absorbs ${number} of ${target}'s status ailments." color="81"/>
+	<dtd id="573" english="${actor} or a alliance member is participating in a union.${lb}Ineligible to obtain treasure from this enemy." color="1"/>
+	<dtd id="574" english="${actor}'s pet is currently unable to perform that action." color="1"/>
+	<dtd id="575" english="${actor}'s pet does not have enough TP to perform that action." color="122"/>
+	<dtd id="576" english="${actor}'s ranged attack hits ${target} squarely for ${number} points of damage!" color="D"/>
+	<dtd id="577" english="${actor}'s ranged attack strikes true, pummeling ${target} for ${number} points of damage!" color="D"/>
+	<dtd id="578" english="Hunt objective fulfilled!${lb}Please report to a hunt registry to collect your reward." color="1"/>
+	<dtd id="579" english="Unable to use the ${item}.${lb}Party leaders or those not in a party cannot use a ${item}." color="1"/>
+	<dtd id="580" english="Unable to use the ${item}.${lb}The party leader is in either a area beyond warping range or a place you have yet to visit." color="1"/>
+	<dtd id="581" english="Unable to cast ${spell}.${lb}Astral Flow must be in effect to cast this spell." color="1"/>
+	<dtd id="582" english="${actor} obtains ${gil}." color="1"/>
+	<dtd id="583" english="Trial ${number}: ${number} objective remains." color="1"/>
+	<dtd id="584" english="You have completed Trial ${number}.${lb}Report your success to a Magian Moogle." color="1"/>
+	<dtd id="585" english="${actor} uses ${ability}.${lb}${target}'s enmity towards ${actor} is ${number}%." color="101" units="%%"/>
+	<dtd id="586" english="Towards ${target} is ${number}%." color="101" units="%%"/>
+	<dtd id="587" english="${target} regains ${number} HP." color="H" units="HP"/>
+	<dtd id="588" english="${target} regains ${number} MP." color="H" units="MP"/>
+	<dtd id="589" english="${target} have been healed of ${number} status ailments." color="1"/>
+	<dtd id="590" english="You can now perform ${weapon_skill}." color="1"/>
+	<dtd id="591" english="${actor} uses ${ability}.${lb}${target} is afflicted with Bewildered Daze (lv.${number})." color="101" units="lv."/>
+	<dtd id="592" english="${target} attempts to counter ${actor}'s attack, but misses." color="M"/>
+	<dtd id="593" english="${actor} uses ${ability}.${lb}${actor} steals a ${item} from ${target}.${lb}Additional effect: ${target} is afflicted with Attack Down." color="101"/>
+	<dtd id="594" english="${actor} uses ${ability}.${lb}${actor} steals a ${item} from ${target}.${lb}Additional effect: ${target} is afflicted with Defense Down." color="101"/>
+	<dtd id="595" english="${actor} uses ${ability}.${lb}${actor} steals a ${item} from ${target}.${lb}Additional effect: ${target} is afflicted with Magic Atk. Down." color="101"/>
+	<dtd id="596" english="${actor} uses ${ability}.${lb}${actor} steals a ${item} from ${target}.${lb}Additional effect: ${target} is afflicted with Magic Def. Down." color="101"/>
+	<dtd id="597" english="${actor} uses ${ability}.${lb}${actor} steals a ${item} from ${target}.${lb}Additional effect: ${target} is afflicted with Evasion Down." color="101"/>
+	<dtd id="598" english="${actor} uses ${ability}.${lb}${actor} steals a ${item} from ${target}.${lb}Additional effect: ${target} is afflicted with Accuracy Down." color="101"/>
+	<dtd id="599" english="${actor} uses ${ability}.${lb}${actor} steals a ${item} from ${target}.${lb}Additional effect: ${target} is afflicted with Slow." color="101"/>
+	<dtd id="600" english="${actor} eats a ${item}.${lb}${actor} finds a ${item} inside!" color="1"/>
+	<dtd id="601" english="Objective fulfilled!${lb}Please report to a Dominion Sergeant to collect your reward." color="122"/>
+	<dtd id="602" english="${actor} uses ${ability}.${lb}${target} receives the effect of ${ability}." color="101"/>
+	<dtd id="603" english="Additional effect: Treasure Hunter effectiveness against ${target} increases to ${number}." color="501"/>
+	<dtd id="604" english="${actor} eats a ${item}, but finds nothing inside..." color="1"/>
+	<dtd id="605" english="Additional effect: ${target} falls to the ground." color="56"/>
+	<dtd id="606" english="${actor}'s absorbs ${target}'s counter.${lb}${actor} recovers ${number} HP." color="H" units="HP"/>
+	<dtd id="607" english="${actor} uses ${weapon_skill}.${lb}${number} of ${target}'s status ailments disappears!" color="H"/>
+	<dtd id="608" english="${actor} uses ${ability}.${lb}Treasure Hunter effectiveness against ${target} increases to ${number}." color="501"/>
+	<dtd id="609" english="Prowess attained: Increased treasure casket discovery." color="122"/>
+	<dtd id="610" english="Prowess attained: Increased combat and magic skill gain." color="122"/>
+	<dtd id="611" english="Prowess attained: Increased crystal yield." color="122"/>
+	<dtd id="612" english="Prowess attained: Treasure Hunter bonus." color="122"/>
+	<dtd id="613" english="Prowess attained: Increased attack speed." color="122"/>
+	<dtd id="614" english="Prowess attained: Increased HP and MP." color="122"/>
+	<dtd id="615" english="Prowess attained: Enhanced accuracy and ranged accuracy." color="122"/>
+	<dtd id="616" english="Prowess attained: Enhanced attack and ranged attack." color="122"/>
+	<dtd id="617" english="Prowess attained: Enhanced magic accuracy and magic attack." color="122"/>
+	<dtd id="618" english="Prowess attained: Enhanced &quot;Cure&quot; potency." color="122"/>
+	<dtd id="619" english="Prowess attained: Increased weapon skill damage." color="122"/>
+	<dtd id="620" english="Prowess attained: &quot;Killer&quot; effects bonus." color="122"/>
+
+	<dtd id="625" english="Prowess boosted: Increased treasure casket discovery." color="122"/>
+	<dtd id="626" english="Prowess boosted: Increased combat and magic skill gain." color="122"/>
+	<dtd id="627" english="Prowess boosted: Increased crystal yield." color="122"/>
+	<dtd id="628" english="Prowess boosted: Treasure Hunter bonus." color="122"/>
+	<dtd id="629" english="Prowess boosted: Increased attack speed." color="122"/>
+	<dtd id="630" english="Prowess boosted: Increased HP and MP." color="122"/>
+	<dtd id="631" english="Prowess boosted: Enhanced accuracy and ranged accuracy." color="122"/>
+	<dtd id="632" english="Prowess boosted: Enhanced attack and ranged attack." color="122"/>
+	<dtd id="633" english="Prowess boosted: Enhanced magic accuracy and magic attack." color="122"/>
+	<dtd id="634" english="Prowess boosted: Enhanced &quot;Cure&quot; potency." color="122"/>
+	<dtd id="635" english="Prowess boosted: Increased weapon skill damage." color="122"/>
+	<dtd id="636" english="Prowess boosted: &quot;Killer&quot; effects bonus." color="122"/>
+
+	<dtd id="641" english="Additional effect: 1 of ${target}'s attributes is drained." color="1"/>
+	<dtd id="642" english="${actor} casts ${spell}.${lb}${actor} absorbs ${number} of ${target}'s status benefits." color="1"/>
+	<dtd id="643" english="Your current training regime will begin anew!" color="122"/>
+	<dtd id="644" english="${actor} uses ${ability}.${lb}${number} of ${target}'s status effects are removed." color="H"/>
+	<dtd id="645" english="${actor} uses ${ability}.${lb}${target} is ${status}." color="65"/>
+	<dtd id="646" english="${actor} uses ${ability}.${lb}${target} falls to the ground." color="56"/>
+	<dtd id="647" english="${actor} casts ${ability}.${lb}${target}'s ${status} effect disappears!" color="81"/>
+	<dtd id="648" english="${actor} leads the casting of ${spell}.${lb}${target} takes ${number} points of damage." color="D"/>
+	<dtd id="649" english="A member of another party is readying ${spell} against your target.${lb}You cannot cast the same spell at this time." color="1"/>
+	<dtd id="650" english="${actor} leads the casting of ${spell}.${lb}Magic Burst!${lb}${target} takes ${number} points of damage." color="D"/>
+	<dtd id="651" english="${actor} leads the casting of ${spell}.${lb}${target} recovers ${number} hit points!" color="H"/>
+	<dtd id="652" english="Additional effect: ${target} loses ${number} TP." color="56" units="TP"/>
+	<dtd id="653" english="${actor} casts ${spell}.${lb}${target} resists the spell.${lb}Immunobreak!" color="R"/>
+	<dtd id="654" english="${target} resists the spell.${lb}Immunobreak!" color="R"/>
+	<dtd id="655" english="${actor} casts ${spell}.${lb}${target} completely resists the spell." color="R"/>
+	<dtd id="656" english="${target} completely resists the spell." color="R"/>
+	<dtd id="657" english="${actor} uses ${ability}.${lb}All enmity is transferred to ${target}." color="101"/>
+	<dtd id="658" english="${actor} uses ${ability}, but misses ${target}." color="M"/>
+	<dtd id="659" english="No effect on ${target}." color="R"/>
+	<dtd id="660" english="The same effect is already active on that luopan!" color="122"/>
+	<dtd id="661" english="${actor} has already placed a luopan.${lb}Unable to use ability." color="122"/>
+	<dtd id="662" english="This action requires a luopan." color="122"/>
+	<dtd id="663" english="${actor} uses ${ability}.${lb}The luopan's HP consumption rate has been reduced." color="101"/>
+	<dtd id="664" english="${actor} uses ${ability}.${lb}The effects of the luopan and its HP consumption rate have increased." color="101"/>
+	<dtd id="665" english="${actor} has a pet.${lb}Unable to use ability." color="1"/>
+	<dtd id="666" english="This action requires the ability Rune Enchantment." color="1"/>
+	<dtd id="667" english="${actor} uses ${ability}.${lb}Accuracy and evasion are enhanced." color="101"/>
+	<dtd id="668" english="${actor} uses ${ability}.${lb}${target} receives the effect of Vallation, reducing damage taken from certain elemental magic spells." color="101"/>
+	<dtd id="669" english="Magic damage of a certain element is reduced for ${target}." color="101"/>
+	<dtd id="670" english="${actor} uses ${ability}.${lb}${target} can now absorb magic damage of a certain element." color="101"/>
+	<dtd id="671" english="${actor} uses ${ability}.${lb}${target} now has enhanced resistance." color="101"/>
+	<dtd id="672" english="${actor} uses ${ability}.${lb}${target} receives the effect of Gambit, reducing defense against magic of a certain element." color="101"/>
+	<dtd id="673" english="${actor} obtains ${number} corpuscles of menace plasm." color="127"/>
+	<dtd id="674" english="${actor} uses ${ability}, and finds ${number} ${item}." color="101"/>
+	<dtd id="675" english="${actor} readies ${weapon_skill}." color="110"/>
+	<dtd id="676" english="${target}'s movement speed increases." color="101"/>
+</messagesd>

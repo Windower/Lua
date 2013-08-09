@@ -1,0 +1,58 @@
+Release Date: 9:00 PM, 4-01-13.
+Author Comment: This document is whitespace sensitive, which means that you need the same number of spaces between things as exist in this initial settings file.
+Author Comment: It looks at the first two words separated by spaces and then takes anything as the value in question if the first two words are relevant.
+Author Comment: If you ever mess it up so that it does not work, you can just delete it and battlemod will regenerate it upon reload.
+Author Comment: For the output customization lines, simply place the book and page number that you would like to change to upon a job change..
+Author Comment: If 2 jobs share a book, you can place the same book number for each job, then put their individual pages..
+Author Comment: Example:  BLM and SCH both use Macro Book 2:  BLM uses page 3. SCH uses page 1..
+Author Comment: Put BLM Book: 2,  BLM Page: 3,  SCH Book: 2,  SCH Page: 1..
+Author Comment: If you wish to disable auto-macro Changing for a specific job, type "disabled".  (e.g. BLM Book: disabled)
+Author Comment: The design of the settings file is credited to Byrthnoth as well as the creation of the settings file.
+
+
+File Settings: Fill in below
+WAR Book: 1
+WAR Page: 1
+MNK Book: 2
+MNK Page: 1
+WHM Book: 3
+WHM Page: 1
+BLM Book: 20
+BLM Page: 1
+RDM Book: 5
+RDM Page: 1
+THF Book: 6
+THF Page: 1
+PLD Book: 7
+PLD Page: 1
+DRK Book: 8
+DRK Page: 1
+BST Book: 9
+BST Page: 1
+BRD Book: 10
+BRD Page: 1
+RNG Book: 11
+RNG Page: 1
+SAM Book: 12
+SAM Page: 1
+NIN Book: 13
+NIN Page: 1
+DRG Book: 14
+DRG Page: 1
+SMN Book: 15
+SMN Page: 1
+BLU Book: 16
+BLU Page: 1
+COR Book: 17
+COR Page: 1
+PUP Book: 18
+PUP Page: 1
+DNC Book: 19
+DNC Page: 1
+SCH Book: 20
+SCH Page: 1
+GEO Book: 5
+GEO Page: 1
+RUN Book: 4
+RUN Page: 1
+

@@ -4,21 +4,29 @@ A few string helper functions.
 
 _libs = _libs or {}
 _libs.stringhelper = true
-_libs.tablehelper = _libs.tablehelper or require 'tablehelper'
 _libs.functools = _libs.functools or require 'functools'
-_libs.mathhelper = _libs.mathhelper or require 'mathhelper'
 
-debug.getmetatable("").__index = string
+_meta = _meta or {}
+_meta.T = _meta.T or {}
+
+debug.getmetatable('').__index = string
+debug.getmetatable('').__unm = functools.negate..functools.equals
 
 -- Returns the character at position pos. Negative positions are counted from the opposite end.
 function string.at(str, pos)
-	return str:slice(pos, pos)
+	return str:sub(pos, pos)
+end
+
+-- Returns the character at position pos. Defaults to 1 to return the first character.
+function string.first(str, offset)
+	offset = offset or 1
+	return str:sub(offset, offset)
 end
 
 -- Returns the character at position #str-pos. Defaults to 0 to return the last character.
 function string.last(str, offset)
 	offset = offset or 1
-	return str:at(-offset)
+	return str:sub(-offset, -offset)
 end
 
 -- Returns true if the string contains a substring.
@@ -26,46 +34,61 @@ function string.contains(str, sub)
 	return str:find(sub, nil, true)
 end
 
--- Splits a string into a table by a separator pattern. Empty strings are ignored.
+-- Splits a string into a table by a separator pattern.
 function string.psplit(str, sep, maxsplit)
 	maxsplit = maxsplit or 0
-	
+
 	return str:split(sep, maxsplit, false)
 end
 
--- Splits a string into a table by a separator string. Empty strings are ignored.
+-- Splits a string into a table by a separator string.
 function string.split(str, sep, maxsplit, pattern)
+	if sep == '' then
+		local res = {}
+		local key = 0
+		for c in str:gmatch('.') do
+			key = key + 1
+			res[key] = c
+		end
+
+		return setmetatable(res, _meta.T)
+	end
+
 	maxsplit = maxsplit or 0
 	if pattern == nil then
 		pattern = true
 	end
-	
-	local res = T{}
+
+	local res = {}
+	local key = 0
 	local i = 1
-	while i <= #str do
+	local startpos, endpos
+	local match
+	while i <= #str + 1 do
 		-- Find the next occurence of sep.
-		local startpos, endpos = str:find(sep, i, pattern)
+		startpos, endpos = str:find(sep, i, pattern)
 		-- If found, get the substring and append it to the table.
-		if startpos ~= nil then
-			matchstr = string.slice(str, i, startpos-1)
-			-- Ignore empty string
-			if #matchstr > 0 then
-				res:append(matchstr)
-				-- If maximum number of splits reached, return
-				if #res == maxsplit - 1 then
-					res:append(str:slice(endpos + 1))
-					break
-				end
+		if startpos then
+			match = string.slice(str, i, startpos - 1)
+			key = key + 1
+			res[key] = match
+			-- If maximum number of splits reached, return
+			if key == maxsplit - 1 then
+				key = key + 1
+				res[key] = str:slice(endpos + 1)
+				break
 			end
 			i = endpos + 1
 		-- If not found, no more separaters to split, append the remaining string.
 		else
-			res:append(str:slice(i))
+			key = key + 1
+			res[key] = str:slice(i)
 			break
 		end
 	end
-	
-	return res
+
+	res.n = key
+	return setmetatable(res, _meta.L)
 end
 
 -- Alias to string.sub, with some syntactic sugar.
@@ -90,37 +113,22 @@ end
 
 -- Removes all characters in chars from str.
 function string.stripchars(str, chars)
-	-- Create table for the characters, for faster checking.
-	local charset = chars:charset()
-	
-	function subchar(c)
-		if charset:containskey(c) then
-			return ''
-		end
-		return c
-	end
-	
-	return str:map(subchar)
-end
-
--- Returns a table keyed with all characters from the string. Mainly used for O(1) membership checking with table.containskey.
-function string.charset(str)
-	local charset = T{}
-	for c in str:gmatch('.') do
-		charset[c] = true
-	end
-	
-	return charset
+	return str:gsub('['..chars..']', '')
 end
 
 -- Checks it the string starts with the specified substring.
 function string.startswith(str, substr)
-	return str:slice(1, #substr) == substr
+	return str:sub(1, #substr) == substr
 end
 
 -- Checks it the string ends with the specified substring.
 function string.endswith(str, substr)
-	return str:slice(-#substr) == substr
+	return str:sub(-#substr) == substr
+end
+
+-- Returns the length of a string.
+function string.length(str)
+	return #str
 end
 
 -- Checks if string is enclosed in start and finish. If only one argument is provided, it will check for that string both at the beginning and the end.
@@ -137,59 +145,194 @@ end
 
 -- Returns the same string with the first letter capitalized.
 function string.ucfirst(str)
-	return str:at(1):upper()..str:slice(2)
+	return str:sub(1, 1):upper()..str:sub(2)
 end
 
 -- Returns the same string with the first letter of every word capitalized.
 function string.capitalize(str)
-	return str:split(' '):map(string.uc_first):sconcat()
+	local res = {}
+
+	for _, val in ipairs(str:split(' ')) do
+		res[#res + 1] = val:ucfirst()
+	end
+
+	return table.concat(res, ' ')
+end
+
+-- Takes a padding character pad and pads the string str to the left of it, until len is reached. pad defaults to a space.
+function string.lpad(str, pad, len)
+	pad = pad or ' '
+	return (pad:rep(len)..str):sub(-len)
+end
+
+-- Takes a padding character pad and pads the string str to the right of it, until len is reached. pad defaults to a space.
+function string.rpad(str, pad, len)
+	pad = pad or ' '
+	return (str..pad:rep(len)):sub(1, len)
 end
 
 -- Returns the string padded with zeroes until the length is len.
 function string.zfill(str, len)
-	return (('0'):rep(len)..str):slice(-len)
+	return str:lpad('0', len)
 end
 
 -- Converts a string in base base to a number.
 function string.todec(numstr, base)
 	-- Create a table of allowed values according to base and how much each is worth.
-	local digits = T{}
+	local digits = {}
 	local val = 0
-	for c in math.digitorder:gmatch('.') do
+	for c in ('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'):gmatch('.') do
 		digits[c] = val
 		val = val + 1
 		if val == base then
 			break
 		end
 	end
-	
+
 	local index = base^(#numstr-1)
 	local acc = 0
 	for c in numstr:gmatch('.') do
 		acc = acc + digits[c]*index
 		index = index/base
 	end
-	
+
 	return acc
 end
 
 -- Checks if a string is in a table.
-function string.isin(str, ...)
-	return T{...}:flatten():contains(str)
+function string.isin(str, t)
+	for _, arg in pairs(t) do
+		if arg == str then
+			return true
+		end
+	end
+
+	return false
 end
 
--- Checks if a string is empty
-function string.isempty(str)
-	return #str == 0
+-- Checks if a string is empty.
+function string.empty(str)
+	return str == ''
+end
+
+-- Returns a slug of a string.
+function string.slug(str)
+	return str
+		:gsub(' I', '1')
+		:gsub(' II', '2')
+		:gsub(' III', '3')
+		:gsub(' IV', '4')
+		:gsub(' V', '5')
+		:gsub('[^%w]', '')
+		:lower()
+end
+
+-- Returns a string with Lua pattern characters escaped.
+function string.escape(str)
+	return str:gsub('[[%]%%^$*()%.%+?-]', '%%%1')
+end
+
+-- Returns a Lua pattern from a wildcard string (with ? and * as placeholders for one and many characters respectively).
+function string.wildcard(str)
+	return str:gsub('[[%]%%^$()%+?-]', '%%%1'):gsub('*', '.*'):gsub('?', '.')
+end
+
+-- Returns a case-insensitive pattern for a given (non-pattern) string. For patterns, see string.ipattern.
+function string.istring(str)
+	return (str:gsub('%a', function(c) return '['..c:upper()..c:lower()..']' end))
+end
+
+-- Returns a case-insensitive pattern for a given pattern.
+function string.ipattern(str)
+	local res = ''
+	local percent = false
+	local val
+	for c in str:it() do
+		if c == '%' then
+			percent = not percent
+			res = res..c
+		elseif not percent then
+			val = string.byte(c)
+			if val > 64 and val <= 90 or val > 96 and val <= 122 then
+				res = res..'['..c:upper()..c:lower()..']'
+			else
+				res = res..c
+			end
+		else
+			percent = false
+			res = res..c
+		end
+	end
+
+	return res
+end
+
+-- A string.find wrapper for case-insensitive patterns.
+function string.ifind(str, pattern)
+	return str:find(pattern:ipattern())
+end
+
+-- A string.match wrapper for case-insensitive patterns.
+function string.imatch(str, pattern)
+	return str:match(pattern:ipattern())
+end
+
+-- A string.gmatch wrapper for case-insensitive patterns.
+function string.igmatch(str, pattern)
+	return str:gmatch(pattern:ipattern())
+end
+
+-- A string.gsub wrapper for case-insensitive patterns.
+function string.igsub(str, pattern, replace)
+	return str:gsub(pattern:ipattern(), replace)
 end
 
 -- Counts the occurrences of a substring in a string.
 function string.count(str, sub)
-	return str:pcount(sub:gsub('[[%]%%^$*().-+]', '%%%1'))
+	return str:pcount(sub:escape())
 end
 
 -- Counts the occurrences of a pattern in a string.
 function string.pcount(str, pat)
-	local _, count = str:gsub(pat, '')
-	return count
+	return string.gsub[2](str, pat, '')
+end
+
+-- Returns a plural version of a string, if the provided table contains more than one element.
+-- Defaults to appending an s, but accepts an option string as second argument which it will the string with.
+function string.plural(str, t, replace)
+	if type(t) == 'number' and t > 1 or #t > 1 then
+		return replace or str..'s'
+	end
+
+	return str
+end
+
+-- Returns a formatted item list for use in natural language representation of a number of items.
+-- The second argument specifies how the trailing element is handled:
+-- * and: Appends the last element with an and instead of a comma. [Default]
+-- * csv: Appends the last element with a comma, like every other element.
+-- * oxford: Appends the last element with a comma, followed by an and.
+-- The third argument specifies an optional output, if the table is empty.
+function table.format(t, trail, subs)
+	local l = #t
+	if l == 0 then
+		return subs or ''
+	elseif l == 1 then
+		return t[next(t)]
+	end
+
+	trail = trail or 'and'
+
+	local last
+	if trail == 'and' then
+		last = ' and '
+	elseif trail == 'csv' then
+		last = ', '
+	elseif trail == 'oxford' then
+		last = ', and '
+	else
+		warning('Invalid format for table.format: \''..trail..'\'.')
+	end
+
+	return t:slice(1, -2):concat(', ')..last..t:last()
 end
