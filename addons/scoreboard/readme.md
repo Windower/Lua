@@ -1,5 +1,5 @@
 Author: Suji
-Version: 0.9b
+Version: 1.0
 Addon to show alliance DPS and damage in real time.
 Abbreviation: //sb
 
@@ -39,12 +39,25 @@ Command list:
   //sb report l        Reports to your linkshell
   //sb report t suji   Reports in tell to Suji
 
+* REPORTSTAT <stat> [<target>]
+  RS <stat> [<target>]
+  Reports the given stat. With no argument, it will go to whatever you have
+  your current chatmode set to. You may also pass the standard FFXI chat
+  abbreviations as arguments. Support arguments are 's', 't', 'p', 'l'.
+  If you pass 't' (for tell), you must also pass a player name to send
+  the tell to. Currently only 'acc' is supported. Examples:
+  //sb reportstat acc     -- Sends acc report your default chatmode
+  //sb rs acc             -- Same as above
+  //sb rs acc p           -- Explicitly to party
+  //sb rs acc tell suji   -- Sends acc to Suji
+  //sb rs acc t suji      -- Same as above
+  
 * FILTER
   This takes one of three sub-commands.
   * FILTER SHOW
   Shows the current mob filters.
 
-  * FILTER ADD <mob1> <mob2> ...
+* FILTER ADD <mob1> <mob2> ...
   Adds mob(s) to the filters. These can all be substrings. Legal Lua
   patterns are also allowed.
 
