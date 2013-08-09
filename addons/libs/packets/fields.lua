@@ -2,9 +2,15 @@
 A collection of detailed packet field information.
 ]]
 
+require 'pack'
+
 local fields = {}
-fields.outgoing = {}
-fields.incoming = {}
+fields.outgoing = {_mult = {}}
+fields.incoming = {_mult = {}}
+
+local indices = {}
+indices.outgoing = {}
+indices.incoming = {}
 
 --[[
 	Function definitions. Used to display packet field information.
@@ -355,7 +361,11 @@ fields.incoming[0x030] = L{
 }
 
 -- Pet Stat
-fields.incoming[0x044] = L{
+-- This packet varies and is indexed by job ID (byte 4)
+fields.incoming._mult[0x044] = {}
+indices.incoming[0x044] = {byte = 4, length = 1}
+
+fields.incoming._mult[0x044][0x12] = L{     -- PUP
 -- Packet 0x044 is sent twice in sequence when stats could change. This can be caused by anything from
 -- using a Maneuver on PUP to changing job. The two packets are the same length. The first
 -- contains information about your main job. The second contains information about your
@@ -597,8 +607,25 @@ fields.incoming[0x0F6] = L{
 fields.incoming[0x0F9] = L{
 	{ctype='unsigned int',      label='ID',                 fn=id},             --    4 -   7
 	{ctype='unsigned short',    label='Player Index'},                          --    8 -   9
-	{ctype='unsigned char',      label='_unknown1'},                            --   10 -  10
-	{ctype='unsigned char',      label='_unknown2'},                            --   11 -  11
+	{ctype='unsigned char',     label='_unknown1'},                             --   10 -  10
+	{ctype='unsigned char',     label='_unknown2'},                             --   11 -  11
 }
+
+local pack_strs = {
+    [1] = 'b',
+    [2] = 'H',
+    [4] = 'I',
+}
+
+function fields.get(id, mode, data)
+    if fields[mode][id] then
+        return fields[mode][id]
+    end
+
+    local index = indices[mode][id]
+    if index then
+        return (fields[mode]._mult[id][data:sub(index.byte + 1):unpack(pack_strs[index.length])])
+    end
+end
 
 return fields
