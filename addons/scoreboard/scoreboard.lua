@@ -2,7 +2,7 @@
 
 _addon = _addon or {}
 _addon.name = 'Scoreboard'
-_addon.version = 1.0
+_addon.version = 1.1
 
 require 'tablehelper'
 require 'stringhelper'
@@ -52,7 +52,7 @@ function event_addon_command(...)
             sb_output('sb pos <x> <y> : Positions the scoreboard')
             sb_output('sb reset : Reset damage')
             sb_output('sb report [<target>] : Reports damage. Can take standard chatmode target options.')
-            sb_output('sb reportstat <stat> [<target>] : Reports the given stat. Can take standard chatmode target options. Ex: //sb rs acc p')
+            sb_output('sb reportstat <stat> [<player>] [<target>] : Reports the given stat. Can take standard chatmode target options. Ex: //sb rs acc p')
             sb_output('sb filter show  : Shows current filter settings')
             sb_output('sb filter add <mob1> <mob2> ... : Add mob patterns to the filter (substrings ok)')
             sb_output('sb filter clear : Clears mob filter')

@@ -1,5 +1,5 @@
 Author: Suji
-Version: 1.0
+Version: 1.1
 Addon to show alliance DPS and damage in real time.
 Abbreviation: //sb
 
@@ -39,18 +39,26 @@ Command list:
   //sb report l        Reports to your linkshell
   //sb report t suji   Reports in tell to Suji
 
-* REPORTSTAT <stat> [<target>]
-  RS <stat> [<target>]
-  Reports the given stat. With no argument, it will go to whatever you have
+* REPORTSTAT <stat> [<playerName>] [<target>]
+  RS <stat> [<playerName>] [<target>]
+  Reports the given stat. Supported stats are:
+      acc, racc, crit, rcrit, wsavg
+  
+  'playerName' may be the name of a player if you wish to see only one player.
+  
+  For 'target', with no argument, it will go to whatever you have
   your current chatmode set to. You may also pass the standard FFXI chat
   abbreviations as arguments. Support arguments are 's', 't', 'p', 'l'.
   If you pass 't' (for tell), you must also pass a player name to send
-  the tell to. Currently only 'acc' is supported. Examples:
-  //sb reportstat acc     -- Sends acc report your default chatmode
-  //sb rs acc             -- Same as above
-  //sb rs acc p           -- Explicitly to party
-  //sb rs acc tell suji   -- Sends acc to Suji
-  //sb rs acc t suji      -- Same as above
+  the tell to.
+
+  Examples:
+  //sb reportstat acc       -- Sends acc report your default chatmode
+  //sb rs crit              -- Same as above
+  //sb rs crit p            -- Explicitly to party
+  //sb rs acc tell suji     -- Sends acc to Suji
+  //sb rs acc t suji        -- Same as above
+  //sb rs acc tulia t suji  -- Report accuracy for Tulia only and send it in tell to Suji
   
 * FILTER
   This takes one of three sub-commands.
