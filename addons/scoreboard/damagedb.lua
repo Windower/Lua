@@ -14,7 +14,8 @@ DamageDB.player_stat_fields = T{
 }
 ]]
 DamageDB.player_stat_fields = T{
-    'acc', 'racc', 'crit', 'rcrit'
+    'acc', 'racc', 'crit', 'rcrit',
+    'wsavg'
 }
 
 function DamageDB:new (o)
