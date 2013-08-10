@@ -82,6 +82,8 @@ function options_load()
 	if tempplayer then
 		if tempplayer['main_job'] ~= 'NONE' then
 			filterload(tempplayer['main_job'])
+		elseif get_mob_by_id(tempplayer['id'])['race'] == 0 then
+			filterload('MON')
 		else
 			filterload('DEFAULT')
 		end
