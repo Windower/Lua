@@ -362,12 +362,12 @@ end
 function Display:report_stat(stat, args)
     local stats = self.db:query_stat(stat, args.player)
     
-    if stat == 'acc' then
+    if T{'acc', 'racc', 'crit', 'rcrit'}:contains(stat) then
         local elements = T{}
-
-        for name, acc_pair in pairs(stats) do
-            if acc_pair[2] > 0 then
-                elements:append({acc_pair[1], string.format("%s %.2f%% (%ds)", name, 100 * acc_pair[1], acc_pair[2])})
+        local header   = stat:ucfirst() .. ': '
+        for name, stat_pair in pairs(stats) do
+            if stat_pair[2] > 0 then
+                elements:append({stat_pair[1], string.format("%s %.2f%% (%ds)", name, 100 * stat_pair[1], stat_pair[2])})
             end
         end
         local function cmp(a, b) 
@@ -376,7 +376,23 @@ function Display:report_stat(stat, args)
         table.sort(elements, cmp)
         
         -- Send the report to the specified chatmode
-        local wrapped = wrap_elements(elements:slice(1, self.settings.numplayers):map(function (p) return p[2] end), 'Acc: ')
+        local wrapped = wrap_elements(elements:slice(1, self.settings.numplayers):map(function (p) return p[2] end), header)
+        slow_output(build_input_command(args.chatmode, args.telltarget), wrapped, self.settings.numplayers)
+    elseif stat == 'wsavg' then
+        local elements = T{}
+        local header   = stat:ucfirst() .. ': '
+        for name, stat_pair in pairs(stats) do
+            if stat_pair[2] > 0 then
+                elements:append({stat_pair[1], string.format("%s %d (%ds)", name, stat_pair[1], stat_pair[2])})
+            end
+        end
+        local function cmp(a, b) 
+            return a[1] > b[1]
+        end
+        table.sort(elements, cmp)
+        
+        -- Send the report to the specified chatmode
+        local wrapped = wrap_elements(elements:slice(1, self.settings.numplayers):map(function (p) return p[2] end), header)
         slow_output(build_input_command(args.chatmode, args.telltarget), wrapped, self.settings.numplayers)
     end
 end
