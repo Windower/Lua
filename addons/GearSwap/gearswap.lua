@@ -1,3 +1,31 @@
+--Copyright (c) 2013, Byrthnoth
+--All rights reserved.
+
+--Redistribution and use in source and binary forms, with or without
+--modification, are permitted provided that the following conditions are met:
+
+--    * Redistributions of source code must retain the above copyright
+--      notice, this list of conditions and the following disclaimer.
+--    * Redistributions in binary form must reproduce the above copyright
+--      notice, this list of conditions and the following disclaimer in the
+--      documentation and/or other materials provided with the distribution.
+--    * Neither the name of <addon name> nor the
+--      names of its contributors may be used to endorse or promote products
+--      derived from this software without specific prior written permission.
+
+--THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+--ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+--WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+--DISCLAIMED. IN NO EVENT SHALL <your name> BE LIABLE FOR ANY
+--DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+--(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+--LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+--ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+--(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+--SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+language = 'english'
 file = require 'filehelper'
 require 'sets'
 require 'stringhelper'
@@ -7,10 +35,11 @@ require 'resources'
 require 'equip_processing'
 require 'targets'
 require 'refresh'
+require 'user_functions'
 
 _addon = {}
 _addon.name = 'GearSwap'
-_addon.version = '0.501'
+_addon.version = '0.603'
 _addon.commands = {'gs','gearswap'}
 
 function event_load()
@@ -26,7 +55,6 @@ function event_load()
 	send_command('@alias gs lua c gearswap')
 	refresh_globals()
 	_global.force_send = false
-	language = world.language:lower()
 	
 	if world.logged_in then
 		refresh_user_env()
@@ -43,12 +71,38 @@ function event_addon_command(...)
 	local command = table.concat({...},' ')
 	if logging then	logit(logfile,'\n\n'..tostring(os.clock)..command) end
 	local splitup = split(command,' ')
-	if splitup[1]:lower() == 'c' and #splitup > 1 then
+	if splitup[1]:lower() == 'c' then
 		if gearswap_disabled then return end
-		equip_sets('self_command',_raw.table.concat(splitup,' ',2,#splitup))
+		if splitup[2] then equip_sets('self_command',_raw.table.concat(splitup,' ',2,#splitup))
+		else
+			add_to_chat(123,'GearSwap: No self command passed.')
+		end
 	elseif splitup[1]:lower() == 'equip' and not midaction then
 		if gearswap_disabled then return end
-		equip_sets('equip_command',user_env.sets[_raw.table.concat(splitup,' ',2,#splitup)])
+		local set_split = split(_raw.table.concat(splitup,' ',2,#splitup):gsub('[%[%]\']',''),'%.')
+		local n = 1
+		local tempset = user_env.sets
+		while n <= #set_split do
+			if tempset[set_split[n]] then
+				tempset = tempset[set_split[n]]
+				if n == #set_split then
+					equip_sets('equip_command',tempset)
+					break
+				else
+					n = n+1
+				end
+			else
+				add_to_chat(123,'GearSwap: Equip command cannot be completed. That set does not exist.')
+				break
+			end
+		end
+	elseif splitup[1]:lower() == 'disable' then
+		gearswap_disabled = not gearswap_disabled
+		if gearswap_disabled then
+			write('GearSwap Disabled')
+		else
+			write('GearSwap Enabled')
+		end
 	elseif splitup[1]:lower() == 'reload' then
 		refresh_user_env()
 	elseif strip(splitup[1]) == 'debugmode' then
@@ -64,7 +118,7 @@ end
 
 function midact()
 	if not action_sent then
-		if debugging >= 1 then add_to_chat(1,'Had for force the command to send.') end
+		if debugging >= 1 then add_to_chat(123,'GearSwap: Had to force the command to send.') end
 		send_check(true)
 	end
 	action_sent = false
@@ -72,17 +126,24 @@ end
 
 function event_outgoing_text(original,modified)
 	if gearswap_disabled then return modified end
-	local splitline = split(modified,' ')
+	
+	local temp_mod = convert_auto_trans(modified)
+	local splitline = split(temp_mod,' ')
 	local command = splitline[1]
 
-	local a,b,abil = string.find(original,'"(.-)"')
-	if abil then abil = abil:lower() end
+	local a,b,abil = string.find(temp_mod,'"(.-)"')
+	if abil then
+		abil = abil:lower()
+	elseif #splitline == 3 then
+		abil = splitline[2]:lower()
+	end
+	
 	local temptarg = valid_target(splitline[#splitline])
 	
 	if command == '/raw' then
 		return _raw.table.concat(splitline,' ',2,#splitline)
-	elseif command_list[command] and temptarg and validabils[abil] and not midaction then
-		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) Original: '..original) end
+	elseif command_list[command] and temptarg and validabils[language][abil] and not midaction then
+		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) temp_mod: '..temp_mod) end
 		refresh_globals()
 			
 		send_command('@wait 1;lua invoke gearswap midact')
@@ -90,13 +151,19 @@ function event_outgoing_text(original,modified)
 		local r_line, s_type
 			
 		if command_list[command] == 'Magic' then
-			r_line = r_spells[validabils[abil:lower()]['Magic']]
-			r_line.name = r_line['english']
-			s_type = command_list[r_spells[validabils[abil:lower()]['Magic']]['prefix']]
+			r_line = r_spells[validabils[language][abil:lower()]['Magic']]
+			r_line.name = r_line[language]
+			s_type = 'Magic' -- command_list[r_spells[validabils[language][abil:lower()]['Magic']]['prefix']]
 		elseif command_list[command] == 'Ability' then
-			r_line = r_abilities[validabils[abil:lower()]['Ability']]
-			r_line.name = r_line['english']
-			s_type = command_list[r_abilities[validabils[abil:lower()]['Ability']]['prefix']]
+			r_line = r_abilities[validabils[language][abil:lower()]['Ability']]
+			r_line.name = r_line[language]
+			s_type = 'Ability' -- command_list[r_abilities[validabils[language][abil:lower()]['Ability']]['prefix']]
+		elseif command_list[command] == 'Item' then
+			r_line = r_items[validabils[language][abil:lower()]['Item']]
+			r_line.name = r_line[language]
+			r_line.prefix = '/item'
+			r_line.type = 'Item'
+			s_type = 'Item'
 		elseif debugging then
 			write('this case should never be hit '..command)
 		end
@@ -105,31 +172,27 @@ function event_outgoing_text(original,modified)
 		
 		r_line = aftercast_cost(r_line)
 		
-		storedcommand = r_line['prefix']..' "'..r_line['english']..'" '
+		storedcommand = r_line['prefix']..' "'..r_line[language]..'" '
 		equip_sets('precast',r_line,{type=s_type})
 
-		return '' -- Makes an infinite loop with Spellcast. They fight to the death.
-	elseif command_list[command] and temptarg  and not midaction then
-		if command_list[command] == 'Ranged Attack' then
-			if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) Original: '..original) end
-			refresh_globals()
+		return ''
+	elseif command_list[command] == 'Ranged Attack' and temptarg and not midaction then
+		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) temp_mod: '..temp_mod) end
+		refresh_globals()
 
-			rline = {name='Ranged Attack',english='Ranged Attack',prefix='/range',element='None',targets='Enemy',skill='Ability',mpcost=0,tpcost=-1,casttime=0,recast=0,validtarget={Self=false,Player=false,Party=false,Ally=false,NPC=false,Enemy=true}}
-			send_command('@wait 1;lua invoke gearswap midact')
+		rline = ranged_line
+		send_command('@wait 1;lua invoke gearswap midact')
+		
+		_global.storedtarget = temptarg
+		
+		r_line = aftercast_cost(rline)
 			
-			_global.storedtarget = temptarg
-			
-			r_line = aftercast_cost(rline)
-				
-			storedcommand = r_line['prefix']..' '
-			equip_sets('precast',r_line,{type="Ranged Attack"})
+		storedcommand = r_line['prefix']..' '
+		equip_sets('precast',r_line,{type="Ranged Attack"})
 
-			return '' -- Makes an infinite loop with Spellcast. They fight to the death.
-		elseif debugging then
-			write('(100) this case should never be hit '..command)
-		end
-	elseif midaction and validabils[tostring(abil):lower()] then
-		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(122) Canceled: '..original) end
+		return ''
+	elseif midaction and validabils[language][tostring(abil):lower()] then
+		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(122) Canceled: '..temp_mod) end
 		return ''
 	end
 	return modified
@@ -187,11 +250,11 @@ function event_outgoing_chunk(id,data)
 		local actor_name = get_mob_by_id(actor_id)['name']
 		local target_name = get_mob_by_index(index)['name']
 		if category == 3 then
-			abil_name = r_spells[param]['english']
+			abil_name = r_spells[param][language]
 		elseif category == 7 then
-			abil_name = r_abilities[param+768]['english']
+			abil_name = r_abilities[param+768][language]
 		elseif category == 9 then
-			abil_name = r_abilities[param]['english']
+			abil_name = r_abilities[param][language]
 		elseif category == 16 then
 			abil_name = 'Ranged Attack'
 		end
@@ -203,7 +266,8 @@ function event_outgoing_chunk(id,data)
 end
 
 function event_action(act)
-	if gearswap_disabled then return end
+	if gearswap_disabled or act_category == 1 then return end
+	
 	refresh_player()
 	local prefix = ''
 	
@@ -211,21 +275,24 @@ function event_action(act)
 		prefix = 'pet_'
 	end
 	
-	if (player['id'] ~= act['actor_id'] and pet['id']~=act['actor_id']) or act['category'] == 1 then
+	if (player['id'] ~= act['actor_id'] and pet['id']~=act['actor_id']) then
 		return -- If the action is not being used by the player, the pet, or is a melee attack then abort processing.
 	end
 	
 	local spell = get_spell(act)
 	local category = act['category']
 	
-	if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(178) Event Action: '..tostring(spell.english)..' '..tostring(act['category'])) end
+	if logging then	
+		if spell then logit(logfile,'\n\n'..tostring(os.clock)..'(178) Event Action: '..tostring(spell.english)..' '..tostring(act['category']))
+		else logit(logfile,'\n\nNil spell detected') end
+	end
 	
 	if jas[category] then
 		equip_sets(prefix..'aftercast',spell,{type=get_action_type(category)})
 	elseif readies[category] then
-		if act['param'] == 28787 then ----------- NEED TO ADD BETTER HANDLING FOR THIS -----------------------------
+		if act['param'] == 28787 and not category == 9 then ----------- NEED TO ADD BETTER HANDLING FOR THIS ----------------------------- Why?
 			equip_sets(prefix..'aftercast',spell,{type='Failure'})
-		else
+		elseif act['param'] ~= 28787 then
 			equip_sets(prefix..'midcast',spell,{type=get_action_type(category)})
 		end
 	elseif uses[category] then
@@ -235,15 +302,18 @@ end
 
 function event_action_message(actor_id,target_id,actor_index,target_index,message_id,param_1,param_2,param_3)
 	if gearswap_disabled then return end
-	if unable_to_use:contains(message_id) then
+	if message_id == 62 then
+		equip_sets('aftercast',r_items[param_1],{type='Failure'})
+	elseif unable_to_use:contains(message_id) then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(195) Event Action Message: '..tostring(message_id)..' Interrupt') end
-		equip_sets('aftercast',{name='Interrupt'},{type='Recast'})
+		equip_sets('aftercast',{name='Interrupt',type='Interrupt'},{type='Recast'})
 	end
 end
 
 function event_status_change(old,new)
-	if gearswap_disabled or T{'Event','Other','Zoning'}:contains(old) or T{'Event','Other','Zoning'}:contains(new) then return end
+	if gearswap_disabled or T{'Event','Other','Zoning','Dead'}:contains(old) or T{'Event','Other','Zoning','Dead'}:contains(new) then return end
 	-- Event may not be a real status yet. This is a blacklist to prevent people from swapping out of crafting gear or when disengaging from NPCs.
+	if old == '' then old = 'Idle' end
 	equip_sets('status_change',new,old)
 end
 
@@ -277,61 +347,6 @@ end
 
 
 
--- Non-events --
-
-
-function debug_mode(boolean)
-	if boolean then _global.debug_mode = boolean
-	else
-		_global.debug_mode = true
-	end
-end
-
-
-function show_swaps(boolean)
-	if boolean then _global.show_swaps = boolean
-	else
-		_global.show_swaps = true
-	end
-end
-
-
-function verify_equip(boolean)
-	if boolean then _global.verify_equip = boolean
-	else
-		_global.verify_equip = true
-	end
-end
-
-
-function cancel_spell(boolean)
-	if boolean then _global.cancel_spell = boolean
-	else
-		_global.cancel_spell = true
-	end
-end
-
-function force_send(boolean)
-	if boolean then _global.force_send = boolean
-	else
-		_global.force_send = true
-	end
-end
-
-function change_target(name)
-	if name then _global.storedtarget = name else
-		add_to_chat(123,'Name is nil or false')
-	end
-end
-
-function cast_delay(delay)
-	if tonumber(delay) then
-		_global.cast_delay = tonumber(delay)
-	else
-		add_to_chat(123,'Cast delay is not a number')
-	end
-end
-
 function get_spell(act)
 	local spell, abil_ID, effect_val = {}
 	local msg_ID = act['targets'][1]['actions'][1]['message']
@@ -352,7 +367,7 @@ function get_spell(act)
 				spell = r_spells[abil_ID]
 			elseif T{3,6,7,13,14,15}:contains(act['category']) then
 				spell = r_abilities[abil_ID] -- May have to correct for charmed pets some day, but I'm not sure there are any monsters with TP moves that give no message.
-			elseif T{}:contains(act['category']) then
+			elseif T{5,9}:contains(act['category']) then
 				spell = r_items[abil_ID]
 			else
 				spell = {none=tostring(msg_ID)} -- Debugging
@@ -361,7 +376,7 @@ function get_spell(act)
 		end
 		
 		
-		local fields = fieldsearch(dialog[msg_ID]['english'])
+		local fields = fieldsearch(dialog[msg_ID][language])
 		
 		if table.contains(fields,'spell') then
 			spell = r_spells[abil_ID]
@@ -396,7 +411,7 @@ function get_spell(act)
 		end
 	end
 	
-	spell.name = spell['english']
+	spell.name = spell[language]
 	return spell
 end
 
@@ -405,9 +420,9 @@ function aftercast_cost(rline)
 		return {tpaftercast = player['tp'],mpaftercast = tonumber(player['mp']),mppaftercast = tonumber(player['mpp'])}
 	end
 	if not rline['mpcost'] then rline['mpcost'] = 0 end
-	if not rline['tpcost'] then rline['tpcost'] = -1 end
+	if not rline['tpcost'] then rline['tpcost'] = 0 end
 	
-	if tonumber(rline['tpcost']) == -1 or not rline['tpcost'] then rline['tpaftercast'] = player['tp'] else
+	if tonumber(rline['tpcost']) == 0 or not rline['tpcost'] then rline['tpaftercast'] = player['tp'] else
 	rline['tpaftercast'] = player['tp'] - tonumber(rline['tpcost']) end
 	
 	if tonumber(rline['mpcost']) == 0 then

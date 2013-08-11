@@ -1,3 +1,30 @@
+--Copyright (c) 2013, Byrthnoth
+--All rights reserved.
+
+--Redistribution and use in source and binary forms, with or without
+--modification, are permitted provided that the following conditions are met:
+
+--    * Redistributions of source code must retain the above copyright
+--      notice, this list of conditions and the following disclaimer.
+--    * Redistributions in binary form must reproduce the above copyright
+--      notice, this list of conditions and the following disclaimer in the
+--      documentation and/or other materials provided with the distribution.
+--    * Neither the name of <addon name> nor the
+--      names of its contributors may be used to endorse or promote products
+--      derived from this software without specific prior written permission.
+
+--THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+--ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+--WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+--DISCLAIMED. IN NO EVENT SHALL <your name> BE LIABLE FOR ANY
+--DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+--(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+--LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+--ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+--(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+--SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
 -----------------------------------------------------------------------------------
 --Name: parse_resources()
 --Args:
@@ -20,7 +47,7 @@
 -----------------------------------------------------------------------------------
 function parse_resources(lines_file)
 	local ignore_fields = S{'index'}
-	local convert_fields = {fr='french',frl='french_log',de='german',del='german_log',jp='japanese',jpl='japanese_log'}
+	local convert_fields = {enl='english_log',fr='french',frl='french_log',de='german',del='german_log',jp='japanese',jpl='japanese_log'}
 	
 	local completed_table = {}
 	for i in ipairs(lines_file) do
@@ -109,12 +136,13 @@ function split(msg, match)
 	local length = msg:len()
 	local splitarr = T{}
 	local u = 1
+	local match_len = match:gsub('%%',''):len()
 	while u <= length do
 		local nextanch = msg:find(match,u)
 		if nextanch ~= nil then
-			splitarr[#splitarr+1] = msg:sub(u,nextanch-match:len())
+			splitarr[#splitarr+1] = msg:sub(u,nextanch-match_len)
 			if nextanch~=length then
-				u = nextanch+match:len()
+				u = nextanch+match_len
 			else
 				u = length+1
 			end

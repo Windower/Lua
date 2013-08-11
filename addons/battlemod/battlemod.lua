@@ -51,44 +51,50 @@ function event_load()
 end
 
 function options_load()
-	if not dir_exists(lua_base_path..'data/') then
-		create_dir(lua_base_path..'data/')
+	if not dir_exists(lua_base_path..'data\\') then
+		create_dir(lua_base_path..'data\\')
 	end
-	if not dir_exists(lua_base_path..'data/filters/') then
-		create_dir(lua_base_path..'data/filters/')
+	if not dir_exists(lua_base_path..'data\\filters\\') then
+		create_dir(lua_base_path..'data\\filters\\')
 	end
 	 
-	local settingsFile = file.new('data/settings.xml',true)
-	local filterFile=file.new('data/filters/filters.xml',true)
-	local colorsFile=file.new('data/colors.xml',true)
+	local settingsFile = file.new('data\\settings.xml',true)
+	local filterFile=file.new('data\\filters\\filters.xml',true)
+	local colorsFile=file.new('data\\colors.xml',true)
 	
-	if not file.exists('data/settings.xml') then
+	if not file.exists('data\\settings.xml') then
 		settingsFile:write(default_settings)
 		write('Default settings xml file created')
 	end
 	
-	local settingtab = config.load('data/settings.xml',default_settings_table)
+	local settingtab = config.load('data\\settings.xml',default_settings_table)
 	config.save(settingtab)
 	
 	for i,v in pairs(settingtab) do
 		_G[i] = v
 	end
 	
-	if not file.exists('data/filters/filters.xml') then
+	if not file.exists('data\\filters\\filters.xml') then
 		filterFile:write(default_filters)
 		write('Default filters xml file created')
 	end
 	local tempplayer = get_player()
 	if tempplayer then
-		filterload(tempplayer['main_job'])
+		if tempplayer['main_job'] ~= 'NONE' then
+			filterload(tempplayer['main_job'])
+		elseif get_mob_by_id(tempplayer['id'])['race'] == 0 then
+			filterload('MON')
+		else
+			filterload('DEFAULT')
+		end
 	else
 		filterload('DEFAULT')
 	end
-	if not file.exists('data/colors.xml') then
+	if not file.exists('data\\colors.xml') then
 		colorsFile:write(default_colors)
 		write('Default colors xml file created')
 	end
-	local colortab = config.load('data/colors.xml',default_color_table)
+	local colortab = config.load('data\\colors.xml',default_color_table)
 	config.save(colortab)
 	for i,v in pairs(colortab) do
 		color_arr[i] = colconv(v,i)
@@ -102,11 +108,11 @@ end
 
 function filterload(job)
 	if current_job == job then return end
-	if file.exists('data/filters/filters-'..job..'.xml') then
-		filter = config.load('data/filters/filters-'..job..'.xml',default_filter_table,false)
+	if file.exists('data\\filters\\filters-'..job..'.xml') then
+		filter = config.load('data\\filters\\filters-'..job..'.xml',default_filter_table,false)
 		add_to_chat(4,'Loaded '..job..' Battlemod filters')
 	else
-		filter = config.load('data/filters/filters.xml',default_filter_table,false)
+		filter = config.load('data\\filters\\filters.xml',default_filter_table,false)
 		add_to_chat(4,'Loaded default Battlemod filters')
 	end
 	current_job = job
@@ -292,6 +298,12 @@ function event_action_message(actor_id,index,actor_target_index,target_target_in
 		local actor_table = get_mob_by_id(actor_id)
 		local target_table = get_mob_by_id(index)
 		local party_table = get_party()
+		
+		if actor_table == nil then
+			return
+		elseif actor_table['name'] == nil or actor_table['is_npc'] == nil then
+			return
+		end
 		
 		local actor = actor_table['name']
 		local target = target_table['name']

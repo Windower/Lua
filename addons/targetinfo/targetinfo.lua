@@ -7,73 +7,71 @@ _addon = {}
 _addon.name = 'TargetInfo'
 _addon.command = 'targetinfo'
 _addon.shortcommand = 'ti'
-_addon.ver = 0.9
+_addon.ver = '1.0.0.0'
 
 defaults = {}
 defaults.showhexid = true
-defaults.showfullid = false
-defaults.showspeed = false
-defaults.pos = {}
-defaults.pos.x = 0
-defaults.pos.y = 0
-defaults.bg = {}
-defaults.bg.red = 0
-defaults.bg.green = 0
-defaults.bg.blue = 0
-defaults.bg.alpha = 102
-defaults.text = {}
-defaults.text.font = 'Arial'
-defaults.text.red = 0
-defaults.text.green = 0
-defaults.text.blue = 0
-defaults.text.alpha = 255
-defaults.text.size = 12
+defaults.showfullid = true
+defaults.showspeed = true
+defaults.display = {}
+defaults.display.pos = {}
+defaults.display.pos.x = 0
+defaults.display.pos.y = 0
+defaults.display.bg = {}
+defaults.display.bg.red = 0
+defaults.display.bg.green = 0
+defaults.display.bg.blue = 0
+defaults.display.bg.alpha = 102
+defaults.display.text = {}
+defaults.display.text.font = 'Consolas'
+defaults.display.text.red = 255
+defaults.display.text.green = 255
+defaults.display.text.blue = 255
+defaults.display.text.alpha = 255
+defaults.display.text.size = 12
 
 text = {}
 
-function setID(index)
-    if index == 0 then
-        text:hide()        
-        return
-    end
-
-    local mob = get_mob_by_index(index)
-    local id = mob['id']
-
-    if id and id > 0 then
-        text:show()
-        if mob['is_npc'] then
-            text:text(id:tohex():slice(-3))
-        else
-            text:hide()
-        end
-    else
-        text:hide()
-    end
-end
-
 -- Events
 
-function event_target_change(target_index)
-    setID(target_index)
+function render_box()
+	local mob = get_mob_by_target('t')
+	if mob and mob.id > 0 and mob.is_npc then
+        local info = {}
+        info.hex = mob.id:hex():slice(-3)
+        info.full = mob.id
+        local speed = math.round(100*(mob.speed/4 - 1), 2)
+        info.speed = (
+            speed > 0 and
+                '\\cs(0,255,0)+'..speed
+            or speed < 0 and
+                '\\cs(255,0,0)'..speed
+            or
+                speed)..'%\\cr'
+        text_box:update(info)
+        text_box:show()
+	else
+		text_box:hide()
+	end
 end
 
 -- Constructor
 
-function event_load()
-    settings = config.load(defaults)
-    settings:save()
+register_event('load', function()
+	settings = config.load(defaults)
+	settings:save()
 
-    text = texts.new(settings)
+    local properties = L{}
+    if settings.showhexid then
+        properties:append('Hex ID:  ${hex|-}')
+    end
+    if settings.showfullid then
+        properties:append('Full ID: ${full|-}')
+    end
+    if settings.showspeed then
+        properties:append('Speed:   ${speed|-}')
+    end
+	text_box = texts.new(properties:concat('\n'), settings.display, settings)
 
-    setID(get_player()['target_index'])
-    
-    send_command('alias targetinfo')
-end
-
--- Destructor
-
-function event_unload()
-    text:destroy()
-    send_command('unalias targetid')
-end
+    register_event('prerender', render_box)
+end)

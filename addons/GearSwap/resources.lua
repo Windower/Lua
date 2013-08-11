@@ -1,3 +1,30 @@
+--Copyright (c) 2013, Byrthnoth
+--All rights reserved.
+
+--Redistribution and use in source and binary forms, with or without
+--modification, are permitted provided that the following conditions are met:
+
+--    * Redistributions of source code must retain the above copyright
+--      notice, this list of conditions and the following disclaimer.
+--    * Redistributions in binary form must reproduce the above copyright
+--      notice, this list of conditions and the following disclaimer in the
+--      documentation and/or other materials provided with the distribution.
+--    * Neither the name of <addon name> nor the
+--      names of its contributors may be used to endorse or promote products
+--      derived from this software without specific prior written permission.
+
+--THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+--ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+--WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+--DISCLAIMED. IN NO EVENT SHALL <your name> BE LIABLE FOR ANY
+--DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+--(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+--LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+--ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+--(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+--SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
 speFile = file.new('../../plugins/resources/spells.xml')
 jaFile = file.new('../../plugins/resources/abils.xml')
 statusFile = file.new('../../plugins/resources/status.xml')
@@ -15,45 +42,58 @@ r_mabils = parse_resources(r_mabilsFile:readlines())
 
 
 -- Convert the spells and job abilities into a referenceable list of aliases --
-validabils = T{}
+validabils = {}
+validabils['english'] = T{}
+validabils['french'] = T{}
+validabils['german'] = T{}
+validabils['japanese'] = T{}
 
-function make_abil(abil,t,i)
-	if not rawget(validabils,abil:lower()) then
-		validabils[abil:lower()] = {}
+function make_abil(abil,lang,t,i)
+	if not abil[lang] then return end
+	local temptab = validabils[lang]
+	local sp = abil[lang]:lower()
+	
+	if not rawget(temptab,sp) then
+		temptab[sp] = {}
 	end
-	validabils[abil:lower()][t] = i
+	temptab[sp][t] = i
+end
+
+function make_entry(v,typ,i)
+	if not v.targets then v.targets = 'None' end
+	v['validtarget'] = {Self=false,Player=false,Party=false,Ally=false,NPC=false,Enemy=false}
+	local potential_targets = split(v['targets'],', ')
+	for n,m in pairs(potential_targets) do
+		v['validtarget'][m] = true
+	end
+	if not v.tpcost or v.tpcost == -1 then v.tpcost = 0 end
+	if not v.mpcost or v.mpcost == -1 then v.mpcost = 0 end
+	if not v.prefix then
+		if typ == 'Magic' then v.prefix = '/ma'
+		elseif typ == 'Ability' then v.prefix = '/ja'
+		elseif typ == 'Item' then v.prefix = '/item'
+		end
+	end
+	if not v.element then v.element = 'None' end
+	if not v.type then v.type = typ end
+	if not v.recast then v.recast = 0 end
+	if not v.casttime then v.casttime = 0 end
+	if not v.skill then v.skill = typ end
+	
+	make_abil(v,'english',typ,i)
+	make_abil(v,'german',typ,i)
+	make_abil(v,'french',typ,i)
+	make_abil(v,'japanese',typ,i)
+	
+	return v
 end
 
 for i,v in pairs(r_spells) do
-	v['validtarget'] = {Self=false,Player=false,Party=false,Ally=false,NPC=false,Enemy=false}
-	local potential_targets = split(v['targets'],', ')
-	for n,m in pairs(potential_targets) do
-		v['validtarget'][m] = true
-	end
-	
-	make_abil(v['english'],'Magic',i)
-	if v['alias'] then
-		local struck = split(v['alias'],'|')
-		for n,m in pairs(struck) do
-			make_abil(m,'Magic',i)
-		end
-	end
+	v = make_entry(v,'Magic',i)
 end
 
 for i,v in pairs(r_abilities) do
-	v['validtarget'] = {Self=false,Player=false,Party=false,Ally=false,NPC=false,Enemy=false}
-	local potential_targets = split(v['targets'],', ')
-	for n,m in pairs(potential_targets) do
-		v['validtarget'][m] = true
-	end
-	
-	make_abil(v['english'],'Ability',i)
-	if v['alias'] then
-		local struck = split(v['alias'],'|')
-		for n,m in pairs(struck) do
-			make_abil(m,'Ability',i)
-		end
-	end
+	v = make_entry(v,'Ability',i)
 end
 
 -- Item processing --
@@ -61,11 +101,12 @@ r_items = table.range(65535)
 r_items:update(parse_resources(r_itemsGFile:readlines()))
 r_items:update(parse_resources(r_itemsAFile:readlines()))
 r_items:update(parse_resources(r_itemsWFile:readlines()))
-en_item_names = {}
 
 for i,v in pairs(r_items) do
-	if v['enl'] then
-		en_item_names[v['enl']] = i
+	if type(v) == 'table' then
+		if v.targets ~= 'None' then
+			v = make_entry(v,'Item',i)
+		end
 	end
 end
 
@@ -84,6 +125,9 @@ command_list = {['/ja']='Ability',['/jobability']='Ability',['/so']='Magic',['/s
 	['/ra']='Ranged Attack',['/range']='Ranged Attack',['/throw']='Ranged Attack',['/shoot']='Ranged Attack',['/ms']='Ability',['/monsterskill']='Ability',
 	['/ws']='Ability',['/weaponskill']='Ability',['/item']='Item',['/pet']='Ability'}
 
+ranged_line = {name='Ranged Attack',english='Ranged Attack',prefix='/range',element='None',targets='Enemy',skill='Ability',mpcost=0,
+	tpcost=0,casttime=0,recast=0,validtarget={Self=false,Player=false,Party=false,Ally=false,NPC=false,Enemy=true}}
+
 category_map = T{'Melee Swing','Ranged Attack','Weapon Skill','Magic','Item','Ability','Weapon Skill','Magic','Item','None','TP Move','Ranged Attack','Pet','Ability','Ability'}
 
 jobs = {WAR=0x00000002,MNK=0x00000004,WHM=0x00000008,BLM=0x00000010,RDM=0x00000020,THF=0x00000040,PLD=0x00000080,DRK=0x00000100,BST=0x00000200,BRD=0x00000400,
@@ -98,7 +142,7 @@ dat_races = {HumeM=0x0002,HumeF=0x0004,ElvaanM=0x0008,ElvaanF=0x0010,TaruM=0x002
 jas = {false,false,false,false,false,true,false,false,false,false,false,false,false,true,true,false}--6,14,15}
 readies = {false,false,false,false,false,false,true,true,true,false,false,true,false,false,false,false}--{7,8,9,12}
 uses = {false,true,true,true,true,false,false,false,false,false,false,false,true,false,false,false}--{2,3,4,5,13}
-unable_to_use = T{17,18,55,56,87,88,89,90,104,191,308,313,325,410,428,561,574,579,580,581,661,665,4,5,12,16,34,35,40,47,48,49,62,71,72,76,78,84,91,92,94,95,96,106,111,128,154,155,190,192,193,198,199,215,216,217,218,219,220,233,246,247,307,315,316,328,337,338,346,347,348,349,356,411,443,444,445,446,514,516,517,518,524,525,547,568,569,575,649,660,662,666} -- Probably don't need some of these (event action)
+unable_to_use = T{17,18,55,56,87,88,89,90,104,191,308,313,325,410,428,561,574,579,580,581,661,665,4,5,12,16,34,35,40,47,48,49,71,72,76,78,84,91,92,94,95,96,106,111,128,154,155,190,192,193,198,199,215,216,217,218,219,220,233,246,247,307,315,316,328,337,338,346,347,348,349,356,411,443,444,445,446,514,516,517,518,523,524,525,547,568,569,575,649,660,662,666} -- Probably don't need some of these (event action)
 pass_through_targs = T{'<t>','<me>','<ft>','<scan>','<bt>','<lastst>','<r>','<pet>','<p0>','<p1>','<p2>','<p3>','<p4>',
 	'<p5>','<a10>','<a11>','<a12>','<a13>','<a14>','<a15>','<a20>','<a21>','<a22>','<a23>','<a24>','<a25>'}
 st_targs = T{'<stnpc>','<stal>','<stpc>','<stpt>'}
@@ -128,7 +172,7 @@ player = {}
 alliance = {}
 player.equipment = {}
 pet = {isvalid=false}
-st_flag = true
+st_flag = false
 current_job_file = nil
 
 

@@ -13,8 +13,8 @@ function get_sets()
 		ring1="Minstrel's ring",ring2="Prolix Ring",back="Swith Cape",waist="Aoidos' Belt",legs="Orvail Pants",
 		feet="Bokwus Boots"}
 		
-	sets.precast_FC = {head="Nares Cap",neck="Orunmila's Torque",ear1="Loquac. Earring",body="Marduk's Jubbah +1",
-		hands="Repartie Gloves",ring2="Prolix Ring",back="Swith Cape",waist="Siegel Sash",legs="Orvail Pants",
+	sets.precast_FC = {head="Nahtirah Hat",neck="Orunmila's Torque",ear1="Loquac. Earring",body="Marduk's Jubbah +1",
+		hands="Mdk. Dastanas +1",ring2="Prolix Ring",back="Swith Cape",waist="Siegel Sash",legs="Orvail Pants",
 		feet="Rostrum Pumps"}
 		
 	sets.precast_Cure = {body="Heka's Kalasiris",legs="Nabu's Shalwar",back="Pahtli Cape"}
@@ -67,7 +67,11 @@ end
 
 function precast(spell,action)
 	if spell.type == 'BardSong' then
-		verify_equip()
+		if string.find(world.area:lower(),'cirdas caverns') then
+			cast_delay(0.5)
+		else
+			verify_equip()
+		end
 		if spell.target.type == 'PLAYER' and not buffactive.pianissimo then
 			cast_delay(1.5)
 			send_command('@input /raw /ja "Pianissimo" <me>')
@@ -97,11 +101,15 @@ function midcast(spell,action)
 	if spell.type == 'BardSong' then
 		if spell.english == 'Water Carol' or spell.english == 'Water Carol II' or spell.english == 'Herb Pastoral' or spell.english == 'Goblin Gavotte' then
 			equip(sets.midcast_Base,sets.midcast_DBuff)
-		elseif spell.target.type == 'MONSTER' then
-			equip(sets.midcast_Base,sets.midcast_Debuff,sets.midcast_GBuff)
+		elseif spell.target then
+			if spell.target.type == 'MONSTER' then
+				equip(sets.midcast_Base,sets.midcast_Debuff,sets.midcast_GBuff)
+			else
+				equip(sets.midcast_Base,sets.midcast_Buff,sets.midcast_GBuff)
+				if string.find(spell.english,'Ballad') then equip(sets.midcast_Ballad) end
+			end
 		else
-			equip(sets.midcast_Base,sets.midcast_Buff,sets.midcast_GBuff)
-			if string.find(spell.english,'Ballad') then equip(sets.midcast_Ballad) end
+			write('Nil error line 104: '..spell.english)
 		end
 	elseif string.find(spell.english,'Cur') then
 		equip(sets.midcast_Base,sets.midcast_Cure)

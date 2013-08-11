@@ -120,7 +120,7 @@ end
 
 -- List of valid prefixes to be interpreted. The values currently have no use.
 command_list = {['/ja']='Ability',['/jobability']='Ability',['/so']='Magic',['/song']='Magic',['/ma']='Magic',['/magic']='Magic',['/nin']='Magic',['/ninjutsu']='Magic',
-	['/ra']='Ranged Attack',['/range']='Ranged Attack',['/throw']='Ranged Attack',['/shoot']='Ranged Attack',['/ms']='Weapon Skill',['/monsterskill']='Ability',
+	['/ra']='Ranged Attack',['/range']='Ranged Attack',['/throw']='Ranged Attack',['/shoot']='Ranged Attack',['/ms']='Weapon Skill',['/monsterskill']='Ability',['/ms']='Ability',
 	['/ws']='Weapon Skill',['/weaponskill']='Weapon Skill',['/item']='Ability',['/pet']='Ability'}
 
 -- List of other commands that might use name completion.
@@ -141,4 +141,8 @@ ignore_list = {['/equip']=true,['/raw']=true,['/fish']=true,['/dig']=true,['/ran
 pass_through_targs = T{'<t>','<me>','<ft>','<scan>','<bt>','<lastst>','<r>','<pet>','<p0>','<p1>','<p2>','<p3>','<p4>',
 	'<p5>','<a10>','<a11>','<a12>','<a13>','<a14>','<a15>','<a20>','<a21>','<a22>','<a23>','<a24>','<a25>','<stpc>','<stal>','<stnpc>','<stpt>'}
 
+targ_reps = {t='<t>',me='<me>',ft='<ft>',scan='<scan>',bt='<bt>',lastst='<lastst>',r='<r>',pet='<pet>',p0='<p0>',p1='<p1>',p2='<p2>',p3='<p3>',p4='<p4>',
+	p5='<p5>',a10='<a10>',a11='<a11>',a12='<a12>',a13='<a13>',a14='<a14>',a15='<a15>',a20='<a20>',a21='<a21>',a22='<a22>',a23='<a23>',a24='<a24>',a25='<a25>',
+	stpc='<stpc>',stal='<stal>',stnpc='<stnpc>',stpt='<stpt>'}
+	
 language = 'english' -- get_ffxi_info()['language']:lower()
