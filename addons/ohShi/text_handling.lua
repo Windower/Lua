@@ -1,3 +1,31 @@
+--[[
+Copyright (c) 2013, Ricky Gall
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+    * Neither the name of <addon name> nor the
+    names of its contributors may be used to endorse or promote products
+    derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL <your name> BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+]]
+
 texts = require 'texts'
 
 --Create the textbox
@@ -5,7 +33,7 @@ function initText()
     ohShi_tb = texts.new(settings)
     tracking:append('ohShi initialized ')
     textUpdate()
-    send_command('@wait '..settings.duration..'; lua i ohshi remText')
+    windower.send_command('@wait '..settings.duration..'; lua i ohshi remText')
 end
 
 --Removes first line of a textbox
@@ -57,7 +85,7 @@ function addText(name,abtype,abil,dMob,dangerous)
             tracking:append(' '..str)
         end
     end
-    send_command('@wait '..settings.duration..'; lua i ohshinew remText')
+    windower.send_command('@wait '..settings.duration..'; lua i ohshinew remText')
     textUpdate()
 end
 
@@ -86,19 +114,19 @@ end
 function flashImage()
     local name = 'ohShi'..tostring(math.random(10000000,99999999))
     prims:add(name)
-    prim_create(name)
-    prim_set_color(name,255,255,255,255)
-    prim_set_fit_to_texture(name,false)
-    prim_set_texture(name,lua_base_path..'data/warning.png')
-    prim_set_repeat(name,1,1)
-    prim_set_visibility(name,true)
-    prim_set_position(name,settings.pos.x-30,settings.pos.y-10)
-    prim_set_size(name,30,30)
-    send_command('@wait '..settings['duration']..';lua i ohshinew deleteImage '..name)
+    windower.prim.create(name)
+    windower.prim.set_color(name,255,255,255,255)
+    windower.prim.set_fit_to_texture(name,false)
+    windower.prim.set_texture(name,lua_base_path..'data/warning.png')
+    windower.prim.set_repeat(name,1,1)
+    windower.prim.set_visibility(name,true)
+    windower.prim.set_position(name,settings.pos.x-30,settings.pos.y-10)
+    windower.prim.set_size(name,30,30)
+    windower.send_command('@wait '..settings['duration']..';lua i ohshinew deleteImage '..name)
 end
 
 --Called to delete the image after it's time is up.
 function deleteImage(str)
     prims:remove(str)
-    prim_delete(str)
+    windower.prim.delete(str)
 end

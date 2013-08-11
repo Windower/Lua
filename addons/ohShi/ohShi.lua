@@ -42,32 +42,27 @@ chat = require 'chat'
 require 'default_settings'
 require 'text_handling'
 require 'helper_functions'
-
 --This function is called when the addon loads. Defines aliases and 
 --registers functions, as well as filling the resource tables.
-function event_load()
+function onLoad()
     notice('Version '.._addon.version..' Loaded. Type //ohshi help for list of commands.')
-    register_event('action', getAct)
-    register_event('action message',statuswore)
-    register_event('addon command',commands)
-    register_event('incoming text',getIncText)
     spells = parse_resources(speFile:readlines())
     stats = parse_resources(staFile:readlines())
     jAbils = parse_resources(jaFile:readlines())
     mAbils = parse_resources(maFile:readlines())
-    send_command('alias ohshi lua c ohshi')
+    windower.send_command('alias ohshi lua c ohshi')
     initText()
 end
 
 --Used when the addon is unloaded to save settings.
-function event_unload()
+function onUnload()
     settings:update(ohShi_tb._settings)
     settings.bg.alpha = nil
     settings.padding = nil
     settings.text.alpha = nil
     settings.text.content = nil
     settings.visible = nil
-    send_command('unalias ohshi')
+    windower.send_command('unalias ohshi')
     settings:save('all')
 end
 
@@ -166,11 +161,11 @@ function commands(...)
                 ohShi_tb:hide()
                 settings:save('all')
             elseif comm == 'settings' then 
-                add_to_chat(207,'OhShi - Current Textbox Settings')
-                add_to_chat(207,'  BG:   R: '..settings.bg.red..'  G: '..settings.bg.green..'  B: '..settings.bg.blue)
-                add_to_chat(207,'  Font: '..settings.text.font..'  Size: '..settings.text.size)
-                add_to_chat(207,'  Text: R: '..settings.text.red..'  G: '..settings.text.green..'  B: '..settings.text.blue)
-                add_to_chat(207,'  Pos:  X: '..settings.pos.x..'| Y: '..settings.pos.y)
+                windower.add_to_chat(207,'OhShi - Current Textbox Settings')
+                windower.add_to_chat(207,'  BG:   R: '..settings.bg.red..'  G: '..settings.bg.green..'  B: '..settings.bg.blue)
+                windower.add_to_chat(207,'  Font: '..settings.text.font..'  Size: '..settings.text.size)
+                windower.add_to_chat(207,'  Text: R: '..settings.text.red..'  G: '..settings.text.green..'  B: '..settings.text.blue)
+                windower.add_to_chat(207,'  Pos:  X: '..settings.pos.x..'  Y: '..settings.pos.y)
             end
         else
             local helptext = [[OhShi - Command List:
@@ -187,7 +182,7 @@ function commands(...)
     settings - shows current textbox settings
     show/hide - toggles visibility of the tracker so you can make changes.]]
             for _, line in ipairs(helptext:split('\n')) do
-                add_to_chat(207, line..chat.colorcontrols.reset)
+                windower.add_to_chat(207, line..chat.colorcontrols.reset)
             end
         end
     end
@@ -198,13 +193,13 @@ function getAct(act)
     local curact = T(act)
     local actor = T{}
     actor.id = curact.actor_id
-    actor.name = get_mob_by_id(actor.id)['name']
+    actor.name = windower.ffxi.get_mob_by_id(actor.id)['name']
     local extparam = curact.param
     local targets = curact.targets
-    local party = T(get_party())
+    local party = T(windower.ffxi.get_party())
     local typ = ''
     local danger = false
-    local player = T(get_player())
+    local player = T(windower.ffxi.get_player())
     
     if not settings.staggeronly then
         if settings.showrolls and curact.category == 6 and jAbils[extparam]['type'] == 'CorsairRoll' then
@@ -235,9 +230,9 @@ end
 --Catches statuses wearing on mobs you applied them to
 function statuswore(actor_id, target_id, actor_index, target_index, message_id, param_1, param_2, param_3)
     if not settings.staggeronly then
-        local actor = T(get_mob_by_id(actor_id))
-        local player = T(get_player())
-        local target = T(get_mob_by_id(target_id))
+        local actor = T(windower.ffxi.get_mob_by_id(actor_id))
+        local player = T(windower.ffxi.get_player())
+        local target = T(windower.ffxi.get_mob_by_id(target_id))
         if S{204,205,206}:contains(message_id) and isMob(target_id) then
             if actor.id == player.id then
                 if mCheck(target.name) then
@@ -270,3 +265,9 @@ function getIncText(old,new,color)
     return new,color
 end
 
+windower.register_event('load',onLoad)
+windower.register_event('unload',onUnload)
+windower.register_event('action', getAct)
+windower.register_event('action message',statuswore)
+windower.register_event('addon command',commands)
+windower.register_event('incoming text',getIncText)

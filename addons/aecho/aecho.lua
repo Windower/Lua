@@ -51,44 +51,45 @@ function initialize()
     autoecho = true
 end
 
-function event_load()
-    send_command('alias aecho lua c aecho')
-    if get_ffxi_info()['logged_in'] then
+function onLoad()
+    windower.send_command('alias aecho lua c aecho')
+    if windower.get_ffxi_info()['logged_in'] then
         initialize()
     end
 end
 
-function event_login()
+function onLogin()
     initialize()
 end
 
-function event_unload()
-    send_command('unalias aecho')
+function onUnload()
+    windower.send_command('unalias aecho')
 end
 
-function event_gain_status(id,name)
+function gainStatus(id,name)
     for key,val in pairs(settings.buffs) do
-        if key:lower() ==name:lower() then
+        if key:lower() == name:lower() then
             if name:lower() == 'silence' and autoecho then
-                send_command('input /item "Echo Drops" '..get_player()["name"])
+                windower.send_command('input /item "Echo Drops" '..windower.ffxi.get_player()["name"])
             end
             if settings.alttrack then
-                send_command('send @others atc '..get_player()["name"]..' - '..name)
+                windower.send_command('send @others atc '..windower.ffxi.get_player()["name"]..' - '..name)
             end
         end
     end
 end
 
-function event_incoming_text(old,new,color)
+function incText(old,new,color)
     if settings.sitrack then
         local sta,ea,txt = string.find(new,'The effect of ([%w]+) is about to wear off.')
         if sta ~= nil then 
-            send_command('@send @others atc '..get_player()['name']..' - '..txt..' wearing off.')
+            windower.send_command('@send @others atc '..windower.ffxi.get_player()['name']..' - '..txt..' wearing off.')
         end
     end
     return new,color
 end
-function event_addon_command(...)
+
+function commands(...)
     local args = {...}
     if args[1] ~= nil then
         local comm = args[1]:lower()
@@ -136,3 +137,10 @@ function event_addon_command(...)
         end
     end
 end
+
+windower.register_event('load', onLoad)
+windower.register_event('unload', onUnload)
+windower.register_event('login', onLogin)
+windower.register_event('gain status', gainStatus)
+windower.register_event('incoming text', incText)
+windower.register_event('addon command', commands)
