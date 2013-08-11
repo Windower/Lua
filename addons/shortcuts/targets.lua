@@ -97,7 +97,28 @@ function target_make(targets)
 	----------------------------------------------------------------------------------------------
 	-- Should add additional filtering here to tell whether or not <t> will return a valid target.
 	----------------------------------------------------------------------------------------------
-	if targets['Player'] or targets['Party'] or targets['Ally'] or targets['Enemy'] or targets['NPC'] then
+	local target = get_mob_by_target('<t>')
+	local target_type = 'Self'
+	if not target then
+	elseif target['is_npc'] then
+		target_type = 'Enemy'
+		-- Need to add handling that differentiates 'Enemy' and 'NPC' here.
+	else
+		target_type = 'Player'
+		local party = get_party()
+		for i,v in pairs(party) do
+			if v.name == target.name then
+				if i:sub(1,1) == 'p' then
+					target_type = 'Party'
+				else
+					target_type = 'Ally'
+				end
+				break
+			end
+		end
+	end
+	
+	if targets[target_type] then
 		return '<t>'
 --	elseif targets['Self'] then
 --		spell_targ = '<me>'

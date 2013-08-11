@@ -41,7 +41,7 @@ require 'ambiguous_names'
 require 'targets'
 
 _addon = {}
-_addon.version = '0.5'
+_addon.version = '0.6'
 _addon.name = 'Shortcuts'
 _addon.commands = {'shortcuts'}
 
@@ -84,6 +84,7 @@ end
 -----------------------------------------------------------------------------------
 function event_outgoing_text(original,modified)
 	local temp_org = convert_auto_trans(original)
+	if original:sub(1,1) ~= '/' then return modified end
 	temp_org = temp_org:gsub(' <wait %d+>','')
 	if logging then
 		logfile:write('\n\n',tostring(os.clock()),'temp_org: ',temp_org,'\nModified: ',modified)

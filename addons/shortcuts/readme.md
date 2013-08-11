@@ -9,6 +9,7 @@ project, but its feature stands on its own so it has been released now.
 None  
 
 ####Changelog:  
+v0.6 - 08/11/13 - Fixed autotranslate, eliminated valid commands that aren't prefixed by '/', and made target creation smarter.
 v0.5 - 08/05/13 - Added handling for <st..> commands and support for target shorthands (t for <t>, stpc for <stpc>, etc.)
 v0.4 - 07/25/13 - Added handling for Monstrosity. Added logging. Modified target handling.
 v0.3 - 07/14/13 - Fixed an ambiguous_names error. Retooled some parts in anticipation of the new hook and Monstrosity. Added infinite loop detection.
