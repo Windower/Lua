@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon = {}
 _addon.name = 'AzureSets'
-_addon.version = '1.151'
+_addon.version = '1.2'
 
 require 'tablehelper'
 require 'stringhelper'
@@ -54,9 +54,9 @@ function initialize()
     get_current_spellset()
 end
 
-function event_load()
-    send_command('alias azureset lua c azureSets')
-    send_command('alias aset lua c azureSets')
+function onLoad()
+    windower.send_command('alias azureset lua c azureSets')
+    windower.send_command('alias aset lua c azureSets')
     speFile = files.new('data/bluespells.xml')
     spells = T{}
     spells = parse_resources(speFile:readlines())
@@ -64,29 +64,29 @@ function event_load()
     initialize()
 end
 
-function event_login()
+function onLogin()
     initialize()
 end
 
-function event_unload()
-    send_command('unalias azureset')
-    send_command('unalias aset')
+function onUnload()
+    windower.send_command('unalias azureset')
+    windower.send_command('unalias aset')
 end
 
-function event_job_change(mjob_id, mjob, mjob_lvl, sjob_id, sjob, sjob_lvl)
+function jobChange(mjob_id, mjob, mjob_lvl, sjob_id, sjob, sjob_lvl)
     if mjob_id == 16 then
         initialize()
     end
 end
 
 function set_spells(spellset)
-    if get_player()['main_job_id'] ~= 16 --[[and get_player()['sub_job_id'] ~= 16]] then return nil end
+    if windower.ffxi.get_player()['main_job_id'] ~= 16 --[[and get_player()['sub_job_id'] ~= 16]] then return nil end
     if settings.spellsets[spellset] == nil then return end
     if settings.spellsets[spellset]:equals(get_current_spellset()) then
         error(spellset..' was already equipped.')
         return
     end
-    reset_blue_magic_spells()
+    windower.packets.reset_blue_magic_spells()
     log('Starting to set '..spellset..'.')
     set_spells_from_spellset(spellset,1)
     return
@@ -101,22 +101,22 @@ function set_spells_from_spellset(spellset,slot)
     if tempname ~= nil then
         for id = 1, #spells do
             if spells[id]['english']:lower() == tempname:lower() then
-                set_blue_magic_spell(spells[id]['index'], tonumber(slot))
+                windower.packets.set_blue_magic_spell(spells[id]['index'], tonumber(slot))
                 break
             end
         end
     end
     if tonumber(slot) < 20 then
-        send_command('@wait .5;lua i azuresets set_spells_from_spellset '..spellset..' '..slot+1)
+        windower.send_command('@wait .5;lua i azuresets set_spells_from_spellset '..spellset..' '..slot+1)
     else
         log(spellset..' has been equipped.')
-        send_command('@timers c "Blue Magic Cooldown" 60 up')
+        windower.send_command('@timers c "Blue Magic Cooldown" 60 up')
     end
     
 end
 
 function set_single_spell(spell,slot)
-    if get_player()['main_job_id'] ~= 16 --[[and get_player()['sub_job_id'] ~= 16]] then return nil end
+    if windower.ffxi.get_player()['main_job_id'] ~= 16 --[[and get_player()['sub_job_id'] ~= 16]] then return nil end
     
     local tmpTable = T(get_current_spellset())
     for key,val in pairs(tmpTable) do
@@ -131,8 +131,8 @@ function set_single_spell(spell,slot)
         if spells[id]['english']:lower() == spell then
             --This is where single spell setting code goes.
             --Need to set by spell index rather than name.
-            set_blue_magic_spell(spells[id]['index'], tonumber(slot))
-            send_command('@timers c "Blue Magic Cooldown" 60 up')
+            windower.packets.set_blue_magic_spell(spells[id]['index'], tonumber(slot))
+            windower.send_command('@timers c "Blue Magic Cooldown" 60 up')
             tmpTable['slot'..slot] = spell
         end
     end
@@ -140,11 +140,11 @@ function set_single_spell(spell,slot)
 end
 
 function get_current_spellset()
-    if get_player()['main_job_id'] ~= 16 --[[and get_player()['sub_job_id'] ~= 16]] then return nil end
+    if windower.ffxi.get_player()['main_job_id'] ~= 16 --[[and get_player()['sub_job_id'] ~= 16]] then return nil end
     local spellTable = T{}
     local tmpTable = T{}
-    if get_player()['main_job_id'] == 16 then
-        local tmpTable = T(get_mjob_data()['spells'])
+    if windower.ffxi.get_player()['main_job_id'] == 16 then
+        local tmpTable = T(windower.ffxi.get_mjob_data()['spells'])
         local i,id
         for i = 1, #tmpTable do
             local t = ''
@@ -162,32 +162,8 @@ function get_current_spellset()
     return spellTable
 end
 
---[[ Not yet implemented
-function remove_one_spell(spell)
-    if get_player()['main_job_id'] ~= 16 and get_player()['sub_job_id'] ~= 16 then return nil end
-    local st,en,loc
-    local tmpTable = T(get_current_spellset())
-    for key,val in pairs(tmpTable) do
-        if tmpTable[key] == spell then 
-            st,en,loc = string.find(key,'slot(%d+)')
-        end
-    end
-    --insert spell add code here
-    for id = 1, #spells do
-        if spells[id]['english']:lower()] == spell then
-            --This is where single spell removing code goes.
-            --Need to remove by spell index rather than name.
-            log('Removing '..spell..' from slot '..tonumber(loc)..'.')
-            tmpTable['slot'..loc] = nil
-        end
-    end
-    tmpTable:vprint()
-    tmpTable = nil
-end
-]]
-
 function remove_all_spells(trigger)
-    reset_blue_magic_spells()
+    windower.packets.reset_blue_magic_spells()
     notice('All spells removed.')
 end
 
@@ -220,7 +196,7 @@ function get_spellset_content(spellset)
     settings.spellsets[spellset]:print()
 end
 
-function event_addon_command(...)
+function commands(...)
     if get_player()['main_job_id'] ~= 16 --[[and get_player()['sub_job_id'] ~= 16]] then
         error('You are not on (main) Blue Mage.')
         return nil 
@@ -298,3 +274,9 @@ function parse_resources(lines_file)
     end
     return completed_table
 end
+
+windower.register_event('addon command', commands)
+windower.register_event('load', onLoad)
+windower.register_event('login', onLogin)
+windower.register_event('unload', onUnload)
+windower.register_event('job change', jobChange)
