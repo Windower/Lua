@@ -1,0 +1,76 @@
+<?xml version="1.1"?>
+
+<attachments>
+  <i id="8193" fire="2" wind="2" thunder="2" light="0" ice="2" earth="2" water="2" dark="0" english="Harlequin Head" />
+  <i id="8194" fire="3" wind="2" thunder="2" light="2" ice="0" earth="3" water="0" dark="0" english="Valoredge Head" />
+  <i id="8195" fire="3" wind="3" thunder="2" light="2" ice="0" earth="0" water="2" dark="0" english="Sharpshot Head" />
+  <i id="8196" fire="0" wind="2" thunder="0" light="0" ice="3" earth="2" water="3" dark="2" english="Stormwaker Head" />
+  <i id="8197" fire="0" wind="2" thunder="0" light="3" ice="3" earth="2" water="3" dark="0" english="Soulsoother Head" />
+  <i id="8198" fire="0" wind="2" thunder="0" light="0" ice="3" earth="2" water="3" dark="3" english="Spiritreaver Head" />
+  <i id="8224" fire="3" wind="3" thunder="3" light="3" ice="3" earth="3" water="3" dark="3" english="Harlequin Frame" />
+  <i id="8225" fire="4" wind="3" thunder="3" light="3" ice="2" earth="4" water="3" dark="2" english="Valoredge Frame" />
+  <i id="8226" fire="3" wind="4" thunder="4" light="3" ice="2" earth="3" water="3" dark="2" english="Sharpshot Frame" />
+  <i id="8227" fire="2" wind="2" thunder="3" light="3" ice="4" earth="3" water="3" dark="4" english="Stormwaker Frame" />
+  <i id="8449" fire="1" wind="0" thunder="0" light="0" ice="0" earth="0" water="0" dark="0" english="Strobe" />
+  <i id="8450" fire="2" wind="0" thunder="0" light="0" ice="0" earth="0" water="0" dark="0" english="Tension Spring" />
+  <i id="8451" fire="1" wind="0" thunder="0" light="0" ice="0" earth="0" water="0" dark="0" english="Inhibitor" />
+  <i id="8452" fire="3" wind="0" thunder="0" light="0" ice="0" earth="0" water="0" dark="0" english="Tension Spring II" />
+  <i id="8453" fire="2" wind="0" thunder="0" light="0" ice="0" earth="0" water="0" dark="0" english="Attuner" />
+  <i id="8454" fire="1" wind="0" thunder="0" light="0" ice="0" earth="0" water="0" dark="0" english="Reactive Shield" />
+  <i id="8455" fire="1" wind="0" thunder="0" light="0" ice="0" earth="0" water="0" dark="0" english="Flame Holder" />
+  <i id="8456" fire="2" wind="0" thunder="0" light="0" ice="0" earth="0" water="0" dark="0" english="Heat Capacitor" />
+  <i id="8481" fire="0" wind="0" thunder="0" light="0" ice="2" earth="0" water="0" dark="0" english="Mana Booster" />
+  <i id="8482" fire="0" wind="0" thunder="0" light="0" ice="2" earth="0" water="0" dark="0" english="Loudspeaker" />
+  <i id="8483" fire="0" wind="0" thunder="0" light="0" ice="1" earth="0" water="0" dark="0" english="Scanner" />
+  <i id="8484" fire="0" wind="0" thunder="0" light="0" ice="3" earth="0" water="0" dark="0" english="Loudspeaker II" />
+  <i id="8485" fire="0" wind="0" thunder="0" light="0" ice="2" earth="0" water="0" dark="0" english="Tactical Processor" />
+  <i id="8486" fire="0" wind="0" thunder="0" light="0" ice="2" earth="0" water="0" dark="0" english="Tranquilizer" />
+  <i id="8487" fire="0" wind="0" thunder="0" light="0" ice="1" earth="0" water="0" dark="0" english="Ice Maker" />
+  <i id="8488" fire="0" wind="0" thunder="0" light="0" ice="2" earth="0" water="0" dark="0" english="Power Cooler" />
+  <i id="8513" fire="0" wind="2" thunder="0" light="0" ice="0" earth="0" water="0" dark="0" english="Accelerator" />
+  <i id="8514" fire="0" wind="1" thunder="0" light="0" ice="0" earth="0" water="0" dark="0" english="Scope" />
+  <i id="8515" fire="0" wind="1" thunder="0" light="0" ice="0" earth="0" water="0" dark="0" english="Pattern Reader" />
+  <i id="8516" fire="0" wind="3" thunder="0" light="0" ice="0" earth="0" water="0" dark="0" english="Accelerator II" />
+  <i id="8517" fire="0" wind="2" thunder="0" light="0" ice="0" earth="0" water="0" dark="0" english="Drum Magazine" />
+  <i id="8518" fire="0" wind="2" thunder="0" light="0" ice="0" earth="0" water="0" dark="0" english="Turbo Charger" />
+  <i id="8519" fire="0" wind="1" thunder="0" light="0" ice="0" earth="0" water="0" dark="0" english="Replicator" />
+  <i id="8520" fire="0" wind="3" thunder="0" light="0" ice="0" earth="0" water="0" dark="0" english="Barrage Turbine" />
+  <i id="8545" fire="0" wind="0" thunder="0" light="0" ice="0" earth="1" water="0" dark="0" english="Shock Absorber" />
+  <i id="8546" fire="0" wind="0" thunder="0" light="0" ice="0" earth="2" water="0" dark="0" english="Armor Plate" />
+  <i id="8547" fire="0" wind="0" thunder="0" light="0" ice="0" earth="1" water="0" dark="0" english="Analyzer" />
+  <i id="8548" fire="0" wind="0" thunder="0" light="0" ice="0" earth="3" water="0" dark="0" english="Armor Plate II" />
+  <i id="8549" fire="0" wind="0" thunder="0" light="0" ice="0" earth="2" water="0" dark="0" english="Equalizer" />
+  <i id="8550" fire="0" wind="0" thunder="0" light="0" ice="0" earth="1" water="0" dark="0" english="Schurzen" />
+  <i id="8551" fire="0" wind="0" thunder="0" light="0" ice="0" earth="1" water="0" dark="0" english="Hammermill" />
+  <i id="8552" fire="0" wind="0" thunder="0" light="0" ice="0" earth="2" water="0" dark="0" english="Barrier Module" />
+  <i id="8577" fire="0" wind="0" thunder="2" light="0" ice="0" earth="0" water="0" dark="0" english="Stabilizer" />
+  <i id="8578" fire="0" wind="0" thunder="1" light="0" ice="0" earth="0" water="0" dark="0" english="Volt Gun" />
+  <i id="8579" fire="0" wind="0" thunder="1" light="0" ice="0" earth="0" water="0" dark="0" english="Heat Seeker" />
+  <i id="8580" fire="0" wind="0" thunder="3" light="0" ice="0" earth="0" water="0" dark="0" english="Stabilizer II" />
+  <i id="8581" fire="0" wind="0" thunder="2" light="0" ice="0" earth="0" water="0" dark="0" english="Target Marker" />
+  <i id="8582" fire="0" wind="0" thunder="2" light="0" ice="0" earth="0" water="0" dark="0" english="Dynamo" />
+  <i id="8583" fire="0" wind="0" thunder="2" light="0" ice="0" earth="0" water="0" dark="0" english="Coiler" />
+  <i id="8584" fire="0" wind="0" thunder="2" light="0" ice="0" earth="0" water="0" dark="0" english="Galvanizer" />
+  <i id="8609" fire="0" wind="0" thunder="0" light="0" ice="0" earth="0" water="2" dark="0" english="Mana Jammer" />
+  <i id="8610" fire="0" wind="0" thunder="0" light="0" ice="0" earth="0" water="1" dark="0" english="Heatsink" />
+  <i id="8611" fire="0" wind="0" thunder="0" light="0" ice="0" earth="0" water="1" dark="0" english="Stealth Screen" />
+  <i id="8612" fire="0" wind="0" thunder="0" light="0" ice="0" earth="0" water="3" dark="0" english="Mana Jammer II" />
+  <i id="8613" fire="0" wind="0" thunder="0" light="0" ice="0" earth="0" water="2" dark="0" english="Mana Channeler" />
+  <i id="8614" fire="0" wind="0" thunder="0" light="0" ice="0" earth="0" water="1" dark="0" english="Condenser" />
+  <i id="8615" fire="0" wind="0" thunder="0" light="0" ice="0" earth="0" water="1" dark="0" english="Steam Jacket" />
+  <i id="8616" fire="0" wind="0" thunder="0" light="0" ice="0" earth="0" water="1" dark="0" english="Percolator" />
+  <i id="8641" fire="0" wind="0" thunder="0" light="2" ice="0" earth="0" water="0" dark="0" english="Auto-Repair Kit" />
+  <i id="8642" fire="0" wind="0" thunder="0" light="2" ice="0" earth="0" water="0" dark="0" english="Flashbulb" />
+  <i id="8643" fire="0" wind="0" thunder="0" light="1" ice="0" earth="0" water="0" dark="0" english="Damage Gauge" />
+  <i id="8644" fire="0" wind="0" thunder="0" light="3" ice="0" earth="0" water="0" dark="0" english="Auto-Repair Kit II" />
+  <i id="8645" fire="0" wind="0" thunder="0" light="2" ice="0" earth="0" water="0" dark="0" english="Eraser" />
+  <i id="8646" fire="0" wind="0" thunder="0" light="1" ice="0" earth="0" water="0" dark="0" english="Optic Fiber" />
+  <i id="8648" fire="0" wind="0" thunder="0" light="2" ice="0" earth="0" water="0" dark="0" english="Vivi-Valve" />
+  <i id="8673" fire="0" wind="0" thunder="0" light="0" ice="0" earth="0" water="0" dark="2" english="Mana Tank" />
+  <i id="8674" fire="0" wind="0" thunder="0" light="0" ice="0" earth="0" water="0" dark="2" english="Mana Converter" />
+  <i id="8675" fire="0" wind="0" thunder="0" light="0" ice="0" earth="0" water="0" dark="1" english="Mana Conserver" />
+  <i id="8676" fire="0" wind="0" thunder="0" light="0" ice="0" earth="0" water="0" dark="3" english="Mana Tank II" />
+  <i id="8677" fire="0" wind="0" thunder="0" light="0" ice="0" earth="0" water="0" dark="2" english="Smoke Screen" />
+  <i id="8678" fire="0" wind="0" thunder="0" light="0" ice="0" earth="0" water="0" dark="1" english="Economizer" />
+  <i id="8680" fire="0" wind="0" thunder="0" light="0" ice="0" earth="0" water="0" dark="2" english="Disruptor" />
+</attachments>

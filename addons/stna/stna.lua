@@ -30,10 +30,10 @@ _addon = {}
 _addon.name = 'STNA'
 _addon.version = '1.07'
 require 'tablehelper'
+require 'sets'
 
-function event_load()
-	player = get_player()
-	send_command('alias stna lua c stna')
+function onLoad()
+	windower.send_command('alias stna lua c stna')
 	statSpell = { 
 				Paralysis='Paralyna',
 				Curse='Cursna',
@@ -46,71 +46,55 @@ function event_load()
 				Blindness='Blindna'
 			}
 	--You may change this priority as you see fit this is my personal preference		
-	priority = { 
-				'Doom','Curse','Petrification',
-				'Paralysis','Plague','Silence',
-				'Blindness','Poison','Diseased'
-			}
-	statusTable = T{}
+    priority = T{}
+    priority[1] = 'Doom'
+    priority[2] = 'Curse'
+    priority[3] = 'Petrification'
+	priority[4] = 'Paralysis'
+    priority[5] = 'Plague'
+    priority[6] = 'Silence'
+	priority[7] = 'Blindness'
+    priority[8] = 'Poison'
+    priority[9] = 'Diseased'
+	
+	statusTable = S{}
 end
 
-function event_login()
-	player = get_player()
+function onUnload()
+	windower.send_command('unalias stna')
 end
 
-function event_unload()
-	send_command('unalias stna')
-end
-
-function event_addon_command()
-	if statusTable[1] == nil then
-		add_to_chat(55,"You are not afflicted by a status with a -na spell.")
-	else
+function commands()
+	if statusTable ~= nil then
+        local player = windower.ffxi.get_player()
 		for i = 1, 9 do
-			for u = 1, #statusTable do
-				if statusTable[u]:lower() == priority[i]:lower() then
-					send_command('send @others '..statSpell[priority[i]]..' '..player['name'])
-					if statusTable[u]:lower() == 'doom' then
-						send_command('input /item "Holy Water" '..player['name'])  --Auto Holy water for doom
-					end
-					return
-				end
-			end
-			if i == 9 then
-				add_to_chat(55,"You are not afflicted by a status with a -na spell.")
-			end
+			if statusTable:contains(priority[i]) then
+                windower.send_command('send @others /ma "'..statSpell[priority[i]]..'" '..player['name'])
+                if priority[i] == 'Doom' then
+                    windower.send_command('input /item "Holy Water" '..player['name'])  --Auto Holy water for doom
+                end
+                return
+            end
 		end
+        windower.add_to_chat(55,"You are not afflicted by a status with a -na spell.")
 	end
 end
 
-function event_gain_status(id,name)
-	if #statusTable == 0 then
-		for i = 1, #priority do
-			if priority[i]:lower() == name:lower() then
-				statusTable[#statusTable+1] = name
-			end
-		end
-	else	
-		for u = 1, #statusTable do
-			if statusTable[u]:lower() == name:lower() then
-				return
-			else
-				for i = 1, #priority do
-					if priority[i]:lower() == name:lower() then
-						statusTable[#statusTable+1] = name
-					end
-				end
-			end
-		end
-	end
+function gainStatus(id,name)
+    if priority:contains(name) and not statusTable:contains(name) then
+        statusTable:add(name)
+    end
 end
 
 
-function event_lose_status(id,name)
-	for u = 1, #statusTable do
-		if statusTable[u]:lower() == name:lower() then
-			table.remove(statusTable,u)
-			return
-		end
-	end
+function loseStatus(id,name)
+    if statusTable:contains(name) then
+        statusTable:remove(name)
+    end
 end
+
+windower.register_event('load', onLoad)
+windower.register_event('unload', onUnload)
+windower.register_event('gain status', gainStatus)
+windower.register_event('lose status', loseStatus)
+windower.register_event('addon command', commands)
