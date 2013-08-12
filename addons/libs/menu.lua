@@ -50,7 +50,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
    My_Menu = menu.create("my_menu_name", "Menu caption test", MenuList, 200, 200, 5)
 
-   My_Menu = menu.combine(Menu, {
+   My_Menu = menu.combine(My_Menu, {
       on_load = function (this)
          write('Menu ['..this.menu_name..'] on_load trigger')
       end,
