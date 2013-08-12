@@ -111,39 +111,6 @@ end
 
 windower.register_event('prerender', callback_event) -- Kick event ~30x/sec
 
-local function menu_move(menu_name, x, y)
-   local x1,y1 = windower.text.get_location('menu_tb_'..menu_name)
-   local x2,y2 = windower.text.get_extents('menu_tb_'..menu_name)
-
-   menu_list[menu_name]['x'] = x
-   menu_list[menu_name]['y'] = y
-
-   windower.text.set_location('menu_caption_'..menu_name, x, y)
-
-   windower.text.set_location('menu_tb_'..menu_name, x, 15 + y)
-   windower.text.set_location('menu_cur_'..menu_name, x, 15 + y + menu_list[menu_name]['cur'] * 14)
-
-   windower.text.set_location('menu_scr_'..menu_name, x + x2, 15 + y)
-   local bar_x,bar_y = windower.text.get_location('menu_bar_'..menu_name)
-   bar_y = bar_y - y1
-   windower.text.set_location('menu_bar_'..menu_name, x + x2, 15 + y + bar_y)
-end
-
-local function menu_refresh(menu_name)
-   local tb = ''
-
-   for i = 0, menu_list[menu_name]['mx'] do
-      tb=tb..menu_list[menu_name]['core_text'][i+menu_list[menu_name]['scr']]
-   end
-
-   windower.text.set_text('menu_tb_'..menu_name, tb)
-
-   local x,y = windower.text.get_location('menu_tb_'..menu_name)
-
-   windower.text.set_location('menu_cur_'..menu_name, x, y + menu_list[menu_name]['cur'] * 14)
-   windower.text.set_text('menu_cur_'..menu_name, menu_list[menu_name]['core_text'][menu_list[menu_name]['cur'] + menu_list[menu_name]['scr']])
-end
-
 function menu.new(menu_name, caption, opt, x, y, mx)
    menu_list[menu_name] = {}
 
@@ -158,7 +125,7 @@ function menu.new(menu_name, caption, opt, x, y, mx)
    menu_list[menu_name]['scr'] = 0
    menu_list[menu_name]['cur'] = 0
    menu_list[menu_name]['mx'] = mx - 1
-   menu_list[menu_name]['max_ln'] = string.len(caption)+1
+   menu_list[menu_name]['max_char'] = string.len(caption)+1
 
    menu_list[menu_name]['x'] = x
    menu_list[menu_name]['y'] = y
@@ -171,8 +138,8 @@ function menu.new(menu_name, caption, opt, x, y, mx)
 
       menu_list[menu_name]['key'][ii] = i
 
-      if menu_list[menu_name]['max_ln'] < string.len(menu_list[menu_name]['text'][ii]) + 1 then 
-         menu_list[menu_name]['max_ln'] = string.len(menu_list[menu_name]['text'][ii]) + 1
+      if menu_list[menu_name]['max_char'] < string.len(menu_list[menu_name]['text'][ii]) + 1 then 
+         menu_list[menu_name]['max_char'] = string.len(menu_list[menu_name]['text'][ii]) + 1
       end
       ii = ii + 1
    end
@@ -180,7 +147,7 @@ function menu.new(menu_name, caption, opt, x, y, mx)
    if mx > #menu_list[menu_name]['text'] + 1 then mx = #menu_list[menu_name]['text'] + 1 end
 
    for i = 0, #menu_list[menu_name]['text'] do
-      menu_list[menu_name]['core_text'][i] = ' '..menu_list[menu_name]['text'][i]..string.rep(' ', menu_list[menu_name]['max_ln'] - string.len(menu_list[menu_name]['text'][i]))..'\\cr\n'
+      menu_list[menu_name]['core_text'][i] = ' '..menu_list[menu_name]['text'][i]..string.rep(' ', menu_list[menu_name]['max_char'] - string.len(menu_list[menu_name]['text'][i]))..'\\cr\n'
    end
 
    for i = 0, mx-1 do
@@ -188,7 +155,7 @@ function menu.new(menu_name, caption, opt, x, y, mx)
       scr=scr..' \\cr\n'
    end
 
-   caption = caption..string.rep(' ', menu_list[menu_name]['max_ln']- string.len(caption))..' X\\cr\n'
+   caption = caption..string.rep(' ', menu_list[menu_name]['max_char']- string.len(caption))..' X\\cr\n'
 
    -- Create all Textbox
 
@@ -255,7 +222,7 @@ function menu.new(menu_name, caption, opt, x, y, mx)
          local x = menu_list[key]['x']
          local y = menu_list[key]['y']
 
-         menu_move(key, x, y)
+         menu_list[key].move(x,y)
          windower.text.set_location('menu_bar_'..key, x + x2, y + 15)
          windower.text.set_visibility('menu_caption_'..key, true)
          windower.text.set_visibility('menu_tb_'..key, true)
@@ -280,11 +247,38 @@ function menu.new(menu_name, caption, opt, x, y, mx)
    end
 
    menu_list[menu_name]['move'] = function(x, y)
-      menu_move(menu_name, x, y)
+      local x1,y1 = windower.text.get_location('menu_tb_'..menu_name)
+      local x2,y2 = windower.text.get_extents('menu_tb_'..menu_name)
+
+      menu_list[menu_name]['x'] = x
+      menu_list[menu_name]['y'] = y
+
+      windower.text.set_location('menu_caption_'..menu_name, x, y)
+
+      windower.text.set_location('menu_tb_'..menu_name, x, 15 + y)
+      windower.text.set_location('menu_cur_'..menu_name, x, 15 + y + menu_list[menu_name]['cur'] * 14)
+
+      windower.text.set_location('menu_scr_'..menu_name, x + x2, 15 + y)
+      local bar_x,bar_y = windower.text.get_location('menu_bar_'..menu_name)
+      bar_y = bar_y - y1
+      windower.text.set_location('menu_bar_'..menu_name, x + x2, 15 + y + bar_y)
+
    end
 
    menu_list[menu_name]['refresh'] = function()
-      menu_refresh(menu_name)
+      local tb = ''
+
+      for i = 0, menu_list[menu_name]['mx'] do
+         tb=tb..menu_list[menu_name]['core_text'][i+menu_list[menu_name]['scr']]
+      end
+
+      windower.text.set_text('menu_tb_'..menu_name, tb)
+
+      local x,y = windower.text.get_location('menu_tb_'..menu_name)
+
+      windower.text.set_location('menu_cur_'..menu_name, x, y + menu_list[menu_name]['cur'] * 14)
+      windower.text.set_text('menu_cur_'..menu_name, menu_list[menu_name]['core_text'][menu_list[menu_name]['cur'] + menu_list[menu_name]['scr']])
+
    end
 
    return menu_list[menu_name]
@@ -360,7 +354,7 @@ windower.register_event('mouse', function(action_type, x, y, is_blocked)
   
                         if menu_list[key]['cur'] ~= menu_cur then
                            menu_list[key]['cur'] = menu_cur
-                           menu_refresh(key)
+                             menu_list[key].refresh()
                         end
 
                         mouse_on = 'content'
@@ -391,7 +385,7 @@ windower.register_event('mouse', function(action_type, x, y, is_blocked)
             NewX = x1 + x - mouse_press_x 
             NewY = y1 + y - mouse_press_y
 
-            menu_move(mpn, NewX, NewY)
+            this.move(NewX, NewY)
 
             if type(this['on_move']) == 'function' then
                this['on_move'](this, this.x, this.y)
@@ -428,7 +422,7 @@ windower.register_event('mouse', function(action_type, x, y, is_blocked)
                if menu_list[mpn]['scr'] ~= scr then
                   if scr + menu_list[mpn]['cur'] <= #menu_list[mpn]['text'] then
                      menu_list[mpn]['scr'] = scr
-                     menu_refresh(mpn)
+                     menu_list[mpn].refresh()
                   end
                end
 
@@ -437,13 +431,14 @@ windower.register_event('mouse', function(action_type, x, y, is_blocked)
          return false
       end
 
-   elseif action_type == 513 and mouse_on ~= nil then --mouse down 
-      mouse_moved = false
-      mouse_press_x = x
-      mouse_press_y = y
-      mpn = current_menu
-
-      return true
+   elseif action_type == 513 then
+      if mouse_on ~= nil then --mouse down 
+         mouse_moved = false
+         mouse_press_x = x
+         mouse_press_y = y
+         mpn = current_menu
+         return true
+      end
    end
 end)
 
