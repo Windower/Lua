@@ -27,13 +27,13 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
--- CreateMenu(Menu_name, Caption, Menu_Option_List, x, y, Max_Line_Show, sub_key *optional)
+-- CreateMenu(menu_name, caption, menu_option_list, x, y, Max_Line_Show, sub_key *optional)
 
- ** Menu_name need to be unique.
+ ** menu_name need to be unique.
 
  Example:
 
-   MenuList = {
+   menu_list = {
 	sub="Oneiros Grip",
 	rear="Cmd. Earring",
 	main="Terra's Staff",
@@ -48,9 +48,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 	head="Dls. Chapeau +2",
 	feet="Estq. houseaux +2"}
 
-   My_Menu = menu.create("my_menu_name", "Menu caption test", MenuList, 200, 200, 5)
+   my_menu = menu.create("my_menu_name", "Menu caption test", menu_list, 200, 200, 5)
 
-   My_Menu = menu.combine(My_Menu, {
+   my_menu = menu.combine(my_menu, {
       on_load = function (this)
          write('Menu ['..this.menu_name..'] on_load trigger')
       end,
@@ -68,7 +68,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       end,
 
       on_move = function (this, x, y)
-         write('Menu_event_move ['..this.menu_name..'] X='..x..' Y='..y)
+         write('menu_event_move ['..this.menu_name..'] X='..x..' Y='..y)
       end
    })
 
@@ -113,128 +113,128 @@ end
 
 windower.register_event('prerender', menu.callback_event) -- Kick event ~30x/sec
 
-function menu.Refresh(MenuName)
+function menu.refresh(menu_name)
    local tb = ''
 
-   for i = 0, menu.list[MenuName]['mx'] do
-      tb=tb..menu.list[MenuName]['Core_Text'][i+menu.list[MenuName]['scr']]
+   for i = 0, menu.list[menu_name]['mx'] do
+      tb=tb..menu.list[menu_name]['Core_Text'][i+menu.list[menu_name]['scr']]
    end
 
-   windower.text.set_text('Menu_TB_'..MenuName, tb)
+   windower.text.set_text('menu_tb_'..menu_name, tb)
 
-   x,y = windower.text.get_location('Menu_TB_'..MenuName)
+   local x,y = windower.text.get_location('menu_tb_'..menu_name)
 
-   windower.text.set_location('Menu_cur_'..MenuName, x, y + menu.list[MenuName]['cur'] * 14)
-   windower.text.set_text('Menu_cur_'..MenuName, menu.list[MenuName]['Core_Text'][menu.list[MenuName]['cur'] + menu.list[MenuName]['scr']])
+   windower.text.set_location('menu_cur_'..menu_name, x, y + menu.list[menu_name]['cur'] * 14)
+   windower.text.set_text('menu_cur_'..menu_name, menu.list[menu_name]['Core_Text'][menu.list[menu_name]['cur'] + menu.list[menu_name]['scr']])
 end
 
-function menu.create(MenuName, Caption, opt, x, y, mx, sub_key)
-   menu.list[MenuName] = {}
+function menu.create(menu_name, caption, opt, x, y, mx, sub_key)
+   menu.list[menu_name] = {}
 
    local tb = ''
    local scr = ''
 
-   menu.list[MenuName]['menu_name'] = MenuName
-   menu.list[MenuName]['Core_Text'] = {}
-   menu.list[MenuName]['text'] = {}
-   menu.list[MenuName]['key'] = {}
+   menu.list[menu_name]['menu_name'] = menu_name
+   menu.list[menu_name]['Core_Text'] = {}
+   menu.list[menu_name]['text'] = {}
+   menu.list[menu_name]['key'] = {}
 
-   menu.list[MenuName]['scr'] = 0
-   menu.list[MenuName]['cur'] = 0
-   menu.list[MenuName]['mx'] = mx - 1
-   menu.list[MenuName]['max_ln'] = string.len(Caption)+1
+   menu.list[menu_name]['scr'] = 0
+   menu.list[menu_name]['cur'] = 0
+   menu.list[menu_name]['mx'] = mx - 1
+   menu.list[menu_name]['max_ln'] = string.len(caption)+1
 
-   menu.list[MenuName]['x'] = x
-   menu.list[MenuName]['y'] = y
+   menu.list[menu_name]['x'] = x
+   menu.list[menu_name]['y'] = y
 
    -- FIX Text Length
    local ii = 0
 
    for i, v in pairs(opt) do
       if sub_key ~= nil then 
-         menu.list[MenuName]['text'][ii] = v[sub_key]
+         menu.list[menu_name]['text'][ii] = v[sub_key]
       else
-         menu.list[MenuName]['text'][ii] = v
+         menu.list[menu_name]['text'][ii] = v
       end
 
-      menu.list[MenuName]['key'][ii] = i
+      menu.list[menu_name]['key'][ii] = i
 
-      if menu.list[MenuName]['max_ln'] < string.len(menu.list[MenuName]['text'][ii]) + 1 then 
-         menu.list[MenuName]['max_ln'] = string.len(menu.list[MenuName]['text'][ii]) + 1
+      if menu.list[menu_name]['max_ln'] < string.len(menu.list[menu_name]['text'][ii]) + 1 then 
+         menu.list[menu_name]['max_ln'] = string.len(menu.list[menu_name]['text'][ii]) + 1
       end
       ii = ii + 1
    end
 
-   if mx > #menu.list[MenuName]['text'] + 1 then mx = #menu.list[MenuName]['text'] + 1 end
+   if mx > #menu.list[menu_name]['text'] + 1 then mx = #menu.list[menu_name]['text'] + 1 end
 
-   for i = 0, #menu.list[MenuName]['text'] do
-      menu.list[MenuName]['Core_Text'][i] = ' '..menu.list[MenuName]['text'][i]..string.rep(' ', menu.list[MenuName]['max_ln'] - string.len(menu.list[MenuName]['text'][i]))..'\\cr\n'
+   for i = 0, #menu.list[menu_name]['text'] do
+      menu.list[menu_name]['Core_Text'][i] = ' '..menu.list[menu_name]['text'][i]..string.rep(' ', menu.list[menu_name]['max_ln'] - string.len(menu.list[menu_name]['text'][i]))..'\\cr\n'
    end
 
    for i = 0, mx-1 do
-      tb=tb..menu.list[MenuName]['Core_Text'][i]
+      tb=tb..menu.list[menu_name]['Core_Text'][i]
       scr=scr..' \\cr\n'
    end
 
-   Caption = Caption..string.rep(' ', menu.list[MenuName]['max_ln']- string.len(Caption))..' X\\cr\n'
+   caption = caption..string.rep(' ', menu.list[menu_name]['max_ln']- string.len(caption))..' X\\cr\n'
 
    -- Create all Textbox
 
-   windower.text.create('Menu_Caption_'..MenuName)
-   windower.text.set_location('Menu_Caption_'..MenuName, -10000, -10000)
-   windower.text.set_bg_color('Menu_Caption_'..MenuName, 180, 80, 110, 140)
-   windower.text.set_color('Menu_Caption_'..MenuName, 250, 250, 250, 250)
-   windower.text.set_bold('Menu_Caption_'..MenuName, 'true')
-   windower.text.set_text('Menu_Caption_'..MenuName, Caption)
-   windower.text.set_bg_visibility('Menu_Caption_'..MenuName, true)
-   windower.text.set_font('Menu_Caption_'..MenuName, 'Courier New', 9)
-   windower.text.set_visibility('Menu_Caption_'..MenuName, true)
+   windower.text.create('menu_caption_'..menu_name)
+   windower.text.set_location('menu_caption_'..menu_name, -10000, -10000)
+   windower.text.set_bg_color('menu_caption_'..menu_name, 180, 80, 110, 140)
+   windower.text.set_color('menu_caption_'..menu_name, 250, 250, 250, 250)
+   windower.text.set_bold('menu_caption_'..menu_name, 'true')
+   windower.text.set_text('menu_caption_'..menu_name, caption)
+   windower.text.set_bg_visibility('menu_caption_'..menu_name, true)
+   windower.text.set_font('menu_caption_'..menu_name, 'Courier New', 9)
+   windower.text.set_visibility('menu_caption_'..menu_name, true)
 
-   windower.text.create('Menu_TB_'..MenuName)
-   windower.text.set_location('Menu_TB_'..MenuName, -10000, -10000)
-   windower.text.set_bg_color('Menu_TB_'..MenuName, 140, 54, 43, 0)
-   windower.text.set_color('Menu_TB_'..MenuName, 250, 220, 220, 220)
-   windower.text.set_bold('Menu_TB_'..MenuName, 'true')
-   windower.text.set_text('Menu_TB_'..MenuName, tb)
-   windower.text.set_bg_visibility('Menu_TB_'..MenuName, true)
-   windower.text.set_font('Menu_TB_'..MenuName, 'Courier New', 9)
-   windower.text.set_visibility('Menu_TB_'..MenuName, true)
+   windower.text.create('menu_tb_'..menu_name)
+   windower.text.set_location('menu_tb_'..menu_name, -10000, -10000)
+   windower.text.set_bg_color('menu_tb_'..menu_name, 140, 54, 43, 0)
+   windower.text.set_color('menu_tb_'..menu_name, 250, 220, 220, 220)
+   windower.text.set_bold('menu_tb_'..menu_name, 'true')
+   windower.text.set_text('menu_tb_'..menu_name, tb)
+   windower.text.set_bg_visibility('menu_tb_'..menu_name, true)
+   windower.text.set_font('menu_tb_'..menu_name, 'Courier New', 9)
+   windower.text.set_visibility('menu_tb_'..menu_name, true)
 
-   windower.text.create('Menu_cur_'..MenuName)
-   windower.text.set_bg_color('Menu_cur_'..MenuName, 155, 40, 40, 100)
-   windower.text.set_color('Menu_cur_'..MenuName, 255, 255, 255, 255)
-   windower.text.set_bold('Menu_cur_'..MenuName, 'true')
-   windower.text.set_text('Menu_cur_'..MenuName, menu.list[MenuName]['Core_Text'][menu.list[MenuName]['cur']])
-   windower.text.set_bg_visibility('Menu_cur_'..MenuName, true)
-   windower.text.set_font('Menu_cur_'..MenuName, 'Courier New', 9)
-   windower.text.set_visibility('Menu_cur_'..MenuName, false)
+   windower.text.create('menu_cur_'..menu_name)
+   windower.text.set_bg_color('menu_cur_'..menu_name, 155, 40, 40, 100)
+   windower.text.set_color('menu_cur_'..menu_name, 255, 255, 255, 255)
+   windower.text.set_bold('menu_cur_'..menu_name, 'true')
+   windower.text.set_text('menu_cur_'..menu_name, menu.list[menu_name]['Core_Text'][menu.list[menu_name]['cur']])
+   windower.text.set_bg_visibility('menu_cur_'..menu_name, true)
+   windower.text.set_font('menu_cur_'..menu_name, 'Courier New', 9)
+   windower.text.set_visibility('menu_cur_'..menu_name, false)
 
-   windower.text.create('Menu_scr_'..MenuName)
-   windower.text.set_bg_color('Menu_scr_'..MenuName, 140, 80, 80, 80)
-   windower.text.set_color('Menu_scr_'..MenuName, 255, 0, 0, 0)
-   windower.text.set_bold('Menu_scr_'..MenuName, 'true')
-   windower.text.set_text('Menu_scr_'..MenuName, scr)
-   windower.text.set_bg_visibility('Menu_scr_'..MenuName, true)
-   windower.text.set_font('Menu_scr_'..MenuName, 'Courier New', 9)
-   windower.text.set_visibility('Menu_scr_'..MenuName, false)
+   windower.text.create('menu_scr_'..menu_name)
+   windower.text.set_bg_color('menu_scr_'..menu_name, 140, 80, 80, 80)
+   windower.text.set_color('menu_scr_'..menu_name, 255, 0, 0, 0)
+   windower.text.set_bold('menu_scr_'..menu_name, 'true')
+   windower.text.set_text('menu_scr_'..menu_name, scr)
+   windower.text.set_bg_visibility('menu_scr_'..menu_name, true)
+   windower.text.set_font('menu_scr_'..menu_name, 'Courier New', 9)
+   windower.text.set_visibility('menu_scr_'..menu_name, false)
 
-   windower.text.create('Menu_bar_'..MenuName)
-   windower.text.set_bg_color('Menu_bar_'..MenuName, 255, 255, 255, 255)
-   windower.text.set_color('Menu_bar_'..MenuName, 255, 0, 0, 0)
-   windower.text.set_bold('Menu_bar_'..MenuName, 'true')
-   windower.text.set_text('Menu_bar_'..MenuName, ' \\cr')
-   windower.text.set_bg_visibility('Menu_bar_'..MenuName, true)
-   windower.text.set_font('Menu_bar_'..MenuName, 'Courier New', 9)
-   windower.text.set_visibility('Menu_bar_'..MenuName, false)
+   windower.text.create('menu_bar_'..menu_name)
+   windower.text.set_bg_color('menu_bar_'..menu_name, 255, 255, 255, 255)
+   windower.text.set_color('menu_bar_'..menu_name, 255, 0, 0, 0)
+   windower.text.set_bold('menu_bar_'..menu_name, 'true')
+   windower.text.set_text('menu_bar_'..menu_name, ' \\cr')
+   windower.text.set_bg_visibility('menu_bar_'..menu_name, true)
+   windower.text.set_font('menu_bar_'..menu_name, 'Courier New', 9)
+   windower.text.set_visibility('menu_bar_'..menu_name, false)
 
-   -- kick this function every .01 sec. (no return or return false cancel the functin loop)
-   menu.callback_list['onload_Menu.'..MenuName] = {
-      clock = os.clock() + .01,
+   -- kick this function every .05 sec. (no return or return false cancel the functin loop)
+   menu.callback_list['onload_Menu.'..menu_name] = {
+      clock = os.clock() + .05,
 
       fn = function(key) 
-         menu.callback_list[key].clock = os.clock() + .01
+         menu.callback_list[key].clock = os.clock() + .05
          key = string.gsub(key, 'onload_Menu.', '')
-         local x2,y2 = windower.text.get_extents('Menu_TB_'..key)
+         local x2,y2 = windower.text.get_extents('menu_tb_'..key)
 
          if x2 == 0 then  -- No graphic update yet.
             return true
@@ -244,12 +244,12 @@ function menu.create(MenuName, Caption, opt, x, y, mx, sub_key)
          local y = menu.list[key]['y']
 
          menu.move(key, x, y)
-         windower.text.set_location('Menu_bar_'..key, x + x2, y + 15)
-         windower.text.set_visibility('Menu_Caption_'..key, true)
-         windower.text.set_visibility('Menu_TB_'..key, true)
-         windower.text.set_visibility('Menu_cur_'..key, true)
-         windower.text.set_visibility('Menu_scr_'..key, true)
-         windower.text.set_visibility('Menu_bar_'..key, true)
+         windower.text.set_location('menu_bar_'..key, x + x2, y + 15)
+         windower.text.set_visibility('menu_caption_'..key, true)
+         windower.text.set_visibility('menu_tb_'..key, true)
+         windower.text.set_visibility('menu_cur_'..key, true)
+         windower.text.set_visibility('menu_scr_'..key, true)
+         windower.text.set_visibility('menu_bar_'..key, true)
 
 
          if type(menu.list[key]['on_load']) == 'function' then
@@ -257,21 +257,21 @@ function menu.create(MenuName, Caption, opt, x, y, mx, sub_key)
          end 
       end}
 
-   menu.list[MenuName]['close'] = function()
+   menu.list[menu_name]['close'] = function()
       write('closing menu')
-      windower.text.delete('Menu_TB_'..MenuName)
-      windower.text.delete('Menu_cur_'..MenuName)
-      windower.text.delete('Menu_scr_'..MenuName)
-      windower.text.delete('Menu_bar_'..MenuName)
-      windower.text.delete('Menu_Caption_'..MenuName)
-      menu.list[MenuName] = nil
+      windower.text.delete('menu_tb_'..menu_name)
+      windower.text.delete('menu_cur_'..menu_name)
+      windower.text.delete('menu_scr_'..menu_name)
+      windower.text.delete('menu_bar_'..menu_name)
+      windower.text.delete('menu_caption_'..menu_name)
+      menu.list[menu_name] = nil
    end
 
-   menu.list[MenuName]['move'] = function(x, y)
-      menu.move(MenuName, x, y)
+   menu.list[menu_name]['move'] = function(x, y)
+      menu.move(menu_name, x, y)
    end
 
-   return menu.list[MenuName]
+   return menu.list[menu_name]
 end 
 
 function menu.combine(set1,set2)
@@ -281,25 +281,25 @@ function menu.combine(set1,set2)
    return set1
 end
 
-function menu.move(MenuName, x, y)
-   local x1,y1 = windower.text.get_location('Menu_TB_'..MenuName)
-   local x2,y2 = windower.text.get_extents('Menu_TB_'..MenuName)
+function menu.move(menu_name, x, y)
+   local x1,y1 = windower.text.get_location('menu_tb_'..menu_name)
+   local x2,y2 = windower.text.get_extents('menu_tb_'..menu_name)
 
-   menu.list[MenuName]['x'] = x
-   menu.list[MenuName]['y'] = y
+   menu.list[menu_name]['x'] = x
+   menu.list[menu_name]['y'] = y
 
-   windower.text.set_location('Menu_Caption_'..MenuName, x, y)
+   windower.text.set_location('menu_caption_'..menu_name, x, y)
    y = y + 15
-   windower.text.set_location('Menu_TB_'..MenuName, x, y)
-   windower.text.set_location('Menu_cur_'..MenuName, x, y + menu.list[MenuName]['cur'] * 14)
+   windower.text.set_location('menu_tb_'..menu_name, x, y)
+   windower.text.set_location('menu_cur_'..menu_name, x, y + menu.list[menu_name]['cur'] * 14)
 
-   windower.text.set_location('Menu_scr_'..MenuName, x + x2, y)
-   local bar_x,bar_y = windower.text.get_location('Menu_bar_'..MenuName)
+   windower.text.set_location('menu_scr_'..menu_name, x + x2, y)
+   local bar_x,bar_y = windower.text.get_location('menu_bar_'..menu_name)
    bar_y = bar_y - y1
-   windower.text.set_location('Menu_bar_'..MenuName, x + x2, y + bar_y)
+   windower.text.set_location('menu_bar_'..menu_name, x + x2, y + bar_y)
 end
 
-function menu.mouse_event(ActionType, x, y, is_blocked)
+function menu.mouse_event(action_type, x, y, is_blocked)
    local x1 = 0
    local y1 = 0
 
@@ -311,7 +311,7 @@ function menu.mouse_event(ActionType, x, y, is_blocked)
 
    local this = nil
 
-   if ActionType == 514 then  --mouse up
+   if action_type == 514 then  --mouse up
       if menu.mpn ~= nil then
 
          if menu.mouse_moved == false then
@@ -346,7 +346,7 @@ function menu.mouse_event(ActionType, x, y, is_blocked)
          return true
       end
 
-   elseif ActionType == 512 then  --mouse move
+   elseif action_type == 512 then  --mouse move
       menu.mouse_moved = true
       menu.First_Click = 0
 
@@ -355,8 +355,8 @@ function menu.mouse_event(ActionType, x, y, is_blocked)
          menu.mouse_on = nil
 
          for key, val in pairs(menu.list) do
-            x1,y1 = windower.text.get_location('Menu_TB_'..key)
-            x2,y2 = windower.text.get_extents('Menu_TB_'..key)
+            x1,y1 = windower.text.get_location('menu_tb_'..key)
+            x2,y2 = windower.text.get_extents('menu_tb_'..key)
 
             if x < x1 + x2+9 and x > x1 then 
                if y < y1 + y2 and y > y1 - 15 then 
@@ -365,11 +365,11 @@ function menu.mouse_event(ActionType, x, y, is_blocked)
    
                   if y > y1 then 
                      if x < x1 + x2+1 then 
-                        local Menu_cur = math.floor ((y - y1-1) / 14)
+                        local menu_cur = math.floor ((y - y1-1) / 14)
   
-                        if menu.list[key]['cur'] ~= Menu_cur then
-                           menu.list[key]['cur'] = Menu_cur
-                           menu.Refresh(key)
+                        if menu.list[key]['cur'] ~= menu_cur then
+                           menu.list[key]['cur'] = menu_cur
+                           menu.refresh(key)
                         end
 
                         menu.mouse_on = 'content'
@@ -392,8 +392,8 @@ function menu.mouse_event(ActionType, x, y, is_blocked)
          end
       else
 
-         x1,y1 = windower.text.get_location('Menu_Caption_'..menu.mpn)
-         x2,y2 = windower.text.get_extents('Menu_TB_'..menu.mpn)
+         x1,y1 = windower.text.get_location('menu_caption_'..menu.mpn)
+         x2,y2 = windower.text.get_extents('menu_tb_'..menu.mpn)
 
          if menu.mouse_on == 'caption' or menu.mouse_on == 'content' then
             this = menu.list[menu.mpn]
@@ -410,8 +410,8 @@ function menu.mouse_event(ActionType, x, y, is_blocked)
             menu.mousePressY = y
 
          elseif menu.mouse_on == 'scroll' then
-            xx1,yy1 = windower.text.get_location('Menu_bar_'..menu.mpn)
-            xx2,yy2 = windower.text.get_extents('Menu_bar_'..menu.mpn)
+            xx1,yy1 = windower.text.get_location('menu_bar_'..menu.mpn)
+            xx2,yy2 = windower.text.get_extents('menu_bar_'..menu.mpn)
 
             if menu.mousePressY > yy1 and menu.mousePressY < yy1 + yy2 then 
 
@@ -427,7 +427,7 @@ function menu.mouse_event(ActionType, x, y, is_blocked)
                   menu.mousePressY = y
                end
 
-               windower.text.set_location('Menu_bar_'..menu.mpn, xx1, NewY)
+               windower.text.set_location('menu_bar_'..menu.mpn, xx1, NewY)
 
                local MaxScr = (#menu.list[menu.mpn]['text'] - menu.list[menu.mpn]['mx'])
 
@@ -437,7 +437,7 @@ function menu.mouse_event(ActionType, x, y, is_blocked)
                if menu.list[menu.mpn]['scr'] ~= scr then
                   if scr + menu.list[menu.mpn]['cur'] <= #menu.list[menu.mpn]['text'] then
                      menu.list[menu.mpn]['scr'] = scr
-                     menu.Refresh(menu.mpn)
+                     menu.refresh(menu.mpn)
                   end
                end
 
@@ -446,7 +446,7 @@ function menu.mouse_event(ActionType, x, y, is_blocked)
          return false
       end
 
-   elseif ActionType == 513 and menu.mouse_on ~= nil then --mouse down 
+   elseif action_type == 513 and menu.mouse_on ~= nil then --mouse down 
       menu.mouse_moved = false
       menu.mousePressX = x
       menu.mousePressY = y
@@ -460,11 +460,11 @@ windower.register_event('mouse', menu.mouse_event)
 
 function menu.event_unload()
    for key, val in pairs(menu.list) do
-      windower.text.delete('Menu_TB_'..key)
-      windower.text.delete('Menu_cur_'..key)
-      windower.text.delete('Menu_scr_'..key)
-      windower.text.delete('Menu_bar_'..key)
-      windower.text.delete('Menu_Caption_'..key)
+      windower.text.delete('menu_tb_'..key)
+      windower.text.delete('menu_cur_'..key)
+      windower.text.delete('menu_scr_'..key)
+      windower.text.delete('menu_bar_'..key)
+      windower.text.delete('menu_caption_'..key)
       menu.list[key] = nil
    end
 end
