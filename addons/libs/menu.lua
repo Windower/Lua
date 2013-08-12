@@ -27,7 +27,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
- Syntax:  menu.new(menu_name, caption, menu_option_list, x, y, max_line_show, sub_key *optional)
+ Syntax:  menu.new(menu_name, caption, menu_option_list, x, y, max_line_show)
 
  ** menu_name need to be unique.
 
@@ -144,7 +144,7 @@ local function menu_refresh(menu_name)
    windower.text.set_text('menu_cur_'..menu_name, menu_list[menu_name]['core_text'][menu_list[menu_name]['cur'] + menu_list[menu_name]['scr']])
 end
 
-function menu.new(menu_name, caption, opt, x, y, mx, sub_key)
+function menu.new(menu_name, caption, opt, x, y, mx)
    menu_list[menu_name] = {}
 
    local tb = ''
@@ -167,11 +167,7 @@ function menu.new(menu_name, caption, opt, x, y, mx, sub_key)
    local ii = 0
 
    for i, v in pairs(opt) do
-      if sub_key ~= nil then 
-         menu_list[menu_name]['text'][ii] = v[sub_key]
-      else
-         menu_list[menu_name]['text'][ii] = v
-      end
+      menu_list[menu_name]['text'][ii] = v
 
       menu_list[menu_name]['key'][ii] = i
 
