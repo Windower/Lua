@@ -44,32 +44,32 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    MenuList[8] = 'list9'
    MenuList[9] = 'list10'
 
-   Menu = CreateMenu("my_menu_name", "Menu caption test", MenuList, 200, 200, 5)
+   My_Menu = menu.create("my_menu_name", "Menu caption test", MenuList, 200, 200, 5)
 
-   Menu = menu_combine(Menu, {
+   My_Menu = menu.combine(Menu, {
       on_load = function (this)
-         write('Menu ['..this.Menu_Name..'] on_load trigger')
+         write('Menu ['..this.menu_name..'] on_load trigger')
       end,
 
       on_dbl_click = function (this, index, val)
-         write('Menu ['..this.Menu_Name..'] dbl_click ['..index..'] ('..val..')')
+         write('Menu ['..this.menu_name..'] dbl_click ['..index..'] ('..val..')')
       end,
 
       on_close = function (this)
-         write('Menu ['..this.Menu_Name..'] close')
+         write('Menu ['..this.menu_name..'] close')
       end,
 
       on_click = function (this, index, val)
-         write('Menu ['..this.Menu_Name..'] click ['..index..'] ('..val..')')
+         write('Menu ['..this.menu_name..'] click ['..index..'] ('..val..')')
       end,
 
       on_move = function (this, x, y)
-         write('Menu_event_move ['..this.Menu_Name..'] X='..x..' Y='..y)
+         write('Menu_event_move ['..this.menu_name..'] X='..x..' Y='..y)
       end
    })
 
-**  Menu_Pos			= this.x / this.y
-**  Menu_name			= this.x / this.y
+**  Menu Pos			= this.x / this.y
+**  menu name			= this.menu_name
 **  Menu Scroll position	= this.scr
 **  Menu cursor position	= this.cur
 **  Menu list text value	= this.text[index]
@@ -77,97 +77,102 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ]]------------------------------------------------------------------------------
 
-_Menu = {}
-_Menu.list = {}
-_Menu.First_Click = 0
-_Menu._MenuPress = nil
-_Menu._MenuPressX = 0
-_Menu._MenuPressY = 0
-_Menu._mouse_on = nil
-_Menu._MouseMoved = false
-_Menu._CurrentMenu = nil
 
-_Menu.callback_event = {}
+_libs = _libs or {}
+_libs.menu = true
 
-function menu_callback_event()
-   for key, val in pairs(_Menu.callback_event) do
-      if (os.clock() >= _Menu.callback_event[key].clock) then 
+
+local menu = {}
+
+menu.list = {}
+menu.First_Click = 0
+menu.mpn = nil
+menu.mousePressX = 0
+menu.mousePressY = 0
+menu.mouse_on = nil
+menu.mouse_moved = false
+menu.current_menu = nil
+menu.callback_list = {}
+
+function menu.callback_event()
+   for key, val in pairs(menu.callback_list) do
+      if (os.clock() >= menu.callback_list[key].clock) then 
 
          --only delete if return false or nil.
-         local ret = _Menu.callback_event[key].fn(key)
+         local ret = menu.callback_list[key].fn(key)
          if  ret == false or ret == nil then 
-            _Menu.callback_event[key] = nil
+            menu.callback_list[key] = nil
          end
       end    
    end
 end
 
-windower.register_event('prerender', menu_callback_event) -- Kick event ~30x/sec
+windower.register_event('prerender', menu.callback_event) -- Kick event ~30x/sec
 
-function RefreshMenu(MenuName)
+function menu.Refresh(MenuName)
    local tb = ''
 
-   for i = 0, _Menu.list[MenuName]['mx'] do
-      tb=tb.._Menu.list[MenuName]['Core_Text'][i+_Menu.list[MenuName]['scr']]
+   for i = 0, menu.list[MenuName]['mx'] do
+      tb=tb..menu.list[MenuName]['Core_Text'][i+menu.list[MenuName]['scr']]
    end
 
    windower.text.set_text('Menu_TB_'..MenuName, tb)
 
    x,y = windower.text.get_location('Menu_TB_'..MenuName)
 
-   windower.text.set_location('Menu_cur_'..MenuName, x, y + _Menu.list[MenuName]['cur'] * 14)
-   windower.text.set_text('Menu_cur_'..MenuName, _Menu.list[MenuName]['Core_Text'][_Menu.list[MenuName]['cur'] + _Menu.list[MenuName]['scr']])
+   windower.text.set_location('Menu_cur_'..MenuName, x, y + menu.list[MenuName]['cur'] * 14)
+   windower.text.set_text('Menu_cur_'..MenuName, menu.list[MenuName]['Core_Text'][menu.list[MenuName]['cur'] + menu.list[MenuName]['scr']])
 end
 
-function CreateMenu(MenuName, Caption, opt, x, y, mx, sub_key)
-   _Menu.list[MenuName] = {}
+function menu.create(MenuName, Caption, opt, x, y, mx, sub_key)
+   menu.list[MenuName] = {}
 
    local tb = ''
    local scr = ''
 
-   _Menu.list[MenuName]['Menu_Name'] = MenuName
-   _Menu.list[MenuName]['Core_Text'] = {}
-   _Menu.list[MenuName]['text'] = {}
-   _Menu.list[MenuName]['key'] = {}
+   menu.list[MenuName]['menu_name'] = MenuName
+   menu.list[MenuName]['Core_Text'] = {}
+   menu.list[MenuName]['text'] = {}
+   menu.list[MenuName]['key'] = {}
 
-   _Menu.list[MenuName]['scr'] = 0
-   _Menu.list[MenuName]['cur'] = 0
-   _Menu.list[MenuName]['mx'] = mx - 1
-   _Menu.list[MenuName]['max_ln'] = string.len(Caption)+1
+   menu.list[MenuName]['scr'] = 0
+   menu.list[MenuName]['cur'] = 0
+   menu.list[MenuName]['mx'] = mx - 1
+   menu.list[MenuName]['max_ln'] = string.len(Caption)+1
 
-   _Menu.list[MenuName]['x'] = x
-   _Menu.list[MenuName]['y'] = y
+   menu.list[MenuName]['x'] = x
+   menu.list[MenuName]['y'] = y
 
    -- FIX Text Length
    local ii = 0
 
    for i, v in pairs(opt) do
       if sub_key ~= nil then 
-         _Menu.list[MenuName]['text'][ii] = v[sub_key]
+         menu.list[MenuName]['text'][ii] = v[sub_key]
       else
-         _Menu.list[MenuName]['text'][ii] = v
+         menu.list[MenuName]['text'][ii] = v
       end
 
-      _Menu.list[MenuName]['key'][ii] = i
+      menu.list[MenuName]['key'][ii] = i
 
-      if _Menu.list[MenuName]['max_ln'] < string.len(_Menu.list[MenuName]['text'][ii]) + 1 then 
-         _Menu.list[MenuName]['max_ln'] = string.len(_Menu.list[MenuName]['text'][ii]) + 1
+      if menu.list[MenuName]['max_ln'] < string.len(menu.list[MenuName]['text'][ii]) + 1 then 
+         menu.list[MenuName]['max_ln'] = string.len(menu.list[MenuName]['text'][ii]) + 1
       end
       ii = ii + 1
    end
 
-   if mx > #_Menu.list[MenuName]['text'] + 1 then mx = #_Menu.list[MenuName]['text'] + 1 end
+   if mx > #menu.list[MenuName]['text'] + 1 then mx = #menu.list[MenuName]['text'] + 1 end
 
-   for i = 0, #_Menu.list[MenuName]['text'] do
-      _Menu.list[MenuName]['Core_Text'][i] = ' '.._Menu.list[MenuName]['text'][i]..string.rep(' ', _Menu.list[MenuName]['max_ln'] - string.len(_Menu.list[MenuName]['text'][i]))..'\\cr\n'
+   for i = 0, #menu.list[MenuName]['text'] do
+      menu.list[MenuName]['Core_Text'][i] = ' '..menu.list[MenuName]['text'][i]..string.rep(' ', menu.list[MenuName]['max_ln'] - string.len(menu.list[MenuName]['text'][i]))..'\\cr\n'
    end
 
    for i = 0, mx-1 do
-      tb=tb.._Menu.list[MenuName]['Core_Text'][i]
+      tb=tb..menu.list[MenuName]['Core_Text'][i]
       scr=scr..' \\cr\n'
    end
 
-   Caption = Caption..string.rep(' ', _Menu.list[MenuName]['max_ln']- string.len(Caption))..' X\\cr\n'
+   Caption = Caption..string.rep(' ', menu.list[MenuName]['max_ln']- string.len(Caption))..' X\\cr\n'
 
    -- Create all Textbox
 
@@ -195,7 +200,7 @@ function CreateMenu(MenuName, Caption, opt, x, y, mx, sub_key)
    windower.text.set_bg_color('Menu_cur_'..MenuName, 155, 40, 40, 100)
    windower.text.set_color('Menu_cur_'..MenuName, 255, 255, 255, 255)
    windower.text.set_bold('Menu_cur_'..MenuName, 'true')
-   windower.text.set_text('Menu_cur_'..MenuName, _Menu.list[MenuName]['Core_Text'][_Menu.list[MenuName]['cur']])
+   windower.text.set_text('Menu_cur_'..MenuName, menu.list[MenuName]['Core_Text'][menu.list[MenuName]['cur']])
    windower.text.set_bg_visibility('Menu_cur_'..MenuName, true)
    windower.text.set_font('Menu_cur_'..MenuName, 'Courier New', 9)
    windower.text.set_visibility('Menu_cur_'..MenuName, false)
@@ -219,11 +224,11 @@ function CreateMenu(MenuName, Caption, opt, x, y, mx, sub_key)
    windower.text.set_visibility('Menu_bar_'..MenuName, false)
 
    -- kick this function every .01 sec. (no return or return false cancel the functin loop)
-   _Menu.callback_event['onload_Menu.'..MenuName] = {
+   menu.callback_list['onload_Menu.'..MenuName] = {
       clock = os.clock() + .01,
 
       fn = function(key) 
-         _Menu.callback_event[key].clock = os.clock() + .01
+         menu.callback_list[key].clock = os.clock() + .01
          key = string.gsub(key, 'onload_Menu.', '')
          local x2,y2 = windower.text.get_extents('Menu_TB_'..key)
 
@@ -231,10 +236,10 @@ function CreateMenu(MenuName, Caption, opt, x, y, mx, sub_key)
             return true
          end
 
-         local x = _Menu.list[key]['x']
-         local y = _Menu.list[key]['y']
+         local x = menu.list[key]['x']
+         local y = menu.list[key]['y']
 
-         Move_Menu(key, x, y)
+         menu.move(key, x, y)
          windower.text.set_location('Menu_bar_'..key, x + x2, y + 15)
          windower.text.set_visibility('Menu_Caption_'..key, true)
          windower.text.set_visibility('Menu_TB_'..key, true)
@@ -243,46 +248,46 @@ function CreateMenu(MenuName, Caption, opt, x, y, mx, sub_key)
          windower.text.set_visibility('Menu_bar_'..key, true)
 
 
-         if type(_Menu.list[key]['on_load']) == 'function' then
-            _Menu.list[key]['on_load'](_Menu.list[key])
+         if type(menu.list[key]['on_load']) == 'function' then
+            menu.list[key]['on_load'](menu.list[key])
          end 
       end}
 
-   _Menu.list[MenuName]['close'] = function()
+   menu.list[MenuName]['close'] = function()
       write('closing menu')
       windower.text.delete('Menu_TB_'..MenuName)
       windower.text.delete('Menu_cur_'..MenuName)
       windower.text.delete('Menu_scr_'..MenuName)
       windower.text.delete('Menu_bar_'..MenuName)
       windower.text.delete('Menu_Caption_'..MenuName)
-      _Menu.list[MenuName] = nil
+      menu.list[MenuName] = nil
    end
 
-   _Menu.list[MenuName]['move'] = function(x, y)
-      Move_Menu(MenuName, x, y)
+   menu.list[MenuName]['move'] = function(x, y)
+      menu.move(MenuName, x, y)
    end
 
-   return _Menu.list[MenuName]
+   return menu.list[MenuName]
 end 
 
-function menu_combine(set1,set2)
+function menu.combine(set1,set2)
    for i,v in pairs(set2) do
       set1[i] = v
    end   
    return set1
 end
 
-function Move_Menu(MenuName, x, y)
+function menu.move(MenuName, x, y)
    local x1,y1 = windower.text.get_location('Menu_TB_'..MenuName)
    local x2,y2 = windower.text.get_extents('Menu_TB_'..MenuName)
 
-   _Menu.list[MenuName]['x'] = x
-   _Menu.list[MenuName]['y'] = y
+   menu.list[MenuName]['x'] = x
+   menu.list[MenuName]['y'] = y
 
    windower.text.set_location('Menu_Caption_'..MenuName, x, y)
    y = y + 15
    windower.text.set_location('Menu_TB_'..MenuName, x, y)
-   windower.text.set_location('Menu_cur_'..MenuName, x, y + _Menu.list[MenuName]['cur'] * 14)
+   windower.text.set_location('Menu_cur_'..MenuName, x, y + menu.list[MenuName]['cur'] * 14)
 
    windower.text.set_location('Menu_scr_'..MenuName, x + x2, y)
    local bar_x,bar_y = windower.text.get_location('Menu_bar_'..MenuName)
@@ -290,7 +295,7 @@ function Move_Menu(MenuName, x, y)
    windower.text.set_location('Menu_bar_'..MenuName, x + x2, y + bar_y)
 end
 
-function menu_mouse_event(ActionType, x, y, is_blocked)
+function menu.mouse_event(ActionType, x, y, is_blocked)
    local x1 = 0
    local y1 = 0
 
@@ -303,12 +308,12 @@ function menu_mouse_event(ActionType, x, y, is_blocked)
    local this = nil
 
    if ActionType == 514 then  --mouse up
-      if _Menu._MenuPress ~= nil then
+      if menu.mpn ~= nil then
 
-         if _Menu._MouseMoved == false then
-            this = _Menu.list[_Menu._MenuPress]
+         if menu.mouse_moved == false then
+            this = menu.list[menu.mpn]
 
-            if _Menu._mouse_on == 'close' then 
+            if menu.mouse_on == 'close' then 
                if type(this['on_close']) == 'function' then
                   ret = this['on_close'](this)
                   if ret ~= true then
@@ -316,13 +321,13 @@ function menu_mouse_event(ActionType, x, y, is_blocked)
                   end
                end                 
 
-            elseif _Menu._mouse_on == 'content' then 
-               if (os.clock() - _Menu.First_Click) < .5 and _Menu.First_Click ~= 0 then --mouse dbl_click
-                  _Menu.First_Click = 0
+            elseif menu.mouse_on == 'content' then 
+               if (os.clock() - menu.First_Click) < .5 and menu.First_Click ~= 0 then --mouse dbl_click
+                  menu.First_Click = 0
                   if type(this['on_dbl_click']) == 'function' then
                      this['on_dbl_click'](this, this['cur'] + this['scr'], this['text'][ this['cur'] + this['scr'] ])
                   end
-                  _Menu._MenuPress = nil
+                  menu.mpn = nil
                   return true
                else
                   if type(this['on_click']) == 'function' then
@@ -332,49 +337,49 @@ function menu_mouse_event(ActionType, x, y, is_blocked)
             end
          end 
 
-         _Menu._MenuPress = nil
-         _Menu.First_Click = os.clock()
+         menu.mpn = nil
+         menu.First_Click = os.clock()
          return true
       end
 
    elseif ActionType == 512 then  --mouse move
-      _Menu._MouseMoved = true
-      _Menu.First_Click = 0
+      menu.mouse_moved = true
+      menu.First_Click = 0
 
-      if _Menu._MenuPress == nil then
+      if menu.mpn == nil then
 
-         _Menu._mouse_on = nil
+         menu.mouse_on = nil
 
-         for key, val in pairs(_Menu.list) do
+         for key, val in pairs(menu.list) do
             x1,y1 = windower.text.get_location('Menu_TB_'..key)
             x2,y2 = windower.text.get_extents('Menu_TB_'..key)
 
             if x < x1 + x2+9 and x > x1 then 
                if y < y1 + y2 and y > y1 - 15 then 
 
-                  _Menu._CurrentMenu = key
+                  menu.current_menu = key
    
                   if y > y1 then 
                      if x < x1 + x2+1 then 
                         local Menu_cur = math.floor ((y - y1-1) / 14)
   
-                        if _Menu.list[key]['cur'] ~= Menu_cur then
-                           _Menu.list[key]['cur'] = Menu_cur
-                           RefreshMenu(key)
+                        if menu.list[key]['cur'] ~= Menu_cur then
+                           menu.list[key]['cur'] = Menu_cur
+                           menu.Refresh(key)
                         end
 
-                        _Menu._mouse_on = 'content'
+                        menu.mouse_on = 'content'
                         break
                      else 
-                        _Menu._mouse_on = 'scroll'
+                        menu.mouse_on = 'scroll'
                         break
                      end
                   else
                      if x > x1 + x2 then 
-                        _Menu._mouse_on = 'close'
+                        menu.mouse_on = 'close'
                         break
                      else
-                        _Menu._mouse_on = 'caption'
+                        menu.mouse_on = 'caption'
                         break
                      end
                   end 
@@ -383,52 +388,52 @@ function menu_mouse_event(ActionType, x, y, is_blocked)
          end
       else
 
-         x1,y1 = windower.text.get_location('Menu_Caption_'.._Menu._MenuPress)
-         x2,y2 = windower.text.get_extents('Menu_TB_'.._Menu._MenuPress)
+         x1,y1 = windower.text.get_location('Menu_Caption_'..menu.mpn)
+         x2,y2 = windower.text.get_extents('Menu_TB_'..menu.mpn)
 
-         if _Menu._mouse_on == 'caption' or _Menu._mouse_on == 'content' then
-            this = _Menu.list[_Menu._MenuPress]
-            NewX = x1 + x - _Menu._MenuPressX 
-            NewY = y1 + y - _Menu._MenuPressY
+         if menu.mouse_on == 'caption' or menu.mouse_on == 'content' then
+            this = menu.list[menu.mpn]
+            NewX = x1 + x - menu.mousePressX 
+            NewY = y1 + y - menu.mousePressY
 
-            Move_Menu(_Menu._MenuPress, NewX, NewY)
+            menu.move(menu.mpn, NewX, NewY)
 
             if type(this['on_move']) == 'function' then
                this['on_move'](this, this.x, this.y)
             end                 
 
-            _Menu._MenuPressX = x
-            _Menu._MenuPressY = y
+            menu.mousePressX = x
+            menu.mousePressY = y
 
-         elseif _Menu._mouse_on == 'scroll' then
-            xx1,yy1 = windower.text.get_location('Menu_bar_'.._Menu._MenuPress)
-            xx2,yy2 = windower.text.get_extents('Menu_bar_'.._Menu._MenuPress)
+         elseif menu.mouse_on == 'scroll' then
+            xx1,yy1 = windower.text.get_location('Menu_bar_'..menu.mpn)
+            xx2,yy2 = windower.text.get_extents('Menu_bar_'..menu.mpn)
 
-            if _Menu._MenuPressY > yy1 and _Menu._MenuPressY < yy1 + yy2 then 
+            if menu.mousePressY > yy1 and menu.mousePressY < yy1 + yy2 then 
 
-               NewY = yy1 + y - _Menu._MenuPressY
+               NewY = yy1 + y - menu.mousePressY
 
                if NewY <= y1 + 15 then 
                   NewY = y1 + 15
-                  _Menu._MenuPressY = NewY + ( _Menu._MenuPressY - yy1)
+                  menu.mousePressY = NewY + ( menu.mousePressY - yy1)
                elseif NewY >= y1 + y2 then 
                   NewY = y1 + y2
-                  _Menu._MenuPressY = NewY + ( _Menu._MenuPressY - yy1)
+                  menu.mousePressY = NewY + ( menu.mousePressY - yy1)
                else
-                  _Menu._MenuPressY = y
+                  menu.mousePressY = y
                end
 
-               windower.text.set_location('Menu_bar_'.._Menu._MenuPress, xx1, NewY)
+               windower.text.set_location('Menu_bar_'..menu.mpn, xx1, NewY)
 
-               local MaxScr = (#_Menu.list[_Menu._MenuPress]['text'] - _Menu.list[_Menu._MenuPress]['mx'])
+               local MaxScr = (#menu.list[menu.mpn]['text'] - menu.list[menu.mpn]['mx'])
 
                local per =  (NewY-y1) / y2
                local scr = math.floor(per * MaxScr)
  
-               if _Menu.list[_Menu._MenuPress]['scr'] ~= scr then
-                  if scr + _Menu.list[_Menu._MenuPress]['cur'] <= #_Menu.list[_Menu._MenuPress]['text'] then
-                     _Menu.list[_Menu._MenuPress]['scr'] = scr
-                     RefreshMenu(_Menu._MenuPress)
+               if menu.list[menu.mpn]['scr'] ~= scr then
+                  if scr + menu.list[menu.mpn]['cur'] <= #menu.list[menu.mpn]['text'] then
+                     menu.list[menu.mpn]['scr'] = scr
+                     menu.Refresh(menu.mpn)
                   end
                end
 
@@ -437,27 +442,29 @@ function menu_mouse_event(ActionType, x, y, is_blocked)
          return false
       end
 
-   elseif ActionType == 513 and _Menu._mouse_on ~= nil then --mouse down 
-      _Menu._MouseMoved = false
-      _Menu._MenuPressX = x
-      _Menu._MenuPressY = y
-      _Menu._MenuPress = _Menu._CurrentMenu
+   elseif ActionType == 513 and menu.mouse_on ~= nil then --mouse down 
+      menu.mouse_moved = false
+      menu.mousePressX = x
+      menu.mousePressY = y
+      menu.mpn = menu.current_menu
 
       return true
    end
 end
 
-windower.register_event('mouse', menu_mouse_event)
+windower.register_event('mouse', menu.mouse_event)
 
-function menu_event_unload()
-   for key, val in pairs(_Menu.list) do
+function menu.event_unload()
+   for key, val in pairs(menu.list) do
       windower.text.delete('Menu_TB_'..key)
       windower.text.delete('Menu_cur_'..key)
       windower.text.delete('Menu_scr_'..key)
       windower.text.delete('Menu_bar_'..key)
       windower.text.delete('Menu_Caption_'..key)
-      _Menu.list[key] = nil
+      menu.list[key] = nil
    end
 end
 
-windower.register_event('unload', menu_event_unload)
+windower.register_event('unload', menu.event_unload)
+
+return menu
