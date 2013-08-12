@@ -33,16 +33,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  Example:
 
-   MenuList[0] = 'list1'
-   MenuList[1] = 'list2'
-   MenuList[2] = 'list3'
-   MenuList[3] = 'list4'
-   MenuList[4] = 'list5'
-   MenuList[5] = 'list6'
-   MenuList[6] = 'list7'
-   MenuList[7] = 'list8'
-   MenuList[8] = 'list9'
-   MenuList[9] = 'list10'
+   MenuList = {
+	sub="Oneiros Grip",
+	rear="Cmd. Earring",
+	main="Terra's Staff",
+	neck="Twilight Torque",
+	lring="Dark Ring",
+	rring="Dark Ring",
+	back="Shadow Mantle",
+	legs="Crimson Cuisses",
+	waist="Flume Belt",
+	lear="Moonshade Earring",
+	body="Bokwus Robe",
+	head="Dls. Chapeau +2",
+	feet="Estq. houseaux +2"}
 
    My_Menu = menu.create("my_menu_name", "Menu caption test", MenuList, 200, 200, 5)
 
