@@ -227,12 +227,12 @@ function menu.create(menu_name, caption, opt, x, y, mx, sub_key)
    windower.text.set_font('menu_bar_'..menu_name, 'Courier New', 9)
    windower.text.set_visibility('menu_bar_'..menu_name, false)
 
-   -- kick this function every .05 sec. (no return or return false cancel the functin loop)
+   -- kick this function every render until windower.text.get_extents return value. (no return or return false cancel the functin loop)
    menu.callback_list['onload_Menu.'..menu_name] = {
-      clock = os.clock() + .05,
+      clock = os.clock(),
 
       fn = function(key) 
-         menu.callback_list[key].clock = os.clock() + .05
+         menu.callback_list[key].clock = os.clock()
          key = string.gsub(key, 'onload_Menu.', '')
          local x2,y2 = windower.text.get_extents('menu_tb_'..key)
 
