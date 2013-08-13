@@ -55,7 +55,7 @@ end
 function dCheck(typ, sid)
     sid = tonumber(sid)
     if typ == 'spell' then
-        if settings.dangerwords.spells:find(string.imatch-{spells[sid]}) then
+        if settings.dangerwords.spells:find(string.imatch-{spells[sid]['english']}) then
             return true
         end 
     else
