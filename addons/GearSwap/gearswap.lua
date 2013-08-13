@@ -266,7 +266,7 @@ function event_outgoing_chunk(id,data)
 end
 
 function event_action(act)
-	if gearswap_disabled or act_category == 1 then return end
+	if gearswap_disabled or act.category == 1 then return end
 	
 	refresh_player()
 	local prefix = ''
