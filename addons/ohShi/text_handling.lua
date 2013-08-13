@@ -85,7 +85,7 @@ function addText(name,abtype,abil,dMob,dangerous)
             tracking:append(' '..str)
         end
     end
-    windower.send_command('@wait '..settings.duration..'; lua i ohshinew remText')
+    windower.send_command('@wait '..settings.duration..'; lua i ohshi remText')
     textUpdate()
 end
 
@@ -122,7 +122,7 @@ function flashImage()
     windower.prim.set_visibility(name,true)
     windower.prim.set_position(name,settings.pos.x-30,settings.pos.y-10)
     windower.prim.set_size(name,30,30)
-    windower.send_command('@wait '..settings['duration']..';lua i ohshinew deleteImage '..name)
+    windower.send_command('@wait '..settings['duration']..';lua i ohshi deleteImage '..name)
 end
 
 --Called to delete the image after it's time is up.
