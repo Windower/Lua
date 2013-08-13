@@ -47,12 +47,15 @@ end
 --Add text to textbox. Anytime text is added this is called.
 function addText(name,abtype,abil,dMob,dangerous)
     if abtype == 'ws' then
+        abil = tonumber(abil)
         doit = true
         abilname = mAbils[abil-256]['english']
     elseif abtype == 'spell' then
+        abil = tonumber(abil)
         doit = true
         abilname = spells[abil]['english']
     elseif abtype == 'roll' then
+        abil = tonumber(abil)
         doit = true
         abilname = jAbils[abil]['english']..' ['..dMob..']'
         dMob = nil
