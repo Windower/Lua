@@ -18,7 +18,10 @@
   </addon>
   <addon>
     <name>AnsweringMachine</name>
+	<author>Byrth</author>
     <description>Stores tells that you receive for later recall.</description>
+	<bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+	<support>irc.ffochat.com</support>
   </addon>
   <addon>
     <name>AutoJoin</name>
@@ -42,6 +45,8 @@
     <name>BattleMod</name>
     <author>Byrth</author>
     <description>Customizes battle chat messages.</description>
+	<bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+	<support>irc.ffochat.com</support>
   </addon>
   <addon>
     <name>Blist</name>
@@ -77,7 +82,10 @@
   </addon>
   <addon>
     <name>Daze</name>
+	<author>Byrth</author>
     <description>Records what daze effects are on the monster you're fighting.</description>
+	<bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+	<support>irc.ffochat.com</support>
   </addon>
   <addon>
     <name>DynamisHelper</name>
@@ -118,7 +126,9 @@
   <addon>
     <name>GearSwap</name>
     <author>Byrth</author>
-    <description>Changes gear in response to player actions.</description>
+    <description>Changes gear in response to player actions. [[Uses Packets.]]</description>
+	<bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+	<support>irc.ffochat.com</support>
   </addon>
   <addon>
     <name>Linker</name>
@@ -161,6 +171,8 @@
     <name>plugin_manager</name>
     <author>Byrth</author>
     <description>Allows you to specify which plugins and addons will be used with which characters.</description>
+	<bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+	<support>irc.ffochat.com</support>
   </addon>
   <addon>
     <author>Giuliano Riccio (Zohno@Phoenix)</author>
@@ -168,6 +180,13 @@
     <description>Shows the slips' items highlighting those that are stored.</description>
     <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
+  </addon>
+  <addon>
+    <author>Byrth</author>
+    <name>pr</name>
+    <description>An addon that records and formats packets, comparing them with the packets library.</description>
+	<bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+	<support>irc.ffochat.com</support>
   </addon>
   <addon>
     <author>Giuliano Riccio (Zohno@Phoenix)</author>
@@ -178,7 +197,10 @@
   </addon>
   <addon>
     <name>Respond</name>
+	<author>Byrth</author>
     <description>Respond to tells and FFOchat PMs using //r.</description>
+	<bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+	<support>irc.ffochat.com</support>
   </addon>
   <addon>
     <name>RollTracker</name>
@@ -209,7 +231,9 @@
   <addon>
     <name>Shortcuts</name>
     <author>Byrth</author>
-    <description>Applys spellcast-like command completion (interpretation and target completion) to single slash commands. Includes emotes, /check, and /pcmd.</description>
+    <description>Applys spellcast-like command completion (interpretation and target completion) to commands. Includes emotes, /check, and /pcmd.</description>
+	<support>irc.ffochat.com</support>
+	<bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
   </addon>
   <addon>
   	<name>ShoutHelper</name>
