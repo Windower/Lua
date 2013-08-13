@@ -53,7 +53,7 @@ end
 --This function checks the string sent to it against your danger list
 --returns true if it's found and false if not.
 function dCheck(typ, sid)
-    if typ == 'spells' then
+    if typ == 'spell' then
         if settings.dangerwords.spells:find(string.imatch-{spells[sid]}) then
             return true
         end 
