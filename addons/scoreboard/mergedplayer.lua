@@ -16,7 +16,6 @@ function MergedPlayer:new (o)
 end
 
 --[[
-    'crit', 'rcrit',
     'mmin', 'mmax', 'mavg',
     'rmin', 'rmax', 'ravg',
     'wsmin', 'wsmax', 'wsavg'
@@ -85,6 +84,27 @@ function MergedPlayer:rcrit()
     local total = hits + crits
     if total > 0 then
         return {crits / total, total}
+    else
+        return {0, 0}
+    end
+end
+
+
+function MergedPlayer:wsavg()
+    local wsdmg   = 0
+    local wscount = 0
+    
+    for _, p in ipairs(self.players) do
+        for wsid, dmgtable in pairs(p.ws) do
+            for _, dmg in ipairs(dmgtable) do
+                wsdmg = wsdmg + dmg
+                wscount = wscount + 1
+            end
+        end
+    end
+    
+    if wscount > 0 then
+        return {wsdmg / wscount, wscount}
     else
         return {0, 0}
     end

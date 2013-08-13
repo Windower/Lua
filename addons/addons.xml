@@ -211,6 +211,7 @@
     <author>Suji</author>
     <description>Basic in-game damage parser. It displays live DPS and works even when chat filters are enabled.</description>
     <bugtracker>https://github.com/jerryhebert/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Phoenix/Suji</support>
   </addon>
   <addon>
     <name>Shortcuts</name>

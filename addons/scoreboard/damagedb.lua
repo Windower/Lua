@@ -8,14 +8,14 @@ local DamageDB = {
 
 --[[
 DamageDB.player_stat_fields = T{
-    'acc', 'racc', 'crit', 'rcrit',
     'mmin', 'mmax', 'mavg',
     'rmin', 'rmax', 'ravg',
     'wsmin', 'wsmax', 'wsavg'
 }
 ]]
 DamageDB.player_stat_fields = T{
-    'acc', 'racc', 'crit', 'rcrit'
+    'acc', 'racc', 'crit', 'rcrit',
+    'wsavg'
 }
 
 function DamageDB:new (o)
@@ -89,7 +89,11 @@ end
 -- For WS queries, the stat value is a sub-table of {ws1 = ws_stat1, ws2 = ws_stat2}.
 function DamageDB:query_stat(stat, player_name)
     local players = T{}
-    
+
+    if player_name and player_name:match('^[a-zA-Z]+$') then
+        player_name = player_name:lower():ucfirst()
+    end
+
     -- Gather a table mapping player names to all of the corresponding Player instances
     for mob, mob_players in self:iter() do
         for name, player in pairs(mob_players) do
@@ -121,6 +125,7 @@ end
 
 function DamageDB:reset()
     self.db = T{}
+    self:clear_filters()
 end
 
 
