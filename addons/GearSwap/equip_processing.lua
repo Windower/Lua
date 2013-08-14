@@ -26,7 +26,7 @@
 
 
 function equip_sets(swap_type,val1,val2)
-	local items = get_items()
+	refresh_globals()
 	local cur_equip = items['equipment'] -- i = 'head', 'feet', etc.; v = inventory ID (0~80)
 	-- If the swap is not complete, overwrite the current equipment with the equipment that you are swapping to
 	for i,v in pairs(cur_equip) do
@@ -35,7 +35,6 @@ function equip_sets(swap_type,val1,val2)
 		end
 	end
 	
-	refresh_globals()
 	table.reassign(equip_list,player.equipment)
 	
 	if debugging >= 2 then add_to_chat(1,swap_type) end
@@ -61,8 +60,7 @@ function equip_sets(swap_type,val1,val2)
 		elseif user_env.precast then add_to_chat(123,'GearSwap: precast() exists but is not a function') end
 	elseif swap_type == 'midcast' then
 		val1.target = spelltarget
-		if type(user_env.midcast) == 'function' then user_env.midcast(val1,val2) -- User defined function to determine the midcast set
-		elseif user_env.midcast then add_to_chat(123,'GearSwap: midcast() exists but is not a function') end
+		user_env.midcast(val1,val2) -- User defined function to determine the midcast set
 	elseif swap_type == 'aftercast' then
 		if not val1 then val1 = {}
 			add_to_chat(8,'val1 error')
@@ -70,16 +68,13 @@ function equip_sets(swap_type,val1,val2)
 		val1.target = spelltarget
 		midaction = false
 		spelltarget = nil
-		if type(user_env.aftercast) == 'function' then user_env.aftercast(val1,val2) -- User defined function to determine the aftercast set
-		elseif user_env.aftercast then add_to_chat(123,'GearSwap: aftercast() exists but is not a function') end
+		user_env.aftercast(val1,val2) -- User defined function to determine the aftercast set
 	elseif swap_type == 'pet_midcast' then
 		val1.target = spelltarget
-		if type(user_env.pet_midcast) == 'function' then user_env.pet_midcast(val1,val2) -- User defined function to determine the midcast set
-		elseif user_env.pet_midcast then add_to_chat(123,'GearSwap: pet_midcast() exists but is not a function') end
+		user_env.pet_midcast(val1,val2) -- User defined function to determine the midcast set
 	elseif swap_type == 'pet_aftercast' then
 		val1.target = spelltarget
-		if type(user_env.pet_aftercast) == 'function' then user_env.pet_aftercast(val1,val2) -- User defined function to determine the aftercast set
-		elseif user_env.pet_aftercast then add_to_chat(123,'GearSwap: pet_aftercast() exists but is not a function') end
+		user_env.pet_aftercast(val1,val2) -- User defined function to determine the aftercast set
 	elseif swap_type == 'status_change' then
 		if type(user_env.status_change) == 'function' then user_env.status_change(val1,val2) -- User defined function to determine if sets should change following status change
 		elseif user_env.status_change then add_to_chat(123,'GearSwap: status_change() exists but is not a function') end
