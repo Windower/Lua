@@ -269,6 +269,11 @@ function event_action(act)
 	
 	local temp_player = get_player()
 	local player_id = temp_player['id']
+	-- Update player info for aftercast costs.
+	player.tp = temp_player.vitals.tp
+	player.mp = temp_player.vitals.mp
+	player.mpp = temp_player.vitals.mpp
+	
 	local temp_pet,pet_id
 	if temp_player.pet_index then
 		temp_pet = get_mob_by_index(temp_player['pet_index'])

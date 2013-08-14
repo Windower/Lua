@@ -118,12 +118,12 @@ function equip_sets(swap_type,val1,val2)
 	
 	
 	if failure_reason == '' then
-		for i,v in pairs(equip_next) do
+		for i = 0,15 do
 			--if debugging >= 2 then add_to_chat(8,tostring(v)..' '..tostring(i)..' item: '..tostring(r_items[items['inventory'][v]['id']][language..'_log'])) else
-			----inject_packet(is_outgoing, data)
-			set_equip(v,i)
-			sent_out_equip[i] = v -- re-make the equip_next table with the name sent_out_equip as the equipment is sent out.
-			--end
+			if equip_next[i] then
+				set_equip(equip_next[i],i)
+				sent_out_equip[i] = v -- re-make the equip_next table with the name sent_out_equip as the equipment is sent out.
+			end
 		end
 	elseif logging then
 		logit(logfile,'\n\n'..tostring(os.clock)..'(69) failure_reason: '..tostring(failure_reason))
