@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon = {}
 _addon.name = 'OhShi'
-_addon.version = '2.5'
+_addon.version = '2.51'
 
 --Requiring libraries used in this addon
 --These should be saved in addons/libs
@@ -121,13 +121,13 @@ function commands(...)
             end
             local list = args:concat(' '):capitalize()
             if comm:find('on$') then
-                if not settings.dangerwords[typ]:find(string.imatch-{list}) then
+                if not settings.dangerwords[typ]:find(string.imatch-{list..'$'}) then
                     settings.dangerwords[typ]:add(list)
                     notice(list..' added to '..typ..' table.')
                 end
             else
                 if settings.dangerwords[typ]:find(string.imatch-{list}) then
-                    settings.dangerwords[typ]:remove(settings.dangerwords[typ]:find(string.imatch-{list}))
+                    settings.dangerwords[typ]:remove(settings.dangerwords[typ]:find(string.imatch-{list..'$'}))
                     notice(list..' removed from '..typ..' table.')
                 end
             end
