@@ -39,7 +39,7 @@ require 'user_functions'
 
 _addon = {}
 _addon.name = 'GearSwap'
-_addon.version = '0.603'
+_addon.version = '0.604'
 _addon.commands = {'gs','gearswap'}
 
 function event_load()
@@ -144,7 +144,6 @@ function event_outgoing_text(original,modified)
 		return _raw.table.concat(splitline,' ',2,#splitline)
 	elseif command_list[command] and temptarg and validabils[language][abil] and not midaction then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) temp_mod: '..temp_mod) end
-		refresh_globals()
 			
 		send_command('@wait 1;lua invoke gearswap midact')
 		
@@ -173,12 +172,12 @@ function event_outgoing_text(original,modified)
 		r_line = aftercast_cost(r_line)
 		
 		storedcommand = r_line['prefix']..' "'..r_line[language]..'" '
+
 		equip_sets('precast',r_line,{type=s_type})
 
 		return ''
 	elseif command_list[command] == 'Ranged Attack' and temptarg and not midaction then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) temp_mod: '..temp_mod) end
-		refresh_globals()
 
 		rline = ranged_line
 		send_command('@wait 1;lua invoke gearswap midact')
@@ -266,47 +265,88 @@ function event_outgoing_chunk(id,data)
 end
 
 function event_action(act)
-	if gearswap_disabled or act_category == 1 then return end
+	if gearswap_disabled or act.category == 1 then return end
 	
-	refresh_player()
-	local prefix = ''
+	local temp_player = get_player()
+	local player_id = temp_player['id']
+	-- Update player info for aftercast costs.
+	player.tp = temp_player.vitals.tp
+	player.mp = temp_player.vitals.mp
+	player.mpp = temp_player.vitals.mpp
 	
-	if pet['id']==act['actor_id'] then 
-		prefix = 'pet_'
+	local temp_pet,pet_id
+	if temp_player.pet_index then
+		temp_pet = get_mob_by_index(temp_player['pet_index'])
+		pet_id = temp_pet.id
 	end
 	
-	if (player['id'] ~= act['actor_id'] and pet['id']~=act['actor_id']) then
+	if player_id ~= act['actor_id'] and act['actor_id']~=pet_id then
 		return -- If the action is not being used by the player, the pet, or is a melee attack then abort processing.
 	end
 	
+	local prefix = ''
+	
+	if act['actor_id'] == pet_id then 
+		prefix = 'pet_'
+	end
+	
 	local spell = get_spell(act)
-	local category = act['category']
+	local category = act.category
 	
 	if logging then	
 		if spell then logit(logfile,'\n\n'..tostring(os.clock)..'(178) Event Action: '..tostring(spell.english)..' '..tostring(act['category']))
 		else logit(logfile,'\n\nNil spell detected') end
 	end
 	
-	if jas[category] then
-		equip_sets(prefix..'aftercast',spell,{type=get_action_type(category)})
-	elseif readies[category] then
-		if act['param'] == 28787 and not category == 9 then ----------- NEED TO ADD BETTER HANDLING FOR THIS ----------------------------- Why?
-			equip_sets(prefix..'aftercast',spell,{type='Failure'})
-		elseif act['param'] ~= 28787 then
-			equip_sets(prefix..'midcast',spell,{type=get_action_type(category)})
+	if jas[category] or uses[category] or (readies[category] and act.param == 28787 and not category == 9) then
+		local action_type = get_action_type(category)
+		if readies[category] and act.param == 28787 and not category == 9 then
+			action_type = 'Failure'
 		end
-	elseif uses[category] then
-		equip_sets(prefix..'aftercast',spell,{type=get_action_type(category)})
+		if type(user_env[prefix..'aftercast']) == 'function' then
+			equip_sets(prefix..'aftercast',spell,{type=action_type})
+		elseif user_env[prefix..'aftercast'] then
+			midaction = false
+			spelltarget = nil
+			add_to_chat(123,'GearSwap: '..prefix..'aftercast() exists but is not a function')
+		else
+			midaction = false
+			spelltarget = nil
+		end
+	elseif readies[category] and act.param ~= 28787 then
+		if type(user_env[prefix..'midcast']) == 'function' then
+			equip_sets(prefix..'midcast',spell,{type=get_action_type(category)})
+		elseif user_env[prefix..'midcast'] then
+			add_to_chat(123,'GearSwap: '..prefix..'midcast() exists but is not a function')
+		end
 	end
 end
 
 function event_action_message(actor_id,target_id,actor_index,target_index,message_id,param_1,param_2,param_3)
 	if gearswap_disabled then return end
 	if message_id == 62 then
-		equip_sets('aftercast',r_items[param_1],{type='Failure'})
+		if type(user_env.aftercast) == 'function' then
+			equip_sets('aftercast',r_items[param_1],{type='Failure'})
+		elseif user_env.aftercast then
+			midaction = false
+			spelltarget = nil
+			add_to_chat(123,'GearSwap: aftercast() exists but is not a function')
+		else
+			midaction = false
+			spelltarget = nil
+		end
 	elseif unable_to_use:contains(message_id) then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(195) Event Action Message: '..tostring(message_id)..' Interrupt') end
-		equip_sets('aftercast',{name='Interrupt',type='Interrupt'},{type='Recast'})
+		if type(user_env.aftercast) == 'function' then
+			equip_sets('aftercast',{name='Interrupt',type='Interrupt'},{type='Recast'})
+		elseif user_env.aftercast then
+			midaction = false
+			spelltarget = nil
+			add_to_chat(123,'GearSwap: aftercast() exists but is not a function')
+		else
+			midaction = false
+			spelltarget = nil
+		end
 	end
 end
 
@@ -361,7 +401,6 @@ function get_spell(act)
 	if act['category'] == 2 then
 		spell.english = 'Ranged Attack'
 	else
-	
 		if not dialog[msg_ID] then
 			if T{4,8}:contains(act['category']) then
 				spell = r_spells[abil_ID]
@@ -383,14 +422,14 @@ function get_spell(act)
 		elseif table.contains(fields,'ability') then
 			spell = r_abilities[abil_ID]
 		elseif table.contains(fields,'weapon_skill') then
-			if abil_ID > 255 then -- WZ_RECOVER_ALL is used by chests in Limbus
-				spell = r_mabils[abil_ID-256]
-				if spell.english == '.' then
-					spell.english = 'Special Attack'
-				end
-			elseif abil_ID < 256 then
+--			if abil_ID > 255 then -- WZ_RECOVER_ALL is used by chests in Limbus
+--				spell = r_mabils[abil_ID-256]
+--				if spell.english == '.' then
+--					spell.english = 'Special Attack'
+--				end
+--			elseif abil_ID < 256 then
 				spell = r_abilities[abil_ID+768]
-			end
+--			end
 		elseif msg_ID == 303 then
 			spell = r_abilities[74] -- Divine Seal
 		elseif msg_ID == 304 then

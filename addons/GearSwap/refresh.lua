@@ -146,11 +146,11 @@ function refresh_player()
 	end
 	player.job = player.main_job..'/'..player.sub_job
 	
-	local player_mob_table = get_mob_by_id(player['id'])
+	local player_mob_table = get_mob_by_index(player['index'])
 	
 	if player_mob_table['race']~= nil then player.race = mob_table_races[player_mob_table['race']] end
 	
-	local items = get_items()
+	items = get_items()
 	local cur_equip = items['equipment'] -- i = 'head', 'feet', etc.; v = inventory ID (0~80)
 	if sent_out_equip then -- If the swap is not complete, overwrite the current equipment with the equipment that you are swapping to
 		for i,v in pairs(cur_equip) do
