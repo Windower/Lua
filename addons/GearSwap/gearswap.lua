@@ -39,7 +39,7 @@ require 'user_functions'
 
 _addon = {}
 _addon.name = 'GearSwap'
-_addon.version = '0.603'
+_addon.version = '0.604'
 _addon.commands = {'gs','gearswap'}
 
 function event_load()
@@ -172,6 +172,7 @@ function event_outgoing_text(original,modified)
 		r_line = aftercast_cost(r_line)
 		
 		storedcommand = r_line['prefix']..' "'..r_line[language]..'" '
+
 		equip_sets('precast',r_line,{type=s_type})
 
 		return ''
@@ -300,7 +301,12 @@ function event_action(act)
 		if type(user_env[prefix..'aftercast']) == 'function' then
 			equip_sets(prefix..'aftercast',spell,{type=action_type})
 		elseif user_env[prefix..'aftercast'] then
+			midaction = false
+			spelltarget = nil
 			add_to_chat(123,'GearSwap: '..prefix..'aftercast() exists but is not a function')
+		else
+			midaction = false
+			spelltarget = nil
 		end
 	elseif readies[category] and act.param ~= 28787 then
 		if type(user_env[prefix..'midcast']) == 'function' then
@@ -317,14 +323,24 @@ function event_action_message(actor_id,target_id,actor_index,target_index,messag
 		if type(user_env.aftercast) == 'function' then
 			equip_sets('aftercast',r_items[param_1],{type='Failure'})
 		elseif user_env.aftercast then
-			add_to_chat(123,'GearSwap: '..prefix..'aftercast() exists but is not a function')
+			midaction = false
+			spelltarget = nil
+			add_to_chat(123,'GearSwap: aftercast() exists but is not a function')
+		else
+			midaction = false
+			spelltarget = nil
 		end
 	elseif unable_to_use:contains(message_id) then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(195) Event Action Message: '..tostring(message_id)..' Interrupt') end
 		if type(user_env.aftercast) == 'function' then
 			equip_sets('aftercast',{name='Interrupt',type='Interrupt'},{type='Recast'})
 		elseif user_env.aftercast then
-			add_to_chat(123,'GearSwap: '..prefix..'aftercast() exists but is not a function')
+			midaction = false
+			spelltarget = nil
+			add_to_chat(123,'GearSwap: aftercast() exists but is not a function')
+		else
+			midaction = false
+			spelltarget = nil
 		end
 	end
 end
@@ -380,7 +396,6 @@ function get_spell(act)
 	if act['category'] == 2 then
 		spell.english = 'Ranged Attack'
 	else
-	
 		if not dialog[msg_ID] then
 			if T{4,8}:contains(act['category']) then
 				spell = r_spells[abil_ID]
