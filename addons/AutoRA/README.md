@@ -1,4 +1,4 @@
-AutoRA v. 1.0.2
+AutoRA v. 2.0.0
 
 AutoRA simply causes ranged attacks to behave like the melee Auto-Attack while your weapon is drawn.  If no weapon is drawn or you put your weapon away, your ranged attacks will cease.
 
@@ -14,5 +14,4 @@ ara [options]
 	start  - Starts Ranged Attacking (Identical to CTRL + D)
 	stop   - Stops Ranged Attacking (Identical to ALT + D)
 	shoot  - Fires a ranged attack
-	reload - Reloads settings
 	help   - Shows Version info and available commands
