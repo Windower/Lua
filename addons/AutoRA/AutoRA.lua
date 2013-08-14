@@ -27,7 +27,7 @@
 
 function event_load()
 
-	version = '1.0.2'
+	version = '2.0.0'
 	delay = 0
 	RW_delay = 0
 	Ammo_delay = 0
@@ -37,62 +37,17 @@ function event_load()
 	send_command('bind ^d ara start')
 	send_command('bind !d ara stop')
 	send_command('alias ara lua c autora')
-	setDelay()
 	
-end
-
---Function Designer:  Byrth
-function setDelay()
-	local f = io.open(lua_base_path..'data/settings.txt', "r")
-	if f == nil then
-		local g = io.open(lua_base_path..'data/settings.txt', "w")
-		g:write('Release Date: 11:50 PM, 4-06-13\46\n')
-		g:write('Author Comment: This document is whitespace sensitive, which means that you need the same number of spaces between things as exist in this initial settings file\46\n')
-		g:write('Author Comment: It looks at the first two words separated by spaces and then takes anything as the value in question if the first two words are relevant\46\n')
-		g:write('Author Comment: If you ever mess it up so that it does not work, you can just delete it and AutoRA will regenerate it upon reload\46\n')
-		g:write('Author Comment: Simply add your ranged weapon delay in the "RA Delay:" line and your ammo delay in the "Ammo Delay:" line in place of the existing numbers.\n')
-		g:write('Author Comment: The design of the settings file is credited to Byrthnoth as well as the creation of the settings file.\n\n\n\n')
-		g:write('Fill In Settings Below:\n')
-		g:write('RA Delay: 288 \nAmmo Delay: 288\n')
-		g:close()
-		RW_delay = 288
-		Ammo_delay = 288
-		write('Default settings file created')
-		add_to_chat(13,'AutoRA created a settings file and loaded!')
-	else
-		f:close()
-		for curline in io.lines(lua_base_path..'data/settings.txt') do
-			local splat = split(curline,' ')
-			local cmd = ''
-			if splat[2] ~=nil then
-				cmd = (splat[1]..' '..splat[2]):gsub(':',''):lower()
-			end
-			if cmd == 'ra delay' then
-				RW_delay = tonumber(splat[3])
-			elseif cmd == 'ammo delay' then
-				Ammo_delay = tonumber(splat[3])
-			end
-		end
-		add_to_chat(17,'AutoRA read from a settings file and loaded!')
-	end
-	delay = ((RW_delay + Ammo_delay)/90)
 end
 	
 function start()
 	player = get_player()
 	if (player.status:lower() == 'engaged' ) then
 		auto = 1
-		retrn = 1
 	elseif (player.status:lower() == 'idle' ) then
 		auto = 0
 	end
-	if (auto == 1 and retrn == 1) then
-		shoot()
-	elseif (auto == 0 and retrn == 0) then
-		shootOnce()
-	elseif (auto == 0 and retrn == 1) then
-		retrn = 0
-	end
+	shoot()
 end
 
 function stop()
@@ -101,12 +56,12 @@ end
 
 function shoot()
 	send_command('/shoot <t>')
-	send_command('wait ' .. delay .. '; ara start')
 end
 
 function shootOnce()
 	send_command('/shoot <t>')
 end
+
 --Function Author:  Byrth
 function split(msg, match)
 	local length = msg:len()
@@ -127,6 +82,29 @@ function split(msg, match)
 		end
 	end
 	return splitarr
+end
+
+function event_action(act)
+	local actor = act.actor_id
+	local category = act.category
+	local player = get_player()
+	
+	if ((actor == (player.id or player.index))) then
+		if category == 2 then
+			if auto == 1 then
+				if (player.status:lower() == 'engaged' ) then
+					auto = 1
+				elseif (player.status:lower() == 'idle' ) then
+					auto = 0
+				end
+			end
+			
+			if auto == 1 then
+				send_command('wait 2; /shoot <t>')
+			elseif auto == 0 then
+			end
+		end
+	end
 end
 
 --Function Designer:  Byrth
