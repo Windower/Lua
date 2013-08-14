@@ -33,51 +33,51 @@ require 'tablehelper'
 require 'sets'
 
 function onLoad()
-	windower.send_command('alias stna lua c stna')
-	statSpell = { 
-				Paralysis='Paralyna',
-				Curse='Cursna',
-				Doom='Cursna',
-				Silence='Silena',
-				Plague='Viruna',
-				Diseased='Viruna',
-				Petrification='Stona',
-				Poison='Poisona',
-				Blindness='Blindna'
-			}
-	--You may change this priority as you see fit this is my personal preference		
+    windower.send_command('@alias stna lua c stna')
+    statSpell = { 
+        paralysis='Paralyna',
+        curse='Cursna',
+        doom='Cursna',
+        silence='Silena',
+        plague='Viruna',
+        diseased='Viruna',
+        petrification='Stona',
+        poison='Poisona',
+        blindness='Blindna'
+    }
+    --You may change this priority as you see fit this is my personal preference		
     priority = T{}
-    priority[1] = 'Doom'
-    priority[2] = 'Curse'
-    priority[3] = 'Petrification'
-	priority[4] = 'Paralysis'
-    priority[5] = 'Plague'
-    priority[6] = 'Silence'
-	priority[7] = 'Blindness'
-    priority[8] = 'Poison'
-    priority[9] = 'Diseased'
+    priority[1] = 'doom'
+    priority[2] = 'curse'
+    priority[3] = 'petrification'
+    priority[4] = 'paralysis'
+    priority[5] = 'plague'
+    priority[6] = 'silence'
+    priority[7] = 'blindness'
+    priority[8] = 'poison'
+    priority[9] = 'diseased'
 	
-	statusTable = S{}
+    statusTable = S{}
 end
 
 function onUnload()
-	windower.send_command('unalias stna')
+    windower.send_command('@unalias stna')
 end
 
 function commands()
-	if statusTable ~= nil then
+    if statusTable ~= nil then
         local player = windower.ffxi.get_player()
-		for i = 1, 9 do
-			if statusTable:contains(priority[i]) then
+        for i = 1, 9 do
+            if statusTable:contains(priority[i]) then
                 windower.send_command('send @others /ma "'..statSpell[priority[i]]..'" '..player['name'])
                 if priority[i] == 'Doom' then
                     windower.send_command('input /item "Holy Water" '..player['name'])  --Auto Holy water for doom
                 end
                 return
             end
-		end
+        end
         windower.add_to_chat(55,"You are not afflicted by a status with a -na spell.")
-	end
+    end
 end
 
 function gainStatus(id,name)
