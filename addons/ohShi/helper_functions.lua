@@ -60,7 +60,7 @@ function dCheck(typ, sid)
         end 
     else
         local list = mAbils[sid-256]['english']
-        if settings.dangerwords.weaponskills:find(string.imatch-{list}) then
+        if settings.dangerwords.weaponskills:find(string.imatch-{list..'$'}) then
             return true
         end 
     end

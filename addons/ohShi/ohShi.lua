@@ -126,7 +126,7 @@ function commands(...)
                     notice(list..' added to '..typ..' table.')
                 end
             else
-                if settings.dangerwords[typ]:find(string.imatch-{list}) then
+                if settings.dangerwords[typ]:find(string.imatch-{list..'$'}) then
                     settings.dangerwords[typ]:remove(settings.dangerwords[typ]:find(string.imatch-{list..'$'}))
                     notice(list..' removed from '..typ..' table.')
                 end

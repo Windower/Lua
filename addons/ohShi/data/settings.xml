@@ -2,15 +2,16 @@
 <settings>
 	<global>
 		<bg>
+			<alpha>255</alpha>
 			<blue>0</blue>
 			<green>0</green>
 			<red>0</red>
 		</bg>
 		<dangerwords>
 			<spells>Aeroga IV, Aeroja, Blizzaga IV, Blizzaja, Breakga, Death, Firaga IV, Firaja, Kaustra, Meteor, Stonega IV, Stoneja, Thundaga IV, Thundaja</spells>
-			<weaponskills>Arm Cannon, Astral Flow, Ballistic Kick, Beastruction, Chainspell, Danse, Divesting Gale, Eradicator, Extreme Purgitation, Frog, Fulmination, Gates, Geirrothr, Gorge, Mandible Massacre, Nerve, Oblivion&apos;s Mantle, Pawn&apos;s Penumbra, Provenance Watcher starts, Raksha Stance, Rancid Reflux, Slimy Proposal, Thundris, Yama&apos;s, Zantetsuken</weaponskills>
+			<weaponskills>Arm Cannon, Astral Flow, Ballistic Kick, Beastruction, Chainspell, Danse Macabre, Divesting Gale, Eradicator, Extreme Purgitation, Frog Chorus, Frog Song, Fulmination, Gates of Hades, Geirrothr, Gorge, Mandible Massacre, Nerve Gas, Oblivion&apos;s Mantle, Pawn&apos;s Penumbra, Raksha Stance, Rancid Reflux, Slimy Proposal, Thundris Shriek, Yama&apos;s Judgment, Zantetsuken</weaponskills>
 		</dangerwords>
-		<duration>5</duration>
+		<duration>10</duration>
 		<moblist>
 			<abyssea>Alfard, Carabosse, Glavoid, Isgebind, Orthrus</abyssea>
 			<dangerous>Apademak, Provenance Watcher</dangerous>
@@ -19,19 +20,23 @@
 			<other>Bloodthirsty, Cerberus, Dvergr, Enraged, Hydra, Khimaira, Khrysokhimaira, Odin, Tiamat</other>
 			<voidwatch>Aello, Agathos, Akvan, Asb, Belphoebe, Bismarck, Botulus Rex, Celaeno, Cherufe, Gasha, Gaunab, Giltine, Goji, Gugalanna, Hahava, Ig-Alima, Kaggen, Kalasutrax, Kholomodumo, Mellonia, Morta, Ocythoe, Pil, Provenance Watcher, Qilin, Rukh, Sarbaz, Shah, Taweret, Uptala, Wazir</voidwatch>
 		</moblist>
+		<padding>0</padding>
 		<pos>
-			<x>538</x>
-			<y>603</y>
+			<x>400</x>
+			<y>300</y>
 		</pos>
 		<selfrolls>false</selfrolls>
 		<showrolls>true</showrolls>
 		<staggeronly>false</staggeronly>
 		<text>
+			<alpha>255</alpha>
 			<blue>255</blue>
+			<content />
 			<font>Consolas</font>
 			<green>255</green>
 			<red>255</red>
 			<size>10</size>
 		</text>
+		<visible>false</visible>
 	</global>
 </settings>
