@@ -58,7 +58,7 @@ defaults.moblist['meebles'] = S{"Goldwing", "Silagilith", "Surtr", "Dreyruk", "S
 defaults.moblist['other'] = S{"Tiamat", "Khimaira", "Khrysokhimaira", "Cerberus", "Dvergr", "Bloodthirsty", "Hydra", "Enraged", "Odin"}
 defaults.moblist['dangerous'] = S{"Provenance Watcher", "Apademak"}
 defaults.dangerwords = T{}
-defaults.dangerwords['weaponskills'] = S{"Zantetsuken", "Geirrothr", "Astral Flow", "Chainspell", "Beastruction", "Mandible Massacre", "Oblivion's Mantle", "Divesting Gale", "Frog", "Danse", "Raksha Stance", "Yama's", "Ballistic Kick", "Eradicator", "Arm Cannon", "Gorge", "Extreme Purgitation", "Slimy Proposal", "Rancid Reflux", "Provenance Watcher starts", "Pawn's Penumbra", "Gates", "Fulmination", "Nerve", "Thundris"}
+defaults.dangerwords['weaponskills'] = S{"Zantetsuken", "Geirrothr", "Astral Flow", "Chainspell", "Beastruction", "Mandible Massacre", "Oblivion's Mantle", "Divesting Gale", "Frog Song", "Frog Chorus", "Danse Macabre", "Raksha Stance", "Yama's Judgment", "Ballistic Kick", "Eradicator", "Arm Cannon", "Gorge", "Extreme Purgitation", "Slimy Proposal", "Rancid Reflux", "Pawn's Penumbra", "Gates of Hades", "Fulmination", "Nerve Gas", "Thundris Shriek"}
 defaults.dangerwords['spells'] = S{"Death", "Meteor", "Kaustra", "Breakga", "Thundaga IV", "Thundaja", "Firaga IV", "Firaja", "Aeroga IV", "Aeroja", "Blizzaga IV", "Blizzaja", "Stonega IV", "Stoneja"}
 
 --Fill settings from either defaults table or settings.xml
