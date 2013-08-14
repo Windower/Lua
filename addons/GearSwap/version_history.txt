@@ -1,9 +1,23 @@
 -------------------------------------------------
-Gearswap 0.503 - event_status_change() handling changed so people don't swap gear when disengaging from NPCs or crafting.
+Gearswap 0.604 - Added more handling to deal with monstrosity. Dramatical reduced memory requirements.
 -------------------------------------------------
-Gearswap 0.502 - require unmasked and documented.
+Gearswap 0.603 - Added handling to deal with monstrosity. About a week worth of misc. changes that I can't remember.
 -------------------------------------------------
-Gearswap 0.501 - file_unload user function added.
+Gearswap 0.602 - Minor refactoring, moved things around, added a little more protection to send_command()
+-------------------------------------------------
+Gearswap 0.601 - Improved the equip command to handle multiple set layers
+-------------------------------------------------
+Gearswap 0.600 - Added item handling and add/documented require
+-------------------------------------------------
+Gearswap 0.505 - Added and documented set_combine()
+-------------------------------------------------
+Gearswap 0.504 - "Fixed" reraise crash error. Likely indicates an underlying problem in LuaCore that should be addressed
+-------------------------------------------------
+Gearswap 0.503 - Event_status_change() handling changed so people don't swap gear when disengaging from NPCs or crafting.
+-------------------------------------------------
+Gearswap 0.502 - Require unmasked and documented.
+-------------------------------------------------
+Gearswap 0.501 - File_unload user function added.
 -------------------------------------------------
 Gearswap 0.500 - Initial beta release
 -------------------------------------------------

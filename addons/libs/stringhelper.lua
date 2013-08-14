@@ -219,13 +219,13 @@ end
 -- Takes a padding character pad and pads the string str to the left of it, until len is reached. pad defaults to a space.
 function string.lpad(str, pad, len)
 	pad = pad or ' '
-	return (pad:rep(len)..str):sub(-len)
+	return (pad:rep(len)..str):sub(-(len > #str and len or #str))
 end
 
 -- Takes a padding character pad and pads the string str to the right of it, until len is reached. pad defaults to a space.
 function string.rpad(str, pad, len)
 	pad = pad or ' '
-	return (str..pad:rep(len)):sub(1, len)
+	return (str..pad:rep(len)):sub(1, -(len > #str and len or #str))
 end
 
 -- Returns the string padded with zeroes until the length is len.
@@ -287,7 +287,7 @@ end
 
 -- Returns a string with Lua pattern characters escaped.
 function string.escape(str)
-	return str:gsub('[[%]%%^$*()%.%+?-]', '%%%1')
+	return (str:gsub('[[%]%%^$*()%.%+?-]', '%%%1'))
 end
 
 -- Returns a Lua pattern from a wildcard string (with ? and * as placeholders for one and many characters respectively).
@@ -295,24 +295,70 @@ function string.wildcard(str)
 	return (str:gsub('[[%]%%^$()%+-.]', '%%%1'):gsub('*', '.*'):gsub('?', '.'))
 end
 
+-- Returns true if the string matches a wildcard pattern.
+string.wmatch = windower.wc_match
+
+-- Includes the | operator in the pattern for alternative matches in string.find.
+function string.mfind(str, full_pattern, ...)
+    local patterns = full_pattern:split('|')
+
+    local found = {}
+    for pattern in ipairs(patterns) do
+        local new_found = {str:find(pattern, ...)}
+        if not found[1] or new_found[1] and new_found[1] < found[1] then
+            found = new_found
+        end
+    end
+
+    return unpack(found)
+end
+
+-- Includes the | operator in the pattern for alternative matches in string.match.
+function string.mmatch(str, full_pattern, ...)
+    local patterns = full_pattern:split('|')
+
+    local found = {}
+    local index = nil
+    for pattern in ipairs(patterns) do
+        local start = {str:find(pattern, ...)}
+        if start and (not index or start < index) then
+            found = {str:match(pattern, ...)}
+            index = start
+        end
+    end
+
+    return unpack(found)
+end
+
+-- Includes the | operator in the pattern for alternative matches in string.gsub.
+function string.mgsub(str, full_pattern, ...)
+    local patterns = full_pattern:split('|')
+
+    for pattern in ipairs(patterns) do
+        str = str:gsub(pattern, ...)
+    end
+
+    return str
+end
+
 -- A string.find wrapper for wildcard patterns.
-function string.wcfind(str, pattern)
-	return str:find(pattern:wildcard())
+function string.wcfind(str, pattern, ...)
+	return str:find(pattern:wildcard(), ...)
 end
 
 -- A string.match wrapper for wildcard patterns.
-function string.wcmatch(str, pattern)
-	return str:match(pattern:wildcard())
+function string.wcmatch(str, pattern, ...)
+	return str:match(pattern:wildcard(), ...)
 end
 
 -- A string.gmatch wrapper for wildcard patterns.
-function string.wcgmatch(str, pattern)
-	return str:gmatch(pattern:wildcard())
+function string.wcgmatch(str, pattern, ...)
+	return str:gmatch(pattern:wildcard(), ...)
 end
 
 -- A string.gsub wrapper for wildcard patterns.
-function string.wcgsub(str, pattern, replace)
-	return str:gsub(pattern:wildcard(), replace)
+function string.wcgsub(str, pattern, ...)
+	return str:gsub(pattern:wildcard(), ...)
 end
 
 -- Returns a case-insensitive pattern for a given (non-pattern) string. For patterns, see string.ipattern.
@@ -346,43 +392,43 @@ function string.ipattern(str)
 end
 
 -- A string.find wrapper for case-insensitive patterns.
-function string.ifind(str, pattern)
-	return str:find(pattern:ipattern())
+function string.ifind(str, pattern, ...)
+	return str:find(pattern:ipattern(), ...)
 end
 
 -- A string.match wrapper for case-insensitive patterns.
-function string.imatch(str, pattern)
-	return str:match(pattern:ipattern())
+function string.imatch(str, pattern, ...)
+	return str:match(pattern:ipattern(), ...)
 end
 
 -- A string.gmatch wrapper for case-insensitive patterns.
-function string.igmatch(str, pattern)
-	return str:gmatch(pattern:ipattern())
+function string.igmatch(str, pattern, ...)
+	return str:gmatch(pattern:ipattern(), ...)
 end
 
 -- A string.gsub wrapper for case-insensitive patterns.
-function string.igsub(str, pattern, replace)
-	return str:gsub(pattern:ipattern(), replace)
+function string.igsub(str, pattern, ...)
+	return str:gsub(pattern:ipattern(), ...)
 end
 
 -- A string.find wrapper for case-insensitive wildcard patterns.
-function string.iwcfind(str, pattern)
-	return str:wcfind(pattern:ipattern())
+function string.iwcfind(str, pattern, ...)
+	return str:wcfind(pattern:ipattern(), ...)
 end
 
 -- A string.match wrapper for case-insensitive wildcard patterns.
-function string.iwcmatch(str, pattern)
-	return str:wcmatch(pattern:ipattern())
+function string.iwcmatch(str, pattern, ...)
+	return str:wcmatch(pattern:ipattern(), ...)
 end
 
 -- A string.gmatch wrapper for case-insensitive wildcard patterns.
-function string.iwcgmatch(str, pattern)
-	return str:wcgmatch(pattern:ipattern())
+function string.iwcgmatch(str, pattern, ...)
+	return str:wcgmatch(pattern:ipattern(), ...)
 end
 
 -- A string.gsub wrapper for case-insensitive wildcard patterns.
-function string.iwcgsub(str, pattern, replace)
-	return str:wcgsub(pattern:ipattern(), replace)
+function string.iwcgsub(str, pattern, ...)
+	return str:wcgsub(pattern:ipattern(), ...)
 end
 
 -- Returns a string with all instances of ${str} replaced with either a table or function lookup.

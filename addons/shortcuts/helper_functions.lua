@@ -137,11 +137,83 @@ end
 ---- name (string): Name to be slugged
 -----------------------------------------------------------------------------------
 --Returns:
----- string with a gsubbed version of name that converts numbers to Roman numerals
--------- removes non-letter/numbers, and forces it to lower case.
+---- string with a gsubbed version of name that removes non-alphanumeric characters,
+-------- forces the string to lower-case, and converts numbers to Roman numerals,
+-------- which are upper case.
 -----------------------------------------------------------------------------------
 function strip(name)
-	return name:gsub('4','iv'):gsub('9','ix'):gsub('0','p'):gsub('3','iii'):gsub('2','ii'):gsub('1','i'):gsub('8','viii'):gsub('7','vii'):gsub('6','vi'):gsub('5','v'):gsub('[^%a]',''):lower()
+	return name:gsub('[^%w]',''):lower():gsub('(%d+)',to_roman)
+end
+
+
+-----------------------------------------------------------------------------------
+--Name: to_roman()
+--Args:
+---- num (string or number): Number to be converted from Arabic to Roman numerals.
+-----------------------------------------------------------------------------------
+--Returns:
+---- roman numerals that represent the passed number.
+-------- This function returns ix for 9 instead of viiii. They are both valid, but
+-------- FFXI uses the ix nomenclature so we will use that.
+-----------------------------------------------------------------------------------
+function to_roman(num)
+	if type(num) ~= 'number' then
+		num = tonumber(num)
+		if num == nil then
+			write('Debug to_roman')
+			return ''
+		end
+	end
+	if num>4599 then return tostring(num) end
+	
+	local retstr = ''
+	
+	if num == 0 then return 'zilch' end
+	
+	while num > 0 do
+		if num >= 1000 then
+			num = num - 1000
+			retstr = retstr..'m'
+		elseif num >= 900 then
+			num = num - 900
+			retstr = retstr..'cm'
+		elseif num >= 500 then
+			num = num - 500
+			retstr = retstr..'d'
+		elseif num >= 400 then
+			num = num - 400
+			retstr = retstr..'cd'
+		elseif num  >= 100 then
+			num = num - 100
+			retstr = retstr..'c'
+		elseif num >= 90 then
+			num = num - 90
+			retstr = retstr..'xc'
+		elseif num >= 50 then
+			num = num - 50
+			retstr = retstr..'l'
+		elseif num >= 40 then
+			num = num - 40
+			retstr = retstr..'xl'
+		elseif num >= 10 then
+			num = num - 10
+			retstr = retstr..'x'
+		elseif num == 9 then
+			num = num - 9
+			retstr = retstr..'ix'
+		elseif num >= 5 then
+			num = num - 5
+			retstr = retstr..'v'
+		elseif num == 4 then
+			num = num - 4
+			retstr = retstr..'iv'
+		elseif num >= 1 then
+			num = num - 1
+			retstr = retstr..'i'
+		end
+	end
+	
+	return retstr
 end
 
 -----------------------------------------------------------------------------------

@@ -1,5 +1,32 @@
+--Copyright (c) 2013, Byrthnoth
+--All rights reserved.
+
+--Redistribution and use in source and binary forms, with or without
+--modification, are permitted provided that the following conditions are met:
+
+--    * Redistributions of source code must retain the above copyright
+--      notice, this list of conditions and the following disclaimer.
+--    * Redistributions in binary form must reproduce the above copyright
+--      notice, this list of conditions and the following disclaimer in the
+--      documentation and/or other materials provided with the distribution.
+--    * Neither the name of <addon name> nor the
+--      names of its contributors may be used to endorse or promote products
+--      derived from this software without specific prior written permission.
+
+--THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+--ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+--WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+--DISCLAIMED. IN NO EVENT SHALL <your name> BE LIABLE FOR ANY
+--DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+--(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+--LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+--ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+--(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+--SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
 function equip_sets(swap_type,val1,val2)
-	local items = get_items()
+	refresh_globals()
 	local cur_equip = items['equipment'] -- i = 'head', 'feet', etc.; v = inventory ID (0~80)
 	-- If the swap is not complete, overwrite the current equipment with the equipment that you are swapping to
 	for i,v in pairs(cur_equip) do
@@ -8,7 +35,6 @@ function equip_sets(swap_type,val1,val2)
 		end
 	end
 	
-	refresh_globals()
 	table.reassign(equip_list,player.equipment)
 	
 	if debugging >= 2 then add_to_chat(1,swap_type) end
@@ -18,15 +44,20 @@ function equip_sets(swap_type,val1,val2)
 			if val1.english then
 				logit(logfile,' : '..val1.english)
 			end
+		else
+			logit(logfile,' : nil-or-false')
 		end
 		if val2 then
 			if val2.type then	logit(logfile,' : '..val2.type)	end
+		else
+			logit(logfile,' : nil-or-false')
 		end
 	end
 
 	if swap_type == 'precast' then
 		val1.target = spelltarget
-		user_env.precast(val1,val2) -- User defined function to determine the precast set
+		if type(user_env.precast) == 'function' then user_env.precast(val1,val2) -- User defined function to determine the precast set
+		elseif user_env.precast then add_to_chat(123,'GearSwap: precast() exists but is not a function') end
 	elseif swap_type == 'midcast' then
 		val1.target = spelltarget
 		user_env.midcast(val1,val2) -- User defined function to determine the midcast set
@@ -45,17 +76,25 @@ function equip_sets(swap_type,val1,val2)
 		val1.target = spelltarget
 		user_env.pet_aftercast(val1,val2) -- User defined function to determine the aftercast set
 	elseif swap_type == 'status_change' then
-		user_env.status_change(val1,val2) -- User defined function to determine if sets should change following status change
+		if type(user_env.status_change) == 'function' then user_env.status_change(val1,val2) -- User defined function to determine if sets should change following status change
+		elseif user_env.status_change then add_to_chat(123,'GearSwap: status_change() exists but is not a function') end
 	elseif swap_type == 'buff_change' then
-		user_env.buff_change(val1,val2) -- User defined function to determine if sets should change following buff change
+		if type(user_env.buff_change) == 'function' then user_env.buff_change(val1,val2) -- User defined function to determine if sets should change following buff change
+		elseif user_env.buff_change then add_to_chat(123,'GearSwap: buff_change() exists but is not a function') end
 	elseif swap_type == 'equip_command' then
 		equip(val1)
 	elseif swap_type == 'self_command' then
-		user_env.self_command(val1)
+		if type(user_env.self_command) == 'function' then user_env.self_command(val1)
+		elseif user_env.self_command then add_to_chat(123,'GearSwap: self_command() exists but is not a function') end
 	elseif swap_type == 'delayed' then
 		equip(stored_equip_list)
 	end
 	
+	if player.race == 'Precomposed NPC' then
+		-- Short circuit the routine and get out if there's no swapping to be done because the user is a monster.
+		send_check(true)
+		return
+	end
 	local equip_next = {}
 	-- Need to make sure the item isn't being traded or synthesized.
 	equip_next = to_id_set(items['inventory'],equip_list) -- Translates the equip_list from the player (i=slot name, v=item name) into a table with i=slot id and v=inventory id.
@@ -73,45 +112,23 @@ function equip_sets(swap_type,val1,val2)
 			failure_reason = 'KOed'
 		end
 		if _global.debug_mode and failure_reason ~= '' then
-			add_to_chat(8,'Cannot change gear right now: '..failure_reason)
+			add_to_chat(8,'Gearswap: Cannot change gear right now: '..failure_reason)
 		end
 	end
 	
 	
 	if failure_reason == '' then
-		for i,v in pairs(equip_next) do
-			--if debugging >= 2 then add_to_chat(8,tostring(v)..' '..tostring(i)..' item: '..tostring(r_items[items['inventory'][v]['id']]['enl'])) else
-			----inject_packet(is_outgoing, data)
-			set_equip(v,i)
-			sent_out_equip[i] = v -- re-make the equip_next table with the name sent_out_equip as the equipment is sent out.
-			--end
+		for i = 0,15 do
+			--if debugging >= 2 then add_to_chat(8,tostring(v)..' '..tostring(i)..' item: '..tostring(r_items[items['inventory'][v]['id']][language..'_log'])) else
+			if equip_next[i] then
+				set_equip(equip_next[i],i)
+				sent_out_equip[i] = v -- re-make the equip_next table with the name sent_out_equip as the equipment is sent out.
+			end
 		end
 	elseif logging then
 		logit(logfile,'\n\n'..tostring(os.clock)..'(69) failure_reason: '..tostring(failure_reason))
 	end
 	send_check(_global.force_send)
-end
-
-function equip(...)
-	local gearsets = {...}
-	for i in ipairs(gearsets) do
-		local temp_set = unify_slots(gearsets[i])
-		for n,m in pairs(temp_set) do
-			rawset(equip_list,n,m)
-		end
-	end
-end
-
-function print_set(set,title)
-	if title then
-		add_to_chat(1,'------------------------- '..title..' -------------------------')
-	else
-		add_to_chat(1,'----------------------------------------------------------------')
-	end
-	for i,v in pairs(set) do
-		add_to_chat(8,tostring(i)..' '..tostring(v))
-	end
-	add_to_chat(1,'----------------------------------------------------------------')
 end
 
 function to_id_set(inventory,equip_list)
@@ -120,13 +137,10 @@ function to_id_set(inventory,equip_list)
 	for n,m in pairs(inventory) do
 		if m['id'] ~= 0 then -- 0 codes for an empty slot
 			if (m['flags'] == 0 or m['flags'] == 5) and r_items[m['id']]['jobs'] then -- Make sure the item isn't being bazaared, isn't already equipped, and can be equipped by specific jobs (unlike pearlsacks).
-				if (jobs[player.main_job] == nil or dat_races[player.race] == nil) and debugging >0 then -- for Cair's bug
-					write('Get Wearable nil snafoodle with '..r_items[m['id']]['english']..' '..player.main_job..' '..player.race)
-				end
 				if get_wearable(jobs[player.main_job],tonumber('0x'..r_items[m['id']]['jobs'])) and (tonumber(r_items[m['id']]['level'])<=player.main_job_level) and get_wearable(dat_races[player.race],tonumber('0x'..r_items[m['id']]['races'])) then
 					for i,v in pairs(equip_list) do
 						if not ret_list[slot_map[i]] then
-							if r_items[m['id']]['enl']:lower() == v:lower() or r_items[m['id']]['english']:lower() == v:lower() then
+							if r_items[m['id']][language..'_log']:lower() == v:lower() or r_items[m['id']][language]:lower() == v:lower() then
 								-- I need to add the ability to interpret extdata and specify which item based on it at some point.
 								equip_list[i] = ''
 								ret_list[slot_map[i]] = m['slot_id']
@@ -136,7 +150,7 @@ function to_id_set(inventory,equip_list)
 					end
 				else
 					for i,v in pairs(equip_list) do
-						if r_items[m['id']]['enl']:lower() == v:lower() or r_items[m['id']]['english']:lower() == v:lower() then
+						if r_items[m['id']][language..'_log']:lower() == v:lower() or r_items[m['id']][language]:lower() == v:lower() then
 							if not get_wearable(jobs[player.main_job],tonumber('0x'..r_items[m['id']]['jobs'])) then
 								equip_list[i] = v..' (cannot be worn by this job)'
 							elseif not (tonumber(r_items[m['id']]['level'])<=player.main_job_level) then
@@ -150,7 +164,7 @@ function to_id_set(inventory,equip_list)
 				end
 			elseif m['flags'] > 0 then
 				for i,v in pairs(equip_list) do
-					if r_items[m['id']]['enl']:lower() == v:lower() or r_items[m['id']]['english']:lower() == v:lower() then
+					if r_items[m['id']][language..'_log']:lower() == v:lower() or r_items[m['id']][language]:lower() == v:lower() then
 						if m['flags'] == 5 then
 							equip_list[i] = ''
 						elseif m['flags'] == 25 then
@@ -166,7 +180,7 @@ function to_id_set(inventory,equip_list)
 	if _global.debug_mode then
 		for i,v in pairs(equip_list) do
 			if v ~= '' and v ~= 'empty' then
-				add_to_chat(8,'Item cannot be equipped: '..i..' '..v)
+				add_to_chat(8,'GearSwap: '..i..' - '..v)
 			end
 		end
 	end
@@ -193,9 +207,9 @@ function to_names_set(id_id,inventory)
 			if inventory[v]['id'] == 0 then
 				equip_package[i]='empty'
 			elseif type(i) ~= 'string' then
-				equip_package[default_slot_map[i]] = r_items[inventory[v]['id']]['english']
+				equip_package[default_slot_map[i]] = r_items[inventory[v]['id']][language]
 			else
-				equip_package[i]=r_items[inventory[v]['id']]['english']
+				equip_package[i]=r_items[inventory[v]['id']][language]
 			end
 		else
 			equip_package[i]='empty'

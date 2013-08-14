@@ -58,7 +58,7 @@ function aftercast(spell,action)
 	end
 end
 
-function status_change(new,old)
+function status_change(old,new)
 	if T{'Idle','Resting'}:contains(new) then
 		equip(sets['aftercast_Idle'])
 	elseif new == 'Engaged' then

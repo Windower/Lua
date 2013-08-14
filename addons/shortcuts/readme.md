@@ -1,15 +1,18 @@
-#Shortcuts v0.4 (beta)
+#Shortcuts v0.7 (beta)
 ####written by Byrth  
 
-Applies the spellcast shortcuts and target completion to single slash commands,  
-including emotes and checks. This addon is part of a larger "replacing spellcast"  
-project, but its feature stands on its own so it has been released now.  
+Completes and properly formats commands (prefixed by at least one '/'),
+including emotes and checks. This addon is part of a larger "replacing
+spellcast" project, and represents the interpretation part of spellcast.
 
 ####Commands/Settings:  
 None  
 
 ####Changelog:  
-v0.1 - 06/15/13 - Created Addon  
-v0.2 - 06/19/13 - Fixed the addon's capacity for infinite loops. Added safe auto-completion for party commands. Added target commands.
-v0.3 - 07/14/13 - Fixed an ambiguous_names error. Retooled some parts in anticipation of the new hook and Monstrosity. Added infinite loop detection.
+v0.7 - 08/12/13 - Improved the hashing algorithm (better roman numeral conversion) and improved target creation again. Updated documentation.
+v0.6 - 08/11/13 - Fixed autotranslate, eliminated valid commands that aren't prefixed by '/', and made target creation smarter.
+v0.5 - 08/05/13 - Added handling for <st..> commands and support for target shorthands (t for <t>, stpc for <stpc>, etc.)
 v0.4 - 07/25/13 - Added handling for Monstrosity. Added logging. Modified target handling.
+v0.3 - 07/14/13 - Fixed an ambiguous_names error. Retooled some parts in anticipation of the new hook and Monstrosity. Added infinite loop detection.
+v0.2 - 06/19/13 - Fixed the addon's capacity for infinite loops. Added safe auto-completion for party commands. Added target commands.
+v0.1 - 06/15/13 - Created Addon  

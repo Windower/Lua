@@ -29,7 +29,7 @@
 -- For handling ambiguous spells and abilities
  
 function smn_unsub(player_array,info)
-	if player_array['main_job_id'] == 15 and player_array['main_job_level'] >= info then
+	if player_array['main_job_id'] == 15  then --and player_array['main_job_level'] >= info and get_mob_by_target('pet') then
 		return 'Ability'
 	end
 	return 'Magic'
@@ -39,12 +39,11 @@ function smn_sub(player_array,info) -- Determines ambiguous black magic that can
 	if player_array['main_job_id'] == 15 and not (info:contains(player_array['sub_job_id'])) then
 		return 'Ability' -- Returns the SMN ability if it's a SMN main without a sub that has access to the spell
 	elseif player_array['main_job_id'] == 15 and (info:contains(player_array['sub_job_id'])) then
-		local pet_array = get_mob_by_index(get_mob_by_id(player_array.id)['pet_index'])
+		local pet_array = get_mob_by_target('pet')
+		if not pet_array then return 'Magic' end
 		local recasts = get_ability_recasts()
-		if info:contains(pet_array['name']) and info:contains('Ward') and recasts[174]<=10 then
-			return 'Ability' -- Returns the SMN ability if it's a SMN main with an appropriate avatar summoned.
-		elseif info:contains(pet_array['name']) and info:contains('Rage') and recasts[173]<=10 then
-			return 'Ability'
+		if (info:contains(pet_array['name']) and info:contains('Ward') and recasts[174]<=10) or (info:contains(pet_array['name']) and info:contains('Rage') and recasts[173]<=10) then
+			return 'Ability' -- Returns the SMN ability if it's a SMN main with an appropriate avatar summoned and the BP timer is up.
 		else
 			return 'Magic'
 		end
@@ -52,22 +51,24 @@ function smn_sub(player_array,info) -- Determines ambiguous black magic that can
 	return 'Magic' -- Returns a spell in every other case.
 end
 
-function blu_unsub(player_array,info,mob_ID) -- Determines ambiguous blue magic that can be subbed. Defaults to spells if the level is high enough.
-	if mob_ID and player_array.race then
-		if player_array.race == 0 then 
+function blu_unsub(player_array,info,mob_ID) -- Determines ambiguous blue magic that cannot be subbed. Defaults to spells on BLU.
+	local race = get_mob_by_id(player_array.id).race
+	if mob_ID and race then
+		if race == 0 then 
 			return 'Monster'
 		end
 	end
 	
-	if player_array['main_job_id'] == 16 and player_array['main_job_level'] >= info then
+	if player_array['main_job_id'] == 16 then -- and player_array['main_job_level'] >= info then
 		return 'Magic'
 	end
 	return 'Ability'
 end
 
 function abil_mob(player_array,info,mob_ID) -- Determines ambiguity between monster TP moves and abilities
-	if mob_ID and player_array.race then
-		if player_array.race == 0 then 
+	local race = get_mob_by_id(player_array.id).race
+	if mob_ID and race then
+		if race == 0 then 
 			return 'Monster'
 		end
 	end
@@ -75,8 +76,9 @@ function abil_mob(player_array,info,mob_ID) -- Determines ambiguity between mons
 end
 
 function magic_mob(player_array,info,mob_ID) -- Determines ambiguity between monster TP moves and magic
-	if mob_ID and player_array.race then
-		if player_array.race == 0 then 
+	local race = get_mob_by_id(player_array.id).race
+	if mob_ID and race then
+		if race == 0 then 
 			return 'Monster'
 		end
 	end
@@ -84,24 +86,21 @@ function magic_mob(player_array,info,mob_ID) -- Determines ambiguity between mon
 end
  
 function blu_sub(player_array,info,mob_ID) -- Determines ambiguous blue magic that can be subbed. Defaults to BST ability
-	if mob_ID and player_array.race then
-		if player_array.race == 0 then 
+	local race = get_mob_by_id(player_array.id).race
+	if mob_ID and race then
+		if race == 0 then 
 			return 'Monster'
 		end
 	end
+	local pet_array = get_mob_by_target('pet')
 	if player_array['main_job_id'] == 9 and player_array['sub_job_id'] ~= 16 then
 		return 'Ability' -- Returns the BST ability if it's BST/not-BLU using the spell
-	elseif player_array['main_job_id'] == 9 and player_array['sub_job_id'] == 16 and player_array['pet_index']~=0 then
-		local pet_array = get_mob_by_index(get_mob_by_id(player_array.id)['pet_index'])
+	elseif player_array['main_job_id'] == 9 and player_array['sub_job_id'] == 16 and pet_array then
 		local recasts = get_ability_recasts()
-		if pet_array['tp'] then -- Temp fix until pet TP is added.
-			if pet_array['tp'] >= 100 and recasts[255] <= 5400 then -- If your pet has TP and Ready's recast is less than 1.5 minutes
-				return 'Ability'
-			else
-				return 'Magic'
-			end
-		else
+		if pet_array.tp >= 100 and recasts[255] <= 5400 then -- If your pet has TP and Ready's recast is less than 1.5 minutes
 			return 'Ability'
+		else
+			return 'Magic'
 		end
 	end
 	return 'Magic'
@@ -132,7 +131,7 @@ thunderstorm={spell_ID=117,abil_ID=631,funct=smn_unsub,info=75},
 dreamflower={spell_ID=678,abil_ID=676,mob_ID=1069,funct=blu_unsub,info=87},
 frostbreath={spell_ID=608,abil_ID=647,mob_ID=1145,funct=blu_unsub,info=66},
 infrasonics={spell_ID=610,abil_ID=687,mob_ID=1140,funct=blu_unsub,info=65},
-ipppneedles={spell_ID=595,abil_ID=699,mob_ID=1090,funct=blu_unsub,info=62},
+mneedles={spell_ID=595,abil_ID=699,mob_ID=1090,funct=blu_unsub,info=62},
 filamentedhold={spell_ID=548,abil_ID=729,mob_ID=1132,funct=blu_unsub,info=52},
 suddenlunge={spell_ID=692,abil_ID=736,mob_ID=2946,funct=blu_unsub,info=95},
 spiralspin={spell_ID=652,abil_ID=737,mob_ID=2949,funct=blu_unsub,info=60},
@@ -270,6 +269,7 @@ function ambig(key)
 		elseif abil_type == 'Magic' then
 			return r_spells[ambig_names[key].spell_ID],abil_type
 		elseif abil_type == 'Monster' then
+			if r_abilities[ambig_names[key].mob_ID].prefix ~= '/monsterskill' then r_abilities[ambig_names[key].mob_ID].prefix = '/monsterskill' end
 			return r_abilities[ambig_names[key].mob_ID],abil_type
 		end
 	end

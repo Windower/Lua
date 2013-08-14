@@ -31,7 +31,7 @@ xml = require 'xml'
 
 _addon = {}
 _addon.version = '0.5'
-_addon.name = 'Plugin Manager'
+_addon.name = 'plugin_manager'
 _addon.commands = {'pm','plugin_manager'}
 
 function event_addon_command(...)

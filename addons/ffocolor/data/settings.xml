@@ -4,4 +4,7 @@
 		<chatColor>207</chatColor>
 		<chatTab>say</chatTab>
 	</global>
+	<nitroustaru>
+		<chatTab>shout</chatTab>
+	</nitroustaru>
 </settings>

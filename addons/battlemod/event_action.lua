@@ -33,7 +33,12 @@ function event_action(act)
 	
 	local party_table = get_party()
 	local actor_table = get_mob_by_id(act['actor_id'])
-
+	
+	if actor_table == nil then
+		return
+	elseif actor_table['name'] == nil or actor_table['is_npc'] == nil then
+		return
+	end
 	local actor = actor_table['name']
 	if actor == nil then return end
 	actor = namecol(actor,actor_table,party_table)
@@ -74,6 +79,7 @@ function event_action(act)
 		
 		for n,m in pairs(act['targets']) do
 			local target_table = get_mob_by_id(act['targets'][n]['id'])
+			if not target_table then return end
 			local target = target_table['name']
 			target = namecol(target,target_table,party_table)
 			
@@ -146,6 +152,7 @@ function event_action(act)
 			local spell,ability,weapon_skill,item,target_table,target
 			
 			target_table = get_mob_by_id(act['targets'][i]['id'])
+			if not target_table then return end
 
 			local flipped = false
 			if act['category'] == 6 and act['param'] > 140 and act['param'] < 149 and act['targets'][1]['actions'][1]['message'] == 0 then -- Force a message for maneuvers.
@@ -562,6 +569,7 @@ end
 function check_filter(actor_table,party_table,target_table,category,msg)
 	-- This determines whether the message should be displayed or filtered
 	-- Returns true (don't filter) or false (filter), boolean
+	if actor_table == nil or party_table == nil or target_table == nil then return false end
 	actor_type = party_id(actor_table,party_table)
 	target_type = party_id(target_table,party_table)
 	
