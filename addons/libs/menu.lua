@@ -360,7 +360,7 @@ windower.register_event('mouse', function(action_type, x, y, delta, is_blocked)
    
                   if y > y1 then 
                      if x <= x1 + x2 then 
-                        local menu_cur = math.floor ((y - y1-1) / (menu_list[key]['char_height']-1))
+                        local menu_cur = math.floor ((y - y1 - 1) / (menu_list[key]['char_height']-1))
 
                         if menu_list[key]['cur'] ~= menu_cur then
                            menu_list[key]['cur'] = menu_cur
@@ -426,9 +426,10 @@ windower.register_event('mouse', function(action_type, x, y, delta, is_blocked)
 
                local MaxScr = (#menu_list[mpn]['text'] - menu_list[mpn]['mx'])
 
-               local per =  (NewY-y1) / y2
+               local per =  (NewY-y1-menu_list[mpn]['char_height']) / (y2-menu_list[mpn]['char_height'])
+
                local scr = math.floor(per * MaxScr)
- 
+
                if menu_list[mpn]['scr'] ~= scr then
                   if scr + menu_list[mpn]['cur'] <= #menu_list[mpn]['text'] then
                      menu_list[mpn]['scr'] = scr
