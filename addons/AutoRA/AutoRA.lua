@@ -91,11 +91,14 @@ function event_action(act)
 	
 	if ((actor == (player.id or player.index))) then
 		if category == 2 then
-			if (player.status:lower() == 'engaged' ) then
-				auto = 1
-			elseif (player.status:lower() == 'idle' ) then
-				auto = 0
+			if auto == 1 then
+				if (player.status:lower() == 'engaged' ) then
+					auto = 1
+				elseif (player.status:lower() == 'idle' ) then
+					auto = 0
+				end
 			end
+			
 			if auto == 1 then
 				send_command('wait 2; /shoot <t>')
 			elseif auto == 0 then
