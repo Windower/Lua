@@ -309,7 +309,7 @@ function texts.pad(t, padding)
 	t._settings.padding = padding
 end
 
-function texts.color(red, green, blue)
+function texts.color(t, red, green, blue)
 	if not red then
 		return t._settings.text.red, t._settings.text.green, t._settings.text.blue
 	end
@@ -383,7 +383,7 @@ local function destroy_texts()
 end
 
 -- Handle drag and drop
-local function handle_mouse(type, x, y, blocked)
+local function handle_mouse(type, x, y, delta, blocked)
     if blocked then
         return
     end
