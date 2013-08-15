@@ -54,6 +54,8 @@ function config.load(filename, confdict)
 	meta.original = T{global = T{}}
 	meta.chars = S{}
 	meta.comments = T{}
+    meta.refresh_obj = T{}
+    meta.refresh_fn = L{}
 
 	settings_map[settings] = meta
 
@@ -74,12 +76,19 @@ end
 
 -- Reloads the settings for the provided table. Needs to be the same table that was assigned to with config.load.
 function config.reload(settings)
-    local meta = settings_map[settings]
-    if not meta then
+    if not settings_map[settings] then
         error('Config reload error: unknown settings table.')
+        return
     end
 
     parse(settings)
+
+    for fn, obj in settings_map[settings].refresh_obj:it() do
+        fn(obj, settings)
+    end
+    for fn in settings_map[settings].refresh_fn:it() do
+        fn(settings)
+    end
 end
 
 -- Resolves to the correct parser and calls the respective subroutine, returns the parsed settings table.
@@ -88,6 +97,7 @@ function parse(settings)
 	local err
 	meta = settings_map[settings]
 
+    if not meta then print(debug.traceback()) end
 	if meta.file.path:endswith('.json') then
 		parsed = _libs.json.read(meta.file)
 
@@ -426,8 +436,20 @@ function nest_xml(t, meta, indentlevel)
 	return fragments:concat()
 end
 
+function config.register(settings, fn, obj)
+    if obj then
+        settings_map[settings].refresh_obj[obj] = fn
+    else
+        settings_map[settings].refresh_fn:append(fn)
+    end
+end
+
+function config.unregister(settings, key)
+    settings_map[settings].refresh[key] = nil
+end
+
 windower.register_event('logout', 'login', function()
-    for settings in settings_map:it() do
+    for _, settings in settings_map:it() do
         config.reload(settings)
     end
 end)
