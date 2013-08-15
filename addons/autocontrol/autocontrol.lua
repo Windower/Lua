@@ -35,9 +35,9 @@ require 'tablehelper'
 require 'stringhelper'
 require 'logger'
 require 'sets'
-local config = require 'config'
-local files = require 'filehelper'
-local defaults = T{}
+config = require 'config'
+files = require 'filehelper'
+defaults = T{}
 defaults.bg = {}
 defaults.bg.red = 0
 defaults.bg.blue = 0

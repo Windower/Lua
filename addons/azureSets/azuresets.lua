@@ -33,9 +33,9 @@ _addon.version = '1.2'
 require 'tablehelper'
 require 'stringhelper'
 require 'logger'
-local config = require 'config'
-local files = require 'filehelper'
-local defaults = T{}
+config = require 'config'
+files = require 'filehelper'
+defaults = T{}
 defaults.spellsets = T{}
 defaults.spellsets.default = T{ }
 defaults.spellsets.vw1 = T{slot01='Firespit', slot02='Heat Breath', slot03='Thermal Pulse', slot04='Blastbomb',
