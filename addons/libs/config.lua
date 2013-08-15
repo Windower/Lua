@@ -123,7 +123,7 @@ function parse(settings)
         meta.original[char] = merge(table.copy(settings), parsed[char], char)
     end
     for char in meta.chars:it() do
-        meta.original[char] = table_diff(parsed.global, meta.original[char])
+        meta.original[char] = table_diff(meta.original.global, meta.original[char])
 	end
 
 	return merge(settings, parsed.global:update(parsed[get_player()['name']:lower()], true))
