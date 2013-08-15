@@ -34,8 +34,8 @@ require 'tablehelper'
 require 'stringhelper'
 require 'logger'
 require 'sets'
-local config = require 'config'
-local defaults = T{}
+config = require 'config'
+defaults = T{}
 defaults.buffs = S{	"light arts","addendum: white","penury","celerity","accession","perpetuance","rapture",
                     "dark arts","addendum: black","parsimony","alacrity","manifestation","ebullience","immanence",
                     "stun","petrified","silence","stun","sleep","slow","paralyze"

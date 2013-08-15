@@ -34,10 +34,10 @@ require 'tablehelper'
 require 'stringhelper'
 require 'logger'
 require 'lists'
-local config = require 'config'
-local files = require 'filehelper'
-local chat = require 'chat'
-local defaults = T{}
+config = require 'config'
+files = require 'filehelper'
+chat = require 'chat'
+defaults = T{}
 defaults.chatTab = 'say'
 defaults.chatColor = 207
 
