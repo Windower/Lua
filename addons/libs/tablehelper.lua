@@ -544,7 +544,7 @@ function table.range(start, finish, step)
 		res[key] = key
 	end
 
-	return T(res)
+	return setmetatable(res, _meta.T)
 end
 
 -- Splits an array into an array of arrays of fixed length.
