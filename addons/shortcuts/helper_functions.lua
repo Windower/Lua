@@ -117,7 +117,7 @@ function split(msg, match)
 	while u <= length do
 		local nextanch = msg:find(match,u)
 		if nextanch ~= nil then
-			splitarr[#splitarr+1] = msg:sub(u,nextanch-match:len())
+			splitarr[#splitarr+1] = msg:sub(u,nextanch-1)
 			if nextanch~=length then
 				u = nextanch+match:len()
 			else
