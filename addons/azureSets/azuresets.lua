@@ -60,7 +60,7 @@ function onLoad()
     speFile = files.new('data/bluespells.xml')
     spells = T{}
     spells = parse_resources(speFile:readlines())
-    settings = config.load(defaults,true)
+    settings = config.load(defaults)
     initialize()
 end
 
