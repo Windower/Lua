@@ -33,17 +33,12 @@ local nest_xml
 local table_diff
 
 -- Loads a specified file, or alternatively a file 'settings.xml' in the current addon/data folder.
-function config.load(filename, confdict, overwrite)
+function config.load(filename, confdict)
 	if type(filename) == 'table' then
-		confdict, filename, overwrite = filename, nil, confdict
-	elseif type(filename) == 'boolean' then
-		filename, overwrite = nil, filename
-	elseif type(confdict) == 'boolean' then
-		confdict, overwrite = nil, confdict
+		filename, confdict = nil, filename
 	end
 
-	confdict = T(confdict):copy()
-	overwrite = overwrite or false
+	confdict = setmetatable(table.copy(confdict), getmetatable(confdict) or _meta.T)
 
 	local confdict_mt = getmetatable(confdict)
 	confdict = setmetatable(confdict, {__class = 'Settings', __index = function(t, k)
@@ -68,7 +63,7 @@ function config.load(filename, confdict, overwrite)
 	if not _libs.filehelper.exists(filepath) then
 		meta.file:set(filename or 'data/settings.xml', true)
 		meta.original['global'] = confdict:copy()
-		confdict:save()
+		config.save(confdict)
 
 		return confdict
 	end
@@ -76,7 +71,7 @@ function config.load(filename, confdict, overwrite)
 	meta.file:set(filepath)
 
 	local err
-	confdict, err = parse(confdict, overwrite)
+	confdict, err = parse(confdict)
 
 	if err ~= nil then
 		error(err)
@@ -86,7 +81,7 @@ function config.load(filename, confdict, overwrite)
 end
 
 -- Resolves to the correct parser and calls the respective subroutine, returns the parsed settings table.
-function parse(confdict, overwrite)
+function parse(confdict)
 	local parsed = T{}
 	local err
 	meta = settings_map[confdict]
@@ -113,7 +108,7 @@ function parse(confdict, overwrite)
 	meta.chars = parsed:keyset() - S{'global'}
 	meta.original = T{}
 
-	if overwrite or confdict:empty() then
+	if table.empty(confdict) then
 		for char in (meta.chars + S{'global'}):it() do
 			meta.original[char] = confdict:copy():update(parsed[char], true)
 		end
