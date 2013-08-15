@@ -293,7 +293,7 @@ function config.save(t, char)
 		meta.original = meta.original:filterkey('global')
 	else
 		meta.original.global:amend(meta.original[char])
-		meta.original[char] = table_diff(meta.original['global'], meta.original[char])
+		meta.original[char] = table_diff(meta.original['global'], meta.original[char]) or setmetatable({}, _meta.T)
 
 		if meta.original[char]:empty(true) then
 			meta.original[char] = nil
@@ -306,7 +306,7 @@ end
 
 -- Returns the table containing only elements from t_new that are different from t and not nil.
 function table_diff(t, t_new)
-	local res = T{}
+	local res = setmetatable({}, _meta.T)
 	local cmp
 
 	for key, val in pairs(t_new) do
@@ -318,23 +318,23 @@ function table_diff(t, t_new)
 				if type(val) == 'table' then
 					if class(val) == 'Set' or class(val) == 'List' then
 						if not cmp:equals(val) then
-							res[key] = val
+							rawset(res, key, val)
 						end
 					elseif table.isarray(val) and table.isarray(cmp) then
 						if not table.equals(cmp, val) then
-							res[key] = val
+							rawset(res, key, val)
 						end
 					else
-						res[key] = table_diff(cmp, val)
+						rawset(res, key, table_diff(cmp, val))
 					end
 				elseif cmp ~= val then
-					res[key] = val
+					rawset(res, key, val)
 				end
 			end
 		end
 	end
 
-	return res
+	return (not table.empty(res) and res) or nil
 end
 
 -- Converts a settings table to a XML representation.
