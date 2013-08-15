@@ -41,7 +41,7 @@ require 'ambiguous_names'
 require 'targets'
 
 _addon = {}
-_addon.version = '0.6'
+_addon.version = '0.8'
 _addon.name = 'Shortcuts'
 _addon.commands = {'shortcuts'}
 
@@ -166,7 +166,7 @@ function command_logic(original,modified)
 		-- If the command is legitimate and requires target completion but not ability interpretation
 		
 		if command2_list[command]==true then -- If there are not any excluded secondary commands
-			local temptarg = valid_target(potential_targ) or target_make({['Player']=true,['Enemy']=true,['Self']=true}) -- Complete the target or make one.
+			local temptarg = valid_target(potential_targ) or target_make({['Player']=true,['Enemy']=true,['Party']=true,['Ally']=true,['NPC']=true,['Self']=true}) -- Complete the target or make one.
 			lastsent = command..' '..temptarg -- Push the command and target together and send it out.
 			if debugging then add_to_chat(8,tostring(counter)..' input '..lastsent) end
 			if logging then
@@ -199,7 +199,7 @@ function command_logic(original,modified)
 					temptarg = potential_targ
 				end
 			elseif not temptarg then -- Make a target if the temptarget isn't valid
-				temptarg = target_make({['Player']=true,['Enemy']=true,['Self']=true})
+				temptarg = target_make({['Player']=true,['Enemy']=true,['Party']=true,['Ally']=true,['NPC']=true,['Self']=true})
 			end
 			lastsent = tempcmd..' '..temptarg
 			if debugging then add_to_chat(8,tostring(counter)..' input '..lastsent) end
