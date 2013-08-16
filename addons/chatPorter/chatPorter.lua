@@ -28,12 +28,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon = {}
 _addon.name = 'ChatPorter'
-_addon.version = '1.33'
+_addon.version = '1.34'
 _addon.author = 'Ragnarok.Ikonic'
 
 require 'tablehelper'
 require 'stringhelper'
-require 'colors'
+require 'chat' -- previously: require 'colors'
 local config = require 'config'
 require 'logger'
 
@@ -156,6 +156,10 @@ end
 
 function event_login(name)
 	settings = config.load(defaults)
+	tb_create("showlinkshell")
+	tb_create("showparty")
+	tb_create("showtell")
+	tb_create("showffochat")
 	show("linkshell")
 	show("party")
 	show("tell")
@@ -165,6 +169,13 @@ function event_login(name)
 --	add_to_chat(160,"Refreshing data...")
 --	add_to_chat(160,"LSname: "..LSname)
 --	add_to_chat(160,"playerName: "..playerName)
+end
+
+function event_logout(name)
+	tb_delete("showlinkshell")
+	tb_delete("showparty")
+	tb_delete("showtell")
+	tb_delete("showffochat")
 end
 
 function event_addon_command(...)
@@ -203,6 +214,7 @@ function event_addon_command(...)
 				add_to_chat(160,'  '..string.color('//cp [l|p|t] color #',204,160)..' : Sets color of l|p|t text (acceptable values of 1-255).')
 				add_to_chat(160,'  '..string.color('//cp [l|p|t|f] show',204,160)..' : Toggles l|p|t|f textboxes from showing.')
 				add_to_chat(160,'  '..string.color('//cp [l|p|t|f] clear',204,160)..' : Clears l|p|t|f textbox.')
+				add_to_chat(160,'  '..string.color('//cp clear',204,160)..' : Clears all textboxes.')
 				add_to_chat(160,'  '..string.color('//cp [l|p|t|f] lines #',204,160)..' : Sets # of lines to show in textbox.')
 				add_to_chat(160,'  '..string.color('//cp [l|p|t|f] [fontname|fn] *',204,160)..' : Sets fontname for textbox.')
 				add_to_chat(160,'  '..string.color('//cp [l|p|t|f] [fontsize|fs] #',204,160)..' : Sets fontsize for textbox.')
@@ -222,6 +234,15 @@ function event_addon_command(...)
         elseif comm == 'toggle' then
 			settings.usechatporter = not settings.usechatporter
 			showStatus('usechatporter')
+		elseif comm == 'clear' then
+			_G['showlinkshell'] = {}
+			show("linkshell")
+			_G['showparty'] = {}
+			show("party")
+			_G['showtell'] = {}
+			show("tell")
+			_G['showffochat'] = {}
+			show("ffochat")
 		elseif S({'l2','p2','t2','r2'}):contains(comm) or comm:match('^f%d%d?$') then
 			com2 = table.remove(args,1)
 			com2mess = table.sconcat(args)
@@ -309,7 +330,7 @@ function event_addon_command(...)
 				if (com3num ~= nil) and (com3num >= 1 and com3num <= 255) then
 					settings[comm][com2] = com3num
 					if com2 == "color" then
-						add_to_chat(160,"  Setting "..com2.." for "..comm..": "..string.color(tostring(com3num),204,160))
+						add_to_chat(160,"  Setting "..string.color(com2,com3num,160).." for "..comm..": "..string.color(tostring(com3num),204,160))
 					else
 						add_to_chat(160,"  Setting "..com2.." value for "..comm.." textbox: "..string.color(tostring(com3num),204,160))
 					end
@@ -366,11 +387,11 @@ function showStatus(var)
 		elseif var == "displaytellchat" then
 			add_to_chat(160,"   DisplayTellChat: " .. string.color(onOffPrint(settings.tell.displaychat),204,160))
 		elseif var == "linkshellcolor" then
-			add_to_chat(160,"   LinkshellColor: " .. string.color(tostring(settings.linkshell.color),204,160))
+		add_to_chat(160,"   Linkshell"..string.color("Color",settings.linkshell.color,160)..": " .. string.color(tostring(settings.linkshell.color),204,160))
 		elseif var == "partycolor" then
-			add_to_chat(160,"   PartyColor: " .. string.color(tostring(settings.party.color),204,160))
+		add_to_chat(160,"   Party"..string.color("Color",settings.party.color,160)..": " .. string.color(tostring(settings.party.color),204,160))
 		elseif var == "tellcolor" then
-			add_to_chat(160,"   TellColor: " .. string.color(tostring(settings.tell.color),204,160))
+		add_to_chat(160,"   Tell"..string.color("Color",settings.tell.color,160)..": " .. string.color(tostring(settings.tell.color),204,160))
 		end
 	elseif var == "textbox" then
 		add_to_chat(160, "Textbox settings: "..string.color('linkshell',settings.linkshell.color,160).." | "..string.color('party',settings.party.color,160).." | "..string.color('tell',settings.tell.color,160).." | "..string.color('ffochat',settings.ffochat.color,160))
@@ -393,9 +414,9 @@ function showStatus(var)
 		add_to_chat(160,"   DisplayLinkshellChat: " .. string.color(onOffPrint(settings.linkshell.displaychat),204,160))
 		add_to_chat(160,"   DisplayPartyChat: " .. string.color(onOffPrint(settings.party.displaychat),204,160))
 		add_to_chat(160,"   DisplayTellChat: " .. string.color(onOffPrint(settings.tell.displaychat),204,160))
-		add_to_chat(160,"   LinkshellColor: " .. string.color(tostring(settings.linkshell.color),204,160))
-		add_to_chat(160,"   PartyColor: " .. string.color(tostring(settings.party.color),204,160))
-		add_to_chat(160,"   TellColor: " .. string.color(tostring(settings.tell.color),204,160))
+		add_to_chat(160,"   Linkshell"..string.color("Color",settings.linkshell.color,160)..": " .. string.color(tostring(settings.linkshell.color),204,160))
+		add_to_chat(160,"   Party"..string.color("Color",settings.party.color,160)..": " .. string.color(tostring(settings.party.color),204,160))
+		add_to_chat(160,"   Tell"..string.color("Color",settings.tell.color,160)..": " .. string.color(tostring(settings.tell.color),204,160))
 	end
 end
 
@@ -526,21 +547,21 @@ function event_incoming_text(original, modified, mode)
 		if (string.find(original, "<(%a+)> (.+)")) then
 			a,b,player,message = string.find(original, "<(%a+)> (.+)")
 			send_ipc_message(specialChar.."l:"..LSname..specialChar..player..specialChar..message)
-			showlinkshell[#showlinkshell +1] = " <"..player.."> "..message:strip_format().." "
+			showlinkshell[#showlinkshell +1] = "<"..player.."> "..message:strip_format()
 			show("linkshell")
 		end
 	elseif (mode == 5) then -- party (me)
 		if (string.find(original, "%((%a+)%) (.+)")) then
 			a,b,player,message = string.find(original, "%((%a+)%) (.+)")
 			send_ipc_message(specialChar.."p:"..""..specialChar..player..specialChar..message)
-			showparty[#showparty +1] = " ("..player..") "..message:strip_format().." "
+			showparty[#showparty +1] = "("..player..") "..message:strip_format()
 			show("party")
 		end
 	elseif (mode == 4) then -- tell (out)
 		if (string.find(original, ">>(%a+) : (.+)")) then
 			a,b,player,message = string.find(original, ">>(%a+) : (.+)")
 			send_ipc_message(specialChar.."t:"..player..specialChar..playerName..specialChar..message)
-			showtell[#showtell +1] = ">>"..player.." : "..message:strip_format().." "
+			showtell[#showtell +1] = ">>"..player.." : "..message:strip_format()
 			show("tell")
 		end
 	end
@@ -548,7 +569,7 @@ function event_incoming_text(original, modified, mode)
 	if (string.find(original, "%[(%d+):#(%a+)%](.+): (.+)")) then
 		a,b,channum,chanchan,player,message = string.find(original, "%[(%d+):#(%a+)%](.+): (.+)")
 --		send_ipc_message(specialChar.."f:"..player..specialChar..playerName..specialChar..message)
-		showffochat[#showffochat +1] = " "..original:strip_format():trim().." "
+		showffochat[#showffochat +1] = original:strip_format():trim()
 		show("ffochat")
 	end
 	
@@ -574,15 +595,15 @@ function event_chat_message(is_gm, mode, player, message)
 	if (mode == 3) then -- tell
 		send_ipc_message(specialChar.."t:"..playerName..specialChar..player..specialChar..message)
 		lastTellFrom = player;
-		showtell[#showtell +1] = player..">> "..message:strip_format().." "
+		showtell[#showtell +1] = player..">> "..message:strip_format()
 		show("tell")
 	elseif (mode == 5) then -- linkshell
 		send_ipc_message(specialChar.."l:"..LSname..specialChar..player..specialChar..message)
-		showlinkshell[#showlinkshell +1] = " <"..player.."> "..message:strip_format().." "
+		showlinkshell[#showlinkshell +1] = "<"..player.."> "..message:strip_format()
 		show("linkshell")
 	elseif (mode == 4) then -- party
 		send_ipc_message(specialChar.."p:"..""..specialChar..player..specialChar..message)
-		showparty[#showparty +1] = " ("..player..") "..message:strip_format().." "
+		showparty[#showparty +1] = "("..player..") "..message:strip_format()
 		show("party")
 	end
 end
@@ -591,6 +612,16 @@ end
 possible port to ffochat LSchannel
 
 allow cp to pass restricted characters, need to delimit them
+
+add option to turn off original display so chat only shows in boxes
+add option to combine chat into a single box
+add option to erase chat from boxes after a set time
+possibly change to read modified instead of original to account for other changes to text
+work on some sort of textbox width wrap
+redefine showlinkshell/p/t tables to be one table with multiple fields:
+	timestamp, chatmode, #text?, 
+add cp all clear to clear all textboxes
+
 
 ]]--
 
