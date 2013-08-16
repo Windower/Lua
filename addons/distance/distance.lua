@@ -1,23 +1,36 @@
+_addon = {}
+_addon.name = 'Distance'
+_addon.author = 'Windower'
+_addon.version = '1.0.0.0'
+_addon.command = 'distance'
+
 require 'logger'
 config = require 'config'
 texts = require 'texts'
 
 defaults = {}
 defaults.pos = {}
-defaults.pos.x = 100
-defaults.pos.y = 50
+defaults.pos.x = -178
+defaults.pos.y = 21
 defaults.text = {}
 defaults.text.font = 'Arial'
 defaults.text.size = 14
-defaults.flags = {'right justified'}
+defaults.flags = {}
+defaults.flags.right = true
 
 settings = config.load(defaults)
 distance = texts.new(settings)
 
-register_event('prerender', function ()
+register_event('prerender', function()
     local t = get_mob_by_target('t')
     distance:text(t and string.format('%.1f', math.sqrt(t.distance)) or '')
     distance:visible(t ~= nil or true)
+end)
+
+register_event('addon command', function(command)
+    if command == 'save' then
+        config.save(settings, 'all')
+    end
 end)
 
 --[[
