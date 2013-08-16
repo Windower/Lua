@@ -88,6 +88,13 @@
 	<support>irc.ffochat.com</support>
   </addon>
   <addon>
+    <name>Distance</name>
+    <author>Arcon</author>
+    <description>Shows the distance to your current target.</description>
+    <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
+  </addon>
+  <addon>
     <name>DynamisHelper</name>
     <description>Displays a timer when a mob is procced, tracks currency obtained, and can create a LL to lot all currency.</description>
 	<bugtracker>https://github.com/tehkrizz/Lua/issues</bugtracker>
