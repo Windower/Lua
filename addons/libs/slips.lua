@@ -116,7 +116,7 @@ function slips.player_has_item(id)
         for _, item in ipairs(items[storage]) do
             if item.id == slip_id then
                 local bit_position = slips.get_item_bit_position(id, slip_id)
-                local bitmask      = item.extdata[math.floor((bit_position - 1) / 8) + 1]
+                local bitmask      = item.extdata:byte(math.floor((bit_position - 1) / 8) + 1)
 
                 if bitmask < 0 then
                     bitmask = bitmask + 256
@@ -144,8 +144,8 @@ function slips.get_player_items()
     for _, storage in ipairs(slips.default_storages) do
         for _, item in ipairs(items[storage]) do
             if slips.storages:contains(item.id) then
-                for bit_position = 0, L(item.extdata):length() * 8 - 1 do
-                    local bitmask = item.extdata[math.floor(bit_position / 8) + 1]
+                for bit_position = 0, item.extdata:length() * 8 - 1 do
+                    local bitmask = item.extdata:byte(math.floor(bit_position / 8) + 1)
 
                     if bitmask < 0 then
                         bitmask = bitmask + 256
