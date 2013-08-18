@@ -274,7 +274,18 @@ function interp_text(splitline,offset,modified)
 		elseif validabils[strippedabil].typ == 'ambig_names' then
 			r_line, s_type = ambig(strippedabil)
 		end
-		lastsent = r_line['prefix']..' "'..r_line['english']..'" '..(temptarg or target_make(r_line['validtarget']))
+		
+		local targets = r_line['validtarget']
+		
+		-- Handling for abilities that change potential targets.
+		if r_line['prefix'] == '/song' or r_line['prefix'] == '/so' then
+			local buffs = get_player()['buffs']
+			for i,v in pairs(buffs) do
+				if v == 409 then targets['Party'] = true end -- Pianissimo
+			end
+		end
+		
+		lastsent = r_line['prefix']..' "'..r_line['english']..'" '..(temptarg or target_make(targets))
 		if debugging then add_to_chat(8,tostring(counter)..' input '..lastsent) end
 		if logging then
 			logfile:write('\n\n',tostring(os.clock()),'Original: ',table.concat(splitline,' '),'\n(180) ',lastsent)
