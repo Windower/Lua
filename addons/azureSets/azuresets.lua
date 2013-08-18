@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 _addon = {}
 _addon.name = 'AzureSets'
 _addon.version = '1.2'
+_addon.author = 'Nitrous (Shiva)'
 
 require 'tablehelper'
 require 'stringhelper'
@@ -73,7 +74,7 @@ function onUnload()
     windower.send_command('unalias aset')
 end
 
-function jobChange(mjob_id, mjob, mjob_lvl, sjob_id, sjob, sjob_lvl)
+function jobChange(mj, mjob_id, mjob_lvl, sj, sjob_id, sjob_lvl)
     if mjob_id == 16 then
         initialize()
     end

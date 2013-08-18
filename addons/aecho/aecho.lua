@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 _addon = {}
 _addon.name = 'AEcho'
 _addon.version = '2.01'
+_addon.author = 'Nitrous (Shiva)'
 
 require 'tablehelper'
 require 'stringhelper'
@@ -66,7 +67,7 @@ function onUnload()
     windower.send_command('unalias aecho')
 end
 
-function gainStatus(id,name)
+function gainStatus(name,id)
     for key,val in pairs(settings.buffs) do
         if key:lower() == name:lower() then
             if name:lower() == 'silence' and autoecho then

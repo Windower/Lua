@@ -14,7 +14,9 @@
   <addon>
     <name>AEcho</name>
     <description>Automatically uses echo drops when you get silenced. Also, uses send to send a message to an alt that you got debuffed.</description>
-    <bugtracker>https://github.com/nitrous24/Lua/issues?page=1</bugtracker>
+    <author>Nitrous (Shiva)</author>
+    <support>irc.ffochat.com</support>
+    <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>
   </addon>
   <addon>
     <name>AnsweringMachine</name>
@@ -22,6 +24,13 @@
     <description>Stores tells that you receive for later recall.</description>
 	<bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
 	<support>irc.ffochat.com</support>
+  </addon>
+  <addon>
+    <name>AutoControl</name>
+    <description>Automated automaton equipment setting and burden tracker.</description>
+    <author>Nitrous (Shiva)</author>
+    <support>irc.ffochat.com</support>
+    <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>
   </addon>
   <addon>
     <name>AutoJoin</name>
@@ -39,7 +48,9 @@
   <addon>
     <name>AzureSets</name>
     <description>Automated blue magic spell setting.</description>
-    <bugtracker>https://github.com/nitrous24/Lua/issues?page=1</bugtracker>
+    <author>Nitrous (Shiva)</author>
+    <support>irc.ffochat.com</support>
+    <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>
   </addon>
   <addon>
     <name>BattleMod</name>
@@ -58,6 +69,9 @@
   <addon>
     <name>cBlock</name>
     <description>Blacklist addon for FFOChat.</description>
+    <author>Nitrous (Shiva)</author>
+    <support>irc.ffochat.com</support>
+    <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>
   </addon>
   <addon>
     <name>CellHelp</name>
@@ -114,7 +128,9 @@
   <addon>
     <name>FFOColor</name>
     <description>Allows you to show FFOChat text in one of the 5 game chat channels. As well as specify colors for the text</description>
-    <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>    
+    <author>Nitrous (Shiva)</author>
+    <support>irc.ffochat.com</support>
+    <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>   
   </addon>
   <addon>
     <author>Giuliano Riccio (Zohno@Phoenix)</author>
@@ -161,7 +177,9 @@
   <addon>
     <name>OhShi</name>
     <description>Keeps track of various event related things. Such as, VW proc messages, mob casting, mob tp moves, TH procs and cor rolls, as well as others.</description>
-    <bugtracker>https://github.com/nitrous24/Lua/issues?page=1</bugtracker>
+    <author>Nitrous (Shiva)</author>
+    <support>irc.ffochat.com</support>
+    <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>
   </addon>
   <addon>
     <name>PetSchool</name>
@@ -256,11 +274,15 @@
   <addon>
     <name>StaggerTrack</name>
     <description>Catches voidwatch weakness messages and prints them to a textbox in case you miss them in the battle spam.</description>
+    <author>Nitrous (Shiva)</author>
+    <support>irc.ffochat.com</support>
     <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>
   </addon>
   <addon>
     <name>STNA</name>
     <description>One-button status removal for dual boxing.</description>
+    <author>Nitrous (Shiva)</author>
+    <support>irc.ffochat.com</support>
     <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>
   </addon>
   <addon>
