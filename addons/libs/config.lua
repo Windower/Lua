@@ -133,7 +133,7 @@ function parse(settings)
         meta.original[char] = merge(table.copy(settings), parsed[char], char)
     end
     for char in meta.chars:it() do
-        meta.original[char] = table_diff(meta.original.global, meta.original[char])
+        meta.original[char] = table_diff(meta.original.global, meta.original[char]) or T{}
 	end
 
 	return merge(settings, parsed.global:update(parsed[get_player()['name']:lower()], true))
@@ -296,7 +296,7 @@ function config.save(t, char)
 	if char == 'all' then
 		char = 'global'
 	elseif not meta.chars:contains(char) then
-		meta.chars:append(char)
+		meta.chars:add(char)
 		meta.original[char] = T{}
 	end
 
