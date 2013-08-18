@@ -270,7 +270,7 @@ windower.register_event('action message',function(actor_id,target_id,actor_index
     -- Consider a way to condense "Wears off" messages?
 	if message_id == 206 then -- Wears off messages
 		local status
-		local target_table = get_mob_by_id(index)
+		local target_table = get_mob_by_index(target_index)
 		local party_table = get_party()
 		local target = target_table['name']
 		
