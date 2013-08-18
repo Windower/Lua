@@ -41,7 +41,7 @@ require 'ambiguous_names'
 require 'targets'
 
 _addon = {}
-_addon.version = '0.6'
+_addon.version = '0.8'
 _addon.name = 'Shortcuts'
 _addon.commands = {'shortcuts'}
 
@@ -54,11 +54,11 @@ _addon.commands = {'shortcuts'}
 ---- None, simply a routine that runs once at the load (after the entire document
 ---- is loaded and treated as a script)
 -----------------------------------------------------------------------------------
-function event_load()
+windower.register_event('load',function()
 	counter = 0
 	lastsent = 'MAUSMAUSMAUSMAUSMAUSMAUSMAUSMAUS'
 	collectgarbage()
-end
+end)
 
 -----------------------------------------------------------------------------------
 --Name: event_unload()
@@ -68,9 +68,9 @@ end
 --Returns:
 ---- None, simply a routine that runs once at unload.
 -----------------------------------------------------------------------------------
-function event_unload()
+windower.register_event('unload',function()
 	if logging then	logfile:close()	end
-end
+end)
 
 
 -----------------------------------------------------------------------------------
@@ -82,7 +82,7 @@ end
 --Returns:
 ---- string, changed command
 -----------------------------------------------------------------------------------
-function event_outgoing_text(original,modified)
+windower.register_event('outgoing text',function(original,modified)
 	local temp_org = convert_auto_trans(original)
 	if original:sub(1,1) ~= '/' then return modified end
 	temp_org = temp_org:gsub(' <wait %d+>','')
@@ -123,7 +123,7 @@ function event_outgoing_text(original,modified)
 	
 	-- Otherwise, dump the inputs into command_logic()
 	return command_logic(temp_org,modified)
-end
+end)
 
 -----------------------------------------------------------------------------------
 --Name: event_unhandled_command()
@@ -133,10 +133,10 @@ end
 --Returns:
 ---- None, but can generate text output through command_logic()
 -----------------------------------------------------------------------------------
-function event_unhandled_command(...)
+windower.register_event('unhandled command',function(...)
 	local combined = table.concat({...},' ') -- concat it back together...
 	command_logic(combined,combined) -- and then dump it into command_logic()
-end
+end)
 
 
 -----------------------------------------------------------------------------------
@@ -166,7 +166,7 @@ function command_logic(original,modified)
 		-- If the command is legitimate and requires target completion but not ability interpretation
 		
 		if command2_list[command]==true then -- If there are not any excluded secondary commands
-			local temptarg = valid_target(potential_targ) or target_make({['Player']=true,['Enemy']=true,['Self']=true}) -- Complete the target or make one.
+			local temptarg = valid_target(potential_targ) or target_make({['Player']=true,['Enemy']=true,['Party']=true,['Ally']=true,['NPC']=true,['Self']=true}) -- Complete the target or make one.
 			lastsent = command..' '..temptarg -- Push the command and target together and send it out.
 			if debugging then add_to_chat(8,tostring(counter)..' input '..lastsent) end
 			if logging then
@@ -199,7 +199,7 @@ function command_logic(original,modified)
 					temptarg = potential_targ
 				end
 			elseif not temptarg then -- Make a target if the temptarget isn't valid
-				temptarg = target_make({['Player']=true,['Enemy']=true,['Self']=true})
+				temptarg = target_make({['Player']=true,['Enemy']=true,['Party']=true,['Ally']=true,['NPC']=true,['Self']=true})
 			end
 			lastsent = tempcmd..' '..temptarg
 			if debugging then add_to_chat(8,tostring(counter)..' input '..lastsent) end
@@ -274,7 +274,18 @@ function interp_text(splitline,offset,modified)
 		elseif validabils[strippedabil].typ == 'ambig_names' then
 			r_line, s_type = ambig(strippedabil)
 		end
-		lastsent = r_line['prefix']..' "'..r_line['english']..'" '..(temptarg or target_make(r_line['validtarget']))
+		
+		local targets = r_line['validtarget']
+		
+		-- Handling for abilities that change potential targets.
+		if r_line['prefix'] == '/song' or r_line['prefix'] == '/so' then
+			local buffs = get_player()['buffs']
+			for i,v in pairs(buffs) do
+				if v == 409 then targets['Party'] = true end -- Pianissimo
+			end
+		end
+		
+		lastsent = r_line['prefix']..' "'..r_line['english']..'" '..(temptarg or target_make(targets))
 		if debugging then add_to_chat(8,tostring(counter)..' input '..lastsent) end
 		if logging then
 			logfile:write('\n\n',tostring(os.clock()),'Original: ',table.concat(splitline,' '),'\n(180) ',lastsent)

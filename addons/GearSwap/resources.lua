@@ -174,7 +174,9 @@ player.equipment = {}
 pet = {isvalid=false}
 st_flag = false
 current_job_file = nil
-
+disable_table = {false,false,false,false,false,false,false,false,false,false,false,false,false,false,false}
+disable_table[0] = false
+registered_user_events = {}
 
 persistant_sequence = {}  ---------------------- TEMPORARY TO INVESTIGATE LAG ISSUES IN DELVE
 persistant_sequence[0] = true

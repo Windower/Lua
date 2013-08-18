@@ -7,6 +7,7 @@ local config = {}
 _libs = _libs or {}
 _libs.config = config
 _libs.tablehelper = _libs.tablehelper or require 'tablehelper'
+_libs.sets = _libs.sets or require 'sets'
 _libs.stringhelper = _libs.stringhelper or require 'stringhelper'
 _libs.xml = _libs.xml or require 'xml'
 _libs.filehelper = _libs.filehelper or require 'filehelper'
@@ -33,20 +34,13 @@ local nest_xml
 local table_diff
 
 -- Loads a specified file, or alternatively a file 'settings.xml' in the current addon/data folder.
-function config.load(filename, confdict, overwrite)
+function config.load(filename, confdict)
 	if type(filename) == 'table' then
-		confdict, filename, overwrite = filename, nil, confdict
-	elseif type(filename) == 'boolean' then
-		filename, overwrite = nil, filename
-	elseif type(confdict) == 'boolean' then
-		confdict, overwrite = nil, confdict
+		filename, confdict = nil, filename
 	end
 
-	confdict = T(confdict):copy()
-	overwrite = overwrite or false
-
-	local confdict_mt = getmetatable(confdict)
-	confdict = setmetatable(confdict, {__class = 'Settings', __index = function(t, k)
+	local confdict_mt = getmetatable(confdict) or _meta.T
+	settings = setmetatable(table.copy(confdict), {__class = 'Settings', __index = function(t, k)
 		if config[k] ~= nil then
 			return config[k]
 		elseif confdict_mt then
@@ -57,42 +51,55 @@ function config.load(filename, confdict, overwrite)
 	-- Settings member variables, in separate struct
 	local meta = {}
 	meta.file = _libs.filehelper.new()
-	meta.original = T{['global'] = T{}}
-	meta.chars = T{}
+	meta.original = T{global = T{}}
+	meta.chars = S{}
 	meta.comments = T{}
+    meta.refresh_obj = T{}
+    meta.refresh_fn = L{}
 
-	settings_map[confdict] = meta
+	settings_map[settings] = meta
 
 	-- Load addon config file (Windower/addon/<addonname>/data/settings.xml).
 	local filepath = filename or 'data/settings.xml'
 	if not _libs.filehelper.exists(filepath) then
 		meta.file:set(filename or 'data/settings.xml', true)
-		meta.original['global'] = confdict:copy()
-		confdict:save()
+		meta.original.global = table.copy(settings)
+		config.save(settings)
 
-		return confdict
+		return settings
 	end
 
 	meta.file:set(filepath)
 
-	local err
-	confdict, err = parse(confdict, overwrite)
+	return parse(settings)
+end
 
-	if err ~= nil then
-		error(err)
-	end
+-- Reloads the settings for the provided table. Needs to be the same table that was assigned to with config.load.
+function config.reload(settings)
+    if not settings_map[settings] then
+        error('Config reload error: unknown settings table.')
+        return
+    end
 
-	return confdict
+    parse(settings)
+
+    for fn, obj in settings_map[settings].refresh_obj:it() do
+        fn(obj, settings)
+    end
+    for fn in settings_map[settings].refresh_fn:it() do
+        fn(settings)
+    end
 end
 
 -- Resolves to the correct parser and calls the respective subroutine, returns the parsed settings table.
-function parse(confdict, overwrite)
+function parse(settings)
 	local parsed = T{}
 	local err
-	meta = settings_map[confdict]
+	meta = settings_map[settings]
 
+    if not meta then print(debug.traceback()) end
 	if meta.file.path:endswith('.json') then
-		parsed = json.read(meta.file)
+		parsed = _libs.json.read(meta.file)
 
 	elseif meta.file.path:endswith('.xml') then
 		parsed, err = _libs.xml.read(meta.file)
@@ -103,30 +110,33 @@ function parse(confdict, overwrite)
 			else
 				error('XML error: Unkown error.')
 			end
-			return confdict
+			return settings
 		end
 
-		parsed = settings_table(parsed, confdict)
+		parsed = settings_table(parsed, settings)
 	end
 
 	-- Determine all characters found in the settings file.
 	meta.chars = parsed:keyset() - S{'global'}
 	meta.original = T{}
 
-	if overwrite or confdict:empty() then
+	if table.empty(settings) then
 		for char in (meta.chars + S{'global'}):it() do
-			meta.original[char] = confdict:copy():update(parsed[char], true)
+			meta.original[char] = table.update(table.copy(settings), parsed[char], true)
 		end
 
-		return confdict:update(parsed['global']:update(parsed[get_player()['name']:lower()], true), true)
+		return settings:update(parsed.global:update(parsed[get_player()['name']:lower()], true), true)
 	end
 
 	-- Update the global settings with the per-player defined settings, if they exist. Save the parsed value for later comparison.
 	for char in (meta.chars + S{'global'}):it() do
-		meta.original[char] = merge(confdict:copy(), parsed[char], char)
+        meta.original[char] = merge(table.copy(settings), parsed[char], char)
+    end
+    for char in meta.chars:it() do
+        meta.original[char] = table_diff(meta.original.global, meta.original[char]) or T{}
 	end
 
-	return merge(confdict, parsed['global']:update(parsed[get_player()['name']:lower()], true))
+	return merge(settings, parsed.global:update(parsed[get_player()['name']:lower()], true))
 end
 
 -- Merges two tables like update would, but retains type-information and tries to work around conflicts.
@@ -134,6 +144,7 @@ function merge(t, t_merge, path)
 	path = (type(path) == 'string' and T{path}) or path
 
 	local oldval
+    local oldtype
 	local err
 
 	local keys = {}
@@ -146,7 +157,7 @@ function merge(t, t_merge, path)
 		key = keys[lkey:lower()]
 		if key == nil then
 			if type(val) == 'table' then
-				t[lkey] = setmetatable(val, _meta.T)
+				t[lkey] = setmetatable(table.copy(val), getmetatable(val) or _meta.T)
 			else
 				t[lkey] = val
 			end
@@ -154,21 +165,22 @@ function merge(t, t_merge, path)
 		else
 			err = false
 			oldval = rawget(t, key)
-			if type(oldval) == 'table' and type(val) == 'table' then
+            oldtype = type(oldval)
+			if oldtype == 'table' and type(val) == 'table' then
 				local res = merge(oldval, val, path and path:copy()+key or nil)
 				if class(oldval) == 'table' or class(oldval) == 'Table' then
-					t[key] = setmetatable(res, _meta.T)
+					t[key] = setmetatable(table.copy(res), _meta.T)
 				elseif class(oldval) == 'List' then
-					t[key] = L(res)
+					t[key] = L(table.copy(res))
 				elseif class(oldval) == 'Set' then
-					t[key] = S(res)
+					t[key] = S(table.copy(res))
 				else
 					notice('This is not supposed to happen. A new data structure has not yet been added to config.lua')
 					t[key] = setmetatable(res, _meta.T)
 				end
 
-			elseif type(oldval) ~= type(val) then
-				if type(oldval) == 'table' then
+			elseif oldtype ~= type(val) then
+				if oldtype == 'table' then
 					if type(val) == 'string' then
 						local res = list.map(val:split(','), string.trim)
 						if class and class(oldval) == 'Set' then
@@ -181,7 +193,7 @@ function merge(t, t_merge, path)
 						err = true
 					end
 
-				elseif type(oldval) == 'number' then
+				elseif oldtype == 'number' then
 					local testdec = tonumber(val)
 					local testhex = tonumber(val, 16)
 					if testdec then
@@ -192,7 +204,7 @@ function merge(t, t_merge, path)
 						err = true
 					end
 
-				elseif type(oldval) == 'boolean' then
+				elseif oldtype == 'boolean' then
 					if val == 'true' then
 						t[key] = true
 					elseif val == 'false' then
@@ -201,8 +213,9 @@ function merge(t, t_merge, path)
 						err = true
 					end
 
-				elseif type(oldval) == 'string' then
+				elseif oldtype == 'string' then
 					t[key] = val
+                    err = true
 
 				else
 					err = true
@@ -283,7 +296,7 @@ function config.save(t, char)
 	if char == 'all' then
 		char = 'global'
 	elseif not meta.chars:contains(char) then
-		meta.chars:append(char)
+		meta.chars:add(char)
 		meta.original[char] = T{}
 	end
 
@@ -293,7 +306,7 @@ function config.save(t, char)
 		meta.original = meta.original:filterkey('global')
 	else
 		meta.original.global:amend(meta.original[char])
-		meta.original[char] = table_diff(meta.original['global'], meta.original[char])
+		meta.original[char] = table_diff(meta.original.global, meta.original[char]) or setmetatable({}, _meta.T)
 
 		if meta.original[char]:empty(true) then
 			meta.original[char] = nil
@@ -306,35 +319,35 @@ end
 
 -- Returns the table containing only elements from t_new that are different from t and not nil.
 function table_diff(t, t_new)
-	local res = T{}
+	local res = setmetatable({}, _meta.T)
 	local cmp
 
 	for key, val in pairs(t_new) do
 		cmp = t[key]
 		if cmp ~= nil then
-			if class(cmp) ~= class(val) then
+			if type(cmp) ~= type(val) then
 				warning('Mismatched setting types for key \''..key..'\':', type(cmp), type(val))
 			else
 				if type(val) == 'table' then
 					if class(val) == 'Set' or class(val) == 'List' then
 						if not cmp:equals(val) then
-							res[key] = val
+							rawset(res, key, val)
 						end
 					elseif table.isarray(val) and table.isarray(cmp) then
 						if not table.equals(cmp, val) then
-							res[key] = val
+							rawset(res, key, val)
 						end
 					else
-						res[key] = table_diff(cmp, val)
+						rawset(res, key, table_diff(cmp, val))
 					end
 				elseif cmp ~= val then
-					res[key] = val
+					rawset(res, key, val)
 				end
 			end
 		end
 	end
 
-	return res
+	return (not table.empty(res) and res) or nil
 end
 
 -- Converts a settings table to a XML representation.
@@ -344,7 +357,7 @@ function settings_xml(meta)
 	local settings = meta.original
 
 	meta.chars = (settings:keyset() - S{'global'}):sort()
-	for char in (L{'global'}+meta.chars):it() do
+	for char in (L{'global'} + meta.chars):it() do
 		if char == 'global' and rawget(meta.comments, 'settings') ~= nil then
 			str = str..'\t<!--\n'
 			local comment_lines = rawget(meta.comments, 'settings'):split('\n')
@@ -422,5 +435,23 @@ function nest_xml(t, meta, indentlevel)
 
 	return fragments:concat()
 end
+
+function config.register(settings, fn, obj)
+    if obj then
+        settings_map[settings].refresh_obj[obj] = fn
+    else
+        settings_map[settings].refresh_fn:append(fn)
+    end
+end
+
+function config.unregister(settings, key)
+    settings_map[settings].refresh[key] = nil
+end
+
+windower.register_event('logout', 'login', function()
+    for _, settings in settings_map:it() do
+        config.reload(settings)
+    end
+end)
 
 return config

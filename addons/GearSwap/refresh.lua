@@ -63,22 +63,32 @@ function load_user_files()
 	end
 	user_env = nil
 	
+	for i,v in pairs(registered_user_events) do
+--		windower.unregister_event(v)
+	end
+	registered_user_events = {}
+	
 	if not file_exists(lua_base_path..'data/'..player['name']..'_'..player.main_job..'.lua') then
 		user_env = nil
 		current_job_file = nil
 		return
 	end
+	
+	local windower_two = windower
+--	windower_two.register_event = register_event_user
+--	windower_two.unregister_event = unregister_event_user
+	
 	user_env = {gearswap = _G, _global = _global,
 		-- Player functions
 		equip = equip, verify_equip=verify_equip, cancel_spell=cancel_spell,
 		force_send=force_send, change_target=change_target, cast_delay=cast_delay,
-		print_set=print_set,set_combine=set_combine,
+		print_set=print_set,set_combine=set_combine,disable=disable,enable=enable,
 		
 		-- Library functions
 		string=string, math=math, sets=sets, table=table, T=T, S=S,
 		tostring = tostring, tonumber = tonumber, pairs = pairs,
 		ipairs = ipairs, write=write, add_to_chat=add_to_chat,
-		send_command=send_cmd_user,register_event=register_event,
+		send_command=send_cmd_user,windower=windower_two,
 		require=require,next=next,
 		
 		-- Player environment things

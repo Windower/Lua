@@ -130,7 +130,7 @@ end
  
 function initialize()
     if file.exists('../battlemod/data/colors.xml') then
-		color=config.load('../battlemod/data/colors.xml', true)
+		color=config.load('../battlemod/data/colors.xml')
 		write('Colors loaded from battlemod')
 	else
 		color=config.load('/data/colors.xml',defaults)

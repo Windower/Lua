@@ -1,4 +1,4 @@
-#Shortcuts v0.7 (beta)
+#Shortcuts v0.8 (beta)
 ####written by Byrth  
 
 Completes and properly formats commands (prefixed by at least one '/'),
@@ -9,6 +9,7 @@ spellcast" project, and represents the interpretation part of spellcast.
 None  
 
 ####Changelog:  
+v0.8 - 08/14/13 - Fixed split(), which was causing errors when assembling resources.
 v0.7 - 08/12/13 - Improved the hashing algorithm (better roman numeral conversion) and improved target creation again. Updated documentation.
 v0.6 - 08/11/13 - Fixed autotranslate, eliminated valid commands that aren't prefixed by '/', and made target creation smarter.
 v0.5 - 08/05/13 - Added handling for <st..> commands and support for target shorthands (t for <t>, stpc for <stpc>, etc.)

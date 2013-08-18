@@ -98,14 +98,14 @@ function set_combine(set1,set2)
 		if slot_map[i] then
 			set3[default_slot_map[slot_map[i]]] = v
 		else
-			add_to_chat(123,'GearSwap: set_combine error, Set 1 contains an unrecognized slot name ('..i..')')
+			add_to_chat(123,'GearSwap: set_combine error, Set 1 contains an unrecognized slot name ('..tostring(i)..')')
 		end
 	end
 	for i,v in pairs(set2) do
 		if slot_map[i] then
 			set3[default_slot_map[slot_map[i]]] = v
 		else
-			add_to_chat(123,'Gearswap: set_combine error, Set 2 contains an unrecognized slot name ('..i..')')
+			add_to_chat(123,'Gearswap: set_combine error, Set 2 contains an unrecognized slot name ('..tostring(i)..')')
 		end
 	end
 	return set3
@@ -121,9 +121,37 @@ function equip(...)
 	end
 end
 
+function disable(...)
+	local disable_tab = {...}
+	if type(disable_tab[1]) == 'table' then
+		disable_tab = disable_tab[1] -- Compensates for people passing a table instead of a series of strings.
+	end
+	for i,v in pairs(disable_tab) do
+		if slot_map[v] then
+			rawset(disable_table,slot_map[v],true)
+		else
+			add_to_chat(123,'Gearswap: disable error, passed an unrecognized slot name ('..tostring(v)..')')
+		end
+	end
+end
+
+function enable(...)
+	local enable_tab = {...}
+	if type(enable_tab[1]) == 'table' then
+		enable_tab = enable_tab[1] -- Compensates for people passing a table instead of a series of strings.
+	end
+	for i,v in pairs(enable_tab) do
+		if slot_map[v] then
+			rawset(disable_table,slot_map[v],false)
+		else
+			add_to_chat(123,'Gearswap: enable error, passed an unrecognized slot name ('..tostring(v)..')')
+		end
+	end
+end
+
 function print_set(set,title)
 	if title then
-		add_to_chat(1,'------------------------- '..title..' -------------------------')
+		add_to_chat(1,'------------------------- '..tostring(title)..' -------------------------')
 	else
 		add_to_chat(1,'----------------------------------------------------------------')
 	end
@@ -138,4 +166,15 @@ function send_cmd_user(command)
 		command='@'..command
 	end
 	send_command(command)
+end
+
+function register_event_user(str,func)
+	id = windower.register_event(str,func)
+--	registered_user_events[id] = true
+	return id
+end
+
+function unregister_event_user(id,str)
+--	windower.unregister_event(id,str)
+--	registered_user_events[id] = false
 end

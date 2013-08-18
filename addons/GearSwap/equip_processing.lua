@@ -120,7 +120,7 @@ function equip_sets(swap_type,val1,val2)
 	if failure_reason == '' then
 		for i = 0,15 do
 			--if debugging >= 2 then add_to_chat(8,tostring(v)..' '..tostring(i)..' item: '..tostring(r_items[items['inventory'][v]['id']][language..'_log'])) else
-			if equip_next[i] then
+			if equip_next[i] and not disable_table[i] then
 				set_equip(equip_next[i],i)
 				sent_out_equip[i] = v -- re-make the equip_next table with the name sent_out_equip as the equipment is sent out.
 			end
@@ -128,7 +128,7 @@ function equip_sets(swap_type,val1,val2)
 	elseif logging then
 		logit(logfile,'\n\n'..tostring(os.clock)..'(69) failure_reason: '..tostring(failure_reason))
 	end
-	send_check(_global.force_send)
+	if swap_type == 'precast' then send_check(_global.force_send) end
 end
 
 function to_id_set(inventory,equip_list)
@@ -139,8 +139,15 @@ function to_id_set(inventory,equip_list)
 			if (m['flags'] == 0 or m['flags'] == 5) and r_items[m['id']]['jobs'] then -- Make sure the item isn't being bazaared, isn't already equipped, and can be equipped by specific jobs (unlike pearlsacks).
 				if get_wearable(jobs[player.main_job],tonumber('0x'..r_items[m['id']]['jobs'])) and (tonumber(r_items[m['id']]['level'])<=player.main_job_level) and get_wearable(dat_races[player.race],tonumber('0x'..r_items[m['id']]['races'])) then
 					for i,v in pairs(equip_list) do
+						local name,augments
+						if type(v) == 'table' then
+							name = v.name
+							-- Augment Handling
+						elseif type(v) == 'string' then
+							name = v
+						end
 						if not ret_list[slot_map[i]] then
-							if r_items[m['id']][language..'_log']:lower() == v:lower() or r_items[m['id']][language]:lower() == v:lower() then
+							if r_items[m['id']][language..'_log']:lower() == name:lower() or r_items[m['id']][language]:lower() == name:lower() then
 								-- I need to add the ability to interpret extdata and specify which item based on it at some point.
 								equip_list[i] = ''
 								ret_list[slot_map[i]] = m['slot_id']
@@ -150,13 +157,20 @@ function to_id_set(inventory,equip_list)
 					end
 				else
 					for i,v in pairs(equip_list) do
-						if r_items[m['id']][language..'_log']:lower() == v:lower() or r_items[m['id']][language]:lower() == v:lower() then
+						local name,augments
+						if type(v) == 'table' then
+							name = v.name
+						-- Augment Handling
+						elseif type(v) == 'string' then
+							name = v
+						end
+						if r_items[m['id']][language..'_log']:lower() == name:lower() or r_items[m['id']][language]:lower() == name:lower() then
 							if not get_wearable(jobs[player.main_job],tonumber('0x'..r_items[m['id']]['jobs'])) then
-								equip_list[i] = v..' (cannot be worn by this job)'
+								equip_list[i] = name..' (cannot be worn by this job)'
 							elseif not (tonumber(r_items[m['id']]['level'])<=player.main_job_level) then
-								equip_list[i] = v..' (job level is too low)'
+								equip_list[i] = name..' (job level is too low)'
 							elseif not get_wearable(dat_races[player.race],tonumber('0x'..r_items[m['id']]['races'])) then
-								equip_list[i] = v..' (cannot be worn by your race)'
+								equip_list[i] = name..' (cannot be worn by your race)'
 							end
 							break
 						end
@@ -164,11 +178,18 @@ function to_id_set(inventory,equip_list)
 				end
 			elseif m['flags'] > 0 then
 				for i,v in pairs(equip_list) do
-					if r_items[m['id']][language..'_log']:lower() == v:lower() or r_items[m['id']][language]:lower() == v:lower() then
+					local name,augments
+					if type(v) == 'table' then
+						name = v.name
+						-- Augment Handling
+					elseif type(v) == 'string' then
+						name = v
+					end
+					if r_items[m['id']][language..'_log']:lower() == name:lower() or r_items[m['id']][language]:lower() == name:lower() then
 						if m['flags'] == 5 then
 							equip_list[i] = ''
 						elseif m['flags'] == 25 then
-							equip_list[i] = v..' (bazaared)'
+							equip_list[i] = name..' (bazaared)'
 						end
 						break
 					end
@@ -221,6 +242,7 @@ end
 
 function send_check(val)
 	if not _global.cancel_spell then
+--		write('arg1: '..tostring(val and storedcommand)..'  arg2: '..tostring(storedcommand)..' '..tostring(table.length(sent_out_equip))..'  arg3: '..tostring(storedcommand and not _global.verify_equip))
 		if (val and storedcommand) or (storedcommand and table.length(sent_out_equip) == 0) or (storedcommand and not _global.verify_equip) then
 			local assemblecommand
 			if not _global.cast_delay or _global.cast_delay == 0 then
