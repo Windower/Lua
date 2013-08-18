@@ -295,8 +295,8 @@ windower.register_event('action message',function(actor_id,target_id,actor_index
 		end
 	elseif passed_messages:contains(message_id) then
 		local status,actor,target,spell,skill,number,number2
-		local actor_table = get_mob_by_id(actor_id)
-		local target_table = get_mob_by_id(index)
+		local actor_table = get_mob_by_index(actor_index)
+		local target_table = get_mob_by_index(target_index)
 		local party_table = get_party()
 		
 		if actor_table == nil then
