@@ -41,14 +41,14 @@ _addon.version = '2.18'
 _addon.name = 'BattleMod'
 _addon.commands = {'bm','battlemod'}
 
-function event_load()
+windower.register_event('load',function()
 	block_equip = false
 	block_cannot = false
 	
     send_command('@alias bm lua c battlemod cmd')
 	options_load()
 	collectgarbage()
-end
+end)
 
 function options_load()
 	if not dir_exists(lua_base_path..'data\\') then
@@ -102,9 +102,9 @@ function options_load()
 	write('Battlemod v'.._addon.version..' loaded.')
 end
 
-function event_job_change(mjob_id,mjob,mjob_lvl,sjob_id,sjob,sjob_lvl)
+windower.register_event('job change',function(mjob, mjob_id, mjob_lvl, sjob, sjob_id, sjob_lvl)
 	filterload(mjob)
-end
+end)
 
 function filterload(job)
 	if current_job == job then return end
@@ -118,11 +118,11 @@ function filterload(job)
 	current_job = job
 end
 
-function event_login(name)
+windower.register_event('login',function(name)
 	send_command('@wait 10;bm reload')
-end
+end)
 
-function event_addon_command(...)
+windower.register_event('addon command',function (...)
     local term = table.concat({...}, ' ')
     local splitarr = split(term,' ')
 	if splitarr[1] == 'cmd' then
@@ -217,9 +217,9 @@ function event_addon_command(...)
 			wearing[stat] = nil
 		end
 	end
-end
+end)
 
-function event_incoming_text(original, modified, color)
+windower.register_event('incoming text',function(original,modified,color)
 	local redcol = color%256
 	
 	if redcol == 36 then
@@ -264,9 +264,9 @@ function event_incoming_text(original, modified, color)
 	end
 	
 	return modified,color
-end
+end)
 
-function event_action_message(actor_id,index,actor_target_index,target_target_index,message_id,param_1,param_2,param_3)
+windower.register_event('action message',function(actor_id,target_id,actor_index,target_index,message_id,param_1,param_2,param_3)
     -- Consider a way to condense "Wears off" messages?
 	if message_id == 206 then -- Wears off messages
 		local status
@@ -356,8 +356,8 @@ function event_action_message(actor_id,index,actor_target_index,target_target_in
 	elseif debugging then 
 		write('debug_EAM#'..message_id..': '..dialog[message_id]['english'])
 	end
-end
+end)
 
-function event_unload()
+windower.register_event('unload',function ()
 	send_command('@unalias bm')
-end
+end)
