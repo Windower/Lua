@@ -170,11 +170,11 @@ end
 
 function register_event_user(str,func)
 	id = windower.register_event(str,func)
---	registered_user_events[id] = true
+	registered_user_events[id] = true
 	return id
 end
 
-function unregister_event_user(id,str)
---	windower.unregister_event(id,str)
---	registered_user_events[id] = false
+function unregister_event_user(id)
+	windower.unregister_event(id)
+	registered_user_events[id] = nil
 end

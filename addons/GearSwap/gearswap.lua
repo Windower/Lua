@@ -30,20 +30,23 @@ file = require 'filehelper'
 require 'sets'
 require 'stringhelper'
 require 'helper_functions'
+require 'tablehelper'
 
 require 'resources'
 require 'equip_processing'
 require 'targets'
 require 'refresh'
 require 'user_functions'
+require 'parse_augments'
 
 _addon = {}
 _addon.name = 'GearSwap'
-_addon.version = '0.605'
+_addon.version = '0.700'
+_addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
 windower.register_event('load',function()
-	debugging = 1
+	debugging = 0
 	
 	if dir_exists('../addons/GearSwap/data/logs') then
 		logging = true
@@ -51,7 +54,6 @@ windower.register_event('load',function()
 		logit(logfile,'GearSwap LOGGER HEADER\n')
 	end
 	
-	send_command('@alias gs lua c gearswap')
 	refresh_globals()
 	_global.force_send = false
 	
@@ -63,7 +65,6 @@ end)
 
 windower.register_event('unload',function ()
 	if logging then	logfile:close() end
-	send_command('@unalias gs')
 end)
 
 windower.register_event('addon command',function (...)

@@ -64,9 +64,8 @@ function load_user_files()
 	user_env = nil
 	
 	for i,v in pairs(registered_user_events) do
---		windower.unregister_event(v)
+		windower.unregister_event(i)
 	end
-	registered_user_events = {}
 	
 	if not file_exists(lua_base_path..'data/'..player['name']..'_'..player.main_job..'.lua') then
 		user_env = nil
@@ -75,8 +74,8 @@ function load_user_files()
 	end
 	
 	local windower_two = windower
---	windower_two.register_event = register_event_user
---	windower_two.unregister_event = unregister_event_user
+	windower_two.register_event = register_event_user
+	windower_two.unregister_event = unregister_event_user
 	
 	user_env = {gearswap = _G, _global = _global,
 		-- Player functions
