@@ -2,9 +2,10 @@
 _addon = {}
 _addon.commands = {'answeringmachine','am'}
 _addon.name = 'AnsweringMachine'
+_addon.author = 'Byrth'
 _addon.version = '1.0'
 
-function event_addon_command(...)
+windower.register_event('addon command',function (...)
 	term = table.concat({...}, ' ')
 	local broken = split(term, ' ')
 	if broken[1] ~= nil then
@@ -76,19 +77,14 @@ function event_addon_command(...)
 			end
 		end
 	end
-end
+end)
 
-function event_load()
-	send_command('@alias am lua c answeringmachine')
+windower.register_event('load',function ()
 	tell_table = {}
 	recording = {}
-end
+end)
 
-function event_unload()
-	send_command('@unalias am')
-end
-
-function event_chat_message(isGM, mode, player, message)
+windower.register_event('chat message',function(message,player,mode,isGM)
 	if mode==3 then
 		if tell_table[player:upper()] ~= nil then
 			tell_table[player:upper()] = tell_table[player:upper()]+1
@@ -104,7 +100,7 @@ function event_chat_message(isGM, mode, player, message)
 			end
 		end
 	end
-end
+end)
 
 function split(msg, match)
 	local length = msg:len()
