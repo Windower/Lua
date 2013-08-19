@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 _addon = {}
 _addon.name = 'FFOColor'
 _addon.version = '2.01'
+_addon.author = 'Nitrous (Shiva)'
 
 require 'tablehelper'
 require 'stringhelper'
