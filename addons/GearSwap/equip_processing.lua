@@ -122,7 +122,7 @@ function equip_sets(swap_type,val1,val2)
 			--if debugging >= 2 then add_to_chat(8,tostring(v)..' '..tostring(i)..' item: '..tostring(r_items[items['inventory'][v]['id']][language..'_log'])) else
 			if equip_next[i] and not disable_table[i] then
 				set_equip(equip_next[i],i)
-				sent_out_equip[i] = v -- re-make the equip_next table with the name sent_out_equip as the equipment is sent out.
+				sent_out_equip[i] = equip_next[i] -- re-make the equip_next table with the name sent_out_equip as the equipment is sent out.
 			end
 		end
 	elseif logging then
@@ -142,6 +142,11 @@ function to_id_set(inventory,equip_list)
 						local name,augments
 						if type(v) == 'table' then
 							name = v.name
+							if v.augments or v.augment then
+								for n,m in pairs(v.augments or v.augment) do
+									
+								end
+							end
 							-- Augment Handling
 						elseif type(v) == 'string' then
 							name = v
