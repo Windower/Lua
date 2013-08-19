@@ -29,6 +29,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 _addon = {}
 _addon.name = 'STNA'
 _addon.version = '1.07'
+_addon.author = 'Nitrous (Shiva)'
+
 require 'tablehelper'
 require 'sets'
 
@@ -80,14 +82,14 @@ function commands()
     end
 end
 
-function gainStatus(id,name)
+function gainStatus(name,id)
     if priority:contains(name) and not statusTable:contains(name) then
         statusTable:add(name)
     end
 end
 
 
-function loseStatus(id,name)
+function loseStatus(name,id)
     if statusTable:contains(name) then
         statusTable:remove(name)
     end
