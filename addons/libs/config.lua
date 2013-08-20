@@ -35,18 +35,18 @@ local table_diff
 
 -- Loads a specified file, or alternatively a file 'settings.xml' in the current addon/data folder.
 function config.load(filename, confdict)
-	if type(filename) == 'table' then
-		filename, confdict = nil, filename
+	if type(filename) ~= 'string' then
+		filename, confdict = 'data/settings.xml', filename
 	end
 
-	local confdict_mt = getmetatable(confdict) or _meta.T
-	settings = setmetatable(table.copy(confdict), {__class = 'Settings', __index = function(t, k)
-		if config[k] ~= nil then
-			return config[k]
-		elseif confdict_mt then
-			return confdict_mt.__index[k]
-		end
-	end})
+    local confdict_mt = getmetatable(confdict)
+    settings = setmetatable(table.copy(confdict or {}), {__class = 'Settings', __index = function(t, k)
+        if config[k] ~= nil then
+            return config[k]
+        elseif confdict_mt then
+            return confdict_mt.__index[k]
+        end
+    end})
 
 	-- Settings member variables, in separate struct
 	local meta = {}
@@ -60,9 +60,9 @@ function config.load(filename, confdict)
 	settings_map[settings] = meta
 
 	-- Load addon config file (Windower/addon/<addonname>/data/settings.xml).
-	local filepath = filename or 'data/settings.xml'
+	local filepath = filename
 	if not _libs.filehelper.exists(filepath) then
-		meta.file:set(filename or 'data/settings.xml', true)
+		meta.file:set(filepath, true)
 		meta.original.global = table.copy(settings)
 		config.save(settings)
 
