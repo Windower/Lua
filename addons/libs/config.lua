@@ -39,7 +39,7 @@ function config.load(filename, confdict)
 		filename, confdict = 'data/settings.xml', filename
 	end
 
-    local confdict_mt = getmetatable(confdict)
+    local confdict_mt = getmetatable(confdict) or _meta.T
     settings = setmetatable(table.copy(confdict or {}), {__class = 'Settings', __index = function(t, k)
         if config[k] ~= nil then
             return config[k]
