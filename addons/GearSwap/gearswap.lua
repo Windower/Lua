@@ -41,12 +41,12 @@ require 'parse_augments'
 
 _addon = {}
 _addon.name = 'GearSwap'
-_addon.version = '0.700'
+_addon.version = '0.701'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
 windower.register_event('load',function()
-	debugging = 0
+	debugging = 1
 	
 	if dir_exists('../addons/GearSwap/data/logs') then
 		logging = true
@@ -116,7 +116,7 @@ windower.register_event('addon command',function (...)
 	end
 end)
 
-function midact()
+function sender()
 	if not action_sent then
 		write('Forcing Send')
 		if debugging >= 1 then add_to_chat(123,'GearSwap: Had to force the command to send.') end
@@ -146,7 +146,7 @@ windower.register_event('outgoing text',function(original,modified)
 	elseif command_list[command] and temptarg and validabils[language][abil] and not midaction then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) temp_mod: '..temp_mod) end
 			
-		send_command('@wait 1;lua invoke gearswap midact')
+		send_command('@wait 1;lua invoke gearswap sender')
 		
 		local r_line, s_type
 			
@@ -181,7 +181,7 @@ windower.register_event('outgoing text',function(original,modified)
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) temp_mod: '..temp_mod) end
 
 		rline = ranged_line
-		send_command('@wait 1;lua invoke gearswap midact')
+		send_command('@wait 1;lua invoke gearswap sender')
 		
 		_global.storedtarget = temptarg
 		
@@ -261,9 +261,14 @@ windower.register_event('outgoing chunk',function(id,data)
 		if logging then logit(logfile,'\n\nActor: '..tostring(actor_name)..'  Target: '..tostring(target_name)..'  Category: '..tostring(category)..'  param: '..tostring(abil_name or param)) end
 		if abil_name then
 			midaction = true
+--			send_command('@wait 1;lua i gearswap midact')
 		end
 	end
 end)
+
+function midact()
+	midaction = false
+end
 
 windower.register_event('action',function(act)
 	if gearswap_disabled or act.category == 1 then return end
@@ -328,6 +333,9 @@ end)
 
 windower.register_event('action message',function(actor_id,target_id,actor_index,target_index,message_id,param_1,param_2,param_3)
 	if gearswap_disabled then return end
+	local tempplay = get_player()
+	if actor_id ~= tempplay.id and actor_id ~= get_mob_by_index(tempplay.pet_index)['id'] then return end
+	
 	if message_id == 62 then
 		if type(user_env.aftercast) == 'function' then
 			equip_sets('aftercast',r_items[param_1],{type='Failure'})
@@ -363,6 +371,7 @@ end)
 
 windower.register_event('gain status',function(name,id)
 	if gearswap_disabled then return end
+	if midaction and T{'terror','sleep','stun','petrification','charm'}:contains(name:lower()) then midaction = false end
 	equip_sets('buff_change',name,'gain')
 end)
 

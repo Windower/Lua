@@ -138,8 +138,10 @@ function load_plugins()
 	local working_array,commandstr = {},'wait 5;'
 	if loader_array[get_player().name:lower()] then
 		working_array = loader_array[get_player().name:lower()]
-	else
+	elseif loader_array['global'] then
 		working_array = loader_array['global']
+	elseif loader_array['Global'] then
+		working_array = loader_array['Global']
 	end
 	
 	for i,v in pairs(working_array['plugin']) do
