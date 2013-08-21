@@ -371,7 +371,7 @@ end)
 
 windower.register_event('gain status',function(name,id)
 	if gearswap_disabled then return end
-	if midaction and T{'terror','sleep','stun','petrification','charm'}:contains(name:lower()) then midaction = false end
+	if midaction and T{'terror','sleep','stun','petrification','charm','weakness'}:contains(name:lower()) then midaction = false end
 	equip_sets('buff_change',name,'gain')
 end)
 
