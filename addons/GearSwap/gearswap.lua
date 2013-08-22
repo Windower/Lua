@@ -334,7 +334,15 @@ end)
 windower.register_event('action message',function(actor_id,target_id,actor_index,target_index,message_id,param_1,param_2,param_3)
 	if gearswap_disabled then return end
 	local tempplay = get_player()
-	if actor_id ~= tempplay.id and actor_id ~= get_mob_by_index(tempplay.pet_index)['id'] then return end
+	if actor_id ~= tempplay.id then
+		if tempplay.pet_index then
+			if actor_id ~= get_mob_by_index(tempplay.pet_index)['id'] then
+				return
+			end
+		else
+			return
+		end
+	end
 	
 	if message_id == 62 then
 		if type(user_env.aftercast) == 'function' then
