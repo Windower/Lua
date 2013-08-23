@@ -142,7 +142,7 @@ function table.tostring(t)
         if tonumber(key) then
             tstr = tstr..valstr
         else
-            tstr = tstr..key..'='..valstr
+            tstr = tstr..tostring(key)..'='..valstr
         end
 
         -- Add comma, unless it's the last value.
@@ -215,7 +215,7 @@ function table.tovstring(t, keys, indentlevel)
         if not keys and tonumber(key) then
             tstr = tstr..indent..'    '..valstr
         else
-            tstr = tstr..indent..'    '..key..'='..valstr
+            tstr = tstr..indent..'    '..tostring(key)..'='..valstr
         end
 
         -- Add comma, unless it's the last value.
