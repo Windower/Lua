@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 _addon = {}
 _addon.name = 'OhShi'
 _addon.version = '2.51'
+_addon.author = 'Nitrous (Shiva)'
 
 --Requiring libraries used in this addon
 --These should be saved in addons/libs

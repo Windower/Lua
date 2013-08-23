@@ -38,17 +38,18 @@ require 'static_vars'
 
 _addon = {}
 _addon.version = '2.18'
+_addon.author = 'Byrth'
 _addon.name = 'BattleMod'
 _addon.commands = {'bm','battlemod'}
 
-function event_load()
+windower.register_event('load',function()
 	block_equip = false
 	block_cannot = false
 	
-    send_command('@alias bm lua c battlemod cmd')
+--    send_command('@alias bm lua c battlemod cmd')
 	options_load()
 	collectgarbage()
-end
+end)
 
 function options_load()
 	if not dir_exists(lua_base_path..'data\\') then
@@ -102,9 +103,9 @@ function options_load()
 	write('Battlemod v'.._addon.version..' loaded.')
 end
 
-function event_job_change(mjob_id,mjob,mjob_lvl,sjob_id,sjob,sjob_lvl)
+windower.register_event('job change',function(mjob, mjob_id, mjob_lvl, sjob, sjob_id, sjob_lvl)
 	filterload(mjob)
-end
+end)
 
 function filterload(job)
 	if current_job == job then return end
@@ -118,108 +119,108 @@ function filterload(job)
 	current_job = job
 end
 
-function event_login(name)
+windower.register_event('login',function(name)
 	send_command('@wait 10;bm reload')
-end
+end)
 
-function event_addon_command(...)
-    local term = table.concat({...}, ' ')
-    local splitarr = split(term,' ')
-	if splitarr[1] == 'cmd' then
-		if splitarr[2] ~= nil then
-			if splitarr[2]:lower() == 'commamode' then
-				commamode = not commamode
-				add_to_chat(121,'Comma Mode flipped! - '..tostring(commamode))
-			elseif splitarr[2]:lower() == 'oxford' then
-				oxford = not oxford
-				add_to_chat(121,'Oxford Mode flipped! - '..tostring(oxford))
-			elseif splitarr[2]:lower() == 'targetnumber' then
-				targetnumber = not targetnumber
-				add_to_chat(121,'Target Number flipped! - '..tostring(targetnumber))
-			elseif splitarr[2]:lower() == 'cancelmulti' then
-				cancelmulti = not cancelmulti
-				add_to_chat(121,'Multi-canceling flipped! - '..tostring(cancelmulti))
-			elseif splitarr[2]:lower() == 'reload' then
-				options_load()
-			elseif splitarr[2]:lower() == 'unload' then
-				send_command('@lua u battlemod')
-			elseif splitarr[2]:lower() == 'condensebattle' then
-				condensebattle = not condensebattle
-				add_to_chat(121,'Condensed Battle text flipped! - '..tostring(condensebattle))
-			elseif splitarr[2]:lower() == 'condensebuffs' then
-				condensebuffs = not condensebuffs
-				add_to_chat(121,'Condensed Buffs text flipped! - '..tostring(condensebuffs))
-			elseif splitarr[2]:lower() == 'condensedamage' then
-				condensedamage = not condensedamage
-				add_to_chat(121,'Condensed Damage text flipped! - '..tostring(condensedamage))
-			elseif splitarr[2]:lower() == 'cg' then
-				collectgarbage()
-			elseif splitarr[2]:lower() == 'colortest' then
-				local counter = 0
-				local line = ''
-				for n = 1, 509 do
-					if not color_redundant:contains(n) and not black_colors:contains(n) then
-						if n <= 255 then
-							loc_col = string.char(0x1F, n)
-						else
-							loc_col = string.char(0x1E, n - 254)
-						end
-						line = line..loc_col..string.format('%03d ', n)
-						counter = counter + 1
+windower.register_event('addon command',function (...)
+ --   local term = table.concat({...}, ' ')
+    local splitarr = {...}
+	if splitarr[1] ~= nil then
+		if splitarr[1]:lower() == 'commamode' then
+			commamode = not commamode
+			add_to_chat(121,'Comma Mode flipped! - '..tostring(commamode))
+		elseif splitarr[1]:lower() == 'oxford' then
+			oxford = not oxford
+			add_to_chat(121,'Oxford Mode flipped! - '..tostring(oxford))
+		elseif splitarr[1]:lower() == 'targetnumber' then
+			targetnumber = not targetnumber
+			add_to_chat(121,'Target Number flipped! - '..tostring(targetnumber))
+		elseif splitarr[1]:lower() == 'cancelmulti' then
+			cancelmulti = not cancelmulti
+			add_to_chat(121,'Multi-canceling flipped! - '..tostring(cancelmulti))
+		elseif splitarr[1]:lower() == 'reload' then
+			options_load()
+		elseif splitarr[1]:lower() == 'unload' then
+			send_command('@lua u battlemod')
+		elseif splitarr[1]:lower() == 'condensebattle' then
+			condensebattle = not condensebattle
+			add_to_chat(121,'Condensed Battle text flipped! - '..tostring(condensebattle))
+		elseif splitarr[1]:lower() == 'condensebuffs' then
+			condensebuffs = not condensebuffs
+			add_to_chat(121,'Condensed Buffs text flipped! - '..tostring(condensebuffs))
+		elseif splitarr[1]:lower() == 'condensedamage' then
+			condensedamage = not condensedamage
+			add_to_chat(121,'Condensed Damage text flipped! - '..tostring(condensedamage))
+		elseif splitarr[1]:lower() == 'cg' then
+			collectgarbage()
+		elseif splitarr[1]:lower() == 'colortest' then
+			local counter = 0
+			local line = ''
+			for n = 1, 509 do
+				if not color_redundant:contains(n) and not black_colors:contains(n) then
+					if n <= 255 then
+						loc_col = string.char(0x1F, n)
+					else
+						loc_col = string.char(0x1E, n - 254)
 					end
-					if counter == 16 or n == 509 then
-						add_to_chat(1, line)
-						counter = 0
-						line = ''
-					end
+					line = line..loc_col..string.format('%03d ', n)
+					counter = counter + 1
 				end
-				add_to_chat(122,'Colors Tested!')
-			elseif splitarr[2]:lower() == 'help' then
-				write('Battlemod has 10 commands')
-				write(' 1. help --- shows this menu')
-				write(' 2. colortest --- Shows the 509 possible colors for use with the settings file')
-				write(' 3. reload --- Reloads the settings file')
-				write('Big Toggles:')
-				write(' 4. condensebuffs --- Condenses Area of Effect buffs, Default = True')
-				write(' 5. condensebattle --- Condenses battle logs according to your settings file, Default = True')
-				write(' 6. condensedamage --- Condenses damage messages within attack rounds, Default = True')
-				write(' 7. cancelmulti --- Cancles multiple consecutive identical lines, Default = True')
-				write('Sub Toggles:')
-				write(' 8. oxford --- Toggle use of oxford comma, Default = True')
-				write(' 9. commamode --- Toggle comma-only mode, Default = False')
-				write(' 10. targetnumber --- Toggle target number display, Default = True')
-			end
-		end
-	else
-		if splitarr[1] == 'flip' then
-			_G[splitarr[2]] = not _G[splitarr[2]]
-		elseif splitarr[1] == 'wearsoff' then
-			local trash = table.remove(splitarr,1)
-			local stat = table.concat(splitarr,' ')
-			local len = #wearing[stat]
-			local targets = table.remove(wearing[stat],1)..string.char(0x1F,191)
-			for i,v in pairs(wearing[stat]) do
-				if i < #wearing[stat] or commamode then
-					targets = targets..string.char(0x1F,191)..', '
-				else
-					if oxford and #wearing[stat] >2 then
-						targets = targets..string.char(0x1F,191)..','
-					end
-					targets = targets..string.char(0x1F,191)..' and '
+				if counter == 16 or n == 509 then
+					add_to_chat(1, line)
+					counter = 0
+					line = ''
 				end
-				targets = targets..v
 			end
-			if targetnumber and len > 1 then
-				targets = '['..len..'] '..targets
-			end
-			local outstr = dialog[206]['english']:gsub('$\123target\125',targets..string.char(0x1F,191)):gsub('$\123status\125',stat..string.char(0x1F,191))
-			add_to_chat(1,string.char(0x1F,191)..outstr..string.char(127,49))
-			wearing[stat] = nil
+			add_to_chat(122,'Colors Tested!')
+		elseif splitarr[1]:lower() == 'help' then
+			write('Battlemod has 10 commands')
+			write(' 1. help --- shows this menu')
+			write(' 2. colortest --- Shows the 509 possible colors for use with the settings file')
+			write(' 3. reload --- Reloads the settings file')
+			write('Big Toggles:')
+			write(' 4. condensebuffs --- Condenses Area of Effect buffs, Default = True')
+			write(' 5. condensebattle --- Condenses battle logs according to your settings file, Default = True')
+			write(' 6. condensedamage --- Condenses damage messages within attack rounds, Default = True')
+			write(' 7. cancelmulti --- Cancles multiple consecutive identical lines, Default = True')
+			write('Sub Toggles:')
+			write(' 8. oxford --- Toggle use of oxford comma, Default = True')
+			write(' 9. commamode --- Toggle comma-only mode, Default = False')
+			write(' 10. targetnumber --- Toggle target number display, Default = True')
 		end
 	end
+end)
+
+-- Invoked Functions
+function flip(str)
+	_G[str] = not _G[str]
 end
 
-function event_incoming_text(original, modified, color)
+function wearsoff(...)
+	stat = table.concat({...},' ')
+	local len = #wearing[stat]
+	local targets = table.remove(wearing[stat],1)..string.char(0x1F,191)
+	for i,v in pairs(wearing[stat]) do
+		if i < #wearing[stat] or commamode then
+			targets = targets..string.char(0x1F,191)..', '
+		else
+			if oxford and #wearing[stat] >2 then
+				targets = targets..string.char(0x1F,191)..','
+			end
+			targets = targets..string.char(0x1F,191)..' and '
+		end
+		targets = targets..v
+	end
+	if targetnumber and len > 1 then
+		targets = '['..len..'] '..targets
+	end
+	local outstr = dialog[206]['english']:gsub('$\123target\125',targets..string.char(0x1F,191)):gsub('$\123status\125',stat..string.char(0x1F,191))
+	add_to_chat(1,string.char(0x1F,191)..outstr..string.char(127,49))
+	wearing[stat] = nil
+end
+
+windower.register_event('incoming text',function(original,modified,color)
 	local redcol = color%256
 	
 	if redcol == 36 then
@@ -241,7 +242,7 @@ function event_incoming_text(original, modified, color)
 		a,z = string.find(original,'Equipment changed')
 		
 		if a and not block_equip then
-			send_command('@wait 1;lua c battlemod flip block_equip')
+			send_command('@wait 1;lua i battlemod flip block_equip')
 			block_equip = true
 		elseif a and block_equip then
 			modified = ''
@@ -252,7 +253,7 @@ function event_incoming_text(original, modified, color)
 		c,z = string.find(original,'You must close the currently open window to use that command')
 		
 		if (a or b or c) and not block_cannot then
-			send_command('@wait 1;lua c battlemod flip block_cannot')
+			send_command('@wait 1;lua i battlemod flip block_cannot')
 			block_cannot = true
 		elseif (a or b or c) and block_cannot then
 			modified = ''
@@ -264,13 +265,13 @@ function event_incoming_text(original, modified, color)
 	end
 	
 	return modified,color
-end
+end)
 
-function event_action_message(actor_id,index,actor_target_index,target_target_index,message_id,param_1,param_2,param_3)
+windower.register_event('action message',function(actor_id,target_id,actor_index,target_index,message_id,param_1,param_2,param_3)
     -- Consider a way to condense "Wears off" messages?
 	if message_id == 206 then -- Wears off messages
 		local status
-		local target_table = get_mob_by_id(index)
+		local target_table = get_mob_by_index(target_index)
 		local party_table = get_party()
 		local target = target_table['name']
 		
@@ -285,18 +286,18 @@ function event_action_message(actor_id,index,actor_target_index,target_target_in
 		if not wearing[status] and not (stat_ignore:contains(param_1)) then
 			wearing[status] = {}
 			wearing[status][1] = namecol(target,target_table,party_table)
-			send_command('@wait 0.5;lua c battlemod wearsoff '..status)
+			send_command('@wait 0.5;lua i battlemod wearsoff '..status)
 		elseif not (stat_ignore:contains(param_1)) then
 			wearing[status][#wearing[status]+1] = namecol(target,target_table,party_table)
 		else -- This handles the stat_ignore values, which are things like Utsusemi, Sneak, Invis, etc. that you don't want to see on a delay
 			wearing[status] = {}
 			wearing[status][1] = namecol(target,target_table,party_table)
-			send_command('@lua c battlemod wearsoff '..status)
+			send_command('@lua i battlemod wearsoff '..status)
 		end
 	elseif passed_messages:contains(message_id) then
 		local status,actor,target,spell,skill,number,number2
-		local actor_table = get_mob_by_id(actor_id)
-		local target_table = get_mob_by_id(index)
+		local actor_table = get_mob_by_index(actor_index)
+		local target_table = get_mob_by_index(target_index)
 		local party_table = get_party()
 		
 		if actor_table == nil then
@@ -309,7 +310,7 @@ function event_action_message(actor_id,index,actor_target_index,target_target_in
 		local target = target_table['name']
 		
 		if message_id > 169 and message_id <179 then
-			if param_1 == 4294967296 then
+			if param_1 == 4294967295 then
 				skill = 'like level -1'..' ('..ratings_arr[param_2+1]..')'
 			else
 				skill = 'like level '..param_1..' ('..ratings_arr[param_2+1]..')'
@@ -356,8 +357,4 @@ function event_action_message(actor_id,index,actor_target_index,target_target_in
 	elseif debugging then 
 		write('debug_EAM#'..message_id..': '..dialog[message_id]['english'])
 	end
-end
-
-function event_unload()
-	send_command('@unalias bm')
-end
+end)

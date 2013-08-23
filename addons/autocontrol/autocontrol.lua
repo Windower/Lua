@@ -29,7 +29,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon = {}
 _addon.name = 'autocontrol'
-_addon.version = '0.2'
+_addon.version = '0.21'
+_addon.author = 'Nitrous (Shiva)'
 
 require 'tablehelper'
 require 'stringhelper'

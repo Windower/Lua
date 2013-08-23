@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-function event_action(act)
+windower.register_event('action',function(act)
 	local persistantmessage,persistanttarget = '',''
 	local persistantcolor = 1
 	local aggregate = false
@@ -486,7 +486,7 @@ function event_action(act)
 		end
 		add_to_chat(persistantcolor,string.char(0x1F,0xFE,0x1E,0x01)..persistantmessage:gsub('$\123target\125',persistanttarget or '')..string.char(127,49))
 	end
-end
+end)
 
 -- Helper Functions --
 function namecol(player,player_table,party_table)

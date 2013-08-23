@@ -2,7 +2,10 @@ Issues:
 * Need to detect/correct for Encumberment (Pathos), Traded, Dbox'ed, AH Dialog, and Crafting.
 * Event status fix. Dead status fix. Zoning status fix.
 * Need a Spellcast -> Lua converter before release.
-* Need to check whether register_event() works within user documents.
 * Need to decide what the heck I'm doing with the second argument to user functions.
-* Need to detect when it's not possible to cast (Sleep, Stun, Break, Terror, Charm, etc.) and reset midaction
+* Need to detect when it's not possible to cast (Sleep, Stun, Break, Terror, Charm, etc.) and reset midaction.
 * Change mob_array.type so that it matches validtarget.
+
+Elpy section:
+* cancel_spell in GearSwap no longer works with Shortcuts loaded. ( http://www.bluegartr.com/threads/115131-Windower-4-Open-Beta?p=5850951&viewfull=1#post5850951 )
+* Various other stuff around there

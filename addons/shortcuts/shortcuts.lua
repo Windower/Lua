@@ -54,11 +54,11 @@ _addon.commands = {'shortcuts'}
 ---- None, simply a routine that runs once at the load (after the entire document
 ---- is loaded and treated as a script)
 -----------------------------------------------------------------------------------
-function event_load()
+windower.register_event('load',function()
 	counter = 0
 	lastsent = 'MAUSMAUSMAUSMAUSMAUSMAUSMAUSMAUS'
 	collectgarbage()
-end
+end)
 
 -----------------------------------------------------------------------------------
 --Name: event_unload()
@@ -68,9 +68,9 @@ end
 --Returns:
 ---- None, simply a routine that runs once at unload.
 -----------------------------------------------------------------------------------
-function event_unload()
+windower.register_event('unload',function()
 	if logging then	logfile:close()	end
-end
+end)
 
 
 -----------------------------------------------------------------------------------
@@ -82,7 +82,7 @@ end
 --Returns:
 ---- string, changed command
 -----------------------------------------------------------------------------------
-function event_outgoing_text(original,modified)
+windower.register_event('outgoing text',function(original,modified)
 	local temp_org = convert_auto_trans(original)
 	if original:sub(1,1) ~= '/' then return modified end
 	temp_org = temp_org:gsub(' <wait %d+>','')
@@ -123,7 +123,7 @@ function event_outgoing_text(original,modified)
 	
 	-- Otherwise, dump the inputs into command_logic()
 	return command_logic(temp_org,modified)
-end
+end)
 
 -----------------------------------------------------------------------------------
 --Name: event_unhandled_command()
@@ -133,10 +133,10 @@ end
 --Returns:
 ---- None, but can generate text output through command_logic()
 -----------------------------------------------------------------------------------
-function event_unhandled_command(...)
+windower.register_event('unhandled command',function(...)
 	local combined = table.concat({...},' ') -- concat it back together...
 	command_logic(combined,combined) -- and then dump it into command_logic()
-end
+end)
 
 
 -----------------------------------------------------------------------------------

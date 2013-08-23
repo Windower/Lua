@@ -162,7 +162,7 @@ _global.show_swaps = false
 
 gearswap_disabled = false
 midaction = false
-sent_out_equip = {}
+sent_out_equip = T{}
 equip_list = {}
 lastbyte = 0x0000
 action_sent = false
@@ -174,7 +174,9 @@ player.equipment = {}
 pet = {isvalid=false}
 st_flag = false
 current_job_file = nil
-
+disable_table = {false,false,false,false,false,false,false,false,false,false,false,false,false,false,false}
+disable_table[0] = false
+registered_user_events = {}
 
 persistant_sequence = {}  ---------------------- TEMPORARY TO INVESTIGATE LAG ISSUES IN DELVE
 persistant_sequence[0] = true

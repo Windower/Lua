@@ -328,7 +328,7 @@ function text_update_loop(str)
     end
 end
 
-function statGain(id,name)
+function statGain(name,id)
     if mjob_id == 18 then
         if id == 305 then 
             decay = get_decay()
@@ -339,7 +339,7 @@ function statGain(id,name)
     end
 end
 
-function statLoss(id,name)
+function statLoss(name,id)
     if mjob_id == 18 then
         if id == 305 then 
             decay = get_decay()
@@ -356,7 +356,7 @@ function timer_start(ele)
     end
 end
 
-function jobChange(mjid, mj, mjl, sjid, sj, sjl)
+function jobChange(mj, mjid, mjl, sj, sjid, sjl)
     mjob_id = mjid
     if mjob_id ~= 18 or petlessZones:contains(windower.get_ffxi_info()['zone_id']) then 
         Burden_tb:hide()
@@ -374,7 +374,7 @@ function zero_all()
     end
 end
 
-function zoneChange(fid,fr,tid,to)
+function zoneChange(fr, fid, to, tid)
     if mjob_id == 18 then
         if petlessZones:contains(tid) then 
             text_update_loop('stop')

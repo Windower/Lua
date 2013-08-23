@@ -30,21 +30,23 @@ file = require 'filehelper'
 require 'sets'
 require 'stringhelper'
 require 'helper_functions'
+require 'tablehelper'
 
 require 'resources'
 require 'equip_processing'
 require 'targets'
 require 'refresh'
 require 'user_functions'
+require 'parse_augments'
 
 _addon = {}
 _addon.name = 'GearSwap'
-_addon.version = '0.604'
+_addon.version = '0.701'
+_addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
-function event_load()
+windower.register_event('load',function()
 	debugging = 1
-	
 	
 	if dir_exists('../addons/GearSwap/data/logs') then
 		logging = true
@@ -52,7 +54,6 @@ function event_load()
 		logit(logfile,'GearSwap LOGGER HEADER\n')
 	end
 	
-	send_command('@alias gs lua c gearswap')
 	refresh_globals()
 	_global.force_send = false
 	
@@ -60,14 +61,13 @@ function event_load()
 		refresh_user_env()
 		if debugging >= 1 then send_command('@unload spellcast;') end
 	end
-end
+end)
 
-function event_unload()
+windower.register_event('unload',function ()
 	if logging then	logfile:close() end
-	send_command('@unalias gs')
-end
+end)
 
-function event_addon_command(...)
+windower.register_event('addon command',function (...)
 	local command = table.concat({...},' ')
 	if logging then	logit(logfile,'\n\n'..tostring(os.clock)..command) end
 	local splitup = split(command,' ')
@@ -114,17 +114,18 @@ function event_addon_command(...)
 	else
 		write('command not found')
 	end
-end
+end)
 
-function midact()
+function sender()
 	if not action_sent then
+		write('Forcing Send')
 		if debugging >= 1 then add_to_chat(123,'GearSwap: Had to force the command to send.') end
 		send_check(true)
 	end
 	action_sent = false
 end
 
-function event_outgoing_text(original,modified)
+windower.register_event('outgoing text',function(original,modified)
 	if gearswap_disabled then return modified end
 	
 	local temp_mod = convert_auto_trans(modified)
@@ -145,7 +146,7 @@ function event_outgoing_text(original,modified)
 	elseif command_list[command] and temptarg and validabils[language][abil] and not midaction then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) temp_mod: '..temp_mod) end
 			
-		send_command('@wait 1;lua invoke gearswap midact')
+		send_command('@wait 1;lua invoke gearswap sender')
 		
 		local r_line, s_type
 			
@@ -180,7 +181,7 @@ function event_outgoing_text(original,modified)
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) temp_mod: '..temp_mod) end
 
 		rline = ranged_line
-		send_command('@wait 1;lua invoke gearswap midact')
+		send_command('@wait 1;lua invoke gearswap sender')
 		
 		_global.storedtarget = temptarg
 		
@@ -195,18 +196,18 @@ function event_outgoing_text(original,modified)
 		return ''
 	end
 	return modified
-end
+end)
 
-function event_incoming_text(original,modified,mode)
+windower.register_event('incoming text',function(original,modified,mode)
 	if gearswap_disabled then return modified, color end
 	if original == '...A command error occurred.' or original == 'You can only use that command during battle.' or original == 'You cannot use that command here.' then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(130) Client canceled command detected: '..mode..' '..original) end
 		equip_sets('aftercast',{name='Invalid Spell'},{type='Recast'})
 	end
 	return modified,color
-end
+end)
 
-function event_incoming_chunk(id,data)
+windower.register_event('incoming chunk',function(id,data)
 	if gearswap_disabled then return end
 	cur_ID = data:byte(3,4)
 	if prev_ID == nil then
@@ -229,13 +230,13 @@ function event_incoming_chunk(id,data)
 			send_check()
 		end
 	end
-end
+end)
 
-function event_zone_change(from_id, from, to_id, to)
+windower.register_event('zone change',function(new_zone,new_zone_id,old_zone,old_zone_id)
 	prev_ID = 0
-end
+end)
 
-function event_outgoing_chunk(id,data)
+windower.register_event('outgoing chunk',function(id,data)
 	if id == 0x015 then
 		lastbyte = data:byte(7,8)
 	end
@@ -260,14 +261,20 @@ function event_outgoing_chunk(id,data)
 		if logging then logit(logfile,'\n\nActor: '..tostring(actor_name)..'  Target: '..tostring(target_name)..'  Category: '..tostring(category)..'  param: '..tostring(abil_name or param)) end
 		if abil_name then
 			midaction = true
+--			send_command('@wait 1;lua i gearswap midact')
 		end
 	end
+end)
+
+function midact()
+	midaction = false
 end
 
-function event_action(act)
+windower.register_event('action',function(act)
 	if gearswap_disabled or act.category == 1 then return end
 	
 	local temp_player = get_player()
+	local temp_player_mob_table = get_mob_by_index(temp_player.index)
 	local player_id = temp_player['id']
 	-- Update player info for aftercast costs.
 	player.tp = temp_player.vitals.tp
@@ -275,12 +282,14 @@ function event_action(act)
 	player.mpp = temp_player.vitals.mpp
 	
 	local temp_pet,pet_id
-	if temp_player.pet_index then
-		temp_pet = get_mob_by_index(temp_player['pet_index'])
-		pet_id = temp_pet.id
+	if temp_player_mob_table.pet_index then
+		temp_pet = get_mob_by_index(temp_player_mob_table.pet_index)
+		if temp_pet then
+			pet_id = temp_pet.id
+		end
 	end
-	
-	if player_id ~= act['actor_id'] and act['actor_id']~=pet_id then
+
+	if act.actor_id ~= player_id and act.actor_id ~= pet_id then
 		return -- If the action is not being used by the player, the pet, or is a melee attack then abort processing.
 	end
 	
@@ -320,10 +329,21 @@ function event_action(act)
 			add_to_chat(123,'GearSwap: '..prefix..'midcast() exists but is not a function')
 		end
 	end
-end
+end)
 
-function event_action_message(actor_id,target_id,actor_index,target_index,message_id,param_1,param_2,param_3)
+windower.register_event('action message',function(actor_id,target_id,actor_index,target_index,message_id,param_1,param_2,param_3)
 	if gearswap_disabled then return end
+	local tempplay = get_player()
+	if actor_id ~= tempplay.id then
+		if tempplay.pet_index then
+			if actor_id ~= get_mob_by_index(tempplay.pet_index)['id'] then
+				return
+			end
+		else
+			return
+		end
+	end
+	
 	if message_id == 62 then
 		if type(user_env.aftercast) == 'function' then
 			equip_sets('aftercast',r_items[param_1],{type='Failure'})
@@ -348,42 +368,43 @@ function event_action_message(actor_id,target_id,actor_index,target_index,messag
 			spelltarget = nil
 		end
 	end
-end
+end)
 
-function event_status_change(old,new)
+windower.register_event('status change',function(new,old)
 	if gearswap_disabled or T{'Event','Other','Zoning','Dead'}:contains(old) or T{'Event','Other','Zoning','Dead'}:contains(new) then return end
 	-- Event may not be a real status yet. This is a blacklist to prevent people from swapping out of crafting gear or when disengaging from NPCs.
 	if old == '' then old = 'Idle' end
 	equip_sets('status_change',new,old)
-end
+end)
 
-function event_gain_status(id,name)
+windower.register_event('gain status',function(name,id)
 	if gearswap_disabled then return end
+	if midaction and T{'terror','sleep','stun','petrification','charm','weakness'}:contains(name:lower()) then midaction = false end
 	equip_sets('buff_change',name,'gain')
-end
+end)
 
-function event_lose_status(id,name)
+windower.register_event('lose status',function(name,id)
 	if gearswap_disabled then return end
 	equip_sets('buff_change',name,'loss')
-end
+end)
 
-function event_job_change(mjob_id, mjob, mjob_lvl, sjob_id, sjob, sjob_lvl)
+windower.register_event('job change',function(mjob, mjob_id, mjob_lvl, sjob, sjob_id, sjob_lvl)
 	if mjob ~= current_job_file then
 		refresh_user_env()
 	end
-end
+end)
 
-function event_login(name)
+windower.register_event('login',function(name)
 	send_command('@wait 2;lua i gearswap refresh_user_env;')
-end
+end)
 
-function event_day_change(day)
+windower.register_event('day change',function(new,old)
 	send_command('@wait 0.5;lua invoke gearswap refresh_ffxi_info')
-end
+end)
 
-function event_weather_change(weather)
+windower.register_event('weather change',function(new_weather, new_weather_id, old_weather, old_weather_id)
 	refresh_ffxi_info()
-end
+end)
 
 
 

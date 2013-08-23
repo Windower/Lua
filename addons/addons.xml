@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <addons>
   <addon>
     <name>Example</name>
@@ -14,14 +14,23 @@
   <addon>
     <name>AEcho</name>
     <description>Automatically uses echo drops when you get silenced. Also, uses send to send a message to an alt that you got debuffed.</description>
-    <bugtracker>https://github.com/nitrous24/Lua/issues?page=1</bugtracker>
+    <author>Nitrous (Shiva)</author>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
+    <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>
   </addon>
   <addon>
     <name>AnsweringMachine</name>
 	<author>Byrth</author>
     <description>Stores tells that you receive for later recall.</description>
 	<bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-	<support>irc.ffochat.com</support>
+	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
+  </addon>
+  <addon>
+    <name>AutoControl</name>
+    <description>Automated automaton equipment setting and burden tracker.</description>
+    <author>Nitrous (Shiva)</author>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
+    <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>
   </addon>
   <addon>
     <name>AutoJoin</name>
@@ -39,14 +48,16 @@
   <addon>
     <name>AzureSets</name>
     <description>Automated blue magic spell setting.</description>
-    <bugtracker>https://github.com/nitrous24/Lua/issues?page=1</bugtracker>
+    <author>Nitrous (Shiva)</author>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
+    <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>
   </addon>
   <addon>
     <name>BattleMod</name>
     <author>Byrth</author>
     <description>Customizes battle chat messages.</description>
 	<bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-	<support>irc.ffochat.com</support>
+	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
     <name>Blist</name>
@@ -58,6 +69,9 @@
   <addon>
     <name>cBlock</name>
     <description>Blacklist addon for FFOChat.</description>
+    <author>Nitrous (Shiva)</author>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
+    <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>
   </addon>
   <addon>
     <name>CellHelp</name>
@@ -85,7 +99,7 @@
 	<author>Byrth</author>
     <description>Records what daze effects are on the monster you're fighting.</description>
 	<bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-	<support>irc.ffochat.com</support>
+	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
     <name>Distance</name>
@@ -114,7 +128,9 @@
   <addon>
     <name>FFOColor</name>
     <description>Allows you to show FFOChat text in one of the 5 game chat channels. As well as specify colors for the text</description>
-    <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>    
+    <author>Nitrous (Shiva)</author>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
+    <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>   
   </addon>
   <addon>
     <author>Giuliano Riccio (Zohno@Phoenix)</author>
@@ -135,7 +151,7 @@
     <author>Byrth</author>
     <description>Changes gear in response to player actions. [[Uses Packets.]]</description>
 	<bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-	<support>irc.ffochat.com</support>
+	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
     <name>Linker</name>
@@ -161,7 +177,9 @@
   <addon>
     <name>OhShi</name>
     <description>Keeps track of various event related things. Such as, VW proc messages, mob casting, mob tp moves, TH procs and cor rolls, as well as others.</description>
-    <bugtracker>https://github.com/nitrous24/Lua/issues?page=1</bugtracker>
+    <author>Nitrous (Shiva)</author>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
+    <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>
   </addon>
   <addon>
     <name>PetSchool</name>
@@ -179,7 +197,7 @@
     <author>Byrth</author>
     <description>Allows you to specify which plugins and addons will be used with which characters.</description>
 	<bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-	<support>irc.ffochat.com</support>
+	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
     <author>Giuliano Riccio (Zohno@Phoenix)</author>
@@ -193,7 +211,7 @@
     <name>pr</name>
     <description>An addon that records and formats packets, comparing them with the packets library.</description>
 	<bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-	<support>irc.ffochat.com</support>
+	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
     <author>Giuliano Riccio (Zohno@Phoenix)</author>
@@ -207,7 +225,7 @@
 	<author>Byrth</author>
     <description>Respond to tells and FFOchat PMs using //r.</description>
 	<bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-	<support>irc.ffochat.com</support>
+	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
     <name>RollTracker</name>
@@ -239,7 +257,7 @@
     <name>Shortcuts</name>
     <author>Byrth</author>
     <description>Applys spellcast-like command completion (interpretation and target completion) to commands. Includes emotes, /check, and /pcmd.</description>
-	<support>irc.ffochat.com</support>
+	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
 	<bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
   </addon>
   <addon>
@@ -256,11 +274,15 @@
   <addon>
     <name>StaggerTrack</name>
     <description>Catches voidwatch weakness messages and prints them to a textbox in case you miss them in the battle spam.</description>
+    <author>Nitrous (Shiva)</author>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
     <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>
   </addon>
   <addon>
     <name>STNA</name>
     <description>One-button status removal for dual boxing.</description>
+    <author>Nitrous (Shiva)</author>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
     <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>
   </addon>
   <addon>
