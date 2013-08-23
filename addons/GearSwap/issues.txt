@@ -8,4 +8,4 @@ Issues:
 
 Elpy section:
 * cancel_spell in GearSwap no longer works with Shortcuts loaded. ( http://www.bluegartr.com/threads/115131-Windower-4-Open-Beta?p=5850951&viewfull=1#post5850951 )
-* 
+* Various other stuff around there

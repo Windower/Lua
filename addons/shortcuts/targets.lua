@@ -45,39 +45,41 @@ function valid_target(targ,flag)
 	elseif targ then
 	-- If the target exists, scan the mob array for it
 		local mob_array = get_mob_array()
-		local targar = T{}
+		local current_target = get_mob_by_index(get_player()['target_index']) --get_ffxi_info()['target'] --get_mob_by_target('<t>') -- Temp fix until Arcon fixes get_mob_by_target
+		local targar = {}
 		for i,v in pairs(mob_array) do
 			targ = percent_strip(targ)
 			if string.find(v['name']:lower(),targ:lower()) then
 				-- Handling for whether it's a monster or not
-				if v['is_npc'] then
-					if not targar:contains('<t>') then
-						table.append(targar,'<t>')
+				if v.is_npc and current_target then
+					if v.id == current_target.id then
+						targar['<t>'] = v.distance
 					end
 				else
-					table.append(targar,v['name'])
+					targar[v.name] = v.distance
 				end
 			elseif tonumber(targ) == v['id'] then
-				table.append(targar,'<lastst>')
+				targar['<lastst>'] = v.distance
 			end
 		end
 		
 		-- If flag is set, push out the target only if it is in the targ array.
-		if targar:contains(targ) then
+		if targar[targ] then
 			spell_targ = targ
 		elseif flag then
 			spell_targ = false
 		else
 			-- If targ starts an element of the monster array, use it.
+			local min_dist = 500
 			for i,v in pairs(targar) do
-				if v:lower():find('^'..targ:lower()) then
-					spell_targ = v
+				if i:lower():find('^'..targ:lower()) then
+					spell_targ = i
 					break
 				end
-			end
-			-- Otherwise, just use whatever the first match is.
-			if not spell_targ then
-				spell_targ = targar[1]
+				if v < min_dist then -- Otherwise, just use the nearest (spatially) match.
+					min_dist = v
+					spell_targ = i
+				end
 			end
 		end
 	end

@@ -1,0 +1,19 @@
+Augments are currently "in," but there are a lot of different augments and SE's system for
+handling them is basically hardcoded to item ID, so don't expect it to be perfect. The system
+will use the first item it finds in your inventory that matches the name/augment combination that
+you provide. If you provide an ambiguous set of conditions, the resulting equipped item will be
+ambiguous (could vary).
+
+
+In order to specify an item by augment, you must use the full name of the augment (even if the
+augment appears on your item in a contracted form) and set it up like this:
+    sets.aftercast_Idle = {ring1={name="Dark Ring",augments={"Physical Damage Taken -6%"}},
+	    ring2={name="Dark Ring",augments={"Breath Damage Taken -6%","Physical Damage Taken -5%"}}}
+
+		
+If it pleases you, you can store your augmented items in variables:
+    lefty = ring1={name="Dark Ring",augments={"Physical Damage Taken -6%"}}
+	righty = ring2={name="Dark Ring",augments={"Breath Damage Taken -6%","Physical Damage Taken -5%"}}
+	sets.aftercast_Idle = {ring1=lefty,ring2=righty}
+
+This will save you a little work when you are dealing with using the same augmented item in multiple sets.

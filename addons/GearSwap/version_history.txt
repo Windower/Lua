@@ -1,4 +1,8 @@
 -------------------------------------------------
+Gearswap 0.701 - Made silent interrupts reset midaction. Fixed aftercast triggering on event_action_messages other than your own/your pets.
+-------------------------------------------------
+Gearswap 0.700 - Added preliminary augmented equipment support. Improved register_event. Finished conversion of GearSwap to new API.
+-------------------------------------------------
 Gearswap 0.605 - Fixed pet_mid/aftercast. Added/documented disable/enable. Verified that register_event will work in user documents.
 -------------------------------------------------
 Gearswap 0.604 - Added more handling to deal with monstrosity. Dramatical reduced memory requirements.

@@ -122,7 +122,7 @@ function equip_sets(swap_type,val1,val2)
 			--if debugging >= 2 then add_to_chat(8,tostring(v)..' '..tostring(i)..' item: '..tostring(r_items[items['inventory'][v]['id']][language..'_log'])) else
 			if equip_next[i] and not disable_table[i] then
 				set_equip(equip_next[i],i)
-				sent_out_equip[i] = v -- re-make the equip_next table with the name sent_out_equip as the equipment is sent out.
+				sent_out_equip[i] = equip_next[i] -- re-make the equip_next table with the name sent_out_equip as the equipment is sent out.
 			end
 		end
 	elseif logging then
@@ -139,28 +139,46 @@ function to_id_set(inventory,equip_list)
 			if (m['flags'] == 0 or m['flags'] == 5) and r_items[m['id']]['jobs'] then -- Make sure the item isn't being bazaared, isn't already equipped, and can be equipped by specific jobs (unlike pearlsacks).
 				if get_wearable(jobs[player.main_job],tonumber('0x'..r_items[m['id']]['jobs'])) and (tonumber(r_items[m['id']]['level'])<=player.main_job_level) and get_wearable(dat_races[player.race],tonumber('0x'..r_items[m['id']]['races'])) then
 					for i,v in pairs(equip_list) do
-						local name,augments
+						local name
+						local extgoal = {}
 						if type(v) == 'table' then
 							name = v.name
-							-- Augment Handling
+							if v.augments then
+								for n,m in pairs(v.augments) do
+									extgoal[n] = augment_to_extdata(m)
+								end
+							end
 						elseif type(v) == 'string' then
 							name = v
 						end
 						if not ret_list[slot_map[i]] then
 							if r_items[m['id']][language..'_log']:lower() == name:lower() or r_items[m['id']][language]:lower() == name:lower() then
 								-- I need to add the ability to interpret extdata and specify which item based on it at some point.
-								equip_list[i] = ''
-								ret_list[slot_map[i]] = m['slot_id']
-								break
+								if extgoal[1] then
+									local count = 0
+									for o,q in pairs(extgoal) do
+										if m['extdata']:sub(3,4) == q or m['extdata']:sub(5,6) == q or m['extdata']:sub(7,8) == q then
+											count = count +1
+										end
+									end
+									if count == #extgoal then
+										equip_list[i] = ''
+										ret_list[slot_map[i]] = m['slot_id']
+										break
+									end
+								else
+									equip_list[i] = ''
+									ret_list[slot_map[i]] = m['slot_id']
+									break
+								end
 							end
 						end
 					end
 				else
 					for i,v in pairs(equip_list) do
-						local name,augments
+						local name
 						if type(v) == 'table' then
 							name = v.name
-						-- Augment Handling
 						elseif type(v) == 'string' then
 							name = v
 						end
@@ -178,10 +196,9 @@ function to_id_set(inventory,equip_list)
 				end
 			elseif m['flags'] > 0 then
 				for i,v in pairs(equip_list) do
-					local name,augments
+					local name
 					if type(v) == 'table' then
 						name = v.name
-						-- Augment Handling
 					elseif type(v) == 'string' then
 						name = v
 					end
