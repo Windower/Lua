@@ -1,10 +1,6 @@
-Author: Stjepan Bakrac
-Addon: AutoJoin
-Version: 0.9.1.0
-
 # AutoJoin
 
-Once loaded, will automatically join party and alliance invites. If you're in a CS, it will wait until it's finished and then join (unless the invite time expires). It will also wait in similar situations, such as being dead and unable to act. It will not process the invite at all if the treasure pool is not empty. This feature may be extended in the future, once access to treasure pool information is exposed in Lua, in which case it could automatically join once the pool empties.
+Once loaded, will automatically join party and alliance invites. If you're in a CS, it will wait until it's finished and then join (unless the invite time expires). It will also wait in similar situations, such as being dead and unable to act. It will not process the invite at all if the treasure pool is not empty. It will also wait until the treasure pool is cleared to join, although it can be forced by typing `/join` normally.
 
 ### Modes
 
@@ -50,4 +46,4 @@ Shows the current mode, the people on the blacklist and whitelist, as well as if
 //autojoin save
 ```
 
-Saves current settings for all characters. This will overwrite all user-defined settings. Nothing is needed to save settings for the current character, that happens automatically any setting is changed.
+Saves current settings for all characters. This will overwrite all user-defined settings. Nothing is needed to save settings for the current character, that happens automatically any time a setting is changed.
