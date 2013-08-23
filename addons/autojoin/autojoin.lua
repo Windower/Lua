@@ -51,7 +51,7 @@ rmstrs = T{'r', 'rm', 'remove', '-'}
 modes = T{'whitelist', 'blacklist'}
 
 -- Invite handler
-function event_party_invite(sender, senderId, something)
+function event_party_invite(senderId, sender, something)
 	reset()
 	if settings.autodecline and settings.blacklist:contains(sender) then
 		send_command('input /decline')
