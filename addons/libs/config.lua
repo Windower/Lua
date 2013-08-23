@@ -141,7 +141,7 @@ end
 
 -- Merges two tables like update would, but retains type-information and tries to work around conflicts.
 function merge(t, t_merge, path)
-    path = (type(path) == 'string' and T{path}) or path
+    path = type(path) == 'string' and T{path} or path
 
     local oldval
     local oldtype
@@ -297,7 +297,7 @@ function config.save(t, char)
         char = 'global'
     elseif not meta.chars:contains(char) then
         meta.chars:add(char)
-        meta.original[char] = T{}
+        meta.original[char] = setmetatable({}, _meta.T)
     end
 
     meta.original[char]:update(t)
@@ -310,7 +310,7 @@ function config.save(t, char)
 
         if meta.original[char]:empty(true) then
             meta.original[char] = nil
-            meta.chars:delete(char)
+            meta.chars:remove(char)
         end
     end
 
@@ -354,10 +354,9 @@ end
 function settings_xml(meta)
     local str = '<?xml version="1.1" ?>\n'
     str = str..'<settings>\n'
-    local settings = meta.original
 
-    meta.chars = (settings:keyset() - S{'global'}):sort()
-    for char in (L{'global'} + meta.chars):it() do
+    local chars = (meta.original:keyset() - S{'global'}):sort()
+    for char in (L{'global'} + chars):it() do
         if char == 'global' and rawget(meta.comments, 'settings') ~= nil then
             str = str..'\t<!--\n'
             local comment_lines = rawget(meta.comments, 'settings'):split('\n')
@@ -369,7 +368,7 @@ function settings_xml(meta)
         end
 
         str = str..'\t<'..char..'>\n'
-        str = str..nest_xml(settings[char], meta, 2)
+        str = str..nest_xml(meta.original[char], meta, 2)
         str = str..'\t</'..char..'>\n'
     end
 
