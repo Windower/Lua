@@ -162,7 +162,9 @@ function vector.tovstring(v)
 end
 
 function vector.vprint(v)
-    log and log(v:tovstring())
+    if log then
+        log(v:tovstring())
+    end
 end
 
 --[[

@@ -243,7 +243,9 @@ function matrix.tovstring(m)
 end
 
 function matrix.vprint(m)
-    log and log(m:tovstring())
+    if log then
+        log(m:tovstring())
+    end
 end
 
 --[[
