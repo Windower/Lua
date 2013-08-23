@@ -43,7 +43,7 @@ default_settings.bg.alpha = 255
 default_settings.bg.red = 0
 default_settings.bg.green = 0
 default_settings.bg.blue = 0
-default_settings.bg.visibile = true
+default_settings.bg.visible = true
 default_settings.flags = {}
 default_settings.flags.right = false
 default_settings.flags.bottom = false
@@ -111,6 +111,7 @@ function texts.new(str, settings, root_settings)
     t._settings = settings or {}
     t._status = t._status or {visible = false}
     t._root_settings = root_settings
+    t._base_str = str
 
     t._texts = {}
     t._defaults = {}
@@ -156,7 +157,7 @@ end
 function apply_settings(t)
     windower.text.set_location(t._name, t._settings.pos.x, t._settings.pos.y)
     windower.text.set_bg_color(t._name, t._settings.bg.alpha, t._settings.bg.red, t._settings.bg.green, t._settings.bg.blue)
-    windower.text.set_bg_visibility(t._name, t._settings.visible)
+    windower.text.set_bg_visibility(t._name, t._settings.bg.visible)
     windower.text.set_color(t._name, t._settings.text.alpha, t._settings.text.red, t._settings.text.green, t._settings.text.blue)
     windower.text.set_font(t._name, t._settings.text.font, t._settings.text.size)
     windower.text.set_bg_border_size(t._name, t._settings.padding)
@@ -188,9 +189,16 @@ function texts.update(t, attr)
     return str
 end
 
--- Unsets all variables.
+-- Restores the original text object not counting updated settings.
 function texts.clear(t)
-    t:update({})
+    t._texts = {}
+    t._defaults = {}
+    t._textorder = {}
+    if t._base_str then
+        texts.append(t, t._base_str)
+    else
+        windower.text.set_text(t._name, '')
+    end
 end
 
 -- Appends new text tokens to be displayed. Supports variables.
@@ -365,7 +373,7 @@ function texts.transparency(t, alpha)
     t._settings.text.alpha = alpha
 end
 
-function texts.bg_color(red, green, blue)
+function texts.bg_color(t, red, green, blue)
     if not red then
         return t._settings.bg.red, t._settings.bg.green, t._settings.bg.blue
     end
@@ -397,12 +405,18 @@ function texts.bg_transparency(t, alpha)
 end
 
 function texts.destroy(t)
+    for i, t_needle in ipairs(saved_texts) do
+        if t == t_needle then
+            table.remove(t, i)
+        end
+    end
     windower.text.delete(t._name)
 end
 
 -- Destroy all text objects when the addon unloads
 local function destroy_texts()
-    for _, t in pairs(saved_texts) do
+    local length = #saved_texts
+    for _, t in ipairs(saved_texts) do
         t:destroy()
     end
 end
