@@ -78,64 +78,71 @@ end})
 -- If data is a string it parses an existing packet, otherwise it will create
 -- a new packet table for injection. In that case, data can ba an optional
 -- table containing values to initialize the packet to.
--- Example usage:
---      local packet = packets.out(0x050, {
---             ['Inventory ID'] = 27,
---          ['Equip Slot'] = 15
+-- 
+-- Example usage
+--  Injection:
+--      local packet = packets.outgoing(0x050, {
+--          ['Inventory ID'] = 27,  -- 27th item in the inventory
+--          ['Equip Slot'] = 15     -- 15th slot, left ring
 --      })
 --      packets.inject(packet)
+-- 
+--  Parsing:
+--      windower.register_event('outgoing chunk', function(id, data)
+--          if id == 0x0B6 then -- outgoing /tell
+--              
+--          end
+--      end)
 function packets.incoming(id, data)
     if data and type(data) == 'string' then
-        return packets.parse(id, 'incoming', data)
+        return packets.parse('incoming', id, data)
     end
 
-    return packets.new(id, 'incoming', data)
+    return packets.new('incoming', id, data)
 end
 
 function packets.outgoing(id, data)
     if type(data) == 'string' then
-        return packets.parse(id, 'outgoing', data)
+        return packets.parse('outgoing', id, data)
     end
 
-    return packets.new(id, 'outgoing', data)
+    return packets.new('outgoing', id, data)
 end
 
-function packets.parse(id, mode, data)
+function packets.parse(dir, id, data)
     local res = {}
     res._id = id
     res._raw = data
-    res._mode = mode
-    res._name = packets[mode][id].name
-    res._description = packets[mode][id].description
+    res._dir = dir
+    res._name = packets.data[dir][id].name
+    res._description = packets.data[dir][id].description
     res._size = 4*math.floor(data:byte(2)/2)
     res._sequence = data:byte(3,3) + data:byte(4, 4)*2^8
     res._data = data:sub(5)
 
-    local fields = packets.fields[mode][id]
-    if #fields == 0 then
+    local fields = packets.fields.get(dir, id, data)
+    if not fields or #fields == 0 then
         return res
     end
 
-    local keys = fields:map(table.get-{'label'})
     local pack_str = '<'..fields:map(table.index+{pack_ids}..table.get-{'ctype'}):concat()
 
     for key, val in ipairs({res._data:unpack(pack_str)}) do
-        if keys[key] then
-            res[keys[key]] = val
-        end
+        local field = fields[key]
+        res[field.label] = field.enc and val:decode(6, field.enc) or val
     end
 
     return res
 end
 
-function packets.new(id, mode, values)
+function packets.new(dir, id, values)
     values = values or {}
 
     local packet = {}
     packet._id = id
-    packet._mode = mode
+    packet._dir = dir
 
-    local fields = packets.fields[mode][id]
+    local fields = packets.fields.get(packet._dir, packet._id)
     if not fields then
         warning('Packet 0x'..id:hex():zfill(3)..' not recognized.')
         return packet
@@ -165,7 +172,7 @@ end
 
 -- Returns binary data from a packet
 function packets.build(packet)
-    local fields = packets.fields[packet._mode][packet._id]
+    local fields = packets.fields.get(packet._dir, packet._id, packet._raw)
     if not fields then
         error('Packet 0x'..packet._id:hex():zfill(3)..' not recognized, unable to build.')
         return
@@ -183,7 +190,7 @@ end
 
 -- Injects a packet built with packets.new
 function packets.inject(packet)
-    local fields = packets.fields[packet._mode][packet._id]
+    local fields = packets.fields.get(packet._dir, packet._id, packet._raw)
     if not fields then
         error('Packet 0x'..packet._id:hex():zfill(3)..' not recognized, unable to send.')
         return
@@ -192,12 +199,12 @@ function packets.inject(packet)
     packet._raw = packets.build(packet)
     packet._data = packet._raw:sub(5)
 
-    if packet._mode == 'incoming' then
+    if packet._dr == 'incoming' then
         windower.packets.inject_incoming(packet._id, packet._data):hex()
-    elseif packet._mode == 'outgoing' then
+    elseif packet._dir == 'outgoing' then
         windower.packets.inject_outgoing(packet._id, packet._data):hex()
     else
-        error('Error sending packet, no mode specified. Please specify \'incoming\' or \'outgoing\'.')
+        error('Error sending packet, no direction specified. Please specify \'incoming\' or \'outgoing\'.')
     end
 end
 

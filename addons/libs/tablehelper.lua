@@ -3,7 +3,7 @@ A few table helper functions, in addition to a new T-table interface, which enab
 
 To define a T-table with explicit values use T{...}, to convert an existing table t, use T(t). To access table methods of a T-table t, use t:methodname(args).
 
-Some functions, such as table.map(t, fn), are optimized for arrays. These functions have the same name as the regular functions, but preceded with an "arr", such as table.arrmap(t, fn). These are only needed, if explicit nil handling between keys is required, that is, if nil is an actual value in the table. This case is very rare, and should not normally be needed. Argument lists are an example of their application.
+For lists, tables with sequential integral indices, use the lists library and the respective L{...} constructor. For sets, tables with unique elements and irrelevant order, use the sets library and the respective S{...} constructor.
 ]]
 
 _libs = _libs or {}
@@ -579,6 +579,7 @@ function table.concat(t, str, from, to)
         from = from or 1
         to = to or #t
         for key = from, to do
+            local val = rawget(t, key)
             res = res..tostring(val)
             if key < to then
                 res = res..str
