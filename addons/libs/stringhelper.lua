@@ -8,7 +8,9 @@ _libs.functools = _libs.functools or require('functools')
 
 _meta = _meta or {}
 
-debug.getmetatable('').__index = string
+debug.getmetatable('').__index = function(str, k)
+    return string[k] or type(k) == 'number' and math.abs(k) <= #str and string.sub(str, k, k) or nil
+end
 debug.getmetatable('').__unm = functools.negate..functools.equals
 
 -- Returns the character at position pos. Negative positions are counted from the opposite end.
@@ -108,6 +110,11 @@ end
 -- Alias to string.sub, with some syntactic sugar.
 function string.slice(str, from, to)
     return str:sub(from or 1, to or #str)
+end
+
+-- Inserts a string into a given section of another string.
+function string.splice(str, from, to, str2)
+    return str:sub(1, from - 1)..str2..str:sub(to + 1)
 end
 
 -- Casts a little endian encoded number from a data string.
@@ -447,6 +454,31 @@ function string.pcount(str, pat)
     return string.gsub[2](str, pat, '')
 end
 
+-- Splits the original string into substrings of equal size (except for possibly the last one)
+function string.chunks(str, size)
+    local res = {}
+    local key = 0
+    for i = 1, #str, size do
+        key = key + 1
+        rawset(res, key, str:sub(i, i + size - 1))
+    end
+
+    if _libs.lists then
+        res.n = key
+        return setmetatable(res, _meta.L)
+    else
+        return res
+    end
+end
+
+-- Returns a string decoded given the appropriate information.
+function string.decode(str, bits, charset)
+    if type(charset) == 'string' then
+        charset = charset:split()
+    end
+    return str:binary():chunks(bits):map(table.get+{charset}..tonumber-{2}):concat()
+end
+
 -- Returns a plural version of a string, if the provided table contains more than one element.
 -- Defaults to appending an s, but accepts an option string as second argument which it will the string with.
 function string.plural(str, t, replace)
@@ -459,7 +491,7 @@ end
 
 -- Returns a formatted item list for use in natural language representation of a number of items.
 -- The second argument specifies how the trailing element is handled:
--- * and: Appends the last element with an and instead of a comma. [Default]
+-- * and: Appends the last element with an "and" instead of a comma. [Default]
 -- * csv: Appends the last element with a comma, like every other element.
 -- * oxford: Appends the last element with a comma, followed by an and.
 -- The third argument specifies an optional output, if the table is empty.
