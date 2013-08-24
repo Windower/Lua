@@ -66,7 +66,7 @@ end
 
 function list.flat(l)
     for key = 1, l.n do
-        if type(l[key]) == 'table' then
+        if type(rawget(l, key)) == 'table' then
             return false
         end
     end
@@ -80,7 +80,7 @@ function list.equals(l1, l2)
     end
 
     for key = 1, l.n do
-        if l1[key] ~= l2[key] then
+        if rawget(l1, key) ~= rawget(l2, key) then
             return false
         end
     end
@@ -104,10 +104,10 @@ end
 
 function list.remove(l, i)
     i = i or l.n
-    local res = l[i]
+    local res = rawget(l, i)
 
     for key = i, l.n do
-        l[key] = l[key + 1]
+        rawset(l, key, rawget(l, key + 1))
     end
 
     l.n = l.n - 1
@@ -118,7 +118,7 @@ function list.extend(l1, l2)
     local n1 = l1.n
     local n2 = l2.n
     for k = 1, n2 do
-        rawset(l1, n1 + k, l2[k])
+        rawset(l1, n1 + k, rawget(l2, k))
     end
 
     l1.n = n1 + n2
@@ -128,8 +128,8 @@ end
 _meta.L.__add = list.extend
 
 function list.contains(l, el)
-    for _, val in ipairs(l) do
-        if val == el then
+    for key = 1, l.n do
+        if rawget(l, key) == el then
             return true
         end
     end
@@ -140,14 +140,14 @@ end
 function list.count(l, fn)
     local count = 0
     if type(fn) ~= 'function' then
-        for _, val in ipairs(l) do
-            if val == fn then
+        for i = 1, l.n do
+            if rawget(l, i) == fn then
                 count = count + 1
             end
         end
     else
-        for _, val in ipairs(l) do
-            if fn(val) then
+        for i = 1, l.n do
+            if fn(rawget(l, i)) then
                 count = count + 1
             end
         end
@@ -163,9 +163,12 @@ function list.concat(l, str, from, to)
     local res = ''
 
     for key = from, to do
-        res = res..tostring(rawget(l, key))
-        if key < l.n then
-            res = res..str
+        local val = rawget(l, key)
+        if val then
+            res = res..tostring(val)
+            if key < l.n then
+                res = res..str
+            end
         end
     end
 
@@ -173,7 +176,7 @@ function list.concat(l, str, from, to)
 end
 
 function list.clear(l)
-    for key in ipairs(l) do
+    for i = 1, l.n do
         rawset(l, key, nil)
     end
 
@@ -182,7 +185,8 @@ function list.clear(l)
 end
 
 function list.with(l, attr, val)
-    for _, el in ipairs(l) do
+    for i = 1, l.n do
+        local el = rawget(l, i)
         if type(el) == 'table' and rawget(el, attr) == val then
             return el
         end
@@ -192,7 +196,8 @@ end
 function list.iwith(l, attr, val)
     local cel
     val = val:lower()
-    for _, el in ipairs(l) do
+    for i = 1, l.n do
+        local el = rawget(l, i)
         if type(el) == 'table' then
             cel = rawget(el, attr)
             if type(cel) == 'string' and cel:lower() == val then
@@ -205,8 +210,8 @@ end
 function list.map(l, fn)
     local res = {}
 
-    for key, val in ipairs(l) do
-        res[key] = fn(val)
+    for key = 1, l.n do
+        rawset(res, key, fn(rawget(l, key)))
     end
 
     res.n = l.n
@@ -222,7 +227,7 @@ function list.filter(l, fn)
         val = rawget(l, okey)
         if fn(val) == true then
             key = key + 1
-            res[key] = val
+            rawset(res, key, val)
         end
     end
 
@@ -232,7 +237,8 @@ end
 
 function list.reduce(l, fn, init)
     local acc = init
-    for _, val in ipairs(l) do
+    for key = 1, l.n do
+        local val = rawget(l, key)
         if acc == nil then
             acc = val
         else
@@ -252,13 +258,13 @@ function list.flatten(l, rec)
     local flat
     local n2
     for k1 = 1, l.n do
-        val = l[k1]
+        val = rawget(l, k1)
         if type(val) == 'table' then
             if rec then
                 flat = list.flatten(val, rec)
                 n2 = flat.n
                 for k2 = 1, n2 do
-                    res[key + k2] = flat[k2]
+                    rawset(res, key + k2, rawget(flat, k2))
                 end
             else
                 if class(val) == 'List' then
@@ -267,13 +273,13 @@ function list.flatten(l, rec)
                     n2 = #val
                 end
                 for k2 = 1, n2 do
-                    res[key + k2] = val[k2]
+                    rawset(res, key + k2, rawget(val, k2))
                 end
             end
             key = key + n2
         else
             key = key + 1
-            res[key] = val
+            rawset(res, key, val)
         end
     end
 
@@ -285,7 +291,7 @@ function list.it(l)
     local key = 0
     return function()
         key = key + 1
-        return l[key], key
+        return rawget(l, key), key
     end
 end
 
@@ -294,8 +300,8 @@ function list.equals(l1, l2)
         return false
     end
 
-    for key, val in ipairs(l1) do
-        if val ~= l2[key] then
+    for key = 1, l1.n do
+        if rawget(l1, key) ~= rawget(l2, key) then
             return false
         end
     end
@@ -320,7 +326,7 @@ function list.slice(l, from, to)
     local key = 0
     for i = from, to do
         key = key + 1
-        res[key] = l[i]
+        rawset(res, key, rawget(l, i))
     end
 
     res.n = key
@@ -344,7 +350,7 @@ function list.copy(l)
     local res = {}
 
     for key = 1, l.n do
-        res[key] = val
+        rawset(res, key, rawget(l, key))
     end
 
     res.n = l.n
@@ -355,7 +361,7 @@ function list.reassign(l, ln)
     l:clear()
 
     for key = 1, ln.n do
-        rawset(l, key, ln[key])
+        rawset(l, key, rawget(ln, key))
     end
 
     l.n = ln.n
@@ -375,7 +381,7 @@ function list.reverse(l)
     local n = l.n
     local rkey = n
     for key = 1, n do
-        res[key] = l[rkey]
+        rawset(res, key, rawget(l, rkey))
         rkey = rkey - 1
     end
 
@@ -383,11 +389,11 @@ function list.reverse(l)
     return setmetatable(res, _meta.L)
 end
 
-function list.range(n)
+function list.range(n, init)
     local res = {}
 
     for key = 1, n do
-        res[key] = key
+        rawset(res, key, init or key)
     end
 
     res.n = n
@@ -395,8 +401,8 @@ function list.range(n)
 end
 
 function list.any(l, fn)
-    for _, val in ipairs(l) do
-        if fn(val) == true then
+    for key = 1, l.n do
+        if fn(rawget(l, key)) == true then
             return true
         end
     end
@@ -405,8 +411,8 @@ function list.any(l, fn)
 end
 
 function list.all(l, fn)
-    for _, val in ipairs(l) do
-        if fn(val) ~= true then
+    for key = 1, l.n do
+        if fn(rawget(l, key)) ~= true then
             return false
         end
     end
@@ -417,11 +423,11 @@ end
 function list.tostring(l)
     local str = '['
 
-    for key, val in ipairs(l) do
+    for key = 1, l.n do
         if key > 1 then
             str = str..', '
         end
-        str = str..tostring(val)
+        str = str..tostring(rawget(l, key))
     end
 
     return str..']'

@@ -173,18 +173,6 @@ function table.map(t, fn)
     return res
 end
 
--- Analogon to table.map, but for array-tables. Possibility to include nil values.
--- DEPRECATED: Use Lists instead
-function table.arrmap(t, fn)
-    local res = T{}
-    for key = 1, #t do
-        -- Evaluate fn with the element and store it.
-        res[key] = fn(t[key])
-    end
-
-    return res
-end
-
 -- Returns a table with all elements from t that satisfy the condition fn, or don't satisfy condition fn, if reverse is set to true. Defaults to false.
 function table.filter(t, fn)
     if type(fn) ~= 'function' then
