@@ -145,7 +145,7 @@ end
 
 
 local function update_dps_clock()
-    if windower.ffxi.get_player()['status'] == 'Engaged' then
+    if windower.ffxi.get_player()['in_combat'] then
         dps_clock:advance()
     else
         dps_clock:pause()
@@ -222,7 +222,7 @@ windower.register_event('action', function(raw_action)
     local action = Action(raw_action)
     local category = action:get_category_string()
 
-    if windower.ffxi.get_player()['status'] ~= 'Engaged' then
+    if not windower.ffxi.get_player()['in_combat'] then
         -- nothing to do
         return
     end
