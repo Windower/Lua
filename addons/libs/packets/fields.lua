@@ -26,6 +26,28 @@ ls_name_ext[0] = '`'
 res = require('resources')
 local language = get_ffxi_info().language:lower()
 local short_language = ({english='en', japanese='jp', german='de', french='fr'})[language]
+local servers = {}
+servers[98] = 'Undine'
+servers[100] = 'Bahamut'
+servers[101] = 'Shiva'
+servers[104] = 'Phoenix'
+servers[105] = 'Carbuncle'
+servers[106] = 'Fenrir'
+servers[107] = 'Sylph'
+servers[108] = 'Valefor'
+servers[110] = 'Leviathan'
+servers[111] = 'Odin'
+servers[115] = 'Quetzalcoatl'
+servers[116] = 'Siren'
+servers[119] = 'Ragnarok'
+servers[122] = 'Cerberus'
+servers[124] = 'Bismarck'
+servers[126] = 'Lakshmi'
+servers[127] = 'Asura'
+
+local function server(val)
+    return servers[val] or 'Unknown'
+end
 
 local function id(val)
     local mob = get_mob_by_id(val)
@@ -42,7 +64,7 @@ local function ip(val)
 end
 
 local function bool(val)
-    return val == 0 and 'false' or 'true'
+    return val ~= 0
 end
 
 local zones = res.zones():map(table.get-{short_language})
@@ -175,6 +197,17 @@ fields.outgoing[0x100] = L{
     {ctype='unsigned char',     label='Sub Job ID'},                            --    5 -   5
     {ctype='unsigned char',     label='_unknown1'},                             --    6 -   6
     {ctype='unsigned char',     label='_unknown2'},                             --    7 -   7
+}
+
+-- Logiin
+fields.incoming[0x00A] = L{
+    {ctype='unsigned int',      label='Player ID',          fn=id},             --    4 -   7
+    {ctype='unsigned short',    label='Player index',       fn=index},          --    8 -   9
+    {ctype='unsigned char[46]', label='_unknown1'},                             --   10 -  55
+    {ctype='unsigned char',     label='Server ID',          fn=server},         --   56 -  56
+    {ctype='unsigned char[75]', label='_unknown2'},                             --   57 - 131
+    {ctype='char[16]',          label='Player name'},                           --  132 - 147
+    {ctype='unsigned char[113]',label='_unknown3'},                             --  148 - 259
 }
 
 -- Zone Response
