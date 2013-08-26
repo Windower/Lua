@@ -185,7 +185,7 @@ function event_load(...)
         posy = 200,
         bgtransparency = 200,
         numplayers = 8,
-        font = 'consolas',
+        font = 'ocurier new',
         fontsize = 10,
         sbcolor = 204
     })
