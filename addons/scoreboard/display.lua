@@ -34,9 +34,11 @@ function Display:new (settings, db)
     
     if not valid_fonts:contains(self.settings.font:lower()) then
         error('Invalid font specified: ' .. self.settings.font)
-        tb_set_font(self.tb_name, 'courier', self.settings.fontsize)
+        tb_set_font(self.tb_name, self.settings.font) 
+        tb_set_font_size(self.tb_name, self.settings.fontsize)
     else
-        tb_set_font(self.tb_name, self.settings.font, self.settings.fontsize)
+        tb_set_font(self.tb_name, self.settings.font) 
+        tb_set_font_size(self.tb_name, self.settings.fontsize)
     end
     
     tb_set_color(self.tb_name, 255, 225, 225, 225)
