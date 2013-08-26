@@ -34,9 +34,11 @@ function Display:new (settings, db)
     
     if not valid_fonts:contains(self.settings.font:lower()) then
         error('Invalid font specified: ' .. self.settings.font)
-        tb_set_font(self.tb_name, 'courier', self.settings.fontsize)
+        tb_set_font(self.tb_name, self.settings.font) 
+        tb_set_font_size(self.tb_name, self.settings.fontsize)
     else
-        tb_set_font(self.tb_name, self.settings.font, self.settings.fontsize)
+        tb_set_font(self.tb_name, self.settings.font,'Courier New') 
+        tb_set_font_size(self.tb_name, self.settings.fontsize)
     end
     
     tb_set_color(self.tb_name, 255, 225, 225, 225)
@@ -322,6 +324,43 @@ function Display:destroy()
     tb_delete(self.tb_name)
 end
 
+function handle_mouse(type, x, y, delta, blocked)
+    if blocked then
+        return
+    end
+
+    if type == 0x200 then
+        if dragged_text then
+            local t = dragged_text[1]
+            Display:set_position(x - dragged_text[2], y - dragged_text[3])
+            return true
+        end
+
+    elseif type == 0x201 then
+            local x_pos, y_pos = windower.text.get_location('scoreboard')
+            local x_off, y_off = windower.text.get_extents('scoreboard')
+
+            if (x_pos <= x and x <= x_pos + x_off
+                or x_pos >= x and x >= x_pos + x_off)
+            and (y_pos <= y and y <= y_pos + y_off
+                or y_pos >= y and y >= y_pos + y_off) then
+                dragged_text = {'scoreboard', x - x_pos, y - y_pos}
+                return true
+            end
+
+    elseif type == 0x202 then
+        if dragged_text then
+            if settings then
+                settings:save()
+            end
+            dragged_text = nil
+            return true
+        end
+    end
+
+    return false
+end
+windower.register_event('mouse', handle_mouse)
 
 return Display
 
