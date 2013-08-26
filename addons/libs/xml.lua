@@ -273,7 +273,7 @@ function xml.tokenize(content, line)
     end
 
     for array, line in tokens:it() do
-        tokens[line] = array:filter(-'')
+        tokens[line] = table.filter(array, -'')
     end
 
     return tokens

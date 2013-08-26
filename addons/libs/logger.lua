@@ -129,7 +129,11 @@ function table.tostring(t)
         val = t[key]
         -- Check for nested tables
         if type(val) == 'table' then
-            valstr = table.tostring(val)
+            if val.tostring then
+                valstr = val:tostring()
+            else
+                valstr = table.tostring(val)
+            end
         else
             if type(val) == 'string' then
                 valstr = '"'..val..'"'
@@ -202,7 +206,11 @@ function table.tovstring(t, keys, indentlevel)
         val = t[key]
         -- Check for nested tables
         if type(val) == 'table' then
-            valstr = table.tovstring(val, keys, indentlevel+1)
+            if val.tovstring then
+                valstr = val:tovstring(keys, indentlevel + 1)
+            else
+                valstr = table.tovstring(val, keys, indentlevel + 1)
+            end
         else
             if type(val) == 'string' then
                 valstr = '"'..val..'"'

@@ -53,6 +53,7 @@ default_settings.padding = 0
 default_settings.text = {}
 default_settings.text.size = 12
 default_settings.text.font = 'Arial'
+default_settings.text.fonts = {}
 default_settings.text.alpha = 255
 default_settings.text.red = 255
 default_settings.text.green = 255
@@ -109,7 +110,7 @@ function texts.new(str, settings, root_settings)
     t = {}
     t._name = 'text_gensym_'..tostring(math.random()):sub(3)
     t._settings = settings or {}
-    t._status = t._status or {visible = false}
+    t._status = t._status or {visible = false, text = {}}
     t._root_settings = root_settings
     t._base_str = str
 
@@ -159,7 +160,8 @@ function apply_settings(t)
     windower.text.set_bg_color(t._name, t._settings.bg.alpha, t._settings.bg.red, t._settings.bg.green, t._settings.bg.blue)
     windower.text.set_bg_visibility(t._name, t._settings.bg.visible)
     windower.text.set_color(t._name, t._settings.text.alpha, t._settings.text.red, t._settings.text.green, t._settings.text.blue)
-    windower.text.set_font(t._name, t._settings.text.font, t._settings.text.size)
+    windower.text.set_font(t._name, t._settings.text.font, unpack(t._settings.text.fonts))
+    windower.text.set_font_size(t._name, t._settings.text.size)
     windower.text.set_bg_border_size(t._name, t._settings.padding)
     windower.text.set_italic(t._name, t._settings.flags.italic)
     windower.text.set_bold(t._name, t._settings.flags.bold)
@@ -184,7 +186,7 @@ function texts.update(t, attr)
     end
 
     windower.text.set_text(t._name, str)
-    t._settings.text.content = str
+    t._status.text.content = str
 
     return str
 end
