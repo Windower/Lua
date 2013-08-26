@@ -37,7 +37,7 @@ function Display:new (settings, db)
         tb_set_font(self.tb_name, self.settings.font) 
         tb_set_font_size(self.tb_name, self.settings.fontsize)
     else
-        tb_set_font(self.tb_name, self.settings.font) 
+        tb_set_font(self.tb_name, self.settings.font,'Courier New') 
         tb_set_font_size(self.tb_name, self.settings.fontsize)
     end
     
@@ -360,7 +360,7 @@ function handle_mouse(type, x, y, delta, blocked)
 
     return false
 end
-register_event('mouse', handle_mouse)
+windower.register_event('mouse', handle_mouse)
 
 return Display
 
