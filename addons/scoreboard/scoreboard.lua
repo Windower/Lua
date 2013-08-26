@@ -185,13 +185,10 @@ function event_load(...)
         posy = 200,
         bgtransparency = 200,
         numplayers = 8,
-        font = 'ocurier new',
+        font = 'courier new',
         fontsize = 10,
         sbcolor = 204
     })
-    if settings.font == 'courier' then
-    	settings.font = 'courier new'
-    end
     send_command('alias sb lua c scoreboard')
     display = Display:new(settings, dps_db)
     reset()
