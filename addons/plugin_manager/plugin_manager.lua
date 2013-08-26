@@ -64,13 +64,13 @@ function load_settings()
 		write('plugin_manager is missing its settings file.')
 	else
 		local settingtab = xml.read('data/settings.xml'):undomify()
-		for child in settingtab:it() do
+		for child in settingtab.children:it() do
 		-- Global/Names layer
 			length = length + 1
 			loader_array[child.name:lower()] = {}
 			loader_array[child.name:lower()]['addon'] = T{}
 			loader_array[child.name:lower()]['plugin'] = T{}
-			for child2 in child:it() do
+			for child2 in child.children:it() do
 				if child2.name == 'addon' or child2.name == 'plugin' then
 				-- Addon/Plugin layer <name>children[1]</name>
 					loader_array[child.name:lower()][child2.name][#loader_array[child.name:lower()][child2.name]+1] = child2.children[1]:lower()

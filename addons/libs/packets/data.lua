@@ -3,8 +3,9 @@ This file returns a table of known packet data.
 ]]
 
 local data = {}
-data.incoming = {}
-data.outgoing = {}
+local dummy =          {name='Unknown',             description='No data available.'}
+data.incoming = setmetatable({}, {__index = function() return dummy end})
+data.outgoing = setmetatable({}, {__index = function() return dummy end})
 
 -- Client packets (outgoing)
 data.outgoing[0x00A] = {name='Client Connect',      description='(unencrypted/uncompressed) First packet sent when connecting to new zone.'}
@@ -24,7 +25,7 @@ data.outgoing[0x050] = {name='Equip',               description='This command is
 data.outgoing[0x05A] = {name='Conquest',            description='This command asks the server for data pertaining to conquest/besieged status.'}
 data.outgoing[0x05B] = {name='Dialog choice',       description='Chooses a dialog option.'}
 data.outgoing[0x05D] = {name='Emote',               description='This command is used in emotes.'}
-data.outgoing[0x05E] = {name='Reqest Zone',         description='Request from the client to zone.'}
+data.outgoing[0x05E] = {name='Request Zone',        description='Request from the client to zone.'}
 data.outgoing[0x061] = {name='Equipment Screen',    description='This command is used when you open your equipment screen.'}
 data.outgoing[0x06E] = {name='Invite Player',       description='Used for Inviting.'}
 data.outgoing[0x083] = {name='Buy Item',            description='Buy an item.'}
