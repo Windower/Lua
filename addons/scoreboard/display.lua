@@ -19,7 +19,7 @@ local valid_fonts = T{
 function Display:set_position(posx, posy)
     self.settings.posx = posx
     self.settings.posy = posy
-    tb_set_location(self.tb_name, posx, posy)
+    windower.text.set_location(self.tb_name, posx, posy)
 end
 
 
@@ -29,22 +29,22 @@ function Display:new (settings, db)
     setmetatable(repr, self)
     self.__index = self
 
-    tb_create(self.tb_name)
-    tb_set_bg_color(self.tb_name, self.settings.bgtransparency, 30, 30, 30)
+    windower.text.create(self.tb_name)
+    windower.text.set_bg_color(self.tb_name, self.settings.bgtransparency, 30, 30, 30)
     
     if not valid_fonts:contains(self.settings.font:lower()) then
         error('Invalid font specified: ' .. self.settings.font)
-        tb_set_font(self.tb_name, self.settings.font) 
-        tb_set_font_size(self.tb_name, self.settings.fontsize)
+        windower.text.set_font(self.tb_name, self.settings.font) 
+        windower.text.set_font_size(self.tb_name, self.settings.fontsize)
     else
-        tb_set_font(self.tb_name, self.settings.font,'Courier New') 
-        tb_set_font_size(self.tb_name, self.settings.fontsize)
+        windower.text.set_font(self.tb_name, self.settings.font,'courier mew','monospace') 
+        windower.text.set_font_size(self.tb_name, self.settings.fontsize)
     end
     
-    tb_set_color(self.tb_name, 255, 225, 225, 225)
-    tb_set_location(self.tb_name, self.settings.posx, self.settings.posy)
-    tb_set_visibility(self.tb_name, self.visible)
-    tb_set_bg_visibility(self.tb_name, 1)
+    windower.text.set_color(self.tb_name, 255, 225, 225, 225)
+    windower.text.set_location(self.tb_name, self.settings.posx, self.settings.posy)
+    windower.text.set_visibility(self.tb_name, self.visible)
+    windower.text.set_bg_visibility(self.tb_name, 1)
 
     return repr
 end
@@ -58,7 +58,7 @@ function Display:toggle_visible()
         self:update()
     end
 
-    tb_set_visibility(self.tb_name, self.visible)
+    windower.text.set_visibility(self.tb_name, self.visible)
 end
 
 
@@ -187,7 +187,7 @@ function Display:update()
     if self.db:isempty() then
         self:reset()
     else
-        tb_set_text(self.tb_name, self:build_scoreboard_header() .. table.concat(display_table, '\n'))
+        windower.text.set_text(self.tb_name, self:build_scoreboard_header() .. table.concat(display_table, '\n'))
     end
 end
 
@@ -314,17 +314,17 @@ end)()
 function Display:reset()
     -- the number of spaces here was counted to keep the table width
     -- consistent even when there's no data being displayed
-    tb_set_text(self.tb_name,  self:build_scoreboard_header() ..
+    windower.text.set_text(self.tb_name,  self:build_scoreboard_header() ..
                                'Waiting for results...' ..
                                string.rep(' ', 17))
 end
 
 
 function Display:destroy()
-    tb_delete(self.tb_name)
+    windower.text.delete(self.tb_name)
 end
 
-function handle_mouse(type, x, y, delta, blocked)
+windower.register_event('mouse', function(type, x, y, delta, blocked)
     if blocked then
         return
     end
@@ -359,8 +359,7 @@ function handle_mouse(type, x, y, delta, blocked)
     end
 
     return false
-end
-windower.register_event('mouse', handle_mouse)
+end)
 
 return Display
 
