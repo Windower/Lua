@@ -62,6 +62,11 @@ function math.hex(val)
     return math.base(val, 16)
 end
 
+-- tostring wrapper.
+function math.string(...)
+    return tostring(...)
+end
+
 -- Converts a number val to a string in base base.
 function math.base(val, base)
     if base == nil or base == 10 or val == 0 then
