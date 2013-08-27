@@ -16,6 +16,7 @@ local spells = T{}
 local items = T{}
 local status = T{}
 local zones = T{}
+local mabils = T{}
 local plugin_resources = '../../plugins/resources/'
 local addon_resources = '../libs/resources/'
 
@@ -105,7 +106,7 @@ function resources.abils()
         return abils
     end
 
-    local file = _libs.filehelper.read(plugin_resources..'spells.xml')
+    local file = _libs.filehelper.read(plugin_resources..'abils.xml')
     local match_string = '<a id="(%d-)" index="(%d-)" prefix="([^"]-)" english="([^"]-)" german="([^"]-)" french="([^"]-)" japanese="([^"]-)" type="([^"]-)" element="([^"]-)" targets="([^"]-)" skill="([^"]-)" mpcost="(%-?%d-)" tpcost="(%d-)" casttime="(%d-)" recast="(%d-)" alias="([^"]-)" />'
     for id, index, english, german, french, japanese, type, element, targets, skill, mpcost, tpcost, casttime, recast, alias in file:gmatch(match_string) do
         abils[tonumber(id)] = {
@@ -277,6 +278,59 @@ function resources.zones()
     end
 
     return zones
+end
+
+
+-- Addon Resources start here. 
+local map_status = function(array, func)
+    local temparray = {}
+    for i,v in ipairs(array) do
+        temparray[i] = func(v)
+    end
+    return temparray
+end
+
+-- Returns Monster Abilities, indexed by ingame ID.
+function resources.mabils()
+    if not mabils:empty() then
+        return mabils
+    end
+
+    local file = _libs.filehelper.read(addon_resources..'mabils.xml')
+    local match_string = '<m id="(%d-)" english="([^"]-)" actorstatus="([^"]-)" targetstatus="([^"]-)" />'
+    for id, english, actorstatus, targetstatus in file:gmatch(match_string) do
+        mabils[tonumber(id)] = {
+            id = tonumber(id),
+            english = unquote(english),
+            actorstatus = map_status(actorstatus:split(','),tonumber),
+            targetstatus = map_status(targetstatus:split(','),tonumber)
+        }
+    end
+    local match_string = '<m id="(%d-)" english="([^"]-)" actorstatus="([^"]-)" />'
+    for id, english, actorstatus in file:gmatch(match_string) do
+        mabils[tonumber(id)] = {
+            id = tonumber(id),
+            english = unquote(english),
+            actorstatus = map_status(actorstatus:split(','),tonumber)
+        }
+    end
+    local match_string = '<m id="(%d-)" english="([^"]-)" targetstatus="([^"]-)" />'
+    for id, english, targetstatus in file:gmatch(match_string) do
+        mabils[tonumber(id)] = {
+            id = tonumber(id),
+            english = unquote(english),
+            targetstatus = map_status(targetstatus:split(','),tonumber)
+        }
+    end
+    local match_string = '<m id="(%d-)" english="([^"]-)" />'
+    for id, english in file:gmatch(match_string) do
+        mabils[tonumber(id)] = {
+            id = tonumber(id),
+            english = unquote(english)
+        }
+    end
+
+    return mabils
 end
 
 return resources
