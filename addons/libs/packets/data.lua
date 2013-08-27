@@ -27,7 +27,11 @@ data.outgoing[0x05B] = {name='Dialog choice',       description='Chooses a dialo
 data.outgoing[0x05D] = {name='Emote',               description='This command is used in emotes.'}
 data.outgoing[0x05E] = {name='Request Zone',        description='Request from the client to zone.'}
 data.outgoing[0x061] = {name='Equipment Screen',    description='This command is used when you open your equipment screen.'}
-data.outgoing[0x06E] = {name='Invite Player',       description='Used for Inviting.'}
+data.outgoing[0x06E] = {name='Party invite',        description='Sent when inviting another player to either party or alliance.'}
+data.outgoing[0x06F] = {name='Party leave',         description='Sent when leaving the party or alliance.'}
+data.outgoing[0x070] = {name='Party breakup',       description='Sent when disbanding the entire party or alliance.'}
+data.outgoing[0x074] = {name='Party response',      description='Sent when responding to a party or alliance invite.'}
+data.outgoing[0x077] = {name='Party change leader', description='Sent when giving party or alliance leader to another player.'}
 data.outgoing[0x083] = {name='Buy Item',            description='Buy an item.'}
 data.outgoing[0x084] = {name='Appraise',            description='Ask server for selling price.'}
 data.outgoing[0x085] = {name='Sell Item',           description='Sell an item from your inventory.'}

@@ -108,7 +108,7 @@ function resources.abils()
     local file = _libs.filehelper.read(plugin_resources..'spells.xml')
     local match_string = '<a id="(%d-)" index="(%d-)" prefix="([^"]-)" english="([^"]-)" german="([^"]-)" french="([^"]-)" japanese="([^"]-)" type="([^"]-)" element="([^"]-)" targets="([^"]-)" skill="([^"]-)" mpcost="(%-?%d-)" tpcost="(%d-)" casttime="(%d-)" recast="(%d-)" alias="([^"]-)" />'
     for id, index, english, german, french, japanese, type, element, targets, skill, mpcost, tpcost, casttime, recast, alias in file:gmatch(match_string) do
-        abils[id] = {
+        abils[tonumber(id)] = {
             id = tonumber(id),
             index = tonumber(index),
             english = english,
@@ -169,7 +169,7 @@ function resources.status()
     local file = _libs.filehelper.read(plugin_resources..'status.xml')
     local match_string = '<b id="(%d-)" duration="(%d-)" fr="([^"]-)" de="([^"]-)" jp="([^"]-)">([^<]-)</b>'
     for id, duration, fr, de, jp, en in file:gmatch(match_string) do
-        status[id] = {
+        status[tonumber(id)] = {
             id = tonumber(id),
             en = en,
             duration = tonumber(duration),
@@ -188,11 +188,14 @@ function resources.items()
         return items
     end
 
+    local match_string
+    local file
+
     -- General items
-    local file = _libs.filehelper.read(plugin_resources..'items_general.xml')
-    local match_string = '<i id="(%d-)" enl="([^"]-)" fr="([^"]-)" frl="([^"]-)" de="([^"]-)" del="([^"]-)" jp="([^"]-)" jpl="([^"]-)">([^<]-)</i>'
+    file = _libs.filehelper.read(plugin_resources..'items_general.xml')
+    match_string = '<i id="(%d-)" enl="([^"]-)" fr="([^"]-)" frl="([^"]-)" de="([^"]-)" del="([^"]-)" jp="([^"]-)" jpl="([^"]-)">([^<]-)</i>'
     for id, enl, fr, frl, de, del, jp, jpl, en in file:gmatch(match_string) do
-        items[id] = {
+        items[tonumber(id)] = {
             id = tonumber(id),
             en = unquote(en),
             enl = unquote(enl),
@@ -202,16 +205,36 @@ function resources.items()
             del = unquote(del),
             jp = unquote(jp),
             jpl = unquote(jpl),
+            targets = 'None',
+            casttime = '0',
+            category = 'general',
+        }
+    end
+    match_string = '<i id="(%d-)" enl="([^"]-)" fr="([^"]-)" frl="([^"]-)" de="([^"]-)" del="([^"]-)" jp="([^"]-)" jpl="([^"]-)" targets="([^"]-)" casttime="(%d-)">([^<]-)</i>'
+    for id, enl, fr, frl, de, del, jp, jpl, targets, casttime, en in file:gmatch(match_string) do
+        items[tonumber(id)] = {
+            id = tonumber(id),
+            en = unquote(en),
+            enl = unquote(enl),
+            fr = unquote(fr),
+            frl = unquote(frl),
+            de = unquote(de),
+            del = unquote(del),
+            jp = unquote(jp),
+            jpl = unquote(jpl),
+            targets = unquote(targets),
+            casttime = tonumber(casttime),
+            category = 'general',
         }
     end
 
     -- Armor and weapons
     local categories = S{'armor', 'weapons'}
     for category in categories:it() do
-        local file = _libs.filehelper.read(plugin_resources..'items_'..category..'.xml')
-        local match_string = '<i id="(%d-)" enl="([^"]-)" fr="([^"]-)" frl="([^"]-)" de="([^"]-)" del="([^"]-)" jp="([^"]-)" jpl="([^"]-)" jobs="([^"]-)" races="([^"]-)" level="([^"]-)">([^<]-)</i>'
-        for id, enl, fr, frl, de, del, jp, jpl, en, jobs, races, level in file:gmatch(match_string) do
-            items[id] = {
+        file = _libs.filehelper.read(plugin_resources..'items_'..category..'.xml')
+        match_string = '<i id="(%d-)" enl="([^"]-)" fr="([^"]-)" frl="([^"]-)" de="([^"]-)" del="([^"]-)" jp="([^"]-)" jpl="([^"]-)" jobs="([^"]-)" races="([^"]-)" level="(%d-)" targets="([^"]-)" casttime="(%d-)" recast="(%d-)">([^<]-)</i>'
+        for id, enl, fr, frl, de, del, jp, jpl, jobs, races, level, targets, casttime, recast, en in file:gmatch(match_string) do
+            items[tonumber(id)] = {
                 id = tonumber(id),
                 en = unquote(en),
                 enl = unquote(enl),
@@ -224,6 +247,10 @@ function resources.items()
                 jobs = parse_jobs(tonumber(jobs, 16)),
                 races = race_table[tonumber(races, 16)],
                 level = tonumber(level),
+                targets = unquote(targets),
+                casttime = tonumber(casttime),
+                recast = tonumber(recast),
+                category = category,
             }
         end
     end
@@ -240,7 +267,7 @@ function resources.zones()
     local file = _libs.filehelper.read(plugin_resources..'areas.xml')
     local match_string = '<a id="(%d-)" fr="([^"]-)" de="([^"]-)" jp="([^"]-)">([^<]-)</a>'
     for id, fr, de, jp, en in file:gmatch(match_string) do
-        zones[id] = {
+        zones[tonumber(id)] = {
             id = tonumber(id),
             en = en,
             fr = fr,
