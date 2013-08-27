@@ -295,7 +295,7 @@ function config.save(t, char)
 
     if char == 'all' then
         char = 'global'
-    elseif not meta.chars:contains(char) then
+    elseif char ~= 'global' and not meta.chars:contains(char) then
         meta.chars:add(char)
         meta.original[char] = setmetatable({}, _meta.T)
     end
