@@ -489,6 +489,11 @@ function string.plural(str, t, replace)
     return str
 end
 
+-- tonumber wrapper
+function string.number(...)
+    tonumber(...)
+end
+
 -- Returns a formatted item list for use in natural language representation of a number of items.
 -- The second argument specifies how the trailing element is handled:
 -- * and: Appends the last element with an "and" instead of a comma. [Default]

@@ -125,11 +125,15 @@ function packets.parse(dir, id, data)
         return res
     end
 
-    local pack_str = '<'..fields:map(table.index+{pack_ids}..table.get-{'ctype'}):concat()
+    local pack_str = fields:map(table.index+{pack_ids}..table.get-{'ctype'}):concat()
 
     for key, val in ipairs({res._data:unpack(pack_str)}) do
         local field = fields[key]
-        res[field.label] = field.enc and val:decode(6, field.enc) or val
+        if not field then
+            print(key, pack_str)
+        else
+            res[field.label] = field.enc and val:decode(6, field.enc) or val
+        end
     end
 
     return res
