@@ -218,29 +218,29 @@ function refresh_ffxi_info()
 	world.real_weather = info.weather
 	world.real_weather_element = info.weather_element
 	if buffactive['voidstorm'] then
-		world.weather = 'dark'
-		world.weather_element = 'dark'
+		world.weather = 'Dark'
+		world.weather_element = 'Dark'
 	elseif buffactive['aurorastorm'] then
-		world.weather = 'light'
-		world.weather_element = 'light'
+		world.weather = 'Light'
+		world.weather_element = 'Light'
 	elseif buffactive['firestorm'] then
-		world.weather = 'fire'
-		world.weather_element = 'fire'
+		world.weather = 'Fire'
+		world.weather_element = 'Fire'
 	elseif buffactive['sandstorm'] then
-		world.weather = 'earth'
-		world.weather_element = 'earth'
+		world.weather = 'Earth'
+		world.weather_element = 'Earth'
 	elseif buffactive['rainstorm'] then
-		world.weather = 'water'
-		world.weather_element = 'water'
+		world.weather = 'Water'
+		world.weather_element = 'Water'
 	elseif buffactive['windstorm'] then
-		world.weather = 'wind'
-		world.weather_element = 'wind'
+		world.weather = 'Wind'
+		world.weather_element = 'Wind'
 	elseif buffactive['hailstorm'] then
-		world.weather = 'ice'
-		world.weather_element = 'ice'
+		world.weather = 'Ice'
+		world.weather_element = 'Ice'
 	elseif buffactive['thunderstorm'] then
-		world.weather = 'thunder'
-		world.weather_element = 'thunder'
+		world.weather = 'Thunder'
+		world.weather_element = 'Thunder'
 	end
 end
 

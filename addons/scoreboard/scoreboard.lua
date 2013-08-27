@@ -3,18 +3,19 @@
 _addon = _addon or {}
 _addon.name = 'Scoreboard'
 _addon.version = 0.9
+_addon.command = 'sb'
 
-require 'tablehelper'
-require 'stringhelper'
-require 'mathhelper'
-require 'logger'
-require 'actionhelper'
-local config = require 'config'
+require('tablehelper')
+require('stringhelper')
+require('mathhelper')
+require('logger')
+require('actionhelper')
+local config = require ('config')
 
-local Display = require 'display'
+local Display = require ('display')
 local display = nil
-dps_clock = require 'dpsclock':new() -- global for now
-dps_db    = require 'damagedb':new() -- global for now
+dps_clock = require('dpsclock'):new() -- global for now
+dps_db    = require('damagedb'):new() -- global for now
 
 -------------------------------------------------------
 
@@ -35,7 +36,7 @@ function sb_output(msg)
 end
 
 -- Handle addon args
-function event_addon_command(...)
+windower.register_event('addon command',function(...)
     local params = {...};
 	
     if #params < 1 then
@@ -132,7 +133,7 @@ function event_addon_command(...)
             end
         end
     end
-end
+end)
 
 
 -- Resets application state
@@ -144,7 +145,7 @@ end
 
 
 local function update_dps_clock()
-    if get_player()['in_combat'] then
+    if windower.ffxi.get_player()['in_combat'] then
         dps_clock:advance()
     else
         dps_clock:pause()
@@ -154,28 +155,22 @@ end
 
 
 -- Keep updates flowing
-function event_time_change(...)
+windower.register_event('time change', function(...)
     update_dps_clock()
     display:update()
-end
+end)
 
 
 -- Keep updates flowing
-function event_status_change(...)
+windower.register_event('status change', function(...)
     update_dps_clock()
     display:update()
-end
+end)
 
-
-function event_login(...)
-    event_load()
-end
-
-
-function event_load(...)
+windower.register_event('login', 'load', function(...)
     -- Bail out until player name is set. The config library depends on player name
     -- being defined to process settings properly.
-    local player_name = get_player()['name']
+    local player_name = windower.ffxi.get_player()['name']
     if player_name == '' then
         return
     end
@@ -185,27 +180,23 @@ function event_load(...)
         posy = 200,
         bgtransparency = 200,
         numplayers = 8,
-        font = 'courier',
+        font = 'courier new',
         fontsize = 10,
         sbcolor = 204
     })
-
-    send_command('alias sb lua c scoreboard')
     display = Display:new(settings, dps_db)
     reset()
-end
+end)
 
-
-function event_unload()
-    send_command('unalias sb')
+windower.register_event('unload', function()
     display:destroy()
-end
+end)
 
 
 -- Returns all mob IDs for anyone in your alliance, including their pets.
 function get_ally_mob_ids()
     local allies = T{}
-    local party = get_party()
+    local party = windower.ffxi.get_party()
 
     for _, member in pairs(party) do
         if member.mob then
@@ -227,11 +218,11 @@ function mob_is_ally(mob_id)
 end
 
 
-function event_action_aux(raw_action)
+windower.register_event('action', function(raw_action)
     local action = Action(raw_action)
     local category = action:get_category_string()
 
-    if not get_player()['in_combat'] then
+    if not windower.ffxi.get_player()['in_combat'] then
         -- nothing to do
         return
     end
@@ -343,8 +334,8 @@ function event_action_aux(raw_action)
 	
     display:update()
     update_dps_clock()
-end
-event_action = event_action_aux
+end)
+--event_action = event_action_aux
 
 
 --[[
