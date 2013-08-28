@@ -16,7 +16,7 @@ local spells = T{}
 local items = T{}
 local status = T{}
 local zones = T{}
-local mabils = T{}
+local monster_abils = T{}
 local plugin_resources = '../../plugins/resources/'
 local addon_resources = '../libs/resources/'
 
@@ -291,15 +291,15 @@ local map_status = function(array, func)
 end
 
 -- Returns Monster Abilities, indexed by ingame ID.
-function resources.mabils()
-    if not mabils:empty() then
-        return mabils
+function resources.monster_abils()
+    if not monster_abils:empty() then
+        return monster_abils
     end
 
     local file = _libs.filehelper.read(addon_resources..'mabils.xml')
     local match_string = '<m id="(%d-)" english="([^"]-)" actorstatus="([^"]-)" targetstatus="([^"]-)" />'
     for id, english, actorstatus, targetstatus in file:gmatch(match_string) do
-        mabils[tonumber(id)] = {
+        monster_abils[tonumber(id)] = {
             id = tonumber(id),
             english = unquote(english),
             actorstatus = map_status(actorstatus:split(','),tonumber),
@@ -308,7 +308,7 @@ function resources.mabils()
     end
     local match_string = '<m id="(%d-)" english="([^"]-)" actorstatus="([^"]-)" />'
     for id, english, actorstatus in file:gmatch(match_string) do
-        mabils[tonumber(id)] = {
+        monster_abils[tonumber(id)] = {
             id = tonumber(id),
             english = unquote(english),
             actorstatus = map_status(actorstatus:split(','),tonumber)
@@ -316,7 +316,7 @@ function resources.mabils()
     end
     local match_string = '<m id="(%d-)" english="([^"]-)" targetstatus="([^"]-)" />'
     for id, english, targetstatus in file:gmatch(match_string) do
-        mabils[tonumber(id)] = {
+        monster_abils[tonumber(id)] = {
             id = tonumber(id),
             english = unquote(english),
             targetstatus = map_status(targetstatus:split(','),tonumber)
@@ -324,13 +324,13 @@ function resources.mabils()
     end
     local match_string = '<m id="(%d-)" english="([^"]-)" />'
     for id, english in file:gmatch(match_string) do
-        mabils[tonumber(id)] = {
+        monster_abils[tonumber(id)] = {
             id = tonumber(id),
             english = unquote(english)
         }
     end
 
-    return mabils
+    return monster_abils
 end
 
 return resources
