@@ -1,5 +1,5 @@
 Author: Suji
-Version: 1.1
+Version: 1.02
 Addon to show alliance DPS and damage in real time.
 Abbreviation: //sb
 
@@ -95,6 +95,8 @@ additional configuration options:
          Consolas, Dejavu Sans Mono.
 * fontsize - Size of Scoreboard's font
 * sbcolor - Color of scoreboard's chat log output
+* showallidps - Set to true to display the alliance DPS, false otherwise.
+* resetfilters - Set to true if you want filters reset when you "//sb reset", false otherwise.
  
 Caveats:
 * DPS is an approximation, although I tested it manually and found it to
