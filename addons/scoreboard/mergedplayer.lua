@@ -93,13 +93,21 @@ end
 function MergedPlayer:wsavg()
     local wsdmg   = 0
     local wscount = 0
-    
-    for _, p in ipairs(self.players) do
-        for wsid, dmgtable in pairs(p.ws) do
-            for _, dmg in ipairs(dmgtable) do
+    --[[
+    for _, p in pairs(self.players) do
+        for _, dmgtable in pairs(p.ws) do
+            for _, dmg in pairs(dmgtable) do
                 wsdmg = wsdmg + dmg
                 wscount = wscount + 1
             end
+        end 
+    end
+    ]]
+    
+    for _, p in pairs(self.players) do
+        for _, dmg in pairs(p.ws) do
+            wsdmg = wsdmg + dmg
+            wscount = wscount + 1
         end
     end
     
