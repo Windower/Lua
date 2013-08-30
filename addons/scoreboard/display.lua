@@ -357,6 +357,21 @@ Display.show_stat = (function()
             sb_output(lines)
         end
     end
+ 
+    stat_display['wsavg'] = function (stats, filters)
+        local lines = T{}
+
+        for name, stat_pair in pairs(stats) do
+            if stat_pair[2] > 0 then
+                lines:append(string.format("%-20s %d (%ds)", name, stat_pair[1], stat_pair[2]))
+            end
+        end
+        
+        if #lines > 0 then
+            sb_output(format_title('WS Average (' .. filters .. ')'))
+            sb_output(lines)
+        end
+    end
     
     return function (self, stat, player_filter)
         local stats = self.db:query_stat(stat, player_filter)
