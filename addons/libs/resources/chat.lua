@@ -1,10 +1,15 @@
--- Titles
-local title = {}
+-- Chat modes
+local chat = {}
 
-title[371] = {name = 'Destined Fellow'}
-title[729] = {name = 'Legendary Legionnaire',   price = 500}
+chat[0]  = {english = 'say',       colors = {incoming = 9,     outgoing = 1}}
+chat[1]  = {english = 'shout',     colors = {incoming = 10,    outgoing = 2}}
+chat[3]  = {english = 'tell',      colors = {incoming = 12,    outgoing = 4}}
+chat[4]  = {english = 'party',     colors = {incoming = 13,    outgoing = 5}}
+chat[5]  = {english = 'linkshell', colors = {incoming = 14,    outgoing = 6}}
+chat[8]  = {english = 'emote',     colors = {incoming = 15,    outgoing = 7}}
+chat[26] = {english = 'yell',      colors = {incoming = 11,    outgoing = 3}}
 
-return title
+return chat
 
 --[[
 Copyright (c) 2013, Windower

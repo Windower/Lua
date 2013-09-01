@@ -4,6 +4,7 @@ This file returns a table of known packet data.
 
 local data = {}
 local dummy =          {name='Unknown',             description='No data available.'}
+
 data.incoming = setmetatable({}, {__index = function() return dummy end})
 data.outgoing = setmetatable({}, {__index = function() return dummy end})
 
