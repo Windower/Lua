@@ -1,15 +1,31 @@
--- Item bags
-local bags = {}
+-- Jobs
+local jobs = {}
 
-bags[0] = {name = 'Inventory',  access = 'Everywhere'}
-bags[1] = {name = 'Mog Safe',   access = 'Mog House'}
-bags[2] = {name = 'Storage',    access = 'Mog House'}
-bags[3] = {name = 'Mog Locker', access = 'Mog House'}
-bags[4] = {name = 'Temp Items', access = 'Situational'}
-bags[5] = {name = 'Satchel',    access = 'Everywhere'}
-bags[6] = {name = 'Sack',       access = 'Everywhere'}
+jobs[1]  = {english = 'Warrior',       short = 'WAR'}
+jobs[2]  = {english = 'Monk',          short = 'MNK'}
+jobs[3]  = {english = 'White Mage',    short = 'WHM'}
+jobs[4]  = {english = 'Black Mage',    short = 'BLM'}
+jobs[5]  = {english = 'Red Mage',      short = 'RDM'}
+jobs[6]  = {english = 'Thief',         short = 'THF'}
+jobs[7]  = {english = 'Paladin',       short = 'PLD'}
+jobs[8]  = {english = 'Dark Knight',   short = 'DRK'}
+jobs[9]  = {english = 'Beastmaster',   short = 'BST'}
+jobs[10] = {english = 'Bard',          short = 'BRD'}
+jobs[11] = {english = 'Ranger',        short = 'RNG'}
+jobs[12] = {english = 'Samurai',       short = 'SAM'}
+jobs[13] = {english = 'Ninja',         short = 'NIN'}
+jobs[14] = {english = 'Dragoon',       short = 'DRG'}
+jobs[15] = {english = 'Summoner',      short = 'SMN'}
+jobs[16] = {english = 'Blue Mage',     short = 'BLU'}
+jobs[17] = {english = 'Corsair',       short = 'COR'}
+jobs[18] = {english = 'Puppetmaster',  short = 'PUP'}
+jobs[19] = {english = 'Dancer',        short = 'DNC'}
+jobs[20] = {english = 'Scholar',       short = 'SCH'}
+jobs[21] = {english = 'Geomancer',     short = 'GEO'}
+jobs[22] = {english = 'Rune Fencer',   short = 'RUN'}
+jobs[23] = {english = 'Monipulator',   short = 'MON'}
 
-return bags
+return jobs
 
 --[[
 Copyright (c) 2013, Windower

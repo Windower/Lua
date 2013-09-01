@@ -159,7 +159,24 @@ end
 
 -- Returns an attribute of a table.
 function table.get(t, att)
+    return t[att]
+end
+
+-- Returns an attribute of a table without invoking metamethods.
+function table.rawget(t, att)
     return rawget(t, att)
+end
+
+-- Sets an attribute of a table to a specified value.
+function table.set(t, att, val)
+    t[att] = val
+    return t
+end
+
+-- Sets an attribute of a table to a specified value, without invoking metamethods.
+function table.rawset(t, att, val)
+    rawset(t, att, val)
+    return t
 end
 
 -- Applies function fn to all elements of the table and returns the resulting table.

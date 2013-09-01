@@ -1,15 +1,34 @@
--- Chat modes
-local chat = {}
+-- Races
+local races = {}
 
-chat[0]  = {name = 'say',       colors = {incoming = 9,     outgoing = 1}}
-chat[1]  = {name = 'shout',     colors = {incoming = 10,    outgoing = 2}}
-chat[3]  = {name = 'tell',      colors = {incoming = 12,    outgoing = 4}}
-chat[4]  = {name = 'party',     colors = {incoming = 13,    outgoing = 5}}
-chat[5]  = {name = 'linkshell', colors = {incoming = 14,    outgoing = 6}}
-chat[8]  = {name = 'emote',     colors = {incoming = 15,    outgoing = 7}}
-chat[26] = {name = 'yell',      colors = {incoming = 11,    outgoing = 3}}
+local male = string.char(0x81, 0x89)
+local female = string.char(0x81, 0x8A)
+local races = {}
+races[2^1] = {english = 'Hume '..male,       }
+races[2^2] = {english = 'Hume '..female,     }
+races[2^3] = {english = 'Elvaan '..male,     }
+races[2^4] = {english = 'Elvaan '..female,   }
+races[2^5] = {english = 'Tarutaru '..male,   }
+races[2^6] = {english = 'Tarutaru '..female, }
+races[2^7] = {english = 'Mithra',            }
+races[2^8] = {english = 'Galka',             }
 
-return chat
+--[[ Compound values ]]
+
+-- 2^1 + 2^3 + 2^5 + 2^8
+races[298] = {english = male,                }
+-- 2^2 + 2^4 + 2^6 + 2^7
+races[212] = {english = female,              }
+-- 2^1 + 2^2
+races[6]   = {english = 'Hume',              }
+-- 2^3 + 2^4
+races[24]  = {english = 'Elvaan',            }
+-- 2^5 + 2^6
+races[96]  = {english = 'Tarutaru',          }
+-- 2^9 - 2
+races[510] = {english = 'All races',         }
+
+return races
 
 --[[
 Copyright (c) 2013, Windower

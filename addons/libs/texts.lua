@@ -301,7 +301,7 @@ function texts.pos(t, x, y)
     t._settings.pos.y = y
 end
 
-function texts.x_pos(t, x)
+function texts.pos_x(t, x)
     if x then
         return t._settings.pos.x
     end
@@ -309,7 +309,7 @@ function texts.x_pos(t, x)
     t:pos(x, t._settings.pos.y)
 end
 
-function texts.y_pos(t, y)
+function texts.pos_y(t, y)
     if not y then
         return t._settings.pos.y
     end
@@ -429,27 +429,34 @@ local function handle_mouse(type, x, y, delta, blocked)
         return
     end
 
+    -- Mouse drag
     if type == 0x200 then
         if dragged_text then
-            local t = dragged_text[1]
-            t:pos(x - dragged_text[2], y - dragged_text[3])
+            dragged_text[1]:pos(x - dragged_text[2], y - dragged_text[3])
             return true
         end
 
+    -- Mouse left click
     elseif type == 0x201 then
         for _, t in pairs(saved_texts) do
-            local x_pos, y_pos = windower.text.get_location(t._name)
-            local x_off, y_off = windower.text.get_extents(t._name)
+            local pos_x, pos_y = windower.text.get_location(t._name)
+            local off_x, off_y = windower.text.get_extents(t._name)
 
-            if (x_pos <= x and x <= x_pos + x_off
-                or x_pos >= x and x >= x_pos + x_off)
-            and (y_pos <= y and y <= y_pos + y_off
-                or y_pos >= y and y >= y_pos + y_off) then
-                dragged_text = {t, x - x_pos, y - y_pos}
+            if (pos_x <= x and x <= pos_x + off_x
+                or pos_x >= x and x >= pos_x + off_x)
+            and (pos_y <= y and y <= pos_y + off_y
+                or pos_y >= y and y >= pos_y + off_y) then
+                if t._settings.flags.right or t._settings.flags.bottom then
+                    local info = windower.get_windower_settings()
+                    pos_x = t._settings.flags.right and pos_x - info.ui_x_res or pos_x
+                    pos_y = t._settings.flags.bottom and pos_y - info.ui_y_res or pos_y
+                end
+                dragged_text = {t, x - pos_x, y - pos_y}
                 return true
             end
         end
 
+    -- Mouse left release
     elseif type == 0x202 then
         if dragged_text then
             if dragged_text[1]._root_settings then

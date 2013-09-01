@@ -5,9 +5,11 @@ config = require 'config'
 
 _addon = _addon or {}
 _addon.name = 'Linker'
-_addon.verson = 1.0
+_addon.author = 'Arcon'
+_addon.version = '1.0.0.0'
 _addon.command = 'linker'
 _addon.short_command = 'web'
+_addon.language = 'Engliish'
 
 defaults = {}
 defaults.raw = {}
@@ -49,42 +51,18 @@ defaults.search.wikia = 'http://wiki.ffxiclopedia.org/wiki/index.php?search=${qu
 defaults.search.g = 'http://google.com/?q=${query}'
 defaults.search.wa = 'http://wolframalpha.com/?i=${query}'
 
+settings = config.load(defaults)
+settings:save()
+
 -- Interpreter
 
-function open_site(site, ...)
+windower.register_event('addon command', function(site, ...)
 	local term = L{...}:concat(' ')
 	if((term == '') or (settings.search[site] == nil and settings.raw[site] ~= nil)) then
-		open_url(settings.raw[site])
+		windower.open_url(settings.raw[site])
 	elseif(settings.search[site] ~= nil) then
-		open_url((settings.search[site]:gsub('${query}', term)))
+		windower.open_url((settings.search[site]:gsub('${query}', term)))
 	else
 		error('Command', site, 'not found.')
 	end
-end
-
--- Constructor
-
-function event_load()
-	send_command('alias linker lua i Linker open_site')
-	send_command('alias web lua i Linker open_site')
-	
-	if get_ffxi_info()['logged_in'] then
-		initialize()
-	end
-end
-
-function event_login()
-	initialize()
-end
-
-function initialize()
-	settings = config.load(defaults)
-	settings:save()
-end
-
--- Destructor
-
-function event_unload()
-	send_command('unalias linker')
-	send_command('unalias web')
-end
+end)

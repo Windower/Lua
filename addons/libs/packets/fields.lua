@@ -6,7 +6,6 @@ require('pack')
 require('functools')
 require('stringhelper')
 require('mathhelper')
-ids = require('id')
 
 local fields = {}
 fields.outgoing = {_mult = {}}
@@ -27,8 +26,6 @@ ls_name_ext[0] = '`'
 -- Function definitions. Used to display packet field information.
 
 res = require('resources')
-local language = get_ffxi_info().language:lower()
-local short_language = ({english='en', japanese='jp', german='de', french='fr'})[language]
 
 local function id(val)
     local mob = get_mob_by_id(val)
@@ -48,15 +45,6 @@ local function bool(val)
     return val ~= 0
 end
 
-local function zone(val)
-    return res.zones()[val][short_language]
-end
-
-local function item(val)
-    print(debug.traceback())
-    return res.items()[val][short_language..'l']:capitalize()
-end
-
 local time = (function()
     local now = os.time()
     local h, m = math.modf(os.difftime(now, os.time(os.date('!*t', now))) / 3600)
@@ -72,36 +60,48 @@ local function cap(val, max)
     return ('%.1f'):format(100*val/max)..'%'
 end
 
+local function zone(val)
+    return res.zones[val].name
+end
+
+local function item(val)
+    return res.items[val].name_full:capitalize()
+end
+
 local function server(val)
-    return ids.servers[val] or 'Unknown'
+    return res.servers[val].name
 end
 
 local function weather(val)
-    return ids.weather[val].name
+    return res.weather[val].name
 end
 
 local function chat(val)
-    return ids.chat[val].name
+    return res.chat[val].name
 end
 
 local function skill(val)
-    return ids.skills[val].name
+    return res.skills[val].name
 end
 
 local function title(val)
-    return ids.titles[val].name
+    return res.titles[val].name
 end
 
 local function job(val)
-    return ids.jobs[val].name
+    return res.jobs[val].name
 end
 
 local function emote(val)
-    return ids.emotes[val].name
+    return '/'..res.emotes[val].command
 end
 
 local function bag(val)
-    return ids.bags[val].name
+    return res.bags[val].name
+end
+
+local function race(val)
+    return res.races[val].name
 end
 
 -- Client Leave
@@ -127,14 +127,14 @@ fields.outgoing[0x015] = L{
 
 -- Action
 fields.outgoing[0x01A] = L{
-    {ctype='unsigned int',      label='Player ID',          fn=id},             --    4 -   7
-    {ctype='unsigned short',    label='Player Index',       fn=index},          --    8 -   9
+    {ctype='unsigned int',      label='Target ID',          fn=id},             --    4 -   7
+    {ctype='unsigned short',    label='Target Index',       fn=index},          --    8 -   9
     {ctype='unsigned short',    label='Category'},                              --   10 -  11
     {ctype='unsigned short',    label='Param'},                                 --   12 -  13
     {ctype='unsigned short',    label='_unknown1'},                             --   14 -  15
 }
 
--- Action
+-- Sort Item
 fields.outgoing[0x03A] = L{
     {ctype='unsigned char',     label='Storage ID'},                            --    4 -   4
     {ctype='unsigned char',     label='_unknown1'},                             --    5 -   5
@@ -149,7 +149,7 @@ fields.outgoing[0x050] = L{
     {ctype='unsigned char',     label='_unknown2'},                             --    7 -   7
 }
 
--- Conquest (0x02 length)
+-- Conquest
 fields.outgoing[0x05A] = L{
 }
 

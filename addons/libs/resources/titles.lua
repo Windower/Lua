@@ -1,19 +1,10 @@
---[[
-    A collection of IDs the game uses internally and their meaning.
-]]
+-- Titles
+local title = {}
 
-local id = {}
+title[371] = {english = 'Destined Fellow'}
+title[729] = {english = 'Legendary Legionnaire',    price = 500}
 
-id.bags     = require('id/bags')
-id.chat     = require('id/chat')
-id.emotes   = require('id/emotes')
-id.jobs     = require('id/jobs')
-id.servers  = require('id/servers')
-id.skills   = require('id/skills')
-id.titles   = require('id/titles')
-id.weather  = require('id/weather')
-
-return id
+return title
 
 --[[
 Copyright (c) 2013, Windower

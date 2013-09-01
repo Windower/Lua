@@ -1,5 +1,5 @@
 --[[
-Functions that facilitate loading, parsing, manipulating and storing of config files.
+    Functions that facilitate loading, parsing, manipulating and storing of config files.
 ]]
 
 local config = {}
