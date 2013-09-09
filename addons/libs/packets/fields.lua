@@ -247,6 +247,34 @@ fields.outgoing[0x100] = L{
     {ctype='unsigned char',     label='_unknown2'},                             --    7 -   7
 }
 
+-- Untraditional Equip
+-- Currently only commented for Monstrosity. Refer to the doku wiki for information on Autos/BLUs.
+-- http://dev.windower.net/doku.php?id=packets:outgoing:0x102_blue_magic_pup_attachment_equip
+fields.outgoing[0x102] = L{
+    {ctype='unsigned int',      label='_unknown1'},                             --    4 -   7  -- 00 00 00 00
+    {ctype='unsigned char',     label='Main Job ID'},                           --    8 -   8  -- 0x17 for Monsters
+    {ctype='unsigned char',     label='Sub Job ID'},                            --    9 -   9  -- 0x00 for Monsters
+    {ctype='unsigned short',    label='_unknown2'},                             --   10 -  11  -- 04 00 for Monsters
+    {ctype='unsigned short',    label='Species ID'},                            --   12 -  13
+    {ctype='unsigned short',    label='_unknown2'},                             --   14 -  15  -- 00 00 for Monsters
+    {ctype='unsigned short',    label='_unknown2'},                             --   14 -  15  -- 00 00 for Monsters
+    {ctype='unsigned short',    label='Instinct ID 1'},                         --   16 -  17
+    {ctype='unsigned short',    label='Instinct ID 2'},                         --   18 -  19
+    {ctype='unsigned short',    label='Instinct ID 3'},                         --   20 -  21
+    {ctype='unsigned short',    label='Instinct ID 4'},                         --   22 -  23
+    {ctype='unsigned short',    label='Instinct ID 5'},                         --   24 -  25
+    {ctype='unsigned short',    label='Instinct ID 6'},                         --   26 -  27
+    {ctype='unsigned short',    label='Instinct ID 7'},                         --   28 -  29
+    {ctype='unsigned short',    label='Instinct ID 8'},                         --   30 -  31
+    {ctype='unsigned short',    label='Instinct ID 9'},                         --   32 -  33
+    {ctype='unsigned short',    label='Instinct ID 10'},                        --   34 -  35
+    {ctype='unsigned short',    label='Instinct ID 11'},                        --   36 -  37
+    {ctype='unsigned short',    label='Instinct ID 12'},                        --   38 -  39
+    {ctype='unsigned char',     label='Name ID 1'},                             --   40 -  40
+    {ctype='unsigned char',     label='Name ID 2'},                             --   41 -  41
+    {ctype='char*',             label='_unknown'},                              --   42 - 159  -- All 00s for Monsters
+}
+
 -- Login
 fields.incoming[0x00A] = L{
     {ctype='unsigned int',      label='Player ID',          fn=id},             --    4 -   7
