@@ -248,15 +248,15 @@ fields.outgoing[0x100] = L{
 }
 
 -- Untraditional Equip
--- Currently only commented for Monstrosity. Refer to the doku wiki for information on Autos/BLUs.
+-- Currently only commented for changing instincts in Monstrosity. Refer to the doku wiki for information on Autos/BLUs.
 -- http://dev.windower.net/doku.php?id=packets:outgoing:0x102_blue_magic_pup_attachment_equip
 fields.outgoing[0x102] = L{
-    {ctype='unsigned int',      label='_unknown1'},                             --    4 -   7  -- 00 00 00 00
+    {ctype='unsigned short',    label='_unknown1'},                             --    4 -   5  -- 00 00 for Monsters
+    {ctype='unsigned short',    label='_unknown1'},                             --    6 -   7  -- Varies by Monster family for the species change packet. Monsters that share the same tnl seem to have the same value. 00 00 for instinct changing.
     {ctype='unsigned char',     label='Main Job ID'},                           --    8 -   8  -- 0x17 for Monsters
     {ctype='unsigned char',     label='Sub Job ID'},                            --    9 -   9  -- 0x00 for Monsters
-    {ctype='unsigned short',    label='_unknown2'},                             --   10 -  11  -- 04 00 for Monsters
-    {ctype='unsigned short',    label='Species ID'},                            --   12 -  13
-    {ctype='unsigned short',    label='_unknown2'},                             --   14 -  15  -- 00 00 for Monsters
+    {ctype='unsigned short',    label='Flag'},                                  --   10 -  11  -- 04 00 for Monsters changing instincts. 01 00 for changing Monsters
+    {ctype='unsigned short',    label='Species ID'},                            --   12 -  13  -- True both for species change and instinct change packets
     {ctype='unsigned short',    label='_unknown2'},                             --   14 -  15  -- 00 00 for Monsters
     {ctype='unsigned short',    label='Instinct ID 1'},                         --   16 -  17
     {ctype='unsigned short',    label='Instinct ID 2'},                         --   18 -  19
@@ -644,8 +644,8 @@ fields.incoming[0x067] = L{
 -- and 40 appears to be for players. _unknown1 is 02 09 for players and 03 05 for
 -- NPCs. The use of this packet is unclear.
     {ctype='unsigned short',    label='_unknown1'},                             --    4 -   5
-    {ctype='unsigned short',    label='Player Index',       fn=index},          --    5 -   6
-    {ctype='unsigned int',      label='Player ID',          fn=id},             --    7 -  10
+    {ctype='unsigned short',    label='Player Index',       fn=index},          --    6 -   7
+    {ctype='unsigned int',      label='Player ID',          fn=id},             --    8 -  11
 }
 
 -- LS Message
