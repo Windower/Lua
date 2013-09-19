@@ -388,7 +388,7 @@ function nest_xml(t, meta, indentlevel)
     local val
     for _, key in ipairs(keys) do
         val = rawget(t, key)
-        if type(val) == 'table' and not (class(val) == 'List' or T(val):isarray()) then
+        if type(val) == 'table' and not (class(val) == 'List' or class(val) == 'Set') then
             fragments:append(indent..'<'..key..'>\n')
             if rawget(meta.comments, key) ~= nil then
                 local c = ('<!-- '..rawget(meta.comments, key):trim()..' -->'):split('\n')
