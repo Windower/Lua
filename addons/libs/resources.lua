@@ -297,8 +297,8 @@ function fns.monster_abils()
         res[id] = {
             id = id,
             english = unquote(english),
-            actor_status = S(actor_status:split(','):map(string.number)),
-            target_status = S(target_status:split(','):map(string.number)),
+            actor_status = S(actor_status:split(','):map(tonumber)),
+            target_status = S(target_status:split(','):map(tonumber)),
         }
         res[id].name = res[id][language_string]
     end
@@ -309,7 +309,7 @@ function fns.monster_abils()
         res[id] = {
             id = id,
             english = unquote(english),
-            actor_status = S(actor_status:split(','):map(string.number)),
+            actor_status = S(actor_status:split(','):map(tonumber)),
             target_status = S{},
         }
         res[id].name = res[id][language_string]
@@ -322,7 +322,7 @@ function fns.monster_abils()
             id = id,
             english = unquote(english),
             actor_status = S{},
-            target_status = S(target_status:split(','):map(string.number)),
+            target_status = S(target_status:split(','):map(tonumber)),
         }
         res[id].name = res[id][language_string]
     end

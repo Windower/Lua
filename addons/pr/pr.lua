@@ -2,7 +2,7 @@ packets,fields = require 'packets'
 require 'tablehelper'
 require 'mathhelper'
 
-function event_load()
+windower.register_event('load',function()
 	indyarr = {'00','10','20','30','40','50','60','70','80','90','A0','B0','C0','D0','E0','F0','G0','H0','I0','J0','K0'}
 	f = io.open(lua_base_path..'data/'..tostring(os.clock())..'.log','w+')
 	write(tostring(f))
@@ -22,13 +22,13 @@ function event_load()
 	end
 	f:write('Player ID: '..Dec2Hex(player['id'])..' Index: '..Dec2Hex(player['index'])..petstuff..'\n\n')
 	f:flush()
-end
+end)
 
-function event_unload()
+windower.register_event('unload',function()
 	io.close(f)
-end
+end)
 
-function event_incoming_chunk(id,data)
+windower.register_event('incoming chunk',function(id,data)
 	if incoming_record_only then
 		if incoming_record_only == id then
 			write_packet('Incoming',incoming,id,data)
@@ -36,9 +36,9 @@ function event_incoming_chunk(id,data)
 	elseif (not incoming_bl:contains(id)) then
 		write_packet('Incoming',incoming,id,data)
 	end
-end
+end)
 
-function event_outgoing_chunk(id,data)
+windower.register_event('outgoing chunk',function(id,data)
 	if outgoing_record_only then
 		if outgoing_record_only == id then
 			write_packet('Outgoing',outgoing,id,data)
@@ -46,14 +46,14 @@ function event_outgoing_chunk(id,data)
 	elseif (not outgoing_bl:contains(id)) then
 		write_packet('Outgoing',outgoing,id,data)
 	end
-end
+end)
 
-function event_incoming_text(original,modified,color)
+windower.register_event('incoming text',function(original,modified,color)
 	if color ~= 8 then
 		f:write(tostring(os.date('%Y-%m-%dT%H:%M:%S'))..'  Text ('..color..'): '..original..'\n\n')
 		f:flush()
 	end
-end
+end)
 
 function str2hex(str)
 	local sixteen = 4
@@ -91,7 +91,7 @@ function write_packet(packet_type,array,id,data)
 	sequence = data:byte(3,4)
 	content = data:sub(5,#data)
 
-	if not array[id] then
+	if not array[id] or array[id].name == 'Unknown' then
 		local assemble = tostring(os.date('%H:%M:%S'))..'  Unidentified '..packet_type..' Packet:'..(Dec2Hex(id) or 'nil')..' Length:'..length..' Sequence:'..sequence..' Content:\n'..(str2hex(content) or 'nil')
 		f:write(assemble..'\n\n')
 		f:flush()

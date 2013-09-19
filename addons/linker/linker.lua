@@ -9,7 +9,7 @@ _addon.author = 'Arcon'
 _addon.version = '1.0.0.0'
 _addon.command = 'linker'
 _addon.short_command = 'web'
-_addon.language = 'Engliish'
+_addon.language = 'English'
 
 defaults = {}
 defaults.raw = {}
