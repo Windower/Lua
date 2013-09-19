@@ -40,7 +40,7 @@ function config.load(filename, confdict)
     end
 
     local confdict_mt = getmetatable(confdict) or _meta.T
-    settings = setmetatable(table.copy(confdict or {}), {__class = 'Settings', __index = function(t, k)
+    local settings = setmetatable(table.copy(confdict or {}), {__class = 'Settings', __index = function(t, k)
         if config[k] ~= nil then
             return config[k]
         elseif confdict_mt then
@@ -368,7 +368,7 @@ function settings_xml(meta)
         end
 
         str = str..'\t<'..char..'>\n'
-        str = str..nest_xml(meta.original[char], meta, 2)
+        str = str..nest_xml(meta.original[char], meta)
         str = str..'\t</'..char..'>\n'
     end
 
@@ -378,17 +378,17 @@ end
 
 -- Converts a table to XML without headers using appropriate indentation and comment spacing. Used in settings_xml.
 function nest_xml(t, meta, indentlevel)
-    indentlevel = indentlevel or 0
-    local indent = ('\t'):rep(indentlevel)
+    indentlevel = indentlevel or 2
+    local indent = (' '):rep(4*indentlevel)
 
     local inlines = T{}
     local fragments = T{}
     local maxlength = 0        -- For proper comment indenting
-    keys = t:keyset():sort()
+    keys = set.sort(table.keyset(t))
     local val
     for _, key in ipairs(keys) do
         val = rawget(t, key)
-        if type(val) == 'table' and not (class(val) == 'List' or T(val):isarray()) then
+        if type(val) == 'table' and not (class(val) == 'List' or class(val) == 'Set') then
             fragments:append(indent..'<'..key..'>\n')
             if rawget(meta.comments, key) ~= nil then
                 local c = ('<!-- '..rawget(meta.comments, key):trim()..' -->'):split('\n')
