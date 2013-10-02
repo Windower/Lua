@@ -38,10 +38,11 @@ require 'targets'
 require 'user_functions'
 require 'refresh'
 require 'parse_augments'
+require 'export'
 
 _addon = {}
 _addon.name = 'GearSwap'
-_addon.version = '0.702'
+_addon.version = '0.703'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -96,6 +97,9 @@ windower.register_event('addon command',function (...)
 				break
 			end
 		end
+	elseif splitup[1]:lower() == 'export' then
+		table.remove(splitup,1)
+		export_set(splitup)
 	elseif splitup[1]:lower() == 'disable' then
 		gearswap_disabled = not gearswap_disabled
 		if gearswap_disabled then
