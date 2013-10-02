@@ -35,13 +35,13 @@ require 'tablehelper'
 require 'resources'
 require 'equip_processing'
 require 'targets'
-require 'refresh'
 require 'user_functions'
+require 'refresh'
 require 'parse_augments'
 
 _addon = {}
 _addon.name = 'GearSwap'
-_addon.version = '0.701'
+_addon.version = '0.702'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -333,6 +333,16 @@ end)
 
 windower.register_event('action message',function(actor_id,target_id,actor_index,target_index,message_id,param_1,param_2,param_3)
 	if gearswap_disabled then return end
+	
+	if spelltarget and spelltarget.id and T{6,20,113,406,605,646}:contains(message_id) then
+		-- Defeats or Falls to the ground
+		if spelltarget.id == target_id then
+			midaction = false
+			spelltarget = nil
+			add_to_chat(123,'GearSwap: Your prey has been defeated by another player!') -- Temporary
+		end
+	end
+	
 	local tempplay = get_player()
 	if actor_id ~= tempplay.id then
 		if tempplay.pet_index then

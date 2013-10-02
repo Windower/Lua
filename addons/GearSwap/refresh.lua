@@ -67,15 +67,13 @@ function load_user_files()
 		windower.unregister_event(i)
 	end
 	
+	unrequire_user()
+	
 	if not file_exists(lua_base_path..'data/'..player['name']..'_'..player.main_job..'.lua') then
 		user_env = nil
 		current_job_file = nil
 		return
 	end
-	
-	local windower_two = windower
-	windower_two.register_event = register_event_user
-	windower_two.unregister_event = unregister_event_user
 	
 	user_env = {gearswap = _G, _global = _global,
 		-- Player functions
@@ -87,8 +85,8 @@ function load_user_files()
 		string=string, math=math, sets=sets, table=table, T=T, S=S,
 		tostring = tostring, tonumber = tonumber, pairs = pairs,
 		ipairs = ipairs, write=write, add_to_chat=add_to_chat,
-		send_command=send_cmd_user,windower=windower_two,
-		require=require,next=next,
+		send_command=send_cmd_user,windower=user_windower,
+		require=require_user,next=next,
 		
 		-- Player environment things
 		buffactive=buffactive,
@@ -96,7 +94,8 @@ function load_user_files()
 		world=world,
 		pet=pet,
 		alliance=alliance,
-		party=alliance[1]
+		party=alliance[1],
+		sets={}
 		}
 
 	-- Try to load data/<name>_<main job>.lua

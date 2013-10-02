@@ -1,4 +1,6 @@
 -------------------------------------------------
+Gearswap 0.702 - Made keys to player data tables all case insensitive. Fixed the user windower structure. Set it so it should reset midaction if the spelltarget dies while casting.
+-------------------------------------------------
 Gearswap 0.701 - Made silent interrupts reset midaction. Fixed aftercast triggering on event_action_messages other than your own/your pets.
 -------------------------------------------------
 Gearswap 0.700 - Added preliminary augmented equipment support. Improved register_event. Finished conversion of GearSwap to new API.

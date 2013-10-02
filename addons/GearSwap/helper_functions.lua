@@ -225,3 +225,32 @@ function logit(file,str)
 	file:write(str)
 	file:flush()
 end
+
+
+-----------------------------------------------------------------------------------
+--Name: user_key_filter()
+--Args:
+---- val (key): potential key to be modified
+-----------------------------------------------------------------------------------
+--Returns:
+---- Filtered key
+-----------------------------------------------------------------------------------
+function user_key_filter(val)
+	if type(val) == 'string' then
+		val = string.lower(val)
+	end
+	return val
+end
+
+
+-----------------------------------------------------------------------------------
+--Name: make_user_table()
+--Args:
+---- None
+-----------------------------------------------------------------------------------
+--Returns:
+---- Table with case-insensitive keys
+-----------------------------------------------------------------------------------
+function make_user_table()
+	return setmetatable({}, user_data_table)
+end

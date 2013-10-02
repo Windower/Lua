@@ -169,7 +169,7 @@ function send_cmd_user(command)
 end
 
 function register_event_user(str,func)
-	id = windower.register_event(str,func)
+	local id = windower.register_event(str,func)
 	registered_user_events[id] = true
 	return id
 end
@@ -178,3 +178,19 @@ function unregister_event_user(id)
 	windower.unregister_event(id)
 	registered_user_events[id] = nil
 end
+
+function require_user(str)
+	user_required[#user_required+1] = str
+	require(str)
+end
+
+function unrequire_user()
+	for __,v in pairs(user_required) do
+		package.loaded.v = nil
+	end
+	table.reassign(user_required,{})
+end
+
+-- Define the user windower functions.
+user_windower = {register_event = register_event_user, unregister_event = unregister_event_user}
+setmetatable(user_windower,{__index=windower})
