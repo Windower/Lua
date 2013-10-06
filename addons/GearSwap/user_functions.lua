@@ -170,25 +170,27 @@ end
 
 function register_event_user(str,func)
 	local id = windower.register_event(str,func)
-	registered_user_events[id] = true
+	registered_user_events[id]=true
 	return id
 end
 
 function unregister_event_user(id)
 	windower.unregister_event(id)
-	registered_user_events[id] = nil
+	registered_user_events[id]=nil
 end
 
-function require_user(str)
-	user_required[#user_required+1] = str
-	require(str)
-end
-
-function unrequire_user()
-	for __,v in pairs(user_required) do
-		package.loaded.v = nil
+function include_user(str)
+	local path = lua_base_path..'data/'..str
+	if str:sub(-4)~='.lua' then
+		path = path..'.lua'
 	end
-	table.reassign(user_required,{})
+	local loaded_values = dofile(path)
+	for i,v in pairs(loaded_values) do
+		rawset(user_env,i,v)
+		if type(v) == 'function' then
+			setfenv(user_env[i],user_env)
+		end
+	end
 end
 
 -- Define the user windower functions.

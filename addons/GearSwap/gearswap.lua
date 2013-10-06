@@ -42,7 +42,7 @@ require 'export'
 
 _addon = {}
 _addon.name = 'GearSwap'
-_addon.version = '0.703'
+_addon.version = '0.704'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -80,7 +80,7 @@ windower.register_event('addon command',function (...)
 		end
 	elseif splitup[1]:lower() == 'equip' and not midaction then
 		if gearswap_disabled then return end
-		local set_split = split(_raw.table.concat(splitup,' ',2,#splitup):gsub('[%[%]\']',''),'%.')
+		local set_split = split(_raw.table.concat(splitup,' ',2,#splitup):gsub('%[','%.'):gsub('[%]\']',''),'%.')
 		local n = 1
 		local tempset = user_env.sets
 		while n <= #set_split do
@@ -108,6 +108,7 @@ windower.register_event('addon command',function (...)
 			write('GearSwap Enabled')
 		end
 	elseif splitup[1]:lower() == 'reload' then
+		write('length: '..#registered_user_events)
 		refresh_user_env()
 	elseif strip(splitup[1]) == 'debugmode' then
 		_global.debug_mode = not _global.debug_mode
@@ -433,8 +434,11 @@ function get_spell(act)
 		effect_val = act['targets'][1]['actions'][1]['param']
 	end
 	
-	if act['category'] == 2 then
+	if act.category == 12 and act.category == 2 then
 		spell.english = 'Ranged Attack'
+		spell.german = 'Ranged Attack'
+		spell.japanese = 'Ranged Attack'
+		spell.french = 'Ranged Attack'
 	else
 		if not dialog[msg_ID] then
 			if T{4,8}:contains(act['category']) then
