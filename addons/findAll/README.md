@@ -54,6 +54,9 @@ findall :omega
 ----
 
 ##Changelog##
+### v1.20131008 ###
+* **add**: Added new case storage support
+
 ### v1.20130610 ###
 * **add**: Added slips as searchable storages for the current character.
 * **add**: The search results will show the long name if the short one doesn't contain the inputted search terms.
