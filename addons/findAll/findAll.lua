@@ -1,5 +1,5 @@
 --[[
-findAll v1.20130610
+findAll v1.20131008
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -35,7 +35,7 @@ require 'sets'
 
 _addon = {}
 _addon.name     = 'findAll'
-_addon.version  = '1.20130610'
+_addon.version  = '1.20131008'
 _addon.commands = 'findAll'
 
 json  = require 'json'
@@ -47,7 +47,7 @@ deferral_time          = 20
 item_names             = T{}
 global_storages        = T{}
 storages_path          = 'data/storages.json'
-storages_order         = L{'temporary', 'inventory', 'safe', 'storage', 'locker', 'satchel', 'sack'}
+storages_order         = L{'temporary', 'inventory', 'safe', 'storage', 'locker', 'satchel', 'sack', 'case'}
 storage_slips_order    = L{'slip 01', 'slip 02', 'slip 03', 'slip 04', 'slip 05', 'slip 06', 'slip 07', 'slip 08', 'slip 09', 'slip 10', 'slip 11', 'slip 12', 'slip 13', 'slip 14'}
 merged_storages_orders = L{}:extend(storages_order):extend(storage_slips_order)
 resources              = {
