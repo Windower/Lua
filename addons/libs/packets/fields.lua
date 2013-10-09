@@ -366,7 +366,7 @@ fields.incoming[0x00D] = L{
     {ctype='unsigned char',     label='_unknown3'},                             --   39 -  42
     {ctype='unsigned int',      label='_unknown4'},                             --   43 -  46 -- Flags again
     {ctype='unsigned int',      label='_unknown5'},                             --   47 -  50
-    {ctype='unsigned int',      label='_unknown6'},                             --   51 -  54
+    {ctype='unsigned int',      label='_unknown6'},                             --   51 -  54 -- DSP notes that the 6th bit of byte 54 is the Ballista flag
     {ctype='unsigned int',      label='_unknown7'},                             --   55 -  58
     {ctype='unsigned int',      label='_unknown8'},                             --   59 -  62
     {ctype='unsigned int',      label='_unknown9'},                             --   63 -  66
@@ -616,19 +616,19 @@ fields.incoming[0x050] = L{
     {ctype='unsigned char',     label='_unknown2'},                             --    7 -   7
 }
 
--- Data Download 3
+-- Model Change
 fields.incoming[0x051] = L{
-    {ctype='unsigned char',     label='face'},                                  --    4 -   4
-    {ctype='unsigned char',     label='race'},                                  --    5 -   5
-    {ctype='unsigned short',    label='_unknown1',          const=0x10},        --    6 -   7
-    {ctype='unsigned short',    label='_unknown2',          const=0x20},        --    8 -   9
-    {ctype='unsigned short',    label='_unknown3',          const=0x30},        --   10 -  11
-    {ctype='unsigned short',    label='_unknown4',          const=0x40},        --   12 -  13
-    {ctype='unsigned short',    label='_unknown5',          const=0x50},        --   14 -  15
-    {ctype='unsigned short',    label='_unknown6',          const=0x60},        --   16 -  17
-    {ctype='unsigned short',    label='_unknown7',          const=0x70},        --   18 -  19
-    {ctype='unsigned short',    label='_unknown8',          const=0x80},        --   20 -  21   Observed to occasionally be FF FF. Significance is unclear
-    {ctype='unsigned short',    label='_unknown9'},                             --   22 -  23   Observed to occasionally be FF FF. Significance is unclear
+    {ctype='unsigned char',     label='Face'},                                  --    4 -   4
+    {ctype='unsigned char',     label='Race'},                                  --    5 -   5
+    {ctype='unsigned short',    label='Head'},                                  --    6 -   7
+    {ctype='unsigned short',    label='Body'},                                  --    8 -   9
+    {ctype='unsigned short',    label='Hands'},                                 --   10 -  11
+    {ctype='unsigned short',    label='Legs'},                                  --   12 -  13
+    {ctype='unsigned short',    label='Feet'},                                  --   14 -  15
+    {ctype='unsigned short',    label='Main'},                                  --   16 -  17
+    {ctype='unsigned short',    label='Sub'},                                   --   18 -  19
+    {ctype='unsigned short',    label='Ranged'},                                --   20 -  21
+    {ctype='unsigned short',    label='_unknown1'},                             --   22 -  23   May varying meaningfully, but it's unclear
 }
 
 -- Weather Change

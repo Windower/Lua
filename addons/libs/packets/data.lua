@@ -87,7 +87,7 @@ data.incoming[0x04B] = {name='Delivery Item',       description='Item in deliver
 data.incoming[0x04D] = {name='Servmes Resp',        description='Server response when someone requests it.'}
 data.incoming[0x04F] = {name='Data Download 2',     description='The data that is sent to the client when it is "Downloading data...".'}
 data.incoming[0x050] = {name='Equip',               description='Updates the characters equipment slots.'}
-data.incoming[0x051] = {name='Data Download 3',     description='Info about equipment and appearance.'}
+data.incoming[0x051] = {name='Model Change',        description='Info about equipment and appearance.'}
 data.incoming[0x052] = {name='NPC Release',         description='Allows your PC to move after interacting with an NPC.'}
 data.incoming[0x053] = {name='Logout Time',         description='The annoying message that tells how much time till you logout.'}
 data.incoming[0x056] = {name='Quest/Mission Log',   description='Updates your quest and mission log on zone and when appropriate.'}
