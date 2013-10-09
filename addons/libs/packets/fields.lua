@@ -304,39 +304,84 @@ fields.incoming[0x00B] = L{
 
 -- PC Update
 fields.incoming[0x00D] = L{
+	-- The flags in this byte are complicated and may not strictly be flags. 
+	-- Byte 32: -- Mentor is somewhere in this byte
+	-- 1 = None
+	-- 2 = Deletes everyone
+	-- 4 = Deletes everyone
+	-- 8 = None
+	-- 16 = None
+	-- 32 = None
+	-- 64 = None
+	-- 128 = None
+	
+	
+	-- Byte 33:
+	-- 1 = None
+	-- 2 = None
+	-- 4 = None
+	-- 8 = LFG
+	-- 16 = Anon
+	-- 32 = Turns your name orange
+	-- 64 = Away
+	-- 128 = None
+	
+	-- Byte 34:
+	-- 1 = POL Icon, can target?
+	-- 2 = no notable effect
+	-- 4 = DCing
+	-- 8 = Untargettable
+	-- 16 = No linkshell
+	-- 32 = No Linkshell again
+	-- 64 = No linkshell again
+	-- 128 = No linkshell again
+	
+	-- Byte 35:
+	-- 1 = Trial Account
+	-- 2 = Trial Account
+	-- 4 = GM Mode
+	-- 8 = None
+	-- 16 = None
+	-- 32 = Invisible models
+	-- 64 = None
+	-- 128 = Bazaar
     {ctype='unsigned int',      label='ID',                 fn=id},             --    4 -   7
     {ctype='unsigned short',    label='Index',              fn=index},          --    8 -   9
     {ctype='unsigned char',     label='Mask'},                                  --   10 -  10
-    {ctype='unsigned char',     label='Rotation'},                              --   11 -  11
+    {ctype='unsigned char',     label='Body Rotation'},                         --   11 -  11
     {ctype='float',             label='X Position'},                            --   12 -  15
     {ctype='float',             label='Z Position'},                            --   16 -  19
     {ctype='float',             label='Y Position'},                            --   20 -  23
-    {ctype='unsigned short',    label='_unknown1'},                             --   24 -  25
+    {ctype='unsigned short',    label='Head Rotation'},                         --   24 -  25
     {ctype='unsigned short',    label='M_TID'},                                 --   26 -  27
-    {ctype='unsigned char',     label='Speed Rating'},                          --   28 -  28
-    {ctype='unsigned char',     label='_unknown2'},                             --   29 -  29
+    {ctype='unsigned char',     label='Current Speed'},                         --   28 -  28
+    {ctype='unsigned char',     label='Base Speed'},                            --   29 -  29
     {ctype='unsigned char',     label='HP %',               fn=percent},        --   30 -  30
     {ctype='unsigned char',     label='Animation'},                             --   31 -  31
     {ctype='unsigned short',    label='Status'},                                --   32 -  33
     {ctype='unsigned short',    label='Flags'},                                 --   34 -  35
-    {ctype='unsigned int',      label='_unknown3'},                             --   36 -  39
-    {ctype='unsigned int',      label='_unknown4'},                             --   40 -  43
-    {ctype='unsigned int',      label='_unknown5'},                             --   44 -  47
-    {ctype='unsigned int',      label='_unknown6'},                             --   48 -  51
-    {ctype='unsigned int',      label='_unknown7'},                             --   52 -  55
-    {ctype='unsigned int',      label='_unknown8'},                             --   56 -  59
-    {ctype='unsigned short',    label='_unknown9'},                             --   60 -  61
-    {ctype='unsigned char',     label='Face'},                                  --   62 -  62
-    {ctype='unsigned char',     label='Race'},                                  --   63 -  63
-    {ctype='unsigned short',    label='Head'},                                  --   64 -  65
-    {ctype='unsigned short',    label='Body'},                                  --   66 -  67
-    {ctype='unsigned short',    label='Hands'},                                 --   68 -  69
-    {ctype='unsigned short',    label='Legs'},                                  --   70 -  71
-    {ctype='unsigned short',    label='Feet'},                                  --   72 -  73
-    {ctype='unsigned short',    label='Main'},                                  --   74 -  75
-    {ctype='unsigned short',    label='Sub'},                                   --   76 -  77
-    {ctype='unsigned short',    label='Ranged'},                                --   78 -  79
-    {ctype='char*',             label='Character Name'},                        --   80 -  95
+    {ctype='unsigned char',     label='Linkshell Red'},                         --   36 -  36
+    {ctype='unsigned char',     label='Linkshell Green'},                       --   37 -  37
+    {ctype='unsigned char',     label='Linkshell Blue'},                        --   38 -  38
+    {ctype='unsigned char',     label='_unknown3'},                             --   39 -  42
+    {ctype='unsigned int',      label='_unknown4'},                             --   43 -  46 -- Flags again
+    {ctype='unsigned int',      label='_unknown5'},                             --   47 -  50
+    {ctype='unsigned int',      label='_unknown6'},                             --   51 -  54
+    {ctype='unsigned int',      label='_unknown7'},                             --   55 -  58
+    {ctype='unsigned int',      label='_unknown8'},                             --   59 -  62
+    {ctype='unsigned int',      label='_unknown9'},                             --   63 -  66
+    {ctype='unsigned char',     label='Face Flags'},                            --   67 -  67 -- 0, 3, 4, or 8
+    {ctype='unsigned char',     label='Face'},                                  --   68 -  68
+    {ctype='unsigned char',     label='Race'},                                  --   69 -  69
+    {ctype='unsigned short',    label='Head'},                                  --   70 -  71
+    {ctype='unsigned short',    label='Body'},                                  --   72 -  73
+    {ctype='unsigned short',    label='Hands'},                                 --   74 -  75
+    {ctype='unsigned short',    label='Legs'},                                  --   76 -  77
+    {ctype='unsigned short',    label='Feet'},                                  --   78 -  79
+    {ctype='unsigned short',    label='Main'},                                  --   80 -  81
+    {ctype='unsigned short',    label='Sub'},                                   --   82 -  83
+    {ctype='unsigned short',    label='Ranged'},                                --   84 -  85
+    {ctype='char*',             label='Character Name'},                        --   86 -  95 -- Variable length, null terminated maybe
 }
 
 -- NPC Update
