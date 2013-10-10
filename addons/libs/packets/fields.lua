@@ -602,10 +602,11 @@ fields.incoming._mult[0x044][0x12] = L{     -- PUP
 
 -- Data Download 2
 fields.incoming[0x04F] = L{
-    {ctype='unsigned char',     label='_unknown1'},                             --    4 -   4   Can contain inventory size (0x51)
-    {ctype='unsigned char',     label='_unknown2'},                             --    5 -   5   Can contain inventory size (0x51)
-    {ctype='unsigned char',     label='_unknown3'},                             --    6 -   6   Can contain inventory size (0x51)
-    {ctype='unsigned char',     label='_unknown4'},                             --    7 -   7
+--   This packet's contents are nonessential. They are often leftovers from other outgoing
+--   packets. It is common to see things like inventory size, equipment information, and
+--   character ID in this packet. They do not appear to be meaningful and the client functions 
+--   normally even if they are blocked.
+    {ctype='unsigned int',     label='_unknown1'},                              --    4 -   7
 }
 
 -- Equip
