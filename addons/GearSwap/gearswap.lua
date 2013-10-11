@@ -35,13 +35,14 @@ require 'tablehelper'
 require 'resources'
 require 'equip_processing'
 require 'targets'
-require 'refresh'
 require 'user_functions'
+require 'refresh'
 require 'parse_augments'
+require 'export'
 
 _addon = {}
 _addon.name = 'GearSwap'
-_addon.version = '0.701'
+_addon.version = '0.704'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -79,7 +80,7 @@ windower.register_event('addon command',function (...)
 		end
 	elseif splitup[1]:lower() == 'equip' and not midaction then
 		if gearswap_disabled then return end
-		local set_split = split(_raw.table.concat(splitup,' ',2,#splitup):gsub('[%[%]\']',''),'%.')
+		local set_split = split(_raw.table.concat(splitup,' ',2,#splitup):gsub('%[','%.'):gsub('[%]\']',''),'%.')
 		local n = 1
 		local tempset = user_env.sets
 		while n <= #set_split do
@@ -96,6 +97,9 @@ windower.register_event('addon command',function (...)
 				break
 			end
 		end
+	elseif splitup[1]:lower() == 'export' then
+		table.remove(splitup,1)
+		export_set(splitup)
 	elseif splitup[1]:lower() == 'disable' then
 		gearswap_disabled = not gearswap_disabled
 		if gearswap_disabled then
@@ -104,6 +108,7 @@ windower.register_event('addon command',function (...)
 			write('GearSwap Enabled')
 		end
 	elseif splitup[1]:lower() == 'reload' then
+		write('length: '..#registered_user_events)
 		refresh_user_env()
 	elseif strip(splitup[1]) == 'debugmode' then
 		_global.debug_mode = not _global.debug_mode
@@ -333,6 +338,16 @@ end)
 
 windower.register_event('action message',function(actor_id,target_id,actor_index,target_index,message_id,param_1,param_2,param_3)
 	if gearswap_disabled then return end
+	
+	if spelltarget and spelltarget.id and T{6,20,113,406,605,646}:contains(message_id) then
+		-- Defeats or Falls to the ground
+		if spelltarget.id == target_id then
+			midaction = false
+			spelltarget = nil
+			add_to_chat(123,'GearSwap: Your prey has been defeated by another player!') -- Temporary
+		end
+	end
+	
 	local tempplay = get_player()
 	if actor_id ~= tempplay.id then
 		if tempplay.pet_index then
@@ -419,8 +434,11 @@ function get_spell(act)
 		effect_val = act['targets'][1]['actions'][1]['param']
 	end
 	
-	if act['category'] == 2 then
+	if act.category == 12 and act.category == 2 then
 		spell.english = 'Ranged Attack'
+		spell.german = 'Ranged Attack'
+		spell.japanese = 'Ranged Attack'
+		spell.french = 'Ranged Attack'
 	else
 		if not dialog[msg_ID] then
 			if T{4,8}:contains(act['category']) then

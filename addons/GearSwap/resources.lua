@@ -152,7 +152,17 @@ avatar_element = {Ifrit='Fire',Titan='Earth',Leviathan='Water',Garuda='Wind',Shi
 	['Dark Elemental']='Dark'}
 
 -- _globals --
-_global = {}
+user_data_table = {
+	__newindex = function(tab, key, val)
+			rawset(tab, user_key_filter(key), val)
+		end,
+
+	__index = function(tab, key)
+		return rawget(tab, user_key_filter(key))
+	end
+	}
+
+_global = make_user_table()
 _global.cast_delay = 0
 _global.storedtarget = ''
 _global.verify_equip = false
@@ -166,17 +176,19 @@ sent_out_equip = T{}
 equip_list = {}
 lastbyte = 0x0000
 action_sent = false
-world = {}
-buffactive = {}
-player = {}
-alliance = {}
-player.equipment = {}
-pet = {isvalid=false}
+world = make_user_table()
+buffactive = make_user_table()
+player = make_user_table()
+alliance = make_user_table()
+player.equipment = make_user_table()
+pet = make_user_table()
+pet.isvalid = false
 st_flag = false
 current_job_file = nil
 disable_table = {false,false,false,false,false,false,false,false,false,false,false,false,false,false,false}
 disable_table[0] = false
 registered_user_events = {}
+
 
 persistant_sequence = {}  ---------------------- TEMPORARY TO INVESTIGATE LAG ISSUES IN DELVE
 persistant_sequence[0] = true
