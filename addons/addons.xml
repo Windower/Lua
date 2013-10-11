@@ -95,13 +95,6 @@
     <support>http://www.ffxiah.com/player/Ragnarok/Ikonic</support>
   </addon>
   <addon>
-    <name>Daze</name>
-	<author>Byrth</author>
-    <description>Records what daze effects are on the monster you're fighting.</description>
-	<bugtracker>https://github.com/Byrth/Lua/issues</bugtracker>
-	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
-  </addon>
-  <addon>
     <name>Distance</name>
     <author>Arcon</author>
     <description>Shows the distance to your current target.</description>
