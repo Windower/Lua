@@ -250,7 +250,7 @@ function fns.items()
                 japanese = unquote(jp),
                 japanese_full = unquote(jpl),
                 jobs = parse_jobs(tonumber(jobs, 16)),
-                races = race_table[tonumber(races, 16)],
+                races = resources.races[tonumber(races, 16)],
                 level = tonumber(level),
                 targets = unquote(targets),
                 cast_time = tonumber(cast_time),
