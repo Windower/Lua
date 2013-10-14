@@ -46,21 +46,22 @@
 ---- There is also currently a field blacklist (ignore_fields) for the sake of memory bloat.
 -----------------------------------------------------------------------------------
 function parse_resources(lines_file)
+	local find = string.find
 	local ignore_fields = S{'index'}
 	local convert_fields = {enl='english_log',fr='french',frl='french_log',de='german',del='german_log',jp='japanese',jpl='japanese_log'}
 	
 	local completed_table = {}
 	for i in ipairs(lines_file) do
 		local str = tostring(lines_file[i])
-		local g,h,typ,key = string.find(str,'<(%w+) id="(%d+)" ')
+		local g,h,typ,key = find(str,'<(%w+) id="(%d+)" ')
 		if typ == 's' then -- Packets and .dats refer to the spell index instead of ID
-			g,h,key = string.find(str,'index="(%d+)" ')
+			g,h,key = find(str,'index="(%d+)" ')
 		end
 		if key~=nil then
 			completed_table[tonumber(key)]={}
 			local q = 1
 			while q <= str:len() do
-				local a,b,ind,val = string.find(str,'(%w+)="([^"]+)"',q)
+				local a,b,ind,val = find(str,'(%w+)="([^"]+)"',q)
 				if ind~=nil then
 					if not ignore_fields[ind] then
 						if convert_fields[ind] then
@@ -77,7 +78,7 @@ function parse_resources(lines_file)
 					q = str:len()+1
 				end
 			end
-			local k,v,english = string.find(str,'>([^<]+)</') -- Look for a Child Text Node
+			local k,v,english = find(str,'>([^<]+)</') -- Look for a Child Text Node
 			if english~=nil then -- key it to 'english' if it exists
 				completed_table[tonumber(key)]['english']=english
 			end

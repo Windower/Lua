@@ -110,7 +110,7 @@ for i,v in pairs(r_items) do
 	end
 end
 
-slot_map = T{main=0,sub=1,range=2,ammo=3,head=4,body=5,hands=6,legs=7,feet=8, neck=9, waist=10,
+slot_map = T{main=0,sub=1,range=2,ranged=2,ammo=3,head=4,body=5,hands=6,legs=7,feet=8, neck=9, waist=10,
 	ear1=11, ear2=12, left_ear=11, right_ear=12, learring=11, rearring=12, lear=11, rear=12,
 	left_ring=13, right_ring=14, lring=13, rring=14, ring1=13, ring2=14, back=15}
 
@@ -131,13 +131,16 @@ ranged_line = {name='Ranged Attack',english='Ranged Attack',prefix='/range',elem
 category_map = T{'Melee Swing','Ranged Attack','Weapon Skill','Magic','Item','Ability','Weapon Skill','Magic','Item','None','TP Move','Ranged Attack','Pet','Ability','Ability'}
 
 jobs = {WAR=0x00000002,MNK=0x00000004,WHM=0x00000008,BLM=0x00000010,RDM=0x00000020,THF=0x00000040,PLD=0x00000080,DRK=0x00000100,BST=0x00000200,BRD=0x00000400,
-RNG=0x00000800,SAM=0x00001000,NIN=0x00002000,DRG=0x00004000,SMN=0x00008000,BLU=0x00010000,COR=0x00020000,PUP=0x00040000,DNC=0x00080000,SCH=0x00100000,GEO=0x00200000,RUN=0x00400000}
+RNG=0x00000800,SAM=0x00001000,NIN=0x00002000,DRG=0x00004000,SMN=0x00008000,BLU=0x00010000,COR=0x00020000,PUP=0x00040000,DNC=0x00080000,SCH=0x00100000,GEO=0x00200000,
+RUN=0x00400000,NONE=0x100000000}
 
 mob_table_races = {[0]='Precomposed NPC',[1]='HumeM',[2]='HumeF',[3]='ElvaanM',[4]='ElvaanF',
 	[5]='TaruM',[6]='TaruF',[7]='Mithra',[8]='Galka',[29]='ChildMithra',[30]='Child_E_H_F',
 	[31]='Child_E_H_M',[32]='ChocoboRounsey',[33]='ChocoboDestrier',[34]='ChocoboPalfrey',
 	[35]='ChocoboCourser',[36]='ChocoboJennet'}
-dat_races = {HumeM=0x0002,HumeF=0x0004,ElvaanM=0x0008,ElvaanF=0x0010,TaruM=0x0020,TaruF=0x0040,Mithra=0x0080,Galka=0x0100}
+dat_races = {['Precomposed NPC']=0x10000,HumeM=0x0002,HumeF=0x0004,ElvaanM=0x0008,ElvaanF=0x0010,
+	TaruM=0x0020,TaruF=0x0040,Mithra=0x0080,Galka=0x0100,['Child_E_H_M']=0x10000,['ChocoboRounsey']=0x10000,
+	['ChocoboDestrier']=0x10000,['ChocoboPalfrey']=0x10000,['ChocoboCourser']=0x10000,['ChocoboJennet']=0x10000}
 
 jas = {false,false,false,false,false,true,false,false,false,false,false,false,false,true,true,false}--6,14,15}
 readies = {false,false,false,false,false,false,true,true,true,false,false,true,false,false,false,false}--{7,8,9,12}

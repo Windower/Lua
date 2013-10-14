@@ -14,7 +14,7 @@ function get_sets()
 		feet="Bokwus Boots"}
 		
 	sets.precast_FC = {head="Nahtirah Hat",neck="Orunmila's Torque",ear1="Loquac. Earring",body="Marduk's Jubbah +1",
-		hands="Mdk. Dastanas +1",ring2="Prolix Ring",back="Swith Cape",waist="Siegel Sash",legs="Orvail Pants",
+		hands="Gendewitha Gages",ring2="Prolix Ring",back="Swith Cape",waist="Siegel Sash",legs="Orvail Pants",
 		feet="Rostrum Pumps"}
 		
 	sets.precast_Cure = {body="Heka's Kalasiris",legs="Nabu's Shalwar",back="Pahtli Cape"}
@@ -25,11 +25,11 @@ function get_sets()
 	-- Midcast Sets
 	sets.midcast_Haste = {main="Terra's Staff",sub="Arbuda Grip",
 		head="Zelus Tiara",neck="Orunmila's Torque",ear1="Loquac. Earring",
-		body="Hedera's Cotehardie",hands="Repartie Gloves",ring2="Prolix Ring",
+		body="Hedera's Cotehardie",hands="Gendewitha Gages",ring2="Prolix Ring",
 		back="Swith Cape",waist="Phasmida Belt",legs="Byakko's Haidate",feet="Rostrum Pumps"}
 
-	sets.midcast_Debuff = {main="Chatoyant Staff",sub="Mephitis grip",
-		head="Marduk's Tiara +1",neck="Aoidos' Matinee",ear1="Psystorm Earring",ear2="Lifestorm earring",
+	sets.midcast_Debuff = {main="Izhiikoh",sub="Genbu's Shield",
+		head="Xux Hat",neck="Aoidos' Matinee",ear1="Psystorm Earring",ear2="Lifestorm earring",
 		body="Aoidos' Hngrln. +2",hands="Ad. Mnchtte. +2",ring1="Omega Ring",ring2="Veela ring",
 		back="Mesmeric Cape",waist="Aristo belt",legs="Mdk. Shalwar +1",feet="Bokwus Boots"}
 	
@@ -44,7 +44,7 @@ function get_sets()
 	
 	sets.midcast_Base = sets.midcast_Haste
 		
-	sets.midcast_Cure = {main="Chatoyant Staff",head="Marduk's Tiara +1",ear2="Novia earring",
+	sets.midcast_Cure = {main="Chatoyant Staff",head="Marduk's Tiara +1",neck="Phalaina Locket",ear2="Novia earring",
 		body="Heka's Kalasiris",hands="Bokwus Gloves",legs="Brd. Cannions +2",feet="Bokwus Boots"}
 		
 	sets.midcast_Stoneskin = {head="Marduk's Tiara +1",body="Marduk's Jubbah +1",hands="Marduk's Dastanas +1",
@@ -77,13 +77,9 @@ function precast(spell,action)
 			send_command('@input /raw /ja "Pianissimo" <me>')
 		end
 		if buffactive['nightingale'] then
-			if spell.english == 'Water Carol' or spell.english == 'Water Carol II' or spell.english == 'Herb Pastoral' or spell.english == 'Goblin Gavotte' then
-				equip(sets.midcast_Base,sets.midcast_DBuff)
-			else
-				equip(sets.midcast_Base,sets.midcast_Buff,sets.midcast_GBuff)
-				if string.find(spell.english,'Ballad') then equip(sets.midcast_Ballad) end
-			end
+			equip_song_gear(spell)
 		else
+			equip_song_gear(spell)
 			equip(sets.precast_FC_Song)
 		end
 	elseif action.type == 'Magic' then
@@ -99,18 +95,7 @@ end
 
 function midcast(spell,action)
 	if spell.type == 'BardSong' then
-		if spell.english == 'Water Carol' or spell.english == 'Water Carol II' or spell.english == 'Herb Pastoral' or spell.english == 'Goblin Gavotte' then
-			equip(sets.midcast_Base,sets.midcast_DBuff)
-		elseif spell.target then
-			if spell.target.type == 'MONSTER' then
-				equip(sets.midcast_Base,sets.midcast_Debuff,sets.midcast_GBuff)
-			else
-				equip(sets.midcast_Base,sets.midcast_Buff,sets.midcast_GBuff)
-				if string.find(spell.english,'Ballad') then equip(sets.midcast_Ballad) end
-			end
-		else
-			write('Nil error line 104: '..spell.english)
-		end
+		equip_song_gear(spell)
 	elseif string.find(spell.english,'Cur') then
 		equip(sets.midcast_Base,sets.midcast_Cure)
 	elseif spell.english=='Stoneskin' then
@@ -128,5 +113,15 @@ function status_change(new,old)
 	end
 end
 
-function buff_change(status,gain_or_loss)
+function equip_song_gear(spell)
+	if spell.english == 'Water Carol' or spell.english == 'Water Carol II' or spell.english == 'Herb Pastoral' or spell.english == 'Goblin Gavotte' then
+		equip(sets.midcast_Base,sets.midcast_DBuff)
+	else
+		if spell.target.type == 'MONSTER' then
+			equip(sets.midcast_Base,sets.midcast_Debuff,sets.midcast_GBuff)
+		else
+			equip(sets.midcast_Base,sets.midcast_Buff,sets.midcast_GBuff)
+			if string.find(spell.english,'Ballad') then equip(sets.midcast_Ballad) end
+		end
+	end
 end
