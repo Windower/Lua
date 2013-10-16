@@ -42,7 +42,7 @@ require 'export'
 
 _addon = {}
 _addon.name = 'GearSwap'
-_addon.version = '0.705'
+_addon.version = '0.706'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -192,7 +192,6 @@ windower.register_event('outgoing text',function(original,modified)
 		r_line = aftercast_cost(r_line)
 		
 		storedcommand = r_line['prefix']..' "'..r_line[language]..'" '
-
 		equip_sets('precast',r_line,{type=s_type})
 
 		return ''

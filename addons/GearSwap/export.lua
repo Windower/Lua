@@ -1,12 +1,14 @@
 function export_set(options)
 	local temp_items,item_list = get_items(),{}
-	local targinv,xml
+	local targinv,xml,all_sets
 	if #options > 0 then
 		for _,v in pairs(options) do
 			if v:lower() == 'inventory' then
 				targinv = true
 			elseif v:lower() == 'xml' then
 				xml = true
+			elseif v:lower() == 'sets' then
+				all_sets = true
 			end
 		end
 	end
@@ -36,6 +38,9 @@ function export_set(options)
 				end
 			end
 		end
+	elseif all_sets then
+		-- Iterate through user_env.sets and find all the gear.
+		item_list = unpack_names('L1',user_env.sets,{})
 	else
 		-- Default to loading the currently worn gear.
 		local gear = temp_items['equipment']
@@ -106,4 +111,21 @@ function export_set(options)
 		f:write('}')
 		f:close()
 	end
+end
+
+function unpack_names(up,tab_level,unpacked_table)
+	for i,v in pairs(tab_level) do
+		if type(v)=='table' then
+			unpacked_table = unpack_names(i,v,unpacked_table)
+		elseif i=='name' then
+			unpacked_table[#unpacked_table+1] = {}
+			unpacked_table[#unpacked_table].slot = up
+			unpacked_table[#unpacked_table].name = v
+		elseif type(v) == 'string' and v~='augment' and v~= 'augments' then
+			unpacked_table[#unpacked_table+1] = {}
+			unpacked_table[#unpacked_table].slot = i
+			unpacked_table[#unpacked_table].name = v
+		end
+	end
+	return unpacked_table
 end
