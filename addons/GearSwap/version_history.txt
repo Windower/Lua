@@ -1,4 +1,6 @@
 -------------------------------------------------
+Gearswap 0.705 - Likely eliminated the Line 71 and 324 errors. Changed the "disable" console command so that it can be used for individual slots or all of gearswap.
+-------------------------------------------------
 Gearswap 0.704 - Changed require() to include() and reworked its back end. Confirmed that register_event() works for users now and are successfully deleted.
 -------------------------------------------------
 Gearswap 0.703 - Added an export command and the appropriate documentation.

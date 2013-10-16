@@ -67,6 +67,13 @@
     <support>http://www.ffxiah.com/player/Ragnarok/Ikonic</support>
   </addon>
   <addon>
+    <name>Cancel</name>
+    <author>Byrth</author>
+    <description>Mimics the cancel plugin, but also accepts buff names instead of just IDs.</description>
+	<bugtracker>https://github.com/Byrth/Lua/issues</bugtracker>
+	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
+  </addon>
+  <addon>
     <name>cBlock</name>
     <description>Blacklist addon for FFOChat.</description>
     <author>Nitrous (Shiva)</author>

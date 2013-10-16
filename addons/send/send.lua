@@ -5,10 +5,10 @@ _addon.name = 'Send'
 _addon.commands = {'send'}
 
 function event_addon_command(...)
-    term = table.concat({...}, ' ')
-	broken_init = split(term, ' ')
-	qual = table.remove(broken_init,1)
-	player = get_player()
+    local term = table.concat({...}, ' ')
+	local broken_init = split(term, ' ')
+	local qual = table.remove(broken_init,1)
+	local player = get_player()
 	if qual:lower()==player['name']:lower() then
 		if broken_init ~= nil then
 			relevant_msg(table.concat(broken_init,' '))
@@ -32,17 +32,17 @@ function event_unload()
 end
 
 function event_ipc_message(msg)
-	broken = split(msg, ' ')
+	local broken = split(msg, ' ')
 	
 	if #broken < 2 then return end
 	
-	qual = table.remove(broken,1)
-	player = get_player()
+	local qual = table.remove(broken,1)
+	local player = get_player()
 	if qual:lower()==player["name"]:lower() then
 		relevant_msg(table.concat(broken,' '))
 	end
 	if string.char(qual:byte(1)) == '@' then
-		arg = string.char(qual:byte(2, qual:len()))
+		local arg = string.char(qual:byte(2, qual:len()))
 		if arg:upper() == player["main_job"]:upper() then
 			if broken ~= nil then
 				relevant_msg(table.concat(broken,' '))
@@ -84,7 +84,7 @@ end
 
 function relevant_msg(msg)
 	local player = get_player()
-    st,en,item,tar = string.find(msg,'/item ([%w%s]+) <(%w+)>')
+    local st,en,item,tar = string.find(msg,'/item ([%w%s]+) <(%w+)>')
     if item ~= nil then
         msg = '/item "'..item..'" <'..tar..'>'
     end

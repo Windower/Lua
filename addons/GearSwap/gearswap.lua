@@ -42,7 +42,7 @@ require 'export'
 
 _addon = {}
 _addon.name = 'GearSwap'
-_addon.version = '0.704'
+_addon.version = '0.705'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -50,7 +50,7 @@ windower.register_event('load',function()
 	debugging = 1
 	
 	if dir_exists('../addons/GearSwap/data/logs') then
-		logging = true
+		logging = false
 		logfile = io.open('../addons/GearSwap/data/logs/NormalLog'..tostring(os.clock())..'.log','w+')
 		logit(logfile,'GearSwap LOGGER HEADER\n')
 	end
@@ -100,15 +100,29 @@ windower.register_event('addon command',function (...)
 	elseif splitup[1]:lower() == 'export' then
 		table.remove(splitup,1)
 		export_set(splitup)
+	elseif splitup[1]:lower() == 'enable' then
+		if splitup[2] and slot_map[splitup[2]:gsub('[^%a]',''):lower()] then
+			enable(splitup[2])
+			write('Gearswap: '..splitup[2]..' enabled.')
+		elseif splitup[2] and splitup[2]:lower()=='all' then
+			enable('main','sub','range','ammo','head','neck','lear','rear','body','hands','lring','rring','back','waist','legs','feet')
+			write('Gearswap: All slots enabled.')
+		elseif gearswap_disabled and not splitup[2] then
+			gearswap_disabled = false
+			write('GearSwap: Enabled')
+		end
 	elseif splitup[1]:lower() == 'disable' then
-		gearswap_disabled = not gearswap_disabled
-		if gearswap_disabled then
-			write('GearSwap Disabled')
-		else
-			write('GearSwap Enabled')
+		if splitup[2] and slot_map[splitup[2]:gsub('[^%a]',''):lower()] then
+			disable(splitup[2])
+			write('Gearswap: '..splitup[2]..' disabled.')
+		elseif splitup[2] and splitup[2]:lower()=='all' then
+			disable('main','sub','range','ammo','head','neck','lear','rear','body','hands','lring','rring','back','waist','legs','feet')
+			write('Gearswap: All slots disabled.')
+		elseif not gearswap_disabled and not splitup[2] then
+			write('GearSwap: Disabled')
+			gearswap_disabled = true
 		end
 	elseif splitup[1]:lower() == 'reload' then
-		write('length: '..#registered_user_events)
 		refresh_user_env()
 	elseif strip(splitup[1]) == 'debugmode' then
 		_global.debug_mode = not _global.debug_mode
@@ -207,7 +221,11 @@ windower.register_event('incoming text',function(original,modified,mode)
 	if gearswap_disabled then return modified, color end
 	if original == '...A command error occurred.' or original == 'You can only use that command during battle.' or original == 'You cannot use that command here.' then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(130) Client canceled command detected: '..mode..' '..original) end
-		equip_sets('aftercast',{name='Invalid Spell'},{type='Recast'})
+		if type(user_env.aftercast)=='function' then
+			equip_sets('aftercast',{name='Invalid Spell'},{type='Recast'})
+		elseif user_env.aftercast then
+			add_to_chat(123,'GearSwap: aftercast() exists but is not a function')
+		end
 	end
 	return modified,color
 end)
@@ -344,7 +362,7 @@ windower.register_event('action message',function(actor_id,target_id,actor_index
 		if spelltarget.id == target_id then
 			midaction = false
 			spelltarget = nil
-			add_to_chat(123,'GearSwap: Your prey has been defeated by another player!') -- Temporary
+--			add_to_chat(123,'GearSwap: Your prey has been defeated by another player!') -- Temporary
 		end
 	end
 	
