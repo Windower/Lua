@@ -1,13 +1,14 @@
 -- Item bags
 local bags = {}
 
-bags[0] = {english = 'Inventory',  access = 'Everywhere'}
-bags[1] = {english = 'Mog Safe',   access = 'Mog House'}
-bags[2] = {english = 'Storage',    access = 'Mog House'}
-bags[3] = {english = 'Mog Locker', access = 'Mog House'}
-bags[4] = {english = 'Temp Items', access = 'Situational'}
-bags[5] = {english = 'Satchel',    access = 'Everywhere'}
-bags[6] = {english = 'Sack',       access = 'Everywhere'}
+bags[0] = {english = 'Inventory',   access = 'Everywhere'}
+bags[1] = {english = 'Safe',        access = 'Mog House'}
+bags[2] = {english = 'Storage',     access = 'Mog House'}
+bags[3] = {english = 'Temporary',   access = 'Situational'}
+bags[4] = {english = 'Locker',      access = 'Mog House'}
+bags[5] = {english = 'Satchel',     access = 'Everywhere'}
+bags[6] = {english = 'Sack',        access = 'Everywhere'}
+bags[7] = {english = 'Case',        access = 'Everywhere'}
 
 return bags
 
