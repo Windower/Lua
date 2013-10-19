@@ -164,7 +164,6 @@ windower.register_event('outgoing text',function(original,modified)
 		return _raw.table.concat(splitline,' ',2,#splitline)
 	elseif command_list[command] and temptarg and validabils[language][abil] and not midaction then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) temp_mod: '..temp_mod) end
-			
 		send_command('@wait 1;lua invoke gearswap sender')
 		
 		local r_line, s_type
@@ -191,7 +190,7 @@ windower.register_event('outgoing text',function(original,modified)
 		
 		r_line = aftercast_cost(r_line)
 		
-		storedcommand = r_line['prefix']..' "'..r_line[language]..'" '
+		storedcommand = command..' "'..r_line[language]..'" '
 		equip_sets('precast',r_line,{type=s_type})
 
 		return ''
