@@ -170,7 +170,7 @@ end)
 
 function cancel(id)
 	if id > 255 then
-		windower.packets.inject_outgoing(0x0F1,string.char(id%256,math.floor(id/256),0,0) -- Inject the cancel packet
+		windower.packets.inject_outgoing(0x0F1,string.char(id%256,math.floor(id/256),0,0)) -- Inject the cancel packet
 	else
 		windower.packets.inject_outgoing(0x0F1,string.char(id,0,0,0)) -- Inject the cancel packet
 	end
