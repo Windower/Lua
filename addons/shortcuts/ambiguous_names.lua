@@ -68,7 +68,7 @@ end
 function abil_mob(player_array,info,mob_ID) -- Determines ambiguity between monster TP moves and abilities
 	local race = get_mob_by_id(player_array.id).race
 	if mob_ID and race then
-		if race == 0 then 
+		if race == 0 and not info then 
 			return 'Monster'
 		end
 	end
@@ -168,7 +168,7 @@ razorfang={abil_ID=681,mob_ID=1039,funct=abil_mob},
 sandblast={abil_ID=714,mob_ID=1043,funct=abil_mob},
 sandpit={abil_ID=715,mob_ID=1044,funct=abil_mob},
 venomspray={abil_ID=716,mob_ID=1045,funct=abil_mob},
-berserk={abil_ID=31,mob_ID=1054,funct=abil_mob},
+berserk={abil_ID=31,mob_ID=1054,funct=abil_mob,info=true},
 leafdagger={abil_ID=678,mob_ID=1073,funct=abil_mob},
 scream={abil_ID=679,mob_ID=1074,funct=abil_mob},
 frogkick={abil_ID=700,mob_ID=1076,funct=abil_mob},
