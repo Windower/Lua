@@ -49,4 +49,4 @@ windower.register_event('incoming text', function(original, modified, mode)
     end
 
     return modified, mode
-end
+end)
