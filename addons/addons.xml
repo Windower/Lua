@@ -22,7 +22,7 @@
     <name>AnsweringMachine</name>
 	<author>Byrth</author>
     <description>Stores tells that you receive for later recall.</description>
-	<bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+	<bugtracker>https://github.com/Byrth/Lua/issues</bugtracker>
 	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
@@ -56,7 +56,7 @@
     <name>BattleMod</name>
     <author>Byrth</author>
     <description>Customizes battle chat messages.</description>
-	<bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+	<bugtracker>https://github.com/Byrth/Lua/issues</bugtracker>
 	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
@@ -65,6 +65,13 @@
     <description>More detailed blist with tiered display options.  Allows for blist to be active on any or all of several chat types.</description>
     <bugtracker>https://github.com/Icinoki/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Ragnarok/Ikonic</support>
+  </addon>
+  <addon>
+    <name>Cancel</name>
+    <author>Byrth</author>
+    <description>Mimics the cancel plugin, but also accepts buff names instead of just IDs.</description>
+	<bugtracker>https://github.com/Byrth/Lua/issues</bugtracker>
+	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
     <name>cBlock</name>
@@ -93,13 +100,6 @@
     <description>Displays tell, party, and linkshell chat to alternate character and optional textbox.  Also, allows you to reply from either character.</description>
     <bugtracker>https://github.com/Icinoki/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Ragnarok/Ikonic</support>
-  </addon>
-  <addon>
-    <name>Daze</name>
-	<author>Byrth</author>
-    <description>Records what daze effects are on the monster you're fighting.</description>
-	<bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
     <name>Distance</name>
@@ -150,7 +150,7 @@
     <name>GearSwap</name>
     <author>Byrth</author>
     <description>Changes gear in response to player actions. [[Uses Packets.]]</description>
-	<bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+	<bugtracker>https://github.com/Byrth/Lua/issues</bugtracker>
 	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
@@ -196,7 +196,7 @@
     <name>plugin_manager</name>
     <author>Byrth</author>
     <description>Allows you to specify which plugins and addons will be used with which characters.</description>
-	<bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+	<bugtracker>https://github.com/Byrth/Lua/issues</bugtracker>
 	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
@@ -210,7 +210,7 @@
     <author>Byrth</author>
     <name>pr</name>
     <description>An addon that records and formats packets, comparing them with the packets library.</description>
-	<bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+	<bugtracker>https://github.com/Byrth/Lua/issues</bugtracker>
 	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
@@ -224,7 +224,7 @@
     <name>Respond</name>
 	<author>Byrth</author>
     <description>Respond to tells and FFOchat PMs using //r.</description>
-	<bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+	<bugtracker>https://github.com/Byrth/Lua/issues</bugtracker>
 	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
@@ -258,7 +258,7 @@
     <author>Byrth</author>
     <description>Applys spellcast-like command completion (interpretation and target completion) to commands. Includes emotes, /check, and /pcmd.</description>
 	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
-	<bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+	<bugtracker>https://github.com/Byrth/Lua/issues</bugtracker>
   </addon>
   <addon>
   	<name>ShoutHelper</name>

@@ -26,20 +26,20 @@ function get_sets()
 	sets.precast_FC_Fire = {main='Atar I'}
 	
 	-- Midcast Sets
-	sets.BP_Base = {main="Yaskomo's Pole",sub="Vox grip",ammo="Dashavatara Sash",
+	sets.BP_Base = {main="Balsam Staff",sub="Vox grip",ammo="Dashavatara Sachet",
 		head="Bokwus Circlet",ear1="Gifted Earring",ear2="Smn. Earring",
 		body="Call. Doublet +2",hands="Spurrina Gages",ring1="Evoker's Ring",ring2="Fervor Ring",
 		legs="Ngen Seraweels",feet="Shedir Crackows"}
 	
 	sets.midcast_Phys_BP = set_combine(sets.BP_Base,{main="Soulscourge",head="Caller's horn +2",neck="Sacrifice torque",back="Astute Cape",waist="Mujin Obi",})
 		
-	sets.midcast_MAB_No_TP_BP = set_combine(sets.BP_Base,{neck="Eidolon Pendant",back="Tiresias' Cape",waist="Caller's sash"})
+	sets.midcast_MAB_No_TP_BP = set_combine(sets.BP_Base,{neck="Eidolon Pendant",back="Tiresias' Cape",waist="Caller's sash",feet="Hagondes Sabots"})
 		
-	sets.midcast_MAB_TP_BP = set_combine(sets.BP_Base,{neck="Eidolon Pendant",back="Tiresias' Cape",waist="Caller's sash",legs="Caller's spats +2"})
+	sets.midcast_MAB_TP_BP = set_combine(sets.BP_Base,{neck="Eidolon Pendant",back="Tiresias' Cape",waist="Caller's sash",legs="Caller's spats +2",feet="Hagondes Sabots"})
 		
-	sets.midcast_MAB_Spell = set_combine(sets.BP_Base,{neck="Eidolon Pendant",hands="Nares Cuffs",back="Tiresias' Cape",waist="Caller's sash"})
+	sets.midcast_MAB_Spell = set_combine(sets.BP_Base,{neck="Eidolon Pendant",hands="Nares Cuffs",back="Tiresias' Cape",waist="Caller's sash",feet="Hagondes Sabots"})
 		
-	sets.midcast_MAcc_BP = set_combine(sets.BP_Base,{neck="Caller's Pendant",body="Anhur Robe",hands="Smn. Bracers +2",back="Astute Cape",legs="Smn. spats +2",feet="Caller's Pgch. +2"})
+	sets.midcast_MAcc_BP = set_combine(sets.BP_Base,{main="Yaskomo's Pole",neck="Caller's Pendant",body="Anhur Robe",hands="Smn. Bracers +2",back="Astute Cape",legs="Smn. spats +2",feet="Caller's Pgch. +2"})
 	
 	sets.midcast_Buff_BP = set_combine(sets.BP_Base,{head="Caller's Horn +2",neck="Caller's Pendant",hands="Smn. Bracers +2",back="Astute Cape",legs="Nares Trews"})
 					
@@ -56,12 +56,12 @@ function get_sets()
 		body="Marduk's Jubbah +1",hands="Marduk's Dastanas +1",ring1="Dark Ring",ring2="Dark Ring",
 		back="Umbra Cape",waist="Hierarch belt",legs="Nares Trews",feet="Herald's Gaiters"}
 	
-	sets.aftercast_Favor = {main="Chatoyant Staff",sub="Vox grip",ammo="Dashavatara Sash",
+	sets.aftercast_Favor = {main="Chatoyant Staff",sub="Vox grip",ammo="Dashavatara Sachet",
 		head="Caller's Horn +2",neck="Caller's Pendant",ear1="Loquac. Earring",ear2="Antivenom Earring",
 		body="Caller's Doublet +2",hands="Smn. Bracers +2",ring1="Evoker's Ring",ring2="Fervor Ring",
 		back="Astute Cape",waist="Hierarch belt",legs="Ngen Seraweels",feet="Rubeus Boots"}
 	
-	sets.aftercast_Perp_Base = {main="Chatoyant Staff",ammo="Dashavatara Sash",
+	sets.aftercast_Perp_Base = {main="Chatoyant Staff",ammo="Dashavatara Sachet",
 		head="Caller's Horn +2",neck="Caller's Pendant",
 		body="Caller's Doublet +2",hands="Adhara Gages",ring1="Evoker's Ring",
 		waist="Hierarch belt",legs="Nares Trews",feet="Caller's Pgch. +2"}
@@ -70,7 +70,7 @@ function get_sets()
 	
 	sets.aftercast_Avatar_Diabolos = {waist="Diabolos's Rope"}
 	
-	sets.aftercast_Avatar_Spirit = {main="Soulscourge",sub="Vox grip",ammo="Dashavatara Sash",
+	sets.aftercast_Avatar_Spirit = {main="Soulscourge",sub="Vox grip",ammo="Dashavatara Sachet",
 		head="Caller's Horn +2",neck="Caller's Pendant",ear2="Smn. Earring",
 		body="Caller's Doublet +2",hands="Smn. Bracers +2",ring1="Evoker's Ring",ring2="Fervor Ring",
 		back="Astute Cape",legs="Smn. spats +2",feet="Rubeus Boots"}
@@ -86,7 +86,7 @@ function get_sets()
 	-- Variables and notes to myself
 	Debuff_BPs = T{'Diamond Storm','Sleepga','Slowga','Tidal Roar','Shock Squall','Nightmare','Pavor Nocturnus','Ultimate Terror','Somnolence','Lunar Cry','Lunar Roar'}
 	Magical_BPs_affected_by_TP = T{'Heavenly Strike','Wind Blade','Holy Mist','Night Terror','Thunderstorm','Geocrush','Meteor Strike','Grand Fall','Lunar Bay','Thunderspark'} -- Unsure if Thunderspark is affected by TP
-	Magical_BPs_unaffected_by_TP = T{'Nether Blast','Aerial Blast','Searing Light','Diamond Dust','Earthen Fury','Zantetsuken','Tidal Wave','Judgment Bolt','Inferno','Howling Moon','Ruinous Omen'}
+	Magical_BPs_unaffected_by_TP = T{'Nether Blast','Aerial Blast','Searing Light','Diamond Dust','Earthen Fury','Zantetsuken','Tidal Wave','Judgment Bolt','Inferno','Howling Moon','Ruinous Omen','Flaming Crush'}
 	Additional_effect_BPs = T{'Rock Throw'}	
 end
 
@@ -157,6 +157,10 @@ function pet_midcast(spell,action)
 		equip(sets.midcast_MAB_Spell)
 	end
 end
+
+--windower.register_event('action',function(act)
+--	windower.add_to_chat(8,'action!')
+--end)
 
 function pet_aftercast(spell,action)
 	idle()

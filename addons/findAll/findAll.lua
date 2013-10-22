@@ -1,5 +1,5 @@
 --[[
-findAll v1.20130610
+findAll v1.20131021
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -34,9 +34,10 @@ require 'logger'
 require 'sets'
 
 _addon = {}
-_addon.name     = 'findAll'
-_addon.version  = '1.20130610'
-_addon.commands = 'findAll'
+_addon.name    = 'findAll'
+_addon.author    = 'Zohno'
+_addon.version = '1.20131021'
+_addon.command = 'findAll'
 
 json  = require 'json'
 file  = require 'filehelper'
@@ -47,7 +48,7 @@ deferral_time          = 20
 item_names             = T{}
 global_storages        = T{}
 storages_path          = 'data/storages.json'
-storages_order         = L{'temporary', 'inventory', 'safe', 'storage', 'locker', 'satchel', 'sack'}
+storages_order         = L{'temporary', 'inventory', 'safe', 'storage', 'locker', 'satchel', 'sack', 'case'}
 storage_slips_order    = L{'slip 01', 'slip 02', 'slip 03', 'slip 04', 'slip 05', 'slip 06', 'slip 07', 'slip 08', 'slip 09', 'slip 10', 'slip 11', 'slip 12', 'slip 13', 'slip 14'}
 merged_storages_orders = L{}:extend(storages_order):extend(storage_slips_order)
 resources              = {
@@ -154,8 +155,10 @@ function search(query, export)
     local sorted_names = global_storages:keyset():sort()
                                                  :reverse()
 
-    sorted_names = sorted_names:append(sorted_names:remove(sorted_names:find(get_player().name)))
+    if windower.get_ffxi_info().logged_in then
+        sorted_names = sorted_names:append(sorted_names:remove(sorted_names:find(windower.ffxi.get_player().name)))
                                :reverse()
+    end
 
     local export_file
 
@@ -204,7 +207,7 @@ function search(query, export)
                     results:sort()
 
                     for _, result in ipairs(results) do
-                        add_to_chat(55, result)
+                        log(result)
                     end
                 end
             end
@@ -232,8 +235,12 @@ function search(query, export)
 end
 
 function get_storages()
-    local items    = get_items()
+    local items    = windower.ffxi.get_items()
     local storages = {}
+
+    if not items then
+        return storages
+    end
 
     storages.gil = items.gil
 
@@ -269,7 +276,8 @@ end
 
 function update()
     if not get_ffxi_info().logged_in then
-        write('you have to be logged in to use this addon')
+        print('You have to be logged in to use this addon.')
+        return false
     end
 
     local time_difference = os.time() - load_timestamp
@@ -325,39 +333,31 @@ function update()
     return true
 end
 
-function event_load()
-    send_command('alias findall lua c findall')
-
+windower.register_event('load', function()
     if get_ffxi_info().logged_in then
         update()
     end
-end
+end)
 
-function event_unload()
-    send_command('unalias findall')
-
+windower.register_event('unload', function()
     if get_ffxi_info().logged_in then
         if not update() then
             error('findAll wasn\'t ready.')
         end
     end
-end
+end)
 
-function event_login()
-    load_timestamp = os.time();
-end
+windower.register_event('login', 'zone change', function()
+    load_timestamp = os.time()
+end)
 
-function event_zone_change()
-    load_timestamp = os.time();
-end
-
-function event_logout()
+windower.register_event('logout', function()
     if not update() then
         error('findAll wasn\'t ready.')
     end
-end
+end)
 
-function event_addon_command(...)
+windower.register_event('addon command', function(...)
     local params = L{...}
     local query  = L{}
     local export = nil
@@ -385,4 +385,4 @@ function event_addon_command(...)
     end
 
     search(query, export)
-end
+end)

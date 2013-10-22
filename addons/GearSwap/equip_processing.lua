@@ -321,5 +321,9 @@ end
 
 
 function get_wearable(player_val,val)
-	return ((val%(player_val*2))/player_val >= 1) -- Cut off the bits above it with modulus, then cut off the bits below it with division and >= 1
+	if player_val then
+		return ((val%(player_val*2))/player_val >= 1) -- Cut off the bits above it with modulus, then cut off the bits below it with division and >= 1
+	else
+		return false -- In cases where the provided playervalue is nil, just return false.
+	end
 end

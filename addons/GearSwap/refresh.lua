@@ -61,21 +61,20 @@ function load_user_files()
 			add_to_chat(123,'GearSwap: file_unload() is not a function')
 		end
 	end
-	user_env = nil
 	
-	for i,v in pairs(registered_user_events) do
-		windower.unregister_event(i)
+	if registered_user_events then
+		for i,v in pairs(registered_user_events) do
+			windower.unregister_event(i)
+		end
 	end
+	
+	user_env = nil
 	
 	if not file_exists(lua_base_path..'data/'..player['name']..'_'..player.main_job..'.lua') then
 		user_env = nil
 		current_job_file = nil
 		return
 	end
-	
-	local windower_two = windower
-	windower_two.register_event = register_event_user
-	windower_two.unregister_event = unregister_event_user
 	
 	user_env = {gearswap = _G, _global = _global,
 		-- Player functions
@@ -87,8 +86,8 @@ function load_user_files()
 		string=string, math=math, sets=sets, table=table, T=T, S=S,
 		tostring = tostring, tonumber = tonumber, pairs = pairs,
 		ipairs = ipairs, write=write, add_to_chat=add_to_chat,
-		send_command=send_cmd_user,windower=windower_two,
-		require=require,next=next,
+		send_command=send_cmd_user,windower=user_windower,
+		include=include_user,next=next,lua_base_path=lua_base_path,
 		
 		-- Player environment things
 		buffactive=buffactive,
@@ -96,7 +95,8 @@ function load_user_files()
 		world=world,
 		pet=pet,
 		alliance=alliance,
-		party=alliance[1]
+		party=alliance[1],
+		sets={}
 		}
 
 	-- Try to load data/<name>_<main job>.lua
@@ -126,7 +126,6 @@ function load_user_files()
 	elseif user_env.get_sets then
 		add_to_chat(123,'GearSwap: get_sets() is defined but is not a function.')
 	end
-	
 end
 
 
@@ -218,29 +217,29 @@ function refresh_ffxi_info()
 	world.real_weather = info.weather
 	world.real_weather_element = info.weather_element
 	if buffactive['voidstorm'] then
-		world.weather = 'dark'
-		world.weather_element = 'dark'
+		world.weather = 'Dark'
+		world.weather_element = 'Dark'
 	elseif buffactive['aurorastorm'] then
-		world.weather = 'light'
-		world.weather_element = 'light'
+		world.weather = 'Light'
+		world.weather_element = 'Light'
 	elseif buffactive['firestorm'] then
-		world.weather = 'fire'
-		world.weather_element = 'fire'
+		world.weather = 'Fire'
+		world.weather_element = 'Fire'
 	elseif buffactive['sandstorm'] then
-		world.weather = 'earth'
-		world.weather_element = 'earth'
+		world.weather = 'Earth'
+		world.weather_element = 'Earth'
 	elseif buffactive['rainstorm'] then
-		world.weather = 'water'
-		world.weather_element = 'water'
+		world.weather = 'Water'
+		world.weather_element = 'Water'
 	elseif buffactive['windstorm'] then
-		world.weather = 'wind'
-		world.weather_element = 'wind'
+		world.weather = 'Wind'
+		world.weather_element = 'Wind'
 	elseif buffactive['hailstorm'] then
-		world.weather = 'ice'
-		world.weather_element = 'ice'
+		world.weather = 'Ice'
+		world.weather_element = 'Ice'
 	elseif buffactive['thunderstorm'] then
-		world.weather = 'thunder'
-		world.weather_element = 'thunder'
+		world.weather = 'Thunder'
+		world.weather_element = 'Thunder'
 	end
 end
 

@@ -1,5 +1,5 @@
-**Author:** Giuliano Riccio  
-**Version:** v 1.20130802
+**Author:** Giuliano Riccio
+**Version:** v 1.20131021
 
 # Reive #
 This addon tracks exp, bayld, momentum scores and bonuses during a reive.

@@ -41,7 +41,7 @@ require 'ambiguous_names'
 require 'targets'
 
 _addon = {}
-_addon.version = '0.8'
+_addon.version = '1.0'
 _addon.name = 'Shortcuts'
 _addon.commands = {'shortcuts'}
 
@@ -56,7 +56,7 @@ _addon.commands = {'shortcuts'}
 -----------------------------------------------------------------------------------
 windower.register_event('load',function()
 	counter = 0
-	lastsent = 'MAUSMAUSMAUSMAUSMAUSMAUSMAUSMAUS'
+	lastsent = ''
 	collectgarbage()
 end)
 
@@ -89,30 +89,6 @@ windower.register_event('outgoing text',function(original,modified)
 	if logging then
 		logfile:write('\n\n',tostring(os.clock()),'temp_org: ',temp_org,'\nModified: ',modified)
 		logfile:flush()
-	end
-	
-	if counter>0 and debugging then --- Subroutine designed to detect and eliminate infinite loops.
-		local dtime = os.clock() - timestamp
-		if dtime > 0.2 then
-			counter = 0
-		else
-			counter = counter +1
-		end
-		if counter == 36 then
-			if logging then
-				f = io.open('../addons/shortcuts/data/loopdetect'..tostring(os.clock())..'.log','w+')
-				f:write('Probable infinite loop detected in Shortcuts: ',tostring(lastsent),'\n',tostring(os.clock()),'temp_org: ',tostring(temp_org))
-				f:flush()
-				f:close()
-			end
-			add_to_chat(8,'Probable infinite loop detected in Shortcuts: '..tostring(lastsent)..'\7Please tell Byrth what you were doing')
-			timestamp = os.clock()
-			counter = 0
-			return modified
-		end
-	elseif debugging then
-		counter = 1
-		timestamp = os.clock()
 	end
 	
 	-- If it's the command that was just sent, blank lastsent and pass it through with only the changes applied by other addons
@@ -318,6 +294,7 @@ function convert_spell(spell)
 		elseif name_line.typ == 'ambig_names' then
 			r_line, s_type = ambig(strip(spell))
 		end
+		
 		if r_line then
 			return r_line[language]
 		else

@@ -4,6 +4,7 @@ This file returns a table of known packet data.
 
 local data = {}
 local dummy =          {name='Unknown',             description='No data available.'}
+
 data.incoming = setmetatable({}, {__index = function() return dummy end})
 data.outgoing = setmetatable({}, {__index = function() return dummy end})
 
@@ -27,7 +28,11 @@ data.outgoing[0x05B] = {name='Dialog choice',       description='Chooses a dialo
 data.outgoing[0x05D] = {name='Emote',               description='This command is used in emotes.'}
 data.outgoing[0x05E] = {name='Request Zone',        description='Request from the client to zone.'}
 data.outgoing[0x061] = {name='Equipment Screen',    description='This command is used when you open your equipment screen.'}
-data.outgoing[0x06E] = {name='Invite Player',       description='Used for Inviting.'}
+data.outgoing[0x06E] = {name='Party invite',        description='Sent when inviting another player to either party or alliance.'}
+data.outgoing[0x06F] = {name='Party leave',         description='Sent when leaving the party or alliance.'}
+data.outgoing[0x070] = {name='Party breakup',       description='Sent when disbanding the entire party or alliance.'}
+data.outgoing[0x074] = {name='Party response',      description='Sent when responding to a party or alliance invite.'}
+data.outgoing[0x077] = {name='Party change leader', description='Sent when giving party or alliance leader to another player.'}
 data.outgoing[0x083] = {name='Buy Item',            description='Buy an item.'}
 data.outgoing[0x084] = {name='Appraise',            description='Ask server for selling price.'}
 data.outgoing[0x085] = {name='Sell Item',           description='Sell an item from your inventory.'}
@@ -43,6 +48,7 @@ data.outgoing[0x0E8] = {name='Toggle Heal',         description='This command is
 data.outgoing[0x0F1] = {name='Cancel',              description='Sent when canceling a buff.'}
 data.outgoing[0x0F4] = {name='Widescan',            description='This command asks the server for a widescan.'}
 data.outgoing[0x100] = {name='Job Change',          description='Sent when initiating a job change.'}
+data.outgoing[0x102] = {name='Untraditional Equip', description='Sent when equipping a pseudo-item like an Automaton Attachment, Instinct, or Blue Magic Spell.'}
 data.outgoing[0x104] = {name='Leave Bazaar',        description='Sent when client leaves a bazaar.'}
 data.outgoing[0x105] = {name='View Bazaar',         description='Sent when viewing somebody\'s bazaar.'}
 data.outgoing[0x106] = {name='Buy Bazaar Item',     description='Buy an item from somebody\'s bazaar.'}
@@ -81,7 +87,7 @@ data.incoming[0x04B] = {name='Delivery Item',       description='Item in deliver
 data.incoming[0x04D] = {name='Servmes Resp',        description='Server response when someone requests it.'}
 data.incoming[0x04F] = {name='Data Download 2',     description='The data that is sent to the client when it is "Downloading data...".'}
 data.incoming[0x050] = {name='Equip',               description='Updates the characters equipment slots.'}
-data.incoming[0x051] = {name='Data Download 3',     description='Info about equipment and appearance.'}
+data.incoming[0x051] = {name='Model Change',        description='Info about equipment and appearance.'}
 data.incoming[0x052] = {name='NPC Release',         description='Allows your PC to move after interacting with an NPC.'}
 data.incoming[0x053] = {name='Logout Time',         description='The annoying message that tells how much time till you logout.'}
 data.incoming[0x056] = {name='Quest/Mission Log',   description='Updates your quest and mission log on zone and when appropriate.'}

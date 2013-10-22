@@ -35,13 +35,14 @@ require 'tablehelper'
 require 'resources'
 require 'equip_processing'
 require 'targets'
-require 'refresh'
 require 'user_functions'
+require 'refresh'
 require 'parse_augments'
+require 'export'
 
 _addon = {}
 _addon.name = 'GearSwap'
-_addon.version = '0.701'
+_addon.version = '0.706'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -49,7 +50,7 @@ windower.register_event('load',function()
 	debugging = 1
 	
 	if dir_exists('../addons/GearSwap/data/logs') then
-		logging = true
+		logging = false
 		logfile = io.open('../addons/GearSwap/data/logs/NormalLog'..tostring(os.clock())..'.log','w+')
 		logit(logfile,'GearSwap LOGGER HEADER\n')
 	end
@@ -79,7 +80,7 @@ windower.register_event('addon command',function (...)
 		end
 	elseif splitup[1]:lower() == 'equip' and not midaction then
 		if gearswap_disabled then return end
-		local set_split = split(_raw.table.concat(splitup,' ',2,#splitup):gsub('[%[%]\']',''),'%.')
+		local set_split = split(_raw.table.concat(splitup,' ',2,#splitup):gsub('%[','%.'):gsub('[%]\']',''),'%.')
 		local n = 1
 		local tempset = user_env.sets
 		while n <= #set_split do
@@ -96,12 +97,30 @@ windower.register_event('addon command',function (...)
 				break
 			end
 		end
+	elseif splitup[1]:lower() == 'export' then
+		table.remove(splitup,1)
+		export_set(splitup)
+	elseif splitup[1]:lower() == 'enable' then
+		if splitup[2] and slot_map[splitup[2]:gsub('[^%a]',''):lower()] then
+			enable(splitup[2])
+			write('Gearswap: '..splitup[2]..' enabled.')
+		elseif splitup[2] and splitup[2]:lower()=='all' then
+			enable('main','sub','range','ammo','head','neck','lear','rear','body','hands','lring','rring','back','waist','legs','feet')
+			write('Gearswap: All slots enabled.')
+		elseif gearswap_disabled and not splitup[2] then
+			gearswap_disabled = false
+			write('GearSwap: Enabled')
+		end
 	elseif splitup[1]:lower() == 'disable' then
-		gearswap_disabled = not gearswap_disabled
-		if gearswap_disabled then
-			write('GearSwap Disabled')
-		else
-			write('GearSwap Enabled')
+		if splitup[2] and slot_map[splitup[2]:gsub('[^%a]',''):lower()] then
+			disable(splitup[2])
+			write('Gearswap: '..splitup[2]..' disabled.')
+		elseif splitup[2] and splitup[2]:lower()=='all' then
+			disable('main','sub','range','ammo','head','neck','lear','rear','body','hands','lring','rring','back','waist','legs','feet')
+			write('Gearswap: All slots disabled.')
+		elseif not gearswap_disabled and not splitup[2] then
+			write('GearSwap: Disabled')
+			gearswap_disabled = true
 		end
 	elseif splitup[1]:lower() == 'reload' then
 		refresh_user_env()
@@ -145,7 +164,6 @@ windower.register_event('outgoing text',function(original,modified)
 		return _raw.table.concat(splitline,' ',2,#splitline)
 	elseif command_list[command] and temptarg and validabils[language][abil] and not midaction then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) temp_mod: '..temp_mod) end
-			
 		send_command('@wait 1;lua invoke gearswap sender')
 		
 		local r_line, s_type
@@ -172,8 +190,7 @@ windower.register_event('outgoing text',function(original,modified)
 		
 		r_line = aftercast_cost(r_line)
 		
-		storedcommand = r_line['prefix']..' "'..r_line[language]..'" '
-
+		storedcommand = command..' "'..r_line[language]..'" '
 		equip_sets('precast',r_line,{type=s_type})
 
 		return ''
@@ -202,7 +219,11 @@ windower.register_event('incoming text',function(original,modified,mode)
 	if gearswap_disabled then return modified, color end
 	if original == '...A command error occurred.' or original == 'You can only use that command during battle.' or original == 'You cannot use that command here.' then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(130) Client canceled command detected: '..mode..' '..original) end
-		equip_sets('aftercast',{name='Invalid Spell'},{type='Recast'})
+		if type(user_env.aftercast)=='function' then
+			equip_sets('aftercast',{name='Invalid Spell'},{type='Recast'})
+		elseif user_env.aftercast then
+			add_to_chat(123,'GearSwap: aftercast() exists but is not a function')
+		end
 	end
 	return modified,color
 end)
@@ -333,6 +354,16 @@ end)
 
 windower.register_event('action message',function(actor_id,target_id,actor_index,target_index,message_id,param_1,param_2,param_3)
 	if gearswap_disabled then return end
+	
+	if spelltarget and spelltarget.id and T{6,20,113,406,605,646}:contains(message_id) then
+		-- Defeats or Falls to the ground
+		if spelltarget.id == target_id then
+			midaction = false
+			spelltarget = nil
+--			add_to_chat(123,'GearSwap: Your prey has been defeated by another player!') -- Temporary
+		end
+	end
+	
 	local tempplay = get_player()
 	if actor_id ~= tempplay.id then
 		if tempplay.pet_index then
@@ -419,8 +450,11 @@ function get_spell(act)
 		effect_val = act['targets'][1]['actions'][1]['param']
 	end
 	
-	if act['category'] == 2 then
+	if act.category == 12 and act.category == 2 then
 		spell.english = 'Ranged Attack'
+		spell.german = 'Ranged Attack'
+		spell.japanese = 'Ranged Attack'
+		spell.french = 'Ranged Attack'
 	else
 		if not dialog[msg_ID] then
 			if T{4,8}:contains(act['category']) then

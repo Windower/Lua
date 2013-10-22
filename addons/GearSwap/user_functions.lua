@@ -169,12 +169,30 @@ function send_cmd_user(command)
 end
 
 function register_event_user(str,func)
-	id = windower.register_event(str,func)
-	registered_user_events[id] = true
+	local id = windower.register_event(str,func)
+	registered_user_events[id]=true
 	return id
 end
 
 function unregister_event_user(id)
 	windower.unregister_event(id)
-	registered_user_events[id] = nil
+	registered_user_events[id]=nil
 end
+
+function include_user(str)
+	local path = lua_base_path..'data/'..str
+	if str:sub(-4)~='.lua' then
+		path = path..'.lua'
+	end
+	local loaded_values = dofile(path)
+	for i,v in pairs(loaded_values) do
+		rawset(user_env,i,v)
+		if type(v) == 'function' then
+			setfenv(user_env[i],user_env)
+		end
+	end
+end
+
+-- Define the user windower functions.
+user_windower = {register_event = register_event_user, unregister_event = unregister_event_user}
+setmetatable(user_windower,{__index=windower})

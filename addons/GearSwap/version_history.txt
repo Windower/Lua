@@ -1,4 +1,14 @@
 -------------------------------------------------
+Gearswap 0.706 - Added a "sets" option to the export command.
+-------------------------------------------------
+Gearswap 0.705 - Likely eliminated the Line 71 and 324 errors. Changed the "disable" console command so that it can be used for individual slots or all of gearswap.
+-------------------------------------------------
+Gearswap 0.704 - Changed require() to include() and reworked its back end. Confirmed that register_event() works for users now and are successfully deleted.
+-------------------------------------------------
+Gearswap 0.703 - Added an export command and the appropriate documentation.
+-------------------------------------------------
+Gearswap 0.702 - Made keys to player data tables all case insensitive. Fixed the user windower structure. Set it so it should reset midaction if the spelltarget dies while casting.
+-------------------------------------------------
 Gearswap 0.701 - Made silent interrupts reset midaction. Fixed aftercast triggering on event_action_messages other than your own/your pets.
 -------------------------------------------------
 Gearswap 0.700 - Added preliminary augmented equipment support. Improved register_event. Finished conversion of GearSwap to new API.

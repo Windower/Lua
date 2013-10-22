@@ -2,6 +2,6 @@
 <settings>
 	<global>
 	<!-- This setting refers to party highlighting, turning this off will mean that only your name is highlighted when mentioned -->
-		<highlighting>Yes</highlighting>
+		<highlighting>true</highlighting>
 	</global>
 </settings>

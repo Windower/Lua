@@ -105,7 +105,7 @@ function target_make(targets)
 		target_type = 'Enemy'
 		-- Need to add handling that differentiates 'Enemy' and 'NPC' here.
 	else
-		target_type = 'Player'
+		target_type = 'Ally'
 		local party = get_party()
 		for i,v in pairs(party) do
 			if v.name == target.name then
@@ -115,8 +115,8 @@ function target_make(targets)
 					else
 						target_type = 'Party'
 					end
-				else
-					target_type = 'Ally'
+--				else
+--					target_type = 'Ally'
 				end
 				break
 			end
@@ -126,6 +126,6 @@ function target_make(targets)
 	if targets[target_type] then
 		return '<t>'
 	end
-
+--	add_to_chat(8,"got to the end "..tostring(target_type))
 	return '<me>'
 end

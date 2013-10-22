@@ -1,5 +1,5 @@
 --[[
-timestamp v1.20130616
+timestamp v1.20131021
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -36,7 +36,8 @@ config = require 'config'
 
 _addon = {}
 _addon.name     = 'timestamp'
-_addon.version  = '1.20130616'
+_addon.author   = 'Zohno'
+_addon.version  = '1.20131021'
 _addon.commands = {'timestamp', 'ts'}
 
 function timezone()
@@ -48,7 +49,7 @@ end
 
 tz, tz_sep = timezone()
 
-constants = T{
+constants = {
     ['year']         = '%Y',
     ['y']            = '%Y',
     ['year_short']   = '%y',
@@ -91,37 +92,13 @@ defaults = {}
 defaults.color  = 508
 defaults.format = '[${time}]'
 
-settings = {}
+settings = config.load(defaults)
 
-function get_string(format)
-    local formatted_string = format:gsub('%${([%l%d_]+)}', function(match) if constants[match] ~= nil then return os.date(constants[match]) else return match end end)
-
-    return formatted_string
+function make_timestamp(format)
+    return os.date((format:gsub('%${([%l%d_]+)}', constants)))
 end
 
-function initialize()
-    settings = config.load(defaults)
-end
-
-function event_load()
-    send_command('alias timestamp lua c timestamp')
-    send_command('alias ts lua c timestamp')
-
-    if get_ffxi_info().logged_in then
-        initialize()
-    end
-end
-
-function event_login()
-    initialize()
-end
-
-function event_unload()
-    send_command('unalias timestamp')
-    send_command('unalias ts')
-end
-
-function event_incoming_text(original, modified, mode)
+windower.register_event('incoming text', function(original, modified, mode)
     if modified ~= '' and not modified:find('^[%s]+$') then
         if mode == 144 then -- 144 works as 150 but the enter prompts are ignored.
             mode     = 150
@@ -134,7 +111,7 @@ function event_incoming_text(original, modified, mode)
         end
 
         if mode ~= 151 then
-            local timeString = get_string(settings.format):color(settings.color)..' '
+            local timeString = make_timestamp(settings.format):color(settings.color)..' '
 
             modified = timeString..modified:gsub('^['..string.char(0x07)..'\n]+', '')
                                            :gsub('([^'..lead_bytes_pattern..'])['..string.char(0x07)..'\n]+$', '%1')
@@ -143,9 +120,9 @@ function event_incoming_text(original, modified, mode)
     end
 
     return modified, mode
-end
+end)
 
-function event_addon_command(...)
+windower.register_event('addon command', function(...)
     local cmd  = (...) and (...):lower() or 'help'
     local args = {select(2, ...)}
 
@@ -164,13 +141,13 @@ function event_addon_command(...)
             log(chat.chars.wsquare..' <format>: defines the timestamp format. The available constants are:')
 
             for key in constants:keyset():sort():it() do
-                log('  ${'..key..'}: '..get_string('${'..key..'}'))
+                log('  ${'..key..'}: '..make_timestamp('${'..key..'}'))
             end
         else
             settings.format = args[1]
 
             settings:save()
-            log('The new timestamp format has been saved ('..get_string(settings.format)..').')
+            log('The new timestamp format has been saved ('..make_timestamp(settings.format)..').')
         end
     elseif cmd == 'color' then
         if not args[1] then
@@ -196,6 +173,6 @@ function event_addon_command(...)
     elseif cmd == 'save' then
         settings:save('all')
     else
-        send_command('timestamp help')
+        windower.send_command('timestamp help')
     end
-end
+end)

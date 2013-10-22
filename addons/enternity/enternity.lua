@@ -1,5 +1,5 @@
 --[[
-enternity v1.20130620
+enternity v1.20131021
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -32,15 +32,16 @@ require 'sets'
 
 _addon = {}
 _addon.name    = 'enternity'
-_addon.version = '1.20130620'
+_addon.author  = 'Zohno'
+_addon.version = '1.20131021'
 
 blist = S{'Geomantic Reservoir'}
 
-function event_incoming_text(original, modified, mode)
+windower.register_event('incoming text', function(original, modified, mode)
     if (mode == 150 or mode == 151) and not original:find(string.char(0x1e, 0x02)) then
         for name in pairs(blist) do
-            if original:find(name) then
-                return modified, mode
+            if original:match(name) then
+                return
             end
         end
         
@@ -48,4 +49,4 @@ function event_incoming_text(original, modified, mode)
     end
 
     return modified, mode
-end
+end)
