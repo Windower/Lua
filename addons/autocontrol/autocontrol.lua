@@ -82,22 +82,22 @@ function initialize()
     end
 end
 
-function onLoad()
+windower.register_event('load', function()
     log('Version '.._addon.version..' loaded! Use //acon help to get a list of commands.')
     initialize()
-end
+end)
 
-function onLogin()
+windower.register_event('login', function()
     initialize()
-end
+end)
 
-function onLogout()
+windower.register_event('logout', function()
     text_update_loop('stop')
-end
+end)
 
-function onUnload()
+windower.register_event('unload', function()
     text_update_loop('stop')
-end
+end)
 
 function attach_set(autoset)
     if windower.ffxi.get_player()['main_job_id'] ~= 18 then return nil end
@@ -235,7 +235,7 @@ function get_autoset_content(autoset)
     settings.autosets[autoset]:vprint()
 end
 
-function commands(...)
+windower.register_event("addon command", function(...)
     if get_player()['main_job_id'] ~= 18 then
         error('You are not on Puppetmaster.')
         return nil 
@@ -309,7 +309,7 @@ The following all correspond to the burden tracker:
             end
         end
     end
-end
+end)
 
 function parse_resources(lines_file)
     local completed_table = T{}
@@ -342,15 +342,3 @@ function parse_resources(lines_file)
     end
     return completed_table
 end
-
-
-windower.register_event('load', onLoad)
-windower.register_event('unload', onUnload)
-windower.register_event('login', onLogin)
-windower.register_event('logout', onLogout)
-windower.register_event("action",actions)
-windower.register_event("addon command",commands)
-windower.register_event("gain status",statGain)
-windower.register_event("lose status",statLoss)
-windower.register_event("zone change",zoneChange)
-windower.register_event("time change",timeChange)
