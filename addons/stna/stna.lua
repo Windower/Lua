@@ -30,12 +30,12 @@ _addon = {}
 _addon.name = 'STNA'
 _addon.version = '1.07'
 _addon.author = 'Nitrous (Shiva)'
+_addon.command = 'stna'
 
 require 'tablehelper'
 require 'sets'
 
-function onLoad()
-    windower.send_command('@alias stna lua c stna')
+windower.register_event('load', function()
     statSpell = { 
         paralysis='Paralyna',
         curse='Cursna',
@@ -60,13 +60,9 @@ function onLoad()
     priority[9] = 'diseased'
 	
     statusTable = S{}
-end
+end)
 
-function onUnload()
-    windower.send_command('@unalias stna')
-end
-
-function commands()
+windower.register_event('addon command', function(...)
     if statusTable ~= nil then
         local player = windower.ffxi.get_player()
         for i = 1, 9 do
@@ -80,23 +76,17 @@ function commands()
         end
         windower.add_to_chat(55,"You are not afflicted by a status with a -na spell.")
     end
-end
+end)
 
-function gainStatus(name,id)
+windower.register_event('gain status', function(name,id)
     if priority:contains(name) and not statusTable:contains(name) then
         statusTable:add(name)
     end
-end
+end)
 
 
-function loseStatus(name,id)
+windower.register_event('lose status', function(name,id)
     if statusTable:contains(name) then
         statusTable:remove(name)
     end
-end
-
-windower.register_event('load', onLoad)
-windower.register_event('unload', onUnload)
-windower.register_event('gain status', gainStatus)
-windower.register_event('lose status', loseStatus)
-windower.register_event('addon command', commands)
+end)

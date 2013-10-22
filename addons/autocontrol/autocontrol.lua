@@ -31,6 +31,7 @@ _addon = {}
 _addon.name = 'autocontrol'
 _addon.version = '0.21'
 _addon.author = 'Nitrous (Shiva)'
+_addon.commands = {'autocontrol','acon'}
 
 require 'tablehelper'
 require 'stringhelper'
@@ -81,27 +82,22 @@ function initialize()
     end
 end
 
-function onLoad()
-    windower.send_command('@alias autocon lua c autocontrol')
-    windower.send_command('@alias acon lua c autocontrol')
+windower.register_event('load', function()
     log('Version '.._addon.version..' loaded! Use //acon help to get a list of commands.')
     initialize()
-end
+end)
 
-function onLogin()
+windower.register_event('login', function()
     initialize()
-end
+end)
 
-function onLogout()
+windower.register_event('logout', function()
     text_update_loop('stop')
-    windower.send_command('@unalias autocon')
-    windower.send_command('@unalias acon')
-end
+end)
 
-function onUnload()
+windower.register_event('unload', function()
     text_update_loop('stop')
-    Burden_tb:destroy()
-end
+end)
 
 function attach_set(autoset)
     if windower.ffxi.get_player()['main_job_id'] ~= 18 then return nil end
@@ -239,7 +235,7 @@ function get_autoset_content(autoset)
     settings.autosets[autoset]:vprint()
 end
 
-function commands(...)
+windower.register_event("addon command", function(...)
     if get_player()['main_job_id'] ~= 18 then
         error('You are not on Puppetmaster.')
         return nil 
@@ -288,8 +284,11 @@ function commands(...)
         elseif comm == 'hide' then Burden_tb:hide()
         elseif comm == 'settings' then 
             log('BG: R: '..settings.bg.red..' G: '..settings.bg.green..' B: '..settings.bg.blue)
+            sleep(10)
             log('Font: '..settings.text.font..' Size: '..settings.text.size)
-            log('Test: R: '..settings.text.red..' G: '..settings.text.green..' B: '..settings.text.blue)
+            sleep(10)
+            log('Text: R: '..settings.text.red..' G: '..settings.text.green..' B: '..settings.text.blue)
+            sleep(10)
             log('Position: X: '..settings.pos.x..' Y: '..settings.pos.y)
         else
             local helptext = [[Autosets command list:
@@ -304,10 +303,13 @@ The following all correspond to the burden tracker:
      bgcolor <r> <g> <b> | txtcolor <r> <g> <b>
      settings - shows current settings
      show/hide - toggles visibility of the tracker so you can make changes.]]
-            log(helptext)
+            for _, line in ipairs(helptext:split('\n')) do
+                windower.add_to_chat(207, line..chat.colorcontrols.reset)
+                sleep(10)
+            end
         end
     end
-end
+end)
 
 function parse_resources(lines_file)
     local completed_table = T{}
@@ -340,15 +342,3 @@ function parse_resources(lines_file)
     end
     return completed_table
 end
-
-
-windower.register_event('load', onLoad)
-windower.register_event('unload', onUnload)
-windower.register_event('login', onLogin)
-windower.register_event('logout', onLogout)
-windower.register_event("action",actions)
-windower.register_event("addon command",commands)
-windower.register_event("gain status",statGain)
-windower.register_event("lose status",statLoss)
-windower.register_event("zone change",zoneChange)
-windower.register_event("time change",timeChange)

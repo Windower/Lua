@@ -1,5 +1,5 @@
 **Author:** Ricky Gall  
-**Version:** 1.2  
+**Version:** 1.21  
 **Description:**  
 Addon to make setting blue spells easier. Currently only works as blu main.
 
