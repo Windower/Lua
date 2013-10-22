@@ -31,6 +31,7 @@ _addon = {}
 _addon.name = 'autocontrol'
 _addon.version = '0.21'
 _addon.author = 'Nitrous (Shiva)'
+_addon.commands = {'autocontrol','acon'}
 
 require 'tablehelper'
 require 'stringhelper'
@@ -82,8 +83,6 @@ function initialize()
 end
 
 function onLoad()
-    windower.send_command('@alias autocon lua c autocontrol')
-    windower.send_command('@alias acon lua c autocontrol')
     log('Version '.._addon.version..' loaded! Use //acon help to get a list of commands.')
     initialize()
 end
@@ -94,13 +93,10 @@ end
 
 function onLogout()
     text_update_loop('stop')
-    windower.send_command('@unalias autocon')
-    windower.send_command('@unalias acon')
 end
 
 function onUnload()
     text_update_loop('stop')
-    Burden_tb:destroy()
 end
 
 function attach_set(autoset)
@@ -288,8 +284,11 @@ function commands(...)
         elseif comm == 'hide' then Burden_tb:hide()
         elseif comm == 'settings' then 
             log('BG: R: '..settings.bg.red..' G: '..settings.bg.green..' B: '..settings.bg.blue)
+            sleep(10)
             log('Font: '..settings.text.font..' Size: '..settings.text.size)
+            sleep(10)
             log('Text: R: '..settings.text.red..' G: '..settings.text.green..' B: '..settings.text.blue)
+            sleep(10)
             log('Position: X: '..settings.pos.x..' Y: '..settings.pos.y)
         else
             local helptext = [[Autosets command list:
@@ -304,7 +303,10 @@ The following all correspond to the burden tracker:
      bgcolor <r> <g> <b> | txtcolor <r> <g> <b>
      settings - shows current settings
      show/hide - toggles visibility of the tracker so you can make changes.]]
-            log(helptext)
+            for _, line in ipairs(helptext:split('\n')) do
+                windower.add_to_chat(207, line..chat.colorcontrols.reset)
+                sleep(10)
+            end
         end
     end
 end

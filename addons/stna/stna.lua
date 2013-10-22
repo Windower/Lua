@@ -30,12 +30,12 @@ _addon = {}
 _addon.name = 'STNA'
 _addon.version = '1.07'
 _addon.author = 'Nitrous (Shiva)'
+_addon.command = 'stna'
 
 require 'tablehelper'
 require 'sets'
 
 function onLoad()
-    windower.send_command('@alias stna lua c stna')
     statSpell = { 
         paralysis='Paralyna',
         curse='Cursna',
@@ -60,10 +60,6 @@ function onLoad()
     priority[9] = 'diseased'
 	
     statusTable = S{}
-end
-
-function onUnload()
-    windower.send_command('@unalias stna')
 end
 
 function commands()
@@ -96,7 +92,6 @@ function loseStatus(name,id)
 end
 
 windower.register_event('load', onLoad)
-windower.register_event('unload', onUnload)
 windower.register_event('gain status', gainStatus)
 windower.register_event('lose status', loseStatus)
 windower.register_event('addon command', commands)

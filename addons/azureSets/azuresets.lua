@@ -28,8 +28,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon = {}
 _addon.name = 'AzureSets'
-_addon.version = '1.2'
+_addon.version = '1.21'
 _addon.author = 'Nitrous (Shiva)'
+_addon.commands = {'aset','azuresets','asets'}
 
 require 'tablehelper'
 require 'stringhelper'
@@ -56,22 +57,16 @@ function initialize()
 end
 
 function onLoad()
-    windower.send_command('alias azureset lua c azureSets')
-    windower.send_command('alias aset lua c azureSets')
     speFile = files.new('data/bluespells.xml')
     spells = T{}
     spells = parse_resources(speFile:readlines())
     settings = config.load(defaults)
+    notice('Version '.._addon.version..' Loaded. Type //aset help for list of commands.')
     initialize()
 end
 
 function onLogin()
     initialize()
-end
-
-function onUnload()
-    windower.send_command('unalias azureset')
-    windower.send_command('unalias aset')
 end
 
 function jobChange(mj, mjob_id, mjob_lvl, sj, sjob_id, sjob_lvl)
@@ -231,15 +226,19 @@ function commands(...)
                 get_spellset_content(args[1])
             end
         elseif comm == 'help' then
-            log('You have access to the following commands with the //aset alias:')
-            log(' 1. removeall - Unsets all spells.')
-            log(' 2. spellset <setname> -- Set (setname)\'s spells.')
-            log(' 3. add <slot> <spell> -- Set (spell) to slot (slot (number)).')
-            log(' 4. save <setname> -- Saves current spellset as (setname)')
-            log(' 5. currentlist -- Lists currently set spells.')
-            log(' 6. setlist -- Lists all spellsets.')
-            log(' 7. spelllist <setname> -- List spells in (setname)')
-            log(' 8. help --Shows this menu.')
+            local helptext = [[AzureSets - Command List:')
+  1. removeall - Unsets all spells.
+  2. spellset <setname> -- Set (setname)'s spells.
+  3. add <slot> <spell> -- Set (spell) to slot (slot (number)).
+  4. save <setname> -- Saves current spellset as (setname).
+  5. currentlist -- Lists currently set spells.
+  6. setlist -- Lists all spellsets.
+  7. spelllist <setname> -- List spells in (setname)
+  8. help --Shows this menu.]]
+            for _, line in ipairs(helptext:split('\n')) do
+                windower.add_to_chat(207, line..chat.colorcontrols.reset)
+                sleep(10)
+            end
         end
     end
 end
@@ -279,5 +278,4 @@ end
 windower.register_event('addon command', commands)
 windower.register_event('load', onLoad)
 windower.register_event('login', onLogin)
-windower.register_event('unload', onUnload)
 windower.register_event('job change', jobChange)

@@ -28,8 +28,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon = {}
 _addon.name = 'FFOColor'
-_addon.version = '2.01'
+_addon.version = '2.02'
 _addon.author = 'Nitrous (Shiva)'
+_addon.command = 'ffocolor'
 
 require 'tablehelper'
 require 'stringhelper'
@@ -43,13 +44,13 @@ defaults.chatTab = 'say'
 defaults.chatColor = 207
 
 function initialize()
+    notice('Version '.._addon.version..' Loaded. Type //ffocolor help for list of commands.')
     settings = config.load(defaults)
     settings:save()
     chatColors = T{say=1,shout=2,tell=4,party=5,linkshell=6,none=settings.chatColor}
 end
 
 function onLoad()
-    windower.send_command('alias ffocolor lua c ffocolor')
     if windower.get_ffxi_info()['logged_in'] then
         initialize()
     end
@@ -59,20 +60,20 @@ function onLogin()
     initialize()
 end
 
-function onUnload()
-    windower.send_command('unalias ffocolor')
-end
-
 function commands(...)
     local args = {...}
     if args[1] ~= nil then
         comm = args[1]:lower()
         if comm == 'help' then
-            notice('You have access to the following commands:')
-            notice(' 1. ffocolor chattab <say/shout/linkshell/party/tell> --Changes the chattab')
-            notice(' 2. ffocolor chatcolor <color#> --Changes the highlight color')
-            notice(' 3. ffocolor getcolors -- Show a list of color codes.')
-            notice(' 4. ffocolor help --Shows this menu.')
+            local helptext = [[FFOColor - Command List:
+ 1. ffocolor chattab <say/shout/linkshell/party/tell> --Changes the chattab.
+ 2. ffocolor chatcolor <color#> --Changes the highlight color.
+ 3. ffocolor getcolors -- Show a list of color codes.
+ 4. ffocolor help --Shows this menu.]]
+            for _, line in ipairs(helptext:split('\n')) do
+                windower.add_to_chat(207, line..chat.colorcontrols.reset)
+                sleep(10)
+            end
         elseif S{'chattab','chatcolor'}:contains(comm) then
             if comm == 'chatcolor' then
                 settings.chatColor = tonumber(args[2])
@@ -96,12 +97,12 @@ function commands(...)
                     counter = counter + 1
                 end
                 if counter == 16 or n == 509 then
-                    notice(line)
+                    log(line)
+                    sleep(10)
                     counter = 0
                     line = ''
                 end
             end
-            notice('Colors Tested!')
         else
             return
         end
@@ -131,6 +132,5 @@ end
 
 windower.register_event('load', onLoad)
 windower.register_event('login', onLogin)
-windower.register_event('unload', onUnload)
 windower.register_event('addon command', commands)
 windower.register_event('incoming text', incText)

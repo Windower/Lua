@@ -28,8 +28,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon = {}
 _addon.name = 'AEcho'
-_addon.version = '2.01'
+_addon.version = '2.02'
 _addon.author = 'Nitrous (Shiva)'
+_addon.command = 'aecho'
 
 require 'tablehelper'
 require 'stringhelper'
@@ -53,7 +54,6 @@ function initialize()
 end
 
 function onLoad()
-    windower.send_command('alias aecho lua c aecho')
     if windower.get_ffxi_info()['logged_in'] then
         initialize()
     end
@@ -61,10 +61,6 @@ end
 
 function onLogin()
     initialize()
-end
-
-function onUnload()
-    windower.send_command('unalias aecho')
 end
 
 function gainStatus(name,id)
@@ -95,13 +91,17 @@ function commands(...)
     if args[1] ~= nil then
         local comm = args[1]:lower()
         if comm == 'help' then
-            notice('You have access to the following commands:')
-            notice(' 1. aecho watch <buffname> --adds buffname to the tracker')
-            notice(' 2. aecho unwatch <buffname> --removes buffname from the tracker')
-            notice(' 3. aecho trackalt --Toggles alt buff/debuff messages on main (this requires send addon)')
-            notice(' 4. aecho sitrack --When sneak/invis begin wearing passes this message to your alts')
-            notice(' 5. aecho list --lists buffs being tracked')
-            notice(' 6. aecho toggle --Toggles off automatic echo drop usage (in case you need this off. does not remain off across loads.)')
+            local helptext = [[AEcho - Command List:
+ 1. aecho watch <buffname> --adds buffname to the tracker
+ 2. aecho unwatch <buffname> --removes buffname from the tracker
+ 3. aecho trackalt --Toggles alt buff/debuff messages on main (this requires send addon)
+ 4. aecho sitrack --When sneak/invis begin wearing passes this message to your alts
+ 5. aecho list --lists buffs being tracked
+ 6. aecho toggle --Toggles off automatic echo drop usage (in case you need this off. does not remain off across loads.)]]
+            for _, line in ipairs(helptext:split('\n')) do
+                windower.add_to_chat(207, line..chat.colorcontrols.reset)
+                sleep(10)
+            end
         elseif S{'watch','trackalt','unwatch','sitrack'}:contains(comm) then
             local list = ''
             local spacer = ''
@@ -140,7 +140,6 @@ function commands(...)
 end
 
 windower.register_event('load', onLoad)
-windower.register_event('unload', onUnload)
 windower.register_event('login', onLogin)
 windower.register_event('gain status', gainStatus)
 windower.register_event('incoming text', incText)
