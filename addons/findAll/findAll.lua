@@ -150,7 +150,8 @@ function search(query, export)
     end
 
     log('Searching: '..query:concat(' '))
-
+    sleep(10)
+    
     local no_results   = true
     local sorted_names = global_storages:keyset():sort()
                                                  :reverse()
@@ -208,6 +209,7 @@ function search(query, export)
 
                     for _, result in ipairs(results) do
                         log(result)
+                        sleep(10)
                     end
                 end
             end
