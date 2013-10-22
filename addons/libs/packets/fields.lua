@@ -363,7 +363,7 @@ fields.incoming[0x00D] = L{
     {ctype='unsigned char',     label='Linkshell Red'},                         --   36 -  36
     {ctype='unsigned char',     label='Linkshell Green'},                       --   37 -  37
     {ctype='unsigned char',     label='Linkshell Blue'},                        --   38 -  38
-    {ctype='unsigned char',     label='_unknown3'},                             --   39 -  42
+    {ctype='unsigned int',      label='_unknown3'},                             --   39 -  42
     {ctype='unsigned int',      label='_unknown4'},                             --   43 -  46 -- Flags again
     {ctype='unsigned int',      label='_unknown5'},                             --   47 -  50
     {ctype='unsigned int',      label='_unknown6'},                             --   51 -  54 -- DSP notes that the 6th bit of byte 54 is the Ballista flag
