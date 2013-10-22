@@ -125,7 +125,13 @@ function parse(settings)
             meta.original[char] = table.update(table.copy(settings), parsed[char], true)
         end
 
-        return settings:update(parsed.global:update(parsed[get_player()['name']:lower()], true), true)
+        local full_parsed = parsed.global
+
+        if windower.get_ffxi_info().logged_in then
+            full_parsed = full_parsed:update(parsed[windower.ffxi.get_player()['name']:lower()], true)
+        end
+
+        return settings:update(full_parsed, true)
     end
 
     -- Update the global settings with the per-player defined settings, if they exist. Save the parsed value for later comparison.
@@ -136,7 +142,13 @@ function parse(settings)
         meta.original[char] = table_diff(meta.original.global, meta.original[char]) or T{}
     end
 
-    return merge(settings, parsed.global:update(parsed[get_player()['name']:lower()], true))
+    local full_parsed = parsed.global
+
+    if windower.get_ffxi_info().logged_in then
+        full_parsed = full_parsed:update(parsed[windower.ffxi.get_player().name:lower()], true)
+    end
+
+    return merge(settings, full_parsed)
 end
 
 -- Merges two tables like update would, but retains type-information and tries to work around conflicts.
@@ -290,7 +302,11 @@ end
 -- Writes the passed config table to the spcified file name.
 -- char defaults to get_player()['name']. Set to "all" to apply to all characters.
 function config.save(t, char)
-    char = (char or get_player()['name']):lower()
+    if not windower.get_ffxi_info().logged_in then
+        return
+    end
+
+    char = (char or windower.ffxi.get_player()['name']):lower()
     meta = settings_map[t]
 
     if char == 'all' then
