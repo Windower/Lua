@@ -76,7 +76,9 @@ str = str..'\nDark:     \\cs(${colDark|255,255,255})${Dark|0}\\cr - ${timeDark|0
 
 Burden_tb = texts.new(str,settings)
 
-function actions(act)
+
+
+windower.register_event("action", function(act)
     if mjob_id == 18 then
         local abil_ID = act['param']
         local actor_id = act['actor_id']
@@ -137,7 +139,7 @@ function actions(act)
         end
         
     end
-end
+end)
 
 function heatupdate(element, maneuver)
     if mjob_id == 18 then
@@ -328,7 +330,7 @@ function text_update_loop(str)
     end
 end
 
-function statGain(name,id)
+windower.register_event("gain status", function(name,id)
     if mjob_id == 18 then
         if id == 305 then 
             decay = get_decay()
@@ -337,9 +339,9 @@ function statGain(name,id)
             windower.send_command('@timers c Overloaded! '..heat[lastMan]-threshold..' down')
         end
     end
-end
+end)
 
-function statLoss(name,id)
+windower.register_event("lose status",function(name,id)
     if mjob_id == 18 then
         if id == 305 then 
             decay = get_decay()
@@ -348,7 +350,7 @@ function statLoss(name,id)
             windower.send_command('@timers d Overloaded!')
         end
     end
-end
+end)
 
 function timer_start(ele)
     if mjob_id == 18 then
@@ -356,13 +358,13 @@ function timer_start(ele)
     end
 end
 
-function jobChange(mj, mjid, mjl, sj, sjid, sjl)
+windower.register_event('job change', function(mj, mjid, mjl, sj, sjid, sjl)
     mjob_id = mjid
     if mjob_id ~= 18 or petlessZones:contains(windower.get_ffxi_info()['zone_id']) then 
         Burden_tb:hide()
         text_update_loop('stop')
     end
-end
+end)
 
 function zero_all()
     for key,val in pairs(heat) do
@@ -374,7 +376,7 @@ function zero_all()
     end
 end
 
-function zoneChange(fr, fid, to, tid)
+windower.register_event("zone change",function(fr, fid, to, tid)
     if mjob_id == 18 then
         if petlessZones:contains(tid) then 
             text_update_loop('stop')
@@ -388,10 +390,10 @@ function zoneChange(fr, fid, to, tid)
             end
         end
     end
-end
+end)
     
-function timeChange(...)
+windower.register_event("time change",function(...)
     if mjob_id == 18 then
         decay = get_decay()
     end
-end
+end)
