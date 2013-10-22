@@ -53,17 +53,17 @@ function initialize()
     autoecho = true
 end
 
-function onLoad()
+windower.register_event('load', function()
     if windower.get_ffxi_info()['logged_in'] then
         initialize()
     end
-end
+end)
 
-function onLogin()
+windower.register_event('login', function()
     initialize()
-end
+end)
 
-function gainStatus(name,id)
+windower.register_event('gain status', function(name,id)
     for key,val in pairs(settings.buffs) do
         if key:lower() == name:lower() then
             if name:lower() == 'silence' and autoecho then
@@ -74,9 +74,9 @@ function gainStatus(name,id)
             end
         end
     end
-end
+end)
 
-function incText(old,new,color)
+windower.register_event('incoming text', function(old,new,color)
     if settings.sitrack then
         local sta,ea,txt = string.find(new,'The effect of ([%w]+) is about to wear off.')
         if sta ~= nil then 
@@ -84,9 +84,9 @@ function incText(old,new,color)
         end
     end
     return new,color
-end
+end)
 
-function commands(...)
+windower.register_event('addon command', function(...)
     local args = {...}
     if args[1] ~= nil then
         local comm = args[1]:lower()
@@ -137,10 +137,4 @@ function commands(...)
             return
         end
     end
-end
-
-windower.register_event('load', onLoad)
-windower.register_event('login', onLogin)
-windower.register_event('gain status', gainStatus)
-windower.register_event('incoming text', incText)
-windower.register_event('addon command', commands)
+end)
