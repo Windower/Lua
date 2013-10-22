@@ -35,7 +35,7 @@ require 'sets'
 
 _addon = {}
 _addon.name    = 'findAll'
-_addon.name    = 'Zohno'
+_addon.author    = 'Zohno'
 _addon.version = '1.20131021'
 _addon.command = 'findAll'
 
