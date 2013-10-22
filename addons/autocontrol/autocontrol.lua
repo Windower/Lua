@@ -289,7 +289,7 @@ function commands(...)
         elseif comm == 'settings' then 
             log('BG: R: '..settings.bg.red..' G: '..settings.bg.green..' B: '..settings.bg.blue)
             log('Font: '..settings.text.font..' Size: '..settings.text.size)
-            log('Test: R: '..settings.text.red..' G: '..settings.text.green..' B: '..settings.text.blue)
+            log('Text: R: '..settings.text.red..' G: '..settings.text.green..' B: '..settings.text.blue)
             log('Position: X: '..settings.pos.x..' Y: '..settings.pos.y)
         else
             local helptext = [[Autosets command list:
