@@ -56,24 +56,24 @@ function initialize()
     get_current_spellset()
 end
 
-function onLoad()
+windower.register_event('load', function()
     speFile = files.new('data/bluespells.xml')
     spells = T{}
     spells = parse_resources(speFile:readlines())
     settings = config.load(defaults)
     notice('Version '.._addon.version..' Loaded. Type //aset help for list of commands.')
     initialize()
-end
+end)
 
-function onLogin()
+windower.register_event('login', function()
     initialize()
-end
+end)
 
-function jobChange(mj, mjob_id, mjob_lvl, sj, sjob_id, sjob_lvl)
+windower.register_event('job change', function(mj, mjob_id, mjob_lvl, sj, sjob_id, sjob_lvl)
     if mjob_id == 16 then
         initialize()
     end
-end
+end)
 
 function set_spells(spellset)
     if windower.ffxi.get_player()['main_job_id'] ~= 16 --[[and get_player()['sub_job_id'] ~= 16]] then return nil end
@@ -192,7 +192,7 @@ function get_spellset_content(spellset)
     settings.spellsets[spellset]:print()
 end
 
-function commands(...)
+windower.register_event('addon command', function(...)
     if get_player()['main_job_id'] ~= 16 --[[and get_player()['sub_job_id'] ~= 16]] then
         error('You are not on (main) Blue Mage.')
         return nil 
@@ -241,7 +241,7 @@ function commands(...)
             end
         end
     end
-end
+end)
 
 function parse_resources(lines_file)
     local completed_table = T{}
@@ -274,8 +274,3 @@ function parse_resources(lines_file)
     end
     return completed_table
 end
-
-windower.register_event('addon command', commands)
-windower.register_event('load', onLoad)
-windower.register_event('login', onLogin)
-windower.register_event('job change', jobChange)
