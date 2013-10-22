@@ -50,17 +50,17 @@ function initialize()
     chatColors = T{say=1,shout=2,tell=4,party=5,linkshell=6,none=settings.chatColor}
 end
 
-function onLoad()
+windower.register_event('load', function()
     if windower.get_ffxi_info()['logged_in'] then
         initialize()
     end
-end
+end)
 
-function onLogin()
+windower.register_event('login', function()
     initialize()
-end
+end)
 
-function commands(...)
+windower.register_event('addon command', function(...)
     local args = {...}
     if args[1] ~= nil then
         comm = args[1]:lower()
@@ -107,9 +107,9 @@ function commands(...)
             return
         end
     end
-end
+end)
 
-function incText(old,new,color)
+windower.register_event('incoming text', function(old,new,color)
     local sta,ea,txt = string.find(new,'([^%w]*%[%d+:#[%w_]+%].-:)')
     local stb = string.find(new,'[^%w]*%[%d+:#%w+%]') or string.find(new,'^[^%w]*%[FFOChat%]')
     if sta ~= nil then
@@ -128,9 +128,4 @@ function incText(old,new,color)
         new = restring
     end
     return new,color
-end
-
-windower.register_event('load', onLoad)
-windower.register_event('login', onLogin)
-windower.register_event('addon command', commands)
-windower.register_event('incoming text', incText)
+end)
