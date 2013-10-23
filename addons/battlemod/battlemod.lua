@@ -193,7 +193,7 @@ windower.register_event('addon command',function (...)
 end)
 
 -- Invoked Functions
-function flip(str)
+function flip_it(str)
 	_G[str] = not _G[str]
 end
 
@@ -242,7 +242,7 @@ windower.register_event('incoming text',function(original,modified,color)
 		a,z = string.find(original,'Equipment changed')
 		
 		if a and not block_equip then
-			send_command('@wait 1;lua i battlemod flip block_equip')
+			send_command('@wait 1;lua i battlemod flip_it block_equip')
 			block_equip = true
 		elseif a and block_equip then
 			modified = ''
@@ -253,7 +253,7 @@ windower.register_event('incoming text',function(original,modified,color)
 		c,z = string.find(original,'You must close the currently open window to use that command')
 		
 		if (a or b or c) and not block_cannot then
-			send_command('@wait 1;lua i battlemod flip block_cannot')
+			send_command('@wait 1;lua i battlemod flip_it block_cannot')
 			block_cannot = true
 		elseif (a or b or c) and block_cannot then
 			modified = ''

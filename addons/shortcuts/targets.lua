@@ -42,7 +42,7 @@ function valid_target(targ,flag)
 	-- If the target is whitelisted, pass it through.
 	if pass_through_targs:contains(targ) then
 		return targ
-	elseif targ then
+	elseif targ and get_player() then
 	-- If the target exists, scan the mob array for it
 		local mob_array = get_mob_array()
 		local current_target = get_mob_by_index(get_player()['target_index']) --get_ffxi_info()['target'] --get_mob_by_target('<t>') -- Temp fix until Arcon fixes get_mob_by_target
