@@ -98,7 +98,7 @@ function make_timestamp(format)
     return os.date((format:gsub('%${([%l%d_]+)}', constants)))
 end
 
-windower.register_event('incoming text', function(original, modified, mode)
+windower.register_event('incoming text', function(original, modified, mode, newmode)
     if modified ~= '' and not modified:find('^[%s]+$') then
         if mode == 144 then -- 144 works as 150 but the enter prompts are ignored.
             mode     = 150
@@ -119,7 +119,7 @@ windower.register_event('incoming text', function(original, modified, mode)
         end
     end
 
-    return modified, mode
+    return modified, newmode
 end)
 
 windower.register_event('addon command', function(...)
