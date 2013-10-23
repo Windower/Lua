@@ -30,7 +30,8 @@ require 'tablehelper'
 xml = require 'xml'
 
 _addon = {}
-_addon.version = '0.5'
+_addon.version = '0.6'
+_addon.author = 'Byrth'
 _addon.name = 'plugin_manager'
 _addon.commands = {}
 
@@ -167,9 +168,12 @@ function make_name(name)
 	if name then
 		name = name:lower()
 	else
-		name = get_player()['name']:lower()
-		if name == nil or name == '' or not loader_array[name] then
-			name = 'global'
+		local play = get_player()
+		if play then
+			name = get_player()['name']:lower()
+			if name == nil or name == '' or not loader_array[name] then
+				name = 'global'
+			end
 		end
 	end
 	return name or 'global'
