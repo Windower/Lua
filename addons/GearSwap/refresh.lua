@@ -155,6 +155,7 @@ function refresh_player()
 	player.job = player.main_job..'/'..player.sub_job
 	
 	local player_mob_table = get_mob_by_index(player['index'])
+	if not player_mob_table then return end
 	
 	if player_mob_table['race']~= nil then player.race = mob_table_races[player_mob_table['race']] end
 	
