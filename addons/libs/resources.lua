@@ -89,13 +89,14 @@ end
 -- Returns the abilities, indexed by ingame ID.
 function fns.abilities()
     local file = _libs.filehelper.read(plugin_resources..'abils.xml')
-    local match_string = '<a id="(%d-)" index="(%d-)" prefix="([^"]-)" english="([^"]-)" german="([^"]-)" french="([^"]-)" japanese="([^"]-)" type="([^"]-)" element="([^"]-)" targets="([^"]-)" skill="([^"]-)" mpcost="(%-?%d-)" tpcost="(%d-)" casttime="(%d-)" recast="(%d-)" alias="([^"]-)" />'
+    local match_string = '<a id="(%-?%d-)" index="(%d-)" prefix="([^"]-)" english="([^"]-)" german="([^"]-)" french="([^"]-)" japanese="([^"]-)" type="([^"]-)" element="([^"]-)" targets="([^"]-)" skill="([^"]-)" mpcost="(%-?%d-)" tpcost="(%-?%d-)" casttime="(%d-)" recast="(%d-)" alias="([^"]-)" />'
     local res = T{}
     for id, index, prefix, english, german, french, japanese, type, element, targets, skill, mp_cost, tp_cost, cast_time, recast, alias in file:gmatch(match_string) do
         id = tonumber(id)
         res[id] = {
             id = id,
             index = tonumber(index),
+            prefix = prefix,
             english = english,
             german = german,
             french = french,
@@ -112,7 +113,6 @@ function fns.abilities()
         }
         res[id].name = res[id][language_string]
     end
-
     resources.abilities = res
 end
 
@@ -126,6 +126,7 @@ function fns.spells()
         res[index] = {
             id = tonumber(id),
             index = index,
+            prefix = prefix,
             english = english,
             german = german,
             french = french,
