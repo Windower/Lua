@@ -78,7 +78,7 @@ windower.register_event('load',function()
 	
 	send_command(firstrun)
 
-	if not get_player() then
+	if get_player() then
 		send_command('@wait 3;lua c plugin_manager unload')
 		send_command('@wait 6;lua c plugin_manager load')
 	end
@@ -167,13 +167,10 @@ end)
 function make_name(name)
 	if name then
 		name = name:lower()
-	else
-		local play = get_player()
-		if play then
-			name = get_player()['name']:lower()
-			if name == nil or name == '' or not loader_array[name] then
-				name = 'global'
-			end
+	elseif get_player() then
+		name = get_player()['name']:lower()
+		if name == nil or name == '' or not loader_array[name] then
+			name = 'global'
 		end
 	end
 	return name or 'global'
