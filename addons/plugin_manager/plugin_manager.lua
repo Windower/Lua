@@ -30,7 +30,8 @@ require 'tablehelper'
 xml = require 'xml'
 
 _addon = {}
-_addon.version = '0.5'
+_addon.version = '0.6'
+_addon.author = 'Byrth'
 _addon.name = 'plugin_manager'
 _addon.commands = {}
 
@@ -77,7 +78,7 @@ windower.register_event('load',function()
 	
 	send_command(firstrun)
 
-	if not get_player() then
+	if get_player() then
 		send_command('@wait 3;lua c plugin_manager unload')
 		send_command('@wait 6;lua c plugin_manager load')
 	end
@@ -166,7 +167,7 @@ end)
 function make_name(name)
 	if name then
 		name = name:lower()
-	else
+	elseif get_player() then
 		name = get_player()['name']:lower()
 		if name == nil or name == '' or not loader_array[name] then
 			name = 'global'
