@@ -98,28 +98,27 @@ function make_timestamp(format)
     return os.date((format:gsub('%${([%l%d_]+)}', constants)))
 end
 
-windower.register_event('incoming text', function(original, modified, mode)
+windower.register_event('incoming text', function(original, modified, mode, newmode)
     if modified ~= '' and not modified:find('^[%s]+$') then
-        if mode == 144 then -- 144 works as 150 but the enter prompts are ignored.
-            mode     = 150
+        if (mode == 144 or newmode == 144) then -- 144 works as 150 but the enter prompts are ignored.
+            newmode  = 150
             modified = modified:gsub(string.char(0x7f, 0x31)..'$', '')
         end
 
-        if mode == 150 then -- 150 automatically indents new lines. 151 works the same way but with no indentation. redirect to 151 and manually add the ideographic space.
-            mode     = 151
+        if (mode == 150 or newmode == 150) then -- 150 automatically indents new lines. 151 works the same way but with no indentation. redirect to 151 and manually add the ideographic space.
+            newmode  = 151
             modified = modified:gsub('([^'..lead_bytes_pattern..'])['..string.char(0x07)..'\n]', '%1\n'..string.char(0x81, 0x40))
         end
 
-        if mode ~= 151 then
+        if (mode ~= 151 and newmode ~= 151) then
             local timeString = make_timestamp(settings.format):color(settings.color)..' '
-
             modified = timeString..modified:gsub('^['..string.char(0x07)..'\n]+', '')
                                            :gsub('([^'..lead_bytes_pattern..'])['..string.char(0x07)..'\n]+$', '%1')
                                            :gsub('([^'..lead_bytes_pattern..'])['..string.char(0x07)..'\n]', '%1\n'..timeString)
         end
     end
 
-    return modified, mode
+    return modified, newmode
 end)
 
 windower.register_event('addon command', function(...)

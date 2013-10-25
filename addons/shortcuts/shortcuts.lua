@@ -57,7 +57,6 @@ _addon.commands = {'shortcuts'}
 windower.register_event('load',function()
 	counter = 0
 	lastsent = ''
-	collectgarbage()
 end)
 
 -----------------------------------------------------------------------------------
@@ -261,7 +260,7 @@ function interp_text(splitline,offset,modified)
 			end
 		end
 		
-		lastsent = r_line['prefix']..' "'..r_line['english']..'" '..(temptarg or target_make(targets))
+		lastsent = r_line.prefix..' "'..r_line['english']..'" '..(temptarg or target_make(targets))
 		if debugging then add_to_chat(8,tostring(counter)..' input '..lastsent) end
 		if logging then
 			logfile:write('\n\n',tostring(os.clock()),'Original: ',table.concat(splitline,' '),'\n(180) ',lastsent)

@@ -28,8 +28,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon = {}
 _addon.name = 'OhShi'
-_addon.version = '2.51'
+_addon.version = '2.52'
 _addon.author = 'Nitrous (Shiva)'
+_addon.command = 'ohshi'
 
 --Requiring libraries used in this addon
 --These should be saved in addons/libs
@@ -40,32 +41,27 @@ require 'sets'
 config = require 'config'
 files = require 'filehelper'
 chat = require 'chat'
+texts = require 'texts'
 require 'default_settings'
 require 'text_handling'
 require 'helper_functions'
+
 --This function is called when the addon loads. Defines aliases and 
 --registers functions, as well as filling the resource tables.
-function onLoad()
+windower.register_event('load',function()
     notice('Version '.._addon.version..' Loaded. Type //ohshi help for list of commands.')
     spells = parse_resources(speFile:readlines())
     stats = parse_resources(staFile:readlines())
     jAbils = parse_resources(jaFile:readlines())
     mAbils = parse_resources(maFile:readlines())
-    windower.send_command('alias ohshi lua c ohshi')
-    initText()
-end
+    windower.send_command('@lua i ohshi initText')
+end)
 
 --Used when the addon is unloaded to save settings.
-function onUnload()
+windower.register_event('unload',function()
     settings:update(ohShi_tb._settings)
-    settings.bg.alpha = nil
-    settings.padding = nil
-    settings.text.alpha = nil
-    settings.text.content = nil
-    settings.visible = nil
-    windower.send_command('unalias ohshi')
     settings:save('all')
-end
+end)
 
 function saveSettings()
     addText('OhShi Settings Updated')
@@ -74,7 +70,7 @@ end
 
 --This function is used to process addon commands
 --like //ohshi help and the like.
-function commands(...)
+windower.register_event('addon command', function(...)
     local args = T{...}
     if args ~= nil then
         local comm = table.remove(args,1):lower()
@@ -163,9 +159,13 @@ function commands(...)
                 settings:save('all')
             elseif comm == 'settings' then 
                 windower.add_to_chat(207,'OhShi - Current Textbox Settings')
+                sleep(10)
                 windower.add_to_chat(207,'  BG:   R: '..settings.bg.red..'  G: '..settings.bg.green..'  B: '..settings.bg.blue)
+                sleep(10)
                 windower.add_to_chat(207,'  Font: '..settings.text.font..'  Size: '..settings.text.size)
+                sleep(10)
                 windower.add_to_chat(207,'  Text: R: '..settings.text.red..'  G: '..settings.text.green..'  B: '..settings.text.blue)
+                sleep(10)
                 windower.add_to_chat(207,'  Pos:  X: '..settings.pos.x..'  Y: '..settings.pos.y)
             end
         else
@@ -184,13 +184,14 @@ function commands(...)
     show/hide - toggles visibility of the tracker so you can make changes.]]
             for _, line in ipairs(helptext:split('\n')) do
                 windower.add_to_chat(207, line..chat.colorcontrols.reset)
+                sleep(10)
             end
         end
     end
-end
+end)
 
 --This event happens when an action packet is received.
-function getAct(act)
+windower.register_event('action', function(act)
     local curact = T(act)
     local actor = T{}
     actor.id = curact.actor_id
@@ -226,10 +227,10 @@ function getAct(act)
             end
         end
     end
-end
+end)
 
 --Catches statuses wearing on mobs you applied them to
-function statuswore(actor_id, target_id, actor_index, target_index, message_id, param_1, param_2, param_3)
+windower.register_event('action message',function(actor_id, target_id, actor_index, target_index, message_id, param_1, param_2, param_3)
     if not settings.staggeronly then
         local actor = T(windower.ffxi.get_mob_by_id(actor_id))
         local player = T(windower.ffxi.get_player())
@@ -248,10 +249,10 @@ function statuswore(actor_id, target_id, actor_index, target_index, message_id, 
             end
         end
     end
-end
+end)
 
 --This event happens whenever text is incoming to the chatlog
-function getIncText(old,new,color)
+windower.register_event('incoming text', function(old,new,color)
     if string.find(old,'(%w+)\'s attack devastates the fiend%p') then
         addText('devastates',string.find(old,'(%w+)\'s attack devastates the fiend%p'))
     elseif string.find(old,'Blue: (%d+)%% / Red: (%d+)%%') then
@@ -264,11 +265,4 @@ function getIncText(old,new,color)
         addText('vulnerable',string.find(old,'The fiend appears(.*)vulnerable to ([%w%s]+)!'))
     end
     return new,color
-end
-
-windower.register_event('load',onLoad)
-windower.register_event('unload',onUnload)
-windower.register_event('action', getAct)
-windower.register_event('action message',statuswore)
-windower.register_event('addon command',commands)
-windower.register_event('incoming text',getIncText)
+end)
