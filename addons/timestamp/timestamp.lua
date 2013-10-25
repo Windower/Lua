@@ -100,7 +100,6 @@ end
 
 windower.register_event('incoming text', function(original, modified, mode, newmode)
     if modified ~= '' and not modified:find('^[%s]+$') then
-        print(mode,newmode)
         if (mode == 144 or newmode == 144) then -- 144 works as 150 but the enter prompts are ignored.
             newmode  = 150
             modified = modified:gsub(string.char(0x7f, 0x31)..'$', '')
@@ -108,7 +107,6 @@ windower.register_event('incoming text', function(original, modified, mode, newm
 
         if (mode == 150 or newmode == 150) then -- 150 automatically indents new lines. 151 works the same way but with no indentation. redirect to 151 and manually add the ideographic space.
             newmode  = 151
-            print('hit')
             modified = modified:gsub('([^'..lead_bytes_pattern..'])['..string.char(0x07)..'\n]', '%1\n'..string.char(0x81, 0x40))
         end
 
