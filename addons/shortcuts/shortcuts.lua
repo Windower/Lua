@@ -41,8 +41,9 @@ require 'ambiguous_names'
 require 'targets'
 
 _addon = {}
-_addon.version = '1.0'
+_addon.version = '1.1'
 _addon.name = 'Shortcuts'
+_addon.author = 'Byrth'
 _addon.commands = {'shortcuts'}
 
 -----------------------------------------------------------------------------------
