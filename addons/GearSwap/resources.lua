@@ -153,6 +153,8 @@ avatar_element = {Ifrit='Fire',Titan='Earth',Leviathan='Water',Garuda='Wind',Shi
 	Diabolos='Dark',Fenrir='Dark',['Fire Elemental']='Fire',['Earth Elemental']='Earth',['Water Elemental']='Water',
 	['Wind Elemental']='Wind',['Ice Elemental']='Ice',['Lightning Elemental']='Thunder',['Light Elemental']='Light',
 	['Dark Elemental']='Dark'}
+encumbrance_map = {0x79,0x7F,0x7F,0x7A,0x7B,0x7C,0x7D,0x7D,0x7A,0x7E,0x80,0x80,0x80,0x80,0x7E}
+encumbrance_map[0] = 0x79 -- Slots mapped onto encumbrance byte values.
 
 -- _globals --
 user_data_table = {
@@ -176,6 +178,7 @@ _global.show_swaps = false
 gearswap_disabled = false
 midaction = false
 sent_out_equip = T{}
+not_sent_out_equip = T{}
 equip_list = {}
 lastbyte = 0x0000
 action_sent = false
@@ -190,6 +193,7 @@ st_flag = false
 current_job_file = nil
 disable_table = {false,false,false,false,false,false,false,false,false,false,false,false,false,false,false}
 disable_table[0] = false
+encumbrance_table = table.reassign({},disable_table)
 registered_user_events = {}
 
 

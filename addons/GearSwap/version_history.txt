@@ -1,4 +1,6 @@
 -------------------------------------------------
+Gearswap 0.707 - Forced the "sets" export to convert all equipment to inventory names. Started to add encumbrance code. Added a check for debuffs that prevent ability/spell usage in outgoing_chunk to reset midact.
+-------------------------------------------------
 Gearswap 0.706 - Added a "sets" option to the export command.
 -------------------------------------------------
 Gearswap 0.705 - Likely eliminated the Line 71 and 324 errors. Changed the "disable" console command so that it can be used for individual slots or all of gearswap.
