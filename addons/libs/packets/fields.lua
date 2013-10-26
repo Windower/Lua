@@ -494,6 +494,29 @@ fields.incoming[0x01F] = L{
     {ctype='unsigned char',     label='_unknown6'},                             --   15 -  15
 }
 
+-- Count to 80
+fields.incoming[0x026] = L{
+    {ctype='unsigned char',     label='_unknown1',          const=0x00},        --    4 -   4
+    {ctype='unsigned char',     label='Counter'},                               --    5 -   5   Varies sequentially between 0x01 and 0x50
+    {ctype='char[22]',          label='_unknown2',          const=0},           --    6 -  27
+}
+
+-- Encumbrance Release
+fields.incoming[0x027] = L{
+    {ctype='unsigned int',      label='Player ID',          fn=id},             --    4 -   7
+    {ctype='unsigned short',    label='Player index',       fn=index},          --    8 -   9
+    {ctype='unsigned char',     label='Slot or Stat ID'},                       --   10 -  10  -- 85 = DEX Down, 87 = AGI Down, 8A = CHR Down, 8B = HP Down, 7A = Head/Neck restriction, 7D = Leg/Foot Restriction
+    {ctype='unsigned char',     label='_unknown1'},                             --   11 -  11  -- 9C
+    {ctype='unsigned int',      label='_unknown2'},                             --   12 -  15  -- 04 00 00 00
+    {ctype='unsigned int',      label='_unknown3'},                             --   16 -  19  -- B6 E3 39 00
+    {ctype='unsigned char',     label='_unknown4'},                             --   20 -  20  -- 01 or 04?
+    {ctype='char[11]',          label='_unknown5'},                             --   21 -  31
+    {ctype='char[16]',          label='Player name'},                           --   32 - 47
+    {ctype='char[16]',          label='_unknown6'},                             --   48 - 63
+    {ctype='char[16]',          label='Player name'},                           --   64 - 79
+    {ctype='char[32]',          label='_unknown7'},                             --   80 - 111
+}
+
 -- Item Assign
 fields.incoming[0x02A] = L{
     {ctype='unsigned int',      label='Player ID',          fn=id},             --    4 -   7
@@ -504,13 +527,6 @@ fields.incoming[0x02A] = L{
     {ctype='unsigned short',    label='Player Index',       fn=index},          --   24 -  25
     {ctype='unsigned short',    label='Message ID'},                            --   26 -  27   The high bit is occasionally set, though the reason for it is unclear.
     {ctype='unsigned int',      label='_unknown1',          const=0x06000000},  --   28 -  31
-}
-
--- Count to 80
-fields.incoming[0x026] = L{
-    {ctype='unsigned char',     label='_unknown1',          const=0x00},        --    4 -   4
-    {ctype='unsigned char',     label='Counter'},                               --    5 -   5   Varies sequentially between 0x01 and 0x50
-    {ctype='char[22]',          label='_unknown2',          const=0},           --    6 -  27
 }
 
 -- Synth Animation
