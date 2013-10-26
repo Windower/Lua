@@ -141,7 +141,6 @@ function sender()
 		if debugging >= 1 then add_to_chat(123,'GearSwap: Had to force the command to send.') end
 		send_check(true)
 	end
-	action_sent = false
 end
 
 windower.register_event('outgoing text',function(original,modified)
@@ -164,7 +163,6 @@ windower.register_event('outgoing text',function(original,modified)
 		return _raw.table.concat(splitline,' ',2,#splitline)
 	elseif command_list[command] and temptarg and validabils[language][abil] and not midaction then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) temp_mod: '..temp_mod) end
-		send_command('@wait 1;lua invoke gearswap sender')
 		
 		local r_line, s_type
 			
@@ -198,7 +196,6 @@ windower.register_event('outgoing text',function(original,modified)
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) temp_mod: '..temp_mod) end
 
 		rline = ranged_line
-		send_command('@wait 1;lua invoke gearswap sender')
 		
 		_global.storedtarget = temptarg
 		
@@ -300,9 +297,10 @@ windower.register_event('outgoing chunk',function(id,data)
 		if logging then logit(logfile,'\n\nActor: '..tostring(actor_name)..'  Target: '..tostring(target_name)..'  Category: '..tostring(category)..'  param: '..tostring(abil_name or param)) end
 		if abil_name and not (buffactive.terror or buffactive.sleep or buffactive.stun or buffactive.petrification or buffactive.charm) then
 			midaction = true
-			send_command('@wait 1;lua i gearswap midact')
+			action_sent = false
 		else
 			midaction = false
+			action_sent = false
 		end
 	end
 end)
