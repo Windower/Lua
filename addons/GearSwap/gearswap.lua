@@ -141,6 +141,8 @@ function sender()
 		if debugging >= 1 then add_to_chat(123,'GearSwap: Had to force the command to send.') end
 		send_check(true)
 	end
+	force_flag = false
+	action_sent = false
 end
 
 windower.register_event('outgoing text',function(original,modified)
@@ -297,10 +299,8 @@ windower.register_event('outgoing chunk',function(id,data)
 		if logging then logit(logfile,'\n\nActor: '..tostring(actor_name)..'  Target: '..tostring(target_name)..'  Category: '..tostring(category)..'  param: '..tostring(abil_name or param)) end
 		if abil_name and not (buffactive.terror or buffactive.sleep or buffactive.stun or buffactive.petrification or buffactive.charm) then
 			midaction = true
-			action_sent = false
 		else
 			midaction = false
-			action_sent = false
 		end
 	end
 end)

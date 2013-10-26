@@ -58,7 +58,10 @@ function equip_sets(swap_type,val1,val2)
 		val1.target = spelltarget
 		if type(user_env.precast) == 'function' then user_env.precast(val1,val2) -- User defined function to determine the precast set
 		elseif user_env.precast then add_to_chat(123,'GearSwap: precast() exists but is not a function') end
-		if _global.verify_equip and not action_sent then send_command('@wait 1;lua invoke gearswap sender')	end
+		if _global.verify_equip and not force_flag then
+			force_flag = true
+			send_command('@wait 1;lua invoke gearswap sender')
+		end
 	elseif swap_type == 'midcast' then
 		val1.target = spelltarget
 		user_env.midcast(val1,val2) -- User defined function to determine the midcast set

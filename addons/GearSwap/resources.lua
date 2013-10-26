@@ -182,6 +182,7 @@ not_sent_out_equip = T{}
 equip_list = {}
 lastbyte = 0x0000
 action_sent = false
+force_flag = false
 world = make_user_table()
 buffactive = make_user_table()
 player = make_user_table()
