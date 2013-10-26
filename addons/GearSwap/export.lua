@@ -13,6 +13,21 @@ function export_set(options)
 		end
 	end
 	
+	local buildmsg = 'GearSwap: Exporting '
+	if targinv then
+		buildmsg = buildmsg..'your current inventory'
+	elseif all_sets then
+		buildmsg = buildmsg..'your current sets table'
+	else
+		buildmsg = buildmsg..'your currently equipped gear'
+	end
+	if xml then
+		buildmsg = buildmsg..' as an xml file.'
+	else
+		buildmsg = buildmsg..' as a lua file.'
+	end
+	add_to_chat(123,buildmsg)
+	
 	if not windower.dir_exists(lua_base_path..'data/export') then
 		windower.create_dir(lua_base_path..'data/export')
 	end
@@ -41,6 +56,7 @@ function export_set(options)
 	elseif all_sets then
 		-- Iterate through user_env.sets and find all the gear.
 		item_list = unpack_names('L1',user_env.sets,{})
+		
 	else
 		-- Default to loading the currently worn gear.
 		local gear = temp_items['equipment']
