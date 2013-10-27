@@ -443,7 +443,7 @@ fields.incoming[0x01B] = L{
     {ctype='unsigned char',     label='NIN Level'},                             --   29 -  29
     {ctype='unsigned char',     label='DRG Level'},                             --   30 -  30
     {ctype='unsigned char',     label='SMN Level'},                             --   31 -  31
-    {ctype='unsigned short',    label='Base STR'},                              --   32 -  33
+    {ctype='unsigned short',    label='Base STR'},                              --   32 -  33  -- Altering these stat values has no impact on your equipment menu.
     {ctype='unsigned short',    label='Base DEX'},                              --   34 -  35
     {ctype='unsigned short',    label='Base VIT'},                              --   36 -  37
     {ctype='unsigned short',    label='Base AGI'},                              --   38 -  39
@@ -478,7 +478,7 @@ fields.incoming[0x01B] = L{
     {ctype='unsigned char',     label='GEO Level'},                             --   93 -  93
     {ctype='unsigned char',     label='RUN Level'},                             --   94 -  94
     {ctype='unsigned char',     label='Current Monster Level'},                 --   95 -  95
-    {ctype='unsigned int',      label='_unknown6'},                             --   96 -  99   Observed value of 00 00 00 00
+    {ctype='unsigned int',      label='Encumbrance Flags'},                     --   96 -  99   [legs, hands, body, head, ammo, range, sub, main,] [back, right_ring, left_ring, right_ear, left_ear, waist, neck, feet] [HP, CHR, MND, INT, AGI, VIT, DEX, STR,] [X X X X X X X MP]
 }
 
 -- Item Assign
@@ -647,6 +647,12 @@ fields.incoming[0x051] = L{
     {ctype='unsigned short',    label='Ranged'},                                --   20 -  21
     {ctype='unsigned short',    label='_unknown1'},                             --   22 -  23   May varying meaningfully, but it's unclear
 }
+
+-- Key Item Log
+--[[fields.incoming[0x055] = L{
+	-- There are 6 of these packets sent on zone, which likely corresponds to the 6 categories of key items.
+	-- FFing these packets between bytes 0x14 and 0x82 gives you access to all (or almost all) key items.
+}]]
 
 -- Weather Change
 fields.incoming[0x057] = L{
