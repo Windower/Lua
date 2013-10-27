@@ -335,7 +335,7 @@
   <addon>
     <author>Cairthenn</author>
     <name>DressUp</name>
-    <description>Enumlates BlinkMeNot functionality. Allows for customization of gear display for you or anyone else.</description>
+    <description>Emulates BlinkMeNot functionality. Allows for customization of gear display for you or anyone else.</description>
     <bugtracker>https://github.com/cairface/Lua/issues</bugtracker>
     <support>http://www.bluegartr.com/members/34070-Cairthenn</support>
   </addon>
