@@ -271,7 +271,7 @@ windower.register_event('incoming chunk',function(id,data)
 end)
 
 windower.register_event('zone change',function(new_zone,new_zone_id,old_zone,old_zone_id)
-	prev_ID = 0
+	midaction = false
 end)
 
 windower.register_event('outgoing chunk',function(id,data)
