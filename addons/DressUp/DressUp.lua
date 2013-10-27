@@ -96,8 +96,9 @@ windower.register_event('incoming chunk',function (id, data)
 		self_Build =  self["Header"]..self["Face"]..self["Race"]..self["Head"]..self["Body"]..self["Hands"]..
 					  self["Legs"]..self["Feet"]..self["Main"]..self["Sub"]..self["Ranged"]..self["unknown"]
 			
-		if settings.blinking["self"]["always"] or settings.blinking["follow"]["always"] 
-		or (settings.blinking["self"]["target"] and (get_player().target_index == get_player().index)) then
+		if settings.blinking["self"]["always"] or settings.blinking["follow"]["always"] or 
+		settings.blinking["all"]["always"] or (settings.blinking["all"]["combat"] and get_player().in_combat) or
+		((settings.blinking["self"]["target"] or settings.blinking["all"]["target"]) and (get_player().target_index == get_player().index)) then
 			if not zone_reset then
 				self_Build = true
 			end
