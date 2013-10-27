@@ -13,6 +13,21 @@ function export_set(options)
 		end
 	end
 	
+	local buildmsg = 'GearSwap: Exporting '
+	if targinv then
+		buildmsg = buildmsg..'your current inventory'
+	elseif all_sets then
+		buildmsg = buildmsg..'your current sets table'
+	else
+		buildmsg = buildmsg..'your currently equipped gear'
+	end
+	if xml then
+		buildmsg = buildmsg..' as an xml file.'
+	else
+		buildmsg = buildmsg..' as a lua file.'
+	end
+	add_to_chat(123,buildmsg)
+	
 	if not windower.dir_exists(lua_base_path..'data/export') then
 		windower.create_dir(lua_base_path..'data/export')
 	end
@@ -41,6 +56,7 @@ function export_set(options)
 	elseif all_sets then
 		-- Iterate through user_env.sets and find all the gear.
 		item_list = unpack_names('L1',user_env.sets,{})
+		
 	else
 		-- Default to loading the currently worn gear.
 		local gear = temp_items['equipment']
@@ -120,12 +136,25 @@ function unpack_names(up,tab_level,unpacked_table)
 		elseif i=='name' then
 			unpacked_table[#unpacked_table+1] = {}
 			unpacked_table[#unpacked_table].slot = up
-			unpacked_table[#unpacked_table].name = v
+			unpacked_table[#unpacked_table].name = unlogify_unpacked_name(v)
 		elseif type(v) == 'string' and v~='augment' and v~= 'augments' then
 			unpacked_table[#unpacked_table+1] = {}
 			unpacked_table[#unpacked_table].slot = i
-			unpacked_table[#unpacked_table].name = v
+			unpacked_table[#unpacked_table].name = unlogify_unpacked_name(v)
 		end
 	end
 	return unpacked_table
+end
+
+function unlogify_unpacked_name(name)
+	for i,v in pairs(r_items) do
+		if type(v) == 'table' then
+			if not v[language..'_log'] then
+				add_to_chat(8,'v = '..tostring(v.english))
+			elseif v[language..'_log']:lower() == name:lower() then
+				return v[language]
+			end
+		end
+	end
+	return name
 end

@@ -169,6 +169,7 @@ function to_roman(num)
 	local retstr = ''
 	
 	if num == 0 then return 'zilch' end
+	if num == 1 then return '' end
 	
 	while num > 0 do
 		if num >= 1000 then

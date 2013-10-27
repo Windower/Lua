@@ -27,7 +27,7 @@
 
 function equip_sets(swap_type,val1,val2)
 	refresh_globals()
-	local cur_equip = items['equipment'] -- i = 'head', 'feet', etc.; v = inventory ID (0~80)
+	local cur_equip = items.equipment -- i = 'head', 'feet', etc.; v = inventory ID (0~80)
 	-- If the swap is not complete, overwrite the current equipment with the equipment that you are swapping to
 	for i,v in pairs(cur_equip) do
 		if sent_out_equip[slot_map[i]] then
@@ -58,6 +58,10 @@ function equip_sets(swap_type,val1,val2)
 		val1.target = spelltarget
 		if type(user_env.precast) == 'function' then user_env.precast(val1,val2) -- User defined function to determine the precast set
 		elseif user_env.precast then add_to_chat(123,'GearSwap: precast() exists but is not a function') end
+		if _global.verify_equip and not force_flag then
+			force_flag = true
+			send_command('@wait 1;lua invoke gearswap sender')
+		end
 	elseif swap_type == 'midcast' then
 		val1.target = spelltarget
 		user_env.midcast(val1,val2) -- User defined function to determine the midcast set
@@ -120,9 +124,11 @@ function equip_sets(swap_type,val1,val2)
 	if failure_reason == '' then
 		for i = 0,15 do
 			--if debugging >= 2 then add_to_chat(8,tostring(v)..' '..tostring(i)..' item: '..tostring(r_items[items['inventory'][v]['id']][language..'_log'])) else
-			if equip_next[i] and not disable_table[i] then
+			if equip_next[i] and not disable_table[i] and not encumbrance_table[i] then
 				set_equip(equip_next[i],i)
 				sent_out_equip[i] = equip_next[i] -- re-make the equip_next table with the name sent_out_equip as the equipment is sent out.
+			elseif equip_next[i] and not disable_table[i] then
+				not_sent_out_equip[i] = equip_next[i]
 			end
 		end
 	elseif logging then
@@ -153,7 +159,6 @@ function to_id_set(inventory,equip_list)
 						end
 						if not ret_list[slot_map[i]] then
 							if r_items[m['id']][language..'_log']:lower() == name:lower() or r_items[m['id']][language]:lower() == name:lower() then
-								-- I need to add the ability to interpret extdata and specify which item based on it at some point.
 								if extgoal[1] then
 									local count = 0
 									for o,q in pairs(extgoal) do

@@ -71,6 +71,7 @@ data.incoming[0x021] = {name='Trade Requested',     description='Sent when someb
 data.incoming[0x022] = {name='Trade Action',        description='Sent whenever something happens with the trade window.'}
 data.incoming[0x025] = {name='Item Accepted',       description='Sent when the server will allow you to trade an item.'}
 data.incoming[0x026] = {name='Count to 80',         description='It counts to 80 and does not have any obvious function. May have something to do with populating inventory.'}
+data.incoming[0x027] = {name='Encumbrance',         description='Occurs when you are released from Encumbrance, although that is unlikely to be its only purpose.'}
 data.incoming[0x028] = {name='Action',              description='Packet sent when an NPC is attacking.'}
 data.incoming[0x029] = {name='Action Message',      description='Packet sent for simple battle-related messages.'}
 data.incoming[0x02A] = {name='Resting Message',     description='Packet sent when you rest in Abyssea.'}

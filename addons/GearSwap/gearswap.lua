@@ -42,7 +42,7 @@ require 'export'
 
 _addon = {}
 _addon.name = 'GearSwap'
-_addon.version = '0.706'
+_addon.version = '0.707'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -141,6 +141,7 @@ function sender()
 		if debugging >= 1 then add_to_chat(123,'GearSwap: Had to force the command to send.') end
 		send_check(true)
 	end
+	force_flag = false
 	action_sent = false
 end
 
@@ -164,7 +165,6 @@ windower.register_event('outgoing text',function(original,modified)
 		return _raw.table.concat(splitline,' ',2,#splitline)
 	elseif command_list[command] and temptarg and validabils[language][abil] and not midaction then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) temp_mod: '..temp_mod) end
-		send_command('@wait 1;lua invoke gearswap sender')
 		
 		local r_line, s_type
 			
@@ -198,7 +198,6 @@ windower.register_event('outgoing text',function(original,modified)
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) temp_mod: '..temp_mod) end
 
 		rline = ranged_line
-		send_command('@wait 1;lua invoke gearswap sender')
 		
 		_global.storedtarget = temptarg
 		
@@ -229,21 +228,39 @@ windower.register_event('incoming text',function(original,modified,mode)
 end)
 
 windower.register_event('incoming chunk',function(id,data)
-	if gearswap_disabled then return end
-	cur_ID = data:byte(3,4)
-	if prev_ID == nil then
-		prev_ID = cur_ID
-	end
-	persistant_sequence[data:byte(3,4)] = true  ---------------------- TEMPORARY TO INVESTIGATE LAG ISSUES IN DELVE
-	if data:byte(3,4) ~= 0x00 then
-		if not persistant_sequence[data:byte(3,4)-1] then
-			if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(140) Packet dropped or out of order: '..cur_ID..' '..prev_ID) end
+--	cur_ID = data:byte(3,4)
+--	if prev_ID == nil then
+--		prev_ID = cur_ID
+--	end
+--	persistant_sequence[data:byte(3,4)] = true  ---------------------- TEMPORARY TO INVESTIGATE LAG ISSUES IN DELVE
+--	if data:byte(3,4) ~= 0x00 then
+--		if not persistant_sequence[data:byte(3,4)-1] then
+--			if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(140) Packet dropped or out of order: '..cur_ID..' '..prev_ID) end
+--		end
+--	end
+--	prev_ID = cur_ID
+--	if prev_ID == 0xFF then
+--		table.reassign(persistant_sequence,{})
+--	end
+	if id == 0x027 then
+		local ind = get_mob_by_index(256*data:byte(10) + data:byte(9))
+		if ind == player.index then
+			local status = data:byte(11)
+			for i=0,15 do
+				if status == encumbrance_map[i] then
+					encumbrance_table[i] = false
+					if not_sent_out_equip[i] then
+						set_equip(not_sent_out_equip[i],i)
+						sent_out_equip[i] = not_sent_out_equip[i]
+						not_sent_out_equip[i] = nil
+					end
+				end
+			end
 		end
 	end
-	prev_ID = cur_ID
-	if prev_ID == 0xFF then
-		table.reassign(persistant_sequence,{})
-	end
+
+	if gearswap_disabled then return end
+
 
 	if id == 0x050 then
 		if sent_out_equip[data:byte(6)] == data:byte(5) then
@@ -280,9 +297,10 @@ windower.register_event('outgoing chunk',function(id,data)
 			abil_name = 'Ranged Attack'
 		end
 		if logging then logit(logfile,'\n\nActor: '..tostring(actor_name)..'  Target: '..tostring(target_name)..'  Category: '..tostring(category)..'  param: '..tostring(abil_name or param)) end
-		if abil_name then
+		if abil_name and not (buffactive.terror or buffactive.sleep or buffactive.stun or buffactive.petrification or buffactive.charm) then
 			midaction = true
---			send_command('@wait 1;lua i gearswap midact')
+		else
+			midaction = false
 		end
 	end
 end)

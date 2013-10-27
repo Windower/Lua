@@ -322,7 +322,9 @@ windower.register_event('action message',function(actor_id,target_id,actor_index
 			number2 = param_2
 		end
 		number = param_1
-		
+	        if message_id == 679 then
+            		number = param_2
+		 end
 		if param_1 ~= 0 then
 			status = (enLog[param_1] or nf(statuses[param_1],'english'))
 			spell = nf(spells[param_1],'english')
