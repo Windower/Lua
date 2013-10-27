@@ -332,4 +332,11 @@
     <bugtracker>https://github.com/r3g1stry/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/user/R3G1STRY</support>
   </addon>
+  <addon>
+    <author>Cairthenn</author>
+    <name>DressUp</name>
+    <description>Enumlates BlinkMeNot functionality. Allows for customization of gear display for you or anyone else.</description>
+    <bugtracker>https://github.com/cairface/Lua/issues</bugtracker>
+    <support>http://www.bluegartr.com/members/34070-Cairthenn</support>
+  </addon>
 </addons>
