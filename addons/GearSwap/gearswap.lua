@@ -42,7 +42,7 @@ require 'export'
 
 _addon = {}
 _addon.name = 'GearSwap'
-_addon.version = '0.707'
+_addon.version = '0.708'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -84,8 +84,8 @@ windower.register_event('addon command',function (...)
 		local n = 1
 		local tempset = user_env.sets
 		while n <= #set_split do
-			if tempset[set_split[n]] then
-				tempset = tempset[set_split[n]]
+			if tempset[set_split[n]] or tempset[tonumber(set_split[n])] then
+				tempset = tempset[set_split[n]] or tempset[tonumber(set_split[n])]
 				if n == #set_split then
 					equip_sets('equip_command',tempset)
 					break
@@ -242,14 +242,15 @@ windower.register_event('incoming chunk',function(id,data)
 --	if prev_ID == 0xFF then
 --		table.reassign(persistant_sequence,{})
 --	end
-	if id == 0x027 then
+--[[	if id == 0x027 then
 		local ind = get_mob_by_index(256*data:byte(10) + data:byte(9))
 		if ind == player.index then
 			local status = data:byte(11)
 			for i=0,15 do
-				if status == encumbrance_map[i] then
+				if status == encumbrance_map[i] and encumbrance_table[i] then
 					encumbrance_table[i] = false
-					if not_sent_out_equip[i] then
+					add_to_chat(123,"Gearswap: Your "..default_slot_map[i]..' are now unlocked.')
+					if not_sent_out_equip[i] and not disable_table[i] then
 						set_equip(not_sent_out_equip[i],i)
 						sent_out_equip[i] = not_sent_out_equip[i]
 						not_sent_out_equip[i] = nil
@@ -257,6 +258,30 @@ windower.register_event('incoming chunk',function(id,data)
 				end
 			end
 		end
+	end]]
+	
+	if id == 0x01B then
+--		add_to_chat(8,'Job Info Packet')
+		local enc = data:byte(97) + data:byte(98)*256
+		for i=0,15 do
+			local tf = (math.floor( (enc%(2^(i+1))) / 2^i ) == 1) -- Could include the binary library some day if necessary
+			if encumbrance_table[i] ~= tf then
+				encumbrance_table[i] = tf
+				if not tf and not_sent_out_equip[i] and not disable_table[i] then
+					set_equip(not_sent_out_equip[i],i)
+					sent_out_equip[i] = not_sent_out_equip[i]
+					not_sent_out_equip[i] = nil 
+--					add_to_chat(123,"Gearswap: Your "..default_slot_map[i]..' are now unlocked.')
+				end
+			end
+		end
+--[[		local encstr = 'Gearswap, Encumbered in slots: '
+		for i,v in pairs(encumbrance_table) do
+			if v then
+				encstr = encstr..default_slot_map[i]..' '
+			end
+		end
+		if encstr ~= 'Gearswap, Encumbered in slots: ' then	add_to_chat(123,encstr) end]]
 	end
 
 	if gearswap_disabled then return end
@@ -300,7 +325,16 @@ windower.register_event('outgoing chunk',function(id,data)
 		if abil_name and not (buffactive.terror or buffactive.sleep or buffactive.stun or buffactive.petrification or buffactive.charm) then
 			midaction = true
 		else
-			midaction = false
+			if type(user_env.aftercast) == 'function' then
+				equip_sets('aftercast',{name='Interrupt',type='Interrupt'},{type='Recast'})
+			elseif user_env.aftercast then
+				midaction = false
+				spelltarget = nil
+				add_to_chat(123,'GearSwap: aftercast() exists but is not a function')
+			else
+				midaction = false
+				spelltarget = nil
+			end
 		end
 	end
 end)
