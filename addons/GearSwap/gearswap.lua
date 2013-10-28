@@ -268,7 +268,11 @@ windower.register_event('incoming chunk',function(id,data)
 			if encumbrance_table[i] ~= tf then
 				encumbrance_table[i] = tf
 				if not tf and not_sent_out_equip[i] and not disable_table[i] then
-					set_equip(not_sent_out_equip[i],i)
+					local eq = get_items().equipment
+					if not_sent_out_equip[i] ~= eq[default_slot_map[i]] then
+						set_equip(not_sent_out_equip[i],i)
+						write('Sent something!')
+					end
 					sent_out_equip[i] = not_sent_out_equip[i]
 					not_sent_out_equip[i] = nil 
 --					add_to_chat(123,"Gearswap: Your "..default_slot_map[i]..' are now unlocked.')

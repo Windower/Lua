@@ -33,6 +33,9 @@ function equip_sets(swap_type,val1,val2)
 		if sent_out_equip[slot_map[i]] then
 			cur_equip[i] = sent_out_equip[slot_map[i]]
 		end
+		if not_sent_out_equip[slot_map[i]] then
+			cur_equip[i] = not_sent_out_equip[slot_map[i]]
+		end
 	end
 	
 	table.reassign(equip_list,player.equipment)
