@@ -443,7 +443,7 @@ fields.incoming[0x01B] = L{
     {ctype='unsigned char',     label='NIN Level'},                             --   29 -  29
     {ctype='unsigned char',     label='DRG Level'},                             --   30 -  30
     {ctype='unsigned char',     label='SMN Level'},                             --   31 -  31
-    {ctype='unsigned short',    label='Base STR'},                              --   32 -  33
+    {ctype='unsigned short',    label='Base STR'},                              --   32 -  33  -- Altering these stat values has no impact on your equipment menu.
     {ctype='unsigned short',    label='Base DEX'},                              --   34 -  35
     {ctype='unsigned short',    label='Base VIT'},                              --   36 -  37
     {ctype='unsigned short',    label='Base AGI'},                              --   38 -  39
@@ -478,7 +478,7 @@ fields.incoming[0x01B] = L{
     {ctype='unsigned char',     label='GEO Level'},                             --   93 -  93
     {ctype='unsigned char',     label='RUN Level'},                             --   94 -  94
     {ctype='unsigned char',     label='Current Monster Level'},                 --   95 -  95
-    {ctype='unsigned int',      label='_unknown6'},                             --   96 -  99   Observed value of 00 00 00 00
+    {ctype='unsigned int',      label='Encumbrance Flags'},                     --   96 -  99   [legs, hands, body, head, ammo, range, sub, main,] [back, right_ring, left_ring, right_ear, left_ear, waist, neck, feet] [HP, CHR, MND, INT, AGI, VIT, DEX, STR,] [X X X X X X X MP]
 }
 
 -- Item Assign
@@ -494,6 +494,29 @@ fields.incoming[0x01F] = L{
     {ctype='unsigned char',     label='_unknown6'},                             --   15 -  15
 }
 
+-- Count to 80
+fields.incoming[0x026] = L{
+    {ctype='unsigned char',     label='_unknown1',          const=0x00},        --    4 -   4
+    {ctype='unsigned char',     label='Counter'},                               --    5 -   5   Varies sequentially between 0x01 and 0x50
+    {ctype='char[22]',          label='_unknown2',          const=0},           --    6 -  27
+}
+
+-- Encumbrance Release
+fields.incoming[0x027] = L{
+    {ctype='unsigned int',      label='Player ID',          fn=id},             --    4 -   7
+    {ctype='unsigned short',    label='Player index',       fn=index},          --    8 -   9
+    {ctype='unsigned char',     label='Slot or Stat ID'},                       --   10 -  10  -- 85 = DEX Down, 87 = AGI Down, 8A = CHR Down, 8B = HP Down, 7A = Head/Neck restriction, 7D = Leg/Foot Restriction
+    {ctype='unsigned char',     label='_unknown1'},                             --   11 -  11  -- 9C
+    {ctype='unsigned int',      label='_unknown2'},                             --   12 -  15  -- 04 00 00 00
+    {ctype='unsigned int',      label='_unknown3'},                             --   16 -  19  -- B6 E3 39 00
+    {ctype='unsigned char',     label='_unknown4'},                             --   20 -  20  -- 01 or 04?
+    {ctype='char[11]',          label='_unknown5'},                             --   21 -  31
+    {ctype='char[16]',          label='Player name'},                           --   32 - 47
+    {ctype='char[16]',          label='_unknown6'},                             --   48 - 63
+    {ctype='char[16]',          label='Player name'},                           --   64 - 79
+    {ctype='char[32]',          label='_unknown7'},                             --   80 - 111
+}
+
 -- Item Assign
 fields.incoming[0x02A] = L{
     {ctype='unsigned int',      label='Player ID',          fn=id},             --    4 -   7
@@ -504,13 +527,6 @@ fields.incoming[0x02A] = L{
     {ctype='unsigned short',    label='Player Index',       fn=index},          --   24 -  25
     {ctype='unsigned short',    label='Message ID'},                            --   26 -  27   The high bit is occasionally set, though the reason for it is unclear.
     {ctype='unsigned int',      label='_unknown1',          const=0x06000000},  --   28 -  31
-}
-
--- Count to 80
-fields.incoming[0x026] = L{
-    {ctype='unsigned char',     label='_unknown1',          const=0x00},        --    4 -   4
-    {ctype='unsigned char',     label='Counter'},                               --    5 -   5   Varies sequentially between 0x01 and 0x50
-    {ctype='char[22]',          label='_unknown2',          const=0},           --    6 -  27
 }
 
 -- Synth Animation
@@ -631,6 +647,12 @@ fields.incoming[0x051] = L{
     {ctype='unsigned short',    label='Ranged'},                                --   20 -  21
     {ctype='unsigned short',    label='_unknown1'},                             --   22 -  23   May varying meaningfully, but it's unclear
 }
+
+-- Key Item Log
+--[[fields.incoming[0x055] = L{
+	-- There are 6 of these packets sent on zone, which likely corresponds to the 6 categories of key items.
+	-- FFing these packets between bytes 0x14 and 0x82 gives you access to all (or almost all) key items.
+}]]
 
 -- Weather Change
 fields.incoming[0x057] = L{

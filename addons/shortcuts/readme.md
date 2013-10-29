@@ -1,4 +1,4 @@
-#Shortcuts v0.9 (beta)
+#Shortcuts v1.1
 ####written by Byrth  
 
 Completes and properly formats commands (prefixed by at least one '/'),
@@ -9,6 +9,7 @@ spellcast" project, and represents the interpretation part of spellcast.
 None  
 
 ####Changelog:  
+v1.1 - 10/23/13 - Reduced "spell1" to "spell" and made some minor adjustments.
 v1.0 - 10/16/13 - Fixed some ambiguous name processing issues with monsterskills.
 v0.9 - 10/1/13  - Fixed targets.lua's interpretation of the target flags.
 v0.8 - 08/14/13 - Fixed split(), which was causing errors when assembling resources.

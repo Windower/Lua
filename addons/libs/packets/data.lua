@@ -71,6 +71,7 @@ data.incoming[0x021] = {name='Trade Requested',     description='Sent when someb
 data.incoming[0x022] = {name='Trade Action',        description='Sent whenever something happens with the trade window.'}
 data.incoming[0x025] = {name='Item Accepted',       description='Sent when the server will allow you to trade an item.'}
 data.incoming[0x026] = {name='Count to 80',         description='It counts to 80 and does not have any obvious function. May have something to do with populating inventory.'}
+data.incoming[0x027] = {name='Encumbrance',         description='Occurs when you are released from Encumbrance, although that is unlikely to be its only purpose.'}
 data.incoming[0x028] = {name='Action',              description='Packet sent when an NPC is attacking.'}
 data.incoming[0x029] = {name='Action Message',      description='Packet sent for simple battle-related messages.'}
 data.incoming[0x02A] = {name='Resting Message',     description='Packet sent when you rest in Abyssea.'}
@@ -90,6 +91,7 @@ data.incoming[0x050] = {name='Equip',               description='Updates the cha
 data.incoming[0x051] = {name='Model Change',        description='Info about equipment and appearance.'}
 data.incoming[0x052] = {name='NPC Release',         description='Allows your PC to move after interacting with an NPC.'}
 data.incoming[0x053] = {name='Logout Time',         description='The annoying message that tells how much time till you logout.'}
+data.incoming[0x055] = {name='Key Item Log',        description='Updates your key item log on zone and when appropriate.'}
 data.incoming[0x056] = {name='Quest/Mission Log',   description='Updates your quest and mission log on zone and when appropriate.'}
 data.incoming[0x057] = {name='Weather Change',      description='Updates the weather effect when the weather changes.'}
 data.incoming[0x058] = {name='Lock Target',         description='Locks your target.'}
@@ -98,6 +100,7 @@ data.incoming[0x05B] = {name='Spawn',               description='Server packet s
 data.incoming[0x05E] = {name='Stop Download',       description='Final packet in a DataDld transmission. May be the only packet in a DataDld sequence.'}
 data.incoming[0x061] = {name='Char Stats',          description='Packet contains a lot of data about your character\'s stats.'}
 data.incoming[0x062] = {name='Skills Update',       description='Packet that shows your weapon and magic skill stats.'}
+data.incoming[0x063] = {name='Set Update',          description='Frequently sent packet during battle that updates specific types of job information, like currently available/set automaton equipment and currently set BLU spells.'}
 data.incoming[0x067] = {name='Unnamed Packet 67',   description='Packet that sends mostly useless information, as far as I can tell.'}
 data.incoming[0x08C] = {name='IDs in party',    	description='Packet that returns ids of people in party'}
 data.incoming[0x0AC] = {name='Ability List',        description='Packet that shows your current abilities and traits.'}
