@@ -145,7 +145,6 @@ end
 
 function unload_plugins(name)
 	local commandstr = ''
-	write('PLUGIN MANAGER: '..tostring(name))
 	for i,v in pairs(loader_array[name]) do
 		for n,m in pairs(v) do
 			if general_array[i][m] then
