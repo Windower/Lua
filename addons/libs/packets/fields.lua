@@ -205,8 +205,16 @@ fields.outgoing[0x077] = L{
 
 -- Speech
 fields.outgoing[0x0B5] = L{
-    {ctype='unsigned short',    label='GM'},                                    --    4 -   5   05 00 for LS chat?
+    {ctype='unsigned char',     label='Mode'},                                  --    4 -   4   05 for LS chat?
+    {ctype='unsigned char',     label='GM'},                                    --    5 -   5   05 for LS chat?
     {ctype='char[255]',         label='Message'},                               --    6 - 260   Message, occasionally terminated by spare 00 bytes.
+}
+
+-- Tell
+fields.outgoing[0x0B6] = L{
+    {ctype='unsigned char',     label='GM?'},                                   --    4 -   4   00 for a normal tell -- Varying this does nothing.
+    {ctype='char[15]',          label='Target name'},                           --    5 -  19   Name of the person to send a tell to
+    {ctype='char[255]',         label='Message'},                               --   20 - 260   Message, occasionally terminated by spare 00 bytes.
 }
 
 -- Set LS Message
