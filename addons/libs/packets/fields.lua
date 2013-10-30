@@ -205,8 +205,16 @@ fields.outgoing[0x077] = L{
 
 -- Speech
 fields.outgoing[0x0B5] = L{
-    {ctype='unsigned short',    label='GM'},                                    --    4 -   5   05 00 for LS chat?
+    {ctype='unsigned char',     label='Mode'},                                  --    4 -   4   05 for LS chat?
+    {ctype='unsigned char',     label='GM'},                                    --    5 -   5   05 for LS chat?
     {ctype='char[255]',         label='Message'},                               --    6 - 260   Message, occasionally terminated by spare 00 bytes.
+}
+
+-- Tell
+fields.outgoing[0x0B6] = L{
+    {ctype='unsigned char',     label='GM?'},                                   --    4 -   4   00 for a normal tell -- Varying this does nothing.
+    {ctype='char[15]',          label='Target name'},                           --    5 -  19   Name of the person to send a tell to
+    {ctype='char[255]',         label='Message'},                               --   20 - 260   Message, occasionally terminated by spare 00 bytes.
 }
 
 -- Set LS Message
@@ -214,6 +222,14 @@ fields.outgoing[0x0E2] = L{
     {ctype='unsigned int',      label='_unknown1',          const=0x00000040},  --    4 -   7
     {ctype='unsigned int',      label='_unknown2'},                             --    8 -  11   Usually 0, but sometimes contains some junk
     {ctype='char[128]',         label='Message'}                                --   12 - 140
+}
+
+-- Logout
+fields.outgoing[0x0E7] = L{
+    {ctype='unsigned char',      label='_unknown1'},                            --    4 -   4 -- Observed to be 00
+    {ctype='unsigned char',      label='_unknown2'},                            --    5 -   5 -- Observed to be 00
+    {ctype='unsigned char',      label='Logout Type'},                          --    6 -   6 -- /logout = 01, /pol == 02 (removed), /shutdown = 03
+    {ctype='unsigned char',      label='_unknown3'},                            --    7 -   7 -- Observed to be 00
 }
 
 -- Sit
@@ -648,6 +664,15 @@ fields.incoming[0x051] = L{
     {ctype='unsigned short',    label='_unknown1'},                             --   22 -  23   May varying meaningfully, but it's unclear
 }
 
+-- Logout Time - This packet is likely used for an entire class of system messages,
+-- but the only one commonly encountered is the logout counter.
+fields.incoming[0x053] = L{
+    {ctype='unsigned int',      label='param'},                                 --    4 -   7   Parameter
+    {ctype='unsigned int',      label='_unknown1'},                             --    8 -  11   00 00 00 00 observed
+    {ctype='unsigned short',    label='Message ID'},                            --   12 -  13   It is unclear which dialogue table this corresponds to
+    {ctype='unsigned short',    label='_unknown2'},                             --   14 -  15   Probably junk.
+}
+
 -- Key Item Log
 --[[fields.incoming[0x055] = L{
 	-- There are 6 of these packets sent on zone, which likely corresponds to the 6 categories of key items.
@@ -766,6 +791,14 @@ fields.incoming[0x0E2] = L{
     {ctype='unsigned char',     label='_unknown6'},                             --   32 -  32
     {ctype='unsigned char',     label='_unknown7'},                             --   32 -  33   Could be an initialization for the name. 0x01 observed.
     {ctype='char[10]',          label='Player Name'},                           --   34 -  34   Maybe a base stat
+}
+
+-- Toggle Heal
+fields.incoming[0x0E8] = L{
+    {ctype='unsigned char',     label='Movement'},                              --    4 -   4   02 if caused by movement
+    {ctype='unsigned char',     label='_unknown2'},                             --    5 -   5   00 observed
+    {ctype='unsigned char',     label='_unknown3'},                             --    6 -   6   00 observed
+    {ctype='unsigned char',     label='_unknown4'},                             --    7 -   7   00 observed
 }
 
 -- Widescan Mob

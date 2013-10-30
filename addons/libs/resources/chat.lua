@@ -9,6 +9,29 @@ chat[5]  = {english = 'linkshell', colors = {incoming = 14,    outgoing = 6}}
 chat[8]  = {english = 'emote',     colors = {incoming = 15,    outgoing = 7}}
 chat[26] = {english = 'yell',      colors = {incoming = 11,    outgoing = 3}}
 
+-- For Packet 0x17 (Incoming Chat):
+-- 0 = Say
+-- 1 = Shout
+-- 2 = Nothing
+-- 3 = Tell
+-- 4 = Party
+-- 5 = Linkshell
+-- 6 = SystemMessage
+-- 7 = SystemMessage
+-- 8 = Emote
+-- 9 = Nothing
+-- 10 = Nothing
+-- 11 = Nothing
+-- 12 = GMTell
+-- 13 = No sender say
+-- 14 = No sender shout
+-- 15 = No sender party
+-- 16 = No sender linkshell
+-- 17~24 = yellow text, like a bazaar check message
+-- 25 = Say?
+-- 26 = Yell
+-- >26 = Nothing
+
 return chat
 
 --[[
