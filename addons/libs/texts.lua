@@ -8,6 +8,7 @@ local saved_texts = {}
 _libs = _libs or {}
 _libs.texts = texts
 
+_meta = _meta or {}
 _meta.Text = _meta.Text or {}
 _meta.Text.__class = 'Text'
 _meta.Text.__index = texts
