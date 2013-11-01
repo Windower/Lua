@@ -141,6 +141,20 @@ fields.outgoing[0x03A] = L{
     {ctype='unsigned short',    label='_unknown2'},                             --    6 -   7
 }
 
+-- Delivery Box
+fields.outgoing[0x04D] = L{
+    {ctype='unsigned char',     label='Manipulation Type'},                     --    4 -   4
+	-- 
+	
+	-- Removing an item from the d-box sends type 0x08
+	-- It then responds to the server's 0x4B (id=0x08) with a 0x0A type packet.
+	-- Their assignment is the same, as far as I can see.
+    {ctype='unsigned char',     label='_unknown1'},                             --    5 -   5  -- 01 observed
+    {ctype='unsigned char',     label='Slot ID'},                               --    6 -   6
+    {ctype='char[5]',           label='_unknown2'},                             --    7 -  11  -- FF FF FF FF FF observed
+    {ctype='char[20]',          label='_unknown3'},                             --   12 -  31  -- All 00 observed
+}
+
 -- Equip
 fields.outgoing[0x050] = L{
     {ctype='unsigned char',     label='Inventory ID'},                          --    4 -   4
@@ -203,10 +217,36 @@ fields.outgoing[0x077] = L{
     {ctype='unsigned short',    label='_unknown1'},                             --   22 -  23
 }
 
+-- Synth
+fields.outgoing[0x096] = L{
+    {ctype='unsigned char',     label='_unknown1'},                             --    4 -   4 -- Crystal ID? Earth = 0x02, Wind-break = 0x19?, Wind no-break = 0x2D?
+    {ctype='unsigned char',     label='_unknown2'},                             --    5 -   5
+    {ctype='unsigned short',    label='Crystal Item ID'},                       --    6 -   7 -- Item ID
+    {ctype='unsigned char',     label='Crystal Inventory slot'},                --    8 -   8 -- Inventory slot ID
+    {ctype='unsigned char',     label='Number of Ingredients'},                 --    9 -   9
+    {ctype='unsigned short',    label='Ingredient 1 ID'},                       --   10 -  11 -- Item ID
+    {ctype='unsigned short',    label='Ingredient 2 ID'},                       --   12 -  13
+    {ctype='unsigned short',    label='Ingredient 3 ID'},                       --   14 -  15
+    {ctype='unsigned short',    label='Ingredient 4 ID'},                       --   16 -  17
+    {ctype='unsigned short',    label='Ingredient 5 ID'},                       --   18 -  19
+    {ctype='unsigned short',    label='Ingredient 6 ID'},                       --   20 -  21
+    {ctype='unsigned short',    label='Ingredient 7 ID'},                       --   22 -  23
+    {ctype='unsigned short',    label='Ingredient 8 ID'},                       --   24 -  25
+    {ctype='unsigned char',     label='Ingredient 1 slot'},                     --   26 -  26 -- Inventory slot ID
+    {ctype='unsigned char',     label='Ingredient 2 slot'},                     --   27 -  27
+    {ctype='unsigned char',     label='Ingredient 3 slot'},                     --   28 -  28
+    {ctype='unsigned char',     label='Ingredient 4 slot'},                     --   29 -  29
+    {ctype='unsigned char',     label='Ingredient 5 slot'},                     --   30 -  30
+    {ctype='unsigned char',     label='Ingredient 6 slot'},                     --   31 -  31
+    {ctype='unsigned char',     label='Ingredient 7 slot'},                     --   32 -  32
+    {ctype='unsigned char',     label='Ingredient 8 slot'},                     --   33 -  33
+    {ctype='unsigned short',    label='_unknown3'},                             --   34 -  35
+}
+
 -- Speech
 fields.outgoing[0x0B5] = L{
     {ctype='unsigned char',     label='Mode'},                                  --    4 -   4   05 for LS chat?
-    {ctype='unsigned char',     label='GM'},                                    --    5 -   5   05 for LS chat?
+    {ctype='unsigned char',     label='GM'},                                    --    5 -   5   01 for GM
     {ctype='char[255]',         label='Message'},                               --    6 - 260   Message, occasionally terminated by spare 00 bytes.
 }
 
@@ -432,7 +472,7 @@ fields.incoming[0x017] = L{
     {ctype='bool',              label='GM'},                                    --    5 -   5   1 for GM or 0 for not
     {ctype='unsigned short',    label='Zone ID',            fn=zone},           --    6 -   7   Zone ID, used for Yell
     {ctype='char[16]',          label='Sender Name'},                           --    8 -  22   Name
-    {ctype='char*',             label='Message'},                               --   23 - 253   Message, occasionally terminated by spare 00 bytes.
+    {ctype='char*',             label='Message'},                               --   23 - 174   Message, occasionally terminated by spare 00 bytes. Max of 150 characters.
 }
 
 -- Job Info
@@ -630,6 +670,72 @@ fields.incoming._mult[0x044][0x12] = L{     -- PUP
     
     -- For Black Mage, 0x29 to 0x43 appear to represent the black magic that you know
     
+}
+
+-- Delivery Item
+fields.incoming[0x04B] = L{
+    {ctype='unsigned char',     label='Packet Type'},                            --    4 -   4
+
+	-- 0x01: (Length is 88 bytes)
+	-- Seems to occur when refreshing the d-box with things that are already there.
+    {ctype='unsigned char',     label='_unknown2'},                              --    5 -   5
+    {ctype='unsigned char',     label='Delivery Slot ID'},                       --    6 -   6 -- This goes left to right and then drops down a row and left to right again. Value is 0 to 7.
+    {ctype='char[5]',           label='_unknown3'},                              --    7 -  11 :: All FF values observed
+    {ctype='unsigned char',     label='_unknown4'},                              --   12 -  12 :: 01 observed
+    {ctype='unsigned char',     label='_unknown5'},                              --   13 -  13 :: 02 observed
+    {ctype='unsigned short',    label='_unknown6'},                              --   14 -  15 :: FF FF observed
+    {ctype='unsigned int',      label='_unknown7'},                              --   16 -  19 :: 07 00 00 00 and 0B 00 00 00 observed - Possibly flags. Rare vs. Rare/Ex.
+    {ctype='char[16]',          label='Sender Name'},                            --   20 -  35
+    {ctype='unsigned int',      label='_unknown7'},                              --   36 -  39 :: 46 32 00 00 and 42 32 00 00 observed - Possibly flags. Rare vs. Rare/Ex.?
+    {ctype='unsigned int',      label='UNIX Timestamp for sending time'},        --   40 -  43
+    {ctype='unsigned int',      label='_unknown8'},                              --   44 -  47 :: 00 00 00 00 observed
+    {ctype='unsigned short',    label='Item ID'},                                --   48 -  49
+    {ctype='unsigned short',    label='_unknown9'},                              --   50 -  51 :: Fiendish Tome: Chapter 11 had it, but Oneiros Pebble was just 00 00
+    {ctype='unsigned int',      label='Flags1'},                                 --   52 -  55 :: 01/04 00 00 00 observed
+    {ctype='unsigned short',    label='Number of Item'},                         --   56 -  57
+    {ctype='char[30]',          label='_unknown10'},                             --   58 -  87 :: All 00 observed
+	
+	-- 0x06: (Length is 88 bytes)
+	-- Occurs for new items.
+	-- Two of these are sent sequentially. The first one doesn't seem to contain much/any
+	-- information and the second one is very similar to a type 0x01 packet
+	-- First packet's frst line:   4B 58 xx xx 06 01 00 01 FF FF FF FF 02 02 FF FF
+	-- Second packet's first line: 4B 58 xx xx 06 01 00 FF FF FF FF FF 01 02 FF FF
+    {ctype='unsigned char',     label='_unknown2'},                              --    5 -   5 -- 01 Observed
+    {ctype='unsigned char',     label='Delivery Slot ID'},                       --    6 -   6
+    {ctype='char[5]',           label='_unknown3'},                              --    7 -  11 :: 01 FF FF FF FF and FF FF FF FF FF observed
+    {ctype='unsigned char',     label='_unknown4'},                              --   12 -  12 :: 01 observed
+    {ctype='unsigned char',     label='Packet Number'},                          --   13 -  13 :: 02 and 03 observed
+    {ctype='unsigned short',    label='_unknown6'},                              --   14 -  15 :: FF FF observed
+    {ctype='unsigned int',      label='_unknown7'},                              --   16 -  19 :: 06 00 00 00 and 07 00 00 00 observed - (06 was for the first packet and 07 was for the second)
+    {ctype='char[16]',          label='Sender Name'},                            --   20 -  35
+    {ctype='unsigned int',      label='_unknown7'},                              --   36 -  39 :: 46 32 00 00 and 42 32 00 00 observed - Possibly flags. Rare vs. Rare/Ex.?
+    {ctype='unsigned int',      label='UNIX Timestamp for sending time'},        --   40 -  43
+    {ctype='unsigned int',      label='_unknown8'},                              --   44 -  47 :: 00 00 00 00 observed
+    {ctype='unsigned short',    label='Item ID'},                                --   48 -  49
+    {ctype='unsigned short',    label='_unknown9'},                              --   50 -  51 :: Fiendish Tome: Chapter 11 had it, but Oneiros Pebble was just 00 00
+    {ctype='unsigned int',      label='Flags1'},                                 --   52 -  55 :: 01/04 00 00 00 observed
+    {ctype='unsigned short',    label='Number of Item'},                         --   56 -  57
+    {ctype='char[30]',          label='_unknown10'},                             --   58 -  87 :: All 00 observed
+	
+	-- 0x05 (Length is 20 bytes)
+	-- Seems to occur quasi-randomly. Can be seen following spells.
+    {ctype='unsigned char',     label='_unknown2'},                              --    5 -   5
+    {ctype='char[6]',           label='_unknown3'},                              --    6 -  11 :: All FF values observed
+    {ctype='unsigned char',     label='_unknown4'},                              --    12 - 12 :: 01 and 02 observed
+    {ctype='unsigned char',     label='_unknown5'},                              --    13 - 13 :: FF observed
+    {ctype='unsigned char',     label='_unknown6'},                              --    14 - 14 :: 00 and FF observed
+    {ctype='unsigned char',     label='_unknown7'},                              --    15 - 15 :: FF observed
+    {ctype='unsigned int',      label='_unknown8'},                              --    16 - 19 :: 00 00 00 00 observed
+
+	-- 0x08: (Length is 88 bytes)
+	-- Seems to occur as the first packet when removing something from the d-box.
+	
+	-- 0x0A: (Length is 88 bytes)
+	-- Seems to occur as the final packet when removing something from the d-box.
+	
+	-- 0x0F: (Length is 20 bytes)
+	-- Seems to occur after closing the d-box.
 }
 
 -- Data Download 2
