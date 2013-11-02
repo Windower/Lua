@@ -1,14 +1,11 @@
-require "data\\bootstrap"
+_addon = {}
+_addon.name = 'Eval'
+_addon.author = 'Aureus'
+_addon.command = 'eval'
+_addon.version = '1.0.0.0'
 
-function event_load()
-	send_command('alias eval lua c eval')
-end
+require('data/bootstrap')
 
-function event_unload()
-	send_command('unalias eval')
-end
-
-function event_addon_command(...)
-    inp = table.concat({...}, ' ')
-	assert(loadstring(inp))()
-end
+windower.register_event('addon command', function(...)
+	assert(loadstring(table.concat({...}, ' ')))()
+end)

@@ -1,5 +1,5 @@
 --[[
-enternity v1.20131021
+enternity v1.20131102
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -33,20 +33,48 @@ require 'sets'
 _addon = {}
 _addon.name    = 'enternity'
 _addon.author  = 'Zohno'
-_addon.version = '1.20131021'
+_addon.version = '1.20131102'
 
-blist = S{'Geomantic Reservoir'}
+blist = S{
+    -- Paintbrush of souls dialogue
+    17428966,
+
+    -- Geomantic Reservoirs (for Geo spells)
+    17613246,
+    17195707,
+    17195710,
+    17596856,
+    17379862,
+    17207950,
+    17297494,
+    17576434,
+    17396247,
+    17580413,
+    17850967,
+    17191529,
+    17228404,
+    17846822,
+    17232297,
+    17232300,
+    17388045,
+    17461577,
+    17293797,
+    17842739,
+    17531228,
+    17269285,
+    17236348,
+    17863490,
+    17863493,
+    17584498,
+    17257104,
+    17220194,
+    17424560,
+}
 
 windower.register_event('incoming text', function(original, modified, mode)
-    if (mode == 150 or mode == 151) and not original:find(string.char(0x1e, 0x02)) then
-        for name in pairs(blist) do
-            if original:match(name) then
-                return
-            end
-        end
-        
+    if (mode == 150 or mode == 151) and not original:match(string.char(0x1e, 0x02)) and not blist:contains(get_mob_by_target('t').id) then
         modified = modified:gsub(string.char(0x7F, 0x31), '')
     end
 
-    return modified, mode
+    return modified
 end)
