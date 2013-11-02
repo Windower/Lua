@@ -431,14 +431,14 @@ local function handle_mouse(type, x, y, delta, blocked)
     end
 
     -- Mouse drag
-    if type == 0x200 then
+    if type == 0 then
         if dragged_text then
             dragged_text[1]:pos(x - dragged_text[2], y - dragged_text[3])
             return true
         end
 
     -- Mouse left click
-    elseif type == 0x201 then
+    elseif type == 1 then
         for _, t in pairs(saved_texts) do
             local pos_x, pos_y = windower.text.get_location(t._name)
             local off_x, off_y = windower.text.get_extents(t._name)
@@ -458,7 +458,7 @@ local function handle_mouse(type, x, y, delta, blocked)
         end
 
     -- Mouse left release
-    elseif type == 0x202 then
+    elseif type == 2 then
         if dragged_text then
             if dragged_text[1]._root_settings then
                 config.save(dragged_text[1]._root_settings)
