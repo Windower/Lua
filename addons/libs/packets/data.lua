@@ -21,6 +21,7 @@ data.outgoing[0x034] = {name='Trade Item',          description='Sends the item 
 data.outgoing[0x037] = {name='Use Item',            description='Use an item.'}
 data.outgoing[0x03A] = {name='Sort Item',           description='Packet sent when you choose to auto-sort your inventory.'}
 data.outgoing[0x04B] = {name='Servmes',             description='Requests the server message (/servmes).'}
+data.outgoing[0x04D] = {name='Delivery Box',        description='Used to manipulate the delivery box.'}
 data.outgoing[0x04E] = {name='Auction',             description='Used to bid on an Auction House item.'}
 data.outgoing[0x050] = {name='Equip',               description='This command is used to equip your character.'}
 data.outgoing[0x05A] = {name='Conquest',            description='This command asks the server for data pertaining to conquest/besieged status.'}
@@ -69,6 +70,7 @@ data.incoming[0x01F] = {name='Item Assign',         description='Assigns an ID t
 data.incoming[0x020] = {name='Item Update',         description='Info about item in your inventory.'}
 data.incoming[0x021] = {name='Trade Requested',     description='Sent when somebody offers to trade with you.'}
 data.incoming[0x022] = {name='Trade Action',        description='Sent whenever something happens with the trade window.'}
+data.incoming[0x023] = {name='Trade Item',          description='Sent when an item appears in the trade window.'}
 data.incoming[0x025] = {name='Item Accepted',       description='Sent when the server will allow you to trade an item.'}
 data.incoming[0x026] = {name='Count to 80',         description='It counts to 80 and does not have any obvious function. May have something to do with populating inventory.'}
 data.incoming[0x027] = {name='Encumbrance',         description='Occurs when you are released from Encumbrance, although that is unlikely to be its only purpose.'}

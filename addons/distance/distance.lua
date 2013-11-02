@@ -22,7 +22,7 @@ settings = config.load(defaults)
 distance = texts.new(settings)
 
 register_event('prerender', function()
-    local t = get_mob_by_target('t')
+	local t = get_mob_by_target('st') or get_mob_by_target('t')
     distance:text(t and string.format('%.1f', math.sqrt(t.distance)) or '')
     distance:visible(t ~= nil or true)
 end)
