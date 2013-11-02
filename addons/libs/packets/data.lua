@@ -40,6 +40,7 @@ data.outgoing[0x085] = {name='Sell Item',           description='Sell an item fr
 data.outgoing[0x096] = {name='Synth',               description='Packet sent containing all data of an attempted synth.'}
 data.outgoing[0x0B5] = {name='Speech',              description='Packet contains normal speech.'}
 data.outgoing[0x0B6] = {name='Tell',                description='/tell\'s sent from client.'}
+data.outgoing[0x0D3] = {name='GM Call',             description='Places a call to the GM queue.'}
 data.outgoing[0x0DC] = {name='Type Bitmask',        description='This command is sent when change your party-seek or /anon status.'}
 data.outgoing[0x0DD] = {name='Check',               description='Used to check other players.'}
 data.outgoing[0x0DE] = {name='Set Bazaar Message',  description='Sets your bazaar message.'}

@@ -109,7 +109,7 @@ function texts.new(str, settings, root_settings)
     end
 
     t = {}
-    t._name = 'text_gensym_'..tostring(math.random()):sub(3)
+    t._name = (_addon and _addon.name or 'text')..'_gensym_'..tostring(t):sub(8)..('%.8X'):format(16^8*math.random()):sub(3)
     t._settings = settings or {}
     t._status = t._status or {visible = false, text = {}}
     t._root_settings = root_settings

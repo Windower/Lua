@@ -12,13 +12,41 @@ _libs.functools = _libs.functools or require('functools')
 
 require('pack')
 
+--[[
+    Packet database. Feel free to correct/amend it wherever it's lacking.
+]]
+
 local packets = {}
 packets.data = require('packets/data')
 packets.fields = require('packets/fields')
 
 --[[
-    Packet database. Feel free to correct/amend it wherever it's lacking.
+    Lengths for C data types.
 ]]
+
+local type_lengths = {
+    ['unsigned char']   = 1,
+    ['unsigned short']  = 2,
+    ['unsigned int']    = 4,
+    ['unsigned long']   = 8,
+    ['signed char']     = 1,
+    ['signed short']    = 2,
+    ['signed int']      = 4,
+    ['signed long']     = 8,
+    ['char']            = 1,
+    ['short']           = 2,
+    ['int']             = 4,
+    ['long']            = 8,
+    ['bool']            = 1,
+    ['float']           = 4,
+    ['double']          = 8,
+}
+setmetatable(type_lengths, {__index = function(t, k)
+    local type, count = k:match('([%a%s]+)%[(%d+)%]')
+    if type and rawget(type_lengths, type) then
+        return tonumber(count)*type_lengths[type]
+    end
+end})
 
 local dummy = {name='Unknown', description='No data available.'}
 
@@ -159,19 +187,35 @@ function packets.new(dir, id, values)
         if not packet[field.label] then
             if field.const then
                 packet[field.label] = field.const
+
             elseif field.ctype == 'bool' then
                 packet[field.label] = false
+
             elseif rawget(pack_ids, field.ctype) then
                 packet[field.label] = 0
-            elseif field.ctype:match('char%s*%[%d+%]') then
+
+            elseif field.ctype:match('char%s*%[%d+%]') or field.ctype:match('char%s*%*') then
                 packet[field.label] = ''
+
             else
-                warning('Unknown packet C type:', field.ctype)
+                warning('Bad packet! Unknown packet C type:', field.ctype)
+                packet._error = true
+
             end
         end
     end
 
-    return packet
+    return setmetatable(packet, {__tostring = function(p)
+        local res = p._dir:capitalize()..' packet 0x'..p._id:hex():zfill(3)..' ('..(p._name and p._name or 'Unrecognized packet')..'):'
+
+        for field, value in pairs(packet) do
+            if not field:startswith('_') then
+                res = res..'\n'..field..': '..tostring(value)
+            end
+        end
+
+        return res
+    end})
 end
 
 -- Returns binary data from a packet
@@ -182,18 +226,19 @@ function packets.build(packet)
         return
     end
 
-    -- 'b2H' for the 4 byte header: unsigned char, unsigned char, short
-    local pack_string = 'b2H'..fields:map(table.index+{pack_ids}..table.get-{'ctype'}):concat()
-    return pack_string:pack(
-        packet._id % 0x100,                                             -- ID
-        packet._size/2 + math.floor(packet._id / 0x100),                -- size
-        0,                                                              -- sequence (filled out later)
-        fields:map(table.get+{packet}..table.get-{'label'}):unpack()    -- remaining arguments
-    ):rpad('\0', packet._size)                                          -- Fll with trailing nulls if necessary
+    -- 'I' for the 4 byte header
+    -- It's zeroed, as it will be filled out when injected
+    local pack_string = 'I'..fields:map(table.index+{pack_ids}..table.get-{'ctype'}):concat()
+    return pack_string:pack(0, fields:map(table.get+{packet}..table.get-{'label'}):unpack())
 end
 
 -- Injects a packet built with packets.new
 function packets.inject(packet)
+    if packet._error then
+        error('Bad packet, cannot inject')
+        return
+    end
+
     local fields = packets.fields.get(packet._dir, packet._id, packet._raw)
     if not fields then
         error('Packet 0x'..packet._id:hex():zfill(3)..' not recognized, unable to send.')
@@ -201,12 +246,11 @@ function packets.inject(packet)
     end
 
     packet._raw = packets.build(packet)
-    packet._data = packet._raw:sub(5)
 
-    if packet._dr == 'incoming' then
-        windower.packets.inject_incoming(packet._id, packet._data):hex()
+    if packet._dir == 'incoming' then
+        windower.packets.inject_incoming(packet._id, packet._raw)
     elseif packet._dir == 'outgoing' then
-        windower.packets.inject_outgoing(packet._id, packet._data):hex()
+        windower.packets.inject_outgoing(packet._id, packet._raw)
     else
         error('Error sending packet, no direction specified. Please specify \'incoming\' or \'outgoing\'.')
     end

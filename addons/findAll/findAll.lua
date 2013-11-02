@@ -1,5 +1,5 @@
 --[[
-findAll v1.20131021
+findAll v1.20131102
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -35,8 +35,8 @@ require 'sets'
 
 _addon = {}
 _addon.name    = 'findAll'
-_addon.author    = 'Zohno'
-_addon.version = '1.20131021'
+_addon.author  = 'Zohno'
+_addon.version = '1.20131102'
 _addon.command = 'findAll'
 
 json  = require 'json'
@@ -150,7 +150,6 @@ function search(query, export)
     end
 
     log('Searching: '..query:concat(' '))
-    sleep(10)
     
     local no_results   = true
     local sorted_names = global_storages:keyset():sort()
@@ -207,9 +206,8 @@ function search(query, export)
 
                     results:sort()
 
-                    for _, result in ipairs(results) do
+                    for i, result in ipairs(results) do
                         log(result)
-                        sleep(10)
                     end
                 end
             end

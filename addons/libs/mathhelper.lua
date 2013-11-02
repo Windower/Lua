@@ -67,6 +67,9 @@ function math.string(...)
     return tostring(...)
 end
 
+-- string.char wrapper, to allow method-like calling on numbers.
+math.char = string.char
+
 -- Converts a number val to a string in base base.
 function math.base(val, base)
     if base == nil or base == 10 or val == 0 then

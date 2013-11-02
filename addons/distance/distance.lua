@@ -21,13 +21,13 @@ defaults.flags.right = true
 settings = config.load(defaults)
 distance = texts.new(settings)
 
-register_event('prerender', function()
-	local t = get_mob_by_target('st') or get_mob_by_target('t')
-    distance:text(t and string.format('%.1f', math.sqrt(t.distance)) or '')
-    distance:visible(t ~= nil or true)
+windower.register_event('prerender', function()
+	local t = windower.ffxi.get_mob_by_target('st') or windower.ffxi.get_mob_by_target('t')
+    distance:text(t and ('%.1f'):format(t.distance:sqrt()) or '')
+    distance:visible(t ~= nil)
 end)
 
-register_event('addon command', function(command)
+windower.register_event('addon command', function(command)
     if command == 'save' then
         config.save(settings, 'all')
     end

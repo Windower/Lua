@@ -1,5 +1,5 @@
 --[[
-chars v1.20130529
+chars v1.20131102
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -28,32 +28,24 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-require 'logger'
+require('logger')
 
 _addon = {}
 _addon.name     = 'chars'
-_addon.version  = '1.20130529'
+_addon.version  = '1.20131102'
 _addon.commands = 'chars'
 
 local chars = require('json').read('../libs/ffxidata.json').chat.chars
 
-function event_load()
-    send_command('alias chars lua c chars')
-end
-
-function event_unload()
-    send_command('alias chars lua c chars')
-end
-
-function event_addon_command(...)
+windower.register_event('addon command', function(...)
     for code, char in pairs(chars) do
         log('<'..code..'>: '..char)
     end
 
     log('Using the pattern <j:text> any alphanumeric character will be replaced with its japanese version')
-end
+end)
 
-function event_outgoing_text(original, modified)
+windower.register_event('outgoing text', function(original, modified)
     for str in modified:gmatch('<j:([^>]+)>') do
         local jString = {}
 
@@ -75,4 +67,4 @@ function event_outgoing_text(original, modified)
     end
 
     return modified
-end
+end)

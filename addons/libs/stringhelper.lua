@@ -117,19 +117,6 @@ function string.splice(str, from, to, str2)
     return str:sub(1, from - 1)..str2..str:sub(to + 1)
 end
 
--- Casts a little endian encoded number from a data string.
-function string.number_cast(str)
-    local res = 0
-
-    local length = #str
-    for c in ipairs({string.byte(str)}) do
-        length = length - 1
-        res = res + c * 0x100^length
-    end
-
-    return res
-end
-
 -- Returns a monowidth hex representation of each character of a string, optionally with a separator between chars.
 function string.hex(str, sep, from, to)
     return str:slice(from, to):split():map(string.zfill-{2}..math.hex..string.byte):concat(sep or '')
@@ -491,7 +478,7 @@ end
 
 -- tonumber wrapper
 function string.number(...)
-    tonumber(...)
+    return tonumber(...)
 end
 
 -- Returns a formatted item list for use in natural language representation of a number of items.
