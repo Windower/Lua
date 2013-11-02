@@ -193,13 +193,7 @@ function table.tovstring(t, keys, indentlevel)
         kt[k] = key
     end
     table.sort(kt, function(x, y)
-        if type(x) == 'number' and type(y) == 'string' then
-            return true
-        elseif type(x) == 'string' and type(y) == 'number' then
-            return false
-        end
-
-        return x<y
+        return type(x) ~= type(y) and type(x) == 'number' or x < y
     end)
 
     for i, key in pairs(kt) do
