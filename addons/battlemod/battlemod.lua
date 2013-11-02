@@ -227,7 +227,7 @@ windower.register_event('incoming text',function(original,modified,color)
 		a,z = string.find(original,' defeats ')
 		if a then
 			if original:sub(1,4) ~= string.char(0x1F,0xFE,0x1E,0x01) then
-				return '',color
+				return true
 			end
 		end
 	elseif redcol == 127 then
@@ -235,7 +235,7 @@ windower.register_event('incoming text',function(original,modified,color)
 		b,z = string.find(original,' experience points')
 		if a or b then
 			if original:sub(1,4) ~= string.char(0x1F,0xFE,0x1E,0x01) then
-				return '',color
+				return true
 			end
 		end
 	elseif redcol == 121 and cancelmulti then
@@ -245,7 +245,7 @@ windower.register_event('incoming text',function(original,modified,color)
 			send_command('@wait 1;lua i battlemod flip_it block_equip')
 			block_equip = true
 		elseif a and block_equip then
-			modified = ''
+			return true
 		end
 	elseif redcol == 123 and cancelmulti then
 		a,z = string.find(original,'You were unable to change your equipped items')
@@ -256,11 +256,11 @@ windower.register_event('incoming text',function(original,modified,color)
 			send_command('@wait 1;lua i battlemod flip_it block_cannot')
 			block_cannot = true
 		elseif (a or b or c) and block_cannot then
-			modified = ''
+			return true
 		end
 	elseif blocked_colors:contains(redcol) then
 		if original:sub(1,4) ~= string.char(0x1F,0xFE,0x1E,0x01) then
-			return '',color
+			return true
 		end
 	end
 	
