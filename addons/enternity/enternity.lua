@@ -72,8 +72,11 @@ blist = S{
 }
 
 windower.register_event('incoming text', function(original, modified, mode)
-    if (mode == 150 or mode == 151) and not original:match(string.char(0x1e, 0x02)) and not blist:contains(get_mob_by_target('t').id) then
-        modified = modified:gsub(string.char(0x7F, 0x31), '')
+    if (mode == 150 or mode == 151) and not original:match(string.char(0x1e, 0x02)) then
+        local target = get_mob_by_target('t')
+        if not (target and blist:contains(target.id)) then
+            modified = modified:gsub(string.char(0x7F, 0x31), '')
+        end
     end
 
     return modified
