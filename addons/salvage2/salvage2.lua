@@ -178,7 +178,7 @@ function initialize()
 	end
 end
 
-windower.register_event('unload',function event_unload()
+windower.register_event('unload',function ()
 	tb_delete('salvage_box2')
 	send_command('timers d Remaining')
 end )

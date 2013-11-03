@@ -227,8 +227,8 @@ local defaults = T{}
 	Cycles.kazham.route[6] = "Arrives in Jeuno|14:49"
 	Cycles.kazham.route[7] = "Arrives in Kazham|19:48"
 	Cycles.kazham.route[8] = "Arrives in Jeuno|20:49"
-	
-windower.register_event('load',function ()
+
+function initialize()
 	cb_time()
 	cb_day()
 	settings = config.load(defaults)
@@ -240,15 +240,20 @@ windower.register_event('load',function ()
 	end
 	
 	gt.mode = settings.mode
-	event_time_change(get_ffxi_info()["time"])
-	event_day_change(get_ffxi_info()["day"])
-	event_moon_pct_change(get_ffxi_info()["moon_pct"])
-end)
+	time_change(get_ffxi_info()["time"])
+	day_change(get_ffxi_info()["day"])
+	moon_pct_change(get_ffxi_info()["moon_pct"])
+end
 
-windower.register_event('unload',function ()
+function destroy()
 	tb_delete('gametime_time')
 	tb_delete('gametime_day')
-end)
+end
+	
+windower.register_event('load',initialize)
+windower.register_event('login',initialize)
+windower.register_event('unload',destroy)
+windower.register_event('logout',destroy)
 
 function getroutes(route)
 	for ckey, cval in pairs(Cycles) do
@@ -265,14 +270,6 @@ function getroutes(route)
 		end
 	end
 end
-
-windower.register_event('login',function ()
-	event_load()
-end)
-
-windower.register_event('logout',function ()
-	event_unload()
-end)
 
 function cb_time()
 	gt.gtt = 'gametime_time'
@@ -302,16 +299,13 @@ function cb_day()
 	tb_set_visibility(gt.gtd,settings.days.visible)
 	--Set font type and size for days 
 	tb_set_font(gt.gtd,settings.days.font,settings.days.font_size)
-	
-	
-	
 end
 
 function default_settings()
 	settings:save('all')
 end
 
-windower.register_event('time change',function (old, new)
+function time_change(old, new)
 	gt.basetime = get_ffxi_info()["time"]
 	gt.basetime = gt.basetime * 100
 	gt.basetime = math.round(gt.basetime)
@@ -322,7 +316,9 @@ windower.register_event('time change',function (old, new)
 	gt.time = T{gt.hour,gt.minute}
 	gt.dectime = timeconvert(gt.time[1]..':'..gt.time[2])
 	tb_set_text(gt.gtt,gt.time[1]..':'..gt.time[2])
-end)
+end
+
+windower.register_event('time change',time_change)
 
 function timeconvert(basetime)
 	basetable = basetime:split(':')
@@ -334,7 +330,7 @@ function timeconvert2(basetime)
 	return basetable[1]..':'..tostring(math.round(tostring(basetable[2]):slice(1,2) / (100/60))):zfill(2)
 end
 
-windower.register_event('day change',function (day)
+function day_change(day)
 --	tb_set_text(gt.gtd,day)
 	if (day == 'Firesday') then
 		dlist = {'1','2','3','4','5','6','7','8'}
@@ -367,21 +363,25 @@ windower.register_event('day change',function (day)
 	gt.WeekReport = daystring
 	tb_set_color(gt.gtd,settings.days.alpha,255,255,255)
 	tb_set_text(gt.gtd,' \\cs'..gt.days[1][10]..gt.MoonPhase..' ('..gt.MoonPct..'%);'..gt.WeekReport)
-	event_moon_change(get_ffxi_info()["moon"])
-end)
+	moon_change(get_ffxi_info()["moon"])
+end
+windower.register_event('day change',day_change)
 
-windower.register_event('moon change',function (moon)
+function moon_change(moon)
 	gt.MoonPhase = moon
 	tb_set_text(gt.gtd,gt.MoonPhase..' ('..gt.MoonPct..'%);'..gt.WeekReport)
 	if settings.moon.change == true then
 		log('Day: '..gt.day..'; Moon: '..gt.MoonPhase..' ('..gt.MoonPct..'%);')
 	end
-end)
+end
 
-windower.register_event('moon pct change',function (pct)
+windower.register_event('moon change',moon_change)
+
+function moon_pct_change(pct)
 	gt.MoonPct = pct
 	tb_set_text(gt.gtd,gt.MoonPhase..' ('..gt.MoonPct..'%);'..gt.WeekReport)
-end)
+end
+windower.register_event('moon pct change',moon_pct_change)
 
 windower.register_event('addon command',function (...)
 	local args	= T({...})
@@ -531,7 +531,7 @@ windower.register_event('addon command',function (...)
 			gt.delimiter = " "
 		log('Week display axis set to horizontal.')
 		end
-		event_day_change(get_ffxi_info()["day"])
+		day_change(get_ffxi_info()["day"])
 	elseif args[1] == 'mode' then
 		inmode = tostring(args[2]):zfill(1)
 		inmode = inmode+0
@@ -541,7 +541,7 @@ windower.register_event('addon command',function (...)
 			settings.mode = inmode
 			log('mode updated')
 		end
-		event_day_change(get_ffxi_info()["day"])
+		day_change(get_ffxi_info()["day"])
 	elseif args[1] == 'save' then
 		settings:save('all')
 		log('Settings saved.')
