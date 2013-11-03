@@ -329,14 +329,14 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
         return
     end
 
-    if type == 0x200 then
+    if type == 0 then
         if dragged_text then
             local t = dragged_text[1]
             Display:set_position(x - dragged_text[2], y - dragged_text[3])
             return true
         end
 
-    elseif type == 0x201 then
+    elseif type == 1 then
             local x_pos, y_pos = windower.text.get_location('scoreboard')
             local x_off, y_off = windower.text.get_extents('scoreboard')
 
@@ -348,7 +348,7 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
                 return true
             end
 
-    elseif type == 0x202 then
+    elseif type == 2 then
         if dragged_text then
             if settings then
                 settings:save()
