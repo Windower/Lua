@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 _addon = {}
 _addon.name = 'MobCompass'
 _addon.version = '1.0'
+_addon.commands = {'mobcompass','mc'}
 
 require 'tablehelper'  -- Required for various table related features. Made by Arcon
 require 'logger'       -- Made by arcon. Here for debugging purposes
@@ -40,7 +41,7 @@ file = require 'filehelper'
 local settingtab = nil
 local settings_file = 'data/settings.xml'
 
-function event_load()
+windower.register_event('load',function ()
 	info = get_ffxi_info()
 	player = get_player()
 
@@ -89,9 +90,6 @@ function event_load()
 	showbuff = settingtab.geomode.showbuff
 	showangle = tostring(settingtab.thfmode.showangle)
 	loop = 1
-	
-	send_command('alias mobcompass lua c mobcompass')
-	send_command('alias mc mobcompass')
 		
 	if info.logged_in == true then
 		loop = 0
@@ -104,30 +102,30 @@ function event_load()
 		get_target()
 	end
 
-end
+end)
 
-function event_unload()
+windower.register_event('unload',function ()
 	loop = 1
 	local i = 1
 	for i = 1,3 do
 		tb_delete(box_name[i])
 	end
-end
+end)
 
-function event_login()
+windower.register_event('login',function ()
 	loop = 0
 	get_target()
-end
+end)
 
-function event_logout(name)
+windower.register_event('logout',function (name)
 	loop = 1
 	local i = 1
 	for i = 1, 3 do
 		set_tb(0,'',i)
 	end
-end
+end)
 
-function event_addon_command(...)
+windower.register_event('addon command',function (...)
     local term = table.concat({...}, ' ')
 	broken = term:split(' ',4)
 
@@ -183,7 +181,7 @@ function event_addon_command(...)
 			write('Thf command : " MC mode thf showangle [always | behind | never] "')
 		end
 	end
-end
+end)
 
 function get_target()
 	--Player info
@@ -418,8 +416,3 @@ function is_sa(angle2)
 	
 	return sa
 end
-
-
-
-
-

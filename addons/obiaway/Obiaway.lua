@@ -51,36 +51,33 @@
 -- 
 -- To Do: add function to turn the console_echo's on/off. 
 
-function event_load()
+windower.register_event('load',function ()
 	write("Loaded Obiaway.")
 	send_command("alias Obiaway lua c Obiaway")
-end
+end)
 
-function event_unload()
+windower.register_event('unload',function ()
 	write("Unloaded Obiaway.")
 	send_command("unalias Obiaway")
-end
+end)
 
-function event_addon_command(...)
+windower.register_event('addon command',function (...)
 	remove_unneeded_obis()
-end
+end)
 
-function event_gain_status(id, name)
-end
-
-function event_lose_status(id, name)
+windower.register_event('lose status',function (id, name)
 	if id>=178 and id<=185 then
 		remove_unneeded_obis()
 	end
-end
+end)
 
-function event_day_change(day)
+windower.register_event('day change',function (day)
 	remove_unneeded_obis()
-end
+end)
 
-function event_weather_change(id, name)
+windower.register_event('weather change',function (id, name)
 	remove_unneeded_obis()
-end
+end)
 
 function get_obis_in_inventory()
 	obis = {}
@@ -188,5 +185,3 @@ function get_all_elements()
 	end
 	return elements
 end
-
-

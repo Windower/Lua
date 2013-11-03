@@ -29,6 +29,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 _addon = {}
 _addon.name = 'shoutHelper'
 _addon.version = '0.2'
+_addon.commands = {'shouthelper','sh'}
+_addon.author = 'Jandel'
 
 require 'tablehelper'
 require 'stringhelper'
@@ -41,8 +43,7 @@ local config = require 'config'
 -- Memo: //lua load shoutHelper
 
 -- Constructor
-function event_load()
-	send_command('alias sh lua command shoutHelper')
+windower.register_event('load',function ()
 	settings = config.load({
 		posx = 300,
 		posy = 140,
@@ -51,10 +52,10 @@ function event_load()
 		fontsize = 10
 	})
 	lavagna = Blackboard:new(settings)
-end
+end)
 
 -- Handle addon args
-function event_addon_command(...)
+windower.register_event('addon command',function (...)
     local params = {...};
 	
     if #params < 1 then
@@ -161,13 +162,11 @@ function event_addon_command(...)
 	    error('Invalid command')
 	end
     end
-end
+end)
 
 
 
 -- Destructor
-function event_unload()
-    send_command('unalias sh')
+windower.register_event('unload',function ()
     lavagna:destroy()
-end
-
+end)

@@ -30,8 +30,7 @@ require 'luau'
 
 _addon = _addon or {}
 _addon.name = 'AutoInvite'
-_addon.command = 'autoinvite'
-_addon.short_command = 'ai'
+_addon.commands = {'autoinvite','ai'}
 _addon.version = 1.0
 
 settings = T{}
@@ -70,7 +69,7 @@ off = T{'off', 'no', 'false'}
 modes = T{'whitelist', 'blacklist'}
 
 -- Check for keyword
-function event_chat_message(is_gm, mode, player, message)
+windower.register_event("chat message", function(is_gm, mode, player, message)
 	local word = false
 	if mode == 3 then
 		for item,_ in pairs(settings.keywords) do
@@ -95,7 +94,7 @@ function event_chat_message(is_gm, mode, player, message)
 			end
 		end
 	end
-end
+end)
 
 -- Attempts to send an invite
 function try_invite(player)
@@ -156,7 +155,7 @@ function remove_item(mode, ...)
 	settings:save()
 end
 
-function event_addon_command(command, ...)
+windower.register_event('addon command',function (command, ...)
 	command = command and command:lower() or 'status'
 	local args = T{...}
 	
@@ -218,19 +217,16 @@ function event_addon_command(command, ...)
 		warning('Unkown command \''..command..'\', ignored.')
 	end
 	settings:save()
-end
+end)
 
-function event_load()	
+windower.register_event('load',function ()	
 	initialize()
 	settings:save()
+end)
 
-	send_command('alias autoinvite lua c autoinvite')
-	send_command('alias ai autoinvite')
-end
-
-function event_login()
+windower.register_event('login',function ()
 	initialize()
-end
+end)
 
 function initialize()
 	-- Load settings from file
@@ -239,8 +235,6 @@ function initialize()
 	settings.blacklist = settings.blacklist:map(string.ucfirst..string.lower)
 end
 
-function event_unload()
-	send_command('unalias autoinvite')
-	send_command('unalias ai')
+windower.register_event('unload', function ()
 	settings:save()
-end
+end)

@@ -38,7 +38,8 @@ slips = require 'slips'
 _addon = {}
 _addon.name     = 'porter'
 _addon.version  = '1.20130529'
-_addon.commands = 'porter'
+_addon.command = 'porter'
+_addon.author = 'Zohno'
 
 item_names = T{}
 resources  = {
@@ -144,15 +145,7 @@ function show_slip(slip_number, slip_page, owned_only)
     end
 end
 
-function event_load()
-    send_command('alias porter lua c porter')
-end
-
-function event_unload()
-    send_command('unalias porter')
-end
-
-function event_addon_command(slip_number, slip_page, owned_only)
+windower.register_event('addon command',function (slip_number, slip_page, owned_only)
     if tonumber(slip_number) == nil then
         slip_page = nil
 
@@ -188,4 +181,4 @@ function event_addon_command(slip_number, slip_page, owned_only)
     end
 
     show_slip(slip_number, slip_page, owned_only)
-end
+end)

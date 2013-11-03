@@ -184,6 +184,7 @@
   <addon>
     <name>PetSchool</name>
     <description>A helper addon for PUPs using spellcast, it informs spellcast of pet casting (healing or nuking).</description>
+	<author>Banggugyangu</author>
   </addon>
   <addon>
     <author>Giuliano Riccio (Zohno@Phoenix)</author>

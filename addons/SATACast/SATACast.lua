@@ -24,8 +24,13 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+_addon = {}
+_addon.version = '1.1.0'
+_addon.command = 'scast'
+_addon.name = 'SATACast'
+_addon.author = 'Banggugyangu'
 
-function event_load()
+windower.register_event('load',function ()
 	
 	version = '1.1.0'
 	SA_Set = ' '
@@ -36,12 +41,11 @@ function event_load()
 	Idle_Set = ' '
 	TH_ON = 0
 	TP_ON = 0
-	send_command('alias scast lua c satacast')
 	add_to_chat(17, 'SATACast v' .. version .. ' loaded.     Author:  Banggugyangu')
 	add_to_chat(17, 'Attempting to load settings from file.')
 	options_load()
 	
-end
+end)
 
 --Function Designer:  Byrth
 function options_load()
@@ -107,8 +111,8 @@ function split(msg, match)
 	end
 	return splitarr
 end
-		
-function event_lose_status(id, name)
+	
+windower.register_event('lose status',function (id, name)
 	local self = get_player()
 	if name == ('Sneak Attack' or 'Trick Attack') then
 		if self.status:lower() == 'engaged' then
@@ -117,9 +121,9 @@ function event_lose_status(id, name)
 			send_command('sc set ' .. Idle_Set)
 		end
 	end
-end
+end)
 
-function event_action(act)
+windower.register_event('action',function (act)
 	local actor = act.actor_id
 	local category = act.category
 	local actor = act.actor_id
@@ -145,10 +149,10 @@ function event_action(act)
 	elseif player.status:lower() == 'idle' then
 		TH_ON = 0
 	end
-end
+end)
 
 --Function Designer:  Byrth
-function event_addon_command(...)
+windower.register_event('addon command',function (...)
     local term = table.concat({...}, ' ')
     local splitarr = split(term,' ')
 	if splitarr[1]:lower() == 'reload' then
@@ -159,5 +163,4 @@ function event_addon_command(...)
 		add_to_chat(17, '    reload  - Reloads settings')
 		add_to_chat(17, '    help   - Displays this help text')
 	end
-end
-
+end)
