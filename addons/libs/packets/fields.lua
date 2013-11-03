@@ -573,6 +573,19 @@ fields.incoming[0x027] = L{
     {ctype='char[32]',          label='_unknown7'},                             --   80 - 111
 }
 
+-- Action Message
+fields.incoming[0x029] = L{
+    {ctype='unsigned int',      label='Actor ID',           fn=id},             --    4 -   7
+    {ctype='unsigned int',      label='Target ID',          fn=id},             --    8 -  11
+    {ctype='unsigned int',      label='param_1'},                               --   12 -  15
+    {ctype='unsigned char',     label='param_2'},                               --   16 -  16  -- 6 bits of byte 16
+    {ctype='char[3]',           label='param_3'},                               --   17 -  19  -- Also includes the last 2 bits of byte 16.
+    {ctype='unsigned short',    label='Actor Index',        fn=index},          --   20 -  21  -- B6 E3 39 00
+    {ctype='unsigned short',    label='Target Index',       fn=index},          --   22 -  23  -- 01 or 04?
+    {ctype='unsigned short',    label='Message ID'},                            --   24 -  25
+    {ctype='unsigned short',    label='_unknown1'},                             --   26 -  27
+}
+
 -- Item Assign
 fields.incoming[0x02A] = L{
     {ctype='unsigned int',      label='Player ID',          fn=id},             --    4 -   7
