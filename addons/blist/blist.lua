@@ -52,27 +52,27 @@ defaults.mutedcolor = 57
 settings = T{}
 members = T{}
 
-function event_load()
+windower.register_event('load',function()
 	settings = config.load(defaults)
 	members = config.load("data/members.xml",members)
 	send_command('alias blist lua command blist')
 	send_command('alias bl lua command blist')
 	add_to_chat(55, "Loading ".._addon.name.." v".._addon.version.." (written by ".._addon.author..")")
 	add_to_chat(160,'  Type '..string.color('//blist help',204,160)..' for a list of possible commands.')
-end
+end)
 
-function event_unload()
+windower.register_event('unload',function()
 	send_command('unalias blist')
 	send_command('unalias bl')
 	add_to_chat(55, "Unloading ".._addon.name.." v".._addon.version..".")
-end
+end)
 
-function event_login(name)
+windower.register_event('login',function (name)
 	settings = config.load(defaults)
 	add_to_chat(160,"Loading "..string.color(_addon.name,55,160).." settings for "..get_player().name..".")
-end
+end)
 
-function event_addon_command(...)
+windower.register_event('addon command',function(...)
 	local args = {...}
 	local dummysettings = table.copy(settings)
 	if args[1] ~= nil then
@@ -206,7 +206,7 @@ function event_addon_command(...)
 	else
 		event_addon_command('help')
 	end
-end
+end)
 
 function showStatus(var)
 	if var == "mutedcolor" then
@@ -242,14 +242,14 @@ function onOffPrint(bleh)
 	return bleh;
 end
 
-function event_ipc_message(msg)
+windower.register_event('ipc message',function (msg)
 	if msg == "blist reload members" then
 		members = config.load("data/members.xml",members)
 --		add_to_chat(160, "Reloading members database.")
 	end
-end
+end)
 
-function event_incoming_text(original, modified, mode)
+windower.register_event('incoming text',function (original, modified, mode)
 	if settings.useblist == true then
 		name = "blist"
 		if mode == 14 and settings.linkshell == true then -- linkshell (others)
@@ -312,4 +312,4 @@ function event_incoming_text(original, modified, mode)
 		end
 		return modified
 	end
-end
+end)

@@ -31,6 +31,7 @@
 
 _addon = _addon or {}
 _addon.name = 'DynamisHelper'
+_addon.commands={'DynamisHelper','dh'}
 _addon.version = 1.0
 
 local config = require 'config'
@@ -86,16 +87,15 @@ for i=1, #Currency do
      Currency[Currency[i]] = 0
 end
 
-function event_load()
+windower.register_event('load',function ()
 --	write('event_load function')
-	send_command('alias dh lua c dynamishelper')
  	player = get_player()['name']
  	obtained = nil
  	write('Dynamis Helper loaded.  Author: Bahamut.Krizz')
  	initializebox()
-end
+end)
 
-function event_addon_command(...)
+windower.register_event('addon command',function (...)
 --	 write('event_addon_command function')
 	local params = {...};
 	if #params < 1 then
@@ -159,10 +159,10 @@ function event_addon_command(...)
    			end
 		end
 	end
-end
+end)
 
 
-function event_incoming_text(original, new, color)
+windower.register_event('incoming text',function (original, new, color)
 --	write('event_incoming_text function')
 	if timer == 'on' then
   		a,b,fiend = string.find(original,"%w+'s attack staggers the (%w+)%!")
@@ -196,7 +196,7 @@ function event_incoming_text(original, new, color)
     	initializebox()
  	end
  	return new, color
-end
+end)
 
 function obtainedf()
 --	write('obtainedf function')
@@ -240,13 +240,13 @@ function initializebox()
 end
 
 
-function event_time_change(...)
+windower.register_event('time change',function (...)
 	if proc == 'on' then
 		currenttime = get_ffxi_info()['time']
  	end
-end
+end)
 
-function event_target_change(targ_id)
+windower.register_event('target change',function (targ_id)
 --	write('event_target_change function')
 	checkzone()
 	if proc == 'on' then
@@ -255,7 +255,7 @@ function event_target_change(targ_id)
   			setproc()
   		end
  	end
-end
+end)
 
 function setproc()
 --	write('setproc function')
@@ -306,8 +306,7 @@ function initializeproc()
 	 	end
 end
 
-function event_unload()
- 	send_command("unalias dh")
+windower.register_event('unload',function ()
  	tb_delete('dynamis_box')
  	tb_delete('proc_box')
-end
+end)

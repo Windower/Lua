@@ -5,8 +5,7 @@ require('luau')
 _addon = _addon or {}
 _addon.name = 'AutoJoin'
 _addon.author = 'Arcon'
-_addon.command = 'autojoin'
-_addon.commands = {'aj'}
+_addon.commands = {'autojoin','aj'}
 _addon.version = '1.0.0.0'
 
 defaults = {}
@@ -48,7 +47,7 @@ function reset()
 end
 
 -- Invite handler
-register_event('party invite', function(sender)
+windower.register_event('party invite', function(sender)
     if settings.autodecline and settings.blacklist:contains(sender) then
         send_command('input /decline')
         notice('Blacklisted invite from '..sender..' blocked.')
@@ -104,7 +103,7 @@ end
 
 -- Interpreter
 
-register_event('addon command', function(command, ...)
+windower.register_event('addon command', function(command, ...)
     command = command and command:lower() or 'status'
     local args = T{...}
 

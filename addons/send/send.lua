@@ -2,9 +2,10 @@
 _addon = {}
 _addon.version = '1.0'
 _addon.name = 'Send'
-_addon.commands = {'send'}
+_addon.command = 'send'
+_addon.author = 'Arcon'
 
-function event_addon_command(...)
+windower.register_event('addon command',function (...)
     local term = table.concat({...}, ' ')
 	local broken_init = split(term, ' ')
 	local qual = table.remove(broken_init,1)
@@ -21,17 +22,9 @@ function event_addon_command(...)
 	else
 		send_ipc_message(term)
 	end
-end
+end)
 
-function event_load()
-	send_command('alias send lua c send')
-end
-
-function event_unload()
-	send_command('unalias send')
-end
-
-function event_ipc_message(msg)
+windower.register_event('ipc message',function (msg)
 	local broken = split(msg, ' ')
 	
 	if #broken < 2 then return end
@@ -57,8 +50,7 @@ function event_ipc_message(msg)
 			end
 		end
 	end
-
-end
+end)
 
 function split(msg, match)
 	if msg == nil then return '' end

@@ -26,13 +26,17 @@
 
 require 'tablehelper'
 
+_addon = {}
+_addon.author = 'Ihm'
+_addon.version = '0.2'
+
 function reinit()
 	clock_current = 0
 	strat_max = 0
 	send_command('@wait 1; lua i StratHelper strat_max_calc')
 end
 
-function event_load()
+windower.register_event('load',function ()
 	strat_max = 0
 	strat_cur = 0
 	strat_ids = T{215,216,217,218,219,220,221,222,234,235,240,241,242,243,316,317}
@@ -44,13 +48,13 @@ function event_load()
 	if get_ffxi_info()['logged_in'] then
 		reinit()
 	end
-end
+end)
 
-function event_unload()
+windower.register_event('unload',function ()
 	send_command('unalias resetstrats')
-end
+end)
 
-function event_action(act)
+windower.register_event('action',function (act)
 	if act.actor_id == get_player()['id'] then
 		if act.category == 6 then
 			if act.param == 210 then
@@ -71,15 +75,15 @@ function event_action(act)
 			end
 		end
 	end
-end
+end)
 
-function event_job_change()
+windower.register_event('job change',function ()
 	reinit()
-end
+end)
 
-function event_login()
+windower.register_event('login',function ()
 	reinit()
-end
+end)
 
 function strat_max_calc()
 	local set_cur = false

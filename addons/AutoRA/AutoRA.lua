@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-function event_load()
+windower.register_event('load',function ()
 
 	version = '2.0.0'
 	delay = 0
@@ -38,7 +38,7 @@ function event_load()
 	send_command('bind !d ara stop')
 	send_command('alias ara lua c autora')
 	
-end
+end)
 	
 function start()
 	player = get_player()
@@ -84,7 +84,7 @@ function split(msg, match)
 	return splitarr
 end
 
-function event_action(act)
+windower.register_event('action',function (act)
 	local actor = act.actor_id
 	local category = act.category
 	local player = get_player()
@@ -105,10 +105,10 @@ function event_action(act)
 			end
 		end
 	end
-end
+end)
 
 --Function Designer:  Byrth
-function event_addon_command(...)
+windower.register_event('addon command',function (...)
     local term = table.concat({...}, ' ')
     local splitarr = split(term,' ')
 	if splitarr[1]:lower() == 'start' then
@@ -130,5 +130,4 @@ function event_addon_command(...)
 		add_to_chat(17, 'To start auto ranged attacks without commands use the key:  Ctrl+d')
 		add_to_chat(17, 'To stop auto ranged attacks in the same manner:  Atl+d')
 	end
-end
-
+end)

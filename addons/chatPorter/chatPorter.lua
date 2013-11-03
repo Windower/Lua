@@ -30,6 +30,7 @@ _addon = {}
 _addon.name = 'ChatPorter'
 _addon.version = '1.33'
 _addon.author = 'Ragnarok.Ikonic'
+_addon.commands = {'ChatPorter','cp'}
 
 require 'tablehelper'
 require 'stringhelper'
@@ -112,14 +113,12 @@ playerResolution = T{}
 playerResolution.x = get_windower_settings().x_res
 playerResolution.y = get_windower_settings().y_res
 
-function event_load()
+windower.register_event('load',function ()
 	settings = config.load(defaults)
 	tb_create("showlinkshell")
 	tb_create("showparty")
 	tb_create("showtell")
 	tb_create("showffochat")
-	send_command('alias ChatPorter lua command ChatPorter')
-	send_command('alias cp lua command ChatPorter')
 	send_command('alias l2 lua command ChatPorter l2')
 	send_command('alias p2 lua command ChatPorter p2')
 	send_command('alias t2 lua command ChatPorter t2')
@@ -133,15 +132,13 @@ function event_load()
 	add_to_chat(160,'  Type '..string.color('//cp help',204,160)..' for a list of possible commands.')
 --	event_addon_command('help')
 --	showStatus()
-end
+end)
 
-function event_unload()
+windower.register_event('unload',function ()
 	tb_delete("showlinkshell")
 	tb_delete("showparty")
 	tb_delete("showtell")
 	tb_delete("showffochat")
-	send_command('unalias ChatPorter')
-	send_command('unalias cp')
 	send_command('unalias l2')
 	send_command('unalias p2')
 	send_command('unalias t2')
@@ -152,9 +149,9 @@ function event_unload()
 	send_command('unalias f4')
 	send_command('unalias f5')
 	add_to_chat(55, "Unloading ".._addon.name.." v".._addon.version..".")
-end
+end)
 
-function event_login(name)
+windower.register_event('login',function (name)
 	settings = config.load(defaults)
 	show("linkshell")
 	show("party")
@@ -165,9 +162,9 @@ function event_login(name)
 --	add_to_chat(160,"Refreshing data...")
 --	add_to_chat(160,"LSname: "..LSname)
 --	add_to_chat(160,"playerName: "..playerName)
-end
+end)
 
-function event_addon_command(...)
+windower.register_event('addon command',function (...)
 	local args = {...}
 	local dummysettings = table.copy(settings)
 	if args[1] ~= nil then
@@ -349,11 +346,11 @@ function event_addon_command(...)
 	else
 		event_addon_command('help')
 	end
-end
+end)
 
-function event_linkshell_change(linkshell)
+windower.register_event('linkshell change',function (linkshell)
 	LSname = get_player().linkshell;
-end
+end)
 
 function showStatus(var)
 	if (var ~= nul) and var ~= "textbox" then
@@ -479,7 +476,7 @@ function show(tbName)
 	tb_set_text("show"..tbName, " " ..table.concat(table.slice(_G['show'..tbName], start, #_G['show'..tbName]), '\n '))
 end
 
-function event_ipc_message(msg)
+windower.register_event('ipc message',function (msg)
 	if (settings.usechatporter == true) then
 		if (string.find(msg, "|(%w+):(%w*)|(%a+)|(.+)")) then
 			a,b,chatMode,senderLSname,senderName,message = string.find(msg, "|(%w+):(%w*)|(%a+)|(.+)")
@@ -512,9 +509,9 @@ function event_ipc_message(msg)
 			end
 		end
 	end
-end
+end)
 
-function event_incoming_text(original, modified, mode)
+windower.register_event('incoming text',function (original, modified, mode)
 	if (playerName == nil) then
 		playerName = get_player().name
 	end
@@ -560,9 +557,9 @@ function event_incoming_text(original, modified, mode)
          6: linkshell (me)
          14: linkshell (others)
      --]]
-end
+end)
 
-function event_chat_message(is_gm, mode, player, message)
+windower.register_event('chat message',function (is_gm, mode, player, message)
 --[[
 3 = tell
 4 = party
@@ -585,7 +582,7 @@ function event_chat_message(is_gm, mode, player, message)
 		showparty[#showparty +1] = " ("..player..") "..message:strip_format().." "
 		show("party")
 	end
-end
+end)
 
 --[[
 possible port to ffochat LSchannel

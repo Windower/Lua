@@ -23,6 +23,8 @@
 _addon = _addon or {}
 _addon.name = 'salvage2'
 _addon.version = 0.1
+_addon.command = 's2'
+_addon.author = 'Bahamut.Krizz'
 local config = require 'config'
 
 require 'tablehelper'
@@ -49,11 +51,10 @@ end
 	pathos_ident = {'Main Weapon/Sub-Weapon restriction', 'Ranged Weapon/Ammo restriction', 'Head/Neck equipment restriction', 'Body equipment restriction', 'Hand equipment restriction', 'Earrings/Rings restriction', 'Back/Waist equipment restriction', 'Leg/Foot equipment restriction', 'Support Job restriction', 'Job Abilities restriction', 'Spellcasting restriction', 'Max HP Down', 'Max MP Down', 'STR Down', 'DEX Down', 'AGI Down', 'MND Down', 'INT Down', 'CHR Down', 'VIT Down'}
 	pathos_short = {'Weapon', 'Ranged', 'Head/Neck', 'Body', 'Hand', 'Earrings/Rings', 'Back/Waist', 'Leg/Foot', 'Support Job', 'Job Abilities', 'Spellcasting', 'Max HP', 'Max MP', 'STR', 'DEX', 'AGI', 'MND', 'INT', 'CHR', 'VIT'}
 
-function event_load()
-	send_command('alias s2 lua c salvage2')
+windower.register_event('load',function ()
 	write('Salvage2 loaded.  Author: Bahamut.Krizz')
-end
-	
+end)
+
 function settings_create()
 	--	get player's name
 	player = get_player()['name']
@@ -65,7 +66,7 @@ function settings_create()
 	end
 end
 
-function event_addon_command(...)
+windower.register_event('addon command',function (...)
 local params = {...};
 	if #params < 1 then
 		return
@@ -112,15 +113,15 @@ local params = {...};
 			end
 		end
 	end
-end
-	
-function event_login()
-	player = get_player()['name']
-end
+end)
 
-function event_zone_change(from_id, from, to_id, to)
+windower.register_event('login',function (name)
+	player = name
+end)
+
+windower.register_event('zone change',function (from_id, from, to_id, to)
 	checkzone()
-end
+end)
 	
 function checkzone()
 	currentzone = get_ffxi_info()['zone']:lower()
@@ -137,7 +138,7 @@ function checkzone()
 	end
 end
 
-function event_incoming_text(original, new, color)
+windower.register_event('incoming text',function (original, new, color)
 
 	a,b,pathos,name = string.find(original,'..(.*) removed for (%w+)\46')
 
@@ -155,7 +156,7 @@ function event_incoming_text(original, new, color)
 		end
 		return new, color
 	end
-end
+end)
 
 function initialize()
 	pathos_remain = (" Pathos Remaining: \n ")
@@ -177,8 +178,7 @@ function initialize()
 	end
 end
 
-function event_unload()
+windower.register_event('unload',function event_unload()
 	tb_delete('salvage_box2')
 	send_command('timers d Remaining')
-	send_command('unalias s2')
-end 
+end )
