@@ -1,5 +1,5 @@
 **Author:** Giuliano Riccio  
-**Version:** v 1.20130529
+**Version:** v 1.20131102
 
 # VWHL #
 This addon redirects the nm's weaknesses (VW or Abyssea) to the "tell" stream so that they can be held in the chat log using the chat filters' hold function (Config > Chat Filters > "Enter" on "Tell" until you get the green "hold" icon).

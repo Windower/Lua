@@ -1,5 +1,5 @@
 --[[
-vwhl - voidwatch highlighter v1.20130529
+vwhl - voidwatch highlighter v1.20131102
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -31,54 +31,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 require 'chat'
 
 _addon = {}
-_addon.name     = 'vwhl'
-_addon.version  = '1.20130529'
-_addon.commands = 'vwhl'
+_addon.name    = 'vwhl'
+_addon.author  = 'Zohno'
+_addon.version = '1.20131102'
+_addon.command = 'vwhl'
 
-function test()
-    add_to_chat(148, 'The fiend appears extremely vulnerable to club weapon skills!')
-    add_to_chat(148, 'The fiend appears highly vulnerable to light elemental blood pacts!')
-    add_to_chat(148, 'The fiend appears highly vulnerable to staff weapon skills!')
-    add_to_chat(148, 'The fiend appears vulnerable to club weapon skills!')
-    add_to_chat(148, 'The fiend appears vulnerable to corsair abilities!')
-    add_to_chat(148, 'The fiend appears vulnerable to water elemental blood pacts!')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-end
-
-function event_load()
-    send_command('alias vwhl lua c vwhl')
-end
-
-function event_unload()
-    send_command('unalias vwhl')
-end
-
-function event_addon_command(cmd)
-    if cmd == 'test' then
-        test()
-    end
-end
-
-function event_incoming_text(original, modified, mode)
+windower.register_event('incoming text', function(original, modified, mode)
     if mode ~= 148 then
         return modified, mode
     end
@@ -289,4 +247,4 @@ function event_incoming_text(original, modified, mode)
     end
 
     return modified, mode
-end
+end)
