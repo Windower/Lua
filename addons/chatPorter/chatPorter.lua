@@ -130,7 +130,6 @@ windower.register_event('load',function ()
 	send_command('alias f5 lua command ChatPorter f5')
 	add_to_chat(55, "Loading ".._addon.name.." v".._addon.version.." (written by ".._addon.author..")")
 	add_to_chat(160,'  Type '..string.color('//cp help',204,160)..' for a list of possible commands.')
---	event_addon_command('help')
 --	showStatus()
 end)
 
@@ -164,7 +163,7 @@ windower.register_event('login',function (name)
 --	add_to_chat(160,"playerName: "..playerName)
 end)
 
-windower.register_event('addon command',function (...)
+function addon_command(...)
 	local args = {...}
 	local dummysettings = table.copy(settings)
 	if args[1] ~= nil then
@@ -344,9 +343,11 @@ windower.register_event('addon command',function (...)
 			return
         end
 	else
-		event_addon_command('help')
+		addon_command('help')
 	end
-end)
+end
+
+windower.register_event('addon command',addon_command)
 
 windower.register_event('linkshell change',function (linkshell)
 	LSname = get_player().linkshell;

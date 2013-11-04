@@ -38,7 +38,7 @@ windower.register_event('chat message',function (isGM, mode, player, message)
 	end
 end)
 
-windower.register_event('incoming text',function event_incoming_text(original, modified, color)
+windower.register_event('incoming text',function (original, modified, color)
 	if original:sub(2,8) == 'PrivMsg' then
 		a,b = string.find(original,'>>')
 		if a~=10 then

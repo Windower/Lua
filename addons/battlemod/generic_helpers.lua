@@ -54,20 +54,21 @@ function split(msg, match)
 end
 
 function parse_resources(lines_file)
-	local ignore_fields = S{'german','french','japanese','index','recast','fr','frl','de','del','jp','jpl'}
+	local ignore_fields = {german=true,french=true,japanese=true,index=true,recast=true,fr=true,frl=true,de=true,del=true,jp=true,jpl=true}
 	local completed_table = {}
 	local counter = 0
+	local find = string.find
 	for i in ipairs(lines_file) do
 		local str = tostring(lines_file[i])
-		local g,h,typ,key = string.find(str,'<(%w+) id="(%d+)" ')
+		local g,h,typ,key = find(str,'<(%w+) id="(%d+)" ')
 		if typ == 's' then
-			g,h,key = string.find(str,'index="(%d+)" ')
+			g,h,key = find(str,'index="(%d+)" ')
 		end
 		if key ~=nil then
 			completed_table[tonumber(key)]={}
 			local q = 1
 			while q <= str:len() do
-				local a,b,ind,val = string.find(str,'(%w+)="([^"]+)"',q)
+				local a,b,ind,val = find(str,'(%w+)="([^"]+)"',q)
 				if ind~=nil then
 					if not ignore_fields[ind] then
 						if str2bool(val) then
@@ -81,7 +82,7 @@ function parse_resources(lines_file)
 					q = str:len()+1
 				end
 			end
-			local k,v,english = string.find(str,'>([^<]+)</')
+			local k,v,english = find(str,'>([^<]+)</')
 			if english~=nil then
 				completed_table[tonumber(key)]['english']=english
 			end

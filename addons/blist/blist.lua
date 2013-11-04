@@ -72,7 +72,7 @@ windower.register_event('login',function (name)
 	add_to_chat(160,"Loading "..string.color(_addon.name,55,160).." settings for "..get_player().name..".")
 end)
 
-windower.register_event('addon command',function(...)
+function addon_command(...)
 	local args = {...}
 	local dummysettings = table.copy(settings)
 	if args[1] ~= nil then
@@ -204,9 +204,11 @@ windower.register_event('addon command',function(...)
 			return
         end
 	else
-		event_addon_command('help')
+		addon_command('help')
 	end
-end)
+end
+
+windower.register_event('addon command',addon_command)
 
 function showStatus(var)
 	if var == "mutedcolor" then
