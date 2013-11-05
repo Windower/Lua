@@ -281,7 +281,6 @@ windower.register_event('incoming chunk',function(id,data)
 		end
 		
 		local tempplay = get_player()
-		add_to_chat(8,tostring(actor_id)..' '..tostring(tempplay.id)..' '..tostring(unable_to_use:contains(tempplay.id)))
 		if actor_id ~= tempplay.id then
 			if tempplay.pet_index then
 				if actor_id ~= get_mob_by_index(tempplay.pet_index)['id'] then
