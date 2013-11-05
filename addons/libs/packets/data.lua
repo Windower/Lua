@@ -105,7 +105,7 @@ data.incoming[0x061] = {name='Char Stats',          description='Packet contains
 data.incoming[0x062] = {name='Skills Update',       description='Packet that shows your weapon and magic skill stats.'}
 data.incoming[0x063] = {name='Set Update',          description='Frequently sent packet during battle that updates specific types of job information, like currently available/set automaton equipment and currently set BLU spells.'}
 data.incoming[0x067] = {name='Unnamed Packet 67',   description='Packet that sends mostly useless information, as far as I can tell.'}
-data.incoming[0x08C] = {name='IDs in party',    	description='Packet that returns ids of people in party'}
+data.incoming[0x08C] = {name='Merits',              description='Contains all merit information. Multiple packets are sent.'}
 data.incoming[0x0AC] = {name='Ability List',        description='Packet that shows your current abilities and traits.'}
 data.incoming[0x0B4] = {name='Seek AnonResp',       description='Server response sent after you put up party or anon flag.'}
 data.incoming[0x0C9] = {name='Show Equip',          description='Shows another player your equipment after using the Check command.'}
