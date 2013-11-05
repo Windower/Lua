@@ -242,7 +242,8 @@ end
 windower.register_event('incoming chunk',function (id,original,modified,is_injected,is_blocked)
 	local pref = original:sub(1,4)
 	local data = original:sub(5)
-	if id == 0x28 then
+	if id == 0x28 and original ~= last_28_packet then
+		last_28_packet = original
 		local act = {}
 		act.do_not_need = get_bit_packed(data,0,8)
 		act.actor_id = get_bit_packed(data,8,40)
@@ -265,6 +266,10 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 				act.targets[i].actions[n].animation = get_bit_packed(data,offset+5,offset+16)
 				act.targets[i].actions[n].effect = get_bit_packed(data,offset+16,offset+21)
 				act.targets[i].actions[n].stagger = get_bit_packed(data,offset+21,offset+27)
+				if debugging then --act.targets[i].actions[n].stagger > 2  then
+					-- Value 8 to 63 will knockback
+					act.targets[i].actions[n].stagger = act.targets[i].actions[n].stagger%8
+				end
 				act.targets[i].actions[n].param = get_bit_packed(data,offset+27,offset+44)
 				act.targets[i].actions[n].message = get_bit_packed(data,offset+44,offset+54)
 				act.targets[i].actions[n].unknown = get_bit_packed(data,offset+54,offset+85)
@@ -380,7 +385,7 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 			local status
 			local targ = player_info(am.target_id)
 			
-			if enfeebling:contains(am.param_1) then
+			if enfeebling:contains(am.param_1) and r_status[param_1] then
 				status = color_it(r_status[param_1]['english'],color_arr.enfeebcol)
 			elseif color_arr.statuscol == rcol then
 				status = color_it(r_status[am.param_1]['english'],string.char(0x1F,191))
@@ -390,15 +395,15 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 			
 			if not wearing[status] and not (stat_ignore:contains(am.param_1)) then
 				wearing[status] = {}
-				wearing[status][1] = color_it(targ.name,color_arr[targ.type])
+				wearing[status][1] = color_it(targ.name,color_arr[targ.owner or targ.type])
 				send_command('@wait 0.5;lua c battlemod wearsoff '..status)
 			elseif not (stat_ignore:contains(am.param_1)) then
-				wearing[status][#wearing[status]+1] = color_it(targ.name,color_arr[targ.type])
+				wearing[status][#wearing[status]+1] = color_it(targ.name,color_arr[targ.owner or targ.type])
 			else
 			-- This handles the stat_ignore values, which are things like Utsusemi,
 			-- Sneak, Invis, etc. that you don't want to see on a delay
 				wearing[status] = {}
-				wearing[status][1] = color_it(targ.name,color_arr[targ.type])
+				wearing[status][1] = color_it(targ.name,color_arr[targ.owner or targ.type])
 				send_command('@lua c battlemod wearsoff '..status)
 			end
 			am.message_id = false
@@ -417,13 +422,13 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 				else
 					skill = 'like level '..am.param_1..' ('..ratings_arr[am.param_2+1]..')'
 				end
-				if debugging then write(am.param_1..'   '..am.param_2..'   '..am.param_3) end
+				--if debugging then write(am.param_1..'   '..am.param_2..'   '..am.param_3) end
 			end
 			
 			if am.message_id == 558  then
 				number2 = am.param_2
 			end
-			am.number = am.param_1
+			number = am.param_1
 			
 			if am.param_1 ~= 0 then
 				status = (enLog[am.param_1] or nf(r_status[am.param_1],'english'))
@@ -439,8 +444,8 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 			end
 
 			if spell then spell = color_it(spell,color_arr.spellcol) end
-			if target then target = color_it(target.name,color_arr[target.type]) end
-			if actor then actor = color_it(actor.name,color_arr[actor.type]) end
+			if target then target = color_it(target.name,color_arr[target.owner or target.type]) end
+			if actor then actor = color_it(actor.name,color_arr[actor.owner or actor.type]) end
 			if skill then skill = color_it(skill,color_arr.abilcol) end
 			
 			local outstr = (dialog[am.message_id]['english']

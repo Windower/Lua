@@ -33,6 +33,7 @@ function nf(field,subfield)
 end
 
 function split(msg, match)
+	if not msg then return {} end
 	local length = #msg
 	local splitarr = {}
 	local u = 1

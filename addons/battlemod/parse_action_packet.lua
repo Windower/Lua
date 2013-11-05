@@ -108,8 +108,8 @@ function parse_action_packet(act)
 		for n,m in pairs(v.actions) do
 			if m.message ~= 0 then
 				local color = color_filt(dialog[m.message].color,v.target[1].id==Self.id)
-				if m.reaction == 11 then act.action.name = 'parried'
-				elseif m.reaction == 12 then act.action.name = 'blocked'
+				if m.reaction == 11 and act.category == 1 then act.action.name = 'parried'
+				elseif m.reaction == 12 and act.category == 1 then act.action.name = 'blocked'
 				elseif m.message == 1 then act.action.name = 'hit'
 				elseif m.message == 15 then act.action.name = 'missed'
 				elseif m.message == 30 then act.action.name = 'anticipated'
@@ -132,7 +132,7 @@ function parse_action_packet(act)
 					:gsub('${item}',act.action.name or 'ERROR 113')
 					:gsub('${weapon_skill}',act.action.name or 'ERROR 114')
 					:gsub('${abil}',act.action.name or 'ERROR 115')
-					:gsub('${actor}',color_it(act.actor.name,color_arr[act.actor.type]))
+					:gsub('${actor}',color_it(act.actor.name,color_arr[act.actor.owner or act.actor.type]))
 					:gsub('${target}',targ)
 					:gsub('${lb}','\7'):gsub('${number}',m.param)
 					:gsub('${status}',m.status or '')
@@ -148,7 +148,7 @@ function parse_action_packet(act)
 					:gsub('${item}',act.action.name or 'ERROR 129')
 					:gsub('${weapon_skill}',act.action.name or 'ERROR 130')
 					:gsub('${abil}',act.action.name or 'ERROR 131')
-					:gsub('${actor}',color_it(act.actor.name,color_arr[act.actor.type]))
+					:gsub('${actor}',color_it(act.actor.name,color_arr[act.actor.owner or act.actor.type]))
 					:gsub('${target}',targ)
 					:gsub('${lb}','\7')
 					:gsub('${number}',m.add_effect_param)
@@ -164,7 +164,7 @@ function parse_action_packet(act)
 					:gsub('${item}',act.action.name or 'ERROR 144')
 					:gsub('${weapon_skill}',act.action.name or 'ERROR 145')
 					:gsub('${abil}',act.action.name or 'ERROR 146')
-					:gsub('${actor}',color_it(act.actor.name,color_arr[act.actor.type]))
+					:gsub('${actor}',color_it(act.actor.name,color_arr[act.actor.owner or act.actor.type]))
 					:gsub('${target}',targ)
 					:gsub('${lb}','\7')
 					:gsub('${number}',m.spike_effect_param)
@@ -198,9 +198,9 @@ function assemble_targets(targs)
 	local out_str = ''
 	for i,v in pairs(targs) do
 		if i == 1 then
-			out_str = color_it(v.name,color_arr[v.type])
+			out_str = color_it(v.name,color_arr[v.owner or v.type])
 		else
-			out_str = conjunctions(out_str,color_it(v.name,color_arr[v.type]),#targs,i)
+			out_str = conjunctions(out_str,color_it(v.name,color_arr[v.owner or v.type]),#targs,i)
 		end
 	end
 	return out_str
