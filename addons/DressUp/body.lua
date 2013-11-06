@@ -934,6 +934,32 @@ models.body[27803] = { name = "Rustic Maillot" , enl = "rustic maillot", model =
 models.body[27804] = { name = "Shoal Maillot" , enl = "shoal maillot", model = 8551} 
 models.body[27805] = { name = "Rustic Maillot +1" , enl = "rustic maillot +1", model = 8550} 
 models.body[27806] = { name = "Shoal Maillot +1" , enl = "shoal maillot +1", model = 8551} 
+models.body[27807] = { name = "Pummeler's Lorica" , enl = "pummeler's lorica" , model = 8256 }
+models.body[27808] = { name = "Anchorite's Cyclas" , enl = "anchorite's cyclas" , model = 8258 }
+models.body[27809] = { name = "Theo. Briault" , enl = "theophany briault" , model = 8260 }
+models.body[27810] = { name = "Spaekona's Coat" , enl = "spaekona's coat" , model = 8262 }
+models.body[27811] = { name = "Atrophy Tabard" , enl = "atrophy tabard" , model = 8264 }
+models.body[27812] = { name = "Pillager's Vest" , enl = "pillager's vest" , model = 8266 }
+models.body[27813] = { name = "Reverence Surcoat" , enl = "reverence surcoat" , model = 8268 }
+models.body[27814] = { name = "Ignominy Cuirass" , enl = "ignominy cuirass" , model = 8270 }
+models.body[27815] = { name = "Totemic Jackcoat" , enl = "totemic jackcoat" , model = 8272 }
+models.body[27816] = { name = "Brioso Justaucorps" , enl = "brioso justaucorps" , model = 8274 }
+models.body[27817] = { name = "Orion Jerkin" , enl = "orion jerkin" , model = 8276 }
+models.body[27818] = { name = "Wakido Domaru" , enl = "wakido domaru" , model = 8278 }
+models.body[27819] = { name = "Hachi. Chainmail" , enl = "hachiya chainmail" , model = 8280 }
+models.body[27820] = { name = "Vishap Mail" , enl = "suit of vishap mail" , model = 8282 }
+models.body[27821] = { name = "Convo. Doublet" , enl = "convoker's doublet" , model = 8284 }
+models.body[27822] = { name = "Assim. Jubbah" , enl = "assimilator's jubbah" , model = 8357 }
+models.body[27823] = { name = "Laksamana Frac" , enl = "laksmana's frac" , model = 8359 }
+models.body[27824] = { name = "Foire Tobe" , enl = "foire tobe" , model = 8361 }
+models.body[27825] = { name = "Maxixi Casaque" , enl = "maxixi casaque" , model = 8402 }
+models.body[27826] = { name = "Maxixi Casaque" , enl = "maxixi casaque" , model = 8403 }
+models.body[27827] = { name = "Academic's Gown" , enl = "academic's gown" , model = 8406 }
+models.body[27895] = { name = "Karieyh Haubert +1" , enl = "Karieyh haubert +1" , model = 8534 }
+models.body[27896] = { name = "Thur. Tabard +1" , enl = "Thurandaut tabard +1" , model = 8535 }
+models.body[27897] = { name = "Orvail Robe +1" , enl = "Orvail robe +1" , model = 8536 }
+models.body[27898] = { name = "Alliance Shirt +1" , enl = "alliance shirt +1" , model = ' ' }
+models.body[27899] = { name = "Alliance Shirt" , enl = "alliance shirt" , model = ' ' }
 models.body[27903] = { name = "Trench Tunic" , enl = "trench tunic", model = 8297} 
 models.body[27904] = { name = "Morass Tunic" , enl = "morass tunic", model = 8539} 
 models.body[27905] = { name = "Woodland Tunic" , enl = "woodland tunic", model = 8540} 

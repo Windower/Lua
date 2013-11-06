@@ -58,9 +58,9 @@ models.head[10426] = { name = "Hexed Bonnet -1" , enl = "hexed bonnet -1", model
 models.head[10427] = { name = "Hexed Coif -1" , enl = "hexed coif -1", model = 4116} 
 models.head[10428] = { name = "Hexed Mitra -1" , enl = "hexed mitra -1", model = 4114} 
 models.head[10429] = { name = "Moogle Masque" , enl = "moogle masque", model = 4403} 
-models.head[10430] = { name = "Decennial Crown" , enl = "decennial crown", model = 4429} 
+models.head[10430] = { name = "Decennial Crown" , enl = "decennial crown", model = 4427} 
 models.head[10431] = { name = "Decennial Tiara" , enl = "decennial tiara", model = 4428} 
-models.head[10432] = { name = "Decennial Crown +1" , enl = "decennial crown +1", model = 4429} 
+models.head[10432] = { name = "Decennial Crown +1" , enl = "decennial crown +1", model = 4427} 
 models.head[10433] = { name = "Decennial Tiara +1" , enl = "decennial tiara +1", model = 4430} 
 models.head[10434] = { name = "Dux Visor" , enl = "dux visor", model = 4432} 
 models.head[10435] = { name = "Dux Visor +1" , enl = "dux visor +1", model = 4432} 
@@ -873,6 +873,37 @@ models.head[27659] = { name = "Idi's Mask" , enl = "idi's mask", model = 4150}
 models.head[27660] = { name = "Genta Kabuto" , enl = "genta kabuto", model = 4015} 
 models.head[27661] = { name = "Namru's Tiara" , enl = "namru's tiara", model = 4224} 
 models.head[27662] = { name = "Neit's Crown" , enl = "neit's crown", model = 4153} 
+models.head[27663] = { name = "Pummeler's Mask" , enl = "pummeler's mask" , model = 4160 }
+models.head[27664] = { name = "Anchorite's Crown" , enl = "anchorite's crown" , model = 4162 }
+models.head[27665] = { name = "Theophany Cap" , enl = "theophany cap" , model = 4164 }
+models.head[27666] = { name = "Spae. Petasos" , enl = "spaekona's petasos" , model = 4168 }
+models.head[27667] = { name = "Atrophy Chapeau" , enl = "atrophy chapeau" , model = 4168 }
+models.head[27668] = { name = "Pillager's Bonnet" , enl = "pillager's bonnet" , model = 4170 }
+models.head[27669] = { name = "Rev. Coronet" , enl = "reverence coronet" , model = 4172 }
+models.head[27670] = { name = "Ignominy Burgeonet" , enl = "ignominy burgeonet" , model = 4174 }
+models.head[27671] = { name = "Totemic Helm" , enl = "totemic helm" , model = 4176 }
+models.head[27672] = { name = "Brioso Roundlet" , enl = "brioso roundlet" , model = 4178 }
+models.head[27673] = { name = "Orion Beret" , enl = "orion beret" , model = 4180 }
+models.head[27674] = { name = "Wakido Kabuto" , enl = "wakido kabuto" , model = 4182 }
+models.head[27675] = { name = "Hachiya Hatsuburi" , enl = "hachiya hatsuburi" , model = 4184 }
+models.head[27676] = { name = "Vishap Armet" , enl = "vishap armet" , model = 4186 }
+models.head[27677] = { name = "Convoker's Horn" , enl = "convoker's horn" , model = 4188 }
+models.head[27678] = { name = "Assim. Keffiyeh" , enl = "assimilator's keffiyeh" , model = 4261 }
+models.head[27679] = { name = "Laksamana's Hat" , enl = "laksamana's hat" , model = 4263 }
+models.head[27680] = { name = "Foire Taj" , enl = "foire taj" , model = 4265 }
+models.head[27681] = { name = "Maxixi Tiara" , enl = "maxixi tiara" , model = 4306 }
+models.head[27682] = { name = "Maxixi Tiara" , enl = "maxixi tiara" , model = 4307 }
+models.head[27683] = { name = "Acad. Mortarboard" , enl = "academic's mortarboard" , model = 4310 }
+models.head[27735] = { name = "Enedron Glasses" , enl = "enedron glasses" , model = 4221 }
+models.head[27736] = { name = "Quiahuiz Helm" , enl = "quiahuiz helm" , model = 4429 }
+models.head[27737] = { name = "Kaabanax Hat" , enl = "kaabanax hat" , model = 4442 }
+models.head[27738] = { name = "Ejekamal Mask" , enl = "ejekamal mask" , model = 4443 }
+models.head[27739] = { name = "Otomi Helm" , enl = "otomi helm" , model = 4444 }
+models.head[27752] = { name = "Karieyh Morion +1" , enl = "Karieyh morion +1" , model = 4438}
+models.head[27753] = { name = "Thur. Chapeau +1" , enl = "Thurandaut chapeau +1" , model = 4439 }
+models.head[27754] = { name = "Orvail Corona +1" , enl = "Orvail corona +1" , model = 4440 }
+models.head[27757] = { name = "Bomb Masque" , enl = "bomb masque" , model = 4455 }
+models.head[27758] = { name = "Bomb Masque +1" , enl = "bomb masque +1" , model = 4455 }
 models.head[27759] = { name = "Korrigan Beret" , enl = "korrigan beret", model = 4250} 
 models.head[27760] = { name = "Chocobo Masque +1" , enl = "chocobo masque +1", model = 4449} 
 models.head[27761] = { name = "Gorney Morion" , enl = "gorney morion", model = 4450} 
@@ -905,7 +936,6 @@ models.head[40001] = { name = "??? Chapeau" , model = 4257 }
 models.head[40002] = { name = "Haudrale's Chapeau" , model = 4338 }
 models.head[40003] = { name = "Geomancer Relic" , model = 4406 }
 models.head[40004] = { name = "Rune Fencer Relic" , model = 4435 }
-models.head[40005] = { name = "Bomb Masque" , model = 4455 }
 
 models.head["Unknown"] = { 4314, 4441 }
 
