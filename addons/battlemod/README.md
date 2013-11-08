@@ -1,6 +1,6 @@
 Author: Byrth
 
-Version: 3.0
+Version: 3.02
 
 Date: 3/11/13
 

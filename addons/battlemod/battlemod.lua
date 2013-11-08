@@ -8,7 +8,7 @@ require 'parse_action_packet'
 require 'statics'
 
 _addon = {}
-_addon.version = '3.0'
+_addon.version = '3.02'
 _addon.name = 'BattleMod'
 _addon.author = 'Byrth'
 _addon.commands = {'bm','battlemod'}
@@ -490,8 +490,8 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 	end
 
 	if id == 0x030 then
-		if get_player().id == (data:byte(7,7)*256*256 + data:byte(6,6)*256 + data:byte(5,5)) then
-			result = data:byte(13,13)
+		if get_player().id == (data:byte(3,3)*256*256 + data:byte(2,2)*256 + data:byte(1,1)) then
+			result = data:byte(9,9)
 			if result == 0 then
 				add_to_chat(8,' ------------- NQ Synthesis -------------')
 			elseif result == 1 then

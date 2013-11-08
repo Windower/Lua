@@ -40,22 +40,23 @@ function parse_action_packet(act)
 				if m.has_spike_effect then
 					m.spike_effect_number = 1
 				end
+				if not check_filter(act.actor,v.target[1],act.category,m.message) then m.message = 0 end
 				if condensedamage and n > 1 then -- Damage/Action condensation within one target
 					for q=1,n-1 do
 						local r = v.actions[q]
-						if m.message == r.message and m.effect == r.effect and m.reaction == r.reaction then
+						if r.message ~= 0 and m.message == r.message and m.effect == r.effect and m.reaction == r.reaction then
 							r.number = r.number + 1
 							r.param = m.param + r.param
 							m.message = 0
 						end
-						if m.has_add_effect then
+						if m.has_add_effect and r.add_effect_message ~= 0 then
 							if m.add_effect_effect == r.add_effect_effect and m.add_effect_message == r.add_effect_message and m.add_effect_message ~= 0 then
 								r.add_effect_number = r.add_effect_number + 1
 								r.add_effect_param = m.add_effect_param + r.add_effect_param
 								m.add_effect_message = 0
 							end
 						end
-						if m.has_spike_effect then
+						if m.has_spike_effect and r.spike_effect_message ~= 0 then
 							if r.spike_effect_effect == r.spike_effect_effect and m.spike_effect_message == r.spike_effect_message and m.spike_effect_message ~= 0 then
 								r.spike_effect_number = r.spike_effect_number + 1
 								r.spike_effect_param = m.spike_effect_param + r.spike_effect_param
@@ -70,21 +71,23 @@ function parse_action_packet(act)
 	--			end
 			end
 		else
-			v.actions[1].number = 1
-			if v.actions[1].has_add_effect then
-				v.actions[1].add_effect_number = 1
+			local tempact = v.actions[1]
+			if not check_filter(act.actor,v.target[1],act.category,tempact.message) then tempact.message = 0 end
+			tempact.number = 1
+			if tempact.has_add_effect then
+				tempact.add_effect_number = 1
 			end
-			if v.actions[1].has_spike_effect then
-				v.actions[1].spike_effect_number = 1
+			if tempact.has_spike_effect then
+				tempact.spike_effect_number = 1
 			end
-			if r_status[v.actions[1].param] then
-				v.actions[1].status = r_status[v.actions[1].param][language]
+			if r_status[tempact.param] then
+				tempact.status = r_status[tempact.param][language]
 			end
-			if r_status[v.actions[1].add_effect_param] then
-				v.actions[1].add_effect_status = r_status[v.actions[1].add_effect_param][language]
+			if r_status[tempact.add_effect_param] then
+				tempact.add_effect_status = r_status[tempact.add_effect_param][language]
 			end
-			if r_status[v.actions[1].spike_effect_param] then
-				v.actions[1].spike_effect_status = r_status[v.actions[1].spike_effect_param][language]
+			if r_status[tempact.spike_effect_param] then
+				tempact.spike_effect_status = r_status[tempact.spike_effect_param][language]
 			end
 		end
 		
@@ -124,6 +127,10 @@ function parse_action_packet(act)
 				elseif m.message == 354 then act.action.name = 'missed RA'
 				elseif m.message == 576 then act.action.name = 'RA hit squarely'
 				elseif m.message == 577 then act.action.name = 'RA struck true'
+				elseif m.message > 287 and m.message < 303 then act.action.name = skillchain_arr[m.message-287]
+				elseif m.message > 384 and m.message < 399 then act.action.name = skillchain_arr[m.message-384]
+				elseif m.message ==603 then act.action.name = 'TH'
+				elseif T{163,229}:contains(m.message) then act.action.name = 'AE'
 				end
 				local msg = simplify_message(m.message)
 				add_to_chat(color,make_condensedamage_number(m.number)..(msg
@@ -141,6 +148,11 @@ function parse_action_packet(act)
 			end
 			if m.has_add_effect and m.add_effect_message ~= 0 then
 				local color = color_filt(dialog[m.add_effect_message].color,v.target[1].id==Self.id)
+				if m.add_effect_message > 287 and m.add_effect_message < 303 then act.action.name = skillchain_arr[m.add_effect_message-287]
+				elseif m.add_effect_message > 384 and m.add_effect_message < 399 then act.action.name = skillchain_arr[m.add_effect_message-384]
+				elseif m.add_effect_message ==603 then act.action.name = 'TH'
+				elseif T{163,229}:contains(m.add_effect_message) then act.action.name = 'AE'
+				end
 				local msg = simplify_message(m.add_effect_message)
 				add_to_chat(color,make_condensedamage_number(m.add_effect_number)..(dialog[m.add_effect_message][language]
 					:gsub('${spell}',act.action.name or 'ERROR 127')
@@ -181,7 +193,7 @@ function simplify_message(msg_ID)
 	local msg = dialog[msg_ID][language]
 	local fields = fieldsearch(msg)
 	if line_full and (fields.actor and fields.target and (fields.spell or fields.ability or fields.item or fields.weapon_skill) and fields.number or 
-		T{1,31,67,352,353,373,576,577}:contains(msg_ID)) then
+		T{1,31,67,163,229,352,353,373,576,577}:contains(msg_ID)) then
 		msg = line_full
 	elseif line_nonumber and (fields.actor and fields.target and (fields.spell or fields.ability or fields.item or fields.weapon_skill) or
 		T{15,30,32,106,282,354}) then
@@ -470,4 +482,50 @@ function linefind(msg_ID,fields,bact)
 		prepstr = dialog[msg_ID]['english']
 	end
 	return prepstr
+end
+
+
+function check_filter(actor,target,category,msg)
+	-- This determines whether the message should be displayed or filtered
+	-- Returns true (don't filter) or false (filter), boolean
+	if not actor.type or not target.type then return false end
+	local actor_type, target_type
+--	if filter[target.type]['target'] then return true end
+	
+	if actor.type == 'p0' then actor_type = 'me' else actor_type = actor.type end
+	if target.type == 'p0' then target_type = 'me' else target_type = target.type end
+	
+	if actor_type ~= 'monsters' and actor_type ~= 'enemies' then
+		if filter[actor_type]['all']
+		or category == 1 and filter[actor_type]['melee']
+		or category == 2 and filter[actor_type]['ranged']
+		or category == 12 and filter[actor_type]['ranged']
+		or category == 5 and filter[actor_type]['items']
+		or category == 9 and filter[actor_type]['uses']
+		or nf(dialog[msg],'color')=='D' and filter[actor_type]['damage']
+		or nf(dialog[msg],'color')=='M' and filter[actor_type]['misses']
+		or nf(dialog[msg],'color')=='H' and filter[actor_type]['healing']
+		or msg == 43 and filter[actor_type]['readies'] or msg == 326 and filter[actor_type]['readies']
+		or msg == 3 and filter[actor_type]['casting'] or msg == 327 and filter[actor_type]['casting']
+		then
+			return false
+		end
+	else
+		if filter[actor_type][target_type]['all']
+		or category == 1 and filter[actor_type][target_type]['melee']
+		or category == 2 and filter[actor_type][target_type]['ranged']
+		or category == 12 and filter[actor_type]['ranged']
+		or category == 5 and filter[actor_type]['items']
+		or category == 9 and filter[actor_type]['uses']
+		or nf(dialog[msg],'color')=='D' and filter[actor_type][target_type]['damage']
+		or nf(dialog[msg],'color')=='M' and filter[actor_type][target_type]['misses']
+		or nf(dialog[msg],'color')=='H' and filter[actor_type][target_type]['healing']
+		or msg == 43 and filter[actor_type][target_type]['readies'] or msg == 326 and filter[actor_type][target_type]['readies']
+		or msg == 3 and filter[actor_type][target_type]['casting'] or msg == 327 and filter[actor_type][target_type]['casting']
+		then
+			return false
+		end
+	end
+
+	return true
 end
