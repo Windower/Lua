@@ -8,7 +8,7 @@ require 'parse_action_packet'
 require 'statics'
 
 _addon = {}
-_addon.version = '3.03'
+_addon.version = '3.04'
 _addon.name = 'BattleMod'
 _addon.author = 'Byrth'
 _addon.commands = {'bm','battlemod'}
@@ -21,7 +21,7 @@ windower.register_event('load',function()
 end)
 
 windower.register_event('login',function (name)
-	send_command('@wait 10;lua i options_load;')
+	send_command('@wait 10;lua i battlemod options_load;')
 end)
 
 windower.register_event('addon command',function (...)

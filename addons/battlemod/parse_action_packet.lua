@@ -117,6 +117,7 @@ function parse_action_packet(act)
 	for i,v in pairs(act.targets) do
 		local targ = assemble_targets(v.target)
 		for n,m in pairs(v.actions) do
+--			add_to_chat(8,m.message)
 			if m.message ~= 0 then
 				local color = color_filt(dialog[m.message].color,v.target[1].id==Self.id)
 				if m.reaction == 11 and act.category == 1 then act.action.name = 'parried'
@@ -200,16 +201,17 @@ end
 function simplify_message(msg_ID)
 	local msg = dialog[msg_ID][language]
 	local fields = fieldsearch(msg)
-	if line_full and (fields.actor and fields.target and (fields.spell or fields.ability or fields.item or fields.weapon_skill) and fields.number or 
-		T{1,31,67,163,229,352,353,373,576,577}:contains(msg_ID)) then
+--	add_to_chat(8,'ability: '..tostring(fields.ability)..'  spell: '..tostring(fields.spell)..'  item: '..tostring(fields.item)..'  weapon skill: '..tostring(fields.weapon_skill)..'  number: '..tostring(fields.number))
+	if line_full and fields.number then --(fields.target and (fields.spell or fields.ability or fields.item or fields.weapon_skill) and fields.number or 
+--		T{1,31,67,163,229,352,353,373,576,577}:contains(msg_ID)) then
 		msg = line_full
-	elseif line_nonumber and (fields.actor and fields.target and (fields.spell or fields.ability or fields.item or fields.weapon_skill) or
-		T{15,30,32,106,282,354}) then
+	elseif line_nonumber and not fields.number then --((fields.spell or fields.ability or fields.item or fields.weapon_skill) or
+--		T{15,30,32,106,282,354}) then
 		msg = line_nonumber
-	elseif line_noactor and fields.target and (fields.spell or fields.ability or fields.item or fields.weapon_skill) and fields.number then
-		msg = line_noactor
-	elseif line_noabil and fields.target and fields.number then
-		msg = line_noabil
+--	elseif line_noactor and (fields.spell or fields.ability or fields.item or fields.weapon_skill) and fields.number then
+--		msg = line_noactor
+--	elseif line_noabil and fields.target and fields.number then
+--		msg = line_noabil
 	end
 	return msg
 end

@@ -97,6 +97,8 @@ message_map[375] = T{412}-- Receives: Item, Target, Status
 message_map[186] = T{194,242,243}-- Receives: Weapon skill, Target, Status
 message_map.Receives = T{203,205,270,272,277,279,280,266,267,269,278}
 message_map[426] = T{427} -- Loses
+message_map[320] = T{267}
+message_map[414] = T{415}
 
 
 speFile = file.new('../../plugins/resources/spells.xml')
