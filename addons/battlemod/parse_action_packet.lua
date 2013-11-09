@@ -40,7 +40,11 @@ function parse_action_packet(act)
 				if m.has_spike_effect then
 					m.spike_effect_number = 1
 				end
-				if not check_filter(act.actor,v.target[1],act.category,m.message) then m.message = 0 end
+				if not check_filter(act.actor,v.target[1],act.category,m.message) then
+					m.message = 0
+					m.add_effect_message = 0
+					m.spike_effect_message = 0
+				end
 				if condensedamage and n > 1 then -- Damage/Action condensation within one target
 					for q=1,n-1 do
 						local r = v.actions[q]
@@ -72,7 +76,11 @@ function parse_action_packet(act)
 			end
 		else
 			local tempact = v.actions[1]
-			if not check_filter(act.actor,v.target[1],act.category,tempact.message) then tempact.message = 0 end
+			if not check_filter(act.actor,v.target[1],act.category,tempact.message) then
+				tempact.message = 0
+				tempact.add_effect_message = 0
+				tempact.spike_effect_message = 0
+			end
 			tempact.number = 1
 			if tempact.has_add_effect then
 				tempact.add_effect_number = 1
@@ -115,13 +123,13 @@ function parse_action_packet(act)
 				elseif m.reaction == 12 and act.category == 1 then act.action.name = 'blocked'
 				elseif m.message == 1 then act.action.name = 'hit'
 				elseif m.message == 15 then act.action.name = 'missed'
-				elseif m.message == 30 then act.action.name = 'anticipated'
+				elseif m.message == 30 then act.action.name = 'anticipated by'
 				elseif m.message == 31 then act.action.name = 'absorbed by shadow'
-				elseif m.message == 32 then act.action.name = 'dodged'
+				elseif m.message == 32 then act.action.name = 'dodged by'
 				elseif m.message == 67 then act.action.name = 'critical hit'
-				elseif m.message == 106 then act.action.name = 'intimidated'
-				elseif m.message == 282 then act.action.name = 'evaded'
-				elseif m.message == 373 then act.action.name = 'absorbed'
+				elseif m.message == 106 then act.action.name = 'intimidated by'
+				elseif m.message == 282 then act.action.name = 'evaded by'
+				elseif m.message == 373 then act.action.name = 'absorbed by'
 				elseif m.message == 352 then act.action.name = 'RA'
 				elseif m.message == 353 then act.action.name = 'critical RA'
 				elseif m.message == 354 then act.action.name = 'missed RA'
@@ -154,7 +162,7 @@ function parse_action_packet(act)
 				elseif T{163,229}:contains(m.add_effect_message) then act.action.name = 'AE'
 				end
 				local msg = simplify_message(m.add_effect_message)
-				add_to_chat(color,make_condensedamage_number(m.add_effect_number)..(dialog[m.add_effect_message][language]
+				add_to_chat(color,make_condensedamage_number(m.add_effect_number)..(msg
 					:gsub('${spell}',act.action.name or 'ERROR 127')
 					:gsub('${ability}',act.action.name or 'ERROR 128')
 					:gsub('${item}',act.action.name or 'ERROR 129')
@@ -170,7 +178,7 @@ function parse_action_packet(act)
 			if m.has_spike_effect and m.spike_effect_message ~= 0 then
 				local color = color_filt(dialog[m.spike_effect_message].color,act.actor.id==Self.id)
 				local msg = simplify_message(m.spike_effect_message)
-				add_to_chat(color,make_condensedamage_number(m.spike_effect_number)..(dialog[m.spike_effect_message][language]
+				add_to_chat(color,make_condensedamage_number(m.spike_effect_number)..(msg
 					:gsub('${spell}',act.action.name or 'ERROR 142')
 					:gsub('${ability}',act.action.name or 'ERROR 143')
 					:gsub('${item}',act.action.name or 'ERROR 144')
@@ -240,7 +248,7 @@ end
 
 function player_info(id)
 	local player_table = get_mob_by_id(id)
-	local typ,owner
+	local typ,owner,filter
 	
 	if player_table == nil then
 		return {name=nil,id=nil,is_npc=nil,type=nil,owner=nil}
@@ -248,13 +256,14 @@ function player_info(id)
 	
 	if player_table.is_npc then
 		if player_table.id%4096>2047 then
-			local party_table = get_party()
-			for i,v in pairs(party_table) do
+			typ = 'other_pets'
+			filter = 'other_pets'
+			owner = 'other'
+			for i,v in pairs(get_party()) do
 				if nf(v.mob,'pet_index') == player_table.index then
 					if i == 'p0' then
 						typ = 'my_pet'
-					else
-						typ = 'other_pets'
+						filter = 'my_pet'
 					end
 					owner = i
 					break
@@ -262,23 +271,33 @@ function player_info(id)
 			end
 		else
 			typ = 'mob'
+			filter = 'monsters'
+			for i,v in pairs(get_party()) do
+				if nf(v.mob,'id') == player_table.claim_id and filter.enemies then
+					filter = 'enemies'
+				end
+			end
 		end
 	else
-		local party_table = get_party()
-		for i,v in pairs(party_table) do
+		typ = 'other'
+		filter = 'others'
+		for i,v in pairs(get_party()) do
 			if v.mob and v.mob.id == player_table.id then
 				typ = i
+				if i == 'p0' then
+					filter = 'me'
+				elseif i:sub(1,1) == 'p' then
+					filter = 'party'
+				else
+					filter = 'alliance'
+				end
 			end
 		end
 	end
-	
-	if player_table ~= nil then -- when you zone into an area, sometimes you can get no player value.
-		if not typ then
-			typ= 'other'
-		end
-	end
-
-	return {name=player_table.name,id=id,is_npc = player_table.is_npc,type=typ,owner=(owner or nil)}
+	if not typ then typ = 'debug' end
+	if not filter then filter = 'me'
+	add_to_chat(8,'DERP DERP DERP') end
+	return {name=player_table.name,id=id,is_npc = player_table.is_npc,type=typ,filter=filter,owner=(owner or nil)}
 end
 
 function get_spell(act)
@@ -489,43 +508,36 @@ function check_filter(actor,target,category,msg)
 	-- This determines whether the message should be displayed or filtered
 	-- Returns true (don't filter) or false (filter), boolean
 	if not actor.type or not target.type then return false end
-	local actor_type, target_type
---	if filter[target.type]['target'] then return true end
 	
-	if col_filt_remap[actor.type] then actor_type = col_filt_remap[actor.type] else actor_type = actor.type end
-	if col_filt_remap[target.type] then target_type = col_filt_remap[target.type] else target_type = target.type end
+	if not filter[actor.filter] then add_to_chat(8,tostring(actor.filter)) end
 	
-	if not filter[actor_type] then
-		add_to_chat(8,tostring(actor_type))
-	end
-	
-	if actor_type ~= 'monsters' and actor_type ~= 'enemies' then
-		if filter[actor_type]['all']
-		or category == 1 and filter[actor_type]['melee']
-		or category == 2 and filter[actor_type]['ranged']
-		or category == 12 and filter[actor_type]['ranged']
-		or category == 5 and filter[actor_type]['items']
-		or category == 9 and filter[actor_type]['uses']
-		or nf(dialog[msg],'color')=='D' and filter[actor_type]['damage']
-		or nf(dialog[msg],'color')=='M' and filter[actor_type]['misses']
-		or nf(dialog[msg],'color')=='H' and filter[actor_type]['healing']
-		or msg == 43 and filter[actor_type]['readies'] or msg == 326 and filter[actor_type]['readies']
-		or msg == 3 and filter[actor_type]['casting'] or msg == 327 and filter[actor_type]['casting']
+	if actor.filter ~= 'monsters' and actor.filter ~= 'enemies' then
+		if filter[actor.filter]['all']
+		or category == 1 and filter[actor.filter]['melee']
+		or category == 2 and filter[actor.filter]['ranged']
+		or category == 12 and filter[actor.filter]['ranged']
+		or category == 5 and filter[actor.filter]['items']
+		or category == 9 and filter[actor.filter]['uses']
+		or nf(dialog[msg],'color')=='D' and filter[actor.filter]['damage']
+		or nf(dialog[msg],'color')=='M' and filter[actor.filter]['misses']
+		or nf(dialog[msg],'color')=='H' and filter[actor.filter]['healing']
+		or msg == 43 and filter[actor.filter]['readies'] or msg == 326 and filter[actor.filter]['readies']
+		or msg == 3 and filter[actor.filter]['casting'] or msg == 327 and filter[actor.filter]['casting']
 		then
 			return false
 		end
 	else
-		if filter[actor_type][target_type]['all']
-		or category == 1 and filter[actor_type][target_type]['melee']
-		or category == 2 and filter[actor_type][target_type]['ranged']
-		or category == 12 and filter[actor_type]['ranged']
-		or category == 5 and filter[actor_type]['items']
-		or category == 9 and filter[actor_type]['uses']
-		or nf(dialog[msg],'color')=='D' and filter[actor_type][target_type]['damage']
-		or nf(dialog[msg],'color')=='M' and filter[actor_type][target_type]['misses']
-		or nf(dialog[msg],'color')=='H' and filter[actor_type][target_type]['healing']
-		or msg == 43 and filter[actor_type][target_type]['readies'] or msg == 326 and filter[actor_type][target_type]['readies']
-		or msg == 3 and filter[actor_type][target_type]['casting'] or msg == 327 and filter[actor_type][target_type]['casting']
+		if filter[actor.filter][target.filter]['all']
+		or category == 1 and filter[actor.filter][target.filter]['melee']
+		or category == 2 and filter[actor.filter][target.filter]['ranged']
+		or category == 12 and filter[actor.filter]['ranged']
+		or category == 5 and filter[actor.filter]['items']
+		or category == 9 and filter[actor.filter]['uses']
+		or nf(dialog[msg],'color')=='D' and filter[actor.filter][target.filter]['damage']
+		or nf(dialog[msg],'color')=='M' and filter[actor.filter][target.filter]['misses']
+		or nf(dialog[msg],'color')=='H' and filter[actor.filter][target.filter]['healing']
+		or msg == 43 and filter[actor.filter][target.filter]['readies'] or msg == 326 and filter[actor.filter][target.filter]['readies']
+		or msg == 3 and filter[actor.filter][target.filter]['casting'] or msg == 327 and filter[actor.filter][target.filter]['casting']
 		then
 			return false
 		end

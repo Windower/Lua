@@ -8,7 +8,7 @@ require 'parse_action_packet'
 require 'statics'
 
 _addon = {}
-_addon.version = '3.02'
+_addon.version = '3.03'
 _addon.name = 'BattleMod'
 _addon.author = 'Byrth'
 _addon.commands = {'bm','battlemod'}
