@@ -42,7 +42,7 @@ require 'export'
 
 _addon = {}
 _addon.name = 'GearSwap'
-_addon.version = '0.708'
+_addon.version = '0.709'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -415,6 +415,7 @@ windower.register_event('outgoing chunk',function(id,data)
 		if logging then logit(logfile,'\n\nActor: '..tostring(actor_name)..'  Target: '..tostring(target_name)..'  Category: '..tostring(category)..'  param: '..tostring(abil_name or param)) end
 		if abil_name and not (buffactive.terror or buffactive.sleep or buffactive.stun or buffactive.petrification or buffactive.charm) then
 			midaction = true
+			send_command('@wait 1.5;lua i gearswap midact')
 		elseif user_env then
 			if type(user_env.aftercast) == 'function' then
 				equip_sets('aftercast',{name='Interrupt',type='Interrupt'},{type='Recast'})
