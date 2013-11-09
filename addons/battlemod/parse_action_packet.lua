@@ -492,8 +492,12 @@ function check_filter(actor,target,category,msg)
 	local actor_type, target_type
 --	if filter[target.type]['target'] then return true end
 	
-	if actor.type == 'p0' then actor_type = 'me' else actor_type = actor.type end
-	if target.type == 'p0' then target_type = 'me' else target_type = target.type end
+	if col_filt_remap[actor.type] then actor_type = col_filt_remap[actor.type] else actor_type = actor.type end
+	if col_filt_remap[target.type] then target_type = col_filt_remap[target.type] else target_type = target.type end
+	
+	if not filter[actor_type] then
+		add_to_chat(8,tostring(actor_type))
+	end
 	
 	if actor_type ~= 'monsters' and actor_type ~= 'enemies' then
 		if filter[actor_type]['all']
