@@ -42,13 +42,13 @@ require 'export'
 
 _addon = {}
 _addon.name = 'GearSwap'
-_addon.version = '0.709'
+_addon.version = '0.710'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
 windower.register_event('load',function()
 	debugging = 1
-	
+	if debugging >= 1 then windower.debug('load') end
 	if dir_exists('../addons/GearSwap/data/logs') then
 		logging = false
 		logfile = io.open('../addons/GearSwap/data/logs/NormalLog'..tostring(os.clock())..'.log','w+')
@@ -65,10 +65,12 @@ windower.register_event('load',function()
 end)
 
 windower.register_event('unload',function ()
+	if debugging >= 1 then windower.debug('unload') end
 	if logging then	logfile:close() end
 end)
 
 windower.register_event('addon command',function (...)
+	if debugging >= 1 then windower.debug('addon command') end
 	local command = table.concat({...},' ')
 	if logging then	logit(logfile,'\n\n'..tostring(os.clock)..command) end
 	local splitup = split(command,' ')
@@ -146,6 +148,7 @@ function sender()
 end
 
 windower.register_event('outgoing text',function(original,modified)
+	if debugging >= 1 then windower.debug('outgoing text') end
 	if gearswap_disabled then return modified end
 	
 	local temp_mod = convert_auto_trans(modified)
@@ -215,6 +218,7 @@ windower.register_event('outgoing text',function(original,modified)
 end)
 
 windower.register_event('incoming text',function(original,modified,mode)
+	if debugging >= 1 then windower.debug('incoming text') end
 	if gearswap_disabled then return modified, color end
 	if original == '...A command error occurred.' or original == 'You can only use that command during battle.' or original == 'You cannot use that command here.' then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(130) Client canceled command detected: '..mode..' '..original) end
@@ -228,37 +232,8 @@ windower.register_event('incoming text',function(original,modified,mode)
 end)
 
 windower.register_event('incoming chunk',function(id,data)
---	cur_ID = data:byte(3,4)
---	if prev_ID == nil then
---		prev_ID = cur_ID
---	end
---	persistant_sequence[data:byte(3,4)] = true  ---------------------- TEMPORARY TO INVESTIGATE LAG ISSUES IN DELVE
---	if data:byte(3,4) ~= 0x00 then
---		if not persistant_sequence[data:byte(3,4)-1] then
---			if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(140) Packet dropped or out of order: '..cur_ID..' '..prev_ID) end
---		end
---	end
---	prev_ID = cur_ID
---	if prev_ID == 0xFF then
---		table.reassign(persistant_sequence,{})
---	end
---[[	if id == 0x027 then
-		local ind = get_mob_by_index(256*data:byte(10) + data:byte(9))
-		if ind == player.index then
-			local status = data:byte(11)
-			for i=0,15 do
-				if status == encumbrance_map[i] and encumbrance_table[i] then
-					encumbrance_table[i] = false
-					add_to_chat(123,"Gearswap: Your "..default_slot_map[i]..' are now unlocked.')
-					if not_sent_out_equip[i] and not disable_table[i] then
-						set_equip(not_sent_out_equip[i],i)
-						sent_out_equip[i] = not_sent_out_equip[i]
-						not_sent_out_equip[i] = nil
-					end
-				end
-			end
-		end
-	end]]
+	if debugging >= 1 then windower.debug('incoming chunk '..id) end
+
 	if id == 0x29 then  -- TEMPORARY FIX
 		if gearswap_disabled then return end
 		data = data:sub(5)
@@ -387,10 +362,12 @@ function get_bit_packed(dat_string,start,stop) -- Temporary
 end
 
 windower.register_event('zone change',function(new_zone,new_zone_id,old_zone,old_zone_id)
+	if debugging >= 1 then windower.debug('zone change') end
 	midaction = false
 end)
 
 windower.register_event('outgoing chunk',function(id,data)
+	if debugging >= 1 then windower.debug('outgoing chunk '..id) end
 	if id == 0x015 then
 		lastbyte = data:byte(7,8)
 	end
@@ -436,6 +413,7 @@ function midact()
 end
 
 windower.register_event('action',function(act)
+	if debugging >= 1 then windower.debug('action') end
 	if gearswap_disabled or act.category == 1 then return end
 	
 	local temp_player = get_player()
@@ -546,6 +524,7 @@ end)
 end)]]
 
 windower.register_event('status change',function(new,old)
+	if debugging >= 1 then windower.debug('status change '..new) end
 	if gearswap_disabled or T{'Event','Other','Zoning','Dead'}:contains(old) or T{'Event','Other','Zoning','Dead'}:contains(new) then return end
 	-- Event may not be a real status yet. This is a blacklist to prevent people from swapping out of crafting gear or when disengaging from NPCs.
 	if old == '' then old = 'Idle' end
@@ -553,31 +532,37 @@ windower.register_event('status change',function(new,old)
 end)
 
 windower.register_event('gain status',function(name,id)
+	if debugging >= 1 then windower.debug('gain status '..name) end
 	if gearswap_disabled then return end
 	if midaction and T{'terror','sleep','stun','petrification','charm','weakness'}:contains(name:lower()) then midaction = false end
 	equip_sets('buff_change',name,'gain')
 end)
 
 windower.register_event('lose status',function(name,id)
+	if debugging >= 1 then windower.debug('lose status '..name) end
 	if gearswap_disabled then return end
 	equip_sets('buff_change',name,'loss')
 end)
 
 windower.register_event('job change',function(mjob, mjob_id, mjob_lvl, sjob, sjob_id, sjob_lvl)
+	if debugging >= 1 then windower.debug('job change') end
 	if mjob ~= current_job_file then
 		refresh_user_env()
 	end
 end)
 
 windower.register_event('login',function(name)
+	if debugging >= 1 then windower.debug('login '..name) end
 	send_command('@wait 2;lua i gearswap refresh_user_env;')
 end)
 
 windower.register_event('day change',function(new,old)
+	if debugging >= 1 then windower.debug('day change') end
 	send_command('@wait 0.5;lua invoke gearswap refresh_ffxi_info')
 end)
 
 windower.register_event('weather change',function(new_weather, new_weather_id, old_weather, old_weather_id)
+	if debugging >= 1 then windower.debug('weather change') end
 	refresh_ffxi_info()
 end)
 
