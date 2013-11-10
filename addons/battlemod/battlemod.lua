@@ -159,6 +159,9 @@ function flip_block_cannot()
 end
 
 function options_load()
+	if get_player() then
+		Self = get_player()
+	end
 	if not dir_exists(lua_base_path..'data\\') then
 		create_dir(lua_base_path..'data\\')
 	end
