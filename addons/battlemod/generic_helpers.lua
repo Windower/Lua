@@ -135,5 +135,6 @@ end
 
 function color_it(to_color,color)
 	local colarr = split(to_color,' ')
+	if not color then add_to_chat(8,'Color was invalid.') return to_color end
 	return color..table.concat(colarr,rcol..' '..color)..rcol
 end

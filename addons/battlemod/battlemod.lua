@@ -8,23 +8,23 @@ require 'parse_action_packet'
 require 'statics'
 
 _addon = {}
-_addon.version = '3.04'
+_addon.version = '3.05'
 _addon.name = 'BattleMod'
 _addon.author = 'Byrth'
 _addon.commands = {'bm','battlemod'}
 
 windower.register_event('load',function()
+	if debugging >= 1 then windower.debug('load') end
 	options_load()
-	if get_player() then
-		Self = get_player()
-	end
 end)
 
 windower.register_event('login',function (name)
+	if debugging >= 1 then windower.debug('login') end
 	send_command('@wait 10;lua i battlemod options_load;')
 end)
 
 windower.register_event('addon command',function (...)
+	if debugging >= 1 then windower.debug('addon command') end
     local term = table.concat({...}, ' ')
     local splitarr = split(term,' ')
 	if splitarr[1] == 'cmd' then
@@ -122,24 +122,10 @@ windower.register_event('addon command',function (...)
 end)
 
 windower.register_event('incoming text',function (original, modified, color)
+	if debugging >= 1 then windower.debug('outgoing text') end
 	local redcol = color%256
 	
---[[	if redcol == 36 then
-		a,z = string.find(original,' defeats ')
-		if a then
-			if original:sub(1,4) ~= string.char(0x1F,0xFE,0x1E,0x01) then
-				modified = true
-			end
-		end
-	elseif redcol == 127 then
-		a,z = string.find(original,' corpuscles of ')
-		b,z = string.find(original,' experience points')
-		if a or b then
-			if original:sub(1,4) ~= string.char(0x1F,0xFE,0x1E,0x01) then
-				modified = true
-			end
-		end
-	else]]if redcol == 121 and cancelmulti then
+	if redcol == 121 and cancelmulti then
 		a,z = string.find(original,'Equipment changed')
 		
 		if a and not block_equip then
@@ -223,7 +209,8 @@ function options_load()
 	end
 end
 
-windower.register_event('job change',function (mjob_id,mjob,mjob_lvl,sjob_id,sjob,sjob_lvl)
+windower.register_event('job change',function (mjob,mjob_id,mjob_lvl,sjob,sjob_id,sjob_lvl)
+	if debugging >= 1 then windower.debug('job change') end
 	filterload(mjob)
 end)
 
@@ -240,6 +227,7 @@ function filterload(job)
 end
 
 windower.register_event('incoming chunk',function (id,original,modified,is_injected,is_blocked)
+	if debugging >= 1 then windower.debug('incoming chunk '..id) end
 	local pref = original:sub(1,4)
 	local data = original:sub(5)
 	if id == 0x28 and original ~= last_28_packet then

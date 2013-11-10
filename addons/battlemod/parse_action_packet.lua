@@ -120,8 +120,8 @@ function parse_action_packet(act)
 --			add_to_chat(8,m.message)
 			if m.message ~= 0 then
 				local color = color_filt(dialog[m.message].color,v.target[1].id==Self.id)
-				if m.reaction == 11 and act.category == 1 then act.action.name = 'parried'
-				elseif m.reaction == 12 and act.category == 1 then act.action.name = 'blocked'
+				if m.reaction == 11 and act.category == 1 then act.action.name = 'parried by'
+				elseif m.reaction == 12 and act.category == 1 then act.action.name = 'blocked by'
 				elseif m.message == 1 then act.action.name = 'hit'
 				elseif m.message == 15 then act.action.name = 'missed'
 				elseif m.message == 30 then act.action.name = 'anticipated by'
@@ -155,7 +155,7 @@ function parse_action_packet(act)
 					:gsub('${gil}',m.param)))
 				m.message = 0
 			end
-			if m.has_add_effect and m.add_effect_message ~= 0 then
+			if m.has_add_effect and m.add_effect_message ~= 0 and add_effect_valid[act.category] then
 				local color = color_filt(dialog[m.add_effect_message].color,v.target[1].id==Self.id)
 				if m.add_effect_message > 287 and m.add_effect_message < 303 then act.action.name = skillchain_arr[m.add_effect_message-287]
 				elseif m.add_effect_message > 384 and m.add_effect_message < 399 then act.action.name = skillchain_arr[m.add_effect_message-384]
@@ -176,8 +176,9 @@ function parse_action_packet(act)
 					:gsub('${status}',m.add_effect_status or '')))
 				m.add_effect_message = 0
 			end
-			if m.has_spike_effect and m.spike_effect_message ~= 0 then
+			if m.has_spike_effect and m.spike_effect_message ~= 0 and spike_effect_valid[act.category] then
 				local color = color_filt(dialog[m.spike_effect_message].color,act.actor.id==Self.id)
+				if m.spike_effect_message == 33 then act.action.name = 'countered by' end
 				local msg = simplify_message(m.spike_effect_message)
 				add_to_chat(color,make_condensedamage_number(m.spike_effect_number)..(msg
 					:gsub('${spell}',act.action.name or 'ERROR 142')
@@ -297,8 +298,6 @@ function player_info(id)
 		end
 	end
 	if not typ then typ = 'debug' end
-	if not filter then filter = 'me'
-	add_to_chat(8,'DERP DERP DERP') end
 	return {name=player_table.name,id=id,is_npc = player_table.is_npc,type=typ,filter=filter,owner=(owner or nil)}
 end
 
