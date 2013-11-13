@@ -25,8 +25,8 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 debugging = false
-if dir_exists('../addons/shortcuts/data/') then
-	logging = false
+logging = false
+if dir_exists('../addons/shortcuts/data/') and logging then
 	logfile = io.open('../addons/shortcuts/data/NormalLog'..tostring(os.clock())..'.log','w+')
 	logfile:write('\n\n','SHORTCUTS LOGGER HEADER: ',tostring(os.clock()),'\n')
 	logfile:flush()
@@ -40,7 +40,7 @@ require 'resources'
 require 'ambiguous_names'
 require 'targets'
 
-_addon = {}
+
 _addon.version = '1.1'
 _addon.name = 'Shortcuts'
 _addon.author = 'Byrth'
@@ -244,10 +244,13 @@ function interp_text(splitline,offset,modified)
 		local r_line, s_type
 		
 		if validabils[strippedabil].typ == 'r_spells' then
+			if debugging then add_to_chat(8,strippedabil..' is considered a spell.') end
 			r_line = r_spells[validabils[strippedabil].index]
 		elseif validabils[strippedabil].typ == 'r_abilities' then
+			if debugging then add_to_chat(8,strippedabil..' is considered an ability.') end
 			r_line = r_abilities[validabils[strippedabil].index]
 		elseif validabils[strippedabil].typ == 'ambig_names' then
+			if debugging then add_to_chat(8,strippedabil..' is considered ambiguous.') end
 			r_line, s_type = ambig(strippedabil)
 		end
 		

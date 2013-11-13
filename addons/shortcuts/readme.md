@@ -1,4 +1,4 @@
-#Shortcuts v1.1
+#Shortcuts v1.2
 ####written by Byrth  
 
 Completes and properly formats commands (prefixed by at least one '/'),
@@ -9,6 +9,7 @@ spellcast" project, and represents the interpretation part of spellcast.
 None  
 
 ####Changelog:  
+v1.2 - 11/13/13 - Added abiguous case handling for amorph/bird spells.
 v1.1 - 10/23/13 - Reduced "spell1" to "spell" and made some minor adjustments.
 v1.0 - 10/16/13 - Fixed some ambiguous name processing issues with monsterskills.
 v0.9 - 10/1/13  - Fixed targets.lua's interpretation of the target flags.
