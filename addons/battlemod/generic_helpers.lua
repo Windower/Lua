@@ -133,8 +133,77 @@ function colconv(str,key)
 	return out
 end
 
+
 function color_it(to_color,color)
-	local colarr = split(to_color,' ')
-	if not color then add_to_chat(8,'Color was invalid.') return to_color end
-	return color..table.concat(colarr,rcol..' '..color)..rcol
+	if not color and debugging then add_to_chat(8,'Color was invalid.') return to_color end
+	if to_color then
+		local colarr = split(to_color,' ')
+		return color..table.concat(colarr,rcol..' '..color)..rcol
+	else
+		return ''
+	end
+end
+
+
+function conjunctions(pre,post,target_count,current)
+	if current < target_count or commamode then
+		pre = pre..', '
+	else
+		if oxford and target_count >2 then
+			pre = pre..','
+		end
+		pre = pre..' and '
+	end
+	return pre..post
+end
+
+
+
+function fieldsearch(message)
+	fieldarr = {}
+	string.gsub(message,"{(.-)}", function(a) fieldarr[a] = true end)
+	return fieldarr
+end
+
+
+function check_filter(actor,target,category,msg)
+	-- This determines whether the message should be displayed or filtered
+	-- Returns true (don't filter) or false (filter), boolean
+	if not actor.filter or not target.filter then return false end
+	
+	if not filter[actor.filter] and debugging then add_to_chat(8,'Battlemod - Filter Not Recognized: '..tostring(actor.filter)) end
+	
+	if actor.filter ~= 'monsters' and actor.filter ~= 'enemies' then
+		if filter[actor.filter]['all']
+		or category == 1 and filter[actor.filter]['melee']
+		or category == 2 and filter[actor.filter]['ranged']
+		or category == 12 and filter[actor.filter]['ranged']
+		or category == 5 and filter[actor.filter]['items']
+		or category == 9 and filter[actor.filter]['uses']
+		or nf(dialog[msg],'color')=='D' and filter[actor.filter]['damage']
+		or nf(dialog[msg],'color')=='M' and filter[actor.filter]['misses']
+		or nf(dialog[msg],'color')=='H' and filter[actor.filter]['healing']
+		or msg == 43 and filter[actor.filter]['readies'] or msg == 326 and filter[actor.filter]['readies']
+		or msg == 3 and filter[actor.filter]['casting'] or msg == 327 and filter[actor.filter]['casting']
+		then
+			return false
+		end
+	else
+		if filter[actor.filter][target.filter]['all']
+		or category == 1 and filter[actor.filter][target.filter]['melee']
+		or category == 2 and filter[actor.filter][target.filter]['ranged']
+		or category == 12 and filter[actor.filter]['ranged']
+		or category == 5 and filter[actor.filter]['items']
+		or category == 9 and filter[actor.filter]['uses']
+		or nf(dialog[msg],'color')=='D' and filter[actor.filter][target.filter]['damage']
+		or nf(dialog[msg],'color')=='M' and filter[actor.filter][target.filter]['misses']
+		or nf(dialog[msg],'color')=='H' and filter[actor.filter][target.filter]['healing']
+		or msg == 43 and filter[actor.filter][target.filter]['readies'] or msg == 326 and filter[actor.filter][target.filter]['readies']
+		or msg == 3 and filter[actor.filter][target.filter]['casting'] or msg == 327 and filter[actor.filter][target.filter]['casting']
+		then
+			return false
+		end
+	end
+
+	return true
 end
