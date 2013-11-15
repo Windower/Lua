@@ -7,7 +7,7 @@ require 'generic_helpers'
 require 'parse_action_packet'
 require 'statics'
 
-_addon.version = '3.06'
+_addon.version = '3.07'
 _addon.name = 'BattleMod'
 _addon.author = 'Byrth'
 _addon.commands = {'bm','battlemod'}

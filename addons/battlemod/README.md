@@ -1,8 +1,8 @@
 Author: Byrth
 
-Version: 3.06
+Version: 3.07
 
-Date: 14/11/13
+Date: 15/11/13
 
 Battlemod, packet version
 

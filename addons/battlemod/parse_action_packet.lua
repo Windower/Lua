@@ -14,7 +14,7 @@ function parse_action_packet(act)
 				if dialog[m.message] then m.fields = fieldsearch(dialog[m.message][language]) end
 				if dialog[m.add_effect_message] then m.add_effect_fields = fieldsearch(dialog[m.add_effect_message][language]) end
 				if dialog[m.spike_effect_message] then m.spike_effect_fields = fieldsearch(dialog[m.spike_effect_message][language]) end
-				
+								
 				if r_status[m.param] and m.param ~= 0 then
 					m.status = r_status[m.param][language]
 				end
@@ -66,6 +66,10 @@ function parse_action_packet(act)
 			if dialog[tempact.message] then tempact.fields = fieldsearch(dialog[tempact.message][language]) end
 			if dialog[tempact.add_effect_message] then tempact.add_effect_fields = fieldsearch(dialog[tempact.add_effect_message][language]) end
 			if dialog[tempact.spike_effect_message] then tempact.spike_effect_fields = fieldsearch(dialog[tempact.spike_effect_message][language]) end
+			
+				
+			--if tempact.add_effect_fields and tempact.add_effect_fields.status then add_to_chat(8,tostring(tempact.add_effect_fields.status)..' '..dialog[tempact.add_effect_message][language]) end
+			
 			if not check_filter(act.actor,v.target[1],act.category,tempact.message) then
 				tempact.message = 0
 				tempact.add_effect_message = 0
@@ -131,10 +135,10 @@ function parse_action_packet(act)
 				if not color_arr[act.actor.owner or act.actor.type] then add_to_chat(8,tostring(act.actor.owner)..' '..act.actor.type) end
 				if m.fields.status then numb = m.status else numb = m.param end
 				add_to_chat(color,make_condensedamage_number(m.number)..(msg
-					:gsub('${spell}',act.action.name or 'ERROR 111')
-					:gsub('${ability}',act.action.name or 'ERROR 112')
-					:gsub('${item}',act.action.name or 'ERROR 113')
-					:gsub('${weapon_skill}',act.action.name or 'ERROR 114')
+					:gsub('${spell}',act.action.spell or 'ERROR 111')
+					:gsub('${ability}',act.action.ability or 'ERROR 112')
+					:gsub('${item}',act.action.item or 'ERROR 113')
+					:gsub('${weapon_skill}',act.action.weapon_skill or 'ERROR 114')
 					:gsub('${abil}',m.simp_name or act.action.name or 'ERROR 115')
 					:gsub('${numb}',numb or 'ERROR 116')
 					:gsub('${actor}',color_it(act.actor.name,color_arr[act.actor.owner or act.actor.type]))
@@ -156,12 +160,12 @@ function parse_action_packet(act)
 				local msg,numb = simplify_message(m.add_effect_message)
 				if m.add_effect_fields.status then numb = m.add_effect_status else numb = m.add_effect_param end
 				add_to_chat(color,make_condensedamage_number(m.add_effect_number)..(msg
-					:gsub('${spell}',act.action.name or 'ERROR 127')
-					:gsub('${ability}',act.action.name or 'ERROR 128')
-					:gsub('${item}',act.action.name or 'ERROR 129')
-					:gsub('${weapon_skill}',act.action.name or 'ERROR 130')
+					:gsub('${spell}',act.action.spell or 'ERROR 127')
+					:gsub('${ability}',act.action.ability or 'ERROR 128')
+					:gsub('${item}',act.action.item or 'ERROR 129')
+					:gsub('${weapon_skill}',act.action.weapon_skill or 'ERROR 130')
 					:gsub('${abil}',m.simp_add_name or act.action.name or 'ERROR 131')
-					:gsub('${numb}',m.add_effect_status or m.add_effect_param or 'ERROR 132')
+					:gsub('${numb}',numb or 'ERROR 132')
 					:gsub('${actor}',color_it(act.actor.name,color_arr[act.actor.owner or act.actor.type]))
 					:gsub('${target}',targ)
 					:gsub('${lb}','\7')
@@ -172,16 +176,17 @@ function parse_action_packet(act)
 			if m.has_spike_effect and m.spike_effect_message ~= 0 and spike_effect_valid[act.category] then
 				local targ = assemble_targets(act.actor,v.target,act.category,m.spike_effect_message)
 				local color = color_filt(dialog[m.spike_effect_message].color,act.actor.id==Self.id)
-				if m.spike_effect_message == 33 then m.simp_spike_name = 'countered by' end
+				if m.spike_effect_message == 33 then m.simp_spike_name = 'countered by' else
+					m.simp_spike_name = 'spikes' end
 				local msg = simplify_message(m.spike_effect_message)
 				if m.spike_effect_fields.status then numb = m.spike_effect_status else numb = m.spike_effect_param end
 				add_to_chat(color,make_condensedamage_number(m.spike_effect_number)..(msg
-					:gsub('${spell}',act.action.name or 'ERROR 142')
-					:gsub('${ability}',act.action.name or 'ERROR 143')
-					:gsub('${item}',act.action.name or 'ERROR 144')
-					:gsub('${weapon_skill}',act.action.name or 'ERROR 145')
+					:gsub('${spell}',act.action.spell or 'ERROR 142')
+					:gsub('${ability}',act.action.ability or 'ERROR 143')
+					:gsub('${item}',act.action.item or 'ERROR 144')
+					:gsub('${weapon_skill}',act.action.weapon_skill or 'ERROR 145')
 					:gsub('${abil}',m.simp_spike_name or act.action.name or 'ERROR 146')
-					:gsub('${numb}',m.spike_effect_status or m.spike_effect_param or 'ERROR 147')
+					:gsub('${numb}',numb or 'ERROR 147')
 					:gsub('${actor}',color_it(act.actor.name,color_arr[act.actor.owner or act.actor.type]))
 					:gsub('${target}',targ)
 					:gsub('${lb}','\7')

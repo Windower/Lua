@@ -160,7 +160,7 @@ end
 
 
 function fieldsearch(message)
-	fieldarr = {}
+	local fieldarr = {}
 	string.gsub(message,"{(.-)}", function(a) fieldarr[a] = true end)
 	return fieldarr
 end
