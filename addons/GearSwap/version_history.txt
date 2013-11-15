@@ -1,4 +1,6 @@
 -------------------------------------------------
+Gearswap 0.711 - Refined category exclusions for the outgoing action packet.
+-------------------------------------------------
 Gearswap 0.710 - Added windower.debug statements.
 -------------------------------------------------
 Gearswap 0.709 - Looped midact back through console with a 1.5 second delay. Tested for 2 days without extra DC issues.

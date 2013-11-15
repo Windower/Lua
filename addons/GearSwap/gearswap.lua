@@ -40,9 +40,9 @@ require 'refresh'
 require 'parse_augments'
 require 'export'
 
-_addon = {}
+
 _addon.name = 'GearSwap'
-_addon.version = '0.710'
+_addon.version = '0.711'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -380,20 +380,21 @@ windower.register_event('outgoing chunk',function(id,data)
 		_unknown1 = data:byte(16,16)*256+data:byte(15,15)
 		local actor_name = get_mob_by_id(actor_id)['name']
 		local target_name = get_mob_by_index(index)['name']
-		if category == 3 then
+		if category == 3 and not buffactive.silence and not buffactive.mute then -- 3 = Magic
 			abil_name = r_spells[param][language]
-		elseif category == 7 then
+		elseif (category == 7 or category == 25) and not buffactive.amnesia then -- 7 = WS, 25 = Monster skill
 			abil_name = r_abilities[param+768][language]
-		elseif category == 9 then
+		elseif category == 9 and not buffactive.amnesia then -- 9 = Ability
 			abil_name = r_abilities[param][language]
-		elseif category == 16 then
+		elseif category == 16 then -- 16 = . . . ranged attack
 			abil_name = 'Ranged Attack'
 		end
 		if logging then logit(logfile,'\n\nActor: '..tostring(actor_name)..'  Target: '..tostring(target_name)..'  Category: '..tostring(category)..'  param: '..tostring(abil_name or param)) end
 		if abil_name and not (buffactive.terror or buffactive.sleep or buffactive.stun or buffactive.petrification or buffactive.charm) then
 			midaction = true
-			send_command('@wait 1.5;lua i gearswap midact')
-		elseif user_env then
+			send_command('@wait 1;lua i gearswap midact')
+		elseif user_env and not T{0,2,4,13,14,15,18,20}:contains(category) then -- 0 = interacting with an NPC, 2 = engaging, 4 = disengaging from menu, 13 = getting up from reraise, 14 = fishing, 15 = changing target, 18 = dismounting chocobo, 20 = zoning
+			if T{3,7,9,16}:contains(category) then add_to_chat(8,'Tell Byrth how you triggered this and this number: '..category) end
 			if type(user_env.aftercast) == 'function' then
 				equip_sets('aftercast',{name='Interrupt',type='Interrupt'},{type='Recast'})
 			elseif user_env.aftercast then
