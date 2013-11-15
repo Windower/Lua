@@ -1,4 +1,4 @@
-#Shortcuts v1.2
+#Shortcuts v1.3
 ####written by Byrth  
 
 Completes and properly formats commands (prefixed by at least one '/'),
@@ -9,6 +9,7 @@ spellcast" project, and represents the interpretation part of spellcast.
 None  
 
 ####Changelog:  
+v1.3 - 11/15/13 - Added handling for "Corpse" spells and fixed a minor glitch in target creation.
 v1.2 - 11/13/13 - Added abiguous case handling for amorph/bird spells.
 v1.1 - 10/23/13 - Reduced "spell1" to "spell" and made some minor adjustments.
 v1.0 - 10/16/13 - Fixed some ambiguous name processing issues with monsterskills.
