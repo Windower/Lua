@@ -1,5 +1,5 @@
 
-_addon = {}
+
 _addon.version = '1.0'
 _addon.name = 'Send'
 _addon.command = 'send'
