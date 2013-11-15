@@ -451,7 +451,8 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 	end
 end)
 
-function multi_packet(ind)
+function multi_packet(...)
+	local ind = table.concat({...},' ')
 --	add_to_chat(8,tostring(multi_actor[ind].name)..' '..tostring(multi_targs[ind][1].name)..' '..tostring(multi_msg[ind]))
 	local targets = assemble_targets(multi_actor[ind],multi_targs[ind],0,multi_msg[ind])
 	local outstr = dialog[multi_msg[ind]][language]
