@@ -133,7 +133,7 @@ function parse_action_packet(act)
 				end
 				local msg,numb = simplify_message(m.message)
 				if not color_arr[act.actor.owner or act.actor.type] then add_to_chat(8,tostring(act.actor.owner)..' '..act.actor.type) end
-				if m.fields.status then numb = m.status else numb = m.param end
+				if m.fields.status then numb = m.status else numb = pref_suf(m.param,m.message) end
 				add_to_chat(color,make_condensedamage_number(m.number)..(msg
 					:gsub('${spell}',act.action.spell or 'ERROR 111')
 					:gsub('${ability}',act.action.ability or 'ERROR 112')
@@ -158,7 +158,7 @@ function parse_action_packet(act)
 				elseif T{163,229}:contains(m.add_effect_message) then m.simp_add_name = 'AE'
 				end
 				local msg,numb = simplify_message(m.add_effect_message)
-				if m.add_effect_fields.status then numb = m.add_effect_status else numb = m.add_effect_param end
+				if m.add_effect_fields.status then numb = m.add_effect_status else numb = pref_suf(m.add_effect_param,m.add_effect_message) end
 				add_to_chat(color,make_condensedamage_number(m.add_effect_number)..(msg
 					:gsub('${spell}',act.action.spell or 'ERROR 127')
 					:gsub('${ability}',act.action.ability or 'ERROR 128')
@@ -179,7 +179,7 @@ function parse_action_packet(act)
 				if m.spike_effect_message == 33 then m.simp_spike_name = 'countered by' else
 					m.simp_spike_name = 'spikes' end
 				local msg = simplify_message(m.spike_effect_message)
-				if m.spike_effect_fields.status then numb = m.spike_effect_status else numb = m.spike_effect_param end
+				if m.spike_effect_fields.status then numb = m.spike_effect_status else numb = pref_suf(m.spike_effect_param,m.spike_effect_message) end
 				add_to_chat(color,make_condensedamage_number(m.spike_effect_number)..(msg
 					:gsub('${spell}',act.action.spell or 'ERROR 142')
 					:gsub('${ability}',act.action.ability or 'ERROR 143')
@@ -198,6 +198,17 @@ function parse_action_packet(act)
 	end
 	
 	return act
+end
+
+function pref_suf(param,msg_ID)
+	local outstr = tostring(param)
+	if dialog[msg_ID] and dialog[msg_ID].prefix then
+		outstr = dialog[msg_ID].prefix..' '..outstr
+	end
+	if dialog[msg_ID] and dialog[msg_ID].suffix then
+		outstr = outstr..' '..dialog[msg_ID].suffix
+	end
+	return outstr
 end
 
 function simplify_message(msg_ID)
