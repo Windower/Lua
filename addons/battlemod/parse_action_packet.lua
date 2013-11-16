@@ -130,6 +130,10 @@ function parse_action_packet(act)
 				elseif m.message == 354 then m.simp_name = 'missed RA'
 				elseif m.message == 576 then m.simp_name = 'RA hit squarely'
 				elseif m.message == 577 then m.simp_name = 'RA struck true'
+				elseif m.message == 426 or m.message == 427 then m.simp_name = 'Bust! '..act.action.name
+				elseif m.message == 435 or m.message == 436 then m.simp_name = act.action.name..' (JAs)'
+				elseif m.message == 437 or m.message == 438 then m.simp_name = act.action.name..' (JAs and TP)'
+				elseif m.message == 439 or m.message == 440 then m.simp_name = act.action.name..' (SPs, JAs, TP, and MP)'
 				end
 				local msg,numb = simplify_message(m.message)
 				if not color_arr[act.actor.owner or act.actor.type] then add_to_chat(8,tostring(act.actor.owner)..' '..act.actor.type) end

@@ -95,6 +95,14 @@ message_map.Receives = T{203,205,270,272,277,279,280,266,267,269,278}
 message_map[426] = T{427} -- Loses
 message_map[320] = T{267}
 message_map[414] = T{415}
+message_map[7] = T{263}
+message_map[148] = T{149}
+message_map[441] = T{421}
+message_map[131] = T{286}
+message_map[150] = T{151}
+message_map[420] = T{421}
+message_map[424] = T{421}
+message_map[437] = T{438}
 
 spike_effect_valid = {true,false,false,false,false,false,false,false,false,false,false,false,false,false,false}
 add_effect_valid = {true,true,true,true,false,false,false,false,false,false,false,false,false,false,false}
