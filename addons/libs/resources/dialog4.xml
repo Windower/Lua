@@ -13,7 +13,7 @@
 	<dtd id="11" english="${actor} falls to level ${number}." color="1"/>
 	<dtd id="12" english="Cannot attack.${lb}Your target is already claimed." color="1"/>
 	<dtd id="13" english="Debug Message: ${actor}: ${target} is now invincible." color="1"/>
-	<dtd id="14" english="${actor}'s attack is countered by ${target}.${lb}${number} of ${actor}'s shadows absorbs the damage and disappears." color="29" units="Shadow"/>
+	<dtd id="14" english="${actor}'s attack is countered by ${target}.${lb}${number} of ${actor}'s shadows absorbs the damage and disappears." color="29" units="shadow"/>
 	<dtd id="15" english="${actor} misses ${target}." color="M"/>
 	<dtd id="16" english="${actor}'s casting is interrupted." color="122"/>
 	<dtd id="17" english="Unable to cast spells at this time." color="122"/>
@@ -30,7 +30,7 @@
 	<dtd id="28" english="${actor} uses a ${item}." color="90"/>
 	<dtd id="29" english="${actor} is paralyzed." color="122"/>
 	<dtd id="30" english="${target} anticipates the attack." color="M"/>
-	<dtd id="31" english="${number} of ${target}'s shadows absorbs the damage and disappears." color="29" units="Shadow"/>
+	<dtd id="31" english="${number} of ${target}'s shadows absorbs the damage and disappears." color="29" units="shadow"/>
 	<dtd id="32" english="${target} dodges the attack." color="29"/>
 	<dtd id="33" english="${actor}'s attack is countered by ${target}.${lb}${actor} takes ${number} points of damage." color="D"/>
 	<dtd id="34" english="${actor} does not have enough MP to cast ${spell}." color="122"/>
@@ -93,7 +93,7 @@
 	<dtd id="91" english="${actor} does not have any ${item}." color="1"/>
 	<dtd id="92" english="Cannot use the ${item} on ${target}." color="1"/>
 	<dtd id="93" english="${actor} casts ${spell}.${lb}${target} vanishes." color="64"/>
-	<dtd id="94" english="You must wait longer to perform that action." color="1"/>
+	<dtd id="94" english="You must wait longer to perform that action." color="121"/>
 	<dtd id="95" english="You cannot learn ${spell}.${lb}You do not meet the job or level requirements." color="1"/>
 	<dtd id="96" english="You already know ${spell}." color="1"/>
 	<dtd id="97" english="${target} was defeated by ${actor}." color="38"/>
@@ -150,7 +150,7 @@
 	<dtd id="148" english="${actor} uses ${ability}.${lb}${target} is fortified against demons." color="101"/>
 	<dtd id="149" english="${target} is fortified against demons." color="101"/>
 	<dtd id="150" english="${actor} uses ${ability}.${lb}${target} is fortified against dragons." color="101"/>
-	<dtd id="151" english="${target} is fortified against dragons." color="101"/>
+	<dtd id="151" english="${target} is fortified against dragons." color="64"/>
 	<dtd id="152" english="Additional effect: ${actor} recovers ${number} MP." color="H" units="MP"/>
 	<dtd id="153" english="${actor} uses ${ability}.${lb}${actor} fails to steal from ${target}." color="69"/>
 	<dtd id="154" english="${target} is out of range." color="122"/>
@@ -214,7 +214,7 @@
 	<dtd id="212" english="It would be difficult for ${actor} to charm ${target}." color="191"/>
 	<dtd id="213" english="${actor} might be able to charm ${target}." color="191"/>
 	<dtd id="214" english="${actor} should be able to charm ${target}." color="191"/>
-	<dtd id="215" english="That action requires a pet." color="1"/>
+	<dtd id="215" english="That action requires a pet." color="122"/>
 	<dtd id="216" english="You do not have a appropriate ranged weapon equipped." color="1"/>
 	<dtd id="217" english="You cannot see ${target}." color="122"/>
 	<dtd id="218" english="You move and interrupt your aim." color="122"/>
@@ -281,7 +281,7 @@
 	<dtd id="279" english="${target} is ${status}." color="122"/>
 	<dtd id="280" english="${target} gains the effect of ${status}." color="56"/>
 	<dtd id="281" english="${number} HP drained from ${target}." color="H" units="HP"/>
-	<dtd id="282" english="${target} evades." color="69"/>
+	<dtd id="282" english="${target} evades." color="114"/>
 	<dtd id="283" english="No effect on ${target}." color="R"/>
 	<dtd id="284" english="${target} resists the effects of the spell!" color="R"/>
 	<dtd id="285" english="${target}'s attacks are enhanced." color="101"/>
@@ -307,7 +307,7 @@
 	<dtd id="305" english="${actor} uses Trick Attack." color="101"/>
 	<dtd id="306" english="${actor} uses ${ability}.${lb}${target} recovers ${number} HP." color="H" units="HP"/>
 	<dtd id="307" english="That action requires a two-handed weapon." color="122"/>
-	<dtd id="308" english="Unable to use the ${item}.${lb}${target}'s inventory is full." color="1"/>
+	<dtd id="308" english="Unable to use the ${item}.${lb}${target}'s inventory is full." color="121"/>
 	<dtd id="309" english="${actor} casts ${spell} on ${target}." color="56"/>
 	<dtd id="310" english="${actor}'s ${skill} skill drops 0.${number} points!" color="1"/>
 	<dtd id="311" english="${actor} covers ${target}." color="101"/>
@@ -379,8 +379,8 @@
 	<dtd id="377" english="${actor} uses a ${item}.${lb}${target} obtains ${item2}." color="81"/>
 	<dtd id="378" english="${actor} uses a ${item}.${lb}${target}'s ${status} effect disappears!" color="81"/>
 	<dtd id="379" english="${actor} uses ${ability}.${lb}Magic Burst!${lb}${target} takes ${number} points of damage." color="D"/>
-	<dtd id="380" english="Your ?Unknown Parameter (Type: B0) 0? modification has risen to level ${number}." color="1"/>
-	<dtd id="381" english="Your ?Unknown Parameter (Type: B0) 0? modification has dropped to level ${number}." color="1"/>
+	<dtd id="380" english="${merit skill} modification has risen to level ${number}." color="1"/>
+	<dtd id="381" english="${merit skill} modification has dropped to level ${number}." color="1"/>
 	<dtd id="382" english="${actor}'s ranged attack hits ${target}.${lb}${target} recovers ${number} hit points!" color="H"/>
 	<dtd id="383" english="${target}'s spikes restore ${number} HP to ${actor}." color="1" units="HP"/>
 	<dtd id="384" english="Additional effect: ${target} recovers ${number} HP." color="H" units="HP"/>
@@ -420,20 +420,20 @@
 	<dtd id="418" english="${actor} uses ${weapon_skill} on ${target}.${lb}${target}'s target switches to ${actor}!" color="56"/>
 	<dtd id="419" english="${target} learns ${spell}!" color="81"/>
 	<dtd id="420" english="${actor} uses ${ability}. The total comes to ${number}!${lb}${target} receives the effect of ${ability}." color="101"/>
-	<dtd id="421" english="${target} receives the effect of ${ability}." color="101"/>
+	<dtd id="421" english="${target} receives the effect of ${ability}." color="111"/>
 	<dtd id="422" english="${actor} uses ${ability}.${lb}The total comes to ${number}!${lb}No effect on ${target}." color="R"/>
 	<dtd id="423" english="No effect on ${target}." color="R"/>
 	<dtd id="424" english="${actor} uses Double-Up.${lb}The total for ${ability} increases to ${number}!${lb}${target} receives the effect of ${ability}." color="101"/>
 	<dtd id="425" english="${actor} uses Double-Up.${lb}The total for ${ability} increases to ${number}!${lb}No effect on ${target}." color="R"/>
-	<dtd id="426" english="${actor} uses Double-Up.${lb}Bust!${lb}${target} loses the effect of ${ability}." color="101"/>
-	<dtd id="427" english="${target} loses the effect of ${ability}." color="101"/>
+	<dtd id="426" english="${actor} uses Double-Up.${lb}Bust!${lb}${target} loses the effect of ${ability}." color="102"/>
+	<dtd id="427" english="${target} loses the effect of ${ability}." color="112"/>
 	<dtd id="428" english="There are no rolls eligible for Double-Up.${lb}Unable to use ability." color="1"/>
 	<dtd id="429" english="The same roll is already active on ${actor}." color="1"/>
 	<dtd id="430" english="${actor} casts ${spell}.${lb}1 of ${target}'s attributes is drained." color="1"/>
 	<dtd id="431" english="${actor} casts ${spell}.${lb}${target}'s TP is reduced." color="56" />
 	<dtd id="432" english="${actor} casts ${spell}.${lb}${target} receives the effect of Accuracy Boost and Evasion Boost." color="101"/>
 	<dtd id="433" english="${actor} casts ${spell}.${lb}${target} receives the effect of Magic Attack Boost and Magic Defense Boost." color="101"/>
-	<dtd id="434" english="You cannot customize a activated automaton." color="1"/>
+	<dtd id="434" english="You cannot customize an activated automaton." color="1"/>
 	<dtd id="435" english="${actor} uses ${ability}!${lb}${target}'s abilities are recharged." color="101"/>
 	<dtd id="436" english="${target}'s abilities are recharged." color="111"/>
 	<dtd id="437" english="${actor} uses ${ability}!${lb}${target}'s abilities are recharged.${lb}${target}'s TP is increased." color="101"/>
@@ -521,7 +521,7 @@
 	<dtd id="519" english="${actor} uses ${ability}.${lb}${target} is afflicted with Lethargic Daze (lv.${number})." color="101" units="lv."/>
 	<dtd id="520" english="${actor} uses ${ability}.${lb}${target} is afflicted with Sluggish Daze (lv.${number})." color="101" units="lv."/>
 	<dtd id="521" english="${actor} uses ${ability}.${lb}${target} is afflicted with Weakened Daze (lv.${number})." color="101" units="lv."/>
-	<dtd id="522" english="${actor} uses ${ability}.${lb}${target} takes ${number} points of damage and is stunned." color="D"/>
+	<dtd id="522" english="${actor} uses ${ability}.${lb}${target} takes ${number} points of damage and is stunned." color="D" units="stun"/>
 	<dtd id="523" english="The same effect is already active on ${actor}." color="122"/>
 	<dtd id="524" english="You have not earned enough finishing moves to perform that action." color="1"/>
 	<dtd id="525" english="${ability} can only be performed during battle." color="1"/>
@@ -534,7 +534,7 @@
 	<dtd id="532" english="${actor} uses ${ability}.${lb}${target} receives the effect of Sneak and Invisible." color="101"/>
 	<dtd id="533" english="${actor} casts ${spell}.${lb}${target}'s Accuracy is drained." color="1"/>
 	<dtd id="534" english="${actor} casts ${spell}.${lb}${target}'s Attack is drained." color="1"/>
-	<dtd id="535" english="${target} retaliates.${lb}${number} of ${actor}'s shadows absorbs the damage and disappears." color="29" units="Shadow"/>
+	<dtd id="535" english="${target} retaliates.${lb}${number} of ${actor}'s shadows absorbs the damage and disappears." color="29" units="shadow"/>
 	<dtd id="536" english="${target} retaliates.${lb}${actor} takes ${number} points of damage." color="D"/>
 	<dtd id="537" english="${target}'s TP is increased to ${number}%." color="H" units="TP"/>
 	<dtd id="538" english="A protective energy absorbs the malice of your enemy!" color="1"/>
@@ -672,7 +672,7 @@
 	<dtd id="676" english="${target}'s movement speed increases." color="101"/>
 	<dtd id="677" english="You are now able to shapeshift into a new monster!" color="91"/>
 	<dtd id="678" english="You have learned a new instinct!" color="91"/>
-	<dtd id="679" english="${actor} will return to the Feretory in: ${number}." color="101"/>
+	<dtd id="679" english="${actor} will return to the Feretory in: ${number2}." color="101"/>
 	<dtd id="680" english="A newfound puissance courses through your veins." color="91"/>
 	<dtd id="681" english="Your muscles ripple with an immensely powerful and invigorating force." color="91"/>
 	<dtd id="682" english="Your puissance withers slightly." color="91"/>
