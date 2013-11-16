@@ -672,7 +672,7 @@
 	<dtd id="676" english="${target}'s movement speed increases." color="101"/>
 	<dtd id="677" english="You are now able to shapeshift into a new monster!" color="91"/>
 	<dtd id="678" english="You have learned a new instinct!" color="91"/>
-	<dtd id="679" english="${actor} will return to the Feretory in: ${number}." color="101"/>
+	<dtd id="679" english="${actor} will return to the Feretory in: ${number2}." color="101"/>
 	<dtd id="680" english="A newfound puissance courses through your veins." color="91"/>
 	<dtd id="681" english="Your muscles ripple with an immensely powerful and invigorating force." color="91"/>
 	<dtd id="682" english="Your puissance withers slightly." color="91"/>
