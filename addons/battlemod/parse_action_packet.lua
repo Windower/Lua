@@ -285,7 +285,7 @@ function player_info(id)
 			filter = 'other_pets'
 			owner = 'other'
 			for i,v in pairs(get_party()) do
-				if nf(v.mob,'pet_index') == player_table.index then
+				if v.mob and v.mob.pet_index and v.mob.pet_index == player_table.index then
 					if i == 'p0' then
 						typ = 'my_pet'
 						filter = 'my_pet'
