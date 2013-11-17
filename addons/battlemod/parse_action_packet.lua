@@ -96,7 +96,7 @@ function parse_action_packet(act)
 		if condensetargets and i > 1 then
 			for n=1,i-1 do
 				local m = act.targets[n]
---				add_to_chat(8,m.actions[1].message..'  '..v.actions[1].message)
+				add_to_chat(8,m.actions[1].message..'  '..v.actions[1].message)
 				if (v.actions[1].message == m.actions[1].message and v.actions[1].param == m.actions[1].param) or
 					(message_map[m.actions[1].message] and message_map[m.actions[1].message]:contains(v.actions[1].message) and v.actions[1].param == m.actions[1].param) or
 					(message_map[m.actions[1].message] and message_map[m.actions[1].message]:contains(v.actions[1].message) and v.actions[1].param == m.actions[1].param) then
@@ -130,10 +130,13 @@ function parse_action_packet(act)
 				elseif m.message == 354 then m.simp_name = 'missed RA'
 				elseif m.message == 576 then m.simp_name = 'RA hit squarely'
 				elseif m.message == 577 then m.simp_name = 'RA struck true'
+				elseif m.message == 157 then m.simp_name = 'Barrage'
+				elseif m.message == 77 then m.simp_name = 'Sange'
 				elseif m.message == 426 or m.message == 427 then m.simp_name = 'Bust! '..act.action.name
 				elseif m.message == 435 or m.message == 436 then m.simp_name = act.action.name..' (JAs)'
 				elseif m.message == 437 or m.message == 438 then m.simp_name = act.action.name..' (JAs and TP)'
 				elseif m.message == 439 or m.message == 440 then m.simp_name = act.action.name..' (SPs, JAs, TP, and MP)'
+				else m.simp_name = ''
 				end
 				local msg,numb = simplify_message(m.message)
 				if not color_arr[act.actor.owner or act.actor.type] then add_to_chat(8,tostring(act.actor.owner)..' '..act.actor.type) end
@@ -159,7 +162,7 @@ function parse_action_packet(act)
 				if m.add_effect_message > 287 and m.add_effect_message < 303 then m.simp_add_name = skillchain_arr[m.add_effect_message-287]
 				elseif m.add_effect_message > 384 and m.add_effect_message < 399 then m.simp_add_name = skillchain_arr[m.add_effect_message-384]
 				elseif m.add_effect_message ==603 then m.simp_add_name = 'TH'
-				elseif T{163,229}:contains(m.add_effect_message) then m.simp_add_name = 'AE'
+				else m.simp_add_name = 'AE'
 				end
 				local msg,numb = simplify_message(m.add_effect_message)
 				if m.add_effect_fields.status then numb = m.add_effect_status else numb = pref_suf(m.add_effect_param,m.add_effect_message) end

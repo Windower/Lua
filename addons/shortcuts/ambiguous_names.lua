@@ -42,6 +42,7 @@ function smn_sub(player_array,spell_ID,abil_ID,mob_ID,info) -- Determines ambigu
 		return 'Ability' -- Returns the SMN ability if it's a SMN main without a sub that has access to the spell
 	elseif player_array['main_job_id'] == 15 and (info:contains(player_array['sub_job_id'])) then
 		local pet_array = get_mob_by_target('pet')
+		local known_spells = windower.ffxi.get_spells()
 		if not pet_array and known_spells[spell_ID] then return 'Magic' end
 		local recasts = get_ability_recasts()
 		if (info:contains(pet_array['name']) and info:contains('Ward') and recasts[174]<=10) or (info:contains(pet_array['name']) and info:contains('Rage') and recasts[173]<=10) then
@@ -60,7 +61,7 @@ function blu_unsub(player_array,spell_ID,abil_ID,mob_ID,info) -- Determines ambi
 			return 'Monster'
 		end
 	end
-	
+	local known_spells = windower.ffxi.get_spells()
 	if player_array['main_job_id'] == 16 and spell_ID and known_spells[spell_ID] then -- and player_array['main_job_level'] >= info then
 		return 'Magic'
 	end

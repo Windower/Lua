@@ -146,4 +146,3 @@ targ_reps = {t='<t>',me='<me>',ft='<ft>',scan='<scan>',bt='<bt>',lastst='<lastst
 	stpc='<stpc>',stal='<stal>',stnpc='<stnpc>',stpt='<stpt>'}
 	
 language = 'english' -- get_ffxi_info()['language']:lower()
-known_spells = windower.ffxi.get_spells()

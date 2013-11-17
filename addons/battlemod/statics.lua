@@ -103,6 +103,7 @@ message_map[150] = T{151}
 message_map[420] = T{421}
 message_map[424] = T{421}
 message_map[437] = T{438}
+message_map[126] = T{676}
 
 spike_effect_valid = {true,false,false,false,false,false,false,false,false,false,false,false,false,false,false}
 add_effect_valid = {true,true,true,true,false,false,false,false,false,false,false,false,false,false,false}
