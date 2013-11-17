@@ -190,6 +190,14 @@ function refresh_player()
 		table.reassign(pet,{isvalid=false})
 	end
 	
+	local ft_table = get_mob_by_target('<ft>')
+	if ft_table then
+		table.reassign(fellow,ft_table)
+		fellow.isvalid = true
+	else
+		table.reassign(fellow,{isvalid=false})
+	end
+	
 	table.reassign(buffactive,get_buff_active(player['buffs']))
 end
 

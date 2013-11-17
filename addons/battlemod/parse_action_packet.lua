@@ -96,7 +96,7 @@ function parse_action_packet(act)
 		if condensetargets and i > 1 then
 			for n=1,i-1 do
 				local m = act.targets[n]
-				add_to_chat(8,m.actions[1].message..'  '..v.actions[1].message)
+--				add_to_chat(8,m.actions[1].message..'  '..v.actions[1].message)
 				if (v.actions[1].message == m.actions[1].message and v.actions[1].param == m.actions[1].param) or
 					(message_map[m.actions[1].message] and message_map[m.actions[1].message]:contains(v.actions[1].message) and v.actions[1].param == m.actions[1].param) or
 					(message_map[m.actions[1].message] and message_map[m.actions[1].message]:contains(v.actions[1].message) and v.actions[1].param == m.actions[1].param) then

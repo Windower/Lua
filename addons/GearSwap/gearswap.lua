@@ -42,7 +42,7 @@ require 'export'
 
 
 _addon.name = 'GearSwap'
-_addon.version = '0.711'
+_addon.version = '0.712'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
