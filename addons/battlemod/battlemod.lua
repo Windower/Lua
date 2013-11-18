@@ -7,7 +7,7 @@ require 'generic_helpers'
 require 'parse_action_packet'
 require 'statics'
 
-_addon.version = '3.07'
+_addon.version = '3.08'
 _addon.name = 'BattleMod'
 _addon.author = 'Byrth'
 _addon.commands = {'bm','battlemod'}
@@ -388,7 +388,7 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 			end
 			am.message_id = false
 		elseif passed_messages:contains(am.message_id) then
-			local status,spell,skill,number,number2
+			local item,status,spell,skill,number,number2
 			
 			if am.message_id > 169 and am.message_id <179 then
 				if am.param_1 == 4294967296 then
@@ -398,15 +398,10 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 				end
 			end
 			
-			number = am.param_1
-			number2 = am.param_2
+			local fields = fieldsearch(dialog[am.message_id][language])
 			
-			if am.param_1 ~= 0 then
+			if fields.status then
 				status = (enLog[am.param_1] or nf(r_status[am.param_1],language))
-				spell = nf(r_spells[am.param_1],language)
-			end
-			
-			if status then
 				if enfeebling:contains(am.param_1) then
 					status = color_it(status,color_arr.enfeebcol)
 				else
@@ -414,12 +409,29 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 				end
 			end
 			
+			if fields.spell then
+				spell = nf(r_spells[am.param_1],language)
+			end
+			
+			if fields.item then
+				item = nf(r_items[am.param_1],language)
+			end
+			
+			if fields.number then
+				number = am.param_1
+			end
+			
+			if fields.number2 then
+				number = am.param_2
+			end
+			
 			local outstr = (dialog[am.message_id][language]
-				:gsub('$\123actor\125',color_it(actor.name,color_arr[actor.owner or actor.type]) or '')
+				:gsub('$\123actor\125',color_it(actor.name or '',color_arr[actor.owner or actor.type]))
 				:gsub('$\123status\125',status or '')
-				:gsub('$\123target\125',color_it(target.name,color_arr[target.owner or target.type]) or '')
-				:gsub('$\123spell\125',color_it(spell,color_arr.spellcol) or '')
-				:gsub('$\123skill\125',color_it(skill,color_arr.abilcol) or '')
+				:gsub('$\123item\125',color_it(item or '',color_arr.itemcol))
+				:gsub('$\123target\125',color_it(target.name or '',color_arr[target.owner or target.type]))
+				:gsub('$\123spell\125',color_it(spell or '',color_arr.spellcol))
+				:gsub('$\123skill\125',color_it(skill or '',color_arr.abilcol))
 				:gsub('$\123number\125',number or '')
 				:gsub('$\123number2\125',number2 or '')
 				:gsub('$\123lb\125','\7'))

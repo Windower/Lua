@@ -135,12 +135,12 @@ end
 
 
 function color_it(to_color,color)
-	if not color and debugging then add_to_chat(8,'Color was invalid.') return to_color end
+	if not color and debugging then add_to_chat(8,'Color was invalid.') end
+	if not color or color == 0 then return to_color end
+	
 	if to_color then
 		local colarr = split(to_color,' ')
 		return color..table.concat(colarr,rcol..' '..color)..rcol
-	else
-		return ''
 	end
 end
 

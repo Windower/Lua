@@ -142,13 +142,13 @@ function parse_action_packet(act)
 				if not color_arr[act.actor.owner or act.actor.type] then add_to_chat(8,tostring(act.actor.owner)..' '..act.actor.type) end
 				if m.fields.status then numb = m.status else numb = pref_suf(m.param,m.message) end
 				add_to_chat(color,make_condensedamage_number(m.number)..(msg
-					:gsub('${spell}',act.action.spell or 'ERROR 111')
-					:gsub('${ability}',act.action.ability or 'ERROR 112')
-					:gsub('${item}',act.action.item or 'ERROR 113')
-					:gsub('${weapon_skill}',act.action.weapon_skill or 'ERROR 114')
-					:gsub('${abil}',m.simp_name or act.action.name or 'ERROR 115')
+					:gsub('${spell}',color_it(act.action.spell or 'ERROR 111',color_arr.spellcol))
+					:gsub('${ability}',color_it(act.action.ability or 'ERROR 112',color_arr.abilcol))
+					:gsub('${item}',color_it(act.action.item or 'ERROR 113',color_arr.itemcol))
+					:gsub('${weapon_skill}',color_it(act.action.weapon_skill or 'ERROR 114',color_arr.wscol))
+					:gsub('${abil}',m.simp_name or 'ERROR 115')
 					:gsub('${numb}',numb or 'ERROR 116')
-					:gsub('${actor}',color_it(act.actor.name,color_arr[act.actor.owner or act.actor.type]))
+					:gsub('${actor}',color_it(act.actor.name or 'ERROR 117',color_arr[act.actor.owner or act.actor.type]))
 					:gsub('${target}',targ)
 					:gsub('${lb}','\7')
 					:gsub('${number}',m.param)
@@ -342,8 +342,10 @@ function get_spell(act)
 	elseif act.category == 2 and act.category == 12 then
 		if msg_ID == 77 then
 			spell = r_abilities[171] -- Sange
+			spell.name = color_it(spell[language],color_arr.abilcol)
 		elseif msg_ID == 157 then
 			spell = r_abilities[60] -- Barrage
+			spell.name = color_it(spell[language],color_arr.abilcol)
 		else
 			spell.english = 'Ranged Attack'
 			spell.german = spell.english
@@ -368,8 +370,10 @@ function get_spell(act)
 		
 		if fields.spell then
 			spell = r_spells[abil_ID]
+			spell.name = color_it(spell[language],color_arr.spellcol)
 		elseif fields.ability then
 			spell = r_abilities[abil_ID]
+			spell.name = color_it(spell[language],color_arr.abilcol)
 		elseif fields.weapon_skill then
 			if abil_ID > 255 then -- WZ_RECOVER_ALL is used by chests in Limbus
 				spell = r_mabils[abil_ID-256]
@@ -379,25 +383,31 @@ function get_spell(act)
 			elseif abil_ID < 256 then
 				spell = r_abilities[abil_ID+768]
 			end
+			spell.name = color_it(spell[language],color_arr.wscol)
 		elseif msg_ID == 303 then
 			spell = r_abilities[74] -- Divine Seal
+			spell.name = color_it(spell[language],color_arr.abilcol)
 		elseif msg_ID == 304 then
 			spell = r_abilities[75] -- 'Elemental Seal'
+			spell.name = color_it(spell[language],color_arr.abilcol)
 		elseif msg_ID == 305 then
 			spell = r_abilities[76] -- 'Trick Attack'
+			spell.name = color_it(spell[language],color_arr.abilcol)
 		elseif msg_ID == 311 or msg_ID == 311 then
 			spell = r_abilities[79] -- 'Cover'
+			spell.name = color_it(spell[language],color_arr.abilcol)
 		elseif msg_ID == 240 or msg_ID == 241 then
 			spell = r_abilities[43] -- 'Hide'
+			spell.name = color_it(spell[language],color_arr.abilcol)
 		end
-		
 		
 		if fields.item then
 			spell = r_items[abil_ID]
+			spell.name = color_it(spell[language],color_arr.itemcol)
 		end
 	end
 	
-	spell.name = spell[language]
+	if not spell.name then spell.name = spell[language] end
 	return spell
 end
 
