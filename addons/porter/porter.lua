@@ -40,7 +40,7 @@ _addon.name     = 'porter'
 _addon.version  = '1.20130529'
 _addon.commands = 'porter'
 
-item_names = L{}
+item_names = T{}
 resources  = {
     ['armor']   = '../../plugins/resources/items_armor.xml',
     ['weapons'] = '../../plugins/resources/items_weapons.xml',

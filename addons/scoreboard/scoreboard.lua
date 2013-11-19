@@ -2,7 +2,7 @@
 
 _addon = _addon or {}
 _addon.name = 'Scoreboard'
-_addon.version = 1.1
+_addon.version = 1.03
 
 require 'tablehelper'
 require 'stringhelper'
@@ -97,6 +97,30 @@ function event_addon_command(...)
                 settings.sbcolor = tonumber(params[3])
                 settings:save()
                 sb_output("Setting 'sbcolor' set to " .. settings.sbcolor)
+            elseif setting == 'showallidps' then
+                if params[3] == 'true' then
+                    settings.showallidps = true
+                elseif params[3] == 'false' then
+                    settings.showallidps = false
+                else
+                    error("Invalid value for 'showallidps'. Must be true or false.")
+                    return
+                end
+                
+                settings:save()
+                sb_output("Setting 'showalldps' set to " .. tostring(settings.showallidps))
+            elseif setting == 'resetfilters' then
+                if params[3] == 'true' then
+                    settings.resetfilters = true
+                elseif params[3] == 'false' then
+                    settings.resetfilters = false
+                else
+                    error("Invalid value for 'resetfilters'. Must be true or false.")
+                    return
+                end
+                
+                settings:save()
+                sb_output("Setting 'resetfilters' set to " .. tostring(settings.resetfilters))
             end
         elseif param1 == "reset" then
             reset()
@@ -123,15 +147,23 @@ function event_addon_command(...)
             settings.visible = not settings.visible
             settings:save()
         elseif param1 == 'filter' then
-            if params[2]:lower() == 'add' then
+            local subcmd
+            if params[2] then
+                subcmd = params[2]:lower()
+            else
+                error('Invalid option to //sb filter. See //sb help')
+                return
+            end
+            
+            if subcmd == 'add' then
                 for i=3, #params do
                     dps_db:add_filter(params[i])
                 end
                 display:update()
-            elseif params[2]:lower() == 'clear' then
+            elseif subcmd == 'clear' then
                 dps_db:clear_filters()
                 display:update()
-            elseif params[2]:lower() == 'show' then
+            elseif subcmd == 'show' then
                 display:report_filters()
             else
                 error('Invalid argument to //sb filter')
@@ -178,10 +210,58 @@ function event_addon_command(...)
                 
                 display:report_stat(stat, {player = arg2, chatmode = arg3, telltarget = params[5]})
             end
+        elseif param1 == 'fields' then
+            do  error("Not implemented yet.") return end
+        elseif param1 == 'save' then
+            do  error("Not implemented yet.") return end
+                
+            if dps_db:isempty() then
+                error('Nothing to save.')
+                return
+            else
+                if params[2] then
+                    if not params2:match('^[a-ZA-Z0-9_-,.:]+$') then
+                        error("Invalid filename: " .. params[2])
+                        return
+                    end
+                    save(params[2])
+                else
+                    save()
+                end
+            end
+        else
+            error('Unrecognized command. See //sb help')
         end
     end
 end
 
+local months = {
+    'jan', 'feb', 'mar', 'apr',
+    'may', 'jun', 'jul', 'aug',
+    'sep', 'oct', 'nov', 'dec'
+}
+
+local function fexists(fname)
+
+end
+
+
+function save(filename)
+    if not filename then
+        local date = os.date("*t", os.time())
+        filename = string.format("sb_%s-%d-%d_%d:%d:%d.txt",
+                                  months[date.month],
+                                  date.day,
+                                  date.year,
+                                  date.hour,
+                                  date.min,
+                                  date.sec)
+    end
+    
+    write('Saving to: ' .. filename)
+    
+
+end
 
 -- Resets application state
 function reset()
@@ -235,9 +315,11 @@ function event_load(...)
         font = 'courier',
         fontsize = 10,
         sbcolor = 204,
-        visible = true
+        visible = true,
+        showallidps = true,
+        resetfilters = true
     })
-
+    
     send_command('alias sb lua c scoreboard')
     display = Display:new(settings, dps_db)
     reset()

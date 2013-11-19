@@ -43,7 +43,7 @@ function file.set(f, path, create)
 	return f
 end
 
--- Check if file exists. There's no better way, it would seem.
+-- Check if file exists.
 function file.exists(f)
 	local path
 	
