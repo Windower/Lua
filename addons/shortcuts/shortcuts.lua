@@ -83,8 +83,8 @@ end)
 ---- string, changed command
 -----------------------------------------------------------------------------------
 windower.register_event('outgoing text',function(original,modified)
-	local temp_org = convert_auto_trans(original)
-	if original:sub(1,1) ~= '/' then return modified end
+	local temp_org = convert_auto_trans(modified)
+	if modified:sub(1,1) ~= '/' then return modified end
 	temp_org = temp_org:gsub(' <wait %d+>','')
 	if logging then
 		logfile:write('\n\n',tostring(os.clock()),'temp_org: ',temp_org,'\nModified: ',modified)
@@ -92,7 +92,7 @@ windower.register_event('outgoing text',function(original,modified)
 	end
 	
 	-- If it's the command that was just sent, blank lastsent and pass it through with only the changes applied by other addons
-	if original == lastsent then
+	if modified == lastsent then
 		lastsent = ''
 		return modified
 	end

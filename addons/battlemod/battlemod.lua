@@ -414,7 +414,7 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 			end
 			
 			if fields.item then
-				item = nf(r_items[am.param_1],language)
+				item = nf(r_items[am.param_1],'enl')
 			end
 			
 			if fields.number then

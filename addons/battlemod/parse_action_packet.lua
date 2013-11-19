@@ -403,7 +403,7 @@ function get_spell(act)
 		
 		if fields.item then
 			spell = r_items[abil_ID]
-			spell.name = color_it(spell[language],color_arr.itemcol)
+			spell.name = color_it(spell['enl'],color_arr.itemcol)
 		end
 	end
 	

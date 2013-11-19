@@ -41,6 +41,9 @@ function valid_target(targ,flag)
 	local spell_targ
 	-- If the target is whitelisted, pass it through.
 	if pass_through_targs:contains(targ) then
+		if (targ == '<t>' or targ == 't') and get_mob_by_target('<t>').id == get_player().id then
+			return '<me>'
+		end
 		return targ
 	elseif targ and get_player() then
 	-- If the target exists, scan the mob array for it
