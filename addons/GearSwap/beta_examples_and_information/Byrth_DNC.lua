@@ -61,27 +61,50 @@ function get_sets()
 	-------------------  WS Sets  ----------------------
 	sets.WS={}
 	
-	sets.WS.Exenterator = {ammo="Potestas Bomblet",
+	sets.WS.Exenterator = {}
+		
+	sets.WS.Exenterator[1] = {ammo="Potestas Bomblet",
+		head="Whirlpool Mask",neck="Houyi's Gorget",ear1="Steelflash Earring",ear2="Bladeborn Earring",
+		body="Manibozho Jerkin",hands="Iuitl Wristbands",ring1="Epona's Ring",ring2="Stormsoul Ring",
+		back="Atheling Mantle",waist="Windbuffet Belt",legs="Nahtirah Trousers",feet="Iuitl Gaiters"}
+
+	sets.WS.Exenterator[2] = {ammo="Potestas Bomblet",
 		head="Uk'uxkaj cap",neck="Houyi's Gorget",ear1="Steelflash Earring",ear2="Bladeborn Earring",
 		body="Manibozho Jerkin",hands="Iuitl Wristbands",ring1="Epona's Ring",ring2="Stormsoul Ring",
 		back="Atheling Mantle",waist="Windbuffet Belt",legs="Nahtirah Trousers",feet="Iuitl Gaiters"}
-	
-	sets.WS.Evisceration = {ammo="Charis Feather",
+
+	sets.WS.Evisceration = {}
+
+	sets.WS.Evisceration[1] = {ammo="Charis Feather",
 		head="Uk'uxkaj cap",neck="Love Torque",ear1="Brutal Earring",ear2="Moonshade Earring",
 		body="Manibozho Jerkin",hands="Buremte Gloves",ring1="Thundersoul Ring",ring2="Rajas Ring",
 		back="Rancorous Mantle",waist="Wanion Belt",legs="Manibozho Brais",feet="Manibozho Boots"}
-	
-	sets.WS['Pyrrhic Kleos'] = {ammo="Charis Feather",
+
+	sets.WS.Evisceration[2] = {ammo="Charis Feather",
+		head="Uk'uxkaj cap",neck="Love Torque",ear1="Brutal Earring",ear2="Moonshade Earring",
+		body="Manibozho Jerkin",hands="Buremte Gloves",ring1="Thundersoul Ring",ring2="Rajas Ring",
+		back="Rancorous Mantle",waist="Wanion Belt",legs="Manibozho Brais",feet="Manibozho Boots"}
+
+	sets.WS['Pyrrhic Kleos'] = {}
+
+	sets.WS['Pyrrhic Kleos'][1] = {ammo="Potestas Bomblet",
+		head="Whirlpool Mask",neck="Justiciar's Torque",ear1="Steelflash Earring",ear2="Bladeborn Earring",
+		body="Manibozho Jerkin",hands="Iuitl Wristbands",ring1="Epona's Ring",ring2="Rajas Ring",
+		back="Atheling Mantle",waist="Wanion Belt",legs="Manibozho Brais",feet="Iuitl Gaiters"}
+
+	sets.WS['Pyrrhic Kleos'][2] = {ammo="Charis Feather",
 		head="Uk'uxkaj cap",neck="Soil Gorget",ear1="Steelflash Earring",ear2="Bladeborn Earring",
 		body="Manibozho Jerkin",hands="Buremte Gloves",ring1="Epona's Ring",ring2="Rajas Ring",
 		back="Atheling Mantle",waist="Wanion Belt",legs="Manibozho Brais",feet="Iuitl Gaiters"}
-	
+
 	-------------------  MA Sets  ----------------------
 	sets.MA={}
-	
+
 	sets.MA.Utsusemi = {head="Uk'uxkaj cap",neck="Magoraga Beads",ear1="Musical Earring",ear2="Novia Earring",
 		body="Manibozho Jerkin",legs="Thaumas Gloves",lring="Beeline Ring",
 		back="Boxer Mantle",waist="Scouter's Rope",legs="Manibozho Legs",feet="Manibozho Boots"}
+		
+	atk_lvl = 1
 end
 
 function precast(spell,act)
@@ -92,7 +115,9 @@ function precast(spell,act)
 		end
 		equip(sets.JA[spell.name])
 	elseif sets.WS[spell.name] then
-		equip(sets.WS[spell.name])
+		if sets.WS[spell.name][atk_lvl] then
+			equip(sets.WS[spell.name][atk_lvl])
+		end
 	elseif string.find(spell.name,'Jig') then
 		equip(sets.JA.Jig)
 		if spell.name == 'Spectral Jig' then

@@ -25,8 +25,8 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 debugging = false
-if dir_exists('../addons/shortcuts/data/') then
-	logging = false
+logging = false
+if dir_exists('../addons/shortcuts/data/') and logging then
 	logfile = io.open('../addons/shortcuts/data/NormalLog'..tostring(os.clock())..'.log','w+')
 	logfile:write('\n\n','SHORTCUTS LOGGER HEADER: ',tostring(os.clock()),'\n')
 	logfile:flush()
@@ -40,8 +40,8 @@ require 'resources'
 require 'ambiguous_names'
 require 'targets'
 
-_addon = {}
-_addon.version = '1.1'
+
+_addon.version = '1.4'
 _addon.name = 'Shortcuts'
 _addon.author = 'Byrth'
 _addon.commands = {'shortcuts'}
@@ -83,8 +83,8 @@ end)
 ---- string, changed command
 -----------------------------------------------------------------------------------
 windower.register_event('outgoing text',function(original,modified)
-	local temp_org = convert_auto_trans(original)
-	if original:sub(1,1) ~= '/' then return modified end
+	local temp_org = convert_auto_trans(modified)
+	if modified:sub(1,1) ~= '/' then return modified end
 	temp_org = temp_org:gsub(' <wait %d+>','')
 	if logging then
 		logfile:write('\n\n',tostring(os.clock()),'temp_org: ',temp_org,'\nModified: ',modified)
@@ -92,7 +92,7 @@ windower.register_event('outgoing text',function(original,modified)
 	end
 	
 	-- If it's the command that was just sent, blank lastsent and pass it through with only the changes applied by other addons
-	if original == lastsent then
+	if modified == lastsent then
 		lastsent = ''
 		return modified
 	end
@@ -142,7 +142,7 @@ function command_logic(original,modified)
 		-- If the command is legitimate and requires target completion but not ability interpretation
 		
 		if command2_list[command]==true then -- If there are not any excluded secondary commands
-			local temptarg = valid_target(potential_targ) or target_make({['Player']=true,['Enemy']=true,['Party']=true,['Ally']=true,['NPC']=true,['Self']=true}) -- Complete the target or make one.
+			local temptarg = valid_target(potential_targ) or target_make({['Player']=true,['Enemy']=true,['Party']=true,['Ally']=true,['NPC']=true,['Self']=true,['Corpse']=true}) -- Complete the target or make one.
 			lastsent = command..' '..temptarg -- Push the command and target together and send it out.
 			if debugging then add_to_chat(8,tostring(counter)..' input '..lastsent) end
 			if logging then
@@ -175,7 +175,7 @@ function command_logic(original,modified)
 					temptarg = potential_targ
 				end
 			elseif not temptarg then -- Make a target if the temptarget isn't valid
-				temptarg = target_make({['Player']=true,['Enemy']=true,['Party']=true,['Ally']=true,['NPC']=true,['Self']=true})
+				temptarg = target_make({['Player']=true,['Enemy']=true,['Party']=true,['Ally']=true,['NPC']=true,['Self']=true,['Corpse']=true})
 			end
 			lastsent = tempcmd..' '..temptarg
 			if debugging then add_to_chat(8,tostring(counter)..' input '..lastsent) end
@@ -244,10 +244,13 @@ function interp_text(splitline,offset,modified)
 		local r_line, s_type
 		
 		if validabils[strippedabil].typ == 'r_spells' then
+			if debugging then add_to_chat(8,strippedabil..' is considered a spell.') end
 			r_line = r_spells[validabils[strippedabil].index]
 		elseif validabils[strippedabil].typ == 'r_abilities' then
+			if debugging then add_to_chat(8,strippedabil..' is considered an ability.') end
 			r_line = r_abilities[validabils[strippedabil].index]
 		elseif validabils[strippedabil].typ == 'ambig_names' then
+			if debugging then add_to_chat(8,strippedabil..' is considered ambiguous.') end
 			r_line, s_type = ambig(strippedabil)
 		end
 		

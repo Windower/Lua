@@ -21,6 +21,7 @@ data.outgoing[0x034] = {name='Trade Item',          description='Sends the item 
 data.outgoing[0x037] = {name='Use Item',            description='Use an item.'}
 data.outgoing[0x03A] = {name='Sort Item',           description='Packet sent when you choose to auto-sort your inventory.'}
 data.outgoing[0x04B] = {name='Servmes',             description='Requests the server message (/servmes).'}
+data.outgoing[0x04D] = {name='Delivery Box',        description='Used to manipulate the delivery box.'}
 data.outgoing[0x04E] = {name='Auction',             description='Used to bid on an Auction House item.'}
 data.outgoing[0x050] = {name='Equip',               description='This command is used to equip your character.'}
 data.outgoing[0x05A] = {name='Conquest',            description='This command asks the server for data pertaining to conquest/besieged status.'}
@@ -39,6 +40,7 @@ data.outgoing[0x085] = {name='Sell Item',           description='Sell an item fr
 data.outgoing[0x096] = {name='Synth',               description='Packet sent containing all data of an attempted synth.'}
 data.outgoing[0x0B5] = {name='Speech',              description='Packet contains normal speech.'}
 data.outgoing[0x0B6] = {name='Tell',                description='/tell\'s sent from client.'}
+data.outgoing[0x0D3] = {name='GM Call',             description='Places a call to the GM queue.'}
 data.outgoing[0x0DC] = {name='Type Bitmask',        description='This command is sent when change your party-seek or /anon status.'}
 data.outgoing[0x0DD] = {name='Check',               description='Used to check other players.'}
 data.outgoing[0x0DE] = {name='Set Bazaar Message',  description='Sets your bazaar message.'}
@@ -69,6 +71,7 @@ data.incoming[0x01F] = {name='Item Assign',         description='Assigns an ID t
 data.incoming[0x020] = {name='Item Update',         description='Info about item in your inventory.'}
 data.incoming[0x021] = {name='Trade Requested',     description='Sent when somebody offers to trade with you.'}
 data.incoming[0x022] = {name='Trade Action',        description='Sent whenever something happens with the trade window.'}
+data.incoming[0x023] = {name='Trade Item',          description='Sent when an item appears in the trade window.'}
 data.incoming[0x025] = {name='Item Accepted',       description='Sent when the server will allow you to trade an item.'}
 data.incoming[0x026] = {name='Count to 80',         description='It counts to 80 and does not have any obvious function. May have something to do with populating inventory.'}
 data.incoming[0x027] = {name='Encumbrance',         description='Occurs when you are released from Encumbrance, although that is unlikely to be its only purpose.'}
@@ -91,6 +94,7 @@ data.incoming[0x050] = {name='Equip',               description='Updates the cha
 data.incoming[0x051] = {name='Model Change',        description='Info about equipment and appearance.'}
 data.incoming[0x052] = {name='NPC Release',         description='Allows your PC to move after interacting with an NPC.'}
 data.incoming[0x053] = {name='Logout Time',         description='The annoying message that tells how much time till you logout.'}
+data.incoming[0x055] = {name='Key Item Log',        description='Updates your key item log on zone and when appropriate.'}
 data.incoming[0x056] = {name='Quest/Mission Log',   description='Updates your quest and mission log on zone and when appropriate.'}
 data.incoming[0x057] = {name='Weather Change',      description='Updates the weather effect when the weather changes.'}
 data.incoming[0x058] = {name='Lock Target',         description='Locks your target.'}
@@ -99,8 +103,9 @@ data.incoming[0x05B] = {name='Spawn',               description='Server packet s
 data.incoming[0x05E] = {name='Stop Download',       description='Final packet in a DataDld transmission. May be the only packet in a DataDld sequence.'}
 data.incoming[0x061] = {name='Char Stats',          description='Packet contains a lot of data about your character\'s stats.'}
 data.incoming[0x062] = {name='Skills Update',       description='Packet that shows your weapon and magic skill stats.'}
+data.incoming[0x063] = {name='Set Update',          description='Frequently sent packet during battle that updates specific types of job information, like currently available/set automaton equipment and currently set BLU spells.'}
 data.incoming[0x067] = {name='Unnamed Packet 67',   description='Packet that sends mostly useless information, as far as I can tell.'}
-data.incoming[0x08C] = {name='IDs in party',    	description='Packet that returns ids of people in party'}
+data.incoming[0x08C] = {name='Merits',              description='Contains all merit information. Multiple packets are sent.'}
 data.incoming[0x0AC] = {name='Ability List',        description='Packet that shows your current abilities and traits.'}
 data.incoming[0x0B4] = {name='Seek AnonResp',       description='Server response sent after you put up party or anon flag.'}
 data.incoming[0x0C9] = {name='Show Equip',          description='Shows another player your equipment after using the Check command.'}

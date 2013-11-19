@@ -30,7 +30,7 @@ _addon = {}
 _addon.name = 'CBlock'
 _addon.version = '1.05'
 
-function event_addon_command(...)
+windower.register_event('addon command',function (...)
     local term = table.concat({...}, ' ')
     a,b,block = string.find(term,'ignore (.*)')
     c,d,delete = string.find(term,'delete (.*)')
@@ -63,7 +63,7 @@ function event_addon_command(...)
         local r,es = os.remove(settingsPath..'tmp2.txt')
         if not r then write(es) end
     end
-end
+end)
 
 function file_exists(name)
    local f=io.open(name,"r")
@@ -76,7 +76,7 @@ function file_exists(name)
     end
 end
 
-function event_load()
+windower.register_event('load',function ()
     send_command('alias cBlock lua c cBlock')
     ignore = {}
     settingsPath = lua_base_path..'data/'
@@ -87,11 +87,11 @@ function event_load()
     else
         fill_ignore()
     end	
-end
+end)
 
-function event_unload()
+windower.register_event('unload',function ()
     send_command('unalias cblock')
-end
+end)
 
 function fill_ignore()
     i = 1
@@ -101,7 +101,7 @@ function fill_ignore()
     end
 end
 
-function event_incoming_text(old,new,color)
+windower.register_event('incoming text',function (old,new,color)
     for i=1,#ignore do
         c,d,text = string.find(old,'%[%d+:#%w+%](.*):')
         if text ~= nil then
@@ -111,4 +111,4 @@ function event_incoming_text(old,new,color)
         end
     end
     return new, color  -- must be here or errors will be thrown
-end
+end)

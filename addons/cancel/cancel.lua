@@ -24,9 +24,8 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-_addon = {}
 _addon.name = 'Cancel'
-_addon.version = '0.5'
+_addon.version = '0.6'
 _addon.author = 'Byrth'
 _addon.commands = {'cancel'}
 
@@ -169,9 +168,5 @@ windower.register_event('addon command',function (...)
 end)
 
 function cancel(id)
-	if id > 255 then
-		windower.packets.inject_outgoing(0x0F1,string.char(id%256,math.floor(id/256),0,0)) -- Inject the cancel packet
-	else
-		windower.packets.inject_outgoing(0x0F1,string.char(id,0,0,0)) -- Inject the cancel packet
-	end
+	windower.packets.inject_outgoing(0xF1,string.char(0xF1,0x04,0,0,id%256,math.floor(id/256),0,0)) -- Inject the cancel packet
 end

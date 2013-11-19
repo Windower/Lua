@@ -71,6 +71,11 @@ function fns.bags()
     resources.bags = T(require(addon_resources..'bags')):map(add_name)
 end
 
+-- Returns the slots, indexed by ingame ID.
+function fns.slots()
+    resources.slots = T(require(addon_resources..'slots')):map(add_name)
+end
+
 -- Returns the emotes, indexed by ingame ID.
 function fns.emotes()
     resources.emotes = T(require(addon_resources..'emotes')):map(add_name)
@@ -237,8 +242,9 @@ function fns.items()
     local categories = S{'armor', 'weapons'}
     for category in categories:it() do
         file = _libs.filehelper.read(plugin_resources..'items_'..category..'.xml')
-        match_string = '<i id="(%d-)" enl="([^"]-)" fr="([^"]-)" frl="([^"]-)" de="([^"]-)" del="([^"]-)" jp="([^"]-)" jpl="([^"]-)" jobs="([^"]-)" races="([^"]-)" level="(%d-)" targets="([^"]-)" casttime="(%d-)" recast="(%d-)">([^<]-)</i>'
-        for id, enl, fr, frl, de, del, jp, jpl, jobs, races, level, targets, cast_time, recast, en in file:gmatch(match_string) do
+        match_string = '<i id="(%d-)" enl="([^"]-)" fr="([^"]-)" frl="([^"]-)" de="([^"]-)" del="([^"]-)" jp="([^"]-)" jpl="([^"]-)" slots="([^"]-)" jobs="([^"]-)" races="([^"]-)" level="(%d-)" targets="([^"]-)" casttime="(%d-)" recast="(%d-)">([^<]-)</i>'
+        category = category:capitalize()
+        for id, enl, fr, frl, de, del, jp, jpl, slots, jobs, races, level, targets, cast_time, recast, en in file:gmatch(match_string) do
             id = tonumber(id)
             res[id] = {
                 id = id,
@@ -250,6 +256,7 @@ function fns.items()
                 german_full = unquote(del),
                 japanese = unquote(jp),
                 japanese_full = unquote(jpl),
+                slots = resources.slots[(tonumber(slots, 16))],
                 jobs = parse_jobs(tonumber(jobs, 16)),
                 races = resources.races[tonumber(races, 16)],
                 level = tonumber(level),

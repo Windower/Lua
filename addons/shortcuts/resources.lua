@@ -55,7 +55,7 @@ end
 function make_abil(abil,t,i)
 	if abil:sub(1,1) == '#' or string.find(abil:lower(),'magic'..string.char(0x40)) then return end
 	ind = strip(abil)
-	if not rawget(validabils,ind) then
+	if not rawget(validabils,ind) or (rawget(validabils,ind).typ == t and rawget(validabils,ind).index == i) then
 		validabils[ind] = {}
 		validabils[ind].typ = t
 		validabils[ind].index = i

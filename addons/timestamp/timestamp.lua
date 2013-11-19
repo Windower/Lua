@@ -1,5 +1,5 @@
 --[[
-timestamp v1.20131021
+timestamp v1.20131102
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -31,13 +31,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 require 'chat'
 require 'logger'
 require 'tablehelper'
+require 'sets'
 
 config = require 'config'
 
 _addon = {}
 _addon.name     = 'timestamp'
 _addon.author   = 'Zohno'
-_addon.version  = '1.20131021'
+_addon.version  = '1.20131102'
 _addon.commands = {'timestamp', 'ts'}
 
 function timezone()
@@ -86,7 +87,9 @@ constants = {
     ['rfc3339']      = '%Y-%m-%dT%H:%M:%S'..tz_sep
 }
 
-lead_bytes_pattern = string.char(0x1E, 0x1F, 0xF7, 0xEF, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89)
+lead_bytes = S{0x1E, 0x1F, 0xF7, 0xEF, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x7F}
+lead_byte_class = '['..lead_bytes:map(string.char):concat()..']'
+newline_regex = '(?<!'..lead_byte_class..')['..string.char(0x07, 0x0A)..']'
 
 defaults = {}
 defaults.color  = 508
@@ -98,24 +101,27 @@ function make_timestamp(format)
     return os.date((format:gsub('%${([%l%d_]+)}', constants)))
 end
 
-windower.register_event('incoming text', function(original, modified, mode, newmode)
-    if modified ~= '' and not modified:find('^[%s]+$') then
-        if (mode == 144 or newmode == 144) then -- 144 works as 150 but the enter prompts are ignored.
-            newmode  = 150
-            modified = modified:gsub(string.char(0x7f, 0x31)..'$', '')
+windower.register_event('incoming text', function(original, modified, mode, newmode, blocked)
+    if blocked then
+        return
+    end
+
+    if mode == 151 or mode == 150 then
+        newmode = 151
+    else
+        -- Split by newline
+        local lines = L(windower.regex.split(modified, newline_regex))
+        -- Insert spaces in NPC text
+        if mode == 190 then
+            for i = 2, lines.n do
+                lines[i] = string.char(0x81, 0x40)..lines[i]
+            end
         end
 
-        if (mode == 150 or newmode == 150) then -- 150 automatically indents new lines. 151 works the same way but with no indentation. redirect to 151 and manually add the ideographic space.
-            newmode  = 151
-            modified = modified:gsub('([^'..lead_bytes_pattern..'])['..string.char(0x07)..'\n]', '%1\n'..string.char(0x81, 0x40))
-        end
-
-        if (mode ~= 151 and newmode ~= 151) then
-            local timeString = make_timestamp(settings.format):color(settings.color)..' '
-            modified = timeString..modified:gsub('^['..string.char(0x07)..'\n]+', '')
-                                           :gsub('([^'..lead_bytes_pattern..'])['..string.char(0x07)..'\n]+$', '%1')
-                                           :gsub('([^'..lead_bytes_pattern..'])['..string.char(0x07)..'\n]', '%1\n'..timeString)
-        end
+        -- Append the colored timestamp before every line and concatenate them again by a newline
+        modified = lines:map(function(str)
+            return make_timestamp(settings.format):color(settings.color)..' '..str
+        end):concat(string.char(0x0A))
     end
 
     return modified, newmode

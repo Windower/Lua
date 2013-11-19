@@ -1,37 +1,33 @@
-_addon = {}
-_addon.name = 'Distance'
-_addon.author = 'Windower'
-_addon.version = '1.0.0.0'
-_addon.command = 'distance'
+-- Slots
+local slots = {}
 
-require 'logger'
-config = require 'config'
-texts = require 'texts'
+slots[2^1]  = {english = 'Main',        }
+slots[2^2]  = {english = 'Sub',         }
+slots[2^3]  = {english = 'Ranged',      }
+slots[2^4]  = {english = 'Ammo',        }
+slots[2^5]  = {english = 'Head',        }
+slots[2^6]  = {english = 'Body',        }
+slots[2^7]  = {english = 'Hands',       }
+slots[2^8]  = {english = 'Legs',        }
+slots[2^9]  = {english = 'Feet',        }
+slots[2^10] = {english = 'Neck',        }
+slots[2^11] = {english = 'Waist',       }
+slots[2^12] = {english = 'Left Ear',    }
+slots[2^13] = {english = 'Right Ear',   }
+slots[2^14] = {english = 'Left Ring',   }
+slots[2^15] = {english = 'Right Ring',  }
+slots[2^16] = {english = 'Back',        }
 
-defaults = {}
-defaults.pos = {}
-defaults.pos.x = -178
-defaults.pos.y = 21
-defaults.text = {}
-defaults.text.font = 'Arial'
-defaults.text.size = 14
-defaults.flags = {}
-defaults.flags.right = true
+--[[ Compound values ]]
 
-settings = config.load(defaults)
-distance = texts.new(settings)
+-- 2^1 + 2^2
+slots[3]     = 'Melee'
+-- 2^12 + 2^13
+slots[12288] = 'Ear'
+-- 2^14 + 2^15
+slots[49152] = 'Ring'
 
-windower.register_event('prerender', function()
-	local t = windower.ffxi.get_mob_by_target('st') or windower.ffxi.get_mob_by_target('t')
-    distance:text(t and ('%.1f'):format(t.distance:sqrt()) or '')
-    distance:visible(t ~= nil)
-end)
-
-windower.register_event('addon command', function(command)
-    if command == 'save' then
-        config.save(settings, 'all')
-    end
-end)
+return slots
 
 --[[
 Copyright (c) 2013, Windower

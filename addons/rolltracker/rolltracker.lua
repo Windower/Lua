@@ -28,6 +28,8 @@
 _addon = {}
 _addon.name = 'RollTracker'
 _addon.version = '1.1'
+_addon.author = 'Balloon'
+_addon.command = 'rolltracker'
 
 config = require 'config'
 settings=config.load(defaults)
@@ -41,8 +43,7 @@ defaults.fold = 1
 
 local symbolnum = require('json').read('../libs/ffxidata.json').chat.chars
 
-function event_addon_command(...)
-    
+windower.register_event('addon command',function (...)
 	cmd = {...}
 	
 	if cmd[1] ~= nil then
@@ -74,11 +75,10 @@ function event_addon_command(...)
 		end
 		
 	end
-end 
+end)
 
-function event_load()
+windower.register_event('load',function ()
 
-	send_command('alias rolltracker lua c rolltracker')
 	override= settings['autostop']
 	luckyroll = 0
 	roll_id ={  97, 98, 99,
@@ -145,18 +145,18 @@ function event_load()
         initialize()
     end
 				
-end
+end)
 
 
-function event_login()
+windower.register_event('login',function ()
     initialize()
-end
+end)
 
 function initialize()
     settings = config.load(defaults)
 end
 
-function event_incoming_text(old, new, color)
+windower.register_event('incoming text',function (old, new, color)
 	match_doubleup = old:find (' uses Double')
 	battlemod_compat = old:find('.*Roll.*'..string.char(129,168))
 	obtained_roll = old:find('.* receives the effect of .* Roll.')
@@ -171,9 +171,9 @@ function event_incoming_text(old, new, color)
 			new=old
 		end
 		return new, color
-end
+end)
 
-function event_action(act)
+windower.register_event('action',function (act)
 	id = act['actor_id']
 	if act['category']==6 then
 		roller = act['param']
@@ -217,7 +217,7 @@ function event_action(act)
 			end
 		end
 	end
-end
+end)
 
 function bust_rate(num, main)
 	if num <= 5 or num == 11 or main ~= get_player()['id'] or settings.bust == 0 then
@@ -230,7 +230,7 @@ end
 
 test=0
 
-function event_outgoing_text(original, modified)
+windower.register_event('outgoing text',function (original, modified)
 	if original:find('/jobability \"Double.*Up') and luckyroll == 1 and override == 0 and id == get_player()['id'] then
 		modified=''
 		add_to_chat(159,'Attempting to Doubleup on a Lucky Roll: Re-double up to continue.')
@@ -267,4 +267,4 @@ function event_outgoing_text(original, modified)
 		return modified
 	end
 	
-end
+end)

@@ -24,16 +24,20 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-function event_load()
+_addon = {}
+_addon.name = 'PetSchool'
+_addon.commands = {'petschool','ps'}
+_addon.author = 'Banggugyangu'
+_addon.version = '1.0.0'
+
+windower.register_event('load',function ()
 	version = '1.0.0'
 	PetNuke = ' '
 	PetHeal = ' '
 	TP_Set = ' '
 	Idle_Set = ' '
-	send_command('alias ps lua c petschool')
-	send_command('alias petschool lua c petschool')
 	options_load()
-end
+end)
 
 --Function Designer:  Byrth
 function options_load()
@@ -75,7 +79,7 @@ function options_load()
 	end
 end
 
-function event_action(act)
+windower.register_event('action',function (act)
 	local player = get_player()
 	local pet = get_mob_by_index(get_mob_by_index(get_player()['index'])['pet_index'])['id']
 	local actor = act.actor_id
@@ -102,7 +106,7 @@ function event_action(act)
 			end
 		end
 	end
-end
+end)
 
 --Function Author:  Byrth
 function split(msg, match)
@@ -116,7 +120,7 @@ function split(msg, match)
 			if nextanch~=length then
 				u = nextanch+match:len()
 			else
-				u = lengthlua 
+				u = lengthlua
 			end
 		else
 			splitarr[#splitarr+1] = msg:sub(u,length)
@@ -127,7 +131,7 @@ function split(msg, match)
 end
 
 --Function Designer:  Byrth
-function event_addon_command(...)
+windower.register_event('addon command',function (...)
     local term = table.concat({...}, ' ')
     local splitarr = split(term,' ')
 	if splitarr[1]:lower() == 'reload' then
@@ -138,4 +142,4 @@ function event_addon_command(...)
 		add_to_chat(17, '    reload  - Reloads settings')
 		add_to_chat(17, '    help   - Displays this help text')
 	end
-end
+end)

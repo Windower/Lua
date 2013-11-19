@@ -1,4 +1,9 @@
-function event_addon_command(...)
+_addon.name = 'Scan'
+_addon.version = '0.1'
+_addon.command = 'scan'
+_addon.author = 'Byrth'
+
+windower.register_event('addon command',function (...)
     term = table.concat({...}, ' ')
 	local broken = split(term, ' ')
 	if broken[1] ~= nil then
@@ -13,10 +18,9 @@ function event_addon_command(...)
 			end
 		end
 	end
-end
+end)
 
-function event_load()
-	send_command('alias scan lua c scan')
+windower.register_event('load',function ()
 	tb_create('scan_box')
 	tb_set_bg_color('scan_box',200,30,30,30)
 	tb_set_color('scan_box',255,200,200,200)
@@ -24,14 +28,13 @@ function event_load()
 	tb_set_visibility('scan_box',1)
 	tb_set_bg_visibility('scan_box',1)
 	tb_set_text('scan_box','No target / Default')
-end
+end)
 
-function event_unload()
-	send_command('unalias scan')
+windower.register_event('unload',function ()
 	tb_delete('scan_box')
-end
+end)
 
-function event_target_change(targId)
+windower.register_event('target change',function (targId)
 	local currentmob = get_mob_by_index(targId)
 	if currentmob ~= nil then
 		if currentmob['id'] == nil then
@@ -40,7 +43,7 @@ function event_target_change(targId)
 			tb_set_text('scan_box','mob_type:'..currentmob['mob_type']..'  model_size:'..currentmob['model_size']..'  targId:'..targId..'  id:'..currentmob['id'])
 		end
 	end
-end
+end)
 
 function split(msg, match)
 	local length = msg:len()

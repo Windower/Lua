@@ -33,6 +33,9 @@ function equip_sets(swap_type,val1,val2)
 		if sent_out_equip[slot_map[i]] then
 			cur_equip[i] = sent_out_equip[slot_map[i]]
 		end
+		if not_sent_out_equip[slot_map[i]] then
+			cur_equip[i] = not_sent_out_equip[slot_map[i]]
+		end
 	end
 	
 	table.reassign(equip_list,player.equipment)
@@ -67,7 +70,9 @@ function equip_sets(swap_type,val1,val2)
 		user_env.midcast(val1,val2) -- User defined function to determine the midcast set
 	elseif swap_type == 'aftercast' then
 		if not val1 then val1 = {}
-			add_to_chat(8,'val1 error')
+			if debugging >= 2 then
+				add_to_chat(8,'val1 error')
+			end
 		end
 		val1.target = spelltarget
 		midaction = false
@@ -127,8 +132,11 @@ function equip_sets(swap_type,val1,val2)
 			if equip_next[i] and not disable_table[i] and not encumbrance_table[i] then
 				set_equip(equip_next[i],i)
 				sent_out_equip[i] = equip_next[i] -- re-make the equip_next table with the name sent_out_equip as the equipment is sent out.
-			elseif equip_next[i] and not disable_table[i] then
+			elseif equip_next[i] then --and not disable_table[i] then
 				not_sent_out_equip[i] = equip_next[i]
+--				if encumbrance_table[i] then
+--					add_to_chat(123,"Gearswap: No can change, compadre! You're encumbered in your "..default_slot_map[i].." slot.")
+--				end
 			end
 		end
 	elseif logging then
@@ -157,7 +165,9 @@ function to_id_set(inventory,equip_list)
 						elseif type(v) == 'string' then
 							name = v
 						end
-						if not ret_list[slot_map[i]] then
+						-- v can also be a table (that doesn't contain a "name" property) or a number, which are both cases that should not generate any kind of equipment changing.
+						-- Hence the "and name" below.
+						if not ret_list[slot_map[i]] and name then
 							if r_items[m['id']][language..'_log']:lower() == name:lower() or r_items[m['id']][language]:lower() == name:lower() then
 								if extgoal[1] then
 									local count = 0
@@ -207,13 +217,15 @@ function to_id_set(inventory,equip_list)
 					elseif type(v) == 'string' then
 						name = v
 					end
-					if r_items[m['id']][language..'_log']:lower() == name:lower() or r_items[m['id']][language]:lower() == name:lower() then
-						if m['flags'] == 5 then
-							equip_list[i] = ''
-						elseif m['flags'] == 25 then
-							equip_list[i] = name..' (bazaared)'
+					if name then -- If "name" isn't a piece of gear, then it won't have a valid value at this point and should be ignored.
+						if r_items[m['id']][language..'_log']:lower() == name:lower() or r_items[m['id']][language]:lower() == name:lower() then
+							if m['flags'] == 5 then
+								equip_list[i] = ''
+							elseif m['flags'] == 25 then
+								equip_list[i] = name..' (bazaared)'
+							end
+							break
 						end
-						break
 					end
 				end
 			end

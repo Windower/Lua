@@ -25,7 +25,7 @@ function get_sets()
 	-- Midcast Sets
 	sets.midcast_Haste = {main="Terra's Staff",sub="Arbuda Grip",
 		head="Zelus Tiara",neck="Orunmila's Torque",ear1="Loquac. Earring",
-		body="Hedera's Cotehardie",hands="Gendewitha Gages",ring2="Prolix Ring",
+		body="Hedera Cotehardie",hands="Gendewitha Gages",ring2="Prolix Ring",
 		back="Swith Cape",waist="Phasmida Belt",legs="Byakko's Haidate",feet="Rostrum Pumps"}
 
 	sets.midcast_Debuff = {main="Izhiikoh",sub="Genbu's Shield",
@@ -48,16 +48,16 @@ function get_sets()
 		body="Heka's Kalasiris",hands="Bokwus Gloves",legs="Brd. Cannions +2",feet="Bokwus Boots"}
 		
 	sets.midcast_Stoneskin = {head="Marduk's Tiara +1",body="Marduk's Jubbah +1",hands="Marduk's Dastanas +1",
-		legs="Brd. Cannions +2",feet="Bokwus Boots"}
+		legs="Shedir Seraweels",feet="Bokwus Boots"}
 	
 	
 	--Aftercast Sets
-	sets.aftercast_Regen = {main="Terra's Staff",
+	sets.aftercast_Regen = {main="Terra's Staff",range="Oneiros Harp",
 		head="Marduk's Tiara +1",neck="Twilight Torque",ear1="Loquac. Earring",ear2="Gifted Earring",
 		body="Marduk's Jubbah +1",hands="Serpentes Cuffs",ring1="Dark Ring",ring2="Dark Ring",
 		back="Umbra Cape",waist="Flume Belt",legs="Nares Trews",feet="Aoidos' Cothrn. +2"}
 	
-	sets.aftercast_PDT = {main="Terra's Staff",
+	sets.aftercast_PDT = {main="Terra's Staff",range="Oneiros Harp",
 		head="Marduk's Tiara +1",neck="Twilight Torque",ear1="Loquac. Earring",ear2="Gifted Earring",
 		body="Marduk's Jubbah +1",hands="Serpentes Cuffs",ring1="Dark Ring",ring2="Dark Ring",
 		back="Umbra Cape",waist="Flume Belt",legs="Nares Trews",feet="Aoidos' Cothrn. +2"}

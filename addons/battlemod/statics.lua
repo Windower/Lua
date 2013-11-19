@@ -23,13 +23,13 @@
 --ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
+language = 'english'
 skillchain_arr = {'Light:','Darkness:','Gravitation:','Fragmentation:','Distortion:','Fusion:','Compression:','Liquefaction:','Induration:','Reverberation:','Transfixion:','Scission:','Detonation:','Impaction:'}
 ratings_arr = {'TW','EEP','EP','DC','EM','T','VT','IT'}
 current_job = 'NONE'
 rcol = string.char(0x1E,0x01)
 blocked_colors = T{20,21,22,23,24,25,26,27,28,29,30,31,32,33,35,37,40,41,42,43,44,50,51,52,56,57,59,60,61,63,68,69,64,65,67,69,81,85,90,91,100,101,102,104,105,106,107,110,111,112,114,122,127,162,163,164,165,166,168,170,171,174,175,177,181,182,183,185,186,188,191} -- Recently added: 27 (MP drain), 165 (alliance drain?), 188 (absorb damage alliance)
-passed_messages = T{4,5,6,16,17,18,20,34,35,36,40,47,48,49,64,78,87,88,89,90,112,116,154,170,171,172,173,174,175,176,177,178,191,192,198,204,215,217,218,234,246,249,307,315,328,350,336,523,530,531,558,561,575,601,609,562,610,611,612,613,614,615,616,617,618,619,620,625,626,627,628,629,630,631,632,633,634,635,636,643,660,661,662,679}
+passed_messages = T{4,5,6,16,17,18,20,34,35,36,40,47,48,49,64,78,87,88,89,90,112,116,154,170,171,172,173,174,175,176,177,178,191,192,198,204,215,217,218,234,246,249,307,315,328,350,336,523,530,531,558,561,575,601,609,562,610,611,612,613,614,615,616,617,618,619,620,625,626,627,628,629,630,631,632,633,634,635,636,643,660,661,662,62,94,251,308,313,371,372,8,105,253,679,97,62,94,251,313,308,206}
 agg_messages = T{85,653,655,75,156,189,248,323,355,408,422,425,82,93,116,127,131,134,151,144,146,148,150,166,186,194,230,236,237,242,243,268,271,319,320,364,375,412,414,416,420,424,426,432,433,441,602,645,668,435,437,439}
 color_redundant = T{26,33,41,71,72,89,94,109,114,164,173,181,184,186,70,84,104,127,128,129,130,131,132,133,134,135,136,137,138,139,140,64,86,91,106,111,175,178,183,81,101,16,65,87,92,107,112,174,176,182,82,102,67,68,69,170,189,15,208,18,25,32,40,163,185,23,24,27,34,35,42,43,162,165,187,188,30,31,14,205,144,145,146,147,148,149,150,151,152,153,190,13,9,253,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,284,285,286,287,292,293,294,295,300,301,301,303,308,309,310,311,316,317,318,319,324,325,326,327,332,333,334,335,340,341,342,343,344,345,346,347,348,349,350,351,355,357,358,360,361,363,366,369,372,374,375,378,381,384,395,406,409,412,415,416,418,421,424,437,450,453,456,458,459,462,479,490,493,496,499,500,502,505,507,508,10,51,52,55,58,62,66,80,83,85,88,90,93,100,103,105,108,110,113,122,168,169,171,172,177,179,180,12,11,37,291} -- 37 and 291 might be unique colors, but they are not gsubbable.
 black_colors = T{352,354,356,388,390,400,402,430,432,442,444,472,474,484,486}
@@ -55,43 +55,58 @@ mobdmg=0,mydmg=0,partydmg=0,allydmg=0,otherdmg=0,
 spellcol=0,abilcol=0,wscol=0,mobwscol=0,mobspellcol=0,statuscol=191,itemcol=256,enfeebcol=475}
 
 filter = {}
-wearing = {}
-line_full = '[${actor}] ${number} ${abil} '..string.char(129,168)..' ${target}'
-line_noactor = '${abil} ${number} '..string.char(129,168)..' ${target}'
-line_nonumber = '[${actor}] ${abil} '..string.char(129,168)..' ${target}'
-line_noabil = 'AOE ${number} '..string.char(129,168)..' ${target}'
-line_aoebuff = '${actor} ${abil} '..string.char(129,168)..' ${target} (${status})'
-line_roll = '${actor} ${abil} '..string.char(129,168)..'${target}'..string.char(129,170)..' ${number}'
+multi_targs = {}
+multi_actor = {}
+multi_msg = {}
+line_full = '[${actor}] ${abil} < ${target} > ${numb}'
+line_nonumber = '[${actor}] ${abil} < ${target} >'
 
-default_settings_table = {line_full='[${actor}] ${number} ${abil} '..string.char(129,168)..' ${target}',line_noactor='${abil} ${number} '..string.char(129,168)..' ${target}',
-line_nonumber='[${actor}] ${abil} '..string.char(129,168)..' ${target}',line_noabil='AOE ${number} '..string.char(129,168)..' ${target}',
-line_aoebuff='${actor} ${abil} '..string.char(129,168)..' ${target} (${status})',line_roll='${actor} ${abil} '..string.char(129,168)..'${target}'..string.char(129,170)..' ${number}',
-condensedamage=true,condensebattle=true,condensebuffs=true,cancelmulti=true,oxford=true,commamode=false,targetnumber=true}
+default_settings_table = {line_full='[${actor}] ${numb} ${abil} '..string.char(129,168)..' ${target}',line_nonumber='[${actor}] ${abil} '..string.char(129,168)..' ${target}',
+	condensedamage=true,condensetargets=true,cancelmulti=true,oxford=true,commamode=false,targetnumber=true,swingnumber=true}
 
 message_map = {}
 for n=1,700,1 do
 	message_map[n] = T{}
 end
+
 message_map[85] = T{284} -- resist
 message_map[653] = T{654} -- immunobreak
 message_map[655] = T{656} -- complete resist
 message_map[93] = T{273} -- vanishes
 --	message_map[75] =  -- no effect spell
 message_map[156] = T{156,323,422,425} -- no effect ability
+message_map[75] = T{283} -- No Effect: Spell, Target
 --	message_map[189] = -- no effect ws
 --	message_map[408] = -- no effect item
 message_map[248] = T{355} -- no ability of any kind
 message_map['No effect'] = T{283,423,659} -- generic "no effect" messages for sorting by category
 message_map[432] = T{433} -- Receives: Spell, Target
 message_map[82] = T{230,236,237,268,271} -- Receives: Spell, Target, Status
+message_map[230] = T{266} -- Receives: Spell, Target, Status
+message_map[319] = T{266} -- Receives: Spell, Target, Status
+message_map[134] = T{287} -- Receives: Spell, Target, Status
 message_map[116] = T{131,134,144,146,148,150,364,414,416,441,602,668,285,145,147,149,151,286,287,365,415,421} -- Receives: Ability, Target
 message_map[127]=T{319,320,645} -- Receives: Ability, Target, Status
 message_map[420]=T{424} -- Receives: Ability, Target, Status, Number
 message_map[375] = T{412}-- Receives: Item, Target, Status
 --	message_map[166] =  -- receives additional effect
 message_map[186] = T{194,242,243}-- Receives: Weapon skill, Target, Status
-message_map['Receives'] = T{203,205,270,272,277,279,280,266,267,269,278}
+message_map.Receives = T{203,205,270,272,277,279,280,266,267,269,278}
 message_map[426] = T{427} -- Loses
+message_map[320] = T{267}
+message_map[414] = T{415}
+message_map[7] = T{263}
+message_map[148] = T{149}
+message_map[441] = T{421}
+message_map[131] = T{286}
+message_map[150] = T{151}
+message_map[420] = T{421}
+message_map[424] = T{421}
+message_map[437] = T{438}
+message_map[126] = T{676}
+
+spike_effect_valid = {true,false,false,false,false,false,false,false,false,false,false,false,false,false,false}
+add_effect_valid = {true,true,true,true,false,false,false,false,false,false,false,false,false,false,false}
 
 
 speFile = file.new('../../plugins/resources/spells.xml')
@@ -103,20 +118,20 @@ itemsGFile = file.new('../../plugins/resources/items_general.xml')
 itemsAFile = file.new('../../plugins/resources/items_armor.xml')
 itemsWFile = file.new('../../plugins/resources/items_weapons.xml')
 
-jobabilities = parse_resources(jaFile:readlines())
-spells = parse_resources(speFile:readlines())
-statuses = parse_resources(statusFile:readlines())
+r_abilities = parse_resources(jaFile:readlines())
+r_spells = parse_resources(speFile:readlines())
+r_status = parse_resources(statusFile:readlines())
 dialog = parse_resources(dialogFile:readlines())
-mabils = parse_resources(mabilsFile:readlines())
-statuses = parse_resources(statusFile:readlines())
-items = table.range(65535)
-items:update(parse_resources(itemsGFile:readlines()))
-items:update(parse_resources(itemsAFile:readlines()))
-items:update(parse_resources(itemsWFile:readlines()))
+r_mabils = parse_resources(mabilsFile:readlines())
+r_items = table.range(65535)
+r_items:update(parse_resources(itemsGFile:readlines()))
+r_items:update(parse_resources(itemsAFile:readlines()))
+r_items:update(parse_resources(itemsWFile:readlines()))
 
+-- This is for the secondary form of these debuffs
 enLog = {}
-for i,v in pairs({0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,134,135,155,156,157,168,176,177,259,260,261,262,263,264,309,474}) do
-	enLog[v] = statuses[v]['enLog']
+for i,v in pairs({0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,28,29,30,31,134,135,155,156,157,168,176,177,259,260,261,262,263,264,309,474}) do
+	enLog[v] = r_status[v]['enLog']
 end
 
 
@@ -301,22 +316,19 @@ default_settings = [[
 <!-- For the output customization lines, ${actor} denotes a value to be replaced. The options are actor, number, abil, and target.
 	 Options for other modes are either "true" or "false". Other values will not be interpreted.-->
 	<global>
-		<condensedamage>true</condensedamage>
-		<condensebattle>true</condensebattle>
-		<condensebuffs>true</condensebuffs>
+        <condensedamage>true</condensedamage>
+        <condensetargets>true</condensetargets>
 		<cancelmulti>true</cancelmulti>
 		<oxford>true</oxford>
 		<commamode>false</commamode>
-		<supersilence>true</supersilence>
 		<targetnumber>true</targetnumber>
+		<swingnumber>true</swingnumber>
+        <tpstatuses>true</tpstatuses>
+        <simplify>true</simplify>
 		
 		
-		<line_full>[${actor}] ${number} ${abil} ]]..string.char(129,168)..[[ ${target}</line_full>
-		<line_noactor>${abil} ${number} ]]..string.char(129,168)..[[ ${target}</line_noactor>
-		<line_nonumber>[${actor}] ${abil} ]]..string.char(129,168)..[[ ${target}</line_nonumber>
-		<line_noabil>AOE ${number} ]]..string.char(129,168)..[[ ${target}</line_noabil>
-		<line_aoebuff>${actor} ${abil} ]]..string.char(129,168)..[[ ${target} (${status})</line_aoebuff>
-		<line_roll>${actor} ${abil} ]]..string.char(129,168)..[[ ${target} ]]..string.char(129,170)..[[ ${number}</line_roll>
+		<line_full>[${actor}] ${abil} &lt; ${target} &gt; ${numb}</line_full>
+		<line_nonumber>[${actor}] ${abil} &lt; ${target} &gt;</line_nonumber>
 	</global>
 </settings>
 ]]

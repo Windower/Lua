@@ -26,6 +26,7 @@
 
 _addon = _addon or {}
 _addon.name = 'cellhelp'
+_addon.commands = {'cellhelp','ch'}
 _addon.version = 0.1
 
 
@@ -101,7 +102,7 @@ function settings_create()
 	
 end
 
-function event_addon_command(...)
+windower.register_event('addon command',function (...)
 	local params = {...};
 	if #params < 1 then
 		return
@@ -156,10 +157,9 @@ function event_addon_command(...)
 			end
 		end			
 	end
-end
+end)
 
-function event_load()
-	send_command('alias ch lua c cellhelp')
+windower.register_event('load',function ()
 	player = get_player()['name']
 	write('CellHelp loaded.  CellHelp Authors: Cerberus.Balloon and Bahamut.Krizz')
 	mode = settingtab["mode"]
@@ -169,15 +169,15 @@ function event_load()
 	lightluggage()
 	send_command('ll profile salvage-'..player..'.txt')
 	initialize()
-end 
+end )
 
-function event_login()
+windower.register_event('login',function ()
 	settings_create()
-end
+end)
 
-function event_zone_change(from_id, from, to_id, to)
+windower.register_event('zone change',function (from_id, from, to_id, to)
 	checkzone()
-end
+end)
 
 function orderlots()
 	lotorder = " "
@@ -246,7 +246,7 @@ function checkzone()
 		end
 end
 
-function event_incoming_text(original, new, color)
+windower.register_event('incoming text',function (original, new, color)
 	a,b,name,cell = string.find(original,'(%w+) obtains an? ..(%w+) cell..\46')
 	if cell ~= nil then
 		if name == player then
@@ -271,10 +271,9 @@ function event_incoming_text(original, new, color)
 		end
 		return new, color
 	end
-end	
+end	)
 
-function event_unload()
+windower.register_event('unload',function ()
 	tb_delete('salvage_box')
 	send_command('timers d Remaining')
-	send_command('unalias ch2')
-end 
+end )

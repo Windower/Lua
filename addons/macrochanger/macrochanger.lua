@@ -24,7 +24,7 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-function event_load()
+windower.register_event('load',function ()
 	version = '1.0.0'
 	globaldisable = 0
 	WAR_Book = ''
@@ -76,7 +76,7 @@ function event_load()
 	add_to_chat(17, 'MacroChanger v' .. version .. ' loaded.     Author:  Banggugyangu')
 	add_to_chat(17, 'Attempting to load settings from file.')
 	options_load()
-end
+end)
 
 function options_load()
 	local f = io.open(lua_base_path..'data/settings.txt', "r")
@@ -271,7 +271,7 @@ function split(msg, match)
 	return splitarr
 end
 
-function event_job_change(mjobId, mjob)
+windower.register_event('job change',function (mjobId, mjob)
 	local player = get_player()
 	local job = player.main_job
 	local book = ''
@@ -357,13 +357,13 @@ function event_job_change(mjobId, mjob)
 		add_to_chat(17, '                             Auto Macro Switching Disabled for All Jobs.')
 		
 	end
-end
+end)
 
-function event_unload()
+windower.register_event('unload',function ()
 	send_command('unalias mc')
-end
+end)
 
-function event_addon_command(...)
+windower.register_event('addon command',function (...)
     local term = table.concat({...}, ' ')
     local splitarr = split(term,' ')
 	local mjob = get_player()['main_job']
@@ -384,4 +384,4 @@ function event_addon_command(...)
 			add_to_chat(17, '   Resets to what is stored in settings upon unloading of addon.  To Permanently change, please change the option in the settings file.')
 		end
 	end
-end
+end)

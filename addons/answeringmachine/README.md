@@ -1,5 +1,5 @@
 Author: Byrth
-Version: 1.0
+Version: 1.1
 Answering Machine with basic functionality
 
 Abbreviation: //am, //answeringmachine

@@ -35,9 +35,9 @@ local ffxi = require 'ffxi'
 local config = require 'config'
 
 _addon = {}
-_addon.rname = 'gametime'
+_addon.name = 'gametime'
 _addon.version = '0.52'
-_addon.command = 'gametime'
+_addon.commands = {'gametime','gt'}
 
 tb_name	= 'addon:gr:gametime'
 visible = false
@@ -227,10 +227,8 @@ local defaults = T{}
 	Cycles.kazham.route[6] = "Arrives in Jeuno|14:49"
 	Cycles.kazham.route[7] = "Arrives in Kazham|19:48"
 	Cycles.kazham.route[8] = "Arrives in Jeuno|20:49"
-	
-function event_load()
-	send_command('alias gametime lua command gametime')
-	send_command('alias gt gametime')
+
+function initialize()
 	cb_time()
 	cb_day()
 	settings = config.load(defaults)
@@ -242,17 +240,20 @@ function event_load()
 	end
 	
 	gt.mode = settings.mode
-	event_time_change(get_ffxi_info()["time"])
-	event_day_change(get_ffxi_info()["day"])
-	event_moon_pct_change(get_ffxi_info()["moon_pct"])
+	time_change(get_ffxi_info()["time"])
+	day_change(get_ffxi_info()["day"])
+	moon_pct_change(get_ffxi_info()["moon_pct"])
 end
 
-function event_unload()
-	send_command('unalias gametime')
-	send_command('unalias gt')
+function destroy()
 	tb_delete('gametime_time')
 	tb_delete('gametime_day')
 end
+	
+windower.register_event('load',initialize)
+windower.register_event('login',initialize)
+windower.register_event('unload',destroy)
+windower.register_event('logout',destroy)
 
 function getroutes(route)
 	for ckey, cval in pairs(Cycles) do
@@ -268,14 +269,6 @@ function getroutes(route)
 			end
 		end
 	end
-end
-
-function event_login()
-	event_load()
-end
-
-function event_logout()
-	event_unload()
 end
 
 function cb_time()
@@ -306,16 +299,13 @@ function cb_day()
 	tb_set_visibility(gt.gtd,settings.days.visible)
 	--Set font type and size for days 
 	tb_set_font(gt.gtd,settings.days.font,settings.days.font_size)
-	
-	
-	
 end
 
 function default_settings()
 	settings:save('all')
 end
 
-function event_time_change(old, new)
+function time_change(old, new)
 	gt.basetime = get_ffxi_info()["time"]
 	gt.basetime = gt.basetime * 100
 	gt.basetime = math.round(gt.basetime)
@@ -328,6 +318,8 @@ function event_time_change(old, new)
 	tb_set_text(gt.gtt,gt.time[1]..':'..gt.time[2])
 end
 
+windower.register_event('time change',time_change)
+
 function timeconvert(basetime)
 	basetable = basetime:split(':')
 	return basetable[1]..'.'..math.round(basetable[2] * (100/60))
@@ -338,7 +330,7 @@ function timeconvert2(basetime)
 	return basetable[1]..':'..tostring(math.round(tostring(basetable[2]):slice(1,2) / (100/60))):zfill(2)
 end
 
-function event_day_change(day)
+function day_change(day)
 --	tb_set_text(gt.gtd,day)
 	if (day == 'Firesday') then
 		dlist = {'1','2','3','4','5','6','7','8'}
@@ -371,10 +363,11 @@ function event_day_change(day)
 	gt.WeekReport = daystring
 	tb_set_color(gt.gtd,settings.days.alpha,255,255,255)
 	tb_set_text(gt.gtd,' \\cs'..gt.days[1][10]..gt.MoonPhase..' ('..gt.MoonPct..'%);'..gt.WeekReport)
-	event_moon_change(get_ffxi_info()["moon"])
+	moon_change(get_ffxi_info()["moon"])
 end
+windower.register_event('day change',day_change)
 
-function event_moon_change(moon)
+function moon_change(moon)
 	gt.MoonPhase = moon
 	tb_set_text(gt.gtd,gt.MoonPhase..' ('..gt.MoonPct..'%);'..gt.WeekReport)
 	if settings.moon.change == true then
@@ -382,12 +375,15 @@ function event_moon_change(moon)
 	end
 end
 
-function event_moon_pct_change(pct)
+windower.register_event('moon change',moon_change)
+
+function moon_pct_change(pct)
 	gt.MoonPct = pct
 	tb_set_text(gt.gtd,gt.MoonPhase..' ('..gt.MoonPct..'%);'..gt.WeekReport)
 end
+windower.register_event('moon pct change',moon_pct_change)
 
-function event_addon_command(...)
+windower.register_event('addon command',function (...)
 	local args	= T({...})
 	if args[1] == nil or args[1] == "help" then
 		log('Use //gametime or //gt as follows:')
@@ -535,7 +531,7 @@ function event_addon_command(...)
 			gt.delimiter = " "
 		log('Week display axis set to horizontal.')
 		end
-		event_day_change(get_ffxi_info()["day"])
+		day_change(get_ffxi_info()["day"])
 	elseif args[1] == 'mode' then
 		inmode = tostring(args[2]):zfill(1)
 		inmode = inmode+0
@@ -545,9 +541,9 @@ function event_addon_command(...)
 			settings.mode = inmode
 			log('mode updated')
 		end
-		event_day_change(get_ffxi_info()["day"])
+		day_change(get_ffxi_info()["day"])
 	elseif args[1] == 'save' then
 		settings:save('all')
 		log('Settings saved.')
 	end
-end
+end)

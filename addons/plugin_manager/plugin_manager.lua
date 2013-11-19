@@ -29,18 +29,18 @@ file = require 'filehelper'
 require 'tablehelper'
 xml = require 'xml'
 
-_addon = {}
-_addon.version = '0.6'
+
+_addon.version = '0.8'
 _addon.author = 'Byrth'
 _addon.name = 'plugin_manager'
 _addon.commands = {}
 
 windower.register_event('addon command',function(...)
-	local cmd = table.concat({...},' ')
-	if cmd == 'load' then
-		load_plugins(make_name())
-	elseif cmd == 'unload' then
-		unload_plugins(make_name())
+	local cmd = {...}
+	if cmd[1] == 'load' then
+		load_plugins(make_name(cmd[2]))
+	elseif cmd[1] == 'unload' then
+		unload_plugins(make_name(cmd[2]))
 	end
 end)
 
@@ -145,7 +145,6 @@ end
 
 function unload_plugins(name)
 	local commandstr = ''
-	
 	for i,v in pairs(loader_array[name]) do
 		for n,m in pairs(v) do
 			if general_array[i][m] then
@@ -156,22 +155,23 @@ function unload_plugins(name)
 	send_command(commandstr)
 end
 
-windower.register_event('login',function()
-	send_command('@wait 3;lua c plugin_manager load')
+windower.register_event('login',function(name)
+	send_command('@wait 3;lua c plugin_manager load '..name)
 end)
 
-windower.register_event('logout',function()
-	send_command('@lua c plugin_manager unload')
+windower.register_event('logout',function(name)
+	send_command('@lua c plugin_manager unload '..name)
 end)
 
 function make_name(name)
 	if name then
 		name = name:lower()
 	elseif get_player() then
-		name = get_player()['name']:lower()
-		if name == nil or name == '' or not loader_array[name] then
-			name = 'global'
-		end
+		name = get_player().name:lower()
+	end
+	
+	if name == nil or name == '' or not loader_array[name] then
+		name = 'global'
 	end
 	return name or 'global'
 end
