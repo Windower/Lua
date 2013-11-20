@@ -43,7 +43,7 @@ file  = require 'filehelper'
 slips = require 'slips'
 
 load_timestamp         = os.time()
-deferral_time          = 0
+deferral_time          = 20
 item_names             = T{}
 global_storages        = {}
 storages_path          = 'data/storages.json'
