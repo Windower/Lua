@@ -16,6 +16,18 @@ local valid_fonts = T{
     'dejavu sans mono'
 }
 
+local valid_fields = T{
+    'name',
+    'dps',
+    'percent',
+    'total',
+    'acc',
+    'racc',
+    'crit',
+    'rcrit',
+    'wsavg'
+}
+
 -- Margin of error for a sample size N at 95% confidence
 local function moe95(n)
     return 0.98 / math.sqrt(n)
@@ -163,11 +175,17 @@ function Display:update()
         return
     end
 
+    if self.db:isempty() then
+        self:reset()
+        return
+    end
+    
     local damage_table, total_damage
     damage_table, total_damage = self:get_sorted_player_damage()
 	
     local display_table = T{}
     local player_lines = 0
+    local alli_damage = 0
     for k, v in pairs(damage_table) do
         if player_lines < self.settings.numplayers then
             local dps
@@ -185,14 +203,17 @@ function Display:update()
             end
             display_table:append(string.format("%-16s%7d%8s %7s", v[1], v[2], percent, dps))
         end
+        
+        alli_damage = alli_damage + v[2] -- gather this even for players not displayed
         player_lines = player_lines + 1
+    end                  
+    
+    if self.settings.showallidps and dps_clock.clock > 0 then
+        display_table:append("-----------------")
+        display_table:append("Alli DPS: " .. string.format("%7.1f", alli_damage / dps_clock.clock))
     end
-	
-    if self.db:isempty() then
-        self:reset()
-    else
-        tb_set_text(self.tb_name, self:build_scoreboard_header() .. table.concat(display_table, '\n'))
-    end
+    
+    tb_set_text(self.tb_name, self:build_scoreboard_header() .. table.concat(display_table, '\n'))
 end
 
 
@@ -333,6 +354,21 @@ Display.show_stat = (function()
         
         if #lines > 0 then
             sb_output(format_title('Ranged Crit. Rate (' .. filters .. ')'))
+            sb_output(lines)
+        end
+    end
+ 
+    stat_display['wsavg'] = function (stats, filters)
+        local lines = T{}
+
+        for name, stat_pair in pairs(stats) do
+            if stat_pair[2] > 0 then
+                lines:append(string.format("%-20s %d (%ds)", name, stat_pair[1], stat_pair[2]))
+            end
+        end
+        
+        if #lines > 0 then
+            sb_output(format_title('WS Average (' .. filters .. ')'))
             sb_output(lines)
         end
     end
