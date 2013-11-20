@@ -422,7 +422,7 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 			end
 			
 			if fields.number2 then
-				number = am.param_2
+				number2 = am.param_2
 			end
 			
 			local outstr = (dialog[am.message_id][language]
