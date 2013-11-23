@@ -6,8 +6,9 @@ config = require 'config'
 require 'generic_helpers'
 require 'parse_action_packet'
 require 'statics'
+res = require 'resources'
 
-_addon.version = '3.08'
+_addon.version = '3.09'
 _addon.name = 'BattleMod'
 _addon.author = 'Byrth'
 _addon.commands = {'bm','battlemod'}
@@ -345,8 +346,8 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 		am.actor_id = get_bit_packed(data,0,32)
 		am.target_id = get_bit_packed(data,32,64)
 		am.param_1 = get_bit_packed(data,64,96)
-		am.param_2 = get_bit_packed(data,96,102) -- First 6 bits
-		am.param_3 = get_bit_packed(data,102,128) -- Rest
+		am.param_2 = get_bit_packed(data,96,106) -- First 6 bits
+		am.param_3 = get_bit_packed(data,106,128) -- Rest
 		am.actor_index = get_bit_packed(data,128,144)
 		am.target_index = get_bit_packed(data,144,160)
 		am.message_id = get_bit_packed(data,160,175) -- Cut off the most significant bit, hopefully
@@ -390,14 +391,6 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 		elseif passed_messages:contains(am.message_id) then
 			local item,status,spell,skill,number,number2
 			
-			if am.message_id > 169 and am.message_id <179 then
-				if am.param_1 == 4294967296 then
-					skill = 'like level -1'..' ('..ratings_arr[am.param_2+1]..')'
-				else
-					skill = 'like level '..am.param_1..' ('..ratings_arr[am.param_2+1]..')'
-				end
-			end
-			
 			local fields = fieldsearch(dialog[am.message_id][language])
 			
 			if fields.status then
@@ -425,6 +418,18 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 				number2 = am.param_2
 			end
 			
+			if fields.skill and res.skills[am.param_1] then
+				skill = res.skills[am.param_1][language]:lower()
+			end
+			
+			if am.message_id > 169 and am.message_id <179 then
+				if am.param_1 == 4294967296 then
+					skill = 'like level -1'..' ('..ratings_arr[am.param_2-63]..')'
+				else
+					skill = 'like level '..am.param_1..' ('..ratings_arr[am.param_2-63]..')'
+				end
+			end
+			
 			local outstr = (dialog[am.message_id][language]
 				:gsub('$\123actor\125',color_it(actor.name or '',color_arr[actor.owner or actor.type]))
 				:gsub('$\123status\125',status or '')
@@ -434,6 +439,7 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 				:gsub('$\123skill\125',color_it(skill or '',color_arr.abilcol))
 				:gsub('$\123number\125',number or '')
 				:gsub('$\123number2\125',number2 or '')
+				:gsub('$\123skill\125',skill or '')
 				:gsub('$\123lb\125','\7'))
 			add_to_chat(dialog[am.message_id]['color'],outstr)
 			am.message_id = false
