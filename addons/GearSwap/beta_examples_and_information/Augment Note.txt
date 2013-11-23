@@ -1,3 +1,6 @@
+============== Advanced "sets" tables ==============
+
+-- Augments --
 Augments are currently "in," but there are a lot of different augments and SE's system for
 handling them is basically hardcoded to item ID, so don't expect it to be perfect. The system
 will use the first item it finds in your inventory that matches the name/augment combination that
@@ -17,3 +20,32 @@ If it pleases you, you can store your augmented items in variables:
 	sets.aftercast_Idle = {ring1=lefty,ring2=righty}
 
 This will save you a little work when you are dealing with using the same augmented item in multiple sets.
+
+
+
+-- Ordering your table --
+Currently tables can be ordered by using advanced "sets" tables similar to the above:
+    sets.nohead = {head={name="empty",order=2},lring={name="Angha ring",order=1}}
+
+This will cause Angha Ring to equip first, and then will take off the equipped head armor. It
+reverses the with whatever item was previously stored in that spot. Order is a number from 1 to 16, and
+the initial order is always:
+1) Main
+2) Sub
+3) Range
+4) Ammo
+5) Head
+6) Body
+7) Hands
+8) Legs
+9) Feet
+10) Neck
+11) Waist
+12) Ear 1
+13) Ear 2
+14) Ring 1
+15) Ring 2
+16) Back
+
+I do not recommend moving Sub in front of Main, Ammo in front of Range, etc. as these will cause equip
+failures.

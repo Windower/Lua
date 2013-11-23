@@ -113,8 +113,8 @@ end
 
 function equip(...)
 	local gearsets = {...}
-	for i in ipairs(gearsets) do
-		local temp_set = unify_slots(gearsets[i])
+	for i,v in ipairs(gearsets) do
+		local temp_set = unify_slots(v) -- This can probably be reduced to another index table.
 		for n,m in pairs(temp_set) do
 			rawset(equip_list,n,m)
 		end

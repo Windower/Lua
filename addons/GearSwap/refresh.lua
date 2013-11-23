@@ -171,7 +171,7 @@ function refresh_player()
 	
 	-- Assign player.equipment to be the gear that has been sent out and the server currently thinks
 	-- you are wearing. (the sent_out_equip for loop above).
-	player.equipment = to_names_set(cur_equip,items['inventory'])
+	player.equipment = to_names_set(cur_equip,items.inventory)
 	
 	-- Monster tables for the target and subtarget.
 	player.target = target_type(get_mob_by_target('t'))

@@ -1,4 +1,6 @@
 -------------------------------------------------
+Gearswap 0.713 - Added equipment order support. Made export sets more safe. Added equip "empty" support.
+-------------------------------------------------
 Gearswap 0.712 - Added adventuring fellow handling.
 -------------------------------------------------
 Gearswap 0.711 - Refined category exclusions for the outgoing action packet.
