@@ -106,8 +106,8 @@ function export_set(options)
 		f:write('<spellcast>\n  <sets>\n    <group name="exported">\n      <set name="exported">\n')
 		for i,v in ipairs(item_list) do
 			if v.name ~= 'empty' then
-				local slot = xmlify(v.slot)
-				local name = xmlify(v.name)
+				local slot = xmlify(tostring(v.slot))
+				local name = xmlify(tostring(v.name))
 				f:write('        <'..slot..'>'..name..'</'..slot..'>\n')
 			end
 		end
