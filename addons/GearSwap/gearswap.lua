@@ -217,11 +217,11 @@ windower.register_event('outgoing text',function(original,modified)
 	return modified
 end)
 
-windower.register_event('incoming text',function(original,modified,mode)
+windower.register_event('incoming text',function(original,modified,color)
 	if debugging >= 1 then windower.debug('incoming text') end
 	if gearswap_disabled then return modified, color end
 	if original == '...A command error occurred.' or original == 'You can only use that command during battle.' or original == 'You cannot use that command here.' then
-		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(130) Client canceled command detected: '..mode..' '..original) end
+		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(130) Client canceled command detected: '..color..' '..original) end
 		if type(user_env.aftercast)=='function' then
 			equip_sets('aftercast',{name='Invalid Spell'},{type='Recast'})
 		elseif user_env.aftercast then
@@ -393,7 +393,7 @@ windower.register_event('outgoing chunk',function(id,data)
 		if abil_name and not (buffactive.terror or buffactive.sleep or buffactive.stun or buffactive.petrification or buffactive.charm) then
 			midaction = true
 			send_command('@wait 1;lua i gearswap midact')
-		elseif user_env and not T{0,2,4,13,14,15,18,20}:contains(category) then -- 0 = interacting with an NPC, 2 = engaging, 4 = disengaging from menu, 13 = getting up from reraise, 14 = fishing, 15 = changing target, 18 = dismounting chocobo, 20 = zoning
+		elseif user_env and not T{0,2,4,13,14,15,18,20}:contains(category) then -- 0 = interacting with an NPC, 2 = engaging, 4 = disengaging from menu, 12= Unclear?, 13 = getting up from reraise, 14 = fishing, 15 = changing target, 18 = dismounting chocobo, 20 = zoning
 			if not T{3,7,9,16}:contains(category) then add_to_chat(8,'Tell Byrth how you triggered this and this number: '..category) end
 			if type(user_env.aftercast) == 'function' then
 				equip_sets('aftercast',{name='Interrupt',type='Interrupt'},{type='Recast'})
