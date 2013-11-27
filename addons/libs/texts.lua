@@ -114,6 +114,7 @@ function texts.new(str, settings, root_settings)
     t._status = t._status or {visible = false, text = {}}
     t._root_settings = root_settings
     t._base_str = str
+    t._events = {}
 
     t._texts = {}
     t._defaults = {}
@@ -169,6 +170,11 @@ function apply_settings(t)
     windower.text.set_right_justified(t._name, t._settings.flags.right)
 --    windower.text.set_bottom_justified(t._name, t._settings.flags.bottom)
     windower.text.set_visibility(t._name, t._status.visible)
+
+    -- Trigger registered post-reload events
+    for _, event in ipairs(t._events) do
+        event(t, t._root_settings)
+    end
 end
 
 -- Sets string values based on the provided attributes.
@@ -407,6 +413,21 @@ function texts.bg_transparency(t, alpha)
     t._settings.bg.alpha = alpha
 end
 
+-- Returns true if the coordinates are currently over the text object
+function texts.hover(t, x, y)
+    if not t:visible() then
+        return false
+    end
+
+    local pos_x, pos_y = windower.text.get_location(t._name)
+    local off_x, off_y = windower.text.get_extents(t._name)
+
+    return (pos_x <= x and x <= pos_x + off_x
+        or pos_x >= x and x >= pos_x + off_x)
+    and (pos_y <= y and y <= pos_y + off_y
+        or pos_y >= y and y >= pos_y + off_y)
+end
+
 function texts.destroy(t)
     for i, t_needle in ipairs(saved_texts) do
         if t == t_needle then
@@ -416,16 +437,8 @@ function texts.destroy(t)
     windower.text.delete(t._name)
 end
 
--- Destroy all text objects when the addon unloads
-local function destroy_texts()
-    local length = #saved_texts
-    for _, t in ipairs(saved_texts) do
-        t:destroy()
-    end
-end
-
 -- Handle drag and drop
-local function handle_mouse(type, x, y, delta, blocked)
+windower.register_event('mouse', function(type, x, y, delta, blocked)
     if blocked then
         return
     end
@@ -443,7 +456,8 @@ local function handle_mouse(type, x, y, delta, blocked)
             local pos_x, pos_y = windower.text.get_location(t._name)
             local off_x, off_y = windower.text.get_extents(t._name)
 
-            if (pos_x <= x and x <= pos_x + off_x
+            if t:visible()
+            and (pos_x <= x and x <= pos_x + off_x
                 or pos_x >= x and x >= pos_x + off_x)
             and (pos_y <= y and y <= pos_y + off_y
                 or pos_y >= y and y >= pos_y + off_y) then
@@ -469,10 +483,26 @@ local function handle_mouse(type, x, y, delta, blocked)
     end
 
     return false
+end)
+
+-- Can define functions to execute every time the settings are reloaded
+function texts.register_reload_event(t, fn)
+    t._events[#t._events + 1] = fn
+    return #t._events
 end
 
-register_event('unload', destroy_texts)
-register_event('mouse', handle_mouse)
+function texts.unregister_reload_event(t, fn)
+    if type(fn) == 'number' then
+        table.remove(t._events, fn)
+    else
+        for index, event in ipairs(t._events) do
+            if event == fn then
+                table.remove(t._events, index)
+                return
+            end
+        end
+    end
+end
 
 return texts
 
