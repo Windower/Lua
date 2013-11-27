@@ -145,6 +145,8 @@ end
 -------- of buffs with that name active.
 -----------------------------------------------------------------------------------
 function refresh_player()
+	if not get_player() then return end
+	
 	table.reassign(player,get_player())
 	for i,v in pairs(player['vitals']) do
 		player[i]=v
@@ -268,7 +270,7 @@ end
 -----------------------------------------------------------------------------------
 function refresh_group_info()
 	local temp_alliance = {[1]={count=0},[2]={count=0},[3]={count=0}}
-	local j = get_party()
+	local j = get_party() or {}
 	for i,v in pairs(j) do
 		if i:sub(1) == 'p' then
 			temp_alliance[1][tonumber(i:sub(2))+1] = v
