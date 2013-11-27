@@ -42,12 +42,12 @@ require 'export'
 
 
 _addon.name = 'GearSwap'
-_addon.version = '0.713'
+_addon.version = '0.714'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
 windower.register_event('load',function()
-	debugging = 1
+	debugging = 0
 	if debugging >= 1 then windower.debug('load') end
 	if dir_exists('../addons/GearSwap/data/logs') then
 		logging = false
@@ -84,7 +84,9 @@ windower.register_event('addon command',function (...)
 		if gearswap_disabled then return end
 		local set_split = split(_raw.table.concat(splitup,' ',2,#splitup):gsub('%[','%.'):gsub('[%]\']',''),'%.')
 		local n = 1
-		local tempset = user_env.sets
+		local tempset
+		if set_split[1] == 'sets' then tempset = user_env
+		else tempset = user_env.sets end
 		while n <= #set_split do
 			if tempset[set_split[n]] or tempset[tonumber(set_split[n])] then
 				tempset = tempset[set_split[n]] or tempset[tonumber(set_split[n])]
