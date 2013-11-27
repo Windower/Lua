@@ -138,6 +138,7 @@ function split(msg, match)
 	local splitarr = T{}
 	local u = 1
 	local match_len = match:gsub('%%',''):len()
+	if match_len == 0 then match_len = 1 end
 	while u <= length do
 		local nextanch = msg:find(match,u)
 		if nextanch ~= nil then

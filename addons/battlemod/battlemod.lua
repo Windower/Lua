@@ -6,56 +6,57 @@ config = require 'config'
 require 'generic_helpers'
 require 'parse_action_packet'
 require 'statics'
+res = require 'resources'
 
-_addon = {}
-_addon.version = '3.0'
+_addon.version = '3.09'
 _addon.name = 'BattleMod'
 _addon.author = 'Byrth'
 _addon.commands = {'bm','battlemod'}
 
 windower.register_event('load',function()
+	if debugging then windower.debug('load') end
 	options_load()
-	if get_player() then
-		Self = get_player()
-	end
 end)
 
 windower.register_event('login',function (name)
-	send_command('@wait 10;lua i options_load;')
+	if debugging then windower.debug('login') end
+	send_command('@wait 10;lua i battlemod options_load;')
 end)
 
 windower.register_event('addon command',function (...)
+	if debugging then windower.debug('addon command') end
     local term = table.concat({...}, ' ')
     local splitarr = split(term,' ')
 	if splitarr[1] == 'cmd' then
 		if splitarr[2] ~= nil then
 			if splitarr[2]:lower() == 'commamode' then
 				commamode = not commamode
-				add_to_chat(121,'Comma Mode flipped! - '..tostring(commamode))
+				add_to_chat(121,'Battlemod: Comma Mode flipped! - '..tostring(commamode))
 			elseif splitarr[2]:lower() == 'oxford' then
 				oxford = not oxford
-				add_to_chat(121,'Oxford Mode flipped! - '..tostring(oxford))
+				add_to_chat(121,'Battlemod: Oxford Mode flipped! - '..tostring(oxford))
 			elseif splitarr[2]:lower() == 'targetnumber' then
 				targetnumber = not targetnumber
-				add_to_chat(121,'Target Number flipped! - '..tostring(targetnumber))
+				add_to_chat(121,'Battlemod: Target Number flipped! - '..tostring(targetnumber))
+			elseif splitarr[2]:lower() == 'swingnumber' then
+				swingnumber = not swingnumber
+				add_to_chat(121,'Battlemod: Round Number flipped! - '..tostring(targetnumber))
 			elseif splitarr[2]:lower() == 'cancelmulti' then
 				cancelmulti = not cancelmulti
-				add_to_chat(121,'Multi-canceling flipped! - '..tostring(cancelmulti))
+				add_to_chat(121,'Battlemod: Multi-canceling flipped! - '..tostring(cancelmulti))
 			elseif splitarr[2]:lower() == 'reload' then
 				options_load()
 			elseif splitarr[2]:lower() == 'unload' then
 				send_command('@lua u battlemod')
-			elseif splitarr[2]:lower() == 'condensebattle' then
-				condensebattle = not condensebattle
-				add_to_chat(121,'Condensed Battle text flipped! - '..tostring(condensebattle))
-			elseif splitarr[2]:lower() == 'condensebuffs' then
-				condensebuffs = not condensebuffs
-				add_to_chat(121,'Condensed Buffs text flipped! - '..tostring(condensebuffs))
+			elseif splitarr[2]:lower() == 'simplify' then
+				simplify = not simplify
+				add_to_chat(121,'Battlemod: Text simplification flipped! - '..tostring(simplify))
 			elseif splitarr[2]:lower() == 'condensedamage' then
 				condensedamage = not condensedamage
-				add_to_chat(121,'Condensed Damage text flipped! - '..tostring(condensedamage))
-			elseif splitarr[2]:lower() == 'cg' then
-				collectgarbage()
+				add_to_chat(121,'Battlemod: Condensed Damage text flipped! - '..tostring(condensedamage))
+			elseif splitarr[2]:lower() == 'condensetargets' then
+				condensetargets = not condensetargets
+				add_to_chat(121,'Battlemod: Condensed Targets flipped! - '..tostring(condensetargets))
 			elseif splitarr[2]:lower() == 'colortest' then
 				local counter = 0
 				local line = ''
@@ -77,69 +78,31 @@ windower.register_event('addon command',function (...)
 				end
 				add_to_chat(122,'Colors Tested!')
 			elseif splitarr[2]:lower() == 'help' then
-				write('Battlemod has 10 commands')
-				write(' 1. help --- shows this menu')
-				write(' 2. colortest --- Shows the 509 possible colors for use with the settings file')
-				write(' 3. reload --- Reloads the settings file')
-				write('Big Toggles:')
-				write(' 4. condensebuffs --- Condenses Area of Effect buffs, Default = True')
-				write(' 5. condensebattle --- Condenses battle logs according to your settings file, Default = True')
-				write(' 6. condensedamage --- Condenses damage messages within attack rounds, Default = True')
-				write(' 7. cancelmulti --- Cancles multiple consecutive identical lines, Default = True')
-				write('Sub Toggles:')
-				write(' 8. oxford --- Toggle use of oxford comma, Default = True')
-				write(' 9. commamode --- Toggle comma-only mode, Default = False')
-				write(' 10. targetnumber --- Toggle target number display, Default = True')
+				write('   :::   '.._addon.name..' ('.._addon.version..'   :::')
+				write('Toggles: (* subtoggles)')
+				write(' 1. simplify --- Condenses battle text using custom messages, Default = True')
+				write(' 2. condensetargets --- Collapse similar messages with multiple targets, Default = True')
+				write('    * targetnumber --- Toggle target number display, Default = True')
+				write('    * oxford --- Toggle use of oxford comma, Default = True')
+				write('    * commamode --- Toggle comma-only mode, Default = False')
+				write(' 3. condensedamage --- Condenses damage messages within attack rounds, Default = True')
+				write('    * swingnumber --- Condenses damage messages within attack rounds, Default = True')
+				write(' 4. cancelmulti --- Cancles multiple consecutive identical lines, Default = True')
+				write('Utilities:')
+				write(' 1. colortest --- Shows the 509 possible colors for use with the settings file')
+				write(' 2. reload --- Reloads the settings file')
+				write(' 3. unload --- Unloads battlemod')
+				write(' 4. help --- shows this menu')
 			end
-		end
-	else
-		if splitarr[1] == 'wearsoff' then
-			local trash = table.remove(splitarr,1)
-			local stat = table.concat(splitarr,' ')
-			local len = #wearing[stat]
-			local targets = table.remove(wearing[stat],1)..string.char(0x1F,191)
-			for i,v in pairs(wearing[stat]) do
-				if i < #wearing[stat] or commamode then
-					targets = targets..string.char(0x1F,191)..', '
-				else
-					if oxford and #wearing[stat] >2 then
-						targets = targets..string.char(0x1F,191)..','
-					end
-					targets = targets..string.char(0x1F,191)..' and '
-				end
-				targets = targets..v
-			end
-			if targetnumber and len > 1 then
-				targets = '['..len..'] '..targets
-			end
-			local outstr = (dialog[206]['english']
-				:gsub('$\123target\125',targets..string.char(0x1F,191))
-				:gsub('$\123status\125',stat..string.char(0x1F,191)) )
-			add_to_chat(1,string.char(0x1F,191)..outstr..string.char(127,49))
-			wearing[stat] = nil
 		end
 	end
 end)
 
 windower.register_event('incoming text',function (original, modified, color)
+	if debugging then windower.debug('outgoing text') end
 	local redcol = color%256
 	
---[[	if redcol == 36 then
-		a,z = string.find(original,' defeats ')
-		if a then
-			if original:sub(1,4) ~= string.char(0x1F,0xFE,0x1E,0x01) then
-				modified = true
-			end
-		end
-	elseif redcol == 127 then
-		a,z = string.find(original,' corpuscles of ')
-		b,z = string.find(original,' experience points')
-		if a or b then
-			if original:sub(1,4) ~= string.char(0x1F,0xFE,0x1E,0x01) then
-				modified = true
-			end
-		end
-	else]]if redcol == 121 and cancelmulti then
+	if redcol == 121 and cancelmulti then
 		a,z = string.find(original,'Equipment changed')
 		
 		if a and not block_equip then
@@ -173,6 +136,9 @@ function flip_block_cannot()
 end
 
 function options_load()
+	if get_player() then
+		Self = get_player()
+	end
 	if not dir_exists(lua_base_path..'data\\') then
 		create_dir(lua_base_path..'data\\')
 	end
@@ -223,7 +189,8 @@ function options_load()
 	end
 end
 
-windower.register_event('job change',function (mjob_id,mjob,mjob_lvl,sjob_id,sjob,sjob_lvl)
+windower.register_event('job change',function (mjob,mjob_id,mjob_lvl,sjob,sjob_id,sjob_lvl)
+	if debugging then windower.debug('job change') end
 	filterload(mjob)
 end)
 
@@ -240,9 +207,13 @@ function filterload(job)
 end
 
 windower.register_event('incoming chunk',function (id,original,modified,is_injected,is_blocked)
+	if debugging then windower.debug('incoming chunk '..id) end
 	local pref = original:sub(1,4)
 	local data = original:sub(5)
-	if id == 0x28 then
+	
+-------------- ACTION PACKET ---------------
+	if id == 0x28 and original ~= last_28_packet then
+		last_28_packet = original
 		local act = {}
 		act.do_not_need = get_bit_packed(data,0,8)
 		act.actor_id = get_bit_packed(data,8,40)
@@ -265,6 +236,10 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 				act.targets[i].actions[n].animation = get_bit_packed(data,offset+5,offset+16)
 				act.targets[i].actions[n].effect = get_bit_packed(data,offset+16,offset+21)
 				act.targets[i].actions[n].stagger = get_bit_packed(data,offset+21,offset+27)
+				if debugging then --act.targets[i].actions[n].stagger > 2  then
+					-- Value 8 to 63 will knockback
+					act.targets[i].actions[n].stagger = act.targets[i].actions[n].stagger%8
+				end
 				act.targets[i].actions[n].param = get_bit_packed(data,offset+27,offset+44)
 				act.targets[i].actions[n].message = get_bit_packed(data,offset+44,offset+54)
 				act.targets[i].actions[n].unknown = get_bit_packed(data,offset+54,offset+85)
@@ -363,130 +338,124 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 --		end
 
 		return pref..react
-	end
-	
-	if id == 0x29 then
+
+
+----------- ACTION MESSAGE ------------		
+	elseif id == 0x29 then
 		local am = {}
 		am.actor_id = get_bit_packed(data,0,32)
 		am.target_id = get_bit_packed(data,32,64)
 		am.param_1 = get_bit_packed(data,64,96)
-		am.param_2 = get_bit_packed(data,96,102) -- First 6 bits
-		am.param_3 = get_bit_packed(data,102,128) -- Rest
+		am.param_2 = get_bit_packed(data,96,106) -- First 6 bits
+		am.param_3 = get_bit_packed(data,106,128) -- Rest
 		am.actor_index = get_bit_packed(data,128,144)
 		am.target_index = get_bit_packed(data,144,160)
 		am.message_id = get_bit_packed(data,160,175) -- Cut off the most significant bit, hopefully
 		
-		if am.message_id == 206 then -- Wears off messages
+		local actor = player_info(am.actor_id)
+		local target = player_info(am.target_id)
+		
+		-- Filter these messages
+		if not check_filter(actor,target,0,am.message_id) then return true end
+		
+		if not actor or not target then -- If the actor or target table is nil, ignore the packet
+		elseif T{206}:contains(am.message_id) and condensetargets then -- Wears off messages
+			-- Condenses across multiple packets
 			local status
-			local targ = player_info(am.target_id)
 			
-			if enfeebling:contains(am.param_1) then
-				status = color_it(r_status[param_1]['english'],color_arr.enfeebcol)
+			if enfeebling:contains(am.param_1) and r_status[param_1] then
+				status = color_it(r_status[param_1][language],color_arr.enfeebcol)
 			elseif color_arr.statuscol == rcol then
-				status = color_it(r_status[am.param_1]['english'],string.char(0x1F,191))
+				status = color_it(r_status[am.param_1][language],string.char(0x1F,191))
 			else
-				status = color_it(r_status[am.param_1]['english'],color_arr.statuscol)
+				status = color_it(r_status[am.param_1][language],color_arr.statuscol)
 			end
 			
-			if not wearing[status] and not (stat_ignore:contains(am.param_1)) then
-				wearing[status] = {}
-				wearing[status][1] = color_it(targ.name,color_arr[targ.type])
-				send_command('@wait 0.5;lua c battlemod wearsoff '..status)
+			if not multi_actor[status] then multi_actor[status] = player_info(am.actor_id) end
+			if not multi_msg[status] then multi_msg[status] = am.message_id end
+			
+			if not multi_targs[status] and not stat_ignore:contains(am.param_1) then
+				multi_targs[status] = {}
+				multi_targs[status][1] = target
+				send_command('@wait 0.5;lua i battlemod multi_packet '..status)
 			elseif not (stat_ignore:contains(am.param_1)) then
-				wearing[status][#wearing[status]+1] = color_it(targ.name,color_arr[targ.type])
+				multi_targs[status][#multi_targs[status]+1] = color_it(target.name,color_arr[target.owner or target.type])
 			else
 			-- This handles the stat_ignore values, which are things like Utsusemi,
 			-- Sneak, Invis, etc. that you don't want to see on a delay
-				wearing[status] = {}
-				wearing[status][1] = color_it(targ.name,color_arr[targ.type])
-				send_command('@lua c battlemod wearsoff '..status)
+				multi_targs[status] = {}
+				multi_targs[status][1] = target
+				send_command('@lua i battlemod multi_packet '..status)
 			end
 			am.message_id = false
 		elseif passed_messages:contains(am.message_id) then
-			local status,spell,skill,number,number2
-			local actor = player_info(am.actor_id)
-			local target = player_info(am.target_id)
+			local item,status,spell,skill,number,number2
 			
-			if actor.name == nil or actor.is_npc == nil then
-				return
-			end
+			local fields = fieldsearch(dialog[am.message_id][language])
 			
-			if am.message_id > 169 and am.message_id <179 then
-				if am.param_1 == 4294967296 then
-					skill = 'like level -1'..' ('..ratings_arr[am.param_2+1]..')'
-				else
-					skill = 'like level '..am.param_1..' ('..ratings_arr[am.param_2+1]..')'
-				end
-				if debugging then write(am.param_1..'   '..am.param_2..'   '..am.param_3) end
-			end
-			
-			if am.message_id == 558  then
-				number2 = am.param_2
-			end
-			am.number = am.param_1
-			
-			if am.param_1 ~= 0 then
-				status = (enLog[am.param_1] or nf(r_status[am.param_1],'english'))
-				spell = nf(r_spells[am.param_1],'english')
-			end
-			
-			if status then
+			if fields.status then
+				status = (enLog[am.param_1] or nf(r_status[am.param_1],language))
 				if enfeebling:contains(am.param_1) then
 					status = color_it(status,color_arr.enfeebcol)
 				else
 					status = color_it(status,color_arr.statuscol)
 				end
 			end
-
-			if spell then spell = color_it(spell,color_arr.spellcol) end
-			if target then target = color_it(target.name,color_arr[target.type]) end
-			if actor then actor = color_it(actor.name,color_arr[actor.type]) end
-			if skill then skill = color_it(skill,color_arr.abilcol) end
 			
-			local outstr = (dialog[am.message_id]['english']
-				:gsub('$\123actor\125',actor or '')
+			if fields.spell then
+				spell = nf(r_spells[am.param_1],language)
+			end
+			
+			if fields.item then
+				item = nf(r_items[am.param_1],'enl')
+			end
+			
+			if fields.number then
+				number = am.param_1
+			end
+			
+			if fields.number2 then
+				number2 = am.param_2
+			end
+			
+			if fields.skill and res.skills[am.param_1] then
+				skill = res.skills[am.param_1][language]:lower()
+			end
+			
+			if am.message_id > 169 and am.message_id <179 then
+				if am.param_1 == 4294967296 then
+					skill = 'like level -1'..' ('..ratings_arr[am.param_2-63]..')'
+				else
+					skill = 'like level '..am.param_1..' ('..ratings_arr[am.param_2-63]..')'
+				end
+			end
+			
+			local outstr = (dialog[am.message_id][language]
+				:gsub('$\123actor\125',color_it(actor.name or '',color_arr[actor.owner or actor.type]))
 				:gsub('$\123status\125',status or '')
-				:gsub('$\123target\125',target or '')
-				:gsub('$\123spell\125',spell or '')
-				:gsub('$\123skill\125',skill or '')
+				:gsub('$\123item\125',color_it(item or '',color_arr.itemcol))
+				:gsub('$\123target\125',color_it(target.name or '',color_arr[target.owner or target.type]))
+				:gsub('$\123spell\125',color_it(spell or '',color_arr.spellcol))
+				:gsub('$\123skill\125',color_it(skill or '',color_arr.abilcol))
 				:gsub('$\123number\125',number or '')
 				:gsub('$\123number2\125',number2 or '')
+				:gsub('$\123skill\125',skill or '')
 				:gsub('$\123lb\125','\7'))
-			add_to_chat(dialog[am.message_id]['color'],string.char(0x1F,0xFE,0x1E,0x01)..outstr..string.char(127,49))
+			add_to_chat(dialog[am.message_id]['color'],outstr)
 			am.message_id = false
-		elseif T{62,94,251,308,313}:contains(am.message_id) then
-		-- 62 is "fails to activate" but it is color 121 so I cannot block it because I
-			-- would also accidentally block a lot of system messages. Thus I have to ignore it.
-		-- Message 251 is "about to wear off" but it is color 123 so I cannot block it
-			-- because I would also block "you failed to swap that gear, idiot!" messages. Thus I have to ignore it.
-		-- Message 308 is "your inventory is full" but it is color 123.
-		-- Message 313 is the red "target is out of range" message but it is color 123 so I
-			-- cannot block it because I would also block "you failed to swap that gear, idiot!" messages. Thus I have to ignore it.
-		elseif T{38,202}:contains(am.message_id) then
+		elseif debugging then 
 		-- 38 is the Skill Up message, which (interestingly) uses all the number params.
 		-- 202 is the Time Remaining message, which (interestingly) uses all the number params.
-			if debugging then
-				write('debug_EAM#'..am.message_id..': '..dialog[am.message_id]['english']..' '..am.param_1..'   '..am.param_2..'   '..am.param_3)
-			end
-		elseif debugging then 
-			write('debug_EAM#'..am.message_id..': '..dialog[am.message_id]['english'])
+			write('debug_EAM#'..am.message_id..': '..dialog[am.message_id][language]..' '..am.param_1..'   '..am.param_2..'   '..am.param_3)
 		end
 		if not am.message_id then
 			return true
 		end
---[[		local ream = assemble_bit_packed('',am.actor_id,0,32)
-		ream = assemble_bit_packed(ream,am.target_id,32,64)
-		ream = assemble_bit_packed(ream,am.param_1,64,96)
-		ream = assemble_bit_packed(ream,am.param_2,96,102) -- First 6 bits
-		ream = assemble_bit_packed(ream,am.param_3,102,128) -- Rest
-		ream = assemble_bit_packed(ream,am.actor_index,128,144)
-		ream = assemble_bit_packed(ream,am.target_index,144,160)
-		ream = assemble_bit_packed(ream,am.message_id,160,175) -- Cut off the most significant bit, hopefully]]
-	end
 
-	if id == 0x030 then
-		if get_player().id == (data:byte(7,7)*256*256 + data:byte(6,6)*256 + data:byte(5,5)) then
-			result = data:byte(13,13)
+------------ SYNTHESIS ANIMATION --------------
+	elseif id == 0x030 then
+		if get_player().id == (data:byte(3,3)*256*256 + data:byte(2,2)*256 + data:byte(1,1)) then
+			result = data:byte(9,9)
 			if result == 0 then
 				add_to_chat(8,' ------------- NQ Synthesis -------------')
 			elseif result == 1 then
@@ -499,6 +468,19 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 		end
 	end
 end)
+
+function multi_packet(...)
+	local ind = table.concat({...},' ')
+--	add_to_chat(8,tostring(multi_actor[ind].name)..' '..tostring(multi_targs[ind][1].name)..' '..tostring(multi_msg[ind]))
+	local targets = assemble_targets(multi_actor[ind],multi_targs[ind],0,multi_msg[ind])
+	local outstr = dialog[multi_msg[ind]][language]
+		:gsub('$\123target\125',targets)
+		:gsub('$\123status\125',ind)
+	add_to_chat(dialog[multi_msg[ind]].color,outstr)
+	multi_targs[ind] = nil
+	multi_msg[ind] = nil
+	multi_actor[ind] = nil
+end
 
 function get_bit_packed(dat_string,start,stop)
 	local newval = 0

@@ -24,7 +24,6 @@
 -- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 -- SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 _addon = {}
 _addon.name = 'DressUp'
 _addon.author = 'Cairthenn'
@@ -55,6 +54,15 @@ local blink_type = "self"
 windower.register_event('load',function ()
 	settings = config.load(defaults)
 	print_blink_settings("global")
+	keyset = {}
+	for k,v in pairs(models) do
+	keyset[k] = {}
+		i = 0
+		for sub_k,sub_v in pairs(v) do
+			i = i + 1
+			keyset[k][i] = sub_k
+		end
+	end
 end)
 
 -- Allows for the model to be restored to desired settings after zoning if blink prevention is on:
@@ -81,13 +89,12 @@ windower.register_event('incoming chunk',function (id, data)
 		self["unknown"] = string.sub(data,23,24)
 		
 		for k,v in pairs(parsed_self) do
-			-- TODO: Readd main/sub/ranged after the model IDs are obtained.
 			if T{"Face","Race","Head","Body","Hands","Legs","Feet"}:contains(k) and v ~= 0 then
 				if settings.self[k:lower()] then
-					self[k] = make_packet_data(settings.self[k:lower()])
+					self[k] = Int2LE(settings.self[k:lower()],k)
 					return_packet = true
 				elseif table.containskey(settings.replacements[k:lower()],v) then
-					self[k] = make_packet_data(settings.replacements[k:lower()][v])
+					self[k] = Int2LE(settings.replacements[k:lower()][v],k)
 					return_packet = true
 				end
 			end
@@ -159,10 +166,10 @@ windower.register_event('incoming chunk',function (id, data)
 				-- TODO: Readd main/sub/ranged after the model IDs are obtained.
 				if T{"Face","Race","Head","Body","Hands","Legs","Feet"}:contains(k) and v ~= 0 then
 					if settings[name][k:lower()] then
-						pc[k] = make_packet_data(settings[name][k:lower()])
+						pc[k] = Int2LE(settings[name][k:lower()],k)
 						return_packet = true
 					elseif table.containskey(settings.replacements[k:lower()],v) then
-						pc[k] = make_packet_data(settings.replacements[k:lower()][v])
+						pc[k] = Int2LE(settings.replacements[k:lower()][v],k)
 						return_packet = true
 					end
 				end
@@ -269,7 +276,7 @@ windower.register_event('addon command', function (...)
 					if args[3+offset] then 
 						if table.containskey(_faces,args[3+offset]:lower()) then
 							settings[du_type]["face"] = _faces[args[3+offset]:lower()]
-						elseif T{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16}:contains(tonumber(args[3+offset])) then
+						elseif T{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,29,30}:contains(tonumber(args[3+offset])) then
 							settings[du_type]["face"] = tonumber(args[3+offset])
 						else
 							error("That is not a valid selection.")
@@ -399,10 +406,10 @@ windower.register_event('addon command', function (...)
 							else
 								error("Specify a replacement face.")
 							end
-						elseif T{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16}:contains(tonumber(args[3])) then
+						elseif T{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,29,30}:contains(tonumber(args[3])) then
 							model_ids[1] = tonumber(args[3])
 							if args[4] then
-								if T{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16}:contains(tonumber(args[4])) then
+								if T{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,29,30}:contains(tonumber(args[4])) then
 									model_ids[2] = tonumber(args[4])
 									settings.replacements.face[tostring(model_ids[1])] = model_ids[2]
 								else

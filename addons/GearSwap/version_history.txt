@@ -1,4 +1,14 @@
 -------------------------------------------------
+Gearswap 0.713 - Added equipment order support. Made export sets more safe. Added equip "empty" support.
+-------------------------------------------------
+Gearswap 0.712 - Added adventuring fellow handling.
+-------------------------------------------------
+Gearswap 0.711 - Refined category exclusions for the outgoing action packet.
+-------------------------------------------------
+Gearswap 0.710 - Added windower.debug statements.
+-------------------------------------------------
+Gearswap 0.709 - Looped midact back through console with a 1.5 second delay. Tested for 2 days without extra DC issues.
+-------------------------------------------------
 Gearswap 0.708 - Added Encumbrance support. Added a message for Exporting files. Added another midaction fix. Altered how Disable works, slightly.
 -------------------------------------------------
 Gearswap 0.707 - Forced the "sets" export to convert all equipment to inventory names. Started to add encumbrance code. Added a check for debuffs that prevent ability/spell usage in outgoing_chunk to reset midact.

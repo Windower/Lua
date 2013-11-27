@@ -28,19 +28,22 @@
  
 -- For handling ambiguous spells and abilities
  
-function smn_unsub(player_array,info)
-	if player_array['main_job_id'] == 15  then --and player_array['main_job_level'] >= info and get_mob_by_target('pet') then
+function smn_unsub(player_array,spell_ID,abil_ID,mob_ID,info)
+	local abils = get_abilities()
+	if player_array['main_job_id'] == 15 and abils[abil_ID] then --and player_array['main_job_level'] >= info and get_mob_by_target('pet') then
 		return 'Ability'
 	end
 	return 'Magic'
 end
  
-function smn_sub(player_array,info) -- Determines ambiguous black magic that can be subbed. Defaults to black magic
-	if player_array['main_job_id'] == 15 and not (info:contains(player_array['sub_job_id'])) then
+function smn_sub(player_array,spell_ID,abil_ID,mob_ID,info) -- Determines ambiguous black magic that can be subbed. Defaults to black magic
+	local abils = get_abilities()
+	if player_array['main_job_id'] == 15 and not (info:contains(player_array['sub_job_id'])) and abils[abil_ID] then
 		return 'Ability' -- Returns the SMN ability if it's a SMN main without a sub that has access to the spell
 	elseif player_array['main_job_id'] == 15 and (info:contains(player_array['sub_job_id'])) then
 		local pet_array = get_mob_by_target('pet')
-		if not pet_array then return 'Magic' end
+		local known_spells = windower.ffxi.get_spells()
+		if not pet_array and known_spells[spell_ID] then return 'Magic' end
 		local recasts = get_ability_recasts()
 		if (info:contains(pet_array['name']) and info:contains('Ward') and recasts[174]<=10) or (info:contains(pet_array['name']) and info:contains('Rage') and recasts[173]<=10) then
 			return 'Ability' -- Returns the SMN ability if it's a SMN main with an appropriate avatar summoned and the BP timer is up.
@@ -51,31 +54,35 @@ function smn_sub(player_array,info) -- Determines ambiguous black magic that can
 	return 'Magic' -- Returns a spell in every other case.
 end
 
-function blu_unsub(player_array,info,mob_ID) -- Determines ambiguous blue magic that cannot be subbed. Defaults to spells on BLU.
+function blu_unsub(player_array,spell_ID,abil_ID,mob_ID,info) -- Determines ambiguous blue magic that cannot be subbed. Defaults to spells on BLU.
 	local race = get_mob_by_id(player_array.id).race
 	if mob_ID and race then
 		if race == 0 then 
 			return 'Monster'
 		end
 	end
-	
-	if player_array['main_job_id'] == 16 then -- and player_array['main_job_level'] >= info then
+	local known_spells = windower.ffxi.get_spells()
+	if player_array['main_job_id'] == 16 and spell_ID and known_spells[spell_ID] then -- and player_array['main_job_level'] >= info then
 		return 'Magic'
 	end
 	return 'Ability'
 end
 
-function abil_mob(player_array,info,mob_ID) -- Determines ambiguity between monster TP moves and abilities
+function abil_mob(player_array,spell_ID,abil_ID,mob_ID,info) -- Determines ambiguity between monster TP moves and abilities
 	local race = get_mob_by_id(player_array.id).race
 	if mob_ID and race then
-		if race == 0 and not info then 
+		local abils = get_abilities()
+		local recasts = get_ability_recasts()
+		if abils[abil_ID] and recasts[r_abils[abil_ID].index] <= 10 then
+			return 'Ability'
+		elseif race == 0 then
 			return 'Monster'
 		end
 	end
 	return 'Ability'
 end
 
-function magic_mob(player_array,info,mob_ID) -- Determines ambiguity between monster TP moves and magic
+function magic_mob(player_array,spell_ID,abil_ID,mob_ID,info) -- Determines ambiguity between monster TP moves and magic
 	local race = get_mob_by_id(player_array.id).race
 	if mob_ID and race then
 		if race == 0 then 
@@ -85,17 +92,17 @@ function magic_mob(player_array,info,mob_ID) -- Determines ambiguity between mon
 	return 'Magic'
 end
  
-function blu_sub(player_array,info,mob_ID) -- Determines ambiguous blue magic that can be subbed. Defaults to BST ability
+function blu_sub(player_array,spell_ID,abil_ID,mob_ID,info) -- Determines ambiguous blue magic that can be subbed. Defaults to BST ability
 	local race = get_mob_by_id(player_array.id).race
 	if mob_ID and race then
 		if race == 0 then 
 			return 'Monster'
 		end
 	end
-	local pet_array = get_mob_by_target('pet')
+	local abils = get_abilities()
 	if player_array['main_job_id'] == 9 and player_array['sub_job_id'] ~= 16 then
 		return 'Ability' -- Returns the BST ability if it's BST/not-BLU using the spell
-	elseif player_array['main_job_id'] == 9 and player_array['sub_job_id'] == 16 and pet_array then
+	elseif player_array['main_job_id'] == 9 and player_array['sub_job_id'] == 16 and abils[abil_ID] then
 		local recasts = get_ability_recasts()
 		if pet_array.tp >= 100 and recasts[255] <= 5400 then -- If your pet has TP and Ready's recast is less than 1.5 minutes
 			return 'Ability'
@@ -119,7 +126,12 @@ aegisschism={absolute=true,abil_ID=1011},
 dancingchains={absolute=true,abil_ID=1012},
 photosynthesis={absolute=true,mob_ID=1092},
 petribreath={absolute=true,mob_ID=1037},
- 
+epoxyspread={absolute=true,mob_ID=2087},
+mucusspread={absolute=true,mob_ID=2085},
+fluidspread={absolute=true,mob_ID=1199},
+fluidtoss={absolute=true,mob_ID=1200},
+balefulgaze={absolute=true,mob_ID=1138},
+
 fireiv={spell_ID=147,abil_ID=549,funct=smn_unsub,info=60},
 stoneiv={spell_ID=162,abil_ID=565,funct=smn_unsub,info=60},
 wateriv={spell_ID=172,abil_ID=581,funct=smn_unsub,info=60},
@@ -208,6 +220,24 @@ aquabreath={abil_ID=755,mob_ID=1577,funct=abil_mob},
 noisomepowder={abil_ID=738,mob_ID=2947,funct=abil_mob},
 sensillablades={abil_ID=761,mob_ID=3714,funct=abil_mob},
 tegminabuffet={abil_ID=762,mob_ID=3715,funct=abil_mob},
+wingslap={abil_ID=756,mob_ID=2482,funct=abil_mob},
+beaklunge={abil_ID=757,mob_ID=2483,funct=abil_mob},
+scissorguard={abil_ID=696,mob_ID=1213,funct=abil_mob},
+intimidate={abil_ID=758,mob_ID=1217,funct=abil_mob},
+recoildive={abil_ID=759,mob_ID=1409,funct=abil_mob},
+purulentooze={abil_ID=747,mob_ID=2952,funct=abil_mob},
+waterwall={abil_ID=760,mob_ID=1221,funct=abil_mob},
+suction={abil_ID=732,mob_ID=1182,funct=abil_mob},
+acidmist={abil_ID=740,mob_ID=1183,funct=abil_mob},
+sandbreath={abil_ID=649,mob_ID=1184,funct=abil_mob},
+drainkiss={abil_ID=733,mob_ID=1185,funct=abil_mob},
+tpdrainkiss={abil_ID=741,mob_ID=1188,funct=abil_mob},
+bigscissors={abil_ID=695,mob_ID=1212,funct=abil_mob},
+bubbleshower={abil_ID=693,mob_ID=1210,funct=abil_mob},
+bubblecurtain={abil_ID=694,mob_ID=1211,funct=abil_mob},
+chokebreath={abil_ID=751,mob_ID=1347,funct=abil_mob},
+backheel={abil_ID=749,mob_ID=1287,funct=abil_mob},
+bubblecurtain={abil_ID=694,mob_ID=1211,funct=abil_mob},
 
 ramcharge={spell_ID=585,mob_ID=1034,funct=magic_mob},
 healingbreeze={spell_ID=581,mob_ID=1055,funct=magic_mob},
@@ -241,6 +271,32 @@ cimicinedischarge={spell_ID=660,mob_ID=2929,funct=magic_mob},
 seedspray={spell_ID=650,mob_ID=2931,funct=magic_mob},
 pleniluneembrace={spell_ID=658,mob_ID=2941,funct=magic_mob},
 asuranclaws={spell_ID=653,mob_ID=2944,funct=magic_mob},
+
+
+feathertickle={spell_ID=573,mob_ID=2469,funct=magic_mob},
+yawn={spell_ID=576,mob_ID=2481,funct=magic_mob},
+maelstrom={spell_ID=515,mob_ID=1230,funct=magic_mob},
+reavingwind={spell_ID=684,mob_ID=3199,funct=magic_mob},
+digest={spell_ID=542,mob_ID=1201,funct=magic_mob},
+amplification={spell_ID=642,mob_ID=2589,funct=magic_mob},
+helldive={spell_ID=567,mob_ID=1390,funct=magic_mob},
+featherbarrier={spell_ID=574,mob_ID=1170,funct=magic_mob},
+deathray={spell_ID=522,mob_ID=1205,funct=magic_mob},
+soundblast={spell_ID=572,mob_ID=1178,funct=magic_mob},
+foulwaters={spell_ID=705,mob_ID=3742,funct=magic_mob},
+retinalglare={spell_ID=707,mob_ID=3798,funct=magic_mob},
+venomshell={spell_ID=513,mob_ID=1273,funct=magic_mob},
+amorphicspikes={spell_ID=697,mob_ID=2592,funct=magic_mob},
+screwdriver={spell_ID=519,mob_ID=1220,funct=magic_mob},
+meteor={spell_ID=218,mob_ID=1402,funct=magic_mob},
+mpdrainkiss={spell_ID=521,mob_ID=1189,funct=magic_mob},
+natmeditation={spell_ID=700,mob_ID=3713,funct=magic_mob},
+blooddrain={spell_ID=570,mob_ID=1162,funct=magic_mob},
+jetstream={spell_ID=569,mob_ID=1163,funct=magic_mob},
+regeneration={spell_ID=664,mob_ID=1186,funct=magic_mob},
+
+
+
  
 sleepga={spell_ID=273,abil_ID=611,funct=smn_sub,info=T{4,'Shiva','Ward'}},
 stoneii={spell_ID=160,abil_ID=561,funct=smn_sub,info=T{4,5,8,20,21,'Titan','Rage'}},
@@ -263,13 +319,13 @@ function ambig(key)
 		elseif ambig_names[key].mob_ID then return r_abilities[ambig_names[key].mob_ID]
 		end
 	else  -- Otherwise it's actually ambiguous, so run the associated function and pass the known information.
-		abil_type=ambig_names[key]['funct'](get_player(),ambig_names[key].info,ambig_names[key].mob_ID)
+		abil_type=ambig_names[key]['funct'](get_player(),ambig_names[key].spell_ID,ambig_names[key].abil_ID,ambig_names[key].mob_ID,ambig_names[key].info,ambig_names[key].mob_ID)
 		if abil_type == 'Ability' then
 			return r_abilities[ambig_names[key].abil_ID],abil_type
 		elseif abil_type == 'Magic' then
 			return r_spells[ambig_names[key].spell_ID],abil_type
 		elseif abil_type == 'Monster' then
-			if r_abilities[ambig_names[key].mob_ID].prefix ~= '/monsterskill' then r_abilities[ambig_names[key].mob_ID].prefix = '/monsterskill' end
+--			if r_abilities[ambig_names[key].mob_ID].prefix ~= '/monsterskill' then r_abilities[ambig_names[key].mob_ID].prefix = '/monsterskill' end
 			return r_abilities[ambig_names[key].mob_ID],abil_type
 		end
 	end

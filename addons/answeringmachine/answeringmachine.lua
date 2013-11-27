@@ -1,9 +1,13 @@
 
-_addon = {}
+
 _addon.commands = {'answeringmachine','am'}
 _addon.name = 'AnsweringMachine'
 _addon.author = 'Byrth'
-_addon.version = '1.0'
+_addon.version = '1.1'
+
+
+tell_table = {}
+recording = {}
 
 windower.register_event('addon command',function (...)
 	term = table.concat({...}, ' ')
@@ -69,34 +73,26 @@ windower.register_event('addon command',function (...)
 		
 		
 		if broken[1]:upper() == "MSG" then
-			local msg_interp = broken
-			table.remove(msg_interp,1)
-			if msg_interp ~= nil then
-				away_msg=table.concat(msg_interp,' ')
-				add_to_chat(5,'Message set to: '..away_msg)
+			table.remove(broken,1)
+			if #broken ~= 0 then
+				away_msg=table.concat(broken,' ')
+				add_to_chat(123,'AnsweringMachine: Message set to: '..away_msg)
 			end
 		end
 	end
 end)
 
-windower.register_event('load',function ()
-	tell_table = {}
-	recording = {}
-end)
-
 windower.register_event('chat message',function(message,player,mode,isGM)
 	if mode==3 then
-		if tell_table[player:upper()] ~= nil then
+		if not playertab then playertab = {} end
+		if tell_table[player:upper()] then
 			tell_table[player:upper()] = tell_table[player:upper()]+1
-			local playertab = recording[player:upper()]
-			playertab[#playertab+1] = message
+			recording[player:upper()][#recording[player:upper()]+1] = message
 		else
 			tell_table[player:upper()] = 1
 			recording[player:upper()] = {message}
-			if away_msg ~= nil then
-				if isGM ~= 1 then
-					send_command('@input /tell '..player..' '..away_msg)
-				end
+			if away_msg and not isGM then
+				send_command('@input /tell '..player..' '..away_msg)
 			end
 		end
 	end

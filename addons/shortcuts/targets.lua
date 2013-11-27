@@ -41,6 +41,9 @@ function valid_target(targ,flag)
 	local spell_targ
 	-- If the target is whitelisted, pass it through.
 	if pass_through_targs:contains(targ) then
+		if (targ == '<t>' or targ == 't') and get_mob_by_target('<t>').id == get_player().id then
+			return '<me>'
+		end
 		return targ
 	elseif targ and get_player() then
 	-- If the target exists, scan the mob array for it
@@ -101,6 +104,8 @@ function target_make(targets)
 	if not target then
 		-- If target doesn't exist, leave it set to ''. This will shortcircuit the
 		-- rest of the processing and just return <me>.
+	elseif target.hpp == 0 then
+		target_type = 'Corpse'
 	elseif target['is_npc'] then
 		target_type = 'Enemy'
 		-- Need to add handling that differentiates 'Enemy' and 'NPC' here.
@@ -115,15 +120,13 @@ function target_make(targets)
 					else
 						target_type = 'Party'
 					end
---				else
---					target_type = 'Ally'
 				end
 				break
 			end
 		end
 	end
 	
-	if targets[target_type] then
+	if targets[target_type] and target_type ~= 'Self' then
 		return '<t>'
 	end
 --	add_to_chat(8,"got to the end "..tostring(target_type))

@@ -32,7 +32,7 @@ function export_set(options)
 		windower.create_dir(lua_base_path..'data/export')
 	end
 	
-	local inv = temp_items['inventory']
+	local inv = temp_items.inventory
 	if targinv then
 		-- Load the entire inventory
 		for _,v in pairs(inv) do
@@ -56,7 +56,6 @@ function export_set(options)
 	elseif all_sets then
 		-- Iterate through user_env.sets and find all the gear.
 		item_list = unpack_names('L1',user_env.sets,{})
-		
 	else
 		-- Default to loading the currently worn gear.
 		local gear = temp_items['equipment']
@@ -107,7 +106,9 @@ function export_set(options)
 		f:write('<spellcast>\n  <sets>\n    <group name="exported">\n      <set name="exported">\n')
 		for i,v in ipairs(item_list) do
 			if v.name ~= 'empty' then
-				f:write('        <'..v.slot..'>'..v.name..'</'..v.slot..'>\n')
+				local slot = xmlify(tostring(v.slot))
+				local name = xmlify(tostring(v.name))
+				f:write('        <'..slot..'>'..name..'</'..slot..'>\n')
 			end
 		end
 		f:write('      </set>\n    </group>\n  </sets>\n</spellcast>')
@@ -157,4 +158,9 @@ function unlogify_unpacked_name(name)
 		end
 	end
 	return name
+end
+
+function xmlify(phrase)
+	if tonumber(phrase:sub(1,1)) then phrase = 'NUM'..phrase end
+	return phrase --:gsub('"','&quot;'):gsub("'","&apos;"):gsub('<','&lt;'):gsub('>','&gt;'):gsub('&&','&amp;')
 end

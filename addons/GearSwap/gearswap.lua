@@ -40,15 +40,15 @@ require 'refresh'
 require 'parse_augments'
 require 'export'
 
-_addon = {}
+
 _addon.name = 'GearSwap'
-_addon.version = '0.708'
+_addon.version = '0.713'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
 windower.register_event('load',function()
 	debugging = 1
-	
+	if debugging >= 1 then windower.debug('load') end
 	if dir_exists('../addons/GearSwap/data/logs') then
 		logging = false
 		logfile = io.open('../addons/GearSwap/data/logs/NormalLog'..tostring(os.clock())..'.log','w+')
@@ -65,10 +65,12 @@ windower.register_event('load',function()
 end)
 
 windower.register_event('unload',function ()
+	if debugging >= 1 then windower.debug('unload') end
 	if logging then	logfile:close() end
 end)
 
 windower.register_event('addon command',function (...)
+	if debugging >= 1 then windower.debug('addon command') end
 	local command = table.concat({...},' ')
 	if logging then	logit(logfile,'\n\n'..tostring(os.clock)..command) end
 	local splitup = split(command,' ')
@@ -146,6 +148,7 @@ function sender()
 end
 
 windower.register_event('outgoing text',function(original,modified)
+	if debugging >= 1 then windower.debug('outgoing text') end
 	if gearswap_disabled then return modified end
 	
 	local temp_mod = convert_auto_trans(modified)
@@ -214,10 +217,11 @@ windower.register_event('outgoing text',function(original,modified)
 	return modified
 end)
 
-windower.register_event('incoming text',function(original,modified,mode)
+windower.register_event('incoming text',function(original,modified,color)
+	if debugging >= 1 then windower.debug('incoming text') end
 	if gearswap_disabled then return modified, color end
 	if original == '...A command error occurred.' or original == 'You can only use that command during battle.' or original == 'You cannot use that command here.' then
-		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(130) Client canceled command detected: '..mode..' '..original) end
+		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(130) Client canceled command detected: '..color..' '..original) end
 		if type(user_env.aftercast)=='function' then
 			equip_sets('aftercast',{name='Invalid Spell'},{type='Recast'})
 		elseif user_env.aftercast then
@@ -228,37 +232,66 @@ windower.register_event('incoming text',function(original,modified,mode)
 end)
 
 windower.register_event('incoming chunk',function(id,data)
---	cur_ID = data:byte(3,4)
---	if prev_ID == nil then
---		prev_ID = cur_ID
---	end
---	persistant_sequence[data:byte(3,4)] = true  ---------------------- TEMPORARY TO INVESTIGATE LAG ISSUES IN DELVE
---	if data:byte(3,4) ~= 0x00 then
---		if not persistant_sequence[data:byte(3,4)-1] then
---			if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(140) Packet dropped or out of order: '..cur_ID..' '..prev_ID) end
---		end
---	end
---	prev_ID = cur_ID
---	if prev_ID == 0xFF then
---		table.reassign(persistant_sequence,{})
---	end
---[[	if id == 0x027 then
-		local ind = get_mob_by_index(256*data:byte(10) + data:byte(9))
-		if ind == player.index then
-			local status = data:byte(11)
-			for i=0,15 do
-				if status == encumbrance_map[i] and encumbrance_table[i] then
-					encumbrance_table[i] = false
-					add_to_chat(123,"Gearswap: Your "..default_slot_map[i]..' are now unlocked.')
-					if not_sent_out_equip[i] and not disable_table[i] then
-						set_equip(not_sent_out_equip[i],i)
-						sent_out_equip[i] = not_sent_out_equip[i]
-						not_sent_out_equip[i] = nil
-					end
-				end
+	if debugging >= 1 then windower.debug('incoming chunk '..id) end
+
+	if id == 0x29 then  -- TEMPORARY FIX
+		if gearswap_disabled then return end
+		data = data:sub(5)
+		local actor_id = get_bit_packed(data,0,32)
+		local target_id = get_bit_packed(data,32,64)
+		local param_1 = get_bit_packed(data,64,96)
+		local param_2 = get_bit_packed(data,96,102) -- First 6 bits
+		local param_3 = get_bit_packed(data,102,128) -- Rest
+		local actor_index = get_bit_packed(data,128,144)
+		local target_index = get_bit_packed(data,144,160)
+		local message_id = get_bit_packed(data,160,175) -- Cut off the most significant bit, hopefully
+		
+		if spelltarget and spelltarget.id and T{6,20,113,406,605,646}:contains(message_id) then
+			-- Defeats or Falls to the ground
+			if spelltarget.id == target_id then
+				midaction = false
+				spelltarget = nil
+	--			add_to_chat(123,'GearSwap: Your prey has been defeated by another player!') -- Temporary
 			end
 		end
-	end]]
+		
+		local tempplay = get_player()
+		if actor_id ~= tempplay.id then
+			if tempplay.pet_index then
+				if actor_id ~= get_mob_by_index(tempplay.pet_index)['id'] then
+					return
+				end
+			else
+				return
+			end
+		end
+		
+		if message_id == 62 then
+			if type(user_env.aftercast) == 'function' then
+				equip_sets('aftercast',r_items[param_1],{type='Failure'})
+			elseif user_env.aftercast then
+				midaction = false
+				spelltarget = nil
+				add_to_chat(123,'GearSwap: aftercast() exists but is not a function')
+			else
+				midaction = false
+				spelltarget = nil
+			end
+		elseif unable_to_use:contains(message_id) then
+			if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(195) Event Action Message: '..tostring(message_id)..' Interrupt') end
+			if type(user_env.aftercast) == 'function' then
+				equip_sets('aftercast',{name='Interrupt',type='Interrupt'},{type='Recast'})
+			elseif user_env.aftercast then
+				midaction = false
+				spelltarget = nil
+				add_to_chat(123,'GearSwap: aftercast() exists but is not a function')
+			else
+				midaction = false
+				spelltarget = nil
+			end
+		end
+	end
+	
 	
 	if id == 0x01B then
 --		add_to_chat(8,'Job Info Packet')
@@ -266,17 +299,16 @@ windower.register_event('incoming chunk',function(id,data)
 		for i=0,15 do
 			local tf = (math.floor( (enc%(2^(i+1))) / 2^i ) == 1) -- Could include the binary library some day if necessary
 			if encumbrance_table[i] ~= tf then
-				encumbrance_table[i] = tf
 				if not tf and not_sent_out_equip[i] and not disable_table[i] then
 					local eq = get_items().equipment
 					if not_sent_out_equip[i] ~= eq[default_slot_map[i]] then
 						set_equip(not_sent_out_equip[i],i)
-						write('Sent something!')
 					end
 					sent_out_equip[i] = not_sent_out_equip[i]
-					not_sent_out_equip[i] = nil 
+					not_sent_out_equip[i] = nil
 --					add_to_chat(123,"Gearswap: Your "..default_slot_map[i]..' are now unlocked.')
 				end
+				encumbrance_table[i] = tf
 			end
 		end
 --[[		local encstr = 'Gearswap, Encumbered in slots: '
@@ -299,11 +331,43 @@ windower.register_event('incoming chunk',function(id,data)
 	end
 end)
 
+
+
+function get_bit_packed(dat_string,start,stop) -- Temporary
+	local newval = 0
+	
+	local c_count = math.ceil(stop/8)
+	while c_count >= math.ceil((start+1)/8) do
+		-- Grabs the most significant byte first and works down towards the least significant.
+		local cur_val = dat_string:byte(c_count)
+		local scal = 256
+		
+		if c_count == math.ceil(stop/8) then -- Take the least significant bits of the most significant byte
+		-- Moduluses by 2^number of bits into the current byte. So 8 bits in would %256, 1 bit in would %2, etc.
+		-- Cuts off the top.
+			cur_val = cur_val%(2^((stop-1)%8+1)) -- -1 and +1 set the modulus result range from 1 to 8 instead of 0 to 7.
+		end
+		
+		if c_count == math.ceil((start+1)/8) then -- Take the most significant bits of the least significant byte
+		-- Divides by the significance of the final bit in the current byte. So 8 bits in would /128, 1 bit in would /1, etc.
+		-- Cuts off the bottom.
+			cur_val = math.floor(cur_val/(2^(start%8)))
+			scal = 2^(8-start%8)
+		end
+		
+		newval = newval*scal + cur_val -- Need to multiply by 2^number of bits in the next byte
+		c_count = c_count - 1
+	end
+	return newval
+end
+
 windower.register_event('zone change',function(new_zone,new_zone_id,old_zone,old_zone_id)
+	if debugging >= 1 then windower.debug('zone change') end
 	midaction = false
 end)
 
 windower.register_event('outgoing chunk',function(id,data)
+	if debugging >= 1 then windower.debug('outgoing chunk '..id) end
 	if id == 0x015 then
 		lastbyte = data:byte(7,8)
 	end
@@ -316,19 +380,21 @@ windower.register_event('outgoing chunk',function(id,data)
 		_unknown1 = data:byte(16,16)*256+data:byte(15,15)
 		local actor_name = get_mob_by_id(actor_id)['name']
 		local target_name = get_mob_by_index(index)['name']
-		if category == 3 then
+		if category == 3 and not buffactive.silence and not buffactive.mute then -- 3 = Magic
 			abil_name = r_spells[param][language]
-		elseif category == 7 then
+		elseif (category == 7 or category == 25) and not buffactive.amnesia then -- 7 = WS, 25 = Monster skill
 			abil_name = r_abilities[param+768][language]
-		elseif category == 9 then
+		elseif category == 9 and not buffactive.amnesia then -- 9 = Ability
 			abil_name = r_abilities[param][language]
-		elseif category == 16 then
+		elseif category == 16 then -- 16 = . . . ranged attack
 			abil_name = 'Ranged Attack'
 		end
 		if logging then logit(logfile,'\n\nActor: '..tostring(actor_name)..'  Target: '..tostring(target_name)..'  Category: '..tostring(category)..'  param: '..tostring(abil_name or param)) end
 		if abil_name and not (buffactive.terror or buffactive.sleep or buffactive.stun or buffactive.petrification or buffactive.charm) then
 			midaction = true
-		else
+			send_command('@wait 1;lua i gearswap midact')
+		elseif user_env and not T{0,2,4,13,14,15,18,20}:contains(category) then -- 0 = interacting with an NPC, 2 = engaging, 4 = disengaging from menu, 12= Unclear?, 13 = getting up from reraise, 14 = fishing, 15 = changing target, 18 = dismounting chocobo, 20 = zoning
+			if not T{3,7,9,16}:contains(category) then add_to_chat(8,'Tell Byrth how you triggered this and this number: '..category) end
 			if type(user_env.aftercast) == 'function' then
 				equip_sets('aftercast',{name='Interrupt',type='Interrupt'},{type='Recast'})
 			elseif user_env.aftercast then
@@ -348,6 +414,7 @@ function midact()
 end
 
 windower.register_event('action',function(act)
+	if debugging >= 1 then windower.debug('action') end
 	if gearswap_disabled or act.category == 1 then return end
 	
 	local temp_player = get_player()
@@ -408,7 +475,7 @@ windower.register_event('action',function(act)
 	end
 end)
 
-windower.register_event('action message',function(actor_id,target_id,actor_index,target_index,message_id,param_1,param_2,param_3)
+--[[windower.register_event('action message',function(actor_id,target_id,actor_index,target_index,message_id,param_1,param_2,param_3)
 	if gearswap_disabled then return end
 	
 	if spelltarget and spelltarget.id and T{6,20,113,406,605,646}:contains(message_id) then
@@ -455,9 +522,10 @@ windower.register_event('action message',function(actor_id,target_id,actor_index
 			spelltarget = nil
 		end
 	end
-end)
+end)]]
 
 windower.register_event('status change',function(new,old)
+	if debugging >= 1 then windower.debug('status change '..new) end
 	if gearswap_disabled or T{'Event','Other','Zoning','Dead'}:contains(old) or T{'Event','Other','Zoning','Dead'}:contains(new) then return end
 	-- Event may not be a real status yet. This is a blacklist to prevent people from swapping out of crafting gear or when disengaging from NPCs.
 	if old == '' then old = 'Idle' end
@@ -465,31 +533,37 @@ windower.register_event('status change',function(new,old)
 end)
 
 windower.register_event('gain status',function(name,id)
+	if debugging >= 1 then windower.debug('gain status '..name) end
 	if gearswap_disabled then return end
 	if midaction and T{'terror','sleep','stun','petrification','charm','weakness'}:contains(name:lower()) then midaction = false end
 	equip_sets('buff_change',name,'gain')
 end)
 
 windower.register_event('lose status',function(name,id)
+	if debugging >= 1 then windower.debug('lose status '..name) end
 	if gearswap_disabled then return end
 	equip_sets('buff_change',name,'loss')
 end)
 
 windower.register_event('job change',function(mjob, mjob_id, mjob_lvl, sjob, sjob_id, sjob_lvl)
+	if debugging >= 1 then windower.debug('job change') end
 	if mjob ~= current_job_file then
 		refresh_user_env()
 	end
 end)
 
 windower.register_event('login',function(name)
+	if debugging >= 1 then windower.debug('login '..name) end
 	send_command('@wait 2;lua i gearswap refresh_user_env;')
 end)
 
 windower.register_event('day change',function(new,old)
+	if debugging >= 1 then windower.debug('day change') end
 	send_command('@wait 0.5;lua invoke gearswap refresh_ffxi_info')
 end)
 
 windower.register_event('weather change',function(new_weather, new_weather_id, old_weather, old_weather_id)
+	if debugging >= 1 then windower.debug('weather change') end
 	refresh_ffxi_info()
 end)
 

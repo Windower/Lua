@@ -171,14 +171,14 @@ function refresh_player()
 	
 	-- Assign player.equipment to be the gear that has been sent out and the server currently thinks
 	-- you are wearing. (the sent_out_equip for loop above).
-	player.equipment = to_names_set(cur_equip,items['inventory'])
+	player.equipment = to_names_set(cur_equip,items.inventory)
 	
 	-- Monster tables for the target and subtarget.
 	player.target = target_type(get_mob_by_target('t'))
 	player.subtarget = target_type(get_mob_by_target('lastst'))
 	
 	-- If you have a pet, make a pet table.
-	if player_mob_table['pet_index'] ~= 0 then
+	if player_mob_table['pet_index'] then
 		table.reassign(pet,get_mob_by_index(player_mob_table['pet_index']))
 		pet.isvalid = true
 		if avatar_element[pet.name] then
@@ -188,6 +188,14 @@ function refresh_player()
 		end
 	else
 		table.reassign(pet,{isvalid=false})
+	end
+	
+	local ft_table = get_mob_by_target('<ft>')
+	if ft_table then
+		table.reassign(fellow,ft_table)
+		fellow.isvalid = true
+	else
+		table.reassign(fellow,{isvalid=false})
 	end
 	
 	table.reassign(buffactive,get_buff_active(player['buffs']))

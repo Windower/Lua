@@ -29,8 +29,8 @@ file = require 'filehelper'
 require 'tablehelper'
 xml = require 'xml'
 
-_addon = {}
-_addon.version = '0.7'
+
+_addon.version = '0.8'
 _addon.author = 'Byrth'
 _addon.name = 'plugin_manager'
 _addon.commands = {}
@@ -168,9 +168,10 @@ function make_name(name)
 		name = name:lower()
 	elseif get_player() then
 		name = get_player().name:lower()
-		if name == nil or name == '' or not loader_array[name] then
-			name = 'global'
-		end
+	end
+	
+	if name == nil or name == '' or not loader_array[name] then
+		name = 'global'
 	end
 	return name or 'global'
 end

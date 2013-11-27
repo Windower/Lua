@@ -690,7 +690,7 @@ fields.incoming[0x04B] = L{
     {ctype='unsigned char',     label='Packet Type'},                            --    4 -   4
 
 	-- 0x01: (Length is 88 bytes)
-	-- Seems to occur when refreshing the d-box with things that are already there.
+	-- Seems to occur when refreshing the d-box after any change (or before changes).
     {ctype='unsigned char',     label='_unknown2'},                              --    5 -   5
     {ctype='unsigned char',     label='Delivery Slot ID'},                       --    6 -   6 -- This goes left to right and then drops down a row and left to right again. Value is 0 to 7.
     {ctype='char[5]',           label='_unknown3'},                              --    7 -  11 :: All FF values observed
@@ -707,6 +707,25 @@ fields.incoming[0x04B] = L{
     {ctype='unsigned int',      label='Flags1'},                                 --   52 -  55 :: 01/04 00 00 00 observed
     {ctype='unsigned short',    label='Number of Item'},                         --   56 -  57
     {ctype='char[30]',          label='_unknown10'},                             --   58 -  87 :: All 00 observed
+	
+	-- 0x02: (Length is 88 bytes)
+	-- Seems to occur when placing items into the d-box.
+	
+	-- 0x03: (Length is 88 bytes)
+	-- Two occur per item that is actually sent (hitting okay to send).
+	
+	-- 0x04: (Length is 88 bytes)
+	-- Two occur per sent item that is Canceled.
+	
+	-- 0x05 (Length is 20 bytes)
+	-- Seems to occur quasi-randomly. Can be seen following spells.
+    {ctype='unsigned char',     label='_unknown2'},                              --    5 -   5
+    {ctype='char[6]',           label='_unknown3'},                              --    6 -  11 :: All FF values observed
+    {ctype='unsigned char',     label='_unknown4'},                              --    12 - 12 :: 01 and 02 observed
+    {ctype='unsigned char',     label='_unknown5'},                              --    13 - 13 :: FF observed
+    {ctype='unsigned char',     label='_unknown6'},                              --    14 - 14 :: 00 and FF observed
+    {ctype='unsigned char',     label='_unknown7'},                              --    15 - 15 :: FF observed
+    {ctype='unsigned int',      label='_unknown8'},                              --    16 - 19 :: 00 00 00 00 observed
 	
 	-- 0x06: (Length is 88 bytes)
 	-- Occurs for new items.
@@ -730,25 +749,27 @@ fields.incoming[0x04B] = L{
     {ctype='unsigned int',      label='Flags1'},                                 --   52 -  55 :: 01/04 00 00 00 observed
     {ctype='unsigned short',    label='Number of Item'},                         --   56 -  57
     {ctype='char[30]',          label='_unknown10'},                             --   58 -  87 :: All 00 observed
-	
-	-- 0x05 (Length is 20 bytes)
-	-- Seems to occur quasi-randomly. Can be seen following spells.
-    {ctype='unsigned char',     label='_unknown2'},                              --    5 -   5
-    {ctype='char[6]',           label='_unknown3'},                              --    6 -  11 :: All FF values observed
-    {ctype='unsigned char',     label='_unknown4'},                              --    12 - 12 :: 01 and 02 observed
-    {ctype='unsigned char',     label='_unknown5'},                              --    13 - 13 :: FF observed
-    {ctype='unsigned char',     label='_unknown6'},                              --    14 - 14 :: 00 and FF observed
-    {ctype='unsigned char',     label='_unknown7'},                              --    15 - 15 :: FF observed
-    {ctype='unsigned int',      label='_unknown8'},                              --    16 - 19 :: 00 00 00 00 observed
 
+	-- 0x07: Length is 20 or 88 bytes
+	-- Sent when something is being removed from the outbox. 20 byte packet is followed by an 88 byte packet for each item removed.
+	
 	-- 0x08: (Length is 88 bytes)
-	-- Seems to occur as the first packet when removing something from the d-box.
+	-- Occur as the first packet when removing or dropping something from the d-box.
+	
+	-- 0x09: (Length is 88 bytes)
+	-- Occur when someone returns something from the d-box.
 	
 	-- 0x0A: (Length is 88 bytes)
-	-- Seems to occur as the final packet when removing something from the d-box.
+	-- Occurs as the second packet when removing something from the d-box or outbox.
+	
+	-- 0x0B: (Length is 88 bytes)
+	-- Occurs as the second packet when dropping something from the d-box.
+	
+	-- 0x0C: (Length is 20 bytes)
+	-- Sent after entering a name and hitting "OK" in the outbox.
 	
 	-- 0x0F: (Length is 20 bytes)
-	-- Seems to occur after closing the d-box.
+	-- One is sent after closing the d-box or outbox.
 }
 
 -- Data Download 2
