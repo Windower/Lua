@@ -192,7 +192,7 @@ end
 function set.tostring(s)
     local res = '{'
     for el in pairs(s) do
-        res = res..el
+        res = res..tostring(el)
         if next(s, el) ~= nil then
             res = res..', '
         end
