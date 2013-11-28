@@ -64,7 +64,7 @@ function config.load(filename, confdict)
     if not _libs.filehelper.exists(filepath) then
         meta.file:set(filepath, true)
         meta.original.global = table.copy(settings)
-        config.save(settings)
+        config.save(settings, 'all')
 
         return settings
     end
@@ -302,7 +302,7 @@ end
 -- Writes the passed config table to the spcified file name.
 -- char defaults to get_player()['name']. Set to "all" to apply to all characters.
 function config.save(t, char)
-    if not windower.get_ffxi_info().logged_in then
+    if char ~= 'all' and not windower.get_ffxi_info().logged_in then
         return
     end
 
