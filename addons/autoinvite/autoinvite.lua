@@ -33,12 +33,12 @@ _addon.name = 'AutoInvite'
 _addon.commands = {'autoinvite','ai'}
 _addon.version = 1.0
 
-settings = T{}
-settings.mode = 'whitelist'
-settings.whitelist = S{}
-settings.blacklist = S{}
-settings.keywords = S{}
-settings.tellback = 'on'
+defaults = T{}
+defaults.mode = 'whitelist'
+defaults.whitelist = S{}
+defaults.blacklist = S{}
+defaults.keywords = S{}
+defaults.tellback = 'on'
 
 -- Statuses that stop you from sending invites.
 statusblock = S{
@@ -230,7 +230,7 @@ end)
 
 function initialize()
 	-- Load settings from file
-	settings = config.load(settings)
+	settings = config.load(defaults)
 	settings.whitelist = settings.whitelist:map(string.ucfirst..string.lower)
 	settings.blacklist = settings.blacklist:map(string.ucfirst..string.lower)
 end
