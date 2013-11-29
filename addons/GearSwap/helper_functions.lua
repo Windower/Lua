@@ -69,6 +69,8 @@ function parse_resources(lines_file)
 						end
 						if val == "true" or val == "false" then
 							completed_table[tonumber(key)][ind] = str2bool(val)
+						elseif tonumber(val) then
+							completed_table[tonumber(key)][ind] = tonumber(val)
 						else
 							completed_table[tonumber(key)][ind] = val:gsub('&quot;','\42'):gsub('&apos;','\39')
 						end

@@ -61,10 +61,18 @@ end
 
 function make_entry(v,typ,i)
 	if not v.targets then v.targets = 'None' end
-	v['validtarget'] = {Self=false,Player=false,Party=false,Ally=false,NPC=false,Enemy=false}
-	local potential_targets = split(v['targets'],', ')
+	v.validtarget = {Self=false,Player=false,Party=false,Ally=false,NPC=false,Enemy=false}
+	
+	local potential_targets
+	
+	if tonumber(v.targets) then -- TEMPORARY FIX UNTIL THE RESOURCES ARE CORRECTED
+		potential_targets = {}
+	else
+		potential_targets = split(v.targets,', ')
+	end
+	
 	for n,m in pairs(potential_targets) do
-		v['validtarget'][m] = true
+		v.validtarget[m] = true
 	end
 	if not v.tpcost or v.tpcost == -1 then v.tpcost = 0 end
 	if not v.mpcost or v.mpcost == -1 then v.mpcost = 0 end

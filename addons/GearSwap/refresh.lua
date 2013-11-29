@@ -200,7 +200,7 @@ function refresh_player()
 		table.reassign(fellow,{isvalid=false})
 	end
 	
-	table.reassign(buffactive,get_buff_active(player['buffs']))
+	refresh_buff_active(player.buffs)
 end
 
 
@@ -288,7 +288,7 @@ function refresh_group_info()
 end
 
 -----------------------------------------------------------------------------------
---Name: get_buff_active(bufflist)
+--Name: refresh_buff_active(bufflist)
 --Args:
 ---- bufflist (table): List of buffs from get_player()['buffs']
 -----------------------------------------------------------------------------------
@@ -298,7 +298,7 @@ end
 ---- of that string present in the buff array. So two marches would give
 ---- buffarr.march==2.
 -----------------------------------------------------------------------------------
-function get_buff_active(bufflist)
+function refresh_buff_active(bufflist)
 	buffarr = {}
 	for i,v in pairs(bufflist) do
 		if r_status[v] then -- For some reason we always have buff 255 active, which doesn't have an entry.
@@ -310,7 +310,7 @@ function get_buff_active(bufflist)
 			end
 		end
 	end
-	return buffarr
+	table.reassign(buffactive,buffarr)
 end
 
 

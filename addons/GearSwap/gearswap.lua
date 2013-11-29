@@ -42,7 +42,7 @@ require 'export'
 
 
 _addon.name = 'GearSwap'
-_addon.version = '0.714'
+_addon.version = '0.715'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -176,6 +176,14 @@ windower.register_event('outgoing text',function(original,modified)
 		if command_list[command] == 'Magic' then
 			r_line = r_spells[validabils[language][abil:lower()]['Magic']]
 			r_line.name = r_line[language]
+			if r_line.type == 'BardSong' and r_line.casttime == 8 then
+				refresh_buff_active(get_player().buffs)
+				if buffactive.pianissimo then
+				-- Handling for the casting time reduction of Pianissimo.
+				-- Note, does not work unless the buff list has been updated.
+					r_line.casttime=4
+				end
+			end
 			s_type = 'Magic' -- command_list[r_spells[validabils[language][abil:lower()]['Magic']]['prefix']]
 		elseif command_list[command] == 'Ability' then
 			r_line = r_abilities[validabils[language][abil:lower()]['Ability']]
@@ -635,6 +643,10 @@ function get_spell(act)
 		else
 			spell = aftercast_cost(spell)
 		end
+	end
+	
+	if spell.type == 'BardSong' and spell.casttime == 8 and buffactive.pianissimo then -- Handling for the casting time reduction of Pianissimo
+		spell.casttime=4
 	end
 	
 	spell.name = spell[language]
