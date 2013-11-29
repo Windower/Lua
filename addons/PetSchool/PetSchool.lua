@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 function event_load()
-	version = '1.0.0'
+	version = '1.0.1'
 	PetNuke = ' '
 	PetHeal = ' '
 	TP_Set = ' '
@@ -47,7 +47,7 @@ function options_load()
 		g:write('Author Comment: For the Gearset, simply place the name of the spellcast set for each setting exactly how it is spelled in spellcast.\n')
 		g:write('Author Comment: The design of the settings file is credited to Byrthnoth as well as the creation of the settings file.\n\n\n\n')
 		g:write('Fill In Settings Below:\n')
-		g:write('PetNuke Set: PetNuke\nPetHeal Set: PetHeal\nTP Set: TP\nIdle Set: Movement\n')
+		g:write('PetNuke Set: PetNuke\nPetHeal Set: PetHeal\nTP Set: TP\nIdle Set: Movement\nVerbose: true\n')
 		g:close()
 		
 		write('Default settings file created')
@@ -69,7 +69,9 @@ function options_load()
 				TP_Set = splat[3]
 			elseif cmd == 'idle set' then
 				Idle_Set = splat[3]
-			end
+            		elseif cmd == 'verbose' then
+                		Verbose = splat[3]
+        		end
 		end
 		add_to_chat(17,'PetSchool read from a settings file and loaded!')
 	end
@@ -87,18 +89,26 @@ function event_action(act)
 		if category == 8 then
 			if actionTarget.is_npc == true then
 				send_command('sc set ' .. PetNuke)
-				add_to_chat(17, '                       Pet Spellcast Started:  Nuking')
+				if Verbose then
+					add_to_chat(17, '                       Pet Spellcast Started:  Nuking')
+				end
 			elseif actionTarget.is_npc == false then
 				send_command('sc set ' .. PetHeal)
-				add_to_chat(17, '                       Pet Spellcast Started:  Curing/Buffing')
+				if Verbose then
+					add_to_chat(17, '                       Pet Spellcast Started:  Curing/Buffing')
+				end
 			end
 		elseif category == 4 then
 			if (player.status:lower() == 'engaged') then
 				send_command('sc set ' .. TP_Set)
-				add_to_chat(17, '                       Pet Spellcast Finished')
+				if Verbose then
+					add_to_chat(17, '                       Pet Spellcast Finished')
+				end
 			elseif (player.status:lower() == 'idle') then
 				send_command('sc set ' .. Idle_Set)
-				add_to_chat(17, '                       Pet Spellcast Finished')
+				if Verbose then
+					add_to_chat(17, '                       Pet Spellcast Finished')
+				end
 			end
 		end
 	end
