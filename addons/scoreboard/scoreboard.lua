@@ -2,17 +2,19 @@
 
 _addon = _addon or {}
 _addon.name = 'Scoreboard'
-_addon.version = 0.9
-_addon.command = 'sb'
+_addon.author = 'Suji'
+_addon.version = '1.04'
+_addon.commands = {'sb', 'scoreboard'}
 
 require('tablehelper')
 require('stringhelper')
 require('mathhelper')
 require('logger')
 require('actionhelper')
-local config = require ('config')
+local file = require('filehelper')
+local config = require('config')
 
-local Display = require ('display')
+local Display = require('display')
 local display = nil
 dps_clock = require('dpsclock'):new() -- global for now
 dps_db    = require('damagedb'):new() -- global for now
@@ -43,13 +45,17 @@ windower.register_event('addon command',function(...)
         return
     end
 
+    local chatmodes = T{'s', 'l', 'p', 't', 'say', 'linkshell', 'party', 'tell'}
+    
     if params[1] then
-        if params[1]:lower() == "help" then
+        local param1 = params[1]:lower()
+        if param1 == "help" then
             sb_output('Scoreboard v' .. _addon.version .. '. Author: Suji')
             sb_output('sb help : Shows help message')
             sb_output('sb pos <x> <y> : Positions the scoreboard')
             sb_output('sb reset : Reset damage')
             sb_output('sb report [<target>] : Reports damage. Can take standard chatmode target options.')
+            sb_output('sb reportstat <stat> [<player>] [<target>] : Reports the given stat. Can take standard chatmode target options. Ex: //sb rs acc p')
             sb_output('sb filter show  : Shows current filter settings')
             sb_output('sb filter add <mob1> <mob2> ... : Add mob patterns to the filter (substrings ok)')
             sb_output('sb filter clear : Clears mob filter')
@@ -57,7 +63,7 @@ windower.register_event('addon command',function(...)
             sb_output('sb stat <stat> [<player>]: Shows specific damage stats. Respects filters. If player isn\'t specified, ' ..
                   'stats for everyone are displayed. Valid stats are:')
             sb_output(dps_db.player_stat_fields:tostring():stripchars('{}"'))
-        elseif params[1]:lower() == "pos" then
+        elseif param1 == "pos" then
             if params[3] then
                 local posx, posy = tonumber(params[2]), tonumber(params[3])
                 display:set_position(posx, posy)
@@ -68,14 +74,65 @@ windower.register_event('addon command',function(...)
                     settings:save()
                 end
             end
-        elseif params[1]:lower() == "reset" then
+        elseif param1 == "set" then
+            local setting = params[2]
+            if not params[3] then
+                return
+            end
+            
+            if setting == 'numplayers' then
+                settings.numplayers = tonumber(params[3])
+                settings:save()
+                display:update()
+                sb_output("Setting 'numplayers' set to " .. settings.numplayers)
+            elseif setting == 'bgtransparency' then
+                settings.bgtransparency = tonumber(params[3])
+                settings:save()
+                display:update()
+                sb_output("Setting 'bgtransparency' set to " .. settings.bgtransparency)
+            elseif setting == 'font' then
+                settings.font = params[3]
+                settings:save()
+                display:update()
+                display:update()
+                sb_output("Setting 'font' set to " .. settings.font)
+            elseif setting == 'sbcolor' then
+                settings.sbcolor = tonumber(params[3])
+                settings:save()
+                sb_output("Setting 'sbcolor' set to " .. settings.sbcolor)
+            elseif setting == 'showallidps' then
+                if params[3] == 'true' then
+                    settings.showallidps = true
+                elseif params[3] == 'false' then
+                    settings.showallidps = false
+                else
+                    error("Invalid value for 'showallidps'. Must be true or false.")
+                    return
+                end
+                
+                settings:save()
+                sb_output("Setting 'showalldps' set to " .. tostring(settings.showallidps))
+            elseif setting == 'resetfilters' then
+                if params[3] == 'true' then
+                    settings.resetfilters = true
+                elseif params[3] == 'false' then
+                    settings.resetfilters = false
+                else
+                    error("Invalid value for 'resetfilters'. Must be true or false.")
+                    return
+                end
+                
+                settings:save()
+                sb_output("Setting 'resetfilters' set to " .. tostring(settings.resetfilters))
+            end
+        elseif param1 == "reset" then
             reset()
-        elseif params[1]:lower() == "report" then
+        elseif param1 == "report" then
             local arg = params[2]
             local arg2 = params[3]
 
             if arg then
-                if T{'s', 'l', 'p', 't', 'say', 'linkshell', 'party', 'tell'}:contains(arg) then
+                if chatmodes:contains(arg) then
                     if arg2 and not arg2:match('^[a-zA-Z]+$') then
                         -- should be a valid player name
                         error('Invalid argument for report t: ' .. arg2)
@@ -88,53 +145,133 @@ windower.register_event('addon command',function(...)
             end
 
             display:report_summary(arg, arg2)
-        elseif params[1]:lower() == "filters" then
-            sb_output("'//sb filters' is deprecated. Please use '//sb filter show' in the future. See //sb help")
-            display:report_filters()
-        elseif params[1]:lower() == "add" then
-            sb_output("'//sb add ...' is deprecated. Please use '//sb filter add ...' in the future. See //sb help")
-            for i=2, #params do
-                dps_db:add_filter(params[i])
-            end
-            display:update()
-        elseif params[1]:lower() == "clear" then
-            sb_output("'//sb clear' is deprecated. Please use '//sb filter clear' in the future. See //sb help")
-            dps_db:clear_filters()
-            display:update()
-        elseif params[1]:lower() == "visible" then
+
+        elseif param1 == "visible" then
             display:toggle_visible()
-        elseif params[1]:lower() == 'filter' then
-            if params[2]:lower() == 'add' then
+            settings.visible = not settings.visible
+            settings:save()
+        elseif param1 == 'filter' then
+            local subcmd
+            if params[2] then
+                subcmd = params[2]:lower()
+            else
+                error('Invalid option to //sb filter. See //sb help')
+                return
+            end
+            
+            if subcmd == 'add' then
                 for i=3, #params do
                     dps_db:add_filter(params[i])
                 end
                 display:update()
-            elseif params[2]:lower() == 'clear' then
+            elseif subcmd == 'clear' then
                 dps_db:clear_filters()
                 display:update()
-            elseif params[2]:lower() == 'show' then
+            elseif subcmd == 'show' then
                 display:report_filters()
             else
                 error('Invalid argument to //sb filter')
             end
-        elseif params[1]:lower() == 'stat' then
-            if not params[2] then
+        elseif param1 == 'stat' then
+            if not params[2] or not dps_db.player_stat_fields:contains(params[2]:lower()) then
                 error('Must pass a stat specifier to //sb stat. Valid arguments: ' ..
                       dps_db.player_stat_fields:tostring():stripchars('{}"'))
             else
                 local stat = params[2]:lower()
-                if dps_db.player_stat_fields:contains(stat) then
-                    local player = params[3]
-                    if player and player:match('^[a-zA-Z]+$') then
-                        player = player:lower():ucfirst()
+                local player = params[3]
+                display:show_stat(stat, player)
+            end
+        elseif param1 == 'reportstat' or param1 == 'rs' then
+            if not params[2] or not dps_db.player_stat_fields:contains(params[2]:lower()) then
+                error('Must pass a stat specifier to //sb reportstat. Valid arguments: ' ..
+                      dps_db.player_stat_fields:tostring():stripchars('{}"'))
+                return
+            end
+            
+            local stat = params[2]:lower()
+            local arg2 = params[3] -- either a player name or a chatmode
+            local arg3 = params[4] -- can only be a chatmode
+
+            -- The below logic is obviously bugged if there happens to be a player named "say",
+            -- "party", "linkshell" etc but I don't care enough to account for those people!
+            
+            if chatmodes:contains(arg2) then
+                -- Arg2 is a chatmode so we assume this is a 3-arg version (no player specified)
+                display:report_stat(stat, {chatmode = arg2, telltarget = arg3})
+            else
+                -- Arg2 is not a chatmode, so we assume it's a player name and then see
+                -- if arg3 looks like an optional chatmode.
+                if arg2 and not arg2:match('^[a-zA-Z]+$') then
+                    -- should be a valid player name
+                    error('Invalid argument for reportstat t ' .. arg2)
+                    return
+                end
+                
+                if arg3 and not chatmodes:contains(arg3) then
+                    error('Invalid argument for reportstat t ' .. arg2 .. ', must be a valid chatmode.')
+                    return
+                end
+                
+                display:report_stat(stat, {player = arg2, chatmode = arg3, telltarget = params[5]})
+            end
+        elseif param1 == 'fields' then
+            do  error("Not implemented yet.") return end
+        elseif param1 == 'save' then
+            if false then -- dps_db:isempty() then
+                error('Nothing to save.')
+                return
+            else
+                if params[2] then
+                    if not params2:match('^[a-ZA-Z0-9_-,.:]+$') then
+                        error("Invalid filename: " .. params[2])
+                        return
                     end
-                    display:show_stat(stat, player)
+                    save(params[2])
+                else
+                    save()
                 end
             end
+        else
+            error('Unrecognized command. See //sb help')
         end
     end
 end)
 
+local months = {
+    'jan', 'feb', 'mar', 'apr',
+    'may', 'jun', 'jul', 'aug',
+    'sep', 'oct', 'nov', 'dec'
+}
+
+local function fexists(fname)
+
+end
+
+
+function save(filename)
+    if not filename then
+        local date = os.date("*t", os.time())
+        filename = string.format("sb_%s-%d-%d-%d-%d.txt",
+                                  months[date.month],
+                                  date.day,
+                                  date.year,
+                                  date.hour,
+                                  date.min)
+    end
+    local parse = file.new('data/parses/' .. filename)
+
+    if parse:exists() then
+        local dup_path = file.new(parse.path)
+        local dup = 0
+
+        while dup_path:exists() do
+            dup_path = file.new(parse.path .. '.' .. dup)
+            dup = dup + 1
+        end
+        parse = dup_path
+    end
+    parse:create()
+end
 
 -- Resets application state
 function reset()
@@ -153,7 +290,6 @@ local function update_dps_clock()
 end
 
 
-
 -- Keep updates flowing
 windower.register_event('time change', function(...)
     update_dps_clock()
@@ -168,10 +304,9 @@ windower.register_event('status change', function(...)
 end)
 
 windower.register_event('login', 'load', function(...)
-    -- Bail out until player name is set. The config library depends on player name
-    -- being defined to process settings properly.
-    local player_name = windower.ffxi.get_player()['name']
-    if player_name == '' then
+    -- Bail out until we are logged in properly.
+    local player = windower.ffxi.get_player()
+    if not player then
         return
     end
 
@@ -182,13 +317,19 @@ windower.register_event('login', 'load', function(...)
         numplayers = 8,
         font = 'courier new',
         fontsize = 10,
-        sbcolor = 204
+        sbcolor = 204,
+        visible = true,
+        showallidps = true,
+        resetfilters = true
     })
+    send_command('alias sb lua c scoreboard')
     display = Display:new(settings, dps_db)
     reset()
 end)
 
+
 windower.register_event('unload', function()
+    send_command('unalias sb')
     display:destroy()
 end)
 
@@ -201,7 +342,8 @@ function get_ally_mob_ids()
     for _, member in pairs(party) do
         if member.mob then
             allies:append(member.mob.id)
-            if member.mob.pet_index > 0 then
+            if member.mob.pet_index and member.mob.pet_index> 0 then
+                write('here d')
                 allies:append(get_mob_by_index(member.mob.pet_index).id)
             end
         end

@@ -16,7 +16,6 @@ function MergedPlayer:new (o)
 end
 
 --[[
-    'crit', 'rcrit',
     'mmin', 'mmax', 'mavg',
     'rmin', 'rmax', 'ravg',
     'wsmin', 'wsmax', 'wsavg'
@@ -90,6 +89,33 @@ function MergedPlayer:rcrit()
     end
 end
 
+function MergedPlayer:wsavg()
+    local wsdmg   = 0
+    local wscount = 0
+    --[[
+    for _, p in pairs(self.players) do
+        for _, dmgtable in pairs(p.ws) do
+            for _, dmg in pairs(dmgtable) do
+                wsdmg = wsdmg + dmg
+                wscount = wscount + 1
+            end
+        end 
+    end
+    ]]
+    
+    for _, p in pairs(self.players) do
+        for _, dmg in pairs(p.ws) do
+            wsdmg = wsdmg + dmg
+            wscount = wscount + 1
+        end
+    end
+    
+    if wscount > 0 then
+        return {wsdmg / wscount, wscount}
+    else
+        return {0, 0}
+    end
+end
 -- Unused atm
 function MergedPlayer:merge(other)
     self.damage = self.damage + other.damage
