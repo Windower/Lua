@@ -87,7 +87,7 @@ function load_user_files()
 		tostring = tostring, tonumber = tonumber, pairs = pairs,
 		ipairs = ipairs, write=write, add_to_chat=add_to_chat,
 		send_command=send_cmd_user,windower=user_windower,
-		include=include_user,next=next,lua_base_path=lua_base_path,
+		include=include_user,next=next,lua_base_path=lua_base_path,empty=empty,
 		
 		-- Player environment things
 		buffactive=buffactive,
@@ -162,11 +162,14 @@ function refresh_player()
 	if player_mob_table['race']~= nil then player.race = mob_table_races[player_mob_table['race']] end
 	
 	items = get_items()
-	local cur_equip = items['equipment'] -- i = 'head', 'feet', etc.; v = inventory ID (0~80)
+	local cur_equip = items.equipment -- i = 'head', 'feet', etc.; v = inventory ID (0~80)
 	if sent_out_equip then -- If the swap is not complete, overwrite the current equipment with the equipment that you are swapping to
 		for i,v in pairs(cur_equip) do
 			if sent_out_equip[slot_map[i]] then
-				cur_equip[i] = sent_out_equip[slot_map[i]]
+				v = sent_out_equip[slot_map[i]]
+			end
+			if v == 0 then
+				v = empty
 			end
 		end
 	end

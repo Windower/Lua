@@ -1,4 +1,6 @@
 -------------------------------------------------
+Gearswap 0.716 - Export now looks up the proper equipment slot. Changed syntax for equipping an empty slot to be less ambiguous. Fixed unequipping on zone (I think).
+-------------------------------------------------
 Gearswap 0.715 - Converted resource strings to numbers if appropriate. Added Pianissimo casttime handling.
 -------------------------------------------------
 Gearswap 0.714 - Minor changes to make export more user friendly.

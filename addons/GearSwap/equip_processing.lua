@@ -31,17 +31,20 @@ function equip_sets(swap_type,val1,val2)
 	-- If the swap is not complete, overwrite the current equipment with the equipment that you are swapping to
 	for i,v in pairs(cur_equip) do
 		if sent_out_equip[slot_map[i]] then
-			cur_equip[i] = sent_out_equip[slot_map[i]]
+			v = sent_out_equip[slot_map[i]]
 		end
 		if not_sent_out_equip[slot_map[i]] then
-			cur_equip[i] = not_sent_out_equip[slot_map[i]]
+			v = not_sent_out_equip[slot_map[i]]
+		end
+		if v == 0 then
+			v = empty
 		end
 	end
 	
 	table.reassign(equip_order,default_equip_order)
 	table.reassign(equip_list,player.equipment)
 	
-	if debugging >= 2 then add_to_chat(1,swap_type) end
+	if debugging >= 2 then add_to_chat(8,swap_type) end
 	if logging then
 		logit(logfile,'\n\n'..tostring(os.clock)..'(15) equip_sets: '..tostring(swap_type))
 		if val1 then
@@ -105,39 +108,40 @@ function equip_sets(swap_type,val1,val2)
 		send_check(true)
 		return
 	end
+	
+--	print_set(equip_list)
+	
 	local equip_next = {}
 	-- Need to make sure the item isn't being traded or synthesized.
 	equip_next = to_id_set(items.inventory,equip_list) -- Translates the equip_list from the player (i=slot name, v=item name) into a table with i=slot id and v=inventory id.
 	equip_next = eliminate_redundant(cur_equip,equip_next) -- Eliminate the equip commands for items that are already equipped
 	
 	if _global.show_swaps and table.length(equip_next)>0 then
-		print_set(to_names_set(equip_next,items['inventory']),swap_type)
+		local tempset = to_names_set(equip_next,items.inventory)
+		print_set(tempset,swap_type)
 	end
 	
-	local failure_reason = ''
+	local failure_reason
 	for i,v in pairs(player.buffs) do
 		if v==14 or v == 17 then
 			failure_reason = 'Charmed'
 		elseif v == 0 then
 			failure_reason = 'KOed'
 		end
-		if _global.debug_mode and failure_reason ~= '' then
-			add_to_chat(8,'Gearswap: Cannot change gear right now: '..failure_reason)
+		if _global.debug_mode and failure_reason then
+			add_to_chat(8,'Gearswap (Debug Mode): Cannot change gear right now: '..failure_reason)
 		end
 	end
 	
 	
-	if failure_reason == '' then
-		for _,i in pairs(equip_order) do
-			--if debugging >= 2 then add_to_chat(8,tostring(v)..' '..tostring(i)..' item: '..tostring(r_items[items['inventory'][v]['id']][language..'_log'])) else
-			if equip_next[i] and not disable_table[i] and not encumbrance_table[i] then
+	if not failure_reason then
+		for _,i in ipairs(equip_order) do
+			if debugging >= 2 and i ~= 0 and equip_next[i] then add_to_chat(8,'Order: '..tostring(_)..'  Slot ID: '..tostring(i)..'  item: '..tostring(r_items[items.inventory[equip_next[i]].id][language..'_log']))
+			elseif equip_next[i] and not disable_table[i] and not encumbrance_table[i] then
 				set_equip(equip_next[i],i)
 				sent_out_equip[i] = equip_next[i] -- re-make the equip_next table with the name sent_out_equip as the equipment is sent out.
 			elseif equip_next[i] then --and not disable_table[i] then
 				not_sent_out_equip[i] = equip_next[i]
---				if encumbrance_table[i] then
---					add_to_chat(123,"Gearswap: No can change, compadre! You're encumbered in your "..default_slot_map[i].." slot.")
---				end
 			end
 		end
 	elseif logging then
@@ -156,21 +160,26 @@ function to_id_set(inventory,equip_list)
 					for i,v in pairs(equip_list) do
 						local name,order
 						local extgoal = {}
-						if type(v) == 'table' then
-							name = v.name
-							if v.augments then
-								for n,m in pairs(v.augments) do
-									extgoal[n] = augment_to_extdata(m)
+						if type(v) == 'table' and v.name then
+								name = v.name
+								if v.augments then
+									for n,m in pairs(v.augments) do
+										extgoal[n] = augment_to_extdata(m)
+									end
 								end
-							end
-							order = v.order
+								order = v.order
+						elseif type(v) == 'table' and v == empty then
+							name = empty
 						elseif type(v) == 'string' then
 							name = v
 						end
 						-- v can also be a table (that doesn't contain a "name" property) or a number, which are both cases that should not generate any kind of equipment changing.
 						-- Hence the "and name" below.
 						if not ret_list[slot_map[i]] and name then
-							if (r_items[m['id']][language..'_log']:lower() == name:lower() or r_items[m['id']][language]:lower() == name:lower()) and get_wearable(dat_slots[slot_map[i]],tonumber('0x'..r_items[m.id].slots)) then
+							if type(name) == 'table' and name == empty then
+								ret_list[slot_map[i]] = 0
+								reorder(order,i)
+							elseif (r_items[m['id']][language..'_log']:lower() == name:lower() or r_items[m['id']][language]:lower() == name:lower()) and get_wearable(dat_slots[slot_map[i]],tonumber('0x'..r_items[m.id].slots)) then
 								if extgoal[1] then
 									local count = 0
 									for o,q in pairs(extgoal) do
@@ -192,21 +201,21 @@ function to_id_set(inventory,equip_list)
 								end
 							elseif (r_items[m['id']][language..'_log']:lower() == name:lower() or r_items[m['id']][language]:lower() == name:lower()) and not get_wearable(dat_slots[slot_map[i]],tonumber('0x'..r_items[m.id].slots)) then
 								equip_list[i] = name..' (cannot be worn in this slot)'
-							elseif name:lower() == 'empty' then
-								ret_list[slot_map[i]] = 0
-								reorder(order,i)
 							end
 						end
 					end
 				else
 					for i,v in pairs(equip_list) do
 						local name
-						if type(v) == 'table' then
+						if type(v) == 'table' and v~=empty then
 							name = v.name
 						elseif type(v) == 'string' then
 							name = v
 						end
-						if r_items[m['id']][language..'_log']:lower() == name:lower() or r_items[m['id']][language]:lower() == name:lower() then
+						if v == empty then
+						elseif not name then
+							add_to_chat(123,'Gearswap: Invalid name found. ('..tostring(v)..')')
+						elseif r_items[m['id']][language..'_log']:lower() == name:lower() or r_items[m['id']][language]:lower() == name:lower() then
 							if not get_wearable(jobs[player.main_job],tonumber('0x'..r_items[m['id']]['jobs'])) then
 								equip_list[i] = name..' (cannot be worn by this job)'
 							elseif not (tonumber(r_items[m['id']]['level'])<=player.main_job_level) then
@@ -245,8 +254,8 @@ function to_id_set(inventory,equip_list)
 	
 	if _global.debug_mode then
 		for i,v in pairs(equip_list) do
-			if v ~= '' and v ~= 'empty' then
-				add_to_chat(8,'GearSwap: '..i..' - '..v)
+			if type(v) == 'string' and v ~= '' then
+				add_to_chat(8,'GearSwap (Debug Mode): '..i..' - '..v)
 			end
 		end
 	end
@@ -290,14 +299,14 @@ function to_names_set(id_id,inventory)
 	for i,v in pairs(id_id) do
 		if v~=0 then
 			if inventory[v]['id'] == 0 then
-				equip_package[i]='empty'
+				equip_package[i]=''
 			elseif type(i) ~= 'string' then
 				equip_package[default_slot_map[i]] = r_items[inventory[v]['id']][language]
 			else
 				equip_package[i]=r_items[inventory[v]['id']][language]
 			end
 		else
-			equip_package[i]='empty'
+			equip_package[i]=''
 		end
 	end
 	

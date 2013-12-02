@@ -42,7 +42,7 @@ require 'export'
 
 
 _addon.name = 'GearSwap'
-_addon.version = '0.715'
+_addon.version = '0.716'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -374,6 +374,7 @@ end
 windower.register_event('zone change',function(new_zone,new_zone_id,old_zone,old_zone_id)
 	if debugging >= 1 then windower.debug('zone change') end
 	midaction = false
+	--sent_out_equip = {}
 end)
 
 windower.register_event('outgoing chunk',function(id,data)
