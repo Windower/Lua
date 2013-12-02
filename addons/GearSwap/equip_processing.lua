@@ -109,7 +109,16 @@ function equip_sets(swap_type,val1,val2)
 		return
 	end
 	
---	print_set(equip_list)
+--	print_set(equip_list,'Debugging')
+
+	for i,v in pairs(equip_list) do
+		if not slot_map[i] then
+			if debugmode then
+				add_to_chat(123,'GearSwap: Attempting to equip an item in an unrecognized slot ('..tostring(i)..')')
+			end
+			equip_list[i] = nil
+		end
+	end
 	
 	local equip_next = {}
 	-- Need to make sure the item isn't being traded or synthesized.
@@ -136,7 +145,14 @@ function equip_sets(swap_type,val1,val2)
 	
 	if not failure_reason then
 		for _,i in ipairs(equip_order) do
-			if debugging >= 2 and i ~= 0 and equip_next[i] then add_to_chat(8,'Order: '..tostring(_)..'  Slot ID: '..tostring(i)..'  item: '..tostring(r_items[items.inventory[equip_next[i]].id][language..'_log']))
+			if debugging >= 2 and equip_next[i] then
+				local out_str = 'Order: '..tostring(_)..'  Slot ID: '..tostring(i)
+				if equip_next[i] ~= 0 then
+					out_str = out_str..'  Item: '..tostring(r_items[items.inventory[equip_next[i]].id][language..'_log'])
+				else
+					out_str = out_str..'  Emptying slot'
+				end
+				add_to_chat(8,'Gearswap: '..out_str)
 			elseif equip_next[i] and not disable_table[i] and not encumbrance_table[i] then
 				set_equip(equip_next[i],i)
 				sent_out_equip[i] = equip_next[i] -- re-make the equip_next table with the name sent_out_equip as the equipment is sent out.
@@ -155,12 +171,14 @@ function to_id_set(inventory,equip_list)
 	
 	for n,m in pairs(inventory) do
 		if m.id and m.id ~= 0 then -- 0 codes for an empty slot, but Arcon will probably make it nil at some point
-			if (m['flags'] == 0 or m['flags'] == 5) and r_items[m['id']]['jobs'] then -- Make sure the item isn't being bazaared, isn't already equipped, and can be equipped by specific jobs (unlike pearlsacks).
-				if get_wearable(jobs[player.main_job],tonumber('0x'..r_items[m['id']]['jobs'])) and (tonumber(r_items[m['id']]['level'])<=player.main_job_level) and get_wearable(dat_races[player.race],tonumber('0x'..r_items[m['id']]['races'])) then
+			if (m.flags == 0 or m.flags == 5) and r_items[m.id].jobs then -- Make sure the item isn't being bazaared, isn't already equipped, and can be equipped by specific jobs (unlike pearlsacks).
+				if get_wearable(jobs[player.main_job],tonumber('0x'..r_items[m.id].jobs)) and (tonumber(r_items[m.id].level)<=player.main_job_level) and get_wearable(dat_races[player.race],tonumber('0x'..r_items[m.id].races)) then
 					for i,v in pairs(equip_list) do
 						local name,order
 						local extgoal = {}
-						if type(v) == 'table' and v.name then
+						if type(v) == 'table' and v == empty then
+							name = empty
+						elseif type(v) == 'table' and v.name then
 								name = v.name
 								if v.augments then
 									for n,m in pairs(v.augments) do
@@ -168,8 +186,6 @@ function to_id_set(inventory,equip_list)
 									end
 								end
 								order = v.order
-						elseif type(v) == 'table' and v == empty then
-							name = empty
 						elseif type(v) == 'string' then
 							name = v
 						end
@@ -183,7 +199,7 @@ function to_id_set(inventory,equip_list)
 								if extgoal[1] then
 									local count = 0
 									for o,q in pairs(extgoal) do
-										if m['extdata']:sub(3,4) == q or m['extdata']:sub(5,6) == q or m['extdata']:sub(7,8) == q then
+										if m.extdata:sub(3,4) == q or m.extdata:sub(5,6) == q or m.extdata:sub(7,8) == q then
 											count = count +1
 										end
 									end
@@ -199,7 +215,7 @@ function to_id_set(inventory,equip_list)
 										reorder(order,i)
 									break
 								end
-							elseif (r_items[m['id']][language..'_log']:lower() == name:lower() or r_items[m['id']][language]:lower() == name:lower()) and not get_wearable(dat_slots[slot_map[i]],tonumber('0x'..r_items[m.id].slots)) then
+							elseif (r_items[m.id][language..'_log']:lower() == name:lower() or r_items[m.id][language]:lower() == name:lower()) and not get_wearable(dat_slots[slot_map[i]],tonumber('0x'..r_items[m.id].slots)) then
 								equip_list[i] = name..' (cannot be worn in this slot)'
 							end
 						end
@@ -216,11 +232,11 @@ function to_id_set(inventory,equip_list)
 						elseif not name then
 							add_to_chat(123,'Gearswap: Invalid name found. ('..tostring(v)..')')
 						elseif r_items[m['id']][language..'_log']:lower() == name:lower() or r_items[m['id']][language]:lower() == name:lower() then
-							if not get_wearable(jobs[player.main_job],tonumber('0x'..r_items[m['id']]['jobs'])) then
+							if not get_wearable(jobs[player.main_job],tonumber('0x'..r_items[m.id].jobs)) then
 								equip_list[i] = name..' (cannot be worn by this job)'
-							elseif not (tonumber(r_items[m['id']]['level'])<=player.main_job_level) then
+							elseif not (tonumber(r_items[m.id].level)<=player.main_job_level) then
 								equip_list[i] = name..' (job level is too low)'
-							elseif not get_wearable(dat_races[player.race],tonumber('0x'..r_items[m['id']]['races'])) then
+							elseif not get_wearable(dat_races[player.race],tonumber('0x'..r_items[m.id].races)) then
 								equip_list[i] = name..' (cannot be worn by your race)'
 							elseif not get_wearable(slot_map[i],tonumber('0x'..r_items[m.id].slots)) then
 								equip_list[i] = name..' (cannot be worn in this slot)'
@@ -238,10 +254,10 @@ function to_id_set(inventory,equip_list)
 						name = v
 					end
 					if name then -- If "name" isn't a piece of gear, then it won't have a valid value at this point and should be ignored.
-						if r_items[m['id']][language..'_log']:lower() == name:lower() or r_items[m['id']][language]:lower() == name:lower() then
-							if m['flags'] == 5 then
+						if r_items[m.id][language..'_log']:lower() == name:lower() or r_items[m.id][language]:lower() == name:lower() then
+							if m.flags == 5 then
 								equip_list[i] = ''
-							elseif m['flags'] == 25 then
+							elseif m.flags == 25 then
 								equip_list[i] = name..' (bazaared)'
 							end
 							break
@@ -298,15 +314,15 @@ function to_names_set(id_id,inventory)
 	local equip_package = {}
 	for i,v in pairs(id_id) do
 		if v~=0 then
-			if inventory[v]['id'] == 0 then
+			if inventory[v].id == 0 then
 				equip_package[i]=''
 			elseif type(i) ~= 'string' then
-				equip_package[default_slot_map[i]] = r_items[inventory[v]['id']][language]
+				equip_package[default_slot_map[i]] = r_items[inventory[v].id][language]
 			else
-				equip_package[i]=r_items[inventory[v]['id']][language]
+				equip_package[i]=r_items[inventory[v].id][language]
 			end
 		else
-			equip_package[i]=''
+			equip_package[i]='empty'
 		end
 	end
 	

@@ -42,7 +42,7 @@ require 'export'
 
 
 _addon.name = 'GearSwap'
-_addon.version = '0.716'
+_addon.version = '0.717'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -404,7 +404,7 @@ windower.register_event('outgoing chunk',function(id,data)
 		if abil_name and not (buffactive.terror or buffactive.sleep or buffactive.stun or buffactive.petrification or buffactive.charm) then
 			midaction = true
 			send_command('@wait 1;lua i gearswap midact')
-		elseif user_env and not T{0,2,4,13,14,15,18,20}:contains(category) then -- 0 = interacting with an NPC, 2 = engaging, 4 = disengaging from menu, 12= Unclear?, 13 = getting up from reraise, 14 = fishing, 15 = changing target, 18 = dismounting chocobo, 20 = zoning
+		elseif user_env and not T{0,2,4,11,13,14,15,18,20}:contains(category) then -- 0 = interacting with an NPC, 2 = engaging, 4 = disengaging from menu, 11 = Homepointing, 12= Unclear?, 13 = getting up from reraise, 14 = fishing, 15 = changing target, 18 = dismounting chocobo, 20 = zoning
 			if not T{3,7,9,16}:contains(category) then add_to_chat(8,'Tell Byrth how you triggered this and this number: '..category) end
 			if type(user_env.aftercast) == 'function' then
 				equip_sets('aftercast',{name='Interrupt',type='Interrupt'},{type='Recast'})

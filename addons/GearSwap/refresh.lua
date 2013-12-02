@@ -96,7 +96,10 @@ function load_user_files()
 		pet=pet,
 		alliance=alliance,
 		party=alliance[1],
-		sets={}
+		sets={naked = {main=empty,sub=empty,range=empty,ammo=empty,
+				head=empty,neck=empty,ear1=empty,ear2=empty,
+				body=empty,hands=empty,ring1=empty,ring2=empty,
+				back=empty,waist=empty,legs=empty,feet=empty}}
 		}
 
 	-- Try to load data/<name>_<main job>.lua
@@ -148,7 +151,7 @@ function refresh_player()
 	if not get_player() then return end
 	
 	table.reassign(player,get_player())
-	for i,v in pairs(player['vitals']) do
+	for i,v in pairs(player.vitals) do
 		player[i]=v
 	end
 	if player.main_job == 'NONE' then
@@ -156,10 +159,19 @@ function refresh_player()
 	end
 	player.job = player.main_job..'/'..player.sub_job
 	
-	local player_mob_table = get_mob_by_index(player['index'])
+	local player_mob_table = get_mob_by_index(player.index)
 	if not player_mob_table then return end
 	
-	if player_mob_table['race']~= nil then player.race = mob_table_races[player_mob_table['race']] end
+	for i,v in pairs(player_mob_table) do
+		if i~= 'is_npc' and i~='tp' and i~='mpp' and i~='claim_id' then
+			player[i] = v
+		end
+	end
+	
+	if player_mob_table['race']~= nil then
+		player.race_id = player.race
+		player.race = mob_table_races[player.race]
+	end
 	
 	items = get_items()
 	local cur_equip = items.equipment -- i = 'head', 'feet', etc.; v = inventory ID (0~80)
@@ -180,12 +192,27 @@ function refresh_player()
 	
 	-- Monster tables for the target and subtarget.
 	player.target = target_type(get_mob_by_target('t'))
+	
+	if player.target and player.target.race~= nil then
+		player.target.race_id = player.target.race
+		player.target.race = mob_table_races[player.target.race]
+	end
+	
 	player.subtarget = target_type(get_mob_by_target('lastst'))
 	
+	if player.subtarget and player.subtarget.race~= nil then
+		player.subtarget.race_id = player.subtarget.race
+		player.subtarget.race = mob_table_races[player.subtarget.race]
+	end
+	
 	-- If you have a pet, make a pet table.
-	if player_mob_table['pet_index'] then
-		table.reassign(pet,get_mob_by_index(player_mob_table['pet_index']))
+	if player_mob_table.pet_index then
+		table.reassign(pet,get_mob_by_index(player_mob_table.pet_index))
 		pet.isvalid = true
+		pet.race_id = pet.race
+		pet.race = nil
+		pet.claim_id = nil
+		pet.is_npc = nil
 		if avatar_element[pet.name] then
 			pet.element = avatar_element[pet.name]
 		else
@@ -199,13 +226,16 @@ function refresh_player()
 	if ft_table then
 		table.reassign(fellow,ft_table)
 		fellow.isvalid = true
+		if fellow.race then
+			fellow.race_id = fellow.race
+			fellow.race = mob_table_races[fellow.race]
+		end
 	else
 		table.reassign(fellow,{isvalid=false})
 	end
 	
 	refresh_buff_active(player.buffs)
 end
-
 
 -----------------------------------------------------------------------------------
 --Name: refresh_ffxi_info()
@@ -275,6 +305,10 @@ function refresh_group_info()
 	local temp_alliance = {[1]={count=0},[2]={count=0},[3]={count=0}}
 	local j = get_party() or {}
 	for i,v in pairs(j) do
+		if v.mob and v.mob.race then
+			v.mob.race_id = v.mob.race
+			v.mob.race = mob_table_races[v.mob.race]
+		end
 		if i:sub(1) == 'p' then
 			temp_alliance[1][tonumber(i:sub(2))+1] = v
 			temp_alliance[1]['count'] = temp_alliance[1]['count'] +1
