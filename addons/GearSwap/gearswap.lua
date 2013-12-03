@@ -39,10 +39,11 @@ require 'user_functions'
 require 'refresh'
 require 'parse_augments'
 require 'export'
+require 'validate'
 
 
 _addon.name = 'GearSwap'
-_addon.version = '0.717'
+_addon.version = '0.718'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -104,6 +105,8 @@ windower.register_event('addon command',function (...)
 	elseif splitup[1]:lower() == 'export' then
 		table.remove(splitup,1)
 		export_set(splitup)
+	elseif splitup[1]:lower() == 'validate' then
+		validate()
 	elseif splitup[1]:lower() == 'enable' then
 		if splitup[2] and slot_map[splitup[2]:gsub('[^%a]',''):lower()] then
 			enable(splitup[2])

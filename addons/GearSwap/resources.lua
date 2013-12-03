@@ -183,6 +183,16 @@ user_data_table = {
 		return rawget(tab, user_key_filter(key))
 	end
 	}
+	
+eq_data_table = {
+	__newindex = function(tab, key, val)
+			rawset(tab, slot_map[user_key_filter(key)], newtab)
+		end,
+
+	__index = function(tab, key)
+		return rawget(tab, slot_map[user_key_filter(key)])
+	end
+	}
 
 _global = make_user_table()
 _global.cast_delay = 0
@@ -205,7 +215,7 @@ world = make_user_table()
 buffactive = make_user_table()
 player = make_user_table()
 alliance = make_user_table()
-player.equipment = make_user_table()
+player.equipment = setmetatable({}, eq_data_table)
 pet = make_user_table()
 pet.isvalid = false
 fellow = make_user_table()

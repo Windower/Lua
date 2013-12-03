@@ -159,11 +159,12 @@ function refresh_player()
 	end
 	player.job = player.main_job..'/'..player.sub_job
 	
-	local player_mob_table = get_mob_by_index(player.index)
+	local player_mob_table = get_mob_by_index(get_player().index)
 	if not player_mob_table then return end
 	
+	
 	for i,v in pairs(player_mob_table) do
-		if i~= 'is_npc' and i~='tp' and i~='mpp' and i~='claim_id' then
+		if i~= 'is_npc' and i~='tp' and i~='mpp' and i~='claim_id' and i~='status' then
 			player[i] = v
 		end
 	end

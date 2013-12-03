@@ -55,7 +55,10 @@ function export_set(options)
 		end
 	elseif all_sets then
 		-- Iterate through user_env.sets and find all the gear.
-		item_list = unpack_names('L1',user_env.sets,{})
+		item_list,exported = unpack_names('L1',user_env.sets,{},{empty=true})
+		for i,v in pairs(exported) do
+			add_to_chat(8,tostring(i))
+		end
 	else
 		-- Default to loading the currently worn gear.
 		local gear = temp_items.equipment
@@ -130,23 +133,30 @@ function export_set(options)
 	end
 end
 
-function unpack_names(up,tab_level,unpacked_table)
+function unpack_names(up,tab_level,unpacked_table,exported)
 	for i,v in pairs(tab_level) do
+		local flag,alt
 		if type(v)=='table' then
-			unpacked_table = unpack_names(i,v,unpacked_table)
+			unpacked_table,exported = unpack_names(i,v,unpacked_table,exported)
 		elseif i=='name' then
-			unpacked_table[#unpacked_table+1] = {}
-			local tempname,tempslot = unlogify_unpacked_name(v)
-			unpacked_table[#unpacked_table].name = tempname
-			unpacked_table[#unpacked_table].slot = tempslot or up
+			alt = up
+			flag = true
 		elseif type(v) == 'string' and v~='augment' and v~= 'augments' and v~= 'order' then
-			unpacked_table[#unpacked_table+1] = {}
-			local tempname,tempslot = unlogify_unpacked_name(v)
-			unpacked_table[#unpacked_table].name = tempname
-			unpacked_table[#unpacked_table].slot = tempslot or i
+			alt = i
+			flag = true
+		end
+		if flag then
+			if not exported[v:lower()] then
+				unpacked_table[#unpacked_table+1] = {}
+				local tempname,tempslot = unlogify_unpacked_name(v)
+				unpacked_table[#unpacked_table].name = tempname
+				unpacked_table[#unpacked_table].slot = tempslot or alt
+				exported[tempname:lower()] = true
+				exported[v:lower()] = true
+			end
 		end
 	end
-	return unpacked_table
+	return unpacked_table,exported
 end
 
 function unlogify_unpacked_name(name)
