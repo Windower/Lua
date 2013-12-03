@@ -178,7 +178,7 @@ windower.register_event('incoming chunk',function (id, data)
 			
 			if settings.blinking["all"]["target"] or settings.blinking["all"]["always"] or settings.blinking["all"]["combat"] then
 				if character then
-					if model_mask:contains(parsed_pc["Mask"]) then
+					if table.contains(model_mask,parsed_pc["Mask"]) then
 						if settings.blinking["all"]["always"] then
 							pc_Build = true
 							return_packet = true
@@ -194,7 +194,7 @@ windower.register_event('incoming chunk',function (id, data)
 			end
 			if settings.blinking[blink_type]["target"] or settings.blinking[blink_type]["always"] or settings.blinking[blink_type]["combat"] then
 				if character then
-					if model_mask:contains(parsed_pc["Mask"]) then
+					if table.contains(model_mask,parsed_pc["Mask"]) then
 						if settings.blinking[blink_type]["always"] and do_blink_logic("always") then
 							pc_Build = true
 							return_packet = true
