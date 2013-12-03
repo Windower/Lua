@@ -43,7 +43,7 @@ require 'validate'
 
 
 _addon.name = 'GearSwap'
-_addon.version = '0.718'
+_addon.version = '0.719'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -603,6 +603,7 @@ function get_spell(act)
 		if not dialog[msg_ID] then
 			if T{4,8}:contains(act['category']) then
 				spell = r_spells[abil_ID]
+				if act.category == 4 then spell.recast = act.recast end
 			elseif T{3,6,7,13,14,15}:contains(act['category']) then
 				spell = r_abilities[abil_ID] -- May have to correct for charmed pets some day, but I'm not sure there are any monsters with TP moves that give no message.
 			elseif T{5,9}:contains(act['category']) then
@@ -616,8 +617,10 @@ function get_spell(act)
 		
 		local fields = fieldsearch(dialog[msg_ID][language])
 		
+		add_to_chat(8,spell.recast)
 		if table.contains(fields,'spell') then
 			spell = r_spells[abil_ID]
+			if act.category == 4 then spell.recast = act.recast end
 		elseif table.contains(fields,'ability') then
 			spell = r_abilities[abil_ID]
 		elseif table.contains(fields,'weapon_skill') then

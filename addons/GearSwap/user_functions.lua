@@ -115,6 +115,7 @@ function equip(...)
 	local gearsets = {...}
 	if #gearsets ~= table.length(gearsets) then
 		add_to_chat(123,'Gearswap: Equip command failure. A passed set is nil')
+		return
 	end
 	for i = 1,table.length(gearsets) do --,v in ipairs(gearsets) do
 		local temp_set = unify_slots(gearsets[i]) -- This can probably be reduced to another index table.
