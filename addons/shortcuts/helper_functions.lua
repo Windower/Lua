@@ -46,7 +46,7 @@
 ---- There is also currently a field blacklist (ignore_fields) for the sake of memory bloat.
 -----------------------------------------------------------------------------------
 function parse_resources(lines_file)
-	local ignore_fields = S{'german','french','japanese','index','fr','frl','de','del','jp','jpl'}
+	local ignore_fields = {german=true,french=true,japanese=true,fr=true,frl=true,de=true,del=true,jp=true,jpl=true}
 	local completed_table = {}
 	for i in ipairs(lines_file) do
 		local str = tostring(lines_file[i])
@@ -63,6 +63,8 @@ function parse_resources(lines_file)
 					if not ignore_fields[ind] then
 						if val == "true" or val == "false" then
 							completed_table[tonumber(key)][ind] = str2bool(val)
+						elseif tonumber(val) then
+							completed_table[tonumber(key)][ind] = tonumber(val)
 						else
 							completed_table[tonumber(key)][ind] = val:gsub('&quot;','\42'):gsub('&apos;','\39')
 						end
