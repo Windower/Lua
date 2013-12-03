@@ -49,6 +49,7 @@ function parse_resources(lines_file)
 	local find = string.find
 	local ignore_fields = S{'index'}
 	local convert_fields = {enl='english_log',fr='french',frl='french_log',de='german',del='german_log',jp='japanese',jpl='japanese_log'}
+	local hex_fields = {jobs=true,races=true,slots=true}
 	
 	local completed_table = {}
 	for i in ipairs(lines_file) do
@@ -69,6 +70,8 @@ function parse_resources(lines_file)
 						end
 						if val == "true" or val == "false" then
 							completed_table[tonumber(key)][ind] = str2bool(val)
+						elseif hex_fields[ind] then
+							completed_table[tonumber(key)][ind] = tonumber('0x'..val)
 						elseif tonumber(val) then
 							completed_table[tonumber(key)][ind] = tonumber(val)
 						else
