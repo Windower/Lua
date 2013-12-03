@@ -66,7 +66,8 @@ windower.register_event('outgoing chunk',function (id, data) if id == 0x5e then 
 
 windower.register_event('incoming chunk',function (id, data)
 	if id == 0x5e then 
-		send_command('@wait 5; lua i DressUp FinishedZone')
+		--Todo: Handle this in a less hacky way
+		send_command('@wait 10; lua i DressUp FinishedZone')
 	elseif id == 0x51 then
 		parsed_self = packets.parse("incoming",id,data)
 
@@ -177,7 +178,7 @@ windower.register_event('incoming chunk',function (id, data)
 			
 			if settings.blinking["all"]["target"] or settings.blinking["all"]["always"] or settings.blinking["all"]["combat"] then
 				if character then
-					if T{16,20}:contains(parsed_pc["Mask"]) then
+					if model_mask:contains(parsed_pc["Mask"]) then
 						if settings.blinking["all"]["always"] then
 							pc_Build = true
 							return_packet = true
@@ -190,9 +191,10 @@ windower.register_event('incoming chunk',function (id, data)
 						end
 					end
 				end
-			elseif settings.blinking[blink_type]["target"] or settings.blinking[blink_type]["always"] or settings.blinking[blink_type]["combat"] then
+			end
+			if settings.blinking[blink_type]["target"] or settings.blinking[blink_type]["always"] or settings.blinking[blink_type]["combat"] then
 				if character then
-					if T{16,20}:contains(parsed_pc["Mask"]) then
+					if model_mask:contains(parsed_pc["Mask"]) then
 						if settings.blinking[blink_type]["always"] and do_blink_logic("always") then
 							pc_Build = true
 							return_packet = true
