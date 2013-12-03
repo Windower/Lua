@@ -172,7 +172,7 @@ function to_id_set(inventory,equip_list)
 	for n,m in pairs(inventory) do
 		if m.id and m.id ~= 0 then -- 0 codes for an empty slot, but Arcon will probably make it nil at some point
 			if (m.flags == 0 or m.flags == 5) and r_items[m.id].jobs then -- Make sure the item isn't being bazaared, isn't already equipped, and can be equipped by specific jobs (unlike pearlsacks).
-				if get_wearable(jobs[player.main_job],tonumber('0x'..r_items[m.id].jobs)) and (tonumber(r_items[m.id].level)<=player.main_job_level) and get_wearable(dat_races[player.race],tonumber('0x'..r_items[m.id].races)) then
+				if get_wearable(jobs[player.main_job],r_items[m.id].jobs) and (r_items[m.id].level<=player.main_job_level) and get_wearable(dat_races[player.race],r_items[m.id].races) then
 					for i,v in pairs(equip_list) do
 						local name,order
 						local extgoal = {}
@@ -195,7 +195,7 @@ function to_id_set(inventory,equip_list)
 							if type(name) == 'table' and name == empty then
 								ret_list[slot_map[i]] = 0
 								reorder(order,i)
-							elseif (r_items[m['id']][language..'_log']:lower() == name:lower() or r_items[m['id']][language]:lower() == name:lower()) and get_wearable(dat_slots[slot_map[i]],tonumber('0x'..r_items[m.id].slots)) then
+							elseif (r_items[m['id']][language..'_log']:lower() == name:lower() or r_items[m['id']][language]:lower() == name:lower()) and get_wearable(dat_slots[slot_map[i]],r_items[m.id].slots) then
 								if extgoal[1] then
 									local count = 0
 									for o,q in pairs(extgoal) do
@@ -215,7 +215,7 @@ function to_id_set(inventory,equip_list)
 										reorder(order,i)
 									break
 								end
-							elseif (r_items[m.id][language..'_log']:lower() == name:lower() or r_items[m.id][language]:lower() == name:lower()) and not get_wearable(dat_slots[slot_map[i]],tonumber('0x'..r_items[m.id].slots)) then
+							elseif (r_items[m.id][language..'_log']:lower() == name:lower() or r_items[m.id][language]:lower() == name:lower()) and not get_wearable(dat_slots[slot_map[i]],r_items[m.id].slots) then
 								equip_list[i] = name..' (cannot be worn in this slot)'
 							end
 						end
