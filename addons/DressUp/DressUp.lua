@@ -519,7 +519,9 @@ windower.register_event('addon command', function (...)
 				error("Valid selections for clear are 'replace', 'self', 'others', and 'player'.")
 			end
 		elseif T{"blinking","bmn","blinkmenot"}:contains(args[1]:lower()) then
-			if args[2] and T{"self","others","party","all","follow"}:contains(args[2]:lower()) and args[3] and T{"target","always","combat","all"}:contains(args[3]:lower()) then
+			if not args[2] or args[2]:lower() == "settings" then
+				print_blink_settings("global")
+			elseif args[2] and T{"self","others","party","all","follow"}:contains(args[2]:lower()) and args[3] and T{"target","always","combat","all"}:contains(args[3]:lower()) then
 				if args[4] and T{"off","on"}:contains(args[4]:lower()) then
 					if args[4]:lower() == "on" then
 						blink_bool = true
@@ -542,8 +544,6 @@ windower.register_event('addon command', function (...)
 						print_blink_settings(args[2]:lower())
 					end
 				end
-			elseif args[2]:lower() == "settings" then
-				print_blink_settings("global")
 			else
 				error("Invalid selections for blinking.")
 			end
