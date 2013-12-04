@@ -1,4 +1,6 @@
 -------------------------------------------------
+Gearswap 0.719 - Removed dependence on sets library. Fixed error that occured when there was no subjob.
+-------------------------------------------------
 Gearswap 0.718 - Fixed player.status. Added the validate command. Improved export sets' efficiency. Updated documentation.
 -------------------------------------------------
 Gearswap 0.717 - Fixed equipment removal. Added sets.naked. Handled category 11 outgoing actions (homepointing). Updated documentation.

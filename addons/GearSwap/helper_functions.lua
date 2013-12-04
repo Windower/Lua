@@ -47,7 +47,7 @@
 -----------------------------------------------------------------------------------
 function parse_resources(lines_file)
 	local find = string.find
-	local ignore_fields = S{'index'}
+	local ignore_fields = {index=true}
 	local convert_fields = {enl='english_log',fr='french',frl='french_log',de='german',del='german_log',jp='japanese',jpl='japanese_log'}
 	local hex_fields = {jobs=true,races=true,slots=true}
 	

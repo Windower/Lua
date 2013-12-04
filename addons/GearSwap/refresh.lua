@@ -83,7 +83,7 @@ function load_user_files()
 		print_set=print_set,set_combine=set_combine,disable=disable,enable=enable,
 		
 		-- Library functions
-		string=string, math=math, sets=sets, table=table, T=T, S=S,
+		string=string, math=math, table=table, T=T,
 		tostring = tostring, tonumber = tonumber, pairs = pairs,
 		ipairs = ipairs, write=write, add_to_chat=add_to_chat,
 		send_command=send_cmd_user,windower=user_windower,
@@ -156,6 +156,12 @@ function refresh_player()
 	end
 	if player.main_job == 'NONE' then
 		player.main_job = 'MON'
+	end
+	if not player.sub_job then
+		player.sub_job = 'NONE'
+		player.sub_job_level = 0
+		player.sub_job_full = 'None'
+		player.sub_job_id = 0
 	end
 	player.job = player.main_job..'/'..player.sub_job
 	
