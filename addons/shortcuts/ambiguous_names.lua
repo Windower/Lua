@@ -73,7 +73,7 @@ function abil_mob(player_array,spell_ID,abil_ID,mob_ID,info) -- Determines ambig
 	if mob_ID and race then
 		local abils = get_abilities()
 		local recasts = get_ability_recasts()
-		if abils[abil_ID] and recasts[r_abils[abil_ID].index] <= 10 then
+		if abils[abil_ID] and recasts[r_abilities[abil_ID].index] <= 10 then
 			return 'Ability'
 		elseif race == 0 then
 			return 'Monster'

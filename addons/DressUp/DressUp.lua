@@ -24,10 +24,9 @@
 -- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 -- SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-_addon = {}
 _addon.name = 'DressUp'
 _addon.author = 'Cairthenn'
-_addon.version = '0.9'
+_addon.version = '0.95'
 _addon.commands = {'DressUp','du'}
 
 --Libs
@@ -47,9 +46,6 @@ require('body')
 require('hands')
 require('legs')
 require('feet')
---require('monster')
-
-local blink_type = "self"
 
 windower.register_event('load',function ()
 	settings = config.load(defaults)
@@ -70,7 +66,8 @@ windower.register_event('outgoing chunk',function (id, data) if id == 0x5e then 
 
 windower.register_event('incoming chunk',function (id, data)
 	if id == 0x5e then 
-		send_command('@wait 5; lua i DressUp FinishedZone')
+		--Todo: Handle this in a less hacky way
+		send_command('@wait 10; lua i DressUp FinishedZone')
 	elseif id == 0x51 then
 		parsed_self = packets.parse("incoming",id,data)
 
@@ -89,7 +86,7 @@ windower.register_event('incoming chunk',function (id, data)
 		self["unknown"] = string.sub(data,23,24)
 		
 		for k,v in pairs(parsed_self) do
-			if T{"Face","Race","Head","Body","Hands","Legs","Feet"}:contains(k) and v ~= 0 then
+			if T{"Face","Race","Head","Body","Hands","Legs","Feet","Main","Sub","Ranged"}:contains(k) and v ~= 0 then
 				if settings.self[k:lower()] then
 					self[k] = Int2LE(settings.self[k:lower()],k)
 					return_packet = true
@@ -103,9 +100,7 @@ windower.register_event('incoming chunk',function (id, data)
 		self_Build =  self["Header"]..self["Face"]..self["Race"]..self["Head"]..self["Body"]..self["Hands"]..
 					  self["Legs"]..self["Feet"]..self["Main"]..self["Sub"]..self["Ranged"]..self["unknown"]
 			
-		if settings.blinking["self"]["always"] or settings.blinking["follow"]["always"] or 
-		settings.blinking["all"]["always"] or (settings.blinking["all"]["combat"] and get_player().in_combat) or
-		((settings.blinking["self"]["target"] or settings.blinking["all"]["target"]) and (get_player().target_index == get_player().index)) then
+		if do_blink_logic("self_special") then
 			if not zone_reset then
 				self_Build = true
 			end
@@ -135,20 +130,17 @@ windower.register_event('incoming chunk',function (id, data)
 			
 			character = get_mob_by_id(parsed_pc["ID"])
 			
-		--[[-- Consider calling this elsewhere? Party update packet would technically work, but it won't grab the
-			-- IDs if the person is not near you when it's sent which is what is needed.]]
-			make_party_ids()
-			
 			-- Name is used to check for custom model settings, blink_type is similar but passes arguments to blink logic.
 			
 			if character then
 				if get_player().follow_index == character.index then
 					blink_type = "follow"
-				elseif table.contains(party_member_list,parsed_pc["ID"]) then
+				elseif table.contains(make_party_ids(),parsed_pc["ID"]) then
 					blink_type = "party"
 				else
 					blink_type = "others"
 				end
+				
 				if character.name == get_player().name then
 					name = "self"
 					blink_type = "self"
@@ -164,7 +156,7 @@ windower.register_event('incoming chunk',function (id, data)
 			
 			for k,v in pairs(parsed_pc) do
 				-- TODO: Readd main/sub/ranged after the model IDs are obtained.
-				if T{"Face","Race","Head","Body","Hands","Legs","Feet"}:contains(k) and v ~= 0 then
+				if T{"Face","Race","Head","Body","Hands","Legs","Feet","Main","Sub","Ranged"}:contains(k) and v ~= 0 then
 					if settings[name][k:lower()] then
 						pc[k] = Int2LE(settings[name][k:lower()],k)
 						return_packet = true
@@ -180,10 +172,13 @@ windower.register_event('incoming chunk',function (id, data)
 	
 			
 			--Begin blinking region
+			if not blink_type then
+				blink_type = "others"
+			end
 			
 			if settings.blinking["all"]["target"] or settings.blinking["all"]["always"] or settings.blinking["all"]["combat"] then
 				if character then
-					if T{16,20}:contains(parsed_pc["Mask"]) then
+					if table.contains(model_mask,parsed_pc["Mask"]) then
 						if settings.blinking["all"]["always"] then
 							pc_Build = true
 							return_packet = true
@@ -196,16 +191,17 @@ windower.register_event('incoming chunk',function (id, data)
 						end
 					end
 				end
-			elseif settings.blinking[blink_type]["target"] or settings.blinking[blink_type]["always"] then
+			end
+			if settings.blinking[blink_type]["target"] or settings.blinking[blink_type]["always"] or settings.blinking[blink_type]["combat"] then
 				if character then
-					if T{16,20}:contains(parsed_pc["Mask"]) then
-						if settings.blinking[blink_type]["always"] and do_blink_logic(blink_type,"always",parsed_pc["ID"],character.index) then
+					if table.contains(model_mask,parsed_pc["Mask"]) then
+						if settings.blinking[blink_type]["always"] and do_blink_logic("always") then
 							pc_Build = true
 							return_packet = true
-						elseif settings.blinking[blink_type]["combat"] and do_blink_logic(blink_type,"combat",parsed_pc["ID"],character.index) then
+						elseif settings.blinking[blink_type]["combat"] and do_blink_logic("combat") then
 							pc_Build = true
 							return_packet = true
-						elseif settings.blinking[blink_type]["target"] and do_blink_logic(blink_type,"target",parsed_pc["ID"],character.index) then
+						elseif settings.blinking[blink_type]["target"] and do_blink_logic("target",character.index) then
 							pc_Build = true
 							return_packet = true
 						end
@@ -525,7 +521,9 @@ windower.register_event('addon command', function (...)
 				error("Valid selections for clear are 'replace', 'self', 'others', and 'player'.")
 			end
 		elseif T{"blinking","bmn","blinkmenot"}:contains(args[1]:lower()) then
-			if args[2] and T{"self","others","party","all","follow"}:contains(args[2]:lower()) and args[3] and T{"target","always","combat","all"}:contains(args[3]:lower()) then
+			if not args[2] or args[2]:lower() == "settings" then
+				print_blink_settings("global")
+			elseif args[2] and T{"self","others","party","all","follow"}:contains(args[2]:lower()) and args[3] and T{"target","always","combat","all"}:contains(args[3]:lower()) then
 				if args[4] and T{"off","on"}:contains(args[4]:lower()) then
 					if args[4]:lower() == "on" then
 						blink_bool = true
@@ -548,8 +546,6 @@ windower.register_event('addon command', function (...)
 						print_blink_settings(args[2]:lower())
 					end
 				end
-			elseif args[2]:lower() == "settings" then
-				print_blink_settings("global")
 			else
 				error("Invalid selections for blinking.")
 			end

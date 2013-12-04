@@ -59,11 +59,14 @@ end
 
 
 function Player:add_ws_damage(ws_id, damage)
+    --[[
     if not self.ws[ws_id] then
         self.ws[ws_id] = T{}
     end
     
     self.ws[ws_id]:append(damage)
+    ]]
+    self.ws:append(damage)
     self.damage = self.damage + damage
 end
 

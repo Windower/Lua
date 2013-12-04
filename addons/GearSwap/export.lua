@@ -40,7 +40,7 @@ function export_set(options)
 				if r_items[v.id] then
 					item_list[#item_list+1] = {}
 					item_list[#item_list].name = r_items[v.id][language]
-					item_list[#item_list].slot = 'item'
+					item_list[#item_list].slot = dat_slots_map[tonumber('0x'..(r_items[v.id].slots or 0))] or 'item'
 				else
 					add_to_chat(123,'GearSwap: You possess an item that is not in the resources yet.')
 				end
@@ -48,17 +48,20 @@ function export_set(options)
 			for i = 1,80 do
 				if not item_list[i] then
 					item_list[i] = {}
-					item_list[i].name = 'empty'
-					item_list[i].slot = 'item'
+					item_list[i].name = empty
+					item_list[i].slot = dat_slots_map[tonumber('0x'..(r_items[v.id].slots or 0))] or 'item'
 				end
 			end
 		end
 	elseif all_sets then
 		-- Iterate through user_env.sets and find all the gear.
-		item_list = unpack_names('L1',user_env.sets,{})
+		item_list,exported = unpack_names('L1',user_env.sets,{},{empty=true})
+		for i,v in pairs(exported) do
+			add_to_chat(8,tostring(i))
+		end
 	else
 		-- Default to loading the currently worn gear.
-		local gear = temp_items['equipment']
+		local gear = temp_items.equipment
 		for i,v in pairs(gear) do
 			if v ~= 0 then
 				if r_items[inv[v].id] then
@@ -73,7 +76,7 @@ function export_set(options)
 		for i = 1,16 do
 			if not item_list[i] then
 				item_list[i] = {}
-				item_list[i].name = 'empty'
+				item_list[i].name = empty
 				item_list[i].slot = default_slot_map[i-1]
 			end
 		end
@@ -85,7 +88,7 @@ function export_set(options)
 	else
 		local not_empty
 		for i,v in pairs(item_list) do
-			if v.name ~= 'empty' then
+			if v.name ~= empty then
 				not_empty = true
 				break
 			end
@@ -105,7 +108,7 @@ function export_set(options)
 		local f = io.open(path..'.xml','w+')
 		f:write('<spellcast>\n  <sets>\n    <group name="exported">\n      <set name="exported">\n')
 		for i,v in ipairs(item_list) do
-			if v.name ~= 'empty' then
+			if v.name ~= empty then
 				local slot = xmlify(tostring(v.slot))
 				local name = xmlify(tostring(v.name))
 				f:write('        <'..slot..'>'..name..'</'..slot..'>\n')
@@ -121,7 +124,7 @@ function export_set(options)
 		local f = io.open(path..'.lua','w+')
 		f:write('sets.exported={\n')
 		for i,v in ipairs(item_list) do
-			if v.name ~= 'empty' then
+			if v.name ~= empty then
 				f:write('    '..v.slot..'="'..v.name..'",\n')
 			end
 		end
@@ -130,34 +133,51 @@ function export_set(options)
 	end
 end
 
-function unpack_names(up,tab_level,unpacked_table)
+function unpack_names(up,tab_level,unpacked_table,exported)
 	for i,v in pairs(tab_level) do
+		local flag,alt
 		if type(v)=='table' then
-			unpacked_table = unpack_names(i,v,unpacked_table)
+			unpacked_table,exported = unpack_names(i,v,unpacked_table,exported)
 		elseif i=='name' then
-			unpacked_table[#unpacked_table+1] = {}
-			unpacked_table[#unpacked_table].slot = up
-			unpacked_table[#unpacked_table].name = unlogify_unpacked_name(v)
-		elseif type(v) == 'string' and v~='augment' and v~= 'augments' then
-			unpacked_table[#unpacked_table+1] = {}
-			unpacked_table[#unpacked_table].slot = i
-			unpacked_table[#unpacked_table].name = unlogify_unpacked_name(v)
+			alt = up
+			flag = true
+		elseif type(v) == 'string' and v~='augment' and v~= 'augments' and v~= 'order' then
+			alt = i
+			flag = true
+		end
+		if flag then
+			if not exported[v:lower()] then
+				unpacked_table[#unpacked_table+1] = {}
+				local tempname,tempslot = unlogify_unpacked_name(v)
+				unpacked_table[#unpacked_table].name = tempname
+				unpacked_table[#unpacked_table].slot = tempslot or alt
+				exported[tempname:lower()] = true
+				exported[v:lower()] = true
+			end
 		end
 	end
-	return unpacked_table
+	return unpacked_table,exported
 end
 
 function unlogify_unpacked_name(name)
+	local slot
+	name = name:lower()
 	for i,v in pairs(r_items) do
 		if type(v) == 'table' then
 			if not v[language..'_log'] then
 				add_to_chat(8,'v = '..tostring(v.english))
-			elseif v[language..'_log']:lower() == name:lower() then
-				return v[language]
+			elseif v[language..'_log']:lower() == name then
+				name = v[language]
+				slot = dat_slots_map[tonumber('0x'..(v.slots or 0))] or 'item'
+				break
+			elseif v[language]:lower() == name then
+				name = v[language]
+				slot = dat_slots_map[tonumber('0x'..(v.slots or 0))] or 'item'
+				break
 			end
 		end
 	end
-	return name
+	return name,slot
 end
 
 function xmlify(phrase)

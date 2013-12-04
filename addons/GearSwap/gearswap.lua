@@ -27,7 +27,6 @@
 
 language = 'english'
 file = require 'filehelper'
-require 'sets'
 require 'stringhelper'
 require 'helper_functions'
 require 'tablehelper'
@@ -39,15 +38,16 @@ require 'user_functions'
 require 'refresh'
 require 'parse_augments'
 require 'export'
+require 'validate'
 
 
 _addon.name = 'GearSwap'
-_addon.version = '0.713'
+_addon.version = '0.719'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
 windower.register_event('load',function()
-	debugging = 1
+	debugging = 0
 	if debugging >= 1 then windower.debug('load') end
 	if dir_exists('../addons/GearSwap/data/logs') then
 		logging = false
@@ -84,7 +84,9 @@ windower.register_event('addon command',function (...)
 		if gearswap_disabled then return end
 		local set_split = split(_raw.table.concat(splitup,' ',2,#splitup):gsub('%[','%.'):gsub('[%]\']',''),'%.')
 		local n = 1
-		local tempset = user_env.sets
+		local tempset
+		if set_split[1] == 'sets' then tempset = user_env
+		else tempset = user_env.sets end
 		while n <= #set_split do
 			if tempset[set_split[n]] or tempset[tonumber(set_split[n])] then
 				tempset = tempset[set_split[n]] or tempset[tonumber(set_split[n])]
@@ -102,6 +104,8 @@ windower.register_event('addon command',function (...)
 	elseif splitup[1]:lower() == 'export' then
 		table.remove(splitup,1)
 		export_set(splitup)
+	elseif splitup[1]:lower() == 'validate' then
+		validate()
 	elseif splitup[1]:lower() == 'enable' then
 		if splitup[2] and slot_map[splitup[2]:gsub('[^%a]',''):lower()] then
 			enable(splitup[2])
@@ -174,6 +178,14 @@ windower.register_event('outgoing text',function(original,modified)
 		if command_list[command] == 'Magic' then
 			r_line = r_spells[validabils[language][abil:lower()]['Magic']]
 			r_line.name = r_line[language]
+			if r_line.type == 'BardSong' and r_line.casttime == 8 then
+				refresh_buff_active(get_player().buffs)
+				if buffactive.pianissimo then
+				-- Handling for the casting time reduction of Pianissimo.
+				-- Note, does not work unless the buff list has been updated.
+					r_line.casttime=4
+				end
+			end
 			s_type = 'Magic' -- command_list[r_spells[validabils[language][abil:lower()]['Magic']]['prefix']]
 		elseif command_list[command] == 'Ability' then
 			r_line = r_abilities[validabils[language][abil:lower()]['Ability']]
@@ -364,6 +376,7 @@ end
 windower.register_event('zone change',function(new_zone,new_zone_id,old_zone,old_zone_id)
 	if debugging >= 1 then windower.debug('zone change') end
 	midaction = false
+	--sent_out_equip = {}
 end)
 
 windower.register_event('outgoing chunk',function(id,data)
@@ -393,7 +406,7 @@ windower.register_event('outgoing chunk',function(id,data)
 		if abil_name and not (buffactive.terror or buffactive.sleep or buffactive.stun or buffactive.petrification or buffactive.charm) then
 			midaction = true
 			send_command('@wait 1;lua i gearswap midact')
-		elseif user_env and not T{0,2,4,13,14,15,18,20}:contains(category) then -- 0 = interacting with an NPC, 2 = engaging, 4 = disengaging from menu, 12= Unclear?, 13 = getting up from reraise, 14 = fishing, 15 = changing target, 18 = dismounting chocobo, 20 = zoning
+		elseif user_env and not T{0,2,4,11,13,14,15,18,20}:contains(category) then -- 0 = interacting with an NPC, 2 = engaging, 4 = disengaging from menu, 11 = Homepointing, 12= Unclear?, 13 = getting up from reraise, 14 = fishing, 15 = changing target, 18 = dismounting chocobo, 20 = zoning
 			if not T{3,7,9,16}:contains(category) then add_to_chat(8,'Tell Byrth how you triggered this and this number: '..category) end
 			if type(user_env.aftercast) == 'function' then
 				equip_sets('aftercast',{name='Interrupt',type='Interrupt'},{type='Recast'})
@@ -589,6 +602,7 @@ function get_spell(act)
 		if not dialog[msg_ID] then
 			if T{4,8}:contains(act['category']) then
 				spell = r_spells[abil_ID]
+				if act.category == 4 then spell.recast = act.recast end
 			elseif T{3,6,7,13,14,15}:contains(act['category']) then
 				spell = r_abilities[abil_ID] -- May have to correct for charmed pets some day, but I'm not sure there are any monsters with TP moves that give no message.
 			elseif T{5,9}:contains(act['category']) then
@@ -602,8 +616,10 @@ function get_spell(act)
 		
 		local fields = fieldsearch(dialog[msg_ID][language])
 		
+		add_to_chat(8,spell.recast)
 		if table.contains(fields,'spell') then
 			spell = r_spells[abil_ID]
+			if act.category == 4 then spell.recast = act.recast end
 		elseif table.contains(fields,'ability') then
 			spell = r_abilities[abil_ID]
 		elseif table.contains(fields,'weapon_skill') then
@@ -633,6 +649,10 @@ function get_spell(act)
 		else
 			spell = aftercast_cost(spell)
 		end
+	end
+	
+	if spell.type == 'BardSong' and spell.casttime == 8 and buffactive.pianissimo then -- Handling for the casting time reduction of Pianissimo
+		spell.casttime=4
 	end
 	
 	spell.name = spell[language]

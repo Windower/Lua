@@ -1,58 +1,72 @@
 function get_sets()
 	TP_Index = 1
 	Idle_Index = 1
-	sets = {}
-	
+
 	sets.weapons = {}
 	sets.weapons[1] = {main="Izhiikoh"}
-	sets.weapons[2]={main="Aphotic Kukri"}
+	sets.weapons[2]={main="Twashtar"}
 	sets.weapons[3]={main="Thief's Knife"}
 	
-	sets.JA_Conspirator = {body="Raider's Vest +2"}
-	sets.JA_Accomplice = {head="Raider's Bonnet +2"}
-	sets.JA_Collaborator = {head="Raider's Bonnet +2"}
-	sets.JA_Steal = {head="Assassin's Bonnet +2",neck="Rabbit Charm",hands="Thief's Kote",
-		waist="Key Ring Belt",legs="Assassin's Culottes",feet="Rogue's Poulaines"}
-	sets.JA_Flee = {feet="Rogue's Poulaines"}
-	sets.JA_Despoil = {legs="Raider's Culottes +2",feet="Raider's Poulaines +2"}
-	sets.JA_Mug = {head="Assassin's Bonnet +2"}
+	sets.JA = {}
+	sets.JA.Conspirator = {body="Raider's Vest +2"}
+	sets.JA.Accomplice = {head="Raider's Bonnet +2"}
+	sets.JA.Collaborator = {head="Raider's Bonnet +2"}
+	sets.JA['Perfect Dodge'] = {hands="Assassin's Armlets +2"}
+	sets.JA.Steal = {head="Assassin's Bonnet +2",neck="Rabbit Charm",hands="Thief's Kote",
+		waist="Key Ring Belt",legs="Assassin's Culottes",feet="Pillager's Poulaines"}
+	sets.JA.Flee = {feet="Pillager's Poulaines"}
+	sets.JA.Despoil = {legs="Raider's Culottes +2",feet="Raider's Poulaines +2"}
+	sets.JA.Mug = {head="Assassin's Bonnet +2"}
 	sets['precast_Perfect Dodge'] = {hands="Assassin's Armlets +2"}
-	sets.JA_Waltz = {head="Anwig Salade",neck="Dualism Collar",ring1="Valseur's Ring",ring2="Veela Ring",
+	sets.JA_Waltz = {head="Anwig Salade",neck="Dualism Collar",body="Iuitl Vest",hands="Buremte Gloves",ring1="Valseur's Ring",ring2="Veela Ring",
 		waist="Aristo Belt",legs="Desultor Tassets",feet="Dance Shoes"}
-
-	sets.WS_Evisceration = {head="Uk'uxkaj Cap",neck="Nefarious Collar",ear1="Moonshade Earring",ear2="Brutal Earring",
-		body="Manibozho Jerkin",hands="Iuitl Wristbands",ring1="Rajas Ring",ring2="Thundersoul Ring",
+	
+	sets.WS = {}
+	sets.WS.SA = {}
+	sets.WS.TA = {}
+	sets.WS.SATA = {}
+	
+	sets.WS.Evisceration = {head="Uk'uxkaj Cap",neck="Nefarious Collar",ear1="Moonshade Earring",ear2="Brutal Earring",
+		body="Manibozho Jerkin",hands="Pillager's Armlets",ring1="Rajas Ring",ring2="Thundersoul Ring",
 		back="Rancorous Mantle",waist="Wanion Belt",legs="Manibozho Brais",feet="Manibozho Boots"}
-
-	sets.WS_Exenterator = {head="Uk'uxkaj Cap",neck="Houyi's Gorget",ear1="Steelflash Earring",ear2="Bladeborn Earring",
-		body="Manibozho Jerkin",hands="Iuitl Wristbands",ring1="Stormsoul Ring",ring2="Epona's Ring",
-		back="Atheling Mantle",waist="Windbuffet Belt",legs="Nahtirah Trousers",feet="Manibozho Boots"}
-
-	sets.WS_TA_Exenterator = {head="Uk'uxkaj Cap",neck="Houyi's Gorget",ear1="Steelflash Earring",ear2="Bladeborn Earring",
-		body="Manibozho Jerkin",hands="Rogue's Armlets +1",ring1="Stormsoul Ring",ring2="Epona's Ring",
-		back="Atheling Mantle",waist="Windbuffet Belt",legs="Nahtirah Trousers",feet="Manibozho Boots"}
 		
-	sets.WS_SA_TA_Exenterator = sets.WS_TA_Exenterator
+	sets.WS.SA.Evisceration = set_combine(sets.WS.Evisceration,{hands="Raider's Armlets +2"})
+
+	sets.WS["Rudra's Storm"] = {head="Whirlpool Mask",neck="Love Torque",ear1="Moonshade Earring",ear2="Brutal Earring",
+		body="Manibozho Jerkin",hands="Iuitl Wristbands",ring1="Rajas Ring",ring2="Thundersoul Ring",
+		back="Atheling Mantle",waist="Wanion Belt",legs="Manibozho Brais",feet="Iuitl Gaiters"}
+		
+	sets.WS.SA["Rudra's Storm"] = set_combine(sets.WS["Rudra's Storm"],{hands="Raider's Armlets +2"})
+
+	sets.WS.Exenterator = {head="Uk'uxkaj Cap",neck="Houyi's Gorget",ear1="Steelflash Earring",ear2="Bladeborn Earring",
+		body="Manibozho Jerkin",hands="Iuitl Wristbands",ring1="Stormsoul Ring",ring2="Epona's Ring",
+		back="Atheling Mantle",waist="Windbuffet Belt",legs="Nahtirah Trousers",feet="Iuitl Gaiters"}
+
+	sets.WS.TA.Exenterator = {head="Uk'uxkaj Cap",neck="Houyi's Gorget",ear1="Steelflash Earring",ear2="Bladeborn Earring",
+		body="Manibozho Jerkin",hands="Pillager's Armlets",ring1="Stormsoul Ring",ring2="Epona's Ring",
+		back="Atheling Mantle",waist="Windbuffet Belt",legs="Nahtirah Trousers",feet="Iuitl Gaiters"}
+		
+	sets.WS.SATA.Exenterator = sets.WS.TA.Exenterator
 	
 	TP_Set_Names = {"Low Man","Delay Cap","Evasion","TH"}
 	sets.TP = {}
-	sets.TP['Low Man'] = {ranged="Raider's Boomerang",head="Uk'uxkaj Cap",neck="Nefarious Collar",
+	sets.TP['Low Man'] = {range="Raider's Bmrng.",head="Uk'uxkaj Cap",neck="Nefarious Collar",
 		ear1="Suppanomimi",ear2="Brutal Earring",body="Thaumas Coat",hands="Iuitl Wristbands",
 		ring1="Rajas Ring",ring2="Epona's Ring",back="Atheling Mantle",waist="Patentia Sash",
 		legs="Manibozho Brais",feet="Manibozho Boots"}
 		
-	sets.TP['TH'] = {ranged="Raider's Boomerang",head="Uk'uxkaj Cap",neck="Asperity Necklace",
+	sets.TP['TH'] = {range="Raider's Bmrng.",head="Ejekamal Mask",neck="Asperity Necklace",
 		ear1="Suppanomimi",ear2="Brutal Earring",body="Thaumas Coat",hands="Assassin's Armlets +2",
-		ring1="Rajas Ring",ring2="Epona's Ring",back="Rancorous Mantle",waist="Patentia Sash",
+		ring1="Rajas Ring",ring2="Epona's Ring",back="Atheling Mantle",waist="Patentia Sash",
 		legs="Manibozho Brais",feet="Raider's Poulaines +2"}
 		
-	sets.TP['Delay Cap'] = {ammo="Potestas Bomblet",head="Uk'uxkaj Cap",neck="Asperity Necklace",
+	sets.TP['Delay Cap'] = {ammo="Potestas Bomblet",head="Iuitl Headgear",neck="Asperity Necklace",
 		ear1="Steelflash Earring",ear2="Bladeborn Earring",body="Thaumas Coat",hands="Iuitl Wristbands",
 		ring1="Rajas Ring",ring2="Epona's Ring",back="Rancorous Mantle",waist="Windbuffet Belt",
 		legs="Manibozho Brais",feet="Manibozho Boots"}
 		
 	sets.TP.Evasion = {ranged="Aliyat Chakram",head="Uk'uxkaj Cap",neck="Torero Torque",
-		ear1="Novia Earring",ear2="Musical Earring",body="Skadi's Cuirie +1",hands="Iuitl Wristbands",
+		ear1="Novia Earring",ear2="Phawaylla Earring",body="Manibozho Jerkin",hands="Iuitl Wristbands",
 		ring1="Beeline Ring",ring2="Epona's Ring",back="Boxer's Mantle",waist="Scouter's Rope",
 		legs="Manibozho Brais",feet="Manibozho Boots"}
 	
@@ -63,24 +77,21 @@ function get_sets()
 		back="Atheling Mantle",waist="Scouter's Rope",legs="Iuitl Tights",feet="Skadi's Jambeaux +1"}
 				
 	sets.Idle.MDT = {head="Uk'uxkaj Cap",neck="Twilight Torque",ear1="Merman's Earring",ear2="Bladeborn Earring",
-		body="Avalon Breastplate",hands="Iuitl Wristbands",ring1="Dark Ring",ring2="Dark Ring",
+		body="Avalon Breastplate",hands="Iuitl Wristbands",ring1="Defending Ring",ring2="Dark Ring",
 		back="Mollusca Mantle",waist="Wanion Belt",legs="Nahtirah Trousers",feet="Skadi's Jambeaux +1"}
+	send_command('input /macro book 12;wait .1;input /macro set 1')
 	
 end
 
 function precast(spell,action)
 	verify_equip()
-	if sets['precast_'..spell.english] then
-		equip(sets['JA_'..spell.english])
+	if sets.JA[spell.english] then
+		equip(sets.JA[spell.english])
 	elseif spell.type=="WeaponSkill" then
-		local satavar = ''
-		if buffactive['sneak attack'] then satavar = satavar..'SA_' end
-		if buffactive['trick attack'] then satavar = satavar..'TA_' end
-		if sets['WS_'..satavar..spell.english] then
-			equip(sets['WS_'..satavar..spell.english])
-		elseif sets['WS_'..spell.english] then
-			equip(sets['WS_'..spell.english])
-		end
+		if sets.WS[spell.english] then equip(sets.WS[spell.english]) end
+		if buffactive['sneak attack'] and buffactive['trick attack'] and sets.WS.SATA[spell.english] then equip(sets.WS.SATA[spell.english])
+		elseif buffactive['sneak attack'] and sets.WS.SA[spell.english] then equip(sets.WS.SA[spell.english])
+		elseif buffactive['trick attack'] and sets.WS.TA[spell.english] then equip(sets.WS.TA[spell.english]) end
 	elseif string.find(spell.english,'Waltz') then
 		equip(sets['JA_Waltz'])
 	end

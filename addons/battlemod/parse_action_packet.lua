@@ -132,10 +132,12 @@ function parse_action_packet(act)
 				elseif m.message == 577 then m.simp_name = 'RA struck true'
 				elseif m.message == 157 then m.simp_name = 'Barrage'
 				elseif m.message == 77 then m.simp_name = 'Sange'
+				elseif m.message == 360 then m.simp_name = act.action.name..' (JA reset)'
 				elseif m.message == 426 or m.message == 427 then m.simp_name = 'Bust! '..act.action.name
 				elseif m.message == 435 or m.message == 436 then m.simp_name = act.action.name..' (JAs)'
 				elseif m.message == 437 or m.message == 438 then m.simp_name = act.action.name..' (JAs and TP)'
 				elseif m.message == 439 or m.message == 440 then m.simp_name = act.action.name..' (SPs, JAs, TP, and MP)'
+				elseif T{252,265,268,269,271,272,274,275}:contains(m.message) then m.simp_name = 'Magic Burst! '..act.action.name
 				else m.simp_name = act.action.name or ''
 				end
 				local msg,numb = simplify_message(m.message)
@@ -225,7 +227,7 @@ function simplify_message(msg_ID)
 	if line_full and (fields.number or fields.status) then -- and (fields.spell or fields.ability or fields.item or fields.weapon_skill) then -- and fields.number or 
 --		T{1,31,67,163,229,352,353,373,576,577}:contains(msg_ID)) then
 		msg = line_full
-	elseif line_nonumber and not (fields.number or fields.status) and (fields.spell or fields.ability or fields.item or fields.weapon_skill) then
+	elseif line_nonumber and not (fields.number or fields.status) then -- and (fields.spell or fields.ability or fields.item or fields.weapon_skill)
 --		T{15,30,32,106,282,354}) then
 		msg = line_nonumber
 --	elseif line_noactor and (fields.spell or fields.ability or fields.item or fields.weapon_skill) and fields.number then
