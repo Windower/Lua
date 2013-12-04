@@ -41,54 +41,12 @@ local function add_name(t)
     return t
 end
 
--- Returns the jobs, indexed by ingame ID.
-function fns.jobs()
-    resources.jobs = T(require(addon_resources..'jobs')):map(add_name)
-end
-
--- Returns the races, indexed by ingame ID.
-function fns.races()
-    resources.races = T(require(addon_resources..'races')):map(add_name)
-end
-
--- Returns the weather, indexed by ingame ID.
-function fns.weather()
-    resources.weather = T(require(addon_resources..'weather')):map(add_name)
-end
-
--- Returns the servers, indexed by ingame ID.
-function fns.servers()
-    resources.servers = T(require(addon_resources..'servers')):map(add_name)
-end
-
--- Returns the chat, indexed by ingame ID.
-function fns.chat()
-    resources.chat = T(require(addon_resources..'chat')):map(add_name)
-end
-
--- Returns the bags, indexed by ingame ID.
-function fns.bags()
-    resources.bags = T(require(addon_resources..'bags')):map(add_name)
-end
-
--- Returns the slots, indexed by ingame ID.
-function fns.slots()
-    resources.slots = T(require(addon_resources..'slots')):map(add_name)
-end
-
--- Returns the emotes, indexed by ingame ID.
-function fns.emotes()
-    resources.emotes = T(require(addon_resources..'emotes')):map(add_name)
-end
-
--- Returns the skills, indexed by ingame ID.
-function fns.skills()
-    resources.skills = T(require(addon_resources..'skills')):map(add_name)
-end
-
--- Returns the titles, indexed by ingame ID.
-function fns.titles()
-    resources.titles = T(require(addon_resources..'titles')):map(add_name)
+-- Add resources from files
+local res_names = S{'jobs', 'races', 'weather', 'servers', 'chat', 'bags', 'slots', 'statuses', 'emotes', 'skills', 'titles'}
+for res_name in res_names:it() do
+    fns[res_name] = function()
+        resources[res_name] = T(require(addon_resources..res_name)):map(add_name)
+    end
 end
 
 -- Returns the abilities, indexed by ingame ID.
