@@ -58,7 +58,7 @@ function files.exists(f)
         path = f.path
     end
 
-    return file_exists(lua_base_path..path)
+    return windower.file_exists(lua_base_path..path)
 end
 
 -- Checks existance of a number of paths, returns the first that exists.
@@ -92,7 +92,7 @@ function files.read(f)
     end
 
     local fh = io.open(lua_base_path..path, 'r')
-    content = fh:read('*all*')
+    local content = fh:read('*all*')
     fh:close()
 
     -- Remove byte order mark for UTF-8, if present
@@ -124,7 +124,7 @@ function files.create_path(f)
     for dir in path:psplit('[/\\]'):filter(-''):it() do
         new_path = new_path..'/'..dir
 
-        if not dir_exists(new_path) then
+        if not windower.dir_exists(new_path) then
             local res, err = create_dir(new_path)
             if not res then
                 if err ~= nil then

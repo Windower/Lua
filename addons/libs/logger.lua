@@ -61,7 +61,7 @@ function captionlog(msg, msgcolor, ...)
     end
 
     for _, line in ipairs(str:split('\n')) do
-        add_to_chat(logger.settings.logcolor, caption..line..chat.colorcontrols.reset)
+        windower.add_to_chat(logger.settings.logcolor, caption..line..chat.colorcontrols.reset)
     end
 end
 
