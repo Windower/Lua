@@ -32,13 +32,13 @@ _addon.version = '1.33'
 _addon.author = 'Ragnarok.Ikonic'
 _addon.commands = {'ChatPorter','cp'}
 
-require 'tablehelper'
-require 'stringhelper'
-require 'colors'
-local config = require 'config'
-require 'logger'
+require('tablehelper')
+require('stringhelper')
+require('chat')
+config = require('config')
+require('logger')
 
-local defaults = T{}
+defaults = T{}
 defaults.usechatporter = true
 
 defaults.linkshell = T{}
@@ -97,7 +97,7 @@ defaults.ffochat.fontsize = 4
 defaults.ffochat.x = 380
 defaults.ffochat.y = 300
 
-settings = T{}
+settings = config.load(defaults)
 
 showlinkshell = T{}
 showparty = T{}
@@ -114,7 +114,6 @@ playerResolution.x = get_windower_settings().x_res
 playerResolution.y = get_windower_settings().y_res
 
 windower.register_event('load',function ()
-	settings = config.load(defaults)
 	tb_create("showlinkshell")
 	tb_create("showparty")
 	tb_create("showtell")
