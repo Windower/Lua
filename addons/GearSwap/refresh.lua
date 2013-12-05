@@ -87,7 +87,7 @@ function load_user_files()
 		tostring = tostring, tonumber = tonumber, pairs = pairs,
 		ipairs = ipairs, write=write, add_to_chat=add_to_chat,
 		send_command=send_cmd_user,windower=user_windower,
-		include=include_user,next=next,windower.addon_path=windower.addon_path,empty=empty,
+		include=include_user,next=next,lua_base_path=windower.addon_path,empty=empty,
 		
 		-- Player environment things
 		buffactive=buffactive,
