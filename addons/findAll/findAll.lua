@@ -1,5 +1,5 @@
 --[[
-findAll v1.20131008
+findAll v1.20131120
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -28,15 +28,15 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
+_addon = {}
+_addon.name     = 'findAll'
+_addon.version  = '1.20131120'
+_addon.commands = 'findAll'
+
 require 'chat'
 require 'lists'
 require 'logger'
 require 'sets'
-
-_addon = {}
-_addon.name     = 'findAll'
-_addon.version  = '1.20131008'
-_addon.commands = 'findAll'
 
 json  = require 'json'
 file  = require 'filehelper'
@@ -67,18 +67,24 @@ function search(query, export)
         return
     end
 
-    local character_filters = S{}
+    local character_set = S{}
+    local character_filter = S{}
     local terms            = ''
 
     for _, query_element in ipairs(query) do
-        if query_element:find('^:%a+$') then
-            character_filters:add(query_element:match('^:(%a+)$'):lower():gsub("^%l", string.upper))
+        local char = query_element:match('^([:!]%a+)$')
+        if char then
+            if char:sub(1, 1) == '!' then
+                character_filter:add(char:sub(2):lower():gsub("^%l", string.upper))
+            else
+                character_set:add(char:sub(2):lower():gsub("^%l", string.upper))
+            end
         else
-            terms = query_element
+            terms = terms..query_element
         end
     end
 
-    if character_filters:length() == 0 and terms == '' then
+    if character_set:length() == 0 and terms == '' then
         return
     end
 
@@ -170,7 +176,7 @@ function search(query, export)
     end
 
     for _, character_name in ipairs(sorted_names) do
-        if character_filters:length() == 0 or character_filters:length() > 0 and character_filters:contains(character_name) then
+        if (character_set:length() == 0 or character_set:contains(character_name)) and not character_filter:contains(character_name) then
             local storages = global_storages[character_name]
 
             for _, storage_name in ipairs(merged_storages_orders) do
@@ -218,7 +224,7 @@ function search(query, export)
 
     if no_results then
         if terms ~= '' then
-            if character_filters:length() == 0 then
+            if character_set:length() == 0 and character_filter:length() == 0 then
                 log('You have no items that match \''..terms..'\'.')
             else
                 log('You have no items that match \''..terms..'\' on the specified characters.')
@@ -362,7 +368,7 @@ function event_addon_command(...)
     local query  = L{}
     local export = nil
 
-    while params:length() > 0 and params[1]:match('^:%a+$') do
+    while params:length() > 0 and params[1]:match('^[:!]%a+$') do
         query:append(params:remove(1))
     end
 
