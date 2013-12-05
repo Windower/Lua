@@ -90,8 +90,8 @@ windower.register_event('incoming chunk',function (id, data)
 				if settings.self[k:lower()] then
 					self[k] = Int2LE(settings.self[k:lower()],k)
 					return_packet = true
-				elseif table.containskey(settings.replacements[k:lower()],v) then
-					self[k] = Int2LE(settings.replacements[k:lower()][v],k)
+				elseif table.containskey(settings.replacements[k:lower()],tostring(v)) then
+					self[k] = Int2LE(settings.replacements[k:lower()][tostring(v)],k)
 					return_packet = true
 				end
 			end
@@ -128,12 +128,12 @@ windower.register_event('incoming chunk',function (id, data)
 			pc["Ranged"] = string.sub(data,85,86)
 			pc["End"] =    string.sub(data,87)		
 			
-			character = get_mob_by_id(parsed_pc["ID"])
+			character = windower.ffxi.get_mob_by_id(parsed_pc["ID"])
 			
 			-- Name is used to check for custom model settings, blink_type is similar but passes arguments to blink logic.
 			
 			if character then
-				if get_player().follow_index == character.index then
+				if windower.ffxi.get_player().follow_index == character.index then
 					blink_type = "follow"
 				elseif table.contains(make_party_ids(),parsed_pc["ID"]) then
 					blink_type = "party"
@@ -141,7 +141,7 @@ windower.register_event('incoming chunk',function (id, data)
 					blink_type = "others"
 				end
 				
-				if character.name == get_player().name then
+				if character.name == windower.ffxi.get_player().name then
 					name = "self"
 					blink_type = "self"
 				elseif settings[character.name:lower()] then
@@ -160,8 +160,8 @@ windower.register_event('incoming chunk',function (id, data)
 					if settings[name][k:lower()] then
 						pc[k] = Int2LE(settings[name][k:lower()],k)
 						return_packet = true
-					elseif table.containskey(settings.replacements[k:lower()],v) then
-						pc[k] = Int2LE(settings.replacements[k:lower()][v],k)
+					elseif table.containskey(settings.replacements[k:lower()],tostring(v)) then
+						pc[k] = Int2LE(settings.replacements[k:lower()][tostring(v)],k)
 						return_packet = true
 					end
 				end
@@ -182,10 +182,10 @@ windower.register_event('incoming chunk',function (id, data)
 						if settings.blinking["all"]["always"] then
 							pc_Build = true
 							return_packet = true
-						elseif settings.blinking["all"]["combat"] and get_player().in_combat then
+						elseif settings.blinking["all"]["combat"] and windower.ffxi.get_player().in_combat then
 							pc_Build = true
 							return_packet = true
-						elseif settings.blinking["all"]["target"] and get_player().target_index == character.index then
+						elseif settings.blinking["all"]["target"] and windower.ffxi.get_player().target_index == character.index then
 							pc_Build = true
 							return_packet = true
 						end
