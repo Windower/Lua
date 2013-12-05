@@ -34,7 +34,7 @@ local ffxi = require 'ffxi'
 
 local config = require 'config'
 
-_addon = {}
+
 _addon.name = 'gametime'
 _addon.version = '0.52'
 _addon.commands = {'gametime','gt'}
@@ -240,9 +240,9 @@ function initialize()
 	end
 	
 	gt.mode = settings.mode
-	time_change(get_ffxi_info()["time"])
-	day_change(get_ffxi_info()["day"])
-	moon_pct_change(get_ffxi_info()["moon_pct"])
+	time_change(windower.ffxi.get_info()["time"])
+	day_change(windower.ffxi.get_info()["day"])
+	moon_pct_change(windower.ffxi.get_info()["moon_pct"])
 end
 
 function destroy()
@@ -306,7 +306,7 @@ function default_settings()
 end
 
 function time_change(old, new)
-	gt.basetime = get_ffxi_info()["time"]
+	gt.basetime = windower.ffxi.get_info()["time"]
 	gt.basetime = gt.basetime * 100
 	gt.basetime = math.round(gt.basetime)
 	gt.basetime = tostring(gt.basetime):zfill(4)
@@ -363,7 +363,7 @@ function day_change(day)
 	gt.WeekReport = daystring
 	tb_set_color(gt.gtd,settings.days.alpha,255,255,255)
 	tb_set_text(gt.gtd,' \\cs'..gt.days[1][10]..gt.MoonPhase..' ('..gt.MoonPct..'%);'..gt.WeekReport)
-	moon_change(get_ffxi_info()["moon"])
+	moon_change(windower.ffxi.get_info()["moon"])
 end
 windower.register_event('day change',day_change)
 
@@ -531,7 +531,7 @@ windower.register_event('addon command',function (...)
 			gt.delimiter = " "
 		log('Week display axis set to horizontal.')
 		end
-		day_change(get_ffxi_info()["day"])
+		day_change(windower.ffxi.get_info()["day"])
 	elseif args[1] == 'mode' then
 		inmode = tostring(args[2]):zfill(1)
 		inmode = inmode+0
@@ -541,7 +541,7 @@ windower.register_event('addon command',function (...)
 			settings.mode = inmode
 			log('mode updated')
 		end
-		day_change(get_ffxi_info()["day"])
+		day_change(windower.ffxi.get_info()["day"])
 	elseif args[1] == 'save' then
 		settings:save('all')
 		log('Settings saved.')

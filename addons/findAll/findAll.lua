@@ -106,7 +106,7 @@ function search(query, export)
 
     if new_item_ids:length() > 0 then
         for kind, resource_path in pairs(resources) do
-            resource = io.open(lua_base_path..resource_path, 'r')
+            resource = io.open(windower.addon_path..resource_path, 'r')
 
             if resource ~= nil then
                 while true do
@@ -160,7 +160,7 @@ function search(query, export)
     local sorted_names = global_storages:keyset():sort()
                                                  :reverse()
 
-    if windower.get_ffxi_info().logged_in then
+    if windower.ffxi.get_info().logged_in then
         sorted_names = sorted_names:append(sorted_names:remove(sorted_names:find(windower.ffxi.get_player().name)))
                                :reverse()
     end
@@ -168,7 +168,7 @@ function search(query, export)
     local export_file
 
     if export ~= nil then
-        export_file = io.open(lua_base_path..'data/'..export, 'w')
+        export_file = io.open(windower.addon_path..'data/'..export, 'w')
 
         if export_file == nil then
             error('The file "'..export..'" cannot be created.')
@@ -280,7 +280,7 @@ function get_storages()
 end
 
 function update()
-    if not get_ffxi_info().logged_in then
+    if not windower.ffxi.get_info().logged_in then
         print('You have to be logged in to use this addon.')
         return false
     end
@@ -339,13 +339,13 @@ function update()
 end
 
 windower.register_event('load', function()
-    if get_ffxi_info().logged_in then
+    if windower.ffxi.get_info().logged_in then
         update()
     end
 end)
 
 windower.register_event('unload', function()
-    if get_ffxi_info().logged_in then
+    if windower.ffxi.get_info().logged_in then
         if not update() then
             error('findAll wasn\'t ready.')
         end

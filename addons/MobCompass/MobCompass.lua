@@ -26,7 +26,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-_addon = {}
+
 _addon.name = 'MobCompass'
 _addon.version = '1.0'
 _addon.commands = {'mobcompass','mc'}
@@ -42,7 +42,7 @@ local settingtab = nil
 local settings_file = 'data/settings.xml'
 
 windower.register_event('load',function ()
-	info = get_ffxi_info()
+	info = windower.ffxi.get_info()
 	player = get_player()
 
 	defaults = {}

@@ -21,7 +21,7 @@ end})
 local plugin_resources = '../../plugins/resources/'
 local addon_resources = 'resources/'
 
-local language_string = _addon and _addon.language and _addon.language:lower() or windower.get_ffxi_info().language:lower()
+local language_string = _addon and _addon.language and _addon.language:lower() or windower.ffxi.get_info().language:lower()
 local language_string_full = language_string..'_full'
 
 local unquotes = {

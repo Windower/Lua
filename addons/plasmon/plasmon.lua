@@ -33,7 +33,7 @@ require 'logger'
 
 local config = require 'config'
 
-_addon = {}
+
 _addon.name    = 'plasmon'
 _addon.author  = 'Zohno'
 _addon.version = '1.20131021'
@@ -269,7 +269,7 @@ function initialize()
     windower.text.set_text(tb_name, '')
     windower.text.set_bg_visibility(tb_name, true)
 
-    if get_ffxi_info().zone_id == 271 then
+    if windower.ffxi.get_info().zone_id == 271 then
         recovery_mode = true
     end
 end
@@ -282,7 +282,7 @@ end
 -- windower events
 
 windower.register_event('load', function()
-    if get_ffxi_info().logged_in then
+    if windower.ffxi.get_info().logged_in then
         initialize()
     end
 end)

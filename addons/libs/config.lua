@@ -127,7 +127,7 @@ function parse(settings)
 
         local full_parsed = parsed.global
 
-        if windower.get_ffxi_info().logged_in then
+        if windower.ffxi.get_info().logged_in then
             full_parsed = full_parsed:update(parsed[windower.ffxi.get_player()['name']:lower()], true)
         end
 
@@ -144,7 +144,7 @@ function parse(settings)
 
     local full_parsed = parsed.global
 
-    if windower.get_ffxi_info().logged_in then
+    if windower.ffxi.get_info().logged_in then
         full_parsed = full_parsed:update(parsed[windower.ffxi.get_player().name:lower()], true)
     end
 
@@ -302,7 +302,7 @@ end
 -- Writes the passed config table to the spcified file name.
 -- char defaults to get_player()['name']. Set to "all" to apply to all characters.
 function config.save(t, char)
-    if char ~= 'all' and not windower.get_ffxi_info().logged_in then
+    if char ~= 'all' and not windower.ffxi.get_info().logged_in then
         return
     end
 

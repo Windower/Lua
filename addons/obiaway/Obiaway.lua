@@ -158,7 +158,7 @@ function get_all_elements()
 	elements["Dark"] = 0
 	elements["None"] = 0
 
-	info = get_ffxi_info()
+	info = windower.ffxi.get_info()
 
 	day_element = info.day_element 
 	elements[day_element] = elements[day_element] + 1

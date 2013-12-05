@@ -224,7 +224,7 @@ function lightluggage()
 		llprofile = (llprofile.."if item is "..settingtab[set][player_num]['lot'].." then lot \n")
 	end
 	
-	io.open(lua_base_path..'../../plugins/ll/salvage-'..player..'.txt',"w"):write(llprofile):close()
+	io.open(windower.addon_path..'../../plugins/ll/salvage-'..player..'.txt',"w"):write(llprofile):close()
 end
 
 function initialize()
@@ -239,7 +239,7 @@ function initialize()
 end
 
 function checkzone()
-	currentzone = get_ffxi_info()['zone']:lower()
+	currentzone = windower.ffxi.get_info()['zone']:lower()
 		if currentzone == 'silver sea remnants' or currentzone == 'zhayolm remnants' or currentzone == 'bhaflau remnants' or currentzone == 'arrapago remnants' then
 			send_command('timers c Remaining 6000 up')
 		else send_command('timers d Remaining')

@@ -26,7 +26,7 @@
 
 require 'tablehelper'
 
-_addon = {}
+
 _addon.author = 'Ihm'
 _addon.version = '0.2'
 
@@ -45,7 +45,7 @@ windower.register_event('load',function ()
 	clock_current = 0
 	loop_active = false
 	send_command('alias resetstrats lua i StratHelper reset_strats')
-	if get_ffxi_info()['logged_in'] then
+	if windower.ffxi.get_info()['logged_in'] then
 		reinit()
 	end
 end)

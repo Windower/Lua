@@ -26,7 +26,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-_addon = {}
+
 _addon.name = 'OhShi'
 _addon.version = '2.52'
 _addon.author = 'Nitrous (Shiva)'
