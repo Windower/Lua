@@ -30,7 +30,7 @@ require 'tablehelper'
 xml = require 'xml'
 
 
-_addon.version = '0.8'
+_addon.version = '0.9'
 _addon.author = 'Byrth'
 _addon.name = 'plugin_manager'
 _addon.commands = {}
@@ -76,11 +76,11 @@ windower.register_event('load',function()
 		end
 	end
 	
-	send_command(firstrun)
+	windower.send_command(firstrun)
 
-	if get_player() then
-		send_command('@wait 3;lua c plugin_manager unload')
-		send_command('@wait 6;lua c plugin_manager load')
+	if windower.ffxi.get_player() then
+		windower.send_command('@wait 3;lua c plugin_manager unload')
+		windower.send_command('@wait 6;lua c plugin_manager load')
 	end
 end)
 
@@ -140,7 +140,7 @@ function load_plugins(name)
 --	for i,v in pairs(loader_array[name].addon) do
 --		commandstr = commandstr..load_command['addon']..v..';wait 0.1;'
 --	end
-	send_command(commandstr)
+	windower.send_command(commandstr)
 end
 
 function unload_plugins(name)
@@ -152,22 +152,22 @@ function unload_plugins(name)
 			end
 		end
 	end
-	send_command(commandstr)
+	windower.send_command(commandstr)
 end
 
 windower.register_event('login',function(name)
-	send_command('@wait 3;lua c plugin_manager load '..name)
+	windower.send_command('@wait 3;lua c plugin_manager load '..name)
 end)
 
 windower.register_event('logout',function(name)
-	send_command('@lua c plugin_manager unload '..name)
+	windower.send_command('@lua c plugin_manager unload '..name)
 end)
 
 function make_name(name)
 	if name then
 		name = name:lower()
 	elseif get_player() then
-		name = get_player().name:lower()
+		name = windower.get_player().name:lower()
 	end
 	
 	if name == nil or name == '' or not loader_array[name] then
