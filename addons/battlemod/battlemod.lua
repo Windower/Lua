@@ -136,8 +136,8 @@ function flip_block_cannot()
 end
 
 function options_load()
-	if get_player() then
-		Self = get_player()
+	if windower.ffxi.get_player() then
+		Self = windower.ffxi.get_player()
 	end
 	if not dir_exists(windower.addon_path..'data\\') then
 		create_dir(windower.addon_path..'data\\')
@@ -166,11 +166,11 @@ function options_load()
 		filterFile:write(default_filters)
 		write('Default filters xml file created')
 	end
-	local tempplayer = get_player()
+	local tempplayer = windower.ffxi.get_player()
 	if tempplayer then
 		if tempplayer.main_job ~= 'NONE' then
 			filterload(tempplayer.main_job)
-		elseif get_mob_by_id(tempplayer.id)['race'] == 0 then
+		elseif windower.ffxi.get_mob_by_id(tempplayer.id)['race'] == 0 then
 			filterload('MON')
 		else
 			filterload('DEFAULT')
@@ -454,7 +454,7 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 
 ------------ SYNTHESIS ANIMATION --------------
 	elseif id == 0x030 then
-		if get_player().id == (data:byte(3,3)*256*256 + data:byte(2,2)*256 + data:byte(1,1)) then
+		if windower.ffxi.get_player().id == (data:byte(3,3)*256*256 + data:byte(2,2)*256 + data:byte(1,1)) then
 			result = data:byte(9,9)
 			if result == 0 then
 				add_to_chat(8,' ------------- NQ Synthesis -------------')

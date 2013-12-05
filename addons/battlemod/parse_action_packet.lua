@@ -274,7 +274,7 @@ function make_condensedamage_number(number)
 end
 
 function player_info(id)
-	local player_table = get_mob_by_id(id)
+	local player_table = windower.ffxi.get_mob_by_id(id)
 	local typ,owner,filter
 	
 	if player_table == nil then
@@ -286,7 +286,7 @@ function player_info(id)
 			typ = 'other_pets'
 			filter = 'other_pets'
 			owner = 'other'
-			for i,v in pairs(get_party()) do
+			for i,v in pairs(windower.ffxi.get_party()) do
 				if v.mob and v.mob.pet_index and v.mob.pet_index == player_table.index then
 					if i == 'p0' then
 						typ = 'my_pet'
@@ -299,7 +299,7 @@ function player_info(id)
 		else
 			typ = 'mob'
 			filter = 'monsters'
-			for i,v in pairs(get_party()) do
+			for i,v in pairs(windower.ffxi.get_party()) do
 				if nf(v.mob,'id') == player_table.claim_id and filter.enemies then
 					filter = 'enemies'
 				end
@@ -308,7 +308,7 @@ function player_info(id)
 	else
 		typ = 'other'
 		filter = 'others'
-		for i,v in pairs(get_party()) do
+		for i,v in pairs(windower.ffxi.get_party()) do
 			if v.mob and v.mob.id == player_table.id then
 				typ = i
 				if i == 'p0' then
