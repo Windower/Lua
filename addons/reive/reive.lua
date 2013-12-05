@@ -34,7 +34,7 @@ require 'stringhelper'
 
 local config = require 'config'
 
-_addon = {}
+
 _addon.name    = 'reive'
 _addon.author  = 'Zohno'
 _addon.version = '1.20131021'

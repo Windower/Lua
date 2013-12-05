@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 require 'chat'
 
-_addon = {}
+
 _addon.name    = 'vwhl'
 _addon.author  = 'Zohno'
 _addon.version = '1.20131102'

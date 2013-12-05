@@ -4,7 +4,7 @@ require 'mathhelper'
 
 windower.register_event('load',function()
 	indyarr = {'00','10','20','30','40','50','60','70','80','90','A0','B0','C0','D0','E0','F0','G0','H0','I0','J0','K0'}
-	f = io.open(lua_base_path..'data/'..tostring(os.clock())..'.log','w+')
+	f = io.open(windower.addon_path..'data/'..tostring(os.clock())..'.log','w+')
 	write(tostring(f))
 	incoming = packets.data.incoming
 	outgoing = packets.data.outgoing

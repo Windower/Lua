@@ -1,4 +1,4 @@
-_addon = {}
+
 _addon.name = 'Distance'
 _addon.author = 'Windower'
 _addon.version = '1.0.0.0'

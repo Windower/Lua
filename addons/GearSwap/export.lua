@@ -28,8 +28,8 @@ function export_set(options)
 	end
 	add_to_chat(123,buildmsg)
 	
-	if not windower.dir_exists(lua_base_path..'data/export') then
-		windower.create_dir(lua_base_path..'data/export')
+	if not windower.dir_exists(windower.addon_path..'data/export') then
+		windower.create_dir(windower.addon_path..'data/export')
 	end
 	
 	local inv = temp_items.inventory
@@ -99,7 +99,7 @@ function export_set(options)
 		end
 	end
 	
-	local path = lua_base_path..'data/export/'..player.name..os.date(' %H %M %S%p  %y-%d-%m')
+	local path = windower.addon_path..'data/export/'..player.name..os.date(' %H %M %S%p  %y-%d-%m')
 	if xml then
 		-- Export in .xml
 		if windower.file_exists(path..'.xml') then

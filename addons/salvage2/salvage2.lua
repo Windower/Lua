@@ -124,7 +124,7 @@ windower.register_event('zone change',function (from_id, from, to_id, to)
 end)
 	
 function checkzone()
-	currentzone = get_ffxi_info()['zone']:lower()
+	currentzone = windower.ffxi.get_info()['zone']:lower()
 	if currentzone == 'silver sea remnants' or currentzone == 'zhayolm remnants' or currentzone == 'bhaflau remnants' or currentzone == 'arrapago remnants' then
 		send_command('timers c Remaining 6000 up')
 		settings_create()

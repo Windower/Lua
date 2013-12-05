@@ -139,11 +139,11 @@ function options_load()
 	if get_player() then
 		Self = get_player()
 	end
-	if not dir_exists(lua_base_path..'data\\') then
-		create_dir(lua_base_path..'data\\')
+	if not dir_exists(windower.addon_path..'data\\') then
+		create_dir(windower.addon_path..'data\\')
 	end
-	if not dir_exists(lua_base_path..'data\\filters\\') then
-		create_dir(lua_base_path..'data\\filters\\')
+	if not dir_exists(windower.addon_path..'data\\filters\\') then
+		create_dir(windower.addon_path..'data\\filters\\')
 	end
 	 
 	local settingsFile = file.new('data\\settings.xml',true)

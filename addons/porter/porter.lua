@@ -35,7 +35,7 @@ require 'stringhelper'
 
 slips = require 'slips'
 
-_addon = {}
+
 _addon.name     = 'porter'
 _addon.version  = '1.20130529'
 _addon.command = 'porter'
@@ -57,7 +57,7 @@ function load_resources()
     slips_items_ids = S(slips_items_ids)
 
     for kind, resource_path in pairs(resources) do
-        resource = io.open(lua_base_path..resource_path, 'r')
+        resource = io.open(windower.addon_path..resource_path, 'r')
 
         if resource ~= nil then
             while true do

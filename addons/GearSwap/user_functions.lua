@@ -196,7 +196,7 @@ function unregister_event_user(id)
 end
 
 function include_user(str)
-	local path = lua_base_path..'data/'..str
+	local path = windower.addon_path..'data/'..str
 	if str:sub(-4)~='.lua' then
 		path = path..'.lua'
 	end

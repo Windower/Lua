@@ -306,7 +306,7 @@ end
 
 function text_update_loop(str)
     if mjob_id == 18 then
-        if str == 'start' and running == 1 and not petlessZones:contains(windower.get_ffxi_info()['zone_id']) then
+        if str == 'start' and running == 1 and not petlessZones:contains(windower.ffxi.get_info()['zone_id']) then
             for key, _ in pairs(heat) do
                 timer[key] = timer[key] - 1
                 if timer[key] < 1 then timer[key] = 0 end
@@ -360,7 +360,7 @@ end
 
 windower.register_event('job change', function(mj, mjid, mjl, sj, sjid, sjl)
     mjob_id = mjid
-    if mjob_id ~= 18 or petlessZones:contains(windower.get_ffxi_info()['zone_id']) then 
+    if mjob_id ~= 18 or petlessZones:contains(windower.ffxi.get_info()['zone_id']) then 
         Burden_tb:hide()
         text_update_loop('stop')
     end

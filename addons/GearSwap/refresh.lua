@@ -70,7 +70,7 @@ function load_user_files()
 	
 	user_env = nil
 	
-	if not file_exists(lua_base_path..'data/'..player['name']..'_'..player.main_job..'.lua') then
+	if not file_exists(windower.addon_path..'data/'..player['name']..'_'..player.main_job..'.lua') then
 		user_env = nil
 		current_job_file = nil
 		return
@@ -87,7 +87,7 @@ function load_user_files()
 		tostring = tostring, tonumber = tonumber, pairs = pairs,
 		ipairs = ipairs, write=write, add_to_chat=add_to_chat,
 		send_command=send_cmd_user,windower=user_windower,
-		include=include_user,next=next,lua_base_path=lua_base_path,empty=empty,
+		include=include_user,next=next,lua_base_path=windower.addon_path,empty=empty,
 		
 		-- Player environment things
 		buffactive=buffactive,
@@ -103,7 +103,7 @@ function load_user_files()
 		}
 
 	-- Try to load data/<name>_<main job>.lua
-	local funct, err = loadfile(lua_base_path..'data/'..player['name']..'_'..player.main_job..'.lua')
+	local funct, err = loadfile(windower.addon_path..'data/'..player['name']..'_'..player.main_job..'.lua')
 	
 	-- If the file cannot be loaded, print the error and load the default.
 	if funct == nil then 
@@ -252,11 +252,11 @@ end
 --Returns:
 ---- None
 ----
----- Updates the global "world" with get_ffxi_info (ignores the target field).
----- Also sets get_ffxi_info()['zone'] to be world.area for consistency with spellcast
+---- Updates the global "world" with windower.ffxi.get_info (ignores the target field).
+---- Also sets windower.ffxi.get_info()['zone'] to be world.area for consistency with spellcast
 -----------------------------------------------------------------------------------
 function refresh_ffxi_info()
-	local info = get_ffxi_info()
+	local info = windower.ffxi.get_info()
 	for i,v in pairs(info) do
 		if i ~= 'target' then
 			world[i] = v

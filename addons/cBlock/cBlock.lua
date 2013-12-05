@@ -26,7 +26,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-_addon = {}
+
 _addon.name = 'CBlock'
 _addon.version = '1.05'
 
@@ -79,7 +79,7 @@ end
 windower.register_event('load',function ()
     send_command('alias cBlock lua c cBlock')
     ignore = {}
-    settingsPath = lua_base_path..'data/'
+    settingsPath = windower.addon_path..'data/'
     settingsFile = settingsPath..'blacklist.txt'
     if not file_exists(settingsFile) then 
         local f,err = assert(io.open(settingsPath.."blacklist.txt","w"))

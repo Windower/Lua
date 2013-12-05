@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 require('logger')
 
-_addon = {}
+
 _addon.name     = 'chars'
 _addon.version  = '1.20131102'
 _addon.commands = 'chars'

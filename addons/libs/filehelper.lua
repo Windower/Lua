@@ -27,7 +27,7 @@ end
 -- Creates a new file. Creates path, if necessary.
 function files.create(f)
     f:create_path()
-    local fh = io.open(lua_base_path..f.path, 'w')
+    local fh = io.open(windower.addon_path..f.path, 'w')
     fh:write('')
     fh:close()
 
@@ -58,7 +58,7 @@ function files.exists(f)
         path = f.path
     end
 
-    return windower.file_exists(lua_base_path..path)
+    return windower.file_exists(windower.addon_path..path)
 end
 
 -- Checks existance of a number of paths, returns the first that exists.
@@ -91,7 +91,7 @@ function files.read(f)
         path = f.path
     end
 
-    local fh = io.open(lua_base_path..path, 'r')
+    local fh = io.open(windower.addon_path..path, 'r')
     local content = fh:read('*all*')
     fh:close()
 
@@ -116,11 +116,11 @@ function files.create_path(f)
         path = f.path:match('(.*)[/\\].-')
 
         if not path then
-            return nil, 'File path already in addon directory: '..lua_base_path..path
+            return nil, 'File path already in addon directory: '..windower.addon_path..path
         end
     end
 
-    new_path = lua_base_path
+    new_path = windower.addon_path
     for dir in path:psplit('[/\\]'):filter(-''):it() do
         new_path = new_path..'/'..dir
 
@@ -170,7 +170,7 @@ function files.it(f)
     end
 
     return coroutine.wrap(function()
-        for l in io.lines(lua_base_path..path) do
+        for l in io.lines(windower.addon_path..path) do
             coroutine.yield(l)
         end
     end)
@@ -206,7 +206,7 @@ function files.write(f, content, flush)
         content = table.concat(content)
     end
 
-    local fh = io.open(lua_base_path..path, 'w')
+    local fh = io.open(windower.addon_path..path, 'w')
     fh:write(content)
     if flush then
         fh:flush()
@@ -247,7 +247,7 @@ function files.append(f, content, flush)
         path = f.path
     end
 
-    local fh = io.open(lua_base_path..path, 'a')
+    local fh = io.open(windower.addon_path..path, 'a')
     fh:write(content)
     if flush then
         fh:flush()

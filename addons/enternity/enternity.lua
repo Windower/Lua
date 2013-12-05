@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 require 'sets'
 
-_addon = {}
+
 _addon.name    = 'enternity'
 _addon.author  = 'Zohno'
 _addon.version = '1.20131102'

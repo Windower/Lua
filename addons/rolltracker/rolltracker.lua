@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-_addon = {}
+
 _addon.name = 'RollTracker'
 _addon.version = '1.1'
 _addon.author = 'Balloon'
@@ -141,7 +141,7 @@ windower.register_event('load',function ()
 				['Blitzer\'s']={2,3.4,4.5,11.3,5.3,6.4,7.2,8.3,1.5,10.2,12.1,'-?', '% Attack delay reduction'},
 				['Courser\'s']={'?','?','?','?','?','?','?','?','?','?','?','?',' Snapshot'}
 				}
-	if get_ffxi_info()['logged_in'] then
+	if windower.ffxi.get_info()['logged_in'] then
         initialize()
     end
 				
