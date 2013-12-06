@@ -81,7 +81,7 @@ end)
 
 function get_obis_in_inventory()
 	obis = {}
-	items = get_items()
+	items = windower.get_items()
 	inv = items.inventory
 	number = items.max_inventory - 1 -- items.max_inventory returns inventory size +1
 	for i=1,number do 
