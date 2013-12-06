@@ -107,12 +107,12 @@ function load_user_files()
 	
 	-- If the file cannot be loaded, print the error and load the default.
 	if funct == nil then 
-		write('User file problem: '..err)
+		print('User file problem: '..err)
 		current_job_file = nil
 		return
 	else
 		current_job_file = player.main_job
-		write('Loaded your '..player.main_job..' Lua file!')
+		print('Loaded your '..player.main_job..' Lua file!')
 	end
 	
 	setfenv(funct, user_env)
@@ -150,7 +150,7 @@ end
 function refresh_player()
 	if not windower.ffxi.get_player() then return end
 	
-	table.reassign(player,get_player())
+	table.reassign(player,windower.ffxi.get_player())
 	for i,v in pairs(player.vitals) do
 		player[i]=v
 	end
@@ -165,7 +165,7 @@ function refresh_player()
 	end
 	player.job = player.main_job..'/'..player.sub_job
 	
-	local player_mob_table = windower.ffxi.get_mob_by_index(get_player().index)
+	local player_mob_table = windower.ffxi.get_mob_by_index(windower.ffxi.get_player().index)
 	if not player_mob_table then return end
 	
 	
@@ -198,14 +198,14 @@ function refresh_player()
 	player.equipment = to_names_set(cur_equip,items.inventory)
 	
 	-- Monster tables for the target and subtarget.
-	player.target = target_type(get_mob_by_target('t'))
+	player.target = target_type(windower.ffxi.get_mob_by_target('t'))
 	
 	if player.target and player.target.race~= nil then
 		player.target.race_id = player.target.race
 		player.target.race = mob_table_races[player.target.race]
 	end
 	
-	player.subtarget = target_type(get_mob_by_target('lastst'))
+	player.subtarget = target_type(windower.ffxi.get_mob_by_target('lastst'))
 	
 	if player.subtarget and player.subtarget.race~= nil then
 		player.subtarget.race_id = player.subtarget.race

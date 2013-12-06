@@ -181,7 +181,7 @@ function send_cmd_user(command)
 	if string.byte(1) ~= 0x40 then
 		command='@'..command
 	end
-	send_command(command)
+	windower.send_command(command)
 end
 
 function register_event_user(str,func)
