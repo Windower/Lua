@@ -284,11 +284,8 @@ windower.register_event("addon command", function(...)
         elseif comm == 'hide' then Burden_tb:hide()
         elseif comm == 'settings' then 
             log('BG: R: '..settings.bg.red..' G: '..settings.bg.green..' B: '..settings.bg.blue)
-            sleep(10)
             log('Font: '..settings.text.font..' Size: '..settings.text.size)
-            sleep(10)
             log('Text: R: '..settings.text.red..' G: '..settings.text.green..' B: '..settings.text.blue)
-            sleep(10)
             log('Position: X: '..settings.pos.x..' Y: '..settings.pos.y)
         else
             local helptext = [[Autosets command list:
@@ -305,7 +302,6 @@ The following all correspond to the burden tracker:
      show/hide - toggles visibility of the tracker so you can make changes.]]
             for _, line in ipairs(helptext:split('\n')) do
                 windower.add_to_chat(207, line..chat.colorcontrols.reset)
-                sleep(10)
             end
         end
     end
