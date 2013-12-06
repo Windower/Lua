@@ -14,33 +14,33 @@ windower.register_event('addon command',function (...)
 		
 		if broken[1]:upper() == "POSITION" then
 			if broken[3] ~= nil then
-				tb_set_location('scan_box',broken[2],broken[3])
+				windower.text.set_location('scan_box',broken[2],broken[3])
 			end
 		end
 	end
 end)
 
 windower.register_event('load',function ()
-	tb_create('scan_box')
-	tb_set_bg_color('scan_box',200,30,30,30)
-	tb_set_color('scan_box',255,200,200,200)
-	tb_set_location('scan_box',900,704)
-	tb_set_visibility('scan_box',1)
-	tb_set_bg_visibility('scan_box',1)
-	tb_set_text('scan_box','No target / Default')
+	windower.text.create('scan_box')
+	windower.text.set_bg_color('scan_box',200,30,30,30)
+	windower.text.set_color('scan_box',255,200,200,200)
+	windower.text.set_location('scan_box',900,704)
+	windower.text.set_visibility('scan_box',1)
+	windower.text.set_bg_visibility('scan_box',1)
+	windower.text.set_text('scan_box','No target / Default')
 end)
 
 windower.register_event('unload',function ()
-	tb_delete('scan_box')
+	windower.text.delete('scan_box')
 end)
 
 windower.register_event('target change',function (targId)
 	local currentmob = windower.ffxi.get_mob_by_index(targId)
 	if currentmob ~= nil then
 		if currentmob['id'] == nil then
-			tb_set_text('scan_box','No target / Default')
+			windower.text.set_text('scan_box','No target / Default')
 		else
-			tb_set_text('scan_box','mob_type:'..currentmob['mob_type']..'  model_size:'..currentmob['model_size']..'  targId:'..targId..'  id:'..currentmob['id'])
+			windower.text.set_text('scan_box','mob_type:'..currentmob['mob_type']..'  model_size:'..currentmob['model_size']..'  targId:'..targId..'  id:'..currentmob['id'])
 		end
 	end
 end)

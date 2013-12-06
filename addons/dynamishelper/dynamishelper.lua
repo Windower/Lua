@@ -117,11 +117,11 @@ windower.register_event('addon command',function (...)
    			if params[2]:lower() == "on" then
     			tracker = "on"
 				initializebox()
-				tb_set_visibility('dynamis_box',true)
+				windower.text.set_visibility('dynamis_box',true)
     			print('Tracker enabled')
    			elseif params[2]:lower() == "off" then
     			tracker = "off"
-    			tb_set_visibility('dynamis_box',false)
+    			windower.text.set_visibility('dynamis_box',false)
     			print('Tracker disabled')
    			elseif params[2]:lower() == "reset" then
 				for i=1, #Currency do
@@ -151,7 +151,7 @@ windower.register_event('addon command',function (...)
    				print('Proc feature enabled.')
    			elseif params[2]:lower() == "off" then
    		 		proc = params[2]
-    			tb_set_visibility('proc_box',false)
+    			windower.text.set_visibility('proc_box',false)
     			print('Proc feature disabled.')
     		elseif params[2]:lower() == "pos" then
    				pposx, pposy = tonumber(params[3]), tonumber(params[4])
@@ -221,21 +221,21 @@ function checkzone()
 		end
 	end
 	if goodzone == 'no' then
-		tb_set_visibility('proc_box',false)
+		windower.text.set_visibility('proc_box',false)
 	end
 end
 
 function initializebox()
 --	print('initializebox function')
 	if obtained ~= nil and tracker == "on" then
- 		tb_create('dynamis_box')
- 		tb_set_bg_color('dynamis_box',200,30,30,30)
- 		tb_set_color('dynamis_box',255,200,200,200)
-		tb_set_location('dynamis_box',trposx,trposy)
- 		tb_set_visibility('dynamis_box',true)
- 		tb_set_bg_visibility('dynamis_box',true)
- 		tb_set_font('dynamis_box','Arial',12)
- 		tb_set_text('dynamis_box',obtained);
+ 		windower.text.create('dynamis_box')
+ 		windower.text.set_bg_color('dynamis_box',200,30,30,30)
+ 		windower.text.set_color('dynamis_box',255,200,200,200)
+		windower.text.set_location('dynamis_box',trposx,trposy)
+ 		windower.text.set_visibility('dynamis_box',true)
+ 		windower.text.set_bg_visibility('dynamis_box',true)
+ 		windower.text.set_font('dynamis_box','Arial',12)
+ 		windower.text.set_text('dynamis_box',obtained);
  	end
 end
 
@@ -291,22 +291,22 @@ end
 
 function initializeproc()
 --		print('initializeproc function')
-		tb_create('proc_box')
-	 	tb_set_bg_color('proc_box',200,30,30,30)
-	 	tb_set_color('proc_box',255,200,200,200)
-	 	tb_set_location('proc_box',pposx,pposy)
+		windower.text.create('proc_box')
+	 	windower.text.set_bg_color('proc_box',200,30,30,30)
+	 	windower.text.set_color('proc_box',255,200,200,200)
+	 	windower.text.set_location('proc_box',pposx,pposy)
 	 	if goodzone == 'yes' and proc == 'on' then
-	 	 	tb_set_visibility('proc_box', true)
+	 	 	windower.text.set_visibility('proc_box', true)
 	 	end
-	 	tb_set_bg_visibility('proc_box',1)
-	 	tb_set_font('proc_box','Arial',12)
-	 	tb_set_text('proc_box',' Current proc for \n '..mob..'\n is '..current_proc);
+	 	windower.text.set_bg_visibility('proc_box',1)
+	 	windower.text.set_font('proc_box','Arial',12)
+	 	windower.text.set_text('proc_box',' Current proc for \n '..mob..'\n is '..current_proc);
 	 	if proc == "off" then
-	 		tb_set_visibility('proc_box', false)
+	 		windower.text.set_visibility('proc_box', false)
 	 	end
 end
 
 windower.register_event('unload',function ()
- 	tb_delete('dynamis_box')
- 	tb_delete('proc_box')
+ 	windower.text.delete('dynamis_box')
+ 	windower.text.delete('proc_box')
 end)

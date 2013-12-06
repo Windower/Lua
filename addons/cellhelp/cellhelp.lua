@@ -118,14 +118,14 @@ windower.register_event('addon command',function (...)
 		elseif params[1]:lower() == "pos" then
 			if params[3] then
 				local posx, posy = tonumber(params[2]), tonumber(params[3])
-				tb_set_location('salvage_box', posx, posy)
+				windower.text.set_location('salvage_box', posx, posy)
 			end
 		elseif params[1]:lower() == "start" then
 			initialize()
 		elseif params[1]:lower() == "hide" then
-			tb_set_visibility('salvage_box', false)
+			windower.text.set_visibility('salvage_box', false)
 		elseif params[1]:lower() == "show" then
-			tb_set_visibility('salvage_box', true)
+			windower.text.set_visibility('salvage_box', true)
 		elseif params[1]:lower() == "set" then
 			if params[2] then
 				set = params[2]:lower()
@@ -228,14 +228,14 @@ function lightluggage()
 end
 
 function initialize()
-	tb_create('salvage_box')
-	tb_set_bg_color('salvage_box',200,30,30,30)
-	tb_set_color('salvage_box',255,200,200,200)
-	tb_set_location('salvage_box',posx,posy)
-	tb_set_visibility('salvage_box',1)
-	tb_set_bg_visibility('salvage_box',1)
-	tb_set_font('salvage_box','Arial',12)
-	tb_set_text('salvage_box',' Lot order:  \n'..lotorder);
+	windower.text.create('salvage_box')
+	windower.text.set_bg_color('salvage_box',200,30,30,30)
+	windower.text.set_color('salvage_box',255,200,200,200)
+	windower.text.set_location('salvage_box',posx,posy)
+	windower.text.set_visibility('salvage_box',1)
+	windower.text.set_bg_visibility('salvage_box',1)
+	windower.text.set_font('salvage_box','Arial',12)
+	windower.text.set_text('salvage_box',' Lot order:  \n'..lotorder);
 end
 
 function checkzone()
@@ -274,6 +274,6 @@ windower.register_event('incoming text',function (original, new, color)
 end	)
 
 windower.register_event('unload',function ()
-	tb_delete('salvage_box')
+	windower.text.delete('salvage_box')
 	send_command('timers d Remaining')
 end )

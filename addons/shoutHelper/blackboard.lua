@@ -44,29 +44,29 @@ function Blackboard:new(settings)
     o = {ally = Alliance:new()}
     setmetatable(o, self)
     self.__index = self
-    tb_create(self.tb_name)
-    tb_set_bg_color(self.tb_name, self.settings.bgtransparency, 30, 30, 30)
-    tb_set_color(self.tb_name, 255, 225, 225, 225)
-    tb_set_location(self.tb_name, self.settings.posx, self.settings.posy)
-    tb_set_visibility(self.tb_name, self.visible)
-    tb_set_bg_visibility(self.tb_name, 1)
+    windower.text.create(self.tb_name)
+    windower.text.set_bg_color(self.tb_name, self.settings.bgtransparency, 30, 30, 30)
+    windower.text.set_color(self.tb_name, 255, 225, 225, 225)
+    windower.text.set_location(self.tb_name, self.settings.posx, self.settings.posy)
+    windower.text.set_visibility(self.tb_name, self.visible)
+    windower.text.set_bg_visibility(self.tb_name, 1)
     return o
 end
 
 function Blackboard:set_position(posx, posy)
     self.settings.posx = posx
     self.settings.posy = posy
-    tb_set_location(self.tb_name, posx, posy)
+    windower.text.set_location(self.tb_name, posx, posy)
 end
 
 function Blackboard:show()
     self.visible = true
-    tb_set_visibility(self.tb_name, true)
+    windower.text.set_visibility(self.tb_name, true)
 end
 
 function Blackboard:hide()
     self.visible = false
-    tb_set_visibility(self.tb_name, false)
+    windower.text.set_visibility(self.tb_name, false)
 end
 
 function Blackboard:set(party, jobs)
@@ -116,7 +116,7 @@ end
 
 function Blackboard:update()
     local string = self.ally:printAlly()
-    tb_set_text(self.tb_name, self.allyName..'\n'..string)
+    windower.text.set_text(self.tb_name, self.allyName..'\n'..string)
     if (not self.visible) then
         self:show()
     end
@@ -144,7 +144,7 @@ function Blackboard:reset(party)
 end
 
 function Blackboard:destroy()
-tb_delete(self.tb_name)
+windower.text.delete(self.tb_name)
 end
 
 return Blackboard
