@@ -108,21 +108,18 @@ windower.register_event('addon command', function(...)
 end)
 
 windower.register_event('incoming text', function(old,new,color,newcolor)
-    local sta,ea,txt = string.find(new,'([^%w]*%[%d+:#[%w_]+%].-:)')
     local stb = string.find(new,'[^%w]*%[%d+:#%w+%]') or string.find(new,'^[^%w]*%[FFOChat%]')
-    if sta ~= nil or stb ~= nil then
+    if stb ~= nil or old:sub(2,8) == 'PrivMsg' then
         if settings.chatTab ~= nil then
             newcolor = chatColors[settings.chatTab]
         end
         new = new:gsub('\r\n','')
         local newsplit = new:split(' ')
-        local restring = ''
-        local spacer = ''
         for it = 1, #newsplit do
             newsplit[it] = newsplit[it]:color(settings.chatColor)
         end
         new = newsplit:concat(' ')
     end
     
-    return new,newcolor
+    return new, newcolor
 end)
