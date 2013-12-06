@@ -523,7 +523,7 @@ function assemble_bit_packed(init,val,initial_length,final_length,debug_val)
 		init = init:sub(1,#init-1) -- Take off the active byte
 	end
 	out_val = out_val + val*2^bits -- left-shift val by the appropriate amount and add it to the remainder (now the lsb-s in val)
-	if debug_val then write(out_val..' '..#init) end
+	if debug_val then print(out_val..' '..#init) end
 	
 	while out_val > 0 do
 		init = init..string.char(out_val%256)
