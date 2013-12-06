@@ -1,162 +1,0 @@
-<?xml version="1.0"?>
-
-<bspells>
-    <q id="0" english="#0"/>
-    
-    <q id="1" index="513" setpoints="3" english="Venom Shell" german="Gifthülle" french="Conque de venin" japanese="??????" />    
-    <q id="2" index="515" setpoints="5" english="Maelstrom" german="Maelstrom" french="Maëlstrom" japanese="????????" />    
-    <q id="3" index="517" setpoints="1" english="Metallic Body" german="Metallkörper" french="Corps métallique" japanese="??????" />    
-    <q id="4" index="519" setpoints="3" english="Screwdriver" german="Schraubenzieher" french="Tournevis" japanese="S.?????" />    
-    <q id="5" index="521" setpoints="4" english="MP Drainkiss" german="MP-Vampirkuss" french="Succion de MP" japanese="MP?????" />    
-    <q id="6" index="522" setpoints="2" english="Death Ray" german="Todesstrahl" french="Rayon de la mort" japanese="????" />    
-    <q id="7" index="524" setpoints="2" english="Sandspin" german="Sandkreisel" french="Trombe de sable" japanese="???" />    
-    <q id="8" index="527" setpoints="3" english="Smite of Rage" german="Schlag des Zorns" french="Coup de rage" japanese="?????" />    
-    <q id="9" index="529" setpoints="2" english="Bludgeon" german="Knüppel" french="Matraque" japanese="?????" />    
-    <q id="10" index="530" setpoints="4" english="Refueling" german="Auftanken" french="Ravitaillement" japanese="???????" />    
-    <q id="11" index="531" setpoints="3" english="Ice Break" german="Eis-Brecher" french="Rupture de glace" japanese="???????" />    
-    <q id="12" index="532" setpoints="4" english="Blitzstrahl" german="Blitzstrahl" french="Blitzstrahl" japanese="B.??????" />    
-    <q id="13" index="533" setpoints="3" english="Self-Destruct" german="Selbstzerstörung" french="Auto-destruction" japanese="??" />    
-    <q id="14" index="534" setpoints="4" english="Mysterious Light" german="Mysteriöses Licht" french="Eclat mystérieux" japanese="????" />    
-    <q id="15" index="535" setpoints="1" english="Cold Wave" german="Kältewelle" french="Vague de froid" japanese="????????" />    
-    <q id="16" index="536" setpoints="1" english="Poison Breath" german="Giftatem" french="Haleine souillée" japanese="???????" />    
-    <q id="17" index="537" setpoints="2" english="Stinking Gas" german="Stinkgas" french="Gaz puant" japanese="?????????" />    
-    <q id="18" index="538" setpoints="4" english="Memento Mori" german="Memento Mori" french="Memento Mori" japanese="???????" />    
-    <q id="19" index="539" setpoints="3" english="Terror Touch" german="Terrorberührung" french="Toucher de terreur" japanese="??????" />    
-    <q id="20" index="540" setpoints="4" english="Spinal Cleave" german="Gratspalter" french="Taillade spinale" japanese="?????????" />    
-    <q id="21" index="541" setpoints="2" english="Blood Saber" german="Blutsäbel" french="Sabre ensanglanté" japanese="????????" />    
-    <q id="22" index="542" setpoints="2" english="Digest" german="Extrakt" french="Digestion" japanese="??" />    
-    <q id="23" index="543" setpoints="2" english="Mandibular Bite" german="Mandibeln-Biss" french="Mandibule" japanese="M.???" />    
-    <q id="24" index="544" setpoints="2" english="Cursed Sphere" german="Fluchkugel" french="Sphère de maléfice" japanese="????????" />    
-    <q id="25" index="545" setpoints="4" english="Sickle Slash" german="Sichelhieb" french="Entaille de faucille" japanese="?????????" />    
-    <q id="26" index="547" setpoints="1" english="Cocoon" german="Kokon" french="Cocon" japanese="????" />    
-    <q id="27" index="548" setpoints="3" english="Filamented Hold" german="Fadenhalt" french="Prise filandreuse" japanese="F.????" />    
-    <q id="28" index="549" setpoints="1" english="Pollen" german="Pollen" french="Pollen" japanese="??" />    
-    <q id="29" index="551" setpoints="1" english="Power Attack" german="Kraft-Attacke" french="Attaque en force" japanese="???????" />    
-    <q id="30" index="554" setpoints="5" english="Death Scissors" german="Todesscheren" french="Ciseaux mortels" japanese="??????" />    
-    <q id="31" index="555" setpoints="3" english="Magnetite Cloud" german="Magnetit-Wolke" french="Nuage magnétique" japanese="???" />    
-    <q id="32" index="557" setpoints="4" english="Eyes On Me" german="Augen auf mich" french="Eyes On Me" japanese="???????" />    
-    <q id="33" index="560" setpoints="3" english="Frenetic Rip" german="Frenetischer Riss" french="Griffes effrénées" japanese="F.???" />    
-    <q id="34" index="561" setpoints="3" english="Frightful Roar" german="Grausames Gebrüll" french="Grogne effroyable" japanese="????????" />    
-    <q id="35" index="563" setpoints="3" english="Hecatomb Wave" german="Hecatomb-Welle" french="Vague hécatombe" japanese="????????" />    
-    <q id="36" index="564" setpoints="4" english="Body Slam" german="Bodyslam" french="Charge physique" japanese="??????" />    
-    <q id="37" index="565" setpoints="4" english="Radiant Breath" german="Strahlenatem" french="Souffle radiant" japanese="R.???" />    
-    <q id="38" index="567" setpoints="2" english="Helldive" german="Höllentaucher" french="Plongée en enfer" japanese="?????" />    
-    <q id="39" index="569" setpoints="4" english="Jet Stream" german="Düsenstrahl" french="Jet-stream" japanese="?????????" />    
-    <q id="40" index="570" setpoints="2" english="Blood Drain" german="Blutsauger" french="Suceur de sang" japanese="??" />    
-    <q id="41" index="572" setpoints="1" english="Sound Blast" german="Schallstoß" french="Rafale de son" japanese="????????" />    
-    <q id="42" index="573" setpoints="3" english="Feather Tickle" german="Federkribbeln" french="Chatouillement" japanese="?????????" />    
-    <q id="43" index="574" setpoints="2" english="Feather Barrier" german="Federbarriere" french="Barrière de plumes" japanese="???????" />    
-    <q id="44" index="575" setpoints="4" english="Jettatura" german="Jettatura" french="Jettatura" japanese="??????" />    
-    <q id="45" index="576" setpoints="3" english="Yawn" german="Gähn" french="Bâillement" japanese="???" />    
-    <q id="46" index="577" setpoints="2" english="Foot Kick" german="Fußtritt" french="Coup de patte" japanese="??????" />    
-    <q id="47" index="578" setpoints="3" english="Wild Carrot" german="Wilde Möhre" french="Carotte sauvage" japanese="????????"/>    
-    <q id="48" index="579" setpoints="4" english="Voracious Trunk" german="Gieriger Rüssel" french="Trompe vorace" japanese="??" />    
-    <q id="49" index="581" setpoints="4" english="Healing Breeze" german="Heilbrise" french="Brise curative" japanese="?????" />    
-    <q id="50" index="582" setpoints="2" english="Chaotic Eye" german="Chaosauge" french="Œil de chaos" japanese="????????" />    
-    <q id="51" index="584" setpoints="2" english="Sheep Song" german="Schaflied" french="Chant ovin" japanese="??????" />    
-    <q id="52" index="585" setpoints="4" english="Ram Charge" german="Widderangriff" french="Coup du bélier" japanese="??????" />    
-    <q id="53" index="587" setpoints="2" english="Claw Cyclone" german="Klauenwirbel" french="Cyclone griffu" japanese="????????" />    
-    <q id="54" index="588" setpoints="2" english="Lowing" german="Erniedrigung" french="Beuglement" japanese="????" />    
-    <q id="55" index="589" setpoints="5" english="Dimensional Death" german="Dimensionaler Fluch" french="Distorsion fatale" japanese="???" />    
-    <q id="56" index="591" setpoints="4" english="Heat Breath" german="Hitzeatem" french="Souffle chaud" japanese="????" />    
-    <q id="57" index="592" setpoints="2" english="Blank Gaze" german="Leerer Blick" french="Regard vide" japanese="???????" />    
-    <q id="58" index="593" setpoints="3" english="Magic Fruit" german="Magische Frucht" french="Fruit magique" japanese="????????" />    
-    <q id="59" index="594" setpoints="3" english="Uppercut" german="Uppercut" french="Uppercut" japanese="???????" />    
-    <q id="60" index="595" setpoints="5" english="1000 Needles" german="1000 Nadeln" french="1000 épines" japanese="???" />    
-    <q id="61" index="596" setpoints="2" english="Pinecone Bomb" german="Kienappel-Bombe" french="Bombe conifère" japanese="????????" />    
-    <q id="62" index="597" setpoints="2" english="Sprout Smack" german="Sprossenklatsche" french="Germe gifleur" japanese="?????????" />    
-    <q id="63" index="598" setpoints="4" english="Soporific" german="Einschläfern" french="Somnifère" japanese="???????" />    
-    <q id="64" index="599" setpoints="2" english="Queasyshroom" german="Übelpilz" french="Champi-nausée" japanese="?????" />    
-    <q id="65" index="603" setpoints="3" english="Wild Oats" german="Wilder Hafer" french="Germination" japanese="???" />    
-    <q id="66" index="604" setpoints="5" english="Bad Breath" german="Schlechter Atem" french="Mauvaise haleine" japanese="???" />    
-    <q id="67" index="605" setpoints="3" english="Geist Wall" german="Geisterwand" french="Mur Geist" japanese="????????" />    
-    <q id="68" index="606" setpoints="2" english="Awful Eye" german="Furchtbares Auge" french="Œil damné" japanese="??????" />    
-    <q id="69" index="608" setpoints="3" english="Frost Breath" german="Frostatem" french="Souffle de glace" japanese="???????" />    
-    <q id="70" index="610" setpoints="4" english="Infrasonics" german="Infraschall" french="Infrasonique" japanese="????" />    
-    <q id="71" index="611" setpoints="5" english="Disseverment" german="Abtrennung" french="Ecartèlement" japanese="????????" />    
-    <q id="72" index="612" setpoints="4" english="Actinic Burst" german="Strahlungsausbruch" french="Eclat actinique" japanese="A.????" />    
-    <q id="73" index="613" setpoints="5" english="Reactor Cool" german="Reaktorkühler" french="Cryoréacteur" japanese="?????" />    
-    <q id="74" index="614" setpoints="3" english="Saline Coat" german="Salzmantel" french="Manteau salin" japanese="????????" />    
-    <q id="75" index="615" setpoints="5" english="Plasma Charge" german="Plasma-Entladung" french="Charge de plasma" japanese="????????" />    
-    <q id="76" index="616" setpoints="5" english="Temporal Shift" german="Zeitverschiebung" french="Décalage temporel" japanese="????????" />    
-    <q id="77" index="617" setpoints="3" english="Vertical Cleave" german="Vertikale Zerteilung" french="Fente verticale" japanese="?????????" />    
-    <q id="78" index="618" setpoints="2" english="Blastbomb" german="Druckwellen-Bombe" french="Obus" japanese="???" />    
-    <q id="79" index="620" setpoints="3" english="Battle Dance" german="Kriegstanz" french="Danse de combat" japanese="??????" />    
-    <q id="80" index="621" setpoints="2" english="Sandspray" german="Sandsprüher" french="Aspersion de sable" japanese="???????" />    
-    <q id="81" index="622" setpoints="2" english="Grand Slam" german="Grand Slam" french="Grande claque" japanese="???????" />    
-    <q id="82" index="623" setpoints="3" english="Head Butt" german="Kopfnuss" french="Coup de tête" japanese="??????" />    
-    <q id="83" index="626" setpoints="3" english="Bomb Toss" german="Bombenwurf" french="Lancer de bombe" japanese="????" />    
-    <q id="84" index="628" setpoints="3" english="Frypan" german="Bratpfanne" french="Poêle à frire" japanese="?????" />    
-    <q id="85" index="629" setpoints="3" english="Flying Hip Press" german="Sturm-Hüftpresse" french="Prise aérienne" japanese="F.??????" />    
-    <q id="86" index="631" setpoints="3" english="Hydro Shot" german="Hydro-Schuss" french="Hydro-coup" japanese="????????" />    
-    <q id="87" index="632" setpoints="3" english="Diamondhide" german="Diamantenhaut" french="Peau de diamant" japanese="???" />    
-    <q id="88" index="633" setpoints="5" english="Enervation" german="Entkräftung" french="Amollissement" japanese="??" />    
-    <q id="89" index="634" setpoints="5" english="Light of Penance" german="Licht der Buße" french="Lumière pénitence" japanese="????" />    
-    <q id="90" index="636" setpoints="4" english="Warm-Up" german="Aufwärmen" french="Echauffement" japanese="??????" />    
-    <q id="91" index="637" setpoints="5" english="Firespit" german="Feuerspucke" french="Crachat embrasé" japanese="?????????" />    
-    <q id="92" index="638" setpoints="3" english="Feather Storm" german="Federsturm" french="Déluge de plumes" japanese="????" />    
-    <q id="93" index="640" setpoints="4" english="Tail Slap" german="Schweifklapser" french="Gifle caudale" japanese="???????" />    
-    <q id="94" index="641" setpoints="5" english="Hysteric Barrage" german="Hysterische Sperre" french="Assaut hystérique" japanese="H.????" />    
-    <q id="95" index="642" setpoints="3" english="Amplification" german="Verstärkerfeld" french="Amplification" japanese="????" />    
-    <q id="96" index="643" setpoints="3" english="Cannonball" german="Kanonenkugel" french="Canon" japanese="???????" />    
-    <q id="97" index="644" setpoints="4" english="Mind Blast" german="Gedankenpresse" french="Explosion mentale" japanese="????????" />    
-    <q id="98" index="645" setpoints="4" english="Exuviation" german="Exuviation" french="Exuviation" japanese="??????????" />    
-    <q id="99" index="646" setpoints="4" english="Magic Hammer" german="Magischer Hammer" french="Marteau magique" japanese="????????" />    
-    <q id="100" index="647" setpoints="2" english="Zephyr Mantle" german="Zephyr-Mantel" french="Mante de zéphyr" japanese="???????" />    
-    <q id="101" index="648" setpoints="1" english="Regurgitation" german="Erbrechen" french="Régurgitation" japanese="?????????" />    
-    <q id="102" index="650" setpoints="2" english="Seedspray" german="Sporenspray" french="Crachat de graines" japanese="???????" />    
-    <q id="103" index="651" setpoints="4" english="Corrosive Ooze" german="Säureschleim" french="Mucus corrosif" japanese="????????" />    
-    <q id="104" index="652" setpoints="3" english="Spiral Spin" german="Spiral-Angriff" french="Vrille tournoyante" japanese="????????" />    
-    <q id="105" index="653" setpoints="2" english="Asuran Claws" german="Asura-Klauen" french="Griffes d'Asura" japanese="???????" />    
-    <q id="106" index="654" setpoints="4" english="Sub-zero Smash" german="Unter-Null-Schlag" french="Cryo-impact" japanese="?????????" />    
-    <q id="107" index="655" setpoints="3" english="Triumphant Roar" german="Triumphgeheul" french="Résonance" japanese="??" />    
-    <q id="108" index="656" setpoints="3" english="Acrid Stream" german="Beißender Strom" french="Projection âcre" japanese="??????????" />    
-    <q id="109" index="657" setpoints="3" english="Blazing Bound" german="Lodernder Bann" french="Plongeon ardent" japanese="????????" />    
-    <q id="110" index="658" setpoints="4" english="Plenilune Embrace" german="Mondsucht" french="Onction pleine lune" japanese="P.??????" />    
-    <q id="111" index="659" setpoints="4" english="Demoralizing Roar" german="Demoral. Gebrüll" french="Rug. démoralisant" japanese="D.??" />    
-    <q id="112" index="660" setpoints="3" english="Cimicine Discharge" german="Stinkendes Sekret" french="Transs. polluante" japanese="C.???????" />    
-    <q id="113" index="661" setpoints="5" english="Animating Wail" german="Lebensklage" french="Plainte encourag." japanese="??" />    
-    <q id="114" index="662" setpoints="3" english="Battery Charge" german="Batterieladung" french="Rechargement" japanese="?????????" />    
-    <q id="115" index="663" setpoints="4" english="Leafstorm" german="Blättersturm" french="Tempête feuilles" japanese="???????" />    
-    <q id="116" index="664" setpoints="2" english="Regeneration" german="Regenerierung" french="Régénération" japanese="?????????" />    
-    <q id="117" index="665" setpoints="1" english="Final Sting" german="Letzter Stich" french="Dernier dard" japanese="????????" />    
-    <q id="118" index="666" setpoints="3" english="Goblin Rush" german="Goblin-Rausch" french="Charge du Goblin" japanese="????????" />    
-    <q id="119" index="667" setpoints="2" english="Vanity Dive" german="Eitelk.-Abtauch." french="Plongée vanités" japanese="???????" />    
-    <q id="120" index="668" setpoints="3" english="Magic Barrier" german="Mag. Barriere" french="Barrière magique" japanese="???????" />    
-    <q id="121" index="669" setpoints="2" english="Whirl of Rage" german="Wirbel d. Zorns" french="Tourbillon fureur" japanese="?????" />    
-    <q id="122" index="670" setpoints="4" english="Benthic Typhoon" german="Benth. Taifun" french="Typh. benthique" japanese="?????????" />    
-    <q id="123" index="671" setpoints="4" english="Auroral Drape" german="Dämmervorh." french="Drapé auroral" japanese="?????????" />    
-    <q id="124" index="672" setpoints="5" english="Osmosis" german="Seelensog" french="Osmose" japanese="??????" />    
-    <q id="125" index="673" setpoints="4" english="Quad. Continuum" german="Quadr. Kont." french="Continuum quad." japanese="???" />    
-    <q id="126" index="674" setpoints="1" english="Fantod" german="Fantod" french="Accès de rage" japanese="??????" />    
-    <q id="127" index="675" setpoints="3" english="Thermal Pulse" german="Thermischer Puls" french="Pulsat. thermique" japanese="???????" />    
-    <q id="128" index="677" setpoints="3" english="Empty Thrash" german="Leere Prügel" french="Rossée du néant" japanese="??????????" />    
-    <q id="129" index="678" setpoints="3" english="Dream Flower" german="Traumblume" french="Fleur de rêves" japanese="???" />    
-    <q id="130" index="679" setpoints="3" english="Occultation" german="Okkultation" french="Occultation" japanese="????????" />    
-    <q id="131" index="680" setpoints="4" english="Charged Whisker" german="Gelad. Schnurrhaar" french="Poil survolté" japanese="??????????" />    
-    <q id="132" index="681" setpoints="5" english="Winds of Promy." german="Promyvion-Winde" french="Vents Promyvion" japanese="????" />    
-    <q id="133" index="682" setpoints="2" english="Delta Thrust" german="Delta-Stich" french="Morsure triang." japanese="???????" />    
-    <q id="134" index="683" setpoints="4" english="Evryone. Grudge" german="Keine Widerrede" french="Rancune collect." japanese="??????" />    
-    <q id="135" index="684" setpoints="4" english="Reaving Wind" german="Plünderschwinge" french="Vent saccageur" japanese="????????" />    
-    <q id="136" index="685" setpoints="3" english="Barrier Tusk" german="Stoßzahnbarriere" french="Défenses protec." japanese="??" />    
-    <q id="137" index="686" setpoints="4" english="Mortal Ray" german="Tödlicher Strahl" french="Rayon mortel" japanese="??????" />    
-    <q id="138" index="687" setpoints="2" english="Water Bomb" german="Wasserbombe" french="Bombe à eau" japanese="?????" />    
-    <q id="139" index="688" setpoints="2" english="Heavy Strike" german="Schwerer Schlag" french="Frappe lourde" japanese="????" />    
-    <q id="140" index="689" setpoints="3" english="Dark Orb" german="Dunkle Sphäre" french="Orbe noir" japanese="??????" />    
-    <q id="141" index="690" setpoints="5" english="White Wind" german="Weißer Wind" french="Vent blanc" japanese="????????" />    
-    <q id="142" index="692" setpoints="4" english="Sudden Lunge" german="Plötzlicher Satz" french="Piqué brutal" japanese="??????" />    
-    <q id="143" index="693" setpoints="5" english="Quadrastrike" german="Vierfach-Schlag" french="Quadra-frappe" japanese="?????????" />    
-    <q id="144" index="694" setpoints="2" english="Vapor Spray" german="Dampfspray" french="Spray de vapeur" japanese="?????????" />    
-    <q id="145" index="695" setpoints="4" english="Thunder Breath" german="Donneratem" french="Souffle foudroyant" japanese="???????" />    
-    <q id="146" index="696" setpoints="5" english="O. Counterstance" german="Gegenschlag" french="Qui-vive orque" japanese="?????????" />    
-    <q id="147" index="697" setpoints="4" english="Amorphic Spikes" german="Amorphe Stacheln" french="Point. amorphes" japanese="??" />    
-    <q id="148" index="698" setpoints="2" english="Wind Breath" german="Windatem" french="Souffle de vent" japanese="???????" />    
-    <q id="149" index="699" setpoints="2" english="Barbed Crescent" german="Stachel-Halbmond" french="Croissant barbelé" japanese="???" />    
-    <q id="150" index="736" setpoints="0" english="Thunderbolt" german="Donnerkeil" french="Traits de foudre" japanese="???????" />    
-    <q id="151" index="737" setpoints="0" english="Harden Shell" german="Harte Schale" french="Durcis. coquille" japanese="????" />    
-    <q id="152" index="738" setpoints="0" english="Absolute Terror" german="Absoluter Terror" french="Terreur absolue" japanese="?????????" />    
-    <q id="153" index="739" setpoints="0" english="Gates of Hades" german="Tor des Hades" french="Portes d'Hadès" japanese="????????" />    
-    <q id="154" index="740" setpoints="0" english="Tourbillion" german="Tourbillion" french="Tourbillon" japanese="???????" />    
-    <q id="155" index="741" setpoints="0" english="Pyric Bulwark" german="Hitzebollwerk" french="Remp. pyrogène" japanese="??????????" />    
-    <q id="156" index="742" setpoints="0" english="Bilgestorm" german="Bilgensturm" french="Déluge putride" japanese="???????" />    
-    <q id="157" index="743" setpoints="0" english="Bloodrake" german="Blutharke" french="Succion sang" japanese="???????" /></bspells>

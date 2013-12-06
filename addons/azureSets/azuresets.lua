@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon = {}
 _addon.name = 'AzureSets'
-_addon.version = '1.151'
+_addon.version = '1.16'
 
 require 'tablehelper'
 require 'stringhelper'
@@ -57,7 +57,7 @@ end
 function event_load()
     send_command('alias azureset lua c azureSets')
     send_command('alias aset lua c azureSets')
-    speFile = files.new('data/bluespells.xml')
+    speFile = files.new('../../plugins/resources/spells.xml')
     spells = T{}
     spells = parse_resources(speFile:readlines())
     settings = config.load(defaults,true)
@@ -99,10 +99,12 @@ function set_spells_from_spellset(spellset,slot)
     else islot = slot end
     local tempname = settings.spellsets[spellset]['slot'..islot]
     if tempname ~= nil then
-        for id = 1, #spells do
-            if spells[id]['english']:lower() == tempname:lower() then
-                set_blue_magic_spell(spells[id]['index'], tonumber(slot))
-                break
+        for id = 512, spells:length() do
+            if spells[id] then
+                if spells[id]['english']:lower() == tempname:lower() then
+                    set_blue_magic_spell(spells[id]['index'], tonumber(slot))
+                    break
+                end
             end
         end
     end
@@ -127,13 +129,15 @@ function set_single_spell(spell,slot)
     end
     if tonumber(slot) < 10 then slot = '0'..slot end
     --insert spell add code here
-    for id = 1, #spells do
-        if spells[id]['english']:lower() == spell then
-            --This is where single spell setting code goes.
-            --Need to set by spell index rather than name.
-            set_blue_magic_spell(spells[id]['index'], tonumber(slot))
-            send_command('@timers c "Blue Magic Cooldown" 60 up')
-            tmpTable['slot'..slot] = spell
+    for id = 512, spells:length() do
+        if spells[id] then
+            if spells[id]['english']:lower() == spell then
+                --This is where single spell setting code goes.
+                --Need to set by spell index rather than name.
+                set_blue_magic_spell(spells[id]['index'], tonumber(slot))
+                send_command('@timers c "Blue Magic Cooldown" 60 up')
+                tmpTable['slot'..slot] = spell
+            end
         end
     end
     tmpTable = nil
@@ -149,11 +153,13 @@ function get_current_spellset()
         for i = 1, #tmpTable do
             local t = ''
             if tonumber(tmpTable[i]) ~= 512 then
-                for id = 1, #spells do
-                    if tonumber(tmpTable[i]) == tonumber(spells[id]['index']) then
-                        if i < 10 then t = '0' end
-                        spellTable['slot'..t..i] = spells[id]['english']:lower()
-                        break
+                for id = 512, spells:length() do
+                    if spells[id] then
+                        if tonumber(tmpTable[i]) == tonumber(spells[id]['index']) then
+                            if i < 10 then t = '0' end
+                            spellTable['slot'..t..i] = spells[id]['english']:lower()
+                            break
+                        end
                     end
                 end
             end
@@ -161,30 +167,6 @@ function get_current_spellset()
     end
     return spellTable
 end
-
---[[ Not yet implemented
-function remove_one_spell(spell)
-    if get_player()['main_job_id'] ~= 16 and get_player()['sub_job_id'] ~= 16 then return nil end
-    local st,en,loc
-    local tmpTable = T(get_current_spellset())
-    for key,val in pairs(tmpTable) do
-        if tmpTable[key] == spell then 
-            st,en,loc = string.find(key,'slot(%d+)')
-        end
-    end
-    --insert spell add code here
-    for id = 1, #spells do
-        if spells[id]['english']:lower()] == spell then
-            --This is where single spell removing code goes.
-            --Need to remove by spell index rather than name.
-            log('Removing '..spell..' from slot '..tonumber(loc)..'.')
-            tmpTable['slot'..loc] = nil
-        end
-    end
-    tmpTable:vprint()
-    tmpTable = nil
-end
-]]
 
 function remove_all_spells(trigger)
     reset_blue_magic_spells()
