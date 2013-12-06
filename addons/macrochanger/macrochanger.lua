@@ -71,10 +71,10 @@ windower.register_event('load',function ()
 	GEO_Page = ''
 	RUN_Book = ''
 	RUN_Page = ''
-	send_command('alias mc lua c macrochanger cmd')
-	send_command('alias macrochanger lua c macrochanger cmd')
-	add_to_chat(17, 'MacroChanger v' .. version .. ' loaded.     Author:  Banggugyangu')
-	add_to_chat(17, 'Attempting to load settings from file.')
+	windower.send_command('alias mc lua c macrochanger cmd')
+	windower.send_command('alias macrochanger lua c macrochanger cmd')
+	windower.add_to_chat(17, 'MacroChanger v' .. version .. ' loaded.     Author:  Banggugyangu')
+	windower.add_to_chat(17, 'Attempting to load settings from file.')
 	options_load()
 end)
 
@@ -145,7 +145,7 @@ function options_load()
 		RUN_Book = '20'
 		RUN_Page = '1'
 		print('Default settings file created')
-		add_to_chat(12,'MacroChanger created a settings file and loaded!')
+		windower.add_to_chat(12,'MacroChanger created a settings file and loaded!')
 	else
 		f:close()
 		for curline in io.lines(windower.addon_path..'data/settings.txt') do
@@ -246,7 +246,7 @@ function options_load()
 				globaldisable = tonumber(splat[3])
 			end
 		end
-		add_to_chat(12,'MacroChanger read from a settings file and loaded!')
+		windower.add_to_chat(12,'MacroChanger read from a settings file and loaded!')
 	end
 end
 
@@ -346,21 +346,21 @@ windower.register_event('job change',function (mjobId, mjob)
 		end
 	
 		if ((book == 'disabled') or (page == 'disabled')) then
-			add_to_chat(17, '                             Auto Macro Switching Disabled for ' .. job ..'.')
+			windower.add_to_chat(17, '                             Auto Macro Switching Disabled for ' .. job ..'.')
 		else	
-			add_to_chat(17, '                             Changing macros to Book: ' .. book .. ' and Page: ' .. page .. '.  Job Changed to ' .. job)
-			send_command('input /macro book ' .. book)
-			send_command('input /macro set ' .. page)
+			windower.add_to_chat(17, '                             Changing macros to Book: ' .. book .. ' and Page: ' .. page .. '.  Job Changed to ' .. job)
+			windower.send_command('input /macro book ' .. book)
+			windower.send_command('input /macro set ' .. page)
 		end
 	elseif globaldisable == 1 then
 	
-		add_to_chat(17, '                             Auto Macro Switching Disabled for All Jobs.')
+		windower.add_to_chat(17, '                             Auto Macro Switching Disabled for All Jobs.')
 		
 	end
 end)
 
 windower.register_event('unload',function ()
-	send_command('unalias mc')
+	windower.send_command('unalias mc')
 end)
 
 windower.register_event('addon command',function (...)
@@ -371,17 +371,17 @@ windower.register_event('addon command',function (...)
 		if splitarr[2] == 'disableall' then
 			if splitarr[3] == 'on' then
 				globaldisable = 1
-				add_to_chat(17, 'All automated macro switching disabled.')
+				windower.add_to_chat(17, 'All automated macro switching disabled.')
 			elseif splitarr[3] == 'off' then
 				globaldisable = 0
-				add_to_chat(17, 'Automated macro switching enabled.')
+				windower.add_to_chat(17, 'Automated macro switching enabled.')
 			end
 		elseif splitarr[2]:lower() == 'help' then
-			add_to_chat(17, 'MacroChanger Commands:')
-			add_to_chat(17, 'disableall [on|off]')
-			add_to_chat(17, '   on - Disables all automated macro switching')
-			add_to_chat(17, '   off - Enables all automated macro switching not disabled individually')
-			add_to_chat(17, '   Resets to what is stored in settings upon unloading of addon.  To Permanently change, please change the option in the settings file.')
+			windower.add_to_chat(17, 'MacroChanger Commands:')
+			windower.add_to_chat(17, 'disableall [on|off]')
+			windower.add_to_chat(17, '   on - Disables all automated macro switching')
+			windower.add_to_chat(17, '   off - Enables all automated macro switching not disabled individually')
+			windower.add_to_chat(17, '   Resets to what is stored in settings upon unloading of addon.  To Permanently change, please change the option in the settings file.')
 		end
 	end
 end)

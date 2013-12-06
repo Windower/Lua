@@ -159,13 +159,9 @@ windower.register_event('addon command', function(...)
                 settings:save('all')
             elseif comm == 'settings' then 
                 windower.add_to_chat(207,'OhShi - Current Textbox Settings')
-                sleep(10)
                 windower.add_to_chat(207,'  BG:   R: '..settings.bg.red..'  G: '..settings.bg.green..'  B: '..settings.bg.blue)
-                sleep(10)
                 windower.add_to_chat(207,'  Font: '..settings.text.font..'  Size: '..settings.text.size)
-                sleep(10)
                 windower.add_to_chat(207,'  Text: R: '..settings.text.red..'  G: '..settings.text.green..'  B: '..settings.text.blue)
-                sleep(10)
                 windower.add_to_chat(207,'  Pos:  X: '..settings.pos.x..'  Y: '..settings.pos.y)
             end
         else
@@ -184,7 +180,6 @@ windower.register_event('addon command', function(...)
     show/hide - toggles visibility of the tracker so you can make changes.]]
             for _, line in ipairs(helptext:split('\n')) do
                 windower.add_to_chat(207, line..chat.colorcontrols.reset)
-                sleep(10)
             end
         end
     end

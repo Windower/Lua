@@ -41,7 +41,7 @@ function get_sets()
 		body="Manibozho Jerkin",legs="Thaumas Gloves",lring="Beeline Ring",
 		back="Boxer Mantle",waist="Scouter's Rope",legs="Manibozho Brais",feet="Iga Kyahan +2"}
 		
-	send_command('input /macro book 16;wait .1;input /macro set 1')
+	windower.send_command('input /macro book 16;wait .1;input /macro set 1')
 end
 
 function precast(spell,action)
@@ -86,10 +86,10 @@ function self_command(command)
 	if command == 'toggle TP set' then
 		if sets.aftercast.TP == sets.TP.DD then
 			sets.aftercast.TP = sets.TP.Solo
-			send_command('@input /echo SOLO SET')
+			windower.send_command('@input /echo SOLO SET')
 		elseif sets.aftercast.TP == sets.TP.Solo then
 			sets.aftercast.TP = sets.TP.DD
-			send_command('@input /echo DD SET')
+			windower.send_command('@input /echo DD SET')
 		end
 	elseif command == 'DT' then
 		equip(sets.DT)

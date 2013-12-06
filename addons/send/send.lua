@@ -18,9 +18,9 @@ windower.register_event('addon command',function (...)
 		if broken_init ~= nil then
 			relevant_msg(table.concat(broken_init,' '))
 		end
-		send_ipc_message(term)
+		windower.send_ipc_message(term)
 	else
-		send_ipc_message(term)
+		windower.send_ipc_message(term)
 	end
 end)
 
@@ -92,13 +92,13 @@ function relevant_msg(msg)
 	
 
 	if msg:sub(1,2)=='//' then
-		send_command(msg:sub(3))
+		windower.send_command(msg:sub(3))
 	elseif msg:sub(1,1)=='/' then
-		send_command('input '..msg)
+		windower.send_command('input '..msg)
 	elseif msg:sub(1,3)=='atc' then
-		add_to_chat(55,msg:sub(5))
+		windower.add_to_chat(55,msg:sub(5))
 	else
-		send_command(msg)
+		windower.send_command(msg)
 	end
 
 end

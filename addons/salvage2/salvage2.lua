@@ -90,18 +90,18 @@ local params = {...};
 			windower.text.set_visibility('salvage_box2', true)
 		elseif params[1]:lower() == "timer" then
 			if params[2] == "start" then
-				send_command('timers c Remaining 6000 up')
+				windower.send_command('timers c Remaining 6000 up')
 			elseif params[2] == "stop" then
-				send_command('timers d Remaining')
+				windower.send_command('timers d Remaining')
 			end
 		elseif params[1]:lower() == "debug" then
 			if params[2]:lower() == "start" then
-					send_command('timers c Remaining 6000 up')
+					windower.send_command('timers c Remaining 6000 up')
 					settings_create()
 					windower.text.set_visibility('salvage_box2', true)
 					initialize()
 			elseif params[2]:lower() == "stop" then
-					send_command('timers d Remaining')
+					windower.send_command('timers d Remaining')
 					windower.text.set_visibility('salvage_box2', false)				
 			end
 		elseif params[1]:lower() == "remove" then
@@ -126,12 +126,12 @@ end)
 function checkzone()
 	currentzone = windower.ffxi.get_info()['zone']:lower()
 	if currentzone == 'silver sea remnants' or currentzone == 'zhayolm remnants' or currentzone == 'bhaflau remnants' or currentzone == 'arrapago remnants' then
-		send_command('timers c Remaining 6000 up')
+		windower.send_command('timers c Remaining 6000 up')
 		settings_create()
 		initialize()
 		windower.text.set_visibility('salvage_box2', true)
 	else
-		send_command('timers d Remaining')
+		windower.send_command('timers d Remaining')
 		settings_create()
 		initialize()
 		windower.text.set_visibility('salvage_box2', false)
@@ -180,5 +180,5 @@ end
 
 windower.register_event('unload',function ()
 	windower.text.delete('salvage_box2')
-	send_command('timers d Remaining')
+	windower.send_command('timers d Remaining')
 end )

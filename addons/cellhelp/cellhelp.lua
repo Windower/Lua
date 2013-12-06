@@ -135,7 +135,7 @@ windower.register_event('addon command',function (...)
 				orderlots()
 				--Populate initial LL
 				lightluggage()
-				send_command('ll profile salvage-'..player..'.txt')
+				windower.send_command('ll profile salvage-'..player..'.txt')
 				initialize()
 			end
 		elseif params[1]:lower() == "mode" then
@@ -151,9 +151,9 @@ windower.register_event('addon command',function (...)
 			end
 		elseif params[1]:lower() == "timer" then
 			if params[2] == "start" then
-				send_command('timers c Remaining 6000 up')
+				windower.send_command('timers c Remaining 6000 up')
 			elseif params[2] == "stop" then
-				send_command('timers d Remaining')
+				windower.send_command('timers d Remaining')
 			end
 		end			
 	end
@@ -167,7 +167,7 @@ windower.register_event('load',function ()
 	settings_create()
 	--Populate initial LL
 	lightluggage()
-	send_command('ll profile salvage-'..player..'.txt')
+	windower.send_command('ll profile salvage-'..player..'.txt')
 	initialize()
 end )
 
@@ -241,8 +241,8 @@ end
 function checkzone()
 	currentzone = windower.ffxi.get_info()['zone']:lower()
 		if currentzone == 'silver sea remnants' or currentzone == 'zhayolm remnants' or currentzone == 'bhaflau remnants' or currentzone == 'arrapago remnants' then
-			send_command('timers c Remaining 6000 up')
-		else send_command('timers d Remaining')
+			windower.send_command('timers c Remaining 6000 up')
+		else windower.send_command('timers d Remaining')
 		end
 end
 
@@ -275,5 +275,5 @@ end	)
 
 windower.register_event('unload',function ()
 	windower.text.delete('salvage_box')
-	send_command('timers d Remaining')
+	windower.send_command('timers d Remaining')
 end )

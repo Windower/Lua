@@ -556,7 +556,7 @@ windower.register_event('addon command', function (...)
 				end
 			end
 		elseif args[1]:lower() == "unload" then
-			send_command('lua unload dressup')
+			windower.send_command('lua unload dressup')
 		end
 	end
 	settings:save('all')

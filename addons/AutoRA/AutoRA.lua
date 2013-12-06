@@ -32,11 +32,11 @@ windower.register_event('load',function ()
 	RW_delay = 0
 	Ammo_delay = 0
 	retrn = 0
-	send_command('unbind ^d')
-	send_command('unbind !d')
-	send_command('bind ^d ara start')
-	send_command('bind !d ara stop')
-	send_command('alias ara lua c autora')
+	windower.send_command('unbind ^d')
+	windower.send_command('unbind !d')
+	windower.send_command('bind ^d ara start')
+	windower.send_command('bind !d ara stop')
+	windower.send_command('alias ara lua c autora')
 	
 end)
 	
@@ -55,11 +55,11 @@ function stop()
 end
 
 function shoot()
-	send_command('/shoot <t>')
+	windower.send_command('/shoot <t>')
 end
 
 function shootOnce()
-	send_command('/shoot <t>')
+	windower.send_command('/shoot <t>')
 end
 
 --Function Author:  Byrth
@@ -100,7 +100,7 @@ windower.register_event('action',function (act)
 			end
 			
 			if auto == 1 then
-				send_command('wait 2; /shoot <t>')
+				windower.send_command('wait 2; /shoot <t>')
 			elseif auto == 0 then
 			end
 		end
@@ -120,14 +120,14 @@ windower.register_event('addon command',function (...)
 	elseif splitarr[1]:lower() == 'reload' then
 		setDelay()
 	elseif splitarr[1]:lower() == 'help' then
-		add_to_chat(17, 'AutoRA  v'..version..'commands:')
-		add_to_chat(17, '//ara [options]')
-		add_to_chat(17, '    start  - Starts auto attack with ranged weapon')
-		add_to_chat(17, '    stop   - Stops auto attack with ranged weapon')
-		add_to_chat(17, '    help   - Displays this help text')
-		add_to_chat(17, ' ')
-		add_to_chat(17, 'AutoRA will only automate ranged attacks if your status is "Engaged".  Otherwise it will always fire a single ranged attack.')
-		add_to_chat(17, 'To start auto ranged attacks without commands use the key:  Ctrl+d')
-		add_to_chat(17, 'To stop auto ranged attacks in the same manner:  Atl+d')
+		windower.add_to_chat(17, 'AutoRA  v'..version..'commands:')
+		windower.add_to_chat(17, '//ara [options]')
+		windower.add_to_chat(17, '    start  - Starts auto attack with ranged weapon')
+		windower.add_to_chat(17, '    stop   - Stops auto attack with ranged weapon')
+		windower.add_to_chat(17, '    help   - Displays this help text')
+		windower.add_to_chat(17, ' ')
+		windower.add_to_chat(17, 'AutoRA will only automate ranged attacks if your status is "Engaged".  Otherwise it will always fire a single ranged attack.')
+		windower.add_to_chat(17, 'To start auto ranged attacks without commands use the key:  Ctrl+d')
+		windower.add_to_chat(17, 'To stop auto ranged attacks in the same manner:  Atl+d')
 	end
 end)

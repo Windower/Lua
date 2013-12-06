@@ -55,8 +55,8 @@ function options_load()
 		g:close()
 		
 		print('Default settings file created')
-		add_to_chat(17,'PetSchool created a settings file and loaded!')
-		add_to_chat(17,'Please Modify the Settings file to fit your spellcast .XML file')
+		windower.add_to_chat(17,'PetSchool created a settings file and loaded!')
+		windower.add_to_chat(17,'Please Modify the Settings file to fit your spellcast .XML file')
 	else
 		f:close()
 		for curline in io.lines(windower.addon_path..'data/settings.txt') do
@@ -75,7 +75,7 @@ function options_load()
 				Idle_Set = splat[3]
 			end
 		end
-		add_to_chat(17,'PetSchool read from a settings file and loaded!')
+		windower.add_to_chat(17,'PetSchool read from a settings file and loaded!')
 	end
 end
 
@@ -90,19 +90,19 @@ windower.register_event('action',function (act)
 	if actor == pet then
 		if category == 8 then
 			if actionTarget.is_npc == true then
-				send_command('sc set ' .. PetNuke)
-				add_to_chat(17, '                       Pet Spellcast Started:  Nuking')
+				windower.send_command('sc set ' .. PetNuke)
+				windower.add_to_chat(17, '                       Pet Spellcast Started:  Nuking')
 			elseif actionTarget.is_npc == false then
-				send_command('sc set ' .. PetHeal)
-				add_to_chat(17, '                       Pet Spellcast Started:  Curing/Buffing')
+				windower.send_command('sc set ' .. PetHeal)
+				windower.add_to_chat(17, '                       Pet Spellcast Started:  Curing/Buffing')
 			end
 		elseif category == 4 then
 			if (player.status:lower() == 'engaged') then
-				send_command('sc set ' .. TP_Set)
-				add_to_chat(17, '                       Pet Spellcast Finished')
+				windower.send_command('sc set ' .. TP_Set)
+				windower.add_to_chat(17, '                       Pet Spellcast Finished')
 			elseif (player.status:lower() == 'idle') then
-				send_command('sc set ' .. Idle_Set)
-				add_to_chat(17, '                       Pet Spellcast Finished')
+				windower.send_command('sc set ' .. Idle_Set)
+				windower.add_to_chat(17, '                       Pet Spellcast Finished')
 			end
 		end
 	end
@@ -137,9 +137,9 @@ windower.register_event('addon command',function (...)
 	if splitarr[1]:lower() == 'reload' then
 		options_load()
 	elseif splitarr[1]:lower() == 'help' then
-		add_to_chat(17, 'PetSchool  v'..version..'commands:')
-		add_to_chat(17, '//ps [options]')
-		add_to_chat(17, '    reload  - Reloads settings')
-		add_to_chat(17, '    help   - Displays this help text')
+		windower.add_to_chat(17, 'PetSchool  v'..version..'commands:')
+		windower.add_to_chat(17, '//ps [options]')
+		windower.add_to_chat(17, '    reload  - Reloads settings')
+		windower.add_to_chat(17, '    help   - Displays this help text')
 	end
 end)

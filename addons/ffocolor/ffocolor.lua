@@ -72,7 +72,6 @@ windower.register_event('addon command', function(...)
  4. ffocolor help --Shows this menu.]]
             for _, line in ipairs(helptext:split('\n')) do
                 windower.add_to_chat(207, line..chat.colorcontrols.reset)
-                sleep(10)
             end
         elseif S{'chattab','chatcolor'}:contains(comm) then
             if comm == 'chatcolor' then
@@ -98,7 +97,6 @@ windower.register_event('addon command', function(...)
                 end
                 if counter == 16 or n == 509 then
                     log(line)
-                    sleep(10)
                     counter = 0
                     line = ''
                 end

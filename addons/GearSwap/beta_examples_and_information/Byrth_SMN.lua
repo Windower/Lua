@@ -86,7 +86,7 @@ function get_sets()
 	Magical_BPs_affected_by_TP = T{'Heavenly Strike','Wind Blade','Holy Mist','Night Terror','Thunderstorm','Geocrush','Meteor Strike','Grand Fall','Lunar Bay','Thunderspark'} -- Unsure if Thunderspark is affected by TP
 	Magical_BPs_unaffected_by_TP = T{'Nether Blast','Aerial Blast','Searing Light','Diamond Dust','Earthen Fury','Zantetsuken','Tidal Wave','Judgment Bolt','Inferno','Howling Moon','Ruinous Omen','Flaming Crush'}
 	Additional_effect_BPs = T{'Rock Throw'}	
-	send_command('input /macro book 8;wait .1;input /macro set 1')
+	windower.send_command('input /macro book 8;wait .1;input /macro set 1')
 end
 
 function precast(spell,action)
@@ -133,7 +133,7 @@ function aftercast(spell,action)
 	if not spell.type or not string.find(spell.type,'BloodPact') then
 		-- Don't want to swap away too quickly if I'm about to put BP damage gear on
 		-- Need to wait 1 in order to allow pet information to update on Release.
-		send_command('@wait 1;gs c Idle')
+		windower.send_command('@wait 1;gs c Idle')
 	end
 end
 

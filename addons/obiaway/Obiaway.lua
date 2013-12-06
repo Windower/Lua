@@ -53,12 +53,12 @@
 
 windower.register_event('load',function ()
 	print("Loaded Obiaway.")
-	send_command("alias Obiaway lua c Obiaway")
+	windower.send_command("alias Obiaway lua c Obiaway")
 end)
 
 windower.register_event('unload',function ()
 	print("Unloaded Obiaway.")
-	send_command("unalias Obiaway")
+	windower.send_command("unalias Obiaway")
 end)
 
 windower.register_event('addon command',function (...)
@@ -81,7 +81,7 @@ end)
 
 function get_obis_in_inventory()
 	obis = {}
-	items = get_items()
+	items = windower.get_items()
 	inv = items.inventory
 	number = items.max_inventory - 1 -- items.max_inventory returns inventory size +1
 	for i=1,number do 
@@ -105,36 +105,36 @@ function remove_unneeded_obis()
 	elements = get_all_elements()
 	obis = get_obis_in_inventory()
 	if obis["Fire"] and elements["Fire"]==0 then
-		send_command("input /put \"Karin Obi\" Sack")
-		send_command("console_echo Moving Karin Obi to Sack")
+		windower.send_command("input /put \"Karin Obi\" Sack")
+		windower.send_command("console_echo Moving Karin Obi to Sack")
 	end
 	if obis["Earth"] and elements["Earth"]==0 then
-		send_command("input /put \"Dorin Obi\" Sack")
-		send_command("console_echo Moving Dorin Obi to Sack")
+		windower.send_command("input /put \"Dorin Obi\" Sack")
+		windower.send_command("console_echo Moving Dorin Obi to Sack")
 	end
 	if obis["Water"] and elements["Water"]==0 then
-		send_command("input /put \"Suirin Obi\" Sack")
-		send_command("console_echo Moving Suirin Obi to Sack")
+		windower.send_command("input /put \"Suirin Obi\" Sack")
+		windower.send_command("console_echo Moving Suirin Obi to Sack")
 	end
 	if obis["Wind"] and elements["Wind"]==0 then
-		send_command("input /put \"Furin Obi\" Sack")
-		send_command("console_echo Moving Furin Obi to Sack")
+		windower.send_command("input /put \"Furin Obi\" Sack")
+		windower.send_command("console_echo Moving Furin Obi to Sack")
 	end
 	if obis["Ice"] and elements["Ice"]==0 then
-		send_command("input /put \"Hyorin Obi\" Sack")
-		send_command("console_echo Moving Hyorin Obi to Sack")
+		windower.send_command("input /put \"Hyorin Obi\" Sack")
+		windower.send_command("console_echo Moving Hyorin Obi to Sack")
 	end
 	if obis["Thunder"] and elements["Thunder"]==0 then
-		send_command("input /put \"Rairin Obi\" Sack")
-		send_command("console_echo Moving Rairin Obi to Sack")
+		windower.send_command("input /put \"Rairin Obi\" Sack")
+		windower.send_command("console_echo Moving Rairin Obi to Sack")
 	end
 	if obis["Light"] and elements["Light"]==0 then	
-		send_command("input /put \"Korin Obi\" Sack")
-		send_command("console_echo Moving Korin Obi to Sack")
+		windower.send_command("input /put \"Korin Obi\" Sack")
+		windower.send_command("console_echo Moving Korin Obi to Sack")
 	end
 	if obis["Dark"] and elements["Dark"]==0 then	
-		send_command("input /put \"Anrin Obi\" Sack")
-		send_command("console_echo Moving Anrin Obi to Sack")
+		windower.send_command("input /put \"Anrin Obi\" Sack")
+		windower.send_command("console_echo Moving Anrin Obi to Sack")
 	end
 end;
 

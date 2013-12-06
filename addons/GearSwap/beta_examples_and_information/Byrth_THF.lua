@@ -79,7 +79,7 @@ function get_sets()
 	sets.Idle.MDT = {head="Uk'uxkaj Cap",neck="Twilight Torque",ear1="Merman's Earring",ear2="Bladeborn Earring",
 		body="Avalon Breastplate",hands="Iuitl Wristbands",ring1="Defending Ring",ring2="Dark Ring",
 		back="Mollusca Mantle",waist="Wanion Belt",legs="Nahtirah Trousers",feet="Skadi's Jambeaux +1"}
-	send_command('input /macro book 12;wait .1;input /macro set 1')
+	windower.send_command('input /macro book 12;wait .1;input /macro set 1')
 	
 end
 
@@ -128,12 +128,12 @@ function self_command(command)
 	if command == 'toggle TP set' then
 		TP_Index = TP_Index +1
 		if TP_Index > #TP_Set_Names then TP_Index = 1 end
-		send_command('@input /echo ----- TP Set changed to '..TP_Set_Names[TP_Index]..' -----')
+		windower.send_command('@input /echo ----- TP Set changed to '..TP_Set_Names[TP_Index]..' -----')
 		equip(sets.TP[TP_Set_Names[TP_Index]])
 	elseif command == 'toggle Idle set' then
 		Idle_Index = Idle_Index +1
 		if Idle_Index > #Idle_Set_Names then Idle_Index = 1 end
-		send_command('@input /echo ----- Idle Set changed to '..Idle_Set_Names[Idle_Index]..' -----')
+		windower.send_command('@input /echo ----- Idle Set changed to '..Idle_Set_Names[Idle_Index]..' -----')
 		equip(sets.Idle[Idle_Set_Names[Idle_Index]])
 	end
 end

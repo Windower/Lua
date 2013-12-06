@@ -129,6 +129,6 @@ function target_make(targets)
 	if targets[target_type] and target_type ~= 'Self' then
 		return '<t>'
 	end
---	add_to_chat(8,"got to the end "..tostring(target_type))
+--	windower.add_to_chat(8,"got to the end "..tostring(target_type))
 	return '<me>'
 end

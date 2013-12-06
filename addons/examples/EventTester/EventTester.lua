@@ -17,11 +17,11 @@ windower.register_event('lose status',function (id, name)
 end)
 
 windower.register_event('logout',function (name)
-	send_command("echo Logout, Name: "..name)
+	windower.send_command("echo Logout, Name: "..name)
 end)
 
 windower.register_event('login',function (name)
-	send_command("echo Login, Name: "..name)
+	windower.send_command("echo Login, Name: "..name)
 end)
 
 windower.register_event('levelup',function (level)
