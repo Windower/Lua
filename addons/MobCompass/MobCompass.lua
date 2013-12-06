@@ -186,13 +186,13 @@ end)
 function get_target()
 	--Player info
 	player = T(get_player())
-	P = T(get_mob_by_id(player.id))
+	P = T(windower.ffxi.get_mob_by_id(player.id))
 	local Px = P.x_pos
 	local Py = P.y_pos
 	local tb_text = T()
 	
 	-- Target info
-	target = T(get_mob_by_index(player.target_index))
+	target = T(windower.ffxi.get_mob_by_index(player.target_index))
 	target_id = target.id
 	local i = 1
 	for i = 1,3 do

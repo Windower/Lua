@@ -35,7 +35,7 @@ windower.register_event('unload',function ()
 end)
 
 windower.register_event('target change',function (targId)
-	local currentmob = get_mob_by_index(targId)
+	local currentmob = windower.ffxi.get_mob_by_index(targId)
 	if currentmob ~= nil then
 		if currentmob['id'] == nil then
 			tb_set_text('scan_box','No target / Default')

@@ -344,7 +344,7 @@ function get_ally_mob_ids()
             allies:append(member.mob.id)
             if member.mob.pet_index and member.mob.pet_index> 0 then
                 print('here d')
-                allies:append(get_mob_by_index(member.mob.pet_index).id)
+                allies:append(windower.ffxi.get_mob_by_index(member.mob.pet_index).id)
             end
         end
     end

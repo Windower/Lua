@@ -251,7 +251,7 @@ windower.register_event('target change',function (targ_id)
 	checkzone()
 	if proc == 'on' then
 		if targ_id ~= 0 then
-			mob = get_mob_by_index(targ_id)['name']
+			mob = windower.ffxi.get_mob_by_index(targ_id)['name']
   			setproc()
   		end
  	end
