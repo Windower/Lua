@@ -109,41 +109,41 @@ windower.register_event('addon command',function (...)
 	elseif splitup[1]:lower() == 'enable' then
 		if splitup[2] and slot_map[splitup[2]:gsub('[^%a]',''):lower()] then
 			enable(splitup[2])
-			write('Gearswap: '..splitup[2]..' enabled.')
+			print('Gearswap: '..splitup[2]..' enabled.')
 		elseif splitup[2] and splitup[2]:lower()=='all' then
 			enable('main','sub','range','ammo','head','neck','lear','rear','body','hands','lring','rring','back','waist','legs','feet')
-			write('Gearswap: All slots enabled.')
+			print('Gearswap: All slots enabled.')
 		elseif gearswap_disabled and not splitup[2] then
 			gearswap_disabled = false
-			write('GearSwap: Enabled')
+			print('GearSwap: Enabled')
 		end
 	elseif splitup[1]:lower() == 'disable' then
 		if splitup[2] and slot_map[splitup[2]:gsub('[^%a]',''):lower()] then
 			disable(splitup[2])
-			write('Gearswap: '..splitup[2]..' disabled.')
+			print('Gearswap: '..splitup[2]..' disabled.')
 		elseif splitup[2] and splitup[2]:lower()=='all' then
 			disable('main','sub','range','ammo','head','neck','lear','rear','body','hands','lring','rring','back','waist','legs','feet')
-			write('Gearswap: All slots disabled.')
+			print('Gearswap: All slots disabled.')
 		elseif not gearswap_disabled and not splitup[2] then
-			write('GearSwap: Disabled')
+			print('GearSwap: Disabled')
 			gearswap_disabled = true
 		end
 	elseif splitup[1]:lower() == 'reload' then
 		refresh_user_env()
 	elseif strip(splitup[1]) == 'debugmode' then
 		_global.debug_mode = not _global.debug_mode
-		write('Debug Mode set to '..tostring(_global.debug_mode)..'.')
+		print('Debug Mode set to '..tostring(_global.debug_mode)..'.')
 	elseif strip(splitup[1]) == 'showswaps' then
 		_global.show_swaps = not _global.show_swaps
-		write('Show Swaps set to '..tostring(_global.show_swaps)..'.')
+		print('Show Swaps set to '..tostring(_global.show_swaps)..'.')
 	else
-		write('command not found')
+		print('command not found')
 	end
 end)
 
 function sender()
 	if not action_sent then
-		write('Forcing Send')
+		print('Forcing Send')
 		if debugging >= 1 then windower.add_to_chat(123,'GearSwap: Had to force the command to send.') end
 		send_check(true)
 	end
@@ -198,7 +198,7 @@ windower.register_event('outgoing text',function(original,modified)
 			r_line.type = 'Item'
 			s_type = 'Item'
 		elseif debugging then
-			write('this case should never be hit '..command)
+			print('this case should never be hit '..command)
 		end
 		
 		_global.storedtarget = temptarg
