@@ -166,7 +166,7 @@ end)
 function make_name(name)
 	if name then
 		name = name:lower()
-	elseif get_player() then
+	elseif windower.ffxi.get_player() then
 		name = windower.get_player().name:lower()
 	end
 	

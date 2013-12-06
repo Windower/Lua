@@ -49,7 +49,7 @@ _addon.commands = {'gs','gearswap'}
 windower.register_event('load',function()
 	debugging = 0
 	if debugging >= 1 then windower.debug('load') end
-	if dir_exists('../addons/GearSwap/data/logs') then
+	if windower.dir_exists('../addons/GearSwap/data/logs') then
 		logging = false
 		logfile = io.open('../addons/GearSwap/data/logs/NormalLog'..tostring(os.clock())..'.log','w+')
 		logit(logfile,'GearSwap LOGGER HEADER\n')
@@ -60,7 +60,7 @@ windower.register_event('load',function()
 	
 	if world.logged_in then
 		refresh_user_env()
-		if debugging >= 1 then send_command('@unload spellcast;') end
+		if debugging >= 1 then windower.send_command('@unload spellcast;') end
 	end
 end)
 
@@ -155,7 +155,7 @@ windower.register_event('outgoing text',function(original,modified)
 	if debugging >= 1 then windower.debug('outgoing text') end
 	if gearswap_disabled then return modified end
 	
-	local temp_mod = convert_auto_trans(modified)
+	local temp_mod = windower.convert_auto_trans(modified)
 	local splitline = split(temp_mod,' ')
 	local command = splitline[1]
 
@@ -267,10 +267,10 @@ windower.register_event('incoming chunk',function(id,data)
 			end
 		end
 		
-		local tempplay = get_player()
+		local tempplay = windower.ffxi.get_player()
 		if actor_id ~= tempplay.id then
 			if tempplay.pet_index then
-				if actor_id ~= get_mob_by_index(tempplay.pet_index)['id'] then
+				if actor_id ~= windower.ffxi.get_mob_by_index(tempplay.pet_index)['id'] then
 					return
 				end
 			else
@@ -289,7 +289,7 @@ windower.register_event('incoming chunk',function(id,data)
 				midaction = false
 				spelltarget = nil
 			end
-		elseif unable_to_use:contains(message_id) then
+		elseif unable_to_use:contains(message_id) and midaction then
 			if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(195) Event Action Message: '..tostring(message_id)..' Interrupt') end
 			if type(user_env.aftercast) == 'function' then
 				equip_sets('aftercast',{name='Interrupt',type='Interrupt'},{type='Recast'})
@@ -312,7 +312,7 @@ windower.register_event('incoming chunk',function(id,data)
 			local tf = (math.floor( (enc%(2^(i+1))) / 2^i ) == 1) -- Could include the binary library some day if necessary
 			if encumbrance_table[i] ~= tf then
 				if not tf and not_sent_out_equip[i] and not disable_table[i] then
-					local eq = get_items().equipment
+					local eq = windower.ffxi.get_items().equipment
 					if not_sent_out_equip[i] ~= eq[default_slot_map[i]] then
 						set_equip(not_sent_out_equip[i],i)
 					end
@@ -391,8 +391,8 @@ windower.register_event('outgoing chunk',function(id,data)
 		category = data:byte(12,12)*256+data:byte(11,11)
 		param = data:byte(14,14)*256+data:byte(13,13)
 		_unknown1 = data:byte(16,16)*256+data:byte(15,15)
-		local actor_name = get_mob_by_id(actor_id)['name']
-		local target_name = get_mob_by_index(index)['name']
+		local actor_name = windower.ffxi.get_mob_by_id(actor_id)['name']
+		local target_name = windower.ffxi.get_mob_by_index(index)['name']
 		if category == 3 and not buffactive.silence and not buffactive.mute then -- 3 = Magic
 			abil_name = r_spells[param][language]
 		elseif (category == 7 or category == 25) and not buffactive.amnesia then -- 7 = WS, 25 = Monster skill
@@ -430,8 +430,8 @@ windower.register_event('action',function(act)
 	if debugging >= 1 then windower.debug('action') end
 	if gearswap_disabled or act.category == 1 then return end
 	
-	local temp_player = get_player()
-	local temp_player_mob_table = get_mob_by_index(temp_player.index)
+	local temp_player = windower.ffxi.get_player()
+	local temp_player_mob_table = windower.ffxi.get_mob_by_index(temp_player.index)
 	local player_id = temp_player['id']
 	-- Update player info for aftercast costs.
 	player.tp = temp_player.vitals.tp
@@ -440,7 +440,7 @@ windower.register_event('action',function(act)
 	
 	local temp_pet,pet_id
 	if temp_player_mob_table.pet_index then
-		temp_pet = get_mob_by_index(temp_player_mob_table.pet_index)
+		temp_pet = windower.ffxi.get_mob_by_index(temp_player_mob_table.pet_index)
 		if temp_pet then
 			pet_id = temp_pet.id
 		end
@@ -500,10 +500,10 @@ end)
 		end
 	end
 	
-	local tempplay = get_player()
+	local tempplay = windower.ffxi.get_player()
 	if actor_id ~= tempplay.id then
 		if tempplay.pet_index then
-			if actor_id ~= get_mob_by_index(tempplay.pet_index)['id'] then
+			if actor_id ~= windower.ffxi.get_mob_by_index(tempplay.pet_index)['id'] then
 				return
 			end
 		else

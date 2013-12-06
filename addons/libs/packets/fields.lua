@@ -28,12 +28,12 @@ ls_name_ext[0] = '`'
 res = require('resources')
 
 local function id(val)
-    local mob = get_mob_by_id(val)
+    local mob = windower.ffxi.get_mob_by_id(val)
     return mob and mob.name
 end
 
 local function index(val)
-    local mob = get_mob_by_index(val)
+    local mob = windower.ffxi.get_mob_by_index(val)
     return mob and mob.name
 end
 
@@ -117,10 +117,10 @@ fields.outgoing[0x015] = L{
     {ctype='float',             label='X Position'},                            --    4 -   7
     {ctype='float',             label='Y Position'},                            --    8 -  11
     {ctype='float',             label='Z Position'},                            --   12 -  15
-    {ctype='float',             label='_unknown1'},                             --   16 -  19
+    {ctype='float',             label='_unknown1'},                             --   16 -  19 -- Counter that indicates how long you've been running?
     {ctype='unsigned char',     label='Rotation'},                              --   20 -  20
     {ctype='unsigned char',     label='_unknown2'},                             --   21 -  21
-    {ctype='unsigned short',    label='Player Index',       fn=index},          --   22 -  23
+    {ctype='unsigned short',    label='Target Index',       fn=index},          --   22 -  23
     {ctype='unsigned int',      label='Timestamp',          fn=time},           --   24 -  27
     {ctype='unsigned int',      label='_unknown3'},                             --   28 -  31
 }
@@ -898,6 +898,22 @@ fields.incoming[0x0CA] = L{
     {ctype='char[118]',         label='Bazaar Message'},                        --   10 - 127   Terminated with a vertical tab
     {ctype='char[16]',          label='Player Name'},                           --  128 - 143
     {ctype='unsigned short',    label='_unknown3'},                             --  144 - 145   C6 01 observed. Not player index.
+    {ctype='unsigned short',    label='_unknown4'},                             --  146 - 147   00 00 observed.
+}
+
+-- Found Item
+fields.incoming[0x0D2] = L{
+--[[07:29:49  Incoming Packet: Found Item Content:  (Ancient Brass)
+  XX  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F
+  00  D2 3C xx xx 01 00 00 00 9B 60 02 01 00 00 00 00 
+  10  8D 07 9B 00 00 00 01 C3 53 94 94 52 00 00 00 00 
+  20  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+  30  00 00 00 00 00 00 00 00 24 00 00 00 ]]
+    {ctype='int',               label='_unknown1'},                             --    4 -   7   Could be characters starting the line - FD 02 02 18 observed
+    {ctype='int',               label='Dropper ID'},                            --    8 -  11   Could also be characters starting the line - 01 FD observed
+    {ctype='int',               label='_unknown2'},                             --   12 -  15   
+    {ctype='short',             label='Item ID'},                               --   16 -  17
+    {ctype='int',               label='_unknown3'},                             --   18 -  21
     {ctype='unsigned short',    label='_unknown4'},                             --  146 - 147   00 00 observed.
 }
 

@@ -62,6 +62,7 @@ function equip_sets(swap_type,val1,val2)
 	end
 
 	if swap_type == 'precast' then
+		if _global.debug_mode then add_to_chat(8,'Gearswap (Debug Mode): Precast '..tostring(val1.name)) end
 		val1.target = spelltarget
 		if type(user_env.precast) == 'function' then user_env.precast(val1,val2) -- User defined function to determine the precast set
 		elseif user_env.precast then add_to_chat(123,'GearSwap: precast() exists but is not a function') end
@@ -70,9 +71,11 @@ function equip_sets(swap_type,val1,val2)
 			send_command('@wait 1;lua invoke gearswap sender')
 		end
 	elseif swap_type == 'midcast' then
+		if _global.debug_mode then add_to_chat(8,'Gearswap (Debug Mode): Midcast '..tostring(val1.name)) end
 		val1.target = spelltarget
 		user_env.midcast(val1,val2) -- User defined function to determine the midcast set
 	elseif swap_type == 'aftercast' then
+		if _global.debug_mode then add_to_chat(8,'Gearswap (Debug Mode): Aftercast '..tostring(val1.name)) end
 		if not val1 then val1 = {}
 			if debugging >= 2 then
 				add_to_chat(8,'val1 error')
@@ -83,20 +86,29 @@ function equip_sets(swap_type,val1,val2)
 		spelltarget = nil
 		user_env.aftercast(val1,val2) -- User defined function to determine the aftercast set
 	elseif swap_type == 'pet_midcast' then
+		if _global.debug_mode then add_to_chat(8,'Gearswap (Debug Mode): Pet Midcast '..tostring(val1.name)) end
 		val1.target = spelltarget
 		user_env.pet_midcast(val1,val2) -- User defined function to determine the midcast set
 	elseif swap_type == 'pet_aftercast' then
+		if _global.debug_mode then add_to_chat(8,'Gearswap (Debug Mode): Pet Aftercast '..tostring(val1.name)) end
 		val1.target = spelltarget
 		user_env.pet_aftercast(val1,val2) -- User defined function to determine the aftercast set
 	elseif swap_type == 'status_change' then
+		if _global.debug_mode then add_to_chat(8,'Gearswap (Debug Mode): Status Change '..tostring(val1)..' '..tostring(val2))
+			for i=1,#val2 do
+				add_to_chat(8,'Gearswap (Debug Mode): '..i..' '..string.byte(val2[i]))
+			end
+		end
 		if type(user_env.status_change) == 'function' then user_env.status_change(val1,val2) -- User defined function to determine if sets should change following status change
 		elseif user_env.status_change then add_to_chat(123,'GearSwap: status_change() exists but is not a function') end
 	elseif swap_type == 'buff_change' then
+		if _global.debug_mode then add_to_chat(8,'Gearswap (Debug Mode): Buff Change '..tostring(val1)..' '..tostring(val2)) end
 		if type(user_env.buff_change) == 'function' then user_env.buff_change(val1,val2) -- User defined function to determine if sets should change following buff change
 		elseif user_env.buff_change then add_to_chat(123,'GearSwap: buff_change() exists but is not a function') end
 	elseif swap_type == 'equip_command' then
 		equip(val1)
 	elseif swap_type == 'self_command' then
+		if _global.debug_mode then add_to_chat(8,'Gearswap (Debug Mode): Self Command '..tostring(val1)) end
 		if type(user_env.self_command) == 'function' then user_env.self_command(val1)
 		elseif user_env.self_command then add_to_chat(123,'GearSwap: self_command() exists but is not a function') end
 	elseif swap_type == 'delayed' then
@@ -270,8 +282,8 @@ function to_id_set(inventory,equip_list)
 	
 	if _global.debug_mode then
 		for i,v in pairs(equip_list) do
-			if type(v) == 'string' and v ~= '' then
-				add_to_chat(8,'GearSwap (Debug Mode): '..i..' - '..v)
+			if type(v) == 'string' and v ~= 'empty' and v~='' then
+				add_to_chat(8,'GearSwap (Debug Mode): Unhandled slot '..i..' - '..v)
 			end
 		end
 	end

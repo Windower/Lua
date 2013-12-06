@@ -13,11 +13,11 @@ windower.register_event('load',function()
 	outgoing_bl = T{0x015,0x0B5,0x050}
 	--incoming_record_only = 0x038
 	--outgoing_record_only = 0x50
-	local player = get_player()
+	local player = windower.ffxi.get_player()
 	local petstuff = ''
-	if get_mob_by_id(player['id'])['pet_index'] ~= 0 then
+	if windower.ffxi.get_mob_by_id(player['id'])['pet_index'] ~= 0 then
 		write(get_mob_by_id(player['id'])['pet_index'])
-		local petinfo = get_mob_by_index(get_mob_by_id(player['id'])['pet_index'])
+		local petinfo = windower.ffxi.get_mob_by_index(get_mob_by_id(player['id'])['pet_index'])
 		petstuff = ' Pet ID: '..Dec2Hex(petinfo['id'])..' Pet Index: '..Dec2Hex(petinfo['index'])
 	end
 	f:write('Player ID: '..Dec2Hex(player['id'])..' Index: '..Dec2Hex(player['index'])..petstuff..'\n\n')

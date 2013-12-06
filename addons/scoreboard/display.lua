@@ -270,7 +270,7 @@ end
 
 local function slow_output(chatprefix, lines, limit)
     -- this is funky but if we don't wait like this, the lines will spew too fast and error
-    send_command(lines:map(function (l) return chatprefix .. l end):concat('; wait 1.2 ; '))
+    windower.send_command(lines:map(function (l) return chatprefix .. l end):concat('; wait 1.2 ; '))
 end
 
 function Display:report_summary (...)

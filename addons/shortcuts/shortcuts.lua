@@ -26,7 +26,7 @@
 
 debugging = false
 logging = false
-if dir_exists('../addons/shortcuts/data/') and logging then
+if windower.dir_exists('../addons/shortcuts/data/') and logging then
 	logfile = io.open('../addons/shortcuts/data/NormalLog'..tostring(os.clock())..'.log','w+')
 	logfile:write('\n\n','SHORTCUTS LOGGER HEADER: ',tostring(os.clock()),'\n')
 	logfile:flush()
@@ -83,7 +83,7 @@ end)
 ---- string, changed command
 -----------------------------------------------------------------------------------
 windower.register_event('outgoing text',function(original,modified)
-	local temp_org = convert_auto_trans(modified)
+	local temp_org = windower.convert_auto_trans(modified)
 	if modified:sub(1,1) ~= '/' then return modified end
 	temp_org = temp_org:gsub(' <wait %d+>','')
 	if logging then
@@ -258,7 +258,7 @@ function interp_text(splitline,offset,modified)
 		
 		-- Handling for abilities that change potential targets.
 		if r_line['prefix'] == '/song' or r_line['prefix'] == '/so' then
-			local buffs = get_player()['buffs']
+			local buffs = windower.ffxi.get_player()['buffs']
 			for i,v in pairs(buffs) do
 				if v == 409 then targets['Party'] = true end -- Pianissimo
 			end
