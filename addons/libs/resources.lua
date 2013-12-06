@@ -82,7 +82,8 @@ end
 -- Returns the spells, indexed by ingame ID.
 function fns.spells()
     local file = _libs.filehelper.read(plugin_resources..'spells.xml')
-    local match_string = '<s id="(%d-)" index="(%d-)" prefix="([^"]-)" english="([^"]-)" german="([^"]-)" french="([^"]-)" japanese="([^"]-)" type="([^"]-)" element="([^"]-)" targets="([^"]-)" skill="([^"]-)" mpcost="(%d-)" casttime="(%d-)" recast="(%d-)" alias="([^"]-)" />'
+    local match_string = '<s id="(%d-)" index="(%d-)" prefix="([^"]-)" english="([^"]-)" german="([^"]-)" french="([^"]-)" japanese="([^"]-)" type="([^"]-)" element="([^"]-)" targets="([^"]-)" skill="([^"]-)" mpcost="([^"]-)" casttime="([^"]-)" recast="([^"]-)" alias="([^"]-)" />'
+    
     local res = T{}
     for id, index, prefix, english, german, french, japanese, type, element, targets, skill, mp_cost, cast_time, recast, alias in file:gmatch(match_string) do
         index = tonumber(index)
@@ -90,10 +91,10 @@ function fns.spells()
             id = tonumber(id),
             index = index,
             prefix = prefix,
-            english = english,
-            german = german,
-            french = french,
-            japanese = japanese,
+            english = unquote(english),
+            german = unquote(german),
+            french = unquote(french),
+            japanese = unquote(japanese),
             type = type,
             element = element,
             targets = targets:split(', '),
@@ -101,11 +102,10 @@ function fns.spells()
             mp_cost = tonumber(mp_cost),
             cast_time = tonumber(cast_time),
             recast = tonumber(recast),
-            alias = alias,
+            alias = alias:split('|'),
         }
         res[index].name = res[index][language_string]
     end
-
     resources.spells = res
 end
 
