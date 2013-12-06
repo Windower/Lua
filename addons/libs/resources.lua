@@ -83,7 +83,7 @@ end
 function fns.spells()
     local file = _libs.filehelper.read(plugin_resources..'spells.xml')
     local match_string = '<s id="(%d-)" index="(%d-)" prefix="([^"]-)" english="([^"]-)" german="([^"]-)" french="([^"]-)" japanese="([^"]-)" type="([^"]-)" element="([^"]-)" targets="([^"]-)" skill="([^"]-)" mpcost="([^"]-)" casttime="([^"]-)" recast="([^"]-)" alias="([^"]-)" />'
-                        --<s id="518" index="623" prefix="/magic" english="Head Butt" german="Kopfnuss" french="Coup de tête" japanese="ヘッドバット" type="BlueMagic" element="None" targets="Enemy" skill="BlueMagic" mpcost="12" casttime="0.5" recast="10" alias="" />
+    
     local res = T{}
     for id, index, prefix, english, german, french, japanese, type, element, targets, skill, mp_cost, cast_time, recast, alias in file:gmatch(match_string) do
         index = tonumber(index)
