@@ -21,7 +21,7 @@ end})
 local plugin_resources = '../../plugins/resources/'
 local addon_resources = 'resources/'
 
-local language_string = _addon and _addon.language and _addon.language:lower() or windower.get_ffxi_info().language:lower()
+local language_string = _addon and _addon.language and _addon.language:lower() or windower.ffxi.get_info().language:lower()
 local language_string_full = language_string..'_full'
 
 local unquotes = {
@@ -41,54 +41,12 @@ local function add_name(t)
     return t
 end
 
--- Returns the jobs, indexed by ingame ID.
-function fns.jobs()
-    resources.jobs = T(require(addon_resources..'jobs')):map(add_name)
-end
-
--- Returns the races, indexed by ingame ID.
-function fns.races()
-    resources.races = T(require(addon_resources..'races')):map(add_name)
-end
-
--- Returns the weather, indexed by ingame ID.
-function fns.weather()
-    resources.weather = T(require(addon_resources..'weather')):map(add_name)
-end
-
--- Returns the servers, indexed by ingame ID.
-function fns.servers()
-    resources.servers = T(require(addon_resources..'servers')):map(add_name)
-end
-
--- Returns the chat, indexed by ingame ID.
-function fns.chat()
-    resources.chat = T(require(addon_resources..'chat')):map(add_name)
-end
-
--- Returns the bags, indexed by ingame ID.
-function fns.bags()
-    resources.bags = T(require(addon_resources..'bags')):map(add_name)
-end
-
--- Returns the slots, indexed by ingame ID.
-function fns.slots()
-    resources.slots = T(require(addon_resources..'slots')):map(add_name)
-end
-
--- Returns the emotes, indexed by ingame ID.
-function fns.emotes()
-    resources.emotes = T(require(addon_resources..'emotes')):map(add_name)
-end
-
--- Returns the skills, indexed by ingame ID.
-function fns.skills()
-    resources.skills = T(require(addon_resources..'skills')):map(add_name)
-end
-
--- Returns the titles, indexed by ingame ID.
-function fns.titles()
-    resources.titles = T(require(addon_resources..'titles')):map(add_name)
+-- Add resources from files
+local res_names = S{'jobs', 'races', 'weather', 'servers', 'chat', 'bags', 'slots', 'statuses', 'emotes', 'skills', 'titles'}
+for res_name in res_names:it() do
+    fns[res_name] = function()
+        resources[res_name] = T(require(addon_resources..res_name)):map(add_name)
+    end
 end
 
 -- Returns the abilities, indexed by ingame ID.
@@ -124,7 +82,8 @@ end
 -- Returns the spells, indexed by ingame ID.
 function fns.spells()
     local file = _libs.filehelper.read(plugin_resources..'spells.xml')
-    local match_string = '<s id="(%d-)" index="(%d-)" prefix="([^"]-)" english="([^"]-)" german="([^"]-)" french="([^"]-)" japanese="([^"]-)" type="([^"]-)" element="([^"]-)" targets="([^"]-)" skill="([^"]-)" mpcost="(%d-)" casttime="(%d-)" recast="(%d-)" alias="([^"]-)" />'
+    local match_string = '<s id="(%d-)" index="(%d-)" prefix="([^"]-)" english="([^"]-)" german="([^"]-)" french="([^"]-)" japanese="([^"]-)" type="([^"]-)" element="([^"]-)" targets="([^"]-)" skill="([^"]-)" mpcost="([^"]-)" casttime="([^"]-)" recast="([^"]-)" alias="([^"]-)" />'
+                        --<s id="518" index="623" prefix="/magic" english="Head Butt" german="Kopfnuss" french="Coup de tête" japanese="ヘッドバット" type="BlueMagic" element="None" targets="Enemy" skill="BlueMagic" mpcost="12" casttime="0.5" recast="10" alias="" />
     local res = T{}
     for id, index, prefix, english, german, french, japanese, type, element, targets, skill, mp_cost, cast_time, recast, alias in file:gmatch(match_string) do
         index = tonumber(index)
@@ -132,10 +91,10 @@ function fns.spells()
             id = tonumber(id),
             index = index,
             prefix = prefix,
-            english = english,
-            german = german,
-            french = french,
-            japanese = japanese,
+            english = unquote(english),
+            german = unquote(german),
+            french = unquote(french),
+            japanese = unquote(japanese),
             type = type,
             element = element,
             targets = targets:split(', '),
@@ -143,11 +102,10 @@ function fns.spells()
             mp_cost = tonumber(mp_cost),
             cast_time = tonumber(cast_time),
             recast = tonumber(recast),
-            alias = alias,
+            alias = alias:split('|'),
         }
         res[index].name = res[index][language_string]
     end
-
     resources.spells = res
 end
 

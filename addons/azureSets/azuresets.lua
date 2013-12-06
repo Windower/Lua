@@ -26,9 +26,9 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-_addon = {}
+
 _addon.name = 'AzureSets'
-_addon.version = '1.21'
+_addon.version = '1.22'
 _addon.author = 'Nitrous (Shiva)'
 _addon.commands = {'aset','azuresets','asets'}
 
@@ -37,6 +37,7 @@ require 'stringhelper'
 require 'logger'
 config = require 'config'
 files = require 'filehelper'
+res = require 'resources'
 defaults = T{}
 defaults.spellsets = T{}
 defaults.spellsets.default = T{ }
@@ -57,9 +58,8 @@ function initialize()
 end
 
 windower.register_event('load', function()
-    speFile = files.new('data/bluespells.xml')
-    spells = T{}
-    spells = parse_resources(speFile:readlines())
+    spells = res.spells
+    print(spells:length())
     settings = config.load(defaults)
     notice('Version '.._addon.version..' Loaded. Type //aset help for list of commands.')
     initialize()
@@ -95,10 +95,12 @@ function set_spells_from_spellset(spellset,slot)
     else islot = slot end
     local tempname = settings.spellsets[spellset]['slot'..islot]
     if tempname ~= nil then
-        for id = 1, #spells do
-            if spells[id]['english']:lower() == tempname:lower() then
-                windower.packets.set_blue_magic_spell(spells[id]['index'], tonumber(slot))
-                break
+        for id = 512, spells:length() do
+            if spells[id] then
+                if spells[id]['english']:lower() == tempname:lower() then
+                    windower.packets.set_blue_magic_spell(spells[id]['index'], tonumber(slot))
+                    break
+                end
             end
         end
     end
@@ -123,13 +125,15 @@ function set_single_spell(spell,slot)
     end
     if tonumber(slot) < 10 then slot = '0'..slot end
     --insert spell add code here
-    for id = 1, #spells do
-        if spells[id]['english']:lower() == spell then
-            --This is where single spell setting code goes.
-            --Need to set by spell index rather than name.
-            windower.packets.set_blue_magic_spell(spells[id]['index'], tonumber(slot))
-            windower.send_command('@timers c "Blue Magic Cooldown" 60 up')
-            tmpTable['slot'..slot] = spell
+    for id = 512, spells:length() do
+        if spells[id] then
+            if spells[id]['english']:lower() == spell then
+                --This is where single spell setting code goes.
+                --Need to set by spell index rather than name.
+                windower.packets.set_blue_magic_spell(spells[id]['index'], tonumber(slot))
+                windower.send_command('@timers c "Blue Magic Cooldown" 60 up')
+                tmpTable['slot'..slot] = spell
+            end
         end
     end
     tmpTable = nil
@@ -145,11 +149,13 @@ function get_current_spellset()
         for i = 1, #tmpTable do
             local t = ''
             if tonumber(tmpTable[i]) ~= 512 then
-                for id = 1, #spells do
-                    if tonumber(tmpTable[i]) == tonumber(spells[id]['index']) then
-                        if i < 10 then t = '0' end
-                        spellTable['slot'..t..i] = spells[id]['english']:lower()
-                        break
+                for id = 512, spells:length() do
+                    if spells[id] then
+                        if tonumber(tmpTable[i]) == tonumber(spells[id]['index']) then
+                            if i < 10 then t = '0' end
+                            spellTable['slot'..t..i] = spells[id]['english']:lower()
+                            break
+                        end
                     end
                 end
             end
@@ -193,7 +199,7 @@ function get_spellset_content(spellset)
 end
 
 windower.register_event('addon command', function(...)
-    if get_player()['main_job_id'] ~= 16 --[[and get_player()['sub_job_id'] ~= 16]] then
+    if windower.ffxi.get_player()['main_job_id'] ~= 16 --[[and get_player()['sub_job_id'] ~= 16]] then
         error('You are not on (main) Blue Mage.')
         return nil 
     end
@@ -237,7 +243,7 @@ windower.register_event('addon command', function(...)
   8. help --Shows this menu.]]
             for _, line in ipairs(helptext:split('\n')) do
                 windower.add_to_chat(207, line..chat.colorcontrols.reset)
-                sleep(10)
+                
             end
         end
     end
