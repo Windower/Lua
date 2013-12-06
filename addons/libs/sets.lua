@@ -80,7 +80,7 @@ function set.union(s1, s2)
         s2 = S{s2}
     end
 
-    s = {}
+    local s = {}
 
     for el in pairs(s1) do
         s[el] = true
@@ -95,7 +95,7 @@ end
 _meta.S.__add = set.union
 
 function set.intersection(s1, s2)
-    s = {}
+    local s = {}
     for el in pairs(s1) do
         s[el] = rawget(s2, el)
     end
@@ -110,7 +110,7 @@ function set.diff(s1, s2)
         s2 = S(s2)
     end
 
-    s = {}
+    local s = {}
 
     for el in pairs(s1) do
         s[el] = (not rawget(s2, el) and true) or nil
@@ -122,7 +122,7 @@ end
 _meta.S.__sub = set.diff
 
 function set.sdiff(s1, s2)
-    s = {}
+    local s = {}
     for el in pairs(s1) do
         s[el] = (not rawget(s2, el) and true) or nil
     end
@@ -192,7 +192,7 @@ end
 function set.tostring(s)
     local res = '{'
     for el in pairs(s) do
-        res = res..el
+        res = res..tostring(el)
         if next(s, el) ~= nil then
             res = res..', '
         end

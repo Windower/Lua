@@ -70,7 +70,7 @@ function load_user_files()
 	
 	user_env = nil
 	
-	if not file_exists(lua_base_path..'data/'..player['name']..'_'..player.main_job..'.lua') then
+	if not file_exists(windower.addon_path..'data/'..player['name']..'_'..player.main_job..'.lua') then
 		user_env = nil
 		current_job_file = nil
 		return
@@ -83,11 +83,11 @@ function load_user_files()
 		print_set=print_set,set_combine=set_combine,disable=disable,enable=enable,
 		
 		-- Library functions
-		string=string, math=math, sets=sets, table=table, T=T, S=S,
+		string=string, math=math, table=table, T=T,
 		tostring = tostring, tonumber = tonumber, pairs = pairs,
 		ipairs = ipairs, write=write, add_to_chat=add_to_chat,
 		send_command=send_cmd_user,windower=user_windower,
-		include=include_user,next=next,lua_base_path=lua_base_path,
+		include=include_user,next=next,lua_base_path=windower.addon_path,empty=empty,
 		
 		-- Player environment things
 		buffactive=buffactive,
@@ -96,11 +96,14 @@ function load_user_files()
 		pet=pet,
 		alliance=alliance,
 		party=alliance[1],
-		sets={}
+		sets={naked = {main=empty,sub=empty,range=empty,ammo=empty,
+				head=empty,neck=empty,ear1=empty,ear2=empty,
+				body=empty,hands=empty,ring1=empty,ring2=empty,
+				back=empty,waist=empty,legs=empty,feet=empty}}
 		}
 
 	-- Try to load data/<name>_<main job>.lua
-	local funct, err = loadfile(lua_base_path..'data/'..player['name']..'_'..player.main_job..'.lua')
+	local funct, err = loadfile(windower.addon_path..'data/'..player['name']..'_'..player.main_job..'.lua')
 	
 	-- If the file cannot be loaded, print the error and load the default.
 	if funct == nil then 
@@ -145,42 +148,78 @@ end
 -------- of buffs with that name active.
 -----------------------------------------------------------------------------------
 function refresh_player()
+	if not get_player() then return end
+	
 	table.reassign(player,get_player())
-	for i,v in pairs(player['vitals']) do
+	for i,v in pairs(player.vitals) do
 		player[i]=v
 	end
 	if player.main_job == 'NONE' then
 		player.main_job = 'MON'
 	end
+	if not player.sub_job then
+		player.sub_job = 'NONE'
+		player.sub_job_level = 0
+		player.sub_job_full = 'None'
+		player.sub_job_id = 0
+	end
 	player.job = player.main_job..'/'..player.sub_job
 	
-	local player_mob_table = get_mob_by_index(player['index'])
+	local player_mob_table = get_mob_by_index(get_player().index)
 	if not player_mob_table then return end
 	
-	if player_mob_table['race']~= nil then player.race = mob_table_races[player_mob_table['race']] end
+	
+	for i,v in pairs(player_mob_table) do
+		if i~= 'is_npc' and i~='tp' and i~='mpp' and i~='claim_id' and i~='status' then
+			player[i] = v
+		end
+	end
+	
+	if player_mob_table['race']~= nil then
+		player.race_id = player.race
+		player.race = mob_table_races[player.race]
+	end
 	
 	items = get_items()
-	local cur_equip = items['equipment'] -- i = 'head', 'feet', etc.; v = inventory ID (0~80)
+	local cur_equip = items.equipment -- i = 'head', 'feet', etc.; v = inventory ID (0~80)
 	if sent_out_equip then -- If the swap is not complete, overwrite the current equipment with the equipment that you are swapping to
 		for i,v in pairs(cur_equip) do
 			if sent_out_equip[slot_map[i]] then
-				cur_equip[i] = sent_out_equip[slot_map[i]]
+				v = sent_out_equip[slot_map[i]]
+			end
+			if v == 0 then
+				v = empty
 			end
 		end
 	end
 	
 	-- Assign player.equipment to be the gear that has been sent out and the server currently thinks
 	-- you are wearing. (the sent_out_equip for loop above).
-	player.equipment = to_names_set(cur_equip,items['inventory'])
+	player.equipment = to_names_set(cur_equip,items.inventory)
 	
 	-- Monster tables for the target and subtarget.
 	player.target = target_type(get_mob_by_target('t'))
+	
+	if player.target and player.target.race~= nil then
+		player.target.race_id = player.target.race
+		player.target.race = mob_table_races[player.target.race]
+	end
+	
 	player.subtarget = target_type(get_mob_by_target('lastst'))
 	
+	if player.subtarget and player.subtarget.race~= nil then
+		player.subtarget.race_id = player.subtarget.race
+		player.subtarget.race = mob_table_races[player.subtarget.race]
+	end
+	
 	-- If you have a pet, make a pet table.
-	if player_mob_table['pet_index'] then
-		table.reassign(pet,get_mob_by_index(player_mob_table['pet_index']))
+	if player_mob_table.pet_index then
+		table.reassign(pet,get_mob_by_index(player_mob_table.pet_index))
 		pet.isvalid = true
+		pet.race_id = pet.race
+		pet.race = nil
+		pet.claim_id = nil
+		pet.is_npc = nil
 		if avatar_element[pet.name] then
 			pet.element = avatar_element[pet.name]
 		else
@@ -194,13 +233,16 @@ function refresh_player()
 	if ft_table then
 		table.reassign(fellow,ft_table)
 		fellow.isvalid = true
+		if fellow.race then
+			fellow.race_id = fellow.race
+			fellow.race = mob_table_races[fellow.race]
+		end
 	else
 		table.reassign(fellow,{isvalid=false})
 	end
 	
-	table.reassign(buffactive,get_buff_active(player['buffs']))
+	refresh_buff_active(player.buffs)
 end
-
 
 -----------------------------------------------------------------------------------
 --Name: refresh_ffxi_info()
@@ -210,11 +252,11 @@ end
 --Returns:
 ---- None
 ----
----- Updates the global "world" with get_ffxi_info (ignores the target field).
----- Also sets get_ffxi_info()['zone'] to be world.area for consistency with spellcast
+---- Updates the global "world" with windower.ffxi.get_info (ignores the target field).
+---- Also sets windower.ffxi.get_info()['zone'] to be world.area for consistency with spellcast
 -----------------------------------------------------------------------------------
 function refresh_ffxi_info()
-	local info = get_ffxi_info()
+	local info = windower.ffxi.get_info()
 	for i,v in pairs(info) do
 		if i ~= 'target' then
 			world[i] = v
@@ -268,8 +310,12 @@ end
 -----------------------------------------------------------------------------------
 function refresh_group_info()
 	local temp_alliance = {[1]={count=0},[2]={count=0},[3]={count=0}}
-	local j = get_party()
+	local j = get_party() or {}
 	for i,v in pairs(j) do
+		if v.mob and v.mob.race then
+			v.mob.race_id = v.mob.race
+			v.mob.race = mob_table_races[v.mob.race]
+		end
 		if i:sub(1) == 'p' then
 			temp_alliance[1][tonumber(i:sub(2))+1] = v
 			temp_alliance[1]['count'] = temp_alliance[1]['count'] +1
@@ -286,7 +332,7 @@ function refresh_group_info()
 end
 
 -----------------------------------------------------------------------------------
---Name: get_buff_active(bufflist)
+--Name: refresh_buff_active(bufflist)
 --Args:
 ---- bufflist (table): List of buffs from get_player()['buffs']
 -----------------------------------------------------------------------------------
@@ -296,7 +342,7 @@ end
 ---- of that string present in the buff array. So two marches would give
 ---- buffarr.march==2.
 -----------------------------------------------------------------------------------
-function get_buff_active(bufflist)
+function refresh_buff_active(bufflist)
 	buffarr = {}
 	for i,v in pairs(bufflist) do
 		if r_status[v] then -- For some reason we always have buff 255 active, which doesn't have an entry.
@@ -308,7 +354,7 @@ function get_buff_active(bufflist)
 			end
 		end
 	end
-	return buffarr
+	table.reassign(buffactive,buffarr)
 end
 
 

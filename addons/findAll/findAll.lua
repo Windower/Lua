@@ -1,5 +1,5 @@
 --[[
-findAll v1.20131102
+findAll v1.20131120
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -28,16 +28,15 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
+_addon.name    = 'findAll'
+_addon.author  = 'Zohno'
+_addon.version = '1.20131120'
+_addon.command = 'findAll'
+
 require 'chat'
 require 'lists'
 require 'logger'
 require 'sets'
-
-_addon = {}
-_addon.name    = 'findAll'
-_addon.author  = 'Zohno'
-_addon.version = '1.20131102'
-_addon.command = 'findAll'
 
 json  = require 'json'
 file  = require 'filehelper'
@@ -68,18 +67,24 @@ function search(query, export)
         return
     end
 
-    local character_filters = S{}
+    local character_set = S{}
+    local character_filter = S{}
     local terms            = ''
 
     for _, query_element in ipairs(query) do
-        if query_element:find('^:%a+$') then
-            character_filters:add(query_element:match('^:(%a+)$'):lower():gsub("^%l", string.upper))
+        local char = query_element:match('^([:!]%a+)$')
+        if char then
+            if char:sub(1, 1) == '!' then
+                character_filter:add(char:sub(2):lower():gsub("^%l", string.upper))
+            else
+                character_set:add(char:sub(2):lower():gsub("^%l", string.upper))
+            end
         else
             terms = query_element
         end
     end
 
-    if character_filters:length() == 0 and terms == '' then
+    if character_set:length() == 0 and terms == '' then
         return
     end
 
@@ -101,7 +106,7 @@ function search(query, export)
 
     if new_item_ids:length() > 0 then
         for kind, resource_path in pairs(resources) do
-            resource = io.open(lua_base_path..resource_path, 'r')
+            resource = io.open(windower.addon_path..resource_path, 'r')
 
             if resource ~= nil then
                 while true do
@@ -155,7 +160,7 @@ function search(query, export)
     local sorted_names = global_storages:keyset():sort()
                                                  :reverse()
 
-    if windower.get_ffxi_info().logged_in then
+    if windower.ffxi.get_info().logged_in then
         sorted_names = sorted_names:append(sorted_names:remove(sorted_names:find(windower.ffxi.get_player().name)))
                                :reverse()
     end
@@ -163,7 +168,7 @@ function search(query, export)
     local export_file
 
     if export ~= nil then
-        export_file = io.open(lua_base_path..'data/'..export, 'w')
+        export_file = io.open(windower.addon_path..'data/'..export, 'w')
 
         if export_file == nil then
             error('The file "'..export..'" cannot be created.')
@@ -173,7 +178,7 @@ function search(query, export)
     end
 
     for _, character_name in ipairs(sorted_names) do
-        if character_filters:length() == 0 or character_filters:length() > 0 and character_filters:contains(character_name) then
+        if (character_set:length() == 0 or character_set:contains(character_name)) and not character_filter:contains(character_name) then
             local storages = global_storages[character_name]
 
             for _, storage_name in ipairs(merged_storages_orders) do
@@ -221,7 +226,7 @@ function search(query, export)
 
     if no_results then
         if terms ~= '' then
-            if character_filters:length() == 0 then
+            if character_set:length() == 0 and character_filter:length() == 0 then
                 log('You have no items that match \''..terms..'\'.')
             else
                 log('You have no items that match \''..terms..'\' on the specified characters.')
@@ -275,7 +280,7 @@ function get_storages()
 end
 
 function update()
-    if not get_ffxi_info().logged_in then
+    if not windower.ffxi.get_info().logged_in then
         print('You have to be logged in to use this addon.')
         return false
     end
@@ -334,13 +339,13 @@ function update()
 end
 
 windower.register_event('load', function()
-    if get_ffxi_info().logged_in then
+    if windower.ffxi.get_info().logged_in then
         update()
     end
 end)
 
 windower.register_event('unload', function()
-    if get_ffxi_info().logged_in then
+    if windower.ffxi.get_info().logged_in then
         if not update() then
             error('findAll wasn\'t ready.')
         end
@@ -362,7 +367,7 @@ windower.register_event('addon command', function(...)
     local query  = L{}
     local export = nil
 
-    while params:length() > 0 and params[1]:match('^:%a+$') do
+    while params:length() > 0 and params[1]:match('^[:!]%a+$') do
         query:append(params:remove(1))
     end
 

@@ -24,7 +24,7 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-_addon = {}
+
 _addon.version = '1.1.0'
 _addon.command = 'scast'
 _addon.name = 'SATACast'
@@ -49,9 +49,9 @@ end)
 
 --Function Designer:  Byrth
 function options_load()
-	local f = io.open(lua_base_path..'data/settings.txt', "r")
+	local f = io.open(windower.addon_path..'data/settings.txt', "r")
 	if f == nil then
-		local g = io.open(lua_base_path..'data/settings.txt', "w")
+		local g = io.open(windower.addon_path..'data/settings.txt', "w")
 		g:write('Release Date: 11:50 PM, 4-06-13\46\n')
 		g:write('Author Comment: This document is whitespace sensitive, which means that you need the same number of spaces between things as exist in this initial settings file\46\n')
 		g:write('Author Comment: It looks at the first two words separated by spaces and then takes anything as the value in question if the first two words are relevant\46\n')
@@ -66,7 +66,7 @@ function options_load()
 		add_to_chat(17,'SATACast created a settings file and loaded!')
 	else
 		f:close()
-		for curline in io.lines(lua_base_path..'data/settings.txt') do
+		for curline in io.lines(windower.addon_path..'data/settings.txt') do
 			local splat = split(curline,' ')
 			local cmd = ''
 			if splat[2] ~=nil then

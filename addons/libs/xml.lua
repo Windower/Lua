@@ -14,9 +14,14 @@ _libs.filehelper = _libs.filehelper or require('filehelper')
 
 -- Local functions
 local entity_unescape
+local xml_error
+local pcdata
+local attribute
+local validate_headers
+local parse
 local tokenize
-local classify
 local get_namespace
+local classify
 local make_namespace_name
 
 -- Define singleton XML characters that can delimit inner tag strings.
@@ -50,6 +55,8 @@ function entity_unescape(_, entity)
     end
 end
 
+local entities = setmetatable(unescapes, {__index = entity_unescape})
+
 function string.xml_unescape(str)
     return (str:gsub("&(.-);", entities))
 end
@@ -62,8 +69,6 @@ function string.xml_escape(str)
         return c
     end)
 end
-
-entities = setmetatable(unescapes, {__index=entity_unescape})
 
 -- Takes a filename and tries to parse the XML in it, after a validity check.
 function xml.read(file)

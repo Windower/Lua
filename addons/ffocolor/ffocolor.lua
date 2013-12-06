@@ -26,7 +26,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-_addon = {}
+
 _addon.name = 'FFOColor'
 _addon.version = '2.02'
 _addon.author = 'Nitrous (Shiva)'
@@ -51,7 +51,7 @@ function initialize()
 end
 
 windower.register_event('load', function()
-    if windower.get_ffxi_info()['logged_in'] then
+    if windower.ffxi.get_info()['logged_in'] then
         initialize()
     end
 end)

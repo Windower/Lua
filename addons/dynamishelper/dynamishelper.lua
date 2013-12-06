@@ -141,7 +141,7 @@ windower.register_event('addon command',function (...)
   		elseif params[1]:lower() == "ll" then
    			if params[2]:lower() == "create" then
     			player = get_player()['name']
-    			io.open(lua_base_path..'../../plugins/ll/dynamis-'..player..'.txt',"w"):write('if item is 1452, 1453, 1455, 1456, 1449, 1450 then lot'):close()
+    			io.open(windower.addon_path..'../../plugins/ll/dynamis-'..player..'.txt',"w"):write('if item is 1452, 1453, 1455, 1456, 1449, 1450 then lot'):close()
     			send_command('ll profile dynamis-'..player..'.txt')
    			else write("Invalid light luggage option.")
    			end
@@ -214,7 +214,7 @@ end
 function checkzone()
 --	write('checkzone function')
 	goodzone = 'no'
-	currentzone = get_ffxi_info()['zone']:lower()
+	currentzone = windower.ffxi.get_info()['zone']:lower()
 	for i=1, #ProcZones do
 		if currentzone == ProcZones[i]:lower() then
 			goodzone = 'yes'
@@ -242,7 +242,7 @@ end
 
 windower.register_event('time change',function (...)
 	if proc == 'on' then
-		currenttime = get_ffxi_info()['time']
+		currenttime = windower.ffxi.get_info()['time']
  	end
 end)
 
@@ -261,7 +261,7 @@ function setproc()
 --	write('setproc function')
 	current_proc = 'lolidk'
 	if currenttime == nil or currenttime == '' or currenttime == nil then
-		currenttime = get_ffxi_info()['time']
+		currenttime = windower.ffxi.get_info()['time']
 	end
  	if currenttime >= 00.00 and currenttime < 08.00 then
   		window = 'morning'

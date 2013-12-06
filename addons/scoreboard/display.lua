@@ -1,4 +1,5 @@
 -- Display object
+require('texts')
 
 local Display = {
     visible = true,
@@ -16,9 +17,23 @@ local valid_fonts = T{
     'dejavu sans mono'
 }
 
+local valid_fields = T{
+    'name',
+    'dps',
+    'percent',
+    'total',
+    'acc',
+    'racc',
+    'crit',
+    'rcrit',
+    'wsavg'
+}
+
+-- Margin of error for a sample size N at 95% confidence
+local function moe95(n)
+    return 0.98 / math.sqrt(n)
+end
 function Display:set_position(posx, posy)
-    self.settings.posx = posx
-    self.settings.posy = posy
     windower.text.set_location(self.tb_name, posx, posy)
 end
 
@@ -28,6 +43,7 @@ function Display:new (settings, db)
     self.settings = settings
     setmetatable(repr, self)
     self.__index = self
+    self.visible = settings.visible
 
     windower.text.create(self.tb_name)
     windower.text.set_bg_color(self.tb_name, self.settings.bgtransparency, 30, 30, 30)
@@ -37,7 +53,7 @@ function Display:new (settings, db)
         windower.text.set_font(self.tb_name, self.settings.font) 
         windower.text.set_font_size(self.tb_name, self.settings.fontsize)
     else
-        windower.text.set_font(self.tb_name, self.settings.font,'courier mew','monospace') 
+        windower.text.set_font(self.tb_name, self.settings.font,'courier new','monospace') 
         windower.text.set_font_size(self.tb_name, self.settings.fontsize)
     end
     
@@ -159,11 +175,16 @@ function Display:update()
         return
     end
 
+    if self.db:isempty() then
+        self:reset()
+        return
+    end
     local damage_table, total_damage
     damage_table, total_damage = self:get_sorted_player_damage()
 	
     local display_table = T{}
     local player_lines = 0
+    local alli_damage = 0
     for k, v in pairs(damage_table) do
         if player_lines < self.settings.numplayers then
             local dps
@@ -181,43 +202,20 @@ function Display:update()
             end
             display_table:append(string.format("%-16s%7d%8s %7s", v[1], v[2], percent, dps))
         end
+        alli_damage = alli_damage + v[2] -- gather this even for players not displayed
         player_lines = player_lines + 1
     end
-	
-    if self.db:isempty() then
-        self:reset()
-    else
-        windower.text.set_text(self.tb_name, self:build_scoreboard_header() .. table.concat(display_table, '\n'))
+
+    if self.settings.showallidps and dps_clock.clock > 0 then
+        display_table:append("-----------------")
+        display_table:append("Alli DPS: " .. string.format("%7.1f", alli_damage / dps_clock.clock))
     end
+	
+    windower.text.set_text(self.tb_name, self:build_scoreboard_header() .. table.concat(display_table, '\n'))
 end
 
 
-function Display:report_summary (...)
-    local chatmode, tell_target = table.unpack({...})
-	
-    local damage_table, total_damage
-    damage_table, total_damage = self:get_sorted_player_damage()
-    local max_line_length = 127 -- game constant
-
-    -- We have to make sure not to exceed max line or it can cause a crash
-    local display_table = T{}
-    local line_length = 0
-    for k, v in pairs(damage_table) do
-        -- TODO: this algorithm doesn't quite work right but it's close
-        formatted_entry = string.format("%s %d(%.1f%%)", v[1], v[2], 100 * v[2]/total_damage)
-        local new_line_length = line_length + formatted_entry:len() + 2 -- 2 is for the sep
-		
-        if new_line_length < max_line_length then
-            display_table:append(formatted_entry)
-            line_length = new_line_length
-        else
-            -- If we don't break here, a subsequent player could fit but that would result
-            -- in out-of-order damage reporting
-            break
-        end
-    end
-
-    -- Send the report to the current chatmode
+local function build_input_command(chatmode, tell_target)
     local input_cmd = 'input '
     if chatmode then
         input_cmd = input_cmd .. '/' .. chatmode .. ' '
@@ -225,8 +223,70 @@ function Display:report_summary (...)
             input_cmd = input_cmd .. tell_target .. ' '
         end
     end
+    
+    return input_cmd
+end
 
-    send_command(input_cmd .. table.concat(display_table, ', '))
+-- Takes a table of elements to be wrapped across multiple lines and returns
+-- a table of strings, each of which fits within one FFXI line.
+local function wrap_elements(elements, header, sep)
+    local max_line_length = 120 -- game constant
+    if not sep then
+        sep = ', '
+    end
+    
+    local lines = T{}
+    local current_line = nil
+    local line_length
+    
+    local i = 1
+    while i <= #elements do
+        if not current_line then
+            current_line = T{}
+            line_length = header:len()
+            lines:append(current_line)
+        end
+ 
+        local new_line_length = line_length + elements[i]:len() + sep:len()
+        if new_line_length > max_line_length then
+            current_line = T{}
+            lines:append(current_line)
+            new_line_length = elements[i]:len() + sep:len()
+        end
+        
+        current_line:append(elements[i])
+        line_length = new_line_length
+        i = i + 1
+    end
+    
+    local baked_lines = lines:map(function (ls) return ls:concat(sep) end)
+    if header:len() > 0 and #baked_lines > 0 then
+        baked_lines[1] = header .. baked_lines[1]
+    end
+    
+    return baked_lines
+end
+
+
+local function slow_output(chatprefix, lines, limit)
+    -- this is funky but if we don't wait like this, the lines will spew too fast and error
+    send_command(lines:map(function (l) return chatprefix .. l end):concat('; wait 1.2 ; '))
+end
+
+function Display:report_summary (...)
+    local chatmode, tell_target = table.unpack({...})
+	
+    local damage_table, total_damage
+    damage_table, total_damage = self:get_sorted_player_damage()
+
+    local elements = T{}
+    for k, v in pairs(damage_table) do
+        elements:append(string.format("%s %d(%.1f%%)", v[1], v[2], 100 * v[2]/total_damage))
+    end
+
+    -- Send the report to the specified chatmode
+    slow_output(build_input_command(chatmode, tell_target),
+                wrap_elements(elements:slice(1, self.settings.numplayers), 'Dmg: '), self.settings.numplayers)
 end
 
 
@@ -294,7 +354,22 @@ Display.show_stat = (function()
             sb_output(lines)
         end
     end
-    
+
+    stat_display['wsavg'] = function (stats, filters)
+        local lines = T{}
+
+        for name, stat_pair in pairs(stats) do
+            if stat_pair[2] > 0 then
+                lines:append(string.format("%-20s %d (%ds)", name, stat_pair[1], stat_pair[2]))
+            end
+        end
+        
+        if #lines > 0 then
+            sb_output(format_title('WS Average (' .. filters .. ')'))
+            sb_output(lines)
+        end
+    end
+
     return function (self, stat, player_filter)
         local stats = self.db:query_stat(stat, player_filter)
         local filters = self.db:get_filters()
@@ -310,6 +385,50 @@ Display.show_stat = (function()
     end
 end)()
 
+
+local function insert_stat_header(header, elements)
+    
+end
+
+-- TODO: This needs to be factored somehow to take better advantage of similar
+--       code already written for reporting and stat queries.
+function Display:report_stat(stat, args)
+    local stats = self.db:query_stat(stat, args.player)
+    
+    if T{'acc', 'racc', 'crit', 'rcrit'}:contains(stat) then
+        local elements = T{}
+        local header   = stat:ucfirst() .. ': '
+        for name, stat_pair in pairs(stats) do
+            if stat_pair[2] > 0 then
+                elements:append({stat_pair[1], string.format("%s %.2f%% (%ds)", name, 100 * stat_pair[1], stat_pair[2])})
+            end
+        end
+        local function cmp(a, b) 
+            return a[1] > b[1]
+        end
+        table.sort(elements, cmp)
+        
+        -- Send the report to the specified chatmode
+        local wrapped = wrap_elements(elements:slice(1, self.settings.numplayers):map(function (p) return p[2] end), header)
+        slow_output(build_input_command(args.chatmode, args.telltarget), wrapped, self.settings.numplayers)
+    elseif stat == 'wsavg' then
+        local elements = T{}
+        local header   = stat:ucfirst() .. ': '
+        for name, stat_pair in pairs(stats) do
+            if stat_pair[2] > 0 then
+                elements:append({stat_pair[1], string.format("%s %d (%ds)", name, stat_pair[1], stat_pair[2])})
+            end
+        end
+        local function cmp(a, b) 
+            return a[1] > b[1]
+        end
+        table.sort(elements, cmp)
+        
+        -- Send the report to the specified chatmode
+        local wrapped = wrap_elements(elements:slice(1, self.settings.numplayers):map(function (p) return p[2] end), header)
+        slow_output(build_input_command(args.chatmode, args.telltarget), wrapped, self.settings.numplayers)
+    end
+end
 
 function Display:reset()
     -- the number of spaces here was counted to keep the table width

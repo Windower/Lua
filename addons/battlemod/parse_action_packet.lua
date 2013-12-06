@@ -14,7 +14,7 @@ function parse_action_packet(act)
 				if dialog[m.message] then m.fields = fieldsearch(dialog[m.message][language]) end
 				if dialog[m.add_effect_message] then m.add_effect_fields = fieldsearch(dialog[m.add_effect_message][language]) end
 				if dialog[m.spike_effect_message] then m.spike_effect_fields = fieldsearch(dialog[m.spike_effect_message][language]) end
-								
+
 				if r_status[m.param] and m.param ~= 0 then
 					m.status = r_status[m.param][language]
 				end
@@ -68,7 +68,7 @@ function parse_action_packet(act)
 			if dialog[tempact.spike_effect_message] then tempact.spike_effect_fields = fieldsearch(dialog[tempact.spike_effect_message][language]) end
 			
 				
-			--if tempact.add_effect_fields and tempact.add_effect_fields.status then add_to_chat(8,tostring(tempact.add_effect_fields.status)..' '..dialog[tempact.add_effect_message][language]) end
+			--if tempact.add_effect_fields and tempact.add_effect_fields.status then windower.add_to_chat(8,tostring(tempact.add_effect_fields.status)..' '..dialog[tempact.add_effect_message][language]) end
 			
 			if not check_filter(act.actor,v.target[1],act.category,tempact.message) then
 				tempact.message = 0
@@ -96,7 +96,7 @@ function parse_action_packet(act)
 		if condensetargets and i > 1 then
 			for n=1,i-1 do
 				local m = act.targets[n]
---				add_to_chat(8,m.actions[1].message..'  '..v.actions[1].message)
+--				windower.add_to_chat(8,m.actions[1].message..'  '..v.actions[1].message)
 				if (v.actions[1].message == m.actions[1].message and v.actions[1].param == m.actions[1].param) or
 					(message_map[m.actions[1].message] and message_map[m.actions[1].message]:contains(v.actions[1].message) and v.actions[1].param == m.actions[1].param) or
 					(message_map[m.actions[1].message] and message_map[m.actions[1].message]:contains(v.actions[1].message) and v.actions[1].param == m.actions[1].param) then
@@ -110,7 +110,7 @@ function parse_action_packet(act)
 	
 	for i,v in pairs(act.targets) do
 		for n,m in pairs(v.actions) do
---			add_to_chat(8,m.message)
+--			windower.add_to_chat(8,m.message)
 			if m.message ~= 0 then
 				local targ = assemble_targets(act.actor,v.target,act.category,m.message)
 				local color = color_filt(dialog[m.message].color,v.target[1].id==Self.id)
@@ -132,16 +132,18 @@ function parse_action_packet(act)
 				elseif m.message == 577 then m.simp_name = 'RA struck true'
 				elseif m.message == 157 then m.simp_name = 'Barrage'
 				elseif m.message == 77 then m.simp_name = 'Sange'
+				elseif m.message == 360 then m.simp_name = act.action.name..' (JA reset)'
 				elseif m.message == 426 or m.message == 427 then m.simp_name = 'Bust! '..act.action.name
 				elseif m.message == 435 or m.message == 436 then m.simp_name = act.action.name..' (JAs)'
 				elseif m.message == 437 or m.message == 438 then m.simp_name = act.action.name..' (JAs and TP)'
 				elseif m.message == 439 or m.message == 440 then m.simp_name = act.action.name..' (SPs, JAs, TP, and MP)'
+				elseif T{252,265,268,269,271,272,274,275}:contains(m.message) then m.simp_name = 'Magic Burst! '..act.action.name
 				else m.simp_name = act.action.name or ''
 				end
 				local msg,numb = simplify_message(m.message)
-				if not color_arr[act.actor.owner or act.actor.type] then add_to_chat(8,tostring(act.actor.owner)..' '..act.actor.type) end
+				if not color_arr[act.actor.owner or act.actor.type] then windower.add_to_chat(8,tostring(act.actor.owner)..' '..act.actor.type) end
 				if m.fields.status then numb = m.status else numb = pref_suf(m.param,m.message) end
-				add_to_chat(color,make_condensedamage_number(m.number)..(msg
+				windower.add_to_chat(color,make_condensedamage_number(m.number)..(msg
 					:gsub('${spell}',color_it(act.action.spell or 'ERROR 111',color_arr.spellcol))
 					:gsub('${ability}',color_it(act.action.ability or 'ERROR 112',color_arr.abilcol))
 					:gsub('${item}',color_it(act.action.item or 'ERROR 113',color_arr.itemcol))
@@ -166,7 +168,7 @@ function parse_action_packet(act)
 				end
 				local msg,numb = simplify_message(m.add_effect_message)
 				if m.add_effect_fields.status then numb = m.add_effect_status else numb = pref_suf(m.add_effect_param,m.add_effect_message) end
-				add_to_chat(color,make_condensedamage_number(m.add_effect_number)..(msg
+				windower.add_to_chat(color,make_condensedamage_number(m.add_effect_number)..(msg
 					:gsub('${spell}',act.action.spell or 'ERROR 127')
 					:gsub('${ability}',act.action.ability or 'ERROR 128')
 					:gsub('${item}',act.action.item or 'ERROR 129')
@@ -187,7 +189,7 @@ function parse_action_packet(act)
 					m.simp_spike_name = 'spikes' end
 				local msg = simplify_message(m.spike_effect_message)
 				if m.spike_effect_fields.status then numb = m.spike_effect_status else numb = pref_suf(m.spike_effect_param,m.spike_effect_message) end
-				add_to_chat(color,make_condensedamage_number(m.spike_effect_number)..(msg
+				windower.add_to_chat(color,make_condensedamage_number(m.spike_effect_number)..(msg
 					:gsub('${spell}',act.action.spell or 'ERROR 142')
 					:gsub('${ability}',act.action.ability or 'ERROR 143')
 					:gsub('${item}',act.action.item or 'ERROR 144')
@@ -221,11 +223,11 @@ end
 function simplify_message(msg_ID)
 	local msg = dialog[msg_ID][language]
 	local fields = fieldsearch(msg)
---	add_to_chat(8,'ability: '..tostring(fields.ability)..'  spell: '..tostring(fields.spell)..'  item: '..tostring(fields.item)..'  weapon skill: '..tostring(fields.weapon_skill)..'  number: '..tostring(fields.number))
+--	windower.add_to_chat(8,'ability: '..tostring(fields.ability)..'  spell: '..tostring(fields.spell)..'  item: '..tostring(fields.item)..'  weapon skill: '..tostring(fields.weapon_skill)..'  number: '..tostring(fields.number))
 	if line_full and (fields.number or fields.status) then -- and (fields.spell or fields.ability or fields.item or fields.weapon_skill) then -- and fields.number or 
 --		T{1,31,67,163,229,352,353,373,576,577}:contains(msg_ID)) then
 		msg = line_full
-	elseif line_nonumber and not (fields.number or fields.status) and (fields.spell or fields.ability or fields.item or fields.weapon_skill) then
+	elseif line_nonumber and not (fields.number or fields.status) then -- and (fields.spell or fields.ability or fields.item or fields.weapon_skill)
 --		T{15,30,32,106,282,354}) then
 		msg = line_nonumber
 --	elseif line_noactor and (fields.spell or fields.ability or fields.item or fields.weapon_skill) and fields.number then
@@ -272,7 +274,7 @@ function make_condensedamage_number(number)
 end
 
 function player_info(id)
-	local player_table = get_mob_by_id(id)
+	local player_table = windower.ffxi.get_mob_by_id(id)
 	local typ,owner,filter
 	
 	if player_table == nil then
@@ -284,7 +286,7 @@ function player_info(id)
 			typ = 'other_pets'
 			filter = 'other_pets'
 			owner = 'other'
-			for i,v in pairs(get_party()) do
+			for i,v in pairs(windower.ffxi.get_party()) do
 				if v.mob and v.mob.pet_index and v.mob.pet_index == player_table.index then
 					if i == 'p0' then
 						typ = 'my_pet'
@@ -297,7 +299,7 @@ function player_info(id)
 		else
 			typ = 'mob'
 			filter = 'monsters'
-			for i,v in pairs(get_party()) do
+			for i,v in pairs(windower.ffxi.get_party()) do
 				if nf(v.mob,'id') == player_table.claim_id and filter.enemies then
 					filter = 'enemies'
 				end
@@ -306,7 +308,7 @@ function player_info(id)
 	else
 		typ = 'other'
 		filter = 'others'
-		for i,v in pairs(get_party()) do
+		for i,v in pairs(windower.ffxi.get_party()) do
 			if v.mob and v.mob.id == player_table.id then
 				typ = i
 				if i == 'p0' then
@@ -415,7 +417,7 @@ end
 function color_filt(col,is_me)
 	--Used to convert situational colors from the resources into real colors
 	--Depends on whether or not the target is you, the same as using in-game colors
-	-- Returns a color code for add_to_chat()
+	-- Returns a color code for windower.add_to_chat()
 	-- Does not currently support a Debuff/Buff distinction
 	if col == "D" then -- Damage
 		if is_me then

@@ -126,7 +126,7 @@ end
 
 statuses = parse_resources(statusFile:readlines())
 name_index = {}
-language = 'english' --get_ffxi_info().language
+language = 'english' --windower.ffxi.get_info().language
 
 for i,v in pairs(statuses) do
 	local stripped = strip(v.english)

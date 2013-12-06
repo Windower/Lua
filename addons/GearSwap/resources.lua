@@ -61,10 +61,18 @@ end
 
 function make_entry(v,typ,i)
 	if not v.targets then v.targets = 'None' end
-	v['validtarget'] = {Self=false,Player=false,Party=false,Ally=false,NPC=false,Enemy=false}
-	local potential_targets = split(v['targets'],', ')
+	v.validtarget = {Self=false,Player=false,Party=false,Ally=false,NPC=false,Enemy=false}
+	
+	local potential_targets
+	
+	if tonumber(v.targets) then -- TEMPORARY FIX UNTIL THE RESOURCES ARE CORRECTED
+		potential_targets = {}
+	else
+		potential_targets = split(v.targets,', ')
+	end
+	
 	for n,m in pairs(potential_targets) do
-		v['validtarget'][m] = true
+		v.validtarget[m] = true
 	end
 	if not v.tpcost or v.tpcost == -1 then v.tpcost = 0 end
 	if not v.mpcost or v.mpcost == -1 then v.mpcost = 0 end
@@ -141,6 +149,15 @@ mob_table_races = {[0]='Precomposed NPC',[1]='HumeM',[2]='HumeF',[3]='ElvaanM',[
 dat_races = {['Precomposed NPC']=0x10000,HumeM=0x0002,HumeF=0x0004,ElvaanM=0x0008,ElvaanF=0x0010,
 	TaruM=0x0020,TaruF=0x0040,Mithra=0x0080,Galka=0x0100,['Child_E_H_M']=0x10000,['ChocoboRounsey']=0x10000,
 	['ChocoboDestrier']=0x10000,['ChocoboPalfrey']=0x10000,['ChocoboCourser']=0x10000,['ChocoboJennet']=0x10000}
+	
+dat_slots = {0x0002,0x0004,0x0008,0x0010,0x0020,0x0040,0x0080,0x0100,0x0200,0x0400,0x0800,0x1000,0x2000,0x4000,0x8000}
+dat_slots[0] = 0x0001
+
+dat_slots_map={[1]='main',[2]='sub',[3]='main',[4] = 'range',[8]='ammo',[16]='head',[32]='body',
+	[64]='hands',[128]='legs',[256]='feet',[512]='neck',[1024]='waist',[2048]='left_ear',[4096]='right_ear',
+	[6144]='left_ear',[8192]='left_ring',[16384]='right_ring',[24576]='left_ring',[32768]='back'}
+
+default_equip_order = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
 
 jas = {false,false,false,false,false,true,false,false,false,false,false,false,false,true,true,false}--6,14,15}
 readies = {false,false,false,false,false,false,true,true,true,false,false,true,false,false,false,false}--{7,8,9,12}
@@ -166,6 +183,16 @@ user_data_table = {
 		return rawget(tab, user_key_filter(key))
 	end
 	}
+	
+eq_data_table = {
+	__newindex = function(tab, key, val)
+			rawset(tab, slot_map[user_key_filter(key)], newtab)
+		end,
+
+	__index = function(tab, key)
+		return rawget(tab, slot_map[user_key_filter(key)])
+	end
+	}
 
 _global = make_user_table()
 _global.cast_delay = 0
@@ -180,6 +207,7 @@ midaction = false
 sent_out_equip = T{}
 not_sent_out_equip = T{}
 equip_list = {}
+equip_order = {}
 lastbyte = 0x0000
 action_sent = false
 force_flag = false
@@ -187,7 +215,7 @@ world = make_user_table()
 buffactive = make_user_table()
 player = make_user_table()
 alliance = make_user_table()
-player.equipment = make_user_table()
+player.equipment = setmetatable({}, eq_data_table)
 pet = make_user_table()
 pet.isvalid = false
 fellow = make_user_table()
@@ -198,6 +226,7 @@ disable_table = {false,false,false,false,false,false,false,false,false,false,fal
 disable_table[0] = false
 encumbrance_table = table.reassign({},disable_table)
 registered_user_events = {}
+empty = {name="empty"}
 
 
 persistant_sequence = {}  ---------------------- TEMPORARY TO INVESTIGATE LAG ISSUES IN DELVE

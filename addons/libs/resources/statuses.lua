@@ -1,37 +1,29 @@
+-- Statuses
+local statuses = {}
 
-_addon.name = 'Distance'
-_addon.author = 'Windower'
-_addon.version = '1.0.0.0'
-_addon.command = 'distance'
+statuses[0x00] = {english = 'Idle'}
+statuses[0x01] = {english = 'Engaged'}
+statuses[0x02] = {english = 'Dead'}
+statuses[0x03] = {english = 'Engaged dead'}
+statuses[0x04] = {english = 'Event'}
+statuses[0x05] = {english = 'Chocobo'}
+statuses[0x21] = {english = 'Healing'}
+statuses[0x22] = {english = 'Locked'}
+statuses[0x26] = {english = 'Fishing fighting'}
+statuses[0x27] = {english = 'Fishing caught'}
+statuses[0x28] = {english = 'Fishing broken rod'}
+statuses[0x29] = {english = 'Fishing broken line'}
+statuses[0x2A] = {english = 'Fishing caught monster'}
+statuses[0x2B] = {english = 'Fishing lost catch'}
+statuses[0x2C] = {english = 'Crafting'}
+statuses[0x2F] = {english = 'Sitting'}
+statuses[0x30] = {english = 'Kneeling'}
+statuses[0x32] = {english = 'Fishing'}
+statuses[0x33] = {english = 'Fishing fighting center'}
+statuses[0x34] = {english = 'Fishing fighting right'}
+statuses[0x35] = {english = 'Fishing fighting left'}
 
-require 'logger'
-config = require 'config'
-texts = require 'texts'
-
-defaults = {}
-defaults.pos = {}
-defaults.pos.x = -178
-defaults.pos.y = 21
-defaults.text = {}
-defaults.text.font = 'Arial'
-defaults.text.size = 14
-defaults.flags = {}
-defaults.flags.right = true
-
-settings = config.load(defaults)
-distance = texts.new(settings)
-
-windower.register_event('prerender', function()
-	local t = windower.ffxi.get_mob_by_target('st') or windower.ffxi.get_mob_by_target('t')
-    distance:text(t and ('%.1f'):format(t.distance:sqrt()) or '')
-    distance:visible(t ~= nil)
-end)
-
-windower.register_event('addon command', function(command)
-    if command == 'save' then
-        config.save(settings, 'all')
-    end
-end)
+return statuses
 
 --[[
 Copyright (c) 2013, Windower

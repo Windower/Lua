@@ -1,4 +1,4 @@
-_addon = {}
+
 _addon.name = 'Eval'
 _addon.author = 'Aureus'
 _addon.command = 'eval'

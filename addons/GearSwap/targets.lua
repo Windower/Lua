@@ -50,8 +50,9 @@ function valid_target(targ)
 		return targ
 	elseif targ then
 		local mob_array = get_mob_array()
+		local lower_targ = targ:lower()
 		for i,v in pairs(mob_array) do
-			if v['name']==targ and not v['is_npc'] then
+			if v['name']:lower()==lower_targ and not v['is_npc'] then
 				spell_targ = targ
 				table.reassign(spelltarget,target_type(v))
 				spelltarget.raw = targ

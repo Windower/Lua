@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
 
-_addon = {}
+
 _addon.name = 'autocontrol'
 _addon.version = '0.21'
 _addon.author = 'Nitrous (Shiva)'
@@ -172,7 +172,7 @@ function set_attachments_from_autoset(autoset,slot)
             send_command('@wait .5;lua i autocontrol set_attachments_from_autoset '..autoset..' '..slot+1)
         else
             log(windower.ffxi.get_mjob_data()['name']..' has been equipped with the '..autoset..' set.')
-            if petlessZones:contains(windower.get_ffxi_info()['zone_id']) then 
+            if petlessZones:contains(windower.ffxi.get_info()['zone_id']) then 
                 return
             else
                 if windower.ffxi.get_ability_recasts()[205] == 0 then

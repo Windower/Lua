@@ -35,7 +35,7 @@ require 'sets'
 
 config = require 'config'
 
-_addon = {}
+
 _addon.name     = 'timestamp'
 _addon.author   = 'Zohno'
 _addon.version  = '1.20131102'

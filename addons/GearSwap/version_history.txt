@@ -1,4 +1,18 @@
 -------------------------------------------------
+Gearswap 0.719 - Removed dependence on sets library. Fixed error that occured when there was no subjob.
+-------------------------------------------------
+Gearswap 0.718 - Fixed player.status. Added the validate command. Improved export sets' efficiency. Updated documentation.
+-------------------------------------------------
+Gearswap 0.717 - Fixed equipment removal. Added sets.naked. Handled category 11 outgoing actions (homepointing). Updated documentation.
+-------------------------------------------------
+Gearswap 0.716 - Export now looks up the proper equipment slot. Changed syntax for equipping an empty slot to be less ambiguous. Fixed unequipping on zone (I think).
+-------------------------------------------------
+Gearswap 0.715 - Converted resource strings to numbers if appropriate. Added Pianissimo casttime handling.
+-------------------------------------------------
+Gearswap 0.714 - Minor changes to make export more user friendly.
+-------------------------------------------------
+Gearswap 0.713 - Added equipment order support. Made export sets more safe. Added equip "empty" support.
+-------------------------------------------------
 Gearswap 0.712 - Added adventuring fellow handling.
 -------------------------------------------------
 Gearswap 0.711 - Refined category exclusions for the outgoing action packet.

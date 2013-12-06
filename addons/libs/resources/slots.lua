@@ -1,31 +1,31 @@
 -- Slots
 local slots = {}
 
-slots[2^1]  = {english = 'Main',        }
-slots[2^2]  = {english = 'Sub',         }
-slots[2^3]  = {english = 'Ranged',      }
-slots[2^4]  = {english = 'Ammo',        }
-slots[2^5]  = {english = 'Head',        }
-slots[2^6]  = {english = 'Body',        }
-slots[2^7]  = {english = 'Hands',       }
-slots[2^8]  = {english = 'Legs',        }
-slots[2^9]  = {english = 'Feet',        }
-slots[2^10] = {english = 'Neck',        }
-slots[2^11] = {english = 'Waist',       }
-slots[2^12] = {english = 'Left Ear',    }
-slots[2^13] = {english = 'Right Ear',   }
-slots[2^14] = {english = 'Left Ring',   }
-slots[2^15] = {english = 'Right Ring',  }
-slots[2^16] = {english = 'Back',        }
+slots[2^1]   = {english = 'Main',       }
+slots[2^2]   = {english = 'Sub',        }
+slots[2^3]   = {english = 'Ranged',     }
+slots[2^4]   = {english = 'Ammo',       }
+slots[2^5]   = {english = 'Head',       }
+slots[2^6]   = {english = 'Body',       }
+slots[2^7]   = {english = 'Hands',      }
+slots[2^8]   = {english = 'Legs',       }
+slots[2^9]   = {english = 'Feet',       }
+slots[2^10]  = {english = 'Neck',       }
+slots[2^11]  = {english = 'Waist',      }
+slots[2^12]  = {english = 'Left Ear',   }
+slots[2^13]  = {english = 'Right Ear',  }
+slots[2^14]  = {english = 'Left Ring',  }
+slots[2^15]  = {english = 'Right Ring', }
+slots[2^16]  = {english = 'Back',       }
 
 --[[ Compound values ]]
 
 -- 2^1 + 2^2
-slots[3]     = 'Melee'
+slots[3]     = {english = 'Melee',      }
 -- 2^12 + 2^13
-slots[12288] = 'Ear'
+slots[12288] = {english = 'Ear',        }
 -- 2^14 + 2^15
-slots[49152] = 'Ring'
+slots[49152] = {english = 'Ring',       }
 
 return slots
 

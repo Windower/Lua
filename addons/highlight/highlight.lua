@@ -3,7 +3,7 @@ chat = require 'chat'
 require 'tablehelper'
 require 'stringhelper'
  
-_addon = {}
+
 _addon.author = 'Balloon'
 _addon.name = 'Highlight'
 _addon.version = '1.0' 
@@ -55,7 +55,7 @@ windower.register_event('addon command', function(command, ...)
     args = {...}
  
     if command == 'write' then
-        io.open(lua_base_path..'/logs/'..player..'.txt',"a"):write('\n =='..string.sub(os.date(), 0, 8)..'== \n'..table.concat(previousmentions, '\n')):close()
+        io.open(windower.addon_path..'/logs/'..player..'.txt',"a"):write('\n =='..string.sub(os.date(), 0, 8)..'== \n'..table.concat(previousmentions, '\n')):close()
  
     elseif command == 'view' then
         if not args[1] then 

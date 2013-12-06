@@ -61,7 +61,7 @@ function captionlog(msg, msgcolor, ...)
     end
 
     for _, line in ipairs(str:split('\n')) do
-        add_to_chat(logger.settings.logcolor, caption..line..chat.colorcontrols.reset)
+        windower.add_to_chat(logger.settings.logcolor, caption..line..chat.colorcontrols.reset)
     end
 end
 
@@ -86,7 +86,7 @@ end
 function flog(filename, ...)
     filename = filename or logger.settings.defaultfile
 
-    local fh, err = io.open(lua_base_path..filename, 'a')
+    local fh, err = io.open(windower.addon_path..filename, 'a')
     if fh == nil then
         if err ~= nil then
             error('File error:', err)
