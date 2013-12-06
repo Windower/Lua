@@ -185,9 +185,9 @@ windower.register_event('action',function (act)
 				for i=1, #roll_id do
 					if roller == roll_id[i] then
 						for n=1, #act['targets'] do
-							for z in pairs(get_party()) do
-								if get_party()[z]['mob'] ~= nil then
-									if act['targets'][n]['id'] == get_party()[z]['mob']['id'] then	
+							for z in pairs(windower.ffxi.get_party()) do
+								if windower.ffxi.get_party()[z]['mob'] ~= nil then
+									if act['targets'][n]['id'] == windower.ffxi.get_party()[z]['mob']['id'] then	
 										effected_member[n]=player_color[z]..get_party()[z]['name']..chat.colorcontrols.reset
 									end
 								end

@@ -98,7 +98,7 @@ end)
 
 -- Attempts to send an invite
 function try_invite(player)
-	if get_party()['p5'] then
+	if windower.ffxi.get_party()['p5'] then
 		notice(player.. 'cannot be invited - party is full')
 		if settings.tell_back == 'on' then
 			send_command('input /t '..player..' Party is currently full.')
