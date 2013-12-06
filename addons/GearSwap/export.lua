@@ -26,7 +26,7 @@ function export_set(options)
 	else
 		buildmsg = buildmsg..' as a lua file.'
 	end
-	add_to_chat(123,buildmsg)
+	windower.add_to_chat(123,buildmsg)
 	
 	if not windower.dir_exists(windower.addon_path..'data/export') then
 		windower.create_dir(windower.addon_path..'data/export')
@@ -42,7 +42,7 @@ function export_set(options)
 					item_list[#item_list].name = r_items[v.id][language]
 					item_list[#item_list].slot = dat_slots_map[tonumber('0x'..(r_items[v.id].slots or 0))] or 'item'
 				else
-					add_to_chat(123,'GearSwap: You possess an item that is not in the resources yet.')
+					windower.add_to_chat(123,'GearSwap: You possess an item that is not in the resources yet.')
 				end
 			end
 			for i = 1,80 do
@@ -56,9 +56,9 @@ function export_set(options)
 	elseif all_sets then
 		-- Iterate through user_env.sets and find all the gear.
 		item_list,exported = unpack_names('L1',user_env.sets,{},{empty=true})
-		for i,v in pairs(exported) do
-			add_to_chat(8,tostring(i))
-		end
+--		for i,v in pairs(exported) do
+--			windower.add_to_chat(8,tostring(i))
+--		end
 	else
 		-- Default to loading the currently worn gear.
 		local gear = temp_items.equipment
@@ -69,7 +69,7 @@ function export_set(options)
 					item_list[slot_map[i]+1].name = r_items[inv[v].id][language]
 					item_list[slot_map[i]+1].slot = i --default_slot_map[inv[v].slot_id]
 				else
-					add_to_chat(123,'GearSwap: You are wearing an item that is not in the resources yet.')
+					windower.add_to_chat(123,'GearSwap: You are wearing an item that is not in the resources yet.')
 				end
 			end
 		end
@@ -83,7 +83,7 @@ function export_set(options)
 	end
 	
 	if #item_list == 0 then
-		add_to_chat(123,'GearSwap: There is nothing to export.')
+		windower.add_to_chat(123,'GearSwap: There is nothing to export.')
 		return
 	else
 		local not_empty
@@ -94,7 +94,7 @@ function export_set(options)
 			end
 		end
 		if not not_empty then
-			add_to_chat(123,'GearSwap: There is nothing to export.')
+			windower.add_to_chat(123,'GearSwap: There is nothing to export.')
 			return
 		end
 	end
@@ -165,7 +165,7 @@ function unlogify_unpacked_name(name)
 	for i,v in pairs(r_items) do
 		if type(v) == 'table' then
 			if not v[language..'_log'] then
-				add_to_chat(8,'v = '..tostring(v.english))
+				windower.add_to_chat(8,'v = '..tostring(v.english))
 			elseif v[language..'_log']:lower() == name then
 				name = v[language]
 				slot = dat_slots_map[tonumber('0x'..(v.slots or 0))] or 'item'

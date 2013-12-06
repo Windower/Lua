@@ -33,7 +33,7 @@ function debug_mode(boolean)
 	elseif boolean == nil then
 		_global.debug_mode = true
 	else
-		add_to_chat(123,'GearSwap: debug_mode was passed an invalid value')
+		windower.add_to_chat(123,'GearSwap: debug_mode was passed an invalid value (true/no value/nil=on, false=off)')
 	end
 end
 
@@ -43,7 +43,7 @@ function show_swaps(boolean)
 	elseif boolean == nil then
 		_global.show_swaps = true
 	else
-		add_to_chat(123,'GearSwap: show_swaps was passed an invalid value')
+		windower.add_to_chat(123,'GearSwap: show_swaps was passed an invalid value (true/no value/nil=on, false=off)')
 	end
 end
 
@@ -53,7 +53,7 @@ function verify_equip(boolean)
 	elseif boolean == nil then
 		_global.verify_equip = true
 	else
-		add_to_chat(123,'GearSwap: verify_equip was passed an invalid value')
+		windower.add_to_chat(123,'GearSwap: verify_equip was passed an invalid value (true/no value/nil=Verify equipment, false=do not verify equipment)')
 	end
 end
 
@@ -63,7 +63,7 @@ function cancel_spell(boolean)
 	elseif boolean == nil then
 		_global.cancel_spell = true
 	else
-		add_to_chat(123,'GearSwap: cancel_spell was passed an invalid value')
+		windower.add_to_chat(123,'GearSwap: cancel_spell was passed an invalid value (true/no value/nil=Cancel the spell, false=do not cancel the spell)')
 	end
 end
 
@@ -72,13 +72,13 @@ function force_send(boolean)
 	elseif boolean == nil then
 		_global.force_send = true
 	else
-		add_to_chat(123,'GearSwap: force_send was passed an invalid value')
+		windower.add_to_chat(123,'GearSwap: force_send was passed an invalid value (true/no value/nil=force send, false=do not force send)')
 	end
 end
 
 function change_target(name)
 	if name and type(name)=='string' then _global.storedtarget = name else
-		add_to_chat(123,'GearSwap: change_target was passed an invalid value')
+		windower.add_to_chat(123,'GearSwap: change_target was passed an invalid value (must be a string)')
 	end
 end
 
@@ -86,26 +86,26 @@ function cast_delay(delay)
 	if tonumber(delay) then
 		_global.cast_delay = tonumber(delay)
 	else
-		add_to_chat(123,'GearSwap: Cast delay is not a number')
+		windower.add_to_chat(123,'GearSwap: Cast delay is not a number')
 	end
 end
 
 function set_combine(set1,set2)
-	if set1 == nil then add_to_chat(123,'GearSwap: set_combine error, Set 1 is nil') end
-	if set2 == nil then add_to_chat(123,'GearSwap: set_combine error, Set 2 is nil') end
+	if set1 == nil then windower.add_to_chat(123,'GearSwap: set_combine error, Set 1 is nil') end
+	if set2 == nil then windower.add_to_chat(123,'GearSwap: set_combine error, Set 2 is nil') end
 	local set3 = {}
 	for i,v in pairs(set1) do
 		if slot_map[i] then
 			set3[default_slot_map[slot_map[i]]] = v
 		else
-			add_to_chat(123,'GearSwap: set_combine error, Set 1 contains an unrecognized slot name ('..tostring(i)..')')
+			windower.add_to_chat(123,'GearSwap: set_combine error, Set 1 contains an unrecognized slot name ('..tostring(i)..')')
 		end
 	end
 	for i,v in pairs(set2) do
 		if slot_map[i] then
 			set3[default_slot_map[slot_map[i]]] = v
 		else
-			add_to_chat(123,'Gearswap: set_combine error, Set 2 contains an unrecognized slot name ('..tostring(i)..')')
+			windower.add_to_chat(123,'Gearswap: set_combine error, Set 2 contains an unrecognized slot name ('..tostring(i)..')')
 		end
 	end
 	return set3
@@ -114,7 +114,7 @@ end
 function equip(...)
 	local gearsets = {...}
 	if #gearsets ~= table.length(gearsets) then
-		add_to_chat(123,'Gearswap: Equip command failure. A passed set is nil')
+		windower.add_to_chat(123,'Gearswap: Equip command failure. A passed set is nil')
 		return
 	end
 	for i = 1,table.length(gearsets) do --,v in ipairs(gearsets) do
@@ -134,7 +134,7 @@ function disable(...)
 		if slot_map[v] then
 			rawset(disable_table,slot_map[v],true)
 		else
-			add_to_chat(123,'Gearswap: disable error, passed an unrecognized slot name ('..tostring(v)..')')
+			windower.add_to_chat(123,'Gearswap: disable error, passed an unrecognized slot name ('..tostring(v)..')')
 		end
 	end
 end
@@ -154,34 +154,34 @@ function enable(...)
 				rawset(not_sent_out_equip,slot_map[v],nil)
 			end
 		else
-			add_to_chat(123,'Gearswap: enable error, passed an unrecognized slot name ('..tostring(v)..')')
+			windower.add_to_chat(123,'Gearswap: enable error, passed an unrecognized slot name ('..tostring(v)..')')
 		end
 	end
 end
 
 function print_set(set,title)
 	if title then
-		add_to_chat(1,'------------------------- '..tostring(title)..' -------------------------')
+		windower.add_to_chat(1,'------------------------- '..tostring(title)..' -------------------------')
 	else
-		add_to_chat(1,'----------------------------------------------------------------')
+		windower.add_to_chat(1,'----------------------------------------------------------------')
 	end
 	if #set == table.length(set) then
 		for i,v in ipairs(set) do
-			add_to_chat(8,tostring(i)..' '..tostring(v))
+			windower.add_to_chat(8,tostring(i)..' '..tostring(v))
 		end
 	else
 		for i,v in pairs(set) do
-			add_to_chat(8,tostring(i)..' '..tostring(v))
+			windower.add_to_chat(8,tostring(i)..' '..tostring(v))
 		end
 	end
-	add_to_chat(1,'----------------------------------------------------------------')
+	windower.add_to_chat(1,'----------------------------------------------------------------')
 end
 
 function send_cmd_user(command)
 	if string.byte(1) ~= 0x40 then
 		command='@'..command
 	end
-	send_command(command)
+	windower.send_command(command)
 end
 
 function register_event_user(str,func)

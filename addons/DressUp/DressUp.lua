@@ -50,6 +50,7 @@ require('feet')
 windower.register_event('load',function ()
 	settings = config.load(defaults)
 	print_blink_settings("global")
+	zone_reset = 2
 	keyset = {}
 	for k,v in pairs(models) do
 	keyset[k] = {}
@@ -62,13 +63,10 @@ windower.register_event('load',function ()
 end)
 
 -- Allows for the model to be restored to desired settings after zoning if blink prevention is on:
-windower.register_event('outgoing chunk',function (id, data) if id == 0x5e then zone_reset = true end end)
+windower.register_event('outgoing chunk',function (id, data) if id == 0x5e then zone_reset = 0 end end)
 
 windower.register_event('incoming chunk',function (id, data)
-	if id == 0x5e then 
-		--Todo: Handle this in a less hacky way
-		send_command('@wait 10; lua i DressUp FinishedZone')
-	elseif id == 0x51 then
+	if id == 0x51 then
 		parsed_self = packets.parse("incoming",id,data)
 
 		local self = T{}
@@ -101,8 +99,10 @@ windower.register_event('incoming chunk',function (id, data)
 					  self["Legs"]..self["Feet"]..self["Main"]..self["Sub"]..self["Ranged"]..self["unknown"]
 			
 		if do_blink_logic("self_special") then
-			if not zone_reset then
+			if zone_reset > 1 then
 				self_Build = true
+			else
+				zone_reset = zone_reset + 1
 			end
 		end
 		-- Model ID 0xFFFF in ranged slot signifies a monster. This prevents undesired results.
