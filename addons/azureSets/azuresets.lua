@@ -99,7 +99,7 @@ function set_spells_from_spellset(spellset,slot)
     else islot = slot end
     local tempname = settings.spellsets[spellset]['slot'..islot]
     if tempname ~= nil then
-        for id = 1, spells:length() do
+        for id = 512, spells:length() do
             if spells[id] then
                 if spells[id]['english']:lower() == tempname:lower() then
                     set_blue_magic_spell(spells[id]['index'], tonumber(slot))
@@ -167,30 +167,6 @@ function get_current_spellset()
     end
     return spellTable
 end
-
---[[ Not yet implemented
-function remove_one_spell(spell)
-    if get_player()['main_job_id'] ~= 16 and get_player()['sub_job_id'] ~= 16 then return nil end
-    local st,en,loc
-    local tmpTable = T(get_current_spellset())
-    for key,val in pairs(tmpTable) do
-        if tmpTable[key] == spell then 
-            st,en,loc = string.find(key,'slot(%d+)')
-        end
-    end
-    --insert spell add code here
-    for id = 1, spells:length() do
-        if spells[id]['english']:lower()] == spell then
-            --This is where single spell removing code goes.
-            --Need to remove by spell index rather than name.
-            log('Removing '..spell..' from slot '..tonumber(loc)..'.')
-            tmpTable['slot'..loc] = nil
-        end
-    end
-    tmpTable:vprint()
-    tmpTable = nil
-end
-]]
 
 function remove_all_spells(trigger)
     reset_blue_magic_spells()
