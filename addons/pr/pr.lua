@@ -16,8 +16,8 @@ windower.register_event('load',function()
 	local player = windower.ffxi.get_player()
 	local petstuff = ''
 	if windower.ffxi.get_mob_by_id(player['id'])['pet_index'] ~= 0 then
-		print(get_mob_by_id(player['id'])['pet_index'])
-		local petinfo = windower.ffxi.get_mob_by_index(get_mob_by_id(player['id'])['pet_index'])
+		print(windower.ffxi.get_mob_by_id(player['id'])['pet_index'])
+		local petinfo = windower.ffxi.get_mob_by_index(windower.ffxi.get_mob_by_id(player['id'])['pet_index'])
 		petstuff = ' Pet ID: '..Dec2Hex(petinfo['id'])..' Pet Index: '..Dec2Hex(petinfo['index'])
 	end
 	f:write('Player ID: '..Dec2Hex(player['id'])..' Index: '..Dec2Hex(player['index'])..petstuff..'\n\n')

@@ -214,7 +214,7 @@ function refresh_player()
 	
 	-- If you have a pet, make a pet table.
 	if player_mob_table.pet_index then
-		table.reassign(pet,get_mob_by_index(player_mob_table.pet_index))
+		table.reassign(pet,windower.ffxi.get_mob_by_index(player_mob_table.pet_index))
 		pet.isvalid = true
 		pet.race_id = pet.race
 		pet.race = nil
