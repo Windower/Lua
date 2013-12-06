@@ -17,19 +17,19 @@ windower.register_event('addon command',function (...)
 			if broken[2] == nil then
 				tell_table = {}
 				recording = {}
-				add_to_chat(4,'Answering Machine>> Blanking the recordings')
+				windower.add_to_chat(4,'Answering Machine>> Blanking the recordings')
 			elseif tell_table[broken[2]:upper()]~=nil then
-				add_to_chat(4,'Answering Machine>> Deleting messages from '..uc_first(broken[2]))
+				windower.add_to_chat(4,'Answering Machine>> Deleting messages from '..uc_first(broken[2]))
 				tell_table[broken[2]:upper()]=nil
 				recording[broken[2]:upper()]=nil
 			else
-				add_to_chat(5,'Cancel error: Could not find specified player in tell history')
+				windower.add_to_chat(5,'Cancel error: Could not find specified player in tell history')
 			end
 		end
 		
 		if broken[1]:upper() == "LIST" then
 			for i,v in pairs(tell_table) do
-				add_to_chat(5,v..' messages from '..uc_first(i))
+				windower.add_to_chat(5,v..' messages from '..uc_first(i))
 			end
 		end
 
@@ -38,37 +38,37 @@ windower.register_event('addon command',function (...)
 				if tell_table[broken[2]:upper()] ~= nil then
 					local num = tell_table[broken[2]:upper()]
 					if num == 1 then
-						add_to_chat(5,'1 message from '..uc_first(broken[2]))
+						windower.add_to_chat(5,'1 message from '..uc_first(broken[2]))
 					else
-						add_to_chat(5,num..' messages from '..uc_first(broken[2]))
+						windower.add_to_chat(5,num..' messages from '..uc_first(broken[2]))
 					end
 					for n = 1,num do
 						local tablekey = recording[broken[2]:upper()]
-						add_to_chat(4,uc_first(broken[2])..'>> '..tablekey[n])
+						windower.add_to_chat(4,uc_first(broken[2])..'>> '..tablekey[n])
 					end
 				end
 			else
-				add_to_chat(4,'Answering Machine>> Playing back all messages')
+				windower.add_to_chat(4,'Answering Machine>> Playing back all messages')
 				for i,v in pairs(tell_table) do
 					if v == 1 then
-						add_to_chat(5,'1 message from '..uc_first(i))
+						windower.add_to_chat(5,'1 message from '..uc_first(i))
 					else
-						add_to_chat(5,v..' messages from '..uc_first(i))
+						windower.add_to_chat(5,v..' messages from '..uc_first(i))
 					end
 					for n = 1,v do
 						local tablekey = recording[i]
-						add_to_chat(4,uc_first(i)..'>> '..tablekey[n])
+						windower.add_to_chat(4,uc_first(i)..'>> '..tablekey[n])
 					end
 				end
 			end
 		end
 		
 		if broken[1]:upper() == "HELP" then
-			write('am clear <name> : Clears current messages, or only messages from <name> if provided')
-			write('am help : Lists these commands!')
-			write('am list : Lists the names of people who have sent you tells')
-			write('am msg <message> : Sets your away message, which will be sent to non-GMs only once after plugin load or message clear')
-			write('am play <name> : Plays current messages, or only messages from <name> if provided')
+			print('am clear <name> : Clears current messages, or only messages from <name> if provided')
+			print('am help : Lists these commands!')
+			print('am list : Lists the names of people who have sent you tells')
+			print('am msg <message> : Sets your away message, which will be sent to non-GMs only once after plugin load or message clear')
+			print('am play <name> : Plays current messages, or only messages from <name> if provided')
 		end
 		
 		
@@ -76,7 +76,7 @@ windower.register_event('addon command',function (...)
 			table.remove(broken,1)
 			if #broken ~= 0 then
 				away_msg=table.concat(broken,' ')
-				add_to_chat(123,'AnsweringMachine: Message set to: '..away_msg)
+				windower.add_to_chat(123,'AnsweringMachine: Message set to: '..away_msg)
 			end
 		end
 	end
@@ -92,7 +92,7 @@ windower.register_event('chat message',function(message,player,mode,isGM)
 			tell_table[player:upper()] = 1
 			recording[player:upper()] = {message}
 			if away_msg and not isGM then
-				send_command('@input /tell '..player..' '..away_msg)
+				windower.send_command('@input /tell '..player..' '..away_msg)
 			end
 		end
 	end
