@@ -59,14 +59,14 @@ windower.register_event('addon command', function(command, ...)
  
     elseif command == 'view' then
         if not args[1] then 
-            add_to_chat(4, "==Recent Mentions==")
+            windower.add_to_chat(4, "==Recent Mentions==")
             if #previousmentions > 20 then
                 for i = 1, 20 do
-                    add_to_chat(4, previousmentions[i])
+                    windower.add_to_chat(4, previousmentions[i])
                 end
             else 
                 for i = 1, #previousmentions do
-                    add_to_chat(4, previousmentions[i])
+                    windower.add_to_chat(4, previousmentions[i])
                 end
             end
  
@@ -74,9 +74,9 @@ windower.register_event('addon command', function(command, ...)
             if tonumber(args[1]) > #previousmentions then
                 print('Not that many mentions, type //highlight view to show them all')
             else
-                add_to_chat(4, '==Last '..args[1]..' Mentions==')
+                windower.add_to_chat(4, '==Last '..args[1]..' Mentions==')
                 for i = 1, tonumber(args[1]) do
-                    add_to_chat(4, previousmentions[i])
+                    windower.add_to_chat(4, previousmentions[i])
                 end
             end
         end

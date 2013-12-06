@@ -12,5 +12,5 @@ windower.register_event('unload',function ()
 end}
 
 windower.register_event('ipc message',function (msg)
-	add_to_chat(5, msg)
+	windower.add_to_chat(5, msg)
 end}

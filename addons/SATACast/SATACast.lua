@@ -41,8 +41,8 @@ windower.register_event('load',function ()
 	Idle_Set = ' '
 	TH_ON = 0
 	TP_ON = 0
-	add_to_chat(17, 'SATACast v' .. version .. ' loaded.     Author:  Banggugyangu')
-	add_to_chat(17, 'Attempting to load settings from file.')
+	windower.add_to_chat(17, 'SATACast v' .. version .. ' loaded.     Author:  Banggugyangu')
+	windower.add_to_chat(17, 'Attempting to load settings from file.')
 	options_load()
 	
 end)
@@ -63,7 +63,7 @@ function options_load()
 		g:close()
 		
 		print('Default settings file created')
-		add_to_chat(17,'SATACast created a settings file and loaded!')
+		windower.add_to_chat(17,'SATACast created a settings file and loaded!')
 	else
 		f:close()
 		for curline in io.lines(windower.addon_path..'data/settings.txt') do
@@ -86,7 +86,7 @@ function options_load()
 				Idle_Set = splat[3]
 			end
 		end
-		add_to_chat(17,'SATACast read from a settings file and loaded!')
+		windower.add_to_chat(17,'SATACast read from a settings file and loaded!')
 	end
 end
 
@@ -158,9 +158,9 @@ windower.register_event('addon command',function (...)
 	if splitarr[1]:lower() == 'reload' then
 		options_load()
 	elseif splitarr[1]:lower() == 'help' then
-		add_to_chat(17, 'SATACast  v'..version..'commands:')
-		add_to_chat(17, '//scast [options]')
-		add_to_chat(17, '    reload  - Reloads settings')
-		add_to_chat(17, '    help   - Displays this help text')
+		windower.add_to_chat(17, 'SATACast  v'..version..'commands:')
+		windower.add_to_chat(17, '//scast [options]')
+		windower.add_to_chat(17, '    reload  - Reloads settings')
+		windower.add_to_chat(17, '    help   - Displays this help text')
 	end
 end)

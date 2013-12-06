@@ -127,8 +127,8 @@ windower.register_event('load',function ()
 	send_command('alias f3 lua command ChatPorter f3')
 	send_command('alias f4 lua command ChatPorter f4')
 	send_command('alias f5 lua command ChatPorter f5')
-	add_to_chat(55, "Loading ".._addon.name.." v".._addon.version.." (written by ".._addon.author..")")
-	add_to_chat(160,'  Type '..string.color('//cp help',204,160)..' for a list of possible commands.')
+	windower.add_to_chat(55, "Loading ".._addon.name.." v".._addon.version.." (written by ".._addon.author..")")
+	windower.add_to_chat(160,'  Type '..string.color('//cp help',204,160)..' for a list of possible commands.')
 --	showStatus()
 end)
 
@@ -146,7 +146,7 @@ windower.register_event('unload',function ()
 	send_command('unalias f3')
 	send_command('unalias f4')
 	send_command('unalias f5')
-	add_to_chat(55, "Unloading ".._addon.name.." v".._addon.version..".")
+	windower.add_to_chat(55, "Unloading ".._addon.name.." v".._addon.version..".")
 end)
 
 windower.register_event('login',function (name)
@@ -157,9 +157,9 @@ windower.register_event('login',function (name)
 	show("ffochat")
 	LSname = windower.ffxi.get_player().linkshell;
 	playerName = windower.ffxi.get_player().name;
---	add_to_chat(160,"Refreshing data...")
---	add_to_chat(160,"LSname: "..LSname)
---	add_to_chat(160,"playerName: "..playerName)
+--	windower.add_to_chat(160,"Refreshing data...")
+--	windower.add_to_chat(160,"LSname: "..LSname)
+--	windower.add_to_chat(160,"playerName: "..playerName)
 end)
 
 function addon_command(...)
@@ -169,44 +169,44 @@ function addon_command(...)
 		comm = args[1]:lower()
         if comm == 'help' then
 			if args[2] == nil or (args[2] ~= "detail" and args[2] ~= "textbox") then
-				add_to_chat(55,_addon.name.." v".._addon.version..' possible commands:')
-				add_to_chat(160,'  '..string.color('//ChatPorter',204,160)..' and '..string.color('//cp',204,160)..' are both valid commands.')
-				add_to_chat(160,'  '..string.color('//cp help',204,160)..' : Lists this menu.')
-				add_to_chat(160,'  '..string.color('//cp status',204,160)..' : Shows current configuration.')
-				add_to_chat(160,'  '..string.color('//cp textbox',204,160)..' : Shows current textbox configurations.')
-				add_to_chat(160,'  '..string.color('//cp colors',204,160)..' : Shows possible color codes.')
-				add_to_chat(160,'  '..string.color('//cp toggle',204,160)..' : Toggles ChatPorter on/off.')
-				add_to_chat(160,'  '..string.color('//cp [l|p|t] [toggle|displaychat]',204,160)..' : Toggles linkshell|party|tell messages from showing or not.')
-				add_to_chat(160,'  '..string.color('//cp [l|p|t] color #',204,160)..' : Sets color of l|p|t text (acceptable values of 1-255).')
-				add_to_chat(160,'  '..string.color('//cp [l|p|t|f] show',204,160)..' : Toggles l|p|t textboxes from showing.')
-				add_to_chat(160,'  '..string.color('//cp [l|p|t|f] [fontname|fn, lines, fontsize|fs, x, y, alpha|a, red|r, green|g, blue|b] #',204,160)..' : Sets l|p|t textbox specifics.')
-				add_to_chat(160,'  '..string.color('//[l2|p2|t2 name|r2] message',204,160)..' : Sends message from second character to linkshell|party|tell|reply.')
-				add_to_chat(160,'  '..string.color('//[f#|cp f#] message',204,160)..' : Sends message from second character to ffochat channel.')
-				add_to_chat(160,'  '..string.color('//cp help detail',204,160)..' : Shows detailed ChatPorter commands.')
-				add_to_chat(160,'  '..string.color('//cp help textbox',204,160)..' : Shows detailed textbox commands.')
+				windower.add_to_chat(55,_addon.name.." v".._addon.version..' possible commands:')
+				windower.add_to_chat(160,'  '..string.color('//ChatPorter',204,160)..' and '..string.color('//cp',204,160)..' are both valid commands.')
+				windower.add_to_chat(160,'  '..string.color('//cp help',204,160)..' : Lists this menu.')
+				windower.add_to_chat(160,'  '..string.color('//cp status',204,160)..' : Shows current configuration.')
+				windower.add_to_chat(160,'  '..string.color('//cp textbox',204,160)..' : Shows current textbox configurations.')
+				windower.add_to_chat(160,'  '..string.color('//cp colors',204,160)..' : Shows possible color codes.')
+				windower.add_to_chat(160,'  '..string.color('//cp toggle',204,160)..' : Toggles ChatPorter on/off.')
+				windower.add_to_chat(160,'  '..string.color('//cp [l|p|t] [toggle|displaychat]',204,160)..' : Toggles linkshell|party|tell messages from showing or not.')
+				windower.add_to_chat(160,'  '..string.color('//cp [l|p|t] color #',204,160)..' : Sets color of l|p|t text (acceptable values of 1-255).')
+				windower.add_to_chat(160,'  '..string.color('//cp [l|p|t|f] show',204,160)..' : Toggles l|p|t textboxes from showing.')
+				windower.add_to_chat(160,'  '..string.color('//cp [l|p|t|f] [fontname|fn, lines, fontsize|fs, x, y, alpha|a, red|r, green|g, blue|b] #',204,160)..' : Sets l|p|t textbox specifics.')
+				windower.add_to_chat(160,'  '..string.color('//[l2|p2|t2 name|r2] message',204,160)..' : Sends message from second character to linkshell|party|tell|reply.')
+				windower.add_to_chat(160,'  '..string.color('//[f#|cp f#] message',204,160)..' : Sends message from second character to ffochat channel.')
+				windower.add_to_chat(160,'  '..string.color('//cp help detail',204,160)..' : Shows detailed ChatPorter commands.')
+				windower.add_to_chat(160,'  '..string.color('//cp help textbox',204,160)..' : Shows detailed textbox commands.')
 			elseif args[2] == "detail" then
-				add_to_chat(55,'  ChatPorter detailed commands:')
-				add_to_chat(160,'  '..string.color('//l2 message',204,160)..' : Sends message from second character to linkshell.')
-				add_to_chat(160,'  '..string.color('//p2 message',204,160)..' : Sends message from second character to party.')
-				add_to_chat(160,'  '..string.color('//t2 name message',204,160)..' : Sends message from second character to name in tell.')
-				add_to_chat(160,'  '..string.color('//r2 message',204,160)..' : Sends reply message from second character.')
-				add_to_chat(160,'  '..string.color('//f# message',204,160)..' : Sends message from second character to FFOChat channel #.  Works for 1-5.')
-				add_to_chat(160,'  '..string.color('//cp f# message',204,160)..' : Same as f#, but for any #.')
+				windower.add_to_chat(55,'  ChatPorter detailed commands:')
+				windower.add_to_chat(160,'  '..string.color('//l2 message',204,160)..' : Sends message from second character to linkshell.')
+				windower.add_to_chat(160,'  '..string.color('//p2 message',204,160)..' : Sends message from second character to party.')
+				windower.add_to_chat(160,'  '..string.color('//t2 name message',204,160)..' : Sends message from second character to name in tell.')
+				windower.add_to_chat(160,'  '..string.color('//r2 message',204,160)..' : Sends reply message from second character.')
+				windower.add_to_chat(160,'  '..string.color('//f# message',204,160)..' : Sends message from second character to FFOChat channel #.  Works for 1-5.')
+				windower.add_to_chat(160,'  '..string.color('//cp f# message',204,160)..' : Same as f#, but for any #.')
 			elseif args[2] == "textbox" then
-				add_to_chat(55,'  ChatPorter textbox commands:')
-				add_to_chat(160,'  '..string.color('//cp [l|p|t|f] [toggle|displaychat]',204,160)..' : Toggles linkshell|party|tell|ffochat messages from showing or not.')
-				add_to_chat(160,'  '..string.color('//cp [l|p|t] color #',204,160)..' : Sets color of l|p|t text (acceptable values of 1-255).')
-				add_to_chat(160,'  '..string.color('//cp [l|p|t|f] show',204,160)..' : Toggles l|p|t|f textboxes from showing.')
-				add_to_chat(160,'  '..string.color('//cp [l|p|t|f] clear',204,160)..' : Clears l|p|t|f textbox.')
-				add_to_chat(160,'  '..string.color('//cp [l|p|t|f] lines #',204,160)..' : Sets # of lines to show in textbox.')
-				add_to_chat(160,'  '..string.color('//cp [l|p|t|f] [fontname|fn] *',204,160)..' : Sets fontname for textbox.')
-				add_to_chat(160,'  '..string.color('//cp [l|p|t|f] [fontsize|fs] #',204,160)..' : Sets fontsize for textbox.')
-				add_to_chat(160,'  '..string.color('//cp [l|p|t|f] x #',204,160)..' : Sets x coordinate for textbox (acceptable values: 10-'.. playerResolution.x-10 ..').')
-				add_to_chat(160,'  '..string.color('//cp [l|p|t|f] y #',204,160)..' : Sets y coordinate for textbox (acceptable values: 10-'.. playerResolution.y-10 ..').')
-				add_to_chat(160,'  '..string.color('//cp [l|p|t|f] [alpha|a] #',204,160)..' : Sets alpha (transparency) for textbox (acceptable values: 1-255; 0=fully transparent, 255=fully visible).')
-				add_to_chat(160,'  '..string.color('//cp [l|p|t|f] [red|r] #',204,160)..' : Sets red value for RGB color of text in textbox.')
-				add_to_chat(160,'  '..string.color('//cp [l|p|t|f] [green|g] #',204,160)..' : Sets green value for RGB color of text in textbox.')
-				add_to_chat(160,'  '..string.color('//cp [l|p|t|f] [blue|b] #',204,160)..' : Sets blue value for RGB color of text in textbox.')
+				windower.add_to_chat(55,'  ChatPorter textbox commands:')
+				windower.add_to_chat(160,'  '..string.color('//cp [l|p|t|f] [toggle|displaychat]',204,160)..' : Toggles linkshell|party|tell|ffochat messages from showing or not.')
+				windower.add_to_chat(160,'  '..string.color('//cp [l|p|t] color #',204,160)..' : Sets color of l|p|t text (acceptable values of 1-255).')
+				windower.add_to_chat(160,'  '..string.color('//cp [l|p|t|f] show',204,160)..' : Toggles l|p|t|f textboxes from showing.')
+				windower.add_to_chat(160,'  '..string.color('//cp [l|p|t|f] clear',204,160)..' : Clears l|p|t|f textbox.')
+				windower.add_to_chat(160,'  '..string.color('//cp [l|p|t|f] lines #',204,160)..' : Sets # of lines to show in textbox.')
+				windower.add_to_chat(160,'  '..string.color('//cp [l|p|t|f] [fontname|fn] *',204,160)..' : Sets fontname for textbox.')
+				windower.add_to_chat(160,'  '..string.color('//cp [l|p|t|f] [fontsize|fs] #',204,160)..' : Sets fontsize for textbox.')
+				windower.add_to_chat(160,'  '..string.color('//cp [l|p|t|f] x #',204,160)..' : Sets x coordinate for textbox (acceptable values: 10-'.. playerResolution.x-10 ..').')
+				windower.add_to_chat(160,'  '..string.color('//cp [l|p|t|f] y #',204,160)..' : Sets y coordinate for textbox (acceptable values: 10-'.. playerResolution.y-10 ..').')
+				windower.add_to_chat(160,'  '..string.color('//cp [l|p|t|f] [alpha|a] #',204,160)..' : Sets alpha (transparency) for textbox (acceptable values: 1-255; 0=fully transparent, 255=fully visible).')
+				windower.add_to_chat(160,'  '..string.color('//cp [l|p|t|f] [red|r] #',204,160)..' : Sets red value for RGB color of text in textbox.')
+				windower.add_to_chat(160,'  '..string.color('//cp [l|p|t|f] [green|g] #',204,160)..' : Sets green value for RGB color of text in textbox.')
+				windower.add_to_chat(160,'  '..string.color('//cp [l|p|t|f] [blue|b] #',204,160)..' : Sets blue value for RGB color of text in textbox.')
 			end
 		elseif comm == 'status' then
             showStatus()
@@ -254,7 +254,7 @@ function addon_command(...)
 				showStatus('display'..comm..'chat')
 			elseif com2 == "show" then
 				settings[comm][com2] = not settings[comm][com2]
-				add_to_chat(160,"  Setting "..comm.." textbox to display: "..string.color(onOffPrint(settings[comm][com2]),204,160))
+				windower.add_to_chat(160,"  Setting "..comm.." textbox to display: "..string.color(onOffPrint(settings[comm][com2]),204,160))
 			elseif com2 == "clear" then
 				_G['show'..comm] = {}
 			elseif com2 == "fontname" or com2 == "fn" then
@@ -262,34 +262,34 @@ function addon_command(...)
 					com3 = table.slice(args,3)
 					com3 = tostring(table.sconcat(com3))
 					settings[comm].fontname = com3
-					add_to_chat(160,"  Setting fontname: "..string.color(com3,204,160))
+					windower.add_to_chat(160,"  Setting fontname: "..string.color(com3,204,160))
 				else
 					settings[comm].fontname = defaults[comm].fontname
-					add_to_chat(160,"  No fontname specified; setting default fontname.")
+					windower.add_to_chat(160,"  No fontname specified; setting default fontname.")
 				end
 			elseif com2 == "lines" then
 				if com3num > 8 or com3num < 1 then
 					settings[comm][com2] = 8
-					add_to_chat(160,"  Invalid setting.  Lines must be a value from 1-8.  Setting max value.")
+					windower.add_to_chat(160,"  Invalid setting.  Lines must be a value from 1-8.  Setting max value.")
 				else
 					settings[comm][com2] = com3num
-					add_to_chat(160,"  Setting lines for "..comm.." textbox: "..string.color(tostring(com3num),204,160))
+					windower.add_to_chat(160,"  Setting lines for "..comm.." textbox: "..string.color(tostring(com3num),204,160))
 				end
 			elseif com2 == "fontsize" or com2 == "fs" then
 				if com3num ~= nil and com3num >= 4 and com3num <= 144 then
 					settings[comm].fontsize = com3num
-					add_to_chat(160,"  Setting fontsize for "..comm.." textbox: "..string.color(tostring(com3num),204,160))
+					windower.add_to_chat(160,"  Setting fontsize for "..comm.." textbox: "..string.color(tostring(com3num),204,160))
 				else
 					settings[comm].fontsize = defaults[comm].fontsize
-					add_to_chat(160,"  Invalid fontsize; acceptable values: 4-144.  Setting to default.")
+					windower.add_to_chat(160,"  Invalid fontsize; acceptable values: 4-144.  Setting to default.")
 				end
 			elseif com2 == "x" or com2 == "y" then
 				if com3num ~= nil and com3num >= 10 and com3num <= playerResolution[com2] - 10 then
 					settings[comm][com2] = com3num
-					add_to_chat(160,"  Setting "..com2.." value for "..comm.." textbox: "..string.color(tostring(com3num),204,160))
+					windower.add_to_chat(160,"  Setting "..com2.." value for "..comm.." textbox: "..string.color(tostring(com3num),204,160))
 				else
 					settings[comm][com2] = defaults[comm][com2]
-					add_to_chat(160,"  Invalid "..com2.." value; acceptable values: 10-".. playerResolution[com2]-10 ..". Setting to default.")
+					windower.add_to_chat(160,"  Invalid "..com2.." value; acceptable values: 10-".. playerResolution[com2]-10 ..". Setting to default.")
 				end
 			elseif S({'color','alpha','a','red','r','green','g','blue','b'}):contains(com2) then
 				if com2 == "a" then
@@ -304,13 +304,13 @@ function addon_command(...)
 				if (com3num ~= nil) and (com3num >= 1 and com3num <= 255) then
 					settings[comm][com2] = com3num
 					if com2 == "color" then
-						add_to_chat(160,"  Setting "..com2.." for "..comm..": "..string.color(tostring(com3num),204,160))
+						windower.add_to_chat(160,"  Setting "..com2.." for "..comm..": "..string.color(tostring(com3num),204,160))
 					else
-						add_to_chat(160,"  Setting "..com2.." value for "..comm.." textbox: "..string.color(tostring(com3num),204,160))
+						windower.add_to_chat(160,"  Setting "..com2.." value for "..comm.." textbox: "..string.color(tostring(com3num),204,160))
 					end
 				else
 					settings[comm][com2] = defaults[comm][com2]
-					add_to_chat(160,"  Invalid "..com2.." value; acceptable values: 1-255.  Setting default.")
+					windower.add_to_chat(160,"  Invalid "..com2.." value; acceptable values: 1-255.  Setting default.")
 				end
 --				showStatus(_G['settings['..comm..']['..com2..']'])
 --				_G['show'..tbName]
@@ -320,10 +320,10 @@ function addon_command(...)
 				if com3 ~= nil and tostring(com3) ~= tostring(dummysettings[comm][com2]) then
 --					settings:save('all') -- all characters
 					settings:save() -- current character only
-					add_to_chat(55,"Saving "..string.color('ChatPorter',204,55).." settings.")
+					windower.add_to_chat(55,"Saving "..string.color('ChatPorter',204,55).." settings.")
 				elseif com2 == "show" or com2 == "toggle" or com2 == "displaychat" then
 					settings:save() -- current character only
-					add_to_chat(55,"Saving "..string.color('ChatPorter',204,55).." settings.")
+					windower.add_to_chat(55,"Saving "..string.color('ChatPorter',204,55).." settings.")
 				end
 			end
 		elseif comm:lower() == 'vprint' then
@@ -338,7 +338,7 @@ function addon_command(...)
 			showparty:vprint()
 
 		else
-			add_to_chat(160, "  Not a valid ".._addon.name.." v".._addon.version.." command.  "..string.color('//cp help',204,160).." for a list of valid commands.")
+			windower.add_to_chat(160, "  Not a valid ".._addon.name.." v".._addon.version.." command.  "..string.color('//cp help',204,160).." for a list of valid commands.")
 			return
         end
 	else
@@ -355,44 +355,44 @@ end)
 function showStatus(var)
 	if (var ~= nul) and var ~= "textbox" then
 		if var == "usechatporter" then
-			add_to_chat(160,"   UseChatPorter: " .. string.color(onOffPrint(settings.usechatporter),204,160))
+			windower.add_to_chat(160,"   UseChatPorter: " .. string.color(onOffPrint(settings.usechatporter),204,160))
 		elseif var == "displaylinkshellchat" then
-			add_to_chat(160,"   DisplayLinkshellChat: " .. string.color(onOffPrint(settings.linkshell.displaychat),204,160))
+			windower.add_to_chat(160,"   DisplayLinkshellChat: " .. string.color(onOffPrint(settings.linkshell.displaychat),204,160))
 		elseif var == "displaypartychat" then
-			add_to_chat(160,"   DisplayPartyChat: " .. string.color(onOffPrint(settings.party.displaychat),204,160))
+			windower.add_to_chat(160,"   DisplayPartyChat: " .. string.color(onOffPrint(settings.party.displaychat),204,160))
 		elseif var == "displaytellchat" then
-			add_to_chat(160,"   DisplayTellChat: " .. string.color(onOffPrint(settings.tell.displaychat),204,160))
+			windower.add_to_chat(160,"   DisplayTellChat: " .. string.color(onOffPrint(settings.tell.displaychat),204,160))
 		elseif var == "linkshellcolor" then
-			add_to_chat(160,"   LinkshellColor: " .. string.color(tostring(settings.linkshell.color),204,160))
+			windower.add_to_chat(160,"   LinkshellColor: " .. string.color(tostring(settings.linkshell.color),204,160))
 		elseif var == "partycolor" then
-			add_to_chat(160,"   PartyColor: " .. string.color(tostring(settings.party.color),204,160))
+			windower.add_to_chat(160,"   PartyColor: " .. string.color(tostring(settings.party.color),204,160))
 		elseif var == "tellcolor" then
-			add_to_chat(160,"   TellColor: " .. string.color(tostring(settings.tell.color),204,160))
+			windower.add_to_chat(160,"   TellColor: " .. string.color(tostring(settings.tell.color),204,160))
 		end
 	elseif var == "textbox" then
-		add_to_chat(160, "Textbox settings: "..string.color('linkshell',settings.linkshell.color,160).." | "..string.color('party',settings.party.color,160).." | "..string.color('tell',settings.tell.color,160).." | "..string.color('ffochat',settings.ffochat.color,160))
---		add_to_chat(160, "displaychat: "..string.color(onOffPrint(settings.linkshell.displaychat),settings.linkshell.color,160).." | "..string.color(onOffPrint(settings.party.displaychat),settings.party.color,160).." | "..string.color(onOffPrint(settings.tell.displaychat),settings.tell.color,160).." | "..string.color(onOffPrint(settings.ffochat.displaychat),settings.ffochat.color,160))
---		add_to_chat(160, "color: "..string.color(tostring(settings.linkshell.color),settings.linkshell.color,160).." | "..string.color(tostring(settings.party.color),settings.party.color,160).." | "..string.color(tostring(settings.tell.color),settings.tell.color,160).." | "..string.color(tostring(settings.ffochat.color),settings.ffochat.color,160))
-		add_to_chat(160, "show: "..string.color(onOffPrint(settings.linkshell.show),settings.linkshell.color,160).." | "..string.color(onOffPrint(settings.party.show),settings.party.color,160).." | "..string.color(onOffPrint(settings.tell.show),settings.tell.color,160).." | "..string.color(onOffPrint(settings.ffochat.show),settings.ffochat.color,160))
-		add_to_chat(160, "lines: "..string.color(tostring(settings.linkshell.lines),settings.linkshell.color,160).." | "..string.color(tostring(settings.party.lines),settings.party.color,160).." | "..string.color(tostring(settings.tell.lines),settings.tell.color,160).." | "..string.color(tostring(settings.ffochat.lines),settings.ffochat.color,160))
-		add_to_chat(160, "fontname: "..string.color(settings.linkshell.fontname,settings.linkshell.color,160).." | "..string.color(settings.party.fontname,settings.party.color,160).." | "..string.color(settings.tell.fontname,settings.tell.color,160).." | "..string.color(settings.ffochat.fontname,settings.ffochat.color,160))
-		add_to_chat(160, "fontsize: "..string.color(tostring(settings.linkshell.fontsize),settings.linkshell.color,160).." | "..string.color(tostring(settings.party.fontsize),settings.party.color,160).." | "..string.color(tostring(settings.tell.fontsize),settings.tell.color,160).." | "..string.color(tostring(settings.ffochat.fontsize),settings.ffochat.color,160))
-		add_to_chat(160, "x: "..string.color(tostring(settings.linkshell.x),settings.linkshell.color,160).." | "..string.color(tostring(settings.party.x),settings.party.color,160).." | "..string.color(tostring(settings.tell.x),settings.tell.color,160).." | "..string.color(tostring(settings.ffochat.x),settings.ffochat.color,160))
-		add_to_chat(160, "y: "..string.color(tostring(settings.linkshell.y),settings.linkshell.color,160).." | "..string.color(tostring(settings.party.y),settings.party.color,160).." | "..string.color(tostring(settings.tell.y),settings.tell.color,160).." | "..string.color(tostring(settings.ffochat.y),settings.ffochat.color,160))
-		add_to_chat(160, "alpha: "..string.color(tostring(settings.linkshell.alpha),settings.linkshell.color,160).." | "..string.color(tostring(settings.party.alpha),settings.party.color,160).." | "..string.color(tostring(settings.tell.alpha),settings.tell.color,160).." | "..string.color(tostring(settings.ffochat.alpha),settings.ffochat.color,160))
-		add_to_chat(160, "red: "..string.color(tostring(settings.linkshell.red),settings.linkshell.color,160).." | "..string.color(tostring(settings.party.red),settings.party.color,160).." | "..string.color(tostring(settings.tell.red),settings.tell.color,160).." | "..string.color(tostring(settings.ffochat.red),settings.ffochat.color,160))
-		add_to_chat(160, "green: "..string.color(tostring(settings.linkshell.green),settings.linkshell.color,160).." | "..string.color(tostring(settings.party.green),settings.party.color,160).." | "..string.color(tostring(settings.tell.green),settings.tell.color,160).." | "..string.color(tostring(settings.ffochat.green),settings.ffochat.color,160))
-		add_to_chat(160, "blue: "..string.color(tostring(settings.linkshell.blue),settings.linkshell.color,160).." | "..string.color(tostring(settings.party.blue),settings.party.color,160).." | "..string.color(tostring(settings.tell.blue),settings.tell.color,160).." | "..string.color(tostring(settings.ffochat.blue),settings.ffochat.color,160))
---add_to_chat(160, string.rep(" ",12-#tostring("displaychat")).."displaychat: "..string.color(string.rep(" ",3-#tostring(onOffPrint(settings.linkshell.displaychat))),settings.linkshell.color,160).." | "..string.color(onOffPrint(settings.party.displaychat),settings.party.color,160).." | "..string.color(onOffPrint(settings.tell.displaychat),settings.tell.color,160))
+		windower.add_to_chat(160, "Textbox settings: "..string.color('linkshell',settings.linkshell.color,160).." | "..string.color('party',settings.party.color,160).." | "..string.color('tell',settings.tell.color,160).." | "..string.color('ffochat',settings.ffochat.color,160))
+--		windower.add_to_chat(160, "displaychat: "..string.color(onOffPrint(settings.linkshell.displaychat),settings.linkshell.color,160).." | "..string.color(onOffPrint(settings.party.displaychat),settings.party.color,160).." | "..string.color(onOffPrint(settings.tell.displaychat),settings.tell.color,160).." | "..string.color(onOffPrint(settings.ffochat.displaychat),settings.ffochat.color,160))
+--		windower.add_to_chat(160, "color: "..string.color(tostring(settings.linkshell.color),settings.linkshell.color,160).." | "..string.color(tostring(settings.party.color),settings.party.color,160).." | "..string.color(tostring(settings.tell.color),settings.tell.color,160).." | "..string.color(tostring(settings.ffochat.color),settings.ffochat.color,160))
+		windower.add_to_chat(160, "show: "..string.color(onOffPrint(settings.linkshell.show),settings.linkshell.color,160).." | "..string.color(onOffPrint(settings.party.show),settings.party.color,160).." | "..string.color(onOffPrint(settings.tell.show),settings.tell.color,160).." | "..string.color(onOffPrint(settings.ffochat.show),settings.ffochat.color,160))
+		windower.add_to_chat(160, "lines: "..string.color(tostring(settings.linkshell.lines),settings.linkshell.color,160).." | "..string.color(tostring(settings.party.lines),settings.party.color,160).." | "..string.color(tostring(settings.tell.lines),settings.tell.color,160).." | "..string.color(tostring(settings.ffochat.lines),settings.ffochat.color,160))
+		windower.add_to_chat(160, "fontname: "..string.color(settings.linkshell.fontname,settings.linkshell.color,160).." | "..string.color(settings.party.fontname,settings.party.color,160).." | "..string.color(settings.tell.fontname,settings.tell.color,160).." | "..string.color(settings.ffochat.fontname,settings.ffochat.color,160))
+		windower.add_to_chat(160, "fontsize: "..string.color(tostring(settings.linkshell.fontsize),settings.linkshell.color,160).." | "..string.color(tostring(settings.party.fontsize),settings.party.color,160).." | "..string.color(tostring(settings.tell.fontsize),settings.tell.color,160).." | "..string.color(tostring(settings.ffochat.fontsize),settings.ffochat.color,160))
+		windower.add_to_chat(160, "x: "..string.color(tostring(settings.linkshell.x),settings.linkshell.color,160).." | "..string.color(tostring(settings.party.x),settings.party.color,160).." | "..string.color(tostring(settings.tell.x),settings.tell.color,160).." | "..string.color(tostring(settings.ffochat.x),settings.ffochat.color,160))
+		windower.add_to_chat(160, "y: "..string.color(tostring(settings.linkshell.y),settings.linkshell.color,160).." | "..string.color(tostring(settings.party.y),settings.party.color,160).." | "..string.color(tostring(settings.tell.y),settings.tell.color,160).." | "..string.color(tostring(settings.ffochat.y),settings.ffochat.color,160))
+		windower.add_to_chat(160, "alpha: "..string.color(tostring(settings.linkshell.alpha),settings.linkshell.color,160).." | "..string.color(tostring(settings.party.alpha),settings.party.color,160).." | "..string.color(tostring(settings.tell.alpha),settings.tell.color,160).." | "..string.color(tostring(settings.ffochat.alpha),settings.ffochat.color,160))
+		windower.add_to_chat(160, "red: "..string.color(tostring(settings.linkshell.red),settings.linkshell.color,160).." | "..string.color(tostring(settings.party.red),settings.party.color,160).." | "..string.color(tostring(settings.tell.red),settings.tell.color,160).." | "..string.color(tostring(settings.ffochat.red),settings.ffochat.color,160))
+		windower.add_to_chat(160, "green: "..string.color(tostring(settings.linkshell.green),settings.linkshell.color,160).." | "..string.color(tostring(settings.party.green),settings.party.color,160).." | "..string.color(tostring(settings.tell.green),settings.tell.color,160).." | "..string.color(tostring(settings.ffochat.green),settings.ffochat.color,160))
+		windower.add_to_chat(160, "blue: "..string.color(tostring(settings.linkshell.blue),settings.linkshell.color,160).." | "..string.color(tostring(settings.party.blue),settings.party.color,160).." | "..string.color(tostring(settings.tell.blue),settings.tell.color,160).." | "..string.color(tostring(settings.ffochat.blue),settings.ffochat.color,160))
+--windower.add_to_chat(160, string.rep(" ",12-#tostring("displaychat")).."displaychat: "..string.color(string.rep(" ",3-#tostring(onOffPrint(settings.linkshell.displaychat))),settings.linkshell.color,160).." | "..string.color(onOffPrint(settings.party.displaychat),settings.party.color,160).." | "..string.color(onOffPrint(settings.tell.displaychat),settings.tell.color,160))
 --"\x1F"..string.char(v)..string.rep(" ",12-#tostring(v))..v.."\x1F"..string.char(160)
 	else
-		add_to_chat(160,"   UseChatPorter: " .. string.color(onOffPrint(settings.usechatporter),204,160))
-		add_to_chat(160,"   DisplayLinkshellChat: " .. string.color(onOffPrint(settings.linkshell.displaychat),204,160))
-		add_to_chat(160,"   DisplayPartyChat: " .. string.color(onOffPrint(settings.party.displaychat),204,160))
-		add_to_chat(160,"   DisplayTellChat: " .. string.color(onOffPrint(settings.tell.displaychat),204,160))
-		add_to_chat(160,"   LinkshellColor: " .. string.color(tostring(settings.linkshell.color),204,160))
-		add_to_chat(160,"   PartyColor: " .. string.color(tostring(settings.party.color),204,160))
-		add_to_chat(160,"   TellColor: " .. string.color(tostring(settings.tell.color),204,160))
+		windower.add_to_chat(160,"   UseChatPorter: " .. string.color(onOffPrint(settings.usechatporter),204,160))
+		windower.add_to_chat(160,"   DisplayLinkshellChat: " .. string.color(onOffPrint(settings.linkshell.displaychat),204,160))
+		windower.add_to_chat(160,"   DisplayPartyChat: " .. string.color(onOffPrint(settings.party.displaychat),204,160))
+		windower.add_to_chat(160,"   DisplayTellChat: " .. string.color(onOffPrint(settings.tell.displaychat),204,160))
+		windower.add_to_chat(160,"   LinkshellColor: " .. string.color(tostring(settings.linkshell.color),204,160))
+		windower.add_to_chat(160,"   PartyColor: " .. string.color(tostring(settings.party.color),204,160))
+		windower.add_to_chat(160,"   TellColor: " .. string.color(tostring(settings.tell.color),204,160))
 	end
 end
 
@@ -441,7 +441,7 @@ function showColors()
 	makeArray = T{}
 	for v = 1, 255, 1 do
 		if colors[v] ~= nil then
-            add_to_chat(v, string.rep(0,3-#tostring(v))..v.." - "..colors[v])
+            windower.add_to_chat(v, string.rep(0,3-#tostring(v))..v.." - "..colors[v])
 		else
 --			if v ~= 253 then
 			--if table.find(UsedColors, v) ~= true and v ~= 253 then
@@ -450,7 +450,7 @@ function showColors()
 			end
 		end
 	end
-	add_to_chat(160,table.sconcat(makeArray))
+	windower.add_to_chat(160,table.sconcat(makeArray))
 	--makeArray:vprint()
 end
 
@@ -482,17 +482,17 @@ windower.register_event('ipc message',function (msg)
 			a,b,chatMode,senderLSname,senderName,message = string.find(msg, "|(%w+):(%w*)|(%a+)|(.+)")
 			if (chatMode == "l") and (settings.linkshell.displaychat == true) then
 				if (senderLSname ~= LSname) then
-					add_to_chat(settings.linkshell.color,"["..senderLSname.."] <"..senderName.."> "..message)
+					windower.add_to_chat(settings.linkshell.color,"["..senderLSname.."] <"..senderName.."> "..message)
 					showlinkshell[#showlinkshell +1] = " ["..senderLSname.."] <"..senderName.."> "..message:strip_format().." "
 					show("linkshell")
 				end
 			elseif (chatMode == "t") and (settings.tell.displaychat == true) then
 				if (playerName ~= senderLSname) and (playerName ~= senderName) then
-					add_to_chat(settings.tell.color,"[t] "..senderName..">>"..senderLSname.." "..message)
+					windower.add_to_chat(settings.tell.color,"[t] "..senderName..">>"..senderLSname.." "..message)
 				end
 			elseif (chatMode == "p") and (settings.party.displaychat == true) then
 				if (T(windower.ffxi.get_party()):with('name', senderName) == nil) then
-					add_to_chat(settings.party.color,"[p] ".."("..senderName..") "..message)
+					windower.add_to_chat(settings.party.color,"[p] ".."("..senderName..") "..message)
 					showparty[#showparty +1] = " [p] ("..senderName..") "..message:strip_format().." "
 					show("party")
 				end

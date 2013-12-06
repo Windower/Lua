@@ -38,7 +38,7 @@ windower.register_event('addon command',function (...)
         ignore[#ignore+1] = block:lower()
         local f = io.open(settingsFile,'a')
         f:write(block.."\n")
-        add_to_chat(55,"No longer seeing "..block.." speak in FFOchat.")
+        windower.add_to_chat(55,"No longer seeing "..block.." speak in FFOchat.")
         local q,r = io.close(f)
         if not q then print(r) end
     elseif delete ~= nil then
@@ -47,7 +47,7 @@ windower.register_event('addon command',function (...)
                 table.remove(ignore,u)
             end
         end
-        add_to_chat(55,"Seeing "..delete.." speak in FFOchat again.")
+        windower.add_to_chat(55,"Seeing "..delete.." speak in FFOchat again.")
         local tmp = io.open(settingsPath..'tmp.txt',"w")
         for line in io.lines(settingsFile) do
             if line ~= delete then

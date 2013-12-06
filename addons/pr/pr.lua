@@ -95,7 +95,7 @@ function write_packet(packet_type,array,id,data)
 		local assemble = tostring(os.date('%H:%M:%S'))..'  Unidentified '..packet_type..' Packet:'..(Dec2Hex(id) or 'nil')..' Length:'..length..' Sequence:'..sequence..' Content:\n'..(str2hex(content) or 'nil')
 		f:write(assemble..'\n\n')
 		f:flush()
-		add_to_chat(8,assemble)
+		windower.add_to_chat(8,assemble)
 	elseif verbose then
 		f:write(tostring(os.date('%H:%M:%S'))..'  '..packet_type..' Packet: '..array[id].name..' Content: \n'..(str2hex(content) or 'nil')..'\n\n')
 		f:flush()

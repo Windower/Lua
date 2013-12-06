@@ -96,7 +96,7 @@ function relevant_msg(msg)
 	elseif msg:sub(1,1)=='/' then
 		send_command('input '..msg)
 	elseif msg:sub(1,3)=='atc' then
-		add_to_chat(55,msg:sub(5))
+		windower.add_to_chat(55,msg:sub(5))
 	else
 		send_command(msg)
 	end

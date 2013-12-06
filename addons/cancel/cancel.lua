@@ -164,7 +164,7 @@ windower.register_event('addon command',function (...)
 		end
 	end
 	
-	add_to_chat(123,'Cancel: Status '..statuses[status_id].english..' not found active in your buff list.')
+	windower.add_to_chat(123,'Cancel: Status '..statuses[status_id].english..' not found active in your buff list.')
 end)
 
 function cancel(id)

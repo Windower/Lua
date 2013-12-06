@@ -30,10 +30,10 @@ function sb_output(msg)
     
     if type(msg) == 'table' then
         for _, line in ipairs(msg) do
-            add_to_chat(color, prefix .. line)
+            windower.add_to_chat(color, prefix .. line)
         end
     else
-        add_to_chat(color, prefix .. msg)
+        windower.add_to_chat(color, prefix .. msg)
     end
 end
 

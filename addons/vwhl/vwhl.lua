@@ -106,7 +106,7 @@ windower.register_event('incoming text', function(original, modified, mode)
             :gsub('special attacks', ('special attacks'):color(258))
             :gsub('blood pacts', ('blood pacts'):color(258))
 
-        add_to_chat(12, '>>> '..original)
+        windower.add_to_chat(12, '>>> '..original)
     elseif original:match('L\'un des points faibles') then
         if original:match('points faibles critiques') then
             original = original:gsub('points faibles critiques', ('points faibles critiques (5)'):color(258))
@@ -181,7 +181,7 @@ windower.register_event('incoming text', function(original, modified, mode)
             :gsub('attaque spéciale', ('attaque spéciale'):color(258))
             :gsub('pacte de sang', ('pacte de sang'):color(258))
 
-        add_to_chat(12, '>>> '..original)
+        windower.add_to_chat(12, '>>> '..original)
     elseif original:match('Das Monster ist nun') then
         if original:match('ganz besonders anfällig') then
             original = original:gsub('ganz besonders anfällig', ('ganz besonders anfällig (5)'):color(258))
@@ -243,7 +243,7 @@ windower.register_event('incoming text', function(original, modified, mode)
             :gsub('Spezialattacken', ('Spezialattacken'):color(258))
             :gsub('Blutsbünde', ('Blutsbünde'):color(258))
 
-        add_to_chat(12, '>>> '..original)
+        windower.add_to_chat(12, '>>> '..original)
     end
 
     return modified, mode

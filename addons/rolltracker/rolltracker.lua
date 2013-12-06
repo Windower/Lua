@@ -56,7 +56,7 @@ windower.register_event('addon command',function (...)
 		if cmd[1]:lower() == "test" then
 			for buffs, integers in pairs(windower.ffxi.get_player()['buffs']) do
 				if integers ~= 255 then
-					add_to_chat(1,integers)
+					windower.add_to_chat(1,integers)
 				end
 				if table.contains(buff_id, integers) then
 					print('equal value detected')
@@ -205,11 +205,11 @@ windower.register_event('action',function (act)
 						if #effected_member > 0 then
 							if rollnum == roll_luck[i] or rollnum == 11 then 
 								luckyroll = 1
-								add_to_chat(1, effectednumber..effected_write..chat.colorcontrols.reset..' '..symbolnum['implies']..' '..roll_ident[tostring(roller)]..' Roll '..symbolnum['circle'..rollnum]..string.char(31,158)..' (Lucky!)'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
+								windower.add_to_chat(1, effectednumber..effected_write..chat.colorcontrols.reset..' '..symbolnum['implies']..' '..roll_ident[tostring(roller)]..' Roll '..symbolnum['circle'..rollnum]..string.char(31,158)..' (Lucky!)'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
 							elseif rollnum==12 and #effected_member > 0 then
-								add_to_chat(1, string.char(31,167)..effectednumber..'Bust! '..chat.colorcontrols.reset..symbolnum['implies']..' '..effected_write..' '..symbolnum['implies']..' ('..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')')
+								windower.add_to_chat(1, string.char(31,167)..effectednumber..'Bust! '..chat.colorcontrols.reset..symbolnum['implies']..' '..effected_write..' '..symbolnum['implies']..' ('..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')')
 							else
-								add_to_chat(1, effectednumber..effected_write..chat.colorcontrols.reset..' '..symbolnum['implies']..' '..roll_ident[tostring(roller)]..' Roll '..symbolnum['circle'..rollnum]..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
+								windower.add_to_chat(1, effectednumber..effected_write..chat.colorcontrols.reset..' '..symbolnum['implies']..' '..roll_ident[tostring(roller)]..' Roll '..symbolnum['circle'..rollnum]..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
 							end
 						end
 					end
@@ -233,7 +233,7 @@ test=0
 windower.register_event('outgoing text',function (original, modified)
 	if original:find('/jobability \"Double.*Up') and luckyroll == 1 and override == 0 and id == windower.ffxi.get_player()['id'] then
 		modified=''
-		add_to_chat(159,'Attempting to Doubleup on a Lucky Roll: Re-double up to continue.')
+		windower.add_to_chat(159,'Attempting to Doubleup on a Lucky Roll: Re-double up to continue.')
 		luckyroll=0
 		return modified
 	end
@@ -259,7 +259,7 @@ windower.register_event('outgoing text',function (original, modified)
 			modified=original
 			test=0
 		else
-			add_to_chat(159,'No \'Bust\'. Fold again to continue.')
+			windower.add_to_chat(159,'No \'Bust\'. Fold again to continue.')
 			modified=''
 			test=1
 		end

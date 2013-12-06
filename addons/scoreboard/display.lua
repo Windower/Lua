@@ -87,7 +87,7 @@ function Display:report_filters()
     else
         mob_str = "Scoreboard filters: " .. filters:concat(', ')
     end
-    add_to_chat(55, mob_str)
+    windower.add_to_chat(55, mob_str)
 
 end
 
