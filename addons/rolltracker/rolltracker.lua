@@ -49,8 +49,8 @@ windower.register_event('addon command',function (...)
 	if cmd[1] ~= nil then
 		
 		if cmd[1]:lower() == "help" then
-			write('To stop rolltracker stopping rolls type: //rolltracker autostop')
-			write('To restart rolltracker stopping doubleup type //rolltracker Doubleup')	
+			print('To stop rolltracker stopping rolls type: //rolltracker autostop')
+			print('To restart rolltracker stopping doubleup type //rolltracker Doubleup')	
 		end
 
 		if cmd[1]:lower() == "test" then
@@ -59,19 +59,19 @@ windower.register_event('addon command',function (...)
 					add_to_chat(1,integers)
 				end
 				if table.contains(buff_id, integers) then
-					write('equal value detected')
+					print('equal value detected')
 				end
 			end
 		end
 		
 		if cmd[1]:lower() == "autostop" then
 			override=1
-			write('Disabled Autostopping Double Up')
+			print('Disabled Autostopping Double Up')
 		end
 		
 		if cmd[1]:lower() == "doubleup" then
 			override=0
-			write('Enable Autostoppping Doubleup')
+			print('Enable Autostoppping Doubleup')
 		end
 		
 	end

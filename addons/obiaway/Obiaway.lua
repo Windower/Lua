@@ -52,12 +52,12 @@
 -- To Do: add function to turn the console_echo's on/off. 
 
 windower.register_event('load',function ()
-	write("Loaded Obiaway.")
+	print("Loaded Obiaway.")
 	send_command("alias Obiaway lua c Obiaway")
 end)
 
 windower.register_event('unload',function ()
-	write("Unloaded Obiaway.")
+	print("Unloaded Obiaway.")
 	send_command("unalias Obiaway")
 end)
 

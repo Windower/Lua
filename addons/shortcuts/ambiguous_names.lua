@@ -310,7 +310,7 @@ thunderii={spell_ID=165,abil_ID=625,funct=smn_sub,info=T{4,5,8,20,21,'Ramuh','Ra
 function ambig(key)
 	local abil_type
 	if ambig_names[key] == nil then -- If there is no entry for the ambiguous command...
-		write('Shortcuts Bug: '..tostring(key))
+		print('Shortcuts Bug: '..tostring(key))
 		return
 	end
 	if ambig_names[key].absolute then -- If there is absolute remapping, where all commands by that name actually map to one ability...

@@ -127,7 +127,7 @@ function colconv(str,key)
 	elseif strnum == 0 then
 		out = rcol
 	else
-		write('You have an invalid color '..key)
+		print('You have an invalid color '..key)
 		out = string.char(0x1F,1)
 	end
 	return out

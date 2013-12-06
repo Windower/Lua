@@ -8,8 +8,8 @@ windower.register_event('addon command',function (...)
 	local broken = split(term, ' ')
 	if broken[1] ~= nil then
 		if broken[1]:upper() == "HELP" then
-			write('scan position <x> <y> : moves the scan text box')
-			write('scan help : Shows this!')
+			print('scan position <x> <y> : moves the scan text box')
+			print('scan help : Shows this!')
 		end
 		
 		if broken[1]:upper() == "POSITION" then

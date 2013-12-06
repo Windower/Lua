@@ -54,7 +54,7 @@ function options_load()
 		g:write('PetNuke Set: PetNuke\nPetHeal Set: PetHeal\nTP Set: TP\nIdle Set: Movement\n')
 		g:close()
 		
-		write('Default settings file created')
+		print('Default settings file created')
 		add_to_chat(17,'PetSchool created a settings file and loaded!')
 		add_to_chat(17,'Please Modify the Settings file to fit your spellcast .XML file')
 	else

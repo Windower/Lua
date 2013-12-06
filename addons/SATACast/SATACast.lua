@@ -62,7 +62,7 @@ function options_load()
 		g:write('SA Set: SneakAttack\nTA Set: TrickAttack\nSATA Set: SATA\nTP Set: TP\nTH Set: TreasureHunter\nIdle Set: Movement\n')
 		g:close()
 		
-		write('Default settings file created')
+		print('Default settings file created')
 		add_to_chat(17,'SATACast created a settings file and loaded!')
 	else
 		f:close()
