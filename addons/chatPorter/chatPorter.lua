@@ -114,10 +114,10 @@ playerResolution.x = get_windower_settings().x_res
 playerResolution.y = get_windower_settings().y_res
 
 windower.register_event('load',function ()
-	tb_create("showlinkshell")
-	tb_create("showparty")
-	tb_create("showtell")
-	tb_create("showffochat")
+	windower.text.create("showlinkshell")
+	windower.text.create("showparty")
+	windower.text.create("showtell")
+	windower.text.create("showffochat")
 	send_command('alias l2 lua command ChatPorter l2')
 	send_command('alias p2 lua command ChatPorter p2')
 	send_command('alias t2 lua command ChatPorter t2')
@@ -133,10 +133,10 @@ windower.register_event('load',function ()
 end)
 
 windower.register_event('unload',function ()
-	tb_delete("showlinkshell")
-	tb_delete("showparty")
-	tb_delete("showtell")
-	tb_delete("showffochat")
+	windower.text.delete("showlinkshell")
+	windower.text.delete("showparty")
+	windower.text.delete("showtell")
+	windower.text.delete("showffochat")
 	send_command('unalias l2')
 	send_command('unalias p2')
 	send_command('unalias t2')
@@ -458,22 +458,22 @@ function show(tbName)
 	if #_G['show'..tbName] > 8 then
 		table.remove(_G["show"..tbName],1)
 	end
-	tb_set_bg_color("show"..tbName, 200, 30, 30, 30)
+	windower.text.set_bg_color("show"..tbName, 200, 30, 30, 30)
 	if #_G['show'..tbName] == 0 then
-		tb_set_bg_visibility("show"..tbName, false)
+		windower.text.set_bg_visibility("show"..tbName, false)
 	else
-		tb_set_bg_visibility("show"..tbName, true)
+		windower.text.set_bg_visibility("show"..tbName, true)
 	end
-	tb_set_color("show"..tbName, settings[tbName].alpha, settings[tbName].red, settings[tbName].green, settings[tbName].blue)
-	tb_set_font("show"..tbName, settings[tbName].fontname, settings[tbName].fontsize)
-	tb_set_location("show"..tbName, settings[tbName].x, settings[tbName].y)
-	tb_set_visibility("show"..tbName, settings[tbName].show)
+	windower.text.set_color("show"..tbName, settings[tbName].alpha, settings[tbName].red, settings[tbName].green, settings[tbName].blue)
+	windower.text.set_font("show"..tbName, settings[tbName].fontname, settings[tbName].fontsize)
+	windower.text.set_location("show"..tbName, settings[tbName].x, settings[tbName].y)
+	windower.text.set_visibility("show"..tbName, settings[tbName].show)
 	if #_G['show'..tbName] <= settings[tbName].lines then
 		start = 1
 	else
 			start = #_G['show'..tbName]-settings[tbName].lines+1
 	end
-	tb_set_text("show"..tbName, " " ..table.concat(table.slice(_G['show'..tbName], start, #_G['show'..tbName]), '\n '))
+	windower.text.set_text("show"..tbName, " " ..table.concat(table.slice(_G['show'..tbName], start, #_G['show'..tbName]), '\n '))
 end
 
 windower.register_event('ipc message',function (msg)
