@@ -15,7 +15,7 @@ function event_action(act)
         for target in action:get_targets() do -- target iterator
             for subaction in target:get_actions() do -- subaction iterator
                 if subaction.message == 1 then -- 1 is the code for messages
-                    write(string.format("%s hit %s for %d damage",
+                    print(string.format("%s hit %s for %d damage",
                           action:get_actor_name(), target:get_name(), subaction.param))
                 end
             end

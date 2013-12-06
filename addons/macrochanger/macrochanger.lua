@@ -144,7 +144,7 @@ function options_load()
 		GEO_Page = '1'
 		RUN_Book = '20'
 		RUN_Page = '1'
-		write('Default settings file created')
+		print('Default settings file created')
 		add_to_chat(12,'MacroChanger created a settings file and loaded!')
 	else
 		f:close()

@@ -38,7 +38,7 @@ local settingtab = nil
 local settings_file = 'data\\settings.xml'
 local settingtab = config.load(settings_file)
 if settingtab == nil then
-	write('No settings file found. Ensure you have a file at data\\settings.xml')
+	print('No settings file found. Ensure you have a file at data\\settings.xml')
 end
 
 --variables
@@ -52,7 +52,7 @@ end
 	pathos_short = {'Weapon', 'Ranged', 'Head/Neck', 'Body', 'Hand', 'Earrings/Rings', 'Back/Waist', 'Leg/Foot', 'Support Job', 'Job Abilities', 'Spellcasting', 'Max HP', 'Max MP', 'STR', 'DEX', 'AGI', 'MND', 'INT', 'CHR', 'VIT'}
 
 windower.register_event('load',function ()
-	write('Salvage2 loaded.  Author: Bahamut.Krizz')
+	print('Salvage2 loaded.  Author: Bahamut.Krizz')
 end)
 
 function settings_create()
@@ -73,12 +73,12 @@ local params = {...};
 	end
 	if params[1] then
 		if params[1]:lower() == "help" then
-			write('Salvage2 available commands:')
-			write('s2 help : Shows this help message')
-			write('s2 pos <x> <y> : Positions the list')
-			write('s2 [hide/show] : Hides the box')
-			write('s2 timer [start/stop] : Starts or stops the zone timer')
-			write('s2 remove <pathos> : Removes the pathos from the remaining list')
+			print('Salvage2 available commands:')
+			print('s2 help : Shows this help message')
+			print('s2 pos <x> <y> : Positions the list')
+			print('s2 [hide/show] : Hides the box')
+			print('s2 timer [start/stop] : Starts or stops the zone timer')
+			print('s2 remove <pathos> : Removes the pathos from the remaining list')
 		elseif params[1]:lower() == "pos" then
 			if params[3] then
 				local posx, posy = tonumber(params[2]), tonumber(params[3])

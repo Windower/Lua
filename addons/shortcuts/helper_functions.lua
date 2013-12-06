@@ -162,7 +162,7 @@ function to_roman(num)
 	if type(num) ~= 'number' then
 		num = tonumber(num)
 		if num == nil then
-			write('Debug to_roman')
+			print('Debug to_roman')
 			return ''
 		end
 	end

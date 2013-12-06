@@ -60,7 +60,7 @@ function make_abil(abil,t,i)
 		validabils[ind].typ = t
 		validabils[ind].index = i
 	else
---		write(tostring(validabils[ind]))
+--		print(tostring(validabils[ind]))
 		if logging then
 			f:write('Original: '..tostring(abil)..' '..tostring(validabils[ind].typ)..' '..tostring(validabils[ind].index)..'\nSecondary: '..tostring(abil)..' '..tostring(t)..' '..tostring(i)..'\n\n')
 			counter = counter +1

@@ -5,7 +5,7 @@ require 'mathhelper'
 windower.register_event('load',function()
 	indyarr = {'00','10','20','30','40','50','60','70','80','90','A0','B0','C0','D0','E0','F0','G0','H0','I0','J0','K0'}
 	f = io.open(windower.addon_path..'data/'..tostring(os.clock())..'.log','w+')
-	write(tostring(f))
+	print(tostring(f))
 	incoming = packets.data.incoming
 	outgoing = packets.data.outgoing
 	verbose = true
@@ -16,7 +16,7 @@ windower.register_event('load',function()
 	local player = windower.ffxi.get_player()
 	local petstuff = ''
 	if windower.ffxi.get_mob_by_id(player['id'])['pet_index'] ~= 0 then
-		write(get_mob_by_id(player['id'])['pet_index'])
+		print(get_mob_by_id(player['id'])['pet_index'])
 		local petinfo = windower.ffxi.get_mob_by_index(get_mob_by_id(player['id'])['pet_index'])
 		petstuff = ' Pet ID: '..Dec2Hex(petinfo['id'])..' Pet Index: '..Dec2Hex(petinfo['index'])
 	end

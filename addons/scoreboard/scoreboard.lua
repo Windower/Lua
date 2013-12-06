@@ -343,7 +343,7 @@ function get_ally_mob_ids()
         if member.mob then
             allies:append(member.mob.id)
             if member.mob.pet_index and member.mob.pet_index> 0 then
-                write('here d')
+                print('here d')
                 allies:append(get_mob_by_index(member.mob.pet_index).id)
             end
         end

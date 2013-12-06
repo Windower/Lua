@@ -86,7 +86,7 @@ end)
 
 function load_settings()
 	if not file.exists('data/settings.xml') then
-		write('plugin_manager is missing its settings file.')
+		print('plugin_manager is missing its settings file.')
 	else
 		-- Iterate over the settings file and simply it, as well as creating a list of all plugins
 		local settingtab = xml.read('data/settings.xml'):undomify()

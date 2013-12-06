@@ -63,7 +63,7 @@ windower.register_event('load',function ()
 	settingtab = config.load(defaults)
 	
 	if settingtab == nil then
-		write('No settings file found. Ensure you have a file at data/settings.xml')
+		print('No settings file found. Ensure you have a file at data/settings.xml')
 	end
 	
 	box_name = T()
@@ -93,12 +93,12 @@ windower.register_event('load',function ()
 		
 	if info.logged_in == true then
 		loop = 0
-		write('Commands are:')
-		write('To change Compass style: ')
-		write('Command = " MC mode [thf | geo] "')
-		write('To change Displays while in associated modes: ')
-		write('Geo command : " MC mode geo showbuff "')
-		write('Thf command : " MC mode thf showangle [always | behind | never] "')
+		print('Commands are:')
+		print('To change Compass style: ')
+		print('Command = " MC mode [thf | geo] "')
+		print('To change Displays while in associated modes: ')
+		print('Geo command : " MC mode geo showbuff "')
+		print('Thf command : " MC mode thf showangle [always | behind | never] "')
 		get_target()
 	end
 
@@ -139,46 +139,46 @@ windower.register_event('addon command',function (...)
 					if broken[3] ~= nil and broken[2] == 'geo' then
 						if broken[3] == 'showbuff' then
 							showbuff = not showbuff
-							write('MC mode geo "showbuff" changed to "'..tostring(showbuff)..'".')
+							print('MC mode geo "showbuff" changed to "'..tostring(showbuff)..'".')
 						else 
-							write('Command "'..broken[3]..'" is not valid.')
-							write('Use "//MC mode geo showbuff" to change display')
+							print('Command "'..broken[3]..'" is not valid.')
+							print('Use "//MC mode geo showbuff" to change display')
 						end
 					elseif broken[3] ~= nil and broken[2] == 'thf' then
 							--print('Thf mode set. Use "//MC mode thf showangle [always | behind | never]" to change display')
 						if broken[3] == 'showangle' and broken[4] ~= nil then
 							if broken[4] == 'always' then
 								showangle = 'always'
-								write('MC mode thf "showangle" changed to "'..showangle..'".')
+								print('MC mode thf "showangle" changed to "'..showangle..'".')
 							elseif broken[4] == 'behind' then
 								showangle = 'behind'
-								write('MC mode thf "showangle" changed to "'..showangle..'".')
+								print('MC mode thf "showangle" changed to "'..showangle..'".')
 							elseif broken[4] == 'never' then
 								showangle = 'never'
-								write('MC mode thf "showangle" changed to "'..showangle..'".')
+								print('MC mode thf "showangle" changed to "'..showangle..'".')
 							else
-								write('Command "'..broken[4]..'" is not valid.')
-								write('Use "//MC mode thf showangle [always | behind | never]" to change display')
+								print('Command "'..broken[4]..'" is not valid.')
+								print('Use "//MC mode thf showangle [always | behind | never]" to change display')
 							end
 						else 
-							write('Command "'..broken[3]..'" is not valid.')
-							write('Use "//MC mode thf showangle [always | behind | never]" to change display')
+							print('Command "'..broken[3]..'" is not valid.')
+							print('Use "//MC mode thf showangle [always | behind | never]" to change display')
 						end
 					end
 				else
-					write('Command "'..broken[2]..'" is not valid.')
-					write('Commands are:')
-					write('Command 1 : //MC mode [thf|geo]')
+					print('Command "'..broken[2]..'" is not valid.')
+					print('Commands are:')
+					print('Command 1 : //MC mode [thf|geo]')
 				end
 			end
 		else
-			write('Command "'..broken[1]..'" is not valid.')
-			write('Commands are:')
-			write('To change Compass style: ')
-			write('Command = " MC mode [thf | geo] "')
-			write('To change Displays while in associated modes: ')
-			write('Geo command : " MC mode geo showbuff "')
-			write('Thf command : " MC mode thf showangle [always | behind | never] "')
+			print('Command "'..broken[1]..'" is not valid.')
+			print('Commands are:')
+			print('To change Compass style: ')
+			print('Command = " MC mode [thf | geo] "')
+			print('To change Displays while in associated modes: ')
+			print('Geo command : " MC mode geo showbuff "')
+			print('Thf command : " MC mode thf showangle [always | behind | never] "')
 		end
 	end
 end)

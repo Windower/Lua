@@ -40,7 +40,7 @@ windower.register_event('addon command',function (...)
         f:write(block.."\n")
         add_to_chat(55,"No longer seeing "..block.." speak in FFOchat.")
         local q,r = io.close(f)
-        if not q then write(r) end
+        if not q then print(r) end
     elseif delete ~= nil then
         for u = 1, #ignore do
             if ignore[u] == delete then
@@ -55,13 +55,13 @@ windower.register_event('addon command',function (...)
             end
         end
         local q,w = io.close(tmp)
-        if not q then write(w) end
+        if not q then print(w) end
         local r,es = os.rename(settingsFile,settingsPath..'tmp2.txt')
-        if not r then write(es) end
+        if not r then print(es) end
         local e,rs = os.rename(settingsPath..'tmp.txt',settingsFile)
-        if not e then write(rs) end
+        if not e then print(rs) end
         local r,es = os.remove(settingsPath..'tmp2.txt')
-        if not r then write(es) end
+        if not r then print(es) end
     end
 end)
 
@@ -69,7 +69,7 @@ function file_exists(name)
    local f=io.open(name,"r")
    if f~=nil then 
         local q,r = io.close(f)
-        if not q then write(r) end
+        if not q then print(r) end
         return true 
     else
         return false 

@@ -44,7 +44,7 @@ local settingtab = nil
 local settings_file = 'data\\settings.xml'
 local settingtab = config.load(settings_file)
 if settingtab == nil then
-	write('No settings file found. Ensure you have a file at data\\settings.xml')
+	print('No settings file found. Ensure you have a file at data\\settings.xml')
 end
 --variables
 	lotorder = ''
@@ -109,12 +109,12 @@ windower.register_event('addon command',function (...)
 	end
 	if params[1] then
 		if params[1]:lower() == "help" then
-			write('ch help : Shows help message')
-			write('ch pos <x> <y> : Positions the list')
-			write('ch hide : Hides the box')
-			write('ch show : Shows the box')
-			write('ch set [set id] : Loads set from settings file. Default is set1')
-			write('ch mode [lots/nolots] : If mode is changed to nolots, ll will not lot cells automatically.')
+			print('ch help : Shows help message')
+			print('ch pos <x> <y> : Positions the list')
+			print('ch hide : Hides the box')
+			print('ch show : Shows the box')
+			print('ch set [set id] : Loads set from settings file. Default is set1')
+			print('ch mode [lots/nolots] : If mode is changed to nolots, ll will not lot cells automatically.')
 		elseif params[1]:lower() == "pos" then
 			if params[3] then
 				local posx, posy = tonumber(params[2]), tonumber(params[3])
@@ -141,13 +141,13 @@ windower.register_event('addon command',function (...)
 		elseif params[1]:lower() == "mode" then
 			if params[2] == "lots" then
 				mode = params[2]:lower()
-				write('Mode changed to: Cast lots')
+				print('Mode changed to: Cast lots')
 				lightluggage()
 			elseif params[2] == "nolots" then
 				mode = params[2]:lower()
-				write('Mode changed to: Do not cast lots')
+				print('Mode changed to: Do not cast lots')
 				lightluggage()
-			else write('Invalid mode option')
+			else print('Invalid mode option')
 			end
 		elseif params[1]:lower() == "timer" then
 			if params[2] == "start" then
@@ -161,7 +161,7 @@ end)
 
 windower.register_event('load',function ()
 	player = get_player()['name']
-	write('CellHelp loaded.  CellHelp Authors: Cerberus.Balloon and Bahamut.Krizz')
+	print('CellHelp loaded.  CellHelp Authors: Cerberus.Balloon and Bahamut.Krizz')
 	mode = settingtab["mode"]
 	--Initial lot setting
 	settings_create()
