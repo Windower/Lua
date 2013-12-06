@@ -58,7 +58,7 @@ function load_user_files()
 	if user_env then
 		if type(user_env.file_unload)=='function' then user_env.file_unload()
 		elseif user_env.file_unload then
-			add_to_chat(123,'GearSwap: file_unload() is not a function')
+			windower.add_to_chat(123,'GearSwap: file_unload() is not a function')
 		end
 	end
 	
@@ -85,7 +85,7 @@ function load_user_files()
 		-- Library functions
 		string=string, math=math, table=table, T=T,
 		tostring = tostring, tonumber = tonumber, pairs = pairs,
-		ipairs = ipairs, write=write, add_to_chat=add_to_chat,
+		ipairs = ipairs, write=write, add_to_chat=windower.add_to_chat,
 		send_command=send_cmd_user,windower=user_windower,
 		include=include_user,next=next,lua_base_path=windower.addon_path,empty=empty,
 		
@@ -127,7 +127,7 @@ function load_user_files()
 	if type(user_env.get_sets) == 'function' then
 		user_env.get_sets()
 	elseif user_env.get_sets then
-		add_to_chat(123,'GearSwap: get_sets() is defined but is not a function.')
+		windower.add_to_chat(123,'GearSwap: get_sets() is defined but is not a function.')
 	end
 end
 

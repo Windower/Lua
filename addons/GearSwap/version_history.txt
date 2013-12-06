@@ -45,7 +45,7 @@ Gearswap 0.604 - Added more handling to deal with monstrosity. Dramatical reduce
 -------------------------------------------------
 Gearswap 0.603 - Added handling to deal with monstrosity. About a week worth of misc. changes that I can't remember.
 -------------------------------------------------
-Gearswap 0.602 - Minor refactoring, moved things around, added a little more protection to send_command()
+Gearswap 0.602 - Minor refactoring, moved things around, added a little more protection to windower.send_command()
 -------------------------------------------------
 Gearswap 0.601 - Improved the equip command to handle multiple set layers
 -------------------------------------------------
