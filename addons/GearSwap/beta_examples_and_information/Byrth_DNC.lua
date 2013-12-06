@@ -114,14 +114,14 @@ function get_sets()
 		back="Boxer Mantle",waist="Scouter's Rope",legs="Manibozho Brais",feet="Manibozho Boots"}
 		
 	atk_lvl = 1
-	send_command('input /macro book 9;wait .1;input /macro set 1')
+	windower.send_command('input /macro book 9;wait .1;input /macro set 1')
 end
 
 function precast(spell,act)
 	cast_delay('0.2')
 	if sets.JA[spell.name] then
 		if spell.name == 'Trance' and buffactive['saber dance'] then
-			send_command('cancel 410')
+			windower.send_command('cancel 410')
 		end
 		equip(sets.JA[spell.name])
 	elseif sets.WS[spell.name] then
@@ -132,17 +132,17 @@ function precast(spell,act)
 		equip(sets.JA.Jig)
 		if spell.name == 'Spectral Jig' and buffactive.sneak then
 			cast_delay('0.2')
-			send_command('cancel 71')
+			windower.send_command('cancel 71')
 		end
 	elseif string.find(spell.name,'Samba') then
 		if buffactive['fan dance'] then
-			send_command('cancel 411')
+			windower.send_command('cancel 411')
 			cast_delay('0.8')
 		end
 		equip(sets.JA.Samba)
 	elseif string.find(spell.name,'Waltz') then
 		if buffactive['saber dance'] then
-			send_command('cancel 410')
+			windower.send_command('cancel 410')
 			cast_delay('0.8')
 		end
 		equip(sets.JA.Waltz)
@@ -151,7 +151,7 @@ function precast(spell,act)
 	elseif string.find(spell.name,'Utsusemi') then
 		equip(sets.MA.Utsusemi)
 	elseif string.find(spell.name,'Monomi') then
-		send_command('@wait 1.7;cancel 71')
+		windower.send_command('@wait 1.7;cancel 71')
 	end
 	
 	if spell.type == 'WeaponSkill' then
@@ -191,12 +191,12 @@ function self_command(command)
 	if command == 'toggle TP set' then
 		TP_ind = TP_ind +1
 		if TP_ind > #sets.TP.index then TP_ind = 1 end
-		send_command('@input /echo ----- TP Set changed to '..sets.TP.index[TP_ind]..' -----')
+		windower.send_command('@input /echo ----- TP Set changed to '..sets.TP.index[TP_ind]..' -----')
 		equip(sets.TP[sets.TP.index[TP_ind]])
 	elseif command == 'toggle Idle set' then
 		Idle_ind = Idle_ind +1
 		if Idle_ind > #sets.Idle.index then Idle_ind = 1 end
-		send_command('@input /echo ----- Idle Set changed to '..sets.Idle.index[Idle_ind]..' -----')
+		windower.send_command('@input /echo ----- Idle Set changed to '..sets.Idle.index[Idle_ind]..' -----')
 		equip(sets.Idle[sets.Idle.index[Idle_ind]])
 	elseif command == 'equip TP set' then
 		equip_TP_set()

@@ -32,11 +32,11 @@ windower.register_event('load',function ()
 	RW_delay = 0
 	Ammo_delay = 0
 	retrn = 0
-	send_command('unbind ^d')
-	send_command('unbind !d')
-	send_command('bind ^d ara start')
-	send_command('bind !d ara stop')
-	send_command('alias ara lua c autora')
+	windower.send_command('unbind ^d')
+	windower.send_command('unbind !d')
+	windower.send_command('bind ^d ara start')
+	windower.send_command('bind !d ara stop')
+	windower.send_command('alias ara lua c autora')
 	
 end)
 	
@@ -55,11 +55,11 @@ function stop()
 end
 
 function shoot()
-	send_command('/shoot <t>')
+	windower.send_command('/shoot <t>')
 end
 
 function shootOnce()
-	send_command('/shoot <t>')
+	windower.send_command('/shoot <t>')
 end
 
 --Function Author:  Byrth
@@ -100,7 +100,7 @@ windower.register_event('action',function (act)
 			end
 			
 			if auto == 1 then
-				send_command('wait 2; /shoot <t>')
+				windower.send_command('wait 2; /shoot <t>')
 			elseif auto == 0 then
 			end
 		end

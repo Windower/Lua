@@ -116,9 +116,9 @@ windower.register_event('lose status',function (id, name)
 	local self = windower.ffxi.get_player()
 	if name == ('Sneak Attack' or 'Trick Attack') then
 		if self.status:lower() == 'engaged' then
-			send_command('sc set ' .. TP_Set)
+			windower.send_command('sc set ' .. TP_Set)
 		elseif self.status:lower() == 'idle' then
-			send_command('sc set ' .. Idle_Set)
+			windower.send_command('sc set ' .. Idle_Set)
 		end
 	end
 end)
@@ -135,11 +135,11 @@ windower.register_event('action',function (act)
 		if actor == (player.id or player.index) then
 			if category == 1 then
 				if TH_ON == 0 then
-					send_command('sc set ' .. TH_Set)
+					windower.send_command('sc set ' .. TH_Set)
 					TH_ON = 1
 				elseif TH_ON == 1 then
 					if TP_ON == 0 then
-						send_command('sc set ' .. TP_Set)
+						windower.send_command('sc set ' .. TP_Set)
 						TP_ON = 1
 					elseif TP_ON == 1 then
 					end

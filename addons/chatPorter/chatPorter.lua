@@ -110,23 +110,23 @@ specialChar = "|"
 lastTellFrom = ""
 
 playerResolution = T{}
-playerResolution.x = get_windower_settings().x_res
-playerResolution.y = get_windower_settings().y_res
+playerResolution.x = windower.get_windower_settings().x_res
+playerResolution.y = windower.get_windower_settings().y_res
 
 windower.register_event('load',function ()
 	windower.text.create("showlinkshell")
 	windower.text.create("showparty")
 	windower.text.create("showtell")
 	windower.text.create("showffochat")
-	send_command('alias l2 lua command ChatPorter l2')
-	send_command('alias p2 lua command ChatPorter p2')
-	send_command('alias t2 lua command ChatPorter t2')
-	send_command('alias r2 lua command ChatPorter r2')
-	send_command('alias f1 lua command ChatPorter f1')
-	send_command('alias f2 lua command ChatPorter f2')
-	send_command('alias f3 lua command ChatPorter f3')
-	send_command('alias f4 lua command ChatPorter f4')
-	send_command('alias f5 lua command ChatPorter f5')
+	windower.send_command('alias l2 lua command ChatPorter l2')
+	windower.send_command('alias p2 lua command ChatPorter p2')
+	windower.send_command('alias t2 lua command ChatPorter t2')
+	windower.send_command('alias r2 lua command ChatPorter r2')
+	windower.send_command('alias f1 lua command ChatPorter f1')
+	windower.send_command('alias f2 lua command ChatPorter f2')
+	windower.send_command('alias f3 lua command ChatPorter f3')
+	windower.send_command('alias f4 lua command ChatPorter f4')
+	windower.send_command('alias f5 lua command ChatPorter f5')
 	windower.add_to_chat(55, "Loading ".._addon.name.." v".._addon.version.." (written by ".._addon.author..")")
 	windower.add_to_chat(160,'  Type '..string.color('//cp help',204,160)..' for a list of possible commands.')
 --	showStatus()
@@ -137,15 +137,15 @@ windower.register_event('unload',function ()
 	windower.text.delete("showparty")
 	windower.text.delete("showtell")
 	windower.text.delete("showffochat")
-	send_command('unalias l2')
-	send_command('unalias p2')
-	send_command('unalias t2')
-	send_command('unalias r2')
-	send_command('unalias f1')
-	send_command('unalias f2')
-	send_command('unalias f3')
-	send_command('unalias f4')
-	send_command('unalias f5')
+	windower.send_command('unalias l2')
+	windower.send_command('unalias p2')
+	windower.send_command('unalias t2')
+	windower.send_command('unalias r2')
+	windower.send_command('unalias f1')
+	windower.send_command('unalias f2')
+	windower.send_command('unalias f3')
+	windower.send_command('unalias f4')
+	windower.send_command('unalias f5')
 	windower.add_to_chat(55, "Unloading ".._addon.name.." v".._addon.version..".")
 end)
 
@@ -497,15 +497,15 @@ windower.register_event('ipc message',function (msg)
 					show("party")
 				end
 			elseif (chatMode == "l2") then
-				send_command("input /l "..message)
+				windower.send_command("input /l "..message)
 			elseif (chatMode == "p2") then
-				send_command("input /p "..message)
+				windower.send_command("input /p "..message)
 			elseif (chatMode == "t2") then
-				send_command("input /t "..message)
+				windower.send_command("input /t "..message)
 			elseif (chatMode == "r2") then
-				send_command("input /t "..lastTellFrom.." "..message)
+				windower.send_command("input /t "..lastTellFrom.." "..message)
 			elseif (chatMode == "f") then
-				send_command("input /"..senderLSname.." "..message)
+				windower.send_command("input /"..senderLSname.." "..message)
 			end
 		end
 	end

@@ -108,9 +108,9 @@ function attach_set(autoset)
     end
     if windower.ffxi.get_mob_by_id(windower.ffxi.get_player()['id'])['pet_index'] ~= 0 then 
         if windower.ffxi.get_ability_recasts()[208] == 0 then
-            send_command('input /pet "Deactivate" <me>')
+            windower.send_command('input /pet "Deactivate" <me>')
             log('Deactivating '..windower.ffxi.get_mjob_data()['name']..'.')
-            send_command('@wait 2;lua i autocontrol attach_set '..autoset)
+            windower.send_command('@wait 2;lua i autocontrol attach_set '..autoset)
         else
             local var = windower.ffxi.get_ability_recasts()[208]
             if var ~= nil then
@@ -137,7 +137,7 @@ function set_attachments_from_autoset(autoset,slot)
                 end
             end
         end
-        send_command('@wait .5;lua i autocontrol set_attachments_from_autoset '..autoset..' frame')
+        windower.send_command('@wait .5;lua i autocontrol set_attachments_from_autoset '..autoset..' frame')
     elseif slot == 'frame' then
         local tempFrame = settings.autosets[autoset]['frame']
         if tempFrame ~= nil then
@@ -150,7 +150,7 @@ function set_attachments_from_autoset(autoset,slot)
                 end
             end
         end
-        send_command('@wait .5;lua i autocontrol set_attachments_from_autoset '..autoset..' 1')
+        windower.send_command('@wait .5;lua i autocontrol set_attachments_from_autoset '..autoset..' 1')
     else
         local islot
         if tonumber(slot) < 10 then 
@@ -169,14 +169,14 @@ function set_attachments_from_autoset(autoset,slot)
         end
     
         if tonumber(slot) < 12 then
-            send_command('@wait .5;lua i autocontrol set_attachments_from_autoset '..autoset..' '..slot+1)
+            windower.send_command('@wait .5;lua i autocontrol set_attachments_from_autoset '..autoset..' '..slot+1)
         else
             log(windower.ffxi.get_mjob_data()['name']..' has been equipped with the '..autoset..' set.')
             if petlessZones:contains(windower.ffxi.get_info()['zone_id']) then 
                 return
             else
                 if windower.ffxi.get_ability_recasts()[205] == 0 then
-                    send_command('input /ja "Activate" <me>')
+                    windower.send_command('input /ja "Activate" <me>')
                 else
                     log('Unable to reactivate. Activate timer was not ready.')
                 end

@@ -77,7 +77,7 @@ function file_exists(name)
 end
 
 windower.register_event('load',function ()
-    send_command('alias cBlock lua c cBlock')
+    windower.send_command('alias cBlock lua c cBlock')
     ignore = {}
     settingsPath = windower.addon_path..'data/'
     settingsFile = settingsPath..'blacklist.txt'
@@ -90,7 +90,7 @@ windower.register_event('load',function ()
 end)
 
 windower.register_event('unload',function ()
-    send_command('unalias cblock')
+    windower.send_command('unalias cblock')
 end)
 
 function fill_ignore()

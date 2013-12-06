@@ -33,7 +33,7 @@ _addon.version = '0.2'
 function reinit()
 	clock_current = 0
 	strat_max = 0
-	send_command('@wait 1; lua i StratHelper strat_max_calc')
+	windower.send_command('@wait 1; lua i StratHelper strat_max_calc')
 end
 
 windower.register_event('load',function ()
@@ -44,14 +44,14 @@ windower.register_event('load',function ()
 	scvar_strats_max = '_SCH_Strats_Max'
 	clock_current = 0
 	loop_active = false
-	send_command('alias resetstrats lua i StratHelper reset_strats')
+	windower.send_command('alias resetstrats lua i StratHelper reset_strats')
 	if windower.ffxi.get_info()['logged_in'] then
 		reinit()
 	end
 end)
 
 windower.register_event('unload',function ()
-	send_command('unalias resetstrats')
+	windower.send_command('unalias resetstrats')
 end)
 
 windower.register_event('action',function (act)
@@ -60,17 +60,17 @@ windower.register_event('action',function (act)
 			if act.param == 210 then
 				clock_current = os.clock()
 				strat_cur = strat_max
-				send_command('sc var set ' .. scvar_strats_current .. ' ' .. strat_cur)
+				windower.send_command('sc var set ' .. scvar_strats_current .. ' ' .. strat_cur)
 			elseif strat_ids:contains(act.param) then
 				strat_max_calc()
 				if T(windower.ffxi.get_player()['buffs']):contains(377) == false then
 					strat_cur = strat_cur - 1
-					send_command('sc var set ' .. scvar_strats_current .. ' ' .. strat_cur)
+					windower.send_command('sc var set ' .. scvar_strats_current .. ' ' .. strat_cur)
 				end
 				if loop_active == false then
 					loop_active = true
 					clock_current = os.clock()
-					send_command('@wait 0.5; lua i StratHelper strat_loop')
+					windower.send_command('@wait 0.5; lua i StratHelper strat_loop')
 				end
 			end
 		end
@@ -97,19 +97,19 @@ function strat_max_calc()
 	end
 	if set_cur then
 		strat_cur = strat_max
-		send_command('sc var set ' .. scvar_strats_current .. ' ' .. strat_cur)
+		windower.send_command('sc var set ' .. scvar_strats_current .. ' ' .. strat_cur)
 	end
-	send_command('sc var set ' .. scvar_strats_max .. ' ' .. strat_max)
+	windower.send_command('sc var set ' .. scvar_strats_max .. ' ' .. strat_max)
 end
 
 function strat_loop()
 	if (240 / strat_max) - (os.clock() - clock_current) < 0 then
 		clock_current = os.clock()
 		strat_cur = strat_cur + 1
-		send_command('sc var set ' .. scvar_strats_current .. ' ' .. strat_cur)
+		windower.send_command('sc var set ' .. scvar_strats_current .. ' ' .. strat_cur)
 	end
 	if strat_cur < strat_max then
-		send_command('@wait 0.5; lua i StratHelper strat_loop')
+		windower.send_command('@wait 0.5; lua i StratHelper strat_loop')
 	else
 		loop_active = false
 	end

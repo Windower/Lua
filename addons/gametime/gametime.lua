@@ -483,9 +483,9 @@ windower.register_event('addon command',function (...)
 				log('Time transparency set to '..inalpha..' ('..math.round(100-(inalpha/2.55),0)..'%).')
 			end
 		elseif args[2] == 'x' or args[2] == 'posx' then
-			send_command('gt timex '..args[3])
+			windower.send_command('gt timex '..args[3])
 		elseif args[2] == 'y' or args[2] == 'posy' then
-			send_command('gt timey '..args[3])
+			windower.send_command('gt timey '..args[3])
 		elseif args[2] == 'hide' then
 			windower.text.set_visibility(gt.gtt,false)
 			settings.time.visible = false
@@ -509,9 +509,9 @@ windower.register_event('addon command',function (...)
 				log('Days transparency set to '..inalpha..' ('..math.round(100-(inalpha/2.55),0)..'%).')
 			end
 		elseif args[2] == 'x' or args[2] == 'posx' then
-			send_command('gt daysx '..args[3])
+			windower.send_command('gt daysx '..args[3])
 		elseif args[2] == 'y' or args[2] == 'posy' then
-			send_command('gt timey '..args[3])
+			windower.send_command('gt timey '..args[3])
 		elseif args[2] == 'hide' then
 			windower.text.set_visibility(gt.gtd,false)
 			settings.days.visible = false

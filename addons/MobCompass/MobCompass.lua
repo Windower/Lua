@@ -276,7 +276,7 @@ function get_target()
 	end
 	
 	if loop == 0 then
-		send_command('@wait 0.1;lua i MobCompass get_target')
+		windower.send_command('@wait 0.1;lua i MobCompass get_target')
 	end
 	
 end

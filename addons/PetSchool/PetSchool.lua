@@ -90,18 +90,18 @@ windower.register_event('action',function (act)
 	if actor == pet then
 		if category == 8 then
 			if actionTarget.is_npc == true then
-				send_command('sc set ' .. PetNuke)
+				windower.send_command('sc set ' .. PetNuke)
 				windower.add_to_chat(17, '                       Pet Spellcast Started:  Nuking')
 			elseif actionTarget.is_npc == false then
-				send_command('sc set ' .. PetHeal)
+				windower.send_command('sc set ' .. PetHeal)
 				windower.add_to_chat(17, '                       Pet Spellcast Started:  Curing/Buffing')
 			end
 		elseif category == 4 then
 			if (player.status:lower() == 'engaged') then
-				send_command('sc set ' .. TP_Set)
+				windower.send_command('sc set ' .. TP_Set)
 				windower.add_to_chat(17, '                       Pet Spellcast Finished')
 			elseif (player.status:lower() == 'idle') then
-				send_command('sc set ' .. Idle_Set)
+				windower.send_command('sc set ' .. Idle_Set)
 				windower.add_to_chat(17, '                       Pet Spellcast Finished')
 			end
 		end

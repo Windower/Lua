@@ -71,8 +71,8 @@ windower.register_event('load',function ()
 	GEO_Page = ''
 	RUN_Book = ''
 	RUN_Page = ''
-	send_command('alias mc lua c macrochanger cmd')
-	send_command('alias macrochanger lua c macrochanger cmd')
+	windower.send_command('alias mc lua c macrochanger cmd')
+	windower.send_command('alias macrochanger lua c macrochanger cmd')
 	windower.add_to_chat(17, 'MacroChanger v' .. version .. ' loaded.     Author:  Banggugyangu')
 	windower.add_to_chat(17, 'Attempting to load settings from file.')
 	options_load()
@@ -349,8 +349,8 @@ windower.register_event('job change',function (mjobId, mjob)
 			windower.add_to_chat(17, '                             Auto Macro Switching Disabled for ' .. job ..'.')
 		else	
 			windower.add_to_chat(17, '                             Changing macros to Book: ' .. book .. ' and Page: ' .. page .. '.  Job Changed to ' .. job)
-			send_command('input /macro book ' .. book)
-			send_command('input /macro set ' .. page)
+			windower.send_command('input /macro book ' .. book)
+			windower.send_command('input /macro set ' .. page)
 		end
 	elseif globaldisable == 1 then
 	
@@ -360,7 +360,7 @@ windower.register_event('job change',function (mjobId, mjob)
 end)
 
 windower.register_event('unload',function ()
-	send_command('unalias mc')
+	windower.send_command('unalias mc')
 end)
 
 windower.register_event('addon command',function (...)

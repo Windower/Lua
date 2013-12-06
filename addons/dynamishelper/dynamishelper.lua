@@ -142,7 +142,7 @@ windower.register_event('addon command',function (...)
    			if params[2]:lower() == "create" then
     			player = windower.ffxi.get_player()['name']
     			io.open(windower.addon_path..'../../plugins/ll/dynamis-'..player..'.txt',"w"):write('if item is 1452, 1453, 1455, 1456, 1449, 1450 then lot'):close()
-    			send_command('ll profile dynamis-'..player..'.txt')
+    			windower.send_command('ll profile dynamis-'..player..'.txt')
    			else print("Invalid light luggage option.")
    			end
   	 elseif params[1]:lower() == "proc" then
@@ -168,7 +168,7 @@ windower.register_event('incoming text',function (original, new, color)
   		a,b,fiend = string.find(original,"%w+'s attack staggers the (%w+)%!")
    		if fiend == 'fiend' then
 			StaggerCount = StaggerCount + 1
-    		send_command('timers c '..StaggerCount..' 30 down')
+    		windower.send_command('timers c '..StaggerCount..' 30 down')
     		return new, color
     	end
 	end

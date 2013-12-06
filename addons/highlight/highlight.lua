@@ -155,7 +155,7 @@ windower.register_event('incoming chunk', function(id, data)
     if id == 0x0C8 then
         modmember = {}
         members = {}
-        send_command('@wait 0.1; lua i highlight get_party_members')
+        windower.send_command('@wait 0.1; lua i highlight get_party_members')
     end
 end)
  

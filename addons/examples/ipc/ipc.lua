@@ -4,11 +4,11 @@ windower.register_event('addon command',function (...)
 end)
 
 windower.register_event('load',function ()
-	send_command('alias ipc lua c ipc')
+	windower.send_command('alias ipc lua c ipc')
 end}
 
 windower.register_event('unload',function ()
-	send_command('unalias ipc')
+	windower.send_command('unalias ipc')
 end}
 
 windower.register_event('ipc message',function (msg)
