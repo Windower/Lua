@@ -1,7 +1,16 @@
 -- Check Ratings
-local check_rating = {'TW','EEP','EP','DC','EM','T','VT','IT'}
+local check_ratings = {}
 
-return check_rating
+check_ratings[1] = { english='Too weak'             }
+check_ratings[2] = { english='Extremely easy prey'  }
+check_ratings[3] = { english='Easy prey'            }
+check_ratings[4] = { english='Decent challenge'     }
+check_ratings[5] = { english='Even match'           }
+check_ratings[6] = { english='Tough'                }
+check_ratings[7] = { english='Very tough'           }
+check_ratings[8] = { english='Incredibly tough'     }
+
+return check_ratings
 
 --[[
 Copyright (c) 2013, Windower
