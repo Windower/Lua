@@ -54,7 +54,7 @@ windower.register_event('addon command',function (...)
 		end
 
 		if cmd[1]:lower() == "test" then
-			for buffs, integers in pairs(get_player()['buffs']) do
+			for buffs, integers in pairs(windower.ffxi.get_player()['buffs']) do
 				if integers ~= 255 then
 					add_to_chat(1,integers)
 				end
@@ -181,7 +181,7 @@ windower.register_event('action',function (act)
 		effected_member={}
 		bust_rate(rollnum, id)
 		for i=1, #act['targets'] do
-			if act['targets'][i]['id'] == get_player()['id'] then
+			if act['targets'][i]['id'] == windower.ffxi.get_player()['id'] then
 				for i=1, #roll_id do
 					if roller == roll_id[i] then
 						for n=1, #act['targets'] do
@@ -220,7 +220,7 @@ windower.register_event('action',function (act)
 end)
 
 function bust_rate(num, main)
-	if num <= 5 or num == 11 or main ~= get_player()['id'] or settings.bust == 0 then
+	if num <= 5 or num == 11 or main ~= windower.ffxi.get_player()['id'] or settings.bust == 0 then
 		bustrate = ''
 	else 
 		bustrate = '\7  [Chance to Bust]: '..string.format("%.1f",(num-5)*16.67)..'%'
@@ -231,7 +231,7 @@ end
 test=0
 
 windower.register_event('outgoing text',function (original, modified)
-	if original:find('/jobability \"Double.*Up') and luckyroll == 1 and override == 0 and id == get_player()['id'] then
+	if original:find('/jobability \"Double.*Up') and luckyroll == 1 and override == 0 and id == windower.ffxi.get_player()['id'] then
 		modified=''
 		add_to_chat(159,'Attempting to Doubleup on a Lucky Roll: Re-double up to continue.')
 		luckyroll=0
@@ -241,7 +241,7 @@ windower.register_event('outgoing text',function (original, modified)
 	if original:find('/jobability \"Fold') and settings.fold == 1 then
 		a=0
 		
-		for buffs, integers in pairs(get_player()['buffs']) do
+		for buffs, integers in pairs(windower.ffxi.get_player()['buffs']) do
 			if table.contains(buff_id, integers) then
 				a=a+1
 			end

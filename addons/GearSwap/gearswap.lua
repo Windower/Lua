@@ -179,7 +179,7 @@ windower.register_event('outgoing text',function(original,modified)
 			r_line = r_spells[validabils[language][abil:lower()]['Magic']]
 			r_line.name = r_line[language]
 			if r_line.type == 'BardSong' and r_line.casttime == 8 then
-				refresh_buff_active(get_player().buffs)
+				refresh_buff_active(windower.ffxi.get_player().buffs)
 				if buffactive.pianissimo then
 				-- Handling for the casting time reduction of Pianissimo.
 				-- Note, does not work unless the buff list has been updated.

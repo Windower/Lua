@@ -77,7 +77,7 @@ end
 
 function settings_create()
 --	get player's name
-	player = get_player()['name']
+	player = windower.ffxi.get_player()['name']
 --	dynamic players from settings
 	for i=1, #players do
 		playernumber = players[i]
@@ -160,7 +160,7 @@ windower.register_event('addon command',function (...)
 end)
 
 windower.register_event('load',function ()
-	player = get_player()['name']
+	player = windower.ffxi.get_player()['name']
 	print('CellHelp loaded.  CellHelp Authors: Cerberus.Balloon and Bahamut.Krizz')
 	mode = settingtab["mode"]
 	--Initial lot setting

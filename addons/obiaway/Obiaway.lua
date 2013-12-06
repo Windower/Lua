@@ -164,7 +164,7 @@ function get_all_elements()
 	elements[day_element] = elements[day_element] + 1
 	weather_element = info.weather_element
 	elements[weather_element] = elements[weather_element] + 1
-	buffs = get_player().buffs
+	buffs = windower.ffxi.get_player().buffs
 
 	if inTable(buffs, 178) then
 	  elements["Fire"] = elements["Fire"] +1

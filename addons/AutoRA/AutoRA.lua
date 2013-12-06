@@ -41,7 +41,7 @@ windower.register_event('load',function ()
 end)
 	
 function start()
-	player = get_player()
+	player = windower.ffxi.get_player()
 	if (player.status:lower() == 'engaged' ) then
 		auto = 1
 	elseif (player.status:lower() == 'idle' ) then
@@ -87,7 +87,7 @@ end
 windower.register_event('action',function (act)
 	local actor = act.actor_id
 	local category = act.category
-	local player = get_player()
+	local player = windower.ffxi.get_player()
 	
 	if ((actor == (player.id or player.index))) then
 		if category == 2 then

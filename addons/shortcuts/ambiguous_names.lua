@@ -319,7 +319,7 @@ function ambig(key)
 		elseif ambig_names[key].mob_ID then return r_abilities[ambig_names[key].mob_ID]
 		end
 	else  -- Otherwise it's actually ambiguous, so run the associated function and pass the known information.
-		abil_type=ambig_names[key]['funct'](get_player(),ambig_names[key].spell_ID,ambig_names[key].abil_ID,ambig_names[key].mob_ID,ambig_names[key].info,ambig_names[key].mob_ID)
+		abil_type=ambig_names[key]['funct'](windower.ffxi.get_player(),ambig_names[key].spell_ID,ambig_names[key].abil_ID,ambig_names[key].mob_ID,ambig_names[key].info,ambig_names[key].mob_ID)
 		if abil_type == 'Ability' then
 			return r_abilities[ambig_names[key].abil_ID],abil_type
 		elseif abil_type == 'Magic' then

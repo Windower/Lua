@@ -272,7 +272,7 @@ function split(msg, match)
 end
 
 windower.register_event('job change',function (mjobId, mjob)
-	local player = get_player()
+	local player = windower.ffxi.get_player()
 	local job = player.main_job
 	local book = ''
 	local page = ''
@@ -366,7 +366,7 @@ end)
 windower.register_event('addon command',function (...)
     local term = table.concat({...}, ' ')
     local splitarr = split(term,' ')
-	local mjob = get_player()['main_job']
+	local mjob = windower.ffxi.get_player()['main_job']
 	if splitarr[1] == 'cmd' then
 		if splitarr[2] == 'disableall' then
 			if splitarr[3] == 'on' then

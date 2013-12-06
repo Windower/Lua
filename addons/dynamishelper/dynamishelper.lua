@@ -89,7 +89,7 @@ end
 
 windower.register_event('load',function ()
 --	print('event_load function')
- 	player = get_player()['name']
+ 	player = windower.ffxi.get_player()['name']
  	obtained = nil
  	print('Dynamis Helper loaded.  Author: Bahamut.Krizz')
  	initializebox()
@@ -140,7 +140,7 @@ windower.register_event('addon command',function (...)
     		end
   		elseif params[1]:lower() == "ll" then
    			if params[2]:lower() == "create" then
-    			player = get_player()['name']
+    			player = windower.ffxi.get_player()['name']
     			io.open(windower.addon_path..'../../plugins/ll/dynamis-'..player..'.txt',"w"):write('if item is 1452, 1453, 1455, 1456, 1449, 1450 then lot'):close()
     			send_command('ll profile dynamis-'..player..'.txt')
    			else print("Invalid light luggage option.")

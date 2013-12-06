@@ -55,7 +55,7 @@ windower.register_event('unload',function ()
 end)
 
 windower.register_event('action',function (act)
-	if act.actor_id == get_player()['id'] then
+	if act.actor_id == windower.ffxi.get_player()['id'] then
 		if act.category == 6 then
 			if act.param == 210 then
 				clock_current = os.clock()
@@ -63,7 +63,7 @@ windower.register_event('action',function (act)
 				send_command('sc var set ' .. scvar_strats_current .. ' ' .. strat_cur)
 			elseif strat_ids:contains(act.param) then
 				strat_max_calc()
-				if T(get_player()['buffs']):contains(377) == false then
+				if T(windower.ffxi.get_player()['buffs']):contains(377) == false then
 					strat_cur = strat_cur - 1
 					send_command('sc var set ' .. scvar_strats_current .. ' ' .. strat_cur)
 				end
@@ -90,10 +90,10 @@ function strat_max_calc()
 	if strat_max == 0 then
 		set_cur = true
 	end
-	if get_player()['main_job'] == 'SCH' then
-		strat_max = math.floor(((get_player()['main_job_level']  - 10) / 20) + 1)
-	elseif get_player()['sub_job'] == 'SCH' then
-		strat_max = math.floor(((get_player()['sub_job_level']  - 10) / 20) + 1)
+	if windower.ffxi.get_player()['main_job'] == 'SCH' then
+		strat_max = math.floor(((windower.ffxi.get_player()['main_job_level']  - 10) / 20) + 1)
+	elseif windower.ffxi.get_player()['sub_job'] == 'SCH' then
+		strat_max = math.floor(((windower.ffxi.get_player()['sub_job_level']  - 10) / 20) + 1)
 	end
 	if set_cur then
 		strat_cur = strat_max

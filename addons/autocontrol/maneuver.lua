@@ -83,7 +83,7 @@ windower.register_event("action", function(act)
         local abil_ID = act['param']
         local actor_id = act['actor_id']
         local player = T(windower.ffxi.get_player())
-        local pet_index = windower.ffxi.get_mob_by_id(get_player()['id'])['pet_index']
+        local pet_index = windower.ffxi.get_mob_by_id(windower.ffxi.get_player()['id'])['pet_index']
         
         if act['category'] == 6 and actor_id == player.id and S{136,139,141,142,143,144,145,146,147,148,309}:contains(abil_ID) then
             if S{141, 142, 143, 144, 145, 146, 147, 148}:contains(abil_ID) then

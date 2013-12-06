@@ -80,8 +80,8 @@ function options_load()
 end
 
 windower.register_event('action',function (act)
-	local player = get_player()
-	local pet = windower.ffxi.get_mob_by_index(windower.ffxi.get_mob_by_index(get_player()['index'])['pet_index'])['id']
+	local player = windower.ffxi.get_player()
+	local pet = windower.ffxi.get_mob_by_index(windower.ffxi.get_mob_by_index(windower.ffxi.get_player()['index'])['pet_index'])['id']
 	local actor = act.actor_id
 	local category = act.category
 	local targets = act.targets

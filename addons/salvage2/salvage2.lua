@@ -57,7 +57,7 @@ end)
 
 function settings_create()
 	--	get player's name
-	player = get_player()['name']
+	player = windower.ffxi.get_player()['name']
 	--  set all pathos as needed
 	for i=1, #pathos_ident  do
 		if pathos_ident[i] ~= nil then
