@@ -59,7 +59,6 @@ end
 
 windower.register_event('load', function()
     spells = res.spells
-    print(spells:length())
     settings = config.load(defaults)
     notice('Version '.._addon.version..' Loaded. Type //aset help for list of commands.')
     initialize()
