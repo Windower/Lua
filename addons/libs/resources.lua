@@ -20,8 +20,7 @@ local resources = setmetatable({}, {__index = function(t, k)
 end})
 
 local resource_mt
-local resource_fns = {}
-function resource_fns.group(r, attr, fn)
+function resource_group(r, fn, attr)
     fn = type(fn) == 'function' and fn or functools.equals(fn)
 
     local res = {}
@@ -33,12 +32,9 @@ function resource_fns.group(r, attr, fn)
 
     return setmetatable(res, resource_mt)
 end
-function resource_fns._post_group(r, fn, attr)
-    return resource_fns.group(r, attr, fn)
-end
 
 resource_mt = {__index = function(t, k)
-    return resource_fns[k] or rawget(t[next(t)], k) and resource_fns._post_group-{k} or table[k]
+    return next(t) and rawget(t[next(t)], k) and resource_group-{k} or table[k]
 end}
 
 local plugin_resources = '../../plugins/resources/'
