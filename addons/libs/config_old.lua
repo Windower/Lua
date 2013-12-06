@@ -40,7 +40,7 @@ function config.load(filename, confdict)
     end
 
     local confdict_mt = getmetatable(confdict) or _meta.T
-    local settings = setmetatable(table.copy(confdict or {}), {__class = 'Settings', __index = function(t, k)
+    settings = setmetatable(table.copy(confdict or {}), {__class = 'Settings', __index = function(t, k)
         if config[k] ~= nil then
             return config[k]
         elseif confdict_mt then
@@ -64,7 +64,7 @@ function config.load(filename, confdict)
     if not _libs.filehelper.exists(filepath) then
         meta.file:set(filepath, true)
         meta.original.global = table.copy(settings)
-        config.save(settings, 'all')
+        config.save(settings)
 
         return settings
     end
@@ -125,13 +125,7 @@ function parse(settings)
             meta.original[char] = table.update(table.copy(settings), parsed[char], true)
         end
 
-        local full_parsed = parsed.global
-
-        if windower.ffxi.get_info().logged_in then
-            full_parsed = full_parsed:update(parsed[windower.ffxi.get_player()['name']:lower()], true)
-        end
-
-        return settings:update(full_parsed, true)
+        return settings:update(parsed.global:update(parsed[get_player()['name']:lower()], true), true)
     end
 
     -- Update the global settings with the per-player defined settings, if they exist. Save the parsed value for later comparison.
@@ -142,13 +136,7 @@ function parse(settings)
         meta.original[char] = table_diff(meta.original.global, meta.original[char]) or T{}
     end
 
-    local full_parsed = parsed.global
-
-    if windower.ffxi.get_info().logged_in then
-        full_parsed = full_parsed:update(parsed[windower.ffxi.get_player().name:lower()], true)
-    end
-
-    return merge(settings, full_parsed)
+    return merge(settings, parsed.global:update(parsed[get_player()['name']:lower()], true))
 end
 
 -- Merges two tables like update would, but retains type-information and tries to work around conflicts.
@@ -302,10 +290,6 @@ end
 -- Writes the passed config table to the spcified file name.
 -- char defaults to windower.ffxi.get_player()['name']. Set to "all" to apply to all characters.
 function config.save(t, char)
-    if char ~= 'all' and not windower.ffxi.get_info().logged_in then
-        return
-    end
-
     char = (char or windower.ffxi.get_player()['name']):lower()
     meta = settings_map[t]
 
@@ -384,7 +368,7 @@ function settings_xml(meta)
         end
 
         str = str..'\t<'..char..'>\n'
-        str = str..nest_xml(meta.original[char], meta)
+        str = str..nest_xml(meta.original[char], meta, 2)
         str = str..'\t</'..char..'>\n'
     end
 
@@ -394,17 +378,17 @@ end
 
 -- Converts a table to XML without headers using appropriate indentation and comment spacing. Used in settings_xml.
 function nest_xml(t, meta, indentlevel)
-    indentlevel = indentlevel or 2
-    local indent = (' '):rep(4*indentlevel)
+    indentlevel = indentlevel or 0
+    local indent = ('\t'):rep(indentlevel)
 
     local inlines = T{}
     local fragments = T{}
     local maxlength = 0        -- For proper comment indenting
-    keys = set.sort(table.keyset(t))
+    keys = t:keyset():sort()
     local val
     for _, key in ipairs(keys) do
         val = rawget(t, key)
-        if type(val) == 'table' and not (class(val) == 'List' or class(val) == 'Set') then
+        if type(val) == 'table' and not (class(val) == 'List' or T(val):isarray()) then
             fragments:append(indent..'<'..key..'>\n')
             if rawget(meta.comments, key) ~= nil then
                 local c = ('<!-- '..rawget(meta.comments, key):trim()..' -->'):split('\n')

@@ -322,14 +322,14 @@ windower.register_event('login', 'load', function(...)
         showallidps = true,
         resetfilters = true
     })
-    send_command('alias sb lua c scoreboard')
+    windower.send_command('alias sb lua c scoreboard')
     display = Display:new(settings, dps_db)
     reset()
 end)
 
 
 windower.register_event('unload', function()
-    send_command('unalias sb')
+    windower.send_command('unalias sb')
     display:destroy()
 end)
 

@@ -148,7 +148,7 @@ windower.register_event('addon command',function (...)
 	local status_id = tonumber(command) or name_index[strip(command)]
 	if not status_id then return end
 	
-	local buffs = get_player().buffs
+	local buffs = windower.ffxi.get_player().buffs
 	
 	for _,v in pairs(buffs) do
 		if type(status_id) == 'table' then

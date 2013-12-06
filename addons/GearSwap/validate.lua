@@ -1,5 +1,5 @@
 function validate()
-	local temp_items,item_list = get_items(),{empty=true}
+	local temp_items,item_list = windower.ffxi.get_items(),{empty=true}
 	
 	for i,v in pairs(temp_items.inventory) do
 		if v.id ~= 0 then

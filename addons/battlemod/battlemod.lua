@@ -20,7 +20,7 @@ end)
 
 windower.register_event('login',function (name)
 	if debugging then windower.debug('login') end
-	send_command('@wait 10;lua i battlemod options_load;')
+	windower.send_command('@wait 10;lua i battlemod options_load;')
 end)
 
 windower.register_event('addon command',function (...)
@@ -31,32 +31,32 @@ windower.register_event('addon command',function (...)
 		if splitarr[2] ~= nil then
 			if splitarr[2]:lower() == 'commamode' then
 				commamode = not commamode
-				add_to_chat(121,'Battlemod: Comma Mode flipped! - '..tostring(commamode))
+				windower.add_to_chat(121,'Battlemod: Comma Mode flipped! - '..tostring(commamode))
 			elseif splitarr[2]:lower() == 'oxford' then
 				oxford = not oxford
-				add_to_chat(121,'Battlemod: Oxford Mode flipped! - '..tostring(oxford))
+				windower.add_to_chat(121,'Battlemod: Oxford Mode flipped! - '..tostring(oxford))
 			elseif splitarr[2]:lower() == 'targetnumber' then
 				targetnumber = not targetnumber
-				add_to_chat(121,'Battlemod: Target Number flipped! - '..tostring(targetnumber))
+				windower.add_to_chat(121,'Battlemod: Target Number flipped! - '..tostring(targetnumber))
 			elseif splitarr[2]:lower() == 'swingnumber' then
 				swingnumber = not swingnumber
-				add_to_chat(121,'Battlemod: Round Number flipped! - '..tostring(targetnumber))
+				windower.add_to_chat(121,'Battlemod: Round Number flipped! - '..tostring(targetnumber))
 			elseif splitarr[2]:lower() == 'cancelmulti' then
 				cancelmulti = not cancelmulti
-				add_to_chat(121,'Battlemod: Multi-canceling flipped! - '..tostring(cancelmulti))
+				windower.add_to_chat(121,'Battlemod: Multi-canceling flipped! - '..tostring(cancelmulti))
 			elseif splitarr[2]:lower() == 'reload' then
 				options_load()
 			elseif splitarr[2]:lower() == 'unload' then
-				send_command('@lua u battlemod')
+				windower.send_command('@lua u battlemod')
 			elseif splitarr[2]:lower() == 'simplify' then
 				simplify = not simplify
-				add_to_chat(121,'Battlemod: Text simplification flipped! - '..tostring(simplify))
+				windower.add_to_chat(121,'Battlemod: Text simplification flipped! - '..tostring(simplify))
 			elseif splitarr[2]:lower() == 'condensedamage' then
 				condensedamage = not condensedamage
-				add_to_chat(121,'Battlemod: Condensed Damage text flipped! - '..tostring(condensedamage))
+				windower.add_to_chat(121,'Battlemod: Condensed Damage text flipped! - '..tostring(condensedamage))
 			elseif splitarr[2]:lower() == 'condensetargets' then
 				condensetargets = not condensetargets
-				add_to_chat(121,'Battlemod: Condensed Targets flipped! - '..tostring(condensetargets))
+				windower.add_to_chat(121,'Battlemod: Condensed Targets flipped! - '..tostring(condensetargets))
 			elseif splitarr[2]:lower() == 'colortest' then
 				local counter = 0
 				local line = ''
@@ -71,12 +71,12 @@ windower.register_event('addon command',function (...)
 						counter = counter + 1
 					end
 					if counter == 16 or n == 509 then
-						add_to_chat(1, line)
+						windower.add_to_chat(1, line)
 						counter = 0
 						line = ''
 					end
 				end
-				add_to_chat(122,'Colors Tested!')
+				windower.add_to_chat(122,'Colors Tested!')
 			elseif splitarr[2]:lower() == 'help' then
 				write('   :::   '.._addon.name..' ('.._addon.version..'   :::')
 				write('Toggles: (* subtoggles)')
@@ -106,7 +106,7 @@ windower.register_event('incoming text',function (original, modified, color)
 		a,z = string.find(original,'Equipment changed')
 		
 		if a and not block_equip then
-			send_command('@wait 1;lua i battlemod flip_block_equip')
+			windower.send_command('@wait 1;lua i battlemod flip_block_equip')
 			block_equip = true
 		elseif a and block_equip then
 			modified = true
@@ -117,7 +117,7 @@ windower.register_event('incoming text',function (original, modified, color)
 		c,z = string.find(original,'You must close the currently open window to use that command')
 		
 		if (a or b or c) and not block_cannot then
-			send_command('@wait 1;lua i battlemod flip_block_cannot')
+			windower.send_command('@wait 1;lua i battlemod flip_block_cannot')
 			block_cannot = true
 		elseif (a or b or c) and block_cannot then
 			modified = true
@@ -139,11 +139,11 @@ function options_load()
 	if windower.ffxi.get_player() then
 		Self = windower.ffxi.get_player()
 	end
-	if not dir_exists(windower.addon_path..'data\\') then
-		create_dir(windower.addon_path..'data\\')
+	if not windower.dir_exists(windower.addon_path..'data\\') then
+		windower.create_dir(windower.addon_path..'data\\')
 	end
-	if not dir_exists(windower.addon_path..'data\\filters\\') then
-		create_dir(windower.addon_path..'data\\filters\\')
+	if not windower.dir_exists(windower.addon_path..'data\\filters\\') then
+		windower.create_dir(windower.addon_path..'data\\filters\\')
 	end
 	 
 	local settingsFile = file.new('data\\settings.xml',true)
@@ -198,10 +198,10 @@ function filterload(job)
 	if Current_job == job then return end
 	if file.exists('data\\filters\\filters-'..job..'.xml') then
 		filter = config.load('data\\filters\\filters-'..job..'.xml',default_filter_table,false)
-		add_to_chat(4,'Loaded '..job..' Battlemod filters')
+		windower.add_to_chat(4,'Loaded '..job..' Battlemod filters')
 	else
 		filter = config.load('data\\filters\\filters.xml',default_filter_table,false)
-		add_to_chat(4,'Loaded default Battlemod filters')
+		windower.add_to_chat(4,'Loaded default Battlemod filters')
 	end
 	Current_job = job
 end
@@ -333,7 +333,7 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 --				if first_error then
 --					first_error = nil
 --				end
---				add_to_chat(8,'Mismatch at byte '..i..'.')
+--				windower.add_to_chat(8,'Mismatch at byte '..i..'.')
 --			end
 --		end
 
@@ -377,7 +377,7 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 			if not multi_targs[status] and not stat_ignore:contains(am.param_1) then
 				multi_targs[status] = {}
 				multi_targs[status][1] = target
-				send_command('@wait 0.5;lua i battlemod multi_packet '..status)
+				windower.send_command('@wait 0.5;lua i battlemod multi_packet '..status)
 			elseif not (stat_ignore:contains(am.param_1)) then
 				multi_targs[status][#multi_targs[status]+1] = color_it(target.name,color_arr[target.owner or target.type])
 			else
@@ -385,7 +385,7 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 			-- Sneak, Invis, etc. that you don't want to see on a delay
 				multi_targs[status] = {}
 				multi_targs[status][1] = target
-				send_command('@lua i battlemod multi_packet '..status)
+				windower.send_command('@lua i battlemod multi_packet '..status)
 			end
 			am.message_id = false
 		elseif passed_messages:contains(am.message_id) then
@@ -441,7 +441,7 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 				:gsub('$\123number2\125',number2 or '')
 				:gsub('$\123skill\125',skill or '')
 				:gsub('$\123lb\125','\7'))
-			add_to_chat(dialog[am.message_id]['color'],outstr)
+			windower.add_to_chat(dialog[am.message_id]['color'],outstr)
 			am.message_id = false
 		elseif debugging then 
 		-- 38 is the Skill Up message, which (interestingly) uses all the number params.
@@ -457,13 +457,13 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 		if windower.ffxi.get_player().id == (data:byte(3,3)*256*256 + data:byte(2,2)*256 + data:byte(1,1)) then
 			result = data:byte(9,9)
 			if result == 0 then
-				add_to_chat(8,' ------------- NQ Synthesis -------------')
+				windower.add_to_chat(8,' ------------- NQ Synthesis -------------')
 			elseif result == 1 then
-				add_to_chat(8,' ---------------- Break -----------------')
+				windower.add_to_chat(8,' ---------------- Break -----------------')
 			elseif result == 2 then
-				add_to_chat(8,' ------------- HQ Synthesis -------------')
+				windower.add_to_chat(8,' ------------- HQ Synthesis -------------')
 			else
-				add_to_chat(8,'Craftmod: Unhandled result '..tostring(result))
+				windower.add_to_chat(8,'Craftmod: Unhandled result '..tostring(result))
 			end
 		end
 	end
@@ -471,12 +471,12 @@ end)
 
 function multi_packet(...)
 	local ind = table.concat({...},' ')
---	add_to_chat(8,tostring(multi_actor[ind].name)..' '..tostring(multi_targs[ind][1].name)..' '..tostring(multi_msg[ind]))
+--	windower.add_to_chat(8,tostring(multi_actor[ind].name)..' '..tostring(multi_targs[ind][1].name)..' '..tostring(multi_msg[ind]))
 	local targets = assemble_targets(multi_actor[ind],multi_targs[ind],0,multi_msg[ind])
 	local outstr = dialog[multi_msg[ind]][language]
 		:gsub('$\123target\125',targets)
 		:gsub('$\123status\125',ind)
-	add_to_chat(dialog[multi_msg[ind]].color,outstr)
+	windower.add_to_chat(dialog[multi_msg[ind]].color,outstr)
 	multi_targs[ind] = nil
 	multi_msg[ind] = nil
 	multi_actor[ind] = nil

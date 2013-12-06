@@ -74,7 +74,7 @@ math.randomseed(os.clock())
 --           -- The target's name is (None), its ID is 0.
 --           -- Now, assume the player is currently targeting its Moogle in the Port Jeuno MH (ID 17784938).
 --
---           mob = get_mob_by_index(get_player()['target_index'])
+--           mob = windower.ffxi.get_mob_by_index(get_player()['target_index'])
 --
 --           t.name = mob['name']
 --           -- This will instantly change the text to include the mob's name:

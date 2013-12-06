@@ -66,7 +66,7 @@ end
 
 -- Returns the name of this actor if there is one
 function action.get_actor_name(self)
-    local mob = get_mob_by_id(self.raw['actor_id'])
+    local mob = windower.ffxi.get_mob_by_id(self.raw['actor_id'])
 
     if mob then
         return mob['name']
@@ -117,7 +117,7 @@ end
 
 -- Returns the name of this target if there is one
 function target.get_name(self)
-    local mob = get_mob_by_id(self.raw['id'])
+    local mob = windower.ffxi.get_mob_by_id(self.raw['id'])
 
     if mob then
         return mob['name']

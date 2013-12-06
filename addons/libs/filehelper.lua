@@ -125,7 +125,7 @@ function files.create_path(f)
         new_path = new_path..'/'..dir
 
         if not windower.dir_exists(new_path) then
-            local res, err = create_dir(new_path)
+            local res, err = windower.create_dir(new_path)
             if not res then
                 if err ~= nil then
                     return nil, err..': '..new_path

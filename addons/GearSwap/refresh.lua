@@ -70,7 +70,7 @@ function load_user_files()
 	
 	user_env = nil
 	
-	if not file_exists(windower.addon_path..'data/'..player['name']..'_'..player.main_job..'.lua') then
+	if not windower.file_exists(windower.addon_path..'data/'..player['name']..'_'..player.main_job..'.lua') then
 		user_env = nil
 		current_job_file = nil
 		return
@@ -140,7 +140,7 @@ end
 --Returns:
 ---- None
 ----
----- Loads player from get_player().
+---- Loads player from windower.ffxi.get_player().
 ---- Adds in a "job", "race", "equipment", "target", and "subtarget" field
 ---- Also updates "pet" and assigns isvalid and element fields.
 ---- Further converts player.buffs to buffactive.
@@ -148,7 +148,7 @@ end
 -------- of buffs with that name active.
 -----------------------------------------------------------------------------------
 function refresh_player()
-	if not get_player() then return end
+	if not windower.ffxi.get_player() then return end
 	
 	table.reassign(player,get_player())
 	for i,v in pairs(player.vitals) do
@@ -165,7 +165,7 @@ function refresh_player()
 	end
 	player.job = player.main_job..'/'..player.sub_job
 	
-	local player_mob_table = get_mob_by_index(get_player().index)
+	local player_mob_table = windower.ffxi.get_mob_by_index(get_player().index)
 	if not player_mob_table then return end
 	
 	
@@ -180,7 +180,7 @@ function refresh_player()
 		player.race = mob_table_races[player.race]
 	end
 	
-	items = get_items()
+	items = windower.ffxi.get_items()
 	local cur_equip = items.equipment -- i = 'head', 'feet', etc.; v = inventory ID (0~80)
 	if sent_out_equip then -- If the swap is not complete, overwrite the current equipment with the equipment that you are swapping to
 		for i,v in pairs(cur_equip) do
@@ -229,7 +229,7 @@ function refresh_player()
 		table.reassign(pet,{isvalid=false})
 	end
 	
-	local ft_table = get_mob_by_target('<ft>')
+	local ft_table = windower.ffxi.get_mob_by_target('<ft>')
 	if ft_table then
 		table.reassign(fellow,ft_table)
 		fellow.isvalid = true
@@ -303,14 +303,14 @@ end
 --Returns:
 ---- None
 ----
----- Takes the mob arrays from get_party() and splits them from p0~5, a10~15, a20~25
+---- Takes the mob arrays from windower.ffxi.get_party() and splits them from p0~5, a10~15, a20~25
 ---- into alliance[1][1~6], alliance[2][1~6], alliance[3][1~6], respectively.
 ---- Also adds a "count" field to alliance (total number of people in alliance) and
 ---- to the individual subtables (total number of people in each party.
 -----------------------------------------------------------------------------------
 function refresh_group_info()
 	local temp_alliance = {[1]={count=0},[2]={count=0},[3]={count=0}}
-	local j = get_party() or {}
+	local j = windower.ffxi.get_party() or {}
 	for i,v in pairs(j) do
 		if v.mob and v.mob.race then
 			v.mob.race_id = v.mob.race
@@ -334,7 +334,7 @@ end
 -----------------------------------------------------------------------------------
 --Name: refresh_buff_active(bufflist)
 --Args:
----- bufflist (table): List of buffs from get_player()['buffs']
+---- bufflist (table): List of buffs from windower.ffxi.get_player()['buffs']
 -----------------------------------------------------------------------------------
 --Returns:
 ---- buffarr (table)
