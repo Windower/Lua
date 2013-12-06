@@ -1,6 +1,6 @@
 windower.register_event('addon command',function (...)
     term = table.concat({...}, ' ')
-	send_ipc_message(term)
+	windower.send_ipc_message(term)
 end)
 
 windower.register_event('load',function ()

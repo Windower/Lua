@@ -222,15 +222,15 @@ function addon_command(...)
 			com2mess = table.sconcat(args)
 			com2mess = string.gsub(com2mess,"\n","\\\92\110")
 			if comm == 'l2' then
-				send_ipc_message(specialChar.."l2:"..LSname..specialChar..playerName..specialChar..com2mess)
+				windower.send_ipc_message(specialChar.."l2:"..LSname..specialChar..playerName..specialChar..com2mess)
 			elseif comm == 'p2' then
-				send_ipc_message(specialChar.."p2:"..""..specialChar..playerName..specialChar..com2mess)
+				windower.send_ipc_message(specialChar.."p2:"..""..specialChar..playerName..specialChar..com2mess)
 			elseif comm == 't2' then
-				send_ipc_message(specialChar.."t2:"..playerName..specialChar..playerName..specialChar..com2mess)
+				windower.send_ipc_message(specialChar.."t2:"..playerName..specialChar..playerName..specialChar..com2mess)
 			elseif comm == 'r2' then
-				send_ipc_message(specialChar.."r2:"..playerName..specialChar..playerName..specialChar..com2mess)
+				windower.send_ipc_message(specialChar.."r2:"..playerName..specialChar..playerName..specialChar..com2mess)
 			elseif string.first(comm, 1) == 'f' then
-				send_ipc_message(specialChar.."f:"..string.at(comm,2)..specialChar..playerName..specialChar..com2mess)
+				windower.send_ipc_message(specialChar.."f:"..string.at(comm,2)..specialChar..playerName..specialChar..com2mess)
 			end
 		elseif comm == "l" or comm == "p" or comm == "t" or comm == "f" then
 			com2 = args[2]
@@ -522,21 +522,21 @@ windower.register_event('incoming text',function (original, modified, mode)
 	if (mode == 6) then -- linkshell (me)
 		if (string.find(original, "<(%a+)> (.+)")) then
 			a,b,player,message = string.find(original, "<(%a+)> (.+)")
-			send_ipc_message(specialChar.."l:"..LSname..specialChar..player..specialChar..message)
+			windower.send_ipc_message(specialChar.."l:"..LSname..specialChar..player..specialChar..message)
 			showlinkshell[#showlinkshell +1] = " <"..player.."> "..message:strip_format().." "
 			show("linkshell")
 		end
 	elseif (mode == 5) then -- party (me)
 		if (string.find(original, "%((%a+)%) (.+)")) then
 			a,b,player,message = string.find(original, "%((%a+)%) (.+)")
-			send_ipc_message(specialChar.."p:"..""..specialChar..player..specialChar..message)
+			windower.send_ipc_message(specialChar.."p:"..""..specialChar..player..specialChar..message)
 			showparty[#showparty +1] = " ("..player..") "..message:strip_format().." "
 			show("party")
 		end
 	elseif (mode == 4) then -- tell (out)
 		if (string.find(original, ">>(%a+) : (.+)")) then
 			a,b,player,message = string.find(original, ">>(%a+) : (.+)")
-			send_ipc_message(specialChar.."t:"..player..specialChar..playerName..specialChar..message)
+			windower.send_ipc_message(specialChar.."t:"..player..specialChar..playerName..specialChar..message)
 			showtell[#showtell +1] = ">>"..player.." : "..message:strip_format().." "
 			show("tell")
 		end
@@ -544,7 +544,7 @@ windower.register_event('incoming text',function (original, modified, mode)
 	
 	if (string.find(original, "%[(%d+):#(%a+)%](.+): (.+)")) then
 		a,b,channum,chanchan,player,message = string.find(original, "%[(%d+):#(%a+)%](.+): (.+)")
---		send_ipc_message(specialChar.."f:"..player..specialChar..playerName..specialChar..message)
+--		windower.send_ipc_message(specialChar.."f:"..player..specialChar..playerName..specialChar..message)
 		showffochat[#showffochat +1] = " "..original:strip_format():trim().." "
 		show("ffochat")
 	end
@@ -569,16 +569,16 @@ windower.register_event('chat message',function (is_gm, mode, player, message)
 ]]--
 
 	if (mode == 3) then -- tell
-		send_ipc_message(specialChar.."t:"..playerName..specialChar..player..specialChar..message)
+		windower.send_ipc_message(specialChar.."t:"..playerName..specialChar..player..specialChar..message)
 		lastTellFrom = player;
 		showtell[#showtell +1] = player..">> "..message:strip_format().." "
 		show("tell")
 	elseif (mode == 5) then -- linkshell
-		send_ipc_message(specialChar.."l:"..LSname..specialChar..player..specialChar..message)
+		windower.send_ipc_message(specialChar.."l:"..LSname..specialChar..player..specialChar..message)
 		showlinkshell[#showlinkshell +1] = " <"..player.."> "..message:strip_format().." "
 		show("linkshell")
 	elseif (mode == 4) then -- party
-		send_ipc_message(specialChar.."p:"..""..specialChar..player..specialChar..message)
+		windower.send_ipc_message(specialChar.."p:"..""..specialChar..player..specialChar..message)
 		showparty[#showparty +1] = " ("..player..") "..message:strip_format().." "
 		show("party")
 	end

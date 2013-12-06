@@ -139,7 +139,7 @@ function addon_command(...)
 			
 				members = members:update(addTemp)
 				members:save('all')
-				send_ipc_message("blist reload members")
+				windower.send_ipc_message("blist reload members")
 				windower.add_to_chat(160,"Updating "..string.color(args[2],56,160).." entry on "..string.color(_addon.name,55,160)..".")
 			end
 		elseif comm == "qa" then
@@ -163,7 +163,7 @@ function addon_command(...)
 			
 				members = members:update(addTemp)
 				members:save('all')
-				send_ipc_message("blist reload members")
+				windower.send_ipc_message("blist reload members")
 				windower.add_to_chat(160,"Updating "..string.color(string.ucfirst(args[2]),56,160).." entry on "..string.color(_addon.name,55,160)..".")
 			end
 		elseif comm == "remove" or comm == "delete" then
@@ -171,7 +171,7 @@ function addon_command(...)
 				windower.add_to_chat(160,"Removing "..string.color(args[2],56,160).." from "..string.color(_addon.name,55,160)..".")
 				members[args[2]].hidetype = "delete"
 				members:save('all')
-				send_ipc_message("blist reload members")
+				windower.send_ipc_message("blist reload members")
 			else
 				windower.add_to_chat(160,"User "..string.color(args[2],56,160).." not in "..string.color(_addon.name,55,160).." database; cannot remove.")
 			end
@@ -294,7 +294,7 @@ windower.register_event('incoming text',function (original, modified, mode)
 			if nowTime > convertedT and members[name].temptime ~= 0 then
 				members[name].hidetype = "delete"
 				members:save('all')
-				send_ipc_message("blist reload members")
+				windower.send_ipc_message("blist reload members")
 			end
 			
 			if members[name].hidetype == "delete" then
@@ -308,7 +308,7 @@ windower.register_event('incoming text',function (original, modified, mode)
 			else
 				members[name].hidetype = "hard"
 				members:save('all')
-				send_ipc_message("blist reload members")
+				windower.send_ipc_message("blist reload members")
 				modified = ''
 			end
 		end

@@ -18,9 +18,9 @@ windower.register_event('addon command',function (...)
 		if broken_init ~= nil then
 			relevant_msg(table.concat(broken_init,' '))
 		end
-		send_ipc_message(term)
+		windower.send_ipc_message(term)
 	else
-		send_ipc_message(term)
+		windower.send_ipc_message(term)
 	end
 end)
 
