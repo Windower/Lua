@@ -314,7 +314,7 @@ windower.register_event('incoming chunk',function(id,data)
 				if not tf and not_sent_out_equip[i] and not disable_table[i] then
 					local eq = windower.ffxi.get_items().equipment
 					if not_sent_out_equip[i] ~= eq[default_slot_map[i]] then
-						set_equip(not_sent_out_equip[i],i)
+						windower.packets.set_equip(not_sent_out_equip[i],i)
 					end
 					sent_out_equip[i] = not_sent_out_equip[i]
 					not_sent_out_equip[i] = nil

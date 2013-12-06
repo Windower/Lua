@@ -149,7 +149,7 @@ function enable(...)
 			rawset(disable_table,slot_map[v],false)
 			local potential_gear = rawget(not_sent_out_equip,slot_map[v])
 			if potential_gear and not rawget(encumbrance_table,slot_map[v]) then
-				set_equip(potential_gear,slot_map[v])
+				windower.packets.set_equip(potential_gear,slot_map[v])
 				rawset(sent_out_equip,slot_map[v],potential_gear)
 				rawset(not_sent_out_equip,slot_map[v],nil)
 			end
