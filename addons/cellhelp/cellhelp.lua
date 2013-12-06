@@ -44,7 +44,7 @@ local settingtab = nil
 local settings_file = 'data\\settings.xml'
 local settingtab = config.load(settings_file)
 if settingtab == nil then
-	write('No settings file found. Ensure you have a file at data\\settings.xml')
+	print('No settings file found. Ensure you have a file at data\\settings.xml')
 end
 --variables
 	lotorder = ''
@@ -77,7 +77,7 @@ end
 
 function settings_create()
 --	get player's name
-	player = get_player()['name']
+	player = windower.ffxi.get_player()['name']
 --	dynamic players from settings
 	for i=1, #players do
 		playernumber = players[i]
@@ -109,23 +109,23 @@ windower.register_event('addon command',function (...)
 	end
 	if params[1] then
 		if params[1]:lower() == "help" then
-			write('ch help : Shows help message')
-			write('ch pos <x> <y> : Positions the list')
-			write('ch hide : Hides the box')
-			write('ch show : Shows the box')
-			write('ch set [set id] : Loads set from settings file. Default is set1')
-			write('ch mode [lots/nolots] : If mode is changed to nolots, ll will not lot cells automatically.')
+			print('ch help : Shows help message')
+			print('ch pos <x> <y> : Positions the list')
+			print('ch hide : Hides the box')
+			print('ch show : Shows the box')
+			print('ch set [set id] : Loads set from settings file. Default is set1')
+			print('ch mode [lots/nolots] : If mode is changed to nolots, ll will not lot cells automatically.')
 		elseif params[1]:lower() == "pos" then
 			if params[3] then
 				local posx, posy = tonumber(params[2]), tonumber(params[3])
-				tb_set_location('salvage_box', posx, posy)
+				windower.text.set_location('salvage_box', posx, posy)
 			end
 		elseif params[1]:lower() == "start" then
 			initialize()
 		elseif params[1]:lower() == "hide" then
-			tb_set_visibility('salvage_box', false)
+			windower.text.set_visibility('salvage_box', false)
 		elseif params[1]:lower() == "show" then
-			tb_set_visibility('salvage_box', true)
+			windower.text.set_visibility('salvage_box', true)
 		elseif params[1]:lower() == "set" then
 			if params[2] then
 				set = params[2]:lower()
@@ -135,39 +135,39 @@ windower.register_event('addon command',function (...)
 				orderlots()
 				--Populate initial LL
 				lightluggage()
-				send_command('ll profile salvage-'..player..'.txt')
+				windower.send_command('ll profile salvage-'..player..'.txt')
 				initialize()
 			end
 		elseif params[1]:lower() == "mode" then
 			if params[2] == "lots" then
 				mode = params[2]:lower()
-				write('Mode changed to: Cast lots')
+				print('Mode changed to: Cast lots')
 				lightluggage()
 			elseif params[2] == "nolots" then
 				mode = params[2]:lower()
-				write('Mode changed to: Do not cast lots')
+				print('Mode changed to: Do not cast lots')
 				lightluggage()
-			else write('Invalid mode option')
+			else print('Invalid mode option')
 			end
 		elseif params[1]:lower() == "timer" then
 			if params[2] == "start" then
-				send_command('timers c Remaining 6000 up')
+				windower.send_command('timers c Remaining 6000 up')
 			elseif params[2] == "stop" then
-				send_command('timers d Remaining')
+				windower.send_command('timers d Remaining')
 			end
 		end			
 	end
 end)
 
 windower.register_event('load',function ()
-	player = get_player()['name']
-	write('CellHelp loaded.  CellHelp Authors: Cerberus.Balloon and Bahamut.Krizz')
+	player = windower.ffxi.get_player()['name']
+	print('CellHelp loaded.  CellHelp Authors: Cerberus.Balloon and Bahamut.Krizz')
 	mode = settingtab["mode"]
 	--Initial lot setting
 	settings_create()
 	--Populate initial LL
 	lightluggage()
-	send_command('ll profile salvage-'..player..'.txt')
+	windower.send_command('ll profile salvage-'..player..'.txt')
 	initialize()
 end )
 
@@ -228,21 +228,21 @@ function lightluggage()
 end
 
 function initialize()
-	tb_create('salvage_box')
-	tb_set_bg_color('salvage_box',200,30,30,30)
-	tb_set_color('salvage_box',255,200,200,200)
-	tb_set_location('salvage_box',posx,posy)
-	tb_set_visibility('salvage_box',1)
-	tb_set_bg_visibility('salvage_box',1)
-	tb_set_font('salvage_box','Arial',12)
-	tb_set_text('salvage_box',' Lot order:  \n'..lotorder);
+	windower.text.create('salvage_box')
+	windower.text.set_bg_color('salvage_box',200,30,30,30)
+	windower.text.set_color('salvage_box',255,200,200,200)
+	windower.text.set_location('salvage_box',posx,posy)
+	windower.text.set_visibility('salvage_box',1)
+	windower.text.set_bg_visibility('salvage_box',1)
+	windower.text.set_font('salvage_box','Arial',12)
+	windower.text.set_text('salvage_box',' Lot order:  \n'..lotorder);
 end
 
 function checkzone()
 	currentzone = windower.ffxi.get_info()['zone']:lower()
 		if currentzone == 'silver sea remnants' or currentzone == 'zhayolm remnants' or currentzone == 'bhaflau remnants' or currentzone == 'arrapago remnants' then
-			send_command('timers c Remaining 6000 up')
-		else send_command('timers d Remaining')
+			windower.send_command('timers c Remaining 6000 up')
+		else windower.send_command('timers d Remaining')
 		end
 end
 
@@ -274,6 +274,6 @@ windower.register_event('incoming text',function (original, new, color)
 end	)
 
 windower.register_event('unload',function ()
-	tb_delete('salvage_box')
-	send_command('timers d Remaining')
+	windower.text.delete('salvage_box')
+	windower.send_command('timers d Remaining')
 end )

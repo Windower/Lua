@@ -350,7 +350,7 @@ function extdata_to_augment(extdata)
 	flags = extdata:byte(1,2)
 	for j=1,string.len(extdata) do
 		if extdata:byte(j) ~= 0 then
---			add_to_chat(1,tostring(extdata:byte(j)))
+--			windower.add_to_chat(1,tostring(extdata:byte(j)))
 		end
 	end
 	id_1 = extdata:byte(3)+(extdata:byte(4)%8)*256
@@ -366,8 +366,8 @@ function extdata_to_augment(extdata)
 	if id_2 ~= 0 then Augment_2 = unpack_augment(augment_index[id_2],val_2) end
 	if id_3 ~= 0 then Augment_3 = unpack_augment(augment_index[id_3],val_3) end
 	
---	add_to_chat(1,'flags: '..tostring(flags)..'  id/val 1: '..id_1..'/'..val_1..'  id/val 2: '..id_2..'/'..val_2..'  id/val 3: '..id_3..'/'..val_3)
---	add_to_chat(8,'-------------------------------------------')
+--	windower.add_to_chat(1,'flags: '..tostring(flags)..'  id/val 1: '..id_1..'/'..val_1..'  id/val 2: '..id_2..'/'..val_2..'  id/val 3: '..id_3..'/'..val_3)
+--	windower.add_to_chat(8,'-------------------------------------------')
 	
 	return Augment_1,Augment_2,Augment_3
 end

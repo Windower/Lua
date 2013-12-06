@@ -389,7 +389,7 @@ windower.register_event('addon command', function(...)
     local args = T({...})
 
     if args[1] == nil then
-        send_command('reive help')
+        windower.send_command('reive help')
         return
     end
 
@@ -894,7 +894,7 @@ windower.register_event('addon command', function(...)
                 log('The objects\' color has been set.')
             end
         else
-            send_command('reive help')
+            windower.send_command('reive help')
         end
     end
 end)

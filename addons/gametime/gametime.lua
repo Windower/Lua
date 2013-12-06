@@ -246,8 +246,8 @@ function initialize()
 end
 
 function destroy()
-	tb_delete('gametime_time')
-	tb_delete('gametime_day')
+	windower.text.delete('gametime_time')
+	windower.text.delete('gametime_day')
 end
 	
 windower.register_event('load',initialize)
@@ -273,32 +273,32 @@ end
 
 function cb_time()
 	gt.gtt = 'gametime_time'
-	tb_create(gt.gtt)
-	tb_set_bg_border_size(gt.gtt,2)
-	tb_set_bg_color(gt.gtt,settings.time.bg_alpha,settings.time.bg_colorr,settings.time.bg_colorg,settings.time.bg_colorb)
-	tb_set_bg_visibility(gt.gtt,settings.time.visible)
-	tb_set_bold(gt.gtt,true)
-	tb_set_color(gt.gtt,settings.time.alpha,settings.time.colorr,settings.time.colorg,settings.time.colorb)
-	tb_set_location(gt.gtt,settings.time.x,settings.time.y)
-	tb_set_text(gt.gtt,'Loading. . .')
-	tb_set_visibility(gt.gtt,settings.time.visible)
+	windower.text.create(gt.gtt)
+	windower.text.set_bg_border_size(gt.gtt,2)
+	windower.text.set_bg_color(gt.gtt,settings.time.bg_alpha,settings.time.bg_colorr,settings.time.bg_colorg,settings.time.bg_colorb)
+	windower.text.set_bg_visibility(gt.gtt,settings.time.visible)
+	windower.text.set_bold(gt.gtt,true)
+	windower.text.set_color(gt.gtt,settings.time.alpha,settings.time.colorr,settings.time.colorg,settings.time.colorb)
+	windower.text.set_location(gt.gtt,settings.time.x,settings.time.y)
+	windower.text.set_text(gt.gtt,'Loading. . .')
+	windower.text.set_visibility(gt.gtt,settings.time.visible)
 	--Set font type and size for time
-	tb_set_font(gt.gtt,settings.time.font,settings.time.font_size)
+	windower.text.set_font(gt.gtt,settings.time.font,settings.time.font_size)
 end
 
 function cb_day()
 	gt.gtd = 'gametime_day'
-	tb_create(gt.gtd)
-	tb_set_bg_border_size(gt.gtd,2)
-	tb_set_bg_color(gt.gtd,settings.days.bg_alpha,settings.days.bg_colorr,settings.days.bg_colorg,settings.days.bg_colorb)
-	tb_set_bg_visibility(gt.gtd,settings.days.visible)
-	tb_set_bold(gt.gtd,true)
-	tb_set_color(gt.gtd,settings.days.alpha,255,255,255)
-	tb_set_location(gt.gtd,settings.days.x,settings.days.y)
-	tb_set_text(gt.gtd,'')
-	tb_set_visibility(gt.gtd,settings.days.visible)
+	windower.text.create(gt.gtd)
+	windower.text.set_bg_border_size(gt.gtd,2)
+	windower.text.set_bg_color(gt.gtd,settings.days.bg_alpha,settings.days.bg_colorr,settings.days.bg_colorg,settings.days.bg_colorb)
+	windower.text.set_bg_visibility(gt.gtd,settings.days.visible)
+	windower.text.set_bold(gt.gtd,true)
+	windower.text.set_color(gt.gtd,settings.days.alpha,255,255,255)
+	windower.text.set_location(gt.gtd,settings.days.x,settings.days.y)
+	windower.text.set_text(gt.gtd,'')
+	windower.text.set_visibility(gt.gtd,settings.days.visible)
 	--Set font type and size for days 
-	tb_set_font(gt.gtd,settings.days.font,settings.days.font_size)
+	windower.text.set_font(gt.gtd,settings.days.font,settings.days.font_size)
 end
 
 function default_settings()
@@ -315,7 +315,7 @@ function time_change(old, new)
 	-- gt.time = T{gt.basetime:slice(1,(#gt.basetime-2)),gt.basetime:slice((#gt.basetime-1),#gt.basetime)}
 	gt.time = T{gt.hour,gt.minute}
 	gt.dectime = timeconvert(gt.time[1]..':'..gt.time[2])
-	tb_set_text(gt.gtt,gt.time[1]..':'..gt.time[2])
+	windower.text.set_text(gt.gtt,gt.time[1]..':'..gt.time[2])
 end
 
 windower.register_event('time change',time_change)
@@ -331,7 +331,7 @@ function timeconvert2(basetime)
 end
 
 function day_change(day)
---	tb_set_text(gt.gtd,day)
+--	windower.text.set_text(gt.gtd,day)
 	if (day == 'Firesday') then
 		dlist = {'1','2','3','4','5','6','7','8'}
 	elseif (day == 'Earthsday') then
@@ -361,15 +361,15 @@ function day_change(day)
 	gt.day = day
 	
 	gt.WeekReport = daystring
-	tb_set_color(gt.gtd,settings.days.alpha,255,255,255)
-	tb_set_text(gt.gtd,' \\cs'..gt.days[1][10]..gt.MoonPhase..' ('..gt.MoonPct..'%);'..gt.WeekReport)
+	windower.text.set_color(gt.gtd,settings.days.alpha,255,255,255)
+	windower.text.set_text(gt.gtd,' \\cs'..gt.days[1][10]..gt.MoonPhase..' ('..gt.MoonPct..'%);'..gt.WeekReport)
 	moon_change(windower.ffxi.get_info()["moon"])
 end
 windower.register_event('day change',day_change)
 
 function moon_change(moon)
 	gt.MoonPhase = moon
-	tb_set_text(gt.gtd,gt.MoonPhase..' ('..gt.MoonPct..'%);'..gt.WeekReport)
+	windower.text.set_text(gt.gtd,gt.MoonPhase..' ('..gt.MoonPct..'%);'..gt.WeekReport)
 	if settings.moon.change == true then
 		log('Day: '..gt.day..'; Moon: '..gt.MoonPhase..' ('..gt.MoonPct..'%);')
 	end
@@ -379,7 +379,7 @@ windower.register_event('moon change',moon_change)
 
 function moon_pct_change(pct)
 	gt.MoonPct = pct
-	tb_set_text(gt.gtd,gt.MoonPhase..' ('..gt.MoonPct..'%);'..gt.WeekReport)
+	windower.text.set_text(gt.gtd,gt.MoonPhase..' ('..gt.MoonPct..'%);'..gt.WeekReport)
 end
 windower.register_event('moon pct change',moon_pct_change)
 
@@ -433,67 +433,67 @@ windower.register_event('addon command',function (...)
 	
 	---CLI Arguments for Time font Size
 	elseif args[1] == 'timeSize' then
-			tb_set_font(gt.gtt,settings.time.font,args[2])
+			windower.text.set_font(gt.gtt,settings.time.font,args[2])
 			settings.time.font_size = args[2]
 			
 			
 			
 	---CLI Arguments for Time font type
 	elseif args[1] == 'timeFont' then
-			tb_set_font(gt.gtt,args[2],settings.time.font_size)
+			windower.text.set_font(gt.gtt,args[2],settings.time.font_size)
 			settings.time.font = args[2]
 
 			
 			
 	---CLI Arguments for Day font Size
 	elseif args[1] == 'daySize' then
-			tb_set_font(gt.gtd,settings.time.font,args[2])
+			windower.text.set_font(gt.gtd,settings.time.font,args[2])
 			settings.days.font_size = args[2]
 			
 			
 			
 	---CLI Arguments for Day font type
 	elseif args[1] == 'dayFont' then
-			tb_set_font(gt.gtd,args[2],settings.time.font_size)
+			windower.text.set_font(gt.gtd,args[2],settings.time.font_size)
 			settings.days.font = args[2]				
 	
 	
 	
 	elseif args[1] == 'timex' then
-			tb_set_location(gt.gtt,args[2],settings.time.y)
+			windower.text.set_location(gt.gtt,args[2],settings.time.y)
 			settings.time.x = args[2]
 	elseif args[1] == 'timey' then
-			tb_set_location(gt.gtt,settings.time.x,args[2])
+			windower.text.set_location(gt.gtt,settings.time.x,args[2])
 			settings.time.y = args[2]
 	elseif args[1] == 'daysx' then
-			tb_set_location(gt.gtd,args[2],settings.days.y)
+			windower.text.set_location(gt.gtd,args[2],settings.days.y)
 			settings.days.x = args[2]
 	elseif args[1] == 'daysy' then
-			tb_set_location(gt.gtd,settings.days.x,args[2])
+			windower.text.set_location(gt.gtd,settings.days.x,args[2])
 			settings.days.y = args[2]
 	elseif args[1] == 'time' then
 		if args[2] == 'alpha' then
 			inalpha = tostring(args[3]):zfill(3)
 			inalpha = inalpha+0
 			if (inalpha > 0 and inalpha < 256) then
-				tb_set_bg_color(gt.gtt,inalpha,settings.time.bg_colorr,settings.time.bg_colorg,settings.time.bg_colorb)
-				tb_set_color(gt.gtt,inalpha,settings.time.colorr,settings.time.colorg,settings.time.colorb)
+				windower.text.set_bg_color(gt.gtt,inalpha,settings.time.bg_colorr,settings.time.bg_colorg,settings.time.bg_colorb)
+				windower.text.set_color(gt.gtt,inalpha,settings.time.colorr,settings.time.colorg,settings.time.colorb)
 				settings.time.bg_alpha = inalpha
 				settings.time.alpha = inalpha
 				log('Time transparency set to '..inalpha..' ('..math.round(100-(inalpha/2.55),0)..'%).')
 			end
 		elseif args[2] == 'x' or args[2] == 'posx' then
-			send_command('gt timex '..args[3])
+			windower.send_command('gt timex '..args[3])
 		elseif args[2] == 'y' or args[2] == 'posy' then
-			send_command('gt timey '..args[3])
+			windower.send_command('gt timey '..args[3])
 		elseif args[2] == 'hide' then
-			tb_set_visibility(gt.gtt,false)
+			windower.text.set_visibility(gt.gtt,false)
 			settings.time.visible = false
 			log('Time display hidden.')
 		elseif args[2] == 'reset' then
-			tb_set_location(gt.gtt,0,0)
+			windower.text.set_location(gt.gtt,0,0)
 		else
-			tb_set_visibility(gt.gtt,true)
+			windower.text.set_visibility(gt.gtt,true)
 			settings.time.visible = true
 			log('Showing time display.')
 		end
@@ -502,24 +502,24 @@ windower.register_event('addon command',function (...)
 			inalpha = tostring(args[3]):zfill(3)
 			inalpha = inalpha+0
 			if (inalpha > 0 and inalpha < 256) then
-				tb_set_bg_color(gt.gtd,inalpha,settings.days.bg_colorr,settings.days.bg_colorg,settings.days.bg_colorb)
-				tb_set_color(gt.gtd,inalpha,255,255,255)
+				windower.text.set_bg_color(gt.gtd,inalpha,settings.days.bg_colorr,settings.days.bg_colorg,settings.days.bg_colorb)
+				windower.text.set_color(gt.gtd,inalpha,255,255,255)
 				settings.days.bg_alpha = inalpha
 				settings.days.alpha = inalpha
 				log('Days transparency set to '..inalpha..' ('..math.round(100-(inalpha/2.55),0)..'%).')
 			end
 		elseif args[2] == 'x' or args[2] == 'posx' then
-			send_command('gt daysx '..args[3])
+			windower.send_command('gt daysx '..args[3])
 		elseif args[2] == 'y' or args[2] == 'posy' then
-			send_command('gt timey '..args[3])
+			windower.send_command('gt timey '..args[3])
 		elseif args[2] == 'hide' then
-			tb_set_visibility(gt.gtd,false)
+			windower.text.set_visibility(gt.gtd,false)
 			settings.days.visible = false
 			log('Days display hidden.')
 		elseif args[2] == 'reset' then
-			tb_set_location(gt.gtd,100,0)
+			windower.text.set_location(gt.gtd,100,0)
 		else
-			tb_set_visibility(gt.gtd,true)
+			windower.text.set_visibility(gt.gtd,true)
 			settings.days.visible = true
 			log('Showing days display.')
 		end

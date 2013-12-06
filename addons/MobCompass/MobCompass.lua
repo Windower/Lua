@@ -43,7 +43,7 @@ local settings_file = 'data/settings.xml'
 
 windower.register_event('load',function ()
 	info = windower.ffxi.get_info()
-	player = get_player()
+	player = windower.ffxi.get_player()
 
 	defaults = {}
 	defaults.geomode = {}
@@ -63,7 +63,7 @@ windower.register_event('load',function ()
 	settingtab = config.load(defaults)
 	
 	if settingtab == nil then
-		write('No settings file found. Ensure you have a file at data/settings.xml')
+		print('No settings file found. Ensure you have a file at data/settings.xml')
 	end
 	
 	box_name = T()
@@ -71,18 +71,18 @@ windower.register_event('load',function ()
 	
 	for i = 1, 3 do 
 		box_name[i] = 'd'..i
-		tb_create(box_name[i])
-		tb_set_bg_color(box_name[i], 0, settingtab['bg_red'], settingtab['bg_green'], settingtab['bg_blue'])
-		tb_set_bg_visibility(box_name[i], true)
-		tb_set_bold(box_name[i], settingtab['txt_bold'])
-		tb_set_right_justified(box_name[i], false)
-		tb_set_color(box_name[i], 0, settingtab['txt_red'], settingtab['txt_green'], settingtab['txt_blue'])
+		windower.text.create(box_name[i])
+		windower.text.set_bg_color(box_name[i], 0, settingtab['bg_red'], settingtab['bg_green'], settingtab['bg_blue'])
+		windower.text.set_bg_visibility(box_name[i], true)
+		windower.text.set_bold(box_name[i], settingtab['txt_bold'])
+		windower.text.set_right_justified(box_name[i], false)
+		windower.text.set_color(box_name[i], 0, settingtab['txt_red'], settingtab['txt_green'], settingtab['txt_blue'])
 		checktext = T()
 		checktext[i] = ''
 		if i < 3 then
-			tb_set_location(box_name[i], settingtab['x_pos'], settingtab['y_pos'])
+			windower.text.set_location(box_name[i], settingtab['x_pos'], settingtab['y_pos'])
 		else
-			tb_set_location(box_name[i], settingtab['x_pos'], settingtab['y_pos'] - 20)
+			windower.text.set_location(box_name[i], settingtab['x_pos'], settingtab['y_pos'] - 20)
 		end
 	end
 
@@ -93,12 +93,12 @@ windower.register_event('load',function ()
 		
 	if info.logged_in == true then
 		loop = 0
-		write('Commands are:')
-		write('To change Compass style: ')
-		write('Command = " MC mode [thf | geo] "')
-		write('To change Displays while in associated modes: ')
-		write('Geo command : " MC mode geo showbuff "')
-		write('Thf command : " MC mode thf showangle [always | behind | never] "')
+		print('Commands are:')
+		print('To change Compass style: ')
+		print('Command = " MC mode [thf | geo] "')
+		print('To change Displays while in associated modes: ')
+		print('Geo command : " MC mode geo showbuff "')
+		print('Thf command : " MC mode thf showangle [always | behind | never] "')
 		get_target()
 	end
 
@@ -108,7 +108,7 @@ windower.register_event('unload',function ()
 	loop = 1
 	local i = 1
 	for i = 1,3 do
-		tb_delete(box_name[i])
+		windower.text.delete(box_name[i])
 	end
 end)
 
@@ -139,60 +139,60 @@ windower.register_event('addon command',function (...)
 					if broken[3] ~= nil and broken[2] == 'geo' then
 						if broken[3] == 'showbuff' then
 							showbuff = not showbuff
-							write('MC mode geo "showbuff" changed to "'..tostring(showbuff)..'".')
+							print('MC mode geo "showbuff" changed to "'..tostring(showbuff)..'".')
 						else 
-							write('Command "'..broken[3]..'" is not valid.')
-							write('Use "//MC mode geo showbuff" to change display')
+							print('Command "'..broken[3]..'" is not valid.')
+							print('Use "//MC mode geo showbuff" to change display')
 						end
 					elseif broken[3] ~= nil and broken[2] == 'thf' then
 							--print('Thf mode set. Use "//MC mode thf showangle [always | behind | never]" to change display')
 						if broken[3] == 'showangle' and broken[4] ~= nil then
 							if broken[4] == 'always' then
 								showangle = 'always'
-								write('MC mode thf "showangle" changed to "'..showangle..'".')
+								print('MC mode thf "showangle" changed to "'..showangle..'".')
 							elseif broken[4] == 'behind' then
 								showangle = 'behind'
-								write('MC mode thf "showangle" changed to "'..showangle..'".')
+								print('MC mode thf "showangle" changed to "'..showangle..'".')
 							elseif broken[4] == 'never' then
 								showangle = 'never'
-								write('MC mode thf "showangle" changed to "'..showangle..'".')
+								print('MC mode thf "showangle" changed to "'..showangle..'".')
 							else
-								write('Command "'..broken[4]..'" is not valid.')
-								write('Use "//MC mode thf showangle [always | behind | never]" to change display')
+								print('Command "'..broken[4]..'" is not valid.')
+								print('Use "//MC mode thf showangle [always | behind | never]" to change display')
 							end
 						else 
-							write('Command "'..broken[3]..'" is not valid.')
-							write('Use "//MC mode thf showangle [always | behind | never]" to change display')
+							print('Command "'..broken[3]..'" is not valid.')
+							print('Use "//MC mode thf showangle [always | behind | never]" to change display')
 						end
 					end
 				else
-					write('Command "'..broken[2]..'" is not valid.')
-					write('Commands are:')
-					write('Command 1 : //MC mode [thf|geo]')
+					print('Command "'..broken[2]..'" is not valid.')
+					print('Commands are:')
+					print('Command 1 : //MC mode [thf|geo]')
 				end
 			end
 		else
-			write('Command "'..broken[1]..'" is not valid.')
-			write('Commands are:')
-			write('To change Compass style: ')
-			write('Command = " MC mode [thf | geo] "')
-			write('To change Displays while in associated modes: ')
-			write('Geo command : " MC mode geo showbuff "')
-			write('Thf command : " MC mode thf showangle [always | behind | never] "')
+			print('Command "'..broken[1]..'" is not valid.')
+			print('Commands are:')
+			print('To change Compass style: ')
+			print('Command = " MC mode [thf | geo] "')
+			print('To change Displays while in associated modes: ')
+			print('Geo command : " MC mode geo showbuff "')
+			print('Thf command : " MC mode thf showangle [always | behind | never] "')
 		end
 	end
 end)
 
 function get_target()
 	--Player info
-	player = T(get_player())
-	P = T(get_mob_by_id(player.id))
+	player = T(windower.ffxi.get_player())
+	P = T(windower.ffxi.get_mob_by_id(player.id))
 	local Px = P.x_pos
 	local Py = P.y_pos
 	local tb_text = T()
 	
 	-- Target info
-	target = T(get_mob_by_index(player.target_index))
+	target = T(windower.ffxi.get_mob_by_index(player.target_index))
 	target_id = target.id
 	local i = 1
 	for i = 1,3 do
@@ -276,17 +276,17 @@ function get_target()
 	end
 	
 	if loop == 0 then
-		send_command('@wait 0.1;lua i MobCompass get_target')
+		windower.send_command('@wait 0.1;lua i MobCompass get_target')
 	end
 	
 end
 
 function set_tb(alpha,text,tb_number)	
 	tb_number = tonumber(tb_number)
-	tb_set_bg_color(box_name[tb_number], alpha,settingtab['bg_red'], settingtab['bg_green'], settingtab['bg_blue'])
-	tb_set_color(box_name[tb_number], alpha,settingtab['txt_red'], settingtab['txt_green'], settingtab['txt_blue'])
+	windower.text.set_bg_color(box_name[tb_number], alpha,settingtab['bg_red'], settingtab['bg_green'], settingtab['bg_blue'])
+	windower.text.set_color(box_name[tb_number], alpha,settingtab['txt_red'], settingtab['txt_green'], settingtab['txt_blue'])
 	if checktext[tb_number] ~= text then
-		tb_set_text(box_name[tb_number], text)
+		windower.text.set_text(box_name[tb_number], text)
 	end
 end
 

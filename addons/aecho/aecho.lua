@@ -100,7 +100,6 @@ windower.register_event('addon command', function(...)
  6. aecho toggle --Toggles off automatic echo drop usage (in case you need this off. does not remain off across loads.)]]
             for _, line in ipairs(helptext:split('\n')) do
                 windower.add_to_chat(207, line..chat.colorcontrols.reset)
-                sleep(10)
             end
         elseif S{'watch','trackalt','unwatch','sitrack'}:contains(comm) then
             local list = ''

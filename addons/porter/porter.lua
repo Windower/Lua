@@ -134,7 +134,7 @@ function show_slip(slip_number, slip_page, owned_only)
                 local is_contained = player_slip_items:contains(item_id)
 
                 if owned_only == false or owned_only == true and is_contained == true then
-                    add_to_chat(
+                    windower.add_to_chat(
                         55,
                         ('slip '..printable_slip_number..'/page '..tostring(slip_page and slip_page or math.ceil(item_position / 16)):lpad('0', 2)..':'):color(259)..' '..
                         item_names[item_id]:color(is_contained and 258 or 261)

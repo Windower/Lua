@@ -38,7 +38,7 @@ function valid_target(targ)
 		st_flag = false
 		spell_targ = nil
 	elseif pass_through_targs:contains(targ) then
-		local j = get_mob_by_target(targ)
+		local j = windower.ffxi.get_mob_by_target(targ)
 		
 		if j == nil then
 			table.reassign(spelltarget,target)
@@ -46,10 +46,10 @@ function valid_target(targ)
 			table.reassign(spelltarget,target_type(j))
 		end
 		spelltarget.raw = targ
---		add_to_chat(8,'Returning targ! '..targ)
+--		windower.add_to_chat(8,'Returning targ! '..targ)
 		return targ
 	elseif targ then
-		local mob_array = get_mob_array()
+		local mob_array = windower.ffxi.get_mob_array()
 		local lower_targ = targ:lower()
 		for i,v in pairs(mob_array) do
 			if v['name']:lower()==lower_targ and not v['is_npc'] then
@@ -75,7 +75,7 @@ function target_type(mob_table)
 	if not mob_table.id then
 		mob_table.type = 'NONE'
 	else
-		local j = get_party()
+		local j = windower.ffxi.get_party()
 		
 		for i,v in pairs(j) do
 			if v['mob'] then

@@ -30,7 +30,7 @@ end
 -- Returns the element of the storm effect currently on the player. If none present, returns nil.
 function ffxi.get_storm()
     for storm, element in pairs(ffxi.data.elements.storms) do
-        if T(get_player()['buffs']):contains(storm) then
+        if T(windower.ffxi.get_player()['buffs']):contains(storm) then
             return element
         end
     end
@@ -61,22 +61,22 @@ end
 
 -- Returns the target's id.
 function ffxi.target_id(default)
-    return get_mob_by_index(get_player()['target_index'])['id'] or default
+    return windower.ffxi.get_mob_by_index(windower.ffxi.get_player()['target_index'])['id'] or default
 end
 
 -- Returns the target's name.
 function ffxi.target_name(default)
-    return get_mob_by_index(get_player()['target_index'])['name'] or default
+    return windower.ffxi.get_mob_by_index(windower.ffxi.get_player()['target_index'])['name'] or default
 end
 
 -- Returns a name based on an id.
 function ffxi.id_to_name(id)
-    return get_mob_by_id(id)['name']
+    return windower.ffxi.get_mob_by_id(id)['name']
 end
 
 -- Returns a name based on an index.
 function ffxi.index_to_name(index)
-    return get_mob_by_index(index)['name']
+    return windower.ffxi.get_mob_by_index(index)['name']
 end
 
 return ffxi

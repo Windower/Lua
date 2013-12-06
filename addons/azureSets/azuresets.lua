@@ -75,7 +75,7 @@ windower.register_event('job change', function(mj, mjob_id, mjob_lvl, sj, sjob_i
 end)
 
 function set_spells(spellset)
-    if windower.ffxi.get_player()['main_job_id'] ~= 16 --[[and get_player()['sub_job_id'] ~= 16]] then return nil end
+    if windower.ffxi.get_player()['main_job_id'] ~= 16 --[[and windower.ffxi.get_player()['sub_job_id'] ~= 16]] then return nil end
     if settings.spellsets[spellset] == nil then return end
     if settings.spellsets[spellset]:equals(get_current_spellset()) then
         error(spellset..' was already equipped.')
@@ -113,7 +113,7 @@ function set_spells_from_spellset(spellset,slot)
 end
 
 function set_single_spell(spell,slot)
-    if windower.ffxi.get_player()['main_job_id'] ~= 16 --[[and get_player()['sub_job_id'] ~= 16]] then return nil end
+    if windower.ffxi.get_player()['main_job_id'] ~= 16 --[[and windower.ffxi.get_player()['sub_job_id'] ~= 16]] then return nil end
     
     local tmpTable = T(get_current_spellset())
     for key,val in pairs(tmpTable) do
@@ -139,7 +139,7 @@ function set_single_spell(spell,slot)
 end
 
 function get_current_spellset()
-    if windower.ffxi.get_player()['main_job_id'] ~= 16 --[[and get_player()['sub_job_id'] ~= 16]] then return nil end
+    if windower.ffxi.get_player()['main_job_id'] ~= 16 --[[and windower.ffxi.get_player()['sub_job_id'] ~= 16]] then return nil end
     local spellTable = T{}
     local tmpTable = T{}
     if windower.ffxi.get_player()['main_job_id'] == 16 then
@@ -198,7 +198,7 @@ function get_spellset_content(spellset)
 end
 
 windower.register_event('addon command', function(...)
-    if windower.ffxi.get_player()['main_job_id'] ~= 16 --[[and get_player()['sub_job_id'] ~= 16]] then
+    if windower.ffxi.get_player()['main_job_id'] ~= 16 --[[and windower.ffxi.get_player()['sub_job_id'] ~= 16]] then
         error('You are not on (main) Blue Mage.')
         return nil 
     end

@@ -49,29 +49,29 @@ windower.register_event('addon command',function (...)
 	if cmd[1] ~= nil then
 		
 		if cmd[1]:lower() == "help" then
-			write('To stop rolltracker stopping rolls type: //rolltracker autostop')
-			write('To restart rolltracker stopping doubleup type //rolltracker Doubleup')	
+			print('To stop rolltracker stopping rolls type: //rolltracker autostop')
+			print('To restart rolltracker stopping doubleup type //rolltracker Doubleup')	
 		end
 
 		if cmd[1]:lower() == "test" then
-			for buffs, integers in pairs(get_player()['buffs']) do
+			for buffs, integers in pairs(windower.ffxi.get_player()['buffs']) do
 				if integers ~= 255 then
-					add_to_chat(1,integers)
+					windower.add_to_chat(1,integers)
 				end
 				if table.contains(buff_id, integers) then
-					write('equal value detected')
+					print('equal value detected')
 				end
 			end
 		end
 		
 		if cmd[1]:lower() == "autostop" then
 			override=1
-			write('Disabled Autostopping Double Up')
+			print('Disabled Autostopping Double Up')
 		end
 		
 		if cmd[1]:lower() == "doubleup" then
 			override=0
-			write('Enable Autostoppping Doubleup')
+			print('Enable Autostoppping Doubleup')
 		end
 		
 	end
@@ -181,13 +181,13 @@ windower.register_event('action',function (act)
 		effected_member={}
 		bust_rate(rollnum, id)
 		for i=1, #act['targets'] do
-			if act['targets'][i]['id'] == get_player()['id'] then
+			if act['targets'][i]['id'] == windower.ffxi.get_player()['id'] then
 				for i=1, #roll_id do
 					if roller == roll_id[i] then
 						for n=1, #act['targets'] do
-							for z in pairs(get_party()) do
-								if get_party()[z]['mob'] ~= nil then
-									if act['targets'][n]['id'] == get_party()[z]['mob']['id'] then	
+							for z in pairs(windower.ffxi.get_party()) do
+								if windower.ffxi.get_party()[z]['mob'] ~= nil then
+									if act['targets'][n]['id'] == windower.ffxi.get_party()[z]['mob']['id'] then	
 										effected_member[n]=player_color[z]..get_party()[z]['name']..chat.colorcontrols.reset
 									end
 								end
@@ -205,11 +205,11 @@ windower.register_event('action',function (act)
 						if #effected_member > 0 then
 							if rollnum == roll_luck[i] or rollnum == 11 then 
 								luckyroll = 1
-								add_to_chat(1, effectednumber..effected_write..chat.colorcontrols.reset..' '..symbolnum['implies']..' '..roll_ident[tostring(roller)]..' Roll '..symbolnum['circle'..rollnum]..string.char(31,158)..' (Lucky!)'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
+								windower.add_to_chat(1, effectednumber..effected_write..chat.colorcontrols.reset..' '..symbolnum['implies']..' '..roll_ident[tostring(roller)]..' Roll '..symbolnum['circle'..rollnum]..string.char(31,158)..' (Lucky!)'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
 							elseif rollnum==12 and #effected_member > 0 then
-								add_to_chat(1, string.char(31,167)..effectednumber..'Bust! '..chat.colorcontrols.reset..symbolnum['implies']..' '..effected_write..' '..symbolnum['implies']..' ('..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')')
+								windower.add_to_chat(1, string.char(31,167)..effectednumber..'Bust! '..chat.colorcontrols.reset..symbolnum['implies']..' '..effected_write..' '..symbolnum['implies']..' ('..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')')
 							else
-								add_to_chat(1, effectednumber..effected_write..chat.colorcontrols.reset..' '..symbolnum['implies']..' '..roll_ident[tostring(roller)]..' Roll '..symbolnum['circle'..rollnum]..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
+								windower.add_to_chat(1, effectednumber..effected_write..chat.colorcontrols.reset..' '..symbolnum['implies']..' '..roll_ident[tostring(roller)]..' Roll '..symbolnum['circle'..rollnum]..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
 							end
 						end
 					end
@@ -220,7 +220,7 @@ windower.register_event('action',function (act)
 end)
 
 function bust_rate(num, main)
-	if num <= 5 or num == 11 or main ~= get_player()['id'] or settings.bust == 0 then
+	if num <= 5 or num == 11 or main ~= windower.ffxi.get_player()['id'] or settings.bust == 0 then
 		bustrate = ''
 	else 
 		bustrate = '\7  [Chance to Bust]: '..string.format("%.1f",(num-5)*16.67)..'%'
@@ -231,9 +231,9 @@ end
 test=0
 
 windower.register_event('outgoing text',function (original, modified)
-	if original:find('/jobability \"Double.*Up') and luckyroll == 1 and override == 0 and id == get_player()['id'] then
+	if original:find('/jobability \"Double.*Up') and luckyroll == 1 and override == 0 and id == windower.ffxi.get_player()['id'] then
 		modified=''
-		add_to_chat(159,'Attempting to Doubleup on a Lucky Roll: Re-double up to continue.')
+		windower.add_to_chat(159,'Attempting to Doubleup on a Lucky Roll: Re-double up to continue.')
 		luckyroll=0
 		return modified
 	end
@@ -241,7 +241,7 @@ windower.register_event('outgoing text',function (original, modified)
 	if original:find('/jobability \"Fold') and settings.fold == 1 then
 		a=0
 		
-		for buffs, integers in pairs(get_player()['buffs']) do
+		for buffs, integers in pairs(windower.ffxi.get_player()['buffs']) do
 			if table.contains(buff_id, integers) then
 				a=a+1
 			end
@@ -259,7 +259,7 @@ windower.register_event('outgoing text',function (original, modified)
 			modified=original
 			test=0
 		else
-			add_to_chat(159,'No \'Bust\'. Fold again to continue.')
+			windower.add_to_chat(159,'No \'Bust\'. Fold again to continue.')
 			modified=''
 			test=1
 		end

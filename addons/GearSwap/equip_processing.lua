@@ -44,7 +44,7 @@ function equip_sets(swap_type,val1,val2)
 	table.reassign(equip_order,default_equip_order)
 	table.reassign(equip_list,player.equipment)
 	
-	if debugging >= 2 then add_to_chat(8,swap_type) end
+	if debugging >= 2 then windower.add_to_chat(8,swap_type) end
 	if logging then
 		logit(logfile,'\n\n'..tostring(os.clock)..'(15) equip_sets: '..tostring(swap_type))
 		if val1 then
@@ -62,20 +62,23 @@ function equip_sets(swap_type,val1,val2)
 	end
 
 	if swap_type == 'precast' then
+		if _global.debug_mode then windower.add_to_chat(8,'Gearswap (Debug Mode): Precast '..tostring(val1.name)) end
 		val1.target = spelltarget
 		if type(user_env.precast) == 'function' then user_env.precast(val1,val2) -- User defined function to determine the precast set
-		elseif user_env.precast then add_to_chat(123,'GearSwap: precast() exists but is not a function') end
+		elseif user_env.precast then windower.add_to_chat(123,'GearSwap: precast() exists but is not a function') end
 		if _global.verify_equip and not force_flag then
 			force_flag = true
-			send_command('@wait 1;lua invoke gearswap sender')
+			windower.send_command('@wait 1;lua invoke gearswap sender')
 		end
 	elseif swap_type == 'midcast' then
+		if _global.debug_mode then windower.add_to_chat(8,'Gearswap (Debug Mode): Midcast '..tostring(val1.name)) end
 		val1.target = spelltarget
 		user_env.midcast(val1,val2) -- User defined function to determine the midcast set
 	elseif swap_type == 'aftercast' then
+		if _global.debug_mode then windower.add_to_chat(8,'Gearswap (Debug Mode): Aftercast '..tostring(val1.name)) end
 		if not val1 then val1 = {}
 			if debugging >= 2 then
-				add_to_chat(8,'val1 error')
+				windower.add_to_chat(8,'val1 error')
 			end
 		end
 		val1.target = spelltarget
@@ -83,22 +86,31 @@ function equip_sets(swap_type,val1,val2)
 		spelltarget = nil
 		user_env.aftercast(val1,val2) -- User defined function to determine the aftercast set
 	elseif swap_type == 'pet_midcast' then
+		if _global.debug_mode then windower.add_to_chat(8,'Gearswap (Debug Mode): Pet Midcast '..tostring(val1.name)) end
 		val1.target = spelltarget
 		user_env.pet_midcast(val1,val2) -- User defined function to determine the midcast set
 	elseif swap_type == 'pet_aftercast' then
+		if _global.debug_mode then windower.add_to_chat(8,'Gearswap (Debug Mode): Pet Aftercast '..tostring(val1.name)) end
 		val1.target = spelltarget
 		user_env.pet_aftercast(val1,val2) -- User defined function to determine the aftercast set
 	elseif swap_type == 'status_change' then
+		if _global.debug_mode then windower.add_to_chat(8,'Gearswap (Debug Mode): Status Change '..tostring(val1)..' '..tostring(val2))
+			for i=1,#val2 do
+				windower.add_to_chat(8,'Gearswap (Debug Mode): '..i..' '..string.byte(val2[i]))
+			end
+		end
 		if type(user_env.status_change) == 'function' then user_env.status_change(val1,val2) -- User defined function to determine if sets should change following status change
-		elseif user_env.status_change then add_to_chat(123,'GearSwap: status_change() exists but is not a function') end
+		elseif user_env.status_change then windower.add_to_chat(123,'GearSwap: status_change() exists but is not a function') end
 	elseif swap_type == 'buff_change' then
+		if _global.debug_mode then windower.add_to_chat(8,'Gearswap (Debug Mode): Buff Change '..tostring(val1)..' '..tostring(val2)) end
 		if type(user_env.buff_change) == 'function' then user_env.buff_change(val1,val2) -- User defined function to determine if sets should change following buff change
-		elseif user_env.buff_change then add_to_chat(123,'GearSwap: buff_change() exists but is not a function') end
+		elseif user_env.buff_change then windower.add_to_chat(123,'GearSwap: buff_change() exists but is not a function') end
 	elseif swap_type == 'equip_command' then
 		equip(val1)
 	elseif swap_type == 'self_command' then
+		if _global.debug_mode then windower.add_to_chat(8,'Gearswap (Debug Mode): Self Command '..tostring(val1)) end
 		if type(user_env.self_command) == 'function' then user_env.self_command(val1)
-		elseif user_env.self_command then add_to_chat(123,'GearSwap: self_command() exists but is not a function') end
+		elseif user_env.self_command then windower.add_to_chat(123,'GearSwap: self_command() exists but is not a function') end
 	elseif swap_type == 'delayed' then
 		equip(stored_equip_list)
 	end
@@ -114,7 +126,7 @@ function equip_sets(swap_type,val1,val2)
 	for i,v in pairs(equip_list) do
 		if not slot_map[i] then
 			if debugmode then
-				add_to_chat(123,'GearSwap: Attempting to equip an item in an unrecognized slot ('..tostring(i)..')')
+				windower.add_to_chat(8,'GearSwap (Debug Mode): Attempting to equip an item in an unrecognized slot ('..tostring(i)..')')
 			end
 			equip_list[i] = nil
 		end
@@ -138,7 +150,7 @@ function equip_sets(swap_type,val1,val2)
 			failure_reason = 'KOed'
 		end
 		if _global.debug_mode and failure_reason then
-			add_to_chat(8,'Gearswap (Debug Mode): Cannot change gear right now: '..failure_reason)
+			windower.add_to_chat(8,'Gearswap (Debug Mode): Cannot change gear right now: '..failure_reason)
 		end
 	end
 	
@@ -152,9 +164,9 @@ function equip_sets(swap_type,val1,val2)
 				else
 					out_str = out_str..'  Emptying slot'
 				end
-				add_to_chat(8,'Gearswap: '..out_str)
+				windower.add_to_chat(8,'Gearswap (Debugging): '..out_str)
 			elseif equip_next[i] and not disable_table[i] and not encumbrance_table[i] then
-				set_equip(equip_next[i],i)
+				windower.packets.set_equip(equip_next[i],i)
 				sent_out_equip[i] = equip_next[i] -- re-make the equip_next table with the name sent_out_equip as the equipment is sent out.
 			elseif equip_next[i] then --and not disable_table[i] then
 				not_sent_out_equip[i] = equip_next[i]
@@ -230,7 +242,7 @@ function to_id_set(inventory,equip_list)
 						end
 						if v == empty then
 						elseif not name then
-							add_to_chat(123,'Gearswap: Invalid name found. ('..tostring(v)..')')
+							windower.add_to_chat(123,'Gearswap: Invalid name found. ('..tostring(v)..')')
 						elseif r_items[m['id']][language..'_log']:lower() == name:lower() or r_items[m['id']][language]:lower() == name:lower() then
 							if not get_wearable(jobs[player.main_job],tonumber('0x'..r_items[m.id].jobs)) then
 								equip_list[i] = name..' (cannot be worn by this job)'
@@ -270,8 +282,8 @@ function to_id_set(inventory,equip_list)
 	
 	if _global.debug_mode then
 		for i,v in pairs(equip_list) do
-			if type(v) == 'string' and v ~= '' then
-				add_to_chat(8,'GearSwap (Debug Mode): '..i..' - '..v)
+			if type(v) == 'string' and v ~= 'empty' and v~='' then
+				windower.add_to_chat(8,'GearSwap (Debug Mode): Unhandled slot '..i..' - '..v)
 			end
 		end
 	end
@@ -291,7 +303,7 @@ function reorder(order,i)
 		equip_order[temp_order] = equip_order[order]
 		equip_order[order] = slot_map[i]
 	elseif order then
-		add_to_chat(123,'Gearswap: Invalid order given')
+		windower.add_to_chat(123,'Gearswap: Invalid order given')
 	end
 end
 
@@ -331,15 +343,15 @@ end
 
 function send_check(val)
 	if not _global.cancel_spell then
---		write('arg1: '..tostring(val and storedcommand)..'  arg2: '..tostring(storedcommand)..' '..tostring(table.length(sent_out_equip))..'  arg3: '..tostring(storedcommand and not _global.verify_equip))
+--		print('arg1: '..tostring(val and storedcommand)..'  arg2: '..tostring(storedcommand)..' '..tostring(table.length(sent_out_equip))..'  arg3: '..tostring(storedcommand and not _global.verify_equip))
 		if (val and storedcommand) or (storedcommand and table.length(sent_out_equip) == 0) or (storedcommand and not _global.verify_equip) then
 			local assemblecommand
 			if not _global.cast_delay or _global.cast_delay == 0 then
 				assemblecommand = '@input /raw '..storedcommand.._global.storedtarget
-				if debugging>=2 then add_to_chat(5,'Undelayed: '..assemblecommand) end
+				if debugging>=2 then windower.add_to_chat(5,'Undelayed: '..assemblecommand) end
 			else
 				assemblecommand = '@wait '.._global.cast_delay..';input /raw '..storedcommand.._global.storedtarget
-				if debugging>=2 then add_to_chat(5,'Delayed: '..assemblecommand) end
+				if debugging>=2 then windower.add_to_chat(5,'Delayed: '..assemblecommand) end
 				_global.cast_delay = nil
 				user_env._global.cast_delay = nil
 			end
@@ -353,10 +365,10 @@ function send_check(val)
 			_global.force_send = false
 			action_sent = true
 			if logging then logit(logfile,'Command Sent: '..assemblecommand..'\n') end
-			send_command(assemblecommand)
+			windower.send_command(assemblecommand)
 		end
 	elseif _global.cancel_spell then
-		if debugging>=2 then add_to_chat(5,'Canceled.') end
+		if debugging>=2 then windower.add_to_chat(5,'Canceled.') end
 		user_env.storedcommand = nil
 		user_env._global.storedtarget = nil
 		user_env._global.cast_delay = nil

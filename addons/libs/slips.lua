@@ -110,7 +110,7 @@ function slips.player_has_item(id)
         return false
     end
 
-    local items = get_items()
+    local items = windower.ffxi.get_items()
 
     for _, storage in ipairs(slips.default_storages) do
         for _, item in ipairs(items[storage]) do
@@ -139,7 +139,7 @@ function slips.get_player_items()
         slips_items[slip_id] = L{}
     end
 
-    local items = get_items()
+    local items = windower.ffxi.get_items()
 
     for _, storage in ipairs(slips.default_storages) do
         for _, item in ipairs(items[storage]) do

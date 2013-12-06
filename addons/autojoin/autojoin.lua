@@ -49,7 +49,7 @@ end
 -- Invite handler
 windower.register_event('party invite', function(sender)
     if settings.autodecline and settings.blacklist:contains(sender) then
-        send_command('input /decline')
+        windower.send_command('input /decline')
         notice('Blacklisted invite from '..sender..' blocked.')
         return
     end
@@ -64,10 +64,10 @@ end)
 function try_join()
     if try then
         if not blocked_statuses:contains(windower.ffxi.get_player().status) and table.empty(windower.ffxi.get_items().treasure) then
-            send_command('input /join')
+            windower.send_command('input /join')
             reset()
         else
-            send_command('@wait 1; lua i autojoin try_join')
+            windower.send_command('@wait 1; lua i autojoin try_join')
         end
     end
 end

@@ -78,21 +78,21 @@ windower.register_event('addon command',function (...)
 				end
 				windower.add_to_chat(122,'Colors Tested!')
 			elseif splitarr[2]:lower() == 'help' then
-				write('   :::   '.._addon.name..' ('.._addon.version..'   :::')
-				write('Toggles: (* subtoggles)')
-				write(' 1. simplify --- Condenses battle text using custom messages, Default = True')
-				write(' 2. condensetargets --- Collapse similar messages with multiple targets, Default = True')
-				write('    * targetnumber --- Toggle target number display, Default = True')
-				write('    * oxford --- Toggle use of oxford comma, Default = True')
-				write('    * commamode --- Toggle comma-only mode, Default = False')
-				write(' 3. condensedamage --- Condenses damage messages within attack rounds, Default = True')
-				write('    * swingnumber --- Condenses damage messages within attack rounds, Default = True')
-				write(' 4. cancelmulti --- Cancles multiple consecutive identical lines, Default = True')
-				write('Utilities:')
-				write(' 1. colortest --- Shows the 509 possible colors for use with the settings file')
-				write(' 2. reload --- Reloads the settings file')
-				write(' 3. unload --- Unloads battlemod')
-				write(' 4. help --- shows this menu')
+				print('   :::   '.._addon.name..' ('.._addon.version..'   :::')
+				print('Toggles: (* subtoggles)')
+				print(' 1. simplify --- Condenses battle text using custom messages, Default = True')
+				print(' 2. condensetargets --- Collapse similar messages with multiple targets, Default = True')
+				print('    * targetnumber --- Toggle target number display, Default = True')
+				print('    * oxford --- Toggle use of oxford comma, Default = True')
+				print('    * commamode --- Toggle comma-only mode, Default = False')
+				print(' 3. condensedamage --- Condenses damage messages within attack rounds, Default = True')
+				print('    * swingnumber --- Condenses damage messages within attack rounds, Default = True')
+				print(' 4. cancelmulti --- Cancles multiple consecutive identical lines, Default = True')
+				print('Utilities:')
+				print(' 1. colortest --- Shows the 509 possible colors for use with the settings file')
+				print(' 2. reload --- Reloads the settings file')
+				print(' 3. unload --- Unloads battlemod')
+				print(' 4. help --- shows this menu')
 			end
 		end
 	end
@@ -152,7 +152,7 @@ function options_load()
 	
 	if not file.exists('data\\settings.xml') then
 		settingsFile:write(default_settings)
-		write('Default settings xml file created')
+		print('Default settings xml file created')
 	end
 	
 	local settingtab = config.load('data\\settings.xml',default_settings_table)
@@ -164,7 +164,7 @@ function options_load()
 	
 	if not file.exists('data\\filters\\filters.xml') then
 		filterFile:write(default_filters)
-		write('Default filters xml file created')
+		print('Default filters xml file created')
 	end
 	local tempplayer = windower.ffxi.get_player()
 	if tempplayer then
@@ -180,7 +180,7 @@ function options_load()
 	end
 	if not file.exists('data\\colors.xml') then
 		colorsFile:write(default_colors)
-		write('Default colors xml file created')
+		print('Default colors xml file created')
 	end
 	local colortab = config.load('data\\colors.xml',default_color_table)
 	config.save(colortab)
@@ -322,7 +322,7 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 			end
 		end
 --		if react:sub(1) ~= data:sub(1,#react) then
---			write('REACT does not match up')
+--			print('REACT does not match up')
 --		end
 		while #react < #data do
 			react = react..data:sub(#react+1,#react+1)
@@ -446,7 +446,7 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 		elseif debugging then 
 		-- 38 is the Skill Up message, which (interestingly) uses all the number params.
 		-- 202 is the Time Remaining message, which (interestingly) uses all the number params.
-			write('debug_EAM#'..am.message_id..': '..dialog[am.message_id][language]..' '..am.param_1..'   '..am.param_2..'   '..am.param_3)
+			print('debug_EAM#'..am.message_id..': '..dialog[am.message_id][language]..' '..am.param_1..'   '..am.param_2..'   '..am.param_3)
 		end
 		if not am.message_id then
 			return true
@@ -523,7 +523,7 @@ function assemble_bit_packed(init,val,initial_length,final_length,debug_val)
 		init = init:sub(1,#init-1) -- Take off the active byte
 	end
 	out_val = out_val + val*2^bits -- left-shift val by the appropriate amount and add it to the remainder (now the lsb-s in val)
-	if debug_val then write(out_val..' '..#init) end
+	if debug_val then print(out_val..' '..#init) end
 	
 	while out_val > 0 do
 		init = init..string.char(out_val%256)

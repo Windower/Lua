@@ -5,7 +5,7 @@ require 'mathhelper'
 windower.register_event('load',function()
 	indyarr = {'00','10','20','30','40','50','60','70','80','90','A0','B0','C0','D0','E0','F0','G0','H0','I0','J0','K0'}
 	f = io.open(windower.addon_path..'data/'..tostring(os.clock())..'.log','w+')
-	write(tostring(f))
+	print(tostring(f))
 	incoming = packets.data.incoming
 	outgoing = packets.data.outgoing
 	verbose = true
@@ -13,11 +13,11 @@ windower.register_event('load',function()
 	outgoing_bl = T{0x015,0x0B5,0x050}
 	--incoming_record_only = 0x038
 	--outgoing_record_only = 0x50
-	local player = get_player()
+	local player = windower.ffxi.get_player()
 	local petstuff = ''
-	if get_mob_by_id(player['id'])['pet_index'] ~= 0 then
-		write(get_mob_by_id(player['id'])['pet_index'])
-		local petinfo = get_mob_by_index(get_mob_by_id(player['id'])['pet_index'])
+	if windower.ffxi.get_mob_by_id(player['id'])['pet_index'] ~= 0 then
+		print(windower.ffxi.get_mob_by_id(player['id'])['pet_index'])
+		local petinfo = windower.ffxi.get_mob_by_index(windower.ffxi.get_mob_by_id(player['id'])['pet_index'])
 		petstuff = ' Pet ID: '..Dec2Hex(petinfo['id'])..' Pet Index: '..Dec2Hex(petinfo['index'])
 	end
 	f:write('Player ID: '..Dec2Hex(player['id'])..' Index: '..Dec2Hex(player['index'])..petstuff..'\n\n')
@@ -95,7 +95,7 @@ function write_packet(packet_type,array,id,data)
 		local assemble = tostring(os.date('%H:%M:%S'))..'  Unidentified '..packet_type..' Packet:'..(Dec2Hex(id) or 'nil')..' Length:'..length..' Sequence:'..sequence..' Content:\n'..(str2hex(content) or 'nil')
 		f:write(assemble..'\n\n')
 		f:flush()
-		add_to_chat(8,assemble)
+		windower.add_to_chat(8,assemble)
 	elseif verbose then
 		f:write(tostring(os.date('%H:%M:%S'))..'  '..packet_type..' Packet: '..array[id].name..' Content: \n'..(str2hex(content) or 'nil')..'\n\n')
 		f:flush()

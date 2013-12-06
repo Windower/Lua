@@ -41,8 +41,8 @@ windower.register_event('load',function ()
 	Idle_Set = ' '
 	TH_ON = 0
 	TP_ON = 0
-	add_to_chat(17, 'SATACast v' .. version .. ' loaded.     Author:  Banggugyangu')
-	add_to_chat(17, 'Attempting to load settings from file.')
+	windower.add_to_chat(17, 'SATACast v' .. version .. ' loaded.     Author:  Banggugyangu')
+	windower.add_to_chat(17, 'Attempting to load settings from file.')
 	options_load()
 	
 end)
@@ -62,8 +62,8 @@ function options_load()
 		g:write('SA Set: SneakAttack\nTA Set: TrickAttack\nSATA Set: SATA\nTP Set: TP\nTH Set: TreasureHunter\nIdle Set: Movement\n')
 		g:close()
 		
-		write('Default settings file created')
-		add_to_chat(17,'SATACast created a settings file and loaded!')
+		print('Default settings file created')
+		windower.add_to_chat(17,'SATACast created a settings file and loaded!')
 	else
 		f:close()
 		for curline in io.lines(windower.addon_path..'data/settings.txt') do
@@ -86,7 +86,7 @@ function options_load()
 				Idle_Set = splat[3]
 			end
 		end
-		add_to_chat(17,'SATACast read from a settings file and loaded!')
+		windower.add_to_chat(17,'SATACast read from a settings file and loaded!')
 	end
 end
 
@@ -113,12 +113,12 @@ function split(msg, match)
 end
 	
 windower.register_event('lose status',function (id, name)
-	local self = get_player()
+	local self = windower.ffxi.get_player()
 	if name == ('Sneak Attack' or 'Trick Attack') then
 		if self.status:lower() == 'engaged' then
-			send_command('sc set ' .. TP_Set)
+			windower.send_command('sc set ' .. TP_Set)
 		elseif self.status:lower() == 'idle' then
-			send_command('sc set ' .. Idle_Set)
+			windower.send_command('sc set ' .. Idle_Set)
 		end
 	end
 end)
@@ -129,17 +129,17 @@ windower.register_event('action',function (act)
 	local actor = act.actor_id
 	local category = act.category
 	local param = act.param
-	local player = get_player()
+	local player = windower.ffxi.get_player()
 	
 	if player.status:lower() == 'engaged' then
 		if actor == (player.id or player.index) then
 			if category == 1 then
 				if TH_ON == 0 then
-					send_command('sc set ' .. TH_Set)
+					windower.send_command('sc set ' .. TH_Set)
 					TH_ON = 1
 				elseif TH_ON == 1 then
 					if TP_ON == 0 then
-						send_command('sc set ' .. TP_Set)
+						windower.send_command('sc set ' .. TP_Set)
 						TP_ON = 1
 					elseif TP_ON == 1 then
 					end
@@ -158,9 +158,9 @@ windower.register_event('addon command',function (...)
 	if splitarr[1]:lower() == 'reload' then
 		options_load()
 	elseif splitarr[1]:lower() == 'help' then
-		add_to_chat(17, 'SATACast  v'..version..'commands:')
-		add_to_chat(17, '//scast [options]')
-		add_to_chat(17, '    reload  - Reloads settings')
-		add_to_chat(17, '    help   - Displays this help text')
+		windower.add_to_chat(17, 'SATACast  v'..version..'commands:')
+		windower.add_to_chat(17, '//scast [options]')
+		windower.add_to_chat(17, '    reload  - Reloads settings')
+		windower.add_to_chat(17, '    help   - Displays this help text')
 	end
 end)

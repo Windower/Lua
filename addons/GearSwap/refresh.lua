@@ -58,7 +58,7 @@ function load_user_files()
 	if user_env then
 		if type(user_env.file_unload)=='function' then user_env.file_unload()
 		elseif user_env.file_unload then
-			add_to_chat(123,'GearSwap: file_unload() is not a function')
+			windower.add_to_chat(123,'GearSwap: file_unload() is not a function')
 		end
 	end
 	
@@ -70,7 +70,7 @@ function load_user_files()
 	
 	user_env = nil
 	
-	if not file_exists(windower.addon_path..'data/'..player['name']..'_'..player.main_job..'.lua') then
+	if not windower.file_exists(windower.addon_path..'data/'..player['name']..'_'..player.main_job..'.lua') then
 		user_env = nil
 		current_job_file = nil
 		return
@@ -85,7 +85,7 @@ function load_user_files()
 		-- Library functions
 		string=string, math=math, table=table, T=T,
 		tostring = tostring, tonumber = tonumber, pairs = pairs,
-		ipairs = ipairs, write=write, add_to_chat=add_to_chat,
+		ipairs = ipairs, print=print, add_to_chat=windower.add_to_chat,
 		send_command=send_cmd_user,windower=user_windower,
 		include=include_user,next=next,lua_base_path=windower.addon_path,empty=empty,
 		
@@ -107,12 +107,12 @@ function load_user_files()
 	
 	-- If the file cannot be loaded, print the error and load the default.
 	if funct == nil then 
-		write('User file problem: '..err)
+		print('User file problem: '..err)
 		current_job_file = nil
 		return
 	else
 		current_job_file = player.main_job
-		write('Loaded your '..player.main_job..' Lua file!')
+		print('Loaded your '..player.main_job..' Lua file!')
 	end
 	
 	setfenv(funct, user_env)
@@ -127,7 +127,7 @@ function load_user_files()
 	if type(user_env.get_sets) == 'function' then
 		user_env.get_sets()
 	elseif user_env.get_sets then
-		add_to_chat(123,'GearSwap: get_sets() is defined but is not a function.')
+		windower.add_to_chat(123,'GearSwap: get_sets() is defined but is not a function.')
 	end
 end
 
@@ -140,7 +140,7 @@ end
 --Returns:
 ---- None
 ----
----- Loads player from get_player().
+---- Loads player from windower.ffxi.get_player().
 ---- Adds in a "job", "race", "equipment", "target", and "subtarget" field
 ---- Also updates "pet" and assigns isvalid and element fields.
 ---- Further converts player.buffs to buffactive.
@@ -148,9 +148,9 @@ end
 -------- of buffs with that name active.
 -----------------------------------------------------------------------------------
 function refresh_player()
-	if not get_player() then return end
+	if not windower.ffxi.get_player() then return end
 	
-	table.reassign(player,get_player())
+	table.reassign(player,windower.ffxi.get_player())
 	for i,v in pairs(player.vitals) do
 		player[i]=v
 	end
@@ -165,7 +165,7 @@ function refresh_player()
 	end
 	player.job = player.main_job..'/'..player.sub_job
 	
-	local player_mob_table = get_mob_by_index(get_player().index)
+	local player_mob_table = windower.ffxi.get_mob_by_index(windower.ffxi.get_player().index)
 	if not player_mob_table then return end
 	
 	
@@ -180,7 +180,7 @@ function refresh_player()
 		player.race = mob_table_races[player.race]
 	end
 	
-	items = get_items()
+	items = windower.ffxi.get_items()
 	local cur_equip = items.equipment -- i = 'head', 'feet', etc.; v = inventory ID (0~80)
 	if sent_out_equip then -- If the swap is not complete, overwrite the current equipment with the equipment that you are swapping to
 		for i,v in pairs(cur_equip) do
@@ -198,14 +198,14 @@ function refresh_player()
 	player.equipment = to_names_set(cur_equip,items.inventory)
 	
 	-- Monster tables for the target and subtarget.
-	player.target = target_type(get_mob_by_target('t'))
+	player.target = target_type(windower.ffxi.get_mob_by_target('t'))
 	
 	if player.target and player.target.race~= nil then
 		player.target.race_id = player.target.race
 		player.target.race = mob_table_races[player.target.race]
 	end
 	
-	player.subtarget = target_type(get_mob_by_target('lastst'))
+	player.subtarget = target_type(windower.ffxi.get_mob_by_target('lastst'))
 	
 	if player.subtarget and player.subtarget.race~= nil then
 		player.subtarget.race_id = player.subtarget.race
@@ -214,7 +214,7 @@ function refresh_player()
 	
 	-- If you have a pet, make a pet table.
 	if player_mob_table.pet_index then
-		table.reassign(pet,get_mob_by_index(player_mob_table.pet_index))
+		table.reassign(pet,windower.ffxi.get_mob_by_index(player_mob_table.pet_index))
 		pet.isvalid = true
 		pet.race_id = pet.race
 		pet.race = nil
@@ -229,7 +229,7 @@ function refresh_player()
 		table.reassign(pet,{isvalid=false})
 	end
 	
-	local ft_table = get_mob_by_target('<ft>')
+	local ft_table = windower.ffxi.get_mob_by_target('<ft>')
 	if ft_table then
 		table.reassign(fellow,ft_table)
 		fellow.isvalid = true
@@ -303,14 +303,14 @@ end
 --Returns:
 ---- None
 ----
----- Takes the mob arrays from get_party() and splits them from p0~5, a10~15, a20~25
+---- Takes the mob arrays from windower.ffxi.get_party() and splits them from p0~5, a10~15, a20~25
 ---- into alliance[1][1~6], alliance[2][1~6], alliance[3][1~6], respectively.
 ---- Also adds a "count" field to alliance (total number of people in alliance) and
 ---- to the individual subtables (total number of people in each party.
 -----------------------------------------------------------------------------------
 function refresh_group_info()
 	local temp_alliance = {[1]={count=0},[2]={count=0},[3]={count=0}}
-	local j = get_party() or {}
+	local j = windower.ffxi.get_party() or {}
 	for i,v in pairs(j) do
 		if v.mob and v.mob.race then
 			v.mob.race_id = v.mob.race
@@ -334,7 +334,7 @@ end
 -----------------------------------------------------------------------------------
 --Name: refresh_buff_active(bufflist)
 --Args:
----- bufflist (table): List of buffs from get_player()['buffs']
+---- bufflist (table): List of buffs from windower.ffxi.get_player()['buffs']
 -----------------------------------------------------------------------------------
 --Returns:
 ---- buffarr (table)

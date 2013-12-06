@@ -49,7 +49,7 @@ _addon.commands = {'gs','gearswap'}
 windower.register_event('load',function()
 	debugging = 0
 	if debugging >= 1 then windower.debug('load') end
-	if dir_exists('../addons/GearSwap/data/logs') then
+	if windower.dir_exists('../addons/GearSwap/data/logs') then
 		logging = false
 		logfile = io.open('../addons/GearSwap/data/logs/NormalLog'..tostring(os.clock())..'.log','w+')
 		logit(logfile,'GearSwap LOGGER HEADER\n')
@@ -60,7 +60,7 @@ windower.register_event('load',function()
 	
 	if world.logged_in then
 		refresh_user_env()
-		if debugging >= 1 then send_command('@unload spellcast;') end
+		if debugging >= 1 then windower.send_command('@unload spellcast;') end
 	end
 end)
 
@@ -78,7 +78,7 @@ windower.register_event('addon command',function (...)
 		if gearswap_disabled then return end
 		if splitup[2] then equip_sets('self_command',_raw.table.concat(splitup,' ',2,#splitup))
 		else
-			add_to_chat(123,'GearSwap: No self command passed.')
+			windower.add_to_chat(123,'GearSwap: No self command passed.')
 		end
 	elseif splitup[1]:lower() == 'equip' and not midaction then
 		if gearswap_disabled then return end
@@ -97,7 +97,7 @@ windower.register_event('addon command',function (...)
 					n = n+1
 				end
 			else
-				add_to_chat(123,'GearSwap: Equip command cannot be completed. That set does not exist.')
+				windower.add_to_chat(123,'GearSwap: Equip command cannot be completed. That set does not exist.')
 				break
 			end
 		end
@@ -109,42 +109,42 @@ windower.register_event('addon command',function (...)
 	elseif splitup[1]:lower() == 'enable' then
 		if splitup[2] and slot_map[splitup[2]:gsub('[^%a]',''):lower()] then
 			enable(splitup[2])
-			write('Gearswap: '..splitup[2]..' enabled.')
+			print('Gearswap: '..splitup[2]..' enabled.')
 		elseif splitup[2] and splitup[2]:lower()=='all' then
 			enable('main','sub','range','ammo','head','neck','lear','rear','body','hands','lring','rring','back','waist','legs','feet')
-			write('Gearswap: All slots enabled.')
+			print('Gearswap: All slots enabled.')
 		elseif gearswap_disabled and not splitup[2] then
 			gearswap_disabled = false
-			write('GearSwap: Enabled')
+			print('GearSwap: Enabled')
 		end
 	elseif splitup[1]:lower() == 'disable' then
 		if splitup[2] and slot_map[splitup[2]:gsub('[^%a]',''):lower()] then
 			disable(splitup[2])
-			write('Gearswap: '..splitup[2]..' disabled.')
+			print('Gearswap: '..splitup[2]..' disabled.')
 		elseif splitup[2] and splitup[2]:lower()=='all' then
 			disable('main','sub','range','ammo','head','neck','lear','rear','body','hands','lring','rring','back','waist','legs','feet')
-			write('Gearswap: All slots disabled.')
+			print('Gearswap: All slots disabled.')
 		elseif not gearswap_disabled and not splitup[2] then
-			write('GearSwap: Disabled')
+			print('GearSwap: Disabled')
 			gearswap_disabled = true
 		end
 	elseif splitup[1]:lower() == 'reload' then
 		refresh_user_env()
 	elseif strip(splitup[1]) == 'debugmode' then
 		_global.debug_mode = not _global.debug_mode
-		write('Debug Mode set to '..tostring(_global.debug_mode)..'.')
+		print('Debug Mode set to '..tostring(_global.debug_mode)..'.')
 	elseif strip(splitup[1]) == 'showswaps' then
 		_global.show_swaps = not _global.show_swaps
-		write('Show Swaps set to '..tostring(_global.show_swaps)..'.')
+		print('Show Swaps set to '..tostring(_global.show_swaps)..'.')
 	else
-		write('command not found')
+		print('command not found')
 	end
 end)
 
 function sender()
 	if not action_sent then
-		write('Forcing Send')
-		if debugging >= 1 then add_to_chat(123,'GearSwap: Had to force the command to send.') end
+		print('Forcing Send')
+		if debugging >= 1 then windower.add_to_chat(123,'GearSwap: Had to force the command to send.') end
 		send_check(true)
 	end
 	force_flag = false
@@ -155,7 +155,7 @@ windower.register_event('outgoing text',function(original,modified)
 	if debugging >= 1 then windower.debug('outgoing text') end
 	if gearswap_disabled then return modified end
 	
-	local temp_mod = convert_auto_trans(modified)
+	local temp_mod = windower.convert_auto_trans(modified)
 	local splitline = split(temp_mod,' ')
 	local command = splitline[1]
 
@@ -179,7 +179,7 @@ windower.register_event('outgoing text',function(original,modified)
 			r_line = r_spells[validabils[language][abil:lower()]['Magic']]
 			r_line.name = r_line[language]
 			if r_line.type == 'BardSong' and r_line.casttime == 8 then
-				refresh_buff_active(get_player().buffs)
+				refresh_buff_active(windower.ffxi.get_player().buffs)
 				if buffactive.pianissimo then
 				-- Handling for the casting time reduction of Pianissimo.
 				-- Note, does not work unless the buff list has been updated.
@@ -198,7 +198,7 @@ windower.register_event('outgoing text',function(original,modified)
 			r_line.type = 'Item'
 			s_type = 'Item'
 		elseif debugging then
-			write('this case should never be hit '..command)
+			print('this case should never be hit '..command)
 		end
 		
 		_global.storedtarget = temptarg
@@ -237,7 +237,7 @@ windower.register_event('incoming text',function(original,modified,color)
 		if type(user_env.aftercast)=='function' then
 			equip_sets('aftercast',{name='Invalid Spell'},{type='Recast'})
 		elseif user_env.aftercast then
-			add_to_chat(123,'GearSwap: aftercast() exists but is not a function')
+			windower.add_to_chat(123,'GearSwap: aftercast() exists but is not a function')
 		end
 	end
 	return modified,color
@@ -263,14 +263,14 @@ windower.register_event('incoming chunk',function(id,data)
 			if spelltarget.id == target_id then
 				midaction = false
 				spelltarget = nil
-	--			add_to_chat(123,'GearSwap: Your prey has been defeated by another player!') -- Temporary
+	--			windower.add_to_chat(123,'GearSwap: Your prey has been defeated by another player!') -- Temporary
 			end
 		end
 		
-		local tempplay = get_player()
+		local tempplay = windower.ffxi.get_player()
 		if actor_id ~= tempplay.id then
 			if tempplay.pet_index then
-				if actor_id ~= get_mob_by_index(tempplay.pet_index)['id'] then
+				if actor_id ~= windower.ffxi.get_mob_by_index(tempplay.pet_index)['id'] then
 					return
 				end
 			else
@@ -284,19 +284,19 @@ windower.register_event('incoming chunk',function(id,data)
 			elseif user_env.aftercast then
 				midaction = false
 				spelltarget = nil
-				add_to_chat(123,'GearSwap: aftercast() exists but is not a function')
+				windower.add_to_chat(123,'GearSwap: aftercast() exists but is not a function')
 			else
 				midaction = false
 				spelltarget = nil
 			end
-		elseif unable_to_use:contains(message_id) then
+		elseif unable_to_use:contains(message_id) and midaction then
 			if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(195) Event Action Message: '..tostring(message_id)..' Interrupt') end
 			if type(user_env.aftercast) == 'function' then
 				equip_sets('aftercast',{name='Interrupt',type='Interrupt'},{type='Recast'})
 			elseif user_env.aftercast then
 				midaction = false
 				spelltarget = nil
-				add_to_chat(123,'GearSwap: aftercast() exists but is not a function')
+				windower.add_to_chat(123,'GearSwap: aftercast() exists but is not a function')
 			else
 				midaction = false
 				spelltarget = nil
@@ -306,19 +306,19 @@ windower.register_event('incoming chunk',function(id,data)
 	
 	
 	if id == 0x01B then
---		add_to_chat(8,'Job Info Packet')
+--		'Job Info Packet'
 		local enc = data:byte(97) + data:byte(98)*256
 		for i=0,15 do
 			local tf = (math.floor( (enc%(2^(i+1))) / 2^i ) == 1) -- Could include the binary library some day if necessary
 			if encumbrance_table[i] ~= tf then
 				if not tf and not_sent_out_equip[i] and not disable_table[i] then
-					local eq = get_items().equipment
+					local eq = windower.ffxi.get_items().equipment
 					if not_sent_out_equip[i] ~= eq[default_slot_map[i]] then
-						set_equip(not_sent_out_equip[i],i)
+						windower.packets.set_equip(not_sent_out_equip[i],i)
 					end
 					sent_out_equip[i] = not_sent_out_equip[i]
 					not_sent_out_equip[i] = nil
---					add_to_chat(123,"Gearswap: Your "..default_slot_map[i]..' are now unlocked.')
+--					windower.add_to_chat(123,"Gearswap: Your "..default_slot_map[i]..' are now unlocked.')
 				end
 				encumbrance_table[i] = tf
 			end
@@ -329,7 +329,7 @@ windower.register_event('incoming chunk',function(id,data)
 				encstr = encstr..default_slot_map[i]..' '
 			end
 		end
-		if encstr ~= 'Gearswap, Encumbered in slots: ' then	add_to_chat(123,encstr) end]]
+		if encstr ~= 'Gearswap, Encumbered in slots: ' then	windower.add_to_chat(123,encstr) end]]
 	end
 
 	if gearswap_disabled then return end
@@ -391,8 +391,8 @@ windower.register_event('outgoing chunk',function(id,data)
 		category = data:byte(12,12)*256+data:byte(11,11)
 		param = data:byte(14,14)*256+data:byte(13,13)
 		_unknown1 = data:byte(16,16)*256+data:byte(15,15)
-		local actor_name = get_mob_by_id(actor_id)['name']
-		local target_name = get_mob_by_index(index)['name']
+		local actor_name = windower.ffxi.get_mob_by_id(actor_id)['name']
+		local target_name = windower.ffxi.get_mob_by_index(index)['name']
 		if category == 3 and not buffactive.silence and not buffactive.mute then -- 3 = Magic
 			abil_name = r_spells[param][language]
 		elseif (category == 7 or category == 25) and not buffactive.amnesia then -- 7 = WS, 25 = Monster skill
@@ -405,15 +405,15 @@ windower.register_event('outgoing chunk',function(id,data)
 		if logging then logit(logfile,'\n\nActor: '..tostring(actor_name)..'  Target: '..tostring(target_name)..'  Category: '..tostring(category)..'  param: '..tostring(abil_name or param)) end
 		if abil_name and not (buffactive.terror or buffactive.sleep or buffactive.stun or buffactive.petrification or buffactive.charm) then
 			midaction = true
-			send_command('@wait 1;lua i gearswap midact')
+			windower.send_command('@wait 1;lua i gearswap midact')
 		elseif user_env and not T{0,2,4,11,13,14,15,18,20}:contains(category) then -- 0 = interacting with an NPC, 2 = engaging, 4 = disengaging from menu, 11 = Homepointing, 12= Unclear?, 13 = getting up from reraise, 14 = fishing, 15 = changing target, 18 = dismounting chocobo, 20 = zoning
-			if not T{3,7,9,16}:contains(category) then add_to_chat(8,'Tell Byrth how you triggered this and this number: '..category) end
+			if not T{3,7,9,16}:contains(category) then windower.add_to_chat(8,'Tell Byrth how you triggered this and this number: '..category) end
 			if type(user_env.aftercast) == 'function' then
 				equip_sets('aftercast',{name='Interrupt',type='Interrupt'},{type='Recast'})
 			elseif user_env.aftercast then
 				midaction = false
 				spelltarget = nil
-				add_to_chat(123,'GearSwap: aftercast() exists but is not a function')
+				windower.add_to_chat(123,'GearSwap: aftercast() exists but is not a function')
 			else
 				midaction = false
 				spelltarget = nil
@@ -430,8 +430,8 @@ windower.register_event('action',function(act)
 	if debugging >= 1 then windower.debug('action') end
 	if gearswap_disabled or act.category == 1 then return end
 	
-	local temp_player = get_player()
-	local temp_player_mob_table = get_mob_by_index(temp_player.index)
+	local temp_player = windower.ffxi.get_player()
+	local temp_player_mob_table = windower.ffxi.get_mob_by_index(temp_player.index)
 	local player_id = temp_player['id']
 	-- Update player info for aftercast costs.
 	player.tp = temp_player.vitals.tp
@@ -440,7 +440,7 @@ windower.register_event('action',function(act)
 	
 	local temp_pet,pet_id
 	if temp_player_mob_table.pet_index then
-		temp_pet = get_mob_by_index(temp_player_mob_table.pet_index)
+		temp_pet = windower.ffxi.get_mob_by_index(temp_player_mob_table.pet_index)
 		if temp_pet then
 			pet_id = temp_pet.id
 		end
@@ -474,7 +474,7 @@ windower.register_event('action',function(act)
 		elseif user_env[prefix..'aftercast'] then
 			midaction = false
 			spelltarget = nil
-			add_to_chat(123,'GearSwap: '..prefix..'aftercast() exists but is not a function')
+			windower.add_to_chat(123,'GearSwap: '..prefix..'aftercast() exists but is not a function')
 		else
 			midaction = false
 			spelltarget = nil
@@ -483,7 +483,7 @@ windower.register_event('action',function(act)
 		if type(user_env[prefix..'midcast']) == 'function' then
 			equip_sets(prefix..'midcast',spell,{type=get_action_type(category)})
 		elseif user_env[prefix..'midcast'] then
-			add_to_chat(123,'GearSwap: '..prefix..'midcast() exists but is not a function')
+			windower.add_to_chat(123,'GearSwap: '..prefix..'midcast() exists but is not a function')
 		end
 	end
 end)
@@ -496,14 +496,14 @@ end)
 		if spelltarget.id == target_id then
 			midaction = false
 			spelltarget = nil
---			add_to_chat(123,'GearSwap: Your prey has been defeated by another player!') -- Temporary
+--			windower.add_to_chat(123,'GearSwap: Your prey has been defeated by another player!') -- Temporary
 		end
 	end
 	
-	local tempplay = get_player()
+	local tempplay = windower.ffxi.get_player()
 	if actor_id ~= tempplay.id then
 		if tempplay.pet_index then
-			if actor_id ~= get_mob_by_index(tempplay.pet_index)['id'] then
+			if actor_id ~= windower.ffxi.get_mob_by_index(tempplay.pet_index)['id'] then
 				return
 			end
 		else
@@ -517,7 +517,7 @@ end)
 		elseif user_env.aftercast then
 			midaction = false
 			spelltarget = nil
-			add_to_chat(123,'GearSwap: aftercast() exists but is not a function')
+			windower.add_to_chat(123,'GearSwap: aftercast() exists but is not a function')
 		else
 			midaction = false
 			spelltarget = nil
@@ -529,7 +529,7 @@ end)
 		elseif user_env.aftercast then
 			midaction = false
 			spelltarget = nil
-			add_to_chat(123,'GearSwap: aftercast() exists but is not a function')
+			windower.add_to_chat(123,'GearSwap: aftercast() exists but is not a function')
 		else
 			midaction = false
 			spelltarget = nil
@@ -567,12 +567,12 @@ end)
 
 windower.register_event('login',function(name)
 	if debugging >= 1 then windower.debug('login '..name) end
-	send_command('@wait 2;lua i gearswap refresh_user_env;')
+	windower.send_command('@wait 2;lua i gearswap refresh_user_env;')
 end)
 
 windower.register_event('day change',function(new,old)
 	if debugging >= 1 then windower.debug('day change') end
-	send_command('@wait 0.5;lua invoke gearswap refresh_ffxi_info')
+	windower.send_command('@wait 0.5;lua invoke gearswap refresh_ffxi_info')
 end)
 
 windower.register_event('weather change',function(new_weather, new_weather_id, old_weather, old_weather_id)
@@ -616,7 +616,6 @@ function get_spell(act)
 		
 		local fields = fieldsearch(dialog[msg_ID][language])
 		
-		add_to_chat(8,spell.recast)
 		if table.contains(fields,'spell') then
 			spell = r_spells[abil_ID]
 			if act.category == 4 then spell.recast = act.recast end

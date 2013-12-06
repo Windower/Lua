@@ -72,7 +72,6 @@ windower.register_event('addon command', function(...)
  4. ffocolor help --Shows this menu.]]
             for _, line in ipairs(helptext:split('\n')) do
                 windower.add_to_chat(207, line..chat.colorcontrols.reset)
-                sleep(10)
             end
         elseif S{'chattab','chatcolor'}:contains(comm) then
             if comm == 'chatcolor' then
@@ -98,7 +97,6 @@ windower.register_event('addon command', function(...)
                 end
                 if counter == 16 or n == 509 then
                     log(line)
-                    sleep(10)
                     counter = 0
                     line = ''
                 end
@@ -110,21 +108,18 @@ windower.register_event('addon command', function(...)
 end)
 
 windower.register_event('incoming text', function(old,new,color,newcolor)
-    local sta,ea,txt = string.find(new,'([^%w]*%[%d+:#[%w_]+%].-:)')
     local stb = string.find(new,'[^%w]*%[%d+:#%w+%]') or string.find(new,'^[^%w]*%[FFOChat%]')
-    if sta ~= nil or stb ~= nil then
+    if stb ~= nil or old:sub(2,8) == 'PrivMsg' then
         if settings.chatTab ~= nil then
             newcolor = chatColors[settings.chatTab]
         end
         new = new:gsub('\r\n','')
         local newsplit = new:split(' ')
-        local restring = ''
-        local spacer = ''
         for it = 1, #newsplit do
             newsplit[it] = newsplit[it]:color(settings.chatColor)
         end
         new = newsplit:concat(' ')
     end
     
-    return new,newcolor
+    return new, newcolor
 end)

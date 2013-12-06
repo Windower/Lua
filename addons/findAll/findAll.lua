@@ -293,7 +293,7 @@ function update()
         return false
     end
 
-    local player_name   = get_player().name
+    local player_name   = windower.ffxi.get_player().name
     local storages_file = file.new(storages_path)
 
     if not storages_file:exists() then

@@ -87,7 +87,7 @@ function get_sets()
 	
 	DaurdSongs = T{'Water Carol','Water Carol II','Ice Carol','Ice Carol II','Herb Pastoral','Goblin Gavotte'}
 	
-	send_command('input /macro book 1;wait .1;input /macro set 1')
+	windower.send_command('input /macro book 1;wait .1;input /macro set 1')
 end
 
 function precast(spell,action)
@@ -99,7 +99,7 @@ function precast(spell,action)
 		end
 		if spell.target.type == 'PLAYER' and not buffactive.pianissimo then
 			cast_delay(1.5)
-			send_command('@input /raw /ja "Pianissimo" <me>')
+			windower.send_command('@input /raw /ja "Pianissimo" <me>')
 		end
 		if buffactive['nightingale'] then
 			equip_song_gear(spell)

@@ -34,7 +34,7 @@ current_r = ''
 windower.register_event('chat message',function (isGM, mode, player, message)
 	if mode==3 and current_r~=player then
 		current_r=player
-		send_command('@alias r input /tell '..current_r)
+		windower.send_command('@alias r input /tell '..current_r)
 	end
 end)
 
@@ -45,7 +45,7 @@ windower.register_event('incoming text',function (original, modified, color)
 			local name = original:sub(10,a-1)
 			if current_r ~= name then
 				current_r = name
-				send_command('@alias r input /pm '..current_r)
+				windower.send_command('@alias r input /pm '..current_r)
 			end
 		end
 	end

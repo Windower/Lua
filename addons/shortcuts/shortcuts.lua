@@ -26,7 +26,7 @@
 
 debugging = false
 logging = false
-if dir_exists('../addons/shortcuts/data/') and logging then
+if windower.dir_exists('../addons/shortcuts/data/') and logging then
 	logfile = io.open('../addons/shortcuts/data/NormalLog'..tostring(os.clock())..'.log','w+')
 	logfile:write('\n\n','SHORTCUTS LOGGER HEADER: ',tostring(os.clock()),'\n')
 	logfile:flush()
@@ -83,7 +83,7 @@ end)
 ---- string, changed command
 -----------------------------------------------------------------------------------
 windower.register_event('outgoing text',function(original,modified)
-	local temp_org = convert_auto_trans(modified)
+	local temp_org = windower.convert_auto_trans(modified)
 	if modified:sub(1,1) ~= '/' then return modified end
 	temp_org = temp_org:gsub(' <wait %d+>','')
 	if logging then
@@ -144,12 +144,12 @@ function command_logic(original,modified)
 		if command2_list[command]==true then -- If there are not any excluded secondary commands
 			local temptarg = valid_target(potential_targ) or target_make({['Player']=true,['Enemy']=true,['Party']=true,['Ally']=true,['NPC']=true,['Self']=true,['Corpse']=true}) -- Complete the target or make one.
 			lastsent = command..' '..temptarg -- Push the command and target together and send it out.
-			if debugging then add_to_chat(8,tostring(counter)..' input '..lastsent) end
+			if debugging then windower.add_to_chat(8,tostring(counter)..' input '..lastsent) end
 			if logging then
 				logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\n(162) ',lastsent) 	
 				logfile:flush()
 			end
-			send_command('@input '..lastsent)
+			windower.send_command('@input '..lastsent)
 			return ''
 		else -- If there are excluded secondary commands (like /pcmd add <name>)
 			local tempcmd = command
@@ -178,12 +178,12 @@ function command_logic(original,modified)
 				temptarg = target_make({['Player']=true,['Enemy']=true,['Party']=true,['Ally']=true,['NPC']=true,['Self']=true,['Corpse']=true})
 			end
 			lastsent = tempcmd..' '..temptarg
-			if debugging then add_to_chat(8,tostring(counter)..' input '..lastsent) end
+			if debugging then windower.add_to_chat(8,tostring(counter)..' input '..lastsent) end
 			if logging then
 				logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\n(193) ',lastsent)
 				logfile:flush()
 			end
-			send_command('@input '..lastsent)
+			windower.send_command('@input '..lastsent)
 			return ''
 		end
 	elseif (command2_list[command] and valid_target(potential_targ,true)) then 
@@ -244,13 +244,13 @@ function interp_text(splitline,offset,modified)
 		local r_line, s_type
 		
 		if validabils[strippedabil].typ == 'r_spells' then
-			if debugging then add_to_chat(8,strippedabil..' is considered a spell.') end
+			if debugging then windower.add_to_chat(8,strippedabil..' is considered a spell.') end
 			r_line = r_spells[validabils[strippedabil].index]
 		elseif validabils[strippedabil].typ == 'r_abilities' then
-			if debugging then add_to_chat(8,strippedabil..' is considered an ability.') end
+			if debugging then windower.add_to_chat(8,strippedabil..' is considered an ability.') end
 			r_line = r_abilities[validabils[strippedabil].index]
 		elseif validabils[strippedabil].typ == 'ambig_names' then
-			if debugging then add_to_chat(8,strippedabil..' is considered ambiguous.') end
+			if debugging then windower.add_to_chat(8,strippedabil..' is considered ambiguous.') end
 			r_line, s_type = ambig(strippedabil)
 		end
 		
@@ -258,19 +258,19 @@ function interp_text(splitline,offset,modified)
 		
 		-- Handling for abilities that change potential targets.
 		if r_line['prefix'] == '/song' or r_line['prefix'] == '/so' then
-			local buffs = get_player()['buffs']
+			local buffs = windower.ffxi.get_player()['buffs']
 			for i,v in pairs(buffs) do
 				if v == 409 then targets['Party'] = true end -- Pianissimo
 			end
 		end
 		
 		lastsent = r_line.prefix..' "'..r_line['english']..'" '..(temptarg or target_make(targets))
-		if debugging then add_to_chat(8,tostring(counter)..' input '..lastsent) end
+		if debugging then windower.add_to_chat(8,tostring(counter)..' input '..lastsent) end
 		if logging then
 			logfile:write('\n\n',tostring(os.clock()),'Original: ',table.concat(splitline,' '),'\n(180) ',lastsent)
 			logfile:flush()
 		end
-		send_command('@input '..lastsent)
+		windower.send_command('@input '..lastsent)
 		return ''
 	end
 	lastsent = ''

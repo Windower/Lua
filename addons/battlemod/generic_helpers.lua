@@ -127,7 +127,7 @@ function colconv(str,key)
 	elseif strnum == 0 then
 		out = rcol
 	else
-		write('You have an invalid color '..key)
+		print('You have an invalid color '..key)
 		out = string.char(0x1F,1)
 	end
 	return out
@@ -135,7 +135,7 @@ end
 
 
 function color_it(to_color,color)
-	if not color and debugging then add_to_chat(8,'Color was invalid.') end
+	if not color and debugging then windower.add_to_chat(8,'Color was invalid.') end
 	if not color or color == 0 then return to_color end
 	
 	if to_color then
@@ -171,7 +171,7 @@ function check_filter(actor,target,category,msg)
 	-- Returns true (don't filter) or false (filter), boolean
 	if not actor.filter or not target.filter then return false end
 	
-	if not filter[actor.filter] and debugging then add_to_chat(8,'Battlemod - Filter Not Recognized: '..tostring(actor.filter)) end
+	if not filter[actor.filter] and debugging then windower.add_to_chat(8,'Battlemod - Filter Not Recognized: '..tostring(actor.filter)) end
 	
 	if actor.filter ~= 'monsters' and actor.filter ~= 'enemies' then
 		if filter[actor.filter]['all']

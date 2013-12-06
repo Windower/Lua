@@ -54,9 +54,9 @@ function options_load()
 		g:write('PetNuke Set: PetNuke\nPetHeal Set: PetHeal\nTP Set: TP\nIdle Set: Movement\n')
 		g:close()
 		
-		write('Default settings file created')
-		add_to_chat(17,'PetSchool created a settings file and loaded!')
-		add_to_chat(17,'Please Modify the Settings file to fit your spellcast .XML file')
+		print('Default settings file created')
+		windower.add_to_chat(17,'PetSchool created a settings file and loaded!')
+		windower.add_to_chat(17,'Please Modify the Settings file to fit your spellcast .XML file')
 	else
 		f:close()
 		for curline in io.lines(windower.addon_path..'data/settings.txt') do
@@ -75,34 +75,34 @@ function options_load()
 				Idle_Set = splat[3]
 			end
 		end
-		add_to_chat(17,'PetSchool read from a settings file and loaded!')
+		windower.add_to_chat(17,'PetSchool read from a settings file and loaded!')
 	end
 end
 
 windower.register_event('action',function (act)
-	local player = get_player()
-	local pet = get_mob_by_index(get_mob_by_index(get_player()['index'])['pet_index'])['id']
+	local player = windower.ffxi.get_player()
+	local pet = windower.ffxi.get_mob_by_index(windower.ffxi.get_mob_by_index(windower.ffxi.get_player()['index'])['pet_index'])['id']
 	local actor = act.actor_id
 	local category = act.category
 	local targets = act.targets
-	local actionTarget = get_mob_by_id(targets[1]['id'])
+	local actionTarget = windower.ffxi.get_mob_by_id(targets[1]['id'])
 	
 	if actor == pet then
 		if category == 8 then
 			if actionTarget.is_npc == true then
-				send_command('sc set ' .. PetNuke)
-				add_to_chat(17, '                       Pet Spellcast Started:  Nuking')
+				windower.send_command('sc set ' .. PetNuke)
+				windower.add_to_chat(17, '                       Pet Spellcast Started:  Nuking')
 			elseif actionTarget.is_npc == false then
-				send_command('sc set ' .. PetHeal)
-				add_to_chat(17, '                       Pet Spellcast Started:  Curing/Buffing')
+				windower.send_command('sc set ' .. PetHeal)
+				windower.add_to_chat(17, '                       Pet Spellcast Started:  Curing/Buffing')
 			end
 		elseif category == 4 then
 			if (player.status:lower() == 'engaged') then
-				send_command('sc set ' .. TP_Set)
-				add_to_chat(17, '                       Pet Spellcast Finished')
+				windower.send_command('sc set ' .. TP_Set)
+				windower.add_to_chat(17, '                       Pet Spellcast Finished')
 			elseif (player.status:lower() == 'idle') then
-				send_command('sc set ' .. Idle_Set)
-				add_to_chat(17, '                       Pet Spellcast Finished')
+				windower.send_command('sc set ' .. Idle_Set)
+				windower.add_to_chat(17, '                       Pet Spellcast Finished')
 			end
 		end
 	end
@@ -137,9 +137,9 @@ windower.register_event('addon command',function (...)
 	if splitarr[1]:lower() == 'reload' then
 		options_load()
 	elseif splitarr[1]:lower() == 'help' then
-		add_to_chat(17, 'PetSchool  v'..version..'commands:')
-		add_to_chat(17, '//ps [options]')
-		add_to_chat(17, '    reload  - Reloads settings')
-		add_to_chat(17, '    help   - Displays this help text')
+		windower.add_to_chat(17, 'PetSchool  v'..version..'commands:')
+		windower.add_to_chat(17, '//ps [options]')
+		windower.add_to_chat(17, '    reload  - Reloads settings')
+		windower.add_to_chat(17, '    help   - Displays this help text')
 	end
 end)

@@ -30,10 +30,10 @@ function sb_output(msg)
     
     if type(msg) == 'table' then
         for _, line in ipairs(msg) do
-            add_to_chat(color, prefix .. line)
+            windower.add_to_chat(color, prefix .. line)
         end
     else
-        add_to_chat(color, prefix .. msg)
+        windower.add_to_chat(color, prefix .. msg)
     end
 end
 
@@ -322,14 +322,14 @@ windower.register_event('login', 'load', function(...)
         showallidps = true,
         resetfilters = true
     })
-    send_command('alias sb lua c scoreboard')
+    windower.send_command('alias sb lua c scoreboard')
     display = Display:new(settings, dps_db)
     reset()
 end)
 
 
 windower.register_event('unload', function()
-    send_command('unalias sb')
+    windower.send_command('unalias sb')
     display:destroy()
 end)
 
@@ -343,8 +343,8 @@ function get_ally_mob_ids()
         if member.mob then
             allies:append(member.mob.id)
             if member.mob.pet_index and member.mob.pet_index> 0 then
-                write('here d')
-                allies:append(get_mob_by_index(member.mob.pet_index).id)
+                print('here d')
+                allies:append(windower.ffxi.get_mob_by_index(member.mob.pet_index).id)
             end
         end
     end

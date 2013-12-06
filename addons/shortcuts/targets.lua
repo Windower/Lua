@@ -41,14 +41,14 @@ function valid_target(targ,flag)
 	local spell_targ
 	-- If the target is whitelisted, pass it through.
 	if pass_through_targs:contains(targ) then
-		if (targ == '<t>' or targ == 't') and get_mob_by_target('<t>').id == get_player().id then
+		if (targ == '<t>' or targ == 't') and windower.ffxi.get_mob_by_target('<t>').id == windower.ffxi.get_player().id then
 			return '<me>'
 		end
 		return targ
-	elseif targ and get_player() then
+	elseif targ and windower.ffxi.get_player() then
 	-- If the target exists, scan the mob array for it
-		local mob_array = get_mob_array()
-		local current_target = get_mob_by_target('<t>')
+		local mob_array = windower.ffxi.get_mob_array()
+		local current_target = windower.ffxi.get_mob_by_target('<t>')
 		local targar = {}
 		for i,v in pairs(mob_array) do
 			targ = percent_strip(targ)
@@ -99,7 +99,7 @@ end
 ---- Created valid target, defaulting to '<me>'
 -----------------------------------------------------------------------------------
 function target_make(targets)
-	local target = get_mob_by_target('<t>')
+	local target = windower.ffxi.get_mob_by_target('<t>')
 	local target_type = ''
 	if not target then
 		-- If target doesn't exist, leave it set to ''. This will shortcircuit the
@@ -111,7 +111,7 @@ function target_make(targets)
 		-- Need to add handling that differentiates 'Enemy' and 'NPC' here.
 	else
 		target_type = 'Ally'
-		local party = get_party()
+		local party = windower.ffxi.get_party()
 		for i,v in pairs(party) do
 			if v.name == target.name then
 				if i:sub(1,1) == 'p' then
@@ -129,6 +129,6 @@ function target_make(targets)
 	if targets[target_type] and target_type ~= 'Self' then
 		return '<t>'
 	end
---	add_to_chat(8,"got to the end "..tostring(target_type))
+--	windower.add_to_chat(8,"got to the end "..tostring(target_type))
 	return '<me>'
 end

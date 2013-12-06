@@ -9,7 +9,7 @@ windower.register_event('addon command',function (...)
     local term = table.concat({...}, ' ')
 	local broken_init = split(term, ' ')
 	local qual = table.remove(broken_init,1)
-	local player = get_player()
+	local player = windower.ffxi.get_player()
 	if qual:lower()==player['name']:lower() then
 		if broken_init ~= nil then
 			relevant_msg(table.concat(broken_init,' '))
@@ -18,9 +18,9 @@ windower.register_event('addon command',function (...)
 		if broken_init ~= nil then
 			relevant_msg(table.concat(broken_init,' '))
 		end
-		send_ipc_message(term)
+		windower.send_ipc_message(term)
 	else
-		send_ipc_message(term)
+		windower.send_ipc_message(term)
 	end
 end)
 
@@ -30,7 +30,7 @@ windower.register_event('ipc message',function (msg)
 	if #broken < 2 then return end
 	
 	local qual = table.remove(broken,1)
-	local player = get_player()
+	local player = windower.ffxi.get_player()
 	if qual:lower()==player["name"]:lower() then
 		relevant_msg(table.concat(broken,' '))
 	end
@@ -75,7 +75,7 @@ function split(msg, match)
 end
 
 function relevant_msg(msg)
-	local player = get_player()
+	local player = windower.ffxi.get_player()
     local st,en,item,tar = string.find(msg,'/item ([%w%s]+) <(%w+)>')
     if item ~= nil then
         msg = '/item "'..item..'" <'..tar..'>'
@@ -92,13 +92,13 @@ function relevant_msg(msg)
 	
 
 	if msg:sub(1,2)=='//' then
-		send_command(msg:sub(3))
+		windower.send_command(msg:sub(3))
 	elseif msg:sub(1,1)=='/' then
-		send_command('input '..msg)
+		windower.send_command('input '..msg)
 	elseif msg:sub(1,3)=='atc' then
-		add_to_chat(55,msg:sub(5))
+		windower.add_to_chat(55,msg:sub(5))
 	else
-		send_command(msg)
+		windower.send_command(msg)
 	end
 
 end

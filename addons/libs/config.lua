@@ -300,7 +300,7 @@ function settings_table(node, confdict, key)
 end
 
 -- Writes the passed config table to the spcified file name.
--- char defaults to get_player()['name']. Set to "all" to apply to all characters.
+-- char defaults to windower.ffxi.get_player()['name']. Set to "all" to apply to all characters.
 function config.save(t, char)
     if char ~= 'all' and not windower.ffxi.get_info().logged_in then
         return

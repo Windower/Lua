@@ -15,7 +15,7 @@ function event_action(act)
         for target in action:get_targets() do -- target iterator
             for subaction in target:get_actions() do -- subaction iterator
                 if subaction.message == 1 then -- 1 is the code for messages
-                    write(string.format("%s hit %s for %d damage",
+                    print(string.format("%s hit %s for %d damage",
                           action:get_actor_name(), target:get_name(), subaction.param))
                 end
             end
@@ -66,7 +66,7 @@ end
 
 -- Returns the name of this actor if there is one
 function action.get_actor_name(self)
-    local mob = get_mob_by_id(self.raw['actor_id'])
+    local mob = windower.ffxi.get_mob_by_id(self.raw['actor_id'])
 
     if mob then
         return mob['name']
@@ -117,7 +117,7 @@ end
 
 -- Returns the name of this target if there is one
 function target.get_name(self)
-    local mob = get_mob_by_id(self.raw['id'])
+    local mob = windower.ffxi.get_mob_by_id(self.raw['id'])
 
     if mob then
         return mob['name']

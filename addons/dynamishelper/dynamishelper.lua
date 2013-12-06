@@ -88,71 +88,71 @@ for i=1, #Currency do
 end
 
 windower.register_event('load',function ()
---	write('event_load function')
- 	player = get_player()['name']
+--	print('event_load function')
+ 	player = windower.ffxi.get_player()['name']
  	obtained = nil
- 	write('Dynamis Helper loaded.  Author: Bahamut.Krizz')
+ 	print('Dynamis Helper loaded.  Author: Bahamut.Krizz')
  	initializebox()
 end)
 
 windower.register_event('addon command',function (...)
---	 write('event_addon_command function')
+--	 print('event_addon_command function')
 	local params = {...};
 	if #params < 1 then
 		return	end
 		if params[1] then
 			if params[1]:lower() == "help" then
-   				write('dh help : Shows help message')
-  				write('dh timer [on/off] : Displays a timer each time a mob is staggered.')
-   				write('dh tracker [on/off/reset/pos x y] : Tracks the amount of currency obtained.')
-				write('dh proc [on/off/pos x y] : Displays the current proc for the targeted mob.')
-   				write('dh ll create : Creates and loads a light luggage profile that will automatically lot all currency.')
+   				print('dh help : Shows help message')
+  				print('dh timer [on/off] : Displays a timer each time a mob is staggered.')
+   				print('dh tracker [on/off/reset/pos x y] : Tracks the amount of currency obtained.')
+				print('dh proc [on/off/pos x y] : Displays the current proc for the targeted mob.')
+   				print('dh ll create : Creates and loads a light luggage profile that will automatically lot all currency.')
 			elseif params[1]:lower() == "timer" then
    				if params[2]:lower() == "on" or params[2]:lower() == "off" then
     				timer = params[2]
-					write('Timer feature is '..timer)
-   				else write("Invalid timer option.")
+					print('Timer feature is '..timer)
+   				else print("Invalid timer option.")
    			end
 		elseif params[1]:lower() == "tracker" then
    			if params[2]:lower() == "on" then
     			tracker = "on"
 				initializebox()
-				tb_set_visibility('dynamis_box',true)
-    			write('Tracker enabled')
+				windower.text.set_visibility('dynamis_box',true)
+    			print('Tracker enabled')
    			elseif params[2]:lower() == "off" then
     			tracker = "off"
-    			tb_set_visibility('dynamis_box',false)
-    			write('Tracker disabled')
+    			windower.text.set_visibility('dynamis_box',false)
+    			print('Tracker disabled')
    			elseif params[2]:lower() == "reset" then
 				for i=1, #Currency do
      				Currency[Currency[i]] = 0
      			end
       			obtainedf()
      	 		initializebox()
-      			write('Tracker reset')
+      			print('Tracker reset')
    			elseif params[2]:lower() == "pos" then
     			if params[3] then
      				trposx, trposy = tonumber(params[3]), tonumber(params[4])
      				obtainedf()
      				initializebox()
-    			else write("Invalid tracker option.")
+    			else print("Invalid tracker option.")
     			end
     		end
   		elseif params[1]:lower() == "ll" then
    			if params[2]:lower() == "create" then
-    			player = get_player()['name']
+    			player = windower.ffxi.get_player()['name']
     			io.open(windower.addon_path..'../../plugins/ll/dynamis-'..player..'.txt',"w"):write('if item is 1452, 1453, 1455, 1456, 1449, 1450 then lot'):close()
-    			send_command('ll profile dynamis-'..player..'.txt')
-   			else write("Invalid light luggage option.")
+    			windower.send_command('ll profile dynamis-'..player..'.txt')
+   			else print("Invalid light luggage option.")
    			end
   	 elseif params[1]:lower() == "proc" then
    			if params[2]:lower() == "on" then
    				proc = params[2]
-   				write('Proc feature enabled.')
+   				print('Proc feature enabled.')
    			elseif params[2]:lower() == "off" then
    		 		proc = params[2]
-    			tb_set_visibility('proc_box',false)
-    			write('Proc feature disabled.')
+    			windower.text.set_visibility('proc_box',false)
+    			print('Proc feature disabled.')
     		elseif params[2]:lower() == "pos" then
    				pposx, pposy = tonumber(params[3]), tonumber(params[4])
    				initializeproc()
@@ -163,12 +163,12 @@ end)
 
 
 windower.register_event('incoming text',function (original, new, color)
---	write('event_incoming_text function')
+--	print('event_incoming_text function')
 	if timer == 'on' then
   		a,b,fiend = string.find(original,"%w+'s attack staggers the (%w+)%!")
    		if fiend == 'fiend' then
 			StaggerCount = StaggerCount + 1
-    		send_command('timers c '..StaggerCount..' 30 down')
+    		windower.send_command('timers c '..StaggerCount..' 30 down')
     		return new, color
     	end
 	end
@@ -199,7 +199,7 @@ windower.register_event('incoming text',function (original, new, color)
 end)
 
 function obtainedf()
---	write('obtainedf function')
+--	print('obtainedf function')
 	obtained = nil
  	for i=1,#Currency do
  		if Currency[Currency[i]] ~= 0 then
@@ -212,7 +212,7 @@ function obtainedf()
 end
 
 function checkzone()
---	write('checkzone function')
+--	print('checkzone function')
 	goodzone = 'no'
 	currentzone = windower.ffxi.get_info()['zone']:lower()
 	for i=1, #ProcZones do
@@ -221,21 +221,21 @@ function checkzone()
 		end
 	end
 	if goodzone == 'no' then
-		tb_set_visibility('proc_box',false)
+		windower.text.set_visibility('proc_box',false)
 	end
 end
 
 function initializebox()
---	write('initializebox function')
+--	print('initializebox function')
 	if obtained ~= nil and tracker == "on" then
- 		tb_create('dynamis_box')
- 		tb_set_bg_color('dynamis_box',200,30,30,30)
- 		tb_set_color('dynamis_box',255,200,200,200)
-		tb_set_location('dynamis_box',trposx,trposy)
- 		tb_set_visibility('dynamis_box',true)
- 		tb_set_bg_visibility('dynamis_box',true)
- 		tb_set_font('dynamis_box','Arial',12)
- 		tb_set_text('dynamis_box',obtained);
+ 		windower.text.create('dynamis_box')
+ 		windower.text.set_bg_color('dynamis_box',200,30,30,30)
+ 		windower.text.set_color('dynamis_box',255,200,200,200)
+		windower.text.set_location('dynamis_box',trposx,trposy)
+ 		windower.text.set_visibility('dynamis_box',true)
+ 		windower.text.set_bg_visibility('dynamis_box',true)
+ 		windower.text.set_font('dynamis_box','Arial',12)
+ 		windower.text.set_text('dynamis_box',obtained);
  	end
 end
 
@@ -247,18 +247,18 @@ windower.register_event('time change',function (...)
 end)
 
 windower.register_event('target change',function (targ_id)
---	write('event_target_change function')
+--	print('event_target_change function')
 	checkzone()
 	if proc == 'on' then
 		if targ_id ~= 0 then
-			mob = get_mob_by_index(targ_id)['name']
+			mob = windower.ffxi.get_mob_by_index(targ_id)['name']
   			setproc()
   		end
  	end
 end)
 
 function setproc()
---	write('setproc function')
+--	print('setproc function')
 	current_proc = 'lolidk'
 	if currenttime == nil or currenttime == '' or currenttime == nil then
 		currenttime = windower.ffxi.get_info()['time']
@@ -270,7 +270,7 @@ function setproc()
 	elseif currenttime >= 16.00 and currenttime <= 23.59 then
   		window = 'night'
  	end
--- 	write(window)
+-- 	print(window)
  	--figure out the stupid mob's proc
  	for i=1, #proctype do
   		for j=1, #staggers[window][proctype[i]] do
@@ -290,23 +290,23 @@ function setproc()
 end
 
 function initializeproc()
---		write('initializeproc function')
-		tb_create('proc_box')
-	 	tb_set_bg_color('proc_box',200,30,30,30)
-	 	tb_set_color('proc_box',255,200,200,200)
-	 	tb_set_location('proc_box',pposx,pposy)
+--		print('initializeproc function')
+		windower.text.create('proc_box')
+	 	windower.text.set_bg_color('proc_box',200,30,30,30)
+	 	windower.text.set_color('proc_box',255,200,200,200)
+	 	windower.text.set_location('proc_box',pposx,pposy)
 	 	if goodzone == 'yes' and proc == 'on' then
-	 	 	tb_set_visibility('proc_box', true)
+	 	 	windower.text.set_visibility('proc_box', true)
 	 	end
-	 	tb_set_bg_visibility('proc_box',1)
-	 	tb_set_font('proc_box','Arial',12)
-	 	tb_set_text('proc_box',' Current proc for \n '..mob..'\n is '..current_proc);
+	 	windower.text.set_bg_visibility('proc_box',1)
+	 	windower.text.set_font('proc_box','Arial',12)
+	 	windower.text.set_text('proc_box',' Current proc for \n '..mob..'\n is '..current_proc);
 	 	if proc == "off" then
-	 		tb_set_visibility('proc_box', false)
+	 		windower.text.set_visibility('proc_box', false)
 	 	end
 end
 
 windower.register_event('unload',function ()
- 	tb_delete('dynamis_box')
- 	tb_delete('proc_box')
+ 	windower.text.delete('dynamis_box')
+ 	windower.text.delete('proc_box')
 end)

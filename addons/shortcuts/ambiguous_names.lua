@@ -29,22 +29,22 @@
 -- For handling ambiguous spells and abilities
  
 function smn_unsub(player_array,spell_ID,abil_ID,mob_ID,info)
-	local abils = get_abilities()
-	if player_array['main_job_id'] == 15 and abils[abil_ID] then --and player_array['main_job_level'] >= info and get_mob_by_target('pet') then
+	local abils = windower.ffxi.get_abilities()
+	if player_array['main_job_id'] == 15 and abils[abil_ID] then --and player_array['main_job_level'] >= info and windower.ffxi.get_mob_by_target('pet') then
 		return 'Ability'
 	end
 	return 'Magic'
 end
  
 function smn_sub(player_array,spell_ID,abil_ID,mob_ID,info) -- Determines ambiguous black magic that can be subbed. Defaults to black magic
-	local abils = get_abilities()
+	local abils = windower.ffxi.get_abilities()
 	if player_array['main_job_id'] == 15 and not (info:contains(player_array['sub_job_id'])) and abils[abil_ID] then
 		return 'Ability' -- Returns the SMN ability if it's a SMN main without a sub that has access to the spell
 	elseif player_array['main_job_id'] == 15 and (info:contains(player_array['sub_job_id'])) then
-		local pet_array = get_mob_by_target('pet')
+		local pet_array = windower.ffxi.get_mob_by_target('pet')
 		local known_spells = windower.ffxi.get_spells()
 		if not pet_array and known_spells[spell_ID] then return 'Magic' end
-		local recasts = get_ability_recasts()
+		local recasts = windower.ffxi.get_ability_recasts()
 		if (info:contains(pet_array['name']) and info:contains('Ward') and recasts[174]<=10) or (info:contains(pet_array['name']) and info:contains('Rage') and recasts[173]<=10) then
 			return 'Ability' -- Returns the SMN ability if it's a SMN main with an appropriate avatar summoned and the BP timer is up.
 		else
@@ -55,7 +55,7 @@ function smn_sub(player_array,spell_ID,abil_ID,mob_ID,info) -- Determines ambigu
 end
 
 function blu_unsub(player_array,spell_ID,abil_ID,mob_ID,info) -- Determines ambiguous blue magic that cannot be subbed. Defaults to spells on BLU.
-	local race = get_mob_by_id(player_array.id).race
+	local race = windower.ffxi.get_mob_by_id(player_array.id).race
 	if mob_ID and race then
 		if race == 0 then 
 			return 'Monster'
@@ -69,10 +69,10 @@ function blu_unsub(player_array,spell_ID,abil_ID,mob_ID,info) -- Determines ambi
 end
 
 function abil_mob(player_array,spell_ID,abil_ID,mob_ID,info) -- Determines ambiguity between monster TP moves and abilities
-	local race = get_mob_by_id(player_array.id).race
+	local race = windower.ffxi.get_mob_by_id(player_array.id).race
 	if mob_ID and race then
-		local abils = get_abilities()
-		local recasts = get_ability_recasts()
+		local abils = windower.ffxi.get_abilities()
+		local recasts = windower.ffxi.get_ability_recasts()
 		if abils[abil_ID] and recasts[r_abilities[abil_ID].index] <= 10 then
 			return 'Ability'
 		elseif race == 0 then
@@ -83,7 +83,7 @@ function abil_mob(player_array,spell_ID,abil_ID,mob_ID,info) -- Determines ambig
 end
 
 function magic_mob(player_array,spell_ID,abil_ID,mob_ID,info) -- Determines ambiguity between monster TP moves and magic
-	local race = get_mob_by_id(player_array.id).race
+	local race = windower.ffxi.get_mob_by_id(player_array.id).race
 	if mob_ID and race then
 		if race == 0 then 
 			return 'Monster'
@@ -93,17 +93,17 @@ function magic_mob(player_array,spell_ID,abil_ID,mob_ID,info) -- Determines ambi
 end
  
 function blu_sub(player_array,spell_ID,abil_ID,mob_ID,info) -- Determines ambiguous blue magic that can be subbed. Defaults to BST ability
-	local race = get_mob_by_id(player_array.id).race
+	local race = windower.ffxi.get_mob_by_id(player_array.id).race
 	if mob_ID and race then
 		if race == 0 then 
 			return 'Monster'
 		end
 	end
-	local abils = get_abilities()
+	local abils = windower.ffxi.get_abilities()
 	if player_array['main_job_id'] == 9 and player_array['sub_job_id'] ~= 16 then
 		return 'Ability' -- Returns the BST ability if it's BST/not-BLU using the spell
 	elseif player_array['main_job_id'] == 9 and player_array['sub_job_id'] == 16 and abils[abil_ID] then
-		local recasts = get_ability_recasts()
+		local recasts = windower.ffxi.get_ability_recasts()
 		if pet_array.tp >= 100 and recasts[255] <= 5400 then -- If your pet has TP and Ready's recast is less than 1.5 minutes
 			return 'Ability'
 		else
@@ -310,7 +310,7 @@ thunderii={spell_ID=165,abil_ID=625,funct=smn_sub,info=T{4,5,8,20,21,'Ramuh','Ra
 function ambig(key)
 	local abil_type
 	if ambig_names[key] == nil then -- If there is no entry for the ambiguous command...
-		write('Shortcuts Bug: '..tostring(key))
+		print('Shortcuts Bug: '..tostring(key))
 		return
 	end
 	if ambig_names[key].absolute then -- If there is absolute remapping, where all commands by that name actually map to one ability...
@@ -319,7 +319,7 @@ function ambig(key)
 		elseif ambig_names[key].mob_ID then return r_abilities[ambig_names[key].mob_ID]
 		end
 	else  -- Otherwise it's actually ambiguous, so run the associated function and pass the known information.
-		abil_type=ambig_names[key]['funct'](get_player(),ambig_names[key].spell_ID,ambig_names[key].abil_ID,ambig_names[key].mob_ID,ambig_names[key].info,ambig_names[key].mob_ID)
+		abil_type=ambig_names[key]['funct'](windower.ffxi.get_player(),ambig_names[key].spell_ID,ambig_names[key].abil_ID,ambig_names[key].mob_ID,ambig_names[key].info,ambig_names[key].mob_ID)
 		if abil_type == 'Ability' then
 			return r_abilities[ambig_names[key].abil_ID],abil_type
 		elseif abil_type == 'Magic' then
