@@ -236,7 +236,7 @@ function get_autoset_content(autoset)
 end
 
 windower.register_event("addon command", function(...)
-    if get_player()['main_job_id'] ~= 18 then
+    if windower.ffxi.get_player()['main_job_id'] ~= 18 then
         error('You are not on Puppetmaster.')
         return nil 
     end

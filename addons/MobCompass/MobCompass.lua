@@ -43,7 +43,7 @@ local settings_file = 'data/settings.xml'
 
 windower.register_event('load',function ()
 	info = windower.ffxi.get_info()
-	player = get_player()
+	player = windower.ffxi.get_player()
 
 	defaults = {}
 	defaults.geomode = {}
@@ -185,7 +185,7 @@ end)
 
 function get_target()
 	--Player info
-	player = T(get_player())
+	player = T(windower.ffxi.get_player())
 	P = T(windower.ffxi.get_mob_by_id(player.id))
 	local Px = P.x_pos
 	local Py = P.y_pos

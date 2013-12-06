@@ -104,8 +104,8 @@ showparty = T{}
 showtell = T{}
 showffochat = T{}
 
-LSname = get_player().linkshell
-playerName = get_player().name
+LSname = windower.ffxi.get_player().linkshell
+playerName = windower.ffxi.get_player().name
 specialChar = "|"
 lastTellFrom = ""
 
@@ -155,8 +155,8 @@ windower.register_event('login',function (name)
 	show("party")
 	show("tell")
 	show("ffochat")
-	LSname = get_player().linkshell;
-	playerName = get_player().name;
+	LSname = windower.ffxi.get_player().linkshell;
+	playerName = windower.ffxi.get_player().name;
 --	add_to_chat(160,"Refreshing data...")
 --	add_to_chat(160,"LSname: "..LSname)
 --	add_to_chat(160,"playerName: "..playerName)
@@ -349,7 +349,7 @@ end
 windower.register_event('addon command',addon_command)
 
 windower.register_event('linkshell change',function (linkshell)
-	LSname = get_player().linkshell;
+	LSname = windower.ffxi.get_player().linkshell;
 end)
 
 function showStatus(var)
@@ -513,10 +513,10 @@ end)
 
 windower.register_event('incoming text',function (original, modified, mode)
 	if (playerName == nil) then
-		playerName = get_player().name
+		playerName = windower.ffxi.get_player().name
 	end
 	if (LSname == nil) then
-		LSname = get_player().linkshell
+		LSname = windower.ffxi.get_player().linkshell
 	end
 
 	if (mode == 6) then -- linkshell (me)

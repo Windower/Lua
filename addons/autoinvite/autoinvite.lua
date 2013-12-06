@@ -106,7 +106,7 @@ function try_invite(player)
 		return
 	end
 	
-	if statusblock:contains(get_player()['status_id']) then
+	if statusblock:contains(windower.ffxi.get_player()['status_id']) then
 		notice(player.. 'cannot be invited - you cannot send an invite at this time (dead, charmed, event).')
 		if settings.tell_back == 'on' then
 			send_command('input /t '..player..' An invite cannot be sent at this time (dead, charmed, event).')

@@ -113,7 +113,7 @@ function split(msg, match)
 end
 	
 windower.register_event('lose status',function (id, name)
-	local self = get_player()
+	local self = windower.ffxi.get_player()
 	if name == ('Sneak Attack' or 'Trick Attack') then
 		if self.status:lower() == 'engaged' then
 			send_command('sc set ' .. TP_Set)
@@ -129,7 +129,7 @@ windower.register_event('action',function (act)
 	local actor = act.actor_id
 	local category = act.category
 	local param = act.param
-	local player = get_player()
+	local player = windower.ffxi.get_player()
 	
 	if player.status:lower() == 'engaged' then
 		if actor == (player.id or player.index) then
