@@ -104,6 +104,36 @@ function str2bool(input)
 end
 
 -----------------------------------------------------------------------------------
+--Name: find_san()
+--Args:
+---- input (string) - Value that might be true or false
+-----------------------------------------------------------------------------------
+--Returns:
+---- boolean or nil. Defaults to nil if input is not true or false.
+-----------------------------------------------------------------------------------
+function find_san(str)
+	if #str == 0 then return str end
+	local op,cl,opadd,last = 0,0,1
+	for i=1,#str do
+		local ch = str:byte(i)
+		if ch == 0x5B then
+			op = op +1
+			opadd = i
+		elseif ch == 0x5D then
+			cl = cl + 1
+		end
+	end
+	if op > cl then
+		if opadd~= #str then
+			str = str..string.char(0x5D)
+		else
+			str = str..str.char(0x7,0x5D)
+		end		-- Close captures
+	end
+	return str
+end
+
+-----------------------------------------------------------------------------------
 --Name: split()
 --Args:
 ---- msg (string): message to be subdivided
