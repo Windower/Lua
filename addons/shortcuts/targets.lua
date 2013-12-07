@@ -40,7 +40,6 @@
 function valid_target(targ,flag)
 	local spell_targ
 	local san_targ = find_san(targ)
-	print(san_targ)
 	-- If the target is whitelisted, pass it through.
 	if pass_through_targs:contains(targ) then
 		if (targ == '<t>' or targ == 't') and windower.ffxi.get_mob_by_target('<t>').id == windower.ffxi.get_player().id then
