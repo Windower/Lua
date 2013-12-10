@@ -39,6 +39,7 @@
 -----------------------------------------------------------------------------------
 function valid_target(targ,flag)
 	local spell_targ
+	local san_targ = find_san(targ)
 	-- If the target is whitelisted, pass it through.
 	if pass_through_targs:contains(targ) then
 		if (targ == '<t>' or targ == 't') and windower.ffxi.get_mob_by_target('<t>').id == windower.ffxi.get_player().id then
@@ -52,7 +53,7 @@ function valid_target(targ,flag)
 		local targar = {}
 		for i,v in pairs(mob_array) do
 			targ = percent_strip(targ)
-			if string.find(v['name']:lower(),targ:lower()) then
+			if string.find(v.name:lower(),san_targ:lower()) then
 				-- Handling for whether it's a monster or not
 				if v.is_npc and current_target then
 					if v.id == current_target.id then
@@ -61,7 +62,7 @@ function valid_target(targ,flag)
 				else
 					targar[v.name] = v.distance
 				end
-			elseif tonumber(targ) == v['id'] then
+			elseif tonumber(targ) == v.id then
 				targar['<lastst>'] = v.distance
 			end
 		end
@@ -75,7 +76,7 @@ function valid_target(targ,flag)
 			-- If targ starts an element of the monster array, use it.
 			local min_dist = 500
 			for i,v in pairs(targar) do
-				if i:lower():find('^'..targ:lower()) then
+				if i:lower():find('^'..san_targ:lower()) then
 					spell_targ = i
 					break
 				end

@@ -14,7 +14,7 @@ windower.register_event('addon command',function (...)
 		if broken_init ~= nil then
 			relevant_msg(table.concat(broken_init,' '))
 		end
-	elseif qual:lower()=='@all' or qual:lower()=='@'..player['main_job']:lower() then
+	elseif qual:lower()=='@all' or qual:lower()=='@'..player.main_job:lower() then
 		if broken_init ~= nil then
 			relevant_msg(table.concat(broken_init,' '))
 		end
@@ -31,12 +31,12 @@ windower.register_event('ipc message',function (msg)
 	
 	local qual = table.remove(broken,1)
 	local player = windower.ffxi.get_player()
-	if qual:lower()==player["name"]:lower() then
+	if qual:lower()==player.name:lower() then
 		relevant_msg(table.concat(broken,' '))
 	end
 	if string.char(qual:byte(1)) == '@' then
 		local arg = string.char(qual:byte(2, qual:len()))
-		if arg:upper() == player["main_job"]:upper() then
+		if arg:upper() == player.main_job:upper() then
 			if broken ~= nil then
 				relevant_msg(table.concat(broken,' '))
 			end
@@ -80,17 +80,19 @@ function relevant_msg(msg)
     if item ~= nil then
         msg = '/item "'..item..'" <'..tar..'>'
     end
-	msg:gsub("<me>", player['name'])
-	msg:gsub("<hp>", tostring(player['hp']))
-	msg:gsub("<mp>", tostring(player['mp']))
-	msg:gsub("<hpp>", tostring(player['hpp']))
-	msg:gsub("<mpp>", tostring(player['mpp']))
-	msg:gsub("<tp>", tostring(player['tp']))
-	msg:gsub("<job>", player['main_job_full']..'/'..player['sub_job_full'])
-	msg:gsub("<mjob>", player['main_job_full'])
-	msg:gsub("<sjob>", player['sub_job_full'])
+	
+	msg:gsub("<me>", tostring(player.name))
+	msg:gsub("<hp>", tostring(player.vitals.hp))
+	msg:gsub("<mp>", tostring(player.vitals.mp))
+	msg:gsub("<hpp>", tostring(player.vitals.hpp))
+	msg:gsub("<mpp>", tostring(player.vitals.mpp))
+	msg:gsub("<tp>", tostring(player.vitals.tp))
+	msg:gsub("<job>", tostring(player.main_job_full)..'/'..tostring(player.sub_job_full))
+	msg:gsub("<mjob>", tostring(player.main_job_full))
+	msg:gsub("<sjob>", tostring(player.sub_job_full))
 	
 
+	
 	if msg:sub(1,2)=='//' then
 		windower.send_command(msg:sub(3))
 	elseif msg:sub(1,1)=='/' then
