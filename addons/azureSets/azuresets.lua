@@ -81,7 +81,7 @@ function set_spells(spellset)
         error(spellset..' was already equipped.')
         return
     end
-    windower.packets.reset_blue_magic_spells()
+    windower.ffxi.reset_blue_magic_spells()
     log('Starting to set '..spellset..'.')
     set_spells_from_spellset(spellset,1)
     return
@@ -97,7 +97,7 @@ function set_spells_from_spellset(spellset,slot)
         for id = 512, spells:length() do
             if spells[id] then
                 if spells[id]['english']:lower() == tempname:lower() then
-                    windower.packets.set_blue_magic_spell(spells[id]['index'], tonumber(slot))
+                    windower.ffxi.set_blue_magic_spell(spells[id]['index'], tonumber(slot))
                     break
                 end
             end
@@ -129,7 +129,7 @@ function set_single_spell(spell,slot)
             if spells[id]['english']:lower() == spell then
                 --This is where single spell setting code goes.
                 --Need to set by spell index rather than name.
-                windower.packets.set_blue_magic_spell(spells[id]['index'], tonumber(slot))
+                windower.ffxi.set_blue_magic_spell(spells[id]['index'], tonumber(slot))
                 windower.send_command('@timers c "Blue Magic Cooldown" 60 up')
                 tmpTable['slot'..slot] = spell
             end
@@ -164,7 +164,7 @@ function get_current_spellset()
 end
 
 function remove_all_spells(trigger)
-    windower.packets.reset_blue_magic_spells()
+    windower.ffxi.reset_blue_magic_spells()
     notice('All spells removed.')
 end
 

@@ -118,7 +118,7 @@ function attach_set(autoset)
             end
         end
     else
-        windower.packets.reset_attachments()
+        windower.ffxi.reset_attachments()
         log('Starting to equip '..autoset..' to '..windower.ffxi.get_mjob_data()['name']..'.')
         set_attachments_from_autoset(autoset, 'head')
     end
@@ -131,7 +131,7 @@ function set_attachments_from_autoset(autoset,slot)
             for id = 8193, 8198 do
                 if atts[id] ~= nil then
                     if atts[id]['english'] == tempHead then
-                        windower.packets.set_attachment(id)
+                        windower.ffxi.set_attachment(id)
                         break
                     end
                 end
@@ -144,7 +144,7 @@ function set_attachments_from_autoset(autoset,slot)
             for id = 8224, 8227 do
                 if atts[id] ~= nil then
                     if atts[id]['english'] == tempFrame then
-                        windower.packets.set_attachment(id)
+                        windower.ffxi.set_attachment(id)
                         break
                     end
                 end
@@ -161,7 +161,7 @@ function set_attachments_from_autoset(autoset,slot)
             for id = 8449, 8680 do
                 if atts[id] ~= nil then
                     if atts[id]['english'] == tempname then
-                        windower.packets.set_attachment(id, tonumber(slot))
+                        windower.ffxi.set_attachment(id, tonumber(slot))
                         break
                     end
                 end
