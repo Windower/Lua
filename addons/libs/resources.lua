@@ -232,8 +232,8 @@ function fns.items()
 
     -- General items
     file = _libs.filehelper.read(plugin_resources..'items_general.xml')
-    match_string = '<i id="(%d-)" enl="([^"]-)" fr="([^"]-)" frl="([^"]-)" de="([^"]-)" del="([^"]-)" jp="([^"]-)" jpl="([^"]-)">([^<]-)</i>'
-    for id, enl, fr, frl, de, del, jp, jpl, en in file:gmatch(match_string) do
+    match_string = '<i id="(%d-)" enl="([^"]-)" fr="([^"]-)" frl="([^"]-)" de="([^"]-)" del="([^"]-)" jp="([^"]-)" jpl="([^"]-)" targets="([%a,%s]-)">([^<]-)</i>'
+    for id, enl, fr, frl, de, del, jp, jpl, targets, en in file:gmatch(match_string) do
         id = tonumber(id)
         res[id] = {
             id = id,
@@ -245,7 +245,7 @@ function fns.items()
             german_full = unquote(del),
             japanese = unquote(jp),
             japanese_full = unquote(jpl),
-            targets = 'None',
+            targets = S(targets:split()):filter(-'None'),
             cast_time = 0,
             category = 'General',
         }
