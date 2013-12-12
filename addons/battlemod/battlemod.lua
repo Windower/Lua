@@ -189,17 +189,14 @@ function options_load()
 	end
 end
 
-windower.register_event('job change',function (mjob,mjob_id,mjob_lvl,sjob,sjob_id,sjob_lvl)
-	if debugging then windower.debug('job change') end
-	filterload(mjob)
-end)
-
 function filterload(job)
 	if Current_job == job then return end
 	if file.exists('data\\filters\\filters-'..job..'.xml') then
+		default_filt = false
 		filter = config.load('data\\filters\\filters-'..job..'.xml',default_filter_table,false)
 		windower.add_to_chat(4,'Loaded '..job..' Battlemod filters')
-	else
+	elseif not default_filt then
+		default_filt = true
 		filter = config.load('data\\filters\\filters.xml',default_filter_table,false)
 		windower.add_to_chat(4,'Loaded default Battlemod filters')
 	end
@@ -466,6 +463,10 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 				windower.add_to_chat(8,'Craftmod: Unhandled result '..tostring(result))
 			end
 		end
+		
+------------- JOB INFO ----------------
+	elseif id == 0x01B then
+		filterload(res.jobs[data:byte(5)].short)
 	end
 end)
 
