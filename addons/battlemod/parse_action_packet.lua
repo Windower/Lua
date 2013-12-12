@@ -34,6 +34,8 @@ function parse_action_packet(act)
 				if not check_filter(act.actor,v.target[1],act.category,m.message) then
 					m.message = 0
 					m.add_effect_message = 0
+				end
+				if not check_filter(v.target[1],act.actor,act.category,m.message) then
 					m.spike_effect_message = 0
 				end
 				if condensedamage and n > 1 then -- Damage/Action condensation within one target
@@ -73,6 +75,8 @@ function parse_action_packet(act)
 			if not check_filter(act.actor,v.target[1],act.category,tempact.message) then
 				tempact.message = 0
 				tempact.add_effect_message = 0
+			end
+			if not check_filter(v.target[1],act.actor,act.category,tempact.message) then
 				tempact.spike_effect_message = 0
 			end
 			tempact.number = 1
