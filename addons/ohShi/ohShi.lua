@@ -49,7 +49,6 @@ require 'helper_functions'
 --This function is called when the addon loads. Defines aliases and 
 --registers functions, as well as filling the resource tables.
 windower.register_event('load',function()
-    notice('Version '.._addon.version..' Loaded. Type //ohshi help for list of commands.')
     spells = parse_resources(speFile:readlines())
     stats = parse_resources(staFile:readlines())
     jAbils = parse_resources(jaFile:readlines())
@@ -72,7 +71,8 @@ end
 --like //ohshi help and the like.
 windower.register_event('addon command', function(...)
     local args = T{...}
-    if args ~= nil then
+    if args[1] == nil then args[1] = 'help' end
+    if args[1] ~= nil then
         local comm = table.remove(args,1):lower()
         
         if S{'showrolls','selfrolls'}:contains(comm) then
@@ -83,10 +83,13 @@ windower.register_event('addon command', function(...)
             elseif comm == 'showrolls' and settings.selfrolls then
                 settings.selfrolls = false
             end
+            print('OhShi Showrolls:', settings.showrolls)
+            print('OhShi Selfrolls:', settings.selfrolls)
             settings:save('all')
         elseif comm == 'duration' then
             if tonumber(args[1]) then
                 settings.duration = tonumber(args[1])
+                print('OhShi Duration:',settings.duration)
                 saveSettings()
             end
         elseif S{'trackon','trackoff'}:contains(comm) then
@@ -190,7 +193,7 @@ windower.register_event('action', function(act)
     local curact = T(act)
     local actor = T{}
     actor.id = curact.actor_id
-    actor.name = windower.ffxi.get_mob_by_id(actor.id)['name']
+    actor.name = windower.ffxi.get_mob_by_id(actor.id)['name'] or ''
     local extparam = curact.param
     local targets = curact.targets
     local party = T(windower.ffxi.get_party())
@@ -247,7 +250,7 @@ windower.register_event('action message',function(actor_id, target_id, actor_ind
 end)
 
 --This event happens whenever text is incoming to the chatlog
-windower.register_event('incoming text', function(old,new,color)
+windower.register_event('incoming text', function(old,new,color,newcolor)
     if string.find(old,'(%w+)\'s attack devastates the fiend%p') then
         addText('devastates',string.find(old,'(%w+)\'s attack devastates the fiend%p'))
     elseif string.find(old,'Blue: (%d+)%% / Red: (%d+)%%') then
@@ -259,5 +262,4 @@ windower.register_event('incoming text', function(old,new,color)
     elseif string.find(old,'The fiend appears(.*)vulnerable to ([%w%s]+)!') then
         addText('vulnerable',string.find(old,'The fiend appears(.*)vulnerable to ([%w%s]+)!'))
     end
-    return new,color
-end)
+end) 
