@@ -42,7 +42,8 @@ function valid_target(targ,flag)
 	local san_targ = find_san(targ)
 	-- If the target is whitelisted, pass it through.
 	if pass_through_targs:contains(targ) then
-		if (targ == '<t>' or targ == 't') and windower.ffxi.get_mob_by_target('<t>').id == windower.ffxi.get_player().id then
+		local cur_targ = windower.ffxi.get_mob_by_target('<t>')
+		if (targ == '<t>' or targ == 't') and cur_targ and cur_targ.id == windower.ffxi.get_player().id then
 			return '<me>'
 		end
 		return targ
@@ -76,7 +77,7 @@ function valid_target(targ,flag)
 			-- If targ starts an element of the monster array, use it.
 			local min_dist = 500
 			for i,v in pairs(targar) do
-				if i:lower():find('^'..san_targ:lower()) then
+				if i:lower()==san_targ:lower() or i:lower():find('^'..san_targ:lower()) then
 					spell_targ = i
 					break
 				end
