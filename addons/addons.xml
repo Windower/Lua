@@ -208,13 +208,6 @@
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
-    <author>Byrth</author>
-    <name>pr</name>
-    <description>An addon that records and formats packets, comparing them with the packets library.</description>
-	<bugtracker>https://github.com/Byrth/Lua/issues</bugtracker>
-	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
-  </addon>
-  <addon>
     <author>Giuliano Riccio (Zohno@Phoenix)</author>
     <name>reive</name>
     <description>Tracks exp, bayld, momentum scores and bonuses during a reive.</description>
