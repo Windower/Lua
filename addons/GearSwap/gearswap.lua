@@ -468,17 +468,17 @@ function action(act)
 	
 	local spell = get_spell(act)
 	local category = act.category
-	
 	if logging then	
 		if spell then logit(logfile,'\n\n'..tostring(os.clock)..'(178) Event Action: '..tostring(spell.english)..' '..tostring(act['category']))
 		else logit(logfile,'\n\nNil spell detected') end
 	end
 	
-	if jas[category] or uses[category] or (readies[category] and act.param == 28787 and not category == 9) then
+	if jas[category] or uses[category] or (readies[category] and act.param == 28787 and not (category == 9)) then
 		local action_type = get_action_type(category)
-		if readies[category] and act.param == 28787 and not category == 9 then
+		if readies[category] and act.param == 28787 and not (category == 9) then
 			action_type = 'Failure'
 		end
+		
 		if type(user_env[prefix..'aftercast']) == 'function' then
 			equip_sets(prefix..'aftercast',spell,{type=action_type})
 		elseif user_env[prefix..'aftercast'] then
