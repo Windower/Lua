@@ -54,14 +54,15 @@ slot13='Death Ray', slot14='Eyes On Me', slot15='Sandspray'
 }
 
 function initialize()
+    spells = res.spells:type('BlueMagic')
+    settings = config.load(defaults)
     get_current_spellset()
 end
 
 windower.register_event('load', function()
-    spells = res.spells
-    settings = config.load(defaults)
-    notice('Version '.._addon.version..' Loaded. Type //aset help for list of commands.')
-    initialize()
+    if windower.ffxi.get_info()['logged_in'] then
+        initialize()
+    end
 end)
 
 windower.register_event('login', function()
@@ -247,35 +248,3 @@ windower.register_event('addon command', function(...)
         end
     end
 end)
-
-function parse_resources(lines_file)
-    local completed_table = T{}
-    local counter = 0
-    for i in ipairs(lines_file) do
-        local str = tostring(lines_file[i])
-        local g,h,typ,key = string.find(str,'<(%w+) id="(%d+)" ')
-        if typ == 's' then
-            g,h,key = string.find(str,'index="(%d+)" ')
-        end
-        if key ~=nil then
-            completed_table[tonumber(key)] = T{}
-            local q = 1
-            while q <= str:len() do
-                local a,b,ind,val = string.find(str,'(%w+)="(.-)"',q)
-                if ind~=nil then
-                    completed_table[tonumber(key)][ind] = T
-                    completed_table[tonumber(key)][ind] = val:gsub('&quot;','\42'):gsub('&apos;','\39')
-                    q = b+1
-                else
-                    q = str:len()+1
-                end
-            end
-            --[[local k,v,english = string.find(str,'>([^<]+)</')
-            if english~=nil then
-                completed_table[tonumber(key)][ind] = T{}
-                completed_table[tonumber(key)]['english']=english
-            end]]
-        end
-    end
-    return completed_table
-end
