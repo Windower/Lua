@@ -186,13 +186,13 @@ end
 
 function register_event_user(str,func)
 	local id = windower.register_event(str,func)
-	registered_user_events[id]=true
+	rawset(registered_user_events,id,true)
 	return id
 end
 
 function unregister_event_user(id)
 	windower.unregister_event(id)
-	registered_user_events[id]=nil
+	rawset(registered_user_events,id,nil)
 end
 
 function include_user(str)

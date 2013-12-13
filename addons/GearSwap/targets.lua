@@ -46,7 +46,6 @@ function valid_target(targ)
 			table.reassign(spelltarget,target_type(j))
 		end
 		spelltarget.raw = targ
---		windower.add_to_chat(8,'Returning targ! '..targ)
 		return targ
 	elseif targ then
 		local mob_array = windower.ffxi.get_mob_array()
