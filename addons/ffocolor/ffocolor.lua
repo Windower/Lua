@@ -77,7 +77,7 @@ windower.register_event('addon command', function(...)
             if comm == 'chatcolor' then
                 settings.chatColor = tonumber(args[2])
             elseif comm == 'chattab' then
-                settings.chatTab = args[2]
+                settings.chatTab = args[2]:lower()
             end
             settings:save()
         elseif comm == 'getcolors' then
@@ -113,12 +113,13 @@ windower.register_event('incoming text', function(old,new,color,newcolor)
         if settings.chatTab ~= nil then
             newcolor = chatColors[settings.chatTab]
         end
-        new = new:gsub('\r\n','')
+        new = new:gsub('\r',''):gsub('\n','')
         local newsplit = new:split(' ')
         for it = 1, #newsplit do
             newsplit[it] = newsplit[it]:color(settings.chatColor)
         end
         new = newsplit:concat(' ')
+        return new, newcolor
     end
     
     return new, newcolor
