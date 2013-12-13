@@ -134,5 +134,4 @@ windower.register_event('incoming text', function(old,new,color,newcolor)
         new = newsplit:concat(' ')
         return new, newcolor
     end
-    return new, newcolor
 end)
