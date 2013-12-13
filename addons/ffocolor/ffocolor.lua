@@ -44,10 +44,9 @@ defaults.chatTab = 'say'
 defaults.chatColor = 207
 
 function initialize()
-    notice('Version '.._addon.version..' Loaded. Type //ffocolor help for list of commands.')
     settings = config.load(defaults)
     settings:save()
-    chatColors = T{say=1,shout=2,tell=4,party=5,linkshell=6,none=settings.chatColor}
+    chatColors = T{say=1,shout=2,tell=4,party=5,linkshell=6,none=74}
 end
 
 windower.register_event('load', function()
@@ -62,22 +61,29 @@ end)
 
 windower.register_event('addon command', function(...)
     local args = {...}
+    if args[1] == nil then args[1] = 'help' end
     if args[1] ~= nil then
         comm = args[1]:lower()
-        if comm == 'help' then
-            local helptext = [[FFOColor - Command List:
- 1. ffocolor chattab <say/shout/linkshell/party/tell> --Changes the chattab.
- 2. ffocolor chatcolor <color#> --Changes the highlight color.
- 3. ffocolor getcolors -- Show a list of color codes.
- 4. ffocolor help --Shows this menu.]]
-            for _, line in ipairs(helptext:split('\n')) do
-                windower.add_to_chat(207, line..chat.colorcontrols.reset)
-            end
-        elseif S{'chattab','chatcolor'}:contains(comm) then
+        if S{'chattab','chatcolor'}:contains(comm) then
             if comm == 'chatcolor' then
-                settings.chatColor = tonumber(args[2])
+                if args[2] == nil then
+                    print('Current Chat Color:', settings.chatColor)
+                elseif args[2] >= 1 and args[2] <= 509 then
+                    settings.chatColor = tonumber(args[2])
+                    print('New Chat Color:', tonumber(args[2]))
+                else
+                    error('Chat color must be between 1 and 509.')
+                end
             elseif comm == 'chattab' then
-                settings.chatTab = args[2]:lower()
+                if args[2] == nil then
+                    print('Current Chat Tab:', settings.chatTab)
+                elseif S{'say','shout','linkshell','party','tell','none'}:contains(args[2]:lower()) then
+                    settings.chatTab = args[2]:lower()
+                    print('New Chat Tab:', args[2]:lower())
+                else
+                    error('Improper tab selection defaulting to say')
+                    settings.chatTab = 'say'
+                end
             end
             settings:save()
         elseif comm == 'getcolors' then
@@ -102,7 +108,14 @@ windower.register_event('addon command', function(...)
                 end
             end
         else
-            return
+            local helptext = [[FFOColor - Command List:
+ 1. ffocolor chattab <say/shout/linkshell/party/tell> --Changes the chattab. Default: say.
+ 2. ffocolor chatcolor <color#> --Changes the highlight color.
+ 3. ffocolor getcolors -- Show a list of color codes.
+ 4. ffocolor help --Shows this menu.]]
+            for _, line in ipairs(helptext:split('\n')) do
+                windower.add_to_chat(207, line..chat.colorcontrols.reset)
+            end
         end
     end
 end)
@@ -121,6 +134,5 @@ windower.register_event('incoming text', function(old,new,color,newcolor)
         new = newsplit:concat(' ')
         return new, newcolor
     end
-    
     return new, newcolor
 end)
