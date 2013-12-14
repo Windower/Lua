@@ -329,7 +329,7 @@ function texts.font(t, font)
         return t._settings.text.font
     end
 
-    windower.text.set_font(t._name, font, t._settings.text.size)
+    windower.text.set_font(t._name, font)
     t._settings.text.font = font
 end
 
@@ -338,7 +338,7 @@ function texts.size(t, size)
         return t._settings.text.size
     end
 
-    windower.text.set_font(t._name, t._settings.text.font, size)
+    windower.text.set_font_size(t._name, size)
     t._settings.text.size = size
 end
 
