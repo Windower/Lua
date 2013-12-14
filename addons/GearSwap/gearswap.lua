@@ -107,23 +107,23 @@ windower.register_event('addon command',function (...)
 	elseif splitup[1]:lower() == 'validate' then
 		validate()
 	elseif splitup[1]:lower() == 'enable' then
-		if splitup[2] and slot_map[splitup[2]:gsub('[^%a]',''):lower()] then
-			enable(splitup[2])
-			print('Gearswap: '..splitup[2]..' enabled.')
-		elseif splitup[2] and splitup[2]:lower()=='all' then
+		if splitup[2] and splitup[2]:lower()=='all' then
 			enable('main','sub','range','ammo','head','neck','lear','rear','body','hands','lring','rring','back','waist','legs','feet')
 			print('Gearswap: All slots enabled.')
+		elseif splitup[2] and slot_map[splitup[2]:gsub('[^%a]',''):lower()] then
+			enable(splitup[2])
+			print('Gearswap: '..splitup[2]..' enabled.')
 		elseif gearswap_disabled then
 			gearswap_disabled = false
 			print('GearSwap: Enabled')
 		end
 	elseif splitup[1]:lower() == 'disable' then
-		if splitup[2] and slot_map[splitup[2]:gsub('[^%a]',''):lower()] then
-			disable(splitup[2])
-			print('Gearswap: '..splitup[2]..' disabled.')
-		elseif splitup[2] and splitup[2]:lower()=='all' then
+		if splitup[2] and splitup[2]:lower()=='all' then
 			disable('main','sub','range','ammo','head','neck','lear','rear','body','hands','lring','rring','back','waist','legs','feet')
 			print('Gearswap: All slots disabled.')
+		elseif splitup[2] and slot_map[splitup[2]:gsub('[^%a]',''):lower()] then
+			disable(splitup[2])
+			print('Gearswap: '..splitup[2]..' disabled.')
 		elseif not gearswap_disabled and not splitup[2] then
 			print('GearSwap: Disabled')
 			gearswap_disabled = true
