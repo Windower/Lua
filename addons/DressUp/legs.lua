@@ -825,9 +825,38 @@ models.legs[28107] = { name = "Foire Churidars" , enl = "foire churidars" , mode
 models.legs[28108] = { name = "Maxixi Tights" , enl = "maxixi tights" , model = 16594 }
 models.legs[28109] = { name = "Maxixi Tights" , enl = "maxixi tights" , model = 16595 }
 models.legs[28110] = { name = "Academic's Pants" , enl = "academic's pants" , model = 16598 }
+models.legs[28111] = { name = "Pumm. Cuisses +1" , enl = "pummeler's cuisses +1" , model = 16448 }
+models.legs[28112] = { name = "Anch. Hose +1" , enl = "anchorite's hose +1" , model = 16450 }
+models.legs[28113] = { name = "Theo. Pant. +1" , enl = "theophany pantaloons +1" , model = 16452 }
+models.legs[28114] = { name = "Spae. Tonban +1" , enl = "spaekona's tonban +1" , model = 16454 }
+models.legs[28115] = { name = "Atrophy Tights +1" , enl = "atrophy tights +1" , model = 16456 }
+models.legs[28116] = { name = "Pill. Culottes +1" , enl = "pillager's culottes +1" , model = 16458 }
+models.legs[28117] = { name = "Rev. Breeches +1" , enl = "reverence breeches +1" , model = 16460 }
+models.legs[28118] = { name = "Igno. Flan. +1" , enl = "ignominy flanchard +1" , model = 16462 }
+models.legs[28119] = { name = "Tot. Trousers +1" , enl = "totemic trousers +1" , model = 16464 }
+models.legs[28120] = { name = "Brioso Cann. +1" , enl = "brioso cannions +1" , model = 16466 }
+models.legs[28121] = { name = "Orion Braccae +1" , enl = "orion braccae +1" , model = 16468 }
+models.legs[28122] = { name = "Wakido Haidate +1" , enl = "wakido haidate +1" , model = 16470 }
+models.legs[28123] = { name = "Hachi. Hakama +1" , enl = "hachiya hakama +1" , model = 16472 }
+models.legs[28124] = { name = "Vishap Brais +1" , enl = "vishap brais +1" , model = 16474 }
+models.legs[28125] = { name = "Con. Spats +1" , enl = "convoker's spats +1" , model = 16476 }
+models.legs[28126] = { name = "Assim. Shalwar +1" , enl = "assimilator's shalwar +1" , model = 16549 }
+models.legs[28127] = { name = "Lak. Trews +1" , enl = "laksamana's trews +1" , model = 16551 }
+models.legs[28128] = { name = "Foire Churidars +1" , enl = "foire churidars +1" , model = 16553 }
+models.legs[28129] = { name = "Maxixi Tights +1" , enl = "maxixi tights +1" , model = 16594 }
+models.legs[28130] = { name = "Maxixi Tights +1" , enl = "maxixi tights +1" , model = 16595 }
+models.legs[28131] = { name = "Acad. Pants +1" , enl = "academic's pants +1" , model = 16598 }
+models.legs[28132] = { name = "Geo. Pants +1" , enl = "geomancy pants +1" , model = 16723 }
+models.legs[28133] = { name = "Rune. Trousers +1" , enl = "runeist trousers +1" , model = 16722 }
 models.legs[28165] = { name = "Laktisma Leggings" , enl = "laktisma leggings" , model = 16401 }
 models.legs[28166] = { name = "Quiahuiz Leggings" , enl = "quiahuiz leggings" , model = 16717 }
 models.legs[28167] = { name = "Kaabnax Trousers" , enl = "kaabnax trousers" , model = 16730 }
+models.legs[28168] = { name = "Outrider Hose" , enl = "outrider hose" , model = 16389 }
+models.legs[28169] = { name = "Espial Hose" , enl = "espial hose" , model = 16407 }
+models.legs[28170] = { name = "Wayfarer Slops" , enl = "wayfarer slops" , model = 16404 }
+models.legs[28171] = { name = "Temachtiani Pants" , enl = "Temachtiani pants" , model = 16486 }
+models.legs[28173] = { name = "Osmium Cuisses" , enl = "osmium cuisses" , model = 16437 }
+models.legs[28174] = { name = "Theurgist's Slacks" , enl = "theurgist's slacks" , model = 16515 }
 models.legs[28182] = { name = "Kari. Brayettes +1" , enl = "Karieyh brayettes +1" , model = 16727 }
 models.legs[28183] = { name = "Thur. Tights +1" , enl = "Thurandaut tights +1" , model = 16728 }
 models.legs[28184] = { name = "Orvail Pants +1" , enl = "Orvail pants +1" , model = 16729 }

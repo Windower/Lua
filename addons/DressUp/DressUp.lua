@@ -155,7 +155,6 @@ windower.register_event('incoming chunk',function (id, data)
 			
 			
 			for k,v in pairs(parsed_pc) do
-				-- TODO: Readd main/sub/ranged after the model IDs are obtained.
 				if T{"Face","Race","Head","Body","Hands","Legs","Feet","Main","Sub","Ranged"}:contains(k) and v ~= 0 then
 					if settings[name][k:lower()] then
 						pc[k] = Int2LE(settings[name][k:lower()],k)

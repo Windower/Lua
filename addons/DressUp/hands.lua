@@ -829,9 +829,40 @@ models.hands[27960] = { name = "Foire Dastanas" , enl = "foire dastanas" , model
 models.hands[27961] = { name = "Maxixi Bangles" , enl = "maxixi bangles" , model = 12498 }
 models.hands[27962] = { name = "Maxixi Bangles" , enl = "maxixi bangles" , model = 12499 }
 models.hands[27963] = { name = "Acad. Bracers" , enl = "academic's bracers" , model = 12502 }
+models.hands[27964] = { name = "Pumm. Mufflers +1" , enl = "pummeler's mufflers +1" , model = 12352 }
+models.hands[27965] = { name = "Anch. Gloves +1" , enl = "anchorite's gloves +1" , model = 12354 }
+models.hands[27966] = { name = "Theo. Mitts +1" , enl = "theophany mitts +1" , model = 12356 }
+models.hands[27967] = { name = "Spae. Gloves +1" , enl = "spaekona's gloves +1" , model = 12358 }
+models.hands[27968] = { name = "Atrophy Gloves +1" , enl = "atrophy gloves +1" , model = 12360 }
+models.hands[27969] = { name = "Pill. Armlets +1" , enl = "pillager's armlets +1" , model = 12362 }
+models.hands[27970] = { name = "Rev. Gauntlets +1" , enl = "reverence gauntlets +1" , model = 12364 }
+models.hands[27971] = { name = "Igno. Gauntlets +1" , enl = "ignominy gauntlets +1" , model = 12366 }
+models.hands[27972] = { name = "Tot. Gloves +1" , enl = "totemic gloves +1" , model = 12368 }
+models.hands[27973] = { name = "Brioso Cuffs +1" , enl = "brioso cuffs +1" , model = 12370 }
+models.hands[27974] = { name = "Orion Bracers +1" , enl = "orion bracers +1" , model = 12372 }
+models.hands[27975] = { name = "Wakido Kote +1" , enl = "wakido kote +1" , model = 12374 }
+models.hands[27976] = { name = "Hachiya Tekko +1" , enl = "hachiya tekko +1" , model = 12376 }
+models.hands[27977] = { name = "Vishap F. G. +1" , enl = "vishap finger gauntlets +1" , model = 12378 }
+models.hands[27978] = { name = "Con. Bracers +1" , enl = "convoker's bracers +1" , model = 12380 }
+models.hands[27979] = { name = "Assim. Bazu. +1" , enl = "assimilator's bazubands +1" , model = 12453 }
+models.hands[27980] = { name = "Lak. Gants +1" , enl = "Laksamana's gants +1" , model = 12455 }
+models.hands[27981] = { name = "Foire Dastanas +1" , enl = "foire dastanas +1" , model = 12457 }
+models.hands[27982] = { name = "Maxixi Bangles +1" , enl = "maxixi bangles +1" , model = 12498 }
+models.hands[27983] = { name = "Maxixi Bangles +1 (Level 99)" , enl = "maxixi bangles +1" , model = 12499 }
+models.hands[27984] = { name = "Acad. Bracers +1" , enl = "academic's bracers +1" , model = 12502 }
+models.hands[27985] = { name = "Geo. Mitaines +1" , enl = "geomancy mitaines +1" , model = 12596 }
+models.hands[27986] = { name = "Runeist Mitons +1" , enl = "runeist mitons +1" , model = 12626 }
+models.hands[28023] = { name = "Work Gloves" , enl = "work gloves" , model = 12654 }
+models.hands[28025] = { name = "Regimen Mittens" , enl = "regimen mittens" , model = 12304 }
 models.hands[28026] = { name = "Aiwon Gauntlets" , enl = "aiwon gauntlets" , model = 12310 }
 models.hands[28027] = { name = "Boor Bracelets" , enl = "boor bracelets" , model = 12288 }
 models.hands[28028] = { name = "Otomi Gloves" , enl = "otomi gloves" , model = 12616 }
+models.hands[28029] = { name = "Outrider Mittens" , enl = "outrider mittens" , model = 12293 }
+models.hands[28030] = { name = "Espial Bracers" , enl = "espial bracers" , model = 12311 }
+models.hands[28031] = { name = "Wayfarer Cuffs" , enl = "wayfarer cuffs" , model = 12308 }
+models.hands[28032] = { name = "Temachtiani Gloves" , enl = "Temachtiani gloves" , model = 12390 }
+models.hands[28034] = { name = "Dynasty Mitts" , enl = "dynasty mitts" , model = 12345 }
+models.hands[28035] = { name = "Lurid Mitts" , enl = "lurid mitts" , model = 12418 }
 models.hands[28042] = { name = "Karieyh Moufles +1" , enl = "Karieyh moufles +1" , model = 12630 }
 models.hands[28043] = { name = "Thur. Gloves +1" , enl = "Thurandaut gloves +1" , model = 12631 }
 models.hands[28044] = { name = "Orvail Cuffs +1" , enl = "Orvail cuffs +1" , model = 12632 }
