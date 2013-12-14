@@ -86,7 +86,7 @@ windower.register_event('addon command', function(command, ...)
     end
 end)
  
-windower.register_event('load', 'login', send_command+{'wait 2; lua i highlight initialize'})
+windower.register_event('load', 'login', windower.send_command+{'wait 2; lua i highlight initialize'})
  
 function initialize()
     send_count = 0 
