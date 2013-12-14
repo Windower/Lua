@@ -114,7 +114,7 @@ function initialize()
     get_party_members()
 end
  
-windower.register_event('incoming text', function(original, modified, color)
+windower.register_event('incoming text', function(original, modified, color, newcolor)
     if not original:match('%[.*%] .* '..string.char(129, 168)..'.*') and not original:match('.* '..chat.chars['implies']..'.*') then
         for names in modified:gmatch('%w+') do
             for name in pairs(members) do
@@ -148,7 +148,7 @@ windower.register_event('incoming text', function(original, modified, color)
             end
         end
  
-    return modified
+    return modified, newcolor
 end)
  
 windower.register_event('incoming chunk', function(id, data)
