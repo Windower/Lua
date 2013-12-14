@@ -121,7 +121,7 @@ windower.register_event('addon command', function(...)
 end)
 
 windower.register_event('incoming text', function(old,new,color,newcolor)
-    local stb = string.find(new,'[^%w]*%[%d+:#%w+%]') or string.find(new,'^[^%w]*%[FFOChat%]')
+    local stb = string.find(new,'[^%w]*%[%d+:#.-%]') or string.find(new,'^[^%w]*%[FFOChat%]')
     if stb ~= nil or old:sub(2,8) == 'PrivMsg' then
         if settings.chatTab ~= nil then
             newcolor = chatColors[settings.chatTab]
