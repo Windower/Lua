@@ -539,7 +539,7 @@ end)]]
 
 windower.register_event('status change',function(new,old)
 	if debugging >= 1 then windower.debug('status change '..new) end
-	if gearswap_disabled or T{'Event','Other','Zoning','Dead'}:contains(old) or T{'Event','Other','Zoning','Dead'}:contains(new) then return end
+	if gearswap_disabled or T{2,3,4}:contains(old) or T{2,3,4}:contains(new) then return end
 	-- Event may not be a real status yet. This is a blacklist to prevent people from swapping out of crafting gear or when disengaging from NPCs.
 	if old == '' then old = 'Idle' end
 	equip_sets('status_change',new,old)
