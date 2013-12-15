@@ -8,11 +8,11 @@ windower.register_event('unload',function ()
 	log("Unloaded EventTester.")
 end)
 
-windower.register_event('gain status',function (id, name)
+windower.register_event('gain buff',function (id, name)
 	log("Gain status, Id: "..id..", Name: "..name)
 end)
 
-windower.register_event('lose status',function (id, name)
+windower.register_event('lose buff',function (id, name)
 	log("Lose status, Id: "..id..", Name: "..name)
 end)
 

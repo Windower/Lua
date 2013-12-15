@@ -545,15 +545,15 @@ windower.register_event('status change',function(new,old)
 	equip_sets('status_change',new,old)
 end)
 
-windower.register_event('gain status',function(name,id)
-	if debugging >= 1 then windower.debug('gain status '..name) end
+windower.register_event('gain buff',function(name,id)
+	if debugging >= 1 then windower.debug('gain buff '..name) end
 	if gearswap_disabled then return end
 	if midaction and T{'terror','sleep','stun','petrification','charm','weakness'}:contains(name:lower()) then midaction = false end
 	equip_sets('buff_change',name,'gain')
 end)
 
-windower.register_event('lose status',function(name,id)
-	if debugging >= 1 then windower.debug('lose status '..name) end
+windower.register_event('lose buff',function(name,id)
+	if debugging >= 1 then windower.debug('lose buff '..name) end
 	if gearswap_disabled then return end
 	equip_sets('buff_change',name,'loss')
 end)

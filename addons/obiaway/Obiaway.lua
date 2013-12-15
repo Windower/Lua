@@ -65,7 +65,7 @@ windower.register_event('addon command',function (...)
 	remove_unneeded_obis()
 end)
 
-windower.register_event('lose status',function (id, name)
+windower.register_event('lose buff',function (id, name)
 	if id>=178 and id<=185 then
 		remove_unneeded_obis()
 	end

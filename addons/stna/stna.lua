@@ -78,14 +78,14 @@ windower.register_event('addon command', function(...)
     end
 end)
 
-windower.register_event('gain status', function(name,id)
+windower.register_event('gain buff', function(name,id)
     if priority:contains(name) and not statusTable:contains(name) then
         statusTable:add(name)
     end
 end)
 
 
-windower.register_event('lose status', function(name,id)
+windower.register_event('lose buff', function(name,id)
     if statusTable:contains(name) then
         statusTable:remove(name)
     end
