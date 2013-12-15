@@ -178,8 +178,8 @@ function fns.spells()
     resources.spells = setmetatable(res, resource_mt)
 end
 
--- Returns the statuses, indexed by ingame ID.
-function fns.statuses()
+-- Returns the buffs, indexed by ingame ID.
+function fns.buffs()
     local file = _libs.filehelper.read(plugin_resources..'status.xml')
     local match_string = '<b id="(%d-)" duration="(%d-)" fr="([^"]-)" de="([^"]-)" jp="([^"]-)" enLog="([^"]-)">([^<]-)</b>'
     local last = {}
@@ -202,7 +202,7 @@ function fns.statuses()
     end
     slots[res] = table.keyset(last)
 
-    resources.statuses = setmetatable(res, resource_mt)
+    resources.buffs = setmetatable(res, resource_mt)
 end
 
 -- Returns the items, indexed by ingame ID.
