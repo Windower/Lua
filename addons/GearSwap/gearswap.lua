@@ -31,7 +31,7 @@ require 'stringhelper'
 require 'helper_functions'
 require 'tablehelper'
 
-require 'resources'
+require 'statics'
 require 'equip_processing'
 require 'targets'
 require 'user_functions'
@@ -39,6 +39,7 @@ require 'refresh'
 require 'parse_augments'
 require 'export'
 require 'validate'
+res = require 'resources'
 
 
 _addon.name = 'GearSwap'
@@ -545,9 +546,7 @@ end
 windower.register_event('status change',function(new,old)
 	if debugging >= 1 then windower.debug('status change '..new) end
 	if gearswap_disabled or T{2,3,4}:contains(old) or T{2,3,4}:contains(new) then return end
-	-- Event may not be a real status yet. This is a blacklist to prevent people from swapping out of crafting gear or when disengaging from NPCs.
-	if old == '' then old = 'Idle' end
-	equip_sets('status_change',new,old)
+	equip_sets('status_change',res.statuses[new].english,res.statuses[old].english)
 end)
 
 windower.register_event('gain buff',function(name,id)
