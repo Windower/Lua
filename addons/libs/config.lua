@@ -1,6 +1,5 @@
 --[[
     Functions that facilitate loading, parsing, manipulating and storing of config files.
-	This is a test message for launcher.
 ]]
 
 local config = {}
