@@ -290,44 +290,47 @@ function player_info(id)
 		return {name=nil,id=nil,is_npc=nil,type='debug',owner=nil}
 	end
 	
-	if player_table.is_npc then
-		if player_table.id%4096>2047 then
-			typ = 'other_pets'
-			filter = 'other_pets'
-			owner = 'other'
-			for i,v in pairs(windower.ffxi.get_party()) do
-				if v.mob and v.mob.pet_index and v.mob.pet_index == player_table.index then
-					if i == 'p0' then
-						typ = 'my_pet'
-						filter = 'my_pet'
+	for i,v in pairs(windower.ffxi.get_party()) do
+		if v.mob and v.mob.id == player_table.id then
+			typ = i
+			if i == 'p0' then
+				filter = 'me'
+			elseif i:sub(1,1) == 'p' then
+				filter = 'party'
+			else
+				filter = 'alliance'
+			end
+		end
+	end
+	
+	if not filter then
+		if player_table.is_npc then
+			if player_table.id%4096>2047 then
+				typ = 'other_pets'
+				filter = 'other_pets'
+				owner = 'other'
+				for i,v in pairs(windower.ffxi.get_party()) do
+					if v.mob and v.mob.pet_index and v.mob.pet_index == player_table.index then
+						if i == 'p0' then
+							typ = 'my_pet'
+							filter = 'my_pet'
+						end
+						owner = i
+						break
 					end
-					owner = i
-					break
+				end
+			else
+				typ = 'mob'
+				filter = 'monsters'
+				for i,v in pairs(windower.ffxi.get_party()) do
+					if nf(v.mob,'id') == player_table.claim_id and filter.enemies then
+						filter = 'enemies'
+					end
 				end
 			end
 		else
-			typ = 'mob'
-			filter = 'monsters'
-			for i,v in pairs(windower.ffxi.get_party()) do
-				if nf(v.mob,'id') == player_table.claim_id and filter.enemies then
-					filter = 'enemies'
-				end
-			end
-		end
-	else
-		typ = 'other'
-		filter = 'others'
-		for i,v in pairs(windower.ffxi.get_party()) do
-			if v.mob and v.mob.id == player_table.id then
-				typ = i
-				if i == 'p0' then
-					filter = 'me'
-				elseif i:sub(1,1) == 'p' then
-					filter = 'party'
-				else
-					filter = 'alliance'
-				end
-			end
+			typ = 'other'
+			filter = 'others'
 		end
 	end
 	if not typ then typ = 'debug' end
