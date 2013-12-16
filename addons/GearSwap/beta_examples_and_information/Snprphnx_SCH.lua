@@ -218,7 +218,6 @@ function status_change(new,tab)
 end
 
 function buff_change(status,gain_or_loss)
-windower.add_to_chat(8,status..' '..gain_or_loss)
 	if status == 'Sublimation: Complete' and gain_or_loss == 'gain' and not 'stunmode' then -- True whether gained or lost
 		sets.aftercast_Idle = sets.aftercast_Idle_noSub
 	elseif status == 'Sublimation: Activated' and gain_or_loss == 'gain' and not 'stunmode' then
