@@ -39,6 +39,9 @@ require 'refresh'
 require 'parse_augments'
 require 'export'
 require 'validate'
+if windower.file_exists(windower.addon_path..'resources.lua') then
+    os.remove(windower.addon_path..'resources.lua',windower.addon_path..'res_bak - can delete.lua')
+end
 res = require 'resources'
 
 
