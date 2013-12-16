@@ -262,6 +262,13 @@
   	<support>http://www.ffxiah.com/player/Ragnarok/Jandel</support>
   </addon>
   <addon>
+    <author>Ihina</author>
+    <name>Silence</name>
+    <description>Prevents equipment changed notifications from showing in chat log.</description>
+    <bugtracker>http://forums.windower.net/index.php?/forum/7-support/</bugtracker>
+    <support>http://forums.windower.net/index.php?/forum/7-support/</support>
+  </addon>
+  <addon>
     <name>Send</name>
     <description>Sends commands between windower instances using IPC.</description>
   </addon>
