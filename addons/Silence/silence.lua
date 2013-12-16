@@ -28,11 +28,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'Silence'
 _addon.author = 'Ihina'
-_addon.version = '1.0.0.0'
-windower.register_event('incoming text', function(original, modified, mode, modified_mode)
-	if original == 'Equipment changed.' then
-		modified = ''
-		return modified, modified_mode
+_addon.version = '1.0.0.1'
+
+windower.register_event('incoming text', function(str)
+	if str == 'Equipment changed.' then
+		return ''
 	end
 end)
 
