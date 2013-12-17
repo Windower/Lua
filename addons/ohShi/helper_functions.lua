@@ -70,7 +70,10 @@ end
 
 --Check if the actor is actually an npc rather than a player
 function isMob(id)
-    return windower.ffxi.get_mob_by_id(id)['is_npc']
+    if not trusts:contains(windower.ffxi.get_mob_by_id(id)['name']) then
+        return windower.ffxi.get_mob_by_id(id)['is_npc']
+    end
+    return false
 end
 
 --This function is used to parse the windower resources

@@ -36,6 +36,7 @@ defaults.duration = 10
 
 --Textbox settings
 defaults.bg = {}
+defaults.bg.alpha = 100
 defaults.bg.red = 0
 defaults.bg.blue = 0
 defaults.bg.green = 0
@@ -63,6 +64,7 @@ defaults.dangerwords['spells'] = S{"Death", "Meteor", "Kaustra", "Breakga", "Thu
 
 --Fill settings from either defaults table or settings.xml
 settings = config.load(defaults)
+ohShi_tb = texts.new(settings)
 
 --create tables to be used throughout the addon
 tracking = T{}
@@ -71,6 +73,7 @@ spells = {}
 jAbils = {}
 mAbils = {}
 stats = {}
+trusts = S{'Kupipi','Excenmille','Naji','Ayame','Zeid','Curila','Nanaa Mihgo'}
 
 speFName = '../../plugins/resources/spells.xml'
 staFName = '../../plugins/resources/status.xml'

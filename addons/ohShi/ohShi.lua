@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 _addon.name = 'OhShi'
-_addon.version = '2.52'
+_addon.version = '2.521'
 _addon.author = 'Nitrous (Shiva)'
 _addon.command = 'ohshi'
 
@@ -193,7 +193,11 @@ windower.register_event('action', function(act)
     local curact = T(act)
     local actor = T{}
     actor.id = curact.actor_id
-    actor.name = windower.ffxi.get_mob_by_id(actor.id)['name'] or ''
+    if windower.ffxi.get_mob_by_id(actor.id) then
+        actor.name = windower.ffxi.get_mob_by_id(actor.id)['name']
+    else
+        return
+    end
     local extparam = curact.param
     local targets = curact.targets
     local party = T(windower.ffxi.get_party())
