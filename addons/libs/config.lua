@@ -306,8 +306,8 @@ function config.save(t, char)
         return
     end
 
-    char = (char or windower.ffxi.get_player()['name']):lower()
-    meta = settings_map[t]
+	char = (char or windower.ffxi.get_player()['name']):lower()
+	meta = settings_map[t]
 
     if char == 'all' then
         char = 'global'
@@ -317,11 +317,11 @@ function config.save(t, char)
     end
 
     meta.original[char]:update(t)
-
+	
     if char == 'global' then
         meta.original = meta.original:filterkey('global')
     else
-        meta.original.global:amend(meta.original[char])
+        meta.original.global:amend(meta.original[char],true)
         meta.original[char] = table_diff(meta.original.global, meta.original[char]) or setmetatable({}, _meta.T)
 
         if meta.original[char]:empty(true) then

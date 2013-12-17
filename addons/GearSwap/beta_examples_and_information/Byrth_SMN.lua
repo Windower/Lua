@@ -10,7 +10,7 @@ function get_sets()
 		body="Call. Doublet +2",hands="Smn. Bracers +2",lring="Evoker's Ring",rring="Fervor Ring",
 		back="Tiresias' cape",legs="Smn. Spats +2",feet="Smn. Pigaches +2"}
 	
-	sets.precast_BP = {hands="Smn. Bracers +2",back="Tiresias' cape",legs="Smn. Spats +2",feet="Smn. Pigaches +2"}
+	sets.precast_BP = {ammo="Eminent Sachet",hands="Smn. Bracers +2",back="Tiresias' cape",legs="Smn. Spats +2",feet="Smn. Pigaches +2"}
 	
 	sets['precast_Mana Cede'] = {hands="Call. Bracers +2"}
 	
@@ -24,7 +24,7 @@ function get_sets()
 	sets.precast_FC_Fire = {main='Atar I'}
 	
 	-- Midcast Sets
-	sets.BP_Base = {main="Balsam Staff",sub="Vox grip",ammo="Dashavatara Sachet",
+	sets.BP_Base = {main="Balsam Staff",sub="Vox grip",ammo="Eminent Sachet",
 		head="Hagondes Hat",ear1="Gifted Earring",ear2="Smn. Earring",
 		body="Call. Doublet +2",hands="Spurrina Gages",ring1="Evoker's Ring",ring2="Fervor Ring",
 		legs="Ngen Seraweels",feet="Convoker's Pigaches"}
@@ -45,7 +45,7 @@ function get_sets()
 		body="Heka's Kalasiris"}
 		
 	sets.midcast_Stoneskin = {head="Marduk's Tiara +1",neck="Stone Gorget",body="Marduk's Jubbah +1",
-		hands="Marduk's Dastanas +1",waist="Seigel Sash",legs="Shedir Seraweels"}
+		hands="Marduk's Dastanas +1",waist="Siegel Sash",legs="Shedir Seraweels"}
 	
 	
 	--Aftercast Sets
@@ -54,12 +54,12 @@ function get_sets()
 		body="Marduk's Jubbah +1",hands="Marduk's Dastanas +1",ring1="Dark Ring",ring2="Defending Ring",
 		back="Umbra Cape",waist="Hierarch belt",legs="Nares Trews",feet="Herald's Gaiters"}
 	
-	sets.aftercast_Favor = {main="Chatoyant Staff",sub="Vox grip",ammo="Dashavatara Sachet",
+	sets.aftercast_Favor = {main="Chatoyant Staff",sub="Vox grip",ammo="Eminent Sachet",
 		head="Caller's Horn +2",neck="Caller's Pendant",ear1="Loquac. Earring",ear2="Antivenom Earring",
 		body="Caller's Doublet +2",hands="Smn. Bracers +2",ring1="Evoker's Ring",ring2="Fervor Ring",
 		back="Conveyance Cape",waist="Hierarch belt",legs="Ngen Seraweels",feet="Rubeus Boots"}
 	
-	sets.aftercast_Perp_Base = {main="Chatoyant Staff",sub="Oneiros Grip",ammo="Dashavatara Sachet",
+	sets.aftercast_Perp_Base = {main="Chatoyant Staff",sub="Oneiros Grip",ammo="Eminent Sachet",
 		head="Caller's Horn +2",neck="Caller's Pendant",
 		body="Caller's Doublet +2",hands="Adhara Gages",ring1="Evoker's Ring",ring2="Defending Ring",
 		waist="Hierarch belt",legs="Nares Trews",feet="Caller's Pgch. +2"}
@@ -68,7 +68,7 @@ function get_sets()
 	
 	sets.aftercast_Avatar_Diabolos = {waist="Diabolos's Rope"}
 	
-	sets.aftercast_Avatar_Spirit = {main="Soulscourge",sub="Vox grip",ammo="Dashavatara Sachet",
+	sets.aftercast_Avatar_Spirit = {main="Soulscourge",sub="Vox grip",ammo="Eminent Sachet",
 		head="Caller's Horn +2",neck="Caller's Pendant",ear2="Smn. Earring",
 		body="Caller's Doublet +2",hands="Smn. Bracers +2",ring1="Evoker's Ring",ring2="Fervor Ring",
 		back="Conveyance Cape",legs="Smn. spats +2",feet="Rubeus Boots"}
@@ -86,7 +86,7 @@ function get_sets()
 	Magical_BPs_affected_by_TP = T{'Heavenly Strike','Wind Blade','Holy Mist','Night Terror','Thunderstorm','Geocrush','Meteor Strike','Grand Fall','Lunar Bay','Thunderspark'} -- Unsure if Thunderspark is affected by TP
 	Magical_BPs_unaffected_by_TP = T{'Nether Blast','Aerial Blast','Searing Light','Diamond Dust','Earthen Fury','Zantetsuken','Tidal Wave','Judgment Bolt','Inferno','Howling Moon','Ruinous Omen','Flaming Crush'}
 	Additional_effect_BPs = T{'Rock Throw'}	
-	windower.send_command('input /macro book 8;wait .1;input /macro set 1')
+	send_command('input /macro book 8;wait .1;input /macro set 1')
 end
 
 function precast(spell,action)
@@ -133,7 +133,7 @@ function aftercast(spell,action)
 	if not spell.type or not string.find(spell.type,'BloodPact') then
 		-- Don't want to swap away too quickly if I'm about to put BP damage gear on
 		-- Need to wait 1 in order to allow pet information to update on Release.
-		windower.send_command('@wait 1;gs c Idle')
+		send_command('@wait 1;gs c Idle')
 	end
 end
 
@@ -156,7 +156,11 @@ function pet_midcast(spell,action)
 		end
 	elseif spell.type=='BloodPactRage' then
 		if Magical_BPs_affected_by_TP:contains(spell.name) or string.find(spell.name,' II') or string.find(spell.name,' IV') then
-			equip(sets.midcast_MAB_TP_BP)
+			if (spell.name == 'Heavenly Strike' and pet.TP > 120) or pet.TP > 280 then
+				equip(sets.midcast_MAB_No_TP_BP)
+			else
+				equip(sets.midcast_MAB_TP_BP)
+			end
 		elseif Magical_BPs_unaffected_by_TP:contains(spell.name) then
 			equip(sets.midcast_MAB_No_TP_BP)
 		elseif Additional_effect_BPs:contains(spell.name) then -- for BPs where the additional effect matters more than the damage
@@ -168,10 +172,6 @@ function pet_midcast(spell,action)
 		equip(sets.midcast_MAB_Spell)
 	end
 end
-
---windower.register_event('action',function(act)
---	windower.add_to_chat(8,'action!')
---end)
 
 function pet_aftercast(spell,action)
 	idle()

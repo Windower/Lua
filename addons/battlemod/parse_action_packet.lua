@@ -80,7 +80,7 @@ function parse_action_packet(act)
 				tempact.spike_effect_message = 0
 			end
 			tempact.number = 1
-			if tempact.has_add_effect then
+			if tempact.has_add_effect and tempact.message ~= 674 then
 				tempact.add_effect_number = 1
 			end
 			if tempact.has_spike_effect then
@@ -122,6 +122,7 @@ function parse_action_packet(act)
 				elseif m.reaction == 12 and act.category == 1 then m.simp_name = 'blocked by'
 				elseif m.message == 1 then m.simp_name = 'hit'
 				elseif m.message == 15 then m.simp_name = 'missed'
+				elseif m.message == 29 or m.message == 84 then m.simp_name = 'is paralyzed'
 				elseif m.message == 30 then m.simp_name = 'anticipated by'
 				elseif m.message == 31 then m.simp_name = 'absorbed by shadow'
 				elseif m.message == 32 then m.simp_name = 'dodged by'
@@ -145,19 +146,21 @@ function parse_action_packet(act)
 				else m.simp_name = act.action.name or ''
 				end
 				local msg,numb = simplify_message(m.message)
-				if not color_arr[act.actor.owner or act.actor.type] then windower.add_to_chat(8,tostring(act.actor.owner)..' '..act.actor.type) end
+				if not color_arr[act.actor.owner or act.actor.type] then windower.add_to_chat(123,'Battlemod error, missing filter:'..tostring(act.actor.owner)..' '..tostring(act.actor.type)) end
 				if m.fields.status then numb = m.status else numb = pref_suf(m.param,m.message) end
-				windower.add_to_chat(color,make_condensedamage_number(m.number)..(msg
+				
+				windower.add_to_chat(color,make_condensedamage_number(m.number)..( (msg or tostring(m.message))
 					:gsub('${spell}',color_it(act.action.spell or 'ERROR 111',color_arr.spellcol))
 					:gsub('${ability}',color_it(act.action.ability or 'ERROR 112',color_arr.abilcol))
 					:gsub('${item}',color_it(act.action.item or 'ERROR 113',color_arr.itemcol))
+					:gsub('${item2}',color_it(act.action.item2 or 'ERROR 121',color_arr.itemcol))
 					:gsub('${weapon_skill}',color_it(act.action.weapon_skill or 'ERROR 114',color_arr.wscol))
 					:gsub('${abil}',m.simp_name or 'ERROR 115')
 					:gsub('${numb}',numb or 'ERROR 116')
 					:gsub('${actor}',color_it(act.actor.name or 'ERROR 117',color_arr[act.actor.owner or act.actor.type]))
 					:gsub('${target}',targ)
 					:gsub('${lb}','\7')
-					:gsub('${number}',m.param)
+					:gsub('${number}',act.action.number or m.param)
 					:gsub('${status}',m.status or 'ERROR 120')
 					:gsub('${gil}',m.param)))
 				m.message = 0
@@ -228,16 +231,18 @@ function simplify_message(msg_ID)
 	local msg = dialog[msg_ID][language]
 	local fields = fieldsearch(msg)
 --	windower.add_to_chat(8,'ability: '..tostring(fields.ability)..'  spell: '..tostring(fields.spell)..'  item: '..tostring(fields.item)..'  weapon skill: '..tostring(fields.weapon_skill)..'  number: '..tostring(fields.number))
-	if line_full and (fields.number or fields.status) then -- and (fields.spell or fields.ability or fields.item or fields.weapon_skill) then -- and fields.number or 
---		T{1,31,67,163,229,352,353,373,576,577}:contains(msg_ID)) then
-		msg = line_full
-	elseif line_nonumber and not (fields.number or fields.status) then -- and (fields.spell or fields.ability or fields.item or fields.weapon_skill)
---		T{15,30,32,106,282,354}) then
-		msg = line_nonumber
---	elseif line_noactor and (fields.spell or fields.ability or fields.item or fields.weapon_skill) and fields.number then
---		msg = line_noactor
---	elseif line_noabil and fields.target and fields.number then
---		msg = line_noabil
+	if simplify and not T{140,557,674}:contains(msg_ID) then
+		if line_full and (fields.number or fields.status) then -- and (fields.spell or fields.ability or fields.item or fields.weapon_skill) then -- and fields.number or 
+	--		T{1,31,67,163,229,352,353,373,576,577}:contains(msg_ID)) then
+			msg = line_full
+		elseif line_nonumber and not (fields.number or fields.status) and (fields.spell or fields.ability or fields.item or fields.weapon_skill) then
+	--		T{15,30,32,106,282,354}) then
+			msg = line_nonumber
+	--	elseif line_noactor and (fields.spell or fields.ability or fields.item or fields.weapon_skill) and fields.number then
+	--		msg = line_noactor
+	--	elseif line_noabil and fields.target and fields.number then
+	--		msg = line_noabil
+		end
 	end
 	return msg
 end
@@ -285,44 +290,47 @@ function player_info(id)
 		return {name=nil,id=nil,is_npc=nil,type='debug',owner=nil}
 	end
 	
-	if player_table.is_npc then
-		if player_table.id%4096>2047 then
-			typ = 'other_pets'
-			filter = 'other_pets'
-			owner = 'other'
-			for i,v in pairs(windower.ffxi.get_party()) do
-				if v.mob and v.mob.pet_index and v.mob.pet_index == player_table.index then
-					if i == 'p0' then
-						typ = 'my_pet'
-						filter = 'my_pet'
+	for i,v in pairs(windower.ffxi.get_party()) do
+		if v.mob and v.mob.id == player_table.id then
+			typ = i
+			if i == 'p0' then
+				filter = 'me'
+			elseif i:sub(1,1) == 'p' then
+				filter = 'party'
+			else
+				filter = 'alliance'
+			end
+		end
+	end
+	
+	if not filter then
+		if player_table.is_npc then
+			if player_table.id%4096>2047 then
+				typ = 'other_pets'
+				filter = 'other_pets'
+				owner = 'other'
+				for i,v in pairs(windower.ffxi.get_party()) do
+					if v.mob and v.mob.pet_index and v.mob.pet_index == player_table.index then
+						if i == 'p0' then
+							typ = 'my_pet'
+							filter = 'my_pet'
+						end
+						owner = i
+						break
 					end
-					owner = i
-					break
+				end
+			else
+				typ = 'mob'
+				filter = 'monsters'
+				for i,v in pairs(windower.ffxi.get_party()) do
+					if nf(v.mob,'id') == player_table.claim_id and filter.enemies then
+						filter = 'enemies'
+					end
 				end
 			end
 		else
-			typ = 'mob'
-			filter = 'monsters'
-			for i,v in pairs(windower.ffxi.get_party()) do
-				if nf(v.mob,'id') == player_table.claim_id and filter.enemies then
-					filter = 'enemies'
-				end
-			end
-		end
-	else
-		typ = 'other'
-		filter = 'others'
-		for i,v in pairs(windower.ffxi.get_party()) do
-			if v.mob and v.mob.id == player_table.id then
-				typ = i
-				if i == 'p0' then
-					filter = 'me'
-				elseif i:sub(1,1) == 'p' then
-					filter = 'party'
-				else
-					filter = 'alliance'
-				end
-			end
+			typ = 'other'
+			filter = 'others'
 		end
 	end
 	if not typ then typ = 'debug' end
@@ -331,13 +339,13 @@ end
 
 function get_spell(act)
 	local spell, abil_ID, effect_val = {}
-	local msg_ID = act['targets'][1]['actions'][1]['message']
+	local msg_ID = act.targets[1].actions[1].message
 	
 	if T{7,8,9}:contains(act['category']) then
-		abil_ID = act['targets'][1]['actions'][1]['param']
-	elseif T{3,4,5,6,11,13,14,15}:contains(act['category']) then
-		abil_ID = act['param']
-		effect_val = act['targets'][1]['actions'][1]['param']
+		abil_ID = act.targets[1].actions[1].param
+	elseif T{3,4,5,6,11,13,14,15}:contains(act.category) then
+		abil_ID = act.param
+		effect_val = act.targets[1].actions[1].param
 	end
 	
 	if act.category == 1 then
@@ -377,9 +385,11 @@ function get_spell(act)
 		if fields.spell then
 			spell = r_spells[abil_ID]
 			spell.name = color_it(spell[language],color_arr.spellcol)
+			spell.spell = color_it(spell[language],color_arr.spellcol)
 		elseif fields.ability then
 			spell = r_abilities[abil_ID]
 			spell.name = color_it(spell[language],color_arr.abilcol)
+			spell.ability = color_it(spell[language],color_arr.abilcol)
 		elseif fields.weapon_skill then
 			if abil_ID > 255 then -- WZ_RECOVER_ALL is used by chests in Limbus
 				spell = r_mabils[abil_ID-256]
@@ -390,26 +400,41 @@ function get_spell(act)
 				spell = r_abilities[abil_ID+768]
 			end
 			spell.name = color_it(spell[language],color_arr.wscol)
+			spell.weapon_skill = color_it(spell[language],color_arr.wscol)
 		elseif msg_ID == 303 then
 			spell = r_abilities[74] -- Divine Seal
 			spell.name = color_it(spell[language],color_arr.abilcol)
+			spell.ability = color_it(spell[language],color_arr.abilcol)
 		elseif msg_ID == 304 then
 			spell = r_abilities[75] -- 'Elemental Seal'
 			spell.name = color_it(spell[language],color_arr.abilcol)
+			spell.ability = color_it(spell[language],color_arr.abilcol)
 		elseif msg_ID == 305 then
 			spell = r_abilities[76] -- 'Trick Attack'
 			spell.name = color_it(spell[language],color_arr.abilcol)
+			spell.ability = color_it(spell[language],color_arr.abilcol)
 		elseif msg_ID == 311 or msg_ID == 311 then
 			spell = r_abilities[79] -- 'Cover'
 			spell.name = color_it(spell[language],color_arr.abilcol)
+			spell.ability = color_it(spell[language],color_arr.abilcol)
 		elseif msg_ID == 240 or msg_ID == 241 then
 			spell = r_abilities[43] -- 'Hide'
 			spell.name = color_it(spell[language],color_arr.abilcol)
+			spell.ability = color_it(spell[language],color_arr.abilcol)
 		end
 		
-		if fields.item then
+		if fields.item and msg_ID ~= 674 and msg_ID ~= 140 then
 			spell = r_items[abil_ID]
 			spell.name = color_it(spell['enl'],color_arr.itemcol)
+			spell.item = color_it(spell['enl'],color_arr.itemcol)
+		end
+		
+		if fields.item2 then
+			local tempspell = r_items[effect_val]
+			spell.item2 = color_it(tempspell.enl,color_arr.itemcol)
+			if fields.number then
+				spell.number = act.targets[1].actions[1].add_effect_param
+			end
 		end
 	end
 	

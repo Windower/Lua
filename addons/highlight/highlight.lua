@@ -86,7 +86,7 @@ windower.register_event('addon command', function(command, ...)
     end
 end)
  
-windower.register_event('load', 'login', send_command+{'wait 2; lua i highlight initialize'})
+windower.register_event('load', 'login', windower.send_command+{'wait 2; lua i highlight initialize'})
  
 function initialize()
     send_count = 0 
@@ -114,7 +114,7 @@ function initialize()
     get_party_members()
 end
  
-windower.register_event('incoming text', function(original, modified, color)
+windower.register_event('incoming text', function(original, modified, color, newcolor)
     if not original:match('%[.*%] .* '..string.char(129, 168)..'.*') and not original:match('.* '..chat.chars['implies']..'.*') then
         for names in modified:gmatch('%w+') do
             for name in pairs(members) do
@@ -148,7 +148,7 @@ windower.register_event('incoming text', function(original, modified, color)
             end
         end
  
-    return modified
+    return modified, newcolor
 end)
  
 windower.register_event('incoming chunk', function(id, data)

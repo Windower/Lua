@@ -55,6 +55,8 @@ end
 ---- variables.
 -----------------------------------------------------------------------------------
 function load_user_files()
+	local path
+	
 	if user_env then
 		if type(user_env.file_unload)=='function' then user_env.file_unload()
 		elseif user_env.file_unload then
@@ -62,17 +64,33 @@ function load_user_files()
 		end
 	end
 	
-	if registered_user_events then
-		for i,v in pairs(registered_user_events) do
-			windower.unregister_event(i)
-		end
+	for i,v in pairs(registered_user_events) do
+		windower.unregister_event(i)
 	end
 	
 	user_env = nil
+	registered_user_events = {}
 	
-	if not windower.file_exists(windower.addon_path..'data/'..player['name']..'_'..player.main_job..'.lua') then
-		user_env = nil
+	if windower.file_exists(windower.addon_path..'data/'..player.name..'_'..player.main_job..'.lua') then
+		path = windower.addon_path..'data/'..player.name..'_'..player.main_job..'.lua'
+	elseif windower.file_exists(windower.addon_path..'data/'..player.name..'-'..player.main_job..'.lua') then
+		path = windower.addon_path..'data/'..player.name..'-'..player.main_job..'.lua'
+	elseif windower.file_exists(windower.addon_path..'data/'..player.name..'_'..player.main_job_full..'.lua') then
+		path = windower.addon_path..'data/'..player.name..'_'..player.main_job_full..'.lua'
+	elseif windower.file_exists(windower.addon_path..'data/'..player.name..'-'..player.main_job_full..'.lua') then
+		path = windower.addon_path..'data/'..player.name..'-'..player.main_job_full..'.lua'
+	elseif windower.file_exists(windower.addon_path..'data/'..player.name..'.lua') then
+		path = windower.addon_path..'data/'..player.name..'.lua'
+	elseif windower.file_exists(windower.addon_path..'data/'..player.main_job..'.lua') then
+		path = windower.addon_path..'data/'..player.main_job..'.lua'
+	elseif windower.file_exists(windower.addon_path..'data/'..player.main_job_full..'.lua') then
+		path = windower.addon_path..'data/'..player.main_job_full..'.lua'
+	elseif windower.file_exists(windower.addon_path..'data/default.lua') then
+		path = windower.addon_path..'data/default.lua'
+	else
 		current_job_file = nil
+		gearswap_disabled = true
+		sets = nil
 		return
 	end
 	
@@ -83,7 +101,7 @@ function load_user_files()
 		print_set=print_set,set_combine=set_combine,disable=disable,enable=enable,
 		
 		-- Library functions
-		string=string, math=math, table=table, T=T,
+		string=string, math=math, table=table, T=T,os=os,
 		tostring = tostring, tonumber = tonumber, pairs = pairs,
 		ipairs = ipairs, print=print, add_to_chat=windower.add_to_chat,
 		send_command=send_cmd_user,windower=user_windower,
@@ -103,12 +121,14 @@ function load_user_files()
 		}
 
 	-- Try to load data/<name>_<main job>.lua
-	local funct, err = loadfile(windower.addon_path..'data/'..player['name']..'_'..player.main_job..'.lua')
+	local funct, err = loadfile(path)
 	
 	-- If the file cannot be loaded, print the error and load the default.
 	if funct == nil then 
 		print('User file problem: '..err)
 		current_job_file = nil
+		gearswap_disabled = true
+		sets = nil
 		return
 	else
 		current_job_file = player.main_job
@@ -119,8 +139,11 @@ function load_user_files()
 	
 	-- Verify that funct contains functions.
 	local status, plugin = pcall(funct)
+	
 	if not status then
 		error('Plugin failed to load: \n'..plugin)
+		gearswap_disabled = true
+		sets = nil
 		return nil
 	end
 	
@@ -129,6 +152,9 @@ function load_user_files()
 	elseif user_env.get_sets then
 		windower.add_to_chat(123,'GearSwap: get_sets() is defined but is not a function.')
 	end
+	
+	gearswap_disabled = false
+	sets = user_env.sets
 end
 
 
@@ -220,6 +246,7 @@ function refresh_player()
 		pet.race = nil
 		pet.claim_id = nil
 		pet.is_npc = nil
+		if pet.tp then pet.tp = pet.tp/10 end
 		if avatar_element[pet.name] then
 			pet.element = avatar_element[pet.name]
 		else
@@ -368,20 +395,5 @@ end
 -----------------------------------------------------------------------------------
 function refresh_user_env()
 	refresh_globals()
-	load_user_files()
---	if player then
---		if player.job == 'NONE' then
---			gearswap_disabled = true
---			sets = nil
---			user_env = nil
---			return
---		end
---	end
-	if not user_env then
-		gearswap_disabled = true
-		sets = nil
-	else
-		gearswap_disabled = false
-		sets = user_env.sets
-	end
+	windower.send_command('@wait 0.5;lua i gearswap load_user_files')
 end

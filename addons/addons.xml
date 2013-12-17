@@ -208,13 +208,6 @@
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
-    <author>Byrth</author>
-    <name>pr</name>
-    <description>An addon that records and formats packets, comparing them with the packets library.</description>
-	<bugtracker>https://github.com/Byrth/Lua/issues</bugtracker>
-	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
-  </addon>
-  <addon>
     <author>Giuliano Riccio (Zohno@Phoenix)</author>
     <name>reive</name>
     <description>Tracks exp, bayld, momentum scores and bonuses during a reive.</description>
@@ -267,6 +260,13 @@
   	<description>Help managing party job in an alliance shout. Displays a in-game editable list (initially empty) in which one can set job and players</description>
   	<bugtracker>https://github.com/Jandella/Lua/issues</bugtracker>
   	<support>http://www.ffxiah.com/player/Ragnarok/Jandel</support>
+  </addon>
+  <addon>
+    <author>Ihina</author>
+    <name>Silence</name>
+    <description>Prevents equipment changed notifications from showing in chat log.</description>
+    <bugtracker>http://forums.windower.net/index.php?/forum/7-support/</bugtracker>
+    <support>http://forums.windower.net/index.php?/forum/7-support/</support>
   </addon>
   <addon>
     <name>Send</name>

@@ -31,7 +31,7 @@ require 'stringhelper'
 require 'helper_functions'
 require 'tablehelper'
 
-require 'resources'
+require 'statics'
 require 'equip_processing'
 require 'targets'
 require 'user_functions'
@@ -39,10 +39,14 @@ require 'refresh'
 require 'parse_augments'
 require 'export'
 require 'validate'
+if windower.file_exists(windower.addon_path..'resources.lua') then
+    os.remove(windower.addon_path..'resources.lua',windower.addon_path..'res_bak - can delete.lua')
+end
+res = require 'resources'
 
 
 _addon.name = 'GearSwap'
-_addon.version = '0.719'
+_addon.version = '0.720'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -107,23 +111,23 @@ windower.register_event('addon command',function (...)
 	elseif splitup[1]:lower() == 'validate' then
 		validate()
 	elseif splitup[1]:lower() == 'enable' then
-		if splitup[2] and slot_map[splitup[2]:gsub('[^%a]',''):lower()] then
-			enable(splitup[2])
-			print('Gearswap: '..splitup[2]..' enabled.')
-		elseif splitup[2] and splitup[2]:lower()=='all' then
+		if splitup[2] and splitup[2]:lower()=='all' then
 			enable('main','sub','range','ammo','head','neck','lear','rear','body','hands','lring','rring','back','waist','legs','feet')
 			print('Gearswap: All slots enabled.')
-		elseif gearswap_disabled and not splitup[2] then
+		elseif splitup[2] and slot_map[splitup[2]:gsub('[^%a]',''):lower()] then
+			enable(splitup[2])
+			print('Gearswap: '..splitup[2]..' enabled.')
+		elseif gearswap_disabled then
 			gearswap_disabled = false
 			print('GearSwap: Enabled')
 		end
 	elseif splitup[1]:lower() == 'disable' then
-		if splitup[2] and slot_map[splitup[2]:gsub('[^%a]',''):lower()] then
-			disable(splitup[2])
-			print('Gearswap: '..splitup[2]..' disabled.')
-		elseif splitup[2] and splitup[2]:lower()=='all' then
+		if splitup[2] and splitup[2]:lower()=='all' then
 			disable('main','sub','range','ammo','head','neck','lear','rear','body','hands','lring','rring','back','waist','legs','feet')
 			print('Gearswap: All slots disabled.')
+		elseif splitup[2] and slot_map[splitup[2]:gsub('[^%a]',''):lower()] then
+			disable(splitup[2])
+			print('Gearswap: '..splitup[2]..' disabled.')
 		elseif not gearswap_disabled and not splitup[2] then
 			print('GearSwap: Disabled')
 			gearswap_disabled = true
@@ -185,6 +189,11 @@ windower.register_event('outgoing text',function(original,modified)
 				-- Note, does not work unless the buff list has been updated.
 					r_line.casttime=4
 				end
+			elseif r_line.type == 'SummonerPact' and buffactive['astral conduit'] then
+				r_line.recast=0
+			elseif buffactive.hasso or buffactive.seigan then
+				r_line.recast=r_line.recast*1.5
+				r_line.casttime = r_line.casttime*1.5
 			end
 			s_type = 'Magic' -- command_list[r_spells[validabils[language][abil:lower()]['Magic']]['prefix']]
 		elseif command_list[command] == 'Ability' then
@@ -229,7 +238,7 @@ windower.register_event('outgoing text',function(original,modified)
 	return modified
 end)
 
-windower.register_event('incoming text',function(original,modified,color)
+windower.register_event('incoming text',function(original,modified,color,modifiedcolor)
 	if debugging >= 1 then windower.debug('incoming text') end
 	if gearswap_disabled then return modified, color end
 	if original == '...A command error occurred.' or original == 'You can only use that command during battle.' or original == 'You cannot use that command here.' then
@@ -240,13 +249,75 @@ windower.register_event('incoming text',function(original,modified,color)
 			windower.add_to_chat(123,'GearSwap: aftercast() exists but is not a function')
 		end
 	end
-	return modified,color
+	return modified,modifiedcolor
 end)
 
-windower.register_event('incoming chunk',function(id,data)
+windower.register_event('incoming chunk',function(id,data,modified,injected,blocked)
 	if debugging >= 1 then windower.debug('incoming chunk '..id) end
 
-	if id == 0x29 then  -- TEMPORARY FIX
+	if id == 0x28 then
+		data = data:sub(5)
+		local act = {}
+		act.do_not_need = get_bit_packed(data,0,8)
+		act.actor_id = get_bit_packed(data,8,40)
+		act.target_count = get_bit_packed(data,40,50)
+		act.category = get_bit_packed(data,50,54)
+		act.param = get_bit_packed(data,54,70)
+		act.unknown = get_bit_packed(data,70,86)
+		act.recast = get_bit_packed(data,86,118)
+		act.targets = {}
+		local offset = 118
+		for i = 1,act.target_count do
+			act.targets[i] = {}
+			act.targets[i].id = get_bit_packed(data,offset,offset+32)
+			act.targets[i].action_count = get_bit_packed(data,offset+32,offset+36)
+			offset = offset + 36
+			act.targets[i].actions = {}
+			for n = 1,act.targets[i].action_count do
+				act.targets[i].actions[n] = {}
+				act.targets[i].actions[n].reaction = get_bit_packed(data,offset,offset+5)
+				act.targets[i].actions[n].animation = get_bit_packed(data,offset+5,offset+16)
+				act.targets[i].actions[n].effect = get_bit_packed(data,offset+16,offset+21)
+				act.targets[i].actions[n].stagger = get_bit_packed(data,offset+21,offset+27)
+				act.targets[i].actions[n].param = get_bit_packed(data,offset+27,offset+44)
+				act.targets[i].actions[n].message = get_bit_packed(data,offset+44,offset+54)
+				act.targets[i].actions[n].unknown = get_bit_packed(data,offset+54,offset+85)
+				act.targets[i].actions[n].has_add_effect = get_bit_packed(data,offset+85,offset+86)
+				offset = offset + 86
+				if act.targets[i].actions[n].has_add_effect == 1 then
+					act.targets[i].actions[n].has_add_effect = true
+					act.targets[i].actions[n].add_effect_animation = get_bit_packed(data,offset,offset+6)
+					act.targets[i].actions[n].add_effect_effect = get_bit_packed(data,offset+6,offset+10)
+					act.targets[i].actions[n].add_effect_param = get_bit_packed(data,offset+10,offset+27)
+					act.targets[i].actions[n].add_effect_message = get_bit_packed(data,offset+27,offset+37)
+					offset = offset + 37
+				else
+					act.targets[i].actions[n].has_add_effect = false
+					act.targets[i].actions[n].add_effect_animation = 0
+					act.targets[i].actions[n].add_effect_effect = 0
+					act.targets[i].actions[n].add_effect_param = 0
+					act.targets[i].actions[n].add_effect_message = 0
+				end
+				act.targets[i].actions[n].has_spike_effect = get_bit_packed(data,offset,offset+1)
+				offset = offset +1
+				if act.targets[i].actions[n].has_spike_effect == 1 then
+					act.targets[i].actions[n].has_spike_effect = true
+					act.targets[i].actions[n].spike_effect_animation = get_bit_packed(data,offset,offset+6)
+					act.targets[i].actions[n].spike_effect_effect = get_bit_packed(data,offset+6,offset+10)
+					act.targets[i].actions[n].spike_effect_param = get_bit_packed(data,offset+10,offset+24)
+					act.targets[i].actions[n].spike_effect_message = get_bit_packed(data,offset+24,offset+34)
+					offset = offset + 34
+				else
+					act.targets[i].actions[n].has_spike_effect = false
+					act.targets[i].actions[n].spike_effect_animation = 0
+					act.targets[i].actions[n].spike_effect_effect = 0
+					act.targets[i].actions[n].spike_effect_param = 0
+					act.targets[i].actions[n].spike_effect_message = 0
+				end
+			end
+		end
+		action(act)
+	elseif id == 0x29 then
 		if gearswap_disabled then return end
 		data = data:sub(5)
 		local actor_id = get_bit_packed(data,0,32)
@@ -258,54 +329,8 @@ windower.register_event('incoming chunk',function(id,data)
 		local target_index = get_bit_packed(data,144,160)
 		local message_id = get_bit_packed(data,160,175) -- Cut off the most significant bit, hopefully
 		
-		if spelltarget and spelltarget.id and T{6,20,113,406,605,646}:contains(message_id) then
-			-- Defeats or Falls to the ground
-			if spelltarget.id == target_id then
-				midaction = false
-				spelltarget = nil
-	--			windower.add_to_chat(123,'GearSwap: Your prey has been defeated by another player!') -- Temporary
-			end
-		end
-		
-		local tempplay = windower.ffxi.get_player()
-		if actor_id ~= tempplay.id then
-			if tempplay.pet_index then
-				if actor_id ~= windower.ffxi.get_mob_by_index(tempplay.pet_index)['id'] then
-					return
-				end
-			else
-				return
-			end
-		end
-		
-		if message_id == 62 then
-			if type(user_env.aftercast) == 'function' then
-				equip_sets('aftercast',r_items[param_1],{type='Failure'})
-			elseif user_env.aftercast then
-				midaction = false
-				spelltarget = nil
-				windower.add_to_chat(123,'GearSwap: aftercast() exists but is not a function')
-			else
-				midaction = false
-				spelltarget = nil
-			end
-		elseif unable_to_use:contains(message_id) and midaction then
-			if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(195) Event Action Message: '..tostring(message_id)..' Interrupt') end
-			if type(user_env.aftercast) == 'function' then
-				equip_sets('aftercast',{name='Interrupt',type='Interrupt'},{type='Recast'})
-			elseif user_env.aftercast then
-				midaction = false
-				spelltarget = nil
-				windower.add_to_chat(123,'GearSwap: aftercast() exists but is not a function')
-			else
-				midaction = false
-				spelltarget = nil
-			end
-		end
-	end
-	
-	
-	if id == 0x01B then
+		action_message(actor_id,target_id,param_1,param_2,param_3,actor_index,target_index,message_id)
+	elseif id == 0x01B then
 --		'Job Info Packet'
 		local enc = data:byte(97) + data:byte(98)*256
 		for i=0,15 do
@@ -318,24 +343,15 @@ windower.register_event('incoming chunk',function(id,data)
 					end
 					sent_out_equip[i] = not_sent_out_equip[i]
 					not_sent_out_equip[i] = nil
---					windower.add_to_chat(123,"Gearswap: Your "..default_slot_map[i]..' are now unlocked.')
+					if _global.debug_mode then windower.add_to_chat(8,"Gearswap (Debug Mode): Your "..default_slot_map[i]..' are now unlocked.') end
 				end
 				encumbrance_table[i] = tf
 			end
 		end
---[[		local encstr = 'Gearswap, Encumbered in slots: '
-		for i,v in pairs(encumbrance_table) do
-			if v then
-				encstr = encstr..default_slot_map[i]..' '
-			end
-		end
-		if encstr ~= 'Gearswap, Encumbered in slots: ' then	windower.add_to_chat(123,encstr) end]]
-	end
-
-	if gearswap_disabled then return end
-
-
-	if id == 0x050 then
+	elseif gearswap_disabled then
+		return
+	elseif id == 0x050 then
+--		'Equipment packet'
 		if sent_out_equip[data:byte(6)] == data:byte(5) then
 			sent_out_equip[data:byte(6)] = nil
 			send_check()
@@ -343,9 +359,7 @@ windower.register_event('incoming chunk',function(id,data)
 	end
 end)
 
-
-
-function get_bit_packed(dat_string,start,stop) -- Temporary
+function get_bit_packed(dat_string,start,stop)
 	local newval = 0
 	
 	local c_count = math.ceil(stop/8)
@@ -379,7 +393,7 @@ windower.register_event('zone change',function(new_zone,new_zone_id,old_zone,old
 	--sent_out_equip = {}
 end)
 
-windower.register_event('outgoing chunk',function(id,data)
+windower.register_event('outgoing chunk',function(id,data,modified,injected,blocked)
 	if debugging >= 1 then windower.debug('outgoing chunk '..id) end
 	if id == 0x015 then
 		lastbyte = data:byte(7,8)
@@ -406,8 +420,8 @@ windower.register_event('outgoing chunk',function(id,data)
 		if abil_name and not (buffactive.terror or buffactive.sleep or buffactive.stun or buffactive.petrification or buffactive.charm) then
 			midaction = true
 			windower.send_command('@wait 1;lua i gearswap midact')
-		elseif user_env and not T{0,2,4,11,13,14,15,18,20}:contains(category) then -- 0 = interacting with an NPC, 2 = engaging, 4 = disengaging from menu, 11 = Homepointing, 12= Unclear?, 13 = getting up from reraise, 14 = fishing, 15 = changing target, 18 = dismounting chocobo, 20 = zoning
-			if not T{3,7,9,16}:contains(category) then windower.add_to_chat(8,'Tell Byrth how you triggered this and this number: '..category) end
+		elseif user_env and not T{0,2,4,5,11,12,13,14,15,18,20}:contains(category) then -- 0 = interacting with an NPC, 2 = engaging, 4 = disengaging from menu, 5 = CFH, 11 = Homepointing, 12= assist, 13 = getting up from reraise, 14 = fishing, 15 = changing target, 18 = dismounting chocobo, 20 = zoning
+			if not T{3,7,9,16,25}:contains(category) then windower.add_to_chat(8,'Tell Byrth how you triggered this and this number: '..category) end
 			if type(user_env.aftercast) == 'function' then
 				equip_sets('aftercast',{name='Interrupt',type='Interrupt'},{type='Recast'})
 			elseif user_env.aftercast then
@@ -426,7 +440,7 @@ function midact()
 	midaction = false
 end
 
-windower.register_event('action',function(act)
+function action(act)
 	if debugging >= 1 then windower.debug('action') end
 	if gearswap_disabled or act.category == 1 then return end
 	
@@ -458,17 +472,17 @@ windower.register_event('action',function(act)
 	
 	local spell = get_spell(act)
 	local category = act.category
-	
 	if logging then	
 		if spell then logit(logfile,'\n\n'..tostring(os.clock)..'(178) Event Action: '..tostring(spell.english)..' '..tostring(act['category']))
 		else logit(logfile,'\n\nNil spell detected') end
 	end
 	
-	if jas[category] or uses[category] or (readies[category] and act.param == 28787 and not category == 9) then
+	if jas[category] or uses[category] or (readies[category] and act.param == 28787 and not (category == 9)) then
 		local action_type = get_action_type(category)
-		if readies[category] and act.param == 28787 and not category == 9 then
+		if readies[category] and act.param == 28787 and not (category == 9) then
 			action_type = 'Failure'
 		end
+		
 		if type(user_env[prefix..'aftercast']) == 'function' then
 			equip_sets(prefix..'aftercast',spell,{type=action_type})
 		elseif user_env[prefix..'aftercast'] then
@@ -486,18 +500,13 @@ windower.register_event('action',function(act)
 			windower.add_to_chat(123,'GearSwap: '..prefix..'midcast() exists but is not a function')
 		end
 	end
-end)
+end
 
---[[windower.register_event('action message',function(actor_id,target_id,actor_index,target_index,message_id,param_1,param_2,param_3)
-	if gearswap_disabled then return end
-	
-	if spelltarget and spelltarget.id and T{6,20,113,406,605,646}:contains(message_id) then
-		-- Defeats or Falls to the ground
-		if spelltarget.id == target_id then
-			midaction = false
-			spelltarget = nil
---			windower.add_to_chat(123,'GearSwap: Your prey has been defeated by another player!') -- Temporary
-		end
+function action_message(actor_id,target_id,param_1,param_2,param_3,actor_index,target_index,message_id)
+	if spelltarget and T{6,20,113,406,605,646}:contains(message_id) and spelltarget.id == target_id then
+		-- If your current spell's target is defeated or falls to the ground
+		midaction = false
+		spelltarget = nil
 	end
 	
 	local tempplay = windower.ffxi.get_player()
@@ -522,7 +531,7 @@ end)
 			midaction = false
 			spelltarget = nil
 		end
-	elseif unable_to_use:contains(message_id) then
+	elseif unable_to_use:contains(message_id) and midaction then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(195) Event Action Message: '..tostring(message_id)..' Interrupt') end
 		if type(user_env.aftercast) == 'function' then
 			equip_sets('aftercast',{name='Interrupt',type='Interrupt'},{type='Recast'})
@@ -535,14 +544,12 @@ end)
 			spelltarget = nil
 		end
 	end
-end)]]
+end
 
 windower.register_event('status change',function(new,old)
 	if debugging >= 1 then windower.debug('status change '..new) end
 	if gearswap_disabled or T{2,3,4}:contains(old) or T{2,3,4}:contains(new) then return end
-	-- Event may not be a real status yet. This is a blacklist to prevent people from swapping out of crafting gear or when disengaging from NPCs.
-	if old == '' then old = 'Idle' end
-	equip_sets('status_change',new,old)
+	equip_sets('status_change',res.statuses[new].english,res.statuses[old].english)
 end)
 
 windower.register_event('gain buff',function(name,id)
@@ -660,20 +667,20 @@ end
 
 function aftercast_cost(rline)
 	if rline == nil then
-		return {tpaftercast = player['tp'],mpaftercast = tonumber(player['mp']),mppaftercast = tonumber(player['mpp'])}
+		return {tpaftercast = player.tp, mpaftercast = player.mp, mppaftercast = player.mpp}
 	end
-	if not rline['mpcost'] then rline['mpcost'] = 0 end
-	if not rline['tpcost'] then rline['tpcost'] = 0 end
+	if not rline.mpcost then rline.mpcost = 0 end
+	if not rline.tpcost then rline.tpcost = 0 end
 	
-	if tonumber(rline['tpcost']) == 0 or not rline['tpcost'] then rline['tpaftercast'] = player['tp'] else
-	rline['tpaftercast'] = player['tp'] - tonumber(rline['tpcost']) end
+	if rline.tpcost == 0 then rline.tpaftercast = player.tp else
+	rline.tpaftercast = player.tp - rline.tpcost end
 	
-	if tonumber(rline['mpcost']) == 0 then
-		rline['mpaftercast'] = tonumber(player['mp'])
-		rline['mppaftercast'] = tonumber(player['mpp'])
+	if rline.mpcost == 0 then
+		rline.mpaftercast = player.mp
+		rline.mppaftercast = player.mpp
 	else
-		rline['mpaftercast'] = player['mp'] - tonumber(rline['mpcost'])
-		rline['mppaftercast'] = (player['mp'] - tonumber(rline['mpcost']))/player['max_mp']
+		rline.mpaftercast = player.mp - rline.mpcost
+		rline.mppaftercast = (player.mp - rline.mpcost)/player.max_mp
 	end
 	
 	return rline
