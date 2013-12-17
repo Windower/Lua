@@ -1,3 +1,42 @@
+_addon.name = 'Silence'
+_addon.author = 'Ihina'
+_addon.version = '1.0.1.0'
+
+require 'logger'
+require 'tablehelper'
+config = require 'config'
+
+last = {}
+t = T{'Equipment changed.', 
+		'You cannot use that command at this time.', 
+		'You cannot use that command while viewing the chat log.', 
+		'You must close the currently open window to use that command.'}
+		
+defaults = {}
+defaults.mode = {}
+defaults.mode.value = 0
+settings = config.load(defaults)
+
+windower.register_event('load', function()
+	for _, str in ipairs(t) do
+		last[str] = 0
+	end
+end)
+
+windower.register_event('incoming text', function(str)
+	if t:contains(str) then
+		if settings.mode.value == 0 then
+			return ''
+		else
+			if os.clock() - last[str] < .75 then
+				return ''
+			else
+				last[str] = os.clock()
+			end
+		end
+	end
+end)
+
 --[[
 Copyright (c) 2013, Ihina
 All rights reserved.
@@ -25,15 +64,3 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
-
-_addon.name = 'Silence'
-_addon.author = 'Ihina'
-_addon.version = '1.0.0.1'
-
-windower.register_event('incoming text', function(str)
-	if str == 'Equipment changed.' then
-		return ''
-	end
-end)
-
-
