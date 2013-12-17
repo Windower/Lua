@@ -558,5 +558,5 @@ windower.register_event('addon command', function (...)
 			windower.send_command('lua unload dressup')
 		end
 	end
-	settings:save('all')
+	config.save(settings,windower.ffxi.get_player().name)
 end)
