@@ -54,14 +54,15 @@ slot13='Death Ray', slot14='Eyes On Me', slot15='Sandspray'
 }
 
 function initialize()
+    spells = res.spells:type('BlueMagic')
+    settings = config.load(defaults)
     get_current_spellset()
 end
 
 windower.register_event('load', function()
-    spells = res.spells
-    settings = config.load(defaults)
-    notice('Version '.._addon.version..' Loaded. Type //aset help for list of commands.')
-    initialize()
+    if windower.ffxi.get_info()['logged_in'] then
+        initialize()
+    end
 end)
 
 windower.register_event('login', function()
@@ -81,7 +82,7 @@ function set_spells(spellset)
         error(spellset..' was already equipped.')
         return
     end
-    windower.packets.reset_blue_magic_spells()
+    windower.ffxi.reset_blue_magic_spells()
     log('Starting to set '..spellset..'.')
     set_spells_from_spellset(spellset,1)
     return
@@ -97,7 +98,7 @@ function set_spells_from_spellset(spellset,slot)
         for id = 512, spells:length() do
             if spells[id] then
                 if spells[id]['english']:lower() == tempname:lower() then
-                    windower.packets.set_blue_magic_spell(spells[id]['index'], tonumber(slot))
+                    windower.ffxi.set_blue_magic_spell(spells[id]['index'], tonumber(slot))
                     break
                 end
             end
@@ -129,7 +130,7 @@ function set_single_spell(spell,slot)
             if spells[id]['english']:lower() == spell then
                 --This is where single spell setting code goes.
                 --Need to set by spell index rather than name.
-                windower.packets.set_blue_magic_spell(spells[id]['index'], tonumber(slot))
+                windower.ffxi.set_blue_magic_spell(spells[id]['index'], tonumber(slot))
                 windower.send_command('@timers c "Blue Magic Cooldown" 60 up')
                 tmpTable['slot'..slot] = spell
             end
@@ -164,7 +165,7 @@ function get_current_spellset()
 end
 
 function remove_all_spells(trigger)
-    windower.packets.reset_blue_magic_spells()
+    windower.ffxi.reset_blue_magic_spells()
     notice('All spells removed.')
 end
 
@@ -247,35 +248,3 @@ windower.register_event('addon command', function(...)
         end
     end
 end)
-
-function parse_resources(lines_file)
-    local completed_table = T{}
-    local counter = 0
-    for i in ipairs(lines_file) do
-        local str = tostring(lines_file[i])
-        local g,h,typ,key = string.find(str,'<(%w+) id="(%d+)" ')
-        if typ == 's' then
-            g,h,key = string.find(str,'index="(%d+)" ')
-        end
-        if key ~=nil then
-            completed_table[tonumber(key)] = T{}
-            local q = 1
-            while q <= str:len() do
-                local a,b,ind,val = string.find(str,'(%w+)="(.-)"',q)
-                if ind~=nil then
-                    completed_table[tonumber(key)][ind] = T
-                    completed_table[tonumber(key)][ind] = val:gsub('&quot;','\42'):gsub('&apos;','\39')
-                    q = b+1
-                else
-                    q = str:len()+1
-                end
-            end
-            --[[local k,v,english = string.find(str,'>([^<]+)</')
-            if english~=nil then
-                completed_table[tonumber(key)][ind] = T{}
-                completed_table[tonumber(key)]['english']=english
-            end]]
-        end
-    end
-    return completed_table
-end

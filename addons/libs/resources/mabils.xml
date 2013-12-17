@@ -2869,7 +2869,7 @@
     <m id="2865" english="#1329" />
     <m id="2866" english="#1330" />
     <m id="2867" english="Fighting Stance a" />
-    <m id="2868" english="Fighting Stance ß" />
+    <m id="2868" english="Fighting Stance ï¿½" />
     <m id="2869" english="Fighting Stance ?" />
     <m id="2870" english="Fighting Stance d" />
     <m id="2871" english="#1335" />
@@ -2891,7 +2891,7 @@
     <m id="2887" english="#1351" />
     <m id="2888" english="#1352" />
     <m id="2889" english="#1353" />
-    <m id="2890" english="#1354" />
+    <m id="2890" english="Frenetic Flurry" />
     <m id="2891" english="#1355" />
     <m id="2892" english="#1356" />
     <m id="2893" english="Dazing Discord" />
@@ -2918,38 +2918,38 @@
     <m id="2914" english="#1378" />
     <m id="2915" english="#1379" />
     <m id="2916" english="#1380" />
-    <m id="2917" english="#1381" />
-    <m id="2918" english="#1382" />
-    <m id="2919" english="#1383" />
-    <m id="2920" english="#1384" />
-    <m id="2921" english="#1385" />
-    <m id="2922" english="#1386" />
-    <m id="2923" english="#1387" />
-    <m id="2924" english="#1388" />
-    <m id="2925" english="#1389" />
-    <m id="2926" english="#1390" />
-    <m id="2927" english="#1391" />
-    <m id="2928" english="#1392" />
-    <m id="2929" english="#1393" />
-    <m id="2930" english="#1394" />
-    <m id="2931" english="#1395" />
-    <m id="2932" english="#1396" />
-    <m id="2933" english="#1397" />
-    <m id="2934" english="#1398" />
-    <m id="2935" english="#1399" />
-    <m id="2936" english="#1400" />
-    <m id="2937" english="#1401" />
-    <m id="2938" english="#1402" />
-    <m id="2939" english="#1403" />
-    <m id="2940" english="#1404" />
-    <m id="2941" english="#1405" />
-    <m id="2942" english="#1406" />
-    <m id="2943" english="#1407" />
-    <m id="2944" english="#1408" />
-    <m id="2945" english="#1409" />
-    <m id="2946" english="#1410" />
-    <m id="2947" english="#1411" />
-    <m id="2948" english="#1412" />
+    <m id="2917" english="Brazen Rush" />
+    <m id="2918" english="Cross Reaver" />
+    <m id="2919" english="Meikyo Shisui" />
+    <m id="2920" english="Chant du Cygne" />
+    <m id="2921" english="Intervene" />
+    <m id="2922" english="Arrogance Incarnate" />
+    <m id="2923" english="Chant du Cygne" />
+    <m id="2924" english="Soul Enslavement" />
+    <m id="2925" english="Amon Drive" />
+    <m id="2926" english="Larceny" />
+    <m id="2927" english="Charm" />
+    <m id="2928" english="Havoc Spiral" />
+    <m id="2929" english="Cloudsplitter" />
+    <m id="2930" english="Yaegasumi" />
+    <m id="2931" english="Dragonfall" />
+    <m id="2932" english="Tachi: Fudo" />
+    <m id="2933" english="King Cobra Clamp" />
+    <m id="2934" english="Red Lotus Blade" />
+    <m id="2935" english="Spirits Within" />
+    <m id="2936" english="Vorpal Blade" />
+    <m id="2937" english="Royal Bash" />
+    <m id="2938" english="Royal Savior" />
+    <m id="2939" english="Abyssal Drain" />
+    <m id="2940" english="Abyssal Strike" />
+    <m id="2941" english="Ground Strike" />
+    <m id="2942" english="Grapeshot" />
+    <m id="2943" english="Pirate Pummel" />
+    <m id="2944" english="Powder Keg" />
+    <m id="2945" english="Walk the Plank" />
+    <m id="2946" english="Uriel Blade" />
+    <m id="2947" english="Scouring Bubbles" />
+    <m id="2948" english="Amatsu: Tsukikage" />
     <m id="2949" english="#1413" />
     <m id="2950" english="#1414" />
     <m id="2951" english="#1415" />

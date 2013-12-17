@@ -791,8 +791,39 @@ models.feet[28240] = { name = "Foire Babouches" , enl = "foire babouches" , mode
 models.feet[28241] = { name = "Maxixi Toeshoes" , enl = "maxixi toeshoes" , model = 20690 }
 models.feet[28242] = { name = "Maxixi Toeshoes" , enl = "maxixi toeshoes" , model = 20691 }
 models.feet[28243] = { name = "Acad. Loafers" , enl = "academic's loafers" , model = 20694 }
+models.feet[28244] = { name = "Pumm. Calligae +1" , enl = "pummeler's calligae +1" , model = 20544 }
+models.feet[28245] = { name = "Anch. Gaiters +1" , enl = "anchorite's gaiters +1" , model = 20546 }
+models.feet[28246] = { name = "Theo. Duckbills +1" , enl = "theophany duckbills +1" , model = 20548 }
+models.feet[28247] = { name = "Spae. Sabots +1" , enl = "spaekona's sabots +1" , model = 20550 }
+models.feet[28248] = { name = "Atrophy Boots +1" , enl = "atrophy boots +1" , model = 20552 }
+models.feet[28249] = { name = "Pill. Poulaines +1" , enl = "pillager's poulaines +1" , model = 20554 }
+models.feet[28250] = { name = "Rev. Leggings +1" , enl = "reverence leggings +1" , model = 20556 }
+models.feet[28251] = { name = "Igno. Sollerets +1" , enl = "ignominy sollerets +1" , model = 20558 }
+models.feet[28252] = { name = "Tot. Gaiters +1" , enl = "totemic gaiters +1" , model = 20560 }
+models.feet[28253] = { name = "Brioso Slippers +1" , enl = "brioso slippers +1" , model = 20562 }
+models.feet[28254] = { name = "Orion Socks +1" , enl = "orion socks +1" , model = 20564 }
+models.feet[28255] = { name = "Waki. Sune-Ate +1" , enl = "wakido sune-ate +1" , model = 20566 }
+models.feet[28256] = { name = "Hachi. Kyahan +1" , enl = "hachiya kyahan +1" , model = 20568 }
+models.feet[28257] = { name = "Vishap Greaves +1" , enl = "vishap greaves +1" , model = 20570 }
+models.feet[28258] = { name = "Con. Pigaches +1" , enl = "convoker's pigaches +1" , model = 20572 }
+models.feet[28259] = { name = "Assim. Charuqs +1" , enl = "assimilator's charuqs +1" , model = 20645 }
+models.feet[28260] = { name = "Lak. Bottes +1" , enl = "laksamana's bottes +1" , model = 20647 }
+models.feet[28261] = { name = "Foire Bab. +1" , enl = "foire babouches +1" , model = 20649 }
+models.feet[28262] = { name = "Maxixi Toe. +1" , enl = "maxixi toeshoes +1" , model = 20690 }
+models.feet[28263] = { name = "Maxixi Toe. +1" , enl = "maxixi toeshoes +1" , model = 20691 }
+models.feet[28264] = { name = "Acad. Loafers +1" , enl = "academic's loafers +1" , model = 20694 }
+models.feet[28265] = { name = "Geo. Sandals +1" , enl = "geomancy sandals +1" , model = 20788 }
+models.feet[28266] = { name = "Runeist Bottes +1" , enl = "runeist bottes +1" , model = 20818 }
+models.feet[28302] = { name = "Thatch Boots" , enl = "thatch boots" , model = 20846 }
 models.feet[28304] = { name = "Litany Clogs" , enl = "litany clogs" , model = 20500 }
 models.feet[28305] = { name = "Ejekamal Boots" , enl = "ejekamal boots" , model = 20808 }
+models.feet[28306] = { name = "Outrider Greaves" , enl = "outrider greaves" , model = 20485 }
+models.feet[28307] = { name = "Espial Socks" , enl = "espial socks" , model = 20503 }
+models.feet[28308] = { name = "Wayfarer Clogs" , enl = "wayfarer clogs" , model = 20500 }
+models.feet[28309] = { name = "Temachtiani Boots" , enl = "temachtiani boots" , model = 20582 }
+models.feet[28311] = { name = "Manabyss Pigaches" , enl = "manabyss pigaches" , model = 20581 }
+models.feet[28312] = { name = "Scamp's Sollerets" , enl = "scamp's sollerets" , model = 20493 }
+models.feet[28313] = { name = "Daihanshi Habaki" , enl = "daihanshi habaki" , model = 20497 }
 models.feet[28320] = { name = "Kar. Sollerets +1" , enl = "Karieyh sollerets +1" , model = 20822 }
 models.feet[28321] = { name = "Thur. Boots +1" , enl = "Thurandaut boots +1" , model = 20823 }
 models.feet[28322] = { name = "Orvail Souliers +1" , enl = "Orvail souliers +1" , model = 20824 }

@@ -63,7 +63,7 @@ windower.register_event('login', function()
     initialize()
 end)
 
-windower.register_event('gain status', function(name,id)
+windower.register_event('gain buff', function(name,id)
     for key,val in pairs(settings.buffs) do
         if key:lower() == name:lower() then
             if name:lower() == 'silence' and autoecho then

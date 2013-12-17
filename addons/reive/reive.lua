@@ -298,7 +298,8 @@ windower.register_event('load', function()
     windower.text.set_location(tb_name, settings.position.x, settings.position.y)
     windower.text.set_bg_color(tb_name, background.a, background.r, background.g, background.b)
     windower.text.set_color(tb_name, settings.font.a, 147, 161, 161)
-    windower.text.set_font(tb_name, settings.font.family, settings.font.size)
+    windower.text.set_font(tb_name, settings.font.family)
+    windower.text.set_font_size(tb_name, settings.font.size)
     windower.text.set_bold(tb_name, settings.font.bold)
     windower.text.set_italic(tb_name, settings.font.italic)
     windower.text.set_text(tb_name, '')
@@ -314,13 +315,13 @@ windower.register_event('unload', function()
     windower.text.delete(tb_name)
 end)
 
-windower.register_event('gain status', function(id)
+windower.register_event('gain buff', function(id)
     if id == 511 then
         start_tracking()
     end
 end)
 
-windower.register_event('lose status', function(id)
+windower.register_event('lose buff', function(id)
     if id == 511 then
         stop_tracking()
     end

@@ -39,9 +39,9 @@ function get_sets()
 		
 	sets.Utsusemi = {head="Uk'uxkaj cap",neck="Magoraga Beads",ear1="Phawaylla Earring",ear2="Novia Earring",
 		body="Manibozho Jerkin",legs="Thaumas Gloves",lring="Beeline Ring",
-		back="Boxer Mantle",waist="Scouter's Rope",legs="Manibozho Brais",feet="Iga Kyahan +2"}
+		back="Boxer's Mantle",waist="Scouter's Rope",legs="Manibozho Brais",feet="Iga Kyahan +2"}
 		
-	windower.send_command('input /macro book 16;wait .1;input /macro set 1')
+	send_command('input /macro book 16;wait .1;input /macro set 1')
 end
 
 function precast(spell,action)
@@ -72,9 +72,9 @@ function aftercast(spell,action)
 end
 
 function status_change(new,old)
-	if T{'Idle','Resting'}:contains(new) then
+	if T{'Idle','Resting'}:contains(player.status) then
 		equip(sets.aftercast.Idle)
-	elseif new == 'Engaged' then
+	elseif player.status == 'Engaged' then
 		equip(sets.aftercast.TP)
 	end
 end
@@ -86,10 +86,10 @@ function self_command(command)
 	if command == 'toggle TP set' then
 		if sets.aftercast.TP == sets.TP.DD then
 			sets.aftercast.TP = sets.TP.Solo
-			windower.send_command('@input /echo SOLO SET')
+			send_command('@input /echo SOLO SET')
 		elseif sets.aftercast.TP == sets.TP.Solo then
 			sets.aftercast.TP = sets.TP.DD
-			windower.send_command('@input /echo DD SET')
+			send_command('@input /echo DD SET')
 		end
 	elseif command == 'DT' then
 		equip(sets.DT)

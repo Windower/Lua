@@ -149,7 +149,7 @@ function enable(...)
 			rawset(disable_table,slot_map[v],false)
 			local potential_gear = rawget(not_sent_out_equip,slot_map[v])
 			if potential_gear and not rawget(encumbrance_table,slot_map[v]) then
-				windower.packets.set_equip(potential_gear,slot_map[v])
+				windower.ffxi.set_equip(potential_gear,slot_map[v])
 				rawset(sent_out_equip,slot_map[v],potential_gear)
 				rawset(not_sent_out_equip,slot_map[v],nil)
 			end
@@ -186,13 +186,13 @@ end
 
 function register_event_user(str,func)
 	local id = windower.register_event(str,func)
-	registered_user_events[id]=true
+	rawset(registered_user_events,id,true)
 	return id
 end
 
 function unregister_event_user(id)
 	windower.unregister_event(id)
-	registered_user_events[id]=nil
+	rawset(registered_user_events,id,nil)
 end
 
 function include_user(str)

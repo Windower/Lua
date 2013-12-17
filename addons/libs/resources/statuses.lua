@@ -7,7 +7,7 @@ statuses[0x02] = {english = 'Dead'}
 statuses[0x03] = {english = 'Engaged dead'}
 statuses[0x04] = {english = 'Event'}
 statuses[0x05] = {english = 'Chocobo'}
-statuses[0x21] = {english = 'Healing'}
+statuses[0x21] = {english = 'Resting'}
 statuses[0x22] = {english = 'Locked'}
 statuses[0x26] = {english = 'Fishing fighting'}
 statuses[0x27] = {english = 'Fishing caught'}

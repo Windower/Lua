@@ -330,7 +330,7 @@ function text_update_loop(str)
     end
 end
 
-windower.register_event("gain status", function(name,id)
+windower.register_event("gain buff", function(name,id)
     if mjob_id == 18 then
         if id == 305 then 
             decay = get_decay()
@@ -341,7 +341,7 @@ windower.register_event("gain status", function(name,id)
     end
 end)
 
-windower.register_event("lose status",function(name,id)
+windower.register_event("lose buff",function(name,id)
     if mjob_id == 18 then
         if id == 305 then 
             decay = get_decay()

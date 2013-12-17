@@ -112,7 +112,7 @@ function split(msg, match)
 	return splitarr
 end
 	
-windower.register_event('lose status',function (id, name)
+windower.register_event('lose buff',function (id, name)
 	local self = windower.ffxi.get_player()
 	if name == ('Sneak Attack' or 'Trick Attack') then
 		if self.status:lower() == 'engaged' then

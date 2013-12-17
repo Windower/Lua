@@ -8,7 +8,7 @@ require 'parse_action_packet'
 require 'statics'
 res = require 'resources'
 
-_addon.version = '3.10'
+_addon.version = '3.11'
 _addon.name = 'BattleMod'
 _addon.author = 'Byrth'
 _addon.commands = {'bm','battlemod'}
@@ -27,73 +27,71 @@ windower.register_event('addon command',function (...)
 	if debugging then windower.debug('addon command') end
     local term = table.concat({...}, ' ')
     local splitarr = split(term,' ')
-	if splitarr[1] == 'cmd' then
-		if splitarr[2] ~= nil then
-			if splitarr[2]:lower() == 'commamode' then
-				commamode = not commamode
-				windower.add_to_chat(121,'Battlemod: Comma Mode flipped! - '..tostring(commamode))
-			elseif splitarr[2]:lower() == 'oxford' then
-				oxford = not oxford
-				windower.add_to_chat(121,'Battlemod: Oxford Mode flipped! - '..tostring(oxford))
-			elseif splitarr[2]:lower() == 'targetnumber' then
-				targetnumber = not targetnumber
-				windower.add_to_chat(121,'Battlemod: Target Number flipped! - '..tostring(targetnumber))
-			elseif splitarr[2]:lower() == 'swingnumber' then
-				swingnumber = not swingnumber
-				windower.add_to_chat(121,'Battlemod: Round Number flipped! - '..tostring(targetnumber))
-			elseif splitarr[2]:lower() == 'cancelmulti' then
-				cancelmulti = not cancelmulti
-				windower.add_to_chat(121,'Battlemod: Multi-canceling flipped! - '..tostring(cancelmulti))
-			elseif splitarr[2]:lower() == 'reload' then
-				options_load()
-			elseif splitarr[2]:lower() == 'unload' then
-				windower.send_command('@lua u battlemod')
-			elseif splitarr[2]:lower() == 'simplify' then
-				simplify = not simplify
-				windower.add_to_chat(121,'Battlemod: Text simplification flipped! - '..tostring(simplify))
-			elseif splitarr[2]:lower() == 'condensedamage' then
-				condensedamage = not condensedamage
-				windower.add_to_chat(121,'Battlemod: Condensed Damage text flipped! - '..tostring(condensedamage))
-			elseif splitarr[2]:lower() == 'condensetargets' then
-				condensetargets = not condensetargets
-				windower.add_to_chat(121,'Battlemod: Condensed Targets flipped! - '..tostring(condensetargets))
-			elseif splitarr[2]:lower() == 'colortest' then
-				local counter = 0
-				local line = ''
-				for n = 1, 509 do
-					if not color_redundant:contains(n) and not black_colors:contains(n) then
-						if n <= 255 then
-							loc_col = string.char(0x1F, n)
-						else
-							loc_col = string.char(0x1E, n - 254)
-						end
-						line = line..loc_col..string.format('%03d ', n)
-						counter = counter + 1
+	if splitarr[1] ~= nil then
+		if splitarr[1]:lower() == 'commamode' then
+			commamode = not commamode
+			windower.add_to_chat(121,'Battlemod: Comma Mode flipped! - '..tostring(commamode))
+		elseif splitarr[1]:lower() == 'oxford' then
+			oxford = not oxford
+			windower.add_to_chat(121,'Battlemod: Oxford Mode flipped! - '..tostring(oxford))
+		elseif splitarr[1]:lower() == 'targetnumber' then
+			targetnumber = not targetnumber
+			windower.add_to_chat(121,'Battlemod: Target Number flipped! - '..tostring(targetnumber))
+		elseif splitarr[1]:lower() == 'swingnumber' then
+			swingnumber = not swingnumber
+			windower.add_to_chat(121,'Battlemod: Round Number flipped! - '..tostring(targetnumber))
+		elseif splitarr[1]:lower() == 'cancelmulti' then
+			cancelmulti = not cancelmulti
+			windower.add_to_chat(121,'Battlemod: Multi-canceling flipped! - '..tostring(cancelmulti))
+		elseif splitarr[1]:lower() == 'reload' then
+			options_load()
+		elseif splitarr[1]:lower() == 'unload' then
+			windower.send_command('@lua u battlemod')
+		elseif splitarr[1]:lower() == 'simplify' then
+			simplify = not simplify
+			windower.add_to_chat(121,'Battlemod: Text simplification flipped! - '..tostring(simplify))
+		elseif splitarr[1]:lower() == 'condensedamage' then
+			condensedamage = not condensedamage
+			windower.add_to_chat(121,'Battlemod: Condensed Damage text flipped! - '..tostring(condensedamage))
+		elseif splitarr[1]:lower() == 'condensetargets' then
+			condensetargets = not condensetargets
+			windower.add_to_chat(121,'Battlemod: Condensed Targets flipped! - '..tostring(condensetargets))
+		elseif splitarr[1]:lower() == 'colortest' then
+			local counter = 0
+			local line = ''
+			for n = 1, 509 do
+				if not color_redundant:contains(n) and not black_colors:contains(n) then
+					if n <= 255 then
+						loc_col = string.char(0x1F, n)
+					else
+						loc_col = string.char(0x1E, n - 254)
 					end
-					if counter == 16 or n == 509 then
-						windower.add_to_chat(1, line)
-						counter = 0
-						line = ''
-					end
+					line = line..loc_col..string.format('%03d ', n)
+					counter = counter + 1
 				end
-				windower.add_to_chat(122,'Colors Tested!')
-			elseif splitarr[2]:lower() == 'help' then
-				print('   :::   '.._addon.name..' ('.._addon.version..'   :::')
-				print('Toggles: (* subtoggles)')
-				print(' 1. simplify --- Condenses battle text using custom messages, Default = True')
-				print(' 2. condensetargets --- Collapse similar messages with multiple targets, Default = True')
-				print('    * targetnumber --- Toggle target number display, Default = True')
-				print('    * oxford --- Toggle use of oxford comma, Default = True')
-				print('    * commamode --- Toggle comma-only mode, Default = False')
-				print(' 3. condensedamage --- Condenses damage messages within attack rounds, Default = True')
-				print('    * swingnumber --- Condenses damage messages within attack rounds, Default = True')
-				print(' 4. cancelmulti --- Cancles multiple consecutive identical lines, Default = True')
-				print('Utilities:')
-				print(' 1. colortest --- Shows the 509 possible colors for use with the settings file')
-				print(' 2. reload --- Reloads the settings file')
-				print(' 3. unload --- Unloads battlemod')
-				print(' 4. help --- shows this menu')
+				if counter == 16 or n == 509 then
+					windower.add_to_chat(1, line)
+					counter = 0
+					line = ''
+				end
 			end
+			windower.add_to_chat(122,'Colors Tested!')
+		elseif splitarr[1]:lower() == 'help' then
+			print('   :::   '.._addon.name..' ('.._addon.version..'   :::')
+			print('Toggles: (* subtoggles)')
+			print(' 1. simplify --- Condenses battle text using custom messages, Default = True')
+			print(' 2. condensetargets --- Collapse similar messages with multiple targets, Default = True')
+			print('    * targetnumber --- Toggle target number display, Default = True')
+			print('    * oxford --- Toggle use of oxford comma, Default = True')
+			print('    * commamode --- Toggle comma-only mode, Default = False')
+			print(' 3. condensedamage --- Condenses damage messages within attack rounds, Default = True')
+			print('    * swingnumber --- Condenses damage messages within attack rounds, Default = True')
+			print(' 4. cancelmulti --- Cancles multiple consecutive identical lines, Default = True')
+			print('Utilities:')
+			print(' 1. colortest --- Shows the 509 possible colors for use with the settings file')
+			print(' 2. reload --- Reloads the settings file')
+			print(' 3. unload --- Unloads battlemod')
+			print(' 4. help --- shows this menu')
 		end
 	end
 end)
@@ -189,17 +187,14 @@ function options_load()
 	end
 end
 
-windower.register_event('job change',function (mjob,mjob_id,mjob_lvl,sjob,sjob_id,sjob_lvl)
-	if debugging then windower.debug('job change') end
-	filterload(mjob)
-end)
-
 function filterload(job)
 	if Current_job == job then return end
 	if file.exists('data\\filters\\filters-'..job..'.xml') then
+		default_filt = false
 		filter = config.load('data\\filters\\filters-'..job..'.xml',default_filter_table,false)
 		windower.add_to_chat(4,'Loaded '..job..' Battlemod filters')
-	else
+	elseif not default_filt then
+		default_filt = true
 		filter = config.load('data\\filters\\filters.xml',default_filter_table,false)
 		windower.add_to_chat(4,'Loaded default Battlemod filters')
 	end
@@ -466,6 +461,10 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 				windower.add_to_chat(8,'Craftmod: Unhandled result '..tostring(result))
 			end
 		end
+		
+------------- JOB INFO ----------------
+	elseif id == 0x01B then
+		filterload(res.jobs[data:byte(5)].short)
 	end
 end)
 
