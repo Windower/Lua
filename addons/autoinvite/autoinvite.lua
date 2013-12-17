@@ -188,7 +188,7 @@ windower.register_event('addon command',function (command, ...)
 			return
 		end
 		
-	elseif aliases:contains(command) then
+	elseif aliases:keyset():contains(command) then
 		mode = aliases[command]
 		names = args:slice(2):map(string.ucfirst..string.lower)
 		if args:empty() then
