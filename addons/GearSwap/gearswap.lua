@@ -238,7 +238,7 @@ windower.register_event('outgoing text',function(original,modified)
 	return modified
 end)
 
-windower.register_event('incoming text',function(original,modified,color)
+windower.register_event('incoming text',function(original,modified,color,modifiedcolor)
 	if debugging >= 1 then windower.debug('incoming text') end
 	if gearswap_disabled then return modified, color end
 	if original == '...A command error occurred.' or original == 'You can only use that command during battle.' or original == 'You cannot use that command here.' then
@@ -249,7 +249,7 @@ windower.register_event('incoming text',function(original,modified,color)
 			windower.add_to_chat(123,'GearSwap: aftercast() exists but is not a function')
 		end
 	end
-	return modified,color
+	return modified,modifiedcolor
 end)
 
 windower.register_event('incoming chunk',function(id,data,modified,injected,blocked)
