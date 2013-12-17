@@ -69,7 +69,7 @@ off = T{'off', 'no', 'false'}
 modes = T{'whitelist', 'blacklist'}
 
 -- Check for keyword
-windower.register_event("chat message", function(is_gm, mode, player, message)
+windower.register_event("chat message", function(message, player, mode, is_gm)
 	local word = false
 	if mode == 3 then
 		for item,_ in pairs(settings.keywords) do
@@ -81,7 +81,7 @@ windower.register_event("chat message", function(is_gm, mode, player, message)
 		if word == false then
 			return
 		end
-		
+
 		if settings.mode == 'blacklist' then
 			if settings.blacklist:contains(player) then
 				return
@@ -131,7 +131,6 @@ function add_item(mode, ...)
 	local new = names - settings[mode]
 	if not new:empty() then
 		settings[mode] = settings[mode] + new
-		log(new:format()..'test')
 		log('Added '..new:format()..' to the '..aliases[mode]..'.')
 	end
 	settings:save()
@@ -162,7 +161,7 @@ windower.register_event('addon command',function (command, ...)
 	-- Changes whitelist/blacklist mode
 	if command == 'mode' then
 		local mode = args[1] or 'status'
-		if table.contains(aliases, mode) then
+		if aliases:keyset():contains(mode) then
 			settings.mode = aliases[mode]
 			log('Mode switched to '..settings.mode..'.')
 		elseif mode == 'status' then
@@ -176,10 +175,10 @@ windower.register_event('addon command',function (command, ...)
 	elseif command == 'tellback' then
 		status = args[1] or 'status'
 		status = string.lower(status)
-		if status == 'on' then
+		if on:contains(status) then
 			settings.tellback = 'on'
 			log('Tellback turned on.')
-		elseif status == 'off' then
+		elseif off:contains(status) then
 			settings.tellback = 'off'
 			log('Tellback turned off.')
 		elseif status == 'status' then
@@ -189,15 +188,15 @@ windower.register_event('addon command',function (command, ...)
 			return
 		end
 		
-	elseif table.contains(aliases, command) then
+	elseif aliases:contains(command) then
 		mode = aliases[command]
 		names = args:slice(2):map(string.ucfirst..string.lower)
 		if args:empty() then
 			log(mode:ucfirst()..':', settings[mode]:format('csv'))
 		else
-			if table.contains(addstrs, args[1]) then
+			if addstrs:contains(args[1]) then
 				add_item(mode, names:unpack())
-			elseif table.contains(rmstrs, args[1]) then
+			elseif rmstrs:contains(args[1]) then
 				remove_item(mode, names:unpack())
 			else
 				notice('Invalid operator specified. Specify add or remove.')
