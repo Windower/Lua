@@ -59,7 +59,6 @@ default_settings.text.alpha = 255
 default_settings.text.red = 255
 default_settings.text.green = 255
 default_settings.text.blue = 255
-default_settings.text.content = ''
 
 math.randomseed(os.clock())
 
@@ -109,7 +108,7 @@ function texts.new(str, settings, root_settings)
     end
 
     t = {}
-    t._name = (_addon and _addon.name or 'text')..'_gensym_'..tostring(t):sub(8)..('%.8X'):format(16^8*math.random()):sub(3)
+    t._name = (_addon and _addon.name or 'text')..'_gensym_'..tostring(t):sub(8)..('_%.8X'):format(16^8*math.random()):sub(3)
     t._settings = settings or {}
     t._status = t._status or {visible = false, text = {}}
     t._root_settings = root_settings
@@ -286,12 +285,12 @@ end
 -- Sets the text. This will ignore the defined text patterns.
 function texts.text(t, str)
     if not str then
-        return t._settings.text.content
+        return t._status.text.content
     end
 
     str = tostring(str)
     windower.text.set_text(t._name, str)
-    t._settings.text.content = str
+    t._status.text.content = str
 end
 
 --[[
