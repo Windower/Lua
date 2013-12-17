@@ -306,8 +306,8 @@ function config.save(t, char)
         return
     end
 
-	char = (char or windower.ffxi.get_player()['name']):lower()
-	meta = settings_map[t]
+    char = (char or windower.ffxi.get_player()['name']):lower()
+    meta = settings_map[t]
 
     if char == 'all' then
         char = 'global'
@@ -321,7 +321,7 @@ function config.save(t, char)
     if char == 'global' then
         meta.original = meta.original:filterkey('global')
     else
-        meta.original.global:amend(meta.original[char],true)
+        meta.original.global:amend(meta.original[char], true)
         meta.original[char] = table_diff(meta.original.global, meta.original[char]) or setmetatable({}, _meta.T)
 
         if meta.original[char]:empty(true) then
@@ -419,14 +419,15 @@ function nest_xml(t, meta, indentlevel)
 
         else
             if class(val) == 'List' then
-                val = val:format('csv')
+                val = list.format(val, 'csv')
             elseif class(val) == 'Set' then
-                val = val:sort():format('csv')
+                val = set.format(val, 'csv')
             elseif type(val) == 'table' then
-                val = T(val):format('csv')
+                val = table.format(val, 'csv')
             else
                 val = tostring(val)
             end
+
             if val == '' then
                 fragments:append(indent..'<'..key..' />')
             else

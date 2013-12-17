@@ -539,15 +539,12 @@ fields.incoming[0x01B] = L{
 
 -- Item Assign
 fields.incoming[0x01F] = L{
-    {ctype='unsigned short',    label='_unknown1'},                             --    4 -   5
-    {ctype='unsigned short',    label='_unknown2'},                             --    6 -   7
+    {ctype='unsigned int',      label='_unknown1',          const=0x00000001},  --    4 -   7
     {ctype='unsigned short',    label='Item ID',            fn=item},           --    8 -   9
-    {ctype='unsigned char',     label='_unknown3'},                             --   10 -  10
+    {ctype='unsigned char',     label='_padding1',          const=0x00},        --   10 -  10
     {ctype='unsigned char',     label='Inventory ID'},                          --   11 -  11
     {ctype='unsigned char',     label='Inventory Status'},                      --   12 -  12
-    {ctype='unsigned char',     label='_unknown4'},                             --   13 -  13
-    {ctype='unsigned char',     label='_unknown5'},                             --   14 -  14
-    {ctype='unsigned char',     label='_unknown6'},                             --   15 -  15
+    {ctype='char[3]',           label='_junk1'},                                --   13 -  13
 }
 
 -- Count to 80
