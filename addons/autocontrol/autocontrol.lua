@@ -75,7 +75,7 @@ function initialize()
         Burden_tb[key] = 0
         Burden_tb['time'..key] = 0 
     end
-    if windower.ffxi.get_mob_by_id(windower.ffxi.get_player()['id'])['pet_index'] ~= 0 then 
+    if windower.ffxi.get_mob_by_id(windower.ffxi.get_player()['id'])['pet_index'] ~= nil then 
         running = 1
         text_update_loop('start')
         Burden_tb:show()
@@ -107,7 +107,7 @@ function attach_set(autoset)
         log('The '..autoset..' set is already equipped.')
         return
     end
-    if windower.ffxi.get_mob_by_id(windower.ffxi.get_player()['id'])['pet_index'] ~= 0 then 
+    if windower.ffxi.get_mob_by_id(windower.ffxi.get_player()['id'])['pet_index'] ~= nil then 
         if windower.ffxi.get_ability_recasts()[208] == 0 then
             windower.send_command('input /pet "Deactivate" <me>')
             log('Deactivating '..windower.ffxi.get_mjob_data()['name']..'.')
@@ -129,26 +129,22 @@ function set_attachments_from_autoset(autoset,slot)
     if slot == 'head' then
         local tempHead = settings.autosets[autoset]['head']
         if tempHead ~= nil then
-            for id = 8193, 8198 do
-                if atts[id] ~= nil then
-                    if atts[id]['english'] == tempHead then
-                        windower.ffxi.set_attachment(id)
+            for att in atts:it() do
+                    if att['name'] == tempHead and att['id'] >5000 then
+                        windower.ffxi.set_attachment(att['id'])
                         break
                     end
-                end
             end
         end
         windower.send_command('@wait .5;lua i autocontrol set_attachments_from_autoset '..autoset..' frame')
     elseif slot == 'frame' then
         local tempFrame = settings.autosets[autoset]['frame']
         if tempFrame ~= nil then
-            for id = 8224, 8227 do
-                if atts[id] ~= nil then
-                    if atts[id]['english'] == tempFrame then
-                        windower.ffxi.set_attachment(id)
+            for att in atts:it() do
+                    if att['name'] == tempFrame and att['id'] >5000 then
+                        windower.ffxi.set_attachment(att['id'])
                         break
                     end
-                end
             end
         end
         windower.send_command('@wait .5;lua i autocontrol set_attachments_from_autoset '..autoset..' 1')
@@ -159,13 +155,11 @@ function set_attachments_from_autoset(autoset,slot)
         else islot = slot end
         local tempname = settings.autosets[autoset]['slot'..islot]
         if tempname ~= nil then
-            for id = 8449, 8680 do
-                if atts[id] ~= nil then
-                    if atts[id]['english'] == tempname then
-                        windower.ffxi.set_attachment(id, tonumber(slot))
+            for att in atts:it() do
+                    if att['name'] == tempname and att['id'] >5000 then
+                        windower.ffxi.set_attachment(att['id'], tonumber(slot))
                         break
                     end
-                end
             end
         end
     
@@ -194,15 +188,16 @@ function get_current_autoset()
         local i,id
         for i = 1, #tmpTable do
             local t = ''
-            if tonumber(tmpTable[i]) ~= 0 then 
+            if tonumber(tmpTable[i]) ~= 0 then
+                print(tmpTable[i], tmpTable[i]+8448,atts[tmpTable[i]+8448], atts:length())
                 if i < 10 then t = '0' end
-                autoTable['slot'..t..i] = atts[tonumber(tmpTable[i])+8448]['english']
+                autoTable['slot'..t..i] = atts[tonumber(tmpTable[i])+8448]['name']
             end
         end
         local headnum = windower.ffxi.get_mjob_data()['head']
         local framenum = windower.ffxi.get_mjob_data()['frame']
-        autoTable['head'] = atts[headnum+8192]['english']
-        autoTable['frame'] = atts[framenum+8223]['english']
+        autoTable['head'] = atts[headnum+8192]['name']
+        autoTable['frame'] = atts[framenum+8223]['name']
         return autoTable
     end
 end
