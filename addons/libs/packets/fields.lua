@@ -6,14 +6,11 @@ require('pack')
 require('functools')
 require('stringhelper')
 require('mathhelper')
+require('lists')
 
 local fields = {}
 fields.outgoing = {_mult = {}}
 fields.incoming = {_mult = {}}
-
-local indices = {}
-indices.outgoing = {}
-indices.incoming = {}
 
 -- String decoding definitions
 local ls_name_msg = T(('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'):split())
@@ -41,6 +38,10 @@ local function ip(val)
     return (val / 2^24):floor()..'.'..((val / 2^16):floor() % 0x100)..'.'..((val / 2^8):floor() % 0x100)..'.'..(val % 0x100)
 end
 
+local function gil(val)
+    return tostring(val):reverse():chunks(3):concat(','):reverse()..' G'
+end
+
 local function bool(val)
     return val ~= 0
 end
@@ -53,6 +54,13 @@ local time = (function()
     now, h, m = nil, nil, nil
     return function(ts)
         return os.date('%Y-%m-%dT%H:%M:%S'..timezone, ts)
+    end
+end)()
+
+local dir = (function()
+    local dir_sets = L{'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW', 'N', 'NNE', 'NE', 'ENE', 'E'}
+    return function(val)
+        return dir_sets[((val + 8)/16):floor() + 1]
     end
 end)()
 
@@ -104,6 +112,20 @@ local function race(val)
     return res.races[val].name
 end
 
+--[[
+    Custom types
+]]
+local types = {}
+types.shop_item = L{
+    {ctype='unsigned int',      label='Price',              fn=gil},            --    0 -   3
+    {ctype='unsigned short',    label='Item ID',            fn=item},           --    4 -   7
+    {ctype='unsigned short',    label='Shop Slot'},                             --    8 -  11
+}
+
+--[[
+    Outgoing packets
+]]
+
 -- Client Leave
 fields.outgoing[0x00D] = L{
     {ctype='unsigned char',     label='_unknown1'},                             --    4 -   4 -- Always 00?
@@ -117,8 +139,9 @@ fields.outgoing[0x015] = L{
     {ctype='float',             label='X Position'},                            --    4 -   7
     {ctype='float',             label='Y Position'},                            --    8 -  11
     {ctype='float',             label='Z Position'},                            --   12 -  15
-    {ctype='float',             label='_unknown1'},                             --   16 -  19 -- Counter that indicates how long you've been running?
-    {ctype='unsigned char',     label='Rotation'},                              --   20 -  20
+    {ctype='unsigned short',    label='_zero1'},                                --   16 -  17
+    {ctype='unsigned short',    label='Run Count'},                             --   18 -  19 -- Counter that indicates how long you've been running?
+    {ctype='unsigned char',     label='Rotation',           fn=dir},            --   20 -  20
     {ctype='unsigned char',     label='_unknown2'},                             --   21 -  21
     {ctype='unsigned short',    label='Target Index',       fn=index},          --   22 -  23
     {ctype='unsigned int',      label='Timestamp',          fn=time},           --   24 -  27
@@ -597,18 +620,27 @@ fields.incoming[0x02A] = L{
 
 -- Synth Animation
 fields.incoming[0x030] = L{
-    {ctype='unsigned int',      label='Player ID',          fn=id},             --    4 -  7
-    {ctype='unsigned short',    label='Index',              fn=index},          --    8 -  9
+    {ctype='unsigned int',      label='Player ID',          fn=id},             --    4 -   7
+    {ctype='unsigned short',    label='Index',              fn=index},          --    8 -   9
     {ctype='unsigned short',    label='Effect'},                                --   10 -  11  -- 10 00 is water, 11 00 is wind, 12 00 is fire, 13 00 is earth, 14 00 is lightning, 15 00 is ice, 16 00 is light, 17 00 is dark
     {ctype='unsigned char',     label='Param'},                                 --   12 -  12  -- 00 is NQ, 01 is break, 02 is HQ
     {ctype='unsigned char',     label='Animation'},                             --   13 -  13  -- Always C2 for me.
     {ctype='unsigned char',     label='_unknown1',          const=0x00},        --   14 -  15  -- Appears to just be trash.
 }
 
+-- Shop
+fields.incoming[0x03C] = L{
+    {ctype='unsigned short',    label='_zero1',             const=0x0000},      --    4 -   5
+    {ctype='unsigned short',    label='_padding1'},                             --    6 -   7
+    {ref=types.shop_item,       label='Item',               count='*'},         --    8 -   *
+}
+
 -- Pet Stat
 -- This packet varies and is indexed by job ID (byte 4)
 fields.incoming._mult[0x044] = {}
-indices.incoming[0x044] = {byte = 4, length = 1}
+fields.incoming[0x044] = function(data)
+    return data, fields.incoming._mult[0x044][data:sub(5,5):byte()]
+end
 
 fields.incoming._mult[0x044][0x12] = L{     -- PUP
 -- Packet 0x044 is sent twice in sequence when stats could change. This can be caused by anything from
@@ -970,27 +1002,56 @@ fields.incoming[0x0F6] = L{
 
 -- Reraise Activation
 fields.incoming[0x0F9] = L{
-    {ctype='unsigned int',      label='ID',                 fn=id},             --    4 -   7
-    {ctype='unsigned short',    label='Player Index'},                          --    8 -   9
+    {ctype='unsigned int',      label='Player ID',          fn=id},             --    4 -   7
+    {ctype='unsigned short',    label='Player Index',       fn=index},          --    8 -   9
     {ctype='unsigned char',     label='_unknown1'},                             --   10 -  10
     {ctype='unsigned char',     label='_unknown2'},                             --   11 -  11
 }
 
-local pack_strs = {
-    [1] = 'b',
-    [2] = 'H',
-    [4] = 'I',
-}
+local sizes = {}
+sizes.char = 1
+sizes.short = 2
+sizes.int = 4
+sizes.long = 8
+sizes.float = 4
+sizes.double = 8
+
+local function parse(fs, data, max)
+    max = max == '*' and 0 or max or 1
+
+    local res = L{}
+    local index = 0
+    local count = 0
+    while index < #data do
+        count = count + 1
+        for field in fs:it() do
+            if field.ctype then
+                field = table.copy(field)
+                if max ~= 1 then
+                    field.label = field.label..' '..tostring(count)
+                end
+
+                res:append(field)
+                index = index + sizes[field.ctype:match('(%a+)[^%a]*$')]
+            else
+                local ext, size = parse(field.ref, data:sub(index + 1), field.count)
+                res = res + ext
+                index = index + size
+            end
+        end
+
+        if count == max then
+            return res, index
+        end
+    end
+
+    return res, index
+end
 
 function fields.get(dir, id, data)
-    if fields[dir][id] then
-        return fields[dir][id]
-    end
-
-    local index = indices[dir][id]
-    if index then
-        return (fields[dir]._mult[id][data:sub(index.byte + 1):unpack(pack_strs[index.length])])
-    end
+    local f = fields[dir][id]
+    f = type(f) == 'function' and f(data) or f
+    return data and parse(f, data:sub(5)) or f
 end
 
 return fields
