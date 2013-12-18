@@ -277,6 +277,27 @@ function fns.items()
         last = res[id]
     end
     slots[res] = slots[res] + table.keyset(last)
+    
+    match_string = '<i id="(%d-)" enl="([^"]-)" fr="([^"]-)" frl="([^"]-)" de="([^"]-)" del="([^"]-)" jp="([^"]-)" jpl="([^"]-)">([^<]-)</i>'
+    for id, enl, fr, frl, de, del, jp, jpl, en in file:gmatch(match_string) do
+        id = tonumber(id)
+        res[id] = {
+            id = id,
+            english = unquote(en),
+            english_full = unquote(enl),
+            french = unquote(fr),
+            french_full = unquote(frl),
+            german = unquote(de),
+            german_full = unquote(del),
+            japanese = unquote(jp),
+            japanese_full = unquote(jpl),
+            category = 'General',
+        }
+        res[id].name = res[id][language_string]
+        res[id].name_full = res[id][language_string_full]
+        last = res[id]
+    end
+    slots[res] = slots[res] + table.keyset(last)
 
     -- Armor and weapons
     local categories = S{'armor', 'weapons'}

@@ -95,13 +95,11 @@ function set_spells_from_spellset(spellset,slot)
     else islot = slot end
     local tempname = settings.spellsets[spellset]['slot'..islot]
     if tempname ~= nil then
-        for id = 512, spells:length() do
-            if spells[id] then
-                if spells[id]['english']:lower() == tempname:lower() then
-                    windower.ffxi.set_blue_magic_spell(spells[id]['index'], tonumber(slot))
+        for spell in spells:it() do
+                if spell['english']:lower() == tempname:lower() then
+                    windower.ffxi.set_blue_magic_spell(spell['index'], tonumber(slot))
                     break
                 end
-            end
         end
     end
     if tonumber(slot) < 20 then
@@ -113,29 +111,27 @@ function set_spells_from_spellset(spellset,slot)
     
 end
 
-function set_single_spell(spell,slot)
+function set_single_spell(setspell,slot)
     if windower.ffxi.get_player()['main_job_id'] ~= 16 --[[and windower.ffxi.get_player()['sub_job_id'] ~= 16]] then return nil end
     
     local tmpTable = T(get_current_spellset())
     for key,val in pairs(tmpTable) do
-        if tmpTable[key]:lower() == spell then 
+        if tmpTable[key]:lower() == setspell then 
             error('That spell is already set.')
             return
         end
     end
     if tonumber(slot) < 10 then slot = '0'..slot end
     --insert spell add code here
-    for id = 512, spells:length() do
-        if spells[id] then
-            if spells[id]['english']:lower() == spell then
+        for spell in spells:it() do
+            if spell['english']:lower() == setspell then
                 --This is where single spell setting code goes.
                 --Need to set by spell index rather than name.
-                windower.ffxi.set_blue_magic_spell(spells[id]['index'], tonumber(slot))
+                windower.ffxi.set_blue_magic_spell(spell['index'], tonumber(slot))
                 windower.send_command('@timers c "Blue Magic Cooldown" 60 up')
-                tmpTable['slot'..slot] = spell
+                tmpTable['slot'..slot] = setspell
             end
         end
-    end
     tmpTable = nil
 end
 
@@ -149,13 +145,11 @@ function get_current_spellset()
         for i = 1, #tmpTable do
             local t = ''
             if tonumber(tmpTable[i]) ~= 512 then
-                for id = 512, spells:length() do
-                    if spells[id] then
-                        if tonumber(tmpTable[i]) == tonumber(spells[id]['index']) then
-                            if i < 10 then t = '0' end
-                            spellTable['slot'..t..i] = spells[id]['english']:lower()
-                            break
-                        end
+                for spell in spells:it() do
+                    if tonumber(tmpTable[i]) == tonumber(spell['index']) then
+                        if i < 10 then t = '0' end
+                        spellTable['slot'..t..i] = spell['english']:lower()
+                        break
                     end
                 end
             end
