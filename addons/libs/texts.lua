@@ -4,6 +4,7 @@ A library to facilitate text primitive creation and manipulation.
 
 local texts = {}
 local saved_texts = {}
+local dragged
 
 _libs = _libs or {}
 _libs.texts = texts
@@ -444,8 +445,8 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
 
     -- Mouse drag
     if type == 0 then
-        if dragged_text then
-            dragged_text[1]:pos(x - dragged_text[2], y - dragged_text[3])
+        if dragged then
+            dragged.text:pos(x - dragged.x, y - dragged.y)
             return true
         end
 
@@ -465,18 +466,18 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
                     pos_x = t._settings.flags.right and pos_x - info.ui_x_res or pos_x
                     pos_y = t._settings.flags.bottom and pos_y - info.ui_y_res or pos_y
                 end
-                dragged_text = {t, x - pos_x, y - pos_y}
+                dragged = {text = t, x = x - pos_x, y = y - pos_y}
                 return true
             end
         end
 
     -- Mouse left release
     elseif type == 2 then
-        if dragged_text then
-            if dragged_text[1]._root_settings then
-                config.save(dragged_text[1]._root_settings)
+        if dragged then
+            if dragged.text._root_settings then
+                config.save(dragged.text._root_settings)
             end
-            dragged_text = nil
+            dragged = nil
             return true
         end
     end
