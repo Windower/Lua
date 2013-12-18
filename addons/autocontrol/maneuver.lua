@@ -133,7 +133,7 @@ windower.register_event("action", function(act)
             end
         elseif S{1688,1689,1690,1691,1692,1755,1765,1812,1876,2489,2490,2491}:contains(abil_ID-256) 
                and windower.ffxi.get_mob_by_id(actor_id)['index'] == pet_index 
-               and pet_index > 0 then
+               and pet_index ~= nil then
                 local abil = abil_ID - 256
                 windower.send_command('@timers c "'..autoabils[abil].name..'" '..autoabils[abil].recast..' up')
         end
@@ -322,7 +322,7 @@ function text_update_loop(str)
                 Burden_tb['ol'..key] = tempol
             end
             Burden_tb:update()
-            if windower.ffxi.get_mob_by_id(windower.ffxi.get_player()['id'])['pet_index'] ~= 0 then 
+            if windower.ffxi.get_mob_by_id(windower.ffxi.get_player()['id'])['pet_index'] ~= nil then 
                 windower.send_command('@wait 1;lua i autocontrol text_update_loop start')
                 running = 1
             end
@@ -384,7 +384,7 @@ windower.register_event("zone change",function(fr, fid, to, tid)
             Burden_tb:hide()
             return
         else    
-            if windower.ffxi.get_mob_by_id(windower.ffxi.get_player()['id'])['pet_index'] ~= 0 then 
+            if windower.ffxi.get_mob_by_id(windower.ffxi.get_player()['id'])['pet_index'] nil then 
                 Burden_tb:show()
                 activate_burden()
             end
