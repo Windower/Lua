@@ -189,7 +189,6 @@ function get_current_autoset()
         for i = 1, #tmpTable do
             local t = ''
             if tonumber(tmpTable[i]) ~= 0 then
-                print(tmpTable[i], tmpTable[i]+8448,atts[tmpTable[i]+8448], atts:length())
                 if i < 10 then t = '0' end
                 autoTable['slot'..t..i] = atts[tonumber(tmpTable[i])+8448]['name']
             end
