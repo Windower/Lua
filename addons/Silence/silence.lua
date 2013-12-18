@@ -1,31 +1,26 @@
 _addon.name = 'Silence'
 _addon.author = 'Ihina'
 _addon.version = '1.0.1.0'
+_addon.command = 'silence'
 
 require 'logger'
 require 'tablehelper'
 config = require 'config'
 
-last = {}
-t = T{'Equipment changed.', 
-		'You cannot use that command at this time.', 
-		'You cannot use that command while viewing the chat log.', 
-		'You must close the currently open window to use that command.',
-		'Equipment removed.' }
-		
 defaults = {}
 defaults.mode = {}
 defaults.mode.value = 0
 settings = config.load(defaults)
 
-windower.register_event('load', function()
-	for _, str in ipairs(t) do
-		last[str] = 0
-	end
-end)
-
+last = {}
+last['Equipment changed.'] = 0
+last['You cannot use that command at this time.'] = 0
+last['You cannot use that command while viewing the chat log.'] = 0
+last['You must close the currently open window to use that command.'] = 0
+last['Equipment removed.'] = 0
+		
 windower.register_event('incoming text', function(str)
-	if t:contains(str) then
+	if last[str] then
 		if settings.mode.value == 0 then
 			return ''
 		else
@@ -35,6 +30,15 @@ windower.register_event('incoming text', function(str)
 				last[str] = os.clock()
 			end
 		end
+	end
+end)
+
+windower.register_event('addon command', function(...)
+	local param = L{...}
+	print('here')
+	if param[1] == 'mode' then
+		settings.mode.value = tonumber(param[2])
+		settings:save()
 	end
 end)
 
