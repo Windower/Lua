@@ -1,3 +1,48 @@
+_addon.name = 'Silence'
+_addon.author = 'Ihina'
+_addon.version = '1.0.1.0'
+_addon.command = 'silence'
+
+config = require 'config'
+defaults = {}
+defaults.ShowOne = false
+settings = config.load(defaults)
+
+last = {}
+last['Equipment changed.'] = 0
+last['You cannot use that command at this time.'] = 0
+last['You cannot use that command while viewing the chat log.'] = 0
+last['You must close the currently open window to use that command.'] = 0
+last['Equipment removed.'] = 0
+		
+windower.register_event('incoming text', function(str)
+	if last[str] then
+		if not settings.ShowOne then
+			return ''
+		else
+			if os.clock() - last[str] < .75 then
+				return ''
+			else
+				last[str] = os.clock()
+			end
+		end
+	end
+end)
+
+windower.register_event('addon command', function(...)
+	local param = L{...}
+	if param[1] == 'showone' then
+		if param[2] == 'true' then 
+			settings.ShowOne = true
+			print('-showone set to true-')
+		elseif param[2] == 'false' then 
+			settings.ShowOne = false
+			print('-showone set to false-')
+		end
+		settings:save()
+	end
+end)
+
 --[[
 Copyright (c) 2013, Ihina
 All rights reserved.
@@ -25,15 +70,3 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
-
-_addon.name = 'Silence'
-_addon.author = 'Ihina'
-_addon.version = '1.0.0.1'
-
-windower.register_event('incoming text', function(str)
-	if str == 'Equipment changed.' then
-		return ''
-	end
-end)
-
-
