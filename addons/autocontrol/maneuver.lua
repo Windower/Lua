@@ -322,9 +322,14 @@ function text_update_loop(str)
                 Burden_tb['ol'..key] = tempol
             end
             Burden_tb:update()
-            if windower.ffxi.get_mob_by_id(windower.ffxi.get_player()['id'])['pet_index'] ~= nil then 
-                windower.send_command('@wait 1;lua i autocontrol text_update_loop start')
-                running = 1
+            
+            local player_mob = windower.ffxi.get_mob_by_id(windower.ffxi.get_player()['id'])
+            if player_mob then
+                if player_mob['pet_index'] ~= nil
+                   and player_mob['pet_index'] ~= 0 then 
+                    windower.send_command('@wait 1;lua i autocontrol text_update_loop start')
+                    running = 1
+                end
             end
         elseif str == 'stop' then running = 0 end
     end
@@ -376,21 +381,29 @@ function zero_all()
     end
 end
 
-windower.register_event("zone change",function(fr, fid, to, tid)
+function zone_check(to, tid, fr, fid)
     if mjob_id == 18 then
         if petlessZones:contains(tid) then 
             text_update_loop('stop')
             zero_all()
             Burden_tb:hide()
             return
-        else    
-            if windower.ffxi.get_mob_by_id(windower.ffxi.get_player()['id'])['pet_index'] nil then 
-                Burden_tb:show()
-                activate_burden()
+        else
+            local player_mob = windower.ffxi.get_mob_by_id(windower.ffxi.get_player()['id'])
+            if player_mob then
+                if player_mob['pet_index'] ~= nil
+                   and player_mob['pet_index'] ~= 0 then 
+                    Burden_tb:show()
+                    activate_burden()
+                end
+            else
+                windower.send_command('@wait 10;lua i autocontrol zone_check "'..to..'" '..tid)
             end
         end
     end
-end)
+end
+
+windower.register_event("zone change", zone_check)
     
 windower.register_event("time change",function(...)
     if mjob_id == 18 then
