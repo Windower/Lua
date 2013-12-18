@@ -29,7 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 _addon.name = 'autocontrol'
-_addon.version = '0.21'
+_addon.version = '0.22'
 _addon.author = 'Nitrous (Shiva)'
 _addon.commands = {'autocontrol','acon'}
 
@@ -75,7 +75,8 @@ function initialize()
         Burden_tb[key] = 0
         Burden_tb['time'..key] = 0 
     end
-    if windower.ffxi.get_mob_by_id(windower.ffxi.get_player()['id'])['pet_index'] ~= nil then 
+    if windower.ffxi.get_mob_by_id(windower.ffxi.get_player()['id'])['pet_index']
+       and windower.ffxi.get_mob_by_id(windower.ffxi.get_player()['id'])['pet_index'] ~= 0 then 
         running = 1
         text_update_loop('start')
         Burden_tb:show()
@@ -103,11 +104,12 @@ end)
 function attach_set(autoset)
     if windower.ffxi.get_player()['main_job_id'] ~= 18 then return nil end
     if settings.autosets[autoset] == nil then return end
-    if settings.autosets[autoset]:equals(get_current_autoset()) then
+    if settings.autosets[autoset]:map(string.lower):equals(get_current_autoset():map(string.lower)) then
         log('The '..autoset..' set is already equipped.')
         return
     end
-    if windower.ffxi.get_mob_by_id(windower.ffxi.get_player()['id'])['pet_index'] ~= nil then 
+    if windower.ffxi.get_mob_by_id(windower.ffxi.get_player()['id'])['pet_index']
+       and windower.ffxi.get_mob_by_id(windower.ffxi.get_player()['id'])['pet_index'] ~= 0 then 
         if windower.ffxi.get_ability_recasts()[208] == 0 then
             windower.send_command('input /pet "Deactivate" <me>')
             log('Deactivating '..windower.ffxi.get_mjob_data()['name']..'.')
@@ -127,10 +129,10 @@ end
 
 function set_attachments_from_autoset(autoset,slot)
     if slot == 'head' then
-        local tempHead = settings.autosets[autoset]['head']
+        local tempHead = settings.autosets[autoset]['head']:lower()
         if tempHead ~= nil then
             for att in atts:it() do
-                    if att['name'] == tempHead and att['id'] >5000 then
+                    if att['name']:lower() == tempHead and att['id'] >5000 then
                         windower.ffxi.set_attachment(att['id'])
                         break
                     end
@@ -138,10 +140,10 @@ function set_attachments_from_autoset(autoset,slot)
         end
         windower.send_command('@wait .5;lua i autocontrol set_attachments_from_autoset '..autoset..' frame')
     elseif slot == 'frame' then
-        local tempFrame = settings.autosets[autoset]['frame']
+        local tempFrame = settings.autosets[autoset]['frame']:lower()
         if tempFrame ~= nil then
             for att in atts:it() do
-                    if att['name'] == tempFrame and att['id'] >5000 then
+                    if att['name']:lower() == tempFrame and att['id'] >5000 then
                         windower.ffxi.set_attachment(att['id'])
                         break
                     end
@@ -153,10 +155,10 @@ function set_attachments_from_autoset(autoset,slot)
         if tonumber(slot) < 10 then 
             islot = '0'..slot
         else islot = slot end
-        local tempname = settings.autosets[autoset]['slot'..islot]
+        local tempname = settings.autosets[autoset]['slot'..islot]:lower()
         if tempname ~= nil then
             for att in atts:it() do
-                    if att['name'] == tempname and att['id'] >5000 then
+                    if att['name']:lower() == tempname and att['id'] >5000 then
                         windower.ffxi.set_attachment(att['id'], tonumber(slot))
                         break
                     end
@@ -190,13 +192,13 @@ function get_current_autoset()
             local t = ''
             if tonumber(tmpTable[i]) ~= 0 then
                 if i < 10 then t = '0' end
-                autoTable['slot'..t..i] = atts[tonumber(tmpTable[i])+8448]['name']
+                autoTable['slot'..t..i] = atts[tonumber(tmpTable[i])+8448]['name']:lower()
             end
         end
         local headnum = windower.ffxi.get_mjob_data()['head']
         local framenum = windower.ffxi.get_mjob_data()['frame']
-        autoTable['head'] = atts[headnum+8192]['name']
-        autoTable['frame'] = atts[framenum+8223]['name']
+        autoTable['head'] = atts[headnum+8192]['name']:lower()
+        autoTable['frame'] = atts[framenum+8223]['name']:lower()
         return autoTable
     end
 end
@@ -239,7 +241,7 @@ windower.register_event("addon command", function(...)
     if args ~= nil then
         local comm = table.remove(args,1):lower()
         
-        if comm == 'save' then
+        if comm == 'saveset' then
             if args[1] ~= nil then
                 save_set(args[1])
             end
