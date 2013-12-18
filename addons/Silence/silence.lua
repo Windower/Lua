@@ -3,13 +3,9 @@ _addon.author = 'Ihina'
 _addon.version = '1.0.1.0'
 _addon.command = 'silence'
 
-require 'logger'
-require 'tablehelper'
 config = require 'config'
-
 defaults = {}
-defaults.mode = {}
-defaults.mode.value = 0
+defaults.ShowOne = false
 settings = config.load(defaults)
 
 last = {}
@@ -21,7 +17,7 @@ last['Equipment removed.'] = 0
 		
 windower.register_event('incoming text', function(str)
 	if last[str] then
-		if settings.mode.value == 0 then
+		if not settings.ShowOne then
 			return ''
 		else
 			if os.clock() - last[str] < .75 then
@@ -35,9 +31,14 @@ end)
 
 windower.register_event('addon command', function(...)
 	local param = L{...}
-	print('here')
-	if param[1] == 'mode' then
-		settings.mode.value = tonumber(param[2])
+	if param[1] == 'showone' then
+		if param[2] == 'true' then 
+			settings.ShowOne = true
+			print('-showone set to true-')
+		elseif param[2] == 'false' then 
+			settings.ShowOne = false
+			print('-showone set to false-')
+		end
 		settings:save()
 	end
 end)
