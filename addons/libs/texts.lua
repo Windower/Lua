@@ -446,7 +446,7 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
     -- Mouse drag
     if type == 0 then
         if dragged then
-            dragged.text:pos(x - dragged_text.x, y - dragged_text.y)
+            dragged.text:pos(x - dragged.x, y - dragged.y)
             return true
         end
 
