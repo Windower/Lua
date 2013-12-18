@@ -1,7 +1,7 @@
 -- Skills
 local skills = {}
 
-skills[0]  = {english = 'None',                 category = 'None'}
+skills[0]  = {english = '(N/A)',                category = 'None'}
 
 skills[1]  = {english = 'Hand-to-Hand',         category = 'Combat'}
 skills[2]  = {english = 'Dagger',               category = 'Combat'}
@@ -15,9 +15,19 @@ skills[9]  = {english = 'Katana',               category = 'Combat'}
 skills[10] = {english = 'Great Katana',         category = 'Combat'}
 skills[11] = {english = 'Club',                 category = 'Combat'}
 skills[12] = {english = 'Staff',                category = 'Combat'}
+
+for i = 13, 21, 1 do
+    skills[i] = {english = '(Weapon '..tostring(24 - i + 1)..')', category = 'None'}
+end
+
+skills[22] = {english = 'Automaton Melee',      category = 'Puppet'}
+skills[23] = {english = 'Automaton Archery',    category = 'Puppet'}
+skills[24] = {english = 'Automaton Magic',      category = 'Puppet'}
+
 skills[25] = {english = 'Archery',              category = 'Combat'}
 skills[26] = {english = 'Marksmanship',         category = 'Combat'}
 skills[27] = {english = 'Throwing',             category = 'Combat'}
+
 skills[28] = {english = 'Guard',                category = 'Combat'}
 skills[29] = {english = 'Evasion',              category = 'Combat'}
 skills[30] = {english = 'Shield',               category = 'Combat'}
@@ -38,16 +48,24 @@ skills[43] = {english = 'Blue Magic',           category = 'Magic'}
 skills[44] = {english = 'Geomancy',             category = 'Magic'}
 skills[45] = {english = 'Handbell',             category = 'Magic'}
 
-skills[48] = {english = 'Fishing',              category = 'Crafts'}
-skills[49] = {english = 'Woodworking',          category = 'Crafts'}
-skills[50] = {english = 'Smithing',             category = 'Crafts'}
-skills[51] = {english = 'Goldsmithing',         category = 'Crafts'}
-skills[52] = {english = 'Clothcraft',           category = 'Crafts'}
-skills[53] = {english = 'Leathercraft',         category = 'Crafts'}
-skills[54] = {english = 'Bonecraft',            category = 'Crafts'}
-skills[55] = {english = 'Alchemy',              category = 'Crafts'}
-skills[56] = {english = 'Cooking',              category = 'Crafts'}
-skills[57] = {english = 'Synergy',              category = 'Crafts'}
+for i = 46, 47, 1 do
+    skills[i] = {english = '(Magic '..tostring(47 - i + 1)..')', category = 'None'}
+end
+
+skills[48] = {english = 'Fishing',              category = 'Synthesis'}
+skills[49] = {english = 'Woodworking',          category = 'Synthesis'}
+skills[50] = {english = 'Smithing',             category = 'Synthesis'}
+skills[51] = {english = 'Goldsmithing',         category = 'Synthesis'}
+skills[52] = {english = 'Clothcraft',           category = 'Synthesis'}
+skills[53] = {english = 'Leathercraft',         category = 'Synthesis'}
+skills[54] = {english = 'Bonecraft',            category = 'Synthesis'}
+skills[55] = {english = 'Alchemy',              category = 'Synthesis'}
+skills[56] = {english = 'Cooking',              category = 'Synthesis'}
+skills[57] = {english = 'Synergy',              category = 'Synthesis'}
+
+for i = 48, 63, 1 do
+    skills[i] = {english = '(Synthesis '..tostring(63 - i + 1)..')', category = 'None'}
+end
 
 return skills
 
