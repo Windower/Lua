@@ -11,7 +11,7 @@ t = T{'Equipment changed.',
 		'You cannot use that command at this time.', 
 		'You cannot use that command while viewing the chat log.', 
 		'You must close the currently open window to use that command.',
-		'Equipment removed.'}
+		'Equipment removed.' }
 		
 defaults = {}
 defaults.mode = {}
