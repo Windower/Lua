@@ -384,7 +384,7 @@ windower.register_event("zone change",function(fr, fid, to, tid)
             Burden_tb:hide()
             return
         else    
-            if windower.ffxi.get_mob_by_id(windower.ffxi.get_player()['id'])['pet_index'] nil then 
+            if windower.ffxi.get_mob_by_id(windower.ffxi.get_player()['id'])['pet_index'] ~= nil then 
                 Burden_tb:show()
                 activate_burden()
             end
