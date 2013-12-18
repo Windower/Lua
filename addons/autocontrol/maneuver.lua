@@ -325,7 +325,7 @@ function text_update_loop(str)
             
             local player_mob = windower.ffxi.get_mob_by_id(windower.ffxi.get_player()['id'])
             if player_mob then
-                if player_mob['pet_index'] ~= nil
+                if player_mob['pet_index']
                    and player_mob['pet_index'] ~= 0 then 
                     windower.send_command('@wait 1;lua i autocontrol text_update_loop start')
                     running = 1
@@ -391,7 +391,7 @@ function zone_check(to, tid, fr, fid)
         else
             local player_mob = windower.ffxi.get_mob_by_id(windower.ffxi.get_player()['id'])
             if player_mob then
-                if player_mob['pet_index'] ~= nil
+                if player_mob['pet_index']
                    and player_mob['pet_index'] ~= 0 then 
                     Burden_tb:show()
                     activate_burden()
