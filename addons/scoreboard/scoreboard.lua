@@ -3,7 +3,7 @@
 _addon = _addon or {}
 _addon.name = 'Scoreboard'
 _addon.author = 'Suji'
-_addon.version = '1.06'
+_addon.version = '1.07'
 _addon.commands = {'sb', 'scoreboard'}
 
 require('tablehelper')
@@ -334,8 +334,11 @@ windower.register_event('login', 'load', function(...)
 
     settings = config.load(default_settings)
     windower.send_command('alias sb lua c scoreboard')
-    display = Display:new(settings, dps_db)
-    reset()
+    
+    if not display then
+        display = Display:new(settings, dps_db)
+        reset()
+    end
 end)
 
 
