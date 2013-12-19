@@ -112,17 +112,22 @@ local function race(val)
     return res.races[val].name
 end
 
-local function inv(val)
-    return res.items[windower.ffxi.get_items().inventory[val].id].name
+local function slots(val)
+    return res.slots[val].name
 end
 
-local slot = (function()
-    local slots = {'Sub', 'Range', 'Ammo', 'Head', 'Body', 'Hands', 'Legs', 'Feet', 'Neck', 'Waist', 'Left ear', 'Right ear', 'Left ring', 'Right ring', 'Back'}
-    slots[0] = 'Main'
-    return function(val)
-        return slots[val]
+local function slot(val)
+    return res.slots[2^val].name
+end
+
+local function inv(val)
+    if val == 0 then
+        return '(None)'
     end
-end)()
+
+    local id = windower.ffxi.get_items().inventory[val].id
+    return id > 0 and res.items[id].name or 'Unknown'
+end
 
 --[[
     Custom types
