@@ -28,8 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 _addon.name = 'Blist'
-_addon.version = '1.2'
 _addon.author = 'Ragnarok.Ikonic'
+_addon.version = '1.2.0.1'
 
 require 'tablehelper'
 require 'stringhelper'
@@ -69,7 +69,7 @@ end)
 
 windower.register_event('login',function (name)
 	settings = config.load(defaults)
-	windower.add_to_chat(160,"Loading "..string.color(_addon.name,55,160).." settings for "..get_player().name..".")
+	windower.add_to_chat(160,"Loading "..string.color(_addon.name,55,160).." settings for "..windower.ffxi.get_player().name..".")
 end)
 
 function addon_command(...)
