@@ -14,6 +14,7 @@ last['You cannot use that command at this time.'] = 0
 last['You cannot use that command while viewing the chat log.'] = 0
 last['You must close the currently open window to use that command.'] = 0
 last['Equipment removed.'] = 0
+last['You were unable to change your equipped items.'] = 0
 		
 windower.register_event('incoming text', function(str)
 	if last[str] then
