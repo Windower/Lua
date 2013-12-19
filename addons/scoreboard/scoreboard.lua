@@ -3,7 +3,7 @@
 _addon = _addon or {}
 _addon.name = 'Scoreboard'
 _addon.author = 'Suji'
-_addon.version = '1.05'
+_addon.version = '1.06'
 _addon.commands = {'sb', 'scoreboard'}
 
 require('tablehelper')
@@ -303,7 +303,8 @@ end
 
 
 local function update_dps_clock()
-    if windower.ffxi.get_player()['in_combat'] then
+    local player = windower.ffxi.get_player()
+    if player and windower.ffxi.get_player()['in_combat'] then
         dps_clock:advance()
     else
         dps_clock:pause()
@@ -374,7 +375,8 @@ windower.register_event('action', function(raw_action)
     local action = Action(raw_action)
     local category = action:get_category_string()
 
-    if not windower.ffxi.get_player()['in_combat'] then
+    local player = windower.ffxi.get_player()
+    if not player or not windower.ffxi.get_player()['in_combat'] then
         -- nothing to do
         return
     end
