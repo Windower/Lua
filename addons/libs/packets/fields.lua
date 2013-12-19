@@ -112,6 +112,18 @@ local function race(val)
     return res.races[val].name
 end
 
+local function inv(val)
+    return res.items[windower.ffxi.get_items().inventory[val].id].name
+end
+
+local slot = (function()
+    local slots = {'Sub', 'Range', 'Ammo', 'Head', 'Body', 'Hands', 'Legs', 'Feet', 'Neck', 'Waist', 'Left ear', 'Right ear', 'Left ring', 'Right ring', 'Back'}
+    slots[0] = 'Main'
+    return function(val)
+        return slots[val]
+    end
+end)()
+
 --[[
     Custom types
 ]]
@@ -180,8 +192,8 @@ fields.outgoing[0x04D] = L{
 
 -- Equip
 fields.outgoing[0x050] = L{
-    {ctype='unsigned char',     label='Inventory ID'},                          --    4 -   4
-    {ctype='unsigned char',     label='Equip Slot'},                            --    5 -   5
+    {ctype='unsigned char',     label='Inventory ID',       fn=inv},            --    4 -   4
+    {ctype='unsigned char',     label='Equip Slot',         fn=slot},           --    5 -   5
     {ctype='unsigned char',     label='_unknown1'},                             --    6 -   6
     {ctype='unsigned char',     label='_unknown2'},                             --    7 -   7
 }
@@ -812,8 +824,8 @@ fields.incoming[0x04F] = L{
 
 -- Equip
 fields.incoming[0x050] = L{
-    {ctype='unsigned char',     label='Inventory ID'},                          --    4 -   4
-    {ctype='unsigned char',     label='Equip Slot'},                            --    5 -   5
+    {ctype='unsigned char',     label='Inventory ID',       fn=inv},            --    4 -   4
+    {ctype='unsigned char',     label='Equip Slot',         fn=slot},           --    5 -   5
     {ctype='unsigned char',     label='_unknown1'},                             --    6 -   6
     {ctype='unsigned char',     label='_unknown2'},                             --    7 -   7
 }
@@ -1009,6 +1021,7 @@ fields.incoming[0x0F9] = L{
 }
 
 local sizes = {}
+sizes.bool = 1
 sizes.char = 1
 sizes.short = 2
 sizes.int = 4
