@@ -29,15 +29,15 @@
 -- Proc identifier
 -- Lot currency
 
-_addon = _addon or {}
 _addon.name = 'DynamisHelper'
-_addon.commands={'DynamisHelper','dh'}
-_addon.version = 1.0
+_addon.author = 'Krizz'
+_addon.commands = {'DynamisHelper','dh'}
+_addon.version = '1.0.1.0'
 
 local config = require 'config'
 
 -- Variables
-staggers = T{'morning','day','night'}
+staggers = T{}
 staggers['morning'] = T{}
 staggers['morning']['ja'] = {"Kindred Thief", "Kindred Beastmaster", "Kindred Monk", "Kindred Ninja", "Kindred Ranger", "Hydra Thief", "Hydra Beastmaster", "Hydra Monk", "Hydra Ninja", "Hydra Ranger", "Nightmare Bugard", "Nightmare Crawler", "Nightmare Fly", "Nightmare Flytrap", "Nightmare Funguar", "Nightmare Gaylas", "Nightmare Hornet", "Nightmare Kraken", "Nightmare Raven", "Nightmare Roc", "Nightmare Uragnite", "Vanguard Ambusher", "Vanguard Assassin", "Vanguard Beasttender", "Vanguard Footsoldier", "Vanguard Gutslasher", "Vanguard Hitman", "Vanguard Impaler", "Vanguard Kusa", "Vanguard Liberator", "Vanguard Mason", "Vanguard Militant", "Vanguard Neckchopper", "Vanguard Ogresoother", "Vanguard Pathfinder", "Vanguard Pitfighter", "Vanguard Purloiner", "Vanguard Salvager","Vanguard Sentinel","Vanguard Trooper","Vanguard Welldigger"}
 staggers['morning']['magic'] = {"Kindred White Mage", "Kindred Bard", "Kindred Summoner", "Kindred Black Mage", "Kindred Red Mage", "Hydra White Mage", "Hydra Bard", "Hydra Summoner", "Hydra Black Mage", "Hydra Red Mage", "Nightmare Bunny", "Nightmare Cluster", "Nightmare Eft", "Nightmare Hippogryph", "Nightmare Makara", "Nightmare Mandragora", "Nightmare Sabotender", "Nightmare Sheep", "Nightmare Snoll", "Nightmare Stirge", "Nightmare Weapon", "Vanguard Alchemist", "Vanguard Amputator", "Vanguard Bugler", "Vanguard Chanter", "Vanguard Constable", "Vanguard Dollmaster", "Vanguard Enchanter", "Vanguard Maestro", "Vanguard Mesmerizer", "Vanguard Minstrel", "Vanguard Necromancer", "Vanguard Oracle", "Vanguard Prelate", "Vanguard Priest", "Vanguard Protector", "Vanguard Shaman", "Vanguard Thaumaturge", "Vanguard Undertaker", "Vanguard Vexer", "Vanguard Visionary"}
@@ -71,28 +71,25 @@ trposy = 250
 pposx = 800
 pposy = 250
 
-local settings_file = 'data\\settings.xml'
-if settings_file ~= '' then
- 	local settings = config.load(settings_file)
- 		timer = settings['timer']
- 		tracker = settings['tracker']
- 		trposx = settings['trposx']
- 		trposy = settings['trposy']
- 		proc = settings['proc']
- 		pposx = settings['pposx']
- 		pposy = settings['pposy']
-end
+settings = config.load()
+timer = settings['timer']
+tracker = settings['tracker']
+trposx = settings['trposx']
+trposy = settings['trposy']
+proc = settings['proc']
+pposx = settings['pposx']
+pposy = settings['pposy']
 
 for i=1, #Currency do
      Currency[Currency[i]] = 0
 end
 
-windower.register_event('load',function ()
---	print('event_load function')
- 	player = windower.ffxi.get_player()['name']
- 	obtained = nil
- 	print('Dynamis Helper loaded.  Author: Bahamut.Krizz')
- 	initializebox()
+windower.register_event('load', 'login', function()
+    if windower.ffxi.get_info().logged_in then
+        player = windower.ffxi.get_player()['name']
+        obtained = nil
+        initializebox()
+    end
 end)
 
 windower.register_event('addon command',function (...)
@@ -261,13 +258,13 @@ function setproc()
 --	print('setproc function')
 	current_proc = 'lolidk'
 	if currenttime == nil or currenttime == '' or currenttime == nil then
-		currenttime = windower.ffxi.get_info()['time']
+		currenttime = windower.ffxi.get_info().time
 	end
- 	if currenttime >= 00.00 and currenttime < 08.00 then
+ 	if currenttime >= 0*60 and currenttime < 8*60 then
   		window = 'morning'
- 	elseif currenttime >= 08.00 and currenttime < 16.00 then
+ 	elseif currenttime >= 8*60 and currenttime < 16*60 then
   		window = 'day'
-	elseif currenttime >= 16.00 and currenttime <= 23.59 then
+	elseif currenttime >= 16*60 and currenttime <= 24*60 then
   		window = 'night'
  	end
 -- 	print(window)
