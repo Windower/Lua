@@ -3,7 +3,7 @@
 _addon = _addon or {}
 _addon.name = 'Scoreboard'
 _addon.author = 'Suji'
-_addon.version = '1.04'
+_addon.version = '1.07'
 _addon.commands = {'sb', 'scoreboard'}
 
 require('tablehelper')
@@ -12,7 +12,7 @@ require('mathhelper')
 require('logger')
 require('actionhelper')
 local file = require('filehelper')
-local config = require('config')
+config = require('config')
 
 local Display = require('display')
 local display = nil
@@ -22,6 +22,34 @@ dps_db    = require('damagedb'):new() -- global for now
 -------------------------------------------------------
 
 local settings = nil -- holds a config instance
+
+-- Conventional settings layout
+local default_settings = {}
+default_settings.numplayers = 8
+default_settings.sbcolor = 204
+default_settings.showallidps = true
+default_settings.resetfilters = true
+default_settings.visible = true
+
+default_settings.display = {}
+default_settings.display.pos = {}
+default_settings.display.pos.x = 500
+default_settings.display.pos.y = 100
+
+default_settings.display.bg = {}
+default_settings.display.bg.alpha = 200
+default_settings.display.bg.red = 0
+default_settings.display.bg.green = 0
+default_settings.display.bg.blue = 0
+
+default_settings.display.text = {}
+default_settings.display.text.size = 10
+default_settings.display.text.font = 'Courier New'
+default_settings.display.text.fonts = {}
+default_settings.display.text.alpha = 255
+default_settings.display.text.red = 255
+default_settings.display.text.green = 255
+default_settings.display.text.blue = 255
 
 -- Accepts msg as a string or a table
 function sb_output(msg)
@@ -67,12 +95,6 @@ windower.register_event('addon command',function(...)
             if params[3] then
                 local posx, posy = tonumber(params[2]), tonumber(params[3])
                 display:set_position(posx, posy)
-                
-                if posx ~= settings.posx or posy ~= settings.posy then
-                    settings.posx = posx
-                    settings.posy = posy
-                    settings:save()
-                end
             end
         elseif param1 == "set" then
             local setting = params[2]
@@ -86,16 +108,15 @@ windower.register_event('addon command',function(...)
                 display:update()
                 sb_output("Setting 'numplayers' set to " .. settings.numplayers)
             elseif setting == 'bgtransparency' then
-                settings.bgtransparency = tonumber(params[3])
+                settings.display.bg.alpha  = tonumber(params[3])
                 settings:save()
                 display:update()
-                sb_output("Setting 'bgtransparency' set to " .. settings.bgtransparency)
+                sb_output("Setting 'bgtransparency' set to " .. settings.display.bg.alpha)
             elseif setting == 'font' then
-                settings.font = params[3]
+                settings.display.text.font = params[3]
                 settings:save()
                 display:update()
-                display:update()
-                sb_output("Setting 'font' set to " .. settings.font)
+                sb_output("Setting 'font' set to " .. settings.display.text.font)
             elseif setting == 'sbcolor' then
                 settings.sbcolor = tonumber(params[3])
                 settings:save()
@@ -282,7 +303,8 @@ end
 
 
 local function update_dps_clock()
-    if windower.ffxi.get_player()['in_combat'] then
+    local player = windower.ffxi.get_player()
+    if player and windower.ffxi.get_player()['in_combat'] then
         dps_clock:advance()
     else
         dps_clock:pause()
@@ -310,25 +332,18 @@ windower.register_event('login', 'load', function(...)
         return
     end
 
-    settings = config.load({
-        posx = 10,
-        posy = 200,
-        bgtransparency = 200,
-        numplayers = 8,
-        font = 'courier new',
-        fontsize = 10,
-        sbcolor = 204,
-        visible = true,
-        showallidps = true,
-        resetfilters = true
-    })
+    settings = config.load(default_settings)
     windower.send_command('alias sb lua c scoreboard')
-    display = Display:new(settings, dps_db)
-    reset()
+    
+    if not display then
+        display = Display:new(settings, dps_db)
+        reset()
+    end
 end)
 
 
 windower.register_event('unload', function()
+    settings:save()
     windower.send_command('unalias sb')
     display:destroy()
 end)
@@ -363,7 +378,8 @@ windower.register_event('action', function(raw_action)
     local action = Action(raw_action)
     local category = action:get_category_string()
 
-    if not windower.ffxi.get_player()['in_combat'] then
+    local player = windower.ffxi.get_player()
+    if not player or not windower.ffxi.get_player()['in_combat'] then
         -- nothing to do
         return
     end

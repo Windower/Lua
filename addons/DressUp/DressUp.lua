@@ -85,7 +85,7 @@ windower.register_event('incoming chunk',function (id, data)
 		
 		for k,v in pairs(parsed_self) do
 			if T{"Face","Race","Head","Body","Hands","Legs","Feet","Main","Sub","Ranged"}:contains(k) and v ~= 0 then
-				if settings.self[k:lower()] then
+				if settings.self[k:lower()] and settings.self[k:lower()] > 0 then
 					self[k] = Int2LE(settings.self[k:lower()],k)
 					return_packet = true
 				elseif table.containskey(settings.replacements[k:lower()],tostring(v)) then
@@ -128,7 +128,7 @@ windower.register_event('incoming chunk',function (id, data)
 			pc["Ranged"] = string.sub(data,85,86)
 			pc["End"] =    string.sub(data,87)		
 			
-			character = windower.ffxi.get_mob_by_id(parsed_pc["ID"])
+			character = windower.ffxi.get_mob_by_index(parsed_pc["Index"])
 			
 			-- Name is used to check for custom model settings, blink_type is similar but passes arguments to blink logic.
 			
@@ -156,7 +156,7 @@ windower.register_event('incoming chunk',function (id, data)
 			
 			for k,v in pairs(parsed_pc) do
 				if T{"Face","Race","Head","Body","Hands","Legs","Feet","Main","Sub","Ranged"}:contains(k) and v ~= 0 then
-					if settings[name][k:lower()] then
+					if settings[name][k:lower()] and settings[name][k:lower()] > 0 then
 						pc[k] = Int2LE(settings[name][k:lower()],k)
 						return_packet = true
 					elseif table.containskey(settings.replacements[k:lower()],tostring(v)) then

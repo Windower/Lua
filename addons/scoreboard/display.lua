@@ -1,5 +1,5 @@
 -- Display object
-require('texts')
+local texts = require('texts')
 
 local Display = {
     visible = true,
@@ -29,39 +29,40 @@ local valid_fields = T{
     'wsavg'
 }
 
--- Margin of error for a sample size N at 95% confidence
-local function moe95(n)
-    return 0.98 / math.sqrt(n)
-end
+
 function Display:set_position(posx, posy)
-    windower.text.set_location(self.tb_name, posx, posy)
+    self.text:pos(posx, posy)
 end
 
-
-function Display:new (settings, db)
+function Display:new(settings, db)
     local repr = {db = db}
     self.settings = settings
     setmetatable(repr, self)
     self.__index = self
     self.visible = settings.visible
 
-    windower.text.create(self.tb_name)
-    windower.text.set_bg_color(self.tb_name, self.settings.bgtransparency, 30, 30, 30)
+    self.text = texts.new(settings.display, settings)
+    self.text:bg_alpha(self.settings.display.bg.alpha)
+    self.text:bg_color(30, 30, 30)
     
-    if not valid_fonts:contains(self.settings.font:lower()) then
-        error('Invalid font specified: ' .. self.settings.font)
-        windower.text.set_font(self.tb_name, self.settings.font) 
-        windower.text.set_font_size(self.tb_name, self.settings.fontsize)
+    if not valid_fonts:contains(self.settings.display.text.font:lower()) then
+        error('Invalid font specified: ' .. self.settings.display.text.font)
+        self.text:font(self.settings.display.text.font)
+        self.text:size(self.settings.display.text.fontsize)
     else
-        windower.text.set_font(self.tb_name, self.settings.font,'courier new','monospace') 
-        windower.text.set_font_size(self.tb_name, self.settings.fontsize)
+        self.text:font(self.settings.display.text.font, 'courier new', 'monospace') 
+        self.text:size(self.settings.display.text.size)
     end
     
-    windower.text.set_color(self.tb_name, 255, 225, 225, 225)
-    windower.text.set_location(self.tb_name, self.settings.posx, self.settings.posy)
-    windower.text.set_visibility(self.tb_name, self.visible)
-    windower.text.set_bg_visibility(self.tb_name, 1)
+    self.text:alpha(255)
+    self.text:color(255, 255, 255)
 
+    if self.visible then
+        self.text:show()
+    else
+        self.text:hide()
+    end
+    
     return repr
 end
 
@@ -74,7 +75,11 @@ function Display:toggle_visible()
         self:update()
     end
 
-    windower.text.set_visibility(self.tb_name, self.visible)
+    if self.visible then
+        self.text:show()
+    else
+        self.text:hide()
+    end
 end
 
 
@@ -211,7 +216,7 @@ function Display:update()
         display_table:append("Alli DPS: " .. string.format("%7.1f", alli_damage / dps_clock.clock))
     end
 	
-    windower.text.set_text(self.tb_name, self:build_scoreboard_header() .. table.concat(display_table, '\n'))
+    self.text:text(self:build_scoreboard_header() .. table.concat(display_table, '\n'))
 end
 
 
@@ -272,6 +277,7 @@ local function slow_output(chatprefix, lines, limit)
     -- this is funky but if we don't wait like this, the lines will spew too fast and error
     windower.send_command(lines:map(function (l) return chatprefix .. l end):concat('; wait 1.2 ; '))
 end
+
 
 function Display:report_summary (...)
     local chatmode, tell_target = table.unpack({...})
@@ -433,52 +439,15 @@ end
 function Display:reset()
     -- the number of spaces here was counted to keep the table width
     -- consistent even when there's no data being displayed
-    windower.text.set_text(self.tb_name,  self:build_scoreboard_header() ..
-                               'Waiting for results...' ..
-                               string.rep(' ', 17))
+    self.text:text(self:build_scoreboard_header() ..
+                      'Waiting for results...' ..
+                      string.rep(' ', 17))
 end
 
 
 function Display:destroy()
-    windower.text.delete(self.tb_name)
+    self.text:destroy()
 end
-
-windower.register_event('mouse', function(type, x, y, delta, blocked)
-    if blocked then
-        return
-    end
-
-    if type == 0 then
-        if dragged_text then
-            local t = dragged_text[1]
-            Display:set_position(x - dragged_text[2], y - dragged_text[3])
-            return true
-        end
-
-    elseif type == 1 then
-            local x_pos, y_pos = windower.text.get_location('scoreboard')
-            local x_off, y_off = windower.text.get_extents('scoreboard')
-
-            if (x_pos <= x and x <= x_pos + x_off
-                or x_pos >= x and x >= x_pos + x_off)
-            and (y_pos <= y and y <= y_pos + y_off
-                or y_pos >= y and y >= y_pos + y_off) then
-                dragged_text = {'scoreboard', x - x_pos, y - y_pos}
-                return true
-            end
-
-    elseif type == 2 then
-        if dragged_text then
-            if settings then
-                settings:save()
-            end
-            dragged_text = nil
-            return true
-        end
-    end
-
-    return false
-end)
 
 return Display
 

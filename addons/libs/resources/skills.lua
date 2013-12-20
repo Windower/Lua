@@ -63,7 +63,7 @@ skills[55] = {english = 'Alchemy',              category = 'Synthesis'}
 skills[56] = {english = 'Cooking',              category = 'Synthesis'}
 skills[57] = {english = 'Synergy',              category = 'Synthesis'}
 
-for i = 48, 63, 1 do
+for i = 58, 63, 1 do
     skills[i] = {english = '(Synthesis '..tostring(63 - i + 1)..')', category = 'None'}
 end
 

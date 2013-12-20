@@ -1,5 +1,5 @@
 Author: Suji
-Version: 1.04
+Version: 1.07
 Addon to show alliance DPS and damage in real time.
 Abbreviation: //sb
 
