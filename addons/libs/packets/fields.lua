@@ -1027,8 +1027,8 @@ fields.incoming[0x0E8] = L{
 -- Widescan Mob
 fields.incoming[0x0F4] = L{
     {ctype='unsigned short',    label='Index',              fn=index},          --    4 -   5
-    {ctype='unsigned char',     label='_unknown1'},                             --    6 -   7
-    {ctype='unsigned char',     label='Type'},                                  --    6 -   7   1 = NPC (green), 2 = Enemy (red)
+    {ctype='unsigned char',     label='_unknown1'},                             --    6 -   6
+    {ctype='unsigned char',     label='Type'},                                  --    7 -   7   1 = NPC (green), 2 = Enemy (red)
     {ctype='short',             label='X Offset'},                              --    8 -   9   Offset on the map
     {ctype='short',             label='Y Offset'},                              --   10 -  11
     {ctype='char[16]',          label='Name'},                                  --   12 -  27   Slugged, may not extend all the way to 27. Up to 25 has been observed
@@ -1091,7 +1091,7 @@ end
 function fields.get(dir, id, data)
     local f = fields[dir][id]
     f = type(f) == 'function' and f(data) or f
-    return data and parse(f, data:sub(5)) or f
+    return f and data and parse(f, data:sub(5)) or f
 end
 
 return fields
