@@ -24,6 +24,17 @@ ls_name_ext[0] = '`'
 
 res = require('resources')
 
+local function s(val, from, to)
+    from = from - 1
+    val = val/2^from
+
+    if to then
+        val = val % 2^(to - from)
+    end
+
+    return val
+end
+
 local function id(val)
     local mob = windower.ffxi.get_mob_by_id(val)
     return mob and mob.name
@@ -127,6 +138,16 @@ local function inv(val)
 
     local id = windower.ffxi.get_items().inventory[val].id
     return id > 0 and res.items[id].name or 'Unknown'
+end
+
+local function hex(val, fill)
+    local res = val:hex()
+    return fill and res:zfill(8*fill) or res
+end
+
+local function bin(val, fill)
+    local res = val:binary()
+    return fill and res:zfill(8*fill) or res
 end
 
 --[[
@@ -371,14 +392,14 @@ fields.outgoing[0x102] = L{
     {ctype='char*',             label='_unknown'},                              --   42 - 159  -- All 00s for Monsters
 }
 
--- Login
+-- Zone update
 fields.incoming[0x00A] = L{
     {ctype='unsigned int',      label='Player ID',          fn=id},             --    4 -   7
     {ctype='unsigned short',    label='Player index',       fn=index},          --    8 -   9
     {ctype='char[38]',          label='_unknown1'},                             --   10 -  47
     {ctype='unsigned char',     label='Zone ID',            fn=zone},           --   48 -  48
     {ctype='char[19]',          label='_unknown3'},                             --   49 -  67
-    {ctype='unsigned char',     label='Weather ID'},                            --   68 -  68
+    {ctype='unsigned char',     label='Weather ID',         fn=weather},        --   68 -  68
     {ctype='char[63]',          label='_unknown4'},                             --   69 - 131
     {ctype='char[16]',          label='Player name'},                           --  132 - 147
     {ctype='char[113]',         label='_unknown5'},                             --  148 - 259
@@ -386,7 +407,7 @@ fields.incoming[0x00A] = L{
 
 -- Zone Response
 fields.incoming[0x00B] = L{
-    {ctype='unsigned int',      label='Type'},                                  --    4 -   7
+    {ctype='unsigned int',      label='Type'},                                  --    4 -   7 Logout: 1, Teleport/Warp: 2, Regular zone: 3
     {ctype='unsigned int',      label='IP',                 fn=ip},             --    8 -   8
     {ctype='unsigned short',    label='Port'},                                  --   12 -  15
     {ctype='unsigned short',    label='_unknown1'},                             --   16 -  17
@@ -443,13 +464,13 @@ fields.incoming[0x00D] = L{
 	-- 128 = Bazaar
     {ctype='unsigned int',      label='ID',                 fn=id},             --    4 -   7
     {ctype='unsigned short',    label='Index',              fn=index},          --    8 -   9
-    {ctype='unsigned char',     label='Mask'},                                  --   10 -  10
-    {ctype='unsigned char',     label='Body Rotation'},                         --   11 -  11
+    {ctype='unsigned char',     label='Mask',               fn=bin-{1}},        --   10 -  10
+    {ctype='unsigned char',     label='Body Rotation',      fn=dir},            --   11 -  11
     {ctype='float',             label='X Position'},                            --   12 -  15
     {ctype='float',             label='Z Position'},                            --   16 -  19
     {ctype='float',             label='Y Position'},                            --   20 -  23
-    {ctype='unsigned short',    label='Head Rotation'},                         --   24 -  25
-    {ctype='unsigned short',    label='M_TID'},                                 --   26 -  27
+    {ctype='unsigned short',    label='Head Rotation',      fn=dir},            --   24 -  25
+    {ctype='unsigned short',    label='Target Index *2',    fn=index..s-{2}},   --   26 -  27
     {ctype='unsigned char',     label='Current Speed'},                         --   28 -  28
     {ctype='unsigned char',     label='Base Speed'},                            --   29 -  29
     {ctype='unsigned char',     label='HP %',               fn=percent},        --   30 -  30
@@ -460,13 +481,13 @@ fields.incoming[0x00D] = L{
     {ctype='unsigned char',     label='Linkshell Green'},                       --   37 -  37
     {ctype='unsigned char',     label='Linkshell Blue'},                        --   38 -  38
     {ctype='unsigned int',      label='_unknown3'},                             --   39 -  42
-    {ctype='unsigned int',      label='_unknown4'},                             --   43 -  46 -- Flags again
+    {ctype='unsigned int',      label='_unknown4'},                             --   43 -  46   Flags again
     {ctype='unsigned int',      label='_unknown5'},                             --   47 -  50
-    {ctype='unsigned int',      label='_unknown6'},                             --   51 -  54 -- DSP notes that the 6th bit of byte 54 is the Ballista flag
+    {ctype='unsigned int',      label='_unknown6'},                             --   51 -  54   DSP notes that the 6th bit of byte 54 is the Ballista flag
     {ctype='unsigned int',      label='_unknown7'},                             --   55 -  58
     {ctype='unsigned int',      label='_unknown8'},                             --   59 -  62
     {ctype='unsigned int',      label='_unknown9'},                             --   63 -  66
-    {ctype='unsigned char',     label='Face Flags'},                            --   67 -  67 -- 0, 3, 4, or 8
+    {ctype='unsigned char',     label='Face Flags'},                            --   67 -  67   0, 3, 4, or 8
     {ctype='unsigned char',     label='Face'},                                  --   68 -  68
     {ctype='unsigned char',     label='Race'},                                  --   69 -  69
     {ctype='unsigned short',    label='Head'},                                  --   70 -  71
@@ -477,33 +498,33 @@ fields.incoming[0x00D] = L{
     {ctype='unsigned short',    label='Main'},                                  --   80 -  81
     {ctype='unsigned short',    label='Sub'},                                   --   82 -  83
     {ctype='unsigned short',    label='Ranged'},                                --   84 -  85
-    {ctype='char*',             label='Character Name'},                        --   86 -  95 -- Variable length, null terminated maybe
+    {ctype='char*',             label='Character Name'},                        --   86 -   *
 }
 
 -- NPC Update
+-- There are two different types of these packets. One is for regular NPCs, the other occurs for certain NPCs (often nameless) and differs greatly in structure.
+-- The common fields seem to be the ID, Index, mask and _unknown3.
+-- The second one seems to have an int counter at 0x38 that increases by varying amounts every time byte 0x1F changes.
+-- Currently I don't know how to algorithmically distinguish when the packets are different.
 fields.incoming[0x00E] = L{
     {ctype='unsigned int',      label='ID',                 fn=id},             --    4 -   7
     {ctype='unsigned short',    label='Index',              fn=index},          --    8 -   9
-    {ctype='unsigned char',     label='Mask'},                                  --   10 -  10
-    {ctype='unsigned char',     label='Rotation'},                              --   11 -  11
+    {ctype='unsigned char',     label='Mask',               fn=bin-{1}},        --   10 -  10
+    {ctype='unsigned char',     label='Rotation',           fn=dir},            --   11 -  11
     {ctype='float',             label='X Position'},                            --   12 -  15
     {ctype='float',             label='Z Position'},                            --   16 -  19
     {ctype='float',             label='Y Position'},                            --   20 -  23
-    {ctype='unsigned short',    label='_unknown1'},                             --   24 -  25
-    {ctype='unsigned short',    label='_unknown2'},                             --   26 -  27
-    {ctype='unsigned short',    label='_unknown3'},                             --   28 -  29
+    {ctype='unsigned int',      label='Walk Count'},                            --   24 -  27   Steadily increases until rotation changes. Does not reset while the mob isn't walking. Only goes until 0xFF1F.
+    {ctype='unsigned short',    label='_unknown3',          fn=bin-{2}},        --   28 -  29
     {ctype='unsigned char',     label='HP %',               fn=percent},        --   30 -  30
     {ctype='unsigned char',     label='Animation'},                             --   31 -  31
-    {ctype='unsigned short',    label='Status'},                                --   32 -  33
-    {ctype='unsigned short',    label='_unknown4'},                             --   34 -  35
-    {ctype='unsigned int',      label='_unknown5'},                             --   36 -  39
-    {ctype='unsigned int',      label='_unknown6'},                             --   40 -  43
+    {ctype='unsigned int',      label='_unknown4',          fn=bin-{4}},        --   32 -  33
+    {ctype='unsigned int',      label='_unknown5',          fn=bin-{4}},        --   36 -  39
+    {ctype='unsigned int',      label='_unknown6',          fn=bin-{4}},        --   40 -  43
     {ctype='unsigned int',      label='Claimer ID',         fn=id},             --   44 -  47
     {ctype='unsigned short',    label='_unknown7'},                             --   48 -  49
     {ctype='unsigned short',    label='Model'},                                 --   50 -  51
--- This value can't be displayed properly yet, since the array length varies.
--- Will need to implement a workaround for that.
-    {ctype='char[16]',          label='Name'},                                  --   52 -  75
+    {ctype='char*',             label='Name'},                                  --   52 -   *
 }
 
 -- Incoming Chat
@@ -968,31 +989,31 @@ fields.incoming[0x0DF] = L{
     {ctype='unsigned int',      label='ID',                 fn=id},             --    4 -   7
     {ctype='unsigned int',      label='HP'},                                    --    8 -  11
     {ctype='unsigned int',      label='MP'},                                    --   12 -  15
-    {ctype='unsigned int',      label='TP'},                                    --   16 -  19   Truncated, does not include the decimal value.
+    {ctype='unsigned int',      label='TP',                 fn=percent},        --   16 -  19   Truncated, does not include the decimal value.
     {ctype='unsigned short',    label='Player Index',       fn=index},          --   20 -  21
-    {ctype='unsigned char',     label='HPP'},                                   --   22 -  22
-    {ctype='unsigned char',     label='MPP'},                                   --   23 -  23
+    {ctype='unsigned char',     label='HPP',                fn=percent},        --   22 -  22
+    {ctype='unsigned char',     label='MPP',                fn=percent},        --   23 -  23
     {ctype='unsigned short',    label='_unknown1'},                             --   24 -  25
     {ctype='unsigned short',    label='_unknown2'},                             --   26 -  27
 }
 
 -- Char Info
 fields.incoming[0x0E2] = L{
-    {ctype='unsigned int',      label='ID',                 fn=id},             --    4 -   7
+    {ctype='unsigned int',      label='Player ID',          fn=id},             --    4 -   7
     {ctype='unsigned int',      label='HP'},                                    --    8 -  11
     {ctype='unsigned int',      label='MP'},                                    --   12 -  15
-    {ctype='unsigned int',      label='TP'},                                    --   16 -  19
+    {ctype='unsigned int',      label='TP',                 fn=percent},        --   16 -  19
     {ctype='unsigned int',      label='_unknown1'},                             --   20 -  23   Looks like it could be flags for something.
     {ctype='unsigned short',    label='Player Index',       fn=index},          --   24 -  25
     {ctype='unsigned char',     label='_unknown2'},                             --   26 -  26
     {ctype='unsigned char',     label='_unknown3'},                             --   27 -  27
     {ctype='unsigned char',     label='_unknown4'},                             --   28 -  28
-    {ctype='unsigned char',     label='HPP'},                                   --   29 -  29
-    {ctype='unsigned char',     label='MPP'},                                   --   30 -  30
+    {ctype='unsigned char',     label='HPP',                fn=percent},        --   29 -  29
+    {ctype='unsigned char',     label='MPP',                fn=percent},        --   30 -  30
     {ctype='unsigned char',     label='_unknown5'},                             --   31 -  31
     {ctype='unsigned char',     label='_unknown6'},                             --   32 -  32
     {ctype='unsigned char',     label='_unknown7'},                             --   32 -  33   Could be an initialization for the name. 0x01 observed.
-    {ctype='char[10]',          label='Player Name'},                           --   34 -  34   Maybe a base stat
+    {ctype='char*',             label='Player Name'},                           --   34 -   *   Maybe a base stat
 }
 
 -- Toggle Heal
@@ -1005,16 +1026,17 @@ fields.incoming[0x0E8] = L{
 
 -- Widescan Mob
 fields.incoming[0x0F4] = L{
-    {ctype='unsigned float',    label='X Position'},                            --    4 -   7 -- May be reversed with Y position
-    {ctype='unsigned float',    label='Y Position'},                            --    8 -  11
-    {ctype='char[16]',          label='Name'},                                  --   12 -  27 -- May not extend all the way to 27. Up to 25 has been observed
+    {ctype='unsigned short',    label='Index',              fn=index},          --    4 -   5
+    {ctype='unsigned char',     label='_unknown1'},                             --    6 -   7
+    {ctype='unsigned char',     label='Type'},                                  --    6 -   7   1 = NPC (green), 2 = Enemy (red)
+    {ctype='short',             label='X Offset'},                              --    8 -   9   Offset on the map
+    {ctype='short',             label='Y Offset'},                              --   10 -  11
+    {ctype='char[16]',          label='Name'},                                  --   12 -  27   Slugged, may not extend all the way to 27. Up to 25 has been observed
 }
 
 -- Widescan Mark
 fields.incoming[0x0F6] = L{
-    {ctype='unsigned char',     label='flags'},                                 --    4 -   4 -- 1 for the start of a widescan list. 2 for the end of the list.
-    {ctype='unsigned char',     label='_unknown1'},                             --    5 -   5 -- No observed non-0 values
-    {ctype='unsigned short',    label='_unknown2'},                             --    6 -   7 -- No observed non-0 values
+    {ctype='unsigned int',      label='Type'},                                 --     4 -   7   1 for the start of a widescan list. 2 for the end of the list.
 }
 
 -- Reraise Activation
