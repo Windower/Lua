@@ -894,6 +894,18 @@ fields.incoming[0x057] = L{
     {ctype='unsigned short',    label='_unknown2'},                             --   10 -  11
 }
 
+-- NPC Spawn
+fields.incoming[0x05B] = L{
+    {ctype='float',             label='X Position'},                            --    4 -   7
+    {ctype='float',             label='Z Position'},                            --    8 -  11
+    {ctype='float',             label='Y Position'},                            --   12 -  15
+    {ctype='unsigned int',      label='Mob ID',             fn=id},             --   16 -  19
+    {ctype='unsigned short',    label='Mob Index',          fn=index},          --   20 -  21
+    {ctype='unsigned char',     label='Type'},                                  --   22 -  22   3 for regular Monsters, 0 for Treasure Caskets and NPCs
+    {ctype='unsigned char',     label='_unknown1'},                             --   23 -  23   Always 0 if Type is 3, otherwise a seemingly random non-zero number
+    {ctype='unsigned int',      label='_unknown2'},                             --   24 -  27
+}
+
 -- Char Stats
 fields.incoming[0x061] = L{
     {ctype='unsigned int',      label='Maximum HP'},                            --    4 -   7
@@ -940,12 +952,18 @@ fields.incoming[0x061] = L{
 
 -- Unnamed 0x067
 fields.incoming[0x067] = L{
--- The length of this packet is 28 or 40 bytes. 28 appears to be for NPCs/monsters
--- and 40 appears to be for players. _unknown1 is 02 09 for players and 03 05 for
--- NPCs. The use of this packet is unclear.
+-- The length of this packet is 24, 28, 36 or 40 bytes. The latter two seem to feature a 16 char
+-- name field. 24/28 appears to be for NPCs/monsters. When summoning pets, their name appear in 
+-- the 16 byte name field. 40 Appears to be for players, although it's 36 when summoning a pet.
+-- _unknown1 is 02 09 for players and 03 05 for NPCs, unless players summon a pet, then it's
+-- 44 07. The use of this packet is unclear.
     {ctype='unsigned short',    label='_unknown1'},                             --    4 -   5
     {ctype='unsigned short',    label='Player Index',       fn=index},          --    6 -   7
     {ctype='unsigned int',      label='Player ID',          fn=id},             --    8 -  11
+    {ctype='unsigned short',    label='Other Index',        fn=index},          --   12 -  13
+    {ctype='unsigned short',    label='_unknown2'},                             --   14 -  15
+    {ctype='unsigned int',      label='_unknown3'},                             --   16 -  19   Always 0?
+    {ctype='char*',             label='Other Name'},                            --   20 -   *
 }
 
 -- LS Message
