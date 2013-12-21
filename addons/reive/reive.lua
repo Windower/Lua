@@ -315,13 +315,13 @@ windower.register_event('unload', function()
     windower.text.delete(tb_name)
 end)
 
-windower.register_event('gain buff', function(id)
+windower.register_event('gain buff', function(name,id)
     if id == 511 then
         start_tracking()
     end
 end)
 
-windower.register_event('lose buff', function(id)
+windower.register_event('lose buff', function(name,id)
     if id == 511 then
         stop_tracking()
     end
