@@ -6,21 +6,20 @@ _libs = _libs or {}
 _libs.mathhelper = true
 
 _raw = _raw or {}
-_raw.math = _raw.math or {}
-_raw.math = setmetatable(_raw.math, {__index=math})
+_raw.math = setmetatable(_raw.math or {}, {__index = math})
 
-debug.setmetatable(0, {__index=math})
+debug.setmetatable(0, {__index = math})
 
 -- Order of digits for higher base math
-math.digitorder = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'}
+local digitorder = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'}
 
 -- Constants
-math.e = math.exp(1)
+math.e = (1):exp()
 
 -- Rounds to prec decimal digits. Accepts negative numbers for precision.
 function math.round(num, prec)
     local mult = 10^(prec or 0)
-    return math.floor(num * mult + 0.5) / mult
+    return ((num * mult + 0.5) / mult):floor()
 end
 
 -- Returns the sign of num, -1 for a negative number, +1 for a positive number and 0 for 0.
@@ -33,39 +32,30 @@ _raw.math.log = math.log
 
 -- Returns an arbitrary-base logarithm. Defaults to e.
 function math.log(val, base)
-    if base == nil then
-        base = math.e
+    if not base then
+        return _raw.math.log(val)
     end
 
     return _raw.math.log(val)/_raw.math.log(base)
 end
 
--- DEPRECATED:
--- These functions have been renamed to drop the 'to'. See below.
-function math.tobinary(val) return math.base(val, 2) end
-function math.tooctal(val) return math.base(val, 8) end
-function math.tohex(val) return math.base(val, 16) end
-function math.tobase(val, base) return math.base(val, base) end
-
 -- Returns a binary string representation of val.
 function math.binary(val)
-    return math.base(val, 2)
+    return val:base(2)
 end
 
 -- Returns a octal string representation of val.
 function math.octal(val)
-    return math.base(val, 8)
+    return val:base(8)
 end
 
 -- Returns a hex string representation of val.
 function math.hex(val)
-    return math.base(val, 16)
+    return val:base(16)
 end
 
 -- tostring wrapper.
-function math.string(...)
-    return tostring(...)
-end
+math.string = tostring
 
 -- string.char wrapper, to allow method-like calling on numbers.
 math.char = string.char
@@ -73,20 +63,20 @@ math.char = string.char
 -- Converts a number val to a string in base base.
 function math.base(val, base)
     if base == nil or base == 10 or val == 0 then
-        return tostring(val)
+        return val:string()
     elseif base == 1 then
         return ('1'):rep(val)
     end
 
-    local num = math.abs(val)
+    local num = val:abs()
 
     local res = {}
     local key = 1
     local pos
     while num > 0 do
         pos = num % base + 1
-        res[key] = math.digitorder[pos]
-        num = math.floor(num / base)
+        res[key] = digitorder[pos]
+        num = (num / base):floor()
         key = key + 1
     end
 

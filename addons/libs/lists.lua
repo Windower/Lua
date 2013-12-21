@@ -373,7 +373,7 @@ _raw.table.sort = _raw.table.sort or table.sort
 function list.sort(l, ...)
     _raw.table.sort(l, ...)
     return l
-end 
+end
 
 function list.reverse(l)
     local res = {}

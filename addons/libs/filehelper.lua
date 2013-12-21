@@ -216,11 +216,6 @@ function files.write(f, content, flush)
     return f
 end
 
--- Write array to file. Overwrites everything within the file, if present
-function files.writelines(f, lines)
-    return files.write(f, table.concat(lines, '\n'))
-end
-
 -- Append to file. Sets a newline per default, unless newline is set to false.
 function files.append(f, content, flush)
     local path
@@ -255,11 +250,6 @@ function files.append(f, content, flush)
     fh:close()
 
     return f
-end
-
--- Append an array of lines to file. Sets a newline per default, unless newline is set to false.
-function files.appendlines(f, lines, newline)
-    return files.append(f, table.concat(lines, '\n'), newline)
 end
 
 return files
