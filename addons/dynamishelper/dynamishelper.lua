@@ -237,12 +237,6 @@ function initializebox()
 end
 
 
-windower.register_event('time change',function (...)
-	if proc == 'on' then
-		currenttime = windower.ffxi.get_info()['time']
- 	end
-end)
-
 windower.register_event('target change',function (targ_id)
 --	print('event_target_change function')
 	checkzone()
@@ -257,9 +251,7 @@ end)
 function setproc()
 --	print('setproc function')
 	current_proc = 'lolidk'
-	if currenttime == nil or currenttime == '' or currenttime == nil then
-		currenttime = windower.ffxi.get_info().time
-	end
+    local currenttime = windower.ffxi.get_info().time
  	if currenttime >= 0*60 and currenttime < 8*60 then
   		window = 'morning'
  	elseif currenttime >= 8*60 and currenttime < 16*60 then

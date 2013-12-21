@@ -313,17 +313,11 @@ end
 
 
 -- Keep updates flowing
-windower.register_event('time change', function(...)
+windower.register_event('time change', 'status change', function(...)
     update_dps_clock()
     display:update()
 end)
 
-
--- Keep updates flowing
-windower.register_event('status change', function(...)
-    update_dps_clock()
-    display:update()
-end)
 
 windower.register_event('login', 'load', function(...)
     -- Bail out until we are logged in properly.
