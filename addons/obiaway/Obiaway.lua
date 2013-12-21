@@ -65,7 +65,7 @@ windower.register_event('addon command',function (...)
 	remove_unneeded_obis()
 end)
 
-windower.register_event('lose buff',function (id, name)
+windower.register_event('lose buff',function (name,id)
 	if id>=178 and id<=185 then
 		remove_unneeded_obis()
 	end
@@ -81,7 +81,7 @@ end)
 
 function get_obis_in_inventory()
 	obis = {}
-	items = windower.get_items()
+	items = windower.ffxi.get_items()
 	inv = items.inventory
 	number = items.max_inventory - 1 -- items.max_inventory returns inventory size +1
 	for i=1,number do 
