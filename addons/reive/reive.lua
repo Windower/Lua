@@ -37,7 +37,7 @@ local config = require 'config'
 
 _addon.name    = 'reive'
 _addon.author  = 'Zohno'
-_addon.version = '1.20131021'
+_addon.version = '1.20131221'
 _addon.command = 'reive'
 
 tb_name = 'addon:gr:reive'
