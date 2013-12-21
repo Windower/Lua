@@ -51,18 +51,32 @@
 -- 
 -- To Do: add function to turn the console_echo's on/off. 
 
-windower.register_event('load',function ()
-	print("Loaded Obiaway.")
-	windower.send_command("alias Obiaway lua c Obiaway")
-end)
+_addon.author = "ReaperX"
+_addon.version = "1.0"
+_addon.command = "obiaway"
 
-windower.register_event('unload',function ()
-	print("Unloaded Obiaway.")
-	windower.send_command("unalias Obiaway")
-end)
+local config = require('config')
+require('sets')
+
+defaults = {}
+defaults.location = 'sack'
+
+settings = config.load(defaults)
+
+windower.register_event('load'), function()
+    print('Use //obiaway <sack/satchel/case> to set location to store obis.')
+end
 
 windower.register_event('addon command',function (...)
-	remove_unneeded_obis()
+	if args[1] == 'location' then
+		if S{'sack','case','satchel'}:contains(args[2]:lower()) then
+            settings.location = args[2]
+        else
+            print('Location can only be sack, satchel or case.')
+        end
+	else
+		remove_unneeded_obis()
+	end
 end)
 
 windower.register_event('lose buff',function (name,id)
@@ -71,11 +85,7 @@ windower.register_event('lose buff',function (name,id)
 	end
 end)
 
-windower.register_event('day change',function (day)
-	remove_unneeded_obis()
-end)
-
-windower.register_event('weather change',function (id, name)
+windower.register_event('day change','weather change', function ()
 	remove_unneeded_obis()
 end)
 
@@ -104,39 +114,34 @@ end
 function remove_unneeded_obis()
 	elements = get_all_elements()
 	obis = get_obis_in_inventory()
+	local str = ''
 	if obis["Fire"] and elements["Fire"]==0 then
-		windower.send_command("input /put \"Karin Obi\" Sack")
-		windower.send_command("console_echo Moving Karin Obi to Sack")
+		str = str.."input /put \"Karin Obi\" "..settings.location..";wait .5;"
 	end
 	if obis["Earth"] and elements["Earth"]==0 then
-		windower.send_command("input /put \"Dorin Obi\" Sack")
-		windower.send_command("console_echo Moving Dorin Obi to Sack")
+		str = str.."input /put \"Dorin Obi\" "..settings.location..";wait .5;"
 	end
 	if obis["Water"] and elements["Water"]==0 then
-		windower.send_command("input /put \"Suirin Obi\" Sack")
-		windower.send_command("console_echo Moving Suirin Obi to Sack")
+		str = str.."input /put \"Suirin Obi\" "..settings.location..";wait .5;"
 	end
 	if obis["Wind"] and elements["Wind"]==0 then
-		windower.send_command("input /put \"Furin Obi\" Sack")
-		windower.send_command("console_echo Moving Furin Obi to Sack")
+		str = str.."input /put \"Furin Obi\" "..settings.location..";wait .5;"
 	end
 	if obis["Ice"] and elements["Ice"]==0 then
-		windower.send_command("input /put \"Hyorin Obi\" Sack")
-		windower.send_command("console_echo Moving Hyorin Obi to Sack")
+		str = str.."input /put \"Hyorin Obi\" "..settings.location..";wait .5;"
 	end
 	if obis["Thunder"] and elements["Thunder"]==0 then
-		windower.send_command("input /put \"Rairin Obi\" Sack")
-		windower.send_command("console_echo Moving Rairin Obi to Sack")
+		str = str.."input /put \"Rairin Obi\" "..settings.location..";wait .5;"
 	end
 	if obis["Light"] and elements["Light"]==0 then	
-		windower.send_command("input /put \"Korin Obi\" Sack")
-		windower.send_command("console_echo Moving Korin Obi to Sack")
+		str = str.."input /put \"Korin Obi\" "..settings.location..";wait .5;"
 	end
 	if obis["Dark"] and elements["Dark"]==0 then	
-		windower.send_command("input /put \"Anrin Obi\" Sack")
-		windower.send_command("console_echo Moving Anrin Obi to Sack")
+		str = str.."input /put \"Anrin Obi\" "..settings.location
 	end
-end;
+	windower.send_command(str)
+    print('Putting unneeded obis away in '..settings.location..'.')
+end
 
 function inTable(tbl, item)
     for key, value in pairs(tbl) do
