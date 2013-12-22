@@ -57,3 +57,5 @@ Currently only tested and supporting two characters.
 * v1.31 06/07/13 Settings can now be set for each character and are only saved when a change is made.  
 * v1.32 06/09/13 Fixed bug where textboxes would vanish on first run through.  Added clear option for textboxes.  Fixed issue of textbox settings not always saving.  
 * v1.33 06/09/13 Added textbox support for ffochat.  
+* v1.34 08/16/13 Changed include 'colors' to include 'chat' to make it current.  
+* v1.35 12/21/13 Updated textboxes to fix after recent update.  
