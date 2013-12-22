@@ -680,4 +680,26 @@
 	<dtd id="684" english="{$target} has been claimed!" color="91"/>
 	<dtd id="685" english="The enemy you are battling will no longer be claimed in: {$number}." color="91"/>
 	<dtd id="686" english="The enemy you were battling is no longer claimed." color="91"/>
+	<dtd id="687" english="${actor} captured the ${target}." color="91"/>
+	<dtd id="688" english="${actor} has fled!" color="91"/>
+	<dtd id="689" english="${actor} captured the ${target}." color="91"/>
+	<dtd id="690" english="You have completed the following Records of Eminence objective: ${regime}." color="91"/>
+	<dtd id="691" english="This objective may be repeated, and can be canceled from the menu." color="91"/>
+	<dtd id="692" english="You receive ${number} sparks of eminence and now possess a total of ${number2}." color="91"/>
+	<dtd id="693" english="As a special bonus for your valiant efforts, you have been awarded ${item}." color="91"/>
+	<dtd id="694" english="As a special bonus for your valiant efforts, you have been awarded ${number} sparks of eminence." color="91"/>
+	<dtd id="695" english="Unable to receive special bonus. Make room in your inventory and receive your reward from the Records of Eminence menu." color="123"/>
+	<dtd id="696" english="You have yet to receive certain special bonuses from objectives you have completed. Make room in your inventory and receive your rewards from the Records of Eminence menu." color="123"/>
+	<dtd id="697" english="Records of Eminence: ${regime}." color="91"/>
+	<dtd id="698" english="Progress: ${number}/${number2}." color="91"/>
+	<dtd id="699" english="A new objective has been added!" color="91"/>
+	<dtd id="700" english="You are unable to use Trust magic at this time." color="121"/>
+	<dtd id="701" english="There's no time to do that now!" color="91"/>
+	<dtd id="704" english="You have undertaken &quot;${regime}.&quot;" color="91"/>
+	<dtd id="705" english="You have undertaken the limited-time Records of Eminence challenge &quot;${regime}.&quot;." color="91"/>
+	<dtd id="706" english="You have obtained a ${item} as a special reward." color="91"/>
+	<dtd id="707" english="As a first-time bonus, you receive ${number} sparks of eminence for a total of ${number2}!" color="91"/>
+	<dtd id="708" english="This place is now known as a location that brings memories flooding back to ${actor}." color="91"/>
+	<dtd id="709" english="As a special bonus for your valiant efforts, you have been awarded the following: ${item}" color="91"/>
+	<dtd id="710" english="You are cleared to fulfill this objective again." color="91"/>
 </messagesd>
