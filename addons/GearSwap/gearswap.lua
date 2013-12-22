@@ -52,6 +52,8 @@ _addon.version = '0.722'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
+debugging = 0
+
 windower.register_event('load',function()
 	if debugging >= 1 then windower.debug('load') end
 	if windower.dir_exists('../addons/GearSwap/data/logs') then
@@ -340,7 +342,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
 	elseif id == 0x01B then
 --		'Job Info Packet'
 		local enc = data:byte(97) + data:byte(98)*256
-		items = get_items()
+		items = windower.ffxi.get_items()
 		for i=0,15 do
 			local tf = (math.floor( (enc%(2^(i+1))) / 2^i ) == 1) -- Could include the binary library some day if necessary
 			if encumbrance_table[i] ~= tf and not tf and not_sent_out_equip[i] and not disable_table[i] then
@@ -719,7 +721,7 @@ function get_action_type(category)
 	return action_type
 end
 
-if debugging >= 1 then
+if debugging and debugging >= 1 then
 	require('data/bootstrap')
 
 	windower.register_event('addon command', function(...)
