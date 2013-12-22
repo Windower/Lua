@@ -95,7 +95,7 @@ augment_index = {
 	--[0x084: "Double Atk."+1 "Crit. hit +0 | value + 1
 
 	--0x080~0x084 are pet augs with a pair of stats with 0x080 being just "Pet:"
-	--the second stat starts at 0. the previouses pet augs add +2. the first previous non pet aug adds +2. any other non pet aug will add +1.
+	--the second stat starts at 0. the previous pet augs add +2. the first previous non pet aug adds +2. any other non pet aug will add +1.
 	--any aug >= 0x032 will be added after the pet stack and will not be counted to increase the 2nd pet's aug stat and will be prolly assigned to the pet.
 	--https://gist.github.com/giulianoriccio/6df4fbd1f2a166fed041/raw/4e1d1103e7fe0e69d25f8264387506b5e38296a7/augs
 
@@ -343,7 +343,7 @@ augment_index = {
 
 
 
-function extdata_to_augment(extdata)
+--[[function extdata_to_augment(extdata)
 	if not extdata then return end
 	local flags,id_1,val_1,id_2,val_2,id_3,val_3,Augment_1,Augment_2,Augment_3
 	
@@ -381,7 +381,7 @@ function unpack_augment(augment_table,val)
 		else return_augment = return_augment..'-'..(val-v.offset) end
 	end
 	return return_augment
-end
+end]]
 
 function augment_to_extdata(str)
 	local stripped = str:lower():gsub('[^%-%w,]','')
@@ -390,16 +390,17 @@ function augment_to_extdata(str)
 	local a,b,aug,pol,val = string.find(stripped,'(%w+)(.)(%d+)')
 	if pol == '-' then pol = -1
 	else
-		aug = (aug or '')..(pol or '') -- Temporary for debugging reasons
+--		aug = (aug or '')..(pol or '') -- Temporary for debugging reasons
 		pol = 1
 	end
 	
 	for i,v in pairs(augment_index) do
-		if v[1].stat == aug and val/(v[1].multiplier or 1) - pol*v[1].offset <= 32 then
+		if v[1].stat == aug and (val/(v[1].multiplier or 1) - pol*v[1].offset) <= 32 then
 			val = val/(v[1].multiplier or 1) - pol*v[1].offset
 			firstbyte = i%256
 			secondbyte = math.floor(i/256)+8*val
 			twobyte = string.char(firstbyte)..string.char(secondbyte)
+			break
 		end
 	end
 	return twobyte

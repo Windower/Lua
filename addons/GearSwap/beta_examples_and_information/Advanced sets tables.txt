@@ -15,8 +15,8 @@ augment appears on your item in a contracted form) and set it up like this:
 
 		
 If it pleases you, you can store your augmented items in variables:
-    lefty = ring1={name="Dark Ring",augments={"Physical Damage Taken -6%"}}
-	righty = ring2={name="Dark Ring",augments={"Breath Damage Taken -6%","Physical Damage Taken -5%"}}
+    lefty = {name="Dark Ring",augments={"Physical Damage Taken -6%"}}
+	righty = {name="Dark Ring",augments={"Breath Damage Taken -6%","Physical Damage Taken -5%"}}
 	sets.aftercast_Idle = {ring1=lefty,ring2=righty}
 
 This will save you a little work when you are dealing with using the same augmented item in multiple sets.

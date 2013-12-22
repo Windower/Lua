@@ -71,23 +71,18 @@ function load_user_files()
 	user_env = nil
 	registered_user_events = {}
 	
-	if windower.file_exists(windower.addon_path..'data/'..player.name..'_'..player.main_job..'.lua') then
-		path = windower.addon_path..'data/'..player.name..'_'..player.main_job..'.lua'
-	elseif windower.file_exists(windower.addon_path..'data/'..player.name..'-'..player.main_job..'.lua') then
-		path = windower.addon_path..'data/'..player.name..'-'..player.main_job..'.lua'
-	elseif windower.file_exists(windower.addon_path..'data/'..player.name..'_'..player.main_job_full..'.lua') then
-		path = windower.addon_path..'data/'..player.name..'_'..player.main_job_full..'.lua'
-	elseif windower.file_exists(windower.addon_path..'data/'..player.name..'-'..player.main_job_full..'.lua') then
-		path = windower.addon_path..'data/'..player.name..'-'..player.main_job_full..'.lua'
-	elseif windower.file_exists(windower.addon_path..'data/'..player.name..'.lua') then
-		path = windower.addon_path..'data/'..player.name..'.lua'
-	elseif windower.file_exists(windower.addon_path..'data/'..player.main_job..'.lua') then
-		path = windower.addon_path..'data/'..player.main_job..'.lua'
-	elseif windower.file_exists(windower.addon_path..'data/'..player.main_job_full..'.lua') then
-		path = windower.addon_path..'data/'..player.main_job_full..'.lua'
-	elseif windower.file_exists(windower.addon_path..'data/default.lua') then
-		path = windower.addon_path..'data/default.lua'
-	else
+	local basepath
+	if windower.dir_exists(windower.addon_path..'data/'..player.name) then
+		path = pathsearch(windower.addon_path..'data/'..player.name..'/')
+	end
+	if not path and windower.dir_exists(windower.addon_path..'data/common') then
+		path = pathsearch(windower.addon_path..'data/common/')
+	end
+	if not path then
+		path = pathsearch(windower.addon_path..'data/')
+	end
+	
+	if not path then
 		current_job_file = nil
 		gearswap_disabled = true
 		sets = nil
@@ -99,13 +94,14 @@ function load_user_files()
 		equip = equip, verify_equip=verify_equip, cancel_spell=cancel_spell,
 		force_send=force_send, change_target=change_target, cast_delay=cast_delay,
 		print_set=print_set,set_combine=set_combine,disable=disable,enable=enable,
+		send_command=send_cmd_user,windower=user_windower,include=include_user,
+		midaction=user_midaction,
 		
 		-- Library functions
-		string=string, math=math, table=table, T=T,os=os,
+		string=string, math=math, table=table, T=T,S=S,os=os,
 		tostring = tostring, tonumber = tonumber, pairs = pairs,
 		ipairs = ipairs, print=print, add_to_chat=windower.add_to_chat,
-		send_command=send_cmd_user,windower=user_windower,
-		include=include_user,next=next,lua_base_path=windower.addon_path,empty=empty,
+		next=next,lua_base_path=windower.addon_path,empty=empty,
 		
 		-- Player environment things
 		buffactive=buffactive,
@@ -224,26 +220,14 @@ function refresh_player()
 	player.equipment = to_names_set(cur_equip,items.inventory)
 	
 	-- Monster tables for the target and subtarget.
-	player.target = target_type(windower.ffxi.get_mob_by_target('t'))
-	
-	if player.target and player.target.race~= nil then
-		player.target.race_id = player.target.race
-		player.target.race = mob_table_races[player.target.race]
-	end
-	
-	player.subtarget = target_type(windower.ffxi.get_mob_by_target('lastst'))
-	
-	if player.subtarget and player.subtarget.race~= nil then
-		player.subtarget.race_id = player.subtarget.race
-		player.subtarget.race = mob_table_races[player.subtarget.race]
-	end
+	player.target = target_complete(windower.ffxi.get_mob_by_target('t'))
+	player.subtarget = target_complete(windower.ffxi.get_mob_by_target('st'))
+	player.last_subtarget = target_complete(windower.ffxi.get_mob_by_target('lastst'))
 	
 	-- If you have a pet, make a pet table.
 	if player_mob_table.pet_index then
-		table.reassign(pet,windower.ffxi.get_mob_by_index(player_mob_table.pet_index))
+		table.reassign(pet,target_complete(windower.ffxi.get_mob_by_index(player_mob_table.pet_index)))
 		pet.isvalid = true
-		pet.race_id = pet.race
-		pet.race = nil
 		pet.claim_id = nil
 		pet.is_npc = nil
 		if pet.tp then pet.tp = pet.tp/10 end
@@ -253,19 +237,14 @@ function refresh_player()
 			pet.element = 'None'
 		end
 	else
-		table.reassign(pet,{isvalid=false})
+		table.reassign(pet,{type="NONE",isvalid=false})
 	end
 	
-	local ft_table = windower.ffxi.get_mob_by_target('<ft>')
-	if ft_table then
-		table.reassign(fellow,ft_table)
+	table.reassign(fellow,target_complete(windower.ffxi.get_mob_by_target('<ft>')))
+	if fellow.name then
 		fellow.isvalid = true
-		if fellow.race then
-			fellow.race_id = fellow.race
-			fellow.race = mob_table_races[fellow.race]
-		end
 	else
-		table.reassign(fellow,{isvalid=false})
+		fellow.isvalid=false
 	end
 	
 	refresh_buff_active(player.buffs)
@@ -396,4 +375,35 @@ end
 function refresh_user_env()
 	refresh_globals()
 	windower.send_command('@wait 0.5;lua i gearswap load_user_files')
+end
+
+
+-----------------------------------------------------------------------------------
+--Name: pathsearch()
+--Args:
+---- basepath - string of the path to search. Ends in /.
+-----------------------------------------------------------------------------------
+--Returns:
+---- path of a valid file, if it exists.
+-----------------------------------------------------------------------------------
+function pathsearch(basepath)
+	local path
+	if windower.file_exists(basepath..player.name..'_'..player.main_job..'.lua') then
+		path = basepath..player.name..'_'..player.main_job..'.lua'
+	elseif windower.file_exists(basepath..player.name..'-'..player.main_job..'.lua') then
+		path = basepath..player.name..'-'..player.main_job..'.lua'
+	elseif windower.file_exists(basepath..player.name..'_'..player.main_job_full..'.lua') then
+		path = basepath..player.name..'_'..player.main_job_full..'.lua'
+	elseif windower.file_exists(basepath..player.name..'-'..player.main_job_full..'.lua') then
+		path = basepath..player.name..'-'..player.main_job_full..'.lua'
+	elseif windower.file_exists(basepath..player.name..'.lua') then
+		path = basepath..player.name..'.lua'
+	elseif windower.file_exists(basepath..player.main_job..'.lua') then
+		path = basepath..player.main_job..'.lua'
+	elseif windower.file_exists(basepath..player.main_job_full..'.lua') then
+		path = basepath..player.main_job_full..'.lua'
+	elseif windower.file_exists(basepath..'default.lua') then
+		path = basepath..'default.lua'
+	end
+	return path
 end

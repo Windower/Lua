@@ -40,7 +40,7 @@ function export_set(options)
 				if r_items[v.id] then
 					item_list[#item_list+1] = {}
 					item_list[#item_list].name = r_items[v.id][language]
-					item_list[#item_list].slot = dat_slots_map[tonumber('0x'..(r_items[v.id].slots or 0))] or 'item'
+					item_list[#item_list].slot = dat_slots_map[r_items[v.id].slots or 0] or 'item'
 				else
 					windower.add_to_chat(123,'GearSwap: You possess an item that is not in the resources yet.')
 				end
@@ -49,7 +49,7 @@ function export_set(options)
 				if not item_list[i] then
 					item_list[i] = {}
 					item_list[i].name = empty
-					item_list[i].slot = dat_slots_map[tonumber('0x'..(r_items[v.id].slots or 0))] or 'item'
+					item_list[i].slot = dat_slots_map[r_items[v.id].slots or 0] or 'item'
 				end
 			end
 		end
@@ -168,11 +168,11 @@ function unlogify_unpacked_name(name)
 				windower.add_to_chat(8,'v = '..tostring(v.english))
 			elseif v[language..'_log']:lower() == name then
 				name = v[language]
-				slot = dat_slots_map[tonumber('0x'..(v.slots or 0))] or 'item'
+				slot = dat_slots_map[v.slots or 0] or 'item'
 				break
 			elseif v[language]:lower() == name then
 				name = v[language]
-				slot = dat_slots_map[tonumber('0x'..(v.slots or 0))] or 'item'
+				slot = dat_slots_map[v.slots or 0] or 'item'
 				break
 			end
 		end

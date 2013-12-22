@@ -78,8 +78,7 @@ function get_sets()
 		body="Marduk's Jubbah +1",hands="Nares Cuffs",ring1="Celestial Ring",ring2="Angha Ring",
 		back="Vita cape",waist="Austerity belt",legs="Nares Trews",feet="Oracle's Pigaches"}
 	
-	sets.aftercast_Idle = sets.aftercast_None
-	
+	sets.aftercast_Idle = sets.aftercast_None	
 	
 	-- Variables and notes to myself
 	Debuff_BPs = T{'Diamond Storm','Sleepga','Slowga','Tidal Roar','Shock Squall','Nightmare','Pavor Nocturnus','Ultimate Terror','Somnolence','Lunar Cry','Lunar Roar'}
