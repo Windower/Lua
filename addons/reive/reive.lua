@@ -37,7 +37,7 @@ local config = require 'config'
 
 _addon.name    = 'reive'
 _addon.author  = 'Zohno'
-_addon.version = '1.20131021'
+_addon.version = '1.20131221'
 _addon.command = 'reive'
 
 tb_name = 'addon:gr:reive'
@@ -315,13 +315,13 @@ windower.register_event('unload', function()
     windower.text.delete(tb_name)
 end)
 
-windower.register_event('gain buff', function(id)
+windower.register_event('gain buff', function(name,id)
     if id == 511 then
         start_tracking()
     end
 end)
 
-windower.register_event('lose buff', function(id)
+windower.register_event('lose buff', function(name,id)
     if id == 511 then
         stop_tracking()
     end
