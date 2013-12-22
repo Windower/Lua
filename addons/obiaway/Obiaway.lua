@@ -63,9 +63,9 @@ defaults.location = 'sack'
 
 settings = config.load(defaults)
 
-windower.register_event('load'), function()
+windower.register_event('load', function()
     print('Use //obiaway <sack/satchel/case> to set location to store obis')
-end
+end)
 
 windower.register_event('addon command',function (...)
     if args[1] == 'location' then
