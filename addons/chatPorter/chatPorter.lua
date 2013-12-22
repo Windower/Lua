@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 _addon.name = 'ChatPorter'
-_addon.version = '1.33'
+_addon.version = '1.35'
 _addon.author = 'Ragnarok.Ikonic'
 _addon.commands = {'ChatPorter','cp'}
 
@@ -465,7 +465,8 @@ function show(tbName)
 		windower.text.set_bg_visibility("show"..tbName, true)
 	end
 	windower.text.set_color("show"..tbName, settings[tbName].alpha, settings[tbName].red, settings[tbName].green, settings[tbName].blue)
-	windower.text.set_font("show"..tbName, settings[tbName].fontname, settings[tbName].fontsize)
+	windower.text.set_font("show"..tbName, settings[tbName].fontname)
+	windower.text.set_font_size("show"..tbName, settings[tbName].fontsize)
 	windower.text.set_location("show"..tbName, settings[tbName].x, settings[tbName].y)
 	windower.text.set_visibility("show"..tbName, settings[tbName].show)
 	if #_G['show'..tbName] <= settings[tbName].lines then
