@@ -438,13 +438,13 @@ end
 -- Finds a table entry based on an attribute.
 function table.with(t, attr, val)
     val = type(val) ~= 'function' and functools.equals(val) or val
-    for _, el in pairs(t) do
+    for key, el in pairs(t) do
         if type(el) == 'table' and val(rawget(el, attr)) then
-            return el
+            return el, key
         end
     end
 
-    return nil
+    return nil, nil
 end
 
 -- Finds a table entry based on an attribute, case-insensitive.
