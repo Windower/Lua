@@ -75,11 +75,17 @@ function initialize()
         Burden_tb[key] = 0
         Burden_tb['time'..key] = 0 
     end
-    if windower.ffxi.get_mob_by_id(windower.ffxi.get_player()['id'])['pet_index']
-       and windower.ffxi.get_mob_by_id(windower.ffxi.get_player()['id'])['pet_index'] ~= 0 then 
-        running = 1
-        text_update_loop('start')
-        Burden_tb:show()
+    if mjob_id == 18 then
+        if windower.get_mob_by_id(windower.ffxi.get_player()['id']) then
+            if windower.ffxi.get_mob_by_id(windower.ffxi.get_player()['id'])['pet_index']
+               and windower.ffxi.get_mob_by_id(windower.ffxi.get_player()['id'])['pet_index'] ~= 0 then 
+                running = 1
+                text_update_loop('start')
+                Burden_tb:show()
+            end
+        else
+            windower.send_command('@wait 5;lua i autocontrol initialize')
+        end
     end
 end
 
