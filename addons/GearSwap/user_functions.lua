@@ -313,5 +313,5 @@ function user_midaction()
 end
 
 -- Define the user windower functions.
-user_windower = {register_event = register_event_user, unregister_event = unregister_event_user}
+user_windower = {register_event = register_event_user, unregister_event = unregister_event_user, send_command = send_cmd_user}
 setmetatable(user_windower,{__index=windower})

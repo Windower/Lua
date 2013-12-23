@@ -387,8 +387,9 @@ function augment_to_extdata(str)
 	local stripped = str:lower():gsub('[^%-%w,]','')
 	local twobyte,firstbyte,secondbyte
 	
-	local a,b,aug,pol,val = string.find(stripped,'(%w+)(.)(%d+)')
-	if pol == '-' then pol = -1
+	local a,b,aug,pol,val = string.find(stripped,'(%a+)(%-*)(%d+)')
+	if pol == '-' then
+		pol = -1
 	else
 --		aug = (aug or '')..(pol or '') -- Temporary for debugging reasons
 		pol = 1
@@ -397,8 +398,8 @@ function augment_to_extdata(str)
 	for i,v in pairs(augment_index) do
 		if v[1].stat == aug and (val/(v[1].multiplier or 1) - pol*v[1].offset) <= 32 then
 			val = val/(v[1].multiplier or 1) - pol*v[1].offset
-			firstbyte = i%256
-			secondbyte = math.floor(i/256)+8*val
+			firstbyte = i%256 or 0
+			secondbyte = math.floor(i/256)+8*val or 0
 			twobyte = string.char(firstbyte)..string.char(secondbyte)
 			break
 		end

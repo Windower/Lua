@@ -209,7 +209,6 @@ sent_out_equip = T{}
 not_sent_out_equip = T{}
 equip_list = {}
 equip_order = {}
-lastbyte = 0x0000
 action_sent = false
 force_flag = false
 world = make_user_table()

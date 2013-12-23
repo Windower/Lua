@@ -27,7 +27,6 @@
 
 function equip_sets(swap_type,val1,val2)
 	_global.current_event = swap_type
-	if user_env then user_env.midaction = midaction end
 	refresh_globals()
 	local cur_equip = get_gs_gear(items.equipment,swap_type)
 	
@@ -167,7 +166,7 @@ function equip_sets(swap_type,val1,val2)
 	
 	if not failure_reason then
 		for _,i in ipairs(equip_order) do
-			if debugging >= 2 and equip_next[i] then
+			if debugging >= 3 and equip_next[i] then
 				local out_str = 'Order: '..tostring(_)..'  Slot ID: '..tostring(i)
 				if equip_next[i] ~= 0 then
 					out_str = out_str..'  Item: '..tostring(r_items[items.inventory[equip_next[i]].id][language..'_log'])
@@ -178,7 +177,7 @@ function equip_sets(swap_type,val1,val2)
 			elseif equip_next[i] and not disable_table[i] and not encumbrance_table[i] then
 				windower.ffxi.set_equip(equip_next[i],i)
 				sent_out_equip[i] = equip_next[i] -- re-make the equip_next table with the name sent_out_equip as the equipment is sent out.
-			elseif equip_next[i] then --and not disable_table[i] then
+			elseif equip_next[i] then
 				not_sent_out_equip[i] = equip_next[i]
 			end
 		end
@@ -220,16 +219,17 @@ function to_id_set(inventory,equip_list)
 								reorder(order,i)
 							elseif (r_items[m['id']][language..'_log']:lower() == name:lower() or r_items[m['id']][language]:lower() == name:lower()) and get_wearable(dat_slots[slot_map[i]],r_items[m.id].slots) then
 								if extgoal[1] then
-									windower.add_to_chat(8,'here '..extgoal[1]:byte(1)..' '..extgoal[1]:byte(2)..' '..m.extdata:byte(3)..' '..m.extdata:byte(4)..' '..m.extdata:byte(5)..' '..m.extdata:byte(6)..' '..m.extdata:byte(9)..' '..m.extdata:byte(8))
 									local count = 0
 									for o,q in pairs(extgoal) do
 										-- It appears only the first five bits are used for augment value.
 										local first,second,third = string.char(m.extdata:byte(4)%32), string.char(m.extdata:byte(6)%32), string.char(m.extdata:byte(8)%32)
-										local exttemp = m.extdata:sub(1,3)..first..m.extdata:sub(5,5)..second..m.extdata:sub(7,7)..third..m.extdata:sub(9)
+									--	local exttemp = m.extdata:sub(1,3)..first..m.extdata:sub(5,5)..second..m.extdata:sub(7,7)..third..m.extdata:sub(9)
+										local exttemp = m.extdata
 										if exttemp:sub(3,4) == q or exttemp:sub(5,6) == q or exttemp:sub(7,8) == q then
 											count = count +1
 										end
 									end
+									windower.add_to_chat(8,tostring(count))
 									if count == #extgoal then
 										equip_list[i] = ''
 										ret_list[slot_map[i]] = m.slot_id
@@ -436,12 +436,12 @@ function get_gs_gear(cur_equip,swap_type)
 	-- If the swap is not complete, overwrite the current equipment with the equipment that you are swapping to
 	for i,v in pairs(cur_equip) do
 		if sent_out_equip[slot_map[i]] then
-			rawset(cur_equip,i,sent_out_equip[slot_map[i]])
+			cur_equip[i] = sent_out_equip[slot_map[i]]
 		elseif not_sent_out_equip[slot_map[i]] then
-			rawset(cur_equip,i,not_sent_out_equip[slot_map[i]])
+			cur_equip[i] = not_sent_out_equip[slot_map[i]]
 		end
 		if v == 0 then
-			rawset(cur_equip,i,empty)
+			cur_equip[i] = empty
 		end
 		if v and v ~= 0 and debugging > 0 and items.inventory[v] and r_items[items.inventory[v].id] then
 			sent_out_box = sent_out_box..tostring(i)..' '..tostring(r_items[items.inventory[v].id].english)..'\n'

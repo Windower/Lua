@@ -88,7 +88,6 @@ function load_user_files()
 		sets = nil
 		return
 	end
-	
 	user_env = {gearswap = _G, _global = _global,
 		-- Player functions
 		equip = equip, verify_equip=verify_equip, cancel_spell=cancel_spell,

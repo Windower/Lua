@@ -264,7 +264,7 @@ end)
 windower.register_event('incoming chunk',function(id,data,modified,injected,blocked)
 	if debugging >= 1 then windower.debug('incoming chunk '..id) end
 
-	if id == 0x28 then
+	if id == 0x28 and not injected then
 		data = data:sub(5)
 		local act = {}
 		act.do_not_need = get_bit_packed(data,0,8)
@@ -326,7 +326,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
 			end
 		end
 		action(act)
-	elseif id == 0x29 then
+	elseif id == 0x29 and not injected then
 		if gearswap_disabled then return end
 		data = data:sub(5)
 		local actor_id = get_bit_packed(data,0,32)
@@ -339,7 +339,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
 		local message_id = get_bit_packed(data,160,175) -- Cut off the most significant bit, hopefully
 		
 		action_message(actor_id,target_id,param_1,param_2,param_3,actor_index,target_index,message_id)
-	elseif id == 0x01B then
+	elseif id == 0x01B and not injected then
 --		'Job Info Packet'
 		local enc = data:byte(97) + data:byte(98)*256
 		items = windower.ffxi.get_items()
@@ -364,7 +364,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
 		end
 	elseif gearswap_disabled then
 		return
-	elseif id == 0x050 then
+	elseif id == 0x050 and not injected then
 --		'Equipment packet'
 		if sent_out_equip[data:byte(6)] == data:byte(5) then
 			sent_out_equip[data:byte(6)] = nil
@@ -404,15 +404,13 @@ end
 windower.register_event('zone change',function(new_zone,new_zone_id,old_zone,old_zone_id)
 	if debugging >= 1 then windower.debug('zone change') end
 	_global.midaction = false
-	--sent_out_equip = {}
+	sent_out_equip = {}
+	not_sent_out_equip = {}
 end)
 
 windower.register_event('outgoing chunk',function(id,data,modified,injected,blocked)
 	if debugging >= 1 then windower.debug('outgoing chunk '..id) end
-	if id == 0x015 then
-		lastbyte = data:byte(7,8)
-	end
-	if id == 0x01A then -- Action packet
+	if id == 0x01A and not injected then -- Action packet
 		local abil
 		actor_id = data:byte(8,8)*256^3+data:byte(7,7)*256^2+data:byte(6,6)*256+data:byte(5,5)
 		index = data:byte(10,10)*256+data:byte(9,9)
@@ -430,6 +428,7 @@ windower.register_event('outgoing chunk',function(id,data,modified,injected,bloc
 		elseif category == 16 then -- 16 = . . . ranged attack
 			abil = r_abilities[1]
 		end
+		abil.interrupted = false
 		if logging then logit(logfile,'\n\nActor: '..tostring(actor_name)..'  Target: '..tostring(target_name)..'  Category: '..tostring(category)..'  param: '..tostring(abil_name or param)) end
 		if abil and not (buffactive.terror or buffactive.sleep or buffactive.stun or buffactive.petrification or buffactive.charm) then
 			_global.midaction = true
@@ -500,6 +499,7 @@ function action(act)
 		-- I do not know if this will affect automatons being interrupted.
 		local action_type = get_action_type(category)
 		if readies[category] and act.param == 28787 and not (category == 9) then
+			act.interrupted = true
 			action_type = 'Interruption'
 		end
 		
@@ -687,6 +687,7 @@ function get_spell(act)
 	end
 	
 	spell.name = spell[language]
+	spell.interrupted = false
 	return spell
 end
 
@@ -733,10 +734,12 @@ if debugging and debugging >= 1 then
 			windower.text.set_visibility('precast',true)
 			windower.text.set_visibility('midcast',true)
 			windower.text.set_visibility('aftercast',true)
+			windower.text.set_visibility('buff_change',true)
 		elseif opt == 'invisible' then
 			windower.text.set_visibility('precast',false)
 			windower.text.set_visibility('midcast',false)
 			windower.text.set_visibility('aftercast',false)
+			windower.text.set_visibility('buff_change',false)
 		end
 	end)
 	
@@ -746,7 +749,7 @@ if debugging and debugging >= 1 then
 	windower.text.set_font('precast','Consolas')
 	windower.text.set_font_size('precast',12)
 	windower.text.set_color('precast',255,255,255,255)
-	windower.text.set_location('precast',500,10)
+	windower.text.set_location('precast',250,10)
 	windower.text.set_visibility('precast',false)
 	windower.text.set_text('precast','Panda')
 	
@@ -756,7 +759,7 @@ if debugging and debugging >= 1 then
 	windower.text.set_font('midcast','Consolas')
 	windower.text.set_font_size('midcast',12)
 	windower.text.set_color('midcast',255,255,255,255)
-	windower.text.set_location('midcast',750,10)
+	windower.text.set_location('midcast',500,10)
 	windower.text.set_visibility('midcast',false)
 	windower.text.set_text('midcast','Panda')
 	
@@ -766,7 +769,17 @@ if debugging and debugging >= 1 then
 	windower.text.set_font('aftercast','Consolas')
 	windower.text.set_font_size('aftercast',12)
 	windower.text.set_color('aftercast',255,255,255,255)
-	windower.text.set_location('aftercast',1000,10)
+	windower.text.set_location('aftercast',750,10)
 	windower.text.set_visibility('aftercast',false)
 	windower.text.set_text('aftercast','Panda')
+	
+	windower.text.create('buff_change')
+	windower.text.set_bg_color('buff_change',100,100,100,100)
+	windower.text.set_bg_visibility('buff_change',true)
+	windower.text.set_font('buff_change','Consolas')
+	windower.text.set_font_size('buff_change',12)
+	windower.text.set_color('buff_change',255,255,255,255)
+	windower.text.set_location('buff_change',1000,10)
+	windower.text.set_visibility('buff_change',false)
+	windower.text.set_text('buff_change','Panda')
 end
