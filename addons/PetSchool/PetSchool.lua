@@ -80,15 +80,18 @@ function options_load()
 end
 
 windower.register_event('action',function (act)
-	local player = windower.ffxi.get_player()
-	local pet = windower.ffxi.get_mob_by_index(windower.ffxi.get_mob_by_index(windower.ffxi.get_player()['index'])['pet_index'])['id']
+	local pet = windower.ffxi.get_mob_by_target('pet')
+    if not pet then
+        return
+    end
+
 	local actor = act.actor_id
 	local category = act.category
 	local targets = act.targets
-	local actionTarget = windower.ffxi.get_mob_by_id(targets[1]['id'])
 	
 	if actor == pet then
 		if category == 8 then
+            local actionTarget = windower.ffxi.get_mob_by_id(targets[1].id)
 			if actionTarget.is_npc == true then
 				windower.send_command('sc set ' .. PetNuke)
 				windower.add_to_chat(17, '                       Pet Spellcast Started:  Nuking')
@@ -97,6 +100,7 @@ windower.register_event('action',function (act)
 				windower.add_to_chat(17, '                       Pet Spellcast Started:  Curing/Buffing')
 			end
 		elseif category == 4 then
+            local player = windower.ffxi.get_player()
 			if (player.status:lower() == 'engaged') then
 				windower.send_command('sc set ' .. TP_Set)
 				windower.add_to_chat(17, '                       Pet Spellcast Finished')
