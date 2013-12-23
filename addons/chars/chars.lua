@@ -33,7 +33,7 @@ require('logger')
 
 _addon.name     = 'chars'
 _addon.version  = '1.20131102'
-_addon.commands = 'chars'
+_addon.command  = 'chars'
 
 local chars = require('json').read('../libs/ffxidata.json').chat.chars
 
