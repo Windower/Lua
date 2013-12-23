@@ -31,7 +31,7 @@ function equip_sets(swap_type,val1,val2)
 	local cur_equip = get_gs_gear(items.equipment,swap_type)
 	
 	table.reassign(equip_order,default_equip_order)
-	table.reassign(equip_list,player.equipment)
+	table.reassign(equip_list,to_names_set(cur_equip,items.inventory))
 	
 	if debugging >= 2 then windower.add_to_chat(8,swap_type) end
 	if logging then
@@ -222,7 +222,7 @@ function to_id_set(inventory,equip_list)
 									local count = 0
 									for o,q in pairs(extgoal) do
 										-- It appears only the first five bits are used for augment value.
-										local first,second,third = string.char(m.extdata:byte(4)%32), string.char(m.extdata:byte(6)%32), string.char(m.extdata:byte(8)%32)
+									--	local first,second,third = string.char(m.extdata:byte(4)%32), string.char(m.extdata:byte(6)%32), string.char(m.extdata:byte(8)%32)
 									--	local exttemp = m.extdata:sub(1,3)..first..m.extdata:sub(5,5)..second..m.extdata:sub(7,7)..third..m.extdata:sub(9)
 										local exttemp = m.extdata
 										if exttemp:sub(3,4) == q or exttemp:sub(5,6) == q or exttemp:sub(7,8) == q then
@@ -340,7 +340,7 @@ end
 function to_names_set(id_id,inventory)
 	local equip_package = {}
 	for i,v in pairs(id_id) do
-		if v~=0 then
+		if v~=0 and v~=empty then
 			if inventory[v].id == 0 then
 				equip_package[i]=''
 			elseif type(i) ~= 'string' then

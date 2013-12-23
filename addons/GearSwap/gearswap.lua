@@ -262,7 +262,7 @@ windower.register_event('incoming text',function(original,modified,color,modifie
 end)
 
 windower.register_event('incoming chunk',function(id,data,modified,injected,blocked)
-	if debugging >= 1 then windower.debug('incoming chunk '..id) end
+--	if debugging >= 1 then windower.debug('incoming chunk '..id) end
 
 	if id == 0x28 and not injected then
 		data = data:sub(5)
@@ -409,7 +409,7 @@ windower.register_event('zone change',function(new_zone,new_zone_id,old_zone,old
 end)
 
 windower.register_event('outgoing chunk',function(id,data,modified,injected,blocked)
-	if debugging >= 1 then windower.debug('outgoing chunk '..id) end
+--	if debugging >= 1 then windower.debug('outgoing chunk '..id) end
 	if id == 0x01A and not injected then -- Action packet
 		local abil
 		actor_id = data:byte(8,8)*256^3+data:byte(7,7)*256^2+data:byte(6,6)*256+data:byte(5,5)
@@ -428,7 +428,7 @@ windower.register_event('outgoing chunk',function(id,data,modified,injected,bloc
 		elseif category == 16 then -- 16 = . . . ranged attack
 			abil = r_abilities[1]
 		end
-		abil.interrupted = false
+		if abil then abil.interrupted = false end
 		if logging then logit(logfile,'\n\nActor: '..tostring(actor_name)..'  Target: '..tostring(target_name)..'  Category: '..tostring(category)..'  param: '..tostring(abil_name or param)) end
 		if abil and not (buffactive.terror or buffactive.sleep or buffactive.stun or buffactive.petrification or buffactive.charm) then
 			_global.midaction = true
