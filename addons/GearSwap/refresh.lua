@@ -97,7 +97,7 @@ function load_user_files()
 		midaction=user_midaction,
 		
 		-- Library functions
-		string=string, math=math, table=table, T=T,S=S,os=os,
+		string=string, math=math, table=table, T=T,S=S,os=os,type=type,
 		tostring = tostring, tonumber = tonumber, pairs = pairs,
 		ipairs = ipairs, print=print, add_to_chat=windower.add_to_chat,
 		next=next,lua_base_path=windower.addon_path,empty=empty,
