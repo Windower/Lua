@@ -24,20 +24,19 @@
 -- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 -- SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-require 'chat'
-require 'logger'
-require 'stringhelper'
-require 'mathhelper'
-require 'tablehelper'
-
-local ffxi = require 'ffxi'
-
-local config = require 'config'
-
-
 _addon.name = 'gametime'
 _addon.version = '0.52'
 _addon.commands = {'gametime','gt'}
+
+require('chat')
+require('logger')
+require('stringhelper')
+require('mathhelper')
+require('tablehelper')
+
+ffxi = require('ffxi')
+config = require('config')
+
 
 tb_name	= 'addon:gr:gametime'
 visible = false
@@ -240,9 +239,8 @@ function initialize()
 	end
 	
 	gt.mode = settings.mode
-	time_change(windower.ffxi.get_info()["time"])
-	day_change(windower.ffxi.get_info()["day"])
-	moon_pct_change(windower.ffxi.get_info()["moon_pct"])
+	day_change(windower.ffxi.get_info().day)
+	moon_pct_change(windower.ffxi.get_info().moon_pct)
 end
 
 function destroy()
