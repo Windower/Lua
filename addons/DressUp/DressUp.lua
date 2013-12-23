@@ -49,9 +49,11 @@ require('feet')
 
 windower.register_event('load','login',function ()
 	settings = config.load(defaults)
-	_char = windower.ffxi.get_player().name:lower()
-	if not settings[_char] then settings[_char] = {} end
-	print_blink_settings("global")
+	if windower.ffxi.get_player() then
+		_char = windower.ffxi.get_player().name:lower()
+		if not settings[_char] then settings[_char] = {} end
+		print_blink_settings("global")
+	end
 	zone_reset = 2
 end)
 
