@@ -94,7 +94,7 @@ pack_ids = setmetatable(pack_ids, {__index = function(t, k)
         local pack_id = rawget(t, type)
         if pack_id then
             if type == 'char' then
-                return 'S*'
+                return 'z'
             else
                 return pack_id..'*'
             end
