@@ -47,7 +47,6 @@ function config.load(filename, confdict)
             return confdict_mt.__index[k]
         end
     end})
-
     -- Settings member variables, in separate struct
     local meta = {}
     meta.file = _libs.filehelper.new()
@@ -115,7 +114,6 @@ function parse(settings)
 
         parsed = settings_table(parsed, settings)
     end
-
     -- Determine all characters found in the settings file.
     meta.chars = parsed:keyset() - S{'global'}
     meta.original = T{}
@@ -128,7 +126,7 @@ function parse(settings)
         local full_parsed = parsed.global
 
         if windower.ffxi.get_info().logged_in then
-            full_parsed = full_parsed:update(parsed[windower.ffxi.get_player()['name']:lower()], true)
+            full_parsed = full_parsed:update(parsed[windower.ffxi.get_player().name:lower()], true)
         end
 
         return settings:update(full_parsed, true)

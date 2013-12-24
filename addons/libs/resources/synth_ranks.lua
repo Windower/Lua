@@ -1,25 +1,19 @@
--- Servers
-local servers = {}
+-- synth_ranks
+local synth_ranks = {}
 
-servers[2]  = {english = 'Undine'}
-servers[4]  = {english = 'Bahamut'}
-servers[5]  = {english = 'Shiva'}
-servers[8]  = {english = 'Phoenix'}
-servers[9]  = {english = 'Carbuncle'}
-servers[10] = {english = 'Fenrir'}
-servers[11] = {english = 'Sylph'}
-servers[12] = {english = 'Valefor'}
-servers[14] = {english = 'Leviathan'}
-servers[15] = {english = 'Odin'}
-servers[19] = {english = 'Quetzalcoatl'}
-servers[20] = {english = 'Siren'}
-servers[23] = {english = 'Ragnarok'}
-servers[26] = {english = 'Cerberus'}
-servers[28] = {english = 'Bismarck'}
-servers[30] = {english = 'Lakshmi'}
-servers[31] = {english = 'Asura'}
+synth_ranks[0]  = {english = 'Amateur'}
+synth_ranks[1]  = {english = 'Recruit'}
+synth_ranks[2]  = {english = 'Initiate'}
+synth_ranks[3]  = {english = 'Novice'}
+synth_ranks[4]  = {english = 'Apprentice'}
+synth_ranks[5]  = {english = 'Journeyman'}
+synth_ranks[6] =  {english = 'Craftsman'}
+synth_ranks[7] =  {english = 'Artisan'}
+synth_ranks[8] =  {english = 'Adept'}
+synth_ranks[9] =  {english = 'Veteran'}
+synth_ranks[10] = {english = 'Expert'}
 
-return servers
+return synth_ranks
 
 --[[
 Copyright (c) 2013, Windower
