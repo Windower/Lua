@@ -195,9 +195,26 @@ fields.outgoing[0x01A] = L{
     {ctype='unsigned short',    label='_unknown1'},                             --   14 -  15
 }
 
+-- Drop Item
+fields.outgoing[0x028] = L{
+    {ctype='unsigned int',      label='_unknown1'},                             --    4 -   7
+    {ctype='unsigned char',     label='Current Bag ID',     fn=bag},            --    8 -   8
+    {ctype='unsigned char',     label='Inventory ID'},                          --    9 -   9
+    {ctype='unsigned short',    label='_unknown2'},                             --   10 -  11
+}
+
+-- Move Item
+fields.outgoing[0x029] = L{
+    {ctype='unsigned int',      label='_unknown1'},                             --    4 -   7 -- 1 has been observed
+    {ctype='unsigned char',     label='Current Bag ID',     fn=bag},            --    8 -   8
+    {ctype='unsigned char',     label='Target Bag ID',      fn=bag},            --    9 -   9
+    {ctype='unsigned char',     label='Current Inventory ID'},                  --   10 -  10
+    {ctype='unsigned char',     label='_unknown2'},                             --   11 -  11 -- Has taken the value 52. Unclear purpose.
+}
+
 -- Sort Item
 fields.outgoing[0x03A] = L{
-    {ctype='unsigned char',     label='Storage ID'},                            --    4 -   4
+    {ctype='unsigned char',     label='Bag ID',             fn=bag},            --    4 -   4
     {ctype='unsigned char',     label='_unknown1'},                             --    5 -   5
     {ctype='unsigned short',    label='_unknown2'},                             --    6 -   7
 }
