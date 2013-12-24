@@ -1,23 +1,23 @@
 -- Servers
 local servers = {}
 
-servers[2]  = {name = 'Undine'}
-servers[4]  = {name = 'Bahamut'}
-servers[5]  = {name = 'Shiva'}
-servers[8]  = {name = 'Phoenix'}
-servers[9]  = {name = 'Carbuncle'}
-servers[10] = {name = 'Fenrir'}
-servers[11] = {name = 'Sylph'}
-servers[12] = {name = 'Valefor'}
-servers[14] = {name = 'Leviathan'}
-servers[15] = {name = 'Odin'}
-servers[19] = {name = 'Quetzalcoatl'}
-servers[20] = {name = 'Siren'}
-servers[23] = {name = 'Ragnarok'}
-servers[26] = {name = 'Cerberus'}
-servers[28] = {name = 'Bismarck'}
-servers[30] = {name = 'Lakshmi'}
-servers[31] = {name = 'Asura'}
+servers[2]  = {english = 'Undine'}
+servers[4]  = {english = 'Bahamut'}
+servers[5]  = {english = 'Shiva'}
+servers[8]  = {english = 'Phoenix'}
+servers[9]  = {english = 'Carbuncle'}
+servers[10] = {english = 'Fenrir'}
+servers[11] = {english = 'Sylph'}
+servers[12] = {english = 'Valefor'}
+servers[14] = {english = 'Leviathan'}
+servers[15] = {english = 'Odin'}
+servers[19] = {english = 'Quetzalcoatl'}
+servers[20] = {english = 'Siren'}
+servers[23] = {english = 'Ragnarok'}
+servers[26] = {english = 'Cerberus'}
+servers[28] = {english = 'Bismarck'}
+servers[30] = {english = 'Lakshmi'}
+servers[31] = {english = 'Asura'}
 
 return servers
 
