@@ -49,6 +49,7 @@ require('feet')
 
 windower.register_event('load','login',function ()
 	settings = config.load(defaults)
+	_char = nil
 	if windower.ffxi.get_player() then
 		_char = windower.ffxi.get_player().name:lower()
 		if not settings[_char] then settings[_char] = {} end
@@ -57,11 +58,14 @@ windower.register_event('load','login',function ()
 	zone_reset = 2
 end)
 
+windower.register_event('logout',function() _char = nil end)
+
 -- Allows for the model to be restored to desired settings after zoning if blink prevention is on:
 windower.register_event('outgoing chunk',function (id, data) if id == 0x5e then zone_reset = 0 end end)
 
 windower.register_event('incoming chunk',function (id, data)
 	if id == 0x51 then
+		if not _char then return end
 		parsed_self = packets.parse("incoming",id,data)
 
 		local self = T{}
@@ -185,10 +189,17 @@ end
 windower.register_event('addon command', function (command,...)
 	command = command and command:lower() or 'help'
 	local args = T{...}:map(string.lower)
-		
-	if command == "eval" then
+	local _clear = nil
+	
+	if command == 'help' then
+		print(helptext)
+	elseif command == "eval" then
 		assert(loadstring(L{...}:concat(' ')))()
 	
+	elseif command == "autoupdate" or command == "au" then
+		settings.autoupdate = not settings.autoupdate
+		notice("AutoUpdate setting is now "..tostring(settings.autoupdate)..".")
+		
 	----------------------------------------------------------
 	--------------- Commands for model changes ---------------
 	----------------------------------------------------------
@@ -318,8 +329,7 @@ windower.register_event('addon command', function (command,...)
 			error("Please specify something to clear.")
 			return
 		end
-		
-		local _clear = T{"replacements","self","others","player"}:contains(args[1]) and args:remove(1)
+		_clear = T{"replacements","self","others","player"}:contains(args[1]) and args:remove(1)
 		if _clear == "player" then
 			_clear = args:remove(1)
 		elseif _clear == "self" then
@@ -431,6 +441,10 @@ windower.register_event('addon command', function (command,...)
 			error("Something went wrong!")
 			return
 		end
+	end
+	if settings.autoupdate and ((command == _char) or (_clear == _char)) then
+		local _requestindex = Int2LE(windower.ffxi.get_player().index,2)
+		windower.packets.inject_outgoing(0x16,string.char(0,0,0,0).._requestindex..string.char(0,0))
 	end
 	
 	settings:save('all')
