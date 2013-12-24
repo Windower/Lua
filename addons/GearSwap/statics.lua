@@ -204,7 +204,6 @@ _global.midaction = false
 _global.current_event = 'None'
 
 gearswap_disabled = false
-_global.midaction = false
 sent_out_equip = T{}
 not_sent_out_equip = T{}
 equip_list = {}

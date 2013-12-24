@@ -195,41 +195,22 @@ function enable(...)
 		enable_tab = enable_tab[1] -- Compensates for people passing a table instead of a series of strings.
 	end
 	items = windower.ffxi.get_items()
-	local id_equip = {}
-	for i,v in pairs(items.equipment) do
-		id_equip[slot_map[i]] = v
-	end
-	for i,v in pairs(sent_out_equip) do
-		id_equip[i] = v
-	end
 	local sending_table = {}
 	for i,v in pairs(enable_tab) do
 		if slot_map[v] then
-			rawset(disable_table,slot_map[v],false)
-			local potential_gear = rawget(not_sent_out_equip,slot_map[v])
-			local nope_flag
-			for i,v in pairs(items.equipment) do
-				if v == potential_gear then
-					nope_flag = true
-				end
-			end
-			if potential_gear and id_equip[slot_map[v]] ~= potential_gear and not rawget(encumbrance_table,slot_map[v]) and not nope_flag then
-				sending_table[slot_map[v]] = potential_gear
-				rawset(sent_out_equip,slot_map[v],potential_gear)
-				rawset(not_sent_out_equip,slot_map[v],nil)
+			local local_slot = default_slot_map[slot_map[v]]
+			disable_table[slot_map[v]] = false
+			local potential_gear = not_sent_out_equip[local_slot]
+			if potential_gear then
+				sending_table[local_slot] = not_sent_out_equip[local_slot]
+				not_sent_out_equip[local_slot] = nil
 			end
 		else
 			windower.add_to_chat(123,'Gearswap: enable error, passed an unrecognized slot name ('..tostring(v)..')')
 		end
 	end
-	if _global.show_swaps and table.length(sending_table)>0 then
-		local tempset = to_names_set(sending_table,items.inventory)
-		print_set(tempset,'Enable Command')
-	end
-	for i=0,15 do
-		if sending_table[i] then
-			windower.ffxi.set_equip(sending_table[i],i)
-		end
+	if table.length(sending_table) > 0 then
+		equip_sets('equip_command',sending_table)
 	end
 end
 
@@ -284,20 +265,13 @@ function include_user(str)
 	end
 	if str:sub(-4)~='.lua' then str = str..'.lua' end
 
-	local path = windower.addon_path..'data/'..str
-	local path2 = windower.addon_path..'data/'..player.name..'/'..str
-	local path3 = windower.addon_path..'data/common/'..str
+	local path, loaded_values = pathsearch({str})
 	
-	local loaded_values
-	if windower.file_exists(path2) then
-		loaded_values = dofile(path2)
-	elseif file.exists(path) then
-		loaded_values = dofile(path)
-	elseif file.exists(path3) then
-		loaded_values = dofile(path3)
-	else
+	if not path then
 		windower.add_to_chat(123,'Gearswap: Include failure. Cannot find file.')
 		return
+	else
+		loaded_values = dofile(path)
 	end
 	
 	for i,v in pairs(loaded_values) do
@@ -308,7 +282,12 @@ function include_user(str)
 	end
 end
 
-function user_midaction()
+function user_midaction(bool)
+	if bool == false or bool == true then
+		_global.midaction = bool
+	elseif bool ~= nil then
+		windower.add_to_chat(123,'GearSwap: midaction() takes a bool or no argument')
+	end
 	return _global.midaction
 end
 

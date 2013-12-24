@@ -1,4 +1,6 @@
 -------------------------------------------------
+Gearswap 0.723 - Removed a debug message, updated documentation, and refactored equip_processing.lua extensively.
+-------------------------------------------------
 Gearswap 0.722 - Changed the ranged attack spell table to reflect the resources. Added spell.interrupted boolean. Added a persistent spell for ambiguous interruption message cases. Changed interrupted action.type to "Interruption"... Many things.
 -------------------------------------------------
 Gearswap 0.721 - Adjusted for API changes and related documentation.

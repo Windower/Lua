@@ -176,6 +176,8 @@ function fieldsearch(message)
 	return fieldarr
 end
 
+
+
 -----------------------------------------------------------------------------------
 --Name: strip()
 --Args:
@@ -188,6 +190,8 @@ end
 function strip(name)
 	return name:gsub('4','iv'):gsub('9','ix'):gsub('0','p'):gsub('3','iii'):gsub('2','ii'):gsub('1','i'):gsub('8','viii'):gsub('7','vii'):gsub('6','vi'):gsub('5','v'):gsub('[^%a]',''):lower()
 end
+
+
 
 -----------------------------------------------------------------------------------
 --Name: table.reassign()
@@ -260,4 +264,61 @@ end
 -----------------------------------------------------------------------------------
 function make_user_table()
 	return setmetatable({}, user_data_table)
+end
+
+
+-----------------------------------------------------------------------------------
+--Name: get_bit_packed(dat_string,start,stop)
+--Args:
+---- dat_string - string that is being bit-unpacked to a number
+---- start - first bit
+---- stop - last bit
+-----------------------------------------------------------------------------------
+--Returns:
+---- number from the indicated range of bits 
+-----------------------------------------------------------------------------------
+function get_bit_packed(dat_string,start,stop)
+	local newval = 0
+	
+	local c_count = math.ceil(stop/8)
+	while c_count >= math.ceil((start+1)/8) do
+		-- Grabs the most significant byte first and works down towards the least significant.
+		local cur_val = dat_string:byte(c_count)
+		local scal = 256
+		
+		if c_count == math.ceil(stop/8) then -- Take the least significant bits of the most significant byte
+		-- Moduluses by 2^number of bits into the current byte. So 8 bits in would %256, 1 bit in would %2, etc.
+		-- Cuts off the top.
+			cur_val = cur_val%(2^((stop-1)%8+1)) -- -1 and +1 set the modulus result range from 1 to 8 instead of 0 to 7.
+		end
+		
+		if c_count == math.ceil((start+1)/8) then -- Take the most significant bits of the least significant byte
+		-- Divides by the significance of the final bit in the current byte. So 8 bits in would /128, 1 bit in would /1, etc.
+		-- Cuts off the bottom.
+			cur_val = math.floor(cur_val/(2^(start%8)))
+			scal = 2^(8-start%8)
+		end
+		
+		newval = newval*scal + cur_val -- Need to multiply by 2^number of bits in the next byte
+		c_count = c_count - 1
+	end
+	return newval
+end
+
+
+-----------------------------------------------------------------------------------
+--Name: get_wearable(player_val,val)
+--Args:
+---- player_val - Number representing the player's characteristic
+---- val - Number representing the item's affinities
+-----------------------------------------------------------------------------------
+--Returns:
+---- True (player_val exists in val) or false (anything else)
+-----------------------------------------------------------------------------------
+function get_wearable(player_val,val)
+	if player_val then
+		return ((val%(player_val*2))/player_val >= 1) -- Cut off the bits above it with modulus, then cut off the bits below it with division and >= 1
+	else
+		return false -- In cases where the provided playervalue is nil, just return false.
+	end
 end

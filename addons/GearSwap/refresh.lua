@@ -71,16 +71,11 @@ function load_user_files()
 	user_env = nil
 	registered_user_events = {}
 	
-	local basepath
-	if windower.dir_exists(windower.addon_path..'data/'..player.name) then
-		path = pathsearch(windower.addon_path..'data/'..player.name..'/')
-	end
-	if not path and windower.dir_exists(windower.addon_path..'data/common') then
-		path = pathsearch(windower.addon_path..'data/common/')
-	end
-	if not path then
-		path = pathsearch(windower.addon_path..'data/')
-	end
+	local tab = {player.name..'_'..player.main_job..'.lua',player.name..'-'..player.main_job..'.lua',
+		player.name..'_'..player.main_job_full..'.lua',player.name..'-'..player.main_job_full..'.lua',
+		player.name..'.lua',player.main_job..'.lua',player.main_job_full..'.lua','default.lua'}
+	
+	local path = pathsearch(tab)
 	
 	if not path then
 		current_job_file = nil
@@ -266,34 +261,34 @@ function refresh_ffxi_info()
 		if i ~= 'target' then
 			world[i] = v
 		end
-		if i == 'zone' then
+		if i ~= 'target' and i == 'zone' then
 			world.area = v
 		end
 	end
 	world.real_weather = info.weather
 	world.real_weather_element = info.weather_element
-	if buffactive['voidstorm'] then
+	if buffactive.voidstorm then
 		world.weather = 'Dark'
 		world.weather_element = 'Dark'
-	elseif buffactive['aurorastorm'] then
+	elseif buffactive.aurorastorm then
 		world.weather = 'Light'
 		world.weather_element = 'Light'
-	elseif buffactive['firestorm'] then
+	elseif buffactive.firestorm then
 		world.weather = 'Fire'
 		world.weather_element = 'Fire'
-	elseif buffactive['sandstorm'] then
+	elseif buffactive.sandstorm then
 		world.weather = 'Earth'
 		world.weather_element = 'Earth'
-	elseif buffactive['rainstorm'] then
+	elseif buffactive.rainstorm then
 		world.weather = 'Water'
 		world.weather_element = 'Water'
-	elseif buffactive['windstorm'] then
+	elseif buffactive.windstorm then
 		world.weather = 'Wind'
 		world.weather_element = 'Wind'
-	elseif buffactive['hailstorm'] then
+	elseif buffactive.hailstorm then
 		world.weather = 'Ice'
 		world.weather_element = 'Ice'
-	elseif buffactive['thunderstorm'] then
+	elseif buffactive.thunderstorm then
 		world.weather = 'Thunder'
 		world.weather_element = 'Thunder'
 	end
@@ -323,17 +318,17 @@ function refresh_group_info()
 		end
 		if i:sub(1) == 'p' then
 			temp_alliance[1][tonumber(i:sub(2))+1] = v
-			temp_alliance[1]['count'] = temp_alliance[1]['count'] +1
+			temp_alliance[1].count = temp_alliance[1].count +1
 		elseif i:sub(1,2) == 'a1' then
 			temp_alliance[2][tonumber(i:sub(3))+1] = v
-			temp_alliance[2]['count'] = temp_alliance[2]['count'] +1
+			temp_alliance[2].count = temp_alliance[2].count +1
 		elseif i:sub(1,2) == 'a2' then
 			temp_alliance[3][tonumber(i:sub(3))+1] = v
-			temp_alliance[3]['count'] = temp_alliance[3]['count'] +1
+			temp_alliance[3].count = temp_alliance[3].count +1
 		end
 	end
 	table.reassign(alliance,temp_alliance)
-	alliance['count'] = temp_alliance[1]['count'] + temp_alliance[2]['count'] + temp_alliance[3]['count']
+	alliance.count = temp_alliance[1].count + temp_alliance[2].count + temp_alliance[3].count
 end
 
 -----------------------------------------------------------------------------------
@@ -380,29 +375,23 @@ end
 -----------------------------------------------------------------------------------
 --Name: pathsearch()
 --Args:
----- basepath - string of the path to search. Ends in /.
+---- tab - table of strings of the file name to search.
 -----------------------------------------------------------------------------------
 --Returns:
----- path of a valid file, if it exists.
+---- path of a valid file, if it exists. False if it doesn't.
 -----------------------------------------------------------------------------------
-function pathsearch(basepath)
-	local path
-	if windower.file_exists(basepath..player.name..'_'..player.main_job..'.lua') then
-		path = basepath..player.name..'_'..player.main_job..'.lua'
-	elseif windower.file_exists(basepath..player.name..'-'..player.main_job..'.lua') then
-		path = basepath..player.name..'-'..player.main_job..'.lua'
-	elseif windower.file_exists(basepath..player.name..'_'..player.main_job_full..'.lua') then
-		path = basepath..player.name..'_'..player.main_job_full..'.lua'
-	elseif windower.file_exists(basepath..player.name..'-'..player.main_job_full..'.lua') then
-		path = basepath..player.name..'-'..player.main_job_full..'.lua'
-	elseif windower.file_exists(basepath..player.name..'.lua') then
-		path = basepath..player.name..'.lua'
-	elseif windower.file_exists(basepath..player.main_job..'.lua') then
-		path = basepath..player.main_job..'.lua'
-	elseif windower.file_exists(basepath..player.main_job_full..'.lua') then
-		path = basepath..player.main_job_full..'.lua'
-	elseif windower.file_exists(basepath..'default.lua') then
-		path = basepath..'default.lua'
+function pathsearch(tab)
+	local basetab = {[1]=windower.addon_path..'data/'..player.name..'/',[2]=windower.addon_path..'data/common/',
+		[3]=windower.addon_path..'data/'}
+	
+	for _,basepath in ipairs(basetab) do
+		if windower.dir_exists(basepath) then
+			for i,v in ipairs(tab) do
+				if windower.file_exists(basepath..v) then
+					return basepath..v
+				end
+			end
+		end
 	end
-	return path
+	return false
 end

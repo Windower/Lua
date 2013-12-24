@@ -24,7 +24,6 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 language = 'english'
 file = require 'filehelper'
 require 'stringhelper'
@@ -40,19 +39,19 @@ require 'parse_augments'
 require 'export'
 require 'validate'
 require 'sets'
-
-if windower.file_exists(windower.addon_path..'resources.lua') then
-    os.remove(windower.addon_path..'resources.lua',windower.addon_path..'res_bak - can delete.lua')
-end
 res = require 'resources'
 
 
 _addon.name = 'GearSwap'
-_addon.version = '0.722'
+_addon.version = '0.723'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
-debugging = 0
+if windower.file_exists(windower.addon_path..'data/bootstrap.lua') then
+	debugging = 1
+else
+	debugging = 0
+end
 
 windower.register_event('load',function()
 	if debugging >= 1 then windower.debug('load') end
@@ -93,7 +92,7 @@ windower.register_event('addon command',function (...)
 		else
 			windower.add_to_chat(123,'GearSwap: No self command passed.')
 		end
-	elseif splitup[1]:lower() == 'equip' and not _global.midaction then
+	elseif splitup[1]:lower() == 'equip' then
 		if gearswap_disabled then return end
 		local set_split = split(_raw.table.concat(splitup,' ',2,#splitup):gsub('%[','%.'):gsub('[%]\']',''),'%.')
 		local n = 1
@@ -125,10 +124,10 @@ windower.register_event('addon command',function (...)
 			print('Gearswap: All slots enabled.')
 		elseif splitup[2] and slot_map[splitup[2]:gsub('[^%a]',''):lower()] then
 			enable(splitup[2])
-			print('Gearswap: '..splitup[2]..' enabled.')
+			print('Gearswap: '..splitup[2]..' slot enabled.')
 		elseif gearswap_disabled then
 			gearswap_disabled = false
-			print('GearSwap: Enabled')
+			print('GearSwap: User file enabled')
 		end
 	elseif splitup[1]:lower() == 'disable' then
 		if splitup[2] and splitup[2]:lower()=='all' then
@@ -136,21 +135,21 @@ windower.register_event('addon command',function (...)
 			print('Gearswap: All slots disabled.')
 		elseif splitup[2] and slot_map[splitup[2]:gsub('[^%a]',''):lower()] then
 			disable(splitup[2])
-			print('Gearswap: '..splitup[2]..' disabled.')
+			print('Gearswap: '..splitup[2]..' slot disabled.')
 		elseif not gearswap_disabled and not splitup[2] then
-			print('GearSwap: Disabled')
+			print('GearSwap: User file disabled')
 			gearswap_disabled = true
 		end
 	elseif splitup[1]:lower() == 'reload' then
 		refresh_user_env()
 	elseif strip(splitup[1]) == 'debugmode' then
 		_global.debug_mode = not _global.debug_mode
-		print('Debug Mode set to '..tostring(_global.debug_mode)..'.')
+		print('GearSwap: Debug Mode set to '..tostring(_global.debug_mode)..'.')
 	elseif strip(splitup[1]) == 'showswaps' then
 		_global.show_swaps = not _global.show_swaps
-		print('Show Swaps set to '..tostring(_global.show_swaps)..'.')
+		print('GearSwap: Show Swaps set to '..tostring(_global.show_swaps)..'.')
 	elseif not ((strip(splitup[1]) == 'eval' or strip(splitup[1]) == 'visible' or strip(splitup[1]) == 'invisible') and debugging>0) then
-		print('command not found')
+		print('GearSwap: Command not found')
 	end
 end)
 
@@ -183,7 +182,7 @@ windower.register_event('outgoing text',function(original,modified)
 	
 	if command == '/raw' then
 		return _raw.table.concat(splitline,' ',2,#splitline)
-	elseif command_list[command] and temptarg and validabils[language][abil] and not _global.midaction then
+	elseif command_list[command] and temptarg and validabils[language][abil] then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) temp_mod: '..temp_mod) end
 		
 		local r_line, s_type
@@ -198,8 +197,6 @@ windower.register_event('outgoing text',function(original,modified)
 				-- Note, does not work unless the buff list has been updated.
 					r_line.casttime=4
 				end
-			elseif r_line.type == 'SummonerPact' and buffactive['astral conduit'] then
-				r_line.recast=0
 			elseif buffactive.hasso or buffactive.seigan then
 				r_line.recast=r_line.recast*1.5
 				r_line.casttime = r_line.casttime*1.5
@@ -208,6 +205,9 @@ windower.register_event('outgoing text',function(original,modified)
 		elseif command_list[command] == 'Ability' then
 			r_line = r_abilities[validabils[language][abil:lower()].Ability]
 			r_line.name = r_line[language]
+			if r_line.type == 'SummonerPact' and buffactive['astral conduit'] then
+				r_line.recast=0
+			end
 			s_type = 'Ability' -- command_list[r_abilities[validabils[language][abil:lower()]['Ability']]['prefix']]
 		elseif command_list[command] == 'Item' then
 			r_line = r_items[validabils[language][abil:lower()].Item]
@@ -215,7 +215,7 @@ windower.register_event('outgoing text',function(original,modified)
 			r_line.prefix = '/item'
 			r_line.type = 'Item'
 			s_type = 'Item'
-		elseif debugging then
+		elseif debugging and debugging >= 1 then
 			print('this case should never be hit '..command)
 		end
 		
@@ -227,22 +227,20 @@ windower.register_event('outgoing text',function(original,modified)
 		equip_sets('precast',r_line,{type=s_type})
 
 		return ''
-	elseif command_list[command] == 'Ranged Attack' and temptarg and not _global.midaction then
+	elseif command_list[command] == 'Ranged Attack' and temptarg then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) temp_mod: '..temp_mod) end
 
 		rline = r_abilities[1]
-		
 		_global.storedtarget = temptarg
-		
 		r_line = aftercast_cost(rline)
 			
-		storedcommand = r_line['prefix']..' '
+		storedcommand = r_line.prefix..' '
 		equip_sets('precast',r_line,{type="Ranged Attack"})
 
 		return ''
-	elseif _global.midaction and validabils[language][tostring(abil):lower()] then
-		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(122) Canceled: '..temp_mod) end
-		return ''
+--	elseif _global.midaction and validabils[language][tostring(abil):lower()] then
+--		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(122) Canceled: '..temp_mod) end
+--		return ''
 	end
 	return modified
 end)
@@ -250,10 +248,11 @@ end)
 windower.register_event('incoming text',function(original,modified,color,modifiedcolor)
 	if debugging >= 1 then windower.debug('incoming text') end
 	if gearswap_disabled then return modified, color end
-	if original == '...A command error occurred.' or original == 'You can only use that command during battle.' or original == 'You cannot use that command here.' then
+	if string.find(original,'...A command error occurred.') or original == 'You can only use that command during battle.' or original == 'You cannot use that command here.' then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(130) Client canceled command detected: '..color..' '..original) end
 		if type(user_env.aftercast)=='function' then
-			equip_sets('aftercast',{name='Invalid Spell'},{type='Recast'})
+			persistent_spell.interrupted = true
+			equip_sets('aftercast',persistent_spell,{type='Interruption'})
 		elseif user_env.aftercast then
 			windower.add_to_chat(123,'GearSwap: aftercast() exists but is not a function')
 		end
@@ -262,7 +261,7 @@ windower.register_event('incoming text',function(original,modified,color,modifie
 end)
 
 windower.register_event('incoming chunk',function(id,data,modified,injected,blocked)
---	if debugging >= 1 then windower.debug('incoming chunk '..id) end
+	if debugging >= 1 then windower.debug('incoming chunk '..id) end
 
 	if id == 0x28 and not injected then
 		data = data:sub(5)
@@ -343,24 +342,18 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
 --		'Job Info Packet'
 		local enc = data:byte(97) + data:byte(98)*256
 		items = windower.ffxi.get_items()
-		for i=0,15 do
-			local tf = (math.floor( (enc%(2^(i+1))) / 2^i ) == 1) -- Could include the binary library some day if necessary
-			if encumbrance_table[i] ~= tf and not tf and not_sent_out_equip[i] and not disable_table[i] then
-				local eq = items.equipment
-				local nope_flag
-				for i,v in pairs(eq) do
-					if not_sent_out_equip[i] == v then
-						nope_flag = true
-					end
-				end
-				if not nope_flag then
-					windower.ffxi.set_equip(not_sent_out_equip[i],i)
-				end
-				sent_out_equip[i] = not_sent_out_equip[i]
-				not_sent_out_equip[i] = nil
-				if _global.debug_mode then windower.add_to_chat(8,"Gearswap (Debug Mode): Your "..default_slot_map[i]..' are now unlocked.') end
+		local tab = {}
+		for i,v in pairs(default_slot_map) do
+			local tf = (math.floor( (enc%(2^(i+1))) / 2^i ) == 1) -- Extract the single bit as a boolean
+			if encumbrance_table[i] and not tf and not_sent_out_equip[v] and not disable_table[i] then
+				tab[v] = not_sent_out_equip[v]
+				not_sent_out_equip[v] = nil
+				if _global.debug_mode then windower.add_to_chat(8,"Gearswap (Debug Mode): Your "..v..' are now unlocked.') end
 			end
 			encumbrance_table[i] = tf
+		end
+		if table.length(tab) > 0 then
+			equip_sets('equip_command',tab)
 		end
 	elseif gearswap_disabled then
 		return
@@ -373,43 +366,8 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
 	end
 end)
 
-function get_bit_packed(dat_string,start,stop)
-	local newval = 0
-	
-	local c_count = math.ceil(stop/8)
-	while c_count >= math.ceil((start+1)/8) do
-		-- Grabs the most significant byte first and works down towards the least significant.
-		local cur_val = dat_string:byte(c_count)
-		local scal = 256
-		
-		if c_count == math.ceil(stop/8) then -- Take the least significant bits of the most significant byte
-		-- Moduluses by 2^number of bits into the current byte. So 8 bits in would %256, 1 bit in would %2, etc.
-		-- Cuts off the top.
-			cur_val = cur_val%(2^((stop-1)%8+1)) -- -1 and +1 set the modulus result range from 1 to 8 instead of 0 to 7.
-		end
-		
-		if c_count == math.ceil((start+1)/8) then -- Take the most significant bits of the least significant byte
-		-- Divides by the significance of the final bit in the current byte. So 8 bits in would /128, 1 bit in would /1, etc.
-		-- Cuts off the bottom.
-			cur_val = math.floor(cur_val/(2^(start%8)))
-			scal = 2^(8-start%8)
-		end
-		
-		newval = newval*scal + cur_val -- Need to multiply by 2^number of bits in the next byte
-		c_count = c_count - 1
-	end
-	return newval
-end
-
-windower.register_event('zone change',function(new_zone,new_zone_id,old_zone,old_zone_id)
-	if debugging >= 1 then windower.debug('zone change') end
-	_global.midaction = false
-	sent_out_equip = {}
-	not_sent_out_equip = {}
-end)
-
 windower.register_event('outgoing chunk',function(id,data,modified,injected,blocked)
---	if debugging >= 1 then windower.debug('outgoing chunk '..id) end
+	if debugging >= 1 then windower.debug('outgoing chunk '..id) end
 	if id == 0x01A and not injected then -- Action packet
 		local abil
 		actor_id = data:byte(8,8)*256^3+data:byte(7,7)*256^2+data:byte(6,6)*256+data:byte(5,5)
@@ -432,7 +390,7 @@ windower.register_event('outgoing chunk',function(id,data,modified,injected,bloc
 		if logging then logit(logfile,'\n\nActor: '..tostring(actor_name)..'  Target: '..tostring(target_name)..'  Category: '..tostring(category)..'  param: '..tostring(abil_name or param)) end
 		if abil and not (buffactive.terror or buffactive.sleep or buffactive.stun or buffactive.petrification or buffactive.charm) then
 			_global.midaction = true
-			windower.send_command('@wait 1;lua i gearswap midact')
+--			windower.send_command('@wait 1;lua i gearswap midact')
 		elseif user_env and not T{0,2,4,5,11,12,13,14,15,18,20}:contains(category) then -- 0 = interacting with an NPC, 2 = engaging, 4 = disengaging from menu, 5 = CFH, 11 = Homepointing, 12= assist, 13 = getting up from reraise, 14 = fishing, 15 = changing target, 18 = dismounting chocobo, 20 = zoning
 			if not T{3,7,9,16,25}:contains(category) then windower.add_to_chat(8,'Tell Byrth how you triggered this and this number: '..category) end
 			if type(user_env.aftercast) == 'function' then
@@ -451,10 +409,6 @@ windower.register_event('outgoing chunk',function(id,data,modified,injected,bloc
 		end
 	end
 end)
-
-function midact()
-	_global.midaction = false
-end
 
 function action(act)
 	if debugging >= 1 then windower.debug('action') end
@@ -556,7 +510,7 @@ function action_message(actor_id,target_id,param_1,param_2,param_3,actor_index,t
 			_global.midaction = false
 			spelltarget = nil
 		end
-	elseif unable_to_use:contains(message_id) and _global.midaction then
+	elseif unable_to_use:contains(message_id) then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(195) Event Action Message: '..tostring(message_id)..' Interrupt') end
 		if type(user_env[prefix..'aftercast']) == 'function' then
 			persistent_spell.interrupted = true
@@ -613,7 +567,12 @@ windower.register_event('weather change',function(new_weather, new_weather_id, o
 	refresh_ffxi_info()
 end)
 
-
+windower.register_event('zone change',function(new_zone,new_zone_id,old_zone,old_zone_id)
+	if debugging >= 1 then windower.debug('zone change') end
+	_global.midaction = false
+	sent_out_equip = {}
+	not_sent_out_equip = {}
+end)
 
 function get_spell(act)
 	local spell, abil_ID, effect_val = {}
