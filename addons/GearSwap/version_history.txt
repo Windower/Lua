@@ -1,4 +1,8 @@
 -------------------------------------------------
+Gearswap 0.723 - Removed a debug message, updated documentation, and refactored equip_processing.lua extensively.
+-------------------------------------------------
+Gearswap 0.722 - Changed the ranged attack spell table to reflect the resources. Added spell.interrupted boolean. Added a persistent spell for ambiguous interruption message cases. Changed interrupted action.type to "Interruption"... Many things.
+-------------------------------------------------
 Gearswap 0.721 - Adjusted for API changes and related documentation.
 -------------------------------------------------
 Gearswap 0.720 - Fixed Pet TP magnitude, exposed OS library, updated documentation, improved file name handling (a bit), and minor changes to the validation algorithm.
@@ -25,7 +29,7 @@ Gearswap 0.710 - Added windower.debug statements.
 -------------------------------------------------
 Gearswap 0.709 - Looped midact back through console with a 1.5 second delay. Tested for 2 days without extra DC issues.
 -------------------------------------------------
-Gearswap 0.708 - Added Encumbrance support. Added a message for Exporting files. Added another midaction fix. Altered how Disable works, slightly.
+Gearswap 0.708 - Added Encumbrance support. Added a message for Exporting files. Added another _global.midaction fix. Altered how Disable works, slightly.
 -------------------------------------------------
 Gearswap 0.707 - Forced the "sets" export to convert all equipment to inventory names. Started to add encumbrance code. Added a check for debuffs that prevent ability/spell usage in outgoing_chunk to reset midact.
 -------------------------------------------------
@@ -37,9 +41,9 @@ Gearswap 0.704 - Changed require() to include() and reworked its back end. Confi
 -------------------------------------------------
 Gearswap 0.703 - Added an export command and the appropriate documentation.
 -------------------------------------------------
-Gearswap 0.702 - Made keys to player data tables all case insensitive. Fixed the user windower structure. Set it so it should reset midaction if the spelltarget dies while casting.
+Gearswap 0.702 - Made keys to player data tables all case insensitive. Fixed the user windower structure. Set it so it should reset _global.midaction if the spelltarget dies while casting.
 -------------------------------------------------
-Gearswap 0.701 - Made silent interrupts reset midaction. Fixed aftercast triggering on event_action_messages other than your own/your pets.
+Gearswap 0.701 - Made silent interrupts reset _global.midaction. Fixed aftercast triggering on event_action_messages other than your own/your pets.
 -------------------------------------------------
 Gearswap 0.700 - Added preliminary augmented equipment support. Improved register_event. Finished conversion of GearSwap to new API.
 -------------------------------------------------

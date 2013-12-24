@@ -41,7 +41,7 @@ require 'ambiguous_names'
 require 'targets'
 
 
-_addon.version = '1.5'
+_addon.version = '1.6'
 _addon.name = 'Shortcuts'
 _addon.author = 'Byrth'
 _addon.commands = {'shortcuts'}
@@ -85,6 +85,10 @@ end)
 windower.register_event('outgoing text',function(original,modified)
 	local temp_org = windower.convert_auto_trans(modified)
 	if modified:sub(1,1) ~= '/' then return modified end
+	if debugging then 
+		local tempst = windower.ffxi.get_mob_by_target('st')
+		windower.add_to_chat(8,modified..' '..tostring(tempst))
+		end
 	temp_org = temp_org:gsub(' <wait %d+>','')
 	if logging then
 		logfile:write('\n\n',tostring(os.clock()),'temp_org: ',temp_org,'\nModified: ',modified)
@@ -110,7 +114,7 @@ end)
 ---- None, but can generate text output through command_logic()
 -----------------------------------------------------------------------------------
 windower.register_event('unhandled command',function(...)
-	local combined = table.concat({...},' ') -- concat it back together...
+	local combined = windower.convert_auto_trans(table.concat({...},' ')) -- concat it back together...
 	command_logic(combined,combined) -- and then dump it into command_logic()
 end)
 
@@ -257,10 +261,10 @@ function interp_text(splitline,offset,modified)
 		local targets = r_line['validtarget']
 		
 		-- Handling for abilities that change potential targets.
-		if r_line['prefix'] == '/song' or r_line['prefix'] == '/so' then
-			local buffs = windower.ffxi.get_player()['buffs']
+		if r_line.prefix == '/song' or r_line.prefix == '/so' and r_line.casttime == 8 then
+			local buffs = windower.ffxi.get_player().buffs
 			for i,v in pairs(buffs) do
-				if v == 409 then targets['Party'] = true end -- Pianissimo
+				if v == 409 then targets.Party = true end -- Pianissimo
 			end
 		end
 		

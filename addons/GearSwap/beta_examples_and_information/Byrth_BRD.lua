@@ -3,15 +3,15 @@ function get_sets()
 	sets.precast.JA = {}
 	
 	-- Precast Sets
-	sets.precast.Nightingale = {feet="Brd. Slippers +2"}
+	sets.precast.JA.Nightingale = {feet="Brd. Slippers +2"}
 	
-	sets.precast.Troubadour = {body="Bard's Justaucorps +2"}
+	sets.precast.JA.Troubadour = {body="Bard's Justaucorps +2"}
 	
-	sets.precast['Soul Voice'] = {legs="Brd. Cannions +2"}
+	sets.precast.JA['Soul Voice'] = {legs="Brd. Cannions +2"}
 	
 	sets.precast.FC = {}
 	
-	sets.precast.FC.Song = {head="Aoidos' Calot +2",neck="Aoidos' Matinee",
+	sets.precast.FC.Song = {head="Aoidos' Calot +2",neck="Orunmila's Torque",
 		ear1={name="Loquac. Earring",order=5},ear2="Aoidos' Earring",body="Marduk's Jubbah +1",hands={name="Gendewitha Gages",order=8},
 		ring1="Defending ring",ring2={name="Prolix Ring",order=7},back="Swith Cape +1",waist="Aoidos' Belt",legs={name="Gendewitha Spats",order=9},
 		feet={name="Bokwus Boots",order=6}}
@@ -27,9 +27,9 @@ function get_sets()
 	
 	sets.precast.WS = {}
 	sets.precast.WS['Mordant Rime'] = {range="Gjallarhorn",
-		head="Nahtirah Hat",neck="Dualism Collar",ear1="Aoidos' Earring",
-		body="Brd. Justaucorps +2",hands="Buremte Gloves",ring1="Veela Ring",ring2="Thundersoul Ring",
-		back="Swith Cape +1",waist="Aristo Belt",legs="Gendewitha Spats",feet="Brioso slippers"}
+		head="Nahtirah Hat",neck="Aqua Gorget",ear1="Aoidos' Earring",
+		body="Bard's Justaucorps +2",hands="Buremte Gloves",ring1="Veela Ring",ring2="Thundersoul Ring",
+		back="Atheling Mantle",waist="Aqua Belt",legs="Gendewitha Spats",feet="Brioso slippers"}
 	
 	-- Midcast Sets
 	sets.midcast = {}
@@ -37,14 +37,14 @@ function get_sets()
 	sets.midcast.Haste = {main="Terra's Staff",sub="Oneiros Grip",
 		head={name="Nahtirah Hat",order=6},neck="Orunmila's Torque",ear1="Loquac. Earring",ear2={name="Gifted Earring",order=7},
 		body={name="Hedera Cotehardie",order=5},hands={name="Gendewitha Gages",order=11},ring2={name="Prolix Ring",order=10},
-		back={name="Rhapsodie's Cape",order=8},waist="Phasmida Belt",legs="Byakko's Haidate",feet={name="Chelona Boots +1",order=9}}
+		back={name="Rhapsode's Cape",order=8},waist="Phasmida Belt",legs="Byakko's Haidate",feet={name="Chelona Boots +1",order=9}}
 
 	sets.midcast.Debuff = {main="Twashtar",sub="Genbu's Shield",range="Gjallarhorn",
 		head="Kaabanax Hat",neck="Aoidos' Matinee",ear1="Psystorm Earring",ear2="Lifestorm earring",
 		body="Aoidos' Hngrln. +2",hands="Ad. Mnchtte. +2",ring1="Omega Ring",ring2="Sangoma ring",
 		back="Rhapsode's Cape",waist="Aristo belt",legs="Mdk. Shalwar +1",feet="Brioso slippers"}
 	
-	sets.midcast.Buff = {main="Legato Dagger",head="Aoidos' Calot +2",neck="Aoidos' Matinee",
+	sets.midcast.Buff = {main="Carnwenhan",sub="Genbu's Shield",head="Aoidos' Calot +2",neck="Aoidos' Matinee",
 		body="Aoidos' Hngrln. +2",hands="Ad. Mnchtte. +2",legs="Mdk. Shalwar +1",feet="Brioso slippers"}
 	
 	sets.midcast.DBuff = {range="Daurdabla"}
@@ -52,6 +52,8 @@ function get_sets()
 	sets.midcast.GBuff = {range="Gjallarhorn"}
 		
 	sets.midcast.Ballad = {legs="Aoidos' Rhing. +2"}
+		
+	sets.midcast.Scherzo = {feet="Aoidos' Cothrn. +2"}
 		
 	sets.midcast.Finale = {neck="Wind Torque",feet="Bokwus Boots"}
 		
@@ -68,7 +70,7 @@ function get_sets()
 	
 	--Aftercast Sets
 	sets.aftercast = {}
-	sets.aftercast.Regen = {main="Terra's Staff",sub="Oneiros Grip",range="Oneiros Harp",
+	sets.aftercast.Regen = {main={name="Terra's Staff",order=1},sub={name="Oneiros Grip",order=2},range="Oneiros Harp",
 		head="Marduk's Tiara +1",neck="Twilight Torque",ear1={name="Loquac. Earring",order=7},ear2={name="Gifted Earring",order=5},
 		body="Marduk's Jubbah +1",hands={name="Serpentes Cuffs",order=9},ring1="Defending Ring",ring2={name="Dark Ring",order=8},
 		back="Umbra Cape",waist="Flume Belt",legs={name="Nares Trews",order=6},feet="Aoidos' Cothrn. +2"}
@@ -79,15 +81,16 @@ function get_sets()
 		back="Umbra Cape",waist="Flume Belt",legs="Gendewitha Spats",feet="Aoidos' Cothrn. +2"}
 	
 	sets.aftercast.Engaged = {range="Oneiros Harp",
-		head="Zelus Tiara",neck="Asperity Necklace",ear1="Loquac. Earring",ear2="Gifted Earring",
-		body="Hedera Cotehardie",hands="Buremte Gloves",ring1="Defending Ring",ring2="Dark Ring",
-		back="Umbra Cape",waist="Phasmida Belt",legs="Byakko's Haidate",feet="Brioso slippers"}
+		head="Zelus Tiara",neck="Asperity Necklace",ear1="Brutal Earring",ear2="Suppanomimi",
+		body="Hedera Cotehardie",hands="Buremte Gloves",ring1="Pyrosoul Ring",ring2="Rajas Ring",
+		back="Atheling Mantle",waist="Phasmida Belt",legs="Byakko's Haidate",feet="Brioso slippers"}
 		
 	sets.aftercast.Idle = sets.aftercast.Regen
 	
 	DaurdSongs = T{'Water Carol','Water Carol II','Ice Carol','Ice Carol II','Herb Pastoral','Goblin Gavotte'}
 	
-	windower.send_command('input /macro book 1;wait .1;input /macro set 1')
+	send_command('input /macro book 3;wait .1;input /macro set 1')
+	timer_reg = {}
 end
 
 function precast(spell,action)
@@ -99,7 +102,7 @@ function precast(spell,action)
 		end
 		if spell.target.type == 'PLAYER' and not buffactive.pianissimo then
 			cast_delay(1.5)
-			windower.send_command('@input /raw /ja "Pianissimo" <me>')
+			send_command('@input /raw /ja "Pianissimo" <me>')
 		end
 		if buffactive['nightingale'] then
 			equip_song_gear(spell)
@@ -112,6 +115,10 @@ function precast(spell,action)
 		if tonumber(spell.casttime) >= 4 then verify_equip() end
 		if string.find(spell.english,'Cur') then
 			equip(sets.precast.Cure)
+		end
+	elseif spell.type == 'WeaponSkill' then
+		if sets.precast.WS[spell.name] then
+			equip(sets.precast.WS[spell.name])
 		end
 	end
 	
@@ -130,6 +137,59 @@ function midcast(spell,action)
 end
 
 function aftercast(spell,action)
+	if spell.type == 'BardSong' and spell.target.type:upper() == 'SELF' then
+		local t = os.time()
+		
+		-- Eliminate songs that have already expired
+		local tempreg = {}
+		for i,v in pairs(timer_reg) do
+			if v < t then tempreg[i] = true end
+		end
+		for i,v in pairs(tempreg) do
+			timer_reg[i] = nil
+		end
+		
+		local dur = calculate_duration(spell.name)
+		if timer_reg[spell.name] then
+			if (timer_reg[spell.name] - t) <= 120 then
+				send_command('timers delete "'..spell.name..'"')
+				timer_reg[spell.name] = t + dur
+				send_command('timers create "'..spell.name..'" '..dur..' down')
+			end
+		else
+			local maxsongs = 2
+			if player.equipment.range == 'Daurdabla' then
+				maxsongs = maxsongs+2
+			end
+			if buffactive['Clarion Call'] then
+				maxsongs = maxsongs+1
+			end
+			if maxsongs < table.length(timer_reg) then
+				maxsongs = table.length(timer_reg)
+			end
+			
+			if table.length(timer_reg) < maxsongs then
+				timer_reg[spell.name] = t+dur
+				send_command('timers create "'..spell.name..'" '..dur..' down')
+			else
+				local rep,repsong
+				for i,v in pairs(timer_reg) do
+					if t+dur > v then
+						if not rep or rep > v then
+							rep = v
+							repsong = i
+						end
+					end
+				end
+				if repsong then
+					timer_reg[repsong] = nil
+					send_command('timers delete "'..repsong..'"')
+					timer_reg[spell.name] = t+dur
+					send_command('timers create "'..spell.name..'" '..dur..' down')
+				end
+			end
+		end
+	end
 	if player.status == 'Engaged' then
 		equip(sets.aftercast.Engaged)
 	else
@@ -163,6 +223,43 @@ function equip_song_gear(spell)
 		else
 			equip(sets.midcast.Base,sets.midcast.Buff,sets.midcast.GBuff)
 			if string.find(spell.english,'Ballad') then equip(sets.midcast.Ballad) end
+			if string.find(spell.english,'Scherzo') then equip(sets.midcast.Scherzo) end
 		end
 	end
 end
+
+function calculate_duration(name)
+	local mult = 1
+	if player.equipment.range == 'Daurdabla' then mult = mult + 0.3 end
+	if player.equipment.range == "Gjallarhorn" then mult = mult + 0.4 end
+	
+	if player.equipment.neck == "Aoidos' Matinee" then mult = mult + 0.1 end
+	if player.equipment.feet == "Brioso Slippers" then mult = mult + 0.1 end
+	if player.equipment.body == "Aoidos' Hngrln. +2" then mult = mult + 0.1 end
+	if player.equipment.legs == "Mdk. Shalwar +1" then mult = mult + 0.1 end
+	if player.equipment.main == "Carnwenhan" then mult = mult + 0.1 end
+	
+	if string.find(name,'March') and player.equipment.hands == 'Ad. Mnchtte. +2' then mult = mult + 0.1 end
+	if string.find(name,'Minuet') and player.equipment.body == "Aoidos' Hngrln. +2" then mult = mult + 0.1 end
+	if string.find(name,'Madrigal') and player.equipment.head == "Aoidos' Calot +2" then mult = mult + 0.1 end
+	if string.find(name,'Ballad') and player.equipment.legs == "Aoidos' Rhing. +2" then mult = mult + 0.1 end
+	if string.find(name,'Scherzo') and player.equipment.feet == "Aoidos' Cothrn. +2" then mult = mult + 0.1 end
+	
+	if buffactive.Troubadour then
+		mult = mult*2
+	end
+	if string.find(name,'Scherzo') and buffactive['Soul Voice'] then
+		mult = mult*2
+	elseif string.find(name,'Scherzo') and buffactive['Marcato'] then
+		mult = mult*1.5
+	end
+	
+	return mult*120
+end
+
+--[[windower.register_event('zone change',function (...)
+	for i,v in pairs(timer_reg) do
+		send_command('timers delete "'..i..'"')
+	end
+	timer_reg = {}
+end)]]

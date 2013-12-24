@@ -43,20 +43,19 @@ r_mabils = parse_resources(r_mabilsFile:readlines())
 
 -- Convert the spells and job abilities into a referenceable list of aliases --
 validabils = {}
-validabils['english'] = T{}
-validabils['french'] = T{}
-validabils['german'] = T{}
-validabils['japanese'] = T{}
+validabils['english'] = {}
+validabils['french'] = {}
+validabils['german'] = {}
+validabils['japanese'] = {}
 
 function make_abil(abil,lang,t,i)
 	if not abil[lang] then return end
-	local temptab = validabils[lang]
 	local sp = abil[lang]:lower()
 	
-	if not rawget(temptab,sp) then
-		temptab[sp] = {}
+	if not validabils[lang][sp] then
+		validabils[lang][sp] = {}
 	end
-	temptab[sp][t] = i
+	validabils[lang][sp][t] = i
 end
 
 function make_entry(v,typ,i)
@@ -133,9 +132,6 @@ command_list = {['/ja']='Ability',['/jobability']='Ability',['/so']='Magic',['/s
 	['/ra']='Ranged Attack',['/range']='Ranged Attack',['/throw']='Ranged Attack',['/shoot']='Ranged Attack',['/ms']='Ability',['/monsterskill']='Ability',
 	['/ws']='Ability',['/weaponskill']='Ability',['/item']='Item',['/pet']='Ability'}
 
-ranged_line = {name='Ranged Attack',english='Ranged Attack',prefix='/range',element='None',targets='Enemy',skill='Ability',mpcost=0,
-	tpcost=0,casttime=0,recast=0,validtarget={Self=false,Player=false,Party=false,Ally=false,NPC=false,Enemy=true}}
-
 category_map = T{'Melee Swing','Ranged Attack','Weapon Skill','Magic','Item','Ability','Weapon Skill','Magic','Item','None','TP Move','Ranged Attack','Pet','Ability','Ability'}
 
 jobs = {WAR=0x00000002,MNK=0x00000004,WHM=0x00000008,BLM=0x00000010,RDM=0x00000020,THF=0x00000040,PLD=0x00000080,DRK=0x00000100,BST=0x00000200,BRD=0x00000400,
@@ -162,7 +158,10 @@ default_equip_order = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
 jas = {false,false,false,false,false,true,false,false,false,false,false,false,false,true,true,false}--6,14,15}
 readies = {false,false,false,false,false,false,true,true,true,false,false,true,false,false,false,false}--{7,8,9,12}
 uses = {false,true,true,true,true,false,false,false,false,false,true,false,true,false,false,false}--{2,3,4,5,11,13}
-unable_to_use = T{17,18,55,56,87,88,89,90,104,191,308,313,325,410,428,561,574,579,580,581,661,665,4,5,12,16,34,35,40,47,48,49,71,72,76,78,84,91,92,94,95,96,106,111,128,154,155,190,192,193,198,199,215,216,217,218,219,220,233,246,247,307,315,316,328,337,338,346,347,348,349,356,411,443,444,445,446,514,516,517,518,523,524,525,547,568,569,575,649,660,662,666} -- Probably don't need some of these (event action)
+unable_to_use = T{17,18,55,56,87,88,89,90,104,191,308,313,325,410,428,561,574,579,580,581,661,665,
+	4,5,12,16,34,35,40,47,48,49,71,72,76,78,84,91,92,94,95,96,106,111,128,154,155,190,192,193,198,
+	199,215,216,217,218,219,220,233,246,247,307,315,316,328,337,338,346,347,348,349,356,411,443,444,
+	445,446,514,516,517,518,523,524,525,547,568,569,575,649,660,662,666,700,701} -- Probably don't need some of these (event action)
 pass_through_targs = T{'<t>','<me>','<ft>','<scan>','<bt>','<lastst>','<r>','<pet>','<p0>','<p1>','<p2>','<p3>','<p4>',
 	'<p5>','<a10>','<a11>','<a12>','<a13>','<a14>','<a15>','<a20>','<a21>','<a22>','<a23>','<a24>','<a25>'}
 st_targs = T{'<stnpc>','<stal>','<stpc>','<stpt>'}
@@ -201,14 +200,14 @@ _global.verify_equip = false
 _global.cancel_spell = false
 _global.debug_mode = false
 _global.show_swaps = false
+_global.midaction = false
+_global.current_event = 'None'
 
 gearswap_disabled = false
-midaction = false
 sent_out_equip = T{}
 not_sent_out_equip = T{}
 equip_list = {}
 equip_order = {}
-lastbyte = 0x0000
 action_sent = false
 force_flag = false
 world = make_user_table()
@@ -227,9 +226,10 @@ disable_table[0] = false
 encumbrance_table = table.reassign({},disable_table)
 registered_user_events = {}
 empty = {name="empty"}
+persistent_spell = {}
 
 
-persistant_sequence = {}  ---------------------- TEMPORARY TO INVESTIGATE LAG ISSUES IN DELVE
-persistant_sequence[0] = true
-prev_ID = 0
-cur_ID = 0
+--persistant_sequence = {}  ---------------------- TEMPORARY TO INVESTIGATE LAG ISSUES IN DELVE
+--persistant_sequence[0] = true
+--prev_ID = 0
+--cur_ID = 0

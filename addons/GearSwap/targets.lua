@@ -41,9 +41,10 @@ function valid_target(targ)
 		local j = windower.ffxi.get_mob_by_target(targ)
 		
 		if j == nil then
-			table.reassign(spelltarget,target)
+			if _global.debug_mode then windower.add_to_chat(8,'Gearswap (Debug Mode): Target is unhandled by get_mob_by_target - '..tostring(targ)) end
+			table.reassign(spelltarget,target) -- Shouldn't this be an error case?
 		else
-			table.reassign(spelltarget,target_type(j))
+			table.reassign(spelltarget,target_complete(j))
 		end
 		spelltarget.raw = targ
 		return targ
@@ -51,13 +52,13 @@ function valid_target(targ)
 		local mob_array = windower.ffxi.get_mob_array()
 		local lower_targ = targ:lower()
 		for i,v in pairs(mob_array) do
-			if v['name']:lower()==lower_targ and not v['is_npc'] then
+			if v.name:lower()==lower_targ and not v.is_npc then
 				spell_targ = targ
-				table.reassign(spelltarget,target_type(v))
+				table.reassign(spelltarget,target_complete(v))
 				spelltarget.raw = targ
-			elseif tonumber(targ) == v['id'] then
+			elseif tonumber(targ) == v.id then
 				spell_targ = '<lastst>'
-				table.reassign(spelltarget,target_type(v))
+				table.reassign(spelltarget,target_complete(v))
 				spelltarget.raw = '<lastst>'
 			end
 		end
@@ -65,9 +66,8 @@ function valid_target(targ)
 	return spell_targ
 end
 
-function target_type(mob_table)
-	if mob_table == nil then return end
-	
+function target_complete(mob_table)
+	if mob_table == nil then return {type = 'NONE'} end
 	
 	------------------------------- Should consider moving the partycount part of this code to refresh_player() ----------------------------------
 	mob_table.isallymember = false
@@ -77,24 +77,37 @@ function target_type(mob_table)
 		local j = windower.ffxi.get_party()
 		
 		for i,v in pairs(j) do
-			if v['mob'] then
-				if v['mob']['id'] == mob_table['id'] then
+			if v.mob then
+				if v.mob.id == mob_table.id then
 					mob_table.isallymember = true
 				end
 			end
 		end
 	------------------------------------------------------------------------------------------------------------------------------------
 		
-		if player['id'] == mob_table['id'] then
+		if player.id == mob_table.id then
 			mob_table.type = 'SELF'
-		elseif mob_table['is_npc'] then
-			if mob_table['id']%4096>2047 then
+		elseif mob_table.is_npc then
+			if mob_table.id%4096>2047 then
 				mob_table.type = 'NPC'
 			else
 				mob_table.type = 'MONSTER'
 			end
 		else
 			mob_table.type = 'PLAYER'
+		end
+	end
+	
+	if mob_table.race then 
+		mob_table.race_id = mob_table.race
+		mob_table.race = mob_table_races[mob_table.race]
+	end
+	if mob_table.status then
+		mob_table.status_id = mob_table.status
+		if res.statuses[mob_table.status] then
+			mob_table.status = res.statuses[mob_table.status].english
+		else
+			mob_table.status = 'Unknown'
 		end
 	end
 	return mob_table

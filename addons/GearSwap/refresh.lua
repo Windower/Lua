@@ -71,41 +71,31 @@ function load_user_files()
 	user_env = nil
 	registered_user_events = {}
 	
-	if windower.file_exists(windower.addon_path..'data/'..player.name..'_'..player.main_job..'.lua') then
-		path = windower.addon_path..'data/'..player.name..'_'..player.main_job..'.lua'
-	elseif windower.file_exists(windower.addon_path..'data/'..player.name..'-'..player.main_job..'.lua') then
-		path = windower.addon_path..'data/'..player.name..'-'..player.main_job..'.lua'
-	elseif windower.file_exists(windower.addon_path..'data/'..player.name..'_'..player.main_job_full..'.lua') then
-		path = windower.addon_path..'data/'..player.name..'_'..player.main_job_full..'.lua'
-	elseif windower.file_exists(windower.addon_path..'data/'..player.name..'-'..player.main_job_full..'.lua') then
-		path = windower.addon_path..'data/'..player.name..'-'..player.main_job_full..'.lua'
-	elseif windower.file_exists(windower.addon_path..'data/'..player.name..'.lua') then
-		path = windower.addon_path..'data/'..player.name..'.lua'
-	elseif windower.file_exists(windower.addon_path..'data/'..player.main_job..'.lua') then
-		path = windower.addon_path..'data/'..player.main_job..'.lua'
-	elseif windower.file_exists(windower.addon_path..'data/'..player.main_job_full..'.lua') then
-		path = windower.addon_path..'data/'..player.main_job_full..'.lua'
-	elseif windower.file_exists(windower.addon_path..'data/default.lua') then
-		path = windower.addon_path..'data/default.lua'
-	else
+	local tab = {player.name..'_'..player.main_job..'.lua',player.name..'-'..player.main_job..'.lua',
+		player.name..'_'..player.main_job_full..'.lua',player.name..'-'..player.main_job_full..'.lua',
+		player.name..'.lua',player.main_job..'.lua',player.main_job_full..'.lua','default.lua'}
+	
+	local path = pathsearch(tab)
+	
+	if not path then
 		current_job_file = nil
 		gearswap_disabled = true
 		sets = nil
 		return
 	end
-	
 	user_env = {gearswap = _G, _global = _global,
 		-- Player functions
 		equip = equip, verify_equip=verify_equip, cancel_spell=cancel_spell,
 		force_send=force_send, change_target=change_target, cast_delay=cast_delay,
 		print_set=print_set,set_combine=set_combine,disable=disable,enable=enable,
+		send_command=send_cmd_user,windower=user_windower,include=include_user,
+		midaction=user_midaction,
 		
 		-- Library functions
-		string=string, math=math, table=table, T=T,os=os,
+		string=string, math=math, table=table, T=T,S=S,os=os,type=type,
 		tostring = tostring, tonumber = tonumber, pairs = pairs,
 		ipairs = ipairs, print=print, add_to_chat=windower.add_to_chat,
-		send_command=send_cmd_user,windower=user_windower,
-		include=include_user,next=next,lua_base_path=windower.addon_path,empty=empty,
+		next=next,lua_base_path=windower.addon_path,empty=empty,
 		
 		-- Player environment things
 		buffactive=buffactive,
@@ -224,26 +214,14 @@ function refresh_player()
 	player.equipment = to_names_set(cur_equip,items.inventory)
 	
 	-- Monster tables for the target and subtarget.
-	player.target = target_type(windower.ffxi.get_mob_by_target('t'))
-	
-	if player.target and player.target.race~= nil then
-		player.target.race_id = player.target.race
-		player.target.race = mob_table_races[player.target.race]
-	end
-	
-	player.subtarget = target_type(windower.ffxi.get_mob_by_target('lastst'))
-	
-	if player.subtarget and player.subtarget.race~= nil then
-		player.subtarget.race_id = player.subtarget.race
-		player.subtarget.race = mob_table_races[player.subtarget.race]
-	end
+	player.target = target_complete(windower.ffxi.get_mob_by_target('t'))
+	player.subtarget = target_complete(windower.ffxi.get_mob_by_target('st'))
+	player.last_subtarget = target_complete(windower.ffxi.get_mob_by_target('lastst'))
 	
 	-- If you have a pet, make a pet table.
 	if player_mob_table.pet_index then
-		table.reassign(pet,windower.ffxi.get_mob_by_index(player_mob_table.pet_index))
+		table.reassign(pet,target_complete(windower.ffxi.get_mob_by_index(player_mob_table.pet_index)))
 		pet.isvalid = true
-		pet.race_id = pet.race
-		pet.race = nil
 		pet.claim_id = nil
 		pet.is_npc = nil
 		if pet.tp then pet.tp = pet.tp/10 end
@@ -253,19 +231,14 @@ function refresh_player()
 			pet.element = 'None'
 		end
 	else
-		table.reassign(pet,{isvalid=false})
+		table.reassign(pet,{type="NONE",isvalid=false})
 	end
 	
-	local ft_table = windower.ffxi.get_mob_by_target('<ft>')
-	if ft_table then
-		table.reassign(fellow,ft_table)
+	table.reassign(fellow,target_complete(windower.ffxi.get_mob_by_target('<ft>')))
+	if fellow.name then
 		fellow.isvalid = true
-		if fellow.race then
-			fellow.race_id = fellow.race
-			fellow.race = mob_table_races[fellow.race]
-		end
 	else
-		table.reassign(fellow,{isvalid=false})
+		fellow.isvalid=false
 	end
 	
 	refresh_buff_active(player.buffs)
@@ -288,34 +261,34 @@ function refresh_ffxi_info()
 		if i ~= 'target' then
 			world[i] = v
 		end
-		if i == 'zone' then
+		if i ~= 'target' and i == 'zone' then
 			world.area = v
 		end
 	end
 	world.real_weather = info.weather
 	world.real_weather_element = info.weather_element
-	if buffactive['voidstorm'] then
+	if buffactive.voidstorm then
 		world.weather = 'Dark'
 		world.weather_element = 'Dark'
-	elseif buffactive['aurorastorm'] then
+	elseif buffactive.aurorastorm then
 		world.weather = 'Light'
 		world.weather_element = 'Light'
-	elseif buffactive['firestorm'] then
+	elseif buffactive.firestorm then
 		world.weather = 'Fire'
 		world.weather_element = 'Fire'
-	elseif buffactive['sandstorm'] then
+	elseif buffactive.sandstorm then
 		world.weather = 'Earth'
 		world.weather_element = 'Earth'
-	elseif buffactive['rainstorm'] then
+	elseif buffactive.rainstorm then
 		world.weather = 'Water'
 		world.weather_element = 'Water'
-	elseif buffactive['windstorm'] then
+	elseif buffactive.windstorm then
 		world.weather = 'Wind'
 		world.weather_element = 'Wind'
-	elseif buffactive['hailstorm'] then
+	elseif buffactive.hailstorm then
 		world.weather = 'Ice'
 		world.weather_element = 'Ice'
-	elseif buffactive['thunderstorm'] then
+	elseif buffactive.thunderstorm then
 		world.weather = 'Thunder'
 		world.weather_element = 'Thunder'
 	end
@@ -345,17 +318,17 @@ function refresh_group_info()
 		end
 		if i:sub(1) == 'p' then
 			temp_alliance[1][tonumber(i:sub(2))+1] = v
-			temp_alliance[1]['count'] = temp_alliance[1]['count'] +1
+			temp_alliance[1].count = temp_alliance[1].count +1
 		elseif i:sub(1,2) == 'a1' then
 			temp_alliance[2][tonumber(i:sub(3))+1] = v
-			temp_alliance[2]['count'] = temp_alliance[2]['count'] +1
+			temp_alliance[2].count = temp_alliance[2].count +1
 		elseif i:sub(1,2) == 'a2' then
 			temp_alliance[3][tonumber(i:sub(3))+1] = v
-			temp_alliance[3]['count'] = temp_alliance[3]['count'] +1
+			temp_alliance[3].count = temp_alliance[3].count +1
 		end
 	end
 	table.reassign(alliance,temp_alliance)
-	alliance['count'] = temp_alliance[1]['count'] + temp_alliance[2]['count'] + temp_alliance[3]['count']
+	alliance.count = temp_alliance[1].count + temp_alliance[2].count + temp_alliance[3].count
 end
 
 -----------------------------------------------------------------------------------
@@ -396,4 +369,29 @@ end
 function refresh_user_env()
 	refresh_globals()
 	windower.send_command('@wait 0.5;lua i gearswap load_user_files')
+end
+
+
+-----------------------------------------------------------------------------------
+--Name: pathsearch()
+--Args:
+---- tab - table of strings of the file name to search.
+-----------------------------------------------------------------------------------
+--Returns:
+---- path of a valid file, if it exists. False if it doesn't.
+-----------------------------------------------------------------------------------
+function pathsearch(tab)
+	local basetab = {[1]=windower.addon_path..'data/'..player.name..'/',[2]=windower.addon_path..'data/common/',
+		[3]=windower.addon_path..'data/'}
+	
+	for _,basepath in ipairs(basetab) do
+		if windower.dir_exists(basepath) then
+			for i,v in ipairs(tab) do
+				if windower.file_exists(basepath..v) then
+					return basepath..v
+				end
+			end
+		end
+	end
+	return false
 end
