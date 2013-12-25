@@ -14,6 +14,7 @@ local fns = {}
 
 local slots = {}
 
+local resource_mt = {}
 local resources = setmetatable({}, {__index = function(t, k)
     if fns[k] then
         t[k] = setmetatable(fns[k](), resource_mt)
@@ -21,7 +22,6 @@ local resources = setmetatable({}, {__index = function(t, k)
     end
 end})
 
-local resource_mt = {}
 function resource_group(r, fn, attr)
     fn = type(fn) == 'function' and fn or functools.equals(fn)
 
