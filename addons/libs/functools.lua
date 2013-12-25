@@ -139,13 +139,23 @@ function math.odd(num)
 end
 
 -- Adds two numbers.
-function math.sum(val1, val2)
+function math.add(val1, val2)
     return val1 + val2
 end
 
 -- Multiplies two numbers.
 function math.mult(val1, val2)
     return val1 * val2
+end
+
+-- Subtracts one number from another.
+function math.sub(val1, val2)
+    return val1 - val2
+end
+
+-- Divides one number by another.
+function math.div(val1, val2)
+    return val1 / val2
 end
 
 --[[
