@@ -32,7 +32,7 @@ end
 
 -- Returns true if the string contains a substring.
 function string.contains(str, sub)
-    return str:find(sub, nil, true)
+    return str:find(sub, nil, true) ~= nil
 end
 
 -- Splits a string into a table by a separator pattern.
@@ -270,11 +270,11 @@ end
 -- Returns a slug of a string.
 function string.slug(str)
     return str
-        :gsub(' I', '1')
-        :gsub(' II', '2')
-        :gsub(' III', '3')
-        :gsub(' IV', '4')
-        :gsub(' V', '5')
+        :gsub(' I$', '1')
+        :gsub(' II$', '2')
+        :gsub(' III$', '3')
+        :gsub(' IV$', '4')
+        :gsub(' V$', '5')
         :gsub('[^%w]', '')
         :lower()
 end
