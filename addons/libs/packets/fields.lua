@@ -360,6 +360,11 @@ fields.outgoing[0x0F4] = L{
     {ctype='unsigned short',    label='_unknown2'},                             --  6
 }
 
+-- Widescan Track
+fields.outgoing[0x0F5] = L{
+    {ctype='unsigned short',    label='Index',                  fn=index},      --  4 Setting an index of 0 stops tracking
+}
+
 -- Job Change
 fields.outgoing[0x100] = L{
     {ctype='unsigned char',     label='Main Job ID'},                           --  4
@@ -1071,6 +1076,17 @@ fields.incoming[0x0F4] = L{
     {ctype='short',             label='X Offset'},                              --  8   Offset on the map
     {ctype='short',             label='Y Offset'},                              --  A
     {ctype='char[16]',          label='Name'},                                  --  C   Slugged, may not extend all the way to 27. Up to 25 has been observed. This will be used if Type == 0
+}
+
+-- Widescan Track
+fields.incoming[0x0F5] = L{
+    {ctype='float',             label='X Position'},                            --  4
+    {ctype='float',             label='Z Position'},                            --  8
+    {ctype='float',             label='Y Position'},                            --  C
+    {ctype='unsigned char',     label='_unknown1'},                             -- 10 Same value as _unknown1 of 0x0F4
+    {ctype='unsigned char',     label='_padding1'},                             -- 11
+    {ctype='unsigned short',    label='Index',              fn=index},          -- 12
+    {ctype='unsigned int',      label='Status'},                                -- 14 1 for regular data, 2 when zoning (resets tracker), 3 when resetting (new wide scan)
 }
 
 -- Widescan Mark
