@@ -5,7 +5,7 @@ The primary functionality provided here are iterators which allow for
 easy traversal of the sub-tables within the packet. Example:
 
 =======================================================================================
-require 'actionhelper'
+require 'actions'
 
 function event_action(act)
   action = Action(act) -- constructor
@@ -27,7 +27,7 @@ end
 ]]
 
 _libs = _libs or {}
-_libs.actionhelper = true
+_libs.actions = true
 
 local category_strings = {
     'melee',
@@ -138,7 +138,7 @@ modification, are permitted provided that the following conditions are met:
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name of Actionhelper nor the
+    * Neither the name of actions nor the
       names of its contributors may be used to endorse or promote products
       derived from this software without specific prior written permission.
 
