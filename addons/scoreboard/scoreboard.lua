@@ -8,7 +8,7 @@ _addon.commands = {'sb', 'scoreboard'}
 
 require('tables')
 require('strings')
-require('mathhelper')
+require('maths')
 require('logger')
 require('actionhelper')
 local file = require('filehelper')

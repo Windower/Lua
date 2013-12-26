@@ -35,7 +35,7 @@ local config = require 'config'
 
 require 'tables'
 require 'strings'
-require 'mathhelper'
+require 'maths'
 require 'logger'
 require 'actionhelper'
 -----------------------------

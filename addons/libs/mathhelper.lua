@@ -3,7 +3,7 @@ A few math helper functions.
 ]]
 
 _libs = _libs or {}
-_libs.mathhelper = true
+_libs.maths = true
 
 _raw = _raw or {}
 _raw.math = setmetatable(_raw.math or {}, {__index = math})

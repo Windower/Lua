@@ -5,7 +5,7 @@ Library for a matrix data structure and operations defined on it.
 _libs = _libs or {}
 _libs.matrices = true
 _libs.tables = _libs.tables or require('tables')
-_libs.mathhelper = _libs.mathhelper or require('mathhelper')
+_libs.maths = _libs.maths or require('maths')
 _libs.vectors = _libs.vectors or require('vectors')
 
 matrix = {}

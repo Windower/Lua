@@ -6,7 +6,7 @@ When size is 0x00 it means the size is either unknown or varies.
 _libs = _libs or {}
 _libs.packets = true
 _libs.lists = _libs.lists or require('lists')
-_libs.mathhelper = _libs.mathhelper or require('mathhelper')
+_libs.maths = _libs.maths or require('maths')
 _libs.strings = _libs.strings or require('strings')
 _libs.functions = _libs.functions or require('functions')
 

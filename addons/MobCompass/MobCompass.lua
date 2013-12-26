@@ -34,7 +34,7 @@ _addon.commands = {'mobcompass','mc'}
 require 'tables'  -- Required for various table related features. Made by Arcon
 require 'logger'       -- Made by arcon. Here for debugging purposes
 require 'strings' -- Required to parse the other files. Probably made by Arcon
-require 'mathhelper'
+require 'maths'
 local config = require 'config'
 file = require 'filehelper'
 

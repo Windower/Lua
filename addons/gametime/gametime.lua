@@ -31,7 +31,7 @@ _addon.commands = {'gametime','gt'}
 require('chat')
 require('logger')
 require('strings')
-require('mathhelper')
+require('maths')
 require('tables')
 
 ffxi = require('ffxi')
