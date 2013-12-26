@@ -7,6 +7,7 @@ require('functools')
 require('stringhelper')
 require('mathhelper')
 require('lists')
+bit = require('bit')
 
 local fields = {}
 fields.outgoing = {_mult = {}}
@@ -25,14 +26,9 @@ ls_name_ext[0] = '`'
 res = require('resources')
 
 local function s(val, from, to)
-    from = from - 1
-    val = val/2^from
-
-    if to then
-        val = val % 2^(to - from)
-    end
-
-    return val
+    from = from and from - 1 or 0
+    to = to or 16
+    return bit.band(bit.rshift(val, from), 2^(to - from) - 1)
 end
 
 local function id(val)
@@ -131,6 +127,10 @@ local function slot(val)
     return res.slots[2^val].name
 end
 
+local function srank(val)
+    return res.synth_ranks[val].name
+end
+
 local function inv(val)
     if val == 0 then
         return '(None)'
@@ -151,7 +151,11 @@ local function bin(val, fill)
 end
 
 local function cskill(val)
-    return  s(val, 1, 15):string() .. ' (' .. (val >= 0x8000 and 'Capped' or 'Uncapped') .. ')'
+    return  s(val, 1, 15):string() .. ', ' .. (s(val, 16, 16) == 1 and 'Capped' or 'Uncapped')
+end
+
+local function sskill(val)
+    return  s(val, 6, 15):string() .. ', ' .. (s(val, 16, 16) == 1 and 'Capped' or 'Uncapped') .. ', ' .. (res.synth_ranks[s(val, 1, 5)] and res.synth_ranks[s(val, 1, 5)].name or 'Unknown: ' .. s(val, 1, 5))
 end
 
 --[[
@@ -960,20 +964,51 @@ fields.incoming[0x061] = L{
 
 -- Skills Update
 fields.incoming[0x062] = L{
-    {ctype='unsigned char[126]', label='_unknown1'},                             -- 04
-    {ctype='unsigned short',     label='Hand-to-Hand',       fn=cskill},         -- 82
-    {ctype='unsigned short',     label='Dagger',             fn=cskill},         -- 84
-    {ctype='unsigned short',     label='Sword',              fn=cskill},         -- 86
-    {ctype='unsigned short',     label='Great Sword',        fn=cskill},         -- 88
-    {ctype='unsigned short',     label='Axe',                fn=cskill},         -- 8A
-    {ctype='unsigned short',     label='Great Axe',          fn=cskill},         -- 8C
-    {ctype='unsigned short',     label='Scythe',             fn=cskill},         -- 8E
-    {ctype='unsigned short',     label='Polearm',            fn=cskill},         -- 90
-    {ctype='unsigned short',     label='Katana',             fn=cskill},         -- 92
-    {ctype='unsigned short',     label='Great Katana',       fn=cskill},         -- 94
-    {ctype='unsigned short',     label='Club',               fn=cskill},         -- 96
-    {ctype='unsigned short',     label='Staff',              fn=cskill},         -- 98
---    {ctype='unsigned short',     label='',fn=cskill},         -- 01
+    {ctype='char[126]',         label='_unknown1'},                             -- 04
+    {ctype='unsigned short',    label='Hand-to-Hand',       fn=cskill},         -- 82
+    {ctype='unsigned short',    label='Dagger',             fn=cskill},         -- 84
+    {ctype='unsigned short',    label='Sword',              fn=cskill},         -- 86
+    {ctype='unsigned short',    label='Great Sword',        fn=cskill},         -- 88
+    {ctype='unsigned short',    label='Axe',                fn=cskill},         -- 8A
+    {ctype='unsigned short',    label='Great Axe',          fn=cskill},         -- 8C
+    {ctype='unsigned short',    label='Scythe',             fn=cskill},         -- 8E
+    {ctype='unsigned short',    label='Polearm',            fn=cskill},         -- 90
+    {ctype='unsigned short',    label='Katana',             fn=cskill},         -- 92
+    {ctype='unsigned short',    label='Great Katana',       fn=cskill},         -- 94
+    {ctype='unsigned short',    label='Club',               fn=cskill},         -- 96
+    {ctype='unsigned short',    label='Staff',              fn=cskill},         -- 98
+    {ctype='char[24]',          label='_dummy1'},                               -- 9A
+    {ctype='unsigned short',    label='Archery',            fn=cskill},         -- B2
+    {ctype='unsigned short',    label='Marksmanship',       fn=cskill},         -- B4
+    {ctype='unsigned short',    label='Throwing',           fn=cskill},         -- B6
+    {ctype='unsigned short',    label='Guarding',           fn=cskill},         -- B8
+    {ctype='unsigned short',    label='Evasion',            fn=cskill},         -- BA
+    {ctype='unsigned short',    label='Shield',             fn=cskill},         -- BC
+    {ctype='unsigned short',    label='Parrying',           fn=cskill},         -- BE
+    {ctype='unsigned short',    label='DivineMagic',        fn=cskill},         -- C0
+    {ctype='unsigned short',    label='HealingMagic',       fn=cskill},         -- C2
+    {ctype='unsigned short',    label='EnhancingMagic',     fn=cskill},         -- C4
+    {ctype='unsigned short',    label='EnfeeblingMagic',    fn=cskill},         -- C6
+    {ctype='unsigned short',    label='ElementalMagic',     fn=cskill},         -- C8
+    {ctype='unsigned short',    label='DarkMagic',          fn=cskill},         -- CA
+    {ctype='unsigned short',    label='SummoningMagic',     fn=cskill},         -- CC
+    {ctype='unsigned short',    label='Ninjitsu',           fn=cskill},         -- CE
+    {ctype='unsigned short',    label='Singing',            fn=cskill},         -- D0
+    {ctype='unsigned short',    label='StringInstrument',   fn=cskill},         -- D2
+    {ctype='unsigned short',    label='WindInstrument',     fn=cskill},         -- D4
+    {ctype='unsigned short',    label='BlueMagic',          fn=cskill},         -- D6
+    {ctype='char[8]',           label='_dummy2'},                               -- D8
+    {ctype='unsigned short',    label='Fishing',            fn=sskill},         -- E0
+    {ctype='unsigned short',    label='Woodworking',        fn=sskill},         -- E2
+    {ctype='unsigned short',    label='Smithing',           fn=sskill},         -- E4
+    {ctype='unsigned short',    label='Goldsmithing',       fn=sskill},         -- E6
+    {ctype='unsigned short',    label='Clothcraft',         fn=sskill},         -- E8
+    {ctype='unsigned short',    label='Leathercraft',       fn=sskill},         -- EA
+    {ctype='unsigned short',    label='Bonecraft',          fn=sskill},         -- EC
+    {ctype='unsigned short',    label='Alchemy',            fn=sskill},         -- EE
+    {ctype='unsigned short',    label='Cooking',            fn=sskill},         -- F0
+    {ctype='unsigned short',    label='Synergy',            fn=sskill},         -- F2
+    {ctype='char*',             label='_padding',           const=0xFF},        -- F4
 }
 
 -- Unnamed 0x067
