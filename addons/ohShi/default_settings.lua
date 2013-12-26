@@ -73,7 +73,7 @@ spells = {}
 jAbils = {}
 mAbils = {}
 stats = {}
-trusts = S{'Kupipi','Excenmille','Naji','Ayame','Zeid','Curilla','Nanaa Mihgo'}
+trusts = S{'Kupipi','Excenmille','Naji','Ayame','Zeid','Curilla','Nanaa Mihgo','Trion','Shantotto','Volker','Ajido-Marujido'}
 
 speFName = '../../plugins/resources/spells.xml'
 staFName = '../../plugins/resources/status.xml'
