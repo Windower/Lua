@@ -68,9 +68,9 @@ end
 local res_names = S{'jobs', 'races', 'weather', 'servers', 'chat', 'bags', 'slots', 'statuses', 'emotes', 'skills', 'titles', 'encumbrance', 'check_ratings', 'synth_ranks'}
 for res_name in res_names:it() do
     fns[res_name] = function()
-        local res = require(addon_resources..res_name)
+        local res = table.map(require(addon_resources..res_name), add_name)
         slots[res] = table.keyset(next[2](res))
-        return table.map(res, add_name)
+        return res
     end
 end
 
