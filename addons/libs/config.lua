@@ -6,7 +6,7 @@ local config = {}
 
 _libs = _libs or {}
 _libs.config = config
-_libs.tablehelper = _libs.tablehelper or require('tablehelper')
+_libs.tables = _libs.tables or require('tables')
 _libs.sets = _libs.sets or require('sets')
 _libs.stringhelper = _libs.stringhelper or require('stringhelper')
 _libs.xml = _libs.xml or require('xml')

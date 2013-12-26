@@ -33,7 +33,7 @@ _addon.version = '0.22'
 _addon.author = 'Nitrous (Shiva)'
 _addon.commands = {'autocontrol','acon'}
 
-require 'tablehelper'
+require 'tables'
 require 'stringhelper'
 require 'logger'
 require 'sets'

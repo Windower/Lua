@@ -35,7 +35,7 @@ _addon.command = 'ohshi'
 --Requiring libraries used in this addon
 --These should be saved in addons/libs
 require 'logger'
-require 'tablehelper'
+require 'tables'
 require 'stringhelper'
 require 'sets'
 config = require 'config'

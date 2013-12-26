@@ -31,7 +31,7 @@ _addon.name = 'Blist'
 _addon.author = 'Ragnarok.Ikonic'
 _addon.version = '1.2.0.1'
 
-require 'tablehelper'
+require 'tables'
 require 'stringhelper'
 require 'colors'
 local config = require 'config'

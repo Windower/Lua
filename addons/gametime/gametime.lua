@@ -32,7 +32,7 @@ require('chat')
 require('logger')
 require('stringhelper')
 require('mathhelper')
-require('tablehelper')
+require('tables')
 
 ffxi = require('ffxi')
 config = require('config')

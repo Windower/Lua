@@ -6,7 +6,7 @@ local xml = {}
 
 _libs = _libs or {}
 _libs.xml = xml
-_libs.tablehelper = _libs.tablehelper or require('tablehelper')
+_libs.tables = _libs.tables or require('tables')
 _libs.lists = _libs.lists or require('lists')
 _libs.sets = _libs.sets or require('sets')
 _libs.stringhelper = _libs.stringhelper or require('stringhelper')

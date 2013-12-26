@@ -4,7 +4,7 @@ A library providing advanced list support and better optimizations for list-base
 
 _libs = _libs or {}
 _libs.lists = true
-_libs.tablehelper = _libs.tablehelper or require('tablehelper')
+_libs.tables = _libs.tables or require('tables')
 
 _raw = _raw or {}
 _raw.table = _raw.table or {}

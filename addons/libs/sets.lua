@@ -4,7 +4,7 @@ A library providing sets as a data structure.
 
 _libs = _libs or {}
 _libs.sets = true
-_libs.tablehelper = _libs.tablehelper or require('tablehelper')
+_libs.tables = _libs.tables or require('tables')
 _libs.functions = _libs.functions or require('functions')
 
 set = {}

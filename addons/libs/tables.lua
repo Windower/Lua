@@ -7,7 +7,7 @@ For lists, tables with sequential integral indices, use the lists library and th
 ]]
 
 _libs = _libs or {}
-_libs.tablehelper = true
+_libs.tables = true
 _libs.mathhelper = _libs.mathhelper or require('mathhelper')
 _libs.functions = _libs.functions or require('functions')
 

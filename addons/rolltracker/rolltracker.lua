@@ -34,7 +34,7 @@ _addon.command = 'rolltracker'
 config = require 'config'
 settings=config.load(defaults)
 chat = require 'chat'
-require 'tablehelper'
+require 'tables'
 defaults = {}
 defaults.autostop = 0
 defaults.bust = 1

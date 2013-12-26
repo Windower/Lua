@@ -32,7 +32,7 @@ _addon.version = '1.22'
 _addon.author = 'Nitrous (Shiva)'
 _addon.commands = {'aset','azuresets','asets'}
 
-require 'tablehelper'
+require 'tables'
 require 'stringhelper'
 require 'logger'
 config = require 'config'

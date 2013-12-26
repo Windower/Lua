@@ -1,4 +1,4 @@
-require 'tablehelper'
+require 'tables'
 require 'sets'
 file = require 'filehelper'
 config = require 'config'

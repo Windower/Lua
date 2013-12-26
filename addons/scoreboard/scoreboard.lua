@@ -6,7 +6,7 @@ _addon.author = 'Suji'
 _addon.version = '1.07'
 _addon.commands = {'sb', 'scoreboard'}
 
-require('tablehelper')
+require('tables')
 require('stringhelper')
 require('mathhelper')
 require('logger')

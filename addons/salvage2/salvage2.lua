@@ -27,7 +27,7 @@ _addon.command = 's2'
 _addon.author = 'Bahamut.Krizz'
 local config = require 'config'
 
-require 'tablehelper'
+require 'tables'
 require 'stringhelper'
 require 'mathhelper'
 require 'logger'

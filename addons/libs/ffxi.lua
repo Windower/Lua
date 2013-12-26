@@ -6,7 +6,7 @@ local ffxi = {}
 
 _libs = _libs or {}
 _libs.ffxi = ffxi
-_libs.tablehelper = _libs.tablehelper or require('tablehelper')
+_libs.tables = _libs.tables or require('tables')
 _libs.stringhelper = _libs.stringhelper or require('stringhelper')
 _libs.functions = _libs.functions or require('functions')
 _libs.json = _libs.json or require('json')

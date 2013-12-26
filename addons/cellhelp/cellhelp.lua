@@ -33,7 +33,7 @@ _addon.version = 0.1
 local config = require 'config'
 
 
-require 'tablehelper'
+require 'tables'
 require 'stringhelper'
 require 'mathhelper'
 require 'logger'

@@ -40,7 +40,7 @@ end
 -- Returns the normalized time in seconds it took to perform the provided functions rep number of times, with the specified arguments.
 function timeit.benchmark(rep, ...)
     _libs.functions = _libs.functions or require 'functions'
-    _libs.tablehelper = _libs.tablehelper or require 'tablehelper'
+    _libs.tables = _libs.tables or require 'tables'
     _libs.logger = _libs.logger or require 'logger'
 
     local args = T{...}

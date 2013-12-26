@@ -32,7 +32,7 @@ _addon.version = '2.02'
 _addon.author = 'Nitrous (Shiva)'
 _addon.command = 'aecho'
 
-require 'tablehelper'
+require 'tables'
 require 'stringhelper'
 require 'logger'
 require 'sets'

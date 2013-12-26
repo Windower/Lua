@@ -32,7 +32,7 @@ _addon.version = '1.07'
 _addon.author = 'Nitrous (Shiva)'
 _addon.command = 'stna'
 
-require 'tablehelper'
+require 'tables'
 require 'sets'
 
 windower.register_event('load', function()

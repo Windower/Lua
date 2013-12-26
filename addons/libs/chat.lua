@@ -6,7 +6,7 @@ local chat = {}
 
 _libs = _libs or {}
 _libs.chat = chat
-_libs.tablehelper = _libs.tablehelper or require('tablehelper')
+_libs.tables = _libs.tables or require('tables')
 _libs.sets = _libs.sets or require('sets')
 _libs.stringhelper = _libs.stringhelper or require('stringhelper')
 _libs.json = _libs.json or require('json')

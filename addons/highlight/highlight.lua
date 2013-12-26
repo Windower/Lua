@@ -1,6 +1,6 @@
 file = require 'filehelper'
 chat = require 'chat'
-require 'tablehelper'
+require 'tables'
 require 'stringhelper'
  
 

@@ -26,7 +26,7 @@
 
 
 file = require 'filehelper'
-require 'tablehelper'
+require 'tables'
 xml = require 'xml'
 
 

@@ -32,7 +32,7 @@ _addon.version = '1.35'
 _addon.author = 'Ragnarok.Ikonic'
 _addon.commands = {'ChatPorter','cp'}
 
-require('tablehelper')
+require('tables')
 require('stringhelper')
 require('chat')
 config = require('config')
