@@ -1,4 +1,4 @@
-file = require 'filehelper'
+file = require 'files'
 chat = require 'chat'
 require 'tables'
 require 'strings'

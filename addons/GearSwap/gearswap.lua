@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 language = 'english'
-file = require 'filehelper'
+file = require 'files'
 require 'strings'
 require 'helper_functions'
 require 'tables'

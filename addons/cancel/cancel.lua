@@ -29,7 +29,7 @@ _addon.version = '0.6'
 _addon.author = 'Byrth'
 _addon.commands = {'cancel'}
 
-file = require 'filehelper'
+file = require 'files'
 
 statusFile = file.new('../../plugins/resources/status.xml')
 

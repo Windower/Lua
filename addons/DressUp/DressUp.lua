@@ -32,7 +32,7 @@ _addon.commands = {'DressUp','du'}
 --Libs
 packets = require('packets')
 config = require('config')
-file = require('filehelper')
+file = require('files')
 require('luau')
 
 --DressUp files

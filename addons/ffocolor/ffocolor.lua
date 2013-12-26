@@ -37,7 +37,7 @@ require 'strings'
 require 'logger'
 require 'lists'
 config = require 'config'
-files = require 'filehelper'
+files = require 'files'
 chat = require 'chat'
 defaults = T{}
 defaults.chatTab = 'say'

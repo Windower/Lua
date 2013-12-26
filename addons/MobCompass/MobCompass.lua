@@ -36,7 +36,7 @@ require 'logger'       -- Made by arcon. Here for debugging purposes
 require 'strings' -- Required to parse the other files. Probably made by Arcon
 require 'maths'
 local config = require 'config'
-file = require 'filehelper'
+file = require 'files'
 
 local settingtab = nil
 local settings_file = 'data/settings.xml'

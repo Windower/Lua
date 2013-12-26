@@ -7,7 +7,7 @@ _libs.resources = true
 _libs.functions = _libs.functions or require('functions')
 _libs.tables = _libs.tables or require('tables')
 _libs.strings = _libs.strings or require('strings')
-_libs.filehelper = _libs.filehelper or require('filehelper')
+_libs.files = _libs.files or require('files')
 _libs.xml = _libs.xml or require('xml')
 
 local fns = {}
@@ -76,7 +76,7 @@ end
 
 -- Returns the abilities, indexed by ingame ID.
 function fns.abilities()
-    local file = _libs.filehelper.read(plugin_resources..'abils.xml')
+    local file = _libs.files.read(plugin_resources..'abils.xml')
     local match_string
     local last = {}
 
@@ -143,7 +143,7 @@ end
 
 -- Returns the spells, indexed by ingame ID.
 function fns.spells()
-    local file = _libs.filehelper.read(plugin_resources..'spells.xml')
+    local file = _libs.files.read(plugin_resources..'spells.xml')
     local match_string = '<s id="(%d-)" index="(%d-)" prefix="([^"]-)" english="([^"]-)" german="([^"]-)" french="([^"]-)" japanese="([^"]-)" type="([^"]-)" element="([^"]-)" targets="([^"]-)" skill="([^"]-)" mpcost="(%d-)" casttime="([%d%.]-)" recast="([%d%.]-)" alias="([^"]-)" />'
     local last = {}
 
@@ -180,7 +180,7 @@ end
 
 -- Returns the buffs, indexed by ingame ID.
 function fns.buffs()
-    local file = _libs.filehelper.read(plugin_resources..'status.xml')
+    local file = _libs.files.read(plugin_resources..'status.xml')
     local match_string = '<b id="(%d-)" duration="(%d-)" fr="([^"]-)" de="([^"]-)" jp="([^"]-)" enLog="([^"]-)">([^<]-)</b>'
     local last = {}
 
@@ -231,7 +231,7 @@ function fns.items()
     slots[res] = S{}
 
     -- General items
-    file = _libs.filehelper.read(plugin_resources..'items_general.xml')
+    file = _libs.files.read(plugin_resources..'items_general.xml')
     match_string = '<i id="(%d-)" enl="([^"]-)" fr="([^"]-)" frl="([^"]-)" de="([^"]-)" del="([^"]-)" jp="([^"]-)" jpl="([^"]-)" targets="([%a,%s]-)">([^<]-)</i>'
     for id, enl, fr, frl, de, del, jp, jpl, targets, en in file:gmatch(match_string) do
         id = id:number()
@@ -302,7 +302,7 @@ function fns.items()
     -- Armor and weapons
     local categories = S{'armor', 'weapons'}
     for category in categories:it() do
-        file = _libs.filehelper.read(plugin_resources..'items_'..category..'.xml')
+        file = _libs.files.read(plugin_resources..'items_'..category..'.xml')
         match_string = '<i id="(%d-)" enl="([^"]-)" fr="([^"]-)" frl="([^"]-)" de="([^"]-)" del="([^"]-)" jp="([^"]-)" jpl="([^"]-)" slots="([^"]-)" jobs="([^"]-)" races="([^"]-)" level="(%d-)" targets="([%a,%s]-)" casttime="([%d%.]-)" recast="(%d-)">([^<]-)</i>'
         category = category:capitalize()
         for id, enl, fr, frl, de, del, jp, jpl, slots, jobs, races, level, targets, cast_time, recast, en in file:gmatch(match_string) do
@@ -338,7 +338,7 @@ end
 
 -- Returns the zones, indexed by ingame ID.
 function fns.zones()
-    local file = _libs.filehelper.read(plugin_resources..'areas.xml')
+    local file = _libs.files.read(plugin_resources..'areas.xml')
     local match_string = '<a id="(%d-)" fr="([^"]-)" de="([^"]-)" jp="([^"]-)">([^<]-)</a>'
     local last = {}
 
@@ -363,7 +363,7 @@ end
 
 -- Returns monster abilities, indexed by ingame ID.
 function fns.monster_abils()
-    local file = _libs.filehelper.read(addon_resources..'mabils.xml')
+    local file = _libs.files.read(addon_resources..'mabils.xml')
     local match_string
     local last = {}
 

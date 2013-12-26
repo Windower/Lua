@@ -36,7 +36,7 @@ require 'tables'
 require 'strings'
 require 'logger'
 config = require 'config'
-files = require 'filehelper'
+files = require 'files'
 res = require 'resources'
 defaults = T{}
 defaults.spellsets = T{}

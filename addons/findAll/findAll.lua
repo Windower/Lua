@@ -39,7 +39,7 @@ require 'logger'
 require 'sets'
 
 json  = require 'json'
-file  = require 'filehelper'
+file  = require 'files'
 slips = require 'slips'
 
 load_timestamp         = os.time()

@@ -1,6 +1,6 @@
 require 'tables'
 require 'sets'
-file = require 'filehelper'
+file = require 'files'
 config = require 'config'
 
 require 'generic_helpers'

@@ -35,7 +35,7 @@ _addon.author = 'Jandel'
 require 'tables'
 require 'strings'
 require 'logger'
---local file = require 'filehelper'
+--local file = require 'files'
 local Blackboard = require 'blackboard'
 local lavagna = nil
 local config = require 'config'

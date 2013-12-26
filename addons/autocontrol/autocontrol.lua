@@ -39,7 +39,7 @@ require 'logger'
 require 'sets'
 res = require 'resources'
 config = require 'config'
-files = require 'filehelper'
+files = require 'files'
 defaults = T{}
 defaults.bg = {}
 defaults.bg.red = 0

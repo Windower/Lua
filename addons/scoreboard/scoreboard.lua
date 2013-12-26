@@ -11,7 +11,7 @@ require('strings')
 require('maths')
 require('logger')
 require('actionhelper')
-local file = require('filehelper')
+local file = require('files')
 config = require('config')
 
 local Display = require('display')

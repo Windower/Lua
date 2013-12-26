@@ -10,7 +10,7 @@ _libs.tables = _libs.tables or require('tables')
 _libs.lists = _libs.lists or require('lists')
 _libs.sets = _libs.sets or require('sets')
 _libs.strings = _libs.strings or require('strings')
-_libs.filehelper = _libs.filehelper or require('filehelper')
+_libs.files = _libs.files or require('files')
 
 -- Local functions
 local entity_unescape
@@ -73,7 +73,7 @@ end
 -- Takes a filename and tries to parse the XML in it, after a validity check.
 function xml.read(file)
     if type(file) == 'string' then
-        file = _libs.filehelper.new(file)
+        file = _libs.files.new(file)
     end
 
     if not file:exists() then
