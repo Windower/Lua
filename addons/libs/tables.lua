@@ -606,12 +606,6 @@ function table.sconcat(t)
 end
 
 -- Check if table is empty.
--- DEPRECATED: Use table.empty instead.
-function table.isempty(t)
-    return next(t) == nil
-end
-
--- Check if table is empty.
 -- If rec is true, it counts empty nested empty tables as empty as well.
 function table.empty(t, rec)
     if not rec then
