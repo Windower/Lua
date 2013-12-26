@@ -37,7 +37,7 @@ require 'tables'
 require 'strings'
 require 'maths'
 require 'logger'
-require 'actionhelper'
+require 'actions'
 -----------------------------
 
 local settingtab = nil
