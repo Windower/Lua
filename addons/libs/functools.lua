@@ -4,7 +4,6 @@ Adds some tools for functional programming. Amends various other namespaces by f
 
 _libs = _libs or {}
 _libs.functools = true
-_libs.tablehelper = _libs.tablehelper or require('tablehelper')
 
 --[[
     Purely functional
@@ -16,6 +15,8 @@ functools = {}
 function functools.empty()
 end
 
+debug.setmetatable(functools.empty, functools)
+
 -- The identity function.
 function functools.identity(...)
     return ...
@@ -24,14 +25,25 @@ end
 -- Returns a partially applied function, depending on the number of arguments provided.
 function functools.apply(fn, args)
     return function(...)
-        return fn(T(args):copy():extend(T{...}):unpack())
+        local key = #args + 1
+        for _, arg in ipairs({...}) do
+            args[key] = arg
+            key = key + 1
+        end
+        return fn(unpack(args))
     end
 end
 
 -- Returns a partially applied function, with the argument provided at the end.
 function functools.endapply(fn, args)
     return function(...)
-        return fn(T{...}:extend(T(args):copy()):unpack())
+        local res = {...}
+        local key = #res
+        for _, arg in ipairs(args) do
+            key = key + 1
+            res[key] = arg
+        end
+        return fn(unpack(res))
     end
 end
 
@@ -56,18 +68,28 @@ function functools.negate(fn)
     end
 end
 
--- Returns a function that returns a subset of the provided function's elements according to a table slice.
--- * i == nil:    Returns all elements as a table
--- * j == nil:    Returns all elements from i until the end
-function functools.slice(fn, i, j)
+-- Returns the ith element of a function.
+function functools.select(fn, i)
     return function(...)
-        return T{fn(...)}:slice(i, j):unpack()
+        return select(i, fn(...))
     end
 end
 
--- Returns the ith element of a function.
-function functools.select(fn, i)
-    return functools.slice(fn, i, i)
+-- tostring wrapper
+function functools.string(fn)
+    return tostring(fn)
+end
+
+local function index(fn, key)
+    if type(key) == 'number' then
+        return fn.select(key)
+    elseif rawget(functools, key) then
+        return function(...)
+            return functools[key](fn, ...)
+        end
+    end
+
+    return nil
 end
 
 -- Assigns a metatable on functions to introduce certain function operators.
@@ -75,11 +97,12 @@ end
 -- * fn-{...} partially applies a function to arguments from the end.
 -- * fn1..fn2 pipes input from fn2 to fn1.
 debug.setmetatable(functools.empty, {
-    __index = functools.select,
+    __index = index,
     __add = functools.apply,
     __sub = functools.endapply,
     __concat = functools.pipe,
     __unm = functools.negate,
+    __class = 'Function'
 })
 
 --[[
@@ -191,13 +214,13 @@ end
 
 -- Applies function fn to all elements of the table and returns the resulting table.
 function table.map(t, fn)
-    local res = T{}
+    local res = {}
     for key, val in pairs(t) do
         -- Evaluate fn with the element and store it.
         res[key] = fn(val)
     end
 
-    return res
+    return setmetatable(res, getmetatable(t))
 end
 
 -- Returns a table with all elements from t that satisfy the condition fn, or don't satisfy condition fn, if reverse is set to true. Defaults to false.
@@ -206,23 +229,15 @@ function table.filter(t, fn)
         fn = functools.equals(fn)
     end
 
-    local res = T{}
-    if T(t):isarray() then
-        for _, val in ipairs(t) do
-            if fn(val) then
-                res:append(val)
-            end
-        end
-    else
-        for key, val in pairs(t) do
-            -- Only copy if fn(val) evaluates to true
-            if fn(val) then
-                res[key] = val
-            end
+    local res = {}
+    for key, val in pairs(t) do
+        -- Only copy if fn(val) evaluates to true
+        if fn(val) then
+            res[key] = val
         end
     end
 
-    return res
+    return setmetatable(res, getmetatable(t))
 end
 
 -- Returns a table with all elements from t whose keys satisfy the condition fn, or don't satisfy condition fn, if reverse is set to true. Defaults to false.
@@ -231,7 +246,7 @@ function table.filterkey(t, fn)
         fn = functools.equals(fn)
     end
 
-    local res = T{}
+    local res = {}
     for key, val in pairs(t) do
         -- Only copy if fn(key) evaluates to true
         if fn(key) then
@@ -239,7 +254,7 @@ function table.filterkey(t, fn)
         end
     end
 
-    return res
+    return setmetatable(res, getmetatable(t))
 end
 
 -- Returns the result of applying the function fn to the first two elements of t, then again on the result and the next element from t, until all elements are accumulated.
