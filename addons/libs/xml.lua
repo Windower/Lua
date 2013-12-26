@@ -47,9 +47,9 @@ local spaces = S{' ', '\n', '\t', '\r'}
 -- Only used internally to index the unescapes table.
 function entity_unescape(_, entity)
     if entity:startswith('#x') then
-        return string.char(tonumber(entity:sub(3), 16))
+        return entity:sub(3):number(16):char()
     elseif entity:startswith('#') then
-        return string.char(tonumber(entity:sub(2)))
+        return entity:sub(2):number():char()
     else
         return entity
     end
@@ -181,9 +181,9 @@ end
 -- * .*(?!\]\]>)    CDATA
 function tokenize(content, line)
     local current = ''
-    local tokens = T{}
+    local tokens = L{}
     for i = 1, line do
-        tokens:append(T{})
+        tokens:append(L{})
     end
 
     local quote = nil
@@ -191,7 +191,7 @@ function tokenize(content, line)
     for c in content:it() do
         -- Only useful for a line count, to produce more accurate debug messages.
         if c == '\n' then
-            tokens:append(T{})
+            tokens:append(L{})
         end
 
         if mode == 'quote' then
@@ -283,9 +283,10 @@ function tokenize(content, line)
     end
 
     for array, line in tokens:it() do
-        tokens[line] = table.filter(array, -'')
+        tokens[line] = array:filter(-'')
     end
 
+    print(tokens)
     return tokens
 end
 
@@ -316,7 +317,7 @@ function classify(tokens, var)
     local headers = var
 
     local mode = 'inner'
-    local parsed = T{dom.new()}
+    local parsed = L{dom.new()}
     local name = nil
     for line, intokens in ipairs(tokens) do
         for _, token in ipairs(intokens) do
