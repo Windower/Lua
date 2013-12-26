@@ -154,6 +154,12 @@
 	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
+    <name>Itemizer</name>
+    <author>Ihina</author>
+    <description>Use commands to move items and gear between bags</description>
+    <support>http://www.ffxiah.com/player/Bismarck/Ihina/support>
+  </addon>
+  <addon>
     <name>Linker</name>
     <author>Arcon</author>
     <description>Allows opening links to certain websites from within the game, with an optional search parameter.</description>
@@ -260,6 +266,12 @@
     <description>Applys spellcast-like command completion (interpretation and target completion) to commands. Includes emotes, /check, and /pcmd.</description>
 	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
 	<bugtracker>https://github.com/Byrth/Lua/issues</bugtracker>
+  </addon>
+  <addon>
+    <name>Silence</name>
+    <author>Ihina</author>
+    <description>Eliminates the flood of equipment change messages.</description>
+    <support>http://www.ffxiah.com/player/Bismarck/Ihina/support>
   </addon>
   <addon>
   	<name>ShoutHelper</name>
