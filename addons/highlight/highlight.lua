@@ -1,7 +1,7 @@
 file = require 'filehelper'
 chat = require 'chat'
 require 'tables'
-require 'stringhelper'
+require 'strings'
  
 
 _addon.author = 'Balloon'

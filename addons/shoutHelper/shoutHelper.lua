@@ -33,7 +33,7 @@ _addon.commands = {'shouthelper','sh'}
 _addon.author = 'Jandel'
 
 require 'tables'
-require 'stringhelper'
+require 'strings'
 require 'logger'
 --local file = require 'filehelper'
 local Blackboard = require 'blackboard'

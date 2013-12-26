@@ -7,7 +7,7 @@ _addon.version = '1.07'
 _addon.commands = {'sb', 'scoreboard'}
 
 require('tables')
-require('stringhelper')
+require('strings')
 require('mathhelper')
 require('logger')
 require('actionhelper')

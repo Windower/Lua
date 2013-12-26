@@ -32,7 +32,7 @@ _addon.author = 'Ragnarok.Ikonic'
 _addon.version = '1.2.0.1'
 
 require 'tables'
-require 'stringhelper'
+require 'strings'
 require 'colors'
 local config = require 'config'
 require 'logger'

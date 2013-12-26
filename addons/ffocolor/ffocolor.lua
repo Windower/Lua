@@ -33,7 +33,7 @@ _addon.author = 'Nitrous (Shiva)'
 _addon.command = 'ffocolor'
 
 require 'tables'
-require 'stringhelper'
+require 'strings'
 require 'logger'
 require 'lists'
 config = require 'config'

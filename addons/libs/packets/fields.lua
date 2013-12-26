@@ -4,7 +4,7 @@
 
 require('pack')
 require('functions')
-require('stringhelper')
+require('strings')
 require('mathhelper')
 require('lists')
 bit = require('bit')

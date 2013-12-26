@@ -8,7 +8,7 @@ _libs = _libs or {}
 _libs.chat = chat
 _libs.tables = _libs.tables or require('tables')
 _libs.sets = _libs.sets or require('sets')
-_libs.stringhelper = _libs.stringhelper or require('stringhelper')
+_libs.strings = _libs.strings or require('strings')
 _libs.json = _libs.json or require('json')
 
 chat = table.update(chat, (ffxi and ffxi.data and ffxi.data.chat) or _libs.json.read('../libs/ffxidata.json').chat)

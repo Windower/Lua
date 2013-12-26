@@ -33,7 +33,7 @@ _addon.author = 'Nitrous (Shiva)'
 _addon.command = 'aecho'
 
 require 'tables'
-require 'stringhelper'
+require 'strings'
 require 'logger'
 require 'sets'
 config = require 'config'

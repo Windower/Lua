@@ -33,7 +33,7 @@ _addon.author = 'Ragnarok.Ikonic'
 _addon.commands = {'ChatPorter','cp'}
 
 require('tables')
-require('stringhelper')
+require('strings')
 require('chat')
 config = require('config')
 require('logger')

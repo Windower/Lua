@@ -8,7 +8,7 @@ _libs = _libs or {}
 _libs.json = json
 _libs.tables = _libs.tables or require('tables')
 _libs.lists = _libs.lists or require('lists')
-_libs.stringhelper = _libs.stringhelper or require('stringhelper')
+_libs.strings = _libs.strings or require('strings')
 _libs.filehelper = _libs.filehelper or require('filehelper')
 
 -- Define singleton JSON characters that can delimit strings.

@@ -34,7 +34,7 @@ _addon.author = 'Nitrous (Shiva)'
 _addon.commands = {'autocontrol','acon'}
 
 require 'tables'
-require 'stringhelper'
+require 'strings'
 require 'logger'
 require 'sets'
 res = require 'resources'

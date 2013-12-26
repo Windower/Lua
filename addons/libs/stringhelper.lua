@@ -3,7 +3,7 @@ A few string helper functions.
 ]]
 
 _libs = _libs or {}
-_libs.stringhelper = true
+_libs.strings = true
 _libs.functions = _libs.functions or require('functions')
 
 _meta = _meta or {}

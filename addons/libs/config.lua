@@ -8,7 +8,7 @@ _libs = _libs or {}
 _libs.config = config
 _libs.tables = _libs.tables or require('tables')
 _libs.sets = _libs.sets or require('sets')
-_libs.stringhelper = _libs.stringhelper or require('stringhelper')
+_libs.strings = _libs.strings or require('strings')
 _libs.xml = _libs.xml or require('xml')
 _libs.filehelper = _libs.filehelper or require('filehelper')
 

@@ -26,7 +26,7 @@
 
 language = 'english'
 file = require 'filehelper'
-require 'stringhelper'
+require 'strings'
 require 'helper_functions'
 require 'tables'
 

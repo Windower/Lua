@@ -4,7 +4,7 @@ This library provides a set of functions to aid in debugging.
 
 _libs = _libs or {}
 _libs.logger = true
-_libs.stringhelper = _libs.stringhelper or require('stringhelper')
+_libs.strings = _libs.strings or require('strings')
 chat = require('chat')
 _libs.chat = _libs.chat or (chat ~= nil)
 

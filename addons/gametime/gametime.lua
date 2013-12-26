@@ -30,7 +30,7 @@ _addon.commands = {'gametime','gt'}
 
 require('chat')
 require('logger')
-require('stringhelper')
+require('strings')
 require('mathhelper')
 require('tables')
 

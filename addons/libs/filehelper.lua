@@ -6,7 +6,7 @@ local files = {}
 
 _libs = _libs or {}
 _libs.filehelper = files
-_libs.stringhelper = _libs.stringhelper or require('stringhelper')
+_libs.strings = _libs.strings or require('strings')
 
 local createfile = false
 

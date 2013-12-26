@@ -7,7 +7,7 @@ _libs = _libs or {}
 _libs.packets = true
 _libs.lists = _libs.lists or require('lists')
 _libs.mathhelper = _libs.mathhelper or require('mathhelper')
-_libs.stringhelper = _libs.stringhelper or require('stringhelper')
+_libs.strings = _libs.strings or require('strings')
 _libs.functions = _libs.functions or require('functions')
 
 require('pack')
