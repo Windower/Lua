@@ -17,6 +17,7 @@ bagIndex['storage'] = 2
 bagIndex['locker'] = 3
 bagIndex['satchel'] = 5
 bagIndex['sack'] = 6
+bagIndex['case'] = 7
 
 bagTable = {}
 function bagTable.inventory() return windower.ffxi.get_items().inventory end
@@ -25,6 +26,7 @@ function bagTable.storage() return windower.ffxi.get_items().storage end
 function bagTable.locker() return windower.ffxi.get_items().locker end
 function bagTable.satchel() return windower.ffxi.get_items().satchel end
 function bagTable.sack() return windower.ffxi.get_items().sack end
+function bagTable.case() return windower.ffxi.get_items().case end
 
 bagFunc = {}
 function bagFunc.get (x,y) windower.ffxi.get_item(x, y) end
@@ -34,18 +36,15 @@ windower.register_event('unhandled command', function(...)
 	local param = L{...}
 
 	if param[1] == 'get' or param[1] == 'put' then
-		command = param[1]
-		bag = param[param:length()]
+		local command = param:remove(1)
+		local bag = param:remove(#param)
+		local item = param:concat(' ')
+
 		local search = bag
 		if command == 'put' then
 			search = 'inventory' 
 		end
-				
-		param:remove(0)
-		param:remove(param:length())
-		item = tostring(param):split(','):concat('')
-		item = (item:slice(2, item:length() - 1))
-		
+
 		local id = res.items:name(windower.wc_match-{item})
 		if id:length() == 0 then
 			id = res.items:name_full(windower.wc_match-{item})
@@ -58,7 +57,7 @@ windower.register_event('unhandled command', function(...)
 		t = bagTable[search]()
 		for slot, item in pairs(t) do 
 			if id[item.id] then 
-				bagFunc[param[0]](bagIndex[bag], slot)
+				bagFunc[command](bagIndex[bag], slot)
 				return
 			end 
 		end
