@@ -3,27 +3,27 @@ Adds some tools for functional programming. Amends various other namespaces by f
 ]]
 
 _libs = _libs or {}
-_libs.functools = true
+_libs.functions = true
 
 --[[
     Purely functional
 ]]
 
-functools = {}
+functions = {}
 
 -- The empty function.
-function functools.empty()
+function functions.empty()
 end
 
-debug.setmetatable(functools.empty, functools)
+debug.setmetatable(functions.empty, functions)
 
 -- The identity function.
-function functools.identity(...)
+function functions.identity(...)
     return ...
 end
 
 -- Returns a partially applied function, depending on the number of arguments provided.
-function functools.apply(fn, args)
+function functions.apply(fn, args)
     return function(...)
         local key = #args + 1
         for _, arg in ipairs({...}) do
@@ -35,7 +35,7 @@ function functools.apply(fn, args)
 end
 
 -- Returns a partially applied function, with the argument provided at the end.
-function functools.endapply(fn, args)
+function functions.endapply(fn, args)
     return function(...)
         local res = {...}
         local key = #res
@@ -48,44 +48,44 @@ function functools.endapply(fn, args)
 end
 
 -- Returns a function that calls a provided chain of functions in right-to-left order.
-function functools.pipe(fn1, fn2)
+function functions.pipe(fn1, fn2)
     return function(...)
         return fn1(fn2(...))
     end
 end
 
 -- Returns a closure over the argument el that returns true, if its argument equals el.
-function functools.equals(el)
+function functions.equals(el)
     return function(cmp)
         return el == cmp
     end
 end
 
 -- Returns a negation function of a boolean function.
-function functools.negate(fn)
+function functions.negate(fn)
     return function(...)
         return not (true == fn(...))
     end
 end
 
 -- Returns the ith element of a function.
-function functools.select(fn, i)
+function functions.select(fn, i)
     return function(...)
         return select(i, fn(...))
     end
 end
 
 -- tostring wrapper
-function functools.string(fn)
+function functions.string(fn)
     return tostring(fn)
 end
 
 local function index(fn, key)
     if type(key) == 'number' then
         return fn.select(key)
-    elseif rawget(functools, key) then
+    elseif rawget(functions, key) then
         return function(...)
-            return functools[key](fn, ...)
+            return functions[key](fn, ...)
         end
     end
 
@@ -96,12 +96,12 @@ end
 -- * fn+{...} partially applies a function to arguments.
 -- * fn-{...} partially applies a function to arguments from the end.
 -- * fn1..fn2 pipes input from fn2 to fn1.
-debug.setmetatable(functools.empty, {
+debug.setmetatable(functions.empty, {
     __index = index,
-    __add = functools.apply,
-    __sub = functools.endapply,
-    __concat = functools.pipe,
-    __unm = functools.negate,
+    __add = functions.apply,
+    __sub = functions.endapply,
+    __concat = functions.pipe,
+    __unm = functions.negate,
     __class = 'Function'
 })
 
@@ -226,7 +226,7 @@ end
 -- Returns a table with all elements from t that satisfy the condition fn, or don't satisfy condition fn, if reverse is set to true. Defaults to false.
 function table.filter(t, fn)
     if type(fn) ~= 'function' then
-        fn = functools.equals(fn)
+        fn = functions.equals(fn)
     end
 
     local res = {}
@@ -243,7 +243,7 @@ end
 -- Returns a table with all elements from t whose keys satisfy the condition fn, or don't satisfy condition fn, if reverse is set to true. Defaults to false.
 function table.filterkey(t, fn)
     if type(fn) ~= 'function' then
-        fn = functools.equals(fn)
+        fn = functions.equals(fn)
     end
 
     local res = {}

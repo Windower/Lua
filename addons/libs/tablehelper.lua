@@ -9,7 +9,7 @@ For lists, tables with sequential integral indices, use the lists library and th
 _libs = _libs or {}
 _libs.tablehelper = true
 _libs.mathhelper = _libs.mathhelper or require('mathhelper')
-_libs.functools = _libs.functools or require('functools')
+_libs.functions = _libs.functions or require('functions')
 
 _raw = _raw or {}
 _raw.table = _raw.table or {}
@@ -150,7 +150,7 @@ _meta.T.__add = table.extend
 -- Returns the number of element in the table that satisfy fn. If fn is not a function, counts the number of occurrences of fn.
 function table.count(t, fn)
     if type(fn) ~= 'function' then
-        fn = functools.equals(fn)
+        fn = functions.equals(fn)
     end
 
     count = 0
@@ -218,7 +218,7 @@ end
 -- Searches elements of a table for an element. If, instead of an element, a function is provided, will search for the first element to satisfy that function.
 function table.find(t, fn)
     if type(fn) ~= 'function' then
-        fn = functools.equals(fn)
+        fn = functions.equals(fn)
     end
 
     for key, val in pairs(t) do
@@ -437,7 +437,7 @@ end
 
 -- Finds a table entry based on an attribute.
 function table.with(t, attr, val)
-    val = type(val) ~= 'function' and functools.equals(val) or val
+    val = type(val) ~= 'function' and functions.equals(val) or val
     for key, el in pairs(t) do
         if type(el) == 'table' and val(rawget(el, attr)) then
             return el, key

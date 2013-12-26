@@ -8,7 +8,7 @@ _libs = _libs or {}
 _libs.ffxi = ffxi
 _libs.tablehelper = _libs.tablehelper or require('tablehelper')
 _libs.stringhelper = _libs.stringhelper or require('stringhelper')
-_libs.functools = _libs.functools or require('functools')
+_libs.functions = _libs.functions or require('functions')
 _libs.json = _libs.json or require('json')
 
 ffxi.data = _libs.json.read('../libs/ffxidata.json')

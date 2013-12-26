@@ -4,7 +4,7 @@ A library to handle ingame resources, as provided by the Radsources XMLs. It wil
 
 _libs = _libs or {}
 _libs.resources = true
-_libs.functools = _libs.functools or require('functools')
+_libs.functions = _libs.functions or require('functions')
 _libs.tablehelper = _libs.tablehelper or require('tablehelper')
 _libs.stringhelper = _libs.stringhelper or require('stringhelper')
 _libs.filehelper = _libs.filehelper or require('filehelper')
@@ -23,7 +23,7 @@ local resources = setmetatable({}, {__index = function(t, k)
 end})
 
 function resource_group(r, fn, attr)
-    fn = type(fn) == 'function' and fn or functools.equals(fn)
+    fn = type(fn) == 'function' and fn or functions.equals(fn)
 
     local res = {}
     for index, item in pairs(r) do

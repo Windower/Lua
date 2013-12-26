@@ -4,14 +4,14 @@ A few string helper functions.
 
 _libs = _libs or {}
 _libs.stringhelper = true
-_libs.functools = _libs.functools or require('functools')
+_libs.functions = _libs.functions or require('functions')
 
 _meta = _meta or {}
 
 debug.getmetatable('').__index = function(str, k)
     return string[k] or type(k) == 'number' and math.abs(k) <= #str and string.sub(str, k, k) or nil
 end
-debug.getmetatable('').__unm = functools.negate..functools.equals
+debug.getmetatable('').__unm = functions.negate..functions.equals
 
 -- Returns the character at position pos. Negative positions are counted from the opposite end.
 function string.at(str, pos)

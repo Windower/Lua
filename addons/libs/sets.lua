@@ -5,7 +5,7 @@ A library providing sets as a data structure.
 _libs = _libs or {}
 _libs.sets = true
 _libs.tablehelper = _libs.tablehelper or require('tablehelper')
-_libs.functools = _libs.functools or require('functools')
+_libs.functions = _libs.functions or require('functions')
 
 set = {}
 
@@ -141,7 +141,7 @@ end
 
 function set.find(s, fn)
     if type(fn) ~= 'function' then
-        fn = functools.equals(fn)
+        fn = functions.equals(fn)
     end
     
     for el in pairs(s) do

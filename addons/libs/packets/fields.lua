@@ -3,7 +3,7 @@
 ]]
 
 require('pack')
-require('functools')
+require('functions')
 require('stringhelper')
 require('mathhelper')
 require('lists')
