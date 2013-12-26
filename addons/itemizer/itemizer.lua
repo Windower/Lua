@@ -3,11 +3,7 @@ _addon.author = 'Ihina'
 _addon.version = '1.0.0.0'
 _addon.command = 'itemizer'
 
-require 'tablehelper'
-require 'chat'
 require 'logger'
-require 'actionhelper'
-config = require('config')
 res = require('resources')
 
 bagIndex = {}
@@ -54,10 +50,16 @@ windower.register_event('unhandled command', function(...)
 			end
 		end
 		
+		index = bagIndex[bag]
+		if index == nil then
+			log("Unknown bag")
+			return
+		end
+		
 		t = bagTable[search]()
 		for slot, item in pairs(t) do 
 			if id[item.id] then 
-				bagFunc[command](bagIndex[bag], slot)
+				bagFunc[command](index, slot)
 				return
 			end 
 		end
