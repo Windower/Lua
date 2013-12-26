@@ -286,7 +286,6 @@ function tokenize(content, line)
         tokens[line] = array:filter(-'')
     end
 
-    print(tokens)
     return tokens
 end
 
