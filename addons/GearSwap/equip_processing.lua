@@ -325,7 +325,7 @@ function to_id_set(inventory,equip_list)
 	end
 	
 	if _global.debug_mode and table.length(error_list) > 0 then
-		print_set(error_list,'Debug Mode (error list')
+		print_set(error_list,'Debug Mode (error list)')
 	end
 	if _global.debug_mode and table.length(equip_list) > 0 then
 		print_set(equip_list,'Debug Mode (gear not equipped)')
