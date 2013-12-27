@@ -215,6 +215,14 @@ function enable(...)
 end
 
 function print_set(set,title)
+	if not set then
+		if title then
+			windower.add_to_chat(1,'Print_set: '..title..' set is nil.')
+		else
+			windower.add_to_chat(1,'Print_set: Set is nil.')
+		end
+		return
+	end
 	if title then
 		windower.add_to_chat(1,'------------------------- '..tostring(title)..' -------------------------')
 	else
