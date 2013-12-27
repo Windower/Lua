@@ -60,7 +60,7 @@ local time = (function()
     local timezone = ('%+.2d:%.2d'):format(h, 60 * m)
     now, h, m = nil, nil, nil
     return function(ts)
-        return os.date('%Y-%m-%dT%H:%M:%S'..timezone, ts)
+        return os.date('%Y-%m-%dT%H:%M:%S'..timezone, os.time() - ts)
     end
 end)()
 
@@ -447,14 +447,22 @@ fields.outgoing[0x102] = L{
 -- Zone update
 fields.incoming[0x00A] = L{
     {ctype='unsigned int',      label='Player ID',          fn=id},             -- 04
-    {ctype='unsigned short',    label='Player index',       fn=index},          -- 08
+    {ctype='unsigned short',    label='Player Index',       fn=index},          -- 08
     {ctype='char[38]',          label='_unknown1'},                             -- 0A
-    {ctype='unsigned char',     label='Zone ID',            fn=zone},           -- 30
-    {ctype='char[19]',          label='_unknown3'},                             -- 31
+    {ctype='unsigned short',    label='Zone ID',            fn=zone},           -- 30
+    {ctype='char[10]',          label='_unknown3'},                             -- 32
+    {ctype='unsigned int',      label='Timestamp 1',        fn=time},           -- 3C
+    {ctype='unsigned short',    label='Zone ID MH',         fn=zone},           -- 40   Zone ID when zoning out of MH, otherwise 0
+    {ctype='unsigned short',    label='_dupe_Zone ID',      fn=zone},           -- 42
     {ctype='unsigned char',     label='Weather ID',         fn=weather},        -- 44
-    {ctype='char[63]',          label='_unknown4'},                             -- 45
-    {ctype='char[16]',          label='Player name'},                           -- 84
-    {ctype='char[113]',         label='_unknown5'},                             -- 94
+    {ctype='char[63]',          label='_unknown5'},                             -- 45
+    {ctype='char[16]',          label='Player Name'},                           -- 84
+    {ctype='char[12]',          label='_unknown6'},                             -- 94
+    {ctype='unsigned int',      label='Timestamp 2',        fn=time},           -- A0
+    {ctype='char[68]',          label='_unknown6'},                             -- A4
+    {ctype='unsigned int',      label='Player HP'},                             -- E8
+    {ctype='unsigned int',      label='Player MP'},                             -- EC
+    {ctype='char[20]',          label='_unknown7'},                             -- F0
 }
 
 -- Zone Response
