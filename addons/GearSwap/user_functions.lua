@@ -216,7 +216,11 @@ end
 
 function print_set(set,title)
 	if not set then
-		windower.add_to_chat(1,'Print_set: Set is nil.')
+		if title then
+			windower.add_to_chat(1,'Print_set: '..title..' set is nil.')
+		else
+			windower.add_to_chat(1,'Print_set: Set is nil.')
+		end
 		return
 	end
 	if title then
