@@ -133,32 +133,40 @@ end
 --Name: split()
 --Args:
 ---- msg (string): message to be subdivided
----- match (string/char): marker for subdivision
+---- delim (string/char): marker for subdivision
 -----------------------------------------------------------------------------------
 --Returns:
 ---- Table containing string(s)
 -----------------------------------------------------------------------------------
-function split(msg, match)
-	local length = msg:len()
-	local splitarr = T{}
-	local u = 1
-	local match_len = match:gsub('%%',''):len()
-	if match_len == 0 then match_len = 1 end
-	while u <= length do
-		local nextanch = msg:find(match,u)
-		if nextanch ~= nil then
-			splitarr[#splitarr+1] = msg:sub(u,nextanch-match_len)
-			if nextanch~=length then
-				u = nextanch+match_len
-			else
-				u = length+1
-			end
+function split(msg, delim)
+	local result = T{}
+
+	-- If no delimiter specified, just extract alphabetic words
+	if not delim or delim == '' then
+		for word in msg:gmatch("%a+") do
+			result[#result+1] = word
+		end
+	else
+		-- If the delimiter isn't in the message, just return the whole message
+		if string.find(msg, delim) == nil then
+			result[1] = msg
 		else
-			splitarr[#splitarr+1] = msg:sub(u,length)
-			u = length+1
+			-- Otherwise use a capture pattern based on the delimiter to
+			-- extract text chunks.
+			local pat = "(.-)" .. delim .. "()"
+			local lastPos
+			for part, pos in msg:gmatch(pat) do
+				result[#result+1] = part
+				lastPos = pos
+			end
+			-- Handle the last field
+			if #msg > lastPos then
+				result[#result+1] = msg:sub(lastPos)
+			end
 		end
 	end
-	return splitarr
+	
+	return result
 end
 
 -----------------------------------------------------------------------------------
