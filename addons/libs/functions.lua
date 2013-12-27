@@ -25,12 +25,16 @@ end
 -- Returns a partially applied function, depending on the number of arguments provided.
 function functions.apply(fn, args)
     return function(...)
-        local key = #args + 1
-        for _, arg in ipairs({...}) do
-            args[key] = arg
-            key = key + 1
+        local res = {}
+        for key, arg in ipairs(args) do
+            res[key] = arg
         end
-        return fn(unpack(args))
+        local key = #args
+        for _, arg in ipairs({...}) do
+            key = key + 1
+            res[key] = arg
+        end
+        return fn(unpack(res))
     end
 end
 
