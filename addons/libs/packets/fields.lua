@@ -203,6 +203,45 @@ fields.outgoing[0x01A] = L{
     {ctype='unsigned short',    label='_unknown1'},                             -- 0E
 }
 
+-- Drop Item
+fields.outgoing[0x028] = L{
+    {ctype='unsigned int',      label='_unknown1'},                             -- 04
+    {ctype='unsigned char',     label='Current Bag ID',     fn=bag},            -- 08
+    {ctype='unsigned char',     label='Inventory Index'},                       -- 09 -- For the item being dropped
+    {ctype='unsigned short',    label='_unknown2'},                             -- 10
+}
+
+-- Move Item
+fields.outgoing[0x029] = L{
+    {ctype='unsigned int',      label='_unknown1'},                             -- 04 -- 1 has been observed
+    {ctype='unsigned char',     label='Current Bag ID',     fn=bag},            -- 08
+    {ctype='unsigned char',     label='Target Bag ID',      fn=bag},            -- 09
+    {ctype='unsigned char',     label='Inventory Index'},                       -- 10 -- For the item being moved
+    {ctype='unsigned char',     label='_unknown2'},                             -- 11 -- Has taken the value 52. Unclear purpose.
+}
+
+-- Menu Item
+fields.outgoing[0x036] = L{
+    {ctype='unsigned int',      label='Target ID'},                             -- 04
+    {ctype='unsigned char[14]', label='_unknown1'},                             -- 08
+    {ctype='unsigned short',    label='Target Index'},                          -- 22
+    {ctype='unsigned char[24]', label='_unknown2'},                             -- 24 -- Sometimes takes values.
+    {ctype='unsigned char',     label='Inventory Index'},                       -- 48 -- For the item being used
+    {ctype='unsigned char[10]', label='_unknown2'},                             -- 49
+    {ctype='unsigned short',    label='Target Index'},                          -- 58
+}
+
+-- Use Item
+fields.outgoing[0x037] = L{
+    {ctype='unsigned int',      label='Player ID'},                             -- 04
+    {ctype='unsigned int',      label='_unknown1'},                             -- 08 -- 00 00 00 00 observed
+    {ctype='unsigned short',    label='Player Index'},                          -- 12
+    {ctype='unsigned char',     label='Inventory Index'},                       -- 14
+    {ctype='unsigned char',     label='_unknown2'},                             -- 15 -- Takes values
+    {ctype='unsigned char',     label='Bag ID'},                                -- 16
+    {ctype='unsigned char[3]',  label='_unknown3'},                             -- 17
+}
+
 -- Sort Item
 fields.outgoing[0x03A] = L{
     {ctype='unsigned char',     label='Storage ID'},                            -- 04
