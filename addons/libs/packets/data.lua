@@ -18,6 +18,7 @@ data.outgoing[0x029] = {name='Move Item',           description='Move item from 
 data.outgoing[0x032] = {name='Offer Trade',         description='This is sent when you offer to trade somebody.'}
 data.outgoing[0x033] = {name='Trade Tell',          description='This packet allows you to accept or cancel a trade request.'}
 data.outgoing[0x034] = {name='Trade Item',          description='Sends the item you want to trade to the server.'}
+data.outgoing[0x036] = {name='Menu Item',           description='Use an item from the item menu.'}
 data.outgoing[0x037] = {name='Use Item',            description='Use an item.'}
 data.outgoing[0x03A] = {name='Sort Item',           description='Packet sent when you choose to auto-sort your inventory.'}
 data.outgoing[0x04B] = {name='Servmes',             description='Requests the server message (/servmes).'}
