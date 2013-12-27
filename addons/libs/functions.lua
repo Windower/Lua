@@ -86,10 +86,10 @@ end
 
 local function index(fn, key)
     if type(key) == 'number' then
-        return fn.select(key)
+        return fn:select(key)
     elseif rawget(functions, key) then
         return function(...)
-            return functions[key](fn, ...)
+            return functions[key](...)
         end
     end
 
