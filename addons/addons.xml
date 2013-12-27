@@ -158,7 +158,7 @@
     <author>Ihina</author>
     <description>Use commands to move items and gear between bags</description>
     <bugtracker>https://github.com/Jayjs20/Lua/issues</bugtracker>
-    <support>http://www.ffxiah.com/player/Bismarck/Ihina/support>
+    <support>http://www.ffxiah.com/player/Bismarck/Ihina</support>
   </addon>
   <addon>
     <name>Linker</name>
