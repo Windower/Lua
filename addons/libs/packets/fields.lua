@@ -447,19 +447,36 @@ fields.incoming[0x00A] = L{
     {ctype='unsigned short',    label='Player Index',       fn=index},          -- 08
     {ctype='char[38]',          label='_unknown1'},                             -- 0A
     {ctype='unsigned short',    label='Zone ID',            fn=zone},           -- 30
-    {ctype='char[10]',          label='_unknown3'},                             -- 32
-    {ctype='unsigned int',      label='Timestamp 1',        fn=time},           -- 3C
+    {ctype='char[6]',           label='_unknown2'},                             -- 32
+    {ctype='unsigned int',      label='Timestamp 1',        fn=time},           -- 38
+    {ctype='unsigned int',      label='Timestamp 2',        fn=time},           -- 3C
     {ctype='unsigned short',    label='Zone ID MH',         fn=zone},           -- 40   Zone ID when zoning out of MH, otherwise 0
     {ctype='unsigned short',    label='_dupe_Zone ID',      fn=zone},           -- 42
-    {ctype='unsigned char',     label='Weather ID',         fn=weather},        -- 44
-    {ctype='char[63]',          label='_unknown5'},                             -- 45
+    {ctype='char[36]',          label='_unknown3'},                             -- 44
+    {ctype='unsigned short',    label='Weather ID',         fn=weather},        -- 68
+    {ctype='unsigned short',    label='_unknown4',          fn=weather},        -- 6A
+    {ctype='char[24]',          label='_unknown5'},                             -- 6C
     {ctype='char[16]',          label='Player Name'},                           -- 84
     {ctype='char[12]',          label='_unknown6'},                             -- 94
-    {ctype='unsigned int',      label='Timestamp 2',        fn=time},           -- A0
-    {ctype='char[68]',          label='_unknown6'},                             -- A4
-    {ctype='unsigned int',      label='Player HP'},                             -- E8
-    {ctype='unsigned int',      label='Player MP'},                             -- EC
-    {ctype='char[20]',          label='_unknown7'},                             -- F0
+    {ctype='unsigned int',      label='Abyssea Timestamp',  fn=time},           -- A0
+    {ctype='char[40]',          label='_unknown7'},                             -- A4
+    {ctype='signed short',      label='STR'},                                   -- CC
+    {ctype='signed short',      label='DEX'},                                   -- CE
+    {ctype='signed short',      label='VIT'},                                   -- D0
+    {ctype='signed short',      label='AGI'},                                   -- D2
+    {ctype='signed short',      label='IND'},                                   -- F4
+    {ctype='signed short',      label='MND'},                                   -- D6
+    {ctype='signed short',      label='CHR'},                                   -- D8
+    {ctype='signed short',      label='STR Bonus'},                             -- DA
+    {ctype='signed short',      label='DEX Bonus'},                             -- DC
+    {ctype='signed short',      label='VIT Bonus'},                             -- DE
+    {ctype='signed short',      label='AGI Bonus'},                             -- E0
+    {ctype='signed short',      label='INT Bonus'},                             -- E2
+    {ctype='signed short',      label='MND Bonus'},                             -- E4
+    {ctype='signed short',      label='CHR Bonus'},                             -- E6
+    {ctype='unsigned int',      label='Max HP'},                                -- E8
+    {ctype='unsigned int',      label='Max MP'},                                -- EC
+    {ctype='char[20]',          label='_unknown8'},                             -- F0
 }
 
 -- Zone Response
