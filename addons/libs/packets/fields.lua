@@ -294,45 +294,42 @@ fields.outgoing[0x061] = L{
 
 -- Party invite
 fields.outgoing[0x06E] = L{
-    {ctype='unsigned int',      label='Target ID',          fn=id},             -- 04  This is so weird. The client only knows IDs from searching for people or running into them. So if neither has happened, the manual invite will fail, as the ID cannot be retrieved.
-    {ctype='unsigned short',    label='Target index',       fn=index},          -- 08  00 if target not in zone
-    {ctype='unsigned char',     label='Alliance'},                              -- 0A  02 for alliance, 00 for party or if invalid alliance target (the client somehow knows..)
+    {ctype='unsigned int',      label='Target ID',          fn=id},             -- 04   This is so weird. The client only knows IDs from searching for people or running into them. So if neither has happened, the manual invite will fail, as the ID cannot be retrieved.
+    {ctype='unsigned short',    label='Target index',       fn=index},          -- 08   00 if target not in zone
+    {ctype='unsigned char',     label='Alliance'},                              -- 0A   02 for alliance, 00 for party or if invalid alliance target (the client somehow knows..)
     {ctype='unsigned char',     label='_const1',            const=0x041},       -- 0B
 }
 
 -- Party leaving
 fields.outgoing[0x06F] = L{
-    {ctype='unsigned char',     label='_const1',            const=0x00},        -- 04
-    {ctype='unsigned char[3]',  label='_junk1'},                                -- 05
+    {ctype='unsigned char',     label='_const1',            const=0x00},        -- 04   02 for alliance, 00 for party
 }
 
 -- Party breakup
 fields.outgoing[0x070] = L{
-    {ctype='unsigned char',     label='Alliance'},                              -- 04  02 for alliance, 00 for party
-    {ctype='unsigned char[3]',  label='_junk1'},                                -- 05
+    {ctype='unsigned char',     label='Alliance'},                              -- 04   02 for alliance, 00 for party
 }
 
 -- Party invite response
 fields.outgoing[0x074] = L{
-    {ctype='unsigned char',     label='Join',               fn=bool},           -- 04
-    {ctype='unsigned char[3]',  label='_junk1'},                                -- 05
+    {ctype='bool',              label='Join',               fn=bool},           -- 04
 }
 
 -- Party change leader
 fields.outgoing[0x077] = L{
-    {ctype='char[16]',          label='Target name'},                           -- 04  Name of the person to give leader to
-    {ctype='unsigned short',    label='Alliance'},                              -- 14  02 01 for alliance, 00 00 for party
+    {ctype='char[16]',          label='Target Name'},                           -- 04   Name of the person to give leader to
+    {ctype='unsigned short',    label='Alliance'},                              -- 14   02 01 for alliance, 00 00 for party
     {ctype='unsigned short',    label='_unknown1'},                             -- 16
 }
 
 -- Synth
 fields.outgoing[0x096] = L{
-    {ctype='unsigned char',     label='_unknown1'},                             -- 04 -- Crystal ID? Earth = 0x02, Wind-break = 0x19?, Wind no-break = 0x2D?
+    {ctype='unsigned char',     label='_unknown1'},                             -- 04   Crystal ID? Earth = 0x02, Wind-break = 0x19?, Wind no-break = 0x2D?
     {ctype='unsigned char',     label='_unknown2'},                             -- 05
-    {ctype='unsigned short',    label='Crystal Item ID'},                       -- 06 -- Item ID
-    {ctype='unsigned char',     label='Crystal Inventory slot'},                -- 08 -- Inventory slot ID
+    {ctype='unsigned short',    label='Crystal Item ID'},                       -- 06
+    {ctype='unsigned char',     label='Crystal Inventory Index'},               -- 08
     {ctype='unsigned char',     label='Number of Ingredients'},                 -- 09
-    {ctype='unsigned short',    label='Ingredient 1 ID'},                       -- 0A -- Item ID
+    {ctype='unsigned short',    label='Ingredient 1 ID'},                       -- 0A
     {ctype='unsigned short',    label='Ingredient 2 ID'},                       -- 0C
     {ctype='unsigned short',    label='Ingredient 3 ID'},                       -- 0E
     {ctype='unsigned short',    label='Ingredient 4 ID'},                       -- 10
@@ -340,14 +337,14 @@ fields.outgoing[0x096] = L{
     {ctype='unsigned short',    label='Ingredient 6 ID'},                       -- 14
     {ctype='unsigned short',    label='Ingredient 7 ID'},                       -- 16
     {ctype='unsigned short',    label='Ingredient 8 ID'},                       -- 18
-    {ctype='unsigned char',     label='Ingredient 1 slot'},                     -- 1A -- Inventory slot ID
-    {ctype='unsigned char',     label='Ingredient 2 slot'},                     -- 1B
-    {ctype='unsigned char',     label='Ingredient 3 slot'},                     -- 1C
-    {ctype='unsigned char',     label='Ingredient 4 slot'},                     -- 1D
-    {ctype='unsigned char',     label='Ingredient 5 slot'},                     -- 1E
-    {ctype='unsigned char',     label='Ingredient 6 slot'},                     -- 1F
-    {ctype='unsigned char',     label='Ingredient 7 slot'},                     -- 20
-    {ctype='unsigned char',     label='Ingredient 8 slot'},                     -- 21
+    {ctype='unsigned char',     label='Ingredient 1 Index'},                    -- 1A
+    {ctype='unsigned char',     label='Ingredient 2 Index'},                    -- 1B
+    {ctype='unsigned char',     label='Ingredient 3 Index'},                    -- 1C
+    {ctype='unsigned char',     label='Ingredient 4 Index'},                    -- 1D
+    {ctype='unsigned char',     label='Ingredient 5 Index'},                    -- 1E
+    {ctype='unsigned char',     label='Ingredient 6 Index'},                    -- 1F
+    {ctype='unsigned char',     label='Ingredient 7 Index'},                    -- 20
+    {ctype='unsigned char',     label='Ingredient 8 Index'},                    -- 21
     {ctype='unsigned short',    label='_unknown3'},                             -- 22
 }
 
@@ -360,9 +357,9 @@ fields.outgoing[0x0B5] = L{
 
 -- Tell
 fields.outgoing[0x0B6] = L{
-    {ctype='unsigned char',     label='GM?'},                                   -- 04   00 for a normal tell -- Varying this does nothing.
-    {ctype='char[15]',          label='Target name'},                           -- 05   Name of the person to send a tell to
-    {ctype='char[255]',         label='Message'},                               -- 14   Message, occasionally terminated by spare 00 bytes.
+    {ctype='unsigned char',     label='_unknown1',          const=0x00},        -- 04   00 for a normal tell -- Varying this does nothing.
+    {ctype='char[15]',          label='Target Name'},                           -- 05   Name of the person to send a tell to
+    {ctype='char*',             label='Message'},                               -- 14   Message, occasionally terminated by spare 00 bytes.
 }
 
 -- Set LS Message
