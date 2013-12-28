@@ -79,9 +79,23 @@ function functions.select(fn, i)
     end
 end
 
+--[[
+    Various built-in wrappers
+]]
+
 -- tostring wrapper
 function functions.string(fn)
     return tostring(fn)
+end
+
+-- type wrapper
+function functions.type(fn)
+    return type(fn)
+end
+
+-- class wrapper
+function functions.class(fn)
+    return class(fn)
 end
 
 local function index(fn, key)
