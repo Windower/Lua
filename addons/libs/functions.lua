@@ -79,6 +79,16 @@ function functions.select(fn, i)
     end
 end
 
+-- Returns an iterator of the results of the function.
+function functions.it(fn, ...)
+    local res = {fn(...)}
+    local key = 0
+    return function()
+        key = key + 1
+        return res[key]
+    end
+end
+
 --[[
     Various built-in wrappers
 ]]
