@@ -189,11 +189,6 @@ end
     Table functions
 ]]
 
--- Accesses a table key. Invoked metamethods.
-function table.index(t, key)
-    return t[key]
-end
-
 -- Returns an attribute of a table.
 function table.get(t, att)
     return t[att]
@@ -214,6 +209,11 @@ end
 function table.rawset(t, att, val)
     rawset(t, att, val)
     return t
+end
+
+-- Looks up the value of a table element in another table
+function table.lookup(t, ref, key)
+    return ref[t[key]]
 end
 
 -- Applies function fn to all elements of the table and returns the resulting table.
