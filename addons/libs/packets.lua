@@ -228,8 +228,8 @@ function packets.build(packet)
 
     -- 'I' for the 4 byte header
     -- It's zeroed, as it will be filled out when injected
-    local pack_string = 'I'..fields:map(table.index+{pack_ids}..table.get-{'ctype'}):concat()
-    return pack_string:pack(0, fields:map(table.get+{packet}..table.get-{'label'}):unpack())
+    local pack_string = 'I'..fields:map(table.lookup-{pack_ids, 'ctype'}):concat()
+    return pack_string:pack(0, fields:map(table.lookup-{packet, 'label'}):unpack())
 end
 
 -- Injects a packet built with packets.new
