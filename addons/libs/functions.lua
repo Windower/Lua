@@ -23,7 +23,8 @@ function functions.identity(...)
 end
 
 -- Returns a partially applied function, depending on the number of arguments provided.
-function functions.apply(fn, args)
+function functions.apply(fn, ...)
+    local args = {...}
     return function(...)
         local res = {}
         for key, arg in ipairs(args) do
@@ -39,7 +40,8 @@ function functions.apply(fn, args)
 end
 
 -- Returns a partially applied function, with the argument provided at the end.
-function functions.endapply(fn, args)
+function functions.endapply(fn, ...)
+    local args = {...}
     return function(...)
         local res = {...}
         local key = #res
@@ -120,14 +122,22 @@ local function index(fn, key)
     return nil
 end
 
+local function add(fn, args)
+    return fn:apply(unpack(args))
+end
+
+local function sub(fn, args)
+    return fn:endapply(unpack(args))
+end
+
 -- Assigns a metatable on functions to introduce certain function operators.
 -- * fn+{...} partially applies a function to arguments.
 -- * fn-{...} partially applies a function to arguments from the end.
 -- * fn1..fn2 pipes input from fn2 to fn1.
 debug.setmetatable(functions.empty, {
     __index = index,
-    __add = functions.apply,
-    __sub = functions.endapply,
+    __add = add,
+    __sub = sub,
     __concat = functions.pipe,
     __unm = functions.negate,
     __class = 'Function'
