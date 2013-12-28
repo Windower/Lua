@@ -12,14 +12,18 @@ _libs.functions = true
 functions = {}
 
 -- The empty function.
-function functions.empty()
-end
+function functions.empty() end
 
 debug.setmetatable(functions.empty, functions)
 
 -- The identity function.
-function functions.identity(...)
-    return ...
+function functions.identity(fn)
+    return fn
+end
+
+-- An evaluation function.
+function functions.eval(fn, ...)
+    return fn(...)
 end
 
 -- Returns a partially applied function, depending on the number of arguments provided.
