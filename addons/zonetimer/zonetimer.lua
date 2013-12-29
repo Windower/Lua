@@ -45,8 +45,6 @@ windower.register_event('prerender', function()
 	end
 end)
 
---[[for key,value in pairs(res.items) do log(key,value) end]]
-
 windower.register_event('addon command', function(...)
 	local param = L{...}
 	local command = param[1]
