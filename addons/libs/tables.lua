@@ -546,7 +546,7 @@ end
 
 -- Returns the first table, reassigned to the second one.
 function table.reassign(t, tn)
-    return t:clear():update(tn)
+    return table.update(table.clear(t), tn)
 end
 
 -- Returns an array containing values from start to finish. If no finish is specified, returns table.range(1, start)
