@@ -30,12 +30,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 require('logger')
 
-
 _addon.name     = 'chars'
 _addon.version  = '1.20131102'
 _addon.command  = 'chars'
 
-local chars = require('chat').chars
+chars = require('chat.chars')
 
 windower.register_event('addon command', function(...)
     for code, char in pairs(chars) do
