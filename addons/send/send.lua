@@ -3,7 +3,7 @@
 _addon.version = '1.0'
 _addon.name = 'Send'
 _addon.command = 'send'
-_addon.author = 'Arcon'
+_addon.author = 'Byrth'
 
 windower.register_event('addon command',function (...)
     local term = table.concat({...}, ' ')
