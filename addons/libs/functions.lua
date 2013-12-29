@@ -28,8 +28,8 @@ function functions.const(val)
     end
 end
 
--- An evaluation function.
-function functions.eval(fn, ...)
+-- A function calling function.
+function functions.call(fn, ...)
     return fn(...)
 end
 
