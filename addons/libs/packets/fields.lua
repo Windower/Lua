@@ -459,7 +459,28 @@ fields.incoming[0x00A] = L{
     {ctype='char[16]',          label='Player Name'},                           -- 84
     {ctype='char[12]',          label='_unknown6'},                             -- 94
     {ctype='unsigned int',      label='Abyssea Timestamp',  fn=time},           -- A0
-    {ctype='char[40]',          label='_unknown7'},                             -- A4
+    {ctype='char[16]',          label='_unknown7'},                             -- A4   0xAC is 2 for some zones, 0 for others
+    {ctype='unsigned char',     label='Main Job',           fn=job},            -- B4
+    {ctype='unsigned char',     label='_unknown7'},                             -- B5
+    {ctype='unsigned char',     label='_unknown8'},                             -- B6
+    {ctype='unsigned char',     label='Sub Job',            fn=job},            -- B7
+    {ctype='unsigned int',      label='_unknown9'},                             -- B8
+    {ctype='unsigned char',     label='(None) Level'},                          -- BC
+    {ctype='unsigned char',     label='WAR Level'},                             -- BD
+    {ctype='unsigned char',     label='MNK Level'},                             -- BE
+    {ctype='unsigned char',     label='WHM Level'},                             -- BF
+    {ctype='unsigned char',     label='BLM Level'},                             -- C0
+    {ctype='unsigned char',     label='RDM Level'},                             -- C1
+    {ctype='unsigned char',     label='THF Level'},                             -- C2
+    {ctype='unsigned char',     label='PLD Level'},                             -- C3
+    {ctype='unsigned char',     label='DRK Level'},                             -- C4
+    {ctype='unsigned char',     label='BST Level'},                             -- C5
+    {ctype='unsigned char',     label='BRD Level'},                             -- C6
+    {ctype='unsigned char',     label='RNG Level'},                             -- C7
+    {ctype='unsigned char',     label='SAM Level'},                             -- C8
+    {ctype='unsigned char',     label='NIN Level'},                             -- C9
+    {ctype='unsigned char',     label='DRG Level'},                             -- CA
+    {ctype='unsigned char',     label='SMN Level'},                             -- CB
     {ctype='signed short',      label='STR'},                                   -- CC
     {ctype='signed short',      label='DEX'},                                   -- CE
     {ctype='signed short',      label='VIT'},                                   -- D0
@@ -476,7 +497,7 @@ fields.incoming[0x00A] = L{
     {ctype='signed short',      label='CHR Bonus'},                             -- E6
     {ctype='unsigned int',      label='Max HP'},                                -- E8
     {ctype='unsigned int',      label='Max MP'},                                -- EC
-    {ctype='char[20]',          label='_unknown8'},                             -- F0
+    {ctype='char[20]',          label='_unknown10'},                            -- F0
 }
 
 -- Zone Response
