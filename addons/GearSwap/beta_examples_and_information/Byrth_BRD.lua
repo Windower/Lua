@@ -94,17 +94,18 @@ function get_sets()
 end
 
 function precast(spell,action)
+--	if midaction() then return end
 	if spell.type == 'BardSong' then
 		if string.find(world.area:lower(),'cirdas caverns') then
 			cast_delay(0.5)
 		else
 			verify_equip()
 		end
-		if spell.target.type == 'PLAYER' and not buffactive.pianissimo then
+		if spell.target.type == 'PLAYER' and not buffactive.pianissimo and spell.casttime == 8 then
 			cast_delay(1.5)
 			send_command('@input /raw /ja "Pianissimo" <me>')
 		end
-		if buffactive['nightingale'] then
+		if buffactive.nightingale then
 			equip_song_gear(spell)
 		else
 			equip_song_gear(spell)
@@ -112,8 +113,8 @@ function precast(spell,action)
 		end
 	elseif action.type == 'Magic' then
 		equip(sets.precast.FC.Normal)
-		if tonumber(spell.casttime) >= 4 then verify_equip() end
-		if string.find(spell.english,'Cur') then
+		if spell.casttime >= 4 then verify_equip() end
+		if string.find(spell.english,'Cur') and spell.name ~= 'Cursna' then
 			equip(sets.precast.Cure)
 		end
 	elseif spell.type == 'WeaponSkill' then
@@ -127,6 +128,7 @@ function precast(spell,action)
 end
 
 function midcast(spell,action)
+--	windower.send_command('wait 1;gs c midact')
 	if spell.type == 'BardSong' then
 		equip_song_gear(spell)
 	elseif string.find(spell.english,'Cur') then
@@ -137,7 +139,8 @@ function midcast(spell,action)
 end
 
 function aftercast(spell,action)
-	if spell.type == 'BardSong' and spell.target.type:upper() == 'SELF' then
+	if spell.interrupted then windower.add_to_chat(8,'OMG, INTERRUPTED!!!') end
+	if spell.type == 'BardSong' and spell.target and spell.target.type:upper() == 'SELF' then
 		local t = os.time()
 		
 		-- Eliminate songs that have already expired
@@ -209,6 +212,8 @@ end
 function self_command(cmd)
 	if cmd == 'unlock' then
 		enable('main','sub')
+	elseif cmd == 'midact' then
+		midaction(false)
 	end
 end
 
@@ -237,7 +242,7 @@ function calculate_duration(name)
 	if player.equipment.feet == "Brioso Slippers" then mult = mult + 0.1 end
 	if player.equipment.body == "Aoidos' Hngrln. +2" then mult = mult + 0.1 end
 	if player.equipment.legs == "Mdk. Shalwar +1" then mult = mult + 0.1 end
-	if player.equipment.main == "Carnwenhan" then mult = mult + 0.1 end
+	if player.equipment.main == "Carnwenhan" then mult = mult + 0.2 end
 	
 	if string.find(name,'March') and player.equipment.hands == 'Ad. Mnchtte. +2' then mult = mult + 0.1 end
 	if string.find(name,'Minuet') and player.equipment.body == "Aoidos' Hngrln. +2" then mult = mult + 0.1 end
@@ -250,7 +255,7 @@ function calculate_duration(name)
 	end
 	if string.find(name,'Scherzo') and buffactive['Soul Voice'] then
 		mult = mult*2
-	elseif string.find(name,'Scherzo') and buffactive['Marcato'] then
+	elseif string.find(name,'Scherzo') and buffactive.marcato then
 		mult = mult*1.5
 	end
 	

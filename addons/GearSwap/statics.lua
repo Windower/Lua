@@ -42,20 +42,27 @@ r_mabils = parse_resources(r_mabilsFile:readlines())
 
 
 -- Convert the spells and job abilities into a referenceable list of aliases --
+	
+unify_prefix = {['/ma'] = '/ma', ['/magic']='/ma',['/jobability'] = '/ja',['/ja']='/ja',['/item']='/item',['/song']='/ma',
+	['/so']='/ma',['/ninjutsu']='/ma',['/pet']='/pet',['/weaponskill']='/ws',['/ws']='/ws',['/ra']='/ra',['/rangedattack']='/ra',
+	['/nin']='/ma',['/throw']='/ra',['/range']='/ra',['/shoot']='/ra',['/monsterskill']='/ms',['/ms']='/ms',['/unknown']='/trig',
+	['/trigger']='/trig',['/echo']='/echo'}
+	
 validabils = {}
-validabils['english'] = {}
-validabils['french'] = {}
-validabils['german'] = {}
-validabils['japanese'] = {}
+validabils['english'] = {['/ma'] = {}, ['/ja'] = {}, ['/ws'] = {}, ['/item'] = {}, ['/ra'] = {}, ['/ms'] = {}, ['/pet'] = {}, ['/trig'] = {}, ['/echo'] = {}}
+validabils['french'] = {['/ma'] = {}, ['/ja'] = {}, ['/ws'] = {}, ['/item'] = {}, ['/ra'] = {}, ['/ms'] = {}, ['/pet'] = {}, ['/trig'] = {}, ['/echo'] = {}}
+validabils['german'] = {['/ma'] = {}, ['/ja'] = {}, ['/ws'] = {}, ['/item'] = {}, ['/ra'] = {}, ['/ms'] = {}, ['/pet'] = {}, ['/trig'] = {}, ['/echo'] = {}}
+validabils['japanese'] = {['/ma'] = {}, ['/ja'] = {}, ['/ws'] = {}, ['/item'] = {}, ['/ra'] = {}, ['/ms'] = {}, ['/pet'] = {}, ['/trig'] = {}, ['/echo'] = {}}
 
 function make_abil(abil,lang,t,i)
-	if not abil[lang] then return end
+	if not abil[lang] or not abil.prefix then return end
 	local sp = abil[lang]:lower()
-	
-	if not validabils[lang][sp] then
-		validabils[lang][sp] = {}
+	if not unify_prefix[abil.prefix:lower()] then
+		print(abil.prefix:lower())
 	end
-	validabils[lang][sp][t] = i
+	local pref = unify_prefix[abil.prefix:lower()]
+	
+	validabils[lang][pref][sp] = i
 end
 
 function make_entry(v,typ,i)
@@ -67,18 +74,20 @@ function make_entry(v,typ,i)
 	if tonumber(v.targets) then -- TEMPORARY FIX UNTIL THE RESOURCES ARE CORRECTED
 		potential_targets = {}
 	else
-		potential_targets = split(v.targets,', ')
+		potential_targets = v.targets:split(', ')
 	end
 	
-	for n,m in pairs(potential_targets) do
+	for n,m in ipairs(potential_targets) do
 		v.validtarget[m] = true
 	end
 	if not v.tpcost or v.tpcost == -1 then v.tpcost = 0 end
 	if not v.mpcost or v.mpcost == -1 then v.mpcost = 0 end
 	if not v.prefix then
+		if debugging >= 1 then
+			windower.add_to_chat(8,'GearSwap (Debug Mode): '..i..' of type '..typ..' lacks a prefix')
+		end
 		if typ == 'Magic' then v.prefix = '/ma'
 		elseif typ == 'Ability' then v.prefix = '/ja'
-		elseif typ == 'Item' then v.prefix = '/item'
 		end
 	end
 	if not v.element then v.element = 'None' end
@@ -96,11 +105,11 @@ function make_entry(v,typ,i)
 end
 
 for i,v in pairs(r_spells) do
-	v = make_entry(v,'Magic',i)
+	r_spells[i] = make_entry(v,'Magic',i)
 end
 
 for i,v in pairs(r_abilities) do
-	v = make_entry(v,'Ability',i)
+	r_abilities[i] = make_entry(v,'Ability',i)
 end
 
 -- Item processing --
@@ -110,19 +119,11 @@ r_items:update(parse_resources(r_itemsAFile:readlines()))
 r_items:update(parse_resources(r_itemsWFile:readlines()))
 
 for i,v in pairs(r_items) do
-	if type(v) == 'table' then
-		if v.targets ~= 'None' then
-			v = make_entry(v,'Item',i)
-		end
+	if type(v) == 'table' and v.targets ~= 'None' then
+		v.prefix = '/item'
+		r_items[i] = make_entry(v,'Item',i)
 	end
 end
-
-slot_map = T{main=0,sub=1,range=2,ranged=2,ammo=3,head=4,body=5,hands=6,legs=7,feet=8, neck=9, waist=10,
-	ear1=11, ear2=12, left_ear=11, right_ear=12, learring=11, rearring=12, lear=11, rear=12,
-	left_ring=13, right_ring=14, lring=13, rring=14, ring1=13, ring2=14, back=15}
-
-short_slot_map = T{main=0,sub=1,range=2,ammo=3,head=4,body=5,hands=6,legs=7,feet=8, neck=9, waist=10,
-	left_ear=11, right_ear=12, left_ring=13, right_ring=14, back=15}
 	
 default_slot_map = T{'sub','range','ammo','head','body','hands','legs','feet','neck','waist',
 	'left_ear', 'right_ear', 'left_ring', 'right_ring','back'}
@@ -163,8 +164,8 @@ unable_to_use = T{17,18,55,56,87,88,89,90,104,191,308,313,325,410,428,561,574,57
 	199,215,216,217,218,219,220,233,246,247,307,315,316,328,337,338,346,347,348,349,356,411,443,444,
 	445,446,514,516,517,518,523,524,525,547,568,569,575,649,660,662,666,700,701} -- Probably don't need some of these (event action)
 pass_through_targs = T{'<t>','<me>','<ft>','<scan>','<bt>','<lastst>','<r>','<pet>','<p0>','<p1>','<p2>','<p3>','<p4>',
-	'<p5>','<a10>','<a11>','<a12>','<a13>','<a14>','<a15>','<a20>','<a21>','<a22>','<a23>','<a24>','<a25>'}
-st_targs = T{'<stnpc>','<stal>','<stpc>','<stpt>'}
+	'<p5>','<a10>','<a11>','<a12>','<a13>','<a14>','<a15>','<a20>','<a21>','<a22>','<a23>','<a24>','<a25>','<stnpc>',
+	'<stal>','<stpc>','<stpt>'}
 avatar_element = {Ifrit='Fire',Titan='Earth',Leviathan='Water',Garuda='Wind',Shiva='Ice',Ramuh='Thunder',Carbuncle='Light',
 	Diabolos='Dark',Fenrir='Dark',['Fire Elemental']='Fire',['Earth Elemental']='Earth',['Water Elemental']='Water',
 	['Wind Elemental']='Wind',['Ice Elemental']='Ice',['Lightning Elemental']='Thunder',['Light Elemental']='Light',
@@ -192,6 +193,54 @@ eq_data_table = {
 		return rawget(tab, slot_map[user_key_filter(key)])
 	end
 	}
+	
+slot_map = make_user_table()
+short_slot_map = make_user_table()
+
+slot_map.main = 0
+slot_map.sub = 1
+slot_map.range = 2
+slot_map.ranged = 2
+slot_map.ammo = 3
+slot_map.head = 4
+slot_map.body = 5
+slot_map.hands = 6
+slot_map.legs = 7
+slot_map.feet = 8
+slot_map.neck = 9
+slot_map.waist = 10
+slot_map.ear1 = 11
+slot_map.ear2 = 12
+slot_map.left_ear = 11
+slot_map.right_ear = 12
+slot_map.learring = 11
+slot_map.rearring = 12
+slot_map.lear = 11
+slot_map.rear = 12
+slot_map.left_ring = 13
+slot_map.right_ring = 14
+slot_map.lring = 13
+slot_map.rring = 14
+slot_map.ring1 = 13
+slot_map.ring2 = 14
+slot_map.back = 15
+
+short_slot_map.main = 0
+short_slot_map.sub = 1
+short_slot_map.range = 2
+short_slot_map.ammo = 3
+short_slot_map.head = 4
+short_slot_map.body = 5
+short_slot_map.hands = 6
+short_slot_map.legs = 7
+short_slot_map.feet = 8
+short_slot_map.neck = 9
+short_slot_map.waist = 10
+short_slot_map.left_ear = 11
+short_slot_map.right_ear = 12
+short_slot_map.left_ring = 13
+short_slot_map.right_ring = 14
+short_slot_map.back = 15
 
 _global = make_user_table()
 _global.cast_delay = 0
@@ -203,13 +252,13 @@ _global.show_swaps = false
 _global.midaction = false
 _global.current_event = 'None'
 
-gearswap_disabled = false
+gearSwap_disabled = false
 sent_out_equip = T{}
 not_sent_out_equip = T{}
+out_arr = {}
 equip_list = {}
 equip_order = {}
 action_sent = false
-force_flag = false
 world = make_user_table()
 buffactive = make_user_table()
 player = make_user_table()

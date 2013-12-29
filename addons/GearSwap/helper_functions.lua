@@ -130,46 +130,6 @@ function Dec2Hex(nValue)
 end
 
 -----------------------------------------------------------------------------------
---Name: split()
---Args:
----- msg (string): message to be subdivided
----- delim (string/char): marker for subdivision
------------------------------------------------------------------------------------
---Returns:
----- Table containing string(s)
------------------------------------------------------------------------------------
-function split(msg, delim)
-	local result = T{}
-
-	-- If no delimiter specified, just extract alphabetic words
-	if not delim or delim == '' then
-		for word in msg:gmatch("%a+") do
-			result[#result+1] = word
-		end
-	else
-		-- If the delimiter isn't in the message, just return the whole message
-		if string.find(msg, delim) == nil then
-			result[1] = msg
-		else
-			-- Otherwise use a capture pattern based on the delimiter to
-			-- extract text chunks.
-			local pat = "(.-)" .. delim .. "()"
-			local lastPos
-			for part, pos in msg:gmatch(pat) do
-				result[#result+1] = part
-				lastPos = pos
-			end
-			-- Handle the last field
-			if #msg > lastPos then
-				result[#result+1] = msg:sub(lastPos)
-			end
-		end
-	end
-	
-	return result
-end
-
------------------------------------------------------------------------------------
 --Name: fieldsearch()
 --Args:
 ---- message (string): Message to be searched
@@ -212,15 +172,15 @@ end
 ---- The "targ" table is blanked, and then the values from "new" are assigned to it
 ---- In the event that new is not passed, targ is not filled with anything.
 -----------------------------------------------------------------------------------
-function table.reassign(targ,new,weak)
+function table.reassign(targ,new,strength)
 	if new == nil then new = {} end
-	if weak then
+	if strength == true then
 		for i,v in pairs(new) do
 			if targ[i] == nil then targ[i] = v end
 		end
 	else
 		for i,v in pairs(targ) do
-			targ[i] = nil
+			if not new[i] then targ[i] = nil end
 		end
 		for i,v in pairs(new) do
 			targ[i] = v

@@ -24,6 +24,17 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+_addon.name = 'GearSwap'
+_addon.version = '0.800'
+_addon.author = 'Byrth'
+_addon.commands = {'gs','gearswap'}
+
+if windower.file_exists(windower.addon_path..'data/bootstrap.lua') then
+	debugging = 1
+else
+	debugging = 0
+end
+
 language = 'english'
 file = require 'files'
 require 'strings'
@@ -40,18 +51,6 @@ require 'export'
 require 'validate'
 require 'sets'
 res = require 'resources'
-
-
-_addon.name = 'GearSwap'
-_addon.version = '0.723'
-_addon.author = 'Byrth'
-_addon.commands = {'gs','gearswap'}
-
-if windower.file_exists(windower.addon_path..'data/bootstrap.lua') then
-	debugging = 1
-else
-	debugging = 0
-end
 
 windower.register_event('load',function()
 	if debugging >= 1 then windower.debug('load') end
@@ -85,15 +84,15 @@ windower.register_event('addon command',function (...)
 	if debugging >= 1 then windower.debug('addon command') end
 	local command = table.concat({...},' ')
 	if logging then	logit(logfile,'\n\n'..tostring(os.clock)..command) end
-	local splitup = split(command,' ')
+	local splitup = command:split(' ')
 	if splitup[1]:lower() == 'c' then
-		if gearswap_disabled then return end
+		if gearSwap_disabled then return end
 		if splitup[2] then equip_sets('self_command',_raw.table.concat(splitup,' ',2,#splitup))
 		else
 			windower.add_to_chat(123,'GearSwap: No self command passed.')
 		end
 	elseif splitup[1]:lower() == 'equip' then
-		if gearswap_disabled then return end
+		if gearSwap_disabled then return end
 		local set_split = split(_raw.table.concat(splitup,' ',2,#splitup):gsub('%[','%.'):gsub('[%]\']',''),'%.')
 		local n = 1
 		local tempset
@@ -121,24 +120,36 @@ windower.register_event('addon command',function (...)
 	elseif splitup[1]:lower() == 'enable' then
 		if splitup[2] and splitup[2]:lower()=='all' then
 			enable('main','sub','range','ammo','head','neck','lear','rear','body','hands','lring','rring','back','waist','legs','feet')
-			print('Gearswap: All slots enabled.')
-		elseif splitup[2] and slot_map[splitup[2]:gsub('[^%a]',''):lower()] then
-			enable(splitup[2])
-			print('Gearswap: '..splitup[2]..' slot enabled.')
-		elseif gearswap_disabled then
-			gearswap_disabled = false
+			print('GearSwap: All slots enabled.')
+		elseif splitup[2] then
+			for i=2,splitup.n do
+				if slot_map[splitup[i]:gsub('[^%a]',''):lower()] then
+					enable(splitup[i])
+					print('GearSwap: '..splitup[i]..' slot enabled.')
+				else
+					print('GearSwap: Unable to find slot '..tostring(splitup[i])..'.')
+				end
+			end
+		elseif gearSwap_disabled then
+			gearSwap_disabled = false
 			print('GearSwap: User file enabled')
 		end
 	elseif splitup[1]:lower() == 'disable' then
 		if splitup[2] and splitup[2]:lower()=='all' then
 			disable('main','sub','range','ammo','head','neck','lear','rear','body','hands','lring','rring','back','waist','legs','feet')
-			print('Gearswap: All slots disabled.')
-		elseif splitup[2] and slot_map[splitup[2]:gsub('[^%a]',''):lower()] then
-			disable(splitup[2])
-			print('Gearswap: '..splitup[2]..' slot disabled.')
-		elseif not gearswap_disabled and not splitup[2] then
+			print('GearSwap: All slots disabled.')
+		elseif splitup[2]  then
+			for i=2,splitup.n do
+				if slot_map[splitup[i]:gsub('[^%a]',''):lower()] then
+					disable(splitup[i])
+					print('GearSwap: '..splitup[i]..' slot disabled.')
+				else
+					print('GearSwap: Unable to find slot '..tostring(splitup[i])..'.')
+				end
+			end
+		elseif not gearSwap_disabled and not splitup[2] then
 			print('GearSwap: User file disabled')
-			gearswap_disabled = true
+			gearSwap_disabled = true
 		end
 	elseif splitup[1]:lower() == 'reload' then
 		refresh_user_env()
@@ -155,40 +166,39 @@ end)
 
 function sender()
 	if not action_sent then
-		print('Forcing Send')
-		if debugging >= 1 then windower.add_to_chat(123,'GearSwap: Had to force the command to send.') end
-		send_check(true)
+		if debugging >= 1 or _global.debug_mode then windower.add_to_chat(8,'GearSwap (Debug Mode): Had to force the command to send. Exit conditions went unmet.') end
+		if sent_out_equip.ind then 
+			packet_send_check(true,sent_out_equip.ind)
+		end
+		sent_out_equip = {}
 	end
-	force_flag = false
 	action_sent = false
 end
 
 windower.register_event('outgoing text',function(original,modified)
 	if debugging >= 1 then windower.debug('outgoing text') end
-	if gearswap_disabled then return modified end
+	if gearSwap_disabled then return modified end
 	
 	local temp_mod = windower.convert_auto_trans(modified)
-	local splitline = split(temp_mod,' ')
+	local splitline = temp_mod:split(' ')
 	local command = splitline[1]
 
 	local a,b,abil = string.find(temp_mod,'"(.-)"')
 	if abil then
 		abil = abil:lower()
-	elseif #splitline == 3 then
+	elseif splitline.n == 3 then
 		abil = splitline[2]:lower()
 	end
 	
-	local temptarg = valid_target(splitline[#splitline])
-	
-	if command == '/raw' then
-		return _raw.table.concat(splitline,' ',2,#splitline)
-	elseif command_list[command] and temptarg and validabils[language][abil] then
+	local temptarg = valid_target(splitline[splitline.n])
+		
+	if command_list[command] and temptarg and validabils[language][unify_prefix[command]][abil] then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) temp_mod: '..temp_mod) end
 		
 		local r_line, s_type
 			
 		if command_list[command] == 'Magic' then
-			r_line = r_spells[validabils[language][abil:lower()].Magic]
+			r_line = r_spells[validabils[language][unify_prefix[command]][abil:lower()]]
 			r_line.name = r_line[language]
 			if r_line.type == 'BardSong' and r_line.casttime == 8 then
 				refresh_buff_active(windower.ffxi.get_player().buffs)
@@ -201,16 +211,16 @@ windower.register_event('outgoing text',function(original,modified)
 				r_line.recast=r_line.recast*1.5
 				r_line.casttime = r_line.casttime*1.5
 			end
-			s_type = 'Magic' -- command_list[r_spells[validabils[language][abil:lower()]['Magic']]['prefix']]
+			s_type = 'Magic'
 		elseif command_list[command] == 'Ability' then
-			r_line = r_abilities[validabils[language][abil:lower()].Ability]
+			r_line = r_abilities[validabils[language][unify_prefix[command]][abil:lower()]]
 			r_line.name = r_line[language]
 			if r_line.type == 'SummonerPact' and buffactive['astral conduit'] then
 				r_line.recast=0
 			end
-			s_type = 'Ability' -- command_list[r_abilities[validabils[language][abil:lower()]['Ability']]['prefix']]
+			s_type = 'Ability'
 		elseif command_list[command] == 'Item' then
-			r_line = r_items[validabils[language][abil:lower()].Item]
+			r_line = r_items[validabils[language][unify_prefix[command]][abil:lower()]]
 			r_line.name = r_line[language]
 			r_line.prefix = '/item'
 			r_line.type = 'Item'
@@ -221,44 +231,38 @@ windower.register_event('outgoing text',function(original,modified)
 		
 		_global.storedtarget = temptarg
 		
-		r_line = aftercast_cost(r_line)
+		spell = aftercast_cost(r_line)
 		
-		storedcommand = command..' "'..r_line[language]..'" '
-		equip_sets('precast',r_line,{type=s_type})
-
-		return ''
+		storedcommand = command..' "'..spell[language]..'" '
+		return equip_sets('pretarget',spell,{type=s_type})
 	elseif command_list[command] == 'Ranged Attack' and temptarg then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) temp_mod: '..temp_mod) end
 
 		rline = r_abilities[1]
 		_global.storedtarget = temptarg
-		r_line = aftercast_cost(rline)
-			
-		storedcommand = r_line.prefix..' '
-		equip_sets('precast',r_line,{type="Ranged Attack"})
-
-		return ''
---	elseif _global.midaction and validabils[language][tostring(abil):lower()] then
---		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(122) Canceled: '..temp_mod) end
---		return ''
+		spell = aftercast_cost(rline)
+		
+		storedcommand = spell.prefix..' '
+		return equip_sets('pretarget',spell,{type="Ranged Attack"})
 	end
 	return modified
 end)
 
-windower.register_event('incoming text',function(original,modified,color,modifiedcolor)
+--[[windower.register_event('incoming text',function(original,modified,color,modifiedcolor)
 	if debugging >= 1 then windower.debug('incoming text') end
-	if gearswap_disabled then return modified, color end
+	if gearSwap_disabled then return modified, color end
 	if string.find(original,'...A command error occurred.') or original == 'You can only use that command during battle.' or original == 'You cannot use that command here.' then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(130) Client canceled command detected: '..color..' '..original) end
 		if type(user_env.aftercast)=='function' then
-			persistent_spell.interrupted = true
+			if persistent_spell then persistent_spell.interrupted = true
+			else persistent_spell = {name="Unknown Interrupt"} end
 			equip_sets('aftercast',persistent_spell,{type='Interruption'})
 		elseif user_env.aftercast then
 			windower.add_to_chat(123,'GearSwap: aftercast() exists but is not a function')
 		end
 	end
 	return modified,modifiedcolor
-end)
+end)]]
 
 windower.register_event('incoming chunk',function(id,data,modified,injected,blocked)
 	if debugging >= 1 then windower.debug('incoming chunk '..id) end
@@ -324,9 +328,9 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
 				end
 			end
 		end
-		action(act)
+		inc_action(act)
 	elseif id == 0x29 and not injected then
-		if gearswap_disabled then return end
+		if gearSwap_disabled then return end
 		data = data:sub(5)
 		local actor_id = get_bit_packed(data,0,32)
 		local target_id = get_bit_packed(data,32,64)
@@ -348,71 +352,151 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
 			if encumbrance_table[i] and not tf and not_sent_out_equip[v] and not disable_table[i] then
 				tab[v] = not_sent_out_equip[v]
 				not_sent_out_equip[v] = nil
-				if _global.debug_mode then windower.add_to_chat(8,"Gearswap (Debug Mode): Your "..v..' are now unlocked.') end
+				if _global.debug_mode then windower.add_to_chat(8,"GearSwap (Debug Mode): Your "..v..' are now unlocked.') end
 			end
 			encumbrance_table[i] = tf
 		end
 		if table.length(tab) > 0 then
 			equip_sets('equip_command',tab)
 		end
-	elseif gearswap_disabled then
+	elseif id == 0x29 and not injected then
+		if gearSwap_disabled then return end
+		data = data:sub(5)
+		local actor_id = get_bit_packed(data,0,32)
+		local target_id = get_bit_packed(data,32,64)
+		local param_1 = get_bit_packed(data,64,96)
+		local param_2 = get_bit_packed(data,96,102) -- First 6 bits
+		local param_3 = get_bit_packed(data,102,128) -- Rest
+		local actor_index = get_bit_packed(data,128,144)
+		local target_index = get_bit_packed(data,144,160)
+		local message_id = get_bit_packed(data,160,175) -- Cut off the most significant bit, hopefully
+		
+		action_message(actor_id,target_id,param_1,param_2,param_3,actor_index,target_index,message_id)
+	elseif gearSwap_disabled then
 		return
 	elseif id == 0x050 and not injected then
 --		'Equipment packet'
 		if sent_out_equip[data:byte(6)] == data:byte(5) then
 			sent_out_equip[data:byte(6)] = nil
-			send_check()
+			if table.length(sent_out_equip) == 1 and sent_out_equip.ind then
+				local out = packet_send_check(true,sent_out_equip.ind)
+				sent_out_equip.ind = nil
+				if type(out) == 'string' then
+					windower.packets.inject_outgoing((out:byte(2)%2)*256+out:byte(1),out)
+				end
+			end
 		end
 	end
 end)
 
 windower.register_event('outgoing chunk',function(id,data,modified,injected,blocked)
 	if debugging >= 1 then windower.debug('outgoing chunk '..id) end
-	if id == 0x01A and not injected then -- Action packet
-		local abil
-		actor_id = data:byte(8,8)*256^3+data:byte(7,7)*256^2+data:byte(6,6)*256+data:byte(5,5)
-		index = data:byte(10,10)*256+data:byte(9,9)
-		category = data:byte(12,12)*256+data:byte(11,11)
-		param = data:byte(14,14)*256+data:byte(13,13)
-		_unknown1 = data:byte(16,16)*256+data:byte(15,15)
-		local actor_name = windower.ffxi.get_mob_by_id(actor_id)['name']
-		local target_name = windower.ffxi.get_mob_by_index(index)['name']
-		if category == 3 and not buffactive.silence and not buffactive.mute then -- 3 = Magic
-			abil = r_spells[param]
-		elseif (category == 7 or category == 25) and not buffactive.amnesia then -- 7 = WS, 25 = Monster skill
-			abil = r_abilities[param+768]
-		elseif category == 9 and not buffactive.amnesia then -- 9 = Ability
-			abil = r_abilities[param]
-		elseif category == 16 then -- 16 = . . . ranged attack
-			abil = r_abilities[1]
-		end
-		if abil then abil.interrupted = false end
-		if logging then logit(logfile,'\n\nActor: '..tostring(actor_name)..'  Target: '..tostring(target_name)..'  Category: '..tostring(category)..'  param: '..tostring(abil_name or param)) end
-		if abil and not (buffactive.terror or buffactive.sleep or buffactive.stun or buffactive.petrification or buffactive.charm) then
-			_global.midaction = true
---			windower.send_command('@wait 1;lua i gearswap midact')
-		elseif user_env and not T{0,2,4,5,11,12,13,14,15,18,20}:contains(category) then -- 0 = interacting with an NPC, 2 = engaging, 4 = disengaging from menu, 5 = CFH, 11 = Homepointing, 12= assist, 13 = getting up from reraise, 14 = fishing, 15 = changing target, 18 = dismounting chocobo, 20 = zoning
-			if not T{3,7,9,16,25}:contains(category) then windower.add_to_chat(8,'Tell Byrth how you triggered this and this number: '..category) end
-			if type(user_env.aftercast) == 'function' then
-				windower.add_to_chat(8,'Interrupted! Category: '..category)
-				abil.interrupted = true
-				abil.name = abil[language]
-				equip_sets('aftercast',abil,{type='Interruption'})
-			elseif user_env.aftercast then
-				_global.midaction = false
-				spelltarget = nil
-				windower.add_to_chat(123,'GearSwap: aftercast() exists but is not a function')
-			else
-				_global.midaction = false
-				spelltarget = nil
-			end
+	if (id == 0x1A or id == 0x36 or id == 0x37) and not injected then
+		local ind,arr = #out_arr +1,{}
+		out_arr[ind] = {}
+		out_arr[ind].data = data
+		out_arr[ind].cast_delay = 0
+		out_arr[ind].verify_equip = false
+		data = data:sub(5)
+		if id == 0x01A then -- Action packet
+			arr.actor_id = get_bit_packed(data,0,32)
+			arr.target_index = get_bit_packed(data,32,48)
+			arr.category = get_bit_packed(data,48,64)
+			arr.param = get_bit_packed(data,64,80)
+			arr.unknown1 = get_bit_packed(data,80,96)
+			return out_action(arr,ind)
+		elseif id == 0x036 then
+	--		'Menu Item Packet'
+			arr.target_id = get_bit_packed(data,0,32)
+			arr.inventory_index = get_bit_packed(data,352,360)
+			arr.target_index = get_bit_packed(data,432,448)
+			return out_item(arr,ind)
+		elseif id == 0x037 then
+	--		'Use Item Packet'
+			arr.target_id = get_bit_packed(data,0,32)
+			arr.target_index = get_bit_packed(data,64,80)
+			arr.inventory_index = get_bit_packed(data,80,88)
+			return out_item(arr,ind)
 		end
 	end
 end)
 
-function action(act)
+function out_action(arr,ind)
+	spell = nil
+	local int_flag, acttype
+	if arr.category == 3 then -- 3 = Magic
+		acttype = 'Magic'
+		spell = r_spells[arr.param]
+		if buffactive.silence or buffactive.mute then int_flag = true end
+	elseif arr.category == 7 or category == 25 then -- 7 = WS, 25 = Monster skill
+		acttype = "Weapon Skill"
+		spell = r_abilities[arr.param+768]
+		if buffactive.amnesia then int_flag = true end
+	elseif arr.category == 9 then -- 9 = Ability
+		acttype = "Ability"
+		spell = r_abilities[arr.param]
+		if buffactive.amnesia then int_flag = true end
+	elseif arr.category == 16 then -- 16 = . . . ranged attack
+		acttype = "Ranged Attack"
+		spell = r_abilities[1]
+	end
+	if buffactive.terror or buffactive.sleep or buffactive.stun or buffactive.petrification or buffactive.charm then
+		int_flag = true
+	end
+	if logging then
+		local actor_name = windower.ffxi.get_mob_by_id(arr.actor_id).name
+		local target_name = windower.ffxi.get_mob_by_index(arr.target_index).name
+		logit(logfile,'\n\nActor: '..tostring(actor_name)..'  Target: '..tostring(target_name)..'  Category: '..tostring(arr.category)..'  param: '..tostring(spell.name or arr.param))
+	end
+	
+	if spell then
+		spell = aftercast_cost(spell)
+		if int_flag then
+			spell.interrupted = true
+		else
+			spell.interrupted = false
+		end
+		spell.name = spell[language]
+		if _global.debug_mode then windower.add_to_chat(8,"GearSwap (Debug Mode): Attempting to use "..spell.name) end
+		
+		local temp_val = equip_sets('precast',spell,{type=acttype},ind)
+		_global.midaction = true
+		return temp_val
+--[[	elseif abil and user_env and not T{0,2,4,5,11,12,13,14,15,18,20}:contains(arr.category) then -- 0 = interacting with an NPC, 2 = engaging, 4 = disengaging from menu, 5 = CFH, 11 = Homepointing, 12= assist, 13 = getting up from reraise, 14 = fishing, 15 = changing target, 18 = dismounting chocobo, 20 = zoning
+		if not T{3,7,9,16,25}:contains(arr.category) then windower.add_to_chat(8,'Tell Byrth how you triggered this and this number: '..arr.category) end
+		if type(user_env.aftercast) == 'function' and abil.name == 'Unknown Interruption' then
+			windower.add_to_chat(8,'Interrupted! Category: '..arr.category)
+			equip_sets('aftercast',abil,{type='Interruption'})
+		elseif user_env.aftercast then
+			_global.midaction = false
+			spelltarget = nil
+			windower.add_to_chat(123,'GearSwap: aftercast() exists but is not a function')
+		else
+			_global.midaction = false
+			spelltarget = nil
+		end]]
+	end
+end
+
+function out_item(arr,ind)
+	items = windower.ffxi.get_items()
+	spell = aftercast_cost(r_items[items.inventory[arr.inventory_index].id])
+	if spell then
+		spell.name = spell[language]
+		if buffactive.muddle or buffactive.medicine then -- What exactly does medicated status block?
+			spell.interrupted = true
+		else
+			spell.interrupted = false
+		end
+	end
+	if _global.debug_mode then windower.add_to_chat(8,"GearSwap (Debug Mode): Attempting to use "..item.name) end
+--	windower.add_to_chat(8,spell.english..' '..windower.ffxi.get_mob_by_index(arr.target_index).name)
+	return equip_sets('precast',spell,{type="Item"},ind)
+end
+
+function inc_action(act)
 	if debugging >= 1 then windower.debug('action') end
-	if gearswap_disabled or act.category == 1 then return end
+	if gearSwap_disabled or act.category == 1 then return end
 	
 	local temp_player = windower.ffxi.get_player()
 	local temp_player_mob_table = windower.ffxi.get_mob_by_index(temp_player.index)
@@ -440,7 +524,7 @@ function action(act)
 		prefix = 'pet_'
 	end
 	
-	local spell = get_spell(act)
+	spell = get_spell(act)
 	local category = act.category
 	if logging then	
 		if spell then logit(logfile,'\n\n'..tostring(os.clock)..'(178) Event Action: '..tostring(spell.english)..' '..tostring(act['category']))
@@ -513,7 +597,8 @@ function action_message(actor_id,target_id,param_1,param_2,param_3,actor_index,t
 	elseif unable_to_use:contains(message_id) then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(195) Event Action Message: '..tostring(message_id)..' Interrupt') end
 		if type(user_env[prefix..'aftercast']) == 'function' then
-			persistent_spell.interrupted = true
+			if persistent_spell then persistent_spell.interrupted = true
+			else persistent_spell = {name="Unknown Interrupt"} end
 			equip_sets(prefix..'aftercast',persistent_spell,{type='Interruption'})
 		elseif user_env[prefix..'aftercast'] then
 			_global.midaction = false
@@ -528,20 +613,20 @@ end
 
 windower.register_event('status change',function(new,old)
 	if debugging >= 1 then windower.debug('status change '..new) end
-	if gearswap_disabled or T{2,3,4}:contains(old) or T{2,3,4}:contains(new) then return end
+	if gearSwap_disabled or T{2,3,4}:contains(old) or T{2,3,4}:contains(new) then return end
 	equip_sets('status_change',res.statuses[new].english,res.statuses[old].english)
 end)
 
 windower.register_event('gain buff',function(name,id)
 	if debugging >= 1 then windower.debug('gain buff '..name) end
-	if gearswap_disabled then return end
+	if gearSwap_disabled then return end
 	if _global.midaction and T{'terror','sleep','stun','petrification','charm','weakness'}:contains(name:lower()) then _global.midaction = false end
 	equip_sets('buff_change',name,'gain')
 end)
 
 windower.register_event('lose buff',function(name,id)
 	if debugging >= 1 then windower.debug('lose buff '..name) end
-	if gearswap_disabled then return end
+	if gearSwap_disabled then return end
 	equip_sets('buff_change',name,'loss')
 end)
 
@@ -554,12 +639,12 @@ end)
 
 windower.register_event('login',function(name)
 	if debugging >= 1 then windower.debug('login '..name) end
-	windower.send_command('@wait 2;lua i gearswap refresh_user_env;')
+	windower.send_command('@wait 2;lua i gearSwap refresh_user_env;')
 end)
 
 windower.register_event('day change',function(new,old)
 	if debugging >= 1 then windower.debug('day change') end
-	windower.send_command('@wait 0.5;lua invoke gearswap refresh_ffxi_info')
+	windower.send_command('@wait 0.5;lua invoke gearSwap refresh_ffxi_info')
 end)
 
 windower.register_event('weather change',function(new_weather, new_weather_id, old_weather, old_weather_id)

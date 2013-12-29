@@ -31,39 +31,28 @@ function valid_target(targ)
 	if not spelltarget then spelltarget = {} end
 	
 	local spell_targ
-	if st_targs:contains(targ) then
-		st_flag = true
-		spell_targ = nil
-	elseif st_flag then
-		st_flag = false
-		spell_targ = nil
-	elseif pass_through_targs:contains(targ) then
+	if pass_through_targs:contains(targ) then
 		local j = windower.ffxi.get_mob_by_target(targ)
 		
-		if j == nil then
-			if _global.debug_mode then windower.add_to_chat(8,'Gearswap (Debug Mode): Target is unhandled by get_mob_by_target - '..tostring(targ)) end
-			table.reassign(spelltarget,target) -- Shouldn't this be an error case?
+		if not j then
+			windower.add_to_chat(8,tostring(targ))
+			table.reassign(spelltarget,{}) -- st targets
 		else
 			table.reassign(spelltarget,target_complete(j))
 		end
 		spelltarget.raw = targ
-		return targ
-	elseif targ then
+		return targ,spelltarget
+	elseif not tonumber(targ) then
 		local mob_array = windower.ffxi.get_mob_array()
-		local lower_targ = targ:lower()
 		for i,v in pairs(mob_array) do
-			if v.name:lower()==lower_targ and not v.is_npc then
+			if v.name:lower()==targ:lower() and not v.is_npc then
 				spell_targ = targ
 				table.reassign(spelltarget,target_complete(v))
 				spelltarget.raw = targ
-			elseif tonumber(targ) == v.id then
-				spell_targ = '<lastst>'
-				table.reassign(spelltarget,target_complete(v))
-				spelltarget.raw = '<lastst>'
 			end
 		end
 	end
-	return spell_targ
+	return spell_targ,spelltarget
 end
 
 function target_complete(mob_table)
