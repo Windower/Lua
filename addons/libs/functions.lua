@@ -21,6 +21,13 @@ function functions.identity(fn)
     return fn
 end
 
+-- Returns a function that returns a constant value.
+function functions.const(val)
+    return function()
+        return val
+    end
+end
+
 -- An evaluation function.
 function functions.eval(fn, ...)
     return fn(...)
