@@ -9,8 +9,8 @@ _libs.chat = chat
 _libs.tables = _libs.tables or require('tables')
 _libs.sets = _libs.sets or require('sets')
 _libs.strings = _libs.strings or require('strings')
-_libs.chat.colors = _libs.chat.colors or require('ffxidata.chat.colors')
-_libs.chat.controls = _libs.chat.controls or require('ffxidata.chat.controls')
+_libs.chat.colors = _libs.chat.colors or require('chat.colors')
+_libs.chat.controls = _libs.chat.controls or require('chat.controls')
 
 -- Local functions
 local make_color
