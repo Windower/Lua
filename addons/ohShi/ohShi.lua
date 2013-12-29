@@ -34,17 +34,17 @@ _addon.command = 'ohshi'
 
 --Requiring libraries used in this addon
 --These should be saved in addons/libs
-require 'logger'
-require 'tables'
-require 'strings'
-require 'sets'
-config = require 'config'
-files = require 'files'
-chat = require 'chat'
-texts = require 'texts'
-require 'default_settings'
-require 'text_handling'
-require 'helper_functions'
+require('logger')
+require('tables')
+require('strings')
+require('sets')
+config = require('config')
+files = require('files')
+chat = require('chat')
+texts = require('texts')
+require('default_settings')
+require('text_handling')
+require('helper_functions')
 
 --This function is called when the addon loads. Defines aliases and 
 --registers functions, as well as filling the resource tables.
@@ -182,7 +182,7 @@ windower.register_event('addon command', function(...)
     settings - shows current textbox settings
     show/hide - toggles visibility of the tracker so you can make changes.]]
             for _, line in ipairs(helptext:split('\n')) do
-                windower.add_to_chat(207, line..chat.colorcontrols.reset)
+                windower.add_to_chat(207, line..chat.controls.reset)
             end
         end
     end

@@ -34,9 +34,7 @@ require('strings')
 require('maths')
 require('tables')
 
-ffxi = require('ffxi')
 config = require('config')
-
 
 tb_name	= 'addon:gr:gametime'
 visible = false

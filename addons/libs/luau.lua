@@ -9,9 +9,8 @@ require('lists')
 require('sets')
 require('maths')
 require('functions')
-chat = require('chat')
-ffxi = require('ffxi')
 config = require('config')
+res = require('resources')
 
 collectgarbage()
 

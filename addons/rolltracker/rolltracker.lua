@@ -24,24 +24,22 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
-
 _addon.name = 'RollTracker'
 _addon.version = '1.1'
 _addon.author = 'Balloon'
 _addon.command = 'rolltracker'
 
-config = require 'config'
-settings=config.load(defaults)
-chat = require 'chat'
-require 'tables'
+config = require('config')
+chat = require('chat')
+require('tables')
+
 defaults = {}
 defaults.autostop = 0
 defaults.bust = 1
 defaults.effected = 1
 defaults.fold = 1
 
-local symbolnum = require('json').read('../libs/ffxidata.json').chat.chars
+settings = config.load(defaults)
 
 windower.register_event('addon command',function (...)
 	cmd = {...}
@@ -188,7 +186,7 @@ windower.register_event('action',function (act)
 							for z in pairs(windower.ffxi.get_party()) do
 								if windower.ffxi.get_party()[z]['mob'] ~= nil then
 									if act['targets'][n]['id'] == windower.ffxi.get_party()[z]['mob']['id'] then	
-										effected_member[n]=player_color[z]..windower.ffxi.get_party()[z]['name']..chat.colorcontrols.reset
+										effected_member[n]=player_color[z]..windower.ffxi.get_party()[z]['name']..chat.controls.reset
 									end
 								end
 							end
@@ -205,11 +203,11 @@ windower.register_event('action',function (act)
 						if #effected_member > 0 then
 							if rollnum == roll_luck[i] or rollnum == 11 then 
 								luckyroll = 1
-								windower.add_to_chat(1, effectednumber..effected_write..chat.colorcontrols.reset..' '..symbolnum['implies']..' '..roll_ident[tostring(roller)]..' Roll '..symbolnum['circle'..rollnum]..string.char(31,158)..' (Lucky!)'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
+								windower.add_to_chat(1, effectednumber..effected_write..chat.controls.reset..' '..chat.chars['implies']..' '..roll_ident[tostring(roller)]..' Roll '..chat.chars['circle'..rollnum]..string.char(31,158)..' (Lucky!)'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
 							elseif rollnum==12 and #effected_member > 0 then
-								windower.add_to_chat(1, string.char(31,167)..effectednumber..'Bust! '..chat.colorcontrols.reset..symbolnum['implies']..' '..effected_write..' '..symbolnum['implies']..' ('..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')')
+								windower.add_to_chat(1, string.char(31,167)..effectednumber..'Bust! '..chat.controls.reset..chat.chars['implies']..' '..effected_write..' '..chat.chars['implies']..' ('..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')')
 							else
-								windower.add_to_chat(1, effectednumber..effected_write..chat.colorcontrols.reset..' '..symbolnum['implies']..' '..roll_ident[tostring(roller)]..' Roll '..symbolnum['circle'..rollnum]..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
+								windower.add_to_chat(1, effectednumber..effected_write..chat.controls.reset..' '..chat.chars['implies']..' '..roll_ident[tostring(roller)]..' Roll '..chat.chars['circle'..rollnum]..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
 							end
 						end
 					end

@@ -35,7 +35,7 @@ _addon.name     = 'chars'
 _addon.version  = '1.20131102'
 _addon.command  = 'chars'
 
-local chars = require('json').read('../libs/ffxidata.json').chat.chars
+local chars = require('chat').chars
 
 windower.register_event('addon command', function(...)
     for code, char in pairs(chars) do

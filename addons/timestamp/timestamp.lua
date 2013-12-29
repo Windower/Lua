@@ -28,12 +28,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-require 'chat'
-require 'logger'
-require 'tables'
-require 'sets'
+require('chat')
+require('logger')
+require('tables')
+require('sets')
 
-config = require 'config'
+config = require('config')
 
 
 _addon.name     = 'timestamp'
@@ -128,14 +128,10 @@ windower.register_event('incoming text', function(original, modified, mode, newm
 end)
 
 windower.register_event('addon command', function(...)
-    local cmd  = (...) and (...):lower() or 'help'
+    local cmd  = (...) and (...):lower()
     local args = {select(2, ...)}
 
-    if cmd == 'help' then
-        log(chat.chars.wsquare..' timestamp [<command>] help -- shows the help text.')
-        log(chat.chars.wsquare..' timestamp color <color> -- sets the timestamp color.')
-        log(chat.chars.wsquare..' timestamp format <format> -- sets the timestamp format.')
-    elseif cmd == 'format' then
+    if cmd == 'format' then
         if not args[1] then
             error('Please specify the new timestamp format.')
         elseif args[1] == 'help' then
@@ -178,6 +174,7 @@ windower.register_event('addon command', function(...)
     elseif cmd == 'save' then
         settings:save('all')
     else
-        windower.send_command('timestamp help')
-    end
+        log(chat.chars.wsquare..' timestamp [<command>] help -- shows the help text.')
+        log(chat.chars.wsquare..' timestamp color <color> -- sets the timestamp color.')
+        log(chat.chars.wsquare..' timestamp format <format> -- sets the timestamp format.')
 end)

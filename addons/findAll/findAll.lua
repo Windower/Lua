@@ -331,7 +331,7 @@ function update()
         characters_json:append('"'..character_name..'":{'..storages_json:concat(',')..'}')
     end
 
-    storages_file:write('{'..characters_json:concat(',')..'}')
+    storages_file:write('{'..characters_json:concat(',\n')..'}')
 
     collectgarbage()
 
