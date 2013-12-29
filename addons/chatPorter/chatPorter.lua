@@ -104,8 +104,6 @@ showparty = T{}
 showtell = T{}
 showffochat = T{}
 
-LSname = windower.ffxi.get_player().linkshell
-playerName = windower.ffxi.get_player().name
 specialChar = "|"
 lastTellFrom = ""
 
@@ -127,9 +125,15 @@ windower.register_event('load',function ()
 	windower.send_command('alias f3 lua command ChatPorter f3')
 	windower.send_command('alias f4 lua command ChatPorter f4')
 	windower.send_command('alias f5 lua command ChatPorter f5')
-	windower.add_to_chat(55, "Loading ".._addon.name.." v".._addon.version.." (written by ".._addon.author..")")
 	windower.add_to_chat(160,'  Type '..string.color('//cp help',204,160)..' for a list of possible commands.')
---	showStatus()
+end)
+
+windower.register_event('load', 'login', 'linkshell change', function()
+    local player = windower.ffxi.get_player()
+    if player then
+        playerName = player.name
+        LSname = player.linkshell
+    end
 end)
 
 windower.register_event('unload',function ()
@@ -146,7 +150,6 @@ windower.register_event('unload',function ()
 	windower.send_command('unalias f3')
 	windower.send_command('unalias f4')
 	windower.send_command('unalias f5')
-	windower.add_to_chat(55, "Unloading ".._addon.name.." v".._addon.version..".")
 end)
 
 windower.register_event('login',function (name)
