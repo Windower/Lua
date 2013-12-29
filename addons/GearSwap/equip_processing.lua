@@ -184,7 +184,9 @@ function equip_sets(swap_type,val1,val2,ind)
 				windower.add_to_chat(8,'GearSwap (Debugging): '..out_str)
 			elseif equip_next[i] and not disable_table[i] and not encumbrance_table[i] then
 				windower.debug('attempting to set gear. Order: '..tostring(_)..'  Slot ID: '..tostring(i)..'  Inv. ID: '..tostring(equip_next[i]))
-				windower.ffxi.set_equip(equip_next[i],i)
+				--windower.ffxi.set_equip(equip_next[i],i)
+				-- TEMP FIX FOR BUG IN set_equip():
+				windower.packets.inject_outgoing(0x050, string.char(0, 0, 0, 0, equip_next[i], i))
 				sent_out_equip[i] = equip_next[i] -- re-make the equip_next table with the name sent_out_equip as the equipment is sent out.
 			end
 		end
