@@ -6,6 +6,7 @@ local files = {}
 
 _libs = _libs or {}
 _libs.files = files
+_libs.strings = _libs.strings or require('strings')
 
 local createfile = false
 
