@@ -11,3 +11,5 @@ zonetimer fontsize #
     
 zoentimer help
     print these instructions in the log
+    
+Original plugin by Krellion. 
