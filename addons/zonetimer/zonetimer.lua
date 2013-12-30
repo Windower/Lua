@@ -3,9 +3,9 @@ _addon.author = 'Ihina'
 _addon.version = '1.0.0.0'
 _addon.command = 'zonetimer'
 
-require 'logger'
-config = require 'config'
-texts = require 'texts'
+require('logger')
+config = require ('config')
+texts = require ('texts')
  
 defaults = {}
 defaults.pos = {}
