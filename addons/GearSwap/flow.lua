@@ -341,8 +341,6 @@ function inc_action(act)
 end
 
 function inc_action_message(arr)
-	print_set(arr,' Arrrrrrr ')
-	-- actor_id,target_id,param_1,param_2,param_3,actor_index,target_index,message_id)
 	if spelltarget and T{6,20,113,406,605,646}:contains(arr.message_id) and spelltarget.id == arr.target_id then
 		-- If your current spell's target is defeated or falls to the ground
 		_global.midaction = false
