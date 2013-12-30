@@ -354,4 +354,11 @@
     <bugtracker>https://github.com/cairface/Lua/issues</bugtracker>
     <support>http://www.bluegartr.com/members/34070-Cairthenn</support>
   </addon>
+    <addon>
+    <name>zonetimer</name>
+    <author>Ihina</author>
+    <description>Displays the amount of time one has been in zone.  Original by Krellion.</description>
+    <bugtracker>https://github.com/Jayjs20/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Bismarck/Ihina</support>
+  </addon>
 </addons>
