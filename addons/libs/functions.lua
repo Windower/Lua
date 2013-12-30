@@ -309,21 +309,11 @@ end
 -- Returns the result of applying the function fn to the first two elements of t, then again on the result and the next element from t, until all elements are accumulated.
 -- init is an optional initial value to be used. If provided, init and t[1] will be compared first, otherwise t[1] and t[2].
 function table.reduce(t, fn, init)
-    -- Return the initial argument if table is empty
-    if not next(t) then
-        return init
-    end
-
     -- Set the accumulator variable to the init value (which can be nil as well)
-    local acc = init
-    for _, val in pairs(t) do
-        -- If the accumulator is nil, which can only happen on the first iteration and if no initial value was provided, set acc to the first value val.
-        if acc == nil then
-            acc = val
-        -- If not, which will hold true for all subsequent values, apply the funtion to the accumulated value and the next table value and store the result.
-        else
-            acc = fn(acc, val)
-        end
+    local acc = init or next[2](t)
+    local pfn, arg1, arg2 = pairs(t)
+    for _, val in init and pfn or pfn(t) and pfn, arg1, arg2 do
+        acc = fn(acc, val)
     end
 
     return acc

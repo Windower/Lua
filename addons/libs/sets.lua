@@ -244,13 +244,10 @@ function set.filter(s, fn)
 end
 
 function set.reduce(s, fn, init)
-    local acc = init
-    for el in pairs(s) do
-        if acc == nil then
-            acc = el
-        else
-            acc = fn(acc, el)
-        end
+    local acc = init or next[2](s)
+    local pfn = pairs(s)
+    for el in init and pfn or pfn(s) and pfn do
+        acc = fn(acc, el)
     end
 
     return acc

@@ -75,9 +75,6 @@ function class(o)
     return mt and mt.__class or type(o)
 end
 
-_libs = _libs
-_meta = _meta
-
 -- Checks if a table is an array, only having sequential integer keys.
 function table.isarray(t)
     local count = 0
