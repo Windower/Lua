@@ -79,11 +79,11 @@ function load_user_files()
 	
 	if not path then
 		current_job_file = nil
-		gearSwap_disabled = true
+		gearswap_disabled = true
 		sets = nil
 		return
 	end
-	user_env = {gearSwap = _G, _global = _global,
+	user_env = {gearSwap = _G, _global = _global, _settings = _settings,
 		-- Player functions
 		equip = equip, verify_equip=verify_equip, cancel_spell=cancel_spell,
 		force_send=force_send, change_target=change_target, cast_delay=cast_delay,
@@ -117,7 +117,7 @@ function load_user_files()
 	if funct == nil then 
 		print('User file problem: '..err)
 		current_job_file = nil
-		gearSwap_disabled = true
+		gearswap_disabled = true
 		sets = nil
 		return
 	else
@@ -132,7 +132,7 @@ function load_user_files()
 	
 	if not status then
 		error('Plugin failed to load: \n'..plugin)
-		gearSwap_disabled = true
+		gearswap_disabled = true
 		sets = nil
 		return nil
 	end
@@ -143,7 +143,7 @@ function load_user_files()
 		windower.add_to_chat(123,'GearSwap: get_sets() is defined but is not a function.')
 	end
 	
-	gearSwap_disabled = false
+	gearswap_disabled = false
 	sets = user_env.sets
 end
 

@@ -2,7 +2,7 @@ function export_set(options)
 	local temp_items,item_list = windower.ffxi.get_items(),{}
 	local targinv,xml,all_sets
 	if #options > 0 then
-		for _,v in pairs(options) do
+		for _,v in ipairs(options) do
 			if v:lower() == 'inventory' then
 				targinv = true
 			elseif v:lower() == 'xml' then

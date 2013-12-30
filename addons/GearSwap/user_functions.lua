@@ -29,9 +29,9 @@
 
 
 function debug_mode(boolean)
-	if boolean == true or boolean == false then _global.debug_mode = boolean
+	if boolean == true or boolean == false then _settings.debug_mode = boolean
 	elseif boolean == nil then
-		_global.debug_mode = true
+		_settings.debug_mode = true
 	else
 		windower.add_to_chat(123,'GearSwap: debug_mode was passed an invalid value (true/no value/nil=on, false=off)')
 	end
@@ -39,9 +39,9 @@ end
 
 
 function show_swaps(boolean)
-	if boolean == true or boolean == false then _global.show_swaps = boolean
+	if boolean == true or boolean == false then _settings.show_swaps = boolean
 	elseif boolean == nil then
-		_global.show_swaps = true
+		_settings.show_swaps = true
 	else
 		windower.add_to_chat(123,'GearSwap: show_swaps was passed an invalid value (true/no value/nil=on, false=off)')
 	end
@@ -126,14 +126,14 @@ function set_combine(...)
 		for i,v in pairs(set1) do
 			if slot_map[i] then
 				set3[default_slot_map[slot_map[i]]] = v
-			elseif _global.debug_mode then
+			elseif _settings.debug_mode then
 				windower.add_to_chat(8,'GearSwap (Debug Mode): set_combine error, Set 1 contains an unrecognized slot name ('..tostring(i)..')')
 			end
 		end
 		for i,v in pairs(set2) do
 			if slot_map[i] then
 				set3[default_slot_map[slot_map[i]]] = v
-			elseif _global.debug_mode then
+			elseif _settings.debug_mode then
 				windower.add_to_chat(8,'GearSwap (Debug Mode): set_combine error, Set 2 contains an unrecognized slot name ('..tostring(i)..')')
 			end
 		end
