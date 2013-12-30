@@ -4,8 +4,8 @@ _addon.version = '1.0.0.0'
 _addon.command = 'zonetimer'
 
 require('logger')
-config = require ('config')
-texts = require ('texts')
+config = require('config')
+texts = require('texts')
  
 defaults = {}
 defaults.pos = {}
@@ -22,28 +22,17 @@ zone = ''
 windower.register_event('prerender', function()
 	current_zone = windower.ffxi.get_info().zone
 	if zone == current_zone then
-		seconds = os.difftime(os.time(),start_time)
-		local hour = 0
-		local minute = 0
-		while seconds >= 3600 do
-			seconds = seconds - 3600
-			hour = hour + 1
-		end
-		while seconds >= 60 do
-			seconds = seconds - 60
-			minute = minute + 1
-		end
-		
-		
-		times:text(string.format("%02d", hour) .. ":" .. 
-					string.format("%02d", minute) .. ":" .. 
-					string.format("%02d", seconds))
-		times:visible(seconds ~= nil)
+		seconds = os.time() - start_time
+		times:text(os.date('!%H:%M:%S', seconds))
+		--times:text(seconds - start_time)
+		times:visible(true)
 	else
 		zone = current_zone
 		start_time = os.time()
 	end
 end)
+
+--[[for key,value in pairs(res.items) do log(key,value) end]]
 
 windower.register_event('addon command', function(...)
 	local param = L{...}
@@ -66,6 +55,9 @@ windower.register_event('addon command', function(...)
 		config.save(settings, 'all')
 		times:visible(false)
 		times = texts.new(settings)
+	elseif command == 'print' then
+		print(start_time .. " " .. os.time())
+	
 	end
 end)
 
