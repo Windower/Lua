@@ -3,9 +3,9 @@
 ]]
 
 require('pack')
-require('functools')
-require('stringhelper')
-require('mathhelper')
+require('functions')
+require('strings')
+require('maths')
 require('lists')
 bit = require('bit')
 
@@ -60,7 +60,7 @@ local time = (function()
     local timezone = ('%+.2d:%.2d'):format(h, 60 * m)
     now, h, m = nil, nil, nil
     return function(ts)
-        return os.date('%Y-%m-%dT%H:%M:%S'..timezone, ts)
+        return os.date('%Y-%m-%dT%H:%M:%S'..timezone, os.time() - ts)
     end
 end)()
 
@@ -294,45 +294,42 @@ fields.outgoing[0x061] = L{
 
 -- Party invite
 fields.outgoing[0x06E] = L{
-    {ctype='unsigned int',      label='Target ID',          fn=id},             -- 04  This is so weird. The client only knows IDs from searching for people or running into them. So if neither has happened, the manual invite will fail, as the ID cannot be retrieved.
-    {ctype='unsigned short',    label='Target index',       fn=index},          -- 08  00 if target not in zone
-    {ctype='unsigned char',     label='Alliance'},                              -- 0A  02 for alliance, 00 for party or if invalid alliance target (the client somehow knows..)
+    {ctype='unsigned int',      label='Target ID',          fn=id},             -- 04   This is so weird. The client only knows IDs from searching for people or running into them. So if neither has happened, the manual invite will fail, as the ID cannot be retrieved.
+    {ctype='unsigned short',    label='Target index',       fn=index},          -- 08   00 if target not in zone
+    {ctype='unsigned char',     label='Alliance'},                              -- 0A   02 for alliance, 00 for party or if invalid alliance target (the client somehow knows..)
     {ctype='unsigned char',     label='_const1',            const=0x041},       -- 0B
 }
 
 -- Party leaving
 fields.outgoing[0x06F] = L{
-    {ctype='unsigned char',     label='_const1',            const=0x00},        -- 04
-    {ctype='unsigned char[3]',  label='_junk1'},                                -- 05
+    {ctype='unsigned char',     label='_const1',            const=0x00},        -- 04   02 for alliance, 00 for party
 }
 
 -- Party breakup
 fields.outgoing[0x070] = L{
-    {ctype='unsigned char',     label='Alliance'},                              -- 04  02 for alliance, 00 for party
-    {ctype='unsigned char[3]',  label='_junk1'},                                -- 05
+    {ctype='unsigned char',     label='Alliance'},                              -- 04   02 for alliance, 00 for party
 }
 
 -- Party invite response
 fields.outgoing[0x074] = L{
-    {ctype='unsigned char',     label='Join',               fn=bool},           -- 04
-    {ctype='unsigned char[3]',  label='_junk1'},                                -- 05
+    {ctype='bool',              label='Join',               fn=bool},           -- 04
 }
 
 -- Party change leader
 fields.outgoing[0x077] = L{
-    {ctype='char[16]',          label='Target name'},                           -- 04  Name of the person to give leader to
-    {ctype='unsigned short',    label='Alliance'},                              -- 14  02 01 for alliance, 00 00 for party
+    {ctype='char[16]',          label='Target Name'},                           -- 04   Name of the person to give leader to
+    {ctype='unsigned short',    label='Alliance'},                              -- 14   02 01 for alliance, 00 00 for party
     {ctype='unsigned short',    label='_unknown1'},                             -- 16
 }
 
 -- Synth
 fields.outgoing[0x096] = L{
-    {ctype='unsigned char',     label='_unknown1'},                             -- 04 -- Crystal ID? Earth = 0x02, Wind-break = 0x19?, Wind no-break = 0x2D?
+    {ctype='unsigned char',     label='_unknown1'},                             -- 04   Crystal ID? Earth = 0x02, Wind-break = 0x19?, Wind no-break = 0x2D?
     {ctype='unsigned char',     label='_unknown2'},                             -- 05
-    {ctype='unsigned short',    label='Crystal Item ID'},                       -- 06 -- Item ID
-    {ctype='unsigned char',     label='Crystal Inventory slot'},                -- 08 -- Inventory slot ID
+    {ctype='unsigned short',    label='Crystal Item ID'},                       -- 06
+    {ctype='unsigned char',     label='Crystal Inventory Index'},               -- 08
     {ctype='unsigned char',     label='Number of Ingredients'},                 -- 09
-    {ctype='unsigned short',    label='Ingredient 1 ID'},                       -- 0A -- Item ID
+    {ctype='unsigned short',    label='Ingredient 1 ID'},                       -- 0A
     {ctype='unsigned short',    label='Ingredient 2 ID'},                       -- 0C
     {ctype='unsigned short',    label='Ingredient 3 ID'},                       -- 0E
     {ctype='unsigned short',    label='Ingredient 4 ID'},                       -- 10
@@ -340,14 +337,14 @@ fields.outgoing[0x096] = L{
     {ctype='unsigned short',    label='Ingredient 6 ID'},                       -- 14
     {ctype='unsigned short',    label='Ingredient 7 ID'},                       -- 16
     {ctype='unsigned short',    label='Ingredient 8 ID'},                       -- 18
-    {ctype='unsigned char',     label='Ingredient 1 slot'},                     -- 1A -- Inventory slot ID
-    {ctype='unsigned char',     label='Ingredient 2 slot'},                     -- 1B
-    {ctype='unsigned char',     label='Ingredient 3 slot'},                     -- 1C
-    {ctype='unsigned char',     label='Ingredient 4 slot'},                     -- 1D
-    {ctype='unsigned char',     label='Ingredient 5 slot'},                     -- 1E
-    {ctype='unsigned char',     label='Ingredient 6 slot'},                     -- 1F
-    {ctype='unsigned char',     label='Ingredient 7 slot'},                     -- 20
-    {ctype='unsigned char',     label='Ingredient 8 slot'},                     -- 21
+    {ctype='unsigned char',     label='Ingredient 1 Index'},                    -- 1A
+    {ctype='unsigned char',     label='Ingredient 2 Index'},                    -- 1B
+    {ctype='unsigned char',     label='Ingredient 3 Index'},                    -- 1C
+    {ctype='unsigned char',     label='Ingredient 4 Index'},                    -- 1D
+    {ctype='unsigned char',     label='Ingredient 5 Index'},                    -- 1E
+    {ctype='unsigned char',     label='Ingredient 6 Index'},                    -- 1F
+    {ctype='unsigned char',     label='Ingredient 7 Index'},                    -- 20
+    {ctype='unsigned char',     label='Ingredient 8 Index'},                    -- 21
     {ctype='unsigned short',    label='_unknown3'},                             -- 22
 }
 
@@ -360,9 +357,9 @@ fields.outgoing[0x0B5] = L{
 
 -- Tell
 fields.outgoing[0x0B6] = L{
-    {ctype='unsigned char',     label='GM?'},                                   -- 04   00 for a normal tell -- Varying this does nothing.
-    {ctype='char[15]',          label='Target name'},                           -- 05   Name of the person to send a tell to
-    {ctype='char[255]',         label='Message'},                               -- 14   Message, occasionally terminated by spare 00 bytes.
+    {ctype='unsigned char',     label='_unknown1',          const=0x00},        -- 04   00 for a normal tell -- Varying this does nothing.
+    {ctype='char[15]',          label='Target Name'},                           -- 05   Name of the person to send a tell to
+    {ctype='char*',             label='Message'},                               -- 14   Message, occasionally terminated by spare 00 bytes.
 }
 
 -- Set LS Message
@@ -447,14 +444,60 @@ fields.outgoing[0x102] = L{
 -- Zone update
 fields.incoming[0x00A] = L{
     {ctype='unsigned int',      label='Player ID',          fn=id},             -- 04
-    {ctype='unsigned short',    label='Player index',       fn=index},          -- 08
+    {ctype='unsigned short',    label='Player Index',       fn=index},          -- 08
     {ctype='char[38]',          label='_unknown1'},                             -- 0A
-    {ctype='unsigned char',     label='Zone ID',            fn=zone},           -- 30
-    {ctype='char[19]',          label='_unknown3'},                             -- 31
-    {ctype='unsigned char',     label='Weather ID',         fn=weather},        -- 44
-    {ctype='char[63]',          label='_unknown4'},                             -- 45
-    {ctype='char[16]',          label='Player name'},                           -- 84
-    {ctype='char[113]',         label='_unknown5'},                             -- 94
+    {ctype='unsigned short',    label='Zone ID',            fn=zone},           -- 30
+    {ctype='char[6]',           label='_unknown2'},                             -- 32
+    {ctype='unsigned int',      label='Timestamp 1',        fn=time},           -- 38
+    {ctype='unsigned int',      label='Timestamp 2',        fn=time},           -- 3C
+    {ctype='unsigned short',    label='Zone ID MH',         fn=zone},           -- 40   Zone ID when zoning out of MH, otherwise 0
+    {ctype='unsigned short',    label='_dupe_Zone ID',      fn=zone},           -- 42
+    {ctype='char[36]',          label='_unknown3'},                             -- 44
+    {ctype='unsigned short',    label='Weather ID',         fn=weather},        -- 68
+    {ctype='unsigned short',    label='_unknown4',          fn=weather},        -- 6A
+    {ctype='char[24]',          label='_unknown5'},                             -- 6C
+    {ctype='char[16]',          label='Player Name'},                           -- 84
+    {ctype='char[12]',          label='_unknown6'},                             -- 94
+    {ctype='unsigned int',      label='Abyssea Timestamp',  fn=time},           -- A0
+    {ctype='char[16]',          label='_unknown7'},                             -- A4   0xAC is 2 for some zones, 0 for others
+    {ctype='unsigned char',     label='Main Job',           fn=job},            -- B4
+    {ctype='unsigned char',     label='_unknown7'},                             -- B5
+    {ctype='unsigned char',     label='_unknown8'},                             -- B6
+    {ctype='unsigned char',     label='Sub Job',            fn=job},            -- B7
+    {ctype='unsigned int',      label='_unknown9'},                             -- B8
+    {ctype='unsigned char',     label='(None) Level'},                          -- BC
+    {ctype='unsigned char',     label='WAR Level'},                             -- BD
+    {ctype='unsigned char',     label='MNK Level'},                             -- BE
+    {ctype='unsigned char',     label='WHM Level'},                             -- BF
+    {ctype='unsigned char',     label='BLM Level'},                             -- C0
+    {ctype='unsigned char',     label='RDM Level'},                             -- C1
+    {ctype='unsigned char',     label='THF Level'},                             -- C2
+    {ctype='unsigned char',     label='PLD Level'},                             -- C3
+    {ctype='unsigned char',     label='DRK Level'},                             -- C4
+    {ctype='unsigned char',     label='BST Level'},                             -- C5
+    {ctype='unsigned char',     label='BRD Level'},                             -- C6
+    {ctype='unsigned char',     label='RNG Level'},                             -- C7
+    {ctype='unsigned char',     label='SAM Level'},                             -- C8
+    {ctype='unsigned char',     label='NIN Level'},                             -- C9
+    {ctype='unsigned char',     label='DRG Level'},                             -- CA
+    {ctype='unsigned char',     label='SMN Level'},                             -- CB
+    {ctype='signed short',      label='STR'},                                   -- CC
+    {ctype='signed short',      label='DEX'},                                   -- CE
+    {ctype='signed short',      label='VIT'},                                   -- D0
+    {ctype='signed short',      label='AGI'},                                   -- D2
+    {ctype='signed short',      label='IND'},                                   -- F4
+    {ctype='signed short',      label='MND'},                                   -- D6
+    {ctype='signed short',      label='CHR'},                                   -- D8
+    {ctype='signed short',      label='STR Bonus'},                             -- DA
+    {ctype='signed short',      label='DEX Bonus'},                             -- DC
+    {ctype='signed short',      label='VIT Bonus'},                             -- DE
+    {ctype='signed short',      label='AGI Bonus'},                             -- E0
+    {ctype='signed short',      label='INT Bonus'},                             -- E2
+    {ctype='signed short',      label='MND Bonus'},                             -- E4
+    {ctype='signed short',      label='CHR Bonus'},                             -- E6
+    {ctype='unsigned int',      label='Max HP'},                                -- E8
+    {ctype='unsigned int',      label='Max MP'},                                -- EC
+    {ctype='char[20]',          label='_unknown10'},                            -- F0
 }
 
 -- Zone Response

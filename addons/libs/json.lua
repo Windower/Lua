@@ -6,10 +6,10 @@ local json = {}
 
 _libs = _libs or {}
 _libs.json = json
-_libs.tablehelper = _libs.tablehelper or require('tablehelper')
+_libs.tables = _libs.tables or require('tables')
 _libs.lists = _libs.lists or require('lists')
-_libs.stringhelper = _libs.stringhelper or require('stringhelper')
-_libs.filehelper = _libs.filehelper or require('filehelper')
+_libs.strings = _libs.strings or require('strings')
+_libs.files = _libs.files or require('files')
 
 -- Define singleton JSON characters that can delimit strings.
 json.singletons = '{}[],:'
@@ -17,7 +17,7 @@ json.singletons = '{}[],:'
 -- Takes a filename and tries to parse the JSON in it, after a validity check.
 function json.read(file)
     if type(file) == 'string' then
-        file = _libs.filehelper.new(file)
+        file = _libs.files.new(file)
     end
 
     if not file:exists() then

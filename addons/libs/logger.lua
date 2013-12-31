@@ -4,8 +4,8 @@ This library provides a set of functions to aid in debugging.
 
 _libs = _libs or {}
 _libs.logger = true
-_libs.stringhelper = _libs.stringhelper or require('stringhelper')
-chat = require('chat')
+_libs.strings = _libs.strings or require('strings')
+local chat = require('chat')
 _libs.chat = _libs.chat or (chat ~= nil)
 
 local logger = {}
@@ -61,7 +61,7 @@ function captionlog(msg, msgcolor, ...)
     end
 
     for _, line in ipairs(str:split('\n')) do
-        windower.add_to_chat(logger.settings.logcolor, caption..line..chat.colorcontrols.reset)
+        windower.add_to_chat(logger.settings.logcolor, caption..line..chat.controls.reset)
     end
 end
 

@@ -39,7 +39,7 @@ require 'logger'
 require 'sets'
 
 json  = require 'json'
-file  = require 'filehelper'
+file  = require 'files'
 slips = require 'slips'
 
 load_timestamp         = os.time()
@@ -331,7 +331,7 @@ function update()
         characters_json:append('"'..character_name..'":{'..storages_json:concat(',')..'}')
     end
 
-    storages_file:write('{'..characters_json:concat(',')..'}')
+    storages_file:write('{'..characters_json:concat(',\n')..'}')
 
     collectgarbage()
 

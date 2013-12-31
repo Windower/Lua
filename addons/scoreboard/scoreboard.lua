@@ -6,12 +6,12 @@ _addon.author = 'Suji'
 _addon.version = '1.07'
 _addon.commands = {'sb', 'scoreboard'}
 
-require('tablehelper')
-require('stringhelper')
-require('mathhelper')
+require('tables')
+require('strings')
+require('maths')
 require('logger')
-require('actionhelper')
-local file = require('filehelper')
+require('actions')
+local file = require('files')
 config = require('config')
 
 local Display = require('display')

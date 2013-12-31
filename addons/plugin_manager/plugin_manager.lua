@@ -25,8 +25,8 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-file = require 'filehelper'
-require 'tablehelper'
+file = require 'files'
+require 'tables'
 xml = require 'xml'
 
 

@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 require 'chat'
 require 'logger'
-require 'stringhelper'
+require 'strings'
 
 local config = require 'config'
 

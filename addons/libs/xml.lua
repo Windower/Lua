@@ -6,11 +6,11 @@ local xml = {}
 
 _libs = _libs or {}
 _libs.xml = xml
-_libs.tablehelper = _libs.tablehelper or require('tablehelper')
+_libs.tables = _libs.tables or require('tables')
 _libs.lists = _libs.lists or require('lists')
 _libs.sets = _libs.sets or require('sets')
-_libs.stringhelper = _libs.stringhelper or require('stringhelper')
-_libs.filehelper = _libs.filehelper or require('filehelper')
+_libs.strings = _libs.strings or require('strings')
+_libs.files = _libs.files or require('files')
 
 -- Local functions
 local entity_unescape
@@ -47,9 +47,9 @@ local spaces = S{' ', '\n', '\t', '\r'}
 -- Only used internally to index the unescapes table.
 function entity_unescape(_, entity)
     if entity:startswith('#x') then
-        return string.char(tonumber(entity:sub(3), 16))
+        return entity:sub(3):number(16):char()
     elseif entity:startswith('#') then
-        return string.char(tonumber(entity:sub(2)))
+        return entity:sub(2):number():char()
     else
         return entity
     end
@@ -73,7 +73,7 @@ end
 -- Takes a filename and tries to parse the XML in it, after a validity check.
 function xml.read(file)
     if type(file) == 'string' then
-        file = _libs.filehelper.new(file)
+        file = _libs.files.new(file)
     end
 
     if not file:exists() then
@@ -181,9 +181,9 @@ end
 -- * .*(?!\]\]>)    CDATA
 function tokenize(content, line)
     local current = ''
-    local tokens = T{}
+    local tokens = L{}
     for i = 1, line do
-        tokens:append(T{})
+        tokens:append(L{})
     end
 
     local quote = nil
@@ -191,7 +191,7 @@ function tokenize(content, line)
     for c in content:it() do
         -- Only useful for a line count, to produce more accurate debug messages.
         if c == '\n' then
-            tokens:append(T{})
+            tokens:append(L{})
         end
 
         if mode == 'quote' then
@@ -283,7 +283,7 @@ function tokenize(content, line)
     end
 
     for array, line in tokens:it() do
-        tokens[line] = table.filter(array, -'')
+        tokens[line] = array:filter(-'')
     end
 
     return tokens
@@ -316,7 +316,7 @@ function classify(tokens, var)
     local headers = var
 
     local mode = 'inner'
-    local parsed = T{dom.new()}
+    local parsed = L{dom.new()}
     local name = nil
     for line, intokens in ipairs(tokens) do
         for _, token in ipairs(intokens) do

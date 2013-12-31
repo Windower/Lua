@@ -1,19 +1,16 @@
 --[[
-    A few functions that add an interface for color editing.
+    A collection of FFXI-specific chat/text functions and character/control database.
 ]]
 
 local chat = {}
 
 _libs = _libs or {}
 _libs.chat = chat
-_libs.tablehelper = _libs.tablehelper or require('tablehelper')
+_libs.tables = _libs.tables or require('tables')
 _libs.sets = _libs.sets or require('sets')
-_libs.stringhelper = _libs.stringhelper or require('stringhelper')
-_libs.json = _libs.json or require('json')
-
-chat = table.update(chat, (ffxi and ffxi.data and ffxi.data.chat) or _libs.json.read('../libs/ffxidata.json').chat)
-local colors = chat.colors
-local color_controls = chat.colorcontrols
+_libs.strings = _libs.strings or require('strings')
+_libs.chat.colors = _libs.chat.colors or require('chat.colors')
+_libs.chat.controls = _libs.chat.controls or require('chat.controls')
 
 -- Local functions
 local make_color
@@ -25,14 +22,14 @@ function make_color(col)
             warning('Invalid color number '..col..'. Only numbers between 1 and 511 permitted, except 256 and 257.')
             col = ''
         elseif col <= 0xFF then
-            col = color_controls[1]..string.char(col)
+            col = chat.controls.color1..string.char(col)
         else
-            col = color_controls[2]..string.char(col - 256)
+            col = chat.controls.color2..string.char(col - 256)
         end
     else
         if #col > 2 then
             local cl = col
-            col = colors[col]
+            col = chat.colors[col]
             if col == nil then
                 warning('Color \''..cl..'\' not found.')
                 col = ''
@@ -51,7 +48,7 @@ function string.color(str, new_color, reset_color)
         return str
     end
 
-    reset_color = reset_color or color_controls.reset
+    reset_color = reset_color or chat.controls.reset
 
     new_color = make_color(new_color)
     reset_color = make_color(reset_color)

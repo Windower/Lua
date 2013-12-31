@@ -3,12 +3,14 @@ A list of deciphered packets and their meaning, with a short description.
 When size is 0x00 it means the size is either unknown or varies.
 ]]
 
+local packets = {}
+
 _libs = _libs or {}
-_libs.packets = true
+_libs.packets = packets
 _libs.lists = _libs.lists or require('lists')
-_libs.mathhelper = _libs.mathhelper or require('mathhelper')
-_libs.stringhelper = _libs.stringhelper or require('stringhelper')
-_libs.functools = _libs.functools or require('functools')
+_libs.maths = _libs.maths or require('maths')
+_libs.strings = _libs.strings or require('strings')
+_libs.functions = _libs.functions or require('functions')
 
 require('pack')
 
@@ -16,7 +18,6 @@ require('pack')
     Packet database. Feel free to correct/amend it wherever it's lacking.
 ]]
 
-local packets = {}
 packets.data = require('packets/data')
 packets.fields = require('packets/fields')
 
@@ -46,6 +47,8 @@ setmetatable(type_lengths, {__index = function(t, k)
     if type and rawget(type_lengths, type) then
         return tonumber(count)*type_lengths[type]
     end
+
+    return nil
 end})
 
 local dummy = {name='Unknown', description='No data available.'}
@@ -54,9 +57,9 @@ local dummy = {name='Unknown', description='No data available.'}
 local function make_val(ctype, ...)
     if ctype == 'unsigned int' or ctype == 'unsigned short' or ctype == 'unsigned char' or ctype == 'unsigned long' then
         return tonumber(L{...}:reverse():map(string.zfill-{2}..math.tohex):concat(), 16)
-    else
-        return data
     end
+
+    return data
 end
 
 -- Type identifiers as declared in lpack.c
@@ -100,6 +103,8 @@ pack_ids = setmetatable(pack_ids, {__index = function(t, k)
             end
         end
     end
+
+    return nil
 end})
 
 -- Constructor for packets (both injected and parsed).
@@ -153,7 +158,7 @@ function packets.parse(dir, id, data)
         return res
     end
 
-    local pack_str = fields:map(table.index+{pack_ids}..table.get-{'ctype'}):concat()
+    local pack_str = fields:map(table.lookup-{pack_ids, 'ctype'}):concat()
 
     for key, val in ipairs({res._data:unpack(pack_str)}) do
         local field = fields[key]
@@ -223,26 +228,26 @@ function packets.build(packet)
     local fields = packets.fields.get(packet._dir, packet._id, packet._raw)
     if not fields then
         error('Packet 0x'..packet._id:hex():zfill(3)..' not recognized, unable to build.')
-        return
+        return nil
     end
 
     -- 'I' for the 4 byte header
     -- It's zeroed, as it will be filled out when injected
-    local pack_string = 'I'..fields:map(table.index+{pack_ids}..table.get-{'ctype'}):concat()
-    return pack_string:pack(0, fields:map(table.get+{packet}..table.get-{'label'}):unpack())
+    local pack_string = 'I'..fields:map(table.lookup-{pack_ids, 'ctype'}):concat()
+    return pack_string:pack(0, fields:map(table.lookup-{packet, 'label'}):unpack())
 end
 
 -- Injects a packet built with packets.new
 function packets.inject(packet)
     if packet._error then
         error('Bad packet, cannot inject')
-        return
+        return nil
     end
 
     local fields = packets.fields.get(packet._dir, packet._id, packet._raw)
     if not fields then
         error('Packet 0x'..packet._id:hex():zfill(3)..' not recognized, unable to send.')
-        return
+        return nil
     end
 
     packet._raw = packets.build(packet)

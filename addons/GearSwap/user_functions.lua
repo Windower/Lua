@@ -29,9 +29,9 @@
 
 
 function debug_mode(boolean)
-	if boolean == true or boolean == false then _global.debug_mode = boolean
+	if boolean == true or boolean == false then _settings.debug_mode = boolean
 	elseif boolean == nil then
-		_global.debug_mode = true
+		_settings.debug_mode = true
 	else
 		windower.add_to_chat(123,'GearSwap: debug_mode was passed an invalid value (true/no value/nil=on, false=off)')
 	end
@@ -39,9 +39,9 @@ end
 
 
 function show_swaps(boolean)
-	if boolean == true or boolean == false then _global.show_swaps = boolean
+	if boolean == true or boolean == false then _settings.show_swaps = boolean
 	elseif boolean == nil then
-		_global.show_swaps = true
+		_settings.show_swaps = true
 	else
 		windower.add_to_chat(123,'GearSwap: show_swaps was passed an invalid value (true/no value/nil=on, false=off)')
 	end
@@ -49,8 +49,8 @@ end
 
 
 function verify_equip(boolean)
-	if _global.current_event ~= 'precast' then
-		windower.add_to_chat(123,'GearSwap: verify_equip() is only valid in the precast function')
+	if _global.current_event ~= 'precast' and _global.current_event ~= 'pretarget' then
+		windower.add_to_chat(123,'GearSwap: verify_equip() is only valid in the precast and pretarget functions')
 		return
 	end
 	if boolean == true or boolean == false then _global.verify_equip = boolean
@@ -63,8 +63,8 @@ end
 
 
 function cancel_spell(boolean)
-	if _global.current_event ~= 'precast' then
-		windower.add_to_chat(123,'GearSwap: cancel_spell() is only valid in the precast function')
+	if _global.current_event ~= 'precast' and _global.current_event ~= 'pretarget' then
+		windower.add_to_chat(123,'GearSwap: cancel_spell() is only valid in the precast and pretarget functions')
 		return
 	end
 	if boolean == true or boolean == false then _global.cancel_spell = boolean
@@ -76,8 +76,8 @@ function cancel_spell(boolean)
 end
 
 function force_send(boolean)
-	if _global.current_event ~= 'precast' then
-		windower.add_to_chat(123,'GearSwap: force_send() is only valid in the precast function')
+	if _global.current_event ~= 'precast' and _global.current_event ~= 'pretarget' then
+		windower.add_to_chat(123,'GearSwap: force_send() is only valid in the precast and pretarget functions')
 		return
 	end
 	if boolean == true or boolean == false then _global.force_send = boolean
@@ -89,20 +89,22 @@ function force_send(boolean)
 end
 
 function change_target(name)
-	if _global.current_event ~= 'precast' then
-		windower.add_to_chat(123,'GearSwap: change_target() is only valid in the precast function')
+	if _global.current_event ~= 'pretarget' then
+		windower.add_to_chat(123,'GearSwap: change_target() is only valid in the pretarget')
 		return
 	end
 	if name and type(name)=='string' then
-		_global.storedtarget = name
+		local temp_targ
+		_global.storedtarget,temp_targ = valid_target(name)
+		spell.target = temp_targ
 	else
 		windower.add_to_chat(123,'GearSwap: change_target was passed an invalid value (must be a string)')
 	end
 end
 
 function cast_delay(delay)
-	if _global.current_event ~= 'precast' then
-		windower.add_to_chat(123,'GearSwap: cast_delay() is only valid in the precast function')
+	if _global.current_event ~= 'precast' and _global.current_event ~= 'pretarget' then
+		windower.add_to_chat(123,'GearSwap: cast_delay() is only valid in the precast and pretarget functions')
 		return
 	end
 	if tonumber(delay) then
@@ -124,15 +126,15 @@ function set_combine(...)
 		for i,v in pairs(set1) do
 			if slot_map[i] then
 				set3[default_slot_map[slot_map[i]]] = v
-			else
-				windower.add_to_chat(123,'GearSwap: set_combine error, Set 1 contains an unrecognized slot name ('..tostring(i)..')')
+			elseif _settings.debug_mode then
+				windower.add_to_chat(8,'GearSwap (Debug Mode): set_combine error, Set 1 contains an unrecognized slot name ('..tostring(i)..')')
 			end
 		end
 		for i,v in pairs(set2) do
 			if slot_map[i] then
 				set3[default_slot_map[slot_map[i]]] = v
-			else
-				windower.add_to_chat(123,'Gearswap: set_combine error, Set 2 contains an unrecognized slot name ('..tostring(i)..')')
+			elseif _settings.debug_mode then
+				windower.add_to_chat(8,'GearSwap (Debug Mode): set_combine error, Set 2 contains an unrecognized slot name ('..tostring(i)..')')
 			end
 		end
 		return set3
@@ -164,7 +166,7 @@ end
 function equip(...)
 	local gearsets = {...}
 	if #gearsets ~= table.length(gearsets) then
-		windower.add_to_chat(123,'Gearswap: Equip command failure. A passed set is nil')
+		windower.add_to_chat(123,'GearSwap: Equip command failure. A passed set is nil')
 		return
 	end
 	for i = 1,table.length(gearsets) do
@@ -184,7 +186,7 @@ function disable(...)
 		if slot_map[v] then
 			rawset(disable_table,slot_map[v],true)
 		else
-			windower.add_to_chat(123,'Gearswap: disable error, passed an unrecognized slot name ('..tostring(v)..')')
+			windower.add_to_chat(123,'GearSwap: disable error, passed an unrecognized slot name ('..tostring(v)..')')
 		end
 	end
 end
@@ -206,7 +208,7 @@ function enable(...)
 				not_sent_out_equip[local_slot] = nil
 			end
 		else
-			windower.add_to_chat(123,'Gearswap: enable error, passed an unrecognized slot name ('..tostring(v)..')')
+			windower.add_to_chat(123,'GearSwap: enable error, passed an unrecognized slot name ('..tostring(v)..')')
 		end
 	end
 	if table.length(sending_table) > 0 then
@@ -217,9 +219,9 @@ end
 function print_set(set,title)
 	if not set then
 		if title then
-			windower.add_to_chat(1,'Print_set: '..title..' set is nil.')
+			windower.add_to_chat(123,'GearSwap: print_set error '..title..' set is nil.')
 		else
-			windower.add_to_chat(1,'Print_set: Set is nil.')
+			windower.add_to_chat(123,'GearSwap: print_set error, set is nil.')
 		end
 		return
 	end
@@ -268,7 +270,7 @@ end
 
 function include_user(str)
 	if not (type(str) == 'string') then
-		windower.add_to_chat(123,'Gearswap: Include failure. Must pass a string.')
+		windower.add_to_chat(123,'GearSwap: Include failure. Must pass a string.')
 		return
 	end
 	if str:sub(-4)~='.lua' then str = str..'.lua' end
@@ -276,7 +278,7 @@ function include_user(str)
 	local path, loaded_values = pathsearch({str})
 	
 	if not path then
-		windower.add_to_chat(123,'Gearswap: Include failure. Cannot find file.')
+		windower.add_to_chat(123,'GearSwap: Include failure. Cannot find file.')
 		return
 	else
 		loaded_values = dofile(path)

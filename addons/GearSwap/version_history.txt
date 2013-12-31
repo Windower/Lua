@@ -1,73 +1,75 @@
 -------------------------------------------------
-Gearswap 0.723 - Removed a debug message, updated documentation, and refactored equip_processing.lua extensively.
+GearSwap 0.800 - Added pretarget and moved precast to outgoing_chunk. Changed "buff_change()" to pass a boolean instead of a string indicating whether the buff was gained or lost.
 -------------------------------------------------
-Gearswap 0.722 - Changed the ranged attack spell table to reflect the resources. Added spell.interrupted boolean. Added a persistent spell for ambiguous interruption message cases. Changed interrupted action.type to "Interruption"... Many things.
+GearSwap 0.723 - Removed a debug message, updated documentation, and refactored equip_processing.lua extensively.
 -------------------------------------------------
-Gearswap 0.721 - Adjusted for API changes and related documentation.
+GearSwap 0.722 - Changed the ranged attack spell table to reflect the resources. Added spell.interrupted boolean. Added a persistent spell for ambiguous interruption message cases. Changed interrupted action.type to "Interruption"... Many things.
 -------------------------------------------------
-Gearswap 0.720 - Fixed Pet TP magnitude, exposed OS library, updated documentation, improved file name handling (a bit), and minor changes to the validation algorithm.
+GearSwap 0.721 - Adjusted for API changes and related documentation.
 -------------------------------------------------
-Gearswap 0.719 - Removed dependence on sets library. Fixed error that occured when there was no subjob.
+GearSwap 0.720 - Fixed Pet TP magnitude, exposed OS library, updated documentation, improved file name handling (a bit), and minor changes to the validation algorithm.
 -------------------------------------------------
-Gearswap 0.718 - Fixed player.status. Added the validate command. Improved export sets' efficiency. Updated documentation.
+GearSwap 0.719 - Removed dependence on sets library. Fixed error that occured when there was no subjob.
 -------------------------------------------------
-Gearswap 0.717 - Fixed equipment removal. Added sets.naked. Handled category 11 outgoing actions (homepointing). Updated documentation.
+GearSwap 0.718 - Fixed player.status. Added the validate command. Improved export sets' efficiency. Updated documentation.
 -------------------------------------------------
-Gearswap 0.716 - Export now looks up the proper equipment slot. Changed syntax for equipping an empty slot to be less ambiguous. Fixed unequipping on zone (I think).
+GearSwap 0.717 - Fixed equipment removal. Added sets.naked. Handled category 11 outgoing actions (homepointing). Updated documentation.
 -------------------------------------------------
-Gearswap 0.715 - Converted resource strings to numbers if appropriate. Added Pianissimo casttime handling.
+GearSwap 0.716 - Export now looks up the proper equipment slot. Changed syntax for equipping an empty slot to be less ambiguous. Fixed unequipping on zone (I think).
 -------------------------------------------------
-Gearswap 0.714 - Minor changes to make export more user friendly.
+GearSwap 0.715 - Converted resource strings to numbers if appropriate. Added Pianissimo casttime handling.
 -------------------------------------------------
-Gearswap 0.713 - Added equipment order support. Made export sets more safe. Added equip "empty" support.
+GearSwap 0.714 - Minor changes to make export more user friendly.
 -------------------------------------------------
-Gearswap 0.712 - Added adventuring fellow handling.
+GearSwap 0.713 - Added equipment order support. Made export sets more safe. Added equip "empty" support.
 -------------------------------------------------
-Gearswap 0.711 - Refined category exclusions for the outgoing action packet.
+GearSwap 0.712 - Added adventuring fellow handling.
 -------------------------------------------------
-Gearswap 0.710 - Added windower.debug statements.
+GearSwap 0.711 - Refined category exclusions for the outgoing action packet.
 -------------------------------------------------
-Gearswap 0.709 - Looped midact back through console with a 1.5 second delay. Tested for 2 days without extra DC issues.
+GearSwap 0.710 - Added windower.debug statements.
 -------------------------------------------------
-Gearswap 0.708 - Added Encumbrance support. Added a message for Exporting files. Added another _global.midaction fix. Altered how Disable works, slightly.
+GearSwap 0.709 - Looped midact back through console with a 1.5 second delay. Tested for 2 days without extra DC issues.
 -------------------------------------------------
-Gearswap 0.707 - Forced the "sets" export to convert all equipment to inventory names. Started to add encumbrance code. Added a check for debuffs that prevent ability/spell usage in outgoing_chunk to reset midact.
+GearSwap 0.708 - Added Encumbrance support. Added a message for Exporting files. Added another _global.midaction fix. Altered how Disable works, slightly.
 -------------------------------------------------
-Gearswap 0.706 - Added a "sets" option to the export command.
+GearSwap 0.707 - Forced the "sets" export to convert all equipment to inventory names. Started to add encumbrance code. Added a check for debuffs that prevent ability/spell usage in outgoing_chunk to reset midact.
 -------------------------------------------------
-Gearswap 0.705 - Likely eliminated the Line 71 and 324 errors. Changed the "disable" console command so that it can be used for individual slots or all of gearswap.
+GearSwap 0.706 - Added a "sets" option to the export command.
 -------------------------------------------------
-Gearswap 0.704 - Changed require() to include() and reworked its back end. Confirmed that register_event() works for users now and are successfully deleted.
+GearSwap 0.705 - Likely eliminated the Line 71 and 324 errors. Changed the "disable" console command so that it can be used for individual slots or all of gearSwap.
 -------------------------------------------------
-Gearswap 0.703 - Added an export command and the appropriate documentation.
+GearSwap 0.704 - Changed require() to include() and reworked its back end. Confirmed that register_event() works for users now and are successfully deleted.
 -------------------------------------------------
-Gearswap 0.702 - Made keys to player data tables all case insensitive. Fixed the user windower structure. Set it so it should reset _global.midaction if the spelltarget dies while casting.
+GearSwap 0.703 - Added an export command and the appropriate documentation.
 -------------------------------------------------
-Gearswap 0.701 - Made silent interrupts reset _global.midaction. Fixed aftercast triggering on event_action_messages other than your own/your pets.
+GearSwap 0.702 - Made keys to player data tables all case insensitive. Fixed the user windower structure. Set it so it should reset _global.midaction if the spelltarget dies while casting.
 -------------------------------------------------
-Gearswap 0.700 - Added preliminary augmented equipment support. Improved register_event. Finished conversion of GearSwap to new API.
+GearSwap 0.701 - Made silent interrupts reset _global.midaction. Fixed aftercast triggering on event_action_messages other than your own/your pets.
 -------------------------------------------------
-Gearswap 0.605 - Fixed pet_mid/aftercast. Added/documented disable/enable. Verified that register_event will work in user documents.
+GearSwap 0.700 - Added preliminary augmented equipment support. Improved register_event. Finished conversion of GearSwap to new API.
 -------------------------------------------------
-Gearswap 0.604 - Added more handling to deal with monstrosity. Dramatical reduced memory requirements.
+GearSwap 0.605 - Fixed pet_mid/aftercast. Added/documented disable/enable. Verified that register_event will work in user documents.
 -------------------------------------------------
-Gearswap 0.603 - Added handling to deal with monstrosity. About a week worth of misc. changes that I can't remember.
+GearSwap 0.604 - Added more handling to deal with monstrosity. Dramatical reduced memory requirements.
 -------------------------------------------------
-Gearswap 0.602 - Minor refactoring, moved things around, added a little more protection to windower.send_command()
+GearSwap 0.603 - Added handling to deal with monstrosity. About a week worth of misc. changes that I can't remember.
 -------------------------------------------------
-Gearswap 0.601 - Improved the equip command to handle multiple set layers
+GearSwap 0.602 - Minor refactoring, moved things around, added a little more protection to windower.send_command()
 -------------------------------------------------
-Gearswap 0.600 - Added item handling and add/documented require
+GearSwap 0.601 - Improved the equip command to handle multiple set layers
 -------------------------------------------------
-Gearswap 0.505 - Added and documented set_combine()
+GearSwap 0.600 - Added item handling and add/documented require
 -------------------------------------------------
-Gearswap 0.504 - "Fixed" reraise crash error. Likely indicates an underlying problem in LuaCore that should be addressed
+GearSwap 0.505 - Added and documented set_combine()
 -------------------------------------------------
-Gearswap 0.503 - Event_status_change() handling changed so people don't swap gear when disengaging from NPCs or crafting.
+GearSwap 0.504 - "Fixed" reraise crash error. Likely indicates an underlying problem in LuaCore that should be addressed
 -------------------------------------------------
-Gearswap 0.502 - Require unmasked and documented.
+GearSwap 0.503 - Event_status_change() handling changed so people don't swap gear when disengaging from NPCs or crafting.
 -------------------------------------------------
-Gearswap 0.501 - File_unload user function added.
+GearSwap 0.502 - Require unmasked and documented.
 -------------------------------------------------
-Gearswap 0.500 - Initial beta release
+GearSwap 0.501 - File_unload user function added.
+-------------------------------------------------
+GearSwap 0.500 - Initial beta release
 -------------------------------------------------

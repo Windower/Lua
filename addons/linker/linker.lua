@@ -1,5 +1,5 @@
-require 'tablehelper'
-require 'stringhelper'
+require 'tables'
+require 'strings'
 require 'logger'
 config = require 'config'
 

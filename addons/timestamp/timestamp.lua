@@ -28,18 +28,17 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-require 'chat'
-require 'logger'
-require 'tablehelper'
-require 'sets'
-
-config = require 'config'
-
-
 _addon.name     = 'timestamp'
 _addon.author   = 'Zohno'
 _addon.version  = '1.20131102'
 _addon.commands = {'timestamp', 'ts'}
+
+chat = require('chat')
+require('logger')
+require('tables')
+require('sets')
+
+config = require('config')
 
 function timezone()
     local now  = os.time()
@@ -84,7 +83,7 @@ constants = {
     ['rfc822']       = '%a, %d %b %y %H:%M:%S '..tz,
     ['rfc1036']      = '%a, %d %b %y %H:%M:%S '..tz,
     ['rfc1123']      = '%a, %d %b %Y %H:%M:%S '..tz,
-    ['rfc3339']      = '%Y-%m-%dT%H:%M:%S'..tz_sep
+    ['rfc3339']      = '%Y-%m-%dT%H:%M:%S'..tz_sep,
 }
 
 lead_bytes = S{0x1E, 0x1F, 0xF7, 0xEF, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x7F}
@@ -128,14 +127,10 @@ windower.register_event('incoming text', function(original, modified, mode, newm
 end)
 
 windower.register_event('addon command', function(...)
-    local cmd  = (...) and (...):lower() or 'help'
+    local cmd  = (...) and (...):lower()
     local args = {select(2, ...)}
 
-    if cmd == 'help' then
-        log(chat.chars.wsquare..' timestamp [<command>] help -- shows the help text.')
-        log(chat.chars.wsquare..' timestamp color <color> -- sets the timestamp color.')
-        log(chat.chars.wsquare..' timestamp format <format> -- sets the timestamp format.')
-    elseif cmd == 'format' then
+    if cmd == 'format' then
         if not args[1] then
             error('Please specify the new timestamp format.')
         elseif args[1] == 'help' then
@@ -178,6 +173,8 @@ windower.register_event('addon command', function(...)
     elseif cmd == 'save' then
         settings:save('all')
     else
-        windower.send_command('timestamp help')
+        log(chat.chars.wsquare..' timestamp [<command>] help -- shows the help text.')
+        log(chat.chars.wsquare..' timestamp color <color> -- sets the timestamp color.')
+        log(chat.chars.wsquare..' timestamp format <format> -- sets the timestamp format.')
     end
 end)

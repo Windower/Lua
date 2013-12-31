@@ -1,13 +1,12 @@
-file = require 'filehelper'
-chat = require 'chat'
-require 'tablehelper'
-require 'stringhelper'
- 
-
 _addon.author = 'Balloon'
 _addon.name = 'Highlight'
 _addon.version = '1.0' 
 _addon.command = 'highlight'
+
+file = require('files')
+chat = require('chat')
+require('tables')
+require('strings')
  
 members={}
 mulenames={}
@@ -17,7 +16,7 @@ color={}
 mulecolor={}
 previousmentions={}
  
-config = require 'config'
+config = require('config')
  
 defaults = {}
 defaults.p0 = 501
@@ -126,7 +125,7 @@ windower.register_event('incoming text', function(original, modified, color, new
                 end
             end
             for mule, color in pairs(mulenames) do
-                modified = modified:igsub(mule, mulecolor[mule]..mule:capitalize()..chat.colorcontrols.reset)
+                modified = modified:igsub(mule, mulecolor[mule]..mule:capitalize()..chat.controls.reset)
             end
             if not settings.highlighting then
                 modified = modified:gsub('%(['..string.char(0x1e, 0x1f)..'].(%w+)'..'['..string.char(0x1e, 0x1f)..'].%)(.*)', function(name, rest) return '('..name..')'..rest end)            
@@ -169,7 +168,7 @@ function colconv(str, key)
     elseif strnum ~= 0 then
         print('You have an invalid color '..key)
     end
-    return chat.colorcontrols.reset
+    return chat.controls.reset
 end
  
 function get_party_members()
@@ -177,12 +176,12 @@ function get_party_members()
         for member, mob in pairs(windower.ffxi.get_party()) do
             if not mulenames[mob['name']:lower()] then
                 members[member] = mob['name']
-                modmember[member] = color[member]..mob['name']..chat.colorcontrols.reset
+                modmember[member] = color[member]..mob['name']..chat.controls.reset
             end
         end
     else 
         members['p0'] = player
-        modmember['p0'] = color['p0']..player..chat.colorcontrols.reset
+        modmember['p0'] = color['p0']..player..chat.controls.reset
     end    
 end
  

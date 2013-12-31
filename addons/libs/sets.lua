@@ -4,8 +4,8 @@ A library providing sets as a data structure.
 
 _libs = _libs or {}
 _libs.sets = true
-_libs.tablehelper = _libs.tablehelper or require('tablehelper')
-_libs.functools = _libs.functools or require('functools')
+_libs.tables = _libs.tables or require('tables')
+_libs.functions = _libs.functions or require('functions')
 
 set = {}
 
@@ -141,7 +141,7 @@ end
 
 function set.find(s, fn)
     if type(fn) ~= 'function' then
-        fn = functools.equals(fn)
+        fn = functions.equals(fn)
     end
     
     for el in pairs(s) do
@@ -244,13 +244,10 @@ function set.filter(s, fn)
 end
 
 function set.reduce(s, fn, init)
-    local acc = init
-    for el in pairs(s) do
-        if acc == nil then
-            acc = el
-        else
-            acc = fn(acc, el)
-        end
+    local acc = init or next[2](s)
+    local pfn = pairs(s)
+    for el in init and pfn or pfn(s) and pfn do
+        acc = fn(acc, el)
     end
 
     return acc

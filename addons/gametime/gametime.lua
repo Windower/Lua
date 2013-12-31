@@ -30,13 +30,11 @@ _addon.commands = {'gametime','gt'}
 
 require('chat')
 require('logger')
-require('stringhelper')
-require('mathhelper')
-require('tablehelper')
+require('strings')
+require('maths')
+require('tables')
 
-ffxi = require('ffxi')
 config = require('config')
-
 
 tb_name	= 'addon:gr:gametime'
 visible = false

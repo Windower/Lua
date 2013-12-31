@@ -6,11 +6,11 @@ local config = {}
 
 _libs = _libs or {}
 _libs.config = config
-_libs.tablehelper = _libs.tablehelper or require('tablehelper')
+_libs.tables = _libs.tables or require('tables')
 _libs.sets = _libs.sets or require('sets')
-_libs.stringhelper = _libs.stringhelper or require('stringhelper')
+_libs.strings = _libs.strings or require('strings')
 _libs.xml = _libs.xml or require('xml')
-_libs.filehelper = _libs.filehelper or require('filehelper')
+_libs.files = _libs.files or require('files')
 
 if not _libs.logger then
     error = print
@@ -49,7 +49,7 @@ function config.load(filename, confdict)
     end})
     -- Settings member variables, in separate struct
     local meta = {}
-    meta.file = _libs.filehelper.new()
+    meta.file = _libs.files.new()
     meta.original = T{global = T{}}
     meta.chars = S{}
     meta.comments = T{}
@@ -60,7 +60,7 @@ function config.load(filename, confdict)
 
     -- Load addon config file (Windower/addon/<addonname>/data/settings.xml).
     local filepath = filename
-    if not _libs.filehelper.exists(filepath) then
+    if not _libs.files.exists(filepath) then
         meta.file:set(filepath, true)
         meta.original.global = table.copy(settings)
         config.save(settings, 'all')

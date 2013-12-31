@@ -4,7 +4,7 @@ A library providing advanced list support and better optimizations for list-base
 
 _libs = _libs or {}
 _libs.lists = true
-_libs.tablehelper = _libs.tablehelper or require('tablehelper')
+_libs.tables = _libs.tables or require('tables')
 
 _raw = _raw or {}
 _raw.table = _raw.table or {}
@@ -236,14 +236,9 @@ function list.filter(l, fn)
 end
 
 function list.reduce(l, fn, init)
-    local acc = init
-    for key = 1, l.n do
-        local val = rawget(l, key)
-        if acc == nil then
-            acc = val
-        else
-            acc = fn(acc, val)
-        end
+    local acc = init or l[1]
+    for key = init and 1 or 2, l.n do
+        acc = fn(acc, rawget(l, key))
     end
 
     return acc

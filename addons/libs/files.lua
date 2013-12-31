@@ -5,8 +5,8 @@ File handler.
 local files = {}
 
 _libs = _libs or {}
-_libs.filehelper = files
-_libs.stringhelper = _libs.stringhelper or require('stringhelper')
+_libs.files = files
+_libs.strings = _libs.strings or require('strings')
 
 local createfile = false
 
@@ -15,10 +15,10 @@ function files.new(path, create)
     create = true and (create ~= false)
 
     if path == nil then
-        return setmetatable(T{}, {__index = files})
+        return setmetatable({}, {__index = files})
     end
 
-    local f = setmetatable(T{}, {__index = files})
+    local f = setmetatable({}, {__index = files})
     f:set(path, create)
 
     return f
@@ -96,7 +96,7 @@ function files.read(f)
     fh:close()
 
     -- Remove byte order mark for UTF-8, if present
-    if content:startswith(string.char(0xEF, 0xBB, 0xBF)) then
+    if content:sub(1, 3) == (string.char(0xEF, 0xBB, 0xBF)) then
         return content:sub(4)
     end
 

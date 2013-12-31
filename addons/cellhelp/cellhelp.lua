@@ -33,11 +33,11 @@ _addon.version = 0.1
 local config = require 'config'
 
 
-require 'tablehelper'
-require 'stringhelper'
-require 'mathhelper'
+require 'tables'
+require 'strings'
+require 'maths'
 require 'logger'
-require 'actionhelper'
+require 'actions'
 -----------------------------
 
 local settingtab = nil

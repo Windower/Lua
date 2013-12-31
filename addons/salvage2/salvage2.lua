@@ -27,11 +27,11 @@ _addon.command = 's2'
 _addon.author = 'Bahamut.Krizz'
 local config = require 'config'
 
-require 'tablehelper'
-require 'stringhelper'
-require 'mathhelper'
+require 'tables'
+require 'strings'
+require 'maths'
 require 'logger'
-require 'actionhelper'
+require 'actions'
 -----------------------------
 
 local settingtab = nil

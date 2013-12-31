@@ -3,15 +3,14 @@ LuaU - A utility tool for making Lua usable within FFXI. Loads several libraries
 ]]
 
 require('logger')
-require('stringhelper')
-require('tablehelper')
+require('strings')
+require('tables')
 require('lists')
 require('sets')
-require('mathhelper')
-require('functools')
-chat = require('chat')
-ffxi = require('ffxi')
+require('maths')
+require('functions')
 config = require('config')
+res = require('resources')
 
 collectgarbage()
 

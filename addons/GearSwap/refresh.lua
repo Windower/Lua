@@ -83,7 +83,7 @@ function load_user_files()
 		sets = nil
 		return
 	end
-	user_env = {gearswap = _G, _global = _global,
+	user_env = {gearSwap = _G, _global = _global, _settings = _settings,
 		-- Player functions
 		equip = equip, verify_equip=verify_equip, cancel_spell=cancel_spell,
 		force_send=force_send, change_target=change_target, cast_delay=cast_delay,
@@ -92,7 +92,7 @@ function load_user_files()
 		midaction=user_midaction,
 		
 		-- Library functions
-		string=string, math=math, table=table, T=T,S=S,os=os,type=type,
+		string=string, math=math, table=table, T=T,S=S,L=L,os=os,type=type,
 		tostring = tostring, tonumber = tonumber, pairs = pairs,
 		ipairs = ipairs, print=print, add_to_chat=windower.add_to_chat,
 		next=next,lua_base_path=windower.addon_path,empty=empty,
@@ -368,7 +368,7 @@ end
 -----------------------------------------------------------------------------------
 function refresh_user_env()
 	refresh_globals()
-	windower.send_command('@wait 0.5;lua i gearswap load_user_files')
+	windower.send_command('@wait 0.5;lua i '.._addon.name..' load_user_files')
 end
 
 

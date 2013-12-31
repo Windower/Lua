@@ -32,7 +32,7 @@ if windower.dir_exists('../addons/shortcuts/data/') and logging then
 	logfile:flush()
 end
 
-file = require 'filehelper'
+file = require 'files'
 require 'sets'
 require 'helper_functions'
 

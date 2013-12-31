@@ -31,12 +31,12 @@ _addon.name = 'MobCompass'
 _addon.version = '1.0'
 _addon.commands = {'mobcompass','mc'}
 
-require 'tablehelper'  -- Required for various table related features. Made by Arcon
+require 'tables'  -- Required for various table related features. Made by Arcon
 require 'logger'       -- Made by arcon. Here for debugging purposes
-require 'stringhelper' -- Required to parse the other files. Probably made by Arcon
-require 'mathhelper'
+require 'strings' -- Required to parse the other files. Probably made by Arcon
+require 'maths'
 local config = require 'config'
-file = require 'filehelper'
+file = require 'files'
 
 local settingtab = nil
 local settings_file = 'data/settings.xml'

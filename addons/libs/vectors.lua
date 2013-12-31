@@ -4,8 +4,8 @@ Vectors for operations in a d-dimensional space.
 
 _libs = _libs or {}
 _libs.vectors = true
-_libs.tablehelper = _libs.tablehelper or require('tablehelper')
-_libs.mathhelper = _libs.mathhelper or require('mathhelper')
+_libs.tables = _libs.tables or require('tables')
+_libs.maths = _libs.maths or require('maths')
 
 vector = {}
 

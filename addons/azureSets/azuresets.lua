@@ -32,35 +32,38 @@ _addon.version = '1.22'
 _addon.author = 'Nitrous (Shiva)'
 _addon.commands = {'aset','azuresets','asets'}
 
-require 'tablehelper'
-require 'stringhelper'
-require 'logger'
-config = require 'config'
-files = require 'filehelper'
-res = require 'resources'
-defaults = T{}
-defaults.spellsets = T{}
-defaults.spellsets.default = T{ }
-defaults.spellsets.vw1 = T{slot01='Firespit', slot02='Heat Breath', slot03='Thermal Pulse', slot04='Blastbomb',
+require('tables')
+require('strings')
+require('logger')
+config = require('config')
+files = require('files')
+res = require('resources')
+chat = require('chat')
+
+defaults = {}
+defaults.spellsets = {}
+defaults.spellsets.default = {}
+defaults.spellsets.vw1 = {slot01='Firespit', slot02='Heat Breath', slot03='Thermal Pulse', slot04='Blastbomb',
 slot05='Infrasonics', slot06='Frost Breath', slot07='Ice Break', slot08='Cold Wave',
 slot09='Sandspin', slot10='Magnetite Cloud', slot11='Cimicine Discharge', slot12='Bad Breath', 
 slot13='Acrid Stream', slot14='Maelstrom', slot15='Corrosive Ooze', slot16='Cursed Sphere', 
 slot17='Awful Eye'
 }
-defaults.spellsets.vw2 = T{slot01='Hecatomb Wave', slot02='Mysterious Light', slot03='Leafstorm', slot04='Reaving Wind',
+defaults.spellsets.vw2 = {slot01='Hecatomb Wave', slot02='Mysterious Light', slot03='Leafstorm', slot04='Reaving Wind',
 slot05='Temporal Shift', slot06='Mind Blast', slot07='Blitzstrahl', slot08='Charged Whisker',
 slot09='Blank Gaze', slot10='Radiant Breath', slot11='Light of Penance', slot12='Actinic Burst',
 slot13='Death Ray', slot14='Eyes On Me', slot15='Sandspray'
 }
 
+settings = config.load(defaults)
+
 function initialize()
     spells = res.spells:type('BlueMagic')
-    settings = config.load(defaults)
     get_current_spellset()
 end
 
 windower.register_event('load', function()
-    if windower.ffxi.get_info()['logged_in'] then
+    if windower.ffxi.get_info().logged_in then
         initialize()
     end
 end)
@@ -236,7 +239,7 @@ windower.register_event('addon command', function(...)
   7. spelllist <setname> -- List spells in (setname)
   8. help --Shows this menu.]]
             for _, line in ipairs(helptext:split('\n')) do
-                windower.add_to_chat(207, line..chat.colorcontrols.reset)
+                windower.add_to_chat(207, line..chat.controls.reset)
                 
             end
         end

@@ -31,14 +31,17 @@ _addon.version = '0.22'
 _addon.author = 'Nitrous (Shiva)'
 _addon.commands = {'autocontrol','acon'}
 
-require 'tablehelper'
-require 'stringhelper'
-require 'logger'
-require 'sets'
-res = require 'resources'
-config = require 'config'
-files = require 'filehelper'
-defaults = T{}
+require('tables')
+require('strings')
+require('logger')
+require('sets')
+res = require('resources')
+config = require('config')
+files = require('files')
+chat = require('chat')
+require('maneuver')
+
+defaults = {}
 defaults.bg = {}
 defaults.bg.red = 0
 defaults.bg.blue = 0
@@ -56,9 +59,6 @@ defaults.autosets = T{}
 defaults.autosets.default = T{ }
     
 settings = config.load(defaults)
-settings:save()
-
-require 'maneuver'
 
 petlessZones = S{50,235,234,224,284,233,70,257,251,14,242,250,226,245,
                  237,249,131,53,252,231,236,246,232,240,247,243,223,248,230,
@@ -291,7 +291,7 @@ The following all correspond to the burden tracker:
      settings - shows current settings
      show/hide - toggles visibility of the tracker so you can make changes.]]
             for _, line in ipairs(helptext:split('\n')) do
-                windower.add_to_chat(207, line..chat.colorcontrols.reset)
+                windower.add_to_chat(207, line..chat.controls.reset)
             end
         end
     end
