@@ -132,9 +132,6 @@ function equip_sets(swap_type,val1,val2,ind)
 	end
 	
 	local equip_next = to_id_set(items.inventory,equip_list) -- Translates the equip_list from the player (i=slot name, v=item name) into a table with i=slot id and v=inventory id.
-	
-	print_set(equip_next,'Equip next: '..swap_type)
-	
 	equip_next = eliminate_redundant(cur_equip,equip_next) -- Eliminate the equip commands for items that are already equipped
 	
 	if _settings.show_swaps and table.length(equip_next)>0 then
@@ -423,13 +420,6 @@ function get_gs_gear(cur_equip,swap_type)
 			sent_out_box = sent_out_box..tostring(i)..' '..tostring(r_items[items.inventory[v].id].english)..'\n'
 		end
 	end
-	windower.add_to_chat(1,'----------------- DIFF '..swap_type..' -----------------')
-	for i,v in pairs(cur_equip) do
-		if temp_set[i] ~= v then
-			windower.add_to_chat(8,tostring(i)..' '..tostring(v))
-		end
-	end
-	windower.add_to_chat(1,'----------------------------------------')
 	if debugging > 0 then windower.text.set_text(swap_type,sent_out_box) end
 	return cur_equip
 end
