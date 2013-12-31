@@ -123,6 +123,9 @@ function target_make(targets)
 						target_type = 'Party'
 					end
 				end
+				if target.charmed then
+					target_type = 'Enemy'
+				end
 				break
 			end
 		end
