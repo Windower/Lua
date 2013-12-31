@@ -154,7 +154,6 @@ function equip_sets(swap_type,val1,val2,ind)
 	
 	if not failure_reason then
 		if ind and _global.verify_equip then sent_out_equip.ind = ind end
-		
 		for _,i in ipairs(equip_order) do
 			if debugging >= 3 and equip_next[i] then
 				local out_str = 'Order: '..tostring(_)..'  Slot ID: '..tostring(i)..'  Inv. ID: '..tostring(equip_next[i])
@@ -408,7 +407,9 @@ function get_gs_gear(cur_equip,swap_type)
 	local not_sent_ids = to_id_set(items.inventory,not_sent_out_equip)
 
 	for i,v in pairs(cur_equip) do
-		if sent_out_equip[short_slot_map[i]] then
+		if limbo_equip[short_slot_map[i]] then
+			cur_equip[i] = limbo_equip[short_slot_map[i]]
+		elseif sent_out_equip[short_slot_map[i]] then
 			cur_equip[i] = sent_out_equip[short_slot_map[i]]
 		elseif not_sent_ids[short_slot_map[i]] then
 			cur_equip[i] = not_sent_ids[short_slot_map[i]]

@@ -265,8 +265,9 @@ _settings.show_swaps = false
 
 
 gearswap_disabled = false
-sent_out_equip = T{}
-not_sent_out_equip = T{}
+sent_out_equip = {}
+not_sent_out_equip = {}
+limbo_equip = {}
 out_arr = {}
 equip_list = {}
 equip_order = {}
