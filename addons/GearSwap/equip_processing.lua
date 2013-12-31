@@ -408,10 +408,10 @@ function get_gs_gear(cur_equip,swap_type)
 	local not_sent_ids = to_id_set(items.inventory,not_sent_out_equip)
 
 	for i,v in pairs(cur_equip) do
-		if sent_out_equip[short_slot_map[i]] then
-			cur_equip[i] = sent_out_equip[short_slot_map[i]]
-		elseif not_sent_ids[short_slot_map[i]] then
-			cur_equip[i] = not_sent_ids[short_slot_map[i]]
+		if sent_out_equip[slot_map[i]] then
+			cur_equip[i] = sent_out_equip[slot_map[i]]
+		elseif not_sent_ids[slot_map[i]] then
+			cur_equip[i] = not_sent_ids[slot_map[i]]
 		end
 		if v == 0 or v == 'empty' then
 			cur_equip[i] = empty
