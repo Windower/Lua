@@ -338,6 +338,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
 --		'Equipment packet'
 		if sent_out_equip[data:byte(6)] == data:byte(5) then
 			sent_out_equip[data:byte(6)] = nil
+			limbo_equip[data:byte(6)] = data:byte(5)
 			if table.length(sent_out_equip) == 1 and sent_out_equip.ind and out_arr[sent_out_equip.ind] and out_arr[sent_out_equip.ind].verify_equip then
 				local out = packet_send_check(true,sent_out_equip.ind)
 				sent_out_equip.ind = nil
@@ -346,6 +347,8 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
 				end
 			end
 		end
+	elseif id == 0x01D and not injected then
+		limbo_equip = {}
 	end
 end)
 
