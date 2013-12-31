@@ -1,4 +1,4 @@
-#Shortcuts v1.6
+#Shortcuts v1.7
 ####written by Byrth  
 
 Completes and properly formats commands (prefixed by at least one '/'),
@@ -9,6 +9,7 @@ spellcast" project, and represents the interpretation part of spellcast.
 None  
 
 ####Changelog:  
+v1.7 - 12/31/13 - Fixed st targets for shortcuts.
 v1.6 - 12/12/13 - Fixed "target is nil" bug.
 v1.5 - 12/7/13  - Various bugfixes and more complete support for pattern matching.
 v1.4 - 11/17/13 - Improved ambiguous name handling using windower.ffxi.get_abilities().
