@@ -51,6 +51,7 @@ require 'export'
 require 'validate'
 require 'sets'
 require 'flow'
+require 'lists'
 res = require 'resources'
 
 windower.register_event('load',function()

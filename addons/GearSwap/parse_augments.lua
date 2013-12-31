@@ -345,42 +345,87 @@ augment_index = {
 
 --[[function extdata_to_augment(extdata)
 	if not extdata then return end
-	local flags,id_1,val_1,id_2,val_2,id_3,val_3,Augment_1,Augment_2,Augment_3
+	local flags,id_1,val_1,id_2,val_2,id_3,val_3,id_4,val_4,Augment_1,Augment_2,Augment_3,Augment_4
+	local trial_complete,trial_number = false
 	
-	flags = extdata:byte(1,2)
-	for j=1,string.len(extdata) do
-		if extdata:byte(j) ~= 0 then
---			windower.add_to_chat(1,tostring(extdata:byte(j)))
+	flags = extdata:sub(1,2)
+	
+	if flags:byte(1) == 2 then
+		if flags:byte(2) == 3 then
+			id_1 = extdata:byte(3)+(extdata:byte(4)%8)*256
+			val_1 = math.floor(extdata:byte(4)/8)
+			
+			id_2 = extdata:byte(5)+(extdata:byte(6)%8)*256
+			val_2 = math.floor(extdata:byte(6)/8)
+			
+			id_3 = extdata:byte(7)+(extdata:byte(8)%8)*256
+			val_3 = math.floor(extdata:byte(8)/8)
+			
+			if id_1 ~= 0 then Augment_1 = unpack_augment(augment_index[id_1],val_1) end
+			if id_2 ~= 0 then Augment_2 = unpack_augment(augment_index[id_2],val_2) end
+			if id_3 ~= 0 then Augment_3 = unpack_augment(augment_index[id_3],val_3) end
+		elseif flags:byte(2) == 67 then
+			id_1 = extdata:byte(7)+(extdata:byte(8)%8)*256
+			val_1 = math.floor(extdata:byte(8)/8)
+			
+			id_2 = extdata:byte(9)+(extdata:byte(10)%8)*256
+			val_2 = math.floor(extdata:byte(10)/8)
+			
+			trial_number = extdata:byte(12)*256+extdata:byte(11)
+			if trial_number%32768 > 1 then
+				trial_number = trial_number%32768
+				trial_complete = true
+			end
+			
+			if id_1 ~= 0 then Augment_1 = unpack_augment(augment_index[id_1],val_1) end
+			if id_2 ~= 0 then Augment_2 = unpack_augment(augment_index[id_2],val_2) end
+			
+		elseif flags:byte(2) == 35 then
+			-- Manibozho, Bokwus, etc.
+			id_1 = extdata:byte(7)
+			val_1 = extdata:byte(8)
+			
+			id_2 = extdata:byte(9)
+			val_2 = extdata:byte(10)
+			
+			id_3 = extdata:byte(11)
+			val_3 = extdata:byte(12)
 		end
+	elseif flags:byte(1) == 45 then
+		-- Pearlsacks are 45,85
+	elseif flags:byte(1) == 1 then
+		-- Enchanted item
+		local uses_remaining = extdata:byte(2)
 	end
-	id_1 = extdata:byte(3)+(extdata:byte(4)%8)*256
-	val_1 = math.floor(extdata:byte(4)/8)
-	
-	id_2 = extdata:byte(5)+(extdata:byte(6)%8)*256
-	val_2 = math.floor(extdata:byte(6)/8)
-	
-	id_3 = extdata:byte(7)+(extdata:byte(8)%8)*256
-	val_3 = math.floor(extdata:byte(8)/8)
-	
-	if id_1 ~= 0 then Augment_1 = unpack_augment(augment_index[id_1],val_1) end
-	if id_2 ~= 0 then Augment_2 = unpack_augment(augment_index[id_2],val_2) end
-	if id_3 ~= 0 then Augment_3 = unpack_augment(augment_index[id_3],val_3) end
-	
 --	windower.add_to_chat(1,'flags: '..tostring(flags)..'  id/val 1: '..id_1..'/'..val_1..'  id/val 2: '..id_2..'/'..val_2..'  id/val 3: '..id_3..'/'..val_3)
 --	windower.add_to_chat(8,'-------------------------------------------')
 	
-	return Augment_1,Augment_2,Augment_3
+	return Augment_1,Augment_2,Augment_3,Augment_4,trial_number,trial_complete
 end
 
 function unpack_augment(augment_table,val)
 	local return_augment
-	for i,v in pairs(augment_table) do
-		if i > 1 then return_augment = return_augment..',' end
-		return_augment = (return_augment or '')..v.stat
-		if v.offset >= 0 then return_augment = return_augment..(val+v.offset)
-		else return_augment = return_augment..'-'..(val-v.offset) end
+	if augment_table and type(augment_table) == 'table' then
+		for i,v in pairs(augment_table) do
+			if i > 1 then return_augment = return_augment..',' end
+			return_augment = (return_augment or '')..v.stat
+			if v.offset >= 0 then return_augment = return_augment..((val+v.offset)*(v.multiplier or 1))
+			else return_augment = return_augment..'-'..((val-v.offset)*(v.multiplier or 1)) end
+		end
 	end
-	return return_augment
+	return return_augment or 'nil'
+end
+
+for i,v in pairs(windower.ffxi.get_items().inventory) do
+	if v.extdata then
+		local tempstr = r_items[v.id].english..'   '
+		for n=1,string.len(v.extdata) do
+			tempstr = tempstr..string.byte(v.extdata,n)..' '
+		end
+		local aug1,aug2,aug3,trial,done = extdata_to_augment(v.extdata)
+		tempstr = tempstr..'    Augs: '..tostring(aug1)..'   '..tostring(aug2)..'   '..tostring(aug3)..'   '..tostring(trial)..'   '..tostring(done)
+		windower.add_to_chat(2,tempstr)
+	end
 end]]
 
 function augment_to_extdata(str)
@@ -391,12 +436,11 @@ function augment_to_extdata(str)
 	if pol == '-' then
 		pol = -1
 	else
---		aug = (aug or '')..(pol or '') -- Temporary for debugging reasons
 		pol = 1
 	end
 	
 	for i,v in pairs(augment_index) do
-		if v[1].stat == aug and (val/(v[1].multiplier or 1) - pol*v[1].offset) <= 32 then
+		if v[1].stat == aug and (val/(v[1].multiplier or 1) - pol*v[1].offset) <= 32 then -- Value has a maximum value of 32 because it's only 5 bits.
 			val = val/(v[1].multiplier or 1) - pol*v[1].offset
 			firstbyte = i%256 or 0
 			secondbyte = math.floor(i/256)+8*val or 0
