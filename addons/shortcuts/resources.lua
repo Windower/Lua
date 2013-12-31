@@ -135,11 +135,13 @@ command2_list = {['/kick']=true,['/assist']=true,['/alliancecmd']=T{'kick','add'
 	['/check']=true,['/c']=true,['/breaklinkshell']=true,['/target']=true,['/ta']=true,['/ra']=true,['/targetnpc']=true,['/follow']=true}
 
 -- List of commands to be ignored
-ignore_list = {['/equip']=true,['/raw']=true,['/fish']=true,['/dig']=true,['/range']=true,['/map']=true,['/hide']=true}
+ignore_list = {['/equip']=true,['/raw']=true,['/fish']=true,['/dig']=true,['/range']=true,['/map']=true,['/hide']=true,['/attackoff']=true,['/quest']=true}
 
 -- Targets to ignore and just pass through
 pass_through_targs = T{'<t>','<me>','<ft>','<scan>','<bt>','<lastst>','<r>','<pet>','<p0>','<p1>','<p2>','<p3>','<p4>',
-	'<p5>','<a10>','<a11>','<a12>','<a13>','<a14>','<a15>','<a20>','<a21>','<a22>','<a23>','<a24>','<a25>','<stpc>','<stal>','<stnpc>','<stpt>'}
+	'<p5>','<a10>','<a11>','<a12>','<a13>','<a14>','<a15>','<a20>','<a21>','<a22>','<a23>','<a24>','<a25>'}
+
+st_targs = T{'<stpc>','<stal>','<stnpc>','<stpt>'}
 
 targ_reps = {t='<t>',me='<me>',ft='<ft>',scan='<scan>',bt='<bt>',lastst='<lastst>',r='<r>',pet='<pet>',p0='<p0>',p1='<p1>',p2='<p2>',p3='<p3>',p4='<p4>',
 	p5='<p5>',a10='<a10>',a11='<a11>',a12='<a12>',a13='<a13>',a14='<a14>',a15='<a15>',a20='<a20>',a21='<a21>',a22='<a22>',a23='<a23>',a24='<a24>',a25='<a25>',
