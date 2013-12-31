@@ -88,6 +88,7 @@ function make_entry(v,typ,i)
 		end
 		if typ == 'Magic' then v.prefix = '/ma'
 		elseif typ == 'Ability' then v.prefix = '/ja'
+		else v.prefix = '/item'
 		end
 	end
 	if not v.element then v.element = 'None' end
@@ -121,7 +122,11 @@ r_items:update(parse_resources(r_itemsWFile:readlines()))
 for i,v in pairs(r_items) do
 	if type(v) == 'table' and v.targets ~= 'None' then
 		v.prefix = '/item'
+		v.type = 'Item'
 		r_items[i] = make_entry(v,'Item',i)
+	elseif type(v) == 'table' then
+		r_items[i].prefix = '/item'
+		r_items[i].type = 'Item'
 	end
 end
 	
