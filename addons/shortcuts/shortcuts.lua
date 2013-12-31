@@ -35,6 +35,7 @@ end
 file = require 'files'
 require 'sets'
 require 'helper_functions'
+require 'tables'
 
 require 'resources'
 require 'ambiguous_names'
