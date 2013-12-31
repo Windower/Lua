@@ -57,13 +57,11 @@ function equip_sets(swap_type,val1,val2,ind)
 		_global.verify_equip = false
 		_global.force_send = false
 		if _settings.debug_mode then windower.add_to_chat(8,'GearSwap (Debug Mode): Pretarget '..tostring(val1.name)) end
-		val1.target = spelltarget
 		if type(user_env.pretarget) == 'function' then user_env.pretarget(val1,val2) -- User defined function to determine the pretarget set
 		elseif user_env.pretarget then windower.add_to_chat(123,'GearSwap: pretarget() exists but is not a function') end
 		ind = mk_out_arr_entry(val1,{target_id=spell.target.id},nil)
 	elseif swap_type == 'precast' then
 		if _settings.debug_mode then windower.add_to_chat(8,'GearSwap (Debug Mode): Precast '..tostring(val1.name)) end
-		val1.target = spelltarget
 		if type(user_env.precast) == 'function' then user_env.precast(val1,val2) -- User defined function to determine the precast set
 		elseif user_env.precast then windower.add_to_chat(123,'GearSwap: precast() exists but is not a function') end
 		if _global.verify_equip then
@@ -72,7 +70,6 @@ function equip_sets(swap_type,val1,val2,ind)
 		_global.midaction = true
 	elseif swap_type == 'midcast' then
 		if _settings.debug_mode then windower.add_to_chat(8,'GearSwap (Debug Mode): Midcast '..tostring(val1.name)) end
-		val1.target = spelltarget
 		user_env.midcast(val1,val2) -- User defined function to determine the midcast set
 	elseif swap_type == 'aftercast' then
 		if _settings.debug_mode then windower.add_to_chat(8,'GearSwap (Debug Mode): Aftercast '..tostring(val1.name)) end
@@ -81,18 +78,14 @@ function equip_sets(swap_type,val1,val2,ind)
 				windower.add_to_chat(8,'val1 error')
 			end
 		end
-		val1.target = spelltarget
 		_global.midaction = false
-		spelltarget = nil
 		user_env.aftercast(val1,val2) -- User defined function to determine the aftercast set
 	elseif swap_type == 'pet_midcast' then
 		if _settings.debug_mode then windower.add_to_chat(8,'GearSwap (Debug Mode): Pet Midcast '..tostring(val1.name)) end
-		val1.target = spelltarget
 		user_env.pet_midcast(val1,val2) -- User defined function to determine the midcast set
 	elseif swap_type == 'pet_aftercast' then
 		if _settings.debug_mode then windower.add_to_chat(8,'GearSwap (Debug Mode): Pet Aftercast '..tostring(val1.name)) end
 		if val1 then
-			val1.target = spelltarget
 		else
 			windower.add_to_chat(8,'---------------- VAL1 IS NIL ------------')
 		end
@@ -125,9 +118,12 @@ function equip_sets(swap_type,val1,val2,ind)
 			command_send_check(out_arr[ind].storedtarget)
 		elseif swap_type == 'precast' then
 			packet_send_check(true,ind)
+		elseif swap_type == 'aftercast' then
+			d_out_arr_entry(val1,ind)
 		end
 		return
 	end
+	
 	
 	for i,v in pairs(short_slot_map) do
 		if equip_list[i] and (disable_table[v] or encumbrance_table[v]) then
@@ -136,6 +132,8 @@ function equip_sets(swap_type,val1,val2,ind)
 	end
 	
 	local equip_next = to_id_set(items.inventory,equip_list) -- Translates the equip_list from the player (i=slot name, v=item name) into a table with i=slot id and v=inventory id.
+	
+	print_set(equip_next,'Equip next: '..swap_type)
 	
 	equip_next = eliminate_redundant(cur_equip,equip_next) -- Eliminate the equip commands for items that are already equipped
 	
@@ -158,7 +156,7 @@ function equip_sets(swap_type,val1,val2,ind)
 	
 	
 	if not failure_reason then
-		if ind then sent_out_equip.ind = ind end
+		if ind and _global.verify_equip then sent_out_equip.ind = ind end
 		
 		for _,i in ipairs(equip_order) do
 			if debugging >= 3 and equip_next[i] then
@@ -257,7 +255,7 @@ function to_id_set(inventory,equip_list)
 	end
 	for n,m in pairs(inventory) do
 		if check_wearable(m.id) then
-			if m.flags == 0 then -- Make sure the item is either unequipped and not otherwise committed.
+			if m.flags == 0 or m.flags == 5 then -- Make sure the item is either equipped or not otherwise committed. eliminate_redundant will take care of the already-equipped gear.
 				for i,v in pairs(short_slot_map) do
 					local name,order,extgoal = expand_entry(equip_list[i])
 					-- equip_list[i] can also be a table (that doesn't contain a "name" property) or a number, which are both cases that should not generate any kind of equipment changing.
@@ -407,15 +405,16 @@ function unify_slots(equipment)
 end
 
 function get_gs_gear(cur_equip,swap_type)
+	local temp_set = table.reassign({},cur_equip)
 	local sent_out_box = 'Going into '..swap_type..':\n' -- i = 'head', 'feet', etc.; v = inventory ID (0~80)
 	-- If the swap is not complete, overwrite the current equipment with the equipment that you are swapping to
 	local not_sent_ids = to_id_set(items.inventory,not_sent_out_equip)
 
 	for i,v in pairs(cur_equip) do
-		if sent_out_equip[slot_map[i]] then
-			cur_equip[i] = sent_out_equip[slot_map[i]]
-		elseif not_sent_ids[slot_map[i]] then
-			cur_equip[i] = not_sent_ids[slot_map[i]]
+		if sent_out_equip[short_slot_map[i]] then
+			cur_equip[i] = sent_out_equip[short_slot_map[i]]
+		elseif not_sent_ids[short_slot_map[i]] then
+			cur_equip[i] = not_sent_ids[short_slot_map[i]]
 		end
 		if v == 0 or v == 'empty' then
 			cur_equip[i] = empty
@@ -424,6 +423,13 @@ function get_gs_gear(cur_equip,swap_type)
 			sent_out_box = sent_out_box..tostring(i)..' '..tostring(r_items[items.inventory[v].id].english)..'\n'
 		end
 	end
+	windower.add_to_chat(1,'----------------- DIFF '..swap_type..' -----------------')
+	for i,v in pairs(cur_equip) do
+		if temp_set[i] ~= v then
+			windower.add_to_chat(8,tostring(i)..' '..tostring(v))
+		end
+	end
+	windower.add_to_chat(1,'----------------------------------------')
 	if debugging > 0 then windower.text.set_text(swap_type,sent_out_box) end
 	return cur_equip
 end

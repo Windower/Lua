@@ -99,19 +99,22 @@ end
 function mk_out_arr_entry(sp,arr,original)
 	local inde = unify_prefix[spell.prefix]..' '..spell.english
 	if out_arr[inde..' '..tostring(arr.target_id)] then
-		out_arr[inde..' '..arr.target_id].data = original
 		inde = inde..' '..arr.target_id
+		out_arr[inde].data = original
+		out_arr[inde].spell.target = sp.target
 	elseif out_arr[inde..' nil'] then
-		out_arr[inde..' nil'].data = original
 		inde = inde..' nil'
+		out_arr[inde].data = original
+		out_arr[inde].spell.target = sp.target
 	else
-		if debugging >= 3 then windower.add_to_chat(8,'GearSwap (Debug Mode): Creating a new out_arr entry: '..tostring(inde)..' '..tostring(arr.target_id)) end
+		if debugging >= 2 then windower.add_to_chat(8,'GearSwap (Debug Mode): Creating a new out_arr entry: '..tostring(inde)..' '..tostring(arr.target_id)) end
 		inde = inde..' '..tostring(arr.target_id)
 		out_arr[inde] = {}
 		out_arr[inde].data = original
 		out_arr[inde].verify_equip = false
 		out_arr[inde].cast_delay = 0
 		out_arr[inde].force_send = false
+		out_arr[inde].spell = sp
 	end
 	return inde
 end
@@ -202,6 +205,7 @@ function out_action(arr,original)
 			spell.interrupted = false
 		end
 		spell.name = spell[language]
+		spell.target = target_complete(windower.ffxi.get_mob_by_index(arr.target_index))
 		if _settings.debug_mode then windower.add_to_chat(8,"GearSwap (Debug Mode): Attempting to use "..spell.name) end
 		
 		return equip_sets('precast',spell,{type=acttype},inde)
@@ -225,6 +229,7 @@ function out_item(arr,original)
 	if spell then
 		local inde = mk_out_arr_entry(spell,arr,original)
 		spell.name = spell[language]
+		spell.target = target_complete(windower.ffxi.get_mob_by_index(arr.target_index))
 		if buffactive.muddle or buffactive.medicine then -- What exactly does medicated status block?
 			spell.interrupted = true
 		else
@@ -309,6 +314,7 @@ function inc_action(act)
 	local inde
 	if spell then
 		inde = unify_prefix[spell.prefix]..' '..spell.english
+		spell.target = target_complete(windower.ffxi.get_mob_by_id(act.targets[1].id))
 	end
 	
 	if jas[category] or uses[category] or (readies[category] and act.param == 28787 and not (category == 9 or (category == 7 and prefix == 'pet_'))) then
@@ -324,12 +330,10 @@ function inc_action(act)
 		if type(user_env[prefix..'aftercast']) == 'function' then
 			equip_sets(prefix..'aftercast',spell,{type=action_type},inde)
 		elseif user_env[prefix..'aftercast'] then
-			_global.midaction = false
-			spelltarget = nil
+			d_out_arr_entry(spell,inde)
 			windower.add_to_chat(123,'GearSwap: '..prefix..'aftercast() exists but is not a function')
 		else
-			_global.midaction = false
-			spelltarget = nil
+			d_out_arr_entry(spell,inde)
 		end
 	elseif readies[category] and act.param ~= 28787 then
 		if type(user_env[prefix..'midcast']) == 'function' then
@@ -341,10 +345,10 @@ function inc_action(act)
 end
 
 function inc_action_message(arr)
-	if spelltarget and T{6,20,113,406,605,646}:contains(arr.message_id) and spelltarget.id == arr.target_id then
+	-- actor_id,target_id,param_1,param_2,param_3,actor_index,target_index,message_id)
+	if T{6,20,113,406,605,646}:contains(arr.message_id) then
 		-- If your current spell's target is defeated or falls to the ground
-		_global.midaction = false
-		spelltarget = nil
+		delete_out_arr_by_id(arr.target_id)
 	end
 	
 	local tempplay = windower.ffxi.get_player()
@@ -367,27 +371,46 @@ function inc_action_message(arr)
 			tempitem.interrupted = true
 			equip_sets('aftercast',tempitem,{type='Interruption'},true)
 		elseif user_env.aftercast then
-			_global.midaction = false
-			spelltarget = nil
+			delete_out_arr_by_id(arr.target_id)
 			windower.add_to_chat(123,'GearSwap: aftercast() exists but is not a function')
 		else
-			_global.midaction = false
-			spelltarget = nil
+			delete_out_arr_by_id(arr.target_id)
 		end
 	elseif unable_to_use:contains(arr.message_id) then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(195) Event Action Message: '..tostring(message_id)..' Interrupt') end
 		if type(user_env[prefix..'aftercast']) == 'function' then
-			if persistent_spell then persistent_spell.interrupted = true
-			else persistent_spell = {name="Unknown Interrupt"} end
-			equip_sets(prefix..'aftercast',persistent_spell,{type='Interruption'},true)
+			local loop_check
+			for i,v in pairs(out_arr) do
+				if v.spell and v.spell.target and v.spell.target.id == arr.target_id then
+					v.spell.interrupted = true
+					equip_sets(prefix..'aftercast',v.spell,{type='Interruption'},true)
+					loop_check = true
+					break
+				end
+			end
+			if not loop_check then
+				equip_sets(prefix..'aftercast',{name="Unknown Interruption",english="Unknown Interruption",interrupted=true},{type='Interruption'},true)
+			end
 		elseif user_env[prefix..'aftercast'] then
-			_global.midaction = false
-			spelltarget = nil
+			delete_out_arr_by_id(arr.target_id)
 			windower.add_to_chat(123,'GearSwap: '..prefix..'aftercast() exists but is not a function')
 		else
-			_global.midaction = false
-			spelltarget = nil
+			delete_out_arr_by_id(arr.target_id)
 		end
+	end
+end
+
+function delete_out_arr_by_id(id)
+	local deleted_table = {}
+	for i,v in pairs(out_arr) do
+		if v.spell and v.spell.target then
+			if v.spell.target.id == arr.target_id then
+				deleted_table[i] = true
+			end
+		end
+	end
+	for i,v in pairs(deleted_table) do
+		out_arr[i] = nil
 	end
 end
 

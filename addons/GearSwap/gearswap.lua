@@ -175,7 +175,7 @@ windower.register_event('outgoing text',function(original,modified)
 		abil = splitline[2]:lower()
 	end
 	
-	local temptarg = valid_target(splitline[splitline.n])
+	local temptarg,temp_mob_arr = valid_target(splitline[splitline.n])
 		
 	if command_list[command] and temptarg and validabils[language][unify_prefix[command]][abil] then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) temp_mod: '..temp_mod) end
@@ -217,6 +217,7 @@ windower.register_event('outgoing text',function(original,modified)
 		_global.storedtarget = temptarg
 		
 		spell = aftercast_cost(r_line)
+		spell.target = temp_mob_arr
 		
 		storedcommand = command..' "'..spell[language]..'" '
 		return equip_sets('pretarget',spell,{type=s_type})
@@ -226,6 +227,7 @@ windower.register_event('outgoing text',function(original,modified)
 		rline = r_abilities[1]
 		_global.storedtarget = temptarg
 		spell = aftercast_cost(rline)
+		spell.target = temp_mob_arr
 		
 		storedcommand = spell.prefix..' '
 		return equip_sets('pretarget',spell,{type="Ranged Attack"})

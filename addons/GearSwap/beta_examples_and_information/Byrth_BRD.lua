@@ -139,7 +139,6 @@ function midcast(spell,action)
 end
 
 function aftercast(spell,action)
-	if spell.interrupted then windower.add_to_chat(8,'OMG, INTERRUPTED!!!') end
 	if spell.type == 'BardSong' and spell.target and spell.target.type:upper() == 'SELF' then
 		local t = os.time()
 		

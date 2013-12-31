@@ -28,17 +28,14 @@
 -- Target Processing --
 
 function valid_target(targ)
-	if not spelltarget then spelltarget = {} end
+	local spelltarget = {}
 	
 	local spell_targ
 	if pass_through_targs:contains(targ) then
 		local j = windower.ffxi.get_mob_by_target(targ)
 		
-		if not j then
-			windower.add_to_chat(8,tostring(targ))
-			table.reassign(spelltarget,{}) -- st targets
-		else
-			table.reassign(spelltarget,target_complete(j))
+		if j then
+			spelltarget = target_complete(j)
 		end
 		spelltarget.raw = targ
 		return targ,spelltarget
@@ -46,13 +43,13 @@ function valid_target(targ)
 		local mob_array = windower.ffxi.get_mob_array()
 		for i,v in pairs(mob_array) do
 			if v.name:lower()==targ:lower() and not v.is_npc then
-				spell_targ = targ
-				table.reassign(spelltarget,target_complete(v))
+				spelltarget = target_complete(v)
 				spelltarget.raw = targ
+				return targ,spelltarget
 			end
 		end
 	end
-	return spell_targ,spelltarget
+	return false,false
 end
 
 function target_complete(mob_table)
@@ -98,6 +95,9 @@ function target_complete(mob_table)
 		else
 			mob_table.status = 'Unknown'
 		end
+	end
+	if mob_table.distance then
+		mob_table.distance = math.sqrt(mob_table.distance)
 	end
 	return mob_table
 end
