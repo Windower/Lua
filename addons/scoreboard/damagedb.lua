@@ -49,7 +49,7 @@ end
 
 
 function DamageDB:_filter_contains_mob(mob_name)
-    if self.filter:isempty() then
+    if self.filter:empty() then
         return true
     end
     
@@ -119,8 +119,8 @@ function DamageDB:query_stat(stat, player_name)
 end
 
 
-function DamageDB:isempty()
-    return self.db:isempty()
+function DamageDB:empty()
+    return self.db:empty()
 end
 
 

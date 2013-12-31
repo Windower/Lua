@@ -87,7 +87,7 @@ function Display:report_filters()
     local mob_str
     local filters = self.db:get_filters()
     
-    if filters:isempty() then
+    if filters:empty() then
         mob_str = "Scoreboard filters: None (Displaying damage for all mobs)"
     else
         mob_str = "Scoreboard filters: " .. filters:concat(', ')
@@ -104,14 +104,14 @@ function Display:build_scoreboard_header()
     local mob_filter_str
     local filters = self.db:get_filters()
 
-    if filters:isempty() then
+    if filters:empty() then
         mob_filter_str = "All"
     else
         mob_filter_str = table.concat(filters, ", ")
     end
 	
     local labels
-    if self.db:isempty() then
+    if self.db:empty() then
         labels = "\n"
     else
         labels = string.format("%23s%7s%9s\n", "Tot", "Pct", "DPS")
@@ -142,7 +142,7 @@ function Display:get_sorted_player_damage()
     local mob, players
     local player_total_dmg = T{}
 
-    if self.db:isempty() then
+    if self.db:empty() then
         return {}, 0
     end
 	
@@ -180,7 +180,7 @@ function Display:update()
         return
     end
 
-    if self.db:isempty() then
+    if self.db:empty() then
         self:reset()
         return
     end
@@ -381,7 +381,7 @@ Display.show_stat = (function()
         local filters = self.db:get_filters()
         local filter_str
         
-        if filters:isempty() then
+        if filters:empty() then
             filter_str = 'All mobs'
         else
             filter_str = filters:concat(', ')

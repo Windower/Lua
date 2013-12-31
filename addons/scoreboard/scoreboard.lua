@@ -238,7 +238,7 @@ windower.register_event('addon command',function(...)
         elseif param1 == 'fields' then
             do  error("Not implemented yet.") return end
         elseif param1 == 'save' then
-            if false then -- dps_db:isempty() then
+            if false then -- dps_db:empty() then
                 error('Nothing to save.')
                 return
             else
