@@ -331,9 +331,9 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
 		if table.length(tab) > 0 then
 			equip_sets('equip_command',tab)
 		end
-		if current_job_file ~= res.jobs[data:byte(9)].short then
-			refresh_user_env(data:byte(9))
-		end
+--		if current_job_file ~= res.jobs[data:byte(9)].short then
+--			refresh_user_env(data:byte(9))
+--		end
 	elseif gearswap_disabled then
 		return
 	elseif id == 0x050 and not injected then
@@ -424,7 +424,6 @@ end)
 
 windower.register_event('job change',function(mjob, mjob_id, mjob_lvl, sjob, sjob_id, sjob_lvl)
 	if debugging >= 1 then windower.debug('job change') end
-	print(mjob, mjob_id, mjob_lvl, sjob, sjob_id, sjob_lvl)
 	if mjob ~= current_job_file then
 		refresh_user_env(mjob_id)
 	end
