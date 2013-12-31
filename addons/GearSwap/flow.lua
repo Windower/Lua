@@ -99,7 +99,7 @@ end
 function mk_out_arr_entry(sp,arr,original)
 	local inde = unify_prefix[spell.prefix]..' '..spell.english
 	if out_arr[inde..' '..tostring(arr.target_id)] then
-		inde = inde..' '..arr.target_id
+		inde = inde..' '..tostring(arr.target_id)
 		out_arr[inde].data = original
 		out_arr[inde].spell.target = sp.target
 	elseif out_arr[inde..' nil'] then
@@ -312,9 +312,12 @@ function inc_action(act)
 	end
 	
 	local inde
-	if spell then
+	if spell and spell.english then
 		inde = unify_prefix[spell.prefix]..' '..spell.english
 		spell.target = target_complete(windower.ffxi.get_mob_by_id(act.targets[1].id))
+	elseif spell then
+		unknown_out_arr_deletion(prefix,{target_id = act.targets[1].id})
+		return
 	end
 	
 	if jas[category] or uses[category] or (readies[category] and act.param == 28787 and not (category == 9 or (category == 7 and prefix == 'pet_'))) then
@@ -378,25 +381,29 @@ function inc_action_message(arr)
 		end
 	elseif unable_to_use:contains(arr.message_id) then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(195) Event Action Message: '..tostring(message_id)..' Interrupt') end
-		if type(user_env[prefix..'aftercast']) == 'function' then
-			local loop_check
-			for i,v in pairs(out_arr) do
-				if v.spell and v.spell.target and v.spell.target.id == arr.target_id then
-					v.spell.interrupted = true
-					equip_sets(prefix..'aftercast',v.spell,{type='Interruption'},true)
-					loop_check = true
-					break
-				end
+		unknown_out_arr_deletion(prefix,arr)
+	end
+end
+
+function unknown_out_arr_deletion(prefix,arr)
+	if type(user_env[prefix..'aftercast']) == 'function' then
+		local loop_check
+		for i,v in pairs(out_arr) do
+			if v.spell and v.spell.target and v.spell.target.id == arr.target_id then
+				v.spell.interrupted = true
+				equip_sets(prefix..'aftercast',v.spell,{type='Interruption'},true)
+				loop_check = true
+				break
 			end
-			if not loop_check then
---				equip_sets(prefix..'aftercast',{name="Unknown Interruption",english="Unknown Interruption",interrupted=true},{type='Interruption'},true)
-			end
-		elseif user_env[prefix..'aftercast'] then
-			delete_out_arr_by_id(arr.target_id)
-			windower.add_to_chat(123,'GearSwap: '..prefix..'aftercast() exists but is not a function')
-		else
-			delete_out_arr_by_id(arr.target_id)
 		end
+		if not loop_check then
+	--				equip_sets(prefix..'aftercast',{name="Unknown Interruption",english="Unknown Interruption",interrupted=true},{type='Interruption'},true)
+		end
+	elseif user_env[prefix..'aftercast'] then
+		delete_out_arr_by_id(arr.target_id)
+		windower.add_to_chat(123,'GearSwap: '..prefix..'aftercast() exists but is not a function')
+	else
+		delete_out_arr_by_id(arr.target_id)
 	end
 end
 
@@ -404,7 +411,7 @@ function delete_out_arr_by_id(id)
 	local deleted_table = {}
 	for i,v in pairs(out_arr) do
 		if v.spell and v.spell.target then
-			if v.spell.target.id == arr.target_id then
+			if v.spell.target.id == id then
 				deleted_table[i] = true
 			end
 		end
@@ -414,22 +421,22 @@ function delete_out_arr_by_id(id)
 	end
 end
 
-function command_send_check(targ,inde)
+function command_send_check(inde)
 	if out_arr[inde] then
 		if out_arr[inde].cancel_spell then
 			if debugging>=2 then windower.add_to_chat(5,'Spell canceled.') end
 			storedcommand = nil
 			return ''
 		else
+			out_arr[inde].spell = spell
 	--		print('arg1: '..tostring(val and storedcommand)..'  arg2: '..tostring(storedcommand)..' '..tostring(table.length(sent_out_equip))..'  arg3: '..tostring(storedcommand and not _global.verify_equip))
-			if targ and storedcommand then
-				local assemblecommand = storedcommand..targ
+			if (out_arr[inde].spell and out_arr[inde].spell.target and out_arr[inde].spell.target.raw) and storedcommand then
+				local assemblecommand = storedcommand..out_arr[inde].spell.target.raw
 				storedcommand = nil
-				out_arr[inde].spell = spell
 				if logging then logit(logfile,'Command Sent: '..assemblecommand..'\n') end
 				return assemblecommand
 			elseif _settings.debug_mode then
-				windower.add_to_chat(8,'GearSwap (Debug Mode): Spell was not sent because there was no stored command ('..tostring(stored_command)') or target ('..tostring(targ)..')')
+				windower.add_to_chat(8,'GearSwap (Debug Mode): Spell was not sent because there was no stored command ('..tostring(stored_command)') or target ('..tostring(out_arr[inde].spell and out_arr[inde].spell.target and out_arr[inde].spell.target.raw)..')')
 				return ''
 			end
 		end

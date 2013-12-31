@@ -177,7 +177,7 @@ function equip_sets(swap_type,val1,val2,ind)
 	
 	cache_globals(ind)
 	if swap_type == 'pretarget' then
-		return command_send_check(out_arr[ind].storedtarget,ind)
+		return command_send_check(ind)
 	elseif swap_type == 'precast' then
 		return packet_send_check(_global.force_send,ind)
 	elseif swap_type == 'aftercast' then

@@ -1,4 +1,6 @@
 -------------------------------------------------
+GearSwap 0.801 - Combatted double precasts, fixed a variety of nil errors, and made Paralysis work (hopefully).
+-------------------------------------------------
 GearSwap 0.800 - Added pretarget and moved precast to outgoing_chunk. Changed "buff_change()" to pass a boolean instead of a string indicating whether the buff was gained or lost.
 -------------------------------------------------
 GearSwap 0.723 - Removed a debug message, updated documentation, and refactored equip_processing.lua extensively.

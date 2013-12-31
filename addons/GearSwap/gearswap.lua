@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.800'
+_addon.version = '0.801'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -155,7 +155,7 @@ function disenable(tab,funct,functname,pol)
 				print('GearSwap: Unable to find slot '..tostring(tab[i])..'.')
 			end
 		end
-	elseif not gearswap_disabled and not tab[2] then
+	elseif gearswap_disabled ~= pol and not tab[2] then
 		print('GearSwap: User file '..functname..'d')
 		gearswap_disabled = pol
 	end
@@ -215,8 +215,6 @@ windower.register_event('outgoing text',function(original,modified)
 			print('this case should never be hit '..command)
 		end
 		
-		_global.storedtarget = temptarg
-		
 		spell = aftercast_cost(r_line)
 		spell.target = temp_mob_arr
 		
@@ -226,7 +224,6 @@ windower.register_event('outgoing text',function(original,modified)
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) temp_mod: '..temp_mod) end
 
 		rline = r_abilities[1]
-		_global.storedtarget = temptarg
 		spell = aftercast_cost(rline)
 		spell.target = temp_mob_arr
 		
@@ -332,6 +329,9 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
 		if table.length(tab) > 0 then
 			equip_sets('equip_command',tab)
 		end
+		if current_job_file ~= res.jobs[data:byte(9)].short then
+			refresh_user_env(data:byte(9))
+		end
 	elseif gearswap_disabled then
 		return
 	elseif id == 0x050 and not injected then
@@ -353,6 +353,15 @@ windower.register_event('outgoing chunk',function(id,original,modified,injected,
 	if gearswap_disabled then return end
 	if debugging >= 1 then windower.debug('outgoing chunk '..id) end
 	if (id == 0x1A or id == 0x36 or id == 0x37) and not injected then
+		local cur_time = os.clock()
+		for i,v in pairs(outgoing_packet_table) do
+			if cur_time-v > 1 then
+				outgoing_packet_table[i] = nil
+			elseif i:sub(1,2) == original:sub(1,2) and i:sub(5) == original:sub(5) then
+				return
+			end
+		end
+		outgoing_packet_table[original] = os.clock()
 		local arr = {}
 		data = original:sub(5)
 		if id == 0x01A then
@@ -401,8 +410,9 @@ end)
 
 windower.register_event('job change',function(mjob, mjob_id, mjob_lvl, sjob, sjob_id, sjob_lvl)
 	if debugging >= 1 then windower.debug('job change') end
+	print(mjob, mjob_id, mjob_lvl, sjob, sjob_id, sjob_lvl)
 	if mjob ~= current_job_file then
-		refresh_user_env()
+		refresh_user_env(mjob_id)
 	end
 end)
 
@@ -449,7 +459,7 @@ function get_spell(act)
 				if act.category == 4 and spell then spell.recast = act.recast end
 			elseif T{3,6,7,13,14,15}:contains(act.category) then
 				spell = r_abilities[abil_ID] -- May have to correct for charmed pets some day, but I'm not sure there are any monsters with TP moves that give no message.
-			elseif T{5,9}:contains(act['category']) then
+			elseif T{5,9}:contains(act.category) then
 				spell = r_items[abil_ID]
 			else
 				spell = {name=tostring(msg_ID)} -- Debugging

@@ -54,7 +54,8 @@ end
 ---- user_env, a table of all of the player defined functions and their current
 ---- variables.
 -----------------------------------------------------------------------------------
-function load_user_files()
+function load_user_files(job_id)
+	job_id = tonumber(job_id)
 	local path
 	
 	if user_env then
@@ -71,9 +72,9 @@ function load_user_files()
 	user_env = nil
 	registered_user_events = {}
 	
-	local tab = {player.name..'_'..player.main_job..'.lua',player.name..'-'..player.main_job..'.lua',
-		player.name..'_'..player.main_job_full..'.lua',player.name..'-'..player.main_job_full..'.lua',
-		player.name..'.lua',player.main_job..'.lua',player.main_job_full..'.lua','default.lua'}
+	local tab = {player.name..'_'..res.jobs[job_id].short..'.lua',player.name..'-'..res.jobs[job_id].short..'.lua',
+		player.name..'_'..res.jobs[job_id].english..'.lua',player.name..'-'..res.jobs[job_id].english..'.lua',
+		player.name..'.lua',res.jobs[job_id].short..'.lua',res.jobs[job_id].english..'.lua','default.lua'}
 	
 	local path = pathsearch(tab)
 	
@@ -92,7 +93,7 @@ function load_user_files()
 		midaction=user_midaction,
 		
 		-- Library functions
-		string=string, math=math, table=table, T=T,S=S,L=L,os=os,type=type,
+		string=string, math=math, table=table, T=T,S=S,L=L,set=set,list=list,os=os,type=type,
 		tostring = tostring, tonumber = tonumber, pairs = pairs,
 		ipairs = ipairs, print=print, add_to_chat=windower.add_to_chat,
 		next=next,lua_base_path=windower.addon_path,empty=empty,
@@ -121,8 +122,8 @@ function load_user_files()
 		sets = nil
 		return
 	else
-		current_job_file = player.main_job
-		print('Loaded your '..player.main_job..' Lua file!')
+		current_job_file = res.jobs[job_id].short
+		print('Loaded your '..res.jobs[job_id].short..' Lua file!')
 	end
 	
 	setfenv(funct, user_env)
@@ -366,9 +367,10 @@ end
 --Returns:
 ---- none, but loads user files if they exist.
 -----------------------------------------------------------------------------------
-function refresh_user_env()
+function refresh_user_env(job_id)
 	refresh_globals()
-	windower.send_command('@wait 0.5;lua i '.._addon.name..' load_user_files')
+	if not job_id then job_id = windower.ffxi.get_player().main_job_id end
+	windower.send_command('@wait 0.5;lua i '.._addon.name..' load_user_files '..job_id)
 end
 
 
