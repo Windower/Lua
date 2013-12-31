@@ -389,7 +389,7 @@ function inc_action_message(arr)
 				end
 			end
 			if not loop_check then
-				equip_sets(prefix..'aftercast',{name="Unknown Interruption",english="Unknown Interruption",interrupted=true},{type='Interruption'},true)
+--				equip_sets(prefix..'aftercast',{name="Unknown Interruption",english="Unknown Interruption",interrupted=true},{type='Interruption'},true)
 			end
 		elseif user_env[prefix..'aftercast'] then
 			delete_out_arr_by_id(arr.target_id)
