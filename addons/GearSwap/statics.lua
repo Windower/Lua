@@ -287,6 +287,7 @@ disable_table[0] = false
 encumbrance_table = table.reassign({},disable_table)
 registered_user_events = {}
 empty = {name="empty"}
+outgoing_packet_table = {}
 
 
 --persistant_sequence = {}  ---------------------- TEMPORARY TO INVESTIGATE LAG ISSUES IN DELVE
