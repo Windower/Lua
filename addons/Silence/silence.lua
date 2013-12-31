@@ -1,9 +1,9 @@
 _addon.name = 'Silence'
 _addon.author = 'Ihina'
-_addon.version = '1.0.1.0'
+_addon.version = '1.0.1.1'
 _addon.command = 'silence'
 
-config = require 'config'
+config = require('config')
 defaults = {}
 defaults.ShowOne = false
 settings = config.load(defaults)
@@ -17,14 +17,15 @@ last['Equipment removed.'] = 0
 last['You were unable to change your equipped items.'] = 0
 last['You cannot use that command while unconscious.'] = 0
 last['You cannot use that command while charmed.'] = 0
+last['You can only use that command during battle.'] = 0
 		
 windower.register_event('incoming text', function(str)
 	if last[str] then
 		if not settings.ShowOne then
-			return ''
+			return true
 		else
 			if os.clock() - last[str] < .75 then
-				return ''
+				return true
 			else
 				last[str] = os.clock()
 			end
@@ -73,3 +74,4 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
+--Original plugin by Taj
