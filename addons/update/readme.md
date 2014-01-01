@@ -1,6 +1,6 @@
 # Update
 
-Once loaded can update all addons and plugins to the newest version using `//update`. This can also be done automatically be configuring the settings file. Or typing `//update auto`.
+Once loaded can update all addons and plugins to the newest version using `//update`. This can also be done automatically by configuring the settings file or by typing `//update auto`.
 
 ### Commands
 
@@ -12,7 +12,7 @@ update
 
 Will send an update command.
 
-*Note:* This interferes with Spellcast XMLs using the custom `update` trigger command. To resolve that problem stop using Spellcast.
+**Note:** This interferes with Spellcast XMLs using the custom `update` trigger command. To resolve that problem stop using Spellcast.
 
 #### Toggle automatic updates
 
