@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.801'
+_addon.version = '0.802'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -137,7 +137,7 @@ windower.register_event('addon command',function (...)
 	elseif strip(splitup[1]) == 'showswaps' then
 		_settings.show_swaps = not _settings.show_swaps
 		print('GearSwap: Show Swaps set to '..tostring(_settings.show_swaps)..'.')
-	elseif not ((strip(splitup[1]) == 'eval' or strip(splitup[1]) == 'visible' or strip(splitup[1]) == 'invisible') and debugging>0) then
+	elseif not ((strip(splitup[1]) == 'eval' or strip(splitup[1]) == 'visible' or strip(splitup[1]) == 'invisible' or strip(splitup[1]) == 'clocking' ) and debugging>0) then
 		print('GearSwap: Command not found')
 	end
 end)
@@ -163,6 +163,7 @@ end
 
 windower.register_event('outgoing text',function(original,modified)
 	if debugging >= 1 then windower.debug('outgoing text') end
+	if clocking then out_time = os.clock() end
 	if gearswap_disabled then return modified end
 	
 	local temp_mod = windower.convert_auto_trans(modified)
@@ -299,6 +300,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
 		end
 		inc_action(act)
 	elseif id == 0x29 and not injected then
+		if clocking then windower.add_to_chat(8,'Action Message: '..(os.clock() - out_time)) end
 		if gearswap_disabled then return end
 		data = data:sub(5)
 		local arr = {}
@@ -329,9 +331,9 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
 		if table.length(tab) > 0 then
 			equip_sets('equip_command',tab)
 		end
-		if current_job_file ~= res.jobs[data:byte(9)].short then
-			refresh_user_env(data:byte(9))
-		end
+--		if current_job_file ~= res.jobs[data:byte(9)].short then
+--			refresh_user_env(data:byte(9))
+--		end
 	elseif gearswap_disabled then
 		return
 	elseif id == 0x050 and not injected then
@@ -367,6 +369,7 @@ windower.register_event('outgoing chunk',function(id,original,modified,injected,
 		outgoing_packet_table[original] = os.clock()
 		local arr = {}
 		data = original:sub(5)
+		local result
 		if id == 0x01A then
 	--		'Action Packet'
 			arr.actor_id = get_bit_packed(data,0,32)
@@ -375,20 +378,28 @@ windower.register_event('outgoing chunk',function(id,original,modified,injected,
 			arr.param = get_bit_packed(data,64,80)
 			arr.unknown1 = get_bit_packed(data,80,96)
 			arr.target_id = windower.ffxi.get_mob_by_index(arr.target_index).id
-			return out_action(arr,original)
+			result = out_action(arr,original)
 		elseif id == 0x036 then
 	--		'Menu Item Packet'
 			arr.target_id = get_bit_packed(data,0,32)
 			arr.inventory_index = get_bit_packed(data,352,360)
 			arr.target_index = get_bit_packed(data,432,448)
-			return out_item(arr,original)
+			result = out_item(arr,original)
 		elseif id == 0x037 then
 	--		'Use Item Packet'
 			arr.target_id = get_bit_packed(data,0,32)
 			arr.target_index = get_bit_packed(data,64,80)
 			arr.inventory_index = get_bit_packed(data,80,88)
-			return out_item(arr,original)
+			result = out_item(arr,original)
 		end
+		if result == true then
+			return true
+		elseif result then
+			windower.packets.inject_outgoing(id,result)
+			return true
+		end
+	elseif id == 0x1A and injected and clocking then
+		windower.add_to_chat(8,'Injection time: '..(os.clock()-out_time))
 	end
 end)
 
@@ -413,7 +424,6 @@ end)
 
 windower.register_event('job change',function(mjob, mjob_id, mjob_lvl, sjob, sjob_id, sjob_lvl)
 	if debugging >= 1 then windower.debug('job change') end
-	print(mjob, mjob_id, mjob_lvl, sjob, sjob_id, sjob_lvl)
 	if mjob ~= current_job_file then
 		refresh_user_env(mjob_id)
 	end
@@ -567,6 +577,8 @@ if debugging and debugging >= 1 then
 			windower.text.set_visibility('midcast',false)
 			windower.text.set_visibility('aftercast',false)
 			windower.text.set_visibility('buff_change',false)
+		elseif opt == 'clocking' then
+			if clocking then clocking = false else clocking = true end
 		end
 	end)
 	

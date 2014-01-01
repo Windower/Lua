@@ -225,7 +225,11 @@ end
 -----------------------------------------------------------------------------------
 function out_item(arr,original)
 	items = windower.ffxi.get_items()
-	spell = aftercast_cost(r_items[items.inventory[arr.inventory_index].id])
+	if arr.inventory_index == 0 then -- Gil is inventory_index 0 and item ID 65535
+		spell = aftercast_cost(r_items[65535])
+	else
+		spell = aftercast_cost(r_items[items.inventory[arr.inventory_index].id])
+	end
 	if spell then
 		local inde = mk_out_arr_entry(spell,arr,original)
 		spell.name = spell[language]

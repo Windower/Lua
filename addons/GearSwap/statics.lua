@@ -251,6 +251,18 @@ short_slot_map.left_ring = 13
 short_slot_map.right_ring = 14
 short_slot_map.back = 15
 
+
+-- key mapping for combining sets
+function defaultSlotMap(k)
+	if slot_map[k] then
+		return default_slot_map[slot_map[k]]
+	else
+		return nil
+	end
+end
+
+
+
 _global = make_user_table()
 _global.cast_delay = 0
 _global.storedtarget = ''

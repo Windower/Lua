@@ -1,5 +1,7 @@
 -------------------------------------------------
-GearSwap 0.801 - Combatted double precasts, fixed a variety of nil errors, and made Paralysis work (hopefully).
+GearSwap 0.802 - Introduced the debugging "clocking" setting. Changed how actions are injected.
+-------------------------------------------------
+GearSwap 0.801 - Combated double precasts, fixed a variety of nil errors, and made Paralysis work (hopefully).
 -------------------------------------------------
 GearSwap 0.800 - Added pretarget and moved precast to outgoing_chunk. Changed "buff_change()" to pass a boolean instead of a string indicating whether the buff was gained or lost.
 -------------------------------------------------

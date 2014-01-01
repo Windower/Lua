@@ -25,7 +25,7 @@
 -- SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'gametime'
-_addon.version = '0.52'
+_addon.version = '0.6'
 _addon.commands = {'gametime','gt'}
 
 require('chat')
@@ -34,6 +34,7 @@ require('strings')
 require('maths')
 require('tables')
 
+texts = require('texts')
 config = require('config')
 
 tb_name	= 'addon:gr:gametime'
@@ -114,34 +115,38 @@ local defaults = T{}
 	defaults.saved = 0
 	defaults.mode = 1
 	defaults.time = T{}
-	defaults.time.visible = true
-	defaults.time.x = 0 -- left
-	defaults.time.y = 0 -- top
-	defaults.time.alpha = 100
-	defaults.time.colorr = 255
-	defaults.time.colorg = 255
-	defaults.time.colorb = 255
-	defaults.time.font_size = 12
-	defaults.time.font = 'tahoma'
-	defaults.time.bg_alpha = 25
-	defaults.time.bg_colorr = 100
-	defaults.time.bg_colorg = 100
-	defaults.time.bg_colorb = 100
+	defaults.time.pos = {}
+	defaults.time.pos.x = 0 -- left
+	defaults.time.pos.y = 0 -- top
+	defaults.time.text = {}
+	defaults.time.text.alpha = 255
+	defaults.time.text.red = 255
+	defaults.time.text.green = 255
+	defaults.time.text.blue = 255
+	defaults.time.text.size = 12
+	defaults.time.text.font = 'Consolas'
+	defaults.time.bg = {}
+	defaults.time.bg.alpha = 25
+	defaults.time.bg.red = 100
+	defaults.time.bg.green = 100
+	defaults.time.bg.blue = 100
+	defaults.time.bg.visible = true
+	
 	
 	defaults.days = T{}
-	defaults.days.visible = true
-	defaults.days.x = 100
-	defaults.days.y = 0
-	defaults.days.alpha = 75
-	defaults.days.font_size = 12
-	defaults.days.font = 'tahoma'
-	
-	defaults.days.bg_alpha = 100
-	defaults.days.bg_colorr = 0
-	defaults.days.bg_colorg = 0
-	defaults.days.bg_colorb = 0
+	defaults.days.pos = {}
+	defaults.days.pos.x = 100
+	defaults.days.pos.y = 0 -- top
+	defaults.days.text = {}
+	defaults.days.text.alpha = 255
+	defaults.days.text.size = 12
+	defaults.days.text.font = 'Consolas'
+	defaults.days.bg = {}
+	defaults.days.bg.alpha = 100
+	defaults.days.bg.red = 0
+	defaults.days.bg.green = 0
+	defaults.days.bg.blue = 0
 	defaults.days.axis = 'horizontal'
-	defaults.days.text_alpha = 100
 	defaults.days.change = true
 	defaults.moon = T{}
 	defaults.moon.change = true
@@ -238,18 +243,9 @@ function initialize()
 	
 	gt.mode = settings.mode
 	day_change(windower.ffxi.get_info().day)
-	moon_pct_change(windower.ffxi.get_info().moon_pct)
-end
-
-function destroy()
-	windower.text.delete('gametime_time')
-	windower.text.delete('gametime_day')
 end
 	
-windower.register_event('load',initialize)
-windower.register_event('login',initialize)
-windower.register_event('unload',destroy)
-windower.register_event('logout',destroy)
+windower.register_event('login','load',initialize)
 
 function getroutes(route)
 	for ckey, cval in pairs(Cycles) do
@@ -268,33 +264,15 @@ function getroutes(route)
 end
 
 function cb_time()
-	gt.gtt = 'gametime_time'
-	windower.text.create(gt.gtt)
-	windower.text.set_bg_border_size(gt.gtt,2)
-	windower.text.set_bg_color(gt.gtt,settings.time.bg_alpha,settings.time.bg_colorr,settings.time.bg_colorg,settings.time.bg_colorb)
-	windower.text.set_bg_visibility(gt.gtt,settings.time.visible)
-	windower.text.set_bold(gt.gtt,true)
-	windower.text.set_color(gt.gtt,settings.time.alpha,settings.time.colorr,settings.time.colorg,settings.time.colorb)
-	windower.text.set_location(gt.gtt,settings.time.x,settings.time.y)
-	windower.text.set_text(gt.gtt,'Loading. . .')
-	windower.text.set_visibility(gt.gtt,settings.time.visible)
-	--Set font type and size for time
-	windower.text.set_font(gt.gtt,settings.time.font,settings.time.font_size)
+	time_base_string = '${hours|XX}:${minutes|XX}'
+	gt.gtt = texts.new(time_base_string,settings.time)
+	gt.gtt:show()
 end
 
 function cb_day()
-	gt.gtd = 'gametime_day'
-	windower.text.create(gt.gtd)
-	windower.text.set_bg_border_size(gt.gtd,2)
-	windower.text.set_bg_color(gt.gtd,settings.days.bg_alpha,settings.days.bg_colorr,settings.days.bg_colorg,settings.days.bg_colorb)
-	windower.text.set_bg_visibility(gt.gtd,settings.days.visible)
-	windower.text.set_bold(gt.gtd,true)
-	windower.text.set_color(gt.gtd,settings.days.alpha,255,255,255)
-	windower.text.set_location(gt.gtd,settings.days.x,settings.days.y)
-	windower.text.set_text(gt.gtd,'')
-	windower.text.set_visibility(gt.gtd,settings.days.visible)
-	--Set font type and size for days 
-	windower.text.set_font(gt.gtd,settings.days.font,settings.days.font_size)
+	day_base_string = '${day|} ${MoonPhase|Unknown} (${MoonPct|-}%); ${WeekReport|}'
+	gt.gtd = texts.new(day_base_string,settings.days)
+	gt.gtd:show()
 end
 
 function default_settings()
@@ -302,11 +280,9 @@ function default_settings()
 end
 
 windower.register_event('time change', function(new, old)
-    local min
-    gt.hour, min = windower.ffxi.get_info().time:modf()
-    gt.minute = 60*min
-	gt.dectime = timeconvert(gt.hour..':'..gt.minute)
-	windower.text.set_text(gt.gtt, gt.hour..':'..gt.minute)
+	gt.hours = math.floor(new / 60)
+	gt.minutes = new % 60
+	gt.gtt:update(gt)
 end)
 
 function timeconvert(basetime)
@@ -320,7 +296,6 @@ function timeconvert2(basetime)
 end
 
 function day_change(day)
---	windower.text.set_text(gt.gtd,day)
 	if (day == 'Firesday') then
 		dlist = {'1','2','3','4','5','6','7','8'}
 	elseif (day == 'Earthsday') then
@@ -331,7 +306,7 @@ function day_change(day)
 		dlist = {'4','5','6','7','8','1','2','3'}
 	elseif (day == 'Iceday') then
 		dlist = {'5','6','7','8','1','2','3','4'}
-	elseif (day == 'Lightningday') then
+	elseif (day == 'Lightningsday') then
 		dlist = {'6','7','8','1','2','3','4','5'}
 	elseif (day == 'Lightsday') then
 		dlist = {'7','8','1','2','3','4','5','6'}
@@ -347,18 +322,18 @@ function day_change(day)
 		daystring = ''..daystring..gt.delimiter..' \\cs'..gt.days[(dval+0)][10]..gt.days[(dval+0)][settings.mode]
 	end
 	
-	gt.day = day
-	
+	gt.day = day	
 	gt.WeekReport = daystring
-	windower.text.set_color(gt.gtd,settings.days.alpha,255,255,255)
-	windower.text.set_text(gt.gtd,' \\cs'..gt.days[1][10]..gt.MoonPhase..' ('..gt.MoonPct..'%);'..gt.WeekReport)
+	gt.gtd:update(gt)
 	moon_change(windower.ffxi.get_info()["moon"])
 end
+
 windower.register_event('day change',day_change)
 
 function moon_change(moon)
 	gt.MoonPhase = moon
-	windower.text.set_text(gt.gtd,gt.MoonPhase..' ('..gt.MoonPct..'%);'..gt.WeekReport)
+	gt.MoonPct = windower.ffxi.get_info()["moon_pct"]
+	gt.gtd:update(gt)
 	if settings.moon.change == true then
 		log('Day: '..gt.day..'; Moon: '..gt.MoonPhase..' ('..gt.MoonPct..'%);')
 	end
@@ -366,14 +341,8 @@ end
 
 windower.register_event('moon change',moon_change)
 
-function moon_pct_change(pct)
-	gt.MoonPct = pct
-	windower.text.set_text(gt.gtd,gt.MoonPhase..' ('..gt.MoonPct..'%);'..gt.WeekReport)
-end
-windower.register_event('moon pct change',moon_pct_change)
-
-windower.register_event('addon command',function (...)
-	local args	= T({...})
+windower.register_event('addon command', function (...)
+	local args	= T{...}:map(string.lower)
 	if args[1] == nil or args[1] == "help" then
 		log('Use //gametime or //gt as follows:')
 		log('Positioning:')
@@ -422,53 +391,38 @@ windower.register_event('addon command',function (...)
 	
 	---CLI Arguments for Time font Size
 	elseif args[1] == 'timeSize' then
-			windower.text.set_font(gt.gtt,settings.time.font,args[2])
-			settings.time.font_size = args[2]
-			
-			
+			gt.gtt:size(tonumber(args[2]))	
 			
 	---CLI Arguments for Time font type
 	elseif args[1] == 'timeFont' then
-			windower.text.set_font(gt.gtt,args[2],settings.time.font_size)
-			settings.time.font = args[2]
-
-			
+		gt.gtt:font(args[2])	
 			
 	---CLI Arguments for Day font Size
 	elseif args[1] == 'daySize' then
-			windower.text.set_font(gt.gtd,settings.time.font,args[2])
-			settings.days.font_size = args[2]
-			
-			
-			
+		gt.gtd:size(tonumber(args[2]))				
+	
 	---CLI Arguments for Day font type
 	elseif args[1] == 'dayFont' then
-			windower.text.set_font(gt.gtd,args[2],settings.time.font_size)
-			settings.days.font = args[2]				
-	
-	
+		gt.gtd:font(args[2])	
 	
 	elseif args[1] == 'timex' then
-			windower.text.set_location(gt.gtt,args[2],settings.time.y)
-			settings.time.x = args[2]
+		gt.gtt:pos_x(tonumber(args[2]))
+		
 	elseif args[1] == 'timey' then
-			windower.text.set_location(gt.gtt,settings.time.x,args[2])
-			settings.time.y = args[2]
+		gt.gtt:pos_y(tonumber(args[2]))
+		
 	elseif args[1] == 'daysx' then
-			windower.text.set_location(gt.gtd,args[2],settings.days.y)
-			settings.days.x = args[2]
+		gt.gtd:pos_x(tonumber(args[2]))
+		
 	elseif args[1] == 'daysy' then
-			windower.text.set_location(gt.gtd,settings.days.x,args[2])
-			settings.days.y = args[2]
+		gt.gtd:pos_y(tonumber(args[2]))
+		
 	elseif args[1] == 'time' then
 		if args[2] == 'alpha' then
 			inalpha = tostring(args[3]):zfill(3)
 			inalpha = inalpha+0
 			if (inalpha > 0 and inalpha < 256) then
-				windower.text.set_bg_color(gt.gtt,inalpha,settings.time.bg_colorr,settings.time.bg_colorg,settings.time.bg_colorb)
-				windower.text.set_color(gt.gtt,inalpha,settings.time.colorr,settings.time.colorg,settings.time.colorb)
-				settings.time.bg_alpha = inalpha
-				settings.time.alpha = inalpha
+				gt.gtt:alpha(inalpha)
 				log('Time transparency set to '..inalpha..' ('..math.round(100-(inalpha/2.55),0)..'%).')
 			end
 		elseif args[2] == 'x' or args[2] == 'posx' then
@@ -476,14 +430,12 @@ windower.register_event('addon command',function (...)
 		elseif args[2] == 'y' or args[2] == 'posy' then
 			windower.send_command('gt timey '..args[3])
 		elseif args[2] == 'hide' then
-			windower.text.set_visibility(gt.gtt,false)
-			settings.time.visible = false
+			gt.gtt:hide()
 			log('Time display hidden.')
 		elseif args[2] == 'reset' then
-			windower.text.set_location(gt.gtt,0,0)
+			gt.gtt:pos(0,0)
 		else
-			windower.text.set_visibility(gt.gtt,true)
-			settings.time.visible = true
+			gt.gtt:show()
 			log('Showing time display.')
 		end
 	elseif args[1] == 'days' then
@@ -491,26 +443,21 @@ windower.register_event('addon command',function (...)
 			inalpha = tostring(args[3]):zfill(3)
 			inalpha = inalpha+0
 			if (inalpha > 0 and inalpha < 256) then
-				windower.text.set_bg_color(gt.gtd,inalpha,settings.days.bg_colorr,settings.days.bg_colorg,settings.days.bg_colorb)
-				windower.text.set_color(gt.gtd,inalpha,255,255,255)
-				settings.days.bg_alpha = inalpha
-				settings.days.alpha = inalpha
-				log('Days transparency set to '..inalpha..' ('..math.round(100-(inalpha/2.55),0)..'%).')
+				gt.gtd:alpha(inalpha)
+				log('Day transparency set to '..inalpha..' ('..math.round(100-(inalpha/2.55),0)..'%).')
 			end
 		elseif args[2] == 'x' or args[2] == 'posx' then
 			windower.send_command('gt daysx '..args[3])
 		elseif args[2] == 'y' or args[2] == 'posy' then
-			windower.send_command('gt timey '..args[3])
+			windower.send_command('gt daysy '..args[3])
 		elseif args[2] == 'hide' then
-			windower.text.set_visibility(gt.gtd,false)
-			settings.days.visible = false
-			log('Days display hidden.')
+			gt.gtd:hide()
+			log('Day display hidden.')
 		elseif args[2] == 'reset' then
-			windower.text.set_location(gt.gtd,100,0)
+			gt.gtd:pos(0,0)
 		else
-			windower.text.set_visibility(gt.gtd,true)
-			settings.days.visible = true
-			log('Showing days display.')
+			gt.gtd:show()
+			log('Showing day display.')
 		end
 	elseif args[1] == 'axis' then
 		if args[2] == 'vertical' then

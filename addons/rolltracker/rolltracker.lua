@@ -31,6 +31,7 @@ _addon.command = 'rolltracker'
 
 config = require('config')
 chat = require('chat')
+chars = require('chat.chars')
 require('tables')
 
 defaults = {}
@@ -155,13 +156,15 @@ function initialize()
 end
 
 windower.register_event('incoming text',function (old, new, color)
-	match_doubleup = old:find (' uses Double')
+	new_bm = old:find("Roll.* The total.*")
+	match_doubleup = old:find ('.*uses Double.*The total')
 	battlemod_compat = old:find('.*Roll.*'..string.char(129,168))
 	obtained_roll = old:find('.* receives the effect of .* Roll.')
-	not_party = old:find ('%('..'%w+'..'%).* Roll ')	
-		if battlemod_compat or match_doubleup and not_party~=nil then
+	not_party = old:find ('%('..'%w+'..'%).* Roll ')
+		if new_bm or match_doubleup and color ~= 123 then
 			new=''
 		end
+		
 		if obtained_roll ~= nil then
 			new=''
 		end
@@ -203,11 +206,11 @@ windower.register_event('action',function (act)
 						if #effected_member > 0 then
 							if rollnum == roll_luck[i] or rollnum == 11 then 
 								luckyroll = 1
-								windower.add_to_chat(1, effectednumber..effected_write..chat.controls.reset..' '..chat.chars['implies']..' '..roll_ident[tostring(roller)]..' Roll '..chat.chars['circle'..rollnum]..string.char(31,158)..' (Lucky!)'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
+								windower.add_to_chat(1, effectednumber..effected_write..chat.controls.reset..' '..chars['implies']..' '..roll_ident[tostring(roller)]..' Roll '..chars['circle'..rollnum]..string.char(31,158)..' (Lucky!)'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
 							elseif rollnum==12 and #effected_member > 0 then
-								windower.add_to_chat(1, string.char(31,167)..effectednumber..'Bust! '..chat.controls.reset..chat.chars['implies']..' '..effected_write..' '..chat.chars['implies']..' ('..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')')
+								windower.add_to_chat(1, string.char(31,167)..effectednumber..'Bust! '..chat.controls.reset..chars['implies']..' '..effected_write..' '..chars['implies']..' ('..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')')
 							else
-								windower.add_to_chat(1, effectednumber..effected_write..chat.controls.reset..' '..chat.chars['implies']..' '..roll_ident[tostring(roller)]..' Roll '..chat.chars['circle'..rollnum]..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
+								windower.add_to_chat(1, effectednumber..effected_write..chat.controls.reset..' '..chars['implies']..' '..roll_ident[tostring(roller)]..' Roll '..chars['circle'..rollnum]..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
 							end
 						end
 					end

@@ -33,6 +33,21 @@ function functions.call(fn, ...)
     return fn(...)
 end
 
+-- A function that executes the provided function if the provided condition is met.
+function functions.cond(fn, check)
+    return function(...)
+        return check(...) and fn(...) or nil
+    end
+end
+
+-- Returns a function fully applied to the provided arguments.
+function functions.prepare(fn, ...)
+    local args = {...}
+    return function()
+        fn(unpack(args))
+    end
+end
+
 -- Returns a partially applied function, depending on the number of arguments provided.
 function functions.apply(fn, ...)
     local args = {...}

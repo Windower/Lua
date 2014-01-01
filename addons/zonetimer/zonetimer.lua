@@ -20,19 +20,21 @@ times = texts.new(settings)
 zone = ''
 
 windower.register_event('prerender', function()
-	current_zone = windower.ffxi.get_info().zone
+    local info = windower.ffxi.get_info()
+    if not info.logged_in then
+        return
+    end
+
+	current_zone = info.zone
 	if zone == current_zone then
 		seconds = os.time() - start_time
 		times:text(os.date('!%H:%M:%S', seconds))
-		--times:text(seconds - start_time)
 		times:visible(true)
 	else
 		zone = current_zone
 		start_time = os.time()
 	end
 end)
-
---[[for key,value in pairs(res.items) do log(key,value) end]]
 
 windower.register_event('addon command', function(...)
 	local param = L{...}

@@ -56,14 +56,14 @@ function valid_target(targ,flag)
 		local targar = {}
 		for i,v in pairs(mob_array) do
 			targ = percent_strip(targ)
-			if string.find(v.name:lower(),san_targ:lower()) then
+			if string.find(v.name:lower(),san_targ:lower()) and v.valid_target then
 				-- Handling for whether it's a monster or not
 				if v.is_npc and current_target then
 					if v.id == current_target.id then
-						targar['<t>'] = v.distance
+						targar['<t>'] = math.sqrt(v.distance)
 					end
-				else
-					targar[v.name] = v.distance
+				elseif not v.is_npc then
+					targar[v.name] = math.sqrt(v.distance)
 				end
 			end
 		end
