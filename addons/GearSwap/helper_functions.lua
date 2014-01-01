@@ -336,13 +336,19 @@ function combine_with_map(keymap, a, b, ...)
 	
 	if a then
 		for k,v in pairs(a) do
-			result[keymap(k)] = v
+			local k1 = keymap(k)
+			if k1 then
+				result[k1] = v
+			end
 		end
 	end
 	
 	if b then
 		for k,v in pairs(b) do
-			result[keymap(k)] = v
+			local k1 = keymap(k)
+			if k1 then
+				result[k1] = v
+			end
 		end
 	end
 	
