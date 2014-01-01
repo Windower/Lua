@@ -257,7 +257,7 @@ function defaultSlotMap(k)
 	if slot_map[k] then
 		return default_slot_map[slot_map[k]]
 	else
-		return k
+		return nil
 	end
 end
 
