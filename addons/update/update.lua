@@ -5,4 +5,4 @@ _addon.command = 'update'
 
 require('functions')
 
-windower.register_event('addon command', os.execute:apply(windower.addon_path .. '../../Windower.exe -u'))
+windower.register_event('addon command', os.execute:apply('"' .. windower.addon_path .. '../../Windower.exe" -u'))
