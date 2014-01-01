@@ -356,6 +356,13 @@
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
+    <name>Update</name>
+    <author>Arcon</author>
+    <description>Updates and reloads all plugins and addons when typing //update.</description>
+    <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
+  </addon>
+  <addon>
     <name>vwhl</name>
     <author>Giuliano Riccio (Zohno@Phoenix)</author>
     <description>Redirects the nm's weaknesses (VW or Abyssea) to the "tell" stream so that they can be held using the chat filters' function and highlights the important info.</description>
