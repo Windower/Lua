@@ -310,14 +310,16 @@ end
 
 
 -----------------------------------------------------------------------------------
---Name: combine(...)
+--Name: combine_with_map(keymap, a, b, ...)
 -- Combines an arbitrary number of tables together.  Does not modify the original tables.
 -- Keys are mapped through an optionally provided keymap function.
 -- Keys from later tables overwrite earlier ones in the list.
 -- Does not do recursive combines (does not process sub-tables).
 -- Implemented by a function call to combine_with_map using the default keymap.
 --Args:
----- Any number of tables/gear sets
+---- keymap - function defining how to translate the keys of the origin tables
+----          to the output table
+---- a, b, etc -- tables to combine.
 -----------------------------------------------------------------------------------
 --Returns:
 ---- A table combining all the provided sets.
