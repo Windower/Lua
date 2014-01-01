@@ -290,3 +290,59 @@ function get_wearable(player_val,val)
 		return false -- In cases where the provided playervalue is nil, just return false.
 	end
 end
+
+
+-----------------------------------------------------------------------------------
+--Name: combine(...)
+-- Combines an arbitrary number of tables together.  Does not modify the original tables.
+-- Keys from later tables overwrite earlier ones in the list.
+-- Does not do recursive combines (does not process sub-tables).
+-- Implemented by a function call to combine_with_map using the default keymap.
+--Args:
+---- Any number of tables/gear sets
+-----------------------------------------------------------------------------------
+--Returns:
+---- A table combining all the provided sets.
+-----------------------------------------------------------------------------------
+function combine(...)
+	return combine_with_map(nil, ...)
+end
+
+
+-----------------------------------------------------------------------------------
+--Name: combine(...)
+-- Combines an arbitrary number of tables together.  Does not modify the original tables.
+-- Keys are mapped through an optionally provided keymap function.
+-- Keys from later tables overwrite earlier ones in the list.
+-- Does not do recursive combines (does not process sub-tables).
+-- Implemented by a function call to combine_with_map using the default keymap.
+--Args:
+---- Any number of tables/gear sets
+-----------------------------------------------------------------------------------
+--Returns:
+---- A table combining all the provided sets.
+-----------------------------------------------------------------------------------
+function combine_with_map(keymap, a, b, ...)
+	local keymap = keymap or function(k) return k end
+	local result = T{}
+
+	local remainder = {...}
+	
+	if #remainder > 0 then
+		b = combine_with_map(keymap, b, unpack(remainder))
+	end
+	
+	if a then
+		for k,v in pairs(a) do
+			result[keymap(k)] = v
+		end
+	end
+	
+	if b then
+		for k,v in pairs(b) do
+			result[keymap(k)] = v
+		end
+	end
+	
+	return result
+end
