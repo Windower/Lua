@@ -115,53 +115,9 @@ function cast_delay(delay)
 end
 
 function set_combine(...)
-	local set_list = {...}
-
-	if #set_list == 0 then
-		windower.add_to_chat(123,'GearSwap: set_combine error, first set is nil')
-	elseif #set_list == 1 then
-		return set_list[1]
-	elseif #set_list == 2 then
-		local set1,set2,set3 = set_list[1],set_list[2],{}
-		for i,v in pairs(set1) do
-			if slot_map[i] then
-				set3[default_slot_map[slot_map[i]]] = v
-			elseif _settings.debug_mode then
-				windower.add_to_chat(8,'GearSwap (Debug Mode): set_combine error, Set 1 contains an unrecognized slot name ('..tostring(i)..')')
-			end
-		end
-		for i,v in pairs(set2) do
-			if slot_map[i] then
-				set3[default_slot_map[slot_map[i]]] = v
-			elseif _settings.debug_mode then
-				windower.add_to_chat(8,'GearSwap (Debug Mode): set_combine error, Set 2 contains an unrecognized slot name ('..tostring(i)..')')
-			end
-		end
-		return set3
-	else
-		for i=1,#set_list-1 do
-			set_list[#set_list-i] = set_combine(set_list[#set_list-i],set_list[#set_list-i+1])
-		end
-		return set_list[1]
-	end
-	
-	
-	set1 = table.remove(set_list,1)
-	for i,v in pairs(set1) do windower.add_to_chat(8,'set1: '..tostring(i)..' '..tostring(v)) end
-	set2 = set_list[1]
-	if set1 == nil then windower.add_to_chat(123,'GearSwap: set_combine error, first set is nil') end
-	if set2 == nil then windower.add_to_chat(123,'GearSwap: set_combine error, second set is nil') end
-	
-	if #set_list == 1 then
-		return set3
-	elseif #set_list > 1 then
-		set_list[1] = set3
-		windower.add_to_chat(8,'One level')
-		return set_combine(set_list)
-	else
-		windower.add_to_chat(8,'This should never be hit - set_combine debug message')
-	end
+	return combine_with_map(defaultSlotMap, ...)
 end
+
 
 function equip(...)
 	local gearsets = {...}
@@ -300,6 +256,7 @@ function user_midaction(bool)
 	end
 	return _global.midaction
 end
+
 
 -- Define the user windower functions.
 user_windower = {register_event = register_event_user, unregister_event = unregister_event_user, send_command = send_cmd_user}
