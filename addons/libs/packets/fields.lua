@@ -222,13 +222,32 @@ fields.outgoing[0x029] = L{
 
 -- Menu Item
 fields.outgoing[0x036] = L{
+-- Item order is Gil -> top row left-to-right -> bottom row left-to-right, but
+-- they slide up and fill empty slots
     {ctype='unsigned int',      label='Target ID'},                             -- 04
-    {ctype='unsigned char[14]', label='_unknown1'},                             -- 08
-    {ctype='unsigned short',    label='Target Index'},                          -- 22
-    {ctype='unsigned char[24]', label='_unknown2'},                             -- 24 -- Sometimes takes values.
-    {ctype='unsigned char',     label='Inventory Index'},                       -- 48 -- For the item being used
-    {ctype='unsigned char[10]', label='_unknown2'},                             -- 49
+    {ctype='unsigned int',      label='Item 1 Quantity'},                       -- 08
+    {ctype='unsigned int',      label='Item 2 Quantity'},                       -- 12
+    {ctype='unsigned int',      label='Item 3 Quantity'},                       -- 16
+    {ctype='unsigned int',      label='Item 4 Quantity'},                       -- 20
+    {ctype='unsigned int',      label='Item 5 Quantity'},                       -- 24
+    {ctype='unsigned int',      label='Item 6 Quantity'},                       -- 28
+    {ctype='unsigned int',      label='Item 7 Quantity'},                       -- 32
+    {ctype='unsigned int',      label='Item 8 Quantity'},                       -- 36
+    {ctype='unsigned int',      label='Item 9 Quantity'},                       -- 40
+    {ctype='unsigned int',      label='_unknown1'},                             -- 44
+    {ctype='unsigned char',     label='Item 1 Inventory Index'},                -- 48  -- Gil has an Inventory Index of 0
+    {ctype='unsigned char',     label='Item 2 Inventory Index'},                -- 49
+    {ctype='unsigned char',     label='Item 3 Inventory Index'},                -- 50
+    {ctype='unsigned char',     label='Item 4 Inventory Index'},                -- 51
+    {ctype='unsigned char',     label='Item 5 Inventory Index'},                -- 52
+    {ctype='unsigned char',     label='Item 6 Inventory Index'},                -- 53
+    {ctype='unsigned char',     label='Item 7 Inventory Index'},                -- 54
+    {ctype='unsigned char',     label='Item 8 Inventory Index'},                -- 55
+    {ctype='unsigned char',     label='Item 9 Inventory Index'},                -- 56
+    {ctype='unsigned char',     label='_unknown2'},                             -- 57
     {ctype='unsigned short',    label='Target Index'},                          -- 58
+    {ctype='unsigned char',     label='Number of Items'},                       -- 60
+    {ctype='unsigned char[3]',  label='_unknown3'},                             -- 61
 }
 
 -- Use Item
