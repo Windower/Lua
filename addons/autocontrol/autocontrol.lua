@@ -203,7 +203,7 @@ function save_set(setname)
     end
     local curAuto = T(get_current_autoset())
     settings.autosets[setname] = curAuto
-    settings:save()
+    settings:save('all')
     notice('Set '..setname..' saved.')
 end
 
@@ -269,7 +269,7 @@ windower.register_event("addon command", function(...)
             settings.text.alpha = nil
             settings.text.content = nil
             settings.visible = nil
-            settings:save()
+            settings:save('all')
         elseif comm == 'show' then Burden_tb:show()
         elseif comm == 'hide' then Burden_tb:hide()
         elseif comm == 'settings' then 
