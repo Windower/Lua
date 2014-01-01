@@ -264,7 +264,7 @@ function getroutes(route)
 end
 
 function cb_time()
-	time_base_string = '${time|X:XX}'
+	time_base_string = '${hours|XX}:${minutes|XX}'
 	gt.gtt = texts.new(time_base_string,settings.time)
 	gt.gtt:show()
 end
@@ -280,7 +280,8 @@ function default_settings()
 end
 
 windower.register_event('time change', function(new, old)
-	gt.time = windower.ffxi.get_info().time_string
+	gt.hours = math.floor(new / 60)
+	gt.minutes = new % 60
 	gt.gtt:update(gt)
 end)
 
