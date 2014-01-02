@@ -1,5 +1,3 @@
-
-
 _addon.version = '1.0'
 _addon.name = 'Send'
 _addon.command = 'send'
@@ -18,15 +16,20 @@ windower.register_event('addon command',function (...)
 		if broken_init ~= nil then
 			relevant_msg(table.concat(broken_init,' '))
 		end
-		windower.send_ipc_message(term)
+		windower.send_ipc_message('send ' .. term)
 	else
-		windower.send_ipc_message(term)
+		windower.send_ipc_message('send ' .. term)
 	end
 end)
 
 windower.register_event('ipc message',function (msg)
 	local broken = split(msg, ' ')
-	
+
+    local command = table.remove(broken, 1)
+    if command ~= 'send' then
+        return
+    end
+
 	if #broken < 2 then return end
 	
 	local qual = table.remove(broken,1)
