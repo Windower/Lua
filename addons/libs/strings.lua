@@ -488,11 +488,9 @@ end
 -- * oxford: Appends the last element with a comma, followed by an and.
 -- The third argument specifies an optional output, if the table is empty.
 function table.format(t, trail, subs)
-    local l = #t
-    if l == 0 then
+    local first = next(t)
+    if not first then
         return subs or ''
-    elseif l == 1 then
-        return t[next(t)]
     end
 
     trail = trail or 'and'
@@ -508,7 +506,19 @@ function table.format(t, trail, subs)
         warning('Invalid format for table.format: \''..trail..'\'.')
     end
 
-    return t:slice(1, -2):concat(', ')..last..t:last()
+    local res = ''
+    for k, v in pairs(t) do
+        res = res .. tostring(v)
+        if next(t, k) then
+            if next(t, next(t, k)) then
+                res = res .. ', '
+            else
+                res = res .. last
+            end
+        end
+    end
+
+    return res
 end
 
 --[[
