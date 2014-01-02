@@ -268,15 +268,9 @@ function set.concat(s, str)
 end
 
 function set.format(s, trail, subs)
-    local l
-    if s:empty() then
+    local first = next(t)
+    if not first then
         return subs or ''
-    elseif #s == 1 then
-        return '{'..tostring(next(s))..'}'
-    elseif _libs.lists then
-        l = L(s)
-    else
-        l = T(s)
     end
 
     trail = trail or 'and'
@@ -292,7 +286,19 @@ function set.format(s, trail, subs)
         warning('Invalid format for table.format: \''..trail..'\'.')
     end
 
-    return l:slice(1, -2):concat(', ')..last..l:last()
+    local res = ''
+    for v in pairs(t) do
+        res = res .. tostring(v)
+        if next(t, v) then
+            if next(t, next(t, v)) then
+                res = res .. ', '
+            else
+                res = res .. last
+            end
+        end
+    end
+
+    return res
 end
 
 --[[
