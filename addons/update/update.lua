@@ -1,6 +1,6 @@
 _addon.name = 'Update'
 _addon.author = 'Arcon'
-_addon.version = '1.0.0.0'
+_addon.version = '1.1.0.0'
 _addon.command = 'update'
 
 require('functions')
