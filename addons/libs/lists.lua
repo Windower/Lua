@@ -430,6 +430,37 @@ end
 
 _meta.L.__tostring = list.tostring
 
+function list.format(l, trail, subs)
+    if l.n == 0 then
+        return subs or ''
+    end
+
+    trail = trail or 'and'
+
+    local last
+    if trail == 'and' then
+        last = ' and '
+    elseif trail == 'csv' then
+        last = ', '
+    elseif trail == 'oxford' then
+        last = ', and '
+    else
+        warning('Invalid format for table.format: \''..trail..'\'.')
+    end
+
+    local res = ''
+    for i = 1, l.n do
+        res = res .. tostring(l[i])
+        if i < l.n - 1 then
+            res = res .. ', '
+        elseif i == l.n - 1 then
+            res = res .. last
+        end
+    end
+
+    return res
+end
+
 --[[
 Copyright (c) 2013, Windower
 All rights reserved.
