@@ -276,12 +276,22 @@ function table.lookup(t, ref, key)
     return ref[t[key]]
 end
 
--- Applies function fn to all elements of the table and returns the resulting table.
+-- Applies function fn to all values of the table and returns the resulting table.
 function table.map(t, fn)
     local res = {}
     for key, val in pairs(t) do
         -- Evaluate fn with the element and store it.
         res[key] = fn(val)
+    end
+
+    return setmetatable(res, getmetatable(t))
+end
+
+-- Applies function fn to all keys of the table, and returns the resulting table.
+function table.key_map(t, fn)
+    local res = {}
+    for key, val in pairs(t) do
+        res[fn(key)] = val
     end
 
     return setmetatable(res, getmetatable(t))
@@ -305,7 +315,7 @@ function table.filter(t, fn)
 end
 
 -- Returns a table with all elements from t whose keys satisfy the condition fn, or don't satisfy condition fn, if reverse is set to true. Defaults to false.
-function table.filterkey(t, fn)
+function table.key_filter(t, fn)
     if type(fn) ~= 'function' then
         fn = functions.equals(fn)
     end
