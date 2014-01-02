@@ -47,7 +47,7 @@
 -----------------------------------------------------------------------------------
 function parse_resources(lines_file)
 	local find = string.find
-	local ignore_fields = {index=true}
+	local ignore_fields = {}
 	local convert_fields = {enl='english_log',fr='french',frl='french_log',de='german',del='german_log',jp='japanese',jpl='japanese_log'}
 	local hex_fields = {jobs=true,races=true,slots=true}
 	
@@ -293,64 +293,459 @@ end
 
 
 -----------------------------------------------------------------------------------
---Name: combine(...)
--- Combines an arbitrary number of tables together.  Does not modify the original tables.
--- Keys from later tables overwrite earlier ones in the list.
--- Does not do recursive combines (does not process sub-tables).
--- Implemented by a function call to combine_with_map using the default keymap.
---Args:
----- Any number of tables/gear sets
+----Name: unify_slots(g)
+-- Filters the provided gear table to only known slots, and then runs a map
+-- on the table to make sure all keys are the accepted versions for each.
+----Args:
+-- g - A dictionary table containing a gear set.
 -----------------------------------------------------------------------------------
---Returns:
----- A table combining all the provided sets.
+----Returns:
+-- A table simplified to only acceptable slots.
 -----------------------------------------------------------------------------------
-function combine(...)
-	return combine_with_map(nil, ...)
+function unify_slots(g)
+	local g1 = table.key_filter(g, is_slot_key)
+	return table.key_map(g1, get_default_slot)
+end
+ 
+-----------------------------------------------------------------------------------
+----Name: filter_slot_keys(k)
+-- Checks to see if key 'k' is known in the slot_map array.
+----Args:
+-- k - A key to a gear slot in a gear table.
+-----------------------------------------------------------------------------------
+----Returns:
+-- True if the key is recognized in the slot_map table; otherwise false.
+-----------------------------------------------------------------------------------
+function is_slot_key(k)
+	return slot_map[k]
+end
+ 
+-----------------------------------------------------------------------------------
+----Name: get_default_slot(k)
+-- Given a generally known slot key, return the default version of that key.
+----Args:
+-- k - A gear slot key.
+-----------------------------------------------------------------------------------
+----Returns:
+-- Returns the default slot key that matches the provided key.
+-----------------------------------------------------------------------------------
+function get_default_slot(k)
+	if slot_map[k] then
+		return default_slot_map[slot_map[k]]
+	end
+end
+
+-----------------------------------------------------------------------------------
+----Name: set_merge(baseSet, ...)
+-- Merges any additional gear sets (...) into the provided base set.
+-- Ensures that only valid slot keys/elements are used in the combined set.
+----Args:
+-- baseSet - The set that all the other sets are combined into.  May be an empty set.
+-----------------------------------------------------------------------------------
+----Returns:
+-- Returns the modified base set, after all other sets have been merged into it.
+-----------------------------------------------------------------------------------
+function set_merge(baseSet, ...)
+	local combineSets = {...}
+	
+	-- Take the list of tables we're given and cleans them up, so that they
+	-- only contain acceptable slot key entries.
+	local cleanSetsList = table.map(combineSets, unify_slots)
+
+	-- Then reduce using a simple table.update function to generate a single set result.
+	local combinedSet = table.reduce(cleanSetsList, table.update, baseSet)
+
+	return combinedSet
 end
 
 
+
 -----------------------------------------------------------------------------------
---Name: combine_with_map(keymap, a, b, ...)
--- Combines an arbitrary number of tables together.  Does not modify the original tables.
--- Keys are mapped through an optionally provided keymap function.
--- Keys from later tables overwrite earlier ones in the list.
--- Does not do recursive combines (does not process sub-tables).
--- Implemented by a function call to combine_with_map using the default keymap.
+--Name: assemble_action_packet(target_id,target_index,category,spell_id)
+--Desc: Puts together an action packet using one weird old trick!
 --Args:
----- keymap - function defining how to translate the keys of the origin tables
-----          to the output table
----- a, b, etc -- tables to combine.
+---- target_id - The target's ID
+---- target_index - The target's index
+---- category - The action's category. (3 = MA, 7 = WS, 9 = JA, 16 = RA, 25 = MS)
+---- spell_ID - The current spell's ID
 -----------------------------------------------------------------------------------
 --Returns:
----- A table combining all the provided sets.
+---- string - An action packet. First four bytes are dummy bytes.
 -----------------------------------------------------------------------------------
-function combine_with_map(keymap, a, b, ...)
-	local keymap = keymap or function(k) return k end
-	local result = T{}
+function assemble_action_packet(target_id,target_index,category,spell_id)
+	local outstr = string.char(0x1A,0x08,0,0)
+	outstr = outstr..string.char( (target_id%256), math.floor(target_id/256)%256, math.floor( (target_id/65536)%256) , math.floor( (target_id/16777216)%256) )
+	outstr = outstr..string.char( (target_index%256), math.floor(target_index/256)%256)
+	outstr = outstr..string.char( (category%256), math.floor(category/256)%256)
+	outstr = outstr..string.char( (spell_id%256), math.floor(spell_id/256)%256)
+	return outstr..string.char(0,0)
+end
 
-	local remainder = {...}
-	
-	if #remainder > 0 then
-		b = combine_with_map(keymap, b, unpack(remainder))
+
+
+-----------------------------------------------------------------------------------
+--Name: assemble_use_item_packet(target_id,target_index,item)
+--Desc: Puts together an action packet using one weird old trick!
+--Args:
+---- target_id - The target's ID
+---- target_index - The target's index
+---- item_id - The id for the current item
+-----------------------------------------------------------------------------------
+--Returns:
+---- string - A use item packet. First four bytes are dummy bytes.
+-----------------------------------------------------------------------------------
+function assemble_use_item_packet(target_id,target_index,item_id)
+	local outstr = string.char(0x37,0x0A,0,0)
+	outstr = outstr..string.char( (target_id%256), math.floor(target_id/256)%256, math.floor( (target_id/65536)%256) , math.floor( (target_id/16777216)%256) )
+	outstr = outstr..string.char(0,0,0,0)
+	outstr = outstr..string.char( (target_index%256), math.floor(target_index/256)%256)
+	inventory_index,bag_id = find_usable_item(item_id)
+	if inventory_index then
+		outstr = outstr..string.char(inventory_index%256)..string.char(0,bag_id,0,0,0)
+	else
+		return
 	end
-	
-	if a then
-		for k,v in pairs(a) do
-			local k1 = keymap(k)
-			if k1 then
-				result[k1] = v
+	return outstr
+end
+
+
+
+-----------------------------------------------------------------------------------
+--Name: assemble_use_item_packet(target_id,target_index,item)
+--Desc: Puts together an action packet using one weird old trick!
+--Args:
+---- target_id - The target's ID
+---- target_index - The target's index
+---- item_id - The id for the current item
+-----------------------------------------------------------------------------------
+--Returns:
+---- string - A use item packet. First four bytes are dummy bytes.
+-----------------------------------------------------------------------------------
+function assemble_menu_item_packet(target_id,target_index,item_id)
+	local outstr = string.char(0x36,0x20,0,0)
+	-- Target ID
+	outstr = outstr..string.char( (target_id%256), math.floor(target_id/256)%256, math.floor( (target_id/65536)%256) , math.floor( (target_id/16777216)%256) )
+	-- One unit traded
+	outstr = outstr..string.char(1,0,0,0,0,0,0,0)..string.char(0,0,0,0,0,0,0,0)..string.char(0,0,0,0,0,0,0,0)..
+		string.char(0,0,0,0,0,0,0,0)..string.char(0,0,0,0,0,0,0,0)
+	-- Inventory Index for the one unit
+	inventory_index,bag_id = find_usable_item(item_id)
+	if inventory_index then
+		outstr = outstr..string.char(inventory_index%256)
+	else
+		return
+	end
+	-- Nothing else being traded
+	outstr = outstr..string.char(0,0,0,0,0,0,0,0,0)
+	-- Target Index
+	outstr = outstr..string.char( (target_index%256), math.floor(target_index/256)%256)
+	-- Only one item being traded
+	outstr = outstr..string.char(1,0,0,0)
+	return outstr
+end
+
+
+
+-----------------------------------------------------------------------------------
+--Name: find_usable_item(item_id)
+--Desc: Finds a usable item in temporary or normal inventory. Assumes items array
+--      is accurate already.
+--Args:
+---- item_id - The resource line for the current item
+-----------------------------------------------------------------------------------
+--Returns:
+---- inventory_index - The item's use inventory index (if it exists)
+---- bag_id - The item's bag ID (if it exists)
+-----------------------------------------------------------------------------------
+function find_usable_item(item_id)
+	local inventory_index,bag_id
+	for i,v in pairs(items.temporary) do
+		if v and v.id == item_id then
+			inventory_index = i
+			bag_id = 4
+			break
+		end
+	end
+	if not inventory_index then
+		for i,v in pairs(items.inventory) do
+			if v and v.id == item_id then
+				inventory_index = i
+				bag_id = 0
+				break
 			end
 		end
 	end
-	
-	if b then
-		for k,v in pairs(b) do
-			local k1 = keymap(k)
-			if k1 then
-				result[k1] = v
+	return inventory_index,bag_id
+end
+
+
+
+
+
+-----------------------------------------------------------------------------------
+--Name: mk_out_arr_entry(sp,arr,original)
+--Desc: Makes a new entry in out_arr or updates an old one's "data" field.
+--Args:
+---- sp - Resources line for the current spell
+---- arr - table containing a "target_id" field that is the spell's target_id or nil
+---- original - outgoing packet string (or nil in pretarget)
+-----------------------------------------------------------------------------------
+--Returns:
+---- inde - key for out_arr
+-----------------------------------------------------------------------------------
+function mk_out_arr_entry(sp,arr,original)
+	local inde = unify_prefix[spell.prefix]..' '..spell.english
+	if out_arr[inde..' '..tostring(arr.target_id)] then
+		inde = inde..' '..tostring(arr.target_id)
+		out_arr[inde].data = original
+		out_arr[inde].spell.target = sp.target
+	elseif out_arr[inde..' nil'] then
+		inde = inde..' nil'
+		out_arr[inde].data = original
+		out_arr[inde].spell.target = sp.target
+	else
+		if debugging >= 2 then windower.add_to_chat(8,'GearSwap (Debug Mode): Creating a new out_arr entry: '..tostring(inde)..' '..tostring(arr.target_id)) end
+		inde = inde..' '..tostring(arr.target_id)
+		out_arr[inde] = {}
+		out_arr[inde].data = original
+		out_arr[inde].cast_delay = 0
+		out_arr[inde].spell = sp
+	end
+	return inde
+end
+
+
+
+-----------------------------------------------------------------------------------
+--Name: d_out_arr_entry(sp,ind)
+--Desc: Deletes an entry from out_arr.
+--Args:
+---- sp - Resources line for the current spell (at the end of aftercast)
+---- ind - Proposed index of out_arr
+-----------------------------------------------------------------------------------
+--Returns:
+---- None
+-----------------------------------------------------------------------------------
+function d_out_arr_entry(sp,ind)
+	if ind == true then -- ambiguous case
+		local deletion_table = {}
+		for i,v in pairs(out_arr) do
+			if v.midaction then
+				deletion_table[i] = true
+			end
+		end
+		for i,v in pairs(deletion_table) do
+			out_arr[i] = nil
+		end
+	elseif ind == unify_prefix[sp.prefix]..' '..sp.english then
+		if out_arr[ind..' '..tostring(sp.target.id)] then
+			out_arr[ind..' '..sp.target.id] = nil
+		elseif out_arr[ind..' nil'] then
+			out_arr[ind..' nil'] = nil
+		else
+			windower.add_to_chat(123,'GearSwap: Ind identified but not found.')
+		end
+	else
+		windower.add_to_chat(123,'GearSwap: Missing ind was passed.')
+	end
+	return inde
+end
+
+
+
+-----------------------------------------------------------------------------------
+--Name: unknown_out_arr_deletion(prefix,arr)
+--Desc: Deletes an unknown out_arr entry based on target ID
+--Args:
+---- prefix - Current spell's prefix
+---- arr - table containing at least a target ID
+-----------------------------------------------------------------------------------
+--Returns:
+---- none
+-----------------------------------------------------------------------------------
+function unknown_out_arr_deletion(prefix,arr)
+	if type(user_env[prefix..'aftercast']) == 'function' then
+		local loop_check
+		
+		-- Iterate over out_arr looking for a spell targeting the current target
+		-- Call aftercast with this spell's information (interrupted) if one is found.
+		for i,v in pairs(out_arr) do
+			if v.spell and v.spell.target and v.spell.target.id == arr.target_id then
+				v.spell.interrupted = true
+				equip_sets(prefix..'aftercast',v.spell,{type='Interruption'},true)
+				loop_check = true
+				break
+			end
+		end
+		if not loop_check then
+		-- If the above loop fails to produce a result, just go through and
+		-- delete everything associated with that target_id
+			delete_out_arr_by_id(arr.target_id)
+		end
+	elseif user_env[prefix..'aftercast'] then
+		delete_out_arr_by_id(arr.target_id)
+		windower.add_to_chat(123,'GearSwap: '..prefix..'aftercast() exists but is not a function')
+	else
+		delete_out_arr_by_id(arr.target_id)
+	end
+end
+
+
+
+-----------------------------------------------------------------------------------
+--Name: delete_out_arr_by_id(id)
+--Desc: Deletes an unknown out_arr entry based on target ID
+--Args:
+---- id - ID of the target
+-----------------------------------------------------------------------------------
+--Returns:
+---- none
+-----------------------------------------------------------------------------------
+function delete_out_arr_by_id(id)
+	local deleted_table = {}
+	for i,v in pairs(out_arr) do
+		if v.spell and v.spell.target then
+			if v.spell.target.id == id then
+				out_arr[i] = nil
 			end
 		end
 	end
+end
+
+
+
+-----------------------------------------------------------------------------------
+--Name: get_spell(act)
+--Desc: Takes an action table and returns a modified resource line
+--Args:
+---- act - action table in the same format as event_action
+-----------------------------------------------------------------------------------
+--Returns:
+---- spell - Resource line of the current spell
+-----------------------------------------------------------------------------------
+function get_spell(act)
+	local spell, abil_ID, effect_val = {}
+	local msg_ID = act.targets[1].actions[1].message
 	
-	return result
+	if T{7,8,9}:contains(act.category) then
+		abil_ID = act.targets[1].actions[1].param
+	elseif T{3,4,5,6,11,13,14,15}:contains(act.category) then
+		abil_ID = act.param
+		effect_val = act.targets[1].actions[1].param
+	end
+	
+	if act.category == 12 or act.category == 2 then
+		spell = r_abilities[1]
+	else
+		if not dialog[msg_ID] then
+			if T{4,8}:contains(act.category) then
+				spell = r_spells[abil_ID]
+				if act.category == 4 and spell then spell.recast = act.recast end
+			elseif T{3,6,7,13,14,15}:contains(act.category) then
+				spell = r_abilities[abil_ID] -- May have to correct for charmed pets some day, but I'm not sure there are any monsters with TP moves that give no message.
+			elseif T{5,9}:contains(act.category) then
+				spell = r_items[abil_ID]
+			else
+				spell = {name=tostring(msg_ID)} -- Debugging
+			end
+			return spell
+		end
+		
+		
+		local fields = fieldsearch(dialog[msg_ID][language])
+
+		if table.contains(fields,'spell') then
+			spell = r_spells[abil_ID]
+			if act.category == 4 then spell.recast = act.recast end
+		elseif table.contains(fields,'ability') then
+			spell = r_abilities[abil_ID]
+		elseif table.contains(fields,'weapon_skill') then
+--			if abil_ID > 255 then -- WZ_RECOVER_ALL is used by chests in Limbus
+--				spell = r_mabils[abil_ID-256]
+--				if spell.english == '.' then
+--					spell.english = 'Special Attack'
+--				end
+--			elseif abil_ID < 256 then
+				spell = r_abilities[abil_ID+768]
+--			end
+		elseif msg_ID == 303 then
+			spell = r_abilities[74] -- Divine Seal
+		elseif msg_ID == 304 then
+			spell = r_abilities[75] -- 'Elemental Seal'
+		elseif msg_ID == 305 then
+			spell = r_abilities[76] -- 'Trick Attack'
+		elseif msg_ID == 311 or msg_ID == 311 then
+			spell = r_abilities[79] -- 'Cover'
+		elseif msg_ID == 240 or msg_ID == 241 then
+			spell = r_abilities[43] -- 'Hide'
+		elseif msg_ID == 328 then
+			spell = r_abilities[effect_val] -- BPs that are out of range
+		end
+		
+		
+		if table.contains(fields,'item') then
+			spell = r_items[abil_ID]
+		else
+			spell = aftercast_cost(spell)
+		end
+	end
+		
+	spell.name = spell[language]
+	spell.interrupted = false
+	return spell
+end
+
+
+
+-----------------------------------------------------------------------------------
+--Name: aftercast_cost(rline)
+--Desc: Takes a resource line and modifies it so it includes aftercast cost and
+--      a few other values
+--Args:
+---- rline - resource line
+-----------------------------------------------------------------------------------
+--Returns:
+---- rline - modified resource line
+-----------------------------------------------------------------------------------
+function aftercast_cost(rline)
+	if rline == nil then
+		return {tpaftercast = player.tp, mpaftercast = player.mp, mppaftercast = player.mpp}
+	end
+	if not rline.mpcost then rline.mpcost = 0 end
+	if not rline.tpcost then rline.tpcost = 0 end
+	
+	if rline.tpcost == 0 then rline.tpaftercast = player.tp else
+	rline.tpaftercast = player.tp - rline.tpcost end
+	
+	if rline.mpcost == 0 then
+		rline.mpaftercast = player.mp
+		rline.mppaftercast = player.mpp
+	else
+		rline.mpaftercast = player.mp - rline.mpcost
+		rline.mppaftercast = (player.mp - rline.mpcost)/player.max_mp
+	end
+	
+	return rline
+end
+
+
+
+-----------------------------------------------------------------------------------
+--Name: get_action_type(category)
+--Desc: Determines the action's "type."
+--Args:
+---- category - resource line
+-----------------------------------------------------------------------------------
+--Returns:
+---- rline - modified resource line
+-----------------------------------------------------------------------------------
+function get_action_type(category)
+	local action_type
+	if category == 3 and not _global.midaction then
+		-- Try to filter for Job Abilities that come back as WSs.
+		action_type = 'Job Ability'
+	else
+		action_type = category_map[category]
+	end
+	return action_type
 end

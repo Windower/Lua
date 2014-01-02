@@ -1,4 +1,6 @@
 -------------------------------------------------
+GearSwap 0.810 - Changed how precast and midcast are defined for players. Removed verify_equip and force_send. Refactored a great deal.
+-------------------------------------------------
 GearSwap 0.802 - Introduced the debugging "clocking" setting. Changed how actions are injected.
 -------------------------------------------------
 GearSwap 0.801 - Combated double precasts, fixed a variety of nil errors, and made Paralysis work (hopefully).

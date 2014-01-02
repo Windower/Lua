@@ -34,9 +34,15 @@ function valid_target(targ)
 	if pass_through_targs:contains(targ) then
 		local j = windower.ffxi.get_mob_by_target(targ)
 		
-		if j then
-			spelltarget = target_complete(j)
-		end
+		if j then spelltarget = target_complete(j) end
+		
+		spelltarget.raw = targ
+		return targ,spelltarget
+	elseif tonumber(targ) then
+		local j = windower.ffxi.get_mob_by_id(tonumber(targ))
+		
+		if j and j.valid_target then spelltarget = target_complete(j) end
+		
 		spelltarget.raw = targ
 		return targ,spelltarget
 	elseif not tonumber(targ) then

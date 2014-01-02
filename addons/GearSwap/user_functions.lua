@@ -49,16 +49,7 @@ end
 
 
 function verify_equip(boolean)
-	if _global.current_event ~= 'precast' and _global.current_event ~= 'pretarget' then
-		windower.add_to_chat(123,'GearSwap: verify_equip() is only valid in the precast and pretarget functions')
-		return
-	end
-	if boolean == true or boolean == false then _global.verify_equip = boolean
-	elseif boolean == nil then
-		_global.verify_equip = true
-	else
-		windower.add_to_chat(123,'GearSwap: verify_equip was passed an invalid value (true/no value/nil=Verify equipment, false=do not verify equipment)')
-	end
+	windower.add_to_chat(123,'GearSwap: Due to internal changes verify_equip() no longer serves a purpose and has been depreciated')
 end
 
 
@@ -76,16 +67,7 @@ function cancel_spell(boolean)
 end
 
 function force_send(boolean)
-	if _global.current_event ~= 'precast' and _global.current_event ~= 'pretarget' then
-		windower.add_to_chat(123,'GearSwap: force_send() is only valid in the precast and pretarget functions')
-		return
-	end
-	if boolean == true or boolean == false then _global.force_send = boolean
-	elseif boolean == nil then
-		_global.force_send = true
-	else
-		windower.add_to_chat(123,'GearSwap: force_send was passed an invalid value (true/no value/nil=force send, false=do not force send)')
-	end
+	windower.add_to_chat(123,'GearSwap: force_send() has been depreciated due to internal changes and no longer has a purpose')
 end
 
 function change_target(name)
@@ -114,23 +96,14 @@ function cast_delay(delay)
 	end
 end
 
+-- Combines the provided gear sets into a new set.  Returns the result.
 function set_combine(...)
-	return combine_with_map(defaultSlotMap, ...)
+	return set_merge({}, ...)
 end
 
-
+-- Combines the provided gear sets into the equip_list set.
 function equip(...)
-	local gearsets = {...}
-	if #gearsets ~= table.length(gearsets) then
-		windower.add_to_chat(123,'GearSwap: Equip command failure. A passed set is nil')
-		return
-	end
-	for i = 1,table.length(gearsets) do
-		local temp_set = unify_slots(gearsets[i]) -- This can probably be reduced to another index table.
-		for n,m in pairs(temp_set) do
-			rawset(equip_list,n,m)
-		end
-	end
+	set_merge(equip_list, ...)
 end
 
 function disable(...)
