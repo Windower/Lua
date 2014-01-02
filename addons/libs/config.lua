@@ -317,7 +317,7 @@ function config.save(t, char)
     meta.original[char]:update(t)
 	
     if char == 'global' then
-        meta.original = meta.original:filterkey('global')
+        meta.original = meta.original:key_filter('global')
     else
         meta.original.global:amend(meta.original[char], true)
         meta.original[char] = table_diff(meta.original.global, meta.original[char]) or setmetatable({}, _meta.T)
