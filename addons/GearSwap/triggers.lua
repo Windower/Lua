@@ -92,8 +92,10 @@ windower.register_event('outgoing text',function(original,modified)
 				else
 					inde = mk_out_arr_entry(spell,{target_id=spell.target.id},nil)
 				end
-				if unify_prefix[spell.prefix] == '/ma' then
+				if outgoing_action_category_table[unify_prefix[spell.prefix]] == 3 then
 					id = spell.index
+				elseif outgoing_action_category_table[unify_prefix[spell.prefix]] == 7 or outgoing_action_category_table[unify_prefix[spell.prefix]] == 25 then
+					id = spell.id-768
 				else
 					id = spell.id
 				end

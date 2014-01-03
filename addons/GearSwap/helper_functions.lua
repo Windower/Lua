@@ -373,6 +373,14 @@ end
 ---- string - An action packet. First four bytes are dummy bytes.
 -----------------------------------------------------------------------------------
 function assemble_action_packet(target_id,target_index,category,spell_id)
+	if not target_id then
+		windower.add_to_chat(8,'No target id?')
+		return
+	end
+	if not target_index then
+		windower.add_to_chat(8,'No target index?')
+		return
+	end
 	local outstr = string.char(0x1A,0x08,0,0)
 	outstr = outstr..string.char( (target_id%256), math.floor(target_id/256)%256, math.floor( (target_id/65536)%256) , math.floor( (target_id/16777216)%256) )
 	outstr = outstr..string.char( (target_index%256), math.floor(target_index/256)%256)
@@ -564,28 +572,21 @@ end
 ---- none
 -----------------------------------------------------------------------------------
 function unknown_out_arr_deletion(prefix,arr)
-	if type(user_env[prefix..'aftercast']) == 'function' then
-		local loop_check
-		
-		-- Iterate over out_arr looking for a spell targeting the current target
-		-- Call aftercast with this spell's information (interrupted) if one is found.
-		for i,v in pairs(out_arr) do
-			if v.spell and v.spell.target and v.spell.target.id == arr.target_id then
-				v.spell.interrupted = true
-				equip_sets(prefix..'aftercast',v.spell,{type='Interruption'},true)
-				loop_check = true
-				break
-			end
+	local loop_check
+	
+	-- Iterate over out_arr looking for a spell targeting the current target
+	-- Call aftercast with this spell's information (interrupted) if one is found.
+	for i,v in pairs(out_arr) do
+		if v.spell and v.spell.target and v.spell.target.id == arr.target_id then
+			v.spell.interrupted = true
+			equip_sets(prefix..'aftercast',v.spell,{type='Interruption'},true)
+			loop_check = true
+			break
 		end
-		if not loop_check then
-		-- If the above loop fails to produce a result, just go through and
-		-- delete everything associated with that target_id
-			delete_out_arr_by_id(arr.target_id)
-		end
-	elseif user_env[prefix..'aftercast'] then
-		delete_out_arr_by_id(arr.target_id)
-		windower.add_to_chat(123,'GearSwap: '..prefix..'aftercast() exists but is not a function')
-	else
+	end
+	if not loop_check then
+	-- If the above loop fails to produce a result, just go through and
+	-- delete everything associated with that target_id
 		delete_out_arr_by_id(arr.target_id)
 	end
 end

@@ -274,7 +274,7 @@ function command_send_check(inde)
 		out_arr[inde] = nil
 	else
 		out_arr[inde].spell = spell
-		if spell.target and spell.target.id and spell.prefix and unify_prefix[spell.prefix] then
+		if spell.target and spell.target.id and spell.target.index and spell.prefix and unify_prefix[spell.prefix] then
 			if spell.prefix == '/item' then
 				-- Item use packet handling here
 				if spell.target.id == player.id then
@@ -291,6 +291,8 @@ function command_send_check(inde)
 			elseif outgoing_action_category_table[unify_prefix[spell.prefix]] then
 				if outgoing_action_category_table[unify_prefix[spell.prefix]] == 3 then
 					out_arr[inde].proposed_packet = assemble_action_packet(spell.target.id,spell.target.index,outgoing_action_category_table[unify_prefix[spell.prefix]],spell.index)
+				elseif outgoing_action_category_table[unify_prefix[spell.prefix]] == 7 or outgoing_action_category_table[unify_prefix[spell.prefix]] == 25 then
+					out_arr[inde].proposed_packet = assemble_action_packet(spell.target.id,spell.target.index,outgoing_action_category_table[unify_prefix[spell.prefix]],spell.id-768)
 				else
 					out_arr[inde].proposed_packet = assemble_action_packet(spell.target.id,spell.target.index,outgoing_action_category_table[unify_prefix[spell.prefix]],spell.id)
 				end
