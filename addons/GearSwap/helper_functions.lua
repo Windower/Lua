@@ -308,7 +308,7 @@ function unify_slots(g)
 end
  
 -----------------------------------------------------------------------------------
-----Name: filter_slot_keys(k)
+----Name: is_slot_key(k)
 -- Checks to see if key 'k' is known in the slot_map array.
 ----Args:
 -- k - A key to a gear slot in a gear table.
