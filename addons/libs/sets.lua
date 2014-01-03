@@ -268,7 +268,7 @@ function set.concat(s, str)
 end
 
 function set.format(s, trail, subs)
-    local first = next(t)
+    local first = next(s)
     if not first then
         return subs or ''
     end
