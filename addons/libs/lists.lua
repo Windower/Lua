@@ -175,15 +175,6 @@ function list.concat(l, str, from, to)
     return res
 end
 
-function list.clear(l)
-    for i = 1, l.n do
-        rawset(l, key, nil)
-    end
-
-    l.n = 0
-    return l
-end
-
 function list.with(l, attr, val)
     for i = 1, l.n do
         local el = rawget(l, i)
