@@ -206,7 +206,7 @@ end
 function user_pcall(str,val1,val2,exit_funct)
 	if user_env then
 		if type(user_env[str]) == 'function' then
-			user_env[str](val1)
+			user_env[str](val1,val2)
 		elseif user_env[str] then
 			windower.add_to_chat(123,'GearSwap: '..str..'() exists but is not a function')
 		end
