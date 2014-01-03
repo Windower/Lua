@@ -70,17 +70,15 @@ function equip_sets(swap_type,val1,val2,ind)
 	if swap_type == 'pretarget' then
 		_global.cast_delay = 0
 		if _settings.debug_mode then windower.add_to_chat(8,'GearSwap (Debug Mode): Pretarget '..tostring(val1.name)) end
-		if type(user_env.pretarget) == 'function' then user_env.pretarget(val1,val2) -- User defined function to determine the pretarget set
-		elseif user_env.pretarget then windower.add_to_chat(123,'GearSwap: pretarget() exists but is not a function') end
+		user_pcall(swap_type,val1,val2)
 		ind = mk_out_arr_entry(val1,{target_id=spell.target.id},nil)
 	elseif swap_type == 'precast' then
 		if _settings.debug_mode then windower.add_to_chat(8,'GearSwap (Debug Mode): Precast '..tostring(val1.name)) end
-		if type(user_env.precast) == 'function' then user_env.precast(val1,val2) -- User defined function to determine the precast set
-		elseif user_env.precast then windower.add_to_chat(123,'GearSwap: precast() exists but is not a function') end
+		user_pcall(swap_type,val1,val2)
 		_global.midaction = true
 	elseif swap_type == 'midcast' then
 		if _settings.debug_mode then windower.add_to_chat(8,'GearSwap (Debug Mode): Midcast '..tostring(val1.name)) end
-		user_env.midcast(val1,val2) -- User defined function to determine the midcast set
+		user_pcall(swap_type,val1,val2)
 	elseif swap_type == 'aftercast' then
 		if _settings.debug_mode then windower.add_to_chat(8,'GearSwap (Debug Mode): Aftercast '..tostring(val1.name)) end
 		if not val1 then val1 = {}
@@ -89,35 +87,28 @@ function equip_sets(swap_type,val1,val2,ind)
 			end
 		end
 		_global.midaction = false
-		user_env.aftercast(val1,val2) -- User defined function to determine the aftercast set
+		user_pcall(swap_type,val1,val2)
 	elseif swap_type == 'pet_midcast' then
 		if _settings.debug_mode then windower.add_to_chat(8,'GearSwap (Debug Mode): Pet Midcast '..tostring(val1.name)) end
-		user_env.pet_midcast(val1,val2) -- User defined function to determine the midcast set
+		user_pcall(swap_type,val1,val2)
 	elseif swap_type == 'pet_aftercast' then
 		if _settings.debug_mode then windower.add_to_chat(8,'GearSwap (Debug Mode): Pet Aftercast '..tostring(val1.name)) end
 		if val1 then
 		else
 			windower.add_to_chat(8,'---------------- VAL1 IS NIL ------------')
 		end
-		user_env.pet_aftercast(val1,val2) -- User defined function to determine the aftercast set
+		user_pcall(swap_type,val1,val2)
 	elseif swap_type == 'status_change' then
-		if _settings.debug_mode then windower.add_to_chat(8,'GearSwap (Debug Mode): Status Change '..tostring(val1)..' '..tostring(val2))
-			for i=1,#val2 do
-				windower.add_to_chat(8,'GearSwap (Debug Mode): '..i..' '..string.byte(val2[i]))
-			end
-		end
-		if type(user_env.status_change) == 'function' then user_env.status_change(val1,val2) -- User defined function to determine if sets should change following status change
-		elseif user_env.status_change then windower.add_to_chat(123,'GearSwap: status_change() exists but is not a function') end
+		if _settings.debug_mode then windower.add_to_chat(8,'GearSwap (Debug Mode): Status Change '..tostring(val1)..' '..tostring(val2)) end
+		user_pcall(swap_type,val1,val2)
 	elseif swap_type == 'buff_change' then
 		if _settings.debug_mode then windower.add_to_chat(8,'GearSwap (Debug Mode): Buff Change '..tostring(val1)..' '..tostring(val2)) end
-		if type(user_env.buff_change) == 'function' then user_env.buff_change(val1,val2) -- User defined function to determine if sets should change following buff change
-		elseif user_env.buff_change then windower.add_to_chat(123,'GearSwap: buff_change() exists but is not a function') end
+		user_pcall(swap_type,val1,val2)
 	elseif swap_type == 'equip_command' then
 		equip(val1)
 	elseif swap_type == 'self_command' then
 		if _settings.debug_mode then windower.add_to_chat(8,'GearSwap (Debug Mode): Self Command '..tostring(val1)) end
-		if type(user_env.self_command) == 'function' then user_env.self_command(val1)
-		elseif user_env.self_command then windower.add_to_chat(123,'GearSwap: self_command() exists but is not a function') end
+		user_pcall(swap_type,val1,val2)
 	elseif swap_type == 'delayed' then
 		equip(stored_equip_list)
 	end
@@ -199,6 +190,26 @@ function equip_sets(swap_type,val1,val2,ind)
 		packet_send_check(ind)
 	elseif swap_type == 'aftercast' then
 		d_out_arr_entry(val1,ind)
+	end
+end
+
+
+-----------------------------------------------------------------------------------
+--Name: user_pcall(str,val1,val2,exit_funct)
+--Desc: Calls a user function, if it exists. If not, throws an error.
+--Args:
+---- str - Function's key in user_env.
+-----------------------------------------------------------------------------------
+--Returns:
+---- none
+-----------------------------------------------------------------------------------
+function user_pcall(str,val1,val2,exit_funct)
+	if user_env then
+		if type(user_env[str]) == 'function' then
+			user_env[str](val1)
+		elseif user_env[str] then
+			windower.add_to_chat(123,'GearSwap: '..str..'() exists but is not a function')
+		end
 	end
 end
 
@@ -354,7 +365,7 @@ function send_action(inde)
 		cued_packet = inde
 		windower.packets.inject_outgoing(out_arr[inde].proposed_packet:byte(1),out_arr[inde].proposed_packet)
 		equip_sets('midcast',out_arr[inde].spell,{type=out_arr[inde].spell.type},inde)
-		windower.send_command('input /echo Sending!;input /assist <me>')
+		windower.send_command('input /assist <me>')
 	else
 		windower.add_to_chat(123,'GearSwap: Cued Packet not found')
 	end

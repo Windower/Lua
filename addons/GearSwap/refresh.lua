@@ -58,12 +58,7 @@ function load_user_files(job_id)
 	job_id = tonumber(job_id)
 	local path
 	
-	if user_env then
-		if type(user_env.file_unload)=='function' then user_env.file_unload()
-		elseif user_env.file_unload then
-			windower.add_to_chat(123,'GearSwap: file_unload() is not a function')
-		end
-	end
+	user_pcall('file_unload')
 	
 	for i,v in pairs(registered_user_events) do
 		windower.unregister_event(i)
@@ -137,12 +132,7 @@ function load_user_files(job_id)
 		sets = nil
 		return nil
 	end
-	
-	if type(user_env.get_sets) == 'function' then
-		user_env.get_sets()
-	elseif user_env.get_sets then
-		windower.add_to_chat(123,'GearSwap: get_sets() is defined but is not a function.')
-	end
+	user_pcall('get_sets')
 	
 	gearswap_disabled = false
 	sets = user_env.sets

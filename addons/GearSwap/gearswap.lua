@@ -73,12 +73,7 @@ end)
 
 windower.register_event('unload',function ()
 	if debugging >= 1 then windower.debug('unload') end
-	if user_env then
-		if type(user_env.file_unload)=='function' then user_env.file_unload()
-		elseif user_env.file_unload then
-			windower.add_to_chat(123,'GearSwap: file_unload() is not a function')
-		end
-	end
+	user_pcall('file_unload')
 	if logging then	logfile:close() end
 end)
 

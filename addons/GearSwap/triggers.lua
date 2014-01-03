@@ -176,21 +176,10 @@ function inc_action(act)
 			action_type = 'Interruption'
 		end
 		
-		if type(user_env[prefix..'aftercast']) == 'function' then
-			equip_sets(prefix..'aftercast',spell,{type=action_type},inde)
-		elseif user_env[prefix..'aftercast'] then
-			d_out_arr_entry(spell,inde)
-			windower.add_to_chat(123,'GearSwap: '..prefix..'aftercast() exists but is not a function')
-		else
-			d_out_arr_entry(spell,inde)
-		end
+		equip_sets(prefix..'aftercast',spell,{type=action_type},inde)
 	elseif readies[category] and act.param ~= 28787 and prefix == '/pet' then
 		mk_out_arr_entry(spell,{target_id==spell.target.id},nil)
-		if type(user_env[prefix..'midcast']) == 'function' then
-			equip_sets(prefix..'midcast',spell,{type=get_action_type(category)},inde)
-		elseif user_env[prefix..'midcast'] then
-			windower.add_to_chat(123,'GearSwap: '..prefix..'midcast() exists but is not a function')
-		end
+		equip_sets(prefix..'midcast',spell,{type=get_action_type(category)},inde)
 	end
 end
 
