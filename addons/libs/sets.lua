@@ -287,10 +287,10 @@ function set.format(s, trail, subs)
     end
 
     local res = ''
-    for v in pairs(t) do
+    for v in pairs(s) do
         res = res .. tostring(v)
-        if next(t, v) then
-            if next(t, next(t, v)) then
+        if next(s, v) then
+            if next(s, next(s, v)) then
                 res = res .. ', '
             else
                 res = res .. last
