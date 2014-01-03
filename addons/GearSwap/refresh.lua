@@ -118,7 +118,7 @@ function load_user_files(job_id)
 		return
 	else
 		current_job_file = res.jobs[job_id].short
-		print('Loaded your '..res.jobs[job_id].short..' Lua file!')
+		print('GearSwap: Loaded your '..res.jobs[job_id].short..' Lua file!')
 	end
 	
 	setfenv(funct, user_env)
@@ -127,7 +127,7 @@ function load_user_files(job_id)
 	local status, plugin = pcall(funct)
 	
 	if not status then
-		error('Plugin failed to load: \n'..plugin)
+		error('GearSwap: File failed to load: \n'..plugin)
 		gearswap_disabled = true
 		sets = nil
 		return nil

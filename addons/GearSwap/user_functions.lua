@@ -49,7 +49,7 @@ end
 
 
 function verify_equip(boolean)
-	windower.add_to_chat(123,'GearSwap: Due to internal changes verify_equip() no longer serves a purpose and has been depreciated')
+	windower.add_to_chat(123,'GearSwap: verify_equip() has been deprecated due to internal changes and no longer has a purpose')
 end
 
 
@@ -67,7 +67,7 @@ function cancel_spell(boolean)
 end
 
 function force_send(boolean)
-	windower.add_to_chat(123,'GearSwap: force_send() has been depreciated due to internal changes and no longer has a purpose')
+	windower.add_to_chat(123,'GearSwap: force_send() has been deprecated due to internal changes and no longer has a purpose')
 end
 
 function change_target(name)
@@ -141,7 +141,8 @@ function enable(...)
 		end
 	end
 	if table.length(sending_table) > 0 then
-		equip_sets('equip_command',sending_table)
+		refresh_globals()
+		equip_sets('equip_command',nil,sending_table)
 	end
 end
 
@@ -227,7 +228,13 @@ function user_midaction(bool)
 	elseif bool ~= nil then
 		windower.add_to_chat(123,'GearSwap: midaction() takes a bool or no argument')
 	end
-	return _global.midaction
+	
+	for i,v in pairs(out_arr) do
+		if v.midaction then
+			return true,v.spell
+		end
+	end
+	return false
 end
 
 

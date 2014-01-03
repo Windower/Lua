@@ -1,4 +1,6 @@
 -------------------------------------------------
+GearSwap 0.811 - Added a check for whether or not a given spell/ability can be used. Made player.equipment update between pretarget/precast/midcast. Deleted the second argument to pretarget, precast, midcast, aftercast, pet_midcast, and pet_aftercast.
+-------------------------------------------------
 GearSwap 0.810 - Changed how precast and midcast are defined for players. Removed verify_equip and force_send. Refactored a great deal.
 -------------------------------------------------
 GearSwap 0.802 - Introduced the debugging "clocking" setting. Changed how actions are injected.

@@ -385,6 +385,19 @@ function assemble_action_packet(target_id,target_index,category,spell_id)
 	outstr = outstr..string.char( (target_id%256), math.floor(target_id/256)%256, math.floor( (target_id/65536)%256) , math.floor( (target_id/16777216)%256) )
 	outstr = outstr..string.char( (target_index%256), math.floor(target_index/256)%256)
 	outstr = outstr..string.char( (category%256), math.floor(category/256)%256)
+	--if category == 3 and not windower.ffxi.get_spell_recasts()[spell_id] then
+	--	windower.add_to_chat(123,"GearSwap: Unable to make action packet. You do not have access to that spell.")
+	--	return
+	if category ~= 3 then
+		if not windower.ffxi.get_abilities()[spell_id] then
+			windower.add_to_chat(123,"GearSwap: Unable to make action packet. You do not have access to that ability.")
+			return
+		end
+		if category == 7 or category == 25 then
+			spell_id = spell_id - 768
+		end
+		
+	end
 	outstr = outstr..string.char( (spell_id%256), math.floor(spell_id/256)%256)
 	return outstr..string.char(0,0)
 end
@@ -545,6 +558,8 @@ function d_out_arr_entry(sp,ind)
 		for i,v in pairs(deletion_table) do
 			out_arr[i] = nil
 		end
+	elseif not sp.english then
+		windower.add_to_chat(123,'Spell.english is nil in helper_functions at line 548! Tell Byrth what you were doing!')
 	elseif ind == unify_prefix[sp.prefix]..' '..sp.english then
 		if out_arr[ind..' '..tostring(sp.target.id)] then
 			out_arr[ind..' '..sp.target.id] = nil
@@ -579,7 +594,9 @@ function unknown_out_arr_deletion(prefix,arr)
 	for i,v in pairs(out_arr) do
 		if v.spell and v.spell.target and v.spell.target.id == arr.target_id then
 			v.spell.interrupted = true
-			equip_sets(prefix..'aftercast',v.spell,{type='Interruption'},true)
+			v.spell.action_type = 'Interruption'
+			refresh_globals()
+			equip_sets(prefix..'aftercast',true,v.spell)
 			loop_check = true
 			break
 		end

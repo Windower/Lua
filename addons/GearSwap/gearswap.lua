@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.810'
+_addon.version = '0.811'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -86,7 +86,9 @@ windower.register_event('addon command',function (...)
 	local splitup = {...}
 	if splitup[1]:lower() == 'c' then
 		if gearswap_disabled then return end
-		if splitup[2] then equip_sets('self_command',_raw.table.concat(splitup,' ',2,#splitup))
+		if splitup[2] then
+			refresh_globals()
+			equip_sets('self_command',nil,_raw.table.concat(splitup,' ',2,#splitup))
 		else
 			windower.add_to_chat(123,'GearSwap: No self command passed.')
 		end
@@ -101,7 +103,8 @@ windower.register_event('addon command',function (...)
 			if tempset[set_split[n]] or tempset[tonumber(set_split[n])] then
 				tempset = tempset[set_split[n]] or tempset[tonumber(set_split[n])]
 				if n == #set_split then
-					equip_sets('equip_command',tempset)
+					refresh_globals()
+					equip_sets('equip_command',nil,tempset)
 					break
 				else
 					n = n+1
@@ -115,10 +118,14 @@ windower.register_event('addon command',function (...)
 		if user_env and user_env.sets then
 			table.remove(splitup,1)
 			export_set(splitup)
+		else
+			windower.add_to_chat(123,'GearSwap: There is nothing to export because there is no file loaded.')
 		end
 	elseif splitup[1]:lower() == 'validate' then
 		if user_env and user_env.sets then
 			validate()
+		else
+			windower.add_to_chat(123,'GearSwap: There is nothing to validate because there is no file loaded.')
 		end
 	elseif splitup[1]:lower() == 'enable' then
 		disenable(splitup,enable,'enable',false)
@@ -251,7 +258,8 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
 			encumbrance_table[i] = tf
 		end
 		if table.length(tab) > 0 then
-			equip_sets('equip_command',tab)
+			refresh_globals()
+			equip_sets('equip_command',nil,tab)
 		end
 	elseif gearswap_disabled then
 		return
@@ -269,20 +277,28 @@ end)
 windower.register_event('status change',function(new,old)
 	if debugging >= 1 then windower.debug('status change '..new) end
 	if gearswap_disabled or T{2,3,4}:contains(old) or T{2,3,4}:contains(new) then return end
-	equip_sets('status_change',res.statuses[new].english,res.statuses[old].english)
+	
+	refresh_globals()
+	equip_sets('status_change',nil,res.statuses[new].english,res.statuses[old].english)
 end)
 
 windower.register_event('gain buff',function(name,id)
 	if debugging >= 1 then windower.debug('gain buff '..name) end
 	if gearswap_disabled then return end
+	
+	-- Need to figure out what I'm going to do with this:
 	if _global.midaction and T{'terror','sleep','stun','petrification','charm','weakness'}:contains(name:lower()) then _global.midaction = false end
-	equip_sets('buff_change',name,true)
+	
+	
+	refresh_globals()
+	equip_sets('buff_change',nil,name,true)
 end)
 
 windower.register_event('lose buff',function(name,id)
 	if debugging >= 1 then windower.debug('lose buff '..name) end
 	if gearswap_disabled then return end
-	equip_sets('buff_change',name,false)
+	refresh_globals()
+	equip_sets('buff_change',nil,name,false)
 end)
 
 windower.register_event('job change',function(mjob, mjob_id, mjob_lvl, sjob, sjob_id, sjob_lvl)

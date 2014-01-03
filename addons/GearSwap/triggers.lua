@@ -61,6 +61,7 @@ windower.register_event('outgoing text',function(original,modified)
 		elseif temp_mob_arr then
 			if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) temp_mod: '..temp_mod) end
 			if clocking then out_time = os.clock() end
+			refresh_globals()
 	
 			local r_line
 				
@@ -83,7 +84,7 @@ windower.register_event('outgoing text',function(original,modified)
 			r_line.name = r_line[language]
 			spell = aftercast_cost(r_line)
 			spell.target = temp_mob_arr
-			local s_type = command_list[command]
+			spell.action_type = command_list[command]
 			
 			if tonumber(splitline[splitline.n]) then
 				local inde,id
@@ -94,16 +95,16 @@ windower.register_event('outgoing text',function(original,modified)
 				end
 				if outgoing_action_category_table[unify_prefix[spell.prefix]] == 3 then
 					id = spell.index
-				elseif outgoing_action_category_table[unify_prefix[spell.prefix]] == 7 or outgoing_action_category_table[unify_prefix[spell.prefix]] == 25 then
-					id = spell.id-768
 				else
 					id = spell.id
 				end
 				out_arr[inde].proposed_packet = assemble_action_packet(spell.target.id,spell.target.index,outgoing_action_category_table[unify_prefix[spell.prefix]],id)
-				equip_sets('precast',spell,{type=s_type},inde)
-				return ''
+				if out_arr[inde].proposed_packet then
+					equip_sets('precast',inde,spell)
+					return ''
+				end
 			else
-				return equip_sets('pretarget',spell,{type=s_type})
+				return equip_sets('pretarget',nil,spell)
 			end
 		end
 	end
@@ -155,7 +156,7 @@ function inc_action(act)
 	spell = get_spell(act)
 	local category = act.category
 	if logging then	
-		if spell then logit(logfile,'\n\n'..tostring(os.clock)..'(178) Event Action: '..tostring(spell.english)..' '..tostring(act['category']))
+		if spell then logit(logfile,'\n\n'..tostring(os.clock)..'(178) Event Action: '..tostring(spell.english)..' '..tostring(act.category))
 		else logit(logfile,'\n\nNil spell detected') end
 	end
 	
@@ -163,25 +164,27 @@ function inc_action(act)
 	if spell and spell.english then
 		inde = unify_prefix[spell.prefix]..' '..spell.english
 		spell.target = target_complete(windower.ffxi.get_mob_by_id(act.targets[1].id))
+		spell.action_type = get_action_type(act.category)
 	elseif spell then
 		unknown_out_arr_deletion(prefix,{target_id = act.targets[1].id})
 		return
 	end
 	
-	if jas[category] or uses[category] or (readies[category] and act.param == 28787 and not (category == 9 or (category == 7 and prefix == 'pet_'))) then
+	if jas[act.category] or uses[act.category] or (readies[act.category] and act.param == 28787 and not (act.category == 9 or (act.category == 7 and prefix == 'pet_'))) then
 		-- For some reason avatar Out of Range messages send two packets (Category 4 and Category 7)
 		-- Category 4 contains real information, while Category 7 does not.
 		-- I do not know if this will affect automatons being interrupted.
-		local action_type = get_action_type(category)
-		if readies[category] and act.param == 28787 and not (category == 9) then
-			act.interrupted = true
-			action_type = 'Interruption'
+		local action_type = get_action_type(act.category)
+		if readies[act.category] and act.param == 28787 and not (category == 9) then
+			spell.action_type = 'Interruption'
+			spell.interrupted = true
 		end
-		
-		equip_sets(prefix..'aftercast',spell,{type=action_type},inde)
-	elseif readies[category] and act.param ~= 28787 and prefix == '/pet' then
+		refresh_globals()
+		equip_sets(prefix..'aftercast',inde,spell)
+	elseif readies[act.category] and prefix == 'pet_' then -- Entry for pet midcast
 		mk_out_arr_entry(spell,{target_id==spell.target.id},nil)
-		equip_sets(prefix..'midcast',spell,{type=get_action_type(category)},inde)
+		refresh_globals()
+		equip_sets('pet_midcast',inde,spell)
 	end
 end
 
@@ -217,6 +220,7 @@ function inc_action_message(arr)
 			return
 		end
 	end
+	
 	if unable_to_use:contains(arr.message_id) then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(195) Event Action Message: '..tostring(message_id)..' Interrupt') end
 		unknown_out_arr_deletion(prefix,arr)
