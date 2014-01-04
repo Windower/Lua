@@ -246,7 +246,7 @@ end
 function set.reduce(s, fn, init)
     local acc = init or next[2](s)
     local pfn = pairs(s)
-    for el in init and pfn or pfn(s) and pfn do
+    for el in init and pfn or pfn(s) and pfn, s do
         acc = fn(acc, el)
     end
 
