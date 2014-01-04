@@ -67,7 +67,7 @@ data.incoming[0x017] = {name='Incoming Chat',       description='Packet contains
 data.incoming[0x01B] = {name='Job Info',            description='Job Levels and levels unlocked.'}
 data.incoming[0x01C] = {name='Inventory Count',     description='Describes number of slots in inventory.'}
 data.incoming[0x01D] = {name='Finish Inventory',    description='Finish listing the items in inventory.'}
-data.incoming[0x01E] = {name='Modify Inventory',    description='Modifies items in your inventor.'}
+data.incoming[0x01E] = {name='Modify Inventory',    description='Modifies items in your inventory.'}
 data.incoming[0x01F] = {name='Item Assign',         description='Assigns an ID to equipped items in your inventory.'}
 data.incoming[0x020] = {name='Item Update',         description='Info about item in your inventory.'}
 data.incoming[0x021] = {name='Trade Requested',     description='Sent when somebody offers to trade with you.'}
