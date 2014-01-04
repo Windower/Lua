@@ -179,10 +179,10 @@ function inc_action(act)
 			spell.action_type = 'Interruption'
 			spell.interrupted = true
 		end
-		refresh_globals()
-		if (out_arr[inde..' '..act.targets[1].id] or out_arr[inde..' nil'] or (debugging >= 1)) and (act.targets[1].actions[1].message ~= 0 and uses[act.category]) then
+		if (out_arr[inde..' '..act.targets[1].id] or out_arr[inde..' nil'] or (debugging >= 1)) and (act.targets[1].actions[1].message ~= 0 and (uses[act.category] or jas[act.category])) then
 			-- Only aftercast things that were precasted.
 			-- Also, there are some actions (like being paralyzed while casting Ninjutsu) that sends two result action packets. Block the second packet.
+			refresh_globals()
 			equip_sets(prefix..'aftercast',inde,spell)
 		end
 	elseif readies[act.category] and prefix == 'pet_' then -- Entry for pet midcast
