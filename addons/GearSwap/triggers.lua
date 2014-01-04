@@ -170,22 +170,36 @@ function inc_action(act)
 		return
 	end
 	
-	if jas[act.category] or uses[act.category] or (readies[act.category] and act.param == 28787 and not (act.category == 9 or (act.category == 7 and prefix == 'pet_'))) then
-		-- For some reason avatar Out of Range messages send two packets (Category 4 and Category 7)
-		-- Category 4 contains real information, while Category 7 does not.
-		-- I do not know if this will affect automatons being interrupted.
-		local action_type = get_action_type(act.category)
-		if readies[act.category] and act.param == 28787 and not (category == 9) then
+	-- Paralysis of JAs/spells/etc. and Out of Range messages for avatars both send two action packets when they occur.
+	-- The first packet is a paralysis packet that contains the message and spell-appropriate information.
+	-- The second packet contains the interruption code and no useful information as far as I can see.
+	-- The same occurs for items, except that they are both category 9 messages.
+	
+	-- For some reason avatar Out of Range messages send two packets (Category 4 and Category 7)
+	-- Category 4 contains real information, while Category 7 does not.
+	-- I do not know if this will affect automatons being interrupted.
+	
+	if (jas[act.category] or uses[act.category]) and spell then
+		if uses[act.category] and act.param == 28787 then
 			spell.action_type = 'Interruption'
 			spell.interrupted = true
 		end
-		if (out_arr[inde..' '..act.targets[1].id] or out_arr[inde..' nil'] or (debugging >= 1)) and (act.targets[1].actions[1].message ~= 0 and (uses[act.category] or jas[act.category])) then
+		if (out_arr[inde..' '..act.targets[1].id] or out_arr[inde..' nil'] or (debugging >= 1)) then
 			-- Only aftercast things that were precasted.
 			-- Also, there are some actions (like being paralyzed while casting Ninjutsu) that sends two result action packets. Block the second packet.
 			refresh_globals()
 			equip_sets(prefix..'aftercast',inde,spell)
 		end
-	elseif readies[act.category] and prefix == 'pet_' then -- Entry for pet midcast
+	elseif (readies[act.category] and act.param == 28787) and spell then -- and not (act.category == 9 or (act.category == 7 and prefix == 'pet_'))) then
+		spell.action_type = 'Interruption'
+		spell.interrupted = true
+		if (out_arr[inde..' '..act.targets[1].id] or out_arr[inde..' nil'] or (debugging >= 1)) then
+			-- Only aftercast things that were precasted.
+			-- Also, there are some actions (like being paralyzed while casting Ninjutsu) that sends two result action packets. Block the second packet.
+			refresh_globals()
+			equip_sets(prefix..'aftercast',inde,spell)
+		end
+	elseif readies[act.category] and prefix == 'pet_' and act.targets[1].actions[1].message ~= 0 then -- Entry for pet midcast. Excludes the second packet of "Out of range" BPs.
 		mk_out_arr_entry(spell,{target_id==spell.target.id},nil)
 		refresh_globals()
 		equip_sets('pet_midcast',inde,spell)
