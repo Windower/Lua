@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.811'
+_addon.version = '0.812'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -242,7 +242,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
 		arr.actor_index = get_bit_packed(data,128,144)
 		arr.target_index = get_bit_packed(data,144,160)
 		arr.message_id = get_bit_packed(data,160,175) -- Cut off the most significant bit, hopefully
-		
+
 		inc_action_message(arr)
 	elseif id == 0x01B and not injected then
 --		'Job Info Packet'

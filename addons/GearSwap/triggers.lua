@@ -88,8 +88,8 @@ windower.register_event('outgoing text',function(original,modified)
 			
 			if tonumber(splitline[splitline.n]) then
 				local inde,id
-				if out_arr[unify_prefix[spell.prefix]..' '..spell.english..' nil'] then
-					inde = unify_prefix[spell.prefix]..' '..spell.english..' nil'
+				if out_arr[unify_prefix[spell.prefix]..' "'..spell.english..'" nil'] then
+					inde = unify_prefix[spell.prefix]..' "'..spell.english..'" nil'
 				else
 					inde = mk_out_arr_entry(spell,{target_id=spell.target.id},nil)
 				end
@@ -162,11 +162,11 @@ function inc_action(act)
 	
 	local inde
 	if spell and spell.english then
-		inde = unify_prefix[spell.prefix]..' '..spell.english
+		inde = unify_prefix[spell.prefix]..' "'..spell.english..'"'
 		spell.target = target_complete(windower.ffxi.get_mob_by_id(act.targets[1].id))
 		spell.action_type = get_action_type(act.category)
 	elseif spell then
-		unknown_out_arr_deletion(prefix,{target_id = act.targets[1].id})
+		unknown_out_arr_deletion(prefix,act.targets[1].id)
 		return
 	end
 	
@@ -180,7 +180,9 @@ function inc_action(act)
 			spell.interrupted = true
 		end
 		refresh_globals()
-		equip_sets(prefix..'aftercast',inde,spell)
+		if out_arr[inde..' '..act.targets[1].id] or out_arr[inde..' nil'] or (debugging >= 1) then -- Only aftercast things that were precasted.
+			equip_sets(prefix..'aftercast',inde,spell)
+		end
 	elseif readies[act.category] and prefix == 'pet_' then -- Entry for pet midcast
 		mk_out_arr_entry(spell,{target_id==spell.target.id},nil)
 		refresh_globals()
@@ -223,7 +225,7 @@ function inc_action_message(arr)
 	
 	if unable_to_use:contains(arr.message_id) then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(195) Event Action Message: '..tostring(message_id)..' Interrupt') end
-		unknown_out_arr_deletion(prefix,arr)
+		unknown_out_arr_deletion(prefix,arr.target_id)
 	end
 end
 

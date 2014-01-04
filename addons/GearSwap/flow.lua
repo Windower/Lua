@@ -42,7 +42,8 @@
 -----------------------------------------------------------------------------------
 function equip_sets(swap_type,ind,val1,val2)
 	load_globals(ind)
-	if debugging >= 1 then windower.debug(swap_type..' enter') end
+	if debugging >= 1 then windower.debug(swap_type..' enter') 
+	if showphase then windower.add_to_chat(8,swap_type..' enter') end end
 	_global.current_event = swap_type
 	
 	local cur_equip = get_gs_gear(items.equipment,swap_type)
@@ -163,13 +164,20 @@ function equip_sets_exit(swap_type,ind,val1,val2)
 	cache_globals(ind)
 	if swap_type == 'pretarget' then
 		command_send_check(ind)
-		if out_arr[ind] and val1.target then -- Cancelled spell
-			if st_targs:contains(val1.target.raw) then
-				st_flag = true
-			else
-				equip_sets('precast',ind,val1,val2)
-				return ''
-			end
+		if not out_arr[ind] then
+		-- Canceled Spell
+			return ''
+		elseif val1.target and st_targs:contains(val1.target.raw) then
+		-- st targets
+			st_flag = true
+		elseif val1.target and not val1.target.name then
+		-- Spells with invalid pass_through_targs, like using <t> without a target
+			out_arr[ind] = nil
+			storedcommand = nil
+		elseif val1.target and val1.target.name then
+		-- Spells with complete target information
+			equip_sets('precast',ind,val1,val2)
+			return ''
 		end
 	elseif swap_type == 'precast' then
 		packet_send_check(ind)
@@ -254,7 +262,7 @@ end
 -----------------------------------------------------------------------------------
 function command_send_check(inde)
 	if out_arr[inde].cancel_spell then
-		if debugging>=2 then windower.add_to_chat(5,'Spell canceled.') end
+		if debugging>=1 then windower.add_to_chat(5,'Spell canceled.') end
 		storedcommand = nil
 		out_arr[inde] = nil
 	else
@@ -331,7 +339,17 @@ end
 ---- none
 -----------------------------------------------------------------------------------
 function delayed_cast(...)
-	local inde = table.concat({...},' ')
+	local temptab = {...}
+	
+	-- Console strips quotes, so this is necessary to add them back in
+	local inde = temptab[1]..' "'..temptab[2]
+	if #temptab > 3 then
+		for i=3,#temptab-1 do
+			inde = inde..temptab[i]
+		end
+	end
+	inde = inde..'" '..temptab[#temptab]
+	
 	if out_arr[inde] then
 		send_action(inde)
 	elseif debugging >= 1 or _settings.debug_mode then

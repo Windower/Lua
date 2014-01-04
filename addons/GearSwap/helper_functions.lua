@@ -390,7 +390,7 @@ function assemble_action_packet(target_id,target_index,category,spell_id)
 	--	return
 	if category ~= 3 then
 		if not windower.ffxi.get_abilities()[spell_id] then
-			windower.add_to_chat(123,"GearSwap: Unable to make action packet. You do not have access to that ability.")
+			--windower.add_to_chat(123,"GearSwap: Unable to make action packet. You do not have access to that ability.")
 			return
 		end
 		if category == 7 or category == 25 then
@@ -515,7 +515,7 @@ end
 ---- inde - key for out_arr
 -----------------------------------------------------------------------------------
 function mk_out_arr_entry(sp,arr,original)
-	local inde = unify_prefix[spell.prefix]..' '..spell.english
+	local inde = unify_prefix[spell.prefix]..' "'..spell.english..'"'
 	if out_arr[inde..' '..tostring(arr.target_id)] then
 		inde = inde..' '..tostring(arr.target_id)
 		out_arr[inde].data = original
@@ -560,13 +560,13 @@ function d_out_arr_entry(sp,ind)
 		end
 	elseif not sp.english then
 		windower.add_to_chat(123,'Spell.english is nil in helper_functions at line 548! Tell Byrth what you were doing!')
-	elseif ind == unify_prefix[sp.prefix]..' '..sp.english then
+	elseif ind == unify_prefix[sp.prefix]..' "'..sp.english..'"' then
 		if out_arr[ind..' '..tostring(sp.target.id)] then
 			out_arr[ind..' '..sp.target.id] = nil
 		elseif out_arr[ind..' nil'] then
 			out_arr[ind..' nil'] = nil
-		else
-			windower.add_to_chat(123,'GearSwap: Ind identified but not found.')
+		elseif debugging >= 1 then
+			windower.add_to_chat(123,'GearSwap: Ind matches the predicted Ind, but does not exist in out_arr.')
 		end
 	else
 		windower.add_to_chat(123,'GearSwap: Missing ind was passed.')
@@ -581,18 +581,29 @@ end
 --Desc: Deletes an unknown out_arr entry based on target ID
 --Args:
 ---- prefix - Current spell's prefix
----- arr - table containing at least a target ID
+---- target_id - target_ID 
 -----------------------------------------------------------------------------------
 --Returns:
 ---- none
 -----------------------------------------------------------------------------------
-function unknown_out_arr_deletion(prefix,arr)
+function unknown_out_arr_deletion(prefix,target_id)
 	local loop_check
 	
 	-- Iterate over out_arr looking for a spell targeting the current target
 	-- Call aftercast with this spell's information (interrupted) if one is found.
 	for i,v in pairs(out_arr) do
-		if v.spell and v.spell.target and v.spell.target.id == arr.target_id then
+		if v.spell and v.spell.target and v.spell.target.id == target_id then
+			v.spell.interrupted = true
+			v.spell.action_type = 'Interruption'
+			refresh_globals()
+			equip_sets(prefix..'aftercast',true,v.spell)
+			loop_check = true
+			break
+		elseif target_id == player.id and v.midaction then
+			-- Instead of passing the spell target of the offending spell, some
+			-- action messages simply return your information as the target.
+			-- In this case, assume the first action found in out_arr that is between
+			-- precast and aftercast is the action to be canceled.
 			v.spell.interrupted = true
 			v.spell.action_type = 'Interruption'
 			refresh_globals()
@@ -601,10 +612,10 @@ function unknown_out_arr_deletion(prefix,arr)
 			break
 		end
 	end
-	if not loop_check then
+	if not loop_check  then
 	-- If the above loop fails to produce a result, just go through and
 	-- delete everything associated with that target_id
-		delete_out_arr_by_id(arr.target_id)
+		delete_out_arr_by_id(target_id)
 	end
 end
 
