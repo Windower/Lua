@@ -91,24 +91,23 @@ function get_sets()
 	
 	send_command('input /macro book 3;wait .1;input /macro set 1')
 	timer_reg = {}
+	pianissimo_cycle = false
 end
 
 function pretarget(spell)
-	if spell.type == 'BardSong' and spell.target.type and spell.target.type == 'PLAYER' and not buffactive.pianissimo and not spell.target.charmed then
+	if spell.type == 'BardSong' and spell.target.type and spell.target.type == 'PLAYER' and not buffactive.pianissimo and not spell.target.charmed and not pianissimo_cycle then
 		cancel_spell()
+		pianissimo_cycle = true
 		send_command('input /ja "Pianissimo" <me>;wait 1.5;input /ma "'..spell.name..'" '..spell.target.name..';')
 		return
+	end
+	if spell.name ~= 'Pianissimo' then
+		pianissimo_cycle = false
 	end
 end
 
 function precast(spell)
---	if midaction() then return end
 	if spell.type == 'BardSong' then
-		if string.find(world.area:lower(),'cirdas caverns') then
---			cast_delay(0.5)
-		else
---			verify_equip()
-		end
 		if buffactive.nightingale then
 			equip_song_gear(spell)
 			return
@@ -118,7 +117,6 @@ function precast(spell)
 		end
 	elseif spell.action_type == 'Magic' then
 		equip(sets.precast.FC.Normal)
-	--	if spell.casttime >= 4 then verify_equip() end
 		if string.find(spell.english,'Cur') and spell.name ~= 'Cursna' then
 			equip(sets.precast.Cure)
 		end
@@ -133,7 +131,6 @@ function precast(spell)
 end
 
 function midcast(spell)
---	windower.send_command('wait 1;gs c midact')
 	if spell.type == 'BardSong' then
 		equip_song_gear(spell)
 	elseif string.find(spell.english,'Cur') then
