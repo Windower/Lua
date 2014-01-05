@@ -386,13 +386,17 @@ function assemble_action_packet(target_id,target_index,category,spell_id)
 	outstr = outstr..string.char( (target_index%256), math.floor(target_index/256)%256)
 	outstr = outstr..string.char( (category%256), math.floor(category/256)%256)
 
-	if category ~= 3 and category ~= 25 and not windower.ffxi.get_abilities()[spell_id] then
-		windower.add_to_chat(123,"GearSwap: Unable to make action packet. You do not have access to that ability ("..spell_id..")")
+	if (category == 7 or category == 9) and not windower.ffxi.get_abilities()[spell_id] then
+		--windower.add_to_chat(123,"GearSwap: Unable to make action packet. You do not have access to that ability ("..spell_id..")")
 		return
 	end
 	
 	if category == 7 or category == 25 then
 		spell_id = spell_id - 768
+	end
+	
+	if category == 16 then
+		spell_id = 0
 	end
 	
 	outstr = outstr..string.char( (spell_id%256), math.floor(spell_id/256)%256)

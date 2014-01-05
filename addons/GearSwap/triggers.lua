@@ -76,7 +76,7 @@ windower.register_event('outgoing text',function(original,modified)
 				r_line.type = 'Item'
 				storedcommand = command..' "'..r_line[language]..'" '
 			elseif command_list[command] == 'Ranged Attack' then
-				rline = r_abilities[1]
+				r_line = r_abilities[1]
 				storedcommand = command..' '
 			end
 			
