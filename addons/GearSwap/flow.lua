@@ -49,8 +49,13 @@ function equip_sets(swap_type,ind,val1,val2)
 	local cur_equip = get_gs_gear(items.equipment,swap_type)
 	
 	table.reassign(equip_order,default_equip_order)
-	table.reassign(equip_list,to_names_set(cur_equip,items.inventory))
-	table.reassign(player.equipment,equip_list)
+	table.reassign(equip_list,{})
+	table.reassign(player.equipment,to_names_set(cur_equip,items.inventory))
+	for i,v in pairs(slot_map) do
+		if not player.equipment[i] then
+			player.equipment[i] = player.equipment[default_slot_map[v]]
+		end
+	end
 	
 	if debugging >= 2 then windower.add_to_chat(8,swap_type) end
 	if logging then
@@ -90,6 +95,7 @@ function equip_sets(swap_type,ind,val1,val2)
 	elseif swap_type == 'aftercast' then
 		_global.midaction = false
 	end
+	
 	
 	if player.race ~= 'Precomposed NPC' then
 		-- Short circuits the routine and gets out  before equip processing
@@ -262,7 +268,6 @@ end
 -----------------------------------------------------------------------------------
 function command_send_check(inde)
 	if out_arr[inde].cancel_spell then
-		if debugging>=1 then windower.add_to_chat(5,'Spell canceled.') end
 		storedcommand = nil
 		out_arr[inde] = nil
 	else
