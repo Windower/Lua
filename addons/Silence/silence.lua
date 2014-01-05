@@ -35,7 +35,6 @@ end)
 
 windower.register_event('unhandled command', function(...) 
 	local param = L{...}
-	log(param)
 	if param[1] == 'silence' then 
 		if param[2] == 'showone' then
 			if param[3] == 'true' then 
