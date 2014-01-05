@@ -1152,7 +1152,7 @@ fields.incoming[0x0CA] = L{
 fields.incoming[0x0D2] = L{
     {ctype='unsigned int',      label='_unknown1'},                             -- 04   Could be characters starting the line - FD 02 02 18 observed
     {ctype='unsigned int',      label='Dropper ID',         fn=id},             -- 08
-    {ctype='unsigned int',      label='_unknown2'},                             -- 0C   
+    {ctype='unsigned int',      label='Quantity'},                              -- 0C   Takes values greater than 1 in the case of gil
     {ctype='unsigned short',    label='Item ID',            fn=item},           -- 10
     {ctype='unsigned short',    label='Dropper Index',      fn=index},          -- 12
     {ctype='unsigned short',    label='Pool Index'},                            -- 14   This is the internal index in memory, not the one it appears in in the menu
