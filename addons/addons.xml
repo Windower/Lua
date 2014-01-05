@@ -178,6 +178,13 @@
     <support>http://www.ffxiah.com/player/Bismarck/Ihina</support>
   </addon>
   <addon>
+	<name>InfoReplacer</name>
+	<author>Cairthenn</author>
+	<description>Replaces outgoing text prefixed by % with respective game information.</description>
+    <bugtracker>https://github.com/cairface/Lua/issues</bugtracker>
+    <support>http://www.bluegartr.com/members/34070-Cairthenn</support>
+  </addon>
+  <addon>
     <name>Linker</name>
     <author>Arcon</author>
     <description>Allows opening links to certain websites from within the game, with an optional search parameter.</description>
