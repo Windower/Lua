@@ -1150,18 +1150,16 @@ fields.incoming[0x0CA] = L{
 
 -- Found Item
 fields.incoming[0x0D2] = L{
---[[07:29:49  Incoming Packet: Found Item Content:  (Ancient Brass)
-  XX  00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F
-  00  D2 3C xx xx 01 00 00 00 9B 60 02 01 00 00 00 00 
-  10  8D 07 9B 00 00 00 01 C3 53 94 94 52 00 00 00 00 
-  20  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
-  30  00 00 00 00 00 00 00 00 24 00 00 00 ]]
-    {ctype='int',               label='_unknown1'},                             -- 04   Could be characters starting the line - FD 02 02 18 observed
-    {ctype='int',               label='Dropper ID'},                            -- 08   Could also be characters starting the line - 01 FD observed
-    {ctype='int',               label='_unknown2'},                             -- 0C   
-    {ctype='short',             label='Item ID'},                               -- 10
-    {ctype='int',               label='_unknown3'},                             -- 12
-    {ctype='unsigned short',    label='_unknown4'},                             -- 92   00 00 observed.
+    {ctype='unsigned int',      label='_unknown1'},                             -- 04   Could be characters starting the line - FD 02 02 18 observed
+    {ctype='unsigned int',      label='Dropper ID',         fn=id},             -- 08
+    {ctype='unsigned int',      label='Quantity'},                              -- 0C   Takes values greater than 1 in the case of gil
+    {ctype='unsigned short',    label='Item ID',            fn=item},           -- 10
+    {ctype='unsigned short',    label='Dropper Index',      fn=index},          -- 12
+    {ctype='unsigned short',    label='Pool Index'},                            -- 14   This is the internal index in memory, not the one it appears in in the menu
+    {ctype='unsigned short',    label='_unknown4'},                             -- 16   First byte seems to always be 00, second seemingly random, both 00 and FF observed
+    {ctype='unsigned int',      label='Timestamp',          fn=time},           -- 18
+    {ctype='char[28]',          label='_unknown6'},                             -- AC   Always 0 it seems?
+    {ctype='unsigned int',      label='_junk1'},                                -- 38
 }
 
 -- Char Update

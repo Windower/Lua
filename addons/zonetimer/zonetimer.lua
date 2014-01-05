@@ -51,7 +51,7 @@ windower.register_event('addon command', function(...)
 		elseif command == 'posX' then
 			settings.pos.x = param[2]
 		elseif command == 'posY' then
-			settings.pos.x = param[2]
+			settings.pos.y = param[2]
 		end
 
 		config.save(settings, 'all')

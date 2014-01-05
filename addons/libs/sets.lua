@@ -246,7 +246,7 @@ end
 function set.reduce(s, fn, init)
     local acc = init or next[2](s)
     local pfn = pairs(s)
-    for el in init and pfn or pfn(s) and pfn do
+    for el in init and pfn or pfn(s) and pfn, s do
         acc = fn(acc, el)
     end
 
@@ -268,7 +268,7 @@ function set.concat(s, str)
 end
 
 function set.format(s, trail, subs)
-    local first = next(t)
+    local first = next(s)
     if not first then
         return subs or ''
     end
@@ -287,10 +287,10 @@ function set.format(s, trail, subs)
     end
 
     local res = ''
-    for v in pairs(t) do
+    for v in pairs(s) do
         res = res .. tostring(v)
-        if next(t, v) then
-            if next(t, next(t, v)) then
+        if next(s, v) then
+            if next(s, next(s, v)) then
                 res = res .. ', '
             else
                 res = res .. last

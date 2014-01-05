@@ -58,12 +58,7 @@ function load_user_files(job_id)
 	job_id = tonumber(job_id)
 	local path
 	
-	if user_env then
-		if type(user_env.file_unload)=='function' then user_env.file_unload()
-		elseif user_env.file_unload then
-			windower.add_to_chat(123,'GearSwap: file_unload() is not a function')
-		end
-	end
+	user_pcall('file_unload')
 	
 	for i,v in pairs(registered_user_events) do
 		windower.unregister_event(i)
@@ -123,7 +118,7 @@ function load_user_files(job_id)
 		return
 	else
 		current_job_file = res.jobs[job_id].short
-		print('Loaded your '..res.jobs[job_id].short..' Lua file!')
+		print('GearSwap: Loaded your '..res.jobs[job_id].short..' Lua file!')
 	end
 	
 	setfenv(funct, user_env)
@@ -132,17 +127,12 @@ function load_user_files(job_id)
 	local status, plugin = pcall(funct)
 	
 	if not status then
-		error('Plugin failed to load: \n'..plugin)
+		error('GearSwap: File failed to load: \n'..plugin)
 		gearswap_disabled = true
 		sets = nil
 		return nil
 	end
-	
-	if type(user_env.get_sets) == 'function' then
-		user_env.get_sets()
-	elseif user_env.get_sets then
-		windower.add_to_chat(123,'GearSwap: get_sets() is defined but is not a function.')
-	end
+	user_pcall('get_sets')
 	
 	gearswap_disabled = false
 	sets = user_env.sets
@@ -171,9 +161,6 @@ function refresh_player()
 	for i,v in pairs(player.vitals) do
 		player[i]=v
 	end
-	if player.main_job == 'NONE' then
-		player.main_job = 'MON'
-	end
 	if not player.sub_job then
 		player.sub_job = 'NONE'
 		player.sub_job_level = 0
@@ -187,7 +174,9 @@ function refresh_player()
 	
 	
 	for i,v in pairs(player_mob_table) do
-		if i~= 'is_npc' and i~='tp' and i~='mpp' and i~='claim_id' and i~='status' then
+		if i == 'name' then
+			player['mob_name'] = v
+		elseif i~= 'is_npc' and i~='tp' and i~='mpp' and i~='claim_id' and i~='status' then
 			player[i] = v
 		end
 	end
@@ -369,6 +358,7 @@ end
 -----------------------------------------------------------------------------------
 function refresh_user_env(job_id)
 	refresh_globals()
+	out_arr = {}
 	if not job_id then job_id = windower.ffxi.get_player().main_job_id end
 	windower.send_command('@wait 0.5;lua i '.._addon.name..' load_user_files '..job_id)
 end

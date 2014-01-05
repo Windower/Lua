@@ -1,4 +1,12 @@
 -------------------------------------------------
+GearSwap 0.813 - Fixed issues with /pet. Meddled with triggering interruption again. Potentially re-created the Paralysis issue in the process.
+-------------------------------------------------
+GearSwap 0.812 - Fixed Interruption handling for action messages that show the player as the target regardless the real target.
+-------------------------------------------------
+GearSwap 0.811 - Added a check for whether or not a given spell/ability can be used. Made player.equipment update between pretarget/precast/midcast. Deleted the second argument to pretarget, precast, midcast, aftercast, pet_midcast, and pet_aftercast.
+-------------------------------------------------
+GearSwap 0.810 - Changed how precast and midcast are defined for players. Removed verify_equip and force_send. Refactored a great deal.
+-------------------------------------------------
 GearSwap 0.802 - Introduced the debugging "clocking" setting. Changed how actions are injected.
 -------------------------------------------------
 GearSwap 0.801 - Combated double precasts, fixed a variety of nil errors, and made Paralysis work (hopefully).
