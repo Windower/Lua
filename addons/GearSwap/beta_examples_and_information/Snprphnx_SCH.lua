@@ -91,16 +91,14 @@ function get_sets()
 
 end
 
-function precast(spell,action)
+function precast(spell)
 	if spell.english == 'Impact' then
-		cast_delay(2)
 		equip(sets['precast_FastCast'],{body="Twilight Cloak"})
 		if not buffactive['elemental seal'] then
 			add_to_chat(8,'--------- Elemental Seal is down ---------')
 		end
 	
 	elseif spell.skill=='ElementalMagic' and spell.casttime < 3 then
-		cast_delay(0.1)
 		equip(sets.midcast_ElementalMagic)
 		if spell.element == 'Earth' then
 			equip({neck="Quanpur Necklace"})
@@ -109,7 +107,6 @@ function precast(spell,action)
 			equip(sets.Obi[spell.element])
 		end
 	elseif spell.english == 'Stun' then
-		cast_delay(0.1)
 		equip(sets['precast_Stun'])
 		if not buffactive.thunderstorm then
 			add_to_chat(8,'--------- Thunderstorm is down ---------')
@@ -121,7 +118,6 @@ function precast(spell,action)
 		end
 	else
 		equip(sets['precast_FastCast'])
-		cast_delay(0.5)
 	end
 
 	if (buffactive.alacrity or buffactive.celerity) and world.weather_element == spell.element then
@@ -129,7 +125,7 @@ function precast(spell,action)
 	end
 end
 
-function midcast(spell,action)
+function midcast(spell)
 	if string.find(spell.english,'Cur') then 
 		equip(sets.midcast_Cure)
 		if spell.element == world.weather_element or spell_element == world.day_element then
@@ -197,7 +193,7 @@ function midcast(spell,action)
 	end
 end		
 
-function aftercast(spell,action)
+function aftercast(spell)
 	equip(sets['aftercast_Idle'])
 	
 	if spell.english == 'Sleep' or spell.english == 'Sleepga' then
@@ -218,40 +214,34 @@ function status_change(new,tab)
 end
 
 function buff_change(status,gain_or_loss)
-	if status == 'Sublimation: Complete' and gain_or_loss == 'gain' and not 'stunmode' then -- True whether gained or lost
+	if status == 'Sublimation: Complete' and gain_or_loss and not 'stunmode' then -- True whether gained or lost
 		sets.aftercast_Idle = sets.aftercast_Idle_noSub
-	elseif status == 'Sublimation: Activated' and gain_or_loss == 'gain' and not 'stunmode' then
+	elseif status == 'Sublimation: Activated' and gain_or_loss and not 'stunmode' then
 		sets.aftercast_Idle = sets.aftercast_Idle_Sub
 	end
 	equip(sets.aftercast_Idle)
 end
 
-function pet_midcast(spell,action)
-end
-
-function pet_aftercast(spell,action)
-end
-
 	
 
-   function self_command(command)
-        if command == 'stuntarg' then
-                stuntarg = target.name
-        elseif command == 'stunmode' then
-		windower.add_to_chat(100,'Stun Mode')
-                    if sets.aftercast_Idle ~= sets.precast_Stun then
-							stunmode = true
-                            sets.aftercast_Idle = sets.precast_Stun
-                    elseif buffactive['Sublimation: Activated'] then
-							stunmode = false
-                            sets.aftercast_Idle = sets.aftercast_Idle_Sub
-                    else
-							stunmode = false
-                            sets.aftercast_Idle = sets.aftercast_Idle_noSub
-                    end
-                    equip(sets.aftercast_Idle)
-            end
-    end
+function self_command(command)
+	if command == 'stuntarg' then
+			stuntarg = target.name
+	elseif command == 'stunmode' then
+	windower.add_to_chat(100,'Stun Mode')
+				if sets.aftercast_Idle ~= sets.precast_Stun then
+						stunmode = true
+						sets.aftercast_Idle = sets.precast_Stun
+				elseif buffactive['Sublimation: Activated'] then
+						stunmode = false
+						sets.aftercast_Idle = sets.aftercast_Idle_Sub
+				else
+						stunmode = false
+						sets.aftercast_Idle = sets.aftercast_Idle_noSub
+				end
+				equip(sets.aftercast_Idle)
+		end
+end
 
 
 

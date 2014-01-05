@@ -41,9 +41,8 @@ function get_sets()
 	send_command('input /macro book 15;wait .1;input /macro set 1')
 end
 
-function precast(spell,action)
+function precast(spell)
 	if sets.precast[spell.english] then
-		verify_equip()
 		equip(sets.precast[spell.english])
 	elseif spell.type=="WeaponSkill" then
 		equip(sets.precast.WS)
@@ -52,10 +51,10 @@ function precast(spell,action)
 	end
 end
 
-function midcast(spell,action)
+function midcast(spell)
 end
 
-function aftercast(spell,action)
+function aftercast(spell)
 	if player.status =='Engaged' then
 		equip(sets.aftercast.TP)
 	else
