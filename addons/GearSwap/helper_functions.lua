@@ -524,6 +524,10 @@ function mk_out_arr_entry(sp,arr,original)
 		inde = inde..' nil'
 		out_arr[inde].data = original
 		out_arr[inde].spell.target = sp.target
+	elseif out_arr[inde..' '..player.id] then
+		inde = inde..' '..player.id
+		out_arr[inde].data = original
+		out_arr[inde].spell.target = sp.target
 	else
 		if debugging >= 2 then windower.add_to_chat(8,'GearSwap (Debug Mode): Creating a new out_arr entry: '..tostring(inde)..' '..tostring(arr.target_id)) end
 		inde = inde..' '..tostring(arr.target_id)
@@ -565,6 +569,8 @@ function d_out_arr_entry(sp,ind)
 			out_arr[ind..' '..sp.target.id] = nil
 		elseif out_arr[ind..' nil'] then
 			out_arr[ind..' nil'] = nil
+		elseif out_arr[ind..' '..player.id] then
+			out_arr[ind..' '..player.id] = nil
 		elseif debugging >= 1 then
 			windower.add_to_chat(123,'GearSwap: Ind matches the predicted Ind, but does not exist in out_arr.')
 		end

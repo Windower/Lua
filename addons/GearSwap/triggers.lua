@@ -184,7 +184,7 @@ function inc_action(act)
 			spell.action_type = 'Interruption'
 			spell.interrupted = true
 		end
-		if (out_arr[inde..' '..act.targets[1].id] or out_arr[inde..' nil'] or (debugging >= 1)) then
+		if (out_arr[inde..' '..act.targets[1].id] or out_arr[inde..' nil'] or out_arr[inde..' '..player.id] or (debugging >= 1)) then
 			-- Only aftercast things that were precasted.
 			-- Also, there are some actions (like being paralyzed while casting Ninjutsu) that sends two result action packets. Block the second packet.
 			refresh_globals()
@@ -193,7 +193,7 @@ function inc_action(act)
 	elseif (readies[act.category] and act.param == 28787) and spell then -- and not (act.category == 9 or (act.category == 7 and prefix == 'pet_'))) then
 		spell.action_type = 'Interruption'
 		spell.interrupted = true
-		if (out_arr[inde..' '..act.targets[1].id] or out_arr[inde..' nil'] or (debugging >= 1)) then
+		if (out_arr[inde..' '..act.targets[1].id] or out_arr[inde..' nil'] or out_arr[inde..' '..player.id] or (debugging >= 1)) then
 			-- Only aftercast things that were precasted.
 			-- Also, there are some actions (like being paralyzed while casting Ninjutsu) that sends two result action packets. Block the second packet.
 			refresh_globals()
