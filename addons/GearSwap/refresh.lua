@@ -136,6 +136,7 @@ function load_user_files(job_id)
 	
 	gearswap_disabled = false
 	sets = user_env.sets
+	refresh_globals()
 end
 
 

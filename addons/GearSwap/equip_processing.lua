@@ -234,15 +234,15 @@ function get_gs_gear(cur_equip,swap_type)
 	local temp_set = table.reassign({},cur_equip)
 	local sent_out_box = 'Going into '..swap_type..':\n' -- i = 'head', 'feet', etc.; v = inventory ID (0~80)
 	-- If the swap is not complete, overwrite the current equipment with the equipment that you are swapping to
-	local not_sent_ids = to_id_set(items.inventory,not_sent_out_equip)
+--	local not_sent_ids = to_id_set(items.inventory,not_sent_out_equip)
 
 	for i,v in pairs(cur_equip) do
 		if limbo_equip[short_slot_map[i]] then
 			cur_equip[i] = limbo_equip[short_slot_map[i]]
 		elseif sent_out_equip[short_slot_map[i]] then
 			cur_equip[i] = sent_out_equip[short_slot_map[i]]
-		elseif not_sent_ids[short_slot_map[i]] then
-			cur_equip[i] = not_sent_ids[short_slot_map[i]]
+--		elseif not_sent_ids[short_slot_map[i]] then
+--			cur_equip[i] = not_sent_ids[short_slot_map[i]]
 		end
 		if v == 0 or v == 'empty' then
 			cur_equip[i] = empty
