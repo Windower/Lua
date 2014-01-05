@@ -161,9 +161,6 @@ function refresh_player()
 	for i,v in pairs(player.vitals) do
 		player[i]=v
 	end
-	if player.main_job == 'NONE' then
-		player.main_job = 'MON'
-	end
 	if not player.sub_job then
 		player.sub_job = 'NONE'
 		player.sub_job_level = 0
@@ -177,7 +174,9 @@ function refresh_player()
 	
 	
 	for i,v in pairs(player_mob_table) do
-		if i~= 'is_npc' and i~='tp' and i~='mpp' and i~='claim_id' and i~='status' then
+		if i == 'name' then
+			player['mob_name'] = v
+		elseif i~= 'is_npc' and i~='tp' and i~='mpp' and i~='claim_id' and i~='status' then
 			player[i] = v
 		end
 	end

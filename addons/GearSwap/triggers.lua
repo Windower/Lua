@@ -54,7 +54,6 @@ windower.register_event('outgoing text',function(original,modified)
 	end
 	
 	local temptarg,temp_mob_arr = valid_target(splitline[splitline.n])
-	
 	if command_list[command] and temptarg and (validabils[language][unify_prefix[command]][abil] or unify_prefix[command]=='/ra') then
 		if st_flag then
 			st_flag = nil
@@ -220,6 +219,8 @@ end
 ---- none
 -----------------------------------------------------------------------------------
 function inc_action_message(arr)
+	if debugging >= 1 then windower.debug('action message') end
+	if gearswap_disabled then return end
 	if T{6,20,113,406,605,646}:contains(arr.message_id) then
 		-- If your current spell's target is defeated or falls to the ground
 		delete_out_arr_by_id(arr.target_id)
