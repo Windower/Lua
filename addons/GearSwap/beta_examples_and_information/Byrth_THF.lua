@@ -17,8 +17,7 @@ function get_sets()
 	sets.JA.Flee = {feet="Pillager's Poulaines"}
 	sets.JA.Despoil = {legs="Raider's Culottes +2",feet="Raider's Poulaines +2"}
 	sets.JA.Mug = {head="Assassin's Bonnet +2"}
-	sets['precast_Perfect Dodge'] = {hands="Assassin's Armlets +2"}
-	sets.JA_Waltz = {head="Anwig Salade",neck="Dualism Collar",body="Iuitl Vest",hands="Buremte Gloves",ring1="Valseur's Ring",ring2="Veela Ring",
+	sets.JA.Waltz = {head="Anwig Salade",neck="Dualism Collar",body="Iuitl Vest",hands="Buremte Gloves",ring1="Valseur's Ring",ring2="Veela Ring",
 		waist="Aristo Belt",legs="Desultor Tassets",feet="Dance Shoes"}
 	
 	sets.WS = {}
@@ -83,8 +82,7 @@ function get_sets()
 	
 end
 
-function precast(spell,action)
-	verify_equip()
+function precast(spell)
 	if sets.JA[spell.english] then
 		equip(sets.JA[spell.english])
 	elseif spell.type=="WeaponSkill" then
@@ -93,14 +91,11 @@ function precast(spell,action)
 		elseif buffactive['sneak attack'] and sets.WS.SA[spell.english] then equip(sets.WS.SA[spell.english])
 		elseif buffactive['trick attack'] and sets.WS.TA[spell.english] then equip(sets.WS.TA[spell.english]) end
 	elseif string.find(spell.english,'Waltz') then
-		equip(sets['JA_Waltz'])
+		equip(sets.JA.Waltz)
 	end
 end
 
-function midcast(spell,action)
-end
-
-function aftercast(spell,action)
+function aftercast(spell)
 	if player.status=='Engaged' then
 		equip(sets.TP[TP_Set_Names[TP_Index]])
 	else
@@ -118,9 +113,9 @@ end
 
 function buff_change(buff,gain_or_loss)
 	if buff=="Sneak Attack" then
-		soloSA = (gain_or_loss == "gain")
+		soloSA = gain_or_loss
 	elseif buff=="Trick Attack" then
-		soloTA = (gain_or_loss == "gain")
+		soloTA = gain_or_loss
 	end
 end
 

@@ -28,7 +28,7 @@ function get_sets()
 	sets.precast.WS = {}
 	sets.precast.WS['Mordant Rime'] = {range="Gjallarhorn",
 		head="Nahtirah Hat",neck="Aqua Gorget",ear1="Aoidos' Earring",
-		body="Bard's Justaucorps +2",hands="Buremte Gloves",ring1="Veela Ring",ring2="Thundersoul Ring",
+		body="Bard's Justaucorps +2",hands="Brioso Cuffs +1",ring1="Veela Ring",ring2="Thundersoul Ring",
 		back="Atheling Mantle",waist="Aqua Belt",legs="Gendewitha Spats",feet="Brioso slippers"}
 	
 	-- Midcast Sets
@@ -39,9 +39,9 @@ function get_sets()
 		body={name="Hedera Cotehardie",order=5},hands={name="Gendewitha Gages",order=11},ring2={name="Prolix Ring",order=10},
 		back={name="Rhapsode's Cape",order=8},waist="Phasmida Belt",legs="Byakko's Haidate",feet={name="Chelona Boots +1",order=9}}
 
-	sets.midcast.Debuff = {main="Twashtar",sub="Genbu's Shield",range="Gjallarhorn",
+	sets.midcast.Debuff = {main="Carnwenhan",sub="Genbu's Shield",range="Gjallarhorn",
 		head="Kaabanax Hat",neck="Aoidos' Matinee",ear1="Psystorm Earring",ear2="Lifestorm earring",
-		body="Aoidos' Hngrln. +2",hands="Ad. Mnchtte. +2",ring1="Omega Ring",ring2="Sangoma ring",
+		body="Aoidos' Hngrln. +2",hands="Lurid Mitts",ring1="Omega Ring",ring2="Sangoma ring",
 		back="Rhapsode's Cape",waist="Aristo belt",legs="Mdk. Shalwar +1",feet="Brioso slippers"}
 	
 	sets.midcast.Buff = {main="Carnwenhan",sub="Genbu's Shield",head="Aoidos' Calot +2",neck="Aoidos' Matinee",
@@ -55,9 +55,9 @@ function get_sets()
 		
 	sets.midcast.Scherzo = {feet="Aoidos' Cothrn. +2"}
 		
-	sets.midcast.Finale = {neck="Wind Torque",feet="Bokwus Boots"}
+	sets.midcast.Finale = {neck="Wind Torque",legs="Brioso Cannions +1",feet="Bokwus Boots"}
 		
-	sets.midcast.Lullaby = {hands="Brioso Cuffs"}
+	sets.midcast.Lullaby = {hands="Brioso Cuffs +1"}
 	
 	sets.midcast.Base = sets.midcast.Haste
 		
@@ -82,7 +82,7 @@ function get_sets()
 	
 	sets.aftercast.Engaged = {range="Oneiros Harp",
 		head="Zelus Tiara",neck="Asperity Necklace",ear1="Brutal Earring",ear2="Suppanomimi",
-		body="Hedera Cotehardie",hands="Buremte Gloves",ring1="Pyrosoul Ring",ring2="Rajas Ring",
+		body="Hedera Cotehardie",hands="Brioso Cuffs +1",ring1="Pyrosoul Ring",ring2="Rajas Ring",
 		back="Atheling Mantle",waist="Phasmida Belt",legs="Byakko's Haidate",feet="Brioso slippers"}
 		
 	sets.aftercast.Idle = sets.aftercast.Regen
@@ -93,27 +93,32 @@ function get_sets()
 	timer_reg = {}
 end
 
-function precast(spell,action)
+function pretarget(spell)
+	if spell.type == 'BardSong' and spell.target.type and spell.target.type == 'PLAYER' and not buffactive.pianissimo and not spell.target.charmed then
+		cancel_spell()
+		send_command('input /ja "Pianissimo" <me>;wait 1.5;input /ma "'..spell.name..'" '..spell.target.name..';')
+		return
+	end
+end
+
+function precast(spell)
 --	if midaction() then return end
 	if spell.type == 'BardSong' then
 		if string.find(world.area:lower(),'cirdas caverns') then
-			cast_delay(0.5)
+--			cast_delay(0.5)
 		else
-			verify_equip()
-		end
-		if spell.target.type == 'PLAYER' and not buffactive.pianissimo and spell.casttime == 8 then
-			cast_delay(1.5)
-			send_command('@input /raw /ja "Pianissimo" <me>')
+--			verify_equip()
 		end
 		if buffactive.nightingale then
 			equip_song_gear(spell)
+			return
 		else
 			equip_song_gear(spell)
 			equip(sets.precast.FC.Song)
 		end
-	elseif action.type == 'Magic' then
+	elseif spell.action_type == 'Magic' then
 		equip(sets.precast.FC.Normal)
-		if spell.casttime >= 4 then verify_equip() end
+	--	if spell.casttime >= 4 then verify_equip() end
 		if string.find(spell.english,'Cur') and spell.name ~= 'Cursna' then
 			equip(sets.precast.Cure)
 		end
@@ -127,7 +132,7 @@ function precast(spell,action)
 	if sets.precast.JA[spell.english] then equip(sets.precast.JA[spell.english]) end
 end
 
-function midcast(spell,action)
+function midcast(spell)
 --	windower.send_command('wait 1;gs c midact')
 	if spell.type == 'BardSong' then
 		equip_song_gear(spell)
@@ -138,8 +143,8 @@ function midcast(spell,action)
 	end
 end
 
-function aftercast(spell,action)
-	if spell.type == 'BardSong' and spell.target and spell.target.type:upper() == 'SELF' then
+function aftercast(spell)
+	if spell.type and spell.type == 'BardSong' and spell.target and spell.target.type:upper() == 'SELF' then
 		local t = os.time()
 		
 		-- Eliminate songs that have already expired
@@ -241,7 +246,7 @@ function calculate_duration(name)
 	if player.equipment.feet == "Brioso Slippers" then mult = mult + 0.1 end
 	if player.equipment.body == "Aoidos' Hngrln. +2" then mult = mult + 0.1 end
 	if player.equipment.legs == "Mdk. Shalwar +1" then mult = mult + 0.1 end
-	if player.equipment.main == "Carnwenhan" then mult = mult + 0.2 end
+	if player.equipment.main == "Carnwenhan" then mult = mult + 0.5 end
 	
 	if string.find(name,'March') and player.equipment.hands == 'Ad. Mnchtte. +2' then mult = mult + 0.1 end
 	if string.find(name,'Minuet') and player.equipment.body == "Aoidos' Hngrln. +2" then mult = mult + 0.1 end

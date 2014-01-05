@@ -88,21 +88,15 @@ function get_sets()
 	send_command('input /macro book 8;wait .1;input /macro set 1')
 end
 
-function precast(spell,action)
-	if spell.name:sub(1,3) == 'Bar' then
-		return
-	end
-	if tonumber(spell.casttime) > 5 then
-		verify_equip()
-	end
-	if action.type == 'Magic' then
+function precast(spell)
+	if spell.action_type == 'Magic' then
 		equip(sets.precast_FC)
 		if string.find(spell.english,'Cur') then
 			equip(sets.precast_Cur)
 		end
 	elseif string.find(spell.type,'BloodPact') then
 		if buffactive['Astral Conduit'] then
-			midcast(spell,action)
+			pet_midcast(spell)
 		else
 			equip(sets.precast_BP)
 		end
@@ -112,31 +106,25 @@ function precast(spell,action)
 	if sets['precast_'..spell.english] then equip(sets['precast_'..spell.english]) end
 end
 
-function midcast(spell,action)
-	if spell.name:sub(1,3) == 'Bar' then
-		return
-	end
+function midcast(spell)
 	if string.find(spell.english,'Cur') then
 		equip(sets.midcast_Cur)
 	elseif spell.english=='Stoneskin' then
 		equip(sets.midcast_Stoneskin)
-	else -- Bloodpacts don't have a midcast, so don't worry about them.
-		idle()
+--	else -- Bloodpacts don't have a midcast, so don't worry about them.
+--		idle()
 	end
 end
 
-function aftercast(spell,action)
-	if spell.name and spell.name:sub(1,3) == 'Bar' then
-		return
-	end
+function aftercast(spell)
 	if not spell.type or not string.find(spell.type,'BloodPact') then
 		-- Don't want to swap away too quickly if I'm about to put BP damage gear on
 		-- Need to wait 1 in order to allow pet information to update on Release.
-		send_command('@wait 1;gs c Idle')
+		send_command('@wait 1.5;gs c Idle')
 	end
 end
 
-function status_change(new,action)
+function status_change(new,old)
 	if new=='Idle' then
 		idle()
 	elseif new=='Resting' then
@@ -144,7 +132,7 @@ function status_change(new,action)
 	end
 end
 
-function pet_midcast(spell,action)
+function pet_midcast(spell)
 	if spell.name == 'Perfect Defense' then
 		equip(sets['precast_Elemental Siphon'],{feet="Rubeus Boots"})
 	elseif spell.type=='BloodPactWard' then
@@ -172,7 +160,7 @@ function pet_midcast(spell,action)
 	end
 end
 
-function pet_aftercast(spell,action)
+function pet_aftercast(spell)
 	idle()
 end
 

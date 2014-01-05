@@ -2,16 +2,16 @@ function get_sets()
 	-------------------  JA Sets  ----------------------
 	sets.JA = {}
 	sets.JA.Waltz = {head="Khepri Bonnet",neck="Dualism Collar",lear="Novia Earring",rear="Roundel Earring",
-	body="Maxixi Casaque",hands="Buremte Gloves",lring="Veela Ring",rring="Valseur's Ring",
+	body="Maxixi Casaque",hands="Maxixi Bangles +1",lring="Veela Ring",rring="Valseur's Ring",
 	back="Toetapper Mantle",waist="Aristo Belt",legs="Desultor Tassets",feet="Maxixi Toeshoes"}
 	
-	sets.JA.Samba = {head="Maxixi Tiara"}
+	sets.JA.Samba = {head="Maxixi Tiara +1"}
 	
 	sets.JA.Jig = {legs='Etoile Tights +2',feet="Maxixi Toeshoes"}
 	
 	sets.JA.Step = {ammo="Honed Tathlum",
 		head="Whirlpool Mask",neck="Ziel Charm",ear1="Steelflash Earring",ear2="Bladeborn Earring",
-		body="Manibozho Jerkin",hands="Buremte Gloves",ring1="Thundersoul Ring",ring2="Beeline Ring",
+		body="Manibozho Jerkin",hands="Maxixi Bangles +1",ring1="Thundersoul Ring",ring2="Beeline Ring",
 		back="Toetapper Mantle",legs="Manibozho Brais",feet="Etoile Shoes +2"}
 	
 	sets.JA['Feather Step'] = set_combine(sets.JA.Step,{feet="Charis Shoes +2"})
@@ -35,11 +35,11 @@ function get_sets()
 	Idle_ind = 1
 	sets.Idle.Normal = {main="Terpsichore",sub="Izhiikoh",ammo="Potestas Bomblet",
 		head="Oce. Headpiece +1",neck="Wiglen Gorget",lear="Novia Earring",rear="Phawaylla Earring",
-		body="Kheper Jacket",hands="Buremte Gloves",lring="Sheltered Ring",rring="Paguroidea Ring",
+		body="Kheper Jacket",hands="Maxixi Bangles +1",lring="Sheltered Ring",rring="Paguroidea Ring",
 		back="Boxer's Mantle",waist="Scouter's Rope",legs="Nahtirah Trousers",feet="Skadi's Jambeaux +1"}
 		
 	sets.Idle.MDT={head="Uk'uxkaj cap",neck="Twilight Torque",lear="Merman's Earring",
-		body="Avalon Breastplate",hands="Buremte Gloves",lring="Defending Ring",rring="Dark Ring",
+		body="Avalon Breastplate",hands="Maxixi Bangles +1",lring="Defending Ring",rring="Dark Ring",
 		back="Mollusca Mantle",waist="Wanion Belt",legs="Nahtirah Trousers",feet="Manibozho Boots"}
 	
 	-------------------  TP Sets  ----------------------
@@ -86,12 +86,12 @@ function get_sets()
 
 	sets.WS.Evisceration[1] = {ammo="Charis Feather",
 		head="Uk'uxkaj cap",neck="Love Torque",ear1="Brutal Earring",ear2="Moonshade Earring",
-		body="Manibozho Jerkin",hands="Buremte Gloves",ring1="Thundersoul Ring",ring2="Rajas Ring",
+		body="Manibozho Jerkin",hands="Maxixi Bangles +1",ring1="Thundersoul Ring",ring2="Rajas Ring",
 		back="Rancorous Mantle",waist="Wanion Belt",legs="Manibozho Brais",feet="Manibozho Boots"}
 
 	sets.WS.Evisceration[2] = {ammo="Charis Feather",
 		head="Uk'uxkaj cap",neck="Love Torque",ear1="Brutal Earring",ear2="Moonshade Earring",
-		body="Manibozho Jerkin",hands="Buremte Gloves",ring1="Thundersoul Ring",ring2="Rajas Ring",
+		body="Manibozho Jerkin",hands="Maxixi Bangles +1",ring1="Thundersoul Ring",ring2="Rajas Ring",
 		back="Rancorous Mantle",waist="Wanion Belt",legs="Manibozho Brais",feet="Manibozho Boots"}
 
 	sets.WS['Pyrrhic Kleos'] = {}
@@ -103,7 +103,7 @@ function get_sets()
 
 	sets.WS['Pyrrhic Kleos'][2] = {ammo="Charis Feather",
 		head="Uk'uxkaj cap",neck="Soil Gorget",ear1="Steelflash Earring",ear2="Bladeborn Earring",
-		body="Manibozho Jerkin",hands="Buremte Gloves",ring1="Epona's Ring",ring2="Rajas Ring",
+		body="Manibozho Jerkin",hands="Maxixi Bangles +1",ring1="Epona's Ring",ring2="Rajas Ring",
 		back="Atheling Mantle",waist="Wanion Belt",legs="Manibozho Brais",feet="Iuitl Gaiters"}
 
 	-------------------  MA Sets  ----------------------
@@ -118,7 +118,7 @@ function get_sets()
 end
 
 function precast(spell,act)
-	cast_delay('0.2')
+	cast_delay(0)
 	if sets.JA[spell.name] then
 		if spell.name == 'Trance' and buffactive['saber dance'] then
 			send_command('cancel 410')
@@ -131,19 +131,16 @@ function precast(spell,act)
 	elseif spell.type=='Jig' then
 		equip(sets.JA.Jig)
 		if spell.name == 'Spectral Jig' and buffactive.sneak then
-			cast_delay('0.2')
 			send_command('cancel 71')
 		end
 	elseif spell.type=='Samba' then
 		if buffactive['fan dance'] then
 			send_command('cancel 411')
-			cast_delay('0.8')
 		end
 		equip(sets.JA.Samba)
 	elseif spell.type=='Waltz' then
 		if buffactive['saber dance'] then
 			send_command('cancel 410')
-			cast_delay('0.8')
 		end
 		equip(sets.JA.Waltz)
 	elseif spell.type=='Step' then
@@ -172,20 +169,20 @@ function aftercast(spell,act)
 		if spell.name:sub(1,11) == 'Drain Samba' then
 			id = 368
 			if #spell.name == 11 then
-				dur = 160
+				dur = 165
 			else
-				dur = 130
+				dur = 135
 			end
 		elseif spell.name:sub(1,11) == 'Aspir Samba' then
 			id = 369
 			if #spell.name == 11 then
-				dur = 160
+				dur = 165
 			else
-				dur = 130
+				dur = 135
 			end
 		elseif spell.name == 'Haste Samba' then
 			id = 370
-			dur = 130
+			dur = 135
 		end
 		
 		if buffactive['saber dance'] then
