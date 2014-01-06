@@ -10,7 +10,7 @@ require('logger')
 config = require('config')
 
 defaults = {}
-defaults.AutoUpdate = true
+defaults.AutoUpdate = false
 defaults.CheckInterval = 300
 
 settings = config.load(defaults)
