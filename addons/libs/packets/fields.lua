@@ -1169,7 +1169,7 @@ fields.incoming[0x0D3] = L{
     {ctype='unsigned int',      label='Current Lot ID',     fn=id},             -- 08
     {ctype='unsigned short',    label='Highest Lot Index',  fn=index},          -- 0C
     {ctype='unsigned short',    label='Highest Lot'},                           -- 0E
-    {ctype='unsigned short',    label='Current Lot Index',  fn=index..s-{1,15}, -- 10   The highest bit is set
+    {ctype='unsigned short',    label='Current Lot Index',  fn=index..s-{1,15}},-- 10   The highest bit is set
     {ctype='unsigned short',    label='Current Lot'},                           -- 12
     {ctype='unsigned char',     label='_unknown1'},                             -- 14
     {ctype='unsigned char',     label='Drop'},                                  -- 15   1 if the item dropped, 0 otherwise
