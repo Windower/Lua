@@ -226,43 +226,48 @@ function refresh_player()
 	end
 	
 	if player.main_job == 'PUP' or player.sub_job == 'PUP' then
-		local auto_tab = windower.ffxi.get_mjob_data()
-		for i,v in pairs(auto_tab) do
-			if not T{'available_heads','attachments','available_frames','available_attachments','frame','head'}:contains(i) then
-				pet[i] = v
-			end
-		end
-		pet.available_heads = make_user_table()
-		pet.attachments = make_user_table()
-		pet.available_frames = make_user_table()
-		pet.available_attachments = make_user_table()
-		for i,v in pairs(auto_tab.available_heads) do
-			if v ~= 0 then
-				pet.available_heads[r_items[i+8192][language]] = true
-			end
-		end
-		for i,v in pairs(auto_tab.available_frames) do
-			if v ~= 0 then
-				pet.available_frames[r_items[i+8223][language]] = true
-			end
-		end
-		for i,v in pairs(auto_tab.available_attachments) do
-			if v ~= 0 then
-				pet.available_attachments[r_items[i+8256][language]] = true
-			end
-		end
-		for i,v in pairs(auto_tab.attachments) do
-			if v ~= 0 then
-				pet.attachments[r_items[v+8448][language]] = true
-			end
-		end
+		local auto_tab
+		if player.main_job == 'PUP' then auto_tab = windower.ffxi.get_mjob_data()
+		else auto_tab = windower.ffxi.get_sjob_data() end
 		
-		pet.frame = r_items[auto_tab.frame+8223][language]
-		pet.head = r_items[auto_tab.frame+8192][language]
-		if pet.max_mp ~= 0 then
-			pet.mpp = math.floor(pet.mp/pet.max_mp*100)
-		else
-			pet.mpp = 0
+		if auto_tab.name then
+			for i,v in pairs(auto_tab) do
+				if not T{'available_heads','attachments','available_frames','available_attachments','frame','head'}:contains(i) then
+					pet[i] = v
+				end
+			end
+			pet.available_heads = make_user_table()
+			pet.attachments = make_user_table()
+			pet.available_frames = make_user_table()
+			pet.available_attachments = make_user_table()
+			for i,v in pairs(auto_tab.available_heads) do
+				if v ~= 0 then
+					pet.available_heads[r_items[i+8192][language]] = true
+				end
+			end
+			for i,v in pairs(auto_tab.available_frames) do
+				if v ~= 0 then
+					pet.available_frames[r_items[i+8223][language]] = true
+				end
+			end
+			for i,v in pairs(auto_tab.available_attachments) do
+				if v ~= 0 then
+					pet.available_attachments[r_items[i+8256][language]] = true
+				end
+			end
+			for i,v in pairs(auto_tab.attachments) do
+				if v ~= 0 then
+					pet.attachments[r_items[v+8448][language]] = true
+				end
+			end
+			
+			pet.frame = r_items[auto_tab.frame+8223][language]
+			pet.head = r_items[auto_tab.frame+8192][language]
+			if pet.max_mp ~= 0 then
+				pet.mpp = math.floor(pet.mp/pet.max_mp*100)
+			else
+				pet.mpp = 0
+			end
 		end
 	end
 	
