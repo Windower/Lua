@@ -51,10 +51,9 @@ function valid_target(targ,flag)
 		return targ
 	elseif targ and windower.ffxi.get_player() then
 	-- If the target exists, scan the mob array for it
-		local mob_array = windower.ffxi.get_mob_array()
 		local current_target = windower.ffxi.get_mob_by_target('<t>')
 		local targar = {}
-		for i,v in pairs(mob_array) do
+		for i,v in pairs(windower.ffxi.get_mob_array()) do
 			targ = percent_strip(targ)
 			if string.find(v.name:lower(),san_targ:lower()) and v.valid_target then
 				-- Handling for whether it's a monster or not
