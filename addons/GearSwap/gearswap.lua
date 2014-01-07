@@ -41,6 +41,7 @@ require 'strings'
 require 'tables'
 require 'lists'
 require 'sets'
+require 'texts'
 require 'helper_functions'
 
 require 'statics'

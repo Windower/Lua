@@ -88,8 +88,8 @@ function load_user_files(job_id)
 		midaction=user_midaction,
 		
 		-- Library functions
-		string=string, math=math, table=table,set=set,list=list,T=T,S=S,L=L, os=os,type=type,
-		tostring = tostring, tonumber = tonumber, pairs = pairs,
+		string=string,math=math,table=table,set=set,list=list,T=T,S=S,L=L,os=os,
+		text=text,type=type,tostring=tostring,tonumber=tonumber,pairs=pairs,
 		ipairs = ipairs, print=print, add_to_chat=windower.add_to_chat,
 		next=next,lua_base_path=windower.addon_path,empty=empty,
 		
