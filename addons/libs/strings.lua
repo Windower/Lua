@@ -212,14 +212,12 @@ end
 
 -- Takes a padding character pad and pads the string str to the left of it, until len is reached. pad defaults to a space.
 function string.lpad(str, pad, len)
-    pad = pad or ' '
     return (pad:rep(len)..str):sub(-(len > #str and len or #str))
 end
 
 -- Takes a padding character pad and pads the string str to the right of it, until len is reached. pad defaults to a space.
 function string.rpad(str, pad, len)
-    pad = pad or ' '
-    return (str..pad:rep(len)):sub(1, -(len > #str and len or #str))
+    return (str..pad:rep(len)):sub(1, len > #str and len or #str)
 end
 
 -- Returns the string padded with zeroes until the length is len.

@@ -1,4 +1,4 @@
-#Shortcuts v1.7
+#Shortcuts v1.8
 ####written by Byrth  
 
 Completes and properly formats commands (prefixed by at least one '/'),
@@ -9,6 +9,7 @@ spellcast" project, and represents the interpretation part of spellcast.
 None  
 
 ####Changelog:  
+v1.8 - 1/6/14   - Fix target selection. Interpret the outgoing text as an ability first (instead of combination of ability and target).
 v1.7 - 12/31/13 - Fixed st targets for shortcuts.
 v1.6 - 12/12/13 - Fixed "target is nil" bug.
 v1.5 - 12/7/13  - Various bugfixes and more complete support for pattern matching.

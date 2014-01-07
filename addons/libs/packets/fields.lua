@@ -1151,6 +1151,7 @@ fields.incoming[0x0CA] = L{
 -- Found Item
 fields.incoming[0x0D2] = L{
     {ctype='unsigned int',      label='_unknown1'},                             -- 04   Could be characters starting the line - FD 02 02 18 observed
+                                                                                -- 04   Arcon: Only ever observed 0x00000001 for this
     {ctype='unsigned int',      label='Dropper ID',         fn=id},             -- 08
     {ctype='unsigned int',      label='Quantity'},                              -- 0C   Takes values greater than 1 in the case of gil
     {ctype='unsigned short',    label='Item ID',            fn=item},           -- 10
@@ -1160,6 +1161,21 @@ fields.incoming[0x0D2] = L{
     {ctype='unsigned int',      label='Timestamp',          fn=time},           -- 18
     {ctype='char[28]',          label='_unknown6'},                             -- AC   Always 0 it seems?
     {ctype='unsigned int',      label='_junk1'},                                -- 38
+}
+
+-- Item lot/drop
+fields.incoming[0x0D3] = L{
+    {ctype='unsigned int',      label='Highest Lot ID',     fn=id},             -- 04
+    {ctype='unsigned int',      label='Current Lot ID',     fn=id},             -- 08
+    {ctype='unsigned short',    label='Highest Lot Index',  fn=index},          -- 0C
+    {ctype='unsigned short',    label='Highest Lot'},                           -- 0E
+    {ctype='unsigned short',    label='Current Lot Index',  fn=index..s-{1,15}},-- 10   The highest bit is set
+    {ctype='unsigned short',    label='Current Lot'},                           -- 12
+    {ctype='unsigned char',     label='_unknown1'},                             -- 14
+    {ctype='unsigned char',     label='Drop'},                                  -- 15   1 if the item dropped, 0 otherwise
+    {ctype='char[16]',          label='Highest Lot Name'},                      -- 16
+    {ctype='char[16]',          label='Current Lot Name'},                      -- 26
+    {ctype='char[6]',           label='_junk1'},                                -- 36
 }
 
 -- Char Update
