@@ -132,11 +132,11 @@ function load_user_files(job_id)
 		sets = nil
 		return nil
 	end
+	refresh_globals()
 	user_pcall('get_sets')
 	
 	gearswap_disabled = false
 	sets = user_env.sets
-	refresh_globals()
 end
 
 
@@ -182,7 +182,7 @@ function refresh_player()
 		end
 	end
 	
-	if player_mob_table['race']~= nil then
+	if player_mob_table.race ~= nil then
 		player.race_id = player.race
 		player.race = mob_table_races[player.race]
 	end
@@ -222,7 +222,48 @@ function refresh_player()
 			pet.element = 'None'
 		end
 	else
-		table.reassign(pet,{type="NONE",isvalid=false})
+		table.reassign(pet,{isvalid=false})
+	end
+	
+	if player.main_job == 'PUP' or player.sub_job == 'PUP' then
+		local auto_tab = windower.ffxi.get_mjob_data()
+		for i,v in pairs(auto_tab) do
+			if not T{'available_heads','attachments','available_frames','available_attachments','frame','head'}:contains(i) then
+				pet[i] = v
+			end
+		end
+		pet.available_heads = make_user_table()
+		pet.attachments = make_user_table()
+		pet.available_frames = make_user_table()
+		pet.available_attachments = make_user_table()
+		for i,v in pairs(auto_tab.available_heads) do
+			if v ~= 0 then
+				pet.available_heads[r_items[i+8192][language]] = true
+			end
+		end
+		for i,v in pairs(auto_tab.available_frames) do
+			if v ~= 0 then
+				pet.available_frames[r_items[i+8223][language]] = true
+			end
+		end
+		for i,v in pairs(auto_tab.available_attachments) do
+			if v ~= 0 then
+				pet.available_attachments[r_items[i+8256][language]] = true
+			end
+		end
+		for i,v in pairs(auto_tab.attachments) do
+			if v ~= 0 then
+				pet.attachments[r_items[v+8448][language]] = true
+			end
+		end
+		
+		pet.frame = r_items[auto_tab.frame+8223][language]
+		pet.head = r_items[auto_tab.frame+8192][language]
+		if pet.max_mp ~= 0 then
+			pet.mpp = math.floor(pet.mp/pet.max_mp*100)
+		else
+			pet.mpp = 0
+		end
 	end
 	
 	table.reassign(fellow,target_complete(windower.ffxi.get_mob_by_target('<ft>')))
