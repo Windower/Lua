@@ -40,7 +40,8 @@ function Q(t)
         return q
     end
 
-    local q = t
+    local q = {}
+    q.data = t
     q.front = 1
     if class(t) == 'List' then
         q.back = t.n + 1
@@ -132,7 +133,7 @@ function queue.sort(q, ...)
 end
 
 function queue.tostring(q)
-    local str = '<'
+    local str = '|'
 
     for key = q.front, q.back - 1 do
         if key > q.front then
