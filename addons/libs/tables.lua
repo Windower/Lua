@@ -490,7 +490,7 @@ end
 -- Return true if any element of t satisfies the condition fn.
 function table.any(t, fn)
     for _, val in pairs(t) do
-        if(fn(val) == true) then
+        if fn(val) then
             return true
         end
     end
@@ -501,7 +501,7 @@ end
 -- Return true if all elements of t satisfy the condition fn.
 function table.all(t, fn)
     for _, val in pairs(t) do
-        if(fn(val) ~= true) then
+        if not fn(val) then
             return false
         end
     end
