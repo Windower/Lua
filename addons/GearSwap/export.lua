@@ -9,6 +9,10 @@ function export_set(options)
 				xml = true
 			elseif v:lower() == 'sets' then
 				all_sets = true
+				if not user_env or not user_env.sets then
+					windower.add_to_chat(123,'GearSwap: Cannot export the sets table of the current file because there is no file loaded.')
+					return
+				end
 			end
 		end
 	end

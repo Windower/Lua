@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.815'
+_addon.version = '0.816'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -85,6 +85,8 @@ windower.register_event('addon command',function (...)
 		logit(logfile,'\n\n'..tostring(os.clock)..command)
 	end
 	local splitup = {...}
+	if not splitup[1] then return end -- handles //gs
+	
 	if splitup[1]:lower() == 'c' then
 		if gearswap_disabled then return end
 		if splitup[2] then
@@ -116,12 +118,8 @@ windower.register_event('addon command',function (...)
 			end
 		end
 	elseif splitup[1]:lower() == 'export' then
-		if user_env and user_env.sets then
-			table.remove(splitup,1)
-			export_set(splitup)
-		else
-			windower.add_to_chat(123,'GearSwap: There is nothing to export because there is no file loaded.')
-		end
+		table.remove(splitup,1)
+		export_set(splitup)
 	elseif splitup[1]:lower() == 'validate' then
 		if user_env and user_env.sets then
 			validate()

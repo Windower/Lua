@@ -516,7 +516,7 @@ end
 ---- inde - key for out_arr
 -----------------------------------------------------------------------------------
 function mk_out_arr_entry(sp,arr,original)
-	local inde = unify_prefix[spell.prefix]..' "'..spell.english..'"'
+	local inde = get_prefix(spell.prefix)..' "'..spell.english..'"'
 	if out_arr[inde..' '..tostring(arr.target_id)] then
 		inde = inde..' '..tostring(arr.target_id)
 		out_arr[inde].data = original
@@ -538,6 +538,25 @@ function mk_out_arr_entry(sp,arr,original)
 		out_arr[inde].spell = sp
 	end
 	return inde
+end
+
+
+
+-----------------------------------------------------------------------------------
+--Name: get_prefix(pref)
+--Desc: Returns the proper unified prefix, or "Automaton " in the case of an automaton action
+--Args:
+---- pref - Prefix to match (or nil, for automatons)
+-----------------------------------------------------------------------------------
+--Returns:
+---- unified prefix (or Automaton)
+-----------------------------------------------------------------------------------
+function get_prefix(pref)
+	if not pref then
+		return 'Automaton '
+	else
+		return unify_prefix[pref]
+	end
 end
 
 
@@ -565,7 +584,7 @@ function d_out_arr_entry(sp,ind)
 		end
 	elseif not sp.english then
 		windower.add_to_chat(123,'Spell.english is nil in helper_functions at line 548! Tell Byrth what you were doing!')
-	elseif ind == unify_prefix[sp.prefix]..' "'..sp.english..'"' then
+	elseif ind == get_prefix(sp.prefix)..' "'..sp.english..'"' then
 		if out_arr[ind..' '..tostring(sp.target.id)] then
 			out_arr[ind..' '..sp.target.id] = nil
 		elseif out_arr[ind..' nil'] then
@@ -696,14 +715,14 @@ function get_spell(act)
 		elseif table.contains(fields,'ability') then
 			spell = r_abilities[abil_ID]
 		elseif table.contains(fields,'weapon_skill') then
---			if abil_ID > 255 then -- WZ_RECOVER_ALL is used by chests in Limbus
---				spell = r_mabils[abil_ID-256]
---				if spell.english == '.' then
---					spell.english = 'Special Attack'
---				end
---			elseif abil_ID < 256 then
+			if abil_ID > 255 then -- WZ_RECOVER_ALL is used by chests in Limbus
+				spell = r_mabils[abil_ID-256]
+				if spell.english == '.' then
+					spell.english = 'Special Attack'
+				end
+			elseif abil_ID < 256 then
 				spell = r_abilities[abil_ID+768]
---			end
+			end
 		elseif msg_ID == 303 then
 			spell = r_abilities[74] -- Divine Seal
 		elseif msg_ID == 304 then
@@ -728,6 +747,7 @@ function get_spell(act)
 		
 	spell.name = spell[language]
 	spell.interrupted = false
+	
 	return spell
 end
 
