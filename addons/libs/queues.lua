@@ -41,7 +41,7 @@ function Q(t)
     end
 
     local q = {}
-    q.data = t
+    q.data = setmetatable(t, nil)
     q.front = 1
     if class(t) == 'List' then
         q.back = t.n + 1
@@ -66,16 +66,16 @@ function queue.push(q, el)
     return q
 end
 
-_meta.Q.__add = queue.push
-
 function queue.pop(q)
+    if q:empty() then
+        return nil
+    end
+
     local res = rawget(q.data, q.front)
     rawset(q.data, q.front, nil)
     q.front = q.front + 1
     return res
 end
-
-_meta.Q.__sub = queue.pop
 
 function queue.insert(q, i, el)
     q.back = q.back + 1
