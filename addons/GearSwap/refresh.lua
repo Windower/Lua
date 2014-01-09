@@ -262,7 +262,7 @@ function refresh_player()
 			end
 			
 			pet.frame = r_items[auto_tab.frame+8223][language]
-			pet.head = r_items[auto_tab.frame+8192][language]
+			pet.head = r_items[auto_tab.head+8192][language]
 			if pet.max_mp ~= 0 then
 				pet.mpp = math.floor(pet.mp/pet.max_mp*100)
 			else
