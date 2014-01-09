@@ -165,7 +165,11 @@ end
 windower.register_event('incoming chunk',function(id,data,modified,injected,blocked)
 	if debugging >= 1 then windower.debug('incoming chunk '..id) end
 
-	if id == 0x28 and not injected then
+	if id == 0x0E and not injected and pet.index and pet.index == data:byte(9) + data:byte(10)*256 and data:byte(11) == 7 and pet.status ~= res.statuses[data:byte(32)] then
+		local oldstatus = pet.status
+		refresh_globals()
+		equip_sets('pet_status_change',nil,res.statuses[data:byte(32)],oldstatus)
+	elseif id == 0x28 and not injected then
 		if clocking then windower.add_to_chat(8,'Action Packet: '..(os.clock() - out_time)) end
 		data = data:sub(5)
 		local act = {}
