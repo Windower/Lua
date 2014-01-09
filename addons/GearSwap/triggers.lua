@@ -161,7 +161,7 @@ function inc_action(act)
 	
 	local inde
 	if spell and spell.english then
-		inde = unify_prefix[spell.prefix]..' "'..spell.english..'"'
+		inde = get_prefix(spell.prefix)..' "'..spell.english..'"'
 		spell.target = target_complete(windower.ffxi.get_mob_by_id(act.targets[1].id))
 		spell.action_type = get_action_type(act.category)
 	elseif spell then

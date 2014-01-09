@@ -544,16 +544,16 @@ end
 
 -----------------------------------------------------------------------------------
 --Name: get_prefix(pref)
---Desc: Returns the proper unified prefix, or "Automaton " in the case of an automaton action
+--Desc: Returns the proper unified prefix, or "Mosnter " in the case of a monster action
 --Args:
----- pref - Prefix to match (or nil, for automatons)
+---- pref - Prefix to match (or nil, for monster TP moves)
 -----------------------------------------------------------------------------------
 --Returns:
----- unified prefix (or Automaton)
+---- unified prefix (or Monster)
 -----------------------------------------------------------------------------------
 function get_prefix(pref)
 	if not pref then
-		return 'Automaton '
+		return 'Monster '
 	else
 		return unify_prefix[pref]
 	end
