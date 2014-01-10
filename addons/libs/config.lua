@@ -192,7 +192,7 @@ function merge(t, t_merge, path)
             elseif oldtype ~= type(val) then
                 if oldtype == 'table' then
                     if type(val) == 'string' then
-                        local res = list.map(val:split(','), string.trim)
+                        local res = table.map(val:split(','), string.trim)
                         if class and class(oldval) == 'Set' then
                             res = S(res)
                         elseif class and class(oldval) == 'Table' then
