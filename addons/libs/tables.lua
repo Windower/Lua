@@ -487,28 +487,6 @@ function table.rekey(t, key)
     return setmetatable(res, getmetatable(t) or _meta.T)
 end
 
--- Return true if any element of t satisfies the condition fn.
-function table.any(t, fn)
-    for _, val in pairs(t) do
-        if fn(val) then
-            return true
-        end
-    end
-
-    return false
-end
-
--- Return true if all elements of t satisfy the condition fn.
-function table.all(t, fn)
-    for _, val in pairs(t) do
-        if not fn(val) then
-            return false
-        end
-    end
-
-    return true
-end
-
 -- Wrapper around unpack(t). Returns table elements as a list of values. Only works on arrays.
 function table.unpack(t)
     return unpack(t)
