@@ -356,6 +356,28 @@ function table.reduce(t, fn, init)
     return acc
 end
 
+-- Return true if any element of t satisfies the condition fn.
+function table.any(t, fn)
+    for val in (t.it or it)(t) do
+        if fn(val) then
+            return true
+        end
+    end
+
+    return false
+end
+
+-- Return true if all elements of t satisfy the condition fn.
+function table.all(t, fn)
+    for val in (t.it or it)(t) do
+        if not fn(val) then
+            return false
+        end
+    end
+
+    return true
+end
+
 --[[
     String functions.
 ]]
