@@ -347,7 +347,13 @@ end
 -----------------------------------------------------------------------------------
 function set_merge(baseSet, ...)
 	local combineSets = {...}
-	
+
+	local canCombine = table.all(combineSets, function(t) return type(t) == 'table' end)
+	if not canCombine then
+		-- the code that called equip() or set_combine() is #3 on the stack from here
+		error("Trying to combine non-gear sets.", 3)
+	end
+
 	-- Take the list of tables we're given and cleans them up, so that they
 	-- only contain acceptable slot key entries.
 	local cleanSetsList = table.map(combineSets, unify_slots)
