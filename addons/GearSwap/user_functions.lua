@@ -212,6 +212,12 @@ function include_user(str)
 		loaded_values = dofile(path)
 	end
 	
+	if not loaded_values then
+		error('\nGearSwap: Nothing was returned by the include ('..tostring(str)..').  Cannot add it to the user environment.', 2)
+	elseif type(loaded_values) ~= 'table' then
+		error('\nGearSwap: The include ('..tostring(str)..') did not return a table.  Cannot add it to the user environment.', 2)
+	end
+	
 	for i,v in pairs(loaded_values) do
 		rawset(user_env,i,v)
 		if type(v) == 'function' then
