@@ -289,7 +289,7 @@ function table.map(t, fn)
     local res = {}
     for val, key in (t.it or it)(t) do
         -- Evaluate fn with the element and store it.
-        res[key] = fn(val, key)
+        res[key] = fn(val)
     end
 
     return setmetatable(res, getmetatable(t))
@@ -299,7 +299,7 @@ end
 function table.key_map(t, fn)
     local res = {}
     for val, key in (t.it or it)(t) do
-        res[fn(key, val)] = val
+        res[fn(key)] = val
     end
 
     return setmetatable(res, getmetatable(t))
@@ -314,7 +314,7 @@ function table.filter(t, fn)
     local res = {}
     for val, key in (t.it or it)(t) do
         -- Only copy if fn(val) evaluates to true
-        if fn(val, key) then
+        if fn(val) then
             res[key] = val
         end
     end
@@ -331,7 +331,7 @@ function table.key_filter(t, fn)
     local res = {}
     for val, key in (t.it or it)(t) do
         -- Only copy if fn(key) evaluates to true
-        if fn(key, val) then
+        if fn(key) then
             res[key] = val
         end
     end
