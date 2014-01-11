@@ -207,8 +207,7 @@ function include_user(str)
 	local path, loaded_values = pathsearch({str})
 	
 	if not path then
-		windower.add_to_chat(123,'GearSwap: Include failure. Cannot find file.')
-		return
+		error('\nGearSwap: Cannot find the include file ('..tostring(str)..').', 2)
 	else
 		loaded_values = dofile(path)
 	end
