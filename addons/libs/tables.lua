@@ -202,7 +202,7 @@ function table.amend(t, t_amend, recursive, maxrec, rec)
 
     local cmp
     for key, val in pairs(t_amend) do
-        if t[key] ~= nil and recursive and rec ~= maxrec and type(t[key]) == 'table' and type(val) == 'table' and not table.isarray(val) then
+        if t[key] ~= nil and recursive and rec ~= maxrec and type(t[key]) == 'table' and type(val) == 'table' and class(val) ~= 'List' and class(val) ~= 'Set' and not table.isarray(val) then
             t[key] = table.amend(t[key], val, true, maxrec, rec + 1)
         elseif t[key] == nil then
             t[key] = val
