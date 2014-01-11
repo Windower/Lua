@@ -198,7 +198,7 @@ function list.map(l, fn)
     local res = {}
 
     for key = 1, l.n do
-        res[key] = fn(val)
+        res[key] = fn(rawget(l, key))
     end
 
     res.n = l.n
