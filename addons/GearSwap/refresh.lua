@@ -58,6 +58,7 @@ function load_user_files(job_id)
 	job_id = tonumber(job_id)
 	local path
 	
+	refresh_globals()
 	user_pcall('file_unload')
 	
 	for i,v in pairs(registered_user_events) do
@@ -132,7 +133,7 @@ function load_user_files(job_id)
 		sets = nil
 		return nil
 	end
-	refresh_globals()
+	
 	user_pcall('get_sets')
 	
 	gearswap_disabled = false
