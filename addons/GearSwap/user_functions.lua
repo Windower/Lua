@@ -201,7 +201,6 @@ end
 function include_user(str)
 	if not (type(str) == 'string') then
 		error('\nGearSwap: include() was passed an invalid value ('..tostring(str)..'). (must be a string)', 2)
-		return
 	end
 	if str:sub(-4)~='.lua' then str = str..'.lua' end
 
