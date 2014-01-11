@@ -18,11 +18,7 @@ _meta.L.__index = function(l, k)
         k = l.n + k + 1
         return rawget(l[k])
     end
-    if list[k] ~= nil then
-        return list[k]
-    else
-        return T(l)[k]
-    end
+    return list[k] or table[k]
 end
 _meta.L.__newindex = function(l, k, v)
     if type(k) == 'number' then
@@ -202,7 +198,7 @@ function list.map(l, fn)
     local res = {}
 
     for key = 1, l.n do
-        rawset(res, key, fn(rawget(l, key)))
+        res[key] = fn(rawget(l, key))
     end
 
     res.n = l.n
@@ -224,15 +220,6 @@ function list.filter(l, fn)
 
     res.n = key
     return setmetatable(res, _meta.L)
-end
-
-function list.reduce(l, fn, init)
-    local acc = init or l[1]
-    for key = init and 1 or 2, l.n do
-        acc = fn(acc, rawget(l, key))
-    end
-
-    return acc
 end
 
 function list.flatten(l, rec)

@@ -276,10 +276,18 @@ function table.lookup(t, ref, key)
     return ref[t[key]]
 end
 
+local it = function(t)
+    local key
+    return function()
+        key = next(t, key)
+        return rawget(t, key), key
+    end
+end
+
 -- Applies function fn to all values of the table and returns the resulting table.
 function table.map(t, fn)
     local res = {}
-    for key, val in pairs(t) do
+    for val, key in (t.it or it)(t) do
         -- Evaluate fn with the element and store it.
         res[key] = fn(val)
     end
@@ -290,7 +298,7 @@ end
 -- Applies function fn to all keys of the table, and returns the resulting table.
 function table.key_map(t, fn)
     local res = {}
-    for key, val in pairs(t) do
+    for val, key in (t.it or it)(t) do
         res[fn(key)] = val
     end
 
@@ -304,7 +312,7 @@ function table.filter(t, fn)
     end
 
     local res = {}
-    for key, val in pairs(t) do
+    for val, key in (t.it or it)(t) do
         -- Only copy if fn(val) evaluates to true
         if fn(val) then
             res[key] = val
@@ -321,7 +329,7 @@ function table.key_filter(t, fn)
     end
 
     local res = {}
-    for key, val in pairs(t) do
+    for val, key in (t.it or it)(t) do
         -- Only copy if fn(key) evaluates to true
         if fn(key) then
             res[key] = val
@@ -335,13 +343,39 @@ end
 -- init is an optional initial value to be used. If provided, init and t[1] will be compared first, otherwise t[1] and t[2].
 function table.reduce(t, fn, init)
     -- Set the accumulator variable to the init value (which can be nil as well)
-    local acc = init or next[2](t)
-    local pfn, arg1, arg2 = pairs(t)
-    for _, val in init and pfn or pfn(t) and pfn, arg1, arg2 do
-        acc = fn(acc, val)
+    local acc = init
+    for val in (t.it or it)(t) do
+        if init then
+            acc = fn(acc, val)
+        else
+            acc = val
+            init = true
+        end
     end
 
     return acc
+end
+
+-- Return true if any element of t satisfies the condition fn.
+function table.any(t, fn)
+    for val in (t.it or it)(t) do
+        if fn(val) then
+            return true
+        end
+    end
+
+    return false
+end
+
+-- Return true if all elements of t satisfy the condition fn.
+function table.all(t, fn)
+    for val in (t.it or it)(t) do
+        if not fn(val) then
+            return false
+        end
+    end
+
+    return true
 end
 
 --[[

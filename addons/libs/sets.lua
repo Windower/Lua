@@ -11,7 +11,7 @@ set = {}
 
 _meta = _meta or {}
 _meta.S = {}
-_meta.S.__index = function(s, x) if set[x] ~= nil then return set[x] else return table[x] end end
+_meta.S.__index = function(s, x) return set[x] or table[x] end
 _meta.S.__class = 'Set'
 
 function S(t)
@@ -135,6 +135,26 @@ end
 
 _meta.S.__pow = set.sdiff
 
+function set.map(s, fn)
+    local res = {}
+    for el in pairs(s) do
+        rawset(res, fn(el), true)
+    end
+
+    return setmetatable(res, _meta.S)
+end
+
+function set.filter(s, fn)
+    local res = {}
+    for el in pairs(s) do
+        if fn(el) then
+            rawset(res, el, true)
+        end
+    end
+
+    return setmetatable(res, _meta.S)
+end
+
 function set.contains(s, el)
     return rawget(s, el) == true
 end
@@ -163,7 +183,7 @@ function set.it(s)
     local key = nil
     return function()
         key = next(s, key)
-        return key
+        return key, true
     end
 end
 
@@ -222,35 +242,6 @@ function set.sort(s, ...)
     end
 
     return T(s):sort(...)
-end
-
-function set.map(s, fn)
-    local res = {}
-
-    for el in pairs(s) do
-        res[fn(el)] = true
-    end
-
-    return setmetatable(res, _meta.S)
-end
-
-function set.filter(s, fn)
-    local res = {}
-    for el in pairs(s) do
-        res[el] = fn(el) == true or nil
-    end
-
-    return setmetatable(res, _meta.S)
-end
-
-function set.reduce(s, fn, init)
-    local acc = init or next[2](s)
-    local pfn = pairs(s)
-    for el in init and pfn or pfn(s) and pfn, s do
-        acc = fn(acc, el)
-    end
-
-    return acc
 end
 
 function set.concat(s, str)
