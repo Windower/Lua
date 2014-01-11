@@ -135,6 +135,26 @@ end
 
 _meta.S.__pow = set.sdiff
 
+function set.map(s, fn)
+    local res = {}
+    for el in pairs(s) do
+        rawset(res, fn(el), true)
+    end
+
+    return setmetatable(res, _meta.S)
+end
+
+function set.filter(s, fn)
+    local res = {}
+    for el in pairs(s) do
+        if fn(el) then
+            rawset(res, el, true)
+        end
+    end
+
+    return setmetatable(res, _meta.S)
+end
+
 function set.contains(s, el)
     return rawget(s, el) == true
 end
