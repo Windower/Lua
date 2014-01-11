@@ -165,7 +165,7 @@ end
 windower.register_event('incoming chunk',function(id,data,modified,injected,blocked)
 	if debugging >= 1 then windower.debug('incoming chunk '..id) end
 
-	if id == 0x0E and not injected and pet.index and pet.index == data:byte(9) + data:byte(10)*256 and data:byte(11) == 7 then
+	if id == 0x0E and not injected and pet.index and pet.index == data:byte(9) + data:byte(10)*256 and math.floor((data:byte(11)%8)/4)== 1 then
 		local oldstatus = pet.status
 		local newstatus = res.statuses[data:byte(32)]
 		if newstatus then newstatus = newstatus.english
