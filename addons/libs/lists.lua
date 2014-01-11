@@ -198,7 +198,7 @@ function list.map(l, fn)
     local res = {}
 
     for key = 1, l.n do
-        res[key] = fn(val, key)
+        res[key] = fn(val)
     end
 
     res.n = l.n
@@ -212,7 +212,7 @@ function list.filter(l, fn)
     local val
     for okey = 1, l.n do
         val = rawget(l, okey)
-        if fn(val, key) == true then
+        if fn(val) == true then
             key = key + 1
             rawset(res, key, val)
         end
