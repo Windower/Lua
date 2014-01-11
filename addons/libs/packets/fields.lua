@@ -619,7 +619,7 @@ fields.incoming[0x00D] = L{
 fields.incoming[0x00E] = L{
     {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
     {ctype='unsigned short',    label='Index',              fn=index},          -- 08
-    {ctype='unsigned char',     label='Mask',               fn=bin-{1}},        -- 0A
+    {ctype='unsigned char',     label='Mask',               fn=bin-{1}},        -- 0A   Mask with bit 4 set updates NPC status
     {ctype='unsigned char',     label='Rotation',           fn=dir},            -- 0B
     {ctype='float',             label='X Position'},                            -- 0C
     {ctype='float',             label='Z Position'},                            -- 10
