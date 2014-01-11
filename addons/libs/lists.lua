@@ -194,6 +194,17 @@ function list.iwith(l, attr, val)
     end
 end
 
+function list.map(l, fn)
+    local res = {}
+
+    for key = 1, l.n do
+        res[key] = fn(val, key)
+    end
+
+    res.n = l.n
+    return setmetatable(res, _meta.L)
+end
+
 function list.filter(l, fn)
     local res = {}
 
@@ -201,7 +212,7 @@ function list.filter(l, fn)
     local val
     for okey = 1, l.n do
         val = rawget(l, okey)
-        if fn(val) == true then
+        if fn(val, key) == true then
             key = key + 1
             rawset(res, key, val)
         end
