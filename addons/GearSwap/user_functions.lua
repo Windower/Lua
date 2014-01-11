@@ -201,17 +201,21 @@ end
 function include_user(str)
 	if not (type(str) == 'string') then
 		error('\nGearSwap: include() was passed an invalid value ('..tostring(str)..'). (must be a string)', 2)
-		return
 	end
 	if str:sub(-4)~='.lua' then str = str..'.lua' end
 
 	local path, loaded_values = pathsearch({str})
 	
 	if not path then
-		windower.add_to_chat(123,'GearSwap: Include failure. Cannot find file.')
-		return
+		error('\nGearSwap: Cannot find the include file ('..tostring(str)..').', 2)
 	else
 		loaded_values = dofile(path)
+	end
+	
+	if not loaded_values then
+		error('\nGearSwap: Nothing was returned by the include ('..tostring(str)..').  Cannot add it to the user environment.', 2)
+	elseif type(loaded_values) ~= 'table' then
+		error('\nGearSwap: The include ('..tostring(str)..') did not return a table.  Cannot add it to the user environment.', 2)
 	end
 	
 	for i,v in pairs(loaded_values) do
