@@ -202,7 +202,20 @@ function refresh_player()
 	
 	-- Assign player.equipment to be the gear that has been sent out and the server currently thinks
 	-- you are wearing. (the sent_out_equip for loop above).
-	player.equipment = to_names_set(cur_equip,items.inventory)
+	player.equipment = make_user_table()
+	table.reassign(player.equipment,to_names_set(cur_equip,items.inventory))
+	
+	-- Assign player.inventory to be keyed to item.inventory[i][language] and to have a value of count, similar to buffactive
+	player.inventory = make_user_table()
+	for i,v in pairs(items.inventory) do
+		if v.id and v.id ~= 0 then
+			if not player.inventory[r_items[v.id][language]] then
+				player.inventory[r_items[v.id][language]] = v.count
+			else
+				player.inventory[r_items[v.id][language]] = player.inventory[r_items[v.id][language]] + v.count
+			end
+		end
+	end
 	
 	-- Monster tables for the target and subtarget.
 	player.target = target_complete(windower.ffxi.get_mob_by_target('t'))

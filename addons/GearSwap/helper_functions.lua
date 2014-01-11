@@ -789,25 +789,3 @@ function aftercast_cost(rline)
 	
 	return rline
 end
-
-
-
------------------------------------------------------------------------------------
---Name: get_action_type(category)
---Desc: Determines the action's "type."
---Args:
----- category - resource line
------------------------------------------------------------------------------------
---Returns:
----- rline - modified resource line
------------------------------------------------------------------------------------
-function get_action_type(category)
-	local action_type
-	if category == 3 and not _global.midaction then
-		-- Try to filter for Job Abilities that come back as WSs.
-		action_type = 'Job Ability'
-	else
-		action_type = category_map[category]
-	end
-	return action_type
-end

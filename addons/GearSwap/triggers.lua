@@ -161,9 +161,10 @@ function inc_action(act)
 	
 	local inde
 	if spell and spell.english then
-		inde = get_prefix(spell.prefix)..' "'..spell.english..'"'
+		local pre = get_prefix(spell.prefix)
+		inde = pre..' "'..spell.english..'"'
 		spell.target = target_complete(windower.ffxi.get_mob_by_id(act.targets[1].id))
-		spell.action_type = get_action_type(act.category)
+		spell.action_type = command_list[pre]
 	elseif spell then
 		unknown_out_arr_deletion(prefix,act.targets[1].id)
 		return
