@@ -58,13 +58,13 @@ function parse_resources(lines_file)
 		if typ == 's' then -- Packets and .dats refer to the spell index instead of ID
 			g,h,key = find(str,'index="(%d+)" ')
 		end
-		if key~=nil then
+		if key~=nil and not (typ == 's' and (tonumber(key) == 363 or tonumber(key) == 364)) then
 			completed_table[tonumber(key)]={}
 			local q = 1
 			while q <= str:len() do
 				local a,b,ind,val = find(str,'(%w+)="([^"]+)"',q)
 				if ind~=nil then
-					if not ignore_fields[ind] then
+					if not ignore_fields[ind]  then
 						if convert_fields[ind] then
 							ind = convert_fields[ind]
 						end
