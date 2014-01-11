@@ -206,16 +206,10 @@ function refresh_player()
 	table.reassign(player.equipment,to_names_set(cur_equip,items.inventory))
 	
 	-- Assign player.inventory to be keyed to item.inventory[i][language] and to have a value of count, similar to buffactive
-	player.inventory = make_user_table()
-	for i,v in pairs(items.inventory) do
-		if v.id and v.id ~= 0 then
-			if not player.inventory[r_items[v.id][language]] then
-				player.inventory[r_items[v.id][language]] = v.count
-			else
-				player.inventory[r_items[v.id][language]] = player.inventory[r_items[v.id][language]] + v.count
-			end
-		end
-	end
+	player.inventory = refresh_item_list(items.inventory)
+	player.sack = refresh_item_list(items.sack)
+	player.satchel = refresh_item_list(items.satchel)
+	player.case = refresh_item_list(items.case)
 	
 	-- Monster tables for the target and subtarget.
 	player.target = target_complete(windower.ffxi.get_mob_by_target('t'))
@@ -405,6 +399,31 @@ function refresh_buff_active(bufflist)
 		end
 	end
 	table.reassign(buffactive,buffarr)
+end
+
+-----------------------------------------------------------------------------------
+--Name: refresh_item_list(itemlist)
+--Args:
+---- itemlist (table): List of items from windower.ffxi.get_items().something
+-----------------------------------------------------------------------------------
+--Returns:
+---- retarr (table)
+---- retarr is indexed by the string buff name and has a value equal to the number
+---- of that string present in the buff array. So two marches would give
+---- retarr.izhiikoh==1.
+-----------------------------------------------------------------------------------
+function refresh_item_list(itemlist)
+	retarr = make_user_table()
+	for i,v in pairs(itemlist) do
+		if v.id and v.id ~= 0 then
+			if not retarr[r_items[v.id][language]] then
+				retarr[r_items[v.id][language]] = v.count
+			else
+				retarr[r_items[v.id][language]] = retarr[r_items[v.id][language]] + v.count
+			end
+		end
+	end
+	return retarr
 end
 
 
