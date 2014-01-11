@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.815'
+_addon.version = '0.816'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -85,6 +85,8 @@ windower.register_event('addon command',function (...)
 		logit(logfile,'\n\n'..tostring(os.clock)..command)
 	end
 	local splitup = {...}
+	if not splitup[1] then return end -- handles //gs
+	
 	if splitup[1]:lower() == 'c' then
 		if gearswap_disabled then return end
 		if splitup[2] then
@@ -116,12 +118,8 @@ windower.register_event('addon command',function (...)
 			end
 		end
 	elseif splitup[1]:lower() == 'export' then
-		if user_env and user_env.sets then
-			table.remove(splitup,1)
-			export_set(splitup)
-		else
-			windower.add_to_chat(123,'GearSwap: There is nothing to export because there is no file loaded.')
-		end
+		table.remove(splitup,1)
+		export_set(splitup)
 	elseif splitup[1]:lower() == 'validate' then
 		if user_env and user_env.sets then
 			validate()
@@ -167,7 +165,17 @@ end
 windower.register_event('incoming chunk',function(id,data,modified,injected,blocked)
 	if debugging >= 1 then windower.debug('incoming chunk '..id) end
 
-	if id == 0x28 and not injected then
+	if id == 0x0E and not injected and pet.index and pet.index == data:byte(9) + data:byte(10)*256 and math.floor((data:byte(11)%8)/4)== 1 then
+		local oldstatus = pet.status
+		local newstatus = res.statuses[data:byte(32)]
+		if newstatus then newstatus = newstatus.english
+		else newstatus = data:byte(32) end
+		if oldstatus ~= newstatus then
+			-- Should put a filter on this to prevent it from sending anything other than resting, engaged, and idle.
+			refresh_globals()
+			equip_sets('pet_status_change',nil,newstatus,oldstatus)
+		end
+	elseif id == 0x28 and not injected then
 		if clocking then windower.add_to_chat(8,'Action Packet: '..(os.clock() - out_time)) end
 		data = data:sub(5)
 		local act = {}
@@ -304,6 +312,10 @@ end)
 
 windower.register_event('job change',function(mjob, mjob_id, mjob_lvl, sjob, sjob_id, sjob_lvl)
 	if debugging >= 1 then windower.debug('job change') end
+	disable_table = {false,false,false,false,false,false,false,false,false,false,false,false,false,false,false}
+	not_sent_out_equip = {}
+	sent_out_equip = {}
+	limbo_equip = {}
 	if mjob ~= current_job_file then
 		refresh_user_env(mjob_id)
 	end

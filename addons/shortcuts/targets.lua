@@ -54,7 +54,6 @@ function valid_target(targ,flag)
 		local current_target = windower.ffxi.get_mob_by_target('<t>')
 		local targar = {}
 		for i,v in pairs(windower.ffxi.get_mob_array()) do
-			targ = percent_strip(targ)
 			if string.find(v.name:lower(),san_targ:lower()) and v.valid_target then
 				-- Handling for whether it's a monster or not
 				if v.is_npc and current_target then

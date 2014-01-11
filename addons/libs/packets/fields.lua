@@ -131,12 +131,12 @@ local function srank(val)
     return res.synth_ranks[val].name
 end
 
-local function inv(val)
+local function inv(bag, val)
     if val == 0 then
         return '(None)'
     end
 
-    local id = windower.ffxi.get_items().inventory[val].id
+    local id = windower.ffxi.get_items()[res.bags[bag].english:lower()][val].id
     return id > 0 and res.items[id].name or 'Unknown'
 end
 
@@ -224,46 +224,44 @@ fields.outgoing[0x029] = L{
 fields.outgoing[0x036] = L{
 -- Item order is Gil -> top row left-to-right -> bottom row left-to-right, but
 -- they slide up and fill empty slots
-    {ctype='unsigned int',      label='Target ID'},                             -- 04
+    {ctype='unsigned int',      label='Target ID',          fn=id},             -- 04
     {ctype='unsigned int',      label='Item 1 Quantity'},                       -- 08
-    {ctype='unsigned int',      label='Item 2 Quantity'},                       -- 12
-    {ctype='unsigned int',      label='Item 3 Quantity'},                       -- 16
-    {ctype='unsigned int',      label='Item 4 Quantity'},                       -- 20
-    {ctype='unsigned int',      label='Item 5 Quantity'},                       -- 24
-    {ctype='unsigned int',      label='Item 6 Quantity'},                       -- 28
-    {ctype='unsigned int',      label='Item 7 Quantity'},                       -- 32
-    {ctype='unsigned int',      label='Item 8 Quantity'},                       -- 36
-    {ctype='unsigned int',      label='Item 9 Quantity'},                       -- 40
-    {ctype='unsigned int',      label='_unknown1'},                             -- 44
-    {ctype='unsigned char',     label='Item 1 Inventory Index'},                -- 48  -- Gil has an Inventory Index of 0
-    {ctype='unsigned char',     label='Item 2 Inventory Index'},                -- 49
-    {ctype='unsigned char',     label='Item 3 Inventory Index'},                -- 50
-    {ctype='unsigned char',     label='Item 4 Inventory Index'},                -- 51
-    {ctype='unsigned char',     label='Item 5 Inventory Index'},                -- 52
-    {ctype='unsigned char',     label='Item 6 Inventory Index'},                -- 53
-    {ctype='unsigned char',     label='Item 7 Inventory Index'},                -- 54
-    {ctype='unsigned char',     label='Item 8 Inventory Index'},                -- 55
-    {ctype='unsigned char',     label='Item 9 Inventory Index'},                -- 56
-    {ctype='unsigned char',     label='_unknown2'},                             -- 57
-    {ctype='unsigned short',    label='Target Index'},                          -- 58
-    {ctype='unsigned char',     label='Number of Items'},                       -- 60
-    {ctype='unsigned char[3]',  label='_unknown3'},                             -- 61
+    {ctype='unsigned int',      label='Item 2 Quantity'},                       -- 0C
+    {ctype='unsigned int',      label='Item 3 Quantity'},                       -- 10
+    {ctype='unsigned int',      label='Item 4 Quantity'},                       -- 14
+    {ctype='unsigned int',      label='Item 5 Quantity'},                       -- 18
+    {ctype='unsigned int',      label='Item 6 Quantity'},                       -- 1C
+    {ctype='unsigned int',      label='Item 7 Quantity'},                       -- 20
+    {ctype='unsigned int',      label='Item 8 Quantity'},                       -- 24
+    {ctype='unsigned int',      label='Item 9 Quantity'},                       -- 28
+    {ctype='unsigned int',      label='_unknown1'},                             -- 2C
+    {ctype='unsigned char',     label='Item 1 Index',       fn=inv+{0}},        -- 30   Gil has an Inventory Index of 0
+    {ctype='unsigned char',     label='Item 2 Index',       fn=inv+{0}},        -- 31
+    {ctype='unsigned char',     label='Item 3 Index',       fn=inv+{0}},        -- 32
+    {ctype='unsigned char',     label='Item 4 Index',       fn=inv+{0}},        -- 33
+    {ctype='unsigned char',     label='Item 5 Index',       fn=inv+{0}},        -- 34
+    {ctype='unsigned char',     label='Item 6 Index',       fn=inv+{0}},        -- 35
+    {ctype='unsigned char',     label='Item 7 Index',       fn=inv+{0}},        -- 36
+    {ctype='unsigned char',     label='Item 8 Index',       fn=inv+{0}},        -- 37
+    {ctype='unsigned char',     label='Item 9 Index',       fn=inv+{0}},        -- 38
+    {ctype='unsigned char',     label='_unknown2'},                             -- 39
+    {ctype='unsigned short',    label='Target Index',       fn=index},          -- 3A
+    {ctype='unsigned char',     label='Number of Items'},                       -- 3C
 }
 
 -- Use Item
 fields.outgoing[0x037] = L{
-    {ctype='unsigned int',      label='Player ID'},                             -- 04
-    {ctype='unsigned int',      label='_unknown1'},                             -- 08 -- 00 00 00 00 observed
-    {ctype='unsigned short',    label='Player Index'},                          -- 12
-    {ctype='unsigned char',     label='Inventory Index'},                       -- 14
-    {ctype='unsigned char',     label='_unknown2'},                             -- 15 -- Takes values
-    {ctype='unsigned char',     label='Bag ID'},                                -- 16
-    {ctype='unsigned char[3]',  label='_unknown3'},                             -- 17
+    {ctype='unsigned int',      label='Player ID',          fn=id},             -- 04
+    {ctype='unsigned int',      label='_unknown1'},                             -- 08   00 00 00 00 observed
+    {ctype='unsigned short',    label='Player Index',       fn=index},          -- 0C
+    {ctype='unsigned char',     label='Item Index',         fn=inv+{0}},        -- 0E
+    {ctype='unsigned char',     label='_unknown2'},                             -- 0F   Takes values
+    {ctype='unsigned char',     label='Bag',                fn=bag},            -- 10
 }
 
 -- Sort Item
 fields.outgoing[0x03A] = L{
-    {ctype='unsigned char',     label='Storage ID'},                            -- 04
+    {ctype='unsigned char',     label='Bag',                fn=bag},            -- 04
     {ctype='unsigned char',     label='_unknown1'},                             -- 05
     {ctype='unsigned short',    label='_unknown2'},                             -- 06
 }
@@ -276,18 +274,16 @@ fields.outgoing[0x04D] = L{
 	-- Removing an item from the d-box sends type 0x08
 	-- It then responds to the server's 0x4B (id=0x08) with a 0x0A type packet.
 	-- Their assignment is the same, as far as I can see.
-    {ctype='unsigned char',     label='_unknown1'},                             -- 05  -- 01 observed
+    {ctype='unsigned char',     label='_unknown1'},                             -- 05   01 observed
     {ctype='unsigned char',     label='Slot ID'},                               -- 06
-    {ctype='char[5]',           label='_unknown2'},                             -- 07  -- FF FF FF FF FF observed
-    {ctype='char[20]',          label='_unknown3'},                             -- 0C  -- All 00 observed
+    {ctype='char[5]',           label='_unknown2'},                             -- 07   FF FF FF FF FF observed
+    {ctype='char[20]',          label='_unknown3'},                             -- 0C   All 00 observed
 }
 
 -- Equip
 fields.outgoing[0x050] = L{
-    {ctype='unsigned char',     label='Inventory ID',       fn=inv},            -- 04
+    {ctype='unsigned char',     label='Item Index',         fn=inv+{0}},        -- 04
     {ctype='unsigned char',     label='Equip Slot',         fn=slot},           -- 05
-    {ctype='unsigned char',     label='_unknown1'},                             -- 06
-    {ctype='unsigned char',     label='_unknown2'},                             -- 07
 }
 
 -- Conquest
@@ -623,7 +619,7 @@ fields.incoming[0x00D] = L{
 fields.incoming[0x00E] = L{
     {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
     {ctype='unsigned short',    label='Index',              fn=index},          -- 08
-    {ctype='unsigned char',     label='Mask',               fn=bin-{1}},        -- 0A
+    {ctype='unsigned char',     label='Mask',               fn=bin-{1}},        -- 0A   Mask with bit 4 set updates NPC status
     {ctype='unsigned char',     label='Rotation',           fn=dir},            -- 0B
     {ctype='float',             label='X Position'},                            -- 0C
     {ctype='float',             label='Z Position'},                            -- 10
@@ -963,10 +959,8 @@ fields.incoming[0x04F] = L{
 
 -- Equip
 fields.incoming[0x050] = L{
-    {ctype='unsigned char',     label='Inventory ID',       fn=inv},            -- 04
+    {ctype='unsigned char',     label='Item Index',         fn=inv+{0}},        -- 04
     {ctype='unsigned char',     label='Equip Slot',         fn=slot},           -- 05
-    {ctype='unsigned char',     label='_unknown1'},                             -- 06
-    {ctype='unsigned char',     label='_unknown2'},                             -- 07
 }
 
 -- Model Change

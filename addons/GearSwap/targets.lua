@@ -45,7 +45,7 @@ function valid_target(targ)
 		
 		spelltarget.raw = targ
 		return targ,spelltarget
-	elseif not tonumber(targ) then
+	elseif not tonumber(targ) and targ ~= '' then
 		local mob_array = windower.ffxi.get_mob_array()
 		for i,v in pairs(mob_array) do
 			if v.name:lower()==targ:lower() and not v.is_npc then

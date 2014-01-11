@@ -33,7 +33,7 @@ function debug_mode(boolean)
 	elseif boolean == nil then
 		_settings.debug_mode = true
 	else
-		windower.add_to_chat(123,'GearSwap: debug_mode was passed an invalid value (true/no value/nil=on, false=off)')
+		error('\nGearSwap: show_swaps() was passed an invalid value ('..tostring(boolean)..'). (true/no value/nil=on, false=off)', 2)
 	end
 end
 
@@ -43,36 +43,36 @@ function show_swaps(boolean)
 	elseif boolean == nil then
 		_settings.show_swaps = true
 	else
-		windower.add_to_chat(123,'GearSwap: show_swaps was passed an invalid value (true/no value/nil=on, false=off)')
+		error('\nGearSwap: show_swaps() was passed an invalid value ('..tostring(boolean)..'). (true/no value/nil=on, false=off)', 2)
 	end
 end
 
 
 function verify_equip(boolean)
-	windower.add_to_chat(123,'GearSwap: verify_equip() has been deprecated due to internal changes and no longer has a purpose')
+	print('GearSwap: verify_equip() has been deprecated due to internal changes and no longer has a purpose')
 end
 
 
 function cancel_spell(boolean)
 	if _global.current_event ~= 'precast' and _global.current_event ~= 'pretarget' then
-		windower.add_to_chat(123,'GearSwap: cancel_spell() is only valid in the precast and pretarget functions')
+		error('\nGearSwap: cancel_spell() is only valid in the precast and pretarget functions', 2)
 		return
 	end
 	if boolean == true or boolean == false then _global.cancel_spell = boolean
 	elseif boolean == nil then
 		_global.cancel_spell = true
 	else
-		windower.add_to_chat(123,'GearSwap: cancel_spell was passed an invalid value (true/no value/nil=Cancel the spell, false=do not cancel the spell)')
+		error('\nGearSwap: cancel_spell() was passed an invalid value ('..tostring(boolean)..'). (true/no value/nil=Cancel the spell, false=do not cancel the spell)', 2)
 	end
 end
 
 function force_send(boolean)
-	windower.add_to_chat(123,'GearSwap: force_send() has been deprecated due to internal changes and no longer has a purpose')
+	print('GearSwap: force_send() has been deprecated due to internal changes and no longer has a purpose')
 end
 
 function change_target(name)
 	if _global.current_event ~= 'pretarget' then
-		windower.add_to_chat(123,'GearSwap: change_target() is only valid in the pretarget')
+		error('\nGearSwap: change_target() is only valid in the pretarget function', 2)
 		return
 	end
 	if name and type(name)=='string' then
@@ -80,19 +80,19 @@ function change_target(name)
 		_global.storedtarget,temp_targ = valid_target(name)
 		spell.target = temp_targ
 	else
-		windower.add_to_chat(123,'GearSwap: change_target was passed an invalid value (must be a string)')
+		error('\nGearSwap: change_target() was passed an invalid value ('..tostring(name)..'). (must be a string)', 2)
 	end
 end
 
 function cast_delay(delay)
 	if _global.current_event ~= 'precast' and _global.current_event ~= 'pretarget' then
-		windower.add_to_chat(123,'GearSwap: cast_delay() is only valid in the precast and pretarget functions')
+		error('\nGearSwap: cast_delay() is only valid in the precast and pretarget functions', 2)
 		return
 	end
 	if tonumber(delay) then
 		_global.cast_delay = tonumber(delay)
 	else
-		windower.add_to_chat(123,'GearSwap: Cast delay is not a number')
+		error('\nGearSwap: cast_delay() was passed an invalid value ('..tostring(delay)..'). (cast delay must be a number of seconds)', 2)
 	end
 end
 
@@ -115,7 +115,7 @@ function disable(...)
 		if slot_map[v] then
 			rawset(disable_table,slot_map[v],true)
 		else
-			windower.add_to_chat(123,'GearSwap: disable error, passed an unrecognized slot name ('..tostring(v)..')')
+			error('\nGearSwap: disable error, passed an unrecognized slot name ('..tostring(v)..').',2)
 		end
 	end
 end
@@ -137,7 +137,7 @@ function enable(...)
 				not_sent_out_equip[local_slot] = nil
 			end
 		else
-			windower.add_to_chat(123,'GearSwap: enable error, passed an unrecognized slot name ('..tostring(v)..')')
+			error('\nGearSwap: enable error, passed an unrecognized slot name ('..tostring(v)..').',2)
 		end
 	end
 	if table.length(sending_table) > 0 then
@@ -149,9 +149,9 @@ end
 function print_set(set,title)
 	if not set then
 		if title then
-			windower.add_to_chat(123,'GearSwap: print_set error '..title..' set is nil.')
+			error('\nGearSwap: print_set error, '..title..' set is nil.', 2)
 		else
-			windower.add_to_chat(123,'GearSwap: print_set error, set is nil.')
+			error('\nGearSwap: print_set error, set is nil.', 2)
 		end
 		return
 	end
@@ -200,7 +200,7 @@ end
 
 function include_user(str)
 	if not (type(str) == 'string') then
-		windower.add_to_chat(123,'GearSwap: Include failure. Must pass a string.')
+		error('\nGearSwap: include() was passed an invalid value ('..tostring(str)..'). (must be a string)', 2)
 		return
 	end
 	if str:sub(-4)~='.lua' then str = str..'.lua' end
@@ -226,7 +226,7 @@ function user_midaction(bool)
 	if bool == false or bool == true then
 		_global.midaction = bool
 	elseif bool ~= nil then
-		windower.add_to_chat(123,'GearSwap: midaction() takes a bool or no argument')
+		error('\nGearSwap: midaction() was passed an invalid value ('..tostring(bool)..'). (true=true, false=false, nil=nothing)', 2)
 	end
 	
 	for i,v in pairs(out_arr) do

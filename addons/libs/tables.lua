@@ -202,7 +202,7 @@ function table.amend(t, t_amend, recursive, maxrec, rec)
 
     local cmp
     for key, val in pairs(t_amend) do
-        if t[key] ~= nil and recursive and rec ~= maxrec and type(t[key]) == 'table' and type(val) == 'table' and not table.isarray(val) then
+        if t[key] ~= nil and recursive and rec ~= maxrec and type(t[key]) == 'table' and type(val) == 'table' and class(val) ~= 'List' and class(val) ~= 'Set' and not table.isarray(val) then
             t[key] = table.amend(t[key], val, true, maxrec, rec + 1)
         elseif t[key] == nil then
             t[key] = val
@@ -485,28 +485,6 @@ function table.rekey(t, key)
     end
 
     return setmetatable(res, getmetatable(t) or _meta.T)
-end
-
--- Return true if any element of t satisfies the condition fn.
-function table.any(t, fn)
-    for _, val in pairs(t) do
-        if(fn(val) == true) then
-            return true
-        end
-    end
-
-    return false
-end
-
--- Return true if all elements of t satisfy the condition fn.
-function table.all(t, fn)
-    for _, val in pairs(t) do
-        if(fn(val) ~= true) then
-            return false
-        end
-    end
-
-    return true
 end
 
 -- Wrapper around unpack(t). Returns table elements as a list of values. Only works on arrays.

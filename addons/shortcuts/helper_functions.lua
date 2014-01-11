@@ -106,28 +106,52 @@ end
 -----------------------------------------------------------------------------------
 --Name: find_san()
 --Args:
----- input (string) - Value that might be true or false
+---- str (string) - string to be sanitized
 -----------------------------------------------------------------------------------
 --Returns:
----- boolean or nil. Defaults to nil if input is not true or false.
+---- sanitized string
 -----------------------------------------------------------------------------------
 function find_san(str)
 	if #str == 0 then return str end
-	local op,cl,opadd,last = 0,0,1
+	
+	str = bracket_closer(str,0x28,0x29)
+	str = bracket_closer(str,0x5B,0x5D)
+	
+	-- strip precentages
+	local hanging_percent,num = 0,num
+	while str:byte(#str-hanging_percent) == 37 do
+		hanging_percent = hanging_percent + 1
+	end
+	str = str:sub(1,#str-hanging_percent%2)
+	return str
+end
+
+-----------------------------------------------------------------------------------
+--Name: bracket_closer()
+--Args:
+---- str (string) - string to have its brackets closed
+---- opener (number) - opening character's ASCII code
+---- closer (number) - closing character's ASCII code
+-----------------------------------------------------------------------------------
+--Returns:
+---- string with its opened brackets closed
+-----------------------------------------------------------------------------------
+function bracket_closer(str,opener,closer)
+	op,cl,opadd = 0,0,1
 	for i=1,#str do
 		local ch = str:byte(i)
-		if ch == 0x5B then
+		if ch == opener then
 			op = op +1
 			opadd = i
-		elseif ch == 0x5D then
+		elseif ch == closer then
 			cl = cl + 1
 		end
 	end
 	if op > cl then
-		if opadd~= #str then
-			str = str..string.char(0x5D)
+		if opadd ~= #str then
+			str = str..string.char(closer)
 		else
-			str = str..str.char(0x7,0x5D)
+			str = str..str.char(0x7,closer)
 		end		-- Close captures
 	end
 	return str
@@ -247,21 +271,4 @@ function to_roman(num)
 	end
 	
 	return retstr
-end
-
------------------------------------------------------------------------------------
---Name: percent_strip()
---Args:
----- line (string): string to be checked for % signs and stripped
------------------------------------------------------------------------------------
---Returns:
----- line, without any trailing %s.
------------------------------------------------------------------------------------
-function percent_strip(line)
-	local line_len = #line
-	while line:byte(line_len) == 37 do
-		line = line:sub(1,line_len-1)
-		line_len = line_len -1
-	end
-	return line
 end
