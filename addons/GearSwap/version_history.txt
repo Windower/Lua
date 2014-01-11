@@ -1,9 +1,8 @@
 -------------------------------------------------
-<<<<<<< HEAD
-=======
+GearSwap 0.816 - Automaton midcast fixed. //gs fixed. //gs export no longer requires a user file (except for the sets option).
+-------------------------------------------------
 GearSwap 0.815 - Automaton information added. 
 -------------------------------------------------
->>>>>>> 4.1-dev
 GearSwap 0.814 - Fixed the equipment table, which was being unreliable.
 -------------------------------------------------
 GearSwap 0.813 - Fixed issues with /pet. Meddled with triggering interruption again. Potentially re-created the Paralysis issue in the process.

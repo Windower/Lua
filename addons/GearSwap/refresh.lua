@@ -137,7 +137,6 @@ function load_user_files(job_id)
 	
 	gearswap_disabled = false
 	sets = user_env.sets
-	refresh_globals()
 end
 
 
@@ -203,7 +202,14 @@ function refresh_player()
 	
 	-- Assign player.equipment to be the gear that has been sent out and the server currently thinks
 	-- you are wearing. (the sent_out_equip for loop above).
-	player.equipment = to_names_set(cur_equip,items.inventory)
+	player.equipment = make_user_table()
+	table.reassign(player.equipment,to_names_set(cur_equip,items.inventory))
+	
+	-- Assign player.inventory to be keyed to item.inventory[i][language] and to have a value of count, similar to buffactive
+	player.inventory = refresh_item_list(items.inventory)
+	player.sack = refresh_item_list(items.sack)
+	player.satchel = refresh_item_list(items.satchel)
+	player.case = refresh_item_list(items.case)
 	
 	-- Monster tables for the target and subtarget.
 	player.target = target_complete(windower.ffxi.get_mob_by_target('t'))
@@ -263,7 +269,7 @@ function refresh_player()
 			end
 			
 			pet.frame = r_items[auto_tab.frame+8223][language]
-			pet.head = r_items[auto_tab.frame+8192][language]
+			pet.head = r_items[auto_tab.head+8192][language]
 			if pet.max_mp ~= 0 then
 				pet.mpp = math.floor(pet.mp/pet.max_mp*100)
 			else
@@ -393,6 +399,31 @@ function refresh_buff_active(bufflist)
 		end
 	end
 	table.reassign(buffactive,buffarr)
+end
+
+-----------------------------------------------------------------------------------
+--Name: refresh_item_list(itemlist)
+--Args:
+---- itemlist (table): List of items from windower.ffxi.get_items().something
+-----------------------------------------------------------------------------------
+--Returns:
+---- retarr (table)
+---- retarr is indexed by the string buff name and has a value equal to the number
+---- of that string present in the buff array. So two marches would give
+---- retarr.izhiikoh==1.
+-----------------------------------------------------------------------------------
+function refresh_item_list(itemlist)
+	retarr = make_user_table()
+	for i,v in pairs(itemlist) do
+		if v.id and v.id ~= 0 then
+			if not retarr[r_items[v.id][language]] then
+				retarr[r_items[v.id][language]] = v.count
+			else
+				retarr[r_items[v.id][language]] = retarr[r_items[v.id][language]] + v.count
+			end
+		end
+	end
+	return retarr
 end
 
 
