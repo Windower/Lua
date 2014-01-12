@@ -13,6 +13,11 @@ debug.getmetatable('').__index = function(str, k)
 end
 debug.getmetatable('').__unm = functions.negate..functions.equals
 
+-- Returns a function that returns the string when called.
+function string.fn(str)
+    return functions.const(str)
+end
+
 -- Returns the character at position pos. Negative positions are counted from the opposite end.
 function string.at(str, pos)
     return str:sub(pos, pos)

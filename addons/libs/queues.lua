@@ -22,7 +22,7 @@ _meta.Q.__index = function(q, k)
         end
     end
 
-    return rawget(queue, k) or T(q.data)[k]
+    return rawget(queue, k) or rawget(table, k)
 end
 _meta.Q.__newindex = function(q, k, v)
     error('Cannot assign queue value:', k)

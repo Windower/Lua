@@ -11,7 +11,7 @@ set = {}
 
 _meta = _meta or {}
 _meta.S = {}
-_meta.S.__index = function(s, x) return set[x] or table[x] end
+_meta.S.__index = function(s, k) return rawget(set, k) or rawget(table, k) end
 _meta.S.__class = 'Set'
 
 function S(t)
