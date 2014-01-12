@@ -174,6 +174,7 @@ function equip_sets_exit(swap_type,ind,val1,val2)
 		-- Canceled Spell
 			local tempcmd = storedcommand..' '..spell.target.raw
 			storedcommand = nil
+			if debugging >= 1 or _global.debugmode then windower.add_to_chat(8,'GearSwap (Debug): Unable to create a packet for this command ('..tempcmd..')') end
 			return tempcmd
 		elseif val1.target and st_targs:contains(val1.target.raw) then
 		-- st targets
