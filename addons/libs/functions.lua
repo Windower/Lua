@@ -40,6 +40,22 @@ function functions.cond(fn, check)
     end
 end
 
+-- 
+function functions.args(fn, ...)
+    local args = {...}
+    return function(...)
+        local res = {}
+        for key, arg in ipairs(args) do
+            if type(arg) == 'number' then
+                rawset(res, key, select(arg, ...))
+            else
+                rawset(res, key, arg(...))
+            end
+        end
+        return fn(unpack(res))
+    end
+end
+
 -- Returns a function fully applied to the provided arguments.
 function functions.prepare(fn, ...)
     local args = {...}
