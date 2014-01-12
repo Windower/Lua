@@ -170,7 +170,7 @@ function equip_sets_exit(swap_type,ind,val1,val2)
 	cache_globals(ind)
 	if swap_type == 'pretarget' then
 		command_send_check(ind)
-		if not out_arr[ind] then
+		if not out_arr[ind] and storedcommand then
 		-- Canceled Spell
 			local tempcmd = storedcommand..' '..spell.target.raw
 			storedcommand = nil
@@ -295,7 +295,6 @@ function command_send_check(inde)
 					out_arr[inde].proposed_packet = assemble_action_packet(spell.target.id,spell.target.index,outgoing_action_category_table[unify_prefix[spell.prefix]],spell.id)
 				end
 				if not out_arr[inde].proposed_packet then
-					storedcommand = ''
 					out_arr[inde] = nil
 				end
 			else
