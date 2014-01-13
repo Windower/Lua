@@ -58,11 +58,10 @@ end)
 
 windower.register_event('logout',function() _char = nil end)
 
--- Allows for the model to be restored to desired settings after zoning if blink prevention is on:
-windower.register_event('outgoing chunk',function (id, data) if id == 0x5e then zone_reset = 0 end end)
-
 windower.register_event('incoming chunk',function (id, data)
-    if id == 0x51 then
+    if id == 0x5e then 
+        zone_reset = 0
+    elseif id == 0x51 then
         if not _char then return end
         
         local _ignore = data:sub(1,4)
