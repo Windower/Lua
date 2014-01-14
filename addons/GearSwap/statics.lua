@@ -178,9 +178,9 @@ pass_through_targs = {['<t>']=true,['<me>']=true,['<ft>']=true,['<scan>']=true,[
 	['<a20>']=true,['<a21>']=true,['<a22>']=true,['<a23>']=true,['<a24>']=true,['<a25>']=true,['<st>']=true,
 	['<stnpc>']=true,['<stal>']=true,['<stpc>']=true,['<stpt>']=true}
 
-avatar_element = {Ifrit='Fire',Titan='Earth',Leviathan='Water',Garuda='Wind',Shiva='Ice',Ramuh='Thunder',Carbuncle='Light',
+avatar_element = {Ifrit='Fire',Titan='Earth',Leviathan='Water',Garuda='Wind',Shiva='Ice',Ramuh='Lightning',Carbuncle='Light',
 	Diabolos='Dark',Fenrir='Dark',['Fire Elemental']='Fire',['Earth Elemental']='Earth',['Water Elemental']='Water',
-	['Wind Elemental']='Wind',['Ice Elemental']='Ice',['Lightning Elemental']='Thunder',['Light Elemental']='Light',
+	['Wind Elemental']='Wind',['Ice Elemental']='Ice',['Lightning Elemental']='Lightning',['Light Elemental']='Light',
 	['Dark Elemental']='Dark'}
 encumbrance_map = {0x79,0x7F,0x7F,0x7A,0x7B,0x7C,0x7D,0x7D,0x7A,0x7E,0x80,0x80,0x80,0x80,0x7E}
 encumbrance_map[0] = 0x79 -- Slots mapped onto encumbrance byte values.

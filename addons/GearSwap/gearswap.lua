@@ -340,6 +340,7 @@ end)
 windower.register_event('zone change',function(new_zone,new_zone_id,old_zone,old_zone_id)
 	if debugging >= 1 then windower.debug('zone change') end
 	_global.midaction = false
+	_global.pet_midaction = false
 	sent_out_equip = {}
 	not_sent_out_equip = {}
 	out_arr = {}
