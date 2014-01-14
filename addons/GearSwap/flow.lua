@@ -81,12 +81,18 @@ function equip_sets(swap_type,ind,val1,val2)
 			windower.add_to_chat(8,'val1 error')
 		end
 	end
+	
+	if swap_type == 'pet_midcast' then
+		_global.pet_midaction = true
+	end
 
+	
 	if swap_type == 'equip_command' then
 		equip(val1)
 	else
 		user_pcall(swap_type,val1,val2)
 	end
+	
 	
 	if swap_type == 'pretarget' then -- Target may just have been changed, so make the ind now.
 		ind = mk_out_arr_entry(val1,{target_id=spell.target.id},nil)
@@ -176,7 +182,7 @@ function equip_sets_exit(swap_type,ind,val1,val2)
 			storedcommand = nil
 			if debugging >= 1 or _global.debugmode then windower.add_to_chat(8,'GearSwap (Debug): Unable to create a packet for this command ('..tempcmd..')') end
 			return tempcmd
-		elseif val1.target and st_targs:contains(val1.target.raw) then
+		elseif val1.target and st_targs[val1.target.raw] then
 		-- st targets
 			st_flag = true
 		elseif val1.target and not val1.target.name then
@@ -255,6 +261,7 @@ function cache_globals(inde)
 	_global.cast_delay = 0
 	_global.storedtarget = ''
 	_global.midaction = false
+	_global.pet_midaction = false
 	_global.cancel_spell = false
 end
 

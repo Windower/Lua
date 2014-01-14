@@ -200,7 +200,7 @@ function inc_action(act)
 			equip_sets(prefix..'aftercast',inde,spell)
 		end
 	elseif readies[act.category] and prefix == 'pet_' and act.targets[1].actions[1].message ~= 0 then -- Entry for pet midcast. Excludes the second packet of "Out of range" BPs.
-		mk_out_arr_entry(spell,{target_id==spell.target.id},nil)
+		inde = mk_out_arr_entry(spell,{target_id==spell.target.id},nil)
 		refresh_globals()
 		equip_sets('pet_midcast',inde,spell)
 	end
