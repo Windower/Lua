@@ -178,21 +178,22 @@ function equip_sets_exit(swap_type,ind,val1,val2)
 		command_send_check(ind)
 		if not out_arr[ind] and storedcommand then
 		-- Canceled Spell
-			local tempcmd = storedcommand..' '..spell.target.raw
-			storedcommand = nil
-			if debugging >= 1 or _global.debugmode then windower.add_to_chat(8,'GearSwap (Debug): Unable to create a packet for this command ('..tempcmd..')') end
-			return tempcmd
-		elseif val1.target and st_targs[val1.target.raw] then
+		elseif out_arr[ind] and val1.target and st_targs[val1.target.raw] then
 		-- st targets
 			st_flag = true
-		elseif val1.target and not val1.target.name then
+		elseif out_arr[ind] and val1.target and not val1.target.name then
 		-- Spells with invalid pass_through_targs, like using <t> without a target
 			out_arr[ind] = nil
-			storedcommand = nil
-		elseif val1.target and val1.target.name then
+		elseif out_arr[ind] and val1.target and val1.target.name then
 		-- Spells with complete target information
 			equip_sets('precast',ind,val1,val2)
 			return ''
+		end
+		if storedcommand then
+			local tempcmd = storedcommand..' '..spell.target.raw
+			storedcommand = nil
+			if debugging >= 1 or _global.debugmode then windower.add_to_chat(8,'GearSwap (Debug): Unable to create a packet for this command or action canceled ('..tempcmd..')') end
+			return tempcmd
 		end
 	elseif swap_type == 'precast' then
 		packet_send_check(ind)
