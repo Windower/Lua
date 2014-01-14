@@ -334,8 +334,8 @@ function refresh_ffxi_info()
 		world.weather = 'Ice'
 		world.weather_element = 'Ice'
 	elseif buffactive.thunderstorm then
-		world.weather = 'Thunder'
-		world.weather_element = 'Thunder'
+		world.weather = 'Lightning'
+		world.weather_element = 'Lightning'
 	end
 end
 
