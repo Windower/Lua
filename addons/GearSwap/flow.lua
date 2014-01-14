@@ -176,9 +176,7 @@ function equip_sets_exit(swap_type,ind,val1,val2)
 	cache_globals(ind)
 	if swap_type == 'pretarget' then
 		command_send_check(ind)
-		if not out_arr[ind] and storedcommand then
-		-- Canceled Spell
-		elseif out_arr[ind] and val1.target and st_targs[val1.target.raw] then
+		if out_arr[ind] and val1.target and st_targs[val1.target.raw] then
 		-- st targets
 			st_flag = true
 		elseif out_arr[ind] and val1.target and not val1.target.name then
@@ -187,7 +185,7 @@ function equip_sets_exit(swap_type,ind,val1,val2)
 		elseif out_arr[ind] and val1.target and val1.target.name then
 		-- Spells with complete target information
 			equip_sets('precast',ind,val1,val2)
-			return ''
+			return true
 		end
 		if storedcommand then
 			local tempcmd = storedcommand..' '..spell.target.raw
