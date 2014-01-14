@@ -59,7 +59,7 @@ function export_set(options)
 		end
 	elseif all_sets then
 		-- Iterate through user_env.sets and find all the gear.
-		item_list,exported = unpack_names('L1',user_env.sets,{},{empty=true})
+		item_list,exported = unpack_names({},'L1',user_env.sets,{},{empty=true})
 --		for i,v in pairs(exported) do
 --			windower.add_to_chat(8,tostring(i))
 --		end
@@ -137,11 +137,12 @@ function export_set(options)
 	end
 end
 
-function unpack_names(up,tab_level,unpacked_table,exported)
+function unpack_names(ret_tab,up,tab_level,unpacked_table,exported)
 	for i,v in pairs(tab_level) do
 		local flag,alt
-		if type(v)=='table' then
-			unpacked_table,exported = unpack_names(i,v,unpacked_table,exported)
+		if type(v)=='table' and not ret_tab[tostring(tab_level[i])] then
+			ret_tab[tostring(tab_level[i])] = true
+			unpacked_table,exported = unpack_names(ret_tab,i,v,unpacked_table,exported)
 		elseif i=='name' then
 			alt = up
 			flag = true

@@ -10,14 +10,15 @@ function validate(filter)
 	
 	windower.add_to_chat(123,'GearSwap: Validating sets against inventory')
 	windower.add_to_chat(123,'           (does not detect multiple identical items or look at augments)')
-	local missing = unpack_layer({},item_list,sets,filter)
+	local missing = unpack_layer({},{},item_list,sets,filter)
 	windower.add_to_chat(123,'GearSwap: '..table.length(missing)..' missing items detected.')
 end
 
-function unpack_layer(missing,item_list,tab,filter)
+function unpack_layer(reg_tab,missing,item_list,tab,filter)
 	for i,v in pairs(tab) do
-		if type(v)=='table' and not v.name then
-			missing = unpack_layer(missing,item_list,v,filter)
+		if type(v)=='table' and not v.name and not reg_tab[tostring(tab[i])] then
+			reg_tab[tostring(tab[i])] = true -- to avoid circular references
+			missing = unpack_layer(reg_tab,missing,item_list,v,filter)
 		elseif type(i) == 'string' and ((type(v) == 'table' and v.name and slot_map[i:lower()]) or (type(v) == 'string' and slot_map[i:lower()])) then
 			local nam = v.name or v
 			if not item_list[nam:lower()] and not missing[nam:lower()] and tryfilter(nam:lower(), filter) then
