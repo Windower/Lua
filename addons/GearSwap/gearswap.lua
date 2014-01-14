@@ -122,7 +122,8 @@ windower.register_event('addon command',function (...)
 		export_set(splitup)
 	elseif splitup[1]:lower() == 'validate' then
 		if user_env and user_env.sets then
-			validate()
+			table.remove(splitup, 1)
+			validate(splitup)
 		else
 			windower.add_to_chat(123,'GearSwap: There is nothing to validate because there is no file loaded.')
 		end
