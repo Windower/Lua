@@ -76,7 +76,7 @@ end
 function validate_sets(filter)
 	local missingitems = S{}
 
-	windower.add_to_chat(123,'GearSwap: Checking for items in gear sets that are not used in your inventory.')
+	windower.add_to_chat(123,'GearSwap: Checking for items in gear sets that are not in your inventory.')
 	windower.add_to_chat(123,'           (does not detect multiple identical items or look at augments)')
 	
 	recurse_sets(sets, missingitems, filter)
