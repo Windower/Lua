@@ -14,11 +14,11 @@ list = {}
 _meta = _meta or {}
 _meta.L = {}
 _meta.L.__index = function(l, k)
-    if type(k) == 'number' and k < 0 then
-        k = l.n + k + 1
-        return rawget(l[k])
+    if type(k) == 'number' then
+        k = k < 0 and l.n + k + 1 or k
+        return rawget(l, k)
     end
-    return list[k] or table[k]
+    return rawget(list, k) or rawget(table, k)
 end
 _meta.L.__newindex = function(l, k, v)
     if type(k) == 'number' then

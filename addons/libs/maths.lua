@@ -4,6 +4,7 @@ A few math helper functions.
 
 _libs = _libs or {}
 _libs.maths = true
+_libs.functions = _libs.functions or require('functions')
 
 _raw = _raw or {}
 _raw.math = setmetatable(_raw.math or {}, {__index = math})
@@ -14,7 +15,12 @@ debug.setmetatable(0, {__index = math})
 local digitorder = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'}
 
 -- Constants
-math.e = (1):exp()
+math.e = 1:exp()
+
+-- Returns a function that returns the number when called.
+function math.fn(val)
+    return functions.const(val)
+end
 
 -- Rounds to prec decimal digits. Accepts negative numbers for precision.
 function math.round(num, prec)
@@ -65,7 +71,7 @@ function math.base(val, base)
     if base == nil or base == 10 or val == 0 then
         return val:string()
     elseif base == 1 then
-        return ('1'):rep(val)
+        return '1':rep(val)
     end
 
     local num = val:abs()
