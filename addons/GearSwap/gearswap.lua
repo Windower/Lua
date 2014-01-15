@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.816'
+_addon.version = '0.817'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -122,7 +122,8 @@ windower.register_event('addon command',function (...)
 		export_set(splitup)
 	elseif splitup[1]:lower() == 'validate' then
 		if user_env and user_env.sets then
-			validate()
+			table.remove(splitup, 1)
+			validate(splitup)
 		else
 			windower.add_to_chat(123,'GearSwap: There is nothing to validate because there is no file loaded.')
 		end
@@ -339,6 +340,7 @@ end)
 windower.register_event('zone change',function(new_zone,new_zone_id,old_zone,old_zone_id)
 	if debugging >= 1 then windower.debug('zone change') end
 	_global.midaction = false
+	_global.pet_midaction = false
 	sent_out_equip = {}
 	not_sent_out_equip = {}
 	out_arr = {}

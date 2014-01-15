@@ -241,6 +241,21 @@ function user_midaction(bool)
 	return false
 end
 
+function user_pet_midaction(bool)
+	if bool == false or bool == true then
+		_global.pet_midaction = bool
+	elseif bool ~= nil then
+		error('\nGearSwap: pet_midaction() was passed an invalid value ('..tostring(bool)..'). (true=true, false=false, nil=nothing)', 2)
+	end
+	
+	for i,v in pairs(out_arr) do
+		if v.pet_midaction then
+			return true,v.spell
+		end
+	end
+	return false
+end
+
 
 -- Define the user windower functions.
 user_windower = {register_event = register_event_user, unregister_event = unregister_event_user, send_command = send_cmd_user}

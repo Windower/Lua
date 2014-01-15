@@ -172,12 +172,15 @@ unable_to_use = T{17,18,55,56,87,88,89,90,104,191,308,313,325,410,428,561,574,57
 -- 192 : param_1 = Ability ID
 -- 17 : no information
 -- 34 : param_1 = Spell index
-pass_through_targs = T{'<t>','<me>','<ft>','<scan>','<bt>','<lastst>','<r>','<pet>','<p0>','<p1>','<p2>','<p3>','<p4>',
-	'<p5>','<a10>','<a11>','<a12>','<a13>','<a14>','<a15>','<a20>','<a21>','<a22>','<a23>','<a24>','<a25>','<st>','<stnpc>',
-	'<stal>','<stpc>','<stpt>'}
-avatar_element = {Ifrit='Fire',Titan='Earth',Leviathan='Water',Garuda='Wind',Shiva='Ice',Ramuh='Thunder',Carbuncle='Light',
+pass_through_targs = {['<t>']=true,['<me>']=true,['<ft>']=true,['<scan>']=true,['<bt>']=true,['<lastst>']=true,
+	['<r>']=true,['<pet>']=true,['<p0>']=true,['<p1>']=true,['<p2>']=true,['<p3>']=true,['<p4>']=true,
+	['<p5>']=true,['<a10>']=true,['<a11>']=true,['<a12>']=true,['<a13>']=true,['<a14>']=true,['<a15>']=true,
+	['<a20>']=true,['<a21>']=true,['<a22>']=true,['<a23>']=true,['<a24>']=true,['<a25>']=true,['<st>']=true,
+	['<stnpc>']=true,['<stal>']=true,['<stpc>']=true,['<stpt>']=true}
+
+avatar_element = {Ifrit='Fire',Titan='Earth',Leviathan='Water',Garuda='Wind',Shiva='Ice',Ramuh='Lightning',Carbuncle='Light',
 	Diabolos='Dark',Fenrir='Dark',['Fire Elemental']='Fire',['Earth Elemental']='Earth',['Water Elemental']='Water',
-	['Wind Elemental']='Wind',['Ice Elemental']='Ice',['Lightning Elemental']='Thunder',['Light Elemental']='Light',
+	['Wind Elemental']='Wind',['Ice Elemental']='Ice',['Lightning Elemental']='Lightning',['Light Elemental']='Light',
 	['Dark Elemental']='Dark'}
 encumbrance_map = {0x79,0x7F,0x7F,0x7A,0x7B,0x7C,0x7D,0x7D,0x7A,0x7E,0x80,0x80,0x80,0x80,0x7E}
 encumbrance_map[0] = 0x79 -- Slots mapped onto encumbrance byte values.
@@ -258,6 +261,7 @@ _global.cast_delay = 0
 _global.storedtarget = ''
 _global.cancel_spell = false
 _global.midaction = false
+_global.pet_midaction = false
 _global.current_event = 'None'
 
 _settings = {}
@@ -282,7 +286,7 @@ pet = make_user_table()
 pet.isvalid = false
 fellow = make_user_table()
 fellow.isvalid = false
-st_targs = T{'<st>','<stpc>','<stal>','<stnpc>','<stpt>'}
+st_targs = {['<st>']=true,['<stpc>']=true,['<stal>']=true,['<stnpc>']=true,['<stpt>']=true}
 current_job_file = nil
 disable_table = {false,false,false,false,false,false,false,false,false,false,false,false,false,false,false}
 outgoing_action_category_table = {['/ma']=3,['/ws']=7,['/ja']=9,['/ra']=16,['/ms']=25}

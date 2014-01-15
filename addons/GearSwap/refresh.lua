@@ -86,7 +86,7 @@ function load_user_files(job_id)
 		force_send=force_send, change_target=change_target, cast_delay=cast_delay,
 		print_set=print_set,set_combine=set_combine,disable=disable,enable=enable,
 		send_command=send_cmd_user,windower=user_windower,include=include_user,
-		midaction=user_midaction,
+		midaction=user_midaction,pet_midaction=user_pet_midaction,
 		
 		-- Library functions
 		string=string,math=math,table=table,set=set,list=list,T=T,S=S,L=L,os=os,
@@ -334,8 +334,8 @@ function refresh_ffxi_info()
 		world.weather = 'Ice'
 		world.weather_element = 'Ice'
 	elseif buffactive.thunderstorm then
-		world.weather = 'Thunder'
-		world.weather_element = 'Thunder'
+		world.weather = 'Lightning'
+		world.weather_element = 'Lightning'
 	end
 end
 
@@ -409,24 +409,42 @@ end
 -----------------------------------------------------------------------------------
 --Returns:
 ---- retarr (table)
----- retarr is indexed by the string buff name and has a value equal to the number
----- of that string present in the buff array. So two marches would give
----- retarr.izhiikoh==1.
+---- retarr is indexed by the item name, and contains a table with the
+---- item id, count, and short name.  If the long name for the item is
+---- different than the short name, an additional entry is added for
+---- that.
+----
+---- Overall, this allows doing simple existance checks for both short
+---- and long name (eg: player.inventory["Theo. Cap +1"] and
+---- player.inventory["Theopany Cap +1"] both return the same table,
+---- and both would be 'true' in a conditional check)), and get the item
+---- count (player.inventory["Orichalc. Bullet"].count)
+---- It also allows one to check for the alternate spelling of an item.
 -----------------------------------------------------------------------------------
 function refresh_item_list(itemlist)
 	retarr = make_user_table()
 	for i,v in pairs(itemlist) do
 		if v.id and v.id ~= 0 then
+			-- If we don't already have the primary item name in the table, add it.
 			if not retarr[r_items[v.id][language]] then
-				retarr[r_items[v.id][language]] = v.count
+				-- We add the entry as a sub-table containing the id and count
+				retarr[r_items[v.id][language]] = {id=v.id, count=v.count, shortname=r_items[v.id][language]:lower()}
+				-- If a long version of the name exists, and is different from the short version,
+				-- add the long name to the info table and point the long name's key at that table.
+				if r_items[v.id][language..'_log'] and r_items[v.id][language..'_log']:lower() ~= r_items[v.id][language]:lower() then
+					retarr[r_items[v.id][language]].longname = r_items[v.id][language..'_log']:lower()
+					retarr[r_items[v.id][language..'_log']] = retarr[r_items[v.id][language]]
+				end
 			else
-				retarr[r_items[v.id][language]] = retarr[r_items[v.id][language]] + v.count
+				-- If there's already an entry for this item, all the hard work has already
+				-- been done.  Just update the count on the subtable of the main item, and
+				-- everything else will link together.
+				retarr[r_items[v.id][language]].count = retarr[r_items[v.id][language]].count + v.count
 			end
 		end
 	end
 	return retarr
 end
-
 
 -----------------------------------------------------------------------------------
 --Name: refresh_user_env()

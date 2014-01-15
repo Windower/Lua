@@ -31,7 +31,7 @@ function valid_target(targ)
 	local spelltarget = {}
 	
 	local spell_targ
-	if pass_through_targs:contains(targ) then
+	if pass_through_targs[targ] then
 		local j = windower.ffxi.get_mob_by_target(targ)
 		
 		if j then spelltarget = target_complete(j) end

@@ -57,6 +57,7 @@ windower.register_event('outgoing text',function(original,modified)
 	if command_list[command] and temptarg and (validabils[language][unify_prefix[command]][abil] or unify_prefix[command]=='/ra') then
 		if st_flag then
 			st_flag = nil
+			return true
 		elseif temp_mob_arr then
 			if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) temp_mod: '..temp_mod) end
 			if clocking then out_time = os.clock() end
@@ -100,7 +101,7 @@ windower.register_event('outgoing text',function(original,modified)
 				out_arr[inde].proposed_packet = assemble_action_packet(spell.target.id,spell.target.index,outgoing_action_category_table[unify_prefix[spell.prefix]],id)
 				if out_arr[inde].proposed_packet then
 					equip_sets('precast',inde,spell)
-					return ''
+					return true
 				end
 			else
 				return equip_sets('pretarget',nil,spell)
@@ -200,7 +201,7 @@ function inc_action(act)
 			equip_sets(prefix..'aftercast',inde,spell)
 		end
 	elseif readies[act.category] and prefix == 'pet_' and act.targets[1].actions[1].message ~= 0 then -- Entry for pet midcast. Excludes the second packet of "Out of range" BPs.
-		mk_out_arr_entry(spell,{target_id==spell.target.id},nil)
+		inde = mk_out_arr_entry(spell,{target_id==spell.target.id},nil)
 		refresh_globals()
 		equip_sets('pet_midcast',inde,spell)
 	end
