@@ -59,8 +59,36 @@ end)
 windower.register_event('logout',function() _char = nil end)
 
 windower.register_event('incoming chunk',function (id, data)
-    if id == 0x5e then 
-        zone_reset = 0
+    if id == 0x0a then
+        if not _char then return end
+        local _ignore = data:sub(1,68)
+        local self = T{ Face = data:byte(69), Race = data:byte(70), 
+                        Head = data:byte(71) + 256*data:byte(72),
+                        Body = data:byte(73) + 256*data:byte(74),
+                        Hands = data:byte(75) + 256*data:byte(76),
+                        Legs = data:byte(77) + 256*data:byte(78),
+                        Feet = data:byte(79) + 256*data:byte(80),
+                        Main = data:byte(81) + 256*data:byte(82),
+                        Sub = data:byte(83) + 256*data:byte(84),
+                        Ranged = data:byte(85) + 256*data:byte(86),
+                        }
+        local _end = data:sub(87)
+        
+        for k,v in pairs(self) do
+            if S{"Face","Race","Head","Body","Hands","Legs","Feet","Main","Sub","Ranged"}:contains(k) and v ~= 0 then
+                if settings[_char][k:lower()] then
+                    self[k] = Int2LE(settings[_char][k:lower()],k)
+                elseif table.containskey(settings.replacements[k:lower()],tostring(v)) then
+                    self[k] = Int2LE(settings.replacements[k:lower()][tostring(v)],k)
+                else
+                    self[k] = Int2LE(v,k)
+                end
+            end
+        end  
+            
+        return  _ignore..self["Face"]..self["Race"]..self["Head"]..self["Body"]..self["Hands"]..
+                      self["Legs"]..self["Feet"]..self["Main"]..self["Sub"]..self["Ranged"].._end
+    
     elseif id == 0x51 then
         if not _char then return end
         
@@ -89,18 +117,13 @@ windower.register_event('incoming chunk',function (id, data)
             end
         end
             
-        self_Build =  _ignore..self["Face"]..self["Race"]..self["Head"]..self["Body"]..self["Hands"]..
-                      self["Legs"]..self["Feet"]..self["Main"]..self["Sub"]..self["Ranged"].._end
-            
         local blink_type = windower.ffxi.get_player().autorun and "follow" or "self"
-            if zone_reset > 1 then
-                self_Build = blink_logic(self_Build,blink_type,windower.ffxi.get_player().index)
-            else
-                zone_reset = zone_reset + 1
-            end
+        block = blink_logic(blink_type,windower.ffxi.get_player().index)
+        
         -- Model ID 0xFFFF in ranged slot signifies a monster. This prevents undesired results.
         if self["Ranged"] ~= string.char(0xFF,0xFF) then
-            return self_Build
+            return block or _ignore..self["Face"]..self["Race"]..self["Head"]..self["Body"]..self["Hands"]..
+                      self["Legs"]..self["Feet"]..self["Main"]..self["Sub"]..self["Ranged"].._end
         end
     elseif id == 0x00d then
                        
@@ -120,6 +143,7 @@ windower.register_event('incoming chunk',function (id, data)
             local _Index = data:byte(9) + 256*data:byte(10)
             local character = windower.ffxi.get_mob_by_index(_Index)
             local blink_type = "others"
+            local block = false
             local return_packet = false
             -- Name is used to check for custom model settings, blink_type is similar but passes arguments to blink logic.
             
@@ -156,18 +180,14 @@ windower.register_event('incoming chunk',function (id, data)
                         pc[k] = Int2LE(v,k)
                     end
                 end
-            end
-            
-            local pc_Build = _ignore..pc["Face"]..pc["Race"]..pc["Head"]..pc["Body"]..pc["Hands"]..
-                       pc["Legs"]..pc["Feet"]..pc["Main"]..pc["Sub"]..pc["Ranged"].._end
-    
+            end    
             
             --Begin blinking region
             
             if character then
                 if model_mask:contains(data:byte(11)) then
-                    pc_Build = blink_logic(pc_Build,blink_type,character.index)
-                    if pc_Build == true then return_packet = true end
+                    block = blink_logic(blink_type,character.index)
+                    if block == true then return_packet = true end
                 end
             end
             
@@ -175,7 +195,8 @@ windower.register_event('incoming chunk',function (id, data)
             
             -- Prevents superfluous returning of the PC Update packet by only doing so if the requirements are flagged
             if return_packet and pc["Ranged"] ~= string.char(0xFF,0xFF) then
-                return pc_Build
+                return block or _ignore..pc["Face"]..pc["Race"]..pc["Head"]..pc["Body"]..pc["Hands"]..
+                       pc["Legs"]..pc["Feet"]..pc["Main"]..pc["Sub"]..pc["Ranged"].._end
             end
     end
 end
