@@ -271,6 +271,18 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
 			refresh_globals()
 			equip_sets('equip_command',nil,tab)
 		end
+	elseif id == 0x067 and not injected then
+		local flag_1 = data:byte(5)
+		local flag_2 = data:byte(6)
+		local owner_ind = data:byte(14)*256+data:byte(13)
+		local subj_ind = data:byte(8)*256+data:byte(7)
+		if flag_1 == 3 and flag_2 == 5 and windower.ffxi.get_player().index == owner_ind then
+			refresh_globals()
+			equip_sets('pet_gain',nil,pet,true)
+		elseif flag_1 == 4 and flag_2 == 5 and windower.ffxi.get_player().index == subj_ind then
+			refresh_globals()
+			equip_sets('pet_gain',nil,pet,false)
+		end
 	elseif gearswap_disabled then
 		return
 	elseif id == 0x050 and not injected then
