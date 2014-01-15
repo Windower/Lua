@@ -467,7 +467,17 @@ fields.incoming[0x00A] = L{
     {ctype='unsigned int',      label='Timestamp 2',        fn=time},           -- 3C
     {ctype='unsigned short',    label='Zone ID MH',         fn=zone},           -- 40   Zone ID when zoning out of MH, otherwise 0
     {ctype='unsigned short',    label='_dupe_Zone ID',      fn=zone},           -- 42
-    {ctype='char[36]',          label='_unknown3'},                             -- 44
+    {ctype='unsigned char',     label='Race'},                                  -- 44
+    {ctype='unsigned char',     label='Face'},                                  -- 45
+    {ctype='unsigned short',    label='Head'},                                  -- 46
+    {ctype='unsigned short',    label='Body'},                                  -- 48
+    {ctype='unsigned short',    label='Hands'},                                 -- 4A
+    {ctype='unsigned short',    label='Legs'},                                  -- 4C
+    {ctype='unsigned short',    label='Feet'},                                  -- 4E
+    {ctype='unsigned short',    label='Main'},                                  -- 50
+    {ctype='unsigned short',    label='Sub'},                                   -- 52
+    {ctype='unsigned short',    label='Ranged'},                                -- 54
+    {ctype='char[18]',          label='_unknown3'},                             -- 56
     {ctype='unsigned short',    label='Weather ID',         fn=weather},        -- 68
     {ctype='unsigned short',    label='_unknown4',          fn=weather},        -- 6A
     {ctype='char[24]',          label='_unknown5'},                             -- 6C
