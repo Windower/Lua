@@ -354,26 +354,51 @@ end
 ---- to the individual subtables (total number of people in each party.
 -----------------------------------------------------------------------------------
 function refresh_group_info()
-	local temp_alliance = {[1]={count=0},[2]={count=0},[3]={count=0}}
+	clean_alliance()
+	
 	local j = windower.ffxi.get_party() or {}
 	for i,v in pairs(j) do
 		if v.mob and v.mob.race then
 			v.mob.race_id = v.mob.race
 			v.mob.race = mob_table_races[v.mob.race]
 		end
+		
+		local allyIndex
+		local partyIndex
+		
+		-- For 'p#', ally index is 1, party index is the second char
 		if i:sub(1,1) == 'p' then
-			temp_alliance[1][tonumber(i:sub(2))+1] = v
-			temp_alliance[1].count = temp_alliance[1].count +1
-		elseif i:sub(1,2) == 'a1' then
-			temp_alliance[2][tonumber(i:sub(3))+1] = v
-			temp_alliance[2].count = temp_alliance[2].count +1
-		elseif i:sub(1,2) == 'a2' then
-			temp_alliance[3][tonumber(i:sub(3))+1] = v
-			temp_alliance[3].count = temp_alliance[3].count +1
+			allyIndex = 1
+			partyIndex = tonumber(i:sub(2))+1
+		-- For 'a##', ally index is the second char, party index is the third char
+		else
+			allyIndex = tonumber(i:sub(2,2))+1
+			partyIndex = tonumber(i:sub(3))+1
 		end
+		
+		alliance[allyIndex][partyIndex] = v
+		alliance[allyIndex].count = alliance[allyIndex].count + 1
+		alliance.count = alliance.count + 1
 	end
-	table.reassign(alliance,temp_alliance)
-	alliance.count = temp_alliance[1].count + temp_alliance[2].count + temp_alliance[3].count
+end
+
+-- Cleans the current alliance array while keeping the subtable pointers intact.
+function clean_alliance()
+	if not alliance or #alliance == 0 then
+		alliance = make_user_table()
+		alliance[1]={count=0}
+		alliance[2]={count=0}
+		alliance[3]={count=0}
+		alliance.count=0
+	else
+		for ally_party = 1,3 do
+			for i,v in pairs(alliance[ally_party]) do
+				alliance[ally_party][i] = nil
+			end
+			alliance[ally_party].count = 0
+		end
+		alliance.count = 0
+	end
 end
 
 -----------------------------------------------------------------------------------
