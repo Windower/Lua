@@ -361,7 +361,7 @@ function refresh_group_info()
 			v.mob.race_id = v.mob.race
 			v.mob.race = mob_table_races[v.mob.race]
 		end
-		if i:sub(1) == 'p' then
+		if i:sub(1,1) == 'p' then
 			temp_alliance[1][tonumber(i:sub(2))+1] = v
 			temp_alliance[1].count = temp_alliance[1].count +1
 		elseif i:sub(1,2) == 'a1' then
