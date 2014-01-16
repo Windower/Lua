@@ -1,5 +1,5 @@
 -------------------------------------------------
-GearSwap 0.818 - Added call_user_event() user function. Added pet_acquired() user event.
+GearSwap 0.818 - Added call_user_event() user function. Added pet_change() user event.
 -------------------------------------------------
 GearSwap 0.817 - Added filtering to //gs validate. Added pet_midcast() user function.
 -------------------------------------------------
