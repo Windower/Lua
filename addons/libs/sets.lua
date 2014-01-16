@@ -249,7 +249,7 @@ function set.concat(s, str)
     local res = ''
 
     for el in pairs(s) do
-        res = res..tostring(s)
+        res = res..tostring(el)
         if next(s, el) then
             res = res..str
         end
