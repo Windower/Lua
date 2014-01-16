@@ -122,6 +122,7 @@ windower.register_event('addon command',function (...)
 		export_set(splitup)
 	elseif splitup[1]:lower() == 'validate' then
 		if user_env and user_env.sets then
+			refresh_globals()
 			table.remove(splitup, 1)
 			validate(splitup)
 		else
