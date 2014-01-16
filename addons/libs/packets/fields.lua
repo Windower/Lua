@@ -1123,15 +1123,20 @@ fields.incoming[0x067] = L{
 -- the 16 byte name field. 40 Appears to be for players, although it's 36 when summoning a pet.
 -- _unknown1 is 02 09 for players and 03 05 for NPCs, unless players summon a pet, then it's
 -- 44 07. The use of this packet is unclear.
+-- 44 07 or 44 06 or 84 07 all update pet TP and use the below mapping. They do not update Owner Index
+-- 84 07 appears to be reserved for pets with long names.
+-- 03 05 is sent when summoning pets, Trust NPCs, etc.
+-- 04 05 is sent when releasing pets (unknown for Trust NPCs)
     {ctype='unsigned char',     label='Mask_1'},                                -- 04
     {ctype='unsigned char',     label='Mask_2'},                                -- 05
-    {ctype='unsigned short',    label='Pet Index',       fn=index},             -- 06
-    {ctype='unsigned int',      label='Pet ID',          fn=id},                -- 08
+    {ctype='unsigned short',    label='Pet Index',          fn=index},          -- 06
+    {ctype='unsigned int',      label='Pet ID',             fn=id},             -- 08
     {ctype='unsigned short',    label='Owner Index',        fn=index},          -- 0C
     {ctype='unsigned char',     label='Current HP%'},                           -- 0E  -- Set in 44 06 packet
     {ctype='unsigned char',     label='Maximum HP%'},                           -- 0F  -- Set in 44 06 packet
-    {ctype='unsigned int',      label='_unknown1'},                             -- 10   Always 0?
-    {ctype='char*',             label='Pet Name'},                              -- 14  -- Set in 44 06 packet
+    {ctype='unsigned short',    label='Pet TP%'},                               -- 10  -- Multiplied by 10, set in 44 06 packet. Can take values at other times that might not be Pet TP
+    {ctype='unsigned short',    label='_unknown1'},                             -- 12
+    {ctype='char*',             label='Pet Name'},                              -- 14  -- Set in 44 06 packet. Packet expands to accommodate pet name length.
 }
 
 -- LS Message
