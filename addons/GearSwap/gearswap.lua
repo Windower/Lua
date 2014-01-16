@@ -279,10 +279,10 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
 		local subj_ind = data:byte(8)*256+data:byte(7)
 		if flag_1 == 3 and flag_2 == 5 and windower.ffxi.get_player().index == owner_ind then
 			refresh_globals()
-			equip_sets('pet_gain',nil,pet,true)
+			equip_sets('pet_change',nil,pet,true)
 		elseif flag_1 == 4 and flag_2 == 5 and windower.ffxi.get_player().index == subj_ind then
 			refresh_globals()
-			equip_sets('pet_gain',nil,pet,false)
+			equip_sets('pet_change',nil,pet,false)
 		end
 	elseif gearswap_disabled then
 		return
