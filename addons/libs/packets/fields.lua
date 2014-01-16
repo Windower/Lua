@@ -1123,13 +1123,15 @@ fields.incoming[0x067] = L{
 -- the 16 byte name field. 40 Appears to be for players, although it's 36 when summoning a pet.
 -- _unknown1 is 02 09 for players and 03 05 for NPCs, unless players summon a pet, then it's
 -- 44 07. The use of this packet is unclear.
-    {ctype='unsigned short',    label='_unknown1'},                             -- 04
-    {ctype='unsigned short',    label='Player Index',       fn=index},          -- 06
-    {ctype='unsigned int',      label='Player ID',          fn=id},             -- 08
-    {ctype='unsigned short',    label='Other Index',        fn=index},          -- 0C
-    {ctype='unsigned short',    label='_unknown2'},                             -- 0E
-    {ctype='unsigned int',      label='_unknown3'},                             -- 10   Always 0?
-    {ctype='char*',             label='Other Name'},                            -- 14
+    {ctype='unsigned char',     label='Mask_1'},                                -- 04
+    {ctype='unsigned char',     label='Mask_2'},                                -- 05
+    {ctype='unsigned short',    label='Pet Index',       fn=index},             -- 06
+    {ctype='unsigned int',      label='Pet ID',          fn=id},                -- 08
+    {ctype='unsigned short',    label='Owner Index',        fn=index},          -- 0C
+    {ctype='unsigned char',     label='Current HP%'},                           -- 0E  -- Set in 44 06 packet
+    {ctype='unsigned char',     label='Maximum HP%'},                           -- 0F  -- Set in 44 06 packet
+    {ctype='unsigned int',      label='_unknown1'},                             -- 10   Always 0?
+    {ctype='char*',             label='Pet Name'},                              -- 14  -- Set in 44 06 packet
 }
 
 -- LS Message
