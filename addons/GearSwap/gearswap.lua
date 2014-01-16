@@ -277,9 +277,22 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
 		local flag_2 = data:byte(6)
 		local owner_ind = data:byte(14)*256+data:byte(13)
 		local subj_ind = data:byte(8)*256+data:byte(7)
+		if windower.ffxi.get_player().index == owner_ind or windower.ffxi.get_player().index == subj_ind then windower.add_to_chat(8,flag_2..' '..flag_1) end
 		if flag_1 == 3 and flag_2 == 5 and windower.ffxi.get_player().index == owner_ind then
-			refresh_globals()
-			equip_sets('pet_change',nil,pet,true)
+			if not pet.is_valid then
+				refresh_globals()
+				table.reassign(pet,target_complete(windower.ffxi.get_mob_by_index(subj_ind)))
+				pet.isvalid = true
+				pet.claim_id = nil
+				pet.is_npc = nil
+				if pet.tp then pet.tp = pet.tp/10 end
+				if avatar_element[pet.name] then
+					pet.element = avatar_element[pet.name]
+				else
+					pet.element = 'None'
+				end
+				equip_sets('pet_change',nil,pet,true)
+			end
 		elseif flag_1 == 4 and flag_2 == 5 and windower.ffxi.get_player().index == subj_ind then
 			refresh_globals()
 			equip_sets('pet_change',nil,pet,false)
