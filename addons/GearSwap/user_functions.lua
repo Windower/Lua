@@ -256,6 +256,10 @@ function user_pet_midaction(bool)
 	return false
 end
 
+function user_equip_sets(name,...)
+	equip_sets(name,nil,...)
+end
+
 
 -- Define the user windower functions.
 user_windower = {register_event = register_event_user, unregister_event = unregister_event_user, send_command = send_cmd_user}

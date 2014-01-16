@@ -40,7 +40,10 @@
 ---- pretarget : empty string to blank packet or full string
 ---- Everything else : nil
 -----------------------------------------------------------------------------------
-function equip_sets(swap_type,ind,val1,val2)
+function equip_sets(swap_type,ind,...)
+	local var_inps = {...}
+	local val1 = var_inps[1]
+	local val2 = var_inps[2]
 	load_globals(ind)
 	if debugging >= 1 then windower.debug(swap_type..' enter') 
 	if showphase then windower.add_to_chat(8,swap_type..' enter') end end
@@ -90,7 +93,7 @@ function equip_sets(swap_type,ind,val1,val2)
 	if swap_type == 'equip_command' then
 		equip(val1)
 	else
-		user_pcall(swap_type,val1,val2)
+		user_pcall(swap_type,unpack(var_inps))
 	end
 	
 	
@@ -210,10 +213,10 @@ end
 --Returns:
 ---- none
 -----------------------------------------------------------------------------------
-function user_pcall(str,val1,val2)
+function user_pcall(str,...)
 	if user_env then
 		if type(user_env[str]) == 'function' then
-			user_env[str](val1,val2)
+			user_env[str](...)
 		elseif user_env[str] then
 			windower.add_to_chat(123,'GearSwap: '..str..'() exists but is not a function')
 		end

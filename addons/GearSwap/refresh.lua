@@ -86,7 +86,7 @@ function load_user_files(job_id)
 		force_send=force_send, change_target=change_target, cast_delay=cast_delay,
 		print_set=print_set,set_combine=set_combine,disable=disable,enable=enable,
 		send_command=send_cmd_user,windower=user_windower,include=include_user,
-		midaction=user_midaction,pet_midaction=user_pet_midaction,
+		midaction=user_midaction,pet_midaction=user_pet_midaction,call_user_event=user_equip_sets,
 		
 		-- Library functions
 		string=string,math=math,table=table,set=set,list=list,T=T,S=S,L=L,os=os,
