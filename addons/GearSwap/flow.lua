@@ -103,6 +103,8 @@ function equip_sets(swap_type,ind,...)
 		_global.midaction = true
 	elseif swap_type == 'aftercast' then
 		_global.midaction = false
+	elseif swap_type == 'pet_aftercast' then
+		_global.pet_midaction = false
 	end
 	
 	
