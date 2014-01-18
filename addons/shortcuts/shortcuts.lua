@@ -89,7 +89,7 @@ windower.register_event('outgoing text',function(original,modified)
 	if debugging then 
 		local tempst = windower.ffxi.get_mob_by_target('st')
 		windower.add_to_chat(8,modified..' '..tostring(tempst))
-		end
+	end
 	temp_org = temp_org:gsub(' <wait %d+>','')
 	if logging then
 		logfile:write('\n\n',tostring(os.clock()),'temp_org: ',temp_org,'\nModified: ',modified)
@@ -135,6 +135,10 @@ function command_logic(original,modified)
 	local command = splitline[1] -- Treat the first word as a command.
 	local potential_targ = splitline[#splitline]
 	local a,b,spell = string.find(original,'"(.-)"')
+	
+	if unhandled_list[command] then
+		return modified
+	end
 	
 	if spell then
 		spell = spell:lower()

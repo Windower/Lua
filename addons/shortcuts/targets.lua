@@ -75,7 +75,7 @@ function valid_target(targ,flag)
 			-- If targ starts an element of the monster array, use it.
 			local min_dist = 50
 			for i,v in pairs(targar) do
-				if (i:lower()==san_targ:lower() or i:lower():find('^'..san_targ:lower())) then
+				if (i:lower()==san_targ:lower()) then-- or i:lower():find('^'..san_targ:lower())) then
 					spell_targ = i
 					break
 				end
