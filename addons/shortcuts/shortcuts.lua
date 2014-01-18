@@ -158,7 +158,11 @@ function command_logic(original,modified)
 		
 		if command2_list[command]==true then -- If there are not any excluded secondary commands
 			local temptarg = valid_target(potential_targ) or target_make({['Player']=true,['Enemy']=true,['Party']=true,['Ally']=true,['NPC']=true,['Self']=true,['Corpse']=true}) -- Complete the target or make one.
-			lastsent = command..' '..temptarg -- Push the command and target together and send it out.
+			if temptarg ~= '<me>' then -- These commands, like emotes, check, etc., don't need to default to <me>
+				lastsent = command..' '..temptarg -- Push the command and target together and send it out.
+			else
+				lastsent = command
+			end
 			if debugging then windower.add_to_chat(8,tostring(counter)..' input '..lastsent) end
 			if logging then
 				logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\n(162) ',lastsent) 	
