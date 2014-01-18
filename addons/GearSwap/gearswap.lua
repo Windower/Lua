@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.817'
+_addon.version = '0.818'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -122,6 +122,7 @@ windower.register_event('addon command',function (...)
 		export_set(splitup)
 	elseif splitup[1]:lower() == 'validate' then
 		if user_env and user_env.sets then
+			refresh_globals()
 			table.remove(splitup, 1)
 			validate(splitup)
 		else
@@ -270,6 +271,33 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
 		if table.length(tab) > 0 then
 			refresh_globals()
 			equip_sets('equip_command',nil,tab)
+		end
+	elseif id == 0x067 and not injected then
+		local flag_1 = data:byte(5)
+		local flag_2 = data:byte(6)
+		local owner_ind = data:byte(14)*256+data:byte(13)
+		local subj_ind = data:byte(8)*256+data:byte(7)
+	--	if debugging >= 1 and (windower.ffxi.get_player().index == owner_ind or windower.ffxi.get_player().index == subj_ind) then windower.add_to_chat(8,flag_2..' '..flag_1) end
+		if flag_1 == 3 and flag_2 == 5 and windower.ffxi.get_player().index == owner_ind then
+			local temp_mob = windower.ffxi.get_mob_by_index(subj_ind)
+			if temp_mob then
+				refresh_globals()
+				table.reassign(pet,target_complete(temp_mob))
+				pet.isvalid = true
+				pet.claim_id = nil
+				pet.is_npc = nil
+				if pet.tp then pet.tp = pet.tp/10 end
+				if avatar_element[pet.name] then
+					pet.element = avatar_element[pet.name]
+				else
+					pet.element = 'None'
+				end
+				equip_sets('pet_change',nil,pet,true)
+			end
+		elseif flag_1 == 4 and flag_2 == 5 and windower.ffxi.get_player().index == subj_ind then
+			refresh_globals()
+			pet.isvalid = false
+			equip_sets('pet_change',nil,pet,false)
 		end
 	elseif gearswap_disabled then
 		return

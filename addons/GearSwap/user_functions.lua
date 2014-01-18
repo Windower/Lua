@@ -188,14 +188,26 @@ function send_cmd_user(command)
 end
 
 function register_event_user(str,func)
-	local id = windower.register_event(str,func)
-	rawset(registered_user_events,id,true)
+	if type(func)~='function' then
+		error('\nGearSwap: windower.register_event() was passed an invalid value ('..tostring(func)..'). (must be a function)', 2)
+	elseif type(str) ~= 'string' then
+		error('\nGearSwap: windower.register_event() was passed an invalid value ('..tostring(str)..'). (must be a string)', 2)
+	end
+	local id = windower.register_event(str,user_equip_sets(func))
+	registered_user_events[id] = true
 	return id
 end
 
 function unregister_event_user(id)
+	if type(id)~='number' then
+		error('\nGearSwap: windower.unregister_event() was passed an invalid value ('..tostring(id)..'). (must be a number)', 2)
+	end
 	windower.unregister_event(id)
-	rawset(registered_user_events,id,nil)
+	registered_user_events[id] = nil
+end
+
+function user_equip_sets(func)
+	return setfenv(function(...) equip_sets(func,nil,...) end,user_env)
 end
 
 function include_user(str)

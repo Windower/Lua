@@ -490,7 +490,7 @@ function find_usable_item(item_id)
 	for i,v in pairs(items.temporary) do
 		if v and v.id == item_id then
 			inventory_index = i
-			bag_id = 4
+			bag_id = 3
 			break
 		end
 	end

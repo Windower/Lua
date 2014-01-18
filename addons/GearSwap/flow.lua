@@ -40,11 +40,14 @@
 ---- pretarget : empty string to blank packet or full string
 ---- Everything else : nil
 -----------------------------------------------------------------------------------
-function equip_sets(swap_type,ind,val1,val2)
+function equip_sets(swap_type,ind,...)
+	local var_inps = {...}
+	local val1 = var_inps[1]
+	local val2 = var_inps[2]
 	load_globals(ind)
-	if debugging >= 1 then windower.debug(swap_type..' enter') 
-	if showphase then windower.add_to_chat(8,swap_type..' enter') end end
-	_global.current_event = swap_type
+	if debugging >= 1 then windower.debug(tostring(swap_type)..' enter') 
+	if showphase then windower.add_to_chat(8,tostring(swap_type)..' enter') end end
+	_global.current_event = tostring(swap_type)
 	
 	local cur_equip = get_gs_gear(items.equipment,swap_type)
 	
@@ -82,24 +85,28 @@ function equip_sets(swap_type,ind,val1,val2)
 		end
 	end
 	
-	if swap_type == 'pet_midcast' then
+	if type(swap_type) == 'string' and swap_type == 'pet_midcast' then
 		_global.pet_midaction = true
 	end
 
 	
-	if swap_type == 'equip_command' then
+	if type(swap_type) == 'function' then
+		swap_type(...)
+	elseif swap_type == 'equip_command' then
 		equip(val1)
 	else
-		user_pcall(swap_type,val1,val2)
+		user_pcall(swap_type,...)
 	end
 	
 	
-	if swap_type == 'pretarget' then -- Target may just have been changed, so make the ind now.
+	if type(swap_type) == 'string' and swap_type == 'pretarget' then -- Target may just have been changed, so make the ind now.
 		ind = mk_out_arr_entry(val1,{target_id=spell.target.id},nil)
-	elseif swap_type == 'precast' then
+	elseif type(swap_type) == 'string' and swap_type == 'precast' then
 		_global.midaction = true
-	elseif swap_type == 'aftercast' then
+	elseif type(swap_type) == 'string' and swap_type == 'aftercast' then
 		_global.midaction = false
+	elseif type(swap_type) == 'string' and swap_type == 'pet_aftercast' then
+		_global.pet_midaction = false
 	end
 	
 	
@@ -118,7 +125,7 @@ function equip_sets(swap_type,ind,val1,val2)
 		
 		if _settings.show_swaps and table.length(equip_next)>0 then
 			local tempset = to_names_set(equip_next,items.inventory)
-			print_set(tempset,swap_type)
+			print_set(tempset,tostring(swap_type))
 		end
 		
 		local failure_reason
@@ -154,7 +161,7 @@ function equip_sets(swap_type,ind,val1,val2)
 		end
 	end
 	
-	if debugging >= 1 then windower.debug(swap_type..' exit') end
+	if debugging >= 1 then windower.debug(tostring(swap_type)..' exit') end
 	
 	return equip_sets_exit(swap_type,ind,val1,val2)
 end
@@ -174,29 +181,33 @@ end
 -----------------------------------------------------------------------------------
 function equip_sets_exit(swap_type,ind,val1,val2)
 	cache_globals(ind)
-	if swap_type == 'pretarget' then
-		command_send_check(ind)
-		if out_arr[ind] and val1.target and st_targs[val1.target.raw] then
-		-- st targets
-			st_flag = true
-		elseif out_arr[ind] and val1.target and not val1.target.name then
-		-- Spells with invalid pass_through_targs, like using <t> without a target
-			out_arr[ind] = nil
-		elseif out_arr[ind] and val1.target and val1.target.name then
-		-- Spells with complete target information
-			equip_sets('precast',ind,val1,val2)
-			return true
+	if type(swap_type) == 'string' then
+		if swap_type == 'pretarget' then
+			command_send_check(ind)
+			if out_arr[ind] and val1.target and st_targs[val1.target.raw] then
+			-- st targets
+				st_flag = true
+			elseif out_arr[ind] and val1.target and not val1.target.name then
+			-- Spells with invalid pass_through_targs, like using <t> without a target
+				out_arr[ind] = nil
+			elseif out_arr[ind] and val1.target and val1.target.name then
+			-- Spells with complete target information
+				equip_sets('precast',ind,val1,val2)
+				return true
+			end
+			if storedcommand then
+				local tempcmd = storedcommand..' '..spell.target.raw
+				storedcommand = nil
+				if debugging >= 1 or _global.debugmode then windower.add_to_chat(8,'GearSwap (Debug): Unable to create a packet for this command or action canceled ('..tempcmd..')') end
+				return tempcmd
+			elseif not storedcommand and not out_arr[ind] then
+				return true
+			end
+		elseif swap_type == 'precast' then
+			packet_send_check(ind)
+		elseif swap_type == 'aftercast' then
+			d_out_arr_entry(val1,ind)
 		end
-		if storedcommand then
-			local tempcmd = storedcommand..' '..spell.target.raw
-			storedcommand = nil
-			if debugging >= 1 or _global.debugmode then windower.add_to_chat(8,'GearSwap (Debug): Unable to create a packet for this command or action canceled ('..tempcmd..')') end
-			return tempcmd
-		end
-	elseif swap_type == 'precast' then
-		packet_send_check(ind)
-	elseif swap_type == 'aftercast' then
-		d_out_arr_entry(val1,ind)
 	end
 end
 
@@ -210,10 +221,10 @@ end
 --Returns:
 ---- none
 -----------------------------------------------------------------------------------
-function user_pcall(str,val1,val2)
+function user_pcall(str,...)
 	if user_env then
 		if type(user_env[str]) == 'function' then
-			user_env[str](val1,val2)
+			user_env[str](...)
 		elseif user_env[str] then
 			windower.add_to_chat(123,'GearSwap: '..str..'() exists but is not a function')
 		end

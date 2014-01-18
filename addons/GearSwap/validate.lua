@@ -76,7 +76,7 @@ end
 function validate_sets(filter)
 	local missingitems = S{}
 
-	windower.add_to_chat(123,'GearSwap: Checking for items in gear sets that are not used in your inventory.')
+	windower.add_to_chat(123,'GearSwap: Checking for items in gear sets that are not in your inventory.')
 	windower.add_to_chat(123,'           (does not detect multiple identical items or look at augments)')
 	
 	recurse_sets(sets, missingitems, filter)
@@ -95,13 +95,12 @@ function recurse_sets(tab, accum, filter, stack)
 	for i,v in pairs(tab) do
 		nam = v.name or v
 		if type(nam) == 'string' and nam ~= 'empty' then
-			if not slot_map[i:lower()] then
+			if type(i) == 'string' and not slot_map[i:lower()] then
 				windower.add_to_chat(123,'GearSwap: '..tostring(i)..' contains a "name" element but is not a valid slot.')
-			end
-			if not player.inventory[nam] and tryfilter(nam:lower(), filter) then
+			elseif not player.inventory[nam] and tryfilter(nam:lower(), filter) and type(i)=='string' and slot_map[i:lower()] then
 				accum:add(nam)
 			end
-		elseif type(nam) == 'table' then
+		elseif type(nam) == 'table' and nam ~= empty  then
 			if not stack then stack = S{} end
 
 			stack:add(tab)
