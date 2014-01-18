@@ -200,6 +200,8 @@ function equip_sets_exit(swap_type,ind,val1,val2)
 				storedcommand = nil
 				if debugging >= 1 or _global.debugmode then windower.add_to_chat(8,'GearSwap (Debug): Unable to create a packet for this command or action canceled ('..tempcmd..')') end
 				return tempcmd
+			elseif not storedcommand and not out_arr[ind] then
+				return true
 			end
 		elseif swap_type == 'precast' then
 			packet_send_check(ind)
