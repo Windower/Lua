@@ -56,6 +56,7 @@ data.outgoing[0x104] = {name='Leave Bazaar',        description='Sent when clien
 data.outgoing[0x105] = {name='View Bazaar',         description='Sent when viewing somebody\'s bazaar.'}
 data.outgoing[0x106] = {name='Buy Bazaar Item',     description='Buy an item from somebody\'s bazaar.'}
 data.outgoing[0x10A] = {name='Set Price',           description='Set the price on a bazaar item.'}
+data.outgoing[0x10F] = {name='Currency Menu',       description='Requests currency information for the menu.'}
 
 -- Server packets (incoming)
 data.incoming[0x009] = {name='Standard Message',    description='A standardized message send from FFXI.'}
@@ -122,6 +123,7 @@ data.incoming[0x0F6] = {name='Widescan Mark',       description='Marks the start
 data.incoming[0x0F9] = {name='Reraise Activation',  description='Reassigns targetable status on reraise activation?'}
 data.incoming[0x105] = {name='Data Download 4',     description='The data that is sent to the client when it is "Downloading data...".'}
 data.incoming[0x108] = {name='Data Download 5',     description='The data that is sent to the client when it is "Downloading data...".'}
+data.incoming[0x113] = {name='Currency Info',       description='Contains all currencies to be displayed in the currency menu.'}
 
 return data
 

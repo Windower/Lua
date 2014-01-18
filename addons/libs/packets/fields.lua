@@ -1123,13 +1123,20 @@ fields.incoming[0x067] = L{
 -- the 16 byte name field. 40 Appears to be for players, although it's 36 when summoning a pet.
 -- _unknown1 is 02 09 for players and 03 05 for NPCs, unless players summon a pet, then it's
 -- 44 07. The use of this packet is unclear.
-    {ctype='unsigned short',    label='_unknown1'},                             -- 04
-    {ctype='unsigned short',    label='Player Index',       fn=index},          -- 06
-    {ctype='unsigned int',      label='Player ID',          fn=id},             -- 08
-    {ctype='unsigned short',    label='Other Index',        fn=index},          -- 0C
-    {ctype='unsigned short',    label='_unknown2'},                             -- 0E
-    {ctype='unsigned int',      label='_unknown3'},                             -- 10   Always 0?
-    {ctype='char*',             label='Other Name'},                            -- 14
+-- 44 07 or 44 06 or 84 07 all update pet TP and use the below mapping. They do not update Owner Index
+-- 84 07 appears to be reserved for pets with long names.
+-- 03 05 is sent when summoning pets, Trust NPCs, etc.
+-- 04 05 is sent when releasing pets (unknown for Trust NPCs)
+    {ctype='unsigned char',     label='Mask_1'},                                -- 04
+    {ctype='unsigned char',     label='Mask_2'},                                -- 05
+    {ctype='unsigned short',    label='Pet Index',          fn=index},          -- 06
+    {ctype='unsigned int',      label='Pet ID',             fn=id},             -- 08
+    {ctype='unsigned short',    label='Owner Index',        fn=index},          -- 0C
+    {ctype='unsigned char',     label='Current HP%'},                           -- 0E  -- Set in 44 06 packet
+    {ctype='unsigned char',     label='Maximum HP%'},                           -- 0F  -- Set in 44 06 packet
+    {ctype='unsigned short',    label='Pet TP%'},                               -- 10  -- Multiplied by 10, set in 44 06 packet. Can take values at other times that might not be Pet TP
+    {ctype='unsigned short',    label='_unknown1'},                             -- 12
+    {ctype='char*',             label='Pet Name'},                              -- 14  -- Set in 44 06 packet. Packet expands to accommodate pet name length.
 }
 
 -- LS Message
@@ -1254,6 +1261,83 @@ fields.incoming[0x0F9] = L{
     {ctype='unsigned short',    label='Player Index',       fn=index},          -- 08
     {ctype='unsigned char',     label='_unknown1'},                             -- 0A
     {ctype='unsigned char',     label='_unknown2'},                             -- 0B
+}
+
+--Currency Info
+fields.incoming[0x113] = L{
+    {ctype='signed int',        label='Conquest Points (San d\'Oria)'},         -- 04
+    {ctype='signed int',        label='Conquest Points (Bastok)'},              -- 08
+    {ctype='signed int',        label='Conquest Points (Windurst)'},            -- 0C
+    {ctype='unsigned short',    label='Beastman Seals'},                        -- 10
+    {ctype='unsigned short',    label='Kindred Seals'},                         -- 12
+    {ctype='unsigned short',    label='Kindred Crests'},                        -- 14
+    {ctype='unsigned short',    label='High Kindred Crests'},                   -- 16
+    {ctype='unsigned short',    label='Sacred Kindred Crests'},                 -- 18
+    {ctype='unsigned short',    label='Ancient Beastcoins'},                    -- 1A
+    {ctype='unsigned short',    label='Valor Points'},                          -- 1C
+    {ctype='unsigned short',    label='Scylds'},                                -- 1E
+    {ctype='signed int',        label='Guild Points (Fishing)'},                -- 20
+    {ctype='signed int',        label='Guild Points (Woodworking)'},            -- 24
+    {ctype='signed int',        label='Guild Points (Smithing)'},               -- 28
+    {ctype='signed int',        label='Guild Points (Goldsmithing)'},           -- 2C
+    {ctype='signed int',        label='Guild Points (Weaving)'},                -- 30
+    {ctype='signed int',        label='Guild Points (Leathercraft)'},           -- 34
+    {ctype='signed int',        label='Guild Points (Bonecraft)'},              -- 38
+    {ctype='signed int',        label='Guild Points (Alchemy)'},                -- 3C
+    {ctype='signed int',        label='Guild Points (Cooking)'},                -- 40
+    {ctype='signed int',        label='Cinders'},                               -- 44
+    {ctype='unsigned char',     label='Syngery Fewell (Fire)'},                 -- 48
+    {ctype='unsigned char',     label='Syngery Fewell (Ice)'},                  -- 49
+    {ctype='unsigned char',     label='Syngery Fewell (Wind)'},                 -- 4A
+    {ctype='unsigned char',     label='Syngery Fewell (Earth)'},                -- 4B
+    {ctype='unsigned char',     label='Syngery Fewell (Lightning)'},            -- 4C
+    {ctype='unsigned char',     label='Syngery Fewell (Water)'},                -- 4D
+    {ctype='unsigned char',     label='Syngery Fewell (Light)'},                -- 4E
+    {ctype='unsigned char',     label='Syngery Fewell (Dark)'},                 -- 4F
+    {ctype='signed int',        label='Ballista Points'},                       -- 50
+    {ctype='signed int',        label='Fellow Points'},                         -- 54
+    {ctype='unsigned short',    label='Chocobucks (San d\'Oria)'},              -- 58
+    {ctype='unsigned short',    label='Chocobucks (Bastok)'},                   -- 5A
+    {ctype='unsigned short',    label='Chocobucks (Windurst)'},                 -- 5C
+    {ctype='short',             label='_unknown1'},                             -- 5E
+    {ctype='signed int',        label='Research Marks'},                        -- 60
+    {ctype='unsigned char',     label='Wizened Tunnel Worms'},                  -- 64
+    {ctype='unsigned char',     label='Wizened Morion Worms'},                  -- 65
+    {ctype='unsigned char',     label='Wizened Phantom Worms'},                 -- 66
+    {ctype='char',              label='_unknown2'},                             -- 67
+    {ctype='signed int',        label='Moblin Marbles'},                        -- 68
+    {ctype='unsigned short',    label='Infamy'},                                -- 6C
+    {ctype='unsigned short',    label='Prestige'},                              -- 6E
+    {ctype='signed int',        label='Legion Points'},                         -- 70
+    {ctype='signed int',        label='Sparks of Eminence'},                    -- 74
+    {ctype='signed int',        label='Shining Stars'},                         -- 78
+    {ctype='signed int',        label='Imperial Standing'},                     -- 7C
+    {ctype='signed int',        label='Assault Points (Leujaoam Sanctum)'},     -- 80
+    {ctype='signed int',        label='Assault Points (M.J.T.G.)'},             -- 84
+    {ctype='signed int',        label='Assault Points (Lebros Cavern)'},        -- 88
+    {ctype='signed int',        label='Assault Points (Periqia)'},              -- 8C
+    {ctype='signed int',        label='Assault Points (Ilrusi Atoll)'},         -- 90
+    {ctype='signed int',        label='Nyzul Tokens'},                          -- 94
+    {ctype='signed int',        label='Zeni'},                                  -- 98
+    {ctype='signed int',        label='Jettons'},                               -- 9C
+    {ctype='signed int',        label='Therion Ichor'},                         -- A0
+    {ctype='signed int',        label='Allied Notes'},                          -- A4
+    {ctype='signed int',        label='Bayld'},                                 -- A8
+    {ctype='unsigned short',    label='Kinetic Units'},                         -- AC
+    {ctype='short',             label='_unknown3'},                             -- AE
+    {ctype='unsigned short',    label='Obsidian Fragments'},                    -- B0
+    {ctype='short',             label='_unknown4'},                             -- B2
+    {ctype='signed int',        label='Lebondopt Wings'},                       -- B4
+    {ctype='signed int',        label='Mweya Plasm Corpuscles'},                -- B8
+    {ctype='signed int',        label='Cruor'},                                 -- BC
+    {ctype='signed int',        label='Resistance Credits'},                    -- C0
+    {ctype='signed int',        label='Dominion Notes'},                        -- C4
+    {ctype='unsigned char',     label='5th Echelon Battle Trophies'},           -- C8
+    {ctype='unsigned char',     label='4th Echelon Battle Trophies'},           -- C9
+    {ctype='unsigned char',     label='3rd Echelon Battle Trophies'},           -- CA
+    {ctype='unsigned char',     label='2nd Echelon Battle Trophies'},           -- CB
+    {ctype='unsigned char',     label='1st Echelon Battle Trophies'},           -- CC
+    {ctype='char[3]',           label='_unknown5'},                             -- CD
 }
 
 local sizes = {}

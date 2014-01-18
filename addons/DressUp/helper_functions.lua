@@ -67,19 +67,13 @@ function blink_logic(blink_type,index)
 end
 
 function Int2LE(num,number_of_bytes)
-    these_bytes = ''
+    local these_bytes = ''
 
-    if num == "RandomModel" then
-        num = random_gear(number_of_bytes:lower())
-    end
+    num = num or 0
 
-    if not num then
-        num = 0
-    end
-
-    if T{"Race","Face"}:contains(number_of_bytes) then
+    if S{"Race","Face"}:contains(number_of_bytes) then
         number_of_bytes = 1
-    elseif T{"Head","Body","Hands","Legs","Feet","Sub","Main","Ranged"}:contains(number_of_bytes) then
+    elseif S{"Head","Body","Hands","Legs","Feet","Sub","Main","Ranged"}:contains(number_of_bytes) then
         number_of_bytes = 2
     else
         number_of_bytes = number_of_bytes or 4

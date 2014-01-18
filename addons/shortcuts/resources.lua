@@ -133,6 +133,8 @@ command2_list = {['/kick']=true,['/assist']=true,['/alliancecmd']=T{'kick','add'
 	['/panic']=T{'motion'},['/point']=T{'motion'},['/praise']=T{'motion'},['/psych']=T{'motion'},['/salute']=T{'motion'},['/shocked']=T{'motion'},['/sigh']=T{'motion'},['/sit']=T{'motion'},['/slap']=T{'motion'},
 	['/smile']=T{'motion'},['/stagger']=T{'motion'},['/stare']=T{'motion'},['/sulk']=T{'motion'},['/surprised']=T{'motion'},['/think']=T{'motion'},['/toss']=T{'motion'},['/upset']=T{'motion'},['/welcome']=T{'motion'},
 	['/check']=true,['/c']=true,['/breaklinkshell']=true,['/target']=true,['/ta']=true,['/ra']=true,['/targetnpc']=true,['/follow']=true}
+	
+unhandled_list = {['/p']=true,['/s']=true,['/sh']=true,['/yell']=true,['/echo']=true,['/t']=true,['/l']=true}
 
 -- List of commands to be ignored
 ignore_list = {['/equip']=true,['/raw']=true,['/fish']=true,['/dig']=true,['/range']=true,['/map']=true,['/hide']=true,['/attackoff']=true,['/quest']=true}
