@@ -53,9 +53,9 @@ windower.register_event('load','login',function ()
         if not settings[_char] then settings[_char] = {} end
         print_blink_settings("global")
         if load_profile(windower.ffxi.get_player().main_job) then
-            update_model(windower.ffxi.get_player().index)
             notice('Loaded profile: ' .. windower.ffxi.get_player().main_job)
         end
+        update_model(windower.ffxi.get_player().index)
     end
     
 end)
