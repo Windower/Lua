@@ -261,7 +261,7 @@ function simplify_message(msg_ID)
 	local msg = dialog[msg_ID][language]
 	local fields = fieldsearch(msg)
 
-	if simplify and not T{23,140,557,674}:contains(msg_ID) then
+	if simplify and not T{23,125,129,133,139,140,153,244,453,557,593,594,595,596,597,598,599,674}:contains(msg_ID) then
 		if T{93,273,522,653,654,655,656,85,284,75,156,189,248,283,312,323,336,355,408,422,423,425,659,158,245,324,592,658}:contains(msg_ID) then
 			fields.status = true
 		end
@@ -470,9 +470,13 @@ function get_spell(act)
 		end
 		
 		if fields.item and msg_ID ~= 674 and msg_ID ~= 140 then
-			spell = r_items[abil_ID]
-			spell.name = color_it(spell['enl'],color_arr.itemcol)
-			spell.item = color_it(spell['enl'],color_arr.itemcol)
+			if T{125,593,594,595,596,597,598,599}:contains(msg_ID) then
+				spell.item = color_it(r_items[effect_val]['enl'], color_arr.itemcol)
+			else
+				spell = r_items[abil_ID]
+				spell.name = color_it(spell['enl'],color_arr.itemcol)
+				spell.item = color_it(spell['enl'],color_arr.itemcol)
+			end
 		end
 		
 		if fields.item2 then
