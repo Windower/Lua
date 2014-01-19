@@ -59,10 +59,25 @@ filter = {}
 multi_targs = {}
 multi_actor = {}
 multi_msg = {}
-line_full = '[${actor}] ${abil} < ${target} > ${numb}'
-line_nonumber = '[${actor}] ${abil} < ${target} >'
+line_aoe       = 'AOE ${numb} '..string.char(129,168)..' ${target}'
+line_aoebuff   = '${actor} ${abil} '..string.char(129,168)..' ${target} (${status})'
+line_full      = '[${actor}] ${numb} ${abil} '..string.char(129,168)..' ${target}'
+line_itemnum   = '[${actor}] ${abil} '..string.char(129,168)..' ${target} (${numb} ${item2})'
+line_item      = '[${actor}] ${abil} '..string.char(129,168)..' ${target} (${item2})'
+line_noability = '${numb} '..string.char(129,168)..' ${target}'
+line_noactor   = '${abil} ${numb} '..string.char(129,168)..' ${target}'
+line_nonumber  = '[${actor}] ${abil} '..string.char(129,168)..' ${target}'
+line_roll      = '${actor} ${abil} '..string.char(129,168)..' ${target} '..string.char(129,170)..' ${number}'
 
-default_settings_table = {line_full='[${actor}] ${numb} ${abil} '..string.char(129,168)..' ${target}',line_nonumber='[${actor}] ${abil} '..string.char(129,168)..' ${target}',
+default_settings_table = {line_aoe       = 'AOE ${numb} '..string.char(129,168)..' ${target}',
+			line_aoebuff   = '${actor} ${abil} '..string.char(129,168)..' ${target} (${status})',
+			line_full      = '[${actor}] ${numb} ${abil} '..string.char(129,168)..' ${target}',
+			line_itemnum   = '[${actor}] ${abil} '..string.char(129,168)..' ${target} (${numb} ${item2})',
+			line_item      = '[${actor}] ${abil} '..string.char(129,168)..' ${target} (${item2})',
+			line_noability = '${numb} '..string.char(129,168)..' ${target}',
+			line_noactor   = '${abil} ${numb} '..string.char(129,168)..' ${target}',
+			line_nonumber  = '[${actor}] ${abil} '..string.char(129,168)..' ${target}',
+			line_roll = '${actor} ${abil} '..string.char(129,168)..' ${target} '..string.char(129,170)..' ${number}',
 	condensedamage=true,condensetargets=true,cancelmulti=true,oxford=true,commamode=false,targetnumber=true,swingnumber=true}
 
 message_map = {}
@@ -340,10 +355,15 @@ default_settings = [[
 		<swingnumber>true</swingnumber>
         <tpstatuses>true</tpstatuses>
         <simplify>true</simplify>
-		
-		
-		<line_full>[${actor}] ${abil} &lt; ${target} &gt; ${numb}</line_full>
-		<line_nonumber>[${actor}] ${abil} &lt; ${target} &gt;</line_nonumber>
+		<line_aoe>AOE ${numb} ]]..string.char(129,168)..[[ ${target}</line_aoe>		
+		<line_aoebuff>${actor} ${abil} ]]..string.char(129,168)..[[ ${target} (${status})</line_aoebuff>
+		<line_full>[${actor}] ${numb} ${abil} ]]..string.char(129,168)..[[ ${target}</line_full>		
+		<line_item>[${actor}] ${abil} ]]..string.char(129,168)..[[ ${target} (${item2})</line_item>
+		<line_itemnum>[${actor}] ${abil} ]]..string.char(129,168)..[[ ${target} (${numb} ${item2})</line_itemnum>
+		<line_noability>${numb} ]]..string.char(129,168)..[[ ${target}</line_noability>
+		<line_noactor>${abil} ${numb} ]]..string.char(129,168)..[[ ${target}</line_noactor>
+		<line_nonumber>[${actor}] ${abil} ]]..string.char(129,168)..[[ ${target}</line_nonumber>
+		<line_roll>${actor} ${abil} ]]..string.char(129,168)..[[ ${target} ]]..string.char(129,170)..[[ ${number}</line_roll>
 	</global>
 </settings>
 ]]
