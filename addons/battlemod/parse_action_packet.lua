@@ -121,7 +121,7 @@ function parse_action_packet(act)
 				elseif m.message == 15 then m.simp_name = 'missed'
 				elseif m.message == 29 or m.message == 84 then m.simp_name = 'is paralyzed'
 				elseif m.message == 30 then m.simp_name = 'anticipated by'
-				elseif m.message == 31 then m.simp_name = 'absorbed by '
+				elseif m.message == 31 then m.simp_name = 'absorbed by'
 				elseif m.message == 32 then m.simp_name = 'dodged by'
 				elseif m.message == 67 then m.simp_name = 'critical hit'
 				elseif m.message == 106 then m.simp_name = 'intimidated by'
@@ -265,6 +265,9 @@ function simplify_message(msg_ID)
 		if T{93,273,522,653,654,655,656,85,284,75,156,189,248,283,312,323,336,355,408,422,423,425,659,158,245,324,592,658}:contains(msg_ID) then
 			fields.status = true
 		end
+		if msg_ID == 31 then
+			fields.actor = true
+		end	
 		if (msg_ID > 287 and msg_ID < 303) or (msg_ID > 384 and msg_ID < 399) or
 			T{152,161,162,163,165,229,384,603,652}:contains(msg_ID) then
 				fields.ability = true
