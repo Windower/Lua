@@ -4,13 +4,11 @@ function parse_action_packet(act)
 		-- target : type, name, is_npc
 	act.actor = player_info(act.actor_id)
 	act.action = get_spell(act) -- Pulls the resources line for the action
-	
 	for i,v in ipairs(act.targets) do
 		v.target = {}
 		v.target[1] = player_info(v.id)
 		if #v.actions > 1 then
 			for n,m in ipairs(v.actions) do
-				
 				if dialog[m.message] then m.fields = fieldsearch(dialog[m.message][language]) end
 				if dialog[m.add_effect_message] then m.add_effect_fields = fieldsearch(dialog[m.add_effect_message][language]) end
 				if dialog[m.spike_effect_message] then m.spike_effect_fields = fieldsearch(dialog[m.spike_effect_message][language]) end
@@ -114,7 +112,6 @@ function parse_action_packet(act)
 	
 	for i,v in pairs(act.targets) do
 		for n,m in pairs(v.actions) do
---			windower.add_to_chat(8,m.message)
 			if m.message ~= 0 then
 				local targ = assemble_targets(act.actor,v.target,act.category,m.message)
 				local color = color_filt(dialog[m.message].color,v.target[1].id==Self.id)
@@ -124,7 +121,7 @@ function parse_action_packet(act)
 				elseif m.message == 15 then m.simp_name = 'missed'
 				elseif m.message == 29 or m.message == 84 then m.simp_name = 'is paralyzed'
 				elseif m.message == 30 then m.simp_name = 'anticipated by'
-				elseif m.message == 31 then m.simp_name = 'absorbed by shadow'
+				elseif m.message == 31 then m.simp_name = 'absorbed by '
 				elseif m.message == 32 then m.simp_name = 'dodged by'
 				elseif m.message == 67 then m.simp_name = 'critical hit'
 				elseif m.message == 106 then m.simp_name = 'intimidated by'
@@ -144,6 +141,35 @@ function parse_action_packet(act)
 				elseif m.message == 439 or m.message == 440 then m.simp_name = act.action.name..' (SPs, JAs, TP, and MP)'
 				elseif T{252,265,268,269,271,272,274,275}:contains(m.message) then m.simp_name = 'Magic Burst! '..act.action.name
 				else m.simp_name = act.action.name or ''
+				end
+
+--				if m.message == 93 or m.message == 273 then m.status=color_it('Vanish',color_arr['statuscol']) end
+
+				-- Special Message Handling
+				if m.message == 93 or m.message == 273 then
+					m.status=color_it('Vanish',color_arr['statuscol'])
+				elseif m.message == 522 and simplify then
+					m.target = m.target..' (stunned)'
+				elseif T{158,188,245,324,592,658}:contains(m.message) and simplify then
+					-- When you miss a WS or JA. Relevant for condensed battle.
+					m.status = 'Miss' --- This probably doesn't work due to the if a==nil statement below.
+				elseif m.message == 653 or m.message == 654 then
+					m.status = color_it('Immunobreak',color_arr['statuscol'])
+				elseif m.message == 655 or m.message == 656 then
+					m.status = color_it('Completely Resists',color_arr['statuscol'])
+				elseif m.message == 85 or m.message == 284 then
+					m.status = color_it('Resists',color_arr['statuscol'])
+				elseif m.message == 674 then -- Scavenge
+					m.number = act['targets'][i]['actions'][n]['add_effect_param']..' '..color_it(items[effect_val]['enl'],color_arr['itemcol'])
+				elseif T{75,156,189,248,283,312,323,336,355,408,422,423,425,659}:contains(m.message) then
+					m.status = color_it('No effect',color_arr['statuscol']) -- The status code for "No Effect" is 255, so it might actually work without this line
+				end
+				if m.message == 188 then
+					m.simp_name = m.simp_name..' (Miss)'
+			--	elseif m.message == 189 then
+			--		m.simp_name = m.simp_name..' (No Effect)'
+				elseif T{78,198,328}:contains(m.message) then
+					m.simp_name = '(Too Far)'
 				end
 				local msg,numb = simplify_message(m.message)
 				if not color_arr[act.actor.owner or act.actor.type] then windower.add_to_chat(123,'Battlemod error, missing filter:'..tostring(act.actor.owner)..' '..tostring(act.actor.type)) end
@@ -175,18 +201,22 @@ function parse_action_packet(act)
 				end
 				local msg,numb = simplify_message(m.add_effect_message)
 				if m.add_effect_fields.status then numb = m.add_effect_status else numb = pref_suf(m.add_effect_param,m.add_effect_message) end
-				windower.add_to_chat(color,make_condensedamage_number(m.add_effect_number)..(msg
-					:gsub('${spell}',act.action.spell or 'ERROR 127')
-					:gsub('${ability}',act.action.ability or 'ERROR 128')
-					:gsub('${item}',act.action.item or 'ERROR 129')
-					:gsub('${weapon_skill}',act.action.weapon_skill or 'ERROR 130')
-					:gsub('${abil}',m.simp_add_name or act.action.name or 'ERROR 131')
-					:gsub('${numb}',numb or 'ERROR 132')
-					:gsub('${actor}',color_it(act.actor.name,color_arr[act.actor.owner or act.actor.type]))
-					:gsub('${target}',targ)
-					:gsub('${lb}','\7')
-					:gsub('${number}',m.add_effect_param)
-					:gsub('${status}',m.add_effect_status or 'ERROR 178')))
+				if not act.action then
+					windower.add_to_chat(color, 'act.action==nil : '..m.message..' - '..m.add_effect_message..' - '..msg)
+				else
+					windower.add_to_chat(color,make_condensedamage_number(m.add_effect_number)..(msg
+						:gsub('${spell}',act.action.spell or 'ERROR 127')
+						:gsub('${ability}',act.action.ability or 'ERROR 128')
+						:gsub('${item}',act.action.item or 'ERROR 129')
+						:gsub('${weapon_skill}',act.action.weapon_skill or 'ERROR 130')
+						:gsub('${abil}',m.simp_add_name or act.action.name or 'ERROR 131')
+						:gsub('${numb}',numb or 'ERROR 132')
+						:gsub('${actor}',color_it(act.actor.name,color_arr[act.actor.owner or act.actor.type]))
+						:gsub('${target}',targ)
+						:gsub('${lb}','\7')
+						:gsub('${number}',m.add_effect_param)
+						:gsub('${status}',m.add_effect_status or 'ERROR 178')))
+				end
 				m.add_effect_message = 0
 			end
 			if m.has_spike_effect and m.spike_effect_message ~= 0 and spike_effect_valid[act.category] then
@@ -230,18 +260,34 @@ end
 function simplify_message(msg_ID)
 	local msg = dialog[msg_ID][language]
 	local fields = fieldsearch(msg)
---	windower.add_to_chat(8,'ability: '..tostring(fields.ability)..'  spell: '..tostring(fields.spell)..'  item: '..tostring(fields.item)..'  weapon skill: '..tostring(fields.weapon_skill)..'  number: '..tostring(fields.number))
-	if simplify and not T{140,557,674}:contains(msg_ID) then
-		if line_full and (fields.number or fields.status) then -- and (fields.spell or fields.ability or fields.item or fields.weapon_skill) then -- and fields.number or 
-	--		T{1,31,67,163,229,352,353,373,576,577}:contains(msg_ID)) then
+
+	if simplify and not T{23,140,557,674}:contains(msg_ID) then
+		if T{93,273,522,653,654,655,656,85,284,75,156,189,248,283,312,323,336,355,408,422,423,425,659,158,245,324,592,658}:contains(msg_ID) then
+			fields.status = true
+		end
+		if (msg_ID > 287 and msg_ID < 303) or (msg_ID > 384 and msg_ID < 399) or
+			T{152,161,162,163,165,229,384,603,652}:contains(msg_ID) then
+				fields.ability = true
+		end
+
+		if line_full and fields.number and fields.target and fields.actor then
 			msg = line_full
-		elseif line_nonumber and not (fields.number or fields.status) and (fields.spell or fields.ability or fields.item or fields.weapon_skill) then
-	--		T{15,30,32,106,282,354}) then
+		elseif line_aoebuff and fields.status and fields.target then --and fields.actor then -- and (fields.spell or fields.ability or fields.item or fields.weapon_skill) then
+			msg = line_aoebuff
+		elseif line_item and fields.item2 then
+			if fields.number then
+				msg = line_itemnum
+			else
+				msg = line_item
+			end
+		elseif line_nonumber and not fields.number then
 			msg = line_nonumber
-	--	elseif line_noactor and (fields.spell or fields.ability or fields.item or fields.weapon_skill) and fields.number then
-	--		msg = line_noactor
-	--	elseif line_noabil and fields.target and fields.number then
-	--		msg = line_noabil
+		elseif line_aoe and T{264}:contains(msg_ID) then
+			msg = line_aoe
+		elseif line_noactor and not fields.actor and (fields.spell or fields.ability or fields.item or fields.weapon_skill) then
+			msg = line_noactor
+		elseif line_noability and not fields.actor then
+			msg = line_noability
 		end
 	end
 	return msg
