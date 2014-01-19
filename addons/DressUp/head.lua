@@ -457,7 +457,7 @@ models.head[12514] = { name = "Rogue's Bonnet" , enl = "rogue's bonnet", model =
 models.head[12515] = { name = "Gallant Coronet" , enl = "gallant coronet", model = 4172} 
 models.head[12516] = { name = "Chaos Burgeonet" , enl = "chaos burgeonet", model = 4174} 
 models.head[12517] = { name = "Beast Helm" , enl = "beast helm", model = 4176} 
-models.head[12518] = { name = "Hunter's Beret" , enl = "hunter's beret", model = 4178} 
+models.head[12518] = { name = "Hunter's Beret" , enl = "hunter's beret", model = 4180} 
 models.head[12519] = { name = "Drachen Armet" , enl = "drachen armet", model = 4186} 
 models.head[12520] = { name = "Evoker's Horn" , enl = "evoker's horn", model = 4188} 
 models.head[12521] = { name = "Blue Ribbon" , enl = "blue ribbon", model = 4128} 
