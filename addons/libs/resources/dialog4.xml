@@ -25,7 +25,7 @@
 	<dtd id="23" english="${actor} learns a new spell!" color="91"/>
 	<dtd id="24" english="${target} recovers ${number} HP." color="H"  suffix="HP"/>
 	<dtd id="25" english="${target} recovers ${number} MP." color="H"  suffix="MP"/>
-	<dtd id="26" english="${target} recovers ${number} HP and MP." color="H" />
+	<dtd id="26" english="${target} recovers ${number} HP and MP." color="H" suffix="HP/MP"/>
 	<dtd id="27" english="Debug Message: Cannot execute command.${lb}No (BTCALC) command in ATEL source." color="1"/>
 	<dtd id="28" english="${actor} uses a ${item}." color="90"/>
 	<dtd id="29" english="${actor} is paralyzed." color="122"/>
