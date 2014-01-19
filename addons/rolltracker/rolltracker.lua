@@ -161,7 +161,7 @@ windower.register_event('incoming text',function (old, new, color)
 	battlemod_compat = old:find('.*Roll.*'..string.char(129,168))
 	obtained_roll = old:find('.* receives the effect of .* Roll.')
 	not_party = old:find ('%('..'%w+'..'%).* Roll ')
-		if new_bm or match_doubleup and color ~= 123 then
+		if new_bm or battlemod_compat or match_doubleup and color ~= 123 then
 			new=''
 		end
 		
