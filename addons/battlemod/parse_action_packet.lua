@@ -469,7 +469,7 @@ function get_spell(act)
 			spell.ability = color_it(spell[language],color_arr.abilcol)
 		end
 		
-		if fields.item and msg_ID ~= 674 and msg_ID ~= 140 then
+		if fields.item then
 			if T{125,593,594,595,596,597,598,599}:contains(msg_ID) then
 				spell.item = color_it(r_items[effect_val]['enl'], color_arr.itemcol)
 			else
