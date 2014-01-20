@@ -50,7 +50,7 @@ end
 
 function load_profile(name)
 
-    if settings.profiles[windower.ffxi.get_player().name:lower() .. name:lower()] then
+    if settings.profiles[windower.ffxi.get_player().name:lower() ..'_'.. name:lower()] then
         settings[windower.ffxi.get_player().name:lower()]:update(settings.profiles[windower.ffxi.get_player().name:lower() ..'_'.. name:lower()])
         return true
     elseif settings.profiles[name:lower()] then
