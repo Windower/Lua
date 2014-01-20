@@ -272,6 +272,11 @@ function simplify_message(msg_ID)
 			T{152,161,162,163,165,229,384,603,652}:contains(msg_ID) then
 				fields.ability = true
 		end
+		
+		if T{152,160,161,162,163,164,165,166,167,168,229,652}:contains(msg_ID) then
+			fields.actor  = true
+			fields.target = true
+		end
 
 		if line_full and fields.number and fields.target and fields.actor then
 			msg = line_full
