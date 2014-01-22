@@ -451,7 +451,7 @@ function refresh_item_list(itemlist)
 	for i,v in pairs(itemlist) do
 		if v.id and v.id ~= 0 then
 			-- If we don't already have the primary item name in the table, add it.
-			if not retarr[r_items[v.id][language]] then
+			if r_items[v.id] and r_items[v.id][language] and not retarr[r_items[v.id][language]] then
 				-- We add the entry as a sub-table containing the id and count
 				retarr[r_items[v.id][language]] = {id=v.id, count=v.count, shortname=r_items[v.id][language]:lower()}
 				-- If a long version of the name exists, and is different from the short version,
@@ -460,7 +460,7 @@ function refresh_item_list(itemlist)
 					retarr[r_items[v.id][language]].longname = r_items[v.id][language..'_log']:lower()
 					retarr[r_items[v.id][language..'_log']] = retarr[r_items[v.id][language]]
 				end
-			else
+			elseif r_items[v.id] and r_items[v.id][language] then
 				-- If there's already an entry for this item, all the hard work has already
 				-- been done.  Just update the count on the subtable of the main item, and
 				-- everything else will link together.
