@@ -9,7 +9,7 @@ elements[4] = {english = 'Lightning', french = "foudre",    german = 'Blitz',   
 elements[5] = {english = 'Water',     french = "l'eau",     german = 'Wasser',  japanese = '水'}
 elements[6] = {english = 'Light',     french = "lumière",   german = 'Licht',   japanese = '光'}
 elements[7] = {english = 'Dark',      french = "ténèbres",  german = 'Dunkel',  japanese = '闇'}
-elements[0xF] = {english = 'None',    french = "nul",       german = 'Keiner',  japanese = 'なし'}
+elements[0xF] = {english = 'None',    french = "nul",       german = 'Nichts',  japanese = 'なし'}
 
 return elements
 
