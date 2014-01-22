@@ -1337,7 +1337,16 @@ fields.incoming[0x113] = L{
     {ctype='unsigned char',     label='3rd Echelon Battle Trophies'},           -- CA
     {ctype='unsigned char',     label='2nd Echelon Battle Trophies'},           -- CB
     {ctype='unsigned char',     label='1st Echelon Battle Trophies'},           -- CC
-    {ctype='char[3]',           label='_unknown5'},                             -- CD
+    {ctype='unsigned char',     label='Cave Conservation Points'},              -- CD
+    {ctype='unsigned char',     label='Imperial Army ID Tags'},                 -- CE
+    {ctype='unsigned char',     label='Op Credits'},                            -- CF
+    {ctype='signed int',        label='Traverser Stones'},                      -- D0
+    {ctype='signed int',        label='Voidstones'},                            -- D4
+    {ctype='signed int',        label='Kupofried\'s Corundums'},                -- D8
+    {ctype='unsigned char',     label='Coalition Imprimaturs'},                 -- DC
+    {ctype='unsigned char',     label='Moblin Pheromone Sacks'},                -- DD
+    {ctype='short',             label='_unknown5'},                             -- DE
+    {ctype='int',               label='_unknown6'},                             -- F0
 }
 
 local sizes = {}
