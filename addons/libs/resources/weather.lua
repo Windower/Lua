@@ -1,26 +1,26 @@
 -- Weather
 local weather = {}
 
-weather[0]  = {english = 'Clear',           element = 0xF,  intensity = 0}
-weather[1]  = {english = 'Sunshine',        element = 0xF,  intensity = 0}
-weather[2]  = {english = 'Clouds',          element = 0xF,  intensity = 0}
-weather[3]  = {english = 'Fog',             element = 0xF,  intensity = 0}
-weather[4]  = {english = 'Hot spells',      element = 0x0,  intensity = 1}
-weather[5]  = {english = 'Heat waves',      element = 0x0,  intensity = 2}
-weather[6]  = {english = 'Rains',           element = 0x4,  intensity = 1}
-weather[7]  = {english = 'Squalls',         element = 0x4,  intensity = 2}
-weather[8]  = {english = 'Dust storms',     element = 0x3,  intensity = 1}
-weather[9]  = {english = 'Sand storms',     element = 0x3,  intensity = 2}
-weather[10] = {english = 'Winds',           element = 0x2,  intensity = 1}
-weather[11] = {english = 'Gales',           element = 0x2,  intensity = 2}
-weather[12] = {english = 'Snow',            element = 0x1,  intensity = 1}
-weather[13] = {english = 'Blizzards',       element = 0x1,  intensity = 2}
-weather[14] = {english = 'Thunder',         element = 0x5,  intensity = 1}
-weather[15] = {english = 'Thunderstorms',   element = 0x5,  intensity = 2}
-weather[16] = {english = 'Auroras',         element = 0x6,  intensity = 1}
-weather[17] = {english = 'Stellar glare',   element = 0x6,  intensity = 2}
-weather[18] = {english = 'Gloom',           element = 0x7,  intensity = 1}
-weather[19] = {english = 'Miasma',          element = 0x7,  intensity = 2}
+weather[0]  = {english = 'Fine patches',    french = 'Beau temps',              german = 'Zeitweise bewölkt',   element = 0xF,  intensity = 0}
+weather[1]  = {english = 'Sunshine',        french = 'Soleil',                  german = 'Sonne',               element = 0xF,  intensity = 0}
+weather[2]  = {english = 'Clouds',          french = 'Nuages',                  german = 'Wolken',              element = 0xF,  intensity = 0}
+weather[3]  = {english = 'Fog',             french = 'Brume',                   german = 'Nebel',               element = 0xF,  intensity = 0}
+weather[4]  = {english = 'Hot spells',      french = 'Brûlant',                 german = 'Hitze',               element = 0x0,  intensity = 1}
+weather[5]  = {english = 'Heat waves',      french = 'Ardent',                  german = 'Hitzewellen',         element = 0x0,  intensity = 2}
+weather[6]  = {english = 'Rain',            french = 'Pluie',                   german = 'Regen',               element = 0x4,  intensity = 1}
+weather[7]  = {english = 'Squalls',         french = 'Averse',                  german = 'Böen',                element = 0x4,  intensity = 2}
+weather[8]  = {english = 'Dust storms',     french = 'Tempêtes de poussière',   german = 'Staubstürme',         element = 0x3,  intensity = 1}
+weather[9]  = {english = 'Sand storms',     french = 'Tempêtes de sable',       german = 'Sandstürme',          element = 0x3,  intensity = 2}
+weather[10] = {english = 'Winds',           french = 'Vents',                   german = 'Wind',                element = 0x2,  intensity = 1}
+weather[11] = {english = 'Gales',           french = 'Rafales',                 german = 'Orkane',              element = 0x2,  intensity = 2}
+weather[12] = {english = 'Snow',            french = 'Neige',                   german = 'Schnee',              element = 0x1,  intensity = 1}
+weather[13] = {english = 'Blizzards',       french = 'Blizzards',               german = 'Eissturm',            element = 0x1,  intensity = 2}
+weather[14] = {english = 'Thunder',         french = 'Orage',                   german = 'Donner',              element = 0x5,  intensity = 1}
+weather[15] = {english = 'Thunderstorms',   french = 'Gros orage',              german = 'Gewitter',            element = 0x5,  intensity = 2}
+weather[16] = {english = 'Auroras',         french = 'Aurores boréales',        german = 'Polarlicht',          element = 0x6,  intensity = 1}
+weather[17] = {english = 'Stellar glare',   french = 'Aurores incandescentes',  german = 'Sternenflut',         element = 0x6,  intensity = 2}
+weather[18] = {english = 'Gloom',           french = 'Pénombre',                german = 'Dunkelheit',          element = 0x7,  intensity = 1}
+weather[19] = {english = 'Darkness',        french = 'Obscurité',               german = 'Finsternis',          element = 0x7,  intensity = 2}
 
 return weather
 
