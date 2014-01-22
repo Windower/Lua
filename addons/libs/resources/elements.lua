@@ -1,14 +1,14 @@
--- Item elements
+﻿-- Basic elements
 local elements = {}
 
-elements[0] = {english = 'Fire'}
-elements[1] = {english = 'Ice'}
-elements[2] = {english = 'Wind'}
-elements[3] = {english = 'Earth'}
-elements[4] = {english = 'Lightning'}
-elements[5] = {english = 'Water'}
-elements[6] = {english = 'Light'}
-elements[7] = {english = 'Dark'}
+elements[0] = {english = 'Fire',      french = "feu",       german = 'Feuer',   japanese = '火'}
+elements[1] = {english = 'Ice',       french = "glace",     german = 'Eis',     japanese = '氷'}
+elements[2] = {english = 'Wind',      french = "vent",      german = 'Wind',    japanese = '風'}
+elements[3] = {english = 'Earth',     french = "terre",     german = 'Erde',    japanese = '土'}
+elements[4] = {english = 'Lightning', french = "foudre",    german = 'Blitz',   japanese = '雷'}
+elements[5] = {english = 'Water',     french = "l'eau",     german = 'Wasser',  japanese = '水'}
+elements[6] = {english = 'Light',     french = "lumière",   german = 'Licht',   japanese = '光'}
+elements[7] = {english = 'Dark',      french = "ténèbres",  german = 'Dunkel',  japanese = '闇'}
 
 return elements
 
