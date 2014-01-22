@@ -1,4 +1,4 @@
-﻿-- Item days
+﻿-- Days of the week
 local days = {}
 
 days[0] = {english = 'Firesday',      french = "Jour du feu",        german = 'Feuertag',   japanese = '火',   element = 0}
