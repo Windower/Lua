@@ -1,26 +1,26 @@
 -- Weather
 local weather = {}
 
-weather[0]  = {english = 'Clear',           element = 'None',       intensity = 0}
-weather[1]  = {english = 'Sunshine',        element = 'None',       intensity = 0}
-weather[2]  = {english = 'Clouds',          element = 'None',       intensity = 0}
-weather[3]  = {english = 'Fog',             element = 'None',       intensity = 0}
-weather[4]  = {english = 'Hot spells',      element = 'Fire',       intensity = 1}
-weather[5]  = {english = 'Heat waves',      element = 'Fire',       intensity = 2}
-weather[6]  = {english = 'Rains',           element = 'Water',      intensity = 1}
-weather[7]  = {english = 'Squalls',         element = 'Water',      intensity = 2}
-weather[8]  = {english = 'Dust storms',     element = 'Earth',      intensity = 1}
-weather[9]  = {english = 'Sand storms',     element = 'Earth',      intensity = 2}
-weather[10] = {english = 'Winds',           element = 'Wind',       intensity = 1}
-weather[11] = {english = 'Gales',           element = 'Wind',       intensity = 2}
-weather[12] = {english = 'Snow',            element = 'Ice',        intensity = 1}
-weather[13] = {english = 'Blizzards',       element = 'Ice',        intensity = 2}
-weather[14] = {english = 'Thunder',         element = 'Lightning',  intensity = 1}
-weather[15] = {english = 'Thunderstorms',   element = 'Lightning',  intensity = 2}
-weather[16] = {english = 'Auroras',         element = 'Light',      intensity = 1}
-weather[17] = {english = 'Stellar glare',   element = 'Light',      intensity = 2}
-weather[18] = {english = 'Gloom',           element = 'Darkness',   intensity = 1}
-weather[19] = {english = 'Miasma',          element = 'Darkness',   intensity = 2}
+weather[0]  = {english = 'Clear',           element = 0xF,  intensity = 0}
+weather[1]  = {english = 'Sunshine',        element = 0xF,  intensity = 0}
+weather[2]  = {english = 'Clouds',          element = 0xF,  intensity = 0}
+weather[3]  = {english = 'Fog',             element = 0xF,  intensity = 0}
+weather[4]  = {english = 'Hot spells',      element = 0x0,  intensity = 1}
+weather[5]  = {english = 'Heat waves',      element = 0x0,  intensity = 2}
+weather[6]  = {english = 'Rains',           element = 0x4,  intensity = 1}
+weather[7]  = {english = 'Squalls',         element = 0x4,  intensity = 2}
+weather[8]  = {english = 'Dust storms',     element = 0x3,  intensity = 1}
+weather[9]  = {english = 'Sand storms',     element = 0x3,  intensity = 2}
+weather[10] = {english = 'Winds',           element = 0x2,  intensity = 1}
+weather[11] = {english = 'Gales',           element = 0x2,  intensity = 2}
+weather[12] = {english = 'Snow',            element = 0x1,  intensity = 1}
+weather[13] = {english = 'Blizzards',       element = 0x1,  intensity = 2}
+weather[14] = {english = 'Thunder',         element = 0x5,  intensity = 1}
+weather[15] = {english = 'Thunderstorms',   element = 0x5,  intensity = 2}
+weather[16] = {english = 'Auroras',         element = 0x6,  intensity = 1}
+weather[17] = {english = 'Stellar glare',   element = 0x6,  intensity = 2}
+weather[18] = {english = 'Gloom',           element = 0x7,  intensity = 1}
+weather[19] = {english = 'Miasma',          element = 0x7,  intensity = 2}
 
 return weather
 
