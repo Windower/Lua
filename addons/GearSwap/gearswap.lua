@@ -329,14 +329,14 @@ windower.register_event('gain buff',function(name,id)
 	
 	
 	refresh_globals()
-	equip_sets('buff_change',nil,name:sub(1,1):upper()..name:sub(2),true)
+	equip_sets('buff_change',nil,name:sub(1,1):upper()..name:sub(2):lower(),true)
 end)
 
 windower.register_event('lose buff',function(name,id)
 	if debugging >= 1 then windower.debug('lose buff '..name) end
 	if gearswap_disabled then return end
 	refresh_globals()
-	equip_sets('buff_change',nil,name:sub(1,1):upper()..name:sub(2),false)
+	equip_sets('buff_change',nil,name:sub(1,1):upper()..name:sub(2):lower(),false)
 end)
 
 windower.register_event('job change',function(mjob, mjob_id, mjob_lvl, sjob, sjob_id, sjob_lvl)
