@@ -1,4 +1,4 @@
-﻿-- Weather
+-- Weather
 local weather = {}
 
 weather[0]  = {english = 'Fine patches',    french = 'Beau temps',              german = 'Zeitweise bewölkt',   japanese = '快晴',    element = 0xF,  intensity = 0}
