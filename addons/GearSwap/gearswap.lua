@@ -175,7 +175,11 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
 		if oldstatus ~= newstatus then
 			-- Should put a filter on this to prevent it from sending anything other than resting, engaged, and idle.
 			refresh_globals()
-			equip_sets('pet_status_change',nil,newstatus,oldstatus)
+
+			if pet.isvalid then
+				pet.status = newstatus
+				equip_sets('pet_status_change',nil,newstatus,oldstatus)
+			end
 		end
 	elseif id == 0x28 and not injected then
 		if clocking then windower.add_to_chat(8,'Action Packet: '..(os.clock() - out_time)) end
