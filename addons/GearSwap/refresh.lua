@@ -220,17 +220,20 @@ function refresh_player()
 	-- If we have a pet, create or update the table info.
 	if player_mob_table.pet_index then
 		local new_isvalid = true
+		local current_status
 
 		-- If the pet table fully exists already, copy over its status instead of
 		-- forcing it.  This accounts for being called after the pet is released,
 		-- where isvalid was set to false.
 		if pet.isvalid ~= nil and player_mob_table.pet_index == pet.index then
 			new_isvalid = pet.isvalid
+			current_status = pet.status
 		end
 
 		table.reassign(pet, target_complete(windower.ffxi.get_mob_by_index(player_mob_table.pet_index)))
-		
+
 		pet.isvalid = new_isvalid
+		if current_status then pet.status = current_status end
 		pet.claim_id = nil
 		pet.is_npc = nil
 		if pet.tp then pet.tp = pet.tp/10 end
