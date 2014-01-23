@@ -82,6 +82,7 @@ function update_pet(msg_id,pet_idx_in, own_idx_in)
 	local pet_table = windower.ffxi.get_mob_by_index(pet_idx)
 	if pet_table == nil then
 		windower.text.set_visibility(tb_name, false)
+		charm = false
 		windower.add_to_chat(8, 'PetTP Invisible')
 		return false
 	end
@@ -171,13 +172,15 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 				or (original:byte(0x05) == 0x03 and original:byte(0x06) == 0x05 and (((original:byte(0x0D)+original:byte(0x0E)*256) == 0))) -- NPC pops
 				or (original:byte(0x05) == 0x03 and original:byte(0x06) == 0x05 and (((original:byte(0x0D)+original:byte(0x0E)*256) ~= windower.ffxi.get_player().index))) -- other people summoning
 			) then
-				if original:byte(0x05) == 0x84 and original:byte(0x06) == 0x08 then
+				if original:byte(0x06) == 0x08 then
 					windower.add_to_chat(8, '0x67'
 						   ..', len: '..original:length()
-						   ..', mask_1: '..original:byte(0x05)
+						   ..', mask_1: '..string.format('0x%02x',original:byte(0x05))
 						   ..', mask_2: '..original:byte(0x06)
 						   ..', pet_idx: '..(original:byte(0x0D)+original:byte(0x0E)*256)
-						   ..', pet_id: '..(original:byte(0x09)+original:byte(0x0A)*256+original:byte(0x0B)*256*256+original:byte(0x0C)*256*256*256)
+						   ..', pet_id: '..(original:byte(0x09)+original:byte(0x0A)*256)
+						   ..', ???1: '..original:byte(0x0B)
+						   ..', ???2: '..original:byte(0x0C)
 						   ..', own_idx: '..(original:byte(0x07)+original:byte(0x08)*256)
 						   ..', hp%: '..original:byte(0x0F)
 						   ..', mp%: '..original:byte(0x10)
@@ -189,10 +192,12 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 				else
 					windower.add_to_chat(8, '0x67'
 						   ..', len: '..original:length()
-						   ..', mask_1: '..original:byte(0x05)
+						   ..', mask_1: '..string.format('0x%02x',original:byte(0x05))
 						   ..', mask_2: '..original:byte(0x06)
 						   ..', pet_idx: '..(original:byte(0x07)+original:byte(0x08)*256)
-						   ..', pet_id: '..(original:byte(0x09)+original:byte(0x0A)*256+original:byte(0x0B)*256*256+original:byte(0x0C)*256*256*256)
+						   ..', pet_id: '..(original:byte(0x09)+original:byte(0x0A)*256)
+						   ..', ???1: '..original:byte(0x0B)
+						   ..', ???2: '..original:byte(0x0C)
 						   ..', own_idx: '..(original:byte(0x0D)+original:byte(0x0E)*256)
 						   ..', hp%: '..original:byte(0x0F)
 						   ..', mp%: '..original:byte(0x10)
@@ -209,7 +214,7 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 				current_mp_percent = original:byte(0x10)
 				current_tp_percent = (original:byte(0x11)+(original:byte(0x12)*256))/10
 --				petname = original:sub(0x15,original:find(string.char(0),0x15)-1)
-				if original:byte(0x05) == 0x84 and original:byte(0x06) == 0x08 then
+				if original:byte(0x06) == 0x08 then
 					own_idx = (original:byte(0x07)+original:byte(0x08)*256)
 					pet_idx = (original:byte(0x0D)+original:byte(0x0E)*256)
 					if not charm then
@@ -241,6 +246,7 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 			elseif (original:byte(0x05) == 0x04) and (original:byte(0x06) == 0x05) then
 				windower.text.set_visibility(tb_name, false)
 				windower.add_to_chat(8, 'PetTP Invisible')
+				charm = false
 			end
 		elseif id==0x0E and original:byte(0x0B) == 0x07 then	-- npc update
 			if mypet_idx == (original:byte(0x09)+original:byte(0x0A)*256) then
@@ -268,7 +274,10 @@ windower.register_event('load', function()
     windower.text.set_italic(tb_name, settings.font.italic)
     windower.text.set_text(tb_name, '')
     windower.text.set_bg_visibility(tb_name, defaults.bgvisible)
-
+	windower.add_to_chat(8, 'Player index: '..windower.ffxi.get_player().index)
+	if windower.ffxi.get_mob_by_target('pet') then
+		windower.add_to_chat(8, 'Pet Id: '..windower.ffxi.get_mob_by_target('pet').id)
+	end
     update_pet()
 end)
 
@@ -279,6 +288,7 @@ end)
 windower.register_event('job change', function()
 	windower.text.set_visibility(tb_name, false)
 	windower.add_to_chat(8, 'PetTP Invisible')
+	charm = false
 end)
 
 windower.register_event('unload', function()
