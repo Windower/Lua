@@ -149,7 +149,7 @@ function parse_action_packet(act)
 				if m.message == 93 or m.message == 273 then
 					m.status=color_it('Vanish',color_arr['statuscol'])
 				elseif m.message == 522 and simplify then
-					m.target = m.target..' (stunned)'
+					targ = targ..' (stunned)'
 				elseif T{158,188,245,324,592,658}:contains(m.message) and simplify then
 					-- When you miss a WS or JA. Relevant for condensed battle.
 					m.status = 'Miss' --- This probably doesn't work due to the if a==nil statement below.

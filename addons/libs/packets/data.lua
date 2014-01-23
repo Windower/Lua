@@ -88,7 +88,7 @@ data.incoming[0x03C] = {name='Shop',                description='Displays items 
 data.incoming[0x03D] = {name='Value',               description='Returns the value of an item.'}
 data.incoming[0x041] = {name='Stupid Evil Packet',  description='This packet is stupid and evil. Required for emotes.'}
 data.incoming[0x044] = {name='Pet Stat',            description='Contains information about Automaton stats and may be involved in Blue Magic.'}
-data.incoming[0x04B] = {name='Logout Acknowledge',  description='Acknoledges a logout attempt.'}
+data.incoming[0x04B] = {name='Logout Acknowledge',  description='Acknowledges a logout attempt.'}
 data.incoming[0x04B] = {name='Delivery Item',       description='Item in delivery box.'}
 data.incoming[0x04D] = {name='Servmes Resp',        description='Server response when someone requests it.'}
 data.incoming[0x04F] = {name='Data Download 2',     description='The data that is sent to the client when it is "Downloading data...".'}
@@ -106,13 +106,14 @@ data.incoming[0x05E] = {name='Stop Download',       description='Final packet in
 data.incoming[0x061] = {name='Char Stats',          description='Packet contains a lot of data about your character\'s stats.'}
 data.incoming[0x062] = {name='Skills Update',       description='Packet that shows your weapon and magic skill stats.'}
 data.incoming[0x063] = {name='Set Update',          description='Frequently sent packet during battle that updates specific types of job information, like currently available/set automaton equipment and currently set BLU spells.'}
-data.incoming[0x067] = {name='Unnamed Packet 67',   description='Packet that sends mostly useless information, as far as I can tell.'}
+data.incoming[0x067] = {name='Pet Info',            description='Updates information about whether or not you have a pet and the TP, HP, etc. of the pet if appropriate.'}
 data.incoming[0x08C] = {name='Merits',              description='Contains all merit information. Multiple packets are sent.'}
+data.incoming[0x0AA] = {name='Spell List',          description='Packet that shows the spells that you know.'}
 data.incoming[0x0AC] = {name='Ability List',        description='Packet that shows your current abilities and traits.'}
 data.incoming[0x0B4] = {name='Seek AnonResp',       description='Server response sent after you put up party or anon flag.'}
 data.incoming[0x0C9] = {name='Show Equip',          description='Shows another player your equipment after using the Check command.'}
-data.incoming[0x0CC] = {name='Linkshell Message',   description='/lsmes text and headers.'}
 data.incoming[0x0CA] = {name='Bazaar Message',      description='Shows another players bazaar message after using the Check command or sets your own on zoning.'}
+data.incoming[0x0CC] = {name='Linkshell Message',   description='/lsmes text and headers.'}
 data.incoming[0x0D2] = {name='Found Item',          description='This command shows an item found on defeated mob or from a Treasure Chest.'}
 data.incoming[0x0D3] = {name='Lot/drop item',       description='Sent when someone casts a lot on an item or when the item drops to someone.'}
 data.incoming[0x0DD] = {name='Alliance Update',     description='Alliance/party member info - zone, HP%, HP% etc.'}

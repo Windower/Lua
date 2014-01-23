@@ -65,7 +65,7 @@ local function add_name(t)
 end
 
 -- Add resources from files
-local res_names = S{'jobs', 'races', 'weather', 'servers', 'chat', 'bags', 'slots', 'statuses', 'emotes', 'skills', 'titles', 'encumbrance', 'check_ratings', 'synth_ranks'}
+local res_names = S{'jobs', 'races', 'weather', 'servers', 'chat', 'bags', 'slots', 'statuses', 'emotes', 'skills', 'titles', 'encumbrance', 'check_ratings', 'synth_ranks', 'days', 'moon_phases', 'elements'}
 for res_name in res_names:it() do
     fns[res_name] = function()
         local res = table.map(require(addon_resources..res_name), add_name)
