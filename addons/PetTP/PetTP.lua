@@ -1,5 +1,4 @@
 
-
 local config = require 'config'
 
 _addon = _addon or {}
@@ -274,10 +273,10 @@ windower.register_event('load', function()
     windower.text.set_italic(tb_name, settings.font.italic)
     windower.text.set_text(tb_name, '')
     windower.text.set_bg_visibility(tb_name, defaults.bgvisible)
-	windower.add_to_chat(8, 'Player index: '..windower.ffxi.get_player().index)
-	if windower.ffxi.get_mob_by_target('pet') then
-		windower.add_to_chat(8, 'Pet Id: '..windower.ffxi.get_mob_by_target('pet').id)
-	end
+--	windower.add_to_chat(8, 'Player index: '..windower.ffxi.get_player().index)
+--	if windower.ffxi.get_mob_by_target('pet') then
+--		windower.add_to_chat(8, 'Pet Id: '..windower.ffxi.get_mob_by_target('pet').id)
+--	end
     update_pet()
 end)
 
