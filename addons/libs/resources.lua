@@ -14,9 +14,16 @@ local fns = {}
 
 local slots = {}
 
+local language_string = _addon and _addon.language and _addon.language:lower() or windower.ffxi.get_info().language:lower()
+local log_language_string = 'log_' .. language_string
+
 local resource_mt = {}
 local resources = setmetatable({}, {__index = function(t, k)
-    if fns[k] then
+    if k == 'name' then
+        return t[language_string]
+    elseif k == 'log_name' then
+        return t[log_language_string]
+    elseif fns[k] then
         t[k] = setmetatable(fns[k](), resource_mt)
         return t[k]
     end
@@ -43,9 +50,6 @@ resource_mt.__class = 'Resource'
 
 local plugin_resources = '../../plugins/resources/'
 local addon_resources = 'resources/'
-
-local language_string = _addon and _addon.language and _addon.language:lower() or windower.ffxi.get_info().language:lower()
-local language_string_full = language_string..'_full'
 
 local unquotes = {
     ['quot'] = '"',
@@ -104,7 +108,6 @@ function fns.abilities()
             recast = recast:number(),
             alias = S(alias:split('|')),
         }
-        res[id].name = res[id][language_string]
         last = res[id]
     end
     slots[res] = slots[res] + table.keyset(last)
@@ -133,7 +136,6 @@ function fns.abilities()
             wsB = wsB,
             wsC = wsC,
         }
-        res[id].name = res[id][language_string]
         last = res[id]
     end
     slots[res] = slots[res] + table.keyset(last)
@@ -169,7 +171,6 @@ function fns.spells()
                 recast = recast:number(),
                 alias = S(alias:split('|')),
             }
-            res[index].name = res[index][language_string]
             last = res[index]
         end
     end
@@ -197,7 +198,6 @@ function fns.buffs()
             english_log = english_log,
             duration = duration:number(),
         }
-        res[id].name = res[id][language_string]
         last = res[id]
     end
     slots[res] = table.keyset(last)
@@ -249,8 +249,6 @@ function fns.items()
             cast_time = 0,
             category = 'General',
         }
-        res[id].name = res[id][language_string]
-        res[id].name_full = res[id][language_string_full]
         last = res[id]
     end
     slots[res] = slots[res] + table.keyset(last)
@@ -272,8 +270,6 @@ function fns.items()
             cast_time = cast_time:number(),
             category = 'General',
         }
-        res[id].name = res[id][language_string]
-        res[id].name_full = res[id][language_string_full]
         last = res[id]
     end
     slots[res] = slots[res] + table.keyset(last)
@@ -293,8 +289,6 @@ function fns.items()
             japanese_full = unquote(jpl),
             category = 'General',
         }
-        res[id].name = res[id][language_string]
-        res[id].name_full = res[id][language_string_full]
         last = res[id]
     end
     slots[res] = slots[res] + table.keyset(last)
@@ -326,8 +320,6 @@ function fns.items()
                 recast = recast:number(),
                 category = category,
             }
-            res[id].name = res[id][language_string]
-            res[id].name_full = res[id][language_string_full]
             last = res[id]
         end
     end
@@ -353,7 +345,6 @@ function fns.zones()
             german = de,
             japanese = jp,
         }
-        res[id].name = res[id][language_string]
         last = res[id]
     end
     slots[res] = table.keyset(last)
@@ -379,7 +370,6 @@ function fns.monster_abils()
             actor_status = S(actor_status:split(','):map(tonumber)),
             target_status = S(target_status:split(','):map(tonumber)),
         }
-        res[id].name = res[id][language_string]
         last = res[id]
     end
     slots[res] = slots[res] + table.keyset(last)
@@ -393,7 +383,6 @@ function fns.monster_abils()
             actor_status = S(actor_status:split(','):map(tonumber)),
             target_status = S{},
         }
-        res[id].name = res[id][language_string]
         last = res[id]
     end
     slots[res] = slots[res] + table.keyset(last)
@@ -407,7 +396,6 @@ function fns.monster_abils()
             actor_status = S{},
             target_status = S(target_status:split(','):map(tonumber)),
         }
-        res[id].name = res[id][language_string]
         last = res[id]
     end
     slots[res] = slots[res] + table.keyset(last)
@@ -421,7 +409,6 @@ function fns.monster_abils()
             actor_status = S{},
             target_status = S{},
         }
-        res[id].name = res[id][language_string]
         last = res[id]
     end
     slots[res] = slots[res] + table.keyset(last)
