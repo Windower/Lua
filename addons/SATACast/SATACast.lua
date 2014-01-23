@@ -30,6 +30,8 @@ _addon.command = 'scast'
 _addon.name = 'SATACast'
 _addon.author = 'Banggugyangu'
 
+res = require('resources')
+
 windower.register_event('load',function ()
 	
 	version = '1.1.0'
@@ -112,8 +114,9 @@ function split(msg, match)
 	return splitarr
 end
 	
-windower.register_event('lose buff',function (id, name)
+windower.register_event('lose buff', function (id)
 	local self = windower.ffxi.get_player()
+    local name = res.buffs[id].english
 	if name == ('Sneak Attack' or 'Trick Attack') then
 		if self.status:lower() == 'engaged' then
 			windower.send_command('sc set ' .. TP_Set)

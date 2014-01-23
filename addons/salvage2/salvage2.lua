@@ -20,26 +20,21 @@
 --ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-_addon = _addon or {}
+
 _addon.name = 'salvage2'
 _addon.version = 0.1
 _addon.command = 's2'
 _addon.author = 'Bahamut.Krizz'
-local config = require 'config'
 
-require 'tables'
-require 'strings'
-require 'maths'
-require 'logger'
-require 'actions'
+require('tables')
+require('strings')
+require('maths')
+require('logger')
+require('actions')
+config = require('config')
 -----------------------------
 
-local settingtab = nil
-local settings_file = 'data\\settings.xml'
-local settingtab = config.load(settings_file)
-if settingtab == nil then
-	print('No settings file found. Ensure you have a file at data\\settings.xml')
-end
+settingtab = config.load()
 
 --variables
 	posx = 1000
@@ -50,10 +45,6 @@ end
 	end
 	pathos_ident = {'Main Weapon/Sub-Weapon restriction', 'Ranged Weapon/Ammo restriction', 'Head/Neck equipment restriction', 'Body equipment restriction', 'Hand equipment restriction', 'Earrings/Rings restriction', 'Back/Waist equipment restriction', 'Leg/Foot equipment restriction', 'Support Job restriction', 'Job Abilities restriction', 'Spellcasting restriction', 'Max HP Down', 'Max MP Down', 'STR Down', 'DEX Down', 'AGI Down', 'MND Down', 'INT Down', 'CHR Down', 'VIT Down'}
 	pathos_short = {'Weapon', 'Ranged', 'Head/Neck', 'Body', 'Hand', 'Earrings/Rings', 'Back/Waist', 'Leg/Foot', 'Support Job', 'Job Abilities', 'Spellcasting', 'Max HP', 'Max MP', 'STR', 'DEX', 'AGI', 'MND', 'INT', 'CHR', 'VIT'}
-
-windower.register_event('load',function ()
-	print('Salvage2 loaded.  Author: Bahamut.Krizz')
-end)
 
 function settings_create()
 	--	get player's name
@@ -115,17 +106,14 @@ local params = {...};
 	end
 end)
 
-windower.register_event('login',function (name)
+windower.register_event('login', function(name)
 	player = name
 end)
 
-windower.register_event('zone change',function (from_id, from, to_id, to)
-	checkzone()
-end)
-	
-function checkzone()
-	currentzone = windower.ffxi.get_info()['zone']:lower()
-	if currentzone == 'silver sea remnants' or currentzone == 'zhayolm remnants' or currentzone == 'bhaflau remnants' or currentzone == 'arrapago remnants' then
+salvage_zones = S{73, 74, 75, 76}
+
+windower.register_event('zone change', function(id)
+	if salvage_zones:contains(id) then
 		windower.send_command('timers c Remaining 6000 up')
 		settings_create()
 		initialize()
@@ -136,7 +124,7 @@ function checkzone()
 		initialize()
 		windower.text.set_visibility('salvage_box2', false)
 	end
-end
+end)
 
 windower.register_event('incoming text',function (original, new, color)
 

@@ -38,6 +38,7 @@ require('logger')
 require('sets')
 config = require('config')
 chat = require('chat')
+res = require('resources')
 
 defaults = {}
 defaults.buffs = S{	"light arts","addendum: white","penury","celerity","accession","perpetuance","rapture",
@@ -51,7 +52,8 @@ settings = config.load(defaults)
 
 autoecho = true
 
-windower.register_event('gain buff', function(name,id)
+windower.register_event('gain buff', function(id)
+    local name = res.buffs[id].english
     for key,val in pairs(settings.buffs) do
         if key:lower() == name:lower() then
             if name:lower() == 'silence' and autoecho then

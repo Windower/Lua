@@ -32,8 +32,9 @@ _addon.version = '1.07'
 _addon.author = 'Nitrous (Shiva)'
 _addon.command = 'stna'
 
-require 'tables'
-require 'sets'
+require('tables')
+require('sets')
+res = require('resources')
 
 windower.register_event('load', function()
     statSpell = { 
@@ -78,14 +79,16 @@ windower.register_event('addon command', function(...)
     end
 end)
 
-windower.register_event('gain buff', function(name,id)
+windower.register_event('gain buff', function(id)
+    local name = res.buffs[id].english
     if priority:contains(name) and not statusTable:contains(name) then
         statusTable:add(name)
     end
 end)
 
 
-windower.register_event('lose buff', function(name,id)
+windower.register_event('lose buff', function(id)
+    local name = res.buffs[id].english
     if statusTable:contains(name) then
         statusTable:remove(name)
     end

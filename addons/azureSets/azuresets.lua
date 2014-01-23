@@ -62,21 +62,11 @@ function initialize()
     get_current_spellset()
 end
 
-windower.register_event('load', function()
-    if windower.ffxi.get_info().logged_in then
-        initialize()
-    end
-end)
+windower.register_event('load', initialize:cond(function() return windower.ffxi.get_info().logged_in end)
 
-windower.register_event('login', function()
-    initialize()
-end)
+windower.register_event('login', initialize)
 
-windower.register_event('job change', function(mj, mjob_id, mjob_lvl, sj, sjob_id, sjob_lvl)
-    if mjob_id == 16 then
-        initialize()
-    end
-end)
+windower.register_event('job change', initialize:cond(function(job) return job == 16 end))
 
 function set_spells(spellset)
     if windower.ffxi.get_player()['main_job_id'] ~= 16 --[[and windower.ffxi.get_player()['sub_job_id'] ~= 16]] then return nil end

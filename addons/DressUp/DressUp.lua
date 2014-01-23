@@ -30,7 +30,6 @@ _addon.version = '1.0'
 _addon.commands = {'DressUp','du'}
 
 --Libs
-config = require('config')
 require('luau')
 
 --DressUp files
@@ -63,7 +62,7 @@ end)
 windower.register_event('logout',function() _char = nil end)
 
 windower.register_event('job change',function(job)
-    if load_profile(job) then
+    if load_profile(res.jobs[job].name) then
         update_model(windower.ffxi.get_player().index)
         notice('Loaded profile: ' .. job)
     end

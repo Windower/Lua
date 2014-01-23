@@ -34,7 +34,10 @@ _addon.author = 'Krizz'
 _addon.commands = {'DynamisHelper','dh'}
 _addon.version = '1.0.1.0'
 
-local config = require 'config'
+require('strings')
+require('sets')
+config = require('config')
+res = require('resources')
 
 -- Variables
 staggers = T{}
@@ -57,12 +60,12 @@ staggers['night']['ws'] = {"Kindred Paladin", "Kindred Warrior", "Kindred Samura
 staggers['night']['random'] = {"Ascetox Ratgums", "Be'Zhe Keeprazer", "Bhuu Wjato the Firepool", "Bordox Kittyback", "Brewnix Bittypupils", "Caa Xaza the Madpiercer", "Cobraclaw Buchzvotch", "De'Bho Pyrohand", "Deathcaller Bidfbid", "Drakefeast Wubmfub", "Draklix Scalecrust", "Droprix Granitepalms", "Elvaanlopper Grokdok", "Foo Peku the Bloodcloak", "Ga'Fho Venomtouch", "Galkarider Retzpratz", "Gibberox Pimplebeak", "Go'Tyo Magenapper", "Gu'Khu Dukesniper", "Gu'Nha Wallstormer", "Guu Waji the Preacher", "Heavymail Djidzbad", "Hee Mida the Meticulous", "Humegutter Adzjbadj", "Jeunoraider Gepkzip", "Ji'Fhu Infiltrator", "Ji'Khu Towercleaver", "Knii Hoqo the Bisector", "Koo Saxu the Everfast", "Kuu Xuka the Nimble", "Lockbuster Zapdjipp", "Maa Zaua the Wyrmkeeper", "Mi'Rhe Whisperblade", "Mithraslaver Debhabob", "Moltenox Stubthumbs", "Morblox Chubbychin", "Mu'Gha Legionkiller", "Na'Hya Floodmaker", "Nee Huxa the Judgmental", "Nu'Bhi Spiraleye", "Puu Timu the Phantasmal", "Routsix Rubbertendon", "Ruffbix Jumbolobes", "Ryy Qihi the Idolrobber", "Shisox Widebrow", "Skinmask Ugghfogg", "Slinkix Trufflesniff", "So'Gho Adderhandler", "So'Zho Metalbender", "Soo Jopo the Fiendking", "Spinalsucker Galflmall", "Swypestix Tigershins", "Ta'Hyu Gallanthunter", "Taruroaster Biggsjig", "Tocktix Thinlids", "Ultrasonic Zeknajak", "Whistrix Toadthroat", "Wraithdancer Gidbnod", "Xaa Chau the Roctalon", "Xhoo Fuza the Sublime", "Angra Mainyu", "Dagourmarche", "Goublefaupe", "Mildaunegeux", "Quiebitiel", "Velosareon", "Taquede", "Pignonpausard", "Hitaume", "Cavanneche", "Arch Angra Mainyu", "Count Vine", "Count Zaebos", "Duke Berith", "Duke Gomory", "Duke Scox", "King Zagan", "Marquis Andras", "Marquis Cimeries", "Marquis Decarabia", "Marquis Gamygyn", "Marquis Nebiros", "Marquis Orias", "Marquis Sabnak", "Prince Seere", "Count Raum", "Dynamis Lord", "Duke Haures", "Marquis Caim", "Baron Avnas", "Count Haagenti", "Arch Dynamis Lord", "Aitvaras", "Alklha", "Antaeus", "Anvilix Sootwrists", "Apocalyptic Beast", "Arch Antaeus", "Arch Apocalyptic Beast", "Arch Christelle", "Arch Goblin Golem", "Arch Gu'Dha Effigy", "Arch Overlord Tombstone", "Arch Tzee Xicu Idol", "Baa Dava the Bibliophage", "Bandrix Rockjaw", "Barong", "Battlechoir Gitchfotch", "Bladeburner Rokgevok", "Blazox Boneybod", "Bloodfist Voshgrosh", "Bootrix Jaggedelbow", "Bu'Bho Truesteel", "Buffrix Eargone", "Cirrate Christelle", "Cloktix Longnail", "Diabolos Club", "Diabolos Diamond", "Diabolos Heart", "Diabolos Letum", "Diabolos Nox", "Diabolos Somnus", "Diabolos Spade", "Diabolos Umbra", "Distilix Stickytoes", "Doo Peku the Fleetfoot", "Elixmix Hooknose", "Elvaansticker Bxafraff", "Eremix Snottynostril", "Fairy Ring", "Feralox Honeylips", "Feralox's Slime", "Flamecaller Zoeqdoq", "Fuu Tzapo the Blessed", "Gabblox Magpietongue", "Gi'Bhe Fleshfeaster", "Gi'Pha Manameister", "Goblin Golem", "Gosspix Blabblerlips", "Gu'Dha Effigy", "Gu'Nhi Noondozer", "Haa Pevi the Stentorian", "Hamfist Gukhbuk", "Hermitrix Toothrot", "Humnox Drumbelly", "Jabbrox Grannyguise", "Jabkix Pigeonpec", "Karashix Swollenskull", "Kikklix Longlegs", "Ko'Dho Cannonball", "Koo Rahi the Levinblade", "Loo Hepe the Eyepiercer", "Lost Aitvaras", "Lost Alklha", "Lost Barong", "Lost Fairy Ring", "Lost Nant'ina", "Lost Scolopendra", "Lost Stcemqestcint", "Lost Stihi", "Lost Stringes", "Lost Suttung", "Lurklox Dhalmelneck", "Lyncean Juwgneg", "Maa Febi the Steadfast", "Mobpix Mucousmouth", "Morgmox Moldnoggin", "Mortilox Wartpaws", "Muu Febi the Steadfast", "Naa Yixo the Stillrage", "Nant'ina", "Nightmare Taurus", "Overlord's Tombstone", "Prowlox Barrelbelly", "Quicktrix Hexhands", "Qu'Pho Bloodspiller", "Ra'Gho Darkfount", "Ra'Gho's Avatar", "Reapertongue Gadgquok", "Ree Nata the Melomanic", "Rutrix Hamgams", "Scolopendra", "Scourquix Scaleskin", "Scourquix's Wyvern", "Scruffix Shaggychest", "Shamblix Rottenheart", "Slystix Megapeepers", "Smeltix Thickhide", "Snypestix Eaglebeak", "Soulsender Fugbrag", "Sparkspox Sweatbrow", "Spellspear Djokvukk", "Stcemqestcint", "Steelshank Kratzvatz", "Stihi", "Stringes", "Suttung", "Tee Zaksa the Ceaseless", "Te'Zha Ironclad", "Ticktox Beadyeyes", "Trailblix Goatmug", "Tufflix Loglimbs", "", "Tymexox Ninefingers", "Tzee Xicu Idol", "Va'Rhu Bodysnatcher", "Va'Zhe Pummelsong", "Voidstreaker Butchnotch", "Wasabix Callusdigit", "Wilywox Tenderpalm", "Woodnix Shrillwhistle", "Wuu Qoho the Razorclaw", "Wyrmgnasher Bjakdek", "Wyrmwix Snakespecs", "Xoo Kaza the Solemn", "Xuu Bhoqa the Enigma", "Ze'Vho Fallsplitter", "Zo'Pha Forgesoul"}
 staggers['night']['none'] = {"Animated Claymore", "Animated Dagger", "Animated Great Axe", "Animated Gun", "Animated Hammer", "Animated Horn", "Animated Kunai", "Animated Knuckles", "Animated Longbow", "Animated Longsword", "Animated Scythe", "Animated Shield", "Animated Spear", "Animated Staff", "Animated Tabar", "Animated Tachi", "Fire Pukis", "Petro Pukis", "Poison Pukis", "Wind Pukis", "Kindred's Vouivre", "Kindred's Wyvern", "Kindred's Avatar", "Vanguard Eye", "Prototype Eye", "Nebiros's Avatar", "Haagenti's Avatar", "Caim's Vouivre", "Andras's Vouivre", "Adamantking Effigy", "Avatar Icon", "Goblin Replica", "Serjeant Tombstone", "Zagan's Wyvern", "Hydra's Hound", "Hydra's Wyvern", "Hydra's Avatar", "Rearguard Eye", "Adamantking Effigy", "Adamantking Image", "Avatar Icon", "Avatar Idol", "Effigy Prototype", "Goblin Replica", "Goblin Statue", "Icon Prototype", "Manifest Icon", "Manifest Icon", "Prototype Eye", "Serjeant Tombstone", "Statue Prototype", "Tombstone Prototype", "Vanguard Eye", "Vanguard's Avatar", "Vanguard's Avatar", "Vanguard's Avatar", "Vanguard's Avatar", "Vanguard's Crow", "Vanguard's Hecteyes", "Vanguard's Scorpion", "Vanguard's Slime", "Vanguard's Wyvern", "Vanguard's Wyvern", "Vanguard's Wyvern", "Vanguard's Wyvern", "Warchief Tombstone"}
 Currency = {"Ordelle Bronzepiece", "Montiont Silverpiece", "One Byne Bill","One Hundred Byne Bill","Tukuku Whiteshell", "Lungo-Nango Jadeshell", "Forgotten Thought", "Forgotten Hope", "Forgotten Touch", "Forgotten Journey", "Forgotten Step"}
-ProcZones = {"Dynamis - San d'Oria","Dynamis - Windurst","Dynamis - Bastok","Dynamis - Jeuno","Dynamis - Beaucedine","Dynamis - Xarcabard","Dynamis - Valkurm","Dynamis - Buburimu","Dynamis - Qufim","Dynamis - Tavnazia"}
+ProcZones = res.zones:english(string.startswith-{'Dynamis'}):keyset()
 proctype = {"ja","magic","ws","random","none"}
 StaggerCount = 0
 current_proc = "lolidk"
 currentime = 0
-goodzone = "no"
+goodzone = false
 timer = "off"
 tracker = "off"
 proc = "off"
@@ -86,7 +89,7 @@ end
 
 windower.register_event('load', 'login', function()
     if windower.ffxi.get_info().logged_in then
-        player = windower.ffxi.get_player()['name']
+        player = windower.ffxi.get_player().name
         obtained = nil
         initializebox()
     end
@@ -196,7 +199,6 @@ windower.register_event('incoming text',function (original, new, color)
 end)
 
 function obtainedf()
---	print('obtainedf function')
 	obtained = nil
  	for i=1,#Currency do
  		if Currency[Currency[i]] ~= 0 then
@@ -208,22 +210,14 @@ function obtainedf()
  	end
 end
 
-function checkzone()
---	print('checkzone function')
-	goodzone = 'no'
-	currentzone = windower.ffxi.get_info()['zone']:lower()
-	for i=1, #ProcZones do
-		if currentzone == ProcZones[i]:lower() then
-			goodzone = 'yes'
-		end
+windower.register_event('zone change', function(id)
+	goodzone = ProcZones:contains(id)
+	if not goodzone then
+		windower.text.set_visibility('proc_box', false)
 	end
-	if goodzone == 'no' then
-		windower.text.set_visibility('proc_box',false)
-	end
-end
+end)
 
 function initializebox()
---	print('initializebox function')
 	if obtained ~= nil and tracker == "on" then
  		windower.text.create('dynamis_box')
  		windower.text.set_bg_color('dynamis_box',200,30,30,30)
@@ -236,20 +230,14 @@ function initializebox()
  	end
 end
 
-
-windower.register_event('target change',function (targ_id)
---	print('event_target_change function')
-	checkzone()
-	if proc == 'on' then
-		if targ_id ~= 0 then
-			mob = windower.ffxi.get_mob_by_index(targ_id)['name']
-  			setproc()
-  		end
+windower.register_event('target change', function(targ_id)
+	if proc == 'on' and targ_id ~= 0 then
+        mob = windower.ffxi.get_mob_by_index(targ_id)['name']
+        setproc()
  	end
 end)
 
 function setproc()
---	print('setproc function')
 	current_proc = 'lolidk'
     local currenttime = windower.ffxi.get_info().time
  	if currenttime >= 0*60 and currenttime < 8*60 then
@@ -259,7 +247,6 @@ function setproc()
 	elseif currenttime >= 16*60 and currenttime <= 24*60 then
   		window = 'night'
  	end
--- 	print(window)
  	--figure out the stupid mob's proc
  	for i=1, #proctype do
   		for j=1, #staggers[window][proctype[i]] do
@@ -284,7 +271,7 @@ function initializeproc()
 	 	windower.text.set_bg_color('proc_box',200,30,30,30)
 	 	windower.text.set_color('proc_box',255,200,200,200)
 	 	windower.text.set_location('proc_box',pposx,pposy)
-	 	if goodzone == 'yes' and proc == 'on' then
+	 	if goodzone and proc == 'on' then
 	 	 	windower.text.set_visibility('proc_box', true)
 	 	end
 	 	windower.text.set_bg_visibility('proc_box',1)

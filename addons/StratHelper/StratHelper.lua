@@ -24,11 +24,11 @@
 -- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 -- SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-require 'tables'
+require('tables')
 
-
+_addon.name = 'StratHelper'
 _addon.author = 'Ihm'
-_addon.version = '0.2'
+_addon.version = '0.2.0.0'
 
 function reinit()
 	clock_current = 0
@@ -39,20 +39,18 @@ end
 windower.register_event('load',function ()
 	strat_max = 0
 	strat_cur = 0
-	strat_ids = T{215,216,217,218,219,220,221,222,234,235,240,241,242,243,316,317}
+	strat_ids = S{215,216,217,218,219,220,221,222,234,235,240,241,242,243,316,317}
 	scvar_strats_current = '_SCH_Strats_Current'
 	scvar_strats_max = '_SCH_Strats_Max'
 	clock_current = 0
 	loop_active = false
-	windower.send_command('alias resetstrats lua i StratHelper reset_strats')
-	if windower.ffxi.get_info()['logged_in'] then
+	windower.send_command('alias resetstrats lua i StratHelper reinit')
+	if windower.ffxi.get_info().logged_in then
 		reinit()
 	end
 end)
 
-windower.register_event('unload',function ()
-	windower.send_command('unalias resetstrats')
-end)
+windower.register_event('unload', windower.send_command:prepare('unalias resetstrats'))
 
 windower.register_event('action',function (act)
 	if act.actor_id == windower.ffxi.get_player()['id'] then
@@ -77,13 +75,9 @@ windower.register_event('action',function (act)
 	end
 end)
 
-windower.register_event('job change',function ()
-	reinit()
-end)
+windower.register_event('job change', reinit)
 
-windower.register_event('login',function ()
-	reinit()
-end)
+windower.register_event('login', reinit)
 
 function strat_max_calc()
 	local set_cur = false
@@ -116,8 +110,4 @@ function strat_loop()
 	if strat_cur > strat_max then
 		strat_cur = strat_max
 	end
-end
-
-function reset_strats()
-	reinit()
 end

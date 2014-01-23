@@ -74,6 +74,7 @@ end
 	}
 	players = {'player1', 'player2', 'player3', 'player4'}
 
+salvage_zones = S{73, 74, 75, 76}
 
 function settings_create()
 --	get player's name
@@ -171,12 +172,14 @@ windower.register_event('load',function ()
 	initialize()
 end )
 
-windower.register_event('login',function ()
-	settings_create()
-end)
+windower.register_event('login', settings_create)
 
-windower.register_event('zone change',function (from_id, from, to_id, to)
-	checkzone()
+windower.register_event('zone change', function(id)
+    if salvage_zones:contains(id) then
+        windower.send_command('timers c Remaining 6000 up')
+    else
+        windower.send_command('timers d Remaining')
+    end
 end)
 
 function orderlots()
@@ -236,14 +239,6 @@ function initialize()
 	windower.text.set_bg_visibility('salvage_box',1)
 	windower.text.set_font('salvage_box','Arial',12)
 	windower.text.set_text('salvage_box',' Lot order:  \n'..lotorder);
-end
-
-function checkzone()
-	currentzone = windower.ffxi.get_info()['zone']:lower()
-		if currentzone == 'silver sea remnants' or currentzone == 'zhayolm remnants' or currentzone == 'bhaflau remnants' or currentzone == 'arrapago remnants' then
-			windower.send_command('timers c Remaining 6000 up')
-		else windower.send_command('timers d Remaining')
-		end
 end
 
 windower.register_event('incoming text',function (original, new, color)

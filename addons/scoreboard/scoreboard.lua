@@ -304,7 +304,7 @@ end
 
 local function update_dps_clock()
     local player = windower.ffxi.get_player()
-    if player and windower.ffxi.get_player()['in_combat'] then
+    if player and player.in_combat then
         dps_clock:advance()
     else
         dps_clock:pause()
@@ -313,13 +313,13 @@ end
 
 
 -- Keep updates flowing
-windower.register_event('time change', 'status change', function(...)
+windower.register_event('time change', 'status change', function()
     update_dps_clock()
     display:update()
 end)
 
 
-windower.register_event('login', 'load', function(...)
+windower.register_event('login', 'load', function()
     -- Bail out until we are logged in properly.
     local player = windower.ffxi.get_player()
     if not player then

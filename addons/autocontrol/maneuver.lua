@@ -306,7 +306,7 @@ end
 
 function text_update_loop(str)
     if mjob_id == 18 then
-        if str == 'start' and running == 1 and not petlessZones:contains(windower.ffxi.get_info()['zone_id']) then
+        if str == 'start' and running == 1 and not petlessZones:contains(windower.ffxi.get_info().zone) then
             for key, _ in pairs(heat) do
                 timer[key] = timer[key] - 1
                 if timer[key] < 1 then timer[key] = 0 end
