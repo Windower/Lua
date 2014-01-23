@@ -1,4 +1,4 @@
-﻿-- Basic elements
+-- Basic elements
 local elements = {}
 
 elements[0] = {english = 'Fire',      french = "feu",       german = 'Feuer',   japanese = '火'}

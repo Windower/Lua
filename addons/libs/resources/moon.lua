@@ -1,4 +1,4 @@
-﻿-- Moon phases
+-- Moon phases
 local moon = {}
 
 moon[0]  = { english = 'New Moon',              french = 'Nouvelle lune',              german = 'Neumond',             japanese = '新月' }
