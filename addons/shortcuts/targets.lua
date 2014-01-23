@@ -54,7 +54,7 @@ function valid_target(targ,flag)
 		local current_target = windower.ffxi.get_mob_by_target('<t>')
 		local targar = {}
 		for i,v in pairs(windower.ffxi.get_mob_array()) do
-			if string.find(v.name:lower(),san_targ:lower()) and v.valid_target then
+			if string.find(v.name:lower(),san_targ:lower()) and (v.valid_target or v.id == windower.ffxi.get_player().id) then
 				-- Handling for whether it's a monster or not
 				if v.is_npc and current_target then
 					if v.id == current_target.id then
@@ -65,7 +65,7 @@ function valid_target(targ,flag)
 				end
 			end
 		end
-		
+				
 		-- If flag is set, push out the target only if it is in the targ array.
 		if targar[targ] then
 			spell_targ = targ

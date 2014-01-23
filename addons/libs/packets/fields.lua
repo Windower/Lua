@@ -1137,11 +1137,11 @@ fields.incoming[0x067] = L{
     {ctype='unsigned short',    label='Pet Index',          fn=index},          -- 06
     {ctype='unsigned int',      label='Pet ID',             fn=id},             -- 08
     {ctype='unsigned short',    label='Owner Index',        fn=index},          -- 0C
-    {ctype='unsigned char',     label='Current HP%'},                           -- 0E  -- Set in 44 06 packet
-    {ctype='unsigned char',     label='Maximum HP%'},                           -- 0F  -- Set in 44 06 packet
-    {ctype='unsigned short',    label='Pet TP%'},                               -- 10  -- Multiplied by 10, set in 44 06 packet. Can take values at other times that might not be Pet TP
+    {ctype='unsigned char',     label='Current HP%'},                           -- 0E
+    {ctype='unsigned char',     label='Current MP%'},                           -- 0F
+    {ctype='unsigned short',    label='Pet TP%'},                               -- 10  -- Multiplied by 10
     {ctype='unsigned short',    label='_unknown1'},                             -- 12
-    {ctype='char*',             label='Pet Name'},                              -- 14  -- Set in 44 06 packet. Packet expands to accommodate pet name length.
+    {ctype='char*',             label='Pet Name'},                              -- 14  -- Packet expands to accommodate pet name length.
 }
 
 -- LS Message
