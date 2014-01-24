@@ -350,13 +350,14 @@ windower.register_event('lose buff',function(buff_id)
 	equip_sets('buff_change',nil,buff_name,false)
 end)
 
-windower.register_event('job change',function(mjob, mjob_id, mjob_lvl, sjob, sjob_id, sjob_lvl)
+windower.register_event('job change',function(mjob_id, mjob_lvl, sjob_id, sjob_lvl)
 	if debugging >= 1 then windower.debug('job change') end
 	disable_table = {false,false,false,false,false,false,false,false,false,false,false,false,false,false,false}
 	not_sent_out_equip = {}
 	sent_out_equip = {}
 	limbo_equip = {}
-	if mjob ~= current_job_file then
+
+	if current_job_file ~= res.jobs[mjob_id].short then
 		refresh_user_env(mjob_id)
 	end
 end)
