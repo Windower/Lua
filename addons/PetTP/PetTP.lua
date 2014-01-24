@@ -221,7 +221,7 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 				current_mp_percent = original:byte(0x10)
 				current_tp_percent = (original:byte(0x11)+(original:byte(0x12)*256))/10
 				printpettp(pet_idx,own_idx)
-			elseif (original:byte(0x05) == 0x03) and (original:byte(0x06) == 0x05) and ((original:byte(0x0D)+original:byte(0x0E)*256) ~= 0) then
+			elseif not petactive and (original:byte(0x05) == 0x03) and (original:byte(0x06) == 0x05) and ((original:byte(0x0D)+original:byte(0x0E)*256) ~= 0) then
 				if update_pet(pet_idx,own_idx) == true then
 					current_hp = 0
 					max_hp	   = 0
