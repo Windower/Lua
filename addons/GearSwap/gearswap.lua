@@ -86,8 +86,9 @@ windower.register_event('addon command',function (...)
 	end
 	local splitup = {...}
 	if not splitup[1] then return end -- handles //gs
+	local cmd = splitup[1]:lower()
 	
-	if splitup[1]:lower() == 'c' then
+	if cmd == 'c' then
 		if gearswap_disabled then return end
 		if splitup[2] then
 			refresh_globals()
@@ -95,7 +96,7 @@ windower.register_event('addon command',function (...)
 		else
 			windower.add_to_chat(123,'GearSwap: No self command passed.')
 		end
-	elseif splitup[1]:lower() == 'equip' then
+	elseif cmd == 'equip' then
 		if gearswap_disabled then return end
 		local set_split = string.split(_raw.table.concat(splitup,' ',2,#splitup):gsub('%[','%.'):gsub('[%]\']',''),'.')
 		local n = 1
@@ -117,10 +118,10 @@ windower.register_event('addon command',function (...)
 				break
 			end
 		end
-	elseif splitup[1]:lower() == 'export' then
+	elseif cmd == 'export' then
 		table.remove(splitup,1)
 		export_set(splitup)
-	elseif splitup[1]:lower() == 'validate' then
+	elseif cmd == 'validate' then
 		if user_env and user_env.sets then
 			refresh_globals()
 			table.remove(splitup, 1)
@@ -128,19 +129,19 @@ windower.register_event('addon command',function (...)
 		else
 			windower.add_to_chat(123,'GearSwap: There is nothing to validate because there is no file loaded.')
 		end
-	elseif splitup[1]:lower() == 'enable' then
+	elseif cmd == 'enable' then
 		disenable(splitup,enable,'enable',false)
-	elseif splitup[1]:lower() == 'disable' then
+	elseif cmd == 'disable' then
 		disenable(splitup,disable,'disable',true)
-	elseif splitup[1]:lower() == 'reload' then
+	elseif cmd == 'reload' or cmd == 'r' then
 		refresh_user_env()
-	elseif strip(splitup[1]) == 'debugmode' then
+	elseif strip(cmd) == 'debugmode' then
 		_settings.debug_mode = not _settings.debug_mode
 		print('GearSwap: Debug Mode set to '..tostring(_settings.debug_mode)..'.')
-	elseif strip(splitup[1]) == 'showswaps' then
+	elseif strip(cmd) == 'showswaps' then
 		_settings.show_swaps = not _settings.show_swaps
 		print('GearSwap: Show Swaps set to '..tostring(_settings.show_swaps)..'.')
-	elseif not ((strip(splitup[1]) == 'eval' or strip(splitup[1]) == 'visible' or strip(splitup[1]) == 'invisible' or strip(splitup[1]) == 'clocking' ) and debugging>0) then
+	elseif not (S{'eval','visible','invisible','clocking'}:contains(cmd) and debugging>0) then
 		print('GearSwap: Command not found')
 	end
 end)
