@@ -222,12 +222,12 @@ function include_user(str)
 		error('\nGearSwap: Cannot find the include file ('..tostring(str)..').', 2)
 	end
 	
-	local f = loadfile(path)
-	if f then
+	local f, err = loadfile(path)
+	if f and not err then
 		setfenv(f,user_env)
 		f()
 	else
-		error('\nGearSwap: Error loading file ('..tostring(str)..').', 2)
+		error('\nGearSwap: Error loading file ('..tostring(str)..'): '..err, 2)
 	end
 end
 
