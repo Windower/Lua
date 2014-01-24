@@ -17,7 +17,8 @@ local current_mp_percent = 0
 local current_tp_percent = 0
 local tb_name = 'addon:pettp'
 local petactive = false
-local verbose = false
+local verbose = true
+local superverbose = false
 
 local defaults = T{}
 
@@ -25,6 +26,8 @@ defaults.autocolor = true
 defaults.bgvisible = true
 
 defaults.position = T{}
+--defaults.position.x = 1250
+--defaults.position.y = 890
 defaults.position.x = windower.get_windower_settings().x_res*2/3
 defaults.position.y = windower.get_windower_settings().y_res-17
 
@@ -56,8 +59,10 @@ function make_visible()
 end
 
 function make_invisible()
-	windower.text.set_visibility(tb_name, false)
-	if verbose == true then windower.add_to_chat(8, 'PetTP Invisible') end
+	if petactive then
+		windower.text.set_visibility(tb_name, false)
+		if verbose == true then windower.add_to_chat(8, 'PetTP Invisible') end
+	end
 	petactive = false
 	mypet_idx = nil
 end
@@ -65,11 +70,13 @@ end
 function valid_pet(pet_idx_in, own_idx_in)
 	local player = windower.ffxi.get_player()
 
+	if superverbose == true then windower.add_to_chat('valid_pet: ', tostring(petactive)..' - '..(pet_idx_in or 'nil')..' - '..(own_idx_in or 'nil')..' - '..player.index) end
 	if petactive then 
 		if mypet_idx then
 			if not pet_idx_in or mypet_idx == pet_idx_in then
 				return mypet_idx
 			else
+				if superverbose == true then windower.add_to_chat(8, 'mypet_idx ~= pet_idx_in') end
 				return
 			end
 		elseif own_idx_in and player.index == own_idx_in then
@@ -80,8 +87,10 @@ function valid_pet(pet_idx_in, own_idx_in)
 	
 	local pet    = windower.ffxi.get_mob_by_target('pet')	
 	if pet_idx_in and pet and pet_idx_in ~= pet.index then
+		if superverbose == true then windower.add_to_chat(8, 'pet.index ~= pet_idx_in') end
 		return
-	elseif pet_idx_in and player.mob and player.mob.pet_index and pet_idx_in ~= pet.index then
+	elseif pet_idx_in and player.mob and player.mob.pet_index and pet_idx_in ~= player.mob.pet_index then
+		if superverbose == true then windower.add_to_chat(8, 'player.mob.pet_index ~= pet_idx_in') end
 		return
 	elseif pet then
 		mypet_idx = pet.index
@@ -90,17 +99,23 @@ function valid_pet(pet_idx_in, own_idx_in)
 		mypet_idx = player.mob.pet_index	
 		return mypet_idx
 	end
+	if superverbose == true then windower.add_to_chat(8, 'pet invalid') end
 	return
 end
 function update_pet(pet_idx_in,own_idx_in)
 	pet_idx = valid_pet(pet_idx_in,own_idx_in)
 
 	if pet_idx == nil then
+		if superverbose == true then windower.add_to_chat(8, 'pet_idx == nil, pidx: '..(pet_idx_in or 'nil')..', '..(own_idx_in or 'nil')) end
 		return false
 	end
 
 	local pet_table = windower.ffxi.get_mob_by_index(pet_idx)
 	if pet_table == nil then
+		if superverbose == true then windower.add_to_chat(8, 'pet_table == nil, pidx: '..(pet_idx_in or 'nil')..', '..(own_idx_in or 'nil')) end
+		if petactive then -- presumably we have a pet, he just hasn't loaded, yet...
+			return true
+		end
 		make_invisible()
 		return false
 	end
@@ -181,7 +196,7 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 					current_mp_percent=0
 				end
 				printpettp()
-				if verbose == true then
+				if superverbose == true then
 					windower.add_to_chat(8, '0x44'
 						..', len: '..original:length()
 						..', cur_hp: '..current_hp
@@ -202,7 +217,7 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 				own_idx = (original:byte(0x0D)+original:byte(0x0E)*256)
 			end
 
-			if verbose == true and not ( 
+			if superverbose == true and not ( 
 				   (original:byte(0x05) == 0x02 and original:byte(0x06) == 0x09) -- not pet related
 				--or (original:byte(0x05) == 0x84 and original:byte(0x06) == 0x07) -- pet % update
 				or (original:byte(0x05) == 0x03 and original:byte(0x06) == 0x05 and (own_idx == 0)) -- NPC pops
@@ -234,6 +249,7 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 						make_visible()
 					else
 						make_invisible()
+						if superverbose == true then windower.add_to_chat(8, 'pet not found') end
 					end
 				end
 				current_hp_percent = original:byte(0x0F)
@@ -273,7 +289,7 @@ windower.register_event('load', function()
 	windower.text.set_italic(tb_name, settings.font.italic)
 	windower.text.set_text(tb_name, '')
 	windower.text.set_bg_visibility(tb_name, defaults.bgvisible)
-	if verbose == true then
+	if superverbose == true then
 		windower.add_to_chat(8, 'Player index: '..windower.ffxi.get_player().index)
 		if windower.ffxi.get_mob_by_target('pet') then
 			windower.add_to_chat(8, 'Pet index: '..windower.ffxi.get_mob_by_target('pet').index)
@@ -286,12 +302,15 @@ windower.register_event('load', function()
 end)
 
 windower.register_event('Zone change', function()
+	mypet_idx = nil
 	if update_pet() == true then
+		if verbose == true then windower.add_to_chat(8, 'Found pet after zoning...') end
 		make_visible()
 		printpettp()
-	else
+	elseif petactive then
 		make_invisible()
-	end		
+		if verbose == true then windower.add_to_chat(8, 'Lost pet after zoning...') end
+	end
 end)
 
 windower.register_event('job change', function()
