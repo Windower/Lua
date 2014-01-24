@@ -1,3 +1,4 @@
+
 local config = require 'config'
 
 _addon = _addon or {}
@@ -25,8 +26,10 @@ defaults.autocolor = true
 defaults.bgvisible = true
 
 defaults.position = T{}
-defaults.position.x = 1250
-defaults.position.y = 890
+--defaults.position.x = 1250
+--defaults.position.y = 890
+defaults.position.x = windower.get_windower_settings().x_res*2/3
+defaults.position.y = windower.get_windower_settings().y_res-17
 
 defaults.font = T{}
 defaults.font.family = 'Courier New'
@@ -66,7 +69,7 @@ function valid_pet(pet_idx_in, own_idx_in)
 
 	if petactive then 
 		if mypet_idx then
-			if mypet_idx == pet_idx_in then
+			if not pet_idx_in or mypet_idx == pet_idx_in then
 				return mypet_idx
 			else
 				return
@@ -169,9 +172,28 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 				max_hp	   = original:byte(0x6B)+(original:byte(0x6C)*256)
 				current_mp = original:byte(0x6D)+(original:byte(0x6E)*256)
 				max_mp	   = original:byte(0x6F)+(original:byte(0x70)*256)
-				current_hp_percent=math.floor(100*current_hp/max_hp)
-				current_mp_percent=math.floor(100*current_mp/max_mp)
+				if max_hp ~= 0 then
+					current_hp_percent=math.floor(100*current_hp/max_hp)
+				else
+					current_hp_percent=0
+				end
+				if max_mp ~= 0 then
+					current_mp_percent=math.floor(100*current_mp/max_mp)
+				else
+					current_mp_percent=0
+				end
 				printpettp()
+				if verbose == true then
+					windower.add_to_chat(8, '0x44'
+						..', len: '..original:length()
+						..', cur_hp: '..current_hp
+						..', max_hp: '..max_hp
+						..', cur_mp: '..current_mp
+						..', max_mp: '..max_mp
+						..', cur_hp_%: '..current_hp_percent
+						..', cur_mp_%: '..current_mp_percent
+					)
+				end
 			end
 		elseif id == 0x67 then	-- general hp/tp/mp update
 			if T{0x04,0x44,0xC4,0x84}:contains(original:byte(0x05)) then
@@ -266,8 +288,6 @@ windower.register_event('load', function()
 end)
 
 windower.register_event('Zone change', function()
-	petactive = false
-	mypet_idx = nil
 	if update_pet() == true then
 		make_visible()
 		printpettp()
