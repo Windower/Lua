@@ -169,16 +169,21 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
 
 	if id == 0x0E and not injected and pet.index and pet.index == data:byte(9) + data:byte(10)*256 and math.floor((data:byte(11)%8)/4)== 1 then
 		local oldstatus = pet.status
-		local newstatus = res.statuses[data:byte(32)]
-		if newstatus then newstatus = newstatus.english
-		else newstatus = data:byte(32) end
-		if oldstatus ~= newstatus then
-			-- Should put a filter on this to prevent it from sending anything other than resting, engaged, and idle.
-			refresh_globals()
-
-			if pet.isvalid then
-				pet.status = newstatus
-				equip_sets('pet_status_change',nil,newstatus,oldstatus)
+		local status_id = data:byte(32)
+		-- Ignore all statuses aside from Idle/Engaged/Dead/Engaged dead.
+		if status_id < 4 then
+			local newstatus = res.statuses[status_id]
+			if newstatus and newstatus.english then
+				newstatus = newstatus.english
+	
+				if oldstatus ~= newstatus then
+					refresh_globals()
+		
+					if pet.isvalid then
+						pet.status = newstatus
+						equip_sets('pet_status_change',nil,newstatus,oldstatus)
+					end
+				end
 			end
 		end
 	elseif id == 0x28 and not injected then
