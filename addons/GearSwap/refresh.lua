@@ -317,8 +317,8 @@ end
 function refresh_ffxi_info()
 	local info = windower.ffxi.get_info()
 	for i,v in pairs(info) do
-		if i == 'zone' and r_areas[v] then
-			world.zone = r_areas[v][language]
+		if i == 'zone' and res.zones[v] then
+			world.zone = res.zones[v][language]
 			world.area = world.zone
 		elseif i == 'weather' and res.weather[v] then
 			world.weather_id = v
