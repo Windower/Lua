@@ -244,13 +244,8 @@ function user_midaction(bool)
 	elseif bool ~= nil then
 		error('\nGearSwap: midaction() was passed an invalid value ('..tostring(bool)..'). (true=true, false=false, nil=nothing)', 2)
 	end
-	
-	for i,v in pairs(out_arr) do
-		if v.midaction then
-			return true,v.spell
-		end
-	end
-	return false
+
+	return _global.midaction
 end
 
 function user_pet_midaction(bool)
@@ -259,13 +254,8 @@ function user_pet_midaction(bool)
 	elseif bool ~= nil then
 		error('\nGearSwap: pet_midaction() was passed an invalid value ('..tostring(bool)..'). (true=true, false=false, nil=nothing)', 2)
 	end
-	
-	for i,v in pairs(out_arr) do
-		if v.pet_midaction then
-			return true,v.spell
-		end
-	end
-	return false
+
+	return _global.pet_midaction
 end
 
 
