@@ -25,6 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+areaFile = file.new('../../plugins/resources/areas.xml')
 speFile = file.new('../../plugins/resources/spells.xml')
 jaFile = file.new('../../plugins/resources/abils.xml')
 statusFile = file.new('../../plugins/resources/status.xml')
@@ -34,6 +35,7 @@ r_itemsGFile = file.new('../../plugins/resources/items_general.xml')
 r_itemsAFile = file.new('../../plugins/resources/items_armor.xml')
 r_itemsWFile = file.new('../../plugins/resources/items_weapons.xml')
 
+r_areas = parse_resources(areaFile:readlines())
 r_abilities = parse_resources(jaFile:readlines())
 r_spells = parse_resources(speFile:readlines())
 r_status = parse_resources(statusFile:readlines())
