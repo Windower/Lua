@@ -129,7 +129,7 @@ function update_pet(pet_idx_in,own_idx_in)
 
 	local pet_table = windower.ffxi.get_mob_by_index(pet_idx)
 	if pet_table == nil then
-		if superverbose == true then windower.add_to_chat(8, 'pet_table == nil, pidx: '..(pet_idx_in or 'nil')..', '..(own_idx_in or 'nil')) end
+		if superverbose == true then windower.add_to_chat(8, 'pet_table == nil, pidx: '..(pet_idx or 'nil')..', '..(own_idx_in or 'nil')) end
 		if petactive then -- presumably we have a pet, he just hasn't loaded, yet...
 			return true
 		end
@@ -150,7 +150,11 @@ function printpettp(pet_idx_in,own_idx_in)
 	if not petactive then
 		return
 	end
-	if valid_pet(pet_idx_in,own_idx_in) == nil then
+	if petname == 'Unknown' then
+		if update_pet(pet_idx_in,own_idx_in) == false then
+			return
+		end
+	elseif valid_pet(pet_idx_in,own_idx_in) == nil then
 		return
 	end
 
@@ -207,6 +211,7 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 					end
 				end
 				if petactive then
+					petname    = original:sub(0x59,original:find(string.char(0),0x59)-1)
 					current_hp = original:byte(0x69)+(original:byte(0x6A)*256)
 					max_hp	   = original:byte(0x6B)+(original:byte(0x6C)*256)
 					current_mp = original:byte(0x6D)+(original:byte(0x6E)*256)
@@ -271,6 +276,7 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 			end
 			if (original:byte(0x05) == 0x04) and (original:byte(0x06) == 0x05) then
 				make_invisible()
+				if verbose == true then windower.add_to_chat(8, 'Pet died/despawned') end
 			elseif T{0x04,0x44,0xC4,0x84}:contains(original:byte(0x05)) then
 				if not petactive then
 					petactive = true  -- force our pet to appear even if it's not attached to us yet
@@ -284,6 +290,9 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 				current_hp_percent = original:byte(0x0F)
 				current_mp_percent = original:byte(0x10)
 				current_tp_percent = (original:byte(0x11)+(original:byte(0x12)*256))/10
+				if petname == 'Unknown' then
+					petname = original:sub(0x15,original:find(string.char(0),0x15)-1)
+				end
 				printpettp(pet_idx,own_idx)
 			elseif not petactive and (original:byte(0x05) == 0x03) and (original:byte(0x06) == 0x05) and ((original:byte(0x0D)+original:byte(0x0E)*256) ~= 0) then
 				if update_pet(pet_idx,own_idx) == true then
@@ -387,8 +396,7 @@ windower.register_event('addon command',function (...)
 			print('   :::   '.._addon.name..' ('.._addon.version..'   :::')
 			print('Toggles: (* subtoggles)')
 			print(' 1. verbose --- Some light logging, Default = false')
-			print(' 2. superverbose --- Heavy packet logging, Default = False')
-			print(' 3. help --- shows this menu')
+			print(' 2. help --- shows this menu')
 		end
 	end
 end)
