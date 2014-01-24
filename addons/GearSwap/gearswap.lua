@@ -324,23 +324,30 @@ windower.register_event('status change',function(new,old)
 	equip_sets('status_change',nil,res.statuses[new].english,res.statuses[old].english)
 end)
 
-windower.register_event('gain buff',function(name,id)
-	if debugging >= 1 then windower.debug('gain buff '..name) end
+windower.register_event('gain buff',function(buff_id)
+	if not r_status[buff_id] then
+		error('GearSwap: No known status for buff id #'..tostring(buff_id))
+	end
+	local buff_name = r_status[buff_id][language]
+	if debugging >= 1 then windower.debug('gain buff '..buff_name..' ('..tostring(buff_id)..')') end
 	if gearswap_disabled then return end
 	
 	-- Need to figure out what I'm going to do with this:
-	if _global.midaction and T{'terror','sleep','stun','petrification','charm','weakness'}:contains(name:lower()) then _global.midaction = false end
-	
+	if _global.midaction and T{'terror','sleep','stun','petrification','charm','weakness'}:contains(buff_name:lower()) then _global.midaction = false end
 	
 	refresh_globals()
-	equip_sets('buff_change',nil,name:sub(1,1):upper()..name:sub(2):lower(),true)
+	equip_sets('buff_change',nil,buff_name,true)
 end)
 
-windower.register_event('lose buff',function(name,id)
-	if debugging >= 1 then windower.debug('lose buff '..name) end
+windower.register_event('lose buff',function(buff_id)
+	if not r_status[buff_id] then
+		error('GearSwap: No known status for buff id #'..tostring(buff_id))
+	end
+	local buff_name = r_status[buff_id][language]
+	if debugging >= 1 then windower.debug('lose buff '..buff_name..' ('..tostring(buff_id)..')') end
 	if gearswap_disabled then return end
 	refresh_globals()
-	equip_sets('buff_change',nil,name:sub(1,1):upper()..name:sub(2):lower(),false)
+	equip_sets('buff_change',nil,buff_name,false)
 end)
 
 windower.register_event('job change',function(mjob, mjob_id, mjob_lvl, sjob, sjob_id, sjob_lvl)
