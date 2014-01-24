@@ -214,27 +214,20 @@ function include_user(str)
 	if not (type(str) == 'string') then
 		error('\nGearSwap: include() was passed an invalid value ('..tostring(str)..'). (must be a string)', 2)
 	end
+	
 	if str:sub(-4)~='.lua' then str = str..'.lua' end
-
 	local path, loaded_values = pathsearch({str})
 	
 	if not path then
 		error('\nGearSwap: Cannot find the include file ('..tostring(str)..').', 2)
+	end
+	
+	local f = loadfile(path)
+	if f then
+		setfenv(f,user_env)
+		f()
 	else
-		loaded_values = dofile(path)
-	end
-	
-	if not loaded_values then
-		error('\nGearSwap: Nothing was returned by the include ('..tostring(str)..').  Cannot add it to the user environment.', 2)
-	elseif type(loaded_values) ~= 'table' then
-		error('\nGearSwap: The include ('..tostring(str)..') did not return a table.  Cannot add it to the user environment.', 2)
-	end
-	
-	for i,v in pairs(loaded_values) do
-		rawset(user_env,i,v)
-		if type(v) == 'function' then
-			setfenv(user_env[i],user_env)
-		end
+		error('\nGearSwap: Error loading file ('..tostring(str)..').', 2)
 	end
 end
 
