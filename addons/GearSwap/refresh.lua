@@ -317,38 +317,50 @@ end
 function refresh_ffxi_info()
 	local info = windower.ffxi.get_info()
 	for i,v in pairs(info) do
-		if i ~= 'target' then
+		if i == 'zone' and r_areas[v] then
+			world.zone = r_areas[v][language]
+			world.area = world.zone
+		elseif i == 'weather' and res.weather[v] then
+			world.weather_id = v
+			world.weather = res.weather[v][language]
+			world.real_weather = world.weather
+			world.weather_element = res.elements[res.weather[v].element][language]
+			world.real_weather_element = world.weather_element
+		elseif i == 'day' and res.days[v] then
+			world.day = res.days[v][language]
+			world.day_element = res.elements[res.days[v].element][language]
+		elseif i == 'moon' then
+			world.moon_pct = v
+		elseif i == 'moon_phase' and res.moon_phases[v] then
+			world.moon = res.moon_phases[v][language]
+		elseif i ~= 'target' then
 			world[i] = v
 		end
-		if i ~= 'target' and i == 'zone' then
-			world.area = v
-		end
 	end
-	world.real_weather = info.weather
-	world.real_weather_element = info.weather_element
+
 	if buffactive.voidstorm then
-		world.weather = 'Dark'
+		world.weather = 'Voidstorm'
 		world.weather_element = 'Dark'
 	elseif buffactive.aurorastorm then
-		world.weather = 'Light'
+		world.weather = 'Aurorastorm'
 		world.weather_element = 'Light'
 	elseif buffactive.firestorm then
-		world.weather = 'Fire'
+		world.weather = 'Firestorm'
 		world.weather_element = 'Fire'
 	elseif buffactive.sandstorm then
-		world.weather = 'Earth'
+		world.weather = 'Sandstorm'
 		world.weather_element = 'Earth'
 	elseif buffactive.rainstorm then
-		world.weather = 'Water'
+		world.weather = 'Rainstorm'
 		world.weather_element = 'Water'
 	elseif buffactive.windstorm then
-		world.weather = 'Wind'
+		world.weather = 'Windstorm'
 		world.weather_element = 'Wind'
 	elseif buffactive.hailstorm then
-		world.weather = 'Ice'
+		world.weather = 'Hailstorm'
 		world.weather_element = 'Ice'
 	elseif buffactive.thunderstorm then
-		world.weather = 'Lightning'
+		world.weather = 'Thunderstorm'
 		world.weather_element = 'Lightning'
 	end
 end
