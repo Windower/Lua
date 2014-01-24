@@ -1,4 +1,3 @@
-
 local config = require 'config'
 
 _addon = _addon or {}
@@ -26,8 +25,6 @@ defaults.autocolor = true
 defaults.bgvisible = true
 
 defaults.position = T{}
---defaults.position.x = 1250
---defaults.position.y = 890
 defaults.position.x = windower.get_windower_settings().x_res*2/3
 defaults.position.y = windower.get_windower_settings().y_res-17
 
@@ -53,6 +50,7 @@ defaults.colors.text.b = 255
 settings = config.load(defaults)
 
 function make_visible()
+	petactive = true
 	windower.text.set_visibility(tb_name, true)
 	if verbose == true then windower.add_to_chat(8, 'PetTP Visible') end
 end
@@ -231,7 +229,7 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 				make_invisible()
 			elseif T{0x04,0x44,0xC4,0x84}:contains(original:byte(0x05)) then
 				if not petactive then
-					petactive = true
+					petactive = true  -- force our pet to appear even if it's not attached to us yet
 					if update_pet(pet_idx,own_idx) == true then
 						make_visible()
 					else
