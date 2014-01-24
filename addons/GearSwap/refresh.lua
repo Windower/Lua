@@ -217,20 +217,34 @@ function refresh_player()
 	player.subtarget = target_complete(windower.ffxi.get_mob_by_target('st'))
 	player.last_subtarget = target_complete(windower.ffxi.get_mob_by_target('lastst'))
 	
-	-- If you have a pet, make a pet table.
+	-- If we have a pet, create or update the table info.
 	if player_mob_table.pet_index then
-		table.reassign(pet,target_complete(windower.ffxi.get_mob_by_index(player_mob_table.pet_index)))
-		pet.isvalid = true
+		local new_isvalid = true
+		local current_status
+
+		-- If the pet table fully exists already, copy over its status instead of
+		-- forcing it.  This accounts for being called after the pet is released,
+		-- where isvalid was set to false.
+		if pet.isvalid ~= nil and player_mob_table.pet_index == pet.index then
+			new_isvalid = pet.isvalid
+			current_status = pet.status
+		end
+
+		table.reassign(pet, target_complete(windower.ffxi.get_mob_by_index(player_mob_table.pet_index)))
+
+		pet.isvalid = new_isvalid
+		if current_status then pet.status = current_status end
 		pet.claim_id = nil
 		pet.is_npc = nil
 		if pet.tp then pet.tp = pet.tp/10 end
+		
 		if avatar_element[pet.name] then
 			pet.element = avatar_element[pet.name]
 		else
 			pet.element = 'None'
 		end
 	else
-		table.reassign(pet,{isvalid=false})
+		table.reassign(pet, {isvalid=false})
 	end
 	
 	if player.main_job == 'PUP' or player.sub_job == 'PUP' then
