@@ -1,4 +1,3 @@
-
 local config = require 'config'
 
 _addon = _addon or {}
@@ -18,7 +17,7 @@ local current_mp_percent = 0
 local current_tp_percent = 0
 local tb_name = 'addon:pettp'
 local petactive = false
-local verbose = true
+local verbose = false
 
 local defaults = T{}
 
