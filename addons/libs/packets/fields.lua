@@ -64,6 +64,8 @@ local time = (function()
     end
 end)()
 
+local time_ms = time..function(val) return val/1000  end
+
 local dir = (function()
     local dir_sets = L{'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW', 'N', 'NNE', 'NE', 'ENE', 'E'}
     return function(val)
@@ -174,10 +176,10 @@ types.shop_item = L{
 
 -- Client Leave
 fields.outgoing[0x00D] = L{
-    {ctype='unsigned char',     label='_unknown1'},                             -- 04 -- Always 00?
-    {ctype='unsigned char',     label='_unknown2'},                             -- 05 -- Always 00?
-    {ctype='unsigned char',     label='_unknown3'},                             -- 06 -- Always 00?
-    {ctype='unsigned char',     label='_unknown4'},                             -- 07 -- Always 00?
+    {ctype='unsigned char',     label='_unknown1'},                             -- 04   Always 00?
+    {ctype='unsigned char',     label='_unknown2'},                             -- 05   Always 00?
+    {ctype='unsigned char',     label='_unknown3'},                             -- 06   Always 00?
+    {ctype='unsigned char',     label='_unknown4'},                             -- 07   Always 00?
 }
 
 -- Standard Client
@@ -185,12 +187,12 @@ fields.outgoing[0x015] = L{
     {ctype='float',             label='X Position'},                            -- 04
     {ctype='float',             label='Y Position'},                            -- 08
     {ctype='float',             label='Z Position'},                            -- 0C
-    {ctype='unsigned short',    label='_zero1'},                                -- 10
-    {ctype='unsigned short',    label='Run Count'},                             -- 12 -- Counter that indicates how long you've been running?
+    {ctype='unsigned short',    label='_junk1'},                                -- 10
+    {ctype='unsigned short',    label='Run Count'},                             -- 12   Counter that indicates how long you've been running?
     {ctype='unsigned char',     label='Rotation',           fn=dir},            -- 14
     {ctype='unsigned char',     label='_unknown2'},                             -- 15
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 16
-    {ctype='unsigned int',      label='Timestamp',          fn=time},           -- 18
+    {ctype='unsigned int',      label='Timestamp',          fn=time_ms},        -- 18   Milliseconds
     {ctype='unsigned int',      label='_unknown3'},                             -- 1A
 }
 
