@@ -380,6 +380,10 @@ windower.register_event('job change',function(mjob_id, mjob_lvl, sjob_id, sjob_l
 
 	if current_job_file ~= res.jobs[mjob_id].short then
 		refresh_user_env(mjob_id)
+	elseif player.sub_job ~= res.jobs[mjob_id].short then
+		local temp_sub = player.sub_job
+		refresh_globals()
+		equip_sets('sub_job_change',nil,res.jobs[mjob_id].short,temp_sub)
 	end
 end)
 
