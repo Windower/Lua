@@ -600,8 +600,10 @@ function d_out_arr_entry(sp,ind)
 		elseif debugging >= 1 then
 			windower.add_to_chat(123,'GearSwap: Ind matches the predicted Ind, but does not exist in out_arr.')
 		end
+	elseif out_arr[ind] then
+		out_arr[ind] = nil
 	else
-		windower.add_to_chat(123,'GearSwap: Missing ind was passed.')
+		windower.add_to_chat(123,'GearSwap: Missing ind was passed: '..tostring(ind))
 	end
 	return inde
 end
@@ -654,6 +656,39 @@ end
 
 
 -----------------------------------------------------------------------------------
+--Name: delete_out_arr_by_time()
+--Desc: Deletes the most recent out_arr entry
+--Args:
+---- none
+-----------------------------------------------------------------------------------
+--Returns:
+---- none
+-----------------------------------------------------------------------------------
+function delete_out_arr_by_time(target)
+	local time_stamp,ind
+	local time_now = os.time()
+	
+	-- Iterate over out_arr looking for a spell targeting the current target
+	-- Call aftercast with this spell's information (interrupted) if one is found.
+	for i,v in pairs(out_arr) do
+		if (target == 'player' and v.midaction or target=='pet' and v.pet_midaction) and v.timestamp and (not time_stamp or (time_now - v.timestamp) < (time_now - time_stamp)) then
+			time_stamp = v.timestamp
+			ind = i
+		end
+	end
+	if time_stamp then
+		out_arr[ind].spell.interrupted = true
+		out_arr[ind].spell.action_type = 'Interruption'
+		refresh_globals()
+		local prefix = ''
+		if out_arr[ind].spell.prefix == '/pet' then prefix = 'pet_' end
+		equip_sets(prefix..'aftercast',ind,out_arr[ind].spell)
+	end
+end
+
+
+
+-----------------------------------------------------------------------------------
 --Name: delete_out_arr_by_id(id)
 --Desc: Deletes an unknown out_arr entry based on target ID
 --Args:
@@ -663,14 +698,16 @@ end
 ---- none
 -----------------------------------------------------------------------------------
 function delete_out_arr_by_id(id)
-	local deleted_table = {}
+	local last_tab = 0
 	for i,v in pairs(out_arr) do
 		if v.spell and v.spell.target then
 			if v.spell.target.id == id then
+				last_tab = table.reassign({},out_arr[i])
 				out_arr[i] = nil
 			end
 		end
 	end
+	return last_tab
 end
 
 

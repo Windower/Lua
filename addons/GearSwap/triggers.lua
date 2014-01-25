@@ -202,7 +202,6 @@ function inc_action(act)
 		end
 	elseif readies[act.category] and prefix == 'pet_' and act.targets[1].actions[1].message ~= 0 then -- Entry for pet midcast. Excludes the second packet of "Out of range" BPs.
 		inde = mk_out_arr_entry(spell,spell.target.id,nil)
-		windower.add_to_chat(8,tostring(spell.target.id)..' '..inde)
 		refresh_globals()
 		equip_sets('pet_midcast',inde,spell)
 	end
@@ -225,8 +224,14 @@ function inc_action_message(arr)
 	if debugging >= 1 then windower.debug('action message') end
 	if gearswap_disabled then return end
 	if T{6,20,113,406,605,646}:contains(arr.message_id) then
-		-- If your current spell's target is defeated or falls to the ground
-		delete_out_arr_by_id(arr.target_id)
+		-- If a spell's target is defeated or falls to the ground
+		local tab = delete_out_arr_by_id(arr.target_id)
+		if tab and tab.spell and tab.spell.prefix == '/pet' then 
+			equip_sets('pet_aftercast',true,tab.spell)
+		elseif tab and tab.spell then
+			equip_sets('aftercast',true,tab.spell)
+		end
+		return
 	end
 	
 	local tempplay = windower.ffxi.get_player()
@@ -243,10 +248,11 @@ function inc_action_message(arr)
 		end
 	end
 	
-	if unable_to_use:contains(arr.message_id) then
+	if unable_to_use:contains(arr.message_id) and arr.actor_id == player.id then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(195) Event Action Message: '..tostring(message_id)..' Interrupt') end
-		unknown_out_arr_deletion(prefix,arr.target_id)
+		delete_out_arr_by_time('player')
+		--unknown_out_arr_deletion(prefix,arr.target_id)
+	elseif unable_to_use:contains(arr.message_id) and debugging >= 1 then
+		windower.add_to_chat(8,'Handled Action message received with a target other than yourself: '..tostring(dialog[arr.message_id].english)..' '..tostring(windower.ffxi.get_mob_by_id(actor_id).name))
 	end
 end
-
-
