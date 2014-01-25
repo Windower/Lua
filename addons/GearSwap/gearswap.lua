@@ -63,9 +63,9 @@ windower.register_event('load',function()
 		logfile = io.open('../addons/GearSwap/data/logs/NormalLog'..tostring(os.clock())..'.log','w+')
 		logit(logfile,'GearSwap LOGGER HEADER\n')
 	end
-
+	
 	refresh_globals()
-
+	
 	if world.logged_in then
 		refresh_user_env()
 		if debugging >= 1 then windower.send_command('@unload spellcast;') end
@@ -87,7 +87,7 @@ windower.register_event('addon command',function (...)
 	local splitup = {...}
 	if not splitup[1] then return end -- handles //gs
 	local cmd = splitup[1]:lower()
-
+	
 	if cmd == 'c' then
 		if gearswap_disabled then return end
 		if splitup[2] then
@@ -167,7 +167,7 @@ end
 
 windower.register_event('incoming chunk',function(id,data,modified,injected,blocked)
 	if debugging >= 1 then windower.debug('incoming chunk '..id) end
-
+	
 	if next_packet_events and next_packet_events.sequence_id ~= data:byte(4)*256+data:byte(3) then
 		if not next_packet_events.globals_update or next_packet_events.globals_update ~= data:byte(4)*256 + data:byte(3) then
 			refresh_globals()
@@ -192,7 +192,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
 			next_packet_events = nil
 		end
 	end
-
+	
 	if id == 0x0E and not injected and pet.index and pet.index == data:byte(9) + data:byte(10)*256 and math.floor((data:byte(11)%8)/4)== 1 then
 		local oldstatus = pet.status
 		local status_id = data:byte(32)
@@ -205,7 +205,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
 					if not next_packet_events then next_packet_events = {sequence_id = data:byte(4)*256+data:byte(3)} end
 					next_packet_events.pet_status_change = {newstatus=newstatus,oldstatus=oldstatus}
 --					refresh_globals()
-
+		
 --					if pet.isvalid then
 --						pet.status = newstatus
 --						equip_sets('pet_status_change',nil,newstatus,oldstatus)
@@ -314,7 +314,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
 		local owner_ind = data:byte(14)*256+data:byte(13)
 		local subj_ind = data:byte(8)*256+data:byte(7)
 	--	if debugging >= 1 and (windower.ffxi.get_player().index == owner_ind or windower.ffxi.get_player().index == subj_ind) then windower.add_to_chat(8,flag_2..' '..flag_1) end
-
+		
 		if flag_1 == 3 and flag_2 == 5 and windower.ffxi.get_player().index == owner_ind and not pet.isvalid then
 			if not next_packet_events then next_packet_events = {sequence_id = data:byte(4)*256+data:byte(3)} end
 			next_packet_events.pet_change = {subj_ind = subj_ind}
@@ -340,7 +340,7 @@ end)
 windower.register_event('status change',function(new,old)
 	if debugging >= 1 then windower.debug('status change '..new) end
 	if gearswap_disabled or T{2,3,4}:contains(old) or T{2,3,4}:contains(new) then return end
-
+	
 	refresh_globals()
 	equip_sets('status_change',nil,res.statuses[new].english,res.statuses[old].english)
 end)
@@ -352,10 +352,10 @@ windower.register_event('gain buff',function(buff_id)
 	local buff_name = r_status[buff_id][language]
 	if debugging >= 1 then windower.debug('gain buff '..buff_name..' ('..tostring(buff_id)..')') end
 	if gearswap_disabled then return end
-
+	
 	-- Need to figure out what I'm going to do with this:
 	if _global.midaction and T{'terror','sleep','stun','petrification','charm','weakness'}:contains(buff_name:lower()) then _global.midaction = false end
-
+	
 	refresh_globals()
 	equip_sets('buff_change',nil,buff_name,true)
 end)
@@ -433,7 +433,7 @@ if debugging and debugging >= 1 then
 			if clocking then clocking = false else clocking = true end
 		end
 	end)
-
+	
 	windower.text.create('precast')
 	windower.text.set_bg_color('precast',100,100,100,100)
 	windower.text.set_bg_visibility('precast',true)
@@ -443,7 +443,7 @@ if debugging and debugging >= 1 then
 	windower.text.set_location('precast',250,10)
 	windower.text.set_visibility('precast',false)
 	windower.text.set_text('precast','Panda')
-
+	
 	windower.text.create('midcast')
 	windower.text.set_bg_color('midcast',100,100,100,100)
 	windower.text.set_bg_visibility('midcast',true)
@@ -453,7 +453,7 @@ if debugging and debugging >= 1 then
 	windower.text.set_location('midcast',500,10)
 	windower.text.set_visibility('midcast',false)
 	windower.text.set_text('midcast','Panda')
-
+	
 	windower.text.create('aftercast')
 	windower.text.set_bg_color('aftercast',100,100,100,100)
 	windower.text.set_bg_visibility('aftercast',true)
@@ -463,7 +463,7 @@ if debugging and debugging >= 1 then
 	windower.text.set_location('aftercast',750,10)
 	windower.text.set_visibility('aftercast',false)
 	windower.text.set_text('aftercast','Panda')
-
+	
 	windower.text.create('buff_change')
 	windower.text.set_bg_color('buff_change',100,100,100,100)
 	windower.text.set_bg_visibility('buff_change',true)

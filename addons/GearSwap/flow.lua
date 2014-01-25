@@ -86,6 +86,7 @@ function equip_sets(swap_type,ind,...)
 	end
 	
 	if type(swap_type) == 'string' and swap_type == 'pet_midcast' then
+		out_arr[ind].timestamp = os.time()
 		_global.pet_midaction = true
 	end
 
@@ -103,6 +104,7 @@ function equip_sets(swap_type,ind,...)
 		ind = mk_out_arr_entry(val1,spell.target.id,nil)
 	elseif type(swap_type) == 'string' and swap_type == 'precast' then
 		_global.midaction = true
+		out_arr[ind].timestamp = os.time()
 	elseif type(swap_type) == 'string' and swap_type == 'aftercast' then
 		_global.midaction = false
 	elseif type(swap_type) == 'string' and swap_type == 'pet_aftercast' then
