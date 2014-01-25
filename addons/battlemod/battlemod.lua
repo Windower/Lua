@@ -418,8 +418,8 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 			end
 			
 			if am.message_id > 169 and am.message_id <179 then
-				if am.param_1 == 4294967296 then
-					skill = 'like level -1'..' ('..ratings_arr[am.param_2-63]..')'
+				if am.param_1 > 2147483647 then
+					skill = 'like level -1 ('..ratings_arr[am.param_2-63]..')'
 				else
 					skill = 'like level '..am.param_1..' ('..ratings_arr[am.param_2-63]..')'
 				end
