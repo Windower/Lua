@@ -190,10 +190,10 @@ fields.outgoing[0x015] = L{
     {ctype='unsigned short',    label='_junk1'},                                -- 10
     {ctype='unsigned short',    label='Run Count'},                             -- 12   Counter that indicates how long you've been running?
     {ctype='unsigned char',     label='Rotation',           fn=dir},            -- 14
-    {ctype='unsigned char',     label='_unknown2'},                             -- 15
+    {ctype='unsigned char',     label='_unknown1'},                             -- 15
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 16
     {ctype='unsigned int',      label='Timestamp',          fn=time_ms},        -- 18   Milliseconds
-    {ctype='unsigned int',      label='_unknown3'},                             -- 1A
+    {ctype='unsigned int',      label='_junk2'},                                -- 1A
 }
 
 -- Action
@@ -208,18 +208,18 @@ fields.outgoing[0x01A] = L{
 -- Drop Item
 fields.outgoing[0x028] = L{
     {ctype='unsigned int',      label='_unknown1'},                             -- 04
-    {ctype='unsigned char',     label='Current Bag ID',     fn=bag},            -- 08
-    {ctype='unsigned char',     label='Inventory Index'},                       -- 09 -- For the item being dropped
-    {ctype='unsigned short',    label='_unknown2'},                             -- 10
+    {ctype='unsigned char',     label='Current Bag',        fn=bag},            -- 08
+    {ctype='unsigned char',     label='Inventory Index',    fn=inv+{0}},        -- 09   For the item being dropped
+    {ctype='unsigned short',    label='_unknown2'},                             -- 0A
 }
 
 -- Move Item
 fields.outgoing[0x029] = L{
-    {ctype='unsigned int',      label='_unknown1'},                             -- 04 -- 1 has been observed
-    {ctype='unsigned char',     label='Current Bag ID',     fn=bag},            -- 08
-    {ctype='unsigned char',     label='Target Bag ID',      fn=bag},            -- 09
-    {ctype='unsigned char',     label='Inventory Index'},                       -- 10 -- For the item being moved
-    {ctype='unsigned char',     label='_unknown2'},                             -- 11 -- Has taken the value 52. Unclear purpose.
+    {ctype='unsigned int',      label='_unknown1'},                             -- 04   1 has been observed
+    {ctype='unsigned char',     label='Current Bag',        fn=bag},            -- 08
+    {ctype='unsigned char',     label='Target Bag',         fn=bag},            -- 09
+    {ctype='unsigned char',     label='Inventory Index',    fn=inv+{0}},        -- 0A   For the item being moved
+    {ctype='unsigned char',     label='_unknown2'},                             -- 0B   Has taken the value 52. Unclear purpose.
 }
 
 -- Menu Item
@@ -300,7 +300,7 @@ fields.outgoing[0x05B] = L{
     {ctype='unsigned char',     label='_unknown2'},                             -- 0B
     {ctype='unsigned short',    label='Player Index',       fn=index},          -- 0C
     {ctype='unsigned short',    label='_unknown3'},                             -- 0E
-    {ctype='unsigned short',    label='Zone ID',            fn=zone},           -- 10
+    {ctype='unsigned short',    label='Zone',               fn=zone},           -- 10
     {ctype='unsigned char',     label='_unknown4'},                             -- 12
     {ctype='unsigned char',     label='_unknown5'},                             -- 13
 }
@@ -343,25 +343,25 @@ fields.outgoing[0x077] = L{
 fields.outgoing[0x096] = L{
     {ctype='unsigned char',     label='_unknown1'},                             -- 04   Crystal ID? Earth = 0x02, Wind-break = 0x19?, Wind no-break = 0x2D?
     {ctype='unsigned char',     label='_unknown2'},                             -- 05
-    {ctype='unsigned short',    label='Crystal Item ID'},                       -- 06
-    {ctype='unsigned char',     label='Crystal Inventory Index'},               -- 08
-    {ctype='unsigned char',     label='Number of Ingredients'},                 -- 09
-    {ctype='unsigned short',    label='Ingredient 1 ID'},                       -- 0A
-    {ctype='unsigned short',    label='Ingredient 2 ID'},                       -- 0C
-    {ctype='unsigned short',    label='Ingredient 3 ID'},                       -- 0E
-    {ctype='unsigned short',    label='Ingredient 4 ID'},                       -- 10
-    {ctype='unsigned short',    label='Ingredient 5 ID'},                       -- 12
-    {ctype='unsigned short',    label='Ingredient 6 ID'},                       -- 14
-    {ctype='unsigned short',    label='Ingredient 7 ID'},                       -- 16
-    {ctype='unsigned short',    label='Ingredient 8 ID'},                       -- 18
-    {ctype='unsigned char',     label='Ingredient 1 Index'},                    -- 1A
-    {ctype='unsigned char',     label='Ingredient 2 Index'},                    -- 1B
-    {ctype='unsigned char',     label='Ingredient 3 Index'},                    -- 1C
-    {ctype='unsigned char',     label='Ingredient 4 Index'},                    -- 1D
-    {ctype='unsigned char',     label='Ingredient 5 Index'},                    -- 1E
-    {ctype='unsigned char',     label='Ingredient 6 Index'},                    -- 1F
-    {ctype='unsigned char',     label='Ingredient 7 Index'},                    -- 20
-    {ctype='unsigned char',     label='Ingredient 8 Index'},                    -- 21
+    {ctype='unsigned short',    label='Crystal ID',         fn=item},           -- 06
+    {ctype='unsigned char',     label='Crystal Index',      fn=inv+{0}},        -- 08
+    {ctype='unsigned char',     label='Ingredient Count'},                      -- 09
+    {ctype='unsigned short',    label='Ingredient 1 ID',    fn=item},           -- 0A
+    {ctype='unsigned short',    label='Ingredient 2 ID',    fn=item},           -- 0C
+    {ctype='unsigned short',    label='Ingredient 3 ID',    fn=item},           -- 0E
+    {ctype='unsigned short',    label='Ingredient 4 ID',    fn=item},           -- 10
+    {ctype='unsigned short',    label='Ingredient 5 ID',    fn=item},           -- 12
+    {ctype='unsigned short',    label='Ingredient 6 ID',    fn=item},           -- 14
+    {ctype='unsigned short',    label='Ingredient 7 ID',    fn=item},           -- 16
+    {ctype='unsigned short',    label='Ingredient 8 ID',    fn=item},           -- 18
+    {ctype='unsigned char',     label='Ingredient 1 Index', fn=inv+{0}},        -- 1A
+    {ctype='unsigned char',     label='Ingredient 2 Index', fn=inv+{0}},        -- 1B
+    {ctype='unsigned char',     label='Ingredient 3 Index', fn=inv+{0}},        -- 1C
+    {ctype='unsigned char',     label='Ingredient 4 Index', fn=inv+{0}},        -- 1D
+    {ctype='unsigned char',     label='Ingredient 5 Index', fn=inv+{0}},        -- 1E
+    {ctype='unsigned char',     label='Ingredient 6 Index', fn=inv+{0}},        -- 1F
+    {ctype='unsigned char',     label='Ingredient 7 Index', fn=inv+{0}},        -- 20
+    {ctype='unsigned char',     label='Ingredient 8 Index', fn=inv+{0}},        -- 21
     {ctype='unsigned short',    label='_unknown3'},                             -- 22
 }
 
@@ -788,9 +788,17 @@ fields.incoming[0x030] = L{
     {ctype='unsigned char',     label='_unknown1',          const=0x00},        -- 0E  -- Appears to just be trash.
 }
 
+--Item Updates
+fields.incoming[0x020] = L{
+    {ctype='unsigned int',      label='Item Count'},                            -- 04
+    {ctype='unsigned int',      label='_unknown1',          const=0x00},        -- 08
+    {ctype='unsigned short',    label='Item ID',            fn=item},           -- 0C
+    {ctype='unsigned short',    label='Inventory Index?',   fn=inv+{0}},        -- 0E
+}
+
 -- Shop
 fields.incoming[0x03C] = L{
-    {ctype='unsigned short',    label='_zero1',             const=0x0000},      -- 04
+    {ctype='unsigned short',    label='_const1',            const=0x0000},      -- 04
     {ctype='unsigned short',    label='_padding1'},                             -- 06
     {ref=types.shop_item,       label='Item',               count='*'},         -- 08 -   *
 }
