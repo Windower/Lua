@@ -212,7 +212,7 @@ windower.register_event('time change', function()
 		timercountdown = timercountdown - 1
 		if update_pet() == true then
 			if superverbose == true then windower.add_to_chat(8, 'SCAN: Found a pet!') end
-			windower.send_command('ptp stoptimer')	
+			timercountdown = 0
 			current_hp = 0
 			max_hp	   = 0
 			current_mp = 0
