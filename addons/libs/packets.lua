@@ -162,9 +162,7 @@ function packets.parse(dir, id, data)
 
     for key, val in ipairs({res._data:unpack(pack_str)}) do
         local field = fields[key]
-        if not field then
-            print(key, pack_str)
-        else
+        if field then
             res[field.label] = field.enc and val:decode(6, field.enc) or val
         end
     end

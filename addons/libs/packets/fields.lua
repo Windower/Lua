@@ -14,11 +14,11 @@ fields.outgoing = {_mult = {}}
 fields.incoming = {_mult = {}}
 
 -- String decoding definitions
-local ls_name_msg = T(('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'):split())
+local ls_name_msg = T('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ':split())
 ls_name_msg[0] = (0):char()
-local item_inscr = T(('0123456798ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz{'):split())
+local item_inscr = T('0123456798ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz{':split())
 item_inscr[0] = (0):char()
-local ls_name_ext = T(('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'..(0):char():rep(11)):split())
+local ls_name_ext = T(('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' .. (0):char():rep(11)):split())
 ls_name_ext[0] = '`'
 
 -- Function definitions. Used to display packet field information.
@@ -26,8 +26,8 @@ ls_name_ext[0] = '`'
 res = require('resources')
 
 local function s(val, from, to)
-    from = from and from - 1 or 0
-    to = to or 16
+    from = from - 1
+    to = to
     return bit.band(bit.rshift(val, from), 2^(to - from) - 1)
 end
 
@@ -57,7 +57,7 @@ local time = (function()
     local now = os.time()
     local h, m = math.modf(os.difftime(now, os.time(os.date('!*t', now))) / 3600)
 
-    local timezone = ('%+.2d:%.2d'):format(h, 60 * m)
+    local timezone = '%+.2d:%.2d':format(h, 60 * m)
     now, h, m = nil, nil, nil
     return function(ts)
         return os.date('%Y-%m-%dT%H:%M:%S'..timezone, os.time() - ts)
@@ -74,7 +74,7 @@ local dir = (function()
 end)()
 
 local function cap(val, max)
-    return ('%.1f'):format(100*val/max)..'%'
+    return '%.1f':format(100*val/max)..'%'
 end
 
 local function zone(val)
@@ -82,7 +82,10 @@ local function zone(val)
 end
 
 local function item(val)
-    return res.items[val].name_full:capitalize()
+    if not val then log(debug.traceback()) end
+    return val ~= 0
+            and res.items[val].log_name:capitalize()
+        or '-'
 end
 
 local function server(val)
@@ -135,11 +138,17 @@ end
 
 local function inv(bag, val)
     if val == 0 then
-        return '(None)'
+        return bag == 0
+                and windower.ffxi.get_items().gil
+            or '-'
     end
 
     local id = windower.ffxi.get_items()[res.bags[bag].english:lower()][val].id
-    return id > 0 and res.items[id].name or 'Unknown'
+    return id > 0 and res.items[id].name or '-'
+end
+
+local function invp(index, val, data)
+    return inv(data[index + 1]:byte(), val)
 end
 
 local function hex(val, fill)
@@ -190,10 +199,10 @@ fields.outgoing[0x015] = L{
     {ctype='unsigned short',    label='_junk1'},                                -- 10
     {ctype='unsigned short',    label='Run Count'},                             -- 12   Counter that indicates how long you've been running?
     {ctype='unsigned char',     label='Rotation',           fn=dir},            -- 14
-    {ctype='unsigned char',     label='_unknown1'},                             -- 15
+    {ctype='unsigned char',     label='_unknown2'},                             -- 15
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 16
     {ctype='unsigned int',      label='Timestamp',          fn=time_ms},        -- 18   Milliseconds
-    {ctype='unsigned int',      label='_junk2'},                                -- 1A
+    {ctype='unsigned int',      label='_unknown3'},                             -- 1A
 }
 
 -- Action
@@ -208,18 +217,18 @@ fields.outgoing[0x01A] = L{
 -- Drop Item
 fields.outgoing[0x028] = L{
     {ctype='unsigned int',      label='_unknown1'},                             -- 04
-    {ctype='unsigned char',     label='Current Bag',        fn=bag},            -- 08
-    {ctype='unsigned char',     label='Inventory Index',    fn=inv+{0}},        -- 09   For the item being dropped
-    {ctype='unsigned short',    label='_unknown2'},                             -- 0A
+    {ctype='unsigned char',     label='Current Bag ID',     fn=bag},            -- 08
+    {ctype='unsigned char',     label='Inventory Index'},                       -- 09 -- For the item being dropped
+    {ctype='unsigned short',    label='_unknown2'},                             -- 10
 }
 
 -- Move Item
 fields.outgoing[0x029] = L{
-    {ctype='unsigned int',      label='_unknown1'},                             -- 04   1 has been observed
-    {ctype='unsigned char',     label='Current Bag',        fn=bag},            -- 08
-    {ctype='unsigned char',     label='Target Bag',         fn=bag},            -- 09
-    {ctype='unsigned char',     label='Inventory Index',    fn=inv+{0}},        -- 0A   For the item being moved
-    {ctype='unsigned char',     label='_unknown2'},                             -- 0B   Has taken the value 52. Unclear purpose.
+    {ctype='unsigned int',      label='_unknown1'},                             -- 04 -- 1 has been observed
+    {ctype='unsigned char',     label='Current Bag ID',     fn=bag},            -- 08
+    {ctype='unsigned char',     label='Target Bag ID',      fn=bag},            -- 09
+    {ctype='unsigned char',     label='Inventory Index'},                       -- 10 -- For the item being moved
+    {ctype='unsigned char',     label='_unknown2'},                             -- 11 -- Has taken the value 52. Unclear purpose.
 }
 
 -- Menu Item
@@ -300,7 +309,7 @@ fields.outgoing[0x05B] = L{
     {ctype='unsigned char',     label='_unknown2'},                             -- 0B
     {ctype='unsigned short',    label='Player Index',       fn=index},          -- 0C
     {ctype='unsigned short',    label='_unknown3'},                             -- 0E
-    {ctype='unsigned short',    label='Zone',               fn=zone},           -- 10
+    {ctype='unsigned short',    label='Zone ID',            fn=zone},           -- 10
     {ctype='unsigned char',     label='_unknown4'},                             -- 12
     {ctype='unsigned char',     label='_unknown5'},                             -- 13
 }
@@ -343,25 +352,25 @@ fields.outgoing[0x077] = L{
 fields.outgoing[0x096] = L{
     {ctype='unsigned char',     label='_unknown1'},                             -- 04   Crystal ID? Earth = 0x02, Wind-break = 0x19?, Wind no-break = 0x2D?
     {ctype='unsigned char',     label='_unknown2'},                             -- 05
-    {ctype='unsigned short',    label='Crystal ID',         fn=item},           -- 06
-    {ctype='unsigned char',     label='Crystal Index',      fn=inv+{0}},        -- 08
-    {ctype='unsigned char',     label='Ingredient Count'},                      -- 09
-    {ctype='unsigned short',    label='Ingredient 1 ID',    fn=item},           -- 0A
-    {ctype='unsigned short',    label='Ingredient 2 ID',    fn=item},           -- 0C
-    {ctype='unsigned short',    label='Ingredient 3 ID',    fn=item},           -- 0E
-    {ctype='unsigned short',    label='Ingredient 4 ID',    fn=item},           -- 10
-    {ctype='unsigned short',    label='Ingredient 5 ID',    fn=item},           -- 12
-    {ctype='unsigned short',    label='Ingredient 6 ID',    fn=item},           -- 14
-    {ctype='unsigned short',    label='Ingredient 7 ID',    fn=item},           -- 16
-    {ctype='unsigned short',    label='Ingredient 8 ID',    fn=item},           -- 18
-    {ctype='unsigned char',     label='Ingredient 1 Index', fn=inv+{0}},        -- 1A
-    {ctype='unsigned char',     label='Ingredient 2 Index', fn=inv+{0}},        -- 1B
-    {ctype='unsigned char',     label='Ingredient 3 Index', fn=inv+{0}},        -- 1C
-    {ctype='unsigned char',     label='Ingredient 4 Index', fn=inv+{0}},        -- 1D
-    {ctype='unsigned char',     label='Ingredient 5 Index', fn=inv+{0}},        -- 1E
-    {ctype='unsigned char',     label='Ingredient 6 Index', fn=inv+{0}},        -- 1F
-    {ctype='unsigned char',     label='Ingredient 7 Index', fn=inv+{0}},        -- 20
-    {ctype='unsigned char',     label='Ingredient 8 Index', fn=inv+{0}},        -- 21
+    {ctype='unsigned short',    label='Crystal Item ID'},                       -- 06
+    {ctype='unsigned char',     label='Crystal Inventory Index'},               -- 08
+    {ctype='unsigned char',     label='Number of Ingredients'},                 -- 09
+    {ctype='unsigned short',    label='Ingredient 1 ID'},                       -- 0A
+    {ctype='unsigned short',    label='Ingredient 2 ID'},                       -- 0C
+    {ctype='unsigned short',    label='Ingredient 3 ID'},                       -- 0E
+    {ctype='unsigned short',    label='Ingredient 4 ID'},                       -- 10
+    {ctype='unsigned short',    label='Ingredient 5 ID'},                       -- 12
+    {ctype='unsigned short',    label='Ingredient 6 ID'},                       -- 14
+    {ctype='unsigned short',    label='Ingredient 7 ID'},                       -- 16
+    {ctype='unsigned short',    label='Ingredient 8 ID'},                       -- 18
+    {ctype='unsigned char',     label='Ingredient 1 Index'},                    -- 1A
+    {ctype='unsigned char',     label='Ingredient 2 Index'},                    -- 1B
+    {ctype='unsigned char',     label='Ingredient 3 Index'},                    -- 1C
+    {ctype='unsigned char',     label='Ingredient 4 Index'},                    -- 1D
+    {ctype='unsigned char',     label='Ingredient 5 Index'},                    -- 1E
+    {ctype='unsigned char',     label='Ingredient 6 Index'},                    -- 1F
+    {ctype='unsigned char',     label='Ingredient 7 Index'},                    -- 20
+    {ctype='unsigned char',     label='Ingredient 8 Index'},                    -- 21
     {ctype='unsigned short',    label='_unknown3'},                             -- 22
 }
 
@@ -592,7 +601,7 @@ fields.incoming[0x00D] = L{
     {ctype='float',             label='Z Position'},                            -- 10
     {ctype='float',             label='Y Position'},                            -- 14
     {ctype='unsigned short',    label='Head Rotation',      fn=dir},            -- 18
-    {ctype='unsigned short',    label='Target Index *2',    fn=index..s-{2}},   -- 1A
+    {ctype='unsigned short',    label='Target Index *2',    fn=index..s+{2,15}},-- 1A
     {ctype='unsigned char',     label='Current Speed'},                         -- 1C
     {ctype='unsigned char',     label='Base Speed'},                            -- 1D
     {ctype='unsigned char',     label='HP %',               fn=percent},        -- 1E
@@ -730,6 +739,16 @@ fields.incoming[0x01F] = L{
     {ctype='char[3]',           label='_junk1'},                                -- 0D
 }
 
+-- Item Updates
+fields.incoming[0x020] = L{
+    {ctype='unsigned int',      label='Item Count'},                            -- 04
+    {ctype='unsigned int',      label='_unknown1',          const=0x00},        -- 08
+    {ctype='unsigned short',    label='Item ID',            fn=item},           -- 0C
+    {ctype='unsigned char',     label='Bag',                fn=bag},            -- 0E
+    {ctype='unsigned char',     label='Inventory Index',    fn=invp+{0x0E}},    -- 0F
+    {ctype='char[28]',          label='ExtData',            fn='...':fn()},     -- 10
+}
+
 -- Count to 80
 fields.incoming[0x026] = L{
     {ctype='unsigned char',     label='_unknown1',          const=0x00},        -- 04
@@ -788,17 +807,9 @@ fields.incoming[0x030] = L{
     {ctype='unsigned char',     label='_unknown1',          const=0x00},        -- 0E  -- Appears to just be trash.
 }
 
---Item Updates
-fields.incoming[0x020] = L{
-    {ctype='unsigned int',      label='Item Count'},                            -- 04
-    {ctype='unsigned int',      label='_unknown1',          const=0x00},        -- 08
-    {ctype='unsigned short',    label='Item ID',            fn=item},           -- 0C
-    {ctype='unsigned short',    label='Inventory Index?',   fn=inv+{0}},        -- 0E
-}
-
 -- Shop
 fields.incoming[0x03C] = L{
-    {ctype='unsigned short',    label='_const1',            const=0x0000},      -- 04
+    {ctype='unsigned short',    label='_zero1',             const=0x0000},      -- 04
     {ctype='unsigned short',    label='_padding1'},                             -- 06
     {ref=types.shop_item,       label='Item',               count='*'},         -- 08 -   *
 }
@@ -1143,15 +1154,28 @@ fields.incoming[0x067] = L{
 -- 03 05 is sent when summoning pets, Trust NPCs, etc.
 -- 04 05 is sent when releasing pets (unknown for Trust NPCs)
 
-    {ctype='unsigned short',     label='Mask'},                                -- 04
+    {ctype='unsigned short',    label='Mask'},                                  -- 04
     {ctype='unsigned short',    label='Pet Index',          fn=index},          -- 06
     {ctype='unsigned int',      label='Pet ID',             fn=id},             -- 08
     {ctype='unsigned short',    label='Owner Index',        fn=index},          -- 0C
     {ctype='unsigned char',     label='Current HP%'},                           -- 0E
     {ctype='unsigned char',     label='Current MP%'},                           -- 0F
-    {ctype='unsigned short',    label='Pet TP%'},                               -- 10  -- Multiplied by 10
+    {ctype='unsigned short',    label='Pet TP%'},                               -- 10   Multiplied by 10
     {ctype='unsigned short',    label='_unknown1'},                             -- 12
-    {ctype='char*',             label='Pet Name'},                              -- 14  -- Packet expands to accommodate pet name length.
+    {ctype='char*',             label='Pet Name'},                              -- 14   Packet expands to accommodate pet name length.
+}
+
+-- Synth Result
+fields.incoming[0x06F] = L{
+    {ctype='unsigned char',     label='Lost Items'},                            -- 04
+    {ctype='signed char',       label='Quality'},                               -- 05   0 for NQ, 1 for HQ, -1 for break... others?
+    {ctype='unsigned char',     label='Count'},                                 -- 06   Even set for fail (set as the NQ amount in that case)
+    {ctype='unsigned char',     label='_unknown2'},                             -- 07   0 and 1 observed on the same synth result
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 08
+    {ctype='unsigned short[8]', label='Lost Item',          fn=item},           -- 0A
+    {ctype='unsigned char',     label='_unknown4'},                             -- 1A   Always 37?
+    {ctype='char[7]',           label='_unknown5'},                             -- 1B   Always 0?
+    {ctype='unsigned short',    label='_junk1'},                                -- 22
 }
 
 -- LS Message
@@ -1195,7 +1219,7 @@ fields.incoming[0x0D3] = L{
     {ctype='unsigned int',      label='Current Lot ID',     fn=id},             -- 08
     {ctype='unsigned short',    label='Highest Lot Index',  fn=index},          -- 0C
     {ctype='unsigned short',    label='Highest Lot'},                           -- 0E
-    {ctype='unsigned short',    label='Current Lot Index',  fn=index..s-{1,15}},-- 10   The highest bit is set
+    {ctype='unsigned short',    label='Current Lot Index',  fn=index..s+{1,15}},-- 10   The highest bit is set
     {ctype='unsigned short',    label='Current Lot'},                           -- 12
     {ctype='unsigned char',     label='_unknown1'},                             -- 14
     {ctype='unsigned char',     label='Drop'},                                  -- 15   1 if the item dropped, 0 otherwise
@@ -1384,12 +1408,20 @@ local function parse(fs, data, max)
         for field in fs:it() do
             if field.ctype then
                 field = table.copy(field)
-                if max ~= 1 then
-                    field.label = field.label..' '..tostring(count)
-                end
+                local ctype, count_str = field.ctype:match('(.*)%[(%d+)%]')
+                if count_str and ctype ~= 'char' then
+                    field.ctype = ctype
+                    local ext, size = parse(L{field}, data:sub(index + 1), count_str:number())
+                    res = res + ext
+                    index = index + size
+                else
+                    if max ~= 1 then
+                        field.label = field.label..' '..tostring(count)
+                    end
 
-                res:append(field)
-                index = index + sizes[field.ctype:match('(%a+)[^%a]*$')]
+                    res:append(field)
+                    index = index + sizes[field.ctype:match('(%a+)[^%a]*$')]
+                end
             else
                 local ext, size = parse(field.ref, data:sub(index + 1), field.count)
                 res = res + ext
