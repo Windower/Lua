@@ -179,6 +179,33 @@ types.shop_item = L{
     {ctype='unsigned short',    label='Shop Slot'},                             -- 08
 }
 
+local enums = {
+    synth = {
+        [0] = 'Success',
+        [1] = 'Fail',
+        [2] = 'Interrupted',
+        [3] = 'Cancel, invalid recipe',
+        [4] = 'Cancel',
+        [5] = 'Fail, crystal lost',
+        [6] = 'Cancel, skill too low',
+        [7] = 'Cancel, rare',
+    },
+    logout = {
+        [1] = '/loguot',
+        [2] = '/pol',
+        [3] = '/shutdown',
+    },
+    zone = {
+        [1] = 'Logout',
+        [2] = 'Teleport',
+        [3] = 'Zone line',
+    },
+}
+
+local function e(t, val)
+    return enums[t][val]
+end
+
 --[[
     Outgoing packets
 ]]
@@ -397,10 +424,10 @@ fields.outgoing[0x0E2] = L{
 
 -- Logout
 fields.outgoing[0x0E7] = L{
-    {ctype='unsigned char',      label='_unknown1'},                            -- 04 -- Observed to be 00
-    {ctype='unsigned char',      label='_unknown2'},                            -- 05 -- Observed to be 00
-    {ctype='unsigned char',      label='Logout Type'},                          -- 06 -- /logout = 01, /pol == 02 (removed), /shutdown = 03
-    {ctype='unsigned char',      label='_unknown3'},                            -- 07 -- Observed to be 00
+    {ctype='unsigned char',      label='_unknown1'},                            -- 04   Observed to be 00
+    {ctype='unsigned char',      label='_unknown2'},                            -- 05   Observed to be 00
+    {ctype='unsigned char',      label='Logout Type',       fn=e+'logout'},     -- 06   /logout = 01, /pol == 02 (removed), /shutdown = 03
+    {ctype='unsigned char',      label='_unknown3'},                            -- 07   Observed to be 00
 }
 
 -- Sit
@@ -538,7 +565,7 @@ fields.incoming[0x00A] = L{
 
 -- Zone Response
 fields.incoming[0x00B] = L{
-    {ctype='unsigned int',      label='Type'},                                  -- 04 Logout: 1, Teleport/Warp: 2, Regular zone: 3
+    {ctype='unsigned int',      label='Type',               fn=e+'zone'},       -- 04
     {ctype='unsigned int',      label='IP',                 fn=ip},             -- 08
     {ctype='unsigned short',    label='Port'},                                  -- 0C
     {ctype='unsigned short',    label='_unknown1'},                             -- 10
@@ -1167,13 +1194,13 @@ fields.incoming[0x067] = L{
 
 -- Synth Result
 fields.incoming[0x06F] = L{
-    {ctype='unsigned char',     label='Lost Items'},                            -- 04
-    {ctype='signed char',       label='Quality'},                               -- 05   0 for NQ, 1 for HQ, -1 for break... others?
+    {ctype='unsigned char',     label='Result',             fn=e+{'synth'}},    -- 04
+    {ctype='signed char',       label='Quality'},                               -- 05
     {ctype='unsigned char',     label='Count'},                                 -- 06   Even set for fail (set as the NQ amount in that case)
-    {ctype='unsigned char',     label='_unknown2'},                             -- 07   0 and 1 observed on the same synth result
+    {ctype='unsigned char',     label='_junk1'},                                -- 07
     {ctype='unsigned short',    label='Item',               fn=item},           -- 08
     {ctype='unsigned short[8]', label='Lost Item',          fn=item},           -- 0A
-    {ctype='unsigned char',     label='_unknown4'},                             -- 1A   Always 37?
+    {ctype='unsigned char',     label='_unknown1',          const=0x37},        -- 1A   Always 37?
     {ctype='char[7]',           label='_unknown5'},                             -- 1B   Always 0?
     {ctype='unsigned short',    label='_junk1'},                                -- 22
 }
