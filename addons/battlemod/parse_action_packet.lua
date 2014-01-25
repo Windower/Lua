@@ -174,7 +174,15 @@ function parse_action_packet(act)
 				local msg,numb = simplify_message(m.message)
 				if not color_arr[act.actor.owner or act.actor.type] then windower.add_to_chat(123,'Battlemod error, missing filter:'..tostring(act.actor.owner)..' '..tostring(act.actor.type)) end
 				if m.fields.status then numb = m.status else numb = pref_suf(m.param,m.message) end
-				
+	
+				if msg and m.message == 70 and not simplify then -- fix pronoun on parry
+					if act.actor.race == 0 then
+						msg = msg:gsub(' his ',' its ')
+					elseif T{2,4,6,7}:contains(act.actor.race) then
+						msg = msg:gsub(' his ',' her ')
+					end
+				end
+			
 				windower.add_to_chat(color,make_condensedamage_number(m.number)..( (msg or tostring(m.message))
 					:gsub('${spell}',color_it(act.action.spell or 'ERROR 111',color_arr.spellcol))
 					:gsub('${ability}',color_it(act.action.ability or 'ERROR 112',color_arr.abilcol))
@@ -341,7 +349,7 @@ function player_info(id)
 	local typ,owner,filter
 	
 	if player_table == nil then
-		return {name=nil,id=nil,is_npc=nil,type='debug',owner=nil}
+		return {name=nil,id=nil,is_npc=nil,type='debug',owner=nil,race=nil}
 	end
 	
 	for i,v in pairs(windower.ffxi.get_party()) do
@@ -388,7 +396,7 @@ function player_info(id)
 		end
 	end
 	if not typ then typ = 'debug' end
-	return {name=player_table.name,id=id,is_npc = player_table.is_npc,type=typ,filter=filter,owner=(owner or nil)}
+	return {name=player_table.name,id=id,is_npc = player_table.is_npc,type=typ,filter=filter,owner=(owner or nil),race = player_table.race}
 end
 
 function get_spell(act)
