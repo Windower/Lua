@@ -167,7 +167,32 @@ end
 
 windower.register_event('incoming chunk',function(id,data,modified,injected,blocked)
 	if debugging >= 1 then windower.debug('incoming chunk '..id) end
-
+	
+	if next_packet_events and next_packet_events.sequence_id ~= data:byte(4)*256+data:byte(3) then
+		if not next_packet_events.globals_update or next_packet_events.globals_update ~= data:byte(4)*256 + data:byte(3) then
+			refresh_globals()
+			next_packet_events.globals_update = data:byte(4)*256+data:byte(3)
+		end
+		if next_packet_events.pet_status_change then
+			if pet.isvalid then
+				equip_sets('pet_status_change',nil,next_packet_events.pet_status_change.newstatus,next_packet_events.pet_status_change.oldstatus)
+			end
+			next_packet_events.pet_status_change = nil
+		end
+		if next_packet_events.pet_change then
+			if next_packet_events.pet_change.pet then -- Losing a pet
+				equip_sets('pet_change',nil,next_packet_events.pet_change.pet,false)
+				next_packet_events.pet_change = nil
+			elseif pet.isvalid then -- Gaining a pet
+				equip_sets('pet_change',nil,pet,true)
+				next_packet_events.pet_change = nil
+			end
+		end
+		if not next_packet_events.pet_status_change and not next_packet_events.pet_change then
+			next_packet_events = nil
+		end
+	end
+	
 	if id == 0x0E and not injected and pet.index and pet.index == data:byte(9) + data:byte(10)*256 and math.floor((data:byte(11)%8)/4)== 1 then
 		local oldstatus = pet.status
 		local status_id = data:byte(32)
@@ -176,14 +201,15 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
 			local newstatus = res.statuses[status_id]
 			if newstatus and newstatus.english then
 				newstatus = newstatus.english
-	
 				if oldstatus ~= newstatus then
-					refresh_globals()
+					if not next_packet_events then next_packet_events = {sequence_id = data:byte(4)*256+data:byte(3)} end
+					next_packet_events.pet_status_change = {newstatus=newstatus,oldstatus=oldstatus}
+--					refresh_globals()
 		
-					if pet.isvalid then
-						pet.status = newstatus
-						equip_sets('pet_status_change',nil,newstatus,oldstatus)
-					end
+--					if pet.isvalid then
+--						pet.status = newstatus
+--						equip_sets('pet_status_change',nil,newstatus,oldstatus)
+--					end
 				end
 			end
 		end
@@ -288,26 +314,15 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
 		local owner_ind = data:byte(14)*256+data:byte(13)
 		local subj_ind = data:byte(8)*256+data:byte(7)
 	--	if debugging >= 1 and (windower.ffxi.get_player().index == owner_ind or windower.ffxi.get_player().index == subj_ind) then windower.add_to_chat(8,flag_2..' '..flag_1) end
-		if flag_1 == 3 and flag_2 == 5 and windower.ffxi.get_player().index == owner_ind then
-			local temp_mob = windower.ffxi.get_mob_by_index(subj_ind)
-			if temp_mob then
-				refresh_globals()
-				table.reassign(pet,target_complete(temp_mob))
-				pet.isvalid = true
-				pet.claim_id = nil
-				pet.is_npc = nil
-				if pet.tp then pet.tp = pet.tp/10 end
-				if avatar_element[pet.name] then
-					pet.element = avatar_element[pet.name]
-				else
-					pet.element = 'None'
-				end
-				equip_sets('pet_change',nil,pet,true)
-			end
+		
+		if flag_1 == 3 and flag_2 == 5 and windower.ffxi.get_player().index == owner_ind and not pet.isvalid then
+			if not next_packet_events then next_packet_events = {sequence_id = data:byte(4)*256+data:byte(3)} end
+			next_packet_events.pet_change = {subj_ind = subj_ind}
 		elseif flag_1 == 4 and flag_2 == 5 and windower.ffxi.get_player().index == subj_ind then
+			if not next_packet_events then next_packet_events = {sequence_id = data:byte(4)*256+data:byte(3)} end
 			refresh_globals()
 			pet.isvalid = false
-			equip_sets('pet_change',nil,pet,false)
+			next_packet_events.pet_change = {pet = table.reassign({},pet)}
 		end
 	elseif gearswap_disabled then
 		return
