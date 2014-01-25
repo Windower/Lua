@@ -159,8 +159,6 @@ function parse_action_packet(act)
 					m.status = color_it('Completely Resists',color_arr['statuscol'])
 				elseif m.message == 85 or m.message == 284 then
 					m.status = color_it('Resists',color_arr['statuscol'])
-				elseif m.message == 674 then -- Scavenge
-					m.number = act['targets'][i]['actions'][n]['add_effect_param']..' '..color_it(items[effect_val]['enl'],color_arr['itemcol'])
 				elseif T{75,156,189,248,283,312,323,336,355,408,422,423,425,659}:contains(m.message) then
 					m.status = color_it('No effect',color_arr['statuscol']) -- The status code for "No Effect" is 255, so it might actually work without this line
 				end
