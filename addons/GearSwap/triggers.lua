@@ -42,7 +42,7 @@ windower.register_event('outgoing text',function(original,modified)
 	if debugging >= 1 then windower.debug('outgoing text (debugging)') end
 	if gearswap_disabled then return modified end
 	
-	local temp_mod = windower.convert_auto_trans(modified)
+	local temp_mod = windower.convert_auto_trans(modified):gsub(' <wait %d+>','')
 	local splitline = temp_mod:split(' ')
 	local command = splitline[1]
 	
