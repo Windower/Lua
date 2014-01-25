@@ -252,17 +252,17 @@ function refresh_player()
 
 			-- available parts
 			for i,id in pairs(auto_tab.available_heads) do
-				if r_items[id] then
+				if r_items[id] and type(r_items[id]) == 'table' then
 					pet.available_heads[r_items[id][language]] = true
 				end
 			end
 			for i,id in pairs(auto_tab.available_frames) do
-				if r_items[id] then
+				if r_items[id] and type(r_items[id]) == 'table' then
 					pet.available_frames[r_items[id][language]] = true
 				end
 			end
 			--for i,id in pairs(auto_tab.available_attachments) do
-			--	if r_items[id] then
+			--	if r_items[id] and type(r_items[id]) == 'table' then
 			--		pet.available_attachments[r_items[id][language]] = true
 			--	end
 			--end
@@ -271,7 +271,7 @@ function refresh_player()
 			pet.head = r_items[auto_tab.head+8192][language]
 			pet.frame = r_items[auto_tab.frame+8223][language]
 			for i,id in pairs(auto_tab.attachments) do
-				if r_items[id] then
+				if r_items[id] and type(r_items[id]) == 'table' then
 					pet.attachments[r_items[id][language]] = true
 				end
 			end
