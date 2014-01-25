@@ -39,7 +39,10 @@ windower.register_event('addon command',function (...)
 			windower.add_to_chat(121,'Battlemod: Target Number flipped! - '..tostring(targetnumber))
 		elseif splitarr[1]:lower() == 'swingnumber' then
 			swingnumber = not swingnumber
-			windower.add_to_chat(121,'Battlemod: Round Number flipped! - '..tostring(targetnumber))
+			windower.add_to_chat(121,'Battlemod: Round Number flipped! - '..tostring(swingnumber))
+		elseif splitarr[1]:lower() == 'sumdamage' then
+			sumdamage = not sumdamage
+			windower.add_to_chat(121,'Battlemod: Sum Damage flipped! - '..tostring(sumdamage))
 		elseif splitarr[1]:lower() == 'cancelmulti' then
 			cancelmulti = not cancelmulti
 			windower.add_to_chat(121,'Battlemod: Multi-canceling flipped! - '..tostring(cancelmulti))
@@ -86,6 +89,7 @@ windower.register_event('addon command',function (...)
 			print('    * commamode --- Toggle comma-only mode, Default = False')
 			print(' 3. condensedamage --- Condenses damage messages within attack rounds, Default = True')
 			print('    * swingnumber --- Condenses damage messages within attack rounds, Default = True')
+			print('    * sumdamage --- Sums condensed damage, if false damage is comma separated, Default = True')
 			print(' 4. cancelmulti --- Cancles multiple consecutive identical lines, Default = True')
 			print('Utilities:')
 			print(' 1. colortest --- Shows the 509 possible colors for use with the settings file')
