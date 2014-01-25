@@ -178,7 +178,7 @@ function parse_action_packet(act)
 				if msg and m.message == 70 and not simplify then -- fix pronoun on parry
 					if act.actor.race == 0 then
 						msg = msg:gsub(' his ',' its ')
-					elseif T{2,4,6,7}:contains(act.actor.race) then
+					elseif female_races:contains(act.actor.race) then
 						msg = msg:gsub(' his ',' her ')
 					end
 				end
