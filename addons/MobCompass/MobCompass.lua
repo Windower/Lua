@@ -41,8 +41,7 @@ file = require 'files'
 local settingtab = nil
 local settings_file = 'data/settings.xml'
 
-windower.register_event('load',function ()
-	info = windower.ffxi.get_info()
+windower.register_event('load', function()
 	player = windower.ffxi.get_player()
 
 	defaults = {}
@@ -91,7 +90,7 @@ windower.register_event('load',function ()
 	showangle = tostring(settingtab.thfmode.showangle)
 	loop = 1
 		
-	if info.logged_in == true then
+	if windower.ffxi.get_info().logged_in then
 		loop = 0
 		print('Commands are:')
 		print('To change Compass style: ')
@@ -104,7 +103,7 @@ windower.register_event('load',function ()
 
 end)
 
-windower.register_event('unload',function ()
+windower.register_event('unload', function()
 	loop = 1
 	local i = 1
 	for i = 1,3 do
@@ -112,12 +111,12 @@ windower.register_event('unload',function ()
 	end
 end)
 
-windower.register_event('login',function ()
+windower.register_event('login', function()
 	loop = 0
 	get_target()
 end)
 
-windower.register_event('logout',function (name)
+windower.register_event('logout', function(name)
 	loop = 1
 	local i = 1
 	for i = 1, 3 do

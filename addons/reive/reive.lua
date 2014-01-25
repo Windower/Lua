@@ -315,17 +315,8 @@ windower.register_event('unload', function()
     windower.text.delete(tb_name)
 end)
 
-windower.register_event('gain buff', function(name,id)
-    if id == 511 then
-        start_tracking()
-    end
-end)
-
-windower.register_event('lose buff', function(name,id)
-    if id == 511 then
-        stop_tracking()
-    end
-end)
+windower.register_event('gain buff', start_tracking:cond(function(id) return id == 511 end))
+windower.register_event('lose buff', stop_tracking:cond(function(id) return id == 511 end))
 
 windower.register_event('incoming text', function(original, modified, mode)
     local match

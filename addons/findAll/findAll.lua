@@ -33,14 +33,14 @@ _addon.author  = 'Zohno'
 _addon.version = '1.20131120'
 _addon.command = 'findAll'
 
-require 'chat'
-require 'lists'
-require 'logger'
-require 'sets'
+require('chat')
+require('lists')
+require('logger')
+require('sets')
 
-json  = require 'json'
-file  = require 'files'
-slips = require 'slips'
+json  = require('json')
+file  = require('files')
+slips = require('slips')
 
 load_timestamp         = os.time()
 deferral_time          = 20
@@ -338,29 +338,15 @@ function update()
     return true
 end
 
-windower.register_event('load', function()
-    if windower.ffxi.get_info().logged_in then
-        update()
-    end
-end)
+windower.register_event('load', update:cond(function() return windower.ffxi.get_info().logged_in end))
 
-windower.register_event('unload', function()
-    if windower.ffxi.get_info().logged_in then
-        if not update() then
-            error('findAll wasn\'t ready.')
-        end
-    end
-end)
+windower.register_event('unload', error:prepare('findAll wasn\'t ready'):cond(function() return windower.ffxi_get_info().logged_in and not update() end))
 
 windower.register_event('login', 'zone change', function()
     load_timestamp = os.time()
 end)
 
-windower.register_event('logout', function()
-    if not update() then
-        error('findAll wasn\'t ready.')
-    end
-end)
+windower.register_event('logout', error:prepare('findAll wasn\'t ready'):cond(function() return not update() end))
 
 windower.register_event('addon command', function(...)
     local params = L{...}

@@ -207,34 +207,27 @@ function unregister_event_user(id)
 end
 
 function user_equip_sets(func)
-	return setfenv(function(...) equip_sets(func,nil,...) end,user_env)
+	return setfenv(function(...) gearswap.equip_sets(func,nil,...) end,user_env)
 end
 
 function include_user(str)
 	if not (type(str) == 'string') then
 		error('\nGearSwap: include() was passed an invalid value ('..tostring(str)..'). (must be a string)', 2)
 	end
+	
 	if str:sub(-4)~='.lua' then str = str..'.lua' end
-
 	local path, loaded_values = pathsearch({str})
 	
 	if not path then
 		error('\nGearSwap: Cannot find the include file ('..tostring(str)..').', 2)
+	end
+	
+	local f, err = loadfile(path)
+	if f and not err then
+		setfenv(f,user_env)
+		f()
 	else
-		loaded_values = dofile(path)
-	end
-	
-	if not loaded_values then
-		error('\nGearSwap: Nothing was returned by the include ('..tostring(str)..').  Cannot add it to the user environment.', 2)
-	elseif type(loaded_values) ~= 'table' then
-		error('\nGearSwap: The include ('..tostring(str)..') did not return a table.  Cannot add it to the user environment.', 2)
-	end
-	
-	for i,v in pairs(loaded_values) do
-		rawset(user_env,i,v)
-		if type(v) == 'function' then
-			setfenv(user_env[i],user_env)
-		end
+		error('\nGearSwap: Error loading file ('..tostring(str)..'): '..err, 2)
 	end
 end
 
@@ -247,10 +240,11 @@ function user_midaction(bool)
 	
 	for i,v in pairs(out_arr) do
 		if v.midaction then
-			return true,v.spell
+			return true
 		end
 	end
-	return false
+	
+	return _global.midaction
 end
 
 function user_pet_midaction(bool)
@@ -262,10 +256,11 @@ function user_pet_midaction(bool)
 	
 	for i,v in pairs(out_arr) do
 		if v.pet_midaction then
-			return true,v.spell
+			return true
 		end
 	end
-	return false
+
+	return _global.pet_midaction
 end
 
 

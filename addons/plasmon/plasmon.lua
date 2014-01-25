@@ -270,7 +270,7 @@ function initialize()
     windower.text.set_text(tb_name, '')
     windower.text.set_bg_visibility(tb_name, true)
 
-    if windower.ffxi.get_info().zone_id == 271 then
+    if windower.ffxi.get_info().zone == 271 then
         recovery_mode = true
     end
 end
@@ -282,21 +282,13 @@ end
 
 -- windower events
 
-windower.register_event('load', function()
-    if windower.ffxi.get_info().logged_in then
-        initialize()
-    end
-end)
+windower.register_event('load', initialize:cond(function() return windower.ffxi.get_info().logged_in end))
 
 windower.register_event('login', initialize)
 
 windower.register_event('logout', 'unload', dispose)
 
-windower.register_event('zone change', function(to, to_id, from, from_id)
-    if from_id == 271 and track then
-        stop_tracking()
-    end
-end)
+windower.register_event('zone change', stop_tracking:cond(function(id) return id == 271 and track end))
 
 windower.register_event('incoming text', function(original, modified, mode)
     local match

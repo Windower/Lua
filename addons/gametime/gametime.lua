@@ -25,6 +25,7 @@
 -- SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'gametime'
+_addon.author = 'Omnys'
 _addon.version = '0.6'
 _addon.commands = {'gametime','gt'}
 
@@ -280,7 +281,7 @@ function default_settings()
 end
 
 windower.register_event('time change', function(new, old)
-	gt.hours = math.floor(new / 60)
+	gt.hours = (new / 60):floor()
 	gt.minutes = new % 60
 	gt.gtt:update(gt)
 end)
@@ -296,6 +297,7 @@ function timeconvert2(basetime)
 end
 
 function day_change(day)
+    day = res.days[day].english
 	if (day == 'Firesday') then
 		dlist = {'1','2','3','4','5','6','7','8'}
 	elseif (day == 'Earthsday') then
@@ -325,21 +327,22 @@ function day_change(day)
 	gt.day = day	
 	gt.WeekReport = daystring
 	gt.gtd:update(gt)
-	moon_change(windower.ffxi.get_info()["moon"])
+	moon_change()
 end
 
-windower.register_event('day change',day_change)
+windower.register_event('day change', moon_change..day_change)
 
-function moon_change(moon)
-	gt.MoonPhase = moon
-	gt.MoonPct = windower.ffxi.get_info()["moon_pct"]
+function moon_change()
+    local info = windower.ffxi.get_info()
+	gt.MoonPhase = res.moon_phases[info.moon_phase].english
+	gt.MoonPct = info.moon
 	gt.gtd:update(gt)
 	if settings.moon.change == true then
 		log('Day: '..gt.day..'; Moon: '..gt.MoonPhase..' ('..gt.MoonPct..'%);')
 	end
 end
 
-windower.register_event('moon change',moon_change)
+windower.register_event('moon change', moon_change)
 
 windower.register_event('addon command', function (...)
 	local args	= T{...}:map(string.lower)
@@ -467,9 +470,9 @@ windower.register_event('addon command', function (...)
 			gt.delimiter = " "
 		log('Week display axis set to horizontal.')
 		end
-		day_change(windower.ffxi.get_info()["day"])
+		day_change(windower.ffxi.get_info().day)
 	elseif args[1] == 'mode' then
-		inmode = tostring(args[2]):zfill(1)
+		inmode = args[2]:zfill(1)
 		inmode = inmode+0
 		if inmode > 4 then
 			return
@@ -477,7 +480,7 @@ windower.register_event('addon command', function (...)
 			settings.mode = inmode
 			log('mode updated')
 		end
-		day_change(windower.ffxi.get_info()["day"])
+		day_change(windower.ffxi.get_info().day)
 	elseif args[1] == 'save' then
 		settings:save('all')
 		log('Settings saved.')

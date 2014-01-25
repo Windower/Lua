@@ -217,20 +217,21 @@ function refresh_player()
 	player.subtarget = target_complete(windower.ffxi.get_mob_by_target('st'))
 	player.last_subtarget = target_complete(windower.ffxi.get_mob_by_target('lastst'))
 	
-	-- If you have a pet, make a pet table.
+	-- If we have a pet, create or update the table info.
 	if player_mob_table.pet_index then
-		table.reassign(pet,target_complete(windower.ffxi.get_mob_by_index(player_mob_table.pet_index)))
-		pet.isvalid = true
+		table.reassign(pet, target_complete(windower.ffxi.get_mob_by_index(player_mob_table.pet_index)))
 		pet.claim_id = nil
 		pet.is_npc = nil
+		pet.isvalid = true
 		if pet.tp then pet.tp = pet.tp/10 end
+		
 		if avatar_element[pet.name] then
 			pet.element = avatar_element[pet.name]
 		else
 			pet.element = 'None'
 		end
 	else
-		table.reassign(pet,{isvalid=false})
+		table.reassign(pet, {isvalid=false})
 	end
 	
 	if player.main_job == 'PUP' or player.sub_job == 'PUP' then
@@ -248,29 +249,33 @@ function refresh_player()
 			pet.attachments = make_user_table()
 			pet.available_frames = make_user_table()
 			pet.available_attachments = make_user_table()
-			for i,v in pairs(auto_tab.available_heads) do
-				if v ~= 0 then
-					pet.available_heads[r_items[i+8192][language]] = true
+
+			-- available parts
+			for i,id in pairs(auto_tab.available_heads) do
+				if r_items[id] and type(r_items[id]) == 'table' then
+					pet.available_heads[r_items[id][language]] = true
 				end
 			end
-			for i,v in pairs(auto_tab.available_frames) do
-				if v ~= 0 then
-					pet.available_frames[r_items[i+8223][language]] = true
+			for i,id in pairs(auto_tab.available_frames) do
+				if r_items[id] and type(r_items[id]) == 'table' then
+					pet.available_frames[r_items[id][language]] = true
 				end
 			end
-			for i,v in pairs(auto_tab.available_attachments) do
-				if v ~= 0 then
-					pet.available_attachments[r_items[i+8256][language]] = true
-				end
-			end
-			for i,v in pairs(auto_tab.attachments) do
-				if v ~= 0 then
-					pet.attachments[r_items[v+8448][language]] = true
+			--for i,id in pairs(auto_tab.available_attachments) do
+			--	if r_items[id] and type(r_items[id]) == 'table' then
+			--		pet.available_attachments[r_items[id][language]] = true
+			--	end
+			--end
+
+			-- actual parts
+			pet.head = r_items[auto_tab.head+8192][language]
+			pet.frame = r_items[auto_tab.frame+8223][language]
+			for i,id in pairs(auto_tab.attachments) do
+				if r_items[id] and type(r_items[id]) == 'table' then
+					pet.attachments[r_items[id][language]] = true
 				end
 			end
 			
-			pet.frame = r_items[auto_tab.frame+8223][language]
-			pet.head = r_items[auto_tab.head+8192][language]
 			if pet.max_mp ~= 0 then
 				pet.mpp = math.floor(pet.mp/pet.max_mp*100)
 			else
@@ -303,38 +308,50 @@ end
 function refresh_ffxi_info()
 	local info = windower.ffxi.get_info()
 	for i,v in pairs(info) do
-		if i ~= 'target' then
+		if i == 'zone' and res.zones[v] then
+			world.zone = res.zones[v][language]
+			world.area = world.zone
+		elseif i == 'weather' and res.weather[v] then
+			world.weather_id = v
+			world.weather = res.weather[v][language]
+			world.real_weather = world.weather
+			world.weather_element = res.elements[res.weather[v].element][language]
+			world.real_weather_element = world.weather_element
+		elseif i == 'day' and res.days[v] then
+			world.day = res.days[v][language]
+			world.day_element = res.elements[res.days[v].element][language]
+		elseif i == 'moon' then
+			world.moon_pct = v
+		elseif i == 'moon_phase' and res.moon_phases[v] then
+			world.moon = res.moon_phases[v][language]
+		elseif i ~= 'target' then
 			world[i] = v
 		end
-		if i ~= 'target' and i == 'zone' then
-			world.area = v
-		end
 	end
-	world.real_weather = info.weather
-	world.real_weather_element = info.weather_element
+
 	if buffactive.voidstorm then
-		world.weather = 'Dark'
+		world.weather = 'Voidstorm'
 		world.weather_element = 'Dark'
 	elseif buffactive.aurorastorm then
-		world.weather = 'Light'
+		world.weather = 'Aurorastorm'
 		world.weather_element = 'Light'
 	elseif buffactive.firestorm then
-		world.weather = 'Fire'
+		world.weather = 'Firestorm'
 		world.weather_element = 'Fire'
 	elseif buffactive.sandstorm then
-		world.weather = 'Earth'
+		world.weather = 'Sandstorm'
 		world.weather_element = 'Earth'
 	elseif buffactive.rainstorm then
-		world.weather = 'Water'
+		world.weather = 'Rainstorm'
 		world.weather_element = 'Water'
 	elseif buffactive.windstorm then
-		world.weather = 'Wind'
+		world.weather = 'Windstorm'
 		world.weather_element = 'Wind'
 	elseif buffactive.hailstorm then
-		world.weather = 'Ice'
+		world.weather = 'Hailstorm'
 		world.weather_element = 'Ice'
 	elseif buffactive.thunderstorm then
-		world.weather = 'Lightning'
+		world.weather = 'Thunderstorm'
 		world.weather_element = 'Lightning'
 	end
 end
@@ -451,7 +468,7 @@ function refresh_item_list(itemlist)
 	for i,v in pairs(itemlist) do
 		if v.id and v.id ~= 0 then
 			-- If we don't already have the primary item name in the table, add it.
-			if not retarr[r_items[v.id][language]] then
+			if r_items[v.id] and r_items[v.id][language] and not retarr[r_items[v.id][language]] then
 				-- We add the entry as a sub-table containing the id and count
 				retarr[r_items[v.id][language]] = {id=v.id, count=v.count, shortname=r_items[v.id][language]:lower()}
 				-- If a long version of the name exists, and is different from the short version,
@@ -460,7 +477,7 @@ function refresh_item_list(itemlist)
 					retarr[r_items[v.id][language]].longname = r_items[v.id][language..'_log']:lower()
 					retarr[r_items[v.id][language..'_log']] = retarr[r_items[v.id][language]]
 				end
-			else
+			elseif r_items[v.id] and r_items[v.id][language] then
 				-- If there's already an entry for this item, all the hard work has already
 				-- been done.  Just update the count on the subtable of the main item, and
 				-- everything else will link together.

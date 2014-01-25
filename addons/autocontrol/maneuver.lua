@@ -179,9 +179,9 @@ end
 function get_decay()
     if mjob_id == 18 then
         local newdecay
-        if T(windower.ffxi.get_mjob_data()['attachments']):contains(8610-8448) then
+        if T(windower.ffxi.get_mjob_data().attachments):contains(8610-8448) then
             local mans = 0
-            local buffs = windower.ffxi.get_player()['buffs']
+            local buffs = windower.ffxi.get_player().buffs
             for z = 1, #buffs do
                 if buffs[z] == 305 then
                     mans = mans + 1
@@ -306,7 +306,7 @@ end
 
 function text_update_loop(str)
     if mjob_id == 18 then
-        if str == 'start' and running == 1 and not petlessZones:contains(windower.ffxi.get_info()['zone_id']) then
+        if str == 'start' and running == 1 and not petlessZones:contains(windower.ffxi.get_info().zone) then
             for key, _ in pairs(heat) do
                 timer[key] = timer[key] - 1
                 if timer[key] < 1 then timer[key] = 0 end
@@ -335,7 +335,7 @@ function text_update_loop(str)
     end
 end
 
-windower.register_event("gain buff", function(name,id)
+windower.register_event('gain buff', function(id)
     if mjob_id == 18 then
         if id == 305 then 
             decay = get_decay()
@@ -346,7 +346,7 @@ windower.register_event("gain buff", function(name,id)
     end
 end)
 
-windower.register_event("lose buff",function(name,id)
+windower.register_event('lose buff', function(id)
     if mjob_id == 18 then
         if id == 305 then 
             decay = get_decay()
@@ -363,9 +363,9 @@ function timer_start(ele)
     end
 end
 
-windower.register_event('job change', function(mj, mjid, mjl, sj, sjid, sjl)
-    mjob_id = mjid
-    if mjob_id ~= 18 or petlessZones:contains(windower.ffxi.get_info()['zone_id']) then 
+windower.register_event('job change', function(mj)
+    mjob_id = mj
+    if mjob_id ~= 18 or petlessZones:contains(windower.ffxi.get_info().zone) then 
         Burden_tb:hide()
         text_update_loop('stop')
     end
@@ -381,31 +381,29 @@ function zero_all()
     end
 end
 
-function zone_check(to, tid, fr, fid)
+windower.register_event('zone change', function(to)
     if mjob_id == 18 then
-        if petlessZones:contains(tid) then 
+        if petlessZones:contains(to) then 
             text_update_loop('stop')
             zero_all()
             Burden_tb:hide()
             return
         else
-            local player_mob = windower.ffxi.get_mob_by_id(windower.ffxi.get_player()['id'])
+            local player_mob = windower.ffxi.get_mob_by_target('me')
             if player_mob then
-                if player_mob['pet_index']
-                   and player_mob['pet_index'] ~= 0 then 
+                if player_mob.pet_index
+                   and player_mob.pet_index ~= 0 then 
                     Burden_tb:show()
                     activate_burden()
                 end
             else
-                windower.send_command('@wait 10;lua i autocontrol zone_check "'..to..'" '..tid)
+                windower.send_command('@wait 10;lua i autocontrol zone_check ' .. to)
             end
         end
     end
-end
-
-windower.register_event("zone change", zone_check)
+end)
     
-windower.register_event("time change",function(...)
+windower.register_event('time change', function()
     if mjob_id == 18 then
         decay = get_decay()
     end

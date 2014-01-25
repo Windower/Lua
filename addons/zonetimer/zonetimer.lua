@@ -17,7 +17,7 @@ defaults.text.size = 12
  
 settings = config.load(defaults)
 times = texts.new(settings)
-zone = ''
+zone = 0
 
 windower.register_event('prerender', function()
     local info = windower.ffxi.get_info()

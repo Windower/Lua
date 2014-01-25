@@ -44,6 +44,33 @@ function get_item_id(str,slot)
     end
 end
 
+function update_model(index)
+    windower.packets.inject_outgoing(0x16,string.char(0,0,0,0)..Int2LE(index,2)..string.char(0,0))
+end
+
+function load_profile(name)
+
+    if settings.profiles[windower.ffxi.get_player().name:lower() ..'_'.. name:lower()] then
+        settings[windower.ffxi.get_player().name:lower()]:update(settings.profiles[windower.ffxi.get_player().name:lower() ..'_'.. name:lower()])
+        return true
+    elseif settings.profiles[name:lower()] then
+        settings[windower.ffxi.get_player().name:lower()]:update(settings.profiles[name:lower()])
+        return true
+    end
+    
+    return false
+end
+
+function save_profile(name)
+    if not name or name:len() == 0 then 
+        error('No profile name was entered.') 
+    end
+    
+    if not settings.profiles[name:lower()] then settings.profiles[name:lower()] = T{} end    
+    settings.profiles[name:lower()]:update(settings[windower.ffxi.get_player().name:lower()])
+    notice('Saved your current settings to the profile: ' .. name)
+end
+
 function blink_logic(blink_type,index)
     if settings.blinking["all"]["always"] then
         return true

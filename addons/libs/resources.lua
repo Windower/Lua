@@ -14,13 +14,28 @@ local fns = {}
 
 local slots = {}
 
+local language_string = _addon and _addon.language and _addon.language:lower() or windower.ffxi.get_info().language:lower()
+local log_language_string = 'log_' .. language_string
+
+-- The metatable for all sub tables of the root resource table
 local resource_mt = {}
+
+-- The metatable for the root resource table
 local resources = setmetatable({}, {__index = function(t, k)
     if fns[k] then
         t[k] = setmetatable(fns[k](), resource_mt)
         return t[k]
     end
 end})
+
+-- The metatable for a single resource item (an entry in a sub table of the root resource table)
+local resource_entry_mt = {__index = function(t, k)
+    return k == 'name'
+            and t[language_string]
+        or k == 'log_name'
+            and t[log_language_string]
+        or table[k]
+end}
 
 function resource_group(r, fn, attr)
     fn = type(fn) == 'function' and fn or functions.equals(fn)
@@ -37,15 +52,14 @@ function resource_group(r, fn, attr)
 end
 
 resource_mt.__index = function(t, k)
-    return slots[t]:contains(k) and resource_group-{k} or table[k]
+    return slots[t]:contains(k)
+            and resource_group-{k}
+        or table[k]
 end
 resource_mt.__class = 'Resource'
 
 local plugin_resources = '../../plugins/resources/'
 local addon_resources = 'resources/'
-
-local language_string = _addon and _addon.language and _addon.language:lower() or windower.ffxi.get_info().language:lower()
-local language_string_full = language_string..'_full'
 
 local unquotes = {
     ['quot'] = '"',
@@ -59,16 +73,11 @@ local unquote = function(str)
     return (str:gsub('&(.-);', unquotes))
 end
 
-local function add_name(t)
-    t.name = t[language_string]
-    return t
-end
-
 -- Add resources from files
-local res_names = S{'jobs', 'races', 'weather', 'servers', 'chat', 'bags', 'slots', 'statuses', 'emotes', 'skills', 'titles', 'encumbrance', 'check_ratings', 'synth_ranks'}
+local res_names = S{'jobs', 'races', 'weather', 'servers', 'chat', 'bags', 'slots', 'statuses', 'emotes', 'skills', 'titles', 'encumbrance', 'check_ratings', 'synth_ranks', 'days', 'moon_phases', 'elements'}
 for res_name in res_names:it() do
     fns[res_name] = function()
-        local res = table.map(require(addon_resources..res_name), add_name)
+        local res = table.map(require(addon_resources..res_name), setmetatable-{resource_entry_mt})
         slots[res] = table.keyset(next[2](res))
         return res
     end
@@ -86,7 +95,7 @@ function fns.abilities()
     match_string = '<a id="(%-?%d-)" index="(%d-)" prefix="(/%a-)" english="([^"]-)" german="([^"]-)" french="([^"]-)" japanese="([^"]-)" type="(%w-)" element="([%a,%s]-)" targets="([%a,%s]-)" skill="(%a-)" mpcost="(%d-)" tpcost="(%-?%d-)" casttime="(%d-)" recast="(%d-)" alias="([%w|]-)" />'
     for id, index, prefix, english, german, french, japanese, type, elements, targets, skill, mp_cost, tp_cost, cast_time, recast, alias in file:gmatch(match_string) do
         id = id:number()
-        res[id] = {
+        res[id] = setmetatable({
             id = id,
             index = index:number(),
             prefix = prefix,
@@ -103,8 +112,7 @@ function fns.abilities()
             cast_time = cast_time:number(),
             recast = recast:number(),
             alias = S(alias:split('|')),
-        }
-        res[id].name = res[id][language_string]
+        }, resource_entry_mt)
         last = res[id]
     end
     slots[res] = slots[res] + table.keyset(last)
@@ -112,7 +120,7 @@ function fns.abilities()
     match_string = '<a id="(%-?%d-)" index="(%d-)" prefix="(/%a-)" english="([^"]-)" german="([^"]-)" french="([^"]-)" japanese="([^"]-)" type="(%w-)" element="([%a,%s]-)" targets="([%a,%s]-)" skill="(%a-)" mpcost="(%d-)" tpcost="(%-?%d-)" casttime="(%d-)" recast="(%d-)" alias="([%w|]-)" wsA="(%a-)" wsB="(%a-)" wsC="(%a-)" />'
     for id, index, prefix, english, german, french, japanese, type, elements, targets, skill, mp_cost, tp_cost, cast_time, recast, alias, wsA, wsB, wsC in file:gmatch(match_string) do
         id = id:number()
-        res[id] = {
+        res[id] = setmetatable({
             id = id,
             index = index:number(),
             prefix = prefix,
@@ -132,8 +140,7 @@ function fns.abilities()
             wsA = wsA,
             wsB = wsB,
             wsC = wsC,
-        }
-        res[id].name = res[id][language_string]
+        }, resource_entry_mt)
         last = res[id]
     end
     slots[res] = slots[res] + table.keyset(last)
@@ -152,7 +159,7 @@ function fns.spells()
     for id, index, prefix, english, german, french, japanese, type, element, targets, skill, mp_cost, cast_time, recast, alias in file:gmatch(match_string) do
         index = index:number()
         if prefix ~= '/trigger' then
-            res[index] = {
+            res[index] = setmetatable({
                 id = id:number(),
                 index = index,
                 prefix = prefix,
@@ -168,8 +175,7 @@ function fns.spells()
                 cast_time = cast_time:number(),
                 recast = recast:number(),
                 alias = S(alias:split('|')),
-            }
-            res[index].name = res[index][language_string]
+            }, resource_entry_mt)
             last = res[index]
         end
     end
@@ -188,7 +194,7 @@ function fns.buffs()
 
     for id, duration, fr, de, jp, en_log, en in file:gmatch(match_string) do
         id = id:number()
-        res[id] = {
+        res[id] = setmetatable({
             id = id,
             english = unquote(en),
             french = unquote(fr),
@@ -196,8 +202,7 @@ function fns.buffs()
             japanese = unquote(jp),
             english_log = english_log,
             duration = duration:number(),
-        }
-        res[id].name = res[id][language_string]
+        }, resource_entry_mt)
         last = res[id]
     end
     slots[res] = table.keyset(last)
@@ -235,22 +240,20 @@ function fns.items()
     match_string = '<i id="(%d-)" enl="([^"]-)" fr="([^"]-)" frl="([^"]-)" de="([^"]-)" del="([^"]-)" jp="([^"]-)" jpl="([^"]-)" targets="([%a,%s]-)">([^<]-)</i>'
     for id, enl, fr, frl, de, del, jp, jpl, targets, en in file:gmatch(match_string) do
         id = id:number()
-        res[id] = {
+        res[id] = setmetatable({
             id = id,
             english = unquote(en),
-            english_full = unquote(enl),
+            log_english = unquote(enl),
             french = unquote(fr),
-            french_full = unquote(frl),
+            log_french = unquote(frl),
             german = unquote(de),
-            german_full = unquote(del),
+            log_german = unquote(del),
             japanese = unquote(jp),
-            japanese_full = unquote(jpl),
+            log_japanese = unquote(jpl),
             targets = S(targets:split()):remove('None'),
             cast_time = 0,
             category = 'General',
-        }
-        res[id].name = res[id][language_string]
-        res[id].name_full = res[id][language_string_full]
+        }, resource_entry_mt)
         last = res[id]
     end
     slots[res] = slots[res] + table.keyset(last)
@@ -258,22 +261,20 @@ function fns.items()
     match_string = '<i id="(%d-)" enl="([^"]-)" fr="([^"]-)" frl="([^"]-)" de="([^"]-)" del="([^"]-)" jp="([^"]-)" jpl="([^"]-)" targets="([%a,%s]-)" casttime="([%d%.]-)">([^<]-)</i>'
     for id, enl, fr, frl, de, del, jp, jpl, targets, cast_time, en in file:gmatch(match_string) do
         id = id:number()
-        res[id] = {
+        res[id] = setmetatable({
             id = id,
             english = unquote(en),
-            english_full = unquote(enl),
+            log_english = unquote(enl),
             french = unquote(fr),
-            french_full = unquote(frl),
+            log_french = unquote(frl),
             german = unquote(de),
-            german_full = unquote(del),
+            log_german = unquote(del),
             japanese = unquote(jp),
-            japanese_full = unquote(jpl),
+            log_japanese = unquote(jpl),
             targets = S(targets:split()):remove('None'),
             cast_time = cast_time:number(),
             category = 'General',
-        }
-        res[id].name = res[id][language_string]
-        res[id].name_full = res[id][language_string_full]
+        }, resource_entry_mt)
         last = res[id]
     end
     slots[res] = slots[res] + table.keyset(last)
@@ -281,20 +282,18 @@ function fns.items()
     match_string = '<i id="(%d-)" enl="([^"]-)" fr="([^"]-)" frl="([^"]-)" de="([^"]-)" del="([^"]-)" jp="([^"]-)" jpl="([^"]-)">([^<]-)</i>'
     for id, enl, fr, frl, de, del, jp, jpl, en in file:gmatch(match_string) do
         id = id:number()
-        res[id] = {
+        res[id] = setmetatable({
             id = id,
             english = unquote(en),
-            english_full = unquote(enl),
+            log_english = unquote(enl),
             french = unquote(fr),
-            french_full = unquote(frl),
+            log_french = unquote(frl),
             german = unquote(de),
-            german_full = unquote(del),
+            log_german = unquote(del),
             japanese = unquote(jp),
-            japanese_full = unquote(jpl),
+            log_japanese = unquote(jpl),
             category = 'General',
-        }
-        res[id].name = res[id][language_string]
-        res[id].name_full = res[id][language_string_full]
+        }, resource_entry_mt)
         last = res[id]
     end
     slots[res] = slots[res] + table.keyset(last)
@@ -307,16 +306,16 @@ function fns.items()
         category = category:capitalize()
         for id, enl, fr, frl, de, del, jp, jpl, slots, jobs, races, level, targets, cast_time, recast, en in file:gmatch(match_string) do
             id = id:number()
-            res[id] = {
+            res[id] = setmetatable({
                 id = id,
                 english = unquote(en),
-                english_full = unquote(enl),
+                log_english = unquote(enl),
                 french = unquote(fr),
-                french_full = unquote(frl),
+                log_french = unquote(frl),
                 german = unquote(de),
-                german_full = unquote(del),
+                log_german = unquote(del),
                 japanese = unquote(jp),
-                japanese_full = unquote(jpl),
+                log_japanese = unquote(jpl),
                 slots = resources.slots[slots:number(16)],
                 jobs = parse_jobs(jobs:number(16)),
                 races = resources.races[races:number(16)],
@@ -325,9 +324,7 @@ function fns.items()
                 cast_time = cast_time:number(),
                 recast = recast:number(),
                 category = category,
-            }
-            res[id].name = res[id][language_string]
-            res[id].name_full = res[id][language_string_full]
+            }, resource_entry_mt)
             last = res[id]
         end
     end
@@ -346,14 +343,13 @@ function fns.zones()
 
     for id, fr, de, jp, en in file:gmatch(match_string) do
         id = id:number()
-        res[id] = {
+        res[id] = setmetatable({
             id = id,
             english = en,
             french = fr,
             german = de,
             japanese = jp,
-        }
-        res[id].name = res[id][language_string]
+        }, resource_entry_mt)
         last = res[id]
     end
     slots[res] = table.keyset(last)
@@ -373,13 +369,12 @@ function fns.monster_abils()
     match_string = '<m id="(%d-)" english="([^"]-)" actor_status="([^"]-)" target_status="([^"]-)" />'
     for id, english, actor_status, target_status in file:gmatch(match_string) do
         id = id:number()
-        res[id] = {
+        res[id] = setmetatable({
             id = id,
             english = unquote(english),
             actor_status = S(actor_status:split(','):map(tonumber)),
             target_status = S(target_status:split(','):map(tonumber)),
-        }
-        res[id].name = res[id][language_string]
+        }, resource_entry_mt)
         last = res[id]
     end
     slots[res] = slots[res] + table.keyset(last)
@@ -387,13 +382,12 @@ function fns.monster_abils()
     match_string = '<m id="(%d-)" english="([^"]-)" actor_status="([^"]-)" />'
     for id, english, actor_status in file:gmatch(match_string) do
         id = id:number()
-        res[id] = {
+        res[id] = setmetatable({
             id = id,
             english = unquote(english),
             actor_status = S(actor_status:split(','):map(tonumber)),
             target_status = S{},
-        }
-        res[id].name = res[id][language_string]
+        }, resource_entry_mt)
         last = res[id]
     end
     slots[res] = slots[res] + table.keyset(last)
@@ -401,13 +395,12 @@ function fns.monster_abils()
     match_string = '<m id="(%d-)" english="([^"]-)" target_status="([^"]-)" />'
     for id, english, target_status in file:gmatch(match_string) do
         id = id:number()
-        res[id] = {
+        res[id] = setmetatable({
             id = id,
             english = unquote(english),
             actor_status = S{},
             target_status = S(target_status:split(','):map(tonumber)),
-        }
-        res[id].name = res[id][language_string]
+        }, resource_entry_mt)
         last = res[id]
     end
     slots[res] = slots[res] + table.keyset(last)
@@ -415,13 +408,12 @@ function fns.monster_abils()
     match_string = '<m id="(%d-)" english="([^"]-)" />'
     for id, english in file:gmatch(match_string) do
         id = id:number()
-        res[id] = {
+        res[id] = setmetatable({
             id = id,
             english = unquote(english),
             actor_status = S{},
             target_status = S{},
-        }
-        res[id].name = res[id][language_string]
+        }, resource_entry_mt)
         last = res[id]
     end
     slots[res] = slots[res] + table.keyset(last)

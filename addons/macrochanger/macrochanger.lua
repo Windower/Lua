@@ -24,8 +24,11 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+_addon.name = 'MacroChanger'
+_addon.author = 'Banggugyangu'
+_addon.version = '1.0.0.0'
+
 windower.register_event('load',function ()
-	version = '1.0.0'
 	globaldisable = 0
 	WAR_Book = ''
 	WAR_Page = ''
@@ -73,8 +76,6 @@ windower.register_event('load',function ()
 	RUN_Page = ''
 	windower.send_command('alias mc lua c macrochanger cmd')
 	windower.send_command('alias macrochanger lua c macrochanger cmd')
-	windower.add_to_chat(17, 'MacroChanger v' .. version .. ' loaded.     Author:  Banggugyangu')
-	windower.add_to_chat(17, 'Attempting to load settings from file.')
 	options_load()
 end)
 
@@ -271,9 +272,9 @@ function split(msg, match)
 	return splitarr
 end
 
-windower.register_event('job change',function (mjobId, mjob)
+windower.register_event('job change',function (job_id)
 	local player = windower.ffxi.get_player()
-	local job = player.main_job
+	local job = res.jobs[job_id].short
 	local book = ''
 	local page = ''
 	if globaldisable == 0 then
@@ -359,9 +360,7 @@ windower.register_event('job change',function (mjobId, mjob)
 	end
 end)
 
-windower.register_event('unload',function ()
-	windower.send_command('unalias mc')
-end)
+windower.register_event('unload', windower.send_command:prepare('unalias mc'))
 
 windower.register_event('addon command',function (...)
     local term = table.concat({...}, ' ')

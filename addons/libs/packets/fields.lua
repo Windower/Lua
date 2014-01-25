@@ -14,11 +14,11 @@ fields.outgoing = {_mult = {}}
 fields.incoming = {_mult = {}}
 
 -- String decoding definitions
-local ls_name_msg = T(('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'):split())
+local ls_name_msg = T('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ':split())
 ls_name_msg[0] = (0):char()
-local item_inscr = T(('0123456798ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz{'):split())
+local item_inscr = T('0123456798ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz{':split())
 item_inscr[0] = (0):char()
-local ls_name_ext = T(('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'..(0):char():rep(11)):split())
+local ls_name_ext = T(('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' .. (0):char():rep(11)):split())
 ls_name_ext[0] = '`'
 
 -- Function definitions. Used to display packet field information.
@@ -26,8 +26,8 @@ ls_name_ext[0] = '`'
 res = require('resources')
 
 local function s(val, from, to)
-    from = from and from - 1 or 0
-    to = to or 16
+    from = from - 1
+    to = to
     return bit.band(bit.rshift(val, from), 2^(to - from) - 1)
 end
 
@@ -57,12 +57,14 @@ local time = (function()
     local now = os.time()
     local h, m = math.modf(os.difftime(now, os.time(os.date('!*t', now))) / 3600)
 
-    local timezone = ('%+.2d:%.2d'):format(h, 60 * m)
+    local timezone = '%+.2d:%.2d':format(h, 60 * m)
     now, h, m = nil, nil, nil
     return function(ts)
         return os.date('%Y-%m-%dT%H:%M:%S'..timezone, os.time() - ts)
     end
 end)()
+
+local time_ms = time..function(val) return val/1000  end
 
 local dir = (function()
     local dir_sets = L{'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW', 'N', 'NNE', 'NE', 'ENE', 'E'}
@@ -72,7 +74,7 @@ local dir = (function()
 end)()
 
 local function cap(val, max)
-    return ('%.1f'):format(100*val/max)..'%'
+    return '%.1f':format(100*val/max)..'%'
 end
 
 local function zone(val)
@@ -80,7 +82,10 @@ local function zone(val)
 end
 
 local function item(val)
-    return res.items[val].name_full:capitalize()
+    if not val then log(debug.traceback()) end
+    return val ~= 0
+            and res.items[val].log_name:capitalize()
+        or '-'
 end
 
 local function server(val)
@@ -133,11 +138,17 @@ end
 
 local function inv(bag, val)
     if val == 0 then
-        return '(None)'
+        return bag == 0
+                and windower.ffxi.get_items().gil
+            or '-'
     end
 
     local id = windower.ffxi.get_items()[res.bags[bag].english:lower()][val].id
-    return id > 0 and res.items[id].name or 'Unknown'
+    return id > 0 and res.items[id].name or '-'
+end
+
+local function invp(index, val, data)
+    return inv(data[index + 1]:byte(), val)
 end
 
 local function hex(val, fill)
@@ -168,16 +179,43 @@ types.shop_item = L{
     {ctype='unsigned short',    label='Shop Slot'},                             -- 08
 }
 
+local enums = {
+    synth = {
+        [0] = 'Success',
+        [1] = 'Fail',
+        [2] = 'Interrupted',
+        [3] = 'Cancel, invalid recipe',
+        [4] = 'Cancel',
+        [5] = 'Fail, crystal lost',
+        [6] = 'Cancel, skill too low',
+        [7] = 'Cancel, rare',
+    },
+    logout = {
+        [1] = '/loguot',
+        [2] = '/pol',
+        [3] = '/shutdown',
+    },
+    zone = {
+        [1] = 'Logout',
+        [2] = 'Teleport',
+        [3] = 'Zone line',
+    },
+}
+
+local function e(t, val)
+    return enums[t][val]
+end
+
 --[[
     Outgoing packets
 ]]
 
 -- Client Leave
 fields.outgoing[0x00D] = L{
-    {ctype='unsigned char',     label='_unknown1'},                             -- 04 -- Always 00?
-    {ctype='unsigned char',     label='_unknown2'},                             -- 05 -- Always 00?
-    {ctype='unsigned char',     label='_unknown3'},                             -- 06 -- Always 00?
-    {ctype='unsigned char',     label='_unknown4'},                             -- 07 -- Always 00?
+    {ctype='unsigned char',     label='_unknown1'},                             -- 04   Always 00?
+    {ctype='unsigned char',     label='_unknown2'},                             -- 05   Always 00?
+    {ctype='unsigned char',     label='_unknown3'},                             -- 06   Always 00?
+    {ctype='unsigned char',     label='_unknown4'},                             -- 07   Always 00?
 }
 
 -- Standard Client
@@ -185,12 +223,12 @@ fields.outgoing[0x015] = L{
     {ctype='float',             label='X Position'},                            -- 04
     {ctype='float',             label='Y Position'},                            -- 08
     {ctype='float',             label='Z Position'},                            -- 0C
-    {ctype='unsigned short',    label='_zero1'},                                -- 10
-    {ctype='unsigned short',    label='Run Count'},                             -- 12 -- Counter that indicates how long you've been running?
+    {ctype='unsigned short',    label='_junk1'},                                -- 10
+    {ctype='unsigned short',    label='Run Count'},                             -- 12   Counter that indicates how long you've been running?
     {ctype='unsigned char',     label='Rotation',           fn=dir},            -- 14
     {ctype='unsigned char',     label='_unknown2'},                             -- 15
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 16
-    {ctype='unsigned int',      label='Timestamp',          fn=time},           -- 18
+    {ctype='unsigned int',      label='Timestamp',          fn=time_ms},        -- 18   Milliseconds
     {ctype='unsigned int',      label='_unknown3'},                             -- 1A
 }
 
@@ -386,10 +424,10 @@ fields.outgoing[0x0E2] = L{
 
 -- Logout
 fields.outgoing[0x0E7] = L{
-    {ctype='unsigned char',      label='_unknown1'},                            -- 04 -- Observed to be 00
-    {ctype='unsigned char',      label='_unknown2'},                            -- 05 -- Observed to be 00
-    {ctype='unsigned char',      label='Logout Type'},                          -- 06 -- /logout = 01, /pol == 02 (removed), /shutdown = 03
-    {ctype='unsigned char',      label='_unknown3'},                            -- 07 -- Observed to be 00
+    {ctype='unsigned char',      label='_unknown1'},                            -- 04   Observed to be 00
+    {ctype='unsigned char',      label='_unknown2'},                            -- 05   Observed to be 00
+    {ctype='unsigned char',      label='Logout Type',       fn=e+'logout'},     -- 06   /logout = 01, /pol == 02 (removed), /shutdown = 03
+    {ctype='unsigned char',      label='_unknown3'},                            -- 07   Observed to be 00
 }
 
 -- Sit
@@ -527,7 +565,7 @@ fields.incoming[0x00A] = L{
 
 -- Zone Response
 fields.incoming[0x00B] = L{
-    {ctype='unsigned int',      label='Type'},                                  -- 04 Logout: 1, Teleport/Warp: 2, Regular zone: 3
+    {ctype='unsigned int',      label='Type',               fn=e+'zone'},       -- 04
     {ctype='unsigned int',      label='IP',                 fn=ip},             -- 08
     {ctype='unsigned short',    label='Port'},                                  -- 0C
     {ctype='unsigned short',    label='_unknown1'},                             -- 10
@@ -590,7 +628,7 @@ fields.incoming[0x00D] = L{
     {ctype='float',             label='Z Position'},                            -- 10
     {ctype='float',             label='Y Position'},                            -- 14
     {ctype='unsigned short',    label='Head Rotation',      fn=dir},            -- 18
-    {ctype='unsigned short',    label='Target Index *2',    fn=index..s-{2}},   -- 1A
+    {ctype='unsigned short',    label='Target Index *2',    fn=index..s+{2,15}},-- 1A
     {ctype='unsigned char',     label='Current Speed'},                         -- 1C
     {ctype='unsigned char',     label='Base Speed'},                            -- 1D
     {ctype='unsigned char',     label='HP %',               fn=percent},        -- 1E
@@ -726,6 +764,16 @@ fields.incoming[0x01F] = L{
     {ctype='unsigned char',     label='Inventory ID'},                          -- 0B
     {ctype='unsigned char',     label='Inventory Status'},                      -- 0C
     {ctype='char[3]',           label='_junk1'},                                -- 0D
+}
+
+-- Item Updates
+fields.incoming[0x020] = L{
+    {ctype='unsigned int',      label='Item Count'},                            -- 04
+    {ctype='unsigned int',      label='_unknown1',          const=0x00},        -- 08
+    {ctype='unsigned short',    label='Item ID',            fn=item},           -- 0C
+    {ctype='unsigned char',     label='Bag',                fn=bag},            -- 0E
+    {ctype='unsigned char',     label='Inventory Index',    fn=invp+{0x0E}},    -- 0F
+    {ctype='char[28]',          label='ExtData',            fn='...':fn()},     -- 10
 }
 
 -- Count to 80
@@ -1116,27 +1164,45 @@ fields.incoming[0x062] = L{
     {ctype='char*',             label='_padding',           const=0xFF},        -- F4
 }
 
--- Unnamed 0x067
+-- Pet Info
 fields.incoming[0x067] = L{
--- The length of this packet is 24, 28, 36 or 40 bytes. The latter two seem to feature a 16 char
--- name field. 24/28 appears to be for NPCs/monsters. When summoning pets, their name appear in 
--- the 16 byte name field. 40 Appears to be for players, although it's 36 when summoning a pet.
--- _unknown1 is 02 09 for players and 03 05 for NPCs, unless players summon a pet, then it's
--- 44 07. The use of this packet is unclear.
--- 44 07 or 44 06 or 84 07 all update pet TP and use the below mapping. They do not update Owner Index
--- 84 07 appears to be reserved for pets with long names.
+-- The length of this packet is 24, 28, 36 or 40 bytes, featuring a 0, 4, 8, 12, or 16 byte name field.
+
+-- The Mask seem to be a bitpacked combination of a mask indicating which information is updated and
+--    a field indicating the length of the name in the packet.
+
+-- The information below should probably be re-verified, but:
+-- 44 07 is used for pets with names that are 4-7 characters (8 character field). It updates pet TP but not Owner Index.
+-- 84 07 is used for pets with names that are 8-11 characters (12 character field). It updates pet TP but not Owner Index.
+-- C4 07 is used for pets with even longer names (>11 characters, 16 character field). It updates pet TP but not Owner Index.
+-- 44 08 is used for pets with extremely long names. It updates pet TP but not Owner Index.
+
+-- 02 09 is sent regularly to update owner information (about yourself). This might contain information if you are charmed.
 -- 03 05 is sent when summoning pets, Trust NPCs, etc.
 -- 04 05 is sent when releasing pets (unknown for Trust NPCs)
-    {ctype='unsigned char',     label='Mask_1'},                                -- 04
-    {ctype='unsigned char',     label='Mask_2'},                                -- 05
+
+    {ctype='unsigned short',    label='Mask'},                                  -- 04
     {ctype='unsigned short',    label='Pet Index',          fn=index},          -- 06
     {ctype='unsigned int',      label='Pet ID',             fn=id},             -- 08
     {ctype='unsigned short',    label='Owner Index',        fn=index},          -- 0C
-    {ctype='unsigned char',     label='Current HP%'},                           -- 0E  -- Set in 44 06 packet
-    {ctype='unsigned char',     label='Maximum HP%'},                           -- 0F  -- Set in 44 06 packet
-    {ctype='unsigned short',    label='Pet TP%'},                               -- 10  -- Multiplied by 10, set in 44 06 packet. Can take values at other times that might not be Pet TP
+    {ctype='unsigned char',     label='Current HP%'},                           -- 0E
+    {ctype='unsigned char',     label='Current MP%'},                           -- 0F
+    {ctype='unsigned short',    label='Pet TP%'},                               -- 10   Multiplied by 10
     {ctype='unsigned short',    label='_unknown1'},                             -- 12
-    {ctype='char*',             label='Pet Name'},                              -- 14  -- Set in 44 06 packet. Packet expands to accommodate pet name length.
+    {ctype='char*',             label='Pet Name'},                              -- 14   Packet expands to accommodate pet name length.
+}
+
+-- Synth Result
+fields.incoming[0x06F] = L{
+    {ctype='unsigned char',     label='Result',             fn=e+{'synth'}},    -- 04
+    {ctype='signed char',       label='Quality'},                               -- 05
+    {ctype='unsigned char',     label='Count'},                                 -- 06   Even set for fail (set as the NQ amount in that case)
+    {ctype='unsigned char',     label='_junk1'},                                -- 07
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 08
+    {ctype='unsigned short[8]', label='Lost Item',          fn=item},           -- 0A
+    {ctype='unsigned char',     label='_unknown1',          const=0x37},        -- 1A   Always 37?
+    {ctype='char[7]',           label='_unknown5'},                             -- 1B   Always 0?
+    {ctype='unsigned short',    label='_junk1'},                                -- 22
 }
 
 -- LS Message
@@ -1180,7 +1246,7 @@ fields.incoming[0x0D3] = L{
     {ctype='unsigned int',      label='Current Lot ID',     fn=id},             -- 08
     {ctype='unsigned short',    label='Highest Lot Index',  fn=index},          -- 0C
     {ctype='unsigned short',    label='Highest Lot'},                           -- 0E
-    {ctype='unsigned short',    label='Current Lot Index',  fn=index..s-{1,15}},-- 10   The highest bit is set
+    {ctype='unsigned short',    label='Current Lot Index',  fn=index..s+{1,15}},-- 10   The highest bit is set
     {ctype='unsigned short',    label='Current Lot'},                           -- 12
     {ctype='unsigned char',     label='_unknown1'},                             -- 14
     {ctype='unsigned char',     label='Drop'},                                  -- 15   1 if the item dropped, 0 otherwise
@@ -1337,7 +1403,16 @@ fields.incoming[0x113] = L{
     {ctype='unsigned char',     label='3rd Echelon Battle Trophies'},           -- CA
     {ctype='unsigned char',     label='2nd Echelon Battle Trophies'},           -- CB
     {ctype='unsigned char',     label='1st Echelon Battle Trophies'},           -- CC
-    {ctype='char[3]',           label='_unknown5'},                             -- CD
+    {ctype='unsigned char',     label='Cave Conservation Points'},              -- CD
+    {ctype='unsigned char',     label='Imperial Army ID Tags'},                 -- CE
+    {ctype='unsigned char',     label='Op Credits'},                            -- CF
+    {ctype='signed int',        label='Traverser Stones'},                      -- D0
+    {ctype='signed int',        label='Voidstones'},                            -- D4
+    {ctype='signed int',        label='Kupofried\'s Corundums'},                -- D8
+    {ctype='unsigned char',     label='Coalition Imprimaturs'},                 -- DC
+    {ctype='unsigned char',     label='Moblin Pheromone Sacks'},                -- DD
+    {ctype='short',             label='_unknown5'},                             -- DE
+    {ctype='int',               label='_unknown6'},                             -- F0
 }
 
 local sizes = {}
@@ -1360,12 +1435,20 @@ local function parse(fs, data, max)
         for field in fs:it() do
             if field.ctype then
                 field = table.copy(field)
-                if max ~= 1 then
-                    field.label = field.label..' '..tostring(count)
-                end
+                local ctype, count_str = field.ctype:match('(.*)%[(%d+)%]')
+                if count_str and ctype ~= 'char' then
+                    field.ctype = ctype
+                    local ext, size = parse(L{field}, data:sub(index + 1), count_str:number())
+                    res = res + ext
+                    index = index + size
+                else
+                    if max ~= 1 then
+                        field.label = field.label..' '..tostring(count)
+                    end
 
-                res:append(field)
-                index = index + sizes[field.ctype:match('(%a+)[^%a]*$')]
+                    res:append(field)
+                    index = index + sizes[field.ctype:match('(%a+)[^%a]*$')]
+                end
             else
                 local ext, size = parse(field.ref, data:sub(index + 1), field.count)
                 res = res + ext

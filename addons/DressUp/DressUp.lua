@@ -30,7 +30,6 @@ _addon.version = '1.0'
 _addon.commands = {'DressUp','du'}
 
 --Libs
-config = require('config')
 require('luau')
 
 --DressUp files
@@ -52,11 +51,22 @@ windower.register_event('load','login',function ()
         _char = windower.ffxi.get_player().name:lower()
         if not settings[_char] then settings[_char] = {} end
         print_blink_settings("global")
+        if load_profile(windower.ffxi.get_player().main_job) then
+            notice('Loaded profile: ' .. windower.ffxi.get_player().main_job)
+        end
+        update_model(windower.ffxi.get_player().index)
     end
-    zone_reset = 2
+    
 end)
 
 windower.register_event('logout',function() _char = nil end)
+
+windower.register_event('job change',function(job)
+    if load_profile(res.jobs[job].name) then
+        update_model(windower.ffxi.get_player().index)
+        notice('Loaded profile: ' .. job)
+    end
+end)
 
 windower.register_event('incoming chunk',function (id, data)
     if id == 0x0a then
@@ -216,7 +226,24 @@ windower.register_event('addon command', function (command,...)
         settings.autoupdate = not settings.autoupdate
         notice("AutoUpdate setting is now "..tostring(settings.autoupdate)..".")
         
-    ----------------------------------------------------------
+    elseif command == "save" or command == "s" then
+        save_profile(args:concat(''))
+    
+    elseif command == "load" or command == "l" then
+        if load_profile(args:concat('')) then
+            notice('Loaded profile: ' .. args:concat(''))
+        else
+            error('Failed to find a profile named: ' .. args:concat(''))
+        end
+    
+    elseif command == "delete" or command == "d" then
+        if settings.profiles[args:concat(''):lower()] then
+            settings.profiles[args:concat(''):lower()] = nil
+            notice('Deleted profile: ' .. args:concat(''))
+        else
+            error('Failed to find a profile named: ' .. args:concat(''))
+        end
+   ----------------------------------------------------------
     --------------- Commands for model changes ---------------
     ----------------------------------------------------------
     
@@ -459,8 +486,7 @@ windower.register_event('addon command', function (command,...)
         end
     end
     if settings.autoupdate and ((command == _char) or (_clear == _char)) then
-        local _requestindex = Int2LE(windower.ffxi.get_player().index,2)
-        windower.packets.inject_outgoing(0x16,string.char(0,0,0,0).._requestindex..string.char(0,0))
+        update_model(windower.ffxi.get_player().index)
     end
     
     settings:save('all')

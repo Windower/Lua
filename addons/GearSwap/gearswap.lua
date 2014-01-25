@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.818'
+_addon.version = '0.820'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -86,8 +86,9 @@ windower.register_event('addon command',function (...)
 	end
 	local splitup = {...}
 	if not splitup[1] then return end -- handles //gs
+	local cmd = splitup[1]:lower()
 	
-	if splitup[1]:lower() == 'c' then
+	if cmd == 'c' then
 		if gearswap_disabled then return end
 		if splitup[2] then
 			refresh_globals()
@@ -95,7 +96,7 @@ windower.register_event('addon command',function (...)
 		else
 			windower.add_to_chat(123,'GearSwap: No self command passed.')
 		end
-	elseif splitup[1]:lower() == 'equip' then
+	elseif cmd == 'equip' then
 		if gearswap_disabled then return end
 		local set_split = string.split(_raw.table.concat(splitup,' ',2,#splitup):gsub('%[','%.'):gsub('[%]\']',''),'.')
 		local n = 1
@@ -117,10 +118,10 @@ windower.register_event('addon command',function (...)
 				break
 			end
 		end
-	elseif splitup[1]:lower() == 'export' then
+	elseif cmd == 'export' then
 		table.remove(splitup,1)
 		export_set(splitup)
-	elseif splitup[1]:lower() == 'validate' then
+	elseif cmd == 'validate' then
 		if user_env and user_env.sets then
 			refresh_globals()
 			table.remove(splitup, 1)
@@ -128,19 +129,19 @@ windower.register_event('addon command',function (...)
 		else
 			windower.add_to_chat(123,'GearSwap: There is nothing to validate because there is no file loaded.')
 		end
-	elseif splitup[1]:lower() == 'enable' then
+	elseif cmd == 'enable' then
 		disenable(splitup,enable,'enable',false)
-	elseif splitup[1]:lower() == 'disable' then
+	elseif cmd == 'disable' then
 		disenable(splitup,disable,'disable',true)
-	elseif splitup[1]:lower() == 'reload' then
+	elseif cmd == 'reload' or cmd == 'r' then
 		refresh_user_env()
-	elseif strip(splitup[1]) == 'debugmode' then
+	elseif strip(cmd) == 'debugmode' then
 		_settings.debug_mode = not _settings.debug_mode
 		print('GearSwap: Debug Mode set to '..tostring(_settings.debug_mode)..'.')
-	elseif strip(splitup[1]) == 'showswaps' then
+	elseif strip(cmd) == 'showswaps' then
 		_settings.show_swaps = not _settings.show_swaps
 		print('GearSwap: Show Swaps set to '..tostring(_settings.show_swaps)..'.')
-	elseif not ((strip(splitup[1]) == 'eval' or strip(splitup[1]) == 'visible' or strip(splitup[1]) == 'invisible' or strip(splitup[1]) == 'clocking' ) and debugging>0) then
+	elseif not (S{'eval','visible','invisible','clocking'}:contains(cmd) and debugging>0) then
 		print('GearSwap: Command not found')
 	end
 end)
@@ -166,16 +167,51 @@ end
 
 windower.register_event('incoming chunk',function(id,data,modified,injected,blocked)
 	if debugging >= 1 then windower.debug('incoming chunk '..id) end
-
+	
+	if next_packet_events and next_packet_events.sequence_id ~= data:byte(4)*256+data:byte(3) then
+		if not next_packet_events.globals_update or next_packet_events.globals_update ~= data:byte(4)*256 + data:byte(3) then
+			refresh_globals()
+			next_packet_events.globals_update = data:byte(4)*256+data:byte(3)
+		end
+		if next_packet_events.pet_status_change then
+			if pet.isvalid then
+				equip_sets('pet_status_change',nil,next_packet_events.pet_status_change.newstatus,next_packet_events.pet_status_change.oldstatus)
+			end
+			next_packet_events.pet_status_change = nil
+		end
+		if next_packet_events.pet_change then
+			if next_packet_events.pet_change.pet then -- Losing a pet
+				equip_sets('pet_change',nil,next_packet_events.pet_change.pet,false)
+				next_packet_events.pet_change = nil
+			elseif pet.isvalid then -- Gaining a pet
+				equip_sets('pet_change',nil,pet,true)
+				next_packet_events.pet_change = nil
+			end
+		end
+		if not next_packet_events.pet_status_change and not next_packet_events.pet_change then
+			next_packet_events = nil
+		end
+	end
+	
 	if id == 0x0E and not injected and pet.index and pet.index == data:byte(9) + data:byte(10)*256 and math.floor((data:byte(11)%8)/4)== 1 then
 		local oldstatus = pet.status
-		local newstatus = res.statuses[data:byte(32)]
-		if newstatus then newstatus = newstatus.english
-		else newstatus = data:byte(32) end
-		if oldstatus ~= newstatus then
-			-- Should put a filter on this to prevent it from sending anything other than resting, engaged, and idle.
-			refresh_globals()
-			equip_sets('pet_status_change',nil,newstatus,oldstatus)
+		local status_id = data:byte(32)
+		-- Ignore all statuses aside from Idle/Engaged/Dead/Engaged dead.
+		if status_id < 4 then
+			local newstatus = res.statuses[status_id]
+			if newstatus and newstatus.english then
+				newstatus = newstatus.english
+				if oldstatus ~= newstatus then
+					if not next_packet_events then next_packet_events = {sequence_id = data:byte(4)*256+data:byte(3)} end
+					next_packet_events.pet_status_change = {newstatus=newstatus,oldstatus=oldstatus}
+--					refresh_globals()
+		
+--					if pet.isvalid then
+--						pet.status = newstatus
+--						equip_sets('pet_status_change',nil,newstatus,oldstatus)
+--					end
+				end
+			end
 		end
 	elseif id == 0x28 and not injected then
 		if clocking then windower.add_to_chat(8,'Action Packet: '..(os.clock() - out_time)) end
@@ -278,26 +314,15 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
 		local owner_ind = data:byte(14)*256+data:byte(13)
 		local subj_ind = data:byte(8)*256+data:byte(7)
 	--	if debugging >= 1 and (windower.ffxi.get_player().index == owner_ind or windower.ffxi.get_player().index == subj_ind) then windower.add_to_chat(8,flag_2..' '..flag_1) end
-		if flag_1 == 3 and flag_2 == 5 and windower.ffxi.get_player().index == owner_ind then
-			local temp_mob = windower.ffxi.get_mob_by_index(subj_ind)
-			if temp_mob then
-				refresh_globals()
-				table.reassign(pet,target_complete(temp_mob))
-				pet.isvalid = true
-				pet.claim_id = nil
-				pet.is_npc = nil
-				if pet.tp then pet.tp = pet.tp/10 end
-				if avatar_element[pet.name] then
-					pet.element = avatar_element[pet.name]
-				else
-					pet.element = 'None'
-				end
-				equip_sets('pet_change',nil,pet,true)
-			end
+		
+		if flag_1 == 3 and flag_2 == 5 and windower.ffxi.get_player().index == owner_ind and not pet.isvalid then
+			if not next_packet_events then next_packet_events = {sequence_id = data:byte(4)*256+data:byte(3)} end
+			next_packet_events.pet_change = {subj_ind = subj_ind}
 		elseif flag_1 == 4 and flag_2 == 5 and windower.ffxi.get_player().index == subj_ind then
+			if not next_packet_events then next_packet_events = {sequence_id = data:byte(4)*256+data:byte(3)} end
 			refresh_globals()
 			pet.isvalid = false
-			equip_sets('pet_change',nil,pet,false)
+			next_packet_events.pet_change = {pet = table.reassign({},pet)}
 		end
 	elseif gearswap_disabled then
 		return
@@ -320,33 +345,45 @@ windower.register_event('status change',function(new,old)
 	equip_sets('status_change',nil,res.statuses[new].english,res.statuses[old].english)
 end)
 
-windower.register_event('gain buff',function(name,id)
-	if debugging >= 1 then windower.debug('gain buff '..name) end
+windower.register_event('gain buff',function(buff_id)
+	if not r_status[buff_id] then
+		error('GearSwap: No known status for buff id #'..tostring(buff_id))
+	end
+	local buff_name = r_status[buff_id][language]
+	if debugging >= 1 then windower.debug('gain buff '..buff_name..' ('..tostring(buff_id)..')') end
 	if gearswap_disabled then return end
 	
 	-- Need to figure out what I'm going to do with this:
-	if _global.midaction and T{'terror','sleep','stun','petrification','charm','weakness'}:contains(name:lower()) then _global.midaction = false end
-	
+	if _global.midaction and T{'terror','sleep','stun','petrification','charm','weakness'}:contains(buff_name:lower()) then _global.midaction = false end
 	
 	refresh_globals()
-	equip_sets('buff_change',nil,name,true)
+	equip_sets('buff_change',nil,buff_name,true)
 end)
 
-windower.register_event('lose buff',function(name,id)
-	if debugging >= 1 then windower.debug('lose buff '..name) end
+windower.register_event('lose buff',function(buff_id)
+	if not r_status[buff_id] then
+		error('GearSwap: No known status for buff id #'..tostring(buff_id))
+	end
+	local buff_name = r_status[buff_id][language]
+	if debugging >= 1 then windower.debug('lose buff '..buff_name..' ('..tostring(buff_id)..')') end
 	if gearswap_disabled then return end
 	refresh_globals()
-	equip_sets('buff_change',nil,name,false)
+	equip_sets('buff_change',nil,buff_name,false)
 end)
 
-windower.register_event('job change',function(mjob, mjob_id, mjob_lvl, sjob, sjob_id, sjob_lvl)
+windower.register_event('job change',function(mjob_id, mjob_lvl, sjob_id, sjob_lvl)
 	if debugging >= 1 then windower.debug('job change') end
 	disable_table = {false,false,false,false,false,false,false,false,false,false,false,false,false,false,false}
 	not_sent_out_equip = {}
 	sent_out_equip = {}
 	limbo_equip = {}
-	if mjob ~= current_job_file then
+
+	if current_job_file ~= res.jobs[mjob_id].short then
 		refresh_user_env(mjob_id)
+	elseif player.sub_job ~= res.jobs[mjob_id].short then
+		local temp_sub = player.sub_job
+		refresh_globals()
+		equip_sets('sub_job_change',nil,res.jobs[mjob_id].short,temp_sub)
 	end
 end)
 
