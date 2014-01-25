@@ -100,7 +100,7 @@ function equip_sets(swap_type,ind,...)
 	
 	
 	if type(swap_type) == 'string' and swap_type == 'pretarget' then -- Target may just have been changed, so make the ind now.
-		ind = mk_out_arr_entry(val1,{target_id=spell.target.id},nil)
+		ind = mk_out_arr_entry(val1,spell.target.id,nil)
 	elseif type(swap_type) == 'string' and swap_type == 'precast' then
 		_global.midaction = true
 	elseif type(swap_type) == 'string' and swap_type == 'aftercast' then
@@ -205,7 +205,7 @@ function equip_sets_exit(swap_type,ind,val1,val2)
 			end
 		elseif swap_type == 'precast' then
 			packet_send_check(ind)
-		elseif swap_type == 'aftercast' then
+		elseif swap_type == 'aftercast' or swap_type == 'pet_aftercast' then
 			d_out_arr_entry(val1,ind)
 		end
 	end

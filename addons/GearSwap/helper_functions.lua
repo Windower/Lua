@@ -521,10 +521,10 @@ end
 --Returns:
 ---- inde - key for out_arr
 -----------------------------------------------------------------------------------
-function mk_out_arr_entry(sp,arr,original)
+function mk_out_arr_entry(sp,targ_id,original)
 	local inde = get_prefix(spell.prefix)..' "'..spell.english..'"'
-	if out_arr[inde..' '..tostring(arr.target_id)] then
-		inde = inde..' '..tostring(arr.target_id)
+	if out_arr[inde..' '..tostring(targ_id)] then
+		inde = inde..' '..tostring(targ_id)
 		out_arr[inde].data = original
 		out_arr[inde].spell.target = sp.target
 	elseif out_arr[inde..' nil'] then
@@ -536,8 +536,8 @@ function mk_out_arr_entry(sp,arr,original)
 		out_arr[inde].data = original
 		out_arr[inde].spell.target = sp.target
 	else
-		if debugging >= 2 then windower.add_to_chat(8,'GearSwap (Debug Mode): Creating a new out_arr entry: '..tostring(inde)..' '..tostring(arr.target_id)) end
-		inde = inde..' '..tostring(arr.target_id)
+		if debugging >= 2 then windower.add_to_chat(8,'GearSwap (Debug Mode): Creating a new out_arr entry: '..tostring(inde)..' '..tostring(targ_id)) end
+		inde = inde..' '..tostring(targ_id)
 		out_arr[inde] = {}
 		out_arr[inde].data = original
 		out_arr[inde].cast_delay = 0

@@ -91,7 +91,7 @@ windower.register_event('outgoing text',function(original,modified)
 				if out_arr[unify_prefix[spell.prefix]..' "'..spell.english..'" nil'] then
 					inde = unify_prefix[spell.prefix]..' "'..spell.english..'" nil'
 				else
-					inde = mk_out_arr_entry(spell,{target_id=spell.target.id},nil)
+					inde = mk_out_arr_entry(spell,spell.target.id,nil)
 				end
 				if outgoing_action_category_table[unify_prefix[spell.prefix]] == 3 then
 					id = spell.index
@@ -201,7 +201,8 @@ function inc_action(act)
 			equip_sets(prefix..'aftercast',inde,spell)
 		end
 	elseif readies[act.category] and prefix == 'pet_' and act.targets[1].actions[1].message ~= 0 then -- Entry for pet midcast. Excludes the second packet of "Out of range" BPs.
-		inde = mk_out_arr_entry(spell,{target_id==spell.target.id},nil)
+		inde = mk_out_arr_entry(spell,spell.target.id,nil)
+		windower.add_to_chat(8,tostring(spell.target.id)..' '..inde)
 		refresh_globals()
 		equip_sets('pet_midcast',inde,spell)
 	end
