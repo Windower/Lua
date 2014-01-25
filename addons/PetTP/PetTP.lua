@@ -19,6 +19,7 @@ local tb_name = 'addon:pettp'
 local petactive = false
 local verbose = false
 local superverbose = false
+local timercountdown = 0
 
 local defaults = T{}
 
@@ -201,6 +202,29 @@ function printpettp(pet_idx_in,own_idx_in)
 	windower.text.set_text(tb_name, output)
 end
 
+windower.register_event('time change', function()
+	if timercountdown == 0 then
+		return
+	elseif petactive then
+		if superverbose == true then windower.add_to_chat(8, 'SCAN: Pet appeared between scans!') end
+		timercountdown = 0
+	else
+		timercountdown = timercountdown - 1
+		if update_pet() == true then
+			if superverbose == true then windower.add_to_chat(8, 'SCAN: Found a pet!') end
+			windower.send_command('ptp stoptimer')	
+			current_hp = 0
+			max_hp	   = 0
+			current_mp = 0
+			max_mp	   = 0
+			make_visible()
+			printpettp()
+		elseif timercountdown == 0 then
+			if superverbose == true then windower.add_to_chat(8, 'SCAN: No pet found in 5 ticks') end		
+		end
+	end
+end)
+
 windower.register_event('incoming chunk',function(id,original,modified,injected,blocked)
 	if not injected then
 		if id == 0x44 then
@@ -294,7 +318,7 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 					petname = original:sub(0x15,original:find(string.char(0),0x15)-1)
 				end
 				printpettp(pet_idx,own_idx)
-			elseif not petactive and (original:byte(0x05) == 0x03) and (original:byte(0x06) == 0x05) and ((original:byte(0x0D)+original:byte(0x0E)*256) ~= 0) then
+			elseif not petactive and (original:byte(0x05) == 0x03) and (original:byte(0x06) == 0x05) and (own_idx == windower.ffxi.get_player().index) then
 				if update_pet(pet_idx,own_idx) == true then
 					current_hp = 0
 					max_hp	   = 0
@@ -302,6 +326,8 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 					max_mp	   = 0
 					make_visible()
 					printpettp(pet_idx,own_idx_in)
+				else	-- last resort
+					timercountdown = 5
 				end
 			end
 		elseif id==0x0E and original:byte(0x0B) == 0x07 then	-- npc update
