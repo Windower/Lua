@@ -42,8 +42,9 @@ function parse_action_packet(act)
 
 						if r.message ~= 0 and m.message ~= 0 then
 							if m.message == r.message or (condensecrits and S{1,67}:contains(m.message) and S{1,67}:contains(r.message)) then 
-								if (m.effect == r.effect) or (condensecrits and S{1,67}:contains(m.message)) then
+								if (m.effect == r.effect) or (S{1,67}:contains(m.message) and S{0,2,4}:contains(m.effect) and S{0,2,4}:contains(r.effect)) then  -- combine kicks and crits
 									 if m.reaction == r.reaction or (S{8,10}:contains(m.reaction) and S{8,10}:contains(r.reaction)) then  -- combine hits and guards
+--										windower.add_to_chat(8, 'Condensed: '..m.message..':'..r.message..' - '..m.effect..':'..r.effect..' - '..m.reaction..':'..r.reaction)
 										r.number = r.number + 1
 										if not sumdamage then
 											if not r.cparam then
@@ -63,8 +64,14 @@ function parse_action_packet(act)
 											r.effect = m.effect
 										end
 										m.message = 0
+									else
+--										windower.add_to_chat(8, 'Didn\'t condense: '..m.message..':'..r.message..' - '..m.effect..':'..r.effect..' - '..m.reaction..':'..r.reaction)
 									end
+								else
+--									windower.add_to_chat(8, 'Didn\'t condense: '..m.message..':'..r.message..' - '..m.effect..':'..r.effect..' - '..m.reaction..':'..r.reaction)
 								end
+							else
+--								windower.add_to_chat(8, 'Didn\'t condense: '..m.message..':'..r.message..' - '..m.effect..':'..r.effect..' - '..m.reaction..':'..r.reaction)
 							end
 						end
 						if m.has_add_effect and r.add_effect_message ~= 0 then
