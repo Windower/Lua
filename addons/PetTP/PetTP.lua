@@ -344,7 +344,7 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 		elseif id==0x0E and S{0x07,0x0B,0x0F}:contains(original:byte(0x0B)) then	-- npc update
 			if mypet_idx == (original:byte(0x09)+original:byte(0x0A)*256) then
 				if current_hp_percent ~= original:byte(0x1F) then
-					if superverbose==true then windower.add_to_chat(8, '0x0E - '..original:byte(0x0B)..': '..original:byte(0x1F)) end
+					if superverbose == true then windower.add_to_chat(8, '0x0E - '..original:byte(0x0B)..': '..original:byte(0x1F)) end
 					current_hp_percent = original:byte(0x1F)
 					if max_hp ~= 0 then
 						current_hp = math.floor(current_hp_percent * max_hp / 100)
@@ -353,7 +353,7 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 				end
 			end
 		elseif id==0x0E and not S{0,1,8}:contains(original:byte(0x0B)) and mypet_idx == (original:byte(0x09)+original:byte(0x0A)*256) then
-			if superverbose==true then windower.add_to_chat(8, '0x0E ~ '..original:byte(0x0B)..': '..original:byte(0x1F)) end
+			if superverbose == true then windower.add_to_chat(8, '0x0E ~ '..original:byte(0x0B)..': '..original:byte(0x1F)) end
 		end
 	end
 end)
