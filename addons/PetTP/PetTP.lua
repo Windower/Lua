@@ -67,6 +67,13 @@ function make_invisible()
 	petactive = false
 	mypet_idx = nil
 	petname = nil
+	current_hp = 0
+	max_hp	   = 0
+	current_mp = 0
+	max_mp	   = 0
+	current_hp_percent = 0
+	current_mp_percent = 0
+	current_tp_percent = 0
 end
 
 function valid_pet(pet_idx_in, own_idx_in)
@@ -219,10 +226,6 @@ windower.register_event('time change', function()
 		if update_pet() == true then
 			if superverbose == true then windower.add_to_chat(8, 'SCAN: Found a pet!') end
 			timercountdown = 0
-			current_hp = 0
-			max_hp	   = 0
-			current_mp = 0
-			max_mp	   = 0
 			make_visible()
 			printpettp()
 		elseif timercountdown == 0 then
@@ -242,39 +245,43 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 				end
 				if petactive then
 					local newpetname    = original:sub(0x59,original:find(string.char(0),0x59)-1)
-					if petname ~= newpetname then
+					if petname == nil then
 						if superverbose == true then windower.add_to_chat(8, 'Updating PuppetName: '..newpetname) end
+						petname = newpetname
 					end
-					petname = newpetname
-					current_hp = original:byte(0x69)+(original:byte(0x6A)*256)
-					max_hp	   = original:byte(0x6B)+(original:byte(0x6C)*256)
-					current_mp = original:byte(0x6D)+(original:byte(0x6E)*256)
-					max_mp	   = original:byte(0x6F)+(original:byte(0x70)*256)
-					if max_hp ~= 0 then
-						current_hp_percent=math.floor(100*current_hp/max_hp)
+					if petname == newpetname then -- make sure we only update if we actually have a puppet out
+						current_hp = original:byte(0x69)+(original:byte(0x6A)*256)
+						max_hp	   = original:byte(0x6B)+(original:byte(0x6C)*256)
+						current_mp = original:byte(0x6D)+(original:byte(0x6E)*256)
+						max_mp	   = original:byte(0x6F)+(original:byte(0x70)*256)
+						if max_hp ~= 0 then
+							current_hp_percent=math.floor(100*current_hp/max_hp)
+						else
+							current_hp_percent=0
+						end
+						if max_mp ~= 0 then
+							current_mp_percent=math.floor(100*current_mp/max_mp)
+						else
+							current_mp_percent=0
+						end
+						printpettp()
+						if superverbose == true then
+							windower.add_to_chat(8, '0x44'
+								..', len: '..original:length()
+								..', petname: '..petname
+								..', cur_hp: '..current_hp
+								..', max_hp: '..max_hp
+								..', cur_mp: '..current_mp
+								..', max_mp: '..max_mp
+								..', cur_hp_%: '..current_hp_percent
+								..', cur_mp_%: '..current_mp_percent
+							)
+						end
 					else
-						current_hp_percent=0
-					end
-					if max_mp ~= 0 then
-						current_mp_percent=math.floor(100*current_mp/max_mp)
-					else
-						current_mp_percent=0
-					end
-					printpettp()
-					if superverbose == true then
-						windower.add_to_chat(8, '0x44'
-							..', len: '..original:length()
-							..', petname: '..petname
-							..', cur_hp: '..current_hp
-							..', max_hp: '..max_hp
-							..', cur_mp: '..current_mp
-							..', max_mp: '..max_mp
-							..', cur_hp_%: '..current_hp_percent
-							..', cur_mp_%: '..current_mp_percent
-						)
+						if superverbose == true then windower.add_to_chat(8, '0x44, pet is not a puppet') end
 					end
 				else
-					if superverbose == true then windower.add_to_chat(8, '0x44, pet not active') end
+					if superverbose == true then windower.add_to_chat(8, '0x44, puppet not active') end
 				end
 			end
 		elseif id == 0x67 then	-- general hp/tp/mp update
@@ -343,10 +350,6 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 				end
 			elseif not petactive and (original:byte(0x05) == 0x03) and (original:byte(0x06) == 0x05) and (own_idx == windower.ffxi.get_player().index) then
 				if update_pet(pet_idx,own_idx) == true then
-					current_hp = 0
-					max_hp	   = 0
-					current_mp = 0
-					max_mp	   = 0
 					make_visible()
 					printpettp(pet_idx,own_idx_in)
 				else	-- last resort
