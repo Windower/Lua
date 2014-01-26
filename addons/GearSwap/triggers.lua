@@ -222,7 +222,12 @@ function inc_action_message(arr)
 	if debugging >= 1 then windower.debug('action message') end
 	if gearswap_disabled then return end
 	if T{6,20,113,406,605,646}:contains(arr.message_id) then
-		-- If a spell's target is defeated or falls to the ground
+		-- 6   : target is defeated by actor
+		-- 20  : target falls to the ground
+		-- 113 : target falls to the ground
+		-- 406 : target falls to the ground
+		-- 605 : target falls to the ground
+		-- 646 : target falls to the ground
 		local ts,tab = delete_command_registry_by_id(arr.target_id)
 		if tab and tab.spell and tab.spell.prefix == '/pet' then 
 			equip_sets('pet_aftercast',nil,tab.spell)

@@ -103,7 +103,8 @@ function equip_sets(swap_type,ts,...)
 		ts = mk_command_registry_entry(val1)
 	elseif type(swap_type) == 'string' and swap_type == 'precast' then
 		_global.midaction = true
-		command_registry[ts].timestamp = os.time()
+		if not command_registry[ts] then if debugging >= 1 then print_set(spell,'precast nil error') end
+		else command_registry[ts].timestamp = os.time() end
 	end
 	
 	
