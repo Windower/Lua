@@ -43,6 +43,9 @@ windower.register_event('addon command',function (...)
 		elseif splitarr[1]:lower() == 'sumdamage' then
 			sumdamage = not sumdamage
 			windower.add_to_chat(121,'Battlemod: Sum Damage flipped! - '..tostring(sumdamage))
+		elseif splitarr[1]:lower() == 'condensecrits' then
+			condensecrits = not condensecrits
+			windower.add_to_chat(121,'Battlemod: Condense Crits flipped! - '..tostring(condensecrits))
 		elseif splitarr[1]:lower() == 'cancelmulti' then
 			cancelmulti = not cancelmulti
 			windower.add_to_chat(121,'Battlemod: Multi-canceling flipped! - '..tostring(cancelmulti))
@@ -80,22 +83,21 @@ windower.register_event('addon command',function (...)
 			end
 			windower.add_to_chat(122,'Colors Tested!')
 		elseif splitarr[1]:lower() == 'help' then
-			print('   :::   '.._addon.name..' ('.._addon.version..'   :::')
+			print('   :::   '.._addon.name..' ('.._addon.version..')   :::')
 			print('Toggles: (* subtoggles)')
-			print(' 1. simplify --- Condenses battle text using custom messages, Default = True')
-			print(' 2. condensetargets --- Collapse similar messages with multiple targets, Default = True')
-			print('    * targetnumber --- Toggle target number display, Default = True')
-			print('    * oxford --- Toggle use of oxford comma, Default = True')
-			print('    * commamode --- Toggle comma-only mode, Default = False')
-			print(' 3. condensedamage --- Condenses damage messages within attack rounds, Default = True')
-			print('    * swingnumber --- Condenses damage messages within attack rounds, Default = True')
-			print('    * sumdamage --- Sums condensed damage, if false damage is comma separated, Default = True')
-			print(' 4. cancelmulti --- Cancles multiple consecutive identical lines, Default = True')
-			print('Utilities:')
-			print(' 1. colortest --- Shows the 509 possible colors for use with the settings file')
-			print(' 2. reload --- Reloads the settings file')
-			print(' 3. unload --- Unloads battlemod')
-			print(' 4. help --- shows this menu')
+			print('           1. simplify         --- Condenses battle text using custom messages ('..tostring(simplify)..')')
+			print('           2. condensetargets  --- Collapse similar messages with multiple targets ('..tostring(condensetargets)..')')
+			print('               * targetnumber  --- Toggle target number display ('..tostring(targetnumber)..')')
+			print('               * oxford        --- Toggle use of oxford comma ('..tostring(oxford)..')')
+			print('               * commamode     --- Toggle comma-only mode ('..tostring(commamode)..')')
+			print('           3. condensedamage   --- Condenses damage messages within attack rounds ('..tostring(condensedamage)..')')
+			print('               * swingnumber   --- Show # of attack rounds ('..tostring(swingnumber)..')')
+			print('               * sumdamage     --- Sums condensed damage, if false damage is comma separated ('..tostring(sumdamage)..')')
+			print('               * condensecrits --- Condenses critical hits and normal hits together ('..tostring(condensecrits)..')')
+			print('           4. cancelmulti      --- Cancles multiple consecutive identical lines ('..tostring(cancelmulti)..')')
+			print('Utilities: 1. colortest        --- Shows the 509 possible colors for use with the settings file')
+			print('           2. reload           --- Reloads settings file')
+			print('           3. unload           --- Unloads Battlemod')
 		end
 	end
 end)
