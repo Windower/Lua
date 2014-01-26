@@ -62,7 +62,7 @@ function initialize()
     get_current_spellset()
 end
 
-windower.register_event('load', initialize:cond(function() return windower.ffxi.get_info().logged_in end)
+windower.register_event('load', initialize:cond(function() return windower.ffxi.get_info().logged_in end))
 
 windower.register_event('login', initialize)
 
