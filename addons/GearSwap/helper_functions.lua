@@ -511,39 +511,78 @@ end
 
 
 -----------------------------------------------------------------------------------
---Name: mk_out_arr_entry(sp,arr,original)
---Desc: Makes a new entry in out_arr or updates an old one's "data" field.
+--Name: mk_command_registry_entry(sp)
+--Desc: Makes a new entry in command_registry.
 --Args:
 ---- sp - Resources line for the current spell
----- arr - table containing a "target_id" field that is the spell's target_id or nil
----- original - outgoing packet string (or nil in pretarget)
 -----------------------------------------------------------------------------------
 --Returns:
----- inde - key for out_arr
+---- inde - index_command for command_registry
 -----------------------------------------------------------------------------------
-function mk_out_arr_entry(sp,targ_id,original)
-	local inde = get_prefix(spell.prefix)..' "'..spell.english..'"'
-	if out_arr[inde..' '..tostring(targ_id)] then
-		inde = inde..' '..tostring(targ_id)
-		out_arr[inde].data = original
-		out_arr[inde].spell.target = sp.target
-	elseif out_arr[inde..' nil'] then
-		inde = inde..' nil'
-		out_arr[inde].data = original
-		out_arr[inde].spell.target = sp.target
-	elseif out_arr[inde..' '..player.id] then
-		inde = inde..' '..player.id
-		out_arr[inde].data = original
-		out_arr[inde].spell.target = sp.target
-	else
-		if debugging >= 2 then windower.add_to_chat(8,'GearSwap (Debug Mode): Creating a new out_arr entry: '..tostring(inde)..' '..tostring(targ_id)) end
-		inde = inde..' '..tostring(targ_id)
-		out_arr[inde] = {}
-		out_arr[inde].data = original
-		out_arr[inde].cast_delay = 0
-		out_arr[inde].spell = sp
+function mk_command_registry_entry(sp)
+	local ts = os.time()
+	while command_registry[ts] do
+		ts = ts+0.001
 	end
-	return inde
+	command_registry[ts] = {}
+	command_registry[ts].cast_delay = 0
+	command_registry[ts].spell = sp
+	if debugging >= 2 then
+		windower.add_to_chat(8,'GearSwap (Debug Mode): Creating a new command_registry entry: '..tostring(ts)..' '..tostring(command_registry[ts]))
+	end
+	return ts
+end
+
+
+
+-----------------------------------------------------------------------------------
+--Name: find_command_registry_key(typ,value)
+--Desc: Returns the proper unified prefix, or "Mosnter " in the case of a monster action
+--Args:
+---- typ - 'spell', 'command', 'timestamp', or 'id'
+---- value - The spell, command, timestamp, or id
+---- Currently the ID and Timestamp options are unused.
+-----------------------------------------------------------------------------------
+--Returns:
+---- timestamp index of command_registry
+-----------------------------------------------------------------------------------
+function find_command_registry_key(typ,value)
+	if typ == 'spell' then
+		-- Finds all entries of a given spell in the table.
+		-- Returns the one with the most recent timestamp.
+		-- Actions that do not have timestamps yet (have not hit midcast) are given lowest priority.
+		local potential_entries,current_time,winner,winning_ind = {},os.time()
+		for i,v in pairs(command_registry) do
+			if v.spell and v.spell.prefix == value.prefix and v.spell.name == value.name then
+				potential_entries[i] = v.timestamp or 0
+			end
+		end
+		for i,v in pairs(potential_entries) do
+			if not winner or (current_time - v < current_time - winner) then
+				winner = v
+				winning_ind = i
+			end
+		end
+		return winning_ind
+	elseif typ == 'command' then
+		for i,v in pairs(command_registry) do
+			if v.index_command == value then
+				return i
+			end
+		end
+	elseif typ == 'timestamp' then
+		for i,v in pairs(command_registry) do
+			if v.index_timestamp == value then
+				return i
+			end
+		end
+	elseif typ == 'id' then
+		for i,v in pairs(command_registry) do
+			if v.spell and v.spell.target and value == v.spell.target.id then
+				return i
+			end
+		end
+	end
 end
 
 
@@ -566,148 +605,56 @@ function get_prefix(pref)
 end
 
 
-
 -----------------------------------------------------------------------------------
---Name: d_out_arr_entry(sp,ind)
---Desc: Deletes an entry from out_arr.
+--Name: find_command_registry_by_time()
+--Desc: Finds the most recent command_registry entry
 --Args:
----- sp - Resources line for the current spell (at the end of aftercast)
----- ind - Proposed index of out_arr
------------------------------------------------------------------------------------
---Returns:
----- None
------------------------------------------------------------------------------------
-function d_out_arr_entry(sp,ind)
-	if ind == true then -- ambiguous case
-		local deletion_table = {}
-		for i,v in pairs(out_arr) do
-			if v.midaction then
-				deletion_table[i] = true
-			end
-		end
-		for i,v in pairs(deletion_table) do
-			out_arr[i] = nil
-		end
-	elseif not sp.english then
-		windower.add_to_chat(123,'Spell.english is nil in helper_functions at line 548! Tell Byrth what you were doing!')
-	elseif ind == get_prefix(sp.prefix)..' "'..sp.english..'"' then
-		if out_arr[ind..' '..tostring(sp.target.id)] then
-			out_arr[ind..' '..sp.target.id] = nil
-		elseif out_arr[ind..' nil'] then
-			out_arr[ind..' nil'] = nil
-		elseif out_arr[ind..' '..player.id] then
-			out_arr[ind..' '..player.id] = nil
-		elseif debugging >= 1 then
-			windower.add_to_chat(123,'GearSwap: Ind matches the predicted Ind, but does not exist in out_arr.')
-		end
-	elseif out_arr[ind] then
-		out_arr[ind] = nil
-	else
-		windower.add_to_chat(123,'GearSwap: Missing ind was passed: '..tostring(ind))
-	end
-	return inde
-end
-
-
-
------------------------------------------------------------------------------------
---Name: unknown_out_arr_deletion(prefix,arr)
---Desc: Deletes an unknown out_arr entry based on target ID
---Args:
----- prefix - Current spell's prefix
----- target_id - target_ID 
+---- target - 'player' or 'pet'
 -----------------------------------------------------------------------------------
 --Returns:
 ---- none
 -----------------------------------------------------------------------------------
-function unknown_out_arr_deletion(prefix,target_id)
-	local loop_check
-	
-	-- Iterate over out_arr looking for a spell targeting the current target
-	-- Call aftercast with this spell's information (interrupted) if one is found.
-	for i,v in pairs(out_arr) do
-		if v.spell and v.spell.target and v.spell.target.id == target_id then
-			v.spell.interrupted = true
-			v.spell.action_type = 'Interruption'
-			refresh_globals()
-			equip_sets(prefix..'aftercast',true,v.spell)
-			loop_check = true
-			break
-		elseif target_id == player.id and v.midaction then
-			-- Instead of passing the spell target of the offending spell, some
-			-- action messages simply return your information as the target.
-			-- In this case, assume the first action found in out_arr that is between
-			-- precast and aftercast is the action to be canceled.
-			v.spell.interrupted = true
-			v.spell.action_type = 'Interruption'
-			refresh_globals()
-			equip_sets(prefix..'aftercast',true,v.spell)
-			loop_check = true
-			break
-		end
-	end
-	if not loop_check  then
-	-- If the above loop fails to produce a result, just go through and
-	-- delete everything associated with that target_id
-		delete_out_arr_by_id(target_id)
-	end
-end
-
-
-
------------------------------------------------------------------------------------
---Name: delete_out_arr_by_time()
---Desc: Deletes the most recent out_arr entry
---Args:
----- none
------------------------------------------------------------------------------------
---Returns:
----- none
------------------------------------------------------------------------------------
-function delete_out_arr_by_time(target)
-	local time_stamp,ind
+function find_command_registry_by_time(target)
+	local time_stamp,ts
 	local time_now = os.time()
 	
-	-- Iterate over out_arr looking for a spell targeting the current target
+	-- Iterate over command_registry looking for the spell with the closest timestamp
+	-- possible that matches the target type.
 	-- Call aftercast with this spell's information (interrupted) if one is found.
-	for i,v in pairs(out_arr) do
-		if (target == 'player' and v.midaction or target=='pet' and v.pet_midaction) and v.timestamp and (not time_stamp or (time_now - v.timestamp) < (time_now - time_stamp)) then
+	for i,v in pairs(command_registry) do
+		if (not time_stamp or (time_now - v.timestamp) < (time_now - time_stamp)) then -- (target == 'player' and v.midaction or target=='pet' and v.pet_midaction) and v.timestamp and 
 			time_stamp = v.timestamp
-			ind = i
+			ts = i
 		end
 	end
 	if time_stamp then
-		out_arr[ind].spell.interrupted = true
-		out_arr[ind].spell.action_type = 'Interruption'
-		refresh_globals()
-		local prefix = ''
-		if out_arr[ind].spell.prefix == '/pet' then prefix = 'pet_' end
-		equip_sets(prefix..'aftercast',ind,out_arr[ind].spell)
+		return ts,table.reassign({},command_registry[ts])
 	end
 end
 
 
 
 -----------------------------------------------------------------------------------
---Name: delete_out_arr_by_id(id)
---Desc: Deletes an unknown out_arr entry based on target ID
+--Name: delete_command_registry_by_id(id)
+--Desc: Deletes all command_registry entry based that match a given target ID.
 --Args:
 ---- id - ID of the target
 -----------------------------------------------------------------------------------
 --Returns:
 ---- none
 -----------------------------------------------------------------------------------
-function delete_out_arr_by_id(id)
-	local last_tab = 0
-	for i,v in pairs(out_arr) do
+function delete_command_registry_by_id(id)
+	local ts,last_tab
+	for i,v in pairs(command_registry) do
 		if v.spell and v.spell.target then
 			if v.spell.target.id == id then
-				last_tab = table.reassign({},out_arr[i])
-				out_arr[i] = nil
+				last_tab = table.reassign({},command_registry[i])
+				ts = i
+				command_registry[i] = nil
 			end
 		end
 	end
-	return last_tab
+	return ts,last_tab
 end
 
 

@@ -27,12 +27,12 @@
 
 
 -----------------------------------------------------------------------------------
---Name: equip_sets(swap_type,ind,val1,val2)
+--Name: equip_sets(swap_type,ts,val1,val2)
 --Desc: General purpose equipment pipeline / user function caller. 
 --Args:
 ---- swap_type - Determines equip_sets' behavior in terms of which user function it
 --      attempts to call
----- ind - nil or index of out_arr
+---- ts - index of command_registry or nil for pretarget/commands
 ---- val1 - First argument to be passed to the user function
 ---- val2 - Second argument to be passed to the user function
 -----------------------------------------------------------------------------------
@@ -40,13 +40,13 @@
 ---- pretarget : empty string to blank packet or full string
 ---- Everything else : nil
 -----------------------------------------------------------------------------------
-function equip_sets(swap_type,ind,...)
+function equip_sets(swap_type,ts,...)
 	local var_inps = {...}
 	local val1 = var_inps[1]
 	local val2 = var_inps[2]
-	load_globals(ind)
+	load_globals(ts)
 	if debugging >= 1 then windower.debug(tostring(swap_type)..' enter') 
-	if showphase then windower.add_to_chat(8,tostring(swap_type)..' enter') end end
+	if showphase or debugging >= 2 then windower.add_to_chat(8,tostring(swap_type)..' enter') end end
 	_global.current_event = tostring(swap_type)
 	
 	local cur_equip = get_gs_gear(items.equipment,swap_type)
@@ -60,7 +60,6 @@ function equip_sets(swap_type,ind,...)
 		end
 	end
 	
-	if debugging >= 2 then windower.add_to_chat(8,swap_type) end
 	if logging then
 		logit(logfile,'\n\n'..tostring(os.clock)..'(15) equip_sets: '..tostring(swap_type))
 		if val1 then
@@ -86,8 +85,8 @@ function equip_sets(swap_type,ind,...)
 	end
 	
 	if type(swap_type) == 'string' and swap_type == 'pet_midcast' then
-		out_arr[ind].timestamp = os.time()
 		_global.pet_midaction = true
+		command_registry[ts].timestamp = os.time()
 	end
 
 	
@@ -101,14 +100,10 @@ function equip_sets(swap_type,ind,...)
 	
 	
 	if type(swap_type) == 'string' and swap_type == 'pretarget' then -- Target may just have been changed, so make the ind now.
-		ind = mk_out_arr_entry(val1,spell.target.id,nil)
+		ts = mk_command_registry_entry(val1)
 	elseif type(swap_type) == 'string' and swap_type == 'precast' then
 		_global.midaction = true
-		out_arr[ind].timestamp = os.time()
-	elseif type(swap_type) == 'string' and swap_type == 'aftercast' then
-		_global.midaction = false
-	elseif type(swap_type) == 'string' and swap_type == 'pet_aftercast' then
-		_global.pet_midaction = false
+		command_registry[ts].timestamp = os.time()
 	end
 	
 	
@@ -165,36 +160,35 @@ function equip_sets(swap_type,ind,...)
 	
 	if debugging >= 1 then windower.debug(tostring(swap_type)..' exit') end
 	
-	return equip_sets_exit(swap_type,ind,val1,val2)
+	return equip_sets_exit(swap_type,ts,val1)
 end
 
 
 -----------------------------------------------------------------------------------
---Name: equip_sets_exit(swap_type,ind,val1,val2)
+--Name: equip_sets_exit(swap_type,ind,val1)
 --Desc: Cleans up the global table and leaves equip_sets properly.
 --Args:
 ---- swap_type - Current swap type for equip_sets
----- ind - Current index of out_arr
+---- ts - Current index of command_registry
 ---- val1 - First argument of equip_sets
----- val2 - Second argument of equip_sets
 -----------------------------------------------------------------------------------
 --Returns:
 ---- none
 -----------------------------------------------------------------------------------
-function equip_sets_exit(swap_type,ind,val1,val2)
-	cache_globals(ind)
+function equip_sets_exit(swap_type,ts,val1)
+	cache_globals(ts)
 	if type(swap_type) == 'string' then
 		if swap_type == 'pretarget' then
-			command_send_check(ind)
-			if out_arr[ind] and val1.target and st_targs[val1.target.raw] then
+			command_send_check(ts)
+			if ts and val1.target and st_targs[val1.target.raw] then
 			-- st targets
 				st_flag = true
-			elseif out_arr[ind] and val1.target and not val1.target.name then
+			elseif ts and val1.target and not val1.target.name then
 			-- Spells with invalid pass_through_targs, like using <t> without a target
-				out_arr[ind] = nil
-			elseif out_arr[ind] and val1.target and val1.target.name then
+				command_registry[ts] = nil
+			elseif ts and val1.target and val1.target.name then
 			-- Spells with complete target information
-				equip_sets('precast',ind,val1,val2)
+				equip_sets('precast',ts,val1)
 				return true
 			end
 			if storedcommand then
@@ -202,13 +196,27 @@ function equip_sets_exit(swap_type,ind,val1,val2)
 				storedcommand = nil
 				if debugging >= 1 or _global.debugmode then windower.add_to_chat(8,'GearSwap (Debug): Unable to create a packet for this command or action canceled ('..tempcmd..')') end
 				return tempcmd
-			elseif not storedcommand and not out_arr[ind] then
+			elseif not storedcommand and not ts then
 				return true
 			end
 		elseif swap_type == 'precast' then
-			packet_send_check(ind)
-		elseif swap_type == 'aftercast' or swap_type == 'pet_aftercast' then
-			d_out_arr_entry(val1,ind)
+			packet_send_check(ts)
+		elseif swap_type == 'aftercast' then
+			if ts then
+				for i,v in pairs(command_registry) do
+					if v.midaction then
+						command_registry[i] = nil
+					end
+				end
+			end
+		elseif swap_type == 'pet_aftercast' then
+			if ts then
+				for i,v in pairs(command_registry) do
+					if v.pet_midaction then
+						command_registry[i] = nil
+					end
+				end
+			end
 		end
 	end
 end
@@ -236,19 +244,21 @@ end
 
 -----------------------------------------------------------------------------------
 --Name: load_globals(inde)
---Desc: Takes the relevant values from out_arr for the current action and places 
+--Desc: Takes the relevant values from command_registry for the current action and places 
 --      them in the _global table, to preserve their values from pretarget to
 --      precast.
 --Args:
----- inde - key for out_arr
+---- inde - key for command_registry
 -----------------------------------------------------------------------------------
 --Returns:
 ---- none
 -----------------------------------------------------------------------------------
-function load_globals(inde)
-	for i,v in pairs(_global) do
-		if out_arr[inde] and out_arr[inde][i] then
-			_global[i] = out_arr[inde][i]
+function load_globals(ts)
+	if command_registry[ts] then
+		for i,v in pairs(_global) do
+			if command_registry[ts][i] then
+				_global[i] = command_registry[ts][i]
+			end
 		end
 	end
 end
@@ -257,17 +267,17 @@ end
 -----------------------------------------------------------------------------------
 --Name: cache_globals(inde)
 --Desc: Takes the values from _global for the current action and places them in the
---      relevant out_arr table, to preserve their values from pretarget to precast.
+--      relevant command_registry table, to preserve their values from pretarget to precast.
 --Args:
----- inde - key for out_arr
+---- inde - key for command_registry
 -----------------------------------------------------------------------------------
 --Returns:
 ---- none
 -----------------------------------------------------------------------------------
-function cache_globals(inde)
-	for i,v in pairs(_global) do
-		if out_arr[inde] then
-			out_arr[inde][i] = v
+function cache_globals(ts)
+	if command_registry[ts] then
+		for i,v in pairs(_global) do
+			command_registry[ts][i] = v
 		end
 	end
 	_global.cast_delay = 0
@@ -283,39 +293,39 @@ end
 --Name: command_send_check(inde)
 --Desc: Check at the end of pretarget to see whether or not the command should be sent.
 --Args:
----- inde - out_arr index of the current spell
+---- inde - command_registry index of the current spell
 -----------------------------------------------------------------------------------
 --Returns:
 ---- string - gets propagated back to the outgoing_text function
 -----------------------------------------------------------------------------------
-function command_send_check(inde)
-	if out_arr[inde].cancel_spell then
+function command_send_check(ts)
+	if command_registry[ts].cancel_spell then
 		storedcommand = nil
-		out_arr[inde] = nil
+		command_registry[ts] = nil
 	else
-		out_arr[inde].spell = spell
+		command_registry[ts].spell = spell
 		if spell.target and spell.target.id and spell.target.index and spell.prefix and unify_prefix[spell.prefix] then
 			if spell.prefix == '/item' then
 				-- Item use packet handling here
 				if spell.target.id == player.id then
 					--0x37 packet
-					out_arr[inde].proposed_packet = assemble_use_item_packet(spell.target.id,spell.target.index,spell.id)
+					command_registry[ts].proposed_packet = assemble_use_item_packet(spell.target.id,spell.target.index,spell.id)
 				else
 					--0x36 packet
 					test_packet = assemble_menu_item_packet(spell.target.id,spell.target.index,spell.id)
-					out_arr[inde].proposed_packet = test_packet
+					command_registry[ts].proposed_packet = test_packet
 				end
-				if not out_arr[inde].proposed_packet then
-					out_arr[inde] = nil
+				if not command_registry[ts].proposed_packet then
+					command_registry[ts] = nil
 				end
 			elseif outgoing_action_category_table[unify_prefix[spell.prefix]] then
 				if outgoing_action_category_table[unify_prefix[spell.prefix]] == 3 then
-					out_arr[inde].proposed_packet = assemble_action_packet(spell.target.id,spell.target.index,outgoing_action_category_table[unify_prefix[spell.prefix]],spell.index)
+					command_registry[ts].proposed_packet = assemble_action_packet(spell.target.id,spell.target.index,outgoing_action_category_table[unify_prefix[spell.prefix]],spell.index)
 				else
-					out_arr[inde].proposed_packet = assemble_action_packet(spell.target.id,spell.target.index,outgoing_action_category_table[unify_prefix[spell.prefix]],spell.id)
+					command_registry[ts].proposed_packet = assemble_action_packet(spell.target.id,spell.target.index,outgoing_action_category_table[unify_prefix[spell.prefix]],spell.id)
 				end
-				if not out_arr[inde].proposed_packet then
-					out_arr[inde] = nil
+				if not command_registry[ts].proposed_packet then
+					command_registry[ts] = nil
 				end
 			else
 				windower.add_to_chat(8,"GearSwap: Hark, what weird prefix through yonder window breaks? "..tostring(spell.prefix))
@@ -330,24 +340,24 @@ end
 --Name: packet_send_check(inde)
 --Desc: Determines whether or not to send the current packet.
 --      Cancels if _global.cancel_spell is true
---          If out_arr[inde].cast_delay is not 0, cues delayed_cast with the proper
+--          If command_registry[ts].cast_delay is not 0, cues delayed_cast with the proper
 --          delay instead of sending immediately.
 --Args:
----- inde - key of out_arr
+---- ts - key of command_registry
 -----------------------------------------------------------------------------------
 --Returns:
 ---- true (to block) or the outgoing packet
 -----------------------------------------------------------------------------------
-function packet_send_check(inde)
-	if out_arr[inde] then
-		if out_arr[inde].cancel_spell then
-			out_arr[inde] = nil
+function packet_send_check(ts)
+	if ts then
+		if command_registry[ts].cancel_spell then
+			command_registry[ts] = nil
 		else
-			if out_arr[inde].cast_delay == 0 then
-				send_action(inde)
+			if command_registry[ts].cast_delay == 0 then
+				send_action(ts)
 				return
 			else
-				windower.send_command('@wait '..out_arr[inde].cast_delay..';lua i '.._addon.name..' delayed_cast '..inde)
+				windower.send_command('@wait '..command_registry[ts].cast_delay..';lua i '.._addon.name..' delayed_cast '..ts)
 			end
 		end
 	end
@@ -356,28 +366,18 @@ end
 
 
 -----------------------------------------------------------------------------------
---Name: delayed_cast(...)
+--Name: delayed_cast(ts)
 --Desc: Triggers an outgoing action packet (if the passed key is valid).
 --Args:
----- {...} - space delimited key for out_arr (hopefully)
+---- ts - Timestamp argument to delayed_cast
 -----------------------------------------------------------------------------------
 --Returns:
 ---- none
 -----------------------------------------------------------------------------------
-function delayed_cast(...)
-	local temptab = {...}
-	
-	-- Console strips quotes, so this is necessary to add them back in
-	local inde = temptab[1]..' "'..temptab[2]
-	if #temptab > 3 then
-		for i=3,#temptab-1 do
-			inde = inde..temptab[i]
-		end
-	end
-	inde = inde..'" '..temptab[#temptab]
-	
-	if out_arr[inde] then
-		send_action(inde)
+function delayed_cast(ts)
+	ts = tonumber(ts)
+	if ts then
+		send_action(ts)
 	elseif debugging >= 1 or _settings.debug_mode then
 		windower.add_to_chat(8,'GearSwap (Debug Mode): Bad index passed to delayed_cast')
 	end
@@ -388,16 +388,16 @@ end
 --Name: send_action(inde)
 --Desc: Sends the cued action packet, if it exists.
 --Args:
----- inde - Key to an out_arr entry that includes an action packet (hopefully)
+---- inde - index_command for a command_registry entry that includes an action packet (hopefully)
 -----------------------------------------------------------------------------------
 --Returns:
 ---- none
 -----------------------------------------------------------------------------------
-function send_action(inde)
-	if out_arr[inde].proposed_packet then
-		cued_packet = inde
-		windower.packets.inject_outgoing(out_arr[inde].proposed_packet:byte(1),out_arr[inde].proposed_packet)
-		equip_sets('midcast',inde,out_arr[inde].spell)
+function send_action(ts)
+	if command_registry[ts].proposed_packet then
+		cued_packet = ts
+		windower.packets.inject_outgoing(command_registry[ts].proposed_packet:byte(1),command_registry[ts].proposed_packet)
+		equip_sets('midcast',ts,command_registry[ts].spell)
 		windower.send_command('input /assist <me>')
 	else
 		windower.add_to_chat(123,'GearSwap: Cued Packet not found')
@@ -437,7 +437,7 @@ windower.register_event('outgoing chunk',function(id,original,modified,injected,
 		local target_index = get_bit_packed(original,64,80)
 		local category = get_bit_packed(original,80,96)
 		local target_id = windower.ffxi.get_mob_by_index(target_index).id
-		if category == 12 and cued_packet and out_arr[cued_packet] and out_arr[cued_packet].proposed_packet and target_id == player.id then
+		if category == 12 and cued_packet and command_registry[cued_packet] and command_registry[cued_packet].proposed_packet and target_id == player.id then
 			cued_packet = nil
 			return true
 		end

@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.820'
+_addon.version = '0.821'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -408,7 +408,7 @@ windower.register_event('zone change',function(new_zone,new_zone_id,old_zone,old
 	_global.pet_midaction = false
 	sent_out_equip = {}
 	not_sent_out_equip = {}
-	out_arr = {}
+	command_registry = {}
 end)
 
 if debugging and debugging >= 1 then
