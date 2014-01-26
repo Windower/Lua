@@ -60,6 +60,7 @@ end
 
 function make_invisible()
 	if petactive then
+		windower.text.set_text(tb_name, '')
 		windower.text.set_visibility(tb_name, false)
 		if verbose == true then windower.add_to_chat(8, 'PetTP Invisible') end
 	end
@@ -138,6 +139,7 @@ function update_pet(pet_idx_in,own_idx_in)
 	end
 
 	petname = pet_table['name']
+	if superverbose == true then windower.add_to_chat(8, 'Updating PetName: '..petname) end
 	current_hp_percent = pet_table['hpp']
 	if not pet_table['mpp'] == nil then
 		current_mp_percent = pet_table['mpp']
@@ -147,6 +149,7 @@ function update_pet(pet_idx_in,own_idx_in)
 		if superverbose == true then windower.add_to_chat(8, 'Picked up a likely dead pet') end
 		return false
 	end
+if superverbose == true then windower.add_to_chat(8, 'Picked up a pet: '..petname..', hp%: '..current_hp_percent) end
 	return true
 end
 
@@ -238,7 +241,11 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 					end
 				end
 				if petactive then
-					petname    = original:sub(0x59,original:find(string.char(0),0x59)-1)
+					local newpetname    = original:sub(0x59,original:find(string.char(0),0x59)-1)
+					if petname ~= newpetname then
+						if superverbose == true then windower.add_to_chat(8, 'Updating PuppetName: '..newpetname) end
+					end
+					petname = newpetname
 					current_hp = original:byte(0x69)+(original:byte(0x6A)*256)
 					max_hp	   = original:byte(0x6B)+(original:byte(0x6C)*256)
 					current_mp = original:byte(0x6D)+(original:byte(0x6E)*256)
@@ -257,6 +264,7 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 					if superverbose == true then
 						windower.add_to_chat(8, '0x44'
 							..', len: '..original:length()
+							..', petname: '..petname
 							..', cur_hp: '..current_hp
 							..', max_hp: '..max_hp
 							..', cur_mp: '..current_mp
@@ -303,10 +311,12 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 				make_invisible()
 				if verbose == true then windower.add_to_chat(8, 'Pet died/despawned') end
 			elseif S{0x04,0x44,0xC4,0x84}:contains(original:byte(0x05)) then
+				local newpet = false
 				if not petactive then
 					petactive = true  -- force our pet to appear even if it's not attached to us yet
 					if update_pet(pet_idx,own_idx) == true then
 						make_visible()
+						newpet = true
 					else
 						make_invisible()
 						if superverbose == true then windower.add_to_chat(8, 'pet not found') end
@@ -315,7 +325,7 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 				local new_hp_percent = original:byte(0x0F)
 				local new_mp_percent = original:byte(0x10)
 				local new_tp_percent = (original:byte(0x11)+(original:byte(0x12)*256))/10
-				if (new_hp_percent ~= current_hp_percent) or (new_mp_percent ~= current_mp_percent) or (new_tp_percent ~= current_tp_percent) or petname == nil then
+				if newpet or (new_hp_percent ~= current_hp_percent) or (new_mp_percent ~= current_mp_percent) or (new_tp_percent ~= current_tp_percent) or petname == nil then
 					if (max_hp ~= 0) and (new_hp_percent ~= current_hp_percent) then
 						current_hp = math.floor(current_hp_percent * max_hp / 100)
 					end
@@ -324,6 +334,7 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 					end
 					if petname == nil then
 						petname = original:sub(0x15,original:find(string.char(0),0x15)-1)
+						if superverbose == true then windower.add_to_chat(8, 'Updated PetName: '..petname) end
 					end
 					current_hp_percent = new_hp_percent
 					current_mp_percent = new_mp_percent
