@@ -150,20 +150,16 @@ function inc_action(act)
 	end
 	
 	spell = get_spell(act)
-	local category = act.category
 	if logging then	
 		if spell then logit(logfile,'\n\n'..tostring(os.clock)..'(178) Event Action: '..tostring(spell.english)..' '..tostring(act.category))
 		else logit(logfile,'\n\nNil spell detected') end
 	end
 	
-	local inde
 	if spell and spell.english then
-		local pre = get_prefix(spell.prefix)
-		inde = pre..' "'..spell.english..'"'
 		spell.target = target_complete(windower.ffxi.get_mob_by_id(act.targets[1].id))
-		spell.action_type = command_list[pre]
+		spell.action_type = command_list[get_prefix(spell.prefix)]
 	else
-		if debugging >= 1 then windower.add_to_chat(123,'Incoming Action packet did not generate a spell. '..tostring((spell or {})['prefix'])) end
+		if debugging >= 1 then windower.send_command('input /echo Incoming Action packet did not generate a spell/aftercast.')end
 		return
 	end
 	
@@ -183,7 +179,7 @@ function inc_action(act)
 			spell.action_type = 'Interruption'
 			spell.interrupted = true
 		end
-		if ts then
+		if ts or spell.prefix == '/item' then
 			-- Only aftercast things that were precasted.
 			-- Also, there are some actions (like being paralyzed while casting Ninjutsu) that sends two result action packets. Block the second packet.
 			refresh_globals()
@@ -194,7 +190,7 @@ function inc_action(act)
 	elseif (readies[act.category] and act.param == 28787) then -- and not (act.category == 9 or (act.category == 7 and prefix == 'pet_'))) then
 		spell.action_type = 'Interruption'
 		spell.interrupted = true
-		if ts then
+		if ts or spell.prefix == '/item' then
 			-- Only aftercast things that were precasted.
 			-- Also, there are some actions (like being paralyzed while casting Ninjutsu) that sends two result action packets. Block the second packet.
 			refresh_globals()
@@ -203,7 +199,7 @@ function inc_action(act)
 			windower.add_to_chat(8,'GearSwap (Debug Mode): Hitting Aftercast without detecting an entry in command_registry')
 		end
 	elseif readies[act.category] and prefix == 'pet_' and act.targets[1].actions[1].message ~= 0 then -- Entry for pet midcast. Excludes the second packet of "Out of range" BPs.
-		ts = mk_command_registry_entry(spell,spell.target.id)
+		ts = mk_command_registry_entry(spell)
 		refresh_globals()
 		equip_sets('pet_midcast',ts,spell)
 	end
@@ -252,10 +248,15 @@ function inc_action_message(arr)
 	
 	if unable_to_use:contains(arr.message_id) and arr.actor_id == player.id then
 		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(195) Event Action Message: '..tostring(message_id)..' Interrupt') end
-		ts,tab = find_command_registry_by_time('player')
+		local ts,tab = find_command_registry_by_time('player')
 		
-		tab.spell.interrupted = true
-		tab.spell.action_type = 'Interruption'
+		if tab and tab.spell then
+			tab.spell.interrupted = true
+			tab.spell.action_type = 'Interruption'
+		else
+			tab = {}
+			tab.spell = {interrupted=true,action_type='Interruption'}
+		end
 		refresh_globals()
 		equip_sets(prefix..'aftercast',ts,tab.spell)
 	elseif unable_to_use:contains(arr.message_id) and debugging >= 1 then

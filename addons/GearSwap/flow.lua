@@ -46,7 +46,7 @@ function equip_sets(swap_type,ts,...)
 	local val2 = var_inps[2]
 	load_globals(ts)
 	if debugging >= 1 then windower.debug(tostring(swap_type)..' enter') 
-	if showphase then windower.add_to_chat(8,tostring(swap_type)..' enter') end end
+	if showphase or debugging >= 2 then windower.add_to_chat(8,tostring(swap_type)..' enter') end end
 	_global.current_event = tostring(swap_type)
 	
 	local cur_equip = get_gs_gear(items.equipment,swap_type)
@@ -60,7 +60,6 @@ function equip_sets(swap_type,ts,...)
 		end
 	end
 	
-	if debugging >= 2 then windower.add_to_chat(8,swap_type) end
 	if logging then
 		logit(logfile,'\n\n'..tostring(os.clock)..'(15) equip_sets: '..tostring(swap_type))
 		if val1 then
@@ -101,7 +100,7 @@ function equip_sets(swap_type,ts,...)
 	
 	
 	if type(swap_type) == 'string' and swap_type == 'pretarget' then -- Target may just have been changed, so make the ind now.
-		ind = mk_command_registry_entry(val1,spell.target.id)
+		ts = mk_command_registry_entry(val1)
 	elseif type(swap_type) == 'string' and swap_type == 'precast' then
 		_global.midaction = true
 		command_registry[ts].timestamp = os.time()
@@ -161,23 +160,22 @@ function equip_sets(swap_type,ts,...)
 	
 	if debugging >= 1 then windower.debug(tostring(swap_type)..' exit') end
 	
-	return equip_sets_exit(swap_type,ts,val1,val2)
+	return equip_sets_exit(swap_type,ts,val1)
 end
 
 
 -----------------------------------------------------------------------------------
---Name: equip_sets_exit(swap_type,ind,val1,val2)
+--Name: equip_sets_exit(swap_type,ind,val1)
 --Desc: Cleans up the global table and leaves equip_sets properly.
 --Args:
 ---- swap_type - Current swap type for equip_sets
 ---- ts - Current index of command_registry
 ---- val1 - First argument of equip_sets
----- val2 - Second argument of equip_sets
 -----------------------------------------------------------------------------------
 --Returns:
 ---- none
 -----------------------------------------------------------------------------------
-function equip_sets_exit(swap_type,ts,val1,val2)
+function equip_sets_exit(swap_type,ts,val1)
 	cache_globals(ts)
 	if type(swap_type) == 'string' then
 		if swap_type == 'pretarget' then
@@ -190,7 +188,7 @@ function equip_sets_exit(swap_type,ts,val1,val2)
 				command_registry[ts] = nil
 			elseif ts and val1.target and val1.target.name then
 			-- Spells with complete target information
-				equip_sets('precast',ts,val1,val2)
+				equip_sets('precast',ts,val1)
 				return true
 			end
 			if storedcommand then
@@ -204,15 +202,19 @@ function equip_sets_exit(swap_type,ts,val1,val2)
 		elseif swap_type == 'precast' then
 			packet_send_check(ts)
 		elseif swap_type == 'aftercast' then
-			for i,v in pairs(command_registry) do
-				if v.midaction then
-					command_registry[i] = nil
+			if ts then
+				for i,v in pairs(command_registry) do
+					if v.midaction then
+						command_registry[i] = nil
+					end
 				end
 			end
 		elseif swap_type == 'pet_aftercast' then
-			for i,v in pairs(command_registry) do
-				if v.pet_midaction then
-					command_registry[i] = nil
+			if ts then
+				for i,v in pairs(command_registry) do
+					if v.pet_midaction then
+						command_registry[i] = nil
+					end
 				end
 			end
 		end
@@ -364,10 +366,10 @@ end
 
 
 -----------------------------------------------------------------------------------
---Name: delayed_cast(...)
+--Name: delayed_cast(ts)
 --Desc: Triggers an outgoing action packet (if the passed key is valid).
 --Args:
----- {...} - space delimited key for command_registry (hopefully)
+---- ts - Timestamp argument to delayed_cast
 -----------------------------------------------------------------------------------
 --Returns:
 ---- none

@@ -511,23 +511,25 @@ end
 
 
 -----------------------------------------------------------------------------------
---Name: mk_command_registry_entry(sp,targ_id)
---Desc: Makes a new entry in command_registry or updates an old one's "data" field.
+--Name: mk_command_registry_entry(sp)
+--Desc: Makes a new entry in command_registry.
 --Args:
 ---- sp - Resources line for the current spell
----- targ_id - target_id of the current spell (or nil)
 -----------------------------------------------------------------------------------
 --Returns:
 ---- inde - index_command for command_registry
 -----------------------------------------------------------------------------------
-function mk_command_registry_entry(sp,targ_id)
-	local inde = get_prefix(spell.prefix)..' "'..spell.english..'"'..' '..tostring(targ_id)
-	if debugging >= 2 then windower.add_to_chat(8,'GearSwap (Debug Mode): Creating a new command_registry entry: '..tostring(inde)) end
+function mk_command_registry_entry(sp)
 	local ts = os.time()
+	while command_registry[ts] do
+		ts = ts+0.001
+	end
 	command_registry[ts] = {}
 	command_registry[ts].cast_delay = 0
 	command_registry[ts].spell = sp
-	command_registry[ts].index_command = inde
+	if debugging >= 2 then
+		windower.add_to_chat(8,'GearSwap (Debug Mode): Creating a new command_registry entry: '..tostring(ts)..' '..tostring(command_registry[ts]))
+	end
 	return ts
 end
 
@@ -620,7 +622,7 @@ function find_command_registry_by_time(target)
 	-- possible that matches the target type.
 	-- Call aftercast with this spell's information (interrupted) if one is found.
 	for i,v in pairs(command_registry) do
-		if (target == 'player' and v.midaction or target=='pet' and v.pet_midaction) and v.timestamp and (not time_stamp or (time_now - v.timestamp) < (time_now - time_stamp)) then
+		if (not time_stamp or (time_now - v.timestamp) < (time_now - time_stamp)) then -- (target == 'player' and v.midaction or target=='pet' and v.pet_midaction) and v.timestamp and 
 			time_stamp = v.timestamp
 			ts = i
 		end
