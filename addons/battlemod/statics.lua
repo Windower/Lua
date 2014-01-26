@@ -81,7 +81,7 @@ default_settings_table = {line_aoe       = 'AOE ${numb} '..string.char(129,168).
 			line_noactor   = '${abil} ${numb} '..string.char(129,168)..' ${target}',
 			line_nonumber  = '[${actor}] ${abil} '..string.char(129,168)..' ${target}',
 			line_roll = '${actor} ${abil} '..string.char(129,168)..' ${target} '..string.char(129,170)..' ${number}',
-	condensedamage=true,condensetargets=true,cancelmulti=true,oxford=true,commamode=false,targetnumber=true,swingnumber=true}
+	condensedamage=true,condensetargets=true,cancelmulti=true,oxford=true,commamode=false,targetnumber=true,swingnumber=true,sumdamage=true,condensecrits=false}
 
 message_map = {}
 for n=1,700,1 do
@@ -356,6 +356,8 @@ default_settings = [[
 		<commamode>false</commamode>
 		<targetnumber>true</targetnumber>
 		<swingnumber>true</swingnumber>
+		<sumdamage>true</sumdamage>
+		<condensecrits>false</condensecrits>
         <tpstatuses>true</tpstatuses>
         <simplify>true</simplify>
 		<line_aoe>AOE ${numb} ]]..string.char(129,168)..[[ ${target}</line_aoe>		

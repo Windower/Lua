@@ -39,14 +39,47 @@ function parse_action_packet(act)
 				if condensedamage and n > 1 then -- Damage/Action condensation within one target
 					for q=1,n-1 do
 						local r = v.actions[q]
-						if r.message ~= 0 and m.message == r.message and m.effect == r.effect and m.reaction == r.reaction then
-							r.number = r.number + 1
-							r.param = m.param + r.param
-							m.message = 0
+
+						if r.message ~= 0 and m.message ~= 0 then
+							if m.message == r.message or (condensecrits and S{1,67}:contains(m.message) and S{1,67}:contains(r.message)) then 
+								if (m.effect == r.effect) or (S{1,67}:contains(m.message) and S{0,2,4}:contains(m.effect) and S{0,2,4}:contains(r.effect)) then  -- combine kicks and crits
+									 if m.reaction == r.reaction or (S{8,10}:contains(m.reaction) and S{8,10}:contains(r.reaction)) then  -- combine hits and guards
+--										windower.add_to_chat(8, 'Condensed: '..m.message..':'..r.message..' - '..m.effect..':'..r.effect..' - '..m.reaction..':'..r.reaction)
+										r.number = r.number + 1
+										if not sumdamage then
+											if not r.cparam then
+												r.cparam = r.param
+												if condensecrits and r.message == 67 then
+													r.cparam = r.cparam..'!'
+												end
+											end
+											r.cparam = r.cparam..', '..m.param
+											if condensecrits and m.message == 67 then
+												r.cparam = r.cparam..'!'
+											end
+										end
+										r.param = m.param + r.param
+										if condensecrits and m.message == 67 then
+											r.message = m.message
+											r.effect = m.effect
+										end
+										m.message = 0
+									else
+--										windower.add_to_chat(8, 'Didn\'t condense: '..m.message..':'..r.message..' - '..m.effect..':'..r.effect..' - '..m.reaction..':'..r.reaction)
+									end
+								else
+--									windower.add_to_chat(8, 'Didn\'t condense: '..m.message..':'..r.message..' - '..m.effect..':'..r.effect..' - '..m.reaction..':'..r.reaction)
+								end
+							else
+--								windower.add_to_chat(8, 'Didn\'t condense: '..m.message..':'..r.message..' - '..m.effect..':'..r.effect..' - '..m.reaction..':'..r.reaction)
+							end
 						end
 						if m.has_add_effect and r.add_effect_message ~= 0 then
 							if m.add_effect_effect == r.add_effect_effect and m.add_effect_message == r.add_effect_message and m.add_effect_message ~= 0 then
 								r.add_effect_number = r.add_effect_number + 1
+								if not sumdamage then
+									r.cadd_effect_param = (r.cadd_effect_param or r.add_effect_param)..', '..m.add_effect_param
+								end
 								r.add_effect_param = m.add_effect_param + r.add_effect_param
 								m.add_effect_message = 0
 							end
@@ -54,6 +87,9 @@ function parse_action_packet(act)
 						if m.has_spike_effect and r.spike_effect_message ~= 0 then
 							if r.spike_effect_effect == r.spike_effect_effect and m.spike_effect_message == r.spike_effect_message and m.spike_effect_message ~= 0 then
 								r.spike_effect_number = r.spike_effect_number + 1
+								if not sumdamage then
+									r.cspike_effect_param = (r.cspike_effect_param or r.spike_effect_param)..', '..m.spike_effect_param
+								end
 								r.spike_effect_param = m.spike_effect_param + r.spike_effect_param
 								m.spike_effect_message = 0
 							end
@@ -171,7 +207,7 @@ function parse_action_packet(act)
 				end
 				local msg,numb = simplify_message(m.message)
 				if not color_arr[act.actor.owner or act.actor.type] then windower.add_to_chat(123,'Battlemod error, missing filter:'..tostring(act.actor.owner)..' '..tostring(act.actor.type)) end
-				if m.fields.status then numb = m.status else numb = pref_suf(m.param,m.message) end
+				if m.fields.status then numb = m.status else numb = pref_suf((m.cparam or m.param),m.message) end
 	
 				if msg and m.message == 70 and not simplify then -- fix pronoun on parry
 					if act.actor.race == 0 then
@@ -206,7 +242,7 @@ function parse_action_packet(act)
 				else m.simp_add_name = 'AE'
 				end
 				local msg,numb = simplify_message(m.add_effect_message)
-				if m.add_effect_fields.status then numb = m.add_effect_status else numb = pref_suf(m.add_effect_param,m.add_effect_message) end
+				if m.add_effect_fields.status then numb = m.add_effect_status else numb = pref_suf((m.cadd_effect_param or m.add_effect_param),m.add_effect_message) end
 				if not act.action then
 					windower.add_to_chat(color, 'act.action==nil : '..m.message..' - '..m.add_effect_message..' - '..msg)
 				else
@@ -231,7 +267,7 @@ function parse_action_packet(act)
 				if m.spike_effect_message == 33 then m.simp_spike_name = 'countered by' else
 					m.simp_spike_name = 'spikes' end
 				local msg = simplify_message(m.spike_effect_message)
-				if m.spike_effect_fields.status then numb = m.spike_effect_status else numb = pref_suf(m.spike_effect_param,m.spike_effect_message) end
+				if m.spike_effect_fields.status then numb = m.spike_effect_status else numb = pref_suf((m.cspike_effect_param or m.spike_effect_param),m.spike_effect_message) end
 				windower.add_to_chat(color,make_condensedamage_number(m.spike_effect_number)..(msg
 					:gsub('${spell}',act.action.spell or 'ERROR 142')
 					:gsub('${ability}',act.action.ability or 'ERROR 143')
