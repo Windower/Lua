@@ -1,27 +1,26 @@
-local config = require 'config'
+local config = require ('config')
 
-_addon = _addon or {}
 _addon.name = 'PetTP'
 _addon.author = 'SnickySnacks'
 _addon.version = '1.0'
 _addon.commands = {'ptp','pettp'}
 
-local petname = 'Unknown'
-local mypet_idx = nil
-local current_hp = 0
-local max_hp = 0
-local current_mp = 0
-local max_mp = 0
-local current_hp_percent = 0
-local current_mp_percent = 0
-local current_tp_percent = 0
-local tb_name = 'addon:pettp'
-local petactive = false
-local verbose = false
-local superverbose = false
-local timercountdown = 0
+petname = nil
+mypet_idx = nil
+current_hp = 0
+max_hp = 0
+current_mp = 0
+max_mp = 0
+current_hp_percent = 0
+current_mp_percent = 0
+current_tp_percent = 0
+tb_name = 'addon:pettp'
+petactive = false
+verbose = false
+superverbose = false
+timercountdown = 0
 
-local defaults = T{}
+defaults = T{}
 
 defaults.autocolor = true
 defaults.bgvisible = true
@@ -61,11 +60,20 @@ end
 
 function make_invisible()
 	if petactive then
+		windower.text.set_text(tb_name, '')
 		windower.text.set_visibility(tb_name, false)
 		if verbose == true then windower.add_to_chat(8, 'PetTP Invisible') end
 	end
 	petactive = false
 	mypet_idx = nil
+	petname = nil
+	current_hp = 0
+	max_hp	   = 0
+	current_mp = 0
+	max_mp	   = 0
+	current_hp_percent = 0
+	current_mp_percent = 0
+	current_tp_percent = 0
 end
 
 function valid_pet(pet_idx_in, own_idx_in)
@@ -80,7 +88,6 @@ function valid_pet(pet_idx_in, own_idx_in)
 					windower.add_to_chat(8, 'valid_pet(): '..tostring(petactive)..', pet_idx_in: '..(pet_idx_in or 'nil')..', own_idx_in: '..(own_idx_in or 'nil')..', player.index '..player.index)
 					windower.add_to_chat(8, 'mypet_idx ~= pet_idx_in '..mypet_idx..' vs. '..pet_idx_in) 
 				end
-	--			return
 			end
 		elseif own_idx_in and player.index == own_idx_in then
 			mypet_idx = pet_idx_in
@@ -139,11 +146,18 @@ function update_pet(pet_idx_in,own_idx_in)
 	end
 
 	petname = pet_table['name']
+	if superverbose == true then windower.add_to_chat(8, 'Updating PetName: '..petname) end
 	current_hp_percent = pet_table['hpp']
 	if not pet_table['mpp'] == nil then
 		current_mp_percent = pet_table['mpp']
 	end
 	current_tp_percent = pet_table['tp']/10
+	if not petactive and current_hp_percent == 0 then  -- we're likely picking up a dead or despawning pet
+		if superverbose == true then windower.add_to_chat(8, 'Picked up a likely dead pet') end
+		make_invisible()
+		return false
+	end
+	if superverbose == true then windower.add_to_chat(8, 'Picked up a pet: '..petname..', hp%: '..current_hp_percent) end
 	return true
 end
 
@@ -151,7 +165,7 @@ function printpettp(pet_idx_in,own_idx_in)
 	if not petactive then
 		return
 	end
-	if petname == 'Unknown' then
+	if petname == nil then
 		if update_pet(pet_idx_in,own_idx_in) == false then
 			return
 		end
@@ -161,7 +175,7 @@ function printpettp(pet_idx_in,own_idx_in)
 
 	local output
 
-	output = petname..': '
+	output = (petname or 'Unknown')..': '
 	if settings.autocolor == true then
 		if current_hp_percent > 75 then
 			output = output..'\\cr\\cs(128,255,128)'		
@@ -213,14 +227,10 @@ windower.register_event('time change', function()
 		if update_pet() == true then
 			if superverbose == true then windower.add_to_chat(8, 'SCAN: Found a pet!') end
 			timercountdown = 0
-			current_hp = 0
-			max_hp	   = 0
-			current_mp = 0
-			max_mp	   = 0
 			make_visible()
 			printpettp()
 		elseif timercountdown == 0 then
-			if superverbose == true then windower.add_to_chat(8, 'SCAN: No pet found in 5 ticks') end		
+			if superverbose == true then windower.add_to_chat(8, 'SCAN: No pet found in 5 ticks') end
 		end
 	end
 end)
@@ -235,39 +245,48 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 					end
 				end
 				if petactive then
-					petname    = original:sub(0x59,original:find(string.char(0),0x59)-1)
-					current_hp = original:byte(0x69)+(original:byte(0x6A)*256)
-					max_hp	   = original:byte(0x6B)+(original:byte(0x6C)*256)
-					current_mp = original:byte(0x6D)+(original:byte(0x6E)*256)
-					max_mp	   = original:byte(0x6F)+(original:byte(0x70)*256)
-					if max_hp ~= 0 then
-						current_hp_percent=math.floor(100*current_hp/max_hp)
-					else
-						current_hp_percent=0
+					local newpetname    = original:sub(0x59,original:find(string.char(0),0x59)-1)
+					if petname == nil then
+						if superverbose == true then windower.add_to_chat(8, 'Updating PuppetName: '..newpetname) end
+						petname = newpetname
 					end
-					if max_mp ~= 0 then
-						current_mp_percent=math.floor(100*current_mp/max_mp)
+					if petname == newpetname then -- make sure we only update if we actually have a puppet out
+						current_hp = original:byte(0x69)+(original:byte(0x6A)*256)
+						max_hp	   = original:byte(0x6B)+(original:byte(0x6C)*256)
+						current_mp = original:byte(0x6D)+(original:byte(0x6E)*256)
+						max_mp	   = original:byte(0x6F)+(original:byte(0x70)*256)
+						if max_hp ~= 0 then
+							current_hp_percent=math.floor(100*current_hp/max_hp)
+						else
+							current_hp_percent=0
+						end
+						if max_mp ~= 0 then
+							current_mp_percent=math.floor(100*current_mp/max_mp)
+						else
+							current_mp_percent=0
+						end
+						printpettp()
+						if superverbose == true then
+							windower.add_to_chat(8, '0x44'
+								..', len: '..original:length()
+								..', petname: '..petname
+								..', cur_hp: '..current_hp
+								..', max_hp: '..max_hp
+								..', cur_mp: '..current_mp
+								..', max_mp: '..max_mp
+								..', cur_hp_%: '..current_hp_percent
+								..', cur_mp_%: '..current_mp_percent
+							)
+						end
 					else
-						current_mp_percent=0
-					end
-					printpettp()
-					if superverbose == true then
-						windower.add_to_chat(8, '0x44'
-							..', len: '..original:length()
-							..', cur_hp: '..current_hp
-							..', max_hp: '..max_hp
-							..', cur_mp: '..current_mp
-							..', max_mp: '..max_mp
-							..', cur_hp_%: '..current_hp_percent
-							..', cur_mp_%: '..current_mp_percent
-						)
+						if superverbose == true then windower.add_to_chat(8, '0x44, pet is not a puppet') end
 					end
 				else
-					if superverbose == true then windower.add_to_chat(8, '0x44, pet not active') end
+					if superverbose == true then windower.add_to_chat(8, '0x44, puppet not active') end
 				end
 			end
 		elseif id == 0x67 then	-- general hp/tp/mp update
-			if T{0x04,0x44,0xC4,0x84}:contains(original:byte(0x05)) then
+			if S{0x04,0x44,0xC4,0x84}:contains(original:byte(0x05)) then
 				own_idx = (original:byte(0x07)+original:byte(0x08)*256)
 				pet_idx = (original:byte(0x0D)+original:byte(0x0E)*256)
 			else
@@ -293,50 +312,65 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 					   ..', hp%: '..original:byte(0x0F)
 					   ..', mp%: '..original:byte(0x10)
 					   ..', tp%: '..(original:byte(0x11)+original:byte(0x12)*256)/10
-					   ..', unk1: '..original:byte(0x13)
-					   ..', unk2: '..original:byte(0x14)
 					   ..', name: '..original:sub(0x15,original:find(string.char(0),0x15)-1)
 					)
 			end
 			if (original:byte(0x05) == 0x04) and (original:byte(0x06) == 0x05) then
 				make_invisible()
 				if verbose == true then windower.add_to_chat(8, 'Pet died/despawned') end
-			elseif T{0x04,0x44,0xC4,0x84}:contains(original:byte(0x05)) then
+			elseif S{0x04,0x44,0xC4,0x84}:contains(original:byte(0x05)) then
+				local newpet = false
 				if not petactive then
 					petactive = true  -- force our pet to appear even if it's not attached to us yet
 					if update_pet(pet_idx,own_idx) == true then
 						make_visible()
+						newpet = true
 					else
 						make_invisible()
 						if superverbose == true then windower.add_to_chat(8, 'pet not found') end
 					end
 				end
-				current_hp_percent = original:byte(0x0F)
-				current_mp_percent = original:byte(0x10)
-				current_tp_percent = (original:byte(0x11)+(original:byte(0x12)*256))/10
-				if petname == 'Unknown' then
-					petname = original:sub(0x15,original:find(string.char(0),0x15)-1)
+				local new_hp_percent = original:byte(0x0F)
+				local new_mp_percent = original:byte(0x10)
+				local new_tp_percent = (original:byte(0x11)+(original:byte(0x12)*256))/10
+				if newpet or (new_hp_percent ~= current_hp_percent) or (new_mp_percent ~= current_mp_percent) or (new_tp_percent ~= current_tp_percent) or petname == nil then
+					if (max_hp ~= 0) and (new_hp_percent ~= current_hp_percent) then
+						current_hp = math.floor(current_hp_percent * max_hp / 100)
+					end
+					if (max_mp ~= 0) and (new_mp_percent ~= current_mp_percent) then
+						current_mp = math.floor(current_mp_percent * max_mp / 100)
+					end
+					if petname == nil then
+						petname = original:sub(0x15,original:find(string.char(0),0x15)-1)
+						if superverbose == true then windower.add_to_chat(8, 'Updated PetName: '..petname) end
+					end
+					current_hp_percent = new_hp_percent
+					current_mp_percent = new_mp_percent
+					current_tp_percent = new_tp_percent
+					printpettp(pet_idx,own_idx)
 				end
-				printpettp(pet_idx,own_idx)
 			elseif not petactive and (original:byte(0x05) == 0x03) and (original:byte(0x06) == 0x05) and (own_idx == windower.ffxi.get_player().index) then
 				if update_pet(pet_idx,own_idx) == true then
-					current_hp = 0
-					max_hp	   = 0
-					current_mp = 0
-					max_mp	   = 0
 					make_visible()
 					printpettp(pet_idx,own_idx_in)
 				else	-- last resort
 					timercountdown = 5
+					if superverbose == true then windower.add_to_chat(8, 'Starting to scan for a pet...') end
 				end
 			end
 		elseif id==0x0E and original:byte(0x0B) == 0x07 then	-- npc update
 			if mypet_idx == (original:byte(0x09)+original:byte(0x0A)*256) then
 				if current_hp_percent ~= original:byte(0x1F) then
+					if superverbose == true then windower.add_to_chat(8, '0x0E - '..original:byte(0x0B)..': '..original:byte(0x1F)) end
 					current_hp_percent = original:byte(0x1F)
+					if max_hp ~= 0 then
+						current_hp = math.floor(current_hp_percent * max_hp / 100)
+					end
 					printpettp(mypet_idx)
 				end
 			end
+		elseif id==0x0E and not S{0x00,0x01,0x08,0x09}:contains(original:byte(0x0B)) and mypet_idx == (original:byte(0x09)+original:byte(0x0A)*256) then
+			if superverbose == true then windower.add_to_chat(8, '0x0E ~ '..original:byte(0x0B)..': '..original:byte(0x1F)) end
 		end
 	end
 end)
@@ -385,31 +419,8 @@ windower.register_event('unload', function()
     windower.text.delete(tb_name)
 end)
 
-function split(msg, match)
-	if not msg then return {} end
-	local length = #msg
-	local splitarr = {}
-	local u = 1
-	while u <= length do
-		local nextanch = msg:find(match,u)
-		if nextanch ~= nil then
-			splitarr[#splitarr+1] = msg:sub(u,nextanch-match:len())
-			if nextanch~=length then
-				u = nextanch+match:len()
-			else
-				u = length+1
-			end
-		else
-			splitarr[#splitarr+1] = msg:sub(u,length)
-			u = length+1
-		end
-	end
-	return splitarr
-end
-
 windower.register_event('addon command',function (...)
-	local term = table.concat({...}, ' ')
-	local splitarr = split(term,' ')
+	local splitarr = {...}
 
 	for i,v in pairs(splitarr) do
 		if v:lower() == 'verbose' then
@@ -419,10 +430,10 @@ windower.register_event('addon command',function (...)
 			superverbose = not superverbose
 			windower.add_to_chat(121,'PetTP: SuperVerbose Mode flipped! - '..tostring(superverbose))
 		elseif v:lower() == 'help' then
-			print('   :::   '.._addon.name..' ('.._addon.version..'   :::')
-			print('Toggles: (* subtoggles)')
+			print('   :::   '.._addon.name..' ('.._addon.version..')   :::')
+			print('Utilities:')
 			print(' 1. verbose --- Some light logging, Default = false')
-			print(' 2. help --- shows this menu')
+			print(' 2. help    --- shows this menu')
 		end
 	end
 end)
