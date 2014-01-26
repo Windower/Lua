@@ -39,19 +39,39 @@ function parse_action_packet(act)
 				if condensedamage and n > 1 then -- Damage/Action condensation within one target
 					for q=1,n-1 do
 						local r = v.actions[q]
-						if r.message ~= 0 and m.message == r.message and m.effect == r.effect and (m.reaction == r.reaction or (m.reaction == 8 and r.reaction == 10) or (m.reaction == 10 and r.reaction == 8)) then  -- combine hits and guards
-							r.number = r.number + 1
-							if not sumdamage then
-								r.cparam = (r.cparam or m.param)..', '..r.param
+
+						if r.message ~= 0 and m.message ~= 0 then
+							if m.message == r.message or (condensecrits and S{1,67}:contains(m.message) and S{1,67}:contains(r.message)) then 
+								if (m.effect == r.effect) or (condensecrits and S{1,67}:contains(m.message)) then
+									 if m.reaction == r.reaction or (S{8,10}:contains(m.reaction) and S{8,10}:contains(r.reaction)) then  -- combine hits and guards
+										r.number = r.number + 1
+										if not sumdamage then
+											if not r.cparam then
+												r.cparam = r.param
+												if condensecrits and r.message == 67 then
+													r.cparam = r.cparam..'!'
+												end
+											end
+											r.cparam = r.cparam..', '..m.param
+											if condensecrits and m.message == 67 then
+												r.cparam = r.cparam..'!'
+											end
+										end
+										r.param = m.param + r.param
+										if condensecrits and m.message == 67 then
+											r.message = m.message
+											r.effect = m.effect
+										end
+										m.message = 0
+									end
+								end
 							end
-							r.param = m.param + r.param
-							m.message = 0
 						end
 						if m.has_add_effect and r.add_effect_message ~= 0 then
 							if m.add_effect_effect == r.add_effect_effect and m.add_effect_message == r.add_effect_message and m.add_effect_message ~= 0 then
 								r.add_effect_number = r.add_effect_number + 1
 								if not sumdamage then
-									r.cadd_effect_param = (r.cadd_effect_param or m.add_effect_param)..', '..r.add_effect_param
+									r.cadd_effect_param = (r.cadd_effect_param or r.add_effect_param)..', '..m.add_effect_param
 								end
 								r.add_effect_param = m.add_effect_param + r.add_effect_param
 								m.add_effect_message = 0
@@ -61,7 +81,7 @@ function parse_action_packet(act)
 							if r.spike_effect_effect == r.spike_effect_effect and m.spike_effect_message == r.spike_effect_message and m.spike_effect_message ~= 0 then
 								r.spike_effect_number = r.spike_effect_number + 1
 								if not sumdamage then
-									r.cspike_effect_param = (r.cspike_effect_param or m.spike_effect_param)..', '..r.spike_effect_param
+									r.cspike_effect_param = (r.cspike_effect_param or r.spike_effect_param)..', '..m.spike_effect_param
 								end
 								r.spike_effect_param = m.spike_effect_param + r.spike_effect_param
 								m.spike_effect_message = 0
