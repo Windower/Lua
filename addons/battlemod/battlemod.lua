@@ -8,9 +8,9 @@ require 'parse_action_packet'
 require 'statics'
 res = require 'resources'
 
-_addon.version = '3.11'
+_addon.version = '3.12'
 _addon.name = 'BattleMod'
-_addon.author = 'Byrth'
+_addon.author = 'Byrth, maintainer: SnickySnacks'
 _addon.commands = {'bm','battlemod'}
 
 windower.register_event('load',function()
