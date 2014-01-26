@@ -39,7 +39,7 @@ function parse_action_packet(act)
 				if condensedamage and n > 1 then -- Damage/Action condensation within one target
 					for q=1,n-1 do
 						local r = v.actions[q]
-						if r.message ~= 0 and m.message == r.message and m.effect == r.effect and m.reaction == r.reaction then
+						if r.message ~= 0 and m.message == r.message and m.effect == r.effect and (m.reaction == r.reaction or (m.reaction == 8 and r.reaction == 10) or (m.reaction == 10 and r.reaction == 8)) then  -- combine hits and guards
 							r.number = r.number + 1
 							if not sumdamage then
 								r.cparam = (r.cparam or m.param)..', '..r.param
