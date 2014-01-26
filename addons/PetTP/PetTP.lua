@@ -154,9 +154,10 @@ function update_pet(pet_idx_in,own_idx_in)
 	current_tp_percent = pet_table['tp']/10
 	if not petactive and current_hp_percent == 0 then  -- we're likely picking up a dead or despawning pet
 		if superverbose == true then windower.add_to_chat(8, 'Picked up a likely dead pet') end
+		make_invisible()
 		return false
 	end
-if superverbose == true then windower.add_to_chat(8, 'Picked up a pet: '..petname..', hp%: '..current_hp_percent) end
+	if superverbose == true then windower.add_to_chat(8, 'Picked up a pet: '..petname..', hp%: '..current_hp_percent) end
 	return true
 end
 
@@ -229,7 +230,7 @@ windower.register_event('time change', function()
 			make_visible()
 			printpettp()
 		elseif timercountdown == 0 then
-			if superverbose == true then windower.add_to_chat(8, 'SCAN: No pet found in 5 ticks') end		
+			if superverbose == true then windower.add_to_chat(8, 'SCAN: No pet found in 5 ticks') end
 		end
 	end
 end)
@@ -354,9 +355,10 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 					printpettp(pet_idx,own_idx_in)
 				else	-- last resort
 					timercountdown = 5
+					if superverbose == true then windower.add_to_chat(8, 'Starting to scan for a pet...') end
 				end
 			end
-		elseif id==0x0E and S{0x07,0x0B,0x0F}:contains(original:byte(0x0B)) then	-- npc update
+		elseif id==0x0E and original:byte(0x0B) == 0x07 then	-- npc update
 			if mypet_idx == (original:byte(0x09)+original:byte(0x0A)*256) then
 				if current_hp_percent ~= original:byte(0x1F) then
 					if superverbose == true then windower.add_to_chat(8, '0x0E - '..original:byte(0x0B)..': '..original:byte(0x1F)) end
@@ -367,7 +369,7 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 					printpettp(mypet_idx)
 				end
 			end
-		elseif id==0x0E and not S{0,1,8}:contains(original:byte(0x0B)) and mypet_idx == (original:byte(0x09)+original:byte(0x0A)*256) then
+		elseif id==0x0E and not S{0x00,0x01,0x08,0x09}:contains(original:byte(0x0B)) and mypet_idx == (original:byte(0x09)+original:byte(0x0A)*256) then
 			if superverbose == true then windower.add_to_chat(8, '0x0E ~ '..original:byte(0x0B)..': '..original:byte(0x1F)) end
 		end
 	end
