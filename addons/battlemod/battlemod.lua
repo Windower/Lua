@@ -469,7 +469,7 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 		end
 		
 ------------- JOB INFO ----------------
-	elseif id == 0x06F then
+--[[	elseif id == 0x06F then
 		local result = data:byte(6,6)
 		if result == 1 then
 			windower.add_to_chat(8,' -------------- HQ Tier 1! --------------')
@@ -478,6 +478,7 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 		elseif result == 3 then
 			windower.add_to_chat(8,' -------------- HQ Tier 3! --------------')
 		end
+]]		
 	elseif id == 0x01B then
 		filterload(res.jobs[data:byte(5)].short)
 	end
