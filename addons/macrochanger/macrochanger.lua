@@ -273,7 +273,7 @@ end
 
 windower.register_event('job change',function (job_id)
 	local player = windower.ffxi.get_player()
-	local job = res.jobs[job_id].short
+	local job = player.main_job
 	local book = ''
 	local page = ''
 	if globaldisable == 0 then
