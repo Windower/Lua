@@ -426,7 +426,7 @@ fields.outgoing[0x0E2] = L{
 fields.outgoing[0x0E7] = L{
     {ctype='unsigned char',      label='_unknown1'},                            -- 04   Observed to be 00
     {ctype='unsigned char',      label='_unknown2'},                            -- 05   Observed to be 00
-    {ctype='unsigned char',      label='Logout Type',       fn=e+'logout'},     -- 06   /logout = 01, /pol == 02 (removed), /shutdown = 03
+    {ctype='unsigned char',      label='Logout Type',       fn=e+{'logout'}},   -- 06   /logout = 01, /pol == 02 (removed), /shutdown = 03
     {ctype='unsigned char',      label='_unknown3'},                            -- 07   Observed to be 00
 }
 
@@ -565,7 +565,7 @@ fields.incoming[0x00A] = L{
 
 -- Zone Response
 fields.incoming[0x00B] = L{
-    {ctype='unsigned int',      label='Type',               fn=e+'zone'},       -- 04
+    {ctype='unsigned int',      label='Type',               fn=e+{'zone'}},     -- 04
     {ctype='unsigned int',      label='IP',                 fn=ip},             -- 08
     {ctype='unsigned short',    label='Port'},                                  -- 0C
     {ctype='unsigned short',    label='_unknown1'},                             -- 10
