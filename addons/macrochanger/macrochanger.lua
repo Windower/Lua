@@ -27,8 +27,11 @@
 _addon.name = 'MacroChanger'
 _addon.author = 'Banggugyangu'
 _addon.version = '1.0.0.0'
+_addon.commands = {'mc','macrochanger'}
 
-windower.register_event('load',function ()
+require('strings')
+
+windower.register_event('load', function()
 	globaldisable = 0
 	WAR_Book = ''
 	WAR_Page = ''
@@ -74,8 +77,6 @@ windower.register_event('load',function ()
 	GEO_Page = ''
 	RUN_Book = ''
 	RUN_Page = ''
-	windower.send_command('alias mc lua c macrochanger cmd')
-	windower.send_command('alias macrochanger lua c macrochanger cmd')
 	options_load()
 end)
 
@@ -150,7 +151,7 @@ function options_load()
 	else
 		f:close()
 		for curline in io.lines(windower.addon_path..'data/settings.txt') do
-			local splat = split(curline,' ')
+			local splat = curline:split(' ')
 			local cmd = ''
 			if splat[2] ~=nil then
 				cmd = (splat[1]..' '..splat[2]):gsub(':',''):lower()
@@ -274,7 +275,7 @@ end
 
 windower.register_event('job change',function (job_id)
 	local player = windower.ffxi.get_player()
-	local job = res.jobs[job_id].short
+	local job = player.main_job
 	local book = ''
 	local page = ''
 	if globaldisable == 0 then
@@ -360,27 +361,22 @@ windower.register_event('job change',function (job_id)
 	end
 end)
 
-windower.register_event('unload', windower.send_command:prepare('unalias mc'))
-
-windower.register_event('addon command',function (...)
-    local term = table.concat({...}, ' ')
-    local splitarr = split(term,' ')
+windower.register_event('addon command', function(...)
+    local args = {...}
 	local mjob = windower.ffxi.get_player()['main_job']
-	if splitarr[1] == 'cmd' then
-		if splitarr[2] == 'disableall' then
-			if splitarr[3] == 'on' then
-				globaldisable = 1
-				windower.add_to_chat(17, 'All automated macro switching disabled.')
-			elseif splitarr[3] == 'off' then
-				globaldisable = 0
-				windower.add_to_chat(17, 'Automated macro switching enabled.')
-			end
-		elseif splitarr[2]:lower() == 'help' then
-			windower.add_to_chat(17, 'MacroChanger Commands:')
-			windower.add_to_chat(17, 'disableall [on|off]')
-			windower.add_to_chat(17, '   on - Disables all automated macro switching')
-			windower.add_to_chat(17, '   off - Enables all automated macro switching not disabled individually')
-			windower.add_to_chat(17, '   Resets to what is stored in settings upon unloading of addon.  To Permanently change, please change the option in the settings file.')
+	if args[1] == 'disableall' then
+		if args[2] == 'on' then
+			globaldisable = 1
+			windower.add_to_chat(17, 'All automated macro switching disabled.')
+		elseif args[2] == 'off' then
+			globaldisable = 0
+			windower.add_to_chat(17, 'Automated macro switching enabled.')
 		end
+	elseif args[1]:lower() == 'help' then
+		windower.add_to_chat(17, 'MacroChanger Commands:')
+		windower.add_to_chat(17, 'disableall [on|off]')
+		windower.add_to_chat(17, '   on - Disables all automated macro switching')
+		windower.add_to_chat(17, '   off - Enables all automated macro switching not disabled individually')
+		windower.add_to_chat(17, '   Resets to what is stored in settings upon unloading of addon.  To Permanently change, please change the option in the settings file.')
 	end
 end)
