@@ -393,9 +393,11 @@ windower.register_event('load', function()
             windower.add_to_chat(8, 'Pet index: '..windower.ffxi.get_mob_by_target('pet').index)
         end
     end
-    if update_pet() == true then
-        make_visible()
-        printpettp()
+    if windower.ffxi.get_player() then
+        if update_pet() == true then
+            make_visible()
+            printpettp()
+        end
     end
 end)
 
