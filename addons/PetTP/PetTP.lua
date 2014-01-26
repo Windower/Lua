@@ -65,6 +65,7 @@ function make_invisible()
 	end
 	petactive = false
 	mypet_idx = nil
+	petname = nil
 end
 
 function valid_pet(pet_idx_in, own_idx_in)
