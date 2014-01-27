@@ -350,7 +350,7 @@ end
 ---- true (to block) or the outgoing packet
 -----------------------------------------------------------------------------------
 function packet_send_check(ts)
-	if ts then
+	if ts and command_registry[ts] then
 		if command_registry[ts].cancel_spell then
 			command_registry[ts] = nil
 		else
