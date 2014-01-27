@@ -622,7 +622,7 @@ function find_command_registry_by_time(target)
 	-- possible that matches the target type.
 	-- Call aftercast with this spell's information (interrupted) if one is found.
 	for i,v in pairs(command_registry) do
-		if (not time_stamp or (v.timestamp and (time_now - v.timestamp)) < (time_now - time_stamp)) then -- (target == 'player' and v.midaction or target=='pet' and v.pet_midaction) and v.timestamp and 
+		if not time_stamp or (v.timestamp and ((time_now - v.timestamp) < (time_now - time_stamp))) then -- (target == 'player' and v.midaction or target=='pet' and v.pet_midaction) and v.timestamp and 
 			time_stamp = v.timestamp
 			ts = i
 		end
