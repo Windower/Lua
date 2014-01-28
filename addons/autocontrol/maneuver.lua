@@ -179,7 +179,7 @@ end
 function get_decay()
     if mjob_id == 18 then
         local newdecay
-        if T(windower.ffxi.get_mjob_data().attachments):contains(8610-8448) then
+        if T(windower.ffxi.get_mjob_data().attachments):contains(8610) then
             local mans = 0
             local buffs = windower.ffxi.get_player().buffs
             for z = 1, #buffs do
@@ -204,7 +204,7 @@ function get_jaheat()
         local baseheat = 20
         local updatedheat = 0
         local bonusheat = 0
-        if T(windower.ffxi.get_mjob_data()['attachments']):contains(8485-8448) then
+        if T(windower.ffxi.get_mjob_data()['attachments']):contains(8485) then
             local mans = 0
             local buffs = windower.ffxi.get_player()['buffs']
             for z = 1, #buffs do
