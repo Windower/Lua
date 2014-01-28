@@ -41,6 +41,7 @@
 ---- Everything else : nil
 -----------------------------------------------------------------------------------
 function equip_sets(swap_type,ts,...)
+	local result_1,result_2
 	local var_inps = {...}
 	local val1 = var_inps[1]
 	local val2 = var_inps[2]
@@ -91,7 +92,7 @@ function equip_sets(swap_type,ts,...)
 
 	
 	if type(swap_type) == 'function' then
-		swap_type(...)
+		result_1,result_2 = swap_type(...)
 	elseif swap_type == 'equip_command' then
 		equip(val1)
 	else
@@ -161,6 +162,9 @@ function equip_sets(swap_type,ts,...)
 	
 	if debugging >= 1 then windower.debug(tostring(swap_type)..' exit') end
 	
+	if type(swap_type) == 'function' then
+		return result_1,result_2
+	end
 	return equip_sets_exit(swap_type,ts,val1)
 end
 

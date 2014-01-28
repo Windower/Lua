@@ -207,7 +207,7 @@ function unregister_event_user(id)
 end
 
 function user_equip_sets(func)
-	return setfenv(function(...) gearswap.equip_sets(func,nil,...) end,user_env)
+	return setfenv(function(...) return gearswap.equip_sets(func,nil,...) end,user_env)
 end
 
 function include_user(str)
