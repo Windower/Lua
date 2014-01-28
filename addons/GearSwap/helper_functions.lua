@@ -508,8 +508,6 @@ end
 
 
 
-
-
 -----------------------------------------------------------------------------------
 --Name: mk_command_registry_entry(sp)
 --Desc: Makes a new entry in command_registry.
@@ -521,6 +519,7 @@ end
 -----------------------------------------------------------------------------------
 function mk_command_registry_entry(sp)
 	local ts = os.time()
+	remove_old_command_registry_entries(ts)
 	while command_registry[ts] do
 		ts = ts+0.001
 	end
@@ -531,6 +530,25 @@ function mk_command_registry_entry(sp)
 		windower.add_to_chat(8,'GearSwap (Debug Mode): Creating a new command_registry entry: '..tostring(ts)..' '..tostring(command_registry[ts]))
 	end
 	return ts
+end
+
+
+
+-----------------------------------------------------------------------------------
+--Name: remove_old_command_registry_entries(ts)
+--Desc: Removes all command_registry entries more than 20 seconds old.
+--Args:
+---- ts - The current time, as obtained from os.time()
+-----------------------------------------------------------------------------------
+--Returns:
+---- none
+-----------------------------------------------------------------------------------
+function remove_old_command_registry_entries(ts)
+	for i,v in pairs(command_registry) do
+		if os.time-i >= 20 then
+			command_registry[i] = nil
+		end
+	end
 end
 
 
