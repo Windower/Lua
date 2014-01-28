@@ -185,13 +185,13 @@ function get_current_autoset()
             local t = ''
             if tonumber(tmpTable[i]) ~= 0 then
                 if i < 10 then t = '0' end
-                autoTable['slot'..t..i] = atts[tonumber(tmpTable[i])+8448].name:lower()
+                autoTable['slot'..t..i] = atts[tonumber(tmpTable[i])].name:lower()
             end
         end
         local headnum = windower.ffxi.get_mjob_data().head
         local framenum = windower.ffxi.get_mjob_data().frame
-        autoTable.head = atts[headnum+8192].name:lower()
-        autoTable.frame = atts[framenum+8223].name:lower()
+        autoTable.head = atts[headnum].name:lower()
+        autoTable.frame = atts[framenum].name:lower()
         return autoTable
     end
 end
