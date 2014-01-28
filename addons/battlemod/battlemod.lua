@@ -8,9 +8,9 @@ require 'parse_action_packet'
 require 'statics'
 res = require 'resources'
 
-_addon.version = '3.11'
+_addon.version = '3.12'
 _addon.name = 'BattleMod'
-_addon.author = 'Byrth'
+_addon.author = 'Byrth, maintainer: SnickySnacks'
 _addon.commands = {'bm','battlemod'}
 
 windower.register_event('load',function()
@@ -39,7 +39,13 @@ windower.register_event('addon command',function (...)
 			windower.add_to_chat(121,'Battlemod: Target Number flipped! - '..tostring(targetnumber))
 		elseif splitarr[1]:lower() == 'swingnumber' then
 			swingnumber = not swingnumber
-			windower.add_to_chat(121,'Battlemod: Round Number flipped! - '..tostring(targetnumber))
+			windower.add_to_chat(121,'Battlemod: Round Number flipped! - '..tostring(swingnumber))
+		elseif splitarr[1]:lower() == 'sumdamage' then
+			sumdamage = not sumdamage
+			windower.add_to_chat(121,'Battlemod: Sum Damage flipped! - '..tostring(sumdamage))
+		elseif splitarr[1]:lower() == 'condensecrits' then
+			condensecrits = not condensecrits
+			windower.add_to_chat(121,'Battlemod: Condense Crits flipped! - '..tostring(condensecrits))
 		elseif splitarr[1]:lower() == 'cancelmulti' then
 			cancelmulti = not cancelmulti
 			windower.add_to_chat(121,'Battlemod: Multi-canceling flipped! - '..tostring(cancelmulti))
@@ -77,21 +83,21 @@ windower.register_event('addon command',function (...)
 			end
 			windower.add_to_chat(122,'Colors Tested!')
 		elseif splitarr[1]:lower() == 'help' then
-			print('   :::   '.._addon.name..' ('.._addon.version..'   :::')
+			print('   :::   '.._addon.name..' ('.._addon.version..')   :::')
 			print('Toggles: (* subtoggles)')
-			print(' 1. simplify --- Condenses battle text using custom messages, Default = True')
-			print(' 2. condensetargets --- Collapse similar messages with multiple targets, Default = True')
-			print('    * targetnumber --- Toggle target number display, Default = True')
-			print('    * oxford --- Toggle use of oxford comma, Default = True')
-			print('    * commamode --- Toggle comma-only mode, Default = False')
-			print(' 3. condensedamage --- Condenses damage messages within attack rounds, Default = True')
-			print('    * swingnumber --- Condenses damage messages within attack rounds, Default = True')
-			print(' 4. cancelmulti --- Cancles multiple consecutive identical lines, Default = True')
-			print('Utilities:')
-			print(' 1. colortest --- Shows the 509 possible colors for use with the settings file')
-			print(' 2. reload --- Reloads the settings file')
-			print(' 3. unload --- Unloads battlemod')
-			print(' 4. help --- shows this menu')
+			print('           1. simplify         --- Condenses battle text using custom messages ('..tostring(simplify)..')')
+			print('           2. condensetargets  --- Collapse similar messages with multiple targets ('..tostring(condensetargets)..')')
+			print('               * targetnumber  --- Toggle target number display ('..tostring(targetnumber)..')')
+			print('               * oxford        --- Toggle use of oxford comma ('..tostring(oxford)..')')
+			print('               * commamode     --- Toggle comma-only mode ('..tostring(commamode)..')')
+			print('           3. condensedamage   --- Condenses damage messages within attack rounds ('..tostring(condensedamage)..')')
+			print('               * swingnumber   --- Show # of attack rounds ('..tostring(swingnumber)..')')
+			print('               * sumdamage     --- Sums condensed damage, if false damage is comma separated ('..tostring(sumdamage)..')')
+			print('               * condensecrits --- Condenses critical hits and normal hits together ('..tostring(condensecrits)..')')
+			print('           4. cancelmulti      --- Cancles multiple consecutive identical lines ('..tostring(cancelmulti)..')')
+			print('Utilities: 1. colortest        --- Shows the 509 possible colors for use with the settings file')
+			print('           2. reload           --- Reloads settings file')
+			print('           3. unload           --- Unloads Battlemod')
 		end
 	end
 end)
@@ -464,7 +470,7 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 		
 ------------- JOB INFO ----------------
 	elseif id == 0x06F then
-		local result = data:byte(6,6)
+		local result = data:byte(2,2)
 		if result == 1 then
 			windower.add_to_chat(8,' -------------- HQ Tier 1! --------------')
 		elseif result == 2 then
@@ -472,6 +478,7 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 		elseif result == 3 then
 			windower.add_to_chat(8,' -------------- HQ Tier 3! --------------')
 		end
+		
 	elseif id == 0x01B then
 		filterload(res.jobs[data:byte(5)].short)
 	end

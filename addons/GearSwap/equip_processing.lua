@@ -40,25 +40,23 @@ function expand_entry(v)
 	if not v then
 		return
 	end
-	local extgoal,name,order
+	local extgoal_1,extgoal_2,name,order = {},{}
 	if type(v) == 'table' and v == empty then
 		name = empty
 	elseif type(v) == 'table' and v.name then
 		name = v.name
+		order = v.order
 		if v.augments then
-			extgoal = {}
 			for n,m in pairs(v.augments) do
-				extgoal[n] = augment_to_extdata(m)
+				extgoal_1[n],extgoal_2[n] = augment_to_extdata(m)
 			end
 		elseif v.augment then
-			extgoal = {}
-			extgoal[1] = augment_to_extdata(v.augment)
+			extgoal_1[1],extgoal_2[1] = augment_to_extdata(v.augment)
 		end
-		order = v.order
 	elseif type(v) == 'string' and v ~= '' then
 		name = v
 	end
-	return name,order,extgoal -- These values are nil if they don't exist.
+	return name,order,extgoal_1,extgoal_2 -- These values are nil if they don't exist.
 end
 
 function name_match(item_id,name)
@@ -82,7 +80,7 @@ function to_id_set(inventory,equip_list)
 	local ret_list = {}
 	local error_list = {}
 	for i,v in pairs(short_slot_map) do -- Should go sanitize equip() so that it changes everything to default_slot_map
-		local name,order,extgoal = expand_entry(equip_list[i])
+		local name,order,extgoal_1,extgoal_2 = expand_entry(equip_list[i])
 		if name == empty or name =='empty' then
 			ret_list[v] = 0
 			reorder(order,i)
@@ -93,27 +91,43 @@ function to_id_set(inventory,equip_list)
 		if check_wearable(m.id) then
 			if m.flags == 0 or m.flags == 5 then -- Make sure the item is either equipped or not otherwise committed. eliminate_redundant will take care of the already-equipped gear.
 				for i,v in pairs(short_slot_map) do
-					local name,order,extgoal = expand_entry(equip_list[i])
+					local name,order,extgoal_1,extgoal_2 = expand_entry(equip_list[i])
 					-- equip_list[i] can also be a table (that doesn't contain a "name" property) or a number, which are both cases that should not generate any kind of equipment changing.
 					-- Hence the "and name" below.
 					if not ret_list[v] and name then
 						if name_match(m.id,name) and get_wearable(dat_slots[v],r_items[m.id].slots) then
-							if extgoal then
+							if extgoal_1 or extgoal_2 then
+								local exttemp = m.extdata
 								local count = 0
-								for o,q in pairs(extgoal) do
-									-- It appears only the first five bits are used for augment value.
+								for o,q in pairs(extgoal_1) do
+								--  It appears only the first five bits are used for augment value.
 								--	local first,second,third = string.char(m.extdata:byte(4)%32), string.char(m.extdata:byte(6)%32), string.char(m.extdata:byte(8)%32)
 								--	local exttemp = m.extdata:sub(1,3)..first..m.extdata:sub(5,5)..second..m.extdata:sub(7,7)..third..m.extdata:sub(9)
-									local exttemp = m.extdata
 									if exttemp:sub(3,4) == q or exttemp:sub(5,6) == q or exttemp:sub(7,8) == q then
 										count = count +1
 									end
 								end
-								if count == #extgoal then
+								if count == #extgoal_1 then
 									equip_list[i] = nil
 									ret_list[v] = m.slot_id
 									reorder(order,i)
 									break
+								elseif extgoal_2 then
+									count = 0
+									for o,q in pairs(extgoal_2) do
+									--  It appears only the first five bits are used for augment value.
+									--	local first,second,third = string.char(m.extdata:byte(4)%32), string.char(m.extdata:byte(6)%32), string.char(m.extdata:byte(8)%32)
+									--	local exttemp = m.extdata:sub(1,3)..first..m.extdata:sub(5,5)..second..m.extdata:sub(7,7)..third..m.extdata:sub(9)
+										if exttemp:sub(7,8) == q or exttemp:sub(9,10) == q or exttemp:sub(11,12) == q then
+											count = count +1
+										end
+									end
+									if count == #extgoal_2 then
+										equip_list[i] = nil
+										ret_list[v] = m.slot_id
+										reorder(order,i)
+										break
+									end
 								end
 							else
 								equip_list[i] = nil

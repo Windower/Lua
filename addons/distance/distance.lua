@@ -1,12 +1,11 @@
-
 _addon.name = 'Distance'
 _addon.author = 'Windower'
-_addon.version = '1.0.0.0'
+_addon.version = '1.0.0.1'
 _addon.command = 'distance'
 
-require 'logger'
-config = require 'config'
-texts = require 'texts'
+require('logger')
+config = require('config')
+texts = require('texts')
 
 defaults = {}
 defaults.pos = {}
@@ -23,7 +22,7 @@ distance = texts.new(settings)
 
 windower.register_event('prerender', function()
 	local t = windower.ffxi.get_mob_by_target('st') or windower.ffxi.get_mob_by_target('t')
-    distance:text(t and ('%.1f'):format(t.distance:sqrt()) or '')
+    distance:text(t and '%.1f':format(t.distance:sqrt()) or '')
     distance:visible(t ~= nil)
 end)
 

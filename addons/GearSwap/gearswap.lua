@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.820'
+_addon.version = '0.821'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -354,7 +354,13 @@ windower.register_event('gain buff',function(buff_id)
 	if gearswap_disabled then return end
 	
 	-- Need to figure out what I'm going to do with this:
-	if _global.midaction and T{'terror','sleep','stun','petrification','charm','weakness'}:contains(buff_name:lower()) then _global.midaction = false end
+	if T{'terror','sleep','stun','petrification','charm','weakness'}:contains(buff_name:lower()) then
+		for i,v in pairs(command_registry) do
+			if v.midaction then
+				command_registry[i] = nil
+			end
+		end
+	end
 	
 	refresh_globals()
 	equip_sets('buff_change',nil,buff_name,true)
@@ -408,7 +414,7 @@ windower.register_event('zone change',function(new_zone,new_zone_id,old_zone,old
 	_global.pet_midaction = false
 	sent_out_equip = {}
 	not_sent_out_equip = {}
-	out_arr = {}
+	command_registry = {}
 end)
 
 if debugging and debugging >= 1 then

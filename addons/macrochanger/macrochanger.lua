@@ -252,27 +252,6 @@ function options_load()
 	end
 end
 
-function split(msg, match)
-	local length = msg:len()
-	local splitarr = {}
-	local u = 1
-	while u <= length do
-		local nextanch = msg:find(match,u)
-		if nextanch ~= nil then
-			splitarr[#splitarr+1] = msg:sub(u,nextanch-match:len())
-			if nextanch~=length then
-				u = nextanch+match:len()
-			else
-				u = lengthlua 
-			end
-		else
-			splitarr[#splitarr+1] = msg:sub(u,length)
-			u = length+1
-		end
-	end
-	return splitarr
-end
-
 windower.register_event('job change',function (job_id)
 	local player = windower.ffxi.get_player()
 	local job = player.main_job
@@ -346,24 +325,24 @@ windower.register_event('job change',function (job_id)
 			book = RUN_Book
 			page = RUN_Page
 		end
-	
+
 		if ((book == 'disabled') or (page == 'disabled')) then
 			windower.add_to_chat(17, '                             Auto Macro Switching Disabled for ' .. job ..'.')
-		else	
+		else
 			windower.add_to_chat(17, '                             Changing macros to Book: ' .. book .. ' and Page: ' .. page .. '.  Job Changed to ' .. job)
 			windower.send_command('input /macro book ' .. book)
 			windower.send_command('input /macro set ' .. page)
 		end
 	elseif globaldisable == 1 then
-	
+
 		windower.add_to_chat(17, '                             Auto Macro Switching Disabled for All Jobs.')
-		
+
 	end
 end)
 
 windower.register_event('addon command', function(...)
     local args = {...}
-	local mjob = windower.ffxi.get_player()['main_job']
+	local mjob = windower.ffxi.get_player().main_job
 	if args[1] == 'disableall' then
 		if args[2] == 'on' then
 			globaldisable = 1

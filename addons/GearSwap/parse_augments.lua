@@ -1,4 +1,4 @@
-augment_index = {
+augment_index_2_3 = {
 	[0x000] = {{stat="none",offset=0}},
 	[0x001] = {{stat="hp", offset=1}},
 	[0x002] = {{stat="hp", offset=33}},
@@ -341,6 +341,110 @@ augment_index = {
 	[0x381] = {{stat="enhancessouleatereffect", offset=1}},
 }
 
+-- none actually codes for the lack of an augment, and those entries are probably not used
+-- because they break the display system.
+augment_index_2_35 = {
+	[0x00] = {{stat="none",offset=0}},
+	[0x01] = {{stat="----------------",offset=0}},
+	[0x02] = {{stat="hp",offset=1}},
+	[0x03] = {{stat="hp",offset=256}},
+	[0x04] = {{stat="mp",offset=1}},
+	[0x05] = {{stat="mp",offset=256}},
+	[0x08] = {{stat="attack",offset=1}},
+	[0x09] = {{stat="attack",offset=256}},
+	[0x0A] = {{stat="rangedattack",offset=1}},
+	[0x0B] = {{stat="rangedattack",offset=256}},
+	[0x0C] = {{stat="accuracy",offset=1}},
+	[0x0D] = {{stat="acuracy",offset=256}},
+	[0x0E] = {{stat="rangedaccuracy",offset=1}},
+	[0x0F] = {{stat="rangedaccuracy",offset=256}},
+	[0x10] = {{stat="defense",offset=1}},
+	[0x11] = {{stat="defense",offset=256}},
+	[0x12] = {{stat="evasion",offset=1}},
+	[0x13] = {{stat="evasion",offset=256}},
+	[0x14] = {{stat="magicattackbonus",offset=1}},
+	[0x15] = {{stat="magicattackbonus",offset=256}},
+	[0x16] = {{stat="magicdefensebonus",offset=1}},
+	[0x17] = {{stat="magicdefensebonus",offset=256}},
+	[0x18] = {{stat="magicaccuracy",offset=1}},
+	[0x19] = {{stat="magicaccuracy",offset=256}},
+	[0x1A] = {{stat="magicevasion",offset=1}},
+	[0x1B] = {{stat="magicevasion",offset=256}},
+	[0x80] = {{stat="petmagicattackbonus",offset=1}},
+	[0x81] = {{stat="petmagicaccuracy",offset=1}},
+	[0x82] = {{stat="petattack",offset=1}},
+	[0x82] = {{stat="petaccuracy",offset=1}},
+	[0xBF] = {{stat="strength",offset=1}},
+	[0xC0] = {{stat="dexterity",offset=1}},
+	[0xC1] = {{stat="vitality",offset=1}},
+	[0xC2] = {{stat="agility",offset=1}},
+	[0xC3] = {{stat="intelligence",offset=1}},
+	[0xC4] = {{stat="mind",offset=1}},
+	[0xC5] = {{stat="charisma",offset=1}},
+	[0xC6] = {{stat="none",offset=0}},
+	[0xC7] = {{stat="none",offset=0}},
+	[0xC8] = {{stat="none",offset=0}},
+	[0xC9] = {{stat="none",offset=0}},
+	[0xCA] = {{stat="none",offset=0}},
+	[0xCB] = {{stat="none",offset=0}},
+	[0xCC] = {{stat="none",offset=0}},
+	[0xCD] = {{stat="none",offset=0}},
+	[0xCE] = {{stat="strength",offset=1},{stat="dexterity",offset=1},{stat="vitality",offset=1},{stat="agility",offset=1},{stat="intelligence",offset=1},{stat="mind",offset=1},{stat="charisma",offset=1}},
+	[0xCF] = {{stat="none",offset=0}},
+	[0xD0] = {{stat="handtohandskill",offset=1}},
+	[0xD1] = {{stat="daggerskill",offset=1}},
+	[0xD2] = {{stat="swordskill", offset=1}},
+	[0xD3] = {{stat="greatswordskill", offset=1}},
+	[0xD4] = {{stat="axeskill", offset=1}},
+	[0xD5] = {{stat="greataxeskill", offset=1}},
+	[0xD6] = {{stat="scytheskill", offset=1}},
+	[0xD7] = {{stat="polearmskill", offset=1}},
+	[0xD8] = {{stat="katanaskill", offset=1}},
+	[0xD9] = {{stat="greatkatanaskill", offset=1}},
+	[0xDA] = {{stat="clubskill", offset=1}},
+	[0xDB] = {{stat="staffskill", offset=1}},
+	[0xDC] = {{stat="269", offset=0}},
+	[0xDD] = {{stat="270", offset=0}},
+	[0xDE] = {{stat="271", offset=0}},
+	[0xDF] = {{stat="272", offset=0}},
+	[0xE0] = {{stat="273", offset=0}},
+	[0xE1] = {{stat="274", offset=0}},
+	[0xE2] = {{stat="275", offset=0}},
+	[0xE3] = {{stat="276", offset=0}},
+	[0xE4] = {{stat="277", offset=0}},
+	[0xE5] = {{stat="automatonmeleeskill", offset=1}},
+	[0xE6] = {{stat="automatonrangedskill", offset=1}},
+	[0xE7] = {{stat="automatonmagicskill", offset=1}},
+	[0xE8] = {{stat="archeryskill", offset=1}},
+	[0xE9] = {{stat="marksmanshipskill", offset=1}},
+	[0xEA] = {{stat="throwingskill", offset=1}},
+	[0xEB] = {{stat="284", offset=0}},
+	[0xEC] = {{stat="285", offset=0}},
+	[0xED] = {{stat="shieldskill", offset=1}},
+	[0xEE] = {{stat="287", offset=0}},
+	[0xEF] = {{stat="divinemagicskill", offset=1}},
+	[0xF0] = {{stat="healingmagicskill", offset=1}},
+	[0xF1] = {{stat="enhancingmagicskill", offset=1}},
+	[0xF2] = {{stat="enfeeblingmagicskill", offset=1}},
+	[0xF3] = {{stat="elementalmagicskill", offset=1}},
+	[0xF4] = {{stat="darkmagicskill", offset=1}},
+	[0xF5] = {{stat="summoningmagicskill", offset=1}},
+	[0xF6] = {{stat="ninjutsuskill", offset=1}},
+	[0xF7] = {{stat="singingskill", offset=1}},
+	[0xF8] = {{stat="stringedinstrumentskill", offset=1}},
+	[0xF9] = {{stat="windinstrumentskill", offset=1}},
+	[0xFA] = {{stat="bluemagicskill", offset=1}},
+	[0xFB] = {{stat="geomancyskill", offset=1}},
+	[0xFC] = {{stat="Handbell Skill", offset=1}},
+	[0xFD] = {{stat="302", offset=0}},
+	[0xFE] = {{stat="303", offset=0}}
+}
+
+for i=0,255 do
+	if not augment_index_2_35[i] then
+		augment_index_2_35[i] = {{stat="???", offset=0}}
+	end
+end
 
 
 --[[function extdata_to_augment(extdata)
@@ -361,9 +465,9 @@ augment_index = {
 			id_3 = extdata:byte(7)+(extdata:byte(8)%8)*256
 			val_3 = math.floor(extdata:byte(8)/8)
 			
-			if id_1 ~= 0 then Augment_1 = unpack_augment(augment_index[id_1],val_1) end
-			if id_2 ~= 0 then Augment_2 = unpack_augment(augment_index[id_2],val_2) end
-			if id_3 ~= 0 then Augment_3 = unpack_augment(augment_index[id_3],val_3) end
+			if id_1 ~= 0 then Augment_1 = unpack_augment(augment_index_2_3[id_1],val_1) end
+			if id_2 ~= 0 then Augment_2 = unpack_augment(augment_index_2_3[id_2],val_2) end
+			if id_3 ~= 0 then Augment_3 = unpack_augment(augment_index_2_3[id_3],val_3) end
 		elseif flags:byte(2) == 67 then
 			id_1 = extdata:byte(7)+(extdata:byte(8)%8)*256
 			val_1 = math.floor(extdata:byte(8)/8)
@@ -377,8 +481,8 @@ augment_index = {
 				trial_complete = true
 			end
 			
-			if id_1 ~= 0 then Augment_1 = unpack_augment(augment_index[id_1],val_1) end
-			if id_2 ~= 0 then Augment_2 = unpack_augment(augment_index[id_2],val_2) end
+			if id_1 ~= 0 then Augment_1 = unpack_augment(augment_index_2_3[id_1],val_1) end
+			if id_2 ~= 0 then Augment_2 = unpack_augment(augment_index_2_3[id_2],val_2) end
 			
 		elseif flags:byte(2) == 35 then
 			-- Manibozho, Bokwus, etc.
@@ -390,6 +494,10 @@ augment_index = {
 			
 			id_3 = extdata:byte(11)
 			val_3 = extdata:byte(12)
+			
+			if id_1 ~= 0 then Augment_1 = unpack_augment(augment_index_2_35[id_1],val_1) end
+			if id_2 ~= 0 then Augment_2 = unpack_augment(augment_index_2_35[id_2],val_2) end
+			if id_3 ~= 0 then Augment_3 = unpack_augment(augment_index_2_35[id_3],val_3) end
 		end
 	elseif flags:byte(1) == 45 then
 		-- Pearlsacks are 45,85
@@ -416,9 +524,9 @@ function unpack_augment(augment_table,val)
 	return return_augment or 'nil'
 end
 
-for i,v in pairs(windower.ffxi.get_items().inventory) do
-	if v.extdata then
-		local tempstr = r_items[v.id].english..'   '
+for i,v in ipairs(windower.ffxi.get_items().locker) do
+	if v.extdata and r_items[v.id] then
+		local tempstr = i..' '..r_items[v.id].english..'   '
 		for n=1,string.len(v.extdata) do
 			tempstr = tempstr..string.byte(v.extdata,n)..' '
 		end
@@ -430,7 +538,7 @@ end]]
 
 function augment_to_extdata(str)
 	local stripped = str:lower():gsub('[^%-%w,]','')
-	local twobyte,firstbyte,secondbyte
+	local twobyte_1,twobyte_2
 	
 	local a,b,aug,pol,val = string.find(stripped,'(%a+)(%-*)(%d+)')
 	if pol == '-' then
@@ -439,14 +547,24 @@ function augment_to_extdata(str)
 		pol = 1
 	end
 	
-	for i,v in pairs(augment_index) do
+	for i,v in pairs(augment_index_2_3) do
 		if v[1].stat == aug and (val/(v[1].multiplier or 1) - pol*v[1].offset) <= 32 then -- Value has a maximum value of 32 because it's only 5 bits.
 			val = val/(v[1].multiplier or 1) - pol*v[1].offset
-			firstbyte = i%256 or 0
-			secondbyte = math.floor(i/256)+8*val or 0
-			twobyte = string.char(firstbyte)..string.char(secondbyte)
+			local firstbyte = i%256 or 0
+			local secondbyte = math.floor(i/256)+8*val or 0
+			twobyte_1 = string.char(firstbyte)..string.char(secondbyte)
 			break
 		end
 	end
-	return twobyte
+	
+	for i,v in pairs(augment_index_2_35) do
+		if v[1].stat == aug and (val/(v[1].multiplier or 1) - pol*v[1].offset) <= 255 then -- Value has a maximum value of 255 because it's 1 byte.
+			val = val/(v[1].multiplier or 1) - pol*v[1].offset
+			local firstbyte = i or 0
+			local secondbyte = val or 0
+			twobyte_2 = string.char(firstbyte)..string.char(secondbyte)
+			break
+		end
+	end
+	return twobyte_1,twobyte_2
 end
