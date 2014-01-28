@@ -76,9 +76,7 @@ function change_target(name)
 		return
 	end
 	if name and type(name)=='string' then
-		local temp_targ
-		_global.storedtarget,temp_targ = valid_target(name)
-		spell.target = temp_targ
+		spell.target = valid_target(name)
 	else
 		error('\nGearSwap: change_target() was passed an invalid value ('..tostring(name)..'). (must be a string)', 2)
 	end

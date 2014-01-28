@@ -45,10 +45,11 @@ function equip_sets(swap_type,ts,...)
 	local var_inps = {...}
 	local val1 = var_inps[1]
 	local val2 = var_inps[2]
-	load_globals(ts)
+	table.reassign(_global,command_registry[ts] or {cast_delay = 0,midaction = false,pet_midaction = false,cancel_spell = false})
+	_global.current_event = tostring(swap_type)
+	
 	if debugging >= 1 then windower.debug(tostring(swap_type)..' enter') 
 	if showphase or debugging >= 2 then windower.add_to_chat(8,tostring(swap_type)..' enter') end end
-	_global.current_event = tostring(swap_type)
 	
 	local cur_equip = get_gs_gear(items.equipment,swap_type)
 	
@@ -92,7 +93,8 @@ function equip_sets(swap_type,ts,...)
 
 	
 	if type(swap_type) == 'function' then
-		results = {swap_type(...)}
+		results = {pcall(swap_type(...))}
+		if not table.remove(results[1]) then error('\nUser Event Error: '..results[1]) end
 	elseif swap_type == 'equip_command' then
 		equip(val1)
 	else
@@ -181,7 +183,9 @@ end
 ---- none
 -----------------------------------------------------------------------------------
 function equip_sets_exit(swap_type,ts,val1)
-	cache_globals(ts)
+	if command_registry[ts] then
+		table.update(command_registry[ts],_global)
+	end
 	if type(swap_type) == 'string' then
 		if swap_type == 'pretarget' then
 			command_send_check(ts)
@@ -239,57 +243,12 @@ end
 function user_pcall(str,...)
 	if user_env then
 		if type(user_env[str]) == 'function' then
-			user_env[str](...)
+			bool,err = pcall(user_env[str](...))
+			if not bool then error('\nUser function error: '..err) end
 		elseif user_env[str] then
 			windower.add_to_chat(123,'GearSwap: '..str..'() exists but is not a function')
 		end
 	end
-end
-
-
------------------------------------------------------------------------------------
---Name: load_globals(inde)
---Desc: Takes the relevant values from command_registry for the current action and places 
---      them in the _global table, to preserve their values from pretarget to
---      precast.
---Args:
----- inde - key for command_registry
------------------------------------------------------------------------------------
---Returns:
----- none
------------------------------------------------------------------------------------
-function load_globals(ts)
-	if command_registry[ts] then
-		for i,v in pairs(_global) do
-			if command_registry[ts][i] then
-				_global[i] = command_registry[ts][i]
-			end
-		end
-	end
-end
-
-
------------------------------------------------------------------------------------
---Name: cache_globals(inde)
---Desc: Takes the values from _global for the current action and places them in the
---      relevant command_registry table, to preserve their values from pretarget to precast.
---Args:
----- inde - key for command_registry
------------------------------------------------------------------------------------
---Returns:
----- none
------------------------------------------------------------------------------------
-function cache_globals(ts)
-	if command_registry[ts] then
-		for i,v in pairs(_global) do
-			command_registry[ts][i] = v
-		end
-	end
-	_global.cast_delay = 0
-	_global.storedtarget = ''
-	_global.midaction = false
-	_global.pet_midaction = false
-	_global.cancel_spell = false
 end
 
 

@@ -1,4 +1,10 @@
 -------------------------------------------------
+GearSwap 0.821 - Finalized register_event(). Protected user files to prevent error propagation.
+-------------------------------------------------
+GearSwap 0.820 - Added 0x02, 0x35 extdata augment handling. Added sub_job_change(new,old) event.
+-------------------------------------------------
+GearSwap 0.819 - API adjustments. Massive refactoring of the scheduler, which improved midaction() and pet_midaction(). Fixed " <wait X>" macros and the buff_change() event.
+-------------------------------------------------
 GearSwap 0.818 - Added pet_change() user event. Refined event registration.
 -------------------------------------------------
 GearSwap 0.817 - Added filtering to //gs validate. Added pet_midcast() user function.
