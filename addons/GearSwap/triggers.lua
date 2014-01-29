@@ -64,9 +64,9 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
 			if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) temp_mod: '..temp_mod) end
 			if clocking then out_time = os.clock() end
 			refresh_globals()
-	
+			
 			local r_line
-				
+			
 			if command_list[command] == 'Magic' then
 				r_line = r_spells[validabils[language][unify_prefix[command]][abil]]
 				storedcommand = command..' "'..r_line[language]..'" '
