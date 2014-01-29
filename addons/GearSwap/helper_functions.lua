@@ -546,7 +546,6 @@ end
 function remove_old_command_registry_entries(ts)
 	for i,v in pairs(command_registry) do
 		if ts-i >= 20 then
-			windower.add_to_chat(8,'deleted')
 			command_registry[i] = nil
 		end
 	end
