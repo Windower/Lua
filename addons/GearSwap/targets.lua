@@ -37,25 +37,25 @@ function valid_target(targ)
 		if j then spelltarget = target_complete(j) end
 		
 		spelltarget.raw = targ
-		return targ,spelltarget
+		return targ, spelltarget
 	elseif tonumber(targ) then
 		local j = windower.ffxi.get_mob_by_id(tonumber(targ))
 		
 		if j then spelltarget = target_complete(j) end
 		
 		spelltarget.raw = targ
-		return targ,spelltarget
+		return targ, spelltarget
 	elseif not tonumber(targ) and targ ~= '' then
 		local mob_array = windower.ffxi.get_mob_array()
 		for i,v in pairs(mob_array) do
 			if v.name:lower()==targ:lower() and not v.is_npc then
 				spelltarget = target_complete(v)
 				spelltarget.raw = targ
-				return targ,spelltarget
+				return targ, spelltarget
 			end
 		end
 	end
-	return false,false
+	return false, false
 end
 
 function target_complete(mob_table)

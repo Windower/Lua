@@ -265,6 +265,6 @@ function get_gs_gear(cur_equip,swap_type)
 			sent_out_box = sent_out_box..tostring(i)..' '..tostring(r_items[items.inventory[v].id].english)..'\n'
 		end
 	end
-	if debugging > 0 then windower.text.set_text(swap_type,sent_out_box) end
+	if debugging > 0 and type(swap_type) == 'string' then windower.text.set_text(swap_type,sent_out_box) end
 	return cur_equip
 end

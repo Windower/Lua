@@ -76,9 +76,7 @@ function change_target(name)
 		return
 	end
 	if name and type(name)=='string' then
-		local temp_targ
-		_global.storedtarget,temp_targ = valid_target(name)
-		spell.target = temp_targ
+		_,spell.target = valid_target(name)
 	else
 		error('\nGearSwap: change_target() was passed an invalid value ('..tostring(name)..'). (must be a string)', 2)
 	end
@@ -207,7 +205,7 @@ function unregister_event_user(id)
 end
 
 function user_equip_sets(func)
-	return setfenv(function(...) gearswap.equip_sets(func,nil,...) end,user_env)
+	return setfenv(function(...) return gearswap.equip_sets(func,nil,...) end,user_env)
 end
 
 function include_user(str)

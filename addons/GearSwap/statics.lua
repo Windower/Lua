@@ -258,7 +258,6 @@ short_slot_map.back = 15
 
 _global = make_user_table()
 _global.cast_delay = 0
-_global.storedtarget = ''
 _global.cancel_spell = false
 _global.midaction = false
 _global.pet_midaction = false
