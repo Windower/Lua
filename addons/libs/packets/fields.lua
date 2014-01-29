@@ -1099,7 +1099,7 @@ fields.incoming[0x061] = L{
     {ctype='unsigned short',    label='Defense'},                               -- 32
     {ctype='signed short',      label='Fire Resistance'},                       -- 34
     {ctype='signed short',      label='Wind Resistance'},                       -- 36
-    {ctype='signed short',      label='Thunder Resistance'},                    -- 38
+    {ctype='signed short',      label='Lightning Resistance'},                  -- 38
     {ctype='signed short',      label='Light Resistance'},                      -- 3A
     {ctype='signed short',      label='Ice Resistance'},                        -- 3C
     {ctype='signed short',      label='Earth Resistance'},                      -- 3E
