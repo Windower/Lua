@@ -93,8 +93,8 @@ function equip_sets(swap_type,ts,...)
 
 	
 	if type(swap_type) == 'function' then
-		results = {pcall(swap_type(...))}
-		if not table.remove(results[1]) then error('\nUser Event Error: '..results[1]) end
+		results = { pcall(swap_type,...) }
+		if not table.remove(results,1) then error('\nUser Event Error: '..results[1]) end
 	elseif swap_type == 'equip_command' then
 		equip(val1)
 	else
@@ -243,7 +243,7 @@ end
 function user_pcall(str,...)
 	if user_env then
 		if type(user_env[str]) == 'function' then
-			bool,err = pcall(user_env[str](...))
+			bool,err = pcall(user_env[str],...)
 			if not bool then error('\nUser function error: '..err) end
 		elseif user_env[str] then
 			windower.add_to_chat(123,'GearSwap: '..str..'() exists but is not a function')
