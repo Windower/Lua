@@ -397,7 +397,7 @@ function assemble_action_packet(target_id,target_index,category,spell_id)
 		return
 	end
 	
-	if r_spells[spell_id].type == 'Blue Magic' and player.main_job ~= 'BLU' and player.sub_job ~= 'BLU' then
+	if spell.type == 'BlueMagic' and player.main_job ~= 'BLU' and player.sub_job ~= 'BLU' then
 		return
 	end
 	
