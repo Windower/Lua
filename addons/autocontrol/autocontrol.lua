@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
 _addon.name = 'autocontrol'
-_addon.version = '0.23'
+_addon.version = '1.0'
 _addon.author = 'Nitrous (Shiva)'
 _addon.commands = {'autocontrol','acon'}
 
@@ -180,10 +180,10 @@ function get_current_autoset()
         local autoTable = T{}
         local tmpTable = T{}
         local tmpTable = T(windower.ffxi.get_mjob_data().attachments)
-        local i,id
-        for i = 1, #tmpTable do
+        local i
+        for i = 1, 12 do
             local t = ''
-            if tonumber(tmpTable[i]) ~= 0 then
+            if tmpTable[i] then
                 if i < 10 then t = '0' end
                 autoTable['slot'..t..i] = atts[tonumber(tmpTable[i])].name:lower()
             end
