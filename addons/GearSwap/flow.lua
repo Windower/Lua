@@ -254,10 +254,10 @@ end
 
 
 -----------------------------------------------------------------------------------
---Name: command_send_check(inde)
+--Name: command_send_check(ts)
 --Desc: Check at the end of pretarget to see whether or not the command should be sent.
 --Args:
----- inde - command_registry index of the current spell
+---- ts - command_registry index of the current spell
 -----------------------------------------------------------------------------------
 --Returns:
 ---- string - gets propagated back to the outgoing_text function
@@ -301,7 +301,7 @@ end
 
 
 -----------------------------------------------------------------------------------
---Name: packet_send_check(inde)
+--Name: packet_send_check(ts)
 --Desc: Determines whether or not to send the current packet.
 --      Cancels if _global.cancel_spell is true
 --          If command_registry[ts].cast_delay is not 0, cues delayed_cast with the proper
@@ -349,10 +349,10 @@ end
 
 
 -----------------------------------------------------------------------------------
---Name: send_action(inde)
+--Name: send_action(ts)
 --Desc: Sends the cued action packet, if it exists.
 --Args:
----- inde - index_command for a command_registry entry that includes an action packet (hopefully)
+---- ts - index for a command_registry entry that includes an action packet (hopefully)
 -----------------------------------------------------------------------------------
 --Returns:
 ---- none
