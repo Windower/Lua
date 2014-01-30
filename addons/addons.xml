@@ -362,6 +362,13 @@
     <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
+    <addon>
+    <name>Treasury</name>
+    <author>Ihina</author>
+    <description>Helpful tool to lot and pass items</description>
+    <bugtracker>https://github.com/Jayjs20/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Bismarck/Ihina</support>
+  </addon>
   <addon>
     <name>Update</name>
     <author>Arcon</author>
