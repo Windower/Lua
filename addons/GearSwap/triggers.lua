@@ -89,7 +89,7 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
 			spell.action_type = command_list[command]
 			
 			if tonumber(splitline[splitline.n]) then
-				local ts,id = find_command_registry_key('command',unify_prefix[spell.prefix]..' "'..spell.english..'" nil') or mk_command_registry_entry(spell,spell.target.id)
+				local ts,id = find_command_registry_key('spell',spell) or mk_command_registry_entry(spell,spell.target.id)
 				
 				if outgoing_action_category_table[unify_prefix[spell.prefix]] == 3 then
 					id = spell.index

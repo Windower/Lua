@@ -515,7 +515,7 @@ end
 ---- sp - Resources line for the current spell
 -----------------------------------------------------------------------------------
 --Returns:
----- inde - index_command for command_registry
+---- ts - index for command_registry
 -----------------------------------------------------------------------------------
 function mk_command_registry_entry(sp)
 	local ts = os.time()
@@ -557,8 +557,8 @@ end
 --Name: find_command_registry_key(typ,value)
 --Desc: Returns the proper unified prefix, or "Mosnter " in the case of a monster action
 --Args:
----- typ - 'spell', 'command', 'timestamp', or 'id'
----- value - The spell, command, timestamp, or id
+---- typ - 'spell', 'timestamp', or 'id'
+---- value - The spell, timestamp, or id
 ---- Currently the ID and Timestamp options are unused.
 -----------------------------------------------------------------------------------
 --Returns:
@@ -582,12 +582,6 @@ function find_command_registry_key(typ,value)
 			end
 		end
 		return winning_ind
-	elseif typ == 'command' then
-		for i,v in pairs(command_registry) do
-			if v.index_command == value then
-				return i
-			end
-		end
 	elseif typ == 'timestamp' then
 		for i,v in pairs(command_registry) do
 			if v.index_timestamp == value then
