@@ -105,7 +105,6 @@ function equip_sets(swap_type,ts,...)
 	if type(swap_type) == 'string' and swap_type == 'pretarget' then -- Target may just have been changed, so make the ind now.
 		ts = mk_command_registry_entry(val1)
 	elseif type(swap_type) == 'string' and swap_type == 'precast' then
-		_global.midaction = true
 		if not command_registry[ts] then if debugging >= 1 then print_set(spell,'precast nil error') end
 		else command_registry[ts].timestamp = os.time() end
 	end
@@ -361,6 +360,7 @@ function send_action(ts)
 	if command_registry[ts].proposed_packet then
 		cued_packet = ts
 		windower.packets.inject_outgoing(command_registry[ts].proposed_packet:byte(1),command_registry[ts].proposed_packet)
+		command_registry[ts].midaction = true
 		equip_sets('midcast',ts,command_registry[ts].spell)
 		windower.send_command('input /assist <me>')
 	else

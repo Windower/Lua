@@ -102,7 +102,7 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
 					return true
 				end
 			else
-				return equip_sets('pretarget',os.time(),spell)
+				return equip_sets('pretarget',-1,spell)
 			end
 		end
 	end
