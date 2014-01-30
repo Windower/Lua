@@ -5,6 +5,8 @@ Items will be passed or lotted based on the addon's internal code when:
 2) A new pass or lot command is inputted (both on a current or an alternate character if the global key word is used)
 3) If a new item drops into the treasure pool
 
+If an item is both in the lot and pass list, the item will be passed.
+
 
 Commands:
 
