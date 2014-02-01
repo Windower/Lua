@@ -265,6 +265,7 @@ _global.current_event = 'None'
 
 _settings = {}
 _settings.debug_mode = false
+_settings.demo_mode = false
 _settings.show_swaps = false
 
 
@@ -294,6 +295,97 @@ encumbrance_table = table.reassign({},disable_table)
 registered_user_events = {}
 empty = {name="empty"}
 outgoing_packet_table = {}
+tool_map = {
+		['Katon: Ichi'] = 'Uchitake',
+		['Katon: Ni'] = 'Uchitake',
+		['Katon: San'] = 'Uchitake',
+		['Hyoton: Ichi'] = 'Tsurara',
+		['Hyoton: Ni'] = 'Tsurara',
+		['Hyoton: San'] = 'Tsurara',
+		['Huton: Ichi'] = 'Kawahori-ogi',
+		['Huton: Ni'] = 'Kawahori-ogi',
+		['Huton: San'] = 'Kawahori-ogi',
+		['Doton: Ichi'] = 'Makibishi',
+		['Doton: Ni'] = 'Makibishi',
+		['Doton: San'] = 'Makibishi',
+		['Raiton: Ichi'] = 'Hiraishin',
+		['Raiton: Ni'] = 'Hiraishin',
+		['Raiton: San'] = 'Hiraishin',
+		['Suiton: Ichi'] = 'Mizu-deppo',
+		['Suiton: Ni'] = 'Mizu-deppo',
+		['Suiton: San'] = 'Mizu-deppo',
+		['Utsusemi: Ichi'] = 'Shihei',
+		['Utsusemi: Ni'] = 'Shihei',
+		['Utsusemi: San'] = 'Shihei',
+		['Jubaku: Ichi'] = 'Jusatsu',
+		['Jubaku: Ni'] = 'Jusatsu',
+		['Jubaku: San'] = 'Jusatsu',
+		['Hojo: Ichi'] = 'Kaginawa',
+		['Hojo: Ni'] = 'Kaginawa',
+		['Hojo: San'] = 'Kaginawa',
+		['Kurayami: Ichi'] = 'Sairui-ran',
+		['Kurayami: Ni'] = 'Sairui-ran',
+		['Kurayami: San'] = 'Sairui-ran',
+		['Dokumori: Ichi'] = 'Kodoku',
+		['Dokumori: Ni'] = 'Kodoku',
+		['Dokumori: San'] = 'Kodoku',
+		['Tonko: Ichi'] = 'Shinobi-tabi',
+		['Tonko: Ni'] = 'Shinobi-tabi',
+		['Tonko: San'] = 'Shinobi-tabi',
+		['Monomi: Ichi'] = 'Sanjaku-tenugui',
+		['Monomi: Ni'] = 'Sanjaku-tenugui',
+		['Aisha: Ichi'] = 'Soshi',
+		['Myoshu: Ichi'] = 'Kabenro',
+		['Yurin: Ichi'] = 'Jinko',
+		['Migawari: Ichi'] = 'Mokujin',
+		['Kakka: Ichi'] = 'Ryuno'
+	}
+
+
+universal_tool_map = {
+		['Katon: Ichi'] = 'Inoshishinofuda',
+		['Katon: Ni'] = 'Inoshishinofuda',
+		['Katon: San'] = 'Inoshishinofuda',
+		['Hyoton: Ichi'] = 'Inoshishinofuda',
+		['Hyoton: Ni'] = 'Inoshishinofuda',
+		['Hyoton: San'] = 'Inoshishinofuda',
+		['Huton: Ichi'] = 'Inoshishinofuda',
+		['Huton: Ni'] = 'Inoshishinofuda',
+		['Huton: San'] = 'Inoshishinofuda',
+		['Doton: Ichi'] = 'Inoshishinofuda',
+		['Doton: Ni'] = 'Inoshishinofuda',
+		['Doton: San'] = 'Inoshishinofuda',
+		['Raiton: Ichi'] = 'Inoshishinofuda',
+		['Raiton: Ni'] = 'Inoshishinofuda',
+		['Raiton: San'] = 'Inoshishinofuda',
+		['Suiton: Ichi'] = 'Inoshishinofuda',
+		['Suiton: Ni'] = 'Inoshishinofuda',
+		['Suiton: San'] = 'Inoshishinofuda',
+		['Utsusemi: Ichi'] = 'Shikanofuda',
+		['Utsusemi: Ni'] = 'Shikanofuda',
+		['Utsusemi: San'] = 'Shikanofuda',
+		['Jubaku: Ichi'] = 'Chonofuda',
+		['Jubaku: Ni'] = 'Chonofuda',
+		['Jubaku: San'] = 'Chonofuda',
+		['Hojo: Ichi'] = 'Chonofuda',
+		['Hojo: Ni'] = 'Chonofuda',
+		['Hojo: San'] = 'Chonofuda',
+		['Kurayami: Ichi'] = 'Chonofuda',
+		['Kurayami: Ni'] = 'Chonofuda',
+		['Kurayami: San'] = 'Chonofuda',
+		['Dokumori: Ichi'] = 'Chonofuda',
+		['Dokumori: Ni'] = 'Chonofuda',
+		['Dokumori: San'] = 'Chonofuda',
+		['Tonko: Ichi'] = 'Shikanofuda',
+		['Tonko: Ni'] = 'Shikanofuda',
+		['Tonko: San'] = 'Shikanofuda',
+		['Monomi: Ichi'] = 'Shikanofuda',
+		['Aisha: Ichi'] = 'Chonofuda',
+		['Myoshu: Ichi'] = 'Shikanofuda',
+		['Yurin: Ichi'] = 'Chonofuda',
+		['Migawari: Ichi'] = 'Shikanofuda',
+		['Kakka: Ichi'] = 'Shikanofuda'
+	}
 
 
 --persistant_sequence = {}  ---------------------- TEMPORARY TO INVESTIGATE LAG ISSUES IN DELVE

@@ -368,7 +368,7 @@ end
 
 -----------------------------------------------------------------------------------
 --Name: assemble_action_packet(target_id,target_index,category,spell_id)
---Desc: Puts together an action packet using one weird old trick!
+--Desc: Puts together an "action" packet (0x1A)
 --Args:
 ---- target_id - The target's ID
 ---- target_index - The target's index
@@ -378,28 +378,11 @@ end
 --Returns:
 ---- string - An action packet. First four bytes are dummy bytes.
 -----------------------------------------------------------------------------------
-function assemble_action_packet(target_id,target_index,category,spell_id)
-	if not target_id then
-		windower.add_to_chat(8,'No target id?')
-		return
-	end
-	if not target_index then
-		windower.add_to_chat(8,'No target index?')
-		return
-	end
+function assemble_action_packet(target_id,target_index,category,spell_id)	
 	local outstr = string.char(0x1A,0x08,0,0)
 	outstr = outstr..string.char( (target_id%256), math.floor(target_id/256)%256, math.floor( (target_id/65536)%256) , math.floor( (target_id/16777216)%256) )
 	outstr = outstr..string.char( (target_index%256), math.floor(target_index/256)%256)
 	outstr = outstr..string.char( (category%256), math.floor(category/256)%256)
-
-	if (category == 7 or category == 9) and not windower.ffxi.get_abilities()[spell_id] then
-		--windower.add_to_chat(123,"GearSwap: Unable to make action packet. You do not have access to that ability ("..spell_id..")")
-		return
-	end
-	
-	if spell.type == 'BlueMagic' and player.main_job ~= 'BLU' and player.sub_job ~= 'BLU' then
-		return
-	end
 	
 	if category == 7 or category == 25 then
 		spell_id = spell_id - 768
@@ -417,7 +400,7 @@ end
 
 -----------------------------------------------------------------------------------
 --Name: assemble_use_item_packet(target_id,target_index,item)
---Desc: Puts together an action packet using one weird old trick!
+--Desc: Puts together a "use item" packet (0x37)
 --Args:
 ---- target_id - The target's ID
 ---- target_index - The target's index
@@ -435,6 +418,7 @@ function assemble_use_item_packet(target_id,target_index,item_id)
 	if inventory_index then
 		outstr = outstr..string.char(inventory_index%256)..string.char(0,bag_id,0,0,0)
 	else
+		debug_mode_chat('Proposed item: '..(r_items[item_id][language] or item_id)..' not found in inventory.')
 		return
 	end
 	return outstr
@@ -443,8 +427,8 @@ end
 
 
 -----------------------------------------------------------------------------------
---Name: assemble_use_item_packet(target_id,target_index,item)
---Desc: Puts together an action packet using one weird old trick!
+--Name: assemble_menu_item_packet(target_id,target_index,item)
+--Desc: Puts together a "menu item" packet (0x36)
 --Args:
 ---- target_id - The target's ID
 ---- target_index - The target's index
@@ -465,6 +449,7 @@ function assemble_menu_item_packet(target_id,target_index,item_id)
 	if inventory_index then
 		outstr = outstr..string.char(inventory_index%256)
 	else
+		debug_mode_chat('Proposed item: '..(r_items[item_id][language] or item_id)..' not found in inventory.')
 		return
 	end
 	-- Nothing else being traded
@@ -508,6 +493,71 @@ function find_usable_item(item_id)
 		end
 	end
 	return inventory_index,bag_id
+end
+
+
+
+-----------------------------------------------------------------------------------
+--Name: filter_pretarget(spell)
+--Desc: Determines whether the current player is capable of using the proposed spell
+----    at pretarget.
+--Args:
+---- spell - current spell table
+-----------------------------------------------------------------------------------
+--Returns:
+---- false to cancel further command processing and just return the command.
+-----------------------------------------------------------------------------------
+function filter_pretarget(spell)
+	local category,spell_id = outgoing_action_category_table[unify_prefix[spell.prefix]]
+	if category == 3 then
+		spell_id = spell.index
+		local available_spells = windower.ffxi.get_spells()
+		-- filter for spells that you do not know
+		if not available_spells[spell_id] and not (spell_id == 503 and player.equipment.body:lower() == 'twilight cloak') then
+			debug_mode_chat("Unable to execute command. You do not know that spell ("..(r_spells[spell_id][language] or spell.id)..")")
+			return false
+		end
+	else
+		spell_id = spell.id
+		if (category == 7 or category == 9) and not windower.ffxi.get_abilities()[spell_id] then
+			debug_mode_chat("Unable to execute command. You do not have access to that ability ("..(r_abilities[spell_id][language] or spell_id)..")")
+			return false
+		end
+	end
+	
+	
+	if spell.type == 'BlueMagic' and player.main_job ~= 'BLU' and player.sub_job ~= 'BLU' then
+		return false
+	elseif spell.type == 'Ninjutsu'  then
+		if player.main_job ~= 'NIN' and player.sub_job ~= 'NIN' then
+			debug_mode_chat("Unable to make action packet. You do not have access to that spell ("..(spell[language] or spell_id)..")")
+			return false
+		elseif not player.inventory[tool_map[spell.english]] and (player.main_job == 'NIN' and not player.inventory[universal_tool_map[spell.english]]) then
+			debug_mode_chat("Unable to make action packet. You do not have the proper tools.")
+			return false
+		end
+	end
+	
+	return true
+end
+
+
+-----------------------------------------------------------------------------------
+--Name: filter_precast(spell)
+--Desc: Determines whether the current player is capable of using the proposed spell
+----    at precast.
+--Args:
+---- spell - current spell table
+-----------------------------------------------------------------------------------
+--Returns:
+---- false to block the outgoing packet
+-----------------------------------------------------------------------------------
+function filter_precast(spell)
+	if not spell.target.id or not spell.target.index then
+		if debugging >= 1 then windower.add_to_chat(8,'No target id or index') end
+		return false
+	end
+	return true
 end
 
 
@@ -788,4 +838,21 @@ function aftercast_cost(rline)
 	end
 	
 	return rline
+end
+
+
+
+-----------------------------------------------------------------------------------
+--Name: debug_mode_chat(message)
+--Desc: Checks _settings.debug_mode and outputs the message if necessary
+--Args:
+---- message - The debug message
+-----------------------------------------------------------------------------------
+--Returns:
+---- none
+-----------------------------------------------------------------------------------
+function debug_mode_chat(message)
+	if _settings.debug_mode then
+		windower.add_to_chat(8,"GearSwap (Debug Mode): "..message)
+	end
 end
