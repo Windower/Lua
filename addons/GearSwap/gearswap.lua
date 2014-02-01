@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.821'
+_addon.version = '0.822'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -138,6 +138,9 @@ windower.register_event('addon command',function (...)
 	elseif strip(cmd) == 'debugmode' then
 		_settings.debug_mode = not _settings.debug_mode
 		print('GearSwap: Debug Mode set to '..tostring(_settings.debug_mode)..'.')
+	elseif strip(cmd) == 'demomode' then
+		_settings.demo_mode = not _settings.demo_mode
+		print('GearSwap: Demo Mode set to '..tostring(_settings.demo_mode)..'.')
 	elseif strip(cmd) == 'showswaps' then
 		_settings.show_swaps = not _settings.show_swaps
 		print('GearSwap: Show Swaps set to '..tostring(_settings.show_swaps)..'.')
@@ -300,7 +303,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
 			if encumbrance_table[i] and math.floor( (enc%(2^(i+1))) / 2^i ) ~= 1 and not_sent_out_equip[v] and not disable_table[i] then
 				tab[v] = not_sent_out_equip[v]
 				not_sent_out_equip[v] = nil
-				if _settings.debug_mode then windower.add_to_chat(8,"GearSwap (Debug Mode): Your "..v..' are now unlocked.') end
+				debug_mode_chat("Your "..v.." are now unlocked.")
 			end
 			encumbrance_table[i] = tf
 		end

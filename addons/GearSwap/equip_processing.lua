@@ -27,9 +27,9 @@
 function check_wearable(item_id)
 	if not item_id or item_id == 0 then -- 0 codes for an empty slot, but Arcon will probably make it nil at some point
 	elseif not r_items[item_id] then
-		if _settings.debug_mode then windower.add_to_chat(8,'GearSwap (Debug Mode): Item '..item_id..' has not been added to resources yet.') end
+		debug_mode_chat("Item '..item_id..' has not been added to resources yet.")
 	elseif not r_items[item_id].jobs then -- Make sure item can be equipped by specific jobs (unlike pearlsacks).
-		if _settings.debug_mode then windower.add_to_chat(8,'GearSwap (Debug Mode): Item '..item_id..' does not have a jobs field in the resources.') end
+		--if _settings.debug_mode then windower.add_to_chat(8,'GearSwap (Debug Mode): Item '..(r_items[item_id][language] or item_id)..' does not have a jobs field in the resources.') end
 	else
 		return (get_wearable(jobs[player.main_job],r_items[item_id].jobs) and (r_items[item_id].level<=player.main_job_level) and get_wearable(dat_races[player.race],r_items[item_id].races))
 	end

@@ -1,4 +1,6 @@
 -------------------------------------------------
+GearSwap 0.822 - Added demomode and filters to prevent impossible actions. 
+-------------------------------------------------
 GearSwap 0.821 - Finalized register_event(). Protected user files to prevent error propagation.
 -------------------------------------------------
 GearSwap 0.820 - Added 0x02, 0x35 extdata augment handling. Added sub_job_change(new,old) event.

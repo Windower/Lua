@@ -88,21 +88,23 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
 			spell.target = temp_mob_arr
 			spell.action_type = command_list[command]
 			
-			if tonumber(splitline[splitline.n]) then
-				local ts,id = find_command_registry_key('spell',spell) or mk_command_registry_entry(spell,spell.target.id)
-				
-				if outgoing_action_category_table[unify_prefix[spell.prefix]] == 3 then
-					id = spell.index
+			if filter_pretarget(spell) then
+				if tonumber(splitline[splitline.n]) then
+					local ts,id = find_command_registry_key('spell',spell) or mk_command_registry_entry(spell,spell.target.id)
+					
+					if outgoing_action_category_table[unify_prefix[spell.prefix]] == 3 then
+						id = spell.index
+					else
+						id = spell.id
+					end
+					command_registry[ts].proposed_packet = assemble_action_packet(spell.target.id,spell.target.index,outgoing_action_category_table[unify_prefix[spell.prefix]],id)
+					if command_registry[ts].proposed_packet then
+						equip_sets('precast',ts,spell)
+						return true
+					end
 				else
-					id = spell.id
+					return equip_sets('pretarget',-1,spell)
 				end
-				command_registry[ts].proposed_packet = assemble_action_packet(spell.target.id,spell.target.index,outgoing_action_category_table[unify_prefix[spell.prefix]],id)
-				if command_registry[ts].proposed_packet then
-					equip_sets('precast',ts,spell)
-					return true
-				end
-			else
-				return equip_sets('pretarget',-1,spell)
 			end
 		end
 	end
@@ -260,12 +262,12 @@ function inc_action_message(arr)
 		if tab and tab.spell then
 			tab.spell.interrupted = true
 			tab.spell.action_type = 'Interruption'
-		else
-			tab = {}
-			tab.spell = {interrupted=true,action_type='Interruption'}
+			refresh_globals()
+			equip_sets(prefix..'aftercast',ts,tab.spell)
+--		else
+--			tab = {}
+--			tab.spell = {interrupted=true,action_type='Interruption'}
 		end
-		refresh_globals()
-		equip_sets(prefix..'aftercast',ts,tab.spell)
 	elseif unable_to_use:contains(arr.message_id) and debugging >= 1 then
 		windower.add_to_chat(8,'Handled Action message received with a target other than yourself: '..tostring(dialog[arr.message_id].english)..' '..tostring(windower.ffxi.get_mob_by_id(actor_id).name))
 	end

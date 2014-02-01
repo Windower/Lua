@@ -147,12 +147,26 @@ end
 function print_set(set,title)
 	if not set then
 		if title then
-			error('\nGearSwap: print_set error, '..title..' set is nil.', 2)
+			error('\nGearSwap: print_set error, '..tostring(title)..' set is nil.', 2)
 		else
 			error('\nGearSwap: print_set error, set is nil.', 2)
 		end
 		return
+	elseif type(set) ~= 'table' then
+		if title then
+			error('\nGearSwap: print_set error, '..tostring(title)..' set is not a table.', 2)
+		else
+			error('\nGearSwap: print_set error, set is not a table.', 2)
+		end
+	elseif table.length(set) == 0 then
+		if title then
+			windower.add_to_chat(1,'------------------'.. tostring(title)..' -- Empty Table -----------------')
+		else
+			windower.add_to_chat(1,'-------------------------- Empty Table -------------------------')
+		end
+		return
 	end
+	
 	if title then
 		windower.add_to_chat(1,'------------------------- '..tostring(title)..' -------------------------')
 	else
