@@ -532,7 +532,7 @@ function filter_pretarget(spell)
 		if player.main_job ~= 'NIN' and player.sub_job ~= 'NIN' then
 			debug_mode_chat("Unable to make action packet. You do not have access to that spell ("..(spell[language] or spell_id)..")")
 			return false
-		elseif not player.inventory[tool_map[spell.english]] and (player.main_job == 'NIN' and not player.inventory[universal_tool_map[spell.english]]) then
+		elseif not player.inventory[tool_map[spell.english]] and not (player.main_job == 'NIN' and player.inventory[universal_tool_map[spell.english]]) then
 			debug_mode_chat("Unable to make action packet. You do not have the proper tools.")
 			return false
 		end
