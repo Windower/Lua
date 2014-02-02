@@ -174,8 +174,6 @@ function printpettp(pet_idx_in,own_idx_in)
         if update_pet(pet_idx_in,own_idx_in) == false then
             return
         end
-  --  elseif valid_pet(pet_idx_in,own_idx_in) == nil then
---        return
     end
 
     local output
