@@ -78,7 +78,12 @@ end
 
 function valid_pet(pet_idx_in, own_idx_in)
     local player = windower.ffxi.get_player()
-
+    
+    if player.vitals.hp == 0 then
+        if superverbose == true then windower.add_to_chat(8, 'Player is dead') end
+        return
+    end
+    
     if petactive then 
         if mypet_idx then
             if not pet_idx_in or mypet_idx == pet_idx_in then
@@ -169,8 +174,8 @@ function printpettp(pet_idx_in,own_idx_in)
         if update_pet(pet_idx_in,own_idx_in) == false then
             return
         end
-    elseif valid_pet(pet_idx_in,own_idx_in) == nil then
-        return
+  --  elseif valid_pet(pet_idx_in,own_idx_in) == nil then
+--        return
     end
 
     local output
