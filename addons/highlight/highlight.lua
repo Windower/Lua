@@ -1,13 +1,13 @@
-file = require 'filehelper'
-chat = require 'chat'
-require 'tablehelper'
-require 'stringhelper'
- 
-_addon = {}
 _addon.author = 'Balloon'
 _addon.name = 'Highlight'
 _addon.version = '1.0' 
 _addon.command = 'highlight'
+
+file = require('files')
+chat = require('chat')
+chars = require('chat.chars')
+require('tables')
+require('strings')
  
 members={}
 mulenames={}
@@ -17,7 +17,7 @@ color={}
 mulecolor={}
 previousmentions={}
  
-config = require 'config'
+config = require('config')
  
 defaults = {}
 defaults.p0 = 501
@@ -55,18 +55,18 @@ windower.register_event('addon command', function(command, ...)
     args = {...}
  
     if command == 'write' then
-        io.open(lua_base_path..'/logs/'..player..'.txt',"a"):write('\n =='..string.sub(os.date(), 0, 8)..'== \n'..table.concat(previousmentions, '\n')):close()
+        io.open(windower.addon_path..'/logs/'..player..'.txt',"a"):write('\n =='..string.sub(os.date(), 0, 8)..'== \n'..table.concat(previousmentions, '\n')):close()
  
     elseif command == 'view' then
         if not args[1] then 
-            add_to_chat(4, "==Recent Mentions==")
+            windower.add_to_chat(4, "==Recent Mentions==")
             if #previousmentions > 20 then
                 for i = 1, 20 do
-                    add_to_chat(4, previousmentions[i])
+                    windower.add_to_chat(4, previousmentions[i])
                 end
             else 
                 for i = 1, #previousmentions do
-                    add_to_chat(4, previousmentions[i])
+                    windower.add_to_chat(4, previousmentions[i])
                 end
             end
  
@@ -74,9 +74,9 @@ windower.register_event('addon command', function(command, ...)
             if tonumber(args[1]) > #previousmentions then
                 print('Not that many mentions, type //highlight view to show them all')
             else
-                add_to_chat(4, '==Last '..args[1]..' Mentions==')
+                windower.add_to_chat(4, '==Last '..args[1]..' Mentions==')
                 for i = 1, tonumber(args[1]) do
-                    add_to_chat(4, previousmentions[i])
+                    windower.add_to_chat(4, previousmentions[i])
                 end
             end
         end
@@ -85,8 +85,12 @@ windower.register_event('addon command', function(command, ...)
         print('To view your last mentions type //highlight view <last number>')
     end
 end)
- 
-windower.register_event('load', 'login', send_command+{'wait 2; lua i highlight initialize'})
+
+windower.register_event('login','load', function()
+	if windower.ffxi.get_info()['logged_in'] == true then
+		windower.send_command('@wait 1; lua i highlight initialize')
+	end
+end)
  
 function initialize()
     send_count = 0 
@@ -110,12 +114,13 @@ function initialize()
     end
  
     player = windower.ffxi.get_player().name
+	print(player)
  
     get_party_members()
 end
  
-windower.register_event('incoming text', function(original, modified, color)
-    if not original:match('%[.*%] .* '..string.char(129, 168)..'.*') and not original:match('.* '..chat.chars['implies']..'.*') then
+windower.register_event('incoming text', function(original, modified, color, newcolor)
+    if not original:match('%[.*%] .* '..string.char(129, 168)..'.*') and not original:match('.* '..chars['implies']..'.*') then
         for names in modified:gmatch('%w+') do
             for name in pairs(members) do
                 modified = modified:igsub(members[name], modmember[name])
@@ -126,7 +131,7 @@ windower.register_event('incoming text', function(original, modified, color)
                 end
             end
             for mule, color in pairs(mulenames) do
-                modified = modified:igsub(mule, mulecolor[mule]..mule:capitalize()..chat.colorcontrols.reset)
+                modified = modified:igsub(mule, mulecolor[mule]..mule:capitalize()..chat.controls.reset)
             end
             if not settings.highlighting then
                 modified = modified:gsub('%(['..string.char(0x1e, 0x1f)..'].(%w+)'..'['..string.char(0x1e, 0x1f)..'].%)(.*)', function(name, rest) return '('..name..')'..rest end)            
@@ -136,7 +141,7 @@ windower.register_event('incoming text', function(original, modified, color)
  
     end
         --Not rolltracker and not battlemod
-        if not original:match('.* '..string.char(129, 168)..'.*') and not original:match('.* '..chat.chars['implies']..'.*') and color ~= 4 then
+        if not original:match('.* '..string.char(129, 168)..'.*') and not original:match('.* '..chars['implies']..'.*') and color ~= 4 then
             --Chat modes not empty
             if original:match('^%(.*%)') or original:match('^<.*>') or original:match('^%[%d:#%w+%]%w+(%[?%w-%]?):') then
                 --Not myself
@@ -148,14 +153,14 @@ windower.register_event('incoming text', function(original, modified, color)
             end
         end
  
-    return modified
+    return modified, newcolor
 end)
  
 windower.register_event('incoming chunk', function(id, data)
     if id == 0x0C8 then
         modmember = {}
         members = {}
-        send_command('@wait 0.1; lua i highlight get_party_members')
+        windower.send_command('@wait 0.1; lua i highlight get_party_members')
     end
 end)
  
@@ -169,7 +174,7 @@ function colconv(str, key)
     elseif strnum ~= 0 then
         print('You have an invalid color '..key)
     end
-    return chat.colorcontrols.reset
+    return chat.controls.reset
 end
  
 function get_party_members()
@@ -177,12 +182,12 @@ function get_party_members()
         for member, mob in pairs(windower.ffxi.get_party()) do
             if not mulenames[mob['name']:lower()] then
                 members[member] = mob['name']
-                modmember[member] = color[member]..mob['name']..chat.colorcontrols.reset
+                modmember[member] = color[member]..mob['name']..chat.controls.reset
             end
         end
     else 
         members['p0'] = player
-        modmember['p0'] = color['p0']..player..chat.colorcontrols.reset
+        modmember['p0'] = color['p0']..player..chat.controls.reset
     end    
 end
  
