@@ -5,10 +5,7 @@ _addon.command = 'highlight'
 
 file = require('files')
 chat = require('chat')
-<<<<<<< HEAD
 chars = require('chat.chars')
-=======
->>>>>>> upstream/4.1-dev
 require('tables')
 require('strings')
  
