@@ -1,5 +1,5 @@
 --[[
-reive v1.20130603
+reive v1.20131021
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -30,14 +30,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 require 'chat'
 require 'logger'
-require 'stringhelper'
+require 'strings'
 
 local config = require 'config'
 
-_addon = {}
-_addon.name     = 'reive'
-_addon.version  = '1.20130603'
-_addon.commands = 'reive'
+
+_addon.name    = 'reive'
+_addon.author  = 'Zohno'
+_addon.version = '1.20131221'
+_addon.command = 'reive'
 
 tb_name = 'addon:gr:reive'
 track   = false
@@ -62,8 +63,6 @@ bonuses_map = {
 }
 
 defaults = T{}
-defaults.v              = 0
-defaults.first_run      = true
 defaults.reset_on_start = false -- deprecated
 defaults.max_scores     = 5
 defaults.light          = false
@@ -138,7 +137,7 @@ defaults.colors.bonus.value.r = 147
 defaults.colors.bonus.value.g = 161
 defaults.colors.bonus.value.b = 161
 
-settings = T{}
+settings = config.load(defaults)
 
 -- plugin functions
 
@@ -164,24 +163,24 @@ end
 
 function test()
     start_tracking()
-    add_to_chat(121, 'Reive momentum score: HP recovery.')
-    add_to_chat(121, 'Momentum bonus: Ability cast recovery!')
-    add_to_chat(121, 'Reive momentum score: Damage taken.')
-    add_to_chat(121, 'Momentum bonus: Status ailment recovery!')
-    add_to_chat(121, 'Reive momentum score: Physical attack.')
-    add_to_chat(121, 'Momentum bonus: Stoneskin!')
-    add_to_chat(121, 'Reive momentum score: Attack success.')
-    add_to_chat(121, 'Momentum bonus: HP recovery!')
-    add_to_chat(121, 'Reive momentum score: HP recovery.')
-    add_to_chat(121, 'Momentum bonus: TP recovery!')
-    add_to_chat(121, 'Reive momentum score: Damage taken.')
-    add_to_chat(121, 'Momentum bonus: Increased maximum HP and MP!')
-    add_to_chat(121, 'Reive momentum score: Physical attack.')
-    add_to_chat(131, 'Player gains 408 limit points.')
-    add_to_chat(121, 'Player obtained 291 bayld!')
-    add_to_chat(121, 'Player obtained 329 bayld!')
-    add_to_chat(121, 'Player obtained 405 bayld!')
-    add_to_chat(131, 'Player gains 426 limit points.')
+    windower.add_to_chat(121, 'Reive momentum score: HP recovery.')
+    windower.add_to_chat(121, 'Momentum bonus: Ability cast recovery!')
+    windower.add_to_chat(121, 'Reive momentum score: Damage taken.')
+    windower.add_to_chat(121, 'Momentum bonus: Status ailment recovery!')
+    windower.add_to_chat(121, 'Reive momentum score: Physical attack.')
+    windower.add_to_chat(121, 'Momentum bonus: Stoneskin!')
+    windower.add_to_chat(121, 'Reive momentum score: Attack success.')
+    windower.add_to_chat(121, 'Momentum bonus: HP recovery!')
+    windower.add_to_chat(121, 'Reive momentum score: HP recovery.')
+    windower.add_to_chat(121, 'Momentum bonus: TP recovery!')
+    windower.add_to_chat(121, 'Reive momentum score: Damage taken.')
+    windower.add_to_chat(121, 'Momentum bonus: Increased maximum HP and MP!')
+    windower.add_to_chat(121, 'Reive momentum score: Physical attack.')
+    windower.add_to_chat(131, 'Player gains 408 limit points.')
+    windower.add_to_chat(121, 'Player obtained 291 bayld!')
+    windower.add_to_chat(121, 'Player obtained 329 bayld!')
+    windower.add_to_chat(121, 'Player obtained 405 bayld!')
+    windower.add_to_chat(131, 'Player gains 426 limit points.')
     stop_tracking()
     show_window()
 end
@@ -237,7 +236,7 @@ function refresh()
     local bonuses_colors = settings.colors.bonus
     local bonuses        = '';
 
-    for index, bonus in pairs(stats.bonuses:keyset():sort()) do
+    for index, bonus in ipairs(stats.bonuses:keyset():sort()) do
         if type(bonuses_map[bonus]) == 'nil' or settings.track[bonuses_map[bonus]] == true then
             local amount = stats.bonuses[bonus]
 
@@ -251,7 +250,7 @@ function refresh()
         text = text..'\n \\cs('..bonuses_colors.title.r..', '..bonuses_colors.title.g..', '..bonuses_colors.title.b..')--== MOMENTUM BONUSES ==--\\cr '..bonuses
     end
 
-    tb_set_text(tb_name, text)
+    windower.text.set_text(tb_name, text)
 end
 
 function reset_stats()
@@ -269,13 +268,13 @@ end
 
 function show_window()
     visible = true
-    tb_set_visibility(tb_name, true)
+    windower.text.set_visibility(tb_name, true)
     refresh()
 end
 
 function hide_window()
     visible = false
-    tb_set_visibility(tb_name, false)
+    windower.text.set_visibility(tb_name, false)
 end
 
 function toggle_window()
@@ -290,67 +289,36 @@ function show_report()
     log('[EXP '..(stats.exp..'/'..stats.tot_exp):color(258)..'] [Bayld '..(stats.bayld..'/'..stats.tot_bayld):color(258)..']')
 end
 
-function first_run()
-    if type(settings.v) ~= 'nil' and settings.v >= tonumber(_addon.version) and settings.first_run == false then
-        return
-    end
-
-    log('Hi '..get_player()['name']:lower()..',')
-    log('thank you for using reive v'.._addon.version)
-    log('With this update I\'ve fixed an issue that prevented the addon to start tracking info.')
-    log('I\'m sorry for any inconvenience this may have caused.')
-    log('- Zohno@Phoenix')
-
-    settings.v         = _addon.version
-    settings.first_run = false
-    settings:save('all')
-end
-
 -- windower events
 
-function event_load()
-    settings = config.load(defaults)
-
+windower.register_event('load', function()
     local background = settings.colors.background
 
-    send_command('alias reive lua c reive')
-    tb_create(tb_name)
-    tb_set_location(tb_name, settings.position.x, settings.position.y)
-    tb_set_bg_color(tb_name, background.a, background.r, background.g, background.b)
-    tb_set_color(tb_name, settings.font.a, 147, 161, 161)
-    tb_set_font(tb_name, settings.font.family, settings.font.size)
-    tb_set_bold(tb_name, settings.font.bold)
-    tb_set_italic(tb_name, settings.font.italic)
-    tb_set_text(tb_name, '')
-    tb_set_bg_visibility(tb_name, true)
+    windower.text.create(tb_name)
+    windower.text.set_location(tb_name, settings.position.x, settings.position.y)
+    windower.text.set_bg_color(tb_name, background.a, background.r, background.g, background.b)
+    windower.text.set_color(tb_name, settings.font.a, 147, 161, 161)
+    windower.text.set_font(tb_name, settings.font.family)
+    windower.text.set_font_size(tb_name, settings.font.size)
+    windower.text.set_bold(tb_name, settings.font.bold)
+    windower.text.set_italic(tb_name, settings.font.italic)
+    windower.text.set_text(tb_name, '')
+    windower.text.set_bg_visibility(tb_name, true)
 
-    if T(get_player()['buffs']):contains(511) then
+    local player = windower.ffxi.get_player()
+    if player and T(player['buffs']):contains(511) then
         start_tracking()
     end
-end
+end)
 
-function event_unload()
-    send_command('unalias reive')
-    tb_delete(tb_name)
-end
+windower.register_event('unload', function()
+    windower.text.delete(tb_name)
+end)
 
-function event_login()
-    first_run()
-end
+windower.register_event('gain buff', start_tracking:cond(function(id) return id == 511 end))
+windower.register_event('lose buff', stop_tracking:cond(function(id) return id == 511 end))
 
-function event_gain_status(id, name)
-    if id == 511 then
-        start_tracking()
-    end
-end
-
-function event_lose_status(id, name)
-    if id == 511 then
-        stop_tracking()
-    end
-end
-
-function event_incoming_text(original, modified, mode)
+windower.register_event('incoming text', function(original, modified, mode)
     local match
 
     if mode == 121 then
@@ -407,13 +375,13 @@ function event_incoming_text(original, modified, mode)
     end
 
     return modified, mode
-end
+end)
 
-function event_addon_command(...)
+windower.register_event('addon command', function(...)
     local args = T({...})
 
     if args[1] == nil then
-        send_command('reive help')
+        windower.send_command('reive help')
         return
     end
 
@@ -598,7 +566,7 @@ function event_addon_command(...)
                 settings.position.x = x
                 settings.position.y = y
 
-                tb_set_location(tb_name, x, y)
+                windower.text.set_location(tb_name, x, y)
                 settings:save('all')
                 notice('The window\'s position has been set.')
             end
@@ -690,10 +658,10 @@ function event_addon_command(...)
                 settings.font.italic = italic
                 settings.font.a      = a
 
-                tb_set_color(tb_name, a, 147, 161, 161)
-                tb_set_font(tb_name, family, size)
-                tb_set_bold(tb_name, bold)
-                tb_set_italic(tb_name, italic)
+                windower.text.set_color(tb_name, a, 147, 161, 161)
+                windower.text.set_font(tb_name, family, size)
+                windower.text.set_bold(tb_name, bold)
+                windower.text.set_italic(tb_name, italic)
                 settings:save('all')
                 log('The font\'s style has been set.')
             end
@@ -903,7 +871,7 @@ function event_addon_command(...)
                             settings.colors[indexes[1]].a = a
                         end
 
-                        tb_set_bg_color(
+                        windower.text.set_bg_color(
                             tb_name,
                             settings.colors[indexes[1]].a,
                             settings.colors[indexes[1]].r,
@@ -918,7 +886,7 @@ function event_addon_command(...)
                 log('The objects\' color has been set.')
             end
         else
-            send_command('reive help')
+            windower.send_command('reive help')
         end
     end
-end
+end)

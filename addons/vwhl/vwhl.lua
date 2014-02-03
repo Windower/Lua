@@ -1,5 +1,5 @@
 --[[
-vwhl - voidwatch highlighter v1.20130529
+vwhl - voidwatch highlighter v1.20131102
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -30,55 +30,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 require 'chat'
 
-_addon = {}
-_addon.name     = 'vwhl'
-_addon.version  = '1.20130529'
-_addon.commands = 'vwhl'
 
-function test()
-    add_to_chat(148, 'The fiend appears extremely vulnerable to club weapon skills!')
-    add_to_chat(148, 'The fiend appears highly vulnerable to light elemental blood pacts!')
-    add_to_chat(148, 'The fiend appears highly vulnerable to staff weapon skills!')
-    add_to_chat(148, 'The fiend appears vulnerable to club weapon skills!')
-    add_to_chat(148, 'The fiend appears vulnerable to corsair abilities!')
-    add_to_chat(148, 'The fiend appears vulnerable to water elemental blood pacts!')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-    add_to_chat(0, 'RANDOM FILL TO TEST HOLD')
-end
+_addon.name    = 'vwhl'
+_addon.author  = 'Zohno'
+_addon.version = '1.20131102'
+_addon.command = 'vwhl'
 
-function event_load()
-    send_command('alias vwhl lua c vwhl')
-end
-
-function event_unload()
-    send_command('unalias vwhl')
-end
-
-function event_addon_command(cmd)
-    if cmd == 'test' then
-        test()
-    end
-end
-
-function event_incoming_text(original, modified, mode)
+windower.register_event('incoming text', function(original, modified, mode)
     if mode ~= 148 then
         return modified, mode
     end
@@ -148,7 +106,7 @@ function event_incoming_text(original, modified, mode)
             :gsub('special attacks', ('special attacks'):color(258))
             :gsub('blood pacts', ('blood pacts'):color(258))
 
-        add_to_chat(12, '>>> '..original)
+        windower.add_to_chat(12, '>>> '..original)
     elseif original:match('L\'un des points faibles') then
         if original:match('points faibles critiques') then
             original = original:gsub('points faibles critiques', ('points faibles critiques (5)'):color(258))
@@ -223,7 +181,7 @@ function event_incoming_text(original, modified, mode)
             :gsub('attaque spéciale', ('attaque spéciale'):color(258))
             :gsub('pacte de sang', ('pacte de sang'):color(258))
 
-        add_to_chat(12, '>>> '..original)
+        windower.add_to_chat(12, '>>> '..original)
     elseif original:match('Das Monster ist nun') then
         if original:match('ganz besonders anfällig') then
             original = original:gsub('ganz besonders anfällig', ('ganz besonders anfällig (5)'):color(258))
@@ -285,8 +243,8 @@ function event_incoming_text(original, modified, mode)
             :gsub('Spezialattacken', ('Spezialattacken'):color(258))
             :gsub('Blutsbünde', ('Blutsbünde'):color(258))
 
-        add_to_chat(12, '>>> '..original)
+        windower.add_to_chat(12, '>>> '..original)
     end
 
     return modified, mode
-end
+end)

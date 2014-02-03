@@ -25,161 +25,153 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-file = require 'filehelper'
-require 'tablehelper'
+file = require 'files'
+require 'tables'
 xml = require 'xml'
 
-_addon = {}
-_addon.version = '0.5'
-_addon.name = 'Plugin Manager'
-_addon.commands = {'pm','plugin_manager'}
 
-function event_addon_command(...)
-	local cmd = table.concat({...},' ')
-	if cmd == 'load' then
-		load_plugins()
-		
+_addon.version = '0.9'
+_addon.author = 'Byrth'
+_addon.name = 'plugin_manager'
+_addon.commands = {}
+
+windower.register_event('addon command',function(...)
+	local cmd = {...}
+	if cmd[1] == 'load' then
+		load_plugins(make_name(cmd[2]))
+	elseif cmd[1] == 'unload' then
+		unload_plugins(make_name(cmd[2]))
 	end
-end
+end)
 
-function event_load()
-	loader_array = {}
-	general_array = {}
+windower.register_event('load',function()
+	loader_array = {} -- Expansion of the settings file
+	general_array = {} -- List of every addon/plugin that gets loaded. true = loaded sometimes. false = loaded all the time. nil = blocked or not used.
 	general_array['addon'] = {}
 	general_array['plugin'] = {}
-	common_array = {}
-	common_array['addon'] = {}
-	common_array['plugin'] = {}
+	load_command = {plugin='load ',addon='lua l '}
+	unload_command = {plugin='unload ',addon='lua u '}
 	load_settings()
-	if get_player().name ~= '' then
-		unload_plugins()
-		send_command('@wait 5;lua c plugin_manager load')
+	
+	-- Iterate over the list of plugins/addons and determine which ones are loaded by all profiles
+	-- Load those plugins once and set them to "false" in the general_array
+	local firstrun,length = '@',0
+	for i,v in pairs(loader_array) do
+		length = length + 1
 	end
-end
+	for q,r in pairs(general_array) do
+		for n,m in pairs(r) do
+			local counter = 0
+			if m == true then
+				for i,v in pairs(loader_array) do
+					if v[q]:contains(n) then
+						counter = counter + 1
+					end
+				end
+				if counter == length then
+					firstrun = firstrun..load_command[q]..n..';wait 0.1;'
+					general_array[q][n] = false
+				end
+			end
+		end
+	end
+	
+	windower.send_command(firstrun)
+
+	if windower.ffxi.get_player() then
+		windower.send_command('@wait 3;lua c plugin_manager unload')
+		windower.send_command('@wait 6;lua c plugin_manager load')
+	end
+end)
 
 function load_settings()
-	--local settingsFile = file.new('data/settings.xml',true)
-	local length = 0
 	if not file.exists('data/settings.xml') then
-		write('plugin_manager is missing its settings file.')
+		print('plugin_manager is missing its settings file.')
 	else
+		-- Iterate over the settings file and simply it, as well as creating a list of all plugins
 		local settingtab = xml.read('data/settings.xml'):undomify()
-		for child in settingtab:it() do
+		for child in settingtab.children:it() do
 		-- Global/Names layer
-			length = length + 1
 			loader_array[child.name:lower()] = {}
 			loader_array[child.name:lower()]['addon'] = T{}
 			loader_array[child.name:lower()]['plugin'] = T{}
-			for child2 in child:it() do
-				if child2.name == 'addon' or child2.name == 'plugin' then
+			for child2 in child.children:it() do
+				if child2.name:lower() == 'addon' or child2.name:lower() == 'plugin' then
 				-- Addon/Plugin layer <name>children[1]</name>
-					loader_array[child.name:lower()][child2.name][#loader_array[child.name:lower()][child2.name]+1] = child2.children[1]:lower()
-					if not general_array[child2.name][child2.children[1]:lower()] then
-						general_array[child2.name][child2.children[1]:lower()] = true
-					end
+					loader_array[child.name:lower()][child2.name:lower()][#loader_array[child.name:lower()][child2.name:lower()]+1] = child2.children[1]:lower()
+					general_array[child2.name:lower()][child2.children[1]:lower()] = true
 				end
 			end
 		end
 		
+		-- Iterate over the blacklist and set blocked plugins to nil.
 		local blacklisttab = xml.read('../../updates/manifest.xml'):undomify()
 		for child in blacklisttab:it() do -- plugins
 			for child2 in child:it() do -- plugin
-				local blockload,name
+				local blockload,name = false
 				for child3 in child2:it() do --name, autoload, description, etc.
 					if child3.name == 'autoload' then
 						if child3.children[1] == 'false' then
 							blockload = true
 						end
 					end
-					if child3.name == 'name' then
-						name = child3.children[1]
+					if child3.name:lower() == 'name' then
+						name = child3.children[1]:lower()
+					end
+					if blockload and name then
+						general_array.plugin[name:lower()] = nil
 					end
 				end
-				if blockload then
-					general_array['plugin'][name:lower()] = false
-				end
 			end
 		end
-		
-		local firstrun = ''
-		for n,m in pairs(general_array['plugin']) do
-			local counter = 0
-			for i,v in pairs(loader_array) do
-				if loader_array[i]['plugin']:contains(n) then
-					counter = counter + 1
-				end
-			end
-			if counter == length then
-				if general_array['plugin'][n] then
-					firstrun = firstrun..'load '..n..';wait 0.1;'
-					general_array['plugin'][n] = false
-				end
-			end
-		end
-		for n,m in pairs(general_array['addon']) do
-			local counter = 0
-			for i,v in pairs(loader_array) do
-				if loader_array[i]['addon']:contains(n) then
-					counter = counter + 1
-				end
-			end
-			if counter == length then
-				if general_array['addon'][n] then
-					firstrun = firstrun..'lua l '..n..';wait 0.1;'
-					general_array['addon'][n] = false
-				end
-			end
-		end
-		send_command(firstrun)
 	end
 end
 
-function load_plugins()
-	local working_array,commandstr = {},'wait 5;'
-	if loader_array[get_player().name:lower()] then
-		working_array = loader_array[get_player().name:lower()]
-	else
-		working_array = loader_array['global']
+function load_plugins(name)
+	local working_array,commandstr = {},'@'--'wait 5;'
+	
+	for q,r in pairs(general_array) do
+		for i,v in pairs(loader_array[name][q]) do
+			if general_array[q][v] then
+				commandstr = commandstr..load_command[q]..v..';wait 0.1;'
+			end
+		end
+	end
+--	for i,v in pairs(loader_array[name].addon) do
+--		commandstr = commandstr..load_command['addon']..v..';wait 0.1;'
+--	end
+	windower.send_command(commandstr)
+end
+
+function unload_plugins(name)
+	local commandstr = ''
+	for i,v in pairs(loader_array[name]) do
+		for n,m in pairs(v) do
+			if general_array[i][m] then
+				commandstr = commandstr..unload_command[i]..m..';wait 0.1;'
+			end
+		end
+	end
+	windower.send_command(commandstr)
+end
+
+windower.register_event('login',function(name)
+	windower.send_command('@wait 3;lua c plugin_manager load '..name)
+end)
+
+windower.register_event('logout',function(name)
+	windower.send_command('@lua c plugin_manager unload '..name)
+end)
+
+function make_name(name)
+	if name then
+		name = name:lower()
+	elseif windower.ffxi.get_player() then
+		name = windower.ffxi.get_player().name:lower()
 	end
 	
-	for i,v in pairs(working_array['plugin']) do
-		if general_array['plugin'][v] then
-			commandstr = commandstr..'load '..v..';wait 0.1;'
-		end
+	if name == nil or name == '' or not loader_array[name] then
+		name = 'global'
 	end
-	for i,v in pairs(working_array['addon']) do
-		commandstr = commandstr..'lua l '..v..';wait 0.1;'
-	end
-	send_command(commandstr)
-end
-
-function unload_plugins()
-	local commandstr = ''
-	for i,v in pairs(general_array['plugin']) do
-		local sendit = false
-		for n,m in pairs(loader_array) do
-			if m['plugin']:contains(i) and v then
-				sendit = true
-			end
-		end
-		if sendit then commandstr = commandstr..'unload '..i..';wait 0.1;' end
-	end
-	for i,v in pairs(general_array['addon']) do
-		local sendit = false
-		for n,m in pairs(loader_array) do
-			if m['addon']:contains(i) and v then
-				sendit = true
-			end
-		end
-		if sendit then commandstr = commandstr..'lua u '..i..';wait 0.1;' end
-	end
-	send_command(commandstr)
-end
-
-function event_login(name)
-	load_plugins()
-end
-
-function event_logout(name)
-	unload_plugins()
+	return name or 'global'
 end

@@ -51,95 +51,88 @@
 -- 
 -- To Do: add function to turn the console_echo's on/off. 
 
-function event_load()
-	write("Loaded Obiaway.")
-	send_command("alias Obiaway lua c Obiaway")
-end
+_addon.author = "ReaperX"
+_addon.version = "1.0"
+_addon.command = "obiaway"
 
-function event_unload()
-	write("Unloaded Obiaway.")
-	send_command("unalias Obiaway")
-end
+require('sets')
+config = require('config')
+res = require('res')
 
-function event_addon_command(...)
-	remove_unneeded_obis()
-end
+defaults = {}
+defaults.location = 'sack'
 
-function event_gain_status(id, name)
-end
+settings = config.load(defaults)
 
-function event_lose_status(id, name)
-	if id>=178 and id<=185 then
-		remove_unneeded_obis()
-	end
-end
+windower.register_event('addon command',function (...)
+    if args[1] == 'location' then
+        if S{'sack','case','satchel'}:contains(args[2]:lower()) then
+            settings.location = args[2]
+        else
+            print('Location can only be sack, satchel or case.')
+        end
+    else
+        remove_unneeded_obis()
+    end
+end)
 
-function event_day_change(day)
-	remove_unneeded_obis()
-end
+windower.register_event('lose buff', remove_unneeded_obis:cond(function(id) return id >= 178 and id <= 185 end))
 
-function event_weather_change(id, name)
-	remove_unneeded_obis()
-end
+windower.register_event('day change', 'weather change', remove_unneeded_obis)
 
 function get_obis_in_inventory()
-	obis = {}
-	items = get_items()
-	inv = items.inventory
-	number = items.max_inventory - 1 -- items.max_inventory returns inventory size +1
-	for i=1,number do 
-	    index = tostring(i)
-		id = inv[index].id
-		if ( id>=15435 and id<=15442) then
-			obis["Fire"] = obis["Fire"] or (id == 15435)
-			obis["Ice"] = obis["Ice"] or (id == 15436)
-			obis["Wind"] = obis["Wind"] or (id == 15437)
-			obis["Earth"] = obis["Earth"] or (id == 15438)
-			obis["Thunder"] = obis["Thunder"] or (id == 15439)
-			obis["Water"] = obis["Water"] or (id == 15440)
-			obis["Light"] = obis["Light"] or (id == 15441)
-			obis["Dark"] = obis["Dark"] or (id == 15442)
-		end
-	end
-	return obis
+    obis = {}
+    items = windower.ffxi.get_items()
+    inv = items.inventory
+    number = items.max_inventory - 1 -- items.max_inventory returns inventory size +1
+    for i=1,number do 
+        index = tostring(i)
+        id = inv[index].id
+        if ( id>=15435 and id<=15442) then
+            obis["Fire"] = obis["Fire"] or (id == 15435)
+            obis["Ice"] = obis["Ice"] or (id == 15436)
+            obis["Wind"] = obis["Wind"] or (id == 15437)
+            obis["Earth"] = obis["Earth"] or (id == 15438)
+            obis["Thunder"] = obis["Thunder"] or (id == 15439)
+            obis["Water"] = obis["Water"] or (id == 15440)
+            obis["Light"] = obis["Light"] or (id == 15441)
+            obis["Dark"] = obis["Dark"] or (id == 15442)
+        end
+    end
+    return obis
 end
 
 function remove_unneeded_obis()
-	elements = get_all_elements()
-	obis = get_obis_in_inventory()
-	if obis["Fire"] and elements["Fire"]==0 then
-		send_command("input /put \"Karin Obi\" Sack")
-		send_command("console_echo Moving Karin Obi to Sack")
-	end
-	if obis["Earth"] and elements["Earth"]==0 then
-		send_command("input /put \"Dorin Obi\" Sack")
-		send_command("console_echo Moving Dorin Obi to Sack")
-	end
-	if obis["Water"] and elements["Water"]==0 then
-		send_command("input /put \"Suirin Obi\" Sack")
-		send_command("console_echo Moving Suirin Obi to Sack")
-	end
-	if obis["Wind"] and elements["Wind"]==0 then
-		send_command("input /put \"Furin Obi\" Sack")
-		send_command("console_echo Moving Furin Obi to Sack")
-	end
-	if obis["Ice"] and elements["Ice"]==0 then
-		send_command("input /put \"Hyorin Obi\" Sack")
-		send_command("console_echo Moving Hyorin Obi to Sack")
-	end
-	if obis["Thunder"] and elements["Thunder"]==0 then
-		send_command("input /put \"Rairin Obi\" Sack")
-		send_command("console_echo Moving Rairin Obi to Sack")
-	end
-	if obis["Light"] and elements["Light"]==0 then	
-		send_command("input /put \"Korin Obi\" Sack")
-		send_command("console_echo Moving Korin Obi to Sack")
-	end
-	if obis["Dark"] and elements["Dark"]==0 then	
-		send_command("input /put \"Anrin Obi\" Sack")
-		send_command("console_echo Moving Anrin Obi to Sack")
-	end
-end;
+    elements = get_all_elements()
+    obis = get_obis_in_inventory()
+    local str = ''
+    if obis["Fire"] and elements["Fire"]==0 then
+        str = str.."input /put \"Karin Obi\" "..settings.location..";wait .5;"
+    end
+    if obis["Earth"] and elements["Earth"]==0 then
+        str = str.."input /put \"Dorin Obi\" "..settings.location..";wait .5;"
+    end
+    if obis["Water"] and elements["Water"]==0 then
+        str = str.."input /put \"Suirin Obi\" "..settings.location..";wait .5;"
+    end
+    if obis["Wind"] and elements["Wind"]==0 then
+        str = str.."input /put \"Furin Obi\" "..settings.location..";wait .5;"
+    end
+    if obis["Ice"] and elements["Ice"]==0 then
+        str = str.."input /put \"Hyorin Obi\" "..settings.location..";wait .5;"
+    end
+    if obis["Thunder"] and elements["Thunder"]==0 then
+        str = str.."input /put \"Rairin Obi\" "..settings.location..";wait .5;"
+    end
+    if obis["Light"] and elements["Light"]==0 then    
+        str = str.."input /put \"Korin Obi\" "..settings.location..";wait .5;"
+    end
+    if obis["Dark"] and elements["Dark"]==0 then    
+        str = str.."input /put \"Anrin Obi\" "..settings.location
+    end
+    windower.send_command(str)
+    print('Putting unneeded obis away in '..settings.location..'.')
+end
 
 function inTable(tbl, item)
     for key, value in pairs(tbl) do
@@ -150,43 +143,41 @@ end
 
 function get_all_elements()
 
-	elements = {}		   
-	elements["Fire"] = 0
-	elements["Earth"] = 0
-	elements["Water"] = 0
-	elements["Wind"] = 0
-	elements["Ice"] = 0
-	elements["Thunder"] = 0
-	elements["Light"] = 0
-	elements["Dark"] = 0
-	elements["None"] = 0
+    elements = {}           
+    elements["Fire"] = 0
+    elements["Earth"] = 0
+    elements["Water"] = 0
+    elements["Wind"] = 0
+    elements["Ice"] = 0
+    elements["Thunder"] = 0
+    elements["Light"] = 0
+    elements["Dark"] = 0
+    elements["None"] = 0
 
-	info = get_ffxi_info()
+    info = windower.ffxi.get_info()
 
-	day_element = info.day_element 
-	elements[day_element] = elements[day_element] + 1
-	weather_element = info.weather_element
-	elements[weather_element] = elements[weather_element] + 1
-	buffs = get_player().buffs
+    local day_element = res.elements[res.days[info.day].element].english
+    elements[day_element] = elements[day_element] + 1
+    local weather_element = res.elements[res.weathers[info.weather].element].english
+    elements[weather_element] = elements[weather_element] + 1
+    buffs = windower.ffxi.get_player().buffs
 
-	if inTable(buffs, 178) then
-	  elements["Fire"] = elements["Fire"] +1
-	elseif inTable(buffs, 183) then
-	  elements["Water"] = elements["Water"] +1
-	elseif inTable(buffs, 181) then
-	  elements["Earth"] = elements["Earth"] +1
-	elseif inTable(buffs, 180) then
-	  elements["Wind"] = elements["Wind"] +1
-	elseif inTable(buffs, 179) then
-	  elements["Ice"] = elements["Ice"] +1
-	elseif inTable(buffs, 182) then
-	  elements["Thunder"] = elements["Thunder"] +1
-	elseif inTable(buffs, 184) then
-	  elements["Light"] = elements["Light"] +1
-	elseif inTable(buffs, 185) then
-	  elements["Dark"] = elements["Dark"] +1
-	end
-	return elements
+    if inTable(buffs, 178) then
+      elements["Fire"] = elements["Fire"] +1
+    elseif inTable(buffs, 183) then
+      elements["Water"] = elements["Water"] +1
+    elseif inTable(buffs, 181) then
+      elements["Earth"] = elements["Earth"] +1
+    elseif inTable(buffs, 180) then
+      elements["Wind"] = elements["Wind"] +1
+    elseif inTable(buffs, 179) then
+      elements["Ice"] = elements["Ice"] +1
+    elseif inTable(buffs, 182) then
+      elements["Thunder"] = elements["Thunder"] +1
+    elseif inTable(buffs, 184) then
+      elements["Light"] = elements["Light"] +1
+    elseif inTable(buffs, 185) then
+      elements["Dark"] = elements["Dark"] +1
+    end
+    return elements
 end
-
-

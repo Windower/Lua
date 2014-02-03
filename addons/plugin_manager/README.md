@@ -1,8 +1,8 @@
 Author: Byrth
 
-Version: 0.5
+Version: 0.8
 
-Date: 17/5/13
+Date: 15/11/13
 
 Plugin Manager
 

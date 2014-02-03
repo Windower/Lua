@@ -1,5 +1,5 @@
-**Author:** Giuliano Riccio  
-**Version:** v 1.20130603
+**Author:** Giuliano Riccio
+**Version:** v 1.20131021
 
 # Reive #
 This addon tracks exp, bayld, momentum scores and bonuses during a reive.
@@ -106,6 +106,9 @@ reive color [[-h]|[-o <objects>] [-d] [-r <red>] [-g <green>] [-b <blue>] [-a <a
 ----
 
 ## Changelog ##
+
+### v1.20130802 ###
+* **fix**: 4.1 compatibility fix.
 
 ### v1.20130603 ###
 * **fix**: Fixed an issue that prevented the addon to start tracking info.

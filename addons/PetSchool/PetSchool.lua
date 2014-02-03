@@ -24,22 +24,26 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-function event_load()
+
+_addon.name = 'PetSchool'
+_addon.commands = {'petschool','ps'}
+_addon.author = 'Banggugyangu'
+_addon.version = '1.0.0'
+
+windower.register_event('load',function ()
 	version = '1.0.0'
 	PetNuke = ' '
 	PetHeal = ' '
 	TP_Set = ' '
 	Idle_Set = ' '
-	send_command('alias ps lua c petschool')
-	send_command('alias petschool lua c petschool')
 	options_load()
-end
+end)
 
 --Function Designer:  Byrth
 function options_load()
-	local f = io.open(lua_base_path..'data/settings.txt', "r")
+	local f = io.open(windower.addon_path..'data/settings.txt', "r")
 	if f == nil then
-		local g = io.open(lua_base_path..'data/settings.txt', "w")
+		local g = io.open(windower.addon_path..'data/settings.txt', "w")
 		g:write('Release Date: 2:16 PM, 4-22-13\46\n')
 		g:write('Author Comment: This document is whitespace sensitive, which means that you need the same number of spaces between things as exist in this initial settings file\46\n')
 		g:write('Author Comment: It looks at the first two words separated by spaces and then takes anything as the value in question if the first two words are relevant\46\n')
@@ -50,12 +54,12 @@ function options_load()
 		g:write('PetNuke Set: PetNuke\nPetHeal Set: PetHeal\nTP Set: TP\nIdle Set: Movement\n')
 		g:close()
 		
-		write('Default settings file created')
-		add_to_chat(17,'PetSchool created a settings file and loaded!')
-		add_to_chat(17,'Please Modify the Settings file to fit your spellcast .XML file')
+		print('Default settings file created')
+		windower.add_to_chat(17,'PetSchool created a settings file and loaded!')
+		windower.add_to_chat(17,'Please Modify the Settings file to fit your spellcast .XML file')
 	else
 		f:close()
-		for curline in io.lines(lua_base_path..'data/settings.txt') do
+		for curline in io.lines(windower.addon_path..'data/settings.txt') do
 			local splat = split(curline,' ')
 			local cmd = ''
 			if splat[2] ~=nil then
@@ -71,38 +75,42 @@ function options_load()
 				Idle_Set = splat[3]
 			end
 		end
-		add_to_chat(17,'PetSchool read from a settings file and loaded!')
+		windower.add_to_chat(17,'PetSchool read from a settings file and loaded!')
 	end
 end
 
-function event_action(act)
-	local player = get_player()
-	local pet = get_mob_by_index(get_mob_by_index(get_player()['index'])['pet_index'])['id']
+windower.register_event('action',function (act)
+	local pet = windower.ffxi.get_mob_by_target('pet')
+    if not pet then
+        return
+    end
+
 	local actor = act.actor_id
 	local category = act.category
 	local targets = act.targets
-	local actionTarget = get_mob_by_id(targets[1]['id'])
 	
 	if actor == pet then
 		if category == 8 then
+            local actionTarget = windower.ffxi.get_mob_by_id(targets[1].id)
 			if actionTarget.is_npc == true then
-				send_command('sc set ' .. PetNuke)
-				add_to_chat(17, '                       Pet Spellcast Started:  Nuking')
+				windower.send_command('sc set ' .. PetNuke)
+				windower.add_to_chat(17, '                       Pet Spellcast Started:  Nuking')
 			elseif actionTarget.is_npc == false then
-				send_command('sc set ' .. PetHeal)
-				add_to_chat(17, '                       Pet Spellcast Started:  Curing/Buffing')
+				windower.send_command('sc set ' .. PetHeal)
+				windower.add_to_chat(17, '                       Pet Spellcast Started:  Curing/Buffing')
 			end
 		elseif category == 4 then
+            local player = windower.ffxi.get_player()
 			if (player.status:lower() == 'engaged') then
-				send_command('sc set ' .. TP_Set)
-				add_to_chat(17, '                       Pet Spellcast Finished')
+				windower.send_command('sc set ' .. TP_Set)
+				windower.add_to_chat(17, '                       Pet Spellcast Finished')
 			elseif (player.status:lower() == 'idle') then
-				send_command('sc set ' .. Idle_Set)
-				add_to_chat(17, '                       Pet Spellcast Finished')
+				windower.send_command('sc set ' .. Idle_Set)
+				windower.add_to_chat(17, '                       Pet Spellcast Finished')
 			end
 		end
 	end
-end
+end)
 
 --Function Author:  Byrth
 function split(msg, match)
@@ -116,7 +124,7 @@ function split(msg, match)
 			if nextanch~=length then
 				u = nextanch+match:len()
 			else
-				u = lengthlua 
+				u = lengthlua
 			end
 		else
 			splitarr[#splitarr+1] = msg:sub(u,length)
@@ -127,15 +135,15 @@ function split(msg, match)
 end
 
 --Function Designer:  Byrth
-function event_addon_command(...)
+windower.register_event('addon command',function (...)
     local term = table.concat({...}, ' ')
     local splitarr = split(term,' ')
 	if splitarr[1]:lower() == 'reload' then
 		options_load()
 	elseif splitarr[1]:lower() == 'help' then
-		add_to_chat(17, 'PetSchool  v'..version..'commands:')
-		add_to_chat(17, '//ps [options]')
-		add_to_chat(17, '    reload  - Reloads settings')
-		add_to_chat(17, '    help   - Displays this help text')
+		windower.add_to_chat(17, 'PetSchool  v'..version..'commands:')
+		windower.add_to_chat(17, '//ps [options]')
+		windower.add_to_chat(17, '    reload  - Reloads settings')
+		windower.add_to_chat(17, '    help   - Displays this help text')
 	end
-end
+end)

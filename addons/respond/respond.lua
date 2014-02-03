@@ -24,34 +24,29 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-_addon = {}
+
 _addon.name = 'Respond'
 _addon.version = '1.1'
-_addon.commands = {'respond'}
+_addon.command = 'respond'
 
-function event_addon_command(...)
-end
+current_r = ''
 
-function event_load()
-	current_r = ''
-end
-
-function event_chat_message(isGM, mode, player, message)
+windower.register_event('chat message',function (isGM, mode, player, message)
 	if mode==3 and current_r~=player then
 		current_r=player
-		send_command('@alias r input /tell '..current_r)
+		windower.send_command('@alias r input /tell '..current_r)
 	end
-end
+end)
 
-function event_incoming_text(original, modified, color)
+windower.register_event('incoming text',function (original, modified, color)
 	if original:sub(2,8) == 'PrivMsg' then
 		a,b = string.find(original,'>>')
 		if a~=10 then
 			local name = original:sub(10,a-1)
 			if current_r ~= name then
 				current_r = name
-				send_command('@alias r input /pm '..current_r)
+				windower.send_command('@alias r input /pm '..current_r)
 			end
 		end
 	end
-end
+end)

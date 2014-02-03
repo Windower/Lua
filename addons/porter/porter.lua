@@ -31,16 +31,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 require 'chat'
 require 'logger'
 require 'sets'
-require 'stringhelper'
+require 'strings'
 
 slips = require 'slips'
 
-_addon = {}
+
 _addon.name     = 'porter'
 _addon.version  = '1.20130529'
-_addon.commands = 'porter'
+_addon.command = 'porter'
+_addon.author = 'Zohno'
 
-item_names = L{}
+item_names = T{}
 resources  = {
     ['armor']   = '../../plugins/resources/items_armor.xml',
     ['weapons'] = '../../plugins/resources/items_weapons.xml',
@@ -56,7 +57,7 @@ function load_resources()
     slips_items_ids = S(slips_items_ids)
 
     for kind, resource_path in pairs(resources) do
-        resource = io.open(lua_base_path..resource_path, 'r')
+        resource = io.open(windower.addon_path..resource_path, 'r')
 
         if resource ~= nil then
             while true do
@@ -133,7 +134,7 @@ function show_slip(slip_number, slip_page, owned_only)
                 local is_contained = player_slip_items:contains(item_id)
 
                 if owned_only == false or owned_only == true and is_contained == true then
-                    add_to_chat(
+                    windower.add_to_chat(
                         55,
                         ('slip '..printable_slip_number..'/page '..tostring(slip_page and slip_page or math.ceil(item_position / 16)):lpad('0', 2)..':'):color(259)..' '..
                         item_names[item_id]:color(is_contained and 258 or 261)
@@ -144,15 +145,7 @@ function show_slip(slip_number, slip_page, owned_only)
     end
 end
 
-function event_load()
-    send_command('alias porter lua c porter')
-end
-
-function event_unload()
-    send_command('unalias porter')
-end
-
-function event_addon_command(slip_number, slip_page, owned_only)
+windower.register_event('addon command',function (slip_number, slip_page, owned_only)
     if tonumber(slip_number) == nil then
         slip_page = nil
 
@@ -188,4 +181,4 @@ function event_addon_command(slip_number, slip_page, owned_only)
     end
 
     show_slip(slip_number, slip_page, owned_only)
-end
+end)

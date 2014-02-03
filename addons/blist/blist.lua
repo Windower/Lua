@@ -26,13 +26,13 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-_addon = {}
-_addon.name = 'Blist'
-_addon.version = '1.2'
-_addon.author = 'Ragnarok.Ikonic'
 
-require 'tablehelper'
-require 'stringhelper'
+_addon.name = 'Blist'
+_addon.author = 'Ragnarok.Ikonic'
+_addon.version = '1.2.0.1'
+
+require 'tables'
+require 'strings'
 require 'colors'
 local config = require 'config'
 require 'logger'
@@ -52,60 +52,60 @@ defaults.mutedcolor = 57
 settings = T{}
 members = T{}
 
-function event_load()
+windower.register_event('load',function()
 	settings = config.load(defaults)
 	members = config.load("data/members.xml",members)
-	send_command('alias blist lua command blist')
-	send_command('alias bl lua command blist')
-	add_to_chat(55, "Loading ".._addon.name.." v".._addon.version.." (written by ".._addon.author..")")
-	add_to_chat(160,'  Type '..string.color('//blist help',204,160)..' for a list of possible commands.')
-end
+	windower.send_command('alias blist lua command blist')
+	windower.send_command('alias bl lua command blist')
+	windower.add_to_chat(55, "Loading ".._addon.name.." v".._addon.version.." (written by ".._addon.author..")")
+	windower.add_to_chat(160,'  Type '..string.color('//blist help',204,160)..' for a list of possible commands.')
+end)
 
-function event_unload()
-	send_command('unalias blist')
-	send_command('unalias bl')
-	add_to_chat(55, "Unloading ".._addon.name.." v".._addon.version..".")
-end
+windower.register_event('unload',function()
+	windower.send_command('unalias blist')
+	windower.send_command('unalias bl')
+	windower.add_to_chat(55, "Unloading ".._addon.name.." v".._addon.version..".")
+end)
 
-function event_login(name)
+windower.register_event('login',function (name)
 	settings = config.load(defaults)
-	add_to_chat(160,"Loading "..string.color(_addon.name,55,160).." settings for "..get_player().name..".")
-end
+	windower.add_to_chat(160,"Loading "..string.color(_addon.name,55,160).." settings for "..windower.ffxi.get_player().name..".")
+end)
 
-function event_addon_command(...)
+function addon_command(...)
 	local args = {...}
 	local dummysettings = table.copy(settings)
 	if args[1] ~= nil then
 		comm = args[1]:lower()
         if comm == 'help' then
-			add_to_chat(55,_addon.name.." v".._addon.version..' possible commands:')
-			add_to_chat(160,'  '..string.color('//Blist',204,160)..' and '..string.color('//bl',204,160)..' are both valid commands.')
-			add_to_chat(160,'  '..string.color('//bl help',204,160)..' : Lists this menu.')
-			add_to_chat(160,'  '..string.color('//bl status',204,160)..' : Shows current configuration.')
-			add_to_chat(160,'  '..string.color('//bl list',204,160)..' : Displays blacklist.')
-			add_to_chat(160,'  '..string.color('//bl useblist|linkshell|party|tell|emote|say|shout|bazaar|examine',204,160)..' : Toggles using '.._addon.name..' for said chat mode.')
-			add_to_chat(160,'  '..string.color('//bl mutedcolor #',204,160)..' : Sets color for muted communication.  Valid values 1-255.')
-			add_to_chat(160,'  '..string.color('//bl add|update name # hidetype reason',204,160)..' : Adds to or updates a user on your blist.')
-			add_to_chat(160,'  '..string.color('  name',204,160)..' = name of person you want to blist')
-			add_to_chat(160,'  '..string.color('  #',204,160)..' = number of days to blist said person; 0 = forever')
-			add_to_chat(160,'  '..string.color('  hidetype',204,160)..' = how blacklisted you want said person to be; valid options: hard, soft, muted')
-			add_to_chat(160,'  '..string.color('    hard',204,160)..' = full blist, nothing gets through')
-			add_to_chat(160,'  '..string.color('    soft',204,160)..' = message saying conversation from name was blocked')
-			add_to_chat(160,'  '..string.color('    muted',204,160)..' = message comes through, but in a different color')
-			add_to_chat(160,'  '..string.color('  reason',204,160)..' = reason why you are adding said person to blist')
-			add_to_chat(160,'  '..string.color('//bl delete|remove name',204,160)..' : Removes a user from your blist.')
-			add_to_chat(160,'  '..string.color('//bl qa name [reason]',204,160)..' : Adds a user to your blist w/o requiring extra details (reason is optional).')
+			windower.add_to_chat(55,_addon.name.." v".._addon.version..' possible commands:')
+			windower.add_to_chat(160,'  '..string.color('//Blist',204,160)..' and '..string.color('//bl',204,160)..' are both valid commands.')
+			windower.add_to_chat(160,'  '..string.color('//bl help',204,160)..' : Lists this menu.')
+			windower.add_to_chat(160,'  '..string.color('//bl status',204,160)..' : Shows current configuration.')
+			windower.add_to_chat(160,'  '..string.color('//bl list',204,160)..' : Displays blacklist.')
+			windower.add_to_chat(160,'  '..string.color('//bl useblist|linkshell|party|tell|emote|say|shout|bazaar|examine',204,160)..' : Toggles using '.._addon.name..' for said chat mode.')
+			windower.add_to_chat(160,'  '..string.color('//bl mutedcolor #',204,160)..' : Sets color for muted communication.  Valid values 1-255.')
+			windower.add_to_chat(160,'  '..string.color('//bl add|update name # hidetype reason',204,160)..' : Adds to or updates a user on your blist.')
+			windower.add_to_chat(160,'  '..string.color('  name',204,160)..' = name of person you want to blist')
+			windower.add_to_chat(160,'  '..string.color('  #',204,160)..' = number of days to blist said person; 0 = forever')
+			windower.add_to_chat(160,'  '..string.color('  hidetype',204,160)..' = how blacklisted you want said person to be; valid options: hard, soft, muted')
+			windower.add_to_chat(160,'  '..string.color('    hard',204,160)..' = full blist, nothing gets through')
+			windower.add_to_chat(160,'  '..string.color('    soft',204,160)..' = message saying conversation from name was blocked')
+			windower.add_to_chat(160,'  '..string.color('    muted',204,160)..' = message comes through, but in a different color')
+			windower.add_to_chat(160,'  '..string.color('  reason',204,160)..' = reason why you are adding said person to blist')
+			windower.add_to_chat(160,'  '..string.color('//bl delete|remove name',204,160)..' : Removes a user from your blist.')
+			windower.add_to_chat(160,'  '..string.color('//bl qa name [reason]',204,160)..' : Adds a user to your blist w/o requiring extra details (reason is optional).')
 		elseif comm == 'status' then
             showStatus()
 		elseif comm == 'list' then
-			add_to_chat(160,string.color("Name",56).." | "..
+			windower.add_to_chat(160,string.color("Name",56).." | "..
 			string.color("TempTime",3).." | "..
 			string.color("HideType",settings.mutedcolor).." | "..
 			string.color("Reason",59).." | "..
 			string.color("Date Added",29))
 			for i,v in pairs(members) do
 				if members[i].hidetype ~= "delete" then
-				add_to_chat(160,string.color(tostring(i),56) .. " | " ..
+				windower.add_to_chat(160,string.color(tostring(i),56) .. " | " ..
 				string.color(tostring(members[i].temptime),3) .. " | " .. 
 				string.color(tostring(members[i].hidetype),settings.mutedcolor) .. " | " .. 
 				string.color(tostring(members[i].reason),59) .. " | " .. 
@@ -118,7 +118,7 @@ function event_addon_command(...)
 			or type(tonumber(args[3]:match("(%d+)"))) ~= "number"
 			or S({'hard','soft','muted'}):contains(args[4]:lower()) ~= true
 			then
-				add_to_chat(160,"Invalid format; use the following: "..string.color("//bl "..comm.." name temptime hidetype reason",204,160))
+				windower.add_to_chat(160,"Invalid format; use the following: "..string.color("//bl "..comm.." name temptime hidetype reason",204,160))
 			else
 				com2 = args[2] -- name
 				com3 = tonumber(args[3]) -- temptime
@@ -139,12 +139,12 @@ function event_addon_command(...)
 			
 				members = members:update(addTemp)
 				members:save('all')
-				send_ipc_message("blist reload members")
-				add_to_chat(160,"Updating "..string.color(args[2],56,160).." entry on "..string.color(_addon.name,55,160)..".")
+				windower.send_ipc_message("blist reload members")
+				windower.add_to_chat(160,"Updating "..string.color(args[2],56,160).." entry on "..string.color(_addon.name,55,160)..".")
 			end
 		elseif comm == "qa" then
 			if type(args[2]:match("(%a+)")) ~= "string" then
-				add_to_chat(160,"Invalid format; use the following: "..string.color("//bl qa <name> %[reason%]",204,160))
+				windower.add_to_chat(160,"Invalid format; use the following: "..string.color("//bl qa <name> %[reason%]",204,160))
 			else
 				com2 = args[2] -- name
 				if args[3] ~= nil then
@@ -163,17 +163,17 @@ function event_addon_command(...)
 			
 				members = members:update(addTemp)
 				members:save('all')
-				send_ipc_message("blist reload members")
-				add_to_chat(160,"Updating "..string.color(string.ucfirst(args[2]),56,160).." entry on "..string.color(_addon.name,55,160)..".")
+				windower.send_ipc_message("blist reload members")
+				windower.add_to_chat(160,"Updating "..string.color(string.ucfirst(args[2]),56,160).." entry on "..string.color(_addon.name,55,160)..".")
 			end
 		elseif comm == "remove" or comm == "delete" then
 			if members[args[2]] ~= nil then
-				add_to_chat(160,"Removing "..string.color(args[2],56,160).." from "..string.color(_addon.name,55,160)..".")
+				windower.add_to_chat(160,"Removing "..string.color(args[2],56,160).." from "..string.color(_addon.name,55,160)..".")
 				members[args[2]].hidetype = "delete"
 				members:save('all')
-				send_ipc_message("blist reload members")
+				windower.send_ipc_message("blist reload members")
 			else
-				add_to_chat(160,"User "..string.color(args[2],56,160).." not in "..string.color(_addon.name,55,160).." database; cannot remove.")
+				windower.add_to_chat(160,"User "..string.color(args[2],56,160).." not in "..string.color(_addon.name,55,160).." database; cannot remove.")
 			end
 		elseif comm == "mutedcolor" or comm == "color" then
 			com2num = tonumber(args[2])
@@ -181,51 +181,53 @@ function event_addon_command(...)
 				settings[comm] = com2num
 			else
 				settings[comm] = defaults[comm]
-				add_to_chat(160,"  Invalid "..string.color(comm,settings.mutedcolor,160).." value; acceptable values: 1-255.  Setting default.")
+				windower.add_to_chat(160,"  Invalid "..string.color(comm,settings.mutedcolor,160).." value; acceptable values: 1-255.  Setting default.")
 			end
 			showStatus(comm)
 			if tostring(com2num) ~= tostring(dummysettings[comm]) then
 				settings:save() -- current character only
-				add_to_chat(55,"Saving "..string.color(_addon.name,204,55).." settings.")
+				windower.add_to_chat(55,"Saving "..string.color(_addon.name,204,55).." settings.")
 			end
 		elseif S({'useblist','linkshell','party','tell','emote','say','shout','bazaar','examine'}):contains(comm) then
 			settings[comm] = not settings[comm]
 			showStatus(comm)
 			if tostring(com2) ~= tostring(dummysettings[comm]) then
 				settings:save() -- current character only
-				add_to_chat(55,"Saving "..string.color(_addon.name,204,55).." settings.")
+				windower.add_to_chat(55,"Saving "..string.color(_addon.name,204,55).." settings.")
 			end
 			
 		elseif comm == "settings" then
 			settings:vprint()
 			
 		else
-			add_to_chat(160, "  Not a valid ".._addon.name.." v".._addon.version.." command.  "..string.color('//bl help',204,160).." for a list of valid commands.")
+			windower.add_to_chat(160, "  Not a valid ".._addon.name.." v".._addon.version.." command.  "..string.color('//bl help',204,160).." for a list of valid commands.")
 			return
         end
 	else
-		event_addon_command('help')
+		addon_command('help')
 	end
 end
 
+windower.register_event('addon command',addon_command)
+
 function showStatus(var)
 	if var == "mutedcolor" then
-		add_to_chat(160,"  Muted"..string.color("Color",settings.mutedcolor,160)..": " .. string.color(tostring(settings.mutedcolor),204,160))
+		windower.add_to_chat(160,"  Muted"..string.color("Color",settings.mutedcolor,160)..": " .. string.color(tostring(settings.mutedcolor),204,160))
 	elseif var == "useblist" then
-		add_to_chat(160,"  UseBlist: " .. string.color(onOffPrint(settings[var]),204,160))
+		windower.add_to_chat(160,"  UseBlist: " .. string.color(onOffPrint(settings[var]),204,160))
 	elseif var ~= nul then
-		add_to_chat(160,"  UseBlistOn"..var:ucfirst()..": " .. string.color(onOffPrint(settings[var]),204,160))
+		windower.add_to_chat(160,"  UseBlistOn"..var:ucfirst()..": " .. string.color(onOffPrint(settings[var]),204,160))
 	else
-		add_to_chat(160,"  UseBlist: " .. string.color(onOffPrint(settings.useblist),204,160))
-		add_to_chat(160,"  UseBlistOnLinkshell: " .. string.color(onOffPrint(settings.linkshell),204,160))
-		add_to_chat(160,"  UseBlistOnParty: " .. string.color(onOffPrint(settings.party),204,160))
-		add_to_chat(160,"  UseBlistOnTell: " .. string.color(onOffPrint(settings.tell),204,160))
-		add_to_chat(160,"  UseBlistOnEmote: " .. string.color(onOffPrint(settings.emote),204,160))
-		add_to_chat(160,"  UseBlistOnSay: " .. string.color(onOffPrint(settings.say),204,160))
-		add_to_chat(160,"  UseBlistOnShout: " .. string.color(onOffPrint(settings.shout),204,160))
-		add_to_chat(160,"  UseBlistOnBazaar: " .. string.color(onOffPrint(settings.bazaar),204,160))
-		add_to_chat(160,"  UseBlistOnExamine: " .. string.color(onOffPrint(settings.examine),204,160))
-		add_to_chat(160,"  Muted"..string.color("Color",settings.mutedcolor,160)..": " .. string.color(tostring(settings.mutedcolor),204,160))
+		windower.add_to_chat(160,"  UseBlist: " .. string.color(onOffPrint(settings.useblist),204,160))
+		windower.add_to_chat(160,"  UseBlistOnLinkshell: " .. string.color(onOffPrint(settings.linkshell),204,160))
+		windower.add_to_chat(160,"  UseBlistOnParty: " .. string.color(onOffPrint(settings.party),204,160))
+		windower.add_to_chat(160,"  UseBlistOnTell: " .. string.color(onOffPrint(settings.tell),204,160))
+		windower.add_to_chat(160,"  UseBlistOnEmote: " .. string.color(onOffPrint(settings.emote),204,160))
+		windower.add_to_chat(160,"  UseBlistOnSay: " .. string.color(onOffPrint(settings.say),204,160))
+		windower.add_to_chat(160,"  UseBlistOnShout: " .. string.color(onOffPrint(settings.shout),204,160))
+		windower.add_to_chat(160,"  UseBlistOnBazaar: " .. string.color(onOffPrint(settings.bazaar),204,160))
+		windower.add_to_chat(160,"  UseBlistOnExamine: " .. string.color(onOffPrint(settings.examine),204,160))
+		windower.add_to_chat(160,"  Muted"..string.color("Color",settings.mutedcolor,160)..": " .. string.color(tostring(settings.mutedcolor),204,160))
 	end
 end
 
@@ -242,14 +244,14 @@ function onOffPrint(bleh)
 	return bleh;
 end
 
-function event_ipc_message(msg)
+windower.register_event('ipc message',function (msg)
 	if msg == "blist reload members" then
 		members = config.load("data/members.xml",members)
---		add_to_chat(160, "Reloading members database.")
+--		windower.add_to_chat(160, "Reloading members database.")
 	end
-end
+end)
 
-function event_incoming_text(original, modified, mode)
+windower.register_event('incoming text',function (original, modified, mode)
 	if settings.useblist == true then
 		name = "blist"
 		if mode == 14 and settings.linkshell == true then -- linkshell (others)
@@ -292,7 +294,7 @@ function event_incoming_text(original, modified, mode)
 			if nowTime > convertedT and members[name].temptime ~= 0 then
 				members[name].hidetype = "delete"
 				members:save('all')
-				send_ipc_message("blist reload members")
+				windower.send_ipc_message("blist reload members")
 			end
 			
 			if members[name].hidetype == "delete" then
@@ -306,10 +308,10 @@ function event_incoming_text(original, modified, mode)
 			else
 				members[name].hidetype = "hard"
 				members:save('all')
-				send_ipc_message("blist reload members")
+				windower.send_ipc_message("blist reload members")
 				modified = ''
 			end
 		end
 		return modified
 	end
-end
+end)

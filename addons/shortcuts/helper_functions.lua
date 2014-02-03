@@ -46,7 +46,7 @@
 ---- There is also currently a field blacklist (ignore_fields) for the sake of memory bloat.
 -----------------------------------------------------------------------------------
 function parse_resources(lines_file)
-	local ignore_fields = S{'german','french','japanese','index','fr','frl','de','del','jp','jpl'}
+	local ignore_fields = {german=true,french=true,japanese=true,fr=true,frl=true,de=true,del=true,jp=true,jpl=true}
 	local completed_table = {}
 	for i in ipairs(lines_file) do
 		local str = tostring(lines_file[i])
@@ -63,6 +63,8 @@ function parse_resources(lines_file)
 					if not ignore_fields[ind] then
 						if val == "true" or val == "false" then
 							completed_table[tonumber(key)][ind] = str2bool(val)
+						elseif tonumber(val) then
+							completed_table[tonumber(key)][ind] = tonumber(val)
 						else
 							completed_table[tonumber(key)][ind] = val:gsub('&quot;','\42'):gsub('&apos;','\39')
 						end
@@ -102,6 +104,60 @@ function str2bool(input)
 end
 
 -----------------------------------------------------------------------------------
+--Name: find_san()
+--Args:
+---- str (string) - string to be sanitized
+-----------------------------------------------------------------------------------
+--Returns:
+---- sanitized string
+-----------------------------------------------------------------------------------
+function find_san(str)
+	if #str == 0 then return str end
+	
+	str = bracket_closer(str,0x28,0x29)
+	str = bracket_closer(str,0x5B,0x5D)
+	
+	-- strip precentages
+	local hanging_percent,num = 0,num
+	while str:byte(#str-hanging_percent) == 37 do
+		hanging_percent = hanging_percent + 1
+	end
+	str = str:sub(1,#str-hanging_percent%2)
+	return str
+end
+
+-----------------------------------------------------------------------------------
+--Name: bracket_closer()
+--Args:
+---- str (string) - string to have its brackets closed
+---- opener (number) - opening character's ASCII code
+---- closer (number) - closing character's ASCII code
+-----------------------------------------------------------------------------------
+--Returns:
+---- string with its opened brackets closed
+-----------------------------------------------------------------------------------
+function bracket_closer(str,opener,closer)
+	op,cl,opadd = 0,0,1
+	for i=1,#str do
+		local ch = str:byte(i)
+		if ch == opener then
+			op = op +1
+			opadd = i
+		elseif ch == closer then
+			cl = cl + 1
+		end
+	end
+	if op > cl then
+		if opadd ~= #str then
+			str = str..string.char(closer)
+		else
+			str = str..str.char(0x7,closer)
+		end		-- Close captures
+	end
+	return str
+end
+
+-----------------------------------------------------------------------------------
 --Name: split()
 --Args:
 ---- msg (string): message to be subdivided
@@ -117,7 +173,7 @@ function split(msg, match)
 	while u <= length do
 		local nextanch = msg:find(match,u)
 		if nextanch ~= nil then
-			splitarr[#splitarr+1] = msg:sub(u,nextanch-match:len())
+			splitarr[#splitarr+1] = msg:sub(u,nextanch-1)
 			if nextanch~=length then
 				u = nextanch+match:len()
 			else
@@ -137,26 +193,82 @@ end
 ---- name (string): Name to be slugged
 -----------------------------------------------------------------------------------
 --Returns:
----- string with a gsubbed version of name that converts numbers to Roman numerals
--------- removes non-letter/numbers, and forces it to lower case.
+---- string with a gsubbed version of name that removes non-alphanumeric characters,
+-------- forces the string to lower-case, and converts numbers to Roman numerals,
+-------- which are upper case.
 -----------------------------------------------------------------------------------
 function strip(name)
-	return name:gsub('4','iv'):gsub('9','ix'):gsub('0','p'):gsub('3','iii'):gsub('2','ii'):gsub('1','i'):gsub('8','viii'):gsub('7','vii'):gsub('6','vi'):gsub('5','v'):gsub('[^%a]',''):lower()
+	return name:gsub('[^%w]',''):lower():gsub('(%d+)',to_roman)
 end
 
+
 -----------------------------------------------------------------------------------
---Name: percent_strip()
+--Name: to_roman()
 --Args:
----- line (string): string to be checked for % signs and stripped
+---- num (string or number): Number to be converted from Arabic to Roman numerals.
 -----------------------------------------------------------------------------------
 --Returns:
----- line, without any trailing %s.
+---- roman numerals that represent the passed number.
+-------- This function returns ix for 9 instead of viiii. They are both valid, but
+-------- FFXI uses the ix nomenclature so we will use that.
 -----------------------------------------------------------------------------------
-function percent_strip(line)
-	local line_len = #line
-	while line:byte(line_len) == 37 do
-		line = line:sub(1,line_len-1)
-		line_len = line_len -1
+function to_roman(num)
+	if type(num) ~= 'number' then
+		num = tonumber(num)
+		if num == nil then
+			print('Debug to_roman')
+			return ''
+		end
 	end
-	return line
+	if num>4599 then return tostring(num) end
+	
+	local retstr = ''
+	
+	if num == 0 then return 'zilch' end
+	if num == 1 then return '' end
+	
+	while num > 0 do
+		if num >= 1000 then
+			num = num - 1000
+			retstr = retstr..'m'
+		elseif num >= 900 then
+			num = num - 900
+			retstr = retstr..'cm'
+		elseif num >= 500 then
+			num = num - 500
+			retstr = retstr..'d'
+		elseif num >= 400 then
+			num = num - 400
+			retstr = retstr..'cd'
+		elseif num  >= 100 then
+			num = num - 100
+			retstr = retstr..'c'
+		elseif num >= 90 then
+			num = num - 90
+			retstr = retstr..'xc'
+		elseif num >= 50 then
+			num = num - 50
+			retstr = retstr..'l'
+		elseif num >= 40 then
+			num = num - 40
+			retstr = retstr..'xl'
+		elseif num >= 10 then
+			num = num - 10
+			retstr = retstr..'x'
+		elseif num == 9 then
+			num = num - 9
+			retstr = retstr..'ix'
+		elseif num >= 5 then
+			num = num - 5
+			retstr = retstr..'v'
+		elseif num == 4 then
+			num = num - 4
+			retstr = retstr..'iv'
+		elseif num >= 1 then
+			num = num - 1
+			retstr = retstr..'i'
+		end
+	end
+	
+	return retstr
 end

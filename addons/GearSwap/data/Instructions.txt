@@ -1,0 +1,6 @@
+This is where user .lua files go. Check out the beta examples and instructions for more information.
+
+Be aware of four things:
+1) If Gearswap fails to execute a command and does not detect this, it will currently block all input until it is reloaded.
+2) verify_equip() is not very robust, and in Delve it tends to not be usable. cast_delay() is recommended instead.
+3) Logging is on at the moment, so that's what the log files are. You can turn it off towards the top of gearswap.

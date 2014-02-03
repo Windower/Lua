@@ -24,8 +24,14 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-function event_load()
-	version = '1.0.0'
+_addon.name = 'MacroChanger'
+_addon.author = 'Banggugyangu'
+_addon.version = '1.0.0.0'
+_addon.commands = {'mc','macrochanger'}
+
+require('strings')
+
+windower.register_event('load', function()
 	globaldisable = 0
 	WAR_Book = ''
 	WAR_Page = ''
@@ -71,17 +77,13 @@ function event_load()
 	GEO_Page = ''
 	RUN_Book = ''
 	RUN_Page = ''
-	send_command('alias mc lua c macrochanger cmd')
-	send_command('alias macrochanger lua c macrochanger cmd')
-	add_to_chat(17, 'MacroChanger v' .. version .. ' loaded.     Author:  Banggugyangu')
-	add_to_chat(17, 'Attempting to load settings from file.')
 	options_load()
-end
+end)
 
 function options_load()
-	local f = io.open(lua_base_path..'data/settings.txt', "r")
+	local f = io.open(windower.addon_path..'data/settings.txt', "r")
 	if f == nil then
-		local g = io.open(lua_base_path..'data/settings.txt', "w")
+		local g = io.open(windower.addon_path..'data/settings.txt', "w")
 		g:write('Release Date: 9:00 PM, 4-01-13\46\n')
 		g:write('Author Comment: This document is whitespace sensitive, which means that you need the same number of spaces between things as exist in this initial settings file\46\n')
 		g:write('Author Comment: It looks at the first two words separated by spaces and then takes anything as the value in question if the first two words are relevant\46\n')
@@ -144,12 +146,12 @@ function options_load()
 		GEO_Page = '1'
 		RUN_Book = '20'
 		RUN_Page = '1'
-		write('Default settings file created')
-		add_to_chat(12,'MacroChanger created a settings file and loaded!')
+		print('Default settings file created')
+		windower.add_to_chat(12,'MacroChanger created a settings file and loaded!')
 	else
 		f:close()
-		for curline in io.lines(lua_base_path..'data/settings.txt') do
-			local splat = split(curline,' ')
+		for curline in io.lines(windower.addon_path..'data/settings.txt') do
+			local splat = curline:split(' ')
 			local cmd = ''
 			if splat[2] ~=nil then
 				cmd = (splat[1]..' '..splat[2]):gsub(':',''):lower()
@@ -246,33 +248,12 @@ function options_load()
 				globaldisable = tonumber(splat[3])
 			end
 		end
-		add_to_chat(12,'MacroChanger read from a settings file and loaded!')
+		windower.add_to_chat(12,'MacroChanger read from a settings file and loaded!')
 	end
 end
 
-function split(msg, match)
-	local length = msg:len()
-	local splitarr = {}
-	local u = 1
-	while u <= length do
-		local nextanch = msg:find(match,u)
-		if nextanch ~= nil then
-			splitarr[#splitarr+1] = msg:sub(u,nextanch-match:len())
-			if nextanch~=length then
-				u = nextanch+match:len()
-			else
-				u = lengthlua 
-			end
-		else
-			splitarr[#splitarr+1] = msg:sub(u,length)
-			u = length+1
-		end
-	end
-	return splitarr
-end
-
-function event_job_change(mjobId, mjob)
-	local player = get_player()
+windower.register_event('job change',function (job_id)
+	local player = windower.ffxi.get_player()
 	local job = player.main_job
 	local book = ''
 	local page = ''
@@ -344,44 +325,37 @@ function event_job_change(mjobId, mjob)
 			book = RUN_Book
 			page = RUN_Page
 		end
-	
+
 		if ((book == 'disabled') or (page == 'disabled')) then
-			add_to_chat(17, '                             Auto Macro Switching Disabled for ' .. job ..'.')
-		else	
-			add_to_chat(17, '                             Changing macros to Book: ' .. book .. ' and Page: ' .. page .. '.  Job Changed to ' .. job)
-			send_command('input /macro book ' .. book)
-			send_command('input /macro set ' .. page)
+			windower.add_to_chat(17, '                             Auto Macro Switching Disabled for ' .. job ..'.')
+		else
+			windower.add_to_chat(17, '                             Changing macros to Book: ' .. book .. ' and Page: ' .. page .. '.  Job Changed to ' .. job)
+			windower.send_command('input /macro book ' .. book)
+			windower.send_command('input /macro set ' .. page)
 		end
 	elseif globaldisable == 1 then
-	
-		add_to_chat(17, '                             Auto Macro Switching Disabled for All Jobs.')
-		
+
+		windower.add_to_chat(17, '                             Auto Macro Switching Disabled for All Jobs.')
+
 	end
-end
+end)
 
-function event_unload()
-	send_command('unalias mc')
-end
-
-function event_addon_command(...)
-    local term = table.concat({...}, ' ')
-    local splitarr = split(term,' ')
-	local mjob = get_player()['main_job']
-	if splitarr[1] == 'cmd' then
-		if splitarr[2] == 'disableall' then
-			if splitarr[3] == 'on' then
-				globaldisable = 1
-				add_to_chat(17, 'All automated macro switching disabled.')
-			elseif splitarr[3] == 'off' then
-				globaldisable = 0
-				add_to_chat(17, 'Automated macro switching enabled.')
-			end
-		elseif splitarr[2]:lower() == 'help' then
-			add_to_chat(17, 'MacroChanger Commands:')
-			add_to_chat(17, 'disableall [on|off]')
-			add_to_chat(17, '   on - Disables all automated macro switching')
-			add_to_chat(17, '   off - Enables all automated macro switching not disabled individually')
-			add_to_chat(17, '   Resets to what is stored in settings upon unloading of addon.  To Permanently change, please change the option in the settings file.')
+windower.register_event('addon command', function(...)
+    local args = {...}
+	local mjob = windower.ffxi.get_player().main_job
+	if args[1] == 'disableall' then
+		if args[2] == 'on' then
+			globaldisable = 1
+			windower.add_to_chat(17, 'All automated macro switching disabled.')
+		elseif args[2] == 'off' then
+			globaldisable = 0
+			windower.add_to_chat(17, 'Automated macro switching enabled.')
 		end
+	elseif args[1]:lower() == 'help' then
+		windower.add_to_chat(17, 'MacroChanger Commands:')
+		windower.add_to_chat(17, 'disableall [on|off]')
+		windower.add_to_chat(17, '   on - Disables all automated macro switching')
+		windower.add_to_chat(17, '   off - Enables all automated macro switching not disabled individually')
+		windower.add_to_chat(17, '   Resets to what is stored in settings upon unloading of addon.  To Permanently change, please change the option in the settings file.')
 	end
-end
+end)

@@ -30,16 +30,15 @@ require 'luau'
 
 _addon = _addon or {}
 _addon.name = 'AutoInvite'
-_addon.command = 'autoinvite'
-_addon.short_command = 'ai'
+_addon.commands = {'autoinvite','ai'}
 _addon.version = 1.0
 
-settings = T{}
-settings.mode = 'whitelist'
-settings.whitelist = S{}
-settings.blacklist = S{}
-settings.keywords = S{}
-settings.tellback = 'on'
+defaults = T{}
+defaults.mode = 'whitelist'
+defaults.whitelist = S{}
+defaults.blacklist = S{}
+defaults.keywords = S{}
+defaults.tellback = 'on'
 
 -- Statuses that stop you from sending invites.
 statusblock = S{
@@ -70,7 +69,7 @@ off = T{'off', 'no', 'false'}
 modes = T{'whitelist', 'blacklist'}
 
 -- Check for keyword
-function event_chat_message(is_gm, mode, player, message)
+windower.register_event("chat message", function(message, player, mode, is_gm)
 	local word = false
 	if mode == 3 then
 		for item,_ in pairs(settings.keywords) do
@@ -82,7 +81,7 @@ function event_chat_message(is_gm, mode, player, message)
 		if word == false then
 			return
 		end
-		
+
 		if settings.mode == 'blacklist' then
 			if settings.blacklist:contains(player) then
 				return
@@ -95,27 +94,27 @@ function event_chat_message(is_gm, mode, player, message)
 			end
 		end
 	end
-end
+end)
 
 -- Attempts to send an invite
 function try_invite(player)
-	if get_party()['p5'] then
+	if windower.ffxi.get_party()['p5'] then
 		notice(player.. 'cannot be invited - party is full')
 		if settings.tell_back == 'on' then
-			send_command('input /t '..player..' Party is currently full.')
+			windower.send_command('input /t '..player..' Party is currently full.')
 		end
 		return
 	end
 	
-	if statusblock:contains(get_player()['status_id']) then
+	if statusblock:contains(windower.ffxi.get_player()['status_id']) then
 		notice(player.. 'cannot be invited - you cannot send an invite at this time (dead, charmed, event).')
 		if settings.tell_back == 'on' then
-			send_command('input /t '..player..' An invite cannot be sent at this time (dead, charmed, event).')
+			windower.send_command('input /t '..player..' An invite cannot be sent at this time (dead, charmed, event).')
 		end
 		return
 	end
 	
-	send_command('input /pcmd add '..player)
+	windower.send_command('input /pcmd add '..player)
 end
 
 -- Adds names/items to a given list type.
@@ -156,14 +155,13 @@ function remove_item(mode, ...)
 	settings:save()
 end
 
-function event_addon_command(command, ...)
+windower.register_event('addon command',function (command, ...)
 	command = command and command:lower() or 'status'
 	local args = T{...}
-	
 	-- Changes whitelist/blacklist mode
 	if command == 'mode' then
 		local mode = args[1] or 'status'
-		if mode:isin(aliases:keyset()) then
+		if aliases:keyset():contains(mode) then
 			settings.mode = aliases[mode]
 			log('Mode switched to '..settings.mode..'.')
 		elseif mode == 'status' then
@@ -177,10 +175,10 @@ function event_addon_command(command, ...)
 	elseif command == 'tellback' then
 		status = args[1] or 'status'
 		status = string.lower(status)
-		if status:isin(on) then
+		if on:contains(status) then
 			settings.tellback = 'on'
 			log('Tellback turned on.')
-		elseif status:isin(off) then
+		elseif off:contains(status) then
 			settings.tellback = 'off'
 			log('Tellback turned off.')
 		elseif status == 'status' then
@@ -190,15 +188,15 @@ function event_addon_command(command, ...)
 			return
 		end
 		
-	elseif command:isin(aliases:keyset()) then
+	elseif aliases:keyset():contains(command) then
 		mode = aliases[command]
 		names = args:slice(2):map(string.ucfirst..string.lower)
 		if args:empty() then
 			log(mode:ucfirst()..':', settings[mode]:format('csv'))
 		else
-			if args[1]:isin(addstrs) then
+			if addstrs:contains(args[1]) then
 				add_item(mode, names:unpack())
-			elseif args[1]:isin(rmstrs) then
+			elseif rmstrs:contains(args[1]) then
 				remove_item(mode, names:unpack())
 			else
 				notice('Invalid operator specified. Specify add or remove.')
@@ -218,29 +216,24 @@ function event_addon_command(command, ...)
 		warning('Unkown command \''..command..'\', ignored.')
 	end
 	settings:save()
-end
+end)
 
-function event_load()	
+windower.register_event('load',function ()	
 	initialize()
 	settings:save()
+end)
 
-	send_command('alias autoinvite lua c autoinvite')
-	send_command('alias ai autoinvite')
-end
-
-function event_login()
+windower.register_event('login',function ()
 	initialize()
-end
+end)
 
 function initialize()
 	-- Load settings from file
-	settings = config.load(settings)
+	settings = config.load(defaults)
 	settings.whitelist = settings.whitelist:map(string.ucfirst..string.lower)
 	settings.blacklist = settings.blacklist:map(string.ucfirst..string.lower)
 end
 
-function event_unload()
-	send_command('unalias autoinvite')
-	send_command('unalias ai')
+windower.register_event('unload', function ()
 	settings:save()
-end
+end)

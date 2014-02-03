@@ -1,49 +1,45 @@
-
-_addon = {}
 _addon.version = '1.0'
 _addon.name = 'Send'
-_addon.commands = {'send'}
+_addon.command = 'send'
+_addon.author = 'Byrth'
 
-function event_addon_command(...)
-    term = table.concat({...}, ' ')
-	broken_init = split(term, ' ')
-	qual = table.remove(broken_init,1)
-	player = get_player()
+windower.register_event('addon command',function (...)
+    local term = table.concat({...}, ' ')
+	local broken_init = split(term, ' ')
+	local qual = table.remove(broken_init,1)
+	local player = windower.ffxi.get_player()
 	if qual:lower()==player['name']:lower() then
 		if broken_init ~= nil then
 			relevant_msg(table.concat(broken_init,' '))
 		end
-	elseif qual:lower()=='@all' or qual:lower()=='@'..player['main_job']:lower() then
+	elseif qual:lower()=='@all' or qual:lower()=='@'..player.main_job:lower() then
 		if broken_init ~= nil then
 			relevant_msg(table.concat(broken_init,' '))
 		end
-		send_ipc_message(term)
+		windower.send_ipc_message('send ' .. term)
 	else
-		send_ipc_message(term)
+		windower.send_ipc_message('send ' .. term)
 	end
-end
+end)
 
-function event_load()
-	send_command('alias send lua c send')
-end
+windower.register_event('ipc message',function (msg)
+	local broken = split(msg, ' ')
 
-function event_unload()
-	send_command('unalias send')
-end
+    local command = table.remove(broken, 1)
+    if command ~= 'send' then
+        return
+    end
 
-function event_ipc_message(msg)
-	broken = split(msg, ' ')
-	
 	if #broken < 2 then return end
 	
-	qual = table.remove(broken,1)
-	player = get_player()
-	if qual:lower()==player["name"]:lower() then
+	local qual = table.remove(broken,1)
+	local player = windower.ffxi.get_player()
+	if qual:lower()==player.name:lower() then
 		relevant_msg(table.concat(broken,' '))
 	end
 	if string.char(qual:byte(1)) == '@' then
-		arg = string.char(qual:byte(2, qual:len()))
-		if arg:upper() == player["main_job"]:upper() then
+		local arg = string.char(qual:byte(2, qual:len()))
+		if arg:upper() == player.main_job:upper() then
 			if broken ~= nil then
 				relevant_msg(table.concat(broken,' '))
 			end
@@ -57,8 +53,7 @@ function event_ipc_message(msg)
 			end
 		end
 	end
-
-end
+end)
 
 function split(msg, match)
 	if msg == nil then return '' end
@@ -83,30 +78,32 @@ function split(msg, match)
 end
 
 function relevant_msg(msg)
-	local player = get_player()
-    st,en,item,tar = string.find(msg,'/item ([%w%s]+) <(%w+)>')
+	local player = windower.ffxi.get_player()
+    local st,en,item,tar = string.find(msg,'/item ([%w%s]+) <(%w+)>')
     if item ~= nil then
         msg = '/item "'..item..'" <'..tar..'>'
     end
-	msg:gsub("<me>", player['name'])
-	msg:gsub("<hp>", tostring(player['hp']))
-	msg:gsub("<mp>", tostring(player['mp']))
-	msg:gsub("<hpp>", tostring(player['hpp']))
-	msg:gsub("<mpp>", tostring(player['mpp']))
-	msg:gsub("<tp>", tostring(player['tp']))
-	msg:gsub("<job>", player['main_job_full']..'/'..player['sub_job_full'])
-	msg:gsub("<mjob>", player['main_job_full'])
-	msg:gsub("<sjob>", player['sub_job_full'])
+	
+	msg:gsub("<me>", tostring(player.name))
+	msg:gsub("<hp>", tostring(player.vitals.hp))
+	msg:gsub("<mp>", tostring(player.vitals.mp))
+	msg:gsub("<hpp>", tostring(player.vitals.hpp))
+	msg:gsub("<mpp>", tostring(player.vitals.mpp))
+	msg:gsub("<tp>", tostring(player.vitals.tp))
+	msg:gsub("<job>", tostring(player.main_job_full)..'/'..tostring(player.sub_job_full))
+	msg:gsub("<mjob>", tostring(player.main_job_full))
+	msg:gsub("<sjob>", tostring(player.sub_job_full))
 	
 
+	
 	if msg:sub(1,2)=='//' then
-		send_command(msg:sub(3))
+		windower.send_command(msg:sub(3))
 	elseif msg:sub(1,1)=='/' then
-		send_command('input '..msg)
+		windower.send_command('input '..msg)
 	elseif msg:sub(1,3)=='atc' then
-		add_to_chat(55,msg:sub(5))
+		windower.add_to_chat(55,msg:sub(5))
 	else
-		send_command(msg)
+		windower.send_command(msg)
 	end
 
 end

@@ -25,7 +25,14 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-function event_load()
+_addon.version = '1.1.0'
+_addon.command = 'scast'
+_addon.name = 'SATACast'
+_addon.author = 'Banggugyangu'
+
+res = require('resources')
+
+windower.register_event('load',function ()
 	
 	version = '1.1.0'
 	SA_Set = ' '
@@ -36,18 +43,17 @@ function event_load()
 	Idle_Set = ' '
 	TH_ON = 0
 	TP_ON = 0
-	send_command('alias scast lua c satacast')
-	add_to_chat(17, 'SATACast v' .. version .. ' loaded.     Author:  Banggugyangu')
-	add_to_chat(17, 'Attempting to load settings from file.')
+	windower.add_to_chat(17, 'SATACast v' .. version .. ' loaded.     Author:  Banggugyangu')
+	windower.add_to_chat(17, 'Attempting to load settings from file.')
 	options_load()
 	
-end
+end)
 
 --Function Designer:  Byrth
 function options_load()
-	local f = io.open(lua_base_path..'data/settings.txt', "r")
+	local f = io.open(windower.addon_path..'data/settings.txt', "r")
 	if f == nil then
-		local g = io.open(lua_base_path..'data/settings.txt', "w")
+		local g = io.open(windower.addon_path..'data/settings.txt', "w")
 		g:write('Release Date: 11:50 PM, 4-06-13\46\n')
 		g:write('Author Comment: This document is whitespace sensitive, which means that you need the same number of spaces between things as exist in this initial settings file\46\n')
 		g:write('Author Comment: It looks at the first two words separated by spaces and then takes anything as the value in question if the first two words are relevant\46\n')
@@ -58,11 +64,11 @@ function options_load()
 		g:write('SA Set: SneakAttack\nTA Set: TrickAttack\nSATA Set: SATA\nTP Set: TP\nTH Set: TreasureHunter\nIdle Set: Movement\n')
 		g:close()
 		
-		write('Default settings file created')
-		add_to_chat(17,'SATACast created a settings file and loaded!')
+		print('Default settings file created')
+		windower.add_to_chat(17,'SATACast created a settings file and loaded!')
 	else
 		f:close()
-		for curline in io.lines(lua_base_path..'data/settings.txt') do
+		for curline in io.lines(windower.addon_path..'data/settings.txt') do
 			local splat = split(curline,' ')
 			local cmd = ''
 			if splat[2] ~=nil then
@@ -82,7 +88,7 @@ function options_load()
 				Idle_Set = splat[3]
 			end
 		end
-		add_to_chat(17,'SATACast read from a settings file and loaded!')
+		windower.add_to_chat(17,'SATACast read from a settings file and loaded!')
 	end
 end
 
@@ -107,35 +113,36 @@ function split(msg, match)
 	end
 	return splitarr
 end
-		
-function event_lose_status(id, name)
-	local self = get_player()
+	
+windower.register_event('lose buff', function (id)
+	local self = windower.ffxi.get_player()
+    local name = res.buffs[id].english
 	if name == ('Sneak Attack' or 'Trick Attack') then
 		if self.status:lower() == 'engaged' then
-			send_command('sc set ' .. TP_Set)
+			windower.send_command('sc set ' .. TP_Set)
 		elseif self.status:lower() == 'idle' then
-			send_command('sc set ' .. Idle_Set)
+			windower.send_command('sc set ' .. Idle_Set)
 		end
 	end
-end
+end)
 
-function event_action(act)
+windower.register_event('action',function (act)
 	local actor = act.actor_id
 	local category = act.category
 	local actor = act.actor_id
 	local category = act.category
 	local param = act.param
-	local player = get_player()
+	local player = windower.ffxi.get_player()
 	
 	if player.status:lower() == 'engaged' then
 		if actor == (player.id or player.index) then
 			if category == 1 then
 				if TH_ON == 0 then
-					send_command('sc set ' .. TH_Set)
+					windower.send_command('sc set ' .. TH_Set)
 					TH_ON = 1
 				elseif TH_ON == 1 then
 					if TP_ON == 0 then
-						send_command('sc set ' .. TP_Set)
+						windower.send_command('sc set ' .. TP_Set)
 						TP_ON = 1
 					elseif TP_ON == 1 then
 					end
@@ -145,19 +152,18 @@ function event_action(act)
 	elseif player.status:lower() == 'idle' then
 		TH_ON = 0
 	end
-end
+end)
 
 --Function Designer:  Byrth
-function event_addon_command(...)
+windower.register_event('addon command',function (...)
     local term = table.concat({...}, ' ')
     local splitarr = split(term,' ')
 	if splitarr[1]:lower() == 'reload' then
 		options_load()
 	elseif splitarr[1]:lower() == 'help' then
-		add_to_chat(17, 'SATACast  v'..version..'commands:')
-		add_to_chat(17, '//scast [options]')
-		add_to_chat(17, '    reload  - Reloads settings')
-		add_to_chat(17, '    help   - Displays this help text')
+		windower.add_to_chat(17, 'SATACast  v'..version..'commands:')
+		windower.add_to_chat(17, '//scast [options]')
+		windower.add_to_chat(17, '    reload  - Reloads settings')
+		windower.add_to_chat(17, '    help   - Displays this help text')
 	end
-end
-
+end)

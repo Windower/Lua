@@ -5,6 +5,62 @@
 		<language>English</language>
 		<spellsets>
 			<default />
+			<failtest>
+				<slot01>magic fruit</slot01>
+				<slot02>battery charge</slot02>
+				<slot03>occultation</slot03>
+				<slot04>amorphic spikes</slot04>
+				<slot05>head butt</slot05>
+				<slot06>actinic burst</slot06>
+				<slot07>winds of promy.</slot07>
+				<slot08>empty thrash</slot08>
+				<slot09>heavy strike</slot09>
+				<slot10>acrid stream</slot10>
+				<slot11>demoralizing roar</slot11>
+				<slot12>quad. continuum</slot12>
+				<slot13>delta thrust</slot13>
+				<slot14>barbed crescent</slot14>
+				<slot15>thermal pulse</slot15>
+				<slot16>auroral drape</slot16>
+				<slot17>dark orb</slot17>
+				<slot18>magic barrier</slot18>
+			</failtest>
+			<vw1>
+				<slot01>Firespit</slot01>
+				<slot02>Heat Breath</slot02>
+				<slot03>Thermal Pulse</slot03>
+				<slot04>Blastbomb</slot04>
+				<slot05>Infrasonics</slot05>
+				<slot06>Frost Breath</slot06>
+				<slot07>Ice Break</slot07>
+				<slot08>Cold Wave</slot08>
+				<slot09>Sandspin</slot09>
+				<slot10>Magnetite Cloud</slot10>
+				<slot11>Cimicine Discharge</slot11>
+				<slot12>Bad Breath</slot12>
+				<slot13>Acrid Stream</slot13>
+				<slot14>Maelstrom</slot14>
+				<slot15>Corrosive Ooze</slot15>
+				<slot16>Cursed Sphere</slot16>
+				<slot17>Awful Eye</slot17>
+			</vw1>
+			<vw2>
+				<slot01>Hecatomb Wave</slot01>
+				<slot02>Mysterious Light</slot02>
+				<slot03>Leafstorm</slot03>
+				<slot04>Reaving Wind</slot04>
+				<slot05>Temporal Shift</slot05>
+				<slot06>Mind Blast</slot06>
+				<slot07>Blitzstrahl</slot07>
+				<slot08>Charged Whisker</slot08>
+				<slot09>Blank Gaze</slot09>
+				<slot10>Radiant Breath</slot10>
+				<slot11>Light of Penance</slot11>
+				<slot12>Actinic Burst</slot12>
+				<slot13>Death Ray</slot13>
+				<slot14>Eyes On Me</slot14>
+				<slot15>Sandspray</slot15>
+			</vw2>
 			<warsub>
 				<slot01>Magic Fruit</slot01>
 				<slot02>Battery Charge</slot02>
@@ -28,4 +84,3 @@
 		</spellsets>
 	</global>
 </settings>
-

@@ -24,20 +24,19 @@
 -- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 -- SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-require 'chat'
-require 'logger'
-require 'stringhelper'
-require 'mathhelper'
-require 'tablehelper'
+_addon.name = 'gametime'
+_addon.author = 'Omnys'
+_addon.version = '0.6'
+_addon.commands = {'gametime','gt'}
 
-local ffxi = require 'ffxi'
+require('chat')
+require('logger')
+require('strings')
+require('maths')
+require('tables')
 
-local config = require 'config'
-
-_addon = {}
-_addon.rname = 'gametime'
-_addon.version = '0.52'
-_addon.command = 'gametime'
+texts = require('texts')
+config = require('config')
 
 tb_name	= 'addon:gr:gametime'
 visible = false
@@ -117,34 +116,38 @@ local defaults = T{}
 	defaults.saved = 0
 	defaults.mode = 1
 	defaults.time = T{}
-	defaults.time.visible = true
-	defaults.time.x = 0 -- left
-	defaults.time.y = 0 -- top
-	defaults.time.alpha = 100
-	defaults.time.colorr = 255
-	defaults.time.colorg = 255
-	defaults.time.colorb = 255
-	defaults.time.font_size = 12
-	defaults.time.font = 'tahoma'
-	defaults.time.bg_alpha = 25
-	defaults.time.bg_colorr = 100
-	defaults.time.bg_colorg = 100
-	defaults.time.bg_colorb = 100
+	defaults.time.pos = {}
+	defaults.time.pos.x = 0 -- left
+	defaults.time.pos.y = 0 -- top
+	defaults.time.text = {}
+	defaults.time.text.alpha = 255
+	defaults.time.text.red = 255
+	defaults.time.text.green = 255
+	defaults.time.text.blue = 255
+	defaults.time.text.size = 12
+	defaults.time.text.font = 'Consolas'
+	defaults.time.bg = {}
+	defaults.time.bg.alpha = 25
+	defaults.time.bg.red = 100
+	defaults.time.bg.green = 100
+	defaults.time.bg.blue = 100
+	defaults.time.bg.visible = true
+	
 	
 	defaults.days = T{}
-	defaults.days.visible = true
-	defaults.days.x = 100
-	defaults.days.y = 0
-	defaults.days.alpha = 75
-	defaults.days.font_size = 12
-	defaults.days.font = 'tahoma'
-	
-	defaults.days.bg_alpha = 100
-	defaults.days.bg_colorr = 0
-	defaults.days.bg_colorg = 0
-	defaults.days.bg_colorb = 0
+	defaults.days.pos = {}
+	defaults.days.pos.x = 100
+	defaults.days.pos.y = 0 -- top
+	defaults.days.text = {}
+	defaults.days.text.alpha = 255
+	defaults.days.text.size = 12
+	defaults.days.text.font = 'Consolas'
+	defaults.days.bg = {}
+	defaults.days.bg.alpha = 100
+	defaults.days.bg.red = 0
+	defaults.days.bg.green = 0
+	defaults.days.bg.blue = 0
 	defaults.days.axis = 'horizontal'
-	defaults.days.text_alpha = 100
 	defaults.days.change = true
 	defaults.moon = T{}
 	defaults.moon.change = true
@@ -227,10 +230,8 @@ local defaults = T{}
 	Cycles.kazham.route[6] = "Arrives in Jeuno|14:49"
 	Cycles.kazham.route[7] = "Arrives in Kazham|19:48"
 	Cycles.kazham.route[8] = "Arrives in Jeuno|20:49"
-	
-function event_load()
-	send_command('alias gametime lua command gametime')
-	send_command('alias gt gametime')
+
+function initialize()
 	cb_time()
 	cb_day()
 	settings = config.load(defaults)
@@ -242,17 +243,10 @@ function event_load()
 	end
 	
 	gt.mode = settings.mode
-	event_time_change(get_ffxi_info()["time"])
-	event_day_change(get_ffxi_info()["day"])
-	event_moon_pct_change(get_ffxi_info()["moon_pct"])
+	day_change(windower.ffxi.get_info().day)
 end
-
-function event_unload()
-	send_command('unalias gametime')
-	send_command('unalias gt')
-	tb_delete('gametime_time')
-	tb_delete('gametime_day')
-end
+	
+windower.register_event('login','load',initialize)
 
 function getroutes(route)
 	for ckey, cval in pairs(Cycles) do
@@ -270,63 +264,27 @@ function getroutes(route)
 	end
 end
 
-function event_login()
-	event_load()
-end
-
-function event_logout()
-	event_unload()
-end
-
 function cb_time()
-	gt.gtt = 'gametime_time'
-	tb_create(gt.gtt)
-	tb_set_bg_border_size(gt.gtt,2)
-	tb_set_bg_color(gt.gtt,settings.time.bg_alpha,settings.time.bg_colorr,settings.time.bg_colorg,settings.time.bg_colorb)
-	tb_set_bg_visibility(gt.gtt,settings.time.visible)
-	tb_set_bold(gt.gtt,true)
-	tb_set_color(gt.gtt,settings.time.alpha,settings.time.colorr,settings.time.colorg,settings.time.colorb)
-	tb_set_location(gt.gtt,settings.time.x,settings.time.y)
-	tb_set_text(gt.gtt,'Loading. . .')
-	tb_set_visibility(gt.gtt,settings.time.visible)
-	--Set font type and size for time
-	tb_set_font(gt.gtt,settings.time.font,settings.time.font_size)
+	time_base_string = '${hours|XX}:${minutes|XX}'
+	gt.gtt = texts.new(time_base_string,settings.time)
+	gt.gtt:show()
 end
 
 function cb_day()
-	gt.gtd = 'gametime_day'
-	tb_create(gt.gtd)
-	tb_set_bg_border_size(gt.gtd,2)
-	tb_set_bg_color(gt.gtd,settings.days.bg_alpha,settings.days.bg_colorr,settings.days.bg_colorg,settings.days.bg_colorb)
-	tb_set_bg_visibility(gt.gtd,settings.days.visible)
-	tb_set_bold(gt.gtd,true)
-	tb_set_color(gt.gtd,settings.days.alpha,255,255,255)
-	tb_set_location(gt.gtd,settings.days.x,settings.days.y)
-	tb_set_text(gt.gtd,'')
-	tb_set_visibility(gt.gtd,settings.days.visible)
-	--Set font type and size for days 
-	tb_set_font(gt.gtd,settings.days.font,settings.days.font_size)
-	
-	
-	
+	day_base_string = '${day|} ${MoonPhase|Unknown} (${MoonPct|-}%); ${WeekReport|}'
+	gt.gtd = texts.new(day_base_string,settings.days)
+	gt.gtd:show()
 end
 
 function default_settings()
 	settings:save('all')
 end
 
-function event_time_change(old, new)
-	gt.basetime = get_ffxi_info()["time"]
-	gt.basetime = gt.basetime * 100
-	gt.basetime = math.round(gt.basetime)
-	gt.basetime = tostring(gt.basetime):zfill(4)
-	gt.hour = gt.basetime:slice(1,(#gt.basetime-2))
-	gt.minute = gt.basetime:slice((#gt.basetime-1),#gt.basetime)
-	-- gt.time = T{gt.basetime:slice(1,(#gt.basetime-2)),gt.basetime:slice((#gt.basetime-1),#gt.basetime)}
-	gt.time = T{gt.hour,gt.minute}
-	gt.dectime = timeconvert(gt.time[1]..':'..gt.time[2])
-	tb_set_text(gt.gtt,gt.time[1]..':'..gt.time[2])
-end
+windower.register_event('time change', function(new, old)
+	gt.hours = (new / 60):floor()
+	gt.minutes = new % 60
+	gt.gtt:update(gt)
+end)
 
 function timeconvert(basetime)
 	basetable = basetime:split(':')
@@ -338,8 +296,8 @@ function timeconvert2(basetime)
 	return basetable[1]..':'..tostring(math.round(tostring(basetable[2]):slice(1,2) / (100/60))):zfill(2)
 end
 
-function event_day_change(day)
---	tb_set_text(gt.gtd,day)
+function day_change(day)
+    day = res.days[day].english
 	if (day == 'Firesday') then
 		dlist = {'1','2','3','4','5','6','7','8'}
 	elseif (day == 'Earthsday') then
@@ -350,7 +308,7 @@ function event_day_change(day)
 		dlist = {'4','5','6','7','8','1','2','3'}
 	elseif (day == 'Iceday') then
 		dlist = {'5','6','7','8','1','2','3','4'}
-	elseif (day == 'Lightningday') then
+	elseif (day == 'Lightningsday') then
 		dlist = {'6','7','8','1','2','3','4','5'}
 	elseif (day == 'Lightsday') then
 		dlist = {'7','8','1','2','3','4','5','6'}
@@ -366,29 +324,28 @@ function event_day_change(day)
 		daystring = ''..daystring..gt.delimiter..' \\cs'..gt.days[(dval+0)][10]..gt.days[(dval+0)][settings.mode]
 	end
 	
-	gt.day = day
-	
+	gt.day = day	
 	gt.WeekReport = daystring
-	tb_set_color(gt.gtd,settings.days.alpha,255,255,255)
-	tb_set_text(gt.gtd,' \\cs'..gt.days[1][10]..gt.MoonPhase..' ('..gt.MoonPct..'%);'..gt.WeekReport)
-	event_moon_change(get_ffxi_info()["moon"])
+	gt.gtd:update(gt)
+	moon_change()
 end
 
-function event_moon_change(moon)
-	gt.MoonPhase = moon
-	tb_set_text(gt.gtd,gt.MoonPhase..' ('..gt.MoonPct..'%);'..gt.WeekReport)
+windower.register_event('day change', moon_change..day_change)
+
+function moon_change()
+    local info = windower.ffxi.get_info()
+	gt.MoonPhase = res.moon_phases[info.moon_phase].english
+	gt.MoonPct = info.moon
+	gt.gtd:update(gt)
 	if settings.moon.change == true then
 		log('Day: '..gt.day..'; Moon: '..gt.MoonPhase..' ('..gt.MoonPct..'%);')
 	end
 end
 
-function event_moon_pct_change(pct)
-	gt.MoonPct = pct
-	tb_set_text(gt.gtd,gt.MoonPhase..' ('..gt.MoonPct..'%);'..gt.WeekReport)
-end
+windower.register_event('moon change', moon_change)
 
-function event_addon_command(...)
-	local args	= T({...})
+windower.register_event('addon command', function (...)
+	local args	= T{...}:map(string.lower)
 	if args[1] == nil or args[1] == "help" then
 		log('Use //gametime or //gt as follows:')
 		log('Positioning:')
@@ -437,68 +394,51 @@ function event_addon_command(...)
 	
 	---CLI Arguments for Time font Size
 	elseif args[1] == 'timeSize' then
-			tb_set_font(gt.gtt,settings.time.font,args[2])
-			settings.time.font_size = args[2]
-			
-			
+			gt.gtt:size(tonumber(args[2]))	
 			
 	---CLI Arguments for Time font type
 	elseif args[1] == 'timeFont' then
-			tb_set_font(gt.gtt,args[2],settings.time.font_size)
-			settings.time.font = args[2]
-
-			
+		gt.gtt:font(args[2])	
 			
 	---CLI Arguments for Day font Size
 	elseif args[1] == 'daySize' then
-			tb_set_font(gt.gtd,settings.time.font,args[2])
-			settings.days.font_size = args[2]
-			
-			
-			
+		gt.gtd:size(tonumber(args[2]))				
+	
 	---CLI Arguments for Day font type
 	elseif args[1] == 'dayFont' then
-			tb_set_font(gt.gtd,args[2],settings.time.font_size)
-			settings.days.font = args[2]				
-	
-	
+		gt.gtd:font(args[2])	
 	
 	elseif args[1] == 'timex' then
-			tb_set_location(gt.gtt,args[2],settings.time.y)
-			settings.time.x = args[2]
+		gt.gtt:pos_x(tonumber(args[2]))
+		
 	elseif args[1] == 'timey' then
-			tb_set_location(gt.gtt,settings.time.x,args[2])
-			settings.time.y = args[2]
+		gt.gtt:pos_y(tonumber(args[2]))
+		
 	elseif args[1] == 'daysx' then
-			tb_set_location(gt.gtd,args[2],settings.days.y)
-			settings.days.x = args[2]
+		gt.gtd:pos_x(tonumber(args[2]))
+		
 	elseif args[1] == 'daysy' then
-			tb_set_location(gt.gtd,settings.days.x,args[2])
-			settings.days.y = args[2]
+		gt.gtd:pos_y(tonumber(args[2]))
+		
 	elseif args[1] == 'time' then
 		if args[2] == 'alpha' then
 			inalpha = tostring(args[3]):zfill(3)
 			inalpha = inalpha+0
 			if (inalpha > 0 and inalpha < 256) then
-				tb_set_bg_color(gt.gtt,inalpha,settings.time.bg_colorr,settings.time.bg_colorg,settings.time.bg_colorb)
-				tb_set_color(gt.gtt,inalpha,settings.time.colorr,settings.time.colorg,settings.time.colorb)
-				settings.time.bg_alpha = inalpha
-				settings.time.alpha = inalpha
+				gt.gtt:alpha(inalpha)
 				log('Time transparency set to '..inalpha..' ('..math.round(100-(inalpha/2.55),0)..'%).')
 			end
 		elseif args[2] == 'x' or args[2] == 'posx' then
-			send_command('gt timex '..args[3])
+			windower.send_command('gt timex '..args[3])
 		elseif args[2] == 'y' or args[2] == 'posy' then
-			send_command('gt timey '..args[3])
+			windower.send_command('gt timey '..args[3])
 		elseif args[2] == 'hide' then
-			tb_set_visibility(gt.gtt,false)
-			settings.time.visible = false
+			gt.gtt:hide()
 			log('Time display hidden.')
 		elseif args[2] == 'reset' then
-			tb_set_location(gt.gtt,0,0)
+			gt.gtt:pos(0,0)
 		else
-			tb_set_visibility(gt.gtt,true)
-			settings.time.visible = true
+			gt.gtt:show()
 			log('Showing time display.')
 		end
 	elseif args[1] == 'days' then
@@ -506,26 +446,21 @@ function event_addon_command(...)
 			inalpha = tostring(args[3]):zfill(3)
 			inalpha = inalpha+0
 			if (inalpha > 0 and inalpha < 256) then
-				tb_set_bg_color(gt.gtd,inalpha,settings.days.bg_colorr,settings.days.bg_colorg,settings.days.bg_colorb)
-				tb_set_color(gt.gtd,inalpha,255,255,255)
-				settings.days.bg_alpha = inalpha
-				settings.days.alpha = inalpha
-				log('Days transparency set to '..inalpha..' ('..math.round(100-(inalpha/2.55),0)..'%).')
+				gt.gtd:alpha(inalpha)
+				log('Day transparency set to '..inalpha..' ('..math.round(100-(inalpha/2.55),0)..'%).')
 			end
 		elseif args[2] == 'x' or args[2] == 'posx' then
-			send_command('gt daysx '..args[3])
+			windower.send_command('gt daysx '..args[3])
 		elseif args[2] == 'y' or args[2] == 'posy' then
-			send_command('gt timey '..args[3])
+			windower.send_command('gt daysy '..args[3])
 		elseif args[2] == 'hide' then
-			tb_set_visibility(gt.gtd,false)
-			settings.days.visible = false
-			log('Days display hidden.')
+			gt.gtd:hide()
+			log('Day display hidden.')
 		elseif args[2] == 'reset' then
-			tb_set_location(gt.gtd,100,0)
+			gt.gtd:pos(0,0)
 		else
-			tb_set_visibility(gt.gtd,true)
-			settings.days.visible = true
-			log('Showing days display.')
+			gt.gtd:show()
+			log('Showing day display.')
 		end
 	elseif args[1] == 'axis' then
 		if args[2] == 'vertical' then
@@ -535,9 +470,9 @@ function event_addon_command(...)
 			gt.delimiter = " "
 		log('Week display axis set to horizontal.')
 		end
-		event_day_change(get_ffxi_info()["day"])
+		day_change(windower.ffxi.get_info().day)
 	elseif args[1] == 'mode' then
-		inmode = tostring(args[2]):zfill(1)
+		inmode = args[2]:zfill(1)
 		inmode = inmode+0
 		if inmode > 4 then
 			return
@@ -545,9 +480,9 @@ function event_addon_command(...)
 			settings.mode = inmode
 			log('mode updated')
 		end
-		event_day_change(get_ffxi_info()["day"])
+		day_change(windower.ffxi.get_info().day)
 	elseif args[1] == 'save' then
 		settings:save('all')
 		log('Settings saved.')
 	end
-end
+end)

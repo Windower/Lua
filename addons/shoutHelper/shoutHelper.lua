@@ -26,14 +26,16 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-_addon = {}
+
 _addon.name = 'shoutHelper'
 _addon.version = '0.2'
+_addon.commands = {'shouthelper','sh'}
+_addon.author = 'Jandel'
 
-require 'tablehelper'
-require 'stringhelper'
+require 'tables'
+require 'strings'
 require 'logger'
---local file = require 'filehelper'
+--local file = require 'files'
 local Blackboard = require 'blackboard'
 local lavagna = nil
 local config = require 'config'
@@ -41,8 +43,7 @@ local config = require 'config'
 -- Memo: //lua load shoutHelper
 
 -- Constructor
-function event_load()
-	send_command('alias sh lua command shoutHelper')
+windower.register_event('load',function ()
 	settings = config.load({
 		posx = 300,
 		posy = 140,
@@ -51,10 +52,10 @@ function event_load()
 		fontsize = 10
 	})
 	lavagna = Blackboard:new(settings)
-end
+end)
 
 -- Handle addon args
-function event_addon_command(...)
+windower.register_event('addon command',function (...)
     local params = {...};
 	
     if #params < 1 then
@@ -64,18 +65,18 @@ function event_addon_command(...)
 	if params[1]:lower() == "help" then
 		--Idea of helper
 	    local color = '204' -- !!there is a function in scoreboard for add_to_chat
-            add_to_chat(color, 'SH: ShoutHelper v' .. _addon.version .. '. Author: Jandel')
-            add_to_chat(color, 'SH: sh help : Shows help message')
-            add_to_chat(color, 'SH: sh pos <x> <y> : Positions the list')
-            add_to_chat(color, 'SH: sh clear [<party>]: Reset list (if no party is given, it will reset all alliance).')
+            windower.add_to_chat(color, 'SH: ShoutHelper v' .. _addon.version .. '. Author: Jandel')
+            windower.add_to_chat(color, 'SH: sh help : Shows help message')
+            windower.add_to_chat(color, 'SH: sh pos <x> <y> : Positions the list')
+            windower.add_to_chat(color, 'SH: sh clear [<party>]: Reset list (if no party is given, it will reset all alliance).')
             --the following two line are commented because there's no function implemented
-            --add_to_chat(color, 'SH: sh save <filename> : Save alliance settings. If the file already exists it will overwrite it.')
-            --add_to_chat(color, 'SH: sh load <filename>  : Load the <filename> alliance settings.')
-            add_to_chat(color, "SH: sh set <party> <job1> <job2> ... : Add a job to the party. pt1 is for first party, pt2 and pt3 for second and third party. ".."Won\'t add jobs if the party list is full")
-            add_to_chat(color, 'SH: sh add [<job>] <player> : assign the name of that player to the corrisponding job.')
-            add_to_chat(color, 'SH: sh del [<party>] <job> : deletes the job from the alliance list. Party from wich delet it is optional')
-            add_to_chat(color, 'SH: sh rm <player>: removes the player from the alliance list')
-            add_to_chat(color, 'SH: sh visible : shows/hide the current alliance list')
+            --windower.add_to_chat(color, 'SH: sh save <filename> : Save alliance settings. If the file already exists it will overwrite it.')
+            --windower.add_to_chat(color, 'SH: sh load <filename>  : Load the <filename> alliance settings.')
+            windower.add_to_chat(color, "SH: sh set <party> <job1> <job2> ... : Add a job to the party. pt1 is for first party, pt2 and pt3 for second and third party. ".."Won\'t add jobs if the party list is full")
+            windower.add_to_chat(color, 'SH: sh add [<job>] <player> : assign the name of that player to the corrisponding job.')
+            windower.add_to_chat(color, 'SH: sh del [<party>] <job> : deletes the job from the alliance list. Party from wich delet it is optional')
+            windower.add_to_chat(color, 'SH: sh rm <player>: removes the player from the alliance list')
+            windower.add_to_chat(color, 'SH: sh visible : shows/hide the current alliance list')
         elseif params[1]:lower() == "pos" then
             if params[3] then
                 local posx, posy = tonumber(params[2]), tonumber(params[3])
@@ -161,13 +162,11 @@ function event_addon_command(...)
 	    error('Invalid command')
 	end
     end
-end
+end)
 
 
 
 -- Destructor
-function event_unload()
-    send_command('unalias sh')
+windower.register_event('unload',function ()
     lavagna:destroy()
-end
-
+end)

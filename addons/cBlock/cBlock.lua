@@ -26,11 +26,11 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-_addon = {}
+
 _addon.name = 'CBlock'
 _addon.version = '1.05'
 
-function event_addon_command(...)
+windower.register_event('addon command',function (...)
     local term = table.concat({...}, ' ')
     a,b,block = string.find(term,'ignore (.*)')
     c,d,delete = string.find(term,'delete (.*)')
@@ -38,16 +38,16 @@ function event_addon_command(...)
         ignore[#ignore+1] = block:lower()
         local f = io.open(settingsFile,'a')
         f:write(block.."\n")
-        add_to_chat(55,"No longer seeing "..block.." speak in FFOchat.")
+        windower.add_to_chat(55,"No longer seeing "..block.." speak in FFOchat.")
         local q,r = io.close(f)
-        if not q then write(r) end
+        if not q then print(r) end
     elseif delete ~= nil then
         for u = 1, #ignore do
             if ignore[u] == delete then
                 table.remove(ignore,u)
             end
         end
-        add_to_chat(55,"Seeing "..delete.." speak in FFOchat again.")
+        windower.add_to_chat(55,"Seeing "..delete.." speak in FFOchat again.")
         local tmp = io.open(settingsPath..'tmp.txt',"w")
         for line in io.lines(settingsFile) do
             if line ~= delete then
@@ -55,31 +55,31 @@ function event_addon_command(...)
             end
         end
         local q,w = io.close(tmp)
-        if not q then write(w) end
+        if not q then print(w) end
         local r,es = os.rename(settingsFile,settingsPath..'tmp2.txt')
-        if not r then write(es) end
+        if not r then print(es) end
         local e,rs = os.rename(settingsPath..'tmp.txt',settingsFile)
-        if not e then write(rs) end
+        if not e then print(rs) end
         local r,es = os.remove(settingsPath..'tmp2.txt')
-        if not r then write(es) end
+        if not r then print(es) end
     end
-end
+end)
 
 function file_exists(name)
    local f=io.open(name,"r")
    if f~=nil then 
         local q,r = io.close(f)
-        if not q then write(r) end
+        if not q then print(r) end
         return true 
     else
         return false 
     end
 end
 
-function event_load()
-    send_command('alias cBlock lua c cBlock')
+windower.register_event('load',function ()
+    windower.send_command('alias cBlock lua c cBlock')
     ignore = {}
-    settingsPath = lua_base_path..'data/'
+    settingsPath = windower.addon_path..'data/'
     settingsFile = settingsPath..'blacklist.txt'
     if not file_exists(settingsFile) then 
         local f,err = assert(io.open(settingsPath.."blacklist.txt","w"))
@@ -87,11 +87,11 @@ function event_load()
     else
         fill_ignore()
     end	
-end
+end)
 
-function event_unload()
-    send_command('unalias cblock')
-end
+windower.register_event('unload',function ()
+    windower.send_command('unalias cblock')
+end)
 
 function fill_ignore()
     i = 1
@@ -101,7 +101,7 @@ function fill_ignore()
     end
 end
 
-function event_incoming_text(old,new,color)
+windower.register_event('incoming text',function (old,new,color)
     for i=1,#ignore do
         c,d,text = string.find(old,'%[%d+:#%w+%](.*):')
         if text ~= nil then
@@ -111,4 +111,4 @@ function event_incoming_text(old,new,color)
         end
     end
     return new, color  -- must be here or errors will be thrown
-end
+end)

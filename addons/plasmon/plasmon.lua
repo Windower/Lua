@@ -1,5 +1,5 @@
 --[[
-plasmon v1.20130613
+plasmon v1.20131021
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -33,10 +33,11 @@ require 'logger'
 
 local config = require 'config'
 
-_addon = {}
-_addon.name     = 'plasmon'
-_addon.version  = '1.20130613'
-_addon.commands = 'plasmon'
+
+_addon.name    = 'plasmon'
+_addon.author  = 'Zohno'
+_addon.version = '1.20131021'
+_addon.command = 'plasmon'
 
 tb_name       = 'addon:gr:plasmon'
 track         = false
@@ -56,8 +57,6 @@ stats.airlixirs2     = 0
 stats.tot_airlixirs2 = 0
 
 defaults = T{}
-defaults.v         = 0
-defaults.first_run = true
 defaults.light     = false
 defaults.timer     = true
 
@@ -111,7 +110,7 @@ defaults.colors.airlixir.value.r = 147
 defaults.colors.airlixir.value.g = 161
 defaults.colors.airlixir.value.b = 161
 
-settings = T{}
+settings = config.load(defaults)
 
 -- plugin functions
 
@@ -125,7 +124,7 @@ function parse_options(args)
 
         local option = args:remove(1):sub(2)
 
-        if type(args[1]) ~= 'nil' and not args[1]:match('^-%a') then
+        if args[1] ~= nil and not args[1]:match('^-%a') then
             options[option] = args:remove(1)
         else
             options[option] = true
@@ -136,22 +135,22 @@ function parse_options(args)
 end
 
 function test()
-    add_to_chat(148, 'Now permeating the mists surrounding the fracture.')
-    add_to_chat(148, 'You receive 50 corpuscles of mweya plasm.')
-    add_to_chat(121, 'You find an airlixir on the Mob')
-    add_to_chat(148, 'You receive 50 corpuscles of mweya plasm.')
-    add_to_chat(148, 'You receive 50 corpuscles of mweya plasm.')
-    add_to_chat(148, 'You receive 150 corpuscles of mweya plasm.')
-    add_to_chat(148, 'You receive 50 corpuscles of mweya plasm.')
-    add_to_chat(121, 'You find an airlixir on the Mob')
-    add_to_chat(148, 'You receive 500 corpuscles of mweya plasm.')
-    add_to_chat(121, 'You find an airlixir on the Mob')
-    add_to_chat(121, 'You find an airlixir on the Mob')
-    add_to_chat(121, 'You find an airlixir on the Mob')
-    add_to_chat(121, 'You find an airlixir on the Mob')
-    add_to_chat(121, 'You find an airlixir +1 on the Mob')
-    add_to_chat(121, 'You find an airlixir +2 on the Mob')
-    add_to_chat(146, 'Your time has expired for this battle. Now exiting...')
+    windower.add_to_chat(148, 'Now permeating the mists surrounding the fracture.')
+    windower.add_to_chat(148, 'You receive 50 corpuscles of mweya plasm.')
+    windower.add_to_chat(121, 'You find an airlixir on the Mob')
+    windower.add_to_chat(148, 'You receive 50 corpuscles of mweya plasm.')
+    windower.add_to_chat(148, 'You receive 50 corpuscles of mweya plasm.')
+    windower.add_to_chat(148, 'You receive 150 corpuscles of mweya plasm.')
+    windower.add_to_chat(148, 'You receive 50 corpuscles of mweya plasm.')
+    windower.add_to_chat(121, 'You find an airlixir on the Mob')
+    windower.add_to_chat(148, 'You receive 500 corpuscles of mweya plasm.')
+    windower.add_to_chat(121, 'You find an airlixir on the Mob')
+    windower.add_to_chat(121, 'You find an airlixir on the Mob')
+    windower.add_to_chat(121, 'You find an airlixir on the Mob')
+    windower.add_to_chat(121, 'You find an airlixir on the Mob')
+    windower.add_to_chat(121, 'You find an airlixir +1 on the Mob')
+    windower.add_to_chat(121, 'You find an airlixir +2 on the Mob')
+    windower.add_to_chat(146, 'Your time has expired for this battle. Now exiting...')
     show_window()
 end
 
@@ -183,11 +182,11 @@ function stop_tracking()
 end
 
 function start_timer()
-    send_command('timers create Delve 2700 down ../../../addons/plasmon/icon')
+    windower.send_command('timers create Delve 2700 down ../../../addons/plasmon/icon')
 end
 
 function stop_timer()
-    send_command('timers delete Delve')
+    windower.send_command('timers delete Delve')
 end
 
 function refresh_window()
@@ -212,7 +211,7 @@ function refresh_window()
         ' \\cs('..airlixir_colors.value.r..', '..airlixir_colors.value.g..', '..airlixir_colors.value.b..')'..stats.airlixirs2..'/'..stats.tot_airlixirs2..'\\cr'
     }
 
-    tb_set_text(tb_name, text:concat(''))
+    windower.text.set_text(tb_name, text:concat(''))
 end
 
 function reset_stats()
@@ -236,13 +235,13 @@ end
 
 function show_window()
     visible = true
-    tb_set_visibility(tb_name, true)
+    windower.text.set_visibility(tb_name, true)
     refresh_window()
 end
 
 function hide_window()
     visible = false
-    tb_set_visibility(tb_name, false)
+    windower.text.set_visibility(tb_name, false)
 end
 
 function toggle_window()
@@ -257,80 +256,41 @@ function show_report()
     log('[Plasm '..(stats.plasm..'/'..stats.tot_plasm):color(258)..'] [Mobs '..(stats.mobs..'/'..stats.tot_mobs):color(258)..'] [Airlixir '..(stats.airlixirs..'/'..stats.tot_airlixirs):color(258)..' | +1 '..(stats.airlixirs1..'/'..stats.tot_airlixirs1):color(258)..' | +2 '..(stats.airlixirs2..'/'..stats.tot_airlixirs2):color(258)..']')
 end
 
-function first_run()
-    if type(settings.v) ~= 'nil' and settings.v >= tonumber(_addon.version) and settings.first_run == false then
-        return
-    end
-
-    --[[log('Hi '..get_player()['name']:lower()..',')
-    log('Thank you for using plasmon v'.._addon.version)
-    log('In this update I\'ve added a function to enable/disable the fracture timer for people who don\'t like to feel under pressure. :D')
-    log('- zohno@phoenix')]]
-
-    settings.v = _addon.version
-    settings.first_run = false
-    settings:save('all')
-end
-
 function initialize()
-    settings = config.load(defaults)
-
     local background = settings.colors.background
 
-    tb_create(tb_name)
-    tb_set_location(tb_name, settings.position.x, settings.position.y)
-    tb_set_bg_color(tb_name, background.a, background.r, background.g, background.b)
-    tb_set_color(tb_name, settings.font.a, 147, 161, 161)
-    tb_set_font(tb_name, settings.font.family, settings.font.size)
-    tb_set_bold(tb_name, settings.font.bold)
-    tb_set_italic(tb_name, settings.font.italic)
-    tb_set_text(tb_name, '')
-    tb_set_bg_visibility(tb_name, true)
+    windower.text.create(tb_name)
+    windower.text.set_location(tb_name, settings.position.x, settings.position.y)
+    windower.text.set_bg_color(tb_name, background.a, background.r, background.g, background.b)
+    windower.text.set_color(tb_name, settings.font.a, 147, 161, 161)
+    windower.text.set_font(tb_name, settings.font.family)
+    windower.text.set_font_size(tb_name, settings.font.size)
+    windower.text.set_bold(tb_name, settings.font.bold)
+    windower.text.set_italic(tb_name, settings.font.italic)
+    windower.text.set_text(tb_name, '')
+    windower.text.set_bg_visibility(tb_name, true)
 
-    if get_ffxi_info().zone_id == 271 then
+    if windower.ffxi.get_info().zone == 271 then
         recovery_mode = true
     end
 end
 
 function dispose()
-    tb_delete(tb_name)
-    send_command('timers delete Delve')
+    windower.text.delete(tb_name)
+    windower.send_command('timers delete Delve')
 end
 
 -- windower events
 
-function event_load()
-    if _addon.commands then
-        send_command('alias '.._addon.commands..' lua c '.._addon.name)
-    end
+windower.register_event('load', initialize:cond(function() return windower.ffxi.get_info().logged_in end))
 
-    if get_ffxi_info()['logged_in'] then
-        initialize()
-    end
-end
+windower.register_event('login', initialize)
 
-function event_unload()
-    dispose()
+windower.register_event('logout', 'unload', dispose)
 
-    send_command('unalias plasmon')
-end
+windower.register_event('zone change', stop_tracking:cond(function(id) return id == 271 and track end))
 
-function event_login()
-    initialize()
-    first_run()
-end
-
-function event_logout()
-    dispose()
-end
-
-function event_zone_change(from_id, from, to_id, to)
-    if from_id == 271 and track then
-        stop_tracking()
-    end
-end
-
-function event_incoming_text(original, modified, mode)
+windower.register_event('incoming text', function(original, modified, mode)
     local match
 
     original = original:strip_format()
@@ -422,13 +382,13 @@ function event_incoming_text(original, modified, mode)
     end
 
     return modified, mode
-end
+end)
 
-function event_addon_command(...)
+windower.register_event('addon command', function(...)
     local args = T({...})
 
     if args[1] == nil then
-        send_command('plasmon help')
+        windower.send_command('plasmon help')
         return
     end
 
@@ -578,7 +538,7 @@ function event_addon_command(...)
                 settings.position.x = x
                 settings.position.y = y
 
-                tb_set_location(tb_name, x, y)
+                windower.text.set_location(tb_name, x, y)
                 settings:save('all')
                 log('The window\'s position has been set.')
             end
@@ -670,10 +630,10 @@ function event_addon_command(...)
                 settings.font.italic = italic
                 settings.font.a      = a
 
-                tb_set_color(tb_name, a, 147, 161, 161)
-                tb_set_font(tb_name, family, size)
-                tb_set_bold(tb_name, bold)
-                tb_set_italic(tb_name, italic)
+                windower.text.set_color(tb_name, a, 147, 161, 161)
+                windower.text.set_font(tb_name, family, size)
+                windower.text.set_bold(tb_name, bold)
+                windower.text.set_italic(tb_name, italic)
                 settings:save('all')
                 log('The font\'s style has been set.')
             end
@@ -872,7 +832,7 @@ function event_addon_command(...)
                             settings.colors[indexes[1]].a = a
                         end
 
-                        tb_set_bg_color(
+                        windower.text.set_bg_color(
                             tb_name,
                             settings.colors[indexes[1]].a,
                             settings.colors[indexes[1]].r,
@@ -887,7 +847,7 @@ function event_addon_command(...)
                 log('The objects\' color has been set.')
             end
         else
-            send_command('plasmon help')
+            windower.send_command('plasmon help')
         end
     end
-end
+end)

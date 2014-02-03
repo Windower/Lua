@@ -24,98 +24,70 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-_addon = _addon or {}
-_addon.name = 'th tracker'
+
+_addon.name = 'THTracker'
+_addon.author = 'Krizz'
 _addon.version = 1.0
+_addon.commands = {'thtracker', 'th'}
 
+config = require 'config'
+texts = require 'texts'
 
-local config = require 'config'
+defaults = {}
+defaults.pos = {}
+defaults.pos.x = 1000
+defaults.pos.y = 200
+defaults.color = {}
+defaults.color.alpha = 200
+defaults.color.red = 200
+defaults.color.green = 200
+defaults.color.blue = 200
+defaults.bg = {}
+defaults.bg.alpha = 200
+defaults.bg.red = 30
+defaults.bg.green = 30
+defaults.bg.blue = 30
 
-thoutput = ''
-posx = 1000
-posy = 200
-see = true
+settings = config.load(defaults)
 
-local settingtab = nil
-local settings_file = 'data\\settings.xml'
-local settingtab = config.load(settings_file)
-if settingtab == nil then
-	write('No settings file found. Ensure you have a file at data\\settings.xml')
-end
+th = texts.new(settings)
 
-	if settingtab['posx'] ~= nil then
-		posx = settingtab['posx']
-		posy = settingtab['posy']
-	end	
-	
-local name = nil
+windower.register_event('addon command', function(command, ...)
+    command = command and command:lower()
+    local args = {...}
 
-function event_load()
-	send_command('alias th lua c thtracker')
-	thbox()
-	tb_set_visibility('th_box',false)
-end
+    if command == 'pos' then
+        local posx, posy = tonumber(params[2]), tonumber(params[3])
+        if posx and posy then
+            th:pos(posx, posy)
+        end
 
-function event_addon_command(...)
-	local params = {...};
-	if #params < 1 then
-		return
-	end
-	if params[1] then
-		if params[1]:lower() == "help" then
-			write('th help : Shows help message')
-			write('th pos <x> <y> : Positions the list')
-			write('th hide : Hides the box')
-			write('th show : Shows the box')
-		elseif params[1]:lower() == "pos" then
-			if params[3] then
-				local posx, posy = tonumber(params[2]), tonumber(params[3])
-				tb_set_location('th_box', posx, posy)
-			end
-		elseif params[1]:lower() == "hide" then
-			see = false
-			tb_set_visibility('th_box', see)
-		elseif params[1]:lower() == "show" then
-			see = true
-			tb_set_visibility('th_box', see)
-		end
-	end
-end
+    elseif command == "hide" then
+        th:hide()
 
-function event_incoming_text(original, new, color)
-	count = 0
-	a,b,name,count = string.find(original,'Additional effect: Treasure Hunter effectiveness against the (.*)%s? increases to (%d+)\46')
-	a,b,deadmob = string.find(original,'%w+ defeats the (.*)\46')
-	if name ~= nil and count ~= 0 then
-		mob = name
-		thoutput = ' '
-		thoutput = (' '..name..'\n TH: '..count)
-		thbox()
-		tb_set_text('th_box', thoutput);
-		tb_set_visibility('th_box',see)
-	end
-	if deadmob ~= nil and mob ~= nil then
-		if mob == deadmob then
-			tb_set_text('th_box', '')
-			name = nil
-			deadmob = nil
-			thoutput = nil
-		end
-	end
-end
+    elseif command == 'show' then
+        th:show()
 
-function thbox()
-	tb_create('th_box')
-	tb_set_bg_color('th_box',200,30,30,30)
-	tb_set_color('th_box',255,200,200,200)
-	tb_set_location('th_box',posx,posy)
-	tb_set_visibility('th_box', see)
-	tb_set_bg_visibility('th_box',1)
-	tb_set_font('th_box','Arial',12)
-end
+    else
+        print('th help : Shows help message')
+        print('th pos <x> <y> : Positions the list')
+        print('th hide : Hides the box')
+        print('th show : Shows the box')
 
-function event_unload()
-	tb_delete('th_box')
+    end
+end)
 
-	send_command('unalias th')
-end 
+windower.register_event('incoming text', function(original, new, color)
+    local name, count = original:match('Additional effect: Treasure Hunter effectiveness against the (.*) increases to (%d+).')
+    if name and count then
+        mob = name
+        th:text(' '..name..'\n TH: '..count);
+        th:show()
+    end
+
+    name = original:match('%w+ defeats the (.*).')
+    if name and mob == name then
+        th:text('')
+        th:hide()
+    end
+end)

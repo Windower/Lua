@@ -1,5 +1,5 @@
 **Author:** Ricky Gall  
-**Version:** 1.15  
+**Version:** 1.21  
 **Description:**  
 Addon to make setting blue spells easier. Currently only works as blu main.
 
@@ -16,6 +16,10 @@ Addon to make setting blue spells easier. Currently only works as blu main.
  8. //aset help --Shows this menu.
  
 **Changes:**  
+v1.15 - v1.22  
+ * Fixed spells that were missing
+ * Recoded for 4.1
+ 
 v1.1 - v1.15  
  * Added spellset listing
  * Added listing a given set's spells
