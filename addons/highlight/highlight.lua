@@ -85,17 +85,12 @@ windower.register_event('addon command', function(command, ...)
         print('To view your last mentions type //highlight view <last number>')
     end
 end)
-<<<<<<< HEAD
 
 windower.register_event('login','load', function()
 	if windower.ffxi.get_info()['logged_in'] == true then
 		windower.send_command('@wait 1; lua i highlight initialize')
 	end
 end)
-=======
- 
-windower.register_event('load', 'login', windower.send_command+{'wait 2; lua i highlight initialize'})
->>>>>>> upstream/4.1-dev
  
 function initialize()
     send_count = 0 
@@ -125,11 +120,7 @@ function initialize()
 end
  
 windower.register_event('incoming text', function(original, modified, color, newcolor)
-<<<<<<< HEAD
     if not original:match('%[.*%] .* '..string.char(129, 168)..'.*') and not original:match('.* '..chars['implies']..'.*') then
-=======
-    if not original:match('%[.*%] .* '..string.char(129, 168)..'.*') and not original:match('.* '..chat.chars['implies']..'.*') then
->>>>>>> upstream/4.1-dev
         for names in modified:gmatch('%w+') do
             for name in pairs(members) do
                 modified = modified:igsub(members[name], modmember[name])
