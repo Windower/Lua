@@ -188,17 +188,19 @@ function equip_sets_exit(swap_type,ts,val1)
 	if type(swap_type) == 'string' then
 		if swap_type == 'pretarget' then
 			command_send_check(ts)
-			if ts and command_registry[ts] and val1.target and st_targs[val1.target.raw] then
-			-- st targets
-				st_flag = true
-			elseif ts and command_registry[ts] and val1.target and not val1.target.name then
-			-- Spells with invalid pass_through_targs, like using <t> without a target
-				command_registry[ts] = nil
-			elseif ts and command_registry[ts] and val1.target and val1.target.name then
-			-- Spells with complete target information
-			-- command_registry[ts] is deleted for cancelled spells
-				equip_sets('precast',ts,val1)
-				return true
+			if ts and command_registry[ts] and val1.target then
+				if st_targs[val1.target.raw] then
+				-- st targets
+					st_flag = true
+				elseif not val1.target.name then
+				-- Spells with invalid pass_through_targs, like using <t> without a target
+					command_registry[ts] = nil
+				else
+				-- Spells with complete target information
+				-- command_registry[ts] is deleted for cancelled spells
+					equip_sets('precast',ts,val1)
+					return true
+				end
 			elseif not ts and debugging >= 1 then
 				windower.add_to_chat(123,'Hey Byrth, ts somehow does not exist here.')
 			end
@@ -208,7 +210,7 @@ function equip_sets_exit(swap_type,ts,val1)
 				
 				debug_mode_chat("Unable to create a packet for this command or action canceled ("..tempcmd..")")
 				return tempcmd
-			elseif not storedcommand and (not ts or not command_registry[ts]) then
+			elseif not ts or not command_registry[ts] then
 				return true
 			end
 		elseif swap_type == 'precast' then
