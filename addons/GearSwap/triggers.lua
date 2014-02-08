@@ -41,11 +41,23 @@
 ---- none or ''
 -----------------------------------------------------------------------------------
 windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
+--	windower.add_to_chat(8,modified..'    Blocked: ' ..tostring(blocked)..'     FFXI: '..tostring(ffxi))
 	if debugging >= 1 then windower.debug('outgoing text (debugging)') end
 	if gearswap_disabled then return modified end
 	
 	local temp_mod = windower.convert_auto_trans(modified):gsub(' <wait %d+>','')
 	local splitline = temp_mod:split(' ')
+	local remove_array = {}
+	for i,v in pairs(splitline) do
+		if v == '' then
+			remove_array[i] = true
+		end
+	end
+	for i,v in pairs(remove_array) do
+		table.remove(splitline,i)
+		splitline.n = splitline.n-1
+	end
+
 	local command = splitline[1]
 	
 	local a,b,abil = string.find(temp_mod,'"(.-)"')
