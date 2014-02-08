@@ -57,6 +57,7 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
 		table.remove(splitline,i)
 		splitline.n = splitline.n-1
 	end
+	if splitline.n == 0 then return end
 
 	local command = splitline[1]
 	
