@@ -52,7 +52,7 @@ function resource_group(r, fn, attr)
 end
 
 resource_mt.__index = function(t, k)
-    return slots[t]:contains(k)
+    return (slots[t]:contains(k) or k == 'name')
             and resource_group-{k}
         or table[k]
 end
@@ -233,7 +233,7 @@ function fns.items()
     local match_string
 
     local res = {}
-    slots[res] = S{}
+    slots[res] = S{'log_name'}
 
     -- General items
     file = _libs.files.read(plugin_resources..'items_general.xml')
