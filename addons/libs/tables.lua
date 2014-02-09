@@ -621,7 +621,7 @@ function table.min(t)
 end
 
 -- Returns the maximum element of the table.
-function table.min(t)
+function table.max(t)
     return table.reduce(t, math.max)
 end
 

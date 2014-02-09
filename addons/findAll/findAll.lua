@@ -340,7 +340,7 @@ end
 
 windower.register_event('load', update:cond(function() return windower.ffxi.get_info().logged_in end))
 
-windower.register_event('unload', error:prepare('findAll wasn\'t ready'):cond(function() return windower.ffxi_get_info().logged_in and not update() end))
+windower.register_event('unload', error:prepare('findAll wasn\'t ready'):cond(function() return windower.ffxi.get_info().logged_in and not update() end))
 
 windower.register_event('login', 'zone change', function()
     load_timestamp = os.time()

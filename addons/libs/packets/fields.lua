@@ -756,9 +756,44 @@ fields.incoming[0x01B] = L{
     {ctype='unsigned int',      label='Encumbrance Flags'},                     -- 60   [legs, hands, body, head, ammo, range, sub, main,] [back, right_ring, left_ring, right_ear, left_ear, waist, neck, feet] [HP, CHR, MND, INT, AGI, VIT, DEX, STR,] [X X X X X X X MP]
 }
 
+-- Inventory Count
+-- It is unclear why there are two representations of the size for this.
+-- I have manipulated my inventory size on a mule after the item update packets have
+-- all arrived and still did not see any change in the second set of sizes, so they
+-- may not be max size/used size chars as I initially assumed. Adding them as shorts
+-- for now.
+-- There appears to be space for another 8 bags.
+fields.incoming[0x01C] = L{
+    {ctype='unsigned char',     label='Inventory Size'},                        -- 04
+    {ctype='unsigned char',     label='Safe Size'},                             -- 05
+    {ctype='unsigned char',     label='Storage Size'},                          -- 06
+    {ctype='unsigned char',     label='Temporary Size'},                        -- 07
+    {ctype='unsigned char',     label='Locker Size'},                           -- 08
+    {ctype='unsigned char',     label='Satchel Size'},                          -- 09
+    {ctype='unsigned char',     label='Sack Size'},                             -- 0A
+    {ctype='unsigned char',     label='Case Size'},                             -- 0B
+    {ctype='char[8]',           label='_padding1',          const=0x00},        -- 0C
+    {ctype='unsigned short',    label='Inventory Size'},                        -- 14
+    {ctype='unsigned short',    label='Safe Size'},                             -- 16
+    {ctype='unsigned short',    label='Safe Taken'},                            -- 16
+    {ctype='unsigned short',    label='Storage Size'},                          -- 18   For some reason this reports a value 4 larger than the first Storage Size.
+    {ctype='unsigned short',    label='Temporary Size'},                        -- 1A
+    {ctype='unsigned short',    label='Locker Size'},                           -- 1C
+    {ctype='unsigned short',    label='Satchel Size'},                          -- 1E
+    {ctype='unsigned short',    label='Sack Size'},                             -- 20
+    {ctype='unsigned short',    label='Case Size'},                             -- 22
+    {ctype='char[16]',          label='_padding2',          const=0x00},        -- 24
+}
+
+-- Finish Inventory
+fields.incoming[0x01D] = L{
+    {ctype='unsigned char',     label='Flag',               const=0x01},        -- 04
+    {ctype='char[3]',           label='_junk1'},                                -- 05
+}
+
 -- Item Assign
 fields.incoming[0x01F] = L{
-    {ctype='unsigned int',      label='_unknown1',          const=0x00000001},  -- 04
+    {ctype='unsigned int',      label='Item Count'},                            -- 04
     {ctype='unsigned short',    label='Item ID',            fn=item},           -- 08
     {ctype='unsigned char',     label='_padding1',          const=0x00},        -- 0A
     {ctype='unsigned char',     label='Inventory ID'},                          -- 0B
@@ -1099,7 +1134,7 @@ fields.incoming[0x061] = L{
     {ctype='unsigned short',    label='Defense'},                               -- 32
     {ctype='signed short',      label='Fire Resistance'},                       -- 34
     {ctype='signed short',      label='Wind Resistance'},                       -- 36
-    {ctype='signed short',      label='Thunder Resistance'},                    -- 38
+    {ctype='signed short',      label='Lightning Resistance'},                  -- 38
     {ctype='signed short',      label='Light Resistance'},                      -- 3A
     {ctype='signed short',      label='Ice Resistance'},                        -- 3C
     {ctype='signed short',      label='Earth Resistance'},                      -- 3E

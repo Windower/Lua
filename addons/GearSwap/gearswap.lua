@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.821'
+_addon.version = '0.822'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -138,6 +138,9 @@ windower.register_event('addon command',function (...)
 	elseif strip(cmd) == 'debugmode' then
 		_settings.debug_mode = not _settings.debug_mode
 		print('GearSwap: Debug Mode set to '..tostring(_settings.debug_mode)..'.')
+	elseif strip(cmd) == 'demomode' then
+		_settings.demo_mode = not _settings.demo_mode
+		print('GearSwap: Demo Mode set to '..tostring(_settings.demo_mode)..'.')
 	elseif strip(cmd) == 'showswaps' then
 		_settings.show_swaps = not _settings.show_swaps
 		print('GearSwap: Show Swaps set to '..tostring(_settings.show_swaps)..'.')
@@ -300,7 +303,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
 			if encumbrance_table[i] and math.floor( (enc%(2^(i+1))) / 2^i ) ~= 1 and not_sent_out_equip[v] and not disable_table[i] then
 				tab[v] = not_sent_out_equip[v]
 				not_sent_out_equip[v] = nil
-				if _settings.debug_mode then windower.add_to_chat(8,"GearSwap (Debug Mode): Your "..v..' are now unlocked.') end
+				debug_mode_chat("Your "..v.." are now unlocked.")
 			end
 			encumbrance_table[i] = tf
 		end
@@ -354,7 +357,13 @@ windower.register_event('gain buff',function(buff_id)
 	if gearswap_disabled then return end
 	
 	-- Need to figure out what I'm going to do with this:
-	if _global.midaction and T{'terror','sleep','stun','petrification','charm','weakness'}:contains(buff_name:lower()) then _global.midaction = false end
+	if T{'terror','sleep','stun','petrification','charm','weakness'}:contains(buff_name:lower()) then
+		for i,v in pairs(command_registry) do
+			if v.midaction then
+				command_registry[i] = nil
+			end
+		end
+	end
 	
 	refresh_globals()
 	equip_sets('buff_change',nil,buff_name,true)
@@ -380,10 +389,10 @@ windower.register_event('job change',function(mjob_id, mjob_lvl, sjob_id, sjob_l
 
 	if current_job_file ~= res.jobs[mjob_id].short then
 		refresh_user_env(mjob_id)
-	elseif player.sub_job ~= res.jobs[mjob_id].short then
+	elseif player.sub_job ~= res.jobs[sjob_id].short then
 		local temp_sub = player.sub_job
 		refresh_globals()
-		equip_sets('sub_job_change',nil,res.jobs[mjob_id].short,temp_sub)
+		equip_sets('sub_job_change',nil,res.jobs[sjob_id].short,temp_sub)
 	end
 end)
 

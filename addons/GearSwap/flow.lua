@@ -41,13 +41,15 @@
 ---- Everything else : nil
 -----------------------------------------------------------------------------------
 function equip_sets(swap_type,ts,...)
+	local results
 	local var_inps = {...}
 	local val1 = var_inps[1]
 	local val2 = var_inps[2]
-	load_globals(ts)
+	table.reassign(_global,command_registry[ts] or {cast_delay = 0,midaction = false,pet_midaction = false,cancel_spell = false})
+	_global.current_event = tostring(swap_type)
+	
 	if debugging >= 1 then windower.debug(tostring(swap_type)..' enter') 
 	if showphase or debugging >= 2 then windower.add_to_chat(8,tostring(swap_type)..' enter') end end
-	_global.current_event = tostring(swap_type)
 	
 	local cur_equip = get_gs_gear(items.equipment,swap_type)
 	
@@ -76,7 +78,7 @@ function equip_sets(swap_type,ts,...)
 		end
 	end
 	
-	if _settings.debug_mode then windower.add_to_chat(8,'GearSwap (Debug Mode): '..swap_type) end
+	debug_mode_chat("Entering "..swap_type)
 	
 	if not val1 then val1 = {}
 		if debugging >= 2 then
@@ -91,7 +93,8 @@ function equip_sets(swap_type,ts,...)
 
 	
 	if type(swap_type) == 'function' then
-		swap_type(...)
+		results = { pcall(swap_type,...) }
+		if not table.remove(results,1) then error('\nUser Event Error: '..results[1]) end
 	elseif swap_type == 'equip_command' then
 		equip(val1)
 	else
@@ -102,8 +105,8 @@ function equip_sets(swap_type,ts,...)
 	if type(swap_type) == 'string' and swap_type == 'pretarget' then -- Target may just have been changed, so make the ind now.
 		ts = mk_command_registry_entry(val1)
 	elseif type(swap_type) == 'string' and swap_type == 'precast' then
-		_global.midaction = true
-		command_registry[ts].timestamp = os.time()
+		if not command_registry[ts] then if debugging >= 1 then print_set(spell,'precast nil error') end
+		else command_registry[ts].timestamp = os.time() end
 	end
 	
 	
@@ -120,7 +123,7 @@ function equip_sets(swap_type,ts,...)
 		local equip_next = to_id_set(items.inventory,equip_list) -- Translates the equip_list from the player (i=slot name, v=item name) into a table with i=slot id and v=inventory id.
 		equip_next = eliminate_redundant(cur_equip,equip_next) -- Eliminate the equip commands for items that are already equipped
 		
-		if _settings.show_swaps and table.length(equip_next)>0 then
+		if (_settings.show_swaps and table.length(equip_next) > 0) or _settings.demo_mode then --and table.length(equip_next)>0 then
 			local tempset = to_names_set(equip_next,items.inventory)
 			print_set(tempset,tostring(swap_type))
 		end
@@ -132,8 +135,8 @@ function equip_sets(swap_type,ts,...)
 			elseif v == 0 then
 				failure_reason = 'KOed'
 			end
-			if _settings.debug_mode and failure_reason then
-				windower.add_to_chat(8,'GearSwap (Debug Mode): Cannot change gear right now: '..failure_reason)
+			if failure_reason then
+				debug_mode_chat("Cannot change gear right now: "..failure_reason)
 			end
 		end
 		
@@ -149,7 +152,7 @@ function equip_sets(swap_type,ts,...)
 					windower.add_to_chat(8,'GearSwap (Debugging): '..out_str)
 				elseif equip_next[i] and not disable_table[i] and not encumbrance_table[i] then
 					windower.debug('attempting to set gear. Order: '..tostring(_)..'  Slot ID: '..tostring(i)..'  Inv. ID: '..tostring(equip_next[i]))
-					windower.ffxi.set_equip(equip_next[i],i)
+					if not _settings.demo_mode then windower.ffxi.set_equip(equip_next[i],i) end
 					sent_out_equip[i] = equip_next[i] -- re-make the equip_next table with the name sent_out_equip as the equipment is sent out.
 				end
 			end
@@ -160,6 +163,9 @@ function equip_sets(swap_type,ts,...)
 	
 	if debugging >= 1 then windower.debug(tostring(swap_type)..' exit') end
 	
+	if type(swap_type) == 'function' then
+		return unpack(results)
+	end
 	return equip_sets_exit(swap_type,ts,val1)
 end
 
@@ -176,31 +182,41 @@ end
 ---- none
 -----------------------------------------------------------------------------------
 function equip_sets_exit(swap_type,ts,val1)
-	cache_globals(ts)
+	if command_registry[ts] then
+		table.update(command_registry[ts],_global)
+	end
 	if type(swap_type) == 'string' then
 		if swap_type == 'pretarget' then
 			command_send_check(ts)
-			if ts and val1.target and st_targs[val1.target.raw] then
-			-- st targets
-				st_flag = true
-			elseif ts and val1.target and not val1.target.name then
-			-- Spells with invalid pass_through_targs, like using <t> without a target
-				command_registry[ts] = nil
-			elseif ts and val1.target and val1.target.name then
-			-- Spells with complete target information
-				equip_sets('precast',ts,val1)
-				return true
+			if ts and command_registry[ts] and val1.target then
+				if st_targs[val1.target.raw] then
+				-- st targets
+					st_flag = true
+				elseif not val1.target.name then
+				-- Spells with invalid pass_through_targs, like using <t> without a target
+					command_registry[ts] = nil
+				else
+				-- Spells with complete target information
+				-- command_registry[ts] is deleted for cancelled spells
+					equip_sets('precast',ts,val1)
+					return true
+				end
+			elseif not ts and debugging >= 1 then
+				windower.add_to_chat(123,'Hey Byrth, ts somehow does not exist here.')
 			end
-			if storedcommand then
+			if storedcommand then -- Stored commands are deleted for canceled spells
 				local tempcmd = storedcommand..' '..spell.target.raw
 				storedcommand = nil
-				if debugging >= 1 or _global.debugmode then windower.add_to_chat(8,'GearSwap (Debug): Unable to create a packet for this command or action canceled ('..tempcmd..')') end
+				
+				debug_mode_chat("Unable to create a packet for this command or action canceled ("..tempcmd..")")
 				return tempcmd
-			elseif not storedcommand and not ts then
+			elseif not ts or not command_registry[ts] then
 				return true
 			end
 		elseif swap_type == 'precast' then
 			packet_send_check(ts)
+		elseif swap_type == 'midcast' and _settings.demo_mode then
+			equip_sets('aftercast',ts,val1)
 		elseif swap_type == 'aftercast' then
 			if ts then
 				for i,v in pairs(command_registry) do
@@ -234,7 +250,8 @@ end
 function user_pcall(str,...)
 	if user_env then
 		if type(user_env[str]) == 'function' then
-			user_env[str](...)
+			bool,err = pcall(user_env[str],...)
+			if not bool then error('\nUser function error: '..err) end
 		elseif user_env[str] then
 			windower.add_to_chat(123,'GearSwap: '..str..'() exists but is not a function')
 		end
@@ -242,58 +259,12 @@ function user_pcall(str,...)
 end
 
 
------------------------------------------------------------------------------------
---Name: load_globals(inde)
---Desc: Takes the relevant values from command_registry for the current action and places 
---      them in the _global table, to preserve their values from pretarget to
---      precast.
---Args:
----- inde - key for command_registry
------------------------------------------------------------------------------------
---Returns:
----- none
------------------------------------------------------------------------------------
-function load_globals(ts)
-	if command_registry[ts] then
-		for i,v in pairs(_global) do
-			if command_registry[ts][i] then
-				_global[i] = command_registry[ts][i]
-			end
-		end
-	end
-end
-
 
 -----------------------------------------------------------------------------------
---Name: cache_globals(inde)
---Desc: Takes the values from _global for the current action and places them in the
---      relevant command_registry table, to preserve their values from pretarget to precast.
---Args:
----- inde - key for command_registry
------------------------------------------------------------------------------------
---Returns:
----- none
------------------------------------------------------------------------------------
-function cache_globals(ts)
-	if command_registry[ts] then
-		for i,v in pairs(_global) do
-			command_registry[ts][i] = v
-		end
-	end
-	_global.cast_delay = 0
-	_global.storedtarget = ''
-	_global.midaction = false
-	_global.pet_midaction = false
-	_global.cancel_spell = false
-end
-
-
-
------------------------------------------------------------------------------------
---Name: command_send_check(inde)
+--Name: command_send_check(ts)
 --Desc: Check at the end of pretarget to see whether or not the command should be sent.
 --Args:
----- inde - command_registry index of the current spell
+---- ts - command_registry index of the current spell
 -----------------------------------------------------------------------------------
 --Returns:
 ---- string - gets propagated back to the outgoing_text function
@@ -319,13 +290,15 @@ function command_send_check(ts)
 					command_registry[ts] = nil
 				end
 			elseif outgoing_action_category_table[unify_prefix[spell.prefix]] then
-				if outgoing_action_category_table[unify_prefix[spell.prefix]] == 3 then
-					command_registry[ts].proposed_packet = assemble_action_packet(spell.target.id,spell.target.index,outgoing_action_category_table[unify_prefix[spell.prefix]],spell.index)
-				else
-					command_registry[ts].proposed_packet = assemble_action_packet(spell.target.id,spell.target.index,outgoing_action_category_table[unify_prefix[spell.prefix]],spell.id)
-				end
-				if not command_registry[ts].proposed_packet then
-					command_registry[ts] = nil
+				if filter_precast(spell) then
+					if outgoing_action_category_table[unify_prefix[spell.prefix]] == 3 then
+						command_registry[ts].proposed_packet = assemble_action_packet(spell.target.id,spell.target.index,outgoing_action_category_table[unify_prefix[spell.prefix]],spell.index)
+					else
+						command_registry[ts].proposed_packet = assemble_action_packet(spell.target.id,spell.target.index,outgoing_action_category_table[unify_prefix[spell.prefix]],spell.id)
+					end
+					if not command_registry[ts].proposed_packet then
+						command_registry[ts] = nil
+					end
 				end
 			else
 				windower.add_to_chat(8,"GearSwap: Hark, what weird prefix through yonder window breaks? "..tostring(spell.prefix))
@@ -337,7 +310,7 @@ end
 
 
 -----------------------------------------------------------------------------------
---Name: packet_send_check(inde)
+--Name: packet_send_check(ts)
 --Desc: Determines whether or not to send the current packet.
 --      Cancels if _global.cancel_spell is true
 --          If command_registry[ts].cast_delay is not 0, cues delayed_cast with the proper
@@ -349,7 +322,7 @@ end
 ---- true (to block) or the outgoing packet
 -----------------------------------------------------------------------------------
 function packet_send_check(ts)
-	if ts then
+	if ts and command_registry[ts] then
 		if command_registry[ts].cancel_spell then
 			command_registry[ts] = nil
 		else
@@ -378,17 +351,17 @@ function delayed_cast(ts)
 	ts = tonumber(ts)
 	if ts then
 		send_action(ts)
-	elseif debugging >= 1 or _settings.debug_mode then
-		windower.add_to_chat(8,'GearSwap (Debug Mode): Bad index passed to delayed_cast')
+	else
+		debug_mode_chat("Bad index passed to delayed_cast")
 	end
 end
 
 
 -----------------------------------------------------------------------------------
---Name: send_action(inde)
+--Name: send_action(ts)
 --Desc: Sends the cued action packet, if it exists.
 --Args:
----- inde - index_command for a command_registry entry that includes an action packet (hopefully)
+---- ts - index for a command_registry entry that includes an action packet (hopefully)
 -----------------------------------------------------------------------------------
 --Returns:
 ---- none
@@ -396,11 +369,10 @@ end
 function send_action(ts)
 	if command_registry[ts].proposed_packet then
 		cued_packet = ts
-		windower.packets.inject_outgoing(command_registry[ts].proposed_packet:byte(1),command_registry[ts].proposed_packet)
+		if not _settings.demo_mode then windower.packets.inject_outgoing(command_registry[ts].proposed_packet:byte(1),command_registry[ts].proposed_packet) end
+		command_registry[ts].midaction = true
 		equip_sets('midcast',ts,command_registry[ts].spell)
 		windower.send_command('input /assist <me>')
-	else
-		windower.add_to_chat(123,'GearSwap: Cued Packet not found')
 	end
 end
 

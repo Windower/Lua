@@ -5,6 +5,7 @@ _addon.command = 'highlight'
 
 file = require('files')
 chat = require('chat')
+chars = require('chat.chars')
 require('tables')
 require('strings')
  
@@ -84,8 +85,12 @@ windower.register_event('addon command', function(command, ...)
         print('To view your last mentions type //highlight view <last number>')
     end
 end)
- 
-windower.register_event('load', 'login', windower.send_command+{'wait 2; lua i highlight initialize'})
+
+windower.register_event('login','load', function()
+	if windower.ffxi.get_info()['logged_in'] == true then
+		windower.send_command('@wait 1; lua i highlight initialize')
+	end
+end)
  
 function initialize()
     send_count = 0 
@@ -109,12 +114,13 @@ function initialize()
     end
  
     player = windower.ffxi.get_player().name
+	print(player)
  
     get_party_members()
 end
  
 windower.register_event('incoming text', function(original, modified, color, newcolor)
-    if not original:match('%[.*%] .* '..string.char(129, 168)..'.*') and not original:match('.* '..chat.chars['implies']..'.*') then
+    if not original:match('%[.*%] .* '..string.char(129, 168)..'.*') and not original:match('.* '..chars['implies']..'.*') then
         for names in modified:gmatch('%w+') do
             for name in pairs(members) do
                 modified = modified:igsub(members[name], modmember[name])
@@ -135,7 +141,7 @@ windower.register_event('incoming text', function(original, modified, color, new
  
     end
         --Not rolltracker and not battlemod
-        if not original:match('.* '..string.char(129, 168)..'.*') and not original:match('.* '..chat.chars['implies']..'.*') and color ~= 4 then
+        if not original:match('.* '..string.char(129, 168)..'.*') and not original:match('.* '..chars['implies']..'.*') and color ~= 4 then
             --Chat modes not empty
             if original:match('^%(.*%)') or original:match('^<.*>') or original:match('^%[%d:#%w+%]%w+(%[?%w-%]?):') then
                 --Not myself

@@ -76,9 +76,7 @@ function change_target(name)
 		return
 	end
 	if name and type(name)=='string' then
-		local temp_targ
-		_global.storedtarget,temp_targ = valid_target(name)
-		spell.target = temp_targ
+		_,spell.target = valid_target(name)
 	else
 		error('\nGearSwap: change_target() was passed an invalid value ('..tostring(name)..'). (must be a string)', 2)
 	end
@@ -149,12 +147,26 @@ end
 function print_set(set,title)
 	if not set then
 		if title then
-			error('\nGearSwap: print_set error, '..title..' set is nil.', 2)
+			error('\nGearSwap: print_set error, '..tostring(title)..' set is nil.', 2)
 		else
 			error('\nGearSwap: print_set error, set is nil.', 2)
 		end
 		return
+	elseif type(set) ~= 'table' then
+		if title then
+			error('\nGearSwap: print_set error, '..tostring(title)..' set is not a table.', 2)
+		else
+			error('\nGearSwap: print_set error, set is not a table.', 2)
+		end
+	elseif table.length(set) == 0 then
+		if title then
+			windower.add_to_chat(1,'------------------'.. tostring(title)..' -- Empty Table -----------------')
+		else
+			windower.add_to_chat(1,'-------------------------- Empty Table -------------------------')
+		end
+		return
 	end
+	
 	if title then
 		windower.add_to_chat(1,'------------------------- '..tostring(title)..' -------------------------')
 	else
@@ -207,7 +219,7 @@ function unregister_event_user(id)
 end
 
 function user_equip_sets(func)
-	return setfenv(function(...) gearswap.equip_sets(func,nil,...) end,user_env)
+	return setfenv(function(...) return gearswap.equip_sets(func,nil,...) end,user_env)
 end
 
 function include_user(str)
