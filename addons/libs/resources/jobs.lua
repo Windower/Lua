@@ -25,6 +25,18 @@ jobs[21] = {english = 'Geomancer',     short = 'GEO'}
 jobs[22] = {english = 'Rune Fencer',   short = 'RUN'}
 jobs[23] = {english = 'Monipulator',   short = 'MON'}
 
+jobs.convert = function (bits)
+    local list = {}
+    
+    for i=1,#jobs do
+        if math.floor(bits%(2^(i+1))/2^i) == 1 then
+            list[#list + 1] = i
+        end
+    end
+    
+    return list
+end
+
 return jobs
 
 --[[

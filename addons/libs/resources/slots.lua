@@ -1,31 +1,46 @@
 -- Slots
 local slots = {}
 
-slots[2^0]   = {english = 'Main',       }
-slots[2^1]   = {english = 'Sub',        }
-slots[2^2]   = {english = 'Ranged',     }
-slots[2^3]   = {english = 'Ammo',       }
-slots[2^4]   = {english = 'Head',       }
-slots[2^5]   = {english = 'Body',       }
-slots[2^6]   = {english = 'Hands',      }
-slots[2^7]   = {english = 'Legs',       }
-slots[2^8]   = {english = 'Feet',       }
-slots[2^9]   = {english = 'Neck',       }
-slots[2^10]  = {english = 'Waist',      }
-slots[2^11]  = {english = 'Left Ear',   }
-slots[2^12]  = {english = 'Right Ear',  }
-slots[2^13]  = {english = 'Left Ring',  }
-slots[2^14]  = {english = 'Right Ring', }
-slots[2^15]  = {english = 'Back',       }
+slots[0]   = {english = 'Main',       }
+slots[1]   = {english = 'Sub',        }
+slots[2]   = {english = 'Ranged',     }
+slots[3]   = {english = 'Ammo',       }
+slots[4]   = {english = 'Head',       }
+slots[5]   = {english = 'Body',       }
+slots[6]   = {english = 'Hands',      }
+slots[7]   = {english = 'Legs',       }
+slots[8]   = {english = 'Feet',       }
+slots[9]   = {english = 'Neck',       }
+slots[10]  = {english = 'Waist',      }
+slots[11]  = {english = 'Left Ear',   }
+slots[12]  = {english = 'Right Ear',  }
+slots[13]  = {english = 'Left Ring',  }
+slots[14]  = {english = 'Right Ring', }
+slots[15]  = {english = 'Back',       }
 
 --[[ Compound values ]]
 
--- 2^0 + 2^1
-slots[3]     = {english = 'Melee',      }
--- 2^11 + 2^12
-slots[6144]  = {english = 'Ear',        }
--- 2^13 + 2^14
-slots[24576] = {english = 'Ring',       }
+slots.type = function (slot)
+    if slot == 0 or slot == 1 then
+        return {english = 'Melee',    }
+    elseif slot == 11 or slot == 12 then
+        return {english = 'Ear',      }
+    elseif slot == 13 or slot == 14 then
+        return {english = 'Ring',     }
+    end
+end
+
+slots.convert = function (bits)
+    local list = {}
+    
+    for i=0,#slots do
+        if math.floor(bits%(2^(i+1))/2^i) == 1 then
+            list[#list + 1] = i
+        end
+    end
+    
+    return list
+end
 
 return slots
 
