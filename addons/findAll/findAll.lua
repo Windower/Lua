@@ -37,13 +37,13 @@ require('chat')
 require('lists')
 require('logger')
 require('sets')
+require('tables')
 
 json  = require('json')
 file  = require('files')
 slips = require('slips')
 
-load_timestamp         = os.time()
-deferral_time          = 20
+enable_search          = true
 item_names             = T{}
 global_storages        = T{}
 storages_path          = 'data/storages.json'
@@ -57,17 +57,13 @@ resources              = {
 }
 
 function search(query, export)
-    if global_storages ~= nil then
-        if not update() then
-            return
-        end
-    end
+    update()
 
     if query:length() == 0 then
         return
     end
 
-    local character_set = S{}
+    local character_set    = S{}
     local character_filter = S{}
     local terms            = ''
 
@@ -235,8 +231,6 @@ function search(query, export)
             log('You have no items on the specified characters.')
         end
     end
-
-    collectgarbage()
 end
 
 function get_storages()
@@ -244,7 +238,7 @@ function get_storages()
     local storages = {}
 
     if not items then
-        return storages
+        return false
     end
 
     storages.gil = items.gil
@@ -285,13 +279,10 @@ function update()
         return false
     end
 
-    local time_difference = os.time() - load_timestamp
-
-    if time_difference < deferral_time then
-        notice('findAll will be available in '..(deferral_time - time_difference)..' seconds.')
-
+    if enable_search == false then
+        notice('findAll has not detected a fully loaded inventory yet.')
         return false
-    end
+	end
 
     local player_name   = windower.ffxi.get_player().name
     local storages_file = file.new(storages_path)
@@ -303,10 +294,16 @@ function update()
     global_storages = json.read(storages_file)
 
     if global_storages == nil then
-        global_storages = {}
+        global_storages = T{}
     end
+	
+	local temp_storages = get_storages()
 
-    global_storages[player_name] = get_storages()
+	if temp_storages then
+		global_storages[player_name] = temp_storages
+	else
+		return false
+	end
 
     -- build json string
     local characters_json = L{}
@@ -340,13 +337,22 @@ end
 
 windower.register_event('load', update:cond(function() return windower.ffxi.get_info().logged_in end))
 
-windower.register_event('unload', error:prepare('findAll wasn\'t ready'):cond(function() return windower.ffxi.get_info().logged_in and not update() end))
-
-windower.register_event('login', 'zone change', function()
-    load_timestamp = os.time()
+windower.register_event('incoming chunk', function(id,original,modified,injected,blocked)
+	if next_sequence and original:byte(4)*256+original:byte(3) == next_sequence then
+		enable_search = true
+		update()
+		next_sequence = nil
+	end
+	
+	if id == 0x00A then -- First packet of a new zone
+		enable_search = false
+	elseif id == 0x01D then
+	-- This packet indicates that the temporary item structure should be copied over to
+	-- the real item structure, accessed with get_items(). Thus we wait one packet and
+	-- then trigger an update.
+		next_sequence = (original:byte(4)*256+original:byte(3)+1)%0x100
+	end
 end)
-
-windower.register_event('logout', error:prepare('findAll wasn\'t ready'):cond(function() return not update() end))
 
 windower.register_event('addon command', function(...)
     local params = L{...}
