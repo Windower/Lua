@@ -36,15 +36,15 @@ races.gender = function(race)
 end
 
 races.convert = function (bits)
-    local list = {}
+    local set = S{}
     
     for i=0,#races do
         if math.floor(bits%(2^(i+1))/2^i) == 1 then
-            list[#list + 1] = i
+            set:add(i)
         end
     end
     
-    return list
+    return set
 end
 
 races.get_equipment_availability = function (bits)

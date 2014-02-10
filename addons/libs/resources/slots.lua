@@ -31,15 +31,15 @@ slots.type = function (slot)
 end
 
 slots.convert = function (bits)
-    local list = {}
+    local set = S{}
     
     for i=0,#slots do
         if math.floor(bits%(2^(i+1))/2^i) == 1 then
-            list[#list + 1] = i
+            set:add(i)
         end
     end
     
-    return list
+    return set
 end
 
 return slots
