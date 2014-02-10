@@ -25,18 +25,6 @@ jobs[21] = {english = 'Geomancer',     short = 'GEO'}
 jobs[22] = {english = 'Rune Fencer',   short = 'RUN'}
 jobs[23] = {english = 'Monipulator',   short = 'MON'}
 
-jobs.convert = function (bits)
-    local set = S{}
-    
-    for i=1,#jobs do
-        if math.floor(bits%(2^(i+1))/2^i) == 1 then
-            set:add(i)
-        end
-    end
-    
-    return set
-end
-
 return jobs
 
 --[[

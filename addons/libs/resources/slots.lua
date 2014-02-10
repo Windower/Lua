@@ -1,46 +1,38 @@
 -- Slots
 local slots = {}
 
-slots[0]   = {english = 'Main',       }
-slots[1]   = {english = 'Sub',        }
-slots[2]   = {english = 'Ranged',     }
-slots[3]   = {english = 'Ammo',       }
-slots[4]   = {english = 'Head',       }
-slots[5]   = {english = 'Body',       }
-slots[6]   = {english = 'Hands',      }
-slots[7]   = {english = 'Legs',       }
-slots[8]   = {english = 'Feet',       }
-slots[9]   = {english = 'Neck',       }
-slots[10]  = {english = 'Waist',      }
-slots[11]  = {english = 'Left Ear',   }
-slots[12]  = {english = 'Right Ear',  }
-slots[13]  = {english = 'Left Ring',  }
-slots[14]  = {english = 'Right Ring', }
-slots[15]  = {english = 'Back',       }
+slots[0]   = {english = 'Main',             }
+slots[1]   = {english = 'Sub',              }
+slots[2]   = {english = 'Ranged',           }
+slots[3]   = {english = 'Ammo',             }
+slots[4]   = {english = 'Head',             }
+slots[5]   = {english = 'Body',             }
+slots[6]   = {english = 'Hands',            }
+slots[7]   = {english = 'Legs',             }
+slots[8]   = {english = 'Feet',             }
+slots[9]   = {english = 'Neck',             }
+slots[10]  = {english = 'Waist',            }
+slots[11]  = {english = 'Left Ear',         }
+slots[12]  = {english = 'Right Ear',        }
+slots[13]  = {english = 'Left Ring',        }
+slots[14]  = {english = 'Right Ring',       }
+slots[15]  = {english = 'Back',             }
 
 --[[ Compound values ]]
 
-slots.type = function (slot)
-    if slot == 0 or slot == 1 then
-        return {english = 'Melee',    }
-    elseif slot == 11 or slot == 12 then
-        return {english = 'Ear',      }
-    elseif slot == 13 or slot == 14 then
-        return {english = 'Ring',     }
+slots.category = {}
+for key, value in pairs(slots) do
+    if type(key) == 'number' then
+        slots.category[key] = value
     end
 end
 
-slots.convert = function (bits)
-    local set = S{}
-    
-    for i=0,#slots do
-        if math.floor(bits%(2^(i+1))/2^i) == 1 then
-            set:add(i)
-        end
-    end
-    
-    return set
-end
+slots.category[0]  = {english = 'Melee',    }
+slots.category[1]  = slots.category[0]
+slots.category[11] = {english = 'Ear',      }
+slots.category[12] = slots.category[11]
+slots.category[13] = {english = 'Ring',     }
+slots.category[14] = slots.category[13]
 
 return slots
 
