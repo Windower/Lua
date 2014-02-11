@@ -26,110 +26,6 @@
 
 
 -----------------------------------------------------------------------------------
---Name: parse_resources()
---Args:
----- lines_file (table of strings) - Table loaded with readlines() from an opened file
------------------------------------------------------------------------------------
---Returns:
----- Table of subtables indexed by their id (or index).
----- Subtables contain the child text nodes/attributes of each resources line.
-----
----- Child text nodes are given the key "english".
----- Attributes keyed by the attribute name, for example:
----- <a id="1500" a="1" b="5" c="10">15</a>
----- turns into:
----- completed_table[1500]['a']==1
----- completed_table[1500]['b']==5
----- completed_table[1500]['c']==10
----- completed_table[1500]['english']==15
-----
----- There is also currently a field blacklist (ignore_fields) for the sake of memory bloat.
------------------------------------------------------------------------------------
-function parse_resources(lines_file)
-    local find = string.find
-    local ignore_fields = {}
-    local convert_fields = {enl='english_log',fr='french',frl='french_log',de='german',del='german_log',jp='japanese',jpl='japanese_log'}
-    local hex_fields = {jobs=true,races=true,slots=true}
-    
-    local completed_table = {}
-    for i in ipairs(lines_file) do
-        local str = tostring(lines_file[i])
-        local g,h,typ,key = find(str,'<(%w+) id="(%d+)" ')
-        if typ == 's' then -- Packets and .dats refer to the spell index instead of ID
-            g,h,key = find(str,'index="(%d+)" ')
-        end
-        if key~=nil and not (typ == 's' and (tonumber(key) == 363 or tonumber(key) == 364)) then
-            completed_table[tonumber(key)]={}
-            local q = 1
-            while q <= str:len() do
-                local a,b,ind,val = find(str,'(%w+)="([^"]+)"',q)
-                if ind~=nil then
-                    if not ignore_fields[ind]  then
-                        if convert_fields[ind] then
-                            ind = convert_fields[ind]
-                        end
-                        if val == "true" or val == "false" then
-                            completed_table[tonumber(key)][ind] = str2bool(val)
-                        elseif hex_fields[ind] then
-                            completed_table[tonumber(key)][ind] = tonumber('0x'..val)
-                        elseif tonumber(val) then
-                            completed_table[tonumber(key)][ind] = tonumber(val)
-                        else
-                            completed_table[tonumber(key)][ind] = val:gsub('&quot;','\42'):gsub('&apos;','\39')
-                        end
-                    end
-                    q = b+1
-                else
-                    q = str:len()+1
-                end
-            end
-            local k,v,english = find(str,'>([^<]+)</') -- Look for a Child Text Node
-            if english~=nil then -- key it to 'english' if it exists
-                completed_table[tonumber(key)]['english']=english
-            end
-        end
-    end
-
-    return completed_table
-end
-
------------------------------------------------------------------------------------
---Name: str2bool()
---Args:
----- input (string) - Value that might be true or false
------------------------------------------------------------------------------------
---Returns:
----- boolean or nil. Defaults to nil if input is not true or false.
------------------------------------------------------------------------------------
-function str2bool(input)
-    -- Used in the options_load() function
-    if input:lower() == 'true' then
-        return true
-    elseif input:lower() == 'false' then
-        return false
-    else
-        return nil
-    end
-end
-
------------------------------------------------------------------------------------
---Name: Dec2Hex()  -- From Nitrous
---Args:
----- nValue (string or number): Value to be converted to hex
------------------------------------------------------------------------------------
---Returns:
----- String version of the hex value.
------------------------------------------------------------------------------------
-function Dec2Hex(nValue)
-    if type(nValue) == "string" then
-        nValue = tonumber(nValue);
-    end
-    nHexVal = string.format("%X", nValue);  -- %X returns uppercase hex, %x gives lowercase letters
-    sHexVal = nHexVal.."";
-    return sHexVal;
-end
-
------------------------------------------------------------------------------------
 --Name: fieldsearch()
 --Args:
 ---- message (string): Message to be searched
@@ -145,7 +41,6 @@ function fieldsearch(message)
 end
 
 
-
 -----------------------------------------------------------------------------------
 --Name: strip()
 --Args:
@@ -157,52 +52,6 @@ end
 -----------------------------------------------------------------------------------
 function strip(name)
     return name:gsub('4','iv'):gsub('9','ix'):gsub('0','p'):gsub('3','iii'):gsub('2','ii'):gsub('1','i'):gsub('8','viii'):gsub('7','vii'):gsub('6','vi'):gsub('5','v'):gsub('[^%a]',''):lower()
-end
-
-
-
------------------------------------------------------------------------------------
---Name: table.reassign()
---Args:
----- targ (table): Table to be replaced
----- new (table): Table with values to transfer to the targ table
------------------------------------------------------------------------------------
---Returns:
----- targ (table)
----- The "targ" table is blanked, and then the values from "new" are assigned to it
----- In the event that new is not passed, targ is not filled with anything.
------------------------------------------------------------------------------------
-function table.reassign(targ,new,strength)
-    if new == nil then new = {} end
-    if strength == true then
-        for i,v in pairs(new) do
-            if targ[i] == nil then targ[i] = v end
-        end
-    else
-        for i,v in pairs(targ) do
-            if not new[i] then targ[i] = nil end
-        end
-        for i,v in pairs(new) do
-            targ[i] = v
-        end
-    end
-    return targ
-end
-
-
-
------------------------------------------------------------------------------------
---Name: logit()
---Args:
----- logfile (file): File to be logged to
----- str (string): String to be logged.
------------------------------------------------------------------------------------
---Returns:
----- none
------------------------------------------------------------------------------------
-function logit(file,str)
-    file:write(str)
-    file:flush()
 end
 
 
@@ -275,24 +124,6 @@ end
 
 
 -----------------------------------------------------------------------------------
---Name: get_wearable(player_val,val)
---Args:
----- player_val - Number representing the player's characteristic
----- val - Number representing the item's affinities
------------------------------------------------------------------------------------
---Returns:
----- True (player_val exists in val) or false (anything else)
------------------------------------------------------------------------------------
-function get_wearable(player_val,val)
-    if player_val then
-        return ((val%(player_val*2))/player_val >= 1) -- Cut off the bits above it with modulus, then cut off the bits below it with division and >= 1
-    else
-        return false -- In cases where the provided playervalue is nil, just return false.
-    end
-end
-
-
------------------------------------------------------------------------------------
 ----Name: unify_slots(g)
 -- Filters the provided gear table to only known slots, and then runs a map
 -- on the table to make sure all keys are the accepted versions for each.
@@ -306,6 +137,7 @@ function unify_slots(g)
     local g1 = table.key_filter(g, is_slot_key)
     return table.key_map(g1, get_default_slot)
 end
+
  
 -----------------------------------------------------------------------------------
 ----Name: is_slot_key(k)
@@ -319,6 +151,7 @@ end
 function is_slot_key(k)
     return slot_map[k]
 end
+ 
  
 -----------------------------------------------------------------------------------
 ----Name: get_default_slot(k)
@@ -334,6 +167,7 @@ function get_default_slot(k)
         return default_slot_map[slot_map[k]]
     end
 end
+
 
 -----------------------------------------------------------------------------------
 ----Name: set_merge(baseSet, ...)
@@ -363,7 +197,6 @@ function set_merge(baseSet, ...)
 
     return combinedSet
 end
-
 
 
 -----------------------------------------------------------------------------------
@@ -397,7 +230,6 @@ function assemble_action_packet(target_id,target_index,category,spell_id)
 end
 
 
-
 -----------------------------------------------------------------------------------
 --Name: assemble_use_item_packet(target_id,target_index,item)
 --Desc: Puts together a "use item" packet (0x37)
@@ -423,7 +255,6 @@ function assemble_use_item_packet(target_id,target_index,item_id)
     end
     return outstr
 end
-
 
 
 -----------------------------------------------------------------------------------
@@ -462,7 +293,6 @@ function assemble_menu_item_packet(target_id,target_index,item_id)
 end
 
 
-
 -----------------------------------------------------------------------------------
 --Name: find_usable_item(item_id)
 --Desc: Finds a usable item in temporary or normal inventory. Assumes items array
@@ -494,7 +324,6 @@ function find_usable_item(item_id)
     end
     return inventory_index,bag_id
 end
-
 
 
 -----------------------------------------------------------------------------------
@@ -561,7 +390,6 @@ function filter_precast(spell)
 end
 
 
-
 -----------------------------------------------------------------------------------
 --Name: mk_command_registry_entry(sp)
 --Desc: Makes a new entry in command_registry.
@@ -587,7 +415,6 @@ function mk_command_registry_entry(sp)
 end
 
 
-
 -----------------------------------------------------------------------------------
 --Name: remove_old_command_registry_entries(ts)
 --Desc: Removes all command_registry entries more than 20 seconds old.
@@ -604,7 +431,6 @@ function remove_old_command_registry_entries(ts)
         end
     end
 end
-
 
 
 -----------------------------------------------------------------------------------
@@ -628,6 +454,7 @@ function find_command_registry_key(typ,value)
             if v.spell and v.spell.prefix == value.prefix and v.spell.name == value.name then
                 potential_entries[i] = v.timestamp or 0
             elseif v.spell and v.spell.name == 'Double-Up' and value.type == 'CorsairRoll' then
+                -- Double Up ability uses will return action packets that match Corsair Rolls rather than Double Up
 				potential_entries[i] = v.timestamp or 0
 			end
         end
@@ -650,25 +477,6 @@ function find_command_registry_key(typ,value)
                 return i
             end
         end
-    end
-end
-
-
-
------------------------------------------------------------------------------------
---Name: get_prefix(pref)
---Desc: Returns the proper unified prefix, or "Monster " in the case of a monster action
---Args:
----- pref - Prefix to match (or nil, for monster TP moves)
------------------------------------------------------------------------------------
---Returns:
----- unified prefix (or Monster)
------------------------------------------------------------------------------------
-function get_prefix(pref)
-    if not pref then
-        return 'Monster '
-    else
-        return unify_prefix[pref]
     end
 end
 
@@ -701,7 +509,6 @@ function find_command_registry_by_time(target)
 end
 
 
-
 -----------------------------------------------------------------------------------
 --Name: delete_command_registry_by_id(id)
 --Desc: Deletes all command_registry entry based that match a given target ID.
@@ -724,7 +531,6 @@ function delete_command_registry_by_id(id)
     end
     return ts,last_tab
 end
-
 
 
 -----------------------------------------------------------------------------------
@@ -752,7 +558,7 @@ function get_spell(act)
     if act.category == 12 or act.category == 2 then
         spell = table.reassign(spell,res.abilities[abil_ID])
     else
-        if not dialog[msg_ID] then
+        if not res.action_messages[msg_ID] then
             if act.category == 4 or act.category == 8 then
                 spell = table.reassign(spell,res.spells[abil_ID])
                 if act.category == 4 and spell then spell.recast = act.recast end
@@ -767,7 +573,7 @@ function get_spell(act)
         end
         
         
-        local fields = fieldsearch(dialog[msg_ID][language])
+        local fields = fieldsearch(res.action_messages[msg_ID][language])
 
         if table.contains(fields,'spell') then
             spell = table.reassign(spell,res.spells[abil_ID])
@@ -776,7 +582,7 @@ function get_spell(act)
             spell = table.reassign(spell,res.abilities[abil_ID])
         elseif table.contains(fields,'weapon_skill') then
             if abil_ID > 255 then -- WZ_RECOVER_ALL is used by chests in Limbus
-                spell = table.reassign(spell,res.monster_abils[abil_ID-256])
+                spell = table.reassign(spell,res.monster_abilities[abil_ID-256])
                 if spell.english == '.' then
                     spell.english = 'Special Attack'
                 end
@@ -812,7 +618,6 @@ function get_spell(act)
 end
 
 
-
 -----------------------------------------------------------------------------------
 --Name: aftercast_cost(rline)
 --Desc: Takes a resource line and modifies it so it includes aftercast cost and
@@ -845,7 +650,6 @@ function aftercast_cost(rline)
 end
 
 
-
 -----------------------------------------------------------------------------------
 --Name: debug_mode_chat(message)
 --Desc: Checks _settings.debug_mode and outputs the message if necessary
@@ -859,4 +663,19 @@ function debug_mode_chat(message)
     if _settings.debug_mode then
         windower.add_to_chat(8,"GearSwap (Debug Mode): "..message)
     end
+end
+
+
+-----------------------------------------------------------------------------------
+--Name: logit()
+--Args:
+---- logfile (file): File to be logged to
+---- str (string): String to be logged.
+-----------------------------------------------------------------------------------
+--Returns:
+---- none
+-----------------------------------------------------------------------------------
+function logit(file,str)
+    file:write(str)
+    file:flush()
 end

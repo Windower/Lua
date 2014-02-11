@@ -174,7 +174,7 @@ function inc_action(act)
     
     if spell and spell.english then
         spell.target = target_complete(windower.ffxi.get_mob_by_id(act.targets[1].id))
-        spell.action_type = command_list[get_prefix(spell.prefix)]
+        spell.action_type = command_list[unify_prefix[spell.prefix or 'Mon']]
     else
         if debugging >= 1 then windower.send_command('input /echo Incoming Action packet did not generate a spell/aftercast.')end
         return
@@ -282,6 +282,6 @@ function inc_action_message(arr)
 --            tab.spell = {interrupted=true,action_type='Interruption'}
         end
     elseif unable_to_use:contains(arr.message_id) and debugging >= 1 then
-        windower.add_to_chat(8,'Handled Action message received with a target other than yourself: '..tostring(dialog[arr.message_id].english)..' '..tostring(windower.ffxi.get_mob_by_id(actor_id).name))
+        windower.add_to_chat(8,'Handled Action message received with a target other than yourself: '..tostring(res.action_messages[arr.message_id].english)..' '..tostring(windower.ffxi.get_mob_by_id(actor_id).name))
     end
 end
