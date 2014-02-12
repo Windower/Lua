@@ -16,8 +16,8 @@ current_mp_percent = 0
 current_tp_percent = 0
 tb_name            = 'addon:pettp'
 petactive          = false
-verbose            = true
-superverbose       = true
+verbose            = false
+superverbose       = false
 timercountdown     = 0
 
 defaults = T{}
