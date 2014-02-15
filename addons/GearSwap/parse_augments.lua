@@ -205,7 +205,7 @@ augment_index_2_3 = {
     [0x153] = {{stat="elementalsiphon", offset=1}},
     [0x154] = {{stat="phantomrollabilitydelay", offset=-1}},
     [0x155] = {{stat="repairpotency", offset=1}},
-    [0x156] = {{stat="waltztpcost", offset=-1}},
+    [0x156] = {{stat="waltztp_cost", offset=-1}},
 
     [0x15E] = {{stat="occasionallymaximizesmagicaccuracy", offset=1}},
     [0x15F] = {{stat="occasionallyquickensspellcasting", offset=1}},

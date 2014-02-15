@@ -49,7 +49,7 @@ GearSwap 0.717 - Fixed equipment removal. Added sets.naked. Handled category 11 
 -------------------------------------------------
 GearSwap 0.716 - Export now looks up the proper equipment slot. Changed syntax for equipping an empty slot to be less ambiguous. Fixed unequipping on zone (I think).
 -------------------------------------------------
-GearSwap 0.715 - Converted resource strings to numbers if appropriate. Added Pianissimo casttime handling.
+GearSwap 0.715 - Converted resource strings to numbers if appropriate. Added Pianissimo cast_time handling.
 -------------------------------------------------
 GearSwap 0.714 - Minor changes to make export more user friendly.
 -------------------------------------------------
