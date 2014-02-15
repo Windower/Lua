@@ -51,7 +51,7 @@ function precast(spell)
 		equip(sets.precast.WS)
 	elseif string.find(spell.english,'Waltz') then
 		equip(sets.precast.Waltz)
-	elseif spell.type:lower() == 'ninjutsu' and spell.casttime > 1 then
+	elseif spell.type:lower() == 'ninjutsu' and spell.cast_time > 1 then
 		equip(sets.precast.Ninjutsu)
 	end
 end

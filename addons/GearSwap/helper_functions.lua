@@ -632,18 +632,18 @@ function aftercast_cost(rline)
     if rline == nil then
         return {tpaftercast = player.tp, mpaftercast = player.mp, mppaftercast = player.mpp}
     end
-    if not rline.mpcost or rline.mpcost == -1 then rline.mpcost = 0 end
-    if not rline.tpcost or rline.tpcost == -1 then rline.tpcost = 0 end
+    if not rline.mp_cost or rline.mp_cost == -1 then rline.mp_cost = 0 end
+    if not rline.tp_cost or rline.tp_cost == -1 then rline.tp_cost = 0 end
     
-    if rline.tpcost == 0 then rline.tpaftercast = player.tp else
-    rline.tpaftercast = player.tp - rline.tpcost end
+    if rline.tp_cost == 0 then rline.tpaftercast = player.tp else
+    rline.tpaftercast = player.tp - rline.tp_cost end
     
-    if rline.mpcost == 0 then
+    if rline.mp_cost == 0 then
         rline.mpaftercast = player.mp
         rline.mppaftercast = player.mpp
     else
-        rline.mpaftercast = player.mp - rline.mpcost
-        rline.mppaftercast = (player.mp - rline.mpcost)/player.max_mp
+        rline.mpaftercast = player.mp - rline.mp_cost
+        rline.mppaftercast = (player.mp - rline.mp_cost)/player.max_mp
     end
     
     return rline

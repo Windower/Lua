@@ -98,7 +98,7 @@ function precast(spell)
 			add_to_chat(8,'--------- Elemental Seal is down ---------')
 		end
 	
-	elseif spell.skill=='ElementalMagic' and spell.casttime < 3 then
+	elseif spell.skill=='ElementalMagic' and spell.cast_time < 3 then
 		equip(sets.midcast_ElementalMagic)
 		if spell.element == 'Earth' then
 			equip({neck="Quanpur Necklace"})
