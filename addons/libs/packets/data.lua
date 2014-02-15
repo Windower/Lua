@@ -20,7 +20,9 @@ data.outgoing[0x033] = {name='Trade Tell',          description='This packet all
 data.outgoing[0x034] = {name='Trade Item',          description='Sends the item you want to trade to the server.'}
 data.outgoing[0x036] = {name='Menu Item',           description='Use an item from the item menu.'}
 data.outgoing[0x037] = {name='Use Item',            description='Use an item.'}
-data.outgoing[0x03A] = {name='Sort Item',           description='Packet sent when you choose to auto-sort your inventory.'}
+data.outgoing[0x03A] = {name='Sort Item',           description='Stacks the items in your inventory. Sent when hitting "Sort" in the menu.'}
+data.outgoing[0x041] = {name='Lot Item',            description='Lotting an item in the treasure pool.'}
+data.outgoing[0x042] = {name='Pass Item',           description='Passing an item in the treasure pool.'}
 data.outgoing[0x04B] = {name='Servmes',             description='Requests the server message (/servmes).'}
 data.outgoing[0x04D] = {name='Delivery Box',        description='Used to manipulate the delivery box.'}
 data.outgoing[0x04E] = {name='Auction',             description='Used to bid on an Auction House item.'}

@@ -304,6 +304,16 @@ fields.outgoing[0x03A] = L{
     {ctype='unsigned short',    label='_unknown2'},                             -- 06
 }
 
+-- Lot item
+fields.outgoing[0x041] = L{
+    {ctype='unsigned char',     label='Slot'},                                  -- 04
+}
+
+-- Pass item
+fields.outgoing[0x042] = L{
+    {ctype='unsigned char',     label='Slot'},                                  -- 04
+}
+
 -- Delivery Box
 fields.outgoing[0x04D] = L{
     {ctype='unsigned char',     label='Manipulation Type'},                     -- 04
