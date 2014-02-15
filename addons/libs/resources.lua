@@ -83,20 +83,26 @@ for res_name in res_names:it() do
     end
 end
 
-resources.convert = function(bits)
-    local res = S{}
+local flag_cache = {}
+resources.parse_flags = function(bits)
+    if not flag_cache[bits] then
+        local res = S{}
 
-    local rem
-    local count = 0
-    while bits > 0 do
-        bits, rem = (bits/2):modf()
-        if rem > 0 then
-            res:add(count)
+        local rem
+        local count = 0
+        local num = bits:number(16)
+        while num > 0 do
+            num, rem = (num/2):modf()
+            if rem > 0 then
+                res:add(count)
+            end
+            count = count + 1
         end
-        count = count + 1
+
+        flag_cache[bits] = res
     end
 
-    return res
+    return flag_cache[bits]
 end
 
 -- Returns the abilities, indexed by ingame ID.
@@ -316,9 +322,9 @@ function fns.items()
                 log_german = unquote(del),
                 japanese = unquote(jp),
                 log_japanese = unquote(jpl),
-                slots = resources.convert(slots:number(16)),
-                jobs = resources.convert(jobs:number(16)),
-                races = resources.convert(races:number(16)),
+                slots = resources.parse_flags(slots),
+                jobs = resources.parse_flags(jobs),
+                races = resources.parse_flags(races),
                 level = level:number(),
                 targets = S(targets:split()):remove('None'),
                 cast_time = cast_time:number(),
