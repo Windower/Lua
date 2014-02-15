@@ -52,7 +52,7 @@ function resource_group(r, fn, attr)
 end
 
 resource_mt.__index = function(t, k)
-    return slots[t]:contains(k)
+    return (slots[t]:contains(k) or k == 'name')
             and resource_group-{k}
         or table[k]
 end
@@ -74,13 +74,35 @@ local unquote = function(str)
 end
 
 -- Add resources from files
-local res_names = S{'jobs', 'races', 'weather', 'servers', 'chat', 'bags', 'slots', 'statuses', 'emotes', 'skills', 'titles', 'encumbrance', 'check_ratings', 'synth_ranks', 'days', 'moon_phases', 'elements'}
+local res_names = S{'jobs', 'races', 'weather', 'servers', 'chat', 'bags', 'slots', 'statuses', 'emotes', 'skills', 'titles', 'encumbrance', 'check_ratings', 'synth_ranks', 'days', 'moon_phases', 'elements', 'monster_abilities', 'action_messages'}
 for res_name in res_names:it() do
     fns[res_name] = function()
-        local res = table.map(require(addon_resources..res_name), setmetatable-{resource_entry_mt})
+        local res = table.map(require(addon_resources .. res_name), (setmetatable-{resource_entry_mt}):cond(function(key) return type(key) == 'table' end))
         slots[res] = table.keyset(next[2](res))
         return res
     end
+end
+
+local flag_cache = {}
+resources.parse_flags = function(bits)
+    if not flag_cache[bits] then
+        local res = S{}
+
+        local rem
+        local count = 0
+        local num = bits:number(16)
+        while num > 0 do
+            num, rem = (num/2):modf()
+            if rem > 0 then
+                res:add(count)
+            end
+            count = count + 1
+        end
+
+        flag_cache[bits] = res
+    end
+
+    return flag_cache[bits]
 end
 
 -- Returns the abilities, indexed by ingame ID.
@@ -212,28 +234,12 @@ end
 
 -- Returns the items, indexed by ingame ID.
 function fns.items()
-    local function parse_jobs(num)
-        local res = S{}
-
-        local count = 0
-        local mod
-        while num > 0 do
-            count = count + 1
-            num, mod = math.modf(num/2)
-            if mod ~= 0 then
-                res:add(resources.jobs[count])
-            end
-        end
-
-        return res
-    end
-
     local file
     local last = {}
     local match_string
 
     local res = {}
-    slots[res] = S{}
+    slots[res] = S{'log_name'}
 
     -- General items
     file = _libs.files.read(plugin_resources..'items_general.xml')
@@ -316,9 +322,9 @@ function fns.items()
                 log_german = unquote(del),
                 japanese = unquote(jp),
                 log_japanese = unquote(jpl),
-                slots = resources.slots[slots:number(16)],
-                jobs = parse_jobs(jobs:number(16)),
-                races = resources.races[races:number(16)],
+                slots = resources.parse_flags(slots),
+                jobs = resources.parse_flags(jobs),
+                races = resources.parse_flags(races),
                 level = level:number(),
                 targets = S(targets:split()):remove('None'),
                 cast_time = cast_time:number(),
@@ -353,70 +359,6 @@ function fns.zones()
         last = res[id]
     end
     slots[res] = table.keyset(last)
-
-    return res
-end
-
--- Returns monster abilities, indexed by ingame ID.
-function fns.monster_abils()
-    local file = _libs.files.read(addon_resources..'mabils.xml')
-    local match_string
-    local last = {}
-
-    local res = {}
-    slots[res] = S{}
-
-    match_string = '<m id="(%d-)" english="([^"]-)" actor_status="([^"]-)" target_status="([^"]-)" />'
-    for id, english, actor_status, target_status in file:gmatch(match_string) do
-        id = id:number()
-        res[id] = setmetatable({
-            id = id,
-            english = unquote(english),
-            actor_status = S(actor_status:split(','):map(tonumber)),
-            target_status = S(target_status:split(','):map(tonumber)),
-        }, resource_entry_mt)
-        last = res[id]
-    end
-    slots[res] = slots[res] + table.keyset(last)
-
-    match_string = '<m id="(%d-)" english="([^"]-)" actor_status="([^"]-)" />'
-    for id, english, actor_status in file:gmatch(match_string) do
-        id = id:number()
-        res[id] = setmetatable({
-            id = id,
-            english = unquote(english),
-            actor_status = S(actor_status:split(','):map(tonumber)),
-            target_status = S{},
-        }, resource_entry_mt)
-        last = res[id]
-    end
-    slots[res] = slots[res] + table.keyset(last)
-
-    match_string = '<m id="(%d-)" english="([^"]-)" target_status="([^"]-)" />'
-    for id, english, target_status in file:gmatch(match_string) do
-        id = id:number()
-        res[id] = setmetatable({
-            id = id,
-            english = unquote(english),
-            actor_status = S{},
-            target_status = S(target_status:split(','):map(tonumber)),
-        }, resource_entry_mt)
-        last = res[id]
-    end
-    slots[res] = slots[res] + table.keyset(last)
-
-    match_string = '<m id="(%d-)" english="([^"]-)" />'
-    for id, english in file:gmatch(match_string) do
-        id = id:number()
-        res[id] = setmetatable({
-            id = id,
-            english = unquote(english),
-            actor_status = S{},
-            target_status = S{},
-        }, resource_entry_mt)
-        last = res[id]
-    end
-    slots[res] = slots[res] + table.keyset(last)
 
     return res
 end

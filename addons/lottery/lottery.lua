@@ -1,40 +1,19 @@
--- Slots
-local slots = {}
+_addon.name = 'Lottery'
+_addon.author = 'Arcon'
+_addon.language = 'english'
+_addon.version = '1.0.0.0'
 
-slots[0]   = {english = 'Main',             }
-slots[1]   = {english = 'Sub',              }
-slots[2]   = {english = 'Ranged',           }
-slots[3]   = {english = 'Ammo',             }
-slots[4]   = {english = 'Head',             }
-slots[5]   = {english = 'Body',             }
-slots[6]   = {english = 'Hands',            }
-slots[7]   = {english = 'Legs',             }
-slots[8]   = {english = 'Feet',             }
-slots[9]   = {english = 'Neck',             }
-slots[10]  = {english = 'Waist',            }
-slots[11]  = {english = 'Left Ear',         }
-slots[12]  = {english = 'Right Ear',        }
-slots[13]  = {english = 'Left Ring',        }
-slots[14]  = {english = 'Right Ring',       }
-slots[15]  = {english = 'Back',             }
-
---[[ Compound values ]]
-
-slots.category = {}
-for key, value in pairs(slots) do
-    if type(key) == 'number' then
-        slots.category[key] = value
+windower.register_event('outgoing chunk', function(id, data, modified, injected, blocked)
+    if not blocked and id == 0x41 then
+        windower.send_ipc_message('pass ' .. tostring(data:sub(5, 5):byte()))
     end
-end
+end)
 
-slots.category[0]  = {english = 'Melee',    }
-slots.category[1]  = slots.category[0]
-slots.category[11] = {english = 'Ear',      }
-slots.category[12] = slots.category[11]
-slots.category[13] = {english = 'Ring',     }
-slots.category[14] = slots.category[13]
-
-return slots
+windower.register_event('ipc message', function(message)
+    if message:sub(1, 4) == 'pass' then
+        windower.ffxi.pass_item(tonumber(message:sub(6)))
+    end
+end)
 
 --[[
 Copyright (c) 2013, Windower

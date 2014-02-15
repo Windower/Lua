@@ -243,7 +243,7 @@ fields.outgoing[0x01A] = L{
 
 -- Drop Item
 fields.outgoing[0x028] = L{
-    {ctype='unsigned int',      label='_unknown1'},                             -- 04
+    {ctype='unsigned int',      label='Quantity'},                              -- 04
     {ctype='unsigned char',     label='Current Bag ID',     fn=bag},            -- 08
     {ctype='unsigned char',     label='Inventory Index'},                       -- 09 -- For the item being dropped
     {ctype='unsigned short',    label='_unknown2'},                             -- 10
@@ -251,7 +251,7 @@ fields.outgoing[0x028] = L{
 
 -- Move Item
 fields.outgoing[0x029] = L{
-    {ctype='unsigned int',      label='_unknown1'},                             -- 04 -- 1 has been observed
+    {ctype='unsigned int',      label='Quantity'},                              -- 04
     {ctype='unsigned char',     label='Current Bag ID',     fn=bag},            -- 08
     {ctype='unsigned char',     label='Target Bag ID',      fn=bag},            -- 09
     {ctype='unsigned char',     label='Inventory Index'},                       -- 10 -- For the item being moved
@@ -302,6 +302,16 @@ fields.outgoing[0x03A] = L{
     {ctype='unsigned char',     label='Bag',                fn=bag},            -- 04
     {ctype='unsigned char',     label='_unknown1'},                             -- 05
     {ctype='unsigned short',    label='_unknown2'},                             -- 06
+}
+
+-- Lot item
+fields.outgoing[0x041] = L{
+    {ctype='unsigned char',     label='Slot'},                                  -- 04
+}
+
+-- Pass item
+fields.outgoing[0x042] = L{
+    {ctype='unsigned char',     label='Slot'},                                  -- 04
 }
 
 -- Delivery Box

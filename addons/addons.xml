@@ -192,6 +192,13 @@
     <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
   </addon>
   <addon>
+    <name>Lottery</name>
+    <author>Arcon</author>
+    <description>Automatically passes an item on all accounts if lotted by another.</description>
+    <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
+  </addon>
+  <addon>
     <name>MacroChanger</name>
     <author>Banggugyangu</author>
     <description>Automatically switches Macro Book and Page according to job changes.</description>

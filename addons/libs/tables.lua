@@ -441,7 +441,7 @@ end
 function table.with(t, attr, val)
     val = type(val) ~= 'function' and functions.equals(val) or val
     for key, el in pairs(t) do
-        if type(el) == 'table' and val(rawget(el, attr)) then
+        if type(el) == 'table' and val(el[attr]) then
             return el, key
         end
     end

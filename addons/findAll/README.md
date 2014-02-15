@@ -1,5 +1,5 @@
 **Author:** Giuliano Riccio
-**Version:** v 1.20131120
+**Version:** v 1.20140210
 
 # FindAll #
 
@@ -54,8 +54,12 @@ findall :omega
 ----
 
 ##Changelog##
+### v1.20140210 ###
+* **fix**: Fixed bug that occasionally deleted stored inventory structures.
+* **change**: Increased the inventory structure refresh rate using packets.
+
 ### v1.20131008 ###
-* **add**: Added new case storage support
+* **add**: Added new case storage support.
 
 ### v1.20130610 ###
 * **add**: Added slips as searchable storages for the current character.

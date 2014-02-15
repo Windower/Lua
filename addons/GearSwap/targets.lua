@@ -28,82 +28,82 @@
 -- Target Processing --
 
 function valid_target(targ)
-	local spelltarget = {}
-	
-	local spell_targ
-	if pass_through_targs[targ] then
-		local j = windower.ffxi.get_mob_by_target(targ)
-		
-		if j then spelltarget = target_complete(j) end
-		
-		spelltarget.raw = targ
-		return targ, spelltarget
-	elseif tonumber(targ) then
-		local j = windower.ffxi.get_mob_by_id(tonumber(targ))
-		
-		if j then spelltarget = target_complete(j) end
-		
-		spelltarget.raw = targ
-		return targ, spelltarget
-	elseif not tonumber(targ) and targ ~= '' then
-		local mob_array = windower.ffxi.get_mob_array()
-		for i,v in pairs(mob_array) do
-			if v.name:lower()==targ:lower() and not v.is_npc then
-				spelltarget = target_complete(v)
-				spelltarget.raw = targ
-				return targ, spelltarget
-			end
-		end
-	end
-	return false, false
+    local spelltarget = {}
+    
+    local spell_targ
+    if pass_through_targs[targ] then
+        local j = windower.ffxi.get_mob_by_target(targ)
+        
+        if j then spelltarget = target_complete(j) end
+        
+        spelltarget.raw = targ
+        return targ, spelltarget
+    elseif tonumber(targ) then
+        local j = windower.ffxi.get_mob_by_id(tonumber(targ))
+        
+        if j then spelltarget = target_complete(j) end
+        
+        spelltarget.raw = targ
+        return targ, spelltarget
+    elseif not tonumber(targ) and targ ~= '' then
+        local mob_array = windower.ffxi.get_mob_array()
+        for i,v in pairs(mob_array) do
+            if v.name:lower()==targ:lower() and not v.is_npc then
+                spelltarget = target_complete(v)
+                spelltarget.raw = targ
+                return targ, spelltarget
+            end
+        end
+    end
+    return false, false
 end
 
 function target_complete(mob_table)
-	if mob_table == nil then return {type = 'NONE'} end
-	
-	------------------------------- Should consider moving the partycount part of this code to refresh_player() ----------------------------------
-	mob_table.isallymember = false
-	if not mob_table.id then
-		mob_table.type = 'NONE'
-	else
-		local j = windower.ffxi.get_party()
-		
-		for i,v in pairs(j) do
-			if v.mob then
-				if v.mob.id == mob_table.id then
-					mob_table.isallymember = true
-				end
-			end
-		end
-	------------------------------------------------------------------------------------------------------------------------------------
-		
-		if player.id == mob_table.id then
-			mob_table.type = 'SELF'
-		elseif mob_table.is_npc then
-			if mob_table.id%4096>2047 then
-				mob_table.type = 'NPC'
-			else
-				mob_table.type = 'MONSTER'
-			end
-		else
-			mob_table.type = 'PLAYER'
-		end
-	end
-	
-	if mob_table.race then 
-		mob_table.race_id = mob_table.race
-		mob_table.race = mob_table_races[mob_table.race]
-	end
-	if mob_table.status then
-		mob_table.status_id = mob_table.status
-		if res.statuses[mob_table.status] then
-			mob_table.status = res.statuses[mob_table.status].english
-		else
-			mob_table.status = 'Unknown'
-		end
-	end
-	if mob_table.distance then
-		mob_table.distance = math.sqrt(mob_table.distance)
-	end
-	return mob_table
+    if mob_table == nil then return {type = 'NONE'} end
+    
+    ------------------------------- Should consider moving the partycount part of this code to refresh_player() ----------------------------------
+    mob_table.isallymember = false
+    if not mob_table.id then
+        mob_table.type = 'NONE'
+    else
+        local j = windower.ffxi.get_party()
+        
+        for i,v in pairs(j) do
+            if v.mob then
+                if v.mob.id == mob_table.id then
+                    mob_table.isallymember = true
+                end
+            end
+        end
+    ------------------------------------------------------------------------------------------------------------------------------------
+        
+        if player.id == mob_table.id then
+            mob_table.type = 'SELF'
+        elseif mob_table.is_npc then
+            if mob_table.id%4096>2047 then
+                mob_table.type = 'NPC'
+            else
+                mob_table.type = 'MONSTER'
+            end
+        else
+            mob_table.type = 'PLAYER'
+        end
+    end
+    
+    if mob_table.race then 
+        mob_table.race_id = mob_table.race
+        mob_table.race = mob_table_races[mob_table.race]
+    end
+    if mob_table.status then
+        mob_table.status_id = mob_table.status
+        if res.statuses[mob_table.status] then
+            mob_table.status = res.statuses[mob_table.status].english
+        else
+            mob_table.status = 'Unknown'
+        end
+    end
+    if mob_table.distance then
+        mob_table.distance = math.sqrt(mob_table.distance)
+    end
+    return mob_table
 end

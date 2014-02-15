@@ -1,4 +1,6 @@
 -------------------------------------------------
+GearSwap 0.823 - Changed GearSwap to run off the resources library. Fixed Double-Up's aftercast.
+-------------------------------------------------
 GearSwap 0.822 - Added demomode and filters to prevent impossible actions. 
 -------------------------------------------------
 GearSwap 0.821 - Finalized register_event(). Protected user files to prevent error propagation.
