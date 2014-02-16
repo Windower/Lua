@@ -1,8 +1,9 @@
-local config = require ('config')
+config = require ('config')
+texts  = require('texts')
 
 _addon.name     = 'PetTP'
 _addon.author   = 'SnickySnacks'
-_addon.version  = '1.0'
+_addon.version  = '1.01'
 _addon.commands = {'ptp','pettp'}
 
 petname            = nil
@@ -14,7 +15,6 @@ max_mp             = 0
 current_hp_percent = 0
 current_mp_percent = 0
 current_tp_percent = 0
-tb_name            = 'addon:pettp'
 petactive          = false
 verbose            = false
 superverbose       = false
@@ -23,43 +23,45 @@ timercountdown     = 0
 defaults = T{}
 
 defaults.autocolor = true
-defaults.bgvisible = true
 
-defaults.position   = T{}
-defaults.position.x = windower.get_windower_settings().x_res*2/3
-defaults.position.y = windower.get_windower_settings().y_res-17
+defaults.pos   = T{}
+defaults.pos.x = windower.get_windower_settings().x_res*2/3
+defaults.pos.y = windower.get_windower_settings().y_res-17
 
-defaults.font        = T{}
-defaults.font.family = 'Courier New'
-defaults.font.size   = 10
-defaults.font.a      = 255
-defaults.font.bold   = false
-defaults.font.italic = false
+defaults.bg         = T{}
+defaults.bg.alpha   = 255
+defaults.bg.red     = 0
+defaults.bg.green   = 0
+defaults.bg.blue    = 0
+defaults.bg.visible = true
 
-defaults.colors              = T{}
-defaults.colors.background   = T{}
-defaults.colors.background.r = 0
-defaults.colors.background.g = 0
-defaults.colors.background.b = 0
-defaults.colors.background.a = 255
+defaults.flags        = {}
+defaults.flags.right  = false
+defaults.flags.bottom = false
+defaults.flags.bold   = false
+defaults.flags.italic = false
 
-defaults.colors.text   = T{}
-defaults.colors.text.r = 255
-defaults.colors.text.g = 255
-defaults.colors.text.b = 255
+defaults.text       = {}
+defaults.text.size  = 10
+defaults.text.font  = 'Courier New'
+defaults.text.alpha = 255
+defaults.text.red   = 255
+defaults.text.green = 255
+defaults.text.blue  = 255
 
 settings = config.load(defaults)
+pettp    = texts.new(settings)
 
 function make_visible()
     petactive = true
-    windower.text.set_visibility(tb_name, true)
+    pettp:visible(true);
     if verbose == true then windower.add_to_chat(8, 'PetTP Visible') end
 end
 
 function make_invisible()
     if petactive then
-        windower.text.set_text(tb_name, '')
-        windower.text.set_visibility(tb_name, false)
+        pettp:text('')
+        pettp:visible(false)
         if verbose == true then windower.add_to_chat(8, 'PetTP Invisible') end
     end
     petactive = false
@@ -184,11 +186,11 @@ function printpettp(pet_idx_in,own_idx_in)
     else
         output = output..current_hp_percent..'%'
     end
-    if settings.autocolor == true then output = output..'\\cr\\cs('..settings.colors.text.r..','..settings.colors.text.g..','..settings.colors.text.b..')' end    
+    if settings.autocolor == true then output = output..'\\cr\\cs('..settings.text.red..','..settings.text.green..','..settings.text.blue..')' end    
     output = output..' ['
     if settings.autocolor == true and current_tp_percent >= 100 then output = output..'\\cr\\cs(128,255,128)' end
     output = output..string.format('%.1f',current_tp_percent)..'%'
-    if settings.autocolor == true and current_tp_percent >= 100 then output = output..'\\cr\\cs('..settings.colors.text.r..','..settings.colors.text.g..','..settings.colors.text.b..')' end    
+    if settings.autocolor == true and current_tp_percent >= 100 then output = output..'\\cr\\cs('..settings.text.red..','..settings.text.green..','..settings.text.blue..')' end    
     output = output..']'
     if max_mp > 0 then
         if current_mp_percent > 75 then
@@ -201,11 +203,11 @@ function printpettp(pet_idx_in,own_idx_in)
             output = output..'\\cr\\cs(255,0,0)'
         end
         output = output..' '..current_mp..'/'..max_mp..' ('..current_mp_percent..')'
-        if settings.autocolor == true then output = output..'\\cr\\cs('..settings.colors.text.r..','..settings.colors.text.g..','..settings.colors.text.b..')' end    
+        if settings.autocolor == true then output = output..'\\cr\\cs('..settings.text.red..','..settings.text.green..','..settings.text.blue..')' end    
     end
     output = output..'\\cr'
 
-    windower.text.set_text(tb_name, output)
+    pettp:text(output)
 end
 
 windower.register_event('time change', function()
@@ -365,17 +367,6 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 end)
 
 windower.register_event('load', function()
-    local background = settings.colors.background
-    windower.text.create(tb_name)
-    windower.text.set_location(tb_name, settings.position.x, settings.position.y)
-    windower.text.set_bg_color(tb_name, background.a, background.r, background.g, background.b)
-    windower.text.set_color(tb_name, settings.font.a, defaults.colors.text.r, defaults.colors.text.g, defaults.colors.text.b)
-    windower.text.set_font(tb_name, settings.font.family)
-    windower.text.set_font_size(tb_name, settings.font.size)
-    windower.text.set_bold(tb_name, settings.font.bold)
-    windower.text.set_italic(tb_name, settings.font.italic)
-    windower.text.set_text(tb_name, '')
-    windower.text.set_bg_visibility(tb_name, defaults.bgvisible)
     if superverbose == true then
         windower.add_to_chat(8, 'Player index: '..windower.ffxi.get_player().index)
         if windower.ffxi.get_mob_by_target('pet') then
@@ -406,15 +397,13 @@ windower.register_event('job change', function()
     make_invisible()
 end)
 
-windower.register_event('unload', function()
-    windower.text.delete(tb_name)
-end)
-
 windower.register_event('addon command',function (...)
     local splitarr = {...}
 
     for i,v in pairs(splitarr) do
-        if v:lower() == 'verbose' then
+        if v:lower() == 'save' then
+            config.save(settings, 'all')
+        elseif v:lower() == 'verbose' then
             verbose = not verbose
             windower.add_to_chat(121,'PetTP: Verbose Mode flipped! - '..tostring(verbose))
         elseif v:lower() == 'superverbose' then
