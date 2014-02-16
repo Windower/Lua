@@ -254,10 +254,10 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
                             petname = new_petname
                         end
                         if petname == new_petname then -- make sure we only update if we actually have a puppet out
-                            current_hp = original:byte(0x69)+(original:byte(0x6A)*256)
-                            max_hp       = original:byte(0x6B)+(original:byte(0x6C)*256)
-                            current_mp = original:byte(0x6D)+(original:byte(0x6E)*256)
-                            max_mp       = original:byte(0x6F)+(original:byte(0x70)*256)
+                            current_hp = new_current_hp
+                            max_hp     = new_max_hp
+                            current_mp = new_current_mp
+                            max_mp     = new_max_mp
                             if max_hp ~= 0 then
                                 current_hp_percent=math.floor(100*current_hp/max_hp)
                             else
@@ -324,10 +324,10 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
                 local new_tp_percent = (original:byte(0x11)+(original:byte(0x12)*256))/10
                 if newpet or (new_hp_percent ~= current_hp_percent) or (new_mp_percent ~= current_mp_percent) or (new_tp_percent ~= current_tp_percent) or petname == nil then
                     if (max_hp ~= 0) and (new_hp_percent ~= current_hp_percent) then
-                        current_hp = math.floor(current_hp_percent * max_hp / 100)
+                        current_hp = math.floor(new_hp_percent * max_hp / 100)
                     end
                     if (max_mp ~= 0) and (new_mp_percent ~= current_mp_percent) then
-                        current_mp = math.floor(current_mp_percent * max_mp / 100)
+                        current_mp = math.floor(new_mp_percent * max_mp / 100)
                     end
                     if petname == nil then
                         petname = original:sub(0x15,original:find(string.char(0),0x15)-1)
