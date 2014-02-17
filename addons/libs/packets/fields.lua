@@ -855,7 +855,7 @@ fields.incoming[0x029] = L{
     {ctype='unsigned short',    label='_unknown1'},                             -- 1A
 }
 
--- Item Assign
+-- Resting Message
 fields.incoming[0x02A] = L{
     {ctype='unsigned int',      label='Player ID',          fn=id},             -- 04
     {ctype='unsigned int',      label='Param 1'},                               -- 08
