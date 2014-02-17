@@ -37,6 +37,7 @@ require('tables')
 
 texts = require('texts')
 config = require('config')
+res = require('resources')
 
 tb_name	= 'addon:gr:gametime'
 visible = false
