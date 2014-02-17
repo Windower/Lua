@@ -48,17 +48,10 @@ function export_set(options)
                 else
                     windower.add_to_chat(123,'GearSwap: You possess an item that is not in the resources yet.')
                 end
-            end
-            for i = 1,80 do
-                if not item_list[i] then
-                    item_list[i] = {}
-                    item_list[i].name = empty
-                    item_list[i].slot = 'item'
-                    for i,_ in pairs(res.items.slots) do
-                        item_list[i].slot = res.slots[i]
-                        break
-                    end
-                end
+            else
+                item_list[i] = {}
+                item_list[i].name = empty
+                item_list[i].slot = 'item'
             end
         end
     elseif all_sets then
