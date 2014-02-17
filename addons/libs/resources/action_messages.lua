@@ -700,7 +700,12 @@ return {
     [707] = { english="As a first-time bonus, you receive ${number} sparks of eminence for a total of ${number2}!", color=91},
     [708] = { english="This place is now known as a location that brings memories flooding back to ${actor}.", color=91},
     [709] = { english="As a special bonus for your valiant efforts, you have been awarded the following: ${item}", color=91},
-    [710] = { english="You are cleared to fulfill this objective again.", color=91}
+    [710] = { english="You are cleared to fulfill this objective again.", color=91},
+    [711] = { english=".", color=91},
+    [712] = { english="Primary Accuracy: ${number} / Primary Attack: ${number2}", color=91},
+    [713] = { english="Auxiliary Accuracy: ${number} / Auxiliary Attack: ${number2}", color=91},
+    [714] = { english="Ranged Accuracy: ${number} / Ranged Attack: ${number2}", color=91},
+    [715] = { english="Evasion: ${number} / Defense: ${number2}", color=91}
 }
 
 
