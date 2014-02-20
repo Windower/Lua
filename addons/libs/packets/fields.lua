@@ -297,6 +297,15 @@ fields.outgoing[0x037] = L{
     {ctype='unsigned char',     label='Bag',                fn=bag},            -- 10
 }
 
+-- Model DisAppear
+fields.outgoing[0x038] = L{
+    {ctype='unsigned int',      label='NPC ID',             fn=id},             -- 04
+    {ctype='unsigned int',      label='NPC ID2',            fn=id},             -- 08   Always observed to be the same as the first field
+    {ctype='char[4]',           label='kesu_deru'},                             -- 0C   Either kesu or deru (erase or appear, respectively)
+    {ctype='unsigned char',     label='NPC Index',          fn=index},          -- 10
+    {ctype='unsigned char',     label='NPC Index2',         fn=index},          -- 12
+}
+
 -- Sort Item
 fields.outgoing[0x03A] = L{
     {ctype='unsigned char',     label='Bag',                fn=bag},            -- 04
@@ -1370,6 +1379,12 @@ fields.incoming[0x0F9] = L{
     {ctype='unsigned short',    label='Player Index',       fn=index},          -- 08
     {ctype='unsigned char',     label='_unknown1'},                             -- 0A
     {ctype='unsigned char',     label='_unknown2'},                             -- 0B
+}
+
+-- Sparks update packet
+fields.incoming[0x110] = L{
+    {ctype='unsigned short',      label='Sparks Total'},                        -- 04
+    {ctype='unsigned short',      label='_unknown1'},                           -- 06   Sparks are currently capped at 50,000
 }
 
 -- Eminence Message

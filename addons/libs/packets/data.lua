@@ -86,6 +86,7 @@ data.incoming[0x02D] = {name='EXP Gain (kill)',     description='Packet sent aft
 data.incoming[0x030] = {name='Synth Animation',     description='Generates the synthesis animation'}
 data.incoming[0x036] = {name='NPC Chat',            description='Dialog from NPC\'s.'}
 data.incoming[0x037] = {name='Update Char',         description='Updates a characters stats and animation.'}
+data.incoming[0x038] = {name='Model DisAppear',     description='Sent when a model should appear or disappear.'}
 data.incoming[0x03C] = {name='Shop',                description='Displays items in a vendors shop.'}
 data.incoming[0x03D] = {name='Value',               description='Returns the value of an item.'}
 data.incoming[0x041] = {name='Stupid Evil Packet',  description='This packet is stupid and evil. Required for emotes.'}
@@ -127,6 +128,7 @@ data.incoming[0x0F6] = {name='Widescan Mark',       description='Marks the start
 data.incoming[0x0F9] = {name='Reraise Activation',  description='Reassigns targetable status on reraise activation?'}
 data.incoming[0x105] = {name='Data Download 4',     description='The data that is sent to the client when it is "Downloading data...".'}
 data.incoming[0x108] = {name='Data Download 5',     description='The data that is sent to the client when it is "Downloading data...".'}
+data.incoming[0x110] = {name='Sparks Update',       description='Occurs when you sparks increase and generates the related message.'}
 data.incoming[0x111] = {name='Eminence Message',    description='Causes Records of Eminence messages.'}
 data.incoming[0x113] = {name='Currency Info',       description='Contains all currencies to be displayed in the currency menu.'}
 
