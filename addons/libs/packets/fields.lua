@@ -1372,6 +1372,42 @@ fields.incoming[0x0F9] = L{
     {ctype='unsigned char',     label='_unknown2'},                             -- 0B
 }
 
+-- Eminence Message
+fields.incoming[0x111] = L{
+    {ctype='bit[12]',           label='RoE Quest ID 1'},                        -- 04
+    {ctype='bit[20]',           label='RoE Quest 1 Progress'},                  -- 05
+    {ctype='bit[12]',           label='RoE Quest ID 2'},                        -- 08
+    {ctype='bit[20]',           label='RoE Quest 2 Progress'},                  -- 09
+    {ctype='bit[12]',           label='RoE Quest ID 3'},                        -- 0C
+    {ctype='bit[20]',           label='RoE Quest 3 Progress'},                  -- 0D
+    {ctype='bit[12]',           label='RoE Quest ID 4'},                        -- 10
+    {ctype='bit[20]',           label='RoE Quest 4 Progress'},                  -- 11
+    {ctype='bit[12]',           label='RoE Quest ID 5'},                        -- 14
+    {ctype='bit[20]',           label='RoE Quest 5 Progress'},                  -- 15
+    {ctype='bit[12]',           label='RoE Quest ID 6'},                        -- 18
+    {ctype='bit[20]',           label='RoE Quest 6 Progress'},                  -- 19
+    {ctype='bit[12]',           label='RoE Quest ID 7'},                        -- 1C
+    {ctype='bit[20]',           label='RoE Quest 7 Progress'},                  -- 1D
+    {ctype='bit[12]',           label='RoE Quest ID 8'},                        -- 20
+    {ctype='bit[20]',           label='RoE Quest 8 Progress'},                  -- 21
+    {ctype='bit[12]',           label='RoE Quest ID 9'},                        -- 24
+    {ctype='bit[20]',           label='RoE Quest 9 Progress'},                  -- 25
+    {ctype='bit[12]',           label='RoE Quest ID 10'},                       -- 28
+    {ctype='bit[20]',           label='RoE Quest 10 Progress'},                 -- 29
+    {ctype='bit[12]',           label='RoE Quest ID 11'},                       -- 2C
+    {ctype='bit[20]',           label='RoE Quest 11 Progress'},                 -- 2D
+    {ctype='bit[12]',           label='RoE Quest ID 12'},                       -- 30
+    {ctype='bit[20]',           label='RoE Quest 12 Progress'},                 -- 31
+    {ctype='bit[12]',           label='RoE Quest ID 13'},                       -- 34
+    {ctype='bit[20]',           label='RoE Quest 13 Progress'},                 -- 35
+    {ctype='bit[12]',           label='RoE Quest ID 14'},                       -- 38
+    {ctype='bit[20]',           label='RoE Quest 14 Progress'},                 -- 39
+    {ctype='bit[12]',           label='RoE Quest ID 15'},                       -- 3C
+    {ctype='bit[20]',           label='RoE Quest 15 Progress'},                 -- 3D
+    {ctype='bit[12]',           label='RoE Quest ID 16'},                       -- 40
+    {ctype='bit[20]',           label='RoE Quest 16 Progress'},                 -- 41
+}
+
 --Currency Info
 fields.incoming[0x113] = L{
     {ctype='signed int',        label='Conquest Points (San d\'Oria)'},         -- 04
