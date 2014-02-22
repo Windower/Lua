@@ -522,6 +522,22 @@ fields.outgoing[0x102] = L{
     {ctype='char*',             label='_unknown'},                              -- 2A  -- All 00s for Monsters
 }
 
+-- Start RoE Quest
+fields.outgoing[0x10C] = L{
+    {ctype='unsigned short',    label='RoE Quest ID'},                          -- 04   This field is likely actually 12 bits
+    {ctype='unsigned short',    label='_junk1'},                                -- 06
+}
+
+-- Cancel RoE Quest
+fields.outgoing[0x10D] = L{
+    {ctype='unsigned short',    label='RoE Quest ID'},                          -- 04   This field is likely actually 12 bits
+    {ctype='unsigned short',    label='_junk1'},                                -- 06
+}
+
+-- Currency Menu
+fields.outgoing[0x10F] = L{
+}
+
 -- Zone update
 fields.incoming[0x00A] = L{
     {ctype='unsigned int',      label='Player ID',          fn=id},             -- 04
