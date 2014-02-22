@@ -115,15 +115,22 @@ end})
 -- Example usage
 --  Injection:
 --      local packet = packets.outgoing(0x050, {
---          ['Inventory ID'] = 27,  -- 27th item in the inventory
---          ['Equip Slot'] = 15     -- 15th slot, left ring
+--          ['Inventory Index'] = 27,   -- 27th item in the inventory
+--          ['Equipment Slot'] = 15     -- 15th slot, left ring
 --      })
+--      packets.inject(packet)
+--
+--  Injection (Alternative):
+--      local packet = packets.outgoing(0x050)
+--      packet['Inventory Index'] = 27  -- 27th item in the inventory
+--      packet['Equipment Slot'] = 15   -- 15th slot, left ring
 --      packets.inject(packet)
 -- 
 --  Parsing:
 --      windower.register_event('outgoing chunk', function(id, data)
 --          if id == 0x0B6 then -- outgoing /tell
---              
+--              local packet = packets.outgoing(id, data)
+--              print(packet['Target Name'], packet['Message'])
 --          end
 --      end)
 function packets.incoming(id, data)
