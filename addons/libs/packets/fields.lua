@@ -989,6 +989,29 @@ fields.incoming._mult[0x044][0x12] = L{     -- PUP
     -- For Black Mage, 0x29 to 0x43 appear to represent the black magic that you know
 }
 
+fields.incoming._mult[0x044][0x17] = L{     -- MON
+    {ctype='unsigned char',     label='Job ID'},                                -- 04
+    {ctype='unsigned char',     label='_unknown'},                              -- 05
+    {ctype='unsigned char',     label='_unknown'},                              -- 06
+    {ctype='unsigned char',     label='_unknown'},                              -- 07
+    {ctype='unsigned short',    label='Species ID'},                            -- 08   
+    {ctype='unsigned short',    label='_unknown'},                              -- 0A   
+    {ctype='unsigned short',    label='Instinct ID 1'},                         -- 0C   Instinct assignments are based off their position in the equipment list.
+    {ctype='unsigned short',    label='Instinct ID 2'},                         -- 0E
+    {ctype='unsigned short',    label='Instinct ID 3'},                         -- 10
+    {ctype='unsigned short',    label='Instinct ID 4'},                         -- 12
+    {ctype='unsigned short',    label='Instinct ID 5'},                         -- 14
+    {ctype='unsigned short',    label='Instinct ID 6'},                         -- 16
+    {ctype='unsigned short',    label='Instinct ID 7'},                         -- 18
+    {ctype='unsigned short',    label='Instinct ID 8'},                         -- 1A
+    {ctype='unsigned short',    label='Instinct ID 9'},                         -- 1C
+    {ctype='unsigned short',    label='Instinct ID 10'},                        -- 1E
+    {ctype='unsigned short',    label='Instinct ID 11'},                        -- 20
+    {ctype='unsigned short',    label='Instinct ID 12'},                        -- 22
+    {ctype='unsigned short',    label='_unknown1'},                             -- 24
+    {ctype='char[118]',         label='_unknown'},                              -- 26   Zeroing everything beyond this point has no notable effect.
+}
+
 -- Delivery Item
 fields.incoming[0x04B] = L{
     {ctype='unsigned char',     label='Packet Type'},                           -- 04
@@ -1082,6 +1105,7 @@ fields.incoming[0x04F] = L{
 --   packets. It is common to see things like inventory size, equipment information, and
 --   character ID in this packet. They do not appear to be meaningful and the client functions 
 --   normally even if they are blocked.
+--   Tends to bookend model change packets (0x51), though blocking it, zeroing it, etc. affects nothing.
     {ctype='unsigned int',     label='_unknown1'},                              -- 04
 }
 
@@ -1089,6 +1113,7 @@ fields.incoming[0x04F] = L{
 fields.incoming[0x050] = L{
     {ctype='unsigned char',     label='Inventory Index',    fn=inv+{0}},        -- 04
     {ctype='unsigned char',     label='Equipment Slot',     fn=slot},           -- 05
+	{ctype='unsigned short',    label='_junk1'}                                 -- 06
 }
 
 -- Model Change
@@ -1180,7 +1205,7 @@ fields.incoming[0x061] = L{
     {ctype='unsigned short',    label='Nation rank'},                           -- 46
     {ctype='unsigned short',    label='Rank points',        fn=cap-{0xFFF}},    -- 48
     {ctype='unsigned short',    label='Home point',         fn=zone},           -- 4A
-    {ctype='unsigned short',    label='_unknown23'},                            -- 4C
+    {ctype='unsigned short',    label='_unknown23'},                            -- 4C   0xFF-ing this last region has no notable effect.
     {ctype='unsigned short',    label='_unknown24'},                            -- 4E
     {ctype='unsigned short',    label='_unknown25'},                            -- 50
     {ctype='unsigned short',    label='_unknown26'},                            -- 52   00 00 observed.
@@ -1233,6 +1258,46 @@ fields.incoming[0x062] = L{
     {ctype='unsigned short',    label='Cooking',            fn=sskill},         -- F0
     {ctype='unsigned short',    label='Synergy',            fn=sskill},         -- F2
     {ctype='char*',             label='_padding',           const=0xFF},        -- F4
+}
+
+-- Set Update
+-- This packet likely varies based on jobs, but currently I only have it worked out for Monstrosity.
+-- It also appears in three chunks, so it's double-varying.
+
+fields.incoming[0x063] = L{
+	-- Order == 2
+	{ctype='unsigned short',    label='Order'},                                 -- 04
+	{ctype='unsigned int',      label='_flags1'},                               -- 06   
+	{ctype='unsigned int',      label='_flags2'},                               -- 08   The 3rd bit of the last byte is the flag that indicates whether or not you are xp capped (blue levels)
+}
+
+fields.incoming[0x063] = L{
+	-- Order == 3
+	{ctype='unsigned short',    label='Order'},                                 -- 04
+	{ctype='unsigned short',    label='_flags1'},                               -- 06   Consistently D8 for me
+	{ctype='unsigned short',    label='_flags2'},                               -- 08   Vary when I change species
+	{ctype='unsigned short',    label='_flags3'},                               -- 0A   Consistent across species
+	{ctype='unsigned char',     label='Mon. Rank'},                             -- 0C   00 = Mon, 01 = NM, 02 = HNM
+	{ctype='unsigned char',     label='_unknown1'},                             -- 0D   00
+	{ctype='unsigned short',    label='_unknown2'},                             -- 0E   00 00
+	{ctype='unsigned short',    label='_unknown3'},                             -- 10   76 00
+	{ctype='unsigned short',    label='Infamy'},                                -- 12
+	{ctype='unsigned int',      label='_unknown2'},                             -- 14   00s
+	{ctype='unsigned int',      label='_unknown3'},                             -- 18   00s
+	{ctype='char[64]',          label='Instinct Bitfield 1'},                   -- 1C   See below
+	-- Bitpacked 2-bit values. 0 = no instincts from that species, 1 == first instinct, 2 == first and second instinct, 3 == first, second, and third instinct.
+	{ctype='char[128]',         label='Monster Level Char field'},              -- 5C   Mapped onto the item ID for these creatures. (00 doesn't exist, 01 is rabbit, 02 is behemoth, etc.)
+}
+
+fields.incoming[0x063] = L{
+	-- Order == 4
+	{ctype='unsigned short',    label='Order'},                                 -- 04
+	{ctype='unsigned short',    label='_unknown1'},                             -- 06   B0 00
+	{ctype='char[126]',         label='_unknown2'},                             -- 08   FF-ing has no effect.
+	{ctype='unsigned char',     label='Slime Level'},                           -- 86   
+	{ctype='unsigned char',     label='Spriggan Level'},                        -- 87   
+	{ctype='char[12]',          label='Instinct Bitfield 3'},                   -- 88   Contains job/race instincts from the 0x03 set. Has 8 unused bytes. This is a 1:1 mapping.
+	{ctype='char[32]',          label='Variants Bitfield'},                     -- 94   Does not show normal monsters, only variants. Bit is 1 if the variant is owned. Length is an estimation including the possible padding.
 }
 
 -- Pet Info
@@ -1337,6 +1402,7 @@ fields.incoming[0x0DF] = L{
     {ctype='unsigned char',     label='MPP',                fn=percent},        -- 17
     {ctype='unsigned short',    label='_unknown1'},                             -- 18
     {ctype='unsigned short',    label='_unknown2'},                             -- 1A
+    {ctype='unsigned int',      label='_unknown3'},                             -- 1C
 }
 
 -- Char Info
