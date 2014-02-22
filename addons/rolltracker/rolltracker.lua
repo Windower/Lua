@@ -98,15 +98,15 @@ windower.register_event('load',function ()
 				329, 330, 331, 332,
 				333, 334, 335, 336, 337, 338}
 	player_color={['p0']=string.char(0x1E, 247),['p1']=string.char(0x1F, 204),['p2']=string.char(0x1E, 156),['p3']=string.char(0x1E,238),['p4']=string.char(0x1E,5),['p5']=string.char(0x1E,6)}
-	roll_ident={[97]=' ', ['98']='Fighter\'s',['99']='Monk\'s',['100']='Healer\'s',
-						['101']='Wizard\'s',['102']='Warlock\'s',['103']='Rogue\'s',
-						['104']='Gallant\'s',['105']='Chaos',['106']='Beast',
-						['107']='Choral',['108']='Hunter\'s',['109']='Samurai',
-						['110']='Ninja',['111']='Drachen',['112']='Evoker\'s',
-						['113']='Magus\'s',['114']='Corsair\'s',['115']='Puppet',
-						['116']='Dancer\'s',['117']='Scholar\'s',['118']='Bolter\'s',
-						['119']='Caster\'s', ['120']='Courser\'s', ['121']='Blitzer\'s',
-						['122']='Tactician\'s',['303']='Miser\'s',['302']='Allies\'', ['304']='Companion\'s',['305']='Avenger\'s'
+	roll_ident={[97]=' ', [98]='Fighter\'s',[99]='Monk\'s',[100]='Healer\'s',
+						[101]='Wizard\'s',[102]='Warlock\'s',[103]='Rogue\'s',
+						[104]='Gallant\'s',[105]='Chaos',[106]='Beast',
+						[107]='Choral',[108]='Hunter\'s',[109]='Samurai',
+						[110]='Ninja',[111]='Drachen',[112]='Evoker\'s',
+						[113]='Magus\'s',[114]='Corsair\'s',[115]='Puppet',
+						[116]='Dancer\'s',[117]='Scholar\'s',[118]='Bolter\'s',
+						[119]='Caster\'s', [120]='Courser\'s', [121]='Blitzer\'s',
+						[122]='Tactician\'s',[303]='Miser\'s',[302]='Allies\'', [304]='Companion\'s',[305]='Avenger\'s'
 			}
 	roll_luck={ 0,5,3,3,5,4,5,3,4,4,2,4,2,4,4,5,2,5,3,3,2,3,2,3,4,5,5,3,2,4 }
 	roll_buff={
@@ -156,61 +156,59 @@ function initialize()
 end
 
 windower.register_event('incoming text',function (old, new, color)
-	new_bm = old:find("Roll.* The total.*")
-	match_doubleup = old:find ('.*uses Double.*The total')
-	battlemod_compat = old:find('.*Roll.*'..string.char(129,168))
-	obtained_roll = old:find('.* receives the effect of .* Roll.')
-	not_party = old:find ('%('..'%w+'..'%).* Roll ')
-		if new_bm or battlemod_compat or match_doubleup and color ~= 123 then
-			new=''
-		end
-		
-		if obtained_roll ~= nil then
-			new=''
-		end
-		if not_party then
-			new=old
-		end
-		return new, color
+    if old:match("Roll.* The total.*") or old:match('.*Roll.*' .. string.char(0x81, 0xA8)) or old:match('.*uses Double.*The total') and color ~= 123 then
+        return true
+    end
+    
+    if old:match('.* receives the effect of .* Roll.') ~= nil then
+        return true
+    end
+    if old:match('%('..'%w+'..'%).* Roll ') then
+        new = old
+    end
+    return new, color
 end)
 
-windower.register_event('action',function (act)
-	id = act['actor_id']
-	if act['category']==6 then
-		roller = act['param']
-		rollnum = act['targets'][1]['actions'][1]['param']
-		effected_member={}
-		bust_rate(rollnum, id)
-		for i=1, #act['targets'] do
-			if act['targets'][i]['id'] == windower.ffxi.get_player()['id'] then
-				for i=1, #roll_id do
+windower.register_event('action', function(act)
+	id = act.actor_id
+	if act.category == 6 then
+		roller = act.param
+		rollnum = act.targets[1].actions[1].param
+		effected_member = {}
+		local bust_rate(rollnum, id)
+		for i = 1, #act.targets do
+			if act.targets[i].id == windower.ffxi.get_player().id then
+				for i = 1, #roll_id do
 					if roller == roll_id[i] then
-						for n=1, #act['targets'] do
-							for z in pairs(windower.ffxi.get_party()) do
-								if windower.ffxi.get_party()[z]['mob'] ~= nil then
-									if act['targets'][n]['id'] == windower.ffxi.get_party()[z]['mob']['id'] then	
-										effected_member[n]=player_color[z]..windower.ffxi.get_party()[z]['name']..chat.controls.reset
+						for n = 1, #act.targets do
+                            local party = windower.ffxi.get_party()
+							for z in pairs(party) do
+								if party[z].mob ~= nil then
+									if act.targets[n].id == party[z].mob.id then	
+										effected_member[n] = player_color[z] .. party[z].name .. chat.controls.reset
 									end
 								end
 							end
 						end
+
 						local effected_write = table.concat(effected_member, ', ')
+                        local effected_number
 						if settings.effected == 1 then 
-							effectednumber = '['..#effected_member..'] '
+							effected_number = '[' .. #effected_member .. '] '
 						else
-							effectednumber = '' 
+							effected_number = '' 
 						end
 						
-						luckyroll=0
+						luckyroll = 0
 						
 						if #effected_member > 0 then
 							if rollnum == roll_luck[i] or rollnum == 11 then 
 								luckyroll = 1
-								windower.add_to_chat(1, effectednumber..effected_write..chat.controls.reset..' '..chars['implies']..' '..roll_ident[tostring(roller)]..' Roll '..chars['circle'..rollnum]..string.char(31,158)..' (Lucky!)'..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
-							elseif rollnum==12 and #effected_member > 0 then
-								windower.add_to_chat(1, string.char(31,167)..effectednumber..'Bust! '..chat.controls.reset..chars['implies']..' '..effected_write..' '..chars['implies']..' ('..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')')
+								windower.add_to_chat(1, effected_number..effected_write..chat.controls.reset..' '..chars.implies..' '..roll_ident[roller]..' Roll '..chars['circle' .. rollnum]..string.char(31,158)..' (Lucky!)'..string.char(31,13)..' (+'..roll_buff[roll_ident[roller]][rollnum]..roll_buff[roll_ident[roller]][13]..')'..bustrate)
+							elseif rollnum == 12 and #effected_member > 0 then
+								windower.add_to_chat(1, string.char(31,167)..effected_number..'Bust! '..chat.controls.reset..chars.implies..' '..effected_write..' '..chars.implies..' ('..roll_buff[roll_ident[roller]][rollnum]..roll_buff[roll_ident[roller]][13]..')')
 							else
-								windower.add_to_chat(1, effectednumber..effected_write..chat.controls.reset..' '..chars['implies']..' '..roll_ident[tostring(roller)]..' Roll '..chars['circle'..rollnum]..string.char(31,13)..' (+'..roll_buff[roll_ident[tostring(roller)]][rollnum]..roll_buff[roll_ident[tostring(roller)]][13]..')'..bustrate)
+								windower.add_to_chat(1, effected_number..effected_write..chat.controls.reset..' '..chars.implies..' '..roll_ident[roller]..' Roll '..chars['circle' .. rollnum]..string.char(31,13)..' (+'..roll_buff[roll_ident[roller]][rollnum]..roll_buff[roll_ident[roller]][13]..')'..bustrate)
 							end
 						end
 					end
@@ -221,48 +219,48 @@ windower.register_event('action',function (act)
 end)
 
 function bust_rate(num, main)
-	if num <= 5 or num == 11 or main ~= windower.ffxi.get_player()['id'] or settings.bust == 0 then
-		bustrate = ''
-	else 
-		bustrate = '\7  [Chance to Bust]: '..string.format("%.1f",(num-5)*16.67)..'%'
+	if num <= 5 or num == 11 or main ~= windower.ffxi.get_player().id or settings.bust == 0 then
+		return ''
 	end
-	return bustrate
+    return '\7  [Chance to Bust]: ' .. '%.1f':format((num-5)*16.67) .. '%'
 end
 
-test=0
+test = false
 
-windower.register_event('outgoing text',function (original, modified)
-	if original:find('/jobability \"Double.*Up') and luckyroll == 1 and override == 0 and id == windower.ffxi.get_player()['id'] then
-		modified=''
-		windower.add_to_chat(159,'Attempting to Doubleup on a Lucky Roll: Re-double up to continue.')
-		luckyroll=0
-		return modified
+windower.register_event('outgoing text', function(original, modified)
+    local player
+	if original:match('/jobability \"Double.*Up') then
+        player = windower.ffxi.get_player()
+        if luckyroll == 1 and override == 0 and id == player.id then
+            windower.add_to_chat(159,'Attempting to Doubleup on a Lucky Roll: Re-double up to continue.')
+            luckyroll = 0
+            return true
+        end
 	end
 	
-	if original:find('/jobability \"Fold') and settings.fold == 1 then
-		a=0
-		
-		for buffs, integers in pairs(windower.ffxi.get_player()['buffs']) do
-			if table.contains(buff_id, integers) then
-				a=a+1
+	if settings.fold == 1 and original:match('/jobability \"Fold') then
+		local count = 0
+
+        local trigger = false
+		for _, buff in pairs(player.buffs) do
+			if table.contains(buff_id, buff) then
+				count = count + 1
 			end
 			
-			if table.contains(buff_id, integers) then
-				if integers == 309 or a==2 then
-					gooff='yes'
-				else
-					gooff='no'
+			if table.contains(buff_id, buff) then
+				if buff == 309 or count == 2 then
+					trigger = true
 				end
 			end
 		end
 		
-		if gooff=='yes' or test==1 then
-			modified=original
-			test=0
+		if trigger or test then
+			modified = original
+			test = false
 		else
-			windower.add_to_chat(159,'No \'Bust\'. Fold again to continue.')
-			modified=''
-			test=1
+			windower.add_to_chat(159, 'No \'Bust\'. Fold again to continue.')
+			test = true
+			return true
 		end
 		
 		return modified
