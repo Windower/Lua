@@ -64,8 +64,9 @@ end
 
 -- Type identifiers as declared in lpack.c
 local pack_ids = {}
-pack_ids['bool']            = 'B'
-pack_ids['unsigned char']   = 'b'
+pack_ids['bit']             = 'b'   -- Windower exclusive
+pack_ids['bool']            = 'B'   -- Windower exclusive
+pack_ids['unsigned char']   = 'C'   -- Originally 'b', replaced by 'bit' for Windower
 pack_ids['unsigned short']  = 'H'
 pack_ids['unsigned int']    = 'I'
 pack_ids['unsigned long']   = 'L'
@@ -85,7 +86,7 @@ pack_ids = setmetatable(pack_ids, {__index = function(t, k)
         local pack_id = rawget(t, type)
         if pack_id then
             if type == 'char' then
-                return 'S'..number
+                return 'S'..number  -- Windower exclusive
             else
                 return pack_id..number
             end
