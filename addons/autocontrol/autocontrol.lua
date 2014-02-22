@@ -226,49 +226,42 @@ function get_autoset_content(autoset)
 end
 
 windower.register_event("addon command", function(comm, ...)
-    if windower.ffxi.get_player()['main_job_id'] ~= 18 then
+    if windower.ffxi.get_player().main_job_id ~= 18 then
         error('You are not on Puppetmaster.')
         return nil 
     end
-    local args = T{...}
-    if comm == nil then comm = 'help' end
+    local args = L{...}
+    comm = comm or 'help'
         
     if comm == 'saveset' then
-        if args[1] ~= nil then
+        if args[1] then
             save_set(args[1])
         end
     elseif comm == 'add' then
-        if args[2] ~= nil then
+        if args[2] then
             local slot = table.remove(args,1)
             local attach = args:sconcat()
             add_attachment(attach,slot)
         end
     elseif comm == 'equipset' then
-        if args[1] ~= nil then
+        if args[1] then
             attach_set(args[1])
         end
     elseif comm == 'setlist' then
         get_autoset_list()
     elseif comm == 'attlist' then
-        if args[1] ~= nil then
+        if args[1] then
             get_autoset_content(args[1])
         end
     elseif comm == 'list' then
         get_current_autoset():vprint()
     elseif S{'fonttype','fontsize','pos','bgcolor','txtcolor'}:contains(comm) then
-            if comm == 'fonttype' then Burden_tb:font(args[1] or nil)
-        elseif comm == 'fontsize' then Burden_tb:size(args[1] or nil)
-        elseif comm == 'pos' then Burden_tb:pos(args[1] or nil,args[2] or nil)
-        elseif comm == 'bgcolor' then Burden_tb:bgcolor(args[1] or nil,args[2] or nil,args[3] or nil)
-        elseif comm == 'txtcolor' then Burden_tb:color(args[1] or nil,args[2] or nil,args[3] or nil)
+            if comm == 'fonttype' then Burden_tb:font(args[1])
+        elseif comm == 'fontsize' then Burden_tb:size(args[1])
+        elseif comm == 'pos' then Burden_tb:pos(args[1], args[2])
+        elseif comm == 'bgcolor' then Burden_tb:bgcolor(args[1], args[2], args[3])
+        elseif comm == 'txtcolor' then Burden_tb:color(args[1], args[2], args[3])
         end
-        settings:update(Burden_tb._settings)
-        settings.bg.alpha = nil
-        settings.padding = nil
-        settings.text.alpha = nil
-        settings.text.content = nil
-        settings.visible = nil
-        settings:save('all')
     elseif comm == 'show' then Burden_tb:show()
     elseif comm == 'hide' then Burden_tb:hide()
     elseif comm == 'settings' then 
