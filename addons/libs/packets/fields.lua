@@ -180,7 +180,7 @@ types.shop_item = L{
 }
 
 local enums = {
-    synth = {
+    ['synth'] = {
         [0] = 'Success',
         [1] = 'Fail',
         [2] = 'Interrupted',
@@ -190,15 +190,33 @@ local enums = {
         [6] = 'Cancel, skill too low',
         [7] = 'Cancel, rare',
     },
-    logout = {
+    ['logout'] = {
         [1] = '/loguot',
         [2] = '/pol',
         [3] = '/shutdown',
     },
-    zone = {
+    ['zone'] = {
         [1] = 'Logout',
         [2] = 'Teleport',
         [3] = 'Zone line',
+    },
+    [0x038] = {
+        deru = 'Appear',
+        kesu = 'Disappear',
+    },
+    ['ws track'] = {
+        [1] = 'Update',
+        [2] = 'Reset (zone)',
+        [3] = 'Reset (new scan)',
+    },
+    ['ws mob'] = {
+        [0] = 'Other',
+        [1] = 'Friendly',
+        [2] = 'Enemy',
+    },
+    ['ws mark'] = {
+        [1] = 'Start',
+        [2] = 'End',
     },
 }
 
@@ -254,8 +272,8 @@ fields.outgoing[0x029] = L{
     {ctype='unsigned int',      label='Quantity'},                              -- 04
     {ctype='unsigned char',     label='Current Bag ID',     fn=bag},            -- 08
     {ctype='unsigned char',     label='Target Bag ID',      fn=bag},            -- 09
-    {ctype='unsigned char',     label='Inventory Index'},                       -- 10 -- For the item being moved
-    {ctype='unsigned char',     label='_unknown2'},                             -- 11 -- Has taken the value 52. Unclear purpose.
+    {ctype='unsigned char',     label='Inventory Index'},                       -- 10   For the item being moved
+    {ctype='unsigned char',     label='_unknown2'},                             -- 11   Has taken the value 52. Unclear purpose.
 }
 
 -- Menu Item
@@ -295,15 +313,6 @@ fields.outgoing[0x037] = L{
     {ctype='unsigned char',     label='Slot',               fn=inv+{0}},        -- 0E
     {ctype='unsigned char',     label='_unknown2'},                             -- 0F   Takes values
     {ctype='unsigned char',     label='Bag',                fn=bag},            -- 10
-}
-
--- Model DisAppear
-fields.outgoing[0x038] = L{
-    {ctype='unsigned int',      label='NPC ID',             fn=id},             -- 04
-    {ctype='unsigned int',      label='NPC ID2',            fn=id},             -- 08   Always observed to be the same as the first field
-    {ctype='char[4]',           label='kesu_deru'},                             -- 0C   Either kesu or deru (erase or appear, respectively)
-    {ctype='unsigned char',     label='NPC Index',          fn=index},          -- 10
-    {ctype='unsigned char',     label='NPC Index2',         fn=index},          -- 12
 }
 
 -- Sort Item
@@ -398,25 +407,25 @@ fields.outgoing[0x077] = L{
 fields.outgoing[0x096] = L{
     {ctype='unsigned char',     label='_unknown1'},                             -- 04   Crystal ID? Earth = 0x02, Wind-break = 0x19?, Wind no-break = 0x2D?
     {ctype='unsigned char',     label='_unknown2'},                             -- 05
-    {ctype='unsigned short',    label='Crystal Item ID'},                       -- 06
-    {ctype='unsigned char',     label='Crystal Inventory Index'},               -- 08
+    {ctype='unsigned short',    label='Crystal',                fn=item},       -- 06
+    {ctype='unsigned char',     label='Crystal Index',          fn=inv},        -- 08
     {ctype='unsigned char',     label='Number of Ingredients'},                 -- 09
-    {ctype='unsigned short',    label='Ingredient 1 ID'},                       -- 0A
-    {ctype='unsigned short',    label='Ingredient 2 ID'},                       -- 0C
-    {ctype='unsigned short',    label='Ingredient 3 ID'},                       -- 0E
-    {ctype='unsigned short',    label='Ingredient 4 ID'},                       -- 10
-    {ctype='unsigned short',    label='Ingredient 5 ID'},                       -- 12
-    {ctype='unsigned short',    label='Ingredient 6 ID'},                       -- 14
-    {ctype='unsigned short',    label='Ingredient 7 ID'},                       -- 16
-    {ctype='unsigned short',    label='Ingredient 8 ID'},                       -- 18
-    {ctype='unsigned char',     label='Ingredient 1 Index'},                    -- 1A
-    {ctype='unsigned char',     label='Ingredient 2 Index'},                    -- 1B
-    {ctype='unsigned char',     label='Ingredient 3 Index'},                    -- 1C
-    {ctype='unsigned char',     label='Ingredient 4 Index'},                    -- 1D
-    {ctype='unsigned char',     label='Ingredient 5 Index'},                    -- 1E
-    {ctype='unsigned char',     label='Ingredient 6 Index'},                    -- 1F
-    {ctype='unsigned char',     label='Ingredient 7 Index'},                    -- 20
-    {ctype='unsigned char',     label='Ingredient 8 Index'},                    -- 21
+    {ctype='unsigned short',    label='Ingredient 1',           fn=item},       -- 0A
+    {ctype='unsigned short',    label='Ingredient 2',           fn=item},       -- 0C
+    {ctype='unsigned short',    label='Ingredient 3',           fn=item},       -- 0E
+    {ctype='unsigned short',    label='Ingredient 4',           fn=item},       -- 10
+    {ctype='unsigned short',    label='Ingredient 5',           fn=item},       -- 12
+    {ctype='unsigned short',    label='Ingredient 6',           fn=item},       -- 14
+    {ctype='unsigned short',    label='Ingredient 7',           fn=item},       -- 16
+    {ctype='unsigned short',    label='Ingredient 8',           fn=item},       -- 18
+    {ctype='unsigned char',     label='Ingredient 1 Index',     fn=item},       -- 1A
+    {ctype='unsigned char',     label='Ingredient 2 Index',     fn=item},       -- 1B
+    {ctype='unsigned char',     label='Ingredient 3 Index',     fn=item},       -- 1C
+    {ctype='unsigned char',     label='Ingredient 4 Index',     fn=item},       -- 1D
+    {ctype='unsigned char',     label='Ingredient 5 Index',     fn=item},       -- 1E
+    {ctype='unsigned char',     label='Ingredient 6 Index',     fn=item},       -- 1F
+    {ctype='unsigned char',     label='Ingredient 7 Index',     fn=item},       -- 20
+    {ctype='unsigned char',     label='Ingredient 8 Index',     fn=item},       -- 21
     {ctype='unsigned short',    label='_unknown3'},                             -- 22
 }
 
@@ -491,8 +500,8 @@ fields.outgoing[0x100] = L{
 fields.outgoing[0x102] = L{
     {ctype='unsigned short',    label='_unknown1'},                             -- 04  -- 00 00 for Monsters
     {ctype='unsigned short',    label='_unknown1'},                             -- 06  -- Varies by Monster family for the species change packet. Monsters that share the same tnl seem to have the same value. 00 00 for instinct changing.
-    {ctype='unsigned char',     label='Main Job ID'},                           -- 08  -- 00x17 for Monsters
-    {ctype='unsigned char',     label='Sub Job ID'},                            -- 09  -- 00x00 for Monsters
+    {ctype='unsigned char',     label='Main Job',           fn=job},            -- 08  -- 00x17 for Monsters
+    {ctype='unsigned char',     label='Sub Job',            fn=job},            -- 09  -- 00x00 for Monsters
     {ctype='unsigned short',    label='Flag'},                                  -- 0A  -- 04 00 for Monsters changing instincts. 01 00 for changing Monsters
     {ctype='unsigned short',    label='Species ID'},                            -- 0C  -- True both for species change and instinct change packets
     {ctype='unsigned short',    label='_unknown2'},                             -- 0E  -- 00 00 for Monsters
@@ -523,7 +532,7 @@ fields.incoming[0x00A] = L{
     {ctype='unsigned int',      label='Timestamp 1',        fn=time},           -- 38
     {ctype='unsigned int',      label='Timestamp 2',        fn=time},           -- 3C
     {ctype='unsigned short',    label='Zone ID MH',         fn=zone},           -- 40   Zone ID when zoning out of MH, otherwise 0
-    {ctype='unsigned short',    label='_dupe_Zone ID',      fn=zone},           -- 42
+    {ctype='unsigned short',    label='_dupeZone ID',       fn=zone},           -- 42
     {ctype='unsigned char',     label='Race'},                                  -- 44
     {ctype='unsigned char',     label='Face'},                                  -- 45
     {ctype='unsigned short',    label='Head'},                                  -- 46
@@ -716,10 +725,10 @@ fields.incoming[0x017] = L{
 -- Job Info
 fields.incoming[0x01B] = L{
     {ctype='unsigned int',      label='_unknown1'},                             -- 04   Observed value of 05
-    {ctype='unsigned char',     label='Main Job ID'},                           -- 08
+    {ctype='unsigned char',     label='Main Job',           fn=job},            -- 08
     {ctype='unsigned char',     label='Flag or Main Job Level?'},               -- 09
     {ctype='unsigned char',     label='Flag or Sub Job Level?'},                -- 0A
-    {ctype='unsigned char',     label='Sub Job ID'},                            -- 0B
+    {ctype='unsigned char',     label='Sub Job',            fn=job},            -- 0B
     {ctype='unsigned int',      label='_unknown2'},                             -- 0C   Flags -- FF FF FF 00 observed
     {ctype='unsigned char',     label='_unknown3'},                             -- 10   Flag or List Start
     {ctype='unsigned char',     label='WAR Level'},                             -- 11
@@ -814,7 +823,7 @@ fields.incoming[0x01F] = L{
     {ctype='unsigned int',      label='Count'},                                 -- 04
     {ctype='unsigned short',    label='ID',                 fn=item},           -- 08
     {ctype='unsigned char',     label='_padding1',          const=0x00},        -- 0A
-    {ctype='unsigned char',     label='Slot'},                                  -- 0B
+    {ctype='unsigned char',     label='Index',              fn=inv},            -- 0B
     {ctype='unsigned char',     label='Inventory Status'},                      -- 0C
 }
 
@@ -824,7 +833,7 @@ fields.incoming[0x020] = L{
     {ctype='unsigned int',      label='Bazaar',             fn=gil},            -- 08
     {ctype='unsigned short',    label='ID',                 fn=item},           -- 0C
     {ctype='unsigned char',     label='Bag',                fn=bag},            -- 0E
-    {ctype='unsigned char',     label='Slot',               fn=invp+{0x0E}},    -- 0F
+    {ctype='unsigned char',     label='Index',              fn=invp+{0x0E}},    -- 0F
     {ctype='char[28]',          label='ExtData',            fn='...':fn()},     -- 10
 }
 
@@ -884,6 +893,15 @@ fields.incoming[0x030] = L{
     {ctype='unsigned char',     label='Param'},                                 -- 0C  -- 00 is NQ, 01 is break, 02 is HQ
     {ctype='unsigned char',     label='Animation'},                             -- 0D  -- Always C2 for me.
     {ctype='unsigned char',     label='_unknown1',          const=0x00},        -- 0E  -- Appears to just be trash.
+}
+
+-- Model DisAppear
+fields.incoming[0x038] = L{
+    {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
+    {ctype='unsigned int',      label='_dupeID',            fn=id},             -- 08
+    {ctype='char[4]',           label='Type',               fn=e+{0x038}},      -- 0C   "kesu" for disappearing, "deru" for appearing, "deru" only seems to work
+    {ctype='unsigned short',    label='Index',              fn=index},          -- 10
+    {ctype='unsigned short',    label='_dupeIndex',         fn=index},          -- 12
 }
 
 -- Shop
@@ -986,9 +1004,9 @@ fields.incoming[0x04B] = L{
     {ctype='unsigned int',      label='_unknown7'},                             -- 10   07 00 00 00 and 0B 00 00 00 observed - Possibly flags. Rare vs. Rare/Ex.
     {ctype='char[16]',          label='Sender Name'},                           -- 14
     {ctype='unsigned int',      label='_unknown7'},                             -- 24   46 32 00 00 and 42 32 00 00 observed - Possibly flags. Rare vs. Rare/Ex.?
-    {ctype='unsigned int',      label='UNIX Timestamp for sending time'},       -- 28
+    {ctype='unsigned int',      label='UNIX Timestamp',         fn=time},       -- 28
     {ctype='unsigned int',      label='_unknown8'},                             -- 2C   00 00 00 00 observed
-    {ctype='unsigned short',    label='Item ID'},                               -- 30
+    {ctype='unsigned short',    label='Item',                   fn=item},       -- 30
     {ctype='unsigned short',    label='_unknown9'},                             -- 32   Fiendish Tome: Chapter 11 had it, but Oneiros Pebble was just 00 00
     {ctype='unsigned int',      label='Flags1'},                                -- 34   01/04 00 00 00 observed
     {ctype='unsigned short',    label='Number of Item'},                        -- 38
@@ -1028,7 +1046,7 @@ fields.incoming[0x04B] = L{
     {ctype='unsigned int',      label='_unknown7'},                             -- 10   06 00 00 00 and 07 00 00 00 observed - (06 was for the first packet and 07 was for the second)
     {ctype='char[16]',          label='Sender Name'},                           -- 14
     {ctype='unsigned int',      label='_unknown7'},                             -- 24   46 32 00 00 and 42 32 00 00 observed - Possibly flags. Rare vs. Rare/Ex.?
-    {ctype='unsigned int',      label='UNIX Timestamp for sending time'},       -- 28
+    {ctype='unsigned int',      label='UNIX Timestamp'},                        -- 28
     {ctype='unsigned int',      label='_unknown8'},                             -- 2C   00 00 00 00 observed
     {ctype='unsigned short',    label='Item ID'},                               -- 30
     {ctype='unsigned short',    label='_unknown9'},                             -- 32   Fiendish Tome: Chapter 11 had it, but Oneiros Pebble was just 00 00
@@ -1088,7 +1106,8 @@ fields.incoming[0x051] = L{
     {ctype='unsigned short',    label='_unknown1'},                             -- 16   May varying meaningfully, but it's unclear
 }
 
--- Logout Time - This packet is likely used for an entire class of system messages,
+-- Logout Time
+-- This packet is likely used for an entire class of system messages,
 -- but the only one commonly encountered is the logout counter.
 fields.incoming[0x053] = L{
     {ctype='unsigned int',      label='param'},                                 -- 04   Parameter
@@ -1127,9 +1146,9 @@ fields.incoming[0x05B] = L{
 fields.incoming[0x061] = L{
     {ctype='unsigned int',      label='Maximum HP'},                            -- 04
     {ctype='unsigned int',      label='Maximum MP'},                            -- 08
-    {ctype='unsigned char',     label='Main Job ID',        fn=job},            -- 0C
+    {ctype='unsigned char',     label='Main Job',           fn=job},            -- 0C
     {ctype='unsigned char',     label='Main Job Level'},                        -- 0D
-    {ctype='unsigned char',     label='Sub Job ID',         fn=job},            -- 0E
+    {ctype='unsigned char',     label='Sub Job',            fn=job},            -- 0E
     {ctype='unsigned char',     label='Sub Job Level'},                         -- 0F
     {ctype='unsigned short',    label='Current EXP'},                           -- 10
     {ctype='unsigned short',    label='Required EXP'},                          -- 12
@@ -1283,7 +1302,7 @@ fields.incoming[0x0D2] = L{
                                                                                 -- 04   Arcon: Only ever observed 0x00000001 for this
     {ctype='unsigned int',      label='Dropper ID',         fn=id},             -- 08
     {ctype='unsigned int',      label='Count'},                                 -- 0C   Takes values greater than 1 in the case of gil
-    {ctype='unsigned short',    label='Item ID',            fn=item},           -- 10
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 10
     {ctype='unsigned short',    label='Dropper Index',      fn=index},          -- 12
     {ctype='unsigned short',    label='Pool Index'},                            -- 14   This is the internal index in memory, not the one it appears in in the menu
     {ctype='unsigned short',    label='_unknown4'},                             -- 16   First byte seems to always be 00, second seemingly random, both 00 and FF observed
@@ -1351,9 +1370,9 @@ fields.incoming[0x0E8] = L{
 fields.incoming[0x0F4] = L{
     {ctype='unsigned short',    label='Index',              fn=index},          -- 04
     {ctype='unsigned char',     label='_unknown1'},                             -- 06
-    {ctype='unsigned char',     label='Type'},                                  -- 07   1 = NPC (green), 2 = Enemy (red), 0 = Other (blue)
-    {ctype='short',             label='X Offset'},                              -- 08   Offset on the map
-    {ctype='short',             label='Y Offset'},                              -- 0A
+    {ctype='unsigned char',     label='Type',               fn=e+{'ws mob'}},   -- 07
+    {ctype='short',             label='X Offset',           fn=pixel},          -- 08   Offset on the map
+    {ctype='short',             label='Y Offset',           fn=pixel},          -- 0A
     {ctype='char[16]',          label='Name'},                                  -- 0C   Slugged, may not extend all the way to 27. Up to 25 has been observed. This will be used if Type == 0
 }
 
@@ -1362,15 +1381,15 @@ fields.incoming[0x0F5] = L{
     {ctype='float',             label='X Position'},                            -- 04
     {ctype='float',             label='Z Position'},                            -- 08
     {ctype='float',             label='Y Position'},                            -- 0C
-    {ctype='unsigned char',     label='_unknown1'},                             -- 10 Same value as _unknown1 of 0x0F4
+    {ctype='unsigned char',     label='_unknown1'},                             -- 10   Same value as _unknown1 of 0x0F4
     {ctype='unsigned char',     label='_padding1'},                             -- 11
     {ctype='unsigned short',    label='Index',              fn=index},          -- 12
-    {ctype='unsigned int',      label='Status'},                                -- 14 1 for regular data, 2 when zoning (resets tracker), 3 when resetting (new wide scan)
+    {ctype='unsigned int',      label='Status',             fn=e+{'ws track'}}, -- 14
 }
 
 -- Widescan Mark
 fields.incoming[0x0F6] = L{
-    {ctype='unsigned int',      label='Type'},                                  -- 04   1 for the start of a widescan list. 2 for the end of the list.
+    {ctype='unsigned int',      label='Type',               fn=e+{'ws mark'}},  -- 04
 }
 
 -- Reraise Activation
@@ -1537,7 +1556,7 @@ local function parse(fs, data, max)
                     index = index + size
                 else
                     if max ~= 1 then
-                        field.label = field.label..' '..tostring(count)
+                        field.label = field.label .. ' ' .. count:string()
                     end
 
                     res:append(field)
