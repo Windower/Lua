@@ -64,8 +64,9 @@ end
 
 -- Type identifiers as declared in lpack.c
 local pack_ids = {}
-pack_ids['bool']            = 'B'
-pack_ids['unsigned char']   = 'b'
+pack_ids['bit']             = 'b'   -- Windower exclusive
+pack_ids['bool']            = 'B'   -- Windower exclusive
+pack_ids['unsigned char']   = 'C'   -- Originally 'b', replaced by 'bit' for Windower
 pack_ids['unsigned short']  = 'H'
 pack_ids['unsigned int']    = 'I'
 pack_ids['unsigned long']   = 'L'
@@ -85,7 +86,7 @@ pack_ids = setmetatable(pack_ids, {__index = function(t, k)
         local pack_id = rawget(t, type)
         if pack_id then
             if type == 'char' then
-                return 'S'..number
+                return 'S'..number  -- Windower exclusive
             else
                 return pack_id..number
             end
@@ -115,15 +116,22 @@ end})
 -- Example usage
 --  Injection:
 --      local packet = packets.outgoing(0x050, {
---          ['Inventory ID'] = 27,  -- 27th item in the inventory
---          ['Equip Slot'] = 15     -- 15th slot, left ring
+--          ['Inventory Index'] = 27,   -- 27th item in the inventory
+--          ['Equipment Slot'] = 15     -- 15th slot, left ring
 --      })
+--      packets.inject(packet)
+--
+--  Injection (Alternative):
+--      local packet = packets.outgoing(0x050)
+--      packet['Inventory Index'] = 27  -- 27th item in the inventory
+--      packet['Equipment Slot'] = 15   -- 15th slot, left ring
 --      packets.inject(packet)
 -- 
 --  Parsing:
 --      windower.register_event('outgoing chunk', function(id, data)
 --          if id == 0x0B6 then -- outgoing /tell
---              
+--              local packet = packets.outgoing(id, data)
+--              print(packet['Target Name'], packet['Message'])
 --          end
 --      end)
 function packets.incoming(id, data)

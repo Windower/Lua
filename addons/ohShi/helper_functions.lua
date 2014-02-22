@@ -59,7 +59,7 @@ function dCheck(typ, sid)
             return true
         end 
     else
-        local list = mAbils[sid-256]['english']
+        local list = res.monster_abilities[sid-256]['english']
         if settings.dangerwords.weaponskills:find(string.imatch-{list..'$'}) then
             return true
         end 

@@ -175,7 +175,7 @@ windower.register_event('action', function(act)
 		roller = act.param
 		rollnum = act.targets[1].actions[1].param
 		effected_member = {}
-		bust_rate(rollnum, id)
+		local bustrate = bust_rate(rollnum, id)
 		for i = 1, #act.targets do
 			if act.targets[i].id == windower.ffxi.get_player().id then
 				for i = 1, #roll_id do
