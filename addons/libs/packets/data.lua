@@ -132,6 +132,7 @@ data.incoming[0x105] = {name='Data Download 4',     description='The data that i
 data.incoming[0x108] = {name='Data Download 5',     description='The data that is sent to the client when it is "Downloading data...".'}
 data.incoming[0x110] = {name='Sparks Update',       description='Occurs when you sparks increase and generates the related message.'}
 data.incoming[0x111] = {name='Eminence Message',    description='Causes Records of Eminence messages.'}
+data.incoming[0x112] = {name='RoE Quest Log',       description='Updates your RoE quest log on zone and when appropriate.'}
 data.incoming[0x113] = {name='Currency Info',       description='Contains all currencies to be displayed in the currency menu.'}
 
 return data

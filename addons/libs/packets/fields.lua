@@ -1524,6 +1524,16 @@ fields.incoming[0x111] = L{
     {ctype='bit[20]',           label='RoE Quest 16 Progress'},                 -- 41
 }
 
+-- RoE Quest Log
+fields.incoming[0x112] = L{
+    {ctype='char[128]',         label='RoE Quest Bitfield'},                    -- 04   See next line
+	-- There's probably one bit to indicate that a quest can be undertaken and another
+	--  that indicates whether it has been completed once. The meaning of the individual
+	--  bits obviously varies with Order. RoE quests with storyline are in the Packet
+	--  with Order == 3. Most normal quests are in Order == 0
+    {ctype='unsigned int',      label='Order'},                                 -- 84   0,1,2,3
+}
+
 --Currency Info
 fields.incoming[0x113] = L{
     {ctype='signed int',        label='Conquest Points (San d\'Oria)'},         -- 04
