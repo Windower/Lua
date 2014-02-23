@@ -309,7 +309,7 @@ function texts.pos(t, x, y)
 end
 
 function texts.pos_x(t, x)
-    if x then
+    if not x then
         return t._settings.pos.x
     end
 
