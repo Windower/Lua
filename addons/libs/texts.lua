@@ -463,8 +463,11 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
                 or pos_y >= y and y >= pos_y + off_y) then
                 if t._settings.flags.right or t._settings.flags.bottom then
                     local info = windower.get_windower_settings()
-                    pos_x = t._settings.flags.right and pos_x - info.ui_x_res or pos_x
-                    pos_y = t._settings.flags.bottom and pos_y - info.ui_y_res or pos_y
+                    if t._settings.flags.right then
+                        pos_x = pos_x - info.ui_x_res
+                    else
+                        pos_y = pos_y - info.ui_y_res
+                    end
                 end
                 dragged = {text = t, x = x - pos_x, y = y - pos_y}
                 return true
