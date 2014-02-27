@@ -373,6 +373,17 @@ fields.outgoing[0x05B] = L{
 fields.outgoing[0x061] = L{
 }
 
+-- Digging Finished
+-- This packet alone is responsible for generating the digging result, meaning that anyone that can inject
+-- this packet is capable of digging with 0 delay.
+fields.outgoing[0x063] = L{
+    {ctype='unsigned int',      label='Player ID',          fn=id},             -- 04
+    {ctype='unsigned int',      label='_unknown1'},                             -- 08
+    {ctype='unsigned short',    label='Player Index',       fn=index},          -- 0C
+    {ctype='unsigned char',     label='Action ID?'},                            -- 0E   Changing it to anything other than 0x11 causes the packet to fail
+    {ctype='unsigned char',     label='_junk1'},                                -- 0F   Likely junk. Has no effect on anything notable.
+}
+
 -- Party invite
 fields.outgoing[0x06E] = L{
     {ctype='unsigned int',      label='Target ID',          fn=id},             -- 04   This is so weird. The client only knows IDs from searching for people or running into them. So if neither has happened, the manual invite will fail, as the ID cannot be retrieved.
@@ -520,6 +531,22 @@ fields.outgoing[0x102] = L{
     {ctype='unsigned char',     label='Name ID 1'},                             -- 28
     {ctype='unsigned char',     label='Name ID 2'},                             -- 29
     {ctype='char*',             label='_unknown'},                              -- 2A  -- All 00s for Monsters
+}
+
+-- Start RoE Quest
+fields.outgoing[0x10C] = L{
+    {ctype='unsigned short',    label='RoE Quest ID'},                          -- 04   This field is likely actually 12 bits
+    {ctype='unsigned short',    label='_junk1'},                                -- 06
+}
+
+-- Cancel RoE Quest
+fields.outgoing[0x10D] = L{
+    {ctype='unsigned short',    label='RoE Quest ID'},                          -- 04   This field is likely actually 12 bits
+    {ctype='unsigned short',    label='_junk1'},                                -- 06
+}
+
+-- Currency Menu
+fields.outgoing[0x10F] = L{
 }
 
 -- Zone update
@@ -883,6 +910,14 @@ fields.incoming[0x02A] = L{
     {ctype='unsigned short',    label='Player Index',       fn=index},          -- 18
     {ctype='unsigned short',    label='Message ID'},                            -- 1A   The high bit is occasionally set, though the reason for it is unclear.
     {ctype='unsigned int',      label='_unknown1',          const=0x06000000},  -- 1C
+}
+
+-- Digging Animation
+fields.incoming[0x02F] = L{
+    {ctype='unsigned int',      label='Player ID',          fn=id},             -- 04
+    {ctype='unsigned short',    label='Player Index',       fn=index},          -- 08
+    {ctype='unsigned char',     label='Animation ID'},                          -- 0A   Changing it to anything other than 1 eliminates the animation
+    {ctype='unsigned char',     label='_junk1'},                                -- 0B   Likely junk. Has no effect on anything notable.
 }
 
 -- Synth Animation
@@ -1506,6 +1541,16 @@ fields.incoming[0x111] = L{
     {ctype='bit[20]',           label='RoE Quest 15 Progress'},                 -- 3D
     {ctype='bit[12]',           label='RoE Quest ID 16'},                       -- 40
     {ctype='bit[20]',           label='RoE Quest 16 Progress'},                 -- 41
+}
+
+-- RoE Quest Log
+fields.incoming[0x112] = L{
+    {ctype='char[128]',         label='RoE Quest Bitfield'},                    -- 04   See next line
+	-- There's probably one bit to indicate that a quest can be undertaken and another
+	--  that indicates whether it has been completed once. The meaning of the individual
+	--  bits obviously varies with Order. RoE quests with storyline are in the Packet
+	--  with Order == 3. Most normal quests are in Order == 0
+    {ctype='unsigned int',      label='Order'},                                 -- 84   0,1,2,3
 }
 
 --Currency Info

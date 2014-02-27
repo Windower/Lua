@@ -32,6 +32,7 @@ data.outgoing[0x05B] = {name='Dialog choice',       description='Chooses a dialo
 data.outgoing[0x05D] = {name='Emote',               description='This command is used in emotes.'}
 data.outgoing[0x05E] = {name='Request Zone',        description='Request from the client to zone.'}
 data.outgoing[0x061] = {name='Equipment Screen',    description='This command is used when you open your equipment screen.'}
+data.outgoing[0x063] = {name='Digging Finished',    description='This packet is sent when the chocobo digging animation is fixed.'}
 data.outgoing[0x06E] = {name='Party invite',        description='Sent when inviting another player to either party or alliance.'}
 data.outgoing[0x06F] = {name='Party leave',         description='Sent when leaving the party or alliance.'}
 data.outgoing[0x070] = {name='Party breakup',       description='Sent when disbanding the entire party or alliance.'}
@@ -58,6 +59,8 @@ data.outgoing[0x104] = {name='Leave Bazaar',        description='Sent when clien
 data.outgoing[0x105] = {name='View Bazaar',         description='Sent when viewing somebody\'s bazaar.'}
 data.outgoing[0x106] = {name='Buy Bazaar Item',     description='Buy an item from somebody\'s bazaar.'}
 data.outgoing[0x10A] = {name='Set Price',           description='Set the price on a bazaar item.'}
+data.outgoing[0x10C] = {name='Start RoE Quest',     description='Sent to undertake a Records of Eminence Quest.'}
+data.outgoing[0x10D] = {name='Cancel RoE Quest',    description='Sent to cancel a Records of Eminence Quest.'}
 data.outgoing[0x10F] = {name='Currency Menu',       description='Requests currency information for the menu.'}
 
 -- Server packets (incoming)
@@ -83,6 +86,7 @@ data.incoming[0x028] = {name='Action',              description='Packet sent whe
 data.incoming[0x029] = {name='Action Message',      description='Packet sent for simple battle-related messages.'}
 data.incoming[0x02A] = {name='Resting Message',     description='Packet sent when you rest in Abyssea.'}
 data.incoming[0x02D] = {name='EXP Gain (kill)',     description='Packet sent after you defeat a mob and gain XP.'}
+data.incoming[0x02F] = {name='Digging Animation',   description='Generates the chocobo digging animation'}
 data.incoming[0x030] = {name='Synth Animation',     description='Generates the synthesis animation'}
 data.incoming[0x036] = {name='NPC Chat',            description='Dialog from NPC\'s.'}
 data.incoming[0x037] = {name='Update Char',         description='Updates a characters stats and animation.'}
@@ -130,6 +134,7 @@ data.incoming[0x105] = {name='Data Download 4',     description='The data that i
 data.incoming[0x108] = {name='Data Download 5',     description='The data that is sent to the client when it is "Downloading data...".'}
 data.incoming[0x110] = {name='Sparks Update',       description='Occurs when you sparks increase and generates the related message.'}
 data.incoming[0x111] = {name='Eminence Message',    description='Causes Records of Eminence messages.'}
+data.incoming[0x112] = {name='RoE Quest Log',       description='Updates your RoE quest log on zone and when appropriate.'}
 data.incoming[0x113] = {name='Currency Info',       description='Contains all currencies to be displayed in the currency menu.'}
 
 return data
