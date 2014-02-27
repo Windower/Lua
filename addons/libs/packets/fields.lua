@@ -373,6 +373,17 @@ fields.outgoing[0x05B] = L{
 fields.outgoing[0x061] = L{
 }
 
+-- Digging Finished
+-- This packet alone is responsible for generating the digging result, meaning that anyone that can inject
+-- this packet is capable of digging with 0 delay.
+fields.outgoing[0x063] = L{
+    {ctype='unsigned int',      label='Player ID',          fn=id},             -- 04
+    {ctype='unsigned int',      label='_unknown1'},                             -- 08
+    {ctype='unsigned short',    label='Player Index',       fn=index},          -- 0C
+    {ctype='unsigned char',     label='Action ID?'},                            -- 0E   Changing it to anything other than 0x11 causes the packet to fail
+    {ctype='unsigned char',     label='_junk1'},                                -- 0F   Likely junk. Has no effect on anything notable.
+}
+
 -- Party invite
 fields.outgoing[0x06E] = L{
     {ctype='unsigned int',      label='Target ID',          fn=id},             -- 04   This is so weird. The client only knows IDs from searching for people or running into them. So if neither has happened, the manual invite will fail, as the ID cannot be retrieved.
@@ -899,6 +910,14 @@ fields.incoming[0x02A] = L{
     {ctype='unsigned short',    label='Player Index',       fn=index},          -- 18
     {ctype='unsigned short',    label='Message ID'},                            -- 1A   The high bit is occasionally set, though the reason for it is unclear.
     {ctype='unsigned int',      label='_unknown1',          const=0x06000000},  -- 1C
+}
+
+-- Digging Animation
+fields.incoming[0x02F] = L{
+    {ctype='unsigned int',      label='Player ID',          fn=id},             -- 04
+    {ctype='unsigned short',    label='Player Index',       fn=index},          -- 08
+    {ctype='unsigned char',     label='Animation ID'},                          -- 0A   Changing it to anything other than 1 eliminates the animation
+    {ctype='unsigned char',     label='_junk1'},                                -- 0B   Likely junk. Has no effect on anything notable.
 }
 
 -- Synth Animation
