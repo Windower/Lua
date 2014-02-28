@@ -454,6 +454,15 @@ fields.outgoing[0x0B6] = L{
     {ctype='char*',             label='Message'},                               -- 14   Message, occasionally terminated by spare 00 bytes.
 }
 
+-- Check
+fields.outgoing[0x0DD] = L{
+    {ctype='unsigned int',      label='Target ID',          fn=id},             -- 04
+    {ctype='unsigned short',    label='TargetIndex',        fn=index},          -- 08
+    {ctype='unsigned short',    label='_unknown1'},                             -- 0A
+    {ctype='unsigned char',     label='Check Type'},                            -- 0C   00 = Normal /check, 01 = /checkname, 02 = /checkparam
+    {ctype='char[3]',           label='_junk1'}                                 -- 0D
+}
+
 -- Set LS Message
 fields.outgoing[0x0E2] = L{
     {ctype='unsigned int',      label='_unknown1',          const=0x00000040},  -- 04
@@ -531,6 +540,17 @@ fields.outgoing[0x102] = L{
     {ctype='unsigned char',     label='Name ID 1'},                             -- 28
     {ctype='unsigned char',     label='Name ID 2'},                             -- 29
     {ctype='char*',             label='_unknown'},                              -- 2A  -- All 00s for Monsters
+}
+
+-- Close Bazaar
+-- Sent when you close your bazaar window
+fields.outgoing[0x109] = L{
+}
+
+-- Open Bazaar
+-- Sent when you attempt to open your bazaar to set prices
+fields.outgoing[0x10B] = L{
+    {ctype='unsigned int',      label='_unknown1'},                             -- 04   00 00 00 00 for me
 }
 
 -- Start RoE Quest
@@ -1501,10 +1521,45 @@ fields.incoming[0x0F9] = L{
     {ctype='unsigned char',     label='_unknown2'},                             -- 0B
 }
 
+-- Bazaar Seller Info Packet
+-- Information on the purchase sent to the buyer when they attempt to buy
+-- something from a bazaar (whether or not they are successful)
+fields.incoming[0x106] = L{
+    {ctype='unsigned int',      label='_unknown1'},                             -- 04   00 00 00 00 for me
+    {ctype='char[16]',          label='Seller Name'},                           -- 06
+}
+
+-- Bazaar Purchase Info Packet
+-- Information on the purchase sent to the buyer when the purchase is successful.
+fields.incoming[0x109] = L{
+    {ctype='unsigned int',      label='Buyer ID',          fn=id},              -- 04
+    {ctype='unsigned int',      label='Quantity'},                              -- 08
+    {ctype='unsigned short',    label='Buyer Index',       fn=index},           -- 0C
+    {ctype='unsigned short',    label='Seller Index',      fn=index},           -- 0E
+    {ctype='char[16]',          label='Buyer Name'},                            -- 10
+    {ctype='unsigned int',      label='_unknown1'},                             -- 20   Was 05 00 02 00 for me
+}
+
+-- Bazaar Buyer Info Packet
+-- Information on the purchase sent to the seller when a sale is successful.
+fields.incoming[0x10A] = L{
+    {ctype='unsigned int',      label='Quantity'},                              -- 04
+    {ctype='unsigned short',    label='Item ID'},                               -- 08
+    {ctype='char[16]',          label='Buyer Name'},                            -- 0A
+    {ctype='unsigned int',      label='_unknown1'},                             -- 1A   Was 00 00 00 00 for me
+    {ctype='unsigned short',    label='_unknown2'},                             -- 1C   Was 64 00 for me. Seems to be variable length? Also got 32 32 00 00 00 00 00 00 once.
+}
+
+-- Bazaar Open Packet
+-- Packet sent when you open your bazaar.
+fields.incoming[0x10B] = L{
+    {ctype='unsigned int',      label='_unknown1'},                             -- 04   Was 00 00 00 00 for me
+}
+
 -- Sparks update packet
 fields.incoming[0x110] = L{
-    {ctype='unsigned short',      label='Sparks Total'},                        -- 04
-    {ctype='unsigned short',      label='_unknown1'},                           -- 06   Sparks are currently capped at 50,000
+    {ctype='unsigned short',    label='Sparks Total'},                          -- 04
+    {ctype='unsigned short',    label='_unknown1'},                             -- 06   Sparks are currently capped at 50,000
 }
 
 -- Eminence Message
