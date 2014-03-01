@@ -257,6 +257,12 @@ fields.outgoing[0x015] = L{
     {ctype='unsigned int',      label='_unknown3'},                             -- 1A
 }
 
+-- Update Request
+fields.outgoing[0x016] = L{
+    {ctype='unsigned short',    label='Target Index',       fn=index},          -- 04
+    {ctype='unsigned short',    label='_unknown1'},                             -- 06
+}
+
 -- Action
 fields.outgoing[0x01A] = L{
     {ctype='unsigned int',      label='Target ID',          fn=id},             -- 04
