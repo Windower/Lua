@@ -113,7 +113,7 @@ local function job(val)
 end
 
 local function emote(val)
-    return '/'..res.emotes[val].command
+    return '/' .. res.emotes[val].command
 end
 
 local function bag(val)
@@ -151,14 +151,12 @@ local function invp(index, val, data)
     return inv(data[index + 1]:byte(), val)
 end
 
-local function hex(val, fill)
-    local res = val:hex()
-    return fill and res:zfill(8*fill) or res
+local function hex(fill, val)
+    return val:hex():zfill(2*fill):chunks(2):concat(' ')
 end
 
-local function bin(val, fill)
-    local res = val:binary()
-    return fill and res:zfill(8*fill) or res
+local function bin(fill, val)
+    return val:hex():zfill(8*fill):chunks(8):concat(' ')
 end
 
 local function cskill(val)
@@ -710,7 +708,7 @@ fields.incoming[0x00D] = L{
 	-- 128 = Bazaar
     {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
     {ctype='unsigned short',    label='Index',              fn=index},          -- 08
-    {ctype='unsigned char',     label='Mask',               fn=bin-{1}},        -- 0A
+    {ctype='unsigned char',     label='Mask',               fn=bin+{1}},        -- 0A
     {ctype='unsigned char',     label='Body Rotation',      fn=dir},            -- 0B
     {ctype='float',             label='X Position'},                            -- 0C
     {ctype='float',             label='Z Position'},                            -- 10
@@ -755,18 +753,18 @@ fields.incoming[0x00D] = L{
 fields.incoming[0x00E] = L{
     {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
     {ctype='unsigned short',    label='Index',              fn=index},          -- 08
-    {ctype='unsigned char',     label='Mask',               fn=bin-{1}},        -- 0A   Mask with bit 4 set updates NPC status
+    {ctype='unsigned char',     label='Mask',               fn=bin+{1}},        -- 0A   Mask with bit 4 set updates NPC status
     {ctype='unsigned char',     label='Rotation',           fn=dir},            -- 0B
     {ctype='float',             label='X Position'},                            -- 0C
     {ctype='float',             label='Z Position'},                            -- 10
     {ctype='float',             label='Y Position'},                            -- 14
     {ctype='unsigned int',      label='Walk Count'},                            -- 18   Steadily increases until rotation changes. Does not reset while the mob isn't walking. Only goes until 0xFF1F.
-    {ctype='unsigned short',    label='_unknown3',          fn=bin-{2}},        -- 1A
+    {ctype='unsigned short',    label='_unknown3',          fn=bin+{2}},        -- 1A
     {ctype='unsigned char',     label='HP %',               fn=percent},        -- 1E
     {ctype='unsigned char',     label='Animation'},                             -- 1F
-    {ctype='unsigned int',      label='_unknown4',          fn=bin-{4}},        -- 20
-    {ctype='unsigned int',      label='_unknown5',          fn=bin-{4}},        -- 24
-    {ctype='unsigned int',      label='_unknown6',          fn=bin-{4}},        -- 28
+    {ctype='unsigned int',      label='_unknown4',          fn=bin+{4}},        -- 20
+    {ctype='unsigned int',      label='_unknown5',          fn=bin+{4}},        -- 24
+    {ctype='unsigned int',      label='_unknown6',          fn=bin+{4}},        -- 28
     {ctype='unsigned int',      label='Claimer ID',         fn=id},             -- 2C
     {ctype='unsigned short',    label='_unknown7'},                             -- 30
     {ctype='unsigned short',    label='Model'},                                 -- 32
@@ -1174,7 +1172,7 @@ fields.incoming[0x04F] = L{
 --   character ID in this packet. They do not appear to be meaningful and the client functions 
 --   normally even if they are blocked.
 --   Tends to bookend model change packets (0x51), though blocking it, zeroing it, etc. affects nothing.
-    {ctype='unsigned int',     label='_unknown1'},                              -- 04
+    {ctype='unsigned int',      label='_unknown1'},                             -- 04
 }
 
 -- Equip
