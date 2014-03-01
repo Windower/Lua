@@ -228,6 +228,10 @@ end
     Outgoing packets
 ]]
 
+
+-- Packet sent on zoning. 12 bytes long, all content bytes are 00.
+-- fields.outgoing[0x00C]
+
 -- Client Leave
 fields.outgoing[0x00D] = L{
     {ctype='unsigned char',     label='_unknown1'},                             -- 04   Always 00?
@@ -235,6 +239,9 @@ fields.outgoing[0x00D] = L{
     {ctype='unsigned char',     label='_unknown3'},                             -- 06   Always 00?
     {ctype='unsigned char',     label='_unknown4'},                             -- 07   Always 00?
 }
+
+-- Packet sent on zoning. 36 bytes long, all content bytes are 00.
+-- fields.outgoing[0x00F]
 
 -- Standard Client
 fields.outgoing[0x015] = L{
@@ -1395,6 +1402,13 @@ fields.incoming[0x06F] = L{
     {ctype='char[7]',           label='_unknown5'},                             -- 1B   Always 0?
     {ctype='unsigned short',    label='_junk1'},                                -- 22
 }
+
+-- Campaign Map Info
+-- fields.incoming[0x071]
+-- Perhaps it's my lack of interest, but this (triple-ish) packet is nearly incomprehensible to me.
+-- Does not appear to contain zone IDs. It's probably bitpacked or something.
+-- Has a byte that seems to be either 02 or 03, but the packet is sent three times. There are two 02s.
+-- The second 02 packet contains different information after the ~48th content byte.
 
 -- LS Message
 fields.incoming[0x0CC] = L{
