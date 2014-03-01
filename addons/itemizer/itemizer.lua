@@ -176,7 +176,7 @@ windower.register_event('outgoing text', function(text)
     elseif settings.AutoItems and text:startswith('/item') then
         local items = windower.ffxi.get_items()
         local item_names = T{}
-        for bag in bag_names:it() do
+        for bag in bag_names.all:it() do
             for _, item in ipairs(items[bag]) do
                 if item.id > 0 then
                     item_names[item.id] = res.items[item.id].name
