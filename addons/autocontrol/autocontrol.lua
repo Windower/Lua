@@ -203,7 +203,7 @@ function save_set(setname)
     end
     local curAuto = T(get_current_autoset())
     settings.autosets[setname] = curAuto
-    settings:save('all')
+    config.save(settings, 'all')
     notice('Set '..setname..' saved.')
 end
 
@@ -262,6 +262,7 @@ windower.register_event("addon command", function(comm, ...)
         elseif comm == 'bgcolor' then Burden_tb:bgcolor(args[1], args[2], args[3])
         elseif comm == 'txtcolor' then Burden_tb:color(args[1], args[2], args[3])
         end
+        config.save(settings, 'all')
     elseif comm == 'show' then Burden_tb:show()
     elseif comm == 'hide' then Burden_tb:hide()
     elseif comm == 'settings' then 

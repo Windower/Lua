@@ -54,8 +54,8 @@ end
 
 
 function cancel_spell(boolean)
-    if _global.current_event ~= 'precast' and _global.current_event ~= 'pretarget' then
-        error('\nGearSwap: cancel_spell() is only valid in the precast and pretarget functions', 2)
+    if _global.current_event ~= 'precast' and _global.current_event ~= 'pretarget' and _global.current_event ~= 'filtered_action' then
+        error('\nGearSwap: cancel_spell() is only valid in the precast, pretarget, or filtered_action functions', 2)
         return
     end
     if boolean == true or boolean == false then _global.cancel_spell = boolean
@@ -219,6 +219,7 @@ function unregister_event_user(id)
 end
 
 function user_equip_sets(func)
+    refresh_globals()
     return setfenv(function(...) return gearswap.equip_sets(func,nil,...) end,user_env)
 end
 

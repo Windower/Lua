@@ -228,6 +228,10 @@ end
     Outgoing packets
 ]]
 
+
+-- Packet sent on zoning. 12 bytes long, all content bytes are 00.
+-- fields.outgoing[0x00C]
+
 -- Client Leave
 fields.outgoing[0x00D] = L{
     {ctype='unsigned char',     label='_unknown1'},                             -- 04   Always 00?
@@ -235,6 +239,9 @@ fields.outgoing[0x00D] = L{
     {ctype='unsigned char',     label='_unknown3'},                             -- 06   Always 00?
     {ctype='unsigned char',     label='_unknown4'},                             -- 07   Always 00?
 }
+
+-- Packet sent on zoning. 36 bytes long, all content bytes are 00.
+-- fields.outgoing[0x00F]
 
 -- Standard Client
 fields.outgoing[0x015] = L{
@@ -248,6 +255,12 @@ fields.outgoing[0x015] = L{
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 16
     {ctype='unsigned int',      label='Timestamp',          fn=time_ms},        -- 18   Milliseconds
     {ctype='unsigned int',      label='_unknown3'},                             -- 1A
+}
+
+-- Update Request
+fields.outgoing[0x016] = L{
+    {ctype='unsigned short',    label='Target Index',       fn=index},          -- 04
+    {ctype='unsigned short',    label='_unknown1'},                             -- 06
 }
 
 -- Action
@@ -373,6 +386,17 @@ fields.outgoing[0x05B] = L{
 fields.outgoing[0x061] = L{
 }
 
+-- Digging Finished
+-- This packet alone is responsible for generating the digging result, meaning that anyone that can inject
+-- this packet is capable of digging with 0 delay.
+fields.outgoing[0x063] = L{
+    {ctype='unsigned int',      label='Player ID',          fn=id},             -- 04
+    {ctype='unsigned int',      label='_unknown1'},                             -- 08
+    {ctype='unsigned short',    label='Player Index',       fn=index},          -- 0C
+    {ctype='unsigned char',     label='Action ID?'},                            -- 0E   Changing it to anything other than 0x11 causes the packet to fail
+    {ctype='unsigned char',     label='_junk1'},                                -- 0F   Likely junk. Has no effect on anything notable.
+}
+
 -- Party invite
 fields.outgoing[0x06E] = L{
     {ctype='unsigned int',      label='Target ID',          fn=id},             -- 04   This is so weird. The client only knows IDs from searching for people or running into them. So if neither has happened, the manual invite will fail, as the ID cannot be retrieved.
@@ -441,6 +465,15 @@ fields.outgoing[0x0B6] = L{
     {ctype='unsigned char',     label='_unknown1',          const=0x00},        -- 04   00 for a normal tell -- Varying this does nothing.
     {ctype='char[15]',          label='Target Name'},                           -- 05   Name of the person to send a tell to
     {ctype='char*',             label='Message'},                               -- 14   Message, occasionally terminated by spare 00 bytes.
+}
+
+-- Check
+fields.outgoing[0x0DD] = L{
+    {ctype='unsigned int',      label='Target ID',          fn=id},             -- 04
+    {ctype='unsigned short',    label='TargetIndex',        fn=index},          -- 08
+    {ctype='unsigned short',    label='_unknown1'},                             -- 0A
+    {ctype='unsigned char',     label='Check Type'},                            -- 0C   00 = Normal /check, 01 = /checkname, 02 = /checkparam
+    {ctype='char[3]',           label='_junk1'}                                 -- 0D
 }
 
 -- Set LS Message
@@ -520,6 +553,17 @@ fields.outgoing[0x102] = L{
     {ctype='unsigned char',     label='Name ID 1'},                             -- 28
     {ctype='unsigned char',     label='Name ID 2'},                             -- 29
     {ctype='char*',             label='_unknown'},                              -- 2A  -- All 00s for Monsters
+}
+
+-- Close Bazaar
+-- Sent when you close your bazaar window
+fields.outgoing[0x109] = L{
+}
+
+-- Open Bazaar
+-- Sent when you attempt to open your bazaar to set prices
+fields.outgoing[0x10B] = L{
+    {ctype='unsigned int',      label='_unknown1'},                             -- 04   00 00 00 00 for me
 }
 
 -- Start RoE Quest
@@ -899,6 +943,14 @@ fields.incoming[0x02A] = L{
     {ctype='unsigned short',    label='Player Index',       fn=index},          -- 18
     {ctype='unsigned short',    label='Message ID'},                            -- 1A   The high bit is occasionally set, though the reason for it is unclear.
     {ctype='unsigned int',      label='_unknown1',          const=0x06000000},  -- 1C
+}
+
+-- Digging Animation
+fields.incoming[0x02F] = L{
+    {ctype='unsigned int',      label='Player ID',          fn=id},             -- 04
+    {ctype='unsigned short',    label='Player Index',       fn=index},          -- 08
+    {ctype='unsigned char',     label='Animation ID'},                          -- 0A   Changing it to anything other than 1 eliminates the animation
+    {ctype='unsigned char',     label='_junk1'},                                -- 0B   Likely junk. Has no effect on anything notable.
 }
 
 -- Synth Animation
@@ -1357,6 +1409,13 @@ fields.incoming[0x06F] = L{
     {ctype='unsigned short',    label='_junk1'},                                -- 22
 }
 
+-- Campaign Map Info
+-- fields.incoming[0x071]
+-- Perhaps it's my lack of interest, but this (triple-ish) packet is nearly incomprehensible to me.
+-- Does not appear to contain zone IDs. It's probably bitpacked or something.
+-- Has a byte that seems to be either 02 or 03, but the packet is sent three times. There are two 02s.
+-- The second 02 packet contains different information after the ~48th content byte.
+
 -- LS Message
 fields.incoming[0x0CC] = L{
     {ctype='int',               label='_unknown1'},                             -- 04
@@ -1482,10 +1541,45 @@ fields.incoming[0x0F9] = L{
     {ctype='unsigned char',     label='_unknown2'},                             -- 0B
 }
 
+-- Bazaar Seller Info Packet
+-- Information on the purchase sent to the buyer when they attempt to buy
+-- something from a bazaar (whether or not they are successful)
+fields.incoming[0x106] = L{
+    {ctype='unsigned int',      label='_unknown1'},                             -- 04   00 00 00 00 for me
+    {ctype='char[16]',          label='Seller Name'},                           -- 06
+}
+
+-- Bazaar Purchase Info Packet
+-- Information on the purchase sent to the buyer when the purchase is successful.
+fields.incoming[0x109] = L{
+    {ctype='unsigned int',      label='Buyer ID',          fn=id},              -- 04
+    {ctype='unsigned int',      label='Quantity'},                              -- 08
+    {ctype='unsigned short',    label='Buyer Index',       fn=index},           -- 0C
+    {ctype='unsigned short',    label='Seller Index',      fn=index},           -- 0E
+    {ctype='char[16]',          label='Buyer Name'},                            -- 10
+    {ctype='unsigned int',      label='_unknown1'},                             -- 20   Was 05 00 02 00 for me
+}
+
+-- Bazaar Buyer Info Packet
+-- Information on the purchase sent to the seller when a sale is successful.
+fields.incoming[0x10A] = L{
+    {ctype='unsigned int',      label='Quantity'},                              -- 04
+    {ctype='unsigned short',    label='Item ID'},                               -- 08
+    {ctype='char[16]',          label='Buyer Name'},                            -- 0A
+    {ctype='unsigned int',      label='_unknown1'},                             -- 1A   Was 00 00 00 00 for me
+    {ctype='unsigned short',    label='_unknown2'},                             -- 1C   Was 64 00 for me. Seems to be variable length? Also got 32 32 00 00 00 00 00 00 once.
+}
+
+-- Bazaar Open Packet
+-- Packet sent when you open your bazaar.
+fields.incoming[0x10B] = L{
+    {ctype='unsigned int',      label='_unknown1'},                             -- 04   Was 00 00 00 00 for me
+}
+
 -- Sparks update packet
 fields.incoming[0x110] = L{
-    {ctype='unsigned short',      label='Sparks Total'},                        -- 04
-    {ctype='unsigned short',      label='_unknown1'},                           -- 06   Sparks are currently capped at 50,000
+    {ctype='unsigned short',    label='Sparks Total'},                          -- 04
+    {ctype='unsigned short',    label='_unknown1'},                             -- 06   Sparks are currently capped at 50,000
 }
 
 -- Eminence Message

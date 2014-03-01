@@ -342,7 +342,7 @@ function filter_pretarget(spell)
         spell_id = spell.index
         local available_spells = windower.ffxi.get_spells()
         -- filter for spells that you do not know
-        if not available_spells[spell_id] and not (spell_id == 503 and player.equipment.body:lower() == 'twilight cloak') then
+        if not available_spells[spell_id] and not spell_id == 503 then
             debug_mode_chat("Unable to execute command. You do not know that spell ("..(res.spells[spell_id][language] or spell.id)..")")
             return false
         end
@@ -355,7 +355,7 @@ function filter_pretarget(spell)
     end
     
     
-    if spell.type == 'BlueMagic' and player.main_job ~= 'BLU' and player.sub_job ~= 'BLU' and not debugging then
+    if spell.type == 'BlueMagic' and player.main_job ~= 'BLU' and player.sub_job ~= 'BLU' then
         return false
     elseif spell.type == 'Ninjutsu'  then
         if player.main_job ~= 'NIN' and player.sub_job ~= 'NIN' then
