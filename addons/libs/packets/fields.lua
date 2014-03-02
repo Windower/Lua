@@ -177,7 +177,7 @@ types.shop_item = L{
     {ctype='unsigned short',    label='Shop Slot'},                             -- 08
 }
 types.roe_quest = L{
-    {ctype='bit[12]',           label='RoE Quest'},                             -- 00:00
+    {ctype='bit[12]',           label='RoE Quest ID'},                          -- 00:00
     {ctype='bit[20]',           label='RoE Quest Progress'},                    -- 01:04
 }
 
@@ -219,6 +219,14 @@ local enums = {
     ['ws mark'] = {
         [1] = 'Start',
         [2] = 'End',
+    },
+    ['bazaar'] = {
+        [0] = 'Open',
+        [1] = 'Close',
+    },
+    ['try'] = {
+        [0] = 'Succeeded',
+        [1] = 'Failed',
     },
 }
 
@@ -557,15 +565,38 @@ fields.outgoing[0x102] = L{
     {ctype='char*',             label='_unknown'},                              -- 2A  -- All 00s for Monsters
 }
 
--- Close Bazaar
+-- Open Bazaar
+-- Sent when you open someone's bazaar from the /check window
+fields.outgoing[0x105] = L{
+    {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
+    {ctype='unsigned short',    label='Index',              fn=index},          -- 08
+}
+
+-- Bid Bazaar
+-- Sent when you bid on an item in someone's bazaar
+fields.outgoing[0x106] = L{
+    {ctype='unsigned char',     label='Inventory Index'},                       -- 04   The seller's inventory index of the wanted item
+    {ctype='char[3]',           label='_junk1'},                                -- 05
+    {ctype='unsigned int',      label='Count'},                                 -- 08
+}
+
+-- Close own Bazaar
 -- Sent when you close your bazaar window
 fields.outgoing[0x109] = L{
 }
 
--- Open Bazaar
+-- Bazaar price set
+-- Sent when you set the price of an item in your bazaar
+fields.outgoing[0x10A] = L{
+    {ctype='unsigned char',     label='Inventory Index',    fn=inv+{0}},        -- 04
+    {ctype='char[3]',           label='_junk1'},                                -- 05
+    {ctype='unsigned int',      label='Price',              fn=gil},            -- 08
+}
+
+-- Open own Bazaar
 -- Sent when you attempt to open your bazaar to set prices
 fields.outgoing[0x10B] = L{
-    {ctype='unsigned int',      label='_unknown1'},                             -- 04   00 00 00 00 for me
+    {ctype='unsigned int',      label='_unknown1',          const=0x00000000},  -- 04   00 00 00 00 for me
 }
 
 -- Start RoE Quest
@@ -870,7 +901,7 @@ fields.incoming[0x01C] = L{
     {ctype='unsigned short',    label='Satchel Size'},                          -- 20
     {ctype='unsigned short',    label='Sack Size'},                             -- 22
     {ctype='unsigned short',    label='Case Size'},                             -- 24
-    {ctype='char[16]',          label='_padding2',          const=0x00},        -- 26
+    {ctype='char[16]',          label='_padding2',          const=''},          -- 26
 }
 
 -- Finish Inventory
@@ -1535,27 +1566,55 @@ fields.incoming[0x0F6] = L{
 
 -- Reraise Activation
 fields.incoming[0x0F9] = L{
-    {ctype='unsigned int',      label='Player ID',          fn=id},             -- 04
-    {ctype='unsigned short',    label='Player Index',       fn=index},          -- 08
+    {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
+    {ctype='unsigned short',    label='Index',              fn=index},          -- 08
     {ctype='unsigned char',     label='_unknown1'},                             -- 0A
     {ctype='unsigned char',     label='_unknown2'},                             -- 0B
+}
+
+-- Bazaar item listing
+fields.incoming[0x105] = L{
+    {ctype='unsigned int',      label='Price',              fn=gil},            -- 04
+    {ctype='unsigned int',      label='Count'},                                 -- 08
+    {ctype='unsigned short',    label='_unknown1'},                             -- 0C
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 0E
+    {ctype='unsigned char',     label='Inventory Index'},                       -- 10   This is the seller's inventory index of the item
 }
 
 -- Bazaar Seller Info Packet
 -- Information on the purchase sent to the buyer when they attempt to buy
 -- something from a bazaar (whether or not they are successful)
 fields.incoming[0x106] = L{
-    {ctype='unsigned int',      label='_unknown1'},                             -- 04   00 00 00 00 for me
-    {ctype='char[16]',          label='Seller Name'},                           -- 06
+    {ctype='unsigned int',      label='Type',               fn=e+{'try'}},      -- 04
+    {ctype='char[16]',          label='Name'},                                  -- 08
+}
+
+-- Bazaar closed
+-- Sent when the bazaar closes while you're browsing it
+-- This includes you buying the last item which leads to the message:
+-- "Player's bazaar was closed midway through your transaction"
+fields.incoming[0x107] = L{
+    {ctype='char[16]',          label='Name'},                                  -- 04
+}
+
+-- Bazaar visitor
+-- Sent when someone opens your bazaar
+fields.incoming[0x108] = L{
+    {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
+    {ctype='unsigned int',      label='Type',               fn=e+{'bazaar'}},   -- 08
+    {ctype='unsigned char',     label='_unknown1',          const=0x00},        -- 0C   Always zero?
+    {ctype='unsigned char',     label='_unknown2'},                             -- 0D   Possibly junk, often zero, sometimes random
+    {ctype='unsigned short',    label='Index',              fn=index},          -- 0E
+    {ctype='char[16]',          label='Name'},                                  -- 10
 }
 
 -- Bazaar Purchase Info Packet
 -- Information on the purchase sent to the buyer when the purchase is successful.
 fields.incoming[0x109] = L{
-    {ctype='unsigned int',      label='Buyer ID',          fn=id},              -- 04
+    {ctype='unsigned int',      label='Buyer ID',           fn=id},             -- 04
     {ctype='unsigned int',      label='Quantity'},                              -- 08
-    {ctype='unsigned short',    label='Buyer Index',       fn=index},           -- 0C
-    {ctype='unsigned short',    label='Seller Index',      fn=index},           -- 0E
+    {ctype='unsigned short',    label='Buyer Index',        fn=index},          -- 0C
+    {ctype='unsigned short',    label='Bazaar Index',       fn=index},          -- 0E
     {ctype='char[16]',          label='Buyer Name'},                            -- 10
     {ctype='unsigned int',      label='_unknown1'},                             -- 20   Was 05 00 02 00 for me
 }
