@@ -998,11 +998,11 @@ fields.incoming[0x030] = L{
 fields.incoming[0x032] = L{
     {ctype='unsigned int',      label='NPC ID',             fn=id},             -- 04
     {ctype='unsigned short',    label='NPC Index',          fn=index},          -- 08
-    {ctype='unsigned short',    label='Zone ID'},                               -- 1A
-    {ctype='unsigned short',    label='Menu ID'},                               -- 1C   Seems to select between menus within a zone
-    {ctype='unsigned short',    label='_unknown1'},                             -- 1E   00 for me
-    {ctype='unsigned char',     label='Zone ID 2'},                             -- 20   Always the same as the other Zone ID, as far as I've seen.
-    {ctype='char[3]',           label='_junk1'},                                -- 21   Always 00s for me
+    {ctype='unsigned short',    label='Zone ID'},                               -- 0A
+    {ctype='unsigned short',    label='Menu ID'},                               -- 0C   Seems to select between menus within a zone
+    {ctype='unsigned short',    label='_unknown1'},                             -- 0E   00 for me
+    {ctype='unsigned char',     label='Zone ID 2'},                             -- 10   Always the same as the other Zone ID, as far as I've seen.
+    {ctype='char[3]',           label='_junk1'},                                -- 11   Always 00s for me
 }
 
 -- NPC Interaction Type 2
@@ -1021,6 +1021,7 @@ fields.incoming[0x034] = L{
     {ctype='unsigned short',    label='Menu ID'},                               -- 2C   Seems to select between menus within a zone
     {ctype='unsigned short',    label='_unknown3'},                             -- 2E   08 for me, but FFing did nothing
     {ctype='unsigned char',     label='Zone ID 2'},                             -- 30   Always the same as the other Zone ID, as far as I've seen.
+    {ctype='char[3]',           label='_junk1'},                                -- 31   Always 00s for me
 }
 
 -- Model DisAppear
