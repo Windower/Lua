@@ -173,8 +173,12 @@ end
 local types = {}
 types.shop_item = L{
     {ctype='unsigned int',      label='Price',              fn=gil},            -- 00
-    {ctype='unsigned short',    label='Item ID',            fn=item},           -- 04
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 04
     {ctype='unsigned short',    label='Shop Slot'},                             -- 08
+}
+types.roe_quest = L{
+    {ctype='bit[12]',           label='RoE Quest ID'},                          -- 00:00
+    {ctype='bit[20]',           label='RoE Quest Progress'},                    -- 01:04
 }
 
 local enums = {
@@ -215,6 +219,14 @@ local enums = {
     ['ws mark'] = {
         [1] = 'Start',
         [2] = 'End',
+    },
+    ['bazaar'] = {
+        [0] = 'Open',
+        [1] = 'Close',
+    },
+    ['try'] = {
+        [0] = 'Succeeded',
+        [1] = 'Failed',
     },
 }
 
@@ -553,27 +565,48 @@ fields.outgoing[0x102] = L{
     {ctype='char*',             label='_unknown'},                              -- 2A  -- All 00s for Monsters
 }
 
--- Close Bazaar
+-- Open Bazaar
+-- Sent when you open someone's bazaar from the /check window
+fields.outgoing[0x105] = L{
+    {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
+    {ctype='unsigned short',    label='Index',              fn=index},          -- 08
+}
+
+-- Bid Bazaar
+-- Sent when you bid on an item in someone's bazaar
+fields.outgoing[0x106] = L{
+    {ctype='unsigned char',     label='Inventory Index'},                       -- 04   The seller's inventory index of the wanted item
+    {ctype='char[3]',           label='_junk1'},                                -- 05
+    {ctype='unsigned int',      label='Count'},                                 -- 08
+}
+
+-- Close own Bazaar
 -- Sent when you close your bazaar window
 fields.outgoing[0x109] = L{
 }
 
--- Open Bazaar
+-- Bazaar price set
+-- Sent when you set the price of an item in your bazaar
+fields.outgoing[0x10A] = L{
+    {ctype='unsigned char',     label='Inventory Index',    fn=inv+{0}},        -- 04
+    {ctype='char[3]',           label='_junk1'},                                -- 05
+    {ctype='unsigned int',      label='Price',              fn=gil},            -- 08
+}
+
+-- Open own Bazaar
 -- Sent when you attempt to open your bazaar to set prices
 fields.outgoing[0x10B] = L{
-    {ctype='unsigned int',      label='_unknown1'},                             -- 04   00 00 00 00 for me
+    {ctype='unsigned int',      label='_unknown1',          const=0x00000000},  -- 04   00 00 00 00 for me
 }
 
 -- Start RoE Quest
 fields.outgoing[0x10C] = L{
-    {ctype='unsigned short',    label='RoE Quest ID'},                          -- 04   This field is likely actually 12 bits
-    {ctype='unsigned short',    label='_junk1'},                                -- 06
+    {ctype='unsigned short',    label='RoE Quest'},                             -- 04   This field is likely actually 12 bits
 }
 
 -- Cancel RoE Quest
 fields.outgoing[0x10D] = L{
-    {ctype='unsigned short',    label='RoE Quest ID'},                          -- 04   This field is likely actually 12 bits
-    {ctype='unsigned short',    label='_junk1'},                                -- 06
+    {ctype='unsigned short',    label='RoE Quest'},                             -- 04   This field is likely actually 12 bits
 }
 
 -- Currency Menu
@@ -868,7 +901,7 @@ fields.incoming[0x01C] = L{
     {ctype='unsigned short',    label='Satchel Size'},                          -- 20
     {ctype='unsigned short',    label='Sack Size'},                             -- 22
     {ctype='unsigned short',    label='Case Size'},                             -- 24
-    {ctype='char[16]',          label='_padding2',          const=0x00},        -- 26
+    {ctype='char[16]',          label='_padding2',          const=''},          -- 26
 }
 
 -- Finish Inventory
@@ -961,6 +994,36 @@ fields.incoming[0x030] = L{
     {ctype='unsigned char',     label='_unknown1',          const=0x00},        -- 0E  -- Appears to just be trash.
 }
 
+-- NPC Interaction Type 1
+fields.incoming[0x032] = L{
+    {ctype='unsigned int',      label='NPC ID',             fn=id},             -- 04
+    {ctype='unsigned short',    label='NPC Index',          fn=index},          -- 08
+    {ctype='unsigned short',    label='Zone ID'},                               -- 0A
+    {ctype='unsigned short',    label='Menu ID'},                               -- 0C   Seems to select between menus within a zone
+    {ctype='unsigned short',    label='_unknown1'},                             -- 0E   00 for me
+    {ctype='unsigned char',     label='Zone ID 2'},                             -- 10   Always the same as the other Zone ID, as far as I've seen.
+    {ctype='char[3]',           label='_junk1'},                                -- 11   Always 00s for me
+}
+
+-- NPC Interaction Type 2
+fields.incoming[0x034] = L{
+    {ctype='unsigned int',      label='NPC ID',             fn=id},             -- 04
+    {ctype='unsigned int',      label='Menu Parameter 1'},                      -- 08
+    {ctype='unsigned int',      label='Menu Parameter 2'},                      -- 0C
+    {ctype='unsigned int',      label='Menu Parameter 3'},                      -- 10
+    {ctype='unsigned int',      label='Menu Parameter 4'},                      -- 14
+    {ctype='unsigned int',      label='Menu Parameter 5'},                      -- 18
+    {ctype='unsigned int',      label='Menu Parameter 6'},                      -- 1C
+    {ctype='unsigned int',      label='Menu Parameter 7'},                      -- 20
+    {ctype='unsigned int',      label='Menu Parameter 8'},                      -- 24
+    {ctype='unsigned short',    label='NPC Index',          fn=index},          -- 28
+    {ctype='unsigned short',    label='Zone ID'},                               -- 2A
+    {ctype='unsigned short',    label='Menu ID'},                               -- 2C   Seems to select between menus within a zone
+    {ctype='unsigned short',    label='_unknown3'},                             -- 2E   08 for me, but FFing did nothing
+    {ctype='unsigned char',     label='Zone ID 2'},                             -- 30   Always the same as the other Zone ID, as far as I've seen.
+    {ctype='char[3]',           label='_junk1'},                                -- 31   Always 00s for me
+}
+
 -- Model DisAppear
 fields.incoming[0x038] = L{
     {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
@@ -981,7 +1044,7 @@ fields.incoming[0x03C] = L{
 -- This packet varies and is indexed by job ID (byte 4)
 fields.incoming._mult[0x044] = {}
 fields.incoming[0x044] = function(data)
-    return data, fields.incoming._mult[0x044][data:sub(5,5):byte()]
+    return fields.incoming._mult[0x044][data:sub(5,5):byte()]
 end
 
 fields.incoming._mult[0x044][0x12] = L{     -- PUP
@@ -1330,8 +1393,12 @@ fields.incoming[0x062] = L{
 -- This packet likely varies based on jobs, but currently I only have it worked out for Monstrosity.
 -- It also appears in three chunks, so it's double-varying.
 
-fields.incoming[0x063] = L{
-	-- Order == 2
+fields.incoming._mult[0x063] = {}
+fields.incoming[0x063] = function(data)
+    return fields.incoming._mult[0x063][data:sub(5,5):byte()]
+end
+
+fields.incoming._mult[0x063][0x02] = L{
 	{ctype='unsigned short',    label='Order'},                                 -- 04
 	{ctype='unsigned int',      label='_flags1'},                               -- 06   
 	{ctype='unsigned int',      label='_flags2'},                               -- 08   The 3rd bit of the last byte is the flag that indicates whether or not you are xp capped (blue levels)
@@ -1533,27 +1600,55 @@ fields.incoming[0x0F6] = L{
 
 -- Reraise Activation
 fields.incoming[0x0F9] = L{
-    {ctype='unsigned int',      label='Player ID',          fn=id},             -- 04
-    {ctype='unsigned short',    label='Player Index',       fn=index},          -- 08
+    {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
+    {ctype='unsigned short',    label='Index',              fn=index},          -- 08
     {ctype='unsigned char',     label='_unknown1'},                             -- 0A
     {ctype='unsigned char',     label='_unknown2'},                             -- 0B
+}
+
+-- Bazaar item listing
+fields.incoming[0x105] = L{
+    {ctype='unsigned int',      label='Price',              fn=gil},            -- 04
+    {ctype='unsigned int',      label='Count'},                                 -- 08
+    {ctype='unsigned short',    label='_unknown1'},                             -- 0C
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 0E
+    {ctype='unsigned char',     label='Inventory Index'},                       -- 10   This is the seller's inventory index of the item
 }
 
 -- Bazaar Seller Info Packet
 -- Information on the purchase sent to the buyer when they attempt to buy
 -- something from a bazaar (whether or not they are successful)
 fields.incoming[0x106] = L{
-    {ctype='unsigned int',      label='_unknown1'},                             -- 04   00 00 00 00 for me
-    {ctype='char[16]',          label='Seller Name'},                           -- 06
+    {ctype='unsigned int',      label='Type',               fn=e+{'try'}},      -- 04
+    {ctype='char[16]',          label='Name'},                                  -- 08
+}
+
+-- Bazaar closed
+-- Sent when the bazaar closes while you're browsing it
+-- This includes you buying the last item which leads to the message:
+-- "Player's bazaar was closed midway through your transaction"
+fields.incoming[0x107] = L{
+    {ctype='char[16]',          label='Name'},                                  -- 04
+}
+
+-- Bazaar visitor
+-- Sent when someone opens your bazaar
+fields.incoming[0x108] = L{
+    {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
+    {ctype='unsigned int',      label='Type',               fn=e+{'bazaar'}},   -- 08
+    {ctype='unsigned char',     label='_unknown1',          const=0x00},        -- 0C   Always zero?
+    {ctype='unsigned char',     label='_unknown2'},                             -- 0D   Possibly junk, often zero, sometimes random
+    {ctype='unsigned short',    label='Index',              fn=index},          -- 0E
+    {ctype='char[16]',          label='Name'},                                  -- 10
 }
 
 -- Bazaar Purchase Info Packet
 -- Information on the purchase sent to the buyer when the purchase is successful.
 fields.incoming[0x109] = L{
-    {ctype='unsigned int',      label='Buyer ID',          fn=id},              -- 04
+    {ctype='unsigned int',      label='Buyer ID',           fn=id},             -- 04
     {ctype='unsigned int',      label='Quantity'},                              -- 08
-    {ctype='unsigned short',    label='Buyer Index',       fn=index},           -- 0C
-    {ctype='unsigned short',    label='Seller Index',      fn=index},           -- 0E
+    {ctype='unsigned short',    label='Buyer Index',        fn=index},          -- 0C
+    {ctype='unsigned short',    label='Bazaar Index',       fn=index},          -- 0E
     {ctype='char[16]',          label='Buyer Name'},                            -- 10
     {ctype='unsigned int',      label='_unknown1'},                             -- 20   Was 05 00 02 00 for me
 }
@@ -1582,38 +1677,7 @@ fields.incoming[0x110] = L{
 
 -- Eminence Message
 fields.incoming[0x111] = L{
-    {ctype='bit[12]',           label='RoE Quest ID 1'},                        -- 04
-    {ctype='bit[20]',           label='RoE Quest 1 Progress'},                  -- 05
-    {ctype='bit[12]',           label='RoE Quest ID 2'},                        -- 08
-    {ctype='bit[20]',           label='RoE Quest 2 Progress'},                  -- 09
-    {ctype='bit[12]',           label='RoE Quest ID 3'},                        -- 0C
-    {ctype='bit[20]',           label='RoE Quest 3 Progress'},                  -- 0D
-    {ctype='bit[12]',           label='RoE Quest ID 4'},                        -- 10
-    {ctype='bit[20]',           label='RoE Quest 4 Progress'},                  -- 11
-    {ctype='bit[12]',           label='RoE Quest ID 5'},                        -- 14
-    {ctype='bit[20]',           label='RoE Quest 5 Progress'},                  -- 15
-    {ctype='bit[12]',           label='RoE Quest ID 6'},                        -- 18
-    {ctype='bit[20]',           label='RoE Quest 6 Progress'},                  -- 19
-    {ctype='bit[12]',           label='RoE Quest ID 7'},                        -- 1C
-    {ctype='bit[20]',           label='RoE Quest 7 Progress'},                  -- 1D
-    {ctype='bit[12]',           label='RoE Quest ID 8'},                        -- 20
-    {ctype='bit[20]',           label='RoE Quest 8 Progress'},                  -- 21
-    {ctype='bit[12]',           label='RoE Quest ID 9'},                        -- 24
-    {ctype='bit[20]',           label='RoE Quest 9 Progress'},                  -- 25
-    {ctype='bit[12]',           label='RoE Quest ID 10'},                       -- 28
-    {ctype='bit[20]',           label='RoE Quest 10 Progress'},                 -- 29
-    {ctype='bit[12]',           label='RoE Quest ID 11'},                       -- 2C
-    {ctype='bit[20]',           label='RoE Quest 11 Progress'},                 -- 2D
-    {ctype='bit[12]',           label='RoE Quest ID 12'},                       -- 30
-    {ctype='bit[20]',           label='RoE Quest 12 Progress'},                 -- 31
-    {ctype='bit[12]',           label='RoE Quest ID 13'},                       -- 34
-    {ctype='bit[20]',           label='RoE Quest 13 Progress'},                 -- 35
-    {ctype='bit[12]',           label='RoE Quest ID 14'},                       -- 38
-    {ctype='bit[20]',           label='RoE Quest 14 Progress'},                 -- 39
-    {ctype='bit[12]',           label='RoE Quest ID 15'},                       -- 3C
-    {ctype='bit[20]',           label='RoE Quest 15 Progress'},                 -- 3D
-    {ctype='bit[12]',           label='RoE Quest ID 16'},                       -- 40
-    {ctype='bit[20]',           label='RoE Quest 16 Progress'},                 -- 41
+    {ref=types.roe_quest,       count=16},                                      -- 04
 }
 
 -- RoE Quest Log
