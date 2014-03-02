@@ -173,8 +173,12 @@ end
 local types = {}
 types.shop_item = L{
     {ctype='unsigned int',      label='Price',              fn=gil},            -- 00
-    {ctype='unsigned short',    label='Item ID',            fn=item},           -- 04
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 04
     {ctype='unsigned short',    label='Shop Slot'},                             -- 08
+}
+types.roe_quest = L{
+    {ctype='bit[12]',           label='RoE Quest'},                             -- 00:00
+    {ctype='bit[20]',           label='RoE Quest Progress'},                    -- 01:04
 }
 
 local enums = {
@@ -566,14 +570,12 @@ fields.outgoing[0x10B] = L{
 
 -- Start RoE Quest
 fields.outgoing[0x10C] = L{
-    {ctype='unsigned short',    label='RoE Quest ID'},                          -- 04   This field is likely actually 12 bits
-    {ctype='unsigned short',    label='_junk1'},                                -- 06
+    {ctype='unsigned short',    label='RoE Quest'},                             -- 04   This field is likely actually 12 bits
 }
 
 -- Cancel RoE Quest
 fields.outgoing[0x10D] = L{
-    {ctype='unsigned short',    label='RoE Quest ID'},                          -- 04   This field is likely actually 12 bits
-    {ctype='unsigned short',    label='_junk1'},                                -- 06
+    {ctype='unsigned short',    label='RoE Quest'},                             -- 04   This field is likely actually 12 bits
 }
 
 -- Currency Menu
@@ -1582,38 +1584,7 @@ fields.incoming[0x110] = L{
 
 -- Eminence Message
 fields.incoming[0x111] = L{
-    {ctype='bit[12]',           label='RoE Quest ID 1'},                        -- 04
-    {ctype='bit[20]',           label='RoE Quest 1 Progress'},                  -- 05
-    {ctype='bit[12]',           label='RoE Quest ID 2'},                        -- 08
-    {ctype='bit[20]',           label='RoE Quest 2 Progress'},                  -- 09
-    {ctype='bit[12]',           label='RoE Quest ID 3'},                        -- 0C
-    {ctype='bit[20]',           label='RoE Quest 3 Progress'},                  -- 0D
-    {ctype='bit[12]',           label='RoE Quest ID 4'},                        -- 10
-    {ctype='bit[20]',           label='RoE Quest 4 Progress'},                  -- 11
-    {ctype='bit[12]',           label='RoE Quest ID 5'},                        -- 14
-    {ctype='bit[20]',           label='RoE Quest 5 Progress'},                  -- 15
-    {ctype='bit[12]',           label='RoE Quest ID 6'},                        -- 18
-    {ctype='bit[20]',           label='RoE Quest 6 Progress'},                  -- 19
-    {ctype='bit[12]',           label='RoE Quest ID 7'},                        -- 1C
-    {ctype='bit[20]',           label='RoE Quest 7 Progress'},                  -- 1D
-    {ctype='bit[12]',           label='RoE Quest ID 8'},                        -- 20
-    {ctype='bit[20]',           label='RoE Quest 8 Progress'},                  -- 21
-    {ctype='bit[12]',           label='RoE Quest ID 9'},                        -- 24
-    {ctype='bit[20]',           label='RoE Quest 9 Progress'},                  -- 25
-    {ctype='bit[12]',           label='RoE Quest ID 10'},                       -- 28
-    {ctype='bit[20]',           label='RoE Quest 10 Progress'},                 -- 29
-    {ctype='bit[12]',           label='RoE Quest ID 11'},                       -- 2C
-    {ctype='bit[20]',           label='RoE Quest 11 Progress'},                 -- 2D
-    {ctype='bit[12]',           label='RoE Quest ID 12'},                       -- 30
-    {ctype='bit[20]',           label='RoE Quest 12 Progress'},                 -- 31
-    {ctype='bit[12]',           label='RoE Quest ID 13'},                       -- 34
-    {ctype='bit[20]',           label='RoE Quest 13 Progress'},                 -- 35
-    {ctype='bit[12]',           label='RoE Quest ID 14'},                       -- 38
-    {ctype='bit[20]',           label='RoE Quest 14 Progress'},                 -- 39
-    {ctype='bit[12]',           label='RoE Quest ID 15'},                       -- 3C
-    {ctype='bit[20]',           label='RoE Quest 15 Progress'},                 -- 3D
-    {ctype='bit[12]',           label='RoE Quest ID 16'},                       -- 40
-    {ctype='bit[20]',           label='RoE Quest 16 Progress'},                 -- 41
+    {ref=types.roe_quest,       count=16},                                      -- 04
 }
 
 -- RoE Quest Log
