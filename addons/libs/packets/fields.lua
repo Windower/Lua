@@ -994,12 +994,17 @@ fields.incoming[0x030] = L{
     {ctype='unsigned char',     label='_unknown1',          const=0x00},        -- 0E  -- Appears to just be trash.
 }
 
--- Dialogue Box 2
+-- NPC Interaction Type 2
 fields.incoming[0x034] = L{
     {ctype='unsigned int',      label='Player ID',          fn=id},             -- 04
-    {ctype='unsigned int',      label='_unknown1'},                             -- 08
-    {ctype='unsigned int',      label='Flags'},                                 -- 0C
-    {ctype='char[24]',          label='_unknown2'},                             -- 10
+    {ctype='unsigned int',      label='Menu Parameter 1'},                      -- 08
+    {ctype='unsigned int',      label='Menu Parameter 2'},                      -- 0C
+    {ctype='unsigned int',      label='Menu Parameter 3'},                      -- 10
+    {ctype='unsigned int',      label='Menu Parameter 4'},                      -- 14
+    {ctype='unsigned int',      label='Menu Parameter 5'},                      -- 18
+    {ctype='unsigned int',      label='Menu Parameter 6'},                      -- 1C
+    {ctype='unsigned int',      label='Menu Parameter 7'},                      -- 20
+    {ctype='unsigned int',      label='Menu Parameter 8'},                      -- 24
     {ctype='unsigned short',    label='Player Index',       fn=index},          -- 28
     {ctype='unsigned short',    label='Zone ID'},                               -- 2A
     {ctype='unsigned short',    label='Menu ID'},                               -- 2C   Seems to select between menus within a zone
