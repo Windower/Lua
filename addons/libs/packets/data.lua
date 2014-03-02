@@ -91,6 +91,8 @@ data.incoming[0x02A] = {name='Resting Message',     description='Packet sent whe
 data.incoming[0x02D] = {name='EXP Gain (kill)',     description='Packet sent after you defeat a mob and gain XP.'}
 data.incoming[0x02F] = {name='Digging Animation',   description='Generates the chocobo digging animation'}
 data.incoming[0x030] = {name='Synth Animation',     description='Generates the synthesis animation'}
+data.incoming[0x032] = {name='NPC Interaction 1',   description='Occurs before menus and some cutscenes'}
+data.incoming[0x034] = {name='NPC Interaction 2',   description='Occurs before menus and some cutscenes'}
 data.incoming[0x036] = {name='NPC Chat',            description='Dialog from NPC\'s.'}
 data.incoming[0x037] = {name='Update Char',         description='Updates a characters stats and animation.'}
 data.incoming[0x038] = {name='Model DisAppear',     description='Sent when a model should appear or disappear.'}

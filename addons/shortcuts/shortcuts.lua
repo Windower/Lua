@@ -145,7 +145,6 @@ function command_logic(original,modified)
     elseif #splitline == 3 then
 		if valid_target(potential_targ) then
 			spell = splitline[2]
-			windower.add_to_chat(8,'here')
 		else
 			spell = splitline[2]..' '..splitline[3]
 		end
