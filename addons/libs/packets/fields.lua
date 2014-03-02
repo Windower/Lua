@@ -994,6 +994,19 @@ fields.incoming[0x030] = L{
     {ctype='unsigned char',     label='_unknown1',          const=0x00},        -- 0E  -- Appears to just be trash.
 }
 
+-- Dialogue Box 2
+fields.incoming[0x034] = L{
+    {ctype='unsigned int',      label='Player ID',          fn=id},             -- 04
+    {ctype='unsigned int',      label='_unknown1'},                             -- 08
+    {ctype='unsigned int',      label='Flags'},                                 -- 0C
+    {ctype='char[24]',          label='_unknown2'},                             -- 10
+    {ctype='unsigned short',    label='Player Index',       fn=index},          -- 28
+    {ctype='unsigned short',    label='Zone ID'},                               -- 2A
+    {ctype='unsigned short',    label='Menu ID'},                               -- 2C   Seems to select between menus within a zone
+    {ctype='unsigned short',    label='_unknown3'},                             -- 2E   08 for me, but FFing did nothing
+    {ctype='unsigned char',     label='Zone ID 2'},                             -- 30   Always the same as the other Zone ID, as far as I've seen.
+}
+
 -- Model DisAppear
 fields.incoming[0x038] = L{
     {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
