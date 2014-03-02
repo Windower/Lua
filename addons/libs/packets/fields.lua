@@ -1014,7 +1014,7 @@ fields.incoming[0x03C] = L{
 -- This packet varies and is indexed by job ID (byte 4)
 fields.incoming._mult[0x044] = {}
 fields.incoming[0x044] = function(data)
-    return data, fields.incoming._mult[0x044][data:sub(5,5):byte()]
+    return fields.incoming._mult[0x044][data:sub(5,5):byte()]
 end
 
 fields.incoming._mult[0x044][0x12] = L{     -- PUP
@@ -1363,8 +1363,12 @@ fields.incoming[0x062] = L{
 -- This packet likely varies based on jobs, but currently I only have it worked out for Monstrosity.
 -- It also appears in three chunks, so it's double-varying.
 
-fields.incoming[0x063] = L{
-	-- Order == 2
+fields.incoming._mult[0x063] = {}
+fields.incoming[0x063] = function(data)
+    return fields.incoming._mult[0x063][data:sub(5,5):byte()]
+end
+
+fields.incoming._mult[0x063][0x02] = L{
 	{ctype='unsigned short',    label='Order'},                                 -- 04
 	{ctype='unsigned int',      label='_flags1'},                               -- 06   
 	{ctype='unsigned int',      label='_flags2'},                               -- 08   The 3rd bit of the last byte is the flag that indicates whether or not you are xp capped (blue levels)
