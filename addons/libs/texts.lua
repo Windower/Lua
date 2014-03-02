@@ -158,7 +158,8 @@ function amend(settings, text)
 end
 
 function apply_settings(t)
-    windower.text.set_location(t._name, t._settings.pos.x, t._settings.pos.y)
+    local settings = windower.get_windower_settings()
+    windower.text.set_location(t._name, t._settings.pos.x + (t._settings.flags.right and settings.ui_x_res or 0), t._settings.pos.y + (t._settings.flags.bottom and settings.ui_y_res or 0))
     windower.text.set_bg_color(t._name, t._settings.bg.alpha, t._settings.bg.red, t._settings.bg.green, t._settings.bg.blue)
     windower.text.set_bg_visibility(t._name, t._settings.bg.visible)
     windower.text.set_color(t._name, t._settings.text.alpha, t._settings.text.red, t._settings.text.green, t._settings.text.blue)
@@ -303,7 +304,8 @@ function texts.pos(t, x, y)
         return t._settings.pos.x, t._settings.pos.y
     end
 
-    windower.text.set_location(t._name, x, y)
+    local settings = windower.get_windower_settings()
+    windower.text.set_location(t._name, x + (t._settings.flags.right and settings.ui_x_res or 0), y + (t._settings.flags.bottom and settings.ui_y_res or 0))
     t._settings.pos.x = x
     t._settings.pos.y = y
 end

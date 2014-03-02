@@ -607,7 +607,7 @@ end
 
 -- Sum up all elements of a table.
 function table.sum(t)
-    return table.reduce(t, math.sum, 0)
+    return table.reduce(t, math.add, 0)
 end
 
 -- Multiply all elements of a table.

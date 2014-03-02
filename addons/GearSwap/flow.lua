@@ -251,7 +251,7 @@ function user_pcall(str,...)
     if user_env then
         if type(user_env[str]) == 'function' then
             bool,err = pcall(user_env[str],...)
-            if not bool then error('\nUser function error: '..err) end
+            if not bool then error('\nGearSwap has detected an error in the user function '..str..':\n'..err) end
         elseif user_env[str] then
             windower.add_to_chat(123,'GearSwap: '..str..'() exists but is not a function')
         end

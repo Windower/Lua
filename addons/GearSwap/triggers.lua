@@ -118,7 +118,9 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
                 else
                     return equip_sets('pretarget',-1,spell)
                 end
-            end
+			else
+                return equip_sets('filtered_action',-1,spell)
+			end
         end
     end
     return modified

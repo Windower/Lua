@@ -2,6 +2,12 @@ function parse_action_packet(act)
     -- Make a function that returns the action array with additional information
         -- actor : type, name, is_npc
         -- target : type, name, is_npc
+    if not Self then
+        Self = windower.ffxi.get_player()
+        if not Self then
+            return act
+        end
+    end
     act.actor = player_info(act.actor_id)
     act.action = get_spell(act) -- Pulls the resources line for the action
     for i,v in ipairs(act.targets) do

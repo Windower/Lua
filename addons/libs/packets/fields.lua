@@ -113,7 +113,7 @@ local function job(val)
 end
 
 local function emote(val)
-    return '/'..res.emotes[val].command
+    return '/' .. res.emotes[val].command
 end
 
 local function bag(val)
@@ -151,14 +151,12 @@ local function invp(index, val, data)
     return inv(data[index + 1]:byte(), val)
 end
 
-local function hex(val, fill)
-    local res = val:hex()
-    return fill and res:zfill(8*fill) or res
+local function hex(fill, val)
+    return val:hex():zfill(2*fill):chunks(2):concat(' ')
 end
 
-local function bin(val, fill)
-    local res = val:binary()
-    return fill and res:zfill(8*fill) or res
+local function bin(fill, val)
+    return val:hex():zfill(8*fill):chunks(8):concat(' ')
 end
 
 local function cskill(val)
@@ -228,6 +226,10 @@ end
     Outgoing packets
 ]]
 
+
+-- Packet sent on zoning. 12 bytes long, all content bytes are 00.
+-- fields.outgoing[0x00C]
+
 -- Client Leave
 fields.outgoing[0x00D] = L{
     {ctype='unsigned char',     label='_unknown1'},                             -- 04   Always 00?
@@ -235,6 +237,9 @@ fields.outgoing[0x00D] = L{
     {ctype='unsigned char',     label='_unknown3'},                             -- 06   Always 00?
     {ctype='unsigned char',     label='_unknown4'},                             -- 07   Always 00?
 }
+
+-- Packet sent on zoning. 36 bytes long, all content bytes are 00.
+-- fields.outgoing[0x00F]
 
 -- Standard Client
 fields.outgoing[0x015] = L{
@@ -248,6 +253,12 @@ fields.outgoing[0x015] = L{
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 16
     {ctype='unsigned int',      label='Timestamp',          fn=time_ms},        -- 18   Milliseconds
     {ctype='unsigned int',      label='_unknown3'},                             -- 1A
+}
+
+-- Update Request
+fields.outgoing[0x016] = L{
+    {ctype='unsigned short',    label='Target Index',       fn=index},          -- 04
+    {ctype='unsigned short',    label='_unknown1'},                             -- 06
 }
 
 -- Action
@@ -454,6 +465,15 @@ fields.outgoing[0x0B6] = L{
     {ctype='char*',             label='Message'},                               -- 14   Message, occasionally terminated by spare 00 bytes.
 }
 
+-- Check
+fields.outgoing[0x0DD] = L{
+    {ctype='unsigned int',      label='Target ID',          fn=id},             -- 04
+    {ctype='unsigned short',    label='TargetIndex',        fn=index},          -- 08
+    {ctype='unsigned short',    label='_unknown1'},                             -- 0A
+    {ctype='unsigned char',     label='Check Type'},                            -- 0C   00 = Normal /check, 01 = /checkname, 02 = /checkparam
+    {ctype='char[3]',           label='_junk1'}                                 -- 0D
+}
+
 -- Set LS Message
 fields.outgoing[0x0E2] = L{
     {ctype='unsigned int',      label='_unknown1',          const=0x00000040},  -- 04
@@ -531,6 +551,17 @@ fields.outgoing[0x102] = L{
     {ctype='unsigned char',     label='Name ID 1'},                             -- 28
     {ctype='unsigned char',     label='Name ID 2'},                             -- 29
     {ctype='char*',             label='_unknown'},                              -- 2A  -- All 00s for Monsters
+}
+
+-- Close Bazaar
+-- Sent when you close your bazaar window
+fields.outgoing[0x109] = L{
+}
+
+-- Open Bazaar
+-- Sent when you attempt to open your bazaar to set prices
+fields.outgoing[0x10B] = L{
+    {ctype='unsigned int',      label='_unknown1'},                             -- 04   00 00 00 00 for me
 }
 
 -- Start RoE Quest
@@ -677,7 +708,7 @@ fields.incoming[0x00D] = L{
 	-- 128 = Bazaar
     {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
     {ctype='unsigned short',    label='Index',              fn=index},          -- 08
-    {ctype='unsigned char',     label='Mask',               fn=bin-{1}},        -- 0A
+    {ctype='unsigned char',     label='Mask',               fn=bin+{1}},        -- 0A
     {ctype='unsigned char',     label='Body Rotation',      fn=dir},            -- 0B
     {ctype='float',             label='X Position'},                            -- 0C
     {ctype='float',             label='Z Position'},                            -- 10
@@ -722,18 +753,18 @@ fields.incoming[0x00D] = L{
 fields.incoming[0x00E] = L{
     {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
     {ctype='unsigned short',    label='Index',              fn=index},          -- 08
-    {ctype='unsigned char',     label='Mask',               fn=bin-{1}},        -- 0A   Mask with bit 4 set updates NPC status
+    {ctype='unsigned char',     label='Mask',               fn=bin+{1}},        -- 0A   Mask with bit 4 set updates NPC status
     {ctype='unsigned char',     label='Rotation',           fn=dir},            -- 0B
     {ctype='float',             label='X Position'},                            -- 0C
     {ctype='float',             label='Z Position'},                            -- 10
     {ctype='float',             label='Y Position'},                            -- 14
     {ctype='unsigned int',      label='Walk Count'},                            -- 18   Steadily increases until rotation changes. Does not reset while the mob isn't walking. Only goes until 0xFF1F.
-    {ctype='unsigned short',    label='_unknown3',          fn=bin-{2}},        -- 1A
+    {ctype='unsigned short',    label='_unknown3',          fn=bin+{2}},        -- 1A
     {ctype='unsigned char',     label='HP %',               fn=percent},        -- 1E
     {ctype='unsigned char',     label='Animation'},                             -- 1F
-    {ctype='unsigned int',      label='_unknown4',          fn=bin-{4}},        -- 20
-    {ctype='unsigned int',      label='_unknown5',          fn=bin-{4}},        -- 24
-    {ctype='unsigned int',      label='_unknown6',          fn=bin-{4}},        -- 28
+    {ctype='unsigned int',      label='_unknown4',          fn=bin+{4}},        -- 20
+    {ctype='unsigned int',      label='_unknown5',          fn=bin+{4}},        -- 24
+    {ctype='unsigned int',      label='_unknown6',          fn=bin+{4}},        -- 28
     {ctype='unsigned int',      label='Claimer ID',         fn=id},             -- 2C
     {ctype='unsigned short',    label='_unknown7'},                             -- 30
     {ctype='unsigned short',    label='Model'},                                 -- 32
@@ -1141,7 +1172,7 @@ fields.incoming[0x04F] = L{
 --   character ID in this packet. They do not appear to be meaningful and the client functions 
 --   normally even if they are blocked.
 --   Tends to bookend model change packets (0x51), though blocking it, zeroing it, etc. affects nothing.
-    {ctype='unsigned int',     label='_unknown1'},                              -- 04
+    {ctype='unsigned int',      label='_unknown1'},                             -- 04
 }
 
 -- Equip
@@ -1376,6 +1407,13 @@ fields.incoming[0x06F] = L{
     {ctype='unsigned short',    label='_junk1'},                                -- 22
 }
 
+-- Campaign Map Info
+-- fields.incoming[0x071]
+-- Perhaps it's my lack of interest, but this (triple-ish) packet is nearly incomprehensible to me.
+-- Does not appear to contain zone IDs. It's probably bitpacked or something.
+-- Has a byte that seems to be either 02 or 03, but the packet is sent three times. There are two 02s.
+-- The second 02 packet contains different information after the ~48th content byte.
+
 -- LS Message
 fields.incoming[0x0CC] = L{
     {ctype='int',               label='_unknown1'},                             -- 04
@@ -1501,10 +1539,45 @@ fields.incoming[0x0F9] = L{
     {ctype='unsigned char',     label='_unknown2'},                             -- 0B
 }
 
+-- Bazaar Seller Info Packet
+-- Information on the purchase sent to the buyer when they attempt to buy
+-- something from a bazaar (whether or not they are successful)
+fields.incoming[0x106] = L{
+    {ctype='unsigned int',      label='_unknown1'},                             -- 04   00 00 00 00 for me
+    {ctype='char[16]',          label='Seller Name'},                           -- 06
+}
+
+-- Bazaar Purchase Info Packet
+-- Information on the purchase sent to the buyer when the purchase is successful.
+fields.incoming[0x109] = L{
+    {ctype='unsigned int',      label='Buyer ID',          fn=id},              -- 04
+    {ctype='unsigned int',      label='Quantity'},                              -- 08
+    {ctype='unsigned short',    label='Buyer Index',       fn=index},           -- 0C
+    {ctype='unsigned short',    label='Seller Index',      fn=index},           -- 0E
+    {ctype='char[16]',          label='Buyer Name'},                            -- 10
+    {ctype='unsigned int',      label='_unknown1'},                             -- 20   Was 05 00 02 00 for me
+}
+
+-- Bazaar Buyer Info Packet
+-- Information on the purchase sent to the seller when a sale is successful.
+fields.incoming[0x10A] = L{
+    {ctype='unsigned int',      label='Quantity'},                              -- 04
+    {ctype='unsigned short',    label='Item ID'},                               -- 08
+    {ctype='char[16]',          label='Buyer Name'},                            -- 0A
+    {ctype='unsigned int',      label='_unknown1'},                             -- 1A   Was 00 00 00 00 for me
+    {ctype='unsigned short',    label='_unknown2'},                             -- 1C   Was 64 00 for me. Seems to be variable length? Also got 32 32 00 00 00 00 00 00 once.
+}
+
+-- Bazaar Open Packet
+-- Packet sent when you open your bazaar.
+fields.incoming[0x10B] = L{
+    {ctype='unsigned int',      label='_unknown1'},                             -- 04   Was 00 00 00 00 for me
+}
+
 -- Sparks update packet
 fields.incoming[0x110] = L{
-    {ctype='unsigned short',      label='Sparks Total'},                        -- 04
-    {ctype='unsigned short',      label='_unknown1'},                           -- 06   Sparks are currently capped at 50,000
+    {ctype='unsigned short',    label='Sparks Total'},                          -- 04
+    {ctype='unsigned short',    label='_unknown1'},                             -- 06   Sparks are currently capped at 50,000
 }
 
 -- Eminence Message

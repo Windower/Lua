@@ -12,6 +12,7 @@ data.outgoing = setmetatable({}, {__index = function() return dummy end})
 data.outgoing[0x00A] = {name='Client Connect',      description='(unencrypted/uncompressed) First packet sent when connecting to new zone.'}
 data.outgoing[0x00D] = {name='Client Leave',        description='Last packet sent from client before it leaves the zone.'}
 data.outgoing[0x015] = {name='Standard Client',     description='Packet contains data that is sent almost every time (i.e your character\'s position).'}
+data.outgoing[0x016] = {name='Update Request',      description='Packet that requests a PC/NPC update packet.'}
 data.outgoing[0x01A] = {name='Action',              description='An action being done on a target (i.e. an attack or spell).'}
 data.outgoing[0x028] = {name='Drop Item',           description='Drops an item.'}
 data.outgoing[0x029] = {name='Move Item',           description='Move item from one inventory to another.'}
@@ -58,7 +59,9 @@ data.outgoing[0x102] = {name='Untraditional Equip', description='Sent when equip
 data.outgoing[0x104] = {name='Leave Bazaar',        description='Sent when client leaves a bazaar.'}
 data.outgoing[0x105] = {name='View Bazaar',         description='Sent when viewing somebody\'s bazaar.'}
 data.outgoing[0x106] = {name='Buy Bazaar Item',     description='Buy an item from somebody\'s bazaar.'}
+data.outgoing[0x109] = {name='Close Bazaar',        description='Sent after closing your bazaar window.'}
 data.outgoing[0x10A] = {name='Set Price',           description='Set the price on a bazaar item.'}
+data.outgoing[0x10B] = {name='Open Bazaar',         description='Sent when opening your bazaar window to set prices.'}
 data.outgoing[0x10C] = {name='Start RoE Quest',     description='Sent to undertake a Records of Eminence Quest.'}
 data.outgoing[0x10D] = {name='Cancel RoE Quest',    description='Sent to cancel a Records of Eminence Quest.'}
 data.outgoing[0x10F] = {name='Currency Menu',       description='Requests currency information for the menu.'}
@@ -115,6 +118,7 @@ data.incoming[0x062] = {name='Skills Update',       description='Packet that sho
 data.incoming[0x063] = {name='Set Update',          description='Frequently sent packet during battle that updates specific types of job information, like currently available/set automaton equipment and currently set BLU spells.'}
 data.incoming[0x067] = {name='Pet Info',            description='Updates information about whether or not you have a pet and the TP, HP, etc. of the pet if appropriate.'}
 data.incoming[0x06F] = {name='Synth Result',        description='Results of an attempted synthesis process.'}
+data.incoming[0x071] = {name='Campaign Map Info',   description='Populates the Campaign map.'}
 data.incoming[0x08C] = {name='Merits',              description='Contains all merit information. Multiple packets are sent.'}
 data.incoming[0x0AA] = {name='Spell List',          description='Packet that shows the spells that you know.'}
 data.incoming[0x0AC] = {name='Ability List',        description='Packet that shows your current abilities and traits.'}
@@ -131,7 +135,10 @@ data.incoming[0x0F4] = {name='Widescan Mob',        description='Displays one mo
 data.incoming[0x0F6] = {name='Widescan Mark',       description='Marks the start and ending of a widescan list.'}
 data.incoming[0x0F9] = {name='Reraise Activation',  description='Reassigns targetable status on reraise activation?'}
 data.incoming[0x105] = {name='Data Download 4',     description='The data that is sent to the client when it is "Downloading data...".'}
+data.incoming[0x106] = {name='Bazaar Seller Info',  description='Information on the purchase sent to the buyer when they attempt to buy something.'}
 data.incoming[0x108] = {name='Data Download 5',     description='The data that is sent to the client when it is "Downloading data...".'}
+data.incoming[0x109] = {name='Bazaar Purch. Info',  description='Information on the purchase sent to the buyer when the purchase is successful.'}
+data.incoming[0x10A] = {name='Bazaar Buyer Info',   description='Information on the purchase sent to the seller when a sale is successful.'}
 data.incoming[0x110] = {name='Sparks Update',       description='Occurs when you sparks increase and generates the related message.'}
 data.incoming[0x111] = {name='Eminence Message',    description='Causes Records of Eminence messages.'}
 data.incoming[0x112] = {name='RoE Quest Log',       description='Updates your RoE quest log on zone and when appropriate.'}

@@ -468,17 +468,19 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
             end
         end
         
-------------- JOB INFO ----------------
     elseif id == 0x06F then
-        local result = data:byte(2,2)
-        if result == 1 then
-            windower.add_to_chat(8,' -------------- HQ Tier 1! --------------')
-        elseif result == 2 then
-            windower.add_to_chat(8,' -------------- HQ Tier 2! --------------')
-        elseif result == 3 then
-            windower.add_to_chat(8,' -------------- HQ Tier 3! --------------')
+        if data:byte(1) == 0 then
+            local result = data:byte(2)
+            if result == 1 then
+                windower.add_to_chat(8,' -------------- HQ Tier 1! --------------')
+            elseif result == 2 then
+                windower.add_to_chat(8,' -------------- HQ Tier 2! --------------')
+            elseif result == 3 then
+                windower.add_to_chat(8,' -------------- HQ Tier 3! --------------')
+            end
         end
         
+    ------------- JOB INFO ----------------
     elseif id == 0x01B then
         filterload(res.jobs[data:byte(5)].short)
     end
