@@ -2,7 +2,7 @@ name = 'SubTarget'
 version = '1.0'
 author = 'Sebyg666'
 
-Must have the "send"
+Must have the "send" addon to work
 
 can use //subtarget or //sta
 
