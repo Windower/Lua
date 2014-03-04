@@ -2,9 +2,7 @@ name = 'SubTarget'
 version = '1.0'
 author = 'Sebyg666'
 
-*********************************************************************************
-*** Must have the "send" and "shortcuts" addons loaded for this addon to work ***
-*********************************************************************************
+Must have the "send"
 
 can use //subtarget or //sta
 
@@ -18,8 +16,7 @@ Command "GO":
 	- Main usage.                                                       
 	- create an ingame macro with 2 lines                               
 		- line 1: /target <stal>                                     
-		- line 2: /con sta go mule_name spell_name 
-	- Sepll_name must be shortcutted, i.e. 'magesballad' not 'Mages ballad'                 
+		- line 2: /con sta go mule_name spell_name                 
 	- This sends your mule the spell + the target selected from <stal> 
  
 Command "TOGGLE":              
