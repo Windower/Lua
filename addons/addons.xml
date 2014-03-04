@@ -397,4 +397,11 @@
     <bugtracker>https://github.com/Jayjs20/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Bismarck/Ihina</support>
   </addon>
+  <addon>
+    <name>subTarget</name>
+    <author>Sebyg666</author>
+    <description>Enhances the usage of the send addon by allowing a stal or stpc or st target to be sent as the spell recipient. This removes the need for multiple macros for the same spell.</description>
+    <bugtracker>https://github.com/sebyg666/Lua/issues</bugtracker>
+    <support>https://github.com/sebyg666/Lua/tree/4.1-dev/addons/SubTarget</support>
+  </addon>
 </addons>
