@@ -12,64 +12,396 @@
     <support>http://forums.windower.net/topic/21775-random-question-thread/</support>
   </addon>
   <addon>
-  	<name>AEcho</name>
-  	<description>Automatically uses echo drops when you get silenced. Also, uses send to send a message to an alt that you got debuffed.</description>
+    <name>AEcho</name>
+    <description>Automatically uses echo drops when you get silenced. Also, uses send to send a message to an alt that you got debuffed.</description>
+    <author>Nitrous (Shiva)</author>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
+    <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>
   </addon>
   <addon>
     <name>AnsweringMachine</name>
+	<author>Byrth</author>
     <description>Stores tells that you receive for later recall.</description>
+	<bugtracker>https://github.com/Byrth/Lua/issues</bugtracker>
+	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
+  </addon>
+  <addon>
+    <name>AutoControl</name>
+    <description>Automated automaton equipment setting and burden tracker.</description>
+    <author>Nitrous (Shiva)</author>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
+    <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>
+  </addon>
+  <addon>
+    <name>autoinvite</name>
+    <author>r3g1stry</author>
+    <description>Automatically invites players when sent a tell with a specified keyword.</description>
+    <bugtracker>https://github.com/r3g1stry/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/user/R3G1STRY</support>
   </addon>
   <addon>
     <name>AutoJoin</name>
+    <author>Arcon</author>
     <description>Automatically joins or declines party invites. Configurable with blacklist/whitelist mode and auto-decline settings.</description>
-	<bugtracker>https://github.com/z16/Lua/issues</bugtracker>
+    <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
+  </addon>
+  <addon>
+    <name>AutoRA</name>
+    <author>Banggugyangu</author>
+    <description>Causes Ranged Attacks to behave the same as melee Auto-Attack.</description>
+    <bugtracker>https://github.com/banggugyangu/Lua/issues</bugtracker>
+  </addon>
+  <addon>
+    <name>AzureSets</name>
+    <description>Automated blue magic spell setting.</description>
+    <author>Nitrous (Shiva)</author>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
+    <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>
   </addon>
   <addon>
     <name>BattleMod</name>
+    <author>Byrth</author>
     <description>Customizes battle chat messages.</description>
+	<bugtracker>https://github.com/Byrth/Lua/issues</bugtracker>
+	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
-  	<name>FFOColor</name>
-  	<description>Allows you to show FFOChat text in one of the 5 game chat channels. As well as specify colors for the text</description>
+    <name>Blist</name>
+    <author>Ikonic</author>
+    <description>More detailed blist with tiered display options.  Allows for blist to be active on any or all of several chat types.</description>
+    <bugtracker>https://github.com/Icinoki/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Ragnarok/Ikonic</support>
+  </addon>
+  <addon>
+    <name>Cancel</name>
+    <author>Byrth</author>
+    <description>Mimics the cancel plugin, but also accepts buff names instead of just IDs.</description>
+	<bugtracker>https://github.com/Byrth/Lua/issues</bugtracker>
+	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
+  </addon>
+  <addon>
+    <name>cBlock</name>
+    <description>Blacklist addon for FFOChat.</description>
+    <author>Nitrous (Shiva)</author>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
+    <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>
+  </addon>
+  <addon>
+    <name>CellHelp</name>
+    <author>Krizz and Balloon</author>
+    <description>Tracks cells that are needed, displays your position in the lot order, and creates the appropriate LL profiles.</description>
+	<bugtracker>https://github.com/tehkrizz/Lua/issues</bugtracker>
+	<support>http://www.ffxiah.com/player/Bahamut/Krizz</support>
+  </addon>
+  <addon>
+    <name>chars</name>
+    <author>Giuliano Riccio (Zohno@Phoenix)</author>
+    <description>Lets you input special chars using simple tags (ex.: &lt;note&gt; for ♪).</description>
+    <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
+  </addon>
+  <addon>
+    <name>ChatPorter</name>
+    <author>Ikonic</author>
+    <description>Displays tell, party, and linkshell chat to alternate character and optional textbox.  Also, allows you to reply from either character.</description>
+    <bugtracker>https://github.com/Icinoki/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Ragnarok/Ikonic</support>
+  </addon>
+  <addon>
+    <name>Distance</name>
+    <author>Arcon</author>
+    <description>Shows the distance to your current target.</description>
+    <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
+  </addon>
+  <addon>
+    <name>DressUp</name>
+    <author>Cairthenn</author>
+    <description>Emulates BlinkMeNot functionality. Allows for customization of gear display for you or anyone else.</description>
+    <bugtracker>https://github.com/cairface/Lua/issues</bugtracker>
+    <support>http://www.bluegartr.com/members/34070-Cairthenn</support>
+  </addon>
+  <addon>
+    <name>DynamisHelper</name>
+    <description>Displays a timer when a mob is procced, tracks currency obtained, and can create a LL to lot all currency.</description>
+	<bugtracker>https://github.com/tehkrizz/Lua/issues</bugtracker>
+	<support>http://www.ffxiah.com/player/Bahamut/Krizz</support>
+  </addon>
+  <addon>
+    <author>Giuliano Riccio (Zohno@Phoenix)</author>
+    <name>enternity</name>
+    <description>Enters "Enter" automatically when prompted during a cutscene or when talking to NPCs. It will not skip choice dialog boxes.</description>
+    <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
+  </addon>
+  <addon>
+    <name>eval</name>
+    <author>Aureus</author>
+    <description>Allows developers to run arbitrary lua code in the console.</description>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
+  </addon>
+  <addon>
+    <name>FFOColor</name>
+    <author>Nitrous (Shiva)</author>
+    <description>Allows you to show FFOChat text in one of the 5 game chat channels. As well as specify colors for the text</description>
+    <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>   
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
+  </addon>
+  <addon>
+    <name>findAll</name>
+    <author>Giuliano Riccio (Zohno@Phoenix)</author>
+    <description>Searches items stored on all your characters. Click "about" for more instructions.</description>
+    <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
+  </addon>
+  <addon>
+    <author>Omnys@Valefor</author>
+    <name>Gametime</name>
+    <description>Displays game time, game-week, moon information, and travel times.</description>
+    <bugtracker>https://github.com/thatdudegrim/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Valefor/Omnys</support>
+  </addon>
+  <addon>
+    <name>GearSwap</name>
+    <author>Byrth</author>
+    <description>Changes gear in response to player actions. [[Uses Packets.]]</description>
+	<bugtracker>https://github.com/Byrth/Lua/issues</bugtracker>
+	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
+  </addon>
+  <addon>
+    <name>Itemizer</name>
+    <author>Ihina</author>
+    <description>Use commands to move items and gear between bags</description>
+    <bugtracker>https://github.com/Jayjs20/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Bismarck/Ihina</support>
+  </addon>
+  <addon>
+	<name>InfoReplacer</name>
+	<author>Cairthenn</author>
+	<description>Replaces outgoing text prefixed by % with respective game information.</description>
+    <bugtracker>https://github.com/cairface/Lua/issues</bugtracker>
+    <support>http://www.bluegartr.com/members/34070-Cairthenn</support>
   </addon>
   <addon>
     <name>Linker</name>
+    <author>Arcon</author>
     <description>Allows opening links to certain websites from within the game, with an optional search parameter.</description>
-	<bugtracker>https://github.com/z16/Lua/issues</bugtracker>
+    <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
   </addon>
   <addon>
-  	<name>OhShi</name>
-  	<description>Keeps track of various event related things. Such as, VW proc messages, mob casting, mob tp moves, TH procs and cor rolls, as well as others.</description>
+    <name>Lottery</name>
+    <author>Arcon</author>
+    <description>Automatically passes an item on all accounts if lotted by another.</description>
+    <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
   </addon>
   <addon>
-  	<name>Respond</name>
-  	<description>Respond to tells and FFOchat PMs using //r.</description>
+    <name>MacroChanger</name>
+    <author>Banggugyangu</author>
+    <description>Automatically switches Macro Book and Page according to job changes.</description>
+    <bugtracker>https://github.com/banggugyangu/Lua/issues</bugtracker>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
+  </addon>
+  <addon>
+    <name>MobCompass</name>
+    <description>A compass to show your position relative to the target (not players) for geo and has a setup for Sneak attack</description>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
+  </addon>
+  <addon>
+    <name>obiaway</name>
+    <description>Automatically remove elemental obis based on day/weather/storm conditions.</description>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
+  </addon>
+  <addon>
+    <name>OhShi</name>
+    <description>Keeps track of various event related things. Such as, VW proc messages, mob casting, mob tp moves, TH procs and cor rolls, as well as others.</description>
+    <author>Nitrous (Shiva)</author>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
+    <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>
+  </addon>
+  <addon>
+    <name>PetSchool</name>
+	<author>Banggugyangu</author>
+    <description>A helper addon for PUPs using spellcast, it informs spellcast of pet casting (healing or nuking).</description>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
+  </addon>
+ <addon>
+    <name>PetTP</name>
+    <author>SnickySnacks</author>
+    <description>Tracks pet vitals (HP/TP/MP)</description>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
+  </addon> 
+  <addon>
+    <name>plasmon</name>
+    <author>Giuliano Riccio (Zohno@Phoenix)</author>
+    <description>tracks plasm, killed mobs and dropped airlixirs during a delve.</description>
+    <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
+  </addon>
+  <addon>
+    <name>plugin_manager</name>
+    <author>Byrth</author>
+    <description>Allows you to specify which plugins and addons will be used with which characters.</description>
+	<bugtracker>https://github.com/Byrth/Lua/issues</bugtracker>
+	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
+  </addon>
+  <addon>
+    <name>porter</name>
+    <author>Giuliano Riccio (Zohno@Phoenix)</author>
+    <description>Shows the slips' items highlighting those that are stored.</description>
+    <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
+  </addon>
+  <addon>
+    <name>reive</name>
+    <author>Giuliano Riccio (Zohno@Phoenix)</author>
+    <description>Tracks exp, bayld, momentum scores and bonuses during a reive.</description>
+    <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
+  </addon>
+  <addon>
+    <name>Respond</name>
+	<author>Byrth</author>
+    <description>Respond to tells and FFOchat PMs using //r.</description>
+	<bugtracker>https://github.com/Byrth/Lua/issues</bugtracker>
+	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
+  </addon>
+  <addon>
+    <name>RollTracker</name>
+    <author>Balloon</author>
+    <description>Simplifies Cor rolls, tells you the bonus they give, stops you from doubling up on lucky rolls and reports your chance to bust.</description>
+	<bugtracker>https://github.com/Podginator/Lua/issues</bugtracker>
+	<support>Podginator@gmail.com</support>
+  </addon>
+  <addon>
+    <name>salvage2</name>
+    <author>Krizz</author>
+    <description>Displays pathos that have not been removed in Salvage 2. Displays zone timer.</description>
+	<bugtracker>https://github.com/tehkrizz/Lua/issues</bugtracker>
+	<support>http://www.ffxiah.com/player/Bahamut/Krizz</support>
+  </addon>
+  <addon>
+    <name>SATACast</name>
+    <author>Banggugyangu</author>
+    <description>Informs Spellcast about changes to Sneak Attack and Trick Attack status.</description>
+    <bugtracker>https://github.com/banggugyangu/Lua/issues</bugtracker>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
     <name>Scoreboard</name>
     <author>Suji</author>
     <description>Basic in-game damage parser. It displays live DPS and works even when chat filters are enabled.</description>
-    <support>https://github.com/jerryhebert/Lua/issues</support>
+    <bugtracker>https://github.com/jerryhebert/Lua/issues</bugtracker>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
+  </addon>
+  <addon>
+    <name>Shortcuts</name>
+    <author>Byrth</author>
+    <description>Applys spellcast-like command completion (interpretation and target completion) to commands. Includes emotes, /check, and /pcmd.</description>
+	<bugtracker>https://github.com/Byrth/Lua/issues</bugtracker>
+	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
+  </addon>
+  <addon>
+    <name>Silence</name>
+    <author>Ihina</author>
+    <description>Eliminates the flood of equipment change messages.</description>
+    <bugtracker>https://github.com/Jayjs20/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Bismarck/Ihina</support>
+  </addon>
+  <addon>
+  	<name>ShoutHelper</name>
+  	<author>Jandel</author>
+  	<description>Help managing party job in an alliance shout. Displays a in-game editable list (initially empty) in which one can set job and players</description>
+  	<bugtracker>https://github.com/Jandella/Lua/issues</bugtracker>
+  	<support>http://www.ffxiah.com/player/Ragnarok/Jandel</support>
   </addon>
   <addon>
     <name>Send</name>
+    <author>Byrth</author>
     <description>Sends commands between windower instances using IPC.</description>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
-  	<name>StaggerTrack</name>
-  	<description>Catches voidwatch weakness messages and prints them to a textbox in case you miss them in the battle spam.</description>
+    <name>StaggerTrack</name>
+    <author>Nitrous (Shiva)</author>
+    <description>Catches voidwatch weakness messages and prints them to a textbox in case you miss them in the battle spam.</description>
+    <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
-  	<name>STNA</name>
-  	<description>One-button status removal for dual boxing.</description>
+    <name>STNA</name>
+    <author>Nitrous (Shiva)</author>
+    <description>One-button status removal for dual boxing.</description>
+    <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
-  	<name>vwhl</name>
-  	<description>Redirects vw nm's vulnerabilities to the "tell" stream so that they can be held using the chat filters' function and highlights the important info. Supports EN, FR, DE clients.</description>
+    <name>StratHelper</name>
+    <author>Ihm</author>
+    <description>A simple helper addon for Spellcast for Scholar Stratagems. It will automatically calculate the number of stratagems you have and push them into spellcast variables.</description>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
-  	<name>Spellcast_helper</name>
-	<author>Seb</author>
-  	<description>Spellcast assisting program</description>
+    <name>Highlight</name>
+    <description>Highlights party members names when mentioned in the chatlog.</description>
+    <author>Balloon</author>
+	<bugtracker>https://github.com/Podginator/Lua/issues</bugtracker>
+	<support>Podginator@gmail.com</support>
+  </addon>
+  <addon>
+    <name>TargetInfo</name>
+    <author>Arcon</author>
+    <description>Displays information about your current target in memory.</description>
+    <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
+  </addon>
+  <addon>
+    <name>thtracker</name>
+    <author>Krizz</author>
+    <description>Displays latest TH level from chat.</description>
+	<bugtracker>https://github.com/tehkrizz/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Bahamut/Krizz</support>
+  </addon>
+  <addon>
+    <name>timestamp</name>
+    <author>Giuliano Riccio (Zohno@Phoenix)</author>
+    <description>Prefixes any chat message with a timestamp. Based on Timestamp plugin.</description>
+    <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
+  </addon>
+  <addon>
+    <name>Update</name>
+    <author>Arcon</author>
+    <description>Updates and reloads all plugins and addons when typing //update.</description>
+    <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
+  </addon>
+  <addon>
+    <name>vwhl</name>
+    <author>Giuliano Riccio (Zohno@Phoenix)</author>
+    <description>Redirects the nm's weaknesses (VW or Abyssea) to the "tell" stream so that they can be held using the chat filters' function and highlights the important info.</description>
+    <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
+  </addon>
+  <addon>
+    <name>zonetimer</name>
+    <author>Ihina</author>
+    <description>Displays the amount of time one has been in zone.  Original by Krellion.</description>
+    <bugtracker>https://github.com/Jayjs20/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Bismarck/Ihina</support>
+  </addon>
+  <addon>
+    <name>subTarget</name>
+    <author>Sebyg666</author>
+    <description>Enhances the usage of the send addon by allowing a stal or stpc or st target to be sent as the spell recipient. This removes the need for multiple macros for the same spell.</description>
+    <bugtracker>https://github.com/sebyg666/Lua/issues</bugtracker>
+    <support>https://github.com/sebyg666/Lua/tree/4.1-dev/addons/SubTarget</support>
   </addon>
 </addons>
