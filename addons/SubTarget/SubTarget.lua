@@ -32,7 +32,7 @@ _addon.commands = {'SubTarget','STa'}
 require('tables')
 require('logger')
 require('strings')
-require'tablehelper'
+
  
 toggle = false
  
