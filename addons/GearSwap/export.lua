@@ -44,7 +44,9 @@ function export_set(options)
                 if res.items[v.id] then
                     item_list[#item_list+1] = {}
                     item_list[#item_list].name = res.items[v.id][language]
-                    item_list[#item_list].slot = dat_slots_map[res.items[v.id].slots or 0] or 'item'
+                    local potslots = v.slots
+                    if potslots then potslots = res.slots[potslots:it()()].english:gsub(' ','_') end
+                    item_list[#item_list].slot = potslots or 'item'
                 else
                     windower.add_to_chat(123,'GearSwap: You possess an item that is not in the resources yet.')
                 end
@@ -166,11 +168,15 @@ function unlogify_unpacked_name(name)
                 windower.add_to_chat(8,'v = '..tostring(v.english))
             elseif v['log_'..language]:lower() == name then
                 name = v[language]
-                slot = dat_slots_map[v.slots or 0] or 'item'
+                local potslots = v.slots
+                if potslots then potslots = res.slots[potslots:it()()].english:gsub(' ','_') end
+                slot = potslots or 'item'
                 break
             elseif v[language]:lower() == name then
                 name = v[language]
-                slot = dat_slots_map[v.slots or 0] or 'item'
+                local potslots = v.slots
+                if potslots then potslots = res.slots[potslots:it()()].english:gsub(' ','_') end
+                slot = potslots or 'item'
                 break
             end
         end
