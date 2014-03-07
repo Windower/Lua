@@ -92,10 +92,6 @@ dat_races = {['Precomposed NPC']=0x10000,HumeM=0x0002,HumeF=0x0004,ElvaanM=0x000
 dat_slots = {0x0002,0x0004,0x0008,0x0010,0x0020,0x0040,0x0080,0x0100,0x0200,0x0400,0x0800,0x1000,0x2000,0x4000,0x8000}
 dat_slots[0] = 0x0001
 
-dat_slots_map={[1]='main',[2]='sub',[3]='main',[4] = 'range',[8]='ammo',[16]='head',[32]='body',
-    [64]='hands',[128]='legs',[256]='feet',[512]='neck',[1024]='waist',[2048]='left_ear',[4096]='right_ear',
-    [6144]='left_ear',[8192]='left_ring',[16384]='right_ring',[24576]='left_ring',[32768]='back'}
-
 default_equip_order = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
 
 jas = {false,false,false,false,false,true,false,false,false,false,false,false,false,true,true,false}--6,14,15}

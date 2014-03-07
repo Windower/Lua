@@ -114,8 +114,8 @@ function fns.abilities()
     local res = {}
     slots[res] = S{}
 
-    match_string = '<a id="(%-?%d-)" index="(%d-)" prefix="(/%a-)" english="([^"]-)" german="([^"]-)" french="([^"]-)" japanese="([^"]-)" type="(%w-)" element="([%a,%s]-)" targets="([%a,%s]-)" skill="(%a-)" mpcost="(%d-)" tpcost="(%-?%d-)" casttime="(%d-)" recast="(%d-)" alias="([%w|]-)" />'
-    for id, index, prefix, english, german, french, japanese, type, elements, targets, skill, mp_cost, tp_cost, cast_time, recast, alias in file:gmatch(match_string) do
+    match_string = '<a id="(%-?%d-)" index="(%d-)" prefix="(/%a-)" english="([^"]-)" german="([^"]-)" french="([^"]-)" japanese="([^"]-)" type="(%w-)" element="(%a+)[%a,%s]-" targets="([%a,%s]-)" skill="(%a-)" mpcost="(%d-)" tpcost="(%-?%d-)" casttime="(%d-)" recast="(%d-)" alias="([%w|]-)" />'
+    for id, index, prefix, english, german, french, japanese, type, element, targets, skill, mp_cost, tp_cost, cast_time, recast, alias in file:gmatch(match_string) do
         id = id:number()
         res[id] = setmetatable({
             id = id,
@@ -126,7 +126,7 @@ function fns.abilities()
             french = unquote(french),
             japanese = unquote(japanese),
             type = type,
-            elements = S(elements:split(', ')):remove('None'),
+            element = element,
             targets = S(targets:split(', ')),
             skill = skill,
             mp_cost = mp_cost:number(),
@@ -139,8 +139,8 @@ function fns.abilities()
     end
     slots[res] = slots[res] + table.keyset(last)
 
-    match_string = '<a id="(%-?%d-)" index="(%d-)" prefix="(/%a-)" english="([^"]-)" german="([^"]-)" french="([^"]-)" japanese="([^"]-)" type="(%w-)" element="([%a,%s]-)" targets="([%a,%s]-)" skill="(%a-)" mpcost="(%d-)" tpcost="(%-?%d-)" casttime="(%d-)" recast="(%d-)" alias="([%w|]-)" wsA="(%a-)" wsB="(%a-)" wsC="(%a-)" />'
-    for id, index, prefix, english, german, french, japanese, type, elements, targets, skill, mp_cost, tp_cost, cast_time, recast, alias, wsA, wsB, wsC in file:gmatch(match_string) do
+    match_string = '<a id="(%-?%d-)" index="(%d-)" prefix="(/%a-)" english="([^"]-)" german="([^"]-)" french="([^"]-)" japanese="([^"]-)" type="(%w-)" element="(%a+)[%a,%s]-" targets="([%a,%s]-)" skill="(%a-)" mpcost="(%d-)" tpcost="(%-?%d-)" casttime="(%d-)" recast="(%d-)" alias="([%w|]-)" wsA="(%a-)" wsB="(%a-)" wsC="(%a-)" />'
+    for id, index, prefix, english, german, french, japanese, type, element, targets, skill, mp_cost, tp_cost, cast_time, recast, alias, wsA, wsB, wsC in file:gmatch(match_string) do
         id = id:number()
         res[id] = setmetatable({
             id = id,
@@ -151,7 +151,7 @@ function fns.abilities()
             french = unquote(french),
             japanese = unquote(japanese),
             type = type,
-            elements = S(elements:split(', ')):remove('None'),
+            element = element,
             targets = S(targets:split(', ')),
             skill = skill,
             mp_cost = mp_cost:number(),
@@ -172,7 +172,7 @@ end
 
 -- Returns the spells, indexed by ingame ID.
 function fns.spells()
-    local file = _libs.files.read(plugin_resources..'spells.xml')
+    local file = _libs.files.read(plugin_resources .. 'spells.xml')
     local match_string = '<s id="(%d-)" index="(%d-)" prefix="([^"]-)" english="([^"]-)" german="([^"]-)" french="([^"]-)" japanese="([^"]-)" type="([^"]-)" element="([^"]-)" targets="([^"]-)" skill="([^"]-)" mpcost="(%d-)" casttime="([%d%.]-)" recast="([%d%.]-)" alias="([^"]-)" />'
     local last = {}
 
