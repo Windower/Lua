@@ -1044,6 +1044,32 @@ fields.incoming[0x034] = L{
     {ctype='char[3]',           label='_junk1'},                                -- 31   Always 00s for me
 }
 
+-- Player update
+-- Buff IDs go can over 0xFF, but in the packet each buff only takes up one byte.
+-- To address that there's a 8 byte bitmask starting at 0x4C where each 2 bits
+-- represent how much to add to the value in the respective byte.
+fields.incoming[0x037] = L{
+    {ctype='unsigned char[32]', label='Buff',               fn=buff},           -- 04
+    {ctype='unsigned int',      label='Player ID',          fn=id},             -- 24
+    {ctype='unsigned short',    label='_unknown1'},                             -- 28
+    {ctype='unsigned char',     label='HP %',               fn=percent},        -- 29
+    {ctype='unsigned char',     label='_unknown2'},                             -- 2A
+    {ctype='unsigned char',     label='_unknown3'},                             -- 2B
+    {ctype='unsigned char',     label='_unknown4'},                             -- 2C
+    {ctype='unsigned char',     label='_unknown5'},                             -- 2D
+    {ctype='unsigned char',     label='_unknown6'},                             -- 2E
+    {ctype='unsigned char',     label='Status',             fn=status},         -- 30
+    {ctype='unsigned char',     label='LS Color Red'},                          -- 31
+    {ctype='unsigned char',     label='LS Color Green'},                        -- 32
+    {ctype='unsigned char',     label='LS Color Blue'},                         -- 33
+    {ctype='char[8]',           label='_unknown7'},                             -- 34
+    {ctype='unsigned int',      label='_unknown8'},                             -- 3C
+    {ctype='unsigned int',      label='Timestamp',          fn=time},           -- 40
+    {ctype='char[8]',           label='_unknown9'},                             -- 44
+    {ctype='char[8]',           label='Bit Mask'},                              -- 4C
+    {ctype='char[8]',           label='_unknown10'},                            -- 54
+}
+
 -- Model DisAppear
 fields.incoming[0x038] = L{
     {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
