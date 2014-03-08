@@ -53,6 +53,10 @@ local function bool(val)
     return val ~= 0
 end
 
+local function div(denom, val)
+    return val/denom
+end
+
 local time = (function()
     local now = os.time()
     local h, m = (os.difftime(now, os.time(os.date('!*t', now))) / 3600):modf()
@@ -337,6 +341,7 @@ fields.outgoing[0x037] = L{
     {ctype='unsigned char',     label='Slot',               fn=inv+{0}},        -- 0E
     {ctype='unsigned char',     label='_unknown2'},                             -- 0F   Takes values
     {ctype='unsigned char',     label='Bag',                fn=bag},            -- 10
+    {ctype='char[3]',           label='_unknown2'}                              -- 11
 }
 
 -- Sort Item
@@ -526,7 +531,7 @@ fields.outgoing[0x0EA] = L{
 
 -- Cancel
 fields.outgoing[0x0F1] = L{
-    {ctype='unsigned char',     label='Buff ID'},                               -- 04
+    {ctype='unsigned char',     label='Buff'},                                  -- 04
     {ctype='unsigned char',     label='_unknown1'},                             -- 05
     {ctype='unsigned char',     label='_unknown2'},                             -- 06
     {ctype='unsigned char',     label='_unknown3'},                             -- 07
@@ -1484,8 +1489,8 @@ fields.incoming[0x06F] = L{
     {ctype='unsigned char',     label='_junk1'},                                -- 07
     {ctype='unsigned short',    label='Item',               fn=item},           -- 08
     {ctype='unsigned short[8]', label='Lost Item',          fn=item},           -- 0A
-    {ctype='unsigned char',     label='Skill',              const=skill},       -- 1A
-    {ctype='char[7]',           label='_unknown2'},                             -- 1B   Always 0?
+    {ctype='unsigned char[4]',  label='Skill',              fn=skill},          -- 1A
+    {ctype='unsigned char[4]',  label='Skillup',            fn=div+{10}},       -- 1E
     {ctype='unsigned short',    label='_junk2'},                                -- 22
 }
 
