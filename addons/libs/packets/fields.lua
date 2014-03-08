@@ -15,10 +15,10 @@ fields.incoming = {_mult = {}}
 
 -- String decoding definitions
 local ls_name_msg = T('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ':split())
-ls_name_msg[0] = (0):char()
+ls_name_msg[0] = 0:char()
 local item_inscr = T('0123456798ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz{':split())
-item_inscr[0] = (0):char()
-local ls_name_ext = T(('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' .. (0):char():rep(11)):split())
+item_inscr[0] = 0:char()
+local ls_name_ext = T(('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' .. 0:char():rep(11)):split())
 ls_name_ext[0] = '`'
 
 -- Function definitions. Used to display packet field information.
@@ -42,7 +42,7 @@ local function index(val)
 end
 
 local function ip(val)
-    return (val / 2^24):floor()..'.'..((val / 2^16):floor() % 0x100)..'.'..((val / 2^8):floor() % 0x100)..'.'..(val % 0x100)
+    return '%d.%d.%d.%d':format('I':pack(val):unpack('CCCC'))
 end
 
 local function gil(val)
@@ -53,9 +53,13 @@ local function bool(val)
     return val ~= 0
 end
 
+local function div(denom, val)
+    return val/denom
+end
+
 local time = (function()
     local now = os.time()
-    local h, m = math.modf(os.difftime(now, os.time(os.date('!*t', now))) / 3600)
+    local h, m = (os.difftime(now, os.time(os.date('!*t', now))) / 3600):modf()
 
     local timezone = '%+.2d:%.2d':format(h, 60 * m)
     now, h, m = nil, nil, nil
@@ -64,7 +68,7 @@ local time = (function()
     end
 end)()
 
-local time_ms = time..function(val) return val/1000  end
+local time_ms = time .. function(val) return val/1000 end
 
 local dir = (function()
     local dir_sets = L{'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW', 'N', 'NNE', 'NE', 'ENE', 'E'}
@@ -82,9 +86,8 @@ local function zone(val)
 end
 
 local function item(val)
-    if not val then log(debug.traceback()) end
-    return val ~= 0
-            and res.items[val].log_name:capitalize()
+    return val ~= 0 and res.items[val]
+            and res.items[val].name
         or '-'
 end
 
@@ -137,14 +140,16 @@ local function srank(val)
 end
 
 local function inv(bag, val)
-    if val == 0 then
-        return bag == 0
-                and windower.ffxi.get_items().gil
-            or '-'
+    if val == 0 or not res.bags[bag] then
+        return '-'
     end
 
-    local id = windower.ffxi.get_items()[res.bags[bag].english:lower()][val].id
-    return id > 0 and res.items[id].name or '-'
+    local items = windower.ffxi.get_items()[res.bags[bag].english:lower()]
+    if not items[val] then
+        return '-'
+    end
+
+    return item(items[val].id)
 end
 
 local function invp(index, val, data)
@@ -185,7 +190,7 @@ local enums = {
     ['synth'] = {
         [0] = 'Success',
         [1] = 'Fail',
-        [2] = 'Interrupted',
+        [2] = 'Fail, interrupted',
         [3] = 'Cancel, invalid recipe',
         [4] = 'Cancel',
         [5] = 'Fail, crystal lost',
@@ -336,6 +341,7 @@ fields.outgoing[0x037] = L{
     {ctype='unsigned char',     label='Slot',               fn=inv+{0}},        -- 0E
     {ctype='unsigned char',     label='_unknown2'},                             -- 0F   Takes values
     {ctype='unsigned char',     label='Bag',                fn=bag},            -- 10
+    {ctype='char[3]',           label='_unknown2'}                              -- 11
 }
 
 -- Sort Item
@@ -392,6 +398,20 @@ fields.outgoing[0x05B] = L{
     {ctype='unsigned char',     label='_unknown5'},                             -- 13
 }
 
+-- Zone request
+-- Sent when crossing a zone line.
+fields.outgoing[0x05E] = L{
+    {ctype='unsigned int',      label='Zone line'},                             -- 04   This seems to be a fourCC consisting of the following chars:
+                                                                                --      'z' (apparently constant)
+                                                                                --      Region-specific char ('6' for Jeuno, '3' for Qufim, etc.)
+                                                                                --      Zone-specific char ('u' for Port Jeuno, 't' for Lower Jeuno, 's' for Upper Jeuno, etc.)
+                                                                                --      Zone line identifier ('4' for Port Jeuno > Qufim Island, '2' for Port Jeuno > Lower Jeuno, etc.)
+    {ctype='char[12]',          label='_unknown1',          const=''},          -- 08
+    {ctype='unsigned short',    label='_unknown2',          const=0},           -- 14
+    {ctype='unsigned char',     label='_unknown3',          const=0x04},        -- 16   Seemed to never vary for me
+    {ctype='unsigned char',     label='Type'},                                  -- 17   03 for leaving the MH, 00 otherwise
+}
+
 -- Equipment Screen (0x02 length) -- Also observed when zoning
 fields.outgoing[0x061] = L{
 }
@@ -442,7 +462,7 @@ fields.outgoing[0x096] = L{
     {ctype='unsigned char',     label='_unknown1'},                             -- 04   Crystal ID? Earth = 0x02, Wind-break = 0x19?, Wind no-break = 0x2D?
     {ctype='unsigned char',     label='_unknown2'},                             -- 05
     {ctype='unsigned short',    label='Crystal',                fn=item},       -- 06
-    {ctype='unsigned char',     label='Crystal Index',          fn=inv},        -- 08
+    {ctype='unsigned char',     label='Crystal Index',          fn=inv+{0}},    -- 08
     {ctype='unsigned char',     label='Number of Ingredients'},                 -- 09
     {ctype='unsigned short',    label='Ingredient 1',           fn=item},       -- 0A
     {ctype='unsigned short',    label='Ingredient 2',           fn=item},       -- 0C
@@ -452,15 +472,15 @@ fields.outgoing[0x096] = L{
     {ctype='unsigned short',    label='Ingredient 6',           fn=item},       -- 14
     {ctype='unsigned short',    label='Ingredient 7',           fn=item},       -- 16
     {ctype='unsigned short',    label='Ingredient 8',           fn=item},       -- 18
-    {ctype='unsigned char',     label='Ingredient 1 Index',     fn=item},       -- 1A
-    {ctype='unsigned char',     label='Ingredient 2 Index',     fn=item},       -- 1B
-    {ctype='unsigned char',     label='Ingredient 3 Index',     fn=item},       -- 1C
-    {ctype='unsigned char',     label='Ingredient 4 Index',     fn=item},       -- 1D
-    {ctype='unsigned char',     label='Ingredient 5 Index',     fn=item},       -- 1E
-    {ctype='unsigned char',     label='Ingredient 6 Index',     fn=item},       -- 1F
-    {ctype='unsigned char',     label='Ingredient 7 Index',     fn=item},       -- 20
-    {ctype='unsigned char',     label='Ingredient 8 Index',     fn=item},       -- 21
-    {ctype='unsigned short',    label='_unknown3'},                             -- 22
+    {ctype='unsigned char',     label='Ingredient 1 Index',     fn=inv+{0}},    -- 1A
+    {ctype='unsigned char',     label='Ingredient 2 Index',     fn=inv+{0}},    -- 1B
+    {ctype='unsigned char',     label='Ingredient 3 Index',     fn=inv+{0}},    -- 1C
+    {ctype='unsigned char',     label='Ingredient 4 Index',     fn=inv+{0}},    -- 1D
+    {ctype='unsigned char',     label='Ingredient 5 Index',     fn=inv+{0}},    -- 1E
+    {ctype='unsigned char',     label='Ingredient 6 Index',     fn=inv+{0}},    -- 1F
+    {ctype='unsigned char',     label='Ingredient 7 Index',     fn=inv+{0}},    -- 20
+    {ctype='unsigned char',     label='Ingredient 8 Index',     fn=inv+{0}},    -- 21
+    {ctype='unsigned short',    label='_junk1'},                                -- 22
 }
 
 -- Speech
@@ -511,7 +531,7 @@ fields.outgoing[0x0EA] = L{
 
 -- Cancel
 fields.outgoing[0x0F1] = L{
-    {ctype='unsigned char',     label='Buff ID'},                               -- 04
+    {ctype='unsigned char',     label='Buff'},                                  -- 04
     {ctype='unsigned char',     label='_unknown1'},                             -- 05
     {ctype='unsigned char',     label='_unknown2'},                             -- 06
     {ctype='unsigned char',     label='_unknown3'},                             -- 07
@@ -939,11 +959,11 @@ fields.incoming[0x026] = L{
 fields.incoming[0x027] = L{
     {ctype='unsigned int',      label='Player ID',          fn=id},             -- 04
     {ctype='unsigned short',    label='Player Index',       fn=index},          -- 08
-    {ctype='unsigned char',     label='Slot or Stat ID'},                       -- 0A  -- 85 = DEX Down, 87 = AGI Down, 8A = CHR Down, 8B = HP Down, 7A = Head/Neck restriction, 7D = Leg/Foot Restriction
-    {ctype='unsigned char',     label='_unknown1'},                             -- 0B  -- 09C
-    {ctype='unsigned int',      label='_unknown2'},                             -- 0C  -- 04 00 00 00
-    {ctype='unsigned int',      label='_unknown3'},                             -- 10  -- B6 E3 39 00
-    {ctype='unsigned char',     label='_unknown4'},                             -- 14  -- 01 or 04?
+    {ctype='unsigned char',     label='Slot or Stat ID'},                       -- 0A   85 = DEX Down, 87 = AGI Down, 8A = CHR Down, 8B = HP Down, 7A = Head/Neck restriction, 7D = Leg/Foot Restriction
+    {ctype='unsigned char',     label='_unknown1'},                             -- 0B   9C
+    {ctype='unsigned int',      label='_unknown2'},                             -- 0C   04 00 00 00
+    {ctype='unsigned int',      label='_unknown3'},                             -- 10
+    {ctype='unsigned char',     label='_unknown4'},                             -- 14
     {ctype='char[11]',          label='_unknown5'},                             -- 15
     {ctype='char[16]',          label='Player Name'},                           -- 20
     {ctype='char[16]',          label='_unknown6'},                             -- 30
@@ -956,10 +976,10 @@ fields.incoming[0x029] = L{
     {ctype='unsigned int',      label='Actor ID',           fn=id},             -- 04
     {ctype='unsigned int',      label='Target ID',          fn=id},             -- 08
     {ctype='unsigned int',      label='Param 1'},                               -- 0C
-    {ctype='unsigned char',     label='Param 2'},                               -- 10  -- 06 bits of byte 16
-    {ctype='char[3]',           label='Param 3'},                               -- 11  -- Also includes the last 2 bits of byte 16.
-    {ctype='unsigned short',    label='Actor Index',        fn=index},          -- 14  -- B6 E3 39 00
-    {ctype='unsigned short',    label='Target Index',       fn=index},          -- 16  -- 01 or 04?
+    {ctype='bit[6]',            label='Param 2'},                               -- 10
+    {ctype='bit[26]',           label='Param 3'},                               -- 11
+    {ctype='unsigned short',    label='Actor Index',        fn=index},          -- 14
+    {ctype='unsigned short',    label='Target Index',       fn=index},          -- 16
     {ctype='unsigned short',    label='Message ID'},                            -- 18
     {ctype='unsigned short',    label='_unknown1'},                             -- 1A
 }
@@ -1022,6 +1042,32 @@ fields.incoming[0x034] = L{
     {ctype='unsigned short',    label='_unknown3'},                             -- 2E   08 for me, but FFing did nothing
     {ctype='unsigned char',     label='Zone ID 2'},                             -- 30   Always the same as the other Zone ID, as far as I've seen.
     {ctype='char[3]',           label='_junk1'},                                -- 31   Always 00s for me
+}
+
+-- Player update
+-- Buff IDs go can over 0xFF, but in the packet each buff only takes up one byte.
+-- To address that there's a 8 byte bitmask starting at 0x4C where each 2 bits
+-- represent how much to add to the value in the respective byte.
+fields.incoming[0x037] = L{
+    {ctype='unsigned char[32]', label='Buff',               fn=buff},           -- 04
+    {ctype='unsigned int',      label='Player ID',          fn=id},             -- 24
+    {ctype='unsigned short',    label='_unknown1'},                             -- 28
+    {ctype='unsigned char',     label='HP %',               fn=percent},        -- 29
+    {ctype='unsigned char',     label='_unknown2'},                             -- 2A
+    {ctype='unsigned char',     label='_unknown3'},                             -- 2B
+    {ctype='unsigned char',     label='_unknown4'},                             -- 2C
+    {ctype='unsigned char',     label='_unknown5'},                             -- 2D
+    {ctype='unsigned char',     label='_unknown6'},                             -- 2E
+    {ctype='unsigned char',     label='Status',             fn=status},         -- 30
+    {ctype='unsigned char',     label='LS Color Red'},                          -- 31
+    {ctype='unsigned char',     label='LS Color Green'},                        -- 32
+    {ctype='unsigned char',     label='LS Color Blue'},                         -- 33
+    {ctype='char[8]',           label='_unknown7'},                             -- 34
+    {ctype='unsigned int',      label='_unknown8'},                             -- 3C
+    {ctype='unsigned int',      label='Timestamp',          fn=time},           -- 40
+    {ctype='char[8]',           label='_unknown9'},                             -- 44
+    {ctype='char[8]',           label='Bit Mask'},                              -- 4C
+    {ctype='char[8]',           label='_unknown10'},                            -- 54
 }
 
 -- Model DisAppear
@@ -1469,9 +1515,9 @@ fields.incoming[0x06F] = L{
     {ctype='unsigned char',     label='_junk1'},                                -- 07
     {ctype='unsigned short',    label='Item',               fn=item},           -- 08
     {ctype='unsigned short[8]', label='Lost Item',          fn=item},           -- 0A
-    {ctype='unsigned char',     label='_unknown1',          const=0x37},        -- 1A   Always 37?
-    {ctype='char[7]',           label='_unknown5'},                             -- 1B   Always 0?
-    {ctype='unsigned short',    label='_junk1'},                                -- 22
+    {ctype='unsigned char[4]',  label='Skill',              fn=skill},          -- 1A
+    {ctype='unsigned char[4]',  label='Skillup',            fn=div+{10}},       -- 1E
+    {ctype='unsigned short',    label='_junk2'},                                -- 22
 }
 
 -- Campaign Map Info
@@ -1791,13 +1837,14 @@ local function parse(fs, data, max)
     local res = L{}
     local index = 0
     local count = 0
+    local bitoffset = 0
     while index < #data do
         count = count + 1
         for field in fs:it() do
             if field.ctype then
                 field = table.copy(field)
                 local ctype, count_str = field.ctype:match('(.*)%[(%d+)%]')
-                if count_str and ctype ~= 'char' then
+                if count_str and ctype ~= 'char' and ctype ~= 'bit' then
                     field.ctype = ctype
                     local ext, size = parse(L{field}, data:sub(index + 1), count_str:number())
                     res = res + ext
@@ -1808,7 +1855,13 @@ local function parse(fs, data, max)
                     end
 
                     res:append(field)
-                    index = index + sizes[field.ctype:match('(%a+)[^%a]*$')]
+                    if ctype == 'bit' then
+                        local bits = count_str:number()
+                        bitoffset = (bitoffset + bits) % 8
+                        index = index + ((bitoffset + bits) / 8):floor()
+                    else
+                        index = index + sizes[field.ctype:match('(%a+)[^%a]*$')]
+                    end
                 end
             else
                 local ext, size = parse(field.ref, data:sub(index + 1), field.count)

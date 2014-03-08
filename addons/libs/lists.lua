@@ -373,26 +373,6 @@ function list.range(n, init)
     return setmetatable(res, _meta.L)
 end
 
-function list.any(l, fn)
-    for key = 1, l.n do
-        if fn(rawget(l, key)) == true then
-            return true
-        end
-    end
-
-    return false
-end
-
-function list.all(l, fn)
-    for key = 1, l.n do
-        if fn(rawget(l, key)) ~= true then
-            return false
-        end
-    end
-
-    return true
-end
-
 function list.tostring(l)
     local str = '['
 
