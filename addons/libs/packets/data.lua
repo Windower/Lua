@@ -96,6 +96,7 @@ data.incoming[0x034] = {name='NPC Interaction 2',   description='Occurs before m
 data.incoming[0x036] = {name='NPC Chat',            description='Dialog from NPC\'s.'}
 data.incoming[0x037] = {name='Update Char',         description='Updates a characters stats and animation.'}
 data.incoming[0x038] = {name='Model DisAppear',     description='Sent when a model should appear or disappear.'}
+data.incoming[0x039] = {name='Env. Animation 2',    description='Sent once per minute in Mog Gardens. Probably animating something.'}
 data.incoming[0x03C] = {name='Shop',                description='Displays items in a vendors shop.'}
 data.incoming[0x03D] = {name='Value',               description='Returns the value of an item.'}
 data.incoming[0x041] = {name='Stupid Evil Packet',  description='This packet is stupid and evil. Required for emotes.'}
