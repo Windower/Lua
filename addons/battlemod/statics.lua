@@ -139,7 +139,7 @@ message_map[243] = T{278}
 message_map[2] = T{264}
 
 spike_effect_valid = {true,false,false,false,false,false,false,false,false,false,false,false,false,false,false}
-add_effect_valid = {true,true,true,true,false,false,false,false,false,false,false,false,false,false,false}
+add_effect_valid = {true,true,true,true,false,false,false,false,false,false,true,false,false,false,false}
 
 
 speFile = file.new('../../plugins/resources/spells.xml')
