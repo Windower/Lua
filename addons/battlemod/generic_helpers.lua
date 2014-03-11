@@ -125,7 +125,11 @@ function colconv(str,key)
     elseif strnum >0 then
         out = string.char(0x1F,strnum)
     elseif strnum == 0 then
-        out = rcol
+        if key and default_color_table[key] ~= 0 then
+            return colconv(default_color_table[key])             
+        else
+            out = rcol
+        end
     else
         print('You have an invalid color '..key)
         out = string.char(0x1F,1)

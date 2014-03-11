@@ -1079,6 +1079,14 @@ fields.incoming[0x038] = L{
     {ctype='unsigned short',    label='_dupeIndex',         fn=index},          -- 12
 }
 
+-- Env. Animation 2
+fields.incoming[0x039] = L{
+    {ctype='unsigned int',      label='_unknown1'},                             -- 04   00 00 00 00 observed
+    {ctype='unsigned int',      label='_unknown2'},                             -- 08   00 00 00 00 observed
+    {ctype='char[4]',           label='Type',               fn=e+{0x038}},      -- 0C   "nbof" or "nbon" observed
+    {ctype='unsigned int',      label='_unknown3'},                             -- 10   00 00 00 00 observed
+}
+
 -- Shop
 fields.incoming[0x03C] = L{
     {ctype='unsigned short',    label='_zero1',             const=0x0000},      -- 04
