@@ -22,7 +22,6 @@ local ls_name_ext = T(('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' ..
 ls_name_ext[0] = '`'
 
 -- Function definitions. Used to display packet field information.
-
 res = require('resources')
 
 local function s(val, from, to)
@@ -33,12 +32,12 @@ end
 
 local function id(val)
     local mob = windower.ffxi.get_mob_by_id(val)
-    return mob and mob.name
+    return mob and mob.name or '-'
 end
 
 local function index(val)
     local mob = windower.ffxi.get_mob_by_index(val)
-    return mob and mob.name
+    return mob and mob.name or '-'
 end
 
 local function ip(val)
@@ -82,7 +81,7 @@ local function cap(val, max)
 end
 
 local function zone(val)
-    return res.zones[val].name
+    return val > 0 and res.zones[val].name or '-'
 end
 
 local function item(val)
@@ -127,12 +126,8 @@ local function race(val)
     return res.races[val].name
 end
 
-local function slots(val)
-    return res.slots[val].name
-end
-
 local function slot(val)
-    return res.slots[2^val].name
+    return res.slots[val].name
 end
 
 local function srank(val)
@@ -157,11 +152,11 @@ local function invp(index, val, data)
 end
 
 local function hex(fill, val)
-    return val:hex():zfill(2*fill):chunks(2):concat(' ')
+    return val:hex():zfill(2*fill):chunks(2):reverse():concat(' ')
 end
 
 local function bin(fill, val)
-    return val:hex():zfill(8*fill):chunks(8):concat(' ')
+    return val:binary():zfill(8*fill):chunks(8):reverse():concat(' ')
 end
 
 local function cskill(val)
@@ -184,6 +179,13 @@ types.shop_item = L{
 types.roe_quest = L{
     {ctype='bit[12]',           label='RoE Quest ID'},                          -- 00:00
     {ctype='bit[20]',           label='RoE Quest Progress'},                    -- 01:04
+}
+types.alliance_member = L{
+    {ctype='unsigned int',      label='ID',                 fn=id},             -- 00
+    {ctype='unsigned short',    label='Index',              fn=index},          -- 04
+    {ctype='unsigned short',    label='Flags',              fn=bin+{2}},        -- 06
+    {ctype='unsigned short',    label='Zone',               fn=zone},           -- 08
+    {ctype='unsigned short',    label='_unknown2'},                             -- 0A
 }
 
 local enums = {
@@ -1417,17 +1419,17 @@ fields.incoming[0x062] = L{
     {ctype='unsigned short',    label='Evasion',            fn=cskill},         -- BA
     {ctype='unsigned short',    label='Shield',             fn=cskill},         -- BC
     {ctype='unsigned short',    label='Parrying',           fn=cskill},         -- BE
-    {ctype='unsigned short',    label='DivineMagic',        fn=cskill},         -- C0
-    {ctype='unsigned short',    label='HealingMagic',       fn=cskill},         -- C2
-    {ctype='unsigned short',    label='EnhancingMagic',     fn=cskill},         -- C4
-    {ctype='unsigned short',    label='EnfeeblingMagic',    fn=cskill},         -- C6
-    {ctype='unsigned short',    label='ElementalMagic',     fn=cskill},         -- C8
+    {ctype='unsigned short',    label='Divine Magic',       fn=cskill},         -- C0
+    {ctype='unsigned short',    label='Healing Magic',      fn=cskill},         -- C2
+    {ctype='unsigned short',    label='Enhancing Magic',    fn=cskill},         -- C4
+    {ctype='unsigned short',    label='Enfeebling Magic',   fn=cskill},         -- C6
+    {ctype='unsigned short',    label='Elemental Magic',    fn=cskill},         -- C8
     {ctype='unsigned short',    label='DarkMagic',          fn=cskill},         -- CA
-    {ctype='unsigned short',    label='SummoningMagic',     fn=cskill},         -- CC
+    {ctype='unsigned short',    label='Summoning Magic',    fn=cskill},         -- CC
     {ctype='unsigned short',    label='Ninjitsu',           fn=cskill},         -- CE
     {ctype='unsigned short',    label='Singing',            fn=cskill},         -- D0
-    {ctype='unsigned short',    label='StringInstrument',   fn=cskill},         -- D2
-    {ctype='unsigned short',    label='WindInstrument',     fn=cskill},         -- D4
+    {ctype='unsigned short',    label='String Instrument',  fn=cskill},         -- D2
+    {ctype='unsigned short',    label='Wind Instrument',    fn=cskill},         -- D4
     {ctype='unsigned short',    label='BlueMagic',          fn=cskill},         -- D6
     {ctype='char[8]',           label='_dummy2'},                               -- D8
     {ctype='unsigned short',    label='Fishing',            fn=sskill},         -- E0
@@ -1545,6 +1547,14 @@ fields.incoming[0x0CC] = L{
     {ctype='char[16]',          label='Linkshell Name',     enc=ls_name_msg},   -- 9C   6-bit packed
 }
 
+-- Alliance status update
+fields.incoming[0x0C8] = L{
+    {ctype='unsigned char',     label='_unknown1'},                             -- 04
+    {ctype='char[3]',           label='_junk1'},                                -- 05
+    {ref=types.alliance_member, count=18},                                      -- 08
+    {ctype='char[24]',          label='_unknown2',          const=''},          -- E0   Always 0?
+}
+
 -- Bazaar Message
 fields.incoming[0x0CA] = L{
     {ctype='int',               label='_unknown1'},                             -- 04   Could be characters starting the line - FD 02 02 18 observed
@@ -1583,6 +1593,24 @@ fields.incoming[0x0D3] = L{
     {ctype='char[16]',          label='Highest Lot Name'},                      -- 16
     {ctype='char[16]',          label='Current Lot Name'},                      -- 26
     {ctype='char[6]',           label='_junk1'},                                -- 36
+}
+
+-- Party member update
+fields.incoming[0x0DD] = L{
+    {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
+    {ctype='unsigned int',      label='HP'},                                    -- 08
+    {ctype='unsigned int',      label='MP'},                                    -- 0C
+    {ctype='unsigned int',      label='TP',                 fn=percent},        -- 10
+    {ctype='unsigned short',    label='Flags',              fn=bin+{2}},        -- 14
+    {ctype='unsigned short',    label='_unknown1'},                             -- 16
+    {ctype='unsigned short',    label='Index',              fn=index},          -- 18
+    {ctype='unsigned short',    label='_unknown2'},                             -- 1A
+    {ctype='unsigned char',     label='_unknown3'},                             -- 1C
+    {ctype='unsigned char',     label='HP%',                fn=percent},        -- 1D
+    {ctype='unsigned char',     label='MP%',                fn=percent},        -- 1E
+    {ctype='unsigned char',     label='_unknown4'},                             -- 1F
+    {ctype='unsigned short',    label='Zone',               fn=zone},           -- 20
+    {ctype='char*',             label='Name'},                                  -- 22
 }
 
 -- Char Update
