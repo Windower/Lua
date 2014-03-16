@@ -1267,10 +1267,12 @@ enums.delivery = {
     [0x0B] = 'Drop item (delivery)',
     -- Sent after entering a name and hitting "OK" in the outbox.
     [0x0C] = 'Send request',
+    -- Sent after requesting the send box, causes the client to open the send box dialogue.
+    [0x0D] = 'Send dialogue start',
     -- Sent after requesting the delivery box, causes the client to open the delivery box dialogue.
     [0x0E] = 'Delivery dialogue start',
     -- Sent after closing the delivery box or send box.
-    [0x0F] = 'Delivery dialogue finish',
+    [0x0F] = 'Delivery/send dialogue finish',
 }
 
 -- This is always sent for every packet of this ID
