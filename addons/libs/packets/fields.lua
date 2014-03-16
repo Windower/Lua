@@ -56,7 +56,7 @@ local function div(denom, val)
     return val/denom
 end
 
-local time = (function()
+local time = function()
     local now = os.time()
     local h, m = (os.difftime(now, os.time(os.date('!*t', now))) / 3600):modf()
 
@@ -65,16 +65,27 @@ local time = (function()
     return function(ts)
         return os.date('%Y-%m-%dT%H:%M:%S' .. timezone, os.time() - ts)
     end
-end)()
+end()
+
+local utime = function()
+    local now = os.time()
+    local h, m = (os.difftime(now, os.time(os.date('!*t', now))) / 3600):modf()
+
+    local timezone = '%+.2d:%.2d':format(h, 60 * m)
+    now, h, m = nil, nil, nil
+    return function(ts)
+        return os.date('%Y-%m-%dT%H:%M:%S' .. timezone, ts)
+    end
+end()
 
 local time_ms = time .. function(val) return val/1000 end
 
-local dir = (function()
+local dir = function()
     local dir_sets = L{'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW', 'N', 'NNE', 'NE', 'ENE', 'E'}
     return function(val)
         return dir_sets[((val + 8)/16):floor() + 1]
     end
-end)()
+end()
 
 local function cap(val, max)
     return '%.1f':format(100*val/max)..'%'
@@ -995,7 +1006,7 @@ fields.incoming[0x02A] = L{
     {ctype='unsigned int',      label='Param 4'},                               -- 14
     {ctype='unsigned short',    label='Player Index',       fn=index},          -- 18
     {ctype='unsigned short',    label='Message ID'},                            -- 1A   The high bit is occasionally set, though the reason for it is unclear.
-    {ctype='unsigned int',      label='_unknown1',          const=0x06000000},  -- 1C
+    {ctype='unsigned int',      label='_unknown1'},                             -- 1C   Possibly flags, 0x06000000 and 0x02000000 observed
 }
 
 -- Digging Animation
@@ -1198,13 +1209,19 @@ fields.incoming._mult[0x044][0x17] = L{     -- MON
 }
 
 -- Delivery Item
-fields.incoming[0x04B] = L{
-    {ctype='unsigned char',     label='Packet Type'},                           -- 04
+fields.incoming._mult[0x04B] = {}
+fields.incoming[0x04B] = function()
+    local full = S{0x01, 0x06, 0x08, 0x0A}
+    return function(data)
+        return full:contains(data:byte(5, 5)) and fields.incoming._mult[0x04B].slot or fields.incoming._mult[0x04B].base
+    end
+end()
 
-	-- 00x01: (Length is 88 bytes)
-	-- Seems to occur when refreshing the d-box after any change (or before changes).
+--[[
+fields.incoming._mult[0x04B][0x01] = L{
+    {ctype='unsigned char',     label='Type'},                                  -- 04
     {ctype='unsigned char',     label='_unknown2'},                             -- 05
-    {ctype='unsigned char',     label='Delivery Slot ID'},                      -- 06   This goes left to right and then drops down a row and left to right again. Value is 0 to 7.
+    {ctype='unsigned char',     label='Delivery Slot'},                         -- 06
     {ctype='char[5]',           label='_unknown3'},                             -- 07   All FF values observed
     {ctype='unsigned char',     label='_unknown4'},                             -- 0C   01 observed
     {ctype='unsigned char',     label='_unknown5'},                             -- 0D   02 observed
@@ -1212,76 +1229,90 @@ fields.incoming[0x04B] = L{
     {ctype='unsigned int',      label='_unknown7'},                             -- 10   07 00 00 00 and 0B 00 00 00 observed - Possibly flags. Rare vs. Rare/Ex.
     {ctype='char[16]',          label='Sender Name'},                           -- 14
     {ctype='unsigned int',      label='_unknown7'},                             -- 24   46 32 00 00 and 42 32 00 00 observed - Possibly flags. Rare vs. Rare/Ex.?
-    {ctype='unsigned int',      label='UNIX Timestamp',         fn=time},       -- 28
+    {ctype='unsigned int',      label='UNIX Timestamp',         fn=utime},      -- 28
     {ctype='unsigned int',      label='_unknown8'},                             -- 2C   00 00 00 00 observed
     {ctype='unsigned short',    label='Item',                   fn=item},       -- 30
     {ctype='unsigned short',    label='_unknown9'},                             -- 32   Fiendish Tome: Chapter 11 had it, but Oneiros Pebble was just 00 00
     {ctype='unsigned int',      label='Flags1'},                                -- 34   01/04 00 00 00 observed
     {ctype='unsigned short',    label='Number of Item'},                        -- 38
     {ctype='char[30]',          label='_unknown10'},                            -- 40   All 00 observed
-	
-	-- 00x02: (Length is 88 bytes)
-	-- Seems to occur when placing items into the d-box.
-	
-	-- 00x03: (Length is 88 bytes)
-	-- Two occur per item that is actually sent (hitting okay to send).
-	
-	-- 00x04: (Length is 88 bytes)
-	-- Two occur per sent item that is Canceled.
-	
-	-- 00x05 (Length is 20 bytes)
-	-- Seems to occur quasi-randomly. Can be seen following spells.
-    {ctype='unsigned char',     label='_unknown2'},                             -- 05
-    {ctype='char[6]',           label='_unknown3'},                             -- 06   All FF values observed
-    {ctype='unsigned char',     label='_unknown4'},                             -- 0C   01 and 02 observed
-    {ctype='unsigned char',     label='_unknown5'},                             -- 0D   FF observed
-    {ctype='unsigned char',     label='_unknown6'},                             -- 0E   00 and FF observed
-    {ctype='unsigned char',     label='_unknown7'},                             -- 0F   FF observed
-    {ctype='unsigned int',      label='_unknown8'},                             -- 10   00 00 00 00 observed
-	
-	-- 00x06: (Length is 88 bytes)
-	-- Occurs for new items.
-	-- Two of these are sent sequentially. The first one doesn't seem to contain much/any
-	-- information and the second one is very similar to a type 0x01 packet
-	-- First packet's frst line:   4B 58 xx xx 06 01 00 01 FF FF FF FF 02 02 FF FF
-	-- Second packet's first line: 4B 58 xx xx 06 01 00 FF FF FF FF FF 01 02 FF FF
-    {ctype='unsigned char',     label='_unknown2'},                             -- 05   01 Observed
-    {ctype='unsigned char',     label='Delivery Slot ID'},                      -- 06
-    {ctype='char[5]',           label='_unknown3'},                             -- 07   01 FF FF FF FF and FF FF FF FF FF observed
-    {ctype='unsigned char',     label='_unknown4'},                             -- 0C   01 observed
-    {ctype='unsigned char',     label='Packet Number'},                         -- 0D   02 and 03 observed
-    {ctype='unsigned short',    label='_unknown6'},                             -- 0E   FF FF observed
-    {ctype='unsigned int',      label='_unknown7'},                             -- 10   06 00 00 00 and 07 00 00 00 observed - (06 was for the first packet and 07 was for the second)
+}]]
+
+enums.delivery = {
+    -- Seems to occur when refreshing the d-box after any change (or before changes).
+    [0x01] = 'Slot info',
+    -- Seems to occur when placing items into the d-box.
+    [0x02] = 'Place item',
+    -- Two occur per item that is actually sent (hitting "OK" to send).
+    [0x03] = 'Send confirm',
+    -- Two occur per sent item that is Canceled.
+    [0x04] = 'Send cancel',
+    -- Seems to occur quasi-randomly. Can be seen following spells.
+    [0x05] = 'Unknown 0x05',
+    -- Occurs for new items.
+    -- Two of these are sent sequentially. The first one doesn't seem to contain much/any
+    -- information and the second one is very similar to a type 0x01 packet
+    -- First packet's frst line:   4B 58 xx xx 06 01 00 01 FF FF FF FF 02 02 FF FF
+    -- Second packet's first line: 4B 58 xx xx 06 01 00 FF FF FF FF FF 01 02 FF FF
+    [0x06] = 'New item',
+    -- Occurs as the first packet when removing something from the send box.
+    [0x07] = 'Remove item (send)',
+    -- Occurs as the first packet when removing or dropping something from the delivery box.
+    [0x08] = 'Remove/drop item (delivery)',
+    -- Occurs when someone returns something from the delivery box.
+    [0x09] = 'Return item',
+    -- Occurs as the second packet when removing something from the delivery box or send box.
+    [0x0A] = 'Remove item confirm',
+    -- Occurs as the second packet when dropping something from the delivery box.
+    [0x0B] = 'Drop item (delivery)',
+    -- Sent after entering a name and hitting "OK" in the outbox.
+    [0x0C] = 'Send request',
+    -- Sent after requesting the delivery box, causes the client to open the delivery box dialogue.
+    [0x0E] = 'Delivery dialogue start',
+    -- Sent after closing the delivery box or send box.
+    [0x0F] = 'Delivery dialogue finish',
+}
+
+-- This is always sent for every packet of this ID
+fields.incoming._mult[0x04B].base = L{
+    {ctype='unsigned char',     label='Type',               fn=e+{'delivery'}}, -- 04
+    {ctype='unsigned char',     label='_unknown1'},                             -- 05   FF if Type is 05, otherwise 01
+    {ctype='signed char',       label='Delivery Slot'},                         -- 06   This goes left to right and then drops down a row and left to right again. Value is 00 through 07
+    {ctype='signed char',       label='_unknown2'},                             -- 0C   01 if Type is 06, otherwise FF
+                                                                                -- 0C   06 Type always seems to come in a pair, this field is only 01 for the first packet
+    {ctype='signed int',        label='_unknown3',          const=-1},          -- 07   Always FF FF FF FF?
+    {ctype='signed char',       label='_unknown4'},                             -- 0C   01 observed
+    {ctype='signed char',       label='Packet Number'},                         -- 0D   02 and 03 observed
+    {ctype='signed char',       label='_unknown5'},                             -- 0E   FF FF observed
+    {ctype='signed char',       label='_unknown5'},                             -- 0E   FF FF observed
+    {ctype='unsigned int',      label='_unknown6'},                             -- 10   06 00 00 00 and 07 00 00 00 observed - (06 was for the first packet and 07 was for the second)
+}
+
+-- If the type is 0x01, 0x06, 0x08 or 0x0A, these fields appear in the packet in addition to the base
+fields.incoming._mult[0x04B].slot = L{
+    {ref=fields.incoming._mult[0x04B].base},                                    -- 04
     {ctype='char[16]',          label='Sender Name'},                           -- 14
     {ctype='unsigned int',      label='_unknown7'},                             -- 24   46 32 00 00 and 42 32 00 00 observed - Possibly flags. Rare vs. Rare/Ex.?
-    {ctype='unsigned int',      label='UNIX Timestamp'},                        -- 28
+    {ctype='unsigned int',      label='Timestamp',          fn=utime},          -- 28
     {ctype='unsigned int',      label='_unknown8'},                             -- 2C   00 00 00 00 observed
-    {ctype='unsigned short',    label='Item ID'},                               -- 30
+    {ctype='unsigned short',    label='Item ID',            fn=item},           -- 30
     {ctype='unsigned short',    label='_unknown9'},                             -- 32   Fiendish Tome: Chapter 11 had it, but Oneiros Pebble was just 00 00
-    {ctype='unsigned int',      label='Flags1'},                                -- 34   01/04 00 00 00 observed
-    {ctype='unsigned short',    label='Number of Item'},                        -- 38
-    {ctype='char[30]',          label='_unknown10'},                            -- 3A   All 00 observed
+                                                                                -- 32   May well be junked, 38 38 observed
+    {ctype='unsigned int',      label='Flags?'},                                -- 34   01/04 00 00 00 observed
+    {ctype='unsigned short',    label='Count'},                                 -- 38
+    {ctype='unsigned short',    label='_unknown10'},                            -- 3A
+    {ctype='char[28]',          label='_unknown11'},                            -- 3C   All 00 observed, ext data? Doesn't seem to be the case, but same size
+}
 
-	-- 00x07: Length is 20 or 88 bytes
-	-- Sent when something is being removed from the outbox. 20 byte packet is followed by an 88 byte packet for each item removed.
-	
-	-- 00x08: (Length is 88 bytes)
-	-- Occur as the first packet when removing or dropping something from the d-box.
-	
-	-- 00x09: (Length is 88 bytes)
-	-- Occur when someone returns something from the d-box.
-	
-	-- 00x0A: (Length is 88 bytes)
-	-- Occurs as the second packet when removing something from the d-box or outbox.
-	
-	-- 00x0B: (Length is 88 bytes)
-	-- Occurs as the second packet when dropping something from the d-box.
-	
-	-- 00x0C: (Length is 20 bytes)
-	-- Sent after entering a name and hitting "OK" in the outbox.
-	
-	-- 00x0F: (Length is 20 bytes)
-	-- One is sent after closing the d-box or outbox.
+-- Auction house open
+-- The server sends this when the player clicks on an AH NPC, it starts the AH dialogue
+fields.incoming[0x04C] = L{
+    {ctype='unsigned char',     label='Type'},                                  --  0x02 for AH, 0x0A for... something, related to AH
+    {ctype='unsigned char',     label='Index?'},                                --  Counts up when Type is 0x0A
+    {ctype='unsigned char',     label='Response'},                              --  Disambiguation when Type is 0x02. Everything but 0x01 seems to result in:
+                                                                                --  "Auction house is temporarily closed for trading."
+    {ctype='unsigned char',     label='_unknown1',          const=0x00},        --  Possibly padding
+    {ctype='char[52',           label='_unknown2'},                             --
 }
 
 -- Data Download 2
@@ -1916,7 +1947,9 @@ end
 
 function fields.get(dir, id, data)
     local f = fields[dir][id]
-    f = type(f) == 'function' and f(data) or f
+    if type(f) == 'function' then
+        f = f(data)
+    end
     return f and data and parse(f, data:sub(5)) or f
 end
 
