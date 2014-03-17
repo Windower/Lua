@@ -124,7 +124,7 @@ function use_item(id, count, items)
         if item and item.count >= count then
             -- Move it to the inventory
             for i = 1, count do
-                windower.ffxi.get_item(bag_index, item.slot_id)
+                windower.ffxi.get_item(bag_index, item.slot)
             end
 
             -- Add currently processing ID to set of active IDs
