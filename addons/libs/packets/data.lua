@@ -126,12 +126,13 @@ data.incoming[0x08C] = {name='Merits',              description='Contains all me
 data.incoming[0x0AA] = {name='Spell List',          description='Packet that shows the spells that you know.'}
 data.incoming[0x0AC] = {name='Ability List',        description='Packet that shows your current abilities and traits.'}
 data.incoming[0x0B4] = {name='Seek AnonResp',       description='Server response sent after you put up party or anon flag.'}
+data.incoming[0x0C8] = {name='Party Struct Update', description='Updates all party member info in one struct. No player vital data (HP/MP/TP) or names are sent here.'}
 data.incoming[0x0C9] = {name='Show Equip',          description='Shows another player your equipment after using the Check command.'}
 data.incoming[0x0CA] = {name='Bazaar Message',      description='Shows another players bazaar message after using the Check command or sets your own on zoning.'}
 data.incoming[0x0CC] = {name='Linkshell Message',   description='/lsmes text and headers.'}
 data.incoming[0x0D2] = {name='Found Item',          description='This command shows an item found on defeated mob or from a Treasure Chest.'}
 data.incoming[0x0D3] = {name='Lot/drop item',       description='Sent when someone casts a lot on an item or when the item drops to someone.'}
-data.incoming[0x0DD] = {name='Alliance Update',     description='Alliance/party member info - zone, HP%, HP% etc.'}
+data.incoming[0x0DD] = {name='Party Member Update', description='Alliance/party member info - zone, HP%, HP% etc.'}
 data.incoming[0x0DF] = {name='Char Update',         description='A packet sent from server which updates character HP, MP and TP.'}
 data.incoming[0x0E2] = {name='Char Info',           description='Sends name, HP, HP%, etc.'}
 data.incoming[0x0F4] = {name='Widescan Mob',        description='Displays one monster.'}
