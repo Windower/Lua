@@ -113,7 +113,7 @@ function to_id_set(inventory,equip_list)
                                     end
                                     if count == #extgoal_1 then
                                         equip_list[i] = nil
-                                        ret_list[v] = m.slot_id
+                                        ret_list[v] = m.slot
                                         reorder(order,i)
                                         break
                                     elseif #extgoal_2 ~= 0 then
@@ -128,14 +128,14 @@ function to_id_set(inventory,equip_list)
                                         end
                                         if count == #extgoal_2 then
                                             equip_list[i] = nil
-                                            ret_list[v] = m.slot_id
+                                            ret_list[v] = m.slot
                                             reorder(order,i)
                                             break
                                         end
                                     end
                                 else
                                     equip_list[i] = nil
-                                    ret_list[v] = m.slot_id
+                                    ret_list[v] = m.slot
                                     reorder(order,i)
                                     break
                                 end

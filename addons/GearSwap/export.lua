@@ -66,7 +66,7 @@ function export_set(options)
                 if res.items[inv[v].id] then
                     item_list[slot_map[i]+1] = {}
                     item_list[slot_map[i]+1].name = res.items[inv[v].id][language]
-                    item_list[slot_map[i]+1].slot = i --default_slot_map[inv[v].slot_id]
+                    item_list[slot_map[i]+1].slot = i --default_slot_map[inv[v].slot]
                 else
                     windower.add_to_chat(123,'GearSwap: You are wearing an item that is not in the resources yet.')
                 end
