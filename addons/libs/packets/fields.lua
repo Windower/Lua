@@ -470,6 +470,28 @@ fields.outgoing[0x077] = L{
     {ctype='unsigned short',    label='_unknown1'},                             -- 16
 }
 
+-- NPC buy
+-- Sent when buying an item from an NPC vendor
+fields.outgoing[0x083] = L{
+    {ctype='unsigned char',     label='Count'},                                 -- 04
+    {ctype='char[3]',           label='_unknown1'},                             -- 05   Always 0? Possibly padding
+    {ctype='unsigned short',    label='_unknown2'},                             -- 08   Always 0?
+    {ctype='unsigned char',     label='Shop Slot'},                             -- 0A   The same index sent in incoming packet 0x03C
+    {ctype='unsigned char',     label='_unknown3'},                             -- 0B   Always 0? Possibly padding
+    {ctype='unsigned int',      label='_unknown4'},                             -- 0C   Always 0?
+}
+
+-- NPC Sell price query
+-- Sent when trying to sell an item to an NPC
+-- Clicking on the item the first time will determine the price
+fields.outgoing[0x084] = L{
+    {ctype='unsigned char',     label='_unknown1'},                             -- 04   Always 1? Possibly a type
+    {ctype='char[3]',           label='_unknown2'},                             -- 05   Always 0? Possibly padding
+    {ctype='unsigned short',    label='Item ID',                fn=item},       -- 08   ID of the item to query the price for
+    {ctype='unsigned char',     label='Inventory Index',        fn=inv+{0}},    -- 09   Inventory index of the same item
+    {ctype='unsigned char',     label='_unknown3'},                             -- 0A   Always 0? Likely padding
+}
+
 -- Synth
 fields.outgoing[0x096] = L{
     {ctype='unsigned char',     label='_unknown1'},                             -- 04   Crystal ID? Earth = 0x02, Wind-break = 0x19?, Wind no-break = 0x2D?
