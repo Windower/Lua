@@ -89,7 +89,7 @@ function to_id_set(inventory,equip_list)
     end
     for n,m in pairs(inventory) do
         if check_wearable(m.id) then
-            if m.flags == 0 or m.flags == 5 then -- Make sure the item is either equipped or not otherwise committed. eliminate_redundant will take care of the already-equipped gear.
+            if m.status == 0 or m.status == 5 then -- Make sure the item is either equipped or not otherwise committed. eliminate_redundant will take care of the already-equipped gear.
                 for i,v in pairs(short_slot_map) do
                     -- equip_list[i] can also be a table (that doesn't contain a "name" property) or a number, which are both cases that should not generate any kind of equipment changing.
                     -- Hence the "and name" below.
@@ -113,7 +113,7 @@ function to_id_set(inventory,equip_list)
                                     end
                                     if count == #extgoal_1 then
                                         equip_list[i] = nil
-                                        ret_list[v] = m.slot_id
+                                        ret_list[v] = m.slot
                                         reorder(order,i)
                                         break
                                     elseif #extgoal_2 ~= 0 then
@@ -128,14 +128,14 @@ function to_id_set(inventory,equip_list)
                                         end
                                         if count == #extgoal_2 then
                                             equip_list[i] = nil
-                                            ret_list[v] = m.slot_id
+                                            ret_list[v] = m.slot
                                             reorder(order,i)
                                             break
                                         end
                                     end
                                 else
                                     equip_list[i] = nil
-                                    ret_list[v] = m.slot_id
+                                    ret_list[v] = m.slot
                                     reorder(order,i)
                                     break
                                 end
@@ -147,17 +147,17 @@ function to_id_set(inventory,equip_list)
                         end
                     end
                 end
-            elseif m.flags > 0 then
+            elseif m.status > 0 then
                 for i,v in pairs(short_slot_map) do
                     local name = expand_entry(equip_list[i])
                     if name and name ~= empty then -- If "name" isn't a piece of gear, then it won't have a valid value at this point and should be ignored.
                         if name_match(m.id,name) then
-                            if m.flags == 5 then
+                            if m.status == 5 then
                                 error_list[i] = name..' (equipped)'
-                            elseif m.flags == 25 then
+                            elseif m.status == 25 then
                                 error_list[i] = name..' (bazaared)'
                             else
-                                error_list[i] = name..' (flags unknown: '..m.flags..' )'
+                                error_list[i] = name..' (status unknown: '..m.status..' )'
                             end
                             break
                         end
