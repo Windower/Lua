@@ -963,13 +963,20 @@ fields.incoming[0x01D] = L{
     {ctype='unsigned int',      label='Flag',               const=0x01},        -- 04
 }
 
+-- Modify Inventory
+fields.incoming[0x01E] = L{
+    {ctype='unsigned int',      label='Count'},                                 -- 04
+    {ctype='unsigned char',     label='Bag',                fn=bag},            -- 08
+    {ctype='unsigned char',     label='Index',              fn=inv+{0}},        -- 09
+}
+
 -- Item Assign
 fields.incoming[0x01F] = L{
     {ctype='unsigned int',      label='Count'},                                 -- 04
     {ctype='unsigned short',    label='ID',                 fn=item},           -- 08
     {ctype='unsigned char',     label='_padding1',          const=0x00},        -- 0A
-    {ctype='unsigned char',     label='Index',              fn=inv},            -- 0B
-    {ctype='unsigned char',     label='Inventory Status'},                      -- 0C
+    {ctype='unsigned char',     label='Index',              fn=inv+{0}},        -- 0B
+    {ctype='unsigned char',     label='Status'},                                -- 0C
 }
 
 -- Item Updates
@@ -982,15 +989,24 @@ fields.incoming[0x020] = L{
     {ctype='char[28]',          label='ExtData',            fn='...':fn()},     -- 10
 }
 
-enums['trade'] = {
-    [0] = 'Start trade',
-    [1] = 'End trade',
-}
--- Trade request sent
+-- Trade request received
 fields.incoming[0x022] = L{
-    {ctype='unsigned int',      label='Target ID',          fn=id},             -- 04
+    {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
+    {ctype='unsigned short',    label='Index',              fn=index},          -- 08
+    {ctype='unsigned short',    label='_junk1'},                                -- 0A
+}
+
+-- Trade request sent
+enums['trade'] = {
+    [0] = 'Trade started',
+    [1] = 'Trade failed',
+    [2] = 'Trade accepted by other party',
+    [9] = 'Trade successful',
+}
+fields.incoming[0x022] = L{
+    {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
     {ctype='unsigned int',      label='Type',               fn=e+{'trade'}},    -- 08
-    {ctype='unsigned short',    label='Target Index',       fn=index},          -- 0C
+    {ctype='unsigned short',    label='Index',              fn=index},          -- 0C
     {ctype='unsigned short',    label='_junk1'},                                -- 0E
 }
 
