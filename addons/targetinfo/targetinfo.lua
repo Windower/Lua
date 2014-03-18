@@ -41,14 +41,14 @@ windower.register_event('prerender', function()
         local info = {}
         info.hex = mob.id:hex():slice(-3)
         info.full = tostring(mob.id):lpad(' ', 8)
-        local speed = math.round(100*(mob.speed/4 - 1), 2)
+        local speed = math.round(100*(mob.movement_speed/4 - 1), 2)
         info.speed = (
             speed > 0 and
-                '\\cs(0,255,0)'..('+'..speed):lpad(' ', 4)
+                '\\cs(0,255,0)' .. ('+' .. speed):lpad(' ', 4)
             or speed < 0 and
-                '\\cs(255,0,0)'..tostring(speed):lpad(' ', 4)
+                '\\cs(255,0,0)' .. tostring(speed):lpad(' ', 4)
             or
-                '\\cs(102,102,102)'..('+'..speed):lpad(' ', 5))..'%\\cr'
+                '\\cs(102,102,102)' .. ('+' .. speed):lpad(' ', 5)) .. '%\\cr'
         text_box:update(info)
         text_box:show()
 	else
@@ -58,7 +58,7 @@ end)
 
 -- Constructor
 
-function initialize(t, settings)
+function (t, settings)
     local properties = L{}
     if settings.showfullid then
         properties:append('ID:  ${full|-}')
@@ -71,8 +71,7 @@ function initialize(t, settings)
     end
     text_box:clear()
     text_box:append(properties:concat('\n'))
-end
-initialize(text_box, settings)
+end(text_box, settings)
 
 text_box:register_reload_event(initialize)
 
