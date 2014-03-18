@@ -990,6 +990,14 @@ fields.incoming[0x022] = L{
     {ctype='unsigned short',    label='_junk1'},                                -- 0E
 }
 
+-- Trade item change
+fields.incoming[0x025] = L{
+    {ctype='unsigned int',      label='Count'},                                 -- 04
+    {ctype='unsigned short',    label='ID',                 fn=item},           -- 08
+    {ctype='unsigned char',     label='Slot'},                                  -- 0A
+    {ctype='unsigned char',     label='Inventory Index',    fn=inv+{0}},        -- 0B
+}
+
 -- Count to 80
 fields.incoming[0x026] = L{
     {ctype='unsigned char',     label='_unknown1',          const=0x00},        -- 04
