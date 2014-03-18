@@ -946,22 +946,21 @@ fields.incoming[0x01C] = L{
     {ctype='unsigned char',     label='Satchel Size'},                          -- 09
     {ctype='unsigned char',     label='Sack Size'},                             -- 0A
     {ctype='unsigned char',     label='Case Size'},                             -- 0B
-    {ctype='char[8]',           label='_padding1',          const=0x00},        -- 0C
-    {ctype='unsigned short',    label='Inventory Size'},                        -- 14
-    {ctype='unsigned short',    label='Safe Size'},                             -- 16
-    {ctype='unsigned short',    label='Safe Taken'},                            -- 18
-    {ctype='unsigned short',    label='Storage Size'},                          -- 1A   For some reason this reports a value 4 larger than the first Storage Size.
-    {ctype='unsigned short',    label='Temporary Size'},                        -- 1C
-    {ctype='unsigned short',    label='Locker Size'},                           -- 1E
-    {ctype='unsigned short',    label='Satchel Size'},                          -- 20
-    {ctype='unsigned short',    label='Sack Size'},                             -- 22
-    {ctype='unsigned short',    label='Case Size'},                             -- 24
-    {ctype='char[16]',          label='_padding2',          const=''},          -- 26
+    {ctype='char[8]',           label='_padding1',          const=''},          -- 0C
+    {ctype='unsigned short',    label='_dupeInventory Size'},                   -- 14
+    {ctype='unsigned short',    label='_dupeSafe Size'},                        -- 16
+    {ctype='unsigned short',    label='_dupeStorage Size'},                     -- 1A   The accumulated storage from all items (uncapped) -1
+    {ctype='unsigned short',    label='_dupeTemporary Size'},                   -- 1C
+    {ctype='unsigned short',    label='_dupeLocker Size'},                      -- 1E
+    {ctype='unsigned short',    label='_dupeSatchel Size'},                     -- 20
+    {ctype='unsigned short',    label='_dupeSack Size'},                        -- 22
+    {ctype='unsigned short',    label='_dupeCase Size'},                        -- 24
+    {ctype='char[18]',          label='_padding2',          const=''},          -- 26
 }
 
 -- Finish Inventory
 fields.incoming[0x01D] = L{
-    {ctype='unsigned char',     label='Flag',               const=0x01},        -- 04
+    {ctype='unsigned int',      label='Flag',               const=0x01},        -- 04
 }
 
 -- Item Assign
