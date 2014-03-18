@@ -982,6 +982,14 @@ fields.incoming[0x020] = L{
     {ctype='char[28]',          label='ExtData',            fn='...':fn()},     -- 10
 }
 
+-- Trade request sent
+fields.incoming[0x022] = L{
+    {ctype='unsigned int',      label='Target ID',          fn=id},             -- 04
+    {ctype='unsigned int',      label='_unknown1',          const=0x00000000},  -- 08
+    {ctype='unsigned short',    label='Target Index',       fn=index},          -- 0C
+    {ctype='unsigned short',    label='_junk1'},                                -- 0E
+}
+
 -- Count to 80
 fields.incoming[0x026] = L{
     {ctype='unsigned char',     label='_unknown1',          const=0x00},        -- 04
