@@ -1,9 +1,10 @@
 _addon.name = 'TargetInfo'
 _addon.author = 'Arcon'
 _addon.version = '1.0.0.2'
+_addon.language = 'English'
 
-require 'luau'
-texts = require 'texts'
+require('luau')
+texts = require('texts')
 
 -- Config
 
@@ -58,7 +59,7 @@ end)
 
 -- Constructor
 
-function (t, settings)
+(function (t, settings)
     local properties = L{}
     if settings.showfullid then
         properties:append('ID:  ${full|-}')
@@ -71,7 +72,7 @@ function (t, settings)
     end
     text_box:clear()
     text_box:append(properties:concat('\n'))
-end(text_box, settings)
+end)(text_box, settings)
 
 text_box:register_reload_event(initialize)
 
