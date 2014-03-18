@@ -982,10 +982,14 @@ fields.incoming[0x020] = L{
     {ctype='char[28]',          label='ExtData',            fn='...':fn()},     -- 10
 }
 
+enums['trade'] = {
+    [0] = 'Start trade',
+    [1] = 'End trade',
+}
 -- Trade request sent
 fields.incoming[0x022] = L{
     {ctype='unsigned int',      label='Target ID',          fn=id},             -- 04
-    {ctype='unsigned int',      label='_unknown1',          const=0x00000000},  -- 08
+    {ctype='unsigned int',      label='Type',               fn=e+{'trade'}},    -- 08
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 0C
     {ctype='unsigned short',    label='_junk1'},                                -- 0E
 }
