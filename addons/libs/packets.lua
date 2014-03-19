@@ -219,10 +219,8 @@ function packets.new(dir, id, values)
     return setmetatable(packet, {__tostring = function(p)
         local res = p._dir:capitalize()..' packet 0x'..p._id:hex():zfill(3)..' ('..(p._name and p._name or 'Unrecognized packet')..'):'
 
-        for field, value in pairs(packet) do
-            if not field:startswith('_') then
-                res = res..'\n'..field..': '..tostring(value)
-            end
+        for field in fields:it() do
+            res = res .. '\n' .. field.label .. ': ' .. tostring(p[field.label]) .. (field.fn and '(' .. field.fn(p[field.label]) .. ')' or '')
         end
 
         return res
