@@ -22,6 +22,9 @@ statuses[0x32] = {english = 'Fishing'}
 statuses[0x33] = {english = 'Fishing fighting center'}
 statuses[0x34] = {english = 'Fishing fighting right'}
 statuses[0x35] = {english = 'Fishing fighting left'}
+statuses[0x38] = {english = 'Fishing rod in water'}
+statuses[0x39] = {english = 'Fishing fish on hook'}
+statuses[0x3A] = {english = 'Fishing put rod away'}
 
 return statuses
 
