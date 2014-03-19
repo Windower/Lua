@@ -531,6 +531,11 @@ fields.outgoing[0x0B6] = L{
     {ctype='char*',             label='Message'},                               -- 14   Message, occasionally terminated by spare 00 bytes.
 }
 
+-- Job Point Menu
+-- This packet has no content bytes
+fields.outgoing[0x0C0] = L{
+}
+
 -- Check
 fields.outgoing[0x0DD] = L{
     {ctype='unsigned int',      label='Target ID',          fn=id},             -- 04
@@ -1628,6 +1633,17 @@ fields.incoming[0x06F] = L{
     {ctype='unsigned char[4]',  label='Skill',              fn=skill},          -- 1A
     {ctype='unsigned char[4]',  label='Skillup',            fn=div+{10}},       -- 1E
     {ctype='unsigned short',    label='_junk2'},                                -- 22
+}
+
+-- Job Points
+-- These packets are currently not used by the client in any detectable way.
+-- The below pattern repeats itself for the entirety of the packet. There are 2 jobs per packet,
+-- and 11 of these packets are sent at the moment in response to the first 0x0C0 outgoing packet since zoning.
+-- This is how it works as of 3-19-14, and it is safe to assume that it will change in the future.
+fields.incoming[0x08D] = L{
+    {ctype='unsigned short',    label='Job Point ID'},                          -- 04   32 potential values for every job, which means you could decompose this into a value bitpacked with job ID if you wanted
+    {ctype='unsigned char',     label='_unknown1'},                             -- 06   Availability? Always 1 in cases where the ID is set at the moment.
+    {ctype='unsigned char',     label='Current Level'},                         -- 07   Current enhancement for this job point ID
 }
 
 -- Campaign Map Info
