@@ -53,7 +53,7 @@ function make_entry(v,typ,i)
 end
 
 for i,v in pairs(res.spells) do
-    if not T{363,364}:contains(res.id) then
+    if not T{363,364}:contains(i) then
         make_entry(v,'Magic',i)
     end
 end

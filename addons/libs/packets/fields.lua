@@ -256,7 +256,6 @@ end
     Outgoing packets
 ]]
 
-
 -- Packet sent on zoning. 12 bytes long, all content bytes are 00.
 -- fields.outgoing[0x00C]
 
@@ -946,22 +945,28 @@ fields.incoming[0x01C] = L{
     {ctype='unsigned char',     label='Satchel Size'},                          -- 09
     {ctype='unsigned char',     label='Sack Size'},                             -- 0A
     {ctype='unsigned char',     label='Case Size'},                             -- 0B
-    {ctype='char[8]',           label='_padding1',          const=0x00},        -- 0C
-    {ctype='unsigned short',    label='Inventory Size'},                        -- 14
-    {ctype='unsigned short',    label='Safe Size'},                             -- 16
-    {ctype='unsigned short',    label='Safe Taken'},                            -- 18
-    {ctype='unsigned short',    label='Storage Size'},                          -- 1A   For some reason this reports a value 4 larger than the first Storage Size.
-    {ctype='unsigned short',    label='Temporary Size'},                        -- 1C
-    {ctype='unsigned short',    label='Locker Size'},                           -- 1E
-    {ctype='unsigned short',    label='Satchel Size'},                          -- 20
-    {ctype='unsigned short',    label='Sack Size'},                             -- 22
-    {ctype='unsigned short',    label='Case Size'},                             -- 24
-    {ctype='char[16]',          label='_padding2',          const=''},          -- 26
+    {ctype='char[8]',           label='_padding1',          const=''},          -- 0C
+    {ctype='unsigned short',    label='_dupeInventory Size'},                   -- 14
+    {ctype='unsigned short',    label='_dupeSafe Size'},                        -- 16
+    {ctype='unsigned short',    label='_dupeStorage Size'},                     -- 1A   The accumulated storage from all items (uncapped) -1
+    {ctype='unsigned short',    label='_dupeTemporary Size'},                   -- 1C
+    {ctype='unsigned short',    label='_dupeLocker Size'},                      -- 1E
+    {ctype='unsigned short',    label='_dupeSatchel Size'},                     -- 20
+    {ctype='unsigned short',    label='_dupeSack Size'},                        -- 22
+    {ctype='unsigned short',    label='_dupeCase Size'},                        -- 24
+    {ctype='char[18]',          label='_padding2',          const=''},          -- 26
 }
 
 -- Finish Inventory
 fields.incoming[0x01D] = L{
-    {ctype='unsigned char',     label='Flag',               const=0x01},        -- 04
+    {ctype='unsigned int',      label='Flag',               const=0x01},        -- 04
+}
+
+-- Modify Inventory
+fields.incoming[0x01E] = L{
+    {ctype='unsigned int',      label='Count'},                                 -- 04
+    {ctype='unsigned char',     label='Bag',                fn=bag},            -- 08
+    {ctype='unsigned char',     label='Index',              fn=inv+{0}},        -- 09
 }
 
 -- Item Assign
@@ -969,8 +974,8 @@ fields.incoming[0x01F] = L{
     {ctype='unsigned int',      label='Count'},                                 -- 04
     {ctype='unsigned short',    label='ID',                 fn=item},           -- 08
     {ctype='unsigned char',     label='_padding1',          const=0x00},        -- 0A
-    {ctype='unsigned char',     label='Index',              fn=inv},            -- 0B
-    {ctype='unsigned char',     label='Inventory Status'},                      -- 0C
+    {ctype='unsigned char',     label='Index',              fn=inv+{0}},        -- 0B
+    {ctype='unsigned char',     label='Status'},                                -- 0C
 }
 
 -- Item Updates
@@ -981,6 +986,46 @@ fields.incoming[0x020] = L{
     {ctype='unsigned char',     label='Bag',                fn=bag},            -- 0E
     {ctype='unsigned char',     label='Index',              fn=invp+{0x0E}},    -- 0F
     {ctype='char[28]',          label='ExtData',            fn='...':fn()},     -- 10
+}
+
+-- Trade request received
+fields.incoming[0x021] = L{
+    {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
+    {ctype='unsigned short',    label='Index',              fn=index},          -- 08
+    {ctype='unsigned short',    label='_junk1'},                                -- 0A
+}
+
+-- Trade request sent
+enums['trade'] = {
+    [0] = 'Trade started',
+    [1] = 'Trade canceled',
+    [2] = 'Trade accepted by other party',
+    [9] = 'Trade successful',
+}
+fields.incoming[0x022] = L{
+    {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
+    {ctype='unsigned int',      label='Type',               fn=e+{'trade'}},    -- 08
+    {ctype='unsigned short',    label='Index',              fn=index},          -- 0C
+    {ctype='unsigned short',    label='_junk1'},                                -- 0E
+}
+
+-- Trade item, other party
+fields.incoming[0x023] = L{
+    {ctype='unsigned int',      label='Count'},                                 -- 04
+    {ctype='unsigned short',    label='Trade count'},                           -- 08   Seems to increment every time packet 0x023 comes in, i.e. every trade action performed by the other party
+    {ctype='unsigned short',    label='ID',                 fn=item},           -- 0A   If the item is removed, gil is used with a count of zero
+    {ctype='unsigned char',     label='_unknown1',          const=0x05},        -- 0C   Possibly junk?
+    {ctype='unsigned char',     label='Slot'},                                  -- 0D   Gil itself is in slot 0, whereas the other slots start at 1 and count up horizontally
+    {ctype='char[26]',          label='_unknown2'},                             -- 0E   ExtData related? 2 bytes short of full item ExtData size
+                                                                                -- 0E   Shows similar characteristics though, 0 on most items, non-zero on charged items
+}
+
+-- Trade item, self
+fields.incoming[0x025] = L{
+    {ctype='unsigned int',      label='Count'},                                 -- 04
+    {ctype='unsigned short',    label='ID',                 fn=item},           -- 08   If the item is removed, gil is used with a count of zero
+    {ctype='unsigned char',     label='Slot'},                                  -- 0A   Gil itself is in slot 0, whereas the other slots start at 1 and count up horizontally
+    {ctype='unsigned char',     label='Inventory Index',    fn=inv+{0}},        -- 0B
 }
 
 -- Count to 80
