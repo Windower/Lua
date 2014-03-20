@@ -1081,6 +1081,19 @@ fields.incoming[0x02A] = L{
     {ctype='unsigned int',      label='_unknown1'},                             -- 1C   Possibly flags, 0x06000000 and 0x02000000 observed
 }
 
+-- Kill Message
+-- Updates EXP gained, RoE messages, Limit Points, and Capacity Points
+fields.incoming[0x02D] = L{
+    {ctype='unsigned int',      label='Player ID',          fn=id},             -- 04
+    {ctype='unsigned int',      label='Target ID',          fn=id},             -- 08   Player ID in the case of RoE log updates
+    {ctype='unsigned short',    label='Player Index',       fn=index},          -- 0C
+    {ctype='unsigned short',    label='Target Index',       fn=index},          -- 0E   Player Index in the case of RoE log updates
+    {ctype='unsigned int',      label='Param 1'},                               -- 10   EXP gained, etc. Numerator for RoE objectives
+    {ctype='unsigned int',      label='Param 2'},                               -- 14   Denominator for RoE objectives
+    {ctype='unsigned short',    label='Message ID'},                            -- 18   
+    {ctype='unsigned short',    label='_flags1'},                               -- 20   This could also be a third parameter, but I suspect it is flags because I have only ever seen one bit set.
+}
+
 -- Digging Animation
 fields.incoming[0x02F] = L{
     {ctype='unsigned int',      label='Player ID',          fn=id},             -- 04
@@ -1553,6 +1566,7 @@ fields.incoming[0x062] = L{
 -- Set Update
 -- This packet likely varies based on jobs, but currently I only have it worked out for Monstrosity.
 -- It also appears in three chunks, so it's double-varying.
+-- Packet was expanded in the March 2014 update and now includes a fourth packet, which contains CP values.
 
 fields.incoming._mult[0x063] = {}
 fields.incoming[0x063] = function(data)
@@ -1873,7 +1887,7 @@ fields.incoming[0x110] = L{
     {ctype='unsigned short',    label='_unknown1'},                             -- 06   Sparks are currently capped at 50,000
 }
 
--- Eminence Message
+-- Eminence Update
 fields.incoming[0x111] = L{
     {ref=types.roe_quest,       count=16},                                      -- 04
 }
