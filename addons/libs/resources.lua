@@ -79,8 +79,8 @@ resources.parse_flags = function(bits)
         local res = S{}
 
         local rem
+        local num = bits
         local count = 0
-        local num = bits:number(16)
         while num > 0 do
             num, rem = (num/2):modf()
             if rem > 0 then
@@ -112,13 +112,13 @@ function fns.items()
 
     for i,v in pairs(res) do
         if v.races then
-            res[i].races = resources.parse_flags(races)
+            res[i].races = resources.parse_flags(v.races)
         end
         if v.jobs then
-            res[i].jobs = resources.parse_flags(jobs)
+            res[i].jobs = resources.parse_flags(v.jobs)
         end
         if v.slots then
-            res[i].slots = resources.parse_flags(slots)
+            res[i].slots = resources.parse_flags(v.slots)
         end
     end
     return res
