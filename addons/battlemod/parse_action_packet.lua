@@ -494,7 +494,7 @@ function get_spell(act)
             spell.ability = color_it(spell[language],color_arr.abilcol)
         elseif fields.weapon_skill then
             if abil_ID > 255 then -- WZ_RECOVER_ALL is used by chests in Limbus
-                spell = res.monsteres.abilities[abil_ID-256]
+                spell = res.monster_abilities[abil_ID-256]
                 if spell.english == '.' then
                     spell.english = 'Special Attack'
                 end
