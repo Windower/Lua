@@ -64,7 +64,7 @@ end
 
 -- Iterate through resources and make validabils.
 function validabils_it(resources_table,str)
-    for i,v in pairs(res.spells) do
+    for i,v in pairs(resources_table) do
         make_abil(v.english,str,i)
         if v.alias then
             local struck = string.split(v.alias,'|')
