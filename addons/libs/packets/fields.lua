@@ -531,6 +531,13 @@ fields.outgoing[0x0B6] = L{
     {ctype='char*',             label='Message'},                               -- 14   Message, occasionally terminated by spare 00 bytes.
 }
 
+-- Job Point Increase
+-- This chunk was sent on three consecutive outgoing packets the only time I've used it
+fields.outgoing[0x0BF] = L{
+    {ctype='unsigned short',    label='Job Point ID'},                          -- 04   
+    {ctype='unsigned short',    label='_junk1',             const=0x0000},      -- 06   No values seen so far
+}
+
 -- Job Point Menu
 -- This packet has no content bytes
 fields.outgoing[0x0C0] = L{
@@ -539,7 +546,7 @@ fields.outgoing[0x0C0] = L{
 -- Check
 fields.outgoing[0x0DD] = L{
     {ctype='unsigned int',      label='Target ID',          fn=id},             -- 04
-    {ctype='unsigned short',    label='TargetIndex',        fn=index},          -- 08
+    {ctype='unsigned short',    label='Target Index',       fn=index},          -- 08
     {ctype='unsigned short',    label='_unknown1'},                             -- 0A
     {ctype='unsigned char',     label='Check Type'},                            -- 0C   00 = Normal /check, 01 = /checkname, 02 = /checkparam
     {ctype='char[3]',           label='_junk1'}                                 -- 0D
