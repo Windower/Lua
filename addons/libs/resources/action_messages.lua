@@ -706,6 +706,21 @@ return {
     [713] = { english="Auxiliary Accuracy: ${number} / Auxiliary Attack: ${number2}", color=91},
     [714] = { english="Ranged Accuracy: ${number} / Ranged Attack: ${number2}", color=91},
     [715] = { english="Evasion: ${number} / Defense: ${number2}", color=91}
+    [716] = { english="${actor} starts casting ${spell}.", color=50}
+    [717] = { english="You cannot call forth alter egos here.", color=121}
+    [718] = { english="${actor} gains ${number} capacity points.", color=121}
+    [719] = { english="${actor} earns a job point!", color=121}
+    [720] = { english="Your ${job_point_skill} modification has risen to level ${number}", color=121}
+    [721] = { english="You receive a bonus of ${number} fishing guild points!", color=121}
+    [722] = { english="You receive a bonus of ${number} woodworking guild points!", color=121}
+    [723] = { english="You receive a bonus of ${number} smithing guild points!", color=121}
+    [724] = { english="You receive a bonus of ${number} goldsmithing guild points!", color=121}
+    [725] = { english="You receive a bonus of ${number} clothcraft guild points!", color=121}
+    [726] = { english="You receive a bonus of ${number} leathercraft guild points!", color=121}
+    [727] = { english="You receive a bonus of ${number} bonecraft guild points!", color=121}
+    [728] = { english="You receive a bonus of ${number} alchemy guild points!", color=121}
+    [729] = { english="You receive a bonus of ${number} cooking guild points!", color=121}
+    [730] = { english="${actor} uses ${weapon_skill}${lb}${target}'s TP is reduced to ${number}.", color=101}
 }
 
 
