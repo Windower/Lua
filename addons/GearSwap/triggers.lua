@@ -103,14 +103,9 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
             
             if filter_pretarget(spell) then
                 if tonumber(splitline[splitline.n]) then
-                    local ts,id = find_command_registry_key('spell',spell) or mk_command_registry_entry(spell,spell.target.id)
-                    
-                    if outgoing_action_category_table[unify_prefix[spell.prefix]] == 3 then
-                        id = spell.index
-                    else
-                        id = spell.id
-                    end
-                    command_registry[ts].proposed_packet = assemble_action_packet(spell.target.id,spell.target.index,outgoing_action_category_table[unify_prefix[spell.prefix]],id)
+                    local ts = find_command_registry_key('spell',spell) or mk_command_registry_entry(spell,spell.target.id)
+
+                    command_registry[ts].proposed_packet = assemble_action_packet(spell.target.id,spell.target.index,outgoing_action_category_table[unify_prefix[spell.prefix]],spell.id)
                     if command_registry[ts].proposed_packet then
                         equip_sets('precast',ts,spell)
                         return true

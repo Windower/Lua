@@ -337,19 +337,17 @@ end
 ---- false to cancel further command processing and just return the command.
 -----------------------------------------------------------------------------------
 function filter_pretarget(spell)
-    local category,spell_id = outgoing_action_category_table[unify_prefix[spell.prefix]]
+    local category = outgoing_action_category_table[unify_prefix[spell.prefix]]
     if category == 3 then
-        spell_id = spell.index
         local available_spells = windower.ffxi.get_spells()
         -- filter for spells that you do not know
-        if not available_spells[spell_id] and not spell_id == 503 then
-            debug_mode_chat("Unable to execute command. You do not know that spell ("..(res.spells[spell_id][language] or spell.id)..")")
+        if not available_spells[spell.id] and not spell.id == 503 then
+            debug_mode_chat("Unable to execute command. You do not know that spell ("..(res.spells[spell.id][language] or spell.id)..")")
             return false
         end
     else
-        spell_id = spell.id
-        if (category == 7 or category == 9) and not windower.ffxi.get_abilities()[spell_id] then
-            debug_mode_chat("Unable to execute command. You do not have access to that ability ("..(res.abilities[spell_id][language] or spell_id)..")")
+        if (category == 7 or category == 9) and not windower.ffxi.get_abilities()[spell.id] then
+            debug_mode_chat("Unable to execute command. You do not have access to that ability ("..(res.abilities[spell.id][language] or spell.id)..")")
             return false
         end
     end
@@ -359,7 +357,7 @@ function filter_pretarget(spell)
         return false
     elseif spell.type == 'Ninjutsu'  then
         if player.main_job ~= 'NIN' and player.sub_job ~= 'NIN' then
-            debug_mode_chat("Unable to make action packet. You do not have access to that spell ("..(spell[language] or spell_id)..")")
+            debug_mode_chat("Unable to make action packet. You do not have access to that spell ("..(spell[language] or spell.id)..")")
             return false
         elseif not player.inventory[tool_map[spell.english]] and not (player.main_job == 'NIN' and player.inventory[universal_tool_map[spell.english]]) then
             debug_mode_chat("Unable to make action packet. You do not have the proper tools.")

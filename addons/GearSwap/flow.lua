@@ -294,11 +294,7 @@ function command_send_check(ts)
                 end
             elseif outgoing_action_category_table[unify_prefix[spell.prefix]] then
                 if filter_precast(spell) then
-                    if outgoing_action_category_table[unify_prefix[spell.prefix]] == 3 then
-                        command_registry[ts].proposed_packet = assemble_action_packet(spell.target.id,spell.target.index,outgoing_action_category_table[unify_prefix[spell.prefix]],spell.index)
-                    else
-                        command_registry[ts].proposed_packet = assemble_action_packet(spell.target.id,spell.target.index,outgoing_action_category_table[unify_prefix[spell.prefix]],spell.id)
-                    end
+                    command_registry[ts].proposed_packet = assemble_action_packet(spell.target.id,spell.target.index,outgoing_action_category_table[unify_prefix[spell.prefix]],spell.id)
                     if not command_registry[ts].proposed_packet then
                         command_registry[ts] = nil
                     end
