@@ -19,14 +19,14 @@ function parse_action_packet(act)
                 if res.action_messages[m.add_effect_message] then m.add_effect_fields = fieldsearch(res.action_messages[m.add_effect_message][language]) end
                 if res.action_messages[m.spike_effect_message] then m.spike_effect_fields = fieldsearch(res.action_messages[m.spike_effect_message][language]) end
 
-                if r_status[m.param] and m.param ~= 0 then
-                    m.status = r_status[m.param][language]
+                if res.buffs[m.param] and m.param ~= 0 then
+                    m.status = res.buffs[m.param][language]
                 end
-                if r_status[m.add_effect_param] and m.add_effect_param ~= 0 then
-                    m.add_effect_status = r_status[m.add_effect_param][language]
+                if res.buffs[m.add_effect_param] and m.add_effect_param ~= 0 then
+                    m.add_effect_status = res.buffs[m.add_effect_param][language]
                 end
-                if r_status[m.spike_effect_param] and m.spike_effect_param ~= 0 then
-                    m.spike_effect_status = r_status[m.spike_effect_param][language]
+                if res.buffs[m.spike_effect_param] and m.spike_effect_param ~= 0 then
+                    m.spike_effect_status = res.buffs[m.spike_effect_param][language]
                 end
                 m.number = 1
                 if m.has_add_effect then
@@ -126,14 +126,14 @@ function parse_action_packet(act)
             if tempact.has_spike_effect then
                 tempact.spike_effect_number = 1
             end
-            if r_status[tempact.param] and tempact.param ~= 0 then
-                tempact.status = r_status[tempact.param][language]
+            if res.buffs[tempact.param] and tempact.param ~= 0 then
+                tempact.status = res.buffs[tempact.param][language]
             end
-            if r_status[tempact.add_effect_param] and tempact.add_effect_param ~= 0 then
-                tempact.add_effect_status = r_status[tempact.add_effect_param][language]
+            if res.buffs[tempact.add_effect_param] and tempact.add_effect_param ~= 0 then
+                tempact.add_effect_status = res.buffs[tempact.add_effect_param][language]
             end
-            if r_status[tempact.spike_effect_param] and tempact.spike_effect_param ~= 0 then
-                tempact.spike_effect_status = r_status[tempact.spike_effect_param][language]
+            if res.buffs[tempact.spike_effect_param] and tempact.spike_effect_param ~= 0 then
+                tempact.spike_effect_status = res.buffs[tempact.spike_effect_param][language]
             end
         end
         
@@ -457,10 +457,10 @@ function get_spell(act)
         spell.french = spell.english
     elseif act.category == 2 and act.category == 12 then
         if msg_ID == 77 then
-            spell = r_abilities[171] -- Sange
+            spell = res.abilities[171] -- Sange
             spell.name = color_it(spell[language],color_arr.abilcol)
         elseif msg_ID == 157 then
-            spell = r_abilities[60] -- Barrage
+            spell = res.abilities[60] -- Barrage
             spell.name = color_it(spell[language],color_arr.abilcol)
         else
             spell.english = 'Ranged Attack'
@@ -471,11 +471,11 @@ function get_spell(act)
     else
         if not res.action_messages[msg_ID] then
             if T{4,8}:contains(act['category']) then
-                spell = r_spells[abil_ID]
+                spell = res.spells[abil_ID]
             elseif T{3,6,7,13,14,15}:contains(act['category']) then
-                spell = r_abilities[abil_ID] -- May have to correct for charmed pets some day, but I'm not sure there are any monsters with TP moves that give no message.
+                spell = res.abilities[abil_ID] -- May have to correct for charmed pets some day, but I'm not sure there are any monsters with TP moves that give no message.
             elseif T{5,9}:contains(act['category']) then
-                spell = r_items[abil_ID]
+                spell = res.items[abil_ID]
             else
                 spell = {none=tostring(msg_ID)} -- Debugging
             end
@@ -485,59 +485,59 @@ function get_spell(act)
         local fields = fieldsearch(res.action_messages[msg_ID][language])
         
         if fields.spell then
-            spell = r_spells[abil_ID]
+            spell = res.spells[abil_ID]
             spell.name = color_it(spell[language],color_arr.spellcol)
             spell.spell = color_it(spell[language],color_arr.spellcol)
         elseif fields.ability then
-            spell = r_abilities[abil_ID]
+            spell = res.abilities[abil_ID]
             spell.name = color_it(spell[language],color_arr.abilcol)
             spell.ability = color_it(spell[language],color_arr.abilcol)
         elseif fields.weapon_skill then
             if abil_ID > 255 then -- WZ_RECOVER_ALL is used by chests in Limbus
-                spell = res.monster_abilities[abil_ID-256]
+                spell = res.monsteres.abilities[abil_ID-256]
                 if spell.english == '.' then
                     spell.english = 'Special Attack'
                 end
             elseif abil_ID < 256 then
-                spell = r_abilities[abil_ID+768]
+                spell = res.abilities[abil_ID+768]
             end
             spell.name = color_it(spell[language],color_arr.wscol)
             spell.weapon_skill = color_it(spell[language],color_arr.wscol)
         elseif msg_ID == 303 then
-            spell = r_abilities[74] -- Divine Seal
+            spell = res.abilities[74] -- Divine Seal
             spell.name = color_it(spell[language],color_arr.abilcol)
             spell.ability = color_it(spell[language],color_arr.abilcol)
         elseif msg_ID == 304 then
-            spell = r_abilities[75] -- 'Elemental Seal'
+            spell = res.abilities[75] -- 'Elemental Seal'
             spell.name = color_it(spell[language],color_arr.abilcol)
             spell.ability = color_it(spell[language],color_arr.abilcol)
         elseif msg_ID == 305 then
-            spell = r_abilities[76] -- 'Trick Attack'
+            spell = res.abilities[76] -- 'Trick Attack'
             spell.name = color_it(spell[language],color_arr.abilcol)
             spell.ability = color_it(spell[language],color_arr.abilcol)
         elseif msg_ID == 311 or msg_ID == 311 then
-            spell = r_abilities[79] -- 'Cover'
+            spell = res.abilities[79] -- 'Cover'
             spell.name = color_it(spell[language],color_arr.abilcol)
             spell.ability = color_it(spell[language],color_arr.abilcol)
         elseif msg_ID == 240 or msg_ID == 241 then
-            spell = r_abilities[43] -- 'Hide'
+            spell = res.abilities[43] -- 'Hide'
             spell.name = color_it(spell[language],color_arr.abilcol)
             spell.ability = color_it(spell[language],color_arr.abilcol)
         end
         
         if fields.item then
             if T{125,593,594,595,596,597,598,599}:contains(msg_ID) then
-                spell.item = color_it(r_items[effect_val]['enl'], color_arr.itemcol)
+                spell.item = color_it(res.items[effect_val]['log_english'], color_arr.itemcol)
             else
-                spell = r_items[abil_ID]
-                spell.name = color_it(spell['enl'],color_arr.itemcol)
-                spell.item = color_it(spell['enl'],color_arr.itemcol)
+                spell = res.items[abil_ID]
+                spell.name = color_it(spell['log_english'],color_arr.itemcol)
+                spell.item = color_it(spell['log_english'],color_arr.itemcol)
             end
         end
         
         if fields.item2 then
-            local tempspell = r_items[effect_val]
-            spell.item2 = color_it(tempspell.enl,color_arr.itemcol)
+            local tempspell = res.items[effect_val]
+            spell.item2 = color_it(tempspell.log_english,color_arr.itemcol)
             if fields.number then
                 spell.number = act.targets[1].actions[1].add_effect_param
             end

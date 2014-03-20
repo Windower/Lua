@@ -2,13 +2,14 @@ require 'tables'
 require 'sets'
 file = require 'files'
 config = require 'config'
+require 'strings'
+res = require 'resources'
 
 require 'generic_helpers'
 require 'parse_action_packet'
 require 'statics'
-res = require 'resources'
 
-_addon.version = '3.12'
+_addon.version = '3.13'
 _addon.name = 'BattleMod'
 _addon.author = 'Byrth, maintainer: SnickySnacks'
 _addon.commands = {'bm','battlemod'}
@@ -26,8 +27,8 @@ end)
 windower.register_event('addon command',function (...)
     if debugging then windower.debug('addon command') end
     local term = table.concat({...}, ' ')
-    local splitarr = split(term,' ')
-    if splitarr[1] ~= nil then
+    local splitarr = string.split(term,' ')
+    if splitarr.n > 0 then
         if splitarr[1]:lower() == 'commamode' then
             commamode = not commamode
             windower.add_to_chat(121,'Battlemod: Comma Mode flipped! - '..tostring(commamode))
@@ -364,12 +365,12 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
             -- Condenses across multiple packets
             local status
             
-            if enfeebling:contains(am.param_1) and r_status[param_1] then
-                status = color_it(r_status[param_1][language],color_arr.enfeebcol)
+            if enfeebling:contains(am.param_1) and res.buffs[param_1] then
+                status = color_it(res.buffs[param_1][language],color_arr.enfeebcol)
             elseif color_arr.statuscol == rcol then
-                status = color_it(r_status[am.param_1][language],string.char(0x1F,191))
+                status = color_it(res.buffs[am.param_1][language],string.char(0x1F,191))
             else
-                status = color_it(r_status[am.param_1][language],color_arr.statuscol)
+                status = color_it(res.buffs[am.param_1][language],color_arr.statuscol)
             end
             
             if not multi_actor[status] then multi_actor[status] = player_info(am.actor_id) end
@@ -395,7 +396,11 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
             local fields = fieldsearch(res.action_messages[am.message_id][language])
             
             if fields.status then
-                status = (enLog[am.param_1] or nf(r_status[am.param_1],language))
+                if log_form_debuffs:contains(am.param_1) then
+                    status = res.buffs[am.param_1].log_english
+                else
+                    status = nf(res.buffs[am.param_1],language)
+                end
                 if enfeebling:contains(am.param_1) then
                     status = color_it(status,color_arr.enfeebcol)
                 else
@@ -404,11 +409,11 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
             end
             
             if fields.spell then
-                spell = nf(r_spells[am.param_1],language)
+                spell = nf(res.spells[am.param_1],language)
             end
             
             if fields.item then
-                item = nf(r_items[am.param_1],'enl')
+                item = nf(res.items[am.param_1],'log_english')
             end
             
             if fields.number then
