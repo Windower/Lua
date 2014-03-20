@@ -9,6 +9,7 @@ spellcast" project, and represents the interpretation part of spellcast.
 None  
 
 ####Changelog:  
+v1.9 - 3/20/14  - Changed Shortcuts over to use the resources library.
 v1.8 - 1/6/14   - Fix target selection. Interpret the outgoing text as an ability first (instead of combination of ability and target).
 v1.7 - 12/31/13 - Fixed st targets for shortcuts.
 v1.6 - 12/12/13 - Fixed "target is nil" bug.

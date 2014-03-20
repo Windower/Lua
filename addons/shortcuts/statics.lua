@@ -24,15 +24,6 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
-
-speFile = file.new('../../plugins/resources/spells.xml')
-jaFile = file.new('../../plugins/resources/abils.xml')
-
-r_abilities = parse_resources(jaFile:readlines())
-r_spells = parse_resources(speFile:readlines())
-
-
 -- Convert the spells and job abilities into a referenceable list of aliases --
 validabils = T{}
 
@@ -71,40 +62,21 @@ function make_abil(abil,t,i)
 	end
 end
 
-
--- Iterate through spells.xml and make validabils.
-for i,v in pairs(r_spells) do
-	v['validtarget'] = {Self=false,Player=false,Party=false,Ally=false,NPC=false,Enemy=false}
-	local potential_targets = split(v['targets'],', ')
-	for n,m in pairs(potential_targets) do
-		v['validtarget'][m] = true
-	end
-	
-	make_abil(v['english'],'r_spells',i)
-	if v['alias'] then
-		local struck = split(v['alias'],'|')
-		for n,m in pairs(struck) do
-			make_abil(m,'r_spells',i)
-		end
-	end
+-- Iterate through resources and make validabils.
+function validabils_it(resources_table,str)
+    for i,v in pairs(res.spells) do
+        make_abil(v.english,str,i)
+        if v.alias then
+            local struck = string.split(v.alias,'|')
+            for n,m in ipairs(struck) do
+                make_abil(m,str,i)
+            end
+        end
+    end
 end
 
--- Iterate through abils.xml and make validabils.
-for i,v in pairs(r_abilities) do
-	v['validtarget'] = {Self=false,Player=false,Party=false,Ally=false,NPC=false,Enemy=false}
-	local potential_targets = split(v['targets'],', ')
-	for n,m in pairs(potential_targets) do
-		v['validtarget'][m] = true
-	end
-	
-	make_abil(v['english'],'r_abilities',i)
-	if v['alias'] then
-		local struck = split(v['alias'],'|')
-		for n,m in pairs(struck) do
-			make_abil(m,'r_abilities',i)
-		end
-	end
-end
+validabils_it(res.spells,'spells')
+validabils_it(res.abilities,'abilities')
 
 if logging then
 	f:write('Counter: '..tostring(counter))
