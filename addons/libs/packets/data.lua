@@ -45,6 +45,7 @@ data.outgoing[0x085] = {name='Sell Item',           description='Sell an item fr
 data.outgoing[0x096] = {name='Synth',               description='Packet sent containing all data of an attempted synth.'}
 data.outgoing[0x0B5] = {name='Speech',              description='Packet contains normal speech.'}
 data.outgoing[0x0B6] = {name='Tell',                description='/tell\'s sent from client.'}
+data.outgoing[0x0BE] = {name='Merit Point Increase',description='Sent when you increase a merit point ability.'}
 data.outgoing[0x0BF] = {name='Job Point Increase',  description='Sent when you increase a job point ability.'}
 data.outgoing[0x0C0] = {name='Job Point Menu',      description='Sent when you open the Job Point menu and triggers Job Point Information packets.'}
 data.outgoing[0x0D3] = {name='GM Call',             description='Places a call to the GM queue.'}

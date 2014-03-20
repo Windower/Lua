@@ -531,6 +531,14 @@ fields.outgoing[0x0B6] = L{
     {ctype='char*',             label='Message'},                               -- 14   Message, occasionally terminated by spare 00 bytes.
 }
 
+-- Merit Point Increase
+fields.outgoing[0x0BE] = L{
+    {ctype='unsigned char',     label='_unknown1',          const=0x03},        -- 04   No idea what it is, but it's always 0x03 for me
+    {ctype='unsigned char',     label='Flag'},                                  -- 05   1 when you're increasing a merit point. 0 when you're decreasing it.
+    {ctype='unsigned short',    label='Merit Point Id'},                        -- 06   No known mapping, but unique to each merit point. Could be an int.
+    {ctype='unsigned int',      label='_unknown2',          const=0x00000000},  -- 08
+}
+
 -- Job Point Increase
 -- This chunk was sent on three consecutive outgoing packets the only time I've used it
 fields.outgoing[0x0BF] = L{
