@@ -107,10 +107,10 @@ end
 
 -- Returns the items, indexed by ingame ID.
 function fns.items()
-    local res = table.map(require(addon_resources .. res_name), (setmetatable-{resource_entry_mt}):cond(function(key) return type(key) == 'table' end))
+    local res = table.map(require(addon_resources .. 'items'), (setmetatable-{resource_entry_mt}):cond(function(key) return type(key) == 'table' end))
     slots[res] = table.keyset(next[2](res))
 
-    for i,v in res do
+    for i,v in pairs(res) do
         if v.races then
             res[i].races = resources.parse_flags(races)
         end
