@@ -32,10 +32,10 @@ if windower.dir_exists('../addons/shortcuts/data/') and logging then
     logfile:flush()
 end
 
-if windower.file_exists(addon_base_path..'resources.lua') then
-    local result = os.remove(addon_base_path..'resources.lua')
+if windower.file_exists(windower.addon_path..'resources.lua') then
+    local result = os.remove(windower.addon_path..'resources.lua')
     if not result then
-        os.rename(addon_base_path..'resources.lua',addon_base_path..'unnecessary.lua')
+        os.rename(windower.addon_path..'resources.lua',windower.addon_path..'unnecessary.lua')
     end
 end
 
