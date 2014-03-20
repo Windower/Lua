@@ -1317,4 +1317,4 @@ local abilities = {
     [3914] = { id=3914,recast_id=900,prefix="/monsterskill",english="Frenetic Flurry",french="Folie furieuse",german="Fanatischer Schlag",japanese="熱狂撃",type="MonsterSkill",element="None",targets={["Enemy"]=true},skill="Ability",mp_cost=0,tp_cost=150,cast_time=0,recast=0,monster_level=1,alias="" },
 }
 
-return abilities
+return abilities, {"id","recast_id","prefix","english","french","german","japanese","type","element","targets","skill","mp_cost","tp_cost","cast_time","recast","monster_level","alias"}

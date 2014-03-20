@@ -556,4 +556,4 @@ local buffs = {
     [578] = { id=578,duration=0,english="Fishy Intuition",english_log="Fishy Intuition",french="Instinct de pêcheur",german="Angelsinn",japanese="釣り師のセンス"},
 }
 
-return buffs
+return buffs, {"id","duration","english","english_log","french","german","japanese"}

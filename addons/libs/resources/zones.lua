@@ -273,4 +273,4 @@ local zones = {
     [285] = { id=285,english="Feretory",french="Sanctuaire des âmes",german="Seelenschrein",japanese="魂の聖櫃"},
 }
 
-return zones
+return zones, {"id","english","french","german","japanese"}

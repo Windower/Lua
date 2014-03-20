@@ -776,4 +776,4 @@ local spells = {
     [927] = { id=927,recast_id=927,prefix="/magic",english="Sakura",french="Sakura",german="Sakura",japanese="サクラ",type="Trust",element="Light",targets={["Self"]=true},skill="0",mp_cost="0",cast_time=2,recast=48,jobs={["WAR"]=1, ["MNK"]=1, ["WHM"]=1, ["BLM"]=1, ["RDM"]=1, ["THF"]=1, ["PLD"]=1, ["DRK"]=1, ["BST"]=1, ["BRD"]=1, ["RNG"]=1, ["SAM"]=1, ["NIN"]=1, ["DRG"]=1, ["SMN"]=1, ["BLU"]=1, ["COR"]=1, ["PUP"]=1, ["DNC"]=1, ["SCH"]=1, ["GEO"]=1, ["RUN"]=1},alias="" },
 }
 
-return spells
+return spells, {"id","recast_id","prefix","english","french","german","japanese","type","element","targets","skill","mp_cost","cast_time","recast","jobs","alias"}
