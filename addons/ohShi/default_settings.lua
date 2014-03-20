@@ -72,7 +72,11 @@ prims = S{}
 spells = {}
 jAbils = {}
 stats = {}
-trusts = S{'Kupipi','Excenmille','Naji','Ayame','Zeid','Curilla','Nanaa Mihgo','Trion','Shantotto','Volker','Ajido-Marujido'}
+trusts = S{'Kupipi','Excenmille','Naji','Ayame','Zeid','Curilla',
+            'Nanaa Mihgo','Trion','Shantotto','Volker','Ajido-Marujido',
+            'Mihli Aliapoh','Valaineral','Joachim','Lion','Prishe','Ulmia',
+            'Iron Eater','Gadalar','Naja Salaheem','Cherukiki','Nashmeira',
+            'Zazarg','Ingrid','Lheko Habhoka'}
 
 speFName = '../../plugins/resources/spells.xml'
 staFName = '../../plugins/resources/status.xml'
