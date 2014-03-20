@@ -60,7 +60,8 @@ function color_it(to_color,color)
     if not color or color == 0 then return to_color end
     
     if to_color then
-        local colarr = split(to_color,' ')
+        local colarr = string.split(to_color,' ')
+        colarr.n = nil
         return color..table.concat(colarr,rcol..' '..color)..rcol
     end
 end

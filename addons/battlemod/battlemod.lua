@@ -26,8 +26,7 @@ end)
 
 windower.register_event('addon command',function (...)
     if debugging then windower.debug('addon command') end
-    local term = table.concat({...}, ' ')
-    local splitarr = string.split(term,' ')
+    local splitarr = {...}
     if splitarr.n > 0 then
         if splitarr[1]:lower() == 'commamode' then
             commamode = not commamode
