@@ -1105,8 +1105,8 @@ fields.incoming[0x02D] = L{
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 0E   Player Index in the case of RoE log updates
     {ctype='unsigned int',      label='Param 1'},                               -- 10   EXP gained, etc. Numerator for RoE objectives
     {ctype='unsigned int',      label='Param 2'},                               -- 14   Denominator for RoE objectives
-    {ctype='unsigned short',    label='Message ID'},                            -- 18   
-    {ctype='unsigned short',    label='_flags1'},                               -- 20   This could also be a third parameter, but I suspect it is flags because I have only ever seen one bit set.
+    {ctype='unsigned short',    label='Message ID'},                            -- 18
+    {ctype='unsigned short',    label='_flags1'},                               -- 1A   This could also be a third parameter, but I suspect it is flags because I have only ever seen one bit set.
 }
 
 -- Digging Animation
