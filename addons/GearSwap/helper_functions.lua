@@ -340,30 +340,30 @@ function filter_pretarget(spell)
     local category = outgoing_action_category_table[unify_prefix[spell.prefix]]
     if category == 3 then
         local available_spells = windower.ffxi.get_spells()
-        -- filter for spells that you do not know
-        if not available_spells[spell.id] and not spell.id == 503 then
+        
+        -- Filter for spells that you do not know. Exclude Impact.
+        if not available_spells[spell.id] and not spell.id == 503 or not res.spells[spell.id].jobs[player.main_job] or not (res.spells[spell.id].jobs[player.main_job] <= player.main_job_level) then
             debug_mode_chat("Unable to execute command. You do not know that spell ("..(res.spells[spell.id][language] or spell.id)..")")
             return false
+        elseif spell.type == 'Ninjutsu'  then
+            if player.main_job ~= 'NIN' and player.sub_job ~= 'NIN' then
+                debug_mode_chat("Unable to make action packet. You do not have access to that spell ("..(spell[language] or spell.id)..")")
+                return false
+            elseif not player.inventory[tool_map[spell.english]] and not (player.main_job == 'NIN' and player.inventory[universal_tool_map[spell.english]]) then
+                debug_mode_chat("Unable to make action packet. You do not have the proper tools.")
+                return false
+            end
         end
-    else
-        if (category == 7 or category == 9) and not windower.ffxi.get_abilities()[spell.id] then
-            debug_mode_chat("Unable to execute command. You do not have access to that ability ("..(res.abilities[spell.id][language] or spell.id)..")")
-            return false
-        end
-    end
-    
-    
-    if spell.type == 'BlueMagic' and player.main_job ~= 'BLU' and player.sub_job ~= 'BLU' then
+    elseif (category == 7 or category == 9) and not windower.ffxi.get_abilities()[spell.id] then
+        debug_mode_chat("Unable to execute command. You do not have access to that ability ("..(res.abilities[spell.id][language] or spell.id)..")")
         return false
-    elseif spell.type == 'Ninjutsu'  then
-        if player.main_job ~= 'NIN' and player.sub_job ~= 'NIN' then
-            debug_mode_chat("Unable to make action packet. You do not have access to that spell ("..(spell[language] or spell.id)..")")
-            return false
-        elseif not player.inventory[tool_map[spell.english]] and not (player.main_job == 'NIN' and player.inventory[universal_tool_map[spell.english]]) then
-            debug_mode_chat("Unable to make action packet. You do not have the proper tools.")
-            return false
-        end
+    elseif category == 25 and (not player.main_job == 'MON' or not player.species or not player.species.tp_moves[spell.id-768] or not (player.species.tp_moves[spell.id-768] <= player.main_job_level)) then
+        -- Monstrosity filtering
+        debug_mode_chat("Unable to execute command. You do not have access to that monsterskill ("..(res.abilities[spell.id][language] or spell.id)..")")
+        return false
     end
+    
+    
     
     return true
 end

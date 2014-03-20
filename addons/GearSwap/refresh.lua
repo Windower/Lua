@@ -177,7 +177,7 @@ function refresh_player()
     
     for i,v in pairs(player_mob_table) do
         if i == 'name' then
-            player['mob_name'] = v
+            player.mob_name = v
         elseif i~= 'is_npc' and i~='tp' and i~='mpp' and i~='claim_id' and i~='status' then
             player[i] = v
         end
@@ -282,6 +282,17 @@ function refresh_player()
                 pet.mpp = 0
             end
         end
+    end
+    
+    if player.main_job == 'MON' and species_id ~= 0 then
+        player.species = {}
+        for i,v in pairs(res.items[species_id + 61440]) do
+            if not (i == 'category' or i == 'id') then
+                player.species[i] = v
+            end
+        end
+    else
+        player.species = nil
     end
     
     table.reassign(fellow,target_complete(windower.ffxi.get_mob_by_target('<ft>')))

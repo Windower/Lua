@@ -84,7 +84,17 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
                 r_line = res.spells[validabils[language][unify_prefix[command]][abil]]
                 storedcommand = command..' "'..r_line[language]..'" '
             elseif command_list[command] == 'Ability' then
-                r_line = res.abilities[validabils[language][unify_prefix[command]][abil]]
+                if unify_prefix[command] == '/ms' and player.species then
+                    -- Iterates over currently available monster TP moves instead of using validabils
+                    for i,v in pairs(player.species.tp_moves) do
+                        if res.abilities[i+768][language]:lower() == abil then
+                            r_line = res.abilities[i+768]
+                            break
+                        end
+                    end
+                else
+                    r_line = res.abilities[validabils[language][unify_prefix[command]][abil]]
+                end
                 storedcommand = command..' "'..r_line[language]..'" '
             elseif command_list[command] == 'Item' then
                 r_line = res.items[validabils[language][unify_prefix[command]][abil]]

@@ -229,6 +229,7 @@ disable_table[0] = false
 encumbrance_table = table.reassign({},disable_table)
 registered_user_events = {}
 empty = {name="empty"}
+species_id = 0
 outgoing_packet_table = {}
 tool_map = {
         ['Katon: Ichi'] = 'Uchitake',

@@ -1,4 +1,6 @@
 -------------------------------------------------
+GearSwap 0.833 - Added the first version of a more authentic filter.
+-------------------------------------------------
 GearSwap 0.832 - Adapted GearSwap for the .lua version of resources lib.
 -------------------------------------------------
 GearSwap 0.830 - Fixed various bugs. Differentiated pretarget and precast delays. Augments work again.
