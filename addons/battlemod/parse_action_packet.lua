@@ -527,17 +527,17 @@ function get_spell(act)
         
         if fields.item then
             if T{125,593,594,595,596,597,598,599}:contains(msg_ID) then
-                spell.item = color_it(res.items[effect_val]['log_english'], color_arr.itemcol)
+                spell.item = color_it(res.items[effect_val]['english_log'], color_arr.itemcol)
             else
                 spell = res.items[abil_ID]
-                spell.name = color_it(spell['log_english'],color_arr.itemcol)
-                spell.item = color_it(spell['log_english'],color_arr.itemcol)
+                spell.name = color_it(spell['english_log'],color_arr.itemcol)
+                spell.item = color_it(spell['english_log'],color_arr.itemcol)
             end
         end
         
         if fields.item2 then
             local tempspell = res.items[effect_val]
-            spell.item2 = color_it(tempspell.log_english,color_arr.itemcol)
+            spell.item2 = color_it(tempspell.english_log,color_arr.itemcol)
             if fields.number then
                 spell.number = act.targets[1].actions[1].add_effect_param
             end

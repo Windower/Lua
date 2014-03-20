@@ -473,9 +473,9 @@ function refresh_item_list(itemlist)
                 retarr[res.items[v.id][language]] = {id=v.id, count=v.count, shortname=res.items[v.id][language]:lower()}
                 -- If a long version of the name exists, and is different from the short version,
                 -- add the long name to the info table and point the long name's key at that table.
-                if res.items[v.id]['log_'..language] and res.items[v.id]['log_'..language]:lower() ~= res.items[v.id][language]:lower() then
-                    retarr[res.items[v.id][language]].longname = res.items[v.id]['log_'..language]:lower()
-                    retarr[res.items[v.id]['log_'..language]] = retarr[res.items[v.id][language]]
+                if res.items[v.id][language..'_log'] and res.items[v.id][language..'_log']:lower() ~= res.items[v.id][language]:lower() then
+                    retarr[res.items[v.id][language]].longname = res.items[v.id][language..'_log']:lower()
+                    retarr[res.items[v.id][language..'_log']] = retarr[res.items[v.id][language]]
                 end
             elseif res.items[v.id] and res.items[v.id][language] then
                 -- If there's already an entry for this item, all the hard work has already

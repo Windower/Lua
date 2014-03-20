@@ -61,7 +61,7 @@ end
 
 function name_match(item_id,name)
     if res.items[item_id] then
-        return (res.items[item_id]['log_'..language]:lower() == name:lower() or res.items[item_id][language]:lower() == name:lower())
+        return (res.items[item_id][language..'_log']:lower() == name:lower() or res.items[item_id][language]:lower() == name:lower())
     else
         return false
     end

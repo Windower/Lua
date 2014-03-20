@@ -396,7 +396,7 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
             
             if fields.status then
                 if log_form_debuffs:contains(am.param_1) then
-                    status = res.buffs[am.param_1].log_english
+                    status = res.buffs[am.param_1].english_log
                 else
                     status = nf(res.buffs[am.param_1],language)
                 end
@@ -412,7 +412,7 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
             end
             
             if fields.item then
-                item = nf(res.items[am.param_1],'log_english')
+                item = nf(res.items[am.param_1],'english_log')
             end
             
             if fields.number then
