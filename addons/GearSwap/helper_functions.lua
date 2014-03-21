@@ -342,7 +342,10 @@ function filter_pretarget(spell)
         local available_spells = windower.ffxi.get_spells()
         
         -- Filter for spells that you do not know. Exclude Impact.
-        if not available_spells[spell.id] and not spell.id == 503 or not res.spells[spell.id].jobs[player.main_job] or not (res.spells[spell.id].jobs[player.main_job] <= player.main_job_level) then
+        if (not available_spells[spell.id] and not spell.id == 503) or
+            -- Filter for spells that you know, but do not currently have access to
+            ((not res.spells[spell.id].jobs[player.main_job] or not (res.spells[spell.id].jobs[player.main_job] <= player.main_job_level)) and
+            (not res.spells[spell.id].jobs[player.sub_job] or not (res.spells[spell.id].jobs[player.sub_job] < player.sub_job_level))) then
             debug_mode_chat("Unable to execute command. You do not know that spell ("..(res.spells[spell.id][language] or spell.id)..")")
             return false
         elseif spell.type == 'Ninjutsu'  then
