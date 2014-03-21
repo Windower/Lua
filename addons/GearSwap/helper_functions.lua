@@ -340,13 +340,42 @@ function filter_pretarget(spell)
     local category = outgoing_action_category_table[unify_prefix[spell.prefix]]
     if category == 3 then
         local available_spells = windower.ffxi.get_spells()
+        local spell_jobs = res.spells[spell.id].jobs
         
         -- Filter for spells that you do not know. Exclude Impact.
-        if (not available_spells[spell.id] and not spell.id == 503) or
-            -- Filter for spells that you know, but do not currently have access to
-            ((not res.spells[spell.id].jobs[player.main_job] or not (res.spells[spell.id].jobs[player.main_job] <= player.main_job_level)) and
-            (not res.spells[spell.id].jobs[player.sub_job] or not (res.spells[spell.id].jobs[player.sub_job] < player.sub_job_level))) then
+        if not available_spells[spell.id] and not spell.id == 503 then
             debug_mode_chat("Unable to execute command. You do not know that spell ("..(res.spells[spell.id][language] or spell.id)..")")
+        -- Filter for spells that you know, but do not currently have access to
+        elseif (not spell_jobs[player.main_job] or not (spell_jobs[player.main_job] <= player.main_job_level)) and
+            (not spell_jobs[player.sub_job] or not (spell_jobs[player.sub_job] < player.sub_job_level)) then
+            debug_mode_chat("Unable to execute command. You do not have access to that spell ("..(res.spells[spell.id][language] or spell.id)..")")
+            return false
+        -- At this point, we know that it is technically castable by this job combination if the right conditions are met.
+        elseif player.main_job == 'SCH' and ((addendum_white[spell.id] and not buffactive['Addendum: White']) or
+            (addendum_black[spell.id] and not buffactive['Addendum: Black'])) and not (spell_jobs[player.sub_job]
+            and spell_jobs[player.sub_job] <= player.sub_job_level) then
+            
+            if addendum_white[spell.id] then
+                debug_mode_chat("Unable to execute command. Addendum: White required for that spell ("..(res.spells[spell.id][language] or spell.id)..")")
+            end
+            if addendum_black[spell.id] then
+                debug_mode_chat("Unable to execute command. Addendum: Black required for that spell ("..(res.spells[spell.id][language] or spell.id)..")")
+            end
+            return false
+        elseif player.sub_job == 'SCH' and ((addendum_white[spell.id] and not buffactive['Addendum: White']) or
+            (addendum_black[spell.id] and not buffactive['Addendum: Black'])) and not (spell_jobs[player.main_job]
+            and spell_jobs[player.main_job] <= player.main_job_level) then
+            
+            if addendum_white[spell.id] then
+                debug_mode_chat("Unable to execute command. Addendum: White required for that spell ("..(res.spells[spell.id][language] or spell.id)..")")
+            end
+            if addendum_black[spell.id] then
+                debug_mode_chat("Unable to execute command. Addendum: Black required for that spell ("..(res.spells[spell.id][language] or spell.id)..")")
+            end
+            return false
+        elseif spell.type == 'BlueMagic' and not (player.main_job == 'BLU' and table.contains(windower.ffxi.get_mjob_data().spells,spell.id)) and not
+            (player.sub_job == 'BLU' and table.contains(windower.ffxi.get_sjob_data().spells,spell.id)) then
+            debug_mode_chat("Unable to execute command. Blue magic must be set to cast that spell ("..(res.spells[spell.id][language] or spell.id)..")")
             return false
         elseif spell.type == 'Ninjutsu'  then
             if player.main_job ~= 'NIN' and player.sub_job ~= 'NIN' then
