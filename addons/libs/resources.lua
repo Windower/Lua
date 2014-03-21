@@ -58,20 +58,8 @@ resource_mt.__index = function(t, k)
 end
 resource_mt.__class = 'Resource'
 
-local plugin_resources = '../../plugins/resources/'
-local addon_resources = 'resources/'
-
-local unquotes = {
-    ['quot'] = '"',
-    ['amp'] = '&',
-    ['gt'] = '>',
-    ['lt'] = '<',
-    ['apos'] = '\'',
-}
-
-local unquote = function(str)
-    return (str:gsub('&(.-);', unquotes))
-end
+local plugin_resources = windower.addon_path .. '../../plugins/resources/'
+local addon_resources = windower.addon_path .. '../libs/resources/'
 
 local flag_cache = {}
 resources.parse_flags = function(bits)
@@ -95,32 +83,33 @@ resources.parse_flags = function(bits)
     return flag_cache[bits]
 end
 
+local language_strings = S{'english', 'japanese', 'german', 'french'}
+
 -- Add resources from files
 local res_names = S{'jobs', 'races', 'weather', 'servers', 'chat', 'bags', 'slots', 'statuses', 'emotes', 'skills', 'titles', 'encumbrance', 'check_ratings', 'synth_ranks', 'days', 'moon_phases', 'elements', 'monster_abilities', 'action_messages', 'abilities', 'spells', 'buffs', 'zones'}
 for res_name in res_names:it() do
     fns[res_name] = function()
-        local res = table.map(require(addon_resources .. res_name), (setmetatable-{resource_entry_mt}):cond(function(key) return type(key) == 'table' end))
-        slots[res] = table.keyset(next[2](res))
+        local res, slot_table = dofile(addon_resources .. res_name .. '.lua')
+        res = table.map(res, (setmetatable-{resource_entry_mt}):cond(function(key) return type(key) == 'table' end))
+        slots[res] = S(slot_table) or language_strings + table.keyset(next[2](res))
         return res
     end
 end
 
 -- Returns the items, indexed by ingame ID.
 function fns.items()
-    local res = table.map(require(addon_resources .. 'items'), (setmetatable-{resource_entry_mt}):cond(function(key) return type(key) == 'table' end))
-    slots[res] = table.keyset(next[2](res))
+    local res, slot_table = dofile(addon_resources .. 'items.lua')
+    res = table.map(res, (setmetatable-{resource_entry_mt}):cond(functions.equals('table') .. type))
+    slots[res] = language_strings + S(slot_table)
 
-    for i,v in pairs(res) do
-        if v.races then
+    for i, v in pairs(res) do
+        if v.category ~= 'General' then
             res[i].races = resources.parse_flags(v.races)
-        end
-        if v.jobs then
             res[i].jobs = resources.parse_flags(v.jobs)
-        end
-        if v.slots then
             res[i].slots = resources.parse_flags(v.slots)
         end
     end
+
     return res
 end
 
