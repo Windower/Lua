@@ -261,15 +261,15 @@ function refresh_player()
                     pet.available_frames[res.items[id][language]] = true
                 end
             end
-            --for i,id in pairs(auto_tab.available_attachments) do
-            --    if res.items[id] and type(res.items[id]) == 'table' then
-            --        pet.available_attachments[res.items[id][language]] = true
-            --    end
-            --end
+            for i,id in pairs(auto_tab.available_attachments) do
+                if res.items[id] and type(res.items[id]) == 'table' then
+                    pet.available_attachments[res.items[id][language]] = true
+                end
+            end
 
             -- actual parts
-            pet.head = res.items[auto_tab.head+8192][language]
-            pet.frame = res.items[auto_tab.frame+8223][language]
+            pet.head = res.items[auto_tab.head][language]
+            pet.frame = res.items[auto_tab.frame][language]
             for i,id in pairs(auto_tab.attachments) do
                 if res.items[id] and type(res.items[id]) == 'table' then
                     pet.attachments[res.items[id][language]] = true
