@@ -38,14 +38,14 @@ end
  
 function smn_sub(player_array,spell_ID,abil_ID,mob_ID,info) -- Determines ambiguous black magic that can be subbed. Defaults to black magic
     local abils = windower.ffxi.get_abilities()
-    if player_array['main_job_id'] == 15 and not (info:contains(player_array['sub_job_id'])) and abils[abil_ID] then
+    if player_array.main_job_id == 15 and not (info:contains(player_array.sub_job_id)) and abils[abil_ID] then
         return 'Ability' -- Returns the SMN ability if it's a SMN main without a sub that has access to the spell
-    elseif player_array['main_job_id'] == 15 and (info:contains(player_array['sub_job_id'])) then
+    elseif (player_array.main_job_id == 15 and (info:contains(player_array.sub_job_id))) or (player_array.sub_job_id == 15 and (info:contains(player_array.main_job_id))) then
         local pet_array = windower.ffxi.get_mob_by_target('pet')
         local known_spells = windower.ffxi.get_spells()
         if not pet_array and known_spells[spell_ID] then return 'Magic' end
         local recasts = windower.ffxi.get_ability_recasts()
-        if (info:contains(pet_array['name']) and info:contains('Ward') and recasts[174]<=10) or (info:contains(pet_array['name']) and info:contains('Rage') and recasts[173]<=10) then
+        if (info:contains(pet_array.name) and info:contains('Ward') and recasts[174]<=10) or (info:contains(pet_array.name) and info:contains('Rage') and recasts[173]<=10) then
             return 'Ability' -- Returns the SMN ability if it's a SMN main with an appropriate avatar summoned and the BP timer is up.
         else
             return 'Magic'
@@ -298,6 +298,8 @@ regeneration={spell_ID=664,mob_ID=1186,funct=magic_mob},
 
 
  
+raiseii={spell_ID=13,abil_ID=525,funct=smn_sub,info=T{4,'Cait Sith','Ward'}},
+reraiseii={spell_ID=141,abil_ID=526,funct=smn_sub,info=T{4,'Cait Sith','Ward'}},
 sleepga={spell_ID=273,abil_ID=611,funct=smn_sub,info=T{4,'Shiva','Ward'}},
 stoneii={spell_ID=160,abil_ID=561,funct=smn_sub,info=T{4,5,8,20,21,'Titan','Rage'}},
 waterii={spell_ID=170,abil_ID=577,funct=smn_sub,info=T{4,5,8,20,21,'Leviathan','Rage'}},
