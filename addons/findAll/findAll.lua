@@ -38,12 +38,16 @@ require('lists')
 require('logger')
 require('sets')
 require('tables')
+require('strings')
 
 json  = require('json')
 file  = require('files')
 slips = require('slips')
 
-zone_search          = true
+zone_search            = true
+first_pass             = true
+time_out_offset        = 0
+next_sequence_offset   = 0
 item_names             = T{}
 global_storages        = T{}
 storages_path          = 'data/storages.json'
@@ -338,54 +342,80 @@ end
 windower.register_event('load', update:cond(function() return windower.ffxi.get_info().logged_in end))
 
 windower.register_event('incoming chunk', function(id,original,modified,injected,blocked)
-	if next_sequence and (original:byte(4)*256+original:byte(3) >= next_sequence or original:byte(4)*256+original:byte(3) >= time_out) then
+    local seq = original:byte(4)*256+original:byte(3)
+	if (next_sequence and seq + next_sequence_offset >= next_sequence) or (time_out and seq + time_out_offset >= time_out) then
         zone_search = true
 		update()
 		next_sequence = nil
         time_out = nil
+        sequence_offset = 0
 	end
 	
 	if id == 0x00A then -- First packet of a new zone
 		zone_search = false
-        time_out = (original:byte(4)*256+original:byte(3)+33)%0x100
+        time_out = seq+33
+        if time_out < time_out%0x100 then
+            time_out_offset = 256
+        end
         
-	elseif id == 0x01D then
+--	elseif id == 0x01D then
 	-- This packet indicates that the temporary item structure should be copied over to
 	-- the real item structure, accessed with get_items(). Thus we wait one packet and
 	-- then trigger an update.
-        zone_search = true
-		next_sequence = (original:byte(4)*256+original:byte(3)+1)%0x100
-    elseif (id == 0x20 or id == 0x1F or id == 0x1E) and zone_search then
-        next_sequence = (original:byte(4)*256+original:byte(3)+1)%0x100
+--        zone_search = true
+--		next_sequence = seq+128
+--        if next_sequence < next_sequence%0x100 then
+--            next_sequence_offset = 256
+--        end
+    elseif (id == 0x1E or id == 0x1F or id == 0x20) and zone_search then
+    -- Inventory Finished packets aren't sent for trades and such, so this is more
+    -- of a catch-all approach. There is a subtantial delay to avoid spam writing.
+        next_sequence = seq+128
+        if next_sequence < next_sequence%0x100 then
+            next_sequence_offset = 256
+        end
 	end
 end)
 
-windower.register_event('addon command', function(...)
-    local params = L{...}
-    local query  = L{}
-    local export = nil
-
-    while params:length() > 0 and params[1]:match('^[:!]%a+$') do
-        query:append(params:remove(1))
+windower.register_event('ipc message', function(str)
+    if str == 'findAll update' then
+        update()
     end
+end)
 
-    if params:length() > 0 then
-        export = params[params:length()]:match('^--export=(.+)$') or params[params:length()]:match('^-e(.+)$')
+windower.register_event('addon command', function(...)
+    if first_pass then
+        first_pass = false
+        windower.send_ipc_message('findAll update')
+        windower.send_command('wait 0.05;findall '..table.concat({...},' '))
+    else
+        first_pass = true
+        local params = L{...}
+        local query  = L{}
+        local export = nil
 
-        if export ~= nil then
-            export = export:gsub('%.csv$', '')..'.csv'
-
-            params:remove(params:length())
-
-            if export:match('['..('\\/:*?"<>|'):escape()..']') then
-                export = nil
-
-                error('The filename cannot contain any of the following characters: \\ / : * ? " < > |')
-            end
+        while params:length() > 0 and params[1]:match('^[:!]%a+$') do
+            query:append(params:remove(1))
         end
 
-        query:append(params:concat(' '))
-    end
+        if params:length() > 0 then
+            export = params[params:length()]:match('^--export=(.+)$') or params[params:length()]:match('^-e(.+)$')
 
-    search(query, export)
+            if export ~= nil then
+                export = export:gsub('%.csv$', '')..'.csv'
+
+                params:remove(params:length())
+
+                if export:match('['..('\\/:*?"<>|'):escape()..']') then
+                    export = nil
+
+                    error('The filename cannot contain any of the following characters: \\ / : * ? " < > |')
+                end
+            end
+
+            query:append(params:concat(' '))
+        end
+        
+        search(query, export)
+    end
 end)
