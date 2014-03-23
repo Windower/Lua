@@ -43,7 +43,7 @@ json  = require('json')
 file  = require('files')
 slips = require('slips')
 
-enable_search          = true
+zone_search          = true
 item_names             = T{}
 global_storages        = T{}
 storages_path          = 'data/storages.json'
@@ -279,7 +279,7 @@ function update()
         return false
     end
 
-    if enable_search == false then
+    if zone_search == false then
         notice('findAll has not detected a fully loaded inventory yet.')
         return false
 	end
@@ -338,19 +338,25 @@ end
 windower.register_event('load', update:cond(function() return windower.ffxi.get_info().logged_in end))
 
 windower.register_event('incoming chunk', function(id,original,modified,injected,blocked)
-	if next_sequence and original:byte(4)*256+original:byte(3) == next_sequence then
-		enable_search = true
+	if next_sequence and (original:byte(4)*256+original:byte(3) >= next_sequence or original:byte(4)*256+original:byte(3) >= time_out) then
+        zone_search = true
 		update()
 		next_sequence = nil
+        time_out = nil
 	end
 	
 	if id == 0x00A then -- First packet of a new zone
-		enable_search = false
+		zone_search = false
+        time_out = (original:byte(4)*256+original:byte(3)+33)%0x100
+        
 	elseif id == 0x01D then
 	-- This packet indicates that the temporary item structure should be copied over to
 	-- the real item structure, accessed with get_items(). Thus we wait one packet and
 	-- then trigger an update.
+        zone_search = true
 		next_sequence = (original:byte(4)*256+original:byte(3)+1)%0x100
+    elseif (id == 0x20 or id == 0x1F or id == 0x1E) and zone_search then
+        next_sequence = (original:byte(4)*256+original:byte(3)+1)%0x100
 	end
 end)
 
