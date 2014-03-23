@@ -1,5 +1,5 @@
 local abilities = {
-    [1] = { id=1,recast_id=0,prefix="/echo",english="Ranged",french="Attaque à dist.",german="Fernwaffe",japanese="飛び道具",type="Misc",element="None",targets={["Self"]=true},skill="Ability",mp_cost=0,tp_cost=0,cast_time=0,recast=0,monster_level=0,alias="" },
+    [1] = { id=1,recast_id=0,prefix="/range",english="Ranged",french="Attaque à dist.",german="Fernwaffe",japanese="飛び道具",type="Misc",element="None",targets={["Enemy"]=true},skill="Ability",mp_cost=0,tp_cost=0,cast_time=0,recast=0,monster_level=0,alias="" },
     [2] = { id=2,recast_id=0,prefix="/echo",english="Weapon Abilities",french="Compétence arme",german="Waffenfähigkeiten",japanese="武器技",type="Misc",element="None",targets={["Self"]=true},skill="Ability",mp_cost=0,tp_cost=0,cast_time=0,recast=0,monster_level=0,alias="" },
     [3] = { id=3,recast_id=0,prefix="/echo",english="Fish",french="Pêche",german="Angeln",japanese="釣る",type="Misc",element="None",targets={["Self"]=true},skill="Ability",mp_cost=0,tp_cost=0,cast_time=0,recast=0,monster_level=0,alias="" },
     [4] = { id=4,recast_id=0,prefix="/echo",english="Dig",french="Creuser",german="Graben",japanese="掘る",type="Misc",element="None",targets={["Self"]=true},skill="Ability",mp_cost=0,tp_cost=0,cast_time=0,recast=0,monster_level=0,alias="" },
