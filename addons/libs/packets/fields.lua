@@ -1215,7 +1215,7 @@ fields.incoming[0x03C] = L{
 -- subjob and has the Subjob flag flipped.
 fields.incoming._mult[0x044] = {}
 fields.incoming[0x044] = function(data)
-    return fields.incoming._mult[0x044].base + [data:sub(5,5):byte()]
+    return fields.incoming._mult[0x044].base + fields.incoming._mult[data:sub(5,5):byte()]
 end
 
 -- Base, shared by all jobs
