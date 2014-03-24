@@ -1,5 +1,6 @@
 config = require ('config')
 texts  = require('texts')
+require('pack')
 
 _addon.name     = 'PetTP'
 _addon.author   = 'SnickySnacks'
