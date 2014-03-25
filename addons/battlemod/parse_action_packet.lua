@@ -250,7 +250,7 @@ function parse_action_packet(act)
                 local msg,numb = simplify_message(m.add_effect_message)
                 if m.add_effect_fields.status then numb = m.add_effect_status else numb = pref_suf((m.cadd_effect_param or m.add_effect_param),m.add_effect_message) end
                 if not act.action then
-                    windower.add_to_chat(color, 'act.action==nil : '..m.message..' - '..m.add_effect_message..' - '..msg)
+--                    windower.add_to_chat(color, 'act.action==nil : '..m.message..' - '..m.add_effect_message..' - '..msg)
                 else
                     windower.add_to_chat(color,make_condensedamage_number(m.add_effect_number)..(msg
                         :gsub('${spell}',act.action.spell or 'ERROR 127')
@@ -264,14 +264,27 @@ function parse_action_packet(act)
                         :gsub('${lb}','\7')
                         :gsub('${number}',m.add_effect_param)
                         :gsub('${status}',m.add_effect_status or 'ERROR 178')))
+                        m.add_effect_message = 0
                 end
-                m.add_effect_message = 0
             end
             if m.has_spike_effect and m.spike_effect_message ~= 0 and spike_effect_valid[act.category] then
                 local targ = assemble_targets(act.actor,v.target,act.category,m.spike_effect_message)
                 local color = color_filt(res.action_messages[m.spike_effect_message].color,act.actor.id==Self.id)
-                if m.spike_effect_message == 33 then m.simp_spike_name = 'countered by' else
-                    m.simp_spike_name = 'spikes' end
+                
+                if m.spike_effect_message == 14 then 
+                    m.simp_spike_name = 'from counter'
+                elseif T{33,606}:contains(m.spike_effect_message) then
+                    m.simp_spike_name = 'counter'
+                elseif m.spike_effect_message == 592 then
+                    m.simp_spike_name = 'missed counter'
+                elseif m.spike_effect_message == 536 then
+                    m.simp_spike_name = 'retaliation'
+                elseif m.spike_effect_message == 535 then
+                    m.simp_spike_name = 'from retaliation'
+                else
+                    m.simp_spike_name = 'spikes' 
+                end
+
                 local msg = simplify_message(m.spike_effect_message)
                 if m.spike_effect_fields.status then numb = m.spike_effect_status else numb = pref_suf((m.cspike_effect_param or m.spike_effect_param),m.spike_effect_message) end
                 windower.add_to_chat(color,make_condensedamage_number(m.spike_effect_number)..(msg
@@ -281,8 +294,8 @@ function parse_action_packet(act)
                     :gsub('${weapon_skill}',act.action.weapon_skill or 'ERROR 145')
                     :gsub('${abil}',m.simp_spike_name or act.action.name or 'ERROR 146')
                     :gsub('${numb}',numb or 'ERROR 147')
-                    :gsub('${actor}',color_it(act.actor.name,color_arr[act.actor.owner or act.actor.type]))
-                    :gsub('${target}',targ)
+                    :gsub('${target}',color_it(act.actor.name,color_arr[act.actor.owner or act.actor.type]))
+                    :gsub('${actor}',targ)
                     :gsub('${lb}','\7')
                     :gsub('${number}',m.spike_effect_param)
                     :gsub('${status}',m.spike_effect_status or 'ERROR 150')))
@@ -310,7 +323,7 @@ function simplify_message(msg_ID)
     local fields = fieldsearch(msg)
 
     if simplify and not T{23,125,129,133,139,140,153,244,453,557,593,594,595,596,597,598,599,674}:contains(msg_ID) then
-        if T{93,273,522,653,654,655,656,85,284,75,156,189,248,283,312,323,336,355,408,422,423,425,659,158,245,324,592,658}:contains(msg_ID) then
+        if T{93,273,522,653,654,655,656,85,284,75,156,189,248,283,312,323,336,355,408,422,423,425,659,158,245,324,658}:contains(msg_ID) then
             fields.status = true
         end
         if msg_ID == 31 then
