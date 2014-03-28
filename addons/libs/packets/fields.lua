@@ -225,9 +225,10 @@ local enums = {
         kesu = 'Disappear',
     },
     ['itemstat'] = {
-        [0x00] = 'Regular',
+        [0x00] = 'None',
         [0x05] = 'Equipped',
-        [0x13] = 'Linkshell',
+        [0x13] = 'Active linkshell',
+        [0x19] = 'Bazaaring',
     },
     ['ws track'] = {
         [1] = 'Update',
@@ -306,35 +307,35 @@ fields.outgoing[0x01A] = L{
 
 -- Drop Item
 fields.outgoing[0x028] = L{
-    {ctype='unsigned int',      label='Quantity'},                              -- 04
-    {ctype='unsigned char',     label='Current Bag ID',     fn=bag},            -- 08
-    {ctype='unsigned char',     label='Inventory Index'},                       -- 09 -- For the item being dropped
-    {ctype='unsigned short',    label='_unknown2'},                             -- 10
+    {ctype='unsigned int',      label='Count'},                                 -- 04
+    {ctype='unsigned char',     label='Bag',                fn=bag},            -- 08
+    {ctype='unsigned char',     label='Inventory Index',    fn=invp+{0x08}},    -- 09
+    {ctype='unsigned short',    label='_junk1'},                                -- 0A
 }
 
 -- Move Item
 fields.outgoing[0x029] = L{
-    {ctype='unsigned int',      label='Quantity'},                              -- 04
-    {ctype='unsigned char',     label='Current Bag ID',     fn=bag},            -- 08
-    {ctype='unsigned char',     label='Target Bag ID',      fn=bag},            -- 09
-    {ctype='unsigned char',     label='Inventory Index'},                       -- 10   For the item being moved
-    {ctype='unsigned char',     label='_unknown2'},                             -- 11   Has taken the value 52. Unclear purpose.
+    {ctype='unsigned int',      label='Count'},                                 -- 04
+    {ctype='unsigned char',     label='Bag',                fn=bag},            -- 08
+    {ctype='unsigned char',     label='Target Bag',         fn=bag},            -- 09
+    {ctype='unsigned char',     label='Inventory Index',    fn=invp+{0x08}},    -- 0A
+    {ctype='unsigned char',     label='_junk1'},                                -- 0B   Has taken the value 52. Unclear purpose.
 }
 
 -- Menu Item
 fields.outgoing[0x036] = L{
 -- Item order is Gil -> top row left-to-right -> bottom row left-to-right, but
 -- they slide up and fill empty slots
-    {ctype='unsigned int',      label='Target ID',          fn=id},             -- 04
-    {ctype='unsigned int',      label='Item 1 Quantity'},                       -- 08
-    {ctype='unsigned int',      label='Item 2 Quantity'},                       -- 0C
-    {ctype='unsigned int',      label='Item 3 Quantity'},                       -- 10
-    {ctype='unsigned int',      label='Item 4 Quantity'},                       -- 14
-    {ctype='unsigned int',      label='Item 5 Quantity'},                       -- 18
-    {ctype='unsigned int',      label='Item 6 Quantity'},                       -- 1C
-    {ctype='unsigned int',      label='Item 7 Quantity'},                       -- 20
-    {ctype='unsigned int',      label='Item 8 Quantity'},                       -- 24
-    {ctype='unsigned int',      label='Item 9 Quantity'},                       -- 28
+    {ctype='unsigned int',      label='Target',             fn=id},             -- 04
+    {ctype='unsigned int',      label='Item 1 Count'},                          -- 08
+    {ctype='unsigned int',      label='Item 2 Count'},                          -- 0C
+    {ctype='unsigned int',      label='Item 3 Count'},                          -- 10
+    {ctype='unsigned int',      label='Item 4 Count'},                          -- 14
+    {ctype='unsigned int',      label='Item 5 Count'},                          -- 18
+    {ctype='unsigned int',      label='Item 6 Count'},                          -- 1C
+    {ctype='unsigned int',      label='Item 7 Count'},                          -- 20
+    {ctype='unsigned int',      label='Item 8 Count'},                          -- 24
+    {ctype='unsigned int',      label='Item 9 Count'},                          -- 28
     {ctype='unsigned int',      label='_unknown1'},                             -- 2C
     {ctype='unsigned char',     label='Item 1 Index',       fn=inv+{0}},        -- 30   Gil has an Inventory Index of 0
     {ctype='unsigned char',     label='Item 2 Index',       fn=inv+{0}},        -- 31
@@ -992,15 +993,16 @@ fields.incoming[0x01E] = L{
     {ctype='unsigned int',      label='Count'},                                 -- 04
     {ctype='unsigned char',     label='Bag',                fn=bag},            -- 08
     {ctype='unsigned char',     label='Index',              fn=inv+{0}},        -- 09
+    {ctype='unsigned short',    label='_junk1'},                                -- 10
 }
 
 -- Item Assign
 fields.incoming[0x01F] = L{
     {ctype='unsigned int',      label='Count'},                                 -- 04
     {ctype='unsigned short',    label='ID',                 fn=item},           -- 08
-    {ctype='unsigned char',     label='_padding1',          const=0x00},        -- 0A
-    {ctype='unsigned char',     label='Index',              fn=inv+{0}},        -- 0B
-    {ctype='unsigned char',     label='Status'},                                -- 0C
+    {ctype='unsigned char',     label='Bag',                fn=bag},            -- 0A
+    {ctype='unsigned char',     label='Index',              fn=invp+{0x0A}},    -- 0B
+    {ctype='unsigned char',     label='Status',             fn=e+{'itemstat'}}, -- 0C
 }
 
 -- Item Updates
@@ -1692,8 +1694,9 @@ fields.incoming[0x0D2] = L{
     {ctype='unsigned short',    label='Item',               fn=item},           -- 10
     {ctype='unsigned short',    label='Dropper Index',      fn=index},          -- 12
     {ctype='unsigned short',    label='Pool Index'},                            -- 14   This is the internal index in memory, not the one it appears in in the menu
-    {ctype='unsigned short',    label='_unknown4'},                             -- 16   First byte seems to always be 00, second seemingly random, both 00 and FF observed
-    {ctype='unsigned int',      label='Timestamp',          fn=time},           -- 18
+    {ctype='unsigned char',     label='_unknown4',          const=0x00},        -- 16   Seems to always be 00
+    {ctype='unsigned char',     label='_unknown5'},                             -- 17   Seemingly random, both 00 and FF observed, as well as many values in between
+    {ctype='unsigned int',      label='Timestamp',          fn=utime},          -- 18
     {ctype='char[28]',          label='_unknown6'},                             -- AC   Always 0 it seems?
     {ctype='unsigned int',      label='_junk1'},                                -- 38
 }
