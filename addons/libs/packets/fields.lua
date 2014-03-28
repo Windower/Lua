@@ -224,6 +224,11 @@ local enums = {
         deru = 'Appear',
         kesu = 'Disappear',
     },
+    ['itemstat'] = {
+        [0x00] = 'Regular',
+        [0x05] = 'Equipped',
+        [0x13] = 'Linkshell',
+    },
     ['ws track'] = {
         [1] = 'Update',
         [2] = 'Reset (zone)',
@@ -249,7 +254,7 @@ local enums = {
 }
 
 local function e(t, val)
-    return enums[t][val]
+    return enums[t][val] or 'Unknown value for \'%s\': %i':format(t, val)
 end
 
 --[[
@@ -1005,7 +1010,9 @@ fields.incoming[0x020] = L{
     {ctype='unsigned short',    label='ID',                 fn=item},           -- 0C
     {ctype='unsigned char',     label='Bag',                fn=bag},            -- 0E
     {ctype='unsigned char',     label='Index',              fn=invp+{0x0E}},    -- 0F
-    {ctype='char[28]',          label='ExtData',            fn='...':fn()},     -- 10
+    {ctype='unsigned char',     label='Status',             fn=e+{'itemstat'}}, -- 10
+    {ctype='char[24]',          label='ExtData',            fn='...':fn()},     -- 11
+    {ctype='char[3]',           label='_junk1'},                                -- 29
 }
 
 -- Trade request received
