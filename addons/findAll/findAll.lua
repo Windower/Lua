@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name    = 'findAll'
 _addon.author  = 'Zohno'
-_addon.version = '1.20131120'
+_addon.version = '1.20140328'
 _addon.command = 'findAll'
 
 require('chat')
