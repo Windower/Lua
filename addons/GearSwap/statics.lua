@@ -63,7 +63,7 @@ for i,v in pairs(res.abilities) do
 end
 
 for i,v in pairs(res.items) do
-    if v.targets and v.targets:length() ~= 0 then
+    if v.targets and table.length(v.targets) ~= 0 then
         make_entry(v,'Item',i)
     end
 end
@@ -119,6 +119,13 @@ avatar_element = {Ifrit='Fire',Titan='Earth',Leviathan='Water',Garuda='Wind',Shi
     ['Dark Elemental']='Dark'}
 encumbrance_map = {0x79,0x7F,0x7F,0x7A,0x7B,0x7C,0x7D,0x7D,0x7A,0x7E,0x80,0x80,0x80,0x80,0x7E}
 encumbrance_map[0] = 0x79 -- Slots mapped onto encumbrance byte values.
+
+addendum_white = {[14]="Poisona",[15]="Paralyna",[16]="Blindna",[17]="Silena",[18]="Stona",[19]="Viruna",[20]="Cursna",
+    [143]="Erase",[13]="Raise II",[140]="Raise III",[141]="Reraise II",[142]="Reraise III",[135]="Reraise"}
+    
+addendum_black = {[253]="Sleep",[259]="Sleep II",[260]="Dispel",[162]="Stone IV",[163]="Stone V",[167]="Thunder IV",
+    [168]="Thunder V",[157]="Aero IV",[158]="Aero V",[152]="Blizzard IV",[153]="Blizzard V",[147]="Fire IV",[148]="Fire V",
+    [172]="Water IV",[173]="Water V",[255]="Break"}
 
 -- _globals --
 user_data_table = {
@@ -229,6 +236,7 @@ disable_table[0] = false
 encumbrance_table = table.reassign({},disable_table)
 registered_user_events = {}
 empty = {name="empty"}
+species_id = 0
 outgoing_packet_table = {}
 tool_map = {
         ['Katon: Ichi'] = 'Uchitake',

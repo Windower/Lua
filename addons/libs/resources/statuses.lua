@@ -22,6 +22,13 @@ statuses[0x32] = {english = 'Fishing'}
 statuses[0x33] = {english = 'Fishing fighting center'}
 statuses[0x34] = {english = 'Fishing fighting right'}
 statuses[0x35] = {english = 'Fishing fighting left'}
+statuses[0x38] = {english = 'Fishing rod in water'}
+statuses[0x39] = {english = 'Fishing fish on hook'}
+statuses[0x3A] = {english = 'Fishing caught fish'}
+statuses[0x3B] = {english = 'Fishing rod break'}
+statuses[0x3C] = {english = 'Fishing line break'}
+statuses[0x3D] = {english = 'Fishing monster catch'}
+statuses[0x3E] = {english = 'Fishing no catch or lost'}
 
 return statuses
 

@@ -337,35 +337,65 @@ end
 ---- false to cancel further command processing and just return the command.
 -----------------------------------------------------------------------------------
 function filter_pretarget(spell)
-    local category,spell_id = outgoing_action_category_table[unify_prefix[spell.prefix]]
+    local category = outgoing_action_category_table[unify_prefix[spell.prefix]]
     if category == 3 then
-        spell_id = spell.index
         local available_spells = windower.ffxi.get_spells()
-        -- filter for spells that you do not know
-        if not available_spells[spell_id] and not spell_id == 503 then
-            debug_mode_chat("Unable to execute command. You do not know that spell ("..(res.spells[spell_id][language] or spell.id)..")")
+        local spell_jobs = res.spells[spell.id].jobs
+        
+        -- Filter for spells that you do not know. Exclude Impact.
+        if not available_spells[spell.id] and not spell.id == 503 then
+            debug_mode_chat("Unable to execute command. You do not know that spell ("..(res.spells[spell.id][language] or spell.id)..")")
+        -- Filter for spells that you know, but do not currently have access to
+        elseif (not spell_jobs[player.main_job] or not (spell_jobs[player.main_job] <= player.main_job_level)) and
+            (not spell_jobs[player.sub_job] or not (spell_jobs[player.sub_job] < player.sub_job_level)) then
+            debug_mode_chat("Unable to execute command. You do not have access to that spell ("..(res.spells[spell.id][language] or spell.id)..")")
             return false
-        end
-    else
-        spell_id = spell.id
-        if (category == 7 or category == 9) and not windower.ffxi.get_abilities()[spell_id] then
-            debug_mode_chat("Unable to execute command. You do not have access to that ability ("..(res.abilities[spell_id][language] or spell_id)..")")
+        -- At this point, we know that it is technically castable by this job combination if the right conditions are met.
+        elseif player.main_job == 'SCH' and ((addendum_white[spell.id] and not buffactive['Addendum: White']) or
+            (addendum_black[spell.id] and not buffactive['Addendum: Black'])) and not (spell_jobs[player.sub_job]
+            and spell_jobs[player.sub_job] <= player.sub_job_level) then
+            
+            if addendum_white[spell.id] then
+                debug_mode_chat("Unable to execute command. Addendum: White required for that spell ("..(res.spells[spell.id][language] or spell.id)..")")
+            end
+            if addendum_black[spell.id] then
+                debug_mode_chat("Unable to execute command. Addendum: Black required for that spell ("..(res.spells[spell.id][language] or spell.id)..")")
+            end
             return false
+        elseif player.sub_job == 'SCH' and ((addendum_white[spell.id] and not buffactive['Addendum: White']) or
+            (addendum_black[spell.id] and not buffactive['Addendum: Black'])) and not (spell_jobs[player.main_job]
+            and spell_jobs[player.main_job] <= player.main_job_level) then
+            
+            if addendum_white[spell.id] then
+                debug_mode_chat("Unable to execute command. Addendum: White required for that spell ("..(res.spells[spell.id][language] or spell.id)..")")
+            end
+            if addendum_black[spell.id] then
+                debug_mode_chat("Unable to execute command. Addendum: Black required for that spell ("..(res.spells[spell.id][language] or spell.id)..")")
+            end
+            return false
+        elseif spell.type == 'BlueMagic' and not (player.main_job == 'BLU' and table.contains(windower.ffxi.get_mjob_data().spells,spell.id)) and not
+            (player.sub_job == 'BLU' and table.contains(windower.ffxi.get_sjob_data().spells,spell.id)) then
+            debug_mode_chat("Unable to execute command. Blue magic must be set to cast that spell ("..(res.spells[spell.id][language] or spell.id)..")")
+            return false
+        elseif spell.type == 'Ninjutsu'  then
+            if player.main_job ~= 'NIN' and player.sub_job ~= 'NIN' then
+                debug_mode_chat("Unable to make action packet. You do not have access to that spell ("..(spell[language] or spell.id)..")")
+                return false
+            elseif not player.inventory[tool_map[spell.english]] and not (player.main_job == 'NIN' and player.inventory[universal_tool_map[spell.english]]) then
+                debug_mode_chat("Unable to make action packet. You do not have the proper tools.")
+                return false
+            end
         end
-    end
-    
-    
-    if spell.type == 'BlueMagic' and player.main_job ~= 'BLU' and player.sub_job ~= 'BLU' then
+    elseif (category == 7 or category == 9) and not windower.ffxi.get_abilities()[spell.id] then
+        debug_mode_chat("Unable to execute command. You do not have access to that ability ("..(res.abilities[spell.id][language] or spell.id)..")")
         return false
-    elseif spell.type == 'Ninjutsu'  then
-        if player.main_job ~= 'NIN' and player.sub_job ~= 'NIN' then
-            debug_mode_chat("Unable to make action packet. You do not have access to that spell ("..(spell[language] or spell_id)..")")
-            return false
-        elseif not player.inventory[tool_map[spell.english]] and not (player.main_job == 'NIN' and player.inventory[universal_tool_map[spell.english]]) then
-            debug_mode_chat("Unable to make action packet. You do not have the proper tools.")
-            return false
-        end
+    elseif category == 25 and (not player.main_job == 'MON' or not player.species or not player.species.tp_moves[spell.id-768] or not (player.species.tp_moves[spell.id-768] <= player.main_job_level)) then
+        -- Monstrosity filtering
+        debug_mode_chat("Unable to execute command. You do not have access to that monsterskill ("..(res.abilities[spell.id][language] or spell.id)..")")
+        return false
     end
+    
+    
     
     return true
 end

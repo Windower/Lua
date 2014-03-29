@@ -379,7 +379,8 @@ function zero_all()
     end
 end
 
-windower.register_event('zone change', function(to)
+function zone_check(to)
+    to = tonumber(to)
     if mjob_id == 18 then
         if petlessZones:contains(to) then 
             text_update_loop('stop')
@@ -399,7 +400,9 @@ windower.register_event('zone change', function(to)
             end
         end
     end
-end)
+end
+
+windower.register_event('zone change', zone_check)
     
 windower.register_event('time change', function()
     if mjob_id == 18 then

@@ -177,7 +177,7 @@ function refresh_player()
     
     for i,v in pairs(player_mob_table) do
         if i == 'name' then
-            player['mob_name'] = v
+            player.mob_name = v
         elseif i~= 'is_npc' and i~='tp' and i~='mpp' and i~='claim_id' and i~='status' then
             player[i] = v
         end
@@ -261,15 +261,15 @@ function refresh_player()
                     pet.available_frames[res.items[id][language]] = true
                 end
             end
-            --for i,id in pairs(auto_tab.available_attachments) do
-            --    if res.items[id] and type(res.items[id]) == 'table' then
-            --        pet.available_attachments[res.items[id][language]] = true
-            --    end
-            --end
+            for i,id in pairs(auto_tab.available_attachments) do
+                if res.items[id] and type(res.items[id]) == 'table' then
+                    pet.available_attachments[res.items[id][language]] = true
+                end
+            end
 
             -- actual parts
-            pet.head = res.items[auto_tab.head+8192][language]
-            pet.frame = res.items[auto_tab.frame+8223][language]
+            pet.head = res.items[auto_tab.head][language]
+            pet.frame = res.items[auto_tab.frame][language]
             for i,id in pairs(auto_tab.attachments) do
                 if res.items[id] and type(res.items[id]) == 'table' then
                     pet.attachments[res.items[id][language]] = true
@@ -282,6 +282,17 @@ function refresh_player()
                 pet.mpp = 0
             end
         end
+    end
+    
+    if player.main_job == 'MON' and species_id ~= 0 then
+        player.species = {}
+        for i,v in pairs(res.items[species_id + 61440]) do
+            if not (i == 'category' or i == 'id') then
+                player.species[i] = v
+            end
+        end
+    else
+        player.species = nil
     end
     
     table.reassign(fellow,target_complete(windower.ffxi.get_mob_by_target('<ft>')))
@@ -473,9 +484,9 @@ function refresh_item_list(itemlist)
                 retarr[res.items[v.id][language]] = {id=v.id, count=v.count, shortname=res.items[v.id][language]:lower()}
                 -- If a long version of the name exists, and is different from the short version,
                 -- add the long name to the info table and point the long name's key at that table.
-                if res.items[v.id]['log_'..language] and res.items[v.id]['log_'..language]:lower() ~= res.items[v.id][language]:lower() then
-                    retarr[res.items[v.id][language]].longname = res.items[v.id]['log_'..language]:lower()
-                    retarr[res.items[v.id]['log_'..language]] = retarr[res.items[v.id][language]]
+                if res.items[v.id][language..'_log'] and res.items[v.id][language..'_log']:lower() ~= res.items[v.id][language]:lower() then
+                    retarr[res.items[v.id][language]].longname = res.items[v.id][language..'_log']:lower()
+                    retarr[res.items[v.id][language..'_log']] = retarr[res.items[v.id][language]]
                 end
             elseif res.items[v.id] and res.items[v.id][language] then
                 -- If there's already an entry for this item, all the hard work has already
