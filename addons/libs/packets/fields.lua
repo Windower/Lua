@@ -455,17 +455,20 @@ fields.outgoing[0x06E] = L{
 
 -- Party leaving
 fields.outgoing[0x06F] = L{
-    {ctype='unsigned char',     label='_const1',            const=0x00},        -- 04   02 for alliance, 00 for party
+    {ctype='unsigned char',     label='Alliance'},                              -- 04   02 for alliance, 00 for party
+    {ctype='char[3]',           label='_junk1'}                                 -- 05
 }
 
 -- Party breakup
 fields.outgoing[0x070] = L{
     {ctype='unsigned char',     label='Alliance'},                              -- 04   02 for alliance, 00 for party
+    {ctype='char[3]',           label='_junk1'}                                 -- 05
 }
 
 -- Party invite response
 fields.outgoing[0x074] = L{
     {ctype='bool',              label='Join',               fn=bool},           -- 04
+    {ctype='char[3]',           label='_junk1'}                                 -- 05
 }
 
 -- Party change leader
@@ -866,20 +869,28 @@ fields.incoming[0x00D] = L{
 fields.incoming[0x00E] = L{
     {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
     {ctype='unsigned short',    label='Index',              fn=index},          -- 08
-    {ctype='unsigned char',     label='Mask',               fn=bin+{1}},        -- 0A   Mask with bit 4 set updates NPC status
+    {ctype='unsigned char',     label='Mask',               fn=bin+{1}},        -- 0A   Bits that control which parts of the packet are actual updates (rest is zeroed). Model is always sent
+                                                                                -- 0A   Bit 0: Position, Rotation, Walk Count
+                                                                                -- 0A   Bit 1: Claimer ID
+                                                                                -- 0A   Bit 2: HP, Status
+                                                                                -- 0A   Bit 3: Name
+                                                                                -- 0A   Bit 4: 
+                                                                                -- 0A   Bit 5: The client stops displaying the mob when this bit is set (dead, out of range, etc.)
+                                                                                -- 0A   Bit 6: 
+                                                                                -- 0A   Bit 7: 
     {ctype='unsigned char',     label='Rotation',           fn=dir},            -- 0B
     {ctype='float',             label='X Position'},                            -- 0C
     {ctype='float',             label='Z Position'},                            -- 10
     {ctype='float',             label='Y Position'},                            -- 14
     {ctype='unsigned int',      label='Walk Count'},                            -- 18   Steadily increases until rotation changes. Does not reset while the mob isn't walking. Only goes until 0xFF1F.
-    {ctype='unsigned short',    label='_unknown3',          fn=bin+{2}},        -- 1A
+    {ctype='unsigned short',    label='_unknown1',          fn=bin+{2}},        -- 1A
     {ctype='unsigned char',     label='HP %',               fn=percent},        -- 1E
-    {ctype='unsigned char',     label='Animation'},                             -- 1F
-    {ctype='unsigned int',      label='_unknown4',          fn=bin+{4}},        -- 20
-    {ctype='unsigned int',      label='_unknown5',          fn=bin+{4}},        -- 24
-    {ctype='unsigned int',      label='_unknown6',          fn=bin+{4}},        -- 28
+    {ctype='unsigned char',     label='Status',             fn=status},         -- 1F
+    {ctype='unsigned int',      label='_unknown2',          fn=bin+{4}},        -- 20
+    {ctype='unsigned int',      label='_unknown3',          fn=bin+{4}},        -- 24
+    {ctype='unsigned int',      label='_unknown4',          fn=bin+{4}},        -- 28
     {ctype='unsigned int',      label='Claimer ID',         fn=id},             -- 2C
-    {ctype='unsigned short',    label='_unknown7'},                             -- 30
+    {ctype='unsigned short',    label='_unknown5'},                             -- 30
     {ctype='unsigned short',    label='Model'},                                 -- 32
     {ctype='char*',             label='Name'},                                  -- 34 -   *
 }
