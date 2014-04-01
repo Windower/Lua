@@ -586,16 +586,16 @@ function get_spell(act)
     end
     
     if act.category == 12 or act.category == 2 then
-        spell = table.reassign(spell,res.abilities[abil_ID])
+        spell = res.abilities[abil_ID]
     else
         if not res.action_messages[msg_ID] then
             if act.category == 4 or act.category == 8 then
-                spell = table.reassign(spell,res.spells[abil_ID])
+                spell = res.spells[abil_ID]
                 if act.category == 4 and spell then spell.recast = act.recast end
             elseif T{2,3,6,7,12,13,14,15}:contains(act.category) then
-                spell = table.reassign(spell,res.abilities[abil_ID]) -- May have to correct for charmed pets some day, but I'm not sure there are any monsters with TP moves that give no message.
+                spell = res.abilities[abil_ID] -- May have to correct for charmed pets some day, but I'm not sure there are any monsters with TP moves that give no message.
             elseif T{5,9}:contains(act.category) then
-                spell = table.reassign(spell,res.items[abil_ID])
+                spell = res.items[abil_ID]
             else
                 spell = {name=tostring(msg_ID)} -- Debugging
             end
@@ -606,36 +606,36 @@ function get_spell(act)
         local fields = fieldsearch(res.action_messages[msg_ID][language])
 
         if table.contains(fields,'spell') then
-            spell = table.reassign(spell,res.spells[abil_ID])
+            spell = res.spells[abil_ID]
             if act.category == 4 then spell.recast = act.recast end
         elseif table.contains(fields,'ability') then
-            spell = table.reassign(spell,res.abilities[abil_ID])
+            spell = res.abilities[abil_ID]
         elseif table.contains(fields,'weapon_skill') then
             if abil_ID > 255 then -- WZ_RECOVER_ALL is used by chests in Limbus
-                spell = table.reassign(spell,res.monster_abilities[abil_ID-256])
+                spell = res.monster_abilities[abil_ID-256]
                 if spell.english == '.' then
                     spell.english = 'Special Attack'
                 end
             elseif abil_ID < 256 then
-                spell = table.reassign(spell,res.abilities[abil_ID+768])
+                spell = res.abilities[abil_ID+768]
             end
         elseif msg_ID == 303 then
-            spell = table.reassign(spell,res.abilities[74]) -- Divine Seal
+            spell = res.abilities[74] -- Divine Seal
         elseif msg_ID == 304 then
-            spell = table.reassign(spell,res.abilities[75]) -- 'Elemental Seal'
+            spell = res.abilities[75] -- 'Elemental Seal'
         elseif msg_ID == 305 then
-            spell = table.reassign(spell,res.abilities[76]) -- 'Trick Attack'
+            spell = res.abilities[76] -- 'Trick Attack'
         elseif msg_ID == 311 or msg_ID == 311 then
-            spell = table.reassign(spell,res.abilities[79]) -- 'Cover'
+            spell = res.abilities[79] -- 'Cover'
         elseif msg_ID == 240 or msg_ID == 241 then
-            spell = table.reassign(spell,res.abilities[43]) -- 'Hide'
+            spell = res.abilities[43] -- 'Hide'
         elseif msg_ID == 328 then
-            spell = table.reassign(spell,res.abilities[effect_val]) -- BPs that are out of range
+            spell = res.abilities[effect_val] -- BPs that are out of range
         end
         
         
         if table.contains(fields,'item') then
-            spell = table.reassign(spell,res.items[abil_ID])
+            spell = res.items[abil_ID]
         else
             spell = aftercast_cost(spell)
         end
