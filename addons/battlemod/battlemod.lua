@@ -24,45 +24,46 @@ windower.register_event('login',function (name)
     windower.send_command('@wait 10;lua i battlemod options_load;')
 end)
 
-windower.register_event('addon command',function (...)
+windower.register_event('addon command', function(command, ...)
     if debugging then windower.debug('addon command') end
-    local splitarr = {...}
-    if splitarr.n > 0 then
-        if splitarr[1]:lower() == 'commamode' then
+    local args = {...}
+    command = command and command:lower()
+    if command then
+        if command:lower() == 'commamode' then
             commamode = not commamode
             windower.add_to_chat(121,'Battlemod: Comma Mode flipped! - '..tostring(commamode))
-        elseif splitarr[1]:lower() == 'oxford' then
+        elseif command:lower() == 'oxford' then
             oxford = not oxford
             windower.add_to_chat(121,'Battlemod: Oxford Mode flipped! - '..tostring(oxford))
-        elseif splitarr[1]:lower() == 'targetnumber' then
+        elseif command:lower() == 'targetnumber' then
             targetnumber = not targetnumber
             windower.add_to_chat(121,'Battlemod: Target Number flipped! - '..tostring(targetnumber))
-        elseif splitarr[1]:lower() == 'swingnumber' then
+        elseif command:lower() == 'swingnumber' then
             swingnumber = not swingnumber
             windower.add_to_chat(121,'Battlemod: Round Number flipped! - '..tostring(swingnumber))
-        elseif splitarr[1]:lower() == 'sumdamage' then
+        elseif command:lower() == 'sumdamage' then
             sumdamage = not sumdamage
             windower.add_to_chat(121,'Battlemod: Sum Damage flipped! - '..tostring(sumdamage))
-        elseif splitarr[1]:lower() == 'condensecrits' then
+        elseif command:lower() == 'condensecrits' then
             condensecrits = not condensecrits
             windower.add_to_chat(121,'Battlemod: Condense Crits flipped! - '..tostring(condensecrits))
-        elseif splitarr[1]:lower() == 'cancelmulti' then
+        elseif command:lower() == 'cancelmulti' then
             cancelmulti = not cancelmulti
             windower.add_to_chat(121,'Battlemod: Multi-canceling flipped! - '..tostring(cancelmulti))
-        elseif splitarr[1]:lower() == 'reload' then
+        elseif command:lower() == 'reload' then
             options_load()
-        elseif splitarr[1]:lower() == 'unload' then
+        elseif command:lower() == 'unload' then
             windower.send_command('@lua u battlemod')
-        elseif splitarr[1]:lower() == 'simplify' then
+        elseif command:lower() == 'simplify' then
             simplify = not simplify
             windower.add_to_chat(121,'Battlemod: Text simplification flipped! - '..tostring(simplify))
-        elseif splitarr[1]:lower() == 'condensedamage' then
+        elseif command:lower() == 'condensedamage' then
             condensedamage = not condensedamage
             windower.add_to_chat(121,'Battlemod: Condensed Damage text flipped! - '..tostring(condensedamage))
-        elseif splitarr[1]:lower() == 'condensetargets' then
+        elseif command:lower() == 'condensetargets' then
             condensetargets = not condensetargets
             windower.add_to_chat(121,'Battlemod: Condensed Targets flipped! - '..tostring(condensetargets))
-        elseif splitarr[1]:lower() == 'colortest' then
+        elseif command:lower() == 'colortest' then
             local counter = 0
             local line = ''
             for n = 1, 509 do
@@ -82,7 +83,7 @@ windower.register_event('addon command',function (...)
                 end
             end
             windower.add_to_chat(122,'Colors Tested!')
-        elseif splitarr[1]:lower() == 'help' then
+        elseif command:lower() == 'help' then
             print('   :::   '.._addon.name..' ('.._addon.version..')   :::')
             print('Toggles: (* subtoggles)')
             print('           1. simplify         --- Condenses battle text using custom messages ('..tostring(simplify)..')')
