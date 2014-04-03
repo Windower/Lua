@@ -55,18 +55,18 @@ end)()
 windower.register_event('party invite', function(sender)
     if settings.mode == 'whitelist' and settings.whitelist:contains(sender) then
         join()
-        notice('Joining due to ' .. sender .. ' being whitelisted.')
+        -- notice('Joining due to ' .. sender .. ' being whitelisted.')
     elseif settings.mode == 'blacklist' and not settings.blacklist:contains(sender) then
         join()
-        notice('Joining due to ' .. sender .. ' not being blacklisted.')
+        -- notice('Joining due to ' .. sender .. ' not being blacklisted.')
     elseif settings.mode == 'whitelist' then
-        notice('Not joining due to ' .. sender .. ' not being whitelisted.')
+        -- notice('Not joining due to ' .. sender .. ' not being whitelisted.')
     elseif settings.mode == 'blacklist' then
         if settings.autodecline then
             decline()
-            notice('Declined invite due to ' .. sender .. ' being blacklisted.')
+            -- notice('Declined invite due to ' .. sender .. ' being blacklisted.')
         else
-            notice('Not joining due to ' .. sender .. ' being blacklisted.')
+            -- notice('Not joining due to ' .. sender .. ' being blacklisted.')
         end
     end
 end)
