@@ -252,6 +252,9 @@ local enums = {
         [0] = 'Succeeded',
         [1] = 'Failed',
     },
+    ['action'] = {
+        [0x0D] = 'Reraise dialogue',
+    },
 }
 
 local function e(t, val)
@@ -300,7 +303,7 @@ fields.outgoing[0x016] = L{
 fields.outgoing[0x01A] = L{
     {ctype='unsigned int',      label='Target ID',          fn=id},             -- 04
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 08
-    {ctype='unsigned short',    label='Category'},                              -- 0A
+    {ctype='unsigned short',    label='Category',           fn=e+{'action'}},   -- 0A
     {ctype='unsigned short',    label='Param'},                                 -- 0C
     {ctype='unsigned short',    label='_unknown1'},                             -- 0E
 }
@@ -405,15 +408,14 @@ fields.outgoing[0x05A] = L{
 
 -- Dialogue options
 fields.outgoing[0x05B] = L{
-    {ctype='unsigned int',      label='Player ID',          fn=id},             -- 04
-    {ctype='unsigned char',     label='Option index'},                          -- 08
-    {ctype='unsigned short',    label='_unknown1'},                             -- 09
-    {ctype='unsigned char',     label='_unknown2'},                             -- 0B
-    {ctype='unsigned short',    label='Player Index',       fn=index},          -- 0C
-    {ctype='unsigned short',    label='_unknown3'},                             -- 0E
-    {ctype='unsigned short',    label='Zone ID',            fn=zone},           -- 10
-    {ctype='unsigned char',     label='_unknown4'},                             -- 12
-    {ctype='unsigned char',     label='_unknown5'},                             -- 13
+    {ctype='unsigned int',      label='Target ID',          fn=id},             -- 04
+    {ctype='unsigned short',    label='Option index'},                          -- 08
+    {ctype='unsigned short',    label='_unknown1'},                             -- 0A
+    {ctype='unsigned short',    label='Target Index',       fn=index},          -- 0C
+    {ctype='bool',              label='Begin dialogue'},                        -- 0E   Seems to be 1 when initiating conversion, 0 otherwise, unsure
+    {ctype='unsigned short',    label='Zone',               fn=zone},           -- 10
+    {ctype='unsigned char',     label='_unknown2'},                             -- 12   Might be a short, some parameter for the dialogue option, sometimes related to Index (Index + 0x5C0)
+    {ctype='unsigned char',     label='_unknown3'},                             -- 13
 }
 
 -- Zone request
@@ -1151,30 +1153,23 @@ fields.incoming[0x030] = L{
 fields.incoming[0x032] = L{
     {ctype='unsigned int',      label='NPC ID',             fn=id},             -- 04
     {ctype='unsigned short',    label='NPC Index',          fn=index},          -- 08
-    {ctype='unsigned short',    label='Zone ID'},                               -- 0A
+    {ctype='unsigned short',    label='Zone',               fn=zone},           -- 0A
     {ctype='unsigned short',    label='Menu ID'},                               -- 0C   Seems to select between menus within a zone
     {ctype='unsigned short',    label='_unknown1'},                             -- 0E   00 for me
-    {ctype='unsigned char',     label='Zone ID 2'},                             -- 10   Always the same as the other Zone ID, as far as I've seen.
+    {ctype='unsigned char',     label='_dupeZone',          fn=zone},           -- 10
     {ctype='char[3]',           label='_junk1'},                                -- 11   Always 00s for me
 }
 
 -- NPC Interaction Type 2
 fields.incoming[0x034] = L{
     {ctype='unsigned int',      label='NPC ID',             fn=id},             -- 04
-    {ctype='unsigned int',      label='Menu Parameter 1'},                      -- 08
-    {ctype='unsigned int',      label='Menu Parameter 2'},                      -- 0C
-    {ctype='unsigned int',      label='Menu Parameter 3'},                      -- 10
-    {ctype='unsigned int',      label='Menu Parameter 4'},                      -- 14
-    {ctype='unsigned int',      label='Menu Parameter 5'},                      -- 18
-    {ctype='unsigned int',      label='Menu Parameter 6'},                      -- 1C
-    {ctype='unsigned int',      label='Menu Parameter 7'},                      -- 20
-    {ctype='unsigned int',      label='Menu Parameter 8'},                      -- 24
+    {ctype='unsigned short[16]',label='Menu Parameter'},                        -- 08
     {ctype='unsigned short',    label='NPC Index',          fn=index},          -- 28
-    {ctype='unsigned short',    label='Zone ID'},                               -- 2A
+    {ctype='unsigned short',    label='Zone',               fn=zone},           -- 2A
     {ctype='unsigned short',    label='Menu ID'},                               -- 2C   Seems to select between menus within a zone
-    {ctype='unsigned short',    label='_unknown3'},                             -- 2E   08 for me, but FFing did nothing
-    {ctype='unsigned char',     label='Zone ID 2'},                             -- 30   Always the same as the other Zone ID, as far as I've seen.
-    {ctype='char[3]',           label='_junk1'},                                -- 31   Always 00s for me
+    {ctype='unsigned short',    label='_unknown1',          const=0x08},        -- 2E   08 for me, but FFing did nothing
+    {ctype='unsigned short',    label='_dupeZone',          fn=zone},           -- 30
+    {ctype='char[2]',           label='_junk1'},                                -- 31   Always 00s for me
 }
 
 -- Player update
@@ -1463,9 +1458,9 @@ fields.incoming[0x057] = L{
 
 -- NPC Spawn
 fields.incoming[0x05B] = L{
-    {ctype='float',             label='X Position'},                            -- 04
-    {ctype='float',             label='Z Position'},                            -- 08
-    {ctype='float',             label='Y Position'},                            -- 0C
+    {ctype='float',             label='X'},                                     -- 04
+    {ctype='float',             label='Z'},                                     -- 08
+    {ctype='float',             label='Y'},                                     -- 0C
     {ctype='unsigned int',      label='ID',                 fn=id},             -- 10
     {ctype='unsigned short',    label='Index',              fn=index},          -- 14
     {ctype='unsigned char',     label='Type'},                                  -- 16   3 for regular Monsters, 0 for Treasure Caskets and NPCs
@@ -1507,14 +1502,14 @@ fields.incoming[0x061] = L{
     {ctype='signed short',      label='Earth Resistance'},                      -- 3E
     {ctype='signed short',      label='Water Resistance'},                      -- 40
     {ctype='signed short',      label='Dark Resistance'},                       -- 42
-    {ctype='unsigned short',    label='Title ID',           fn=title},          -- 44
+    {ctype='unsigned short',    label='Title',           fn=title},             -- 44
     {ctype='unsigned short',    label='Nation rank'},                           -- 46
     {ctype='unsigned short',    label='Rank points',        fn=cap-{0xFFF}},    -- 48
     {ctype='unsigned short',    label='Home point',         fn=zone},           -- 4A
-    {ctype='unsigned short',    label='_unknown23'},                            -- 4C   0xFF-ing this last region has no notable effect.
-    {ctype='unsigned short',    label='_unknown24'},                            -- 4E
-    {ctype='unsigned short',    label='_unknown25'},                            -- 50
-    {ctype='unsigned short',    label='_unknown26'},                            -- 52   00 00 observed.
+    {ctype='unsigned short',    label='_unknown1'},                             -- 4C   0xFF-ing this last region has no notable effect.
+    {ctype='unsigned short',    label='_unknown2'},                             -- 4E
+    {ctype='unsigned short',    label='_unknown3'},                             -- 50
+    {ctype='unsigned short',    label='_unknown4'},                             -- 52   00 00 observed.
 }
 
 -- Skills Update
