@@ -698,6 +698,16 @@ fields.outgoing[0x10D] = L{
 fields.outgoing[0x10F] = L{
 }
 
+-- Fishing Action
+fields.outgoing[0x110] = L{
+    {ctype='unsigned int',      label='Player ID'},                             -- 04
+    {ctype='unsigned int',      label='Fish HP'},                               -- 08   Always 200 when releasing, zero when casting and putting away rod
+    {ctype='unsigned short',    label='Player Index'},                          -- 0C
+    {ctype='unsigned char',     label='Action'},                                -- 0E   2 = cast, 3 = release/catch, 4 = put away rod
+    {ctype='unsigned char',     label='_unknown1'},                             -- 0F   Always zero (pre-March fishing update this value would increase over time, probably zone fatigue)
+    {ctype='unsigned int',      label='Catch Key'},                             -- 10   When catching this matches the catch key from the 0x115 packet, otherwise zero
+}
+
 -- Zone update
 fields.incoming[0x00A] = L{
     {ctype='unsigned int',      label='Player ID',          fn=id},             -- 04
@@ -1983,6 +1993,18 @@ fields.incoming[0x113] = L{
     {ctype='unsigned char',     label='Moblin Pheromone Sacks'},                -- DD
     {ctype='short',             label='_unknown5'},                             -- DE
     {ctype='int',               label='_unknown6'},                             -- F0
+}
+
+-- Fish Bite Info
+fields.incoming[0x115] = L{
+    {ctype='unsigned short',    label='_unknown1'},                             -- 04
+    {ctype='unsigned short',    label='_unknown2'},                             -- 06
+    {ctype='unsigned short',    label='_unknown3'},                             -- 08
+    {ctype='unsigned int',      label='Fish Bite ID'},                          -- 0A   Unique to the type of fish that bit
+    {ctype='unsigned short',    label='_unknown4'},                             -- 0E
+    {ctype='unsigned short',    label='_unknown5'},                             -- 10
+    {ctype='unsigned short',    label='_unknown6'},                             -- 12
+    {ctype='unsigned int',      label='Catch Key'},                             -- 14   This value is used in the catch key of the 0x110 packet when catching a fish
 }
 
 local sizes = {}
