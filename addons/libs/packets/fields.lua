@@ -45,7 +45,7 @@ local function ip(val)
 end
 
 local function gil(val)
-    return tostring(val):reverse():chunks(3):concat(','):reverse()..' G'
+    return tostring(val):reverse():chunks(3):concat(','):reverse() .. ' G'
 end
 
 local function bool(val)
@@ -252,9 +252,6 @@ local enums = {
         [0] = 'Succeeded',
         [1] = 'Failed',
     },
-    ['action'] = {
-        [0x0D] = 'Reraise dialogue',
-    },
 }
 
 local function e(t, val)
@@ -297,6 +294,10 @@ fields.outgoing[0x015] = L{
 fields.outgoing[0x016] = L{
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 04
     {ctype='unsigned short',    label='_unknown1'},                             -- 06
+}
+
+enums['action'] = {
+    [0x0D] = 'Reraise dialogue',
 }
 
 -- Action
@@ -698,12 +699,18 @@ fields.outgoing[0x10D] = L{
 fields.outgoing[0x10F] = L{
 }
 
+enums['fishing'] = {
+    [2] = 'Cast rod',
+    [3] = 'Release/catch',
+    [4] = 'Put away rod',
+}
+
 -- Fishing Action
 fields.outgoing[0x110] = L{
-    {ctype='unsigned int',      label='Player ID'},                             -- 04
+    {ctype='unsigned int',      label='Player ID',          fn=id},             -- 04
     {ctype='unsigned int',      label='Fish HP'},                               -- 08   Always 200 when releasing, zero when casting and putting away rod
-    {ctype='unsigned short',    label='Player Index'},                          -- 0C
-    {ctype='unsigned char',     label='Action'},                                -- 0E   2 = cast, 3 = release/catch, 4 = put away rod
+    {ctype='unsigned short',    label='Player Index',       fn=index},          -- 0C
+    {ctype='unsigned char',     label='Action',             fn=e+{'fishing'}},  -- 0E
     {ctype='unsigned char',     label='_unknown1'},                             -- 0F   Always zero (pre-March fishing update this value would increase over time, probably zone fatigue)
     {ctype='unsigned int',      label='Catch Key'},                             -- 10   When catching this matches the catch key from the 0x115 packet, otherwise zero
 }
@@ -713,11 +720,11 @@ fields.incoming[0x00A] = L{
     {ctype='unsigned int',      label='Player ID',          fn=id},             -- 04
     {ctype='unsigned short',    label='Player Index',       fn=index},          -- 08
     {ctype='char[38]',          label='_unknown1'},                             -- 0A
-    {ctype='unsigned short',    label='Zone ID',            fn=zone},           -- 30
+    {ctype='unsigned short',    label='Zone',               fn=zone},           -- 30
     {ctype='char[6]',           label='_unknown2'},                             -- 32
     {ctype='unsigned int',      label='Timestamp 1',        fn=time},           -- 38
     {ctype='unsigned int',      label='Timestamp 2',        fn=time},           -- 3C
-    {ctype='unsigned short',    label='Zone ID MH',         fn=zone},           -- 40   Zone ID when zoning out of MH, otherwise 0
+    {ctype='unsigned short',    label='Zone MH',            fn=zone},           -- 40   Zone ID when zoning out of MH, otherwise 0
     {ctype='unsigned short',    label='_dupeZone ID',       fn=zone},           -- 42
     {ctype='unsigned char',     label='Race'},                                  -- 44
     {ctype='unsigned char',     label='Face'},                                  -- 45
