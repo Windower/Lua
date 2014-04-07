@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 _addon.name = 'OhShi'
-_addon.version = '2.521'
+_addon.version = '2.53'
 _addon.author = 'Nitrous (Shiva)'
 _addon.command = 'ohshi'
 
@@ -146,6 +146,9 @@ windower.register_event('addon command', function(...)
             settings.text.content = nil
             settings.visible = nil
             saveSettings()
+        elseif comm == 'clear' then
+            tracking:clear()
+            textUpdate()
         elseif S{'show','hide','settings'}:contains(comm) then
             if comm == 'show' then 
                 ohShi_tb:text('ohShi showing for settings')
@@ -194,7 +197,7 @@ windower.register_event('action', function(act)
     local actor = T{}
     actor.id = curact.actor_id
     if windower.ffxi.get_mob_by_id(actor.id) then
-        actor.name = windower.ffxi.get_mob_by_id(actor.id)['name']
+        actor.name = windower.ffxi.get_mob_by_id(actor.id).name
     else
         return
     end
