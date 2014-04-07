@@ -178,6 +178,7 @@ windower.register_event('addon command', function(...)
   4. track(on/off) [abyssea/dangerous/legion/meebles/other/voidwatch] <name> 
      - Begin or stop tracking <type (default: other)> of mob named <name>.
   5. spell/ws(on/off) <name> - Start or stop watching for <name> spell|ws.
+  6. clear - Clears the textbox and the tracking table (use if textbox locks up)
   The following all correspond to the tracker:
     fonttype <name> | fontsize <size> | pos <x> <y> - can also click/drag
     bgcolor <r> <g> <b> | txtcolor <r> <g> <b>
