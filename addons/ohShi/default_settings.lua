@@ -73,10 +73,11 @@ spells = {}
 jAbils = {}
 stats = {}
 trusts = S{'Kupipi','Excenmille','Naji','Ayame','Zeid','Curilla',
-            'Nanaa Mihgo','Trion','Shantotto','Volker','Ajido-Marujido',
-            'Mihli Aliapoh','Valaineral','Joachim','Lion','Prishe','Ulmia',
-            'Iron Eater','Gadalar','Naja Salaheem','Cherukiki','Nashmeira',
-            'Zazarg','Ingrid','Lheko Habhoka'}
+            'Nanaamihgo','Trion','Shantotto','Volker','Ajidomarujido',
+            'Mihlialiapoh','Valaineral','Joachim','Lion','Prishe','Ulmia',
+            'Ironeater','Gadalar','Najasalaheem','Cherukiki','Nashmeira',
+            'Zazarg','Ingrid','Lhekohabhoka','Ovjang','Mnejing','Sakura',
+            'Luzaf','Najelith'}
 
 speFName = '../../plugins/resources/spells.xml'
 staFName = '../../plugins/resources/status.xml'
