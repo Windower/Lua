@@ -50,7 +50,7 @@ require 'ambiguous_names'
 require 'targets'
 
 
-_addon.version = '1.9'
+_addon.version = '2.000'
 _addon.name = 'Shortcuts'
 _addon.author = 'Byrth'
 _addon.commands = {'shortcuts'}
@@ -274,7 +274,7 @@ function interp_text(splitline,offset,modified)
 
     local strippedabil = strip(abil) -- Slug the ability
 
-    if validabils[strippedabil] then -- If the ability exists, do this.
+    if strippedabil ~= '' and validabils[strippedabil] then -- If the ability exists, do this.
         local r_line, s_type
         
         if validabils[strippedabil].typ == 'spells' then
