@@ -57,7 +57,7 @@ _addon.command = "obiaway"
 
 require('sets')
 config = require('config')
-res = require('res')
+res = require('resources')
 
 defaults = {}
 defaults.location = 'sack'
