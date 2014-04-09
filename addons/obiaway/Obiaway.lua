@@ -76,10 +76,6 @@ windower.register_event('addon command',function (...)
     end
 end)
 
-windower.register_event('lose buff', remove_unneeded_obis:cond(function(id) return id >= 178 and id <= 185 end))
-
-windower.register_event('day change', 'weather change', remove_unneeded_obis)
-
 function get_obis_in_inventory()
     obis = {}
     items = windower.ffxi.get_items()
@@ -158,7 +154,7 @@ function get_all_elements()
 
     local day_element = res.elements[res.days[info.day].element].english
     elements[day_element] = elements[day_element] + 1
-    local weather_element = res.elements[res.weathers[info.weather].element].english
+    local weather_element = res.elements[res.weather[info.weather].element].english
     elements[weather_element] = elements[weather_element] + 1
     buffs = windower.ffxi.get_player().buffs
 
@@ -181,3 +177,9 @@ function get_all_elements()
     end
     return elements
 end
+
+windower.register_event('lose buff', remove_unneeded_obis:cond(function(id) return id >= 178 and id <= 185 end))
+
+windower.register_event('day change', 'weather change', remove_unneeded_obis)
+
+
