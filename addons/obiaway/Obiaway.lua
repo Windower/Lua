@@ -154,7 +154,7 @@ function get_all_elements()
 
     local day_element = res.elements[res.days[info.day].element].english
     elements[day_element] = elements[day_element] + 1
-    local weather_element = res.elements[res.weathers[info.weather].element].english
+    local weather_element = res.elements[res.weather[info.weather].element].english
     elements[weather_element] = elements[weather_element] + 1
     buffs = windower.ffxi.get_player().buffs
 
