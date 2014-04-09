@@ -75,6 +75,7 @@ windower.register_event('addon command',function (...)
         remove_unneeded_obis()
     end
 end)
+
 function get_obis_in_inventory()
     obis = {}
     items = windower.ffxi.get_items()
@@ -176,6 +177,7 @@ function get_all_elements()
     end
     return elements
 end
+
 windower.register_event('lose buff', remove_unneeded_obis:cond(function(id) return id >= 178 and id <= 185 end))
 
 windower.register_event('day change', 'weather change', remove_unneeded_obis)
