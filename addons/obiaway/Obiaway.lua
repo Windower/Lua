@@ -76,10 +76,6 @@ windower.register_event('addon command',function (...)
     end
 end)
 
-windower.register_event('lose buff', remove_unneeded_obis:cond(function(id) return id >= 178 and id <= 185 end))
-
-windower.register_event('day change', 'weather change', remove_unneeded_obis)
-
 function get_obis_in_inventory()
     obis = {}
     items = windower.ffxi.get_items()
@@ -93,7 +89,7 @@ function get_obis_in_inventory()
             obis["Ice"] = obis["Ice"] or (id == 15436)
             obis["Wind"] = obis["Wind"] or (id == 15437)
             obis["Earth"] = obis["Earth"] or (id == 15438)
-            obis["Thunder"] = obis["Thunder"] or (id == 15439)
+            obis["Lightning"] = obis["Lightning"] or (id == 15439)
             obis["Water"] = obis["Water"] or (id == 15440)
             obis["Light"] = obis["Light"] or (id == 15441)
             obis["Dark"] = obis["Dark"] or (id == 15442)
@@ -121,7 +117,7 @@ function remove_unneeded_obis()
     if obis["Ice"] and elements["Ice"]==0 then
         str = str.."input /put \"Hyorin Obi\" "..settings.location..";wait .5;"
     end
-    if obis["Thunder"] and elements["Thunder"]==0 then
+    if obis["Lightning"] and elements["Lightning"]==0 then
         str = str.."input /put \"Rairin Obi\" "..settings.location..";wait .5;"
     end
     if obis["Light"] and elements["Light"]==0 then    
@@ -149,7 +145,7 @@ function get_all_elements()
     elements["Water"] = 0
     elements["Wind"] = 0
     elements["Ice"] = 0
-    elements["Thunder"] = 0
+    elements["Lightning"] = 0
     elements["Light"] = 0
     elements["Dark"] = 0
     elements["None"] = 0
@@ -158,7 +154,7 @@ function get_all_elements()
 
     local day_element = res.elements[res.days[info.day].element].english
     elements[day_element] = elements[day_element] + 1
-    local weather_element = res.elements[res.weathers[info.weather].element].english
+    local weather_element = res.elements[res.weather[info.weather].element].english
     elements[weather_element] = elements[weather_element] + 1
     buffs = windower.ffxi.get_player().buffs
 
@@ -173,7 +169,7 @@ function get_all_elements()
     elseif inTable(buffs, 179) then
       elements["Ice"] = elements["Ice"] +1
     elseif inTable(buffs, 182) then
-      elements["Thunder"] = elements["Thunder"] +1
+      elements["Lightning"] = elements["Lightning"] +1
     elseif inTable(buffs, 184) then
       elements["Light"] = elements["Light"] +1
     elseif inTable(buffs, 185) then
@@ -181,3 +177,9 @@ function get_all_elements()
     end
     return elements
 end
+
+windower.register_event('lose buff', remove_unneeded_obis:cond(function(id) return id >= 178 and id <= 185 end))
+
+windower.register_event('day change', 'weather change', remove_unneeded_obis)
+
+
