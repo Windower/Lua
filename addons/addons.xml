@@ -391,6 +391,13 @@
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
+    <name>Yush</name>
+    <author>Arcon</author>
+    <description>A file-based macro engine</description>
+    <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
+  </addon>
+  <addon>
     <name>zonetimer</name>
     <author>Ihina</author>
     <description>Displays the amount of time one has been in zone.  Original by Krellion.</description>
