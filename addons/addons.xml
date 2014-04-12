@@ -251,6 +251,13 @@
 	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
+    <name>PointWatch</name>
+    <author>Byrth</author>
+    <description>Allows you to monitor your XP/CP gains and keep track of the Dynamis time limit.</description>
+	<bugtracker>https://github.com/Byrth/Lua/issues</bugtracker>
+	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
+  </addon>
+  <addon>
     <name>porter</name>
     <author>Giuliano Riccio (Zohno@Phoenix)</author>
     <description>Shows the slips' items highlighting those that are stored.</description>
