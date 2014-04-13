@@ -720,9 +720,9 @@ return {
     [727] = { english="You receive a bonus of ${number} bonecraft guild points!", color=121},
     [728] = { english="You receive a bonus of ${number} alchemy guild points!", color=121},
     [729] = { english="You receive a bonus of ${number} cooking guild points!", color=121},
-    [730] = { english="${actor} uses ${weapon_skill}${lb}${target}'s TP is reduced to ${number}.", color=101}
-    [731] = { english="Average item level: ${number}.", color=101}
-    [732] = { english="Skillchain: Universal Enlightenment.${lb}${target} takes ${number} points of damage", color="D"}
+    [730] = { english="${actor} uses ${weapon_skill}${lb}${target}'s TP is reduced to ${number}.", color=101},
+    [731] = { english="Average item level: ${number}.", color=101},
+    [732] = { english="Skillchain: Universal Enlightenment.${lb}${target} takes ${number} points of damage", color="D"},
     [733] = { english="${target}:", color=91},
     [734] = { english="${actor} uses ${ability} on ${target}.", color=91},
 }
