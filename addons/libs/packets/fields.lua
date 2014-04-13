@@ -297,6 +297,7 @@ fields.outgoing[0x016] = L{
 }
 
 enums['action'] = {
+    [0x02] = 'Engage monster',
     [0x03] = 'Magic cast',
     [0x07] = 'Weaponskill usage',
     [0x09] = 'Job ability usage',
