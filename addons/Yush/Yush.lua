@@ -1,5 +1,5 @@
 _addon.author = 'Arcon'
-_addon.version = '1.0.0.0.'
+_addon.version = '1.0.0.1'
 _addon.language = 'English'
 
 require('luau')
@@ -103,7 +103,7 @@ dikt = {    -- Har har
     [40] = '\'',
     [41] = '`',
     [42] = 'shift',
-    [43] = nil,
+    [43] = '\\',
     [44] = 'z',
     [45] = 'x',
     [46] = 'c',
@@ -137,6 +137,7 @@ dikt = {    -- Har har
     [74] = 'num-',
     [75] = 'num4',
     [76] = 'num5',
+    [77] = 'num6',
     [78] = 'num+',
     [79] = 'num1',
     [80] = 'num2',
@@ -163,6 +164,10 @@ dikt = {    -- Har har
 
 windower.register_event('keyboard', function(dik, down)
     local key = dikt[dik]
+    if not key then
+        return
+    end
+
     if not down then
         keys:remove(key)
         return
