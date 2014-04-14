@@ -79,10 +79,6 @@ end
 
 function relevant_msg(msg)
 	local player = windower.ffxi.get_player()
-    local st,en,item,tar = string.find(msg,'/item ([%w%s]+) <(%w+)>')
-    if item ~= nil then
-        msg = '/item "'..item..'" <'..tar..'>'
-    end
 	
 	msg:gsub("<me>", tostring(player.name))
 	msg:gsub("<hp>", tostring(player.vitals.hp))
