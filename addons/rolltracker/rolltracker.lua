@@ -132,7 +132,7 @@ windower.register_event('load',function ()
 				['Caster\'s']={6,15,7,8,9,10,5,11,12,13,20,'-10','% Fast Cast'},
 				['Tactician\'s']={2,2,2,2,4,2,2,1,3,3,5,'-1',' Regain'},
 				['Miser\'s']={3,5,7,9,20,11,2,13,15,17,25,'-?',' Save TP'},
-				['Ninja']={'?','?','?','?','?','?','?','?','?','?','?','?',' Evasion Bonus'},
+				['Ninja']={4,3,5,14,6,7,9,2,10,11,18,'-10',' Evasion Bonus'},
 				['Scholar\'s']={'?','?','?','?','?','?','?','?','?','?','?','?',' Conserve MP'},
 				['Allies\'']={6,7,17,9,11,13,15,17,17,5,17,'?','% Skillchain Damage'},
 				['Companion\'s']={'4HP +2TP','20HP +5TP','6HP +2TP','8HP +2TP','10HP +3TP','12HP +3TP','14HP +3TP','16HP +4TP','18HP +4TP','3HP +1TP','25HP +6TP','-',' Pet: Regen and Regain'},
