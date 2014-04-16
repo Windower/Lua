@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'RollTracker'
-_addon.version = '1.1'
+_addon.version = '1.1.1'
 _addon.author = 'Balloon'
 _addon.command = 'rolltracker'
 
