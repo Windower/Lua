@@ -87,7 +87,7 @@ local dir = function()
     end
 end()
 
-local function cap(val, max)
+local function cap(max, val)
     return '%.1f':format(100*val/max)..'%'
 end
 
@@ -182,22 +182,6 @@ end
     Custom types
 ]]
 local types = {}
-types.shop_item = L{
-    {ctype='unsigned int',      label='Price',              fn=gil},            -- 00
-    {ctype='unsigned short',    label='Item',               fn=item},           -- 04
-    {ctype='unsigned short',    label='Shop Slot'},                             -- 08
-}
-types.roe_quest = L{
-    {ctype='bit[12]',           label='RoE Quest ID'},                          -- 00:00
-    {ctype='bit[20]',           label='RoE Quest Progress'},                    -- 01:04
-}
-types.alliance_member = L{
-    {ctype='unsigned int',      label='ID',                 fn=id},             -- 00
-    {ctype='unsigned short',    label='Index',              fn=index},          -- 04
-    {ctype='unsigned short',    label='Flags',              fn=bin+{2}},        -- 06
-    {ctype='unsigned short',    label='Zone',               fn=zone},           -- 08
-    {ctype='unsigned short',    label='_unknown2'},                             -- 0A
-}
 
 local enums = {
     ['synth'] = {
@@ -744,8 +728,8 @@ fields.incoming[0x00A] = L{
     {ctype='unsigned short',    label='Sub'},                                   -- 52
     {ctype='unsigned short',    label='Ranged'},                                -- 54
     {ctype='char[18]',          label='_unknown3'},                             -- 56
-    {ctype='unsigned short',    label='Weather ID',         fn=weather},        -- 68
-    {ctype='unsigned short',    label='_unknown4',          fn=weather},        -- 6A
+    {ctype='unsigned short',    label='Weather',            fn=weather},        -- 68
+    {ctype='unsigned short',    label='_unknown4'},                             -- 6A
     {ctype='char[24]',          label='_unknown5'},                             -- 6C
     {ctype='char[16]',          label='Player Name'},                           -- 84
     {ctype='char[12]',          label='_unknown6'},                             -- 94
@@ -861,8 +845,9 @@ fields.incoming[0x00D] = L{
     {ctype='unsigned char',     label='Base Speed'},                            -- 1D
     {ctype='unsigned char',     label='HP %',               fn=percent},        -- 1E
     {ctype='unsigned char',     label='Animation'},                             -- 1F
-    {ctype='unsigned short',    label='Status'},                                -- 20
-    {ctype='unsigned short',    label='Flags'},                                 -- 22
+    {ctype='unsigned char',     label='Status'},                                -- 20
+    {ctype='unsigned char',     label='_unknown1'},                             -- 21
+    {ctype='unsigned short',    label='Flags',              fn=bin+{2}},        -- 22
     {ctype='unsigned char',     label='Linkshell Red'},                         -- 24
     {ctype='unsigned char',     label='Linkshell Green'},                       -- 25
     {ctype='unsigned char',     label='Linkshell Blue'},                        -- 26
@@ -1239,6 +1224,12 @@ fields.incoming[0x039] = L{
     {ctype='unsigned int',      label='_unknown3'},                             -- 10   00 00 00 00 observed
 }
 
+types.shop_item = L{
+    {ctype='unsigned int',      label='Price',              fn=gil},            -- 00
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 04
+    {ctype='unsigned short',    label='Shop Slot'},                             -- 08
+}
+
 -- Shop
 fields.incoming[0x03C] = L{
     {ctype='unsigned short',    label='_zero1',             const=0x0000},      -- 04
@@ -1254,7 +1245,7 @@ fields.incoming[0x03C] = L{
 -- subjob and has the Subjob flag flipped.
 fields.incoming._mult[0x044] = {}
 fields.incoming[0x044] = function(data)
-    return fields.incoming._mult[0x044].base + fields.incoming._mult[data:sub(5,5):byte()]
+    return fields.incoming._mult[0x044].base + fields.incoming._mult[0x044][data:sub(5,5):byte()]
 end
 
 -- Base, shared by all jobs
@@ -1528,7 +1519,7 @@ fields.incoming[0x061] = L{
     {ctype='signed short',      label='Dark Resistance'},                       -- 42
     {ctype='unsigned short',    label='Title',           fn=title},             -- 44
     {ctype='unsigned short',    label='Nation rank'},                           -- 46
-    {ctype='unsigned short',    label='Rank points',        fn=cap-{0xFFF}},    -- 48
+    {ctype='unsigned short',    label='Rank points',        fn=cap+{0xFFF}},    -- 48
     {ctype='unsigned short',    label='Home point',         fn=zone},           -- 4A
     {ctype='unsigned short',    label='_unknown1'},                             -- 4C   0xFF-ing this last region has no notable effect.
     {ctype='unsigned short',    label='_unknown2'},                             -- 4E
@@ -1694,7 +1685,15 @@ fields.incoming[0x0CC] = L{
     {ctype='unsigned int',      label='Timestamp',          fn=time},           -- 88
     {ctype='char[16]',          label='Player Name'},                           -- 8C
     {ctype='unsigned int',      label='Permissions'},                           -- 98
-    {ctype='char[16]',          label='Linkshell Name',     enc=ls_name_msg},   -- 9C   6-bit packed
+    {ctype='char[16]',          label='Linkshell',          enc=ls_name_msg},   -- 9C   6-bit packed
+}
+
+types.alliance_member = L{
+    {ctype='unsigned int',      label='ID',                 fn=id},             -- 00
+    {ctype='unsigned short',    label='Index',              fn=index},          -- 04
+    {ctype='unsigned short',    label='Flags',              fn=bin+{2}},        -- 06
+    {ctype='unsigned short',    label='Zone',               fn=zone},           -- 08
+    {ctype='unsigned short',    label='_unknown2'},                             -- 0A
 }
 
 -- Alliance status update
@@ -1703,6 +1702,52 @@ fields.incoming[0x0C8] = L{
     {ctype='char[3]',           label='_junk1'},                                -- 05
     {ref=types.alliance_member, count=18},                                      -- 08
     {ctype='char[24]',          label='_unknown2',          const=''},          -- E0   Always 0?
+}
+
+types.check_item = L{
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 00
+    {ctype='unsigned char',     label='Slot',               fn=slot},           -- 02
+    {ctype='unsigned char',     label='_unknown1'},                             -- 03
+    {ctype='char[24]',          label='ExtData',            fn=hex+{24}},       -- 04
+}
+
+-- Check data
+fields.incoming._mult[0x0C9] = {}
+fields.incoming[0x0C9] = function(data)
+    return fields.incoming._mult[0x0C9].base + fields.incoming._mult[0x0C9][data:byte(0x0B, 0x0B)]
+end
+
+enums[0x0C9] = {
+    [0x01] = 'Metadata',
+    [0x03] = 'Equipment',
+}
+
+-- Common to all messages
+fields.incoming._mult[0x0C9].base = L{
+    {ctype='unsigned int',      label='Target ID',          fn=id},             -- 04
+    {ctype='unsigned short',    label='Target Index',       fn=index},          -- 08
+    {ctype='unsigned char',     label='Type',               fn=e+{0x0C9}},      -- 0A
+}
+
+-- Equipment listing
+fields.incoming._mult[0x0C9][0x03] = L{
+    {ctype='unsigned char',     label='Count'},                                 -- 0B
+    {ref=types.check_item,      count_ref=0x0B},                                -- 0C
+}
+
+-- Metadata
+fields.incoming._mult[0x0C9][0x01] = L{
+    {ctype='unsigned char',     label='_zero1',             const=0x00},        -- 0B
+    {ctype='unsigned short',    label='_unknown1'},                             -- 0C
+    {ctype='unsigned char',     label='_unknown2'},                             -- 0E
+    {ctype='unsigned char',     label='_unknown3'},                             -- 0F
+    {ctype='unsigned short',    label='_unknown4'},                             -- 10
+    {ctype='unsigned char',     label='Main Job',           fn=job},            -- 12
+    {ctype='unsigned char',     label='Sub Job',            fn=job},            -- 13
+    {ctype='char[15]',          label='Linkshell',          enc=ls_name_msg},   -- 14   6-bit packed
+    {ctype='unsigned char',     label='Main Job Level'},                        -- 23
+    {ctype='unsigned char',     label='Sub Job Level'},                         -- 24
+    {ctype='char[43]',          label='_unknown5'},                             -- 25
 }
 
 -- Bazaar Message
@@ -1908,6 +1953,11 @@ fields.incoming[0x110] = L{
     {ctype='unsigned short',    label='_unknown1'},                             -- 06   Sparks are currently capped at 50,000
 }
 
+types.roe_quest = L{
+    {ctype='bit[12]',           label='RoE Quest ID'},                          -- 00:00
+    {ctype='bit[20]',           label='RoE Quest Progress'},                    -- 01:04
+}
+
 -- Eminence Update
 fields.incoming[0x111] = L{
     {ref=types.roe_quest,       count=16},                                      -- 04
@@ -2030,11 +2080,11 @@ sizes.long = 8
 sizes.float = 4
 sizes.double = 8
 
-local function parse(fs, data, max)
+local function parse(fs, data, index, max)
     max = max == '*' and 0 or max or 1
+    index = index or 4
 
     local res = L{}
-    local index = 0
     local count = 0
     local bitoffset = 0
     while index < #data do
@@ -2045,7 +2095,7 @@ local function parse(fs, data, max)
                 local ctype, count_str = field.ctype:match('(.*)%[(%d+)%]')
                 if count_str and ctype ~= 'char' and ctype ~= 'bit' then
                     field.ctype = ctype
-                    local ext, size = parse(L{field}, data:sub(index + 1), count_str:number())
+                    local ext, size = parse(L{field}, data, index, count_str:number())
                     res = res + ext
                     index = index + size
                 else
@@ -2063,7 +2113,12 @@ local function parse(fs, data, max)
                     end
                 end
             else
-                local ext, size = parse(field.ref, data:sub(index + 1), field.count)
+                local type_count = field.count
+                if not type_count then
+                    local byte_index = field.count_ref + 1
+                    type_count = data:byte(byte_index, byte_index)
+                end
+                local ext, size = parse(field.ref, data, index, type_count)
                 res = res + ext
                 index = index + size
             end
@@ -2082,7 +2137,7 @@ function fields.get(dir, id, data)
     if type(f) == 'function' then
         f = f(data)
     end
-    return f and data and parse(f, data:sub(5)) or f
+    return f and data and parse(f, data) or f
 end
 
 return fields
