@@ -121,7 +121,9 @@ function list.extend(l1, l2)
     return l1
 end
 
-_meta.L.__add = list.extend
+_meta.L.__add = function(l1, l2)
+    return L{}:extend(l1):extend(l2)
+end
 
 function list.contains(l, el)
     for key = 1, l.n do
