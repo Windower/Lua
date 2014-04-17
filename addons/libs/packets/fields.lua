@@ -1736,9 +1736,9 @@ fields.incoming._mult[0x0C9][0x03] = L{
 }
 
 -- Metadata
+-- The title needs to be somewhere in here, but not sure where, maybe bit packed?
 fields.incoming._mult[0x0C9][0x01] = L{
-    {ctype='unsigned char',     label='_zero1',             const=0x00},        -- 0B
-    {ctype='unsigned short',    label='_unknown1'},                             -- 0C
+    {ctype='char[3]',           label='_junk1'},                                -- 0B
     {ctype='unsigned char',     label='_unknown2'},                             -- 0E
     {ctype='unsigned char',     label='_unknown3'},                             -- 0F
     {ctype='unsigned short',    label='_unknown4'},                             -- 10
@@ -1747,7 +1747,7 @@ fields.incoming._mult[0x0C9][0x01] = L{
     {ctype='char[15]',          label='Linkshell',          enc=ls_name_msg},   -- 14   6-bit packed
     {ctype='unsigned char',     label='Main Job Level'},                        -- 23
     {ctype='unsigned char',     label='Sub Job Level'},                         -- 24
-    {ctype='char[43]',          label='_unknown5'},                             -- 25
+    {ctype='char[43]',          label='_unknown5'},                             -- 25   At least the first two bytes and the last twelve bytes are junk, possibly more
 }
 
 -- Bazaar Message
