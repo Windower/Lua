@@ -701,7 +701,7 @@ return {
     [708] = { english="This place is now known as a location that brings memories flooding back to ${actor}.", color=91},
     [709] = { english="As a special bonus for your valiant efforts, you have been awarded the following: ${item}", color=91},
     [710] = { english="You are cleared to fulfill this objective again.", color=91},
-    [711] = { english=".", color=91},
+    [711] = { english="(${actor}) ${item}", color=91},
     [712] = { english="Primary Accuracy: ${number} / Primary Attack: ${number2}", color=91},
     [713] = { english="Auxiliary Accuracy: ${number} / Auxiliary Attack: ${number2}", color=91},
     [714] = { english="Ranged Accuracy: ${number} / Ranged Attack: ${number2}", color=91},
@@ -720,7 +720,11 @@ return {
     [727] = { english="You receive a bonus of ${number} bonecraft guild points!", color=121},
     [728] = { english="You receive a bonus of ${number} alchemy guild points!", color=121},
     [729] = { english="You receive a bonus of ${number} cooking guild points!", color=121},
-    [730] = { english="${actor} uses ${weapon_skill}${lb}${target}'s TP is reduced to ${number}.", color=101}
+    [730] = { english="${actor} uses ${weapon_skill}${lb}${target}'s TP is reduced to ${number}.", color=101},
+    [731] = { english="Average item level: ${number}.", color=101},
+    [732] = { english="Skillchain: Universal Enlightenment.${lb}${target} takes ${number} points of damage", color="D"},
+    [733] = { english="${target}:", color=91},
+    [734] = { english="${actor} uses ${ability} on ${target}.", color=91},
 }
 
 
