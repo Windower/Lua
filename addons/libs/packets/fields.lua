@@ -92,7 +92,7 @@ local function cap(max, val)
 end
 
 local function zone(val)
-    return val > 0 and res.zones[val].name or '-'
+    return res.zones[val] and res.zones[val].name or '- (Unknown zone ID: %d)':format(val)
 end
 
 local function item(val)
@@ -277,7 +277,7 @@ fields.outgoing[0x015] = L{
 -- Update Request
 fields.outgoing[0x016] = L{
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 04
-    {ctype='unsigned short',    label='_unknown1'},                             -- 06
+    {ctype='unsigned short',    label='_junk1'},                                -- 06
 }
 
 enums['action'] = {
@@ -392,6 +392,7 @@ fields.outgoing[0x04D] = L{
 fields.outgoing[0x050] = L{
     {ctype='unsigned char',     label='Item Index',         fn=inv+{0}},        -- 04
     {ctype='unsigned char',     label='Equip Slot',         fn=slot},           -- 05
+	{ctype='char[2]',           label='_junk1'}                                 -- 06
 }
 
 -- Conquest
@@ -405,9 +406,10 @@ fields.outgoing[0x05B] = L{
     {ctype='unsigned short',    label='_unknown1'},                             -- 0A
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 0C
     {ctype='bool',              label='Begin dialogue'},                        -- 0E   Seems to be 1 when initiating conversion, 0 otherwise, unsure
+    {ctype='unsigned char',     label='_unknown2'},                             -- 0F
     {ctype='unsigned short',    label='Zone',               fn=zone},           -- 10
-    {ctype='unsigned char',     label='_unknown2'},                             -- 12   Might be a short, some parameter for the dialogue option, sometimes related to Index (Index + 0x5C0)
-    {ctype='unsigned char',     label='_unknown3'},                             -- 13
+    {ctype='unsigned char',     label='_unknown3'},                             -- 12   Might be a short, some parameter for the dialogue option, sometimes related to Index (Index + 0x5C0)
+    {ctype='unsigned char',     label='_unknown4'},                             -- 13
 }
 
 -- Zone request
@@ -1429,7 +1431,7 @@ fields.incoming[0x04F] = L{
 fields.incoming[0x050] = L{
     {ctype='unsigned char',     label='Inventory Index',    fn=inv+{0}},        -- 04
     {ctype='unsigned char',     label='Equipment Slot',     fn=slot},           -- 05
-	{ctype='unsigned short',    label='_junk1'}                                 -- 06
+	{ctype='char[2]',           label='_junk1'}                                 -- 06
 }
 
 -- Model Change
@@ -1471,6 +1473,12 @@ fields.incoming[0x057] = L{
     {ctype='unsigned short',    label='_unknown2'},                             -- 0A
 }
 
+enums.spawntype = {
+    [0x03] = 'Monster',
+    [0x00] = 'Casket or NPC',
+    [0x0A] = 'Self',
+}
+
 -- NPC Spawn
 fields.incoming[0x05B] = L{
     {ctype='float',             label='X'},                                     -- 04
@@ -1478,7 +1486,7 @@ fields.incoming[0x05B] = L{
     {ctype='float',             label='Y'},                                     -- 0C
     {ctype='unsigned int',      label='ID',                 fn=id},             -- 10
     {ctype='unsigned short',    label='Index',              fn=index},          -- 14
-    {ctype='unsigned char',     label='Type'},                                  -- 16   3 for regular Monsters, 0 for Treasure Caskets and NPCs
+    {ctype='unsigned char',     label='Type',               fn=e+{'spawntype'}},-- 16   3 for regular Monsters, 0 for Treasure Caskets and NPCs
     {ctype='unsigned char',     label='_unknown1'},                             -- 17   Always 0 if Type is 3, otherwise a seemingly random non-zero number
     {ctype='unsigned int',      label='_unknown2'},                             -- 18
 }
