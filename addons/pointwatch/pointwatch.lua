@@ -132,7 +132,7 @@ windower.register_event('addon command',function(...)
     local commands = {...}
     local first_cmd = table.remove(commands,1)
     if approved_commands[first_cmd] then
-        texts[func](box,unpack(commands))
+        texts[first_cmd](box,unpack(commands))
     elseif first_cmd == 'reload' then
         windower.send_command('lua r pointwatch')
     elseif first_cmd == 'unload' then
