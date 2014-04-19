@@ -24,7 +24,7 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-_addon.version = '2.100'
+_addon.version = '2.101'
 _addon.name = 'Shortcuts'
 _addon.author = 'Byrth'
 _addon.commands = {'shortcuts'}
@@ -119,6 +119,8 @@ default_aliases = {
 
 aliases = config.load('data\\aliases.xml',default_aliases)
 config.save(aliases)
+setmetatable(aliases,nil)
+
 
 require 'statics'
 require 'ambiguous_names'
@@ -344,7 +346,7 @@ end
 -----------------------------------------------------------------------------------
 function interp_text(splitline,offset,modified)
     local temptarg,abil
-    local no_targ_abil = strip(_raw.table.concat(splitline,' ',1+offset,splitline.n))
+    local no_targ_abil = strip(table.concat(splitline,' ',1+offset,splitline.n))
     
     if validabils[no_targ_abil] then
         abil = no_targ_abil
