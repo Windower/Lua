@@ -182,20 +182,6 @@ function list.with(l, attr, val)
     end
 end
 
-function list.iwith(l, attr, val)
-    local cel
-    val = val:lower()
-    for i = 1, l.n do
-        local el = rawget(l, i)
-        if type(el) == 'table' then
-            cel = rawget(el, attr)
-            if type(cel) == 'string' and cel:lower() == val then
-                return el
-            end
-        end
-    end
-end
-
 function list.map(l, fn)
     local res = {}
 
