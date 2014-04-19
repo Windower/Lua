@@ -66,17 +66,13 @@ end
 function validabils_it(resources_table,str)
     for i,v in pairs(resources_table) do
         make_abil(v.english,str,i)
-        if v.alias then
-            local struck = string.split(v.alias,'|')
-            for n,m in ipairs(struck) do
-                make_abil(m,str,i)
-            end
-        end
     end
 end
 
 validabils_it(res.spells,'spells')
 validabils_it(res.abilities,'abilities')
+
+
 
 if logging then
 	f:write('Counter: '..tostring(counter))

@@ -24,6 +24,12 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+_addon.version = '2.100'
+_addon.name = 'Shortcuts'
+_addon.author = 'Byrth'
+_addon.commands = {'shortcuts'}
+
+
 debugging = false
 logging = false
 if windower.dir_exists('../addons/shortcuts/data/') and logging then
@@ -39,21 +45,84 @@ if windower.file_exists(windower.addon_path..'resources.lua') then
     end
 end
 
+if not windower.dir_exists(windower.addon_path..'data') then
+    windower.create_dir(windower.addon_path..'data')
+end
+
 require 'sets'
 require 'helper_functions'
 require 'tables'
 require 'strings'
 res = require 'resources'
+config = require 'config'
+
+default_aliases = {
+    c1="Cure",
+    c2="Cure II",
+    c3="Cure III",
+    c4="Cure IV",
+    c5="Cure V",
+    c6="Cure VI",
+    r1="Raise",
+    r2="Raise II",
+    r3="Raise III",
+    pro1="Protectra",
+    pro2="Protectra II",
+    pro3="Protectra III",
+    pro4="Protectra IV",
+    pro5="Protectra V",
+    sh1="Shellra",
+    sh2="Shellra II",
+    sh3="Shellra III",
+    sh4="Shellra IV",
+    sh5="Shellra V",
+    she1="Shellra",
+    she2="Shellra II",
+    she3="Shellra III",
+    she4="Shellra IV",
+    she5="Shellra V",
+    bl="Blink",
+    ss="Stoneskin",
+    re1="Regen",
+    re2="Regen II",
+    re3="Regen III",
+    re4="Regen IV",
+    re5="Regen V",
+    holla="Teleport-Holla",
+    dem="Teleport-Dem",
+    mea="Teleport-Mea",
+    yhoat="Teleport-Yhoat",
+    altep="Teleport-Altep",
+    vahzl="Teleport-Vahzl",
+    jugner="Recall-Jugner",
+    pashh="Recall-Pashh",
+    meri="Recall-Meriph",
+    pash="Recall-Pashh",
+    meriph="Recall-Meriph",
+    ichi="Utsusemi: Ichi",
+    ni="Utsusemi: Ni",
+    utsu1="Utsusemi: Ichi",
+    utsu2="Utsusemi: Ni",
+    ds="Divine Seal",
+    es="Elemental Seal",
+    la="Light Arts",
+    da="Dark Arts",
+    pen="Penury",
+    cel="Celerity",
+    cw1="Curing Waltz",
+    cw2="Curing Waltz II",
+    cw3="Curing Waltz III",
+    cw4="Curing Waltz IV",
+    cw5="Curing Waltz V",
+    hw="Healing Waltz"
+}
+
+aliases = config.load('data\\aliases.xml',default_aliases)
+config.save(aliases)
 
 require 'statics'
 require 'ambiguous_names'
 require 'targets'
-
-
-_addon.version = '2.000'
-_addon.name = 'Shortcuts'
-_addon.author = 'Byrth'
-_addon.commands = {'shortcuts'}
 
 -----------------------------------------------------------------------------------
 --Name: event_load()
@@ -139,7 +208,7 @@ end)
 ---- string (sometimes '') depending what the logic says to do.
 -----------------------------------------------------------------------------------
 function command_logic(original,modified)
-    local splitline = string.split(original,' ')
+    local splitline = alias_replace(string.split(original,' '))
     local command = splitline[1] -- Treat the first word as a command.
     local potential_targ = splitline[splitline.n]
     local a,b,spell = string.find(original,'"(.-)"')
@@ -240,6 +309,24 @@ function command_logic(original,modified)
         -- If there is not a valid command, then pass the text with an offset of 0 to the text interpretation function
         return interp_text(splitline,0,modified)
     end
+end
+
+
+-----------------------------------------------------------------------------------
+--Name: alias_replace(tab)
+--Args:
+---- tab (table of strings): splitline
+-----------------------------------------------------------------------------------
+--Returns:
+---- tab (table of strings): with all the aliased values replaced
+-----------------------------------------------------------------------------------
+function alias_replace(tab)
+    for ind,key in ipairs(tab) do
+        if aliases[key:lower()] then
+            tab[ind] = aliases[key:lower()]
+        end
+    end
+    return tab
 end
 
 
