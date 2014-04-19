@@ -1675,8 +1675,8 @@ fields.incoming[0x06F] = L{
 -- This is how it works as of 3-19-14, and it is safe to assume that it will change in the future.
 fields.incoming[0x08D] = L{
     {ctype='unsigned short',    label='Job Point ID'},                          -- 04   32 potential values for every job, which means you could decompose this into a value bitpacked with job ID if you wanted
-    {ctype='unsigned char',     label='_unknown1'},                             -- 06   Availability? Always 1 in cases where the ID is set at the moment.
-    {ctype='unsigned char',     label='Current Level'},                         -- 07   Current enhancement for this job point ID
+    {ctype='bit[10]',           label='_unknown1'},                             -- 06   Always 1 in cases where the ID is set at the moment. Zeroing this has no effect.
+    {ctype='bit[6]',            label='Current Level'},                         -- 07   Current enhancement for this job point ID
 }
 
 -- Campaign Map Info
