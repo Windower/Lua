@@ -7,7 +7,7 @@ res = require 'resources'
 
 _addon.name = 'PointWatch'
 _addon.author = 'Byrth'
-_addon.version = 0.04122014
+_addon.version = 0.04202014
 _addon.command = 'pw'
 
 if not windower.dir_exists('data') then
@@ -74,6 +74,7 @@ function initialize()
     dynamis.static = false
     if info.logged_in and res.zones[info.zone].english:sub(1,7) == 'Dynamis' then
         dynamis.static = true
+        dynamis.zone = info.zone
         error(123,'Loading PointWatch in Dynamis results in an inaccurate timer. Number of KIs is displayed.')
     end
 
@@ -111,10 +112,10 @@ windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blo
                 dynamis.time_limit = 3600
                 for KI,TE in pairs(dynamis_map[dynamis.zone]) do
                     if dynamis.KIs[KI] then
-                        dynamis.time_limit = dynamis.time_limit + TE
+                        dynamis.time_limit = dynamis.time_limit + TE*60
                     end
                 end
-                update()
+                update_box()
             end
         end
     end
@@ -122,9 +123,13 @@ end)
 
 windower.register_event('zone change',function(new,old)
     if res.zones[new].english:sub(1,7) == 'Dynamis' then
-        dynamis.entry_time = os.time()
+        dynamis.entry_time = os.clock()
         dynamis.time_limit = 3600
         dynamis.zone = new
+    else
+        dynamis.entry_time = 0
+        dynamis.time_limit = 0
+        dynamis.zone = 0
     end
 end)
 
@@ -132,13 +137,20 @@ windower.register_event('addon command',function(...)
     local commands = {...}
     local first_cmd = table.remove(commands,1)
     if approved_commands[first_cmd] then
-        texts[first_cmd](box,unpack(commands))
+        local tab = {}
+        for i,v in pairs(commands) do
+            tab[i] = tonumber(v) or v
+        end
+        texts[first_cmd](box,unpack(tab))
+        config.save(box._settings)
     elseif first_cmd == 'reload' then
         windower.send_command('lua r pointwatch')
     elseif first_cmd == 'unload' then
         windower.send_command('lua u pointwatch')
     elseif first_cmd == 'reset' then
         initialize()
+--    elseif first_cmd == 'eval' then
+--        assert(loadstring(table.concat(commands, ' ')))()
     end
 end)
 
@@ -157,8 +169,8 @@ function update_box()
     box:appendline('CP /hour: '..cp_rate)
     box:appendline('XP Total: '..xp.total)
     box:appendline('XP /hour: '..xp_rate)
-    if dynamis.entry_time ~= 0 then
-        box:appendline('Time Rem: '..os.date('%H:%M:%S',dynamis.entry_time+dynamis.time_limit-os.time()))
+    if dynamis.entry_time ~= 0 and dynamis.entry_time+dynamis.time_limit-os.clock() > 0 then
+        box:appendline('Time Rem: '..os.date('%H:%M:%S',dynamis.entry_time+dynamis.time_limit-os.clock()+18000))
     end
     if dynamis.static or dynamis.entry_time ~= 0 then
         box:appendline('Dyna KIs: '..X_or_O(dynamis.KIs.Crimson)..X_or_O(dynamis.KIs.Azure)..X_or_O(dynamis.KIs.Amber)..X_or_O(dynamis.KIs.Alabaster)..X_or_O(dynamis.KIs.Obsidian))
