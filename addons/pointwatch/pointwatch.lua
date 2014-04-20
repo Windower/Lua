@@ -14,36 +14,48 @@ if not windower.dir_exists('data') then
     windower.create_dir('data')
 end
 
-default_settings = {}
-default_settings.pos = {}
-default_settings.pos.x = 0
-default_settings.pos.y = 0
-default_settings.bg = {}
-default_settings.bg.alpha = 255
-default_settings.bg.red = 0
-default_settings.bg.green = 0
-default_settings.bg.blue = 0
-default_settings.bg.visible = true
-default_settings.flags = {}
-default_settings.flags.right = false
-default_settings.flags.bottom = false
-default_settings.flags.bold = false
-default_settings.flags.italic = false
-default_settings.padding = 0
-default_settings.text = {}
-default_settings.text.size = 12
-default_settings.text.font = 'Consolas'
-default_settings.text.fonts = {}
-default_settings.text.alpha = 255
-default_settings.text.red = 255
-default_settings.text.green = 255
-default_settings.text.blue = 255
+default_settings = {
+    strings = {
+        default = "xp.current..'/'..xp.tnl..'XP   '..lp.current..'/'..lp.tnm..'LP ['..lp.number_of_merits..']   XP/hr:'..(math.floor(xp.rate/100)/10)..'   '..cp.current..'/'..cp.tnjp..'CP ['..cp.number_of_job_points..']   '..(math.floor(cp.rate/100)/10)..'kCP/hr'",
+        dynamis = "xp.current..'/'..xp.tnl..'XP   '..lp.current..'/'..lp.tnm..'LP ['..lp.number_of_merits..']   XP/hr:'..(math.floor(xp.rate/100)/10)..'   '..cp.current..'/'..cp.tnjp..'CP ['..cp.number_of_job_points..']   '..dynamis.KIs..'  '..os.date('%H:%M:%S',dynamis.time_remaining+18000)"
+        },
+    text_box_settings = {
+        pos = {
+            x = 0,
+            y = 0,
+        },
+        bg = {
+            alpha = 255,
+            red = 0,
+            green = 0,
+            blue = 0,
+            visible = true
+        },
+        flags = {
+            right = false,
+            bottom = false,
+            bold = false,
+            italic = false
+        },
+        padding = 0,
+        text = {
+            size = 12,
+            font = 'Consolas',
+            fonts = {},
+            alpha = 255,
+            red = 255,
+            green = 255,
+            blue = 255
+        }
+    }
+}
 
 
 settings = config.load('data\\settings.xml',default_settings)
 config.save(settings)
 
-box = texts.new('****PointWatch****',settings)
+box = texts.new('${current_string}',settings.text_box_settings)
+box.current_string = ''
 box:show()
 approved_commands = S{'show','hide','pos','pos_x','pos_y','font','size','pad','color','alpha','transparency','bg_color','bg_alpha','bg_transparency'}
 city_table = {Crimson=10,Azure=10,Amber=10,Alabaster=15,Obsidian=15}
@@ -52,32 +64,53 @@ dynamis_map = {[185]=city_table,[186]=city_table,[187]=city_table,[188]=city_tab
     [134]=other_table,[135]=other_table,[39]=other_table,[40]=other_table,[41]=other_table,[42]=other_table}
 
 function initialize()
-    cp = {}
-    cp.registry = {}
-    cp.total = 0
+    cp = {
+        registry = {},
+        current = 0, -- Not implemented
+        rate = 0,
+        total = 0,
+        tnjp = 30000,
+        number_of_job_points = 0 -- Not implemented
+    }
 
     
-    xp = {}
-    xp.registry = {}
-    xp.total = 0
+    xp = {
+        registry = {},
+        total = 0,
+        rate = 0,
+        current = 0,
+        tnl = 0
+    }
+    
+    lp = {
+        current = 0,
+        tnm = 10000,
+        number_of_merits = 0
+    }
     
     
     local info = windower.ffxi.get_info()
     
     frame_count = 0
     
-    dynamis = {}
-    dynamis.KIs = {}
-    dynamis.entry_time = 0
-    dynamis.time_limit = 0
-    dynamis.zone = 0
-    dynamis.static = false
+    dynamis = {
+        KIs = '',
+        _KIs = {},
+        entry_time = 0,
+        time_limit = 0,
+        zone = 0,
+    }
     if info.logged_in and res.zones[info.zone].english:sub(1,7) == 'Dynamis' then
-        dynamis.static = true
+        cur_func = loadstring("current_string = "..settings.strings.dynamis)
+        setfenv(cur_func,_G)
+        dynamis.entry_time = os.time()
         dynamis.zone = info.zone
         error(123,'Loading PointWatch in Dynamis results in an inaccurate timer. Number of KIs is displayed.')
+    elseif info.logged_in then
+        cur_func = loadstring("current_string = "..settings.strings.default)
+        setfenv(cur_func,_G)
     end
-
+    
 end
 
 initialize()
@@ -95,13 +128,27 @@ windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blo
         elseif msg == 8 or msg == 105 or msg == 371 or msg == 372 then
             xp.registry[t] = (xp.registry[t] or 0) + val
             xp.total = xp.total + val
+            xp.current = xp.current + val
+            if xp.current > xp.tnl and xp.tnl ~= 56000 then
+                xp.current = xp.current - xp.tnl
+                -- I have capped all jobs, but I assume that a 0x61 packet is sent after you
+                --  level up, which will update the TNL and make this adjustment meaningless.
+            elseif xp.current > xp.tnl then
+                lp.current = lp.current + xp.current - xp.tnl + 1
+            end
         end
         update_box()
+    elseif id == 0x61 then
+        xp.current = org:byte(0x11)+org:byte(0x12)*256
+        xp.tnl = org:byte(0x13)+org:byte(0x14)*256
+    elseif id == 0x63 and org:byte(5) == 2 then
+        lp.current = org:byte(9)+org:byte(10)*256
+        lp.number_of_merits = org:byte(11)
     elseif id == 0x55 then
         local packet_id = org:byte(5)
         if packet_id == 7 then
             local dyna_KIs = math.floor((org:byte(6)%64)/2) -- 5 bits (32, 16, 8, 4, and 2 originally -> shifted to 16, 8, 4, 2, and 1)
-            dynamis.KIs = {
+            dynamis._KIs = {
                 ['Crimson'] = dyna_KIs%2 == 1,
                 ['Azure'] = math.floor(dyna_KIs/2)%2 == 1,
                 ['Amber'] = math.floor(dyna_KIs/4)%2 == 1,
@@ -111,7 +158,7 @@ windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blo
             if dynamis_map[dynamis.zone] then
                 dynamis.time_limit = 3600
                 for KI,TE in pairs(dynamis_map[dynamis.zone]) do
-                    if dynamis.KIs[KI] then
+                    if dynamis._KIs[KI] then
                         dynamis.time_limit = dynamis.time_limit + TE*60
                     end
                 end
@@ -123,13 +170,15 @@ end)
 
 windower.register_event('zone change',function(new,old)
     if res.zones[new].english:sub(1,7) == 'Dynamis' then
-        dynamis.entry_time = os.clock()
+        dynamis.entry_time = os.time()
         dynamis.time_limit = 3600
         dynamis.zone = new
+        cur_func = loadstring("current_string = "..settings.strings.dynamis)
     else
         dynamis.entry_time = 0
         dynamis.time_limit = 0
         dynamis.zone = 0
+        cur_func = loadstring("current_string = "..settings.strings.default)
     end
 end)
 
@@ -142,15 +191,16 @@ windower.register_event('addon command',function(...)
             tab[i] = tonumber(v) or v
         end
         texts[first_cmd](box,unpack(tab))
-        config.save(box._settings)
+        settings.text_box_settings = box._settings
+        config.save(settings)
     elseif first_cmd == 'reload' then
         windower.send_command('lua r pointwatch')
     elseif first_cmd == 'unload' then
         windower.send_command('lua u pointwatch')
     elseif first_cmd == 'reset' then
         initialize()
---    elseif first_cmd == 'eval' then
---        assert(loadstring(table.concat(commands, ' ')))()
+    elseif first_cmd == 'eval' then
+        assert(loadstring(table.concat(commands, ' ')))()
     end
 end)
 
@@ -162,20 +212,19 @@ windower.register_event('prerender',function()
 end)
 
 function update_box()
-    local cp_rate = analyze_points_table(cp.registry)
-    local xp_rate = analyze_points_table(xp.registry)
-    box:clear()
-    box:appendline('CP Total: '..cp.total)
-    box:appendline('CP /hour: '..cp_rate)
-    box:appendline('XP Total: '..xp.total)
-    box:appendline('XP /hour: '..xp_rate)
-    if dynamis.entry_time ~= 0 and dynamis.entry_time+dynamis.time_limit-os.clock() > 0 then
-        box:appendline('Time Rem: '..os.date('%H:%M:%S',dynamis.entry_time+dynamis.time_limit-os.clock()+18000))
+    cp.rate = analyze_points_table(cp.registry)
+    xp.rate = analyze_points_table(xp.registry)
+    if dynamis.entry_time ~= 0 and dynamis.entry_time+dynamis.time_limit-os.time() > 0 then
+        dynamis.time_remaining = dynamis.entry_time+dynamis.time_limit-os.time()
+        dynamis.KIs = X_or_O(dynamis._KIs.Crimson)..X_or_O(dynamis._KIs.Azure)..X_or_O(dynamis._KIs.Amber)..X_or_O(dynamis._KIs.Alabaster)..X_or_O(dynamis._KIs.Obsidian)
+    else
+        dynamis.time_remaining = 0
+        dynamis.KIs = ''
     end
-    if dynamis.static or dynamis.entry_time ~= 0 then
-        box:appendline('Dyna KIs: '..X_or_O(dynamis.KIs.Crimson)..X_or_O(dynamis.KIs.Azure)..X_or_O(dynamis.KIs.Amber)..X_or_O(dynamis.KIs.Alabaster)..X_or_O(dynamis.KIs.Obsidian))
+    assert(cur_func)()
+    if box.current_string ~= current_string then
+        box.current_string = current_string
     end
-    box:update()
 end
 
 function X_or_O(bool)
