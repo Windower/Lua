@@ -17,7 +17,7 @@ end
 default_settings = {
     strings = {
         default = "xp.current..'/'..xp.tnl..'XP   '..lp.current..'/'..lp.tnm..'LP ['..lp.number_of_merits..']   XP/hr:'..(math.floor(xp.rate/100)/10)..'   '..cp.current..'/'..cp.tnjp..'CP ['..cp.number_of_job_points..']   '..(math.floor(cp.rate/100)/10)..'kCP/hr'",
-        dynamis = "xp.current..'/'..xp.tnl..'XP   '..lp.current..'/'..lp.tnm..'LP ['..lp.number_of_merits..']   XP/hr:'..(math.floor(xp.rate/100)/10)..'   '..cp.current..'/'..cp.tnjp..'CP ['..cp.number_of_job_points..']   '..dynamis.KIs..'  '..os.date('%H:%M:%S',dynamis.time_remaining+18000)"
+        dynamis = "xp.current..'/'..xp.tnl..'XP   '..lp.current..'/'..lp.tnm..'LP ['..lp.number_of_merits..']   XP/hr:'..(math.floor(xp.rate/100)/10)..'   '..cp.current..'/'..cp.tnjp..'CP ['..cp.number_of_job_points..']   '..dynamis.KIs..'  '..dynamis.time_remaining"
         },
     text_box_settings = {
         pos = {
@@ -103,7 +103,7 @@ function initialize()
     if info.logged_in and res.zones[info.zone].english:sub(1,7) == 'Dynamis' then
         cur_func = loadstring("current_string = "..settings.strings.dynamis)
         setfenv(cur_func,_G)
-        dynamis.entry_time = os.time()
+        dynamis.entry_time = os.clock()
         dynamis.zone = info.zone
         error(123,'Loading PointWatch in Dynamis results in an inaccurate timer. Number of KIs is displayed.')
     elseif info.logged_in then
@@ -144,6 +144,10 @@ windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blo
     elseif id == 0x63 and org:byte(5) == 2 then
         lp.current = org:byte(9)+org:byte(10)*256
         lp.number_of_merits = org:byte(11)
+    elseif id == 0x63 and org:byte(5) == 5 then
+        local offset = windower.ffxi.get_player().main_job_id*4+13 -- So WAR (ID==1) starts at byte 17
+        cp.current = org:byte(offset)+org:byte(offset+1)*256
+        cp.number_of_job_points = org:byte(offset+2)
     elseif id == 0x55 then
         local packet_id = org:byte(5)
         if packet_id == 7 then
@@ -170,7 +174,7 @@ end)
 
 windower.register_event('zone change',function(new,old)
     if res.zones[new].english:sub(1,7) == 'Dynamis' then
-        dynamis.entry_time = os.time()
+        dynamis.entry_time = os.clock()
         dynamis.time_limit = 3600
         dynamis.zone = new
         cur_func = loadstring("current_string = "..settings.strings.dynamis)
@@ -214,8 +218,8 @@ end)
 function update_box()
     cp.rate = analyze_points_table(cp.registry)
     xp.rate = analyze_points_table(xp.registry)
-    if dynamis.entry_time ~= 0 and dynamis.entry_time+dynamis.time_limit-os.time() > 0 then
-        dynamis.time_remaining = dynamis.entry_time+dynamis.time_limit-os.time()
+    if dynamis.entry_time ~= 0 and dynamis.entry_time+dynamis.time_limit-os.clock() > 0 then
+        dynamis.time_remaining = os.date('%H:%M:%S',dynamis.entry_time+dynamis.time_limit-os.clock()+18000)
         dynamis.KIs = X_or_O(dynamis._KIs.Crimson)..X_or_O(dynamis._KIs.Azure)..X_or_O(dynamis._KIs.Amber)..X_or_O(dynamis._KIs.Alabaster)..X_or_O(dynamis._KIs.Obsidian)
     else
         dynamis.time_remaining = 0

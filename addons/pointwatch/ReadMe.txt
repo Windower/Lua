@@ -32,11 +32,11 @@ Here are the available values:
 * lp.tnl                  = Similar to a "To Next Level", but this value is always 10,000 because that's always the number of Limit Points per merit point.
 * lp.number_of_merits     = Number of merit points you have.
 
-* cp.current              = Current Capacity Points (number from 0 to 29,999 CP) -- Yet to be implemented
+* cp.current              = Current Capacity Points (number from 0 to 29,999 CP)
 * cp.rate                 = Current CP gain rate per hour. This is calculated over a 10 minute window and requires at least two gains within the window.
 * cp.total                = Total Capacity Points gained since the last time the addon was loaded (number)
 * cp.tnjp                 = Similar to a "To Next Level", but this value is always 30,000 because that's always the number of CPs per job point.
-* cp.number_of_job_points = Number of job points you currently have on your current job. -- Yet to be implemented
+* cp.number_of_job_points = Number of job points you currently have on your current job.
 
 * dynamis.KIs             = Series of Xs and Os indicating whether or not you have the 5 KIs.
 * dynamis.entry_time      = Your Dynamis entry time, in seconds. -- If the addon is loaded in dynamis, this will be the time of addon load.
