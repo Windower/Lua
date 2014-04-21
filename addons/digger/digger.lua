@@ -119,7 +119,7 @@ function update_stats(count)
         settings.accuracy.successful = settings.accuracy.successful + 1
     end
     settings.fatigue.remaining = settings.fatigue.remaining + count
-    settings:save('all')
+    settings:save()
 end
 
 function display_stats()
@@ -163,7 +163,7 @@ function digger_command(...)
         windower.add_to_chat(200, 'resetting dig accuracy statistics')
         settings.accuracy.successful = 0
         settings.accuracy.total = 0
-        settings:save('all')
+        settings:save()
     elseif #arg == 2 and arg[1]:lower() == 'rank' then
         local rank = arg[2]:lower()
         if rank == 'amateur' then
@@ -204,7 +204,7 @@ function digger_command(...)
             return
         end
         windower.add_to_chat(200, 'setting digging rank to %s: area delay = %d seconds, dig delay = %d seconds':format(rank, settings.delay.area, settings.delay.dig))
-        settings:save('all')
+        settings:save()
     else
         windower.add_to_chat(167, 'usage: digger rank <crafting rank>')
         windower.add_to_chat(167, '        digger reset')
