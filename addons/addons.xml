@@ -109,6 +109,13 @@
     <support>http://www.ffxiah.com/player/Ragnarok/Ikonic</support>
   </addon>
   <addon>
+    <name>digger</name>
+    <author>Seth VanHeulen (Acacia@Odin)</author>
+    <description>Displays Chocobo digging accuracy, fatigue and remaining greens after each dig. Also shows dig "recast" timer using the Timers plugin.</description>
+    <bugtracker>https://github.com/svanheulen/digger-windower-addon/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Odin/Acacia</support>
+  </addon>
+  <addon>
     <name>Distance</name>
     <author>Arcon</author>
     <description>Shows the distance to your current target.</description>
