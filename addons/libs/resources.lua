@@ -29,13 +29,22 @@ local resources = setmetatable({}, {__index = function(t, k)
 end})
 
 -- The metatable for a single resource item (an entry in a sub table of the root resource table)
-local resource_entry_mt = {__index = function(t, k)
-    return k == 'name'
-            and t[language_string]
-        or k == 'log_name'
-            and t[log_language_string]
-        or table[k]
-end}
+local resource_entry_mt = {__index = function()
+    local redict = {
+        name = language_string,
+        log_name = log_language_string,
+        english = 'en',
+        japanese = 'ja',
+        german = 'de',
+        french = 'fr',
+    }
+
+    return function(t, k)
+        return redict[k]
+                and t[redict[k]]
+            or table[k]
+    end
+end()}
 
 function resource_group(r, fn, attr)
     fn = type(fn) == 'function' and fn or functions.equals(fn)
@@ -58,12 +67,17 @@ resource_mt.__index = function(t, k)
 end
 resource_mt.__class = 'Resource'
 
-local plugin_resources = windower.addon_path .. '../../plugins/resources/'
-local addon_resources = windower.addon_path .. '../libs/resources/'
+local resources_path = windower.addon_path .. '../libs/resources/'
 
 local flag_cache = {}
-resources.parse_flags = function(bits)
-    if not flag_cache[bits] then
+local parse_flags = function(bits, lookup, values)
+    if not rawget(flag_cache, lookup) then
+        rawset(flag_cache, lookup, {})
+    end
+
+    if not rawget(rawget(flag_cache, lookup), bits) and rawget(lookup, bits) then
+        rawset(rawget(flag_cache, lookup), bits, rawget(lookup, bits))
+    elseif not rawget(rawget(flag_cache, lookup), bits) then
         local res = S{}
 
         local rem
@@ -72,51 +86,81 @@ resources.parse_flags = function(bits)
         while num > 0 do
             num, rem = (num/2):modf()
             if rem > 0 then
-                res:add(count)
+                res:add(rawget(lookup, values and 2^count or count))
             end
             count = count + 1
         end
 
-        flag_cache[bits] = res
+        rawset(rawget(flag_cache, lookup), bits, res)
     end
 
-    return flag_cache[bits]
+    return rawget(rawget(flag_cache, lookup), bits)
 end
 
 local language_strings = S{'english', 'japanese', 'german', 'french'}
 
 -- Add resources from files
-local res_names = S{'jobs', 'races', 'weather', 'servers', 'chat', 'bags', 'slots', 'statuses', 'emotes', 'skills', 'titles', 'encumbrance', 'check_ratings', 'synth_ranks', 'days', 'moon_phases', 'elements', 'monster_abilities', 'action_messages', 'abilities', 'spells', 'buffs', 'zones'}
+local post_process
+local res_names = S(windower.get_dir(resources_path)):filter(string.endswith-{'.lua'}):map(string.sub-{1, -5})
 for res_name in res_names:it() do
     fns[res_name] = function()
-        local res, slot_table = dofile(addon_resources .. res_name .. '.lua')
+        local res, slot_table = dofile(resources_path .. res_name .. '.lua')
         res = table.map(res, (setmetatable-{resource_entry_mt}):cond(function(key) return type(key) == 'table' end))
         slots[res] = S(slot_table) or language_strings + table.keyset(next[2](res))
+        post_process(res)
         return res
     end
 end
 
--- Returns the items, indexed by ingame ID.
-function fns.items()
-    local res, slot_table = dofile(addon_resources .. 'items.lua')
-    res = table.map(res, (setmetatable-{resource_entry_mt}):cond(functions.equals('table') .. type))
-    slots[res] = language_strings + S(slot_table)
+local lookup
+local flag_keys = S{
+    'targets',
+}
+local fn_cache = {}
 
-    for i, v in pairs(res) do
-        if v.category ~= 'General' then
-            res[i].races = resources.parse_flags(v.races)
-            res[i].jobs = resources.parse_flags(v.jobs)
-            res[i].slots = resources.parse_flags(v.slots)
+post_process = function(t)
+    for key in slots[t]:it() do
+        if rawget(lookup, key) then
+            if flag_keys:contains(key) then
+                rawset(fn_cache, key, function(flags)
+                    return parse_flags(flags, rawget(lookup, key), true)
+                end)
+            else
+                rawset(fn_cache, key, function(flags)
+                    return parse_flags(flags, rawget(lookup, key), false)
+                end)
+            end
+
+        elseif rawget(lookup, key .. 's') then
+            rawset(fn_cache, key, function(value)
+                return rawget(rawget(lookup, key .. 's'), value)
+            end)
+
         end
     end
 
-    return res
+    for _, entry in pairs(t) do
+        for key, fn in pairs(fn_cache) do
+            if rawget(entry, key) ~= nil then
+                rawset(entry, key, fn(rawget(entry, key)))
+            end
+        end
+    end
 end
+
+lookup = {
+    elements = resources.elements,
+    jobs = resources.jobs,
+    slots = resources.slots,
+    races = resources.races,
+    skills = resources.skills,
+    targets = {[0x01] = 'Self', [0x02] = 'Player', [0x04] = 'Party', [0x08] = 'Alliance', [0x10] = 'NPC', [0x20] = 'Enemy', [0x60] = 'Object', [0x9D] = 'Corpse'},
+}
 
 return resources
 
 --[[
-Copyright (c) 2013, Windower
+Copyright (c) 2013-2014, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
