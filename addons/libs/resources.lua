@@ -37,6 +37,10 @@ local resource_entry_mt = {__index = function()
         japanese = 'ja',
         german = 'de',
         french = 'fr',
+        english_log = 'enl',
+        japanese_log = 'ja',
+        german_log = 'del',
+        french_log = 'frl',
     }
 
     return function(t, k)
@@ -75,8 +79,8 @@ local parse_flags = function(bits, lookup, values)
         rawset(flag_cache, lookup, {})
     end
 
-    if not rawget(rawget(flag_cache, lookup), bits) and rawget(lookup, bits) then
-        rawset(rawget(flag_cache, lookup), bits, rawget(lookup, bits))
+    if values and not rawget(rawget(flag_cache, lookup), bits) and rawget(lookup, bits) then
+        rawset(rawget(flag_cache, lookup), bits, S{rawget(lookup, bits)})
     elseif not rawget(rawget(flag_cache, lookup), bits) then
         local res = S{}
 
@@ -126,7 +130,7 @@ post_process = function(t)
                     return parse_flags(flags, rawget(lookup, key), true)
                 end)
             else
-                rawset(fn_cache, key, function(flags)
+                rawset(fn_cache, key, function(flags, id)
                     return parse_flags(flags, rawget(lookup, key), false)
                 end)
             end
