@@ -90,7 +90,9 @@ local parse_flags = function(bits, lookup, values)
         while num > 0 do
             num, rem = (num/2):modf()
             if rem > 0 then
-                res:add(rawget(lookup, values and 2^count or count))
+                -- Commented out due to current API returning numbers instead of objects
+                -- res:add(rawget(lookup, values and 2^count or count))
+                res:add(values and rawget(lookup, 2^count) or count)
             end
             count = count + 1
         end
