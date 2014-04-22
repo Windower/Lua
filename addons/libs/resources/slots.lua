@@ -1,31 +1,38 @@
 -- Slots
 local slots = {}
 
-slots[2^0]   = {english = 'Main',       }
-slots[2^1]   = {english = 'Sub',        }
-slots[2^2]   = {english = 'Ranged',     }
-slots[2^3]   = {english = 'Ammo',       }
-slots[2^4]   = {english = 'Head',       }
-slots[2^5]   = {english = 'Body',       }
-slots[2^6]   = {english = 'Hands',      }
-slots[2^7]   = {english = 'Legs',       }
-slots[2^8]   = {english = 'Feet',       }
-slots[2^9]   = {english = 'Neck',       }
-slots[2^10]  = {english = 'Waist',      }
-slots[2^11]  = {english = 'Left Ear',   }
-slots[2^12]  = {english = 'Right Ear',  }
-slots[2^13]  = {english = 'Left Ring',  }
-slots[2^14]  = {english = 'Right Ring', }
-slots[2^15]  = {english = 'Back',       }
+slots[0]   = {english = 'Main',             }
+slots[1]   = {english = 'Sub',              }
+slots[2]   = {english = 'Ranged',           }
+slots[3]   = {english = 'Ammo',             }
+slots[4]   = {english = 'Head',             }
+slots[5]   = {english = 'Body',             }
+slots[6]   = {english = 'Hands',            }
+slots[7]   = {english = 'Legs',             }
+slots[8]   = {english = 'Feet',             }
+slots[9]   = {english = 'Neck',             }
+slots[10]  = {english = 'Waist',            }
+slots[11]  = {english = 'Left Ear',         }
+slots[12]  = {english = 'Right Ear',        }
+slots[13]  = {english = 'Left Ring',        }
+slots[14]  = {english = 'Right Ring',       }
+slots[15]  = {english = 'Back',             }
 
 --[[ Compound values ]]
 
--- 2^0 + 2^1
-slots[3]     = {english = 'Melee',      }
--- 2^11 + 2^12
-slots[6144]  = {english = 'Ear',        }
--- 2^13 + 2^14
-slots[24576] = {english = 'Ring',       }
+slots.category = {}
+for key, value in pairs(slots) do
+    if type(key) == 'number' then
+        slots.category[key] = value
+    end
+end
+
+slots.category[0]  = {english = 'Melee',    }
+slots.category[1]  = slots.category[0]
+slots.category[11] = {english = 'Ear',      }
+slots.category[12] = slots.category[11]
+slots.category[13] = {english = 'Ring',     }
+slots.category[14] = slots.category[13]
 
 return slots
 

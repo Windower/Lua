@@ -29,88 +29,88 @@
 -- For handling ambiguous spells and abilities
  
 function smn_unsub(player_array,spell_ID,abil_ID,mob_ID,info)
-	local abils = windower.ffxi.get_abilities()
-	if player_array['main_job_id'] == 15 and abils[abil_ID] then --and player_array['main_job_level'] >= info and windower.ffxi.get_mob_by_target('pet') then
-		return 'Ability'
-	end
-	return 'Magic'
+    local abils = windower.ffxi.get_abilities()
+    if player_array['main_job_id'] == 15 and abils[abil_ID] then --and player_array['main_job_level'] >= info and windower.ffxi.get_mob_by_target('pet') then
+        return 'Ability'
+    end
+    return 'Magic'
 end
  
 function smn_sub(player_array,spell_ID,abil_ID,mob_ID,info) -- Determines ambiguous black magic that can be subbed. Defaults to black magic
-	local abils = windower.ffxi.get_abilities()
-	if player_array['main_job_id'] == 15 and not (info:contains(player_array['sub_job_id'])) and abils[abil_ID] then
-		return 'Ability' -- Returns the SMN ability if it's a SMN main without a sub that has access to the spell
-	elseif player_array['main_job_id'] == 15 and (info:contains(player_array['sub_job_id'])) then
-		local pet_array = windower.ffxi.get_mob_by_target('pet')
-		local known_spells = windower.ffxi.get_spells()
-		if not pet_array and known_spells[spell_ID] then return 'Magic' end
-		local recasts = windower.ffxi.get_ability_recasts()
-		if (info:contains(pet_array['name']) and info:contains('Ward') and recasts[174]<=10) or (info:contains(pet_array['name']) and info:contains('Rage') and recasts[173]<=10) then
-			return 'Ability' -- Returns the SMN ability if it's a SMN main with an appropriate avatar summoned and the BP timer is up.
-		else
-			return 'Magic'
-		end
-	end
-	return 'Magic' -- Returns a spell in every other case.
+    local abils = windower.ffxi.get_abilities()
+    if player_array.main_job_id == 15 and not (info:contains(player_array.sub_job_id)) and abils[abil_ID] then
+        return 'Ability' -- Returns the SMN ability if it's a SMN main without a sub that has access to the spell
+    elseif (player_array.main_job_id == 15 and (info:contains(player_array.sub_job_id))) or (player_array.sub_job_id == 15 and (info:contains(player_array.main_job_id))) then
+        local pet_array = windower.ffxi.get_mob_by_target('pet')
+        local known_spells = windower.ffxi.get_spells()
+        if not pet_array and known_spells[spell_ID] then return 'Magic' end
+        local recasts = windower.ffxi.get_ability_recasts()
+        if (info:contains(pet_array.name) and info:contains('Ward') and recasts[174]<=10) or (info:contains(pet_array.name) and info:contains('Rage') and recasts[173]<=10) then
+            return 'Ability' -- Returns the SMN ability if it's a SMN main with an appropriate avatar summoned and the BP timer is up.
+        else
+            return 'Magic'
+        end
+    end
+    return 'Magic' -- Returns a spell in every other case.
 end
 
 function blu_unsub(player_array,spell_ID,abil_ID,mob_ID,info) -- Determines ambiguous blue magic that cannot be subbed. Defaults to spells on BLU.
-	local race = windower.ffxi.get_mob_by_id(player_array.id).race
-	if mob_ID and race then
-		if race == 0 then 
-			return 'Monster'
-		end
-	end
-	local known_spells = windower.ffxi.get_spells()
-	if player_array['main_job_id'] == 16 and spell_ID and known_spells[spell_ID] then -- and player_array['main_job_level'] >= info then
-		return 'Magic'
-	end
-	return 'Ability'
+    local race = windower.ffxi.get_mob_by_id(player_array.id).race
+    if mob_ID and race then
+        if race == 0 then 
+            return 'Monster'
+        end
+    end
+    local known_spells = windower.ffxi.get_spells()
+    if player_array.main_job_id == 16 and spell_ID and known_spells[spell_ID] then -- and player_array['main_job_level'] >= info then
+        return 'Magic'
+    end
+    return 'Ability'
 end
 
 function abil_mob(player_array,spell_ID,abil_ID,mob_ID,info) -- Determines ambiguity between monster TP moves and abilities
-	local race = windower.ffxi.get_mob_by_id(player_array.id).race
-	if mob_ID and race then
-		local abils = windower.ffxi.get_abilities()
-		local recasts = windower.ffxi.get_ability_recasts()
-		if abils[abil_ID] and recasts[r_abilities[abil_ID].index] <= 10 then
-			return 'Ability'
-		elseif race == 0 then
-			return 'Monster'
-		end
-	end
-	return 'Ability'
+    local race = windower.ffxi.get_mob_by_id(player_array.id).race
+    if mob_ID and race then
+        local abils = windower.ffxi.get_abilities()
+        local recasts = windower.ffxi.get_ability_recasts()
+        if abils[abil_ID] and recasts[res.abilities[abil_ID].recast_id] <= 10 then
+            return 'Ability'
+        elseif race == 0 then
+            return 'Monster'
+        end
+    end
+    return 'Ability'
 end
 
 function magic_mob(player_array,spell_ID,abil_ID,mob_ID,info) -- Determines ambiguity between monster TP moves and magic
-	local race = windower.ffxi.get_mob_by_id(player_array.id).race
-	if mob_ID and race then
-		if race == 0 then 
-			return 'Monster'
-		end
-	end
-	return 'Magic'
+    local race = windower.ffxi.get_mob_by_id(player_array.id).race
+    if mob_ID and race then
+        if race == 0 then 
+            return 'Monster'
+        end
+    end
+    return 'Magic'
 end
  
 function blu_sub(player_array,spell_ID,abil_ID,mob_ID,info) -- Determines ambiguous blue magic that can be subbed. Defaults to BST ability
-	local race = windower.ffxi.get_mob_by_id(player_array.id).race
-	if mob_ID and race then
-		if race == 0 then 
-			return 'Monster'
-		end
-	end
-	local abils = windower.ffxi.get_abilities()
-	if player_array['main_job_id'] == 9 and player_array['sub_job_id'] ~= 16 then
-		return 'Ability' -- Returns the BST ability if it's BST/not-BLU using the spell
-	elseif player_array['main_job_id'] == 9 and player_array['sub_job_id'] == 16 and abils[abil_ID] then
-		local recasts = windower.ffxi.get_ability_recasts()
-		if pet_array.tp >= 100 and recasts[255] <= 5400 then -- If your pet has TP and Ready's recast is less than 1.5 minutes
-			return 'Ability'
-		else
-			return 'Magic'
-		end
-	end
-	return 'Magic'
+    local race = windower.ffxi.get_mob_by_id(player_array.id).race
+    if mob_ID and race then
+        if race == 0 then 
+            return 'Monster'
+        end
+    end
+    local abils = windower.ffxi.get_abilities()
+    if player_array['main_job_id'] == 9 and player_array['sub_job_id'] ~= 16 then
+        return 'Ability' -- Returns the BST ability if it's BST/not-BLU using the spell
+    elseif player_array['main_job_id'] == 9 and player_array['sub_job_id'] == 16 and abils[abil_ID] then
+        local recasts = windower.ffxi.get_ability_recasts()
+        if pet_array.tp >= 100 and recasts[255] <= 5400 then -- If your pet has TP and Ready's recast is less than 1.5 minutes
+            return 'Ability'
+        else
+            return 'Magic'
+        end
+    end
+    return 'Magic'
 end
  
  
@@ -157,7 +157,7 @@ dimensionaldeath={spell_ID=589,abil_ID=1023,funct=blu_unsub,info=60},
 footkick={spell_ID=577,abil_ID=672,mob_ID=1025,funct=blu_sub},
 headbutt={spell_ID=623,abil_ID=675,mob_ID=1068,funct=blu_sub},
 queasyshroom={spell_ID=599,abil_ID=702,mob_ID=1078,funct=blu_sub},
-sheepsong={spell_ID=677,abil_ID=692,mob_ID=1032,funct=blu_sub},
+sheepsong={spell_ID=584,abil_ID=692,mob_ID=1032,funct=blu_sub},
 wildoats={spell_ID=603,abil_ID=677,mob_ID=1070,funct=blu_sub},
 clawcyclone={spell_ID=522,abil_ID=682,mob_ID=1041,funct=blu_sub},
 metallicbody={spell_ID=637,abil_ID=697,funct=blu_sub},
@@ -298,6 +298,8 @@ regeneration={spell_ID=664,mob_ID=1186,funct=magic_mob},
 
 
  
+raiseii={spell_ID=13,abil_ID=525,funct=smn_sub,info=T{4,'Cait Sith','Ward'}},
+reraiseii={spell_ID=141,abil_ID=526,funct=smn_sub,info=T{4,'Cait Sith','Ward'}},
 sleepga={spell_ID=273,abil_ID=611,funct=smn_sub,info=T{4,'Shiva','Ward'}},
 stoneii={spell_ID=160,abil_ID=561,funct=smn_sub,info=T{4,5,8,20,21,'Titan','Rage'}},
 waterii={spell_ID=170,abil_ID=577,funct=smn_sub,info=T{4,5,8,20,21,'Leviathan','Rage'}},
@@ -308,39 +310,119 @@ thunderii={spell_ID=165,abil_ID=625,funct=smn_sub,info=T{4,5,8,20,21,'Ramuh','Ra
 }
  
 function ambig(key)
-	local abil_type
-	if ambig_names[key] == nil then -- If there is no entry for the ambiguous command...
-		print('Shortcuts Bug: '..tostring(key))
-		return
-	end
-	if ambig_names[key].absolute then -- If there is absolute remapping, where all commands by that name actually map to one ability...
-		if ambig_names[key].spell_ID then return r_spells[ambig_names[key].spell_ID]
-		elseif ambig_names[key].abil_ID then return r_abilities[ambig_names[key].abil_ID]
-		elseif ambig_names[key].mob_ID then return r_abilities[ambig_names[key].mob_ID]
-		end
-	else  -- Otherwise it's actually ambiguous, so run the associated function and pass the known information.
-		abil_type=ambig_names[key]['funct'](windower.ffxi.get_player(),ambig_names[key].spell_ID,ambig_names[key].abil_ID,ambig_names[key].mob_ID,ambig_names[key].info,ambig_names[key].mob_ID)
-		if abil_type == 'Ability' then
-			return r_abilities[ambig_names[key].abil_ID],abil_type
-		elseif abil_type == 'Magic' then
-			return r_spells[ambig_names[key].spell_ID],abil_type
-		elseif abil_type == 'Monster' then
---			if r_abilities[ambig_names[key].mob_ID].prefix ~= '/monsterskill' then r_abilities[ambig_names[key].mob_ID].prefix = '/monsterskill' end
-			return r_abilities[ambig_names[key].mob_ID],abil_type
-		end
-	end
-	return '',''
+    local abil_type
+    if ambig_names[key] == nil then -- If there is no entry for the ambiguous command...
+        print('Shortcuts Bug: '..tostring(key))
+        return
+    end
+    
+    local commands = get_available_commands()
+    local slugged_commands = make_slugged_command_list(commands)
+    
+    if slugged_commands[key] and slugged_commands[key].type ~= 'Ambiguous' then 
+    -- If the current usage is unambiguous because only one ability is available then...
+        if slugged_commands[key].type == 'Magic' then
+            return commands.Magic[slugged_commands[key].id],slugged_commands[key].type
+        else
+            return commands.Abilities[slugged_commands[key].id],slugged_commands[key].type
+        end
+    else  -- Otherwise it's actually ambiguous, so run the associated function and pass the known information.
+        abil_type=ambig_names[key]['funct'](windower.ffxi.get_player(),ambig_names[key].spell_ID,ambig_names[key].abil_ID,ambig_names[key].mob_ID,ambig_names[key].info,ambig_names[key].mob_ID)
+        if abil_type == 'Ability' then
+            return res.abilities[ambig_names[key].abil_ID],abil_type
+        elseif abil_type == 'Magic' then
+            return res.spells[ambig_names[key].spell_ID],abil_type
+        elseif abil_type == 'Monster' then
+--            if res.abilities[ambig_names[key].mob_ID].prefix ~= '/monsterskill' then res.abilities[ambig_names[key].mob_ID].prefix = '/monsterskill' end
+            return res.abilities[ambig_names[key].mob_ID],abil_type
+        end
+    end
+    return '',''
 end
 
+
+
+-----------------------------------------------------------------------------------
+--Name: get_available_commands()
+--Args:
+---- none
+-----------------------------------------------------------------------------------
+--Returns:
+---- A table containing the currently available command names
+-----------------------------------------------------------------------------------
+function get_available_commands()
+    local player = windower.ffxi.get_player()
+    local valid_abilities = {Magic = {},Abilities = {}}
+    if not player then return valid_abilities end
+    
+    for i,v in pairs(windower.ffxi.get_spells()) do
+        if v and ((res.spells[i].jobs[player.main_job] and res.spells[i].jobs[player.main_job] <= player.main_job_level) or (res.spells[i].jobs[player.sub_job] and res.spells[i].jobs[player.sub_job] <= player.sub_job_level)) then
+            valid_abilities.Magic[i] = res.spells[i]
+        end
+    end
+    
+    for i,v in pairs(windower.ffxi.get_abilities()) do
+        if v then
+            valid_abilities.Abilities[i] = res.abilities[i]
+        end
+    end
+    
+    local mjob = windower.ffxi.get_mjob_data()
+    if mjob and mjob.species_id and res.items[mjob.species_id + 61440] then
+        for i,v in pairs(res.items[mjob.species_id + 61440].tp_moves) do
+            if player.main_job_level >= v then
+                valid_abilities.Abilities[i] = res.abilities[i+768]
+            end
+        end
+    end
+    return valid_abilities
+end
+
+
+
+-----------------------------------------------------------------------------------
+--Name: make_slugged_command_list(commands)
+--Args:
+---- commands : a table generated by get_available_commands()
+-----------------------------------------------------------------------------------
+--Returns:
+---- A table mapping the currently available command names to their IDs
+-----------------------------------------------------------------------------------
+function make_slugged_command_list(commands)
+    local slugged_commands = {}
+    for i,v in pairs(commands.Abilities) do
+        if slugged_commands[stripped] then
+            slugged_commands[stripped] = {type='Ambiguous'}
+        elseif i < 1024 then
+            slugged_commands[strip(v[language])] = {type='Ability',id=i}
+        else
+            slugged_commands[strip(v[language])] = {type='Monster',id=i}
+        end
+    end
+    for i,v in pairs(commands.Magic) do
+        local stripped = strip(v[language])
+        if slugged_commands[stripped] then
+            slugged_commands[stripped] = {type='Ambiguous'}
+        else
+            slugged_commands[stripped] = {type='Magic',id=i}
+        end
+    end
+    return slugged_commands
+end
+
+
+
+
+
 if logging then -- Prints out unhandled ambiguous cases, sort of a pre-emptive line 260 warning.
-	f = io.open('../addons/shortcuts/data/'..tostring(os.clock())..'_unhandled_duplicates.log','w+')
-	
-	for i,v in pairs(validabils) do
-		if v.typ == 'ambig_names' then
-			if ambig_names[i] == nil then
-				f:write(tostring(i)..'\n\n')
-			end
-		end
-	end
-	f:close()
+    f = io.open('../addons/shortcuts/data/'..tostring(os.clock())..'_unhandled_duplicates.log','w+')
+    
+    for i,v in pairs(validabils) do
+        if v.typ == 'ambig_names' then
+            if ambig_names[i] == nil then
+                f:write(tostring(i)..'\n\n')
+            end
+        end
+    end
+    f:close()
 end

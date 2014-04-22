@@ -27,7 +27,7 @@ end
 -- Creates a new file. Creates path, if necessary.
 function files.create(f)
     f:create_path()
-    local fh = io.open(windower.addon_path..f.path, 'w')
+    local fh = io.open(windower.addon_path .. f.path, 'w')
     fh:write('')
     fh:close()
 
@@ -71,7 +71,7 @@ function files.read(f)
     local path
     if type(f) == 'string' then
         if not files.exists(f) then
-            return nil, 'File \''..f..'\' not found, cannot read.'
+            return nil, 'File \'' .. f .. '\' not found, cannot read.'
         end
 
         path = f
@@ -84,14 +84,14 @@ function files.read(f)
             if createfile then
                 return ''
             else
-                return nil, 'File \''..f.path..'\' not found, cannot read.'
+                return nil, 'File \'' .. f.path .. '\' not found, cannot read.'
             end
         end
 
         path = f.path
     end
 
-    local fh = io.open(windower.addon_path..path, 'r')
+    local fh = io.open(windower.addon_path .. path, 'r')
     local content = fh:read('*all*')
     fh:close()
 
@@ -116,22 +116,22 @@ function files.create_path(f)
         path = f.path:match('(.*)[/\\].-')
 
         if not path then
-            return nil, 'File path already in addon directory: '..windower.addon_path..path
+            return nil, 'File path already in addon directory: ' .. windower.addon_path .. f.path
         end
     end
 
     new_path = windower.addon_path
     for dir in path:psplit('[/\\]'):filter(-''):it() do
-        new_path = new_path..'/'..dir
+        new_path = new_path .. '/' .. dir
 
         if not windower.dir_exists(new_path) then
             local res, err = windower.create_dir(new_path)
             if not res then
                 if err ~= nil then
-                    return nil, err..': '..new_path
+                    return nil, err .. ': ' .. new_path
                 end
 
-                return nil, 'Unknown error trying to create path '..new_path
+                return nil, 'Unknown error trying to create path ' .. new_path
             end
         end
     end
@@ -149,7 +149,7 @@ function files.it(f)
     local path
     if type(f) == 'string' then
         if not files.exists(f) then
-            return nil, 'File \''..f..'\' not found, cannot read.'
+            return nil, 'File \'' .. f .. '\' not found, cannot read.'
         end
 
         path = f
@@ -162,7 +162,7 @@ function files.it(f)
             if createfile then
                 return ''
             else
-                return nil, 'File \''..f.path..'\' not found, cannot read.'
+                return nil, 'File \'' .. f.path .. '\' not found, cannot read.'
             end
         end
 
@@ -181,7 +181,7 @@ function files.write(f, content, flush)
     local path
     if type(f) == 'string' then
         if not files.exists(f) then
-            return nil, 'File \''..f..'\' not found, cannot write.'
+            return nil, 'File \'' .. f .. '\' not found, cannot write.'
         end
 
         path = f
@@ -192,10 +192,10 @@ function files.write(f, content, flush)
 
         if not f:exists() then
             if createfile then
-                notice('New file: '..f.path)
+                notice('New file: ' .. f.path)
                 f:create()
             else
-                return nil, 'File \''..f.path..'\' not found, cannot write.'
+                return nil, 'File \'' .. f.path .. '\' not found, cannot write.'
             end
         end
 
@@ -206,7 +206,7 @@ function files.write(f, content, flush)
         content = table.concat(content)
     end
 
-    local fh = io.open(windower.addon_path..path, 'w')
+    local fh = io.open(windower.addon_path .. path, 'w')
     fh:write(content)
     if flush then
         fh:flush()
@@ -221,7 +221,7 @@ function files.append(f, content, flush)
     local path
     if type(f) == 'string' then
         if not files.exists(f) then
-            return nil, 'File \''..f..'\' not found, cannot write.'
+            return nil, 'File \'' .. f .. '\' not found, cannot write.'
         end
 
         path = f
@@ -232,17 +232,17 @@ function files.append(f, content, flush)
 
         if not f:exists() then
             if createfile then
-                notice('New file: '..f.path)
+                notice('New file: ' .. f.path)
                 f:create()
             else
-                return nil, 'File \''..f.path..'\' not found, cannot write.'
+                return nil, 'File \'' .. f.path .. '\' not found, cannot write.'
             end
         end
 
         path = f.path
     end
 
-    local fh = io.open(windower.addon_path..path, 'a')
+    local fh = io.open(windower.addon_path .. path, 'a')
     fh:write(content)
     if flush then
         fh:flush()

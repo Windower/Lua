@@ -71,19 +71,21 @@ tracking = T{}
 prims = S{}
 spells = {}
 jAbils = {}
-mAbils = {}
 stats = {}
-trusts = S{'Kupipi','Excenmille','Naji','Ayame','Zeid','Curilla','Nanaa Mihgo','Trion','Shantotto','Volker','Ajido-Marujido'}
+trusts = S{'Kupipi','Excenmille','Naji','Ayame','Zeid','Curilla',
+            'Nanaamihgo','Trion','Shantotto','Volker','Ajidomarujido',
+            'Mihlialiapoh','Valaineral','Joachim','Lion','Prishe','Ulmia',
+            'Ironeater','Gadalar','Najasalaheem','Cherukiki','Nashmeira',
+            'Zazarg','Ingrid','Lhekohabhoka','Ovjang','Mnejing','Sakura',
+            'Luzaf','Najelith'}
 
 speFName = '../../plugins/resources/spells.xml'
 staFName = '../../plugins/resources/status.xml'
 jaFName = '../../plugins/resources/abils.xml'
-maFName = '../libs/resources/mabils.xml'
 
 speFile = files.new(speFName)
 staFile = files.new(staFName)
 jaFile = files.new(jaFName)
-maFile = files.new(maFName)
 
 --Save settings on load (in case this is first run)
 settings:save('all')

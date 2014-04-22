@@ -1,12 +1,12 @@
 -- Setup
 
 require('luau')
+packets = require('packets')
 
-_addon = _addon or {}
 _addon.name = 'AutoJoin'
 _addon.author = 'Arcon'
-_addon.commands = {'autojoin','aj'}
-_addon.version = '1.0.0.0'
+_addon.commands = {'autojoin', 'aj'}
+_addon.version = '2.0.0.0'
 
 defaults = {}
 defaults.mode = 'whitelist'
@@ -15,11 +15,6 @@ defaults.blacklist = S{}
 defaults.autodecline = false
 
 settings = config.load(defaults)
-
--- Statuses which prevents joining.
-blocked_statuses = S{
-    'Dead', 'Event', 'Charmed'
-}
 
 -- Aliases to access correct modes based on supplied arguments.
 aliases = T{
@@ -40,49 +35,53 @@ dec_strs = S{'decline', 'autodecline', 'auto-decline'}
 alias_strs = aliases:keyset()
 
 -- Currently trying to rejoin
-try = false
 
-function reset()
-    try = false
-end
+;(function()
+    local join_packet = packets.outgoing(0x074, {Join = true})
+    local decline_packet = packets.outgoing(0x074, {Join = false})
+    join = function ()
+        if next(windower.ffxi.get_items().treasure) then
+            windower.send_command('@wait 1; lua invoke autojoin join')
+        else
+            packets.inject(join_packet)
+        end
+    end
+    decline = function ()
+        packets.inject(decline_packet)
+    end
+end)()
 
 -- Invite handler
 windower.register_event('party invite', function(sender)
-    if settings.autodecline and settings.blacklist:contains(sender) then
-        windower.send_command('input /decline')
-        notice('Blacklisted invite from '..sender..' blocked.')
-        return
-    end
-
-    if settings.mode == 'whitelist' and settings.whitelist:contains(sender)
-    or settings.mode == 'blacklist' and not settings.blacklist:contains(sender) then
-        try = true
-        try_join()
-    end
-end)
-
-function try_join()
-    if try then
-        if not blocked_statuses:contains(windower.ffxi.get_player().status) and table.empty(windower.ffxi.get_items().treasure) then
-            windower.send_command('input /join')
-            reset()
+    if settings.mode == 'whitelist' and settings.whitelist:contains(sender) then
+        join()
+        -- notice('Joining due to ' .. sender .. ' being whitelisted.')
+    elseif settings.mode == 'blacklist' and not settings.blacklist:contains(sender) then
+        join()
+        -- notice('Joining due to ' .. sender .. ' not being blacklisted.')
+    elseif settings.mode == 'whitelist' then
+        -- notice('Not joining due to ' .. sender .. ' not being whitelisted.')
+    elseif settings.mode == 'blacklist' then
+        if settings.autodecline then
+            decline()
+            -- notice('Declined invite due to ' .. sender .. ' being blacklisted.')
         else
-            windower.send_command('@wait 1; lua i autojoin try_join')
+            -- notice('Not joining due to ' .. sender .. ' being blacklisted.')
         end
     end
-end
+end)
 
 -- Adds names to a given list type.
 function add_name(mode, ...)
     local names = S{...}
     local duplicates = names * settings[mode]
     if not duplicates:empty() then
-        notice(('User'):plural(duplicates)..' '..duplicates:format()..' already on '..aliases[mode]..'.')
+        notice(('User'):plural(duplicates) .. ' ' .. duplicates:format() .. ' already on ' .. aliases[mode] .. '.')
     end
     local new = names - settings[mode]
     if not new:empty() then
         settings[mode] = settings[mode] + new
-        log('Added '..new:format()..' to the '..aliases[mode]..'.')
+        log('Added ' .. new:format() .. ' to the ' .. aliases[mode] .. '.')
     end
     settings:save()
 end
@@ -92,13 +91,14 @@ function rm_name(mode, ...)
     local names = S{...}
     local dummy = names - settings[mode]
     if not dummy:empty() then
-        notice(('User'):plural(dummy)..' '..dummy:format()..' not found on '..aliases[mode]..'.')
+        notice(('User'):plural(dummy) .. ' ' .. dummy:format() .. ' not found on ' .. aliases[mode] .. '.')
     end
     local remove = names * settings[mode]
     if not remove:empty() then
         settings[mode] = settings[mode] - remove
-        log('Removed '..remove:format()..' from the '..aliases[mode]..'.')
+        log('Removed ' .. remove:format() .. ' from the ' .. aliases[mode] .. '.')
     end
+    settings:save()
 end
 
 -- Interpreter
@@ -113,9 +113,10 @@ windower.register_event('addon command', function(command, ...)
         local mode = args[1] or 'status'
         if alias_strs:contains(mode) then
             settings.mode = aliases[mode]
-            log('Mode switched to '..settings.mode..'.')
+            log('Mode switched to ' .. settings.mode .. '.')
+            settings:save()
         elseif mode == 'status' then
-            log('Currently in '..settings.mode..' mode.')
+            log('Currently in ' .. settings.mode .. ' mode.')
         else
             error('Invalid mode:', args[1])
             return
@@ -124,11 +125,11 @@ windower.register_event('addon command', function(command, ...)
     -- List management
     elseif alias_strs:contains(command) then
         mode = aliases[command]
-        names = args:slice(2):map(string.ucfirst..string.lower)
+        names = args:slice(2):map(string.ucfirst .. string.lower)
 
         -- If no operator provided
         if args:empty() then
-            log(mode:ucfirst()..':', settings[mode]:format('csv'))
+            log(mode:ucfirst() .. ':', settings[mode]:format('csv'))
         else
             if add_strs:contains(args[1]) then
                 add_name(mode, names:unpack())
@@ -144,29 +145,27 @@ windower.register_event('addon command', function(command, ...)
     elseif dec_strs:contains(command) then
         if args[1] ~= nil then
             local decline = args[1]:lower()
-            local check = false
+            local success = true
             if decline == 'true' then
                 settings.autodecline = true
-                check = true
             elseif decline == 'false' then
                 settings.autodecline = false
-                check = true
             else
                 log('Invalid command for autodecline. Specify true or false.')
+                success = false
             end
 
-            if check then
-                log('Set auto-decline to '..tostring(settings.autodecline)..'.')
+            if success then
+                log('Set auto-decline to ' .. tostring(settings.autodecline) .. '.')
                 settings:save()
             end
         else
-            log('Auto-decline is currently '..(settings.autodecline and 'on' or 'off')..'.')
+            log('Auto-decline is currently ' .. (settings.autodecline and 'on' or 'off') .. '.')
         end
 
     -- Save settings. This is only needed for global or cross-character settings, as current-chracter settings will be saved every time something is changed.
     elseif command == 'save' then
-        local profile = args[1] or 'all'
-        settings:save(profile)
+        settings:save(args[1] or 'all')
         log('Settings saved.')
 
     -- Print current settings status
@@ -178,20 +177,13 @@ windower.register_event('addon command', function(command, ...)
 
     -- Unknown command handler
     else
-        warning('Unkown command \''..command..'\', ignored.')
-    end
-end)
+        warning('Unkown command \'' .. command .. '\', ignored.')
 
--- Reset outstanding joining events
-windower.register_event('load', 'login', 'zone change', 'party invite', reset)
-windower.register_event('outgoing text', function(text)
-    if text == '/decline' or text == '/join' then
-        reset()
     end
 end)
 
 --[[
-Copyright (c) 2013, Windower
+Copyright (c) 2013-2014, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

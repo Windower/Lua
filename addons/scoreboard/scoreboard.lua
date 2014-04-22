@@ -68,7 +68,7 @@ end
 -- Handle addon args
 windower.register_event('addon command',function(...)
     local params = {...};
-	
+    
     if #params < 1 then
         return
     end
@@ -356,12 +356,12 @@ function get_ally_mob_ids()
             end
         end
     end
-	
+    
     return allies
 end
 
 
--- Returns true iff is someone (or a pet of someone) in your alliance.
+-- Returns true if is someone (or a pet of someone) in your alliance.
 function mob_is_ally(mob_id)
     -- get zone-local ids of all allies and their pets
     return get_ally_mob_ids():contains(mob_id)
@@ -443,7 +443,7 @@ windower.register_event('action', function(raw_action)
                     end
                 end
             end
-        elseif category == 'job_ability' or category == 'job_ability_unblinkable' then
+        elseif category == 'job_ability' or category == 'job_ability_unblinkable' or category == 'job_ability_run' then
             for target in action:get_targets() do
                 for subaction in target:get_actions() do
                     -- sange(77), generic damage ja(110), other generic dmg ja (317), stun ja (522)
@@ -482,7 +482,7 @@ windower.register_event('action', function(raw_action)
             end
         end
     end
-	
+    
     display:update()
     update_dps_clock()
 end)

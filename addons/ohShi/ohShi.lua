@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 _addon.name = 'OhShi'
-_addon.version = '2.521'
+_addon.version = '2.53'
 _addon.author = 'Nitrous (Shiva)'
 _addon.command = 'ohshi'
 
@@ -42,6 +42,7 @@ config = require('config')
 files = require('files')
 chat = require('chat')
 texts = require('texts')
+res = require('resources')
 require('default_settings')
 require('text_handling')
 require('helper_functions')
@@ -52,7 +53,6 @@ windower.register_event('load',function()
     spells = parse_resources(speFile:readlines())
     stats = parse_resources(staFile:readlines())
     jAbils = parse_resources(jaFile:readlines())
-    mAbils = parse_resources(maFile:readlines())
     windower.send_command('@lua i ohshi initText')
 end)
 
@@ -146,6 +146,9 @@ windower.register_event('addon command', function(...)
             settings.text.content = nil
             settings.visible = nil
             saveSettings()
+        elseif comm == 'clear' then
+            tracking:clear()
+            textUpdate()
         elseif S{'show','hide','settings'}:contains(comm) then
             if comm == 'show' then 
                 ohShi_tb:text('ohShi showing for settings')
@@ -175,6 +178,7 @@ windower.register_event('addon command', function(...)
   4. track(on/off) [abyssea/dangerous/legion/meebles/other/voidwatch] <name> 
      - Begin or stop tracking <type (default: other)> of mob named <name>.
   5. spell/ws(on/off) <name> - Start or stop watching for <name> spell|ws.
+  6. clear - Clears the textbox and the tracking table (use if textbox locks up)
   The following all correspond to the tracker:
     fonttype <name> | fontsize <size> | pos <x> <y> - can also click/drag
     bgcolor <r> <g> <b> | txtcolor <r> <g> <b>
@@ -194,7 +198,7 @@ windower.register_event('action', function(act)
     local actor = T{}
     actor.id = curact.actor_id
     if windower.ffxi.get_mob_by_id(actor.id) then
-        actor.name = windower.ffxi.get_mob_by_id(actor.id)['name']
+        actor.name = windower.ffxi.get_mob_by_id(actor.id).name
     else
         return
     end

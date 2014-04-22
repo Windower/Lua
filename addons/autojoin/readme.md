@@ -1,6 +1,6 @@
 # AutoJoin
 
-Once loaded, will automatically join party and alliance invites. If you're in a CS, it will wait until it's finished and then join (unless the invite time expires). It will also wait in similar situations, such as being dead and unable to act. It will not process the invite at all if the treasure pool is not empty. It will also wait until the treasure pool is cleared to join, although it can be forced by typing `/join` normally.
+Once loaded, will automatically join party and alliance invites. It will not process the invite if the treasure pool is not empty. It will also wait until the treasure pool is cleared to join, although it can be forced by typing `/join` normally.
 
 ### Modes
 

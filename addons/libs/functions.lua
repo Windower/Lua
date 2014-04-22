@@ -266,24 +266,36 @@ end
 ]]
 
 -- Returns an attribute of a table.
-function table.get(t, att)
-    return t[att]
+function table.get(t, ...)
+    local res = {}
+    for i = 1, select('#', ...) do
+        rawset(res, i, t[select(i, ...)])
+    end
+    return unpack(res)
 end
 
 -- Returns an attribute of a table without invoking metamethods.
-function table.rawget(t, att)
-    return rawget(t, att)
+function table.rawget(t, ...)
+    local res = {}
+    for i = 1, select('#', ...) do
+        rawset(res, i, rawget(t, select(i, ...)))
+    end
+    return unpack(res)
 end
 
 -- Sets an attribute of a table to a specified value.
-function table.set(t, att, val)
-    t[att] = val
+function table.set(t, ...)
+    for i = 1, select('#', ...), 2 do
+        t[select(i, ...)] = select(i + 1, ...)
+    end
     return t
 end
 
 -- Sets an attribute of a table to a specified value, without invoking metamethods.
-function table.rawset(t, att, val)
-    rawset(t, att, val)
+function table.rawset(t, ...)
+    for i = 1, select('#', ...), 2 do
+        rawset(t, select(i, ...), select(i + 1, ...))
+    end
     return t
 end
 

@@ -121,7 +121,9 @@ function list.extend(l1, l2)
     return l1
 end
 
-_meta.L.__add = list.extend
+_meta.L.__add = function(l1, l2)
+    return L{}:extend(l1):extend(l2)
+end
 
 function list.contains(l, el)
     for key = 1, l.n do
@@ -176,20 +178,6 @@ function list.with(l, attr, val)
         local el = rawget(l, i)
         if type(el) == 'table' and rawget(el, attr) == val then
             return el
-        end
-    end
-end
-
-function list.iwith(l, attr, val)
-    local cel
-    val = val:lower()
-    for i = 1, l.n do
-        local el = rawget(l, i)
-        if type(el) == 'table' then
-            cel = rawget(el, attr)
-            if type(cel) == 'string' and cel:lower() == val then
-                return el
-            end
         end
     end
 end
@@ -371,26 +359,6 @@ function list.range(n, init)
 
     res.n = n
     return setmetatable(res, _meta.L)
-end
-
-function list.any(l, fn)
-    for key = 1, l.n do
-        if fn(rawget(l, key)) == true then
-            return true
-        end
-    end
-
-    return false
-end
-
-function list.all(l, fn)
-    for key = 1, l.n do
-        if fn(rawget(l, key)) ~= true then
-            return false
-        end
-    end
-
-    return true
 end
 
 function list.tostring(l)

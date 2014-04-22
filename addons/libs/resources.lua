@@ -15,7 +15,7 @@ local fns = {}
 local slots = {}
 
 local language_string = _addon and _addon.language and _addon.language:lower() or windower.ffxi.get_info().language:lower()
-local log_language_string = 'log_' .. language_string
+local log_language_string = language_string .. '_log'
 
 -- The metatable for all sub tables of the root resource table
 local resource_mt = {}
@@ -29,13 +29,26 @@ local resources = setmetatable({}, {__index = function(t, k)
 end})
 
 -- The metatable for a single resource item (an entry in a sub table of the root resource table)
-local resource_entry_mt = {__index = function(t, k)
-    return k == 'name'
-            and t[language_string]
-        or k == 'log_name'
-            and t[log_language_string]
-        or table[k]
-end}
+local resource_entry_mt = {__index = function()
+    local redict = {
+        name = language_string,
+        log_name = log_language_string,
+        english = 'en',
+        japanese = 'ja',
+        german = 'de',
+        french = 'fr',
+        english_log = 'enl',
+        japanese_log = 'ja',
+        german_log = 'del',
+        french_log = 'frl',
+    }
+
+    return function(t, k)
+        return redict[k]
+                and t[redict[k]]
+            or table[k]
+    end
+end()}
 
 function resource_group(r, fn, attr)
     fn = type(fn) == 'function' and fn or functions.equals(fn)
@@ -52,379 +65,108 @@ function resource_group(r, fn, attr)
 end
 
 resource_mt.__index = function(t, k)
-    return slots[t]:contains(k)
+    return (slots[t]:contains(k) or k == 'name')
             and resource_group-{k}
         or table[k]
 end
 resource_mt.__class = 'Resource'
 
-local plugin_resources = '../../plugins/resources/'
-local addon_resources = 'resources/'
+local resources_path = windower.addon_path .. '../libs/resources/'
 
-local unquotes = {
-    ['quot'] = '"',
-    ['amp'] = '&',
-    ['gt'] = '>',
-    ['lt'] = '<',
-    ['apos'] = '\'',
-}
-
-local unquote = function(str)
-    return (str:gsub('&(.-);', unquotes))
-end
-
--- Add resources from files
-local res_names = S{'jobs', 'races', 'weather', 'servers', 'chat', 'bags', 'slots', 'statuses', 'emotes', 'skills', 'titles', 'encumbrance', 'check_ratings', 'synth_ranks', 'days', 'moon_phases', 'elements'}
-for res_name in res_names:it() do
-    fns[res_name] = function()
-        local res = table.map(require(addon_resources..res_name), setmetatable-{resource_entry_mt})
-        slots[res] = table.keyset(next[2](res))
-        return res
+local flag_cache = {}
+local parse_flags = function(bits, lookup, values)
+    if not rawget(flag_cache, lookup) then
+        rawset(flag_cache, lookup, {})
     end
-end
 
--- Returns the abilities, indexed by ingame ID.
-function fns.abilities()
-    local file = _libs.files.read(plugin_resources..'abils.xml')
-    local match_string
-    local last = {}
-
-    local res = {}
-    slots[res] = S{}
-
-    match_string = '<a id="(%-?%d-)" index="(%d-)" prefix="(/%a-)" english="([^"]-)" german="([^"]-)" french="([^"]-)" japanese="([^"]-)" type="(%w-)" element="([%a,%s]-)" targets="([%a,%s]-)" skill="(%a-)" mpcost="(%d-)" tpcost="(%-?%d-)" casttime="(%d-)" recast="(%d-)" alias="([%w|]-)" />'
-    for id, index, prefix, english, german, french, japanese, type, elements, targets, skill, mp_cost, tp_cost, cast_time, recast, alias in file:gmatch(match_string) do
-        id = id:number()
-        res[id] = setmetatable({
-            id = id,
-            index = index:number(),
-            prefix = prefix,
-            english = unquote(english),
-            german = unquote(german),
-            french = unquote(french),
-            japanese = unquote(japanese),
-            type = type,
-            elements = S(elements:split(', ')):remove('None'),
-            targets = S(targets:split(', ')),
-            skill = skill,
-            mp_cost = mp_cost:number(),
-            tp_cost = tp_cost:number(),
-            cast_time = cast_time:number(),
-            recast = recast:number(),
-            alias = S(alias:split('|')),
-        }, resource_entry_mt)
-        last = res[id]
-    end
-    slots[res] = slots[res] + table.keyset(last)
-
-    match_string = '<a id="(%-?%d-)" index="(%d-)" prefix="(/%a-)" english="([^"]-)" german="([^"]-)" french="([^"]-)" japanese="([^"]-)" type="(%w-)" element="([%a,%s]-)" targets="([%a,%s]-)" skill="(%a-)" mpcost="(%d-)" tpcost="(%-?%d-)" casttime="(%d-)" recast="(%d-)" alias="([%w|]-)" wsA="(%a-)" wsB="(%a-)" wsC="(%a-)" />'
-    for id, index, prefix, english, german, french, japanese, type, elements, targets, skill, mp_cost, tp_cost, cast_time, recast, alias, wsA, wsB, wsC in file:gmatch(match_string) do
-        id = id:number()
-        res[id] = setmetatable({
-            id = id,
-            index = index:number(),
-            prefix = prefix,
-            english = unquote(english),
-            german = unquote(german),
-            french = unquote(french),
-            japanese = unquote(japanese),
-            type = type,
-            elements = S(elements:split(', ')):remove('None'),
-            targets = S(targets:split(', ')),
-            skill = skill,
-            mp_cost = mp_cost:number(),
-            tp_cost = tp_cost:number(),
-            cast_time = cast_time:number(),
-            recast = recast:number(),
-            alias = S(alias:split('|')),
-            wsA = wsA,
-            wsB = wsB,
-            wsC = wsC,
-        }, resource_entry_mt)
-        last = res[id]
-    end
-    slots[res] = slots[res] + table.keyset(last)
-
-    return res
-end
-
--- Returns the spells, indexed by ingame ID.
-function fns.spells()
-    local file = _libs.files.read(plugin_resources..'spells.xml')
-    local match_string = '<s id="(%d-)" index="(%d-)" prefix="([^"]-)" english="([^"]-)" german="([^"]-)" french="([^"]-)" japanese="([^"]-)" type="([^"]-)" element="([^"]-)" targets="([^"]-)" skill="([^"]-)" mpcost="(%d-)" casttime="([%d%.]-)" recast="([%d%.]-)" alias="([^"]-)" />'
-    local last = {}
-
-    local res = {}
-
-    for id, index, prefix, english, german, french, japanese, type, element, targets, skill, mp_cost, cast_time, recast, alias in file:gmatch(match_string) do
-        index = index:number()
-        if prefix ~= '/trigger' then
-            res[index] = setmetatable({
-                id = id:number(),
-                index = index,
-                prefix = prefix,
-                english = unquote(english),
-                german = unquote(german),
-                french = unquote(french),
-                japanese = unquote(japanese),
-                type = type,
-                element = element,
-                targets = S(targets:split(', ')),
-                skill = skill,
-                mp_cost = mp_cost:number(),
-                cast_time = cast_time:number(),
-                recast = recast:number(),
-                alias = S(alias:split('|')),
-            }, resource_entry_mt)
-            last = res[index]
-        end
-    end
-    slots[res] = table.keyset(last)
-
-    return res
-end
-
--- Returns the buffs, indexed by ingame ID.
-function fns.buffs()
-    local file = _libs.files.read(plugin_resources..'status.xml')
-    local match_string = '<b id="(%d-)" duration="(%d-)" fr="([^"]-)" de="([^"]-)" jp="([^"]-)" enLog="([^"]-)">([^<]-)</b>'
-    local last = {}
-
-    local res = {}
-
-    for id, duration, fr, de, jp, en_log, en in file:gmatch(match_string) do
-        id = id:number()
-        res[id] = setmetatable({
-            id = id,
-            english = unquote(en),
-            french = unquote(fr),
-            german = unquote(de),
-            japanese = unquote(jp),
-            english_log = english_log,
-            duration = duration:number(),
-        }, resource_entry_mt)
-        last = res[id]
-    end
-    slots[res] = table.keyset(last)
-
-    return res
-end
-
--- Returns the items, indexed by ingame ID.
-function fns.items()
-    local function parse_jobs(num)
+    if values and not rawget(rawget(flag_cache, lookup), bits) and rawget(lookup, bits) then
+        rawset(rawget(flag_cache, lookup), bits, S{rawget(lookup, bits)})
+    elseif not rawget(rawget(flag_cache, lookup), bits) then
         local res = S{}
 
+        local rem
+        local num = bits
         local count = 0
-        local mod
         while num > 0 do
-            count = count + 1
-            num, mod = math.modf(num/2)
-            if mod ~= 0 then
-                res:add(resources.jobs[count])
+            num, rem = (num/2):modf()
+            if rem > 0 then
+                -- Commented out due to current API returning numbers instead of objects
+                -- res:add(rawget(lookup, values and 2^count or count))
+                res:add(values and rawget(lookup, 2^count) or count)
             end
+            count = count + 1
         end
 
+        rawset(rawget(flag_cache, lookup), bits, res)
+    end
+
+    return rawget(rawget(flag_cache, lookup), bits)
+end
+
+local language_strings = S{'english', 'japanese', 'german', 'french'}
+
+-- Add resources from files
+local post_process
+local res_names = S(windower.get_dir(resources_path)):filter(string.endswith-{'.lua'}):map(string.sub-{1, -5})
+for res_name in res_names:it() do
+    fns[res_name] = function()
+        local res, slot_table = dofile(resources_path .. res_name .. '.lua')
+        res = table.map(res, (setmetatable-{resource_entry_mt}):cond(function(key) return type(key) == 'table' end))
+        slots[res] = S(slot_table) or language_strings + table.keyset(next[2](res))
+        post_process(res)
         return res
     end
+end
 
-    local file
-    local last = {}
-    local match_string
+local lookup
+local flag_keys = S{
+    'targets',
+}
+local fn_cache = {}
 
-    local res = {}
-    slots[res] = S{}
+post_process = function(t)
+    for key in slots[t]:it() do
+        if rawget(lookup, key) then
+            if flag_keys:contains(key) then
+                rawset(fn_cache, key, function(flags)
+                    return parse_flags(flags, rawget(lookup, key), true)
+                end)
+            else
+                rawset(fn_cache, key, function(flags, id)
+                    return parse_flags(flags, rawget(lookup, key), false)
+                end)
+            end
 
-    -- General items
-    file = _libs.files.read(plugin_resources..'items_general.xml')
-    match_string = '<i id="(%d-)" enl="([^"]-)" fr="([^"]-)" frl="([^"]-)" de="([^"]-)" del="([^"]-)" jp="([^"]-)" jpl="([^"]-)" targets="([%a,%s]-)">([^<]-)</i>'
-    for id, enl, fr, frl, de, del, jp, jpl, targets, en in file:gmatch(match_string) do
-        id = id:number()
-        res[id] = setmetatable({
-            id = id,
-            english = unquote(en),
-            log_english = unquote(enl),
-            french = unquote(fr),
-            log_french = unquote(frl),
-            german = unquote(de),
-            log_german = unquote(del),
-            japanese = unquote(jp),
-            log_japanese = unquote(jpl),
-            targets = S(targets:split()):remove('None'),
-            cast_time = 0,
-            category = 'General',
-        }, resource_entry_mt)
-        last = res[id]
-    end
-    slots[res] = slots[res] + table.keyset(last)
+        elseif rawget(lookup, key .. 's') then
+            rawset(fn_cache, key, function(value)
+                return rawget(rawget(lookup, key .. 's'), value)
+            end)
 
-    match_string = '<i id="(%d-)" enl="([^"]-)" fr="([^"]-)" frl="([^"]-)" de="([^"]-)" del="([^"]-)" jp="([^"]-)" jpl="([^"]-)" targets="([%a,%s]-)" casttime="([%d%.]-)">([^<]-)</i>'
-    for id, enl, fr, frl, de, del, jp, jpl, targets, cast_time, en in file:gmatch(match_string) do
-        id = id:number()
-        res[id] = setmetatable({
-            id = id,
-            english = unquote(en),
-            log_english = unquote(enl),
-            french = unquote(fr),
-            log_french = unquote(frl),
-            german = unquote(de),
-            log_german = unquote(del),
-            japanese = unquote(jp),
-            log_japanese = unquote(jpl),
-            targets = S(targets:split()):remove('None'),
-            cast_time = cast_time:number(),
-            category = 'General',
-        }, resource_entry_mt)
-        last = res[id]
-    end
-    slots[res] = slots[res] + table.keyset(last)
-    
-    match_string = '<i id="(%d-)" enl="([^"]-)" fr="([^"]-)" frl="([^"]-)" de="([^"]-)" del="([^"]-)" jp="([^"]-)" jpl="([^"]-)">([^<]-)</i>'
-    for id, enl, fr, frl, de, del, jp, jpl, en in file:gmatch(match_string) do
-        id = id:number()
-        res[id] = setmetatable({
-            id = id,
-            english = unquote(en),
-            log_english = unquote(enl),
-            french = unquote(fr),
-            log_french = unquote(frl),
-            german = unquote(de),
-            log_german = unquote(del),
-            japanese = unquote(jp),
-            log_japanese = unquote(jpl),
-            category = 'General',
-        }, resource_entry_mt)
-        last = res[id]
-    end
-    slots[res] = slots[res] + table.keyset(last)
-
-    -- Armor and weapons
-    local categories = S{'armor', 'weapons'}
-    for category in categories:it() do
-        file = _libs.files.read(plugin_resources..'items_'..category..'.xml')
-        match_string = '<i id="(%d-)" enl="([^"]-)" fr="([^"]-)" frl="([^"]-)" de="([^"]-)" del="([^"]-)" jp="([^"]-)" jpl="([^"]-)" slots="([^"]-)" jobs="([^"]-)" races="([^"]-)" level="(%d-)" targets="([%a,%s]-)" casttime="([%d%.]-)" recast="(%d-)">([^<]-)</i>'
-        category = category:capitalize()
-        for id, enl, fr, frl, de, del, jp, jpl, slots, jobs, races, level, targets, cast_time, recast, en in file:gmatch(match_string) do
-            id = id:number()
-            res[id] = setmetatable({
-                id = id,
-                english = unquote(en),
-                log_english = unquote(enl),
-                french = unquote(fr),
-                log_french = unquote(frl),
-                german = unquote(de),
-                log_german = unquote(del),
-                japanese = unquote(jp),
-                log_japanese = unquote(jpl),
-                slots = resources.slots[slots:number(16)],
-                jobs = parse_jobs(jobs:number(16)),
-                races = resources.races[races:number(16)],
-                level = level:number(),
-                targets = S(targets:split()):remove('None'),
-                cast_time = cast_time:number(),
-                recast = recast:number(),
-                category = category,
-            }, resource_entry_mt)
-            last = res[id]
         end
     end
-    slots[res] = slots[res] + table.keyset(last)
 
-    return res
+    for _, entry in pairs(t) do
+        for key, fn in pairs(fn_cache) do
+            if rawget(entry, key) ~= nil then
+                rawset(entry, key, fn(rawget(entry, key)))
+            end
+        end
+    end
 end
 
--- Returns the zones, indexed by ingame ID.
-function fns.zones()
-    local file = _libs.files.read(plugin_resources..'areas.xml')
-    local match_string = '<a id="(%d-)" fr="([^"]-)" de="([^"]-)" jp="([^"]-)">([^<]-)</a>'
-    local last = {}
-
-    local res = {}
-
-    for id, fr, de, jp, en in file:gmatch(match_string) do
-        id = id:number()
-        res[id] = setmetatable({
-            id = id,
-            english = en,
-            french = fr,
-            german = de,
-            japanese = jp,
-        }, resource_entry_mt)
-        last = res[id]
-    end
-    slots[res] = table.keyset(last)
-
-    return res
-end
-
--- Returns monster abilities, indexed by ingame ID.
-function fns.monster_abils()
-    local file = _libs.files.read(addon_resources..'mabils.xml')
-    local match_string
-    local last = {}
-
-    local res = {}
-    slots[res] = S{}
-
-    match_string = '<m id="(%d-)" english="([^"]-)" actor_status="([^"]-)" target_status="([^"]-)" />'
-    for id, english, actor_status, target_status in file:gmatch(match_string) do
-        id = id:number()
-        res[id] = setmetatable({
-            id = id,
-            english = unquote(english),
-            actor_status = S(actor_status:split(','):map(tonumber)),
-            target_status = S(target_status:split(','):map(tonumber)),
-        }, resource_entry_mt)
-        last = res[id]
-    end
-    slots[res] = slots[res] + table.keyset(last)
-
-    match_string = '<m id="(%d-)" english="([^"]-)" actor_status="([^"]-)" />'
-    for id, english, actor_status in file:gmatch(match_string) do
-        id = id:number()
-        res[id] = setmetatable({
-            id = id,
-            english = unquote(english),
-            actor_status = S(actor_status:split(','):map(tonumber)),
-            target_status = S{},
-        }, resource_entry_mt)
-        last = res[id]
-    end
-    slots[res] = slots[res] + table.keyset(last)
-
-    match_string = '<m id="(%d-)" english="([^"]-)" target_status="([^"]-)" />'
-    for id, english, target_status in file:gmatch(match_string) do
-        id = id:number()
-        res[id] = setmetatable({
-            id = id,
-            english = unquote(english),
-            actor_status = S{},
-            target_status = S(target_status:split(','):map(tonumber)),
-        }, resource_entry_mt)
-        last = res[id]
-    end
-    slots[res] = slots[res] + table.keyset(last)
-
-    match_string = '<m id="(%d-)" english="([^"]-)" />'
-    for id, english in file:gmatch(match_string) do
-        id = id:number()
-        res[id] = setmetatable({
-            id = id,
-            english = unquote(english),
-            actor_status = S{},
-            target_status = S{},
-        }, resource_entry_mt)
-        last = res[id]
-    end
-    slots[res] = slots[res] + table.keyset(last)
-
-    return res
-end
+lookup = {
+    elements = resources.elements,
+    jobs = resources.jobs,
+    slots = resources.slots,
+    races = resources.races,
+    skills = resources.skills,
+    targets = {[0x01] = 'Self', [0x02] = 'Player', [0x04] = 'Party', [0x08] = 'Alliance', [0x10] = 'NPC', [0x20] = 'Enemy', [0x60] = 'Object', [0x9D] = 'Corpse'},
+}
 
 return resources
 
 --[[
-Copyright (c) 2013, Windower
+Copyright (c) 2013-2014, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

@@ -158,7 +158,8 @@ function amend(settings, text)
 end
 
 function apply_settings(t)
-    windower.text.set_location(t._name, t._settings.pos.x, t._settings.pos.y)
+    local settings = windower.get_windower_settings()
+    windower.text.set_location(t._name, t._settings.pos.x + (t._settings.flags.right and settings.ui_x_res or 0), t._settings.pos.y + (t._settings.flags.bottom and settings.ui_y_res or 0))
     windower.text.set_bg_color(t._name, t._settings.bg.alpha, t._settings.bg.red, t._settings.bg.green, t._settings.bg.blue)
     windower.text.set_bg_visibility(t._name, t._settings.bg.visible)
     windower.text.set_color(t._name, t._settings.text.alpha, t._settings.text.red, t._settings.text.green, t._settings.text.blue)
@@ -303,13 +304,14 @@ function texts.pos(t, x, y)
         return t._settings.pos.x, t._settings.pos.y
     end
 
-    windower.text.set_location(t._name, x, y)
+    local settings = windower.get_windower_settings()
+    windower.text.set_location(t._name, x + (t._settings.flags.right and settings.ui_x_res or 0), y + (t._settings.flags.bottom and settings.ui_y_res or 0))
     t._settings.pos.x = x
     t._settings.pos.y = y
 end
 
 function texts.pos_x(t, x)
-    if x then
+    if not x then
         return t._settings.pos.x
     end
 
@@ -463,8 +465,11 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
                 or pos_y >= y and y >= pos_y + off_y) then
                 if t._settings.flags.right or t._settings.flags.bottom then
                     local info = windower.get_windower_settings()
-                    pos_x = t._settings.flags.right and pos_x - info.ui_x_res or pos_x
-                    pos_y = t._settings.flags.bottom and pos_y - info.ui_y_res or pos_y
+                    if t._settings.flags.right then
+                        pos_x = pos_x - info.ui_x_res
+                    else
+                        pos_y = pos_y - info.ui_y_res
+                    end
                 end
                 dragged = {text = t, x = x - pos_x, y = y - pos_y}
                 return true

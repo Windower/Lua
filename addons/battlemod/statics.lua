@@ -35,12 +35,12 @@ agg_messages = T{85,653,655,75,156,189,248,323,355,408,422,425,82,93,116,127,131
 color_redundant = T{26,33,41,71,72,89,94,109,114,164,173,181,184,186,70,84,104,127,128,129,130,131,132,133,134,135,136,137,138,139,140,64,86,91,106,111,175,178,183,81,101,16,65,87,92,107,112,174,176,182,82,102,67,68,69,170,189,15,208,18,25,32,40,163,185,23,24,27,34,35,42,43,162,165,187,188,30,31,14,205,144,145,146,147,148,149,150,151,152,153,190,13,9,253,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,284,285,286,287,292,293,294,295,300,301,301,303,308,309,310,311,316,317,318,319,324,325,326,327,332,333,334,335,340,341,342,343,344,345,346,347,348,349,350,351,355,357,358,360,361,363,366,369,372,374,375,378,381,384,395,406,409,412,415,416,418,421,424,437,450,453,456,458,459,462,479,490,493,496,499,500,502,505,507,508,10,51,52,55,58,62,66,80,83,85,88,90,93,100,103,105,108,110,113,122,168,169,171,172,177,179,180,12,11,37,291} -- 37 and 291 might be unique colors, but they are not gsubbable.
 black_colors = T{352,354,356,388,390,400,402,430,432,442,444,472,474,484,486}
 
---	resists = {85,284}
---	immunobreaks = {653,654}
---	complete_resists = {655,656}
---	no_effects = {75,156,189,248,323,355,408,422,425,283,423,659}
---	receives = {82,116,127,131,134,151,144,146,148,150,166,186,194,230,236,237,242,243,268,271,319,320,364,375,412,414,416,420,424,426,432,433,441,602,645,668,203,205,266,270,272,277,279,280,285,145,147,149,151,267,269,278,286,287,365,415,421,427}
---	vanishes = {93,273}
+--    resists = {85,284}
+--    immunobreaks = {653,654}
+--    complete_resists = {655,656}
+--    no_effects = {75,156,189,248,323,355,408,422,425,283,423,659}
+--    receives = {82,116,127,131,134,151,144,146,148,150,166,186,194,230,236,237,242,243,268,271,319,320,364,375,412,414,416,420,424,426,432,433,441,602,645,668,203,205,266,270,272,277,279,280,285,145,147,149,151,267,269,278,286,287,365,415,421,427}
+--    vanishes = {93,273}
 
 no_effect_map = T{248,355,189,75,408,156,0,0,0,0,189,0,189,156,156}
 receives_map = T{0,0,186,82,375,116,0,0,0,0,186,0,127,116,116}
@@ -73,30 +73,30 @@ line_nonumber  = '[${actor}] ${abil} '..string.char(129,168)..' ${target}'
 line_roll      = '${actor} ${abil} '..string.char(129,168)..' ${target} '..string.char(129,170)..' ${number}'
 
 default_settings_table = {line_aoe       = 'AOE ${numb} '..string.char(129,168)..' ${target}',
-			line_aoebuff   = '${actor} ${abil} '..string.char(129,168)..' ${target} (${status})',
-			line_full      = '[${actor}] ${numb} ${abil} '..string.char(129,168)..' ${target}',
-			line_itemnum   = '[${actor}] ${abil} '..string.char(129,168)..' ${target} (${numb} ${item2})',
-			line_item      = '[${actor}] ${abil} '..string.char(129,168)..' ${target} (${item2})',
-			line_noability = '${numb} '..string.char(129,168)..' ${target}',
-			line_noactor   = '${abil} ${numb} '..string.char(129,168)..' ${target}',
-			line_nonumber  = '[${actor}] ${abil} '..string.char(129,168)..' ${target}',
-			line_roll = '${actor} ${abil} '..string.char(129,168)..' ${target} '..string.char(129,170)..' ${number}',
-	condensedamage=true,condensetargets=true,cancelmulti=true,oxford=true,commamode=false,targetnumber=true,swingnumber=true,sumdamage=true,condensecrits=false}
+            line_aoebuff   = '${actor} ${abil} '..string.char(129,168)..' ${target} (${status})',
+            line_full      = '[${actor}] ${numb} ${abil} '..string.char(129,168)..' ${target}',
+            line_itemnum   = '[${actor}] ${abil} '..string.char(129,168)..' ${target} (${numb} ${item2})',
+            line_item      = '[${actor}] ${abil} '..string.char(129,168)..' ${target} (${item2})',
+            line_noability = '${numb} '..string.char(129,168)..' ${target}',
+            line_noactor   = '${abil} ${numb} '..string.char(129,168)..' ${target}',
+            line_nonumber  = '[${actor}] ${abil} '..string.char(129,168)..' ${target}',
+            line_roll = '${actor} ${abil} '..string.char(129,168)..' ${target} '..string.char(129,170)..' ${number}',
+    condensedamage=true,condensetargets=true,cancelmulti=true,oxford=true,commamode=false,targetnumber=true,swingnumber=true,sumdamage=true,condensecrits=false}
 
 message_map = {}
 for n=1,700,1 do
-	message_map[n] = T{}
+    message_map[n] = T{}
 end
 
 message_map[85] = T{284} -- resist
 message_map[653] = T{654} -- immunobreak
 message_map[655] = T{656} -- complete resist
 message_map[93] = T{273} -- vanishes
---	message_map[75] =  -- no effect spell
+--    message_map[75] =  -- no effect spell
 message_map[156] = T{156,323,422,425} -- no effect ability
 message_map[75] = T{283} -- No Effect: Spell, Target
---	message_map[189] = -- no effect ws
---	message_map[408] = -- no effect item
+--    message_map[189] = -- no effect ws
+--    message_map[408] = -- no effect item
 message_map[248] = T{355} -- no ability of any kind
 message_map['No effect'] = T{283,423,659} -- generic "no effect" messages for sorting by category
 message_map[432] = T{433} -- Receives: Spell, Target
@@ -108,7 +108,7 @@ message_map[116] = T{131,134,144,146,148,150,364,414,416,441,602,668,285,145,147
 message_map[127]=T{319,320,645} -- Receives: Ability, Target, Status
 message_map[420]=T{424} -- Receives: Ability, Target, Status, Number
 message_map[375] = T{412}-- Receives: Item, Target, Status
---	message_map[166] =  -- receives additional effect
+--    message_map[166] =  -- receives additional effect
 message_map[186] = T{194,242,243}-- Receives: Weapon skill, Target, Status
 message_map.Receives = T{203,205,270,272,277,279,280,266,267,269,278}
 message_map[426] = T{427} -- Loses
@@ -139,33 +139,10 @@ message_map[243] = T{278}
 message_map[2] = T{264}
 
 spike_effect_valid = {true,false,false,false,false,false,false,false,false,false,false,false,false,false,false}
-add_effect_valid = {true,true,true,true,false,false,false,false,false,false,false,false,false,false,false}
+add_effect_valid = {true,true,true,true,false,false,false,false,false,false,true,false,false,false,false}
 
-
-speFile = file.new('../../plugins/resources/spells.xml')
-jaFile = file.new('../../plugins/resources/abils.xml')
-statusFile = file.new('../../plugins/resources/status.xml')
-dialogFile = file.new('../../addons/libs/resources/dialog4.xml')
-mabilsFile = file.new('../../addons/libs/resources/mabils.xml')
-itemsGFile = file.new('../../plugins/resources/items_general.xml')
-itemsAFile = file.new('../../plugins/resources/items_armor.xml')
-itemsWFile = file.new('../../plugins/resources/items_weapons.xml')
-
-r_abilities = parse_resources(jaFile:readlines())
-r_spells = parse_resources(speFile:readlines())
-r_status = parse_resources(statusFile:readlines())
-dialog = parse_resources(dialogFile:readlines())
-r_mabils = parse_resources(mabilsFile:readlines())
-r_items = table.range(65535)
-r_items:update(parse_resources(itemsGFile:readlines()))
-r_items:update(parse_resources(itemsAFile:readlines()))
-r_items:update(parse_resources(itemsWFile:readlines()))
-
--- This is for the secondary form of these debuffs
-enLog = {}
-for i,v in pairs({0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,28,29,30,31,134,135,155,156,157,168,176,177,259,260,261,262,263,264,309,474}) do
-	enLog[v] = r_status[v]['enLog']
-end
+-- These are the debuffs that are expressed in their log form by battlemod
+log_form_debuffs = T{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,28,29,30,31,134,135,155,156,157,168,176,177,259,260,261,262,263,264,309,474}
 
 
 default_filters = [[
@@ -175,9 +152,9 @@ default_filters = [[
      to eliminate all messages initiated by everyone's pet but your own.
      True means "filter this"
      False means "don't filter this"
-	 
-	 Generally, the outer tag is the actor and the inner tag is the action.
-	 If the monster is the actor, then the inner tag is the target and the tag beyond that is the action.-->
+     
+     Generally, the outer tag is the actor and the inner tag is the action.
+     If the monster is the actor, then the inner tag is the target and the tag beyond that is the action.-->
     <global>
         <me> <!-- You're doing something -->
             <melee>false</melee>  <!-- Prevents your melee ("white") damage from appearing -->
@@ -190,8 +167,8 @@ default_filters = [[
             <readies>false</readies> <!-- Prevents your "Jim readies ____" messages from appearing -->
             <casting>false</casting> <!-- Prevents your "Jim begins casting ____" messages from appearing -->
             <all>false</all> <!-- Prevents all of your messages from appearing -->
-			
-			<target>true</target> <!-- true = SHOW all actions where I am the target. -->
+            
+            <target>true</target> <!-- true = SHOW all actions where I am the target. -->
         </me>
         <party> <!-- A party member is doing something -->
             <melee>false</melee>
@@ -249,80 +226,80 @@ default_filters = [[
             <casting>false</casting>
             <all>false</all>
         </other_pets>
-		
-		
+        
+        
         <monsters> <!-- Monster is doing something with one of the below targets -->
-			<me> <!-- He's targeting you! -->
-				<melee>false</melee>
-				<ranged>false</ranged>
-				<damage>false</damage>
-				<healing>false</healing>
-				<misses>false</misses>
-				<readies>false</readies>
-				<casting>false</casting>
-				<all>false</all>
-			</me>
-			<party> <!-- He's targeting a party member -->
-				<melee>false</melee>
-				<ranged>false</ranged>
-				<damage>false</damage>
-				<healing>false</healing>
-				<misses>false</misses>
-				<readies>false</readies>
-				<casting>false</casting>
-				<all>false</all>
-			</party>
-			<alliance> <!-- He's targeting an alliance member -->
-				<melee>false</melee>
-				<ranged>false</ranged>
-				<damage>false</damage>
-				<healing>false</healing>
-				<misses>false</misses>
-				<readies>false</readies>
-				<casting>false</casting>
-				<all>false</all>
-			</alliance>
-			<others> <!-- He's targeting some guy nearby -->
-				<melee>false</melee>
-				<ranged>false</ranged>
-				<damage>false</damage>
-				<healing>false</healing>
-				<misses>false</misses>
-				<readies>false</readies>
-				<casting>false</casting>
-				<all>false</all>
-			</others>
-			<my_pet> <!-- He's targeting your pet -->
-				<melee>false</melee>
-				<ranged>false</ranged>
-				<damage>false</damage>
-				<healing>false</healing>
-				<misses>false</misses>
-				<readies>false</readies>
-				<casting>false</casting>
-				<all>false</all>
-			</my_pet>
-			<other_pets> <!-- He's targeting someone else's pet -->
-				<melee>false</melee>
-				<ranged>false</ranged>
-				<damage>false</damage>
-				<healing>false</healing>
-				<misses>false</misses>
-				<readies>false</readies>
-				<casting>false</casting>
-				<all>false</all>
-			</other_pets>
-			
-			<monsters> <!-- He's targeting himself or another monster -->
-				<melee>false</melee>
-				<ranged>false</ranged>
-				<damage>false</damage>
-				<healing>false</healing>
-				<misses>false</misses>
-				<readies>false</readies>
-				<casting>false</casting>
-				<all>false</all>
-			</monsters>
+            <me> <!-- He's targeting you! -->
+                <melee>false</melee>
+                <ranged>false</ranged>
+                <damage>false</damage>
+                <healing>false</healing>
+                <misses>false</misses>
+                <readies>false</readies>
+                <casting>false</casting>
+                <all>false</all>
+            </me>
+            <party> <!-- He's targeting a party member -->
+                <melee>false</melee>
+                <ranged>false</ranged>
+                <damage>false</damage>
+                <healing>false</healing>
+                <misses>false</misses>
+                <readies>false</readies>
+                <casting>false</casting>
+                <all>false</all>
+            </party>
+            <alliance> <!-- He's targeting an alliance member -->
+                <melee>false</melee>
+                <ranged>false</ranged>
+                <damage>false</damage>
+                <healing>false</healing>
+                <misses>false</misses>
+                <readies>false</readies>
+                <casting>false</casting>
+                <all>false</all>
+            </alliance>
+            <others> <!-- He's targeting some guy nearby -->
+                <melee>false</melee>
+                <ranged>false</ranged>
+                <damage>false</damage>
+                <healing>false</healing>
+                <misses>false</misses>
+                <readies>false</readies>
+                <casting>false</casting>
+                <all>false</all>
+            </others>
+            <my_pet> <!-- He's targeting your pet -->
+                <melee>false</melee>
+                <ranged>false</ranged>
+                <damage>false</damage>
+                <healing>false</healing>
+                <misses>false</misses>
+                <readies>false</readies>
+                <casting>false</casting>
+                <all>false</all>
+            </my_pet>
+            <other_pets> <!-- He's targeting someone else's pet -->
+                <melee>false</melee>
+                <ranged>false</ranged>
+                <damage>false</damage>
+                <healing>false</healing>
+                <misses>false</misses>
+                <readies>false</readies>
+                <casting>false</casting>
+                <all>false</all>
+            </other_pets>
+            
+            <monsters> <!-- He's targeting himself or another monster -->
+                <melee>false</melee>
+                <ranged>false</ranged>
+                <damage>false</damage>
+                <healing>false</healing>
+                <misses>false</misses>
+                <readies>false</readies>
+                <casting>false</casting>
+                <all>false</all>
+            </monsters>
         </monsters>
     </global>
 </settings>
@@ -347,29 +324,29 @@ default_settings = [[
 <?xml version="1.0" ?>
 <settings>
 <!-- For the output customization lines, ${actor} denotes a value to be replaced. The options are actor, number, abil, and target.
-	 Options for other modes are either "true" or "false". Other values will not be interpreted.-->
-	<global>
+     Options for other modes are either "true" or "false". Other values will not be interpreted.-->
+    <global>
         <condensedamage>true</condensedamage>
         <condensetargets>true</condensetargets>
-		<cancelmulti>true</cancelmulti>
-		<oxford>true</oxford>
-		<commamode>false</commamode>
-		<targetnumber>true</targetnumber>
-		<swingnumber>true</swingnumber>
-		<sumdamage>true</sumdamage>
-		<condensecrits>false</condensecrits>
+        <cancelmulti>true</cancelmulti>
+        <oxford>true</oxford>
+        <commamode>false</commamode>
+        <targetnumber>true</targetnumber>
+        <swingnumber>true</swingnumber>
+        <sumdamage>true</sumdamage>
+        <condensecrits>false</condensecrits>
         <tpstatuses>true</tpstatuses>
         <simplify>true</simplify>
-		<line_aoe>AOE ${numb} ]]..string.char(129,168)..[[ ${target}</line_aoe>		
-		<line_aoebuff>${actor} ${abil} ]]..string.char(129,168)..[[ ${target} (${status})</line_aoebuff>
-		<line_full>[${actor}] ${numb} ${abil} ]]..string.char(129,168)..[[ ${target}</line_full>		
-		<line_item>[${actor}] ${abil} ]]..string.char(129,168)..[[ ${target} (${item2})</line_item>
-		<line_itemnum>[${actor}] ${abil} ]]..string.char(129,168)..[[ ${target} (${numb} ${item2})</line_itemnum>
-		<line_noability>${numb} ]]..string.char(129,168)..[[ ${target}</line_noability>
-		<line_noactor>${abil} ${numb} ]]..string.char(129,168)..[[ ${target}</line_noactor>
-		<line_nonumber>[${actor}] ${abil} ]]..string.char(129,168)..[[ ${target}</line_nonumber>
-		<line_roll>${actor} ${abil} ]]..string.char(129,168)..[[ ${target} ]]..string.char(129,170)..[[ ${number}</line_roll>
-	</global>
+        <line_aoe>AOE ${numb} ]]..string.char(129,168)..[[ ${target}</line_aoe>        
+        <line_aoebuff>${actor} ${abil} ]]..string.char(129,168)..[[ ${target} (${status})</line_aoebuff>
+        <line_full>[${actor}] ${numb} ${abil} ]]..string.char(129,168)..[[ ${target}</line_full>        
+        <line_item>[${actor}] ${abil} ]]..string.char(129,168)..[[ ${target} (${item2})</line_item>
+        <line_itemnum>[${actor}] ${abil} ]]..string.char(129,168)..[[ ${target} (${numb} ${item2})</line_itemnum>
+        <line_noability>${numb} ]]..string.char(129,168)..[[ ${target}</line_noability>
+        <line_noactor>${abil} ${numb} ]]..string.char(129,168)..[[ ${target}</line_noactor>
+        <line_nonumber>[${actor}] ${abil} ]]..string.char(129,168)..[[ ${target}</line_nonumber>
+        <line_roll>${actor} ${abil} ]]..string.char(129,168)..[[ ${target} ]]..string.char(129,170)..[[ ${number}</line_roll>
+    </global>
 </settings>
 ]]
 
@@ -377,46 +354,46 @@ default_colors = [[
 <? xml version="1.0" ?>
 <settings>
 <!-- Colors are customizable based on party / alliance position. Use the colortest command to view the available colors.
-	 If you wish for a color to be unchanged from its normal color, set it to 0. -->
-	<global>
-		<mob>69</mob>
-		<other>8</other>
-		
-		<p0>501</p0>
-		<p1>204</p1>
-		<p2>410</p2>
-		<p3>492</p3>
-		<p4>259</p4>
-		<p5>260</p5>
-		
-		<a10>205</a10>
-		<a11>359</a11>
-		<a12>167</a12>
-		<a13>038</a13>
-		<a14>125</a14>
-		<a15>185</a15>
-		
-		<a20>429</a20>
-		<a21>257</a21>
-		<a22>200</a22>
-		<a23>481</a23>
-		<a24>483</a24>
-		<a25>208</a25>
-		
-		<mobdmg>0</mobdmg>
-		<mydmg>0</mydmg>
-		<partydmg>0</partydmg>
-		<allydmg>0</allydmg>
-		<otherdmg>0</otherdmg>
-		
-		<spellcol>0</spellcol>
-		<mobspellcol>0</mobspellcol>
-		<abilcol>0</abilcol>
-		<wscol>0</wscol>
-		<mobwscol>0</mobwscol>
-		<statuscol>0</statuscol>
-		<enfeebcol>501</enfeebcol>
-		<itemcol>256</itemcol>
-	</global>
+     If you wish for a color to be unchanged from its normal color, set it to 0. -->
+    <global>
+        <mob>69</mob>
+        <other>8</other>
+        
+        <p0>501</p0>
+        <p1>204</p1>
+        <p2>410</p2>
+        <p3>492</p3>
+        <p4>259</p4>
+        <p5>260</p5>
+        
+        <a10>205</a10>
+        <a11>359</a11>
+        <a12>167</a12>
+        <a13>038</a13>
+        <a14>125</a14>
+        <a15>185</a15>
+        
+        <a20>429</a20>
+        <a21>257</a21>
+        <a22>200</a22>
+        <a23>481</a23>
+        <a24>483</a24>
+        <a25>208</a25>
+        
+        <mobdmg>0</mobdmg>
+        <mydmg>0</mydmg>
+        <partydmg>0</partydmg>
+        <allydmg>0</allydmg>
+        <otherdmg>0</otherdmg>
+        
+        <spellcol>0</spellcol>
+        <mobspellcol>0</mobspellcol>
+        <abilcol>0</abilcol>
+        <wscol>0</wscol>
+        <mobwscol>0</mobwscol>
+        <statuscol>0</statuscol>
+        <enfeebcol>501</enfeebcol>
+        <itemcol>256</itemcol>
+    </global>
 </settings>
 ]]

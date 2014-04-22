@@ -38,55 +38,55 @@
 ---- A string or false.
 -----------------------------------------------------------------------------------
 function valid_target(targ,flag)
-	local spell_targ
-	local san_targ = find_san(targ)
-	-- If the target is whitelisted, pass it through.
-	if pass_through_targs:contains(targ) then
-		local cur_targ = windower.ffxi.get_mob_by_target('<t>')
-		if (targ == '<t>' or targ == 't') and cur_targ and cur_targ.id == windower.ffxi.get_player().id then
-			return '<me>'
-		end
-		return targ
-	elseif st_targs:contains(targ) or tonumber(targ) then
-		return targ
-	elseif targ and windower.ffxi.get_player() then
-	-- If the target exists, scan the mob array for it
-		local current_target = windower.ffxi.get_mob_by_target('<t>')
-		local targar = {}
-		for i,v in pairs(windower.ffxi.get_mob_array()) do
-			if string.find(v.name:lower(),san_targ:lower()) and (v.valid_target or v.id == windower.ffxi.get_player().id) then
-				-- Handling for whether it's a monster or not
-				if v.is_npc and current_target then
-					if v.id == current_target.id then
-						targar['<t>'] = math.sqrt(v.distance)
-					end
-				elseif not v.is_npc then
-					targar[v.name] = math.sqrt(v.distance)
-				end
-			end
-		end
-				
-		-- If flag is set, push out the target only if it is in the targ array.
-		if targar[targ] then
-			spell_targ = targ
-		elseif flag then
-			spell_targ = false
-		else
-			-- If targ starts an element of the monster array, use it.
-			local min_dist = 50
-			for i,v in pairs(targar) do
-				if (i:lower()==san_targ:lower()) then-- or i:lower():find('^'..san_targ:lower())) then
-					spell_targ = i
-					break
-				end
-				if v < min_dist then -- Otherwise, just use the nearest (spatially) match.
-					min_dist = v
-					spell_targ = i
-				end
-			end
-		end
-	end
-	return spell_targ
+    local spell_targ
+    local san_targ = find_san(targ)
+    -- If the target is whitelisted, pass it through.
+    if pass_through_targs:contains(targ) then
+        local cur_targ = windower.ffxi.get_mob_by_target('<t>')
+        if (targ == '<t>' or targ == 't') and cur_targ and cur_targ.id == windower.ffxi.get_player().id then
+            return '<me>'
+        end
+        return targ
+    elseif st_targs:contains(targ) or (tonumber(targ) and windower.ffxi.get_mob_by_id(tonumber(targ))) then
+        return targ
+    elseif targ and windower.ffxi.get_player() then
+    -- If the target exists, scan the mob array for it
+        local current_target = windower.ffxi.get_mob_by_target('<t>')
+        local targar = {}
+        for i,v in pairs(windower.ffxi.get_mob_array()) do
+            if string.find(v.name:lower(),san_targ:lower()) and (v.valid_target or v.id == windower.ffxi.get_player().id) then
+                -- Handling for whether it's a monster or not
+                if v.is_npc and current_target then
+                    if v.id == current_target.id then
+                        targar['<t>'] = math.sqrt(v.distance)
+                    end
+                elseif not v.is_npc then
+                    targar[v.name] = math.sqrt(v.distance)
+                end
+            end
+        end
+                
+        -- If flag is set, push out the target only if it is in the targ array.
+        if targar[targ] then
+            spell_targ = targ
+        elseif flag then
+            spell_targ = false
+        else
+            -- If targ starts an element of the monster array, use it.
+            local min_dist = 50
+            for i,v in pairs(targar) do
+                if (i:lower()==san_targ:lower()) then-- or i:lower():find('^'..san_targ:lower())) then
+                    spell_targ = i
+                    break
+                end
+                if v < min_dist then -- Otherwise, just use the nearest (spatially) match.
+                    min_dist = v
+                    spell_targ = i
+                end
+            end
+        end
+    end
+    return spell_targ
 end
 
 
@@ -99,39 +99,39 @@ end
 ---- Created valid target, defaulting to '<me>'
 -----------------------------------------------------------------------------------
 function target_make(targets)
-	local target = windower.ffxi.get_mob_by_target('<t>')
-	local target_type = ''
-	if not target then
-		-- If target doesn't exist, leave it set to ''. This will shortcircuit the
-		-- rest of the processing and just return <me>.
-	elseif target.hpp == 0 then
-		target_type = 'Corpse'
-	elseif target.is_npc then
-		target_type = 'Enemy'
-		-- Need to add handling that differentiates 'Enemy' and 'NPC' here.
-	else
-		target_type = 'Ally'
-		local party = windower.ffxi.get_party()
-		for i,v in pairs(party) do
-			if v.name == target.name then
-				if i:sub(1,1) == 'p' then
-					if i:sub(1,2) == 'p0' then
-						target_type = 'Self'
-					else
-						target_type = 'Party'
-					end
-				end
-				if target.charmed then
-					target_type = 'Enemy'
-				end
-				break
-			end
-		end
-	end
-	
-	if targets[target_type] and target_type ~= 'Self' then
-		return '<t>'
-	end
---	windower.add_to_chat(8,"got to the end "..tostring(target_type))
-	return '<me>'
+    local target = windower.ffxi.get_mob_by_target('<t>')
+    local target_type = ''
+    if not target then
+        -- If target doesn't exist, leave it set to ''. This will shortcircuit the
+        -- rest of the processing and just return <me>.
+    elseif target.hpp == 0 then
+        target_type = 'Corpse'
+    elseif target.is_npc then
+        target_type = 'Enemy'
+        -- Need to add handling that differentiates 'Enemy' and 'NPC' here.
+    else
+        target_type = 'Ally'
+        local party = windower.ffxi.get_party()
+        for i,v in pairs(party) do
+            if v.name == target.name then
+                if i:sub(1,1) == 'p' then
+                    if i:sub(1,2) == 'p0' then
+                        target_type = 'Self'
+                    else
+                        target_type = 'Party'
+                    end
+                end
+                if target.charmed then
+                    target_type = 'Enemy'
+                end
+                break
+            end
+        end
+    end
+    
+    if targets[target_type] and target_type ~= 'Self' then
+        return '<t>'
+    end
+--    windower.add_to_chat(8,"got to the end "..tostring(target_type))
+    return '<me>'
 end

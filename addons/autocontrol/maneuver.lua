@@ -74,9 +74,7 @@ str = str..'\nWater:    \\cs(${colWater|255,255,255})${Water|0}\\cr - ${timeWate
 str = str..'\nLight:    \\cs(${colLight|255,255,255})${Light|0}\\cr - ${timeLight|0}s - ${olLight|0}%'
 str = str..'\nDark:     \\cs(${colDark|255,255,255})${Dark|0}\\cr - ${timeDark|0}s - ${olDark|0}%'
 
-Burden_tb = texts.new(str,settings)
-
-
+Burden_tb = texts.new(str, settings)
 
 windower.register_event("action", function(act)
     if mjob_id == 18 then
@@ -381,7 +379,8 @@ function zero_all()
     end
 end
 
-windower.register_event('zone change', function(to)
+function zone_check(to)
+    to = tonumber(to)
     if mjob_id == 18 then
         if petlessZones:contains(to) then 
             text_update_loop('stop')
@@ -401,7 +400,9 @@ windower.register_event('zone change', function(to)
             end
         end
     end
-end)
+end
+
+windower.register_event('zone change', zone_check)
     
 windower.register_event('time change', function()
     if mjob_id == 18 then
