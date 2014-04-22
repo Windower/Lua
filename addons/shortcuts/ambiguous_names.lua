@@ -356,7 +356,7 @@ function get_available_commands()
     if not player then return valid_abilities end
     
     for i,v in pairs(windower.ffxi.get_spells()) do
-        if v and ((res.spells[i].jobs[res.jobs[player.main_job_id]] and res.spells[i].jobs[res.jobs[player.main_job_id]] <= player.main_job_level) or (res.spells[i].jobs[res.jobs[player.sub_job_id]] and res.spells[i].jobs[res.jobs[player.sub_job_id]] <= player.sub_job_level)) then
+        if v and ((res.spells[i].jobs[player.main_job] and res.spells[i].jobs[player.main_job] <= player.main_job_level) or (res.spells[i].jobs[player.sub_job] and res.spells[i].jobs[player.sub_job] <= player.sub_job_level)) then
             valid_abilities.Magic[i] = res.spells[i]
         end
     end
