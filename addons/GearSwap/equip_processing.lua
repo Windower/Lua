@@ -31,7 +31,7 @@ function check_wearable(item_id)
     elseif not res.items[item_id].jobs then -- Make sure item can be equipped by specific jobs (unlike pearlsacks).
         --debug_mode_chat('GearSwap (Debug Mode): Item '..(res.items[item_id][language] or item_id)..' does not have a jobs field in the resources.')
     else
-        return (res.items[item_id].jobs[player.main_job_id]) and (res.items[item_id].level<=player.main_job_level) and (res.items[item_id].races[player.race_id])
+        return (res.items[item_id].jobs[res.jobs[player.main_job_id]]) and (res.items[item_id].level<=player.main_job_level) and (res.items[item_id].races[res.races[player.race_id]])
     end
     return false
 end
@@ -98,7 +98,7 @@ function to_id_set(inventory,equip_list)
                         local name,order,extgoal_1,extgoal_2 = expand_entry(equip_list[i])
                         
                         if name and name_match(m.id,name) then
-                            if res.items[m.id].slots[v] then
+                            if res.items[m.id].slots[res.slots[v]] then
                                 if #extgoal_1 ~= 0 or #extgoal_2 ~=0 then
                                     local exttemp = m.extdata
                                     local count = 0
@@ -139,7 +139,7 @@ function to_id_set(inventory,equip_list)
                                     reorder(order,i)
                                     break
                                 end
-                            elseif not res.items[m.id].slots[v] then
+                            elseif not res.items[m.id].slots[res.slots[v]] then
                                 equip_list[i] = nil
                                 error_list[i] = name..' (cannot be worn in this slot)'
                                 break
