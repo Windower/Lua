@@ -139,7 +139,8 @@ post_process = function(t)
 
         elseif rawget(lookup, key .. 's') then
             rawset(fn_cache, key, function(value)
-                return rawget(rawget(lookup, key .. 's'), value)
+--                return rawget(rawget(lookup, key .. 's'), value)
+                return value
             end)
 
         end
