@@ -326,11 +326,11 @@ function refresh_ffxi_info()
             world.weather_id = v
             world.weather = res.weather[v][language]
             world.real_weather = world.weather
-            world.weather_element = res.elements[res.weather[v].element][language]
+            world.weather_element = res.weather[v].element[language]
             world.real_weather_element = world.weather_element
         elseif i == 'day' and res.days[v] then
             world.day = res.days[v][language]
-            world.day_element = res.elements[res.days[v].element][language]
+            world.day_element = res.days[v].element[language]
         elseif i == 'moon' then
             world.moon_pct = v
         elseif i == 'moon_phase' and res.moon_phases[v] then
