@@ -286,7 +286,7 @@ function refresh_player()
     
     if player.main_job == 'MON' and species_id ~= 0 then
         player.species = {}
-        for i,v in pairs(res.items[species_id + 61440]) do
+        for i,v in pairs(res.monstrosity[species_id]) do
             if not (i == 'category' or i == 'id') then
                 player.species[i] = v
             end
