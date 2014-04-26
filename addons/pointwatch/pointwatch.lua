@@ -144,8 +144,7 @@ windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blo
         end
         update_box()
     elseif id == 0x55 then
-        local packet_id = org:byte(5)
-        if packet_id == 7 or packet_id == 0x1F then
+        if org:byte(0x85) == 3 then
             local dyna_KIs = math.floor((org:byte(6)%64)/2) -- 5 bits (32, 16, 8, 4, and 2 originally -> shifted to 16, 8, 4, 2, and 1)
             dynamis._KIs = {
                 ['Crimson'] = dyna_KIs%2 == 1,
