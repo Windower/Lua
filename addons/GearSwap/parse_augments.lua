@@ -84,7 +84,7 @@ augment_index_2_3 = {
     [0x073] = {{stat="petstoretp", offset=1}},
     [0x074] = {{stat="petsubtleblow", offset=1}},
     [0x075] = {{stat="petmagicevasion", offset=1}},
-    [0x076] = {{stat="petphysicaldamagetaken", offset=1}},
+    [0x076] = {{stat="petphysicaldamagetaken", offset=-1}},
     [0x077] = {{stat="petmagicdefensebonus", offset=1}},
     [0x078] = {{stat="avatarmagicattackbonus", offset=1}},
 
@@ -355,7 +355,7 @@ augment_index_2_35 = {
     [0x0A] = {{stat="rangedattack",offset=1}},
     [0x0B] = {{stat="rangedattack",offset=256}},
     [0x0C] = {{stat="accuracy",offset=1}},
-    [0x0D] = {{stat="acuracy",offset=256}},
+    [0x0D] = {{stat="accuracy",offset=256}},
     [0x0E] = {{stat="rangedaccuracy",offset=1}},
     [0x0F] = {{stat="rangedaccuracy",offset=256}},
     [0x10] = {{stat="defense",offset=1}},
@@ -370,10 +370,18 @@ augment_index_2_35 = {
     [0x19] = {{stat="magicaccuracy",offset=256}},
     [0x1A] = {{stat="magicevasion",offset=1}},
     [0x1B] = {{stat="magicevasion",offset=256}},
+    [0x1C] = {{stat="damage",offset=1}},
+    [0x1D] = {{stat="damage",offset=256}},
     [0x80] = {{stat="petmagicattackbonus",offset=1}},
     [0x81] = {{stat="petmagicaccuracy",offset=1}},
     [0x82] = {{stat="petattack",offset=1}},
     [0x82] = {{stat="petaccuracy",offset=1}},
+    [0xB9] = {{stat="storetp",offset=1}},
+    [0xBA] = {{stat="doubleattack",offset=1}},
+    [0xBB] = {{stat="snapshot",offset=1}},
+    [0xBC] = {{stat="physicaldamagetaken",offset=-1}},
+    [0xBD] = {{stat="magicdamagetaken",offset=-1}},
+    [0xBE] = {{stat="breathdamagetaken",offset=-1}},
     [0xBF] = {{stat="strength",offset=1}},
     [0xC0] = {{stat="dexterity",offset=1}},
     [0xC1] = {{stat="vitality",offset=1}},
@@ -447,7 +455,7 @@ for i=0,255 do
 end
 
 
---[[function extdata_to_augment(extdata)
+function extdata_to_augment(extdata)
     if not extdata then return end
     local flags,id_1,val_1,id_2,val_2,id_3,val_3,id_4,val_4,Augment_1,Augment_2,Augment_3,Augment_4
     local trial_complete,trial_number = false
@@ -521,10 +529,10 @@ function unpack_augment(augment_table,val)
             else return_augment = return_augment..'-'..((val-v.offset)*(v.multiplier or 1)) end
         end
     end
-    return return_augment or 'nil'
+    return return_augment or nil
 end
 
-for i,v in ipairs(windower.ffxi.get_items().inventory) do
+--[[for i,v in ipairs(windower.ffxi.get_items().inventory) do
     if v.extdata and res.items[v.id] then
         local tempstr = i..' '..res.items[v.id][language]..'   '
         for n=1,string.len(v.extdata) do

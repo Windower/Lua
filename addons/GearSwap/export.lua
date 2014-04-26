@@ -44,9 +44,22 @@ function export_set(options)
                 if res.items[v.id] then
                     item_list[#item_list+1] = {}
                     item_list[#item_list].name = res.items[v.id][language]
-                    local potslots = v.slots
-                    if potslots then potslots = res.slots[potslots:it()()].english:gsub(' ','_') end
-                    item_list[#item_list].slot = potslots or 'item'
+                    local potslots,slot = res.items[v.id].slots
+                    if potslots then
+                        slot = res.slots[potslots:it()()].english:gsub(' ','_'):lower() -- Multi-lingual support requires that we add more languages to slots.lua
+                    end
+                    item_list[#item_list].slot = slot or 'item'
+                    if not xml then
+                        local aug_1,aug_2,aug_3,aug_4,_,__ = extdata_to_augment(v.extdata)
+                        local aug_str = ''
+                        if aug_1 and not tonumber(aug_1) then aug_str = aug_str..'"'..aug_1..'",' end
+                        if aug_2 and not tonumber(aug_2) then aug_str = aug_str..'"'..aug_2..'",' end
+                        if aug_3 and not tonumber(aug_3) then aug_str = aug_str..'"'..aug_3..'",' end
+                        if aug_4 and not tonumber(aug_4) then aug_str = aug_str..'"'..aug_4..'",' end
+                        if string.len(aug_str) > 0 then
+                            item_list[#item_list].augments = aug_str
+                        end
+                    end
                 else
                     windower.add_to_chat(123,'GearSwap: You possess an item that is not in the resources yet.')
                 end
@@ -66,7 +79,18 @@ function export_set(options)
                 if res.items[inv[v].id] then
                     item_list[slot_map[i]+1] = {}
                     item_list[slot_map[i]+1].name = res.items[inv[v].id][language]
-                    item_list[slot_map[i]+1].slot = i --default_slot_map[inv[v].slot]
+                    item_list[slot_map[i]+1].slot = i
+                    if not xml then
+                        local aug_1,aug_2,aug_3,aug_4,_,__ = extdata_to_augment(inv[v].extdata)
+                        local aug_str = ''
+                        if aug_1 and not tonumber(aug_1) then aug_str = aug_str..'"'..aug_1..'",' end
+                        if aug_2 and not tonumber(aug_2) then aug_str = aug_str..'"'..aug_2..'",' end
+                        if aug_3 and not tonumber(aug_3) then aug_str = aug_str..'"'..aug_3..'",' end
+                        if aug_4 and not tonumber(aug_4) then aug_str = aug_str..'"'..aug_4..'",' end
+                        if string.len(aug_str) > 0 then
+                            item_list[slot_map[i]+1].augments = aug_str
+                        end
+                    end
                 else
                     windower.add_to_chat(123,'GearSwap: You are wearing an item that is not in the resources yet.')
                 end
@@ -124,7 +148,12 @@ function export_set(options)
         f:write('sets.exported={\n')
         for i,v in ipairs(item_list) do
             if v.name ~= empty then
-                f:write('    '..v.slot..'="'..v.name..'",\n')
+                if v.augments then
+                    --Advanced set table
+                    f:write('    '..v.slot..'={ name="'..v.name..'", augments={'..v.augments..'}}\n')
+                else
+                    f:write('    '..v.slot..'="'..v.name..'",\n')
+                end
             end
         end
         f:write('}')
