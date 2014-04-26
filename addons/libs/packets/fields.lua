@@ -374,6 +374,17 @@ fields.outgoing[0x042] = L{
     {ctype='unsigned char',     label='Slot'},                                  -- 04
 }
 
+-- Servmes
+-- First 4 bytes resemble the first 4 bytes of the incoming servmessage packet
+fields.outgoing[0x04B] = L{
+    {ctype='unsigned char',     label='_unknown1'},                             -- 04  Always 1?
+    {ctype='unsigned char',     label='_unknown2'},                             -- 05  Can be 1 or 0
+    {ctype='unsigned char',     label='_unknown3'},                             -- 06  Always 1?
+    {ctype='unsigned char',     label='_unknown4'},                             -- 07  Always 2?
+    {ctype='char[12]',          label='_unknown5'},                             -- 08  All 00s
+    {ctype='unsigned int',      label='_unknown5'},                             -- 14  EC 00 00 00 observed. May be junk.
+}
+
 -- Delivery Box
 fields.outgoing[0x04D] = L{
     {ctype='unsigned char',     label='Manipulation Type'},                     -- 04
