@@ -1082,10 +1082,10 @@ fields.incoming[0x025] = L{
 }
 
 -- Count to 80
--- Sent after Item Update chunks (sometimes) when zoning.
+-- Sent after Item Update chunks for active inventory (sometimes) when zoning.
 fields.incoming[0x026] = L{
     {ctype='unsigned char',     label='_unknown1',          const=0x00},        -- 04
-    {ctype='unsigned char',     label='Counter'},                               -- 05   Varies sequentially between 0x01 and 0x50. Corresponds to the slot IDs of the previous incoming packet's Item Update chunks.
+    {ctype='unsigned char',     label='Slot ID'},                               -- 05   Corresponds to the slot IDs of the previous incoming packet's Item Update chunks for active Inventory.
     {ctype='char[22]',          label='_unknown2',          const=0},           -- 06
 }
 
