@@ -1417,6 +1417,22 @@ fields.incoming[0x04C] = L{
     {ctype='char[52',           label='_unknown2'},                             --
 }
 
+-- Servmes Resp
+-- Length of the packet may vary based on message length? Kind of hard to test.
+-- The server message appears to generate some kind of feedback to the server based on the flags?
+-- If you set the first byte to 0 in incoming chunk with eval and do /smes, the message will not display until you unload eval.
+fields.incoming[0x4D] = L{
+    {ctype='unsigned char',     label='_unknown1'},                             -- 04  01  Message does not appear without this
+    {ctype='unsigned char',     label='_unknown2'},                             -- 05  01  Nonessential to message appearance
+    {ctype='unsigned char',     label='_unknown3'},                             -- 06  01  Message does not appear without this
+    {ctype='unsigned char',     label='_unknown4'},                             -- 07  02  Message does not appear without this
+    {ctype='unsigned int',      label='Timestamp',          fn=time},           -- 08  UTC Timestamp
+    {ctype='unsigned int',      label='Message Length 1'},                      -- 0A  Number of characters in the message
+    {ctype='unsigned int',      label='_unknown2'},                             -- 10  00 00 00 00 observed
+    {ctype='unsigned int',      label='Message Length 2'},                      -- 14  Same as Message Length 1. Not sure why this needs to be an int or in here twice.
+    {ctype='char[148]',         label='Message'},                               -- 18  Currently prefixed with 0x81, 0xA1 - A custom shift-jis character that translates to a square.
+}
+
 -- Data Download 2
 fields.incoming[0x04F] = L{
 --   This packet's contents are nonessential. They are often leftovers from other outgoing
@@ -1686,16 +1702,6 @@ fields.incoming[0x08D] = L{
 -- Has a byte that seems to be either 02 or 03, but the packet is sent three times. There are two 02s.
 -- The second 02 packet contains different information after the ~48th content byte.
 
--- LS Message
-fields.incoming[0x0CC] = L{
-    {ctype='int',               label='_unknown1'},                             -- 04
-    {ctype='char[128]',         label='Message'},                               -- 08
-    {ctype='unsigned int',      label='Timestamp',          fn=time},           -- 88
-    {ctype='char[16]',          label='Player Name'},                           -- 8C
-    {ctype='unsigned int',      label='Permissions'},                           -- 98
-    {ctype='char[16]',          label='Linkshell',          enc=ls_name_msg},   -- 9C   6-bit packed
-}
-
 types.alliance_member = L{
     {ctype='unsigned int',      label='ID',                 fn=id},             -- 00
     {ctype='unsigned short',    label='Index',              fn=index},          -- 04
@@ -1764,8 +1770,18 @@ fields.incoming[0x0CA] = L{
     {ctype='unsigned short',    label='_unknown2'},                             -- 08   Could also be characters starting the line - 01 FD observed
     {ctype='char[118]',         label='Bazaar Message'},                        -- 0A   Terminated with a vertical tab
     {ctype='char[16]',          label='Player Name'},                           -- 80
-    {ctype='unsigned short',    label='_unknown3'},                             -- 90   C6 01 observed. Not player index.
+    {ctype='unsigned short',    label='_unknown3'},                             -- 90   C6 01 and 63 02 observed. Not player index.
     {ctype='unsigned short',    label='_unknown4'},                             -- 92   00 00 observed.
+}
+
+-- LS Message
+fields.incoming[0x0CC] = L{
+    {ctype='int',               label='_unknown1'},                             -- 04
+    {ctype='char[128]',         label='Message'},                               -- 08
+    {ctype='unsigned int',      label='Timestamp',          fn=time},           -- 88
+    {ctype='char[16]',          label='Player Name'},                           -- 8C
+    {ctype='unsigned int',      label='Permissions'},                           -- 98
+    {ctype='char[16]',          label='Linkshell',          enc=ls_name_msg},   -- 9C   6-bit packed
 }
 
 -- Found Item
