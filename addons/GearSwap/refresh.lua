@@ -157,9 +157,13 @@ end
 -------- of buffs with that name active.
 -----------------------------------------------------------------------------------
 function refresh_player()
-    if not windower.ffxi.get_player() then return end
+    local pl = windower.ffxi.get_player()
+    if not pl then return end
     
-    table.reassign(player,windower.ffxi.get_player())
+    local player_mob_table = windower.ffxi.get_mob_by_index(pl.index)
+    if not player_mob_table then return end
+    
+    table.reassign(player,pl)
     for i,v in pairs(player.vitals) do
         player[i]=v
     end
@@ -170,10 +174,6 @@ function refresh_player()
         player.sub_job_id = 0
     end
     player.job = player.main_job..'/'..player.sub_job
-    
-    local player_mob_table = windower.ffxi.get_mob_by_index(windower.ffxi.get_player().index)
-    if not player_mob_table then return end
-    
     
     for i,v in pairs(player_mob_table) do
         if i == 'name' then
@@ -188,29 +188,35 @@ function refresh_player()
         player.race = mob_table_races[player.race]
     end
     
-    items = windower.ffxi.get_items()
-    local cur_equip = items.equipment -- i = 'head', 'feet', etc.; v = inventory ID (0~80)
-    if sent_out_equip then -- If the swap is not complete, overwrite the current equipment with the equipment that you are swapping to
-        for i,v in pairs(cur_equip) do
-            if sent_out_equip[slot_map[i]] then
-                v = sent_out_equip[slot_map[i]]
-            end
-            if v == 0 then
-                v = empty
+    
+    
+    local item_table = windower.ffxi.get_items()
+    if item_table then items = item_table end
+    -- This being nil does not cause a return, but items should not really be changing when zoning.
+    if items.equipment then
+        local cur_equip = items.equipment -- i = 'head', 'feet', etc.; v = inventory ID (0~80)
+        if sent_out_equip then -- If the swap is not complete, overwrite the current equipment with the equipment that you are swapping to
+            for i,v in pairs(cur_equip) do
+                if sent_out_equip[slot_map[i]] then
+                    v = sent_out_equip[slot_map[i]]
+                end
+                if v == 0 then
+                    v = empty
+                end
             end
         end
+        
+        -- Assign player.equipment to be the gear that has been sent out and the server currently thinks
+        -- you are wearing. (the sent_out_equip for loop above).
+        player.equipment = make_user_table()
+        table.reassign(player.equipment,to_names_set(cur_equip,items.inventory))
     end
     
-    -- Assign player.equipment to be the gear that has been sent out and the server currently thinks
-    -- you are wearing. (the sent_out_equip for loop above).
-    player.equipment = make_user_table()
-    table.reassign(player.equipment,to_names_set(cur_equip,items.inventory))
-    
     -- Assign player.inventory to be keyed to item.inventory[i][language] and to have a value of count, similar to buffactive
-    player.inventory = refresh_item_list(items.inventory)
-    player.sack = refresh_item_list(items.sack)
-    player.satchel = refresh_item_list(items.satchel)
-    player.case = refresh_item_list(items.case)
+    if items.inventory then player.inventory = refresh_item_list(items.inventory) end
+    if items.sack then player.sack = refresh_item_list(items.sack) end
+    if items.satchel then player.satchel = refresh_item_list(items.satchel) end
+    if items.case then player.case = refresh_item_list(items.case) end
     
     -- Monster tables for the target and subtarget.
     player.target = target_complete(windower.ffxi.get_mob_by_target('t'))
@@ -219,16 +225,21 @@ function refresh_player()
     
     -- If we have a pet, create or update the table info.
     if player_mob_table.pet_index then
-        table.reassign(pet, target_complete(windower.ffxi.get_mob_by_index(player_mob_table.pet_index)))
-        pet.claim_id = nil
-        pet.is_npc = nil
-        pet.isvalid = true
-        if pet.tp then pet.tp = pet.tp/10 end
-        
-        if avatar_element[pet.name] then
-            pet.element = avatar_element[pet.name]
+        local player_pet_table = windower.ffxi.get_mob_by_index(player_mob_table.pet_index)
+        if player_pet_table then
+            table.reassign(pet, target_complete(player_pet_table))
+            pet.claim_id = nil
+            pet.is_npc = nil
+            pet.isvalid = true
+            if pet.tp then pet.tp = pet.tp/10 end
+            
+            if avatar_element[pet.name] then
+                pet.element = avatar_element[pet.name]
+            else
+                pet.element = 'None'
+            end
         else
-            pet.element = 'None'
+            table.reassign(pet, {isvalid=true})
         end
     else
         table.reassign(pet, {isvalid=false})
@@ -284,11 +295,16 @@ function refresh_player()
         end
     end
     
-    if player.main_job == 'MON' and species_id ~= 0 then
-        player.species = {}
-        for i,v in pairs(res.monstrosity[species_id]) do
-            if not (i == 'category' or i == 'id') then
-                player.species[i] = v
+    if player.main_job == 'MON' then
+        local species_id = windower.ffxi.get_mjob_data().species
+        -- Should add instincts when they become available
+        
+        if species_id then
+            player.species = {}
+            for i,v in pairs(res.monstrosity[species_id]) do
+                if i ~= 'id' then
+                    player.species[i] = v
+                end
             end
         end
     else

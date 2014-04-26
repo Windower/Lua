@@ -92,7 +92,8 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
                             break
                         end
                     end
-                else
+                end
+                if not r_line then
                     r_line = res.abilities[validabils[language][unify_prefix[command]][abil]]
                 end
                 storedcommand = command..' "'..r_line[language]..'" '
