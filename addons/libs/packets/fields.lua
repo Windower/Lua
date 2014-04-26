@@ -246,10 +246,16 @@ end
     Outgoing packets
 ]]
 
--- Packet sent on zoning. 12 bytes long, all content bytes are 00.
--- fields.outgoing[0x00C]
+-- Zone In 1
+-- Likely triggers specific incoming packets.
+-- Does not trigger any packets when randomly injected.
+fields.outgoing[0x00C] = L{
+    {ctype='int',               label='_unknown1'},                             -- 04   Always 00s?
+    {ctype='int',               label='_unknown2'},                             -- 04   Always 00s?
+}
 
 -- Client Leave
+-- Last packet sent when zoning. Disconnects from the zone server.
 fields.outgoing[0x00D] = L{
     {ctype='unsigned char',     label='_unknown1'},                             -- 04   Always 00?
     {ctype='unsigned char',     label='_unknown2'},                             -- 05   Always 00?
@@ -257,8 +263,19 @@ fields.outgoing[0x00D] = L{
     {ctype='unsigned char',     label='_unknown4'},                             -- 07   Always 00?
 }
 
--- Packet sent on zoning. 36 bytes long, all content bytes are 00.
--- fields.outgoing[0x00F]
+-- Zone In 2
+-- Likely triggers specific incoming packets.
+-- Does not trigger any packets when randomly injected.
+fields.outgoing[0x00F] = L{
+    {ctype='char[32]',          label='_unknown1'},                             -- 04   Always 00s?
+}
+
+-- Zone In 3
+-- Likely triggers specific incoming packets.
+-- Does not trigger any packets when randomly injected.
+fields.outgoing[0x011] = L{
+    {ctype='int',               label='_unknown1'},                             -- 04   Always 02 00 00 00?
+}
 
 -- Standard Client
 fields.outgoing[0x015] = L{
@@ -1224,7 +1241,7 @@ fields.incoming[0x037] = L{
 fields.incoming[0x038] = L{
     {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
     {ctype='unsigned int',      label='_dupeID',            fn=id},             -- 08
-    {ctype='char[4]',           label='Type',               fn=e+{0x038}},      -- 0C   "kesu" for disappearing, "deru" for appearing, "deru" only seems to work
+    {ctype='char[4]',           label='Type',               fn=e+{0x038}},      -- 0C   "kesu" for disappearing, "deru" for appearing, "deru" only seems to work, "ef96" -- These are all probably animation IDs
     {ctype='unsigned short',    label='Index',              fn=index},          -- 10
     {ctype='unsigned short',    label='_dupeIndex',         fn=index},          -- 12
 }
