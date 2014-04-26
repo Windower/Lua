@@ -1109,8 +1109,7 @@ fields.incoming[0x029] = L{
     {ctype='unsigned int',      label='Actor ID',           fn=id},             -- 04
     {ctype='unsigned int',      label='Target ID',          fn=id},             -- 08
     {ctype='unsigned int',      label='Param 1'},                               -- 0C
-    {ctype='bit[6]',            label='Param 2'},                               -- 10
-    {ctype='bit[26]',           label='Param 3'},                               -- 11
+    {ctype='unsigned int',      label='Param 2/3'},                             -- 10
     {ctype='unsigned short',    label='Actor Index',        fn=index},          -- 14
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 16
     {ctype='unsigned short',    label='Message ID'},                            -- 18
