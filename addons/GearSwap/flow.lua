@@ -102,13 +102,12 @@ function equip_sets(swap_type,ts,...)
     end
     
     
-    if type(swap_type) == 'string' and swap_type == 'pretarget' then -- Target may just have been changed, so make the ind now.
+    if type(swap_type) == 'string' and (swap_type == 'pretarget' or swap_type == 'filtered_action') then -- Target may just have been changed, so make the ind now.
         ts = mk_command_registry_entry(val1)
     elseif type(swap_type) == 'string' and swap_type == 'precast' then
         if not command_registry[ts] then if debugging >= 1 then print_set(spell,'precast nil error') end
         else command_registry[ts].timestamp = os.time() end
     end
-    
     
     if player.race ~= 'Precomposed NPC' then
         -- Short circuits the routine and gets out  before equip processing
@@ -166,6 +165,7 @@ function equip_sets(swap_type,ts,...)
     if type(swap_type) == 'function' then
         return unpack(results)
     end
+    
     return equip_sets_exit(swap_type,ts,val1)
 end
 
@@ -217,7 +217,11 @@ function equip_sets_exit(swap_type,ts,val1)
                 return true
             end
         elseif swap_type == 'precast' then
-            precast_send_check(ts)
+            return precast_send_check(ts)
+        elseif swap_type == 'filtered_action' and command_registry[ts] and command_registry[ts].cancel_spell then
+            storedcommand = nil
+            command_registry[ts] = nil
+            return true
         elseif swap_type == 'midcast' and _settings.demo_mode then
             equip_sets('aftercast',ts,val1)
         elseif swap_type == 'aftercast' then
