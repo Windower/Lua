@@ -425,4 +425,11 @@
     <bugtracker>https://github.com/sebyg666/Lua/issues</bugtracker>
     <support>https://github.com/sebyg666/Lua/tree/4.1-dev/addons/SubTarget</support>
   </addon>
+  <addon>
+    <name>widescantool</name>
+    <author>Mujihina</author>
+    <description>Creates filters and alerts for widescan</description>
+    <bugtracker>https://github.com/mujihina/Lua/issues</bugtracker>
+    <support>https://github.com/mujihina/Lua/tree/4.1-dev/addons/widescantool</support>
+  </addon>
 </addons>
