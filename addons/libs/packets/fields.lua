@@ -246,10 +246,16 @@ end
     Outgoing packets
 ]]
 
--- Packet sent on zoning. 12 bytes long, all content bytes are 00.
--- fields.outgoing[0x00C]
+-- Zone In 1
+-- Likely triggers specific incoming packets.
+-- Does not trigger any packets when randomly injected.
+fields.outgoing[0x00C] = L{
+    {ctype='int',               label='_unknown1'},                             -- 04   Always 00s?
+    {ctype='int',               label='_unknown2'},                             -- 04   Always 00s?
+}
 
 -- Client Leave
+-- Last packet sent when zoning. Disconnects from the zone server.
 fields.outgoing[0x00D] = L{
     {ctype='unsigned char',     label='_unknown1'},                             -- 04   Always 00?
     {ctype='unsigned char',     label='_unknown2'},                             -- 05   Always 00?
@@ -257,8 +263,19 @@ fields.outgoing[0x00D] = L{
     {ctype='unsigned char',     label='_unknown4'},                             -- 07   Always 00?
 }
 
--- Packet sent on zoning. 36 bytes long, all content bytes are 00.
--- fields.outgoing[0x00F]
+-- Zone In 2
+-- Likely triggers specific incoming packets.
+-- Does not trigger any packets when randomly injected.
+fields.outgoing[0x00F] = L{
+    {ctype='char[32]',          label='_unknown1'},                             -- 04   Always 00s?
+}
+
+-- Zone In 3
+-- Likely triggers specific incoming packets.
+-- Does not trigger any packets when randomly injected.
+fields.outgoing[0x011] = L{
+    {ctype='int',               label='_unknown1'},                             -- 04   Always 02 00 00 00?
+}
 
 -- Standard Client
 fields.outgoing[0x015] = L{
@@ -372,6 +389,17 @@ fields.outgoing[0x041] = L{
 -- Pass item
 fields.outgoing[0x042] = L{
     {ctype='unsigned char',     label='Slot'},                                  -- 04
+}
+
+-- Servmes
+-- First 4 bytes resemble the first 4 bytes of the incoming servmessage packet
+fields.outgoing[0x04B] = L{
+    {ctype='unsigned char',     label='_unknown1'},                             -- 04  Always 1?
+    {ctype='unsigned char',     label='_unknown2'},                             -- 05  Can be 1 or 0
+    {ctype='unsigned char',     label='_unknown3'},                             -- 06  Always 1?
+    {ctype='unsigned char',     label='_unknown4'},                             -- 07  Always 2?
+    {ctype='char[12]',          label='_unknown5'},                             -- 08  All 00s
+    {ctype='unsigned int',      label='_unknown5'},                             -- 14  EC 00 00 00 observed. May be junk.
 }
 
 -- Delivery Box
@@ -1082,9 +1110,10 @@ fields.incoming[0x025] = L{
 }
 
 -- Count to 80
+-- Sent after Item Update chunks for active inventory (sometimes) when zoning.
 fields.incoming[0x026] = L{
     {ctype='unsigned char',     label='_unknown1',          const=0x00},        -- 04
-    {ctype='unsigned char',     label='Counter'},                               -- 05   Varies sequentially between 0x01 and 0x50
+    {ctype='unsigned char',     label='Slot ID'},                               -- 05   Corresponds to the slot IDs of the previous incoming packet's Item Update chunks for active Inventory.
     {ctype='char[22]',          label='_unknown2',          const=0},           -- 06
 }
 
@@ -1109,8 +1138,7 @@ fields.incoming[0x029] = L{
     {ctype='unsigned int',      label='Actor ID',           fn=id},             -- 04
     {ctype='unsigned int',      label='Target ID',          fn=id},             -- 08
     {ctype='unsigned int',      label='Param 1'},                               -- 0C
-    {ctype='bit[6]',            label='Param 2'},                               -- 10
-    {ctype='bit[26]',           label='Param 3'},                               -- 11
+    {ctype='unsigned int',      label='Param 2/3'},                             -- 10
     {ctype='unsigned short',    label='Actor Index',        fn=index},          -- 14
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 16
     {ctype='unsigned short',    label='Message ID'},                            -- 18
@@ -1213,7 +1241,7 @@ fields.incoming[0x037] = L{
 fields.incoming[0x038] = L{
     {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
     {ctype='unsigned int',      label='_dupeID',            fn=id},             -- 08
-    {ctype='char[4]',           label='Type',               fn=e+{0x038}},      -- 0C   "kesu" for disappearing, "deru" for appearing, "deru" only seems to work
+    {ctype='char[4]',           label='Type',               fn=e+{0x038}},      -- 0C   "kesu" for disappearing, "deru" for appearing, "deru" only seems to work, "ef96" -- These are all probably animation IDs
     {ctype='unsigned short',    label='Index',              fn=index},          -- 10
     {ctype='unsigned short',    label='_dupeIndex',         fn=index},          -- 12
 }
@@ -1415,6 +1443,22 @@ fields.incoming[0x04C] = L{
                                                                                 --  "Auction house is temporarily closed for trading."
     {ctype='unsigned char',     label='_unknown1',          const=0x00},        --  Possibly padding
     {ctype='char[52',           label='_unknown2'},                             --
+}
+
+-- Servmes Resp
+-- Length of the packet may vary based on message length? Kind of hard to test.
+-- The server message appears to generate some kind of feedback to the server based on the flags?
+-- If you set the first byte to 0 in incoming chunk with eval and do /smes, the message will not display until you unload eval.
+fields.incoming[0x4D] = L{
+    {ctype='unsigned char',     label='_unknown1'},                             -- 04  01  Message does not appear without this
+    {ctype='unsigned char',     label='_unknown2'},                             -- 05  01  Nonessential to message appearance
+    {ctype='unsigned char',     label='_unknown3'},                             -- 06  01  Message does not appear without this
+    {ctype='unsigned char',     label='_unknown4'},                             -- 07  02  Message does not appear without this
+    {ctype='unsigned int',      label='Timestamp',          fn=time},           -- 08  UTC Timestamp
+    {ctype='unsigned int',      label='Message Length 1'},                      -- 0A  Number of characters in the message
+    {ctype='unsigned int',      label='_unknown2'},                             -- 10  00 00 00 00 observed
+    {ctype='unsigned int',      label='Message Length 2'},                      -- 14  Same as Message Length 1. Not sure why this needs to be an int or in here twice.
+    {ctype='char[148]',         label='Message'},                               -- 18  Currently prefixed with 0x81, 0xA1 - A custom shift-jis character that translates to a square.
 }
 
 -- Data Download 2
@@ -1686,16 +1730,6 @@ fields.incoming[0x08D] = L{
 -- Has a byte that seems to be either 02 or 03, but the packet is sent three times. There are two 02s.
 -- The second 02 packet contains different information after the ~48th content byte.
 
--- LS Message
-fields.incoming[0x0CC] = L{
-    {ctype='int',               label='_unknown1'},                             -- 04
-    {ctype='char[128]',         label='Message'},                               -- 08
-    {ctype='unsigned int',      label='Timestamp',          fn=time},           -- 88
-    {ctype='char[16]',          label='Player Name'},                           -- 8C
-    {ctype='unsigned int',      label='Permissions'},                           -- 98
-    {ctype='char[16]',          label='Linkshell',          enc=ls_name_msg},   -- 9C   6-bit packed
-}
-
 types.alliance_member = L{
     {ctype='unsigned int',      label='ID',                 fn=id},             -- 00
     {ctype='unsigned short',    label='Index',              fn=index},          -- 04
@@ -1764,8 +1798,18 @@ fields.incoming[0x0CA] = L{
     {ctype='unsigned short',    label='_unknown2'},                             -- 08   Could also be characters starting the line - 01 FD observed
     {ctype='char[118]',         label='Bazaar Message'},                        -- 0A   Terminated with a vertical tab
     {ctype='char[16]',          label='Player Name'},                           -- 80
-    {ctype='unsigned short',    label='_unknown3'},                             -- 90   C6 01 observed. Not player index.
+    {ctype='unsigned short',    label='_unknown3'},                             -- 90   C6 01 and 63 02 observed. Not player index.
     {ctype='unsigned short',    label='_unknown4'},                             -- 92   00 00 observed.
+}
+
+-- LS Message
+fields.incoming[0x0CC] = L{
+    {ctype='int',               label='_unknown1'},                             -- 04
+    {ctype='char[128]',         label='Message'},                               -- 08
+    {ctype='unsigned int',      label='Timestamp',          fn=time},           -- 88
+    {ctype='char[16]',          label='Player Name'},                           -- 8C
+    {ctype='unsigned int',      label='Permissions'},                           -- 98
+    {ctype='char[16]',          label='Linkshell',          enc=ls_name_msg},   -- 9C   6-bit packed
 }
 
 -- Found Item

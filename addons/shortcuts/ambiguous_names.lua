@@ -368,8 +368,8 @@ function get_available_commands()
     end
     
     local mjob = windower.ffxi.get_mjob_data()
-    if mjob and mjob.species_id and res.items[mjob.species_id + 61440] then
-        for i,v in pairs(res.items[mjob.species_id + 61440].tp_moves) do
+    if mjob and mjob.species_id and res.monstrosity[mjob.species_id] then
+        for i,v in pairs(res.items[mjob.species_id].tp_moves) do
             if player.main_job_level >= v then
                 valid_abilities.Abilities[i] = res.abilities[i+768]
             end

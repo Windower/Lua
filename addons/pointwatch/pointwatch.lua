@@ -7,7 +7,7 @@ res = require 'resources'
 
 _addon.name = 'PointWatch'
 _addon.author = 'Byrth'
-_addon.version = 0.04202014
+_addon.version = 0.042314
 _addon.command = 'pw'
 
 if not windower.dir_exists('data') then
@@ -88,6 +88,11 @@ function initialize()
         number_of_merits = 0
     }
     
+    sparks = {
+        current = 0,
+        maximum = 50000,
+    }
+    
     
     local info = windower.ffxi.get_info()
     
@@ -138,19 +143,8 @@ windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blo
             end
         end
         update_box()
-    elseif id == 0x61 then
-        xp.current = org:byte(0x11)+org:byte(0x12)*256
-        xp.tnl = org:byte(0x13)+org:byte(0x14)*256
-    elseif id == 0x63 and org:byte(5) == 2 then
-        lp.current = org:byte(9)+org:byte(10)*256
-        lp.number_of_merits = org:byte(11)
-    elseif id == 0x63 and org:byte(5) == 5 then
-        local offset = windower.ffxi.get_player().main_job_id*4+13 -- So WAR (ID==1) starts at byte 17
-        cp.current = org:byte(offset)+org:byte(offset+1)*256
-        cp.number_of_job_points = org:byte(offset+2)
     elseif id == 0x55 then
-        local packet_id = org:byte(5)
-        if packet_id == 7 then
+        if org:byte(0x85) == 3 then
             local dyna_KIs = math.floor((org:byte(6)%64)/2) -- 5 bits (32, 16, 8, 4, and 2 originally -> shifted to 16, 8, 4, 2, and 1)
             dynamis._KIs = {
                 ['Crimson'] = dyna_KIs%2 == 1,
@@ -169,6 +163,18 @@ windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blo
                 update_box()
             end
         end
+    elseif id == 0x61 then
+        xp.current = org:byte(0x11)+org:byte(0x12)*256
+        xp.tnl = org:byte(0x13)+org:byte(0x14)*256
+    elseif id == 0x63 and org:byte(5) == 2 then
+        lp.current = org:byte(9)+org:byte(10)*256
+        lp.number_of_merits = org:byte(11)%64
+    elseif id == 0x63 and org:byte(5) == 5 then
+        local offset = windower.ffxi.get_player().main_job_id*4+13 -- So WAR (ID==1) starts at byte 17
+        cp.current = org:byte(offset)+org:byte(offset+1)*256
+        cp.number_of_job_points = org:byte(offset+2)
+    elseif id == 0x110 then
+        sparks.current = org:byte(5)+org:byte(6)*256
     end
 end)
 

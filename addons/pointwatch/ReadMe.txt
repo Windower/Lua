@@ -38,6 +38,9 @@ Here are the available values:
 * cp.tnjp                 = Similar to a "To Next Level", but this value is always 30,000 because that's always the number of CPs per job point.
 * cp.number_of_job_points = Number of job points you currently have on your current job.
 
+* sparks.current          = Current number of RoE Sparks (number between 0 and 50,000)
+* sparks.maximum          = Maximum number of RoE Sparks (always 50,000)
+
 * dynamis.KIs             = Series of Xs and Os indicating whether or not you have the 5 KIs.
 * dynamis.entry_time      = Your Dynamis entry time, in seconds. -- If the addon is loaded in dynamis, this will be the time of addon load.
 * dynamis.time_limit      = Your current Dynamis time limit, in seconds. -- If the addon is loaded in dynamis, you will need to gain a KI for this to be accurate.
@@ -46,5 +49,6 @@ Here are the available values:
 
 
 Version History:
-0.04202014 - Addition of strings system
-0.04122014 - Initial commit
+0.042314 - Addition of strings system
+0.042014 - Addition of strings system
+0.041214 - Initial commit

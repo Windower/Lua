@@ -1,4 +1,6 @@
 -------------------------------------------------
+GearSwap 0.835 - Adaptation for new resources.
+-------------------------------------------------
 GearSwap 0.834 - Filter now handles Scholar spells and Blue Magic.
 -------------------------------------------------
 GearSwap 0.833 - Added the first version of a more authentic filter.

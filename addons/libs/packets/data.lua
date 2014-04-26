@@ -10,7 +10,10 @@ data.outgoing = setmetatable({}, {__index = function() return dummy end})
 
 -- Client packets (outgoing)
 data.outgoing[0x00A] = {name='Client Connect',      description='(unencrypted/uncompressed) First packet sent when connecting to new zone.'}
+data.outgoing[0x00C] = {name='Zone In 1',           description='Likely triggers certain packets to be sent from the server.'}
 data.outgoing[0x00D] = {name='Client Leave',        description='Last packet sent from client before it leaves the zone.'}
+data.outgoing[0x00F] = {name='Zone In 2',           description='Likely triggers certain packets to be sent from the server.'}
+data.outgoing[0x011] = {name='Zone In 3',           description='Likely triggers certain packets to be sent from the server.'}
 data.outgoing[0x015] = {name='Standard Client',     description='Packet contains data that is sent almost every time (i.e your character\'s position).'}
 data.outgoing[0x016] = {name='Update Request',      description='Packet that requests a PC/NPC update packet.'}
 data.outgoing[0x01A] = {name='Action',              description='An action being done on a target (i.e. an attack or spell).'}
