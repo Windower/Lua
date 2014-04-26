@@ -1,5 +1,5 @@
 --[[
-widescantool v1.20140425
+widescantool v1.20140426
 
 Copyright (c) 2014, Mujihina
 All rights reserved.
@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name    = 'widescantool'
 _addon.author  = 'Mujihina'
-_addon.version = '1.20140424'
+_addon.version = '1.20140426'
 _addon.command = 'widescantool'
 _addon.commands = {'wst'}
 
@@ -69,7 +69,7 @@ enable_mode = true
 
 -- Save settings
 function save_settings()
-	update_area_info()
+	update_settings()
 	config.save(settings)
 end
 
@@ -290,13 +290,7 @@ function wst_command (cmd, ...)
 	show_syntax()
 end
 
-function update_area_info()
-	zone_id = windower.ffxi.get_info().zone
-	zone_name = zones[windower.ffxi.get_info().zone].name
-	
-	combined_alerts = settings.global.alerts
-	combined_filters = settings.global.filters
-	
+function update_settings()
 	if (settings.area.alerts:containskey(zone_id)) then
 		combined_alerts = combined_alerts:union(settings.area.alerts[zone_id])
 	end
@@ -306,6 +300,17 @@ function update_area_info()
 	if (settings.filter_pets) then
 		combined_filters = combined_filters:union(pet_filters)
 	end
+end
+
+
+function update_area_info()
+	zone_id = windower.ffxi.get_info().zone
+	zone_name = zones[windower.ffxi.get_info().zone].name
+	
+	combined_alerts = settings.global.alerts
+	combined_filters = settings.global.filters
+	
+	update_settings()
 end
 
 -- Process incoming packets
