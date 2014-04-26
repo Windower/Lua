@@ -245,42 +245,42 @@ function wst_command (cmd, ...)
 	end
 	-- Add Area Filter
 	if (cmd == 'aaf') then
-		windower.add_to_chat (200, 'wst arf: Adding: \"%s\" to area Filters for %s':format(pattern, zone_name))
+		windower.add_to_chat (200, 'wst aaf: Adding: \"%s\" to area Filters for %s':format(pattern, zone_name))
 		if (not settings.area.filters:containskey(zone_id)) then
 			settings.area.filters[zone_id] = S{}
 		end
 		settings.area.filters[zone_id]:add("%s":format(pattern))
-		windower.add_to_chat (207, 'wst arf: Current filters for \"%s\": %s':format(zone_name, settings.area.filters[zone_id]:tostring()))
+		windower.add_to_chat (207, 'wst aaf: Current filters for \"%s\": %s':format(zone_name, settings.area.filters[zone_id]:tostring()))
 		save_settings()
 		return
 	end
 	-- Remove Area Filter
 	if (cmd == 'raf') then
-		windower.add_to_chat (200, 'wst rrf: Removing: \"%s\" from area Filters for %s':format(pattern, zone_name))
+		windower.add_to_chat (200, 'wst raf: Removing: \"%s\" from area Filters for %s':format(pattern, zone_name))
 		if (settings.area.filters:containskey(zone_id)) then
 			settings.area.filters[zone_id]:remove("%s":format(pattern))
-			windower.add_to_chat (207, 'wst rrf: Current filters for \"%s\": %s':format(zone_name, settings.area.filters[zone_id]:tostring()))
+			windower.add_to_chat (207, 'wst raf: Current filters for \"%s\": %s':format(zone_name, settings.area.filters[zone_id]:tostring()))
 			save_settings()
 		end
 		return
 	end
 	-- Add Area Alert
 	if (cmd == 'aaa') then
-		windower.add_to_chat (200, 'wst ara: Adding: \"%s\" to area Alerts for %s':format(pattern, zone_name))
+		windower.add_to_chat (200, 'wst aaa: Adding: \"%s\" to area Alerts for %s':format(pattern, zone_name))
 		if (not settings.area.alerts:containskey(zone_id)) then
 			settings.area.alerts[zone_id] = S{}
 		end
 		settings.area.alerts[zone_id]:add("%s":format(pattern))
-		windower.add_to_chat (207, 'wst ara: Current alerts for \"%s\": %s':format(zone_name,settings.area.alerts[zone_id]:tostring()))
+		windower.add_to_chat (207, 'wst aaa: Current alerts for \"%s\": %s':format(zone_name,settings.area.alerts[zone_id]:tostring()))
 		save_settings()
 		return
 	end
 	-- Remove Area Alert
 	if (cmd == 'raa') then
-		windower.add_to_chat(200, 'wst rra: Removing: \"%s\" from area Alerts for %s':format(pattern, zone_name))
+		windower.add_to_chat(200, 'wst raa: Removing: \"%s\" from area Alerts for %s':format(pattern, zone_name))
 		if (settings.area.alerts:containskey(zone_id)) then
 			settings.area.alerts[zone_id]:remove("%s":format(pattern))
-			windower.add_to_chat (207, 'wst rra: Current alerts for \"%s\": %s':format(zone_name,settings.area.alerts[zone_id]:tostring()))
+			windower.add_to_chat (207, 'wst raa: Current alerts for \"%s\": %s':format(zone_name,settings.area.alerts[zone_id]:tostring()))
 			save_settings()
 		end
 		return
