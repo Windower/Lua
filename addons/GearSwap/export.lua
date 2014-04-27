@@ -150,7 +150,7 @@ function export_set(options)
             if v.name ~= empty then
                 if v.augments then
                     --Advanced set table
-                    f:write('    '..v.slot..'={ name="'..v.name..'", augments={'..v.augments..'}}\n')
+                    f:write('    '..v.slot..'={ name="'..v.name..'", augments={'..v.augments..'}},\n')
                 else
                     f:write('    '..v.slot..'="'..v.name..'",\n')
                 end
