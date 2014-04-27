@@ -288,7 +288,11 @@ windower.register_event('login', initialize)
 
 windower.register_event('logout', 'unload', dispose)
 
-windower.register_event('zone change', stop_tracking:cond(function(id) return (id == 271 or id == 264) and track end))
+windower.register_event('zone change', function(_,id)
+    if (id == 271 or id == 264) and track then
+        stop_tracking()
+    end
+end)
 
 windower.register_event('incoming text', function(original, modified, mode)
     local match
