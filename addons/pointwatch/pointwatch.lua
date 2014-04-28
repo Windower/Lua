@@ -222,7 +222,7 @@ windower.register_event('prerender',function()
 end)
 
 function update_box()
-    if not windower.ffxi.get_info().logged_in then return end
+    if not windower.ffxi.get_info().logged_in or not windower.ffxi.get_player() then return end
     cp.rate = analyze_points_table(cp.registry)
     xp.rate = analyze_points_table(xp.registry)
     if dynamis.entry_time ~= 0 and dynamis.entry_time+dynamis.time_limit-os.clock() > 0 then
