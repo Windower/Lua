@@ -86,10 +86,16 @@ end)
 
 function load_settings()
 	if not file.exists('data/settings.xml') then
-		print('plugin_manager is missing its settings file.')
+		error('plugin_manager: settings.xml is missing.')
 	else
 		-- Iterate over the settings file and simply it, as well as creating a list of all plugins
-		local settingtab = xml.read('data/settings.xml'):undomify()
+		local settingtab = xml.read('data/settings.xml')
+        if settingtab then
+            settingtab = settingtab:undomify()
+        else
+            error('plugin_manager: settings.xml has an error in it. Try using an XML validator.')
+            return
+        end
 		for child in settingtab.children:it() do
 		-- Global/Names layer
 			loader_array[child.name:lower()] = {}

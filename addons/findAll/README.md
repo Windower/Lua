@@ -54,6 +54,10 @@ findall :omega
 ----
 
 ##Changelog##
+### v1.20140328 ###
+* **change**: Changed the inventory structure refresh rate using packets.
+* **add**: IPC usage to track changes across simultaneously active accounts.
+
 ### v1.20140210 ###
 * **fix**: Fixed bug that occasionally deleted stored inventory structures.
 * **change**: Increased the inventory structure refresh rate using packets.

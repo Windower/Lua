@@ -2,13 +2,14 @@ require 'tables'
 require 'sets'
 file = require 'files'
 config = require 'config'
+require 'strings'
+res = require 'resources'
 
 require 'generic_helpers'
 require 'parse_action_packet'
 require 'statics'
-res = require 'resources'
 
-_addon.version = '3.12'
+_addon.version = '3.13'
 _addon.name = 'BattleMod'
 _addon.author = 'Byrth, maintainer: SnickySnacks'
 _addon.commands = {'bm','battlemod'}
@@ -23,46 +24,46 @@ windower.register_event('login',function (name)
     windower.send_command('@wait 10;lua i battlemod options_load;')
 end)
 
-windower.register_event('addon command',function (...)
+windower.register_event('addon command', function(command, ...)
     if debugging then windower.debug('addon command') end
-    local term = table.concat({...}, ' ')
-    local splitarr = split(term,' ')
-    if splitarr[1] ~= nil then
-        if splitarr[1]:lower() == 'commamode' then
+    local args = {...}
+    command = command and command:lower()
+    if command then
+        if command:lower() == 'commamode' then
             commamode = not commamode
             windower.add_to_chat(121,'Battlemod: Comma Mode flipped! - '..tostring(commamode))
-        elseif splitarr[1]:lower() == 'oxford' then
+        elseif command:lower() == 'oxford' then
             oxford = not oxford
             windower.add_to_chat(121,'Battlemod: Oxford Mode flipped! - '..tostring(oxford))
-        elseif splitarr[1]:lower() == 'targetnumber' then
+        elseif command:lower() == 'targetnumber' then
             targetnumber = not targetnumber
             windower.add_to_chat(121,'Battlemod: Target Number flipped! - '..tostring(targetnumber))
-        elseif splitarr[1]:lower() == 'swingnumber' then
+        elseif command:lower() == 'swingnumber' then
             swingnumber = not swingnumber
             windower.add_to_chat(121,'Battlemod: Round Number flipped! - '..tostring(swingnumber))
-        elseif splitarr[1]:lower() == 'sumdamage' then
+        elseif command:lower() == 'sumdamage' then
             sumdamage = not sumdamage
             windower.add_to_chat(121,'Battlemod: Sum Damage flipped! - '..tostring(sumdamage))
-        elseif splitarr[1]:lower() == 'condensecrits' then
+        elseif command:lower() == 'condensecrits' then
             condensecrits = not condensecrits
             windower.add_to_chat(121,'Battlemod: Condense Crits flipped! - '..tostring(condensecrits))
-        elseif splitarr[1]:lower() == 'cancelmulti' then
+        elseif command:lower() == 'cancelmulti' then
             cancelmulti = not cancelmulti
             windower.add_to_chat(121,'Battlemod: Multi-canceling flipped! - '..tostring(cancelmulti))
-        elseif splitarr[1]:lower() == 'reload' then
+        elseif command:lower() == 'reload' then
             options_load()
-        elseif splitarr[1]:lower() == 'unload' then
+        elseif command:lower() == 'unload' then
             windower.send_command('@lua u battlemod')
-        elseif splitarr[1]:lower() == 'simplify' then
+        elseif command:lower() == 'simplify' then
             simplify = not simplify
             windower.add_to_chat(121,'Battlemod: Text simplification flipped! - '..tostring(simplify))
-        elseif splitarr[1]:lower() == 'condensedamage' then
+        elseif command:lower() == 'condensedamage' then
             condensedamage = not condensedamage
             windower.add_to_chat(121,'Battlemod: Condensed Damage text flipped! - '..tostring(condensedamage))
-        elseif splitarr[1]:lower() == 'condensetargets' then
+        elseif command:lower() == 'condensetargets' then
             condensetargets = not condensetargets
             windower.add_to_chat(121,'Battlemod: Condensed Targets flipped! - '..tostring(condensetargets))
-        elseif splitarr[1]:lower() == 'colortest' then
+        elseif command:lower() == 'colortest' then
             local counter = 0
             local line = ''
             for n = 1, 509 do
@@ -82,7 +83,7 @@ windower.register_event('addon command',function (...)
                 end
             end
             windower.add_to_chat(122,'Colors Tested!')
-        elseif splitarr[1]:lower() == 'help' then
+        elseif command:lower() == 'help' then
             print('   :::   '.._addon.name..' ('.._addon.version..')   :::')
             print('Toggles: (* subtoggles)')
             print('           1. simplify         --- Condenses battle text using custom messages ('..tostring(simplify)..')')
@@ -364,12 +365,12 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
             -- Condenses across multiple packets
             local status
             
-            if enfeebling:contains(am.param_1) and r_status[param_1] then
-                status = color_it(r_status[param_1][language],color_arr.enfeebcol)
+            if enfeebling:contains(am.param_1) and res.buffs[param_1] then
+                status = color_it(res.buffs[param_1][language],color_arr.enfeebcol)
             elseif color_arr.statuscol == rcol then
-                status = color_it(r_status[am.param_1][language],string.char(0x1F,191))
+                status = color_it(res.buffs[am.param_1][language],string.char(0x1F,191))
             else
-                status = color_it(r_status[am.param_1][language],color_arr.statuscol)
+                status = color_it(res.buffs[am.param_1][language],color_arr.statuscol)
             end
             
             if not multi_actor[status] then multi_actor[status] = player_info(am.actor_id) end
@@ -395,7 +396,11 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
             local fields = fieldsearch(res.action_messages[am.message_id][language])
             
             if fields.status then
-                status = (enLog[am.param_1] or nf(r_status[am.param_1],language))
+                if log_form_debuffs:contains(am.param_1) then
+                    status = res.buffs[am.param_1].english_log
+                else
+                    status = nf(res.buffs[am.param_1],language)
+                end
                 if enfeebling:contains(am.param_1) then
                     status = color_it(status,color_arr.enfeebcol)
                 else
@@ -404,11 +409,11 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
             end
             
             if fields.spell then
-                spell = nf(r_spells[am.param_1],language)
+                spell = nf(res.spells[am.param_1],language)
             end
             
             if fields.item then
-                item = nf(r_items[am.param_1],'enl')
+                item = nf(res.items[am.param_1],'english_log')
             end
             
             if fields.number then

@@ -43,7 +43,8 @@ local category_strings = {
     'mob_tp_finish',
     'ranged_begin',
     'avatar_tp_finish',
-    'job_ability_unblinkable'
+    'job_ability_unblinkable',
+    'job_ability_run'
 }
 
 local action = {}

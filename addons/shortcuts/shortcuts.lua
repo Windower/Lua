@@ -24,6 +24,12 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+_addon.version = '2.101'
+_addon.name = 'Shortcuts'
+_addon.author = 'Byrth'
+_addon.commands = {'shortcuts'}
+
+
 debugging = false
 logging = false
 if windower.dir_exists('../addons/shortcuts/data/') and logging then
@@ -32,20 +38,93 @@ if windower.dir_exists('../addons/shortcuts/data/') and logging then
     logfile:flush()
 end
 
-file = require 'files'
+if windower.file_exists(windower.addon_path..'resources.lua') then
+    local result = os.remove(windower.addon_path..'resources.lua')
+    if not result then
+        os.rename(windower.addon_path..'resources.lua',windower.addon_path..'unnecessary.lua')
+    end
+end
+
+if not windower.dir_exists(windower.addon_path..'data') then
+    windower.create_dir(windower.addon_path..'data')
+end
+
 require 'sets'
 require 'helper_functions'
 require 'tables'
+require 'strings'
+res = require 'resources'
+config = require 'config'
 
-require 'resources'
+default_aliases = {
+    c1="Cure",
+    c2="Cure II",
+    c3="Cure III",
+    c4="Cure IV",
+    c5="Cure V",
+    c6="Cure VI",
+    r1="Raise",
+    r2="Raise II",
+    r3="Raise III",
+    pro1="Protectra",
+    pro2="Protectra II",
+    pro3="Protectra III",
+    pro4="Protectra IV",
+    pro5="Protectra V",
+    sh1="Shellra",
+    sh2="Shellra II",
+    sh3="Shellra III",
+    sh4="Shellra IV",
+    sh5="Shellra V",
+    she1="Shellra",
+    she2="Shellra II",
+    she3="Shellra III",
+    she4="Shellra IV",
+    she5="Shellra V",
+    bl="Blink",
+    ss="Stoneskin",
+    re1="Regen",
+    re2="Regen II",
+    re3="Regen III",
+    re4="Regen IV",
+    re5="Regen V",
+    holla="Teleport-Holla",
+    dem="Teleport-Dem",
+    mea="Teleport-Mea",
+    yhoat="Teleport-Yhoat",
+    altep="Teleport-Altep",
+    vahzl="Teleport-Vahzl",
+    jugner="Recall-Jugner",
+    pashh="Recall-Pashh",
+    meri="Recall-Meriph",
+    pash="Recall-Pashh",
+    meriph="Recall-Meriph",
+    ichi="Utsusemi: Ichi",
+    ni="Utsusemi: Ni",
+    utsu1="Utsusemi: Ichi",
+    utsu2="Utsusemi: Ni",
+    ds="Divine Seal",
+    es="Elemental Seal",
+    la="Light Arts",
+    da="Dark Arts",
+    pen="Penury",
+    cel="Celerity",
+    cw1="Curing Waltz",
+    cw2="Curing Waltz II",
+    cw3="Curing Waltz III",
+    cw4="Curing Waltz IV",
+    cw5="Curing Waltz V",
+    hw="Healing Waltz"
+}
+
+aliases = config.load('data\\aliases.xml',default_aliases)
+config.save(aliases)
+setmetatable(aliases,nil)
+
+
+require 'statics'
 require 'ambiguous_names'
 require 'targets'
-
-
-_addon.version = '1.8'
-_addon.name = 'Shortcuts'
-_addon.author = 'Byrth'
-_addon.commands = {'shortcuts'}
 
 -----------------------------------------------------------------------------------
 --Name: event_load()
@@ -131,9 +210,9 @@ end)
 ---- string (sometimes '') depending what the logic says to do.
 -----------------------------------------------------------------------------------
 function command_logic(original,modified)
-    local splitline = split(original,' ')
+    local splitline = alias_replace(string.split(original,' '))
     local command = splitline[1] -- Treat the first word as a command.
-    local potential_targ = splitline[#splitline]
+    local potential_targ = splitline[splitline.n]
     local a,b,spell = string.find(original,'"(.-)"')
     
     if unhandled_list[command] then
@@ -142,7 +221,7 @@ function command_logic(original,modified)
     
     if spell then
         spell = spell:lower()
-    elseif #splitline == 3 then
+    elseif splitline.n == 3 then
 		if valid_target(potential_targ) then
 			spell = splitline[2]
 		else
@@ -177,7 +256,7 @@ function command_logic(original,modified)
         else -- If there are excluded secondary commands (like /pcmd add <name>)
             local tempcmd = command
             local passback
-            for _,v in pairs(splitline) do -- Iterate over the potential secondary arguments.
+            for _,v in ipairs(splitline) do -- Iterate over the potential secondary arguments.
             -- I'm not sure when there could be more than one secondary argument, but it's ready if it happens.
                 if command2_list[command]:contains(v) then
                     tempcmd = tempcmd..' '..v
@@ -236,6 +315,24 @@ end
 
 
 -----------------------------------------------------------------------------------
+--Name: alias_replace(tab)
+--Args:
+---- tab (table of strings): splitline
+-----------------------------------------------------------------------------------
+--Returns:
+---- tab (table of strings): with all the aliased values replaced
+-----------------------------------------------------------------------------------
+function alias_replace(tab)
+    for ind,key in ipairs(tab) do
+        if aliases[key:lower()] then
+            tab[ind] = aliases[key:lower()]
+        end
+    end
+    return tab
+end
+
+
+-----------------------------------------------------------------------------------
 --Name: interp_text()
 --Args:
 ---- splitline (table of strings): entire entry, split on spaces.
@@ -249,38 +346,38 @@ end
 -----------------------------------------------------------------------------------
 function interp_text(splitline,offset,modified)
     local temptarg,abil
-    local no_targ_abil = strip(_raw.table.concat(splitline,' ',1+offset,#splitline))
+    local no_targ_abil = strip(table.concat(splitline,' ',1+offset,splitline.n))
     
     if validabils[no_targ_abil] then
         abil = no_targ_abil
-    elseif #splitline > 1 then
-        local potential_targ = splitline[#splitline]
+    elseif splitline.n > 1 then
+        local potential_targ = splitline[splitline.n]
         if targ_reps[potential_targ] then
             potential_targ = targ_reps[potential_targ]
         end
         temptarg = valid_target(potential_targ)
     end
 
-    if temptarg then abil = _raw.table.concat(splitline,' ',1+offset,#splitline-1)
-    elseif not abil then abil = _raw.table.concat(splitline,' ',1+offset,#splitline) end
+    if temptarg then abil = _raw.table.concat(splitline,' ',1+offset,splitline.n-1)
+    elseif not abil then abil = _raw.table.concat(splitline,' ',1+offset,splitline.n) end
 
     local strippedabil = strip(abil) -- Slug the ability
 
-    if validabils[strippedabil] then -- If the ability exists, do this.
+    if strippedabil ~= '' and validabils[strippedabil] then -- If the ability exists, do this.
         local r_line, s_type
         
-        if validabils[strippedabil].typ == 'r_spells' then
+        if validabils[strippedabil].typ == 'spells' then
             if debugging then windower.add_to_chat(8,strippedabil..' is considered a spell.') end
-            r_line = r_spells[validabils[strippedabil].index]
-        elseif validabils[strippedabil].typ == 'r_abilities' then
+            r_line = res.spells[validabils[strippedabil].index]
+        elseif validabils[strippedabil].typ == 'abilities' then
             if debugging then windower.add_to_chat(8,strippedabil..' is considered an ability.') end
-            r_line = r_abilities[validabils[strippedabil].index]
+            r_line = res.abilities[validabils[strippedabil].index]
         elseif validabils[strippedabil].typ == 'ambig_names' then
             if debugging then windower.add_to_chat(8,strippedabil..' is considered ambiguous.') end
             r_line, s_type = ambig(strippedabil)
         end
         
-        local targets = r_line.validtarget
+        local targets = r_line.targets
         
         -- Handling for abilities that change potential targets.
         if r_line.prefix == '/song' or r_line.prefix == '/so' and r_line.casttime == 8 then
@@ -316,10 +413,10 @@ function convert_spell(spell)
     local name_line = validabils[(spell or ''):lower():gsub(' ',''):gsub('[^%w]','')]
     
     if name_line then
-        if name_line.typ == 'r_spells' then
-            r_line = r_spells[name_line.index]
-        elseif name_line.typ == 'r_abilities' then
-            r_line = r_abilities[name_line.index]
+        if name_line.typ == 'spells' then
+            r_line = res.spells[name_line.index]
+        elseif name_line.typ == 'abilities' then
+            r_line = res.abilities[name_line.index]
         elseif name_line.typ == 'ambig_names' then
             r_line, s_type = ambig(strip(spell))
         end

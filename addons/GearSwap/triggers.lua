@@ -84,7 +84,18 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
                 r_line = res.spells[validabils[language][unify_prefix[command]][abil]]
                 storedcommand = command..' "'..r_line[language]..'" '
             elseif command_list[command] == 'Ability' then
-                r_line = res.abilities[validabils[language][unify_prefix[command]][abil]]
+                if unify_prefix[command] == '/ms' and player.species then
+                    -- Iterates over currently available monster TP moves instead of using validabils
+                    for i,v in pairs(player.species.tp_moves) do
+                        if res.abilities[i+768][language]:lower() == abil then
+                            r_line = res.abilities[i+768]
+                            break
+                        end
+                    end
+                end
+                if not r_line then
+                    r_line = res.abilities[validabils[language][unify_prefix[command]][abil]]
+                end
                 storedcommand = command..' "'..r_line[language]..'" '
             elseif command_list[command] == 'Item' then
                 r_line = res.items[validabils[language][unify_prefix[command]][abil]]
@@ -103,14 +114,9 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
             
             if filter_pretarget(spell) then
                 if tonumber(splitline[splitline.n]) then
-                    local ts,id = find_command_registry_key('spell',spell) or mk_command_registry_entry(spell,spell.target.id)
-                    
-                    if outgoing_action_category_table[unify_prefix[spell.prefix]] == 3 then
-                        id = spell.index
-                    else
-                        id = spell.id
-                    end
-                    command_registry[ts].proposed_packet = assemble_action_packet(spell.target.id,spell.target.index,outgoing_action_category_table[unify_prefix[spell.prefix]],id)
+                    local ts = find_command_registry_key('spell',spell) or mk_command_registry_entry(spell,spell.target.id)
+
+                    command_registry[ts].proposed_packet = assemble_action_packet(spell.target.id,spell.target.index,outgoing_action_category_table[unify_prefix[spell.prefix]],spell.id)
                     if command_registry[ts].proposed_packet then
                         equip_sets('precast',ts,spell)
                         return true

@@ -450,7 +450,7 @@ function string.decode(str, bits, charset)
     if type(charset) == 'string' then
         charset = charset:split()
     end
-    return str:binary():chunks(bits):map(table.get+{charset}..tonumber-{2}):concat()
+    return str:binary():chunks(bits):map(table.get+{charset} .. tonumber-{2}):concat():gsub('%z+$', '')
 end
 
 -- Returns a plural version of a string, if the provided table contains more than one element.

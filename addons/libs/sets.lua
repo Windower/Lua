@@ -135,6 +135,24 @@ end
 
 _meta.S.__pow = set.sdiff
 
+function set.subset(s1, s2)
+    for el in pairs(s1) do
+        if not rawget(s2, el) then
+            return false
+        end
+    end
+
+    return true
+end
+
+_meta.S.__le = set.subset
+
+function set.ssubset(s1, s2)
+    return s1 <= s2 and s1 ~= s2
+end
+
+_meta.S.__lt = set.ssubset
+
 function set.map(s, fn)
     local res = {}
     for el in pairs(s) do

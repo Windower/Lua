@@ -285,8 +285,8 @@ function settings_table(node, confdict, key)
         elseif child.type == 'tag' then
             key = child.name:lower()
             local childdict
-            if confdict:containskey(key) then
-                childdict = confdict:copy()
+            if table.containskey(confdict, key) then
+                childdict = table.copy(confdict)
             else
                 childdict = confdict
             end

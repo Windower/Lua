@@ -10,7 +10,10 @@ data.outgoing = setmetatable({}, {__index = function() return dummy end})
 
 -- Client packets (outgoing)
 data.outgoing[0x00A] = {name='Client Connect',      description='(unencrypted/uncompressed) First packet sent when connecting to new zone.'}
+data.outgoing[0x00C] = {name='Zone In 1',           description='Likely triggers certain packets to be sent from the server.'}
 data.outgoing[0x00D] = {name='Client Leave',        description='Last packet sent from client before it leaves the zone.'}
+data.outgoing[0x00F] = {name='Zone In 2',           description='Likely triggers certain packets to be sent from the server.'}
+data.outgoing[0x011] = {name='Zone In 3',           description='Likely triggers certain packets to be sent from the server.'}
 data.outgoing[0x015] = {name='Standard Client',     description='Packet contains data that is sent almost every time (i.e your character\'s position).'}
 data.outgoing[0x016] = {name='Update Request',      description='Packet that requests a PC/NPC update packet.'}
 data.outgoing[0x01A] = {name='Action',              description='An action being done on a target (i.e. an attack or spell).'}
@@ -45,6 +48,9 @@ data.outgoing[0x085] = {name='Sell Item',           description='Sell an item fr
 data.outgoing[0x096] = {name='Synth',               description='Packet sent containing all data of an attempted synth.'}
 data.outgoing[0x0B5] = {name='Speech',              description='Packet contains normal speech.'}
 data.outgoing[0x0B6] = {name='Tell',                description='/tell\'s sent from client.'}
+data.outgoing[0x0BE] = {name='Merit Point Increase',description='Sent when you increase a merit point ability.'}
+data.outgoing[0x0BF] = {name='Job Point Increase',  description='Sent when you increase a job point ability.'}
+data.outgoing[0x0C0] = {name='Job Point Menu',      description='Sent when you open the Job Point menu and triggers Job Point Information packets.'}
 data.outgoing[0x0D3] = {name='GM Call',             description='Places a call to the GM queue.'}
 data.outgoing[0x0DC] = {name='Type Bitmask',        description='This command is sent when change your party-seek or /anon status.'}
 data.outgoing[0x0DD] = {name='Check',               description='Used to check other players.'}
@@ -65,6 +71,7 @@ data.outgoing[0x10B] = {name='Open Bazaar',         description='Sent when openi
 data.outgoing[0x10C] = {name='Start RoE Quest',     description='Sent to undertake a Records of Eminence Quest.'}
 data.outgoing[0x10D] = {name='Cancel RoE Quest',    description='Sent to cancel a Records of Eminence Quest.'}
 data.outgoing[0x10F] = {name='Currency Menu',       description='Requests currency information for the menu.'}
+data.outgoing[0x110] = {name='Fishing Action',      description='Sent when casting, releasing a fish, catching a fish, and putting away your fishing rod.'}
 
 -- Server packets (incoming)
 data.incoming[0x009] = {name='Standard Message',    description='A standardized message send from FFXI.'}
@@ -88,7 +95,7 @@ data.incoming[0x027] = {name='Encumbrance',         description='Occurs when you
 data.incoming[0x028] = {name='Action',              description='Packet sent when an NPC is attacking.'}
 data.incoming[0x029] = {name='Action Message',      description='Packet sent for simple battle-related messages.'}
 data.incoming[0x02A] = {name='Resting Message',     description='Packet sent when you rest in Abyssea.'}
-data.incoming[0x02D] = {name='EXP Gain (kill)',     description='Packet sent after you defeat a mob and gain XP.'}
+data.incoming[0x02D] = {name='Kill Message',        description='Packet sent when you gain XP/LP/CP/JP/MP, advance RoE objectives, etc. by defeating a mob.'}
 data.incoming[0x02F] = {name='Digging Animation',   description='Generates the chocobo digging animation'}
 data.incoming[0x030] = {name='Synth Animation',     description='Generates the synthesis animation'}
 data.incoming[0x032] = {name='NPC Interaction 1',   description='Occurs before menus and some cutscenes'}
@@ -122,7 +129,8 @@ data.incoming[0x063] = {name='Set Update',          description='Frequently sent
 data.incoming[0x067] = {name='Pet Info',            description='Updates information about whether or not you have a pet and the TP, HP, etc. of the pet if appropriate.'}
 data.incoming[0x06F] = {name='Synth Result',        description='Results of an attempted synthesis process.'}
 data.incoming[0x071] = {name='Campaign Map Info',   description='Populates the Campaign map.'}
-data.incoming[0x08C] = {name='Merits',              description='Contains all merit information. Multiple packets are sent.'}
+data.incoming[0x08C] = {name='Merits',              description='Contains all merit information. 3 packets are sent.'}
+data.incoming[0x08D] = {name='Job Points',          description='Contains all job point information. 12 packets are sent.'}
 data.incoming[0x0AA] = {name='Spell List',          description='Packet that shows the spells that you know.'}
 data.incoming[0x0AC] = {name='Ability List',        description='Packet that shows your current abilities and traits.'}
 data.incoming[0x0B4] = {name='Seek AnonResp',       description='Server response sent after you put up party or anon flag.'}
@@ -144,9 +152,10 @@ data.incoming[0x108] = {name='Data Download 5',     description='The data that i
 data.incoming[0x109] = {name='Bazaar Purch. Info',  description='Information on the purchase sent to the buyer when the purchase is successful.'}
 data.incoming[0x10A] = {name='Bazaar Buyer Info',   description='Information on the purchase sent to the seller when a sale is successful.'}
 data.incoming[0x110] = {name='Sparks Update',       description='Occurs when you sparks increase and generates the related message.'}
-data.incoming[0x111] = {name='Eminence Message',    description='Causes Records of Eminence messages.'}
+data.incoming[0x111] = {name='Eminence Update',     description='Causes Records of Eminence messages.'}
 data.incoming[0x112] = {name='RoE Quest Log',       description='Updates your RoE quest log on zone and when appropriate.'}
 data.incoming[0x113] = {name='Currency Info',       description='Contains all currencies to be displayed in the currency menu.'}
+data.incoming[0x115] = {name='Fish Bite Info',      description='Contains information about the fish that you hooked.'}
 
 return data
 
