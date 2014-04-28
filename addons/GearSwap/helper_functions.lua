@@ -664,7 +664,10 @@ function spell_complete(rline)
     end
     if not rline.mp_cost or rline.mp_cost == -1 then rline.mp_cost = 0 end
     if not rline.tp_cost or rline.tp_cost == -1 then rline.tp_cost = 0 end
-    if rline.skill then rline.skill = res.skills[rline.skill].english end
+    
+    if rline.skill and tonumber(rline.skill) then
+        rline.skill = res.skills[rline.skill].english
+    end
     
     if rline.tp_cost == 0 then rline.tpaftercast = player.tp else
     rline.tpaftercast = player.tp - rline.tp_cost end
