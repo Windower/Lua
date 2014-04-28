@@ -108,7 +108,7 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
             end
             
             r_line.name = r_line[language]
-            spell = aftercast_cost(r_line)
+            spell = spell_complete(r_line)
             spell.target = temp_mob_arr
             spell.action_type = command_list[command]
             
