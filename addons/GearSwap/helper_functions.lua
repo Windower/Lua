@@ -637,7 +637,7 @@ function get_spell(act)
         if table.contains(fields,'item') then
             spell = res.items[abil_ID]
         else
-            spell = aftercast_cost(spell)
+            spell = spell_complete(spell)
         end
     end
         
@@ -649,7 +649,7 @@ end
 
 
 -----------------------------------------------------------------------------------
---Name: aftercast_cost(rline)
+--Name: spell_complete(rline)
 --Desc: Takes a resource line and modifies it so it includes aftercast cost and
 --      a few other values
 --Args:
@@ -658,12 +658,16 @@ end
 --Returns:
 ---- rline - modified resource line
 -----------------------------------------------------------------------------------
-function aftercast_cost(rline)
+function spell_complete(rline)
     if rline == nil then
         return {tpaftercast = player.tp, mpaftercast = player.mp, mppaftercast = player.mpp}
     end
     if not rline.mp_cost or rline.mp_cost == -1 then rline.mp_cost = 0 end
     if not rline.tp_cost or rline.tp_cost == -1 then rline.tp_cost = 0 end
+    
+    if rline.skill and tonumber(rline.skill) then
+        rline.skill = res.skills[rline.skill].english
+    end
     
     if rline.tp_cost == 0 then rline.tpaftercast = player.tp else
     rline.tpaftercast = player.tp - rline.tp_cost end
