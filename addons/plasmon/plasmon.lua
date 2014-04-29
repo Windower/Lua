@@ -285,7 +285,7 @@ windower.register_event('login', initialize)
 
 windower.register_event('logout', 'unload', dispose)
 
-windower.register_event('zone change', stop_tracking:cond(function(id) return (id == 271 or id == 264) and track end))
+windower.register_event('zone change', stop_tracking:cond(function(_,id) return (id == 271 or id == 264) and track end))
 
 windower.register_event('incoming text', function(original, modified, mode)
     local match
@@ -368,7 +368,8 @@ windower.register_event('incoming text', function(original, modified, mode)
                 return modified, mode
             end
         end
-    elseif mode == 148 or mode == 151 then
+    elseif mode > 20 then
+    --mode == 148 or mode == 151 then
         match = original:match('Now permeating the mists surrounding the fracture%.')
 
         if match then
