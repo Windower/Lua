@@ -21,11 +21,11 @@ This is what an example file called `Arcon_THF.lua` in the addon's `data` folder
 
 ```lua
 WAR = {
-    ['Ctrl+2'] = 'provoke',
-    ['Ctrl+3'] = 'warcry',
-    ['Ctrl+4'] = 'aggressor',
-    ['Ctrl+5'] = 'berserk',
-    ['Alt+2'] = 'defender',
+    ['Ctrl+2'] = 'input /ja "Provoke" <me>',
+    ['Ctrl+3'] = 'input /ja "Warcry" <me>',
+    ['Ctrl+4'] = 'input /ja "Aggressor" <me>',
+    ['Ctrl+5'] = 'input /ja "Berserk" <me>',
+    ['Alt+2'] = 'input /ja "Defender" <me>',
 }
 
 JA = {
@@ -47,7 +47,7 @@ Magic = {
 }
 
 WS = {
-    ['Ctrl+2'] = 'input /ja "Assassin\'s Charge" <me>'
+    ['Ctrl+2'] = 'input /ja "Assassin\'s Charge" <me>',
     ['Ctrl+3'] = 'input /ws "Aeolian Edge" <t>',
     ['Alt+2'] = 'input /ws "Exenterator" <t>',
     ['Alt+3'] = 'input /ws "Mercy Stroke" <t>',
