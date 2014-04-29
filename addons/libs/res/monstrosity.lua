@@ -1,4 +1,4 @@
--- Automatically generated file: Monsters
+-- Automatically generated file: Monstrosity
 
 return {
     [1] = {id=1,en="Rabbit",ja="ウサギ族",de="Rabbit",fr="Rabbit",tp_moves={[257]=1,[258]=10,[259]=20,[323]=30}},
