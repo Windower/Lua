@@ -182,7 +182,7 @@ windower.register_event('outgoing text',function(original,modified)
     end
     
     -- Otherwise, dump the inputs into command_logic()
-    return command_logic(temp_org:gsub('/',''),modified)
+    return command_logic(temp_org,modified)
 end)
 
 -----------------------------------------------------------------------------------
