@@ -72,7 +72,7 @@ function initialize()
     end
 
     mjob_id = player.main_job_id
-    atts = res.items:category('General')
+    atts = res.items:category('Automaton')
     decay = 1
     for key,_ in pairs(heat) do
         heat[key] = 0
