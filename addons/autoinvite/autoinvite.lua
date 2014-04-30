@@ -26,12 +26,13 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
 ]]
 
-require 'luau'
+require('luau')
 
-_addon = _addon or {}
 _addon.name = 'AutoInvite'
+_addon.author = 'Registry'
 _addon.commands = {'autoinvite','ai'}
 _addon.version = 1.0
+_addon.language = 'english'
 
 defaults = T{}
 defaults.mode = 'whitelist'
@@ -59,22 +60,26 @@ aliases = T{
 }
 
 -- Aliases to access the add and item_to_remove routines.
-addstrs = T{'a', 'add', '+'}
-rmstrs = T{'r', 'rm', 'remove', '-'}
+addstrs = S{'a', 'add', '+'}
+rmstrs = S{'r', 'rm', 'remove', '-'}
 
 -- Aliases for tellback mode.
-on = T{'on', 'yes', 'true'}
-off = T{'off', 'no', 'false'}
+on = S{'on', 'yes', 'true'}
+off = S{'off', 'no', 'false'}
 
-modes = T{'whitelist', 'blacklist'}
+modes = S{'whitelist', 'blacklist'}
+
+-- Load settings from file
+settings = config.load(defaults)
 
 -- Check for keyword
-windower.register_event("chat message", function(message, player, mode, is_gm)
+windower.register_event('chat message', function(message, player, mode, is_gm)
 	local word = false
 	if mode == 3 then
-		for item,_ in pairs(settings.keywords) do
-			if string.find(string.lower(message), string.lower(item)) then
+		for item in settings.keywords:it() do
+			if message:lower():match(item:lower()) then
 				word = true
+                break
 			end
 		end
 		-- if keyword is not found, return
@@ -98,22 +103,23 @@ end)
 
 -- Attempts to send an invite
 function try_invite(player)
-	if windower.ffxi.get_party()['p5'] then
+	if windower.ffxi.get_party().p5 then
 		notice(player.. 'cannot be invited - party is full')
 		if settings.tell_back == 'on' then
 			windower.send_command('input /t '..player..' Party is currently full.')
 		end
 		return
 	end
-	
-	if statusblock:contains(windower.ffxi.get_player()['status_id']) then
-		notice(player.. 'cannot be invited - you cannot send an invite at this time (dead, charmed, event).')
+
+    local status = windower.ffxi.get_player().status
+	if statusblock:contains(status) then
+		notice(player.. 'cannot be invited - you cannot send an invite at this time (' .. status .. ').')
 		if settings.tell_back == 'on' then
-			windower.send_command('input /t '..player..' An invite cannot be sent at this time (dead, charmed, event).')
+			windower.send_command('input /t '..player..' An invite cannot be sent at this time (' .. status .. ').')
 		end
 		return
 	end
-	
+
 	windower.send_command('input /pcmd add '..player)
 end
 
@@ -123,9 +129,9 @@ function add_item(mode, ...)
 	local doubles = names * settings[mode]
 	if not doubles:empty() then
 		if aliases[mode] == 'keywords' then
-			notice(('Keyword'):plural(doubles)..' '..doubles:format()..' already on keyword list.')
+			notice('Keyword':plural(doubles)..' '..doubles:format()..' already on keyword list.')
 		else
-			notice(('User'):plural(doubles)..' '..doubles:format()..' already on '..aliases[mode]..'.')
+			notice('User':plural(doubles)..' '..doubles:format()..' already on '..aliases[mode]..'.')
 		end
 	end
 	local new = names - settings[mode]
@@ -133,7 +139,6 @@ function add_item(mode, ...)
 		settings[mode] = settings[mode] + new
 		log('Added '..new:format()..' to the '..aliases[mode]..'.')
 	end
-	settings:save()
 end
 
 -- Removes names/items from a given list type.
@@ -142,9 +147,9 @@ function remove_item(mode, ...)
 	local dummy = names - settings[mode]
 	if not dummy:empty() then
 		if aliases[mode] == 'keywords' then
-			notice(('Keyword'):plural(dummy)..' '..dummy:format()..' not found on keyword list.')
+			notice('Keyword':plural(dummy)..' '..dummy:format()..' not found on keyword list.')
 		else
-			notice(('User'):plural(dummy)..' '..dummy:format()..' not found on '..aliases[mode]..'.')
+			notice('User':plural(dummy)..' '..dummy:format()..' not found on '..aliases[mode]..'.')
 		end
 	end
 	local item_to_remove = names * settings[mode]
@@ -152,12 +157,11 @@ function remove_item(mode, ...)
 		settings[mode] = settings[mode] - item_to_remove
 		log('Removed '..item_to_remove:format()..' from the '..aliases[mode]..'.')
 	end
-	settings:save()
 end
 
-windower.register_event('addon command',function (command, ...)
+windower.register_event('addon command', function(command, ...)
 	command = command and command:lower() or 'status'
-	local args = T{...}
+	local args = L{...}
 	-- Changes whitelist/blacklist mode
 	if command == 'mode' then
 		local mode = args[1] or 'status'
@@ -214,26 +218,8 @@ windower.register_event('addon command',function (command, ...)
 	-- Ignores (and prints a warning) if unknown command is passed.
 	else
 		warning('Unkown command \''..command..'\', ignored.')
+
 	end
-	settings:save()
-end)
 
-windower.register_event('load',function ()	
-	initialize()
-	settings:save()
-end)
-
-windower.register_event('login',function ()
-	initialize()
-end)
-
-function initialize()
-	-- Load settings from file
-	settings = config.load(defaults)
-	settings.whitelist = settings.whitelist:map(string.ucfirst..string.lower)
-	settings.blacklist = settings.blacklist:map(string.ucfirst..string.lower)
-end
-
-windower.register_event('unload', function ()
-	settings:save()
+	config.save(settings)
 end)
