@@ -150,8 +150,9 @@ windower.register_event('action', function(act)
 				return false
 			end
 		then
+            local party = windower.ffxi.get_party()
 			rollMembers = {}
-            for partyMem in pairs(windower.ffxi.get_party()) do
+            for partyMem in pairs(party) do
                 for effectedTarget = 1, #act.targets do
 					--if mob is nil then the party member is not in zone, will fire an error.
 					if party[partyMem].mob and partyMem:startswith('p') and act.targets[effectedTarget].id == party[partyMem].mob.id then	
