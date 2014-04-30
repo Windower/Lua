@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
 _addon.name = 'autocontrol'
-_addon.version = '1.0'
+_addon.version = '1.01'
 _addon.author = 'Nitrous (Shiva)'
 _addon.commands = {'autocontrol','acon'}
 
