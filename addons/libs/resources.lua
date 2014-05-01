@@ -155,6 +155,7 @@ post_process = function(t)
     end
 end
 
+lookup = {}
 lookup = {
     elements = resources.elements,
     jobs = resources.jobs,
