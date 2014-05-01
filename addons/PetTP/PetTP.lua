@@ -232,8 +232,8 @@ end)
 
 windower.register_event('incoming chunk',function(id,original,modified,injected,blocked)
     if not injected then
+        local check = original:unpack('C', 0x05)
         if id == 0x44 then
-            local check = original:unpack('C', 0x05)
             if check == 0x12 then    -- puppet update
                 local new_current_hp, new_max_hp, new_current_mp, new_max_mp = original:unpack('hhhh', 0x068)
 
