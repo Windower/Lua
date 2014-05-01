@@ -105,8 +105,7 @@ function valid_pet(source,pet_idx_in, own_idx_in)
     
     local pet = windower.ffxi.get_mob_by_target('pet')    
     if pet_idx_in and pet and pet_idx_in ~= pet.index then
-        if superverbose == true then windower.add_to_chat(8, 'valid_pet() : false : pet.index ~= pet_idx_in '..pet.index..' vs. '..pet_idx_in) 
-        end
+        if superverbose == true then windower.add_to_chat(8, 'valid_pet() : false : pet.index ~= pet_idx_in '..pet.index..' vs. '..pet_idx_in) end
         return
     elseif pet_idx_in and player.mob and player.mob.pet_index and pet_idx_in ~= player.mob.pet_index then
         if superverbose == true then windower.add_to_chat(8, 'valid_pet() : false : player.mob.pet_index ~= pet_idx_in '..player.mob.pet_index..' vs. '..pet_idx_in) end
@@ -235,7 +234,7 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
         local check = original:unpack('C', 0x05)
         if id == 0x44 then
             if check == 0x12 then    -- puppet update
-                local new_current_hp, new_max_hp, new_current_mp, new_max_mp = original:unpack('hhhh', 0x068)
+                local new_current_hp, new_max_hp, new_current_mp, new_max_mp = original:unpack('HHHH', 0x069)
 
                 if (not petactive) or (petname == nil) or (new_current_hp ~= current_hp) or (new_max_hp ~= max_hp) or (new_current_mp ~= current_mp) or (new_max_mp ~= max_mp) then
                     if superverbose == true then                
@@ -244,12 +243,12 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
                             ..', max_hp: '..new_max_hp
                             ..', cur_mp: '..new_current_mp
                             ..', max_mp: '..new_max_mp
-                            ..', name: '.. original:unpack('S16', 0x59)
+                            ..', name: '.. original:unpack('z', 0x59)
                         )
                     end
 
                     if petactive then
-                        local new_petname = original:unpack('S16', 0x59)
+                        local new_petname = original:unpack('z', 0x59)
                         if petname == nil then
                             if superverbose == true then windower.add_to_chat(8, 'Updating PuppetName: '..new_petname) end
                             petname = new_petname
@@ -279,7 +278,7 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
                 end
             end
         elseif id == 0x67 then    -- general hp/tp/mp update
-            pet_idx, own_idx = original:unpack('hIh', 0x07)
+            pet_idx, own_idx = original:unpack('HIH', 0x07)
             if S{0x04,0x44,0xC4,0x84}:contains(check) then
                 pet_idx, own_idx = own_idx, pet_idx
             end
@@ -299,7 +298,7 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
                        ..', hp%: '..original:byte(0x0F)
                        ..', mp%: '..original:byte(0x10)
                        ..', tp%: '..(original:byte(0x11)+original:byte(0x12)*256)/10
-                       ..', name: '.. original:unpack('S16', 0x15)
+                       ..', name: '.. original:unpack('z', 0x15)
                     )
             end
             if (check == 0x04) and (original:byte(0x06) == 0x05) then
@@ -317,7 +316,7 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
                         make_invisible()
                     end
                 end
-                local new_hp_percent, new_mp_percent, new_tp_percent = original:unpack('CCh', 0x0F)
+                local new_hp_percent, new_mp_percent, new_tp_percent = original:unpack('CCH', 0x0F)
                 new_tp_percent = new_tp_percent/10
                 if newpet or (new_hp_percent ~= current_hp_percent) or (new_mp_percent ~= current_mp_percent) or (new_tp_percent ~= current_tp_percent) or petname == nil then
                     if (max_hp ~= 0) and (new_hp_percent ~= current_hp_percent) then
@@ -345,7 +344,7 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
                 end
             end
         elseif id==0x0E and S{0x07,0x0F}:contains(original:byte(0x0B)) then    -- npc update
-            if mypet_idx == original:unpack('h', 0x09) then
+            if mypet_idx == original:unpack('H', 0x09) then
                 if current_hp_percent ~= original:byte(0x1F) then
                     if superverbose == true then windower.add_to_chat(8, '0x0E - '..original:byte(0x0B)..': '..original:byte(0x1F)) end
                     current_hp_percent = original:byte(0x1F)
