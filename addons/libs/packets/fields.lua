@@ -1614,7 +1614,9 @@ fields.incoming[0x062] = L{
     {ctype='unsigned short',    label='Stringed Instrument',fn=cskill},         -- D2
     {ctype='unsigned short',    label='Wind Instrument',    fn=cskill},         -- D4
     {ctype='unsigned short',    label='Blue Magic',         fn=cskill},         -- D6
-    {ctype='char[8]',           label='_dummy2'},                               -- D8
+    {ctype='unsigned short',    label='Geomancy',           fn=cskill},         -- D8
+    {ctype='unsigned short',    label='Handbell',           fn=cskill},         -- DA
+    {ctype='char[4]',           label='_dummy2'},                               -- DC
     {ctype='unsigned short',    label='Fishing',            fn=sskill},         -- E0
     {ctype='unsigned short',    label='Woodworking',        fn=sskill},         -- E2
     {ctype='unsigned short',    label='Smithing',           fn=sskill},         -- E4
