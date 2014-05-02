@@ -1694,9 +1694,9 @@ fields.incoming[0x067] = L{
     {ctype='unsigned short',    label='Pet Index',          fn=index},          -- 06
     {ctype='unsigned int',      label='Pet ID',             fn=id},             -- 08
     {ctype='unsigned short',    label='Owner Index',        fn=index},          -- 0C
-    {ctype='unsigned char',     label='Current HP%'},                           -- 0E
-    {ctype='unsigned char',     label='Current MP%'},                           -- 0F
-    {ctype='unsigned short',    label='Pet TP%'},                               -- 10   Multiplied by 10
+    {ctype='unsigned char',     label='Current HP%',        fn=percent},        -- 0E
+    {ctype='unsigned char',     label='Current MP%',        fn=percent},        -- 0F
+    {ctype='unsigned short',    label='Pet TP%',            fn=percent},        -- 10   Multiplied by 10
     {ctype='unsigned short',    label='_unknown1'},                             -- 12
     {ctype='char*',             label='Pet Name'},                              -- 14   Packet expands to accommodate pet name length.
 }
@@ -1822,7 +1822,7 @@ fields.incoming[0x0D2] = L{
     {ctype='unsigned int',      label='Count'},                                 -- 0C   Takes values greater than 1 in the case of gil
     {ctype='unsigned short',    label='Item',               fn=item},           -- 10
     {ctype='unsigned short',    label='Dropper Index',      fn=index},          -- 12
-    {ctype='unsigned short',    label='Pool Index'},                            -- 14   This is the internal index in memory, not the one it appears in in the menu
+    {ctype='unsigned short',    label='Index'},                                 -- 14   This is the internal index in memory, not the one it appears in in the menu
     {ctype='unsigned char',     label='_unknown4',          const=0x00},        -- 16   Seems to always be 00
     {ctype='unsigned char',     label='_unknown5'},                             -- 17   Seemingly random, both 00 and FF observed, as well as many values in between
     {ctype='unsigned int',      label='Timestamp',          fn=utime},          -- 18
@@ -1838,7 +1838,7 @@ fields.incoming[0x0D3] = L{
     {ctype='unsigned short',    label='Highest Lot'},                           -- 0E
     {ctype='unsigned short',    label='Current Lot Index',  fn=index..s+{1,15}},-- 10   The highest bit is set
     {ctype='unsigned short',    label='Current Lot'},                           -- 12   0xFF FF if passing
-    {ctype='unsigned char',     label='Pool Index'},                            -- 14
+    {ctype='unsigned char',     label='Index'},                                 -- 14
     {ctype='unsigned char',     label='Drop'},                                  -- 15   0 if no drop, 1 if dropped to player, 3 if floored
     {ctype='char[16]',          label='Highest Lot Name'},                      -- 16
     {ctype='char[16]',          label='Current Lot Name'},                      -- 26
