@@ -1138,7 +1138,7 @@ fields.incoming[0x029] = L{
     {ctype='unsigned int',      label='Actor ID',           fn=id},             -- 04
     {ctype='unsigned int',      label='Target ID',          fn=id},             -- 08
     {ctype='unsigned int',      label='Param 1'},                               -- 0C
-    {ctype='unsigned int',      label='Param 2/3'},                             -- 10
+    {ctype='unsigned int',      label='Param 2'},                               -- 10
     {ctype='unsigned short',    label='Actor Index',        fn=index},          -- 14
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 16
     {ctype='unsigned short',    label='Message ID'},                            -- 18
@@ -1609,7 +1609,7 @@ fields.incoming[0x062] = L{
     {ctype='unsigned short',    label='Elemental Magic',    fn=cskill},         -- C8
     {ctype='unsigned short',    label='DarkMagic',          fn=cskill},         -- CA
     {ctype='unsigned short',    label='Summoning Magic',    fn=cskill},         -- CC
-    {ctype='unsigned short',    label='Ninjitsu',           fn=cskill},         -- CE
+    {ctype='unsigned short',    label='Ninjutsu',           fn=cskill},         -- CE
     {ctype='unsigned short',    label='Singing',            fn=cskill},         -- D0
     {ctype='unsigned short',    label='String Instrument',  fn=cskill},         -- D2
     {ctype='unsigned short',    label='Wind Instrument',    fn=cskill},         -- D4
