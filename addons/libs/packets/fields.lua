@@ -1607,13 +1607,13 @@ fields.incoming[0x062] = L{
     {ctype='unsigned short',    label='Enhancing Magic',    fn=cskill},         -- C4
     {ctype='unsigned short',    label='Enfeebling Magic',   fn=cskill},         -- C6
     {ctype='unsigned short',    label='Elemental Magic',    fn=cskill},         -- C8
-    {ctype='unsigned short',    label='DarkMagic',          fn=cskill},         -- CA
+    {ctype='unsigned short',    label='Dark Magic',         fn=cskill},         -- CA
     {ctype='unsigned short',    label='Summoning Magic',    fn=cskill},         -- CC
     {ctype='unsigned short',    label='Ninjutsu',           fn=cskill},         -- CE
     {ctype='unsigned short',    label='Singing',            fn=cskill},         -- D0
-    {ctype='unsigned short',    label='String Instrument',  fn=cskill},         -- D2
+    {ctype='unsigned short',    label='Stringed Instrument',fn=cskill},         -- D2
     {ctype='unsigned short',    label='Wind Instrument',    fn=cskill},         -- D4
-    {ctype='unsigned short',    label='BlueMagic',          fn=cskill},         -- D6
+    {ctype='unsigned short',    label='Blue Magic',         fn=cskill},         -- D6
     {ctype='char[8]',           label='_dummy2'},                               -- D8
     {ctype='unsigned short',    label='Fishing',            fn=sskill},         -- E0
     {ctype='unsigned short',    label='Woodworking',        fn=sskill},         -- E2
