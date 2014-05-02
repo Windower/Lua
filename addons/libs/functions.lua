@@ -10,11 +10,21 @@ _libs.functions = true
 ]]
 
 functions = {}
+boolean = {}
 
 -- The empty function.
 function functions.empty() end
 
 debug.setmetatable(functions.empty, functions)
+debug.setmetatable(false, {__index = boolean})
+
+for _, t in pairs({'functions', 'boolean', 'math', 'string', 'table'}) do
+    _G[t].fn = function(val)
+        return function()
+            return val
+        end
+    end
+end
 
 -- The identity function.
 function functions.identity(fn)
@@ -189,8 +199,6 @@ debug.setmetatable(functions.empty, {
     Logic functions
 Mainly used to pass as arguments.
 ]]
-
-boolean = {}
 
 -- Returns true if element is true.
 function boolean._true(val)
