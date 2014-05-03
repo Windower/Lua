@@ -139,29 +139,10 @@ message_map[243] = T{278}
 message_map[2] = T{264}
 
 spike_effect_valid = {true,false,false,false,false,false,false,false,false,false,false,false,false,false,false}
-add_effect_valid = {true,true,true,true,false,false,false,false,false,false,false,false,false,false,false}
+add_effect_valid = {true,true,true,true,false,false,false,false,false,false,true,false,false,false,false}
 
-
-speFile = file.new('../../plugins/resources/spells.xml')
-jaFile = file.new('../../plugins/resources/abils.xml')
-statusFile = file.new('../../plugins/resources/status.xml')
-itemsGFile = file.new('../../plugins/resources/items_general.xml')
-itemsAFile = file.new('../../plugins/resources/items_armor.xml')
-itemsWFile = file.new('../../plugins/resources/items_weapons.xml')
-
-r_abilities = parse_resources(jaFile:readlines())
-r_spells = parse_resources(speFile:readlines())
-r_status = parse_resources(statusFile:readlines())
-r_items = table.range(65535)
-r_items:update(parse_resources(itemsGFile:readlines()))
-r_items:update(parse_resources(itemsAFile:readlines()))
-r_items:update(parse_resources(itemsWFile:readlines()))
-
--- This is for the secondary form of these debuffs
-enLog = {}
-for i,v in pairs({0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,28,29,30,31,134,135,155,156,157,168,176,177,259,260,261,262,263,264,309,474}) do
-    enLog[v] = r_status[v]['enLog']
-end
+-- These are the debuffs that are expressed in their log form by battlemod
+log_form_debuffs = T{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,28,29,30,31,134,135,155,156,157,168,176,177,259,260,261,262,263,264,309,474}
 
 
 default_filters = [[

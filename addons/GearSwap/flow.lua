@@ -102,13 +102,12 @@ function equip_sets(swap_type,ts,...)
     end
     
     
-    if type(swap_type) == 'string' and swap_type == 'pretarget' then -- Target may just have been changed, so make the ind now.
+    if type(swap_type) == 'string' and (swap_type == 'pretarget' or swap_type == 'filtered_action') then -- Target may just have been changed, so make the ind now.
         ts = mk_command_registry_entry(val1)
     elseif type(swap_type) == 'string' and swap_type == 'precast' then
         if not command_registry[ts] then if debugging >= 1 then print_set(spell,'precast nil error') end
         else command_registry[ts].timestamp = os.time() end
     end
-    
     
     if player.race ~= 'Precomposed NPC' then
         -- Short circuits the routine and gets out  before equip processing
@@ -166,6 +165,7 @@ function equip_sets(swap_type,ts,...)
     if type(swap_type) == 'function' then
         return unpack(results)
     end
+    
     return equip_sets_exit(swap_type,ts,val1)
 end
 
@@ -198,11 +198,14 @@ function equip_sets_exit(swap_type,ts,val1)
                 else
                 -- Spells with complete target information
                 -- command_registry[ts] is deleted for cancelled spells
-                    equip_sets('precast',ts,val1)
+                    if command_registry[ts].cast_delay == 0 then
+                        equip_sets('precast',ts,val1)
+                    else
+                        windower.send_command('@wait '..command_registry[ts].cast_delay..';lua i '.._addon.name..' pretarget_delayed_cast '..ts)
+                        command_registry[ts].cast_delay = 0
+                    end
                     return true
                 end
-            elseif not ts and debugging >= 1 then
-                windower.add_to_chat(123,'Hey Byrth, ts somehow does not exist here.')
             end
             if storedcommand then -- Stored commands are deleted for canceled spells
                 local tempcmd = storedcommand..' '..spell.target.raw
@@ -214,7 +217,11 @@ function equip_sets_exit(swap_type,ts,val1)
                 return true
             end
         elseif swap_type == 'precast' then
-            packet_send_check(ts)
+            return precast_send_check(ts)
+        elseif swap_type == 'filtered_action' and command_registry[ts] and command_registry[ts].cancel_spell then
+            storedcommand = nil
+            command_registry[ts] = nil
+            return true
         elseif swap_type == 'midcast' and _settings.demo_mode then
             equip_sets('aftercast',ts,val1)
         elseif swap_type == 'aftercast' then
@@ -251,7 +258,7 @@ function user_pcall(str,...)
     if user_env then
         if type(user_env[str]) == 'function' then
             bool,err = pcall(user_env[str],...)
-            if not bool then error('\nUser function error: '..err) end
+            if not bool then error('\nGearSwap has detected an error in the user function '..str..':\n'..err) end
         elseif user_env[str] then
             windower.add_to_chat(123,'GearSwap: '..str..'() exists but is not a function')
         end
@@ -291,11 +298,7 @@ function command_send_check(ts)
                 end
             elseif outgoing_action_category_table[unify_prefix[spell.prefix]] then
                 if filter_precast(spell) then
-                    if outgoing_action_category_table[unify_prefix[spell.prefix]] == 3 then
-                        command_registry[ts].proposed_packet = assemble_action_packet(spell.target.id,spell.target.index,outgoing_action_category_table[unify_prefix[spell.prefix]],spell.index)
-                    else
-                        command_registry[ts].proposed_packet = assemble_action_packet(spell.target.id,spell.target.index,outgoing_action_category_table[unify_prefix[spell.prefix]],spell.id)
-                    end
+                    command_registry[ts].proposed_packet = assemble_action_packet(spell.target.id,spell.target.index,outgoing_action_category_table[unify_prefix[spell.prefix]],spell.id)
                     if not command_registry[ts].proposed_packet then
                         command_registry[ts] = nil
                     end
@@ -308,12 +311,31 @@ function command_send_check(ts)
 end
 
 
+-----------------------------------------------------------------------------------
+--Name: pretarget_delayed_cast(ts)
+--Desc: Triggers an outgoing action packet (if the passed key is valid).
+--Args:
+---- ts - Timestamp argument to precast_delayed_cast
+-----------------------------------------------------------------------------------
+--Returns:
+---- none
+-----------------------------------------------------------------------------------
+function pretarget_delayed_cast(ts)
+    ts = tonumber(ts)
+    if ts then
+        equip_sets('precast',ts,command_registry[ts].spell)
+    else
+        debug_mode_chat("Bad index passed to pretarget_delayed_cast")
+    end
+end
+
+
 
 -----------------------------------------------------------------------------------
---Name: packet_send_check(ts)
+--Name: precast_send_check(ts)
 --Desc: Determines whether or not to send the current packet.
 --      Cancels if _global.cancel_spell is true
---          If command_registry[ts].cast_delay is not 0, cues delayed_cast with the proper
+--          If command_registry[ts].cast_delay is not 0, cues precast_delayed_cast with the proper
 --          delay instead of sending immediately.
 --Args:
 ---- ts - key of command_registry
@@ -321,7 +343,7 @@ end
 --Returns:
 ---- true (to block) or the outgoing packet
 -----------------------------------------------------------------------------------
-function packet_send_check(ts)
+function precast_send_check(ts)
     if ts and command_registry[ts] then
         if command_registry[ts].cancel_spell then
             command_registry[ts] = nil
@@ -330,7 +352,7 @@ function packet_send_check(ts)
                 send_action(ts)
                 return
             else
-                windower.send_command('@wait '..command_registry[ts].cast_delay..';lua i '.._addon.name..' delayed_cast '..ts)
+                windower.send_command('@wait '..command_registry[ts].cast_delay..';lua i '.._addon.name..' precast_delayed_cast '..ts)
             end
         end
     end
@@ -339,20 +361,20 @@ end
 
 
 -----------------------------------------------------------------------------------
---Name: delayed_cast(ts)
+--Name: precast_delayed_cast(ts)
 --Desc: Triggers an outgoing action packet (if the passed key is valid).
 --Args:
----- ts - Timestamp argument to delayed_cast
+---- ts - Timestamp argument to precast_delayed_cast
 -----------------------------------------------------------------------------------
 --Returns:
 ---- none
 -----------------------------------------------------------------------------------
-function delayed_cast(ts)
+function precast_delayed_cast(ts)
     ts = tonumber(ts)
     if ts then
         send_action(ts)
     else
-        debug_mode_chat("Bad index passed to delayed_cast")
+        debug_mode_chat("Bad index passed to precast_delayed_cast")
     end
 end
 

@@ -10,11 +10,21 @@ _libs.functions = true
 ]]
 
 functions = {}
+boolean = {}
 
 -- The empty function.
 function functions.empty() end
 
 debug.setmetatable(functions.empty, functions)
+debug.setmetatable(false, {__index = boolean})
+
+for _, t in pairs({'functions', 'boolean', 'math', 'string', 'table'}) do
+    _G[t].fn = function(val)
+        return function()
+            return val
+        end
+    end
+end
 
 -- The identity function.
 function functions.identity(fn)
@@ -190,8 +200,6 @@ debug.setmetatable(functions.empty, {
 Mainly used to pass as arguments.
 ]]
 
-boolean = {}
-
 -- Returns true if element is true.
 function boolean._true(val)
     return val == true
@@ -266,24 +274,36 @@ end
 ]]
 
 -- Returns an attribute of a table.
-function table.get(t, att)
-    return t[att]
+function table.get(t, ...)
+    local res = {}
+    for i = 1, select('#', ...) do
+        rawset(res, i, t[select(i, ...)])
+    end
+    return unpack(res)
 end
 
 -- Returns an attribute of a table without invoking metamethods.
-function table.rawget(t, att)
-    return rawget(t, att)
+function table.rawget(t, ...)
+    local res = {}
+    for i = 1, select('#', ...) do
+        rawset(res, i, rawget(t, select(i, ...)))
+    end
+    return unpack(res)
 end
 
 -- Sets an attribute of a table to a specified value.
-function table.set(t, att, val)
-    t[att] = val
+function table.set(t, ...)
+    for i = 1, select('#', ...), 2 do
+        t[select(i, ...)] = select(i + 1, ...)
+    end
     return t
 end
 
 -- Sets an attribute of a table to a specified value, without invoking metamethods.
-function table.rawset(t, att, val)
-    rawset(t, att, val)
+function table.rawset(t, ...)
+    for i = 1, select('#', ...), 2 do
+        rawset(t, select(i, ...), select(i + 1, ...))
+    end
     return t
 end
 

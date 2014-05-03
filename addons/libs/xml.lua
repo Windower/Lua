@@ -144,10 +144,10 @@ function parse(content)
                 quote = c
                 mode = 'quote'
             elseif c == '>' then
-                if tag:at(2) == '?' then
+                if tag[2] == '?' then
                     headers['xmlhead'] = tag
                     tag = ''
-                elseif tag:at(2) == '!' then
+                elseif tag[2] == '!' then
                     headers['dtds']:append(tag)
                     tag = ''
                 else

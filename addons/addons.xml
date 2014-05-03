@@ -109,6 +109,13 @@
     <support>http://www.ffxiah.com/player/Ragnarok/Ikonic</support>
   </addon>
   <addon>
+    <name>digger</name>
+    <author>Seth VanHeulen (Acacia@Odin)</author>
+    <description>Displays Chocobo digging accuracy, fatigue and remaining greens after each dig. Also shows dig "recast" timer using the Timers plugin.</description>
+    <bugtracker>https://github.com/svanheulen/digger-windower-addon/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Odin/Acacia</support>
+  </addon>
+  <addon>
     <name>Distance</name>
     <author>Arcon</author>
     <description>Shows the distance to your current target.</description>
@@ -251,6 +258,13 @@
 	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
+    <name>PointWatch</name>
+    <author>Byrth</author>
+    <description>Allows you to monitor your XP/CP gains and keep track of the Dynamis time limit.</description>
+	<bugtracker>https://github.com/Byrth/Lua/issues</bugtracker>
+	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
+  </addon>
+  <addon>
     <name>porter</name>
     <author>Giuliano Riccio (Zohno@Phoenix)</author>
     <description>Shows the slips' items highlighting those that are stored.</description>
@@ -363,6 +377,13 @@
     <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
   </addon>
   <addon>
+    <name>Treasury</name>
+    <author>Arcon</author>
+    <description>Lots or passes items based on configurable lists, drops unwanted items from the inventory and automatically stacks items when they drop.</description>
+    <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
+  </addon>
+  <addon>
     <name>thtracker</name>
     <author>Krizz</author>
     <description>Displays latest TH level from chat.</description>
@@ -391,10 +412,24 @@
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
+    <name>Yush</name>
+    <author>Arcon</author>
+    <description>A file-based macro engine</description>
+    <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
+  </addon>
+  <addon>
     <name>zonetimer</name>
     <author>Ihina</author>
     <description>Displays the amount of time one has been in zone.  Original by Krellion.</description>
     <bugtracker>https://github.com/Jayjs20/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Bismarck/Ihina</support>
+  </addon>
+  <addon>
+    <name>subTarget</name>
+    <author>Sebyg666</author>
+    <description>Enhances the usage of the send addon by allowing a stal or stpc or st target to be sent as the spell recipient. This removes the need for multiple macros for the same spell.</description>
+    <bugtracker>https://github.com/sebyg666/Lua/issues</bugtracker>
+    <support>https://github.com/sebyg666/Lua/tree/4.1-dev/addons/SubTarget</support>
   </addon>
 </addons>

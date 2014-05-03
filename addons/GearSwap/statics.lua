@@ -53,7 +53,9 @@ function make_entry(v,typ,i)
 end
 
 for i,v in pairs(res.spells) do
-    make_entry(v,'Magic',i)
+    if not T{363,364}:contains(i) then
+        make_entry(v,'Magic',i)
+    end
 end
 
 for i,v in pairs(res.abilities) do
@@ -61,7 +63,7 @@ for i,v in pairs(res.abilities) do
 end
 
 for i,v in pairs(res.items) do
-    if v.targets and v.targets:length() ~= 0 then
+    if v.targets and table.length(v.targets) ~= 0 then
         make_entry(v,'Item',i)
     end
 end
@@ -92,10 +94,6 @@ dat_races = {['Precomposed NPC']=0x10000,HumeM=0x0002,HumeF=0x0004,ElvaanM=0x000
 dat_slots = {0x0002,0x0004,0x0008,0x0010,0x0020,0x0040,0x0080,0x0100,0x0200,0x0400,0x0800,0x1000,0x2000,0x4000,0x8000}
 dat_slots[0] = 0x0001
 
-dat_slots_map={[1]='main',[2]='sub',[3]='main',[4] = 'range',[8]='ammo',[16]='head',[32]='body',
-    [64]='hands',[128]='legs',[256]='feet',[512]='neck',[1024]='waist',[2048]='left_ear',[4096]='right_ear',
-    [6144]='left_ear',[8192]='left_ring',[16384]='right_ring',[24576]='left_ring',[32768]='back'}
-
 default_equip_order = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
 
 jas = {false,false,false,false,false,true,false,false,false,false,false,false,false,true,true,false}--6,14,15}
@@ -121,6 +119,13 @@ avatar_element = {Ifrit='Fire',Titan='Earth',Leviathan='Water',Garuda='Wind',Shi
     ['Dark Elemental']='Dark'}
 encumbrance_map = {0x79,0x7F,0x7F,0x7A,0x7B,0x7C,0x7D,0x7D,0x7A,0x7E,0x80,0x80,0x80,0x80,0x7E}
 encumbrance_map[0] = 0x79 -- Slots mapped onto encumbrance byte values.
+
+addendum_white = {[14]="Poisona",[15]="Paralyna",[16]="Blindna",[17]="Silena",[18]="Stona",[19]="Viruna",[20]="Cursna",
+    [143]="Erase",[13]="Raise II",[140]="Raise III",[141]="Reraise II",[142]="Reraise III",[135]="Reraise"}
+    
+addendum_black = {[253]="Sleep",[259]="Sleep II",[260]="Dispel",[162]="Stone IV",[163]="Stone V",[167]="Thunder IV",
+    [168]="Thunder V",[157]="Aero IV",[158]="Aero V",[152]="Blizzard IV",[153]="Blizzard V",[147]="Fire IV",[148]="Fire V",
+    [172]="Water IV",[173]="Water V",[255]="Break"}
 
 -- _globals --
 user_data_table = {
@@ -231,6 +236,7 @@ disable_table[0] = false
 encumbrance_table = table.reassign({},disable_table)
 registered_user_events = {}
 empty = {name="empty"}
+species_id = 0
 outgoing_packet_table = {}
 tool_map = {
         ['Katon: Ichi'] = 'Uchitake',

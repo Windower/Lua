@@ -10,8 +10,12 @@ data.outgoing = setmetatable({}, {__index = function() return dummy end})
 
 -- Client packets (outgoing)
 data.outgoing[0x00A] = {name='Client Connect',      description='(unencrypted/uncompressed) First packet sent when connecting to new zone.'}
+data.outgoing[0x00C] = {name='Zone In 1',           description='Likely triggers certain packets to be sent from the server.'}
 data.outgoing[0x00D] = {name='Client Leave',        description='Last packet sent from client before it leaves the zone.'}
+data.outgoing[0x00F] = {name='Zone In 2',           description='Likely triggers certain packets to be sent from the server.'}
+data.outgoing[0x011] = {name='Zone In 3',           description='Likely triggers certain packets to be sent from the server.'}
 data.outgoing[0x015] = {name='Standard Client',     description='Packet contains data that is sent almost every time (i.e your character\'s position).'}
+data.outgoing[0x016] = {name='Update Request',      description='Packet that requests a PC/NPC update packet.'}
 data.outgoing[0x01A] = {name='Action',              description='An action being done on a target (i.e. an attack or spell).'}
 data.outgoing[0x028] = {name='Drop Item',           description='Drops an item.'}
 data.outgoing[0x029] = {name='Move Item',           description='Move item from one inventory to another.'}
@@ -32,6 +36,7 @@ data.outgoing[0x05B] = {name='Dialog choice',       description='Chooses a dialo
 data.outgoing[0x05D] = {name='Emote',               description='This command is used in emotes.'}
 data.outgoing[0x05E] = {name='Request Zone',        description='Request from the client to zone.'}
 data.outgoing[0x061] = {name='Equipment Screen',    description='This command is used when you open your equipment screen.'}
+data.outgoing[0x063] = {name='Digging Finished',    description='This packet is sent when the chocobo digging animation is fixed.'}
 data.outgoing[0x06E] = {name='Party invite',        description='Sent when inviting another player to either party or alliance.'}
 data.outgoing[0x06F] = {name='Party leave',         description='Sent when leaving the party or alliance.'}
 data.outgoing[0x070] = {name='Party breakup',       description='Sent when disbanding the entire party or alliance.'}
@@ -43,6 +48,9 @@ data.outgoing[0x085] = {name='Sell Item',           description='Sell an item fr
 data.outgoing[0x096] = {name='Synth',               description='Packet sent containing all data of an attempted synth.'}
 data.outgoing[0x0B5] = {name='Speech',              description='Packet contains normal speech.'}
 data.outgoing[0x0B6] = {name='Tell',                description='/tell\'s sent from client.'}
+data.outgoing[0x0BE] = {name='Merit Point Increase',description='Sent when you increase a merit point ability.'}
+data.outgoing[0x0BF] = {name='Job Point Increase',  description='Sent when you increase a job point ability.'}
+data.outgoing[0x0C0] = {name='Job Point Menu',      description='Sent when you open the Job Point menu and triggers Job Point Information packets.'}
 data.outgoing[0x0D3] = {name='GM Call',             description='Places a call to the GM queue.'}
 data.outgoing[0x0DC] = {name='Type Bitmask',        description='This command is sent when change your party-seek or /anon status.'}
 data.outgoing[0x0DD] = {name='Check',               description='Used to check other players.'}
@@ -57,8 +65,13 @@ data.outgoing[0x102] = {name='Untraditional Equip', description='Sent when equip
 data.outgoing[0x104] = {name='Leave Bazaar',        description='Sent when client leaves a bazaar.'}
 data.outgoing[0x105] = {name='View Bazaar',         description='Sent when viewing somebody\'s bazaar.'}
 data.outgoing[0x106] = {name='Buy Bazaar Item',     description='Buy an item from somebody\'s bazaar.'}
+data.outgoing[0x109] = {name='Close Bazaar',        description='Sent after closing your bazaar window.'}
 data.outgoing[0x10A] = {name='Set Price',           description='Set the price on a bazaar item.'}
+data.outgoing[0x10B] = {name='Open Bazaar',         description='Sent when opening your bazaar window to set prices.'}
+data.outgoing[0x10C] = {name='Start RoE Quest',     description='Sent to undertake a Records of Eminence Quest.'}
+data.outgoing[0x10D] = {name='Cancel RoE Quest',    description='Sent to cancel a Records of Eminence Quest.'}
 data.outgoing[0x10F] = {name='Currency Menu',       description='Requests currency information for the menu.'}
+data.outgoing[0x110] = {name='Fishing Action',      description='Sent when casting, releasing a fish, catching a fish, and putting away your fishing rod.'}
 
 -- Server packets (incoming)
 data.incoming[0x009] = {name='Standard Message',    description='A standardized message send from FFXI.'}
@@ -82,11 +95,15 @@ data.incoming[0x027] = {name='Encumbrance',         description='Occurs when you
 data.incoming[0x028] = {name='Action',              description='Packet sent when an NPC is attacking.'}
 data.incoming[0x029] = {name='Action Message',      description='Packet sent for simple battle-related messages.'}
 data.incoming[0x02A] = {name='Resting Message',     description='Packet sent when you rest in Abyssea.'}
-data.incoming[0x02D] = {name='EXP Gain (kill)',     description='Packet sent after you defeat a mob and gain XP.'}
+data.incoming[0x02D] = {name='Kill Message',        description='Packet sent when you gain XP/LP/CP/JP/MP, advance RoE objectives, etc. by defeating a mob.'}
+data.incoming[0x02F] = {name='Digging Animation',   description='Generates the chocobo digging animation'}
 data.incoming[0x030] = {name='Synth Animation',     description='Generates the synthesis animation'}
+data.incoming[0x032] = {name='NPC Interaction 1',   description='Occurs before menus and some cutscenes'}
+data.incoming[0x034] = {name='NPC Interaction 2',   description='Occurs before menus and some cutscenes'}
 data.incoming[0x036] = {name='NPC Chat',            description='Dialog from NPC\'s.'}
 data.incoming[0x037] = {name='Update Char',         description='Updates a characters stats and animation.'}
 data.incoming[0x038] = {name='Model DisAppear',     description='Sent when a model should appear or disappear.'}
+data.incoming[0x039] = {name='Env. Animation 2',    description='Sent once per minute in Mog Gardens. Probably animating something.'}
 data.incoming[0x03C] = {name='Shop',                description='Displays items in a vendors shop.'}
 data.incoming[0x03D] = {name='Value',               description='Returns the value of an item.'}
 data.incoming[0x041] = {name='Stupid Evil Packet',  description='This packet is stupid and evil. Required for emotes.'}
@@ -110,27 +127,35 @@ data.incoming[0x061] = {name='Char Stats',          description='Packet contains
 data.incoming[0x062] = {name='Skills Update',       description='Packet that shows your weapon and magic skill stats.'}
 data.incoming[0x063] = {name='Set Update',          description='Frequently sent packet during battle that updates specific types of job information, like currently available/set automaton equipment and currently set BLU spells.'}
 data.incoming[0x067] = {name='Pet Info',            description='Updates information about whether or not you have a pet and the TP, HP, etc. of the pet if appropriate.'}
-data.incoming[0x067] = {name='Synth Result',        description='Results of an attempted synthesis process.'}
-data.incoming[0x08C] = {name='Merits',              description='Contains all merit information. Multiple packets are sent.'}
+data.incoming[0x06F] = {name='Synth Result',        description='Results of an attempted synthesis process.'}
+data.incoming[0x071] = {name='Campaign Map Info',   description='Populates the Campaign map.'}
+data.incoming[0x08C] = {name='Merits',              description='Contains all merit information. 3 packets are sent.'}
+data.incoming[0x08D] = {name='Job Points',          description='Contains all job point information. 12 packets are sent.'}
 data.incoming[0x0AA] = {name='Spell List',          description='Packet that shows the spells that you know.'}
 data.incoming[0x0AC] = {name='Ability List',        description='Packet that shows your current abilities and traits.'}
 data.incoming[0x0B4] = {name='Seek AnonResp',       description='Server response sent after you put up party or anon flag.'}
+data.incoming[0x0C8] = {name='Party Struct Update', description='Updates all party member info in one struct. No player vital data (HP/MP/TP) or names are sent here.'}
 data.incoming[0x0C9] = {name='Show Equip',          description='Shows another player your equipment after using the Check command.'}
 data.incoming[0x0CA] = {name='Bazaar Message',      description='Shows another players bazaar message after using the Check command or sets your own on zoning.'}
 data.incoming[0x0CC] = {name='Linkshell Message',   description='/lsmes text and headers.'}
 data.incoming[0x0D2] = {name='Found Item',          description='This command shows an item found on defeated mob or from a Treasure Chest.'}
 data.incoming[0x0D3] = {name='Lot/drop item',       description='Sent when someone casts a lot on an item or when the item drops to someone.'}
-data.incoming[0x0DD] = {name='Alliance Update',     description='Alliance/party member info - zone, HP%, HP% etc.'}
+data.incoming[0x0DD] = {name='Party Member Update', description='Alliance/party member info - zone, HP%, HP% etc.'}
 data.incoming[0x0DF] = {name='Char Update',         description='A packet sent from server which updates character HP, MP and TP.'}
 data.incoming[0x0E2] = {name='Char Info',           description='Sends name, HP, HP%, etc.'}
 data.incoming[0x0F4] = {name='Widescan Mob',        description='Displays one monster.'}
 data.incoming[0x0F6] = {name='Widescan Mark',       description='Marks the start and ending of a widescan list.'}
 data.incoming[0x0F9] = {name='Reraise Activation',  description='Reassigns targetable status on reraise activation?'}
 data.incoming[0x105] = {name='Data Download 4',     description='The data that is sent to the client when it is "Downloading data...".'}
+data.incoming[0x106] = {name='Bazaar Seller Info',  description='Information on the purchase sent to the buyer when they attempt to buy something.'}
 data.incoming[0x108] = {name='Data Download 5',     description='The data that is sent to the client when it is "Downloading data...".'}
+data.incoming[0x109] = {name='Bazaar Purch. Info',  description='Information on the purchase sent to the buyer when the purchase is successful.'}
+data.incoming[0x10A] = {name='Bazaar Buyer Info',   description='Information on the purchase sent to the seller when a sale is successful.'}
 data.incoming[0x110] = {name='Sparks Update',       description='Occurs when you sparks increase and generates the related message.'}
-data.incoming[0x111] = {name='Eminence Message',    description='Causes Records of Eminence messages.'}
+data.incoming[0x111] = {name='Eminence Update',     description='Causes Records of Eminence messages.'}
+data.incoming[0x112] = {name='RoE Quest Log',       description='Updates your RoE quest log on zone and when appropriate.'}
 data.incoming[0x113] = {name='Currency Info',       description='Contains all currencies to be displayed in the currency menu.'}
+data.incoming[0x115] = {name='Fish Bite Info',      description='Contains information about the fish that you hooked.'}
 
 return data
 

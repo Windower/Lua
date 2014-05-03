@@ -32,85 +32,6 @@ function nf(field,subfield)
     end
 end
 
-function split(msg, match)
-    if not msg then return {} end
-    local length = #msg
-    local splitarr = {}
-    local u = 1
-    while u <= length do
-        local nextanch = msg:find(match,u)
-        if nextanch ~= nil then
-            splitarr[#splitarr+1] = msg:sub(u,nextanch-match:len())
-            if nextanch~=length then
-                u = nextanch+match:len()
-            else
-                u = length+1
-            end
-        else
-            splitarr[#splitarr+1] = msg:sub(u,length)
-            u = length+1
-        end
-    end
-    return splitarr
-end
-
-function parse_resources(lines_file)
-    local ignore_fields = {german=true,french=true,japanese=true,index=true,recast=true,fr=true,frl=true,de=true,del=true,jp=true,jpl=true}
-    local completed_table = {}
-    local counter = 0
-    local find = string.find
-    for i in ipairs(lines_file) do
-        local str = tostring(lines_file[i])
-        local g,h,typ,key = find(str,'<(%w+) id="(%d+)" ')
-        if typ == 's' then
-            g,h,key = find(str,'index="(%d+)" ')
-        end
-        if key ~=nil then
-            completed_table[tonumber(key)]={}
-            local q = 1
-            while q <= str:len() do
-                local a,b,ind,val = find(str,'(%w+)="([^"]+)"',q)
-                if ind~=nil then
-                    if not ignore_fields[ind] then
-                        if str2bool(val) then
-                            completed_table[tonumber(key)][ind] = str2bool(val)
-                        else
-                            completed_table[tonumber(key)][ind] = val:gsub('&quot;','\42'):gsub('&apos;','\39')
-                        end
-                    end
-                    q = b+1
-                else
-                    q = str:len()+1
-                end
-            end
-            local k,v,english = find(str,'>([^<]+)</')
-            if english~=nil then
-                completed_table[tonumber(key)]['english']=english
-            end
-        end
-    end
-
-    return completed_table
-end
-
-function str2bool(input)
-    -- Used in the options_load() function
-    if input:lower() == 'true' then
-        return true
-    elseif input:lower() == 'false' then
-        return false
-    else
-        return nil
-    end
-end
-
-function bool2str(input)
-    if input then
-        return 'true'
-    end
-    return 'false'
-end
-
 function flip(p1,p1t,p2,p2t,cond)
     return p2,p2t,p1,p1t,not cond
 end
@@ -139,7 +60,8 @@ function color_it(to_color,color)
     if not color or color == 0 then return to_color end
     
     if to_color then
-        local colarr = split(to_color,' ')
+        local colarr = string.split(to_color,' ')
+        colarr.n = nil
         return color..table.concat(colarr,rcol..' '..color)..rcol
     end
 end

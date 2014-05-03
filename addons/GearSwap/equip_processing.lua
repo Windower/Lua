@@ -29,7 +29,7 @@ function check_wearable(item_id)
     elseif not res.items[item_id] then
         debug_mode_chat("Item '..item_id..' has not been added to resources yet.")
     elseif not res.items[item_id].jobs then -- Make sure item can be equipped by specific jobs (unlike pearlsacks).
-        --if _settings.debug_mode then windower.add_to_chat(8,'GearSwap (Debug Mode): Item '..(res.items[item_id][language] or item_id)..' does not have a jobs field in the resources.') end
+        --debug_mode_chat('GearSwap (Debug Mode): Item '..(res.items[item_id][language] or item_id)..' does not have a jobs field in the resources.')
     else
         return (res.items[item_id].jobs[player.main_job_id]) and (res.items[item_id].level<=player.main_job_level) and (res.items[item_id].races[player.race_id])
     end
@@ -56,12 +56,12 @@ function expand_entry(v)
     elseif type(v) == 'string' and v ~= '' then
         name = v
     end
-    return name,order,extgoal_1,extgoal_2 -- These values are nil if they don't exist.
+    return name,order,extgoal_1,extgoal_2 -- nil, nil, {}, {} if they don't exist
 end
 
 function name_match(item_id,name)
     if res.items[item_id] then
-        return (res.items[item_id]['log_'..language]:lower() == name:lower() or res.items[item_id][language]:lower() == name:lower())
+        return (res.items[item_id][language..'_log']:lower() == name:lower() or res.items[item_id][language]:lower() == name:lower())
     else
         return false
     end
@@ -79,7 +79,7 @@ end
 function to_id_set(inventory,equip_list)
     local ret_list = {}
     local error_list = {}
-    for i,v in pairs(short_slot_map) do -- Should go sanitize equip() so that it changes everything to default_slot_map
+    for i,v in pairs(short_slot_map) do
         local name,order,extgoal_1,extgoal_2 = expand_entry(equip_list[i])
         if name == empty or name =='empty' then
             ret_list[v] = 0
@@ -89,70 +89,75 @@ function to_id_set(inventory,equip_list)
     end
     for n,m in pairs(inventory) do
         if check_wearable(m.id) then
-            if m.flags == 0 or m.flags == 5 then -- Make sure the item is either equipped or not otherwise committed. eliminate_redundant will take care of the already-equipped gear.
+            if m.status == 0 or m.status == 5 then -- Make sure the item is either equipped or not otherwise committed. eliminate_redundant will take care of the already-equipped gear.
                 for i,v in pairs(short_slot_map) do
-                    local name,order,extgoal_1,extgoal_2 = expand_entry(equip_list[i])
                     -- equip_list[i] can also be a table (that doesn't contain a "name" property) or a number, which are both cases that should not generate any kind of equipment changing.
                     -- Hence the "and name" below.
-                    if not ret_list[v] and name then
-                        if name_match(m.id,name) and res.items[m.id].slots[v] then
-                            if extgoal_1 or extgoal_2 then
-                                local exttemp = m.extdata
-                                local count = 0
-                                for o,q in pairs(extgoal_1) do
-                                --  It appears only the first five bits are used for augment value.
-                                --    local first,second,third = string.char(m.extdata:byte(4)%32), string.char(m.extdata:byte(6)%32), string.char(m.extdata:byte(8)%32)
-                                --    local exttemp = m.extdata:sub(1,3)..first..m.extdata:sub(5,5)..second..m.extdata:sub(7,7)..third..m.extdata:sub(9)
-                                    if exttemp:sub(3,4) == q or exttemp:sub(5,6) == q or exttemp:sub(7,8) == q then
-                                        count = count +1
-                                    end
-                                end
-                                if count == #extgoal_1 then
-                                    equip_list[i] = nil
-                                    ret_list[v] = m.slot_id
-                                    reorder(order,i)
-                                    break
-                                elseif extgoal_2 then
-                                    count = 0
-                                    for o,q in pairs(extgoal_2) do
+                    
+                    if not ret_list[v] and equip_list[i] then 
+                        local name,order,extgoal_1,extgoal_2 = expand_entry(equip_list[i])
+                        
+                        if name and name_match(m.id,name) then
+                            if res.items[m.id].slots[v] then
+                                if #extgoal_1 ~= 0 or #extgoal_2 ~=0 then
+                                    local exttemp = m.extdata
+                                    local count = 0
+
+                                    for o,q in pairs(extgoal_1) do
                                     --  It appears only the first five bits are used for augment value.
                                     --    local first,second,third = string.char(m.extdata:byte(4)%32), string.char(m.extdata:byte(6)%32), string.char(m.extdata:byte(8)%32)
                                     --    local exttemp = m.extdata:sub(1,3)..first..m.extdata:sub(5,5)..second..m.extdata:sub(7,7)..third..m.extdata:sub(9)
-                                        if exttemp:sub(7,8) == q or exttemp:sub(9,10) == q or exttemp:sub(11,12) == q then
+                                        if exttemp:sub(3,4) == q or exttemp:sub(5,6) == q or exttemp:sub(7,8) == q then
                                             count = count +1
                                         end
                                     end
-                                    if count == #extgoal_2 then
+                                    if count == #extgoal_1 then
                                         equip_list[i] = nil
-                                        ret_list[v] = m.slot_id
+                                        ret_list[v] = m.slot
                                         reorder(order,i)
                                         break
+                                    elseif #extgoal_2 ~= 0 then
+                                        count = 0
+                                        for o,q in pairs(extgoal_2) do
+                                        --  It appears only the first five bits are used for augment value.
+                                        --    local first,second,third = string.char(m.extdata:byte(4)%32), string.char(m.extdata:byte(6)%32), string.char(m.extdata:byte(8)%32)
+                                        --    local exttemp = m.extdata:sub(1,3)..first..m.extdata:sub(5,5)..second..m.extdata:sub(7,7)..third..m.extdata:sub(9)
+                                            if exttemp:sub(7,8) == q or exttemp:sub(9,10) == q or exttemp:sub(11,12) == q then
+                                                count = count +1
+                                            end
+                                        end
+                                        if count == #extgoal_2 then
+                                            equip_list[i] = nil
+                                            ret_list[v] = m.slot
+                                            reorder(order,i)
+                                            break
+                                        end
                                     end
+                                else
+                                    equip_list[i] = nil
+                                    ret_list[v] = m.slot
+                                    reorder(order,i)
+                                    break
                                 end
-                            else
+                            elseif not res.items[m.id].slots[v] then
                                 equip_list[i] = nil
-                                ret_list[v] = m.slot_id
-                                reorder(order,i)
+                                error_list[i] = name..' (cannot be worn in this slot)'
                                 break
                             end
-                        elseif name_match(m.id,name) and not res.items[m.id].slots[v] then
-                            equip_list[i] = nil
-                            error_list[i] = name..' (cannot be worn in this slot)'
-                            break
                         end
                     end
                 end
-            elseif m.flags > 0 then
+            elseif m.status > 0 then
                 for i,v in pairs(short_slot_map) do
                     local name = expand_entry(equip_list[i])
                     if name and name ~= empty then -- If "name" isn't a piece of gear, then it won't have a valid value at this point and should be ignored.
                         if name_match(m.id,name) then
-                            if m.flags == 5 then
+                            if m.status == 5 then
                                 error_list[i] = name..' (equipped)'
-                            elseif m.flags == 25 then
+                            elseif m.status == 25 then
                                 error_list[i] = name..' (bazaared)'
                             else
-                                error_list[i] = name..' (flags unknown: '..m.flags..' )'
+                                error_list[i] = name..' (status unknown: '..m.status..' )'
                             end
                             break
                         end

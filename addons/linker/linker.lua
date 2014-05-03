@@ -1,14 +1,10 @@
-require 'tables'
-require 'strings'
-require 'logger'
-config = require 'config'
+require('luau')
 
-_addon = _addon or {}
 _addon.name = 'Linker'
 _addon.author = 'Arcon'
-_addon.version = '1.0.0.0'
+_addon.version = '1.1.0.0'
 _addon.command = 'linker'
-_addon.short_command = 'web'
+_addon.commands = {'web'}
 _addon.language = 'English'
 
 defaults = {}
@@ -25,18 +21,16 @@ defaults.raw.wikia = 'http://wiki.ffxiclopedia.org/wiki/Main_Page'
 defaults.raw.of = 'http://forum.square-enix.com/ffxi/forum.php'
 defaults.raw.bgf = 'http://www.bluegartr.com/forum.php'
 defaults.raw.ahf = 'http://www.ffxiah.com/forum'
-defaults.raw.gw = 'http://guildwork.com'
+defaults.raw.gw = 'http://guildwork.com/'
 
 -- Windower
-defaults.raw.win = 'http://windower.net'
---[[ Add once the new forums/wiki go live
-defaults.raw.winf = 'http://'
-defaults.raw.winw = 'http://'
-]]
+defaults.raw.win = 'http://windower.net/'
+defaults.raw.winf = 'http://forums.windower.net/'
+defaults.raw.winw = 'http://wiki.windower.net/'
 
 -- Miscallenous sites
-defaults.raw.g = 'http://google.com'
-defaults.raw.wa = 'http://wolframalpha.com'
+defaults.raw.g = 'http://google.com/'
+defaults.raw.wa = 'http://wolframalpha.com/'
 
 defaults.search = {}
 
@@ -52,17 +46,28 @@ defaults.search.g = 'http://google.com/?q=${query}'
 defaults.search.wa = 'http://wolframalpha.com/?i=${query}'
 
 settings = config.load(defaults)
-settings:save()
 
 -- Interpreter
 
-windower.register_event('addon command', function(site, ...)
-	local term = L{...}:concat(' ')
-	if((term == '') or (settings.search[site] == nil and settings.raw[site] ~= nil)) then
-		windower.open_url(settings.raw[site])
-	elseif(settings.search[site] ~= nil) then
-		windower.open_url((settings.search[site]:gsub('${query}', term)))
-	else
-		error('Command', site, 'not found.')
-	end
+windower.register_event('addon command', function(command, ...)
+    if not ... or not settings.search[command] and settings.raw[command] then
+        windower.open_url(settings.raw[command])
+    elseif settings.search[command] then
+        windower.open_url((settings.search[command]:gsub('${query}', L{...}:concat(' '))))
+    else
+        error('Command "' .. command .. '" not found.')
+    end
 end)
+
+--[[
+Copyright (c) 2013-2014, Windower
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+    * Neither the name of Windower nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL Windower BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+]]

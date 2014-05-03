@@ -9,30 +9,14 @@ _libs.functions = _libs.functions or require('functions')
 _meta = _meta or {}
 
 debug.getmetatable('').__index = function(str, k)
-    return string[k] or type(k) == 'number' and math.abs(k) <= #str and string.sub(str, k, k) or nil
+    return string[k] or type(k) == 'number' and string.sub(str, k, k) or nil
 end
-debug.getmetatable('').__unm = functions.negate..functions.equals
+debug.getmetatable('').__unm = functions.negate .. functions.equals
+debug.getmetatable('').__unp = functions.equals
 
 -- Returns a function that returns the string when called.
 function string.fn(str)
     return functions.const(str)
-end
-
--- Returns the character at position pos. Negative positions are counted from the opposite end.
-function string.at(str, pos)
-    return str:sub(pos, pos)
-end
-
--- Returns the character at position pos. Defaults to 1 to return the first character.
-function string.first(str, offset)
-    offset = offset or 1
-    return str:sub(offset, offset)
-end
-
--- Returns the character at position #str-pos. Defaults to 0 to return the last character.
-function string.last(str, offset)
-    offset = offset or 1
-    return str:sub(-offset, -offset)
 end
 
 -- Returns true if the string contains a substring.
@@ -466,7 +450,7 @@ function string.decode(str, bits, charset)
     if type(charset) == 'string' then
         charset = charset:split()
     end
-    return str:binary():chunks(bits):map(table.get+{charset}..tonumber-{2}):concat()
+    return str:binary():chunks(bits):map(table.get+{charset} .. tonumber-{2}):concat():gsub('%z+$', '')
 end
 
 -- Returns a plural version of a string, if the provided table contains more than one element.

@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
 _addon.name = 'autocontrol'
-_addon.version = '1.0'
+_addon.version = '1.01'
 _addon.author = 'Nitrous (Shiva)'
 _addon.commands = {'autocontrol','acon'}
 
@@ -72,7 +72,7 @@ function initialize()
     end
 
     mjob_id = player.main_job_id
-    atts = res.items:category('General')
+    atts = res.items:category('Automaton')
     decay = 1
     for key,_ in pairs(heat) do
         heat[key] = 0
@@ -203,7 +203,7 @@ function save_set(setname)
     end
     local curAuto = T(get_current_autoset())
     settings.autosets[setname] = curAuto
-    settings:save('all')
+    config.save(settings, 'all')
     notice('Set '..setname..' saved.')
 end
 
@@ -262,6 +262,7 @@ windower.register_event("addon command", function(comm, ...)
         elseif comm == 'bgcolor' then Burden_tb:bgcolor(args[1], args[2], args[3])
         elseif comm == 'txtcolor' then Burden_tb:color(args[1], args[2], args[3])
         end
+        config.save(settings, 'all')
     elseif comm == 'show' then Burden_tb:show()
     elseif comm == 'hide' then Burden_tb:hide()
     elseif comm == 'settings' then 
