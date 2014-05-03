@@ -7,6 +7,9 @@ An addon that manages the treasure pool for you and keeps your inventory clean o
 
 ### Commands
 
+Note:
+All commands can be shortened to `//tr`. `lot` and `pass` can be shortened to `l` and `p` respectively. `add` and `remove` can be shortened to `a` or `+` and `r` or `-` respectively.
+
 `//treasuy lot|pass add|remove [global] <name>`
 
 This will add to or remove from the lot list or pass list all items matching `name`. `name` can contain standard Windower wildcards (`*`, `?`, `|`). It will add those for the current character only, unless global is specified, in which case it will add it for all characters.
