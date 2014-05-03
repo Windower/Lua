@@ -192,11 +192,11 @@ ranMultiple = false
 windower.register_event('outgoing text', function(original, modified)
 	if not original:match('/raw') then
 		if original:match('/jobability \"Double.*Up') then
-	        if isLucky and not override and rollActor == player.id then
-	            windower.add_to_chat(159,'Attempting to Doubleup on a Lucky Roll: Re-double up to continue.')
-	            isLucky = false
-	            return true
-	        end
+			if isLucky and not override and rollActor == player.id then
+				windower.add_to_chat(159,'Attempting to Doubleup on a Lucky Roll: Re-double up to continue.')
+				isLucky = false
+				return true
+			end
 		end
 		
 		if settings.fold == 1 and original:match('/jobability \"Fold') then
