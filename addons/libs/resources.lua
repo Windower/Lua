@@ -162,7 +162,7 @@ lookup = {
     slots = resources.slots,
     races = resources.races,
     skills = resources.skills,
-    targets = {[0x01] = 'Self', [0x02] = 'Player', [0x04] = 'Party', [0x08] = 'Alliance', [0x10] = 'NPC', [0x20] = 'Enemy', [0x60] = 'Object', [0x9D] = 'Corpse'},
+    targets = {[0x01] = 'Self', [0x02] = 'Player', [0x04] = 'Party', [0x08] = 'Ally', [0x10] = 'NPC', [0x20] = 'Enemy', [0x60] = 'Object', [0x9D] = 'Corpse'},
 }
 
 return resources
