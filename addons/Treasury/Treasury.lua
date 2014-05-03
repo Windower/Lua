@@ -21,6 +21,22 @@ defaults.AutoDrop = false
 
 settings = config.load(defaults)
 
+lotpass_commands = T{
+    lot = 'Lot',
+    pass = 'Pass',
+    l = 'Lot',
+    p = 'Pass',
+}
+
+addremove_commands = T{
+    add = 'add',
+    remove = 'remove',
+    a = 'add',
+    r = 'remove',
+    ['+'] = 'add',
+    ['-'] = 'remove',
+}
+
 ids = T{}
 res.items:map(function(item) 
     ids[item.name:lower()] = item.id 
@@ -149,11 +165,16 @@ windower.register_event('addon command', function(command1, command2, ...)
         args:remove(1)
     end
 
-    local name = args:concat(' ')
-    if command1 == 'lot' or command1 == 'pass' then
-        command1 = command1:capitalize()
+    command1 = command1 and command1:lower() or 'help'
+    command2 = command2 and command2:lower() or nil
 
-        if command2 == 'add' or command2 == 'remove' then
+    local name = args:concat(' ')
+    if lotpass_commands:containskey(command1) then
+        command1 = lotpass_commands[command1]
+
+        if addremove_commands:containskey(command2) then
+            command2 = addremove_commands[command2]
+
             local ids = find_id(name)
             if ids:empty() then
                 error('Item does not exist.')
@@ -173,7 +194,7 @@ windower.register_event('addon command', function(command1, command2, ...)
         elseif command2 == 'clear' then
             code[command1]:clear()
             settings[command1]:clear()
-            settings:save()
+            config.save(settings)
 
         elseif command2 == 'list' then
             log(command1 .. ':')
@@ -200,5 +221,25 @@ windower.register_event('addon command', function(command1, command2, ...)
         settings.Lot:clear()
 
         config.save(settings)
+
+    elseif command1 == 'autodrop' then
+        if command2 then
+            settings.AutoDrop = bool_values[command2:lower()]
+        else
+            settings.AutoDrop = not settings.AutoDrop
+        end
+
+        config.save(settings)
+        log('AutoDrop ' .. (settings.AutoDrop and 'enabled' or 'disabled'))
+
+    elseif command1 == 'help' then
+        print(_addon.name .. ' v' .. _addon.version)
+        print('    \\cs(255,255,255)lot|pass add|remove <name>\\cr - Adds are removes all items matching <name> to the specified list')
+        print('    \\cs(255,255,255)lot|pass clear\\cr - Clears the specified list for the current character')
+        print('    \\cs(255,255,255)lot|pass list\\cr - Lists all items on the specified list for the current character')
+        print('    \\cs(255,255,255)lotall|passall\\cr - Lots/Passes all items currently in the pool')
+        print('    \\cs(255,255,255)clearall\\cr - Removes lotting/passing settings for this character')
+        print('    \\cs(255,255,255)autodrop [on|off]\\cr - Enables/disables (or toggles) the auto-drop setting')
+
     end
 end)
