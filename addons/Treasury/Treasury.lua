@@ -131,7 +131,6 @@ windower.register_event('incoming chunk', function(id, original)
         check(treasure.Index, treasure.Item)
     elseif stack_ids:contains(id) then
         if id == 0x020 and settings.AutoDrop then
-            print(settings.AutoDrop)
             local item = packets.incoming(id, original)
             if code.pass:contains(item.ID) then
                 windower.ffxi.drop_item(item.Index, item.Count)
