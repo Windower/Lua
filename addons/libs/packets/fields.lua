@@ -1138,7 +1138,7 @@ fields.incoming[0x029] = L{
     {ctype='unsigned int',      label='Actor ID',           fn=id},             -- 04
     {ctype='unsigned int',      label='Target ID',          fn=id},             -- 08
     {ctype='unsigned int',      label='Param 1'},                               -- 0C
-    {ctype='unsigned int',      label='Param 2/3'},                             -- 10
+    {ctype='unsigned int',      label='Param 2'},                               -- 10
     {ctype='unsigned short',    label='Actor Index',        fn=index},          -- 14
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 16
     {ctype='unsigned short',    label='Message ID'},                            -- 18
@@ -1607,14 +1607,16 @@ fields.incoming[0x062] = L{
     {ctype='unsigned short',    label='Enhancing Magic',    fn=cskill},         -- C4
     {ctype='unsigned short',    label='Enfeebling Magic',   fn=cskill},         -- C6
     {ctype='unsigned short',    label='Elemental Magic',    fn=cskill},         -- C8
-    {ctype='unsigned short',    label='DarkMagic',          fn=cskill},         -- CA
+    {ctype='unsigned short',    label='Dark Magic',         fn=cskill},         -- CA
     {ctype='unsigned short',    label='Summoning Magic',    fn=cskill},         -- CC
-    {ctype='unsigned short',    label='Ninjitsu',           fn=cskill},         -- CE
+    {ctype='unsigned short',    label='Ninjutsu',           fn=cskill},         -- CE
     {ctype='unsigned short',    label='Singing',            fn=cskill},         -- D0
-    {ctype='unsigned short',    label='String Instrument',  fn=cskill},         -- D2
+    {ctype='unsigned short',    label='Stringed Instrument',fn=cskill},         -- D2
     {ctype='unsigned short',    label='Wind Instrument',    fn=cskill},         -- D4
-    {ctype='unsigned short',    label='BlueMagic',          fn=cskill},         -- D6
-    {ctype='char[8]',           label='_dummy2'},                               -- D8
+    {ctype='unsigned short',    label='Blue Magic',         fn=cskill},         -- D6
+    {ctype='unsigned short',    label='Geomancy',           fn=cskill},         -- D8
+    {ctype='unsigned short',    label='Handbell',           fn=cskill},         -- DA
+    {ctype='char[4]',           label='_dummy2'},                               -- DC
     {ctype='unsigned short',    label='Fishing',            fn=sskill},         -- E0
     {ctype='unsigned short',    label='Woodworking',        fn=sskill},         -- E2
     {ctype='unsigned short',    label='Smithing',           fn=sskill},         -- E4
@@ -1692,9 +1694,9 @@ fields.incoming[0x067] = L{
     {ctype='unsigned short',    label='Pet Index',          fn=index},          -- 06
     {ctype='unsigned int',      label='Pet ID',             fn=id},             -- 08
     {ctype='unsigned short',    label='Owner Index',        fn=index},          -- 0C
-    {ctype='unsigned char',     label='Current HP%'},                           -- 0E
-    {ctype='unsigned char',     label='Current MP%'},                           -- 0F
-    {ctype='unsigned short',    label='Pet TP%'},                               -- 10   Multiplied by 10
+    {ctype='unsigned char',     label='Current HP%',        fn=percent},        -- 0E
+    {ctype='unsigned char',     label='Current MP%',        fn=percent},        -- 0F
+    {ctype='unsigned short',    label='Pet TP%',            fn=percent},        -- 10   Multiplied by 10
     {ctype='unsigned short',    label='_unknown1'},                             -- 12
     {ctype='char*',             label='Pet Name'},                              -- 14   Packet expands to accommodate pet name length.
 }
@@ -1820,7 +1822,7 @@ fields.incoming[0x0D2] = L{
     {ctype='unsigned int',      label='Count'},                                 -- 0C   Takes values greater than 1 in the case of gil
     {ctype='unsigned short',    label='Item',               fn=item},           -- 10
     {ctype='unsigned short',    label='Dropper Index',      fn=index},          -- 12
-    {ctype='unsigned short',    label='Pool Index'},                            -- 14   This is the internal index in memory, not the one it appears in in the menu
+    {ctype='unsigned short',    label='Index'},                                 -- 14   This is the internal index in memory, not the one it appears in in the menu
     {ctype='unsigned char',     label='_unknown4',          const=0x00},        -- 16   Seems to always be 00
     {ctype='unsigned char',     label='_unknown5'},                             -- 17   Seemingly random, both 00 and FF observed, as well as many values in between
     {ctype='unsigned int',      label='Timestamp',          fn=utime},          -- 18
@@ -1836,7 +1838,7 @@ fields.incoming[0x0D3] = L{
     {ctype='unsigned short',    label='Highest Lot'},                           -- 0E
     {ctype='unsigned short',    label='Current Lot Index',  fn=index..s+{1,15}},-- 10   The highest bit is set
     {ctype='unsigned short',    label='Current Lot'},                           -- 12   0xFF FF if passing
-    {ctype='unsigned char',     label='Pool Index'},                            -- 14
+    {ctype='unsigned char',     label='Index'},                                 -- 14
     {ctype='unsigned char',     label='Drop'},                                  -- 15   0 if no drop, 1 if dropped to player, 3 if floored
     {ctype='char[16]',          label='Highest Lot Name'},                      -- 16
     {ctype='char[16]',          label='Current Lot Name'},                      -- 26

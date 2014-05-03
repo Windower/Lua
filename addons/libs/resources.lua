@@ -71,7 +71,7 @@ resource_mt.__index = function(t, k)
 end
 resource_mt.__class = 'Resource'
 
-local resources_path = windower.addon_path .. '../libs/res/'
+local resources_path = windower.windower_path .. 'res/'
 
 local flag_cache = {}
 local parse_flags = function(bits, lookup, values)
@@ -155,6 +155,7 @@ post_process = function(t)
     end
 end
 
+lookup = {}
 lookup = {
     elements = resources.elements,
     jobs = resources.jobs,
