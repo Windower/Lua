@@ -143,12 +143,12 @@ windower.register_event('action', function(act)
         if 
             function(act)
                 for i = 1, #act.targets do 
-                    if targets[i].id == player.id then
+                    if act.targets[i].id == player.id then
                         return true
                     end
                 end
                 return false
-            end
+            end(act)
         then
             local party = windower.ffxi.get_party()
             rollMembers = {}
