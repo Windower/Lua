@@ -155,7 +155,7 @@ windower.register_event('action', function(act)
             for partyMem in pairs(party) do
                 for effectedTarget = 1, #act.targets do
                     --if mob is nil then the party member is not in zone, will fire an error.
-                    if party[partyMem].mob and partyMem:startswith('p') and act.targets[effectedTarget].id == party[partyMem].mob.id then   
+                    if party[partyMem].mob and act.targets[effectedTarget].id == party[partyMem].mob.id then   
                         rollMembers[effectedTarget] = partyColour[partyMem] .. party[partyMem].name .. chat.controls.reset
                     end
                 end
