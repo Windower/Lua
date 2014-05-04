@@ -125,6 +125,7 @@ end
 
 stack_ids = S{0x01E, 0x01F, 0x020}
 last_stack_time = 0
+inventory = res.bags:with('english', 'Inventory').id
 windower.register_event('incoming chunk', function(id, original)
     if id == 0x0D2 then
         local treasure = packets.incoming(id, original)
@@ -132,7 +133,7 @@ windower.register_event('incoming chunk', function(id, original)
     elseif stack_ids:contains(id) then
         if id == 0x020 and settings.AutoDrop then
             local item = packets.incoming(id, original)
-            if code.pass:contains(item.ID) then
+            if item.Bag == inventory and code.pass:contains(item.ID) then
                 windower.ffxi.drop_item(item.Index, item.Count)
             end
         end
