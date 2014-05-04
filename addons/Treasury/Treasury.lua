@@ -192,7 +192,7 @@ windower.register_event('addon command', function(command1, command2, ...)
             end
 
         elseif command2 == 'clear' then
-            code[command1]:clear()
+            code[command1:lower()]:clear()
             settings[command1]:clear()
             config.save(settings)
 
