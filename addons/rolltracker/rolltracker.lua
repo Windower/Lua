@@ -1,4 +1,4 @@
---Copyright (c) 2013, Thomas Rogers
+--Copyright (c) 2013-2014, Thomas Rogers
 --All rights reserved.
 
 --Redistribution and use in source and binary forms, with or without
@@ -9,7 +9,7 @@
 --    * Redistributions in binary form must reproduce the above copyright
 --      notice, this list of conditions and the following disclaimer in the
 --      documentation and/or other materials provided with the distribution.
---   * Neither the name of cellhelp nor the
+--    * Neither the name of RollTracker nor the
 --      names of its contributors may be used to endorse or promote products
 --      derived from this software without specific prior written permission.
 
@@ -29,7 +29,7 @@ _addon.version = '1.2'
 _addon.author = 'Balloon'
 _addon.command = 'rolltracker'
 
-require 'tables'
+require('tables')
 config = require('config')
 chat = require('chat')
 chars = require('chat.chars')
@@ -47,7 +47,7 @@ windower.register_event('addon command',function (...)
     if cmd[1] ~= nil then
         if cmd[1]:lower() == "help" then
             print('To stop rolltracker stopping rolls type: //rolltracker autostop')
-            print('To restart rolltracker stopping doubleup type //rolltracker Doubleup')    
+            print('To restart rolltracker stopping doubleup type //rolltracker Doubleup')   
         end
         
         if cmd[1]:lower() == "autostop" then
@@ -58,12 +58,12 @@ windower.register_event('addon command',function (...)
         if cmd[1]:lower() == "doubleup" then
             override = false
             print('Enable Autostoppping Doubleup')
-        end    
+        end 
     end
 end)
 
 windower.register_event('load',function ()
-    buffId = { 309, 310, 311,312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329, 330, 331, 332, 333, 334, 335, 336, 337, 338}    
+    buffId = { 309, 310, 311,312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329, 330, 331, 332, 333, 334, 335, 336, 337, 338} 
     partyColour={['p0']=string.char(0x1E, 247),['p1']=string.char(0x1F, 204),['p2']=string.char(0x1E, 156),['p3']=string.char(0x1E,238),['p4']=string.char(0x1E,5),['p5']=string.char(0x1E,6)}
     rollInfo={
                 [105]={"Chaos",6,8,9,25,11,13,16,3,17,19,31,"-4", '% Attack!', 4},
@@ -142,7 +142,7 @@ windower.register_event('action', function(act)
         -- anonymous function that checks if the player.id is in the targets without wrapping it in another layer of for loops.
         if 
             function(act)
-                for i=1, #act.targets do 
+                for i = 1, #act.targets do 
                     if targets[i].id == player.id then
                         return true
                     end
@@ -152,13 +152,11 @@ windower.register_event('action', function(act)
         then
             local party = windower.ffxi.get_party()
             rollMembers = {}
-            for effectedTarget = 1, #act.targets do
-                for partyMem in pairs(party) do
+            for partyMem in pairs(party) do
+                for effectedTarget = 1, #act.targets do
                     --if mob is nil then the party member is not in zone, will fire an error.
-                    if party[partyMem].mob ~= nil then
-                        if act.targets[effectedTarget].id == party[partyMem].mob.id then    
-                            rollMembers[effectedTarget] = partyColour[partyMem] .. party[partyMem].name .. chat.controls.reset
-                        end
+                    if party[partyMem].mob and partyMem:startswith('p') and act.targets[effectedTarget].id == party[partyMem].mob.id then   
+                        rollMembers[effectedTarget] = partyColour[partyMem] .. party[partyMem].name .. chat.controls.reset
                     end
                 end
             end
@@ -212,7 +210,7 @@ windower.register_event('outgoing text', function(original, modified)
                     end
                 end
             end
-            
+
             if canBust or ranMultiple then
                 modified = original
                 ranMultiple = false
