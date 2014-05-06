@@ -127,7 +127,6 @@ function texts.new(str, settings, root_settings)
         config.save(t._root_settings)
     end
 
-    apply_settings(t, t._settings)
     if _libs.config and t._root_settings then
         _libs.config.register(t._root_settings, apply_settings, t)
     end
@@ -512,7 +511,7 @@ end
 return texts
 
 --[[
-Copyright (c) 2013, Windower
+Copyright (c) 2013-2014, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
