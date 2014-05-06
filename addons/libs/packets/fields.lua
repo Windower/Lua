@@ -736,6 +736,12 @@ fields.outgoing[0x110] = L{
     {ctype='unsigned int',      label='Catch Key'},                             -- 10   When catching this matches the catch key from the 0x115 packet, otherwise zero
 }
 
+-- Lockstyle
+fields.outgoing[0x111] = L{
+    {ctype='bool',              label='Lock'},                                  -- 04   0 = unlock, 1 = lock
+    {ctype='char[3]',           label='_junk1'},                                -- 05   
+}
+
 -- Zone update
 fields.incoming[0x00A] = L{
     {ctype='unsigned int',      label='Player ID',          fn=id},             -- 04
