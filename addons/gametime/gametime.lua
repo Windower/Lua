@@ -297,6 +297,16 @@ function timeconvert2(basetime)
 	return basetable[1]..':'..tostring(math.round(tostring(basetable[2]):slice(1,2) / (100/60))):zfill(2)
 end
 
+function moon_change()
+    local info = windower.ffxi.get_info()
+	gt.MoonPhase = res.moon_phases[info.moon_phase].english
+	gt.MoonPct = info.moon
+	gt.gtd:update(gt)
+	if settings.moon.change == true then
+		log('Day: '..gt.day..'; Moon: '..gt.MoonPhase..' ('..gt.MoonPct..'%);')
+	end
+end
+
 function day_change(day)
     day = res.days[day].english
 	if (day == 'Firesday') then
@@ -332,16 +342,6 @@ function day_change(day)
 end
 
 windower.register_event('day change', moon_change..day_change)
-
-function moon_change()
-    local info = windower.ffxi.get_info()
-	gt.MoonPhase = res.moon_phases[info.moon_phase].english
-	gt.MoonPct = info.moon
-	gt.gtd:update(gt)
-	if settings.moon.change == true then
-		log('Day: '..gt.day..'; Moon: '..gt.MoonPhase..' ('..gt.MoonPct..'%);')
-	end
-end
 
 windower.register_event('moon change', moon_change)
 
