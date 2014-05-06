@@ -9,17 +9,28 @@ config = require('config')
 packets = require('packets')
 require('logger')
 
-s = S{'pass', 'lot'}
-code = {}
-code.pass = S{}
-code.lot = S{}
-
 defaults = {}
 defaults.Pass = S{}
 defaults.Lot = S{}
 defaults.AutoDrop = false
 
 settings = config.load(defaults)
+
+ids = T{}
+res.items:map(function(item) 
+    ids[item.name:lower()] = item.id 
+    ids[item.log_name:lower()] = item.id 
+end)
+
+s = S{'pass', 'lot'}
+code = {}
+code.pass = S{}
+code.lot = S{}
+
+config.register(settings, function(settings_table)
+    code.pass = settings_table.Pass:map(table.get+{ids} .. string.lower)
+    code.lot = settings_table.Lot:map(table.get+{ids} .. string.lower)
+end)
 
 lotpass_commands = T{
     lot = 'Lot',
@@ -36,15 +47,6 @@ addremove_commands = T{
     ['+'] = 'add',
     ['-'] = 'remove',
 }
-
-ids = T{}
-res.items:map(function(item) 
-    ids[item.name:lower()] = item.id 
-    ids[item.log_name:lower()] = item.id 
-end)
-
-code.pass = settings.Pass:map(table.get+{ids} .. string.lower)
-code.lot = settings.Lot:map(table.get+{ids} .. string.lower)
 
 function passlot(command1, command2, ids)
     local action = command1:lower()

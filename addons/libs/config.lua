@@ -462,7 +462,7 @@ function config.unregister(settings, key)
     settings_map[settings].refresh[key] = nil
 end
 
-windower.register_event('logout', 'login', function()
+windower.register_event('load', 'logout', 'login', function()
     for _, settings in settings_map:it() do
         config.reload(settings)
     end
@@ -471,7 +471,7 @@ end)
 return config
 
 --[[
-Copyright (c) 2013, Windower
+Copyright (c) 2013-2014, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
