@@ -66,7 +66,7 @@ windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blo
                     local param_2 = str2bytes(org:sub(0xD,0x10))
                     local param_3 = str2bytes(org:sub(0x11,0x14))
                     local param_4 = str2bytes(org:sub(0x15,0x18))
-                    print(param_1,param_2,param_3,param_4) -- DEBUGGING STATEMENT -------------------------
+                    -- print(param_1,param_2,param_3,param_4) -- DEBUGGING STATEMENT -------------------------
                     if zone_message_functions[i] then
                         zone_message_functions[i](param_1,param_2,param_3,param_4)
                     end
