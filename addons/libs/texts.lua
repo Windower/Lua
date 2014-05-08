@@ -129,6 +129,8 @@ function texts.new(str, settings, root_settings)
 
     if _libs.config and t._root_settings then
         _libs.config.register(t._root_settings, apply_settings, t)
+    else
+        apply_settings(t, t._settings)
     end
 
     if str then
