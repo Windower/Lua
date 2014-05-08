@@ -298,13 +298,17 @@ fields.outgoing[0x016] = L{
 }
 
 enums['action'] = {
+    [0x00] = 'NPC Interaction',
     [0x02] = 'Engage monster',
     [0x03] = 'Magic cast',
+    [0x04] = 'Disengage',
+    [0x05] = 'Call for Help',
     [0x07] = 'Weaponskill usage',
     [0x09] = 'Job ability usage',
     [0x0D] = 'Reraise dialogue',
     [0x0F] = 'Switch target',
     [0x10] = 'Ranged attack',
+    [0x14] = 'Zoning/Appear', -- I think, the resource for this is ambiguous.
     [0x19] = 'Monsterskill',
 }
 
@@ -646,7 +650,7 @@ fields.outgoing[0x100] = L{
 
 -- Untraditional Equip
 -- Currently only commented for changing instincts in Monstrosity. Refer to the doku wiki for information on Autos/BLUs.
--- http://dev.windower.net/doku.php?id=packets:outgoing:0x102_blue_magic_pup_attachment_equip
+-- https://gist.github.com/nitrous24/baf9980df69b3dc7d3cf
 fields.outgoing[0x102] = L{
     {ctype='unsigned short',    label='_unknown1'},                             -- 04  -- 00 00 for Monsters
     {ctype='unsigned short',    label='_unknown1'},                             -- 06  -- Varies by Monster family for the species change packet. Monsters that share the same tnl seem to have the same value. 00 00 for instinct changing.
@@ -734,6 +738,12 @@ fields.outgoing[0x110] = L{
     {ctype='unsigned char',     label='Action',             fn=e+{'fishing'}},  -- 0E
     {ctype='unsigned char',     label='_unknown1'},                             -- 0F   Always zero (pre-March fishing update this value would increase over time, probably zone fatigue)
     {ctype='unsigned int',      label='Catch Key'},                             -- 10   When catching this matches the catch key from the 0x115 packet, otherwise zero
+}
+
+-- Lockstyle
+fields.outgoing[0x111] = L{
+    {ctype='bool',              label='Lock'},                                  -- 04   0 = unlock, 1 = lock
+    {ctype='char[3]',           label='_junk1'},                                -- 05   
 }
 
 -- Zone update
@@ -862,6 +872,16 @@ fields.incoming[0x00D] = L{
 	-- 32 = Invisible models
 	-- 64 = None
 	-- 128 = Bazaar
+    
+    ---- Mask bits, from antiquity:
+    -- 0x01: "Basic"
+    -- 0x02: "Bit 1"
+    -- 0x04: Status
+    -- 0x08: Name
+    -- 0x10: Gear
+    -- 0x20: Bit 5
+    -- 0x40: Bit 6
+    -- 0x80: Bit 7
     {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
     {ctype='unsigned short',    label='Index',              fn=index},          -- 08
     {ctype='unsigned char',     label='Mask',               fn=bin+{1}},        -- 0A
@@ -907,6 +927,21 @@ fields.incoming[0x00D] = L{
 -- The common fields seem to be the ID, Index, mask and _unknown3.
 -- The second one seems to have an int counter at 0x38 that increases by varying amounts every time byte 0x1F changes.
 -- Currently I don't know how to algorithmically distinguish when the packets are different.
+
+-- Mask values (from antiquity):
+-- 0x01: "Basic"
+-- 0x02: Status
+-- 0x04: HP
+-- 0x08: Name
+-- 0x10: "Bit 4"
+-- 0x20: "Bit 5"
+-- 0x40: "Bit 6"
+-- 0x80: "Bit 7"
+
+
+-- Status flags (from antiquity):
+-- 0b00100000 = CFH Bit
+-- 0b10000101 = "Normal_Status?"
 fields.incoming[0x00E] = L{
     {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
     {ctype='unsigned short',    label='Index',              fn=index},          -- 08
@@ -926,7 +961,7 @@ fields.incoming[0x00E] = L{
     {ctype='unsigned int',      label='Walk Count'},                            -- 18   Steadily increases until rotation changes. Does not reset while the mob isn't walking. Only goes until 0xFF1F.
     {ctype='unsigned short',    label='_unknown1',          fn=bin+{2}},        -- 1A
     {ctype='unsigned char',     label='HP %',               fn=percent},        -- 1E
-    {ctype='unsigned char',     label='Status',             fn=status},         -- 1F
+    {ctype='unsigned char',     label='Status',             fn=status},         -- 1F   Status used to be 0x20
     {ctype='unsigned int',      label='_unknown2',          fn=bin+{4}},        -- 20
     {ctype='unsigned int',      label='_unknown3',          fn=bin+{4}},        -- 24
     {ctype='unsigned int',      label='_unknown4',          fn=bin+{4}},        -- 28
@@ -1218,9 +1253,9 @@ fields.incoming[0x034] = L{
 fields.incoming[0x037] = L{
     {ctype='unsigned char[32]', label='Buff',               fn=buff},           -- 04
     {ctype='unsigned int',      label='Player ID',          fn=id},             -- 24
-    {ctype='unsigned short',    label='_unknown1'},                             -- 28
+    {ctype='unsigned short',    label='_unknown1'},                             -- 28   Called "Flags" on the old dev wiki
     {ctype='unsigned char',     label='HP %',               fn=percent},        -- 29
-    {ctype='unsigned char',     label='_unknown2'},                             -- 2A
+    {ctype='unsigned char',     label='_unknown2'},                             -- 2A   May somehow be tied to current animation (old dev wiki)
     {ctype='unsigned char',     label='_unknown3'},                             -- 2B
     {ctype='unsigned char',     label='_unknown4'},                             -- 2C
     {ctype='unsigned char',     label='_unknown5'},                             -- 2D
@@ -1229,7 +1264,7 @@ fields.incoming[0x037] = L{
     {ctype='unsigned char',     label='LS Color Red'},                          -- 31
     {ctype='unsigned char',     label='LS Color Green'},                        -- 32
     {ctype='unsigned char',     label='LS Color Blue'},                         -- 33
-    {ctype='char[8]',           label='_unknown7'},                             -- 34
+    {ctype='char[8]',           label='_unknown7'},                             -- 34   Player's pet index * 8?
     {ctype='unsigned int',      label='_unknown8'},                             -- 3C
     {ctype='unsigned int',      label='Timestamp',          fn=time},           -- 40
     {ctype='char[8]',           label='_unknown9'},                             -- 44
