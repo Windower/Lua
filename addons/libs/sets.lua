@@ -16,6 +16,10 @@ _meta.S.__class = 'Set'
 
 function S(t)
     t = t or {}
+    if class(t) == 'Set' then
+        return t
+    end
+
     local s = {}
 
     if class(t) == 'List' then
