@@ -38,12 +38,12 @@ windower.register_event('load', 'login', 'job change', 'logout', function()
     local basepath = windower.addon_path .. 'data/'
     if player then
         for filepath in L{
-            basepath .. 'name_main/sub.lua',
+            basepath .. 'name_main_sub.lua',
             basepath .. 'name_main.lua',
             basepath .. 'name.lua',
             basepath .. 'binds.lua',
         }:it() do
-            file = loadfile(filepath:gsub('name', player.name):gsub('main', player.main_job):gsub('sub', player.sub_job))
+            file = loadfile(filepath:gsub('name', player.name):gsub('main', player.main_job):gsub('sub', player.sub_job or ''))
             if file then
                 break
             end
