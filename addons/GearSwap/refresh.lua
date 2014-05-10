@@ -174,6 +174,8 @@ function refresh_player()
         player.sub_job_id = 0
     end
     player.job = player.main_job..'/'..player.sub_job
+    player.status_id = player.status
+    player.status = res.statuses[player.status][language]
     
     for i,v in pairs(player_mob_table) do
         if i == 'name' then
