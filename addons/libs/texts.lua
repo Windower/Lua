@@ -1,5 +1,5 @@
 --[[
-A library to facilitate text primitive creation and manipulation.
+    A library to facilitate text primitive creation and manipulation.
 ]]
 
 local texts = {}
@@ -109,7 +109,7 @@ function texts.new(str, settings, root_settings)
     end
 
     t = {}
-    t._name = (_addon and _addon.name or 'text')..'_gensym_'..tostring(t):sub(8)..('_%.8X'):format(16^8*math.random()):sub(3)
+    t._name = (_addon and _addon.name or 'text') .. '_gensym_' .. tostring(t):sub(8) .. '_%.8X':format(16^8 * math.random()):sub(3)
     t._settings = settings or {}
     t._status = t._status or {visible = false, text = {}}
     t._root_settings = root_settings
@@ -127,9 +127,10 @@ function texts.new(str, settings, root_settings)
         config.save(t._root_settings)
     end
 
-    apply_settings(t, t._settings)
     if _libs.config and t._root_settings then
         _libs.config.register(t._root_settings, apply_settings, t)
+    else
+        apply_settings(_, t)
     end
 
     if str then
@@ -157,7 +158,7 @@ function amend(settings, text)
     end
 end
 
-function apply_settings(t)
+function apply_settings(_, t)
     local settings = windower.get_windower_settings()
     windower.text.set_location(t._name, t._settings.pos.x + (t._settings.flags.right and settings.ui_x_res or 0), t._settings.pos.y + (t._settings.flags.bottom and settings.ui_y_res or 0))
     windower.text.set_bg_color(t._name, t._settings.bg.alpha, t._settings.bg.red, t._settings.bg.green, t._settings.bg.blue)
@@ -512,7 +513,7 @@ end
 return texts
 
 --[[
-Copyright (c) 2013, Windower
+Copyright (c) 2013-2014, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
