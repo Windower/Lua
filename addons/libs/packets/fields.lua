@@ -1217,6 +1217,26 @@ fields.incoming[0x034] = L{
     {ctype='char[2]',           label='_junk1'},                                -- 31   Always 00s for me
 }
 
+enums.indi = {
+    [0x5F] = 'Enemy Dark',
+    [0x5E] = 'Enemy Light',
+    [0x5D] = 'Enemy Water',
+    [0x5C] = 'Enemy Lightning',
+    [0x5B] = 'Enemy Earth',
+    [0x5A] = 'Enemy Wind',
+    [0x59] = 'Enemy Ice',
+    [0x58] = 'Enemy Fire',
+    [0x57] = 'Party Dark',
+    [0x56] = 'Party Light',
+    [0x55] = 'Party Water',
+    [0x54] = 'Party Lightning',
+    [0x53] = 'Party Earth',
+    [0x52] = 'Party Wind',
+    [0x51] = 'Party Ice',
+    [0x50] = 'Party Fire',
+    [0x00] = 'None',
+}
+
 -- Player update
 -- Buff IDs go can over 0xFF, but in the packet each buff only takes up one byte.
 -- To address that there's a 8 byte bitmask starting at 0x4C where each 2 bits
@@ -1240,7 +1260,9 @@ fields.incoming[0x037] = L{
     {ctype='unsigned int',      label='Timestamp',          fn=time},           -- 40
     {ctype='char[8]',           label='_unknown9'},                             -- 44
     {ctype='char[8]',           label='Bit Mask'},                              -- 4C
-    {ctype='char[8]',           label='_unknown10'},                            -- 54
+    {ctype='char[4]',           label='_unknown10'},                            -- 54
+    {ctype='unsigned char',     label='Indi Buff',          fn=e+{'indi'}},     -- 58
+    {ctype='char[3]',           label='_unknown11'},                            -- 59
 }
 
 -- Model DisAppear
