@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -- addon information
 
 _addon.name = 'digger'
-_addon.version = '1.3.5'
+_addon.version = '1.4.0'
 _addon.command = 'digger'
 _addon.author = 'Seth VanHeulen (Acacia@Odin)'
 
@@ -61,9 +61,6 @@ settings = config.load(defaults)
 
 -- global constants
 
-fail_message = S{7208, 7250, 7227, 7536, 7194, 7682, 7198, 7256, 7216, 7035}
-success_message = S{6379, 6393, 6406, 6552, 7377, 7692, 7717}
-ease_message = S{7283, 7325, 7302, 7611, 7269, 7757, 7273, 7331, 7291, 7110}
 chocobo_zone = S{2, 4, 51, 52, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 114, 115, 116, 117, 118, 119, 120, 121, 123, 124, 125}
 
 -- buff helper function
@@ -123,23 +120,21 @@ function check_zone_change(new_zone_id, old_zone_id)
     windower.send_command('timers d "Chocobo Dig Delay"')
 end
 
+function check_incoming_text(original, modified, original_mode, modified_mode, blocked)
+    if original:find('Obtained:') ~= nil and get_chocobo_buff() then
+        update_stats(-1)
+        display_stats()
+    elseif original:find('It appears your chocobo found this item with ease.') ~= nil then
+        update_stats(1)
+    elseif original:find('You dig and you dig, but find nothing.') ~= nil then
+        update_stats(0)
+        display_stats()
+    end
+end
+
 function check_incoming_chunk(id, original, modified, injected, blocked)
-    if id == 0x2A and windower.ffxi.get_player().id == original:unpack('I', 5) then
-        local message_id = original:unpack('H', 27) % 0x8000
-        if success_message:contains(message_id) and get_chocobo_buff() then
-            update_stats(-1)
-            display_stats()
-        elseif ease_message:contains(message_id) then
-            update_stats(1)
-        end
-    elseif id == 0x2F and settings.delay.dig > 0 and windower.ffxi.get_player().id == original:unpack('I', 5) then
+    if id == 0x2F and settings.delay.dig > 0 and windower.ffxi.get_player().id == original:unpack('I', 5) then
         windower.send_command('timers c "Chocobo Dig Delay" %d down':format(settings.delay.dig))
-    elseif id == 0x36 and windower.ffxi.get_player().id == original:unpack('I', 5) then
-        local message_id = original:unpack('H', 11) % 0x8000
-        if fail_message:contains(message_id) then
-            update_stats(0)
-            display_stats()
-        end
     end
 end
 
@@ -200,5 +195,6 @@ end
 -- register event callbacks
 
 windower.register_event('zone change', check_zone_change)
+windower.register_event('incoming text', check_incoming_text)
 windower.register_event('incoming chunk', check_incoming_chunk)
 windower.register_event('addon command', digger_command)
