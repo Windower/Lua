@@ -328,7 +328,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
             next_packet_events.pet_change = {pet = table.reassign({},pet)}
         end
     elseif id == 0x037 and not injected then
-        local indi_byte = original:byte(0x59)
+        local indi_byte = data:byte(0x59)
         if indi_byte%128/64 >= 1 then
             _ExtraData.player.indi = {
                     element = res.elements[indi_byte%8][language],
