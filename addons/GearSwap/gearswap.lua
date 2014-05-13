@@ -330,7 +330,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
     elseif id == 0x037 and not injected then
         local indi_byte = original:byte(0x59)
         if indi_byte%128/64 >= 1 then
-            local _ExtraData.player.indi = {
+            _ExtraData.player.indi = {
                     element = res.elements[indi_byte%8][language],
                     element_id = indi_byte%8,
                     size = math.floor(indi_byte%64)/16 + 1, -- Size range of 1~4
