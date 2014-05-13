@@ -329,13 +329,13 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         end
     elseif id == 0x037 and not injected then
         local indi_byte = original:byte(0x59)
-        if indi_byte%128/64 > 1 then
+        if indi_byte%128/64 >= 1 then
             local _ExtraData.player.indi = {
                     element = res.elements[indi_byte%8][language],
                     element_id = indi_byte%8,
                     size = math.floor(indi_byte%64)/16 + 1, -- Size range of 1~4
                 }
-            if (indi_byte%16)/8 > 1 then
+            if (indi_byte%16)/8 >= 1 then
                 _ExtraData.player.indi.target = 'Enemy'
             else
                 _ExtraData.player.indi.target = 'Ally'
