@@ -1846,11 +1846,12 @@ fields.incoming[0x0CC] = L{
 fields.incoming[0x0D2] = L{
     {ctype='unsigned int',      label='_unknown1'},                             -- 04   Could be characters starting the line - FD 02 02 18 observed
                                                                                 -- 04   Arcon: Only ever observed 0x00000001 for this
-    {ctype='unsigned int',      label='Dropper ID',         fn=id},             -- 08
+    {ctype='unsigned int',      label='Dropper',            fn=id},             -- 08
     {ctype='unsigned int',      label='Count'},                                 -- 0C   Takes values greater than 1 in the case of gil
     {ctype='unsigned short',    label='Item',               fn=item},           -- 10
     {ctype='unsigned short',    label='Dropper Index',      fn=index},          -- 12
-    {ctype='unsigned short',    label='Index'},                                 -- 14   This is the internal index in memory, not the one it appears in in the menu
+    {ctype='unsigned char',     label='Index'},                                 -- 14   This is the internal index in memory, not the one it appears in in the menu
+    {ctype='bool',              label='Old'},                                   -- 15   This is true if it's not a new drop, but appeared in the pool before you joined a party
     {ctype='unsigned char',     label='_unknown4',          const=0x00},        -- 16   Seems to always be 00
     {ctype='unsigned char',     label='_unknown5'},                             -- 17   Seemingly random, both 00 and FF observed, as well as many values in between
     {ctype='unsigned int',      label='Timestamp',          fn=utime},          -- 18
@@ -1860,16 +1861,17 @@ fields.incoming[0x0D2] = L{
 
 -- Item lot/drop
 fields.incoming[0x0D3] = L{
-    {ctype='unsigned int',      label='Highest Lot ID',     fn=id},             -- 04
-    {ctype='unsigned int',      label='Current Lot ID',     fn=id},             -- 08
-    {ctype='unsigned short',    label='Highest Lot Index',  fn=index},          -- 0C
+    {ctype='unsigned int',      label='Highest Lotter',     fn=id},             -- 04
+    {ctype='unsigned int',      label='Current Lotter',     fn=id},             -- 08
+    {ctype='unsigned short',    label='Highest Lotter Index',fn=index},         -- 0C
     {ctype='unsigned short',    label='Highest Lot'},                           -- 0E
-    {ctype='unsigned short',    label='Current Lot Index',  fn=index..s+{1,15}},-- 10   The highest bit is set
+    {ctype='bit[15]',           label='Current Lotter Index',fn=index},         -- 10
+    {ctype='bit[1]',            label='_unknown1'}                              -- 11   Always seems set
     {ctype='unsigned short',    label='Current Lot'},                           -- 12   0xFF FF if passing
     {ctype='unsigned char',     label='Index'},                                 -- 14
     {ctype='unsigned char',     label='Drop'},                                  -- 15   0 if no drop, 1 if dropped to player, 3 if floored
-    {ctype='char[16]',          label='Highest Lot Name'},                      -- 16
-    {ctype='char[16]',          label='Current Lot Name'},                      -- 26
+    {ctype='char[16]',          label='Highest Lotter Name'},                   -- 16
+    {ctype='char[16]',          label='Current Lotter Name'},                   -- 26
     {ctype='char[6]',           label='_junk1'},                                -- 36
 }
 
