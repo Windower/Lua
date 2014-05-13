@@ -1866,7 +1866,7 @@ fields.incoming[0x0D3] = L{
     {ctype='unsigned short',    label='Highest Lotter Index',fn=index},         -- 0C
     {ctype='unsigned short',    label='Highest Lot'},                           -- 0E
     {ctype='bit[15]',           label='Current Lotter Index',fn=index},         -- 10
-    {ctype='bit[1]',            label='_unknown1'}                              -- 11   Always seems set
+    {ctype='bit[1]',            label='_unknown1'},                             -- 11   Always seems set
     {ctype='unsigned short',    label='Current Lot'},                           -- 12   0xFF FF if passing
     {ctype='unsigned char',     label='Index'},                                 -- 14
     {ctype='unsigned char',     label='Drop'},                                  -- 15   0 if no drop, 1 if dropped to player, 3 if floored
