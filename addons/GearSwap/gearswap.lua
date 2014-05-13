@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.837'
+_addon.version = '0.836'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -327,6 +327,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
             pet.isvalid = false
             next_packet_events.pet_change = {pet = table.reassign({},pet)}
         end
+<<<<<<< HEAD
     elseif id == 0x037 and not injected then
         local indi_byte = original:byte(0x59)
         if indi_byte%128/64 >= 1 then
@@ -343,6 +344,8 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         else
             _ExtraData.player.indi = nil
         end
+=======
+>>>>>>> parent of 00e66b1... GearSwap v0.837 - Indi spell info
     elseif gearswap_disabled then
         return
     elseif id == 0x050 and not injected then

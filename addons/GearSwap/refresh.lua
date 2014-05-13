@@ -319,14 +319,6 @@ function refresh_player()
     end
     
     refresh_buff_active(player.buffs)
-    
-    for global_variable_name,extradatatable in pairs(_ExtraData) do
-        if _G[global_variable_name] then
-            for sub_variable_name,value in pairs(extradatatable) do
-                _G[global_variable_name][sub_variable_name] = value
-            end
-        end
-    end
 end
 
 -----------------------------------------------------------------------------------

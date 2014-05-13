@@ -1,6 +1,4 @@
 -------------------------------------------------
-GearSwap 0.837 - Created infrastructure for GearSwap served information and added Indi spell aura information to player.
--------------------------------------------------
 GearSwap 0.836 - Added augments to the export feature for currently equipped sets and inventory.
 -------------------------------------------------
 GearSwap 0.835 - Adaptation for new resources.
