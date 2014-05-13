@@ -42,9 +42,9 @@ end)
 	
 function start()
 	player = windower.ffxi.get_player()
-	if (player.status:lower() == 'engaged' ) then
+	if player.status == 1 then
 		auto = 1
-	elseif (player.status:lower() == 'idle' ) then
+	elseif player.status == 0 then
 		auto = 0
 	end
 	shoot()

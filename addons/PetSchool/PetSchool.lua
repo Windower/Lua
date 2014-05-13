@@ -100,11 +100,11 @@ windower.register_event('action',function (act)
 				windower.add_to_chat(17, '                       Pet Spellcast Started:  Curing/Buffing')
 			end
 		elseif category == 4 then
-            local player = windower.ffxi.get_player()
-			if (player.status:lower() == 'engaged') then
+            local status = windower.ffxi.get_player().status
+			if (status == 1) then
 				windower.send_command('sc set ' .. TP_Set)
 				windower.add_to_chat(17, '                       Pet Spellcast Finished')
-			elseif (player.status:lower() == 'idle') then
+			elseif (status == 0) then
 				windower.send_command('sc set ' .. Idle_Set)
 				windower.add_to_chat(17, '                       Pet Spellcast Finished')
 			end
