@@ -28,53 +28,21 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-require 'sets'
-
+require('sets')
 
 _addon.name    = 'enternity'
 _addon.author  = 'Zohno'
-_addon.version = '1.20131102'
+_addon.version = '1.1.0.0'
 
 blist = S{
-    -- Paintbrush of souls dialogue
-    17428966,
-
-    -- Geomantic Reservoirs (for Geo spells)
-    17191568,
-    17195708,
-    17195711,
-    17207951,
-    17220195,
-    17228405,
-    17232298,
-    17232301,
-    17236352,
-    17257105,
-    17269286,
-    17293798,
-    17297495,
-    17379863,
-    17388046,
-    17396261,
-    17424561,
-    17461578,
-    17531229,
-    17576434,
-    17580414,
-    17584499,
-    17596857,
-    17613247,
-    17842739,
-    17846832,
-    17850967,
-    17863497,
-    17863500,
+    'Paintbrush of Souls',  -- Requires correct timing, should not be skipped
+    'Geomantic Reservoir',  -- Causes dialogue freeze for some reason
 }
 
 windower.register_event('incoming text', function(original, modified, mode)
     if (mode == 150 or mode == 151) and not original:match(string.char(0x1e, 0x02)) then
         local target = windower.ffxi.get_mob_by_target('t')
-        if not (target and blist:contains(target.id)) then
+        if not (target and blist:contains(target.name)) then
             modified = modified:gsub(string.char(0x7F, 0x31), '')
         end
     end
