@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
 _addon.name = 'autocontrol'
-_addon.version = '1.0'
+_addon.version = '1.01'
 _addon.author = 'Nitrous (Shiva)'
 _addon.commands = {'autocontrol','acon'}
 
@@ -72,7 +72,7 @@ function initialize()
     end
 
     mjob_id = player.main_job_id
-    atts = res.items:category('General')
+    atts = res.items:category('Automaton')
     decay = 1
     for key,_ in pairs(heat) do
         heat[key] = 0

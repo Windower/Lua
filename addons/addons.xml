@@ -377,6 +377,13 @@
     <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
   </addon>
   <addon>
+    <name>Treasury</name>
+    <author>Arcon</author>
+    <description>Lots or passes items based on configurable lists, drops unwanted items from the inventory and automatically stacks items when they drop.</description>
+    <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
+  </addon>
+  <addon>
     <name>thtracker</name>
     <author>Krizz</author>
     <description>Displays latest TH level from chat.</description>

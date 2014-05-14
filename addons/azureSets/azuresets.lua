@@ -90,7 +90,7 @@ function set_spells_from_spellset(spellset,slot)
     if tempname ~= nil then
         for spell in spells:it() do
                 if spell['english']:lower() == tempname:lower() then
-                    windower.ffxi.set_blue_magic_spell(spell['index'], tonumber(slot))
+                    windower.ffxi.set_blue_magic_spell(spell['id'], tonumber(slot))
                     break
                 end
         end
@@ -119,8 +119,8 @@ function set_single_spell(setspell,slot)
         for spell in spells:it() do
             if spell['english']:lower() == setspell then
                 --This is where single spell setting code goes.
-                --Need to set by spell index rather than name.
-                windower.ffxi.set_blue_magic_spell(spell['index'], tonumber(slot))
+                --Need to set by spell id rather than name.
+                windower.ffxi.set_blue_magic_spell(spell['id'], tonumber(slot))
                 windower.send_command('@timers c "Blue Magic Cooldown" 60 up')
                 tmpTable['slot'..slot] = setspell
             end
@@ -139,7 +139,7 @@ function get_current_spellset()
             local t = ''
             if tonumber(tmpTable[i]) ~= 512 then
                 for spell in spells:it() do
-                    if tonumber(tmpTable[i]) == tonumber(spell['index']) then
+                    if tonumber(tmpTable[i]) == tonumber(spell['id']) then
                         if i < 10 then t = '0' end
                         spellTable['slot'..t..i] = spell['english']:lower()
                         break

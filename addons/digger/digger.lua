@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -- addon information
 
 _addon.name = 'digger'
-_addon.version = '1.3.5'
+_addon.version = '1.3.6'
 _addon.command = 'digger'
 _addon.author = 'Seth VanHeulen (Acacia@Odin)'
 
@@ -124,21 +124,23 @@ function check_zone_change(new_zone_id, old_zone_id)
 end
 
 function check_incoming_chunk(id, original, modified, injected, blocked)
-    if id == 0x2A and windower.ffxi.get_player().id == original:unpack('I', 5) then
-        local message_id = original:unpack('H', 27) % 0x8000
-        if success_message:contains(message_id) and get_chocobo_buff() then
-            update_stats(-1)
-            display_stats()
-        elseif ease_message:contains(message_id) then
-            update_stats(1)
-        end
-    elseif id == 0x2F and settings.delay.dig > 0 and windower.ffxi.get_player().id == original:unpack('I', 5) then
-        windower.send_command('timers c "Chocobo Dig Delay" %d down':format(settings.delay.dig))
-    elseif id == 0x36 and windower.ffxi.get_player().id == original:unpack('I', 5) then
-        local message_id = original:unpack('H', 11) % 0x8000
-        if fail_message:contains(message_id) then
-            update_stats(0)
-            display_stats()
+    if chocobo_zone:contains(windower.ffxi.get_info().zone) then
+        if id == 0x2A and windower.ffxi.get_player().id == original:unpack('I', 5) then
+            local message_id = original:unpack('H', 27) % 0x8000
+            if success_message:contains(message_id) and get_chocobo_buff() then
+                update_stats(-1)
+                display_stats()
+            elseif ease_message:contains(message_id) then
+                update_stats(1)
+            end
+        elseif id == 0x2F and settings.delay.dig > 0 and windower.ffxi.get_player().id == original:unpack('I', 5) then
+            windower.send_command('timers c "Chocobo Dig Delay" %d down':format(settings.delay.dig))
+        elseif id == 0x36 and windower.ffxi.get_player().id == original:unpack('I', 5) then
+            local message_id = original:unpack('H', 11) % 0x8000
+            if fail_message:contains(message_id) then
+                update_stats(0)
+                display_stats()
+            end
         end
     end
 end

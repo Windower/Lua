@@ -71,7 +71,7 @@ resource_mt.__index = function(t, k)
 end
 resource_mt.__class = 'Resource'
 
-local resources_path = windower.addon_path .. '../libs/res/'
+local resources_path = windower.windower_path .. 'res/'
 
 local flag_cache = {}
 local parse_flags = function(bits, lookup, values)
@@ -118,8 +118,9 @@ for res_name in res_names:it() do
     end
 end
 
-local lookup
+local lookup = {}
 local flag_keys = S{
+    'flags',
     'targets',
 }
 local fn_cache = {}
@@ -132,7 +133,7 @@ post_process = function(t)
                     return parse_flags(flags, rawget(lookup, key), true)
                 end)
             else
-                rawset(fn_cache, key, function(flags, id)
+                rawset(fn_cache, key, function(flags)
                     return parse_flags(flags, rawget(lookup, key), false)
                 end)
             end
@@ -161,7 +162,37 @@ lookup = {
     slots = resources.slots,
     races = resources.races,
     skills = resources.skills,
-    targets = {[0x01] = 'Self', [0x02] = 'Player', [0x04] = 'Party', [0x08] = 'Alliance', [0x10] = 'NPC', [0x20] = 'Enemy', [0x60] = 'Object', [0x9D] = 'Corpse'},
+    targets = {
+        [0x01] = 'Self',
+        [0x02] = 'Player',
+        [0x04] = 'Party',
+        [0x08] = 'Ally',
+        [0x10] = 'NPC',
+        [0x20] = 'Enemy',
+
+        [0x60] = 'Object',
+        [0x9D] = 'Corpse',
+    },
+    flags = {
+        [0x0001] = 'Flag00',
+        [0x0002] = 'Flag01',
+        [0x0004] = 'Flag02',
+        [0x0008] = 'Flag03',
+        [0x0010] = 'Flag04',
+        [0x0020] = 'Inscribable',
+        [0x0040] = 'No Auction',
+        [0x0080] = 'Scroll',
+        [0x0100] = 'Linkshell',
+        [0x0200] = 'Usable',
+        [0x0400] = 'NPC Tradeable',
+        [0x0800] = 'Equippable',
+        [0x1000] = 'No NPC Sale',
+        [0x2000] = 'No Delivery',
+        [0x4000] = 'No PC Trade',
+        [0x8000] = 'Rare',
+
+        [0x6040] = 'Exclusive',
+    },
 }
 
 return resources

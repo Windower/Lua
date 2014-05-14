@@ -53,8 +53,7 @@ function config.load(filename, confdict)
     meta.original = T{global = T{}}
     meta.chars = S{}
     meta.comments = T{}
-    meta.refresh_obj = T{}
-    meta.refresh_fn = L{}
+    meta.refresh = T{}
 
     settings_map[settings] = meta
 
@@ -82,11 +81,8 @@ function config.reload(settings)
 
     parse(settings)
 
-    for fn, obj in settings_map[settings].refresh_obj:it() do
-        fn(obj, settings)
-    end
-    for fn in settings_map[settings].refresh_fn:it() do
-        fn(settings)
+    for t in settings_map[settings].refresh:it() do
+        t.fn(settings, unpack(t.args))
     end
 end
 
@@ -96,7 +92,6 @@ function parse(settings)
     local err
     meta = settings_map[settings]
 
-    if not meta then print(debug.traceback()) end
     if meta.file.path:endswith('.json') then
         parsed = _libs.json.read(meta.file)
 
@@ -114,6 +109,7 @@ function parse(settings)
 
         parsed = settings_table(parsed, settings)
     end
+
     -- Determine all characters found in the settings file.
     meta.chars = parsed:keyset() - S{'global'}
     meta.original = T{}
@@ -124,9 +120,9 @@ function parse(settings)
         end
 
         local full_parsed = parsed.global
-
-        if windower.ffxi.get_info().logged_in then
-            full_parsed = full_parsed:update(parsed[windower.ffxi.get_player().name:lower()], true)
+        local player = windower.ffxi.get_player()
+        if player then
+            full_parsed = full_parsed:update(parsed[player.name:lower()], true)
         end
 
         return settings:update(full_parsed, true)
@@ -153,19 +149,14 @@ end
 function merge(t, t_merge, path)
     path = type(path) == 'string' and T{path} or path
 
-    local oldval
-    local oldtype
-    local err
-
     local keys = {}
     for key in pairs(t) do
         keys[key:lower()] = key
     end
 
-    local key
     for lkey, val in pairs(t_merge) do
-        key = keys[lkey:lower()]
-        if key == nil then
+        local key = keys[lkey:lower()]
+        if not key then
             if type(val) == 'table' then
                 t[lkey] = setmetatable(table.copy(val), getmetatable(val) or _meta.T)
             else
@@ -173,17 +164,18 @@ function merge(t, t_merge, path)
             end
 
         else
-            err = false
-            oldval = rawget(t, key)
-            oldtype = type(oldval)
+            local err = false
+            local oldval = rawget(t, key)
+            local oldtype = type(oldval)
             if oldtype == 'table' and type(val) == 'table' then
                 local res = merge(oldval, val, path and path:copy()+key or nil)
-                if class(oldval) == 'table' or class(oldval) == 'Table' then
+                local oldclass = class(oldval)
+                if oldclass == 'table' or oldclass == 'Table' then
                     t[key] = setmetatable(table.copy(res), _meta.T)
-                elseif class(oldval) == 'List' then
+                elseif oldclass == 'List' then
                     t[key] = L(table.copy(res))
-                elseif class(oldval) == 'Set' then
-                    t[key] = S(table.copy(res))
+                elseif oldclass == 'Set' then
+                    t[key] = S(res)
                 else
                     notice('This is not supposed to happen. A new data structure has not yet been added to config.lua')
                     t[key] = setmetatable(res, _meta.T)
@@ -450,19 +442,18 @@ function nest_xml(t, meta, indentlevel)
     return fragments:concat()
 end
 
-function config.register(settings, fn, obj)
-    if obj then
-        settings_map[settings].refresh_obj[obj] = fn
-    else
-        settings_map[settings].refresh_fn:append(fn)
-    end
+function config.register(settings, fn, ...)
+    local args = {...}
+    local key = tostring(args):sub(8)
+    settings_map[settings].refresh[key] = {fn=fn, args=args}
+    return key
 end
 
 function config.unregister(settings, key)
     settings_map[settings].refresh[key] = nil
 end
 
-windower.register_event('logout', 'login', function()
+windower.register_event('load', 'logout', 'login', function()
     for _, settings in settings_map:it() do
         config.reload(settings)
     end
@@ -471,7 +462,7 @@ end)
 return config
 
 --[[
-Copyright (c) 2013, Windower
+Copyright (c) 2013-2014, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

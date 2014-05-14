@@ -1,0 +1,35 @@
+Updating Message IDs: A guide
+
+    Pointwatch relies on zone-based message IDs for some of its features.
+These IDs change on a regular basis. Fortunately, their positions relative
+to one another rarely change, which means that most of the time you only
+have to change one number and the entire zone will work again.
+
+I have written this guide to explain how to change those numbers in the
+hopes that members of the community will maintain pointwatch's message-
+dependent features.
+
+Method 1 - POLUtils
+1) Download POLUtils (if you don't already have it) from the google code site
+2) Install it and run it
+3) Click "FFXI Data Browser"
+4) Go to the "Dialog Tables" menu and select the zone you are interested in
+5) Wait for it to load, then export the entire table as xml
+6) Open the xml file up in a text editor, like Notepad or Notepad++.
+7) Control-F for the key phrase.
+8) The associated message ID is the offset value for that zone.
+
+Method 2 - message_printing
+1) Load Pointwatch (//lua l pointwatch)
+2) Enable message printing (//pw message_printing)
+3) Generate the key message (for instance, by resting in Abyssea)
+4) This will print message IDs to your windower console. They appear in the
+    order they were generated. Select the one that you want (for instance,
+    the second one when you rest in Abyssea).
+5) That value is your offset.
+6) Disable message printing (//pw message_printing)
+
+Both methods:
+* Open message_ids.lua
+* Find the zone and replace the zone.offset value with the correct value.
+* Submit your file to Github, so that everyone can have a working copy!
