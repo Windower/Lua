@@ -21,7 +21,7 @@ settings = config.load(defaults)
 distance = texts.new(settings)
 
 windower.register_event('prerender', function()
-	local t = windower.ffxi.get_mob_by_target('st') or windower.ffxi.get_mob_by_target('t')
+    local t = windower.ffxi.get_mob_by_target('st') or windower.ffxi.get_mob_by_target('t')
     distance:text(t and '%.1f':format(t.distance:sqrt()) or '')
     distance:visible(t ~= nil)
 end)
@@ -33,7 +33,7 @@ windower.register_event('addon command', function(command)
 end)
 
 --[[
-Copyright (c) 2013, Windower
+Copyright © 2013-2014, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
