@@ -298,13 +298,17 @@ fields.outgoing[0x016] = L{
 }
 
 enums['action'] = {
+    [0x00] = 'NPC Interaction',
     [0x02] = 'Engage monster',
     [0x03] = 'Magic cast',
+    [0x04] = 'Disengage',
+    [0x05] = 'Call for Help',
     [0x07] = 'Weaponskill usage',
     [0x09] = 'Job ability usage',
     [0x0D] = 'Reraise dialogue',
     [0x0F] = 'Switch target',
     [0x10] = 'Ranged attack',
+    [0x14] = 'Zoning/Appear', -- I think, the resource for this is ambiguous.
     [0x19] = 'Monsterskill',
 }
 
@@ -405,8 +409,8 @@ fields.outgoing[0x04B] = L{
 -- Delivery Box
 fields.outgoing[0x04D] = L{
     {ctype='unsigned char',     label='Manipulation Type'},                     -- 04
-	-- 
-	
+	--
+
 	-- Removing an item from the d-box sends type 0x08
 	-- It then responds to the server's 0x4B (id=0x08) with a 0x0A type packet.
 	-- Their assignment is the same, as far as I can see.
@@ -575,7 +579,7 @@ fields.outgoing[0x0BE] = L{
 -- Job Point Increase
 -- This chunk was sent on three consecutive outgoing packets the only time I've used it
 fields.outgoing[0x0BF] = L{
-    {ctype='unsigned short',    label='Job Point'},                             -- 04   
+    {ctype='unsigned short',    label='Job Point'},                             -- 04
     {ctype='unsigned short',    label='_junk1',             const=0x0000},      -- 06   No values seen so far
 }
 
@@ -646,7 +650,7 @@ fields.outgoing[0x100] = L{
 
 -- Untraditional Equip
 -- Currently only commented for changing instincts in Monstrosity. Refer to the doku wiki for information on Autos/BLUs.
--- http://dev.windower.net/doku.php?id=packets:outgoing:0x102_blue_magic_pup_attachment_equip
+-- https://gist.github.com/nitrous24/baf9980df69b3dc7d3cf
 fields.outgoing[0x102] = L{
     {ctype='unsigned short',    label='_unknown1'},                             -- 04  -- 00 00 for Monsters
     {ctype='unsigned short',    label='_unknown1'},                             -- 06  -- Varies by Monster family for the species change packet. Monsters that share the same tnl seem to have the same value. 00 00 for instinct changing.
@@ -739,7 +743,7 @@ fields.outgoing[0x110] = L{
 -- Lockstyle
 fields.outgoing[0x111] = L{
     {ctype='bool',              label='Lock'},                                  -- 04   0 = unlock, 1 = lock
-    {ctype='char[3]',           label='_junk1'},                                -- 05   
+    {ctype='char[3]',           label='_junk1'},                                -- 05
 }
 
 -- Zone update
@@ -827,7 +831,7 @@ fields.incoming[0x00B] = L{
 
 -- PC Update
 fields.incoming[0x00D] = L{
-	-- The flags in this byte are complicated and may not strictly be flags. 
+	-- The flags in this byte are complicated and may not strictly be flags.
 	-- Byte 32: -- Mentor is somewhere in this byte
 	-- 01 = None
 	-- 02 = Deletes everyone
@@ -837,8 +841,8 @@ fields.incoming[0x00D] = L{
 	-- 32 = None
 	-- 64 = None
 	-- 128 = None
-	
-	
+
+
 	-- Byte 33:
 	-- 01 = None
 	-- 02 = None
@@ -848,7 +852,7 @@ fields.incoming[0x00D] = L{
 	-- 32 = Turns your name orange
 	-- 64 = Away
 	-- 128 = None
-	
+
 	-- Byte 34:
 	-- 01 = POL Icon, can target?
 	-- 02 = no notable effect
@@ -858,7 +862,7 @@ fields.incoming[0x00D] = L{
 	-- 32 = No Linkshell again
 	-- 64 = No linkshell again
 	-- 128 = No linkshell again
-	
+
 	-- Byte 35:
 	-- 01 = Trial Account
 	-- 02 = Trial Account
@@ -868,6 +872,16 @@ fields.incoming[0x00D] = L{
 	-- 32 = Invisible models
 	-- 64 = None
 	-- 128 = Bazaar
+
+    ---- Mask bits, from antiquity:
+    -- 0x01: "Basic"
+    -- 0x02: "Bit 1"
+    -- 0x04: Status
+    -- 0x08: Name
+    -- 0x10: Gear
+    -- 0x20: Bit 5
+    -- 0x40: Bit 6
+    -- 0x80: Bit 7
     {ctype='unsigned int',      label='Player',             fn=id},             -- 04
     {ctype='unsigned short',    label='Index',              fn=index},          -- 08
     {ctype='unsigned char',     label='Mask',               fn=bin+{1}},        -- 0A
@@ -913,6 +927,21 @@ fields.incoming[0x00D] = L{
 -- The common fields seem to be the ID, Index, mask and _unknown3.
 -- The second one seems to have an int counter at 0x38 that increases by varying amounts every time byte 0x1F changes.
 -- Currently I don't know how to algorithmically distinguish when the packets are different.
+
+-- Mask values (from antiquity):
+-- 0x01: "Basic"
+-- 0x02: Status
+-- 0x04: HP
+-- 0x08: Name
+-- 0x10: "Bit 4"
+-- 0x20: "Bit 5"
+-- 0x40: "Bit 6"
+-- 0x80: "Bit 7"
+
+
+-- Status flags (from antiquity):
+-- 0b00100000 = CFH Bit
+-- 0b10000101 = "Normal_Status?"
 fields.incoming[0x00E] = L{
     {ctype='unsigned int',      label='NPC',                fn=id},             -- 04
     {ctype='unsigned short',    label='Index',              fn=index},          -- 08
@@ -921,10 +950,10 @@ fields.incoming[0x00E] = L{
                                                                                 -- 0A   Bit 1: Claimer ID
                                                                                 -- 0A   Bit 2: HP, Status
                                                                                 -- 0A   Bit 3: Name
-                                                                                -- 0A   Bit 4: 
+                                                                                -- 0A   Bit 4:
                                                                                 -- 0A   Bit 5: The client stops displaying the mob when this bit is set (dead, out of range, etc.)
-                                                                                -- 0A   Bit 6: 
-                                                                                -- 0A   Bit 7: 
+                                                                                -- 0A   Bit 6:
+                                                                                -- 0A   Bit 7:
     {ctype='unsigned char',     label='Rotation',           fn=dir},            -- 0B
     {ctype='float',             label='X Position'},                            -- 0C
     {ctype='float',             label='Z Position'},                            -- 10
@@ -932,7 +961,7 @@ fields.incoming[0x00E] = L{
     {ctype='unsigned int',      label='Walk Count'},                            -- 18   Steadily increases until rotation changes. Does not reset while the mob isn't walking. Only goes until 0xFF1F.
     {ctype='unsigned short',    label='_unknown1',          fn=bin+{2}},        -- 1A
     {ctype='unsigned char',     label='HP %',               fn=percent},        -- 1E
-    {ctype='unsigned char',     label='Status',             fn=status},         -- 1F
+    {ctype='unsigned char',     label='Status',             fn=status},         -- 1F   Status used to be 0x20
     {ctype='unsigned int',      label='_unknown2',          fn=bin+{4}},        -- 20
     {ctype='unsigned int',      label='_unknown3',          fn=bin+{4}},        -- 24
     {ctype='unsigned int',      label='_unknown4',          fn=bin+{4}},        -- 28
@@ -1244,9 +1273,9 @@ enums.indi = {
 fields.incoming[0x037] = L{
     {ctype='unsigned char[32]', label='Buff',               fn=buff},           -- 04
     {ctype='unsigned int',      label='Player',             fn=id},             -- 24
-    {ctype='unsigned short',    label='_unknown1'},                             -- 28
+    {ctype='unsigned short',    label='_unknown1'},                             -- 28   Called "Flags" on the old dev wiki
     {ctype='unsigned char',     label='HP %',               fn=percent},        -- 29
-    {ctype='unsigned char',     label='_unknown2'},                             -- 2A
+    {ctype='unsigned char',     label='_unknown2'},                             -- 2A   May somehow be tied to current animation (old dev wiki)
     {ctype='unsigned char',     label='_unknown3'},                             -- 2B
     {ctype='unsigned char',     label='_unknown4'},                             -- 2C
     {ctype='unsigned char',     label='_unknown5'},                             -- 2D
@@ -1255,7 +1284,7 @@ fields.incoming[0x037] = L{
     {ctype='unsigned char',     label='LS Color Red'},                          -- 31
     {ctype='unsigned char',     label='LS Color Green'},                        -- 32
     {ctype='unsigned char',     label='LS Color Blue'},                         -- 33
-    {ctype='char[8]',           label='_unknown7'},                             -- 34
+    {ctype='char[8]',           label='_unknown7'},                             -- 34   Player's pet index * 8?
     {ctype='unsigned int',      label='_unknown8'},                             -- 3C
     {ctype='unsigned int',      label='Timestamp',          fn=time},           -- 40
     {ctype='char[8]',           label='_unknown9'},                             -- 44
@@ -1493,7 +1522,7 @@ fields.incoming[0x4D] = L{
 fields.incoming[0x04F] = L{
 --   This packet's contents are nonessential. They are often leftovers from other outgoing
 --   packets. It is common to see things like inventory size, equipment information, and
---   character ID in this packet. They do not appear to be meaningful and the client functions 
+--   character ID in this packet. They do not appear to be meaningful and the client functions
 --   normally even if they are blocked.
 --   Tends to bookend model change packets (0x51), though blocking it, zeroing it, etc. affects nothing.
     {ctype='unsigned int',      label='_unknown1'},                             -- 04
@@ -1670,7 +1699,7 @@ end
 
 fields.incoming._mult[0x063][0x02] = L{
 	{ctype='unsigned short',    label='Order'},                                 -- 04
-	{ctype='unsigned int',      label='_flags1'},                               -- 06   
+	{ctype='unsigned int',      label='_flags1'},                               -- 06
 	{ctype='unsigned int',      label='_flags2'},                               -- 08   The 3rd bit of the last byte is the flag that indicates whether or not you are xp capped (blue levels)
 }
 
@@ -1695,8 +1724,8 @@ fields.incoming._mult[0x063][0x04] = L{
 	{ctype='unsigned short',    label='Order'},                                 -- 04
 	{ctype='unsigned short',    label='_unknown1'},                             -- 06   B0 00
 	{ctype='char[126]',         label='_unknown2'},                             -- 08   FF-ing has no effect.
-	{ctype='unsigned char',     label='Slime Level'},                           -- 86   
-	{ctype='unsigned char',     label='Spriggan Level'},                        -- 87   
+	{ctype='unsigned char',     label='Slime Level'},                           -- 86
+	{ctype='unsigned char',     label='Spriggan Level'},                        -- 87
 	{ctype='char[12]',          label='Instinct Bitfield 3'},                   -- 88   Contains job/race instincts from the 0x03 set. Has 8 unused bytes. This is a 1:1 mapping.
 	{ctype='char[32]',          label='Variants Bitfield'},                     -- 94   Does not show normal monsters, only variants. Bit is 1 if the variant is owned. Length is an estimation including the possible padding.
 }
