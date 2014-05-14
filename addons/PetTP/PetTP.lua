@@ -1,5 +1,6 @@
 config = require ('config')
 texts  = require('texts')
+require('pack')
 
 _addon.name     = 'PetTP'
 _addon.author   = 'SnickySnacks'
@@ -104,8 +105,7 @@ function valid_pet(source,pet_idx_in, own_idx_in)
     
     local pet = windower.ffxi.get_mob_by_target('pet')    
     if pet_idx_in and pet and pet_idx_in ~= pet.index then
-        if superverbose == true then windower.add_to_chat(8, 'valid_pet() : false : pet.index ~= pet_idx_in '..pet.index..' vs. '..pet_idx_in) 
-        end
+        if superverbose == true then windower.add_to_chat(8, 'valid_pet() : false : pet.index ~= pet_idx_in '..pet.index..' vs. '..pet_idx_in) end
         return
     elseif pet_idx_in and player.mob and player.mob.pet_index and pet_idx_in ~= player.mob.pet_index then
         if superverbose == true then windower.add_to_chat(8, 'valid_pet() : false : player.mob.pet_index ~= pet_idx_in '..player.mob.pet_index..' vs. '..pet_idx_in) end
@@ -231,12 +231,10 @@ end)
 
 windower.register_event('incoming chunk',function(id,original,modified,injected,blocked)
     if not injected then
+        local check = original:unpack('C', 0x05)
         if id == 0x44 then
-            if original:byte(0x05) == 0x12 then    -- puppet update
-                local new_current_hp = original:byte(0x69)+(original:byte(0x6A)*256)
-                local new_max_hp     = original:byte(0x6B)+(original:byte(0x6C)*256)
-                local new_current_mp = original:byte(0x6D)+(original:byte(0x6E)*256)
-                local new_max_mp     = original:byte(0x6F)+(original:byte(0x70)*256)
+            if check == 0x12 then    -- puppet update
+                local new_current_hp, new_max_hp, new_current_mp, new_max_mp = original:unpack('HHHH', 0x069)
 
                 if (not petactive) or (petname == nil) or (new_current_hp ~= current_hp) or (new_max_hp ~= max_hp) or (new_current_mp ~= current_mp) or (new_max_mp ~= max_mp) then
                     if superverbose == true then                
@@ -245,12 +243,12 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
                             ..', max_hp: '..new_max_hp
                             ..', cur_mp: '..new_current_mp
                             ..', max_mp: '..new_max_mp
-                            ..', name: '..original:sub(0x59,original:find(string.char(0),0x59)-1)
+                            ..', name: '.. original:unpack('z', 0x59)
                         )
                     end
 
                     if petactive then
-                        local new_petname    = original:sub(0x59,original:find(string.char(0),0x59)-1)
+                        local new_petname = original:unpack('z', 0x59)
                         if petname == nil then
                             if superverbose == true then windower.add_to_chat(8, 'Updating PuppetName: '..new_petname) end
                             petname = new_petname
@@ -280,22 +278,19 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
                 end
             end
         elseif id == 0x67 then    -- general hp/tp/mp update
-            if S{0x04,0x44,0xC4,0x84}:contains(original:byte(0x05)) then
-                own_idx = (original:byte(0x07)+original:byte(0x08)*256)
-                pet_idx = (original:byte(0x0D)+original:byte(0x0E)*256)
-            else
-                pet_idx = (original:byte(0x07)+original:byte(0x08)*256)
-                own_idx = (original:byte(0x0D)+original:byte(0x0E)*256)
+            pet_idx, own_idx = original:unpack('HIH', 0x07)
+            if S{0x04,0x44,0xC4,0x84}:contains(check) then
+                pet_idx, own_idx = own_idx, pet_idx
             end
 
             if superverbose == true and not ( 
-                   (original:byte(0x05) == 0x02 and original:byte(0x06) == 0x09) -- not pet related
-                --or (original:byte(0x05) == 0x84 and original:byte(0x06) == 0x07) -- pet % update
-                or (original:byte(0x05) == 0x03 and original:byte(0x06) == 0x05 and (own_idx == 0)) -- NPC pops
-                or (original:byte(0x05) == 0x03 and original:byte(0x06) == 0x05 and (own_idx ~= windower.ffxi.get_player().index)) -- other people summoning
+                   (check == 0x02 and original:byte(0x06) == 0x09) -- not pet related
+                --or (check == 0x84 and original:byte(0x06) == 0x07) -- pet % update
+                or (check == 0x03 and original:byte(0x06) == 0x05 and (own_idx == 0)) -- NPC pops
+                or (check == 0x03 and original:byte(0x06) == 0x05 and (own_idx ~= windower.ffxi.get_player().index)) -- other people summoning
             ) then
                 windower.add_to_chat(8, '0x67'
-                       ..', mask_1: '..string.format('0x%02x',original:byte(0x05))
+                       ..', mask_1: '..string.format('0x%02x',check)
                        ..', mask_2: '..original:byte(0x06)
                        ..', pet_idx: '..pet_idx
                        ..', pet_id: '..(original:byte(0x09)+original:byte(0x0A)*256)
@@ -303,13 +298,13 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
                        ..', hp%: '..original:byte(0x0F)
                        ..', mp%: '..original:byte(0x10)
                        ..', tp%: '..(original:byte(0x11)+original:byte(0x12)*256)/10
-                       ..', name: '..original:sub(0x15,original:find(string.char(0),0x15)-1)
+                       ..', name: '.. original:unpack('z', 0x15)
                     )
             end
-            if (original:byte(0x05) == 0x04) and (original:byte(0x06) == 0x05) then
+            if (check == 0x04) and (original:byte(0x06) == 0x05) then
                 if verbose == true then windower.add_to_chat(8, 'Pet died/despawned') end
                 make_invisible()
-            elseif S{0x04,0x44,0xC4,0x84}:contains(original:byte(0x05)) then
+            elseif S{0x04,0x44,0xC4,0x84}:contains(check) then
                 local newpet = false
                 if not petactive then
                     petactive = true  -- force our pet to appear even if it's not attached to us yet
@@ -321,9 +316,8 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
                         make_invisible()
                     end
                 end
-                local new_hp_percent = original:byte(0x0F)
-                local new_mp_percent = original:byte(0x10)
-                local new_tp_percent = (original:byte(0x11)+(original:byte(0x12)*256))/10
+                local new_hp_percent, new_mp_percent, new_tp_percent = original:unpack('CCH', 0x0F)
+                new_tp_percent = new_tp_percent/10
                 if newpet or (new_hp_percent ~= current_hp_percent) or (new_mp_percent ~= current_mp_percent) or (new_tp_percent ~= current_tp_percent) or petname == nil then
                     if (max_hp ~= 0) and (new_hp_percent ~= current_hp_percent) then
                         current_hp = math.floor(new_hp_percent * max_hp / 100)
@@ -332,7 +326,7 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
                         current_mp = math.floor(new_mp_percent * max_mp / 100)
                     end
                     if petname == nil then
-                        petname = original:sub(0x15,original:find(string.char(0),0x15)-1)
+                        petname = original:unpack('S16', 0x15)
                         if superverbose == true then windower.add_to_chat(8, 'Updated PetName: '..petname) end
                     end
                     current_hp_percent = new_hp_percent
@@ -340,7 +334,7 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
                     current_tp_percent = new_tp_percent
                     printpettp(pet_idx,own_idx)
                 end
-            elseif not petactive and (original:byte(0x05) == 0x03) and (original:byte(0x06) == 0x05) and (own_idx == windower.ffxi.get_player().index) then
+            elseif not petactive and (check == 0x03) and (original:byte(0x06) == 0x05) and (own_idx == windower.ffxi.get_player().index) then
                 if update_pet('0x67-0x03',pet_idx,own_idx) == true then
                     make_visible()
                     printpettp(pet_idx,own_idx_in)
@@ -350,7 +344,7 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
                 end
             end
         elseif id==0x0E and S{0x07,0x0F}:contains(original:byte(0x0B)) then    -- npc update
-            if mypet_idx == (original:byte(0x09)+original:byte(0x0A)*256) then
+            if mypet_idx == original:unpack('H', 0x09) then
                 if current_hp_percent ~= original:byte(0x1F) then
                     if superverbose == true then windower.add_to_chat(8, '0x0E - '..original:byte(0x0B)..': '..original:byte(0x1F)) end
                     current_hp_percent = original:byte(0x1F)
@@ -381,7 +375,7 @@ windower.register_event('load', function()
     end
 end)
 
-windower.register_event('Zone change', function()
+windower.register_event('zone change', function()
     mypet_idx = nil
     if update_pet('zone') == true then
         if verbose == true then windower.add_to_chat(8, 'Found pet after zoning...') end
@@ -397,7 +391,7 @@ windower.register_event('job change', function()
     make_invisible()
 end)
 
-windower.register_event('addon command',function (...)
+windower.register_event('addon command', function(...)
     local splitarr = {...}
 
     for i,v in pairs(splitarr) do

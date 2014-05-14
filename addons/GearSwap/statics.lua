@@ -210,6 +210,14 @@ _settings.debug_mode = false
 _settings.demo_mode = false
 _settings.show_swaps = false
 
+_ExtraData = {
+        player = {},
+        spell = {},
+        alliance = {},
+        pet = {},
+        fellow = {},
+        world = {},
+    }
 
 last_PC_update = ''
 gearswap_disabled = false
@@ -236,7 +244,6 @@ disable_table[0] = false
 encumbrance_table = table.reassign({},disable_table)
 registered_user_events = {}
 empty = {name="empty"}
-species_id = 0
 outgoing_packet_table = {}
 tool_map = {
         ['Katon: Ichi'] = 'Uchitake',

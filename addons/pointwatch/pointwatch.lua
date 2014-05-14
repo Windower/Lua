@@ -1,129 +1,79 @@
--- Point Watch
+--Copyright (c) 2014, Byrthnoth
+--All rights reserved.
+
+--Redistribution and use in source and binary forms, with or without
+--modification, are permitted provided that the following conditions are met:
+
+--    * Redistributions of source code must retain the above copyright
+--      notice, this list of conditions and the following disclaimer.
+--    * Redistributions in binary form must reproduce the above copyright
+--      notice, this list of conditions and the following disclaimer in the
+--      documentation and/or other materials provided with the distribution.
+--    * Neither the name of <addon name> nor the
+--      names of its contributors may be used to endorse or promote products
+--      derived from this software without specific prior written permission.
+
+--THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+--ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+--WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+--DISCLAIMED. IN NO EVENT SHALL <your name> BE LIABLE FOR ANY
+--DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+--(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+--LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+--ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+--(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+--SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 texts = require 'texts'
 config = require 'config'
 require 'sets'
 res = require 'resources'
+require 'statics'
+messages = require 'message_ids'
 
 _addon.name = 'PointWatch'
 _addon.author = 'Byrth'
-_addon.version = 0.042314
+_addon.version = 0.050214
 _addon.command = 'pw'
 
 if not windower.dir_exists('data') then
     windower.create_dir('data')
 end
 
-default_settings = {
-    strings = {
-        default = "xp.current..'/'..xp.tnl..'XP   '..lp.current..'/'..lp.tnm..'LP ['..lp.number_of_merits..']   XP/hr:'..string.format('%.1f',math.floor(xp.rate/100)/10)..'k   '..cp.current..'/'..cp.tnjp..'CP ['..cp.number_of_job_points..']   CP/hr:'..string.format('%.1f',math.floor(cp.rate/100)/10)..'k'",
-        dynamis = "xp.current..'/'..xp.tnl..'XP   '..lp.current..'/'..lp.tnm..'LP ['..lp.number_of_merits..']   XP/hr:'..string.format('%.1f',math.floor(xp.rate/100)/10)..'k   '..cp.current..'/'..cp.tnjp..'CP ['..cp.number_of_job_points..']   '..dynamis.KIs..'  '..dynamis.time_remaining"
-        },
-    text_box_settings = {
-        pos = {
-            x = 0,
-            y = 0,
-        },
-        bg = {
-            alpha = 255,
-            red = 0,
-            green = 0,
-            blue = 0,
-            visible = true
-        },
-        flags = {
-            right = false,
-            bottom = false,
-            bold = false,
-            italic = false
-        },
-        padding = 0,
-        text = {
-            size = 12,
-            font = 'Consolas',
-            fonts = {},
-            alpha = 255,
-            red = 255,
-            green = 255,
-            blue = 255
-        }
-    }
-}
-
-
 settings = config.load('data\\settings.xml',default_settings)
 config.save(settings)
 
-box = texts.new('${current_string}',settings.text_box_settings)
+box = texts.new('${current_string}',settings.text_box_settings,settings)
 box.current_string = ''
 box:show()
-approved_commands = S{'show','hide','pos','pos_x','pos_y','font','size','pad','color','alpha','transparency','bg_color','bg_alpha','bg_transparency'}
-city_table = {Crimson=10,Azure=10,Amber=10,Alabaster=15,Obsidian=15}
-other_table = {Crimson=10,Azure=10,Amber=10,Alabaster=10,Obsidian=20}
-dynamis_map = {[185]=city_table,[186]=city_table,[187]=city_table,[188]=city_table,
-    [134]=other_table,[135]=other_table,[39]=other_table,[40]=other_table,[41]=other_table,[42]=other_table}
-
-function initialize()
-    cp = {
-        registry = {},
-        current = 0, -- Not implemented
-        rate = 0,
-        total = 0,
-        tnjp = 30000,
-        number_of_job_points = 0 -- Not implemented
-    }
-
-    
-    xp = {
-        registry = {},
-        total = 0,
-        rate = 0,
-        current = 0,
-        tnl = 0
-    }
-    
-    lp = {
-        current = 0,
-        tnm = 10000,
-        number_of_merits = 0
-    }
-    
-    sparks = {
-        current = 0,
-        maximum = 50000,
-    }
-    
-    
-    local info = windower.ffxi.get_info()
-    
-    frame_count = 0
-    
-    dynamis = {
-        KIs = '',
-        _KIs = {},
-        entry_time = 0,
-        time_limit = 0,
-        zone = 0,
-    }
-    if info.logged_in and res.zones[info.zone].english:sub(1,7) == 'Dynamis' then
-        cur_func = loadstring("current_string = "..settings.strings.dynamis)
-        setfenv(cur_func,_G)
-        dynamis.entry_time = os.clock()
-        dynamis.zone = info.zone
-        error(123,'Loading PointWatch in Dynamis results in an inaccurate timer. Number of KIs is displayed.')
-    elseif info.logged_in then
-        cur_func = loadstring("current_string = "..settings.strings.default)
-        setfenv(cur_func,_G)
-    end
-    
-end
 
 initialize()
 
 
 windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blocked)
     if is_injected then return end
-    if id == 0x2D then
+    if id == 0x2A then -- Resting message
+        local zone = 'z'..windower.ffxi.get_info().zone
+        if settings.options.message_printing then
+            print('Message ID: '..str2bytes(org:sub(0x1B,0x1C))%2^14)
+        end
+        
+        if messages[zone] then
+            local msg = str2bytes(org:sub(0x1B,0x1C))%2^14
+            for i,v in pairs(messages[zone]) do
+                if tonumber(v) and v + messages[zone].offset  == msg then
+                    local param_1 = str2bytes(org:sub(0x9,0xC))
+                    local param_2 = str2bytes(org:sub(0xD,0x10))
+                    local param_3 = str2bytes(org:sub(0x11,0x14))
+                    local param_4 = str2bytes(org:sub(0x15,0x18))
+                    print(param_1,param_2,param_3,param_4) -- DEBUGGING STATEMENT -------------------------
+                    if zone_message_functions[i] then
+                        zone_message_functions[i](param_1,param_2,param_3,param_4)
+                    end
+                end
+            end
+        end
+    elseif id == 0x2D then
         local val = str2bytes(org:sub(0x11,0x14))
         local msg = str2bytes(org:sub(0x19,0x20))%1024
         local t = os.clock()
@@ -209,6 +159,9 @@ windower.register_event('addon command',function(...)
         windower.send_command('lua u pointwatch')
     elseif first_cmd == 'reset' then
         initialize()
+    elseif first_cmd == 'message_printing' then
+        settings.options.message_printing = not settings.options.message_printing
+        print('Pointwatch: Message printing is '..tostring(settings.options.message_printing)..'.')
     elseif first_cmd == 'eval' then
         assert(loadstring(table.concat(commands, ' ')))()
     end
@@ -222,11 +175,14 @@ windower.register_event('prerender',function()
 end)
 
 function update_box()
-    if not windower.ffxi.get_info().logged_in or not windower.ffxi.get_player() then return end
+    if not windower.ffxi.get_info().logged_in or not windower.ffxi.get_player() then
+        box.current_string = ''
+        return
+    end
     cp.rate = analyze_points_table(cp.registry)
     xp.rate = analyze_points_table(xp.registry)
     if dynamis.entry_time ~= 0 and dynamis.entry_time+dynamis.time_limit-os.clock() > 0 then
-        dynamis.time_remaining = os.date('%H:%M:%S',dynamis.entry_time+dynamis.time_limit-os.clock()+18000)
+        dynamis.time_remaining = os.date('!%H:%M:%S',dynamis.entry_time+dynamis.time_limit-os.clock())
         dynamis.KIs = X_or_O(dynamis._KIs.Crimson)..X_or_O(dynamis._KIs.Azure)..X_or_O(dynamis._KIs.Amber)..X_or_O(dynamis._KIs.Alabaster)..X_or_O(dynamis._KIs.Obsidian)
     else
         dynamis.time_remaining = 0
@@ -281,3 +237,47 @@ function str2bytes(str)
     end
     return num
 end
+
+zone_message_functions = {
+    amber_light = function(p1,p2,p3,p4)
+        abyssea.amber = math.min(abyssea.amber + 8,255)
+    end,
+    azure_light = function(p1,p2,p3,p4)
+        abyssea.azure = math.min(abyssea.azure + 8,255)
+    end,
+    ruby_light = function(p1,p2,p3,p4)
+        abyssea.ruby = math.min(abyssea.ruby + 8,255)
+    end,
+    pearlescent_light = function(p1,p2,p3,p4)
+        abyssea.pearlescent = math.min(abyssea.pearlescent + 5,230)
+    end,
+    ebon_light = function(p1,p2,p3,p4)
+        abyssea.ebon = math.min(abyssea.ebon + p1+1,200) -- NM kill = 1, faint = 1, mild = 2, strong = 3
+    end,
+    silvery_light = function(p1,p2,p3,p4)
+        abyssea.silvery = math.min(abyssea.silvery + 5*(p1+1),200) -- faint = 5, mild = 10, strong = 15
+    end,
+    golden_light = function(p1,p2,p3,p4)
+        abyssea.golden = math.min(abyssea.golden + 5*(p1+1),200) -- faint = 5, mild = 10, strong = 15
+    end,
+    pearl_ebon_gold_silvery = function(p1,p2,p3,p4)
+        abyssea.pearlescent = p1
+        abyssea.ebon = p2
+        abyssea.gold = p3
+        abyssea.silvery = p4
+    end,
+    azure_ruby_amber = function(p1,p2,p3,p4)
+        abyssea.azure = p1
+        abyssea.ruby = p2
+        abyssea.amber = p3
+    end,
+    visitant_status_gain = function(p1,p2,p3,p4)
+        abyssea.time_remaining = p1
+    end,
+    visitant_status_wears_off = function(p1,p2,p3,p4)
+        abyssea.time_remaining = p1
+    end,
+    visitant_status_extend = function(p1,p2,p3,p4)
+        abyssea.time_remaining = abyssea.time_remaining + p1
+    end,
+}

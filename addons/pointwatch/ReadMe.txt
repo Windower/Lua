@@ -46,9 +46,21 @@ Here are the available values:
 * dynamis.time_limit      = Your current Dynamis time limit, in seconds. -- If the addon is loaded in dynamis, you will need to gain a KI for this to be accurate.
 * dynamis.time_remaining  = The current dynamis time remaining, in seconds. -- Will not be accurate if the addon is loaded in dynamis.
 
+* abyssea.amber           = Amber light estimation
+* abyssea.azure           = Azure light estimation
+* abyssea.ruby            = Ruby light estimation
+* abyssea.pearlescent     = Pearlescent light estimation
+* abyssea.gold            = Gold light estimation
+* abyssea.silvery         = Silvery light estimation
+* abyssea.ebon            = Ebon light estimation
+* abyssea.last_time       = The last time you got a time message, in seconds.  -- Not implemented
+* abyssea.time_limit      = The current abyssea time remaining, in seconds. -- Approximate to the minute, not fully implemented
+* abyssea.time_remaining  = The current abyssea time remaining, in seconds. -- Approximate to the minute, not fully implemented
+
 
 
 Version History:
+0.050214 - Fixed the Dynamis clock. Added Abyssea lights.
 0.042314 - Addition of strings system
 0.042014 - Addition of strings system
 0.041214 - Initial commit

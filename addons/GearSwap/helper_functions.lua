@@ -613,8 +613,8 @@ function get_spell(act)
         elseif table.contains(fields,'weapon_skill') then
             if abil_ID > 255 then -- WZ_RECOVER_ALL is used by chests in Limbus
                 spell = res.monster_abilities[abil_ID-256]
-                if spell.english == '.' then
-                    spell.english = 'Special Attack'
+                if not spell then
+                    spell = {id=abil_ID-256,english='Special Attack'}
                 end
             elseif abil_ID < 256 then
                 spell = res.abilities[abil_ID+768]
@@ -635,7 +635,11 @@ function get_spell(act)
         
         
         if table.contains(fields,'item') then
-            spell = res.items[abil_ID]
+            if spell then
+                spell.item = res.items[effect_val]
+            else
+                spell = res.items[abil_ID]
+            end
         else
             spell = spell_complete(spell)
         end

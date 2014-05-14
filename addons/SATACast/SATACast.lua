@@ -114,19 +114,19 @@ function split(msg, match)
 	return splitarr
 end
 	
-windower.register_event('lose buff', function (id)
-	local self = windower.ffxi.get_player()
+windower.register_event('lose buff', function(id)
+	local status = windower.ffxi.get_player().status
     local name = res.buffs[id].english
 	if name == ('Sneak Attack' or 'Trick Attack') then
-		if self.status:lower() == 'engaged' then
+		if status == 1 then
 			windower.send_command('sc set ' .. TP_Set)
-		elseif self.status:lower() == 'idle' then
+		elseif status == 0 then
 			windower.send_command('sc set ' .. Idle_Set)
 		end
 	end
 end)
 
-windower.register_event('action',function (act)
+windower.register_event('action', function(act)
 	local actor = act.actor_id
 	local category = act.category
 	local actor = act.actor_id

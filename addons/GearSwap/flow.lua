@@ -431,7 +431,7 @@ windower.register_event('outgoing chunk',function(id,original,modified,injected,
         local target_index = get_bit_packed(original,64,80)
         local category = get_bit_packed(original,80,96)
         local target_id = windower.ffxi.get_mob_by_index(target_index).id
-        if category == 12 and cued_packet and command_registry[cued_packet] and command_registry[cued_packet].proposed_packet and target_id == player.id then
+        if category == 12 and cued_packet and target_id == player.id then -- and command_registry[cued_packet] and command_registry[cued_packet].proposed_packet
             cued_packet = nil
             return true
         end

@@ -39,7 +39,7 @@ items = res.items
 
 windower.register_event('addon command', function(...)
 	local available = ''
-	for k in pairs(_replace) do
+	for k in pairs(replace) do
 		available = available..', '..k
 	end
 	log('Available replacement variable list (prefix with %): \n'..available:sub(3))

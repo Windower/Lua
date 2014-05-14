@@ -174,6 +174,8 @@ function refresh_player()
         player.sub_job_id = 0
     end
     player.job = player.main_job..'/'..player.sub_job
+    player.status_id = player.status
+    player.status = res.statuses[player.status][language]
     
     for i,v in pairs(player_mob_table) do
         if i == 'name' then
@@ -319,6 +321,14 @@ function refresh_player()
     end
     
     refresh_buff_active(player.buffs)
+    
+    for global_variable_name,extradatatable in pairs(_ExtraData) do
+        if _G[global_variable_name] then
+            for sub_variable_name,value in pairs(extradatatable) do
+                _G[global_variable_name][sub_variable_name] = value
+            end
+        end
+    end
 end
 
 -----------------------------------------------------------------------------------
