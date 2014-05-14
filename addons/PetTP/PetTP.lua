@@ -278,7 +278,8 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
                 end
             end
         elseif id == 0x67 then    -- general hp/tp/mp update
-            pet_idx, own_idx = original:unpack('HIH', 0x07)
+            pet_idx = original:unpack('H', 0x07)
+            own_idx = original:unpack('H', 0x0D)
             if S{0x04,0x44,0xC4,0x84}:contains(check) then
                 pet_idx, own_idx = own_idx, pet_idx
             end
