@@ -409,11 +409,11 @@ fields.outgoing[0x04B] = L{
 -- Delivery Box
 fields.outgoing[0x04D] = L{
     {ctype='unsigned char',     label='Manipulation Type'},                     -- 04
-	--
+    --
 
-	-- Removing an item from the d-box sends type 0x08
-	-- It then responds to the server's 0x4B (id=0x08) with a 0x0A type packet.
-	-- Their assignment is the same, as far as I can see.
+    -- Removing an item from the d-box sends type 0x08
+    -- It then responds to the server's 0x4B (id=0x08) with a 0x0A type packet.
+    -- Their assignment is the same, as far as I can see.
     {ctype='unsigned char',     label='_unknown1'},                             -- 05   01 observed
     {ctype='unsigned char',     label='Slot'},                                  -- 06
     {ctype='char[5]',           label='_unknown2'},                             -- 07   FF FF FF FF FF observed
@@ -422,9 +422,10 @@ fields.outgoing[0x04D] = L{
 
 -- Equip
 fields.outgoing[0x050] = L{
-    {ctype='unsigned char',     label='Item Index',         fn=inv+{0}},        -- 04
+    {ctype='unsigned char',     label='Item Index',         fn=invp+{0x06}},    -- 04
     {ctype='unsigned char',     label='Equip Slot',         fn=slot},           -- 05
-	{ctype='char[2]',           label='_junk1'}                                 -- 06
+    {ctype='unsigned char',     label='Bag',                fn=bag},            -- 06
+    {ctype='char[1]',           label='_junk1'}                                 -- 07
 }
 
 -- Conquest
@@ -831,47 +832,47 @@ fields.incoming[0x00B] = L{
 
 -- PC Update
 fields.incoming[0x00D] = L{
-	-- The flags in this byte are complicated and may not strictly be flags.
-	-- Byte 32: -- Mentor is somewhere in this byte
-	-- 01 = None
-	-- 02 = Deletes everyone
-	-- 04 = Deletes everyone
-	-- 08 = None
-	-- 16 = None
-	-- 32 = None
-	-- 64 = None
-	-- 128 = None
+    -- The flags in this byte are complicated and may not strictly be flags.
+    -- Byte 32: -- Mentor is somewhere in this byte
+    -- 01 = None
+    -- 02 = Deletes everyone
+    -- 04 = Deletes everyone
+    -- 08 = None
+    -- 16 = None
+    -- 32 = None
+    -- 64 = None
+    -- 128 = None
 
 
-	-- Byte 33:
-	-- 01 = None
-	-- 02 = None
-	-- 04 = None
-	-- 08 = LFG
-	-- 16 = Anon
-	-- 32 = Turns your name orange
-	-- 64 = Away
-	-- 128 = None
+    -- Byte 33:
+    -- 01 = None
+    -- 02 = None
+    -- 04 = None
+    -- 08 = LFG
+    -- 16 = Anon
+    -- 32 = Turns your name orange
+    -- 64 = Away
+    -- 128 = None
 
-	-- Byte 34:
-	-- 01 = POL Icon, can target?
-	-- 02 = no notable effect
-	-- 04 = DCing
-	-- 08 = Untargettable
-	-- 16 = No linkshell
-	-- 32 = No Linkshell again
-	-- 64 = No linkshell again
-	-- 128 = No linkshell again
+    -- Byte 34:
+    -- 01 = POL Icon, can target?
+    -- 02 = no notable effect
+    -- 04 = DCing
+    -- 08 = Untargettable
+    -- 16 = No linkshell
+    -- 32 = No Linkshell again
+    -- 64 = No linkshell again
+    -- 128 = No linkshell again
 
-	-- Byte 35:
-	-- 01 = Trial Account
-	-- 02 = Trial Account
-	-- 04 = GM Mode
-	-- 08 = None
-	-- 16 = None
-	-- 32 = Invisible models
-	-- 64 = None
-	-- 128 = Bazaar
+    -- Byte 35:
+    -- 01 = Trial Account
+    -- 02 = Trial Account
+    -- 04 = GM Mode
+    -- 08 = None
+    -- 16 = None
+    -- 32 = Invisible models
+    -- 64 = None
+    -- 128 = Bazaar
 
     ---- Mask bits, from antiquity:
     -- 0x01: "Basic"
@@ -1058,7 +1059,8 @@ fields.incoming[0x01C] = L{
     {ctype='unsigned char',     label='Satchel Size'},                          -- 09
     {ctype='unsigned char',     label='Sack Size'},                             -- 0A
     {ctype='unsigned char',     label='Case Size'},                             -- 0B
-    {ctype='char[8]',           label='_padding1',          const=''},          -- 0C
+    {ctype='unsigned char',     label='Wardrobe Size'},                         -- 0C
+    {ctype='char[7]',           label='_padding1',          const=''},          -- 0D
     {ctype='unsigned short',    label='_dupeInventory Size'},                   -- 14
     {ctype='unsigned short',    label='_dupeSafe Size'},                        -- 16
     {ctype='unsigned short',    label='_dupeStorage Size'},                     -- 1A   The accumulated storage from all items (uncapped) -1
@@ -1067,7 +1069,8 @@ fields.incoming[0x01C] = L{
     {ctype='unsigned short',    label='_dupeSatchel Size'},                     -- 20
     {ctype='unsigned short',    label='_dupeSack Size'},                        -- 22
     {ctype='unsigned short',    label='_dupeCase Size'},                        -- 24
-    {ctype='char[18]',          label='_padding2',          const=''},          -- 26
+    {ctype='unsigned short',    label='_dupeWardrobe Size'},                    -- 26
+    {ctype='char[16]',          label='_padding2',          const=''},          -- 28
 }
 
 -- Finish Inventory
@@ -1530,9 +1533,10 @@ fields.incoming[0x04F] = L{
 
 -- Equip
 fields.incoming[0x050] = L{
-    {ctype='unsigned char',     label='Inventory Index',    fn=inv+{0}},        -- 04
+    {ctype='unsigned char',     label='Inventory Index',    fn=invp+{0x06}},    -- 04
     {ctype='unsigned char',     label='Equipment Slot',     fn=slot},           -- 05
-	{ctype='char[2]',           label='_junk1'}                                 -- 06
+    {ctype='unsigned char',     label='Inventory Bag',      fn=bag},            -- 06
+    {ctype='char[1]',           label='_junk1'}                                 -- 07
 }
 
 -- Model Change
@@ -1562,8 +1566,8 @@ fields.incoming[0x053] = L{
 
 -- Key Item Log
 --[[fields.incoming[0x055] = L{
-	-- There are 6 of these packets sent on zone, which likely corresponds to the 6 categories of key items.
-	-- FFing these packets between bytes 0x14 and 0x82 gives you access to all (or almost all) key items.
+    -- There are 6 of these packets sent on zone, which likely corresponds to the 6 categories of key items.
+    -- FFing these packets between bytes 0x14 and 0x82 gives you access to all (or almost all) key items.
 }]]
 
 -- Weather Change
@@ -1698,36 +1702,36 @@ fields.incoming[0x063] = function(data)
 end
 
 fields.incoming._mult[0x063][0x02] = L{
-	{ctype='unsigned short',    label='Order'},                                 -- 04
-	{ctype='unsigned int',      label='_flags1'},                               -- 06
-	{ctype='unsigned int',      label='_flags2'},                               -- 08   The 3rd bit of the last byte is the flag that indicates whether or not you are xp capped (blue levels)
+    {ctype='unsigned short',    label='Order'},                                 -- 04
+    {ctype='unsigned int',      label='_flags1'},                               -- 06
+    {ctype='unsigned int',      label='_flags2'},                               -- 08   The 3rd bit of the last byte is the flag that indicates whether or not you are xp capped (blue levels)
 }
 
 fields.incoming._mult[0x063][0x03] = L{
-	{ctype='unsigned short',    label='Order'},                                 -- 04
-	{ctype='unsigned short',    label='_flags1'},                               -- 06   Consistently D8 for me
-	{ctype='unsigned short',    label='_flags2'},                               -- 08   Vary when I change species
-	{ctype='unsigned short',    label='_flags3'},                               -- 0A   Consistent across species
-	{ctype='unsigned char',     label='Mon. Rank'},                             -- 0C   00 = Mon, 01 = NM, 02 = HNM
-	{ctype='unsigned char',     label='_unknown1'},                             -- 0D   00
-	{ctype='unsigned short',    label='_unknown2'},                             -- 0E   00 00
-	{ctype='unsigned short',    label='_unknown3'},                             -- 10   76 00
-	{ctype='unsigned short',    label='Infamy'},                                -- 12
-	{ctype='unsigned int',      label='_unknown2'},                             -- 14   00s
-	{ctype='unsigned int',      label='_unknown3'},                             -- 18   00s
-	{ctype='char[64]',          label='Instinct Bitfield 1'},                   -- 1C   See below
-	-- Bitpacked 2-bit values. 0 = no instincts from that species, 1 == first instinct, 2 == first and second instinct, 3 == first, second, and third instinct.
-	{ctype='char[128]',         label='Monster Level Char field'},              -- 5C   Mapped onto the item ID for these creatures. (00 doesn't exist, 01 is rabbit, 02 is behemoth, etc.)
+    {ctype='unsigned short',    label='Order'},                                 -- 04
+    {ctype='unsigned short',    label='_flags1'},                               -- 06   Consistently D8 for me
+    {ctype='unsigned short',    label='_flags2'},                               -- 08   Vary when I change species
+    {ctype='unsigned short',    label='_flags3'},                               -- 0A   Consistent across species
+    {ctype='unsigned char',     label='Mon. Rank'},                             -- 0C   00 = Mon, 01 = NM, 02 = HNM
+    {ctype='unsigned char',     label='_unknown1'},                             -- 0D   00
+    {ctype='unsigned short',    label='_unknown2'},                             -- 0E   00 00
+    {ctype='unsigned short',    label='_unknown3'},                             -- 10   76 00
+    {ctype='unsigned short',    label='Infamy'},                                -- 12
+    {ctype='unsigned int',      label='_unknown2'},                             -- 14   00s
+    {ctype='unsigned int',      label='_unknown3'},                             -- 18   00s
+    {ctype='char[64]',          label='Instinct Bitfield 1'},                   -- 1C   See below
+    -- Bitpacked 2-bit values. 0 = no instincts from that species, 1 == first instinct, 2 == first and second instinct, 3 == first, second, and third instinct.
+    {ctype='char[128]',         label='Monster Level Char field'},              -- 5C   Mapped onto the item ID for these creatures. (00 doesn't exist, 01 is rabbit, 02 is behemoth, etc.)
 }
 
 fields.incoming._mult[0x063][0x04] = L{
-	{ctype='unsigned short',    label='Order'},                                 -- 04
-	{ctype='unsigned short',    label='_unknown1'},                             -- 06   B0 00
-	{ctype='char[126]',         label='_unknown2'},                             -- 08   FF-ing has no effect.
-	{ctype='unsigned char',     label='Slime Level'},                           -- 86
-	{ctype='unsigned char',     label='Spriggan Level'},                        -- 87
-	{ctype='char[12]',          label='Instinct Bitfield 3'},                   -- 88   Contains job/race instincts from the 0x03 set. Has 8 unused bytes. This is a 1:1 mapping.
-	{ctype='char[32]',          label='Variants Bitfield'},                     -- 94   Does not show normal monsters, only variants. Bit is 1 if the variant is owned. Length is an estimation including the possible padding.
+    {ctype='unsigned short',    label='Order'},                                 -- 04
+    {ctype='unsigned short',    label='_unknown1'},                             -- 06   B0 00
+    {ctype='char[126]',         label='_unknown2'},                             -- 08   FF-ing has no effect.
+    {ctype='unsigned char',     label='Slime Level'},                           -- 86
+    {ctype='unsigned char',     label='Spriggan Level'},                        -- 87
+    {ctype='char[12]',          label='Instinct Bitfield 3'},                   -- 88   Contains job/race instincts from the 0x03 set. Has 8 unused bytes. This is a 1:1 mapping.
+    {ctype='char[32]',          label='Variants Bitfield'},                     -- 94   Does not show normal monsters, only variants. Bit is 1 if the variant is owned. Length is an estimation including the possible padding.
 }
 
 -- Pet Info
@@ -2079,10 +2083,10 @@ fields.incoming[0x111] = L{
 -- RoE Quest Log
 fields.incoming[0x112] = L{
     {ctype='char[128]',         label='RoE Quest Bitfield'},                    -- 04   See next line
-	-- There's probably one bit to indicate that a quest can be undertaken and another
-	--  that indicates whether it has been completed once. The meaning of the individual
-	--  bits obviously varies with Order. RoE quests with storyline are in the Packet
-	--  with Order == 3. Most normal quests are in Order == 0
+    -- There's probably one bit to indicate that a quest can be undertaken and another
+    --  that indicates whether it has been completed once. The meaning of the individual
+    --  bits obviously varies with Order. RoE quests with storyline are in the Packet
+    --  with Order == 3. Most normal quests are in Order == 0
     {ctype='unsigned int',      label='Order'},                                 -- 84   0,1,2,3
 }
 
