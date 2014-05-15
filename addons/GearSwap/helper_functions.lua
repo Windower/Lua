@@ -338,7 +338,10 @@ end
 -----------------------------------------------------------------------------------
 function filter_pretarget(spell)
     local category = outgoing_action_category_table[unify_prefix[spell.prefix]]
-    if category == 3 then
+    if world.in_mog_house then
+        debug_mode_chat("Unable to execute commands. Currently in a Mog House zone.")
+        return false
+    elseif category == 3 then
         local available_spells = windower.ffxi.get_spells()
         local spell_jobs = res.spells[spell.id].levels
         
@@ -395,8 +398,6 @@ function filter_pretarget(spell)
         debug_mode_chat("Unable to execute command. You do not have access to that monsterskill ("..(res.abilities[spell.id][language] or spell.id)..")")
         return false
     end
-    
-    
     
     return true
 end
