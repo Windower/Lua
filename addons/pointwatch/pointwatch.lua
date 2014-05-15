@@ -77,7 +77,7 @@ windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blo
         local val = str2bytes(org:sub(0x11,0x14))
         local msg = str2bytes(org:sub(0x19,0x20))%1024
         local t = os.clock()
-        if msg == 718 then
+        if msg == 718 or msg == 735 then
             cp.registry[t] = (cp.registry[t] or 0) + val
             cp.total = cp.total + val
         elseif msg == 8 or msg == 105 or msg == 371 or msg == 372 then
