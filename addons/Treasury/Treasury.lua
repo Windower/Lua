@@ -48,6 +48,15 @@ addremove_commands = T{
     ['-'] = 'remove',
 }
 
+bool_values = T{
+    on = true,
+    ['1'] = true,
+    true = true,
+    off = false,
+    ['0'] = false,
+    false = false,
+}
+
 function passlot(command1, command2, ids)
     local action = command1:lower()
     names = ids:map(table.get-{'name'} .. table.get+{res.items})
