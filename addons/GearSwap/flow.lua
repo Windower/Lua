@@ -51,11 +51,11 @@ function equip_sets(swap_type,ts,...)
     if debugging >= 1 then windower.debug(tostring(swap_type)..' enter') 
     if showphase or debugging >= 2 then windower.add_to_chat(8,tostring(swap_type)..' enter') end end
     
-    local cur_equip = get_gs_gear(items.equipment,swap_type)
+    local cur_equip = get_gs_gear(convert_equipment(items.equipment),swap_type)
     
     table.reassign(equip_order,default_equip_order)
     table.reassign(equip_list,{})
-    table.reassign(player.equipment,to_names_set(cur_equip,items.inventory))
+    table.reassign(player.equipment,to_names_set(cur_equip))
     for i,v in pairs(slot_map) do
         if not player.equipment[i] then
             player.equipment[i] = player.equipment[default_slot_map[v]]
@@ -78,7 +78,11 @@ function equip_sets(swap_type,ts,...)
         end
     end
     
-    debug_mode_chat("Entering "..swap_type)
+    if type(swap_type) == 'string' then
+        debug_mode_chat("Entering "..swap_type)
+    else
+        debug_mode_chat("Entering User Event "..tostring(swap_type))
+    end
     
     if not val1 then val1 = {}
         if debugging >= 2 then
@@ -119,11 +123,11 @@ function equip_sets(swap_type,ts,...)
             end
         end
         
-        local equip_next = to_id_set(items.inventory,equip_list) -- Translates the equip_list from the player (i=slot name, v=item name) into a table with i=slot id and v=inventory id.
+        local equip_next = to_id_set(equip_list) -- Translates the equip_list from the player (i=slot name, v=item name) into a table with i=slot id and v={inv_id=0 or 8, slot=inventory slot}.
         equip_next = eliminate_redundant(cur_equip,equip_next) -- Eliminate the equip commands for items that are already equipped
         
         if (_settings.show_swaps and table.length(equip_next) > 0) or _settings.demo_mode then --and table.length(equip_next)>0 then
-            local tempset = to_names_set(equip_next,items.inventory)
+            local tempset = to_names_set(equip_next)
             print_set(tempset,tostring(swap_type))
         end
         
@@ -143,7 +147,7 @@ function equip_sets(swap_type,ts,...)
             for _,i in ipairs(equip_order) do
                 if debugging >= 3 and equip_next[i] then
                     local out_str = 'Order: '..tostring(_)..'  Slot ID: '..tostring(i)..'  Inv. ID: '..tostring(equip_next[i])
-                    if equip_next[i] ~= 0 then
+                    if equip_next[i].slot ~= 0 then
                         out_str = out_str..'  Item: '..tostring(res.items[items.inventory[equip_next[i]].id][language..'_log'])
                     else
                         out_str = out_str..'  Emptying slot'
@@ -151,7 +155,10 @@ function equip_sets(swap_type,ts,...)
                     windower.add_to_chat(8,'GearSwap (Debugging): '..out_str)
                 elseif equip_next[i] and not disable_table[i] and not encumbrance_table[i] then
                     windower.debug('attempting to set gear. Order: '..tostring(_)..'  Slot ID: '..tostring(i)..'  Inv. ID: '..tostring(equip_next[i]))
-                    if not _settings.demo_mode then windower.ffxi.set_equip(equip_next[i],i) end
+                    if not _settings.demo_mode then
+                        windower.packets.inject_outgoing(0x50,string.char(0x50,0x04,0,0,equip_next[i].slot,i,equip_next[i].inv_id,0))
+                        --windower.ffxi.set_equip(equip_next[i].slot,i,equip_next[i].inv_id)
+                    end
                     sent_out_equip[i] = equip_next[i] -- re-make the equip_next table with the name sent_out_equip as the equipment is sent out.
                 end
             end
