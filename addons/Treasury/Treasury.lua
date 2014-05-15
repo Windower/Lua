@@ -51,10 +51,10 @@ addremove_commands = T{
 bool_values = T{
     on = true,
     ['1'] = true,
-    true = true,
+    ['true'] = true,
     off = false,
     ['0'] = false,
-    false = false,
+    ['false'] = false,
 }
 
 function passlot(command1, command2, ids)
