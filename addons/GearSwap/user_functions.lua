@@ -175,7 +175,7 @@ function print_set(set,title)
     if #set == table.length(set) then
         for i,v in ipairs(set) do
             if type(v) == 'table' and v.name then
-                windower.add_to_chat(8,tostring(i)..' '..tostring(v))
+                windower.add_to_chat(8,tostring(i)..' '..tostring(v.name)..' (Adv.)')
             else
                 windower.add_to_chat(8,tostring(i)..' '..tostring(v))
             end
@@ -183,7 +183,7 @@ function print_set(set,title)
     else
         for i,v in pairs(set) do
             if type(v) == 'table' and v.name then
-                windower.add_to_chat(8,tostring(i)..' '..tostring(v))
+                windower.add_to_chat(8,tostring(i)..' '..tostring(v.name)..' (Adv.)')
             else
                 windower.add_to_chat(8,tostring(i)..' '..tostring(v))
             end

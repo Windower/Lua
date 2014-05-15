@@ -375,6 +375,7 @@ function filter_pretarget(spell)
             return false
         elseif spell.type == 'BlueMagic' and not (player.main_job == 'BLU' and table.contains(windower.ffxi.get_mjob_data().spells,spell.id)) and not
             (player.sub_job == 'BLU' and table.contains(windower.ffxi.get_sjob_data().spells,spell.id)) then
+            -- This code isn't hurting anything, but it doesn't need to be here either.
             debug_mode_chat("Unable to execute command. Blue magic must be set to cast that spell ("..(res.spells[spell.id][language] or spell.id)..")")
             return false
         elseif spell.type == 'Ninjutsu'  then

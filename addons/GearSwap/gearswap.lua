@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.837'
+_addon.version = '0.840'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -349,7 +349,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
 --        'Equipment packet'
         if sent_out_equip[data:byte(6)] == data:byte(5) then
             sent_out_equip[data:byte(6)] = nil
-            limbo_equip[data:byte(6)] = data:byte(5)
+            limbo_equip[data:byte(6)] = {inv_id=data:byte(7),slot=data:byte(5)}
         end
     elseif id == 0x01D and not injected then
         limbo_equip = {}
