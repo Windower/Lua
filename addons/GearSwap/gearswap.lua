@@ -349,12 +349,12 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         return
     elseif id == 0x050 and not injected then
 --        'Equipment packet'
-        if sent_out_equip[data:byte(6)] == data:byte(5) then
+        if sent_out_equip[data:byte(6)] and sent_out_equip[data:byte(6)].slot == data:byte(5) then
             sent_out_equip[data:byte(6)] = nil
             limbo_equip[data:byte(6)] = {inv_id=data:byte(7),slot=data:byte(5)}
         end
     elseif id == 0x01D and not injected then
-        limbo_equip = {}
+        table.clear(limbo_equip)
     end
 end)
 
@@ -401,9 +401,9 @@ end)
 windower.register_event('job change',function(mjob_id, mjob_lvl, sjob_id, sjob_lvl)
     if debugging >= 1 then windower.debug('job change') end
     disable_table = {false,false,false,false,false,false,false,false,false,false,false,false,false,false,false}
-    not_sent_out_equip = {}
-    sent_out_equip = {}
-    limbo_equip = {}
+    table.clear(not_sent_out_equip)
+    table.clear(sent_out_equip)
+    table.clear(limbo_equip)
 
     if current_job_file ~= res.jobs[mjob_id].short then
         refresh_user_env(mjob_id)

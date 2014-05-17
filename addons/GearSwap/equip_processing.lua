@@ -82,7 +82,7 @@ function to_id_set(equip_list)
     for i,v in pairs(short_slot_map) do
         local name,order,extgoal_1,extgoal_2 = expand_entry(equip_list[i])
         if name == empty or name =='empty' then
-            ret_list[v] = {inv_id=0,slot=0}
+            ret_list[v] = {inv_id=0,slot=empty}
             reorder(order,i)
             equip_list[i] = nil
         end
@@ -218,11 +218,11 @@ end
 
 function eliminate_redundant(current_gear,equip_next) -- Eliminates gear you already wear from the table
     for i,v in pairs(current_gear) do
-        if v == empty and (equip_next[slot_map[i]] == 0 or equip_next[slot_map[i]] == empty) then
+        if v.slot == empty and equip_next[slot_map[i]] and equip_next[slot_map[i]].slot == empty then
             equip_next[slot_map[i]] = nil
         else
             for n,m in pairs(equip_next) do
-                if v==m and v ~= 0 then
+                if v.inv_id == m.inv_id and v.slot==m.slot then
                     equip_next[n] = nil
                 end
             end
@@ -256,24 +256,52 @@ function to_names_set(id_id)
 end
 
 function get_gs_gear(cur_equip,swap_type)
-    local temp_set = table.reassign({},cur_equip)
     local sent_out_box = 'Going into '..swap_type..':\n' -- i = 'head', 'feet', etc.; v = inventory ID (0~80)
     -- If the swap is not complete, overwrite the current equipment with the equipment that you are swapping to
 --    local not_sent_ids = to_id_set(items.inventory,not_sent_out_equip)
-
     for i,v in pairs(cur_equip) do
         if limbo_equip[short_slot_map[i]] then
             cur_equip[i] = limbo_equip[short_slot_map[i]]
-        elseif sent_out_equip[short_slot_map[i]] then
+        end
+        if sent_out_equip[short_slot_map[i]] then
             cur_equip[i] = sent_out_equip[short_slot_map[i]]
         end
-        if v == 0 or v == 'empty' then
-            cur_equip[i] = empty
+        if v.slot == 0 or v.slot == 'empty' then
+            cur_equip[i].slot = empty
         end
-        if v and v ~= 0 and debugging > 0 and items.inventory[v] and res.items[items.inventory[v].id] then
-            sent_out_box = sent_out_box..tostring(i)..' '..tostring(res.items[items.inventory[v].id].english)..'\n'
+        if cur_equip[i] and cur_equip[i].slot ~= empty and debugging > 0 then
+            if cur_equip[i].inv_id == 0 and items.inventory[cur_equip[i].slot] and res.items[items.inventory[cur_equip[i].slot].id] then
+                sent_out_box = sent_out_box..tostring(i)..' '..tostring(res.items[items.inventory[cur_equip[i].slot].id].english)..'\n'
+            elseif cur_equip[i].inv_id == 8 and items.wardrobe[cur_equip[i].slot] and res.items[items.wardrobe[cur_equip[i].slot].id] then
+                sent_out_box = sent_out_box..tostring(i)..' '..tostring(res.items[items.wardrobe[cur_equip[i].slot].id].english)..'\n'
+            end
+        elseif cur_equip[i] and cur_equip[i].slot == empty and debugging >0 then
+            sent_out_box = sent_out_box..tostring(i)..' Empty\n'
         end
     end
-    if debugging > 0 and type(swap_type) == 'string' then windower.text.set_text(swap_type,sent_out_box) end
+    if debugging > 0 and type(swap_type) == 'string' then
+--        print_set(limbo_equip,'Limbo Equip '..swap_type)
+--        print_set(sent_out_equip,'Sent Out Equip '..swap_type)
+        windower.text.set_text(swap_type,sent_out_box)
+    end
     return cur_equip
+end
+
+
+-----------------------------------------------------------------------------------
+--Name: convert_equipment(equipment)
+--Args:
+---- equipment - Current equipment table (with _bag indices)
+-----------------------------------------------------------------------------------
+--Returns:
+---- Table where equipment slot name = {inv_id,slot}
+-----------------------------------------------------------------------------------
+function convert_equipment(equipment)
+    local retset = {}
+    for i,v in pairs(equipment) do
+        if i== 'sub' or i:sub(-4) ~= '_bag' then
+            retset[i] = {inv_id=equipment[i..'_bag'],slot=v}
+        end
+    end
+    return retset
 end

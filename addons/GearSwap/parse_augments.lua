@@ -532,7 +532,7 @@ function unpack_augment(augment_table,val)
     return return_augment or nil
 end
 
---[[for i,v in ipairs(windower.ffxi.get_items().inventory) do
+--[[for i,v in ipairs(windower.ffxi.get_items().storage) do
     if v.extdata and res.items[v.id] then
         local tempstr = i..' '..res.items[v.id][language]..'   '
         for n=1,string.len(v.extdata) do
