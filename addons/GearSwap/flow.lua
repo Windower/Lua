@@ -52,7 +52,7 @@ function equip_sets(swap_type,ts,...)
     if showphase or debugging >= 2 then windower.add_to_chat(8,tostring(swap_type)..' enter') end end
     
     local cur_equip = get_gs_gear(convert_equipment(items.equipment),swap_type)
-    
+        
     table.reassign(equip_order,default_equip_order)
     table.reassign(equip_list,{})
     table.reassign(player.equipment,to_names_set(cur_equip))
@@ -122,9 +122,13 @@ function equip_sets(swap_type,ts,...)
                 not_sent_out_equip[i] = equip_list[i]
             end
         end
+--        if type(swap_type) == 'string' then print_set(equip_list,'Equip List') end
         
+--        if type(swap_type) == 'string' then print_set(equip_list,tostring(swap_type)..' before') end
         local equip_next = to_id_set(equip_list) -- Translates the equip_list from the player (i=slot name, v=item name) into a table with i=slot id and v={inv_id=0 or 8, slot=inventory slot}.
+--        if type(swap_type) == 'string' then print_set(equip_next,'Equip Next') end
         equip_next = eliminate_redundant(cur_equip,equip_next) -- Eliminate the equip commands for items that are already equipped
+--        if type(swap_type) == 'string' then print_set(equip_next,'Equip Next 2') end
         
         if (_settings.show_swaps and table.length(equip_next) > 0) or _settings.demo_mode then --and table.length(equip_next)>0 then
             local tempset = to_names_set(equip_next)
@@ -156,7 +160,11 @@ function equip_sets(swap_type,ts,...)
                 elseif equip_next[i] and not disable_table[i] and not encumbrance_table[i] then
                     windower.debug('attempting to set gear. Order: '..tostring(_)..'  Slot ID: '..tostring(i)..'  Inv. ID: '..tostring(equip_next[i]))
                     if not _settings.demo_mode then
-                        windower.packets.inject_outgoing(0x50,string.char(0x50,0x04,0,0,equip_next[i].slot,i,equip_next[i].inv_id,0))
+                        if equip_next[i].slot ~= empty then
+                            windower.packets.inject_outgoing(0x50,string.char(0x50,0x04,0,0,equip_next[i].slot,i,equip_next[i].inv_id,0))
+                        else
+                            windower.packets.inject_outgoing(0x50,string.char(0x50,0x04,0,0,0,i,0,0))
+                        end
                         --windower.ffxi.set_equip(equip_next[i].slot,i,equip_next[i].inv_id)
                     end
                     sent_out_equip[i] = equip_next[i] -- re-make the equip_next table with the name sent_out_equip as the equipment is sent out.

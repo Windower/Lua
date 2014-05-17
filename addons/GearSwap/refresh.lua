@@ -334,24 +334,6 @@ function refresh_player()
 end
 
 -----------------------------------------------------------------------------------
---Name: convert_equipment(equipment)
---Args:
----- equipment - Current equipment table (with _bag indices)
------------------------------------------------------------------------------------
---Returns:
----- Table where equipment slot name = {inv_id,slot}
------------------------------------------------------------------------------------
-function convert_equipment(equipment)
-    local retset = {}
-    for i,v in pairs(equipment) do
-        if i== 'sub' or i:sub(-4) ~= '_bag' then
-            retset[i] = {inv_id=equipment[i..'_bag'],slot=v}
-        end
-    end
-    return retset
-end
-
------------------------------------------------------------------------------------
 --Name: refresh_ffxi_info()
 --Args:
 ---- None
