@@ -216,7 +216,7 @@ _ExtraData = {
         alliance = {},
         pet = {},
         fellow = {},
-        world = {},
+        world = {in_mog_house = false},
     }
 
 last_PC_update = ''

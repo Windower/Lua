@@ -343,6 +343,8 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         else
             _ExtraData.player.indi = nil
         end
+    elseif id == 0x00A and not injected then
+        _ExtraData.world.in_mog_house = data:byte(0x81) == 1
     elseif gearswap_disabled then
         return
     elseif id == 0x050 and not injected then
