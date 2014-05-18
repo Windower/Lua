@@ -73,15 +73,24 @@ function export_set(options)
 --        end
     else
         -- Default to loading the currently worn gear.
-        local gear = temp_items.equipment
+        local gear = convert_equipment(temp_items.equipment)
+        local ward = temp_items.wardrobe
         for i,v in pairs(gear) do
-            if v ~= 0 then
-                if res.items[inv[v].id] then
+            if v.slot ~= 0 then
+                local id,extdata
+                if v.inv_id == 0 and res.items[inv[v.slot].id] then
+                    id = inv[v.slot].id
+                    extdata = inv[v.slot].extdata
+                elseif v.inv_id == 8 and res.items[ward[v.slot].id] then
+                    id = ward[v.slot].id
+                    extdata = ward[v.slot].extdata
+                end
+                if res.items[id] then
                     item_list[slot_map[i]+1] = {}
-                    item_list[slot_map[i]+1].name = res.items[inv[v].id][language]
+                    item_list[slot_map[i]+1].name = res.items[id][language]
                     item_list[slot_map[i]+1].slot = i
                     if not xml then
-                        local aug_1,aug_2,aug_3,aug_4,_,__ = extdata_to_augment(inv[v].extdata)
+                        local aug_1,aug_2,aug_3,aug_4,_,__ = extdata_to_augment(extdata)
                         local aug_str = ''
                         if aug_1 and not tonumber(aug_1) then aug_str = aug_str..'"'..aug_1..'",' end
                         if aug_2 and not tonumber(aug_2) then aug_str = aug_str..'"'..aug_2..'",' end
