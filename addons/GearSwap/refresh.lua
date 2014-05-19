@@ -305,7 +305,7 @@ function refresh_player()
         
         if species_id then
             player.species = {}
-            for i,v in pairs(res.monstrosity_species[species_id]) do
+            for i,v in pairs(res.monstrosity[species_id]) do
                 if i ~= 'id' then
                     player.species[i] = v
                 end

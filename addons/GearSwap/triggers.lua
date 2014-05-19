@@ -88,8 +88,8 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
                     if player.species then
                         -- Iterates over currently available monster TP moves instead of using validabils
                         for i,v in pairs(player.species.tp_moves) do
-                            if res.monstrosity[i][language]:lower() == abil then
-                                r_line = res.monstrosity[i]
+                            if res.monster_abilities[i][language]:lower() == abil then
+                                r_line = res.monster_abilities[i]
                                 break
                             end
                         end

@@ -395,13 +395,13 @@ function filter_pretarget(spell)
         if category == 7 and not S(available.weapon_skills)[spell.id] then
             debug_mode_chat("Unable to execute command. You do not have access to that ability ("..(res.weapon_skills[spell.id][language] or spell.id)..")")
             return false
-        elseif category == 9 and not S(available.job_abilities)[spell.id] and not S(available.pet_commands)[spell.id-512] then
-            debug_mode_chat("Unable to execute command. You do not have access to that ability ("..(res.job_abilities[spell.id][language] or res.pet_commands[spell.id-512] or spell.id)..")")
+        elseif category == 9 and not S(available.job_abilities)[spell.id] then
+            debug_mode_chat("Unable to execute command. You do not have access to that ability ("..(res.job_abilities[spell.id][language] or spell.id)..")")
             return false
         end
-    elseif category == 25 and (not player.main_job == 'MON' or not player.species or not player.species.tp_moves[spell.id-768] or not (player.species.tp_moves[spell.id-768] <= player.main_job_level)) then
+    elseif category == 25 and (not player.main_job == 'MON' or not player.species or not player.species.tp_moves[spell.id] or not (player.species.tp_moves[spell.id] <= player.main_job_level)) then
         -- Monstrosity filtering
-        debug_mode_chat("Unable to execute command. You do not have access to that monsterskill ("..(res.monstrosity[spell.id][language] or spell.id)..")")
+        debug_mode_chat("Unable to execute command. You do not have access to that monsterskill ("..(res.monster_abilities[spell.id][language] or spell.id)..")")
         return false
     end
     
@@ -599,7 +599,7 @@ function get_spell(act)
                 spell = res.spells[abil_ID]
                 if act.category == 4 and spell then spell.recast = act.recast end
             elseif T{6,13,14,15}:contains(act.category) then
-                spell = res.abilities[abil_ID] -- May have to correct for charmed pets some day, but I'm not sure there are any monsters with TP moves that give no message.
+                spell = res.job_abilities[abil_ID] -- May have to correct for charmed pets some day, but I'm not sure there are any monsters with TP moves that give no message.
             elseif T{3,7}:contains(act.category) then
                 spell = res.weapon_skills[abil_ID]
             elseif T{5,9}:contains(act.category) then
@@ -638,7 +638,7 @@ function get_spell(act)
         elseif msg_ID == 240 or msg_ID == 241 then
             spell = res.job_abilities[43] -- 'Hide'
         elseif msg_ID == 328 then
-            spell = res.abilities[effect_val] -- BPs that are out of range
+            spell = res.job_abilities[effect_val] -- BPs that are out of range
         end
         
         

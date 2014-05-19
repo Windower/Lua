@@ -66,11 +66,7 @@ for i,v in pairs(res.weapon_skills) do
     make_entry(v,i)
 end
 
---for i,v in pairs(res.pet_commands) do
---    make_entry(v,'Ability',i)
---end
-
-for i,v in pairs(res.monstrosity) do
+for i,v in pairs(res.monster_abilities) do
     make_entry(v,i)
 end
 
