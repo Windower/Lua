@@ -133,12 +133,15 @@ windower.register_event('zone change',function(new,old)
         dynamis.entry_time = os.clock()
         dynamis.time_limit = 3600
         dynamis.zone = new
-        cur_func = loadstring("current_string = "..settings.strings.dynamis)
+        cur_func,loadstring_err = loadstring("current_string = "..settings.strings.dynamis)
     else
         dynamis.entry_time = 0
         dynamis.time_limit = 0
         dynamis.zone = 0
-        cur_func = loadstring("current_string = "..settings.strings.default)
+        cur_func,loadstring_err = loadstring("current_string = "..settings.strings.default)
+    end
+    if not cur_func then
+        error(loadstring_err)
     end
 end)
 
