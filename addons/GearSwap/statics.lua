@@ -58,7 +58,19 @@ for i,v in pairs(res.spells) do
     end
 end
 
-for i,v in pairs(res.abilities) do
+for i,v in pairs(res.job_abilities) do
+    make_entry(v,'Ability',i)
+end
+
+for i,v in pairs(res.weapon_skills) do
+    make_entry(v,'Ability',i)
+end
+
+--for i,v in pairs(res.pet_commands) do
+--    make_entry(v,'Ability',i)
+--end
+
+for i,v in pairs(res.monstrosity) do
     make_entry(v,'Ability',i)
 end
 
@@ -127,6 +139,9 @@ addendum_black = {[253]="Sleep",[259]="Sleep II",[260]="Dispel",[162]="Stone IV"
     [168]="Thunder V",[157]="Aero IV",[158]="Aero V",[152]="Blizzard IV",[153]="Blizzard V",[147]="Fire IV",[148]="Fire V",
     [172]="Water IV",[173]="Water V",[255]="Break"}
 
+resources_ranged_attack = {id="1",index="0",prefix="/range",english="Ranged",german="Fernwaffe",french="Attaque à dist.",japanese="????",type="Misc",element="None",targets="Enemy",skill="Ability",mpcost="0",tpcost="0",casttime="0",recast="0"}
+
+    
 -- _globals --
 user_data_table = {
     __newindex = function(tab, key, val)
