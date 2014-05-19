@@ -37,7 +37,7 @@ validabils['french'] = {['/ma'] = {}, ['/ja'] = {}, ['/ws'] = {}, ['/item'] = {}
 validabils['german'] = {['/ma'] = {}, ['/ja'] = {}, ['/ws'] = {}, ['/item'] = {}, ['/ra'] = {}, ['/ms'] = {}, ['/pet'] = {}, ['/trig'] = {}, ['/echo'] = {}}
 validabils['japanese'] = {['/ma'] = {}, ['/ja'] = {}, ['/ws'] = {}, ['/item'] = {}, ['/ra'] = {}, ['/ms'] = {}, ['/pet'] = {}, ['/trig'] = {}, ['/echo'] = {}}
 
-function make_abil(abil,lang,t,i)
+function make_abil(abil,lang,i)
     if not abil[lang] or not abil.prefix then return end
     local sp = abil[lang]:lower()
     local pref = unify_prefix[abil.prefix:lower()]
@@ -45,25 +45,25 @@ function make_abil(abil,lang,t,i)
     validabils[lang][pref][sp] = i
 end
 
-function make_entry(v,typ,i)
-    make_abil(v,'english',typ,i)
-    make_abil(v,'german',typ,i)
-    make_abil(v,'french',typ,i)
-    make_abil(v,'japanese',typ,i)
+function make_entry(v,i)
+    make_abil(v,'english',i)
+    make_abil(v,'german',i)
+    make_abil(v,'french',i)
+    make_abil(v,'japanese',i)
 end
 
 for i,v in pairs(res.spells) do
     if not T{363,364}:contains(i) then
-        make_entry(v,'Magic',i)
+        make_entry(v,i)
     end
 end
 
 for i,v in pairs(res.job_abilities) do
-    make_entry(v,'Ability',i)
+    make_entry(v,i)
 end
 
 for i,v in pairs(res.weapon_skills) do
-    make_entry(v,'Ability',i)
+    make_entry(v,i)
 end
 
 --for i,v in pairs(res.pet_commands) do
@@ -71,12 +71,12 @@ end
 --end
 
 for i,v in pairs(res.monstrosity) do
-    make_entry(v,'Ability',i)
+    make_entry(v,i)
 end
 
 for i,v in pairs(res.items) do
     if v.targets and table.length(v.targets) ~= 0 then
-        make_entry(v,'Item',i)
+        make_entry(v,i)
     end
 end
     
