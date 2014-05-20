@@ -328,11 +328,7 @@ function ambig(key)
     
     if slugged_commands[key] and slugged_commands[key].type ~= 'Ambiguous' then 
     -- If the current usage is unambiguous because only one ability is available then...
-        if slugged_commands[key].type == 'spells' then
-            return commands.magic[slugged_commands[key].id],slugged_commands[key].type
-        else
-            return commands.abilities[slugged_commands[key].id],slugged_commands[key].type
-        end
+        return commands[slugged_commands[key].type][slugged_commands[key].id],slugged_commands[key].type
     else  -- Otherwise it's actually ambiguous, so run the associated function and pass the known information.
         abil_type=ambig_names[key]['funct'](windower.ffxi.get_player(),ambig_names[key].IDs,ambig_names[key].info,ambig_names[key].monster_abilities)
         if res[abil_type] then
@@ -356,7 +352,7 @@ end
 -----------------------------------------------------------------------------------
 function get_available_commands()
     local player = windower.ffxi.get_player()
-    local valid_abilities = {spells = {},abilities = {},weapon_skills = {}, monster_abilities = {}}
+    local valid_abilities = {spells = {},job_abilities = {},weapon_skills = {}, monster_abilities = {}}
     if not player then return valid_abilities end
     
     for i,v in pairs(windower.ffxi.get_spells()) do
@@ -366,13 +362,9 @@ function get_available_commands()
     end
     
     for typ,tab in pairs(windower.ffxi.get_abilities()) do
-        if tab then 
-            for _,id in pairs(tab) do
-                if typ == 'pet_commands' then
-                    valid_abilities['job abilities'][ind+512] = tab[ind+512]
-                elseif valid_abilities[typ] then
-                    valid_abilities[typ][ind] = tab[ind]
-                end
+        if tab and typ ~= 'job_traits' then 
+            for _,ind in pairs(tab) do
+                valid_abilities[typ][ind] = res[typ][ind]
             end
         end
     end
@@ -400,21 +392,14 @@ end
 -----------------------------------------------------------------------------------
 function make_slugged_command_list(commands)
     local slugged_commands = {}
-    for i,v in pairs(commands.abilities) do
-        if slugged_commands[stripped] then
-            slugged_commands[stripped] = {type='Ambiguous'}
-        elseif i < 1024 then
-            slugged_commands[strip(v[language])] = {type='job_abilities',id=i}
-        else
-            slugged_commands[strip(v[language])] = {type='monster_abilities',id=i}
-        end
-    end
-    for i,v in pairs(commands.spells) do
-        local stripped = strip(v[language])
-        if slugged_commands[stripped] then
-            slugged_commands[stripped] = {type='Ambiguous'}
-        else
-            slugged_commands[stripped] = {type='spells',id=i}
+    for typ,tab in pairs(commands) do
+        for ind,r_line in pairs(tab) do
+            local stripped = strip(r_line[language])
+            if slugged_commands[stripped] then
+                slugged_commands[stripped] = {type='Ambiguous'}
+            else
+                slugged_commands[stripped] = {type=typ,id=ind}
+            end
         end
     end
     return slugged_commands
