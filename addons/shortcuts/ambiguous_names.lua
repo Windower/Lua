@@ -134,6 +134,8 @@ ambig_names = {
     fluidspread={absolute=true,monster_abilities=431},
     fluidtoss={absolute=true,monster_abilities=432},
     balefulgaze={absolute=true,monster_abilities=370},
+    wingwhirl={absolute=true,monster_abilities=1717},
+    frigidshuffle={absolute=true,monster_abilities=1716},
 
     fireiv={IDs={spells=147,job_abilities=549},funct=smn_unsub,info=60},
     stoneiv={IDs={spells=162,job_abilities=565},funct=smn_unsub,info=60},
@@ -156,6 +158,9 @@ ambig_names = {
     hardenshell={IDs={spells=737,job_abilities=754,monster_abilities=807},funct=blu_unsub,info=95},
     barbedcrescent={IDs={spells=699,weapon_skills=245},funct=blu_unsub,99,info=99},
     dimensionaldeath={IDs={spells=589,weapon_skills=255},funct=blu_unsub,info=60},
+    tourbillion={IDs={spells=740,monster_abilities=2024},funct=blu_unsub,info=97},
+    subzerosmash={IDs={spells=654,monster_abilities=2436},funct=blu_unsub,info=72},
+    pyricbulwark={IDs={spells=741,monster_abilities=1831},funct=blu_unsub,info=98},
      
     footkick={IDs={spells=577,job_abilities=672,monster_abilities=257},funct=blu_sub},
     headbutt={IDs={spells=623,job_abilities=675,monster_abilities=300},funct=blu_sub},

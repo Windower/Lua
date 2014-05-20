@@ -65,7 +65,10 @@ end
 -- Iterate through resources and make validabils.
 function validabils_it(str)
     for i,v in pairs(res[str]) do
-        make_abil(v.english,str,i)
+        if not v.monster_level or (v.monster_level and v.monster_level ~= -1 and v.ja:sub(1,1) ~= '#' )then
+        -- Monster Abilities contains a large number of player-usable moves (but not monstrosity-usable) This excludes them.
+            make_abil(v.english,str,i)
+        end
     end
 end
 
