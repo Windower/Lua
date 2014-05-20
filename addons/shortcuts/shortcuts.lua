@@ -24,7 +24,7 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-_addon.version = '2.2'
+_addon.version = '2.201'
 _addon.name = 'Shortcuts'
 _addon.author = 'Byrth'
 _addon.commands = {'shortcuts'}
@@ -364,11 +364,11 @@ function interp_text(splitline,offset,modified)
     local strippedabil = strip(abil) -- Slug the ability
 
     if strippedabil ~= '' and validabils[strippedabil] then -- If the ability exists, do this.
-        local r_line, s_type
+        local r_line
         
         if validabils[strippedabil].typ == 'ambig_names' then
             if debugging then windower.add_to_chat(8,strippedabil..' is considered ambiguous.') end
-            r_line, s_type = ambig(strippedabil)
+            r_line = ambig(strippedabil)
         elseif res[validabils[strippedabil].typ][validabils[strippedabil].index] then
             if debugging then windower.add_to_chat(8,strippedabil..' is considered a '..validabils[strippedabil].typ..'.') end
             r_line = res[validabils[strippedabil].typ][validabils[strippedabil].index]
@@ -411,7 +411,7 @@ function convert_spell(spell)
     
     if name_line then
         if name_line.typ == 'ambig_names' then
-            r_line, s_type = ambig(strip(spell))
+            r_line = ambig(strip(spell))
         elseif res[name_line.typ][name_line.index] then
             r_line = res[name_line.typ][name_line.index]
         else
