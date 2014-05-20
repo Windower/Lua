@@ -675,7 +675,11 @@ function spell_complete(rline)
         return {tpaftercast = player.tp, mpaftercast = player.mp, mppaftercast = player.mpp}
     end
     if not rline.mp_cost or rline.mp_cost == -1 then rline.mp_cost = 0 end
-    if not rline.tp_cost or rline.tp_cost == -1 then rline.tp_cost = 0 end
+    if not rline.tp_cost and rline.type == 'WeaponSkill' then
+        rline.tp_cost = player.tp
+    elseif not rline.tp_cost or rline.tp_cost == -1 then
+        rline.tp_cost = 0
+    end
     
     if rline.skill and tonumber(rline.skill) then
         rline.skill = res.skills[rline.skill].english
