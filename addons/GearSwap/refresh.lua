@@ -479,7 +479,7 @@ function refresh_buff_active(bufflist)
                 buffarr[buff] = 1
             end
             
-            if buffar[v] then
+            if buffarr[v] then
                 buffarr[v] = buffarr[v] +1
             else
                 buffarr[v] = 1
