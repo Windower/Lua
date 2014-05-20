@@ -84,17 +84,20 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
                 r_line = res.spells[validabils[language][unify_prefix[command]][abil]]
                 storedcommand = command..' "'..r_line[language]..'" '
             elseif command_list[command] == 'Ability' then
-                if unify_prefix[command] == '/ms' and player.species then
-                    -- Iterates over currently available monster TP moves instead of using validabils
-                    for i,v in pairs(player.species.tp_moves) do
-                        if res.abilities[i+768][language]:lower() == abil then
-                            r_line = res.abilities[i+768]
-                            break
+                if unify_prefix[command] == '/ms' then
+                    if player.species then
+                        -- Iterates over currently available monster TP moves instead of using validabils
+                        for i,v in pairs(player.species.tp_moves) do
+                            if res.monster_abilities[i][language]:lower() == abil then
+                                r_line = res.monster_abilities[i]
+                                break
+                            end
                         end
                     end
-                end
-                if not r_line then
-                    r_line = res.abilities[validabils[language][unify_prefix[command]][abil]]
+                elseif unify_prefix[command] == '/ws' then
+                    r_line = res.weapon_skills[validabils[language][unify_prefix[command]][abil]]
+                elseif unify_prefix[command] == '/ja' then
+                    r_line = res.job_abilities[validabils[language][unify_prefix[command]][abil]]
                 end
                 storedcommand = command..' "'..r_line[language]..'" '
             elseif command_list[command] == 'Item' then
@@ -103,7 +106,7 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
                 r_line.type = 'Item'
                 storedcommand = command..' "'..r_line[language]..'" '
             elseif command_list[command] == 'Ranged Attack' then
-                r_line = res.abilities[1]
+                r_line = resources_ranged_attack
                 storedcommand = command..' '
             end
             

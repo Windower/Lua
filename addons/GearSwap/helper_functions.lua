@@ -217,7 +217,7 @@ function assemble_action_packet(target_id,target_index,category,spell_id)
     outstr = outstr..string.char( (target_index%256), math.floor(target_index/256)%256)
     outstr = outstr..string.char( (category%256), math.floor(category/256)%256)
     
-    if category == 7 or category == 25 then
+    if category == 25 then
         spell_id = spell_id - 768
     end
     
@@ -338,7 +338,10 @@ end
 -----------------------------------------------------------------------------------
 function filter_pretarget(spell)
     local category = outgoing_action_category_table[unify_prefix[spell.prefix]]
-    if category == 3 then
+    if world.in_mog_house then
+        debug_mode_chat("Unable to execute commands. Currently in a Mog House zone.")
+        return false
+    elseif category == 3 then
         local available_spells = windower.ffxi.get_spells()
         local spell_jobs = res.spells[spell.id].levels
         
@@ -387,16 +390,20 @@ function filter_pretarget(spell)
                 return false
             end
         end
-    elseif (category == 7 or category == 9) and not windower.ffxi.get_abilities()[spell.id] then
-        debug_mode_chat("Unable to execute command. You do not have access to that ability ("..(res.abilities[spell.id][language] or spell.id)..")")
-        return false
-    elseif category == 25 and (not player.main_job == 'MON' or not player.species or not player.species.tp_moves[spell.id-768] or not (player.species.tp_moves[spell.id-768] <= player.main_job_level)) then
+    elseif category == 7 or category == 9 then
+        local available = windower.ffxi.get_abilities()
+        if category == 7 and not S(available.weapon_skills)[spell.id] then
+            debug_mode_chat("Unable to execute command. You do not have access to that ability ("..(res.weapon_skills[spell.id][language] or spell.id)..")")
+            return false
+        elseif category == 9 and not S(available.job_abilities)[spell.id] then
+            debug_mode_chat("Unable to execute command. You do not have access to that ability ("..(res.job_abilities[spell.id][language] or spell.id)..")")
+            return false
+        end
+    elseif category == 25 and (not player.main_job == 'MON' or not player.species or not player.species.tp_moves[spell.id] or not (player.species.tp_moves[spell.id] <= player.main_job_level)) then
         -- Monstrosity filtering
-        debug_mode_chat("Unable to execute command. You do not have access to that monsterskill ("..(res.abilities[spell.id][language] or spell.id)..")")
+        debug_mode_chat("Unable to execute command. You do not have access to that monsterskill ("..(res.monster_abilities[spell.id][language] or spell.id)..")")
         return false
     end
-    
-    
     
     return true
 end
@@ -582,19 +589,19 @@ function get_spell(act)
     elseif T{3,4,5,6,11,13,14,15}:contains(act.category) then
         abil_ID = act.param
         effect_val = act.targets[1].actions[1].param
-    elseif act.category == 12 or act.category == 2 then
-        abil_ID = 1
     end
     
     if act.category == 12 or act.category == 2 then
-        spell = res.abilities[abil_ID]
+        spell = table.reassign({},resources_ranged_attack)
     else
         if not res.action_messages[msg_ID] then
             if act.category == 4 or act.category == 8 then
                 spell = res.spells[abil_ID]
                 if act.category == 4 and spell then spell.recast = act.recast end
-            elseif T{2,3,6,7,12,13,14,15}:contains(act.category) then
-                spell = res.abilities[abil_ID] -- May have to correct for charmed pets some day, but I'm not sure there are any monsters with TP moves that give no message.
+            elseif T{6,13,14,15}:contains(act.category) then
+                spell = res.job_abilities[abil_ID] -- May have to correct for charmed pets some day, but I'm not sure there are any monsters with TP moves that give no message.
+            elseif T{3,7}:contains(act.category) then
+                spell = res.weapon_skills[abil_ID]
             elseif T{5,9}:contains(act.category) then
                 spell = res.items[abil_ID]
             else
@@ -610,7 +617,7 @@ function get_spell(act)
             spell = res.spells[abil_ID]
             if act.category == 4 then spell.recast = act.recast end
         elseif table.contains(fields,'ability') then
-            spell = res.abilities[abil_ID]
+            spell = res.job_abilities[abil_ID]
         elseif table.contains(fields,'weapon_skill') then
             if abil_ID > 255 then -- WZ_RECOVER_ALL is used by chests in Limbus
                 spell = res.monster_abilities[abil_ID-256]
@@ -618,20 +625,20 @@ function get_spell(act)
                     spell = {id=abil_ID-256,english='Special Attack'}
                 end
             elseif abil_ID < 256 then
-                spell = res.abilities[abil_ID+768]
+                spell = res.weapon_skills[abil_ID]
             end
         elseif msg_ID == 303 then
-            spell = res.abilities[74] -- Divine Seal
+            spell = res.job_abilities[74] -- Divine Seal
         elseif msg_ID == 304 then
-            spell = res.abilities[75] -- 'Elemental Seal'
+            spell = res.job_abilities[75] -- 'Elemental Seal'
         elseif msg_ID == 305 then
-            spell = res.abilities[76] -- 'Trick Attack'
+            spell = res.job_abilities[76] -- 'Trick Attack'
         elseif msg_ID == 311 or msg_ID == 311 then
-            spell = res.abilities[79] -- 'Cover'
+            spell = res.job_abilities[79] -- 'Cover'
         elseif msg_ID == 240 or msg_ID == 241 then
-            spell = res.abilities[43] -- 'Hide'
+            spell = res.job_abilities[43] -- 'Hide'
         elseif msg_ID == 328 then
-            spell = res.abilities[effect_val] -- BPs that are out of range
+            spell = res.job_abilities[effect_val] -- BPs that are out of range
         end
         
         
@@ -668,7 +675,11 @@ function spell_complete(rline)
         return {tpaftercast = player.tp, mpaftercast = player.mp, mppaftercast = player.mpp}
     end
     if not rline.mp_cost or rline.mp_cost == -1 then rline.mp_cost = 0 end
-    if not rline.tp_cost or rline.tp_cost == -1 then rline.tp_cost = 0 end
+    if not rline.tp_cost and rline.type == 'WeaponSkill' then
+        rline.tp_cost = player.tp
+    elseif not rline.tp_cost or rline.tp_cost == -1 then
+        rline.tp_cost = 0
+    end
     
     if rline.skill and tonumber(rline.skill) then
         rline.skill = res.skills[rline.skill].english

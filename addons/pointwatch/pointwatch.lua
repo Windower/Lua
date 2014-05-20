@@ -66,7 +66,7 @@ windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blo
                     local param_2 = str2bytes(org:sub(0xD,0x10))
                     local param_3 = str2bytes(org:sub(0x11,0x14))
                     local param_4 = str2bytes(org:sub(0x15,0x18))
-                    print(param_1,param_2,param_3,param_4) -- DEBUGGING STATEMENT -------------------------
+                    -- print(param_1,param_2,param_3,param_4) -- DEBUGGING STATEMENT -------------------------
                     if zone_message_functions[i] then
                         zone_message_functions[i](param_1,param_2,param_3,param_4)
                     end
@@ -133,12 +133,15 @@ windower.register_event('zone change',function(new,old)
         dynamis.entry_time = os.clock()
         dynamis.time_limit = 3600
         dynamis.zone = new
-        cur_func = loadstring("current_string = "..settings.strings.dynamis)
+        cur_func,loadstring_err = loadstring("current_string = "..settings.strings.dynamis)
     else
         dynamis.entry_time = 0
         dynamis.time_limit = 0
         dynamis.zone = 0
-        cur_func = loadstring("current_string = "..settings.strings.default)
+        cur_func,loadstring_err = loadstring("current_string = "..settings.strings.default)
+    end
+    if not cur_func then
+        error(loadstring_err)
     end
 end)
 
