@@ -24,7 +24,7 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-_addon.version = '2.101'
+_addon.version = '2.2'
 _addon.name = 'Shortcuts'
 _addon.author = 'Byrth'
 _addon.commands = {'shortcuts'}
@@ -366,15 +366,12 @@ function interp_text(splitline,offset,modified)
     if strippedabil ~= '' and validabils[strippedabil] then -- If the ability exists, do this.
         local r_line, s_type
         
-        if validabils[strippedabil].typ == 'spells' then
-            if debugging then windower.add_to_chat(8,strippedabil..' is considered a spell.') end
-            r_line = res.spells[validabils[strippedabil].index]
-        elseif validabils[strippedabil].typ == 'abilities' then
-            if debugging then windower.add_to_chat(8,strippedabil..' is considered an ability.') end
-            r_line = res.abilities[validabils[strippedabil].index]
-        elseif validabils[strippedabil].typ == 'ambig_names' then
+        if validabils[strippedabil].typ == 'ambig_names' then
             if debugging then windower.add_to_chat(8,strippedabil..' is considered ambiguous.') end
             r_line, s_type = ambig(strippedabil)
+        elseif res[validabils[strippedabil].typ][validabils[strippedabil].index] then
+            if debugging then windower.add_to_chat(8,strippedabil..' is considered a '..validabils[strippedabil].typ..'.') end
+            r_line = res[validabils[strippedabil].typ][validabils[strippedabil].index]
         end
         
         local targets = r_line.targets
@@ -413,12 +410,12 @@ function convert_spell(spell)
     local name_line = validabils[(spell or ''):lower():gsub(' ',''):gsub('[^%w]','')]
     
     if name_line then
-        if name_line.typ == 'spells' then
-            r_line = res.spells[name_line.index]
-        elseif name_line.typ == 'abilities' then
-            r_line = res.abilities[name_line.index]
-        elseif name_line.typ == 'ambig_names' then
+        if name_line.typ == 'ambig_names' then
             r_line, s_type = ambig(strip(spell))
+        elseif res[name_line.typ][name_line.index] then
+            r_line = res[name_line.typ][name_line.index]
+        else
+            print('this line should really not be hit ever')
         end
         
         if r_line then

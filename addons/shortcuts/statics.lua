@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 -- Convert the spells and job abilities into a referenceable list of aliases --
-validabils = T{}
+validabils = {}
 
 if logging then
 	f = io.open('../addons/shortcuts/data/'..tostring(os.clock())..'_all_duplicates.log','w+')
@@ -63,14 +63,16 @@ function make_abil(abil,t,i)
 end
 
 -- Iterate through resources and make validabils.
-function validabils_it(resources_table,str)
-    for i,v in pairs(resources_table) do
+function validabils_it(str)
+    for i,v in pairs(res[str]) do
         make_abil(v.english,str,i)
     end
 end
 
-validabils_it(res.spells,'spells')
-validabils_it(res.abilities,'abilities')
+validabils_it('spells')
+validabils_it('job_abilities')
+validabils_it('weapon_skills')
+validabils_it('monster_abilities')
 
 
 
