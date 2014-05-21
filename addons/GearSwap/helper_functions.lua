@@ -217,10 +217,6 @@ function assemble_action_packet(target_id,target_index,category,spell_id)
     outstr = outstr..string.char( (target_index%256), math.floor(target_index/256)%256)
     outstr = outstr..string.char( (category%256), math.floor(category/256)%256)
     
-    if category == 25 then
-        spell_id = spell_id - 768
-    end
-    
     if category == 16 then
         spell_id = 0
     end
