@@ -478,6 +478,12 @@ function refresh_buff_active(bufflist)
             else
                 buffarr[buff] = 1
             end
+            
+            if buffarr[v] then
+                buffarr[v] = buffarr[v] +1
+            else
+                buffarr[v] = 1
+            end
         end
     end
     table.reassign(buffactive,buffarr)

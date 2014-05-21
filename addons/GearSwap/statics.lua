@@ -37,7 +37,7 @@ validabils['french'] = {['/ma'] = {}, ['/ja'] = {}, ['/ws'] = {}, ['/item'] = {}
 validabils['german'] = {['/ma'] = {}, ['/ja'] = {}, ['/ws'] = {}, ['/item'] = {}, ['/ra'] = {}, ['/ms'] = {}, ['/pet'] = {}, ['/trig'] = {}, ['/echo'] = {}}
 validabils['japanese'] = {['/ma'] = {}, ['/ja'] = {}, ['/ws'] = {}, ['/item'] = {}, ['/ra'] = {}, ['/ms'] = {}, ['/pet'] = {}, ['/trig'] = {}, ['/echo'] = {}}
 
-function make_abil(abil,lang,t,i)
+function make_abil(abil,lang,i)
     if not abil[lang] or not abil.prefix then return end
     local sp = abil[lang]:lower()
     local pref = unify_prefix[abil.prefix:lower()]
@@ -45,26 +45,38 @@ function make_abil(abil,lang,t,i)
     validabils[lang][pref][sp] = i
 end
 
-function make_entry(v,typ,i)
-    make_abil(v,'english',typ,i)
-    make_abil(v,'german',typ,i)
-    make_abil(v,'french',typ,i)
-    make_abil(v,'japanese',typ,i)
+function make_entry(v,i)
+    make_abil(v,'english',i)
+    make_abil(v,'german',i)
+    make_abil(v,'french',i)
+    make_abil(v,'japanese',i)
 end
 
 for i,v in pairs(res.spells) do
     if not T{363,364}:contains(i) then
-        make_entry(v,'Magic',i)
+        make_entry(v,i)
     end
 end
 
-for i,v in pairs(res.abilities) do
-    make_entry(v,'Ability',i)
+for i,v in pairs(res.job_abilities) do
+    make_entry(v,i)
+end
+
+for i,v in pairs(res.weapon_skills) do
+    v.type = 'WeaponSkill'
+    v.recast_id = 900
+    make_entry(v,i)
+end
+
+for i,v in pairs(res.monster_abilities) do
+    v.type = 'MonsterSkill'
+    v.recast_id = 900
+    make_entry(v,i)
 end
 
 for i,v in pairs(res.items) do
     if v.targets and table.length(v.targets) ~= 0 then
-        make_entry(v,'Item',i)
+        make_entry(v,i)
     end
 end
     
@@ -127,6 +139,9 @@ addendum_black = {[253]="Sleep",[259]="Sleep II",[260]="Dispel",[162]="Stone IV"
     [168]="Thunder V",[157]="Aero IV",[158]="Aero V",[152]="Blizzard IV",[153]="Blizzard V",[147]="Fire IV",[148]="Fire V",
     [172]="Water IV",[173]="Water V",[255]="Break"}
 
+resources_ranged_attack = {id="1",index="0",prefix="/range",english="Ranged",german="Fernwaffe",french="Attaque à dist.",japanese="????",type="Misc",element="None",targets="Enemy",skill="Ability",mpcost="0",tpcost="0",casttime="0",recast="0"}
+
+    
 -- _globals --
 user_data_table = {
     __newindex = function(tab, key, val)
