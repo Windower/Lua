@@ -678,7 +678,7 @@ function spell_complete(rline)
     end
     
     if rline.skill and tonumber(rline.skill) then
-        rline.skill = res.skills[rline.skill].english
+        rline.skill = res.skills[rline.skill][language]
     end
     
     if rline.element and tonumber(rline.element) then

@@ -202,8 +202,8 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         -- Ignore all statuses aside from Idle/Engaged/Dead/Engaged dead.
         if status_id < 4 then
             local newstatus = res.statuses[status_id]
-            if newstatus and newstatus.english then
-                newstatus = newstatus.english
+            if newstatus and newstatus[language] then
+                newstatus = newstatus[language]
                 if oldstatus ~= newstatus then
                     if not next_packet_events then next_packet_events = {sequence_id = data:byte(4)*256+data:byte(3)} end
                     next_packet_events.pet_status_change = {newstatus=newstatus,oldstatus=oldstatus}
@@ -363,7 +363,7 @@ windower.register_event('status change',function(new,old)
     if gearswap_disabled or T{2,3,4}:contains(old) or T{2,3,4}:contains(new) then return end
     
     refresh_globals()
-    equip_sets('status_change',nil,res.statuses[new].english,res.statuses[old].english)
+    equip_sets('status_change',nil,res.statuses[new][language],res.statuses[old][language])
 end)
 
 windower.register_event('gain buff',function(buff_id)

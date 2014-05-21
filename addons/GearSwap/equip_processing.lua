@@ -271,9 +271,9 @@ function get_gs_gear(cur_equip,swap_type)
         end
         if cur_equip[i] and cur_equip[i].slot ~= empty and debugging > 0 then
             if cur_equip[i].inv_id == 0 and items.inventory[cur_equip[i].slot] and res.items[items.inventory[cur_equip[i].slot].id] then
-                sent_out_box = sent_out_box..tostring(i)..' '..tostring(res.items[items.inventory[cur_equip[i].slot].id].english)..'\n'
+                sent_out_box = sent_out_box..tostring(i)..' '..tostring(res.items[items.inventory[cur_equip[i].slot].id][language])..'\n'
             elseif cur_equip[i].inv_id == 8 and items.wardrobe[cur_equip[i].slot] and res.items[items.wardrobe[cur_equip[i].slot].id] then
-                sent_out_box = sent_out_box..tostring(i)..' '..tostring(res.items[items.wardrobe[cur_equip[i].slot].id].english)..'\n'
+                sent_out_box = sent_out_box..tostring(i)..' '..tostring(res.items[items.wardrobe[cur_equip[i].slot].id][language])..'\n'
             end
         elseif cur_equip[i] and cur_equip[i].slot == empty and debugging >0 then
             sent_out_box = sent_out_box..tostring(i)..' Empty\n'

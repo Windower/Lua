@@ -368,13 +368,10 @@ function interp_text(splitline,offset,modified)
         
         if validabils[strippedabil].typ == 'ambig_names' then
             if debugging then windower.add_to_chat(8,strippedabil..' is considered ambiguous.') end
-            print(splitline,abil,strippedabil)
             r_line = ambig(strippedabil)
         elseif res[validabils[strippedabil].typ][validabils[strippedabil].index] then
             if debugging then windower.add_to_chat(8,strippedabil..' is considered a '..validabils[strippedabil].typ..'.') end
             r_line = res[validabils[strippedabil].typ][validabils[strippedabil].index]
-        else
-            print(strippedabil)
         end
         
         local targets = r_line.targets

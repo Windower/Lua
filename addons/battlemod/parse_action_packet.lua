@@ -491,7 +491,7 @@ function get_spell(act)
                 if abil_ID < 256 then
                     spell = res.weapon_skills[abil_ID] -- May have to correct for charmed pets some day, but I'm not sure there are any monsters with TP moves that give no message.
                 else
-                    spell = res.monster_akills[abil_ID]
+                    spell = res.monster_abilities[abil_ID]
                 end
             elseif T{5,9}:contains(act['category']) then
                 spell = res.items[abil_ID]

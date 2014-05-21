@@ -69,8 +69,8 @@ function load_user_files(job_id)
     registered_user_events = {}
     
     local tab = {player.name..'_'..res.jobs[job_id].short..'.lua',player.name..'-'..res.jobs[job_id].short..'.lua',
-        player.name..'_'..res.jobs[job_id].english..'.lua',player.name..'-'..res.jobs[job_id].english..'.lua',
-        player.name..'.lua',res.jobs[job_id].short..'.lua',res.jobs[job_id].english..'.lua','default.lua'}
+        player.name..'_'..res.jobs[job_id][language]..'.lua',player.name..'-'..res.jobs[job_id][language]..'.lua',
+        player.name..'.lua',res.jobs[job_id].short..'.lua',res.jobs[job_id][language]..'.lua','default.lua'}
     
     local path = pathsearch(tab)
     
@@ -187,7 +187,7 @@ function refresh_player()
     
     if player_mob_table.race ~= nil then
         player.race_id = player.race
-        player.race = mob_table_races[player.race]
+        player.race = res.races[player.race][language]
     end
     
     
@@ -238,9 +238,9 @@ function refresh_player()
             if pet.tp then pet.tp = pet.tp/10 end
             
             if avatar_element[pet.name] then
-                pet.element = avatar_element[pet.name]
+                pet.element = res.elements[avatar_element[pet.name]][language]
             else
-                pet.element = 'None'
+                pet.element = res.elements[-1][language] -- Physical
             end
         else
             table.reassign(pet, {isvalid=true})
@@ -416,7 +416,7 @@ function refresh_group_info()
     for i,v in pairs(j) do
         if v.mob and v.mob.race then
             v.mob.race_id = v.mob.race
-            v.mob.race = mob_table_races[v.mob.race]
+            v.mob.race = res.races[v.mob.race][language]
         end
         
         local allyIndex
