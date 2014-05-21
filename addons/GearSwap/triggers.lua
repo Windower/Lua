@@ -69,7 +69,8 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
     end
     
     local temptarg,temp_mob_arr = valid_target(splitline[splitline.n])
-    if command_list[command] and temptarg and (validabils[language][unify_prefix[command]][abil] or unify_prefix[command]=='/ra') then
+    local unified_prefix = unify_prefix[command]
+    if unified_prefix and temptarg and (validabils[language][unified_prefix][abil] or unified_prefix=='/ra') then
         if st_flag then
             st_flag = nil
             return true
@@ -80,32 +81,32 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
             
             local r_line
             
-            if command_list[command] == 'Magic' then
-                r_line = res.spells[validabils[language][unify_prefix[command]][abil]]
+            if unified_prefix == '/ma' then
+                r_line = res.spells[validabils[language][unified_prefix][abil]]
                 storedcommand = command..' "'..r_line[language]..'" '
-            elseif command_list[command] == 'Ability' then
-                if unify_prefix[command] == '/ms' then
-                    if player.species then
-                        -- Iterates over currently available monster TP moves instead of using validabils
-                        for i,v in pairs(player.species.tp_moves) do
-                            if res.monster_abilities[i][language]:lower() == abil then
-                                r_line = res.monster_abilities[i]
-                                break
-                            end
+            elseif unified_prefix == '/ms' then
+                if player.species then
+                    -- Iterates over currently available monster TP moves instead of using validabils
+                    for i,v in pairs(player.species.tp_moves) do
+                        if res.monster_abilities[i][language]:lower() == abil then
+                            r_line = res.monster_abilities[i]
+                            break
                         end
                     end
-                elseif unify_prefix[command] == '/ws' then
-                    r_line = res.weapon_skills[validabils[language][unify_prefix[command]][abil]]
-                elseif unify_prefix[command] == '/ja' then
-                    r_line = res.job_abilities[validabils[language][unify_prefix[command]][abil]]
                 end
                 storedcommand = command..' "'..r_line[language]..'" '
-            elseif command_list[command] == 'Item' then
-                r_line = res.items[validabils[language][unify_prefix[command]][abil]]
+            elseif unified_prefix == '/ws' then
+                r_line = res.weapon_skills[validabils[language][unified_prefix][abil]]
+                storedcommand = command..' "'..r_line[language]..'" '
+            elseif unified_prefix == '/ja' then
+                r_line = res.job_abilities[validabils[language][unified_prefix][abil]]
+                storedcommand = command..' "'..r_line[language]..'" '
+            elseif unified_prefix == '/item' then
+                r_line = res.items[validabils[language][unified_prefix][abil]]
                 r_line.prefix = '/item'
                 r_line.type = 'Item'
                 storedcommand = command..' "'..r_line[language]..'" '
-            elseif command_list[command] == 'Ranged Attack' then
+            elseif unified_prefix == '/ra' then
                 r_line = resources_ranged_attack
                 storedcommand = command..' '
             end
@@ -113,7 +114,7 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
             r_line.name = r_line[language]
             spell = spell_complete(r_line)
             spell.target = temp_mob_arr
-            spell.action_type = command_list[command]
+            spell.action_type = action_type_map[command]
             
             if filter_pretarget(spell) then
                 if tonumber(splitline[splitline.n]) then
@@ -179,13 +180,13 @@ function inc_action(act)
     
     spell = get_spell(act)
     if logging then    
-        if spell then logit(logfile,'\n\n'..tostring(os.clock)..'(178) Event Action: '..tostring(spell.english)..' '..tostring(act.category))
+        if spell then logit(logfile,'\n\n'..tostring(os.clock)..'(178) Event Action: '..tostring(spell[language])..' '..tostring(act.category))
         else logit(logfile,'\n\nNil spell detected') end
     end
     
-    if spell and spell.english then
+    if spell and spell[language] then
         spell.target = target_complete(windower.ffxi.get_mob_by_id(act.targets[1].id))
-        spell.action_type = command_list[unify_prefix[spell.prefix or 'Mon']]
+        spell.action_type = action_type_map[unify_prefix[spell.prefix or 'Mon']]
     else
         if debugging >= 1 then windower.send_command('input /echo Incoming Action packet did not generate a spell/aftercast.')end
         return
@@ -293,6 +294,6 @@ function inc_action_message(arr)
 --            tab.spell = {interrupted=true,action_type='Interruption'}
         end
     elseif unable_to_use:contains(arr.message_id) and debugging >= 1 then
-        windower.add_to_chat(8,'Handled Action message received with a target other than yourself: '..tostring(res.action_messages[arr.message_id].english)..' '..tostring(windower.ffxi.get_mob_by_id(actor_id).name))
+        windower.add_to_chat(8,'Handled Action message received with a target other than yourself: '..tostring(res.action_messages[arr.message_id][language])..' '..tostring(windower.ffxi.get_mob_by_id(actor_id).name))
     end
 end

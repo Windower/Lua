@@ -92,12 +92,12 @@ function target_complete(mob_table)
     
     if mob_table.race then 
         mob_table.race_id = mob_table.race
-        mob_table.race = mob_table_races[mob_table.race]
+        mob_table.race = res.races[mob_table.race][language]
     end
     if mob_table.status then
         mob_table.status_id = mob_table.status
         if res.statuses[mob_table.status] then
-            mob_table.status = res.statuses[mob_table.status].english
+            mob_table.status = res.statuses[mob_table.status][language]
         else
             mob_table.status = 'Unknown'
         end
