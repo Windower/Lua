@@ -49,13 +49,15 @@ addremove_commands = T{
 }
 
 bool_values = T{
-    on = true,
+    ['on'] = true,
     ['1'] = true,
     ['true'] = true,
-    off = false,
+    ['off'] = false,
     ['0'] = false,
     ['false'] = false,
 }
+
+inventory_id = res.bags:with('english', 'Inventory').id
 
 function passlot(command1, command2, ids)
     local action = command1:lower()
@@ -93,11 +95,13 @@ function force_check()
 end
 
 function check(slot_index, item_id)
-    local items = windower.ffxi.get_items()
     if code.pass:contains(item_id) then
         windower.ffxi.pass_item(slot_index)
-    elseif items.max_inventory - items.count_inventory > 1 and code.lot:contains(item_id) then
-        windower.ffxi.lot_item(slot_index)
+    elseif code.lot:contains(item_id) then
+        local inventory = windower.ffxi.get_items(inventory_id)
+        if inventory.max - inventory.count > 1 then
+            windower.ffxi.lot_item(slot_index)
+        end
     end
 end
 
@@ -127,31 +131,43 @@ function find_id(name)
 end
 
 function pool_ids()
-    local ids = S{}
-    for slot_index,item_table in pairs(windower.ffxi.get_items().treasure) do 
-        ids:add(item_table.item_id)
-    end
-    return ids
+    return S(T(windower.ffxi.get_items().treasure):map(table.get-{'item_id'}))
 end
 
-stack_ids = S{0x01E, 0x01F, 0x020}
+stack = (function()
+    local wait_time = 0
+
+    return function()
+        if os.clock() - last_stack_time > 2 then
+            packets.inject(packets.outgoing(0x03A))
+            last_stack_time = os.clock()
+            wait_time = 0
+        elseif os.clock() - last_stack_time > wait_time then
+            wait_time = wait_time + 0.45
+            windower.send_command('@wait 0.5; lua i treasury stack')
+        end
+    end
+end)()
+
+stack_ids = S{0x01F, 0x020}
 last_stack_time = 0
-inventory = res.bags:with('english', 'Inventory').id
 windower.register_event('incoming chunk', function(id, data)
     if id == 0x0D2 then
         local treasure = packets.incoming(id, data)
         check(treasure.Index, treasure.Item)
     elseif stack_ids:contains(id) then
-        if id == 0x020 and settings.AutoDrop then
-            local packet = packets.incoming(id, data)
-            if packet.Bag == inventory and code.pass:contains(packet.Item) then
-                windower.ffxi.drop_item(packet.Index, packet.Count)
-            end
+        local chunk = packets.incoming(id, data)
+
+        -- Ignore items in other bags
+        if chunk.Bag ~= inventory_id then
+            return
         end
 
-        if os.clock() - last_stack_time > 2000 then
-            packets.inject(packets.outgoing(0x03A))
-            last_stack_time = os.clock()
+        if id == 0x020 and settings.AutoDrop and chunk.Bag == inventory_id and code.pass:contains(chunk.Item) then
+            windower.ffxi.drop_item(chunk.Index, chunk.Count)
+        else
+            -- Don't need to stack in the other case, as a new inventory packet will come in after the drop anyway
+            stack()
         end
     end
 end)
