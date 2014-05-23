@@ -1171,6 +1171,28 @@ fields.incoming[0x027] = L{
     {ctype='char[32]',          label='_unknown7'},                             -- 50
 }
 
+-- Action
+fields.incoming._mult[0x028] = {}
+fields.incoming[0x028] = function(data)
+    return fields.incoming._mult[0x028].base
+end
+
+enums.action_in = {
+    [4] = 'Casting finish',
+    [6] = 'Job Ability use',
+    [8] = 'Casting start',
+}
+
+fields.incoming._mult[0x028].base = L{
+    {ctype='unsigned char',     label='Size'},                                  -- 04
+    {ctype='unsigned int',      label='Actor',              fn=id},             -- 05
+    {ctype='bit[10]',           label='Target Count'},                          -- 09
+    {ctype='bit[4]',            label='Category',           fn=e+{'action_in'}},-- 0A
+    {ctype='bit[16]',           label='Param'},                                 -- 0C
+    {ctype='bit[16]',           label='_unknown1'},                             -- 0E
+    {ctype='bit[32]',           label='Recast'},                                -- 10
+}
+
 -- Action Message
 fields.incoming[0x029] = L{
     {ctype='unsigned int',      label='Actor',              fn=id},             -- 04
