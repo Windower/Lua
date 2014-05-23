@@ -86,12 +86,12 @@ function load_user_files(job_id)
         force_send=force_send, change_target=change_target, cast_delay=cast_delay,
         print_set=print_set,set_combine=set_combine,disable=disable,enable=enable,
         send_command=send_cmd_user,windower=user_windower,include=include_user,
-        midaction=user_midaction,pet_midaction=user_pet_midaction,
+        midaction=user_midaction,pet_midaction=user_pet_midaction,set_language=set_language,
         
         -- Library functions
         string=string,math=math,table=table,set=set,list=list,T=T,S=S,L=L,os=os,
         text=text,type=type,tostring=tostring,tonumber=tonumber,pairs=pairs,
-        ipairs = ipairs, print=print, add_to_chat=windower.add_to_chat,
+        ipairs = ipairs, print=print, add_to_chat=add_to_chat_user,
         next=next,lua_base_path=windower.addon_path,empty=empty,
         
         -- Player environment things
@@ -107,6 +107,8 @@ function load_user_files(job_id)
                 back=empty,waist=empty,legs=empty,feet=empty}}
         }
 
+    language = 'english' -- Reset language to english when changing job files.
+    
     -- Try to load data/<name>_<main job>.lua
     local funct, err = loadfile(path)
     

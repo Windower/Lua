@@ -68,9 +68,6 @@ function export_set(options)
     elseif all_sets then
         -- Iterate through user_env.sets and find all the gear.
         item_list,exported = unpack_names({},'L1',user_env.sets,{},{empty=true})
---        for i,v in pairs(exported) do
---            windower.add_to_chat(8,tostring(i))
---        end
     else
         -- Default to loading the currently worn gear.
         local gear = convert_equipment(temp_items.equipment)

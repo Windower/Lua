@@ -1,4 +1,6 @@
 -------------------------------------------------
+GearSwap 0.850 - Japanese support.
+-------------------------------------------------
 GearSwap 0.840 - Overhaul for Wardrobe. Preparations for new augment library.
 -------------------------------------------------
 GearSwap 0.837 - Created infrastructure for GearSwap served information and added Indi spell aura information to player.

@@ -236,12 +236,12 @@ function to_names_set(id_id)
     
     for i,v in pairs(id_id) do
         if v.slot~=0 and v.slot~=empty then
-            if items[res.bags[v.inv_id][language]:lower()][v.slot].id == 0 then
+            if items[__raw.lower(res.bags[v.inv_id].english)][v.slot].id == 0 then
                 equip_package[i]=''
             elseif type(i) ~= 'string' then
-                equip_package[default_slot_map[i]] = res.items[items[res.bags[v.inv_id][language]:lower()][v.slot].id][language]
+                equip_package[default_slot_map[i]] = res.items[items[__raw.lower(res.bags[v.inv_id].english)][v.slot].id][language]
             else
-                equip_package[i]=res.items[items[res.bags[v.inv_id][language]:lower()][v.slot].id][language]
+                equip_package[i]=res.items[items[__raw.lower(res.bags[v.inv_id].english)][v.slot].id][language]
             end
         else
             if type(i)~= 'string' then

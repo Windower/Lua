@@ -25,6 +25,25 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+__raw = {lower = string.lower}
+
+-----------------------------------------------------------------------------------
+--Name: string.lower()
+--Args:
+---- message (string): Message to be forced to lower case
+-----------------------------------------------------------------------------------
+--Returns:
+---- Lower case message (or not, if the language or message is invalid)
+-----------------------------------------------------------------------------------
+function string.lower(message)
+    if message and type(message) == 'string' and language == 'english' then
+        return __raw.lower(message)
+    else
+        return message
+    end
+end
+
+
 -----------------------------------------------------------------------------------
 --Name: fieldsearch()
 --Args:
@@ -443,7 +462,7 @@ function mk_command_registry_entry(sp)
     command_registry[ts].cast_delay = 0
     command_registry[ts].spell = sp
     if debugging >= 2 then
-        windower.add_to_chat(8,'GearSwap (Debug Mode): Creating a new command_registry entry: '..tostring(ts)..' '..tostring(command_registry[ts]))
+        windower.add_to_chat(8,'GearSwap (Debug Mode): Creating a new command_registry entry: '..windower.to_shift_jis(tostring(ts)..' '..tostring(command_registry[ts])))
     end
     return ts
 end
@@ -607,7 +626,7 @@ function get_spell(act)
         end
         
         
-        local fields = fieldsearch(res.action_messages[msg_ID][language])
+        local fields = fieldsearch(res.action_messages[msg_ID].english) -- ENGLISH
 
         if table.contains(fields,'spell') then
             spell = res.spells[abil_ID]
@@ -711,7 +730,7 @@ end
 -----------------------------------------------------------------------------------
 function debug_mode_chat(message)
     if _settings.debug_mode then
-        windower.add_to_chat(8,"GearSwap (Debug Mode): "..message)
+        windower.add_to_chat(8,"GearSwap (Debug Mode): "..windower.to_shift_jis(tostring(message)))
     end
 end
 

@@ -82,6 +82,18 @@ function change_target(name)
     end
 end
 
+function set_language(lang)
+    if _global.current_event ~= 'None' then
+        error('\nGearSwap: set_language() is only valid in the get_sets function', 2)
+        return
+    end
+    if lang and type(lang) == 'string' and (lang == 'english' or lang == 'japanese') then
+        rawset(_G,'language',lang)
+    else
+        error('\nGearSwap: set_language() was passed an invalid value ('..tostring(lang)..'). (must be a string)', 2)
+    end
+end
+
 function cast_delay(delay)
     if _global.current_event ~= 'precast' and _global.current_event ~= 'pretarget' then
         error('\nGearSwap: cast_delay() is only valid in the precast and pretarget functions', 2)
@@ -147,20 +159,20 @@ end
 function print_set(set,title)
     if not set then
         if title then
-            error('\nGearSwap: print_set error, '..tostring(title)..' set is nil.', 2)
+            error('\nGearSwap: print_set error, '..windower.to_shift_jis(tostring(title))..' set is nil.', 2)
         else
             error('\nGearSwap: print_set error, set is nil.', 2)
         end
         return
     elseif type(set) ~= 'table' then
         if title then
-            error('\nGearSwap: print_set error, '..tostring(title)..' set is not a table.', 2)
+            error('\nGearSwap: print_set error, '..windower.to_shift_jis(tostring(title))..' set is not a table.', 2)
         else
             error('\nGearSwap: print_set error, set is not a table.', 2)
         end
     elseif table.length(set) == 0 then
         if title then
-            windower.add_to_chat(1,'------------------'.. tostring(title)..' -- Empty Table -----------------')
+            windower.add_to_chat(1,'------------------'.. windower.to_shift_jis(tostring(title))..' -- Empty Table -----------------')
         else
             windower.add_to_chat(1,'-------------------------- Empty Table -------------------------')
         end
@@ -168,24 +180,24 @@ function print_set(set,title)
     end
     
     if title then
-        windower.add_to_chat(1,'------------------------- '..tostring(title)..' -------------------------')
+        windower.add_to_chat(1,'------------------------- '..windower.to_shift_jis(tostring(title))..' -------------------------')
     else
         windower.add_to_chat(1,'----------------------------------------------------------------')
     end
     if #set == table.length(set) then
         for i,v in ipairs(set) do
             if type(v) == 'table' and v.name then
-                windower.add_to_chat(8,tostring(i)..' '..tostring(v.name)..' (Adv.)')
+                windower.add_to_chat(8,windower.to_shift_jis(tostring(i))..' '..windower.to_shift_jis(tostring(v.name))..' (Adv.)')
             else
-                windower.add_to_chat(8,tostring(i)..' '..tostring(v))
+                windower.add_to_chat(8,windower.to_shift_jis(tostring(i))..' '..windower.to_shift_jis(tostring(v)))
             end
         end
     else
         for i,v in pairs(set) do
             if type(v) == 'table' and v.name then
-                windower.add_to_chat(8,tostring(i)..' '..tostring(v.name)..' (Adv.)')
+                windower.add_to_chat(8,windower.to_shift_jis(tostring(i))..' '..windower.to_shift_jis(tostring(v.name))..' (Adv.)')
             else
-                windower.add_to_chat(8,tostring(i)..' '..tostring(v))
+                windower.add_to_chat(8,windower.to_shift_jis(tostring(i))..' '..windower.to_shift_jis(tostring(v)))
             end
         end
     end
@@ -276,7 +288,11 @@ function user_pet_midaction(bool)
     return _global.pet_midaction
 end
 
+function add_to_chat_user(num,str)
+    windower.add_to_chat(num,windower.to_shift_jis(str))
+end
+
 
 -- Define the user windower functions.
-user_windower = {register_event = register_event_user, unregister_event = unregister_event_user, send_command = send_cmd_user}
+user_windower = {register_event = register_event_user, unregister_event = unregister_event_user, send_command = send_cmd_user,add_to_chat=add_to_chat_user}
 setmetatable(user_windower,{__index=windower})
