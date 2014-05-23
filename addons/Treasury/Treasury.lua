@@ -139,7 +139,7 @@ stack = (function()
 
     return function()
         if os.clock() - last_stack_time > 2 then
-            packets.inject(packets.outgoing(0x03A))
+            packets.inject(packets.new('outgoing', 0x03A))
             last_stack_time = os.clock()
             wait_time = 0
         elseif os.clock() - last_stack_time > wait_time then
@@ -153,10 +153,11 @@ stack_ids = S{0x01F, 0x020}
 last_stack_time = 0
 windower.register_event('incoming chunk', function(id, data)
     if id == 0x0D2 then
-        local treasure = packets.incoming(id, data)
+        local treasure = packets.parse('incoming', data)
         check(treasure.Index, treasure.Item)
+
     elseif stack_ids:contains(id) then
-        local chunk = packets.incoming(id, data)
+        local chunk = packets.parse('incoming', data)
 
         -- Ignore items in other bags
         if chunk.Bag ~= inventory_id then
