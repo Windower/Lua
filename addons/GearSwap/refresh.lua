@@ -107,6 +107,8 @@ function load_user_files(job_id)
                 back=empty,waist=empty,legs=empty,feet=empty}}
         }
 
+    language = 'english' -- Reset language to english when changing job files.
+    
     -- Try to load data/<name>_<main job>.lua
     local funct, err = loadfile(path)
     
