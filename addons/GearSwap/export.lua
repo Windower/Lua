@@ -202,9 +202,7 @@ function unlogify_unpacked_name(name)
     name = name:lower()
     for i,v in pairs(res.items) do
         if type(v) == 'table' then
-            if not v[language..'_log'] then
-                windower.add_to_chat(8,'v = '..tostring(v.english))
-            elseif v[language..'_log']:lower() == name then
+            if v[language..'_log']:lower() == name then
                 name = v[language]
                 local potslots = v.slots
                 if potslots then potslots = res.slots[potslots:it()()].english:gsub(' ','_') end
