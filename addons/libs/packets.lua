@@ -115,14 +115,14 @@ end})
 -- 
 -- Example usage
 --  Injection:
---      local packet = packets.outgoing(0x050, {
+--      local packet = packets.new('outgoing', 0x050, {
 --          ['Inventory Index'] = 27,   -- 27th item in the inventory
 --          ['Equipment Slot'] = 15     -- 15th slot, left ring
 --      })
 --      packets.inject(packet)
 --
 --  Injection (Alternative):
---      local packet = packets.outgoing(0x050)
+--      local packet = packets.new('outgoing', 0x050)
 --      packet['Inventory Index'] = 27  -- 27th item in the inventory
 --      packet['Equipment Slot'] = 15   -- 15th slot, left ring
 --      packets.inject(packet)
@@ -130,37 +130,21 @@ end})
 --  Parsing:
 --      windower.register_event('outgoing chunk', function(id, data)
 --          if id == 0x0B6 then -- outgoing /tell
---              local packet = packets.outgoing(id, data)
+--              local packet = packets.parse('outgoing', data)
 --              print(packet['Target Name'], packet['Message'])
 --          end
 --      end)
-function packets.incoming(id, data)
-    if data and type(data) == 'string' then
-        return packets.parse('incoming', id, data)
-    end
-
-    return packets.new('incoming', id, data)
-end
-
-function packets.outgoing(id, data)
-    if type(data) == 'string' then
-        return packets.parse('outgoing', id, data)
-    end
-
-    return packets.new('outgoing', id, data)
-end
-
-function packets.parse(dir, id, data)
+function packets.parse(dir, data)
     local res = {}
     res._id, res._size, res._sequence = data:unpack('b9b7H')
     res._size = res._size * 4
     res._raw = data
     res._dir = dir
-    res._name = packets.data[dir][id].name
-    res._description = packets.data[dir][id].description
+    res._name = packets.data[dir][res._id].name
+    res._description = packets.data[dir][res._id].description
     res._data = data:sub(5)
 
-    local fields = packets.fields.get(dir, id, data)
+    local fields = packets.fields.get(dir, res._id, data)
     if not fields or #fields == 0 then
         return res
     end
