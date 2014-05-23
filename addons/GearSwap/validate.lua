@@ -96,7 +96,7 @@ function recurse_sets(tab, accum, filter, stack)
         nam = v.name or v
         if type(nam) == 'string' and nam ~= 'empty' then
             if type(i) == 'string' and not slot_map[i:lower()] then
-                windower.add_to_chat(123,'GearSwap: '..tostring(i)..' contains a "name" element but is not a valid slot.')
+                windower.add_to_chat(123,'GearSwap: '..windower.to_shift_jis(tostring(i))..' contains a "name" element but is not a valid slot.')
             elseif not player.inventory[nam] and not player.wardrobe[nam] and tryfilter(nam:lower(), filter) and type(i)=='string' and slot_map[i:lower()] then
                 accum:add(nam)
             end
