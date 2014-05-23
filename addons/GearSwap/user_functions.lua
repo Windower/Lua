@@ -28,6 +28,18 @@
 -- Functions that are directly exposed to users --
 
 
+function set_language(lang)
+    if _global.current_event ~= 'get_sets' then
+        error('\nGearSwap: set_language() is only valid in the get_sets function', 2)
+        return
+    end
+    if lang and type(lang) == 'string' and (lang == 'english' or lang == 'japanese') then
+        rawset(_G,'language',lang)
+    else
+        error('\nGearSwap: set_language() was passed an invalid value ('..tostring(lang)..'). (must be a string)', 2)
+    end
+end
+
 function debug_mode(boolean)
     if boolean == true or boolean == false then _settings.debug_mode = boolean
     elseif boolean == nil then
@@ -79,18 +91,6 @@ function change_target(name)
         _,spell.target = valid_target(name)
     else
         error('\nGearSwap: change_target() was passed an invalid value ('..tostring(name)..'). (must be a string)', 2)
-    end
-end
-
-function set_language(lang)
-    if _global.current_event ~= 'None' then
-        error('\nGearSwap: set_language() is only valid in the get_sets function', 2)
-        return
-    end
-    if lang and type(lang) == 'string' and (lang == 'english' or lang == 'japanese') then
-        rawset(_G,'language',lang)
-    else
-        error('\nGearSwap: set_language() was passed an invalid value ('..tostring(lang)..'). (must be a string)', 2)
     end
 end
 
