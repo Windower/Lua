@@ -67,6 +67,8 @@ function load_user_files(job_id)
     
     user_env = nil
     registered_user_events = {}
+
+    language = 'english' -- Reset language to english when changing job files.
     
     local tab = {player.name..'_'..res.jobs[job_id].short..'.lua',player.name..'-'..res.jobs[job_id].short..'.lua',
         player.name..'_'..res.jobs[job_id][language]..'.lua',player.name..'-'..res.jobs[job_id][language]..'.lua',
@@ -106,8 +108,6 @@ function load_user_files(job_id)
                 body=empty,hands=empty,ring1=empty,ring2=empty,
                 back=empty,waist=empty,legs=empty,feet=empty}}
         }
-
-    language = 'english' -- Reset language to english when changing job files.
     
     -- Try to load data/<name>_<main job>.lua
     local funct, err = loadfile(path)
