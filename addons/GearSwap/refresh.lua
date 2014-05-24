@@ -567,8 +567,8 @@ end
 ---- path of a valid file, if it exists. False if it doesn't.
 -----------------------------------------------------------------------------------
 function pathsearch(tab)
-    local basetab = {[1]=windower.addon_path..'libs/',[2]=windower.addon_path..'data/'..player.name..'/',
-        [3]=windower.addon_path..'data/common/',[4]=windower.addon_path..'data/'}
+    local basetab = {[1]=windower.addon_path..'libs-dev/',[2]=windower.addon_path..'libs/',
+        [3]=windower.addon_path..'data/'..player.name..'/',[4]=windower.addon_path..'data/common/',[5]=windower.addon_path..'data/'}
     
     for _,basepath in ipairs(basetab) do
         if windower.dir_exists(basepath) then
