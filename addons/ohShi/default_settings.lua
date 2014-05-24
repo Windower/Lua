@@ -77,15 +77,8 @@ trusts = S{'Kupipi','Excenmille','Naji','Ayame','Zeid','Curilla',
             'Mihlialiapoh','Valaineral','Joachim','Lion','Prishe','Ulmia',
             'Ironeater','Gadalar','Najasalaheem','Cherukiki','Nashmeira',
             'Zazarg','Ingrid','Lhekohabhoka','Ovjang','Mnejing','Sakura',
-            'Luzaf','Najelith'}
+            'Luzaf','Najelith', 'Maat','Gessho','Aldo','Moogle','Fablinix'}
 
-speFName = '../../plugins/resources/spells.xml'
-staFName = '../../plugins/resources/status.xml'
-jaFName = '../../plugins/resources/abils.xml'
-
-speFile = files.new(speFName)
-staFile = files.new(staFName)
-jaFile = files.new(jaFName)
 
 --Save settings on load (in case this is first run)
 settings:save('all')
