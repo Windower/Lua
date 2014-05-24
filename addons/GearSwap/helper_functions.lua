@@ -391,7 +391,8 @@ function filter_pretarget(spell)
                 debug_mode_chat("Unable to execute command. Addendum: Black required for that spell ("..(res.spells[spell.id][language] or spell.id)..")")
             end
             return false
-        elseif spell.type == 'BlueMagic' and not (player.main_job == 'BLU' and table.contains(windower.ffxi.get_mjob_data().spells,spell.id)) and not
+        elseif spell.type == 'BlueMagic' and not ((player.main_job == 'BLU' and table.contains(windower.ffxi.get_mjob_data().spells,spell.id)) or
+            ((buffactive['Unbridled Learning'] or buffactive['Unbridled Wisdom']) and unbridled_learning_set[spell.english])) and not
             (player.sub_job == 'BLU' and table.contains(windower.ffxi.get_sjob_data().spells,spell.id)) then
             -- This code isn't hurting anything, but it doesn't need to be here either.
             debug_mode_chat("Unable to execute command. Blue magic must be set to cast that spell ("..(res.spells[spell.id][language] or spell.id)..")")

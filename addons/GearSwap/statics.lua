@@ -42,8 +42,14 @@ validabils['japanese'] = {['/ma'] = {}, ['/ja'] = {}, ['/ws'] = {}, ['/item'] = 
 
 function make_abil(abil,lang,i)
     if not abil[lang] or not abil.prefix then return end
-    local sp = abil[lang]:lower()
-    local pref = unify_prefix[abil.prefix:lower()]
+    local sp,pref
+    if lang == 'english' then
+        sp = abil[lang]:lower()
+        pref = unify_prefix[abil.prefix:lower()]
+    else
+        sp = abil[lang]
+        pref = unify_prefix[abil.prefix:lower()]
+    end
     
     validabils[lang][pref][sp] = i
 end
@@ -242,6 +248,12 @@ encumbrance_table = table.reassign({},disable_table)
 registered_user_events = {}
 empty = {name="empty"}
 outgoing_packet_table = {}
+
+unbridled_learning_set = {['Thunderbolt']=true,['Harden Shell']=true,['Absolute Terror']=true,
+    ['Gates of Hades']=true,['Tourbillion']=true,['Pyric Bulwark']=true,['Bilgestorm']=true,
+    ['Bloodrake']=true,['Droning Whirlwind']=true,['Carcharian Verve']=true,['Blistering Roar']=true,}
+
+
 tool_map = {
         ['Katon: Ichi'] = 'Uchitake',
         ['Katon: Ni'] = 'Uchitake',
