@@ -54,10 +54,9 @@ end
 ---- user_env, a table of all of the player defined functions and their current
 ---- variables.
 -----------------------------------------------------------------------------------
-function load_user_files(job_id)
+function load_user_files(job_id,user_file)
     job_id = tonumber(job_id)
-    local path
-    
+
     refresh_globals()
     user_pcall('file_unload')
     
@@ -70,11 +69,14 @@ function load_user_files(job_id)
 
     language = 'english' -- Reset language to english when changing job files.
     
-    local tab = {player.name..'_'..res.jobs[job_id].short..'.lua',player.name..'-'..res.jobs[job_id].short..'.lua',
-        player.name..'_'..res.jobs[job_id][language]..'.lua',player.name..'-'..res.jobs[job_id][language]..'.lua',
-        player.name..'.lua',res.jobs[job_id].short..'.lua',res.jobs[job_id][language]..'.lua','default.lua'}
-    
-    local path = pathsearch(tab)
+    local path
+    path = pathsearch({user_file})
+    if not path then
+        local tab = {player.name..'_'..res.jobs[job_id].short..'.lua',player.name..'-'..res.jobs[job_id].short..'.lua',
+            player.name..'_'..res.jobs[job_id][language]..'.lua',player.name..'-'..res.jobs[job_id][language]..'.lua',
+            player.name..'.lua',res.jobs[job_id].short..'.lua',res.jobs[job_id][language]..'.lua','default.lua'}
+        path = pathsearch(tab)
+    end
     
     if not path then
         current_job_file = nil
@@ -120,8 +122,8 @@ function load_user_files(job_id)
         sets = nil
         return
     else
-        current_job_file = res.jobs[job_id].short
-        print('GearSwap: Loaded your '..res.jobs[job_id].short..' Lua file!')
+        current_job_file = user_file or res.jobs[job_id].short
+        print('GearSwap: Loaded your '..current_job_file..' Lua file!')
     end
     
     setfenv(funct, user_env)
@@ -565,13 +567,13 @@ end
 ---- path of a valid file, if it exists. False if it doesn't.
 -----------------------------------------------------------------------------------
 function pathsearch(tab)
-    local basetab = {[1]=windower.addon_path..'data/'..player.name..'/',[2]=windower.addon_path..'data/common/',
-        [3]=windower.addon_path..'data/'}
+    local basetab = {[1]=windower.addon_path..'libs-dev/',[2]=windower.addon_path..'libs/',
+        [3]=windower.addon_path..'data/'..player.name..'/',[4]=windower.addon_path..'data/common/',[5]=windower.addon_path..'data/'}
     
     for _,basepath in ipairs(basetab) do
         if windower.dir_exists(basepath) then
             for i,v in ipairs(tab) do
-                if windower.file_exists(basepath..v) then
+                if v ~= '' and windower.file_exists(basepath..v) then
                     return basepath..v
                 end
             end

@@ -36,23 +36,23 @@ alias_strs = aliases:keyset()
 
 -- Currently trying to rejoin
 
-join = (function()
+join = function()
     local join_packet = packets.new('outgoing', 0x074, {Join = true})
-    return function ()
+    return function()
         if next(windower.ffxi.get_items().treasure) then
             windower.send_command('@wait 1; lua invoke autojoin join')
         else
             packets.inject(join_packet)
         end
     end
-end)()
+end()
 
-decline = function ()
+decline = function()
     local decline_packet = packets.new('outgoing', 0x074, {Join = false})
-    return function ()
+    return function()
         packets.inject(decline_packet)
     end
-end)()
+end()
 
 -- Invite handler
 windower.register_event('party invite', function(sender)

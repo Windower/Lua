@@ -88,7 +88,11 @@ function change_target(name)
         return
     end
     if name and type(name)=='string' then
-        _,spell.target = valid_target(name)
+        if valid_target(name) then
+            _,spell.target = valid_target(name)
+        else
+            error('\nGearSwap: change_target() was passed an invalid value ('..tostring(name)..'). (must be a valid target)', 2)
+        end
     else
         error('\nGearSwap: change_target() was passed an invalid value ('..tostring(name)..'). (must be a string)', 2)
     end
