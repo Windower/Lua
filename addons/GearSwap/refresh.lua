@@ -72,9 +72,11 @@ function load_user_files(job_id,user_file)
     local path
     path = pathsearch({user_file})
     if not path then
-        local tab = {player.name..'_'..res.jobs[job_id].short..'.lua',player.name..'-'..res.jobs[job_id].short..'.lua',
-            player.name..'_'..res.jobs[job_id][language]..'.lua',player.name..'-'..res.jobs[job_id][language]..'.lua',
-            player.name..'.lua',res.jobs[job_id].short..'.lua',res.jobs[job_id][language]..'.lua','default.lua'}
+        local long_job = res.jobs[job_id][language]
+        local short_job = res.jobs[job_id][language..'_short']
+        local tab = {player.name..'_'..short_job..'.lua',player.name..'-'..short_job..'.lua',
+            player.name..'_'..long_job..'.lua',player.name..'-'..long_job..'.lua',
+            player.name..'.lua',short_job..'.lua',long_job..'.lua','default.lua'}
         path = pathsearch(tab)
     end
     
@@ -122,7 +124,7 @@ function load_user_files(job_id,user_file)
         sets = nil
         return
     else
-        current_job_file = user_file or res.jobs[job_id].short
+        current_job_file = user_file or res.jobs[job_id][language..'_short']
         print('GearSwap: Loaded your '..current_job_file..' Lua file!')
     end
     
