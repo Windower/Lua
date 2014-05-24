@@ -54,10 +54,9 @@ end
 ---- user_env, a table of all of the player defined functions and their current
 ---- variables.
 -----------------------------------------------------------------------------------
-function load_user_files(job_id)
+function load_user_files(job_id,user_file)
     job_id = tonumber(job_id)
-    local path
-    
+
     refresh_globals()
     user_pcall('file_unload')
     
@@ -67,12 +66,17 @@ function load_user_files(job_id)
     
     user_env = nil
     registered_user_events = {}
+
+    language = 'english' -- Reset language to english when changing job files.
     
-    local tab = {player.name..'_'..res.jobs[job_id].short..'.lua',player.name..'-'..res.jobs[job_id].short..'.lua',
-        player.name..'_'..res.jobs[job_id][language]..'.lua',player.name..'-'..res.jobs[job_id][language]..'.lua',
-        player.name..'.lua',res.jobs[job_id].short..'.lua',res.jobs[job_id][language]..'.lua','default.lua'}
-    
-    local path = pathsearch(tab)
+    local path
+    path = pathsearch({user_file})
+    if not path then
+        local tab = {player.name..'_'..res.jobs[job_id].short..'.lua',player.name..'-'..res.jobs[job_id].short..'.lua',
+            player.name..'_'..res.jobs[job_id][language]..'.lua',player.name..'-'..res.jobs[job_id][language]..'.lua',
+            player.name..'.lua',res.jobs[job_id].short..'.lua',res.jobs[job_id][language]..'.lua','default.lua'}
+        path = pathsearch(tab)
+    end
     
     if not path then
         current_job_file = nil
@@ -86,12 +90,12 @@ function load_user_files(job_id)
         force_send=force_send, change_target=change_target, cast_delay=cast_delay,
         print_set=print_set,set_combine=set_combine,disable=disable,enable=enable,
         send_command=send_cmd_user,windower=user_windower,include=include_user,
-        midaction=user_midaction,pet_midaction=user_pet_midaction,
+        midaction=user_midaction,pet_midaction=user_pet_midaction,set_language=set_language,
         
         -- Library functions
         string=string,math=math,table=table,set=set,list=list,T=T,S=S,L=L,os=os,
         text=text,type=type,tostring=tostring,tonumber=tonumber,pairs=pairs,
-        ipairs = ipairs, print=print, add_to_chat=windower.add_to_chat,
+        ipairs = ipairs, print=print, add_to_chat=add_to_chat_user,
         next=next,lua_base_path=windower.addon_path,empty=empty,
         
         -- Player environment things
@@ -106,7 +110,7 @@ function load_user_files(job_id)
                 body=empty,hands=empty,ring1=empty,ring2=empty,
                 back=empty,waist=empty,legs=empty,feet=empty}}
         }
-
+    
     -- Try to load data/<name>_<main job>.lua
     local funct, err = loadfile(path)
     
@@ -118,8 +122,8 @@ function load_user_files(job_id)
         sets = nil
         return
     else
-        current_job_file = res.jobs[job_id].short
-        print('GearSwap: Loaded your '..res.jobs[job_id].short..' Lua file!')
+        current_job_file = user_file or res.jobs[job_id].short
+        print('GearSwap: Loaded your '..current_job_file..' Lua file!')
     end
     
     setfenv(funct, user_env)
@@ -134,6 +138,11 @@ function load_user_files(job_id)
         return nil
     end
     
+    _global.cast_delay = 0
+    _global.cancel_spell = false
+    _global.midaction = false
+    _global.pet_midaction = false
+    _global.current_event = 'get_sets'
     user_pcall('get_sets')
     
     gearswap_disabled = false
@@ -558,13 +567,13 @@ end
 ---- path of a valid file, if it exists. False if it doesn't.
 -----------------------------------------------------------------------------------
 function pathsearch(tab)
-    local basetab = {[1]=windower.addon_path..'data/'..player.name..'/',[2]=windower.addon_path..'data/common/',
-        [3]=windower.addon_path..'data/'}
+    local basetab = {[1]=windower.addon_path..'libs/',[2]=windower.addon_path..'data/'..player.name..'/',
+        [3]=windower.addon_path..'data/common/',[4]=windower.addon_path..'data/'}
     
     for _,basepath in ipairs(basetab) do
         if windower.dir_exists(basepath) then
             for i,v in ipairs(tab) do
-                if windower.file_exists(basepath..v) then
+                if v ~= '' and windower.file_exists(basepath..v) then
                     return basepath..v
                 end
             end

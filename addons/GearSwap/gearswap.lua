@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.840'
+_addon.version = '0.851'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -128,6 +128,19 @@ windower.register_event('addon command',function (...)
             validate(splitup)
         else
             windower.add_to_chat(123,'GearSwap: There is nothing to validate because there is no file loaded.')
+        end
+    elseif cmd == 'l' or cmd == 'load' then
+        if splitup[2] then
+            local f_name = table.concat(splitup,' ',2)
+            if pathsearch({f_name}) then
+                refresh_globals()
+                command_registry = {}
+                load_user_files(false,f_name)
+            else
+                windower.add_to_chat(123,'GearSwap: File not found.')
+            end
+        else
+            windower.add_to_chat(123,'GearSwap: No file name was provided.')
         end
     elseif cmd == 'enable' then
         disenable(splitup,enable,'enable',false)
@@ -316,7 +329,6 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         local flag_2 = data:byte(6)
         local owner_ind = data:byte(14)*256+data:byte(13)
         local subj_ind = data:byte(8)*256+data:byte(7)
-    --    if debugging >= 1 and (windower.ffxi.get_player().index == owner_ind or windower.ffxi.get_player().index == subj_ind) then windower.add_to_chat(8,flag_2..' '..flag_1) end
         
         if flag_1 == 3 and flag_2 == 5 and windower.ffxi.get_player().index == owner_ind and not pet.isvalid then
             if not next_packet_events then next_packet_events = {sequence_id = data:byte(4)*256+data:byte(3)} end

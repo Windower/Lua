@@ -49,7 +49,7 @@ function equip_sets(swap_type,ts,...)
     _global.current_event = tostring(swap_type)
     
     if debugging >= 1 then windower.debug(tostring(swap_type)..' enter') 
-    if showphase or debugging >= 2 then windower.add_to_chat(8,tostring(swap_type)..' enter') end end
+    if showphase or debugging >= 2 then windower.add_to_chat(8,windower.to_shift_jis(tostring(swap_type))..' enter') end end
     
     local cur_equip = get_gs_gear(convert_equipment(items.equipment),swap_type)
         
@@ -275,7 +275,7 @@ function user_pcall(str,...)
             bool,err = pcall(user_env[str],...)
             if not bool then error('\nGearSwap has detected an error in the user function '..str..':\n'..err) end
         elseif user_env[str] then
-            windower.add_to_chat(123,'GearSwap: '..str..'() exists but is not a function')
+            windower.add_to_chat(123,'GearSwap: '..windower.to_shift_jis(tostring(str))..'() exists but is not a function')
         end
     end
 end
