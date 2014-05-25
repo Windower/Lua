@@ -417,12 +417,12 @@ windower.register_event('job change',function(mjob_id, mjob_lvl, sjob_id, sjob_l
     table.clear(sent_out_equip)
     table.clear(limbo_equip)
 
-    if current_job_file ~= res.jobs[mjob_id].short then
+    if current_job_file ~= res.jobs[mjob_id][language..'_short'] then
         refresh_user_env(mjob_id)
-    elseif player.sub_job ~= res.jobs[sjob_id].short then
+    elseif player.sub_job ~= res.jobs[sjob_id].english_short then
         local temp_sub = player.sub_job
         refresh_globals()
-        equip_sets('sub_job_change',nil,res.jobs[sjob_id].short,temp_sub)
+        equip_sets('sub_job_change',nil,res.jobs[sjob_id][language..'_short'],temp_sub)
     end
 end)
 

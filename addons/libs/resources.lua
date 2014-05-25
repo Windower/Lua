@@ -41,6 +41,10 @@ local resource_entry_mt = {__index = function()
         japanese_log = 'ja',
         german_log = 'del',
         french_log = 'frl',
+        english_short = 'ens',
+        japanese_short = 'jas',
+        german_short = 'des',
+        french_short = 'frs',
     }
 
     return function(t, k)

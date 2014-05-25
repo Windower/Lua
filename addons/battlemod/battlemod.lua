@@ -486,7 +486,7 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
         
     ------------- JOB INFO ----------------
     elseif id == 0x01B then
-        filterload(res.jobs[data:byte(5)].short)
+        filterload(res.jobs[data:byte(5)][language..'_short'])
     end
 end)
 
