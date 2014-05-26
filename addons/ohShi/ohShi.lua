@@ -50,9 +50,9 @@ require('helper_functions')
 --This function is called when the addon loads. Defines aliases and 
 --registers functions, as well as filling the resource tables.
 windower.register_event('load',function()
-    spells = res.spells()
-    stats = res.statuses()
-    jAbils = res.job_abilities()
+    spells = res.spells
+    stats = res.statuses
+    jAbils = res.job_abilities
     windower.send_command('@lua i ohshi initText')
 end)
 
