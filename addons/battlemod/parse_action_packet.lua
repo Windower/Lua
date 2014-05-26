@@ -381,7 +381,7 @@ function assemble_targets(actor,targs,category,msg)
     
     for i,v in pairs(targets) do
         if i == 1 then
-            out_str = color_it(v.name,color_arr[v.owner or v.type])
+            out_str = out_str..color_it(v.name,color_arr[v.owner or v.type]) 
         else
             out_str = conjunctions(out_str,color_it(v.name,color_arr[v.owner or v.type]),#targets,i)
         end
