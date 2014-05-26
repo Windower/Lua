@@ -48,12 +48,13 @@ function find_in_sets(item, tab, stack)
         return false
     end
     for _,v in pairs(tab) do
-        nam = v.name or v
+        local nam = v.name or v
+        local aug = v.augments or v.augment
+        if type(aug) == 'string' then aug = {aug} end
         if type(nam) == 'string' then
             nam = nam:lower()
-            if item.shortname == nam then
-                return true
-            elseif item.longname and item.longname == nam then
+            if (item.shortname == nam or (item.longname and item.longname == nam)) and
+                (not aug or compare_augments(aug,extdata.decode(item).augments)) then
                 return true
             end
         else
@@ -93,11 +94,13 @@ function recurse_sets(tab, accum, filter, stack)
     if type(tab) ~= 'table' then return end
     
     for i,v in pairs(tab) do
-        nam = v.name or v
+        local nam = v.name or v
+        local aug = v.augments or v.augment
+        if type(aug) == 'string' then aug = {aug} end
         if type(nam) == 'string' and nam ~= 'empty' then
             if type(i) == 'string' and not slot_map[i:lower()] then
                 windower.add_to_chat(123,'GearSwap: '..windower.to_shift_jis(tostring(i))..' contains a "name" element but is not a valid slot.')
-            elseif not player.inventory[nam] and not player.wardrobe[nam] and tryfilter(nam:lower(), filter) and type(i)=='string' and slot_map[i:lower()] then
+            elseif tryfilter(nam:lower(), filter) and type(i) == 'string' and slot_map[i:lower()] and not find_in_inv(items.inventory,nam,aug) and not find_in_inv(items.wardrobe,nam,aug) then
                 accum:add(nam)
             end
         elseif type(nam) == 'table' and nam ~= empty  then
@@ -109,6 +112,18 @@ function recurse_sets(tab, accum, filter, stack)
         end
     end
 end
+
+-- Utility support function for finding an item (with or without augments) in inventory
+function find_in_inv(inv,name,aug)    
+    for i,v in pairs(inv) do
+        if res.items[v.id] and (res.items[v.id][language]:lower() == name:lower() or res.items[v.id][language..'_log']:lower() == name:lower()) and
+            (not aug or (v.extdata and compare_augments(aug,extdata.decode(v).augments))) then
+            return true
+        end
+    end
+    return false
+end
+
 
 -- Utility support function for filtering results.
 function tryfilter(name, filter)
