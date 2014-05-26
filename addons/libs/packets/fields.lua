@@ -641,6 +641,46 @@ fields.outgoing[0x0F5] = L{
     {ctype='unsigned short',    label='Index',                  fn=index},      -- 04 Setting an index of 0 stops tracking
 }
 
+-- Place/Move Furniture
+fields.outgoing[0x0FA] = L{
+    {ctype='unsigned short',    label='Item ID'},                               -- 04  00 00 just gives the general update
+    {ctype='unsigned char',     label='Safe Slot'},                             -- 06
+    {ctype='unsigned char',     label='X Position'},                            -- 07  0 to 0x12
+    {ctype='unsigned char',     label='Z Position'},                            -- 08  0 to ?
+    {ctype='unsigned char',     label='Y Position'},                            -- 09  0 to 0x17
+    {ctype='unsigned short',    label='_junk1'},                                -- 0A  00 00 observed
+}
+
+-- Remove Furniture
+fields.outgoing[0x0FB] = L{
+    {ctype='unsigned short',    label='Item ID'},                               -- 04
+    {ctype='unsigned char',     label='Safe Slot'},                             -- 06
+    {ctype='unsigned char',     label='_junk1'},                                -- 07
+}
+
+-- Plant Flowerpot
+fields.outgoing[0x0FC] = L{
+    {ctype='unsigned short',    label='Flowerpot Item ID'},                     -- 04
+    {ctype='unsigned short',    label='Seed Item ID'},                          -- 06
+    {ctype='unsigned char',     label='Flowerpot Safe Slot'},                   -- 08
+    {ctype='unsigned char',     label='Seed Safe Slot'},                        -- 09
+    {ctype='unsigned short',    label='_junk1'},                                -- 0A  00 00 observed
+}
+
+-- Examine Flowerpot
+fields.outgoing[0x0FD] = L{
+    {ctype='unsigned short',    label='Flowerpot Item ID'},                     -- 04
+    {ctype='unsigned char',     label='Flowerpot Safe Slot'},                   -- 06
+    {ctype='unsigned char',     label='_junk1'},                                -- 07
+}
+
+-- Uproot Flowerpot
+fields.outgoing[0x0FE] = L{
+    {ctype='unsigned short',    label='Flowerpot Item ID'},                     -- 04
+    {ctype='unsigned char',     label='Flowerpot Safe Slot'},                   -- 06
+    {ctype='unsigned char',     label='_unknown1'},                             -- 07  Value of 1 observed.
+}
+
 -- Job Change
 fields.outgoing[0x100] = L{
     {ctype='unsigned char',     label='Main Job'},                              -- 04
@@ -2021,6 +2061,14 @@ fields.incoming[0x0F9] = L{
     {ctype='unsigned short',    label='Index',              fn=index},          -- 08
     {ctype='unsigned char',     label='_unknown1'},                             -- 0A
     {ctype='unsigned char',     label='_unknown2'},                             -- 0B
+}
+
+-- Furniture Interaction
+fields.incoming[0x0FA] = L{
+    {ctype='unsigned short',    label='Item ID'},                               -- 04
+    {ctype='char[6]',           label='_unknown1'},                             -- 06  Always 00s for me
+    {ctype='unsigned char',     label='Safe Slot'},                             -- 0C  Safe slot for the furniture being interacted with
+    {ctype='char[3]',           label='_unknown2'},                             -- 0D  Takes values, but doesn't look particularly meaningful
 }
 
 -- Bazaar item listing

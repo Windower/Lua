@@ -60,6 +60,11 @@ data.outgoing[0x0E7] = {name='Logout',              description='A request to lo
 data.outgoing[0x0E8] = {name='Toggle Heal',         description='This command is used to both heal and cancel healing.'}
 data.outgoing[0x0F1] = {name='Cancel',              description='Sent when canceling a buff.'}
 data.outgoing[0x0F4] = {name='Widescan',            description='This command asks the server for a widescan.'}
+data.outgoing[0x0FA] = {name='Place/Move Furniture',description='Sends new position for your furniture.'}
+data.outgoing[0x0FB] = {name='Remove Furniture',    description='Informs the server you have removed some furniture.'}
+data.outgoing[0x0FC] = {name='Plant Flowerpot',     description='Plants a seed in a flowerpot.'}
+data.outgoing[0x0FD] = {name='Examine Flowerpot',   description='Sent when you examine a flowerpot.'}
+data.outgoing[0x0FE] = {name='Uproot Flowerpot',    description='Uproots a flowerpot.'}
 data.outgoing[0x100] = {name='Job Change',          description='Sent when initiating a job change.'}
 data.outgoing[0x102] = {name='Untraditional Equip', description='Sent when equipping a pseudo-item like an Automaton Attachment, Instinct, or Blue Magic Spell.'}
 data.outgoing[0x104] = {name='Leave Bazaar',        description='Sent when client leaves a bazaar.'}
@@ -147,6 +152,7 @@ data.incoming[0x0E2] = {name='Char Info',           description='Sends name, HP,
 data.incoming[0x0F4] = {name='Widescan Mob',        description='Displays one monster.'}
 data.incoming[0x0F6] = {name='Widescan Mark',       description='Marks the start and ending of a widescan list.'}
 data.incoming[0x0F9] = {name='Reraise Activation',  description='Reassigns targetable status on reraise activation?'}
+data.incoming[0x0FA] = {name='Furniture Interact',  description='Confirms furniture manipulation.'}
 data.incoming[0x105] = {name='Data Download 4',     description='The data that is sent to the client when it is "Downloading data...".'}
 data.incoming[0x106] = {name='Bazaar Seller Info',  description='Information on the purchase sent to the buyer when they attempt to buy something.'}
 data.incoming[0x108] = {name='Data Download 5',     description='The data that is sent to the client when it is "Downloading data...".'}
