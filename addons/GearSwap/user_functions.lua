@@ -49,7 +49,6 @@ function debug_mode(boolean)
     end
 end
 
-
 function show_swaps(boolean)
     if boolean == true or boolean == false then _settings.show_swaps = boolean
     elseif boolean == nil then
@@ -59,11 +58,9 @@ function show_swaps(boolean)
     end
 end
 
-
 function verify_equip(boolean)
     print('GearSwap: verify_equip() has been deprecated due to internal changes and no longer has a purpose')
 end
-
 
 function cancel_spell(boolean)
     if _global.current_event ~= 'precast' and _global.current_event ~= 'pretarget' and _global.current_event ~= 'filtered_action' then
@@ -235,8 +232,10 @@ function unregister_event_user(id)
 end
 
 function user_equip_sets(func)
-    refresh_globals()
-    return setfenv(function(...) return gearswap.equip_sets(func,nil,...) end,user_env)
+    return setfenv(function(...)
+        refresh_globals()
+        return gearswap.equip_sets(func,nil,...)
+    end,user_env)
 end
 
 function include_user(str)
