@@ -611,9 +611,9 @@ augment_values = {
         [0x581] = {{stat='Enhances "Empathy" effect', offset=0,multiplier=0}},
         
         [0x584] = {{stat='Reduces Sp. "Blood Pact" MP cost', offset=0,multiplier=0}},
-        [0x585] = {{stat='Inc. Sp. "Blood Pact magic burst dmg.', offset=0,multiplier=0}},
-        [0x586] = {{stat='Increases Sp. "Blood Pact accuracy', offset=0,multiplier=0}},
-        [0x587] = {{stat='Inc. Sp. "Blood Pact magic crit. dmg.', offset=0,multiplier=0}},
+        [0x585] = {{stat='Inc. Sp. "Blood Pact" magic burst dmg.', offset=0,multiplier=0}},
+        [0x586] = {{stat='Increases Sp. "Blood Pact" accuracy', offset=0,multiplier=0}},
+        [0x587] = {{stat='Inc. Sp. "Blood Pact" magic crit. dmg.', offset=0,multiplier=0}},
         
         [0x58A] = {{stat='Enhances "Convergence" effect', offset=0,multiplier=0}},
         [0x58B] = {{stat='Enhances "Enchainment" effect', offset=0,multiplier=0}},
