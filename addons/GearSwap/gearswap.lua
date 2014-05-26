@@ -375,7 +375,7 @@ windower.register_event('status change',function(new,old)
     if gearswap_disabled or T{2,3,4}:contains(old) or T{2,3,4}:contains(new) then return end
     
     refresh_globals()
-    equip_sets('status_change',nil,res.statuses[new][language],res.statuses[old][language])
+    equip_sets('status_change',nil,res.statuses[new].english,res.statuses[old].english)
 end)
 
 windower.register_event('gain buff',function(buff_id)

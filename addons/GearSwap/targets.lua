@@ -97,7 +97,7 @@ function target_complete(mob_table)
     if mob_table.status then
         mob_table.status_id = mob_table.status
         if res.statuses[mob_table.status] then
-            mob_table.status = res.statuses[mob_table.status][language]
+            mob_table.status = res.statuses[mob_table.status].english
         else
             mob_table.status = 'Unknown'
         end
