@@ -1384,13 +1384,13 @@ local id_mapping = {
 
 function extdata.decode(tab)
     if not tab then error('extdata.decode was passed a nil value') end
-    if not tab.extdata or type(tab.extdata)~= 'string' or #tab.extdata ~= 24 then
-        error('extdata.decode was passed an invalid extdata string ('..tostring(tab.extdata)..')',2)
-    end
     if not tab.id or not tonumber(tab.id) then
-        error('extdata.decode was passed an invalid id',2)
+        error('extdata.decode was passed an invalid id ('..tostring(tab.id)..')',2)
     elseif tab.id ~= 0 and not res.items[tab.id] then
-        error('extdata.decode was passed an id that is not yet in the resources ('..tab.id..')',2)
+        error('extdata.decode was passed an id that is not yet in the resources ('..tostring(tab.id)..')',2)
+    end
+    if not tab.extdata or type(tab.extdata)~= 'string' or #tab.extdata ~= 24 then
+        error('extdata.decode was passed an invalid extdata string ('..tostring(tab.extdata)..') ID = '..tostring(tab.id),2)
     end
     
     local typ, func
