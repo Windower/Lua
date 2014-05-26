@@ -55,12 +55,11 @@ end
 function dCheck(typ, sid)
     sid = tonumber(sid)
     if typ == 'spell' then
-        if settings.dangerwords.spells:find(string.imatch-{spells[sid]['english']..'$'}) then
+        if settings.dangerwords.spells:find(string.imatch-{res.spells[sid].english .. '$'}) then
             return true
         end 
     else
-        local list = res.monster_abilities[sid-256]['english']
-        if settings.dangerwords.weaponskills:find(string.imatch-{list..'$'}) then
+        if settings.dangerwords.weaponskills:find(string.imatch-{res.monster_abilities[sid].english .. '$'}) then
             return true
         end 
     end

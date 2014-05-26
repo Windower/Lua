@@ -69,17 +69,9 @@ ohShi_tb = texts.new(settings)
 --create tables to be used throughout the addon
 tracking = T{}
 prims = S{}
-spells = {}
-jAbils = {}
-stats = {}
 trusts = S{'Kupipi','Excenmille','Naji','Ayame','Zeid','Curilla',
             'Nanaamihgo','Trion','Shantotto','Volker','Ajidomarujido',
             'Mihlialiapoh','Valaineral','Joachim','Lion','Prishe','Ulmia',
             'Ironeater','Gadalar','Najasalaheem','Cherukiki','Nashmeira',
             'Zazarg','Ingrid','Lhekohabhoka','Ovjang','Mnejing','Sakura',
             'Luzaf','Najelith', 'Maat','Gessho','Aldo','Moogle','Fablinix'}
-
-
---Save settings on load (in case this is first run)
-settings:save('all')
-

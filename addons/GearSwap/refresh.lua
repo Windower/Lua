@@ -186,7 +186,7 @@ function refresh_player()
     end
     player.job = player.main_job..'/'..player.sub_job
     player.status_id = player.status
-    player.status = res.statuses[player.status][language]
+    player.status = res.statuses[player.status].english
     
     for i,v in pairs(player_mob_table) do
         if i == 'name' then

@@ -24,6 +24,15 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+-----------------------------------------------------------------------------------
+--Name: check_wearable(item_id)
+--Args:
+---- item_id - Item ID to be examined
+-----------------------------------------------------------------------------------
+--Returns:
+---- boolean indicating whether the given piece of gear can be worn or not
+----    Checks for main job / level and race
+-----------------------------------------------------------------------------------
 function check_wearable(item_id)
     if not item_id or item_id == 0 then -- 0 codes for an empty slot, but Arcon will probably make it nil at some point
     elseif not res.items[item_id] then
@@ -36,35 +45,52 @@ function check_wearable(item_id)
     return false
 end
 
-function expand_entry(v)
-    if not v then
-        return
-    end
-    local extgoal_1,extgoal_2,name,order = {},{}
-    if type(v) == 'table' and v == empty then
-        name = empty
-    elseif type(v) == 'table' and v.name then
-        name = v.name
-        order = v.order
-        if v.augments then
-            for n,m in pairs(v.augments) do
-                extgoal_1[n],extgoal_2[n] = augment_to_extdata(m)
-            end
-        elseif v.augment then
-            extgoal_1[1],extgoal_2[1] = augment_to_extdata(v.augment)
-        end
-    elseif type(v) == 'string' and v ~= '' then
-        name = v
-    end
-    return name,order,extgoal_1,extgoal_2 -- nil, nil, {}, {} if they don't exist
-end
-
+-----------------------------------------------------------------------------------
+--Name: name_match(item_id,name)
+--Args:
+---- item_id - Item ID to be compared
+---- name - Name to be compared
+-----------------------------------------------------------------------------------
+--Returns:
+---- boolean indicating whether the name matches the resources entry for the itemID
+-----------------------------------------------------------------------------------
 function name_match(item_id,name)
     if res.items[item_id] then
         return (res.items[item_id][language..'_log']:lower() == name:lower() or res.items[item_id][language]:lower() == name:lower())
     else
         return false
     end
+end
+
+-----------------------------------------------------------------------------------
+--Name: expand_entry(v)
+--Args:
+---- v - Table or string ostensibly from an equipment set
+-----------------------------------------------------------------------------------
+--Returns:
+---- name - Name of the current piece of equipment
+---- order - Order of the current piece as defined in the advanced table
+---- augments - Augments for the current piece as defined in the advanced table
+-----------------------------------------------------------------------------------
+function expand_entry(v)
+    if not v then
+        return
+    end
+    local augments,name,order
+    if type(v) == 'table' and v == empty then
+        name = empty
+    elseif type(v) == 'table' and v.name then
+        name = v.name
+        order = v.order
+        if v.augments then
+            augments = v.augments
+        elseif v.augment then
+            augments = {v.augment}
+        end
+    elseif type(v) == 'string' and v ~= '' then
+        name = v
+    end
+    return name,order,augments -- nil, nil, nil if they don't exist
 end
 
 -----------------------------------------------------------------------------------
@@ -99,43 +125,16 @@ function to_id_set(equip_list)
                         -- Hence the "and name" below.
                         
                         if not ret_list[v] and equip_list[i] then 
-                            local name,order,extgoal_1,extgoal_2 = expand_entry(equip_list[i])
+                            local name,order,augments = expand_entry(equip_list[i])
                             
                             if name and name_match(m.id,name) then
                                 if res.items[m.id].slots[v] then
-                                    if #extgoal_1 ~= 0 or #extgoal_2 ~=0 then
-                                        local exttemp = m.extdata
-                                        local count = 0
-
-                                        for o,q in pairs(extgoal_1) do
-                                        --  It appears only the first five bits are used for augment value.
-                                        --    local first,second,third = string.char(m.extdata:byte(4)%32), string.char(m.extdata:byte(6)%32), string.char(m.extdata:byte(8)%32)
-                                        --    local exttemp = m.extdata:sub(1,3)..first..m.extdata:sub(5,5)..second..m.extdata:sub(7,7)..third..m.extdata:sub(9)
-                                            if exttemp:sub(3,4) == q or exttemp:sub(5,6) == q or exttemp:sub(7,8) == q then
-                                                count = count +1
-                                            end
-                                        end
-                                        if count == #extgoal_1 then
+                                    if augments and #augments ~=0 then -----------------------------------------------------------------------
+                                        if compare_augments(augments,extdata.decode(m).augments) then
                                             equip_list[i] = nil
                                             ret_list[v] = {inv_id=inv_id,slot=m.slot}
                                             reorder(order,i)
                                             break
-                                        elseif #extgoal_2 ~= 0 then
-                                            count = 0
-                                            for o,q in pairs(extgoal_2) do
-                                            --  It appears only the first five bits are used for augment value.
-                                            --    local first,second,third = string.char(m.extdata:byte(4)%32), string.char(m.extdata:byte(6)%32), string.char(m.extdata:byte(8)%32)
-                                            --    local exttemp = m.extdata:sub(1,3)..first..m.extdata:sub(5,5)..second..m.extdata:sub(7,7)..third..m.extdata:sub(9)
-                                                if exttemp:sub(7,8) == q or exttemp:sub(9,10) == q or exttemp:sub(11,12) == q then
-                                                    count = count +1
-                                                end
-                                            end
-                                            if count == #extgoal_2 then
-                                                equip_list[i] = nil
-                                                ret_list[v] = {inv_id=inv_id,slot=m.slot}
-                                                reorder(order,i)
-                                                break
-                                            end
                                         end
                                     else
                                         equip_list[i] = nil
@@ -143,7 +142,7 @@ function to_id_set(equip_list)
                                         reorder(order,i)
                                         break
                                     end
-                                elseif not res.items[m.id].slots[v] then
+                                else
                                     equip_list[i] = nil
                                     error_list[i] = name..' (cannot be worn in this slot)'
                                     break
@@ -198,6 +197,44 @@ function to_id_set(equip_list)
     end
     
     return ret_list
+end
+
+function compare_augments(goal,current)
+    local num_augments = 0
+    local aug_strip = function(str)
+        return str:lower():gsub('[^%-%w,]','')
+    end 
+    for i,v in pairs(current) do
+        if v == 'none' then
+            current[i] = nil
+        else
+            num_augments = num_augments + 1
+        end
+    end
+    if num_augments < #goal then
+        return false
+    else
+        local count = 0
+        for goal_ind,goal_aug in pairs(goal) do
+            local bool
+            for cur_ind,cur_aug in pairs(current) do
+                if aug_strip(goal_aug) == aug_strip(cur_aug) then
+                    bool = true
+                    count = count +1
+                    current[cur_ind] = nil
+                    break
+                end
+            end
+            if not bool then
+                return false
+            end
+        end
+        if count == #goal then
+            return true
+        else
+            return false
+        end
+    end
 end
 
 function reorder(order,i)

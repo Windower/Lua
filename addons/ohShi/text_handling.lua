@@ -45,19 +45,19 @@ function remText()
 end
 
 --Add text to textbox. Anytime text is added this is called.
-function addText(name,abtype,abil,dMob,dangerous)
+function addText(name, abtype, abil, dMob, dangerous)
     if abtype == 'ws' then
         abil = tonumber(abil)
         doit = true
-        abilname = res.monster_abilities[abil-256]['english']
+        abilname = res.monster_abilities[abil].english
     elseif abtype == 'spell' then
         abil = tonumber(abil)
         doit = true
-        abilname = spells[abil]['english']
+        abilname = res.spells[abil].english
     elseif abtype == 'roll' then
         abil = tonumber(abil)
         doit = true
-        abilname = jAbils[abil]['english']..' ['..dMob..']'
+        abilname = res.job_abilities[abil].english .. ' [' .. dMob .. ']'
         dMob = nil
         dangerous = nil
     elseif name == 'vulnerable' then

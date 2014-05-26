@@ -50,12 +50,11 @@ function export_set(options)
                     end
                     item_list[#item_list].slot = slot or 'item'
                     if not xml then
-                        local aug_1,aug_2,aug_3,aug_4,_,__ = extdata_to_augment(v.extdata)
+                        local augments = extdata.decode(v).augments or {}
                         local aug_str = ''
-                        if aug_1 and not tonumber(aug_1) then aug_str = aug_str..'"'..aug_1..'",' end
-                        if aug_2 and not tonumber(aug_2) then aug_str = aug_str..'"'..aug_2..'",' end
-                        if aug_3 and not tonumber(aug_3) then aug_str = aug_str..'"'..aug_3..'",' end
-                        if aug_4 and not tonumber(aug_4) then aug_str = aug_str..'"'..aug_4..'",' end
+                        for aug_ind,augment in pairs(augments) do
+                            if augment ~= 'none' then aug_str = aug_str.."'"..augment.."'," end
+                        end
                         if string.len(aug_str) > 0 then
                             item_list[#item_list].augments = aug_str
                         end
@@ -74,25 +73,23 @@ function export_set(options)
         local ward = temp_items.wardrobe
         for i,v in pairs(gear) do
             if v.slot ~= 0 then
-                local id,extdata
+                local item_tab
                 if v.inv_id == 0 and res.items[inv[v.slot].id] then
-                    id = inv[v.slot].id
-                    extdata = inv[v.slot].extdata
+                    item_tab = inv[v.slot]
                 elseif v.inv_id == 8 and res.items[ward[v.slot].id] then
-                    id = ward[v.slot].id
-                    extdata = ward[v.slot].extdata
+                    item_tab = ward[v.slot]
                 end
-                if res.items[id] then
-                    item_list[slot_map[i]+1] = {}
-                    item_list[slot_map[i]+1].name = res.items[id][language]
-                    item_list[slot_map[i]+1].slot = i
+                if res.items[item_tab.id] then
+                    item_list[slot_map[i]+1] = {
+                        name = res.items[item_tab.id][language],
+                        slot = i
+                        }
                     if not xml then
-                        local aug_1,aug_2,aug_3,aug_4,_,__ = extdata_to_augment(extdata)
+                        local augments = extdata.decode(item_tab).augments or {}
                         local aug_str = ''
-                        if aug_1 and not tonumber(aug_1) then aug_str = aug_str..'"'..aug_1..'",' end
-                        if aug_2 and not tonumber(aug_2) then aug_str = aug_str..'"'..aug_2..'",' end
-                        if aug_3 and not tonumber(aug_3) then aug_str = aug_str..'"'..aug_3..'",' end
-                        if aug_4 and not tonumber(aug_4) then aug_str = aug_str..'"'..aug_4..'",' end
+                        for aug_ind,augment in pairs(augments) do
+                            if augment ~= 'none' then aug_str = aug_str.."'"..augment.."'," end
+                        end
                         if string.len(aug_str) > 0 then
                             item_list[slot_map[i]+1].augments = aug_str
                         end
