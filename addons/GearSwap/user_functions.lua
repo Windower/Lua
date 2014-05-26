@@ -293,7 +293,12 @@ function user_pet_midaction(bool)
 end
 
 function add_to_chat_user(num,str)
-    windower.add_to_chat(num,windower.to_shift_jis(str))
+    if not num then num = 8 end
+    if language == 'japanese' then
+        windower.add_to_chat(num,windower.to_shift_jis(str))
+    else
+        windower.add_to_chat(num,str)
+    end
 end
 
 
