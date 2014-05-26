@@ -49,12 +49,7 @@ require('helper_functions')
 
 --This function is called when the addon loads. Defines aliases and 
 --registers functions, as well as filling the resource tables.
-windower.register_event('load',function()
-    spells = res.spells()
-    stats = res.statuses()
-    jAbils = res.job_abilities()
-    windower.send_command('@lua i ohshi initText')
-end)
+windower.register_event('load', initText)
 
 --Used when the addon is unloaded to save settings.
 windower.register_event('unload',function()
@@ -210,7 +205,7 @@ windower.register_event('action', function(act)
     local player = T(windower.ffxi.get_player())
     
     if not settings.staggeronly then
-        if settings.showrolls and curact.category == 6 and jAbils[extparam]['type'] == 'CorsairRoll' then
+        if settings.showrolls and curact.category == 6 and res.job_abilities[extparam].type == 'CorsairRoll' then
             local allyroller = false
             local selfroll = false
             for pt,member in pairs(party) do
@@ -222,14 +217,14 @@ windower.register_event('action', function(act)
             if allyroller or selfroll then
                 if actor.id == player.id then selfroll = true end
                 if settings.selfrolls and not selfroll then return end
-                addText(actor.name,'roll',extparam,targets[1].actions[1].param)
+                addText(actor.name, 'roll', extparam, targets[1].actions[1].param)
             end
         elseif isMob(actor.id) and S{7,8}:contains(curact.category) and extparam ~= 28787 then
             local inact = targets[1].actions[1]
             if curact.category == 8 then typ = 'spell'
             else typ = 'ws' end
             if (mCheck(actor.name) or dCheck(typ,inact.param)) and inact.message ~= 0 then
-                addText(actor.name,typ,inact.param,mDanger(actor.name),dCheck(typ,inact.param))
+                addText(actor.name, typ, inact.param, mDanger(actor.name), dCheck(typ,inact.param))
             end
         end
     end
@@ -245,11 +240,11 @@ windower.register_event('action message',function(actor_id, target_id, actor_ind
             if actor.id == player.id then
                 if mCheck(target.name) then
                     if message_id == 204 then
-                        addText(target.name..' is no longer '..stats[param_1]['enLog'])
+                        addText(target.name .. ' is no longer ' .. res.buffs[param_1].english_log)
                     elseif message_id == 205 then
-                        addText(target.name..' gains the effect of '..stats[param_1]['enLog'])
+                        addText(target.name .. ' gains the effect of ' .. res.buffs[param_1].english_log)
                     else
-                        addText(target.name..' '..stats[param_1]['enLog']..' effect wears off.')
+                        addText(target.name .. ' ' .. res.buffs[param_1].english_log .. ' effect wears off.')
                     end
                 end
             end
