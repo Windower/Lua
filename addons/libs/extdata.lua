@@ -957,7 +957,7 @@ function string_augment(sys,id,val)
             end
         end
     else
-        augment = 'System: '..sys..' ID: '..id..' Val: '..val
+        augment = 'System: '..tostring(sys)..' ID: '..tostring(id)..' Val: '..tostring(val)
     end
     return augment
 end
@@ -1385,7 +1385,7 @@ local id_mapping = {
 function extdata.decode(tab)
     if not tab then error('extdata.decode was passed a nil value') end
     if not tab.extdata or type(tab.extdata)~= 'string' or #tab.extdata ~= 24 then
-        error('extdata.decode was passed an invalid extdata string',2)
+        error('extdata.decode was passed an invalid extdata string ('..tostring(tab.extdata)..')',2)
     end
     if not tab.id or not tonumber(tab.id) then
         error('extdata.decode was passed an invalid id',2)
