@@ -1290,6 +1290,42 @@ function decode.Equipment(str)
     return rettab
 end
 
+function decode.PvPReservation(str)
+    local rettab = {type='PvP Reservation',
+        time = str:unpack('I') + server_timestamp_offset,
+        level = math.floor(str:byte(4)/32)*10
+    }
+    if rettab.level == 0 then rettab.level = 99 end
+    return rettab
+end
+
+function decode.Reflector(str)
+    local firstnames = {"Bloody", "Brutal", "Celestial", "Combat", "Cyclopean", "Dark", "Deadly",
+            "Drachen", "Giant", "Hostile", "Howling", "Hyper", "Invincible", "Merciless", "Mighty",
+            "Necro", "Nimble", "Poison", "Putrid", "Rabid", "Radiant", "Raging", "Relentless",
+            "Savage", "Silent", "Tenebrous", "The", "Triple", "Undead", "Writhing", "Serpentine",
+            "Aile", "Bete", "Croc", "Babine", "Carapace", "Colosse", "Corne", "Fauve",
+            "Flamme", "Griffe", "Machoire", "Mandibule", "Patte", "Rapace", "Tentacule", "Voyou",
+            "Zaubernder", "Brutaler", "Explosives", "Funkelnder", "Kraftvoller", "Moderndes", "Tosender", "Schwerer",
+            "Sprintender", "Starker", "Stinkender", "Taumelnder", "Tolles", "Verlornes", "Wendiger", "Wuchtiger"}
+        firstnames[0] = "Pit"
+    local lastnames = {"Beast", "Butcher", "Carnifex", "Critter", "Cyclone", "Dancer", "Darkness",
+            "Erudite", "Fang", "Fist", "Flayer", "Gladiator", "Heart", "Howl", "Hunter",
+            "Jack", "Machine", "Mountain", "Nemesis", "Raven", "Reaver", "Rock", "Stalker",
+            "T", "Tiger", "Tornado", "Vermin", "Vortex", "Whispers", "X", "Prime",
+            "Agile", "Brave", "Coriace", "Diabolique", "Espiegle", "Feroce", "Fidele", "Fourbe",
+            "Impitoyable", "Nuisible", "Robuste", "Sanguinaire", "Sauvage", "Stupide", "Tenace", "Tendre",
+            "Boesewicht", "Engel", "Flitzpiepe", "Gottkaiser", "Klotz", "Muelleimer", "Pechvogel", "Postbote",
+            "Prinzessin", "Raecherin", "Riesenbaby", "Hexer", "Teufel", "Vieh", "Vielfrass", "Fleischer"}
+        lastnames[0] = "Monster"
+    local rettab = {type='Reflector',
+        first_name = firstnames[str:byte(1)%64],
+        last_name = lastnames[math.floor(str:byte(1)/64) + (str:byte(2)%16)*4],
+        level = (math.floor(str:byte(7)/16) + (str:byte(8)%16)*16)%128
+    }
+    return rettab
+end
+
 
 local typ_mapping = {
 --[[Types:
@@ -1306,11 +1342,11 @@ local typ_mapping = {
     *12 = Flowerpot
     *14 = Mannequin
     
-    15 = Ballista books
+    *15 = Ballista books
     16 = Chocobo Paraphenelia (Eggs, Cards, slips, etc.)
     17 = Chocobo Ticket and Completion Certificate
     18 = Soul Plates
-    19 = Soul Reflectors
+    *19 = Soul Reflectors
     20 = Salvage logs
     21 = Bonanza Marble
     22 = Maze Tabula M
@@ -1336,6 +1372,8 @@ local typ_mapping = {
     [11] = decode.General,
     [12] = decode.Flowerpot,
     [14] = decode.Mannequin,
+    [15] = decode.PvPReservation,
+    [19] = decode.Reflector,
     }
     
 local id_mapping = {
