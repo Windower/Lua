@@ -93,6 +93,7 @@ function load_user_files(job_id,user_file)
         print_set=print_set,set_combine=set_combine,disable=disable,enable=enable,
         send_command=send_cmd_user,windower=user_windower,include=include_user,
         midaction=user_midaction,pet_midaction=user_pet_midaction,set_language=set_language,
+        show_swaps = show_swaps,debug_mode=debug_mode,
         
         -- Library functions
         string=string,math=math,table=table,set=set,list=list,T=T,S=S,L=L,os=os,
