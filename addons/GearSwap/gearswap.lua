@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.851'
+_addon.version = '0.860'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -43,6 +43,7 @@ require 'lists'
 require 'sets'
 require 'texts'
 res = require 'resources'
+extdata = require 'extdata'
 require 'helper_functions'
 
 require 'statics'
@@ -50,7 +51,6 @@ require 'equip_processing'
 require 'targets'
 require 'user_functions'
 require 'refresh'
-require 'parse_augments'
 require 'export'
 require 'validate'
 require 'flow'
