@@ -113,129 +113,127 @@ gt.MoonPct = ''
 gt.MoonPhase = ''
 
 
-local defaults = T{}
-	defaults.saved = 0
-	defaults.mode = 1
-	defaults.time = T{}
-	defaults.time.pos = {}
-	defaults.time.pos.x = 0 -- left
-	defaults.time.pos.y = 0 -- top
-	defaults.time.text = {}
-	defaults.time.text.alpha = 255
-	defaults.time.text.red = 255
-	defaults.time.text.green = 255
-	defaults.time.text.blue = 255
-	defaults.time.text.size = 12
-	defaults.time.text.font = 'Consolas'
-	defaults.time.bg = {}
-	defaults.time.bg.alpha = 25
-	defaults.time.bg.red = 100
-	defaults.time.bg.green = 100
-	defaults.time.bg.blue = 100
-	defaults.time.bg.visible = true
-	
-	
-	defaults.days = T{}
-	defaults.days.pos = {}
-	defaults.days.pos.x = 100
-	defaults.days.pos.y = 0 -- top
-	defaults.days.text = {}
-	defaults.days.text.alpha = 255
-	defaults.days.text.size = 12
-	defaults.days.text.font = 'Consolas'
-	defaults.days.bg = {}
-	defaults.days.bg.alpha = 100
-	defaults.days.bg.red = 0
-	defaults.days.bg.green = 0
-	defaults.days.bg.blue = 0
-	defaults.days.axis = 'horizontal'
-	defaults.days.change = true
-	defaults.moon = T{}
-	defaults.moon.change = true
-	settings = config.load(defaults)
+defaults = {}
+defaults.saved = 0
+defaults.mode = 1
+defaults.time = {}
+defaults.time.pos = {}
+defaults.time.pos.x = 0 -- left
+defaults.time.pos.y = 0 -- top
+defaults.time.text = {}
+defaults.time.text.alpha = 255
+defaults.time.text.red = 255
+defaults.time.text.green = 255
+defaults.time.text.blue = 255
+defaults.time.text.size = 12
+defaults.time.text.font = 'Consolas'
+defaults.time.bg = {}
+defaults.time.bg.alpha = 25
+defaults.time.bg.red = 100
+defaults.time.bg.green = 100
+defaults.time.bg.blue = 100
+defaults.time.bg.visible = true
 
-	
 
-	Cycles = T{}
-	Cycles.selbina = T{}
-	Cycles.selbina.rname = "Ships between Mhaura and Selbina"
-	Cycles.selbina.route = T{}
-	Cycles.selbina.route[1] = "Arrives in Mhaura and Selbina|22:40"
-	Cycles.selbina.route[2] = "Arrives in Mhaura and Selbina|6:40"
-	Cycles.selbina.route[3] = "Arrives in Mhaura and Selbina|14:40"
+defaults.days = {}
+defaults.days.pos = {}
+defaults.days.pos.x = 100
+defaults.days.pos.y = 0 -- top
+defaults.days.text = {}
+defaults.days.text.alpha = 255
+defaults.days.text.size = 12
+defaults.days.text.font = 'Consolas'
+defaults.days.bg = {}
+defaults.days.bg.alpha = 100
+defaults.days.bg.red = 0
+defaults.days.bg.green = 0
+defaults.days.bg.blue = 0
+defaults.days.axis = 'horizontal'
+defaults.days.change = true
+defaults.moon = {}
+defaults.moon.change = true
+settings = config.load(defaults)
 
-	Cycles.bibiki = T{}
-	Cycles.bibiki.rname = "Ship departing Bibiki Bay for Purgonorgo Isle"
-	Cycles.bibiki.route = T{}
-	Cycles.bibiki.route[1] = "Arrives in Bibiki|4:50"
-	Cycles.bibiki.route[2] = "Arrives in Bibiki|16:50"
 
-	Cycles.nashmau = T{}
-	Cycles.nashmau.rname = "Aht Urhgan / Nashmau Ship"
-	Cycles.nashmau.route = T{}
-	Cycles.nashmau.route[1] = "Arrives in Whitegate and Nashmau|05:00"
-	Cycles.nashmau.route[2] = "Arrives in Whitegate and Nashmau|13:00"
-	Cycles.nashmau.route[3] = "Arrives in Whitegate and Nashmau|21:00"
-	
-	Cycles.whitegate = T{}
-	Cycles.whitegate.rname = "Aht Urhgan / whitegate Ship"
-	Cycles.whitegate.route = T{}
-	Cycles.whitegate.route[1] = "Arrives in Whitegate and Mhaura|10:40"
-	Cycles.whitegate.route[2] = "Arrives in Whitegate and Mhaura|18:40"
-	Cycles.whitegate.route[3] = "Arrives in Whitegate and Mhaura|2:40"
+Cycles = T{}
+Cycles.selbina = T{}
+Cycles.selbina.rname = "Ships between Mhaura and Selbina"
+Cycles.selbina.route = T{}
+Cycles.selbina.route[1] = "Arrives in Mhaura and Selbina|22:40"
+Cycles.selbina.route[2] = "Arrives in Mhaura and Selbina|6:40"
+Cycles.selbina.route[3] = "Arrives in Mhaura and Selbina|14:40"
 
-	Cycles.windurst = T{}
-	Cycles.windurst.rname = "Ship between Windurst and Jeuno"
-	Cycles.windurst.route = {T}
-	Cycles.windurst.route[1] = "Arrives in Windurst|4:47"
-	Cycles.windurst.route[2] = "Arrives in Jeuno|7:41"
-	Cycles.windurst.route[3] = "Arrives in Windurst|10:47"
-	Cycles.windurst.route[4] = "Arrives in Jeuno|13:41"
-	Cycles.windurst.route[5] = "Arrives in Windurst|16:47"
-	Cycles.windurst.route[6] = "Arrives in Jeuno|19:41"
-	Cycles.windurst.route[7] = "Arrives in Windurst|22:47"
-	Cycles.windurst.route[8] = "Arrives in Jeuno|1:41"
+Cycles.bibiki = T{}
+Cycles.bibiki.rname = "Ship departing Bibiki Bay for Purgonorgo Isle"
+Cycles.bibiki.route = T{}
+Cycles.bibiki.route[1] = "Arrives in Bibiki|4:50"
+Cycles.bibiki.route[2] = "Arrives in Bibiki|16:50"
 
-	Cycles.bastok = T{}
-	Cycles.bastok.rname = "Ship between Bastok and Jeuno"
-	Cycles.bastok.route = {T}
-	Cycles.bastok.route[1] = "Arrives in Bastok|0:13"
-	Cycles.bastok.route[2] = "Arrives in Jeuno|3:11"
-	Cycles.bastok.route[3] = "Arrives in Bastok|6:13"
-	Cycles.bastok.route[4] = "Arrives in Jeuno|9:11"
-	Cycles.bastok.route[5] = "Arrives in Bastok|12:13"
-	Cycles.bastok.route[6] = "Arrives in Jeuno|15:11"
-	Cycles.bastok.route[7] = "Arrives in Bastok|18:13"
-	Cycles.bastok.route[8] = "Arrives in Jeuno|21:41"
+Cycles.nashmau = T{}
+Cycles.nashmau.rname = "Aht Urhgan / Nashmau Ship"
+Cycles.nashmau.route = T{}
+Cycles.nashmau.route[1] = "Arrives in Whitegate and Nashmau|05:00"
+Cycles.nashmau.route[2] = "Arrives in Whitegate and Nashmau|13:00"
+Cycles.nashmau.route[3] = "Arrives in Whitegate and Nashmau|21:00"
 
-	Cycles.sandy = T{}
-	Cycles.sandy.rname = "Ship between San d'Oria and Jeuno"
-	Cycles.sandy.route = {T}
-	Cycles.sandy.route[1] = "Arrives in San d'Oria|7:10"
-	Cycles.sandy.route[2] = "Arrives in Jeuno|6:11"
-	Cycles.sandy.route[3] = "Arrives in San d'Oria|9:10"
-	Cycles.sandy.route[4] = "Arrives in Jeuno|12:11"
-	Cycles.sandy.route[5] = "Arrives in San d'Oria|15:10"
-	Cycles.sandy.route[6] = "Arrives in Jeuno|18:11"
-	Cycles.sandy.route[7] = "Arrives in San d'Oria|21:10"
-	Cycles.sandy.route[8] = "Arrives in Jeuno|00:41"
-	
-	Cycles.kazham = T{}
-	Cycles.kazham.rname = "Ship between Kazham and Jeuno"
-	Cycles.kazham.route = {T}
-	Cycles.kazham.route[1] = "Arrives in Kazham|1:48"
-	Cycles.kazham.route[2] = "Arrives in Jeuno|4:49"
-	Cycles.kazham.route[3] = "Arrives in Kazham|7:48"
-	Cycles.kazham.route[4] = "Arrives in Jeuno|10:49"
-	Cycles.kazham.route[5] = "Arrives in Kazham|13:48"
-	Cycles.kazham.route[6] = "Arrives in Jeuno|14:49"
-	Cycles.kazham.route[7] = "Arrives in Kazham|19:48"
-	Cycles.kazham.route[8] = "Arrives in Jeuno|20:49"
+Cycles.whitegate = T{}
+Cycles.whitegate.rname = "Aht Urhgan / whitegate Ship"
+Cycles.whitegate.route = T{}
+Cycles.whitegate.route[1] = "Arrives in Whitegate and Mhaura|10:40"
+Cycles.whitegate.route[2] = "Arrives in Whitegate and Mhaura|18:40"
+Cycles.whitegate.route[3] = "Arrives in Whitegate and Mhaura|2:40"
 
-function initialize()
+Cycles.windurst = T{}
+Cycles.windurst.rname = "Ship between Windurst and Jeuno"
+Cycles.windurst.route = {T}
+Cycles.windurst.route[1] = "Arrives in Windurst|4:47"
+Cycles.windurst.route[2] = "Arrives in Jeuno|7:41"
+Cycles.windurst.route[3] = "Arrives in Windurst|10:47"
+Cycles.windurst.route[4] = "Arrives in Jeuno|13:41"
+Cycles.windurst.route[5] = "Arrives in Windurst|16:47"
+Cycles.windurst.route[6] = "Arrives in Jeuno|19:41"
+Cycles.windurst.route[7] = "Arrives in Windurst|22:47"
+Cycles.windurst.route[8] = "Arrives in Jeuno|1:41"
+
+Cycles.bastok = T{}
+Cycles.bastok.rname = "Ship between Bastok and Jeuno"
+Cycles.bastok.route = {T}
+Cycles.bastok.route[1] = "Arrives in Bastok|0:13"
+Cycles.bastok.route[2] = "Arrives in Jeuno|3:11"
+Cycles.bastok.route[3] = "Arrives in Bastok|6:13"
+Cycles.bastok.route[4] = "Arrives in Jeuno|9:11"
+Cycles.bastok.route[5] = "Arrives in Bastok|12:13"
+Cycles.bastok.route[6] = "Arrives in Jeuno|15:11"
+Cycles.bastok.route[7] = "Arrives in Bastok|18:13"
+Cycles.bastok.route[8] = "Arrives in Jeuno|21:41"
+
+Cycles.sandy = T{}
+Cycles.sandy.rname = "Ship between San d'Oria and Jeuno"
+Cycles.sandy.route = {T}
+Cycles.sandy.route[1] = "Arrives in San d'Oria|7:10"
+Cycles.sandy.route[2] = "Arrives in Jeuno|6:11"
+Cycles.sandy.route[3] = "Arrives in San d'Oria|9:10"
+Cycles.sandy.route[4] = "Arrives in Jeuno|12:11"
+Cycles.sandy.route[5] = "Arrives in San d'Oria|15:10"
+Cycles.sandy.route[6] = "Arrives in Jeuno|18:11"
+Cycles.sandy.route[7] = "Arrives in San d'Oria|21:10"
+Cycles.sandy.route[8] = "Arrives in Jeuno|00:41"
+
+Cycles.kazham = T{}
+Cycles.kazham.rname = "Ship between Kazham and Jeuno"
+Cycles.kazham.route = {T}
+Cycles.kazham.route[1] = "Arrives in Kazham|1:48"
+Cycles.kazham.route[2] = "Arrives in Jeuno|4:49"
+Cycles.kazham.route[3] = "Arrives in Kazham|7:48"
+Cycles.kazham.route[4] = "Arrives in Jeuno|10:49"
+Cycles.kazham.route[5] = "Arrives in Kazham|13:48"
+Cycles.kazham.route[6] = "Arrives in Jeuno|14:49"
+Cycles.kazham.route[7] = "Arrives in Kazham|19:48"
+Cycles.kazham.route[8] = "Arrives in Jeuno|20:49"
+
+config.register(settings, function()
 	cb_time()
 	cb_day()
-	settings = config.load(defaults)
 
 	if settings.days.axis == 'horizontal' then
 		gt.delimiter = ' '
@@ -245,9 +243,7 @@ function initialize()
 	
 	gt.mode = settings.mode
 	day_change(windower.ffxi.get_info().day)
-end
-	
-windower.register_event('login','load',initialize)
+end)
 
 function getroutes(route)
 	for ckey, cval in pairs(Cycles) do
@@ -341,7 +337,7 @@ function day_change(day)
 	moon_change()
 end
 
-windower.register_event('day change', moon_change..day_change)
+windower.register_event('day change', moon_change .. day_change)
 
 windower.register_event('moon change', moon_change)
 
