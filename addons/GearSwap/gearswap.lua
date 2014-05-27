@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.851'
+_addon.version = '0.860'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -43,6 +43,7 @@ require 'lists'
 require 'sets'
 require 'texts'
 res = require 'resources'
+extdata = require 'extdata'
 require 'helper_functions'
 
 require 'statics'
@@ -50,7 +51,6 @@ require 'equip_processing'
 require 'targets'
 require 'user_functions'
 require 'refresh'
-require 'parse_augments'
 require 'export'
 require 'validate'
 require 'flow'
@@ -375,7 +375,7 @@ windower.register_event('status change',function(new,old)
     if gearswap_disabled or T{2,3,4}:contains(old) or T{2,3,4}:contains(new) then return end
     
     refresh_globals()
-    equip_sets('status_change',nil,res.statuses[new][language],res.statuses[old][language])
+    equip_sets('status_change',nil,res.statuses[new].english,res.statuses[old].english)
 end)
 
 windower.register_event('gain buff',function(buff_id)

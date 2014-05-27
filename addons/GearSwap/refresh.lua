@@ -93,6 +93,7 @@ function load_user_files(job_id,user_file)
         print_set=print_set,set_combine=set_combine,disable=disable,enable=enable,
         send_command=send_cmd_user,windower=user_windower,include=include_user,
         midaction=user_midaction,pet_midaction=user_pet_midaction,set_language=set_language,
+        show_swaps = show_swaps,debug_mode=debug_mode,
         
         -- Library functions
         string=string,math=math,table=table,set=set,list=list,T=T,S=S,L=L,os=os,
@@ -186,7 +187,7 @@ function refresh_player()
     end
     player.job = player.main_job..'/'..player.sub_job
     player.status_id = player.status
-    player.status = res.statuses[player.status][language]
+    player.status = res.statuses[player.status].english
     
     for i,v in pairs(player_mob_table) do
         if i == 'name' then
