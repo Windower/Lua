@@ -143,6 +143,44 @@ function functions.it(fn, ...)
     end
 end
 
+-- Schedules the current function to run delayed by the provided time in seconds
+functions.schedule = coroutine.schedule
+
+-- Returns a function that, when called, will execute the underlying function delayed by the provided number of seconds
+function functions.delay(fn, time)
+    return function()
+        fn:schedule(time)
+    end
+end
+
+-- Returns a wrapper table representing the provided function with additional functions:
+function functions.loop(fn, interval, cond)
+    if interval <= 0 then
+        return
+    end
+
+    if type(cond) == 'number' then
+        cond = function()
+            local i = 0
+            local lim = cond
+            return function()
+                i = i + 1
+                return i <= lim
+            end
+        end()
+    end
+    cond = cond or true:fn()
+
+    coroutine.schedule(function()
+        while cond() do
+            fn()
+            -- print('sleeping...', os.clock(), interval)
+            coroutine.sleep(interval)
+            -- print('awoke...', os.clock())
+        end
+    end, 0)
+end
+
 --[[
     Various built-in wrappers
 ]]
@@ -434,7 +472,7 @@ function string.map(str, fn)
 end
 
 --[[
-Copyright (c) 2013, Windower
+Copyright © 2013-2014, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
