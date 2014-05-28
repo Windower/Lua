@@ -305,6 +305,7 @@ enums['action'] = {
     [0x05] = 'Call for Help',
     [0x07] = 'Weaponskill usage',
     [0x09] = 'Job ability usage',
+    [0x0C] = 'Assist',
     [0x0D] = 'Reraise dialogue',
     [0x0F] = 'Switch target',
     [0x10] = 'Ranged attack',
