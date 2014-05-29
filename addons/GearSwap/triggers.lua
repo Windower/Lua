@@ -72,7 +72,7 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
         if targtab[1] then
             temptarg,temp_mob_arr = valid_target(targtab[1])
         end
-    else
+    elseif splitline[2] then
         abil = splitline[2]:lower()
         if splitline[3] then
             temptarg,temp_mob_arr = valid_target(splitline[3])
