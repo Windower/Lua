@@ -15,7 +15,7 @@ local fns = {}
 local slots = {}
 
 local language_string = _addon and _addon.language and _addon.language:lower() or windower.ffxi.get_info().language:lower()
-local log_language_string = language_string .. '_log'
+local language_string_log = language_string .. '_log'
 
 -- The metatable for all sub tables of the root resource table
 local resource_mt = {}
@@ -28,25 +28,25 @@ local resources = setmetatable({}, {__index = function(t, k)
     end
 end})
 
+local redict = {
+    name = language_string,
+    name_log = language_string_log,
+    english = 'en',
+    japanese = 'ja',
+    german = 'de',
+    french = 'fr',
+    english_log = 'enl',
+    japanese_log = 'ja',
+    german_log = 'del',
+    french_log = 'frl',
+    english_short = 'ens',
+    japanese_short = 'jas',
+    german_short = 'des',
+    french_short = 'frs',
+}
+
 -- The metatable for a single resource item (an entry in a sub table of the root resource table)
 local resource_entry_mt = {__index = function()
-    local redict = {
-        name = language_string,
-        log_name = log_language_string,
-        english = 'en',
-        japanese = 'ja',
-        german = 'de',
-        french = 'fr',
-        english_log = 'enl',
-        japanese_log = 'ja',
-        german_log = 'del',
-        french_log = 'frl',
-        english_short = 'ens',
-        japanese_short = 'jas',
-        german_short = 'des',
-        french_short = 'frs',
-    }
-
     return function(t, k)
         return redict[k]
                 and t[redict[k]]
@@ -56,6 +56,7 @@ end()}
 
 function resource_group(r, fn, attr)
     fn = type(fn) == 'function' and fn or functions.equals(fn)
+    attr = redict[attr] or attr
 
     local res = {}
     for index, item in pairs(r) do
@@ -69,11 +70,14 @@ function resource_group(r, fn, attr)
 end
 
 resource_mt.__index = function(t, k)
-    return (slots[t]:contains(k) or k == 'name')
+    return (slots[t]:contains(k) or slots[t]:contains(redict[k]))
             and resource_group-{k}
         or table[k]
 end
 resource_mt.__class = 'Resource'
+resource_mt.__tostring = function(t)
+    return '{' .. t:map(table.get-{'name'}):concat(', ') .. '}'
+end
 
 local resources_path = windower.windower_path .. 'res/'
 
