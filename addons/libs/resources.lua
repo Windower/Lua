@@ -75,6 +75,9 @@ resource_mt.__index = function(t, k)
         or table[k]
 end
 resource_mt.__class = 'Resource'
+resource_mt.__tostring = function(t)
+    return '{' .. t:map(table.get-{'name'}):concat(', ') .. '}'
+end
 
 local resources_path = windower.windower_path .. 'res/'
 
