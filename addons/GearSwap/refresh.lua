@@ -39,10 +39,15 @@
 ---- Updates all global variables to reflect the player's status. Generally run
 ---- before calling a player function.
 -----------------------------------------------------------------------------------
-function refresh_globals()
-    refresh_player()
-    refresh_ffxi_info()
-    refresh_group_info()
+function refresh_globals(user_event_flag)
+    local current = os.clock()
+    local dt = current - last_refresh
+    if dt > 0.03 then
+        last_refresh = current
+        refresh_player(dt,user_event_flag)
+        refresh_ffxi_info(dt,user_event_flag)
+        refresh_group_info(dt,user_event_flag)
+    end
 end
 
 -----------------------------------------------------------------------------------
@@ -168,44 +173,42 @@ end
 -------- Indexes buffs by their buff name and assigns a value equal to the number
 -------- of buffs with that name active.
 -----------------------------------------------------------------------------------
-function refresh_player()
-    local pl = windower.ffxi.get_player()
-    if not pl then return end
+function refresh_player(dt,user_event_flag)
+    if not user_event_flag or dt > 0.5 then
+        local pl = windower.ffxi.get_player()
+        if not pl then return end
+        
+        local player_mob_table = windower.ffxi.get_mob_by_index(pl.index)
+        if not player_mob_table then return end
+        
+        table.reassign(player,pl)
+        for i,v in pairs(player.vitals) do
+            player[i]=v
+        end
+        if not player.sub_job then
+            player.sub_job = 'NONE'
+            player.sub_job_level = 0
+            player.sub_job_full = 'None'
+            player.sub_job_id = 0
+        end
+        player.job = player.main_job..'/'..player.sub_job
+        player.status_id = player.status
+        player.status = res.statuses[player.status].english
     
-    local player_mob_table = windower.ffxi.get_mob_by_index(pl.index)
-    if not player_mob_table then return end
+        for i,v in pairs(player_mob_table) do
+            if i == 'name' then
+                player.mob_name = v
+            elseif i~= 'is_npc' and i~='tp' and i~='mpp' and i~='claim_id' and i~='status' then
+                player[i] = v
+            end
+        end
     
-    table.reassign(player,pl)
-    for i,v in pairs(player.vitals) do
-        player[i]=v
-    end
-    if not player.sub_job then
-        player.sub_job = 'NONE'
-        player.sub_job_level = 0
-        player.sub_job_full = 'None'
-        player.sub_job_id = 0
-    end
-    player.job = player.main_job..'/'..player.sub_job
-    player.status_id = player.status
-    player.status = res.statuses[player.status].english
-    
-    for i,v in pairs(player_mob_table) do
-        if i == 'name' then
-            player.mob_name = v
-        elseif i~= 'is_npc' and i~='tp' and i~='mpp' and i~='claim_id' and i~='status' then
-            player[i] = v
+        if player_mob_table.race ~= nil then
+            player.race_id = player.race
+            player.race = res.races[player.race][language]
         end
     end
     
-    if player_mob_table.race ~= nil then
-        player.race_id = player.race
-        player.race = res.races[player.race][language]
-    end
-    
-    
-    
-    local item_table = windower.ffxi.get_items()
-    if item_table then items = item_table end
     -- This being nil does not cause a return, but items should not really be changing when zoning.
     if items.equipment then
         local cur_equip = convert_equipment(items.equipment) -- i = 'head', 'feet', etc.; v = inventory ID (0~80)
@@ -240,7 +243,7 @@ function refresh_player()
     player.last_subtarget = target_complete(windower.ffxi.get_mob_by_target('lastst'))
     
     -- If we have a pet, create or update the table info.
-    if player_mob_table.pet_index then
+    if player_mob_table and player_mob_table.pet_index then
         local player_pet_table = windower.ffxi.get_mob_by_index(player_mob_table.pet_index)
         if player_pet_table then
             table.reassign(pet, target_complete(player_pet_table))
@@ -309,9 +312,7 @@ function refresh_player()
                 pet.mpp = 0
             end
         end
-    end
-    
-    if player.main_job == 'MON' then
+    elseif player.main_job == 'MON' then
         local species_id = windower.ffxi.get_mjob_data().species
         -- Should add instincts when they become available
         
@@ -356,7 +357,7 @@ end
 ---- Updates the global "world" with windower.ffxi.get_info (ignores the target field).
 ---- Also sets windower.ffxi.get_info()['zone'] to be world.area for consistency with spellcast
 -----------------------------------------------------------------------------------
-function refresh_ffxi_info()
+function refresh_ffxi_info(dt,user_event_flag)
     local info = windower.ffxi.get_info()
     for i,v in pairs(info) do
         if i == 'zone' and res.zones[v] then
@@ -421,7 +422,7 @@ end
 ---- Also adds a "count" field to alliance (total number of people in alliance) and
 ---- to the individual subtables (total number of people in each party.
 -----------------------------------------------------------------------------------
-function refresh_group_info()
+function refresh_group_info(dt,user_event_flag)
     clean_alliance()
     
     local j = windower.ffxi.get_party() or {}
