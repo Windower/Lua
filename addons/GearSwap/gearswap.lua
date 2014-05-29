@@ -47,6 +47,12 @@ res = require 'resources'
 extdata = require 'extdata'
 require 'helper_functions'
 
+-- Resources Checks
+if res.items and res.bags and res.slots and res.statuses and res.jobs and res.elements and res.skills and res.buffs and res.spells and res.job_abilities and res.weapon_skills and res.monster_abilities and res.action_messages and res.skills and res.monstrosity and res.weather and res.moon_phases and res.races then
+else
+    error('Missing resources!')
+end
+
 require 'statics'
 require 'equip_processing'
 require 'targets'
