@@ -222,7 +222,34 @@ _ExtraData = {
         world = {in_mog_house = false},
     }
 
+player = windower.ffxi.get_player()
+if not player then
+    player = {
+        vitals = {},
+        buffs = {},
+        skills = {},
+        jobs = {},
+        merits = {},
+        }
+end
+items = windower.ffxi.get_items()
+if not items then
+    items = {
+            inventory = make_inventory_table(),
+            safe = make_inventory_table(),
+            storage = make_inventory_table(),
+            temporary = make_inventory_table(),
+            satchel = make_inventory_table(),
+            sack = make_inventory_table(),
+            locker = make_inventory_table(),
+            case = make_inventory_table(),
+            wardrobe = make_inventory_table(),
+            equipment = {},
+        }
+end
+
 last_PC_update = ''
+item_update_flag = true
 gearswap_disabled = false
 sent_out_equip = {}
 not_sent_out_equip = {}
@@ -248,6 +275,7 @@ encumbrance_table = table.reassign({},disable_table)
 registered_user_events = {}
 empty = {name="empty"}
 outgoing_packet_table = {}
+last_refresh = 0
 
 unbridled_learning_set = {['Thunderbolt']=true,['Harden Shell']=true,['Absolute Terror']=true,
     ['Gates of Hades']=true,['Tourbillion']=true,['Pyric Bulwark']=true,['Bilgestorm']=true,

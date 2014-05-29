@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.860'
+_addon.version = '0.865'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -42,9 +42,16 @@ require 'tables'
 require 'lists'
 require 'sets'
 require 'texts'
+require 'pack'
 res = require 'resources'
 extdata = require 'extdata'
 require 'helper_functions'
+
+-- Resources Checks
+if res.items and res.bags and res.slots and res.statuses and res.jobs and res.elements and res.skills and res.buffs and res.spells and res.job_abilities and res.weapon_skills and res.monster_abilities and res.action_messages and res.skills and res.monstrosity and res.weather and res.moon_phases and res.races then
+else
+    error('Missing resources!')
+end
 
 require 'statics'
 require 'equip_processing'
@@ -184,6 +191,8 @@ end
 windower.register_event('incoming chunk',function(id,data,modified,injected,blocked)
     if debugging >= 1 then windower.debug('incoming chunk '..id) end
     
+    
+    
     if next_packet_events and next_packet_events.sequence_id ~= data:byte(4)*256+data:byte(3) then
         if not next_packet_events.globals_update or next_packet_events.globals_update ~= data:byte(4)*256 + data:byte(3) then
             refresh_globals()
@@ -209,7 +218,21 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         end
     end
     
-    if id == 0x0E and not injected and pet.index and pet.index == data:byte(9) + data:byte(10)*256 and math.floor((data:byte(11)%8)/4)== 1 then
+    if injected then
+    elseif id == 0x00A then
+        player.name = data:unpack('z',0x85)
+        player.id = data:unpack('I',0x05)
+        player.index = data:unpack('H',0x09)
+        player.main_job = data:byte(0xB5)
+        player.sub_job = data:byte(0xB8)
+        player.vitals.max_hp = data:unpack('I',0xE9)
+        player.vitals.max_mp = data:unpack('I',0xED)
+        update_job_names()
+        
+        _ExtraData.world.in_mog_house = data:byte(0x81) == 1
+    elseif id == 0x00B then
+        items.temporary = make_inventory_table()
+    elseif id == 0x0E and pet.index and pet.index == data:unpack('H',9) and math.floor((data:byte(11)%8)/4)== 1 then
         local oldstatus = pet.status
         local status_id = data:byte(32)
         -- Ignore all statuses aside from Idle/Engaged/Dead/Engaged dead.
@@ -220,16 +243,63 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
                 if oldstatus ~= newstatus then
                     if not next_packet_events then next_packet_events = {sequence_id = data:byte(4)*256+data:byte(3)} end
                     next_packet_events.pet_status_change = {newstatus=newstatus,oldstatus=oldstatus}
---                    refresh_globals()
-        
---                    if pet.isvalid then
---                        pet.status = newstatus
---                        equip_sets('pet_status_change',nil,newstatus,oldstatus)
---                    end
                 end
             end
         end
-    elseif id == 0x28 and not injected then
+    elseif id == 0x01B then
+        for i = 1,23 do
+            player.jobs[to_windower_api(res.jobs[i].english)] = data:byte(i + 72)
+        end
+        
+        local enc = data:byte(97) + data:byte(98)*256
+        items = windower.ffxi.get_items()
+        local tab = {}
+        for i,v in pairs(default_slot_map) do
+            if encumbrance_table[i] and math.floor( (enc%(2^(i+1))) / 2^i ) ~= 1 and not_sent_out_equip[v] and not disable_table[i] then
+                tab[v] = not_sent_out_equip[v]
+                not_sent_out_equip[v] = nil
+                debug_mode_chat("Your "..v.." are now unlocked.")
+            end
+            encumbrance_table[i] = tf
+        end
+        if table.length(tab) > 0 then
+            refresh_globals()
+            equip_sets('equip_command',nil,tab)
+        end
+    elseif id == 0x01E then
+        local bag = to_windower_api(res.bags[data:byte(9)].english)
+        local slot = data:byte(10)
+        local count = data:unpack('I',5)
+        if slot ~= 0 then
+            items[bag][slot].count = count
+            if count == 0 then
+                items[bag][slot].id = 0
+                items[bag][slot].bazaar = 0
+                items[bag][slot].status = 0
+            end
+        end
+    elseif id == 0x01F then
+        local bag = to_windower_api(res.bags[data:byte(11)].english)
+        local slot = data:byte(12)
+        if slot ~= 0 then
+            items[bag][slot].id = data:unpack('H',9)
+            items[bag][slot].count = data:unpack('I',5)
+            items[bag][slot].status = data:byte(13)
+        end
+    elseif id == 0x020 then
+        local bag = to_windower_api(res.bags[data:byte(15)].english)
+        local slot = data:byte(16)
+        if slot ~= 0 then
+            items[bag][slot].id = data:unpack('H',13)
+            items[bag][slot].count = data:unpack('I',5)
+            items[bag][slot].bazaar = data:unpack('I',9)
+            items[bag][slot].status = data:byte(17)
+            items[bag][slot].extdata = data:sub(18,41)
+        else
+            items.gil = data:unpack('I',5)
+        end
+        -- Did not mess with linkshell stuff
+    elseif id == 0x28 then
         if clocking then windower.add_to_chat(8,'Action Packet: '..(os.clock() - out_time)) end
         data = data:sub(5)
         local act = {}
@@ -292,7 +362,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
             end
         end
         inc_action(act)
-    elseif id == 0x29 and not injected then
+    elseif id == 0x29 then
         if clocking then windower.add_to_chat(8,'Action Message: '..(os.clock() - out_time)) end
         if gearswap_disabled then return end
         data = data:sub(5)
@@ -307,39 +377,14 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         arr.message_id = get_bit_packed(data,160,175) -- Cut off the most significant bit, hopefully
 
         inc_action_message(arr)
-    elseif id == 0x01B and not injected then
---        'Job Info Packet'
-        local enc = data:byte(97) + data:byte(98)*256
-        items = windower.ffxi.get_items()
-        local tab = {}
-        for i,v in pairs(default_slot_map) do
-            if encumbrance_table[i] and math.floor( (enc%(2^(i+1))) / 2^i ) ~= 1 and not_sent_out_equip[v] and not disable_table[i] then
-                tab[v] = not_sent_out_equip[v]
-                not_sent_out_equip[v] = nil
-                debug_mode_chat("Your "..v.." are now unlocked.")
-            end
-            encumbrance_table[i] = tf
+    elseif id == 0x037 then
+        player.status_id = data:byte(0x31)
+        local bitmask = data:sub(0x4D,0x54)
+        for i = 1,32 do
+            local bitmask_position = 2*((i-1)%4)
+            player.buffs[i] = data:byte(4+i) + 256*math.floor(bitmask:byte(1+math.floor((i-1)/4))%(2^(bitmask_position+2))/(2^bitmask_position))
         end
-        if table.length(tab) > 0 then
-            refresh_globals()
-            equip_sets('equip_command',nil,tab)
-        end
-    elseif id == 0x067 and not injected then
-        local flag_1 = data:byte(5)
-        local flag_2 = data:byte(6)
-        local owner_ind = data:byte(14)*256+data:byte(13)
-        local subj_ind = data:byte(8)*256+data:byte(7)
         
-        if flag_1 == 3 and flag_2 == 5 and windower.ffxi.get_player().index == owner_ind and not pet.isvalid then
-            if not next_packet_events then next_packet_events = {sequence_id = data:byte(4)*256+data:byte(3)} end
-            next_packet_events.pet_change = {subj_ind = subj_ind}
-        elseif flag_1 == 4 and flag_2 == 5 and windower.ffxi.get_player().index == subj_ind then
-            if not next_packet_events then next_packet_events = {sequence_id = data:byte(4)*256+data:byte(3)} end
-            refresh_globals()
-            pet.isvalid = false
-            next_packet_events.pet_change = {pet = table.reassign({},pet)}
-        end
-    elseif id == 0x037 and not injected then
         local indi_byte = data:byte(0x59)
         if indi_byte%128/64 >= 1 then
             _ExtraData.player.indi = {
@@ -355,9 +400,54 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         else
             _ExtraData.player.indi = nil
         end
-    elseif id == 0x00A and not injected then
-        _ExtraData.world.in_mog_house = data:byte(0x81) == 1
-    elseif gearswap_disabled then
+    elseif id == 0x044 then
+        -- No idea what this is doing
+    elseif id == 0x050 then
+        local slot = data:byte(6)
+        items.equipment[to_windower_api(res.slots[slot].english)] = data:byte(5)
+        items.equipment[to_windower_api(res.slots[slot].english..' bag')] = data:byte(7)
+        items[to_windower_api(res.bags[data:byte(7)].english)][data:byte(5)].status = 5
+    elseif id == 0x061 then
+        player.vitals.max_hp = data:unpack('I',5)
+        player.vitals.max_mp = data:unpack('I',9)
+        player.main_job_id = data:byte(13)
+        player.main_job_level = data:byte(14)
+        player.sub_job_id = data:byte(15)
+        player.sub_job_level = data:byte(16)
+        update_job_names()
+    elseif id == 0x062 then
+        for i = 1,0x71,2 do
+            local skill = data:unpack('H',i + 0x82)
+            local current_skill = res.skills[math.floor(i/2)+1]
+            if current_skill then
+                player.skills[to_windower_api(current_skill.english)] = skill
+            end
+        end
+    elseif id == 0x067 then
+        local flag_1 = data:byte(5)
+        local flag_2 = data:byte(6)
+        local owner_ind = data:byte(14)*256+data:byte(13)
+        local subj_ind = data:byte(8)*256+data:byte(7)
+        
+        if flag_1 == 3 and flag_2 == 5 and windower.ffxi.get_player().index == owner_ind and not pet.isvalid then
+            if not next_packet_events then next_packet_events = {sequence_id = data:byte(4)*256+data:byte(3)} end
+            next_packet_events.pet_change = {subj_ind = subj_ind}
+        elseif flag_1 == 4 and flag_2 == 5 and windower.ffxi.get_player().index == subj_ind then
+            if not next_packet_events then next_packet_events = {sequence_id = data:byte(4)*256+data:byte(3)} end
+            refresh_globals()
+            pet.isvalid = false
+            next_packet_events.pet_change = {pet = table.reassign({},pet)}
+        end
+    elseif id == 0x0DF then
+        player.vitals.hp = data:unpack('I',9)
+        player.vitals.mp = data:unpack('I',13)
+        player.vitals.tp = data:unpack('I',0x11)/10
+        player.vitals.hpp = data:byte(0x17)
+        player.vitals.mpp = data:byte(0x18)
+    end
+    
+    
+    if gearswap_disabled then
         return
     elseif id == 0x050 and not injected then
 --        'Equipment packet'

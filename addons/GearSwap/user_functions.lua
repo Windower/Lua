@@ -233,7 +233,7 @@ end
 
 function user_equip_sets(func)
     return setfenv(function(...)
-        gearswap.refresh_globals()
+        gearswap.refresh_globals(true)
         return gearswap.equip_sets(func,nil,...)
     end,user_env)
 end

@@ -13,14 +13,15 @@ defaults = {}
 defaults.Pass = S{}
 defaults.Lot = S{}
 defaults.AutoDrop = false
+defaults.Delay = 0
 
 settings = config.load(defaults)
 
 ids = T{}
-res.items:map(function(item) 
+for item in res.items:it() do
     ids[item.name:lower()] = item.id 
-    ids[item.log_name:lower()] = item.id 
-end)
+    ids[item.name_log:lower()] = item.id 
+end
 
 s = S{'pass', 'lot'}
 code = {}
@@ -76,6 +77,14 @@ function passlot(command1, command2, ids)
     force_check()
 end
 
+function act(action, ...)
+    windower.ffxi[action]:prepare(...):schedule((math.random() + 1) / 2 * settings.Delay)
+end
+
+pass = act+{'pass_item'}
+lot = act+{'lot_item'}
+drop = act+{'drop_item'}
+
 function force_check()
     local items = windower.ffxi.get_items()
 
@@ -88,7 +97,7 @@ function force_check()
     if settings.AutoDrop then
         for index, item in pairs(items.inventory) do
             if code.pass:contains(item.id) then
-                windower.ffxi.drop_item(index, item.count)
+                drop(index, item.count)
             end
         end
     end
@@ -96,11 +105,11 @@ end
 
 function check(slot_index, item_id)
     if code.pass:contains(item_id) then
-        windower.ffxi.pass_item(slot_index)
+        pass(slot_index)
     elseif code.lot:contains(item_id) then
         local inventory = windower.ffxi.get_items(inventory_id)
         if inventory.max - inventory.count > 1 then
-            windower.ffxi.lot_item(slot_index)
+            lot(slot_index)
         end
     end
 end
