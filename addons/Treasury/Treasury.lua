@@ -18,10 +18,10 @@ defaults.Delay = 0
 settings = config.load(defaults)
 
 ids = T{}
-res.items:map(function(item) 
+for item in res.items:it() do
     ids[item.name:lower()] = item.id 
-    ids[item.log_name:lower()] = item.id 
-end)
+    ids[item.name_log:lower()] = item.id 
+end
 
 s = S{'pass', 'lot'}
 code = {}
