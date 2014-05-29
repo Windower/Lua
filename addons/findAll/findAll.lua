@@ -105,7 +105,7 @@ function search(query, export)
 	    if (resources[id]) then
             item_names[i] = {
                 ['name'] = resources[id].name,
-                ['long_name'] = resources[id].log_name
+                ['long_name'] = resources[id].name_log
             }
         end
     end
