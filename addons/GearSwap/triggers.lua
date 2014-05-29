@@ -61,14 +61,24 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
     
     local command = splitline[1]
     
-    local a,b,abil = string.find(temp_mod,'"(.-)"')
+    local a,b,abil = string.find(temp_mod,' "(.-)" ')
+    local temptarg, temp_mob_array
     if abil then
         abil = abil:lower()
-    elseif splitline.n == 3 then
+        local targtab = (temp_mod:sub(b)):split(' ')
+        while targtab[1] == '' do
+            table.remove(targtab,1)
+        end
+        if targtab[1] then
+            temptarg,temp_mob_arr = valid_target(targtab[1])
+        end
+    elseif splitline[2] then
         abil = splitline[2]:lower()
+        if splitline[3] then
+            temptarg,temp_mob_arr = valid_target(splitline[3])
+        end
     end
     
-    local temptarg,temp_mob_arr = valid_target(splitline[splitline.n])
     local unified_prefix = unify_prefix[command]
     if unified_prefix and temptarg and (validabils[language][unified_prefix][abil] or unified_prefix=='/ra') then
         if st_flag then

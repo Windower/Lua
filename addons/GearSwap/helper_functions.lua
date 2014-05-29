@@ -173,6 +173,74 @@ end
  
  
 -----------------------------------------------------------------------------------
+----Name: make_empty_item_table(slot)
+-- Make an empty item table with slot = slot
+----Args:
+-- slot - The index of the item table
+-----------------------------------------------------------------------------------
+----Returns:
+-- A zero'd table with slot = slot
+-----------------------------------------------------------------------------------
+function make_empty_item_table(slot)
+    return {id=0,
+    count = 0,
+    bazaar = 0,
+    extdata = string.char(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0),
+    status = 0,
+    slot = slot}
+end
+
+
+-----------------------------------------------------------------------------------
+----Name: make_inventory_table()
+-- Make a table of empty item tables
+----Args:
+-- none
+-----------------------------------------------------------------------------------
+----Returns:
+-- A table of 80 empty item tables indexed 1-80
+-----------------------------------------------------------------------------------
+function make_inventory_table()
+    local tab = {}
+    for i = 1,80 do
+        tab[i] = make_empty_item_table(i)
+    end
+    return tab
+end
+
+
+-----------------------------------------------------------------------------------
+----Name: to_windower_api(str)
+-- Takes strings and converts them to resources table key format
+----Args:
+-- str - String to be converted to the windower API version
+-----------------------------------------------------------------------------------
+----Returns:
+-- a lower case string with ' ' replaced with '_'
+-----------------------------------------------------------------------------------
+function to_windower_api(str)
+    return __raw.lower(str:gsub(' ','_'))
+end
+
+
+-----------------------------------------------------------------------------------
+----Name: update_job_names()
+-- Updates job names in the global player array
+----Args:
+-- none
+-----------------------------------------------------------------------------------
+----Returns:
+-- none
+-----------------------------------------------------------------------------------
+function update_job_names()
+    player.main_job = res.jobs[player.main_job_id].english_short
+    player.main_job_full = res.jobs[player.main_job_id].english
+    player.sub_job = res.jobs[player.sub_job_id].english_short
+    player.sub_job_full = res.jobs[player.sub_job_id].english
+end
+
+ 
+-----------------------------------------------------------------------------------
 ----Name: get_default_slot(k)
 -- Given a generally known slot key, return the default version of that key.
 ----Args:
