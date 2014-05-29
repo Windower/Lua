@@ -400,7 +400,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         local slot = data:byte(6)
         items.equipment[to_windower_api(res.slots[slot].english)] = data:byte(5)
         items.equipment[to_windower_api(res.slots[slot].english..' bag')] = data:byte(7)
-        items[to_windower_api(res.bags[data:byte(7)].english)][slot].status = 5
+        items[to_windower_api(res.bags[data:byte(7)].english)][data:byte(5)].status = 5
     elseif id == 0x061 then
         player.vitals.max_hp = data:unpack('I',5)
         player.vitals.max_mp = data:unpack('I',9)
