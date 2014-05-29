@@ -264,18 +264,22 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         local bag = to_windower_api(res.bags[data:byte(9)].english)
         local slot = data:byte(10)
         local count = data:unpack('I',5)
-        items[bag][slot].count = count
-        if count == 0 then
-            items[bag][slot].id = 0
-            items[bag][slot].bazaar = 0
-            items[bag][slot].status = 0
+        if slot ~= 0 then
+            items[bag][slot].count = count
+            if count == 0 then
+                items[bag][slot].id = 0
+                items[bag][slot].bazaar = 0
+                items[bag][slot].status = 0
+            end
         end
     elseif id == 0x01F then
         local bag = to_windower_api(res.bags[data:byte(11)].english)
         local slot = data:byte(12)
-        items[bag][slot].id = data:unpack('H',9)
-        items[bag][slot].count = data:unpack('I',5)
-        items[bag][slot].status = data:byte(13)
+        if slot ~= 0 then
+            items[bag][slot].id = data:unpack('H',9)
+            items[bag][slot].count = data:unpack('I',5)
+            items[bag][slot].status = data:byte(13)
+        end
     elseif id == 0x020 then
         local bag = to_windower_api(res.bags[data:byte(15)].english)
         local slot = data:byte(16)
