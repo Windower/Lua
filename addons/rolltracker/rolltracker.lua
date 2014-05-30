@@ -105,24 +105,18 @@ windower.register_event('load', function()
 
     rollInfo = {}
     for key, val in pairs(rollInfoTemp) do
-        rollInfo[res.buffs:with('english', key .. ' Roll').id] = {key, unpack(val)}
+        rollInfo[res.job_abilities:with('english', key .. ' Roll').id] = {key, unpack(val)}
     end
-
+    
     settings = config.load(defaults)
     --Wanted to change this to true/false in config file, but it wouldn't update to everyone -- This is an inelegant solution.
     override = settings.autostop == 1 and true or false
-                
-    if windower.ffxi.get_info().logged_in then
-        initialize()
-    end
 end)
 
-windower.register_event('login', initialize)
-
-function initialize()
+windower.register_event('load', 'login', function()
     isLucky = false
     player = windower.ffxi.get_player()
-end
+end)
 
 windower.register_event('incoming text', function(old, new, color)
     --Hides Battlemod
