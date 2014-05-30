@@ -285,7 +285,6 @@ equip_list = {}
 equip_order = {}
 world = make_user_table()
 buffactive = make_user_table()
-player = make_user_table()
 alliance = make_user_table()
 player.equipment = make_user_table()
 pet = make_user_table()
