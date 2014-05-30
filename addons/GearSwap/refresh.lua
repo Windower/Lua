@@ -174,11 +174,12 @@ end
 -------- of buffs with that name active.
 -----------------------------------------------------------------------------------
 function refresh_player(dt,user_event_flag)
+    local pl, player_mob_table
     if not user_event_flag or dt > 0.5 then
-        local pl = windower.ffxi.get_player()
+        pl = windower.ffxi.get_player()
         if not pl then return end
         
-        local player_mob_table = windower.ffxi.get_mob_by_index(pl.index)
+        player_mob_table = windower.ffxi.get_mob_by_index(pl.index)
         if not player_mob_table then return end
         
         table.reassign(player,pl)
