@@ -252,7 +252,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         end
         
         local enc = data:byte(97) + data:byte(98)*256
-        items = windower.ffxi.get_items()
+        --items = windower.ffxi.get_items()
         local tab = {}
         for i,v in pairs(default_slot_map) do
             if encumbrance_table[i] and math.floor( (enc%(2^(i+1))) / 2^i ) ~= 1 and not_sent_out_equip[v] and not disable_table[i] then
@@ -270,34 +270,32 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         local bag = to_windower_api(res.bags[data:byte(9)].english)
         local slot = data:byte(10)
         local count = data:unpack('I',5)
-        if slot ~= 0 then
-            items[bag][slot].count = count
-            if count == 0 then
-                items[bag][slot].id = 0
-                items[bag][slot].bazaar = 0
-                items[bag][slot].status = 0
-            end
+        items[bag][slot].count = count
+        if count == 0 then
+            items[bag][slot].id = 0
+            items[bag][slot].bazaar = 0
+            items[bag][slot].status = 0
         end
     elseif id == 0x01F then
         local bag = to_windower_api(res.bags[data:byte(11)].english)
         local slot = data:byte(12)
-        if slot ~= 0 then
-            items[bag][slot].id = data:unpack('H',9)
-            items[bag][slot].count = data:unpack('I',5)
-            items[bag][slot].status = data:byte(13)
+        if not items[bag] or not items[bag][slot] then
+            print(bag,slot)
         end
+        items[bag][slot].id = data:unpack('H',9)
+        items[bag][slot].count = data:unpack('I',5)
+        items[bag][slot].status = data:byte(13)
     elseif id == 0x020 then
         local bag = to_windower_api(res.bags[data:byte(15)].english)
         local slot = data:byte(16)
-        if slot ~= 0 then
-            items[bag][slot].id = data:unpack('H',13)
-            items[bag][slot].count = data:unpack('I',5)
-            items[bag][slot].bazaar = data:unpack('I',9)
-            items[bag][slot].status = data:byte(17)
-            items[bag][slot].extdata = data:sub(18,41)
-        else
-            items.gil = data:unpack('I',5)
+        if not items[bag] or not items[bag][slot] then
+            print(bag,slot)
         end
+        items[bag][slot].id = data:unpack('H',13)
+        items[bag][slot].count = data:unpack('I',5)
+        items[bag][slot].bazaar = data:unpack('I',9)
+        items[bag][slot].status = data:byte(17)
+        items[bag][slot].extdata = data:sub(18,41)
         -- Did not mess with linkshell stuff
     elseif id == 0x28 then
         if clocking then windower.add_to_chat(8,'Action Packet: '..(os.clock() - out_time)) end
@@ -406,9 +404,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         local slot = data:byte(6)
         items.equipment[to_windower_api(res.slots[slot].english)] = data:byte(5)
         items.equipment[to_windower_api(res.slots[slot].english..' bag')] = data:byte(7)
-        if data:byte(5) ~= 0 then
-            items[to_windower_api(res.bags[data:byte(7)].english)][data:byte(5)].status = 5
-        end
+        items[to_windower_api(res.bags[data:byte(7)].english)][data:byte(5)].status = 5
     elseif id == 0x061 then
         player.vitals.max_hp = data:unpack('I',5)
         player.vitals.max_mp = data:unpack('I',9)
