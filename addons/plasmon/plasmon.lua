@@ -370,16 +370,16 @@ windower.register_event('incoming text', function(original, modified, mode)
         end
     elseif mode > 20 then
     --mode == 148 or mode == 151 then
-		--old zones
+        --old zones
         match = original:match('Now permeating the mists surrounding the fracture%.')
         if match then
             start_tracking()
 
             return modified, mode
         end
-		
-		--new zones
-		match = original:match('Now permeating the mists surrounding the obscured domain%.')
+
+        --new zones
+        match = original:match('Now permeating the mists surrounding the obscured domain%.')
         if match then
             start_tracking()
 
