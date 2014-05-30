@@ -267,7 +267,7 @@ function initialize()
     windower.text.set_text(tb_name, '')
     windower.text.set_bg_visibility(tb_name, true)
 
-    if windower.ffxi.get_info().zone == 271 then
+    if windower.ffxi.get_info().zone == 271 or windower.ffxi.get_info().zone == 264 then
         recovery_mode = true
     end
 end
