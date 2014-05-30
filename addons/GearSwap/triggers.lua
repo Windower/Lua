@@ -44,42 +44,29 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
     if debugging >= 1 then windower.debug('outgoing text (debugging)') end
     if gearswap_disabled then return modified end
     
-    local temp_mod = windower.from_shift_jis(windower.convert_auto_trans(modified)):gsub(' <wait %d+>','')
-    local splitline = temp_mod:split(' ')
-    local remove_array = {}
-    for i,v in pairs(splitline) do
-        if v == '' then
-            remove_array[i] = true
-        end
-    end
-    for i,v in pairs(remove_array) do
-        table.remove(splitline,i)
-        splitline.n = splitline.n-1
-    end
+    local splitline = windower.from_shift_jis(windower.convert_auto_trans(modified)):gsub(' <wait %d+>',''):gsub('"(.-)"',function(str)
+            return str:gsub(' ',string.char(7))
+        end):split(' '):filter(function(val)
+            if val ~= '' then
+                return true
+            end
+        end)
+    
     if splitline.n == 0 then return end
 
-    
     local command = splitline[1]
-    
-    local a,b,abil = string.find(temp_mod,' "(.-)" ')
-    local temptarg, temp_mob_array
-    if abil then
-        abil = abil:lower()
-        local targtab = (temp_mod:sub(b)):split(' ')
-        while targtab[1] == '' do
-            table.remove(targtab,1)
-        end
-        if targtab[1] then
-            temptarg,temp_mob_arr = valid_target(targtab[1])
-        end
-    elseif splitline[2] then
-        abil = splitline[2]:lower()
-        if splitline[3] then
-            temptarg,temp_mob_arr = valid_target(splitline[3])
-        end
+    local unified_prefix = unify_prefix[command]
+    local abil,temptarg, temp_mob_arr
+    if splitline[2] then
+        abil = splitline[2]:gsub(string.char(7),' '):lower()
     end
     
-    local unified_prefix = unify_prefix[command]
+    if validabils[language][unified_prefix] and validabils[language][unified_prefix][abil] then
+        temptarg, temp_mob_arr = valid_target(splitline[3])
+    elseif validabils[language][unified_prefix] then
+        temptarg, temp_mob_arr = valid_target(splitline[2])
+    end
+    
     if unified_prefix and temptarg and (validabils[language][unified_prefix][abil] or unified_prefix=='/ra') then
         if st_flag then
             st_flag = nil
@@ -159,18 +146,9 @@ end)
 ---- none
 -----------------------------------------------------------------------------------
 function inc_action(act)
-    if debugging >= 1 then windower.debug('action') end
     if gearswap_disabled or act.category == 1 then return end
-    
-    local temp_player = windower.ffxi.get_player()
-    local temp_player_mob_table = windower.ffxi.get_mob_by_index(temp_player.index)
-    local player_id = temp_player.id
-    -- Update player info for aftercast costs.
-    player.tp = temp_player.vitals.tp
-    player.mp = temp_player.vitals.mp
-    player.mpp = temp_player.vitals.mpp
-    
-    local temp_pet,pet_id
+        
+    local temp_player_mob_table,temp_pet,pet_id = windower.ffxi.get_mob_by_index(player.index)
     if temp_player_mob_table.pet_index then
         temp_pet = windower.ffxi.get_mob_by_index(temp_player_mob_table.pet_index)
         if temp_pet then
@@ -178,7 +156,7 @@ function inc_action(act)
         end
     end
 
-    if act.actor_id ~= player_id and act.actor_id ~= pet_id then
+    if act.actor_id ~= player.id and act.actor_id ~= pet_id then
         return -- If the action is not being used by the player, the pet, or is a melee attack then abort processing.
     end
     
@@ -290,7 +268,7 @@ function inc_action_message(arr)
         end
     end
     
-    if unable_to_use:contains(arr.message_id) and arr.actor_id == player.id then
+    if unable_to_use:contains(arr.message_id) then
         if logging then    logit(logfile,'\n\n'..tostring(os.clock)..'(195) Event Action Message: '..tostring(message_id)..' Interrupt') end
         local ts,tab = find_command_registry_by_time('player')
         
@@ -299,11 +277,6 @@ function inc_action_message(arr)
             tab.spell.action_type = 'Interruption'
             refresh_globals()
             equip_sets(prefix..'aftercast',ts,tab.spell)
---        else
---            tab = {}
---            tab.spell = {interrupted=true,action_type='Interruption'}
         end
-    elseif unable_to_use:contains(arr.message_id) and debugging >= 1 then
-        windower.add_to_chat(8,'Handled Action message received with a target other than yourself: '..tostring(res.action_messages[arr.message_id][language])..' '..tostring(windower.ffxi.get_mob_by_id(actor_id).name))
     end
 end

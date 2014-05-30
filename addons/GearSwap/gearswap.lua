@@ -47,6 +47,12 @@ res = require 'resources'
 extdata = require 'extdata'
 require 'helper_functions'
 
+-- Resources Checks
+if res.items and res.bags and res.slots and res.statuses and res.jobs and res.elements and res.skills and res.buffs and res.spells and res.job_abilities and res.weapon_skills and res.monster_abilities and res.action_messages and res.skills and res.monstrosity and res.weather and res.moon_phases and res.races then
+else
+    error('Missing resources!')
+end
+
 require 'statics'
 require 'equip_processing'
 require 'targets'
@@ -246,7 +252,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         end
         
         local enc = data:byte(97) + data:byte(98)*256
-        items = windower.ffxi.get_items()
+        --items = windower.ffxi.get_items()
         local tab = {}
         for i,v in pairs(default_slot_map) do
             if encumbrance_table[i] and math.floor( (enc%(2^(i+1))) / 2^i ) ~= 1 and not_sent_out_equip[v] and not disable_table[i] then
@@ -264,34 +270,32 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         local bag = to_windower_api(res.bags[data:byte(9)].english)
         local slot = data:byte(10)
         local count = data:unpack('I',5)
-        if slot ~= 0 then
-            items[bag][slot].count = count
-            if count == 0 then
-                items[bag][slot].id = 0
-                items[bag][slot].bazaar = 0
-                items[bag][slot].status = 0
-            end
+        items[bag][slot].count = count
+        if count == 0 then
+            items[bag][slot].id = 0
+            items[bag][slot].bazaar = 0
+            items[bag][slot].status = 0
         end
     elseif id == 0x01F then
         local bag = to_windower_api(res.bags[data:byte(11)].english)
         local slot = data:byte(12)
-        if slot ~= 0 then
-            items[bag][slot].id = data:unpack('H',9)
-            items[bag][slot].count = data:unpack('I',5)
-            items[bag][slot].status = data:byte(13)
+        if not items[bag] or not items[bag][slot] then
+            print(bag,slot)
         end
+        items[bag][slot].id = data:unpack('H',9)
+        items[bag][slot].count = data:unpack('I',5)
+        items[bag][slot].status = data:byte(13)
     elseif id == 0x020 then
         local bag = to_windower_api(res.bags[data:byte(15)].english)
         local slot = data:byte(16)
-        if slot ~= 0 then
-            items[bag][slot].id = data:unpack('H',13)
-            items[bag][slot].count = data:unpack('I',5)
-            items[bag][slot].bazaar = data:unpack('I',9)
-            items[bag][slot].status = data:byte(17)
-            items[bag][slot].extdata = data:sub(18,41)
-        else
-            items.gil = data:unpack('I',5)
+        if not items[bag] or not items[bag][slot] then
+            print(bag,slot)
         end
+        items[bag][slot].id = data:unpack('H',13)
+        items[bag][slot].count = data:unpack('I',5)
+        items[bag][slot].bazaar = data:unpack('I',9)
+        items[bag][slot].status = data:byte(17)
+        items[bag][slot].extdata = data:sub(18,41)
         -- Did not mess with linkshell stuff
     elseif id == 0x28 then
         if clocking then windower.add_to_chat(8,'Action Packet: '..(os.clock() - out_time)) end

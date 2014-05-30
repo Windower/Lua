@@ -174,24 +174,19 @@ end
 -------- of buffs with that name active.
 -----------------------------------------------------------------------------------
 function refresh_player(dt,user_event_flag)
+    local pl, player_mob_table
     if not user_event_flag or dt > 0.5 then
-        local pl = windower.ffxi.get_player()
+        pl = windower.ffxi.get_player()
         if not pl then return end
         
-        local player_mob_table = windower.ffxi.get_mob_by_index(pl.index)
+        player_mob_table = windower.ffxi.get_mob_by_index(pl.index)
         if not player_mob_table then return end
         
         table.reassign(player,pl)
         for i,v in pairs(player.vitals) do
             player[i]=v
         end
-        if not player.sub_job then
-            player.sub_job = 'NONE'
-            player.sub_job_level = 0
-            player.sub_job_full = 'None'
-            player.sub_job_id = 0
-        end
-        player.job = player.main_job..'/'..player.sub_job
+        update_job_names()
         player.status_id = player.status
         player.status = res.statuses[player.status].english
     

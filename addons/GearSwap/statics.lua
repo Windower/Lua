@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 -- Convert the spells and job abilities into a referenceable list of aliases --
-    
+
 unify_prefix = {['/ma'] = '/ma', ['/magic']='/ma',['/jobability'] = '/ja',['/ja']='/ja',['/item']='/item',['/song']='/ma',
     ['/so']='/ma',['/ninjutsu']='/ma',['/weaponskill']='/ws',['/ws']='/ws',['/ra']='/ra',['/rangedattack']='/ra',['/nin']='/ma',
     ['/throw']='/ra',['/range']='/ra',['/shoot']='/ra',['/monsterskill']='/ms',['/ms']='/ms',['/pet']='/ja',['Mon']='Monster '}
@@ -231,6 +231,12 @@ if not player then
         jobs = {},
         merits = {},
         }
+else
+    if not player.vitals then player.vitals = {} end
+    if not player.buffs then player.buffs = {} end
+    if not player.skills then player.skills = {} end
+    if not player.jobs then player.jobs = {} end
+    if not player.merits then player.merits = {} end
 end
 items = windower.ffxi.get_items()
 if not items then
@@ -246,6 +252,26 @@ if not items then
             wardrobe = make_inventory_table(),
             equipment = {},
         }
+else
+    if not items.inventory then items.inventory = make_inventory_table() else
+        items.inventory[0] = make_empty_item_table(0) end
+    if not items.safe then items.safe = make_inventory_table()  else
+        items.safe[0] = make_empty_item_table(0) end
+    if not items.storage then items.storage = make_inventory_table()  else
+        items.storage[0] = make_empty_item_table(0) end
+    if not items.temporary then items.temporary = make_inventory_table()  else
+        items.temporary[0] = make_empty_item_table(0) end
+    if not items.satchel then items.satchel = make_inventory_table()  else
+        items.satchel[0] = make_empty_item_table(0) end
+    if not items.sack then items.sack = make_inventory_table()  else
+        items.sack[0] = make_empty_item_table(0) end
+    if not items.locker then items.locker = make_inventory_table()  else
+        items.locker[0] = make_empty_item_table(0) end
+    if not items.case then items.case = make_inventory_table()  else
+        items.case[0] = make_empty_item_table(0) end
+    if not items.wardrobe then items.wardrobe = make_inventory_table()  else
+        items.wardrobe[0] = make_empty_item_table(0) end
+    if not items.equipment then items.equipment = {}  end
 end
 
 last_PC_update = ''

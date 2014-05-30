@@ -202,7 +202,7 @@ end
 -----------------------------------------------------------------------------------
 function make_inventory_table()
     local tab = {}
-    for i = 1,80 do
+    for i = 0,80 do
         tab[i] = make_empty_item_table(i)
     end
     return tab
@@ -235,8 +235,15 @@ end
 function update_job_names()
     player.main_job = res.jobs[player.main_job_id].english_short
     player.main_job_full = res.jobs[player.main_job_id].english
-    player.sub_job = res.jobs[player.sub_job_id].english_short
-    player.sub_job_full = res.jobs[player.sub_job_id].english
+    
+    if not res.jobs[player.sub_job_id] then
+        player.sub_job = 'NONE'
+        player.sub_job_full = 'None'
+    else
+        player.sub_job = res.jobs[player.sub_job_id].english_short
+        player.sub_job_full = res.jobs[player.sub_job_id].english
+    end
+    player.job = player.main_job..'/'..player.sub_job
 end
 
  
