@@ -185,13 +185,7 @@ function refresh_player(dt,user_event_flag)
         for i,v in pairs(player.vitals) do
             player[i]=v
         end
-        if not player.sub_job then
-            player.sub_job = 'NONE'
-            player.sub_job_level = 0
-            player.sub_job_full = 'None'
-            player.sub_job_id = 0
-        end
-        player.job = player.main_job..'/'..player.sub_job
+        update_job_names()
         player.status_id = player.status
         player.status = res.statuses[player.status].english
     
