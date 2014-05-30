@@ -202,7 +202,7 @@ end
 -----------------------------------------------------------------------------------
 function make_inventory_table()
     local tab = {}
-    for i = 1,80 do
+    for i = 0,80 do
         tab[i] = make_empty_item_table(i)
     end
     return tab
