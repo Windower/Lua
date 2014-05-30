@@ -444,8 +444,8 @@ function filter_pretarget(spell)
             debug_mode_chat("Unable to execute command. You do not have access to that spell ("..(res.spells[spell.id][language] or spell.id)..")")
             return false
         -- At this point, we know that it is technically castable by this job combination if the right conditions are met.
-        elseif player.main_job == 'SCH' and ((addendum_white[spell.id] and not buffactive['Addendum: White']) or
-            (addendum_black[spell.id] and not buffactive['Addendum: Black'])) and not (spell_jobs[player.sub_job_id]
+        elseif player.main_job == 'SCH' and ((addendum_white[spell.id] and not buffactive[401]) or
+            (addendum_black[spell.id] and not buffactive[402])) and not (spell_jobs[player.sub_job_id]
             and spell_jobs[player.sub_job_id] <= player.sub_job_level) then
             
             if addendum_white[spell.id] then
@@ -455,8 +455,8 @@ function filter_pretarget(spell)
                 debug_mode_chat("Unable to execute command. Addendum: Black required for that spell ("..(res.spells[spell.id][language] or spell.id)..")")
             end
             return false
-        elseif player.sub_job == 'SCH' and ((addendum_white[spell.id] and not buffactive['Addendum: White']) or
-            (addendum_black[spell.id] and not buffactive['Addendum: Black'])) and not (spell_jobs[player.main_job_id]
+        elseif player.sub_job == 'SCH' and ((addendum_white[spell.id] and not buffactive[401]) or
+            (addendum_black[spell.id] and not buffactive[402])) and not (spell_jobs[player.main_job_id]
             and spell_jobs[player.main_job_id] <= player.main_job_level) then
             
             if addendum_white[spell.id] then
@@ -467,7 +467,7 @@ function filter_pretarget(spell)
             end
             return false
         elseif spell.type == 'BlueMagic' and not ((player.main_job == 'BLU' and table.contains(windower.ffxi.get_mjob_data().spells,spell.id)) or
-            ((buffactive['Unbridled Learning'] or buffactive['Unbridled Wisdom']) and unbridled_learning_set[spell.english])) and not
+            ((buffactive[485] or buffactive[505]) and unbridled_learning_set[spell.english])) and not
             (player.sub_job == 'BLU' and table.contains(windower.ffxi.get_sjob_data().spells,spell.id)) then
             -- This code isn't hurting anything, but it doesn't need to be here either.
             debug_mode_chat("Unable to execute command. Blue magic must be set to cast that spell ("..(res.spells[spell.id][language] or spell.id)..")")

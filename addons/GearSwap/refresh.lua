@@ -376,30 +376,30 @@ function refresh_ffxi_info(dt,user_event_flag)
         end
     end
 
-    if buffactive.voidstorm then
-        world.weather = 'Voidstorm'
-        world.weather_element = 'Dark'
-    elseif buffactive.aurorastorm then
-        world.weather = 'Aurorastorm'
-        world.weather_element = 'Light'
-    elseif buffactive.firestorm then
-        world.weather = 'Firestorm'
-        world.weather_element = 'Fire'
-    elseif buffactive.sandstorm then
-        world.weather = 'Sandstorm'
-        world.weather_element = 'Earth'
-    elseif buffactive.rainstorm then
-        world.weather = 'Rainstorm'
-        world.weather_element = 'Water'
-    elseif buffactive.windstorm then
-        world.weather = 'Windstorm'
-        world.weather_element = 'Wind'
-    elseif buffactive.hailstorm then
-        world.weather = 'Hailstorm'
-        world.weather_element = 'Ice'
-    elseif buffactive.thunderstorm then
-        world.weather = 'Thunderstorm'
-        world.weather_element = 'Lightning'
+    if buffactive[178] then
+        world.weather = res.weather[4][language]
+        world.weather_element = res.elements[0][language]
+    elseif buffactive[179] then
+        world.weather = res.weather[12][language]
+        world.weather_element = res.elements[1][language]
+    elseif buffactive[180] then
+        world.weather = res.weather[10][language]
+        world.weather_element = res.elements[2][language]
+    elseif buffactive[181] then
+        world.weather = res.weather[8][language]
+        world.weather_element = res.elements[3][language]
+    elseif buffactive[182] then
+        world.weather = res.weather[14][language]
+        world.weather_element = res.elements[4][language]
+    elseif buffactive[183] then
+        world.weather = res.weather[6][language]
+        world.weather_element = res.elements[5][language]
+    elseif buffactive[184] then
+        world.weather = res.weather[16][language]
+        world.weather_element = res.elements[6][language]
+    elseif buffactive[185] then
+        world.weather = res.weather[18][language]
+        world.weather_element = res.elements[7][language]
     end
 end
 
