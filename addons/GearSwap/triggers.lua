@@ -56,12 +56,16 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
 
     local command = splitline[1]
     local unified_prefix = unify_prefix[command]
-    local abil
+    local abil,temptarg, temp_mob_arr
     if splitline[2] then
         abil = splitline[2]:gsub(string.char(7),' '):lower()
     end
-    local temptarg, temp_mob_arr = valid_target(splitline[3])
     
+    if validabils[language][unified_prefix] and validabils[language][unified_prefix][abil] then
+        temptarg, temp_mob_arr = valid_target(splitline[3])
+    elseif validabils[language][unified_prefix] then
+        temptarg, temp_mob_arr = valid_target(splitline[2])
+    end
     
     if unified_prefix and temptarg and (validabils[language][unified_prefix][abil] or unified_prefix=='/ra') then
         if st_flag then
