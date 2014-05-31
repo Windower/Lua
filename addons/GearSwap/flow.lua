@@ -202,7 +202,48 @@ function equip_sets_exit(swap_type,ts,val1)
     end
     if type(swap_type) == 'string' then
         if swap_type == 'pretarget' then
-            command_send_check(ts)
+            
+            if command_registry[ts].cancel_spell then
+                debug_mode_chat("Action canceled ("..storedcommand..' '..spell.target.raw..")")
+                storedcommand = nil
+                command_registry[ts] = nil
+                return true
+            elseif not ts or not command_registry[ts] or not storedcommand then
+                debug_mode_chat('This case should not be hittable - 1')
+                return true
+            end
+            
+            
+            command_registry[ts].spell = val1
+            if val1.target and val1.target.id and val1.target.index and val1.prefix and unify_prefix[val1.prefix] then
+                if val1.prefix == '/item' then
+                    -- Item use packet handling here
+                    if val1.target.id == player.id then
+                        --0x37 packet
+                        command_registry[ts].proposed_packet = assemble_use_item_packet(val1.target.id,val1.target.index,val1.id)
+                    else
+                        --0x36 packet
+                        command_registry[ts].proposed_packet = assemble_menu_item_packet(val1.target.id,val1.target.index,val1.id)
+                    end
+                    if not command_registry[ts].proposed_packet then
+                        command_registry[ts] = nil
+                    end
+                elseif outgoing_action_category_table[unify_prefix[val1.prefix]] then
+                    if filter_precast(val1) then
+                        command_registry[ts].proposed_packet = assemble_action_packet(val1.target.id,val1.target.index,outgoing_action_category_table[unify_prefix[val1.prefix]],val1.id)
+                        if not command_registry[ts].proposed_packet then
+                            command_registry[ts] = nil
+                            
+                            debug_mode_chat("Unable to create a packet for this command ("..storedcommand..' '..val1.target.raw..")")
+                            storedcommand = nil
+                            return storedcommand..' '..val1.target.raw
+                        end
+                    end
+                else
+                    windower.add_to_chat(8,"GearSwap: Hark, what weird prefix through yonder window breaks? "..tostring(spell.prefix))
+                end
+            end
+            
             if ts and command_registry[ts] and val1.target then
                 if st_targs[val1.target.raw] then
                 -- st targets
@@ -210,6 +251,10 @@ function equip_sets_exit(swap_type,ts,val1)
                 elseif not val1.target.name then
                 -- Spells with invalid pass_through_targs, like using <t> without a target
                     command_registry[ts] = nil
+                    debug_mode_chat("Change target was used to pick an invalid target ("..storedcommand..' '..spell.target.raw..")")
+                    local ret = storedcommand..' '..spell.target.raw
+                    storedcommand = nil
+                    return ret
                 else
                 -- Spells with complete target information
                 -- command_registry[ts] is deleted for cancelled spells
@@ -221,16 +266,11 @@ function equip_sets_exit(swap_type,ts,val1)
                     end
                     return true
                 end
-            end
-            if storedcommand then -- Stored commands are deleted for canceled spells
-                local tempcmd = storedcommand..' '..spell.target.raw
-                storedcommand = nil
-                
-                debug_mode_chat("Unable to create a packet for this command or action canceled ("..tempcmd..")")
-                return tempcmd
             elseif not ts or not command_registry[ts] then
+                debug_mode_chat('This case should not be hittable - 2')
                 return true
             end
+
         elseif swap_type == 'precast' then
             return precast_send_check(ts)
         elseif swap_type == 'filtered_action' and command_registry[ts] and command_registry[ts].cancel_spell then
@@ -276,51 +316,6 @@ function user_pcall(str,...)
             if not bool then error('\nGearSwap has detected an error in the user function '..str..':\n'..err) end
         elseif user_env[str] then
             windower.add_to_chat(123,'GearSwap: '..windower.to_shift_jis(tostring(str))..'() exists but is not a function')
-        end
-    end
-end
-
-
-
------------------------------------------------------------------------------------
---Name: command_send_check(ts)
---Desc: Check at the end of pretarget to see whether or not the command should be sent.
---Args:
----- ts - command_registry index of the current spell
------------------------------------------------------------------------------------
---Returns:
----- string - gets propagated back to the outgoing_text function
------------------------------------------------------------------------------------
-function command_send_check(ts)
-    if command_registry[ts].cancel_spell then
-        storedcommand = nil
-        command_registry[ts] = nil
-    else
-        command_registry[ts].spell = spell
-        if spell.target and spell.target.id and spell.target.index and spell.prefix and unify_prefix[spell.prefix] then
-            if spell.prefix == '/item' then
-                -- Item use packet handling here
-                if spell.target.id == player.id then
-                    --0x37 packet
-                    command_registry[ts].proposed_packet = assemble_use_item_packet(spell.target.id,spell.target.index,spell.id)
-                else
-                    --0x36 packet
-                    test_packet = assemble_menu_item_packet(spell.target.id,spell.target.index,spell.id)
-                    command_registry[ts].proposed_packet = test_packet
-                end
-                if not command_registry[ts].proposed_packet then
-                    command_registry[ts] = nil
-                end
-            elseif outgoing_action_category_table[unify_prefix[spell.prefix]] then
-                if filter_precast(spell) then
-                    command_registry[ts].proposed_packet = assemble_action_packet(spell.target.id,spell.target.index,outgoing_action_category_table[unify_prefix[spell.prefix]],spell.id)
-                    if not command_registry[ts].proposed_packet then
-                        command_registry[ts] = nil
-                    end
-                end
-            else
-                windower.add_to_chat(8,"GearSwap: Hark, what weird prefix through yonder window breaks? "..tostring(spell.prefix))
-            end
         end
     end
 end
