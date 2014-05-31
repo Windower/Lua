@@ -51,24 +51,22 @@ function Display:new(settings, db)
         self.text:size(self.settings.display.text.size)
     end
 
-    if self.visible then
-        self.text:show()
-    else
-        self.text:hide()
-    end
+    self:visibility(self.visible)
 
     return repr
 end
 
 
-function Display:show()
-    self:update()
-    self.text:show()
-end
+function Display:visibility(v)
+    if v then
+        self.text:show()
+    else
+        self.text:hide()
+    end
 
-
-function Display:hide()
-    self.text:hide()
+    self.visible = v
+    self.settings.visible = v
+    self.settings:save()
 end
 
 
@@ -277,7 +275,7 @@ function Display:report_summary (...)
 
     local elements = T{}
     for k, v in pairs(damage_table) do
-        elements:append(string.format("%s %d(%.1f%%)", v[1], v[2], 100 * v[2]/total_damage))
+        elements:append('%s %d(%.1f%%)':format(v[1], v[2], 100 * v[2]/total_damage))
     end
 
     -- Send the report to the specified chatmode
@@ -288,24 +286,24 @@ end
 
 -- This is a closure around a hash-based dispatcher. Some conveniences are
 -- defined for the actual stat display functions.
-Display.show_stat = (function()
+Display.show_stat = function()
     local stat_display = {}
-    
+
     local function format_title(msg)
         local line_length = 40
         local msg_length  = msg:len()
         local border_len = math.floor(line_length / 2 - msg_length / 2)
-        
-        return string.rep(' ', border_len) .. msg .. string.rep(' ', border_len)
+
+        return ' ':rep(border_len) .. msg .. ' ':rep(border_len)
     end
-    
+
     stat_display['acc'] = function (stats, filters)
         local lines = T{}
         for name, acc_pair in pairs(stats) do
-            lines:append(string.format("%-20s %.2f%% (%d sample%s)", name, 100 * acc_pair[1], acc_pair[2],
-                                                                  acc_pair[2] == 1 and "" or "s"))
+            lines:append('%-20s %.2f%% (%d sample%s)':format(name, 100 * acc_pair[1], acc_pair[2],
+                                                                  acc_pair[2] == 1 and '' or 's'))
         end
-        
+
         if #lines > 0 then
             sb_output(format_title('-= Accuracy (' .. filters .. ') =-'))
             sb_output(lines)
@@ -315,7 +313,7 @@ Display.show_stat = (function()
     stat_display['racc'] = function (stats, filters)
         local lines = T{}
         for name, racc_pair in pairs(stats) do
-            lines:append(string.format("%-20s %.2f%% (%d sample%s)", name, 100 * racc_pair[1], racc_pair[2],
+            lines:append('%-20s %.2f%% (%d sample%s)':format(name, 100 * racc_pair[1], racc_pair[2],
                                                                      racc_pair[2] == 1 and "" or "s"))
         end
         
@@ -328,21 +326,21 @@ Display.show_stat = (function()
     stat_display['crit'] = function (stats, filters)
         local lines = T{}
         for name, crit_pair in pairs(stats) do
-            lines:append(string.format("%-20s %.2f%% (%d sample%s)", name, 100 * crit_pair[1], crit_pair[2],
-                                                                     crit_pair[2] == 1 and "" or "s"))
+            lines:append('%-20s %.2f%% (%d sample%s)':format(name, 100 * crit_pair[1], crit_pair[2],
+                                                                     crit_pair[2] == 1 and '' or 's'))
         end
-        
+
         if #lines > 0 then
             sb_output(format_title('Melee Crit. Rate (' .. filters .. ')'))
             sb_output(lines)
         end
     end
- 
+
     stat_display['rcrit'] = function (stats, filters)
         local lines = T{}
         for name, crit_pair in pairs(stats) do
-            lines:append(string.format("%-20s %.2f%% (%d sample%s)", name, 100 * crit_pair[1], crit_pair[2],
-                                                                     crit_pair[2] == 1 and "" or "s"))
+            lines:append('%-20s %.2f%% (%d sample%s)':format(name, 100 * crit_pair[1], crit_pair[2],
+                                                                     crit_pair[2] == 1 and '' or 's'))
         end
         
         if #lines > 0 then
@@ -356,7 +354,7 @@ Display.show_stat = (function()
 
         for name, stat_pair in pairs(stats) do
             if stat_pair[2] > 0 then
-                lines:append(string.format("%-20s %d (%ds)", name, stat_pair[1], stat_pair[2]))
+                lines:append('%-20s %d (%ds)':format(name, stat_pair[1], stat_pair[2]))
             end
         end
         
@@ -379,7 +377,7 @@ Display.show_stat = (function()
         
         stat_display[stat](stats, filter_str)
     end
-end)()
+end()
 
 
 -- TODO: This needs to be factored somehow to take better advantage of similar
