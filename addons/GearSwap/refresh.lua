@@ -177,7 +177,7 @@ function refresh_player(dt,user_event_flag)
     local pl, player_mob_table
     if not user_event_flag or dt > 0.5 then
         pl = windower.ffxi.get_player()
-        if not pl then return end
+        if not pl or not pl.vitals then return end
         
         player_mob_table = windower.ffxi.get_mob_by_index(pl.index)
         if not player_mob_table then return end
