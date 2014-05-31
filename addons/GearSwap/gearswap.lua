@@ -410,9 +410,17 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         player.vitals.max_mp = data:unpack('I',9)
         player.main_job_id = data:byte(13)
         player.main_job_level = data:byte(14)
-        player.sub_job_id = data:byte(15)
-        player.sub_job_level = data:byte(16)
-        update_job_names()
+                
+        if player.sub_job_id ~= data:byte(15) then
+            -- Subjob change event
+            local temp_sub = res.jobs[player.sub_job_id][language..'_short']
+            player.sub_job_id = data:byte(15)
+            player.sub_job_level = data:byte(16)
+            update_job_names()
+            equip_sets('sub_job_change',nil,res.jobs[player.sub_job_id][language..'_short'],temp_sub)
+        else
+            update_job_names()
+        end
     elseif id == 0x062 then
         for i = 1,0x71,2 do
             local skill = data:unpack('H',i + 0x82)
@@ -507,10 +515,6 @@ windower.register_event('job change',function(mjob_id, mjob_lvl, sjob_id, sjob_l
 
     if current_job_file ~= res.jobs[mjob_id][language..'_short'] then
         refresh_user_env(mjob_id)
-    elseif player.sub_job ~= res.jobs[sjob_id].english_short then
-        local temp_sub = player.sub_job
-        refresh_globals()
-        equip_sets('sub_job_change',nil,res.jobs[sjob_id][language..'_short'],temp_sub)
     end
 end)
 
