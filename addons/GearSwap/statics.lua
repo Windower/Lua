@@ -222,22 +222,26 @@ _ExtraData = {
         world = {in_mog_house = false},
     }
 
-player = windower.ffxi.get_player()
-if not player then
-    player = {
-        vitals = {},
-        buffs = {},
-        skills = {},
-        jobs = {},
-        merits = {},
-        }
-else
-    if not player.vitals then player.vitals = {} end
-    if not player.buffs then player.buffs = {} end
-    if not player.skills then player.skills = {} end
-    if not player.jobs then player.jobs = {} end
-    if not player.merits then player.merits = {} end
+if not locale then -- Just to keep pl local
+    local pl = windower.ffxi.get_player()
+    if not pl then
+        player = make_user_table()
+        player.vitals = {}
+        player.buffs = {}
+        player.skills = {}
+        player.jobs = {}
+        player.merits = {}
+    else
+        player = make_user_table()
+        table.reassign(player,pl)
+        if not player.vitals then player.vitals = {} end
+        if not player.buffs then player.buffs = {} end
+        if not player.skills then player.skills = {} end
+        if not player.jobs then player.jobs = {} end
+        if not player.merits then player.merits = {} end
+    end
 end
+
 items = windower.ffxi.get_items()
 if not items then
     items = {
