@@ -252,8 +252,9 @@ function equip_sets_exit(swap_type,ts,val1)
                 -- Spells with invalid pass_through_targs, like using <t> without a target
                     command_registry[ts] = nil
                     debug_mode_chat("Change target was used to pick an invalid target ("..storedcommand..' '..spell.target.raw..")")
+                    local ret = storedcommand..' '..spell.target.raw
                     storedcommand = nil
-                    return storedcommand..' '..spell.target.raw
+                    return ret
                 else
                 -- Spells with complete target information
                 -- command_registry[ts] is deleted for cancelled spells
