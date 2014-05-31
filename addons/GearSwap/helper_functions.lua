@@ -252,7 +252,7 @@ end
 -----------------------------------------------------------------------------------
 function update_job_names()
     player.main_job,player.main_job_full = get_job_names(player.main_job_id)
-    player.sub_job, player,sub_job_full = get_job_names(player.sub_job_id)
+    player.sub_job, player.sub_job_full = get_job_names(player.sub_job_id)
     player.job = player.main_job..'/'..player.sub_job
 end
 
