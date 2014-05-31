@@ -14,7 +14,7 @@ local file = require('files')
 config = require('config')
 
 local Display = require('display')
-local display = nil
+local display
 dps_clock = require('dpsclock'):new() -- global for now
 dps_db    = require('damagedb'):new() -- global for now
 
@@ -66,18 +66,19 @@ function sb_output(msg)
 end
 
 -- Handle addon args
-windower.register_event('addon command',function(...)
-    local params = {...};
-    
-    if #params < 1 then
-        return
-    end
+windower.register_event('addon command', function()
+    local chatmodes = S{'s', 'l', 'p', 't', 'say', 'linkshell', 'party', 'tell'}
 
-    local chatmodes = T{'s', 'l', 'p', 't', 'say', 'linkshell', 'party', 'tell'}
-    
-    if params[1] then
-        local param1 = params[1]:lower()
-        if param1 == "help" then
+    return function(command, ...)
+        if command == 'e' then
+            assert(loadstring(table.concat({...}, ' ')))()
+            return
+        end
+
+        command = command:lower() or 'help'
+        local params = {...}
+
+        if command == 'help' then
             sb_output('Scoreboard v' .. _addon.version .. '. Author: Suji')
             sb_output('sb help : Shows help message')
             sb_output('sb pos <x> <y> : Positions the scoreboard')
@@ -91,40 +92,40 @@ windower.register_event('addon command',function(...)
             sb_output('sb stat <stat> [<player>]: Shows specific damage stats. Respects filters. If player isn\'t specified, ' ..
                   'stats for everyone are displayed. Valid stats are:')
             sb_output(dps_db.player_stat_fields:tostring():stripchars('{}"'))
-        elseif param1 == "pos" then
-            if params[3] then
-                local posx, posy = tonumber(params[2]), tonumber(params[3])
+        elseif command == 'pos' then
+            if params[2] then
+                local posx, posy = tonumber(params[1]), tonumber(params[2])
                 display:set_position(posx, posy)
             end
-        elseif param1 == "set" then
-            local setting = params[2]
-            if not params[3] then
+        elseif command == 'set' then
+            if not params[2] then
                 return
             end
-            
+
+            local setting = params[1]
             if setting == 'numplayers' then
-                settings.numplayers = tonumber(params[3])
+                settings.numplayers = tonumber(params[2])
                 settings:save()
                 display:update()
                 sb_output("Setting 'numplayers' set to " .. settings.numplayers)
             elseif setting == 'bgtransparency' then
-                settings.display.bg.alpha  = tonumber(params[3])
+                settings.display.bg.alpha  = tonumber(params[2])
                 settings:save()
                 display:update()
                 sb_output("Setting 'bgtransparency' set to " .. settings.display.bg.alpha)
             elseif setting == 'font' then
-                settings.display.text.font = params[3]
+                settings.display.text.font = params[2]
                 settings:save()
                 display:update()
                 sb_output("Setting 'font' set to " .. settings.display.text.font)
             elseif setting == 'sbcolor' then
-                settings.sbcolor = tonumber(params[3])
+                settings.sbcolor = tonumber(params[2])
                 settings:save()
                 sb_output("Setting 'sbcolor' set to " .. settings.sbcolor)
             elseif setting == 'showallidps' then
-                if params[3] == 'true' then
+                if params[2] == 'true' then
                     settings.showallidps = true
-                elseif params[3] == 'false' then
+                elseif params[2] == 'false' then
                     settings.showallidps = false
                 else
                     error("Invalid value for 'showallidps'. Must be true or false.")
@@ -134,9 +135,9 @@ windower.register_event('addon command',function(...)
                 settings:save()
                 sb_output("Setting 'showalldps' set to " .. tostring(settings.showallidps))
             elseif setting == 'resetfilters' then
-                if params[3] == 'true' then
+                if params[2] == 'true' then
                     settings.resetfilters = true
-                elseif params[3] == 'false' then
+                elseif params[2] == 'false' then
                     settings.resetfilters = false
                 else
                     error("Invalid value for 'resetfilters'. Must be true or false.")
@@ -146,11 +147,11 @@ windower.register_event('addon command',function(...)
                 settings:save()
                 sb_output("Setting 'resetfilters' set to " .. tostring(settings.resetfilters))
             end
-        elseif param1 == "reset" then
+        elseif command == 'reset' then
             reset()
-        elseif param1 == "report" then
-            local arg = params[2]
-            local arg2 = params[3]
+        elseif command == 'report' then
+            local arg = params[1]
+            local arg2 = params[2]
 
             if arg then
                 if chatmodes:contains(arg) then
@@ -167,22 +168,21 @@ windower.register_event('addon command',function(...)
 
             display:report_summary(arg, arg2)
 
-        elseif param1 == 'visible' then
-            display:show()
-            settings.visible = not settings.visible
-            settings:save()
+        elseif command == 'visible' then
+            display:update()
+            display:visibility(not settings.visible)
 
-        elseif param1 == 'filter' then
+        elseif command == 'filter' then
             local subcmd
-            if params[2] then
-                subcmd = params[2]:lower()
+            if params[1] then
+                subcmd = params[1]:lower()
             else
                 error('Invalid option to //sb filter. See //sb help')
                 return
             end
             
             if subcmd == 'add' then
-                for i=3, #params do
+                for i=2, #params do
                     dps_db:add_filter(params[i])
                 end
                 display:update()
@@ -194,25 +194,25 @@ windower.register_event('addon command',function(...)
             else
                 error('Invalid argument to //sb filter')
             end
-        elseif param1 == 'stat' then
-            if not params[2] or not dps_db.player_stat_fields:contains(params[2]:lower()) then
+        elseif command == 'stat' then
+            if not params[1] or not dps_db.player_stat_fields:contains(params[1]:lower()) then
                 error('Must pass a stat specifier to //sb stat. Valid arguments: ' ..
                       dps_db.player_stat_fields:tostring():stripchars('{}"'))
             else
-                local stat = params[2]:lower()
-                local player = params[3]
+                local stat = params[1]:lower()
+                local player = params[2]
                 display:show_stat(stat, player)
             end
-        elseif param1 == 'reportstat' or param1 == 'rs' then
-            if not params[2] or not dps_db.player_stat_fields:contains(params[2]:lower()) then
+        elseif command == 'reportstat' or command == 'rs' then
+            if not params[1] or not dps_db.player_stat_fields:contains(params[1]:lower()) then
                 error('Must pass a stat specifier to //sb reportstat. Valid arguments: ' ..
                       dps_db.player_stat_fields:tostring():stripchars('{}"'))
                 return
             end
             
-            local stat = params[2]:lower()
-            local arg2 = params[3] -- either a player name or a chatmode
-            local arg3 = params[4] -- can only be a chatmode
+            local stat = params[1]:lower()
+            local arg2 = params[2] -- either a player name or a chatmode
+            local arg3 = params[3] -- can only be a chatmode
 
             -- The below logic is obviously bugged if there happens to be a player named "say",
             -- "party", "linkshell" etc but I don't care enough to account for those people!
@@ -234,30 +234,26 @@ windower.register_event('addon command',function(...)
                     return
                 end
                 
-                display:report_stat(stat, {player = arg2, chatmode = arg3, telltarget = params[5]})
+                display:report_stat(stat, {player = arg2, chatmode = arg3, telltarget = params[4]})
             end
-        elseif param1 == 'fields' then
-            do  error("Not implemented yet.") return end
-        elseif param1 == 'save' then
-            if false then -- dps_db:empty() then
-                error('Nothing to save.')
-                return
-            else
-                if params[2] then
-                    if not params2:match('^[a-ZA-Z0-9_-,.:]+$') then
-                        error("Invalid filename: " .. params[2])
-                        return
-                    end
-                    save(params[2])
-                else
-                    save()
+        elseif command == 'fields' then
+            error("Not implemented yet.")
+            return
+        elseif command == 'save' then
+            if params[1] then
+                if not params[1]:match('^[a-ZA-Z0-9_-,.:]+$') then
+                    error("Invalid filename: " .. params[1])
+                    return
                 end
+                save(params[1])
+            else
+                save()
             end
         else
             error('Unrecognized command. See //sb help')
         end
     end
-end)
+end())
 
 local months = {
     'jan', 'feb', 'mar', 'apr',
@@ -347,7 +343,7 @@ windower.register_event('action', function(raw_action)
     local category = action:get_category_string()
 
     local player = windower.ffxi.get_player()
-    if not player or not windower.ffxi.get_player()['in_combat'] then
+    if not player or not windower.ffxi.get_player().in_combat then
         -- nothing to do
         return
     end
@@ -459,12 +455,9 @@ windower.register_event('action', function(raw_action)
 end)
 
 
-windower.register_event('load', 'logout', 'login', function()
-    if windower.ffxi.get_info().logged_in then
-        display:show()
-    else
-        display:hide()
-    end
+config.register(settings, function(settings)
+    update_dps_clock:loop(settings.UpdateFrequency)
+    display:visibility(windower.ffxi.get_info().logged_in)
 end)
 
 
