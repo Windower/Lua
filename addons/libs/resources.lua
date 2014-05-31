@@ -48,9 +48,9 @@ local redict = {
 -- The metatable for a single resource item (an entry in a sub table of the root resource table)
 local resource_entry_mt = {__index = function()
     return function(t, k)
-        return redict[k]
-                and t[redict[k]]
-            or table[k]
+        return rawget(redict, k)
+                and t[rawget(redict, k)]
+            or rawget(table, k)
     end
 end()}
 
@@ -70,13 +70,13 @@ function resource_group(r, fn, attr)
 end
 
 resource_mt.__index = function(t, k)
-    return (slots[t]:contains(k) or slots[t]:contains(redict[k]))
-            and resource_group-{k}
-        or table[k]
+    return rawget(slots, t):contains(k)
+            and resource_group:endapply(k)
+        or rawget(table, k)
 end
 resource_mt.__class = 'Resource'
 resource_mt.__tostring = function(t)
-    return '{' .. t:map(table.get-{'name'}):concat(', ') .. '}'
+    return '{' .. t:map(table.get:endapply('name')):concat(', ') .. '}'
 end
 
 local resources_path = windower.windower_path .. 'res/'
@@ -120,7 +120,7 @@ for res_name in res_names:it() do
     fns[res_name] = function()
         local res, slot_table = dofile(resources_path .. res_name .. '.lua')
         res = table.map(res, (setmetatable-{resource_entry_mt}):cond(function(key) return type(key) == 'table' end))
-        slots[res] = S(slot_table) or language_strings + table.keyset(next[2](res))
+        slots[res] = S(slot_table)
         post_process(res)
         return res
     end
@@ -134,7 +134,8 @@ local flag_keys = S{
 local fn_cache = {}
 
 post_process = function(t)
-    for key in slots[t]:it() do
+    local slot_set = rawget(slots, t)
+    for key in slot_set:it() do
         if rawget(lookup, key) then
             if flag_keys:contains(key) then
                 rawset(fn_cache, key, function(flags)
@@ -161,6 +162,10 @@ post_process = function(t)
                 rawset(entry, key, fn(rawget(entry, key)))
             end
         end
+    end
+
+    for key in pairs(redict) do
+        slot_set:add(key)
     end
 end
 
