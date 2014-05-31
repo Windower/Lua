@@ -56,16 +56,16 @@ end()}
 
 function resource_group(r, fn, attr)
     fn = type(fn) == 'function' and fn or functions.equals(fn)
-    attr = redict[attr] or attr
+    attr = rawget(redict, attr) or attr
 
     local res = {}
     for index, item in pairs(r) do
         if fn(item[attr]) then
-            res[index] = item
+            rawset(res, index, item)
         end
     end
 
-    slots[res] = slots[r]
+    rawset(slots, res, rawget(slots, r))
     return setmetatable(res, resource_mt)
 end
 
