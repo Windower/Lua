@@ -15,6 +15,7 @@
 		<posY>250</posY>
 		<bgTransparency>200</bgTransparency>
 		<numPlayers>8</numPlayers>
+        <UpdateFrequency>0.5</UpdateFrequency>
 	</global>
 
 	<!--

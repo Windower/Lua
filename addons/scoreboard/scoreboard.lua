@@ -1,6 +1,5 @@
 -- Scoreboard addon for Windower4. See readme.md for a complete description.
 
-_addon = _addon or {}
 _addon.name = 'Scoreboard'
 _addon.author = 'Suji'
 _addon.version = '1.07'
@@ -21,8 +20,6 @@ dps_db    = require('damagedb'):new() -- global for now
 
 -------------------------------------------------------
 
-local settings = nil -- holds a config instance
-
 -- Conventional settings layout
 local default_settings = {}
 default_settings.numplayers = 8
@@ -30,6 +27,7 @@ default_settings.sbcolor = 204
 default_settings.showallidps = true
 default_settings.resetfilters = true
 default_settings.visible = true
+default_settings.UpdateFrequency = 0.5
 
 default_settings.display = {}
 default_settings.display.pos = {}
@@ -50,6 +48,8 @@ default_settings.display.text.alpha = 255
 default_settings.display.text.red = 255
 default_settings.display.text.green = 255
 default_settings.display.text.blue = 255
+
+settings = config.load(default_settings)
 
 -- Accepts msg as a string or a table
 function sb_output(msg)
@@ -167,10 +167,11 @@ windower.register_event('addon command',function(...)
 
             display:report_summary(arg, arg2)
 
-        elseif param1 == "visible" then
-            display:toggle_visible()
+        elseif param1 == 'visible' then
+            display:show()
             settings.visible = not settings.visible
             settings:save()
+
         elseif param1 == 'filter' then
             local subcmd
             if params[2] then
@@ -264,10 +265,6 @@ local months = {
     'sep', 'oct', 'nov', 'dec'
 }
 
-local function fexists(fname)
-
-end
-
 
 function save(filename)
     if not filename then
@@ -291,8 +288,10 @@ function save(filename)
         end
         parse = dup_path
     end
+
     parse:create()
 end
+
 
 -- Resets application state
 function reset()
@@ -302,6 +301,10 @@ function reset()
 end
 
 
+display = Display:new(settings, dps_db)
+
+
+-- Keep updates flowing
 local function update_dps_clock()
     local player = windower.ffxi.get_player()
     if player and player.in_combat then
@@ -309,38 +312,9 @@ local function update_dps_clock()
     else
         dps_clock:pause()
     end
-end
 
-
--- Keep updates flowing
-windower.register_event('time change', 'status change', function()
-    update_dps_clock()
     display:update()
-end)
-
-
-windower.register_event('login', 'load', function()
-    -- Bail out until we are logged in properly.
-    local player = windower.ffxi.get_player()
-    if not player then
-        return
-    end
-
-    settings = config.load(default_settings)
-    windower.send_command('alias sb lua c scoreboard')
-    
-    if not display then
-        display = Display:new(settings, dps_db)
-        reset()
-    end
-end)
-
-
-windower.register_event('unload', function()
-    settings:save()
-    windower.send_command('unalias sb')
-    display:destroy()
-end)
+end
 
 
 -- Returns all mob IDs for anyone in your alliance, including their pets.
@@ -482,15 +456,20 @@ windower.register_event('action', function(raw_action)
             end
         end
     end
-    
-    display:update()
-    update_dps_clock()
 end)
---event_action = event_action_aux
+
+
+windower.register_event('load', 'logout', 'login', function()
+    if windower.ffxi.get_info().logged_in then
+        display:show()
+    else
+        display:hide()
+    end
+end)
 
 
 --[[
-Copyright (c) 2013, Jerry Hebert
+Copyright © 2013-2014, Jerry Hebert
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -516,4 +495,3 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
-
