@@ -224,6 +224,24 @@ end
 
 
 -----------------------------------------------------------------------------------
+----Name: get_job_names()
+-- Returns the short and long form of the job name
+----Args:
+-- id - Job ID
+-----------------------------------------------------------------------------------
+----Returns:
+-- short and long form of the job name
+-----------------------------------------------------------------------------------
+function get_job_names(id)
+    if res.jobs[id] then
+        return res.jobs[id][language..'_short'], res.jobs[id][language]
+    else
+        return 'NONE', 'None'
+    end
+end
+
+
+-----------------------------------------------------------------------------------
 ----Name: update_job_names()
 -- Updates job names in the global player array
 ----Args:
@@ -233,16 +251,8 @@ end
 -- none
 -----------------------------------------------------------------------------------
 function update_job_names()
-    player.main_job = res.jobs[player.main_job_id].english_short
-    player.main_job_full = res.jobs[player.main_job_id].english
-    
-    if not res.jobs[player.sub_job_id] then
-        player.sub_job = 'NONE'
-        player.sub_job_full = 'None'
-    else
-        player.sub_job = res.jobs[player.sub_job_id].english_short
-        player.sub_job_full = res.jobs[player.sub_job_id].english
-    end
+    player.main_job,player.main_job_full = get_job_names(player.main_job_id)
+    player.sub_job, player.sub_job_full = get_job_names(player.sub_job_id)
     player.job = player.main_job..'/'..player.sub_job
 end
 
