@@ -34,27 +34,34 @@ end
 
 windower.register_event('load', 'login', 'job change', 'logout', function()
     local player = windower.ffxi.get_player()
-    local file
+    local file, path
     local basepath = windower.addon_path .. 'data/'
     if player then
         for filepath in L{
-            basepath .. 'name_main_sub.lua',
-            basepath .. 'name_main.lua',
-            basepath .. 'name.lua',
-            basepath .. 'binds.lua',
+            {path = 'name_main_sub.lua',    format = '%s\'s %s/%s'},
+            {path = 'name_main.lua',        format = '%s\'s %s'},
+            {path = 'name.lua',             format = '%s\'s'},
         }:it() do
-            file = loadfile(filepath:gsub('name', player.name):gsub('main', player.main_job):gsub('sub', player.sub_job or ''))
+            path = filepath.format:format(player.name, player.main_job, player.sub_job or '')
+            file = loadfile(basepath .. filepath.path:gsub('name', player.name):gsub('main', player.main_job):gsub('sub', player.sub_job or ''))
+
             if file then
                 break
             end
         end
-    else
+    end
+
+    if not file then
+        path = 'Binds'
         file = loadfile(basepath .. 'binds.lua')
     end
 
     if file then
         parse_binds(file())
         reset()
+        print('Yush: Loaded ' .. path .. ' Lua file')
+    else
+        print('Yush: No matching file found for %s (%s/%s)':format(player.name, player.main_job, player.sub_job))
     end
 end)
 
