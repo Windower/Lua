@@ -64,11 +64,11 @@ function passlot(command1, command2, ids)
     local action = command1:lower()
     names = ids:map(table.get-{'name'} .. table.get+{res.items})
     if command2 == 'add' then
-        log('Adding to "' .. command1 .. '":', names)
+        log('Adding to ' .. action .. ' list:', names)
         code[action] = code[action] + ids
         settings[command1] = settings[command1] + names
     else
-        log('Removing to "' .. command1 .. '":', names)
+        log('Removing from ' .. action .. ' list:', names)
         code[action] = code[action] - ids
         settings[command1] = settings[command1] - names
     end
