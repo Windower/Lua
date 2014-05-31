@@ -1,5 +1,6 @@
 function export_set(options)
-    local temp_items,item_list = windower.ffxi.get_items(),{}
+    --local temp_items,item_list = windower.ffxi.get_items(),{}
+    local item_list = {}
     local targinv,xml,all_sets
     if #options > 0 then
         for _,v in ipairs(options) do
@@ -36,7 +37,7 @@ function export_set(options)
         windower.create_dir(windower.addon_path..'data/export')
     end
     
-    local inv = temp_items.inventory
+    local inv = items.inventory
     if targinv then
         -- Load the entire inventory
         for _,v in pairs(inv) do
@@ -69,8 +70,8 @@ function export_set(options)
         item_list,exported = unpack_names({},'L1',user_env.sets,{},{empty=true})
     else
         -- Default to loading the currently worn gear.
-        local gear = convert_equipment(temp_items.equipment)
-        local ward = temp_items.wardrobe
+        local gear = convert_equipment(items.equipment)
+        local ward = items.wardrobe
         for i,v in pairs(gear) do
             if v.slot ~= 0 then
                 local item_tab

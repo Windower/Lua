@@ -234,7 +234,7 @@ function equip_sets_exit(swap_type,ts,val1)
                         if not command_registry[ts].proposed_packet then
                             command_registry[ts] = nil
                             
-                            debug_mode_chat("Unable to create a packet for this command ("..storedcommand..' '..val1.target.raw..")")
+                            debug_mode_chat("Unable to create a packet for this command because the target is still invalid after pretarget ("..storedcommand..' '..val1.target.raw..")")
                             storedcommand = nil
                             return storedcommand..' '..val1.target.raw
                         end
