@@ -160,15 +160,17 @@ end
  
 -----------------------------------------------------------------------------------
 ----Name: is_slot_key(k)
--- Checks to see if key 'k' is known in the slot_map array.
+-- Checks to see if key 'k' is known in the slot_map array, and that slot has not
+-- been disabled.
 ----Args:
 -- k - A key to a gear slot in a gear table.
 -----------------------------------------------------------------------------------
 ----Returns:
--- True if the key is recognized in the slot_map table; otherwise false.
+-- True if the key is recognized in the slot_map table, and that slot is enabled;
+-- otherwise false.
 -----------------------------------------------------------------------------------
 function is_slot_key(k)
-    return slot_map[k]
+    return slot_map[k] and not disable_table[slot_map[k]]
 end
  
  
