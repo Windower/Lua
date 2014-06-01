@@ -1,5 +1,3 @@
-include('no_interruptions.lua')
-
 function get_sets()
     sets.precast = {}
     sets.precast.JA = {}
