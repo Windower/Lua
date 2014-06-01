@@ -413,11 +413,11 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
                 
         if player.sub_job_id ~= data:byte(15) then
             -- Subjob change event
-            local temp_sub = res.jobs[player.sub_job_id][language..'_short']
+            local temp_sub = player.sub_job
             player.sub_job_id = data:byte(15)
             player.sub_job_level = data:byte(16)
             update_job_names()
-            equip_sets('sub_job_change',nil,res.jobs[player.sub_job_id][language..'_short'],temp_sub)
+            equip_sets('sub_job_change',nil,player.sub_job,temp_sub)
         else
             update_job_names()
         end

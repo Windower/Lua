@@ -42,11 +42,13 @@
 function refresh_globals(user_event_flag)
     local current = os.clock()
     local dt = current - last_refresh
-    if dt > 0.03 then
-        last_refresh = current
+    if not user_event_flag or dt > 0.05 then
         refresh_player(dt,user_event_flag)
         refresh_ffxi_info(dt,user_event_flag)
-        refresh_group_info(dt,user_event_flag)
+        if not user_event_flag or dt > 0.5 then
+            refresh_group_info(dt,user_event_flag)
+            last_refresh = current
+        end
     end
 end
 
