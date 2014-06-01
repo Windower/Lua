@@ -244,7 +244,7 @@ end
 
 function user_equip_sets(func)
     return setfenv(function(...)
-            if not gearswap_disabled then
+            if not gearswap.gearswap_disabled then
                 gearswap.refresh_globals(true)
                 return gearswap.equip_sets(func,nil,...)
             end
