@@ -118,7 +118,7 @@ function equip_sets(swap_type,ts,...)
         -- if there's no swapping to be done because the user is a monster.
         
         for i,v in pairs(short_slot_map) do
-            if equip_list[i] and (disable_table[v] or encumbrance_table[v]) then
+            if equip_list[i] and encumbrance_table[v] then
                 not_sent_out_equip[i] = equip_list[i]
             end
         end
@@ -157,7 +157,7 @@ function equip_sets(swap_type,ts,...)
                         out_str = out_str..'  Emptying slot'
                     end
                     windower.add_to_chat(8,'GearSwap (Debugging): '..out_str)
-                elseif equip_next[i] and not disable_table[i] and not encumbrance_table[i] then
+                elseif equip_next[i] and not encumbrance_table[i] then
                     windower.debug('attempting to set gear. Order: '..tostring(_)..'  Slot ID: '..tostring(i)..'  Inv. ID: '..tostring(equip_next[i]))
                     if not _settings.demo_mode then
                         if equip_next[i].slot ~= empty then
