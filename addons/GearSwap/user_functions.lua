@@ -223,6 +223,17 @@ function register_event_user(str,func)
     return id
 end
 
+function raw_register_event_user(str,func)
+    if type(func)~='function' then
+        error('\nGearSwap: windower.register_event() was passed an invalid value ('..tostring(func)..'). (must be a function)', 2)
+    elseif type(str) ~= 'string' then
+        error('\nGearSwap: windower.register_event() was passed an invalid value ('..tostring(str)..'). (must be a string)', 2)
+    end
+    local id = windower.register_event(str,setfenv(func,user_env))
+    registered_user_events[id] = true
+    return id
+end
+
 function unregister_event_user(id)
     if type(id)~='number' then
         error('\nGearSwap: windower.unregister_event() was passed an invalid value ('..tostring(id)..'). (must be a number)', 2)
@@ -233,9 +244,11 @@ end
 
 function user_equip_sets(func)
     return setfenv(function(...)
-        gearswap.refresh_globals(true)
-        return gearswap.equip_sets(func,nil,...)
-    end,user_env)
+            if not gearswap_disabled then
+                gearswap.refresh_globals(true)
+                return gearswap.equip_sets(func,nil,...)
+            end
+        end,user_env)
 end
 
 function include_user(str)
@@ -302,5 +315,6 @@ end
 
 
 -- Define the user windower functions.
-user_windower = {register_event = register_event_user, unregister_event = unregister_event_user, send_command = send_cmd_user,add_to_chat=add_to_chat_user}
+user_windower = {register_event = register_event_user, raw_register_event = raw_register_event_user,
+    unregister_event = unregister_event_user, send_command = send_cmd_user,add_to_chat=add_to_chat_user}
 setmetatable(user_windower,{__index=windower})
