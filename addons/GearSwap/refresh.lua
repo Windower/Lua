@@ -46,7 +46,6 @@ function refresh_globals(user_event_flag)
         refresh_player(dt,user_event_flag)
         refresh_ffxi_info(dt,user_event_flag)
         if not user_event_flag or dt > 0.5 then
-            print('here')
             refresh_group_info(dt,user_event_flag)
             last_refresh = current
         end
