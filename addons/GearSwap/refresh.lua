@@ -121,6 +121,8 @@ function load_user_files(job_id,user_file)
                 back=empty,waist=empty,legs=empty,feet=empty}}
         }
     
+    user_env['_G'] = user_env
+    
     -- Try to load data/<name>_<main job>.lua
     local funct, err = loadfile(path)
     
