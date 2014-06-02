@@ -83,7 +83,7 @@ windower.register_event("action", function(act)
         local player = T(windower.ffxi.get_player())
         local pet_index = windower.ffxi.get_mob_by_id(windower.ffxi.get_player()['id'])['pet_index']
         
-        if act['category'] == 6 and actor_id == player.id and S{136,139,141,142,143,144,145,146,147,148,309}:contains(abil_ID) then
+        if act['category'] == 6 and actor_id == player.id and S{136,139,141,142,143,144,145,146,147,148,309,310}:contains(abil_ID) then
             if S{141, 142, 143, 144, 145, 146, 147, 148}:contains(abil_ID) then
                 windower.send_command('timers c "Maneuver: '..maneuver..'" 60 down')
                 if maneuver > 2 then
@@ -119,7 +119,7 @@ windower.register_event("action", function(act)
             elseif abil_ID == 309 then
                 windower.send_command('@timers d Overloaded!')
                 heatupdate()
-            elseif abil_ID == 136 then
+            elseif abil_ID == 136 or abil_ID == 310 then -- Activate or Deus Ex Automata
                 Burden_tb:show()
                 decay = get_decay()
                 activate_burden()
