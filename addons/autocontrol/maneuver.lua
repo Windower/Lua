@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 local texts = require 'texts'
 threshItems = T
     {['16281']=5  -- Buffoon's Collar
-    ,['16282']=10 -- Buffoon's Collar +1
+    ,['16282']=5  -- Buffoon's Collar +1
     ,['11101']=40 -- Cirque Farsetto +2
     ,['11201']=20 -- Cirque Farsetto +1
     ,['14930']=5  -- Pup. Dastanas
