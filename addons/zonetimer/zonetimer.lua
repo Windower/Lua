@@ -59,6 +59,8 @@ windower.register_event('addon command', function(...)
 		times = texts.new(settings)
 	elseif command == 'print' then
 		print(start_time .. " " .. os.time())
+	elseif command == 'reset' then
+		start_time = os.time()
 	
 	end
 end)
