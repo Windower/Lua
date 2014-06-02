@@ -167,6 +167,8 @@ function set_attachments_from_autoset(autoset,slot)
             else
                 if windower.ffxi.get_ability_recasts()[205] == 0 then
                     windower.send_command('input /ja "Activate" <me>')
+                elseif windower.ffxi.get_ability_recasts()[115] == 0 then
+                    windower.send_command('input /ja "Deus Ex Automata" <me>')
                 else
                     log('Unable to reactivate. Activate timer was not ready.')
                 end
