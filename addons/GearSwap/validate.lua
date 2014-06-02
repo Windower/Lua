@@ -28,10 +28,14 @@ function validate_inventory(filter)
 
     windower.add_to_chat(123,'GearSwap: Checking for items in inventory that are not used in your gear sets.')
     
-    for k,v in pairs(player.inventory) do
-        if v.id then
-            if not alreadyChecked[v.id] and not find_in_sets(v, sets) and tryfilter(v.longname or v.shortname, filter) then
-                extraitems:append(v.longname or v.shortname)
+    for k,v in pairs(items.inventory) do
+        if v.id and v.id ~= 0 then
+            if not alreadyChecked[v.id] and not find_in_sets(v, sets) and tryfilter(res.items[v.id][language..'_log'] or res.items[v.id][language], filter) then
+                if #res.items[v.id][language..'_log'] > #res.items[v.id][language] then
+                    extraitems:append(res.items[v.id][language..'_log'])
+                else 
+                    extraitems:append(res.items[v.id][language])
+                end
             end
             alreadyChecked:add(v.id)
         end
@@ -53,8 +57,7 @@ function find_in_sets(item, tab, stack)
         if type(aug) == 'string' then aug = {aug} end
         if type(nam) == 'string' then
             nam = nam:lower()
-            if (item.shortname == nam or (item.longname and item.longname == nam)) and
-                (not aug or compare_augments(aug,extdata.decode(item).augments)) then
+            if ((res.items[item.id][language] and res.items[item.id][language]:lower() == nam) or (res.items[item.id][language..'_log'] and res.items[item.id][language..'_log']:lower() == nam)) and (not aug or compare_augments(aug,extdata.decode(item).augments)) then
                 return true
             end
         else
