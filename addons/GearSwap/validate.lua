@@ -31,7 +31,11 @@ function validate_inventory(filter)
     for k,v in pairs(items.inventory) do
         if v.id and v.id ~= 0 then
             if not alreadyChecked[v.id] and not find_in_sets(v, sets) and tryfilter(res.items[v.id][language..'_log'] or res.items[v.id][language], filter) then
-                extraitems:append(res.items[v.id][language..'_log'] or res.items[v.id][language])
+                if #res.items[v.id][language..'_log'] > #res.items[v.id][language] then
+                    extraitems:append(res.items[v.id][language..'_log'])
+                else 
+                    extraitems:append(res.items[v.id][language])
+                end
             end
             alreadyChecked:add(v.id)
         end
