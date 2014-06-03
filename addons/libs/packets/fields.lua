@@ -522,12 +522,18 @@ fields.outgoing[0x083] = L{
 -- NPC Sell price query
 -- Sent when trying to sell an item to an NPC
 -- Clicking on the item the first time will determine the price
+-- Also sent automatically when finalizing a sale, immediately preceeding packet 0x085
 fields.outgoing[0x084] = L{
-    {ctype='unsigned char',     label='_unknown1'},                             -- 04   Always 1? Possibly a type
-    {ctype='char[3]',           label='_unknown2'},                             -- 05   Always 0? Possibly padding
-    {ctype='unsigned short',    label='Item ID',                fn=item},       -- 08   ID of the item to query the price for
+    {ctype='unsigned int',      label='Count'},                                 -- 04
+    {ctype='unsigned short',    label='Item',                   fn=item},       -- 08
     {ctype='unsigned char',     label='Inventory Index',        fn=inv+{0}},    -- 09   Inventory index of the same item
     {ctype='unsigned char',     label='_unknown3'},                             -- 0A   Always 0? Likely padding
+}
+
+-- NPC Sell confirm
+-- Sent when confirming a sell of an item to an NPC
+fields.outgoing[0x085] = L{
+    {ctype='unsigned int',      label='_unknown1',              const=1},       -- 04   Always 1? Possibly a type
 }
 
 -- Synth
@@ -1388,6 +1394,16 @@ fields.incoming[0x03C] = L{
     {ctype='unsigned short',    label='_zero1',             const=0x0000},      -- 04
     {ctype='unsigned short',    label='_padding1'},                             -- 06
     {ref=types.shop_item,       label='Item',               count='*'},         -- 08 -   *
+}
+
+-- Price response
+-- Sent after an outgoing price request for an NPC vendor (0x085)
+fields.incoming[0x03D] = L{
+    {ctype='unsigned int',      label='Price',              fn=gil},            -- 04
+    {ctype='unsigned char',     label='Inventory Index',    fn=invp+{0x09}},    -- 08
+    {ctype='unsigned char',     label='Bag',                fn=bag},            -- 09
+    {ctype='unsigned short',    label='_junk1'},                                -- 0A
+    {ctype='unsigned int',      label='_unknown1',          const=1},           -- 0C
 }
 
 -- Pet Stat

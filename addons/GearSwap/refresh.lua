@@ -121,6 +121,8 @@ function load_user_files(job_id,user_file)
                 back=empty,waist=empty,legs=empty,feet=empty}}
         }
     
+    user_env['_G'] = user_env
+    
     -- Try to load data/<name>_<main job>.lua
     local funct, err = loadfile(path)
     
@@ -562,23 +564,48 @@ end
 -----------------------------------------------------------------------------------
 --Name: pathsearch()
 --Args:
----- tab - table of strings of the file name to search.
+---- files_list - table of strings of the file name to search.
 -----------------------------------------------------------------------------------
 --Returns:
 ---- path of a valid file, if it exists. False if it doesn't.
 -----------------------------------------------------------------------------------
-function pathsearch(tab)
-    local basetab = {[1]=windower.addon_path..'libs-dev/',[2]=windower.addon_path..'libs/',
-        [3]=windower.addon_path..'data/'..player.name..'/',[4]=windower.addon_path..'data/common/',[5]=windower.addon_path..'data/'}
+function pathsearch(files_list)
+
+    -- base directory search order:
+    -- windower
+    -- %appdata%/Windower/GearSwap
     
-    for _,basepath in ipairs(basetab) do
+    -- sub directory search order:
+    -- libs-dev (only in windower addon path)
+    -- libs (only in windower addon path)
+    -- data/player.name
+    -- data/common
+    -- data
+    
+    local gearswap_data = windower.addon_path .. 'data/'
+    local gearswap_appdata = os.getenv('APPDATA') .. '/Windower/GearSwap/'
+    
+    local search_path = {
+        [1] = windower.addon_path .. 'libs-dev/',
+        [2] = windower.addon_path .. 'libs/',
+        [3] = gearswap_data .. player.name .. '/',
+        [4] = gearswap_data .. 'common/',
+        [5] = gearswap_data,
+        [6] = gearswap_appdata .. player.name .. '/',
+        [7] = gearswap_appdata .. 'common/',
+        [8] = gearswap_appdata
+    }
+
+    for _,basepath in ipairs(search_path) do
         if windower.dir_exists(basepath) then
-            for i,v in ipairs(tab) do
+            for i,v in ipairs(files_list) do
                 if v ~= '' and windower.file_exists(basepath..v) then
                     return basepath..v
                 end
             end
         end
     end
+    
     return false
 end
+
