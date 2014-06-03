@@ -237,20 +237,15 @@ function get_threshold()
         local basethreshold = 30
         local equip = T(windower.ffxi.get_items()['equipment'])
         local inv = T(windower.ffxi.get_items()['inventory'])
+        local wardrobe =  T(windower.ffxi.get_items()['wardrobe'])
         local bonus = 0
-        if equip.hands ~= 0 then
-            if threshItems[tostring(inv[equip.hands].id)] ~= nil then
-                bonus = bonus + threshItems[tostring(inv[equip.hands].id)]
-            end
-        end
-        if equip.body ~= 0 then
-            if threshItems[tostring(inv[equip.body].id)] ~= nil then
-                bonus = bonus + threshItems[tostring(inv[equip.body].id)]
-            end
-        end
-        if equip.neck ~= 0 then
-            if threshItems[tostring(inv[equip.neck].id)] ~= nil then
-                bonus = bonus + threshItems[tostring(inv[equip.neck].id)]
+        local slots = {'hands', 'body', 'neck', 'back'}
+        for i, s in ipairs(slots) do
+            if equip[s] ~= 0 then
+                local item = threshItems[tostring(inv[equip[s]].id)] or threshItems[tostring(wardrobe[equip[s]].id)]
+                if item ~= nil then
+                    bonus = bonus + item
+                end
             end
         end
         newthreshold = basethreshold + bonus
