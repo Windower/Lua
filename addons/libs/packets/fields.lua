@@ -1644,10 +1644,39 @@ fields.incoming[0x053] = L{
 }
 
 -- Key Item Log
---[[fields.incoming[0x055] = L{
+fields.incoming[0x055] = L{
     -- There are 6 of these packets sent on zone, which likely corresponds to the 6 categories of key items.
     -- FFing these packets between bytes 0x14 and 0x82 gives you access to all (or almost all) key items.
-}]]
+    {ctype='char[0x80]',        label='Bit field',          fn=hex},            -- 04
+    {ctype='unsigned int',      label='Type'},                                  -- 84   Goes from 0 to 5, determines which KI are being sent
+    -- The type describes which KI that particular chunk contains:
+    -- 0:
+    --      Temporary: Ferry ticket, whispers, tuning forks
+    --      Permanent: Airship passes, Shard of <Apathy, Arrogance, etc.>, Hydra corps crap, gate crystals, misc crap
+    --      Abyssea: Traverser stones
+    --      Voidwatch: Crimson/Indigo/Jade stratum abyssites
+    --      Magical Maps: Regular, RotZ, CoP
+    -- 1:
+    --      Temporary: Assault, Einherjar, Salvage, Campaign medals, misc crap
+    --      Permanent: Random CoP, ToAU and WotG KIs, WotG gate crystals
+    --      Claim Slips: AF1 armor slips
+    -- 2:
+    --      Temporary: Luminous fragments, VNM abyssites, ACP KIs
+    --      Permannet: Delkfutt key, synergy, magian log
+    --      Abyssea: Traverser stones, NM trigger KI, battle trophies 1/2/3, Abyssites (including Lunar, cosmos/discernment), regular Atma (including Apoc)
+    --      Voidwatch: White/Ashen stratum abyssites
+    -- 3:
+    --      Temporary: Grey abyssite, Moonshade earring
+    --      Permanent: Prismatic hourglass, Miasmal counteragent recipe, pouch of weighted stones, job gestures
+    --      Abyssea: Crimson bloodstone, battle trophies 4/5, synthetic Atma
+    --      Voidwatch: Voidstones, Petrifacts, Periapts, Atmacites
+    --      Magical Maps: ToAU, WotG, Abyssea, Dynamis
+    -- 4:
+    --      Temporary: Grimoire page
+    --      Permanent: Loadstone, Heart of the bushin, Prototype attuner, Geomagnetron, Adoulinian charter permit, Ring of supernal disjunction
+    --      Voidwatch: Hyacinth/Amber stratum abyssite, VW emblem: Jeuno
+    -- 5:
+}
 
 -- Weather Change
 fields.incoming[0x057] = L{
