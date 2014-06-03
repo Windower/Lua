@@ -29,15 +29,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 local texts = require 'texts'
 threshItems = T
-    {['16281']=5  -- Buffoon's Collar
-    ,['16282']=5  -- Buffoon's Collar +1
-    ,['11101']=40 -- Cirque Farsetto +2
-    ,['11201']=20 -- Cirque Farsetto +1
-    ,['14930']=5  -- Pup. Dastanas
-    ,['15030']=5  -- Pup. Dastanas +1
-    ,['27960']=5  -- Foire Dastanas
-    ,['27981']=5  -- Foire Dastanas +1
-    ,['28634']=5  -- Dispersal Mantle
+    {[16281]=5  -- Buffoon's Collar
+    ,[16282]=5  -- Buffoon's Collar +1
+    ,[11101]=40 -- Cirque Farsetto +2
+    ,[11201]=20 -- Cirque Farsetto +1
+    ,[14930]=5  -- Pup. Dastanas
+    ,[15030]=5  -- Pup. Dastanas +1
+    ,[27960]=5  -- Foire Dastanas
+    ,[27981]=5  -- Foire Dastanas +1
+    ,[28634]=5  -- Dispersal Mantle
     }
 heat = T{}
 heat.Fire = 0
@@ -242,7 +242,7 @@ function get_threshold()
         local slots = {'hands', 'body', 'neck', 'back'}
         for i, s in ipairs(slots) do
             if equip[s] ~= 0 then
-                local item = threshItems[tostring(inv[equip[s]].id)] or threshItems[tostring(wardrobe[equip[s]].id)]
+                local item = threshItems[inv[equip[s]].id] or threshItems[wardrobe[equip[s]].id]
                 if item ~= nil then
                     bonus = bonus + item
                 end
