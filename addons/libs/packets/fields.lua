@@ -1647,7 +1647,8 @@ fields.incoming[0x053] = L{
 fields.incoming[0x055] = L{
     -- There are 6 of these packets sent on zone, which likely corresponds to the 6 categories of key items.
     -- FFing these packets between bytes 0x14 and 0x82 gives you access to all (or almost all) key items.
-    {ctype='char[0x80]',        label='Bit field',          fn=hex},            -- 04
+    {ctype='char[0x40]',        label='Key item available', fn=hex},            -- 04
+    {ctype='char[0x40]',        label='Key item examined',  fn=hex},            -- 44   Bit field correlating to the previous, 1 if KI has been examined, 0 otherwise
     {ctype='unsigned int',      label='Type'},                                  -- 84   Goes from 0 to 5, determines which KI are being sent
     -- The type describes which KI that particular chunk contains:
     -- 0:
