@@ -156,10 +156,11 @@ function init_include()
 	include('Mote-SelfCommands')
 
 	-- Include general user globals, such as custom binds or gear tables.
-	-- If the user defined their own globals (user-globals.lua), use that; otherwise use Mote-Globals.
-	if not load_user_globals() then
-		include('Mote-Globals')
-	end
+	-- Load Mote-Globals first, followed by User-Globals, followed by <character>-Globals.
+	-- Any functions re-defined in the later includes will overwrite the earlier versions.
+	include('Mote-Globals')
+	optional_include({'user-globals.lua'})
+	optional_include({player.name..'-globals.lua'})
 
 	-- user-globals.lua may define additional sets to be added to the local ones.
 	if define_global_sets then
