@@ -918,26 +918,16 @@ end
 -- @param baseSet : The set that any currently active defense set will be applied on top of. (gear set table)
 function apply_defense(baseSet)
 	if state.Defense.Active then
-		local defenseSet
+		local defenseSet = sets.defense
 
 		if state.Defense.Type == 'Physical' then
-			if sets.defense[state.Defense.PhysicalMode] then
-				defenseSet = sets.defense[state.Defense.PhysicalMode]
-			else
-				defenseSet = sets.defense
-			end
+			defenseSet = sets.defense[state.Defense.PhysicalMode] or defenseSet
 		else
-			if sets.defense[state.Defense.MagicalMode] then
-				defenseSet = sets.defense[state.Defense.MagicalMode]
-			else
-				defenseSet = sets.defense
-			end
+			defenseSet = sets.defense[state.Defense.MagicalMode] or defenseSet
 		end
 
 		for _,group in ipairs(classes.CustomDefenseGroups) do
-			if defenseSet[group] then
-				defenseSet = defenseSet[group]
-			end
+			defenseSet = defenseSet[group] or defenseSet
 		end
 
 		baseSet = set_combine(baseSet, defenseSet)
