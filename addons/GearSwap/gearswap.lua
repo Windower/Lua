@@ -423,7 +423,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         end
     elseif id == 0x062 then
         for i = 1,0x71,2 do
-            local skill = data:unpack('H',i + 0x82)
+            local skill = data:unpack('H',i + 0x82)%32768
             local current_skill = res.skills[math.floor(i/2)+1]
             if current_skill then
                 player.skills[to_windower_api(current_skill.english)] = skill
