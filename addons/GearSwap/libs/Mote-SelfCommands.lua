@@ -573,18 +573,19 @@ end
 function get_mode_list(field)
 	local modeList = {}
 	local currentValue = ''
+	local lowerField = field:lower()
 
 	if type(state[field..'Mode']) == 'string' and type(options[field..'Modes']) == 'table' then
 		-- Handles: Offense, Defense, Ranged, Casting, Weaponskill, Idle, Resting modes
 		modeList = options[field..'Modes']
 		currentValue = state[field..'Mode']
-	elseif field == 'Physicaldefense' then
+	elseif lowerField == 'physicaldefense' then
 		modeList = options.PhysicalDefenseModes
 		currentValue = state.Defense.PhysicalMode
-	elseif field == 'Magicaldefense' then
+	elseif lowerField == 'magicaldefense' then
 		modeList = options.MagicalDefenseModes
 		currentValue = state.Defense.MagicalMode
-	elseif field == 'Pctarget' then
+	elseif lowerField == 'pctarget' then
 		modeList = options.TargetModes
 		currentValue = state.PCTargetMode
 	elseif type(state[field..'Mode']) == 'string' and type(options[field..'Modes']) ~= 'table' then
@@ -610,14 +611,16 @@ end
 
 -- Function to set the appropriate state value for the specified field.
 function set_option_mode(field, val)
+    local lowerField = field:lower()
+    
 	if type(state[field..'Mode']) == 'string' then
 		-- Handles: Offense, Defense, Ranged, Casting, Weaponskill, Idle, Resting modes
 		state[field..'Mode'] = val
-	elseif field == 'Physicaldefense' then
+	elseif lowerField == 'physicaldefense' then
 		state.Defense.PhysicalMode = val
-	elseif field == 'Magicaldefense' then
+	elseif lowerField == 'magicaldefense' then
 		state.Defense.MagicalMode = val
-	elseif field == 'Pctarget' then
+	elseif lowerField == 'pctarget' then
 		state.PCTargetMode = val
 	elseif job_set_option_mode then
 		-- Allow job scripts to expand the mode table lists
