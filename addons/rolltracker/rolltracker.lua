@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'RollTracker'
-_addon.version = '1.2'
+_addon.version = '1.2.0.1'
 _addon.author = 'Balloon'
 _addon.command = 'rolltracker'
 
@@ -62,7 +62,7 @@ windower.register_event('addon command',function (...)
 end)
 
 windower.register_event('load', function()
-    buffId = S{res.buffs:with('english', 'Bust')} + S(res.buffs:english(string.endswith-{' Roll'}))
+    buffId = S{res.buffs:with('english', 'Bust').id} + S(res.buffs:english(string.endswith-{' Roll'})):map(table.get-{'id'})
     partyColour = {
         p0 = string.char(0x1E, 247),
         p1 = string.char(0x1F, 204),
