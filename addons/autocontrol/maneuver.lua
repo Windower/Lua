@@ -235,14 +235,12 @@ function get_threshold()
     if mjob_id == 18 then
         local newthreshold = 0
         local basethreshold = 30
-        local equip = T(windower.ffxi.get_items()['equipment'])
-        local inv = T(windower.ffxi.get_items()['inventory'])
-        local wardrobe =  T(windower.ffxi.get_items()['wardrobe'])
+        local items = windower.ffxi.get_items()
         local bonus = 0
         local slots = {'hands', 'body', 'neck', 'back'}
         for i, s in ipairs(slots) do
-            if equip[s] ~= 0 then
-                local item = threshItems[inv[equip[s]].id] or threshItems[wardrobe[equip[s]].id]
+            if items.equipment[s] ~= 0 then
+                local item = threshItems[items.inventory[items.equipment[s]].id] or threshItems[items.wardrobe[items.equipment[s]].id]
                 if item ~= nil then
                     bonus = bonus + item
                 end
