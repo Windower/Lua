@@ -1693,7 +1693,7 @@ enums.spawntype = {
     [0x0A] = 'Self',
 }
 
--- NPC Spawn
+-- Spawn
 fields.incoming[0x05B] = L{
     {ctype='float',             label='X'},                                     -- 04
     {ctype='float',             label='Z'},                                     -- 08
@@ -1841,6 +1841,19 @@ fields.incoming._mult[0x063][0x04] = L{
     {ctype='unsigned char',     label='Spriggan Level'},                        -- 87
     {ctype='char[12]',          label='Instinct Bitfield 3'},                   -- 88   Contains job/race instincts from the 0x03 set. Has 8 unused bytes. This is a 1:1 mapping.
     {ctype='char[32]',          label='Variants Bitfield'},                     -- 94   Does not show normal monsters, only variants. Bit is 1 if the variant is owned. Length is an estimation including the possible padding.
+}
+
+-- Repositioning
+fields.incoming[0x065] = L{
+-- This is identical to the spawn packet, but has 4 more unused bytes.
+    {ctype='float',             label='X'},                                     -- 04
+    {ctype='float',             label='Z'},                                     -- 08
+    {ctype='float',             label='Y'},                                     -- 0C
+    {ctype='unsigned int',      label='ID',                 fn=id},             -- 10
+    {ctype='unsigned short',    label='Index',              fn=index},          -- 14
+    {ctype='unsigned char',     label='_unknown1'},                             -- 16   1 observed. May indicate repositoning type.
+    {ctype='unsigned char',     label='_unknown2'},                             -- 17   Unknown, but matches the same byte of a matching spawn packet
+    {ctype='char[6]',           label='_unknown3'},                             -- 18   All zeros observed.
 }
 
 -- Pet Info
