@@ -68,7 +68,6 @@ function get_item_name(item)
     if type(item) == 'string' then
         name = item
     elseif type(item) == 'table' then
-        print_set(item, 'item')
         if item.id then
             name = get_formal_name_by_item_id(item.id)
         elseif item.name then
