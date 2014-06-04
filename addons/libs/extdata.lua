@@ -1072,14 +1072,14 @@ function decode.Signature(str)
         [50]='n',[51]='o',[52]='p',[53]='q',[54]='r',[55]='s',[56]='t',[57]='u',[58]='v',[59]='w',[60]='x',[61]='y',[62]='z',
         [63]='{'
         }
-    return decode.Six_bit_string(str,sig_map)
+    return decode.bit_string(6,str,sig_map)
 end
 
-function decode.Six_bit_string(str,map)
+function decode.bit_string(bits,str,map)
     local i,sig = 0,''
-    while map[l_to_r_bit_packed(str,i,i+6)] do
-        sig = sig..map[l_to_r_bit_packed(str,i,i+6)]
-        i = i+6
+    while map[l_to_r_bit_packed(str,i,i+bits)] do
+        sig = sig..map[l_to_r_bit_packed(str,i,i+bits)]
+        i = i+bits
     end
     return sig
 end
@@ -1135,7 +1135,7 @@ function decode.Linkshell(str)
         b  = 17*str:byte(8)%16,
         status_id = str:byte(9),
         status = status_map[str:byte(9)],
-        name = decode.Six_bit_string(str:sub(10,name_end),name_map)}
+        name = decode.bit_string(6,str:sub(10,name_end),name_map)}
     
     return rettab
 end
@@ -1327,17 +1327,15 @@ end
 
 function decode.SoulPlate(str)
     local name_end = string.find(str,string.char(0),1)
-    local name_map = {[0]="'",[1]="a",[2]='b',[3]='c',[4]='d',[5]='e',[6]='f',[7]='g',[8]='h',[9]='i',[10]='j',
-        [11]='k',[12]='l',[13]='m',[14]='n',[15]='o',[16]='p',[17]='q',[18]='r',[19]='s',[20]='t',[21]='u',[22]='v',[23]='w',
-        [24]='x',[25]='yx',[26]='z',[27]='A',[28]='B',[29]='C',[30]='D',[31]='E',[32]='F',[33]='G',[34]='H',[35]='I',[36]='J',
-        [37]='K',[38]='L',[39]='M',[40]='N',[41]='O',[42]='P',[43]='Q',[44]='R',[45]='S',[46]='T',[47]='U',[48]='V',[49]='W',
-        [50]='X',[51]='Y',[52]='Z'
-        }
+    local name_map = {}
+    for i = 0,127 do
+        name_map[i] = string.char(i)
+    end
     local rettab = {type = 'Soul Plate',
             skill_id = math.floor(str:byte(21)/128) + str:byte(22)*2 + str:byte(23)%8*(2^9), -- Index for whatever table I end up making, so table[skill_id] would be {name = "Breath Damage", multiplier = 1, percent=true}
 --            skill = nil, -- "Breath damage +5%, etc."
             FP = math.floor(str:byte(23)/8) + str:byte(24)%4*16, -- Cost in FP
---            name = decode.Six_bit_string(str:sub(1,name_end),name_map), -- Name of the monster
+            name = decode.bit_string(7,str:sub(1,name_end),name_map), -- Name of the monster
 --            9D 87 AE C0 = 'Naul'
         }
     return rettab
