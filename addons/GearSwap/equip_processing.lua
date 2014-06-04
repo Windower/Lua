@@ -107,7 +107,7 @@ function to_id_set(equip_list)
     local error_list = {}
     for i,v in pairs(short_slot_map) do
         local name,order,extgoal_1,extgoal_2 = expand_entry(equip_list[i])
-        if name == empty or name =='empty' then
+        if name == empty then
             ret_list[v] = {inv_id=0,slot=empty}
             reorder(order,i)
             equip_list[i] = nil
@@ -259,7 +259,7 @@ function eliminate_redundant(current_gear,equip_next) -- Eliminates gear you alr
             equip_next[slot_map[i]] = nil
         else
             for n,m in pairs(equip_next) do
-                if v.inv_id == m.inv_id and v.slot==m.slot then
+                if m.slot ~= empty and v.inv_id == m.inv_id and v.slot==m.slot then
                     equip_next[n] = nil
                 end
             end
