@@ -38,6 +38,8 @@ __raw = {lower = string.lower}
 function string.lower(message)
     if message and type(message) == 'string' and language == 'english' then
         return __raw.lower(message)
+    elseif message and type(message) == 'string' then
+        return message:gsub('%u',function (letter) return string.char(letter:byte(1)+32) end)
     else
         return message
     end
@@ -456,9 +458,9 @@ function filter_pretarget(spell)
             debug_mode_chat("Unable to execute command. You do not have access to that spell ("..(res.spells[spell.id][language] or spell.id)..")")
             return false
         -- At this point, we know that it is technically castable by this job combination if the right conditions are met.
-        elseif player.main_job == 'SCH' and ((addendum_white[spell.id] and not buffactive[401]) or
-            (addendum_black[spell.id] and not buffactive[402])) and not (spell_jobs[player.sub_job_id]
-            and spell_jobs[player.sub_job_id] <= player.sub_job_level) then
+        elseif player.main_job == 'SCH' and ((addendum_white[spell.id] and not buffactive[401] and not buffactive[416]) or
+            (addendum_black[spell.id] and not buffactive[402] and not buffactive[416])) and
+            not (spell_jobs[player.sub_job_id] and spell_jobs[player.sub_job_id] <= player.sub_job_level) then
             
             if addendum_white[spell.id] then
                 debug_mode_chat("Unable to execute command. Addendum: White required for that spell ("..(res.spells[spell.id][language] or spell.id)..")")
@@ -467,9 +469,9 @@ function filter_pretarget(spell)
                 debug_mode_chat("Unable to execute command. Addendum: Black required for that spell ("..(res.spells[spell.id][language] or spell.id)..")")
             end
             return false
-        elseif player.sub_job == 'SCH' and ((addendum_white[spell.id] and not buffactive[401]) or
-            (addendum_black[spell.id] and not buffactive[402])) and not (spell_jobs[player.main_job_id]
-            and spell_jobs[player.main_job_id] <= player.main_job_level) then
+        elseif player.sub_job == 'SCH' and ((addendum_white[spell.id] and not buffactive[401] and not buffactive[416]) or
+            (addendum_black[spell.id] and not buffactive[402] and not buffactive[416])) and
+            not (spell_jobs[player.main_job_id] and spell_jobs[player.main_job_id] <= player.main_job_level) then
             
             if addendum_white[spell.id] then
                 debug_mode_chat("Unable to execute command. Addendum: White required for that spell ("..(res.spells[spell.id][language] or spell.id)..")")

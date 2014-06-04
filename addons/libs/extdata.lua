@@ -226,7 +226,7 @@ augment_values = {
         [0x150] = {{stat='"Sic" and "Ready" ability delay ', offset=1,multiplier=-1}},
         [0x151] = {{stat="Song recast delay ", offset=1,multiplier=-1}},
         [0x152] = {{stat='"Barrage"', offset=1}},
-        [0x153] = {{stat='"Elemental Siphon"', offset=1}},
+        [0x153] = {{stat='"Elemental Siphon"', offset=1, multiplier=5}},
         [0x154] = {{stat='"Phantom Roll" ability delay ', offset=1,multiplier=-1}},
         [0x155] = {{stat='"Repair" potency ', offset=1,percent=true}},
         [0x156] = {{stat='"Waltz" TP cost ', offset=1,multiplier=-1}},
