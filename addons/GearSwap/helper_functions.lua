@@ -39,7 +39,7 @@ function string.lower(message)
     if message and type(message) == 'string' and language == 'english' then
         return __raw.lower(message)
     elseif message and type(message) == 'string' then
-        return message:gsub('%u',function (letter) return string.char(letter:byte(1)+32) end)
+        return message:gsub('[A-Z]',function (letter) return string.char(letter:byte(1)+32) end)
     else
         return message
     end
