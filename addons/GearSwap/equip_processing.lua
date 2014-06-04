@@ -76,7 +76,7 @@ function expand_entry(v)
     if not v then
         return
     end
-    local augments,name,order
+    local augments,name,order,bag
     if type(v) == 'table' and v == empty then
         name = empty
     elseif type(v) == 'table' and v.name then
@@ -87,10 +87,14 @@ function expand_entry(v)
         elseif v.augment then
             augments = {v.augment}
         end
+        if v.bag and type(v.bag) == 'string' then
+            local bag_list = {inventory = 0, wardrobe = 8}
+            bag = bag_list[v.bag:lower()]
+        end
     elseif type(v) == 'string' and v ~= '' then
         name = v
     end
-    return name,order,augments -- nil, nil, nil if they don't exist
+    return name,order,augments,bag -- all nil if they don't exist
 end
 
 -----------------------------------------------------------------------------------
@@ -107,7 +111,7 @@ function to_id_set(equip_list)
     local error_list = {}
     for i,v in pairs(short_slot_map) do
         local name,order,extgoal_1,extgoal_2 = expand_entry(equip_list[i])
-        if name == empty or name =='empty' then
+        if name == empty then
             ret_list[v] = {inv_id=0,slot=empty}
             reorder(order,i)
             equip_list[i] = nil
@@ -125,9 +129,9 @@ function to_id_set(equip_list)
                         -- Hence the "and name" below.
                         
                         if not ret_list[v] and equip_list[i] then 
-                            local name,order,augments = expand_entry(equip_list[i])
+                            local name,order,augments,bag = expand_entry(equip_list[i])
                             
-                            if name and name_match(m.id,name) then
+                            if (not bag or bag == inv_id) and name and name_match(m.id,name) then
                                 if res.items[m.id].slots[v] then
                                     if augments and #augments ~=0 then -----------------------------------------------------------------------
                                         if compare_augments(augments,extdata.decode(m).augments) then
@@ -259,7 +263,7 @@ function eliminate_redundant(current_gear,equip_next) -- Eliminates gear you alr
             equip_next[slot_map[i]] = nil
         else
             for n,m in pairs(equip_next) do
-                if v.inv_id == m.inv_id and v.slot==m.slot then
+                if m.slot ~= empty and v.inv_id == m.inv_id and v.slot==m.slot then
                     equip_next[n] = nil
                 end
             end

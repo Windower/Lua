@@ -49,3 +49,12 @@ the initial order is always:
 
 I do not recommend moving Sub in front of Main, Ammo in front of Range, etc. as these will cause equip
 failures.
+
+
+
+-- Specifying a bag --
+With the introduction of Mog Wardrobe, it is now possible to equip items from either Inventory or Wardrobe:
+    sets.wardrobe_feet = {feet={name="Bokwus Boots",bag="wardrobe"}}
+
+There is really no reason to do this 99% of the time, but it has been included as a failsafe to let people
+still specify at least two augments in case the augment system stops working in the future.

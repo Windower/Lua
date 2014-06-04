@@ -1644,10 +1644,40 @@ fields.incoming[0x053] = L{
 }
 
 -- Key Item Log
---[[fields.incoming[0x055] = L{
+fields.incoming[0x055] = L{
     -- There are 6 of these packets sent on zone, which likely corresponds to the 6 categories of key items.
     -- FFing these packets between bytes 0x14 and 0x82 gives you access to all (or almost all) key items.
-}]]
+    {ctype='char[0x40]',        label='Key item available', fn=hex},            -- 04
+    {ctype='char[0x40]',        label='Key item examined',  fn=hex},            -- 44   Bit field correlating to the previous, 1 if KI has been examined, 0 otherwise
+    {ctype='unsigned int',      label='Type'},                                  -- 84   Goes from 0 to 5, determines which KI are being sent
+    -- The type describes which KI that particular chunk contains:
+    -- 0:
+    --      Temporary: Ferry ticket, whispers, tuning forks
+    --      Permanent: Airship passes, Shard of <Apathy, Arrogance, etc.>, Hydra corps crap, gate crystals, misc crap
+    --      Abyssea: Traverser stones
+    --      Voidwatch: Crimson/Indigo/Jade stratum abyssites
+    --      Magical Maps: Regular, RotZ, CoP
+    -- 1:
+    --      Temporary: Assault, Einherjar, Salvage, Campaign medals, misc crap
+    --      Permanent: Random CoP, ToAU and WotG KIs, WotG gate crystals
+    --      Claim Slips: AF1 armor slips
+    -- 2:
+    --      Temporary: Luminous fragments, VNM abyssites, ACP KIs
+    --      Permannet: Delkfutt key, synergy, magian log
+    --      Abyssea: Traverser stones, NM trigger KI, battle trophies 1/2/3, Abyssites (including Lunar, cosmos/discernment), regular Atma (including Apoc)
+    --      Voidwatch: White/Ashen stratum abyssites
+    -- 3:
+    --      Temporary: Grey abyssite, Moonshade earring
+    --      Permanent: Prismatic hourglass, Miasmal counteragent recipe, pouch of weighted stones, job gestures
+    --      Abyssea: Crimson bloodstone, battle trophies 4/5, synthetic Atma
+    --      Voidwatch: Voidstones, Petrifacts, Periapts, Atmacites
+    --      Magical Maps: ToAU, WotG, Abyssea, Dynamis
+    -- 4:
+    --      Temporary: Grimoire page
+    --      Permanent: Loadstone, Heart of the bushin, Prototype attuner, Geomagnetron, Adoulinian charter permit, Ring of supernal disjunction
+    --      Voidwatch: Hyacinth/Amber stratum abyssite, VW emblem: Jeuno
+    -- 5:
+}
 
 -- Weather Change
 fields.incoming[0x057] = L{
@@ -1663,7 +1693,7 @@ enums.spawntype = {
     [0x0A] = 'Self',
 }
 
--- NPC Spawn
+-- Spawn
 fields.incoming[0x05B] = L{
     {ctype='float',             label='X'},                                     -- 04
     {ctype='float',             label='Z'},                                     -- 08
@@ -1811,6 +1841,19 @@ fields.incoming._mult[0x063][0x04] = L{
     {ctype='unsigned char',     label='Spriggan Level'},                        -- 87
     {ctype='char[12]',          label='Instinct Bitfield 3'},                   -- 88   Contains job/race instincts from the 0x03 set. Has 8 unused bytes. This is a 1:1 mapping.
     {ctype='char[32]',          label='Variants Bitfield'},                     -- 94   Does not show normal monsters, only variants. Bit is 1 if the variant is owned. Length is an estimation including the possible padding.
+}
+
+-- Repositioning
+fields.incoming[0x065] = L{
+-- This is identical to the spawn packet, but has 4 more unused bytes.
+    {ctype='float',             label='X'},                                     -- 04
+    {ctype='float',             label='Z'},                                     -- 08
+    {ctype='float',             label='Y'},                                     -- 0C
+    {ctype='unsigned int',      label='ID',                 fn=id},             -- 10
+    {ctype='unsigned short',    label='Index',              fn=index},          -- 14
+    {ctype='unsigned char',     label='_unknown1'},                             -- 16   1 observed. May indicate repositoning type.
+    {ctype='unsigned char',     label='_unknown2'},                             -- 17   Unknown, but matches the same byte of a matching spawn packet
+    {ctype='char[6]',           label='_unknown3'},                             -- 18   All zeros observed.
 }
 
 -- Pet Info

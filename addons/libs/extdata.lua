@@ -226,7 +226,7 @@ augment_values = {
         [0x150] = {{stat='"Sic" and "Ready" ability delay ', offset=1,multiplier=-1}},
         [0x151] = {{stat="Song recast delay ", offset=1,multiplier=-1}},
         [0x152] = {{stat='"Barrage"', offset=1}},
-        [0x153] = {{stat='"Elemental Siphon"', offset=1}},
+        [0x153] = {{stat='"Elemental Siphon"', offset=1, multiplier=5}},
         [0x154] = {{stat='"Phantom Roll" ability delay ', offset=1,multiplier=-1}},
         [0x155] = {{stat='"Repair" potency ', offset=1,percent=true}},
         [0x156] = {{stat='"Waltz" TP cost ', offset=1,multiplier=-1}},
@@ -1045,7 +1045,6 @@ function l_to_r_bit_packed(dat_string,start,stop)
         -- Moduluses by 2^number of bits into the current byte. So 8 bits in would %256, 1 bit in would %2, etc.
         -- Cuts off the bottom.
             cur_val = math.floor(cur_val/(2^(8-((stop-1)%8+1)))) -- -1 and +1 set the modulus result range from 1 to 8 instead of 0 to 7.
-            
         end
         
         if c_count == math.ceil((start+1)/8) then -- Take the most significant bits of the least significant byte
@@ -1073,14 +1072,14 @@ function decode.Signature(str)
         [50]='n',[51]='o',[52]='p',[53]='q',[54]='r',[55]='s',[56]='t',[57]='u',[58]='v',[59]='w',[60]='x',[61]='y',[62]='z',
         [63]='{'
         }
-    return decode.Six_bit_string(str,sig_map)
+    return decode.bit_string(6,str,sig_map)
 end
 
-function decode.Six_bit_string(str,map)
+function decode.bit_string(bits,str,map)
     local i,sig = 0,''
-    while map[l_to_r_bit_packed(str,i,i+6)] do
-        sig = sig..map[l_to_r_bit_packed(str,i,i+6)]
-        i = i+6
+    while map[l_to_r_bit_packed(str,i,i+bits)] do
+        sig = sig..map[l_to_r_bit_packed(str,i,i+bits)]
+        i = i+bits
     end
     return sig
 end
@@ -1136,7 +1135,7 @@ function decode.Linkshell(str)
         b  = 17*str:byte(8)%16,
         status_id = str:byte(9),
         status = status_map[str:byte(9)],
-        name = decode.Six_bit_string(str:sub(10,name_end),name_map)}
+        name = decode.bit_string(6,str:sub(10,name_end),name_map)}
     
     return rettab
 end
@@ -1326,6 +1325,22 @@ function decode.Reflector(str)
     return rettab
 end
 
+function decode.SoulPlate(str)
+    local name_end = string.find(str,string.char(0),1)
+    local name_map = {}
+    for i = 1,127 do
+        name_map[i] = string.char(i)
+    end
+    local rettab = {type = 'Soul Plate',
+            skill_id = math.floor(str:byte(21)/128) + str:byte(22)*2 + str:byte(23)%8*(2^9), -- Index for whatever table I end up making, so table[skill_id] would be {name = "Breath Damage", multiplier = 1, percent=true}
+--            skill = nil, -- "Breath damage +5%, etc."
+            FP = math.floor(str:byte(23)/8) + str:byte(24)%4*16, -- Cost in FP
+            name = decode.bit_string(7,str:sub(1,name_end),name_map), -- Name of the monster
+--            9D 87 AE C0 = 'Naul'
+        }
+    return rettab
+end
+
 
 local typ_mapping = {
 --[[Types:
@@ -1373,6 +1388,7 @@ local typ_mapping = {
     [12] = decode.Flowerpot,
     [14] = decode.Mannequin,
     [15] = decode.PvPReservation,
+    [18] = decode.SoulPlate,
     [19] = decode.Reflector,
     }
     
