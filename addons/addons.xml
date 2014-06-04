@@ -432,4 +432,11 @@
     <bugtracker>https://github.com/sebyg666/Lua/issues</bugtracker>
     <support>https://github.com/sebyg666/Lua/tree/4.1-dev/addons/SubTarget</support>
   </addon>
+  <addon>
+    <name>pet_fix</name>
+    <author>Byrth</author>
+    <description>Temporary addon that fixes a null pointer animation error with pets that is causing crashes.</description>
+    <bugtracker>https://github.com/Byrth/Lua/issues</bugtracker>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
+  </addon>
 </addons>
