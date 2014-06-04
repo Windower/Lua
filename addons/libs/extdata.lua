@@ -1328,7 +1328,7 @@ end
 function decode.SoulPlate(str)
     local name_end = string.find(str,string.char(0),1)
     local name_map = {}
-    for i = 0,127 do
+    for i = 1,127 do
         name_map[i] = string.char(i)
     end
     local rettab = {type = 'Soul Plate',
