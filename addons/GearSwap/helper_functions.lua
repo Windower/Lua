@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-__raw = {lower = string.lower}
+__raw = {lower = string.lower, upper = string.upper}
 
 -----------------------------------------------------------------------------------
 --Name: string.lower()
@@ -40,6 +40,24 @@ function string.lower(message)
         return __raw.lower(message)
     elseif message and type(message) == 'string' then
         return message:gsub('[A-Z]',function (letter) return string.char(letter:byte(1)+32) end)
+    else
+        return message
+    end
+end
+
+-----------------------------------------------------------------------------------
+--Name: string.upper()
+--Args:
+---- message (string): Message to be forced to upper case
+-----------------------------------------------------------------------------------
+--Returns:
+---- Upper case message (or not, if the language or message is invalid)
+-----------------------------------------------------------------------------------
+function string.upper(message)
+    if message and type(message) == 'string' and language == 'english' then
+        return __raw.upper(message)
+    elseif message and type(message) == 'string' then
+        return message:gsub('[a-z]',function (letter) return string.char(letter:byte(1)-32) end)
     else
         return message
     end
