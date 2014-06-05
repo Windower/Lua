@@ -517,9 +517,9 @@ windower.register_event('job change',function(mjob_id, mjob_lvl, sjob_id, sjob_l
         refresh_user_env(mjob_id)
     end
 end)
-
 windower.register_event('login',function(name)
     if debugging >= 1 then windower.debug('login '..name) end
+    initialize_globals()
     windower.send_command('@wait 2;lua i gearSwap refresh_user_env;')
 end)
 
