@@ -170,7 +170,7 @@ function set_attachments_from_autoset(autoset,slot)
                 local recasts = windower.ffxi.get_ability_recasts()
                 if settings.AutoActivate and recasts[recast_ids.activate] == 0 then
                     windower.send_command('input /ja "Activate" <me>')
-                elseif settings.AutoDeusExAutomata and recasts[recast_ids.deusex == 0 then
+                elseif settings.AutoDeusExAutomata and recasts[recast_ids.deusex] == 0 then
                     log('Activate is down, using Deus Ex Automata instead.')
                     windower.send_command('input /ja "Deus Ex Automata" <me>')
                 elseif settings.AutoActivate and settings.AutoDeusExAutomata then
