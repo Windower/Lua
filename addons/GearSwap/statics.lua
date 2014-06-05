@@ -222,7 +222,7 @@ _ExtraData = {
         world = {in_mog_house = false},
     }
 
-if not locale then -- Just to keep pl local
+function initialize_globals()
     local pl = windower.ffxi.get_player()
     if not pl then
         player = make_user_table()
@@ -240,43 +240,45 @@ if not locale then -- Just to keep pl local
         if not player.jobs then player.jobs = {} end
         if not player.merits then player.merits = {} end
     end
+
+    items = windower.ffxi.get_items()
+    if not items then
+        items = {
+                inventory = make_inventory_table(),
+                safe = make_inventory_table(),
+                storage = make_inventory_table(),
+                temporary = make_inventory_table(),
+                satchel = make_inventory_table(),
+                sack = make_inventory_table(),
+                locker = make_inventory_table(),
+                case = make_inventory_table(),
+                wardrobe = make_inventory_table(),
+                equipment = {},
+            }
+    else
+        if not items.inventory then items.inventory = make_inventory_table() else
+            items.inventory[0] = make_empty_item_table(0) end
+        if not items.safe then items.safe = make_inventory_table()  else
+            items.safe[0] = make_empty_item_table(0) end
+        if not items.storage then items.storage = make_inventory_table()  else
+            items.storage[0] = make_empty_item_table(0) end
+        if not items.temporary then items.temporary = make_inventory_table()  else
+            items.temporary[0] = make_empty_item_table(0) end
+        if not items.satchel then items.satchel = make_inventory_table()  else
+            items.satchel[0] = make_empty_item_table(0) end
+        if not items.sack then items.sack = make_inventory_table()  else
+            items.sack[0] = make_empty_item_table(0) end
+        if not items.locker then items.locker = make_inventory_table()  else
+            items.locker[0] = make_empty_item_table(0) end
+        if not items.case then items.case = make_inventory_table()  else
+            items.case[0] = make_empty_item_table(0) end
+        if not items.wardrobe then items.wardrobe = make_inventory_table()  else
+            items.wardrobe[0] = make_empty_item_table(0) end
+        if not items.equipment then items.equipment = {}  end
+    end
 end
 
-items = windower.ffxi.get_items()
-if not items then
-    items = {
-            inventory = make_inventory_table(),
-            safe = make_inventory_table(),
-            storage = make_inventory_table(),
-            temporary = make_inventory_table(),
-            satchel = make_inventory_table(),
-            sack = make_inventory_table(),
-            locker = make_inventory_table(),
-            case = make_inventory_table(),
-            wardrobe = make_inventory_table(),
-            equipment = {},
-        }
-else
-    if not items.inventory then items.inventory = make_inventory_table() else
-        items.inventory[0] = make_empty_item_table(0) end
-    if not items.safe then items.safe = make_inventory_table()  else
-        items.safe[0] = make_empty_item_table(0) end
-    if not items.storage then items.storage = make_inventory_table()  else
-        items.storage[0] = make_empty_item_table(0) end
-    if not items.temporary then items.temporary = make_inventory_table()  else
-        items.temporary[0] = make_empty_item_table(0) end
-    if not items.satchel then items.satchel = make_inventory_table()  else
-        items.satchel[0] = make_empty_item_table(0) end
-    if not items.sack then items.sack = make_inventory_table()  else
-        items.sack[0] = make_empty_item_table(0) end
-    if not items.locker then items.locker = make_inventory_table()  else
-        items.locker[0] = make_empty_item_table(0) end
-    if not items.case then items.case = make_inventory_table()  else
-        items.case[0] = make_empty_item_table(0) end
-    if not items.wardrobe then items.wardrobe = make_inventory_table()  else
-        items.wardrobe[0] = make_empty_item_table(0) end
-    if not items.equipment then items.equipment = {}  end
-end
+initialize_globals()
 
 last_PC_update = ''
 item_update_flag = true
