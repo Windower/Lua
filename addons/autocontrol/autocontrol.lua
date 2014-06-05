@@ -150,7 +150,7 @@ function set_attachments_from_autoset(autoset,slot)
         end
         coroutine.schedule(set_attachments_from_autoset:prepare(autoset, '1'), 0.5)
     else
-        local tempname = settings.autosets[autoset]['slot' .. slot:zfill(2)]:lower()
+        local tempname = settings.autosets[autoset]['slot' .. tostring(slot):zfill(2)]:lower()
         if tempname then
             for att in atts:it() do
                 if att.name:lower() == tempname and att.id > 5000 then
@@ -196,7 +196,7 @@ function get_current_autoset()
                 if i < 10 then
                     t = '0'
                 end
-                autoTable['slot' .. i:zfill(2)] = atts[tmpTable[i]].name:lower()
+                autoTable['slot' .. tostring(i):zfill(2)] = atts[tmpTable[i]].name:lower()
             end
         end
         autoTable.head = atts[mjob_data.head].name:lower()
