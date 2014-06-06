@@ -42,15 +42,7 @@ validabils['japanese'] = {['/ma'] = {}, ['/ja'] = {}, ['/ws'] = {}, ['/item'] = 
 
 function make_abil(abil,lang,i)
     if not abil[lang] or not abil.prefix then return end
-    local sp,pref
-    if lang == 'english' then
-        sp = abil[lang]:lower()
-        pref = unify_prefix[abil.prefix:lower()]
-    else
-        sp = abil[lang]:lower()
-        pref = unify_prefix[abil.prefix:lower()]
-    end
-    
+    local sp,pref = abil[lang]:lower(), unify_prefix[abil.prefix:lower()]
     validabils[lang][pref][sp] = i
 end
 
