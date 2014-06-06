@@ -108,6 +108,9 @@ function load_user_files(job_id,user_file)
         ipairs = ipairs, print=print, add_to_chat=add_to_chat_user,
         next=next,lua_base_path=windower.addon_path,empty=empty,
         
+        debug=debug,coroutine=coroutine,setmetatable=setmetatable,getmetatable=getmetatable,
+        rawset=rawset,rawget=rawget,require=include_user,
+        
         -- Player environment things
         buffactive=buffactive,
         player=player,
@@ -593,7 +596,8 @@ function pathsearch(files_list)
         [5] = gearswap_data,
         [6] = gearswap_appdata .. player.name .. '/',
         [7] = gearswap_appdata .. 'common/',
-        [8] = gearswap_appdata
+        [8] = gearswap_appdata,
+        [9] = windower.windower_path .. 'addons/libs/'
     }
 
     for _,basepath in ipairs(search_path) do

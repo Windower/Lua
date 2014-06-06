@@ -47,7 +47,7 @@ function make_abil(abil,lang,i)
         sp = abil[lang]:lower()
         pref = unify_prefix[abil.prefix:lower()]
     else
-        sp = abil[lang]
+        sp = abil[lang]:lower()
         pref = unify_prefix[abil.prefix:lower()]
     end
     
