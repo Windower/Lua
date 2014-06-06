@@ -138,7 +138,7 @@ windower.register_event('zone change',function(new,old)
         cur_func,loadstring_err = loadstring("current_string = "..settings.strings.default)
     end
     if not cur_func or loadstring_err then
-        cur_func = function () return true end
+        cur_func = loadstring("current_string = ''")
         error(loadstring_err)
     end
 end)
