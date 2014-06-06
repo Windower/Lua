@@ -266,9 +266,9 @@ function refresh_player(dt,user_event_flag)
         table.reassign(pet, {isvalid=false})
     end
     
-    if player.main_job == 'PUP' or player.sub_job == 'PUP' then
+    if player.main_job_id == 18 or player.sub_job_id == 18 then
         local auto_tab
-        if player.main_job == 'PUP' then auto_tab = windower.ffxi.get_mjob_data()
+        if player.main_job_id == 18 then auto_tab = windower.ffxi.get_mjob_data()
         else auto_tab = windower.ffxi.get_sjob_data() end
         
         if auto_tab.name then
@@ -314,7 +314,7 @@ function refresh_player(dt,user_event_flag)
                 pet.mpp = 0
             end
         end
-    elseif player.main_job == 'MON' then
+    elseif player.main_job_id == 23 then
         local species_id = windower.ffxi.get_mjob_data().species
         -- Should add instincts when they become available
         
