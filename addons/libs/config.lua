@@ -138,8 +138,9 @@ function parse(settings)
 
     local full_parsed = parsed.global
 
-    if windower.ffxi.get_info().logged_in then
-        full_parsed = full_parsed:update(parsed[windower.ffxi.get_player().name:lower()], true)
+    local player = windower.ffxi.get_player()
+    if player then
+        full_parsed = full_parsed:update(parsed[player.name:lower()], true)
     end
 
     return merge(settings, full_parsed)
@@ -462,7 +463,7 @@ end)
 return config
 
 --[[
-Copyright (c) 2013-2014, Windower
+Copyright © 2013-2014, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
