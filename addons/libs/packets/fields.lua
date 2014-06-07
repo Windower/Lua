@@ -339,6 +339,26 @@ fields.outgoing[0x029] = L{
     {ctype='unsigned char',     label='_junk1'},                                -- 0B   Has taken the value 52. Unclear purpose.
 }
 
+-- Trade request
+fields.outgoing[0x032] = L{
+    {ctype='unsigned int',      label='Target ID',          fn=id},             -- 04
+    {ctype='unsigned short',    label='Target Index',       fn=index},          -- 08
+    {ctype='char[2]',           label='_junk1'}                                 -- 0A
+}
+
+enums[0x033] = {
+    [0] = 'Accept trade',
+    [1] = 'Cancel trade',
+    [2] = 'Confirm trade',
+}
+
+-- Trade confirm
+-- Sent when accepting, confirming or canceling a trade
+fields.outgoing[0x033] = L{
+    {ctype='unsigned int',      label='Type',               fn=e+{0x033}},      -- 04
+    {ctype='char[4]',           label='_unknown1'}                              -- 08
+}
+
 -- Menu Item
 fields.outgoing[0x036] = L{
 -- Item order is Gil -> top row left-to-right -> bottom row left-to-right, but
@@ -1182,8 +1202,8 @@ fields.incoming[0x023] = L{
     {ctype='unsigned short',    label='Item',               fn=item},           -- 0A   If the item is removed, gil is used with a count of zero
     {ctype='unsigned char',     label='_unknown1',          const=0x05},        -- 0C   Possibly junk?
     {ctype='unsigned char',     label='Slot'},                                  -- 0D   Gil itself is in slot 0, whereas the other slots start at 1 and count up horizontally
-    {ctype='char[26]',          label='_unknown2'},                             -- 0E   ExtData related? 2 bytes short of full item ExtData size
-                                                                                -- 0E   Shows similar characteristics though, 0 on most items, non-zero on charged items
+    {ctype='char[24]',          label='ExtData'},                               -- 0E
+    {ctype='char[2]',           label='_junk1'},                                -- 26
 }
 
 -- Trade item, self
