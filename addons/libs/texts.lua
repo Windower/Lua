@@ -172,6 +172,7 @@ function apply_settings(_, t, settings)
     t:bold(settings.flags.bold)
     t:right_justified(settings.flags.right_justified)
     t:bottom_justified(settings.flags.bottom_justified)
+    t:visible(t._status.visible)
 
     -- Trigger registered post-reload events
     for _, event in ipairs(t._events) do
@@ -555,7 +556,7 @@ end
 return texts
 
 --[[
-Copyright (c) 2013-2014, Windower
+Copyright © 2013-2014, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
