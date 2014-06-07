@@ -476,7 +476,7 @@ function filter_pretarget(spell)
             debug_mode_chat("Unable to execute command. You do not have access to that spell ("..(res.spells[spell.id][language] or spell.id)..")")
             return false
         -- At this point, we know that it is technically castable by this job combination if the right conditions are met.
-        elseif player.main_job == 'SCH' and ((addendum_white[spell.id] and not buffactive[401] and not buffactive[416]) or
+        elseif player.main_job_id == 20 and ((addendum_white[spell.id] and not buffactive[401] and not buffactive[416]) or
             (addendum_black[spell.id] and not buffactive[402] and not buffactive[416])) and
             not (spell_jobs[player.sub_job_id] and spell_jobs[player.sub_job_id] <= player.sub_job_level) then
             
@@ -487,7 +487,7 @@ function filter_pretarget(spell)
                 debug_mode_chat("Unable to execute command. Addendum: Black required for that spell ("..(res.spells[spell.id][language] or spell.id)..")")
             end
             return false
-        elseif player.sub_job == 'SCH' and ((addendum_white[spell.id] and not buffactive[401] and not buffactive[416]) or
+        elseif player.sub_job_id == 20 and ((addendum_white[spell.id] and not buffactive[401] and not buffactive[416]) or
             (addendum_black[spell.id] and not buffactive[402] and not buffactive[416])) and
             not (spell_jobs[player.main_job_id] and spell_jobs[player.main_job_id] <= player.main_job_level) then
             
@@ -498,17 +498,17 @@ function filter_pretarget(spell)
                 debug_mode_chat("Unable to execute command. Addendum: Black required for that spell ("..(res.spells[spell.id][language] or spell.id)..")")
             end
             return false
-        elseif spell.type == 'BlueMagic' and not ((player.main_job == 'BLU' and table.contains(windower.ffxi.get_mjob_data().spells,spell.id)) or
+        elseif spell.type == 'BlueMagic' and not ((player.main_job_id == 16 and table.contains(windower.ffxi.get_mjob_data().spells,spell.id)) or
             ((buffactive[485] or buffactive[505]) and unbridled_learning_set[spell.english])) and not
-            (player.sub_job == 'BLU' and table.contains(windower.ffxi.get_sjob_data().spells,spell.id)) then
+            (player.sub_job_id == 16 and table.contains(windower.ffxi.get_sjob_data().spells,spell.id)) then
             -- This code isn't hurting anything, but it doesn't need to be here either.
             debug_mode_chat("Unable to execute command. Blue magic must be set to cast that spell ("..(res.spells[spell.id][language] or spell.id)..")")
             return false
         elseif spell.type == 'Ninjutsu'  then
-            if player.main_job ~= 'NIN' and player.sub_job ~= 'NIN' then
+            if player.main_job_id ~= 13 and player.sub_job_id ~= 13 then
                 debug_mode_chat("Unable to make action packet. You do not have access to that spell ("..(spell[language] or spell.id)..")")
                 return false
-            elseif not player.inventory[tool_map[spell.english]] and not (player.main_job == 'NIN' and player.inventory[universal_tool_map[spell.english]]) then
+            elseif not player.inventory[tool_map[spell.english][language]] and not (player.main_job_id == 13 and player.inventory[universal_tool_map[spell.english][language]]) then
                 debug_mode_chat("Unable to make action packet. You do not have the proper tools.")
                 return false
             end
@@ -522,7 +522,7 @@ function filter_pretarget(spell)
             debug_mode_chat("Unable to execute command. You do not have access to that ability ("..(res.job_abilities[spell.id][language] or spell.id)..")")
             return false
         end
-    elseif category == 25 and (not player.main_job == 'MON' or not player.species or not player.species.tp_moves[spell.id] or not (player.species.tp_moves[spell.id] <= player.main_job_level)) then
+    elseif category == 25 and (not player.main_job_id == 23 or not player.species or not player.species.tp_moves[spell.id] or not (player.species.tp_moves[spell.id] <= player.main_job_level)) then
         -- Monstrosity filtering
         debug_mode_chat("Unable to execute command. You do not have access to that monsterskill ("..(res.monster_abilities[spell.id][language] or spell.id)..")")
         return false

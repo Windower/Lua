@@ -36,18 +36,15 @@ _addon.author = 'Byrth'
 _addon.version = 0.050214
 _addon.command = 'pw'
 
-if not windower.dir_exists('data') then
-    windower.create_dir('data')
-end
-
 settings = config.load('data\\settings.xml',default_settings)
-config.save(settings)
+config.register(settings,initialize)
 
 box = texts.new('${current_string}',settings.text_box_settings,settings)
 box.current_string = ''
 box:show()
 
 initialize()
+
 
 
 windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blocked)
@@ -140,7 +137,8 @@ windower.register_event('zone change',function(new,old)
         dynamis.zone = 0
         cur_func,loadstring_err = loadstring("current_string = "..settings.strings.default)
     end
-    if not cur_func then
+    if not cur_func or loadstring_err then
+        cur_func = loadstring("current_string = ''")
         error(loadstring_err)
     end
 end)
@@ -192,6 +190,7 @@ function update_box()
         dynamis.KIs = ''
     end
     assert(cur_func)()
+    
     if box.current_string ~= current_string then
         box.current_string = current_string
     end

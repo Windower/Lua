@@ -30,8 +30,8 @@ _addon.author = 'Byrth'
 
 windower.register_event('incoming chunk',function (id,original,modified,is_injected,is_blocked)
     if debugging then windower.debug('incoming chunk '..id) end
-    local pref = original:sub(1,4)
-    local data = original:sub(5)
+    local pref = modified:sub(1,4)
+    local data = modified:sub(5)
     
 -------------- ACTION PACKET ---------------
     if id == 0x28 then

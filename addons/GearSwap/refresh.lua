@@ -108,6 +108,9 @@ function load_user_files(job_id,user_file)
         ipairs = ipairs, print=print, add_to_chat=add_to_chat_user,
         next=next,lua_base_path=windower.addon_path,empty=empty,
         
+        debug=debug,coroutine=coroutine,setmetatable=setmetatable,getmetatable=getmetatable,
+        rawset=rawset,rawget=rawget,require=include_user,
+        
         -- Player environment things
         buffactive=buffactive,
         player=player,
@@ -263,9 +266,9 @@ function refresh_player(dt,user_event_flag)
         table.reassign(pet, {isvalid=false})
     end
     
-    if player.main_job == 'PUP' or player.sub_job == 'PUP' then
+    if player.main_job_id == 18 or player.sub_job_id == 18 then
         local auto_tab
-        if player.main_job == 'PUP' then auto_tab = windower.ffxi.get_mjob_data()
+        if player.main_job_id == 18 then auto_tab = windower.ffxi.get_mjob_data()
         else auto_tab = windower.ffxi.get_sjob_data() end
         
         if auto_tab.name then
@@ -311,7 +314,7 @@ function refresh_player(dt,user_event_flag)
                 pet.mpp = 0
             end
         end
-    elseif player.main_job == 'MON' then
+    elseif player.main_job_id == 23 then
         local species_id = windower.ffxi.get_mjob_data().species
         -- Should add instincts when they become available
         
@@ -593,7 +596,8 @@ function pathsearch(files_list)
         [5] = gearswap_data,
         [6] = gearswap_appdata .. player.name .. '/',
         [7] = gearswap_appdata .. 'common/',
-        [8] = gearswap_appdata
+        [8] = gearswap_appdata,
+        [9] = windower.windower_path .. 'addons/libs/'
     }
 
     for _,basepath in ipairs(search_path) do

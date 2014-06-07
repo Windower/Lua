@@ -126,6 +126,11 @@ function export_set(options)
         end
     end
     
+    
+    if not windower.dir_exists(windower.addon_path..'data/export') then
+        windower.create_dir(windower.addon_path..'data/export')
+    end
+    
     local path = windower.addon_path..'data/export/'..player.name..os.date(' %H %M %S%p  %y-%d-%m')
     if xml then
         -- Export in .xml
