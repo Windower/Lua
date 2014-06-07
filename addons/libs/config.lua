@@ -156,7 +156,7 @@ function merge(t, t_merge, path)
     end
 
     for lkey, val in pairs(t_merge) do
-        local key = keys[lkey:lower()]
+        local key = rawget(keys, lkey:lower())
         if not key then
             if type(val) == 'table' then
                 t[lkey] = setmetatable(table.copy(val), getmetatable(val) or _meta.T)
@@ -168,19 +168,9 @@ function merge(t, t_merge, path)
             local err = false
             local oldval = rawget(t, key)
             local oldtype = type(oldval)
+
             if oldtype == 'table' and type(val) == 'table' then
-                local res = merge(oldval, val, path and path:copy()+key or nil)
-                local oldclass = class(oldval)
-                if oldclass == 'table' or oldclass == 'Table' then
-                    t[key] = setmetatable(table.copy(res), _meta.T)
-                elseif oldclass == 'List' then
-                    t[key] = L(table.copy(res))
-                elseif oldclass == 'Set' then
-                    t[key] = S(res)
-                else
-                    notice('This is not supposed to happen. A new data structure has not yet been added to config.lua')
-                    t[key] = setmetatable(res, _meta.T)
-                end
+                t[key] = merge(oldval, val, path and path:copy()+key or nil)
 
             elseif oldtype ~= type(val) then
                 if oldtype == 'table' then
