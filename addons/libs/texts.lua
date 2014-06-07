@@ -173,7 +173,7 @@ function apply_settings(_, t, settings)
     texts.bold(t, settings.flags.bold)
     texts.right_justified(t, settings.flags.right_justified)
     texts.bottom_justified(t, settings.flags.bottom_justified)
-    texts.visible(t._status.visible)
+    texts.visible(t, t._status.visible)
 
     -- Trigger registered post-reload events
     for _, event in ipairs(t._events) do
