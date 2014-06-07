@@ -130,7 +130,7 @@ function texts.new(str, settings, root_settings)
     if _libs.config and t._root_settings and settings then
         _libs.config.register(t._root_settings, apply_settings, t, settings)
     else
-        apply_settings(_, t, settings or t._settings)
+        apply_settings(_, t, settings)
     end
 
     if str then
@@ -159,6 +159,7 @@ function amend(settings, text)
 end
 
 function apply_settings(_, t, settings)
+    settings = settings or t._settings
     t:pos(settings.pos.x, settings.pos.y)
     t:bg_alpha(settings.bg.alpha)
     t:bg_color(settings.bg.red, settings.bg.green, settings.bg.blue)
