@@ -533,7 +533,7 @@ windower.register_event('weather change',function(new_weather_id, old_weather_id
     refresh_ffxi_info()
 end)
 
-windower.register_event('zone change',function(new_zone,new_zone_id,old_zone,old_zone_id)
+windower.register_event('zone change',function(new_zone_id,old_zone_id)
     if debugging >= 1 then windower.debug('zone change') end
     _global.midaction = false
     _global.pet_midaction = false
