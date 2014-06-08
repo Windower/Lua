@@ -528,7 +528,7 @@ windower.register_event('day change',function(new,old)
     windower.send_command('@wait 0.5;lua invoke gearSwap refresh_ffxi_info')
 end)
 
-windower.register_event('weather change',function(new_weather, new_weather_id, old_weather, old_weather_id)
+windower.register_event('weather change',function(new_weather_id, old_weather_id)
     if debugging >= 1 then windower.debug('weather change') end
     refresh_ffxi_info()
 end)
