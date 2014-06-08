@@ -103,7 +103,8 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
         end
         
         for i,v in pairs(act.targets) do
-            if pet_indices[windower.ffxi.get_mob_by_id(v.id).index] then
+            local mob = windower.ffxi.get_mob_by_id(v.id)
+            if mob and pet_indices[mob.index] then
                 act.category = 0
                 for n,m in pairs(act.targets[i].actions) do
                     act.targets[i].actions[n].animation = 0
