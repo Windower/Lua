@@ -445,7 +445,11 @@ windower.register_event('outgoing chunk',function(id,original,modified,injected,
             cued_packet = nil
             return true
         end
-    elseif id == 0x1A and injected and clocking then
-        windower.add_to_chat(8,'Injection time: '..(os.clock()-out_time))
+    elseif id == 0x100 then
+    -- Scrub the equipment array if a valid outgoing job change packet is sent.
+        local newmain = modified:byte(5)
+        if res.jobs[newmain] and newmain ~= player.main_job_id then
+            items.equipment = {}
+        end
     end
 end)
