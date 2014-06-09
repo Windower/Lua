@@ -449,7 +449,15 @@ windower.register_event('outgoing chunk',function(id,original,modified,injected,
     -- Scrub the equipment array if a valid outgoing job change packet is sent.
         local newmain = modified:byte(5)
         if res.jobs[newmain] and newmain ~= player.main_job_id then
-            items.equipment = {}
+            for id,name in pairs(default_slot_map) do
+                if items.equipment[name..'_bag'] then
+                    local slot = items.equipment[name]
+                    local bag = to_windower_api(res.bags[items.equipment[name..'_bag']].english)
+                    items[bag][slot].status = 0
+                    items.equipment[name] = 0
+                    items.equipment[name..'_bag'] = 0
+                end
+            end
         end
     end
 end)
