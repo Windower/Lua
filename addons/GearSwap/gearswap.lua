@@ -164,7 +164,20 @@ windower.register_event('addon command',function (...)
     elseif strip(cmd) == 'showswaps' then
         _settings.show_swaps = not _settings.show_swaps
         print('GearSwap: Show Swaps set to '..tostring(_settings.show_swaps)..'.')
-    elseif not (S{'eval','visible','invisible','clocking'}:contains(cmd) and debugging>0) then
+    elseif _settings.debug_mode and strip(cmd) == 'eval' then
+        table.remove(splitup,1)
+        assert(loadstring(table.concat(splitup,' ')))()
+    elseif debugging and debugging > 1 and _settings.debug_mode and strip(cmd) == 'visible' then
+        windower.text.set_visibility('precast',true)
+        windower.text.set_visibility('midcast',true)
+        windower.text.set_visibility('aftercast',true)
+        windower.text.set_visibility('buff_change',true)
+    elseif debugging and debugging > 1 and _settings.debug_mode and strip(cmd) == 'invisible' then
+        windower.text.set_visibility('precast',false)
+        windower.text.set_visibility('midcast',false)
+        windower.text.set_visibility('aftercast',false)
+        windower.text.set_visibility('buff_change',false)
+    else
         print('GearSwap: Command not found')
     end
 end)
@@ -193,10 +206,10 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
     
     
     
-    if next_packet_events and next_packet_events.sequence_id ~= data:byte(4)*256+data:byte(3) then
-        if not next_packet_events.globals_update or next_packet_events.globals_update ~= data:byte(4)*256 + data:byte(3) then
+    if next_packet_events and next_packet_events.sequence_id ~= data:unpack('H',3) then
+        if not next_packet_events.globals_update or next_packet_events.globals_update ~= data:unpack('H',3) then
             refresh_globals()
-            next_packet_events.globals_update = data:byte(4)*256+data:byte(3)
+            next_packet_events.globals_update = data:unpack('H',3)
         end
         if next_packet_events.pet_status_change then
             if pet.isvalid then
@@ -229,6 +242,10 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         player.vitals.max_mp = data:unpack('I',0xED)
         update_job_names()
         
+--        world.zone_id = data:unpack('H',0x31)
+--        world.weather_id = data:byte(0x69)
+--        world.logged_in = true
+        
         _ExtraData.world.in_mog_house = data:byte(0x81) == 1
     elseif id == 0x00B then
         items.temporary = make_inventory_table()
@@ -251,7 +268,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
             player.jobs[to_windower_api(res.jobs[i].english)] = data:byte(i + 72)
         end
         
-        local enc = data:byte(97) + data:byte(98)*256
+        local enc = data:unpack('H',97)
         --items = windower.ffxi.get_items()
         local tab = {}
         for i,v in pairs(default_slot_map) do
@@ -266,9 +283,12 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
             refresh_globals()
             equip_sets('equip_command',nil,tab)
         end
+--    elseif id == 0x01C then -- Bag size, unused so unincluded
+    elseif id == 0x01D then
+        table.clear(limbo_equip)
     elseif id == 0x01E then
-        local bag = to_windower_api(res.bags[data:byte(9)].english)
-        local slot = data:byte(10)
+        local bag = to_windower_api(res.bags[data:byte(0x09)].english)
+        local slot = data:byte(0x0A)
         local count = data:unpack('I',5)
         items[bag][slot].count = count
         if count == 0 then
@@ -277,28 +297,21 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
             items[bag][slot].status = 0
         end
     elseif id == 0x01F then
-        local bag = to_windower_api(res.bags[data:byte(11)].english)
-        local slot = data:byte(12)
-        if not items[bag] or not items[bag][slot] then
-            print(bag,slot)
-        end
+        local bag = to_windower_api(res.bags[data:byte(0x0B)].english)
+        local slot = data:byte(0x0C)
         items[bag][slot].id = data:unpack('H',9)
         items[bag][slot].count = data:unpack('I',5)
-        items[bag][slot].status = data:byte(13)
+        items[bag][slot].status = data:byte(0x0D)
     elseif id == 0x020 then
-        local bag = to_windower_api(res.bags[data:byte(15)].english)
-        local slot = data:byte(16)
-        if not items[bag] or not items[bag][slot] then
-            print(bag,slot)
-        end
-        items[bag][slot].id = data:unpack('H',13)
+        local bag = to_windower_api(res.bags[data:byte(0x0F)].english)
+        local slot = data:byte(0x10)
+        items[bag][slot].id = data:unpack('H',0x0D)
         items[bag][slot].count = data:unpack('I',5)
         items[bag][slot].bazaar = data:unpack('I',9)
-        items[bag][slot].status = data:byte(17)
-        items[bag][slot].extdata = data:sub(18,41)
+        items[bag][slot].status = data:byte(0x11)
+        items[bag][slot].extdata = data:sub(0x12,0x29)
         -- Did not mess with linkshell stuff
     elseif id == 0x28 then
-        if clocking then windower.add_to_chat(8,'Action Packet: '..(os.clock() - out_time)) end
         data = data:sub(5)
         local act = {}
 --        act.do_not_need = get_bit_packed(data,0,8)
@@ -361,7 +374,6 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         end
         inc_action(act)
     elseif id == 0x29 then
-        if clocking then windower.add_to_chat(8,'Action Message: '..(os.clock() - out_time)) end
         if gearswap_disabled then return end
         data = data:sub(5)
         local arr = {}
@@ -401,10 +413,17 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
     elseif id == 0x044 then
         -- No idea what this is doing
     elseif id == 0x050 then
-        local slot = data:byte(6)
-        items.equipment[to_windower_api(res.slots[slot].english)] = data:byte(5)
-        items.equipment[to_windower_api(res.slots[slot].english..' bag')] = data:byte(7)
-        items[to_windower_api(res.bags[data:byte(7)].english)][data:byte(5)].status = 5
+        local slot = data:byte(5)
+        local equipment_slot = data:byte(6)
+        local bag = data:byte(7)
+        items.equipment[to_windower_api(res.slots[equipment_slot].english)] = slot
+        items.equipment[to_windower_api(res.slots[equipment_slot].english..' bag')] = bag
+        items[to_windower_api(res.bags[bag].english)][slot].status = 5 -- Set the status to "equipped"
+
+        if sent_out_equip[data:byte(6)] and sent_out_equip[data:byte(6)].slot == data:byte(5) then
+            sent_out_equip[data:byte(6)] = nil
+            limbo_equip[data:byte(6)] = {inv_id=data:byte(7),slot=data:byte(5)}
+        end
     elseif id == 0x061 then
         player.vitals.max_hp = data:unpack('I',5)
         player.vitals.max_mp = data:unpack('I',9)
@@ -432,14 +451,14 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
     elseif id == 0x067 then
         local flag_1 = data:byte(5)
         local flag_2 = data:byte(6)
-        local owner_ind = data:byte(14)*256+data:byte(13)
-        local subj_ind = data:byte(8)*256+data:byte(7)
+        local owner_ind = data:unpack('H',13)
+        local subj_ind = data:unpack('H',7)
         
         if flag_1 == 3 and flag_2 == 5 and windower.ffxi.get_player().index == owner_ind and not pet.isvalid then
-            if not next_packet_events then next_packet_events = {sequence_id = data:byte(4)*256+data:byte(3)} end
+            if not next_packet_events then next_packet_events = {sequence_id = data:unpack('H',3)} end
             next_packet_events.pet_change = {subj_ind = subj_ind}
         elseif flag_1 == 4 and flag_2 == 5 and windower.ffxi.get_player().index == subj_ind then
-            if not next_packet_events then next_packet_events = {sequence_id = data:byte(4)*256+data:byte(3)} end
+            if not next_packet_events then next_packet_events = {sequence_id = data:unpack('H',3)} end
             refresh_globals()
             pet.isvalid = false
             next_packet_events.pet_change = {pet = table.reassign({},pet)}
@@ -450,19 +469,6 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         player.vitals.tp = data:unpack('I',0x11)/10
         player.vitals.hpp = data:byte(0x17)
         player.vitals.mpp = data:byte(0x18)
-    end
-    
-    
-    if gearswap_disabled then
-        return
-    elseif id == 0x050 and not injected then
---        'Equipment packet'
-        if sent_out_equip[data:byte(6)] and sent_out_equip[data:byte(6)].slot == data:byte(5) then
-            sent_out_equip[data:byte(6)] = nil
-            limbo_equip[data:byte(6)] = {inv_id=data:byte(7),slot=data:byte(5)}
-        end
-    elseif id == 0x01D and not injected then
-        table.clear(limbo_equip)
     end
 end)
 
@@ -528,12 +534,12 @@ windower.register_event('day change',function(new,old)
     windower.send_command('@wait 0.5;lua invoke gearSwap refresh_ffxi_info')
 end)
 
-windower.register_event('weather change',function(new_weather, new_weather_id, old_weather, old_weather_id)
+windower.register_event('weather change',function(new_weather_id, old_weather_id)
     if debugging >= 1 then windower.debug('weather change') end
     refresh_ffxi_info()
 end)
 
-windower.register_event('zone change',function(new_zone,new_zone_id,old_zone,old_zone_id)
+windower.register_event('zone change',function(new_zone_id,old_zone_id)
     if debugging >= 1 then windower.debug('zone change') end
     _global.midaction = false
     _global.pet_midaction = false
@@ -543,28 +549,6 @@ windower.register_event('zone change',function(new_zone,new_zone_id,old_zone,old
 end)
 
 if debugging and debugging >= 1 then
-    require('data/bootstrap')
-
-    windower.register_event('addon command', function(...)
-        local pantsu = {...}
-        local opt = table.remove(pantsu,1)
-        if opt == 'eval' then
-            assert(loadstring(table.concat(pantsu,' ')))()
-        elseif opt == 'visible' then
-            windower.text.set_visibility('precast',true)
-            windower.text.set_visibility('midcast',true)
-            windower.text.set_visibility('aftercast',true)
-            windower.text.set_visibility('buff_change',true)
-        elseif opt == 'invisible' then
-            windower.text.set_visibility('precast',false)
-            windower.text.set_visibility('midcast',false)
-            windower.text.set_visibility('aftercast',false)
-            windower.text.set_visibility('buff_change',false)
-        elseif opt == 'clocking' then
-            if clocking then clocking = false else clocking = true end
-        end
-    end)
-    
     windower.text.create('precast')
     windower.text.set_bg_color('precast',100,100,100,100)
     windower.text.set_bg_visibility('precast',true)
