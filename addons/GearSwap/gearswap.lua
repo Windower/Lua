@@ -165,7 +165,8 @@ windower.register_event('addon command',function (...)
         _settings.show_swaps = not _settings.show_swaps
         print('GearSwap: Show Swaps set to '..tostring(_settings.show_swaps)..'.')
     elseif _settings.debug_mode and strip(cmd) == 'eval' then
-            assert(loadstring(table.concat(pantsu,' ')))()
+        table.remove(splitup,1)
+        assert(loadstring(table.concat(splitup,' ')))()
     elseif debugging and debugging > 1 and _settings.debug_mode and strip(cmd) == 'visible' then
         windower.text.set_visibility('precast',true)
         windower.text.set_visibility('midcast',true)
