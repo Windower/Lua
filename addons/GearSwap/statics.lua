@@ -247,6 +247,10 @@ function initialize_globals()
                 wardrobe = make_inventory_table(),
                 equipment = {},
             }
+        for id,name in pairs(default_slot_map) do
+            items.equipment.name = 0
+            items.equipment[name..'_bag'] = 0
+        end
     else
         if not items.inventory then items.inventory = make_inventory_table() else
             items.inventory[0] = make_empty_item_table(0) end

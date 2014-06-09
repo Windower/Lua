@@ -127,10 +127,10 @@ function texts.new(str, settings, root_settings)
         config.save(t._root_settings)
     end
 
-    if _libs.config and t._root_settings then
-        _libs.config.register(t._root_settings, apply_settings, t)
+    if _libs.config and t._root_settings and settings then
+        _libs.config.register(t._root_settings, apply_settings, t, settings)
     else
-        apply_settings(_, t)
+        apply_settings(_, t, settings)
     end
 
     if str then
@@ -158,20 +158,22 @@ function amend(settings, text)
     end
 end
 
-function apply_settings(_, t)
-    local settings = windower.get_windower_settings()
-    windower.text.set_location(t._name, t._settings.pos.x + (t._settings.flags.right and settings.ui_x_res or 0), t._settings.pos.y + (t._settings.flags.bottom and settings.ui_y_res or 0))
-    windower.text.set_bg_color(t._name, t._settings.bg.alpha, t._settings.bg.red, t._settings.bg.green, t._settings.bg.blue)
-    windower.text.set_bg_visibility(t._name, t._settings.bg.visible)
-    windower.text.set_color(t._name, t._settings.text.alpha, t._settings.text.red, t._settings.text.green, t._settings.text.blue)
-    windower.text.set_font(t._name, t._settings.text.font, unpack(t._settings.text.fonts))
-    windower.text.set_font_size(t._name, t._settings.text.size)
-    windower.text.set_bg_border_size(t._name, t._settings.padding)
-    windower.text.set_italic(t._name, t._settings.flags.italic)
-    windower.text.set_bold(t._name, t._settings.flags.bold)
-    windower.text.set_right_justified(t._name, t._settings.flags.right)
---    windower.text.set_bottom_justified(t._name, t._settings.flags.bottom)
-    windower.text.set_visibility(t._name, t._status.visible)
+function apply_settings(_, t, settings)
+    settings = settings or t._settings
+    texts.pos(t, settings.pos.x, settings.pos.y)
+    texts.bg_alpha(t, settings.bg.alpha)
+    texts.bg_color(t, settings.bg.red, settings.bg.green, settings.bg.blue)
+    texts.bg_visible(t, settings.bg.visible)
+    texts.color(t, settings.text.red, settings.text.green, settings.text.blue)
+    texts.alpha(t, settings.text.alpha)
+    texts.font(t, settings.text.font, unpack(settings.text.fonts))
+    texts.size(t, settings.text.size)
+    texts.pad(t, settings.padding)
+    texts.italic(t, settings.flags.italic)
+    texts.bold(t, settings.flags.bold)
+    texts.right_justified(t, settings.flags.right_justified)
+    texts.bottom_justified(t, settings.flags.bottom_justified)
+    texts.visible(t, t._status.visible)
 
     -- Trigger registered post-reload events
     for _, event in ipairs(t._events) do
@@ -327,13 +329,14 @@ function texts.pos_y(t, y)
     t:pos(t._settings.pos.x, y)
 end
 
-function texts.font(t, font)
-    if not font then
+function texts.font(t, ...)
+    if not ... then
         return t._settings.text.font
     end
 
-    windower.text.set_font(t._name, font)
-    t._settings.text.font = font
+    windower.text.set_font(t._name, ...)
+    t._settings.text.font = (...)
+    t._settings.text.fonts = {select(2, ...)}
 end
 
 function texts.size(t, size)
@@ -385,6 +388,38 @@ function texts.transparency(t, alpha)
     t._settings.text.alpha = alpha
 end
 
+function texts.right_justified(t, rj)
+    if not rj then
+        return t._settings.flags.right
+    end
+
+    windower.text.set_right_justified(t._name, rj)
+end
+
+function texts.bottom_justified(t, bj)
+    if not bj then
+        return t._settings.flags.bottom
+    end
+
+    windower.text.set_bottom_justified(t._name, bj)
+end
+
+function texts.italic(t, italic)
+    if not italic then
+        return t._settings.flags.italic
+    end
+
+    windower.text.set_italic(t._name, italic)
+end
+
+function texts.bold(t, bold)
+    if not bold then
+        return t._settings.flags.bold
+    end
+
+    windower.text.set_bold(t._name, bold)
+end
+
 function texts.bg_color(t, red, green, blue)
     if not red then
         return t._settings.bg.red, t._settings.bg.green, t._settings.bg.blue
@@ -394,6 +429,15 @@ function texts.bg_color(t, red, green, blue)
     t._settings.bg.red = red
     t._settings.bg.green = green
     t._settings.bg.blue = blue
+end
+
+function texts.bg_visible(t, visible)
+    if not visible then
+        return t._settings.bg.visible
+    end
+
+    windower.text.set_bg_visibility(t._name, visible)
+    t._settings.bg.visible = visible
 end
 
 function texts.bg_alpha(t, alpha)
@@ -513,7 +557,7 @@ end
 return texts
 
 --[[
-Copyright (c) 2013-2014, Windower
+Copyright © 2013-2014, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

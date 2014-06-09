@@ -41,6 +41,9 @@ elements.fastcast_staff_of = {['Light']='Arka I', ['Dark']='Xsaeta I', ['Fire']=
 elements.recast_staff_of = {['Light']='Arka II', ['Dark']='Xsaeta II', ['Fire']='Atar II', ['Ice']='Vourukasha II',
 	['Wind']='Vayuvata II', ['Earth']='Vishrava II', ['Lightning']='Apamajas II', ['Water']='Haoma II', ['Thunder']='Apamajas II'}
 
+elements.perpetuance_staff_of = {['Light']='Arka III', ['Dark']='Xsaeta III', ['Fire']='Atar III', ['Ice']='Vourukasha III',
+	['Wind']='Vayuvata III', ['Earth']='Vishrava III', ['Lightning']='Apamajas III', ['Water']='Haoma III', ['Thunder']='Apamajas III'}
+
 
 -- Elements for skillchain names
 skillchain_elements = {}
@@ -61,17 +64,72 @@ skillchain_elements.Reverberation = S{'Water'}
 
 
 -------------------------------------------------------------------------------------------------------------------
--- Mappings for elemental gear
+-- Mappings for weaponskills
 -------------------------------------------------------------------------------------------------------------------
 
+-- REM weapons and their corresponding weaponskills
+data = {}
+data.weaponskills = {}
+data.weaponskills.relic = {
+    ["Spharai"] = "Final Heaven",
+    ["Mandau"] = "Mercy Stroke",
+    ["Excalibur"] = "Knights of Round",
+    ["Ragnarok"] = "Scourge",
+    ["Guttler"] = "Onslaught",
+    ["Bravura"] = "Metatron Torment",
+    ["Apocalypse"] = "Catastrophe",
+    ["Gungnir"] = "Gierskogul",
+    ["Kikoku"] = "Blade: Metsu",
+    ["Amanomurakumo"] = "Tachi: Kaiten",
+    ["Mjollnir"] = "Randgrith",
+    ["Claustrum"] = "Gates of Tartarus",
+    ["Annihilator"] = "Coronach",
+    ["Yoichinoyumi"] = "Namas Arrow"}
+data.weaponskills.mythic = {
+    ["Conqueror"] = "King's Justice",
+    ["Glanzfaust"] = "Ascetic's Fury",
+    ["Yagrush"] = "Mystic Boon",
+    ["Laevateinn"] = "Vidohunir",
+    ["Murgleis"] = "Death Blossom",
+    ["Vajra"] = "Mandalic Stab",
+    ["Burtgang"] = "Atonement",
+    ["Liberator"] = "Insurgency",
+    ["Aymur"] = "Primal Rend",
+    ["Carnwenhan"] = "Mordant Rime",
+    ["Gastraphetes"] = "Trueflight",
+    ["Kogarasumaru"] = "Tachi: Rana",
+    ["Nagi"] = "Blade: Kamu",
+    ["Ryunohige"] = "Drakesbane",
+    ["Nirvana"] = "Garland of Bliss",
+    ["Tizona"] = "Expiacion",
+    ["Death Penalty"] = "Leaden Salute",
+    ["Kenkonken"] = "Stringing Pummel",
+    ["Terpsichore"] = "Pyrrhic Kleos",
+    ["Tupsimati"] = "Omniscience"}
+data.weaponskills.empyrean = {
+    ["Verethragna"] = "Victory Smite",
+    ["Twashtar"] = "Rudra's Storm",
+    ["Almace"] = "Chant du Cygne",
+    ["Caladbolg"] = "Torcleaver",
+    ["Farsha"] = "Cloudsplitter",
+    ["Ukonvasara"] = "Ukko's Fury",
+    ["Redemption"] = "Quietus",
+    ["Rhongomiant"] = "Camlann's Torment",
+    ["Kannagi"] = "Blade: Hi",
+    ["Masamune"] = "Tachi: Fudo",
+    ["Gambanteinn"] = "Dagann",
+    ["Hvergelmir"] = "Myrkr",
+    ["Gandiva"] = "Jishnu's Radiance",
+    ["Armageddon"] = "Wildfire"}
 
--- list of weaponskills that can be used at greater than melee range
-ranged_weaponskills = S{"Flaming Arrow", "Piercing Arrow", "Dulling Arrow", "Sidewinder", "Arching Arrow",
+-- Weaponskills that can be used at range.
+data.weaponskills.ranged = S{"Flaming Arrow", "Piercing Arrow", "Dulling Arrow", "Sidewinder", "Arching Arrow",
 	"Empyreal Arrow", "Refulgent Arrow", "Apex Arrow", "Namas Arrow", "Jishnu's Radiance",
 	"Hot Shot", "Split Shot", "Sniper Shot", "Slug Shot", "Heavy Shot", "Detonator", "Last Stand",
 	"Coronach", "Trueflight", "Leaden Salute", "Wildfire",
 	"Myrkr"}
 
+ranged_weaponskills = data.weaponskills.ranged
 
 -------------------------------------------------------------------------------------------------------------------
 -- Spell mappings allow defining a general category or description that each of sets of related

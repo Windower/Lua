@@ -61,7 +61,7 @@ windower.register_event('load', 'login', 'job change', 'logout', function()
         reset()
         print('Yush: Loaded ' .. path .. ' Lua file')
     elseif player then
-        print('Yush: No matching file found for %s (%s/%s)':format(player.name, player.main_job, player.sub_job))
+        print('Yush: No matching file found for %s (%s%s)':format(player.name, player.main_job, player.sub_job and '/' .. player.sub_job or ''))
     end
 end)
 

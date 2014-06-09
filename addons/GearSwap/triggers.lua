@@ -73,7 +73,6 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
             return true
         elseif temp_mob_arr then
             if logging then    logit(logfile,'\n\n'..tostring(os.clock)..'(93) temp_mod: '..temp_mod) end
-            if clocking then out_time = os.clock() end
             refresh_globals()
             
             local r_line
