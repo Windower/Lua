@@ -174,11 +174,24 @@ function inc_action(act)
     if spell and spell[language] then
         spell.target = target_complete(windower.ffxi.get_mob_by_id(act.targets[1].id))
         spell.action_type = action_type_map[unify_prefix[spell.prefix or 'Mon']]
+    elseif S{84,78}:contains(act.targets[1].actions[1].message) then -- "Paralyzed" and "too far away" respectively
+        local ts,tab = delete_command_registry_by_id(act.targets[1].id)
+        if tab and tab.spell and tab.spell.prefix == '/pet' then 
+            equip_sets('pet_aftercast',nil,tab.spell)
+        elseif tab and tab.spell then
+            equip_sets('aftercast',nil,tab.spell)
+        end
+        return
     else
         if debugging >= 1 then windower.send_command('input /echo Incoming Action packet did not generate a spell/aftercast.')end
         return
     end
     
+    --[[4 (action message) = "out of range" when attempting to melee something that's too far away
+       78 (action message) = "too far away" when attempting to engage or cast magic on something that's too far away
+       78 (action) = "too far away" when attempting to WS something that's too far away
+       154 (action message) - "out of range" when attempting to use a JA on something that's too far away. param_1 is the JA ID]]
+       
     -- Paralysis of JAs/spells/etc. and Out of Range messages for avatars both send two action packets when they occur.
     -- The first packet is a paralysis packet that contains the message and spell-appropriate information.
     -- The second packet contains the interruption code and no useful information as far as I can see.
@@ -189,7 +202,6 @@ function inc_action(act)
     -- I do not know if this will affect automatons being interrupted.
     
     ts = find_command_registry_key('spell',spell)
-
     if (jas[act.category] or uses[act.category]) then
         if uses[act.category] and act.param == 28787 then
             spell.action_type = 'Interruption'

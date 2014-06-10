@@ -760,6 +760,8 @@ function get_spell(act)
             spell = res.job_abilities[79] -- 'Cover'
         elseif msg_ID == 240 or msg_ID == 241 then
             spell = res.job_abilities[43] -- 'Hide'
+        elseif msg_ID == 244 then
+            spell = res.job_abilities[act.param] -- Mug failures
         elseif msg_ID == 328 then
             spell = res.job_abilities[effect_val] -- BPs that are out of range
         end
