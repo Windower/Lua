@@ -678,8 +678,14 @@ function get_default_precast_set(spell, action, spellMap, eventArgs)
 		if ws_mode == 'Normal' then
 			-- If a particular weaponskill mode isn't specified, see if we have a weaponskill mode
 			-- corresponding to the current offense mode.  If so, use that.
-			if state.OffenseMode ~= 'Normal' and S(options.WeaponskillModes):contains(state.OffenseMode) then
-				ws_mode = state.OffenseMode
+			if spell.skill == 'Archery' or spell.skill == 'Marksmanship' then
+				if state.RangedMode ~= 'Normal' and S(options.WeaponskillModes):contains(state.RangedMode) then
+					ws_mode = state.RangedMode
+				end
+			else
+				if state.OffenseMode ~= 'Normal' and S(options.WeaponskillModes):contains(state.OffenseMode) then
+					ws_mode = state.OffenseMode
+				end
 			end
 		end
 
