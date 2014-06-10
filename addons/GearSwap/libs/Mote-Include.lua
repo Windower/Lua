@@ -642,7 +642,7 @@ function get_default_precast_set(spell, action, spellMap, eventArgs)
 	if spell.action_type == 'Magic' then
 		equipSet = sets.precast.FC
 	elseif spell.action_type == 'Ranged Attack' then
-		equipSet = (sets.precast.RA and not table.empty(sets.precast.RA)) or sets.precast.RangedAttack or sets.precast.RA
+		equipSet = sets.precast.RangedAttack or sets.precast.RA
 	elseif spell.action_type == 'Ability' then
 		if spell.type == 'WeaponSkill' then
 			equipSet = sets.precast.WS
@@ -703,6 +703,15 @@ function get_default_precast_set(spell, action, spellMap, eventArgs)
 			equipSet = equipSet[classes.JAMode]
 		end
 	elseif spell.action_type == 'Ranged Attack' then
+		-- Attach Combat Form and Combat Weapon to set checks
+		if state.CombatForm and equipSet[state.CombatForm] then
+			equipSet = equipSet[state.CombatForm]
+		end
+	
+		if state.CombatWeapon and equipSet[state.CombatWeapon] then
+			equipSet = equipSet[state.CombatWeapon]
+		end
+	
 		-- Check for specific mode for ranged attacks (eg: Acc, Att, etc)
 		if equipSet[state.RangedMode] then
 			equipSet = equipSet[state.RangedMode]
@@ -738,7 +747,7 @@ function get_default_midcast_set(spell, action, spellMap, eventArgs)
 	-- Only ranged attacks and items get specific sub-categories here.
 	
 	if spell.action_type == 'Ranged Attack' then
-		equipSet = (sets.midcast.RA and not table.empty(sets.midcast.RA)) or sets.midcast.RangedAttack or sets.midcast.RA
+		equipSet = sets.midcast.RangedAttack or sets.midcast.RA
 	elseif spell.action_type == 'Item' then
 		equipSet = sets.midcast.Item
 	else
@@ -761,6 +770,15 @@ function get_default_midcast_set(spell, action, spellMap, eventArgs)
 			equipSet = equipSet[state.CastingMode]
 		end
 	elseif spell.action_type == 'Ranged Attack' then
+		-- Attach Combat Form and Combat Weapon to set checks
+		if state.CombatForm and equipSet[state.CombatForm] then
+			equipSet = equipSet[state.CombatForm]
+		end
+	
+		if state.CombatWeapon and equipSet[state.CombatWeapon] then
+			equipSet = equipSet[state.CombatWeapon]
+		end
+	
 		-- Check for specific mode for ranged attacks (eg: Acc, Att, etc)
 		if equipSet[state.RangedMode] then
 			equipSet = equipSet[state.RangedMode]
