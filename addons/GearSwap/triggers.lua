@@ -174,6 +174,14 @@ function inc_action(act)
     if spell and spell[language] then
         spell.target = target_complete(windower.ffxi.get_mob_by_id(act.targets[1].id))
         spell.action_type = action_type_map[unify_prefix[spell.prefix or 'Mon']]
+    elseif act.targets[1].actions[1].message == 84 then
+        local ts,tab = delete_command_registry_by_id(act.targets[1].id)
+        if tab and tab.spell and tab.spell.prefix == '/pet' then 
+            equip_sets('pet_aftercast',nil,tab.spell)
+        elseif tab and tab.spell then
+            equip_sets('aftercast',nil,tab.spell)
+        end
+        return
     else
         if debugging >= 1 then windower.send_command('input /echo Incoming Action packet did not generate a spell/aftercast.')end
         return
@@ -189,7 +197,6 @@ function inc_action(act)
     -- I do not know if this will affect automatons being interrupted.
     
     ts = find_command_registry_key('spell',spell)
-
     if (jas[act.category] or uses[act.category]) then
         if uses[act.category] and act.param == 28787 then
             spell.action_type = 'Interruption'
