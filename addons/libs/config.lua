@@ -152,7 +152,7 @@ function merge(t, t_merge, path)
 
     local keys = {}
     for key in pairs(t) do
-        keys[key:lower()] = key
+        keys[tostring(key):lower()] = key
     end
 
     for lkey, val in pairs(t_merge) do
@@ -287,7 +287,7 @@ function config.save(t, char)
         return
     end
 
-    char = (char or windower.ffxi.get_player()['name']):lower()
+    char = (char or windower.ffxi.get_player().name):lower()
     meta = settings_map[t]
 
     if char == 'all' then
