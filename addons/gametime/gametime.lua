@@ -39,7 +39,6 @@ texts = require('texts')
 config = require('config')
 res = require('resources')
 
-tb_name	= 'addon:gr:gametime'
 visible = false
 
 local gt = {}
@@ -231,18 +230,25 @@ Cycles.kazham.route[6] = "Arrives in Jeuno|14:49"
 Cycles.kazham.route[7] = "Arrives in Kazham|19:48"
 Cycles.kazham.route[8] = "Arrives in Jeuno|20:49"
 
-config.register(settings, function()
-	cb_time()
-	cb_day()
+time_base_string = '${hours|XX}:${minutes|XX}'
+day_base_string = '${day|} ${MoonPhase|Unknown} (${MoonPct|-}%); ${WeekReport|}'
+gt.gtt = texts.new(time_base_string,settings.time)
+gt.gtd = texts.new(day_base_string,settings.days)
 
+config.register(settings, function()
 	if settings.days.axis == 'horizontal' then
 		gt.delimiter = ' '
 	else
 		gt.delimiter = '\n'
 	end
-	
-	gt.mode = settings.mode
-	day_change(windower.ffxi.get_info().day)
+
+    local info = windower.ffxi.get_info()
+    if info.logged_in then
+        day_change(info.day)
+
+        gt.gtt:show()
+        gt.gtd:show()
+    end
 end)
 
 function getroutes(route)
@@ -259,18 +265,6 @@ function getroutes(route)
 			end
 		end
 	end
-end
-
-function cb_time()
-	time_base_string = '${hours|XX}:${minutes|XX}'
-	gt.gtt = texts.new(time_base_string,settings.time)
-	gt.gtt:show()
-end
-
-function cb_day()
-	day_base_string = '${day|} ${MoonPhase|Unknown} (${MoonPct|-}%); ${WeekReport|}'
-	gt.gtd = texts.new(day_base_string,settings.days)
-	gt.gtd:show()
 end
 
 function default_settings()
