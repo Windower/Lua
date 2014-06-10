@@ -174,7 +174,7 @@ function inc_action(act)
     if spell and spell[language] then
         spell.target = target_complete(windower.ffxi.get_mob_by_id(act.targets[1].id))
         spell.action_type = action_type_map[unify_prefix[spell.prefix or 'Mon']]
-    elseif act.targets[1].actions[1].message == 84 then
+    elseif S{84,78}:contains(act.targets[1].actions[1].message) then -- "Paralyzed" and "too far away" respectively
         local ts,tab = delete_command_registry_by_id(act.targets[1].id)
         if tab and tab.spell and tab.spell.prefix == '/pet' then 
             equip_sets('pet_aftercast',nil,tab.spell)
@@ -187,6 +187,11 @@ function inc_action(act)
         return
     end
     
+    --[[4 (action message) = "out of range" when attempting to melee something that's too far away
+       78 (action message) = "too far away" when attempting to engage or cast magic on something that's too far away
+       78 (action) = "too far away" when attempting to WS something that's too far away
+       154 (action message) - "out of range" when attempting to use a JA on something that's too far away. param_1 is the JA ID]]
+       
     -- Paralysis of JAs/spells/etc. and Out of Range messages for avatars both send two action packets when they occur.
     -- The first packet is a paralysis packet that contains the message and spell-appropriate information.
     -- The second packet contains the interruption code and no useful information as far as I can see.
