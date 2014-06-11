@@ -823,7 +823,7 @@ fields.incoming[0x00A] = L{
     {ctype='char[6]',           label='_unknown2'},                             -- 32
     {ctype='unsigned int',      label='Timestamp 1',        fn=time},           -- 38
     {ctype='unsigned int',      label='Timestamp 2',        fn=time},           -- 3C
-    {ctype='unsigned short',    label='Zone MH',            fn=zone},           -- 40   Zone ID when zoning out of MH, otherwise 0
+    {ctype='unsigned short',    label='_unknown3'},                             -- 40
     {ctype='unsigned short',    label='_dupeZone',          fn=zone},           -- 42
     {ctype='unsigned char',     label='Face'},                                  -- 44
     {ctype='unsigned char',     label='Race'},                                  -- 45
@@ -835,19 +835,22 @@ fields.incoming[0x00A] = L{
     {ctype='unsigned short',    label='Main'},                                  -- 50
     {ctype='unsigned short',    label='Sub'},                                   -- 52
     {ctype='unsigned short',    label='Ranged'},                                -- 54
-    {ctype='char[18]',          label='_unknown3'},                             -- 56
+    {ctype='char[18]',          label='_unknown4'},                             -- 56
     {ctype='unsigned short',    label='Weather',            fn=weather},        -- 68
-    {ctype='unsigned short',    label='_unknown4'},                             -- 6A
-    {ctype='char[24]',          label='_unknown5'},                             -- 6C
+    {ctype='unsigned short',    label='_unknown5'},                             -- 6A
+    {ctype='char[24]',          label='_unknown6'},                             -- 6C
     {ctype='char[16]',          label='Player Name'},                           -- 84
-    {ctype='char[12]',          label='_unknown6'},                             -- 94
+    {ctype='char[12]',          label='_unknown7'},                             -- 94
     {ctype='unsigned int',      label='Abyssea Timestamp',  fn=time},           -- A0
-    {ctype='char[16]',          label='_unknown7'},                             -- A4   0xAC is 2 for some zones, 0 for others
+    {ctype='unsigned int',      label='_unknown8',          const=0x0003A020},  -- A4
+    {ctype='char[2]',           label='_unknown9'},                             -- A8
+    {ctype='unsigned short',    label='Zone model'},                            -- AA
+    {ctype='char[8]',           label='_unknown10'},                            -- AC   0xAC is 2 for some zones, 0 for others
     {ctype='unsigned char',     label='Main Job',           fn=job},            -- B4
-    {ctype='unsigned char',     label='_unknown7'},                             -- B5
-    {ctype='unsigned char',     label='_unknown8'},                             -- B6
+    {ctype='unsigned char',     label='_unknown11'},                            -- B5
+    {ctype='unsigned char',     label='_unknown12'},                            -- B6
     {ctype='unsigned char',     label='Sub Job',            fn=job},            -- B7
-    {ctype='unsigned int',      label='_unknown9'},                             -- B8
+    {ctype='unsigned int',      label='_unknown13'},                            -- B8
     {ctype='unsigned char',     label='(None) Level'},                          -- BC
     {ctype='unsigned char',     label='WAR Level'},                             -- BD
     {ctype='unsigned char',     label='MNK Level'},                             -- BE
@@ -880,7 +883,7 @@ fields.incoming[0x00A] = L{
     {ctype='signed short',      label='CHR Bonus'},                             -- E6
     {ctype='unsigned int',      label='Max HP'},                                -- E8
     {ctype='unsigned int',      label='Max MP'},                                -- EC
-    {ctype='char[20]',          label='_unknown10'},                            -- F0
+    {ctype='char[20]',          label='_unknown14'},                            -- F0
 }
 
 -- Zone Response
