@@ -95,6 +95,9 @@ windower.register_event('addon command', function()
         elseif command == 'pos' then
             if params[2] then
                 local posx, posy = tonumber(params[1]), tonumber(params[2])
+                settings.display.pos.x = posx
+                settings.display.pos.y = posy
+                config.save(settings)
                 display:set_position(posx, posy)
             end
         elseif command == 'set' then
