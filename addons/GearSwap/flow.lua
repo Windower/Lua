@@ -120,6 +120,7 @@ function equip_sets(swap_type,ts,...)
         for i,v in pairs(short_slot_map) do
             if equip_list[i] and encumbrance_table[v] then
                 not_sent_out_equip[i] = equip_list[i]
+                equip_list[i] = nil
             end
         end
 --        if type(swap_type) == 'string' then print_set(equip_list,'Equip List') end
@@ -151,7 +152,7 @@ function equip_sets(swap_type,ts,...)
             for _,i in ipairs(equip_order) do
                 if debugging >= 3 and equip_next[i] then
                     local out_str = 'Order: '..tostring(_)..'  Slot ID: '..tostring(i)..'  Inv. ID: '..tostring(equip_next[i])
-                    if equip_next[i].slot ~= 0 then
+                    if equip_next[i].slot ~= empty then
                         out_str = out_str..'  Item: '..tostring(res.items[items.inventory[equip_next[i]].id][language..'_log'])
                     else
                         out_str = out_str..'  Emptying slot'
@@ -160,14 +161,29 @@ function equip_sets(swap_type,ts,...)
                 elseif equip_next[i] and not encumbrance_table[i] then
                     windower.debug('attempting to set gear. Order: '..tostring(_)..'  Slot ID: '..tostring(i)..'  Inv. ID: '..tostring(equip_next[i]))
                     if not _settings.demo_mode then
+                        local equipment_slot_name = to_windower_api(res.slots[i].english)
+                        
+                        local next_bag = to_windower_api(res.bags[equip_next[i].inv_id].english)
+                        local current_bag = to_windower_api(res.bags[items.equipment[equipment_slot_name..'_bag']].english)
+                        
+                        local next_inventory_slot = equip_next[i].slot
+                        local current_inventory_slot = items.equipment[equipment_slot_name]
+                        
+                        items[current_bag][current_inventory_slot].status = 0
+                        
                         if equip_next[i].slot ~= empty then
                             windower.packets.inject_outgoing(0x50,string.char(0x50,0x04,0,0,equip_next[i].slot,i,equip_next[i].inv_id,0))
+                            
+                            items.equipment[equipment_slot_name] = next_inventory_slot
+                            items.equipment[equipment_slot_name..'_bag'] = equip_next[i].inv_id
+                            items[next_bag][next_inventory_slot].status = 5
                         else
                             windower.packets.inject_outgoing(0x50,string.char(0x50,0x04,0,0,0,i,0,0))
+                            items.equipment[equipment_slot_name] = 0
+                            items.equipment[equipment_slot_name..'_bag'] = 0
                         end
                         --windower.ffxi.set_equip(equip_next[i].slot,i,equip_next[i].inv_id)
                     end
-                    sent_out_equip[i] = equip_next[i] -- re-make the equip_next table with the name sent_out_equip as the equipment is sent out.
                 end
             end
         elseif logging then

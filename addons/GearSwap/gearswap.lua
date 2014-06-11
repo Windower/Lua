@@ -284,8 +284,6 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
             equip_sets('equip_command',nil,tab)
         end
 --    elseif id == 0x01C then -- Bag size, unused so unincluded
-    elseif id == 0x01D then
-        table.clear(limbo_equip)
     elseif id == 0x01E then
         local bag = to_windower_api(res.bags[data:byte(0x09)].english)
         local slot = data:byte(0x0A)
@@ -419,11 +417,6 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         items.equipment[to_windower_api(res.slots[equipment_slot].english)] = slot
         items.equipment[to_windower_api(res.slots[equipment_slot].english..' bag')] = bag
         items[to_windower_api(res.bags[bag].english)][slot].status = 5 -- Set the status to "equipped"
-
-        if sent_out_equip[data:byte(6)] and sent_out_equip[data:byte(6)].slot == data:byte(5) then
-            sent_out_equip[data:byte(6)] = nil
-            limbo_equip[data:byte(6)] = {inv_id=data:byte(7),slot=data:byte(5)}
-        end
     elseif id == 0x061 then
         player.vitals.max_hp = data:unpack('I',5)
         player.vitals.max_mp = data:unpack('I',9)
@@ -516,8 +509,6 @@ windower.register_event('job change',function(mjob_id, mjob_lvl, sjob_id, sjob_l
     if debugging >= 1 then windower.debug('job change') end
     disable_table = {false,false,false,false,false,false,false,false,false,false,false,false,false,false,false}
     table.clear(not_sent_out_equip)
-    table.clear(sent_out_equip)
-    table.clear(limbo_equip)
 
     if current_job_file ~= res.jobs[mjob_id][language..'_short'] then
         refresh_user_env(mjob_id)
@@ -543,7 +534,6 @@ windower.register_event('zone change',function(new_zone_id,old_zone_id)
     if debugging >= 1 then windower.debug('zone change') end
     _global.midaction = false
     _global.pet_midaction = false
-    sent_out_equip = {}
     not_sent_out_equip = {}
     command_registry = {}
 end)
