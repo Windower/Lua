@@ -717,7 +717,7 @@ function get_spell(act)
     if act.category == 12 or act.category == 2 then
         spell = table.reassign({},resources_ranged_attack)
     else
-        if not res.action_messages[msg_ID] then
+        if not res.action_messages[msg_ID] or msg_ID == 31 then
             if act.category == 4 or act.category == 8 then
                 spell = res.spells[abil_ID]
                 if act.category == 4 and spell then spell.recast = act.recast end
@@ -735,7 +735,7 @@ function get_spell(act)
         
         
         local fields = fieldsearch(res.action_messages[msg_ID].english) -- ENGLISH
-
+        
         if table.contains(fields,'spell') then
             spell = res.spells[abil_ID]
             if act.category == 4 then spell.recast = act.recast end
