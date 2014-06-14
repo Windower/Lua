@@ -177,7 +177,7 @@ function unify_slots(g)
     return table.key_map(g1, get_default_slot)
 end
 
- 
+
 -----------------------------------------------------------------------------------
 ----Name: is_slot_key(k)
 -- Checks to see if key 'k' is known in the slot_map array, and that slot has not
