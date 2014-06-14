@@ -320,19 +320,17 @@ function set_merge(baseSet, ...)
 
     -- Combine the provided sets into combinedSet.  If anything is blocked by having
     -- the slot disabled, assign the item to the not_sent_out_equip table.
-    local combinedSet = {}
     for _,set in pairs(cleanSetsList) do
         for slot,item in pairs(set) do
             if disable_table[slot_map[slot]] then
                 not_sent_out_equip[slot] = item
             else
-                combinedSet[slot] = item
+                baseSet[slot] = item
             end
         end
     end
-    
 
-    return combinedSet
+    return baseSet
 end
 
 
