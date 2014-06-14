@@ -190,7 +190,7 @@ end
 -- otherwise false.
 -----------------------------------------------------------------------------------
 function is_slot_key(k)
-    return slot_map[k] and not disable_table[slot_map[k]]
+    return slot_map[k]
 end
  
  
@@ -318,8 +318,19 @@ function set_merge(baseSet, ...)
     -- only contain acceptable slot key entries.
     local cleanSetsList = table.map(combineSets, unify_slots)
 
-    -- Then reduce using a simple table.update function to generate a single set result.
-    local combinedSet = table.reduce(cleanSetsList, table.update, baseSet)
+    -- Combine the provided sets into combinedSet.  If anything is blocked by having
+    -- the slot disabled, assign the item to the not_sent_out_equip table.
+    local combinedSet = {}
+    for _,set in pairs(cleanSetsList) do
+        for slot,item in pairs(set) do
+            if disable_table[slot_map[slot]] then
+                not_sent_out_equip[slot] = item
+            else
+                combinedSet[slot] = item
+            end
+        end
+    end
+    
 
     return combinedSet
 end
@@ -616,8 +627,8 @@ function find_command_registry_key(typ,value)
                 potential_entries[i] = v.timestamp or 0
             elseif v.spell and v.spell.name == 'Double-Up' and value.type == 'CorsairRoll' then
                 -- Double Up ability uses will return action packets that match Corsair Rolls rather than Double Up
-				potential_entries[i] = v.timestamp or 0
-			end
+                potential_entries[i] = v.timestamp or 0
+            end
         end
         for i,v in pairs(potential_entries) do
             if not winner or (current_time - v < current_time - winner) then
