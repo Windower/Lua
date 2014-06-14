@@ -268,11 +268,12 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
             player.jobs[to_windower_api(res.jobs[i].english)] = data:byte(i + 72)
         end
         
-        local enc = data:unpack('H',97)
+        local enc = data:unpack('H',0x61)
         --items = windower.ffxi.get_items()
         local tab = {}
         for i,v in pairs(default_slot_map) do
-            if encumbrance_table[i] and math.floor( (enc%(2^(i+1))) / 2^i ) ~= 1 and not_sent_out_equip[v] and not disable_table[i] then
+            local tf = math.floor( (enc%(2^(i+1))) / 2^i ) ~= 1
+            if encumbrance_table[i] and tf and not_sent_out_equip[v] and not disable_table[i] then
                 tab[v] = not_sent_out_equip[v]
                 not_sent_out_equip[v] = nil
                 debug_mode_chat("Your "..v.." are now unlocked.")

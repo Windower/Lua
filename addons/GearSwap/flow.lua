@@ -121,6 +121,7 @@ function equip_sets(swap_type,ts,...)
             if equip_list[i] and encumbrance_table[v] then
                 not_sent_out_equip[i] = equip_list[i]
                 equip_list[i] = nil
+                debug_mode_chat(i..' slot was not equipped because you are encumbered.')
             end
         end
 --        if type(swap_type) == 'string' then print_set(equip_list,'Equip List') end
