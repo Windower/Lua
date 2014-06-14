@@ -150,7 +150,7 @@ windower.register_event('addon command',function (...)
             windower.add_to_chat(123,'GearSwap: No file name was provided.')
         end
     elseif cmd == 'enable' then
-        disenable(splitup,enable,'enable',false)
+        disenable(splitup,command_enable,'enable',false)
     elseif cmd == 'disable' then
         disenable(splitup,disable,'disable',true)
     elseif cmd == 'reload' or cmd == 'r' then

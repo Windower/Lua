@@ -151,6 +151,22 @@ function enable(...)
             error('\nGearSwap: enable error, passed an unrecognized slot name. ('..tostring(v)..')',2)
         end
     end
+    
+    return sending_table
+end
+
+function user_enable(...)
+    local sending_table = enable(...)
+    
+    if table.length(sending_table) > 0 then
+        equip(sending_table)
+    end
+    return sending_table
+end
+
+function command_enable(...)
+    local sending_table = enable(...)
+    
     if table.length(sending_table) > 0 then
         refresh_globals()
         equip_sets('equip_command',nil,sending_table)

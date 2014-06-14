@@ -97,7 +97,7 @@ function load_user_files(job_id,user_file)
         -- Player functions
         equip = equip, verify_equip=verify_equip, cancel_spell=cancel_spell,
         force_send=force_send, change_target=change_target, cast_delay=cast_delay,
-        print_set=print_set,set_combine=set_combine,disable=disable,enable=enable,
+        print_set=print_set,set_combine=set_combine,disable=disable,enable=user_enable,
         send_command=send_cmd_user,windower=user_windower,include=include_user,
         midaction=user_midaction,pet_midaction=user_pet_midaction,set_language=set_language,
         show_swaps = show_swaps,debug_mode=debug_mode,
