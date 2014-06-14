@@ -432,6 +432,13 @@ function player_info(id)
                         end
                         owner = i
                         break
+                    elseif v.mob and v.mob.fellow_index and v.mob.fellow_index == player_table.index then
+                        if i == 'p0' then
+                            typ = 'my_fellow'
+                            filter = 'my_fellow'
+                        end
+                        owner = i
+                        break
                     end
                 end
             else
