@@ -199,10 +199,12 @@ function filterload(job)
     if file.exists('data\\filters\\filters-'..job..'.xml') then
         default_filt = false
         filter = config.load('data\\filters\\filters-'..job..'.xml',default_filter_table,false)
+        config.save(filter)
         windower.add_to_chat(4,'Loaded '..job..' Battlemod filters')
     elseif not default_filt then
         default_filt = true
         filter = config.load('data\\filters\\filters.xml',default_filter_table,false)
+        config.save(filter)
         windower.add_to_chat(4,'Loaded default Battlemod filters')
     end
     Current_job = job
