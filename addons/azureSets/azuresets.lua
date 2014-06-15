@@ -42,14 +42,14 @@ chat = require('chat')
 
 defaults = {}
 defaults.spellsets = {}
-defaults.spellsets.default = {}
-defaults.spellsets.vw1 = {slot01='Firespit', slot02='Heat Breath', slot03='Thermal Pulse', slot04='Blastbomb',
+defaults.spellsets.default = T{}
+defaults.spellsets.vw1 = T{slot01='Firespit', slot02='Heat Breath', slot03='Thermal Pulse', slot04='Blastbomb',
 slot05='Infrasonics', slot06='Frost Breath', slot07='Ice Break', slot08='Cold Wave',
 slot09='Sandspin', slot10='Magnetite Cloud', slot11='Cimicine Discharge', slot12='Bad Breath', 
 slot13='Acrid Stream', slot14='Maelstrom', slot15='Corrosive Ooze', slot16='Cursed Sphere', 
 slot17='Awful Eye'
 }
-defaults.spellsets.vw2 = {slot01='Hecatomb Wave', slot02='Mysterious Light', slot03='Leafstorm', slot04='Reaving Wind',
+defaults.spellsets.vw2 = T{slot01='Hecatomb Wave', slot02='Mysterious Light', slot03='Leafstorm', slot04='Reaving Wind',
 slot05='Temporal Shift', slot06='Mind Blast', slot07='Blitzstrahl', slot08='Charged Whisker',
 slot09='Blank Gaze', slot10='Radiant Breath', slot11='Light of Penance', slot12='Actinic Burst',
 slot13='Death Ray', slot14='Eyes On Me', slot15='Sandspray'

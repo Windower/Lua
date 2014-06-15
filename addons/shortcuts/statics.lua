@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 -- Convert the spells and job abilities into a referenceable list of aliases --
-validabils = T{}
+validabils = {}
 
 if logging then
 	f = io.open('../addons/shortcuts/data/'..tostring(os.clock())..'_all_duplicates.log','w+')
@@ -63,14 +63,19 @@ function make_abil(abil,t,i)
 end
 
 -- Iterate through resources and make validabils.
-function validabils_it(resources_table,str)
-    for i,v in pairs(resources_table) do
-        make_abil(v.english,str,i)
+function validabils_it(str)
+    for i,v in pairs(res[str]) do
+        if not v.monster_level or (v.monster_level and v.monster_level ~= -1 and v.ja:sub(1,1) ~= '#' )then
+        -- Monster Abilities contains a large number of player-usable moves (but not monstrosity-usable) This excludes them.
+            make_abil(v.english,str,i)
+        end
     end
 end
 
-validabils_it(res.spells,'spells')
-validabils_it(res.abilities,'abilities')
+validabils_it('spells')
+validabils_it('job_abilities')
+validabils_it('weapon_skills')
+validabils_it('monster_abilities')
 
 
 

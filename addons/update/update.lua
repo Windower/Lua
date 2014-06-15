@@ -11,7 +11,7 @@ defaults.CheckInterval = 300
 
 settings = config.load(defaults)
 
-debug.setmetatable(nil, {__index = {}, __call = {}})
+debug.setmetatable(nil, {__index = {}, __call = functions.empty})
 
 units = {[''] = 1}
 units.s = units['']

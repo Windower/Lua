@@ -60,6 +60,11 @@ data.outgoing[0x0E7] = {name='Logout',              description='A request to lo
 data.outgoing[0x0E8] = {name='Toggle Heal',         description='This command is used to both heal and cancel healing.'}
 data.outgoing[0x0F1] = {name='Cancel',              description='Sent when canceling a buff.'}
 data.outgoing[0x0F4] = {name='Widescan',            description='This command asks the server for a widescan.'}
+data.outgoing[0x0FA] = {name='Place/Move Furniture',description='Sends new position for your furniture.'}
+data.outgoing[0x0FB] = {name='Remove Furniture',    description='Informs the server you have removed some furniture.'}
+data.outgoing[0x0FC] = {name='Plant Flowerpot',     description='Plants a seed in a flowerpot.'}
+data.outgoing[0x0FD] = {name='Examine Flowerpot',   description='Sent when you examine a flowerpot.'}
+data.outgoing[0x0FE] = {name='Uproot Flowerpot',    description='Uproots a flowerpot.'}
 data.outgoing[0x100] = {name='Job Change',          description='Sent when initiating a job change.'}
 data.outgoing[0x102] = {name='Untraditional Equip', description='Sent when equipping a pseudo-item like an Automaton Attachment, Instinct, or Blue Magic Spell.'}
 data.outgoing[0x104] = {name='Leave Bazaar',        description='Sent when client leaves a bazaar.'}
@@ -72,6 +77,7 @@ data.outgoing[0x10C] = {name='Start RoE Quest',     description='Sent to underta
 data.outgoing[0x10D] = {name='Cancel RoE Quest',    description='Sent to cancel a Records of Eminence Quest.'}
 data.outgoing[0x10F] = {name='Currency Menu',       description='Requests currency information for the menu.'}
 data.outgoing[0x110] = {name='Fishing Action',      description='Sent when casting, releasing a fish, catching a fish, and putting away your fishing rod.'}
+data.outgoing[0x111] = {name='Lockstyle',           description='Sent when using the lockstyle command to lock or unlock.'}
 
 -- Server packets (incoming)
 data.incoming[0x009] = {name='Standard Message',    description='A standardized message send from FFXI.'}
@@ -122,10 +128,11 @@ data.incoming[0x057] = {name='Weather Change',      description='Updates the wea
 data.incoming[0x058] = {name='Lock Target',         description='Locks your target.'}
 data.incoming[0x05A] = {name='Server Emote',        description='This packet is the server\'s response to a client /emote p.'}
 data.incoming[0x05B] = {name='Spawn',               description='Server packet sent when a new mob spawns in area.'}
-data.incoming[0x05E] = {name='Stop Download',       description='Final packet in a DataDld transmission. May be the only packet in a DataDld sequence.'}
+data.incoming[0x05E] = {name='Camp./Besieged Map',  description='Contains information about Campaign and Besieged status.'}
 data.incoming[0x061] = {name='Char Stats',          description='Packet contains a lot of data about your character\'s stats.'}
 data.incoming[0x062] = {name='Skills Update',       description='Packet that shows your weapon and magic skill stats.'}
 data.incoming[0x063] = {name='Set Update',          description='Frequently sent packet during battle that updates specific types of job information, like currently available/set automaton equipment and currently set BLU spells.'}
+data.incoming[0x065] = {name='Repositioning',       description='Moves your character. Seems to be functionally idential to the Spawn packet'}
 data.incoming[0x067] = {name='Pet Info',            description='Updates information about whether or not you have a pet and the TP, HP, etc. of the pet if appropriate.'}
 data.incoming[0x06F] = {name='Synth Result',        description='Results of an attempted synthesis process.'}
 data.incoming[0x071] = {name='Campaign Map Info',   description='Populates the Campaign map.'}
@@ -146,6 +153,7 @@ data.incoming[0x0E2] = {name='Char Info',           description='Sends name, HP,
 data.incoming[0x0F4] = {name='Widescan Mob',        description='Displays one monster.'}
 data.incoming[0x0F6] = {name='Widescan Mark',       description='Marks the start and ending of a widescan list.'}
 data.incoming[0x0F9] = {name='Reraise Activation',  description='Reassigns targetable status on reraise activation?'}
+data.incoming[0x0FA] = {name='Furniture Interact',  description='Confirms furniture manipulation.'}
 data.incoming[0x105] = {name='Data Download 4',     description='The data that is sent to the client when it is "Downloading data...".'}
 data.incoming[0x106] = {name='Bazaar Seller Info',  description='Information on the purchase sent to the buyer when they attempt to buy something.'}
 data.incoming[0x108] = {name='Data Download 5',     description='The data that is sent to the client when it is "Downloading data...".'}

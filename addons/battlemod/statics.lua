@@ -216,6 +216,16 @@ default_filters = [[
             <casting>false</casting>
             <all>false</all>
         </my_pet>
+        <my_fellow> <!-- Your adventuring fellow is doing something -->
+            <melee>false</melee>
+            <ranged>false</ranged>
+            <damage>false</damage>
+            <healing>false</healing>
+            <misses>false</misses>
+            <readies>false</readies>
+            <casting>false</casting>
+            <all>false</all>
+        </my_fellow>
         <other_pets> <!-- Someone else's pet is doing something -->
             <melee>false</melee>
             <ranged>false</ranged>
@@ -226,8 +236,7 @@ default_filters = [[
             <casting>false</casting>
             <all>false</all>
         </other_pets>
-        
-        
+
         <monsters> <!-- Monster is doing something with one of the below targets -->
             <me> <!-- He's targeting you! -->
                 <melee>false</melee>
@@ -279,6 +288,16 @@ default_filters = [[
                 <casting>false</casting>
                 <all>false</all>
             </my_pet>
+            <my_fellow> <!-- He's targeting your adventuring fellow -->
+                <melee>false</melee>
+                <ranged>false</ranged>
+                <damage>false</damage>
+                <healing>false</healing>
+                <misses>false</misses>
+                <readies>false</readies>
+                <casting>false</casting>
+                <all>false</all>
+            </my_fellow>
             <other_pets> <!-- He's targeting someone else's pet -->
                 <melee>false</melee>
                 <ranged>false</ranged>
@@ -289,7 +308,6 @@ default_filters = [[
                 <casting>false</casting>
                 <all>false</all>
             </other_pets>
-            
             <monsters> <!-- He's targeting himself or another monster -->
                 <melee>false</melee>
                 <ranged>false</ranged>
@@ -310,6 +328,7 @@ party={melee=false,ranged=false,damage=false,healing=false,misses=false,items=fa
 alliance={melee=false,ranged=false,damage=false,healing=false,misses=false,items=false,uses=false,readies=false,casting=false,all=false,target=false},
 others={melee=false,ranged=false,damage=false,healing=false,misses=false,items=false,uses=false,readies=false,casting=false,all=false,target=false},
 my_pet={melee=false,ranged=false,damage=false,healing=false,misses=false,readies=false,casting=false,all=false,target=false},
+my_fellow={melee=false,ranged=false,damage=false,healing=false,misses=false,readies=false,casting=false,all=false,target=false},
 other_pets={melee=false,ranged=false,damage=false,healing=false,misses=false,readies=false,casting=false,all=false,target=false},
 monsters = {
 me={melee=false,ranged=false,damage=false,healing=false,misses=false,readies=false,casting=false,all=false},
@@ -317,6 +336,7 @@ party={melee=false,ranged=false,damage=false,healing=false,misses=false,readies=
 alliance={melee=false,ranged=false,damage=false,healing=false,misses=false,readies=false,casting=false,all=false},
 others={melee=false,ranged=false,damage=false,healing=false,misses=false,readies=false,casting=false,all=false},
 my_pet={melee=false,ranged=false,damage=false,healing=false,misses=false,readies=false,casting=false,all=false},
+my_fellow={melee=false,ranged=false,damage=false,healing=false,misses=false,readies=false,casting=false,all=false},
 other_pets={melee=false,ranged=false,damage=false,healing=false,misses=false,readies=false,casting=false,all=false},
 monsters={melee=false,ranged=false,damage=false,healing=false,misses=false,readies=false,casting=false,all=false}} }
 

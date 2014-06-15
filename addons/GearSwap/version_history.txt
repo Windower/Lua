@@ -1,4 +1,16 @@
 -------------------------------------------------
+GearSwap 0.865 - Replicated part of the LuaCore API in GearSwap and set limits on global variable refresh rates.
+-------------------------------------------------
+GearSwap 0.860 - Reworked the augment system to use the extdata library. Consequently enabled evolith support.
+-------------------------------------------------
+GearSwap 0.851 - Added Load command and file path support for a libs folder.
+-------------------------------------------------
+GearSwap 0.850 - Japanese support.
+-------------------------------------------------
+GearSwap 0.840 - Overhaul for Wardrobe. Preparations for new augment library.
+-------------------------------------------------
+GearSwap 0.837 - Created infrastructure for GearSwap served information and added Indi spell aura information to player.
+-------------------------------------------------
 GearSwap 0.836 - Added augments to the export feature for currently equipped sets and inventory.
 -------------------------------------------------
 GearSwap 0.835 - Adaptation for new resources.

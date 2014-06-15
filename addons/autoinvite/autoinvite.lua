@@ -111,7 +111,7 @@ function try_invite(player)
         return
     end
 
-    local status = windower.ffxi.get_player().status
+    local status = res.statuses[windower.ffxi.get_player().status].english
     if statusblock:contains(status) then
         notice(player.. 'cannot be invited - you cannot send an invite at this time (' .. status .. ').')
         if settings.tell_back == 'on' then

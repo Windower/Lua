@@ -49,13 +49,13 @@ function equip_sets(swap_type,ts,...)
     _global.current_event = tostring(swap_type)
     
     if debugging >= 1 then windower.debug(tostring(swap_type)..' enter') 
-    if showphase or debugging >= 2 then windower.add_to_chat(8,tostring(swap_type)..' enter') end end
+    if showphase or debugging >= 2 then windower.add_to_chat(8,windower.to_shift_jis(tostring(swap_type))..' enter') end end
     
-    local cur_equip = get_gs_gear(items.equipment,swap_type)
-    
+    local cur_equip = get_gs_gear(convert_equipment(items.equipment),swap_type)
+        
     table.reassign(equip_order,default_equip_order)
     table.reassign(equip_list,{})
-    table.reassign(player.equipment,to_names_set(cur_equip,items.inventory))
+    table.reassign(player.equipment,to_names_set(cur_equip))
     for i,v in pairs(slot_map) do
         if not player.equipment[i] then
             player.equipment[i] = player.equipment[default_slot_map[v]]
@@ -78,7 +78,11 @@ function equip_sets(swap_type,ts,...)
         end
     end
     
-    debug_mode_chat("Entering "..swap_type)
+    if type(swap_type) == 'string' then
+        debug_mode_chat("Entering "..swap_type)
+    else
+        debug_mode_chat("Entering User Event "..tostring(swap_type))
+    end
     
     if not val1 then val1 = {}
         if debugging >= 2 then
@@ -114,16 +118,22 @@ function equip_sets(swap_type,ts,...)
         -- if there's no swapping to be done because the user is a monster.
         
         for i,v in pairs(short_slot_map) do
-            if equip_list[i] and (disable_table[v] or encumbrance_table[v]) then
+            if equip_list[i] and encumbrance_table[v] then
                 not_sent_out_equip[i] = equip_list[i]
+                equip_list[i] = nil
+                debug_mode_chat(i..' slot was not equipped because you are encumbered.')
             end
         end
+--        if type(swap_type) == 'string' then print_set(equip_list,'Equip List') end
         
-        local equip_next = to_id_set(items.inventory,equip_list) -- Translates the equip_list from the player (i=slot name, v=item name) into a table with i=slot id and v=inventory id.
+--        if type(swap_type) == 'string' then print_set(equip_list,tostring(swap_type)..' before') end
+        local equip_next = to_id_set(equip_list) -- Translates the equip_list from the player (i=slot name, v=item name) into a table with i=slot id and v={inv_id=0 or 8, slot=inventory slot}.
+--        if type(swap_type) == 'string' then print_set(equip_next,'Equip Next') end
         equip_next = eliminate_redundant(cur_equip,equip_next) -- Eliminate the equip commands for items that are already equipped
+--        if type(swap_type) == 'string' then print_set(equip_next,'Equip Next 2') end
         
         if (_settings.show_swaps and table.length(equip_next) > 0) or _settings.demo_mode then --and table.length(equip_next)>0 then
-            local tempset = to_names_set(equip_next,items.inventory)
+            local tempset = to_names_set(equip_next)
             print_set(tempset,tostring(swap_type))
         end
         
@@ -143,16 +153,38 @@ function equip_sets(swap_type,ts,...)
             for _,i in ipairs(equip_order) do
                 if debugging >= 3 and equip_next[i] then
                     local out_str = 'Order: '..tostring(_)..'  Slot ID: '..tostring(i)..'  Inv. ID: '..tostring(equip_next[i])
-                    if equip_next[i] ~= 0 then
+                    if equip_next[i].slot ~= empty then
                         out_str = out_str..'  Item: '..tostring(res.items[items.inventory[equip_next[i]].id][language..'_log'])
                     else
                         out_str = out_str..'  Emptying slot'
                     end
                     windower.add_to_chat(8,'GearSwap (Debugging): '..out_str)
-                elseif equip_next[i] and not disable_table[i] and not encumbrance_table[i] then
+                elseif equip_next[i] and not encumbrance_table[i] then
                     windower.debug('attempting to set gear. Order: '..tostring(_)..'  Slot ID: '..tostring(i)..'  Inv. ID: '..tostring(equip_next[i]))
-                    if not _settings.demo_mode then windower.ffxi.set_equip(equip_next[i],i) end
-                    sent_out_equip[i] = equip_next[i] -- re-make the equip_next table with the name sent_out_equip as the equipment is sent out.
+                    if not _settings.demo_mode then
+                        local equipment_slot_name = to_windower_api(res.slots[i].english)
+                        
+                        local next_bag = to_windower_api(res.bags[equip_next[i].inv_id].english)
+                        local current_bag = to_windower_api(res.bags[items.equipment[equipment_slot_name..'_bag']].english)
+                        
+                        local next_inventory_slot = equip_next[i].slot
+                        local current_inventory_slot = items.equipment[equipment_slot_name]
+                        
+                        items[current_bag][current_inventory_slot].status = 0
+                        
+                        if equip_next[i].slot ~= empty then
+                            windower.packets.inject_outgoing(0x50,string.char(0x50,0x04,0,0,equip_next[i].slot,i,equip_next[i].inv_id,0))
+                            
+                            items.equipment[equipment_slot_name] = next_inventory_slot
+                            items.equipment[equipment_slot_name..'_bag'] = equip_next[i].inv_id
+                            items[next_bag][next_inventory_slot].status = 5
+                        else
+                            windower.packets.inject_outgoing(0x50,string.char(0x50,0x04,0,0,0,i,0,0))
+                            items.equipment[equipment_slot_name] = 0
+                            items.equipment[equipment_slot_name..'_bag'] = 0
+                        end
+                        --windower.ffxi.set_equip(equip_next[i].slot,i,equip_next[i].inv_id)
+                    end
                 end
             end
         elseif logging then
@@ -187,7 +219,48 @@ function equip_sets_exit(swap_type,ts,val1)
     end
     if type(swap_type) == 'string' then
         if swap_type == 'pretarget' then
-            command_send_check(ts)
+            
+            if command_registry[ts].cancel_spell then
+                debug_mode_chat("Action canceled ("..storedcommand..' '..spell.target.raw..")")
+                storedcommand = nil
+                command_registry[ts] = nil
+                return true
+            elseif not ts or not command_registry[ts] or not storedcommand then
+                debug_mode_chat('This case should not be hittable - 1')
+                return true
+            end
+            
+            
+            command_registry[ts].spell = val1
+            if val1.target and val1.target.id and val1.target.index and val1.prefix and unify_prefix[val1.prefix] then
+                if val1.prefix == '/item' then
+                    -- Item use packet handling here
+                    if val1.target.id == player.id then
+                        --0x37 packet
+                        command_registry[ts].proposed_packet = assemble_use_item_packet(val1.target.id,val1.target.index,val1.id)
+                    else
+                        --0x36 packet
+                        command_registry[ts].proposed_packet = assemble_menu_item_packet(val1.target.id,val1.target.index,val1.id)
+                    end
+                    if not command_registry[ts].proposed_packet then
+                        command_registry[ts] = nil
+                    end
+                elseif outgoing_action_category_table[unify_prefix[val1.prefix]] then
+                    if filter_precast(val1) then
+                        command_registry[ts].proposed_packet = assemble_action_packet(val1.target.id,val1.target.index,outgoing_action_category_table[unify_prefix[val1.prefix]],val1.id)
+                        if not command_registry[ts].proposed_packet then
+                            command_registry[ts] = nil
+                            
+                            debug_mode_chat("Unable to create a packet for this command because the target is still invalid after pretarget ("..storedcommand..' '..val1.target.raw..")")
+                            storedcommand = nil
+                            return storedcommand..' '..val1.target.raw
+                        end
+                    end
+                else
+                    windower.add_to_chat(8,"GearSwap: Hark, what weird prefix through yonder window breaks? "..tostring(spell.prefix))
+                end
+            end
+            
             if ts and command_registry[ts] and val1.target then
                 if st_targs[val1.target.raw] then
                 -- st targets
@@ -195,6 +268,10 @@ function equip_sets_exit(swap_type,ts,val1)
                 elseif not val1.target.name then
                 -- Spells with invalid pass_through_targs, like using <t> without a target
                     command_registry[ts] = nil
+                    debug_mode_chat("Change target was used to pick an invalid target ("..storedcommand..' '..spell.target.raw..")")
+                    local ret = storedcommand..' '..spell.target.raw
+                    storedcommand = nil
+                    return ret
                 else
                 -- Spells with complete target information
                 -- command_registry[ts] is deleted for cancelled spells
@@ -206,16 +283,11 @@ function equip_sets_exit(swap_type,ts,val1)
                     end
                     return true
                 end
-            end
-            if storedcommand then -- Stored commands are deleted for canceled spells
-                local tempcmd = storedcommand..' '..spell.target.raw
-                storedcommand = nil
-                
-                debug_mode_chat("Unable to create a packet for this command or action canceled ("..tempcmd..")")
-                return tempcmd
             elseif not ts or not command_registry[ts] then
+                debug_mode_chat('This case should not be hittable - 2')
                 return true
             end
+
         elseif swap_type == 'precast' then
             return precast_send_check(ts)
         elseif swap_type == 'filtered_action' and command_registry[ts] and command_registry[ts].cancel_spell then
@@ -260,52 +332,7 @@ function user_pcall(str,...)
             bool,err = pcall(user_env[str],...)
             if not bool then error('\nGearSwap has detected an error in the user function '..str..':\n'..err) end
         elseif user_env[str] then
-            windower.add_to_chat(123,'GearSwap: '..str..'() exists but is not a function')
-        end
-    end
-end
-
-
-
------------------------------------------------------------------------------------
---Name: command_send_check(ts)
---Desc: Check at the end of pretarget to see whether or not the command should be sent.
---Args:
----- ts - command_registry index of the current spell
------------------------------------------------------------------------------------
---Returns:
----- string - gets propagated back to the outgoing_text function
------------------------------------------------------------------------------------
-function command_send_check(ts)
-    if command_registry[ts].cancel_spell then
-        storedcommand = nil
-        command_registry[ts] = nil
-    else
-        command_registry[ts].spell = spell
-        if spell.target and spell.target.id and spell.target.index and spell.prefix and unify_prefix[spell.prefix] then
-            if spell.prefix == '/item' then
-                -- Item use packet handling here
-                if spell.target.id == player.id then
-                    --0x37 packet
-                    command_registry[ts].proposed_packet = assemble_use_item_packet(spell.target.id,spell.target.index,spell.id)
-                else
-                    --0x36 packet
-                    test_packet = assemble_menu_item_packet(spell.target.id,spell.target.index,spell.id)
-                    command_registry[ts].proposed_packet = test_packet
-                end
-                if not command_registry[ts].proposed_packet then
-                    command_registry[ts] = nil
-                end
-            elseif outgoing_action_category_table[unify_prefix[spell.prefix]] then
-                if filter_precast(spell) then
-                    command_registry[ts].proposed_packet = assemble_action_packet(spell.target.id,spell.target.index,outgoing_action_category_table[unify_prefix[spell.prefix]],spell.id)
-                    if not command_registry[ts].proposed_packet then
-                        command_registry[ts] = nil
-                    end
-                end
-            else
-                windower.add_to_chat(8,"GearSwap: Hark, what weird prefix through yonder window breaks? "..tostring(spell.prefix))
-            end
+            windower.add_to_chat(123,'GearSwap: '..windower.to_shift_jis(tostring(str))..'() exists but is not a function')
         end
     end
 end
@@ -431,11 +458,23 @@ windower.register_event('outgoing chunk',function(id,original,modified,injected,
         local target_index = get_bit_packed(original,64,80)
         local category = get_bit_packed(original,80,96)
         local target_id = windower.ffxi.get_mob_by_index(target_index).id
-        if category == 12 and cued_packet and command_registry[cued_packet] and command_registry[cued_packet].proposed_packet and target_id == player.id then
+        if category == 12 and cued_packet and target_id == player.id then -- and command_registry[cued_packet] and command_registry[cued_packet].proposed_packet
             cued_packet = nil
             return true
         end
-    elseif id == 0x1A and injected and clocking then
-        windower.add_to_chat(8,'Injection time: '..(os.clock()-out_time))
+    elseif id == 0x100 then
+    -- Scrub the equipment array if a valid outgoing job change packet is sent.
+        local newmain = modified:byte(5)
+        if res.jobs[newmain] and newmain ~= player.main_job_id then
+            for id,name in pairs(default_slot_map) do
+                if items.equipment[name..'_bag'] then
+                    local slot = items.equipment[name]
+                    local bag = to_windower_api(res.bags[items.equipment[name..'_bag']].english)
+                    items[bag][slot].status = 0
+                    items.equipment[name] = 0
+                    items.equipment[name..'_bag'] = 0
+                end
+            end
+        end
     end
 end)

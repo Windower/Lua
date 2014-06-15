@@ -1,5 +1,5 @@
 --[[
-plasmon v1.20131021
+plasmon v1.20140530
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -33,7 +33,7 @@ config = require('config')
 
 _addon.name    = 'plasmon'
 _addon.author  = 'Zohno'
-_addon.version = '1.20131021'
+_addon.version = '1.20140530'
 _addon.command = 'plasmon'
 
 tb_name       = 'addon:gr:plasmon'
@@ -267,7 +267,7 @@ function initialize()
     windower.text.set_text(tb_name, '')
     windower.text.set_bg_visibility(tb_name, true)
 
-    if windower.ffxi.get_info().zone == 271 then
+    if windower.ffxi.get_info().zone == 271 or windower.ffxi.get_info().zone == 264 then
         recovery_mode = true
     end
 end
@@ -370,8 +370,16 @@ windower.register_event('incoming text', function(original, modified, mode)
         end
     elseif mode > 20 then
     --mode == 148 or mode == 151 then
+        --old zones
         match = original:match('Now permeating the mists surrounding the fracture%.')
+        if match then
+            start_tracking()
 
+            return modified, mode
+        end
+
+        --new zones
+        match = original:match('Now permeating the mists surrounding the obscured domain%.')
         if match then
             start_tracking()
 

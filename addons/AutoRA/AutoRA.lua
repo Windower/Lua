@@ -41,25 +41,27 @@ windower.register_event('load',function ()
 end)
 	
 function start()
+	windower.add_to_chat(100, 'AutoRA  STARTING~~~~~~~~~~~~~~')	
 	player = windower.ffxi.get_player()
-	if (player.status:lower() == 'engaged' ) then
+	if player.status == 1 then
 		auto = 1
-	elseif (player.status:lower() == 'idle' ) then
+	elseif player.status == 0 then
 		auto = 0
 	end
 	shoot()
 end
 
 function stop()
+	windower.add_to_chat(100, 'AutoRA  STOPPING ~~~~~~~~~~~~~~')	
 	auto = 0
 end
 
 function shoot()
-	windower.send_command('/shoot <t>')
+	windower.send_command('input /shoot <t>')
 end
 
 function shootOnce()
-	windower.send_command('/shoot <t>')
+	windower.send_command('input /shoot <t>')
 end
 
 --Function Author:  Byrth
@@ -92,15 +94,15 @@ windower.register_event('action',function (act)
 	if ((actor == (player.id or player.index))) then
 		if category == 2 then
 			if auto == 1 then
-				if (player.status:lower() == 'engaged' ) then
+				if  player.status == 1 then
 					auto = 1
-				elseif (player.status:lower() == 'idle' ) then
+				elseif  player.status == 0 then
 					auto = 0
 				end
 			end
 			
 			if auto == 1 then
-				windower.send_command('wait 2; /shoot <t>')
+				windower.send_command('@wait 1.5;input /shoot <t>')
 			elseif auto == 0 then
 			end
 		end

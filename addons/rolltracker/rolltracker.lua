@@ -25,12 +25,11 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'RollTracker'
-_addon.version = '1.2'
+_addon.version = '1.2.0.1'
 _addon.author = 'Balloon'
 _addon.command = 'rolltracker'
 
-require('tables')
-config = require('config')
+require('luau')
 chat = require('chat')
 chars = require('chat.chars')
 
@@ -62,72 +61,79 @@ windower.register_event('addon command',function (...)
     end
 end)
 
-windower.register_event('load',function ()
-    buffId = { 309, 310, 311,312, 313, 314, 315, 316, 317, 318, 319, 320, 321, 322, 323, 324, 325, 326, 327, 328, 329, 330, 331, 332, 333, 334, 335, 336, 337, 338} 
-    partyColour={['p0']=string.char(0x1E, 247),['p1']=string.char(0x1F, 204),['p2']=string.char(0x1E, 156),['p3']=string.char(0x1E,238),['p4']=string.char(0x1E,5),['p5']=string.char(0x1E,6)}
-    rollInfo={
-                [105]={"Chaos",6,8,9,25,11,13,16,3,17,19,31,"-4", '% Attack!', 4},
-                [98]={"Fighter's",2,2,3,4,12,5,6,7,1,9,18,'-4','% Double-Attack!', 5},
-                [101]={"Wizard's",2,3,4,4,10,5,6,7,1,7,12, "-4", ' MAB', 5},
-                [112]={"Evoker's",1,1,1,1,3,2,2,2,1,3,4,'-1', ' Refresh!',5},
-                [103]={"Rogue's",2,2,3,4,12,5,6,6,1,8,19,'-6', '% Critical Hit Rate!', 5},
-                [114]={"Corsair's",10, 11, 11, 12, 20, 13, 15, 16, 8, 17, 24, '-6', '% Experience Bonus',5},
-                [108]={"Hunter's",10,13,15,40,18,20,25,5,27,30,50,'-?', ' Accuracy Bonus',4},
-                [113]={"Magus's",5,20,6,8,9,3,10,13,14,15,25,'-8',' Magic Defense Bonus',2},
-                [100]={"Healer's",3,4,12,5,6,7,1,8,9,10,16,'-4','% Cure Potency',3},
-                [111]={"Drachen",10,13,15,40,18,20,25,5,28,30,50,'-8',' Pet: Accuracy Bonus',4},
-                [107]={"Choral",8,42,11,15,19,4,23,27,31,35,50,'+25', '- Spell Interruption Rate',2},
-                [99]={"Monk's",8,10,32,12,14,15,4,20,22,24,40,'-?', ' Subtle Blow', 3},
-                [106]={"Beast",6,8,9,25,11,13,16,3,17,19,31,'-10', '% Pet: Attack Bonus',4},
-                [109]={"Samurai",7,32,10,12,14,4,16,20,22,24,40,'-10',' Store TP Bonus',2},
-                [102]={"Warlock's",2,3,4,12,15,6,7,1,8,9,15,'-5',' Magic Accuracy Bonus',4},
-                [115]={"Puppet",4,5,18,7,9,10,2,11,13,15,22,'-8',' Pet: Magic Attack Bonus',3},
-                [104]={"Gallant's",4,5,15,6,7,8,3,9,10,11,20,'-10','% Defense Bonus', 3},
-                [116]={"Dancer's",3,4,12,5,6,7,1,8,9,10,16,'-4',' Regen',3},
-                [118]={"Bolter's",2,3,12,4,6,7,8,9,5,10,25,'-8','% Movement Speed',3},
-                [119]={"Caster's",6,15,7,8,9,10,5,11,12,13,20,'-10','% Fast Cast',2},
-                [122]={"Tactician's",2,2,2,2,4,2,2,1,3,3,5,'-1',' Regain',5},
-                [303]={"Miser's",3,5,7,9,20,11,2,13,15,17,25,'0',' Save TP',5},
-                [110]={"Ninja",4,5,5,14,6,7,9,2,10,11,18,'-10',' Evasion Bonus',4},
-                [117]={"Scholar's",'?','?','?','?','?','?','?','?','?','?','?','?',' Conserve MP',2},
-                [302]={"Allies'",6,7,17,9,11,13,15,17,17,5,17,'?','% Skillchain Damage',3},
-                [304]={"Companion's",'4HP +2TP','20HP +5TP','6HP +2TP','8HP +2TP','10HP +3TP','12HP +3TP','14HP +3TP','16HP +4TP','18HP +4TP','3HP +1TP','25HP +6TP','-',' Pet: Regen and Regain',2},
-                [305]={"Avenger's",'?','?','?','?','?','?','?','?','?','?','?','?',' Counter Rate',4},
-                [121]={"Blitzer's",2,3.4,4.5,11.3,5.3,6.4,7.2,8.3,1.5,10.2,12.1,'-?', '% Attack delay reduction',4},
-                [120]={"Courser's",'?','?','?','?','?','?','?','?','?','?','?','?',' Snapshot',3}
-                }
-                
+windower.register_event('load', function()
+    buffId = S{res.buffs:with('english', 'Bust').id} + S(res.buffs:english(string.endswith-{' Roll'})):map(table.get-{'id'})
+    partyColour = {
+        p0 = string.char(0x1E, 247),
+        p1 = string.char(0x1F, 204),
+        p2 = string.char(0x1E, 156),
+        p3 = string.char(0x1E, 238),
+        p4 = string.char(0x1E, 5),
+        p5 = string.char(0x1E, 6)
+    }
+    local rollInfoTemp = {
+        ['Chaos'] = {6,8,9,25,11,13,16,3,17,19,31,"-4", '% Attack!', 4},
+        ['Fighter\'s'] = {2,2,3,4,12,5,6,7,1,9,18,'-4','% Double-Attack!', 5},
+        ['Wizard\'s'] = {2,3,4,4,10,5,6,7,1,7,12, "-4", ' MAB', 5},
+        ['Evoker\'s'] = {1,1,1,1,3,2,2,2,1,3,4,'-1', ' Refresh!',5},
+        ['Rogue\'s'] = {2,2,3,4,12,5,6,6,1,8,19,'-6', '% Critical Hit Rate!', 5},
+        ['Corsair\'s'] = {10, 11, 11, 12, 20, 13, 15, 16, 8, 17, 24, '-6', '% Experience Bonus',5},
+        ['Hunter\'s'] = {10,13,15,40,18,20,25,5,27,30,50,'-?', ' Accuracy Bonus',4},
+        ['Magus\'s'] = {5,20,6,8,9,3,10,13,14,15,25,'-8',' Magic Defense Bonus',2},
+        ['Healer\'s'] = {3,4,12,5,6,7,1,8,9,10,16,'-4','% Cure Potency',3},
+        ['Drachen'] = {10,13,15,40,18,20,25,5,28,30,50,'-8',' Pet: Accuracy Bonus',4},
+        ['Choral'] = {8,42,11,15,19,4,23,27,31,35,50,'+25', '- Spell Interruption Rate',2},
+        ['Monk\'s'] = {8,10,32,12,14,15,4,20,22,24,40,'-?', ' Subtle Blow', 3},
+        ['Beast'] = {6,8,9,25,11,13,16,3,17,19,31,'-10', '% Pet: Attack Bonus',4},
+        ['Samurai'] = {7,32,10,12,14,4,16,20,22,24,40,'-10',' Store TP Bonus',2},
+        ['Warlock\'s'] = {2,3,4,12,15,6,7,1,8,9,15,'-5',' Magic Accuracy Bonus',4},
+        ['Puppet'] = {4,5,18,7,9,10,2,11,13,15,22,'-8',' Pet: Magic Attack Bonus',3},
+        ['Gallant\'s'] = {4,5,15,6,7,8,3,9,10,11,20,'-10','% Defense Bonus', 3},
+        ['Dancer\'s'] = {3,4,12,5,6,7,1,8,9,10,16,'-4',' Regen',3},
+        ['Bolter\'s'] = {2,3,12,4,6,7,8,9,5,10,25,'-8','% Movement Speed',3},
+        ['Caster\'s'] = {6,15,7,8,9,10,5,11,12,13,20,'-10','% Fast Cast',2},
+        ['Tactician\'s'] = {2,2,2,2,4,2,2,1,3,3,5,'-1',' Regain',5},
+        ['Miser\'s'] = {3,5,7,9,20,11,2,13,15,17,25,'0',' Save TP',5},
+        ['Ninja'] = {4,5,5,14,6,7,9,2,10,11,18,'-10',' Evasion Bonus',4},
+        ['Scholar\'s'] = {'?','?','?','?','?','?','?','?','?','?','?','?',' Conserve MP',2},
+        ['Allies\''] = {6,7,17,9,11,13,15,17,17,5,17,'?','% Skillchain Damage',3},
+        ['Companion\'s'] = {'4HP +2TP','20HP +5TP','6HP +2TP','8HP +2TP','10HP +3TP','12HP +3TP','14HP +3TP','16HP +4TP','18HP +4TP','3HP +1TP','25HP +6TP','-',' Pet: Regen and Regain',2},
+        ['Avenger\'s'] = {'?','?','?','?','?','?','?','?','?','?','?','?',' Counter Rate',4},
+        ['Blitzer\'s'] = {2,3.4,4.5,11.3,5.3,6.4,7.2,8.3,1.5,10.2,12.1,'-?', '% Attack delay reduction',4},
+        ['Courser\'s'] = {'?','?','?','?','?','?','?','?','?','?','?','?',' Snapshot',3}
+    }
+
+    rollInfo = {}
+    for key, val in pairs(rollInfoTemp) do
+        rollInfo[res.job_abilities:with('english', key .. ' Roll').id] = {key, unpack(val)}
+    end
+    
     settings = config.load(defaults)
     --Wanted to change this to true/false in config file, but it wouldn't update to everyone -- This is an inelegant solution.
-    override = settings['autostop'] == 1 and true or false
-                
-    if windower.ffxi.get_info()['logged_in'] then
-        initialize()
-    end
+    override = settings.autostop == 1 and true or false
 end)
 
-windower.register_event('login',function ()
-    initialize()
-end)
-
-function initialize()
+windower.register_event('load', 'login', function()
     isLucky = false
     player = windower.ffxi.get_player()
-end
+end)
 
-windower.register_event('incoming text',function (old, new, color)
+windower.register_event('incoming text', function(old, new, color)
     --Hides Battlemod
     if old:match("Roll.* The total.*") or old:match('.*Roll.*' .. string.char(0x81, 0xA8)) or old:match('.*uses Double.*The total') and color ~= 123 then
         return true
     end
+
     --Hides normal
     if old:match('.* receives the effect of .* Roll.') ~= nil then
         return true
     end
+
     --Hides Older Battlemod versions --Antiquated
     if old:match('%('..'%w+'..'%).* Roll ') then
         new = old
     end
+
     return new, color
 end)
 
@@ -200,16 +206,10 @@ windower.register_event('outgoing text', function(original, modified)
         if settings.fold == 1 and original:match('/jobability \"Fold') then
             local count = 0
             local canBust = false
+
             --Check to see how many buffs are active
-            for _, buff in pairs(player.buffs) do
-                if table.contains(buffId, buff) then
-                    --Then check to see if 'bust'(309) or if there's enough rolls.
-                    count = count+1
-                    if buff == 309 or count == 2 then
-                        canBust = true
-                    end
-                end
-            end
+            local cor_buffs = S(player.buffs) * buffId
+            canBust = cor_buffs:contains(res.buffs:with('name', 'Bust').id) or cor_buffs:length() > 1
 
             if canBust or ranMultiple then
                 modified = original

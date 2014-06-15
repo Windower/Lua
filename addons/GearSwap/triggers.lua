@@ -41,76 +41,76 @@
 ---- none or ''
 -----------------------------------------------------------------------------------
 windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
---    windower.add_to_chat(8,modified..'    Blocked: ' ..tostring(blocked)..'     FFXI: '..tostring(ffxi))
     if debugging >= 1 then windower.debug('outgoing text (debugging)') end
     if gearswap_disabled then return modified end
     
-    local temp_mod = windower.convert_auto_trans(modified):gsub(' <wait %d+>','')
-    local splitline = temp_mod:split(' ')
-    local remove_array = {}
-    for i,v in pairs(splitline) do
-        if v == '' then
-            remove_array[i] = true
-        end
-    end
-    for i,v in pairs(remove_array) do
-        table.remove(splitline,i)
-        splitline.n = splitline.n-1
-    end
+    local splitline = windower.from_shift_jis(windower.convert_auto_trans(modified)):gsub(' <wait %d+>',''):gsub('"(.-)"',function(str)
+            return str:gsub(' ',string.char(7))
+        end):split(' '):filter(function(val)
+            if val ~= '' then
+                return true
+            end
+        end)
+    
     if splitline.n == 0 then return end
 
     local command = splitline[1]
-    
-    local a,b,abil = string.find(temp_mod,'"(.-)"')
-    if abil then
-        abil = abil:lower()
-    elseif splitline.n == 3 then
-        abil = splitline[2]:lower()
+    local unified_prefix = unify_prefix[command]
+    local abil,temptarg, temp_mob_arr
+    if splitline[2] then
+        abil = splitline[2]:gsub(string.char(7),' '):lower()
     end
     
-    local temptarg,temp_mob_arr = valid_target(splitline[splitline.n])
-    if command_list[command] and temptarg and (validabils[language][unify_prefix[command]][abil] or unify_prefix[command]=='/ra') then
+    if validabils[language][unified_prefix] and validabils[language][unified_prefix][abil] then
+        temptarg, temp_mob_arr = valid_target(splitline[3])
+    elseif validabils[language][unified_prefix] then
+        temptarg, temp_mob_arr = valid_target(splitline[2])
+    end
+    
+    if unified_prefix and temptarg and (validabils[language][unified_prefix][abil] or unified_prefix=='/ra') then
         if st_flag then
             st_flag = nil
             return true
         elseif temp_mob_arr then
             if logging then    logit(logfile,'\n\n'..tostring(os.clock)..'(93) temp_mod: '..temp_mod) end
-            if clocking then out_time = os.clock() end
             refresh_globals()
             
             local r_line
             
-            if command_list[command] == 'Magic' then
-                r_line = res.spells[validabils[language][unify_prefix[command]][abil]]
+            if unified_prefix == '/ma' then
+                r_line = res.spells[validabils[language][unified_prefix][abil]]
                 storedcommand = command..' "'..r_line[language]..'" '
-            elseif command_list[command] == 'Ability' then
-                if unify_prefix[command] == '/ms' and player.species then
+            elseif unified_prefix == '/ms' then
+                if player.species then
                     -- Iterates over currently available monster TP moves instead of using validabils
                     for i,v in pairs(player.species.tp_moves) do
-                        if res.abilities[i+768][language]:lower() == abil then
-                            r_line = res.abilities[i+768]
+                        if res.monster_abilities[i][language]:lower() == abil then
+                            r_line = res.monster_abilities[i]
                             break
                         end
                     end
                 end
-                if not r_line then
-                    r_line = res.abilities[validabils[language][unify_prefix[command]][abil]]
-                end
                 storedcommand = command..' "'..r_line[language]..'" '
-            elseif command_list[command] == 'Item' then
-                r_line = res.items[validabils[language][unify_prefix[command]][abil]]
+            elseif unified_prefix == '/ws' then
+                r_line = res.weapon_skills[validabils[language][unified_prefix][abil]]
+                storedcommand = command..' "'..r_line[language]..'" '
+            elseif unified_prefix == '/ja' then
+                r_line = res.job_abilities[validabils[language][unified_prefix][abil]]
+                storedcommand = command..' "'..r_line[language]..'" '
+            elseif unified_prefix == '/item' then
+                r_line = res.items[validabils[language][unified_prefix][abil]]
                 r_line.prefix = '/item'
                 r_line.type = 'Item'
                 storedcommand = command..' "'..r_line[language]..'" '
-            elseif command_list[command] == 'Ranged Attack' then
-                r_line = res.abilities[1]
+            elseif unified_prefix == '/ra' then
+                r_line = resources_ranged_attack
                 storedcommand = command..' '
             end
             
             r_line.name = r_line[language]
             spell = spell_complete(r_line)
             spell.target = temp_mob_arr
-            spell.action_type = command_list[command]
+            spell.action_type = action_type_map[command]
             
             if filter_pretarget(spell) then
                 if tonumber(splitline[splitline.n]) then
@@ -145,18 +145,9 @@ end)
 ---- none
 -----------------------------------------------------------------------------------
 function inc_action(act)
-    if debugging >= 1 then windower.debug('action') end
     if gearswap_disabled or act.category == 1 then return end
-    
-    local temp_player = windower.ffxi.get_player()
-    local temp_player_mob_table = windower.ffxi.get_mob_by_index(temp_player.index)
-    local player_id = temp_player.id
-    -- Update player info for aftercast costs.
-    player.tp = temp_player.vitals.tp
-    player.mp = temp_player.vitals.mp
-    player.mpp = temp_player.vitals.mpp
-    
-    local temp_pet,pet_id
+        
+    local temp_player_mob_table,temp_pet,pet_id = windower.ffxi.get_mob_by_index(player.index)
     if temp_player_mob_table.pet_index then
         temp_pet = windower.ffxi.get_mob_by_index(temp_player_mob_table.pet_index)
         if temp_pet then
@@ -164,7 +155,7 @@ function inc_action(act)
         end
     end
 
-    if act.actor_id ~= player_id and act.actor_id ~= pet_id then
+    if act.actor_id ~= player.id and act.actor_id ~= pet_id then
         return -- If the action is not being used by the player, the pet, or is a melee attack then abort processing.
     end
     
@@ -176,18 +167,31 @@ function inc_action(act)
     
     spell = get_spell(act)
     if logging then    
-        if spell then logit(logfile,'\n\n'..tostring(os.clock)..'(178) Event Action: '..tostring(spell.english)..' '..tostring(act.category))
+        if spell then logit(logfile,'\n\n'..tostring(os.clock)..'(178) Event Action: '..tostring(spell[language])..' '..tostring(act.category))
         else logit(logfile,'\n\nNil spell detected') end
     end
     
-    if spell and spell.english then
+    if spell and spell[language] then
         spell.target = target_complete(windower.ffxi.get_mob_by_id(act.targets[1].id))
-        spell.action_type = command_list[unify_prefix[spell.prefix or 'Mon']]
+        spell.action_type = action_type_map[unify_prefix[spell.prefix or 'Mon']]
+    elseif S{84,78}:contains(act.targets[1].actions[1].message) then -- "Paralyzed" and "too far away" respectively
+        local ts,tab = delete_command_registry_by_id(act.targets[1].id)
+        if tab and tab.spell and tab.spell.prefix == '/pet' then 
+            equip_sets('pet_aftercast',nil,tab.spell)
+        elseif tab and tab.spell then
+            equip_sets('aftercast',nil,tab.spell)
+        end
+        return
     else
         if debugging >= 1 then windower.send_command('input /echo Incoming Action packet did not generate a spell/aftercast.')end
         return
     end
     
+    --[[4 (action message) = "out of range" when attempting to melee something that's too far away
+       78 (action message) = "too far away" when attempting to engage or cast magic on something that's too far away
+       78 (action) = "too far away" when attempting to WS something that's too far away
+       154 (action message) - "out of range" when attempting to use a JA on something that's too far away. param_1 is the JA ID]]
+       
     -- Paralysis of JAs/spells/etc. and Out of Range messages for avatars both send two action packets when they occur.
     -- The first packet is a paralysis packet that contains the message and spell-appropriate information.
     -- The second packet contains the interruption code and no useful information as far as I can see.
@@ -198,7 +202,6 @@ function inc_action(act)
     -- I do not know if this will affect automatons being interrupted.
     
     ts = find_command_registry_key('spell',spell)
-
     if (jas[act.category] or uses[act.category]) then
         if uses[act.category] and act.param == 28787 then
             spell.action_type = 'Interruption'
@@ -276,7 +279,7 @@ function inc_action_message(arr)
         end
     end
     
-    if unable_to_use:contains(arr.message_id) and arr.actor_id == player.id then
+    if unable_to_use:contains(arr.message_id) then
         if logging then    logit(logfile,'\n\n'..tostring(os.clock)..'(195) Event Action Message: '..tostring(message_id)..' Interrupt') end
         local ts,tab = find_command_registry_by_time('player')
         
@@ -285,11 +288,6 @@ function inc_action_message(arr)
             tab.spell.action_type = 'Interruption'
             refresh_globals()
             equip_sets(prefix..'aftercast',ts,tab.spell)
---        else
---            tab = {}
---            tab.spell = {interrupted=true,action_type='Interruption'}
         end
-    elseif unable_to_use:contains(arr.message_id) and debugging >= 1 then
-        windower.add_to_chat(8,'Handled Action message received with a target other than yourself: '..tostring(res.action_messages[arr.message_id].english)..' '..tostring(windower.ffxi.get_mob_by_id(actor_id).name))
     end
 end

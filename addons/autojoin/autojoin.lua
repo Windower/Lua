@@ -34,40 +34,38 @@ rm_strs = S{'r', 'rm', 'remove', '-'}
 dec_strs = S{'decline', 'autodecline', 'auto-decline'}
 alias_strs = aliases:keyset()
 
--- Currently trying to rejoin
+join = function()
+    local join_packet = packets.new('outgoing', 0x074, {Join = true})
+    return function()
+        local time = 0
+        -- Wait until pool is empty...
+        while not table.empty(windower.ffxi.get_items().treasure) do
+            coroutine.sleep(1)
+            time = time + 1
 
-;(function()
-    local join_packet = packets.outgoing(0x074, {Join = true})
-    local decline_packet = packets.outgoing(0x074, {Join = false})
-    join = function ()
-        if next(windower.ffxi.get_items().treasure) then
-            windower.send_command('@wait 1; lua invoke autojoin join')
-        else
-            packets.inject(join_packet)
+            -- ... but only until the max join time expires
+            if time > 90 then
+                return
+            end
         end
+
+        packets.inject(join_packet)
     end
-    decline = function ()
+end()
+
+decline = function()
+    local decline_packet = packets.new('outgoing', 0x074, {Join = false})
+    return function()
         packets.inject(decline_packet)
     end
-end)()
+end()
 
 -- Invite handler
 windower.register_event('party invite', function(sender)
-    if settings.mode == 'whitelist' and settings.whitelist:contains(sender) then
+    if settings.mode == 'whitelist' and settings.whitelist:contains(sender) or settings.mode == 'blacklist' and not settings.blacklist:contains(sender)then
         join()
-        -- notice('Joining due to ' .. sender .. ' being whitelisted.')
-    elseif settings.mode == 'blacklist' and not settings.blacklist:contains(sender) then
-        join()
-        -- notice('Joining due to ' .. sender .. ' not being blacklisted.')
-    elseif settings.mode == 'whitelist' then
-        -- notice('Not joining due to ' .. sender .. ' not being whitelisted.')
-    elseif settings.mode == 'blacklist' then
-        if settings.autodecline then
-            decline()
-            -- notice('Declined invite due to ' .. sender .. ' being blacklisted.')
-        else
-            -- notice('Not joining due to ' .. sender .. ' being blacklisted.')
-        end
+    elseif settings.mode == 'blacklist' and settings.autodecline then
+        decline()
     end
 end)
 
@@ -183,7 +181,7 @@ windower.register_event('addon command', function(command, ...)
 end)
 
 --[[
-Copyright (c) 2013-2014, Windower
+Copyright © 2013-2014, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

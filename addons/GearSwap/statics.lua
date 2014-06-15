@@ -25,11 +25,14 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 -- Convert the spells and job abilities into a referenceable list of aliases --
-    
+
 unify_prefix = {['/ma'] = '/ma', ['/magic']='/ma',['/jobability'] = '/ja',['/ja']='/ja',['/item']='/item',['/song']='/ma',
-    ['/so']='/ma',['/ninjutsu']='/ma',['/pet']='/pet',['/weaponskill']='/ws',['/ws']='/ws',['/ra']='/ra',['/rangedattack']='/ra',
-    ['/nin']='/ma',['/throw']='/ra',['/range']='/ra',['/shoot']='/ra',['/monsterskill']='/ms',['/ms']='/ms',['/unknown']='/trig',
-    ['/trigger']='/trig',['/echo']='/echo',['/pet']='/ja',['Mon']='Monster '}
+    ['/so']='/ma',['/ninjutsu']='/ma',['/weaponskill']='/ws',['/ws']='/ws',['/ra']='/ra',['/rangedattack']='/ra',['/nin']='/ma',
+    ['/throw']='/ra',['/range']='/ra',['/shoot']='/ra',['/monsterskill']='/ms',['/ms']='/ms',['/pet']='/ja',['Mon']='Monster '}
+
+action_type_map = {['/ja']='Ability',['/jobability']='Ability',['/so']='Magic',['/song']='Magic',['/ma']='Magic',['/magic']='Magic',['/nin']='Magic',['/ninjutsu']='Magic',
+    ['/ra']='Ranged Attack',['/range']='Ranged Attack',['/throw']='Ranged Attack',['/shoot']='Ranged Attack',['/ms']='Ability',['/monsterskill']='Ability',
+    ['/ws']='Ability',['/weaponskill']='Ability',['/item']='Item',['/pet']='Ability',['Monster']='Monster Move'}
     
 validabils = {}
 validabils['english'] = {['/ma'] = {}, ['/ja'] = {}, ['/ws'] = {}, ['/item'] = {}, ['/ra'] = {}, ['/ms'] = {}, ['/pet'] = {}, ['/trig'] = {}, ['/echo'] = {}}
@@ -37,62 +40,50 @@ validabils['french'] = {['/ma'] = {}, ['/ja'] = {}, ['/ws'] = {}, ['/item'] = {}
 validabils['german'] = {['/ma'] = {}, ['/ja'] = {}, ['/ws'] = {}, ['/item'] = {}, ['/ra'] = {}, ['/ms'] = {}, ['/pet'] = {}, ['/trig'] = {}, ['/echo'] = {}}
 validabils['japanese'] = {['/ma'] = {}, ['/ja'] = {}, ['/ws'] = {}, ['/item'] = {}, ['/ra'] = {}, ['/ms'] = {}, ['/pet'] = {}, ['/trig'] = {}, ['/echo'] = {}}
 
-function make_abil(abil,lang,t,i)
+function make_abil(abil,lang,i)
     if not abil[lang] or not abil.prefix then return end
-    local sp = abil[lang]:lower()
-    local pref = unify_prefix[abil.prefix:lower()]
-    
+    local sp,pref = abil[lang]:lower(), unify_prefix[abil.prefix:lower()]
     validabils[lang][pref][sp] = i
 end
 
-function make_entry(v,typ,i)
-    make_abil(v,'english',typ,i)
-    make_abil(v,'german',typ,i)
-    make_abil(v,'french',typ,i)
-    make_abil(v,'japanese',typ,i)
+function make_entry(v,i)
+    make_abil(v,'english',i)
+    make_abil(v,'german',i)
+    make_abil(v,'french',i)
+    make_abil(v,'japanese',i)
 end
 
 for i,v in pairs(res.spells) do
     if not T{363,364}:contains(i) then
-        make_entry(v,'Magic',i)
+        make_entry(v,i)
     end
 end
 
-for i,v in pairs(res.abilities) do
-    make_entry(v,'Ability',i)
+for i,v in pairs(res.job_abilities) do
+    make_entry(v,i)
+end
+
+for i,v in pairs(res.weapon_skills) do
+    v.type = 'WeaponSkill'
+    v.recast_id = 900
+    make_entry(v,i)
+end
+
+for i,v in pairs(res.monster_abilities) do
+    v.type = 'MonsterSkill'
+    v.recast_id = 900
+    make_entry(v,i)
 end
 
 for i,v in pairs(res.items) do
     if v.targets and table.length(v.targets) ~= 0 then
-        make_entry(v,'Item',i)
+        make_entry(v,i)
     end
 end
     
 default_slot_map = T{'sub','range','ammo','head','body','hands','legs','feet','neck','waist',
     'left_ear', 'right_ear', 'left_ring', 'right_ring','back'}
 default_slot_map[0]= 'main'
-
-command_list = {['/ja']='Ability',['/jobability']='Ability',['/so']='Magic',['/song']='Magic',['/ma']='Magic',['/magic']='Magic',['/nin']='Magic',['/ninjutsu']='Magic',
-    ['/ra']='Ranged Attack',['/range']='Ranged Attack',['/throw']='Ranged Attack',['/shoot']='Ranged Attack',['/ms']='Ability',['/monsterskill']='Ability',
-    ['/ws']='Ability',['/weaponskill']='Ability',['/item']='Item',['/pet']='Ability',['Monster']='Monster Move'}
-
-category_map = T{'Melee Swing','Ranged Attack','Weapon Skill','Magic','Item','Ability','Weapon Skill','Magic','Item','None','TP Move','Ranged Attack','Pet','Ability','Ability'}
-
-jobs = {WAR=0x00000002,MNK=0x00000004,WHM=0x00000008,BLM=0x00000010,RDM=0x00000020,THF=0x00000040,PLD=0x00000080,DRK=0x00000100,BST=0x00000200,BRD=0x00000400,
-RNG=0x00000800,SAM=0x00001000,NIN=0x00002000,DRG=0x00004000,SMN=0x00008000,BLU=0x00010000,COR=0x00020000,PUP=0x00040000,DNC=0x00080000,SCH=0x00100000,GEO=0x00200000,
-RUN=0x00400000,NONE=0x100000000}
-
-mob_table_races = {[0]='Precomposed NPC',[1]='HumeM',[2]='HumeF',[3]='ElvaanM',[4]='ElvaanF',
-    [5]='TaruM',[6]='TaruF',[7]='Mithra',[8]='Galka',[29]='ChildMithra',[30]='Child_E_H_F',
-    [31]='Child_E_H_M',[32]='ChocoboRounsey',[33]='ChocoboDestrier',[34]='ChocoboPalfrey',
-    [35]='ChocoboCourser',[36]='ChocoboJennet'}
-    
-dat_races = {['Precomposed NPC']=0x10000,HumeM=0x0002,HumeF=0x0004,ElvaanM=0x0008,ElvaanF=0x0010,
-    TaruM=0x0020,TaruF=0x0040,Mithra=0x0080,Galka=0x0100,['Child_E_H_M']=0x10000,['ChocoboRounsey']=0x10000,
-    ['ChocoboDestrier']=0x10000,['ChocoboPalfrey']=0x10000,['ChocoboCourser']=0x10000,['ChocoboJennet']=0x10000}
-    
-dat_slots = {0x0002,0x0004,0x0008,0x0010,0x0020,0x0040,0x0080,0x0100,0x0200,0x0400,0x0800,0x1000,0x2000,0x4000,0x8000}
-dat_slots[0] = 0x0001
 
 default_equip_order = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
 
@@ -113,10 +104,11 @@ pass_through_targs = {['<t>']=true,['<me>']=true,['<ft>']=true,['<scan>']=true,[
     ['<a20>']=true,['<a21>']=true,['<a22>']=true,['<a23>']=true,['<a24>']=true,['<a25>']=true,['<st>']=true,
     ['<stnpc>']=true,['<stal>']=true,['<stpc>']=true,['<stpt>']=true}
 
-avatar_element = {Ifrit='Fire',Titan='Earth',Leviathan='Water',Garuda='Wind',Shiva='Ice',Ramuh='Lightning',Carbuncle='Light',
-    Diabolos='Dark',Fenrir='Dark',['Fire Elemental']='Fire',['Earth Elemental']='Earth',['Water Elemental']='Water',
-    ['Wind Elemental']='Wind',['Ice Elemental']='Ice',['Lightning Elemental']='Lightning',['Light Elemental']='Light',
-    ['Dark Elemental']='Dark'}
+avatar_element = {Ifrit=0,Titan=3,Leviathan=5,Garuda=2,Shiva=1,Ramuh=4,Carbuncle=6,
+    Diabolos=7,Fenrir=7,['Cait Sith']=6,['Fire Elemental']=0,['Earth Elemental']=3,['Water Elemental']=5,
+    ['Wind Elemental']=2,['Ice Elemental']=1,['Lightning Elemental']=4,['Light Elemental']=6,
+    ['Dark Elemental']=7}
+
 encumbrance_map = {0x79,0x7F,0x7F,0x7A,0x7B,0x7C,0x7D,0x7D,0x7A,0x7E,0x80,0x80,0x80,0x80,0x7E}
 encumbrance_map[0] = 0x79 -- Slots mapped onto encumbrance byte values.
 
@@ -127,6 +119,9 @@ addendum_black = {[253]="Sleep",[259]="Sleep II",[260]="Dispel",[162]="Stone IV"
     [168]="Thunder V",[157]="Aero IV",[158]="Aero V",[152]="Blizzard IV",[153]="Blizzard V",[147]="Fire IV",[148]="Fire V",
     [172]="Water IV",[173]="Water V",[255]="Break"}
 
+resources_ranged_attack = {id="0",index="0",prefix="/range",english="Ranged",german="Fernwaffe",french="Attaque à dist.",japanese="飛び道具",type="Misc",element="None",targets=S{"Enemy"}}
+
+    
 -- _globals --
 user_data_table = {
     __newindex = function(tab, key, val)
@@ -210,18 +205,86 @@ _settings.debug_mode = false
 _settings.demo_mode = false
 _settings.show_swaps = false
 
+_ExtraData = {
+        player = {},
+        spell = {},
+        alliance = {},
+        pet = {},
+        fellow = {},
+        world = {in_mog_house = false},
+    }
+
+function initialize_globals()
+    local pl = windower.ffxi.get_player()
+    if not pl then
+        player = make_user_table()
+        player.vitals = {}
+        player.buffs = {}
+        player.skills = {}
+        player.jobs = {}
+        player.merits = {}
+    else
+        player = make_user_table()
+        table.reassign(player,pl)
+        if not player.vitals then player.vitals = {} end
+        if not player.buffs then player.buffs = {} end
+        if not player.skills then player.skills = {} end
+        if not player.jobs then player.jobs = {} end
+        if not player.merits then player.merits = {} end
+    end
+
+    items = windower.ffxi.get_items()
+    if not items then
+        items = {
+                inventory = make_inventory_table(),
+                safe = make_inventory_table(),
+                storage = make_inventory_table(),
+                temporary = make_inventory_table(),
+                satchel = make_inventory_table(),
+                sack = make_inventory_table(),
+                locker = make_inventory_table(),
+                case = make_inventory_table(),
+                wardrobe = make_inventory_table(),
+                equipment = {},
+            }
+        for id,name in pairs(default_slot_map) do
+            items.equipment.name = 0
+            items.equipment[name..'_bag'] = 0
+        end
+    else
+        if not items.inventory then items.inventory = make_inventory_table() else
+            items.inventory[0] = make_empty_item_table(0) end
+        if not items.safe then items.safe = make_inventory_table()  else
+            items.safe[0] = make_empty_item_table(0) end
+        if not items.storage then items.storage = make_inventory_table()  else
+            items.storage[0] = make_empty_item_table(0) end
+        if not items.temporary then items.temporary = make_inventory_table()  else
+            items.temporary[0] = make_empty_item_table(0) end
+        if not items.satchel then items.satchel = make_inventory_table()  else
+            items.satchel[0] = make_empty_item_table(0) end
+        if not items.sack then items.sack = make_inventory_table()  else
+            items.sack[0] = make_empty_item_table(0) end
+        if not items.locker then items.locker = make_inventory_table()  else
+            items.locker[0] = make_empty_item_table(0) end
+        if not items.case then items.case = make_inventory_table()  else
+            items.case[0] = make_empty_item_table(0) end
+        if not items.wardrobe then items.wardrobe = make_inventory_table()  else
+            items.wardrobe[0] = make_empty_item_table(0) end
+        if not items.equipment then items.equipment = {}  end
+    end
+end
+
+initialize_globals()
 
 last_PC_update = ''
+item_update_flag = true
 gearswap_disabled = false
-sent_out_equip = {}
 not_sent_out_equip = {}
-limbo_equip = {}
 command_registry = {}
 equip_list = {}
 equip_order = {}
 world = make_user_table()
 buffactive = make_user_table()
-player = make_user_table()
 alliance = make_user_table()
 player.equipment = make_user_table()
 pet = make_user_table()
@@ -236,102 +299,102 @@ disable_table[0] = false
 encumbrance_table = table.reassign({},disable_table)
 registered_user_events = {}
 empty = {name="empty"}
-species_id = 0
 outgoing_packet_table = {}
+last_refresh = 0
+
+unbridled_learning_set = {['Thunderbolt']=true,['Harden Shell']=true,['Absolute Terror']=true,
+    ['Gates of Hades']=true,['Tourbillion']=true,['Pyric Bulwark']=true,['Bilgestorm']=true,
+    ['Bloodrake']=true,['Droning Whirlwind']=true,['Carcharian Verve']=true,['Blistering Roar']=true,}
+
+
 tool_map = {
-        ['Katon: Ichi'] = 'Uchitake',
-        ['Katon: Ni'] = 'Uchitake',
-        ['Katon: San'] = 'Uchitake',
-        ['Hyoton: Ichi'] = 'Tsurara',
-        ['Hyoton: Ni'] = 'Tsurara',
-        ['Hyoton: San'] = 'Tsurara',
-        ['Huton: Ichi'] = 'Kawahori-ogi',
-        ['Huton: Ni'] = 'Kawahori-ogi',
-        ['Huton: San'] = 'Kawahori-ogi',
-        ['Doton: Ichi'] = 'Makibishi',
-        ['Doton: Ni'] = 'Makibishi',
-        ['Doton: San'] = 'Makibishi',
-        ['Raiton: Ichi'] = 'Hiraishin',
-        ['Raiton: Ni'] = 'Hiraishin',
-        ['Raiton: San'] = 'Hiraishin',
-        ['Suiton: Ichi'] = 'Mizu-deppo',
-        ['Suiton: Ni'] = 'Mizu-deppo',
-        ['Suiton: San'] = 'Mizu-deppo',
-        ['Utsusemi: Ichi'] = 'Shihei',
-        ['Utsusemi: Ni'] = 'Shihei',
-        ['Utsusemi: San'] = 'Shihei',
-        ['Jubaku: Ichi'] = 'Jusatsu',
-        ['Jubaku: Ni'] = 'Jusatsu',
-        ['Jubaku: San'] = 'Jusatsu',
-        ['Hojo: Ichi'] = 'Kaginawa',
-        ['Hojo: Ni'] = 'Kaginawa',
-        ['Hojo: San'] = 'Kaginawa',
-        ['Kurayami: Ichi'] = 'Sairui-ran',
-        ['Kurayami: Ni'] = 'Sairui-ran',
-        ['Kurayami: San'] = 'Sairui-ran',
-        ['Dokumori: Ichi'] = 'Kodoku',
-        ['Dokumori: Ni'] = 'Kodoku',
-        ['Dokumori: San'] = 'Kodoku',
-        ['Tonko: Ichi'] = 'Shinobi-tabi',
-        ['Tonko: Ni'] = 'Shinobi-tabi',
-        ['Tonko: San'] = 'Shinobi-tabi',
-        ['Monomi: Ichi'] = 'Sanjaku-tenugui',
-        ['Monomi: Ni'] = 'Sanjaku-tenugui',
-        ['Aisha: Ichi'] = 'Soshi',
-        ['Myoshu: Ichi'] = 'Kabenro',
-        ['Yurin: Ichi'] = 'Jinko',
-        ['Migawari: Ichi'] = 'Mokujin',
-        ['Kakka: Ichi'] = 'Ryuno'
+        ['Katon: Ichi'] = res.items[1161],
+        ['Katon: Ni'] = res.items[1161],
+        ['Katon: San'] = res.items[1161],
+        ['Hyoton: Ichi'] = res.items[1164],
+        ['Hyoton: Ni'] = res.items[1164],
+        ['Hyoton: San'] = res.items[1164],
+        ['Huton: Ichi'] = res.items[1167],
+        ['Huton: Ni'] = res.items[1167],
+        ['Huton: San'] = res.items[1167],
+        ['Doton: Ichi'] = res.items[1170],
+        ['Doton: Ni'] = res.items[1170],
+        ['Doton: San'] = res.items[1170],
+        ['Raiton: Ichi'] = res.items[1173],
+        ['Raiton: Ni'] = res.items[1173],
+        ['Raiton: San'] = res.items[1173],
+        ['Suiton: Ichi'] = res.items[1176],
+        ['Suiton: Ni'] = res.items[1176],
+        ['Suiton: San'] = res.items[1176],
+        ['Utsusemi: Ichi'] = res.items[1179],
+        ['Utsusemi: Ni'] = res.items[1179],
+        ['Utsusemi: San'] = res.items[1179],
+        ['Jubaku: Ichi'] = res.items[1182],
+        ['Jubaku: Ni'] = res.items[1182],
+        ['Jubaku: San'] = res.items[1182],
+        ['Hojo: Ichi'] = res.items[1185],
+        ['Hojo: Ni'] = res.items[1185],
+        ['Hojo: San'] = res.items[1185],
+        ['Kurayami: Ichi'] = res.items[1188],
+        ['Kurayami: Ni'] = res.items[1188],
+        ['Kurayami: San'] = res.items[1188],
+        ['Dokumori: Ichi'] = res.items[1191],
+        ['Dokumori: Ni'] = res.items[1191],
+        ['Dokumori: San'] = res.items[1191],
+        ['Tonko: Ichi'] = res.items[1194],
+        ['Tonko: Ni'] = res.items[1194],
+        ['Tonko: San'] = res.items[1194],
+        ['Monomi: Ichi'] = res.items[2553],
+        ['Monomi: Ni'] = res.items[2553],
+        ['Aisha: Ichi'] = res.items[2555],
+        ['Myoshu: Ichi'] = res.items[2642],
+        ['Yurin: Ichi'] = res.items[2643],
+        ['Migawari: Ichi'] = res.items[2970],
+        ['Kakka: Ichi'] = res.items[2644],
     }
 
 
 universal_tool_map = {
-        ['Katon: Ichi'] = 'Inoshishinofuda',
-        ['Katon: Ni'] = 'Inoshishinofuda',
-        ['Katon: San'] = 'Inoshishinofuda',
-        ['Hyoton: Ichi'] = 'Inoshishinofuda',
-        ['Hyoton: Ni'] = 'Inoshishinofuda',
-        ['Hyoton: San'] = 'Inoshishinofuda',
-        ['Huton: Ichi'] = 'Inoshishinofuda',
-        ['Huton: Ni'] = 'Inoshishinofuda',
-        ['Huton: San'] = 'Inoshishinofuda',
-        ['Doton: Ichi'] = 'Inoshishinofuda',
-        ['Doton: Ni'] = 'Inoshishinofuda',
-        ['Doton: San'] = 'Inoshishinofuda',
-        ['Raiton: Ichi'] = 'Inoshishinofuda',
-        ['Raiton: Ni'] = 'Inoshishinofuda',
-        ['Raiton: San'] = 'Inoshishinofuda',
-        ['Suiton: Ichi'] = 'Inoshishinofuda',
-        ['Suiton: Ni'] = 'Inoshishinofuda',
-        ['Suiton: San'] = 'Inoshishinofuda',
-        ['Utsusemi: Ichi'] = 'Shikanofuda',
-        ['Utsusemi: Ni'] = 'Shikanofuda',
-        ['Utsusemi: San'] = 'Shikanofuda',
-        ['Jubaku: Ichi'] = 'Chonofuda',
-        ['Jubaku: Ni'] = 'Chonofuda',
-        ['Jubaku: San'] = 'Chonofuda',
-        ['Hojo: Ichi'] = 'Chonofuda',
-        ['Hojo: Ni'] = 'Chonofuda',
-        ['Hojo: San'] = 'Chonofuda',
-        ['Kurayami: Ichi'] = 'Chonofuda',
-        ['Kurayami: Ni'] = 'Chonofuda',
-        ['Kurayami: San'] = 'Chonofuda',
-        ['Dokumori: Ichi'] = 'Chonofuda',
-        ['Dokumori: Ni'] = 'Chonofuda',
-        ['Dokumori: San'] = 'Chonofuda',
-        ['Tonko: Ichi'] = 'Shikanofuda',
-        ['Tonko: Ni'] = 'Shikanofuda',
-        ['Tonko: San'] = 'Shikanofuda',
-        ['Monomi: Ichi'] = 'Shikanofuda',
-        ['Aisha: Ichi'] = 'Chonofuda',
-        ['Myoshu: Ichi'] = 'Shikanofuda',
-        ['Yurin: Ichi'] = 'Chonofuda',
-        ['Migawari: Ichi'] = 'Shikanofuda',
-        ['Kakka: Ichi'] = 'Shikanofuda'
+        ['Katon: Ichi'] = res.items[2971],
+        ['Katon: Ni'] = res.items[2971],
+        ['Katon: San'] = res.items[2971],
+        ['Hyoton: Ichi'] = res.items[2971],
+        ['Hyoton: Ni'] = res.items[2971],
+        ['Hyoton: San'] = res.items[2971],
+        ['Huton: Ichi'] = res.items[2971],
+        ['Huton: Ni'] = res.items[2971],
+        ['Huton: San'] = res.items[2971],
+        ['Doton: Ichi'] = res.items[2971],
+        ['Doton: Ni'] = res.items[2971],
+        ['Doton: San'] = res.items[2971],
+        ['Raiton: Ichi'] = res.items[2971],
+        ['Raiton: Ni'] = res.items[2971],
+        ['Raiton: San'] = res.items[2971],
+        ['Suiton: Ichi'] = res.items[2971],
+        ['Suiton: Ni'] = res.items[2971],
+        ['Suiton: San'] = res.items[2971],
+        ['Utsusemi: Ichi'] = res.items[2972],
+        ['Utsusemi: Ni'] = res.items[2972],
+        ['Utsusemi: San'] = res.items[2972],
+        ['Jubaku: Ichi'] = res.items[2973],
+        ['Jubaku: Ni'] = res.items[2973],
+        ['Jubaku: San'] = res.items[2973],
+        ['Hojo: Ichi'] = res.items[2973],
+        ['Hojo: Ni'] = res.items[2973],
+        ['Hojo: San'] = res.items[2973],
+        ['Kurayami: Ichi'] = res.items[2973],
+        ['Kurayami: Ni'] = res.items[2973],
+        ['Kurayami: San'] = res.items[2973],
+        ['Dokumori: Ichi'] = res.items[2973],
+        ['Dokumori: Ni'] = res.items[2973],
+        ['Dokumori: San'] = res.items[2973],
+        ['Tonko: Ichi'] = res.items[2972],
+        ['Tonko: Ni'] = res.items[2972],
+        ['Tonko: San'] = res.items[2972],
+        ['Monomi: Ichi'] = res.items[2972],
+        ['Aisha: Ichi'] = res.items[2973],
+        ['Myoshu: Ichi'] = res.items[2972],
+        ['Yurin: Ichi'] = res.items[2973],
+        ['Migawari: Ichi'] = res.items[2972],
+        ['Kakka: Ichi'] = res.items[2972]
     }
-
-
---persistant_sequence = {}  ---------------------- TEMPORARY TO INVESTIGATE LAG ISSUES IN DELVE
---persistant_sequence[0] = true
---prev_ID = 0
---cur_ID = 0

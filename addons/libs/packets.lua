@@ -115,14 +115,14 @@ end})
 -- 
 -- Example usage
 --  Injection:
---      local packet = packets.outgoing(0x050, {
+--      local packet = packets.new('outgoing', 0x050, {
 --          ['Inventory Index'] = 27,   -- 27th item in the inventory
 --          ['Equipment Slot'] = 15     -- 15th slot, left ring
 --      })
 --      packets.inject(packet)
 --
 --  Injection (Alternative):
---      local packet = packets.outgoing(0x050)
+--      local packet = packets.new('outgoing', 0x050)
 --      packet['Inventory Index'] = 27  -- 27th item in the inventory
 --      packet['Equipment Slot'] = 15   -- 15th slot, left ring
 --      packets.inject(packet)
@@ -130,38 +130,21 @@ end})
 --  Parsing:
 --      windower.register_event('outgoing chunk', function(id, data)
 --          if id == 0x0B6 then -- outgoing /tell
---              local packet = packets.outgoing(id, data)
+--              local packet = packets.parse('outgoing', data)
 --              print(packet['Target Name'], packet['Message'])
 --          end
 --      end)
-function packets.incoming(id, data)
-    if data and type(data) == 'string' then
-        return packets.parse('incoming', id, data)
-    end
-
-    return packets.new('incoming', id, data)
-end
-
-function packets.outgoing(id, data)
-    if type(data) == 'string' then
-        return packets.parse('outgoing', id, data)
-    end
-
-    return packets.new('outgoing', id, data)
-end
-
-function packets.parse(dir, id, data)
+function packets.parse(dir, data)
     local res = {}
-    res._id = id
+    res._id, res._size, res._sequence = data:unpack('b9b7H')
+    res._size = res._size * 4
     res._raw = data
     res._dir = dir
-    res._name = packets.data[dir][id].name
-    res._description = packets.data[dir][id].description
-    res._size = 4*math.floor(data:byte(2)/2)
-    res._sequence = data:byte(3,3) + data:byte(4, 4)*2^8
+    res._name = packets.data[dir][res._id].name
+    res._description = packets.data[dir][res._id].description
     res._data = data:sub(5)
 
-    local fields = packets.fields.get(dir, id, data)
+    local fields = packets.fields.get(dir, res._id, data)
     if not fields or #fields == 0 then
         return res
     end
@@ -171,7 +154,7 @@ function packets.parse(dir, id, data)
     for key, val in ipairs({res._data:unpack(pack_str)}) do
         local field = fields[key]
         if field then
-            res[field.label] = field.enc and val:decode(6, field.enc) or val
+            res[field.label] = field.enc and val:decode(field.enc) or val
         end
     end
 
@@ -184,6 +167,7 @@ function packets.new(dir, id, values)
     local packet = {}
     packet._id = id
     packet._dir = dir
+    packet._sequence = 0
 
     local fields = packets.fields.get(packet._dir, packet._id)
     if not fields then
@@ -235,10 +219,13 @@ function packets.build(packet)
         return nil
     end
 
-    -- 'I' for the 4 byte header
-    -- It's zeroed, as it will be filled out when injected
-    local pack_string = 'I'..fields:map(table.lookup-{pack_ids, 'ctype'}):concat()
-    return pack_string:pack(0, fields:map(table.lookup-{packet, 'label'}):unpack())
+    local pack_string = fields:map(table.lookup-{pack_ids, 'ctype'}):concat()
+    local data_string = pack_string:pack(fields:map(table.lookup-{packet, 'label'}):unpack())
+    while #data_string % 4 ~= 0 do
+        data_string = data_string .. 0:char()
+    end
+
+    return 'b9b7H':pack(packet._id, 1 + #data_string / 4, packet._sequence) .. data_string
 end
 
 -- Injects a packet built with packets.new

@@ -36,18 +36,15 @@ _addon.author = 'Byrth'
 _addon.version = 0.050214
 _addon.command = 'pw'
 
-if not windower.dir_exists('data') then
-    windower.create_dir('data')
-end
-
 settings = config.load('data\\settings.xml',default_settings)
-config.save(settings)
+config.register(settings,initialize)
 
 box = texts.new('${current_string}',settings.text_box_settings,settings)
 box.current_string = ''
 box:show()
 
 initialize()
+
 
 
 windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blocked)
@@ -66,7 +63,7 @@ windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blo
                     local param_2 = str2bytes(org:sub(0xD,0x10))
                     local param_3 = str2bytes(org:sub(0x11,0x14))
                     local param_4 = str2bytes(org:sub(0x15,0x18))
-                    print(param_1,param_2,param_3,param_4) -- DEBUGGING STATEMENT -------------------------
+                    -- print(param_1,param_2,param_3,param_4) -- DEBUGGING STATEMENT -------------------------
                     if zone_message_functions[i] then
                         zone_message_functions[i](param_1,param_2,param_3,param_4)
                     end
@@ -77,7 +74,7 @@ windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blo
         local val = str2bytes(org:sub(0x11,0x14))
         local msg = str2bytes(org:sub(0x19,0x20))%1024
         local t = os.clock()
-        if msg == 718 then
+        if msg == 718 or msg == 735 then
             cp.registry[t] = (cp.registry[t] or 0) + val
             cp.total = cp.total + val
         elseif msg == 8 or msg == 105 or msg == 371 or msg == 372 then
@@ -133,12 +130,16 @@ windower.register_event('zone change',function(new,old)
         dynamis.entry_time = os.clock()
         dynamis.time_limit = 3600
         dynamis.zone = new
-        cur_func = loadstring("current_string = "..settings.strings.dynamis)
+        cur_func,loadstring_err = loadstring("current_string = "..settings.strings.dynamis)
     else
         dynamis.entry_time = 0
         dynamis.time_limit = 0
         dynamis.zone = 0
-        cur_func = loadstring("current_string = "..settings.strings.default)
+        cur_func,loadstring_err = loadstring("current_string = "..settings.strings.default)
+    end
+    if not cur_func or loadstring_err then
+        cur_func = loadstring("current_string = ''")
+        error(loadstring_err)
     end
 end)
 
@@ -175,7 +176,10 @@ windower.register_event('prerender',function()
 end)
 
 function update_box()
-    if not windower.ffxi.get_info().logged_in or not windower.ffxi.get_player() then return end
+    if not windower.ffxi.get_info().logged_in or not windower.ffxi.get_player() then
+        box.current_string = ''
+        return
+    end
     cp.rate = analyze_points_table(cp.registry)
     xp.rate = analyze_points_table(xp.registry)
     if dynamis.entry_time ~= 0 and dynamis.entry_time+dynamis.time_limit-os.clock() > 0 then
@@ -186,6 +190,7 @@ function update_box()
         dynamis.KIs = ''
     end
     assert(cur_func)()
+    
     if box.current_string ~= current_string then
         box.current_string = current_string
     end
