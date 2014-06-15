@@ -128,7 +128,7 @@ data.incoming[0x057] = {name='Weather Change',      description='Updates the wea
 data.incoming[0x058] = {name='Lock Target',         description='Locks your target.'}
 data.incoming[0x05A] = {name='Server Emote',        description='This packet is the server\'s response to a client /emote p.'}
 data.incoming[0x05B] = {name='Spawn',               description='Server packet sent when a new mob spawns in area.'}
-data.incoming[0x05E] = {name='Stop Download',       description='Final packet in a DataDld transmission. May be the only packet in a DataDld sequence.'}
+data.incoming[0x05E] = {name='Camp./Besieged Map',  description='Contains information about Campaign and Besieged status.'}
 data.incoming[0x061] = {name='Char Stats',          description='Packet contains a lot of data about your character\'s stats.'}
 data.incoming[0x062] = {name='Skills Update',       description='Packet that shows your weapon and magic skill stats.'}
 data.incoming[0x063] = {name='Set Update',          description='Frequently sent packet during battle that updates specific types of job information, like currently available/set automaton equipment and currently set BLU spells.'}
