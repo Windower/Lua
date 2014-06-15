@@ -272,7 +272,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         --items = windower.ffxi.get_items()
         local tab = {}
         for i,v in pairs(default_slot_map) do
-            local tf = math.floor( (enc%(2^(i+1))) / 2^i ) ~= 1
+            local tf = (((enc%(2^(i+1))) / 2^i) >= 1)
             if encumbrance_table[i] and tf and not_sent_out_equip[v] and not disable_table[i] then
                 tab[v] = not_sent_out_equip[v]
                 not_sent_out_equip[v] = nil
