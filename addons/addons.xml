@@ -398,6 +398,13 @@
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
+    <name>TParty</name>
+    <author>Arcon</author>
+    <description>Shows a target's HP percentage next to their health bar.</description>
+    <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
+  </addon>
+  <addon>
     <name>Update</name>
     <author>Arcon</author>
     <description>Updates and reloads all plugins and addons when typing //update.</description>
