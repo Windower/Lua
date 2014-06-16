@@ -126,7 +126,7 @@ function disable(...)
         if slot_map[v] then
             rawset(disable_table,slot_map[v],true)
         else
-            error('\nGearSwap: disable error, passed an unrecognized slot name ('..tostring(v)..').',2)
+            error('\nGearSwap: disable error, passed an unrecognized slot name. ('..tostring(v)..')',2)
         end
     end
 end
@@ -141,16 +141,32 @@ function enable(...)
     for i,v in pairs(enable_tab) do
         if slot_map[v] then
             local local_slot = default_slot_map[slot_map[v]]
+            print(local_slot,slot_map[v],disable_table[slot_map[v]])
             disable_table[slot_map[v]] = false
-            local potential_gear = not_sent_out_equip[local_slot]
-            if potential_gear then
+            if not_sent_out_equip[local_slot] then
                 sending_table[local_slot] = not_sent_out_equip[local_slot]
                 not_sent_out_equip[local_slot] = nil
             end
         else
-            error('\nGearSwap: enable error, passed an unrecognized slot name ('..tostring(v)..').',2)
+            error('\nGearSwap: enable error, passed an unrecognized slot name. ('..tostring(v)..')',2)
         end
     end
+    
+    return sending_table
+end
+
+function user_enable(...)
+    local sending_table = enable(...)
+    
+    if table.length(sending_table) > 0 then
+        equip(sending_table)
+    end
+    return sending_table
+end
+
+function command_enable(...)
+    local sending_table = enable(...)
+    
     if table.length(sending_table) > 0 then
         refresh_globals()
         equip_sets('equip_command',nil,sending_table)

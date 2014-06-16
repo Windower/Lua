@@ -279,9 +279,7 @@ initialize_globals()
 last_PC_update = ''
 item_update_flag = true
 gearswap_disabled = false
-sent_out_equip = {}
 not_sent_out_equip = {}
-limbo_equip = {}
 command_registry = {}
 equip_list = {}
 equip_order = {}

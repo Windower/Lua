@@ -1728,6 +1728,111 @@ fields.incoming[0x05B] = L{
     {ctype='unsigned int',      label='_unknown2'},                             -- 18
 }
 
+-- Campaign/Besieged Map information
+
+-- Bitpacked Campaign Info:
+-- First/Second Byte -- I could see no change when I FF'd these.
+
+-- Third Byte (bitpacked xxww bbss -- First two bits are for beastmen)
+    -- 0 = Minimal
+    -- 1 = Minor
+    -- 2 = Major
+    -- 3 = Dominant
+
+-- Fourth Byte: Ownership (value)
+    -- 0 = Neutral
+    -- 1 = Sandy
+    -- 2 = Bastok
+    -- 3 = Windurst
+    -- 4 = Beastmen
+    -- 0xFF = Jeuno
+
+
+
+
+-- Bitpacked Besieged Info:
+
+-- Candescence Owners:
+    -- 0 = Whitegate
+    -- 1 = MMJ
+    -- 2 = Halvung
+    -- 3 = Arrapago
+    
+-- Orders:
+    -- 0 = Defend Al Zahbi
+    -- 1 = Intercept Enemy
+    -- 2 = Invade Enemy Base
+    -- 3 = Recover the Orb
+    
+-- Beastman Status
+    -- 0 = Training
+    -- 1 = Advancing
+    -- 2 = Attacking
+    -- 3 = Retreating
+    -- 4 = Defending
+    -- 5 = Preparing
+
+-- Bitpacked region int (for the actual locations on the map, not the overview)
+    -- 3 Least Significant Bits -- Beastman Status for that region
+    -- 8 following bits -- Number of Forces
+    -- 4 following bits -- Level
+    -- 4 following bits -- Number of Archaic Mirrors
+    -- 4 following bits -- Number of Prisoners
+    -- 9 following bits -- No clear purpose
+
+fields.incoming[0x05E] = L{
+    {ctype='unsigned char',     label='Balance of Power'},                      -- 04   Bitpacked: xxww bbss  -- Unclear what the first two bits are for. Number stored is ranking (0-3)
+    {ctype='unsigned char',     label='Tie Indicator'},                         -- 05   Not really sure how this works, but it gives the ] that indicate a tie. It always gives them between position 2 and 3 for me.
+    {ctype='char[20]',          label='_unknown1'},                             -- 06   All Zeros, and changed nothing when 0xFF'd.
+    {ctype='unsigned int',      label='Bitpacked Ronfaure Info'},               -- 1A
+    {ctype='unsigned int',      label='Bitpacked Zulkheim Info'},               -- 1E   
+    {ctype='unsigned int',      label='Bitpacked Norvallen Info'},              -- 22   
+    {ctype='unsigned int',      label='Bitpacked Gustaberg Info'},              -- 26   
+    {ctype='unsigned int',      label='Bitpacked Derfland Info'},               -- 2A   
+    {ctype='unsigned int',      label='Bitpacked Sarutabaruta Info'},           -- 2E   
+    {ctype='unsigned int',      label='Bitpacked Kolshushu Info'},              -- 32   
+    {ctype='unsigned int',      label='Bitpacked Aragoneu Info'},               -- 36   
+    {ctype='unsigned int',      label='Bitpacked Fauregandi Info'},             -- 3A   
+    {ctype='unsigned int',      label='Bitpacked Valdeaunia Info'},             -- 3E   
+    {ctype='unsigned int',      label='Bitpacked Qufim Info'},                  -- 42   
+    {ctype='unsigned int',      label="Bitpacked Li'Telor Info"},               -- 46   
+    {ctype='unsigned int',      label='Bitpacked Kuzotz Info'},                 -- 4A   
+    {ctype='unsigned int',      label='Bitpacked Vollbow Info'},                -- 4E   
+    {ctype='unsigned int',      label='Bitpacked Elshimo Lowlands Info'},       -- 52   
+    {ctype='unsigned int',      label="Bitpacked Elshimo Uplands Info"},        -- 56   
+    {ctype='unsigned int',      label="Bitpacked Tu'Lia Info"},                 -- 5A   
+    {ctype='unsigned int',      label='Bitpacked Movapolos Info'},              -- 5E   
+    {ctype='unsigned int',      label='Bitpacked Tavnazian Archipelago Info'},  -- 62   
+    {ctype='char[32]',          label='_unknown2'},                             -- 66   All Zeros, and changed nothing when 0xFF'd.
+    {ctype='unsigned char',     label="San d'Oria region bar"},                 -- 86   These indicate how full the current region's bar is (in percent).
+    {ctype='unsigned char',     label="Bastok region bar"},                     -- 87   The Beastmen are assigned all leftover percentage points.
+    {ctype='unsigned char',     label="Windurst region bar"},                   -- 88
+    {ctype='char[3]',           label="_unknown3"},                             -- 89   Takes values, but altering them has no obvious impact
+    {ctype='unsigned char',     label="Days to talley"},                        -- 8C   Number of days to the next conquest talley
+    {ctype='char[3]',           label="_unknown4"},                             -- 8D   All Zeros, and changed nothing when 0xFF'd.
+    {ctype='int',               label='Conquest Points'},                       -- 90
+    {ctype='char[12]',          label="_unknown5"},                             -- 94   Mostly zeros and noticed no change when 0xFF'd.
+    
+-- These bytes are for the overview summary on the map.
+    -- The two least significant bits code for the owner of the Astral Candescence.
+    -- The next two bits indicate the current orders.
+    -- The four most significant bits indicate the MMJ level.
+    {ctype='unsigned char',     label="MMJ Level, Orders, and AC"},             -- A0
+    
+    -- Halvung is the 4 least significant bits.
+    -- Arrapago is the 4 most significant bits.
+    {ctype='unsigned char',     label="Halvung and Arrapago Level"},            -- A1
+    {ctype='unsigned char',     label="Beastman Status (1) "},                  -- A2   The 3 LS bits are the MMJ Orders, next 3 bits are the Halvung Orders, top 2 bits are part of the Arrapago Orders
+    {ctype='unsigned char',     label="Beastman Status (2) "},                  -- A3   The Least Significant bit is the top bit of the Arrapago orders. Rest of the byte doesn't seem to do anything?
+
+-- These bytes are for the individual stronghold displays. See above!
+    {ctype='unsigned int',      label='Bitpacked MMJ Info'},                    -- A4
+    {ctype='unsigned int',      label='Bitpacked Halvung Info'},                -- A8
+    {ctype='unsigned int',      label='Bitpacked Arrapago Info'},               -- AC
+    
+    {ctype='int',               label='Imperial Standing'},                     -- B0
+}
+
 -- Char Stats
 fields.incoming[0x061] = L{
     {ctype='unsigned int',      label='Maximum HP'},                            -- 04

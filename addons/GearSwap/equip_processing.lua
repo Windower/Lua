@@ -301,12 +301,6 @@ function get_gs_gear(cur_equip,swap_type)
     -- If the swap is not complete, overwrite the current equipment with the equipment that you are swapping to
 --    local not_sent_ids = to_id_set(items.inventory,not_sent_out_equip)
     for i,v in pairs(cur_equip) do
-        if limbo_equip[short_slot_map[i]] then
-            cur_equip[i] = limbo_equip[short_slot_map[i]]
-        end
-        if sent_out_equip[short_slot_map[i]] then
-            cur_equip[i] = sent_out_equip[short_slot_map[i]]
-        end
         if v.slot == 0 or v.slot == 'empty' then
             cur_equip[i].slot = empty
         end
@@ -321,8 +315,6 @@ function get_gs_gear(cur_equip,swap_type)
         end
     end
     if debugging > 0 and type(swap_type) == 'string' then
---        print_set(limbo_equip,'Limbo Equip '..swap_type)
---        print_set(sent_out_equip,'Sent Out Equip '..swap_type)
         windower.text.set_text(swap_type,sent_out_box)
     end
     return cur_equip

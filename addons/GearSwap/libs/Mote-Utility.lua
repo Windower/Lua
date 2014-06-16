@@ -266,7 +266,7 @@ function refine_waltz(spell, action, spellMap, eventArgs)
 		return
 	end
 
-	if missingHP > 0 then
+	if missingHP and missingHP > 0 then
 		add_to_chat(122,'Trying to cure '..tostring(missingHP)..' HP using '..newWaltz..'.')
 	end
 end

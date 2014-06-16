@@ -177,7 +177,7 @@ function unify_slots(g)
     return table.key_map(g1, get_default_slot)
 end
 
- 
+
 -----------------------------------------------------------------------------------
 ----Name: is_slot_key(k)
 -- Checks to see if key 'k' is known in the slot_map array, and that slot has not
@@ -190,7 +190,7 @@ end
 -- otherwise false.
 -----------------------------------------------------------------------------------
 function is_slot_key(k)
-    return slot_map[k] and not disable_table[slot_map[k]]
+    return slot_map[k]
 end
  
  
@@ -318,10 +318,19 @@ function set_merge(baseSet, ...)
     -- only contain acceptable slot key entries.
     local cleanSetsList = table.map(combineSets, unify_slots)
 
-    -- Then reduce using a simple table.update function to generate a single set result.
-    local combinedSet = table.reduce(cleanSetsList, table.update, baseSet)
+    -- Combine the provided sets into combinedSet.  If anything is blocked by having
+    -- the slot disabled, assign the item to the not_sent_out_equip table.
+    for _,set in pairs(cleanSetsList) do
+        for slot,item in pairs(set) do
+            if disable_table[slot_map[slot]] then
+                not_sent_out_equip[slot] = item
+            else
+                baseSet[slot] = item
+            end
+        end
+    end
 
-    return combinedSet
+    return baseSet
 end
 
 
@@ -616,8 +625,8 @@ function find_command_registry_key(typ,value)
                 potential_entries[i] = v.timestamp or 0
             elseif v.spell and v.spell.name == 'Double-Up' and value.type == 'CorsairRoll' then
                 -- Double Up ability uses will return action packets that match Corsair Rolls rather than Double Up
-				potential_entries[i] = v.timestamp or 0
-			end
+                potential_entries[i] = v.timestamp or 0
+            end
         end
         for i,v in pairs(potential_entries) do
             if not winner or (current_time - v < current_time - winner) then
@@ -717,7 +726,7 @@ function get_spell(act)
     if act.category == 12 or act.category == 2 then
         spell = table.reassign({},resources_ranged_attack)
     else
-        if not res.action_messages[msg_ID] then
+        if not res.action_messages[msg_ID] or msg_ID == 31 then
             if act.category == 4 or act.category == 8 then
                 spell = res.spells[abil_ID]
                 if act.category == 4 and spell then spell.recast = act.recast end
@@ -735,7 +744,7 @@ function get_spell(act)
         
         
         local fields = fieldsearch(res.action_messages[msg_ID].english) -- ENGLISH
-
+        
         if table.contains(fields,'spell') then
             spell = res.spells[abil_ID]
             if act.category == 4 then spell.recast = act.recast end

@@ -150,7 +150,7 @@ windower.register_event('addon command',function (...)
             windower.add_to_chat(123,'GearSwap: No file name was provided.')
         end
     elseif cmd == 'enable' then
-        disenable(splitup,enable,'enable',false)
+        disenable(splitup,command_enable,'enable',false)
     elseif cmd == 'disable' then
         disenable(splitup,disable,'disable',true)
     elseif cmd == 'reload' or cmd == 'r' then
@@ -189,8 +189,8 @@ function disenable(tab,funct,functname,pol)
     elseif tab[2]  then
         for i=2,#tab do
             if slot_map[tab[i]:gsub('[^%a_%d]',''):lower()] then
-                funct(tab[i])
-                print('GearSwap: '..tab[i]..' slot '..functname..'d.')
+                funct(tab[i]:gsub('[^%a_%d]',''):lower())
+                print('GearSwap: '..tab[i]:gsub('[^%a_%d]',''):lower()..' slot '..functname..'d.')
             else
                 print('GearSwap: Unable to find slot '..tostring(tab[i])..'.')
             end
@@ -268,11 +268,12 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
             player.jobs[to_windower_api(res.jobs[i].english)] = data:byte(i + 72)
         end
         
-        local enc = data:unpack('H',97)
+        local enc = data:unpack('H',0x61)
         --items = windower.ffxi.get_items()
         local tab = {}
         for i,v in pairs(default_slot_map) do
-            if encumbrance_table[i] and math.floor( (enc%(2^(i+1))) / 2^i ) ~= 1 and not_sent_out_equip[v] and not disable_table[i] then
+            local tf = (((enc%(2^(i+1))) / 2^i) >= 1)
+            if encumbrance_table[i] and tf and not_sent_out_equip[v] and not disable_table[i] then
                 tab[v] = not_sent_out_equip[v]
                 not_sent_out_equip[v] = nil
                 debug_mode_chat("Your "..v.." are now unlocked.")
@@ -284,8 +285,6 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
             equip_sets('equip_command',nil,tab)
         end
 --    elseif id == 0x01C then -- Bag size, unused so unincluded
-    elseif id == 0x01D then
-        table.clear(limbo_equip)
     elseif id == 0x01E then
         local bag = to_windower_api(res.bags[data:byte(0x09)].english)
         local slot = data:byte(0x0A)
@@ -419,11 +418,6 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         items.equipment[to_windower_api(res.slots[equipment_slot].english)] = slot
         items.equipment[to_windower_api(res.slots[equipment_slot].english..' bag')] = bag
         items[to_windower_api(res.bags[bag].english)][slot].status = 5 -- Set the status to "equipped"
-
-        if sent_out_equip[data:byte(6)] and sent_out_equip[data:byte(6)].slot == data:byte(5) then
-            sent_out_equip[data:byte(6)] = nil
-            limbo_equip[data:byte(6)] = {inv_id=data:byte(7),slot=data:byte(5)}
-        end
     elseif id == 0x061 then
         player.vitals.max_hp = data:unpack('I',5)
         player.vitals.max_mp = data:unpack('I',9)
@@ -516,8 +510,6 @@ windower.register_event('job change',function(mjob_id, mjob_lvl, sjob_id, sjob_l
     if debugging >= 1 then windower.debug('job change') end
     disable_table = {false,false,false,false,false,false,false,false,false,false,false,false,false,false,false}
     table.clear(not_sent_out_equip)
-    table.clear(sent_out_equip)
-    table.clear(limbo_equip)
 
     if current_job_file ~= res.jobs[mjob_id][language..'_short'] then
         refresh_user_env(mjob_id)
@@ -543,7 +535,6 @@ windower.register_event('zone change',function(new_zone_id,old_zone_id)
     if debugging >= 1 then windower.debug('zone change') end
     _global.midaction = false
     _global.pet_midaction = false
-    sent_out_equip = {}
     not_sent_out_equip = {}
     command_registry = {}
 end)

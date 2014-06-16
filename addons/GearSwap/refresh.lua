@@ -97,7 +97,7 @@ function load_user_files(job_id,user_file)
         -- Player functions
         equip = equip, verify_equip=verify_equip, cancel_spell=cancel_spell,
         force_send=force_send, change_target=change_target, cast_delay=cast_delay,
-        print_set=print_set,set_combine=set_combine,disable=disable,enable=enable,
+        print_set=print_set,set_combine=set_combine,disable=disable,enable=user_enable,
         send_command=send_cmd_user,windower=user_windower,include=include_user,
         midaction=user_midaction,pet_midaction=user_pet_midaction,set_language=set_language,
         show_swaps = show_swaps,debug_mode=debug_mode,
@@ -214,18 +214,7 @@ function refresh_player(dt,user_event_flag)
     -- This being nil does not cause a return, but items should not really be changing when zoning.
     if items.equipment then
         local cur_equip = convert_equipment(items.equipment) -- i = 'head', 'feet', etc.; v = inventory ID (0~80)
-        
-        if sent_out_equip then -- If the swap is not complete, overwrite the current equipment with the equipment that you are swapping to
-            for i,v in pairs(cur_equip) do
-                if sent_out_equip[slot_map[i]] then
-                    v = sent_out_equip[slot_map[i]]
-                end
-                if v == 0 then
-                    v = empty
-                end
-            end
-        end
-        
+                
         -- Assign player.equipment to be the gear that has been sent out and the server currently thinks
         -- you are wearing. (the sent_out_equip for loop above).
         player.equipment = make_user_table()

@@ -201,7 +201,7 @@ function parse_action_packet(act)
                     m.status = color_it('Completely Resists',color_arr['statuscol'])
                 elseif m.message == 85 or m.message == 284 then
                     m.status = color_it('Resists',color_arr['statuscol'])
-                elseif T{75,156,189,248,283,312,323,336,355,408,422,423,425,659}:contains(m.message) then
+                elseif T{75,114,156,189,248,283,312,323,336,355,408,422,423,425,659}:contains(m.message) then
                     m.status = color_it('No effect',color_arr['statuscol']) -- The status code for "No Effect" is 255, so it might actually work without this line
                 end
                 if m.message == 188 then
@@ -236,7 +236,7 @@ function parse_action_packet(act)
                     :gsub('${lb}','\7')
                     :gsub('${number}',act.action.number or m.param)
                     :gsub('${status}',m.status or 'ERROR 120')
-                    :gsub('${gil}',m.param)))
+                    :gsub('${gil}',m.param..' gil')))
                 m.message = 0
             end
             if m.has_add_effect and m.add_effect_message ~= 0 and add_effect_valid[act.category] then
@@ -322,8 +322,8 @@ function simplify_message(msg_ID)
     local msg = res.action_messages[msg_ID][language]
     local fields = fieldsearch(msg)
 
-    if simplify and not T{23,125,129,133,139,140,153,244,453,557,593,594,595,596,597,598,599,674}:contains(msg_ID) then
-        if T{93,273,522,653,654,655,656,85,284,75,156,189,248,283,312,323,336,355,408,422,423,425,659,158,245,324,658}:contains(msg_ID) then
+    if simplify and not T{23,125,129,133,139,140,153,244,453,557,565,582,593,594,595,596,597,598,599,674}:contains(msg_ID) then
+        if T{93,273,522,653,654,655,656,85,284,75,114,156,189,248,283,312,323,336,355,408,422,423,425,659,158,245,324,658}:contains(msg_ID) then
             fields.status = true
         end
         if msg_ID == 31 then
@@ -429,6 +429,13 @@ function player_info(id)
                         if i == 'p0' then
                             typ = 'my_pet'
                             filter = 'my_pet'
+                        end
+                        owner = i
+                        break
+                    elseif v.mob and v.mob.fellow_index and v.mob.fellow_index == player_table.index then
+                        if i == 'p0' then
+                            typ = 'my_fellow'
+                            filter = 'my_fellow'
                         end
                         owner = i
                         break
