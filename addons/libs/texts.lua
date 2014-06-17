@@ -50,6 +50,7 @@ default_settings.flags = {}
 default_settings.flags.right = false
 default_settings.flags.bottom = false
 default_settings.flags.bold = false
+default_settings.flags.draggable = true
 default_settings.flags.italic = false
 default_settings.padding = 0
 default_settings.text = {}
@@ -500,14 +501,9 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
     -- Mouse left click
     elseif type == 1 then
         for _, t in pairs(saved_texts) do
-            local pos_x, pos_y = windower.text.get_location(t._name)
-            local off_x, off_y = windower.text.get_extents(t._name)
+            if t._settings.flags.draggable and t:hover(x, y) then
+                local pos_x, pos_y = windower.text.get_location(t._name)
 
-            if t:visible()
-            and (pos_x <= x and x <= pos_x + off_x
-                or pos_x >= x and x >= pos_x + off_x)
-            and (pos_y <= y and y <= pos_y + off_y
-                or pos_y >= y and y >= pos_y + off_y) then
                 if t._settings.flags.right or t._settings.flags.bottom then
                     local info = windower.get_windower_settings()
                     if t._settings.flags.right then
@@ -516,6 +512,7 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
                         pos_y = pos_y - info.ui_y_res
                     end
                 end
+
                 dragged = {text = t, x = x - pos_x, y = y - pos_y}
                 return true
             end
