@@ -460,7 +460,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
     elseif id == 0x0DF then
         player.vitals.hp = data:unpack('I',9)
         player.vitals.mp = data:unpack('I',13)
-        player.vitals.tp = data:unpack('I',0x11)/10
+        player.vitals.tp = data:unpack('I',0x11)
         player.vitals.hpp = data:byte(0x17)
         player.vitals.mpp = data:byte(0x18)
     end
