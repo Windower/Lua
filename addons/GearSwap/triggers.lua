@@ -177,8 +177,10 @@ function inc_action(act)
     elseif S{84,78}:contains(act.targets[1].actions[1].message) then -- "Paralyzed" and "too far away" respectively
         local ts,tab = delete_command_registry_by_id(act.targets[1].id)
         if tab and tab.spell and tab.spell.prefix == '/pet' then 
+            tab.spell.interrupted = true
             equip_sets('pet_aftercast',nil,tab.spell)
         elseif tab and tab.spell then
+            tab.spell.interrupted = true
             equip_sets('aftercast',nil,tab.spell)
         end
         return

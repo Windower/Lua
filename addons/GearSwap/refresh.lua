@@ -103,10 +103,11 @@ function load_user_files(job_id,user_file)
         show_swaps = show_swaps,debug_mode=debug_mode,
         
         -- Library functions
-        string=string,math=math,table=table,set=set,list=list,T=T,S=S,L=L,os=os,
-        text=text,type=type,tostring=tostring,tonumber=tonumber,pairs=pairs,
-        ipairs = ipairs, print=print, add_to_chat=add_to_chat_user,
-        next=next,lua_base_path=windower.addon_path,empty=empty,
+        string=string,math=math,table=table,set=set,list=list,T=T,S=S,L=L,pack=pack,
+        os=os,text=text,type=type,tostring=tostring,tonumber=tonumber,pairs=pairs,
+        ipairs = ipairs, print=print, add_to_chat=add_to_chat_user,unpack=unpack,
+        next=next,lua_base_path=windower.addon_path,empty=empty,file=file,
+        loadstring=loadstring,assert=assert,error=error,pcall=pcall,
         
         debug=debug,coroutine=coroutine,setmetatable=setmetatable,getmetatable=getmetatable,
         rawset=rawset,rawget=rawget,require=include_user,
