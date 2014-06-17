@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -- addon information
 
 _addon.name = 'digger'
-_addon.version = '2.0.0'
+_addon.version = '2.0.1'
 _addon.command = 'digger'
 _addon.author = 'Seth VanHeulen (Acacia@Odin)'
 
@@ -96,7 +96,10 @@ function update_day()
 end
 
 function display_stats()
-    local accuracy = (settings.accuracy.successful / settings.accuracy.total) * 100
+    local accuracy = 0
+    if settings.accuracy.total > 0 then
+        accuracy = (settings.accuracy.successful / settings.accuracy.total) * 100
+    end
     windower.add_to_chat(207, 'dig accuracy: %d%% (%d/%d), items until fatigued: %d, gysahl greens remaining: %d':format(accuracy, settings.accuracy.successful, settings.accuracy.total, settings.fatigue.remaining, get_gysahl_count()))
 end
 
