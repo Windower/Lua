@@ -1,13 +1,13 @@
 -------------------------------------------------------------------------------------------------------------------
--- General utility functions that can be used by any job files.  Outside the scope of what the main
--- include file deals with.
+-- General utility functions that can be used by any job files.
+-- Outside the scope of what the main include file deals with.
 -------------------------------------------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------------------------------------------
 -- Buff utility functions.
 -------------------------------------------------------------------------------------------------------------------
 
-local cancel_spells_to_check = S{'Sneak', 'Spectral Jig', 'Trance', 'Monomi: Ichi', 'Utsusemi: Ichi'}
+local cancel_spells_to_check = S{'Sneak', 'Stoneskin', 'Spectral Jig', 'Trance', 'Monomi: Ichi', 'Utsusemi: Ichi'}
 local cancel_types_to_check = S{'Waltz', 'Samba'}
 
 -- Function to cancel buffs if they'd conflict with using the spell you're attempting.
@@ -273,7 +273,7 @@ end
 
 
 -- Function to allow for automatic adjustment of the spell target type based on preferences.
-function auto_change_target(spell, action, spellMap)
+function auto_change_target(spell, spellMap)
 	-- Don't adjust targetting for explicitly named targets
 	if not spell.target.raw:startswith('<') then
 		return
@@ -529,7 +529,7 @@ end
 
 -- Attempt to load user gear files in place of default gear sets.
 -- Return true if one exists and was loaded.
-function load_user_gear(job)
+function load_sidecar(job)
 	if not job then return false end
 	
 	-- filename format example for user-local files: whm_gear.lua, or playername_whm_gear.lua
@@ -616,6 +616,8 @@ end
 
 -- This is a function that can be attached to a registered event for 'time change'.
 -- It will send a call to the update() function if the time period changes.
+-- To use in your job lua, add this line:
+-- windower.register_event('time change', time_change)
 function time_change(new_time, old_time)
 	local was_daytime = classes.Daytime
 	local was_dusktime = classes.DuskToDawn
