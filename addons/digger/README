@@ -5,9 +5,7 @@ You can report issues, get the latest version, and view the source at:
     https://github.com/svanheulen/digger-windower-addon
 
 Donations are welcome in the form of Alexandrite:
-    Acacia on Odin
-
-You can get in contact with me on FFOChat IRC.
+    Acacia on Odin (http://www.ffxiah.com/player/Odin/Acacia)
 
 This addon requires the Timers plugin to display your "recast" timer for
 digging. It will also display statistics about your dig accuracy,
@@ -17,5 +15,5 @@ also work properly with the Blue Racing Silks bonus.
 The available commands are:
     digger rank <crafting rank>
         Sets your digging rank.
-    digger reset
-        Clears digging accuracy statistics.
+    digger stats [clear]
+        Displays or clears digging accuracy statistics.

@@ -141,7 +141,6 @@ function enable(...)
     for i,v in pairs(enable_tab) do
         if slot_map[v] then
             local local_slot = default_slot_map[slot_map[v]]
-            print(local_slot,slot_map[v],disable_table[slot_map[v]])
             disable_table[slot_map[v]] = false
             if not_sent_out_equip[local_slot] then
                 sending_table[local_slot] = not_sent_out_equip[local_slot]
@@ -282,7 +281,7 @@ function include_user(str)
     local f, err = loadfile(path)
     if f and not err then
         setfenv(f,user_env)
-        f()
+        return f()
     else
         error('\nGearSwap: Error loading file ('..tostring(str)..'): '..err, 2)
     end

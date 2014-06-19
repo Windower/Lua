@@ -542,7 +542,7 @@ function handle_show_set(cmdParams)
 		end
 
 		add_to_chat(122,'Showing current TP set: ['..state.OffenseMode..'/'..state.DefenseMode..']'..meleeGroups)
-		equip(get_current_melee_set())
+		equip(get_melee_set())
 	-- If given a param of 'precast', block equipping midcast/aftercast sets
 	elseif showset_type == 'precast' then
 		mote_flags.show_set = 'precast'
