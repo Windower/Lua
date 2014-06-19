@@ -437,7 +437,8 @@ _raw.table.sort = _raw.table.sort or table.sort
 
 -- Returns a sorted table.
 function table.sort(t, ...)
-    return _raw.table.sort(t, ...)
+    _raw.table.sort(t, ...)
+    return t
 end
 
 -- Returns an iterator over the table.
