@@ -1,4 +1,4 @@
-#Shortcuts v2.2
+#Shortcuts v2.3
 ####written by Byrth  
 
 Completes and properly formats commands (prefixed by at least one '/'),
@@ -9,6 +9,7 @@ spellcast" project, and represents the interpretation part of spellcast.
 None  
 
 ####Changelog:  
+v2.3 -  6/20/14 - Added new monstrosity skill disambiguation.
 v2.2 -  5/19/14 - Accommodated new Resources changes.
 v2.1 -  4/18/14 - Added custom aliases to Shortcuts.
 v2.0 -  4/ 7/14 - Made Shortcuts calculate available spells/abilities in the case of ambiguous abilities. Moving towards an automated ambiguity-handling framework.
