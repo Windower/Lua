@@ -197,6 +197,8 @@ function refresh_player(dt,user_event_flag)
         update_job_names()
         player.status_id = player.status
         player.status = res.statuses[player.status].english
+        player.nation_id = player.nation
+        player.nation = res.regions[player.nation_id][language] or 'None'
     
         for i,v in pairs(player_mob_table) do
             if i == 'name' then
