@@ -51,16 +51,16 @@ function valid_target(targ,flag)
         return targ
     elseif targ and windower.ffxi.get_player() then
     -- If the target exists, scan the mob array for it
-        local current_target = windower.ffxi.get_mob_by_target('<t>')
+        local current_target = windower.ffxi.get_mob_by_target('t')
         local targar = {}
         for i,v in pairs(windower.ffxi.get_mob_array()) do
             if string.find(v.name:lower(),san_targ:lower()) and (v.valid_target or v.id == windower.ffxi.get_player().id) then
                 -- Handling for whether it's a monster or not
-                if v.is_npc and current_target then
+                if v.is_npc and v.spawn_type ~= 14 and current_target then
                     if v.id == current_target.id then
                         targar['<t>'] = math.sqrt(v.distance)
                     end
-                elseif not v.is_npc then
+                elseif not v.is_npc or v.spawn_type == 14 then
                     targar[v.name] = math.sqrt(v.distance)
                 end
             end

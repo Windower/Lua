@@ -31,6 +31,7 @@ Here are the available values:
 * lp.current              = Current Experience Points (number from 0 to 55,999 XP)
 * lp.tnl                  = Similar to a "To Next Level", but this value is always 10,000 because that's always the number of Limit Points per merit point.
 * lp.number_of_merits     = Number of merit points you have.
+* lp.maximum_merits       = Maximum number of merits you can store.
 
 * cp.current              = Current Capacity Points (number from 0 to 29,999 CP)
 * cp.rate                 = Current CP gain rate per hour. This is calculated over a 10 minute window and requires at least two gains within the window.
@@ -60,6 +61,7 @@ Here are the available values:
 
 
 Version History:
+0.062014 - Added lp.maximum_merits.
 0.050214 - Fixed the Dynamis clock. Added Abyssea lights.
 0.042314 - Addition of strings system
 0.042014 - Addition of strings system

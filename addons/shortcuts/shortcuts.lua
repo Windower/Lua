@@ -24,7 +24,7 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-_addon.version = '2.202'
+_addon.version = '2.300'
 _addon.name = 'Shortcuts'
 _addon.author = 'Byrth'
 _addon.commands = {'shortcuts'}
@@ -180,7 +180,7 @@ windower.register_event('outgoing text',function(original,modified)
         lastsent = ''
         return modified
     end
-    
+
     -- Otherwise, dump the inputs into command_logic()
     return command_logic(temp_org,modified)
 end)
@@ -210,7 +210,7 @@ end)
 ---- string (sometimes '') depending what the logic says to do.
 -----------------------------------------------------------------------------------
 function command_logic(original,modified)
-    local splitline = alias_replace(string.split(original,' '))
+    local splitline = alias_replace(string.split(original,' '):filter(-''))
     local command = splitline[1] -- Treat the first word as a command.
     local potential_targ = splitline[splitline.n]
     local a,b,spell = string.find(original,'"(.-)"')

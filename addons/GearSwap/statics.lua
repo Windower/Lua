@@ -212,7 +212,7 @@ _ExtraData = {
         alliance = {},
         pet = {},
         fellow = {},
-        world = {in_mog_house = false},
+        world = {in_mog_house = false,conquest=false},
     }
 
 function initialize_globals()
@@ -399,3 +399,38 @@ universal_tool_map = {
         ['Migawari: Ichi'] = res.items[2972],
         ['Kakka: Ichi'] = res.items[2972]
     }
+
+region_to_zone_map = { 
+    [4] = S{100,101,139,140,141,142,167,190},
+    [5] = S{102,103,108,193,196,248},
+    [6] = S{1,2,104,105,149,150,195},
+    [7] = S{106,107,143,144,172,173,191},
+    [8] = S{109,110,147,148,197},
+    [9] = S{115,116,145,146,169,170,192,194},
+    [10] = S{3,4,117,118,198,213,249},
+    [11] = S{7,8,119,120,151,152,200},
+    [12] = S{9,10,111,166,203,204,206},
+    [13] = S{5,6,112,161,162,165},
+    [14] = S{126,127,157,158,179,184},
+    [15] = S{121,122,153,154,202,251},
+    [16] = S{114,125,168,208,209,247},
+    [17] = S{113,128.174,201,212},
+    [18] = S{123,176,250,252},
+    [19] = S{124,159,160,163,205,207,211},
+    [20] = S{130,177,178,180,181},
+    [22] = S{11,12,13},
+    [24] = S{24,25,26,27,28,29,30,31,32},
+    }
+
+if windower.ffxi.get_info() then
+    local wo = windower.ffxi.get_info()
+    for i,v in pairs(region_to_zone_map) do
+        if v:contains(wo.zone) then
+           _ExtraData.world.conquest = {
+                region_id = i,
+                region_name = res.regions[i][language],
+                }
+            break
+        end
+    end
+end

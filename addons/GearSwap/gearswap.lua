@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.867'
+_addon.version = '0.868'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -247,6 +247,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
 --        world.logged_in = true
         
         _ExtraData.world.in_mog_house = data:byte(0x81) == 1
+        refresh_ffxi_info()
     elseif id == 0x00B then
         items.temporary = make_inventory_table()
     elseif id == 0x0E and pet.index and pet.index == data:unpack('H',9) and math.floor((data:byte(11)%8)/4)== 1 then
@@ -418,6 +419,28 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         items.equipment[to_windower_api(res.slots[equipment_slot].english)] = slot
         items.equipment[to_windower_api(res.slots[equipment_slot].english..' bag')] = bag
         items[to_windower_api(res.bags[bag].english)][slot].status = 5 -- Set the status to "equipped"
+    elseif id == 0x05E then -- Conquest ID
+        if _ExtraData.world.conquest then
+            local offset = _ExtraData.world.conquest.region_id*4 + 11
+            if offset == 99 then
+                offset = 95
+            elseif offset == 107 then
+                offset = 99
+            end
+            local strength_map = {[0]='Minimal',[1]='Minor',[2]='Major',[3]='Dominant'}
+            local nation_map = {[0]={english='Neutral',japanese='Neutral'},[1]=res.regions[0],[2]=res.regions[1],
+                [3]=res.regions[2],[4]={english='Beastman',japanese='Beastman'},[0xFF]=res.regions[3]}
+            _ExtraData.world.conquest.strengths = {
+                beastmen=strength_map[data:byte(offset+2)%4],
+                windurst=strength_map[math.floor(data:byte(offset+2)%16/4)],
+                bastok=strength_map[math.floor(data:byte(offset+2)%64/16)],
+                sandoria=strength_map[math.floor(data:byte(offset+2)/64)],}
+            _ExtraData.world.conquest.nation = nation_map[data:byte(offset+3)][language]
+            _ExtraData.world.conquest.sandoria = data:byte(0x87)
+            _ExtraData.world.conquest.bastok = data:byte(0x88)
+            _ExtraData.world.conquest.windurst = data:byte(0x89)
+            _ExtraData.world.conquest.beastmen = 100-data:byte(0x87)-data:byte(0x88)-data:byte(0x89)
+        end
     elseif id == 0x061 then
         player.vitals.max_hp = data:unpack('I',5)
         player.vitals.max_mp = data:unpack('I',9)
@@ -447,7 +470,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         local flag_2 = data:byte(6)
         local owner_ind = data:unpack('H',13)
         local subj_ind = data:unpack('H',7)
-        
+                
         if flag_1 == 3 and flag_2 == 5 and windower.ffxi.get_player().index == owner_ind and not pet.isvalid then
             if not next_packet_events then next_packet_events = {sequence_id = data:unpack('H',3)} end
             next_packet_events.pet_change = {subj_ind = subj_ind}
@@ -456,6 +479,10 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
             refresh_globals()
             pet.isvalid = false
             next_packet_events.pet_change = {pet = table.reassign({},pet)}
+        elseif flag_2 == 7 and windower.ffxi.get_player().index == subj_ind and not pet.isvalid then
+            if not next_packet_events then next_packet_events = {sequence_id = data:unpack('H',3)} end
+            pet.isvalid = true
+            next_packet_events.pet_change = {subj_ind = owner_ind}
         end
     elseif id == 0x0DF then
         player.vitals.hp = data:unpack('I',9)
@@ -537,6 +564,16 @@ windower.register_event('zone change',function(new_zone_id,old_zone_id)
     _global.pet_midaction = false
     not_sent_out_equip = {}
     command_registry = {}
+    _ExtraData.world.conquest = false
+    for i,v in pairs(region_to_zone_map) do
+        if v:contains(new_zone_id) then
+            _ExtraData.world.conquest = {
+                region_id = i,
+                region_name = res.regions[i][language],
+                }
+            break
+        end
+    end
 end)
 
 if debugging and debugging >= 1 then
