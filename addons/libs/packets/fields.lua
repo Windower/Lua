@@ -1133,19 +1133,20 @@ fields.incoming[0x01C] = L{
     {ctype='char[7]',           label='_padding1',          const=''},          -- 0D
     {ctype='unsigned short',    label='_dupeInventory Size'},                   -- 14
     {ctype='unsigned short',    label='_dupeSafe Size'},                        -- 16
-    {ctype='unsigned short',    label='_dupeStorage Size'},                     -- 1A   The accumulated storage from all items (uncapped) -1
-    {ctype='unsigned short',    label='_dupeTemporary Size'},                   -- 1C
-    {ctype='unsigned short',    label='_dupeLocker Size'},                      -- 1E
-    {ctype='unsigned short',    label='_dupeSatchel Size'},                     -- 20
-    {ctype='unsigned short',    label='_dupeSack Size'},                        -- 22
-    {ctype='unsigned short',    label='_dupeCase Size'},                        -- 24
-    {ctype='unsigned short',    label='_dupeWardrobe Size'},                    -- 26
-    {ctype='char[16]',          label='_padding2',          const=''},          -- 28
+    {ctype='unsigned short',    label='_dupeStorage Size'},                     -- 18   The accumulated storage from all items (uncapped) -1
+    {ctype='unsigned short',    label='_dupeTemporary Size'},                   -- 1A
+    {ctype='unsigned short',    label='_dupeLocker Size'},                      -- 1C
+    {ctype='unsigned short',    label='_dupeSatchel Size'},                     -- 2E
+    {ctype='unsigned short',    label='_dupeSack Size'},                        -- 20
+    {ctype='unsigned short',    label='_dupeCase Size'},                        -- 22
+    {ctype='unsigned short',    label='_dupeWardrobe Size'},                    -- 24
+    {ctype='char[14]',          label='_padding2',          const=''},          -- 26
 }
 
 -- Finish Inventory
 fields.incoming[0x01D] = L{
-    {ctype='unsigned int',      label='Flag',               const=0x01},        -- 04
+    {ctype='unsigned char',     label='Flag',               const=0x01},        -- 04
+    {ctype='char[3]',           label='_junk1'},                                -- 06
 }
 
 -- Modify Inventory
