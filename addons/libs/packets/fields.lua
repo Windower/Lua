@@ -2025,6 +2025,22 @@ fields.incoming[0x06F] = L{
     {ctype='unsigned short',    label='_junk2'},                                -- 22
 }
 
+types.merit_entry = L{
+    {ctype='unsigned short',    label='Merit'},                                 -- 00
+    {ctype='unsigned char',     label='Next Cost'},                             -- 02
+    {ctype='unsigned char',     label='Value'},                                 -- 03
+}
+
+-- Merits
+fields.incoming[0x08C] = function(data)
+    return L{
+        {ctype='unsigned char', label='Count'},                                 -- 04   Number of merits entries in this packet (possibly a short, although it wouldn't make sense)
+        {ctype='char[3]',       label='_unknown1'},                             -- 05   Always 00 0F 01?
+        {ref=types.merit_entry, count=data:byte(5, 5)},                         -- 08
+        {ctype='unsigned int',  label='_unknown2',          const=0x00000000},  ---04
+    }
+end
+
 -- Job Points
 -- These packets are currently not used by the client in any detectable way.
 -- The below pattern repeats itself for the entirety of the packet. There are 2 jobs per packet,

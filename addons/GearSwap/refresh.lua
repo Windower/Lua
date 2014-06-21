@@ -398,6 +398,14 @@ function refresh_ffxi_info(dt,user_event_flag)
         world.weather = res.weather[18][language]
         world.weather_element = res.elements[7][language]
     end
+    
+    for global_variable_name,extradatatable in pairs(_ExtraData) do
+        if _G[global_variable_name] then
+            for sub_variable_name,value in pairs(extradatatable) do
+                _G[global_variable_name][sub_variable_name] = value
+            end
+        end
+    end
 end
 
 
