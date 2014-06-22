@@ -1874,7 +1874,8 @@ fields.incoming[0x061] = L{
     {ctype='unsigned short',    label='Home point',         fn=zone},           -- 4A
     {ctype='unsigned short',    label='_unknown1'},                             -- 4C   0xFF-ing this last region has no notable effect.
     {ctype='unsigned short',    label='_unknown2'},                             -- 4E
-    {ctype='unsigned short',    label='_unknown3'},                             -- 50
+    {ctype='unsigned char',     label='Nation ID'},                             -- 50   0 = sandy, 1 = bastok, 2 = windy
+    {ctype='unsigned char',     label='_unknown3'},                             -- 51
     {ctype='unsigned short',    label='_unknown4'},                             -- 52   00 00 observed.
 }
 
