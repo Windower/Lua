@@ -384,7 +384,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         arr.param_3 = get_bit_packed(data,102,128) -- Rest
         arr.actor_index = get_bit_packed(data,128,144)
         arr.target_index = get_bit_packed(data,144,160)
-        arr.message_id = get_bit_packed(data,160,175) -- Cut off the most significant bit, hopefully
+        arr.message_id = get_bit_packed(data,160,175)
 
         inc_action_message(arr)
     elseif id == 0x037 then
@@ -446,6 +446,9 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         player.vitals.max_mp = data:unpack('I',9)
         player.main_job_id = data:byte(13)
         player.main_job_level = data:byte(14)
+        
+        _ExtraData.player.nation_id = data:byte(0x51)
+        _ExtraData.player.nation = res.regions[_ExtraData.player.nation_id][language] or 'None'
                 
         if player.sub_job_id ~= data:byte(15) then
             -- Subjob change event
