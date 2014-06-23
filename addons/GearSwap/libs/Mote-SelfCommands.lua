@@ -505,13 +505,14 @@ function handle_update(cmdParams)
 	-- init a new eventArgs
 	local eventArgs = {handled = false}
 
+	reset_buff_states()
+
 	-- Allow jobs to override this code
 	if job_update then
 		job_update(cmdParams, eventArgs)
 	end
 
 	if not eventArgs.handled then
-		reset_buff_states()
 		if handle_equipping_gear then
 			handle_equipping_gear(player.status)
 		end
