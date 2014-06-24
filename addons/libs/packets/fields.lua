@@ -864,6 +864,11 @@ fields.outgoing[0x111] = L{
     {ctype='char[3]',           label='_junk1'},                                -- 05
 }
 
+-- ROE quest log request
+fields.outgoing[0x112] = L{
+    {ctype='int',               label='_unknown1'},                             -- 04
+}
+
 -- Zone update
 fields.incoming[0x00A] = L{
     {ctype='unsigned int',      label='Player',             fn=id},             -- 04
