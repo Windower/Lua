@@ -12,7 +12,7 @@ local createfile = false
 
 -- Create a new file object. Accepts a variable number of paths, which it will
 function files.new(path, create)
-    create = true and (create ~= false)
+    create = create ~= false
 
     if path == nil then
         return setmetatable({}, {__index = files})
@@ -36,7 +36,7 @@ end
 
 -- Sets the file to a path value.
 function files.set(f, path, create)
-    create = true and (create ~= false)
+    create = create ~= false
     createfile = create
 
     f.path = path
@@ -121,17 +121,19 @@ function files.create_path(f)
     end
 
     new_path = windower.addon_path
-    for dir in path:psplit('[/\\]'):filter(-''):it() do
-        new_path = new_path .. '/' .. dir
+    for _, dir in ipairs(path:psplit('[/\\]')) do
+        if not dir == '' then
+            new_path = new_path .. '/' .. dir
 
-        if not windower.dir_exists(new_path) then
-            local res, err = windower.create_dir(new_path)
-            if not res then
-                if err ~= nil then
-                    return nil, err .. ': ' .. new_path
+            if not windower.dir_exists(new_path) then
+                local res, err = windower.create_dir(new_path)
+                if not res then
+                    if err ~= nil then
+                        return nil, err .. ': ' .. new_path
+                    end
+
+                    return nil, 'Unknown error trying to create path ' .. new_path
                 end
-
-                return nil, 'Unknown error trying to create path ' .. new_path
             end
         end
     end
@@ -192,7 +194,7 @@ function files.write(f, content, flush)
 
         if not f:exists() then
             if createfile then
-                notice('New file: ' .. f.path)
+                (_libs.logger and notice or print)('New file: ' .. f.path)
                 f:create()
             else
                 return nil, 'File \'' .. f.path .. '\' not found, cannot write.'
