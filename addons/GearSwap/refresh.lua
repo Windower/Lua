@@ -107,7 +107,7 @@ function load_user_files(job_id,user_file)
         os=os,text=text,type=type,tostring=tostring,tonumber=tonumber,pairs=pairs,
         ipairs = ipairs, print=print, add_to_chat=add_to_chat_user,unpack=unpack,
         next=next,lua_base_path=windower.addon_path,empty=empty,file=file,
-        loadstring=loadstring,assert=assert,error=error,pcall=pcall,
+        loadstring=loadstring,assert=assert,error=error,pcall=pcall,io=io,
         
         debug=debug,coroutine=coroutine,setmetatable=setmetatable,getmetatable=getmetatable,
         rawset=rawset,rawget=rawget,require=include_user,
@@ -197,6 +197,8 @@ function refresh_player(dt,user_event_flag)
         update_job_names()
         player.status_id = player.status
         player.status = res.statuses[player.status].english
+        player.nation_id = player.nation
+        player.nation = res.regions[player.nation_id][language] or 'None'
     
         for i,v in pairs(player_mob_table) do
             if i == 'name' then

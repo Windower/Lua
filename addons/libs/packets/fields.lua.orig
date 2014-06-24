@@ -1758,13 +1758,13 @@ fields.incoming[0x05B] = L{
     -- 1 = MMJ
     -- 2 = Halvung
     -- 3 = Arrapago
-
+    
 -- Orders:
     -- 0 = Defend Al Zahbi
     -- 1 = Intercept Enemy
     -- 2 = Invade Enemy Base
     -- 3 = Recover the Orb
-
+    
 -- Beastman Status
     -- 0 = Training
     -- 1 = Advancing
@@ -1786,24 +1786,24 @@ fields.incoming[0x05E] = L{
     {ctype='unsigned char',     label='Tie Indicator'},                         -- 05   Not really sure how this works, but it gives the ] that indicate a tie. It always gives them between position 2 and 3 for me.
     {ctype='char[20]',          label='_unknown1'},                             -- 06   All Zeros, and changed nothing when 0xFF'd.
     {ctype='unsigned int',      label='Bitpacked Ronfaure Info'},               -- 1A
-    {ctype='unsigned int',      label='Bitpacked Zulkheim Info'},               -- 1E
-    {ctype='unsigned int',      label='Bitpacked Norvallen Info'},              -- 22
-    {ctype='unsigned int',      label='Bitpacked Gustaberg Info'},              -- 26
-    {ctype='unsigned int',      label='Bitpacked Derfland Info'},               -- 2A
-    {ctype='unsigned int',      label='Bitpacked Sarutabaruta Info'},           -- 2E
-    {ctype='unsigned int',      label='Bitpacked Kolshushu Info'},              -- 32
-    {ctype='unsigned int',      label='Bitpacked Aragoneu Info'},               -- 36
-    {ctype='unsigned int',      label='Bitpacked Fauregandi Info'},             -- 3A
-    {ctype='unsigned int',      label='Bitpacked Valdeaunia Info'},             -- 3E
-    {ctype='unsigned int',      label='Bitpacked Qufim Info'},                  -- 42
-    {ctype='unsigned int',      label="Bitpacked Li'Telor Info"},               -- 46
-    {ctype='unsigned int',      label='Bitpacked Kuzotz Info'},                 -- 4A
-    {ctype='unsigned int',      label='Bitpacked Vollbow Info'},                -- 4E
-    {ctype='unsigned int',      label='Bitpacked Elshimo Lowlands Info'},       -- 52
-    {ctype='unsigned int',      label="Bitpacked Elshimo Uplands Info"},        -- 56
-    {ctype='unsigned int',      label="Bitpacked Tu'Lia Info"},                 -- 5A
-    {ctype='unsigned int',      label='Bitpacked Movapolos Info'},              -- 5E
-    {ctype='unsigned int',      label='Bitpacked Tavnazian Archipelago Info'},  -- 62
+    {ctype='unsigned int',      label='Bitpacked Zulkheim Info'},               -- 1E   
+    {ctype='unsigned int',      label='Bitpacked Norvallen Info'},              -- 22   
+    {ctype='unsigned int',      label='Bitpacked Gustaberg Info'},              -- 26   
+    {ctype='unsigned int',      label='Bitpacked Derfland Info'},               -- 2A   
+    {ctype='unsigned int',      label='Bitpacked Sarutabaruta Info'},           -- 2E   
+    {ctype='unsigned int',      label='Bitpacked Kolshushu Info'},              -- 32   
+    {ctype='unsigned int',      label='Bitpacked Aragoneu Info'},               -- 36   
+    {ctype='unsigned int',      label='Bitpacked Fauregandi Info'},             -- 3A   
+    {ctype='unsigned int',      label='Bitpacked Valdeaunia Info'},             -- 3E   
+    {ctype='unsigned int',      label='Bitpacked Qufim Info'},                  -- 42   
+    {ctype='unsigned int',      label="Bitpacked Li'Telor Info"},               -- 46   
+    {ctype='unsigned int',      label='Bitpacked Kuzotz Info'},                 -- 4A   
+    {ctype='unsigned int',      label='Bitpacked Vollbow Info'},                -- 4E   
+    {ctype='unsigned int',      label='Bitpacked Elshimo Lowlands Info'},       -- 52   
+    {ctype='unsigned int',      label="Bitpacked Elshimo Uplands Info"},        -- 56   
+    {ctype='unsigned int',      label="Bitpacked Tu'Lia Info"},                 -- 5A   
+    {ctype='unsigned int',      label='Bitpacked Movapolos Info'},              -- 5E   
+    {ctype='unsigned int',      label='Bitpacked Tavnazian Archipelago Info'},  -- 62   
     {ctype='char[32]',          label='_unknown2'},                             -- 66   All Zeros, and changed nothing when 0xFF'd.
     {ctype='unsigned char',     label="San d'Oria region bar"},                 -- 86   These indicate how full the current region's bar is (in percent).
     {ctype='unsigned char',     label="Bastok region bar"},                     -- 87   The Beastmen are assigned all leftover percentage points.
@@ -1813,13 +1813,13 @@ fields.incoming[0x05E] = L{
     {ctype='char[3]',           label="_unknown4"},                             -- 8D   All Zeros, and changed nothing when 0xFF'd.
     {ctype='int',               label='Conquest Points'},                       -- 90
     {ctype='char[12]',          label="_unknown5"},                             -- 94   Mostly zeros and noticed no change when 0xFF'd.
-
+    
 -- These bytes are for the overview summary on the map.
     -- The two least significant bits code for the owner of the Astral Candescence.
     -- The next two bits indicate the current orders.
     -- The four most significant bits indicate the MMJ level.
     {ctype='unsigned char',     label="MMJ Level, Orders, and AC"},             -- A0
-
+    
     -- Halvung is the 4 least significant bits.
     -- Arrapago is the 4 most significant bits.
     {ctype='unsigned char',     label="Halvung and Arrapago Level"},            -- A1
@@ -1830,7 +1830,7 @@ fields.incoming[0x05E] = L{
     {ctype='unsigned int',      label='Bitpacked MMJ Info'},                    -- A4
     {ctype='unsigned int',      label='Bitpacked Halvung Info'},                -- A8
     {ctype='unsigned int',      label='Bitpacked Arrapago Info'},               -- AC
-
+    
     {ctype='int',               label='Imperial Standing'},                     -- B0
 }
 
@@ -1874,7 +1874,11 @@ fields.incoming[0x061] = L{
     {ctype='unsigned short',    label='Home point',         fn=zone},           -- 4A
     {ctype='unsigned short',    label='_unknown1'},                             -- 4C   0xFF-ing this last region has no notable effect.
     {ctype='unsigned short',    label='_unknown2'},                             -- 4E
+<<<<<<< HEAD
     {ctype='unsigned char',     label='Nation'},                                -- 50   0 = sandy, 1 = bastok, 2 = windy
+=======
+    {ctype='unsigned char',     label='Nation ID'},                             -- 50   0 = sandy, 1 = bastok, 2 = windy
+>>>>>>> origin/4.1-dev
     {ctype='unsigned char',     label='_unknown3'},                             -- 51
     {ctype='unsigned short',    label='_unknown4'},                             -- 52   00 00 observed.
 }

@@ -71,7 +71,7 @@ function custom_aftermath_timers_precast(spell)
         info.aftermath.weaponskill = spell.english
         info.aftermath.duration = 0
         
-        info.aftermath.level = math.floor(player.tp / 100)
+        info.aftermath.level = math.floor(player.tp / 1000)
         if info.aftermath.level == 0 then
             info.aftermath.level = 1
         end
@@ -146,7 +146,7 @@ end
 -- Utility functions for changing spells and target types in an automatic manner.
 -------------------------------------------------------------------------------------------------------------------
 
-local waltz_tp_cost = {['Curing Waltz'] = 20, ['Curing Waltz II'] = 35, ['Curing Waltz III'] = 50, ['Curing Waltz IV'] = 65, ['Curing Waltz V'] = 80}
+local waltz_tp_cost = {['Curing Waltz'] = 200, ['Curing Waltz II'] = 350, ['Curing Waltz III'] = 500, ['Curing Waltz IV'] = 650, ['Curing Waltz V'] = 800}
 
 -- Utility function for automatically adjusting the waltz spell being used to match HP needs and TP limits.
 -- Handle spell changes before attempting any precast stuff.
@@ -230,26 +230,26 @@ function refine_waltz(spell, action, spellMap, eventArgs)
 	-- Downgrade the spell to what we can afford
 	if player.tp < tpCost and not buffactive.trance then
 		--[[ Costs:
-			Curing Waltz:     20 TP
-			Curing Waltz II:  35 TP
-			Curing Waltz III: 50 TP
-			Curing Waltz IV:  65 TP
-			Curing Waltz V:   80 TP
-			Divine Waltz:     40 TP
-			Divine Waltz II:  80 TP
+			Curing Waltz:     200 TP
+			Curing Waltz II:  350 TP
+			Curing Waltz III: 500 TP
+			Curing Waltz IV:  650 TP
+			Curing Waltz V:   800 TP
+			Divine Waltz:     400 TP
+			Divine Waltz II:  800 TP
 		--]]
 		
-		if player.tp < 20 then
+		if player.tp < 200 then
 			add_to_chat(122, 'Insufficient TP ['..tostring(player.tp)..']. Cancelling.')
 			eventArgs.cancel = true
 			return
-		elseif player.tp < 35 then
+		elseif player.tp < 350 then
 			newWaltz = 'Curing Waltz'
-		elseif player.tp < 50 then
+		elseif player.tp < 500 then
 			newWaltz = 'Curing Waltz II'
-		elseif player.tp < 65 then
+		elseif player.tp < 650 then
 			newWaltz = 'Curing Waltz III'
-		elseif player.tp < 80 then
+		elseif player.tp < 800 then
 			newWaltz = 'Curing Waltz IV'
 		end
 		
