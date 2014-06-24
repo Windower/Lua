@@ -322,6 +322,11 @@ fields.outgoing[0x01A] = L{
     {ctype='unsigned short',    label='_unknown1'},                             -- 0E
 }
 
+-- /volunteer
+fields.outgoing[0x01E] = L{
+    {ctype='char*',             label='Target Name'},                           -- 04  null terminated string. Length of name to the nearest 4 bytes.
+}
+
 -- Drop Item
 fields.outgoing[0x028] = L{
     {ctype='unsigned int',      label='Count'},                                 -- 04
@@ -404,6 +409,14 @@ fields.outgoing[0x03A] = L{
     {ctype='unsigned char',     label='Bag',                fn=bag},            -- 04
     {ctype='unsigned char',     label='_unknown1'},                             -- 05
     {ctype='unsigned short',    label='_unknown2'},                             -- 06
+}
+
+-- Blacklist (add/delete)
+fields.outgoing[0x03D] = L{
+    {ctype='int',               label='_unknown1'},                             -- 04  Looks like a player ID, but does not match the sender or the receiver.
+    {ctype='char[16]',          label='Name'},                                  -- 08  Character name
+    {ctype='bool',              label='Add/Remove'},                            -- 18  0 = add, 1 = remove
+    {ctype='char[3]',           label='_unknown2'},                             -- 19  Values observed on adding but not deleting.
 }
 
 -- Lot item
@@ -582,6 +595,24 @@ fields.outgoing[0x096] = L{
     {ctype='unsigned short',    label='_junk1'},                                -- 22
 }
 
+-- /nominate or /proposal
+fields.outgoing[0x0A0] = L{
+    {ctype='unsigned char',     label='Packet Type'},                           -- 04  Not typical mapping. 0=Open poll (say), 1 = Open poll (party), 3 = conclude poll
+    -- Just padding if the poll is being concluded.
+    {ctype='char*',             label='Proposal'},                              -- 05  Proposal exactly as written. Space delimited with quotes and all. Null terminated.
+}
+
+-- /vote
+fields.outgoing[0x0A1] = L{
+    {ctype='unsigned char',     label='Option'},                                -- 04  Voting option
+    {ctype='char*',             label='Character Name'},                        -- 05  Character name. Null terminated.
+}
+
+-- /random
+fields.outgoing[0x0A2] = L{
+    {ctype='int',               label='_unknown1'},                             -- 04  No clear purpose
+}
+
 -- Speech
 fields.outgoing[0x0B5] = L{
     {ctype='unsigned char',     label='Mode'},                                  -- 04   05 for LS chat?
@@ -616,6 +647,11 @@ fields.outgoing[0x0BF] = L{
 fields.outgoing[0x0C0] = L{
 }
 
+-- /makelinkshell
+fields.outgoing[0x0C3] = L{
+    {ctype='unsigned int',      label='_junk1'},                                -- 04  No obvious purpose
+}
+
 -- Check
 fields.outgoing[0x0DD] = L{
     {ctype='unsigned int',      label='Target',             fn=id},             -- 04
@@ -623,6 +659,20 @@ fields.outgoing[0x0DD] = L{
     {ctype='unsigned short',    label='_unknown1'},                             -- 0A
     {ctype='unsigned char',     label='Check Type'},                            -- 0C   00 = Normal /check, 01 = /checkname, 02 = /checkparam
     {ctype='char[3]',           label='_junk1'}                                 -- 0D
+}
+
+-- Search Comment
+fields.outgoing[0x0E0] = L{
+    {ctype='char[40]',          label='Line 1'},                                -- 04  Spaces (0x20) fill out any empty characters.
+    {ctype='char[40]',          label='Line 2'},                                -- 2C  Spaces (0x20) fill out any empty characters.
+    {ctype='char[40]',          label='Line 3'},                                -- 54  Spaces (0x20) fill out any empty characters.
+    {ctype='char[4]',           label='_unknown1'},                             -- 7C  20 20 20 00 observed.
+    {ctype='char[24]',          label='_unknown2'},                             -- 80  Likely contains information about the flags.
+}
+
+-- Get LS Message
+fields.outgoing[0x0E1] = L{
+    {ctype='char[136]',         label='_unknown1',          const=0x0},         -- 04
 }
 
 -- Set LS Message
@@ -1430,6 +1480,14 @@ fields.incoming[0x03D] = L{
     {ctype='unsigned int',      label='_unknown1',          const=1},           -- 0C
 }
 
+-- Blacklist (add/delete)
+fields.incoming[0x042] = L{
+    {ctype='int',               label='_unknown1'},                             -- 04  Looks like a player ID, but does not match the sender or the receiver.
+    {ctype='char[16]',          label='Name'},                                  -- 08  Character name
+    {ctype='bool',              label='Add/Remove'},                            -- 18  0 = add, 1 = remove
+    {ctype='char[3]',           label='_unknown2'},                             -- 19  Values observed on adding but not deleting.
+}
+
 -- Pet Stat
 -- This packet varies and is indexed by job ID (byte 4)
 -- Packet 0x044 is sent twice in sequence when stats could change. This can be caused by anything from
@@ -2025,6 +2083,24 @@ fields.incoming[0x06F] = L{
     {ctype='unsigned char[4]',  label='Skill',              fn=skill},          -- 1A
     {ctype='unsigned char[4]',  label='Skillup',            fn=div+{10}},       -- 1E
     {ctype='unsigned short',    label='_junk2'},                                -- 22
+}
+
+-- Proposal
+fields.incoming[0x078] = L{
+    {ctype='unsigned int',      label='Proposer ID',        fn=id},             -- 04
+    {ctype='unsigned int',      label='_unknown1'},                             -- 08  Proposal ID?
+    {ctype='unsigned short',    label='Proposer Index'},                        -- 0C
+    {ctype='char[15]',          label='Proposer Name'},                         -- 0E
+    {ctype='unsigned char',     label='Chat mode'},                             -- 1D  Not typical chat mode mapping. 1 = Party
+    {ctype='char*',             label='Proposal'},                              -- 1E  Proposal text, complete with special characters
+}
+
+-- Proposal Update
+fields.incoming[0x079] = L{
+    {ctype='unsigned int',      label='_unknown1'},                             -- 04
+    {ctype='char[21]',          label='_unknown2'},                             -- 08  Likely contains information about the current chat mode and vote count
+    {ctype='char[16]',          label='Proposer Name'},                         -- 1D
+    {ctype='char[3]',           label='_junk1'},                                -- 1E  All 00s
 }
 
 types.merit_entry = L{
