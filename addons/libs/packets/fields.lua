@@ -336,7 +336,7 @@ fields.outgoing[0x029] = L{
     {ctype='unsigned char',     label='Bag',                fn=bag},            -- 08
     {ctype='unsigned char',     label='Target Bag',         fn=bag},            -- 09
     {ctype='unsigned char',     label='Inventory Index',    fn=invp+{0x08}},    -- 0A
-    {ctype='unsigned char',     label='_junk1'},                                -- 0B   Has taken the value 52. Unclear purpose.
+    {ctype='unsigned char',     label='_unknown1',          const=0x52},        -- 0B
 }
 
 -- Trade request
@@ -1874,7 +1874,8 @@ fields.incoming[0x061] = L{
     {ctype='unsigned short',    label='Home point',         fn=zone},           -- 4A
     {ctype='unsigned short',    label='_unknown1'},                             -- 4C   0xFF-ing this last region has no notable effect.
     {ctype='unsigned short',    label='_unknown2'},                             -- 4E
-    {ctype='unsigned short',    label='_unknown3'},                             -- 50
+    {ctype='unsigned char',     label='Nation'},                                -- 50   0 = sandy, 1 = bastok, 2 = windy
+    {ctype='unsigned char',     label='_unknown3'},                             -- 51
     {ctype='unsigned short',    label='_unknown4'},                             -- 52   00 00 observed.
 }
 
@@ -2042,15 +2043,19 @@ fields.incoming[0x08C] = function(data)
     }
 end
 
+types.job_point = L{
+    {ctype='unsigned short',    label='Job Point ID'},                          -- 00   32 potential values for every job, which means you could decompose this into a value bitpacked with job ID if you wanted
+    {ctype='bit[10]',           label='_unknown1'},                             -- 02   Always 1 in cases where the ID is set at the moment. Zeroing this has no effect.
+    {ctype='bit[6]',            label='Current Level'},                         -- 03   Current enhancement for this job point ID
+}
+
 -- Job Points
 -- These packets are currently not used by the client in any detectable way.
 -- The below pattern repeats itself for the entirety of the packet. There are 2 jobs per packet,
 -- and 11 of these packets are sent at the moment in response to the first 0x0C0 outgoing packet since zoning.
 -- This is how it works as of 3-19-14, and it is safe to assume that it will change in the future.
 fields.incoming[0x08D] = L{
-    {ctype='unsigned short',    label='Job Point ID'},                          -- 04   32 potential values for every job, which means you could decompose this into a value bitpacked with job ID if you wanted
-    {ctype='bit[10]',           label='_unknown1'},                             -- 06   Always 1 in cases where the ID is set at the moment. Zeroing this has no effect.
-    {ctype='bit[6]',            label='Current Level'},                         -- 07   Current enhancement for this job point ID
+    {ref=types.job_point,       count='*'},                                     -- 04
 }
 
 -- Campaign Map Info
