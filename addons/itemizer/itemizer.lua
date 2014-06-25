@@ -22,7 +22,7 @@ windower.register_event('unhandled command', function(command, ...)
 
 		local id = res.items:name(windower.wc_match-{item_name})
 		if id:length() == 0 then
-			id = res.items:name_full(windower.wc_match-{item_name})
+			id = res.items:name_log(windower.wc_match-{item_name})
 			if id:length() == 0 then
 				log('Unknown item')
 				return
