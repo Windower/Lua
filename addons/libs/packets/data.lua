@@ -164,6 +164,7 @@ data.incoming[0x0DD] = {name='Party Member Update', description='Alliance/party 
 data.incoming[0x0DF] = {name='Char Update',         description='A packet sent from server which updates character HP, MP and TP.'}
 data.incoming[0x0E2] = {name='Char Info',           description='Sends name, HP, HP%, etc.'}
 data.incoming[0x0F4] = {name='Widescan Mob',        description='Displays one monster.'}
+data.incoming[0x0F5] = {name='Widescan Track',      description='Updates information when tracking a monster.'}
 data.incoming[0x0F6] = {name='Widescan Mark',       description='Marks the start and ending of a widescan list.'}
 data.incoming[0x0F9] = {name='Reraise Activation',  description='Reassigns targetable status on reraise activation?'}
 data.incoming[0x0FA] = {name='Furniture Interact',  description='Confirms furniture manipulation.'}
