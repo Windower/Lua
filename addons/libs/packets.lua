@@ -41,6 +41,7 @@ local type_lengths = {
     ['bool']            = 1,
     ['float']           = 4,
     ['double']          = 8,
+    ['data']            = 1,
 }
 setmetatable(type_lengths, {__index = function(t, k)
     local type, count = k:match('([%a%s]+)%[(%d+)%]')
@@ -80,6 +81,7 @@ pack_ids['int']             = 'i'
 pack_ids['long']            = 'l'
 pack_ids['float']           = 'f'
 pack_ids['double']          = 'd'
+pack_ids['data']            = 'A'
 pack_ids = setmetatable(pack_ids, {__index = function(t, k)
     local type, number = k:match('(.-)%s*%[(%d+)%]')
     if type then
