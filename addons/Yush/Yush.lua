@@ -1,8 +1,46 @@
 _addon.author = 'Arcon'
-_addon.version = '1.0.0.1'
+_addon.version = '2.0.0.0'
 _addon.language = 'English'
 
 require('luau')
+
+_innerG = {_binds={}}
+for k, v in pairs(_G) do
+    rawset(_innerG, k, v)
+end
+_innerG._innerG = nil
+_innerG._G = _innerG
+
+_innerG.include = function(path)
+    local full_path = windower.addon_path .. 'data/' .. path
+
+    local file = loadfile(full_path)
+    if not file then
+        warning('Include file %s not found.':format(path))
+        return
+    end
+
+    setfenv(file, _innerG)
+    file()
+end
+
+setmetatable(_innerG, {__index = function(g, k)
+    local t = rawget(rawget(g, '_binds'), k)
+    if not t then
+        t = {}
+        rawset(rawget(g, '_binds'), k, t)
+    end
+    return t
+end, __newindex = function(g, k, v)
+    local t = rawget(rawget(g, '_binds'), k)
+    if t and type(v) == 'table' then
+        for k, v in pairs(v) do
+            t[k] = v
+        end
+    else
+        rawset(rawget(g, '_binds'), k, v)
+    end
+end})
 
 defaults = {}
 defaults.ResetKey = '`'
@@ -57,6 +95,7 @@ windower.register_event('load', 'login', 'job change', 'logout', function()
     end
 
     if file then
+        setfenv(file, _innerG)
         parse_binds(file())
         reset()
         print('Yush: Loaded ' .. path .. ' Lua file')
