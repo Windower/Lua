@@ -321,12 +321,7 @@ end
 
 function default_aftercast(spell, spellMap)
 	if not pet_midaction() then
-		if spell.interrupted then
-			-- Wait a half-second to update so that aftercast equip will actually be worn.
-			send_command('wait 0.5;gs c update')
-		else
-			handle_equipping_gear(player.status)
-		end
+		handle_equipping_gear(player.status)
 	end
 end
 
