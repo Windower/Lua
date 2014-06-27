@@ -132,7 +132,7 @@ function equip_sets(swap_type,ts,...)
         end
         
         
-        if not (buffactive.charm or buffactive.KO) then
+        if buffactive.charm or buffactive.KO then
         
             local failure_reason
             if buffactive.charm then
@@ -145,7 +145,7 @@ function equip_sets(swap_type,ts,...)
         else
             for eq_slot_id,_ in priority_order(priorities) do
                 if equip_next[eq_slot_id] and not encumbrance_table[eq_slot_id] and not _settings.demo_mode then
-                    equip_piece(eq_slot_id,equip_next.bag_id,equip_next.slot)
+                    equip_piece(eq_slot_id,equip_next[eq_slot_id].bag_id,equip_next[eq_slot_id].slot)
                 end
             end
         end
@@ -162,12 +162,12 @@ end
 
 
 -----------------------------------------------------------------------------------
---Name: equip_piece(eq_slot_id,next_bag_id,next_slot_id)
+--Name: equip_piece(eq_slot_id,bag_id,inv_slot_id)
 --Desc: Cleans up the global table and leaves equip_sets properly.
 --Args:
----- next_gear - Mapping of 
----- ts - Current index of command_registry
----- val1 - First argument of equip_sets
+---- eq_slot_id - Equipment Slot ID
+---- bag_id - Bag ID of the item to be equipped
+---- inv_slot_id - Inventory Slot ID of the item to be equipped
 -----------------------------------------------------------------------------------
 --Returns:
 ---- none
@@ -179,7 +179,7 @@ function equip_piece(eq_slot_id,bag_id,inv_slot_id)
         items[to_windower_api(res.bags[cur_eq_tab.bag_id].english)][cur_eq_tab.slot].status = 0
     end
     
-    if next_gear[eq_slot_id].slot ~= empty then
+    if inv_slot_id ~= empty then
         windower.packets.inject_outgoing(0x50,string.char(0x50,0x04,0,0,inv_slot_id,eq_slot_id,bag_id,0))
         
         items.equipment[toslotname(eq_slot_id)] = {slot=inv_slot_id,bag_id=bag_id}
@@ -453,6 +453,10 @@ windower.register_event('outgoing chunk',function(id,original,modified,injected,
     -- Scrub the equipment array if a valid outgoing job change packet is sent.
         local newmain = modified:byte(5)
         if res.jobs[newmain] and newmain ~= player.main_job_id then
+            windower.debug('job change')
+            disenable('all',command_enable,'enable',false) -- enable all slots
+            table.clear(not_sent_out_equip)
+            
             for id,name in pairs(default_slot_map) do
                 if items.equipment[name].slot ~= empty then
                     local bag = to_windower_api(res.bags[items.equipment[name].bag_id].english)

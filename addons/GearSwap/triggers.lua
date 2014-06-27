@@ -68,7 +68,7 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
             st_flag = nil
             return true
         elseif temp_mob_arr then
-            logit('\n\n'..tostring(os.clock)..'(93) temp_mod: '..temp_mod)
+            logit('\n\n'..tostring(os.clock)..'(93) temp_mod: '..tostring(temp_mod))
             refresh_globals()
             
             local r_line
