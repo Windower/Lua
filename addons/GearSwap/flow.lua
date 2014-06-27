@@ -140,7 +140,7 @@ function equip_sets(swap_type,ts,...)
             elseif buffactive.KO then
                 failure_reason = 'KOed'
             end
-            debug_mode_chat("Cannot change gear right now: "..failure_reason)
+            debug_mode_chat("Cannot change gear right now: "..tostring(failure_reason))
             logit('\n\n'..tostring(os.clock)..'(69) failure_reason: '..tostring(failure_reason))
         else
             for eq_slot_id,_ in priority_order(priorities) do

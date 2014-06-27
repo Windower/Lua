@@ -194,6 +194,28 @@ short_slot_map.back = 15
 
 
 
+last_PC_update = ''
+item_update_flag = true
+gearswap_disabled = false
+not_sent_out_equip = {}
+command_registry = {}
+equip_list = {}
+world = make_user_table()
+buffactive = make_user_table()
+alliance = make_user_table()
+st_targs = {['<st>']=true,['<stpc>']=true,['<stal>']=true,['<stnpc>']=true,['<stpt>']=true}
+current_job_file = nil
+disable_table = {false,false,false,false,false,false,false,false,false,false,false,false,false,false,false}
+outgoing_action_category_table = {['/ma']=3,['/ws']=7,['/ja']=9,['/ra']=16,['/ms']=25}
+disable_table[0] = false
+encumbrance_table = table.reassign({},disable_table)
+registered_user_events = {}
+empty = {name="empty"}
+--outgoing_packet_table = {}
+last_refresh = 0
+
+
+
 _global = make_user_table()
 _global.cast_delay = 0
 _global.cancel_spell = false
@@ -282,6 +304,7 @@ function initialize_globals()
                     bag_id = items.equipment[name..'_bag']
                     }
                     items.equipment[name..'_bag'] = nil
+                if items.equipment[name].slot == 0 then items.equipment[name].slot = empty end
             end
         end
     end
@@ -289,30 +312,11 @@ end
 
 initialize_globals()
 
-last_PC_update = ''
-item_update_flag = true
-gearswap_disabled = false
-not_sent_out_equip = {}
-command_registry = {}
-equip_list = {}
-world = make_user_table()
-buffactive = make_user_table()
-alliance = make_user_table()
 player.equipment = make_user_table()
 pet = make_user_table()
 pet.isvalid = false
 fellow = make_user_table()
 fellow.isvalid = false
-st_targs = {['<st>']=true,['<stpc>']=true,['<stal>']=true,['<stnpc>']=true,['<stpt>']=true}
-current_job_file = nil
-disable_table = {false,false,false,false,false,false,false,false,false,false,false,false,false,false,false}
-outgoing_action_category_table = {['/ma']=3,['/ws']=7,['/ja']=9,['/ra']=16,['/ms']=25}
-disable_table[0] = false
-encumbrance_table = table.reassign({},disable_table)
-registered_user_events = {}
-empty = {name="empty"}
---outgoing_packet_table = {}
-last_refresh = 0
 
 unbridled_learning_set = {['Thunderbolt']=true,['Harden Shell']=true,['Absolute Terror']=true,
     ['Gates of Hades']=true,['Tourbillion']=true,['Pyric Bulwark']=true,['Bilgestorm']=true,

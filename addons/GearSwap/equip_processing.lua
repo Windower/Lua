@@ -300,14 +300,14 @@ function to_names_set(equipment)
     
     for ind,cur_item in pairs(equipment) do
         local name = 'empty'
-        if cur_item ~= empty then
+        if cur_item.slot ~= empty then
             name = res.items[items[to_windower_api(res.bags[cur_item.bag_id].english)][cur_item.slot].id][language]
         end
         
         if tonumber(ind) and ind >= 0 and ind <= 15 and math.floor(ind) == ind then
-            equip_package[default_slot_map[ind]] = res.items[items[to_windower_api(res.bags[cur_item.bag_id].english)][cur_item.slot].id][language]
+            equip_package[default_slot_map[ind]] = name
         else
-            equip_package[tostring(ind)]=res.items[items[to_windower_api(res.bags[cur_item.bag_id].english)][cur_item.slot].id][language]
+            equip_package[tostring(ind)] = name
         end
     end
 
