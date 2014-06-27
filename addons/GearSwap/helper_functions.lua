@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-__raw = {lower = string.lower, upper = string.upper}
+__raw = {lower = string.lower, upper = string.upper, debug=windower.debug}
 
 -----------------------------------------------------------------------------------
 --Name: string.lower()
@@ -553,7 +553,7 @@ end
 -----------------------------------------------------------------------------------
 function filter_precast(spell)
     if not spell.target.id or not spell.target.index then
-        if debugging >= 1 then windower.add_to_chat(8,'No target id or index') end
+        if debugging.general then windower.add_to_chat(8,'No target id or index') end
         return false
     end
     return true
@@ -578,7 +578,7 @@ function mk_command_registry_entry(sp)
     command_registry[ts] = {}
     command_registry[ts].cast_delay = 0
     command_registry[ts].spell = sp
-    if debugging >= 2 then
+    if debugging.command_registry then
         windower.add_to_chat(8,'GearSwap (Debug Mode): Creating a new command_registry entry: '..windower.to_shift_jis(tostring(ts)..' '..tostring(command_registry[ts])))
     end
     return ts
@@ -737,7 +737,7 @@ function get_spell(act)
             elseif T{5,9}:contains(act.category) then
                 spell = res.items[abil_ID]
             else
-                spell = {name=tostring(msg_ID)} -- Debugging
+                spell = {name=tostring(msg_ID)}
             end
             return spell
         end
@@ -913,4 +913,34 @@ function priority_order(priority_list)
         priority_list[slot_id] = nil
         return slot_id,maximum
     end
+end
+
+
+
+-----------------------------------------------------------------------------------
+--Name: toslotname(slot_id)
+--Args:
+---- slot_id: Number from 0-15 representing the slot
+-----------------------------------------------------------------------------------
+--Returns:
+---- slot name (string)
+-----------------------------------------------------------------------------------
+function toslotname(slot_id)
+    return default_slot_map[slot_id]
+end
+
+
+
+-----------------------------------------------------------------------------------
+--Name: windower.debug(...)
+--Args:
+---- ...: Anything, to be passed to the real windower.debug if the windower_debugging
+---- flag is set.
+-----------------------------------------------------------------------------------
+--Returns:
+---- Nothing
+-----------------------------------------------------------------------------------
+windower.__raw = {debug = windower.debug}
+windower.debug = function(...)
+    if debugging.windower_debug then __raw.debug(...) end
 end

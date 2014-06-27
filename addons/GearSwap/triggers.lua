@@ -41,16 +41,12 @@
 ---- none or ''
 -----------------------------------------------------------------------------------
 windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
-    if debugging >= 1 then windower.debug('outgoing text (debugging)') end
+    windower.debug('outgoing text')
     if gearswap_disabled then return modified end
     
     local splitline = windower.from_shift_jis(windower.convert_auto_trans(modified)):gsub(' <wait %d+>',''):gsub('"(.-)"',function(str)
             return str:gsub(' ',string.char(7))
-        end):split(' '):filter(function(val)
-            if val ~= '' then
-                return true
-            end
-        end)
+        end):split(' '):filter(-'')
     
     if splitline.n == 0 then return end
 
@@ -185,7 +181,7 @@ function inc_action(act)
         end
         return
     else
-        if debugging >= 1 then windower.send_command('input /echo Incoming Action packet did not generate a spell/aftercast.')end
+        if debugging.general then windower.send_command('input /echo Incoming Action packet did not generate a spell/aftercast.')end
         return
     end
     
@@ -214,7 +210,7 @@ function inc_action(act)
             -- Also, there are some actions (like being paralyzed while casting Ninjutsu) that sends two result action packets. Block the second packet.
             refresh_globals()
             equip_sets(prefix..'aftercast',ts,spell)
-        elseif debugging >= 1 then
+        elseif debugging.command_registry then
             windower.add_to_chat(8,'GearSwap (Debug Mode): Hitting Aftercast without detecting an entry in command_registry')
         end
     elseif (readies[act.category] and act.param == 28787) then -- and not (act.category == 9 or (act.category == 7 and prefix == 'pet_'))) then
@@ -225,7 +221,7 @@ function inc_action(act)
             -- Also, there are some actions (like being paralyzed while casting Ninjutsu) that sends two result action packets. Block the second packet.
             refresh_globals()
             equip_sets(prefix..'aftercast',ts,spell)
-        elseif debugging >= 1 then
+        elseif debugging.command_registry then
             windower.add_to_chat(8,'GearSwap (Debug Mode): Hitting Aftercast without detecting an entry in command_registry')
         end
     elseif readies[act.category] and prefix == 'pet_' and act.targets[1].actions[1].message ~= 0 then -- Entry for pet midcast. Excludes the second packet of "Out of range" BPs.
@@ -249,15 +245,9 @@ end
 ---- none
 -----------------------------------------------------------------------------------
 function inc_action_message(arr)
-    if debugging >= 1 then windower.debug('action message') end
+    windower.debug('action message')
     if gearswap_disabled then return end
-    if T{6,20,113,406,605,646}:contains(arr.message_id) then
-        -- 6   : target is defeated by actor
-        -- 20  : target falls to the ground
-        -- 113 : target falls to the ground
-        -- 406 : target falls to the ground
-        -- 605 : target falls to the ground
-        -- 646 : target falls to the ground
+    if T{6,20,113,406,605,646}:contains(arr.message_id) then -- death messages
         local ts,tab = delete_command_registry_by_id(arr.target_id)
         if tab and tab.spell and tab.spell.prefix == '/pet' then 
             equip_sets('pet_aftercast',nil,tab.spell)

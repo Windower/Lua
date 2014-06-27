@@ -48,8 +48,8 @@ function equip_sets(swap_type,ts,...)
     table.reassign(_global,command_registry[ts] or {cast_delay = 0,midaction = false,pet_midaction = false,cancel_spell = false})
     _global.current_event = tostring(swap_type)
     
-    if debugging >= 1 then windower.debug(tostring(swap_type)..' enter') 
-    if showphase or debugging >= 2 then windower.add_to_chat(8,windower.to_shift_jis(tostring(swap_type))..' enter') end end
+    windower.debug(tostring(swap_type)..' enter')
+    if showphase or debugging.general then windower.add_to_chat(8,windower.to_shift_jis(tostring(swap_type))..' enter') end
     
     local cur_equip = table.reassign({},items.equipment)
         
@@ -84,7 +84,7 @@ function equip_sets(swap_type,ts,...)
     end
     
     if not val1 then val1 = {}
-        if debugging >= 2 then
+        if debugging.general then
             windower.add_to_chat(8,'val1 error')
         end
     end
@@ -108,7 +108,7 @@ function equip_sets(swap_type,ts,...)
     if type(swap_type) == 'string' and (swap_type == 'pretarget' or swap_type == 'filtered_action') then -- Target may just have been changed, so make the ind now.
         ts = mk_command_registry_entry(val1)
     elseif type(swap_type) == 'string' and swap_type == 'precast' then
-        if not command_registry[ts] then if debugging >= 1 then print_set(spell,'precast nil error') end
+        if not command_registry[ts] then if debugging.command_registry then print_set(spell,'precast nil error') end
         else command_registry[ts].timestamp = os.time() end
     end
     
@@ -133,53 +133,20 @@ function equip_sets(swap_type,ts,...)
             print_set(tempset,tostring(swap_type))
         end
         
-        local failure_reason
-        for i,v in pairs(player.buffs) do
-            if v==14 or v == 17 then
+        
+        if not (buffactive.charm or buffactive.KO) then
+        
+            local failure_reason
+            if buffactive.charm then
                 failure_reason = 'Charmed'
-            elseif v == 0 then
+            elseif buffactive.KO then
                 failure_reason = 'KOed'
             end
-            if failure_reason then
-                debug_mode_chat("Cannot change gear right now: "..failure_reason)
-            end
-        end
-        
-        if not failure_reason then
-            for equipment_slot,priority in priority_order(priorities) do
-                if debugging >= 3 and equip_next[equipment_slot] then
-                    local out_str = 'Priority: '..tostring(priority)..'  Slot ID: '..tostring(equipment_slot)..'  Inv. ID: '..tostring(equip_next[equipment_slot])
-                    if equip_next[equipment_slot].slot ~= empty then
-                        out_str = out_str..'  Item: '..tostring(res.items[items[to_windower_api(res.bags[equip_next[equipment_slot].bag_id].english)][equip_next[equipment_slot].slot].id][language..'_log'])
-                    else
-                        out_str = out_str..'  Emptying slot'
-                    end
-                    windower.add_to_chat(8,'GearSwap (Debugging): '..out_str)
-                elseif equip_next[equipment_slot] and not encumbrance_table[equipment_slot] then
-                    windower.debug('attempting to set gear. Priority: '..tostring(priority)..'  Slot ID: '..tostring(equipment_slot)..'  Inv. ID: '..tostring(equip_next[equipment_slot]))
-                    if not _settings.demo_mode then
-                        local equipment_slot_name = default_slot_map[equipment_slot]
-                        
-                        local next_bag = to_windower_api(res.bags[equip_next[equipment_slot].bag_id].english)
-                        local current_bag = to_windower_api(res.bags[items.equipment[equipment_slot_name].bag_id].english)
-                        
-                        local next_inventory_slot = equip_next[equipment_slot].slot
-                        
-                        if items.equipment[equipment_slot_name].slot ~= empty then
-                            items[current_bag][items.equipment[equipment_slot_name].slot].status = 0
-                        end
-                        
-                        if equip_next[equipment_slot].slot ~= empty then
-                            windower.packets.inject_outgoing(0x50,string.char(0x50,0x04,0,0,equip_next[equipment_slot].slot,equipment_slot,equip_next[equipment_slot].bag_id,0))
-                            
-                            items.equipment[equipment_slot_name] = {slot=next_inventory_slot,bag_id=equip_next[equipment_slot].bag_id}
-                            items[next_bag][next_inventory_slot].status = 5
-                        else
-                            windower.packets.inject_outgoing(0x50,string.char(0x50,0x04,0,0,0,equipment_slot,0,0))
-                            items.equipment[equipment_slot_name] = {slot=empty,bag_id=0}
-                        end
-                        --windower.ffxi.set_equip(equip_next[equipment_slot].slot,equipment_slot,equip_next[equipment_slot].bag_id)
-                    end
+            debug_mode_chat("Cannot change gear right now: "..failure_reason)
+        else
+            for eq_slot_id,_ in priority_order(priorities) do
+                if equip_next[eq_slot_id] and not encumbrance_table[eq_slot_id] and not _settings.demo_mode then
+                    equip_piece(eq_slot_id,equip_next.bag_id,equip_next.slot)
                 end
             end
         elseif logging then
@@ -187,13 +154,44 @@ function equip_sets(swap_type,ts,...)
         end
     end
     
-    if debugging >= 1 then windower.debug(tostring(swap_type)..' exit') end
+    windower.debug(tostring(swap_type)..' exit')
     
     if type(swap_type) == 'function' then
         return unpack(results)
     end
     
     return equip_sets_exit(swap_type,ts,val1)
+end
+
+
+-----------------------------------------------------------------------------------
+--Name: equip_piece(eq_slot_id,next_bag_id,next_slot_id)
+--Desc: Cleans up the global table and leaves equip_sets properly.
+--Args:
+---- next_gear - Mapping of 
+---- ts - Current index of command_registry
+---- val1 - First argument of equip_sets
+-----------------------------------------------------------------------------------
+--Returns:
+---- none
+-----------------------------------------------------------------------------------
+function equip_piece(eq_slot_id,bag_id,inv_slot_id)
+    local cur_eq_tab = items.equipment[eq_slot_id:toslotname()]
+    
+    if cur_eq_tab.slot ~= empty then
+        items[to_windower_api(res.bags[cur_eq_tab.bag_id].english)][cur_eq_tab.slot].status = 0
+    end
+    
+    if next_gear[eq_slot_id].slot ~= empty then
+        windower.packets.inject_outgoing(0x50,string.char(0x50,0x04,0,0,inv_slot_id,eq_slot_id,bag_id,0))
+        
+        items.equipment[eq_slot_id:toslotname()] = {slot=inv_slot_id,bag_id=bag_id}
+        items[to_windower_api(res.bags[bag_id].english)][inv_slot_id].status = 5
+    else
+        windower.packets.inject_outgoing(0x50,string.char(0x50,0x04,0,0,0,eq_slot_id,0,0))
+        
+        items.equipment[eq_slot_id:toslotname()] = {slot=empty,bag_id=0}
+    end
 end
 
 
@@ -438,9 +436,9 @@ end
 -----------------------------------------------------------------------------------
 windower.register_event('outgoing chunk',function(id,original,modified,injected,blocked)
     if gearswap_disabled then return end
-    if debugging >= 1 then windower.debug('outgoing chunk '..id) end
+    windower.debug('outgoing chunk '..id)
     if id == 0x1A and not injected then
-        local cur_time = os.clock()
+ --[[       local cur_time = os.clock()
         for i,v in pairs(outgoing_packet_table) do
             if cur_time-v > 1 then
                 outgoing_packet_table[i] = nil
@@ -448,12 +446,9 @@ windower.register_event('outgoing chunk',function(id,original,modified,injected,
                 return
             end
         end
-        outgoing_packet_table[original] = os.clock()
+        outgoing_packet_table[original] = os.clock()]]
 
-        local target_index = get_bit_packed(original,64,80)
-        local category = get_bit_packed(original,80,96)
-        local target_id = windower.ffxi.get_mob_by_index(target_index).id
-        if category == 12 and cued_packet and target_id == player.id then -- and command_registry[cued_packet] and command_registry[cued_packet].proposed_packet
+        if original:unpack('H',0xB) == 12 and cued_packet and original:unpack('H',0x9) == player.index then
             cued_packet = nil
             return true
         end

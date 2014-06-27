@@ -252,13 +252,29 @@ function compare_augments(goal,current)
     end
 end
 
-function eliminate_redundant(current_gear,equip_next) -- Eliminates gear you already wear from the table
-    for i,v in pairs(current_gear) do
-        if v.slot == empty and equip_next[slot_map[i]] and equip_next[slot_map[i]].slot == empty then
-            equip_next[slot_map[i]] = nil
+
+-----------------------------------------------------------------------------------
+--Name: eliminate_redundant(current_gear,equip_next)
+--Args:
+---- current_gear - Mapping of currently worn equipment
+---- equip_next   - Mapping of equipment that you want to equip
+-----------------------------------------------------------------------------------
+--Returns:
+---- Set with all duplicate entries eliminated.
+---- empty tables are processed separately, because an unlimited number can be equipped.
+-----------------------------------------------------------------------------------
+function eliminate_redundant(current_gear,equip_next)
+    for eq_slot,cur_item in pairs(current_gear) do
+        if cur_item.slot == empty then
+            if equip_next[slot_map[eq_slot]] and equip_next[slot_map[eq_slot]].slot == empty then
+                equip_next[slot_map[eq_slot]] = nil
+            end
         else
             for n,m in pairs(equip_next) do
-                if m.slot ~= empty and v.bag_id == m.bag_id and v.slot==m.slot then
+                if m.slot ~= empty and cur_item.bag_id == m.bag_id and cur_item.slot==m.slot then
+                    -- If it is already equipped somewhere else, eliminate it.
+                    -- Could add more complicated handling here to control the order of equipped
+                    -- gear and allow people to do things like swap fingers for rings.
                     equip_next[n] = nil
                 end
             end
@@ -267,24 +283,31 @@ function eliminate_redundant(current_gear,equip_next) -- Eliminates gear you alr
     return equip_next
 end
 
-function to_names_set(id_id)
+
+-----------------------------------------------------------------------------------
+--Name: to_names_set(equipment)
+--Args:
+---- equipment - Mapping of equipment slot ID or slot name to a table containing
+----   bag_id and inventory slot ID. If already indexed to a number, treat it as a slot index.
+----   Otherwise, damn the torpedoes and tostring it.
+-----------------------------------------------------------------------------------
+--Returns:
+---- Set with a mapping of slot name to equipment name.
+---- 'empty' is used as a replacement for the empty table.
+-----------------------------------------------------------------------------------
+function to_names_set(equipment)
     local equip_package = {}
     
-    for i,v in pairs(id_id) do
-        if v.slot~=empty then
-            if items[to_windower_api(res.bags[v.bag_id].english)][v.slot].id == 0 then
-                equip_package[i]=''
-            elseif type(i) ~= 'string' then
-                equip_package[default_slot_map[i]] = res.items[items[to_windower_api(res.bags[v.bag_id].english)][v.slot].id][language]
-            else
-                equip_package[i]=res.items[items[to_windower_api(res.bags[v.bag_id].english)][v.slot].id][language]
-            end
+    for ind,cur_item in pairs(equipment) do
+        local name = 'empty'
+        if cur_item ~= empty then
+            name = res.items[items[to_windower_api(res.bags[cur_item.bag_id].english)][cur_item.slot].id][language]
+        end
+        
+        if tonumber(ind) and ind >= 0 and ind <= 15 and math.floor(ind) == ind then
+            equip_package[default_slot_map[ind]] = res.items[items[to_windower_api(res.bags[cur_item.bag_id].english)][cur_item.slot].id][language]
         else
-            if type(i)~= 'string' then
-                equip_package[default_slot_map[i]] = 'empty'
-            else
-                equip_package[i]='empty'
-            end
+            equip_package[tostring(ind)]=res.items[items[to_windower_api(res.bags[cur_item.bag_id].english)][cur_item.slot].id][language]
         end
     end
 

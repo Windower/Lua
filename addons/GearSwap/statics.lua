@@ -311,7 +311,7 @@ disable_table[0] = false
 encumbrance_table = table.reassign({},disable_table)
 registered_user_events = {}
 empty = {name="empty"}
-outgoing_packet_table = {}
+--outgoing_packet_table = {}
 last_refresh = 0
 
 unbridled_learning_set = {['Thunderbolt']=true,['Harden Shell']=true,['Absolute Terror']=true,

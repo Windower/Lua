@@ -30,9 +30,9 @@ _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
 if windower.file_exists(windower.addon_path..'data/bootstrap.lua') then
-    debugging = 1
+    debugging = {windower_debug = true,command_registry = true,general=false}
 else
-    debugging = 0
+    debugging = {}
 end
 
 language = 'english'
@@ -64,7 +64,7 @@ require 'flow'
 require 'triggers'
 
 windower.register_event('load',function()
-    if debugging >= 1 then windower.debug('load') end
+    windower.debug('load')
     if windower.dir_exists('../addons/GearSwap/data/logs') then
         logging = false
         logfile = io.open('../addons/GearSwap/data/logs/NormalLog'..tostring(os.clock())..'.log','w+')
@@ -75,18 +75,18 @@ windower.register_event('load',function()
     
     if world.logged_in then
         refresh_user_env()
-        if debugging >= 1 then windower.send_command('@unload spellcast;') end
+        if debugging.general then windower.send_command('@unload spellcast;') end
     end
 end)
 
 windower.register_event('unload',function ()
-    if debugging >= 1 then windower.debug('unload') end
+    windower.debug('unload')
     user_pcall('file_unload')
     if logging then    logfile:close() end
 end)
 
 windower.register_event('addon command',function (...)
-    if debugging >= 1 then windower.debug('addon command') end
+    windower.debug('addon command')
     if logging then
         local command = table.concat({...},' ')
         logit(logfile,'\n\n'..tostring(os.clock)..command)
@@ -167,16 +167,6 @@ windower.register_event('addon command',function (...)
     elseif _settings.debug_mode and strip(cmd) == 'eval' then
         table.remove(splitup,1)
         assert(loadstring(table.concat(splitup,' ')))()
-    elseif debugging and debugging > 1 and _settings.debug_mode and strip(cmd) == 'visible' then
-        windower.text.set_visibility('precast',true)
-        windower.text.set_visibility('midcast',true)
-        windower.text.set_visibility('aftercast',true)
-        windower.text.set_visibility('buff_change',true)
-    elseif debugging and debugging > 1 and _settings.debug_mode and strip(cmd) == 'invisible' then
-        windower.text.set_visibility('precast',false)
-        windower.text.set_visibility('midcast',false)
-        windower.text.set_visibility('aftercast',false)
-        windower.text.set_visibility('buff_change',false)
     else
         print('GearSwap: Command not found')
     end
@@ -202,9 +192,7 @@ function disenable(tab,funct,functname,pol)
 end
 
 windower.register_event('incoming chunk',function(id,data,modified,injected,blocked)
-    if debugging >= 1 then windower.debug('incoming chunk '..id) end
-    
-    
+    windower.debug('incoming chunk '..id)
     
     if next_packet_events and next_packet_events.sequence_id ~= data:unpack('H',3) then
         if not next_packet_events.globals_update or next_packet_events.globals_update ~= data:unpack('H',3) then
@@ -497,7 +485,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
 end)
 
 windower.register_event('status change',function(new,old)
-    if debugging >= 1 then windower.debug('status change '..new) end
+    windower.debug('status change '..new)
     if gearswap_disabled or T{2,3,4}:contains(old) or T{2,3,4}:contains(new) then return end
     
     refresh_globals()
@@ -509,7 +497,7 @@ windower.register_event('gain buff',function(buff_id)
         error('GearSwap: No known status for buff id #'..tostring(buff_id))
     end
     local buff_name = res.buffs[buff_id][language]
-    if debugging >= 1 then windower.debug('gain buff '..buff_name..' ('..tostring(buff_id)..')') end
+    windower.debug('gain buff '..buff_name..' ('..tostring(buff_id)..')')
     if gearswap_disabled then return end
     
     -- Need to figure out what I'm going to do with this:
@@ -530,14 +518,14 @@ windower.register_event('lose buff',function(buff_id)
         error('GearSwap: No known status for buff id #'..tostring(buff_id))
     end
     local buff_name = res.buffs[buff_id][language]
-    if debugging >= 1 then windower.debug('lose buff '..buff_name..' ('..tostring(buff_id)..')') end
+    windower.debug('lose buff '..buff_name..' ('..tostring(buff_id)..')')
     if gearswap_disabled then return end
     refresh_globals()
     equip_sets('buff_change',nil,buff_name,false)
 end)
 
 windower.register_event('job change',function(mjob_id, mjob_lvl, sjob_id, sjob_lvl)
-    if debugging >= 1 then windower.debug('job change') end
+    windower.debug('job change')
     disable_table = {false,false,false,false,false,false,false,false,false,false,false,false,false,false,false}
     table.clear(not_sent_out_equip)
 
@@ -546,23 +534,23 @@ windower.register_event('job change',function(mjob_id, mjob_lvl, sjob_id, sjob_l
     end
 end)
 windower.register_event('login',function(name)
-    if debugging >= 1 then windower.debug('login '..name) end
+    windower.debug('login '..name)
     initialize_globals()
     windower.send_command('@wait 2;lua i gearSwap refresh_user_env;')
 end)
 
 windower.register_event('day change',function(new,old)
-    if debugging >= 1 then windower.debug('day change') end
+    windower.debug('day change')
     windower.send_command('@wait 0.5;lua invoke gearSwap refresh_ffxi_info')
 end)
 
 windower.register_event('weather change',function(new_weather_id, old_weather_id)
-    if debugging >= 1 then windower.debug('weather change') end
+    windower.debug('weather change')
     refresh_ffxi_info()
 end)
 
 windower.register_event('zone change',function(new_zone_id,old_zone_id)
-    if debugging >= 1 then windower.debug('zone change') end
+    windower.debug('zone change')
     _global.midaction = false
     _global.pet_midaction = false
     not_sent_out_equip = {}
@@ -578,45 +566,3 @@ windower.register_event('zone change',function(new_zone_id,old_zone_id)
         end
     end
 end)
-
-if debugging and debugging >= 1 then
-    windower.text.create('precast')
-    windower.text.set_bg_color('precast',100,100,100,100)
-    windower.text.set_bg_visibility('precast',true)
-    windower.text.set_font('precast','Consolas')
-    windower.text.set_font_size('precast',12)
-    windower.text.set_color('precast',255,255,255,255)
-    windower.text.set_location('precast',250,10)
-    windower.text.set_visibility('precast',false)
-    windower.text.set_text('precast','Panda')
-    
-    windower.text.create('midcast')
-    windower.text.set_bg_color('midcast',100,100,100,100)
-    windower.text.set_bg_visibility('midcast',true)
-    windower.text.set_font('midcast','Consolas')
-    windower.text.set_font_size('midcast',12)
-    windower.text.set_color('midcast',255,255,255,255)
-    windower.text.set_location('midcast',500,10)
-    windower.text.set_visibility('midcast',false)
-    windower.text.set_text('midcast','Panda')
-    
-    windower.text.create('aftercast')
-    windower.text.set_bg_color('aftercast',100,100,100,100)
-    windower.text.set_bg_visibility('aftercast',true)
-    windower.text.set_font('aftercast','Consolas')
-    windower.text.set_font_size('aftercast',12)
-    windower.text.set_color('aftercast',255,255,255,255)
-    windower.text.set_location('aftercast',750,10)
-    windower.text.set_visibility('aftercast',false)
-    windower.text.set_text('aftercast','Panda')
-    
-    windower.text.create('buff_change')
-    windower.text.set_bg_color('buff_change',100,100,100,100)
-    windower.text.set_bg_visibility('buff_change',true)
-    windower.text.set_font('buff_change','Consolas')
-    windower.text.set_font_size('buff_change',12)
-    windower.text.set_color('buff_change',255,255,255,255)
-    windower.text.set_location('buff_change',1000,10)
-    windower.text.set_visibility('buff_change',false)
-    windower.text.set_text('buff_change','Panda')
-end
