@@ -25,7 +25,6 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-
 -----------------------------------------------------------------------------------
 --Name: equip_sets(swap_type,ts,val1,val2)
 --Desc: General purpose equipment pipeline / user function caller. 
