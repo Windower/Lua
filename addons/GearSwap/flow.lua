@@ -57,7 +57,7 @@ function equip_sets(swap_type,ts,...)
     table.reassign(player.equipment,to_names_set(cur_equip))
     for i,v in pairs(slot_map) do
         if not player.equipment[i] then
-            player.equipment[i] = player.equipment[default_slot_map[v]]
+            player.equipment[i] = player.equipment[toslotname(v)]
         end
     end
     
@@ -114,7 +114,7 @@ function equip_sets(swap_type,ts,...)
         -- Short circuits the routine and gets out  before equip processing
         -- if there's no swapping to be done because the user is a monster.
         
-        for i,v in pairs(short_slot_map) do
+        for v,i in pairs(default_slot_map) do
             if equip_list[i] and encumbrance_table[v] then
                 not_sent_out_equip[i] = equip_list[i]
                 equip_list[i] = nil
@@ -173,7 +173,7 @@ end
 ---- none
 -----------------------------------------------------------------------------------
 function equip_piece(eq_slot_id,bag_id,inv_slot_id)
-    local cur_eq_tab = items.equipment[eq_slot_id:toslotname()]
+    local cur_eq_tab = items.equipment[toslotname(eq_slot_id)]
     
     if cur_eq_tab.slot ~= empty then
         items[to_windower_api(res.bags[cur_eq_tab.bag_id].english)][cur_eq_tab.slot].status = 0
@@ -182,12 +182,12 @@ function equip_piece(eq_slot_id,bag_id,inv_slot_id)
     if next_gear[eq_slot_id].slot ~= empty then
         windower.packets.inject_outgoing(0x50,string.char(0x50,0x04,0,0,inv_slot_id,eq_slot_id,bag_id,0))
         
-        items.equipment[eq_slot_id:toslotname()] = {slot=inv_slot_id,bag_id=bag_id}
+        items.equipment[toslotname(eq_slot_id)] = {slot=inv_slot_id,bag_id=bag_id}
         items[to_windower_api(res.bags[bag_id].english)][inv_slot_id].status = 5
     else
         windower.packets.inject_outgoing(0x50,string.char(0x50,0x04,0,0,0,eq_slot_id,0,0))
         
-        items.equipment[eq_slot_id:toslotname()] = {slot=empty,bag_id=0}
+        items.equipment[toslotname(eq_slot_id)] = {slot=empty,bag_id=0}
     end
 end
 

@@ -398,10 +398,10 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         -- No idea what this is doing
     elseif id == 0x050 then
         if data:byte(5) ~= 0 then
-            items.equipment[default_slot_map[data:byte(6)]] = {slot=data:byte(5),bag_id = data:byte(7)}
+            items.equipment[toslotname(data:byte(6))] = {slot=data:byte(5),bag_id = data:byte(7)}
             items[to_windower_api(res.bags[data:byte(7)].english)][data:byte(5)].status = 5 -- Set the status to "equipped"
         else
-            items.equipment[default_slot_map[data:byte(6)]] = {slot=empty,bag_id=0}
+            items.equipment[toslotname(data:byte(6))] = {slot=empty,bag_id=0}
             items[to_windower_api(res.bags[data:byte(7)].english)][data:byte(5)].status = 0 -- Set the status to "unequipped"
         end
     elseif id == 0x05E then -- Conquest ID

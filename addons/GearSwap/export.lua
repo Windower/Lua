@@ -78,7 +78,7 @@ function export_set(options)
             if not item_list[i] then
                 item_list[i] = {}
                 item_list[i].name = empty
-                item_list[i].slot = default_slot_map[i-1]
+                item_list[i].slot = toslotname(i-1)
             end
         end
         

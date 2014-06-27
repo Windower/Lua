@@ -290,7 +290,7 @@ end
 -----------------------------------------------------------------------------------
 function get_default_slot(k)
     if slot_map[k] then
-        return default_slot_map[slot_map[k]]
+        return toslotname(slot_map[k])
     end
 end
 
@@ -929,6 +929,20 @@ end
 -----------------------------------------------------------------------------------
 function toslotname(slot_id)
     return default_slot_map[slot_id]
+end
+
+
+
+-----------------------------------------------------------------------------------
+--Name: toslotid(slot_name)
+--Args:
+---- slot_name: proposed slot name
+-----------------------------------------------------------------------------------
+--Returns:
+---- slot id (whole number from 0-15)
+-----------------------------------------------------------------------------------
+function toslotid(slot_name)
+    return slot_map[slot_name]
 end
 
 

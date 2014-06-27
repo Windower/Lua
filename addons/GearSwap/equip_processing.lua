@@ -110,7 +110,7 @@ function unpack_equip_list(equip_list)
     local ret_list = {}
     local error_list = {}
     local priorities = setmetatable({},{__newindex=prioritize})
-    for slot_name,slot_id in pairs(short_slot_map) do
+    for slot_id,slot_name in pairs(default_slot_map) do
         local name,priority,extgoal_1,extgoal_2 = expand_entry(equip_list[slot_name])
         priorities[slot_id] = priority
         if name == empty then
@@ -125,7 +125,7 @@ function unpack_equip_list(equip_list)
         for _,item_tab in pairs(inventory) do
             if check_wearable(item_tab.id) then
                 if item_tab.status == 0 or item_tab.status == 5 then -- Make sure the item is either equipped or not otherwise committed. eliminate_redundant will take care of the already-equipped gear.
-                    for slot_name,slot_id in pairs(short_slot_map) do
+                    for slot_id,slot_name in pairs(default_slot_map) do
                         -- equip_list[slot_name] can also be a table (that doesn't contain a "name" property) or a number, which are both cases that should not generate any kind of equipment changing.
                         -- Hence the "and name" below.
                         
@@ -154,7 +154,7 @@ function unpack_equip_list(equip_list)
                         end
                     end
                 elseif item_tab.status > 0 then
-                    for slot_name,__ in pairs(short_slot_map) do
+                    for __,slot_name in pairs(default_slot_map) do
                         local name = expand_entry(equip_list[slot_name])
                         if name and name ~= empty then -- If "name" isn't a piece of gear, then it won't have a valid value at this point and should be ignored.
                             if name_match(item_tab.id,name) then
@@ -171,7 +171,7 @@ function unpack_equip_list(equip_list)
                     end
                 end
             else
-                for slot_name,__ in pairs(short_slot_map) do
+                for __,slot_name in pairs(default_slot_map) do
                     local name = expand_entry(equip_list[slot_name])
                     if name == empty then
                     elseif name_match(item_id,name) then
@@ -305,7 +305,7 @@ function to_names_set(equipment)
         end
         
         if tonumber(ind) and ind >= 0 and ind <= 15 and math.floor(ind) == ind then
-            equip_package[default_slot_map[ind]] = name
+            equip_package[toslotname(ind)] = name
         else
             equip_package[tostring(ind)] = name
         end

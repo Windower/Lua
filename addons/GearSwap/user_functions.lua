@@ -131,9 +131,9 @@ function enable(...)
     --items = windower.ffxi.get_items()
     local sending_table = {}
     for i,v in pairs(enable_tab) do
-        if slot_map[v] then
-            local local_slot = default_slot_map[slot_map[v]]
-            disable_table[slot_map[v]] = false
+        local local_slot = get_default_slot(v)
+        if local_slot then
+            disable_table[toslotid(v)] = false
             if not_sent_out_equip[local_slot] then
                 sending_table[local_slot] = not_sent_out_equip[local_slot]
                 not_sent_out_equip[local_slot] = nil

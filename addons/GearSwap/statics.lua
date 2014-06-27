@@ -85,8 +85,6 @@ default_slot_map = T{'sub','range','ammo','head','body','hands','legs','feet','n
     'left_ear', 'right_ear', 'left_ring', 'right_ring','back'}
 default_slot_map[0]= 'main'
 
-default_equip_order = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
-
 jas = {false,false,false,false,false,true,false,false,false,false,false,false,false,true,true,false}--6,14,15}
 readies = {false,false,false,false,false,false,true,true,true,false,false,true,false,false,false,false}--{7,8,9,12}
 uses = {false,true,true,true,true,false,false,false,false,false,true,false,true,false,false,false}--{2,3,4,5,11,13}
@@ -133,8 +131,8 @@ user_data_table = {
         return rawget(tab, user_key_filter(key))
     end
     }
-    
-eq_data_table = {
+
+--[[eq_data_table = {
     __newindex = function(tab, key, val)
             rawset(tab, slot_map[user_key_filter(key)], newtab)
         end,
@@ -142,10 +140,9 @@ eq_data_table = {
     __index = function(tab, key)
         return rawget(tab, slot_map[user_key_filter(key)])
     end
-    }
+    }]]
     
 slot_map = make_user_table()
-short_slot_map = make_user_table()
 
 slot_map.main = 0
 slot_map.sub = 1
@@ -175,27 +172,8 @@ slot_map.ring1 = 13
 slot_map.ring2 = 14
 slot_map.back = 15
 
-short_slot_map.main = 0
-short_slot_map.sub = 1
-short_slot_map.range = 2
-short_slot_map.ammo = 3
-short_slot_map.head = 4
-short_slot_map.body = 5
-short_slot_map.hands = 6
-short_slot_map.legs = 7
-short_slot_map.feet = 8
-short_slot_map.neck = 9
-short_slot_map.waist = 10
-short_slot_map.left_ear = 11
-short_slot_map.right_ear = 12
-short_slot_map.left_ring = 13
-short_slot_map.right_ring = 14
-short_slot_map.back = 15
 
 
-
-last_PC_update = ''
-item_update_flag = true
 gearswap_disabled = false
 not_sent_out_equip = {}
 command_registry = {}
@@ -223,10 +201,7 @@ _global.midaction = false
 _global.pet_midaction = false
 _global.current_event = 'None'
 
-_settings = {}
-_settings.debug_mode = false
-_settings.demo_mode = false
-_settings.show_swaps = false
+_settings = {debug_mode = false, demo_mode = false, show_swaps = false}
 
 _ExtraData = {
         player = {},
@@ -237,91 +212,9 @@ _ExtraData = {
         world = {in_mog_house = false,conquest=false},
     }
 
-function initialize_globals()
-    local pl = windower.ffxi.get_player()
-    if not pl then
-        player = make_user_table()
-        player.vitals = {}
-        player.buffs = {}
-        player.skills = {}
-        player.jobs = {}
-        player.merits = {}
-    else
-        player = make_user_table()
-        table.reassign(player,pl)
-        if not player.vitals then player.vitals = {} end
-        if not player.buffs then player.buffs = {} end
-        if not player.skills then player.skills = {} end
-        if not player.jobs then player.jobs = {} end
-        if not player.merits then player.merits = {} end
-    end
-
-    items = windower.ffxi.get_items()
-    if not items then
-        items = {
-                inventory = make_inventory_table(),
-                safe = make_inventory_table(),
-                storage = make_inventory_table(),
-                temporary = make_inventory_table(),
-                satchel = make_inventory_table(),
-                sack = make_inventory_table(),
-                locker = make_inventory_table(),
-                case = make_inventory_table(),
-                wardrobe = make_inventory_table(),
-                equipment = {},
-            }
-        for id,name in pairs(default_slot_map) do
-            items.equipment[name] = {slot = empty,bag_id=0}
-        end
-    else
-        if not items.inventory then items.inventory = make_inventory_table() else
-            items.inventory[0] = make_empty_item_table(0) end
-        if not items.safe then items.safe = make_inventory_table()  else
-            items.safe[0] = make_empty_item_table(0) end
-        if not items.storage then items.storage = make_inventory_table()  else
-            items.storage[0] = make_empty_item_table(0) end
-        if not items.temporary then items.temporary = make_inventory_table()  else
-            items.temporary[0] = make_empty_item_table(0) end
-        if not items.satchel then items.satchel = make_inventory_table()  else
-            items.satchel[0] = make_empty_item_table(0) end
-        if not items.sack then items.sack = make_inventory_table()  else
-            items.sack[0] = make_empty_item_table(0) end
-        if not items.locker then items.locker = make_inventory_table()  else
-            items.locker[0] = make_empty_item_table(0) end
-        if not items.case then items.case = make_inventory_table()  else
-            items.case[0] = make_empty_item_table(0) end
-        if not items.wardrobe then items.wardrobe = make_inventory_table()  else
-            items.wardrobe[0] = make_empty_item_table(0) end
-        if not items.equipment then
-            items.equipment = {}
-            for id,name in pairs(default_slot_map) do
-                items.equipment[name] = {slot = empty,bag_id=0}
-            end
-        else
-            for name,id in pairs(short_slot_map) do
-                items.equipment[name] = {
-                    slot   = items.equipment[name],
-                    bag_id = items.equipment[name..'_bag']
-                    }
-                    items.equipment[name..'_bag'] = nil
-                if items.equipment[name].slot == 0 then items.equipment[name].slot = empty end
-            end
-        end
-    end
-end
-
-initialize_globals()
-
-player.equipment = make_user_table()
-pet = make_user_table()
-pet.isvalid = false
-fellow = make_user_table()
-fellow.isvalid = false
-
 unbridled_learning_set = {['Thunderbolt']=true,['Harden Shell']=true,['Absolute Terror']=true,
     ['Gates of Hades']=true,['Tourbillion']=true,['Pyric Bulwark']=true,['Bilgestorm']=true,
     ['Bloodrake']=true,['Droning Whirlwind']=true,['Carcharian Verve']=true,['Blistering Roar']=true,}
-
 
 tool_map = {
         ['Katon: Ichi'] = res.items[1161],
@@ -368,7 +261,6 @@ tool_map = {
         ['Migawari: Ichi'] = res.items[2970],
         ['Kakka: Ichi'] = res.items[2644],
     }
-
 
 universal_tool_map = {
         ['Katon: Ichi'] = res.items[2971],
@@ -437,15 +329,97 @@ region_to_zone_map = {
     [24] = S{24,25,26,27,28,29,30,31,32},
     }
 
-if windower.ffxi.get_info() then
+
+function initialize_globals()
+    local pl = windower.ffxi.get_player()
+    if not pl then
+        player = make_user_table()
+        player.vitals = {}
+        player.buffs = {}
+        player.skills = {}
+        player.jobs = {}
+        player.merits = {}
+    else
+        player = make_user_table()
+        table.reassign(player,pl)
+        if not player.vitals then player.vitals = {} end
+        if not player.buffs then player.buffs = {} end
+        if not player.skills then player.skills = {} end
+        if not player.jobs then player.jobs = {} end
+        if not player.merits then player.merits = {} end
+    end
+    
+    player.equipment = make_user_table()
+    pet = make_user_table()
+    pet.isvalid = false
+    fellow = make_user_table()
+    fellow.isvalid = false
+
+    items = windower.ffxi.get_items()
+    if not items then
+        items = {
+                inventory = make_inventory_table(),
+                safe = make_inventory_table(),
+                storage = make_inventory_table(),
+                temporary = make_inventory_table(),
+                satchel = make_inventory_table(),
+                sack = make_inventory_table(),
+                locker = make_inventory_table(),
+                case = make_inventory_table(),
+                wardrobe = make_inventory_table(),
+                equipment = {},
+            }
+        for id,name in pairs(default_slot_map) do
+            items.equipment[name] = {slot = empty,bag_id=0}
+        end
+    else
+        if not items.inventory then items.inventory = make_inventory_table() else
+            items.inventory[0] = make_empty_item_table(0) end
+        if not items.safe then items.safe = make_inventory_table()  else
+            items.safe[0] = make_empty_item_table(0) end
+        if not items.storage then items.storage = make_inventory_table()  else
+            items.storage[0] = make_empty_item_table(0) end
+        if not items.temporary then items.temporary = make_inventory_table()  else
+            items.temporary[0] = make_empty_item_table(0) end
+        if not items.satchel then items.satchel = make_inventory_table()  else
+            items.satchel[0] = make_empty_item_table(0) end
+        if not items.sack then items.sack = make_inventory_table()  else
+            items.sack[0] = make_empty_item_table(0) end
+        if not items.locker then items.locker = make_inventory_table()  else
+            items.locker[0] = make_empty_item_table(0) end
+        if not items.case then items.case = make_inventory_table()  else
+            items.case[0] = make_empty_item_table(0) end
+        if not items.wardrobe then items.wardrobe = make_inventory_table()  else
+            items.wardrobe[0] = make_empty_item_table(0) end
+        if not items.equipment then
+            items.equipment = {}
+            for id,name in pairs(default_slot_map) do
+                items.equipment[name] = {slot = empty,bag_id=0}
+            end
+        else
+            for id,name in pairs(default_slot_map) do
+                items.equipment[name] = {
+                    slot   = items.equipment[name],
+                    bag_id = items.equipment[name..'_bag']
+                    }
+                    items.equipment[name..'_bag'] = nil
+                if items.equipment[name].slot == 0 then items.equipment[name].slot = empty end
+            end
+        end
+    end
+
     local wo = windower.ffxi.get_info()
-    for i,v in pairs(region_to_zone_map) do
-        if v:contains(wo.zone) then
-           _ExtraData.world.conquest = {
-                region_id = i,
-                region_name = res.regions[i][language],
-                }
-            break
+    if wo then
+        for i,v in pairs(region_to_zone_map) do
+            if v:contains(wo.zone) then
+               _ExtraData.world.conquest = {
+                    region_id = i,
+                    region_name = res.regions[i][language],
+                    }
+                break
+            end
         end
     end
 end
+
+initialize_globals()
