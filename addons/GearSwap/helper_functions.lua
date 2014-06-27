@@ -867,3 +867,50 @@ function logit(file,str)
     file:write(str)
     file:flush()
 end
+
+
+
+-----------------------------------------------------------------------------------
+--Name: prioritize()
+--Args:
+---- priority_list (table): Current list of slot orders
+---- slot_id (number): Desired order of the piece of equipment
+---- priority (number): Name for the slot
+-----------------------------------------------------------------------------------
+--Returns:
+---- none
+-----------------------------------------------------------------------------------
+function prioritize(priority_list,slot_id,priority)
+    if priority and tonumber(priority) then -- Check that order is number with no decimal component
+        rawset(priority_list,slot_id,priority)
+        return
+    elseif priority then
+        windower.add_to_chat(123,'GearSwap: Invalid priority ('..tostring(priority)..') given')
+    end
+    rawset(priority_list,slot_id,0)
+end
+
+
+
+-----------------------------------------------------------------------------------
+--Name: priority_order()
+--Args:
+---- priority_list (table): Current list of slot orders
+-----------------------------------------------------------------------------------
+--Returns:
+---- slot_id : Number from 0~15
+-----------------------------------------------------------------------------------
+function priority_order(priority_list)
+    return function ()
+        local maximum,slot_id = -math.huge
+        for i=0,15 do
+            if priority_list[i] and priority_list[i] > maximum then
+                maximum = priority_list[i]
+                slot_id = i
+            end
+        end
+        if not slot_id then return end
+        priority_list[slot_id] = nil
+        return slot_id,maximum
+    end
+end

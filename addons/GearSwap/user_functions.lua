@@ -58,10 +58,6 @@ function show_swaps(boolean)
     end
 end
 
-function verify_equip(boolean)
-    print('GearSwap: verify_equip() has been deprecated due to internal changes and no longer has a purpose')
-end
-
 function cancel_spell(boolean)
     if _global.current_event ~= 'precast' and _global.current_event ~= 'pretarget' and _global.current_event ~= 'filtered_action' then
         error('\nGearSwap: cancel_spell() is only valid in the precast, pretarget, or filtered_action functions', 2)
@@ -73,10 +69,6 @@ function cancel_spell(boolean)
     else
         error('\nGearSwap: cancel_spell() was passed an invalid value ('..tostring(boolean)..'). (true/no value/nil=Cancel the spell, false=do not cancel the spell)', 2)
     end
-end
-
-function force_send(boolean)
-    print('GearSwap: force_send() has been deprecated due to internal changes and no longer has a purpose')
 end
 
 function change_target(name)

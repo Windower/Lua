@@ -249,8 +249,7 @@ function initialize_globals()
                 equipment = {},
             }
         for id,name in pairs(default_slot_map) do
-            items.equipment.name = 0
-            items.equipment[name..'_bag'] = 0
+            items.equipment[name] = {slot = empty,bag_id=0}
         end
     else
         if not items.inventory then items.inventory = make_inventory_table() else
@@ -271,7 +270,20 @@ function initialize_globals()
             items.case[0] = make_empty_item_table(0) end
         if not items.wardrobe then items.wardrobe = make_inventory_table()  else
             items.wardrobe[0] = make_empty_item_table(0) end
-        if not items.equipment then items.equipment = {}  end
+        if not items.equipment then
+            items.equipment = {}
+            for id,name in pairs(default_slot_map) do
+                items.equipment[name] = {slot = empty,bag_id=0}
+            end
+        else
+            for name,id in pairs(short_slot_map) do
+                items.equipment[name] = {
+                    slot   = items.equipment[name],
+                    bag_id = items.equipment[name..'_bag']
+                    }
+                    items.equipment[name..'_bag'] = nil
+            end
+        end
     end
 end
 
@@ -283,7 +295,6 @@ gearswap_disabled = false
 not_sent_out_equip = {}
 command_registry = {}
 equip_list = {}
-equip_order = {}
 world = make_user_table()
 buffactive = make_user_table()
 alliance = make_user_table()

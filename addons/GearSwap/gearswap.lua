@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.868'
+_addon.version = '0.870'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -249,11 +249,12 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         _ExtraData.world.in_mog_house = data:byte(0x81) == 1
         refresh_ffxi_info()
     elseif id == 0x00B then
+        -- Blank temporary items when zoning.
         items.temporary = make_inventory_table()
     elseif id == 0x0E and pet.index and pet.index == data:unpack('H',9) and math.floor((data:byte(11)%8)/4)== 1 then
         local oldstatus = pet.status
         local status_id = data:byte(32)
-        -- Ignore all statuses aside from Idle/Engaged/Dead/Engaged dead.
+        -- Filter all statuses aside from Idle/Engaged/Dead/Engaged dead.
         if status_id < 4 then
             local newstatus = res.statuses[status_id]
             if newstatus and newstatus[language] then
@@ -265,27 +266,25 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
             end
         end
     elseif id == 0x01B then
-        for i = 1,23 do
-            player.jobs[to_windower_api(res.jobs[i].english)] = data:byte(i + 72)
+        for job_id = 1,23 do
+            player.jobs[to_windower_api(res.jobs[job_id].english)] = data:byte(job_id + 72)
         end
         
         local enc = data:unpack('H',0x61)
-        --items = windower.ffxi.get_items()
         local tab = {}
-        for i,v in pairs(default_slot_map) do
-            local tf = (((enc%(2^(i+1))) / 2^i) >= 1)
-            if encumbrance_table[i] and tf and not_sent_out_equip[v] and not disable_table[i] then
-                tab[v] = not_sent_out_equip[v]
-                not_sent_out_equip[v] = nil
-                debug_mode_chat("Your "..v.." are now unlocked.")
+        for slot_id,slot_name in pairs(default_slot_map) do
+            local tf = (((enc%(2^(slot_id+1))) / 2^slot_id) >= 1)
+            if encumbrance_table[slot_id] and tf and not_sent_out_equip[slot_name] and not disable_table[i] then
+                tab[slot_name] = not_sent_out_equip[slot_name]
+                not_sent_out_equip[slot_name] = nil
+                debug_mode_chat("Your "..slot_name.." are now unlocked.")
             end
-            encumbrance_table[i] = tf
+            encumbrance_table[slot_id] = tf
         end
         if table.length(tab) > 0 then
             refresh_globals()
             equip_sets('equip_command',nil,tab)
         end
---    elseif id == 0x01C then -- Bag size, unused so unincluded
     elseif id == 0x01E then
         local bag = to_windower_api(res.bags[data:byte(0x09)].english)
         local slot = data:byte(0x0A)
@@ -413,12 +412,13 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
     elseif id == 0x044 then
         -- No idea what this is doing
     elseif id == 0x050 then
-        local slot = data:byte(5)
-        local equipment_slot = data:byte(6)
-        local bag = data:byte(7)
-        items.equipment[to_windower_api(res.slots[equipment_slot].english)] = slot
-        items.equipment[to_windower_api(res.slots[equipment_slot].english..' bag')] = bag
-        items[to_windower_api(res.bags[bag].english)][slot].status = 5 -- Set the status to "equipped"
+        if data:byte(5) ~= 0 then
+            items.equipment[default_slot_map[data:byte(6)]] = {slot=data:byte(5),bag_id = data:byte(7)}
+            items[to_windower_api(res.bags[data:byte(7)].english)][data:byte(5)].status = 5 -- Set the status to "equipped"
+        else
+            items.equipment[default_slot_map[data:byte(6)]] = {slot=empty,bag_id=0}
+            items[to_windower_api(res.bags[data:byte(7)].english)][data:byte(5)].status = 0 -- Set the status to "unequipped"
+        end
     elseif id == 0x05E then -- Conquest ID
         if _ExtraData.world.conquest then
             local offset = _ExtraData.world.conquest.region_id*4 + 11

@@ -51,9 +51,8 @@ function equip_sets(swap_type,ts,...)
     if debugging >= 1 then windower.debug(tostring(swap_type)..' enter') 
     if showphase or debugging >= 2 then windower.add_to_chat(8,windower.to_shift_jis(tostring(swap_type))..' enter') end end
     
-    local cur_equip = get_gs_gear(convert_equipment(items.equipment),swap_type)
+    local cur_equip = table.reassign({},items.equipment)
         
-    table.reassign(equip_order,default_equip_order)
     table.reassign(equip_list,{})
     table.reassign(player.equipment,to_names_set(cur_equip))
     for i,v in pairs(slot_map) do
@@ -124,13 +123,10 @@ function equip_sets(swap_type,ts,...)
                 debug_mode_chat(i..' slot was not equipped because you are encumbered.')
             end
         end
---        if type(swap_type) == 'string' then print_set(equip_list,'Equip List') end
         
---        if type(swap_type) == 'string' then print_set(equip_list,tostring(swap_type)..' before') end
-        local equip_next = to_id_set(equip_list) -- Translates the equip_list from the player (i=slot name, v=item name) into a table with i=slot id and v={inv_id=0 or 8, slot=inventory slot}.
---        if type(swap_type) == 'string' then print_set(equip_next,'Equip Next') end
+        -- Translates the equip_list from the player (i=slot name, v=item name) into a table with i=slot id and v={bag_id=0 or 8, slot=inventory slot}.
+        local equip_next,priorities = unpack_equip_list(equip_list)
         equip_next = eliminate_redundant(cur_equip,equip_next) -- Eliminate the equip commands for items that are already equipped
---        if type(swap_type) == 'string' then print_set(equip_next,'Equip Next 2') end
         
         if (_settings.show_swaps and table.length(equip_next) > 0) or _settings.demo_mode then --and table.length(equip_next)>0 then
             local tempset = to_names_set(equip_next)
@@ -150,40 +146,39 @@ function equip_sets(swap_type,ts,...)
         end
         
         if not failure_reason then
-            for _,i in ipairs(equip_order) do
-                if debugging >= 3 and equip_next[i] then
-                    local out_str = 'Order: '..tostring(_)..'  Slot ID: '..tostring(i)..'  Inv. ID: '..tostring(equip_next[i])
-                    if equip_next[i].slot ~= empty then
-                        out_str = out_str..'  Item: '..tostring(res.items[items.inventory[equip_next[i]].id][language..'_log'])
+            for equipment_slot,priority in priority_order(priorities) do
+                if debugging >= 3 and equip_next[equipment_slot] then
+                    local out_str = 'Priority: '..tostring(priority)..'  Slot ID: '..tostring(equipment_slot)..'  Inv. ID: '..tostring(equip_next[equipment_slot])
+                    if equip_next[equipment_slot].slot ~= empty then
+                        out_str = out_str..'  Item: '..tostring(res.items[items[to_windower_api(res.bags[equip_next[equipment_slot].bag_id].english)][equip_next[equipment_slot].slot].id][language..'_log'])
                     else
                         out_str = out_str..'  Emptying slot'
                     end
                     windower.add_to_chat(8,'GearSwap (Debugging): '..out_str)
-                elseif equip_next[i] and not encumbrance_table[i] then
-                    windower.debug('attempting to set gear. Order: '..tostring(_)..'  Slot ID: '..tostring(i)..'  Inv. ID: '..tostring(equip_next[i]))
+                elseif equip_next[equipment_slot] and not encumbrance_table[equipment_slot] then
+                    windower.debug('attempting to set gear. Priority: '..tostring(priority)..'  Slot ID: '..tostring(equipment_slot)..'  Inv. ID: '..tostring(equip_next[equipment_slot]))
                     if not _settings.demo_mode then
-                        local equipment_slot_name = to_windower_api(res.slots[i].english)
+                        local equipment_slot_name = default_slot_map[equipment_slot]
                         
-                        local next_bag = to_windower_api(res.bags[equip_next[i].inv_id].english)
-                        local current_bag = to_windower_api(res.bags[items.equipment[equipment_slot_name..'_bag']].english)
+                        local next_bag = to_windower_api(res.bags[equip_next[equipment_slot].bag_id].english)
+                        local current_bag = to_windower_api(res.bags[items.equipment[equipment_slot_name].bag_id].english)
                         
-                        local next_inventory_slot = equip_next[i].slot
-                        local current_inventory_slot = items.equipment[equipment_slot_name]
+                        local next_inventory_slot = equip_next[equipment_slot].slot
                         
-                        items[current_bag][current_inventory_slot].status = 0
+                        if items.equipment[equipment_slot_name].slot ~= empty then
+                            items[current_bag][items.equipment[equipment_slot_name].slot].status = 0
+                        end
                         
-                        if equip_next[i].slot ~= empty then
-                            windower.packets.inject_outgoing(0x50,string.char(0x50,0x04,0,0,equip_next[i].slot,i,equip_next[i].inv_id,0))
+                        if equip_next[equipment_slot].slot ~= empty then
+                            windower.packets.inject_outgoing(0x50,string.char(0x50,0x04,0,0,equip_next[equipment_slot].slot,equipment_slot,equip_next[equipment_slot].bag_id,0))
                             
-                            items.equipment[equipment_slot_name] = next_inventory_slot
-                            items.equipment[equipment_slot_name..'_bag'] = equip_next[i].inv_id
+                            items.equipment[equipment_slot_name] = {slot=next_inventory_slot,bag_id=equip_next[equipment_slot].bag_id}
                             items[next_bag][next_inventory_slot].status = 5
                         else
-                            windower.packets.inject_outgoing(0x50,string.char(0x50,0x04,0,0,0,i,0,0))
-                            items.equipment[equipment_slot_name] = 0
-                            items.equipment[equipment_slot_name..'_bag'] = 0
+                            windower.packets.inject_outgoing(0x50,string.char(0x50,0x04,0,0,0,equipment_slot,0,0))
+                            items.equipment[equipment_slot_name] = {slot=empty,bag_id=0}
                         end
-                        --windower.ffxi.set_equip(equip_next[i].slot,i,equip_next[i].inv_id)
+                        --windower.ffxi.set_equip(equip_next[equipment_slot].slot,equipment_slot,equip_next[equipment_slot].bag_id)
                     end
                 end
             end
@@ -467,12 +462,10 @@ windower.register_event('outgoing chunk',function(id,original,modified,injected,
         local newmain = modified:byte(5)
         if res.jobs[newmain] and newmain ~= player.main_job_id then
             for id,name in pairs(default_slot_map) do
-                if items.equipment[name..'_bag'] then
-                    local slot = items.equipment[name]
-                    local bag = to_windower_api(res.bags[items.equipment[name..'_bag']].english)
-                    items[bag][slot].status = 0
-                    items.equipment[name] = 0
-                    items.equipment[name..'_bag'] = 0
+                if items.equipment[name].slot ~= empty then
+                    local bag = to_windower_api(res.bags[items.equipment[name].bag_id].english)
+                    items[bag][items.equipment[name].slot].status = 0
+                    items.equipment[name] = {slot=empty,bag_id=0}
                 end
             end
         end

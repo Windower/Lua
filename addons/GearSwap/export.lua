@@ -69,21 +69,31 @@ function export_set(options)
         -- Iterate through user_env.sets and find all the gear.
         item_list,exported = unpack_names({},'L1',user_env.sets,{},{empty=true})
     else
+------------------------------------------ CHECK WHETHER THIS STILL WORKS --------------------------------------------------
         -- Default to loading the currently worn gear.
-        local gear = convert_equipment(items.equipment)
+        local gear = table.reassign({},items.equipment)
         local ward = items.wardrobe
-        for i,v in pairs(gear) do
-            if v.slot ~= 0 then
+
+        for i = 1,16 do -- ipairs will be used on item_list
+            if not item_list[i] then
+                item_list[i] = {}
+                item_list[i].name = empty
+                item_list[i].slot = default_slot_map[i-1]
+            end
+        end
+        
+        for slot_name,gs_item_tab in pairs(gear) do
+            if gs_item_tab.slot ~= empty then
                 local item_tab
-                if v.inv_id == 0 and res.items[inv[v.slot].id] then
-                    item_tab = inv[v.slot]
-                elseif v.inv_id == 8 and res.items[ward[v.slot].id] then
-                    item_tab = ward[v.slot]
+                if gs_item_tab.bag_id == 0 and res.items[inv[gs_item_tab.slot].id] then
+                    item_tab = inv[gs_item_tab.slot]
+                elseif gs_item_tab.bag_id == 8 and res.items[ward[gs_item_tab.slot].id] then
+                    item_tab = ward[gs_item_tab.slot]
                 end
                 if res.items[item_tab.id] then
-                    item_list[slot_map[i]+1] = {
+                    item_list[slot_map[slot_name]+1] = {
                         name = res.items[item_tab.id][language],
-                        slot = i
+                        slot = slot_name
                         }
                     if not xml then
                         local augments = extdata.decode(item_tab).augments or {}
@@ -92,19 +102,12 @@ function export_set(options)
                             if augment ~= 'none' then aug_str = aug_str.."'"..augment.."'," end
                         end
                         if string.len(aug_str) > 0 then
-                            item_list[slot_map[i]+1].augments = aug_str
+                            item_list[slot_map[slot_name]+1].augments = aug_str
                         end
                     end
                 else
                     windower.add_to_chat(123,'GearSwap: You are wearing an item that is not in the resources yet.')
                 end
-            end
-        end
-        for i = 1,16 do
-            if not item_list[i] then
-                item_list[i] = {}
-                item_list[i].name = empty
-                item_list[i].slot = default_slot_map[i-1]
             end
         end
     end
