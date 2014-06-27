@@ -181,7 +181,7 @@ windower.register_event('addon command', function(command, ...)
 end)
 
 --[[
-Copyright © 2013-2014, Windower
+Copyright Â© 2013-2014, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
