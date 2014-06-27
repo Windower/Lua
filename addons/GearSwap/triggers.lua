@@ -68,7 +68,7 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
             st_flag = nil
             return true
         elseif temp_mob_arr then
-            if logging then    logit(logfile,'\n\n'..tostring(os.clock)..'(93) temp_mod: '..temp_mod) end
+            logit('\n\n'..tostring(os.clock)..'(93) temp_mod: '..temp_mod)
             refresh_globals()
             
             local r_line
@@ -162,10 +162,8 @@ function inc_action(act)
     end
     
     spell = get_spell(act)
-    if logging then    
-        if spell then logit(logfile,'\n\n'..tostring(os.clock)..'(178) Event Action: '..tostring(spell[language])..' '..tostring(act.category))
-        else logit(logfile,'\n\nNil spell detected') end
-    end
+    if spell then logit('\n\n'..tostring(os.clock)..'(178) Event Action: '..tostring(spell[language])..' '..tostring(act.category))
+    else logit('\n\nNil spell detected') end
     
     if spell and spell[language] then
         spell.target = target_complete(windower.ffxi.get_mob_by_id(act.targets[1].id))
@@ -272,7 +270,7 @@ function inc_action_message(arr)
     end
     
     if unable_to_use:contains(arr.message_id) then
-        if logging then    logit(logfile,'\n\n'..tostring(os.clock)..'(195) Event Action Message: '..tostring(message_id)..' Interrupt') end
+        logit('\n\n'..tostring(os.clock)..'(195) Event Action Message: '..tostring(message_id)..' Interrupt')
         local ts,tab = find_command_registry_by_time('player')
         
         if tab and tab.spell then

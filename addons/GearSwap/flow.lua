@@ -61,20 +61,18 @@ function equip_sets(swap_type,ts,...)
         end
     end
     
-    if logging then
-        logit(logfile,'\n\n'..tostring(os.clock)..'(15) equip_sets: '..tostring(swap_type))
-        if val1 then
-            if val1.english then
-                logit(logfile,' : '..val1.english)
-            end
-        else
-            logit(logfile,' : nil-or-false')
+    logit('\n\n'..tostring(os.clock)..'(15) equip_sets: '..tostring(swap_type))
+    if val1 then
+        if val1.english then
+            logit(' : '..val1.english)
         end
-        if val2 then
-            if val2.type then    logit(logfile,' : '..val2.type)    end
-        else
-            logit(logfile,' : nil-or-false')
-        end
+    else
+        logit(' : nil-or-false')
+    end
+    if val2 then
+        if val2.type then logit(' : '..val2.type)end
+    else
+        logit(' : nil-or-false')
     end
     
     if type(swap_type) == 'string' then
@@ -143,14 +141,13 @@ function equip_sets(swap_type,ts,...)
                 failure_reason = 'KOed'
             end
             debug_mode_chat("Cannot change gear right now: "..failure_reason)
+            logit('\n\n'..tostring(os.clock)..'(69) failure_reason: '..tostring(failure_reason))
         else
             for eq_slot_id,_ in priority_order(priorities) do
                 if equip_next[eq_slot_id] and not encumbrance_table[eq_slot_id] and not _settings.demo_mode then
                     equip_piece(eq_slot_id,equip_next.bag_id,equip_next.slot)
                 end
             end
-        elseif logging then
-            logit(logfile,'\n\n'..tostring(os.clock)..'(69) failure_reason: '..tostring(failure_reason))
         end
     end
     

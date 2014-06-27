@@ -68,7 +68,7 @@ windower.register_event('load',function()
     if windower.dir_exists('../addons/GearSwap/data/logs') then
         logging = false
         logfile = io.open('../addons/GearSwap/data/logs/NormalLog'..tostring(os.clock())..'.log','w+')
-        logit(logfile,'GearSwap LOGGER HEADER\n')
+        logit('GearSwap LOGGER HEADER\n')
     end
     
     refresh_globals()
@@ -87,10 +87,7 @@ end)
 
 windower.register_event('addon command',function (...)
     windower.debug('addon command')
-    if logging then
-        local command = table.concat({...},' ')
-        logit(logfile,'\n\n'..tostring(os.clock)..command)
-    end
+    logit('\n\n'..tostring(os.clock)..table.concat({...},' '))
     local splitup = {...}
     if not splitup[1] then return end -- handles //gs
     local cmd = splitup[1]:lower()

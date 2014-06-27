@@ -863,9 +863,11 @@ end
 --Returns:
 ---- none
 -----------------------------------------------------------------------------------
-function logit(file,str)
-    file:write(str)
-    file:flush()
+function logit(str)
+    if logging then
+        logfile:write(str)
+        logfile:flush()
+    end
 end
 
 
