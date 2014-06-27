@@ -313,3 +313,34 @@ function to_names_set(equipment)
 
     return equip_package
 end
+
+
+-----------------------------------------------------------------------------------
+--Name: equip_piece(eq_slot_id,bag_id,inv_slot_id)
+--Desc: Cleans up the global table and leaves equip_sets properly.
+--Args:
+---- eq_slot_id - Equipment Slot ID
+---- bag_id - Bag ID of the item to be equipped
+---- inv_slot_id - Inventory Slot ID of the item to be equipped
+-----------------------------------------------------------------------------------
+--Returns:
+---- none
+-----------------------------------------------------------------------------------
+function equip_piece(eq_slot_id,bag_id,inv_slot_id)
+    local cur_eq_tab = items.equipment[toslotname(eq_slot_id)]
+    
+    if cur_eq_tab.slot ~= empty then
+        items[to_windower_api(res.bags[cur_eq_tab.bag_id].english)][cur_eq_tab.slot].status = 0
+    end
+    
+    if inv_slot_id ~= empty then
+        windower.packets.inject_outgoing(0x50,string.char(0x50,0x04,0,0,inv_slot_id,eq_slot_id,bag_id,0))
+        
+        items.equipment[toslotname(eq_slot_id)] = {slot=inv_slot_id,bag_id=bag_id}
+        items[to_windower_api(res.bags[bag_id].english)][inv_slot_id].status = 5
+    else
+        windower.packets.inject_outgoing(0x50,string.char(0x50,0x04,0,0,0,eq_slot_id,0,0))
+        
+        items.equipment[toslotname(eq_slot_id)] = {slot=empty,bag_id=0}
+    end
+end

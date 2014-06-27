@@ -218,6 +218,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
     
     if injected then
     elseif id == 0x00A then
+        windower.debug('zone change')
         player.name = data:unpack('z',0x85)
         player.id = data:unpack('I',0x05)
         player.index = data:unpack('H',0x09)
@@ -227,9 +228,23 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         player.vitals.max_mp = data:unpack('I',0xED)
         update_job_names()
         
---        world.zone_id = data:unpack('H',0x31)
---        world.weather_id = data:byte(0x69)
---        world.logged_in = true
+        world.zone_id = data:unpack('H',0x31)
+        _global.midaction = false
+        _global.pet_midaction = false
+        not_sent_out_equip = {}
+        command_registry = {}
+        _ExtraData.world.conquest = false
+        for i,v in pairs(region_to_zone_map) do
+            if v:contains(world.zone_id) then
+                _ExtraData.world.conquest = {
+                    region_id = i,
+                    region_name = res.regions[i][language],
+                    }
+                break
+            end
+        end
+        world.weather_id = data:byte(0x69)
+        world.logged_in = true
         
         _ExtraData.world.in_mog_house = data:byte(0x81) == 1
         refresh_ffxi_info()
@@ -359,16 +374,15 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         inc_action(act)
     elseif id == 0x29 then
         if gearswap_disabled then return end
-        data = data:sub(5)
         local arr = {}
-        arr.actor_id = get_bit_packed(data,0,32)
-        arr.target_id = get_bit_packed(data,32,64)
-        arr.param_1 = get_bit_packed(data,64,96)
-        arr.param_2 = get_bit_packed(data,96,102) -- First 6 bits
-        arr.param_3 = get_bit_packed(data,102,128) -- Rest
-        arr.actor_index = get_bit_packed(data,128,144)
-        arr.target_index = get_bit_packed(data,144,160)
-        arr.message_id = get_bit_packed(data,160,175)
+        arr.actor_id = data:unpack('I',0x05)
+        arr.target_id = data:unpack('I',0x09)
+        arr.param_1 = data:unpack('I',0x0D)
+        arr.param_2 = get_bit_packed(data,128,134) -- First 6 bits
+        arr.param_3 = get_bit_packed(data,134,160) -- Rest
+        arr.actor_index = data:unpack('H',0x15)
+        arr.target_index = data:unpack('H',0x17)
+        arr.message_id = data:unpack('H',0x19)%32768
 
         inc_action_message(arr)
     elseif id == 0x037 then
@@ -442,8 +456,10 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
             player.sub_job_level = data:byte(16)
             update_job_names()
             equip_sets('sub_job_change',nil,player.sub_job,temp_sub)
-        else
-            update_job_names()
+        end
+        update_job_names()
+        if current_job_file ~= res.jobs[player.main_job_id][language..'_short'] then
+                refresh_user_env(player.main_job_id)
         end
     elseif id == 0x062 then
         for i = 1,0x71,2 do
@@ -521,45 +537,8 @@ windower.register_event('lose buff',function(buff_id)
     equip_sets('buff_change',nil,buff_name,false)
 end)
 
-windower.register_event('job change',function(mjob_id, mjob_lvl, sjob_id, sjob_lvl)
-    windower.debug('job change')
-    disable_table = {false,false,false,false,false,false,false,false,false,false,false,false,false,false,false}
-    table.clear(not_sent_out_equip)
-
-    if current_job_file ~= res.jobs[mjob_id][language..'_short'] then
-        refresh_user_env(mjob_id)
-    end
-end)
 windower.register_event('login',function(name)
     windower.debug('login '..name)
     initialize_globals()
-    windower.send_command('@wait 2;lua i gearSwap refresh_user_env;')
-end)
-
-windower.register_event('day change',function(new,old)
-    windower.debug('day change')
-    windower.send_command('@wait 0.5;lua invoke gearSwap refresh_ffxi_info')
-end)
-
-windower.register_event('weather change',function(new_weather_id, old_weather_id)
-    windower.debug('weather change')
-    refresh_ffxi_info()
-end)
-
-windower.register_event('zone change',function(new_zone_id,old_zone_id)
-    windower.debug('zone change')
-    _global.midaction = false
-    _global.pet_midaction = false
-    not_sent_out_equip = {}
-    command_registry = {}
-    _ExtraData.world.conquest = false
-    for i,v in pairs(region_to_zone_map) do
-        if v:contains(new_zone_id) then
-            _ExtraData.world.conquest = {
-                region_id = i,
-                region_name = res.regions[i][language],
-                }
-            break
-        end
-    end
+    windower.send_command('@wait 2;lua i gearswap refresh_user_env;')
 end)
