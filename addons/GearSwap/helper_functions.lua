@@ -875,7 +875,7 @@ end
 -----------------------------------------------------------------------------------
 --Name: prioritize()
 --Args:
----- priority_list (table): Current list of slot orders
+---- priority_list (table): Current list of slot priorities
 ---- slot_id (number): Desired order of the piece of equipment
 ---- priority (number): Name for the slot
 -----------------------------------------------------------------------------------
@@ -883,7 +883,7 @@ end
 ---- none
 -----------------------------------------------------------------------------------
 function prioritize(priority_list,slot_id,priority)
-    if priority and tonumber(priority) then -- Check that order is number with no decimal component
+    if priority and tonumber(priority) then -- Check that priority is number
         rawset(priority_list,slot_id,priority)
         return
     elseif priority then
@@ -897,7 +897,7 @@ end
 -----------------------------------------------------------------------------------
 --Name: priority_order()
 --Args:
----- priority_list (table): Current list of slot orders
+---- priority_list (table): Current list of slot priorities
 -----------------------------------------------------------------------------------
 --Returns:
 ---- slot_id : Number from 0~15

@@ -69,19 +69,19 @@ end
 -----------------------------------------------------------------------------------
 --Returns:
 ---- name - Name of the current piece of equipment
----- order - Order of the current piece as defined in the advanced table
+---- priority - Priority of the current piece as defined in the advanced table
 ---- augments - Augments for the current piece as defined in the advanced table
 -----------------------------------------------------------------------------------
 function expand_entry(entry)
     if not entry then
         return
     end
-    local augments,name,order,bag
+    local augments,name,priority,bag
     if type(entry) == 'table' and entry == empty then
         name = empty
     elseif type(entry) == 'table' and entry.name then
         name = entry.name
-        order = entry.order
+        priority = entry.priority
         if entry.augments then
             augments = entry.augments
         elseif entry.augment then
@@ -94,7 +94,7 @@ function expand_entry(entry)
     elseif type(entry) == 'string' and entry ~= '' then
         name = entry
     end
-    return name,order,augments,bag -- all nil if they don't exist
+    return name,priority,augments,bag -- all nil if they don't exist
 end
 
 -----------------------------------------------------------------------------------

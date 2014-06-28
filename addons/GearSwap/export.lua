@@ -182,7 +182,7 @@ function unpack_names(ret_tab,up,tab_level,unpacked_table,exported)
         elseif i=='name' then
             alt = up
             flag = true
-        elseif type(v) == 'string' and v~='augment' and v~= 'augments' and v~= 'order' then
+        elseif type(v) == 'string' and v~='augment' and v~= 'augments' and v~= 'priority' then
             alt = i
             flag = true
         end
