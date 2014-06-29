@@ -1079,7 +1079,7 @@ function display_breadcrumbs(spell, spellMap, action)
 		end
 	end
 	
-	if cons then
+	if cons and cons ~= ('sets.' .. action) then
 		msg = msg .. tostring(cons)
 		add_to_chat(123, msg)
 	end
