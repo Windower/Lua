@@ -216,8 +216,9 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         end
     end
     
-    if injected then
-    elseif id == 0x00A then
+--    if injected then
+--    else
+    if id == 0x00A then
         windower.debug('zone change')
         player.name = data:unpack('z',0x85)
         player.id = data:unpack('I',0x05)
@@ -274,10 +275,12 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         local tab = {}
         for slot_id,slot_name in pairs(default_slot_map) do
             local tf = (((enc%(2^(slot_id+1))) / 2^slot_id) >= 1)
-            if encumbrance_table[slot_id] and tf and not_sent_out_equip[slot_name] and not disable_table[i] then
+            if encumbrance_table[slot_id] and not tf and not_sent_out_equip[slot_name] and not disable_table[i] then
                 tab[slot_name] = not_sent_out_equip[slot_name]
                 not_sent_out_equip[slot_name] = nil
-                debug_mode_chat("Your "..slot_name.." are now unlocked.")
+            end
+            if encumbrance_table[slot_id] and not tf then
+                debug_mode_chat("Your "..slot_name.." slot is now unlocked.")
             end
             encumbrance_table[slot_id] = tf
         end

@@ -404,16 +404,6 @@ windower.register_event('outgoing chunk',function(id,original,modified,injected,
     if gearswap_disabled then return end
     windower.debug('outgoing chunk '..id)
     if id == 0x1A and not injected then
- --[[       local cur_time = os.clock()
-        for i,v in pairs(outgoing_packet_table) do
-            if cur_time-v > 1 then
-                outgoing_packet_table[i] = nil
-            elseif i:sub(1,2) == original:sub(1,2) and i:sub(5) == original:sub(5) then
-                return
-            end
-        end
-        outgoing_packet_table[original] = os.clock()]]
-
         if original:unpack('H',0xB) == 12 and cued_packet and original:unpack('H',0x9) == player.index then
             cued_packet = nil
             return true
@@ -423,7 +413,7 @@ windower.register_event('outgoing chunk',function(id,original,modified,injected,
         local newmain = modified:byte(5)
         if res.jobs[newmain] and newmain ~= player.main_job_id then
             windower.debug('job change')
-            disenable('all',command_enable,'enable',false) -- enable all slots
+            command_enable('main','sub','range','ammo','head','neck','lear','rear','body','hands','lring','rring','back','waist','legs','feet') -- enable all slots
             table.clear(not_sent_out_equip)
             
             for id,name in pairs(default_slot_map) do
