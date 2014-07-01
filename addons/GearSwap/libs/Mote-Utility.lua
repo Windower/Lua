@@ -533,7 +533,7 @@ function load_sidecar(job)
 	if not job then return false end
 	
 	-- filename format example for user-local files: whm_gear.lua, or playername_whm_gear.lua
-	local filenames = {player.name..'_'..job..'_gear.lua', job..'_gear.lua'}
+	local filenames = {player.name..'_'..job..'_gear.lua', job..'_gear.lua', 'gear/'..player.name..'_'..job..'_gear.lua', 'gear/'..job..'_gear.lua'}
 	return optional_include(filenames)
 end
 

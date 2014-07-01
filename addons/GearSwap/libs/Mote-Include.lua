@@ -973,6 +973,7 @@ end
 function status_change(newStatus, oldStatus)
 	-- init a new eventArgs
 	local eventArgs = {handled = false}
+	mote_vars.set_breadcrumbs:clear()
 
 	-- Allow a global function to be called on status change.
 	if user_status_change then
@@ -989,6 +990,7 @@ function status_change(newStatus, oldStatus)
 	-- Handle equipping default gear if the job didn't mark this as handled.
 	if not eventArgs.handled then
 		handle_equipping_gear(newStatus)
+		display_breadcrumbs()
 	end
 end
 
@@ -1059,7 +1061,12 @@ function display_breadcrumbs(spell, spellMap, action)
 		return
 	end
 	
-	local msg = 'Default ' .. action .. ' set selection for ' .. spell.name
+	local msg = 'Default '
+	
+	if action and spell then
+		msg = msg .. action .. ' set selection for ' .. spell.name
+	end
+	
 	if spellMap then
 		msg = msg .. ' (' .. spellMap .. ')'
 	end
@@ -1078,8 +1085,8 @@ function display_breadcrumbs(spell, spellMap, action)
 			end
 		end
 	end
-	
-	if cons and cons ~= ('sets.' .. action) then
+
+	if cons and (not action or cons ~= ('sets.' .. action)) then
 		msg = msg .. tostring(cons)
 		add_to_chat(123, msg)
 	end
