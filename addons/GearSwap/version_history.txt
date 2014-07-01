@@ -1,4 +1,6 @@
 -------------------------------------------------
+GearSwap 0.872 - Fixed Encumbrance, Job Change issues, and a nil error on login.
+-------------------------------------------------
 GearSwap 0.871 - Debugging and Logging changes.
 -------------------------------------------------
 GearSwap 0.870 - Rewrite of "order" as "priority" for advanced tables.

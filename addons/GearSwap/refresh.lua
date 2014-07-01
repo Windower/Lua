@@ -556,8 +556,13 @@ end
 function refresh_user_env(job_id)
     refresh_globals()
     command_registry = {}
-    if not job_id then job_id = windower.ffxi.get_player().main_job_id end
-    windower.send_command('@wait 0.5;lua i '.._addon.name..' load_user_files '..job_id)
+    if not job_id then job_id = windower.ffxi.get_player().main_job_id 
+        if not job_id then
+            windower.send_command('@wait 1;lua i '.._addon.name..' refresh_user_env')
+        else
+            windower.send_command('@wait 0.5;lua i '.._addon.name..' load_user_files '..job_id)
+        end
+    end
 end
 
 

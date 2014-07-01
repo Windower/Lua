@@ -301,6 +301,9 @@ function to_names_set(equipment)
     for ind,cur_item in pairs(equipment) do
         local name = 'empty'
         if cur_item.slot ~= empty then
+            if items[to_windower_api(res.bags[cur_item.bag_id].english)][cur_item.slot].id == 0 then return {} end
+            -- refresh_player() can run after equip packets arrive but before the item array is fully loaded,
+            -- which results in the id still being the initialization value.
             name = res.items[items[to_windower_api(res.bags[cur_item.bag_id].english)][cur_item.slot].id][language]
         end
         

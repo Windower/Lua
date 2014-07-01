@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.871'
+_addon.version = '0.872'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -216,9 +216,8 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         end
     end
     
---    if injected then
---    else
-    if id == 0x00A then
+    if injected then
+    elseif id == 0x00A then
         windower.debug('zone change')
         player.name = data:unpack('z',0x85)
         player.id = data:unpack('I',0x05)
@@ -292,6 +291,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         local bag = to_windower_api(res.bags[data:byte(0x09)].english)
         local slot = data:byte(0x0A)
         local count = data:unpack('I',5)
+        if not items[bag][slot] then items[bag][slot] = make_empty_item_table(slot) end
         items[bag][slot].count = count
         if count == 0 then
             items[bag][slot].id = 0
@@ -301,12 +301,14 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
     elseif id == 0x01F then
         local bag = to_windower_api(res.bags[data:byte(0x0B)].english)
         local slot = data:byte(0x0C)
+        if not items[bag][slot] then items[bag][slot] = make_empty_item_table(slot) end
         items[bag][slot].id = data:unpack('H',9)
         items[bag][slot].count = data:unpack('I',5)
         items[bag][slot].status = data:byte(0x0D)
     elseif id == 0x020 then
         local bag = to_windower_api(res.bags[data:byte(0x0F)].english)
         local slot = data:byte(0x10)
+        if not items[bag][slot] then items[bag][slot] = make_empty_item_table(slot) end
         items[bag][slot].id = data:unpack('H',0x0D)
         items[bag][slot].count = data:unpack('I',5)
         items[bag][slot].bazaar = data:unpack('I',9)
@@ -414,11 +416,14 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
     elseif id == 0x044 then
         -- No idea what this is doing
     elseif id == 0x050 then
+        local inv = items[to_windower_api(res.bags[data:byte(7)].english)]
         if data:byte(5) ~= 0 then
             items.equipment[toslotname(data:byte(6))] = {slot=data:byte(5),bag_id = data:byte(7)}
+            if not inv[data:byte(5)] then inv[data:byte(5)] = make_empty_item_table(data:byte(5)) end
             items[to_windower_api(res.bags[data:byte(7)].english)][data:byte(5)].status = 5 -- Set the status to "equipped"
         else
             items.equipment[toslotname(data:byte(6))] = {slot=empty,bag_id=0}
+            if not inv[data:byte(5)] then inv[data:byte(5)] = make_empty_item_table(data:byte(5)) end
             items[to_windower_api(res.bags[data:byte(7)].english)][data:byte(5)].status = 0 -- Set the status to "unequipped"
         end
     elseif id == 0x05E then -- Conquest ID
@@ -461,9 +466,6 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
             equip_sets('sub_job_change',nil,player.sub_job,temp_sub)
         end
         update_job_names()
-        if current_job_file ~= res.jobs[player.main_job_id][language..'_short'] then
-                refresh_user_env(player.main_job_id)
-        end
     elseif id == 0x062 then
         for i = 1,0x71,2 do
             local skill = data:unpack('H',i + 0x82)%32768
