@@ -416,6 +416,7 @@ windower.register_event('outgoing chunk',function(id,original,modified,injected,
         if res.jobs[newmain] and newmain ~= player.main_job_id then
             windower.debug('job change')
             command_enable('main','sub','range','ammo','head','neck','lear','rear','body','hands','lring','rring','back','waist','legs','feet') -- enable all slots
+            
             table.clear(not_sent_out_equip)
             
             for id,name in pairs(default_slot_map) do
@@ -425,6 +426,7 @@ windower.register_event('outgoing chunk',function(id,original,modified,injected,
                     items.equipment[name] = {slot=empty,bag_id=0}
                 end
             end
+            refresh_user_env(newmain)
         end
     end
 end)
