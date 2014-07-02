@@ -401,7 +401,6 @@ end
 ---- true if blocking the packet (/assist <me>)
 -----------------------------------------------------------------------------------
 windower.register_event('outgoing chunk',function(id,original,modified,injected,blocked)
-    if gearswap_disabled then return end
     windower.debug('outgoing chunk '..id)
     if id == 0x1A then
         cued_packet = nil
@@ -415,7 +414,6 @@ windower.register_event('outgoing chunk',function(id,original,modified,injected,
         local newmain = modified:byte(5)
         if res.jobs[newmain] and newmain ~= player.main_job_id then
             windower.debug('job change')
-            command_enable('main','sub','range','ammo','head','neck','lear','rear','body','hands','lring','rring','back','waist','legs','feet') -- enable all slots
             
             table.clear(not_sent_out_equip)
             
@@ -427,6 +425,16 @@ windower.register_event('outgoing chunk',function(id,original,modified,injected,
                 end
             end
             refresh_user_env(newmain)
+        end
+    end
+    
+    
+    if gearswap_disabled then return end
+    
+    if id == 0x100 then
+        local newmain = modified:byte(5)
+        if res.jobs[newmain] and newmain ~= player.main_job_id then
+            command_enable('main','sub','range','ammo','head','neck','lear','rear','body','hands','lring','rring','back','waist','legs','feet') -- enable all slots
         end
     end
 end)
