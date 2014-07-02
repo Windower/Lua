@@ -424,6 +424,9 @@ windower.register_event('outgoing chunk',function(id,original,modified,injected,
                     items.equipment[name] = {slot=empty,bag_id=0}
                 end
             end
+            player.main_job_id = data:byte(5)
+            player.sub_job_id = data:byte(6)
+            update_job_names()
             refresh_user_env(newmain)
         end
     end
