@@ -64,7 +64,6 @@ end
 function load_user_files(job_id,user_file)
     job_id = tonumber(job_id)
 
-    refresh_globals()
     user_pcall('file_unload')
     
     for i,v in pairs(registered_user_events) do
