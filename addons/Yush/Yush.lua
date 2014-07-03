@@ -1,5 +1,5 @@
 _addon.author = 'Arcon'
-_addon.version = '2.1.0.0'
+_addon.version = '2.1.1.0'
 _addon.language = 'English'
 _addon.command = 'yush'
 
@@ -272,7 +272,7 @@ windower.register_event('addon command', function(command, ...)
         back()
 
     elseif command == 'press' then
-        keys = keys + S{...}
+        keys = keys + S{...}:map(string.lower)
         check()
 
     end
