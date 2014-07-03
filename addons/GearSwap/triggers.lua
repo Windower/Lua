@@ -172,9 +172,11 @@ function inc_action(act)
         local ts,tab = delete_command_registry_by_id(act.targets[1].id)
         if tab and tab.spell and tab.spell.prefix == '/pet' then 
             tab.spell.interrupted = true
+            command_registry[ts].midaction = false
             equip_sets('pet_aftercast',nil,tab.spell)
         elseif tab and tab.spell then
             tab.spell.interrupted = true
+            command_registry[ts].midaction = false
             equip_sets('aftercast',nil,tab.spell)
         end
         return
@@ -218,6 +220,7 @@ function inc_action(act)
             -- Only aftercast things that were precasted.
             -- Also, there are some actions (like being paralyzed while casting Ninjutsu) that sends two result action packets. Block the second packet.
             refresh_globals()
+            if command_registry[ts] then command_registry[ts].midaction = false end
             equip_sets(prefix..'aftercast',ts,spell)
         elseif debugging.command_registry then
             windower.add_to_chat(8,'GearSwap (Debug Mode): Hitting Aftercast without detecting an entry in command_registry')
@@ -225,6 +228,8 @@ function inc_action(act)
     elseif readies[act.category] and prefix == 'pet_' and act.targets[1].actions[1].message ~= 0 then -- Entry for pet midcast. Excludes the second packet of "Out of range" BPs.
         ts = mk_command_registry_entry(spell)
         refresh_globals()
+        command_registry[ts].pet_midaction = true
+        command_registry[ts].timestamp = os.time()
         equip_sets('pet_midcast',ts,spell)
     end
 end
@@ -247,7 +252,7 @@ function inc_action_message(arr)
     if gearswap_disabled then return end
     if T{6,20,113,406,605,646}:contains(arr.message_id) then -- death messages
         local ts,tab = delete_command_registry_by_id(arr.target_id)
-        if tab and tab.spell and tab.spell.prefix == '/pet' then 
+        if tab and tab.spell and tab.spell.prefix == '/pet' then
             equip_sets('pet_aftercast',nil,tab.spell)
         elseif tab and tab.spell then
             equip_sets('aftercast',nil,tab.spell)
@@ -276,6 +281,7 @@ function inc_action_message(arr)
         if tab and tab.spell then
             tab.spell.interrupted = true
             tab.spell.action_type = 'Interruption'
+            command_registry[ts].midaction = false
             refresh_globals()
             equip_sets(prefix..'aftercast',ts,tab.spell)
         end

@@ -25,12 +25,12 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.872'
+_addon.version = '0.873'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
 if windower.file_exists(windower.addon_path..'data/bootstrap.lua') then
-    debugging = {windower_debug = true,command_registry = true,general=false}
+    debugging = {windower_debug = true,command_registry = false,general=false}
 else
     debugging = {}
 end
@@ -229,8 +229,6 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         update_job_names()
         
         world.zone_id = data:unpack('H',0x31)
-        _global.midaction = false
-        _global.pet_midaction = false
         not_sent_out_equip = {}
         command_registry = {}
         _ExtraData.world.conquest = false

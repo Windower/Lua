@@ -280,35 +280,39 @@ function include_user(str)
 end
 
 function user_midaction(bool)
-    if bool == false or bool == true then
-        _global.midaction = bool
-    elseif bool ~= nil then
-        error('\nGearSwap: midaction() was passed an invalid value ('..tostring(bool)..'). (true=true, false=false, nil=nothing)', 2)
+    if bool == false then
+        for i,v in pairs(command_registry) do
+            if v.midaction then
+                command_registry.midaction = false
+            end
+        end
     end
-    
+
     for i,v in pairs(command_registry) do
         if v.midaction then
             return true
         end
     end
     
-    return _global.midaction
+    return false
 end
 
 function user_pet_midaction(bool)
-    if bool == false or bool == true then
-        _global.pet_midaction = bool
-    elseif bool ~= nil then
-        error('\nGearSwap: pet_midaction() was passed an invalid value ('..tostring(bool)..'). (true=true, false=false, nil=nothing)', 2)
+    if bool == false then
+        for i,v in pairs(command_registry) do
+            if v.pet_midaction then
+                command_registry.pet_midaction = false
+            end
+        end
     end
-    
+
     for i,v in pairs(command_registry) do
         if v.pet_midaction then
             return true
         end
     end
 
-    return _global.pet_midaction
+    return false
 end
 
 function add_to_chat_user(num,str)
