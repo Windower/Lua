@@ -1,5 +1,5 @@
 _addon.author = 'Arcon'
-_addon.version = '2.0.0.0'
+_addon.version = '2.1.0.0'
 _addon.language = 'English'
 _addon.command = 'yush'
 
