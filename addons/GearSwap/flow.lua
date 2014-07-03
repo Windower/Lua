@@ -45,7 +45,7 @@ function equip_sets(swap_type,ts,...)
     local var_inps = {...}
     local val1 = var_inps[1]
     local val2 = var_inps[2]
-    table.reassign(_global,command_registry[ts] or {cast_delay = 0,midaction = false,pet_midaction = false,cancel_spell = false})
+    table.reassign(_global,command_registry[ts] or {cast_delay = 0,cancel_spell = false})
     _global.current_event = tostring(swap_type)
     
     windower.debug(tostring(swap_type)..' enter')
@@ -85,11 +85,6 @@ function equip_sets(swap_type,ts,...)
         if debugging.general then
             windower.add_to_chat(8,'val1 error')
         end
-    end
-    
-    if type(swap_type) == 'string' and swap_type == 'pet_midcast' then
-        _global.pet_midaction = true
-        command_registry[ts].timestamp = os.time()
     end
 
     
@@ -254,6 +249,7 @@ function equip_sets_exit(swap_type,ts,val1)
             command_registry[ts] = nil
             return true
         elseif swap_type == 'midcast' and _settings.demo_mode then
+            command_registry[ts].midaction = false
             equip_sets('aftercast',ts,val1)
         elseif swap_type == 'aftercast' then
             if ts then
@@ -401,7 +397,6 @@ end
 ---- true if blocking the packet (/assist <me>)
 -----------------------------------------------------------------------------------
 windower.register_event('outgoing chunk',function(id,original,modified,injected,blocked)
-    if gearswap_disabled then return end
     windower.debug('outgoing chunk '..id)
     if id == 0x1A then
         cued_packet = nil
@@ -415,7 +410,7 @@ windower.register_event('outgoing chunk',function(id,original,modified,injected,
         local newmain = modified:byte(5)
         if res.jobs[newmain] and newmain ~= player.main_job_id then
             windower.debug('job change')
-            command_enable('main','sub','range','ammo','head','neck','lear','rear','body','hands','lring','rring','back','waist','legs','feet') -- enable all slots
+            
             table.clear(not_sent_out_equip)
             
             for id,name in pairs(default_slot_map) do
@@ -425,6 +420,22 @@ windower.register_event('outgoing chunk',function(id,original,modified,injected,
                     items.equipment[name] = {slot=empty,bag_id=0}
                 end
             end
+            player.main_job_id = modified:byte(5)
+            player.sub_job_id = modified:byte(6)
+            update_job_names()
+            
+            command_registry = {}
+            load_user_files(newmain)
+        end
+    end
+    
+    
+    if gearswap_disabled then return end
+    
+    if id == 0x100 then
+        local newmain = modified:byte(5)
+        if res.jobs[newmain] and newmain ~= player.main_job_id then
+            command_enable('main','sub','range','ammo','head','neck','lear','rear','body','hands','lring','rring','back','waist','legs','feet') -- enable all slots
         end
     end
 end)

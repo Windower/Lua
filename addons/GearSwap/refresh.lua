@@ -64,7 +64,6 @@ end
 function load_user_files(job_id,user_file)
     job_id = tonumber(job_id)
 
-    refresh_globals()
     user_pcall('file_unload')
     
     for i,v in pairs(registered_user_events) do
@@ -155,8 +154,6 @@ function load_user_files(job_id,user_file)
     
     _global.cast_delay = 0
     _global.cancel_spell = false
-    _global.midaction = false
-    _global.pet_midaction = false
     _global.current_event = 'get_sets'
     user_pcall('get_sets')
     
@@ -555,13 +552,13 @@ end
 -----------------------------------------------------------------------------------
 function refresh_user_env(job_id)
     refresh_globals()
-    command_registry = {}
-    if not job_id then job_id = windower.ffxi.get_player().main_job_id 
-        if not job_id then
-            windower.send_command('@wait 1;lua i '.._addon.name..' refresh_user_env')
-        else
-            windower.send_command('@wait 0.5;lua i '.._addon.name..' load_user_files '..job_id)
-        end
+    if not job_id then job_id = windower.ffxi.get_player().main_job_id end
+    
+    if not job_id then
+        windower.send_command('@wait 1;lua i '.._addon.name..' refresh_user_env')
+    else
+        load_user_files(job_id)
+        --windower.send_command('@wait 0.5;lua i '.._addon.name..' load_user_files '..job_id)
     end
 end
 

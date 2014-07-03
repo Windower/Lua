@@ -197,8 +197,6 @@ last_refresh = 0
 _global = make_user_table()
 _global.cast_delay = 0
 _global.cancel_spell = false
-_global.midaction = false
-_global.pet_midaction = false
 _global.current_event = 'None'
 
 _settings = {debug_mode = false, demo_mode = false, show_swaps = false}
