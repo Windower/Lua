@@ -1,6 +1,7 @@
 _addon.author = 'Arcon'
 _addon.version = '2.0.0.0'
 _addon.language = 'English'
+_addon.command = 'yush'
 
 require('luau')
 
@@ -51,9 +52,36 @@ settings = config.load(defaults)
 binds = {}
 current = binds
 stack = L{binds}
+keys = S{}
 
 reset = function()
     current = binds
+end
+
+back = function()
+    if stack:length() == 1 then
+        current = binds
+    else
+        current = stack[stack:length() - 1]
+        stack:remove()
+    end
+end
+
+check = function()
+    for key, val in pairs(current) do
+        if key <= keys then
+            if type(val) == 'string' then
+                windower.send_command(val)
+            else
+                current = val
+                stack:append(current)
+            end
+
+            return true
+        end
+    end
+
+    return false
 end
 
 parse_binds = function(fbinds, top)
@@ -103,8 +131,6 @@ windower.register_event('load', 'login', 'job change', 'logout', function()
         print('Yush: No matching file found for %s (%s%s)':format(player.name, player.main_job, player.sub_job and '/' .. player.sub_job or ''))
     end
 end)
-
-keys = S{}
 
 dikt = {    -- Har har
     [1] = 'esc',
@@ -227,33 +253,33 @@ windower.register_event('keyboard', function(dik, down)
                 reset()
                 return true
             elseif key == settings.BackKey then
-                if stack:length() == 1 then
-                    current = binds
-                else
-                    current = stack[stack:length() - 1]
-                    stack:remove()
-                end
+                back()
                 return true
             end
         end
 
-        for key, val in pairs(current) do
-            if key <= keys then
-                if type(val) == 'string' then
-                    windower.send_command(val)
-                else
-                    current = val
-                    stack:append(current)
-                end
+        return check()
+    end
+end)
 
-                return true
-            end
-        end
+windower.register_event('addon command', function(command, ...)
+    command = command and command:lower() or 'help'
+
+    if command == 'reset' then
+        reset()
+
+    elseif command == 'back' then
+        back()
+
+    elseif command == 'press' then
+        keys = keys + S{...}
+        check()
+
     end
 end)
 
 --[[
-Copyright (c) 2014, Windower
+Copyright © 2014, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
