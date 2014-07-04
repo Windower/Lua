@@ -171,14 +171,6 @@ local function bin(fill, val)
     return type(val) == 'string' and val:binary(' ') or val:binary():zfill(8*fill):chunks(8):reverse():concat(' ')
 end
 
-local function cskill(val)
-    return  s(val, 1, 15):string() .. ', ' .. (s(val, 16, 16) == 1 and 'Capped' or 'Uncapped')
-end
-
-local function sskill(val)
-    return  s(val, 6, 15):string() .. ', ' .. (s(val, 16, 16) == 1 and 'Capped' or 'Uncapped') .. ', ' .. (res.synth_ranks[s(val, 1, 5)] and res.synth_ranks[s(val, 1, 5)].name or 'Unknown: ' .. s(val, 1, 5))
-end
-
 --[[
     Custom types
 ]]
@@ -1935,55 +1927,22 @@ fields.incoming[0x061] = L{
     {ctype='unsigned short',    label='_unknown4'},                             -- 52   00 00 observed.
 }
 
+types.combat_skill = L{
+    {ctype='bit[15]',           label='Level'},                                 -- 00
+    {ctype='boolbit',           label='Capped'},                                -- 01
+}
+
+types.craft_skill = L{
+    {ctype='bit[5]',            label='Rank',               fn=srank},          -- 00
+    {ctype='bit[10]',           label='Level'},                                 -- 00
+    {ctype='boolbit',           label='Capped'},                                -- 01
+}
+
 -- Skills Update
 fields.incoming[0x062] = L{
-    {ctype='data[126]',         label='_unknown1'},                             -- 04
-    {ctype='unsigned short',    label='Hand-to-Hand',       fn=cskill},         -- 82
-    {ctype='unsigned short',    label='Dagger',             fn=cskill},         -- 84
-    {ctype='unsigned short',    label='Sword',              fn=cskill},         -- 86
-    {ctype='unsigned short',    label='Great Sword',        fn=cskill},         -- 88
-    {ctype='unsigned short',    label='Axe',                fn=cskill},         -- 8A
-    {ctype='unsigned short',    label='Great Axe',          fn=cskill},         -- 8C
-    {ctype='unsigned short',    label='Scythe',             fn=cskill},         -- 8E
-    {ctype='unsigned short',    label='Polearm',            fn=cskill},         -- 90
-    {ctype='unsigned short',    label='Katana',             fn=cskill},         -- 92
-    {ctype='unsigned short',    label='Great Katana',       fn=cskill},         -- 94
-    {ctype='unsigned short',    label='Club',               fn=cskill},         -- 96
-    {ctype='unsigned short',    label='Staff',              fn=cskill},         -- 98
-    {ctype='data[24]',          label='_dummy1'},                               -- 9A
-    {ctype='unsigned short',    label='Archery',            fn=cskill},         -- B2
-    {ctype='unsigned short',    label='Marksmanship',       fn=cskill},         -- B4
-    {ctype='unsigned short',    label='Throwing',           fn=cskill},         -- B6
-    {ctype='unsigned short',    label='Guarding',           fn=cskill},         -- B8
-    {ctype='unsigned short',    label='Evasion',            fn=cskill},         -- BA
-    {ctype='unsigned short',    label='Shield',             fn=cskill},         -- BC
-    {ctype='unsigned short',    label='Parrying',           fn=cskill},         -- BE
-    {ctype='unsigned short',    label='Divine Magic',       fn=cskill},         -- C0
-    {ctype='unsigned short',    label='Healing Magic',      fn=cskill},         -- C2
-    {ctype='unsigned short',    label='Enhancing Magic',    fn=cskill},         -- C4
-    {ctype='unsigned short',    label='Enfeebling Magic',   fn=cskill},         -- C6
-    {ctype='unsigned short',    label='Elemental Magic',    fn=cskill},         -- C8
-    {ctype='unsigned short',    label='Dark Magic',         fn=cskill},         -- CA
-    {ctype='unsigned short',    label='Summoning Magic',    fn=cskill},         -- CC
-    {ctype='unsigned short',    label='Ninjutsu',           fn=cskill},         -- CE
-    {ctype='unsigned short',    label='Singing',            fn=cskill},         -- D0
-    {ctype='unsigned short',    label='Stringed Instrument',fn=cskill},         -- D2
-    {ctype='unsigned short',    label='Wind Instrument',    fn=cskill},         -- D4
-    {ctype='unsigned short',    label='Blue Magic',         fn=cskill},         -- D6
-    {ctype='unsigned short',    label='Geomancy',           fn=cskill},         -- D8
-    {ctype='unsigned short',    label='Handbell',           fn=cskill},         -- DA
-    {ctype='data[4]',           label='_dummy2'},                               -- DC
-    {ctype='unsigned short',    label='Fishing',            fn=sskill},         -- E0
-    {ctype='unsigned short',    label='Woodworking',        fn=sskill},         -- E2
-    {ctype='unsigned short',    label='Smithing',           fn=sskill},         -- E4
-    {ctype='unsigned short',    label='Goldsmithing',       fn=sskill},         -- E6
-    {ctype='unsigned short',    label='Clothcraft',         fn=sskill},         -- E8
-    {ctype='unsigned short',    label='Leathercraft',       fn=sskill},         -- EA
-    {ctype='unsigned short',    label='Bonecraft',          fn=sskill},         -- EC
-    {ctype='unsigned short',    label='Alchemy',            fn=sskill},         -- EE
-    {ctype='unsigned short',    label='Cooking',            fn=sskill},         -- F0
-    {ctype='unsigned short',    label='Synergy',            fn=sskill},         -- F2
-    {ctype='char*',             label='_padding',           const=0xFF},        -- F4
+    {ctype='data[124]',         label='_unknown1'},                             -- 04
+    {ref=types.combat_skill,    lookup=res.skills,          count=0x30},        -- 80
+    {ref=types.craft_skill,     lookup=res.synth_ranks,     count=0x10},        -- E0
 }
 
 -- Set Update
@@ -2425,8 +2384,8 @@ fields.incoming[0x110] = L{
 }
 
 types.roe_quest = L{
-    {ctype='bit[12]',           label='RoE Quest ID'},                          -- 00:00
-    {ctype='bit[20]',           label='RoE Quest Progress'},                    -- 01:04
+    {ctype='bit[12]',           label='RoE Quest ID'},                          -- 00
+    {ctype='bit[20]',           label='RoE Quest Progress'},                    -- 01
 }
 
 -- Eminence Update
@@ -2574,12 +2533,16 @@ local function parse(fs, data, index, max)
                     index = index + size
                 else
                     if max ~= 1 then
-                        field.label = field.label .. ' ' .. count:string()
+                        if field.lookup then
+                            field.label = field.lookup[count].english .. ' ' .. field.label
+                        else
+                            field.label = field.label .. ' ' .. count:string()
+                        end
                     end
 
                     res:append(field)
-                    if ctype == 'bit' then
-                        local bits = count_str:number()
+                    if ctype == 'bit' or field.ctype == 'boolbit' then
+                        local bits = count_str and count_str:number() or 1
                         bitoffset = (bitoffset + bits) % 8
                         index = index + ((bitoffset + bits) / 8):floor()
                     else
