@@ -381,7 +381,6 @@ function ambig(key)
         return commands[slugged_commands[key].type][slugged_commands[key].id],slugged_commands[key].type
     else  -- Otherwise it's actually ambiguous, so run the associated function and pass the known information.
         abil_type=ambig_names[key]['funct'](windower.ffxi.get_player(),ambig_names[key].IDs,ambig_names[key].info,ambig_names[key].monster_abilities)
-        print(abil_type,key,ambig_names[key].IDs[abil_type])
         if res[abil_type] then
             return res[abil_type][ambig_names[key].IDs[abil_type]]
         else
