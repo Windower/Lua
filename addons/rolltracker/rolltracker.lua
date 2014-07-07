@@ -94,7 +94,7 @@ windower.register_event('load', function()
         ['Bolter\'s'] = {0.3,0.3,0.8,0.4,0.4,0.5,0.5,0.6,0.2,0.7,1.0,'-8','% Movement Speed',3, 0.2},
         ['Caster\'s'] = {6,15,7,8,9,10,5,11,12,13,20,'-10','% Fast Cast',2, {"legs",11140,10}},
         ['Tactician\'s'] = {10,10,10,10,30,10,10,0,20,20,40,'-10',' Regain',5, 2, {"body", 11100, 10}},
-        ['Miser\'s'] = {3,5,7,9,20,11,2,13,15,17,25,'0',' Save TP',5, 15},
+        ['Miser\'s'] = {30,50,70,90,200,110,20,130,150,170,250,'0',' Save TP',5, 15},
         ['Ninja'] = {4,5,5,14,6,7,9,2,10,11,18,'-10',' Evasion Bonus',4, 2},
         ['Scholar\'s'] = {'?','?','?','?','?','?','?','?','?','?','?','?',' Conserve MP',2, 0},
         ['Allies\''] = {6,7,17,9,11,13,15,17,17,5,17,'?','% Skillchain Damage',3,{'hands',11120, 5}},
@@ -202,6 +202,9 @@ function equipBonus(rollid, rollnum)
 end
 
 function RollEffect(rollid, rollnum)
+    if rollnum == 13 then
+        return
+    end
     --There's gotta be a better way to do this.
     local rollName = rollInfo[rollid][1]
     local equip =  windower.ffxi.get_items()['equipment']
@@ -225,7 +228,7 @@ function RollEffect(rollid, rollnum)
         end
         return "Pet:"..hpVal.." Regen".." +"..tpVal.." Regain" 
     end
-
+    --If there's no Roll Val can't add to it
     if rollVal ~= '?' then
         if leftRing == 28548 or rightRing== 28548 then
             rollVal = rollVal + (rollInfo[rollid][16]*5)
