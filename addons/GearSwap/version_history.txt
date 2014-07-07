@@ -1,4 +1,14 @@
 -------------------------------------------------
+GearSwap 0.873 - Adjusted midaction and pet_midaction.
+-------------------------------------------------
+GearSwap 0.872 - Fixed Encumbrance, Job Change issues, and a nil error on login.
+-------------------------------------------------
+GearSwap 0.871 - Debugging and Logging changes.
+-------------------------------------------------
+GearSwap 0.870 - Rewrite of "order" as "priority" for advanced tables.
+-------------------------------------------------
+GearSwap 0.868 - Ironed out some bugs. Added .in_mog_house. Made pet_change work for gaining charmed pets.
+-------------------------------------------------
 GearSwap 0.865 - Replicated part of the LuaCore API in GearSwap and set limits on global variable refresh rates.
 -------------------------------------------------
 GearSwap 0.860 - Reworked the augment system to use the extdata library. Consequently enabled evolith support.

@@ -14,6 +14,10 @@ _libs.functions = _libs.functions or require('functions')
 
 require('pack')
 
+if not warning then
+    warning = print+{_addon.name and '%s warning:':format(_addon.name) or 'Warning:'}
+end
+
 --[[
     Packet database. Feel free to correct/amend it wherever it's lacking.
 ]]
@@ -41,6 +45,7 @@ local type_lengths = {
     ['bool']            = 1,
     ['float']           = 4,
     ['double']          = 8,
+    ['data']            = 1,
 }
 setmetatable(type_lengths, {__index = function(t, k)
     local type, count = k:match('([%a%s]+)%[(%d+)%]')
@@ -65,6 +70,7 @@ end
 -- Type identifiers as declared in lpack.c
 local pack_ids = {}
 pack_ids['bit']             = 'b'   -- Windower exclusive
+pack_ids['boolbit']         = 'q'   -- Windower exclusive
 pack_ids['bool']            = 'B'   -- Windower exclusive
 pack_ids['unsigned char']   = 'C'   -- Originally 'b', replaced by 'bit' for Windower
 pack_ids['unsigned short']  = 'H'
@@ -80,6 +86,7 @@ pack_ids['int']             = 'i'
 pack_ids['long']            = 'l'
 pack_ids['float']           = 'f'
 pack_ids['double']          = 'd'
+pack_ids['data']            = 'A'
 pack_ids = setmetatable(pack_ids, {__index = function(t, k)
     local type, number = k:match('(.-)%s*%[(%d+)%]')
     if type then
@@ -171,7 +178,7 @@ function packets.new(dir, id, values)
 
     local fields = packets.fields.get(packet._dir, packet._id)
     if not fields then
-        warning('Packet 0x'..id:hex():zfill(3)..' not recognized.')
+        warning('Packet 0x%.3X not recognized.':format(id))
         return packet
     end
 
@@ -183,13 +190,13 @@ function packets.new(dir, id, values)
             if field.const then
                 packet[field.label] = field.const
 
-            elseif field.ctype == 'bool' then
+            elseif field.ctype == 'bool' or field.ctype == 'boolbit' then
                 packet[field.label] = false
 
-            elseif rawget(pack_ids, field.ctype) then
+            elseif rawget(pack_ids, field.ctype) or field.ctype:startswith('bit') then
                 packet[field.label] = 0
 
-            elseif field.ctype:match('char%s*%[%d+%]') or field.ctype:match('char%s*%*') then
+            elseif field.ctype:startswith('char') or field.ctype:startswith('data') then
                 packet[field.label] = ''
 
             else
@@ -203,8 +210,9 @@ function packets.new(dir, id, values)
     return setmetatable(packet, {__tostring = function(p)
         local res = p._dir:capitalize()..' packet 0x'..p._id:hex():zfill(3)..' ('..(p._name and p._name or 'Unrecognized packet')..'):'
 
+        local raw = packets.build(p)
         for field in fields:it() do
-            res = res .. '\n' .. field.label .. ': ' .. tostring(p[field.label]) .. (field.fn and '(' .. field.fn(p[field.label]) .. ')' or '')
+            res = res .. '\n' .. field.label .. ': ' .. tostring(p[field.label]) .. (field.fn and '(' .. field.fn(p[field.label], raw) .. ')' or '')
         end
 
         return res

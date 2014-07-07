@@ -67,8 +67,11 @@ function blu_unsub(player_array,IDs,info) -- Determines ambiguous blue magic tha
     end
     if IDs.weapon_skills then
         return 'weapon_skills'
+    elseif IDs.job_abilities then
+        return 'job_abilities'
+    elseif IDs.spells then
+        return 'spells'
     end
-    return 'job_abilities'
 end
 
 function abil_mob(player_array,IDs,info) -- Determines ambiguity between monster TP moves and abilities
@@ -82,7 +85,11 @@ function abil_mob(player_array,IDs,info) -- Determines ambiguity between monster
             return 'monster_abilities'
         end
     end
-    return 'job_abilities'
+    if IDs.job_abilities then
+        return 'job_abilities'
+    else
+        return 'weapon_skills'
+    end
 end
 
 function magic_mob(player_array,IDs,info) -- Determines ambiguity between monster TP moves and magic
@@ -136,6 +143,12 @@ ambig_names = {
     balefulgaze={absolute=true,monster_abilities=370},
     wingwhirl={absolute=true,monster_abilities=1717},
     frigidshuffle={absolute=true,monster_abilities=1716},
+    curse={absolute=true,monster_abilities=476}, -- Unused curse black magic
+    crystalweapon={absolute=true,monster_abilities=679}, -- 4x Crystal Weapons (different additional effects)
+    heatwave={absolute=true,monster_abilities=512}, -- 2x Heat Wave
+    batterhorn={absolute=true,monster_abilities=2095}, -- 2x Batterhorn
+    graniteskin={absolute=true,monster_abilities=2097}, -- 2x Granite Skin
+    vulcanianimpact={absolute=true,monster_abilities=324}, -- 2x Vulcanian Impact
 
     fireiv={IDs={spells=147,job_abilities=549},funct=smn_unsub,info=60},
     stoneiv={IDs={spells=162,job_abilities=565},funct=smn_unsub,info=60},
@@ -161,6 +174,20 @@ ambig_names = {
     tourbillion={IDs={spells=740,monster_abilities=2024},funct=blu_unsub,info=97},
     subzerosmash={IDs={spells=654,monster_abilities=2436},funct=blu_unsub,info=72},
     pyricbulwark={IDs={spells=741,monster_abilities=1831},funct=blu_unsub,info=98},
+    bloodsaber={IDs={spells=541,monster_abilities=485},funct=blu_unsub,info=48},
+    spinalcleave={IDs={spells=540,monster_abilities=1778},funct=blu_unsub,info=63},
+    mementomori={IDs={spells=538,monster_abilities=530},funct=blu_unsub,info=62},
+    animatingwail={IDs={spells=661,monster_abilities=1782},funct=blu_unsub,info=79},
+    eyesonme={IDs={spells=557,monster_abilities=549},funct=blu_unsub,info=61},
+    magicbarrier={IDs={spells=668,monster_abilities=555},funct=blu_unsub,info=82},
+    refueling={IDs={spells=530,monster_abilities=1851},funct=blu_unsub,info=48},
+    icebreak={IDs={spells=531,monster_abilities=676},funct=blu_unsub,info=50},
+    selfdestruct={IDs={spells=533,monster_abilities=571},funct=blu_unsub,info=50},
+    whirlofrage={IDs={spells=669,monster_abilities=1642},funct=blu_unsub,info=83},
+    bloodrake={IDs={spells=743,monster_abilities=2106},funct=blu_unsub,info=99},
+    coldwave={IDs={spells=535,monster_abilities=528},funct=blu_unsub,info=52},
+    batterycharge={IDs={spells=662,monster_abilities=525},funct=blu_unsub,info=79},
+    heavystrike={IDs={spells=688,monster_abilities=675},funct=blu_unsub,info=92},
      
     footkick={IDs={spells=577,job_abilities=672,monster_abilities=257},funct=blu_sub},
     headbutt={IDs={spells=623,job_abilities=675,monster_abilities=300},funct=blu_sub},
@@ -177,6 +204,13 @@ ambig_names = {
     chaoticeye={IDs={spells=582,job_abilities=730,monster_abilities=653},funct=blu_sub},
     wildcarrot={IDs={spells=578,job_abilities=735,monster_abilities=323},funct=blu_sub},
     jettatura={IDs={spells=575,job_abilities=750},funct=blu_sub},
+    stinkinggas={IDs={spells=537,monster_abilities=489},funct=blu_sub},
+    terrortouch={IDs={spells=539,monster_abilities=475},funct=blu_sub},
+    bludgeon={IDs={spells=529,monster_abilities=683},funct=blu_sub},
+    blitzstrahl={IDs={spells=532,monster_abilities=535},funct=blu_sub},
+    mysteriouslight={IDs={spells=534,monster_abilities=523},funct=blu_sub},
+    smiteofrage={IDs={spells=527,monster_abilities=404},funct=blu_sub},
+    battledance={IDs={spells=620,monster_abilities=1061},funct=blu_sub},
 
     dustcloud={IDs={job_abilities=673,monster_abilities=258},funct=abil_mob},
     whirlclaws={IDs={job_abilities=674,monster_abilities=259},funct=abil_mob},
@@ -245,6 +279,23 @@ ambig_names = {
     bubblecurtain={IDs={job_abilities=694,monster_abilities=443},funct=abil_mob},
     chokebreath={IDs={job_abilities=751,monster_abilities=579},funct=abil_mob},
     backheel={IDs={job_abilities=749,monster_abilities=519},funct=abil_mob},
+    
+    
+    spinningattack={IDs={weapon_skills=6,monster_abilities=521},funct=abil_mob},
+    finalheaven={IDs={weapon_skills=10,monster_abilities=1188},funct=abil_mob},
+    mercystroke={IDs={weapon_skills=26,monster_abilities=1189},funct=abil_mob},
+    knightsofround={IDs={weapon_skills=43,monster_abilities=1190},funct=abil_mob},
+    scourge={IDs={weapon_skills=57,monster_abilities=1191},funct=abil_mob},
+    onslaught={IDs={weapon_skills=73,monster_abilities=1192},funct=abil_mob},
+    metatrontorment={IDs={weapon_skills=89,monster_abilities=1193},funct=abil_mob},
+    catastrophe={IDs={weapon_skills=105,monster_abilities=1194},funct=abil_mob},
+    geirskogul={IDs={weapon_skills=121,monster_abilities=1195},funct=abil_mob},
+    blademetsu={IDs={weapon_skills=137,monster_abilities=1196},funct=abil_mob},
+    tachikaiten={IDs={weapon_skills=153,monster_abilities=1197},funct=abil_mob},
+    randgrith={IDs={weapon_skills=170,monster_abilities=1198},funct=abil_mob},
+    gateoftartarus={IDs={weapon_skills=185,monster_abilities=1199},funct=abil_mob},
+--    namas={IDs={weapon_skills=200,monster_abilities=1200},funct=abil_mob},
+    coronach={IDs={weapon_skills=216,monster_abilities=1201},funct=abil_mob},
 
     ramcharge={IDs={spells=585,monster_abilities=266},funct=magic_mob},
     healingbreeze={IDs={spells=581,monster_abilities=287},funct=magic_mob},
@@ -322,7 +373,6 @@ function ambig(key)
         print('Shortcuts Bug: '..tostring(key))
         return
     end
-    
     local commands = get_available_commands()
     local slugged_commands = make_slugged_command_list(commands)
     

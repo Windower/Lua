@@ -478,7 +478,7 @@ function handle_reset(cmdParams)
 		state.MaxWeaponskillDistance = 0
 		state.SelectNPCTargets = false
 		state.PCTargetMode = 'default'
-		mote_flags.show_set = nil
+		mote_vars.show_set = nil
 		if job_reset then
 			job_reset(resetState)
 		end
@@ -505,13 +505,14 @@ function handle_update(cmdParams)
 	-- init a new eventArgs
 	local eventArgs = {handled = false}
 
+	reset_buff_states()
+
 	-- Allow jobs to override this code
 	if job_update then
 		job_update(cmdParams, eventArgs)
 	end
 
 	if not eventArgs.handled then
-		reset_buff_states()
 		if handle_equipping_gear then
 			handle_equipping_gear(player.status)
 		end
@@ -542,22 +543,22 @@ function handle_show_set(cmdParams)
 		end
 
 		add_to_chat(122,'Showing current TP set: ['..state.OffenseMode..'/'..state.DefenseMode..']'..meleeGroups)
-		equip(get_current_melee_set())
+		equip(get_melee_set())
 	-- If given a param of 'precast', block equipping midcast/aftercast sets
 	elseif showset_type == 'precast' then
-		mote_flags.show_set = 'precast'
+		mote_vars.show_set = 'precast'
 		add_to_chat(122,'GearSwap will now only equip up to precast gear for spells/actions.')
 	-- If given a param of 'midcast', block equipping aftercast sets
 	elseif showset_type == 'midcast' then
-		mote_flags.show_set = 'midcast'
+		mote_vars.show_set = 'midcast'
 		add_to_chat(122,'GearSwap will now only equip up to midcast gear for spells.')
 	-- If given a param of 'midcast', block equipping aftercast sets
 	elseif showset_type == 'petmidcast' or showset_type == 'pet_midcast' then
-		mote_flags.show_set = 'pet_midcast'
+		mote_vars.show_set = 'pet_midcast'
 		add_to_chat(122,'GearSwap will now only equip up to pet midcast gear for spells.')
 	-- With a parameter of 'off', turn off showset functionality.
 	elseif showset_type == 'off' then
-		mote_flags.show_set = nil
+		mote_vars.show_set = nil
 		add_to_chat(122,'Show Sets is turned off.')
 	end
 end
@@ -671,8 +672,8 @@ function display_current_state()
 			'Kiting: '..on_off_names[state.Kiting]..pcTarget..npcTarget)
 	end
 
-	if mote_flags.show_set then
-		add_to_chat(122,'Show Sets it currently showing ['..mote_flags.show_set..'] sets.  Use "//gs c showset off" to turn it off.')
+	if mote_vars.show_set then
+		add_to_chat(122,'Show Sets it currently showing ['..mote_vars.show_set..'] sets.  Use "//gs c showset off" to turn it off.')
 	end
 end
 

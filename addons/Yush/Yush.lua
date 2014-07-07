@@ -1,8 +1,47 @@
 _addon.author = 'Arcon'
-_addon.version = '1.0.0.1'
+_addon.version = '2.1.1.0'
 _addon.language = 'English'
+_addon.command = 'yush'
 
 require('luau')
+
+_innerG = {_binds={}}
+for k, v in pairs(_G) do
+    rawset(_innerG, k, v)
+end
+_innerG._innerG = nil
+_innerG._G = _innerG
+
+_innerG.include = function(path)
+    local full_path = windower.addon_path .. 'data/' .. path
+
+    local file = loadfile(full_path)
+    if not file then
+        warning('Include file %s not found.':format(path))
+        return
+    end
+
+    setfenv(file, _innerG)
+    file()
+end
+
+setmetatable(_innerG, {__index = function(g, k)
+    local t = rawget(rawget(g, '_binds'), k)
+    if not t then
+        t = {}
+        rawset(rawget(g, '_binds'), k, t)
+    end
+    return t
+end, __newindex = function(g, k, v)
+    local t = rawget(rawget(g, '_binds'), k)
+    if t and type(v) == 'table' then
+        for k, v in pairs(v) do
+            t[k] = v
+        end
+    else
+        rawset(rawget(g, '_binds'), k, v)
+    end
+end})
 
 defaults = {}
 defaults.ResetKey = '`'
@@ -13,9 +52,36 @@ settings = config.load(defaults)
 binds = {}
 current = binds
 stack = L{binds}
+keys = S{}
 
 reset = function()
     current = binds
+end
+
+back = function()
+    if stack:length() == 1 then
+        current = binds
+    else
+        current = stack[stack:length() - 1]
+        stack:remove()
+    end
+end
+
+check = function()
+    for key, val in pairs(current) do
+        if key <= keys then
+            if type(val) == 'string' then
+                windower.send_command(val)
+            else
+                current = val
+                stack:append(current)
+            end
+
+            return true
+        end
+    end
+
+    return false
 end
 
 parse_binds = function(fbinds, top)
@@ -57,6 +123,7 @@ windower.register_event('load', 'login', 'job change', 'logout', function()
     end
 
     if file then
+        setfenv(file, _innerG)
         parse_binds(file())
         reset()
         print('Yush: Loaded ' .. path .. ' Lua file')
@@ -64,8 +131,6 @@ windower.register_event('load', 'login', 'job change', 'logout', function()
         print('Yush: No matching file found for %s (%s%s)':format(player.name, player.main_job, player.sub_job and '/' .. player.sub_job or ''))
     end
 end)
-
-keys = S{}
 
 dikt = {    -- Har har
     [1] = 'esc',
@@ -188,33 +253,33 @@ windower.register_event('keyboard', function(dik, down)
                 reset()
                 return true
             elseif key == settings.BackKey then
-                if stack:length() == 1 then
-                    current = binds
-                else
-                    current = stack[stack:length() - 1]
-                    stack:remove()
-                end
+                back()
                 return true
             end
         end
 
-        for key, val in pairs(current) do
-            if key <= keys then
-                if type(val) == 'string' then
-                    windower.send_command(val)
-                else
-                    current = val
-                    stack:append(current)
-                end
+        return check()
+    end
+end)
 
-                return true
-            end
-        end
+windower.register_event('addon command', function(command, ...)
+    command = command and command:lower() or 'help'
+
+    if command == 'reset' then
+        reset()
+
+    elseif command == 'back' then
+        back()
+
+    elseif command == 'press' then
+        keys = keys + S{...}:map(string.lower)
+        check()
+
     end
 end)
 
 --[[
-Copyright (c) 2014, Windower
+Copyright © 2014, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

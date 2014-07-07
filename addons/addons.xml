@@ -342,6 +342,13 @@
 	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
+    <name>SpeedChecker</name>
+    <author>Arcon</author>
+    <description>Displays a small box indicating your current movement speed modifier (+/- X%).</description>
+    <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
+  </addon>
+  <addon>
     <name>StaggerTrack</name>
     <author>Nitrous (Shiva)</author>
     <description>Catches voidwatch weakness messages and prints them to a textbox in case you miss them in the battle spam.</description>
@@ -396,6 +403,13 @@
     <description>Prefixes any chat message with a timestamp. Based on Timestamp plugin.</description>
     <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
+  </addon>
+  <addon>
+    <name>TParty</name>
+    <author>Arcon</author>
+    <description>Shows a target's HP percentage next to their health bar.</description>
+    <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
   </addon>
   <addon>
     <name>Update</name>

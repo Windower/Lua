@@ -417,3 +417,5 @@ default_colors = [[
     </global>
 </settings>
 ]]
+
+local item_lag_preventer = table.length(res.items)

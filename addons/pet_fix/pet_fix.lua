@@ -102,6 +102,11 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
             end
         end
         
+        local actor = windower.ffxi.get_mob_by_id(act.actor_id)
+        if actor and pet_indices[actor.index] then
+            act.category = 0
+        end
+        
         for i,v in pairs(act.targets) do
             local mob = windower.ffxi.get_mob_by_id(v.id)
             if mob and pet_indices[mob.index] then
