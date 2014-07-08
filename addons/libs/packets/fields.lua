@@ -668,20 +668,6 @@ fields.outgoing[0x0E1] = L{
     {ctype='data[136]',         label='_unknown1',          const=0x0},         -- 04
 }
 
--- Search Comment
-fields.outgoing[0x0E0] = L{
-    {ctype='char[40]',          label='Line 1'},                                -- 04  Spaces (0x20) fill out any empty characters.
-    {ctype='char[40]',          label='Line 2'},                                -- 2C  Spaces (0x20) fill out any empty characters.
-    {ctype='char[40]',          label='Line 3'},                                -- 54  Spaces (0x20) fill out any empty characters.
-    {ctype='char[4]',           label='_unknown1'},                             -- 7C  20 20 20 00 observed.
-    {ctype='char[24]',          label='_unknown2'},                             -- 80  Likely contains information about the flags.
-}
-
--- Get LS Message
-fields.outgoing[0x0E1] = L{
-    {ctype='char[136]',         label='_unknown1',          const=0x0},         -- 04
-}
-
 -- Set LS Message
 fields.outgoing[0x0E2] = L{
     {ctype='unsigned int',      label='_unknown1',          const=0x00000040},  -- 04
@@ -869,11 +855,6 @@ fields.outgoing[0x110] = L{
 fields.outgoing[0x111] = L{
     {ctype='bool',              label='Lock'},                                  -- 04   0 = unlock, 1 = lock
     {ctype='data[3]',           label='_junk1'},                                -- 05
-}
-
--- ROE quest log request
-fields.outgoing[0x112] = L{
-    {ctype='int',               label='_unknown1'},                             -- 04
 }
 
 -- ROE quest log request
@@ -2243,6 +2224,10 @@ fields.incoming[0x0DF] = L{
     {ctype='unsigned short',    label='_unknown1'},                             -- 18
     {ctype='unsigned short',    label='_unknown2'},                             -- 1A
     {ctype='unsigned int',      label='_unknown3'},                             -- 1C
+    {ctype='unsigned char',     label='Main job',           fn=job},            -- 20
+    {ctype='unsigned char',     label='Main job level'},                        -- 21
+    {ctype='unsigned char',     label='Sub job',            fn=job},            -- 22
+    {ctype='unsigned char',     label='Sub job level'},                         -- 23
 }
 
 -- Char Info
