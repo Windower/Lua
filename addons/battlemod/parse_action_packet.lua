@@ -182,7 +182,9 @@ function parse_action_packet(act)
                 elseif m.message == 437 or m.message == 438 then m.simp_name = act.action.name..' (JAs and TP)'
                 elseif m.message == 439 or m.message == 440 then m.simp_name = act.action.name..' (SPs, JAs, TP, and MP)'
                 elseif T{252,265,268,269,271,272,274,275}:contains(m.message) then m.simp_name = 'Magic Burst! '..act.action.name
-                elseif not act.action then m.simp_name = ''
+                elseif not act.action then 
+                   m.simp_name = ''
+                   act.action = {}
                 else m.simp_name = act.action.name or ''
                 end
 
