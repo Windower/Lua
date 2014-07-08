@@ -26,6 +26,7 @@
 
 -- Convert the spells and job abilities into a referenceable list of aliases --
 validabils = {}
+ambig_names = {}
 
 if logging then
 	f = io.open('../addons/shortcuts/data/'..tostring(os.clock())..'_all_duplicates.log','w+')
@@ -51,7 +52,6 @@ function make_abil(abil,t,i)
 		validabils[ind].typ = t
 		validabils[ind].index = i
 	else
---		print(tostring(validabils[ind]))
 		if logging then
 			f:write('Original: '..tostring(abil)..' '..tostring(validabils[ind].typ)..' '..tostring(validabils[ind].index)..'\nSecondary: '..tostring(abil)..' '..tostring(t)..' '..tostring(i)..'\n\n')
 			counter = counter +1
@@ -59,6 +59,10 @@ function make_abil(abil,t,i)
 		validabils[ind] = {}
 		validabils[ind].typ = 'ambig_names'
 		validabils[ind].index = ind
+        if not ambig_names[ind] then
+            ambig_names[ind] = {funct=default,IDs={}}
+        end
+        ambig_names[ind].IDs[t] = i
 	end
 end
 
