@@ -41,16 +41,12 @@
 ---- none or ''
 -----------------------------------------------------------------------------------
 windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
-    if debugging >= 1 then windower.debug('outgoing text (debugging)') end
+    windower.debug('outgoing text')
     if gearswap_disabled then return modified end
     
     local splitline = windower.from_shift_jis(windower.convert_auto_trans(modified)):gsub(' <wait %d+>',''):gsub('"(.-)"',function(str)
             return str:gsub(' ',string.char(7))
-        end):split(' '):filter(function(val)
-            if val ~= '' then
-                return true
-            end
-        end)
+        end):split(' '):filter(-'')
     
     if splitline.n == 0 then return end
 
@@ -72,7 +68,7 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
             st_flag = nil
             return true
         elseif temp_mob_arr then
-            if logging then    logit(logfile,'\n\n'..tostring(os.clock)..'(93) temp_mod: '..temp_mod) end
+            logit('\n\n'..tostring(os.clock)..'(93) temp_mod: '..tostring(temp_mod))
             refresh_globals()
             
             local r_line
@@ -166,10 +162,8 @@ function inc_action(act)
     end
     
     spell = get_spell(act)
-    if logging then    
-        if spell then logit(logfile,'\n\n'..tostring(os.clock)..'(178) Event Action: '..tostring(spell[language])..' '..tostring(act.category))
-        else logit(logfile,'\n\nNil spell detected') end
-    end
+    if spell then logit('\n\n'..tostring(os.clock)..'(178) Event Action: '..tostring(spell[language])..' '..tostring(act.category))
+    else logit('\n\nNil spell detected') end
     
     if spell and spell[language] then
         spell.target = target_complete(windower.ffxi.get_mob_by_id(act.targets[1].id))
@@ -185,7 +179,7 @@ function inc_action(act)
         end
         return
     else
-        if debugging >= 1 then windower.send_command('input /echo Incoming Action packet did not generate a spell/aftercast.')end
+        if debugging.general then windower.send_command('input /echo Incoming Action packet did not generate a spell/aftercast.')end
         return
     end
     
@@ -214,7 +208,7 @@ function inc_action(act)
             -- Also, there are some actions (like being paralyzed while casting Ninjutsu) that sends two result action packets. Block the second packet.
             refresh_globals()
             equip_sets(prefix..'aftercast',ts,spell)
-        elseif debugging >= 1 then
+        elseif debugging.command_registry then
             windower.add_to_chat(8,'GearSwap (Debug Mode): Hitting Aftercast without detecting an entry in command_registry')
         end
     elseif (readies[act.category] and act.param == 28787) then -- and not (act.category == 9 or (act.category == 7 and prefix == 'pet_'))) then
@@ -224,13 +218,16 @@ function inc_action(act)
             -- Only aftercast things that were precasted.
             -- Also, there are some actions (like being paralyzed while casting Ninjutsu) that sends two result action packets. Block the second packet.
             refresh_globals()
+            if command_registry[ts] then command_registry[ts].midaction = false end
             equip_sets(prefix..'aftercast',ts,spell)
-        elseif debugging >= 1 then
+        elseif debugging.command_registry then
             windower.add_to_chat(8,'GearSwap (Debug Mode): Hitting Aftercast without detecting an entry in command_registry')
         end
     elseif readies[act.category] and prefix == 'pet_' and act.targets[1].actions[1].message ~= 0 then -- Entry for pet midcast. Excludes the second packet of "Out of range" BPs.
         ts = mk_command_registry_entry(spell)
         refresh_globals()
+        command_registry[ts].pet_midaction = true
+        command_registry[ts].timestamp = os.time()
         equip_sets('pet_midcast',ts,spell)
     end
 end
@@ -249,17 +246,11 @@ end
 ---- none
 -----------------------------------------------------------------------------------
 function inc_action_message(arr)
-    if debugging >= 1 then windower.debug('action message') end
+    windower.debug('action message')
     if gearswap_disabled then return end
-    if T{6,20,113,406,605,646}:contains(arr.message_id) then
-        -- 6   : target is defeated by actor
-        -- 20  : target falls to the ground
-        -- 113 : target falls to the ground
-        -- 406 : target falls to the ground
-        -- 605 : target falls to the ground
-        -- 646 : target falls to the ground
+    if T{6,20,113,406,605,646}:contains(arr.message_id) then -- death messages
         local ts,tab = delete_command_registry_by_id(arr.target_id)
-        if tab and tab.spell and tab.spell.prefix == '/pet' then 
+        if tab and tab.spell and tab.spell.prefix == '/pet' then
             equip_sets('pet_aftercast',nil,tab.spell)
         elseif tab and tab.spell then
             equip_sets('aftercast',nil,tab.spell)
@@ -282,12 +273,13 @@ function inc_action_message(arr)
     end
     
     if unable_to_use:contains(arr.message_id) then
-        if logging then    logit(logfile,'\n\n'..tostring(os.clock)..'(195) Event Action Message: '..tostring(message_id)..' Interrupt') end
+        logit('\n\n'..tostring(os.clock)..'(195) Event Action Message: '..tostring(message_id)..' Interrupt')
         local ts,tab = find_command_registry_by_time('player')
         
         if tab and tab.spell then
             tab.spell.interrupted = true
             tab.spell.action_type = 'Interruption'
+            command_registry[ts].midaction = false
             refresh_globals()
             equip_sets(prefix..'aftercast',ts,tab.spell)
         end

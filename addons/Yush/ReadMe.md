@@ -15,6 +15,57 @@ The file needs to return a table. The table is a key -> action mapping, where th
 
 To go back to the base level, press the button that has been defined in the `data/settings.xml` file as `ResetKey`. To go back only one level, press the button that has been defined in the same file as `BackKey`. They default to `` ` `` and `Backspace` respectively.
 
+### Includes
+
+Yush supports inclusion of base files, in case certain jobs share a macro structure.
+
+If you define a table `WAR` in a file called `WAR-include.lua` that looks like this:
+```lua
+WAR = {
+    ['Ctrl+1'] = 'input /ja "Berserk" <me>',
+    ['Ctrl+2'] = 'input /ja "Warcry" <me>',
+}
+```
+
+You can make use of that file by including it in another file as follows:
+```lua
+include('WAR-include.lua')
+```
+
+It's even possible to define tables in multiple files. The order in which they are included is the order that entries will be overwritten in. So if you define a `WAR` table in both `WAR-include.lua` as well as the file you're including it in (`Arcon_THF.lua` in this example), the table would contain entries from both files without any necessary functions or special syntax, where duplicate entries from `Arcon_THF.lua` would take priority. Simply define the table twice and values will be overwritten in the order they appear in in the file.
+
+Following is another example. This piece is from `WAR-include.lua`:
+```lua
+WAR = {
+    ['Ctrl+1'] = 'input /ja "Berserk" <me>',
+    ['Ctrl+2'] = 'input /ja "Warcry" <me>',
+}
+```
+
+This is from `Arcon_THF.lua`:
+```lua
+include('WAR-include.lua')
+
+WAR = {
+    ['Ctrl+2'] = 'input /ja "Aggressor" <me>',
+}
+```
+
+The result would be *Berserk* on `Ctrl+1` and *Aggressor* on `Ctrl+2`, since the include came first and defined *Warcry* on `Ctrl+2`, but then it was overwritten by the *Aggressor* definition below.
+
+### Logic
+
+Yush supports the full use of the Lua language, as well as all Windower API functions and most Lua libraries (possibly all, but they weren't all tested). For example, in the `Arcon_THF.lua` file we can disambiguate which macros to include depending on the subjob:
+
+```lua
+local sub = windower.ffxi.get_player().sub_job
+if sub == 'WAR' then
+    include('WAR-include.lua')
+elseif sub == 'DNC' then
+    include('DNC-include.lua')
+end
+```
+
 ### Example
 
 This is what an example file called `Arcon_THF.lua` in the addon's `data` folder would look like:

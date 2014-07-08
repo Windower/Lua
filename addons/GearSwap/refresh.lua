@@ -64,7 +64,6 @@ end
 function load_user_files(job_id,user_file)
     job_id = tonumber(job_id)
 
-    refresh_globals()
     user_pcall('file_unload')
     
     for i,v in pairs(registered_user_events) do
@@ -95,8 +94,7 @@ function load_user_files(job_id,user_file)
     end
     user_env = {gearswap = _G, _global = _global, _settings = _settings,
         -- Player functions
-        equip = equip, verify_equip=verify_equip, cancel_spell=cancel_spell,
-        force_send=force_send, change_target=change_target, cast_delay=cast_delay,
+        equip = equip, cancel_spell=cancel_spell, change_target=change_target, cast_delay=cast_delay,
         print_set=print_set,set_combine=set_combine,disable=disable,enable=user_enable,
         send_command=send_cmd_user,windower=user_windower,include=include_user,
         midaction=user_midaction,pet_midaction=user_pet_midaction,set_language=set_language,
@@ -156,8 +154,6 @@ function load_user_files(job_id,user_file)
     
     _global.cast_delay = 0
     _global.cancel_spell = false
-    _global.midaction = false
-    _global.pet_midaction = false
     _global.current_event = 'get_sets'
     user_pcall('get_sets')
     
@@ -215,14 +211,12 @@ function refresh_player(dt,user_event_flag)
     end
     
     -- This being nil does not cause a return, but items should not really be changing when zoning.
-    if items.equipment then
-        local cur_equip = convert_equipment(items.equipment) -- i = 'head', 'feet', etc.; v = inventory ID (0~80)
-                
-        -- Assign player.equipment to be the gear that has been sent out and the server currently thinks
-        -- you are wearing. (the sent_out_equip for loop above).
-        player.equipment = make_user_table()
-        table.reassign(player.equipment,to_names_set(cur_equip))
-    end
+    local cur_equip = table.reassign({},items.equipment)
+            
+    -- Assign player.equipment to be the gear that has been sent out and the server currently thinks
+    -- you are wearing. (the sent_out_equip for loop above).
+    player.equipment = make_user_table()
+    table.reassign(player.equipment,to_names_set(cur_equip))
     
     -- Assign player.inventory to be keyed to item.inventory[i][language] and to have a value of count, similar to buffactive
     if items.inventory then player.inventory = refresh_item_list(items.inventory) end
@@ -558,9 +552,14 @@ end
 -----------------------------------------------------------------------------------
 function refresh_user_env(job_id)
     refresh_globals()
-    command_registry = {}
     if not job_id then job_id = windower.ffxi.get_player().main_job_id end
-    windower.send_command('@wait 0.5;lua i '.._addon.name..' load_user_files '..job_id)
+    
+    if not job_id then
+        windower.send_command('@wait 1;lua i '.._addon.name..' refresh_user_env')
+    else
+        load_user_files(job_id)
+        --windower.send_command('@wait 0.5;lua i '.._addon.name..' load_user_files '..job_id)
+    end
 end
 
 
