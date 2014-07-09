@@ -501,7 +501,7 @@ function get_spell(act)
                 if abil_ID < 256 then
                     spell = res.weapon_skills[abil_ID] -- May have to correct for charmed pets some day, but I'm not sure there are any monsters with TP moves that give no message.
                 else
-                    spell = res.monster_abilities[abil_ID-256]
+                    spell = res.monster_abilities[abil_ID]
                 end
             elseif T{5,9}:contains(act['category']) then
                 spell = res.items[abil_ID]
@@ -522,12 +522,12 @@ function get_spell(act)
             spell.name = color_it(spell[language],color_arr.abilcol)
             spell.ability = color_it(spell[language],color_arr.abilcol)
         elseif fields.weapon_skill then
-            if abil_ID > 255 then -- WZ_RECOVER_ALL is used by chests in Limbus
-                spell = res.monster_abilities[abil_ID-256]
+            if abil_ID > 256 then -- WZ_RECOVER_ALL is used by chests in Limbus
+                spell = res.monster_abilities[abil_ID]
                 if not spell then
                     spell = {english= 'Special Attack'}
                 end
-            elseif abil_ID < 256 then
+            elseif abil_ID <= 256 then
                 spell = res.weapon_skills[abil_ID]
             end
             spell.name = color_it(spell[language],color_arr.wscol)
