@@ -35,51 +35,38 @@ function Display:set_position(posx, posy)
 end
 
 function Display:new(settings, db)
-    local repr = {db = db}
+    local repr = setmetatable({db = db}, self)
     self.settings = settings
-    setmetatable(repr, self)
     self.__index = self
     self.visible = settings.visible
 
     self.text = texts.new(settings.display, settings)
-    self.text:bg_alpha(self.settings.display.bg.alpha)
-    self.text:bg_color(30, 30, 30)
-    
+
     if not valid_fonts:contains(self.settings.display.text.font:lower()) then
         error('Invalid font specified: ' .. self.settings.display.text.font)
         self.text:font(self.settings.display.text.font)
         self.text:size(self.settings.display.text.fontsize)
     else
-        self.text:font(self.settings.display.text.font, 'courier new', 'monospace') 
+        self.text:font(self.settings.display.text.font, 'consolas', 'courier new', 'monospace') 
         self.text:size(self.settings.display.text.size)
     end
-    
-    self.text:alpha(255)
-    self.text:color(255, 255, 255)
 
-    if self.visible then
-        self.text:show()
-    else
-        self.text:hide()
-    end
-    
+    self:visibility(self.visible)
+
     return repr
 end
 
 
-function Display:toggle_visible()
-    local old_visibility = self.visible
-    self.visible = not self.visible
-
-    if not old_visibility then
-        self:update()
-    end
-
-    if self.visible then
+function Display:visibility(v)
+    if v then
         self.text:show()
     else
         self.text:hide()
     end
+
+    self.visible = v
+    self.settings.visible = v
+    self.settings:save()
 end
 
 
@@ -105,31 +92,33 @@ function Display:build_scoreboard_header()
     local filters = self.db:get_filters()
 
     if filters:empty() then
-        mob_filter_str = "All"
+        mob_filter_str = 'All'
     else
-        mob_filter_str = table.concat(filters, ", ")
+        mob_filter_str = table.concat(filters, ', ')
     end
 	
     local labels
     if self.db:empty() then
-        labels = "\n"
+        labels = '\n'
     else
-        labels = string.format("%23s%7s%9s\n", "Tot", "Pct", "DPS")
+        labels = '%23s%7s%9s\n':format('Tot', 'Pct', 'DPS')
     end
 	
     local dps_status
     if dps_clock:is_active() then
-        dps_status = "Active"
+        dps_status = 'Active'
     else
-        dps_status = "Paused"
+        dps_status = 'Paused'
     end
 
     local dps_clock_str = ''
     if dps_clock:is_active() or dps_clock.clock > 1 then
-        dps_clock_str = string.format(" (%s)", dps_clock:to_string())
+        dps_clock_str = ' (%s)':format(dps_clock:to_string())
     end
-    local dps_chunk = string.format("DPS: %s%s", dps_status, dps_clock_str)
-    return string.format("%s%s\nMobs: %-9s\n%s", dps_chunk, string.rep(" ", 29 - dps_chunk:len()) .. "//sb help", mob_filter_str, labels)
+
+    local dps_chunk = 'DPS: %s%s':format(dps_status, dps_clock_str)
+
+    return '%s%s\nMobs: %-9s\n%s':format(dps_chunk, ' ':rep(29 - dps_chunk:len()) .. '//sb help', mob_filter_str, labels)
 end
 
     
@@ -164,10 +153,9 @@ function Display:get_sorted_player_damage()
         sortable:append({player, damage})
     end
 
-    local function cmp(a, b) 
+    table.sort(sortable, function(a, b) 
         return a[2] > b[2]
-    end
-    table.sort(sortable, cmp)
+    end)
 	
     return sortable, total_damage
 end
@@ -196,24 +184,24 @@ function Display:update()
             if dps_clock.clock == 0 then
                 dps = "N/A"
             else
-                dps = string.format("%.2f", math.round(v[2]/dps_clock.clock, 2))
+                dps = '%.2f':format(math.round(v[2] / dps_clock.clock, 2))
             end
             
             local percent
             if total_damage > 0 then
-                percent = string.format('(%.1f%%)', 100 * v[2]/total_damage)
+                percent = '(%.1f%%)':format(100 * v[2] / total_damage)
             else
                 percent = '(0%)'
             end
-            display_table:append(string.format("%-16s%7d%8s %7s", v[1], v[2], percent, dps))
+            display_table:append('%-16s%7d%8s %7s':format(v[1], v[2], percent, dps))
         end
         alli_damage = alli_damage + v[2] -- gather this even for players not displayed
         player_lines = player_lines + 1
     end
 
     if self.settings.showallidps and dps_clock.clock > 0 then
-        display_table:append("-----------------")
-        display_table:append("Alli DPS: " .. string.format("%7.1f", alli_damage / dps_clock.clock))
+        display_table:append('-':rep(17))
+        display_table:append('Alli DPS: ' .. '%7.1f':format(alli_damage / dps_clock.clock))
     end
 	
     self.text:text(self:build_scoreboard_header() .. table.concat(display_table, '\n'))
@@ -287,7 +275,7 @@ function Display:report_summary (...)
 
     local elements = T{}
     for k, v in pairs(damage_table) do
-        elements:append(string.format("%s %d(%.1f%%)", v[1], v[2], 100 * v[2]/total_damage))
+        elements:append('%s %d(%.1f%%)':format(v[1], v[2], 100 * v[2]/total_damage))
     end
 
     -- Send the report to the specified chatmode
@@ -298,24 +286,24 @@ end
 
 -- This is a closure around a hash-based dispatcher. Some conveniences are
 -- defined for the actual stat display functions.
-Display.show_stat = (function()
+Display.show_stat = function()
     local stat_display = {}
-    
+
     local function format_title(msg)
         local line_length = 40
         local msg_length  = msg:len()
         local border_len = math.floor(line_length / 2 - msg_length / 2)
-        
-        return string.rep(' ', border_len) .. msg .. string.rep(' ', border_len)
+
+        return ' ':rep(border_len) .. msg .. ' ':rep(border_len)
     end
-    
+
     stat_display['acc'] = function (stats, filters)
         local lines = T{}
         for name, acc_pair in pairs(stats) do
-            lines:append(string.format("%-20s %.2f%% (%d sample%s)", name, 100 * acc_pair[1], acc_pair[2],
-                                                                  acc_pair[2] == 1 and "" or "s"))
+            lines:append('%-20s %.2f%% (%d sample%s)':format(name, 100 * acc_pair[1], acc_pair[2],
+                                                                  acc_pair[2] == 1 and '' or 's'))
         end
-        
+
         if #lines > 0 then
             sb_output(format_title('-= Accuracy (' .. filters .. ') =-'))
             sb_output(lines)
@@ -325,7 +313,7 @@ Display.show_stat = (function()
     stat_display['racc'] = function (stats, filters)
         local lines = T{}
         for name, racc_pair in pairs(stats) do
-            lines:append(string.format("%-20s %.2f%% (%d sample%s)", name, 100 * racc_pair[1], racc_pair[2],
+            lines:append('%-20s %.2f%% (%d sample%s)':format(name, 100 * racc_pair[1], racc_pair[2],
                                                                      racc_pair[2] == 1 and "" or "s"))
         end
         
@@ -338,21 +326,21 @@ Display.show_stat = (function()
     stat_display['crit'] = function (stats, filters)
         local lines = T{}
         for name, crit_pair in pairs(stats) do
-            lines:append(string.format("%-20s %.2f%% (%d sample%s)", name, 100 * crit_pair[1], crit_pair[2],
-                                                                     crit_pair[2] == 1 and "" or "s"))
+            lines:append('%-20s %.2f%% (%d sample%s)':format(name, 100 * crit_pair[1], crit_pair[2],
+                                                                     crit_pair[2] == 1 and '' or 's'))
         end
-        
+
         if #lines > 0 then
             sb_output(format_title('Melee Crit. Rate (' .. filters .. ')'))
             sb_output(lines)
         end
     end
- 
+
     stat_display['rcrit'] = function (stats, filters)
         local lines = T{}
         for name, crit_pair in pairs(stats) do
-            lines:append(string.format("%-20s %.2f%% (%d sample%s)", name, 100 * crit_pair[1], crit_pair[2],
-                                                                     crit_pair[2] == 1 and "" or "s"))
+            lines:append('%-20s %.2f%% (%d sample%s)':format(name, 100 * crit_pair[1], crit_pair[2],
+                                                                     crit_pair[2] == 1 and '' or 's'))
         end
         
         if #lines > 0 then
@@ -366,7 +354,7 @@ Display.show_stat = (function()
 
         for name, stat_pair in pairs(stats) do
             if stat_pair[2] > 0 then
-                lines:append(string.format("%-20s %d (%ds)", name, stat_pair[1], stat_pair[2]))
+                lines:append('%-20s %d (%ds)':format(name, stat_pair[1], stat_pair[2]))
             end
         end
         
@@ -389,46 +377,26 @@ Display.show_stat = (function()
         
         stat_display[stat](stats, filter_str)
     end
-end)()
+end()
 
-
-local function insert_stat_header(header, elements)
-    
-end
 
 -- TODO: This needs to be factored somehow to take better advantage of similar
 --       code already written for reporting and stat queries.
+local all_stats = S{'acc', 'racc', 'crit', 'rcrit', 'wsavg'}
 function Display:report_stat(stat, args)
-    local stats = self.db:query_stat(stat, args.player)
+    if all_stats:contains(stat) then
+        local stats = self.db:query_stat(stat, args.player)
     
-    if T{'acc', 'racc', 'crit', 'rcrit'}:contains(stat) then
         local elements = T{}
         local header   = stat:ucfirst() .. ': '
         for name, stat_pair in pairs(stats) do
             if stat_pair[2] > 0 then
-                elements:append({stat_pair[1], string.format("%s %.2f%% (%ds)", name, 100 * stat_pair[1], stat_pair[2])})
+                elements:append({stat_pair[1], ('%s %' .. (stat == 'wsavg' and 'd' or '.2f%%') .. ' (%ds)'):format(name, stat_pair[1], stat_pair[2])})
             end
         end
-        local function cmp(a, b) 
+        table.sort(elements, function(a, b) 
             return a[1] > b[1]
-        end
-        table.sort(elements, cmp)
-        
-        -- Send the report to the specified chatmode
-        local wrapped = wrap_elements(elements:slice(1, self.settings.numplayers):map(function (p) return p[2] end), header)
-        slow_output(build_input_command(args.chatmode, args.telltarget), wrapped, self.settings.numplayers)
-    elseif stat == 'wsavg' then
-        local elements = T{}
-        local header   = stat:ucfirst() .. ': '
-        for name, stat_pair in pairs(stats) do
-            if stat_pair[2] > 0 then
-                elements:append({stat_pair[1], string.format("%s %d (%ds)", name, stat_pair[1], stat_pair[2])})
-            end
-        end
-        local function cmp(a, b) 
-            return a[1] > b[1]
-        end
-        table.sort(elements, cmp)
+        end)
         
         -- Send the report to the specified chatmode
         local wrapped = wrap_elements(elements:slice(1, self.settings.numplayers):map(function (p) return p[2] end), header)
@@ -436,23 +404,20 @@ function Display:report_stat(stat, args)
     end
 end
 
+
 function Display:reset()
     -- the number of spaces here was counted to keep the table width
     -- consistent even when there's no data being displayed
     self.text:text(self:build_scoreboard_header() ..
                       'Waiting for results...' ..
-                      string.rep(' ', 17))
+                      ' ':rep(17))
 end
 
-
-function Display:destroy()
-    self.text:destroy()
-end
 
 return Display
 
 --[[
-Copyright (c) 2013, Jerry Hebert
+Copyright © 2013-2014, Jerry Hebert
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

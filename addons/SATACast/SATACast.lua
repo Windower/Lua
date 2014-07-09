@@ -134,7 +134,7 @@ windower.register_event('action', function(act)
 	local param = act.param
 	local player = windower.ffxi.get_player()
 	
-	if player.status:lower() == 'engaged' then
+	if player.status == 1 then
 		if actor == (player.id or player.index) then
 			if category == 1 then
 				if TH_ON == 0 then
@@ -149,7 +149,7 @@ windower.register_event('action', function(act)
 				end
 			end
 		end
-	elseif player.status:lower() == 'idle' then
+	elseif player.status == 0 then
 		TH_ON = 0
 	end
 end)

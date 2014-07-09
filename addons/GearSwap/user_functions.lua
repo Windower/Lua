@@ -28,6 +28,18 @@
 -- Functions that are directly exposed to users --
 
 
+function set_language(lang)
+    if _global.current_event ~= 'get_sets' then
+        error('\nGearSwap: set_language() is only valid in the get_sets function', 2)
+        return
+    end
+    if lang and type(lang) == 'string' and (lang == 'english' or lang == 'japanese') then
+        rawset(_G,'language',lang)
+    else
+        error('\nGearSwap: set_language() was passed an invalid value ('..tostring(lang)..'). (must be a string)', 2)
+    end
+end
+
 function debug_mode(boolean)
     if boolean == true or boolean == false then _settings.debug_mode = boolean
     elseif boolean == nil then
@@ -37,7 +49,6 @@ function debug_mode(boolean)
     end
 end
 
-
 function show_swaps(boolean)
     if boolean == true or boolean == false then _settings.show_swaps = boolean
     elseif boolean == nil then
@@ -46,12 +57,6 @@ function show_swaps(boolean)
         error('\nGearSwap: show_swaps() was passed an invalid value ('..tostring(boolean)..'). (true/no value/nil=on, false=off)', 2)
     end
 end
-
-
-function verify_equip(boolean)
-    print('GearSwap: verify_equip() has been deprecated due to internal changes and no longer has a purpose')
-end
-
 
 function cancel_spell(boolean)
     if _global.current_event ~= 'precast' and _global.current_event ~= 'pretarget' and _global.current_event ~= 'filtered_action' then
@@ -66,17 +71,17 @@ function cancel_spell(boolean)
     end
 end
 
-function force_send(boolean)
-    print('GearSwap: force_send() has been deprecated due to internal changes and no longer has a purpose')
-end
-
 function change_target(name)
     if _global.current_event ~= 'pretarget' then
         error('\nGearSwap: change_target() is only valid in the pretarget function', 2)
         return
     end
     if name and type(name)=='string' then
-        _,spell.target = valid_target(name)
+        if valid_target(name) then
+            _,spell.target = valid_target(name)
+        else
+            error('\nGearSwap: change_target() was passed an invalid value ('..tostring(name)..'). (must be a valid target)', 2)
+        end
     else
         error('\nGearSwap: change_target() was passed an invalid value ('..tostring(name)..'). (must be a string)', 2)
     end
@@ -113,7 +118,7 @@ function disable(...)
         if slot_map[v] then
             rawset(disable_table,slot_map[v],true)
         else
-            error('\nGearSwap: disable error, passed an unrecognized slot name ('..tostring(v)..').',2)
+            error('\nGearSwap: disable error, passed an unrecognized slot name. ('..tostring(v)..')',2)
         end
     end
 end
@@ -123,21 +128,36 @@ function enable(...)
     if type(enable_tab[1]) == 'table' then
         enable_tab = enable_tab[1] -- Compensates for people passing a table instead of a series of strings.
     end
-    items = windower.ffxi.get_items()
+    --items = windower.ffxi.get_items()
     local sending_table = {}
     for i,v in pairs(enable_tab) do
-        if slot_map[v] then
-            local local_slot = default_slot_map[slot_map[v]]
-            disable_table[slot_map[v]] = false
-            local potential_gear = not_sent_out_equip[local_slot]
-            if potential_gear then
+        local local_slot = get_default_slot(v)
+        if local_slot then
+            disable_table[toslotid(v)] = false
+            if not_sent_out_equip[local_slot] then
                 sending_table[local_slot] = not_sent_out_equip[local_slot]
                 not_sent_out_equip[local_slot] = nil
             end
         else
-            error('\nGearSwap: enable error, passed an unrecognized slot name ('..tostring(v)..').',2)
+            error('\nGearSwap: enable error, passed an unrecognized slot name. ('..tostring(v)..')',2)
         end
     end
+    
+    return sending_table
+end
+
+function user_enable(...)
+    local sending_table = enable(...)
+    
+    if table.length(sending_table) > 0 then
+        equip(sending_table)
+    end
+    return sending_table
+end
+
+function command_enable(...)
+    local sending_table = enable(...)
+    
     if table.length(sending_table) > 0 then
         refresh_globals()
         equip_sets('equip_command',nil,sending_table)
@@ -147,20 +167,20 @@ end
 function print_set(set,title)
     if not set then
         if title then
-            error('\nGearSwap: print_set error, '..tostring(title)..' set is nil.', 2)
+            error('\nGearSwap: print_set error, '..windower.to_shift_jis(tostring(title))..' set is nil.', 2)
         else
             error('\nGearSwap: print_set error, set is nil.', 2)
         end
         return
     elseif type(set) ~= 'table' then
         if title then
-            error('\nGearSwap: print_set error, '..tostring(title)..' set is not a table.', 2)
+            error('\nGearSwap: print_set error, '..windower.to_shift_jis(tostring(title))..' set is not a table.', 2)
         else
             error('\nGearSwap: print_set error, set is not a table.', 2)
         end
     elseif table.length(set) == 0 then
         if title then
-            windower.add_to_chat(1,'------------------'.. tostring(title)..' -- Empty Table -----------------')
+            windower.add_to_chat(1,'------------------'.. windower.to_shift_jis(tostring(title))..' -- Empty Table -----------------')
         else
             windower.add_to_chat(1,'-------------------------- Empty Table -------------------------')
         end
@@ -168,24 +188,24 @@ function print_set(set,title)
     end
     
     if title then
-        windower.add_to_chat(1,'------------------------- '..tostring(title)..' -------------------------')
+        windower.add_to_chat(1,'------------------------- '..windower.to_shift_jis(tostring(title))..' -------------------------')
     else
         windower.add_to_chat(1,'----------------------------------------------------------------')
     end
     if #set == table.length(set) then
         for i,v in ipairs(set) do
             if type(v) == 'table' and v.name then
-                windower.add_to_chat(8,tostring(i)..' '..tostring(v))
+                windower.add_to_chat(8,windower.to_shift_jis(tostring(i))..' '..windower.to_shift_jis(tostring(v.name))..' (Adv.)')
             else
-                windower.add_to_chat(8,tostring(i)..' '..tostring(v))
+                windower.add_to_chat(8,windower.to_shift_jis(tostring(i))..' '..windower.to_shift_jis(tostring(v)))
             end
         end
     else
         for i,v in pairs(set) do
             if type(v) == 'table' and v.name then
-                windower.add_to_chat(8,tostring(i)..' '..tostring(v))
+                windower.add_to_chat(8,windower.to_shift_jis(tostring(i))..' '..windower.to_shift_jis(tostring(v.name))..' (Adv.)')
             else
-                windower.add_to_chat(8,tostring(i)..' '..tostring(v))
+                windower.add_to_chat(8,windower.to_shift_jis(tostring(i))..' '..windower.to_shift_jis(tostring(v)))
             end
         end
     end
@@ -210,6 +230,17 @@ function register_event_user(str,func)
     return id
 end
 
+function raw_register_event_user(str,func)
+    if type(func)~='function' then
+        error('\nGearSwap: windower.register_event() was passed an invalid value ('..tostring(func)..'). (must be a function)', 2)
+    elseif type(str) ~= 'string' then
+        error('\nGearSwap: windower.register_event() was passed an invalid value ('..tostring(str)..'). (must be a string)', 2)
+    end
+    local id = windower.register_event(str,setfenv(func,user_env))
+    registered_user_events[id] = true
+    return id
+end
+
 function unregister_event_user(id)
     if type(id)~='number' then
         error('\nGearSwap: windower.unregister_event() was passed an invalid value ('..tostring(id)..'). (must be a number)', 2)
@@ -219,8 +250,12 @@ function unregister_event_user(id)
 end
 
 function user_equip_sets(func)
-    refresh_globals()
-    return setfenv(function(...) return gearswap.equip_sets(func,nil,...) end,user_env)
+    return setfenv(function(...)
+            if not gearswap.gearswap_disabled then
+                gearswap.refresh_globals(true)
+                return gearswap.equip_sets(func,nil,...)
+            end
+        end,user_env)
 end
 
 function include_user(str)
@@ -238,45 +273,59 @@ function include_user(str)
     local f, err = loadfile(path)
     if f and not err then
         setfenv(f,user_env)
-        f()
+        return f()
     else
         error('\nGearSwap: Error loading file ('..tostring(str)..'): '..err, 2)
     end
 end
 
 function user_midaction(bool)
-    if bool == false or bool == true then
-        _global.midaction = bool
-    elseif bool ~= nil then
-        error('\nGearSwap: midaction() was passed an invalid value ('..tostring(bool)..'). (true=true, false=false, nil=nothing)', 2)
+    if bool == false then
+        for i,v in pairs(command_registry) do
+            if v.midaction then
+                command_registry.midaction = false
+            end
+        end
     end
-    
+
     for i,v in pairs(command_registry) do
         if v.midaction then
             return true
         end
     end
     
-    return _global.midaction
+    return false
 end
 
 function user_pet_midaction(bool)
-    if bool == false or bool == true then
-        _global.pet_midaction = bool
-    elseif bool ~= nil then
-        error('\nGearSwap: pet_midaction() was passed an invalid value ('..tostring(bool)..'). (true=true, false=false, nil=nothing)', 2)
+    if bool == false then
+        for i,v in pairs(command_registry) do
+            if v.pet_midaction then
+                command_registry.pet_midaction = false
+            end
+        end
     end
-    
+
     for i,v in pairs(command_registry) do
         if v.pet_midaction then
             return true
         end
     end
 
-    return _global.pet_midaction
+    return false
+end
+
+function add_to_chat_user(num,str)
+    if not num then num = 8 end
+    if language == 'japanese' then
+        windower.add_to_chat(num,windower.to_shift_jis(str))
+    else
+        windower.add_to_chat(num,str)
+    end
 end
 
 
 -- Define the user windower functions.
-user_windower = {register_event = register_event_user, unregister_event = unregister_event_user, send_command = send_cmd_user}
+user_windower = {register_event = register_event_user, raw_register_event = raw_register_event_user,
+    unregister_event = unregister_event_user, send_command = send_cmd_user,add_to_chat=add_to_chat_user}
 setmetatable(user_windower,{__index=windower})

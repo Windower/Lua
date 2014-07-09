@@ -1,6 +1,6 @@
 _addon.name = 'Itemizer'
 _addon.author = 'Ihina'
-_addon.version = '2.0.0.0'
+_addon.version = '2.0.0.1'
 _addon.command = 'itemizer'
 
 require('luau')
@@ -22,7 +22,7 @@ windower.register_event('unhandled command', function(command, ...)
 
 		local id = res.items:name(windower.wc_match-{item_name})
 		if id:length() == 0 then
-			id = res.items:name_full(windower.wc_match-{item_name})
+			id = res.items:name_log(windower.wc_match-{item_name})
 			if id:length() == 0 then
 				log('Unknown item')
 				return
@@ -35,7 +35,6 @@ windower.register_event('unhandled command', function(command, ...)
 			return
 		end
 
-        print(S(id:map(table.get-{'name'})), index, search)
 		for slot, item in pairs(windower.ffxi.get_items()[search]) do 
 			if id[item.id] then 
 				windower.ffxi[command .. '_item'](index, slot)

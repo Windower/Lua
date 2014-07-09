@@ -30,18 +30,15 @@ require 'sets'
 res = require 'resources'
 require 'statics'
 messages = require 'message_ids'
+require 'pack'
 
 _addon.name = 'PointWatch'
 _addon.author = 'Byrth'
-_addon.version = 0.050214
+_addon.version = 0.062014
 _addon.command = 'pw'
 
-if not windower.dir_exists('data') then
-    windower.create_dir('data')
-end
-
 settings = config.load('data\\settings.xml',default_settings)
-config.save(settings)
+config.register(settings,initialize)
 
 box = texts.new('${current_string}',settings.text_box_settings,settings)
 box.current_string = ''
@@ -50,23 +47,28 @@ box:show()
 initialize()
 
 
+
 windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blocked)
     if is_injected then return end
-    if id == 0x2A then -- Resting message
+    if id == 0x29 then -- Action Message, used in Abyssea for xp
+        local val = org:unpack('I',0xD)
+        local msg = org:unpack('H',0x19)%1024
+        exp_msg(val,msg)
+    elseif id == 0x2A then -- Resting message
         local zone = 'z'..windower.ffxi.get_info().zone
         if settings.options.message_printing then
-            print('Message ID: '..str2bytes(org:sub(0x1B,0x1C))%2^14)
+            print('Message ID: '..(org:unpack('H',0x1B)%2^14))
         end
         
         if messages[zone] then
-            local msg = str2bytes(org:sub(0x1B,0x1C))%2^14
+            local msg = org:unpack('H',0x1B)%2^14
             for i,v in pairs(messages[zone]) do
                 if tonumber(v) and v + messages[zone].offset  == msg then
-                    local param_1 = str2bytes(org:sub(0x9,0xC))
-                    local param_2 = str2bytes(org:sub(0xD,0x10))
-                    local param_3 = str2bytes(org:sub(0x11,0x14))
-                    local param_4 = str2bytes(org:sub(0x15,0x18))
-                    print(param_1,param_2,param_3,param_4) -- DEBUGGING STATEMENT -------------------------
+                    local param_1 = org:unpack('I',0x9)
+                    local param_2 = org:unpack('I',0xD)
+                    local param_3 = org:unpack('I',0x11)
+                    local param_4 = org:unpack('I',0x15)
+                    -- print(param_1,param_2,param_3,param_4) -- DEBUGGING STATEMENT -------------------------
                     if zone_message_functions[i] then
                         zone_message_functions[i](param_1,param_2,param_3,param_4)
                     end
@@ -74,25 +76,9 @@ windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blo
             end
         end
     elseif id == 0x2D then
-        local val = str2bytes(org:sub(0x11,0x14))
-        local msg = str2bytes(org:sub(0x19,0x20))%1024
-        local t = os.clock()
-        if msg == 718 then
-            cp.registry[t] = (cp.registry[t] or 0) + val
-            cp.total = cp.total + val
-        elseif msg == 8 or msg == 105 or msg == 371 or msg == 372 then
-            xp.registry[t] = (xp.registry[t] or 0) + val
-            xp.total = xp.total + val
-            xp.current = xp.current + val
-            if xp.current > xp.tnl and xp.tnl ~= 56000 then
-                xp.current = xp.current - xp.tnl
-                -- I have capped all jobs, but I assume that a 0x61 packet is sent after you
-                --  level up, which will update the TNL and make this adjustment meaningless.
-            elseif xp.current > xp.tnl then
-                lp.current = lp.current + xp.current - xp.tnl + 1
-            end
-        end
-        update_box()
+        local val = org:unpack('I',0x11)
+        local msg = org:unpack('H',0x19)%1024
+        exp_msg(val,msg)
     elseif id == 0x55 then
         if org:byte(0x85) == 3 then
             local dyna_KIs = math.floor((org:byte(6)%64)/2) -- 5 bits (32, 16, 8, 4, and 2 originally -> shifted to 16, 8, 4, 2, and 1)
@@ -114,17 +100,18 @@ windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blo
             end
         end
     elseif id == 0x61 then
-        xp.current = org:byte(0x11)+org:byte(0x12)*256
-        xp.tnl = org:byte(0x13)+org:byte(0x14)*256
+        xp.current = org:unpack('H',0x11)
+        xp.tnl = org:unpack('H',0x13)
     elseif id == 0x63 and org:byte(5) == 2 then
-        lp.current = org:byte(9)+org:byte(10)*256
+        lp.current = org:unpack('H',9)
         lp.number_of_merits = org:byte(11)%64
+        lp.maximum_merits = org:byte(0x0D)%64
     elseif id == 0x63 and org:byte(5) == 5 then
         local offset = windower.ffxi.get_player().main_job_id*4+13 -- So WAR (ID==1) starts at byte 17
-        cp.current = org:byte(offset)+org:byte(offset+1)*256
+        cp.current = org:unpack('H',offset)
         cp.number_of_job_points = org:byte(offset+2)
     elseif id == 0x110 then
-        sparks.current = org:byte(5)+org:byte(6)*256
+        sparks.current = org:unpack('H',5)
     end
 end)
 
@@ -133,12 +120,16 @@ windower.register_event('zone change',function(new,old)
         dynamis.entry_time = os.clock()
         dynamis.time_limit = 3600
         dynamis.zone = new
-        cur_func = loadstring("current_string = "..settings.strings.dynamis)
+        cur_func,loadstring_err = loadstring("current_string = "..settings.strings.dynamis)
     else
         dynamis.entry_time = 0
         dynamis.time_limit = 0
         dynamis.zone = 0
-        cur_func = loadstring("current_string = "..settings.strings.default)
+        cur_func,loadstring_err = loadstring("current_string = "..settings.strings.default)
+    end
+    if not cur_func or loadstring_err then
+        cur_func = loadstring("current_string = ''")
+        error(loadstring_err)
     end
 end)
 
@@ -189,6 +180,7 @@ function update_box()
         dynamis.KIs = ''
     end
     assert(cur_func)()
+    
     if box.current_string ~= current_string then
         box.current_string = current_string
     end
@@ -222,20 +214,6 @@ function analyze_points_table(tab)
     end
     
     return rate
-end
-
-function str2bytes(str)
-    local num = 0
-    while str ~= '' do
-        local len = #str
-        num = num*256 + str:byte(len)
-        if len == 1 then
-            break
-        else
-            str = str:sub(1,len-1)
-        end
-    end
-    return num
 end
 
 zone_message_functions = {
@@ -281,3 +259,23 @@ zone_message_functions = {
         abyssea.time_remaining = abyssea.time_remaining + p1
     end,
 }
+
+function exp_msg(val,msg)
+    local t = os.clock()
+    if msg == 718 or msg == 735 then
+        cp.registry[t] = (cp.registry[t] or 0) + val
+        cp.total = cp.total + val
+    elseif msg == 8 or msg == 105 or msg == 371 or msg == 372 then
+        xp.registry[t] = (xp.registry[t] or 0) + val
+        xp.total = xp.total + val
+        xp.current = xp.current + val
+        if xp.current > xp.tnl and xp.tnl ~= 56000 then
+            xp.current = xp.current - xp.tnl
+            -- I have capped all jobs, but I assume that a 0x61 packet is sent after you
+            --  level up, which will update the TNL and make this adjustment meaningless.
+        elseif xp.current > xp.tnl then
+            lp.current = lp.current + xp.current - xp.tnl + 1
+        end
+    end
+    update_box()
+end

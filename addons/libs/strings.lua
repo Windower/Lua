@@ -446,12 +446,21 @@ function string.chunks(str, size)
 end
 
 -- Returns a string decoded given the appropriate information.
-function string.decode(str, bits, charset)
-    if type(charset) == 'string' then
-        charset = charset:split()
+string.decode = (function()
+    local chunk_size = function(t)
+        local e, f = math.frexp(#t)
+        return f + math.ceil(e - 1.5)
     end
-    return str:binary():chunks(bits):map(table.get+{charset} .. tonumber-{2}):concat():gsub('%z+$', '')
-end
+
+    return function(str, charset)
+        if type(charset) == 'string' then
+            local tmp = charset
+            charset = charset:sub(2):split()
+            charset[0] = charset:sub(1, 1)
+        end
+        return str:binary():chunks(chunk_size(charset)):map(table.get+{charset} .. tonumber-{2}):concat():gsub('%z+$', '')
+    end
+end)()
 
 -- Returns a plural version of a string, if the provided table contains more than one element.
 -- Defaults to appending an s, but accepts an option string as second argument which it will the string with.

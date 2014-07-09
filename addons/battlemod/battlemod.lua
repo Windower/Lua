@@ -216,8 +216,7 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
     local data = original:sub(5)
     
 -------------- ACTION PACKET ---------------
-    if id == 0x28 and original ~= last_28_packet then
-        last_28_packet = original
+    if id == 0x28 then
         local act = {}
         act.do_not_need = get_bit_packed(data,0,8)
         act.actor_id = get_bit_packed(data,8,40)
@@ -489,7 +488,7 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
         
     ------------- JOB INFO ----------------
     elseif id == 0x01B then
-        filterload(res.jobs[data:byte(5)].short)
+        filterload(res.jobs[data:byte(5)][language..'_short'])
     end
 end)
 

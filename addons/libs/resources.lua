@@ -15,7 +15,7 @@ local fns = {}
 local slots = {}
 
 local language_string = _addon and _addon.language and _addon.language:lower() or windower.ffxi.get_info().language:lower()
-local log_language_string = language_string .. '_log'
+local language_string_log = language_string .. '_log'
 
 -- The metatable for all sub tables of the root resource table
 local resource_mt = {}
@@ -28,48 +28,56 @@ local resources = setmetatable({}, {__index = function(t, k)
     end
 end})
 
+local redict = {
+    name = language_string,
+    name_log = language_string_log,
+    english = 'en',
+    japanese = 'ja',
+    german = 'de',
+    french = 'fr',
+    english_log = 'enl',
+    japanese_log = 'ja',
+    german_log = 'del',
+    french_log = 'frl',
+    english_short = 'ens',
+    japanese_short = 'jas',
+    german_short = 'des',
+    french_short = 'frs',
+}
+
 -- The metatable for a single resource item (an entry in a sub table of the root resource table)
 local resource_entry_mt = {__index = function()
-    local redict = {
-        name = language_string,
-        log_name = log_language_string,
-        english = 'en',
-        japanese = 'ja',
-        german = 'de',
-        french = 'fr',
-        english_log = 'enl',
-        japanese_log = 'ja',
-        german_log = 'del',
-        french_log = 'frl',
-    }
-
     return function(t, k)
-        return redict[k]
-                and t[redict[k]]
-            or table[k]
+        return rawget(redict, k)
+                and t[rawget(redict, k)]
+            or rawget(table, k)
     end
 end()}
 
 function resource_group(r, fn, attr)
     fn = type(fn) == 'function' and fn or functions.equals(fn)
+    attr = rawget(redict, attr) or attr
 
     local res = {}
     for index, item in pairs(r) do
         if fn(item[attr]) then
-            res[index] = item
+            rawset(res, index, item)
         end
     end
 
-    slots[res] = slots[r]
+    rawset(slots, res, rawget(slots, r))
     return setmetatable(res, resource_mt)
 end
 
 resource_mt.__index = function(t, k)
-    return (slots[t]:contains(k) or k == 'name')
-            and resource_group-{k}
-        or table[k]
+    return rawget(slots, t):contains(k)
+            and resource_group:endapply(k)
+        or rawget(table, k)
 end
 resource_mt.__class = 'Resource'
+resource_mt.__tostring = function(t)
+    return '{' .. t:map(table.get:endapply('name')):concat(', ') .. '}'
+end
 
 local resources_path = windower.windower_path .. 'res/'
 
@@ -112,7 +120,7 @@ for res_name in res_names:it() do
     fns[res_name] = function()
         local res, slot_table = dofile(resources_path .. res_name .. '.lua')
         res = table.map(res, (setmetatable-{resource_entry_mt}):cond(function(key) return type(key) == 'table' end))
-        slots[res] = S(slot_table) or language_strings + table.keyset(next[2](res))
+        slots[res] = S(slot_table)
         post_process(res)
         return res
     end
@@ -126,7 +134,8 @@ local flag_keys = S{
 local fn_cache = {}
 
 post_process = function(t)
-    for key in slots[t]:it() do
+    local slot_set = rawget(slots, t)
+    for key in slot_set:it() do
         if rawget(lookup, key) then
             if flag_keys:contains(key) then
                 rawset(fn_cache, key, function(flags)
@@ -153,6 +162,10 @@ post_process = function(t)
                 rawset(entry, key, fn(rawget(entry, key)))
             end
         end
+    end
+
+    for key in pairs(redict) do
+        slot_set:add(key)
     end
 end
 

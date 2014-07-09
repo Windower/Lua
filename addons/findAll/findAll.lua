@@ -51,14 +51,10 @@ next_sequence_offset   = 0
 item_names             = T{}
 global_storages        = T{}
 storages_path          = 'data/storages.json'
-storages_order         = L{'temporary', 'inventory', 'safe', 'storage', 'locker', 'satchel', 'sack', 'case'}
-storage_slips_order    = L{'slip 01', 'slip 02', 'slip 03', 'slip 04', 'slip 05', 'slip 06', 'slip 07', 'slip 08', 'slip 09', 'slip 10', 'slip 11', 'slip 12', 'slip 13', 'slip 14', 'slip 15', 'slip 16', 'slip 17', 'slip 18'}
+storages_order         = L{'temporary', 'inventory', 'wardrobe', 'safe', 'storage', 'locker', 'satchel', 'sack', 'case'}
+storage_slips_order    = L{'slip 01', 'slip 02', 'slip 03', 'slip 04', 'slip 05', 'slip 06', 'slip 07', 'slip 08', 'slip 09', 'slip 10', 'slip 11', 'slip 12', 'slip 13', 'slip 14', 'slip 15', 'slip 16', 'slip 17', 'slip 18', 'slip 19'}
 merged_storages_orders = L{}:extend(storages_order):extend(storage_slips_order)
-resources              = {
-    ['armor']   = '../../plugins/resources/items_armor.xml',
-    ['weapons'] = '../../plugins/resources/items_weapons.xml',
-    ['general'] = '../../plugins/resources/items_general.xml'
-}
+resources              = require ('resources').items
 
 function search(query, export)
     update()
@@ -104,38 +100,13 @@ function search(query, export)
         end
     end
 
-    if new_item_ids:length() > 0 then
-        for kind, resource_path in pairs(resources) do
-            resource = io.open(windower.addon_path..resource_path, 'r')
-
-            if resource ~= nil then
-                while true do
-                    local line = resource:read()
-
-                    if line == nil then
-                        break
-                    end
-
-                    local id, long_name, name = line:match('id="(%d+)" enl="([^"]+)".+>([^<]+)<')
-
-                    if id ~= nil then
-                        id = tostring(id)
-
-                        if item_names[id] == nil
-                            and new_item_ids:contains(id)
-                        then
-                            item_names[id] = {
-                                ['name']      = name:gsub('♂', string.char(0x81, 0x89)):gsub('♀', string.char(0x81, 0x8A)),
-                                ['long_name'] = long_name:gsub('♂', string.char(0x81, 0x89)):gsub('♀', string.char(0x81, 0x8A))
-                            }
-                        end
-                    end
-                end
-            else
-                error(kind..' resource file not found.')
-            end
-
-            resource:close()
+    for i,_ in pairs(new_item_ids) do
+        local id = tonumber(i)
+	    if (resources[id]) then
+            item_names[i] = {
+                ['name'] = resources[id].name,
+                ['long_name'] = resources[id].name_log
+            }
         end
     end
 

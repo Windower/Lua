@@ -16,6 +16,8 @@ local digitorder = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 
 
 -- Constants
 math.e = 1:exp()
+math.tau = 2 * math.pi
+math.phi = (1 + 5:sqrt())/2
 
 -- Returns a function that returns the number when called.
 function math.fn(val)
@@ -60,12 +62,6 @@ function math.hex(val)
     return val:base(16)
 end
 
--- tostring wrapper.
-math.string = tostring
-
--- string.char wrapper, to allow method-like calling on numbers.
-math.char = string.char
-
 -- Converts a number val to a string in base base.
 function math.base(val, base)
     if base == nil or base == 10 or val == 0 then
@@ -99,8 +95,22 @@ function math.base(val, base)
     return str
 end
 
+-- tostring wrapper.
+math.string = tostring
+
+-- string.char wrapper, to allow method-like calling on numbers.
+math.char = string.char
+
+function math.degree(v)
+    return 360 * v / math.tau
+end
+
+function math.radian(v)
+    return math.tau * v / 360
+end
+
 --[[
-Copyright (c) 2013, Windower
+Copyright © 2013-2014, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
