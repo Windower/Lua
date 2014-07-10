@@ -522,12 +522,12 @@ function get_spell(act)
             spell.name = color_it(spell[language],color_arr.abilcol)
             spell.ability = color_it(spell[language],color_arr.abilcol)
         elseif fields.weapon_skill then
-            if abil_ID > 255 then -- WZ_RECOVER_ALL is used by chests in Limbus
+            if abil_ID > 256 then -- WZ_RECOVER_ALL is used by chests in Limbus
                 spell = res.monster_abilities[abil_ID]
                 if not spell then
                     spell = {english= 'Special Attack'}
                 end
-            elseif abil_ID < 256 then
+            elseif abil_ID <= 256 then
                 spell = res.weapon_skills[abil_ID]
             end
             spell.name = color_it(spell[language],color_arr.wscol)
