@@ -408,7 +408,7 @@ windower.register_event('outgoing chunk',function(id,original,modified,injected,
     elseif id == 0x100 then
     -- Scrub the equipment array if a valid outgoing job change packet is sent.
         local newmain = modified:byte(5)
-        if res.jobs[newmain] and newmain ~= player.main_job_id then
+        if res.jobs[newmain] and newmain ~= 0 and newmain ~= player.main_job_id then
             windower.debug('job change')
             
             table.clear(not_sent_out_equip)
@@ -420,8 +420,7 @@ windower.register_event('outgoing chunk',function(id,original,modified,injected,
                     items.equipment[name] = {slot=empty,bag_id=0}
                 end
             end
-            player.main_job_id = modified:byte(5) ~= 0 and modified:byte(5) or player.main_job_id
-            player.sub_job_id = modified:byte(6) ~= 0 and modified:byte(6) or player.sub_job_id
+            player.main_job_id = newmain
             update_job_names()
             
             command_registry = {}
