@@ -420,8 +420,8 @@ windower.register_event('outgoing chunk',function(id,original,modified,injected,
                     items.equipment[name] = {slot=empty,bag_id=0}
                 end
             end
-            player.main_job_id = modified:byte(5)
-            player.sub_job_id = modified:byte(6)
+            player.main_job_id = modified:byte(5) != 0 and modified:byte(5) or player.main_job_id
+            player.sub_job_id = modified:byte(6) != 0 and modified:byte(6) or player.sub_job_id
             update_job_names()
             
             command_registry = {}
