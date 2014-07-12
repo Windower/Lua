@@ -182,7 +182,9 @@ function parse_action_packet(act)
                 elseif m.message == 437 or m.message == 438 then m.simp_name = act.action.name..' (JAs and TP)'
                 elseif m.message == 439 or m.message == 440 then m.simp_name = act.action.name..' (SPs, JAs, TP, and MP)'
                 elseif T{252,265,268,269,271,272,274,275}:contains(m.message) then m.simp_name = 'Magic Burst! '..act.action.name
-                elseif not act.action then m.simp_name = ''
+                elseif not act.action then 
+                   m.simp_name = ''
+                   act.action = {}
                 else m.simp_name = act.action.name or ''
                 end
 
@@ -520,12 +522,12 @@ function get_spell(act)
             spell.name = color_it(spell[language],color_arr.abilcol)
             spell.ability = color_it(spell[language],color_arr.abilcol)
         elseif fields.weapon_skill then
-            if abil_ID > 255 then -- WZ_RECOVER_ALL is used by chests in Limbus
+            if abil_ID > 256 then -- WZ_RECOVER_ALL is used by chests in Limbus
                 spell = res.monster_abilities[abil_ID]
                 if not spell then
                     spell = {english= 'Special Attack'}
                 end
-            elseif abil_ID < 256 then
+            elseif abil_ID <= 256 then
                 spell = res.weapon_skills[abil_ID]
             end
             spell.name = color_it(spell[language],color_arr.wscol)

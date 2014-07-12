@@ -172,11 +172,9 @@ function inc_action(act)
         local ts,tab = delete_command_registry_by_id(act.targets[1].id)
         if tab and tab.spell and tab.spell.prefix == '/pet' then 
             tab.spell.interrupted = true
-            command_registry[ts].midaction = false
             equip_sets('pet_aftercast',nil,tab.spell)
         elseif tab and tab.spell then
             tab.spell.interrupted = true
-            command_registry[ts].midaction = false
             equip_sets('aftercast',nil,tab.spell)
         end
         return
