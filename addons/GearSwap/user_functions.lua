@@ -283,7 +283,7 @@ function user_midaction(bool)
     if bool == false then
         for i,v in pairs(command_registry) do
             if v.midaction then
-                command_registry.midaction = false
+                command_registry[i].midaction = false
             end
         end
     end
