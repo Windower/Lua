@@ -221,6 +221,8 @@ function RollEffect(rollid, rollnum)
     if rollnum == 13 then
         return
     end
+
+    --print(gearTable[13])
     --There's gotta be a better way to do this.
     local rollName = rollInfo[rollid][1]
     local rollVal = rollInfo[rollid][rollnum]
@@ -239,7 +241,7 @@ function RollEffect(rollid, rollnum)
             hpVal =  hpVal + (rollInfo[rollid][16][1]*5)
             tpVal = tpVal  + (rollInfo[rollid][16][2]*5)
             ringBonus = true
-        elseif gearTable[13] == 28548 or gearTable[14] == 28547 or ringBonus then
+        elseif gearTable[13] == 28547 or gearTable[14] == 28547 or ringBonus then
             hpVal =  hpVal + (rollInfo[rollid][16][1]*3)
             tpVal = tpVal  + (rollInfo[rollid][16][2]*3)
             ringBonus = true
@@ -252,7 +254,7 @@ function RollEffect(rollid, rollnum)
         if gearTable[13] == 28548 or gearTable[14] == 28548 or ringBonus then
             rollVal = rollVal + (rollInfo[rollid][16]*5)
             ringBonus = true
-        elseif gearTable[13] == 28548 or gearTable[14] == 28547 or ringBonus then
+        elseif gearTable[13] == 28547 or gearTable[14] == 28547 or ringBonus then
             rollVal = rollVal + (rollInfo[rollid][16]*3)
             ringBonus = true
         end
