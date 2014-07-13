@@ -12,7 +12,7 @@ local createfile = false
 
 -- Create a new file object. Accepts a variable number of paths, which it will
 function files.new(path, create)
-    create = true and (create ~= false)
+    create = create ~= false
 
     if path == nil then
         return setmetatable({}, {__index = files})
@@ -36,7 +36,7 @@ end
 
 -- Sets the file to a path value.
 function files.set(f, path, create)
-    create = true and (create ~= false)
+    create = create ~= false
     createfile = create
 
     f.path = path
@@ -133,6 +133,8 @@ function files.create_path(f)
 
                 return nil, 'Unknown error trying to create path ' .. new_path
             end
+
+            return nil, 'Unknown error trying to create path ' .. new_path
         end
     end
 
