@@ -122,7 +122,7 @@ function files.create_path(f)
 
     new_path = windower.addon_path
     for _, dir in ipairs(path:psplit('[/\\]')) do
-        if not dir == '' then
+        if dir ~= '' then
             new_path = new_path .. '/' .. dir
 
             if not windower.dir_exists(new_path) then
