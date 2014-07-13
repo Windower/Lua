@@ -58,10 +58,6 @@ function show_swaps(boolean)
     end
 end
 
-function verify_equip(boolean)
-    print('GearSwap: verify_equip() has been deprecated due to internal changes and no longer has a purpose')
-end
-
 function cancel_spell(boolean)
     if _global.current_event ~= 'precast' and _global.current_event ~= 'pretarget' and _global.current_event ~= 'filtered_action' then
         error('\nGearSwap: cancel_spell() is only valid in the precast, pretarget, or filtered_action functions', 2)
@@ -73,10 +69,6 @@ function cancel_spell(boolean)
     else
         error('\nGearSwap: cancel_spell() was passed an invalid value ('..tostring(boolean)..'). (true/no value/nil=Cancel the spell, false=do not cancel the spell)', 2)
     end
-end
-
-function force_send(boolean)
-    print('GearSwap: force_send() has been deprecated due to internal changes and no longer has a purpose')
 end
 
 function change_target(name)
@@ -139,9 +131,9 @@ function enable(...)
     --items = windower.ffxi.get_items()
     local sending_table = {}
     for i,v in pairs(enable_tab) do
-        if slot_map[v] then
-            local local_slot = default_slot_map[slot_map[v]]
-            disable_table[slot_map[v]] = false
+        local local_slot = get_default_slot(v)
+        if local_slot then
+            disable_table[toslotid(v)] = false
             if not_sent_out_equip[local_slot] then
                 sending_table[local_slot] = not_sent_out_equip[local_slot]
                 not_sent_out_equip[local_slot] = nil
@@ -288,35 +280,39 @@ function include_user(str)
 end
 
 function user_midaction(bool)
-    if bool == false or bool == true then
-        _global.midaction = bool
-    elseif bool ~= nil then
-        error('\nGearSwap: midaction() was passed an invalid value ('..tostring(bool)..'). (true=true, false=false, nil=nothing)', 2)
+    if bool == false then
+        for i,v in pairs(command_registry) do
+            if v.midaction then
+                command_registry[i].midaction = false
+            end
+        end
     end
-    
+
     for i,v in pairs(command_registry) do
         if v.midaction then
             return true
         end
     end
     
-    return _global.midaction
+    return false
 end
 
 function user_pet_midaction(bool)
-    if bool == false or bool == true then
-        _global.pet_midaction = bool
-    elseif bool ~= nil then
-        error('\nGearSwap: pet_midaction() was passed an invalid value ('..tostring(bool)..'). (true=true, false=false, nil=nothing)', 2)
+    if bool == false then
+        for i,v in pairs(command_registry) do
+            if v.pet_midaction then
+                command_registry.pet_midaction = false
+            end
+        end
     end
-    
+
     for i,v in pairs(command_registry) do
         if v.pet_midaction then
             return true
         end
     end
 
-    return _global.pet_midaction
+    return false
 end
 
 function add_to_chat_user(num,str)

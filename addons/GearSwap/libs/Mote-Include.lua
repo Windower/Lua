@@ -108,8 +108,9 @@ function init_include()
 
 
 	-- Special control flags.
-	mote_flags = {}
-	mote_flags.show_set = nil
+	mote_vars = {}
+	mote_vars.show_set = nil
+	mote_vars.set_breadcrumbs = L{}
 
 	-- Display text mapping.
 	on_off_names = {[true] = 'on', [false] = 'off'}
@@ -228,6 +229,8 @@ end
 function handle_actions(spell, action)
 	-- Init an eventArgs that allows cancelling.
 	local eventArgs = {handled = false, cancel = false}
+	
+	mote_vars.set_breadcrumbs:clear()
 
 	-- Get the spell mapping, since we'll be passing it to various functions and checks.
 	local spellMap = get_spell_map(spell)
@@ -261,6 +264,7 @@ function handle_actions(spell, action)
 		-- Default handling of this action
 		if not eventArgs.cancel and not eventArgs.handled and _G['default_'..action] then
 			_G['default_'..action](spell, spellMap)
+			display_breadcrumbs(spell, spellMap, action)
 		end
 		
 		-- Job-specific post-handling of this action
@@ -274,6 +278,7 @@ function handle_actions(spell, action)
 		_G['cleanup_'..action](spell, spellMap, eventArgs)
 	end
 end
+
 
 --------------------------------------
 -- Action hooks called by GearSwap.
@@ -321,12 +326,7 @@ end
 
 function default_aftercast(spell, spellMap)
 	if not pet_midaction() then
-		if spell.interrupted then
-			-- Wait a half-second to update so that aftercast equip will actually be worn.
-			send_command('wait 0.5;gs c update')
-		else
-			handle_equipping_gear(player.status)
-		end
+		handle_equipping_gear(player.status)
 	end
 end
 
@@ -345,13 +345,13 @@ end
 --------------------------------------
 
 function filter_midcast(spell, spellMap, eventArgs)
-	if mote_flags.show_set == 'precast' then
+	if mote_vars.show_set == 'precast' then
 		eventArgs.cancel = true
 	end
 end
 
 function filter_aftercast(spell, spellMap, eventArgs)
-	if mote_flags.show_set == 'precast' or mote_flags.show_set == 'midcast' or mote_flags.show_set == 'pet_midcast' then
+	if mote_vars.show_set == 'precast' or mote_vars.show_set == 'midcast' or mote_vars.show_set == 'pet_midcast' then
 		eventArgs.cancel = true
 	elseif spell.name == 'Unknown Interrupt' then
 		eventArgs.cancel = true
@@ -360,7 +360,7 @@ end
 
 function filter_pet_midcast(spell, spellMap, eventArgs)
 	-- If we have show_set active for precast or midcast, don't try to equip pet midcast gear.
-	if mote_flags.show_set == 'precast' or mote_flags.show_set == 'midcast' then
+	if mote_vars.show_set == 'precast' or mote_vars.show_set == 'midcast' then
 		add_to_chat(104, 'Show Sets: Pet midcast not equipped.')
 		eventArgs.cancel = true
 	end
@@ -368,7 +368,7 @@ end
 
 function filter_pet_aftercast(spell, spellMap, eventArgs)
 	-- If show_set is flagged for precast or midcast, don't try to equip aftercast gear.
-	if mote_flags.show_set == 'precast' or mote_flags.show_set == 'midcast' or mote_flags.show_set == 'pet_midcast' then
+	if mote_vars.show_set == 'precast' or mote_vars.show_set == 'midcast' or mote_vars.show_set == 'pet_midcast' then
 		eventArgs.cancel = true
 	end
 end
@@ -379,14 +379,14 @@ end
 
 function cleanup_precast(spell, spellMap, eventArgs)
 	-- If show_set is flagged for precast, notify that we won't try to equip later gear.
-	if mote_flags.show_set == 'precast' then
+	if mote_vars.show_set == 'precast' then
 		add_to_chat(104, 'Show Sets: Stopping at precast.')
 	end
 end
 
 function cleanup_midcast(spell, spellMap, eventArgs)
 	-- If show_set is flagged for midcast, notify that we won't try to equip later gear.
-	if mote_flags.show_set == 'midcast' then
+	if mote_vars.show_set == 'midcast' then
 		add_to_chat(104, 'Show Sets: Stopping at midcast.')
 	end
 end
@@ -401,7 +401,7 @@ end
 
 function cleanup_pet_midcast(spell, spellMap, eventArgs)
 	-- If show_set is flagged for pet midcast, notify that we won't try to equip later gear.
-	if mote_flags.show_set == 'pet_midcast' then
+	if mote_vars.show_set == 'pet_midcast' then
 		add_to_chat(104, 'Show Sets: Stopping at pet midcast.')
 	end
 end
@@ -478,6 +478,9 @@ function get_idle_set(petStatus)
 		return {}
 	end
 	
+	mote_vars.set_breadcrumbs:append('sets')
+	mote_vars.set_breadcrumbs:append('idle')
+	
 	local idleScope
 
 	if buffactive.weakness then
@@ -490,24 +493,29 @@ function get_idle_set(petStatus)
 
 	if idleSet[idleScope] then
 		idleSet = idleSet[idleScope]
+		mote_vars.set_breadcrumbs:append(idleScope)
 	end
 
 	if idleSet[state.IdleMode] then
 		idleSet = idleSet[state.IdleMode]
+		mote_vars.set_breadcrumbs:append(state.IdleMode)
 	end
 
 	if (pet.isvalid or state.Buff.Pet) and idleSet.Pet then
 		idleSet = idleSet.Pet
 		petStatus = petStatus or pet.status
+		mote_vars.set_breadcrumbs:append('Pet')
 
 		if petStatus == 'Engaged' and idleSet.Engaged then
 			idleSet = idleSet.Engaged
+			mote_vars.set_breadcrumbs:append('Engaged')
 		end
 	end
 
 	for _,group in ipairs(classes.CustomIdleGroups) do
 		if idleSet[group] then
 			idleSet = idleSet[group]
+			mote_vars.set_breadcrumbs:append(group)
 		end
 	end
 
@@ -531,26 +539,34 @@ function get_melee_set()
 	if not meleeSet then
 		return {}
 	end
+	
+	mote_vars.set_breadcrumbs:append('sets')
+	mote_vars.set_breadcrumbs:append('engaged')
 
 	if state.CombatForm and meleeSet[state.CombatForm] then
 		meleeSet = meleeSet[state.CombatForm]
+		mote_vars.set_breadcrumbs:append(state.CombatForm)
 	end
 
 	if state.CombatWeapon and meleeSet[state.CombatWeapon] then
 		meleeSet = meleeSet[state.CombatWeapon]
+		mote_vars.set_breadcrumbs:append(state.CombatWeapon)
 	end
 
 	if meleeSet[state.OffenseMode] then
 		meleeSet = meleeSet[state.OffenseMode]
+		mote_vars.set_breadcrumbs:append(state.OffenseMode)
 	end
 
 	if meleeSet[state.DefenseMode] then
 		meleeSet = meleeSet[state.DefenseMode]
+		mote_vars.set_breadcrumbs:append(state.DefenseMode)
 	end
 
 	for _,group in ipairs(classes.CustomMeleeGroups) do
 		if meleeSet[group] then
 			meleeSet = meleeSet[group]
+			mote_vars.set_breadcrumbs:append(group)
 		end
 	end
 
@@ -575,8 +591,12 @@ function get_resting_set()
 		return {}
 	end
 
+	mote_vars.set_breadcrumbs:append('sets')
+	mote_vars.set_breadcrumbs:append('resting')
+
 	if restingSet[state.RestingMode] then
 		restingSet = restingSet[state.RestingMode]
+		mote_vars.set_breadcrumbs:append(state.RestingMode)
 	end
 
 	return restingSet
@@ -593,31 +613,42 @@ function get_precast_set(spell, spellMap)
 	if not sets.precast then
 		return {}
 	end
-	
+
 	local equipSet = sets.precast
 
+	mote_vars.set_breadcrumbs:append('sets')
+	mote_vars.set_breadcrumbs:append('precast')
+	
 	-- Determine base sub-table from type of action being performed.
 	
+	local cat
+	
 	if spell.action_type == 'Magic' then
-		equipSet = sets.precast.FC
+		cat = 'FC'
 	elseif spell.action_type == 'Ranged Attack' then
-		equipSet = sets.precast.RangedAttack or sets.precast.RA
+		cat = (sets.precast.RangedAttack and 'RangedAttack') or 'RA'
 	elseif spell.action_type == 'Ability' then
 		if spell.type == 'WeaponSkill' then
-			equipSet = sets.precast.WS
+			cat = 'WS'
 		elseif spell.type == 'JobAbility' then
-			equipSet = sets.precast.JA
+			cat = 'JA'
 		else
 			-- Allow fallback to .JA table if spell.type isn't found, for all non-weaponskill abilities.
-			equipSet = sets.precast[spell.type] or sets.precast.JA
+			cat = (sets.precast[spell.type] and spell.type) or 'JA'
 		end
 	elseif spell.action_type == 'Item' then
-		equipSet = sets.precast.Item
+		cat = 'Item'
 	end
 	
 	-- If no proper sub-category is defined in the job file, bail out.
-	if not equipSet then
-		return {}
+	if cat then
+		if equipSet[cat] then
+			equipSet = equipSet[cat]
+			mote_vars.set_breadcrumbs:append(cat)
+		else
+			mote_vars.set_breadcrumbs:clear()
+			return {}
+		end
 	end
 
 	-- Handle automatic selection of set based on spell class/name/map/skill/type.
@@ -629,12 +660,14 @@ function get_precast_set(spell, spellMap)
 	if spell.action_type == 'Magic' then
 		if equipSet[state.CastingMode] then
 			equipSet = equipSet[state.CastingMode]
+			mote_vars.set_breadcrumbs:append(state.CastingMode)
 		end
 	elseif spell.type == 'WeaponSkill' then
 		equipSet = get_weaponskill_set(equipSet, spell, spellMap)
 	elseif spell.action_type == 'Ability' then
 		if classes.JAMode and equipSet[classes.JAMode] then
 			equipSet = equipSet[classes.JAMode]
+			mote_vars.set_breadcrumbs:append(classes.JAMode)
 		end
 	elseif spell.action_type == 'Ranged Attack' then
 		equipSet = get_ranged_set(equipSet, spell, spellMap)
@@ -652,38 +685,47 @@ end
 -- Get the default midcast gear set.
 -- This builds on sets.midcast.
 function get_midcast_set(spell, spellMap)
-	local equipSet
-
 	-- If there are no midcast sets defined, bail out.
 	if not sets.midcast then
 		return {}
 	end
 	
+	local equipSet = sets.midcast
+
+	mote_vars.set_breadcrumbs:append('sets')
+	mote_vars.set_breadcrumbs:append('midcast')
+	
 	-- Determine base sub-table from type of action being performed.
 	-- Only ranged attacks and items get specific sub-categories here.
 	
+	local cat
+
 	if spell.action_type == 'Ranged Attack' then
-		equipSet = sets.midcast.RangedAttack or sets.midcast.RA
+		cat = (sets.precast.RangedAttack and 'RangedAttack') or 'RA'
 	elseif spell.action_type == 'Item' then
-		equipSet = sets.midcast.Item
-	else
-		equipSet = sets.midcast
+		cat = 'Item'
 	end
 	
 	-- If no proper sub-category is defined in the job file, bail out.
-	if not equipSet then
-		return {}
+	if cat then
+		if equipSet[cat] then
+			equipSet = equipSet[cat]
+			mote_vars.set_breadcrumbs:append(cat)
+		else
+			mote_vars.set_breadcrumbs:clear()
+			return {}
+		end
 	end
-
+	
 	-- Handle automatic selection of set based on spell class/name/map/skill/type.
 	equipSet = select_specific_set(equipSet, spell, spellMap)
-
 	
 	-- After the default checks, do checks for specialized modes (casting mode, etc).
 	
 	if spell.action_type == 'Magic' then
 		if equipSet[state.CastingMode] then
 			equipSet = equipSet[state.CastingMode]
+			mote_vars.set_breadcrumbs:append(state.CastingMode)
 		end
 	elseif spell.action_type == 'Ranged Attack' then
 		equipSet = get_ranged_set(equipSet, spell, spellMap)
@@ -697,11 +739,18 @@ end
 -- Get the default pet midcast gear set.
 -- This is built in sets.midcast.Pet.
 function get_pet_midcast_set(spell, spellMap)
-	local equipSet = {}
+	-- If there are no midcast sets defined, bail out.
+	if not sets.midcast or not sets.midcast.Pet then
+		return {}
+	end
+
+	local equipSet = sets.midcast.Pet
+
+	mote_vars.set_breadcrumbs:append('sets')
+	mote_vars.set_breadcrumbs:append('midcast')
+	mote_vars.set_breadcrumbs:append('Pet')
 
 	if sets.midcast and sets.midcast.Pet then
-		equipSet = sets.midcast.Pet
-
 		equipSet = select_specific_set(equipSet, spell, spellMap)
 
 		-- We can only generally be certain about whether the pet's action is
@@ -711,10 +760,12 @@ function get_pet_midcast_set(spell, spellMap)
 		if spell.action_type == 'Magic' then
 			if equipSet[state.CastingMode] then
 				equipSet = equipSet[state.CastingMode]
+				mote_vars.set_breadcrumbs:append(state.CastingMode)
 			end
 		elseif spell.action_type == 'Ability' then
 			if equipSet[state.OffenseMode] then
 				equipSet = equipSet[state.OffenseMode]
+				mote_vars.set_breadcrumbs:append(state.OffenseMode)
 			end
 		end
 	end
@@ -756,6 +807,7 @@ function get_weaponskill_set(equipSet, spell, spellMap)
 
 	if equipSet[ws_mode] then
 		equipSet = equipSet[ws_mode]
+		mote_vars.set_breadcrumbs:append(ws_mode)
 	end
 	
 	return equipSet
@@ -767,21 +819,25 @@ function get_ranged_set(equipSet, spell, spellMap)
 	-- Attach Combat Form and Combat Weapon to set checks
 	if state.CombatForm and equipSet[state.CombatForm] then
 		equipSet = equipSet[state.CombatForm]
+		mote_vars.set_breadcrumbs:append(state.CombatForm)
 	end
 
 	if state.CombatWeapon and equipSet[state.CombatWeapon] then
 		equipSet = equipSet[state.CombatWeapon]
+		mote_vars.set_breadcrumbs:append(state.CombatWeapon)
 	end
 
 	-- Check for specific mode for ranged attacks (eg: Acc, Att, etc)
 	if equipSet[state.RangedMode] then
 		equipSet = equipSet[state.RangedMode]
+		mote_vars.set_breadcrumbs:append(state.RangedMode)
 	end
 
 	-- Tack on any additionally specified custom groups, if the sets are defined.
 	for _,group in ipairs(classes.CustomRangedGroups) do
 		if equipSet[group] then
 			equipSet = equipSet[group]
+			mote_vars.set_breadcrumbs:append(group)
 		end
 	end
 
@@ -858,14 +914,20 @@ function select_specific_set(equipSet, spell, spellMap)
 	-- If no simple naming sub-tables were found, and we simply got back the original equip set,
 	-- check for spell.skill and spell.type, then check the simple naming extensions again.
 	if namedSet == equipSet then
-		namedSet = (spell.skill and equipSet[spell.skill]) or
-				   (spell.type and equipSet[spell.type])
-
-		-- If namedSet is nil at this point, we end up returning to equipSet
-		namedSet = get_named_set(namedSet, spell, spellMap) or equipSet
+		if spell.skill and equipSet[spell.skill] then
+			namedSet = equipSet[spell.skill]
+			mote_vars.set_breadcrumbs:append(spell.skill)
+		elseif spell.type and equipSet[spell.type] then
+			namedSet = equipSet[spell.type]
+			mote_vars.set_breadcrumbs:append(spell.type)
+		else
+			return equipSet
+		end
+		
+		namedSet = get_named_set(namedSet, spell, spellMap)
 	end
 
-	return namedSet
+	return namedSet or equipSet
 end
 
 
@@ -876,17 +938,19 @@ end
 function get_named_set(equipSet, spell, spellMap)
 	if equipSet then
 		if classes.CustomClass and equipSet[classes.CustomClass] then
+			mote_vars.set_breadcrumbs:append(classes.CustomClass)
 			return equipSet[classes.CustomClass]
 		elseif equipSet[spell.english] then
+			mote_vars.set_breadcrumbs:append(spell.english)
 			return equipSet[spell.english]
 		elseif spellMap and equipSet[spellMap] then
+			mote_vars.set_breadcrumbs:append(spellMap)
 			return equipSet[spellMap]
 		else
 			return equipSet
 		end
 	end
 end
-
 
 
 -------------------------------------------------------------------------------------------------------------------
@@ -909,6 +973,7 @@ end
 function status_change(newStatus, oldStatus)
 	-- init a new eventArgs
 	local eventArgs = {handled = false}
+	mote_vars.set_breadcrumbs:clear()
 
 	-- Allow a global function to be called on status change.
 	if user_status_change then
@@ -925,6 +990,7 @@ function status_change(newStatus, oldStatus)
 	-- Handle equipping default gear if the job didn't mark this as handled.
 	if not eventArgs.handled then
 		handle_equipping_gear(newStatus)
+		display_breadcrumbs()
 	end
 end
 
@@ -982,4 +1048,48 @@ function pet_status_change(newStatus, oldStatus)
 		job_pet_status_change(newStatus, oldStatus, eventArgs)
 	end
 end
+
+
+-------------------------------------------------------------------------------------------------------------------
+-- Debugging functions.
+-------------------------------------------------------------------------------------------------------------------
+
+-- This is a debugging function that will print the accumulated set selection
+-- breadcrumbs for the default selected set for any given action stage.
+function display_breadcrumbs(spell, spellMap, action)
+	if not _settings.debug_mode then
+		return
+	end
+	
+	local msg = 'Default '
+	
+	if action and spell then
+		msg = msg .. action .. ' set selection for ' .. spell.name
+	end
+	
+	if spellMap then
+		msg = msg .. ' (' .. spellMap .. ')'
+	end
+	msg = msg .. ' : '
+	
+	local cons
+	
+	for _,name in ipairs(mote_vars.set_breadcrumbs) do
+		if not cons then
+			cons = name
+		else
+			if name:contains(' ') or name:contains("'") then
+				cons = cons .. '["' .. name .. '"]'
+			else
+				cons = cons .. '.' .. name
+			end
+		end
+	end
+
+	if cons and (not action or cons ~= ('sets.' .. action)) then
+		msg = msg .. tostring(cons)
+		add_to_chat(123, msg)
+	end
+end
+
 

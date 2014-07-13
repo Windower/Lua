@@ -17,6 +17,7 @@ data.outgoing[0x011] = {name='Zone In 3',           description='Likely triggers
 data.outgoing[0x015] = {name='Standard Client',     description='Packet contains data that is sent almost every time (i.e your character\'s position).'}
 data.outgoing[0x016] = {name='Update Request',      description='Packet that requests a PC/NPC update packet.'}
 data.outgoing[0x01A] = {name='Action',              description='An action being done on a target (i.e. an attack or spell).'}
+data.outgoing[0x01E] = {name='Volunteer',           description='Sent in response to a /volunteer command.'}
 data.outgoing[0x028] = {name='Drop Item',           description='Drops an item.'}
 data.outgoing[0x029] = {name='Move Item',           description='Move item from one inventory to another.'}
 data.outgoing[0x032] = {name='Offer Trade',         description='This is sent when you offer to trade somebody.'}
@@ -25,6 +26,7 @@ data.outgoing[0x034] = {name='Trade Item',          description='Sends the item 
 data.outgoing[0x036] = {name='Menu Item',           description='Use an item from the item menu.'}
 data.outgoing[0x037] = {name='Use Item',            description='Use an item.'}
 data.outgoing[0x03A] = {name='Sort Item',           description='Stacks the items in your inventory. Sent when hitting "Sort" in the menu.'}
+data.outgoing[0x03D] = {name='Blacklist Command',   description='Sent in response to /blacklist add or /blacklist delete.'}
 data.outgoing[0x041] = {name='Lot Item',            description='Lotting an item in the treasure pool.'}
 data.outgoing[0x042] = {name='Pass Item',           description='Passing an item in the treasure pool.'}
 data.outgoing[0x04B] = {name='Servmes',             description='Requests the server message (/servmes).'}
@@ -46,15 +48,22 @@ data.outgoing[0x083] = {name='Buy Item',            description='Buy an item.'}
 data.outgoing[0x084] = {name='Appraise',            description='Ask server for selling price.'}
 data.outgoing[0x085] = {name='Sell Item',           description='Sell an item from your inventory.'}
 data.outgoing[0x096] = {name='Synth',               description='Packet sent containing all data of an attempted synth.'}
+data.outgoing[0x0A0] = {name='Nominate',            description='Sent in response to a /nominate command.'}
+data.outgoing[0x0A1] = {name='Vote',                description='Sent in response to a /vote command.'}
+data.outgoing[0x0A2] = {name='Random',              description='Sent in response to a /random command.'}
 data.outgoing[0x0B5] = {name='Speech',              description='Packet contains normal speech.'}
 data.outgoing[0x0B6] = {name='Tell',                description='/tell\'s sent from client.'}
 data.outgoing[0x0BE] = {name='Merit Point Increase',description='Sent when you increase a merit point ability.'}
 data.outgoing[0x0BF] = {name='Job Point Increase',  description='Sent when you increase a job point ability.'}
 data.outgoing[0x0C0] = {name='Job Point Menu',      description='Sent when you open the Job Point menu and triggers Job Point Information packets.'}
+data.outgoing[0x0C3] = {name='Make Linkshell',      description='Sent in response to the /makelinkshell command.'}
 data.outgoing[0x0D3] = {name='GM Call',             description='Places a call to the GM queue.'}
 data.outgoing[0x0DC] = {name='Type Bitmask',        description='This command is sent when change your party-seek or /anon status.'}
 data.outgoing[0x0DD] = {name='Check',               description='Used to check other players.'}
 data.outgoing[0x0DE] = {name='Set Bazaar Message',  description='Sets your bazaar message.'}
+data.outgoing[0x0E0] = {name='Search Comment',      description='Sets your search comment.'}
+data.outgoing[0x0E1] = {name='Get LS Message',      description='Requests the current linkshell message.'}
+data.outgoing[0x0E2] = {name='Set LS Message',      description='Sets the current linkshell message.'}
 data.outgoing[0x0EA] = {name='Sit',                 description='A request to sit or stand is sent to the server.'}
 data.outgoing[0x0E7] = {name='Logout',              description='A request to logout of the server.'}
 data.outgoing[0x0E8] = {name='Toggle Heal',         description='This command is used to both heal and cancel healing.'}
@@ -78,6 +87,7 @@ data.outgoing[0x10D] = {name='Cancel RoE Quest',    description='Sent to cancel 
 data.outgoing[0x10F] = {name='Currency Menu',       description='Requests currency information for the menu.'}
 data.outgoing[0x110] = {name='Fishing Action',      description='Sent when casting, releasing a fish, catching a fish, and putting away your fishing rod.'}
 data.outgoing[0x111] = {name='Lockstyle',           description='Sent when using the lockstyle command to lock or unlock.'}
+data.outgoing[0x112] = {name='RoE Log Request',     description='Sent when zoning. Requests the ROE quest log.'}
 
 -- Server packets (incoming)
 data.incoming[0x009] = {name='Standard Message',    description='A standardized message send from FFXI.'}
@@ -113,6 +123,7 @@ data.incoming[0x039] = {name='Env. Animation 2',    description='Sent once per m
 data.incoming[0x03C] = {name='Shop',                description='Displays items in a vendors shop.'}
 data.incoming[0x03D] = {name='Value',               description='Returns the value of an item.'}
 data.incoming[0x041] = {name='Stupid Evil Packet',  description='This packet is stupid and evil. Required for emotes.'}
+data.incoming[0x042] = {name='Blacklist Command',   description='Sent in response to /blacklist add or /blacklist delete.'}
 data.incoming[0x044] = {name='Pet Stat',            description='Contains information about Automaton stats and may be involved in Blue Magic.'}
 data.incoming[0x04B] = {name='Logout Acknowledge',  description='Acknowledges a logout attempt.'}
 data.incoming[0x04B] = {name='Delivery Item',       description='Item in delivery box.'}
@@ -136,6 +147,8 @@ data.incoming[0x065] = {name='Repositioning',       description='Moves your char
 data.incoming[0x067] = {name='Pet Info',            description='Updates information about whether or not you have a pet and the TP, HP, etc. of the pet if appropriate.'}
 data.incoming[0x06F] = {name='Synth Result',        description='Results of an attempted synthesis process.'}
 data.incoming[0x071] = {name='Campaign Map Info',   description='Populates the Campaign map.'}
+data.incoming[0x078] = {name='Proposal',            description='Carries proposal information from a /propose or /nominate command.'}
+data.incoming[0x079] = {name='Proposal Update',     description='Proposal update following a /vote command.'}
 data.incoming[0x08C] = {name='Merits',              description='Contains all merit information. 3 packets are sent.'}
 data.incoming[0x08D] = {name='Job Points',          description='Contains all job point information. 12 packets are sent.'}
 data.incoming[0x0AA] = {name='Spell List',          description='Packet that shows the spells that you know.'}
@@ -151,6 +164,7 @@ data.incoming[0x0DD] = {name='Party Member Update', description='Alliance/party 
 data.incoming[0x0DF] = {name='Char Update',         description='A packet sent from server which updates character HP, MP and TP.'}
 data.incoming[0x0E2] = {name='Char Info',           description='Sends name, HP, HP%, etc.'}
 data.incoming[0x0F4] = {name='Widescan Mob',        description='Displays one monster.'}
+data.incoming[0x0F5] = {name='Widescan Track',      description='Updates information when tracking a monster.'}
 data.incoming[0x0F6] = {name='Widescan Mark',       description='Marks the start and ending of a widescan list.'}
 data.incoming[0x0F9] = {name='Reraise Activation',  description='Reassigns targetable status on reraise activation?'}
 data.incoming[0x0FA] = {name='Furniture Interact',  description='Confirms furniture manipulation.'}

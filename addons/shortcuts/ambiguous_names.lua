@@ -27,6 +27,24 @@
  
  
 -- For handling ambiguous spells and abilities
+
+
+function default(player_array,IDs)
+    if IDs.spells and ( (res.spells[ids.spells].levels[player_array.main_job_id] and res.spells[ids.spells].levels[player_array.main_job_id] <= player_array.main_job_level) or
+      (res.spells[ids.spells].levels[player_array.sub_job_id] and res.spells[ids.spells].levels[player_array.sub_job_id] <= player_array.sub_job_level) ) then -- Should check to see if you know the spell
+        return 'spells'
+    elseif IDs.job_abilities and windower.ffxi.get_abilities().job_abilities[IDs.job_abilities] then
+        return 'job_abilities'
+    elseif IDs.weapon_skills and windower.ffxi.get_abilities().weapon_skills[IDs.weapon_skills] then
+        return 'weapon_skills'
+    elseif IDs.monster_abilities then
+        return 'monster_abilities'
+    else
+        for i,v in pairs(IDs) do
+            return i
+        end
+    end
+end
  
 function smn_unsub(player_array,IDs,info)
     local abils = windower.ffxi.get_abilities().job_abilities
@@ -124,7 +142,7 @@ function blu_sub(player_array,IDs,info) -- Determines ambiguous blue magic that 
 end
  
  
-ambig_names = {
+ambig_names = table.update(ambig_names,{
     sleepgaii={absolute=true,spells=274},
     darkarts={absolute=true,job_abilities=232},
     slowga={absolute=true,job_abilities=580},
@@ -365,7 +383,7 @@ ambig_names = {
     aeroii={IDs={spells=155,job_abilities=593},funct=smn_sub,info=T{4,5,8,20,21,'Garuda','Rage'}},
     blizzardii={IDs={spells=150,job_abilities=609},funct=smn_sub,info=T{4,5,8,20,21,'Shiva','Rage'}},
     thunderii={IDs={spells=165,job_abilities=625},funct=smn_sub,info=T{4,5,8,20,21,'Ramuh','Rage'}}
-}
+})
  
 function ambig(key)
     local abil_type
@@ -381,7 +399,6 @@ function ambig(key)
         return commands[slugged_commands[key].type][slugged_commands[key].id],slugged_commands[key].type
     else  -- Otherwise it's actually ambiguous, so run the associated function and pass the known information.
         abil_type=ambig_names[key]['funct'](windower.ffxi.get_player(),ambig_names[key].IDs,ambig_names[key].info,ambig_names[key].monster_abilities)
-        print(abil_type,key,ambig_names[key].IDs[abil_type])
         if res[abil_type] then
             return res[abil_type][ambig_names[key].IDs[abil_type]]
         else

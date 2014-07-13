@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-__raw = {lower = string.lower, upper = string.upper}
+__raw = {lower = string.lower, upper = string.upper, debug=windower.debug}
 
 -----------------------------------------------------------------------------------
 --Name: string.lower()
@@ -290,7 +290,7 @@ end
 -----------------------------------------------------------------------------------
 function get_default_slot(k)
     if slot_map[k] then
-        return default_slot_map[slot_map[k]]
+        return toslotname(slot_map[k])
     end
 end
 
@@ -553,7 +553,7 @@ end
 -----------------------------------------------------------------------------------
 function filter_precast(spell)
     if not spell.target.id or not spell.target.index then
-        if debugging >= 1 then windower.add_to_chat(8,'No target id or index') end
+        if debugging.general then windower.add_to_chat(8,'No target id or index') end
         return false
     end
     return true
@@ -578,7 +578,7 @@ function mk_command_registry_entry(sp)
     command_registry[ts] = {}
     command_registry[ts].cast_delay = 0
     command_registry[ts].spell = sp
-    if debugging >= 2 then
+    if debugging.command_registry then
         windower.add_to_chat(8,'GearSwap (Debug Mode): Creating a new command_registry entry: '..windower.to_shift_jis(tostring(ts)..' '..tostring(command_registry[ts])))
     end
     return ts
@@ -737,7 +737,7 @@ function get_spell(act)
             elseif T{5,9}:contains(act.category) then
                 spell = res.items[abil_ID]
             else
-                spell = {name=tostring(msg_ID)} -- Debugging
+                spell = {name=tostring(msg_ID)}
             end
             return spell
         end
@@ -863,7 +863,100 @@ end
 --Returns:
 ---- none
 -----------------------------------------------------------------------------------
-function logit(file,str)
-    file:write(str)
-    file:flush()
+function logit(str)
+    if logging then
+        logfile:write(str)
+        logfile:flush()
+    end
+end
+
+
+
+-----------------------------------------------------------------------------------
+--Name: prioritize()
+--Args:
+---- priority_list (table): Current list of slot priorities
+---- slot_id (number): Desired order of the piece of equipment
+---- priority (number): Name for the slot
+-----------------------------------------------------------------------------------
+--Returns:
+---- none
+-----------------------------------------------------------------------------------
+function prioritize(priority_list,slot_id,priority)
+    if priority and tonumber(priority) then -- Check that priority is number
+        rawset(priority_list,slot_id,priority)
+        return
+    elseif priority then
+        windower.add_to_chat(123,'GearSwap: Invalid priority ('..tostring(priority)..') given')
+    end
+    rawset(priority_list,slot_id,0)
+end
+
+
+
+-----------------------------------------------------------------------------------
+--Name: priority_order()
+--Args:
+---- priority_list (table): Current list of slot priorities
+-----------------------------------------------------------------------------------
+--Returns:
+---- slot_id : Number from 0~15
+-----------------------------------------------------------------------------------
+function priority_order(priority_list)
+    return function ()
+        local maximum,slot_id = -math.huge
+        for i=0,15 do
+            if priority_list[i] and priority_list[i] > maximum then
+                maximum = priority_list[i]
+                slot_id = i
+            end
+        end
+        if not slot_id then return end
+        priority_list[slot_id] = nil
+        return slot_id,maximum
+    end
+end
+
+
+
+-----------------------------------------------------------------------------------
+--Name: toslotname(slot_id)
+--Args:
+---- slot_id: Number from 0-15 representing the slot
+-----------------------------------------------------------------------------------
+--Returns:
+---- slot name (string)
+-----------------------------------------------------------------------------------
+function toslotname(slot_id)
+    return default_slot_map[slot_id]
+end
+
+
+
+-----------------------------------------------------------------------------------
+--Name: toslotid(slot_name)
+--Args:
+---- slot_name: proposed slot name
+-----------------------------------------------------------------------------------
+--Returns:
+---- slot id (whole number from 0-15)
+-----------------------------------------------------------------------------------
+function toslotid(slot_name)
+    return slot_map[slot_name]
+end
+
+
+
+-----------------------------------------------------------------------------------
+--Name: windower.debug(...)
+--Args:
+---- ...: Anything, to be passed to the real windower.debug if the windower_debugging
+---- flag is set.
+-----------------------------------------------------------------------------------
+--Returns:
+---- Nothing
+-----------------------------------------------------------------------------------
+windower.__raw = {debug = windower.debug}
+windower.debug = function(...)
+    if debugging.windower_debug then __raw.debug(...) end
 end
