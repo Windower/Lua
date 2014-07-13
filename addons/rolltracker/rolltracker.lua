@@ -222,7 +222,7 @@ function RollEffect(rollid, rollnum)
         return
     end
 
-    --print(gearTable[13])
+
     --There's gotta be a better way to do this.
     local rollName = rollInfo[rollid][1]
     local rollVal = rollInfo[rollid][rollnum]
