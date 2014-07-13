@@ -14,12 +14,10 @@ local createfile = false
 function files.new(path, create)
     create = create ~= false
 
-    if path == nil then
-        return setmetatable({}, {__index = files})
-    end
-
     local f = setmetatable({}, {__index = files})
-    f:set(path, create)
+    if path then
+        f:set(path, create)
+    end
 
     return f
 end
@@ -121,23 +119,21 @@ function files.create_path(f)
     end
 
     new_path = windower.addon_path
-    for _, dir in ipairs(path:psplit('[/\\]')) do
-        if not dir == '' then
-            new_path = new_path .. '/' .. dir
+    for dir in path:psplit('[/\\]'):filter(-''):it() do
+        new_path = new_path .. '/' .. dir
 
-            if not windower.dir_exists(new_path) then
-                local res, err = windower.create_dir(new_path)
-                if not res then
-                    if err ~= nil then
-                        return nil, err .. ': ' .. new_path
-                    end
-
-                    return nil, 'Unknown error trying to create path ' .. new_path
+        if not windower.dir_exists(new_path) then
+            local res, err = windower.create_dir(new_path)
+            if not res then
+                if err ~= nil then
+                    return nil, err .. ': ' .. new_path
                 end
-            end
 
-            return nil, 'Unknown error trying to create path ' .. new_path
+                return nil, 'Unknown error trying to create path ' .. new_path
+            end
         end
+
+        return nil, 'Unknown error trying to create path ' .. new_path
     end
 
     return new_path
