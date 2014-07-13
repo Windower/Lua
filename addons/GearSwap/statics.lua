@@ -258,6 +258,8 @@ tool_map = {
         ['Yurin: Ichi'] = res.items[2643],
         ['Migawari: Ichi'] = res.items[2970],
         ['Kakka: Ichi'] = res.items[2644],
+        ['Gekka: Ichi'] = res.items[8803],
+        ['Yain: Ichi'] = res.items[8804],
     }
 
 universal_tool_map = {
@@ -303,6 +305,8 @@ universal_tool_map = {
         ['Yurin: Ichi'] = res.items[2973],
         ['Migawari: Ichi'] = res.items[2972],
         ['Kakka: Ichi'] = res.items[2972]
+        ['Gekka: Ichi'] = res.items[2972],
+        ['Yain: Ichi'] = res.items[2972],
     }
 
 region_to_zone_map = { 
