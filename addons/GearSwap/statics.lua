@@ -304,7 +304,7 @@ universal_tool_map = {
         ['Myoshu: Ichi'] = res.items[2972],
         ['Yurin: Ichi'] = res.items[2973],
         ['Migawari: Ichi'] = res.items[2972],
-        ['Kakka: Ichi'] = res.items[2972]
+        ['Kakka: Ichi'] = res.items[2972],
         ['Gekka: Ichi'] = res.items[2972],
         ['Yain: Ichi'] = res.items[2972],
     }
