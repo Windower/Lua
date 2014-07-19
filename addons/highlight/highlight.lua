@@ -157,10 +157,13 @@ windower.register_event('incoming text', function(original, modified, color, new
 end)
  
 windower.register_event('incoming chunk', function(id, data)
-    if id == 0x0C8 then
+    if id == 0x0C8 and not get_party_members_flag then
         modmember = {}
         members = {}
-        windower.send_command('@wait 0.1; lua i highlight get_party_members')
+        get_party_members_flag = true
+        coroutine.sleep(0.1)
+        get_party_members_flag = nil
+        get_party_members()
     end
 end)
  
