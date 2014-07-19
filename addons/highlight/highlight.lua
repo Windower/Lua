@@ -88,7 +88,8 @@ end)
 
 windower.register_event('login','load', function()
 	if windower.ffxi.get_info()['logged_in'] == true then
-		windower.send_command('@wait 1; lua i highlight initialize')
+        coroutine.sleep(1)
+        initialize()
 	end
 end)
  
