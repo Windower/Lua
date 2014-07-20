@@ -187,24 +187,20 @@ function init_include()
 
 	-- Load up all the gear sets.
 	init_gear_sets()
-	
-	if not file_unload then
-		file_unload = on_file_unload
-	end
 end
 
 -- Auto-initialize the include
 init_include()
 
-
-
 -- Called when this job file is unloaded (eg: job change)
--- Defined indirectly so that user files that define the base hook function (file_unload)
--- don't get overwritten.
-function on_file_unload()
-	(binds_on_unload or global_on_unload)()
-	if job_file_unload then
-		job_file_unload()
+-- Conditional definition so that it doesn't overwrite explicit user
+-- versions of this function.
+if not file_unload then
+	file_unload = function()
+		if job_file_unload then
+			job_file_unload()
+		end
+		_G[(binds_on_unload and 'binds_on_unload') or 'global_on_unload']()
 	end
 end
 
