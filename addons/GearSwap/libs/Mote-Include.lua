@@ -91,6 +91,7 @@ function init_include()
 	-- Spells that fall under this category will be skipped when searching for
 	-- spell.skill sets.
 	classes.NoSkillSpells = no_skill_spells_list
+	classes.SkipSkillCheck = false
 	-- Custom, job-defined class, like the generic spell mappings.
 	-- Takes precedence over default spell maps.
 	-- Is reset at the end of each spell casting cycle (ie: at the end of aftercast).
@@ -651,6 +652,7 @@ function get_precast_set(spell, spellMap)
 		end
 	end
 
+	classes.SkipSkillCheck = false
 	-- Handle automatic selection of set based on spell class/name/map/skill/type.
 	equipSet = select_specific_set(equipSet, spell, spellMap)
 
@@ -717,6 +719,7 @@ function get_midcast_set(spell, spellMap)
 		end
 	end
 	
+	classes.SkipSkillCheck = classes.NoSkillSpells:contains(spell.english)
 	-- Handle automatic selection of set based on spell class/name/map/skill/type.
 	equipSet = select_specific_set(equipSet, spell, spellMap)
 	
@@ -751,6 +754,7 @@ function get_pet_midcast_set(spell, spellMap)
 	mote_vars.set_breadcrumbs:append('Pet')
 
 	if sets.midcast and sets.midcast.Pet then
+		classes.SkipSkillCheck = false
 		equipSet = select_specific_set(equipSet, spell, spellMap)
 
 		-- We can only generally be certain about whether the pet's action is
@@ -914,7 +918,7 @@ function select_specific_set(equipSet, spell, spellMap)
 	-- If no simple naming sub-tables were found, and we simply got back the original equip set,
 	-- check for spell.skill and spell.type, then check the simple naming extensions again.
 	if namedSet == equipSet then
-		if spell.skill and equipSet[spell.skill] then
+		if spell.skill and equipSet[spell.skill] and not classes.SkipSkillCheck then
 			namedSet = equipSet[spell.skill]
 			mote_vars.set_breadcrumbs:append(spell.skill)
 		elseif spell.type and equipSet[spell.type] then
@@ -1086,8 +1090,12 @@ function display_breadcrumbs(spell, spellMap, action)
 		end
 	end
 
-	if cons and (not action or cons ~= ('sets.' .. action)) then
-		msg = msg .. tostring(cons)
+	if cons then
+		if action and cons == ('sets.' .. action) then
+			msg = msg .. "None"
+		else
+			msg = msg .. tostring(cons)
+		end
 		add_to_chat(123, msg)
 	end
 end
