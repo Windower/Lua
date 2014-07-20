@@ -69,9 +69,13 @@ ohShi_tb = texts.new(settings)
 --create tables to be used throughout the addon
 tracking = T{}
 prims = S{}
+--[[ keeping in case the function below doesn't work.
 trusts = S{'Kupipi','Excenmille','Naji','Ayame','Zeid','Curilla',
-            'Nanaamihgo','Trion','Shantotto','Volker','Ajidomarujido',
-            'Mihlialiapoh','Valaineral','Joachim','Lion','Prishe','Ulmia',
-            'Ironeater','Gadalar','Najasalaheem','Cherukiki','Nashmeira',
-            'Zazarg','Ingrid','Lhekohabhoka','Ovjang','Mnejing','Sakura',
-            'Luzaf','Najelith', 'Maat','Gessho','Aldo','Moogle','Fablinix'}
+            'NanaaMihgo','Trion','Shantotto','Volker','Ajido-Marujido',
+            'MihliAliapoh','Valaineral','Joachim','Lion','Prishe','Ulmia',
+            'Ironeater','Gadalar','NajaSalaheem','Cherukiki','Nashmeira',
+            'Zazarg','Ingrid','LhekoHabhoka','Ovjang','Mnejing','Sakura',
+            'Luzaf','Najelith', 'Maat','Gessho','Aldo','Moogle','Fablinix',
+            'D.Shantotto','Elvira','Noillurie','LhuMhakaracca','FerreousCoffin',
+            'StarSibyl','Mumor'}]]
+trusts = res.spells:type('Trust'):gsub(' ','')

@@ -305,7 +305,7 @@ windower.register_event('incoming text', function(original, modified, mode)
                 stats.plasm     = stats.plasm + match
                 stats.tot_plasm = stats.tot_plasm + match
 
-                if match ~= 50 and match % 500 ~= 0 and match % 750 ~= 0 and match % 10000 ~= 0 then
+                if match % 50 == 0 and match % 500 ~= 0 and match % 750 ~= 0 and match % 10000 ~= 0 then
                     mobs = match / 50
                 else
                     mobs = 1
