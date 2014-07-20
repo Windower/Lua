@@ -33,12 +33,12 @@ function initText()
     ohShi_tb = texts.new(settings)
     tracking:append('ohShi initialized ')
     textUpdate()
-    windower.send_command('@wait '..settings.duration..'; lua i ohshi remText')
+    coroutine.schedule(remText, settings.duration or 7)
 end
 
 --Removes first line of a textbox
 function remText()
-    if #tracking > 0 then
+    if tracking:length() > 0 then
         table.remove(tracking,1)
         textUpdate()
     end
@@ -46,6 +46,10 @@ end
 
 --Add text to textbox. Anytime text is added this is called.
 function addText(name, abtype, abil, dMob, dangerous)
+   if tracking:length() > 9 then 
+      tracking:clear()
+      textUpdate()
+   end
     if abtype == 'ws' then
         abil = tonumber(abil)
         doit = true
@@ -88,7 +92,7 @@ function addText(name, abtype, abil, dMob, dangerous)
             tracking:append(' '..str)
         end
     end
-    windower.send_command('@wait '..settings.duration..'; lua i ohshi remText')
+    coroutine.schedule(remText, settings.duration or 7)
     textUpdate()
 end
 
@@ -125,7 +129,7 @@ function flashImage()
     windower.prim.set_visibility(name,true)
     windower.prim.set_position(name,settings.pos.x-30,settings.pos.y-10)
     windower.prim.set_size(name,30,30)
-    windower.send_command('@wait '..settings['duration']..';lua i ohshi deleteImage '..name)
+    coroutine.schedule(deleteImage:prepare(name), settings.duration or 7)
 end
 
 --Called to delete the image after it's time is up.

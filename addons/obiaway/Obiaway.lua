@@ -80,10 +80,10 @@ function get_obis_in_inventory()
     obis = {}
     items = windower.ffxi.get_items()
     inv = items.inventory
-    number = items.max_inventory - 1 -- items.max_inventory returns inventory size +1
+    if not inv then return end
+    number = items.max_inventory
     for i=1,number do 
-        index = tostring(i)
-        id = inv[index].id
+        id = inv[i].id
         if ( id>=15435 and id<=15442) then
             obis["Fire"] = obis["Fire"] or (id == 15435)
             obis["Ice"] = obis["Ice"] or (id == 15436)
