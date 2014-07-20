@@ -231,7 +231,7 @@ local enums = {
     },
 }
 
-local function e(t, val)
+local e = function(t, val)
     return enums[t][val] or 'Unknown value for \'%s\': %i':format(t, val)
 end
 
@@ -362,25 +362,9 @@ fields.outgoing[0x036] = L{
 -- Item order is Gil -> top row left-to-right -> bottom row left-to-right, but
 -- they slide up and fill empty slots
     {ctype='unsigned int',      label='Target',             fn=id},             -- 04
-    {ctype='unsigned int',      label='Item 1 Count'},                          -- 08
-    {ctype='unsigned int',      label='Item 2 Count'},                          -- 0C
-    {ctype='unsigned int',      label='Item 3 Count'},                          -- 10
-    {ctype='unsigned int',      label='Item 4 Count'},                          -- 14
-    {ctype='unsigned int',      label='Item 5 Count'},                          -- 18
-    {ctype='unsigned int',      label='Item 6 Count'},                          -- 1C
-    {ctype='unsigned int',      label='Item 7 Count'},                          -- 20
-    {ctype='unsigned int',      label='Item 8 Count'},                          -- 24
-    {ctype='unsigned int',      label='Item 9 Count'},                          -- 28
+    {ctype='unsigned int[9]',   label='Item Count'},                            -- 08
     {ctype='unsigned int',      label='_unknown1'},                             -- 2C
-    {ctype='unsigned char',     label='Item 1 Index',       fn=inv+{0}},        -- 30   Gil has an Inventory Index of 0
-    {ctype='unsigned char',     label='Item 2 Index',       fn=inv+{0}},        -- 31
-    {ctype='unsigned char',     label='Item 3 Index',       fn=inv+{0}},        -- 32
-    {ctype='unsigned char',     label='Item 4 Index',       fn=inv+{0}},        -- 33
-    {ctype='unsigned char',     label='Item 5 Index',       fn=inv+{0}},        -- 34
-    {ctype='unsigned char',     label='Item 6 Index',       fn=inv+{0}},        -- 35
-    {ctype='unsigned char',     label='Item 7 Index',       fn=inv+{0}},        -- 36
-    {ctype='unsigned char',     label='Item 8 Index',       fn=inv+{0}},        -- 37
-    {ctype='unsigned char',     label='Item 9 Index',       fn=inv+{0}},        -- 38
+    {ctype='unsigned char[9]',  label='Item Index',       fn=inv+{0}},          -- 30   Gil has an Inventory Index of 0
     {ctype='unsigned char',     label='_unknown2'},                             -- 39
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 3A
     {ctype='unsigned char',     label='Number of Items'},                       -- 3C
@@ -568,23 +552,9 @@ fields.outgoing[0x096] = L{
     {ctype='unsigned char',     label='_unknown2'},                             -- 05
     {ctype='unsigned short',    label='Crystal',                fn=item},       -- 06
     {ctype='unsigned char',     label='Crystal Index',          fn=inv+{0}},    -- 08
-    {ctype='unsigned char',     label='Number of Ingredients'},                 -- 09
-    {ctype='unsigned short',    label='Ingredient 1',           fn=item},       -- 0A
-    {ctype='unsigned short',    label='Ingredient 2',           fn=item},       -- 0C
-    {ctype='unsigned short',    label='Ingredient 3',           fn=item},       -- 0E
-    {ctype='unsigned short',    label='Ingredient 4',           fn=item},       -- 10
-    {ctype='unsigned short',    label='Ingredient 5',           fn=item},       -- 12
-    {ctype='unsigned short',    label='Ingredient 6',           fn=item},       -- 14
-    {ctype='unsigned short',    label='Ingredient 7',           fn=item},       -- 16
-    {ctype='unsigned short',    label='Ingredient 8',           fn=item},       -- 18
-    {ctype='unsigned char',     label='Ingredient 1 Index',     fn=inv+{0}},    -- 1A
-    {ctype='unsigned char',     label='Ingredient 2 Index',     fn=inv+{0}},    -- 1B
-    {ctype='unsigned char',     label='Ingredient 3 Index',     fn=inv+{0}},    -- 1C
-    {ctype='unsigned char',     label='Ingredient 4 Index',     fn=inv+{0}},    -- 1D
-    {ctype='unsigned char',     label='Ingredient 5 Index',     fn=inv+{0}},    -- 1E
-    {ctype='unsigned char',     label='Ingredient 6 Index',     fn=inv+{0}},    -- 1F
-    {ctype='unsigned char',     label='Ingredient 7 Index',     fn=inv+{0}},    -- 20
-    {ctype='unsigned char',     label='Ingredient 8 Index',     fn=inv+{0}},    -- 21
+    {ctype='unsigned char',     label='Ingredient count'},                      -- 09
+    {ctype='unsigned short[8]', label='Ingredient',             fn=item},       -- 0A
+    {ctype='unsigned char[8]',  label='Ingredient Index',       fn=inv+{0}},    -- 1A
     {ctype='unsigned short',    label='_junk1'},                                -- 22
 }
 
@@ -770,18 +740,7 @@ fields.outgoing[0x102] = L{
     {ctype='unsigned short',    label='Flag'},                                  -- 0A  -- 04 00 for Monsters changing instincts. 01 00 for changing Monsters
     {ctype='unsigned short',    label='Species'},                               -- 0C  -- True both for species change and instinct change packets
     {ctype='unsigned short',    label='_unknown2'},                             -- 0E  -- 00 00 for Monsters
-    {ctype='unsigned short',    label='Instinct 1'},                            -- 10
-    {ctype='unsigned short',    label='Instinct 2'},                            -- 12
-    {ctype='unsigned short',    label='Instinct 3'},                            -- 14
-    {ctype='unsigned short',    label='Instinct 4'},                            -- 16
-    {ctype='unsigned short',    label='Instinct 5'},                            -- 18
-    {ctype='unsigned short',    label='Instinct 6'},                            -- 1A
-    {ctype='unsigned short',    label='Instinct 7'},                            -- 1C
-    {ctype='unsigned short',    label='Instinct 8'},                            -- 1E
-    {ctype='unsigned short',    label='Instinct 9'},                            -- 20
-    {ctype='unsigned short',    label='Instinct 10'},                           -- 22
-    {ctype='unsigned short',    label='Instinct 11'},                           -- 24
-    {ctype='unsigned short',    label='Instinct 12'},                           -- 26
+    {ctype='unsigned short[12]',label='Instinct'},                              -- 10
     {ctype='unsigned char',     label='Name 1'},                                -- 28
     {ctype='unsigned char',     label='Name 2'},                                -- 29
     {ctype='char*',             label='_unknown'},                              -- 2A  -- All 00s for Monsters
@@ -862,6 +821,10 @@ fields.outgoing[0x112] = L{
     {ctype='int',               label='_unknown1'},                             -- 04
 }
 
+types.job_level = L{
+    {ctype='unsigned char',     label='Level'},                                 -- 00
+}
+
 -- Zone update
 fields.incoming[0x00A] = L{
     {ctype='unsigned int',      label='Player',             fn=id},             -- 04
@@ -899,22 +862,7 @@ fields.incoming[0x00A] = L{
     {ctype='unsigned char',     label='_unknown12'},                            -- B6
     {ctype='unsigned char',     label='Sub Job',            fn=job},            -- B7
     {ctype='unsigned int',      label='_unknown13'},                            -- B8
-    {ctype='unsigned char',     label='(None) Level'},                          -- BC
-    {ctype='unsigned char',     label='WAR Level'},                             -- BD
-    {ctype='unsigned char',     label='MNK Level'},                             -- BE
-    {ctype='unsigned char',     label='WHM Level'},                             -- BF
-    {ctype='unsigned char',     label='BLM Level'},                             -- C0
-    {ctype='unsigned char',     label='RDM Level'},                             -- C1
-    {ctype='unsigned char',     label='THF Level'},                             -- C2
-    {ctype='unsigned char',     label='PLD Level'},                             -- C3
-    {ctype='unsigned char',     label='DRK Level'},                             -- C4
-    {ctype='unsigned char',     label='BST Level'},                             -- C5
-    {ctype='unsigned char',     label='BRD Level'},                             -- C6
-    {ctype='unsigned char',     label='RNG Level'},                             -- C7
-    {ctype='unsigned char',     label='SAM Level'},                             -- C8
-    {ctype='unsigned char',     label='NIN Level'},                             -- C9
-    {ctype='unsigned char',     label='DRG Level'},                             -- CA
-    {ctype='unsigned char',     label='SMN Level'},                             -- CB
+    {ref=types.job_level,       lookup={res.jobs, 0x00},    count=0x10},        -- BC
     {ctype='signed short',      label='STR'},                                   -- CC
     {ctype='signed short',      label='DEX'},                                   -- CE
     {ctype='signed short',      label='VIT'},                                   -- D0
@@ -1108,21 +1056,7 @@ fields.incoming[0x01B] = L{
     {ctype='unsigned char',     label='Sub Job',            fn=job},            -- 0B
     {ctype='unsigned int',      label='_unknown2'},                             -- 0C   Flags -- FF FF FF 00 observed
     {ctype='unsigned char',     label='_unknown3'},                             -- 10   Flag or List Start
-    {ctype='unsigned char',     label='WAR Level'},                             -- 11
-    {ctype='unsigned char',     label='MNK Level'},                             -- 12
-    {ctype='unsigned char',     label='WHM Level'},                             -- 13
-    {ctype='unsigned char',     label='BLM Level'},                             -- 14
-    {ctype='unsigned char',     label='RDM Level'},                             -- 15
-    {ctype='unsigned char',     label='THF Level'},                             -- 16
-    {ctype='unsigned char',     label='PLD Level'},                             -- 17
-    {ctype='unsigned char',     label='DRK Level'},                             -- 18
-    {ctype='unsigned char',     label='BST Level'},                             -- 19
-    {ctype='unsigned char',     label='BRD Level'},                             -- 1A
-    {ctype='unsigned char',     label='RNG Level'},                             -- 1B
-    {ctype='unsigned char',     label='SAM Level'},                             -- 1C
-    {ctype='unsigned char',     label='NIN Level'},                             -- 1D
-    {ctype='unsigned char',     label='DRG Level'},                             -- 1E
-    {ctype='unsigned char',     label='SMN Level'},                             -- 1F
+    {ref=types.job_level,       lookup={res.jobs, 0x01},    count=0x0F},        -- 11
     {ctype='unsigned short',    label='Base STR'},                              -- 20  -- Altering these stat values has no impact on your equipment menu.
     {ctype='unsigned short',    label='Base DEX'},                              -- 22
     {ctype='unsigned short',    label='Base VIT'},                              -- 24
@@ -1135,28 +1069,7 @@ fields.incoming[0x01B] = L{
     {ctype='unsigned int',      label='Maximum MP'},                            -- 40
     {ctype='unsigned int',      label='Flags'},                                 -- 44   Looks like a bunch of flags. Observed value if 01 00 00 00
     {ctype='unsigned char',     label='_unknown5'},                             -- 48   Potential flag to signal the list start. Observed value of 01
-    {ctype='unsigned char',     label='WAR Level'},                             -- 49
-    {ctype='unsigned char',     label='MNK Level'},                             -- 4A
-    {ctype='unsigned char',     label='WHM Level'},                             -- 4B
-    {ctype='unsigned char',     label='BLM Level'},                             -- 4C
-    {ctype='unsigned char',     label='RDM Level'},                             -- 4D
-    {ctype='unsigned char',     label='THF Level'},                             -- 4E
-    {ctype='unsigned char',     label='PLD Level'},                             -- 4F
-    {ctype='unsigned char',     label='DRK Level'},                             -- 50
-    {ctype='unsigned char',     label='BST Level'},                             -- 51
-    {ctype='unsigned char',     label='BRD Level'},                             -- 52
-    {ctype='unsigned char',     label='RNG Level'},                             -- 53
-    {ctype='unsigned char',     label='SAM Level'},                             -- 54
-    {ctype='unsigned char',     label='NIN Level'},                             -- 55
-    {ctype='unsigned char',     label='DRG Level'},                             -- 56
-    {ctype='unsigned char',     label='SMN Level'},                             -- 57
-    {ctype='unsigned char',     label='BLU Level'},                             -- 58
-    {ctype='unsigned char',     label='COR Level'},                             -- 59
-    {ctype='unsigned char',     label='PUP Level'},                             -- 5A
-    {ctype='unsigned char',     label='DNC Level'},                             -- 5B
-    {ctype='unsigned char',     label='SCH Level'},                             -- 5C
-    {ctype='unsigned char',     label='GEO Level'},                             -- 5D
-    {ctype='unsigned char',     label='RUN Level'},                             -- 5E
+    {ref=types.job_level,       lookup={res.jobs, 0x01},    count=0x16},        -- 49
     {ctype='unsigned char',     label='Current Monster Level'},                 -- 5F
     {ctype='unsigned int',      label='Encumbrance Flags'},                     -- 60   [legs, hands, body, head, ammo, range, sub, main,] [back, right_ring, left_ring, right_ear, left_ear, waist, neck, feet] [HP, CHR, MND, INT, AGI, VIT, DEX, STR,] [X X X X X X X MP]
 }
@@ -1922,8 +1835,9 @@ types.craft_skill = L{
 -- Skills Update
 fields.incoming[0x062] = L{
     {ctype='data[124]',         label='_unknown1'},                             -- 04
-    {ref=types.combat_skill,    lookup=res.skills,          count=0x30},        -- 80
-    {ref=types.craft_skill,     lookup=res.synth_ranks,     count=0x10},        -- E0
+    {ref=types.combat_skill,    lookup={res.skills,0x00},   count=0x30},        -- 80
+    {ref=types.craft_skill,     lookup={res.skills,0x30},   count=0x0A},        -- E0
+    {ctype='unsigned short[6]', label='_junk1'},                                -- F4
 }
 
 -- Set Update
@@ -2498,13 +2412,13 @@ sizes.data = 1
 
 local non_array_types = S{'char', 'bit', 'data'}
 
-local function parse(fs, data, index, max)
+local function parse(fs, data, index, max, lookup)
     max = max == '*' and 0 or max or 1
     index = index or 4
 
     local res = L{}
     local count = 0
-    local bitoffset = 0
+    local bit_offset = 0
     while index < #data do
         count = count + 1
         for field in fs:it() do
@@ -2518,8 +2432,9 @@ local function parse(fs, data, index, max)
                     index = index + size
                 else
                     if max ~= 1 then
-                        if field.lookup then
-                            field.label = field.lookup[count].english .. ' ' .. field.label
+                        if lookup then
+                            local resource = lookup[1][count + lookup[2] - 1]
+                            field.label = '%s %s':format(resource and resource.name or 'Unknown %d':format(count + lookup[2] - 1), field.label)
                         else
                             field.label = field.label .. ' ' .. count:string()
                         end
@@ -2528,8 +2443,8 @@ local function parse(fs, data, index, max)
                     res:append(field)
                     if ctype == 'bit' or field.ctype == 'boolbit' then
                         local bits = count_str and count_str:number() or 1
-                        bitoffset = (bitoffset + bits) % 8
-                        index = index + ((bitoffset + bits) / 8):floor()
+                        bit_offset = (bit_offset + bits) % 8
+                        index = index + ((bit_offset + bits) / 8):floor()
                     else
                         index = index + sizes[field.ctype:match('(%a+)[^%a]*$')]
                     end
@@ -2540,7 +2455,7 @@ local function parse(fs, data, index, max)
                     local byte_index = field.count_ref + 1
                     type_count = data:byte(byte_index, byte_index)
                 end
-                local ext, size = parse(field.ref, data, index, type_count)
+                local ext, size = parse(field.ref, data, index, type_count, field.lookup)
                 res = res + ext
                 index = index + size
             end
