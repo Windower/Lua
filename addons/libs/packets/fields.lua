@@ -146,6 +146,10 @@ local function srank(val)
     return res.synth_ranks[val].name
 end
 
+local function arecast(val)
+    return res.ability_recasts[val].name
+end
+
 local function inv(bag, val)
     if val == 0 or not res.bags[bag] then
         return '-'
@@ -1821,6 +1825,12 @@ fields.incoming[0x061] = L{
     {ctype='unsigned short',    label='_unknown4'},                             -- 52   00 00 observed.
 }
 
+types.ability_recast = L{
+    {ctype='unsigned short',    label='Duration',           fn=div+{1}},        -- 00
+    {ctype='unsigned char',     label='_unknown1',          const=0x00},        -- 01
+    {ctype='unsigned char',     label='Recast',             fn=arecast},        -- 02
+}
+
 types.combat_skill = L{
     {ctype='bit[15]',           label='Level'},                                 -- 00
     {ctype='boolbit',           label='Capped'},                                -- 01
@@ -1834,7 +1844,7 @@ types.craft_skill = L{
 
 -- Skills Update
 fields.incoming[0x062] = L{
-    {ctype='data[124]',         label='_unknown1'},                             -- 04
+    {ref=types.ability_recast,                              count=0x1F},        -- 04
     {ref=types.combat_skill,    lookup={res.skills,0x00},   count=0x30},        -- 80
     {ref=types.craft_skill,     lookup={res.skills,0x30},   count=0x0A},        -- E0
     {ctype='unsigned short[6]', label='_junk1'},                                -- F4
@@ -2425,26 +2435,27 @@ local function parse(fs, data, index, max, lookup)
             if field.ctype then
                 field = table.copy(field)
                 local ctype, count_str = field.ctype:match('(.*)%[(%d+)%]')
+                ctype = ctype or field.ctype
                 if count_str and not non_array_types:contains(ctype) then
                     field.ctype = ctype
-                    local ext, size = parse(L{field}, data, index, count_str:number())
+                    local ext, new_index = parse(L{field}, data, index, count_str:number())
                     res = res + ext
-                    index = index + size
+                    index = new_index
                 else
                     if max ~= 1 then
                         if lookup then
                             local resource = lookup[1][count + lookup[2] - 1]
                             field.label = '%s %s':format(resource and resource.name or 'Unknown %d':format(count + lookup[2] - 1), field.label)
                         else
-                            field.label = field.label .. ' ' .. count:string()
+                            field.label = '%s %d':format(field.label, count)
                         end
                     end
 
                     res:append(field)
-                    if ctype == 'bit' or field.ctype == 'boolbit' then
+                    if ctype == 'bit' or ctype == 'boolbit' then
                         local bits = count_str and count_str:number() or 1
-                        bit_offset = (bit_offset + bits) % 8
                         index = index + ((bit_offset + bits) / 8):floor()
+                        bit_offset = (bit_offset + bits) % 8
                     else
                         index = index + sizes[field.ctype:match('(%a+)[^%a]*$')]
                     end
@@ -2455,9 +2466,11 @@ local function parse(fs, data, index, max, lookup)
                     local byte_index = field.count_ref + 1
                     type_count = data:byte(byte_index, byte_index)
                 end
-                local ext, size = parse(field.ref, data, index, type_count, field.lookup)
+                if type_count == 10 then x = true end
+                local ext, new_index = parse(field.ref, data, index, type_count, field.lookup)
+                x = false
                 res = res + ext
-                index = index + size
+                index = new_index
             end
         end
 
