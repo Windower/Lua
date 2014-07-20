@@ -38,6 +38,7 @@ defaults.a22 = 200
 defaults.a23 = 481
 defaults.a24 = 483
 defaults.a25 = 208
+
  
 settingdefaults = {}
 settingdefaults.highlighting = true
@@ -49,6 +50,8 @@ if file.exists('../battlemod/data/colors.xml') then
 else
     color = config.load('/data/colors.xml', defaults)
 end
+
+
  
 windower.register_event('addon command', function(command, ...)
     command = command and command:lower() or 'help'
@@ -87,20 +90,21 @@ windower.register_event('addon command', function(command, ...)
 end)
 
 windower.register_event('login','load', function()
-	if windower.ffxi.get_info()['logged_in'] == true then
+    if windower.ffxi.get_info()['logged_in'] == true then
         coroutine.sleep(1)
         initialize()
-	end
+    end
 end)
  
 function initialize()
     send_count = 0 
     called_count = 0
+    colour={}
  
     nicknames = config.load('/data/nicknames.xml')
     mules = config.load('/data/mules.xml')
     settings = config.load(settingdefaults)
- 
+
     for i, v in pairs(nicknames) do
         nicknames[i] = string.split(v, ',')
     end
@@ -108,14 +112,14 @@ function initialize()
         mulenames[mule] = name
     end
     for i, v in pairs(color) do
-        color[i] = colconv(v,i)
+        colour[i] = colconv(v,i)
     end
     for i, v in pairs(mules) do
         mulecolor[i] = colconv(v,i)
     end
  
     player = windower.ffxi.get_player().name
-	print(player)
+    print(player)
  
     get_party_members()
 end
@@ -186,12 +190,12 @@ function get_party_members()
         for member, mob in pairs(windower.ffxi.get_party()) do
             if not mulenames[mob['name']:lower()] then
                 members[member] = mob['name']
-                modmember[member] = color[member]..mob['name']..chat.controls.reset
+                modmember[member] = colour[member]..mob['name']..chat.controls.reset
             end
         end
     else 
         members['p0'] = player
-        modmember['p0'] = color['p0']..player..chat.controls.reset
+        modmember['p0'] = colour['p0']..player..chat.controls.reset
     end    
 end
  
