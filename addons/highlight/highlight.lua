@@ -97,8 +97,7 @@ windower.register_event('login','load', function()
 end)
  
 function initialize()
-    send_count = 0 
-    called_count = 0
+    prevCount = 0
     colour={}
  
     nicknames = config.load('/data/nicknames.xml')
@@ -162,16 +161,32 @@ windower.register_event('incoming text', function(original, modified, color, new
 end)
  
 windower.register_event('incoming chunk', function(id, data)
-    if id == 0x0C8 and not get_party_members_flag then
-        modmember = {}
-        members = {}
-        get_party_members_flag = true
-        coroutine.sleep(0.1)
-        get_party_members_flag = nil
-        get_party_members()
+    if id == 0x0C8 then
+        prevCount = count
+        count = GetPartyCount(data:sub(0x09, 0xE0))
+        if(prevCount ~= count) then
+            modmember = {}
+            members = {}
+            coroutine.sleep(0.1)
+            get_party_members()
+        end
     end
 end)
- 
+
+function GetPartyCount(data)
+    local count = 0
+    local test = 0
+    local offset = 0
+    while(offset < 216) do
+        local x = data:sub(offset, offset+11)
+        if(x ~= '\0\0\0\0\0\0\0\0\0\0\0\0') then
+            count = count +1 
+        end
+            offset = offset+12
+    end
+    return count
+end
+
 function colconv(str, key)
     -- Taken from Battlemod
     strnum = tonumber(str)
@@ -187,7 +202,8 @@ end
  
 function get_party_members()
     if settings.highlighting then
-        for member, mob in pairs(windower.ffxi.get_party()) do
+        local party = windower.ffxi.get_party()
+        for member, mob in pairs(party) do
             if not mulenames[mob['name']:lower()] then
                 members[member] = mob['name']
                 modmember[member] = colour[member]..mob['name']..chat.controls.reset
@@ -200,7 +216,7 @@ function get_party_members()
 end
  
 --[[
-Copyright (c) 2013, Thomas Rogers
+Copyright (c) 2013-2014, Thomas Rogers
 All rights reserved.
  
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
