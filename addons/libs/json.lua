@@ -244,7 +244,7 @@ function json.classify(tokens, root)
                 else
                     return json.error('Unexpected token \',\'.', line)
                 end
-            elseif key_types:contains(type(token0) and modes:last() == 'new' and scopes:last() == 'object' then
+            elseif key_types:contains(type(token)) and modes:last() == 'new' and scopes:last() == 'object' then
                 keys:append(token)
                 modes[#modes] = 'key'
             elseif value_types:contains(type(token)) then
