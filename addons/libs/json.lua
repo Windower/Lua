@@ -127,7 +127,7 @@ function json.tokenize(content)
             end
         elseif not comment then
             -- If the character is a singleton character, append the previous token and this one, reset the parsing values.
-            if json.singletons:contains(c) then
+            if singletons:contains(c) then
                 if current ~= nil then
                     tokens[line]:append(json.make_val(current))
                     current = nil
