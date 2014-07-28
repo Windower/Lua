@@ -30,7 +30,7 @@
 
 
 function default(player_array,IDs)
-    if IDs.spells and ( (res.spells[ids.spells].levels[player_array.main_job_id] and res.spells[ids.spells].levels[player_array.main_job_id] <= player_array.main_job_level) or
+    if IDs.spells and ( (res.spells[IDs.spells].levels[player_array.main_job_id] and res.spells[IDs.spells].levels[player_array.main_job_id] <= player_array.main_job_level) or
       (res.spells[ids.spells].levels[player_array.sub_job_id] and res.spells[ids.spells].levels[player_array.sub_job_id] <= player_array.sub_job_level) ) then -- Should check to see if you know the spell
         return 'spells'
     elseif IDs.job_abilities and windower.ffxi.get_abilities().job_abilities[IDs.job_abilities] then
@@ -394,18 +394,18 @@ function ambig(key)
     local commands = get_available_commands()
     local slugged_commands = make_slugged_command_list(commands)
     
-    if slugged_commands[key] and slugged_commands[key].type ~= 'Ambiguous' then 
-    -- If the current usage is unambiguous because only one ability is available then...
-        return commands[slugged_commands[key].type][slugged_commands[key].id],slugged_commands[key].type
-    else  -- Otherwise it's actually ambiguous, so run the associated function and pass the known information.
-        abil_type=ambig_names[key]['funct'](windower.ffxi.get_player(),ambig_names[key].IDs,ambig_names[key].info,ambig_names[key].monster_abilities)
-        if res[abil_type] then
+    if slugged_commands[key] then
+        if slugged_commands[key].type == 'Ambiguous' then 
+        -- If the current usage is unambiguous because only one ability is available then...
+            abil_type=ambig_names[key]['funct'](windower.ffxi.get_player(),ambig_names[key].IDs,ambig_names[key].info,ambig_names[key].monster_abilities)
             return res[abil_type][ambig_names[key].IDs[abil_type]]
-        else
-            print('This should not be hit: '..tostring(abil_type))
+        else  -- Otherwise it's actually ambiguous, so run the associated function and pass the known information.
+            return commands[slugged_commands[key].type][slugged_commands[key].id],slugged_commands[key].type
         end
+    else
+        abil_type=default(windower.ffxi.get_player(),ambig_names[key].IDs,ambig_names[key].info,ambig_names[key].monster_abilities)
+        return res[abil_type][ambig_names[key].IDs[abil_type]]
     end
-    return '',''
 end
 
 

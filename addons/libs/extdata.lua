@@ -557,7 +557,7 @@ augment_values = {
         [0x542] = {{stat='Increases Ancient Magic II damage', offset=0,multiplier=0}},
         [0x543] = {{stat='Reduces Ancient Magic II casting time', offset=0,multiplier=0}},
         [0x544] = {{stat='Increases Ancient Magic II accuracy', offset=0,multiplier=0}},
-        [0x545] = {{stat='Increases Ancient Magic II MP cost', offset=0,multiplier=0}},
+        [0x545] = {{stat='Reduces Ancient Magic II MP cost', offset=0,multiplier=0}},
 
         [0x548] = {{stat='Enhances "Dia III" effect', offset=0,multiplier=0}},
         [0x549] = {{stat='Enhances "Slow II" effect', offset=0,multiplier=0}},

@@ -392,6 +392,28 @@ function is_trust_party()
 end
 
 
+-- Call these function with a list of equipment slots to check ('head', 'neck', 'body', etc)
+-- Returns true if any of the specified slots are currently encumbered.
+-- Returns false if all specified slots are unencumbered.
+function is_encumbered(...)
+	local check_list = {...}
+	-- Compensate for people passing a table instead of a series of strings.
+	if type(check_list[1]) == 'table' then
+		check_list = check_list[1]
+	end
+	local check_set = S(check_list)
+	
+	for slot_id,slot_name in pairs(gearswap.default_slot_map) do
+		if check_set:contains(slot_name) then
+			if gearswap.encumbrance_table[slot_id] then
+				return true
+			end
+		end
+	end
+	
+	return false
+end
+
 -------------------------------------------------------------------------------------------------------------------
 -- Elemental gear utility functions.
 -------------------------------------------------------------------------------------------------------------------
@@ -529,7 +551,9 @@ function load_sidecar(job)
 	if not job then return false end
 	
 	-- filename format example for user-local files: whm_gear.lua, or playername_whm_gear.lua
-	local filenames = {player.name..'_'..job..'_gear.lua', job..'_gear.lua', 'gear/'..player.name..'_'..job..'_gear.lua', 'gear/'..job..'_gear.lua'}
+	local filenames = {player.name..'_'..job..'_gear.lua', job..'_gear.lua',
+		'gear/'..player.name..'_'..job..'_gear.lua', 'gear/'..job..'_gear.lua',
+		'gear/'..player.name..'_'..job..'.lua', 'gear/'..job..'.lua'}
 	return optional_include(filenames)
 end
 

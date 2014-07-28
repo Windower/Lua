@@ -215,6 +215,7 @@ end
 ----    or the goal augments do not match the current augments.
 -----------------------------------------------------------------------------------
 function compare_augments(goal,current)
+    if not current then return false end
     local num_augments = 0
     local aug_strip = function(str)
         return str:lower():gsub('[^%-%w,]','')

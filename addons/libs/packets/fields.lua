@@ -522,6 +522,10 @@ fields.outgoing[0x077] = L{
     {ctype='unsigned short',    label='_unknown1'},                             -- 16
 }
 
+-- Party list request (4 byte packet)
+fields.outgoing[0x078] = L{
+}
+
 -- NPC buy
 -- Sent when buying an item from an NPC vendor
 fields.outgoing[0x083] = L{
