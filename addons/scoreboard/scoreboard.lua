@@ -324,7 +324,7 @@ function get_ally_mob_ids()
     for _, member in pairs(party) do
         if member.mob then
             allies:append(member.mob.id)
-            if member.mob.pet_index and member.mob.pet_index> 0 then
+            if member.mob.pet_index and member.mob.pet_index> 0 and windower.ffxi.get_mob_by_index(member.mob.pet_index) then
                 allies:append(windower.ffxi.get_mob_by_index(member.mob.pet_index).id)
             end
         end
@@ -465,7 +465,7 @@ end)
 
 
 --[[
-Copyright © 2013-2014, Jerry Hebert
+Copyright ï¿½ 2013-2014, Jerry Hebert
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
