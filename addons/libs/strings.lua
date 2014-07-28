@@ -219,6 +219,7 @@ function string.todec(numstr, base)
     -- Create a table of allowed values according to base and how much each is worth.
     local digits = {}
     local val = 0
+	local numstr_neg
     for c in ('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'):gmatch('.') do
         digits[c] = val
         val = val + 1
@@ -226,14 +227,21 @@ function string.todec(numstr, base)
             break
         end
     end
-
-    local index = base^(#numstr-1)
+	
+	if numstr:startswith('-') then 
+		numstr_neg = true
+		numstr = numstr:slice(2)
+	end
+    
+	local index = base^(#numstr-1)
     local acc = 0
     for c in numstr:gmatch('.') do
         acc = acc + digits[c]*index
         index = index/base
     end
 
+	if numstr_neg then acc = -acc end
+	
     return acc
 end
 
