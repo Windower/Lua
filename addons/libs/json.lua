@@ -127,7 +127,7 @@ function json.tokenize(content)
             end
         elseif not comment then
             -- If the character is a singleton character, append the previous token and this one, reset the parsing values.
-            if json.singletons:contains(c) then
+            if singletons:contains(c) then
                 if current ~= nil then
                     tokens[line]:append(json.make_val(current))
                     current = nil
@@ -244,7 +244,7 @@ function json.classify(tokens, root)
                 else
                     return json.error('Unexpected token \',\'.', line)
                 end
-            elseif key_types:contains(type(token0) and modes:last() == 'new' and scopes:last() == 'object' then
+            elseif key_types:contains(type(token0)) and modes:last() == 'new' and scopes:last() == 'object' then
                 keys:append(token)
                 modes[#modes] = 'key'
             elseif value_types:contains(type(token)) then
