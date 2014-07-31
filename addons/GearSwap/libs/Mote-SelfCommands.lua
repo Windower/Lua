@@ -189,6 +189,7 @@ function handle_cycle(cmdParams)
 	-- identifier for the field we're changing
 	local paramField = cmdParams[1]
 	local modeField = paramField
+	local order = (cmdParams[2] and S{'reverse', 'backwards', 'r'}:contains(cmdParams[2]:lower()) and 'backwards') or 'forward'
 
 	if paramField:endswith('mode') or paramField:endswith('Mode') then
 		-- Remove 'mode' from the end of the string
@@ -219,9 +220,16 @@ function handle_cycle(cmdParams)
 	end
 
 	-- Increment to the next index in the available modes.
-	index = index + 1
-	if index > #modeList then
-		index = 1
+	if order == 'forward' then
+		index = index + 1
+		if index > #modeList then
+			index = 1
+		end
+	else
+		index = index - 1
+		if index < 1 then
+			index = #modeList
+		end
 	end
 
 	-- Determine the new mode value based on the index.
