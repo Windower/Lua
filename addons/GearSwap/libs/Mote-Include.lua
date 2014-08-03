@@ -300,7 +300,7 @@ end
 
 function aftercast(spell)
 	if state.Buff[spell.english] ~= nil then
-		state.Buff[spell.english] = not spell.interrupted or buffactive[spell.english]
+		state.Buff[spell.english] = not spell.interrupted or buffactive[spell.english] or false
 	end
 	handle_actions(spell, 'aftercast')
 end

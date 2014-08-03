@@ -53,7 +53,7 @@ end
 
 
 -- Some mythics have special durations for level 1 and 2 aftermaths
-local special_aftermath_mythics = S{'Tizona', 'Kenkonken', 'Murgleis', 'Yagrush', 'Carnwenhan', 'Nirvana', 'Tupsimati'}
+local special_aftermath_mythics = S{'Tizona', 'Kenkonken', 'Murgleis', 'Yagrush', 'Carnwenhan', 'Nirvana', 'Tupsimati', 'Idris'}
 
 -- Call from job_precast() to setup aftermath information for custom timers.
 function custom_aftermath_timers_precast(spell)
