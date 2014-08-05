@@ -74,6 +74,13 @@
     <support>http://www.ffxiah.com/player/Ragnarok/Ikonic</support>
   </addon>
   <addon>
+    <name>boxdestroyer</name>
+    <author>Seth VanHeulen (Acacia@Odin)</author>
+    <description>Tracks and displays info about possible combinations for treasure caskets.</description>
+    <bugtracker>https://github.com/svanheulen/boxdestroyer-windower-addon/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Odin/Acacia</support>
+  </addon>
+  <addon>
     <name>Cancel</name>
     <author>Byrth</author>
     <description>Mimics the cancel plugin, but also accepts buff names instead of just IDs.</description>
