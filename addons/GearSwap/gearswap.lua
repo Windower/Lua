@@ -398,6 +398,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         
         local indi_byte = data:byte(0x59)
         if indi_byte%128/64 >= 1 then
+            local temp_indi = _ExtraData.player.indi
             _ExtraData.player.indi = {
                     element = res.elements[indi_byte%8][language],
                     element_id = indi_byte%8,
@@ -408,8 +409,22 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
             else
                 _ExtraData.player.indi.target = 'Ally'
             end
-        else
+            if not temp_indi then
+                -- There was not an indi spell up
+                refresh_globals()
+                equip_sets('indi_change',nil,_ExtraData.player.indi,true)
+            elseif temp_indi.element_id ~= _ExtraData.player.indi.element_id or temp_indi.target ~= _ExtraData.player.indi.target or temp_indi.size ~= _ExtraData.player.indi.size then
+                -- There was already an indi spell up, so check if it changed
+                refresh_globals()
+                equip_sets('indi_change',nil,temp_indi,false)
+                equip_sets('indi_change',nil,_ExtraData.player.indi,true)
+            end
+        elseif _ExtraData.player.indi then
+            -- An indi effect has been lost.
+            local temp_indi = _ExtraData.player.indi
             _ExtraData.player.indi = nil
+            refresh_globals()
+            equip_sets('indi_change',nil,temp_indi,false)
         end
     elseif id == 0x044 then
         -- No idea what this is doing
