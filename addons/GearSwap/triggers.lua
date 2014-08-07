@@ -142,7 +142,7 @@ end)
 -----------------------------------------------------------------------------------
 function inc_action(act)
     if gearswap_disabled or act.category == 1 then return end
-        
+    
     local temp_player_mob_table,temp_pet,pet_id = windower.ffxi.get_mob_by_index(player.index)
     if temp_player_mob_table.pet_index then
         temp_pet = windower.ffxi.get_mob_by_index(temp_player_mob_table.pet_index)
@@ -197,16 +197,18 @@ function inc_action(act)
     -- Category 4 contains real information, while Category 7 does not.
     -- I do not know if this will affect automatons being interrupted.
     
+    
     ts = find_command_registry_key('spell',spell)
     if (jas[act.category] or uses[act.category]) then
         if uses[act.category] and act.param == 28787 then
             spell.action_type = 'Interruption'
             spell.interrupted = true
         end
-        if ts or spell.prefix == '/item' then
+        if ts then --or spell.prefix == '/item' then
             -- Only aftercast things that were precasted.
             -- Also, there are some actions (like being paralyzed while casting Ninjutsu) that sends two result action packets. Block the second packet.
             refresh_globals()
+            command_registry[ts].midaction = false
             equip_sets(prefix..'aftercast',ts,spell)
         elseif debugging.command_registry then
             windower.add_to_chat(8,'GearSwap (Debug Mode): Hitting Aftercast without detecting an entry in command_registry')
@@ -227,7 +229,6 @@ function inc_action(act)
         ts = mk_command_registry_entry(spell)
         refresh_globals()
         command_registry[ts].pet_midaction = true
-        command_registry[ts].timestamp = os.time()
         equip_sets('pet_midcast',ts,spell)
     end
 end
