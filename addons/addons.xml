@@ -419,6 +419,13 @@
     <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
   </addon>
   <addon>
+    <name>translate</name>
+	<author>Byrth</author>
+    <description>Gives a rough JP->EN translation using the resources and custom dictionaries.</description>
+	<bugtracker>https://github.com/Byrth/Lua/issues</bugtracker>
+	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
+  </addon>
+  <addon>
     <name>Update</name>
     <author>Arcon</author>
     <description>Updates and reloads all plugins and addons when typing //update.</description>
