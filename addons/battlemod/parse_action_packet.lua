@@ -19,13 +19,13 @@ function parse_action_packet(act)
                 if res.action_messages[m.add_effect_message] then m.add_effect_fields = fieldsearch(res.action_messages[m.add_effect_message][language]) end
                 if res.action_messages[m.spike_effect_message] then m.spike_effect_fields = fieldsearch(res.action_messages[m.spike_effect_message][language]) end
 
-                if res.buffs[m.param] and m.param ~= 0 then
+                if res.buffs[m.param] then --and m.param ~= 0 then
                     m.status = res.buffs[m.param][language]
                 end
-                if res.buffs[m.add_effect_param] and m.add_effect_param ~= 0 then
+                if res.buffs[m.add_effect_param] then -- and m.add_effect_param ~= 0 then
                     m.add_effect_status = res.buffs[m.add_effect_param][language]
                 end
-                if res.buffs[m.spike_effect_param] and m.spike_effect_param ~= 0 then
+                if res.buffs[m.spike_effect_param] then -- and m.spike_effect_param ~= 0 then
                     m.spike_effect_status = res.buffs[m.spike_effect_param][language]
                 end
                 m.number = 1
@@ -126,13 +126,13 @@ function parse_action_packet(act)
             if tempact.has_spike_effect then
                 tempact.spike_effect_number = 1
             end
-            if res.buffs[tempact.param] and tempact.param ~= 0 then
+            if res.buffs[tempact.param] then -- and tempact.param ~= 0 then
                 tempact.status = res.buffs[tempact.param][language]
             end
-            if res.buffs[tempact.add_effect_param] and tempact.add_effect_param ~= 0 then
+            if res.buffs[tempact.add_effect_param] then -- and tempact.add_effect_param ~= 0 then
                 tempact.add_effect_status = res.buffs[tempact.add_effect_param][language]
             end
-            if res.buffs[tempact.spike_effect_param] and tempact.spike_effect_param ~= 0 then
+            if res.buffs[tempact.spike_effect_param] then -- and tempact.spike_effect_param ~= 0 then
                 tempact.spike_effect_status = res.buffs[tempact.spike_effect_param][language]
             end
         end

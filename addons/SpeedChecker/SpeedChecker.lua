@@ -1,9 +1,11 @@
 _addon.name = 'SpeedChecker'
 _addon.version = '1.0.0.0'
 
+config = require('config')
 texts = require('texts')
 
-speed = texts.new()
+settings = config.load({})
+speed = texts.new(settings)
 speed:show()
 
 get_speed = function()

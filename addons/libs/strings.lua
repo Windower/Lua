@@ -201,12 +201,12 @@ end
 
 -- Takes a padding character pad and pads the string str to the left of it, until len is reached. pad defaults to a space.
 function string.lpad(str, pad, len)
-    return (pad:rep(len)..str):sub(-(len > #str and len or #str))
+    return (pad:rep(len) .. str):sub(-(len > #str and len or #str))
 end
 
 -- Takes a padding character pad and pads the string str to the right of it, until len is reached. pad defaults to a space.
 function string.rpad(str, pad, len)
-    return (str..pad:rep(len)):sub(1, len > #str and len or #str)
+    return (str .. pad:rep(len)):sub(1, len > #str and len or #str)
 end
 
 -- Returns the string padded with zeroes until the length is len.
@@ -214,56 +214,9 @@ function string.zfill(str, len)
     return str:lpad('0', len)
 end
 
--- Converts a string in base base to a number.
-function string.todec(numstr, base)
-    -- Create a table of allowed values according to base and how much each is worth.
-    local digits = {}
-    local val = 0
-    for c in ('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'):gmatch('.') do
-        digits[c] = val
-        val = val + 1
-        if val == base then
-            break
-        end
-    end
-
-    local index = base^(#numstr-1)
-    local acc = 0
-    for c in numstr:gmatch('.') do
-        acc = acc + digits[c]*index
-        index = index/base
-    end
-
-    return acc
-end
-
--- Checks if a string is in a table.
--- DEPRECATED: Use (table|list|set).contains instead
-function string.isin(str, t)
-    for _, arg in pairs(t) do
-        if arg == str then
-            return true
-        end
-    end
-
-    return false
-end
-
 -- Checks if a string is empty.
 function string.empty(str)
     return str == ''
-end
-
--- Returns a slug of a string.
-function string.slug(str)
-    return str
-        :gsub(' I$', '1')
-        :gsub(' II$', '2')
-        :gsub(' III$', '3')
-        :gsub(' IV$', '4')
-        :gsub(' V$', '5')
-        :gsub('[^%w]', '')
-        :lower()
 end
 
 -- Returns a string with Lua pattern characters escaped.

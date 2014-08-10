@@ -197,7 +197,9 @@ init_include()
 -- versions of this function.
 if not file_unload then
 	file_unload = function()
-		if job_file_unload then
+		if user_unload then
+			user_unload()
+		elseif job_file_unload then
 			job_file_unload()
 		end
 		_G[(binds_on_unload and 'binds_on_unload') or 'global_on_unload']()
@@ -286,6 +288,9 @@ function pretarget(spell)
 end
 
 function precast(spell)
+	if state.Buff[spell.english] ~= nil then
+		state.Buff[spell.english] = true
+	end
 	handle_actions(spell, 'precast')
 end
 
@@ -294,6 +299,9 @@ function midcast(spell)
 end
 
 function aftercast(spell)
+	if state.Buff[spell.english] ~= nil then
+		state.Buff[spell.english] = not spell.interrupted or buffactive[spell.english] or false
+	end
 	handle_actions(spell, 'aftercast')
 end
 
@@ -966,6 +974,8 @@ function sub_job_change(newSubjob, oldSubjob)
 	if job_sub_job_change then
 		job_sub_job_change(newSubjob, oldSubjob)
 	end
+	
+	send_command('gs c update')
 end
 
 
@@ -1001,6 +1011,10 @@ end
 function buff_change(buff, gain)
 	-- Init a new eventArgs
 	local eventArgs = {handled = false}
+
+	if state.Buff[buff] ~= nil then
+		state.Buff[buff] = gain
+	end
 
 	-- Allow a global function to be called on buff change.
 	if user_buff_change then

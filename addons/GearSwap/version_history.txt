@@ -1,4 +1,8 @@
 -------------------------------------------------
+GearSwap 0.875 - Changed command_registry handling slightly
+-------------------------------------------------
+GearSwap 0.874 - Added indi_change event
+-------------------------------------------------
 GearSwap 0.873 - Adjusted midaction and pet_midaction.
 -------------------------------------------------
 GearSwap 0.872 - Fixed Encumbrance, Job Change issues, and a nil error on login.

@@ -77,6 +77,7 @@ end
 
 for i,v in pairs(res.items) do
     if v.targets and table.length(v.targets) ~= 0 then
+        v.prefix = '/item'
         make_entry(v,i)
     end
 end

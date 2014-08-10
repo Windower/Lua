@@ -578,6 +578,7 @@ function mk_command_registry_entry(sp)
     command_registry[ts] = {}
     command_registry[ts].cast_delay = 0
     command_registry[ts].spell = sp
+    command_registry[ts].timestamp = ts
     if debugging.command_registry then
         windower.add_to_chat(8,'GearSwap (Debug Mode): Creating a new command_registry entry: '..windower.to_shift_jis(tostring(ts)..' '..tostring(command_registry[ts])))
     end
@@ -668,7 +669,7 @@ function find_command_registry_by_time(target)
     -- possible that matches the target type.
     -- Call aftercast with this spell's information (interrupted) if one is found.
     for i,v in pairs(command_registry) do
-        if not time_stamp or (v.timestamp and ((time_now - v.timestamp) < (time_now - time_stamp))) then -- (target == 'player' and v.midaction or target=='pet' and v.pet_midaction) and v.timestamp and 
+        if not time_stamp or (v.timestamp and ((time_now - v.timestamp) < (time_now - time_stamp))) then
             time_stamp = v.timestamp
             ts = i
         end
@@ -713,7 +714,7 @@ end
 ---- spell - Resource line of the current spell
 -----------------------------------------------------------------------------------
 function get_spell(act)
-    local spell, abil_ID, effect_val = {}
+    local spell, abil_ID, effect_val
     local msg_ID = act.targets[1].actions[1].message
     
     if T{7,8,9}:contains(act.category) then
@@ -786,9 +787,11 @@ function get_spell(act)
             spell = spell_complete(spell)
         end
     end
-        
-    spell.name = spell[language]
-    spell.interrupted = false
+    
+    if spell then
+        spell.name = spell[language]
+        spell.interrupted = false
+    end
     
     return spell
 end

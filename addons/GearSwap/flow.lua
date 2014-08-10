@@ -100,9 +100,8 @@ function equip_sets(swap_type,ts,...)
     
     if type(swap_type) == 'string' and (swap_type == 'pretarget' or swap_type == 'filtered_action') then -- Target may just have been changed, so make the ind now.
         ts = mk_command_registry_entry(val1)
-    elseif type(swap_type) == 'string' and swap_type == 'precast' then
-        if not command_registry[ts] then if debugging.command_registry then print_set(spell,'precast nil error') end
-        else command_registry[ts].timestamp = os.time() end
+    elseif type(swap_type) == 'string' and swap_type == 'precast' and not command_registry[ts] and debugging.command_registry then
+        print_set(spell,'precast nil error')
     end
     
     if player.race ~= 'Precomposed NPC' then
@@ -253,19 +252,21 @@ function equip_sets_exit(swap_type,ts,val1)
             equip_sets('aftercast',ts,val1)
         elseif swap_type == 'aftercast' then
             if ts then
-                for i,v in pairs(command_registry) do
-                    if v.midaction then
-                        command_registry[i] = nil
-                    end
-                end
+                command_registry[ts] = nil
+--                for i,v in pairs(command_registry) do
+--                    if v.midaction then
+--                        command_registry[i] = nil
+--                    end
+--                end
             end
         elseif swap_type == 'pet_aftercast' then
             if ts then
-                for i,v in pairs(command_registry) do
-                    if v.pet_midaction then
-                        command_registry[i] = nil
-                    end
-                end
+                command_registry[ts] = nil
+--                for i,v in pairs(command_registry) do
+--                    if v.pet_midaction then
+--                        command_registry[i] = nil
+--                    end
+--                end
             end
         end
     end
