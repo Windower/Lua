@@ -102,25 +102,13 @@ windower.register_event('addon command',function (...)
         end
     elseif cmd == 'equip' then
         if gearswap_disabled then return end
-        local set_split = string.split(_raw.table.concat(splitup,' ',2,#splitup):gsub('%[','%.'):gsub('[%]\']',''),'.')
-        local n = 1
-        local tempset
-        if set_split[1] == 'sets' then tempset = user_env
-        else tempset = user_env.sets end
-        while n <= #set_split do
-            if tempset[set_split[n]] or tempset[tonumber(set_split[n])] then
-                tempset = tempset[set_split[n]] or tempset[tonumber(set_split[n])]
-                if n == #set_split then
-                    refresh_globals()
-                    equip_sets('equip_command',nil,tempset)
-                    break
-                else
-                    n = n+1
-                end
-            else
-                windower.add_to_chat(123,'GearSwap: Equip command cannot be completed. That set does not exist.')
-                break
-            end
+        local key_list = parse_set_to_keys(table.slice(splitup, 2))
+        local set = get_set_from_keys(key_list)
+        if set then
+            refresh_globals()
+            equip_sets('equip_command',nil,set)
+        else
+            windower.add_to_chat(123,'GearSwap: Equip command cannot be completed. That set does not exist.')
         end
     elseif cmd == 'export' then
         table.remove(splitup,1)

@@ -335,6 +335,90 @@ end
 
 
 -----------------------------------------------------------------------------------
+----Name: parse_set_to_keys(str)
+-- Function to parse a string representation of a table into a list of keys that
+-- that can be used to select that table.
+----Args:
+-- str - Input can be a string, or a table of strings (which will be processed cumulatively, in order).
+--
+-- Example:
+-- Input: sets.precast.WS["Rudra's Storm"]['Ltng. Threnody'].Acc
+-- Output: [sets, precast, WS, Rudra's Storm, Ltng. Threnody, Acc]
+-----------------------------------------------------------------------------------
+----Returns:
+-- Returns a list of keys parsed from the provided input.
+-----------------------------------------------------------------------------------
+function parse_set_to_keys(str)
+    if type(str) == 'string' then
+        str = {str}
+    end
+    
+    -- Parsing results get pushed into the res list.
+    local res = L{}
+
+    local remainder
+    local key
+    local stop
+    local sep = '.'
+    local count = 0
+    
+    while #str > 0 do
+        remainder = table.remove(str, 1)
+        
+        -- Loop as long as remainder hasn't been nil'd or reduced to 0 characters, but only to a maximum of 30 tries.
+        while remainder and #remainder and count < 30 do
+            -- Try aaa.bbb set names first
+            while sep == '.' do
+                _,_,key,sep,remainder = remainder:find("^([^%.%[]*)(%.?%[?)(.*)")
+                res:append(key)
+            end
+            
+            -- Then try aaa['bbb'] set names.
+            -- Be sure to account for both single and double quote enclosures.
+            -- Ignore periods contained within quote strings.
+            while sep == '[' do
+                _,_,sep,remainder = remainder:find([=[^(%'?%"?)(.*)]=]) --' --block bad text highlighting
+                if sep == "'" then
+                    _,_,key,stop,sep,remainder = remainder:find("^([^']+)('])(%.?%[?)(.*)")
+                elseif sep == '"' then
+                    _,_,key,stop,sep,remainder = remainder:find('^([^"]+)("])(%.?%[?)(.*)')
+                end
+                res:append(key)
+            end
+            
+            count = count +1
+        end
+    end
+
+    return res
+end
+
+-----------------------------------------------------------------------------------
+----Name: get_set_from_keys(keys)
+-- Function to take a list of keys select the set they point to, if possible.
+----Args:
+-- keys - A List of strings intended to be keys in progressively nested tables.
+-- The list is presumed to be based on the 'sets' table, and will start from that
+-- point if it is not explicitly provided in the key list.
+-----------------------------------------------------------------------------------
+----Returns:
+-- Returns the set if found, or nil if not.
+-----------------------------------------------------------------------------------
+function get_set_from_keys(keys)
+    local set = keys[1] == 'sets' and _G or sets
+    for key in (keys.it or it)(keys) do
+        set = set[key]
+        if not set then
+            return nil
+        end
+    end
+
+    return set
+end
+
+
+
+-----------------------------------------------------------------------------------
 --Name: assemble_action_packet(target_id,target_index,category,spell_id)
 --Desc: Puts together an "action" packet (0x1A)
 --Args:
