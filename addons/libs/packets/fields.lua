@@ -444,7 +444,7 @@ fields.outgoing[0x050] = L{
 }
 
 -- Equipset
-fields.incoming[0x51] = L{
+fields.outgoing[0x51] = L{
     {ctype='unsigned int',      label='_unknown1'},                             -- 04  First char is probably the number of items to be equipped
     -- This packet is an array of 4-bytes with the following structure:
     {ctype='unsigned char',     label='Inventory Index'},                       -- 08
@@ -456,7 +456,7 @@ fields.incoming[0x51] = L{
 }
 
 -- Build Equipset
-fields.incoming[0x52] = L{
+fields.outgoing[0x52] = L{
     {ctype='unsigned int',      label='_unknown1'},                             -- 04  First char is probably the number of items to be equipped?
     -- This packet is an array of 4-bytes with the following structure:
     {ctype='unsigned char',     label='Bag indicator'},                         -- 08  01 if it is in inventory. 0x21 observed for a Wardrobe item
