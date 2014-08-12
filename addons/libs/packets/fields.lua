@@ -443,6 +443,27 @@ fields.outgoing[0x050] = L{
     {ctype='data[1]',           label='_junk1'}                                 -- 07
 }
 
+-- Equipset
+fields.incoming[0x51] = L{
+    {ctype='unsigned int',      label='_unknown1'},                             -- 04  First char is probably the number of items to be equipped
+    -- This packet is an array of 4-bytes with the following structure:
+    {ctype='unsigned char',     label='Inventory Index'},                       -- 08
+    {ctype='unsigned char',     label='Equipment Slot'},                        -- 09
+    {ctype='unsigned char',     label='Bag ID'},                                -- 0A
+    {ctype='unsigned char',     label='_junk1'},                                -- 0B
+    -- The first 16 are filled with the equip commands that were sent out
+    -- The last 16 indicate the currently equipped gear.
+}
+
+-- Build Equipset
+fields.incoming[0x52] = L{
+    {ctype='unsigned int',      label='_unknown1'},                             -- 04  First char is probably the number of items to be equipped?
+    -- This packet is an array of 4-bytes with the following structure:
+    {ctype='unsigned char',     label='Bag indicator'},                         -- 08  01 if it is in inventory. 0x21 observed for a Wardrobe item
+    {ctype='unsigned char',     label='Equipment Slot'},                        -- 09
+    {ctype='unsigned short',    label='Item ID'},                               -- 0A
+}
+
 -- Conquest
 fields.outgoing[0x05A] = L{
 }
@@ -2412,6 +2433,25 @@ fields.incoming[0x115] = L{
     {ctype='unsigned short',    label='_unknown5'},                             -- 10
     {ctype='unsigned short',    label='_unknown6'},                             -- 12
     {ctype='unsigned int',      label='Catch Key'},                             -- 14   This value is used in the catch key of the 0x110 packet when catching a fish
+}
+
+-- Equipset build echo
+fields.incoming[0x116] = L{
+    -- This packet is an array of 4-bytes with the following structure:
+    {ctype='unsigned char',     label='Bag indicator'},                         -- 04  01 if it is in inventory. 0x21 observed for a Wardrobe item
+    {ctype='unsigned char',     label='Equipment Slot'},                        -- 05
+    {ctype='unsigned short',    label='Item ID'},                               -- 06  Not slot ID or inventory ID, item ID
+}
+
+-- Equipset echo
+fields.incoming[0x117] = L{
+    -- This packet is an array of 4-bytes with the following structure:
+    {ctype='unsigned char',     label='Inventory Index'},                       -- 04
+    {ctype='unsigned char',     label='Equipment Slot'},                        -- 05
+    {ctype='unsigned char',    label='Bag ID'},                                 -- 06
+    {ctype='unsigned char',    label='_junk1'},                                 -- 07
+    -- The first 16 are filled with the equip commands that were sent out
+    -- The last 16 indicate the currently equipped gear.
 }
 
 local sizes = {}
