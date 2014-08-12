@@ -500,6 +500,20 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         player.vitals.tp = data:unpack('I',0x11)
         player.vitals.hpp = data:byte(0x17)
         player.vitals.mpp = data:byte(0x18)
+    elseif id == 0x117 then
+        for i=0x48,4,0x84 do
+            local arr = data:sub(i,i+3)
+            local inv = items[to_windower_api(res.bags[arr:byte(3)].english)]
+            if arr:byte(1) ~= 0 then
+                items.equipment[toslotname(arr:byte(2))] = {slot=arr:byte(1),bag_id = arr:byte(3)}
+                if not inv[arr:byte(1)] then inv[arr:byte(1)] = make_empty_item_table(arr:byte(1)) end
+                items[to_windower_api(res.bags[arr:byte(3)].english)][arr:byte(1)].status = 5 -- Set the status to "equipped"
+            else
+                items.equipment[toslotname(arr:byte(2))] = {slot=empty,bag_id=0}
+                if not inv[arr:byte(1)] then inv[arr:byte(1)] = make_empty_item_table(arr:byte(1)) end
+                items[to_windower_api(res.bags[arr:byte(3)].english)][arr:byte(1)].status = 0 -- Set the status to "unequipped"
+            end
+        end
     end
 end)
 
