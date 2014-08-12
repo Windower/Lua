@@ -102,25 +102,13 @@ windower.register_event('addon command',function (...)
         end
     elseif cmd == 'equip' then
         if gearswap_disabled then return end
-        local set_split = string.split(_raw.table.concat(splitup,' ',2,#splitup):gsub('%[','%.'):gsub('[%]\']',''),'.')
-        local n = 1
-        local tempset
-        if set_split[1] == 'sets' then tempset = user_env
-        else tempset = user_env.sets end
-        while n <= #set_split do
-            if tempset[set_split[n]] or tempset[tonumber(set_split[n])] then
-                tempset = tempset[set_split[n]] or tempset[tonumber(set_split[n])]
-                if n == #set_split then
-                    refresh_globals()
-                    equip_sets('equip_command',nil,tempset)
-                    break
-                else
-                    n = n+1
-                end
-            else
-                windower.add_to_chat(123,'GearSwap: Equip command cannot be completed. That set does not exist.')
-                break
-            end
+        local key_list = parse_set_to_keys(table.slice(splitup, 2))
+        local set = get_set_from_keys(key_list)
+        if set then
+            refresh_globals()
+            equip_sets('equip_command',nil,set)
+        else
+            windower.add_to_chat(123,'GearSwap: Equip command cannot be completed. That set does not exist.')
         end
     elseif cmd == 'export' then
         table.remove(splitup,1)
@@ -512,6 +500,20 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         player.vitals.tp = data:unpack('I',0x11)
         player.vitals.hpp = data:byte(0x17)
         player.vitals.mpp = data:byte(0x18)
+    elseif id == 0x117 then
+        for i=0x48,4,0x84 do
+            local arr = data:sub(i,i+3)
+            local inv = items[to_windower_api(res.bags[arr:byte(3)].english)]
+            if arr:byte(1) ~= 0 then
+                items.equipment[toslotname(arr:byte(2))] = {slot=arr:byte(1),bag_id = arr:byte(3)}
+                if not inv[arr:byte(1)] then inv[arr:byte(1)] = make_empty_item_table(arr:byte(1)) end
+                items[to_windower_api(res.bags[arr:byte(3)].english)][arr:byte(1)].status = 5 -- Set the status to "equipped"
+            else
+                items.equipment[toslotname(arr:byte(2))] = {slot=empty,bag_id=0}
+                if not inv[arr:byte(1)] then inv[arr:byte(1)] = make_empty_item_table(arr:byte(1)) end
+                items[to_windower_api(res.bags[arr:byte(3)].english)][arr:byte(1)].status = 0 -- Set the status to "unequipped"
+            end
+        end
     end
 end)
 
