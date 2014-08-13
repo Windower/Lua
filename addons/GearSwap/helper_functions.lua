@@ -339,7 +339,8 @@ end
 -- Function to parse a string representation of a table into a list of keys that
 -- that can be used to select that table.
 ----Args:
--- str - Input can be a string, or a table of strings (which will be processed cumulatively, in order).
+-- str - Input can be a string, or a table of strings (which will be concatenated
+-- into a single string with spaces as intervals).
 --
 -- Example:
 -- Input: sets.precast.WS["Rudra's Storm"]['Ltng. Threnody'].Acc
@@ -349,48 +350,46 @@ end
 -- Returns a list of keys parsed from the provided input.
 -----------------------------------------------------------------------------------
 function parse_set_to_keys(str)
-    if type(str) == 'string' then
-        str = {str}
+	if type(str) == 'table' then
+		str = table.concat(str, ' ')
     end
     
-    -- Parsing results get pushed into the res list.
-    local res = L{}
+    -- Parsing results get pushed into the result list.
+    local result = L{}
 
-    local remainder
+    local remainder = str
     local key
     local stop
     local sep = '.'
     local count = 0
     
-    while #str > 0 do
-        remainder = table.remove(str, 1)
-        
-        -- Loop as long as remainder hasn't been nil'd or reduced to 0 characters, but only to a maximum of 30 tries.
-        while remainder and #remainder and count < 30 do
-            -- Try aaa.bbb set names first
-            while sep == '.' do
-                _,_,key,sep,remainder = remainder:find("^([^%.%[]*)(%.?%[?)(.*)")
-                res:append(key)
-            end
-            
-            -- Then try aaa['bbb'] set names.
-            -- Be sure to account for both single and double quote enclosures.
-            -- Ignore periods contained within quote strings.
-            while sep == '[' do
-                _,_,sep,remainder = remainder:find([=[^(%'?%"?)(.*)]=]) --' --block bad text highlighting
-                if sep == "'" then
-                    _,_,key,stop,sep,remainder = remainder:find("^([^']+)('])(%.?%[?)(.*)")
-                elseif sep == '"' then
-                    _,_,key,stop,sep,remainder = remainder:find('^([^"]+)("])(%.?%[?)(.*)')
-                end
-                res:append(key)
-            end
-            
-            count = count +1
+    print('start', remainder)
+    
+    -- Loop as long as remainder hasn't been nil'd or reduced to 0 characters, but only to a maximum of 30 tries.
+    while remainder and #remainder and count < 30 do
+        -- Try aaa.bbb set names first
+        while sep == '.' do
+            _,_,key,sep,remainder = remainder:find("^([^%.%[]*)(%.?%[?)(.*)")
+            result:append(key)
         end
+        
+        -- Then try aaa['bbb'] set names.
+        -- Be sure to account for both single and double quote enclosures.
+        -- Ignore periods contained within quote strings.
+        while sep == '[' do
+            _,_,sep,remainder = remainder:find([=[^(%'?%"?)(.*)]=]) --' --block bad text highlighting
+            if sep == "'" then
+                _,_,key,stop,sep,remainder = remainder:find("^([^']+)('])(%.?%[?)(.*)")
+            elseif sep == '"' then
+                _,_,key,stop,sep,remainder = remainder:find('^([^"]+)("])(%.?%[?)(.*)')
+            end
+            result:append(key)
+        end
+        
+        count = count +1
     end
 
-    return res
+    return result
 end
 
 -----------------------------------------------------------------------------------
@@ -407,6 +406,9 @@ end
 function get_set_from_keys(keys)
     local set = keys[1] == 'sets' and _G or sets
     for key in (keys.it or it)(keys) do
+    	if key == nil then
+    		return nil
+    	end
         set = set[key]
         if not set then
             return nil
