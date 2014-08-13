@@ -1,3 +1,4 @@
+--[[
 Copyright (c) 2014, Mujihina
 All rights reserved.
 
@@ -23,26 +24,33 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+]]
 
--- Short script to generate a list of what items you have can be stored in a slip
+-- Short script to generate a list of what items you have can be stored in a slip or with event storage NPC
 
 require('luau')
 
-local slips = require('slips')
-local res   = require ('resources').items
-local items = windower.ffxi.get_items()
-
+local slips       = require('slips')
+local res         = require ('resources').items
+local items       = windower.ffxi.get_items()
+local event_items = require ('event_items')
 
 for _,container in pairs (slips.default_storages) do
     for _,item in ipairs (items[container]) do
         if (item.id > 0) then
+            if (event_items:contains(item.id)) then
+                log ("%s:%s can be stored with %s":format(container:color(259), res[item.id].name:color(258), "Event Storage NPC":color(261)))
+            end                 
             for slip_id,slip_table in pairs (slips.items) do
-                for _,j in ipairs (slip_table) do
-                    if (j == item.id) then
-                        log ("%s:%s can be stored in %s":format(container:color(259), res[item.id].name:color(258), res[slip_id].name:color(240)))
-                    end
+               for _,j in ipairs (slip_table) do
+                   if (j == item.id) then
+                       log ("%s:%s can be stored in %s":format(container:color(259), res[item.id].name:color(258), res[slip_id].name:color(240)))
+                   end
                 end
             end
         end
     end
 end
+
+
+
