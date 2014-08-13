@@ -81,6 +81,8 @@ windower.register_event('addon command', function(...)
             print('OhShi Showrolls:', settings.showrolls)
             print('OhShi Selfrolls:', settings.selfrolls)
             settings:save('all')
+        elseif comm == "staggeronly" then
+            settings.staggeronly = true
         elseif comm == 'duration' then
             if tonumber(args[1]) then
                 settings.duration = tonumber(args[1])
