@@ -78,4 +78,4 @@ trusts = S{'Kupipi','Excenmille','Naji','Ayame','Zeid','Curilla',
             'Luzaf','Najelith', 'Maat','Gessho','Aldo','Moogle','Fablinix',
             'D.Shantotto','Elvira','Noillurie','LhuMhakaracca','FerreousCoffin',
             'StarSibyl','Mumor'}]]
-trusts = res.spells:type('Trust'):gsub(' ','')
+trusts = res.spells:type('Trust'):map(string.gsub-{' ', ''} .. table.get-{'name'})
