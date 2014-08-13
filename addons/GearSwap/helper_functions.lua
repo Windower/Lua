@@ -350,8 +350,8 @@ end
 -- Returns a list of keys parsed from the provided input.
 -----------------------------------------------------------------------------------
 function parse_set_to_keys(str)
-	if type(str) == 'table' then
-		str = table.concat(str, ' ')
+    if type(str) == 'table' then
+        str = table.concat(str, ' ')
     end
     
     -- Parsing results get pushed into the result list.
@@ -406,9 +406,9 @@ end
 function get_set_from_keys(keys)
     local set = keys[1] == 'sets' and _G or sets
     for key in (keys.it or it)(keys) do
-    	if key == nil then
-    		return nil
-    	end
+        if key == nil then
+            return nil
+        end
         set = set[key]
         if not set then
             return nil
