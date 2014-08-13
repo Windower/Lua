@@ -363,8 +363,6 @@ function parse_set_to_keys(str)
     local sep = '.'
     local count = 0
     
-    print('start', remainder)
-    
     -- Loop as long as remainder hasn't been nil'd or reduced to 0 characters, but only to a maximum of 30 tries.
     while remainder and #remainder and count < 30 do
         -- Try aaa.bbb set names first

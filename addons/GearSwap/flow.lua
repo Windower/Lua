@@ -143,7 +143,7 @@ function equip_sets(swap_type,ts,...)
                     chunk_table:append(equip_piece(eq_slot_id,equip_next[eq_slot_id].bag_id,equip_next[eq_slot_id].slot))
                 end
             end
-            if chunk_table.n >= 9 then
+            if chunk_table.n >= 3 then
                 local big_chunk = string.char(0x51,0x24,0,0,chunk_table.n,0,0,0)
                 for i=1,chunk_table.n do
                     big_chunk = big_chunk..chunk_table[i]

@@ -501,7 +501,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         player.vitals.hpp = data:byte(0x17)
         player.vitals.mpp = data:byte(0x18)
     elseif id == 0x117 then
-        for i=0x48,4,0x84 do
+        for i=0x49,0x85,4 do
             local arr = data:sub(i,i+3)
             local inv = items[to_windower_api(res.bags[arr:byte(3)].english)]
             if arr:byte(1) ~= 0 then
