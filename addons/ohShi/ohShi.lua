@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 _addon.name = 'OhShi'
-_addon.version = '2.53'
+_addon.version = '2.54'
 _addon.author = 'Nitrous (Shiva)'
 _addon.command = 'ohshi'
 
@@ -82,7 +82,8 @@ windower.register_event('addon command', function(...)
             print('OhShi Selfrolls:', settings.selfrolls)
             settings:save('all')
         elseif comm == "staggeronly" then
-            settings.staggeronly = true
+            settings.staggeronly = not settings.sstaggeronly
+            print('OhShi Stagger Only mode:', settings.staggeronly)
         elseif comm == 'duration' then
             if tonumber(args[1]) then
                 settings.duration = tonumber(args[1])
