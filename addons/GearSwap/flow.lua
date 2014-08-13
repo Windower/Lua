@@ -137,9 +137,22 @@ function equip_sets(swap_type,ts,...)
             debug_mode_chat("Cannot change gear right now: "..tostring(failure_reason))
             logit('\n\n'..tostring(os.clock)..'(69) failure_reason: '..tostring(failure_reason))
         else
+            local chunk_table = L{}
             for eq_slot_id,_ in priority_order(priorities) do
                 if equip_next[eq_slot_id] and not encumbrance_table[eq_slot_id] and not _settings.demo_mode then
-                    equip_piece(eq_slot_id,equip_next[eq_slot_id].bag_id,equip_next[eq_slot_id].slot)
+                    chunk_table:append(equip_piece(eq_slot_id,equip_next[eq_slot_id].bag_id,equip_next[eq_slot_id].slot))
+                end
+            end
+            if chunk_table.n >= 9 then
+                local big_chunk = string.char(0x51,0x24,0,0,chunk_table.n,0,0,0)
+                for i=1,chunk_table.n do
+                    big_chunk = big_chunk..chunk_table[i]
+                end
+                while string.len(big_chunk) < 0x48 do big_chunk = big_chunk..string.char(0) end
+                windower.packets.inject_outgoing(0x51,big_chunk)
+            elseif chunk_table.n > 0 then
+                for i=1,chunk_table.n do
+                    windower.packets.inject_outgoing(0x50,string.char(0x50,4,0,0)..chunk_table[i])
                 end
             end
         end
