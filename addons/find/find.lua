@@ -46,10 +46,12 @@ local bags = {
 }
 
 local function print_found_items(bag_name, items)
-  local line = '%s: %s (%d)'
-
   for _, item in pairs(items) do
-    log(line:format(bag_name, item.name, item.count))
+    if item.count > 1 then
+      log('%s: %s (%d)':format(bag_name, item.name, item.count))
+    else
+      log('%s: %s':format(bag_name, item.name))
+    end
   end
 end
 
