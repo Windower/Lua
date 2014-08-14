@@ -1,6 +1,6 @@
 # Find
 
-This addon searches your bags for items with names containing a given string (case-insensitive) and prints the search results in your chat log.
+This addon is a functional copy of the "Find" plugin for Windower. It searches your bags for items with names containing a given string (case-insensitive) and prints the search results in your chat log.
 
 ### Example
 
