@@ -1,4 +1,4 @@
-_addon.name = 'Find'
+_addon.name = 'find'
 _addon.author = 'Skudo'
 _addon.version = '1.0.0.0'
 _addon.command = 'find'
