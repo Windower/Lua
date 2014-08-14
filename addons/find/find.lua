@@ -45,7 +45,7 @@ local bags = {
   case = 'Mog Case'
 }
 
-function print_found_items(bag_name, items)
+local function print_found_items(bag_name, items)
   local line = '%s: %s (%d)'
 
   for _, item in pairs(items) do
@@ -53,7 +53,7 @@ function print_found_items(bag_name, items)
   end
 end
 
-function find_items_in_bag(bag, input)
+local function find_items_in_bag(bag, input)
   local found_items = {}
 
   for _, object in pairs(bag) do
@@ -75,7 +75,7 @@ function find_items_in_bag(bag, input)
   return found_items
 end
 
-function find_items(input)
+local function find_items(input)
   local owned_items = windower.ffxi.get_items()
   local found_items = {}
 
