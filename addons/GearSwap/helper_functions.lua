@@ -681,7 +681,13 @@ end
 -----------------------------------------------------------------------------------
 function remove_old_command_registry_entries(ts)
     for i,v in pairs(command_registry) do
-        if ts-i >= 20 then
+        local lim = 20 -- 20 second default limit (good for spells?)
+        if v.spell and v.spell.action_type then
+            if delay_map_to_action_type[v.spell.action_type] then
+                lim = delay_map_to_action_type[v.spell.action_type]
+            end
+        end
+        if ts-i >= lim then
             command_registry[i] = nil
         end
     end
