@@ -35,6 +35,7 @@ require 'logger'
 
 local items = {}
 local bags = {
+  temporary = 'Temporary',
   inventory = 'Inventory',
   safe = 'Mog Safe',
   storage = 'Storage',
