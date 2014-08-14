@@ -9,6 +9,7 @@ require 'logger'
 
 local items = {}
 local bags = {
+  inventory = 'Inventory',
   safe = 'Mog Safe',
   storage = 'Storage',
   locker = 'Mog Locker',
