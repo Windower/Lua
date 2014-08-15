@@ -148,6 +148,8 @@ function search(query, export)
         end
     end
 
+    local total_quantity = 0
+
     for _, character_name in ipairs(sorted_names) do
         if (character_set:length() == 0 or character_set:contains(character_name)) and not character_filter:contains(character_name) then
             local storages = global_storages[character_name]
@@ -159,6 +161,7 @@ function search(query, export)
                     for id, quantity in pairs(storages[storage_name]) do
                         if results_items:contains(id) then
                             if terms_pattern ~= '' then
+                                total_quantity = total_quantity + quantity
                                 results:append(
                                     (character_name..'/'..storage_name..':'):color(259)..' '..
                                     item_names[id].name:gsub('('..terms_pattern..')', ('%1'):color(258))..
@@ -188,6 +191,10 @@ function search(query, export)
                 end
             end
         end
+    end
+
+    if total_quantity > 0 then
+        log('Total: ' .. total_quantity)
     end
 
     if export_file ~= nil then
