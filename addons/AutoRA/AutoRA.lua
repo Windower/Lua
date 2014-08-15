@@ -27,7 +27,7 @@
 
 windower.register_event('load',function ()
 
-	version = '2.0.0'
+	version = '2.1.0'
 	delay = 0
 	RW_delay = 0
 	Ammo_delay = 0
@@ -92,21 +92,24 @@ windower.register_event('action',function (act)
 	local player = windower.ffxi.get_player()
 	
 	if ((actor == (player.id or player.index))) then
-		if category == 2 then
-			if auto == 1 then
-				if  player.status == 1 then
-					auto = 1
-				elseif  player.status == 0 then
-					auto = 0
+		if player.vitals['tp'] < 1000 then
+			if category == 2 then
+				if auto == 1 then
+					if  player.status == 1 then
+						auto = 1
+					elseif  player.status == 0 then
+						auto = 0
+					end
+				end
+			
+				if auto == 1 then
+					windower.send_command('@wait 1.5;input /shoot <t>')
+				elseif auto == 0 then
 				end
 			end
-			
-			if auto == 1 then
-				windower.send_command('@wait 1.5;input /shoot <t>')
-			elseif auto == 0 then
-			end
+		else
+			windower.add_to_chat(100, 'AutoRA  HALTING AT 1000 TP ~~~~~~~~~~~~~~')
 		end
-	end
 end)
 
 --Function Designer:  Byrth
