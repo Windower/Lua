@@ -27,7 +27,7 @@
 
 windower.register_event('load',function ()
 
-	version = '2.1.0'
+	version = '2.1.2'
 	delay = 0
 	RW_delay = 0
 	Ammo_delay = 0
@@ -42,7 +42,7 @@ windower.register_event('load',function ()
 end)
 	
 function start()
-	windower.add_to_chat(100, 'AutoRA  STARTING~~~~~~~~~~~~~~')	
+	windower.add_to_chat(17, 'AutoRA  STARTING~~~~~~~~~~~~~~')	
 	player = windower.ffxi.get_player()
 	if player.status == 1 then
 		auto = 1
@@ -53,7 +53,7 @@ function start()
 end
 
 function stop()
-	windower.add_to_chat(100, 'AutoRA  STOPPING ~~~~~~~~~~~~~~')	
+	windower.add_to_chat(17, 'AutoRA  STOPPING ~~~~~~~~~~~~~~')	
 	auto = 0
 end
 
@@ -90,8 +90,10 @@ end
 function haltontp()
 	
 	if halt_on_tp == true then
+		windower.add_to_chat(17, 'AutoRA will no longer halt upon reaching 1000 TP')
 		halt_on_tp = false
-	else
+	elseif halt_on_tp == false then
+		windower.add_to_chat(17, 'AutoRA will halt upon reaching 1000 TP')
 		halt_on_tp = true
 	end
 
@@ -103,38 +105,37 @@ windower.register_event('action',function (act)
 	local player = windower.ffxi.get_player()
 	
 	if ((actor == (player.id or player.index))) then
-		if player.vitals['tp'] > 1000 then
-			if halt_on_tp == true then
-				windower.add_to_chat(100, 'AutoRA  HALTING AT 1000 TP ~~~~~~~~~~~~~~')
-			else
-				if category == 2 then
-					if auto == 1 then
-						if  player.status == 1 then
-							auto = 1
-						elseif  player.status == 0 then
-							auto = 0
-						end
-					end
-			
-					if auto == 1 then
-						windower.send_command('@wait 1.5;input /shoot <t>')
-					elseif auto == 0 then
-					end
-				end
-			end
-		else
-			if category == 2 then
+		if category == 2 then
+			if player.vitals['tp'] < 1000 then
 				if auto == 1 then
 					if  player.status == 1 then
 						auto = 1
 					elseif  player.status == 0 then
 						auto = 0
+						return
 					end
 				end
-			
 				if auto == 1 then
 					windower.send_command('@wait 1.5;input /shoot <t>')
 				elseif auto == 0 then
+				end
+			else
+				if halt_on_tp == true then
+					windower.add_to_chat(17, 'AutoRA  HALTING AT 1000 TP ~~~~~~~~~~~~~~')
+					return
+				else
+					if auto == 1 then
+						if  player.status == 1 then
+							auto = 1
+						elseif  player.status == 0 then
+							auto = 0
+							return
+						end
+					end
+					if auto == 1 then
+						windower.send_command('@wait 1.5;input /shoot <t>')
+					elseif auto == 0 then
+					end
 				end
 			end
 		end
