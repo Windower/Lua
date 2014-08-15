@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -- addon information
 
 _addon.name = 'boxdestroyer'
-_addon.version = '1.0.0'
+_addon.version = '1.0.1'
 _addon.command = 'boxdestroyer'
 _addon.author = 'Seth VanHeulen (Acacia@Odin)'
 
@@ -66,6 +66,9 @@ box = {}
 -- filter helper functions
 
 function greater_less(id, greater, num)
+    if box[id] == nil then
+        box[id] = default
+    end
     local new = {}
     for _,v in pairs(box[id]) do
         if greater and v > num or not greater and v < num then
@@ -76,6 +79,9 @@ function greater_less(id, greater, num)
 end
 
 function even_odd(id, div, rem)
+    if box[id] == nil then
+        box[id] = default
+    end
     local new = {}
     for _,v in pairs(box[id]) do
         if (math.floor(v / div) % 2) == rem then
@@ -86,6 +92,9 @@ function even_odd(id, div, rem)
 end
 
 function equal(id, first, num)
+    if box[id] == nil then
+        box[id] = default
+    end
     local new = {}
     for _,v in pairs(box[id]) do
         if first and math.floor(v / 10) == num or not first and (v % 10) == num then
