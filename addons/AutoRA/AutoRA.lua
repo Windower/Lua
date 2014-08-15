@@ -122,6 +122,21 @@ windower.register_event('action',function (act)
 					end
 				end
 			end
+		else
+			if category == 2 then
+				if auto == 1 then
+					if  player.status == 1 then
+						auto = 1
+					elseif  player.status == 0 then
+						auto = 0
+					end
+				end
+			
+				if auto == 1 then
+					windower.send_command('@wait 1.5;input /shoot <t>')
+				elseif auto == 0 then
+				end
+			end
 		end
 	end
 end)
