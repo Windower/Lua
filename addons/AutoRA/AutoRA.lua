@@ -32,6 +32,7 @@ windower.register_event('load',function ()
 	RW_delay = 0
 	Ammo_delay = 0
 	retrn = 0
+	halt_on_tp = true
 	windower.send_command('unbind ^d')
 	windower.send_command('unbind !d')
 	windower.send_command('bind ^d ara start')
@@ -86,30 +87,43 @@ function split(msg, match)
 	return splitarr
 end
 
+function haltontp()
+	
+	if halt_on_tp == true then
+		halt_on_tp = false
+	else
+		halt_on_tp = true
+	end
+
+end
+
 windower.register_event('action',function (act)
 	local actor = act.actor_id
 	local category = act.category
 	local player = windower.ffxi.get_player()
 	
 	if ((actor == (player.id or player.index))) then
-		if player.vitals['tp'] < 1000 then
-			if category == 2 then
-				if auto == 1 then
-					if  player.status == 1 then
-						auto = 1
-					elseif  player.status == 0 then
-						auto = 0
+		if player.vitals['tp'] > 1000 then
+			if halt_on_tp == true then
+				windower.add_to_chat(100, 'AutoRA  HALTING AT 1000 TP ~~~~~~~~~~~~~~')
+			else
+				if category == 2 then
+					if auto == 1 then
+						if  player.status == 1 then
+							auto = 1
+						elseif  player.status == 0 then
+							auto = 0
+						end
+					end
+			
+					if auto == 1 then
+						windower.send_command('@wait 1.5;input /shoot <t>')
+					elseif auto == 0 then
 					end
 				end
-			
-				if auto == 1 then
-					windower.send_command('@wait 1.5;input /shoot <t>')
-				elseif auto == 0 then
-				end
 			end
-		else
-			windower.add_to_chat(100, 'AutoRA  HALTING AT 1000 TP ~~~~~~~~~~~~~~')
 		end
+	end
 end)
 
 --Function Designer:  Byrth
@@ -124,12 +138,15 @@ windower.register_event('addon command',function (...)
 		shoot()
 	elseif splitarr[1]:lower() == 'reload' then
 		setDelay()
+	elseif splitarr[1]:lower() == 'haltontp' then
+		haltontp()
 	elseif splitarr[1]:lower() == 'help' then
 		windower.add_to_chat(17, 'AutoRA  v'..version..'commands:')
 		windower.add_to_chat(17, '//ara [options]')
-		windower.add_to_chat(17, '    start  - Starts auto attack with ranged weapon')
-		windower.add_to_chat(17, '    stop   - Stops auto attack with ranged weapon')
-		windower.add_to_chat(17, '    help   - Displays this help text')
+		windower.add_to_chat(17, '    start  	- Starts auto attack with ranged weapon')
+		windower.add_to_chat(17, '    stop   	- Stops auto attack with ranged weapon')
+		windower.add_to_chat(17, '    haltontp	- Toggles automatic halt upon reaching 1000 TP')
+		windower.add_to_chat(17, '    help   	- Displays this help text')
 		windower.add_to_chat(17, ' ')
 		windower.add_to_chat(17, 'AutoRA will only automate ranged attacks if your status is "Engaged".  Otherwise it will always fire a single ranged attack.')
 		windower.add_to_chat(17, 'To start auto ranged attacks without commands use the key:  Ctrl+d')
