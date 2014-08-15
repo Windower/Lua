@@ -365,6 +365,11 @@ windower.register_event('addon command', function(...)
         local query  = L{}
         local export = nil
 
+        -- convert command line params (SJIS) to UTF-8
+        for i, elm in ipairs(params) do
+            params[i] = windower.from_shift_jis(elm)
+        end
+
         while params:length() > 0 and params[1]:match('^[:!]%a+$') do
             query:append(params:remove(1))
         end
