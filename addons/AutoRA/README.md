@@ -16,7 +16,8 @@ Alt + D:  Force stop Ranged attacking.  (Automatically done when weapon is put a
 Commands:
 
 ara [options]
-	start  - Starts Ranged Attacking (Identical to CTRL + D)
-	stop   - Stops Ranged Attacking (Identical to ALT + D)
-	shoot  - Fires a ranged attack
-	help   - Shows Version info and available commands
+	start		- Starts Ranged Attacking (Identical to CTRL + D)
+	stop		- Stops Ranged Attacking (Identical to ALT + D)
+	shoot		- Fires a ranged attack
+	haltontp	- Toggles automatic halt upon reaching 1000 TP
+	help   		- Shows Version info and available commands
