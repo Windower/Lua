@@ -225,6 +225,10 @@ end
 -- Local   - job_xxx() functions get called next. Define in JOB.lua file.
 -- Default - default_xxx() functions get called next. Defined in this file.
 -- Cleanup - cleanup_xxx() functions always get called before exiting.
+--
+-- Parameters:
+-- spell - standard spell table passed in by GearSwap
+-- action - string defining the function mapping to use (precast, midcast, etc)
 function handle_actions(spell, action)
 	-- Init an eventArgs that allows cancelling.
 	local eventArgs = {handled = false, cancel = false}
@@ -527,6 +531,10 @@ function get_idle_set(petStatus)
 	idleSet = apply_defense(idleSet)
 	idleSet = apply_kiting(idleSet)
 
+	if user_customize_idle_set then
+		idleSet = user_customize_idle_set(idleSet)
+	end
+
 	if customize_idle_set then
 		idleSet = customize_idle_set(idleSet)
 	end
@@ -580,6 +588,10 @@ function get_melee_set()
 
 	if customize_melee_set then
 		meleeSet = customize_melee_set(meleeSet)
+	end
+
+	if user_customize_melee_set then
+		meleeSet = user_customize_melee_set(meleeSet)
 	end
 
 	return meleeSet
