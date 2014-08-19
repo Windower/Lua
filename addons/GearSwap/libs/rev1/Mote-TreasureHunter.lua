@@ -42,14 +42,14 @@
 options = options or {}
 state = state or {}
 info = info or {}
-state.TreasureMode = M{['description']='Treasure Mode'}
 
 -- TH mode handling
 if player.main_job == 'THF' then
-    state.TreasureMode:options('None','Tag','SATA','Fulltime')
-    state.TreasureMode:set('Tag')
+    options.TreasureModes = {'None','Tag','SATA','Fulltime'}
+    state.TreasureMode = 'Tag'
 else
-    state.TreasureMode:options('None','Tag')
+    options.TreasureModes = {'None','Tag'}
+    state.TreasureMode = 'None'
 end
 
 -- Tracking vars for TH.
@@ -109,7 +109,7 @@ end
 
 -- For any active TH mode, if we haven't already tagged this target, equip TH gear and lock slots until we manage to hit it.
 function TH_for_first_hit()
-	if player.status == 'Engaged' and state.TreasureMode.value ~= 'None' then
+	if player.status == 'Engaged' and state.TreasureMode ~= 'None' then
 		if not info.tagged_mobs[player.target.id] then
 			if _settings.debug_mode then add_to_chat(123,'Prepping for first hit on '..tostring(player.target.id)..'.') end
 			equip(sets.TreasureHunter)
@@ -169,12 +169,12 @@ end
 function on_action_for_th(action)
 	--add_to_chat(123,'cat='..action.category..',param='..action.param)
 	-- If player takes action, adjust TH tagging information
-	if state.TreasureMode.value ~= 'None' then
+	if state.TreasureMode ~= 'None' then
 		if action.actor_id == player.id then
 			-- category == 1=melee, 2=ranged, 3=weaponskill, 4=spell, 6=job ability, 14=unblinkable JA
-			if state.TreasureMode.value == 'Fulltime' or
-			   (state.TreasureMode.value == 'SATA' and (action.category == 1 or ((state.Buff['Sneak Attack'] or state.Buff['Trick Attack']) and action.category == 3))) or
-			   (state.TreasureMode.value == 'Tag' and action.category == 1 and state.th_gear_is_locked) or -- Tagging with a melee hit
+			if state.TreasureMode == 'Fulltime' or
+			   (state.TreasureMode == 'SATA' and (action.category == 1 or ((state.Buff['Sneak Attack'] or state.Buff['Trick Attack']) and action.category == 3))) or
+			   (state.TreasureMode == 'Tag' and action.category == 1 and state.th_gear_is_locked) or -- Tagging with a melee hit
 			   (th_action_check and th_action_check(action.category, action.param)) -- Any user-specified tagging actions
 			   then
 				for index,target in pairs(action.targets) do
@@ -242,7 +242,7 @@ end
 
 -- Called if we change any user state fields.
 function job_state_change(stateField, newValue, oldValue)
-	if stateField == 'Treasure Mode' then
+	if stateField == 'TreasureMode' then
 		if newValue == 'None' and state.th_gear_is_locked then
 			if _settings.debug_mode then add_to_chat(123,'TH Mode set to None. Unlocking gear.') end
 			unlock_TH()

@@ -72,6 +72,7 @@ function load_user_files(job_id,user_file)
     
     user_env = nil
     registered_user_events = {}
+    include_user_path = nil
 
     language = 'english' -- Reset language to english when changing job files.
     
@@ -98,7 +99,7 @@ function load_user_files(job_id,user_file)
         print_set=print_set,set_combine=set_combine,disable=disable,enable=user_enable,
         send_command=send_cmd_user,windower=user_windower,include=include_user,
         midaction=user_midaction,pet_midaction=user_pet_midaction,set_language=set_language,
-        show_swaps = show_swaps,debug_mode=debug_mode,
+        show_swaps = show_swaps,debug_mode=debug_mode,include_path=user_include_path,
         
         -- Library functions
         string=string,math=math,table=table,set=set,list=list,T=T,S=S,L=L,pack=pack,
@@ -598,12 +599,24 @@ function pathsearch(files_list)
         [8] = gearswap_appdata,
         [9] = windower.windower_path .. 'addons/libs/'
     }
+    
+    local user_path
+    local normal_path
 
     for _,basepath in ipairs(search_path) do
         if windower.dir_exists(basepath) then
             for i,v in ipairs(files_list) do
-                if v ~= '' and windower.file_exists(basepath..v) then
-                    return basepath..v
+                if v ~= '' then
+                    if include_user_path then
+                        user_path = basepath .. include_user_path .. '/' .. v
+                    end
+                    normal_path = basepath .. v
+                    
+                    if user_path and windower.file_exists(user_path) then
+                        return user_path
+                    elseif normal_path and windower.file_exists(normal_path) then
+                        return normal_path
+                    end
                 end
             end
         end

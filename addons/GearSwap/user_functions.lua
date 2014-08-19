@@ -279,6 +279,18 @@ function include_user(str)
     end
 end
 
+-- Allow the user to set a path subdirectory to check when searching for included files.
+-- This path is checked as a subdirectory to each fixed path, before the fixed path itself is checked.
+-- Path argument can only be a string; otherwise this is set to nil.
+function user_include_path(path)
+    if type(path) == 'string' then
+        include_user_path = path
+    else
+        include_user_path = nil
+    end
+end
+
+
 function user_midaction(bool)
     if bool == false then
         for i,v in pairs(command_registry) do
