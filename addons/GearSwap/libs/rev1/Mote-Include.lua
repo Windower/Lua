@@ -25,48 +25,63 @@
 -- Auto-initialize after defining this function.
 -------------------------------------------------------------------------------------------------------------------
 
-current_mote_include_version = 2
 
 function init_include()
-	-- Used to define various types of data mappings.  These may be used in the initialization, so load it up front.
+	-- Used to define various types of data mappings.  These may be used in the initialization,
+	-- so load it up front.
 	include('Mote-Mappings')
-	
-	-- Modes is the include for a mode-tracking variable class.  Used for state vars, below.
-	include('Modes')
+
+	-- Var for tracking misc info
+	info = {}
 
 	-- Var for tracking state values
 	state = {}
 
 	-- General melee offense/defense modes, allowing for hybrid set builds, as well as idle/resting/weaponskill.
-	-- This just defines the vars and sets the descriptions.  List modes with no values automatically
-	-- get assigned a 'Normal' default value.
-	state.OffenseMode         = M{['description'] = 'Offense Mode'}
-	state.HybridMode          = M{['description'] = 'Hybrid Mode'}
-	state.RangedMode          = M{['description'] = 'Ranged Mode'}
-	state.WeaponskillMode     = M{['description'] = 'Weaponskill Mode'}
-	state.CastingMode         = M{['description'] = 'Casting Mode'}
-	state.IdleMode            = M{['description'] = 'Idle Mode'}
-	state.RestingMode         = M{['description'] = 'Resting Mode'}
+	state.OffenseMode     = 'Normal'
+	state.DefenseMode     = 'Normal'
+	state.RangedMode      = 'Normal'
+	state.WeaponskillMode = 'Normal'
+	state.CastingMode     = 'Normal'
+	state.IdleMode        = 'Normal'
+	state.RestingMode     = 'Normal'
 
-	state.DefenseMode         = M{['description'] = 'Defense Mode', 'None', 'Physical', 'Magical'}
-	state.PhysicalDefenseMode = M{['description'] = 'Physical Defense Mode', 'PDT'}
-	state.MagicalDefenseMode  = M{['description'] = 'Magical Defense Mode', 'MDT'}
+	-- All-out defense state, either physical or magical
+	state.Defense = {}
+	state.Defense.Active       = false
+	state.Defense.Type         = 'Physical'
+	state.Defense.PhysicalMode = 'PDT'
+	state.Defense.MagicalMode  = 'MDT'
 
-	state.Kiting              = M(false, 'Kiting')
-	state.SelectNPCTargets    = M(false, 'Select NPC Targets')
-	state.PCTargetMode        = M{['description'] = 'PC Target Mode', 'default', 'stpt', 'stal', 'stpc'}
-
-    state.EquipStop           = M{['description'] = 'Stop Equipping Gear', 'none', 'precast', 'midcast', 'pet_midcast'}
-
-	state.CombatWeapon        = M{['description']='Combat Weapon', ['string']=''}
-	state.CombatForm          = M{['description']='Combat Form', ['string']=''}
-
-    -- Non-mode vars that are used for state tracking.
+	state.Kiting               = false
 	state.MaxWeaponskillDistance = 0
+
+	state.SelectNPCTargets     = false
+	state.PCTargetMode         = 'default'
+
+	state.CombatWeapon = nil
+	state.CombatForm = nil
+
 	state.Buff = {}
 
-	-- Classes describe a 'type' of action.  They are similar to state, but
-	-- may have any free-form value, or describe an entire table of mapped values.
+
+	-- Vars for specifying valid mode values.
+	-- Defaults here are just for example. Set them properly in each job file.
+	options = {}
+	options.OffenseModes = {'Normal'}
+	options.DefenseModes = {'Normal'}
+	options.RangedModes = {'Normal'}
+	options.WeaponskillModes = {'Normal'}
+	options.CastingModes = {'Normal'}
+	options.IdleModes = {'Normal'}
+	options.RestingModes = {'Normal'}
+	options.PhysicalDefenseModes = {'PDT'}
+	options.MagicalDefenseModes = {'MDT'}
+
+	options.TargetModes = {'default', 'stpc', 'stpt', 'stal'}
+
+
+	-- Spell mappings to describe a 'type' of spell.  Used when searching for valid sets.
 	classes = {}
 	-- Basic spell mappings are based on common spell series.
 	-- EG: 'Cure' for Cure, Cure II, Cure III, Cure IV, Cure V, or Cure VI.
@@ -80,8 +95,8 @@ function init_include()
 	-- Custom, job-defined class, like the generic spell mappings.
 	-- Takes precedence over default spell maps.
 	-- Is reset at the end of each spell casting cycle (ie: at the end of aftercast).
-	classes.JAMode = nil
 	classes.CustomClass = nil
+	classes.JAMode = nil
 	-- Custom groups used for defining melee and idle sets.  Persists long-term.
 	classes.CustomMeleeGroups = L{}
 	classes.CustomRangedGroups = L{}
@@ -93,16 +108,18 @@ function init_include()
 	classes.DuskToDawn = false
 
 
-	-- Var for tracking misc info
-	info = {}
-	options = {}
-
 	-- Special control flags.
 	mote_vars = {}
+	mote_vars.show_set = nil
 	mote_vars.set_breadcrumbs = L{}
 
+	-- Display text mapping.
+	on_off_names = {[true] = 'on', [false] = 'off'}
+	on_off_values = T{'on', 'off', 'true', 'false'}
+	true_values = T{'on', 'true'}
 
-	-- Sub-tables within the sets table that we expect to exist, and are annoying to have to
+
+	-- Subtables within the sets table that we expect to exist, and are annoying to have to
 	-- define within each individual job file.  We can define them here to make sure we don't
 	-- have to check for existence.  The job file should be including this before defining
 	-- any sets, so any changes it makes will override these anyway.
@@ -170,14 +187,6 @@ function init_include()
 
 	-- Load up all the gear sets.
 	init_gear_sets()
-end
-
-if not mote_include_version or mote_include_version < current_mote_include_version then
-    add_to_chat(123,'Warning: Your job file is out of date.  Please update to the latest repository baseline.')
-    rev = mote_include_version or 1
-    include_path('rev' .. tostring(rev))
-    include('Mote-Include')
-    return
 end
 
 -- Auto-initialize the include
@@ -345,13 +354,13 @@ end
 --------------------------------------
 
 function filter_midcast(spell, spellMap, eventArgs)
-	if state.EquipStop.value == 'precast' then
+	if mote_vars.show_set == 'precast' then
 		eventArgs.cancel = true
 	end
 end
 
 function filter_aftercast(spell, spellMap, eventArgs)
-	if state.EquipStop.value == 'precast' or state.EquipStop.value == 'midcast' or state.EquipStop.value == 'pet_midcast' then
+	if mote_vars.show_set == 'precast' or mote_vars.show_set == 'midcast' or mote_vars.show_set == 'pet_midcast' then
 		eventArgs.cancel = true
 	elseif spell.name == 'Unknown Interrupt' then
 		eventArgs.cancel = true
@@ -360,7 +369,7 @@ end
 
 function filter_pet_midcast(spell, spellMap, eventArgs)
 	-- If we have show_set active for precast or midcast, don't try to equip pet midcast gear.
-	if state.EquipStop.value == 'precast' or state.EquipStop.value == 'midcast' then
+	if mote_vars.show_set == 'precast' or mote_vars.show_set == 'midcast' then
 		add_to_chat(104, 'Show Sets: Pet midcast not equipped.')
 		eventArgs.cancel = true
 	end
@@ -368,7 +377,7 @@ end
 
 function filter_pet_aftercast(spell, spellMap, eventArgs)
 	-- If show_set is flagged for precast or midcast, don't try to equip aftercast gear.
-	if state.EquipStop.value == 'precast' or state.EquipStop.value == 'midcast' or state.EquipStop.value == 'pet_midcast' then
+	if mote_vars.show_set == 'precast' or mote_vars.show_set == 'midcast' or mote_vars.show_set == 'pet_midcast' then
 		eventArgs.cancel = true
 	end
 end
@@ -379,14 +388,14 @@ end
 
 function cleanup_precast(spell, spellMap, eventArgs)
 	-- If show_set is flagged for precast, notify that we won't try to equip later gear.
-	if state.EquipStop.value == 'precast' then
+	if mote_vars.show_set == 'precast' then
 		add_to_chat(104, 'Show Sets: Stopping at precast.')
 	end
 end
 
 function cleanup_midcast(spell, spellMap, eventArgs)
 	-- If show_set is flagged for midcast, notify that we won't try to equip later gear.
-	if state.EquipStop.value == 'midcast' then
+	if mote_vars.show_set == 'midcast' then
 		add_to_chat(104, 'Show Sets: Stopping at midcast.')
 	end
 end
@@ -401,7 +410,7 @@ end
 
 function cleanup_pet_midcast(spell, spellMap, eventArgs)
 	-- If show_set is flagged for pet midcast, notify that we won't try to equip later gear.
-	if state.EquipStop.value == 'pet_midcast' then
+	if mote_vars.show_set == 'pet_midcast' then
 		add_to_chat(104, 'Show Sets: Stopping at pet midcast.')
 	end
 end
@@ -496,9 +505,9 @@ function get_idle_set(petStatus)
 		mote_vars.set_breadcrumbs:append(idleScope)
 	end
 
-	if idleSet[state.IdleMode.current] then
-		idleSet = idleSet[state.IdleMode.current]
-		mote_vars.set_breadcrumbs:append(state.IdleMode.current)
+	if idleSet[state.IdleMode] then
+		idleSet = idleSet[state.IdleMode]
+		mote_vars.set_breadcrumbs:append(state.IdleMode)
 	end
 
 	if (pet.isvalid or state.Buff.Pet) and idleSet.Pet then
@@ -547,24 +556,24 @@ function get_melee_set()
 	mote_vars.set_breadcrumbs:append('sets')
 	mote_vars.set_breadcrumbs:append('engaged')
 
-	if state.CombatForm.has_value and meleeSet[state.CombatForm.value] then
-		meleeSet = meleeSet[state.CombatForm.value]
-		mote_vars.set_breadcrumbs:append(state.CombatForm.value)
+	if state.CombatForm and meleeSet[state.CombatForm] then
+		meleeSet = meleeSet[state.CombatForm]
+		mote_vars.set_breadcrumbs:append(state.CombatForm)
 	end
 
-	if state.CombatWeapon.has_value and meleeSet[state.CombatWeapon.value] then
-		meleeSet = meleeSet[state.CombatWeapon.value]
-		mote_vars.set_breadcrumbs:append(state.CombatWeapon.value)
+	if state.CombatWeapon and meleeSet[state.CombatWeapon] then
+		meleeSet = meleeSet[state.CombatWeapon]
+		mote_vars.set_breadcrumbs:append(state.CombatWeapon)
 	end
 
-	if meleeSet[state.OffenseMode.current] then
-		meleeSet = meleeSet[state.OffenseMode.current]
-		mote_vars.set_breadcrumbs:append(state.OffenseMode.current)
+	if meleeSet[state.OffenseMode] then
+		meleeSet = meleeSet[state.OffenseMode]
+		mote_vars.set_breadcrumbs:append(state.OffenseMode)
 	end
 
-	if meleeSet[state.HybridMode.current] then
-		meleeSet = meleeSet[state.HybridMode.current]
-		mote_vars.set_breadcrumbs:append(state.HybridMode.current)
+	if meleeSet[state.DefenseMode] then
+		meleeSet = meleeSet[state.DefenseMode]
+		mote_vars.set_breadcrumbs:append(state.DefenseMode)
 	end
 
 	for _,group in ipairs(classes.CustomMeleeGroups) do
@@ -602,9 +611,9 @@ function get_resting_set()
 	mote_vars.set_breadcrumbs:append('sets')
 	mote_vars.set_breadcrumbs:append('resting')
 
-	if restingSet[state.RestingMode.current] then
-		restingSet = restingSet[state.RestingMode.current]
-		mote_vars.set_breadcrumbs:append(state.RestingMode.current)
+	if restingSet[state.RestingMode] then
+		restingSet = restingSet[state.RestingMode]
+		mote_vars.set_breadcrumbs:append(state.RestingMode)
 	end
 
 	return restingSet
@@ -667,9 +676,9 @@ function get_precast_set(spell, spellMap)
 	-- Once we have a named base set, do checks for specialized modes (casting mode, weaponskill mode, etc).
 	
 	if spell.action_type == 'Magic' then
-		if equipSet[state.CastingMode.current] then
-			equipSet = equipSet[state.CastingMode.current]
-			mote_vars.set_breadcrumbs:append(state.CastingMode.current)
+		if equipSet[state.CastingMode] then
+			equipSet = equipSet[state.CastingMode]
+			mote_vars.set_breadcrumbs:append(state.CastingMode)
 		end
 	elseif spell.type == 'WeaponSkill' then
 		equipSet = get_weaponskill_set(equipSet, spell, spellMap)
@@ -733,9 +742,9 @@ function get_midcast_set(spell, spellMap)
 	-- After the default checks, do checks for specialized modes (casting mode, etc).
 	
 	if spell.action_type == 'Magic' then
-		if equipSet[state.CastingMode.current] then
-			equipSet = equipSet[state.CastingMode.current]
-			mote_vars.set_breadcrumbs:append(state.CastingMode.current)
+		if equipSet[state.CastingMode] then
+			equipSet = equipSet[state.CastingMode]
+			mote_vars.set_breadcrumbs:append(state.CastingMode)
 		end
 	elseif spell.action_type == 'Ranged Attack' then
 		equipSet = get_ranged_set(equipSet, spell, spellMap)
@@ -769,14 +778,14 @@ function get_pet_midcast_set(spell, spellMap)
 		-- an action at the request of the player).  Allow CastinMode and
 		-- OffenseMode to refine whatever set was selected above.
 		if spell.action_type == 'Magic' then
-			if equipSet[state.CastingMode.current] then
-				equipSet = equipSet[state.CastingMode.current]
-				mote_vars.set_breadcrumbs:append(state.CastingMode.current)
+			if equipSet[state.CastingMode] then
+				equipSet = equipSet[state.CastingMode]
+				mote_vars.set_breadcrumbs:append(state.CastingMode)
 			end
 		elseif spell.action_type == 'Ability' then
-			if equipSet[state.OffenseMode.current] then
-				equipSet = equipSet[state.OffenseMode.current]
-				mote_vars.set_breadcrumbs:append(state.OffenseMode.current)
+			if equipSet[state.OffenseMode] then
+				equipSet = equipSet[state.OffenseMode]
+				mote_vars.set_breadcrumbs:append(state.OffenseMode)
 			end
 		end
 	end
@@ -788,18 +797,18 @@ end
 -- Function to handle the logic of selecting the proper weaponskill set.
 function get_weaponskill_set(equipSet, spell, spellMap)
 	-- Custom handling for weaponskills
-	local ws_mode = state.WeaponskillMode.current
+	local ws_mode = state.WeaponskillMode
 	
 	if ws_mode == 'Normal' then
 		-- If a particular weaponskill mode isn't specified, see if we have a weaponskill mode
 		-- corresponding to the current offense mode.  If so, use that.
 		if spell.skill == 'Archery' or spell.skill == 'Marksmanship' then
-			if state.RangedMode.current ~= 'Normal' and state.WeaponskillMode:contains(state.RangedMode.current) then
-				ws_mode = state.RangedMode.current
+			if state.RangedMode ~= 'Normal' and S(options.WeaponskillModes):contains(state.RangedMode) then
+				ws_mode = state.RangedMode
 			end
 		else
-			if state.OffenseMode.current ~= 'Normal' and state.WeaponskillMode:contains(state.OffenseMode.current) then
-				ws_mode = state.OffenseMode.current
+			if state.OffenseMode ~= 'Normal' and S(options.WeaponskillModes):contains(state.OffenseMode) then
+				ws_mode = state.OffenseMode
 			end
 		end
 	end
@@ -828,20 +837,20 @@ end
 -- Function to handle the logic of selecting the proper ranged set.
 function get_ranged_set(equipSet, spell, spellMap)
 	-- Attach Combat Form and Combat Weapon to set checks
-	if state.CombatForm.has_value and equipSet[state.CombatForm.value] then
-		equipSet = equipSet[state.CombatForm.value]
-		mote_vars.set_breadcrumbs:append(state.CombatForm.value)
+	if state.CombatForm and equipSet[state.CombatForm] then
+		equipSet = equipSet[state.CombatForm]
+		mote_vars.set_breadcrumbs:append(state.CombatForm)
 	end
 
-	if state.CombatWeapon.has_value and equipSet[state.CombatWeapon.value] then
-		equipSet = equipSet[state.CombatWeapon.value]
-		mote_vars.set_breadcrumbs:append(state.CombatWeapon.value)
+	if state.CombatWeapon and equipSet[state.CombatWeapon] then
+		equipSet = equipSet[state.CombatWeapon]
+		mote_vars.set_breadcrumbs:append(state.CombatWeapon)
 	end
 
 	-- Check for specific mode for ranged attacks (eg: Acc, Att, etc)
-	if equipSet[state.RangedMode.current] then
-		equipSet = equipSet[state.RangedMode.current]
-		mote_vars.set_breadcrumbs:append(state.RangedMode.current)
+	if equipSet[state.RangedMode] then
+		equipSet = equipSet[state.RangedMode]
+		mote_vars.set_breadcrumbs:append(state.RangedMode)
 	end
 
 	-- Tack on any additionally specified custom groups, if the sets are defined.
@@ -863,17 +872,17 @@ end
 -- Function to apply any active defense set on top of the supplied set
 -- @param baseSet : The set that any currently active defense set will be applied on top of. (gear set table)
 function apply_defense(baseSet)
-	if state.DefenseMode.current ~= 'None' then
+	if state.Defense.Active then
 		local defenseSet = sets.defense
 
-		defenseSet = sets.defense[state[state.DefenseMode.current .. 'DefenseMode'].current] or defenseSet
+		if state.Defense.Type == 'Physical' then
+			defenseSet = sets.defense[state.Defense.PhysicalMode] or defenseSet
+		else
+			defenseSet = sets.defense[state.Defense.MagicalMode] or defenseSet
+		end
 
 		for _,group in ipairs(classes.CustomDefenseGroups) do
 			defenseSet = defenseSet[group] or defenseSet
-		end
-
-		if customize_defense_set then
-			defenseSet = customize_defense_set(defenseSet)
 		end
 
 		baseSet = set_combine(baseSet, defenseSet)
@@ -886,7 +895,7 @@ end
 -- Function to add kiting gear on top of the base set if kiting state is true.
 -- @param baseSet : The gear set that the kiting gear will be applied on top of.
 function apply_kiting(baseSet)
-	if state.Kiting.value then
+	if state.Kiting then
 		if sets.Kiting then
 			baseSet = set_combine(baseSet, sets.Kiting)
 		end
