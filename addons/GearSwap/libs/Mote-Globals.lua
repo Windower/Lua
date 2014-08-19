@@ -110,12 +110,3 @@ function user_buff_change(buff, gain, eventArgs)
 	end
 end
 
-
--------------------------------------------------------------------------------------------------------------------
--- Test function to use to avoid modifying Mote-SelfCommands.
--------------------------------------------------------------------------------------------------------------------
-
-function user_test(params)
-
-end
-

@@ -26,7 +26,7 @@ function self_command(commandArgs)
 	if not eventArgs.handled then
 		-- Of the original command message passed in, remove the first word from
 		-- the list (it will be used to determine which function to call), and
-		-- send the remaining words are parameters for the function.
+		-- send the remaining words as parameters for the function.
 		local handleCmd = table.remove(commandArgs, 1)
 
 		if selfCommandMaps[handleCmd] then
