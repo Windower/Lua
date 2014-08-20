@@ -263,9 +263,11 @@ areas.Adoulin = S{
 -------------------------------------------------------------------------------------------------------------------
 
 npcs = {}
-npcs.Trust = S{'Ajido-Marujido','Aldo','Ayame','Cherukiki','Curilla','Excenmille','Fablinix','Gadalar','Gessho',
-		'Ingrid','IronEater','Joachim','Kupipi','LehkoHabhoka','Lion','Luzaf','Maat','MihliAliapoh',
-		'Mnejing','Moogle','NajaSalaheem','Najelith','Naji','NanaaMihgo','Nashmeira','Ovjang','Prishe',
-		'Sakura','Shantotto','Tenzen','Trion','Ulmia','Valaineral','Volker','Zazarg','Zeid'}
+npcs.Trust = S{'Ajido-Marujido','Aldo','Ayame','Cherukiki','Curilla','D.Shantotto','Elivira','Excenmille',
+        'Fablinix','FerreousCoffin','Gadalar','Gessho','Ingrid','IronEater','Joachim','Klara','Kupipi',
+        'LehkoHabhoka','LhuMhakaracca','Lion','Luzaf','Maat','MihliAliapoh','Mnejing','Moogle','Mumor',
+        'NajaSalaheem','Najelith','Naji','NanaaMihgo','Nashmeira','Noillurie','Ovjang','Prishe','Rainemard',
+        'RomaaMihgo','Sakura','Shantotto','StarSibyl','Tenzen','Trion','UkaTotlihn','Ulmia','Valaineral',
+        'Volker','Zazarg','Zeid'}
 
 

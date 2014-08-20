@@ -348,6 +348,8 @@ function get_weather_intensity()
 end
 
 
+-- Returns true if you're in a party solely comprised of Trust NPCs.
+-- TODO: Do we need a check to see if we're in a party partly comprised of Trust NPCs?
 function is_trust_party()
 	-- Check if we're solo
 	if party.count == 1 then
