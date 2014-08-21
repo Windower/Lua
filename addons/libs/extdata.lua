@@ -377,7 +377,7 @@ augment_values = {
         [0x380] = {{stat="Sword enhancement spell damage ", offset=1}},
         [0x381] = {{stat='Enhances "Souleater" effect ', offset=1,percent=true}},
         
-        [0x390] = {{stat="Occ. atk. twice"}, offset=0}},
+        [0x390] = {{stat="Occ. atk. twice", offset=0}},
         -- The below enhancements aren't visible if their value is 0.
         [0x3A0] = {{stat="Fire Affinity ", offset=0}},
         [0x3A1] = {{stat="Ice Affinity ", offset=0}},
