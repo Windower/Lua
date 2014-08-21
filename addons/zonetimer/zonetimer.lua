@@ -1,6 +1,6 @@
 _addon.name = 'zonetimer'
 _addon.author = 'Ihina'
-_addon.version = '1.0.0.0'
+_addon.version = '1.0.1.0'
 _addon.command = 'zonetimer'
 
 require('logger')
@@ -17,23 +17,22 @@ defaults.text.size = 12
  
 settings = config.load(defaults)
 times = texts.new(settings)
-zone = 0
+start_time = os.time()
+
+windower.register_event('zone change', function(new_zone, old_zone)
+	start_time = os.time()
+end)
 
 windower.register_event('prerender', function()
     local info = windower.ffxi.get_info()
     if not info.logged_in then
+        times:hide()
         return
     end
 
-	current_zone = info.zone
-	if zone == current_zone then
-		seconds = os.time() - start_time
-		times:text(os.date('!%H:%M:%S', seconds))
-		times:visible(true)
-	else
-		zone = current_zone
-		start_time = os.time()
-	end
+	seconds = os.time() - start_time
+	times:text(os.date('!%H:%M:%S', seconds))
+	times:visible(true)
 end)
 
 windower.register_event('addon command', function(...)
