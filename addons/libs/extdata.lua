@@ -84,6 +84,16 @@ augment_values = {
         [0x03B] = {{stat='Latent effect: "Regain"', offset=1}},
         [0x03C] = {{stat='Latent effect: "Refresh"', offset=1}},
         [0x03D] = {{stat="Occ. inc. resist. to stat. ailments ", offset=1}},
+        [0x03E] = {{stat="Accuracy", offset=33}},
+        [0x03F] = {{stat="Rng.Acc.", offset=33}},
+        [0x040] = {{stat="Mag. Acc.", offset=33}},
+        [0x041] = {{stat="Attack", offset=33}},
+        [0x042] = {{stat="Rng.Atk.", offset=33}},
+        [0x043] = {{stat="All Songs", offset=1}},
+        [0x044] = {{stat="Accuracy", offset=1},{stat="Attack", offset=1}},
+        [0x045] = {{stat="Rng.Acc.", offset=1},{stat="Rng.Atk.", offset=1}},
+        [0x046] = {{stat="Mag. Acc.", offset=1},{stat='"Mag.Atk.Bns."', offset=1}},
+        [0x047] = {{stat="Damage taken", offset=1,multiplier=-1,percent=true}},
 
         
         -- Need to figure out how to handle this section. The Pet: prefix is only used once despite how many augments are used.
@@ -133,7 +143,7 @@ augment_values = {
         [0x085] = {{stat='"Mag.Atk.Bns."', offset=1}},
         [0x086] = {{stat='"Mag.Def.Bns."', offset=1}},
 
-        [0x087] = {{stat="Avtar:",offset=0}},
+        [0x087] = {{stat="Avatar:",offset=0}},
         [0x089] = {{stat='"Regen"', offset=1}},
         [0x08A] = {{stat='"Refresh"', offset=1}},
         [0x08B] = {{stat='"Rapid Shot"', offset=1}},
@@ -367,7 +377,7 @@ augment_values = {
         [0x380] = {{stat="Sword enhancement spell damage ", offset=1}},
         [0x381] = {{stat='Enhances "Souleater" effect ', offset=1,percent=true}},
         
-        
+        [0x390] = {{stat="Occ. atk. twice"}, offset=0}},
         -- The below enhancements aren't visible if their value is 0.
         [0x3A0] = {{stat="Fire Affinity ", offset=0}},
         [0x3A1] = {{stat="Ice Affinity ", offset=0}},
