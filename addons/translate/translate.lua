@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'Translate'
-_addon.version = '0.140807'
+_addon.version = '0.140823'
 _addon.author = 'Byrth'
 _addon.commands = {'trans'}
 
@@ -71,7 +71,7 @@ rcol = ''--string.char(0x1E,1)
 function to_a_code(num)
     local first_byte,second_byte = math.floor(num/256),num%256
     if first_byte == 0 or second_byte == 0 then return nil end
-    return string.char(0xFD,2,2,first_byte,second_byte,0xFD)
+    return string.char(0xFD,2,2,first_byte,second_byte,0xFD):escape()
 end
 
 function to_item_code(id)
@@ -84,7 +84,7 @@ function to_item_code(id)
         t = 0x0A
         second_byte = 0xFF
     end
-    return string.char(0xFD,t,2,first_byte,second_byte,0xFD)
+    return string.char(0xFD,t,2,first_byte,second_byte,0xFD):escape()
 end
 
 function to_ki_code(id)
@@ -97,7 +97,7 @@ function to_ki_code(id)
         t = 0x16
         second_byte = 0xFF
     end
-    return string.char(0xFD,t,2,first_byte,second_byte,0xFD)
+    return string.char(0xFD,t,2,first_byte,second_byte,0xFD):escape()
 end
 
 function sanity_check(ja)
@@ -132,10 +132,10 @@ for res_name in pairs(handled_resources) do
             local jp = windower.to_shift_jis(res_line.ja or ''):escape()
             local jps = windower.to_shift_jis(res_line.jas or ''):escape()
             if sanity_check(jp) and not trans_list[jp] and sanity_check(res_line.en) then
-                trans_list[jp] = green_col..res_line.en..rcol
+                trans_list[jp] = green_col..res_line.en..rcol:escape()
             end
             if sanity_check(jps) and not trans_list[jps] and sanity_check(res_line.ens) then
-                trans_list[jps] = green_col..res_line.ens..rcol
+                trans_list[jps] = green_col..res_line.ens..rcol:escape()
             end
         end
     end
@@ -211,7 +211,6 @@ windower.register_event('incoming chunk',function(id,orgi,modi,is_injected,is_bl
                 out_text = out_text:gsub(option,trans_list[option])
             end
         end
-        
         
         while #out_text > 0 do
             local boundary = get_boundary_length(out_text,150)
