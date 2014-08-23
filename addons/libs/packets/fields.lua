@@ -2537,8 +2537,6 @@ local function parse(fs, data, index, max, lookup)
                         -- Finished, * can only be applied to the last field
                         index = #data
                     else
-                        --TODO: Remove next line after testing
-                        if not sizes[ctype] then print(ctype) end
                         index = index + count_num * sizes[ctype]
                     end
                 end
