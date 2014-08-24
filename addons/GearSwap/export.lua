@@ -1,7 +1,7 @@
 function export_set(options)
     --local temp_items,item_list = windower.ffxi.get_items(),{}
     local item_list = {}
-    local targinv,xml,all_sets
+    local targinv,xml,all_sets,use_job_in_filename,use_subjob_in_filename,overwrite_existing
     if #options > 0 then
         for _,v in ipairs(options) do
             if v:lower() == 'inventory' then
@@ -14,6 +14,12 @@ function export_set(options)
                     windower.add_to_chat(123,'GearSwap: Cannot export the sets table of the current file because there is no file loaded.')
                     return
                 end
+            elseif v:lower() == 'mainjob' then
+                use_job_in_filename = true
+            elseif v:lower() == 'mainsubjob' then
+                use_subjob_in_filename = true
+            elseif v:lower() == 'overwrite' then
+                overwrite_existing = true
             end
         end
     end
@@ -31,6 +37,17 @@ function export_set(options)
     else
         buildmsg = buildmsg..' as a lua file.'
     end
+    
+    if use_job_in_filename then
+        buildmsg = buildmsg..' (Naming format: Character_JOB)'
+    elseif use_subjob_in_filename then
+        buildmsg = buildmsg..' (Naming format: Character_JOB_SUB)'
+    end
+    
+    if overwrite_existing then
+        buildmsg = buildmsg..' Will overwrite existing files with same name.'
+    end
+    
     windower.add_to_chat(123,buildmsg)
     
     if not windower.dir_exists(windower.addon_path..'data/export') then
@@ -134,10 +151,18 @@ function export_set(options)
         windower.create_dir(windower.addon_path..'data/export')
     end
     
-    local path = windower.addon_path..'data/export/'..player.name..os.date(' %H %M %S%p  %y-%d-%m')
+    local path = windower.addon_path..'data/export/'..player.name
+    
+    if use_job_in_filename then
+        path = path..'_'..windower.ffxi.get_player().main_job
+    elseif use_subjob_in_filename then
+        path = path..'_'..windower.ffxi.get_player().main_job..'_'..windower.ffxi.get_player().sub_job
+    else
+        path = path..os.date(' %H %M %S%p  %y-%d-%m')
+    end
     if xml then
         -- Export in .xml
-        if windower.file_exists(path..'.xml') then
+        if (not overwrite_existing) and windower.file_exists(path..'.xml') then
             path = path..' '..os.clock()
         end
         local f = io.open(path..'.xml','w+')
@@ -153,7 +178,7 @@ function export_set(options)
         f:close()
     else
         -- Default to exporting in .lua
-        if windower.file_exists(path..'.lua') then
+        if (not overwrite_existing) and windower.file_exists(path..'.lua') then
             path = path..' '..os.clock()
         end
         local f = io.open(path..'.lua','w+')
