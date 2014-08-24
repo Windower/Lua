@@ -464,6 +464,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
             player.sub_job_id = data:byte(15)
             player.sub_job_level = data:byte(16)
             update_job_names()
+            refresh_globals()
             equip_sets('sub_job_change',nil,player.sub_job,temp_sub)
         end
         update_job_names()
