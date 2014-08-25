@@ -33,16 +33,10 @@ local redict = {
     name_log = language_string_log,
     english = 'en',
     japanese = 'ja',
-    german = 'de',
-    french = 'fr',
     english_log = 'enl',
     japanese_log = 'ja',
-    german_log = 'del',
-    french_log = 'frl',
     english_short = 'ens',
     japanese_short = 'jas',
-    german_short = 'des',
-    french_short = 'frs',
 }
 
 -- The metatable for a single resource item (an entry in a sub table of the root resource table)
@@ -191,7 +185,7 @@ lookup = {
         [0x0002] = 'Flag01',
         [0x0004] = 'Flag02',
         [0x0008] = 'Flag03',
-        [0x0010] = 'Flag04',
+        [0x0010] = 'Can Send POL',
         [0x0020] = 'Inscribable',
         [0x0040] = 'No Auction',
         [0x0080] = 'Scroll',
