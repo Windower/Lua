@@ -367,11 +367,13 @@ end
 
 function assemble_targets(actor,targs,category,msg)
     local targets = {}
-    for i,v in pairs(targs) do
-    -- Done in two loops so that the ands and commas don't get out of place.
-    -- This loop filters out unwanted targets.
-        if check_filter(actor,v,category,msg) then
-            targets[#targets+1] = v
+    if (targs) then
+        for i,v in pairs(targs) do
+        -- Done in two loops so that the ands and commas don't get out of place.
+        -- This loop filters out unwanted targets.
+            if check_filter(actor,v,category,msg) then
+                targets[#targets+1] = v
+            end
         end
     end
     
