@@ -24,7 +24,7 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-_addon.version = '2.500'
+_addon.version = '2.510'
 _addon.name = 'Shortcuts'
 _addon.author = 'Byrth'
 _addon.commands = {'shortcuts'}
@@ -196,7 +196,10 @@ end)
 -----------------------------------------------------------------------------------
 windower.register_event('unhandled command',function(...)
     local combined = windower.convert_auto_trans(table.concat({...},' ')) -- concat it back together...
-    command_logic(combined,combined) -- and then dump it into command_logic()
+    local cmd = command_logic(combined,combined) -- and then dump it into command_logic()
+    if cmd and cmd ~= '' then
+        windower.send_command('@input '..cmd)
+    end
 end)
 
 
