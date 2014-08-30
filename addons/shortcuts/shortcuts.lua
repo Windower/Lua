@@ -24,7 +24,7 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-_addon.version = '2.400'
+_addon.version = '2.500'
 _addon.name = 'Shortcuts'
 _addon.author = 'Byrth'
 _addon.commands = {'shortcuts'}
@@ -169,7 +169,8 @@ windower.register_event('outgoing text',function(original,modified)
         local tempst = windower.ffxi.get_mob_by_target('st')
         windower.add_to_chat(8,modified..' '..tostring(tempst))
     end
-    temp_org = temp_org:gsub(' <wait %d+>','')
+    temp_org = temp_org:gsub(' <wait %d+>',''):sub(2)
+    
     if logging then
         logfile:write('\n\n',tostring(os.clock()),'temp_org: ',temp_org,'\nModified: ',modified)
         logfile:flush()
@@ -251,7 +252,7 @@ function command_logic(original,modified)
                 logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\n(162) ',lastsent)     
                 logfile:flush()
             end
-            windower.send_command('@input '..lastsent)
+            windower.send_command('@input /'..lastsent)
             return ''
         else -- If there are excluded secondary commands (like /pcmd add <name>)
             local tempcmd = command
@@ -285,7 +286,7 @@ function command_logic(original,modified)
                 logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\n(193) ',lastsent)
                 logfile:flush()
             end
-            windower.send_command('@input '..lastsent)
+            windower.send_command('@input /'..lastsent)
             return ''
         end
     elseif (command2_list[command] and valid_target(potential_targ,true)) then 
@@ -303,7 +304,7 @@ function command_logic(original,modified)
             logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\n(146) Legitimate command')
             logfile:flush()
         end
-        return command..' "'..convert_spell(spell)..'" '..potential_targ
+        return "/"..command..' "'..convert_spell(spell)..'" '..potential_targ
     elseif command_list[command] then
         -- If there is a valid command, then pass the text with an offset of 1 to the text interpretation function
         return interp_text(splitline,1,modified)

@@ -9,6 +9,7 @@ spellcast" project, and represents the interpretation part of spellcast.
 None  
 
 ####Changelog:  
+v2.5 -  8/30/14 - Expanded shortcuts to include single-slash commands. Expanded command prefixes to include double-slash commands.
 v2.4 -  8/30/14 - Changed ambiguous case handling to respect specified prefixes.
 v2.3 -  6/20/14 - Added new monstrosity skill disambiguation.
 v2.2 -  5/19/14 - Accommodated new Resources changes.
