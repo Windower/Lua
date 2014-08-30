@@ -24,7 +24,7 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-_addon.version = '2.401'
+_addon.version = '2.400'
 _addon.name = 'Shortcuts'
 _addon.author = 'Byrth'
 _addon.commands = {'shortcuts'}
@@ -362,7 +362,7 @@ function interp_text(splitline,offset,modified)
     local strippedabil = strip(abil) -- Slug the ability
     local slugged_commands = make_slugged_command_list(commands)
 
-    if strippedabil ~= '' and slugged_commands[strippedabil] then -- If the ability exists, do this.
+    if strippedabil ~= '' and slugged_commands[strippedabil] then -- If you can use the ability, do this.
         local r_line
         
         
@@ -409,6 +409,23 @@ function interp_text(splitline,offset,modified)
         end
         windower.send_command('@input '..lastsent)
         return ''
+    elseif strippedabil ~= '' and validabils[strippedabil] then -- If you can't use the ability, but it does exist, do this
+        local r_line,abil_type
+        if validabils[strippedabil].typ == 'Ambiguous' then
+            abil_type=ambig_names[strippedabil]['funct'](windower.ffxi.get_player(),ambig_names[strippedabil].IDs,ambig_names[strippedabil].info,ambig_names[strippedabil].monster_abilities)
+            r_line= res[abil_type][ambig_names[strippedabil].IDs[abil_type]]
+        else
+            r_line = res[validabils[strippedabil].typ][validabils[strippedabil].index]
+        end
+        
+        lastsent = r_line.prefix..' "'..r_line.english..'" '..(temptarg or target_make(r_line.targets))
+        if debugging then windower.add_to_chat(8,tostring(counter)..' input '..lastsent) end
+        if logging then
+            logfile:write('\n\n',tostring(os.clock()),'Original: ',table.concat(splitline,' '),'\n(180) ',lastsent)
+            logfile:flush()
+        end
+        windower.send_command('@input '..lastsent)
+        return ''
     end
     lastsent = ''
     return modified
@@ -428,7 +445,7 @@ function convert_spell(spell)
     local name_line = validabils[strippedabil]
     
     if name_line then
-        if name_line.typ == 'ambig_names' then
+        if name_line.typ == 'Ambiguous' then
             local abil_type = ambig_names[strippedabil]['funct'](windower.ffxi.get_player(),ambig_names[strippedabil].IDs,ambig_names[strippedabil].info,ambig_names[strippedabil].monster_abilities)
             r_line = res[abil_type][ambig_names[strippedabil].IDs[abil_type]]
         elseif res[name_line.typ][name_line.index] then

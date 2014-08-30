@@ -162,7 +162,9 @@ end
 function make_abil(abil,t,i)
 	if abil:sub(1,1) == '#' or string.find(abil:lower(),'magic'..string.char(0x40)) then return end
 	ind = strip(abil)
-	if not rawget(validabils,ind) or (rawget(validabils,ind).typ == t and rawget(validabils,ind).index == i) then
+	if not validabils[ind] or (validabils[ind].typ == t and validabils[ind].index == i) then
+        -- If an entry doesn't exist or an entry already exists for the same resource type
+        -- This should eliminate the need for absolute remapping for things like Sleepga
 		validabils[ind] = {}
 		validabils[ind].typ = t
 		validabils[ind].index = i
@@ -171,12 +173,10 @@ function make_abil(abil,t,i)
 			f:write('Original: '..tostring(abil)..' '..tostring(validabils[ind].typ)..' '..tostring(validabils[ind].index)..'\nSecondary: '..tostring(abil)..' '..tostring(t)..' '..tostring(i)..'\n\n')
 			counter = counter +1
 		end
-		validabils[ind] = {}
-		validabils[ind].typ = 'ambig_names'
-		validabils[ind].index = ind
         if not ambig_names[ind] then
-            ambig_names[ind] = {funct=default,IDs={}}
+            ambig_names[ind] = {funct=default,IDs={[validabils[ind].typ]=validabils[ind].index}}
         end
+		validabils[ind] = {typ = 'Ambiguous',index = ind}
         ambig_names[ind].IDs[t] = i
 	end
 end
@@ -184,8 +184,8 @@ end
 -- Iterate through resources and make validabils.
 function validabils_it(str)
     for i,v in pairs(res[str]) do
-        if not v.monster_level or (v.monster_level and v.monster_level ~= -1 and v.ja:sub(1,1) ~= '#' )then
-        -- Monster Abilities contains a large number of player-usable moves (but not monstrosity-usable) This excludes them.
+        if (not v.monster_level and v.prefix) or (v.monster_level and v.monster_level ~= -1 and v.ja:sub(1,1) ~= '#' ) then
+        -- Monster Abilities contains a large number of player-usable moves (but not monstrosity-usable). This excludes them.
             make_abil(v.english,str,i)
         end
     end
@@ -516,7 +516,7 @@ if logging then -- Prints out unhandled ambiguous cases, sort of a pre-emptive l
     f = io.open('../addons/shortcuts/data/'..tostring(os.clock())..'_unhandled_duplicates.log','w+')
     
     for i,v in pairs(validabils) do
-        if v.typ == 'ambig_names' then
+        if v.typ == 'Ambiguous' then
             if ambig_names[i] == nil then
                 f:write(tostring(i)..'\n\n')
             end
