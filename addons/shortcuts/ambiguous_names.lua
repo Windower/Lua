@@ -384,31 +384,6 @@ ambig_names = table.update(ambig_names,{
     blizzardii={IDs={spells=150,job_abilities=609},funct=smn_sub,info=T{4,5,8,20,21,'Shiva','Rage'}},
     thunderii={IDs={spells=165,job_abilities=625},funct=smn_sub,info=T{4,5,8,20,21,'Ramuh','Rage'}}
 })
- 
-function ambig(key)
-    local abil_type
-    if ambig_names[key] == nil then -- If there is no entry for the ambiguous command...
-        print('Shortcuts Bug: '..tostring(key))
-        return
-    end
-    local commands = get_available_commands()
-    local slugged_commands = make_slugged_command_list(commands)
-    
-    if slugged_commands[key] then
-        if slugged_commands[key].type == 'Ambiguous' then 
-        -- If the current usage is unambiguous because only one ability is available then...
-            abil_type=ambig_names[key]['funct'](windower.ffxi.get_player(),ambig_names[key].IDs,ambig_names[key].info,ambig_names[key].monster_abilities)
-            return res[abil_type][ambig_names[key].IDs[abil_type]]
-        else  -- Otherwise it's actually ambiguous, so run the associated function and pass the known information.
-            return commands[slugged_commands[key].type][slugged_commands[key].id],slugged_commands[key].type
-        end
-    else
-        abil_type=default(windower.ffxi.get_player(),ambig_names[key].IDs,ambig_names[key].info,ambig_names[key].monster_abilities)
-        return res[abil_type][ambig_names[key].IDs[abil_type]]
-    end
-end
-
-
 
 -----------------------------------------------------------------------------------
 --Name: get_available_commands()

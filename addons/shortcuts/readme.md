@@ -1,4 +1,4 @@
-#Shortcuts v2.3
+#Shortcuts v2.4
 ####written by Byrth  
 
 Completes and properly formats commands (prefixed by at least one '/'),
@@ -9,6 +9,7 @@ spellcast" project, and represents the interpretation part of spellcast.
 None  
 
 ####Changelog:  
+v2.4 -  8/30/14 - Changed ambiguous case handling to respect specified prefixes.
 v2.3 -  6/20/14 - Added new monstrosity skill disambiguation.
 v2.2 -  5/19/14 - Accommodated new Resources changes.
 v2.1 -  4/18/14 - Added custom aliases to Shortcuts.

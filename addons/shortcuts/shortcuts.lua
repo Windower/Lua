@@ -24,7 +24,7 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-_addon.version = '2.300'
+_addon.version = '2.400'
 _addon.name = 'Shortcuts'
 _addon.author = 'Byrth'
 _addon.commands = {'shortcuts'}
@@ -348,30 +348,47 @@ function interp_text(splitline,offset,modified)
     local temptarg,abil
     local no_targ_abil = strip(table.concat(splitline,' ',1+offset,splitline.n))
     
+    local commands = get_available_commands()
+    
     if validabils[no_targ_abil] then
         abil = no_targ_abil
     elseif splitline.n > 1 then
-        local potential_targ = splitline[splitline.n]
-        if targ_reps[potential_targ] then
-            potential_targ = targ_reps[potential_targ]
-        end
-        temptarg = valid_target(potential_targ)
+        temptarg = valid_target(targ_reps[splitline[splitline.n]] or splitline[splitline.n])
     end
 
     if temptarg then abil = _raw.table.concat(splitline,' ',1+offset,splitline.n-1)
     elseif not abil then abil = _raw.table.concat(splitline,' ',1+offset,splitline.n) end
 
     local strippedabil = strip(abil) -- Slug the ability
+    local slugged_commands = make_slugged_command_list(commands)
 
-    if strippedabil ~= '' and validabils[strippedabil] then -- If the ability exists, do this.
+    if strippedabil ~= '' and slugged_commands[strippedabil] then -- If the ability exists, do this.
         local r_line
         
-        if validabils[strippedabil].typ == 'ambig_names' then
+        
+        if slugged_commands[strippedabil].type == 'Ambiguous' then
             if debugging then windower.add_to_chat(8,strippedabil..' is considered ambiguous.') end
-            r_line = ambig(strippedabil)
-        elseif res[validabils[strippedabil].typ][validabils[strippedabil].index] then
-            if debugging then windower.add_to_chat(8,strippedabil..' is considered a '..validabils[strippedabil].typ..'.') end
-            r_line = res[validabils[strippedabil].typ][validabils[strippedabil].index]
+            
+            local abil_type
+            
+            if ambig_names[strippedabil] then
+                if offset == 0 then 
+                    -- It's ambiguous, so run the associated function and pass the known information.
+                    abil_type=ambig_names[strippedabil]['funct'](windower.ffxi.get_player(),ambig_names[strippedabil].IDs,ambig_names[strippedabil].info,ambig_names[strippedabil].monster_abilities)
+                    r_line= commands[abil_type][ambig_names[strippedabil].IDs[abil_type]]
+                else
+                    -- A prefix is specified
+                    abil_type = command_list[splitline[1]]
+                    r_line= commands[abil_type][ambig_names[strippedabil].IDs[abil_type]]
+                end
+            else
+                print('Shortcuts: Resources problem detected!')
+                return
+            end
+            
+        elseif commands[slugged_commands[strippedabil].type][slugged_commands[strippedabil].id] then
+            if debugging then windower.add_to_chat(8,strippedabil..' is considered a '..slugged_commands[strippedabil].type..'.') end
+            r_line = commands[slugged_commands[strippedabil].type][slugged_commands[strippedabil].id]
         end
         
         local targets = r_line.targets

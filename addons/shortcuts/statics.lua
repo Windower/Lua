@@ -96,9 +96,9 @@ end
 -- Constants used in the rest of the addon.
 
 -- List of valid prefixes to be interpreted. The values currently have no use.
-command_list = {['/ja']='Ability',['/jobability']='Ability',['/so']='Magic',['/song']='Magic',['/ma']='Magic',['/magic']='Magic',['/nin']='Magic',['/ninjutsu']='Magic',
-	['/ra']='Ranged Attack',['/range']='Ranged Attack',['/throw']='Ranged Attack',['/shoot']='Ranged Attack',['/monsterskill']='Ability',['/ms']='Ability',
-	['/ws']='Weapon Skill',['/weaponskill']='Weapon Skill',['/item']='Ability',['/pet']='Ability'}
+command_list = {['/ja']='job_abilities',['/jobability']='job_abilities',['/so']='spells',['/song']='spells',['/ma']='spells',['/magic']='spells',['/nin']='spells',['/ninjutsu']='spells',
+	['/ra']='Ranged Attack',['/range']='Ranged Attack',['/throw']='Ranged Attack',['/shoot']='Ranged Attack',['/monsterskill']='monster_abilities',['/ms']='monster_abilities',
+	['/ws']='weapon_skills',['/weaponskill']='weapon_skills',['/item']='Ability',['/pet']='job_abilities'}
 
 -- List of other commands that might use name completion.
 command2_list = {['/kick']=true,['/assist']=true,['/alliancecmd']=T{'kick','add','leader','breakup','leave','looter'},['/partycmd']=T{'kick','add','leader','breakup','leave','looter'},
