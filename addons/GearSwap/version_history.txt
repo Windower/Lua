@@ -1,4 +1,6 @@
 -------------------------------------------------
+GearSwap 0.880 - Accommodated booleans and numbers in equip commands. Fixed world.conquest.strengths.
+-------------------------------------------------
 GearSwap 0.875 - Changed command_registry handling slightly
 -------------------------------------------------
 GearSwap 0.874 - Added indi_change event

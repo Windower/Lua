@@ -263,6 +263,12 @@ function include_user(str)
         error('\nGearSwap: include() was passed an invalid value ('..tostring(str)..'). (must be a string)', 2)
     end
     
+    if T{'bit','socket'}:contains(str:lower()) then
+        return _G[str:lower()]
+    elseif T{'pack'}:contains(str:lower()) then
+        return
+    end
+    
     if str:sub(-4)~='.lua' then str = str..'.lua' end
     local path, loaded_values = pathsearch({str})
     
