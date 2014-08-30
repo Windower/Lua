@@ -38,7 +38,7 @@ function valid_target(targ)
         
         spelltarget.raw = targ
         return targ, spelltarget
-    elseif targ and tonumber(targ) then
+    elseif targ and tonumber(targ) and tonumber(targ) > 255 then
         local j = windower.ffxi.get_mob_by_id(tonumber(targ))
         
         if j then spelltarget = target_complete(j) end
