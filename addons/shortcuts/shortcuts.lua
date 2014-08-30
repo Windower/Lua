@@ -24,7 +24,7 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-_addon.version = '2.510'
+_addon.version = '2.520'
 _addon.name = 'Shortcuts'
 _addon.author = 'Byrth'
 _addon.commands = {'shortcuts'}
@@ -196,8 +196,8 @@ end)
 -----------------------------------------------------------------------------------
 windower.register_event('unhandled command',function(...)
     local combined = windower.convert_auto_trans(table.concat({...},' ')) -- concat it back together...
-    local cmd = command_logic(combined,combined) -- and then dump it into command_logic()
-    if cmd and cmd ~= '' then
+    local cmd,bool = command_logic(combined,combined) -- and then dump it into command_logic()
+    if cmd and bool and cmd ~= '' then
         windower.send_command('@input '..cmd)
     end
 end)
@@ -220,7 +220,7 @@ function command_logic(original,modified)
     local a,b,spell = string.find(original,'"(.-)"')
     
     if unhandled_list[command] then
-        return modified
+        return modified,true
     end
     
     if spell then
@@ -239,7 +239,7 @@ function command_logic(original,modified)
     
     if ignore_list[command] then -- If the command is legitimate and on the blacklist, return it unaltered.
         lastsent = ''
-        return modified
+        return modified,true
     elseif command2_list[command] and not valid_target(potential_targ,true) then
         -- If the command is legitimate and requires target completion but not ability interpretation
         
@@ -256,7 +256,7 @@ function command_logic(original,modified)
                 logfile:flush()
             end
             windower.send_command('@input /'..lastsent)
-            return ''
+            return '',false
         else -- If there are excluded secondary commands (like /pcmd add <name>)
             local tempcmd = command
             local passback
@@ -290,7 +290,7 @@ function command_logic(original,modified)
                 logfile:flush()
             end
             windower.send_command('@input /'..lastsent)
-            return ''
+            return '',false
         end
     elseif (command2_list[command] and valid_target(potential_targ,true)) then 
         -- If the submitted command does not require ability interpretation and is fine already, send it out.
@@ -299,7 +299,7 @@ function command_logic(original,modified)
             logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\n(146) Legitimate command')
             logfile:flush()
         end
-        return modified
+        return modified,true
     elseif command_list[command] and convert_spell(spell) and valid_target(potential_targ,true) then
         -- If the submitted ability is already properly formatted, send it out. Fixes capitalization and minor differences.
         lastsent = ''
@@ -307,7 +307,7 @@ function command_logic(original,modified)
             logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\n(146) Legitimate command')
             logfile:flush()
         end
-        return "/"..command..' "'..convert_spell(spell)..'" '..potential_targ
+        return "/"..command..' "'..convert_spell(spell)..'" '..potential_targ,true
     elseif command_list[command] then
         -- If there is a valid command, then pass the text with an offset of 1 to the text interpretation function
         return interp_text(splitline,1,modified)
@@ -387,7 +387,7 @@ function interp_text(splitline,offset,modified)
                 end
             else
                 print('Shortcuts: Resources problem detected!')
-                return
+                return false,false
             end
             
         elseif commands[slugged_commands[strippedabil].type][slugged_commands[strippedabil].id] then
@@ -412,7 +412,7 @@ function interp_text(splitline,offset,modified)
             logfile:flush()
         end
         windower.send_command('@input '..lastsent)
-        return ''
+        return '',false
     elseif strippedabil ~= '' and validabils[strippedabil] then -- If you can't use the ability, but it does exist, do this
         local r_line,abil_type
         if validabils[strippedabil].typ == 'Ambiguous' then
@@ -429,10 +429,10 @@ function interp_text(splitline,offset,modified)
             logfile:flush()
         end
         windower.send_command('@input '..lastsent)
-        return ''
+        return '',false
     end
     lastsent = ''
-    return modified
+    return modified,false
 end
 
 
