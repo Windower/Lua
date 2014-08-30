@@ -24,7 +24,7 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-_addon.version = '2.520'
+_addon.version = '2.540'
 _addon.name = 'Shortcuts'
 _addon.author = 'Byrth'
 _addon.commands = {'shortcuts'}
@@ -166,8 +166,7 @@ windower.register_event('outgoing text',function(original,modified)
     local temp_org = windower.convert_auto_trans(modified)
     if modified:sub(1,1) ~= '/' then return modified end
     if debugging then 
-        local tempst = windower.ffxi.get_mob_by_target('st')
-        windower.add_to_chat(8,modified..' '..tostring(tempst))
+        windower.add_to_chat(8,modified..' '..tostring(windower.ffxi.get_mob_by_target('st')))
     end
     temp_org = temp_org:gsub(' <wait %d+>',''):sub(2)
     
@@ -216,7 +215,10 @@ end)
 function command_logic(original,modified)
     local splitline = alias_replace(string.split(original,' '):filter(-''))
     local command = splitline[1] -- Treat the first word as a command.
-    local potential_targ = splitline[splitline.n]
+    local potential_targ = '/nope//'
+    if splitline.n ~= 1 then
+        potential_targ = splitline[splitline.n]
+    end
     local a,b,spell = string.find(original,'"(.-)"')
     
     if unhandled_list[command] then
@@ -246,16 +248,17 @@ function command_logic(original,modified)
         if command2_list[command]==true then -- If there are not any excluded secondary commands
             local temptarg = valid_target(potential_targ) or target_make({['Player']=true,['Enemy']=true,['Party']=true,['Ally']=true,['NPC']=true,['Self']=true,['Corpse']=true}) -- Complete the target or make one.
             if temptarg ~= '<me>' then -- These commands, like emotes, check, etc., don't need to default to <me>
-                lastsent = command..' '..temptarg -- Push the command and target together and send it out.
+                lastsent = '/'..command..' '..temptarg -- Push the command and target together and send it out.
             else
-                lastsent = command
+                lastsent = '/'..command
             end
+
             if debugging then windower.add_to_chat(8,tostring(counter)..' input '..lastsent) end
             if logging then
                 logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\n(162) ',lastsent)     
                 logfile:flush()
             end
-            windower.send_command('@input /'..lastsent)
+            windower.send_command('@input '..lastsent)
             return '',false
         else -- If there are excluded secondary commands (like /pcmd add <name>)
             local tempcmd = command
@@ -283,16 +286,16 @@ function command_logic(original,modified)
             elseif not temptarg then -- Make a target if the temptarget isn't valid
                 temptarg = target_make({['Player']=true,['Enemy']=true,['Party']=true,['Ally']=true,['NPC']=true,['Self']=true,['Corpse']=true})
             end
-            lastsent = tempcmd..' '..temptarg
+            lastsent = '/'..tempcmd..' '..temptarg
             if debugging then windower.add_to_chat(8,tostring(counter)..' input '..lastsent) end
             if logging then
                 logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\n(193) ',lastsent)
                 logfile:flush()
             end
-            windower.send_command('@input /'..lastsent)
+            windower.send_command('@input '..lastsent)
             return '',false
         end
-    elseif (command2_list[command] and valid_target(potential_targ,true)) then 
+    elseif command2_list[command] and valid_target(potential_targ,true) then
         -- If the submitted command does not require ability interpretation and is fine already, send it out.
         lastsent = ''
         if logging then
