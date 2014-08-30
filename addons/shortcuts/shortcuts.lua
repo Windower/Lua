@@ -24,7 +24,7 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-_addon.version = '2.400'
+_addon.version = '2.401'
 _addon.name = 'Shortcuts'
 _addon.author = 'Byrth'
 _addon.commands = {'shortcuts'}
@@ -296,7 +296,7 @@ function command_logic(original,modified)
             logfile:flush()
         end
         return modified
-    elseif command_list[command] and convert_spell(spell or '') and valid_target(potential_targ,true) then
+    elseif command_list[command] and convert_spell(spell) and valid_target(potential_targ,true) then
         -- If the submitted ability is already properly formatted, send it out. Fixes capitalization and minor differences.
         lastsent = ''
         if logging then
@@ -424,23 +424,18 @@ end
 ---- Either false, or a corrected spell name.
 -----------------------------------------------------------------------------------
 function convert_spell(spell)
-    local name_line = validabils[(spell or ''):lower():gsub(' ',''):gsub('[^%w]','')]
+    local strippedabil = (spell or ''):lower():gsub(' ',''):gsub('[^%w]','')
+    local name_line = validabils[strippedabil]
     
     if name_line then
         if name_line.typ == 'ambig_names' then
-            r_line = ambig(strip(spell))
+            local abil_type = ambig_names[strippedabil]['funct'](windower.ffxi.get_player(),ambig_names[strippedabil].IDs,ambig_names[strippedabil].info,ambig_names[strippedabil].monster_abilities)
+            r_line = res[abil_type][ambig_names[strippedabil].IDs[abil_type]]
         elseif res[name_line.typ][name_line.index] then
             r_line = res[name_line.typ][name_line.index]
-        else
-            print('this line should really not be hit ever')
         end
         
-        if r_line then
-            return r_line[language]
-        else
-            return false
-        end
-    else
-        return false
+        return r_line[language] or false
     end
+    return false
 end
