@@ -380,6 +380,16 @@ function parse_set_to_keys(str)
                 _,_,key,stop,sep,remainder = remainder:find("^([^']+)('])(%.?%[?)(.*)")
             elseif sep == '"' then
                 _,_,key,stop,sep,remainder = remainder:find('^([^"]+)("])(%.?%[?)(.*)')
+            elseif #sep == 0 then
+                -- If there is no single or double quote detected, attempt to treat the index as a number or boolean
+                local _,_,pot_key,pot_stop,pot_sep,pot_remainder = remainder:find('^([^%]]+)(])(%.?%[?)(.*)')
+                if tonumber(pot_key) then
+                    key,stop,sep,remainder = tonumber(pot_key),pot_stop,pot_sep,pot_remainder
+                elseif pot_key == 'true' then
+                    key,stop,sep,remainder = true,pot_stop,pot_sep,pot_remainder
+                elseif pot_key == 'false' then
+                    key,stop,sep,remainder = false,pot_stop,pot_sep,pot_remainder
+                end
             end
             result:append(key)
         end
