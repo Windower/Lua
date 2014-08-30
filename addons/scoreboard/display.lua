@@ -394,7 +394,7 @@ function Display:report_stat(stat, args)
                 if stat == 'wsavg' then
                     elements:append({stat_pair[1], ('%s %d (%ds)'):format(name, stat_pair[1], stat_pair[2])})
                 else
-                    elements:append({stat_pair[1], ('%s %2.2f%% (%ds)'):format(name, stat_pair[1] * 100, stat_pair[2])})
+                    elements:append({stat_pair[1], ('%s %.2f%% (%ds)'):format(name, stat_pair[1] * 100, stat_pair[2])})
                 end
             end
         end
