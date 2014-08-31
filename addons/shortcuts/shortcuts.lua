@@ -197,6 +197,7 @@ windower.register_event('unhandled command',function(...)
     local combined = windower.convert_auto_trans(table.concat({...},' ')) -- concat it back together...
     local cmd,bool = command_logic(combined,combined) -- and then dump it into command_logic()
     if cmd and bool and cmd ~= '' then
+        if cmd:sub(1,1) ~= '/' then cmd = '/'..cmd end
         windower.send_command('@input '..cmd)
     end
 end)
