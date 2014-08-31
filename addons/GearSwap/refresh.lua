@@ -433,18 +433,20 @@ function refresh_group_info(dt,user_event_flag)
         local partyIndex
         
         -- For 'p#', ally index is 1, party index is the second char
-        if i:sub(1,1) == 'p' then
+        if i:sub(1,1) == 'p' and tonumber(i:sub(2)) then
             allyIndex = 1
             partyIndex = tonumber(i:sub(2))+1
         -- For 'a##', ally index is the second char, party index is the third char
-        else
+        elseif tonumber(i:sub(2,2)) and tonumber(i:sub(3)) then
             allyIndex = tonumber(i:sub(2,2))+1
             partyIndex = tonumber(i:sub(3))+1
         end
         
-        alliance[allyIndex][partyIndex] = v
-        alliance[allyIndex].count = alliance[allyIndex].count + 1
-        alliance.count = alliance.count + 1
+        if allyIndex and partyIndex then
+            alliance[allyIndex][partyIndex] = v
+            alliance[allyIndex].count = alliance[allyIndex].count + 1
+            alliance.count = alliance.count + 1
+        end
     end
 end
 
