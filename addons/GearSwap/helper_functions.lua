@@ -542,7 +542,7 @@ function find_usable_item(item_id)
     -- Should I add some kind of filter for enchanted items?
     if not inventory_index then
         for i,v in pairs(items.inventory) do
-            if v and v.id == item_id then
+            if v and v.id == item_id and is_usable_item(v) then
                 inventory_index = i
                 bag_id = 0
                 break
@@ -551,7 +551,7 @@ function find_usable_item(item_id)
     end
     if not inventory_index then
         for i,v in pairs(items.wardrobe) do
-            if v and v.id == item_id then
+            if v and v.id == item_id and is_usable_item(v) then
                 inventory_index = i
                 bag_id = 8
                 break
@@ -561,6 +561,20 @@ function find_usable_item(item_id)
     return inventory_index,bag_id
 end
 
+-----------------------------------------------------------------------------------
+--Name: is_usable_item(i_tab)
+--Desc: Determines whether the item table belongs to a usable item.
+--Args:
+---- i_tab - current item table
+-----------------------------------------------------------------------------------
+--Returns:
+---- true or false to indicate whether the item is usable
+-----------------------------------------------------------------------------------
+function is_usable_item(i_tab)
+    local ext = extdata.decode(i_tab)
+    if res.items[i_tab.id].type == 7 or (ext.type == 'Enchanted Equipment' and ext.usable) then return true end
+    return false
+end
 
 -----------------------------------------------------------------------------------
 --Name: filter_pretarget(spell)
@@ -579,7 +593,7 @@ function filter_pretarget(spell)
         return false
     elseif category == 3 then
         local available_spells = windower.ffxi.get_spells()
-        local spell_jobs = res.spells[spell.id].levels
+        local spell_jobs = copy_entry(res.spells[spell.id].levels)
         
         -- Filter for spells that you do not know. Exclude Impact.
         if not available_spells[spell.id] and not spell.id == 503 then
@@ -816,6 +830,23 @@ end
 
 
 -----------------------------------------------------------------------------------
+--Name: copy_entry(tab)
+--Desc: Copies a table into a new table while preserving its metatable.
+--      Designed for copying resources entries.
+--Args:
+---- tab - Resources table.
+-----------------------------------------------------------------------------------
+--Returns:
+---- ret - New table that has the same metatable and content as the original table.
+-----------------------------------------------------------------------------------
+function copy_entry(tab)
+    if not tab then return nil end
+    local ret = setmetatable(table.reassign({},tab),getmetatable(tab))
+    return ret
+end
+
+
+-----------------------------------------------------------------------------------
 --Name: get_spell(act)
 --Desc: Takes an action table and returns a modified resource line
 --Args:
@@ -836,18 +867,18 @@ function get_spell(act)
     end
     
     if act.category == 12 or act.category == 2 then
-        spell = table.reassign({},resources_ranged_attack)
+        spell = copy_entry(resources_ranged_attack)
     else
         if not res.action_messages[msg_ID] or msg_ID == 31 then
             if act.category == 4 or act.category == 8 then
-                spell = res.spells[abil_ID]
+                spell = copy_entry(res.spells[abil_ID])
                 if act.category == 4 and spell then spell.recast = act.recast end
             elseif T{6,13,14,15}:contains(act.category) then
-                spell = res.job_abilities[abil_ID] -- May have to correct for charmed pets some day, but I'm not sure there are any monsters with TP moves that give no message.
+                spell = copy_entry(res.job_abilities[abil_ID]) -- May have to correct for charmed pets some day, but I'm not sure there are any monsters with TP moves that give no message.
             elseif T{3,7}:contains(act.category) then
-                spell = res.weapon_skills[abil_ID]
+                spell = copy_entry(res.weapon_skills[abil_ID])
             elseif T{5,9}:contains(act.category) then
-                spell = res.items[abil_ID]
+                spell = copy_entry(res.items[abil_ID])
             else
                 spell = {name=tostring(msg_ID)}
             end
@@ -858,41 +889,41 @@ function get_spell(act)
         local fields = fieldsearch(res.action_messages[msg_ID].english) -- ENGLISH
         
         if table.contains(fields,'spell') then
-            spell = res.spells[abil_ID]
+            spell = copy_entry(res.spells[abil_ID])
             if act.category == 4 then spell.recast = act.recast end
         elseif table.contains(fields,'ability') then
-            spell = res.job_abilities[abil_ID]
+            spell = copy_entry(res.job_abilities[abil_ID])
         elseif table.contains(fields,'weapon_skill') then
             if abil_ID > 255 then -- WZ_RECOVER_ALL is used by chests in Limbus
-                spell = res.monster_abilities[abil_ID]
+                spell = copy_entry(res.monster_abilities[abil_ID])
                 if not spell then
                     spell = {id=abil_ID,english='Special Attack'}
                 end
             elseif abil_ID < 256 then
-                spell = res.weapon_skills[abil_ID]
+                spell = copy_entry(res.weapon_skills[abil_ID])
             end
         elseif msg_ID == 303 then
-            spell = res.job_abilities[74] -- Divine Seal
+            spell = copy_entry(res.job_abilities[74]) -- Divine Seal
         elseif msg_ID == 304 then
-            spell = res.job_abilities[75] -- 'Elemental Seal'
+            spell = copy_entry(res.job_abilities[75]) -- 'Elemental Seal'
         elseif msg_ID == 305 then
-            spell = res.job_abilities[76] -- 'Trick Attack'
+            spell = copy_entry(res.job_abilities[76]) -- 'Trick Attack'
         elseif msg_ID == 311 or msg_ID == 311 then
-            spell = res.job_abilities[79] -- 'Cover'
+            spell = copy_entry(res.job_abilities[79]) -- 'Cover'
         elseif msg_ID == 240 or msg_ID == 241 then
-            spell = res.job_abilities[43] -- 'Hide'
+            spell = copy_entry(res.job_abilities[43]) -- 'Hide'
         elseif msg_ID == 244 then
-            spell = res.job_abilities[act.param] -- Mug failures
+            spell = copy_entry(res.job_abilities[act.param]) -- Mug failures
         elseif msg_ID == 328 then
-            spell = res.job_abilities[effect_val] -- BPs that are out of range
+            spell = copy_entry(res.job_abilities[effect_val]) -- BPs that are out of range
         end
         
         
         if table.contains(fields,'item') then
             if spell then
-                spell.item = res.items[effect_val]
+                spell.item = copy_entry(res.items[effect_val])
             else
-                spell = res.items[abil_ID]
+                spell = copy_entry(res.items[abil_ID])
             end
         else
             spell = spell_complete(spell)

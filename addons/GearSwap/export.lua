@@ -62,7 +62,7 @@ function export_set(options)
                 if res.items[v.id] then
                     item_list[#item_list+1] = {}
                     item_list[#item_list].name = res.items[v.id][language]
-                    local potslots,slot = res.items[v.id].slots
+                    local potslots,slot = copy_entry(res.items[v.id].slots)
                     if potslots then
                         slot = res.slots[potslots:it()()].english:gsub(' ','_'):lower() -- Multi-lingual support requires that we add more languages to slots.lua
                     end

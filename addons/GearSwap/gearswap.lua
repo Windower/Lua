@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.880'
+_addon.version = '0.890'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -244,7 +244,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         local status_id = data:byte(32)
         -- Filter all statuses aside from Idle/Engaged/Dead/Engaged dead.
         if status_id < 4 then
-            local newstatus = res.statuses[status_id]
+            local newstatus = copy_entry(res.statuses[status_id])
             if newstatus and newstatus[language] then
                 newstatus = newstatus[language]
                 if oldstatus ~= newstatus then

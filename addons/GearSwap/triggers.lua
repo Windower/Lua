@@ -74,32 +74,32 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
             local r_line
             
             if unified_prefix == '/ma' then
-                r_line = res.spells[validabils[language][unified_prefix][abil]]
+                r_line = copy_entry(res.spells[validabils[language][unified_prefix][abil]])
                 storedcommand = command..' "'..r_line[language]..'" '
             elseif unified_prefix == '/ms' then
                 if player.species then
                     -- Iterates over currently available monster TP moves instead of using validabils
                     for i,v in pairs(player.species.tp_moves) do
                         if res.monster_abilities[i][language]:lower() == abil then
-                            r_line = res.monster_abilities[i]
+                            r_line = copy_entry(res.monster_abilities[i])
                             break
                         end
                     end
                 end
                 storedcommand = command..' "'..r_line[language]..'" '
             elseif unified_prefix == '/ws' then
-                r_line = res.weapon_skills[validabils[language][unified_prefix][abil]]
+                r_line = copy_entry(res.weapon_skills[validabils[language][unified_prefix][abil]])
                 storedcommand = command..' "'..r_line[language]..'" '
             elseif unified_prefix == '/ja' then
-                r_line = res.job_abilities[validabils[language][unified_prefix][abil]]
+                r_line = copy_entry(res.job_abilities[validabils[language][unified_prefix][abil]])
                 storedcommand = command..' "'..r_line[language]..'" '
             elseif unified_prefix == '/item' then
-                r_line = res.items[validabils[language][unified_prefix][abil]]
+                r_line = copy_entry(res.items[validabils[language][unified_prefix][abil]])
                 r_line.prefix = '/item'
                 r_line.type = 'Item'
                 storedcommand = command..' "'..r_line[language]..'" '
             elseif unified_prefix == '/ra' then
-                r_line = resources_ranged_attack
+                r_line = copy_entry(resources_ranged_attack)
                 storedcommand = command..' '
             end
             
