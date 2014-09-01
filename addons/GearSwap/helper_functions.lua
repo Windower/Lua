@@ -538,11 +538,22 @@ function find_usable_item(item_id)
             break
         end
     end
+    
+    -- Should I add some kind of filter for enchanted items?
     if not inventory_index then
         for i,v in pairs(items.inventory) do
             if v and v.id == item_id then
                 inventory_index = i
                 bag_id = 0
+                break
+            end
+        end
+    end
+    if not inventory_index then
+        for i,v in pairs(items.wardrobe) do
+            if v and v.id == item_id then
+                inventory_index = i
+                bag_id = 8
                 break
             end
         end
