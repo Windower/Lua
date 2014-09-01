@@ -586,7 +586,7 @@ function filter_pretarget(spell)
             debug_mode_chat("Unable to execute command. You do not know that spell ("..(res.spells[spell.id][language] or spell.id)..")")
         -- Filter for spells that you know, but do not currently have access to
         elseif (not spell_jobs[player.main_job_id] or not (spell_jobs[player.main_job_id] <= player.main_job_level)) and
-            (not spell_jobs[player.sub_job_id] or not (spell_jobs[player.sub_job_id] < player.sub_job_level)) then
+            (not spell_jobs[player.sub_job_id] or not (spell_jobs[player.sub_job_id] <= player.sub_job_level)) then
             debug_mode_chat("Unable to execute command. You do not have access to that spell ("..(res.spells[spell.id][language] or spell.id)..")")
             return false
         -- At this point, we know that it is technically castable by this job combination if the right conditions are met.
@@ -604,7 +604,7 @@ function filter_pretarget(spell)
         elseif player.sub_job_id == 20 and ((addendum_white[spell.id] and not buffactive[401] and not buffactive[416]) or
             (addendum_black[spell.id] and not buffactive[402] and not buffactive[416])) and
             not (spell_jobs[player.main_job_id] and spell_jobs[player.main_job_id] <= player.main_job_level) then
-            
+                        
             if addendum_white[spell.id] then
                 debug_mode_chat("Unable to execute command. Addendum: White required for that spell ("..(res.spells[spell.id][language] or spell.id)..")")
             end
