@@ -1,7 +1,7 @@
 --[[
-findAll v1.20131120
+findAll v1.20140904
 
-Copyright (c) 2013, Giuliano Riccio
+Copyright (c) 2013-2014, Giuliano Riccio
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name    = 'findAll'
 _addon.author  = 'Zohno'
-_addon.version = '1.20140328'
+_addon.version = '1.20140904'
 _addon.command = 'findAll'
 
 require('chat')
@@ -296,7 +296,7 @@ function update()
         for storage_name, storage in pairs(storages) do
             if storage_name == 'gil' then
                 storages_json:append('"'..storage_name..'":'..storage)
-            elseif storage_name ~= 'temporary' and not storage_name:match('^slip') then
+            elseif storage_name ~= 'temporary' then
                 local items_json = L{}
 
                 for id, quantity in pairs(storage) do
