@@ -56,7 +56,7 @@ function init_include()
 	state.SelectNPCTargets    = M(false, 'Select NPC Targets')
 	state.PCTargetMode        = M{['description'] = 'PC Target Mode', 'default', 'stpt', 'stal', 'stpc'}
 
-    state.EquipStop           = M{['description'] = 'Stop Equipping Gear', 'none', 'precast', 'midcast', 'pet_midcast'}
+    state.EquipStop           = M{['description'] = 'Stop Equipping Gear', 'off', 'precast', 'midcast', 'pet_midcast'}
 
 	state.CombatWeapon        = M{['description']='Combat Weapon', ['string']=''}
 	state.CombatForm          = M{['description']='Combat Form', ['string']=''}
@@ -262,6 +262,11 @@ function handle_actions(spell, action)
 			display_breadcrumbs(spell, spellMap, action)
 		end
 		
+		-- Global post-handling of this action
+		if not eventArgs.cancel and _G['user_post_'..action] then
+			_G['user_post_'..action](spell, action, spellMap, eventArgs)
+		end
+
 		-- Job-specific post-handling of this action
 		if not eventArgs.cancel and _G['job_post_'..action] then
 			_G['job_post_'..action](spell, action, spellMap, eventArgs)
