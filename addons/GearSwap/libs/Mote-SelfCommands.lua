@@ -361,7 +361,7 @@ function display_current_state()
         add_to_chat(122, msg)
     end
 
-    if state.EquipStop.value ~= 'none' then
+    if state.EquipStop.value ~= 'off' then
         add_to_chat(122,'Gear equips are blocked after ['..state.EquipStop.value..'].  Use "//gs c reset equipstop" to turn it off.')
     end
 end
@@ -430,6 +430,7 @@ function handle_help(cmdParams)
         print('Set bool false:   gs c unset [field]')
         print('Remove gear:      gs c naked')
         print('Show TP Set:      gs c showtp')
+        print('State vars:       gs c help field')
     end
 end
 
