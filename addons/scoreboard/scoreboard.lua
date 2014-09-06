@@ -358,17 +358,17 @@ windower.register_event('action', function(raw_action)
                     -- hit, crit
                     if subaction.message == 1 or subaction.message == 67 then
                         if subaction.message == 67 then
-                            dps_db:add_m_crit(target:get_name(), CreatePlayerName(action), subaction.param)
+                            dps_db:add_m_crit(target:get_name(), create_player_name(action), subaction.param)
                         else
-                            dps_db:add_m_hit(target:get_name(), CreatePlayerName(action), subaction.param)
+                            dps_db:add_m_hit(target:get_name(), create_player_name(action), subaction.param)
                         end
                         
                         -- enspells etc
                         if subaction.has_add_effect and T{163, 229}:contains(subaction.add_effect_message) then
-                            dps_db:add_damage(target:get_name(), CreatePlayerName(action), subaction.add_effect_param)
+                            dps_db:add_damage(target:get_name(), create_player_name(action), subaction.add_effect_param)
                         end
                     elseif subaction.message == 15 or subaction.message == 63 then
-                        dps_db:incr_misses(target:get_name(), CreatePlayerName(action))
+                        dps_db:incr_misses(target:get_name(), create_player_name(action))
                     end
                 end
             end
@@ -392,7 +392,7 @@ windower.register_event('action', function(raw_action)
             for target in action:get_targets() do
                 for subaction in target:get_actions() do
                     if T{2, 252, 264, 650}:contains(subaction.message) then
-                        dps_db:add_damage(target:get_name(), CreatePlayerName(action), subaction.param)
+                        dps_db:add_damage(target:get_name(), create_player_name(action), subaction.param)
                     end
                 end
             end
@@ -429,7 +429,7 @@ windower.register_event('action', function(raw_action)
             for target in action:get_targets() do
                 for subaction in target:get_actions() do
                     if subaction.message == 317 then
-                        dps_db:add_damage(target:get_name(), CreatePlayerName(action), subaction.param)
+                        dps_db:add_damage(target:get_name(), create_player_name(action), subaction.param)
                     end
                 end
             end
@@ -437,7 +437,7 @@ windower.register_event('action', function(raw_action)
             for target in action:get_targets() do
                 for subaction in target:get_actions() do
                     if subaction.message == 185 or subaction.message == 264 then
-                        dps_db:add_damage(target:get_name(), CreatePlayerName(action), subaction.param)
+                        dps_db:add_damage(target:get_name(), create_player_name(action), subaction.param)
                     end
                 end
             end        
@@ -457,7 +457,7 @@ windower.register_event('action', function(raw_action)
     end
 end)
 
-function FindPetOwnerName(action)
+function find_pet_owner_name(action)
 	local pet = windower.ffxi.get_mob_by_id(action:get_id())
     local party = windower.ffxi.get_party()
 	
@@ -474,9 +474,9 @@ function FindPetOwnerName(action)
 	return name
 end
 
-function CreatePlayerName(action)
+function create_player_name(action)
 	local result = action:get_actor_name()
-	local owner = FindPetOwnerName(action)
+	local owner = find_pet_owner_name(action)
 	if owner ~= '' then
 		result = result..' ('..owner..')'
 	end
