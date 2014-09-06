@@ -458,11 +458,11 @@ windower.register_event('action', function(raw_action)
 end)
 
 function find_pet_owner_name(action)
-	local pet = windower.ffxi.get_mob_by_id(action:get_id())
+    local pet = windower.ffxi.get_mob_by_id(action:get_id())
     local party = windower.ffxi.get_party()
-	
-	local name = ''
-	
+    
+    local name = ''
+    
     for _, member in pairs(party) do
         if member.mob then
             if member.mob.pet_index and member.mob.pet_index> 0 and pet.index == member.mob.pet_index then
@@ -471,17 +471,16 @@ function find_pet_owner_name(action)
             end
         end
     end
-	return name
+    return name
 end
 
 function create_player_name(action)
-	local result = action:get_actor_name()
-	local owner = find_pet_owner_name(action)
-	if owner ~= '' then
-		result = result..' ('..owner..')'
-	end
-	
-	return result
+    local result = action:get_actor_name()
+    local owner = find_pet_owner_name(action)
+    if owner ~= '' then
+        result = result..' ('..owner..')'
+    end
+    return result
 end
 
 config.register(settings, function(settings)
