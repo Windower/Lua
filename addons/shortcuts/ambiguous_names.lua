@@ -140,6 +140,66 @@ function blu_sub(player_array,IDs,info) -- Determines ambiguous blue magic that 
     end
     return 'spells'
 end
+
+
+if logging then
+	f = io.open('../addons/shortcuts/data/'..tostring(os.clock())..'_all_duplicates.log','w+')
+	counter = 0
+end
+
+
+
+-----------------------------------------------------------------------------------
+--Name: make_abil()
+--Args:
+---- abil (string): ability name to be stripped
+---- t (string): type of ability (Magic or Ability)
+---- i (number): index id
+-----------------------------------------------------------------------------------
+--Returns:
+---- Nothing, adds a new line to validabils or modifies it.
+-----------------------------------------------------------------------------------
+function make_abil(abil,t,i)
+	if abil:sub(1,1) == '#' or string.find(abil:lower(),'magic'..string.char(0x40)) then return end
+	ind = strip(abil)
+	if not validabils[ind] or (validabils[ind].typ == t and validabils[ind].index == i) then
+        -- If an entry doesn't exist or an entry already exists for the same resource type
+        -- This should eliminate the need for absolute remapping for things like Sleepga
+		validabils[ind] = {}
+		validabils[ind].typ = t
+		validabils[ind].index = i
+	else
+		if logging then
+			f:write('Original: '..tostring(abil)..' '..tostring(validabils[ind].typ)..' '..tostring(validabils[ind].index)..'\nSecondary: '..tostring(abil)..' '..tostring(t)..' '..tostring(i)..'\n\n')
+			counter = counter +1
+		end
+        if not ambig_names[ind] then
+            ambig_names[ind] = {funct=default,IDs={[validabils[ind].typ]=validabils[ind].index}}
+        end
+		validabils[ind] = {typ = 'Ambiguous',index = ind}
+        ambig_names[ind].IDs[t] = i
+	end
+end
+
+-- Iterate through resources and make validabils.
+function validabils_it(str)
+    for i,v in pairs(res[str]) do
+        if (not v.monster_level and v.prefix) or (v.monster_level and v.monster_level ~= -1 and v.ja:sub(1,1) ~= '#' ) then
+        -- Monster Abilities contains a large number of player-usable moves (but not monstrosity-usable). This excludes them.
+            make_abil(v.english,str,i)
+        end
+    end
+end
+
+validabils_it('spells')
+validabils_it('job_abilities')
+validabils_it('weapon_skills')
+validabils_it('monster_abilities')
+
+if logging then
+	f:write('Counter: '..tostring(counter))
+	f:close()
+end
  
  
 ambig_names = table.update(ambig_names,{
@@ -384,31 +444,6 @@ ambig_names = table.update(ambig_names,{
     blizzardii={IDs={spells=150,job_abilities=609},funct=smn_sub,info=T{4,5,8,20,21,'Shiva','Rage'}},
     thunderii={IDs={spells=165,job_abilities=625},funct=smn_sub,info=T{4,5,8,20,21,'Ramuh','Rage'}}
 })
- 
-function ambig(key)
-    local abil_type
-    if ambig_names[key] == nil then -- If there is no entry for the ambiguous command...
-        print('Shortcuts Bug: '..tostring(key))
-        return
-    end
-    local commands = get_available_commands()
-    local slugged_commands = make_slugged_command_list(commands)
-    
-    if slugged_commands[key] then
-        if slugged_commands[key].type == 'Ambiguous' then 
-        -- If the current usage is unambiguous because only one ability is available then...
-            abil_type=ambig_names[key]['funct'](windower.ffxi.get_player(),ambig_names[key].IDs,ambig_names[key].info,ambig_names[key].monster_abilities)
-            return res[abil_type][ambig_names[key].IDs[abil_type]]
-        else  -- Otherwise it's actually ambiguous, so run the associated function and pass the known information.
-            return commands[slugged_commands[key].type][slugged_commands[key].id],slugged_commands[key].type
-        end
-    else
-        abil_type=default(windower.ffxi.get_player(),ambig_names[key].IDs,ambig_names[key].info,ambig_names[key].monster_abilities)
-        return res[abil_type][ambig_names[key].IDs[abil_type]]
-    end
-end
-
-
 
 -----------------------------------------------------------------------------------
 --Name: get_available_commands()
@@ -481,7 +516,7 @@ if logging then -- Prints out unhandled ambiguous cases, sort of a pre-emptive l
     f = io.open('../addons/shortcuts/data/'..tostring(os.clock())..'_unhandled_duplicates.log','w+')
     
     for i,v in pairs(validabils) do
-        if v.typ == 'ambig_names' then
+        if v.typ == 'Ambiguous' then
             if ambig_names[i] == nil then
                 f:write(tostring(i)..'\n\n')
             end

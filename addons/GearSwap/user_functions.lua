@@ -263,6 +263,12 @@ function include_user(str)
         error('\nGearSwap: include() was passed an invalid value ('..tostring(str)..'). (must be a string)', 2)
     end
     
+    if T{'bit','socket'}:contains(str:lower()) then
+        return _G[str:lower()]
+    elseif T{'pack'}:contains(str:lower()) then
+        return
+    end
+    
     if str:sub(-4)~='.lua' then str = str..'.lua' end
     local path, loaded_values = pathsearch({str})
     
@@ -278,6 +284,18 @@ function include_user(str)
         error('\nGearSwap: Error loading file ('..tostring(str)..'): '..err, 2)
     end
 end
+
+-- Allow the user to set a path subdirectory to check when searching for included files.
+-- This path is checked as a subdirectory to each fixed path, before the fixed path itself is checked.
+-- Path argument can only be a string; otherwise this is set to nil.
+function user_include_path(path)
+    if type(path) == 'string' then
+        include_user_path = path
+    else
+        include_user_path = nil
+    end
+end
+
 
 function user_midaction(bool)
     if bool == false then

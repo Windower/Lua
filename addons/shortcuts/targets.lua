@@ -73,14 +73,15 @@ function valid_target(targ,flag)
             spell_targ = false
         else
             -- If targ starts an element of the monster array, use it.
-            local min_dist = 50
+            local priority = 50
             for i,v in pairs(targar) do
-                if (i:lower()==san_targ:lower()) then-- or i:lower():find('^'..san_targ:lower())) then
-                    spell_targ = i
-                    break
+                if (i:lower()==san_targ:lower()) then
+                    v = 0
+                elseif i:lower():find('^'..san_targ:lower()) then
+                    v = v/50
                 end
-                if v < min_dist then -- Otherwise, just use the nearest (spatially) match.
-                    min_dist = v
+                if v < priority then -- Use the highest priority match, with a default priority hierarchy based on distance
+                    priority = v
                     spell_targ = i
                 end
             end

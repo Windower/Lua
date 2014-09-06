@@ -47,7 +47,7 @@ function Display:new(settings, db)
         self.text:font(self.settings.display.text.font)
         self.text:size(self.settings.display.text.fontsize)
     else
-        self.text:font(self.settings.display.text.font, 'consolas', 'courier new', 'monospace') 
+        self.text:font(self.settings.display.text.font, 'consolas', 'courier new', 'monospace')
         self.text:size(self.settings.display.text.size)
     end
 
@@ -73,7 +73,7 @@ end
 function Display:report_filters()
     local mob_str
     local filters = self.db:get_filters()
-    
+
     if filters:empty() then
         mob_str = "Scoreboard filters: None (Displaying damage for all mobs)"
     else
@@ -96,14 +96,14 @@ function Display:build_scoreboard_header()
     else
         mob_filter_str = table.concat(filters, ', ')
     end
-	
+
     local labels
     if self.db:empty() then
         labels = '\n'
     else
         labels = '%23s%7s%9s\n':format('Tot', 'Pct', 'DPS')
     end
-	
+
     local dps_status
     if dps_clock:is_active() then
         dps_status = 'Active'
@@ -121,7 +121,7 @@ function Display:build_scoreboard_header()
     return '%s%s\nMobs: %-9s\n%s':format(dps_chunk, ' ':rep(29 - dps_chunk:len()) .. '//sb help', mob_filter_str, labels)
 end
 
-    
+
 -- Returns following two element pair:
 -- 1) table of sorted 2-tuples containing {player, damage}
 -- 2) integer containing the total damage done
@@ -134,7 +134,7 @@ function Display:get_sorted_player_damage()
     if self.db:empty() then
         return {}, 0
     end
-	
+
     for mob, players in self.db:iter() do
         -- If the filter isn't active, include all mobs
         for player_name, player in pairs(players) do
@@ -145,7 +145,7 @@ function Display:get_sorted_player_damage()
             end
         end
     end
-	
+
     local sortable = T{}
     local total_damage = 0
     for player, damage in pairs(player_total_dmg) do
@@ -153,10 +153,10 @@ function Display:get_sorted_player_damage()
         sortable:append({player, damage})
     end
 
-    table.sort(sortable, function(a, b) 
+    table.sort(sortable, function(a, b)
         return a[2] > b[2]
     end)
-	
+
     return sortable, total_damage
 end
 
@@ -174,7 +174,7 @@ function Display:update()
     end
     local damage_table, total_damage
     damage_table, total_damage = self:get_sorted_player_damage()
-	
+
     local display_table = T{}
     local player_lines = 0
     local alli_damage = 0
@@ -186,7 +186,7 @@ function Display:update()
             else
                 dps = '%.2f':format(math.round(v[2] / dps_clock.clock, 2))
             end
-            
+
             local percent
             if total_damage > 0 then
                 percent = '(%.1f%%)':format(100 * v[2] / total_damage)
@@ -203,7 +203,7 @@ function Display:update()
         display_table:append('-':rep(17))
         display_table:append('Alli DPS: ' .. '%7.1f':format(alli_damage / dps_clock.clock))
     end
-	
+
     self.text:text(self:build_scoreboard_header() .. table.concat(display_table, '\n'))
 end
 
@@ -216,7 +216,7 @@ local function build_input_command(chatmode, tell_target)
             input_cmd = input_cmd .. tell_target .. ' '
         end
     end
-    
+
     return input_cmd
 end
 
@@ -227,11 +227,11 @@ local function wrap_elements(elements, header, sep)
     if not sep then
         sep = ', '
     end
-    
+
     local lines = T{}
     local current_line = nil
     local line_length
-    
+
     local i = 1
     while i <= #elements do
         if not current_line then
@@ -239,24 +239,24 @@ local function wrap_elements(elements, header, sep)
             line_length = header:len()
             lines:append(current_line)
         end
- 
+
         local new_line_length = line_length + elements[i]:len() + sep:len()
         if new_line_length > max_line_length then
             current_line = T{}
             lines:append(current_line)
             new_line_length = elements[i]:len() + sep:len()
         end
-        
+
         current_line:append(elements[i])
         line_length = new_line_length
         i = i + 1
     end
-    
+
     local baked_lines = lines:map(function (ls) return ls:concat(sep) end)
     if header:len() > 0 and #baked_lines > 0 then
         baked_lines[1] = header .. baked_lines[1]
     end
-    
+
     return baked_lines
 end
 
@@ -269,7 +269,7 @@ end
 
 function Display:report_summary (...)
     local chatmode, tell_target = table.unpack({...})
-	
+
     local damage_table, total_damage
     damage_table, total_damage = self:get_sorted_player_damage()
 
@@ -316,7 +316,7 @@ Display.show_stat = function()
             lines:append('%-20s %.2f%% (%d sample%s)':format(name, 100 * racc_pair[1], racc_pair[2],
                                                                      racc_pair[2] == 1 and "" or "s"))
         end
-        
+
         if #lines > 0 then
             sb_output(format_title('-= Ranged Accuracy (' .. filters .. ') =-'))
             sb_output(lines)
@@ -342,7 +342,7 @@ Display.show_stat = function()
             lines:append('%-20s %.2f%% (%d sample%s)':format(name, 100 * crit_pair[1], crit_pair[2],
                                                                      crit_pair[2] == 1 and '' or 's'))
         end
-        
+
         if #lines > 0 then
             sb_output(format_title('Ranged Crit. Rate (' .. filters .. ')'))
             sb_output(lines)
@@ -357,7 +357,7 @@ Display.show_stat = function()
                 lines:append('%-20s %d (%ds)':format(name, stat_pair[1], stat_pair[2]))
             end
         end
-        
+
         if #lines > 0 then
             sb_output(format_title('WS Average (' .. filters .. ')'))
             sb_output(lines)
@@ -368,13 +368,13 @@ Display.show_stat = function()
         local stats = self.db:query_stat(stat, player_filter)
         local filters = self.db:get_filters()
         local filter_str
-        
+
         if filters:empty() then
             filter_str = 'All mobs'
         else
             filter_str = filters:concat(', ')
         end
-        
+
         stat_display[stat](stats, filter_str)
     end
 end()
@@ -386,18 +386,22 @@ local all_stats = S{'acc', 'racc', 'crit', 'rcrit', 'wsavg'}
 function Display:report_stat(stat, args)
     if all_stats:contains(stat) then
         local stats = self.db:query_stat(stat, args.player)
-    
+
         local elements = T{}
         local header   = stat:ucfirst() .. ': '
         for name, stat_pair in pairs(stats) do
             if stat_pair[2] > 0 then
-                elements:append({stat_pair[1], ('%s %' .. (stat == 'wsavg' and 'd' or '.2f%%') .. ' (%ds)'):format(name, stat_pair[1], stat_pair[2])})
+                if stat == 'wsavg' then
+                    elements:append({stat_pair[1], ('%s %d (%ds)'):format(name, stat_pair[1], stat_pair[2])})
+                else
+                    elements:append({stat_pair[1], ('%s %.2f%% (%ds)'):format(name, stat_pair[1] * 100, stat_pair[2])})
+                end
             end
         end
-        table.sort(elements, function(a, b) 
+        table.sort(elements, function(a, b)
             return a[1] > b[1]
         end)
-        
+
         -- Send the report to the specified chatmode
         local wrapped = wrap_elements(elements:slice(1, self.settings.numplayers):map(function (p) return p[2] end), header)
         slow_output(build_input_command(args.chatmode, args.telltarget), wrapped, self.settings.numplayers)

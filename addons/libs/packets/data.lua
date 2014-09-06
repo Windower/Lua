@@ -1,5 +1,5 @@
 --[[
-This file returns a table of known packet data.
+    This file returns a table of known packet data.
 ]]
 
 local data = {}
@@ -34,7 +34,7 @@ data.outgoing[0x04D] = {name='Delivery Box',        description='Used to manipul
 data.outgoing[0x04E] = {name='Auction',             description='Used to bid on an Auction House item.'}
 data.outgoing[0x050] = {name='Equip',               description='This command is used to equip your character.'}
 data.outgoing[0x051] = {name='Equipset',            description='This packet is sent when using /equipset.'}
-data.outgoing[0x052] = {name='Build equipset',      description='This packet is sent when building an equipset.'}
+data.outgoing[0x052] = {name='Equipset Build',      description='This packet is sent when building an equipset.'}
 data.outgoing[0x05A] = {name='Conquest',            description='This command asks the server for data pertaining to conquest/besieged status.'}
 data.outgoing[0x05B] = {name='Dialog choice',       description='Chooses a dialog option.'}
 data.outgoing[0x05D] = {name='Emote',               description='This command is used in emotes.'}
@@ -181,13 +181,13 @@ data.incoming[0x111] = {name='Eminence Update',     description='Causes Records 
 data.incoming[0x112] = {name='RoE Quest Log',       description='Updates your RoE quest log on zone and when appropriate.'}
 data.incoming[0x113] = {name='Currency Info',       description='Contains all currencies to be displayed in the currency menu.'}
 data.incoming[0x115] = {name='Fish Bite Info',      description='Contains information about the fish that you hooked.'}
-data.incoming[0x116] = {name='Equipset build echo', description='Returned from the server when building a set.'}
-data.incoming[0x117] = {name='Equipset echo',       description='Returned from the server after the /equipset command.'}
+data.incoming[0x116] = {name='Equipset Build Response', description='Returned from the server when building a set.'}
+data.incoming[0x117] = {name='Equipset Response',   description='Returned from the server after the /equipset command.'}
 
 return data
 
 --[[
-Copyright (c) 2013, Windower
+Copyright © 2013-2014, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

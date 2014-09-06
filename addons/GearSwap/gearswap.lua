@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.873'
+_addon.version = '0.890'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -43,6 +43,8 @@ require 'lists'
 require 'sets'
 texts = require 'texts'
 require 'pack'
+bit = require 'bit'
+socket = require 'socket'
 res = require 'resources'
 extdata = require 'extdata'
 require 'helper_functions'
@@ -242,7 +244,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         local status_id = data:byte(32)
         -- Filter all statuses aside from Idle/Engaged/Dead/Engaged dead.
         if status_id < 4 then
-            local newstatus = res.statuses[status_id]
+            local newstatus = copy_entry(res.statuses[status_id])
             if newstatus and newstatus[language] then
                 newstatus = newstatus[language]
                 if oldstatus ~= newstatus then
@@ -439,10 +441,10 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
             local nation_map = {[0]={english='Neutral',japanese='Neutral'},[1]=res.regions[0],[2]=res.regions[1],
                 [3]=res.regions[2],[4]={english='Beastman',japanese='Beastman'},[0xFF]=res.regions[3]}
             _ExtraData.world.conquest.strengths = {
-                beastmen=strength_map[data:byte(offset+2)%4],
-                windurst=strength_map[math.floor(data:byte(offset+2)%16/4)],
-                bastok=strength_map[math.floor(data:byte(offset+2)%64/16)],
-                sandoria=strength_map[math.floor(data:byte(offset+2)/64)],}
+                sandoria=strength_map[data:byte(offset+2)%4],
+                bastok=strength_map[math.floor(data:byte(offset+2)%16/4)],
+                windurst=strength_map[math.floor(data:byte(offset+2)%64/16)],
+                beastmen=strength_map[math.floor(data:byte(offset+2)/64)],}
             _ExtraData.world.conquest.nation = nation_map[data:byte(offset+3)][language]
             _ExtraData.world.conquest.sandoria = data:byte(0x87)
             _ExtraData.world.conquest.bastok = data:byte(0x88)
@@ -464,6 +466,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
             player.sub_job_id = data:byte(15)
             player.sub_job_level = data:byte(16)
             update_job_names()
+            refresh_globals()
             equip_sets('sub_job_change',nil,player.sub_job,temp_sub)
         end
         update_job_names()

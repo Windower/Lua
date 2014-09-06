@@ -72,6 +72,7 @@ function load_user_files(job_id,user_file)
     
     user_env = nil
     registered_user_events = {}
+    include_user_path = nil
 
     language = 'english' -- Reset language to english when changing job files.
     
@@ -98,13 +99,13 @@ function load_user_files(job_id,user_file)
         print_set=print_set,set_combine=set_combine,disable=disable,enable=user_enable,
         send_command=send_cmd_user,windower=user_windower,include=include_user,
         midaction=user_midaction,pet_midaction=user_pet_midaction,set_language=set_language,
-        show_swaps = show_swaps,debug_mode=debug_mode,
+        show_swaps = show_swaps,debug_mode=debug_mode,include_path=user_include_path,
         
         -- Library functions
         string=string,math=math,table=table,set=set,list=list,T=T,S=S,L=L,pack=pack,
         os=os,texts=texts,type=type,tostring=tostring,tonumber=tonumber,pairs=pairs,
-        ipairs = ipairs, print=print, add_to_chat=add_to_chat_user,unpack=unpack,
-        next=next,lua_base_path=windower.addon_path,empty=empty,file=file,
+        ipairs=ipairs, print=print, add_to_chat=add_to_chat_user,unpack=unpack,next=next,
+        select=select,lua_base_path=windower.addon_path,empty=empty,file=file,
         loadstring=loadstring,assert=assert,error=error,pcall=pcall,io=io,
         
         debug=debug,coroutine=coroutine,setmetatable=setmetatable,getmetatable=getmetatable,
@@ -432,18 +433,20 @@ function refresh_group_info(dt,user_event_flag)
         local partyIndex
         
         -- For 'p#', ally index is 1, party index is the second char
-        if i:sub(1,1) == 'p' then
+        if i:sub(1,1) == 'p' and tonumber(i:sub(2)) then
             allyIndex = 1
             partyIndex = tonumber(i:sub(2))+1
         -- For 'a##', ally index is the second char, party index is the third char
-        else
+        elseif tonumber(i:sub(2,2)) and tonumber(i:sub(3)) then
             allyIndex = tonumber(i:sub(2,2))+1
             partyIndex = tonumber(i:sub(3))+1
         end
         
-        alliance[allyIndex][partyIndex] = v
-        alliance[allyIndex].count = alliance[allyIndex].count + 1
-        alliance.count = alliance.count + 1
+        if allyIndex and partyIndex then
+            alliance[allyIndex][partyIndex] = v
+            alliance[allyIndex].count = alliance[allyIndex].count + 1
+            alliance.count = alliance.count + 1
+        end
     end
 end
 
@@ -598,12 +601,24 @@ function pathsearch(files_list)
         [8] = gearswap_appdata,
         [9] = windower.windower_path .. 'addons/libs/'
     }
+    
+    local user_path
+    local normal_path
 
     for _,basepath in ipairs(search_path) do
         if windower.dir_exists(basepath) then
             for i,v in ipairs(files_list) do
-                if v ~= '' and windower.file_exists(basepath..v) then
-                    return basepath..v
+                if v ~= '' then
+                    if include_user_path then
+                        user_path = basepath .. include_user_path .. '/' .. v
+                    end
+                    normal_path = basepath .. v
+                    
+                    if user_path and windower.file_exists(user_path) then
+                        return user_path
+                    elseif normal_path and windower.file_exists(normal_path) then
+                        return normal_path
+                    end
                 end
             end
         end
