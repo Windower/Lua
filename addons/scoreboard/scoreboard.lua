@@ -308,9 +308,12 @@ local function update_dps_clock()
     local player = windower.ffxi.get_player()
     local pet
     if player ~= nil then
-    local pet_index = windower.ffxi.get_mob_by_id(player.id).pet_index
-        if pet_index ~= nil then
-            pet = windower.ffxi.get_mob_by_index(pet_index)
+        local player_mob = windower.ffxi.get_mob_by_id(player.id)
+        if player_mob ~= nil then
+            local pet_index = player_mob.pet_index
+            if pet_index ~= nil then
+                pet = windower.ffxi.get_mob_by_index(pet_index)
+            end
         end
     end
     if player and (player.in_combat or (pet ~= nil and pet.status == 1)) then
@@ -355,9 +358,12 @@ windower.register_event('action', function(raw_action)
     local player = windower.ffxi.get_player()
     local pet
     if player ~= nil then
-        local pet_index = windower.ffxi.get_mob_by_id(player.id).pet_index
-        if pet_index ~= nil then
-            pet = windower.ffxi.get_mob_by_index(pet_index)
+        local player_mob = windower.ffxi.get_mob_by_id(player.id)
+        if player_mob ~= nil then
+            local pet_index = player_mob.pet_index
+            if pet_index ~= nil then
+                pet = windower.ffxi.get_mob_by_index(pet_index)
+            end
         end
     end
     if not player or not (windower.ffxi.get_player().in_combat or (pet ~= nil and pet.status == 1)) then
