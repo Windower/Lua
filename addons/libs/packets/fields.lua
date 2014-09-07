@@ -495,7 +495,7 @@ fields.outgoing[0x05B] = L{
     {ctype='unsigned short',    label='Option Index'},                          -- 08
     {ctype='unsigned short',    label='_unknown1'},                             -- 0A
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 0C
-    {ctype='bool',              label='Begin dialogue'},                        -- 0E   Seems to be 1 when initiating conversion, 0 otherwise, unsure
+    {ctype='bool',              label='Automated Message'},                     -- 0E   1 if the response packet is automatically generated, 0 if it was selected by you
     {ctype='unsigned char',     label='_unknown2'},                             -- 0F
     {ctype='unsigned short',    label='Zone',               fn=zone},           -- 10
     {ctype='unsigned char',     label='_unknown3'},                             -- 12   Might be a short, some parameter for the dialogue option, sometimes related to Index (Index + 0x5C0)
@@ -1344,7 +1344,7 @@ fields.incoming[0x032] = L{
 -- NPC Interaction Type 2
 fields.incoming[0x034] = L{
     {ctype='unsigned int',      label='NPC',                fn=id},             -- 04
-    {ctype='unsigned short[16]',label='Menu Parameter'},                        -- 08
+    {ctype='data[32]',          label='Menu Parameters'},                       -- 08   
     {ctype='unsigned short',    label='NPC Index',          fn=index},          -- 28
     {ctype='unsigned short',    label='Zone',               fn=zone},           -- 2A
     {ctype='unsigned short',    label='Menu ID'},                               -- 2C   Seems to select between menus within a zone
@@ -1383,22 +1383,22 @@ fields.incoming[0x037] = L{
     {ctype='unsigned short',    label='_unknown1'},                             -- 28   Called "Flags" on the old dev wiki
     {ctype='unsigned char',     label='HP %',               fn=percent},        -- 29
     {ctype='unsigned char',     label='_unknown2'},                             -- 2A   May somehow be tied to current animation (old dev wiki)
-    {ctype='unsigned char',     label='_unknown3'},                             -- 2B
-    {ctype='unsigned char',     label='_unknown4'},                             -- 2C
-    {ctype='unsigned char',     label='_unknown5'},                             -- 2D
-    {ctype='unsigned char',     label='_unknown6'},                             -- 2E
+    {ctype='unsigned char',     label='Flags'},                                 -- 2B   GM Flag, etc.
+    {ctype='unsigned char',     label='Movement Speed'},                        -- 2C   Player movement speed
+    {ctype='unsigned char',     label='_unknown3'},                             -- 2D
+    {ctype='unsigned char',     label='_unknown4'},                             -- 2E
     {ctype='unsigned char',     label='Status',             fn=status},         -- 30
     {ctype='unsigned char',     label='LS Color Red'},                          -- 31
     {ctype='unsigned char',     label='LS Color Green'},                        -- 32
     {ctype='unsigned char',     label='LS Color Blue'},                         -- 33
-    {ctype='data[8]',           label='_unknown7'},                             -- 34   Player's pet index * 8?
-    {ctype='unsigned int',      label='_unknown8'},                             -- 3C
+    {ctype='data[8]',           label='_unknown5'},                             -- 34   Player's pet index * 8?
+    {ctype='unsigned int',      label='_unknown6'},                             -- 3C
     {ctype='unsigned int',      label='Timestamp',          fn=time},           -- 40
-    {ctype='data[8]',           label='_unknown9'},                             -- 44
+    {ctype='data[8]',           label='_unknown7'},                             -- 44
     {ctype='data[8]',           label='Bit Mask'},                              -- 4C
-    {ctype='data[4]',           label='_unknown10'},                            -- 54
+    {ctype='data[4]',           label='_unknown8'},                             -- 54
     {ctype='unsigned char',     label='Indi Buff',          fn=e+{'indi'}},     -- 58
-    {ctype='data[3]',           label='_unknown11'},                            -- 59
+    {ctype='data[3]',           label='_unknown9'},                             -- 59
 }
 
 -- Model DisAppear
@@ -1719,6 +1719,11 @@ fields.incoming[0x05B] = L{
     {ctype='unsigned char',     label='Type',               fn=e+{'spawntype'}},-- 16   3 for regular Monsters, 0 for Treasure Caskets and NPCs
     {ctype='unsigned char',     label='_unknown1'},                             -- 17   Always 0 if Type is 3, otherwise a seemingly random non-zero number
     {ctype='unsigned int',      label='_unknown2'},                             -- 18
+}
+
+-- Dialogue Information
+fields.incoming[0x05C] = L{
+    {ctype='data[32]',          label='Menu Parameters'},                       -- 04   How information is packed in this region depends on the particular dialogue exchange.
 }
 
 -- Campaign/Besieged Map information
