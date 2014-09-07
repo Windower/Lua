@@ -306,7 +306,14 @@ display = Display:new(settings, dps_db)
 -- Keep updates flowing
 local function update_dps_clock()
     local player = windower.ffxi.get_player()
-    if player and player.in_combat then
+    local pet
+    if player ~= nil then
+    local pet_index = windower.ffxi.get_mob_by_id(player.id).pet_index
+        if pet_index ~= nil then
+            pet = windower.ffxi.get_mob_by_index(pet_index)
+        end
+    end
+    if player and (player.in_combat or (pet ~= nil and pet.status == 1)) then
         dps_clock:advance()
     else
         dps_clock:pause()
@@ -346,7 +353,14 @@ windower.register_event('action', function(raw_action)
     local category = action:get_category_string()
 
     local player = windower.ffxi.get_player()
-    if not player or not windower.ffxi.get_player().in_combat then
+    local pet
+    if player ~= nil then
+        local pet_index = windower.ffxi.get_mob_by_id(player.id).pet_index
+        if pet_index ~= nil then
+            pet = windower.ffxi.get_mob_by_index(pet_index)
+        end
+    end
+    if not player or not (windower.ffxi.get_player().in_combat or (pet ~= nil and pet.status == 1)) then
         -- nothing to do
         return
     end
