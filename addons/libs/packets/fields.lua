@@ -498,8 +498,7 @@ fields.outgoing[0x05B] = L{
     {ctype='bool',              label='Automated Message'},                     -- 0E   1 if the response packet is automatically generated, 0 if it was selected by you
     {ctype='unsigned char',     label='_unknown2'},                             -- 0F
     {ctype='unsigned short',    label='Zone',               fn=zone},           -- 10
-    {ctype='unsigned char',     label='_unknown3'},                             -- 12   Might be a short, some parameter for the dialogue option, sometimes related to Index (Index + 0x5C0)
-    {ctype='unsigned char',     label='_unknown4'},                             -- 13
+    {ctype='unsigned short',    label='Menu ID'},                               -- 12
 }
 
 -- Zone request
