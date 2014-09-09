@@ -306,6 +306,7 @@ enums['action'] = {
     [0x0D] = 'Reraise dialogue',
     [0x0F] = 'Switch target',
     [0x10] = 'Ranged attack',
+    [0x12] = 'Dismount Chocobo',
     [0x14] = 'Zoning/Appear', -- I think, the resource for this is ambiguous.
     [0x19] = 'Monsterskill',
 }
