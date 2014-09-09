@@ -1286,6 +1286,62 @@ fields.incoming[0x029] = L{
     {ctype='unsigned short',    label='_unknown1'},                             -- 1A
 }
 
+
+--[[ 0x2A can be triggered by knealing in the right areas while in the possession of a VWNM KI:
+    Field1 will be lights level:
+    0 = 'Tier 1', -- faintly/feebly depending on whether it's outside of inside Abyssea
+    1 = 'Tier 2', -- softly
+    2 = 'Tier 3', -- solidly. Highest Tier in Abyssea
+    3 = 'Tier 4', --- strongly
+    4 = 'Tier 5', -- very strongly.  Unused currently
+    5 = 'Tier 6', --- furiously.  Unused currently
+    - But if there are no mobs left in area, or no mobs nearby, field1 will be the KeyItem#
+    1253 = 'Clear Abyssite'
+	1254 = 'Colorful Abyssite'
+	1564 = 'Clear Demilune Abyssite'
+	etc.
+
+    Field2 will be direction:
+    0 = 'East'
+    1 = 'Southeast'
+    2 = 'South'
+    3 = 'Southwest'
+    4 = 'West'
+    5 = 'Northwest'
+    6 = 'North'
+    7 = 'Northeast'
+
+    Field3 will be distance. When there are no mobs, this value is set to 300000
+
+    Field4 will be KI# of the abyssite used. Ex:
+    1253 = 'Clear Abyssite'
+	1254 = 'Colorful Abyssite'
+	1564 = 'Clear Demilune Abyssite'
+	etc.
+]]
+
+--[[  0x2A can also be triggered by buying/disposing of a VWNM KI from an NPC:
+      Index/ID field will be those of the NPC
+      Field1 will be 1000 (gil) when acquiring in Jueno, 300 (cruor) when acquiring in Abyssea
+      Field2 will be the KI# acquired
+      Fields are used slighly different when dropping the KI using the NPC.
+]]
+
+--[[  0x2A can also be triggered by spending cruor by buying non-vwnm related items, or even activating/using Flux
+      Field1 will be the amount of cruor spent
+]]
+      
+     
+--[[ 0x2A can also be triggered by zoning into Abyssea:
+     Field1 will be set to your remaining time. 5 at first, then whatever new value when acquiring visiting status.
+     0x2A will likely be triggered as well when extending your time limit. Needs verification.
+]]
+
+
+--[[ 0x2A can be triggered sometimes when zoning into non-Abyssea:
+     Not sure what it means.
+]]
+
 -- Resting Message
 fields.incoming[0x02A] = L{
     {ctype='unsigned int',      label='Player',             fn=id},             -- 04
