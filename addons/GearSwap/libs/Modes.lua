@@ -376,6 +376,9 @@ _meta.M.__methods['set'] = function(m, val)
             error("Unrecognized value type: "..type(val), 2)
         end
     elseif m._track._type == 'list' then
+        if not val then
+            error("List variable cannot be set to nil.", 2)
+        end
         if m._track._invert[val] then
             m._track._current = m._track._invert[val]
         else

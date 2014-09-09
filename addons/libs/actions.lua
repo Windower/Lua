@@ -76,6 +76,11 @@ function action.get_actor_name(self)
     end
 end
 
+--Returns the id of the actor
+function action.get_id(self)
+	return self.raw['actor_id']
+end
+
 -- Returns an iterator for this action's targets
 function action.get_targets(self)
     local targets = self.raw['targets']
