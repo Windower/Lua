@@ -313,7 +313,9 @@ end
 function reset_buff_states()
     if state.Buff then
         for buff,present in pairs(state.Buff) do
-            state.Buff[buff] = buffactive[buff] or false
+            if mote_vars.res_buffs:contains(buff) then
+                state.Buff[buff] = buffactive[buff] or false
+            end
         end
     end
 end
