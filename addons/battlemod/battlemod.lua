@@ -66,7 +66,7 @@ windower.register_event('addon command', function(command, ...)
         elseif command:lower() == 'colortest' then
             local counter = 0
             local line = ''
-            for n = 1, 509 do
+            for n = 1, 262 do
                 if not color_redundant:contains(n) and not black_colors:contains(n) then
                     if n <= 255 then
                         loc_col = string.char(0x1F, n)
@@ -76,8 +76,8 @@ windower.register_event('addon command', function(command, ...)
                     line = line..loc_col..string.format('%03d ', n)
                     counter = counter + 1
                 end
-                if counter == 16 or n == 509 then
-                    windower.add_to_chat(1, line)
+                if counter == 16 or n == 262 then
+                    windower.add_to_chat(6, line)
                     counter = 0
                     line = ''
                 end
