@@ -106,7 +106,7 @@ function load_user_files(job_id,user_file)
         os=os,texts=texts,type=type,tostring=tostring,tonumber=tonumber,pairs=pairs,
         ipairs=ipairs, print=print, add_to_chat=add_to_chat_user,unpack=unpack,next=next,
         select=select,lua_base_path=windower.addon_path,empty=empty,file=file,
-        loadstring=loadstring,assert=assert,error=error,pcall=pcall,io=io,
+        loadstring=loadstring,assert=assert,error=error,pcall=pcall,io=io,dofile=dofile,
         
         debug=debug,coroutine=coroutine,setmetatable=setmetatable,getmetatable=getmetatable,
         rawset=rawset,rawget=rawget,require=include_user,
