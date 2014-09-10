@@ -19,6 +19,31 @@ potencies = {
         sp_recast = {[0]=-1,[1]=-1,[2]=-1,[3]=-2,[4]=-2,[5]=-3,[6]=-3,[7]=-4,[8]=-4,[9]=-4,[10]=-4,[11]=-4,[12]=-4,[13]=-4,[14]=-4,[15]=-4},
     }
 
+sp_390_augments = {
+        [553] = {{stat="Occ. atk. twice", offset=0}},
+        [555] = {{stat="Occ. atk. twice", offset=0}},
+        [556] = {{stat="Occ. atk. 2-3 times", offset=0}},
+        [557] = {{stat="Occ. atk. 2-4 times", offset=0}},
+        [558] = {{stat="Occ. deals dbl. dmg.", offset=0}},
+        [563] = {{stat="Movement speed +8%", offset=0}},
+        [593] = {{stat="Fire Affinity +1", offset=0}},
+        [594] = {{stat="Ice Affinity +1", offset=0}},
+        [595] = {{stat="Wind Affinity +1", offset=0}},
+        [596] = {{stat="Earth Affinity +1", offset=0}},
+        [597] = {{stat="Lightning Affinity +1", offset=0}},
+        [598] = {{stat="Water Affinity +1", offset=0}},
+        [599] = {{stat="Light Affinity +1", offset=0}},
+        [600] = {{stat="Dark Affinity +1", offset=0}},
+        [601] = {{stat="Fire Affinity: Magic Accuracy +1", offset=0}},
+        [602] = {{stat="Ice Affinity: Magic Accuracy +1", offset=0}},
+        [603] = {{stat="Wind Affinity: Magic Accuracy +1", offset=0}},
+        [604] = {{stat="Earth Affinity: Magic Accuracy +1", offset=0}},
+        [605] = {{stat="Lightning Affinity: Magic Accuracy +1", offset=0}},
+        [606] = {{stat="Water Affinity: Magic Accuracy +1", offset=0}},
+        [607] = {{stat="Light Affinity: Magic Accuracy +1", offset=0}},
+        [608] = {{stat="Dark Affinity: Magic Accuracy +1", offset=0}},
+    }
+
 
 augment_values = {
     [1] = {
@@ -125,6 +150,7 @@ augment_values = {
         [0x076] = {{stat="Pet: Phys. dmg. taken ", offset=1,multiplier=-1,percent=true}},
         [0x077] = {{stat='Pet: "Mag.Def.Bns."', offset=1}},
         [0x078] = {{stat='Avatar: "Mag.Atk.Bns."', offset=1}},
+        [0x079] = {{stat='Pet: Breath', offset=1}},
 
         [0x080] = {{stat="Pet:",offset = 0}},
         --[0x081: Accuracy +1 Ranged Acc. +0 | value + 1
@@ -159,7 +185,10 @@ augment_values = {
         [0x092] = {{stat='"Dual Wield"', offset=1}},
         [0x093] = {{stat='"Treasure Hunter"', offset=1}},
         [0x094] = {{stat='"Gilfinder"', offset=1}},
+        
+        [0x097] = {{stat='"Martial Arts"', offset=1}},
         [0x099] = {{stat='"Shield Mastery"', offset=1}},
+        
         [0x0B0] = {{stat='"Resist Sleep"', offset=1}},
         [0x0B1] = {{stat='"Resist Poison"', offset=1}},
         [0x0B2] = {{stat='"Resist Paralyze"', offset=1}},
@@ -173,6 +202,7 @@ augment_values = {
         [0x0BA] = {{stat='"Resist Gravity"', offset=1}},
         [0x0BB] = {{stat='"Resist Slow"', offset=1}},
         [0x0BC] = {{stat='"Resist Charm"', offset=1}},
+        
         [0x0C2] = {{stat='"Kick Attacks"', offset=1}},
         [0x0C3] = {{stat='"Subtle Blow"', offset=1}},
 
@@ -243,11 +273,21 @@ augment_values = {
         [0x154] = {{stat='"Phantom Roll" ability delay ', offset=1,multiplier=-1}},
         [0x155] = {{stat='"Repair" potency ', offset=1,percent=true}},
         [0x156] = {{stat='"Waltz" TP cost ', offset=1,multiplier=-1}},
+        [0x157] = {{stat='"Drain" and "Aspir" potency ', offset=1}},
 
         [0x15E] = {{stat="Occ. maximizes magic accuracy ", offset=1,percent=true}},
         [0x15F] = {{stat="Occ. quickens spellcasting ", offset=1,percent=true}},
         [0x160] = {{stat="Occ. grants dmg. bonus based on TP ", offset=1,percent=true}},
         [0x161] = {{stat="TP Bonus ", offset=1, multiplier=5}},
+        [0x163] = {{stat='Potency of "Cure" effect received', offset=1, percent=true}},
+        [0x16A] = {{stat="Magic Damage ", offset=1}},
+        [0x16B] = {{stat="Chance of successful block ", offset=1}},
+        [0x16E] = {{stat="Blood Pact ab. del. II ", offset=1, multiplier=-1}},
+        [0x170] = {{stat="Phalanx ", offset=1}},
+        [0x171] = {{stat="Blood Pact Dmg.", offset=1}},
+        [0x172] = {{stat='"Rev. Flourish"', offset=1}},
+        [0x173] = {{stat='"Regen" potency', offset=1}},
+        [0x174] = {{stat='"Embolden"', offset=1}},
         -- Empties are Numbered up to 0x17F. Their stat is their index + 1
         [0x200] = {{stat="STR", offset=1}},
         [0x201] = {{stat="DEX", offset=1}},
@@ -290,6 +330,14 @@ augment_values = {
         [0x223] = {{stat="AGI", offset=1, multiplier=-0.5}, {stat="INT", offset=1, multiplier=-0.5}, {stat="CHR", offset=1}},
         [0x224] = {{stat="AGI", offset=1, multiplier=-0.5}, {stat="MND", offset=1, multiplier=-0.5}, {stat="CHR", offset=1}},
         [0x225] = {{stat="INT", offset=1, multiplier=-0.5}, {stat="MND", offset=1, multiplier=-0.5}, {stat="CHR", offset=1}},
+        
+        [0x226] = {{stat="STR", offset=1}, {stat="DEX", offset=1}},
+        [0x227] = {{stat="STR", offset=1}, {stat="VIT", offset=1}},
+        [0x228] = {{stat="STR", offset=1}, {stat="AGI", offset=1}},
+        [0x229] = {{stat="DEX", offset=1}, {stat="AGI", offset=1}},
+        [0x22A] = {{stat="INT", offset=1}, {stat="MND", offset=1}},
+        [0x22B] = {{stat="MND", offset=1}, {stat="CHR", offset=1}},
+        [0x22C] = {{stat="INT", offset=1}, {stat="MND", offset=1}, {stat="CHR", offset=1}},
 
         [0x2E4] = {{stat="DMG:", offset=1}},
         [0x2E5] = {{stat="DMG:", offset=33}},
@@ -319,7 +367,7 @@ augment_values = {
         [0x2FD] = {{stat="Delay:", offset=33,multiplier=-1}},
         [0x2FE] = {{stat="Delay:", offset=65,multiplier=-1}},
         [0x2FF] = {{stat="Delay:", offset=97,multiplier=-1}},
-
+        
         [0x300] = {{stat="Fire resistance", offset=1}},
         [0x301] = {{stat="Ice resistance", offset=1}},
         [0x302] = {{stat="Wind resistance", offset=1}},
@@ -380,7 +428,11 @@ augment_values = {
         [0x380] = {{stat="Sword enhancement spell damage ", offset=1}},
         [0x381] = {{stat='Enhances "Souleater" effect ', offset=1,percent=true}},
         
-        [0x390] = {{stat="Occ. atk. twice", offset=0}},
+        -- This is actually a range for static augments that uses all the bits.
+        
+        [0x390] = {Secondary_Handling = true},
+        [0x391] = {Secondary_Handling = true},
+        [0x392] = {Secondary_Handling = true},
         -- The below enhancements aren't visible if their value is 0.
         [0x3A0] = {{stat="Fire Affinity ", offset=0}},
         [0x3A1] = {{stat="Ice Affinity ", offset=0}},
@@ -949,6 +1001,10 @@ end
 function string_augment(sys,id,val)
     local augment
     local augment_table = augment_values[sys][id]
+    if augment_table.Secondary_Handling then
+        -- This is handling for system 1's indices 0x390~0x392, which have their own static augment lookup table
+        augment_table = sp_390_augments[ (id-0x390)*16 + 545 + val]
+    end
     if augment_table then
         if sys == 3 then
             augment = augment_table[1].stat
