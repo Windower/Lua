@@ -100,7 +100,10 @@ function init_include()
     -- Special control flags.
     mote_vars = {}
     mote_vars.set_breadcrumbs = L{}
-
+    mote_vars.res_buffs = S{}
+    for index,struct in pairs(gearswap.res.buffs) do
+        mote_vars.res_buffs:add(struct.en)
+    end
 
     -- Sub-tables within the sets table that we expect to exist, and are annoying to have to
     -- define within each individual job file.  We can define them here to make sure we don't
