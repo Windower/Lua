@@ -94,6 +94,9 @@ augment_values = {
         [0x045] = {{stat="Rng.Acc.", offset=1},{stat="Rng.Atk.", offset=1}},
         [0x046] = {{stat="Mag. Acc.", offset=1},{stat='"Mag.Atk.Bns."', offset=1}},
         [0x047] = {{stat="Damage taken", offset=1,multiplier=-1,percent=true}},
+        
+        [0x04A] = {{stat="Cap. Point", offset=1,percent=true}},
+        [0x04B] = {{stat="Cap. Point", offset=33,percent=true}},
 
         
         -- Need to figure out how to handle this section. The Pet: prefix is only used once despite how many augments are used.
