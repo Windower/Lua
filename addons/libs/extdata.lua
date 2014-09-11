@@ -173,6 +173,7 @@ augment_values = {
         [0x086] = {{stat='"Mag.Def.Bns."', offset=1}},
 
         [0x087] = {{stat="Avatar:",offset=0}},
+        
         [0x089] = {{stat='"Regen"', offset=1}},
         [0x08A] = {{stat='"Refresh"', offset=1}},
         [0x08B] = {{stat='"Rapid Shot"', offset=1}},
@@ -579,8 +580,16 @@ augment_values = {
         [0x436] = {{stat="Sniper Shot:DMG:", offset=1,multiplier=5,percent=true}},
         [0x437] = {{stat="Detonator:DMG:", offset=1,multiplier=5,percent=true}},
         [0x438] = {{stat="Weapon Skill:DMG:", offset=1,multiplier=5,percent=true}},
-        --0x43F to 0x4FF are bullshit augments like Viper Bite:Fire+5 and Spinning Attack:173
+        --0x43F to 0x47F are bullshit augments like Viper Bite:Fire+5 and Spinning Attack:173
         -- They do not exist in game afaik, so I'm not going to bother writing them
+        
+        [0x4E0] = {{stat="Enh. Mag. eff. dur. ", offset=1}},
+        [0x4E1] = {{stat="Helix eff. dur. ", offset=1}},
+        [0x4E2] = {{stat="Indi. eff. dur. ", offset=1}},
+        
+        [0x4F0] = {{stat="Meditate eff. dur. ", offset=1}},
+        
+        
         [0x500] = {{stat='Enhances "Mighty Strikes" effect', offset=0,multiplier=0}},
         [0x501] = {{stat='Enhances "Hundred Fists" effect', offset=0,multiplier=0}},
         [0x502] = {{stat='Enhances "Benediction" effect', offset=0,multiplier=0}},
