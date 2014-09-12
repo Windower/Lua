@@ -1411,6 +1411,16 @@ fields.incoming[0x034] = L{
     {ctype='data[2]',           label='_junk1'},                                -- 31   Always 00s for me
 }
 
+--- When messages are fishing related, the player is the Actor.
+--- For some areas, the most significant bit of the message ID is set sometimes.
+-- NPC Chat
+fields.incoming[0x036] = L{
+    {ctype='unsigned int',      label='Actor',                fn=id},             -- 04
+    {ctype='unsigned short',    label='Actor Index',          fn=index},          -- 08
+    {ctype='unsigned short',    label='Message ID',           fn=function (val) if val > 0x8000 then return val - 0x8000 else return val end end},           -- 0A
+    {ctype='unsigned int',      label='_unknown1'},                                -- 0C  Probably junk
+}
+
 enums.indi = {
     [0x5F] = 'Enemy Dark',
     [0x5E] = 'Enemy Light',
