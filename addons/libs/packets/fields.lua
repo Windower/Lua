@@ -304,6 +304,7 @@ enums['action'] = {
     [0x09] = 'Job ability usage',
     [0x0C] = 'Assist',
     [0x0D] = 'Reraise dialogue',
+    [0x0E] = 'Cast Fishing Rod',
     [0x0F] = 'Switch target',
     [0x10] = 'Ranged attack',
     [0x12] = 'Dismount Chocobo',
