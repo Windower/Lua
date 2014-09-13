@@ -1418,7 +1418,7 @@ fields.incoming[0x036] = L{
     {ctype='unsigned int',      label='Actor',                fn=id},             -- 04
     {ctype='unsigned short',    label='Actor Index',          fn=index},          -- 08
     {ctype='bit[15]',           label='Message ID'},                              -- 0A
-    {ctype='boolbit',           label='_unknown1'},                               -- 0B
+    {ctype='bit[1]',            label='_unknown1'},                               -- 0B
     {ctype='unsigned int',      label='_unknown2'},                               -- 0C  Probably junk
 }
 
