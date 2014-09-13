@@ -1417,8 +1417,9 @@ fields.incoming[0x034] = L{
 fields.incoming[0x036] = L{
     {ctype='unsigned int',      label='Actor',                fn=id},             -- 04
     {ctype='unsigned short',    label='Actor Index',          fn=index},          -- 08
-    {ctype='unsigned short',    label='Message ID',           fn=function (val) if val > 0x8000 then return val - 0x8000 else return val end end},           -- 0A
-    {ctype='unsigned int',      label='_unknown1'},                                -- 0C  Probably junk
+    {ctype='bit[15]',           label='Message ID'},                              -- 0A
+    {ctype='boolbit',           label='_unknown1'},                               -- 0B
+    {ctype='unsigned int',      label='_unknown2'},                               -- 0C  Probably junk
 }
 
 enums.indi = {
