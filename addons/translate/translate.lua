@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'Translate'
-_addon.version = '0.140823'
+_addon.version = '0.140914'
 _addon.author = 'Byrth'
 _addon.commands = {'trans'}
 
@@ -109,21 +109,21 @@ for res_name in pairs(handled_resources) do
     if res_name == 'auto_translates' then
         for autotranslate_code,res_line in pairs(resource) do
             local jp = windower.to_shift_jis(res_line.ja or ''):escape()
-            if sanity_check(jp) and not trans_list[jp] then
+            if sanity_check(jp) and not trans_list[jp] and jp ~= res_line.en:escape() then
                 trans_list[jp] = to_a_code(autotranslate_code)
             end
         end
     elseif res_name == 'items' then
         for id,res_line in pairs(resource) do
             local jp = windower.to_shift_jis(res_line.ja or ''):escape()
-            if sanity_check(jp) and not trans_list[jp] then
+            if sanity_check(jp) and not trans_list[jp] and jp ~= res_line.en:escape() then
                 trans_list[jp] = to_item_code(id)
             end
         end
     elseif res_name == 'key_items' then
         for id,res_line in pairs(resource) do
             local jp = windower.to_shift_jis(res_line.ja or ''):escape()
-            if sanity_check(jp) and not trans_list[jp] then
+            if sanity_check(jp) and not trans_list[jp] and jp ~= res_line.en:escape() then
                 trans_list[jp] = to_ki_code(id)
             end
         end
@@ -131,10 +131,10 @@ for res_name in pairs(handled_resources) do
         for _,res_line in pairs(resource) do
             local jp = windower.to_shift_jis(res_line.ja or ''):escape()
             local jps = windower.to_shift_jis(res_line.jas or ''):escape()
-            if sanity_check(jp) and not trans_list[jp] and sanity_check(res_line.en) then
+            if sanity_check(jp) and not trans_list[jp] and sanity_check(res_line.en) and jp ~= res_line.en:escape() then
                 trans_list[jp] = green_col..res_line.en..rcol:escape()
             end
-            if sanity_check(jps) and not trans_list[jps] and sanity_check(res_line.ens) then
+            if sanity_check(jps) and not trans_list[jps] and sanity_check(res_line.ens) and jp ~= res_line.en:escape() and jps ~= res_line.ens:escape() then
                 trans_list[jps] = green_col..res_line.ens..rcol:escape()
             end
         end
@@ -148,10 +148,10 @@ for dict_name in pairs(custom_dict_names) do
         for _,res_line in pairs(dict) do
             local jp = windower.to_shift_jis(res_line.ja or ''):escape()
             local jps = windower.to_shift_jis(res_line.jas or ''):escape()
-            if sanity_check(jp) and not trans_list[jp] and sanity_check(res_line.en) then
+            if sanity_check(jp) and not trans_list[jp] and sanity_check(res_line.en) and jp~= res_line.en:escape() then
                 trans_list[jp] = green_col..res_line.en..rcol
             end
-            if sanity_check(jps) and not trans_list[jps] and sanity_check(res_line.ens) then
+            if sanity_check(jps) and not trans_list[jps] and sanity_check(res_line.ens) and jps ~= res_line.ens:escape() then
                 trans_list[jps] = green_col..res_line.ens..rcol
             end
         end
@@ -173,9 +173,9 @@ trans_list['\.'] = nil
 
 
 windower.register_event('incoming chunk',function(id,orgi,modi,is_injected,is_blocked)
-    if not is_blocked and id == 0x17 and not is_injected then
+    if id == 0x17 and not is_injected and not is_blocked then
         local out_text = modi:unpack('z',0x19)
-        local matches = {}
+        local matches,match_bool = {},false
         local function make_matches(catch)
             -- build a table of matches indexed by their length
             local esc = catch:escape()
@@ -184,10 +184,13 @@ windower.register_event('incoming chunk',function(id,orgi,modi,is_injected,is_bl
                 matches[#catch] = {}
             end
             matches[#catch][#matches[#catch]+1] = esc
+            match_bool = true
         end
         for jp,en in pairs(trans_list) do
             out_text:gsub(jp,make_matches)
         end
+        
+        if not match_bool then return end
         
         local order = {}
         for len,_ in pairs(matches) do

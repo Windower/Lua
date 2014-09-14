@@ -440,7 +440,7 @@ end
 --Returns:
 ---- string - An action packet. First four bytes are dummy bytes.
 -----------------------------------------------------------------------------------
-function assemble_action_packet(target_id,target_index,category,spell_id)    
+function assemble_action_packet(target_id,target_index,category,spell_id)
     local outstr = string.char(0x1A,0x08,0,0)
     outstr = outstr..string.char( (target_id%256), math.floor(target_id/256)%256, math.floor( (target_id/65536)%256) , math.floor( (target_id/16777216)%256) )
     outstr = outstr..string.char( (target_index%256), math.floor(target_index/256)%256)
@@ -471,7 +471,7 @@ function assemble_use_item_packet(target_id,target_index,item_id)
     outstr = outstr..string.char( (target_id%256), math.floor(target_id/256)%256, math.floor( (target_id/65536)%256) , math.floor( (target_id/16777216)%256) )
     outstr = outstr..string.char(0,0,0,0)
     outstr = outstr..string.char( (target_index%256), math.floor(target_index/256)%256)
-    inventory_index,bag_id = find_usable_item(item_id)
+    inventory_index,bag_id = find_usable_item(item_id,true)
     if inventory_index then
         outstr = outstr..string.char(inventory_index%256)..string.char(0,bag_id,0,0,0)
     else
@@ -493,43 +493,68 @@ end
 --Returns:
 ---- string - A use item packet. First four bytes are dummy bytes.
 -----------------------------------------------------------------------------------
-function assemble_menu_item_packet(target_id,target_index,item_id)
+function assemble_menu_item_packet(target_id,target_index,...)
     local outstr = string.char(0x36,0x20,0,0)
+    -- Message is coming out too short by 12 characters
+    
     -- Target ID
-    outstr = outstr..string.char( (target_id%256), math.floor(target_id/256)%256, math.floor( (target_id/65536)%256) , math.floor( (target_id/16777216)%256) )
-    -- One unit traded
-    outstr = outstr..string.char(1,0,0,0,0,0,0,0)..string.char(0,0,0,0,0,0,0,0)..string.char(0,0,0,0,0,0,0,0)..
-        string.char(0,0,0,0,0,0,0,0)..string.char(0,0,0,0,0,0,0,0)
-    -- Inventory Index for the one unit
-    inventory_index,bag_id = find_usable_item(item_id)
-    if inventory_index then
-        outstr = outstr..string.char(inventory_index%256)
-    else
-        debug_mode_chat('Proposed item: '..(res.items[item_id][language] or item_id)..' not found in inventory.')
+    outstr = outstr.."I":pack(target_id)
+    local item_ids,counts,count = {...},{},0
+    for i,v in pairs(item_ids) do
+        if res.items[v] then
+            counts[v] = (counts[v] or 0) + 1
+            count = count + 1
+        end
+    end
+    if count > 9 then
+        debug_mode_chat('Too many items ('..count..') passed to the assemble_menu_item_packet function')
         return
     end
-    -- Nothing else being traded
-    outstr = outstr..string.char(0,0,0,0,0,0,0,0,0)
+    
+    local unique_items = 0
+    for i,v in pairs(counts) do
+        outstr = outstr.."I":pack(v)
+        unique_items = unique_items + 1
+    end
+    for i = 1,10-unique_items do
+        outstr = outstr..string.char(0,0,0,0)
+    end
+    
+    -- Inventory Index for the one unit
+    
+    for i,v in pairs(counts) do
+        inventory_index,bag_id = find_usable_item(i,false)
+        if inventory_index then
+            outstr = outstr..string.char(inventory_index%256)
+        else
+            debug_mode_chat('Proposed item: '..(res.items[i][language] or i)..' not found in inventory.')
+            return
+        end
+    end
+    for i = 1,10-unique_items do
+        outstr = outstr..string.char(0)
+    end
     -- Target Index
-    outstr = outstr..string.char( (target_index%256), math.floor(target_index/256)%256)
+    outstr = outstr.."H":pack(target_index)
     -- Only one item being traded
-    outstr = outstr..string.char(1,0,0,0)
+    outstr = outstr..string.char(unique_items,0,0,0)
     return outstr
 end
 
 
 -----------------------------------------------------------------------------------
---Name: find_usable_item(item_id)
+--Name: find_usable_item(item_id,bool)
 --Desc: Finds a usable item in temporary or normal inventory. Assumes items array
 --      is accurate already.
 --Args:
 ---- item_id - The resource line for the current item
+---- bool    - Indicates whether the item must show up in your control-I menu as usable
 -----------------------------------------------------------------------------------
 --Returns:
 ---- inventory_index - The item's use inventory index (if it exists)
 ---- bag_id - The item's bag ID (if it exists)
 -----------------------------------------------------------------------------------
-function find_usable_item(item_id)
+function find_usable_item(item_id,bool)
     local inventory_index,bag_id
     for i,v in pairs(items.temporary) do
         if v and v.id == item_id then
@@ -542,7 +567,7 @@ function find_usable_item(item_id)
     -- Should I add some kind of filter for enchanted items?
     if not inventory_index then
         for i,v in pairs(items.inventory) do
-            if v and v.id == item_id and is_usable_item(v) then
+            if v and v.id == item_id and (not bool or is_usable_item(v)) then
                 inventory_index = i
                 bag_id = 0
                 break
@@ -551,7 +576,7 @@ function find_usable_item(item_id)
     end
     if not inventory_index then
         for i,v in pairs(items.wardrobe) do
-            if v and v.id == item_id and is_usable_item(v) then
+            if v and v.id == item_id and (not bool or is_usable_item(v)) then
                 inventory_index = i
                 bag_id = 8
                 break

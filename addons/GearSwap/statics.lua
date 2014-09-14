@@ -78,10 +78,8 @@ for i,v in pairs(res.monster_abilities) do
 end
 
 for i,v in pairs(res.items) do
-    if v.targets and table.length(v.targets) ~= 0 then
-        v.prefix = '/item'
-        make_entry(v,i)
-    end
+    v.prefix = '/item'
+    make_entry(v,i)
 end
     
 default_slot_map = T{'sub','range','ammo','head','body','hands','legs','feet','neck','waist',
@@ -215,7 +213,8 @@ _ExtraData = {
 
 unbridled_learning_set = {['Thunderbolt']=true,['Harden Shell']=true,['Absolute Terror']=true,
     ['Gates of Hades']=true,['Tourbillion']=true,['Pyric Bulwark']=true,['Bilgestorm']=true,
-    ['Bloodrake']=true,['Droning Whirlwind']=true,['Carcharian Verve']=true,['Blistering Roar']=true,}
+    ['Bloodrake']=true,['Droning Whirlwind']=true,['Carcharian Verve']=true,['Blistering Roar']=true,
+    ['Uproot']=true,['Crashing Thunder']=true,['Polar Roar']=true}
 
 tool_map = {
         ['Katon: Ichi'] = res.items[1161],

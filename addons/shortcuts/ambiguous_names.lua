@@ -235,6 +235,7 @@ ambig_names = table.update(ambig_names,{
     blizzardiv={IDs={spells=152,job_abilities=613},funct=smn_unsub,info=60},
     thunderiv={IDs={spells=167,job_abilities=629},funct=smn_unsub,info=60},
     thunderstorm={IDs={spells=117,job_abilities=631},funct=smn_unsub,info=75},
+    hastega={IDs={job_abilities=595},funct=default},
      
     dreamflower={IDs={spells=678,job_abilities=676,monster_abilities=301},funct=blu_unsub,info=87},
     frostbreath={IDs={spells=608,job_abilities=647,monster_abilities=377},funct=blu_unsub,info=66},
