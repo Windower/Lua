@@ -481,7 +481,7 @@ function find_pet_owner_name(action)
     local pet = windower.ffxi.get_mob_by_id(action:get_id())
     local party = windower.ffxi.get_party()
     
-    local name = ''
+    local name = nil
     
     for _, member in pairs(party) do
         if member.mob then
@@ -498,7 +498,7 @@ function create_mob_name(action)
     local actor = action:get_actor_name()
     local result = ''
     local owner = find_pet_owner_name(action)
-    if owner ~= '' then
+    if owner ~= nil then
         if string.len(actor) > 8 then
             result = string.sub(actor, 1, 7)..'.'
         else
