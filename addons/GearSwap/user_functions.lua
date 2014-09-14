@@ -258,7 +258,7 @@ function user_equip_sets(func)
         end,user_env)
 end
 
-function include_user(str)
+function include_user(str, load_include_in_this_table)
     if not (type(str) == 'string') then
         error('\nGearSwap: include() was passed an invalid value ('..tostring(str)..'). (must be a string)', 2)
     end
@@ -278,8 +278,15 @@ function include_user(str)
     
     local f, err = loadfile(path)
     if f and not err then
-        setfenv(f,user_env)
-        return f()
+        if load_include_in_this_table and type(load_include_in_this_table) == 'table' then
+            setmetatable(load_include_in_this_table, {__index=user_env._G})
+            setfenv(f, load_include_in_this_table)
+            pcall(f, load_include_in_this_table)
+            return load_include_in_this_table
+        else
+            setfenv(f,user_env)
+            return f()
+        end
     else
         error('\nGearSwap: Error loading file ('..tostring(str)..'): '..err, 2)
     end
