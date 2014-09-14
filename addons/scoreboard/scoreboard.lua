@@ -495,10 +495,18 @@ function find_pet_owner_name(action)
 end
 
 function create_player_name(action)
-    local result = action:get_actor_name()
+    local actor = action:get_actor_name()
+    local result = ''
     local owner = find_pet_owner_name(action)
     if owner ~= '' then
-        result = result..' ('..owner..')'
+        if string.len(actor) > 8 then
+            result = string.sub(actor, 1, 7)..'.'
+        else
+            result = actor
+        end
+        result = result..' ('..string.sub(owner, 1, 3)..'.)'
+    else
+        return actor
     end
     return result
 end
