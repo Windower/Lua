@@ -1,7 +1,7 @@
 _addon.commands = {'answeringmachine','am'}
 _addon.name = 'AnsweringMachine'
 _addon.author = 'Byrth'
-_addon.version = '1.2'
+_addon.version = '1.3'
 
 
 recording = {}
@@ -69,8 +69,8 @@ end)
 
 windower.register_event('outgoing chunk',function(id,original,modified,injected,blocked)
     if not blocked and id == 0x0B6 then
-        local name = trim(original:sub(6,20))
-        local message = trim(original:sub(21))
+        local name = trim(original:sub(0x6,0x14))
+        local message = trim(original:sub(0x15))
         if recording[name:upper()] then
             recording[name:upper()][#recording[name:upper()]+1] = {message=message,outgoing=true,timestamp=os.time()}
         else
@@ -113,6 +113,7 @@ function trim(msg)
             return msg:sub(1,i-1)
         end
     end
+    return msg
 end
 
 function pl(num)
