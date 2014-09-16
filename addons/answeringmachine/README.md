@@ -15,5 +15,6 @@ Purpose:
 To record conversations and play them back at your leisure.
 
 Version History:
+1.3 - Adjusted trim function to prevent error when dealing with 15 character names.
 1.2 - Timestamps added. Massive refactoring. Outgoing tells now included.
 1.1 - Version History started, fundamental recording and answering features created.
