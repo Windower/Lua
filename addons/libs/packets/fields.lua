@@ -2125,7 +2125,7 @@ fields.incoming[0x0C8] = L{
     {ctype='unsigned char',     label='_unknown1'},                             -- 04
     {ctype='data[3]',           label='_junk1'},                                -- 05
     {ref=types.alliance_member, count=18},                                      -- 08
-    {ctype='data[24]',          label='_unknown2',          const=''},          -- E0   Always 0?
+    {ctype='data[24]',          label='_unknown3',          const=''},          -- E0   Always 0?
 }
 
 types.check_item = L{
