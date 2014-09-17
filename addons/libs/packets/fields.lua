@@ -2117,7 +2117,7 @@ types.alliance_member = L{
     {ctype='unsigned short',    label='Index',              fn=index},          -- 04
     {ctype='unsigned short',    label='Flags',              fn=bin+{2}},        -- 06
     {ctype='unsigned short',    label='Zone',               fn=zone},           -- 08
-    {ctype='unsigned short',    label='_unknown2'},                             -- 0A
+    {ctype='unsigned short',    label='_unknown2'},                             -- 0A	Always 0?
 }
 
 -- Alliance status update
@@ -2242,7 +2242,11 @@ fields.incoming[0x0DD] = L{
     {ctype='unsigned char',     label='MP%',                fn=percent},        -- 1E
     {ctype='unsigned char',     label='_unknown4'},                             -- 1F
     {ctype='unsigned short',    label='Zone',               fn=zone},           -- 20
-    {ctype='char*',             label='Name'},                                  -- 22
+    {ctype='unsigned char',     label='Main job',           fn=job},            -- 21
+    {ctype='unsigned char',     label='Main job level'},                        -- 22
+    {ctype='unsigned char',     label='Sub job',            fn=job},            -- 23
+    {ctype='unsigned char',     label='Sub job level'},                         -- 24
+    {ctype='char*',             label='Name'},                                  -- 25
 }
 
 -- Char Update
