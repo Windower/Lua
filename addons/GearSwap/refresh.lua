@@ -116,6 +116,7 @@ function load_user_files(job_id,user_file)
         player=player,
         world=world,
         pet=pet,
+        fellow=fellow,
         alliance=alliance,
         party=alliance[1],
         sets={naked = {main=empty,sub=empty,range=empty,ammo=empty,
