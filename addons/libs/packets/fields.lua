@@ -2242,11 +2242,11 @@ fields.incoming[0x0DD] = L{
     {ctype='unsigned char',     label='MP%',                fn=percent},        -- 1E
     {ctype='unsigned char',     label='_unknown4'},                             -- 1F
     {ctype='unsigned short',    label='Zone',               fn=zone},           -- 20
-    {ctype='unsigned char',     label='Main job',           fn=job},            -- 21
-    {ctype='unsigned char',     label='Main job level'},                        -- 22
-    {ctype='unsigned char',     label='Sub job',            fn=job},            -- 23
-    {ctype='unsigned char',     label='Sub job level'},                         -- 24
-    {ctype='char*',             label='Name'},                                  -- 25
+    {ctype='unsigned char',     label='Main job',           fn=job},            -- 22
+    {ctype='unsigned char',     label='Main job level'},                        -- 23
+    {ctype='unsigned char',     label='Sub job',            fn=job},            -- 24
+    {ctype='unsigned char',     label='Sub job level'},                         -- 25
+    {ctype='char*',             label='Name'},                                  -- 26
 }
 
 -- Char Update
