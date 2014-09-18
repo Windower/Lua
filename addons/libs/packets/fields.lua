@@ -1387,6 +1387,40 @@ fields.incoming[0x030] = L{
     {ctype='unsigned char',     label='_unknown1',          const=0x00},        -- 0E  -- Appears to just be trash.
 }
 
+-- Synth List / Synth Recipe
+--[[ This packet is used for list of recipes, but also for details of a specific recipe.
+
+   If you ask the guild NPC that provides regular Image Suppor for recipes, 
+   s/he will give you a list of recipes, fields are as follows:
+   Field1-2: NPC ID
+   Field3: NPC Index
+   Field4-6: Unknown
+   Field7-22: Item ID of recipe
+   Field23: Unknown
+   Field24: Usually Item ID of the recipe on next page
+
+
+   If you ask a guild NPC for a specific recipe, fields are as follows:   
+   field1: item to make (item id)
+   field2,3,4: sub-crafts needed. Note that main craft will not be listed.
+      1 = woodworking
+      2 = smithing
+      3 = goldsmithing
+      4 = clothcraft	
+      5 = leatherworking
+      6 = bonecraft
+      7 = Alchemy
+      8 = Cooking
+   field5: crystal (item id)
+   field6: KeyItem needed, if any (in Big Endian)
+   field7-14: material required (item id)
+   field15-22: qty for each material above.
+   field23-24: Unknown   
+ ]]
+fields.incoming[0x031] = L{
+    {ctype='unsigned short[24]',    label='Field'},                             -- 04    
+}
+
 -- NPC Interaction Type 1
 fields.incoming[0x032] = L{
     {ctype='unsigned int',      label='NPC',                fn=id},             -- 04
