@@ -597,7 +597,7 @@ end
 -----------------------------------------------------------------------------------
 function is_usable_item(i_tab)
     local ext = extdata.decode(i_tab)
-    if res.items[i_tab.id].type == 7 or (ext.type == 'Enchanted Equipment' and ext.usable) then return true end
+    if res.items[i_tab.id].type == 7 or (ext.type == 'Enchanted Equipment' and ext.usable) or res.items[i_tab.id].category == 'Usable' then return true end
     return false
 end
 
