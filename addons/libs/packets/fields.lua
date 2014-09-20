@@ -2342,7 +2342,7 @@ fields.incoming[0x0E8] = L{
 -- Widescan Mob
 fields.incoming[0x0F4] = L{
     {ctype='unsigned short',    label='Index',              fn=index},          -- 04
-    {ctype='unsigned char',     label='_unknown1'},                             -- 06
+    {ctype='unsigned char',     label='Level'},                                 -- 06
     {ctype='unsigned char',     label='Type',               fn=e+{'ws mob'}},   -- 07
     {ctype='short',             label='X Offset',           fn=pixel},          -- 08   Offset on the map
     {ctype='short',             label='Y Offset',           fn=pixel},          -- 0A
