@@ -154,7 +154,7 @@ function parse_action_packet(act)
     
     for i,v in pairs(act.targets) do
         for n,m in pairs(v.actions) do
-            if m.message ~= 0 then
+            if m.message ~= 0 and res.action_messages[m.message] ~= nil then
                 local targ = assemble_targets(act.actor,v.target,act.category,m.message)
                 local color = color_filt(res.action_messages[m.message].color,v.target[1].id==Self.id)
                 if m.reaction == 11 and act.category == 1 then m.simp_name = 'parried by'
