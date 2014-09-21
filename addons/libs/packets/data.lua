@@ -117,6 +117,7 @@ data.incoming[0x02A] = {name='Resting Message',     description='Packet sent whe
 data.incoming[0x02D] = {name='Kill Message',        description='Packet sent when you gain XP/LP/CP/JP/MP, advance RoE objectives, etc. by defeating a mob.'}
 data.incoming[0x02F] = {name='Digging Animation',   description='Generates the chocobo digging animation'}
 data.incoming[0x030] = {name='Synth Animation',     description='Generates the synthesis animation'}
+data.incoming[0x031] = {name='Synth List',          description='List of recipes or materials needed for a recipe'}
 data.incoming[0x032] = {name='NPC Interaction 1',   description='Occurs before menus and some cutscenes'}
 data.incoming[0x034] = {name='NPC Interaction 2',   description='Occurs before menus and some cutscenes'}
 data.incoming[0x036] = {name='NPC Chat',            description='Dialog from NPC\'s.'}
@@ -188,7 +189,7 @@ data.incoming[0x117] = {name='Equipset Response',   description='Returned from t
 return data
 
 --[[
-Copyright © 2013-2014, Windower
+Copyright Â© 2013-2014, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

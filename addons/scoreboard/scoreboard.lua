@@ -306,7 +306,17 @@ display = Display:new(settings, dps_db)
 -- Keep updates flowing
 local function update_dps_clock()
     local player = windower.ffxi.get_player()
-    if player and player.in_combat then
+    local pet
+    if player ~= nil then
+        local player_mob = windower.ffxi.get_mob_by_id(player.id)
+        if player_mob ~= nil then
+            local pet_index = player_mob.pet_index
+            if pet_index ~= nil then
+                pet = windower.ffxi.get_mob_by_index(pet_index)
+            end
+        end
+    end
+    if player and (player.in_combat or (pet ~= nil and pet.status == 1)) then
         dps_clock:advance()
     else
         dps_clock:pause()
@@ -346,7 +356,17 @@ windower.register_event('action', function(raw_action)
     local category = action:get_category_string()
 
     local player = windower.ffxi.get_player()
-    if not player or not windower.ffxi.get_player().in_combat then
+    local pet
+    if player ~= nil then
+        local player_mob = windower.ffxi.get_mob_by_id(player.id)
+        if player_mob ~= nil then
+            local pet_index = player_mob.pet_index
+            if pet_index ~= nil then
+                pet = windower.ffxi.get_mob_by_index(pet_index)
+            end
+        end
+    end
+    if not player or not (windower.ffxi.get_player().in_combat or (pet ~= nil and pet.status == 1)) then
         -- nothing to do
         return
     end
@@ -358,17 +378,17 @@ windower.register_event('action', function(raw_action)
                     -- hit, crit
                     if subaction.message == 1 or subaction.message == 67 then
                         if subaction.message == 67 then
-                            dps_db:add_m_crit(target:get_name(), action:get_actor_name(), subaction.param)
+                            dps_db:add_m_crit(target:get_name(), create_mob_name(action), subaction.param)
                         else
-                            dps_db:add_m_hit(target:get_name(), action:get_actor_name(), subaction.param)
+                            dps_db:add_m_hit(target:get_name(), create_mob_name(action), subaction.param)
                         end
                         
                         -- enspells etc
                         if subaction.has_add_effect and T{163, 229}:contains(subaction.add_effect_message) then
-                            dps_db:add_damage(target:get_name(), action:get_actor_name(), subaction.add_effect_param)
+                            dps_db:add_damage(target:get_name(), create_mob_name(action), subaction.add_effect_param)
                         end
                     elseif subaction.message == 15 or subaction.message == 63 then
-                        dps_db:incr_misses(target:get_name(), action:get_actor_name())
+                        dps_db:incr_misses(target:get_name(), create_mob_name(action))
                     end
                 end
             end
@@ -391,8 +411,8 @@ windower.register_event('action', function(raw_action)
         elseif category == 'spell_finish' then
             for target in action:get_targets() do
                 for subaction in target:get_actions() do
-                    if T{2, 252, 265, 650}:contains(subaction.message) then
-                        dps_db:add_damage(target:get_name(), action:get_actor_name(), subaction.param)
+                    if T{2, 252, 264, 650}:contains(subaction.message) then
+                        dps_db:add_damage(target:get_name(), create_mob_name(action), subaction.param)
                     end
                 end
             end
@@ -429,7 +449,7 @@ windower.register_event('action', function(raw_action)
             for target in action:get_targets() do
                 for subaction in target:get_actions() do
                     if subaction.message == 317 then
-                        dps_db:add_damage(target:get_name(), action:get_actor_name(), subaction.param)
+                        dps_db:add_damage(target:get_name(), create_mob_name(action), subaction.param)
                     end
                 end
             end
@@ -437,7 +457,7 @@ windower.register_event('action', function(raw_action)
             for target in action:get_targets() do
                 for subaction in target:get_actions() do
                     if subaction.message == 185 or subaction.message == 264 then
-                        dps_db:add_damage(target:get_name(), action:get_actor_name(), subaction.param)
+                        dps_db:add_damage(target:get_name(), create_mob_name(action), subaction.param)
                     end
                 end
             end        
@@ -457,6 +477,39 @@ windower.register_event('action', function(raw_action)
     end
 end)
 
+function find_pet_owner_name(action)
+    local pet = windower.ffxi.get_mob_by_id(action:get_id())
+    local party = windower.ffxi.get_party()
+    
+    local name = nil
+    
+    for _, member in pairs(party) do
+        if member.mob then
+            if member.mob.pet_index and member.mob.pet_index> 0 and pet.index == member.mob.pet_index then
+				name = member.mob.name
+                break
+            end
+        end
+    end
+    return name
+end
+
+function create_mob_name(action)
+    local actor = action:get_actor_name()
+    local result = ''
+    local owner = find_pet_owner_name(action)
+    if owner ~= nil then
+        if string.len(actor) > 8 then
+            result = string.sub(actor, 1, 7)..'.'
+        else
+            result = actor
+        end
+        result = result..' ('..string.sub(owner, 1, 3)..'.)'
+    else
+        return actor
+    end
+    return result
+end
 
 config.register(settings, function(settings)
     update_dps_clock:loop(settings.UpdateFrequency)

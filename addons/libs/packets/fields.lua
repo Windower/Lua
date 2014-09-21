@@ -1387,6 +1387,40 @@ fields.incoming[0x030] = L{
     {ctype='unsigned char',     label='_unknown1',          const=0x00},        -- 0E  -- Appears to just be trash.
 }
 
+-- Synth List / Synth Recipe
+--[[ This packet is used for list of recipes, but also for details of a specific recipe.
+
+   If you ask the guild NPC that provides regular Image Suppor for recipes, 
+   s/he will give you a list of recipes, fields are as follows:
+   Field1-2: NPC ID
+   Field3: NPC Index
+   Field4-6: Unknown
+   Field7-22: Item ID of recipe
+   Field23: Unknown
+   Field24: Usually Item ID of the recipe on next page
+
+
+   If you ask a guild NPC for a specific recipe, fields are as follows:   
+   field1: item to make (item id)
+   field2,3,4: sub-crafts needed. Note that main craft will not be listed.
+      1 = woodworking
+      2 = smithing
+      3 = goldsmithing
+      4 = clothcraft	
+      5 = leatherworking
+      6 = bonecraft
+      7 = Alchemy
+      8 = Cooking
+   field5: crystal (item id)
+   field6: KeyItem needed, if any (in Big Endian)
+   field7-14: material required (item id)
+   field15-22: qty for each material above.
+   field23-24: Unknown   
+ ]]
+fields.incoming[0x031] = L{
+    {ctype='unsigned short[24]',    label='Field'},                             -- 04    
+}
+
 -- NPC Interaction Type 1
 fields.incoming[0x032] = L{
     {ctype='unsigned int',      label='NPC',                fn=id},             -- 04
@@ -1409,6 +1443,17 @@ fields.incoming[0x034] = L{
     {ctype='unsigned char',     label='_unknown2'},                             -- 2F
     {ctype='unsigned short',    label='_dupeZone',          fn=zone},           -- 30
     {ctype='data[2]',           label='_junk1'},                                -- 31   Always 00s for me
+}
+
+--- When messages are fishing related, the player is the Actor.
+--- For some areas, the most significant bit of the message ID is set sometimes.
+-- NPC Chat
+fields.incoming[0x036] = L{
+    {ctype='unsigned int',      label='Actor',                fn=id},             -- 04
+    {ctype='unsigned short',    label='Actor Index',          fn=index},          -- 08
+    {ctype='bit[15]',           label='Message ID'},                              -- 0A
+    {ctype='bit',               label='_unknown1'},                               -- 0B
+    {ctype='unsigned int',      label='_unknown2'},                               -- 0C  Probably junk
 }
 
 enums.indi = {
@@ -2117,7 +2162,7 @@ types.alliance_member = L{
     {ctype='unsigned short',    label='Index',              fn=index},          -- 04
     {ctype='unsigned short',    label='Flags',              fn=bin+{2}},        -- 06
     {ctype='unsigned short',    label='Zone',               fn=zone},           -- 08
-    {ctype='unsigned short',    label='_unknown2'},                             -- 0A
+    {ctype='unsigned short',    label='_unknown2'},                             -- 0A	Always 0?
 }
 
 -- Alliance status update
@@ -2242,7 +2287,11 @@ fields.incoming[0x0DD] = L{
     {ctype='unsigned char',     label='MP%',                fn=percent},        -- 1E
     {ctype='unsigned char',     label='_unknown4'},                             -- 1F
     {ctype='unsigned short',    label='Zone',               fn=zone},           -- 20
-    {ctype='char*',             label='Name'},                                  -- 22
+    {ctype='unsigned char',     label='Main job',           fn=job},            -- 22
+    {ctype='unsigned char',     label='Main job level'},                        -- 23
+    {ctype='unsigned char',     label='Sub job',            fn=job},            -- 24
+    {ctype='unsigned char',     label='Sub job level'},                         -- 25
+    {ctype='char*',             label='Name'},                                  -- 26
 }
 
 -- Char Update
@@ -2293,7 +2342,7 @@ fields.incoming[0x0E8] = L{
 -- Widescan Mob
 fields.incoming[0x0F4] = L{
     {ctype='unsigned short',    label='Index',              fn=index},          -- 04
-    {ctype='unsigned char',     label='_unknown1'},                             -- 06
+    {ctype='unsigned char',     label='Level'},                                 -- 06
     {ctype='unsigned char',     label='Type',               fn=e+{'ws mob'}},   -- 07
     {ctype='short',             label='X Offset',           fn=pixel},          -- 08   Offset on the map
     {ctype='short',             label='Y Offset',           fn=pixel},          -- 0A
