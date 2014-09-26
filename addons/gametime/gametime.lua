@@ -272,8 +272,8 @@ function default_settings()
 end
 
 windower.register_event('time change', function(new, old)
-	gt.hours = (new / 60):floor()
-	gt.minutes = new % 60
+	gt.hours = string.format("%d",(new / 60):floor()):zfill(2)
+	gt.minutes = string.format("%d",new % 60):zfill(2)
 	gt.gtt:update(gt)
 end)
 
