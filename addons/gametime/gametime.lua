@@ -132,7 +132,7 @@ defaults.time.bg.red = 100
 defaults.time.bg.green = 100
 defaults.time.bg.blue = 100
 defaults.time.bg.visible = true
-
+defaults.time.zero = 'off'
 
 defaults.days = {}
 defaults.days.pos = {}
@@ -242,6 +242,12 @@ config.register(settings, function()
 		gt.delimiter = '\n'
 	end
 
+	if settings.time.zero == 'on' then
+		gt.zero = 'on'
+	else
+		gt.zero = 'off'
+	end
+
     local info = windower.ffxi.get_info()
     if info.logged_in then
         day_change(info.day)
@@ -272,8 +278,13 @@ function default_settings()
 end
 
 windower.register_event('time change', function(new, old)
-	gt.hours = string.format("%d",(new / 60):floor()):zfill(2)
-	gt.minutes = string.format("%d",new % 60):zfill(2)
+	if gt.zero == 'on' then
+		gt.hours = '%02d':format((new / 60):floor())
+		gt.minutes = '%02d':format(new % 60)
+	else
+		gt.hours = (new / 60):floor()
+		gt.minutes = new % 60
+	end
 	gt.gtt:update(gt)
 end)
 
@@ -356,6 +367,7 @@ windower.register_event('addon command', function (...)
 		log('//gt mode 1-4 :: Fullday; Abbreviated; Element names; Compact')
 		log('//gt route :: Displays route names.')
 		log('//gt route [route name] :: Displays arrival time for route.')
+		log('//gt zero [on/off] :: Displays the time with leading zeros. 04:05 instead of 4:5')
 		-- log('Log Reporting -- Day and Moon Phase (Not Moon %) change') not implemented yet
 		-- log('//gt [days/moon] change [true/false]')
 		-- log('Positioning:')
@@ -472,6 +484,16 @@ windower.register_event('addon command', function (...)
 			log('mode updated')
 		end
 		day_change(windower.ffxi.get_info().day)
+	elseif args[1] == 'zero' then
+		if args[2] == 'on' then
+			gt.zero = args[2]
+			log('zero padding enabled.')
+		elseif args[2] == 'off' then
+			gt.zero = args[2]
+			log('zero padding disabled.')
+		else
+			gt.zero = 'off'
+		end
 	elseif args[1] == 'save' then
 		settings:save('all')
 		log('Settings saved.')
