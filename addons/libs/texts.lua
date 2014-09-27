@@ -14,27 +14,12 @@ _meta.Text = _meta.Text or {}
 _meta.Text.__class = 'Text'
 _meta.Text.__index = texts
 _meta.Text.__newindex = function(t, k, v)
-    local l = #t._textorder
-    for key, val in ipairs(t._textorder) do
-        if val == k then
-            break
-        end
-
-        if key == l then
-            t._textorder[l + 1] = k
-            t._defaults[k] = ''
-        end
-    end
-    t._texts[k] = v ~= nil and tostring(v) or nil
-    t:update()
+    t:update({[k] = v})
 end
 
 --[[
     Local variables
 ]]
-
-local apply_settings
-local amend
 
 local default_settings = {}
 default_settings.pos = {}
@@ -64,38 +49,78 @@ default_settings.text.blue = 255
 
 math.randomseed(os.clock())
 
+local amend = function(settings, text)
+    for key, val in pairs(text) do
+        local sval = rawget(settings, key)
+        if sval == nil then
+            rawset(settings, key, val)
+        else
+            if type(sval) == 'table' and type(val) == 'table' then
+                amend(sval, val)
+            end
+        end
+    end
+end
+
+local apply_settings = function(_, t, settings)
+    settings = settings or t._settings
+    texts.pos(t, settings.pos.x, settings.pos.y)
+    texts.bg_alpha(t, settings.bg.alpha)
+    texts.bg_color(t, settings.bg.red, settings.bg.green, settings.bg.blue)
+    texts.bg_visible(t, settings.bg.visible)
+    texts.color(t, settings.text.red, settings.text.green, settings.text.blue)
+    texts.alpha(t, settings.text.alpha)
+    texts.font(t, settings.text.font, unpack(settings.text.fonts))
+    texts.size(t, settings.text.size)
+    texts.pad(t, settings.padding)
+    texts.italic(t, settings.flags.italic)
+    texts.bold(t, settings.flags.bold)
+    texts.right_justified(t, settings.flags.right_justified)
+    texts.bottom_justified(t, settings.flags.bottom_justified)
+    texts.visible(t, t._status.visible)
+
+    -- Trigger registered post-reload events
+    for _, event in ipairs(t._events) do
+        event(t, t._root_settings)
+    end
+end
+
 -- Returns a new text object.
 -- settings: If provided, it will overwrite the defaults with those. The structure needs to be similar
 -- str:      Formatting string, if provided, will set it as default text. Supports named variables:
---           ${name|default}
---           If those are found, they will initially be set to default. They can later be adjusted by simply setting the values. Example usage:
+--           ${name|default|format}
+--           If those are found, they will initially be set to default. They can later be adjusted by simply
+--           setting the values and it will format them according to the format specifier. Example usage:
 --
---           t = texts.new('The target\'s name is ${name|(None)}, its ID is ${id|0}.')
+--           t = texts.new('The target\'s name is ${name|(None)}, its ID is ${id|0|%.8X}.')
 --           -- At this point the text reads:
---           -- The target's name is (None), its ID is 0.
+--           -- The target's name is (None), its ID is 00000000.
 --           -- Now, assume the player is currently targeting its Moogle in the Port Jeuno MH (ID 17784938).
 --
 --           mob = windower.ffxi.get_mob_by_index(windower.ffxi.get_player()['target_index'])
 --
 --           t.name = mob['name']
 --           -- This will instantly change the text to include the mob's name:
---           -- The target's name is Moogle, its ID is 0.
+--           -- The target's name is Moogle, its ID is 00000000.
 --
 --           t.id = mob['id']
 --           -- This instantly changes the ID part of the text, so it all reads:
---           -- The target's name is Moogle, its ID is 17784938.
+--           -- The target's name is Moogle, its ID is 010F606A.
+--           -- Note that the ID has been converted to an 8-digit hex number, as specified with the "%.8X" format.
 --
 --           t.name = nil
 --           -- This unsets the name and returns it to its default:
---           -- The target's name is (None), its ID is 17784938.
+--           -- The target's name is (None), its ID is 010F606A.
 --
 --           -- To avoid mismatched attributes, like the name and ID in this case, you can also pass a table to update:
 --           t:update(mob)
---           -- Since the mob object contains both a "name" and "id" attribute, and both are used in the text object, it will update those with the respective values. The extra values are ignored.
+--           -- Since the mob object contains both a "name" and "id" attribute, and both are used in the text object,
+--           -- it will update those with the respective values. The extra values are ignored.
 function texts.new(str, settings, root_settings)
     if type(str) ~= 'string' then
         str, settings, root_settings = nil, str, settings
     end
+
     -- Sets the settings table to the provided settings, if not separately provided and the settings are a valid settings table
     if not _libs.config then
         root_settings = nil
@@ -119,6 +144,7 @@ function texts.new(str, settings, root_settings)
 
     t._texts = {}
     t._defaults = {}
+    t._formats = {}
     t._textorder = {}
 
     windower.text.create(t._name)
@@ -146,54 +172,19 @@ function texts.new(str, settings, root_settings)
     return setmetatable(t, _meta.Text)
 end
 
-function amend(settings, text)
-    for key, val in pairs(text) do
-        local sval = rawget(settings, key)
-        if sval == nil then
-            rawset(settings, key, val)
-        else
-            if type(sval) == 'table' and type(val) == 'table' then
-                amend(sval, val)
-            end
-        end
-    end
-end
-
-function apply_settings(_, t, settings)
-    settings = settings or t._settings
-    texts.pos(t, settings.pos.x, settings.pos.y)
-    texts.bg_alpha(t, settings.bg.alpha)
-    texts.bg_color(t, settings.bg.red, settings.bg.green, settings.bg.blue)
-    texts.bg_visible(t, settings.bg.visible)
-    texts.color(t, settings.text.red, settings.text.green, settings.text.blue)
-    texts.alpha(t, settings.text.alpha)
-    texts.font(t, settings.text.font, unpack(settings.text.fonts))
-    texts.size(t, settings.text.size)
-    texts.pad(t, settings.padding)
-    texts.italic(t, settings.flags.italic)
-    texts.bold(t, settings.flags.bold)
-    texts.right_justified(t, settings.flags.right_justified)
-    texts.bottom_justified(t, settings.flags.bottom_justified)
-    texts.visible(t, t._status.visible)
-
-    -- Trigger registered post-reload events
-    for _, event in ipairs(t._events) do
-        event(t, t._root_settings)
-    end
-end
-
 -- Sets string values based on the provided attributes.
 function texts.update(t, attr)
     attr = attr or {}
     local str = ''
     for _, key in ipairs(t._textorder) do
         if attr[key] ~= nil then
-            t._texts[key] = tostring(attr[key])
+            t._texts[key] = t._formats[key]:format(attr[key])
         end
+
         if t._texts[key] ~= nil then
-            str = str..t._texts[key]
+            str = str .. t._texts[key]
         else
-            str = str..t._defaults[key]
+            str = str .. t._defaults[key]
         end
     end
 
@@ -203,82 +194,95 @@ function texts.update(t, attr)
     return str
 end
 
--- Restores the original text object not counting updated settings.
-function texts.clear(t)
+-- Restores the original text object not counting updated settings
+-- If second argument is true, will erase the original text as well and create a blank text object
+function texts.clear(t, erase)
     t._texts = {}
     t._defaults = {}
     t._textorder = {}
-    if t._base_str then
+    t._formats = {}
+
+    if not erase and t._base_str then
         texts.append(t, t._base_str)
     else
         windower.text.set_text(t._name, '')
     end
 end
 
--- Appends new text tokens to be displayed. Supports variables.
+-- Appends new text tokens to be displayed
 function texts.append(t, str)
     local i = 1
-    local startpos, endpos
-    local match
-    local rndname
-    local key = #t._textorder + 1
-    local innerstart, innerend
-    local defaultmatch
+    local index = #t._textorder + 1
     while i <= #str do
-        startpos, endpos = str:find('%${.-}', i)
+        local startpos, endpos = str:find('%${.-}', i)
+        local rndname = '%s_%u':format(t._name, index)
         if startpos then
-            -- Match before the tag.
-            match = str:sub(i, startpos - 1)
-            rndname = t._name..'_'..key
-            t._textorder[key] = rndname
-            t._texts[rndname] = match
-            key = key + 1
-
-            -- Match the tag.
-            match = str:sub(startpos + 2, endpos - 1)
-            innerstart, innerend = match:find('^.-|')
-            if innerstart then
-                defaultmatch = match:sub(innerend + 1)
-                match = match:sub(1, innerend - 1)
-            else
-                defaultmatch = ''
+            -- Match before the tag
+            local match = str:sub(i, startpos - 1)
+            if match ~= '' then
+                t._textorder[index] = rndname
+                t._texts[rndname] = match
+                index = index + 1
             end
-            t._textorder[key] = match
-            t._texts[match] = defaultmatch
-            t._defaults[match] = defaultmatch
-            key = key + 1
 
+            -- Set up defaults
+            match = str:sub(startpos + 2, endpos - 1)
+            local key = match
+            local default = ''
+            local format = '%s'
+
+            -- Match the key
+            local keystart, keyend = match:find('^.-|')
+            if keystart then
+                key = match:sub(1, keyend - 1)
+                match = match:sub(keyend + 1)
+                default = match
+            end
+
+            -- Match the default and format
+            local defaultstart, defaultend = match:find('^.-|')
+            if defaultstart then
+                default = match:sub(1, defaultend - 1)
+                format = match:sub(defaultend + 1)
+            end
+
+            t._textorder[index] = key
+            t._texts[key] = default
+            t._defaults[key] = default
+            t._formats[key] = format
+
+            index = index + 1
             i = endpos + 1
+
         else
-            match = str:sub(i)
-            rndname = t._name..'_'..key
-            t._textorder[key] = rndname
-            t._texts[rndname] = match
+            t._textorder[index] = rndname
+            t._texts[rndname] = str:sub(i)
             break
+
         end
     end
 
     texts.update(t)
 end
 
--- Appends new text tokens with a line break. Supports variables.
+-- Appends new text tokens with a line break
 function texts.appendline(t, str)
-    t:append('\n'..str)
+    t:append('\n' .. str)
 end
 
--- Makes the primitive visible.
+-- Makes the primitive visible
 function texts.show(t)
     windower.text.set_visibility(t._name, true)
     t._status.visible = true
 end
 
--- Makes the primitive invisible.
+-- Makes the primitive invisible
 function texts.hide(t)
     windower.text.set_visibility(t._name, false)
     t._status.visible = false
 end
 
--- Returns whether or not the text object is visible.
+-- Returns whether or not the text object is visible
 function texts.visible(t, visible)
     if visible == nil then
         return t._status.visible
@@ -288,15 +292,14 @@ function texts.visible(t, visible)
     t._status.visible = visible
 end
 
--- Sets the text. This will ignore the defined text patterns.
+-- Sets a new text
 function texts.text(t, str)
     if not str then
         return t._status.text.content
     end
 
-    str = tostring(str)
-    windower.text.set_text(t._name, str)
-    t._status.text.content = str
+    texts.clear(t, true)
+    texts.append(t, str)
 end
 
 --[[
