@@ -510,6 +510,17 @@ function make_slugged_command_list(commands)
 end
 
 
+function get_ambig_r_line(strippedabil)
+    local r_line
+    if ambig_names[strippedabil].absolute then
+        r_line = res.spells[ambig_names[strippedabil].spells or ambig_names[strippedabil].job_abilities or ambig_names[strippedabil].weapon_skills or ambig_names[strippedabil].monster_abilities]
+    else
+        local abil_type = ambig_names[strippedabil].funct(windower.ffxi.get_player(),ambig_names[strippedabil].IDs,ambig_names[strippedabil].info,ambig_names[strippedabil].monster_abilities)
+        r_line = res[abil_type][ambig_names[strippedabil].IDs[abil_type]]
+    end
+    return r_line
+end
+
 
 
 
