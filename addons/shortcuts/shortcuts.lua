@@ -24,7 +24,7 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-_addon.version = '2.540'
+_addon.version = '2.600'
 _addon.name = 'Shortcuts'
 _addon.author = 'Byrth'
 _addon.commands = {'shortcuts'}
@@ -382,8 +382,9 @@ function interp_text(splitline,offset,modified)
             if ambig_names[strippedabil] then
                 if offset == 0 then 
                     -- It's ambiguous, so run the associated function and pass the known information.
-                    abil_type=ambig_names[strippedabil]['funct'](windower.ffxi.get_player(),ambig_names[strippedabil].IDs,ambig_names[strippedabil].info,ambig_names[strippedabil].monster_abilities)
-                    r_line= commands[abil_type][ambig_names[strippedabil].IDs[abil_type]]
+                    r_line = get_ambig_r_line(strippedabil)
+                    --abil_type=ambig_names[strippedabil].funct(windower.ffxi.get_player(),ambig_names[strippedabil].IDs,ambig_names[strippedabil].info,ambig_names[strippedabil].monster_abilities)
+                    --r_line= commands[abil_type][ambig_names[strippedabil].IDs[abil_type]]
                 else
                     -- A prefix is specified
                     abil_type = command_list[splitline[1]]
@@ -420,8 +421,9 @@ function interp_text(splitline,offset,modified)
     elseif strippedabil ~= '' and validabils[strippedabil] then -- If you can't use the ability, but it does exist, do this
         local r_line,abil_type
         if validabils[strippedabil].typ == 'Ambiguous' then
-            abil_type=ambig_names[strippedabil]['funct'](windower.ffxi.get_player(),ambig_names[strippedabil].IDs,ambig_names[strippedabil].info,ambig_names[strippedabil].monster_abilities)
-            r_line= res[abil_type][ambig_names[strippedabil].IDs[abil_type]]
+            r_line = get_ambig_r_line(strippedabil)
+            --abil_type=ambig_names[strippedabil].funct(windower.ffxi.get_player(),ambig_names[strippedabil].IDs,ambig_names[strippedabil].info,ambig_names[strippedabil].monster_abilities)
+            --r_line= res[abil_type][ambig_names[strippedabil].IDs[abil_type]]
         else
             r_line = res[validabils[strippedabil].typ][validabils[strippedabil].index]
         end
@@ -449,13 +451,15 @@ end
 ---- Either false, or a corrected spell name.
 -----------------------------------------------------------------------------------
 function convert_spell(spell)
+    local r_line
     local strippedabil = (spell or ''):lower():gsub(' ',''):gsub('[^%w]','')
     local name_line = validabils[strippedabil]
     
     if name_line then
         if name_line.typ == 'Ambiguous' then
-            local abil_type = ambig_names[strippedabil]['funct'](windower.ffxi.get_player(),ambig_names[strippedabil].IDs,ambig_names[strippedabil].info,ambig_names[strippedabil].monster_abilities)
-            r_line = res[abil_type][ambig_names[strippedabil].IDs[abil_type]]
+            --local abil_type = ambig_names[strippedabil].funct(windower.ffxi.get_player(),ambig_names[strippedabil].IDs,ambig_names[strippedabil].info,ambig_names[strippedabil].monster_abilities)
+            --r_line = res[abil_type][ambig_names[strippedabil].IDs[abil_type]]
+            r_line = get_ambig_r_line(strippedabil)
         elseif res[name_line.typ][name_line.index] then
             r_line = res[name_line.typ][name_line.index]
         end
