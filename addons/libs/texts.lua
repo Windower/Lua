@@ -49,7 +49,10 @@ default_settings.text.blue = 255
 
 math.randomseed(os.clock())
 
-local amend = function(settings, text)
+local amend
+local apply_settings
+
+amend = function(settings, text)
     for key, val in pairs(text) do
         local sval = rawget(settings, key)
         if sval == nil then
@@ -62,7 +65,7 @@ local amend = function(settings, text)
     end
 end
 
-local apply_settings = function(_, t, settings)
+apply_settings = function(_, t, settings)
     settings = settings or t._settings
     texts.pos(t, settings.pos.x, settings.pos.y)
     texts.bg_alpha(t, settings.bg.alpha)
