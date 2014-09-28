@@ -1,4 +1,6 @@
 -------------------------------------------------
+GearSwap 0.891 - Fixed a few bugs with /item commands. Exposed the _addon table.
+-------------------------------------------------
 GearSwap 0.890 - Added support for enchanted items in Wardrobe. Added a filter for enchanted items/armors. Made resources tables static.
 -------------------------------------------------
 GearSwap 0.880 - Accommodated booleans and numbers in equip commands. Fixed world.conquest.strengths.

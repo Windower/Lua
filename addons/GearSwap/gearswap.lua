@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.890'
+_addon.version = '0.891'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 

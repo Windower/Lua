@@ -93,7 +93,7 @@ function load_user_files(job_id,user_file)
         sets = nil
         return
     end
-    user_env = {gearswap = _G, _global = _global, _settings = _settings,
+    user_env = {gearswap = _G, _global = _global, _settings = _settings,_addon=_addon,
         -- Player functions
         equip = equip, cancel_spell=cancel_spell, change_target=change_target, cast_delay=cast_delay,
         print_set=print_set,set_combine=set_combine,disable=disable,enable=user_enable,
