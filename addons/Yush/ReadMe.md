@@ -15,13 +15,38 @@ The file needs to return a table. The table is a key -> action mapping, where th
 
 To go back to the base level, press the button that has been defined in the `data/settings.xml` file as `ResetKey`. To go back only one level, press the button that has been defined in the same file as `BackKey`. They default to `` ` `` and `Backspace` respectively.
 
+### Settings
+
+**ResetKey**
+
+The key which resets the current macro set to the root set (the same that is active when the file is loaded).
+
+**BackKey**
+
+The key which resets the current macro set to the previous set.
+
+**Verbose**
+
+If true, will display the current macro set you are in. The name it displays is the same name it has in the file it loads.
+
+**VerboseOutput**
+
+Determines where the current macro set will be displayed (only effective if the *Verbose* setting is `true`). The following options are available:
+* **Chat**: Will display the current macro set in the FFXI chat log.
+* **Console**: Will display the current macro set in the Windower console.
+* **Text** (**default**): Will display the current macro set in a text box.
+
+**Label**
+
+The properties of the text object holding the current macro set name, if *Verbose* is enabled and *VerboseOutput* set to `Text`.
+
 ### Commands
 
 ```
 yush reset
 ```
 
-Resets the current macro set to the root set (the same that's active when the file is loaded).
+Resets the current macro set to the root set (the same that is active when the file is loaded).
 
 ```
 yush back

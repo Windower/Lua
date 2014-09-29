@@ -4,6 +4,8 @@ _addon.language = 'English'
 _addon.command = 'yush'
 
 require('luau')
+require('logger')
+texts = require('texts')
 
 _innerG = {}
 for k, v in pairs(_G) do
@@ -56,8 +58,12 @@ defaults = {}
 defaults.ResetKey = '`'
 defaults.BackKey = 'backspace'
 defaults.Verbose = false
+defaults.VerboseOutput = 'Text'
+defaults.Label = {}
 
 settings = config.load(defaults)
+
+label = texts.new(settings.Label, settings)
 
 binds = {}
 names = {}
@@ -66,8 +72,16 @@ stack = L{binds}
 keys = S{}
 
 output = function()
-    if settings.Verbose and names[current] then
-        log('Changing into macro set %s.':format(names[current]))
+    if settings.Verbose then
+        names[current] = names[current] or 'Unnamed ' .. tostring(current):sub(8)
+
+        if settings.VerboseOutput == 'Text' then
+            label:text(names[current])
+        elseif settings.VerboseOutput == 'Chat' then
+            log('Changing into macro set %s.':format(names[current]))
+        elseif settings.VerboseOutput == 'Console' then
+            print('Changing into macro set %s.':format(names[current]))
+        end
     end
 end
 
@@ -142,7 +156,7 @@ windower.register_event('load', 'login', 'job change', 'logout', function()
 
     if not file then
         path = 'Binds'
-        file = loadfile(basepath .. 'binds.lua')
+        file = loadfile(basepath .. path)
     end
 
     if file then
@@ -150,12 +164,22 @@ windower.register_event('load', 'login', 'job change', 'logout', function()
         _innerG._binds = {}
         binds = {}
         names = {}
+        keys = S{}
 
         setfenv(file, _innerG)
-        parse_binds(file())
+        local root = file()
+        if not root then
+            _innerG._names = {}
+            _innerG._binds = {}
+            error('Malformatted %s Lua file: no return value.':format(path))
+            return
+        end
+
+        _innerG._names[root] = _innerG._names[root] or 'Root'
+        parse_binds(root)
         reset()
 
-        print('Yush: Loaded ' .. path .. ' Lua file')
+        print('Yush: Loaded %s Lua file':format(path))
     elseif player then
         print('Yush: No matching file found for %s (%s%s)':format(player.name, player.main_job, player.sub_job and '/' .. player.sub_job or ''))
     end
@@ -291,6 +315,14 @@ windower.register_event('keyboard', function(dik, down)
     end
 end)
 
+windower.register_event('prerender', function()
+    if settings.Verbose and settings.VerboseOutput == 'Text' then
+        label:show()
+    else
+        label:hide()
+    end
+end)
+
 windower.register_event('addon command', function(command, ...)
     command = command and command:lower() or 'help'
     local args = {...}
@@ -329,6 +361,7 @@ windower.register_event('addon command', function(command, ...)
         elseif category == 'backkey' then
             if not param then
                 log('Current "Back" key: %s':format(settings.BackKey))
+                return
             elseif not table.find(param) then
                 error('Key %s unknown.':format(param))
                 return
@@ -339,6 +372,7 @@ windower.register_event('addon command', function(command, ...)
         elseif category == 'resetkey' then
             if not param then
                 log('Current "Reset" key: %s':format(settings.ResetKey))
+                return
             elseif not table.find(param) then
                 error('Key %s unknown.':format(param))
                 return
@@ -346,9 +380,25 @@ windower.register_event('addon command', function(command, ...)
                 settings.ResetKey = param
             end
 
+        elseif category == 'verboseoutput' then
+            if not param then
+                log('Currently verbose mode outputs to %s.':format(
+                    settings.VerboseOutput == 'Text' and 'a text object'
+                    or settings.VerboseOutput == 'Chat' and 'the chat log'
+                    or settings.VerboseOutput == 'Console' and 'the console'
+                ))
+                return
+            elseif param == 'text' then
+                settings.VerboseOutput = 'Text'
+            elseif param == 'chat' then
+                settings.VerboseOutput = 'Chat'
+            elseif param == 'console' then
+                settings.VerboseOutput = 'Console'
+            end
+
         end
 
---        config.save(settings)
+        config.save(settings)
 
     elseif command == 'save' then
         config.save(settings, 'all')
