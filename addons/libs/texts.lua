@@ -46,6 +46,11 @@ default_settings.text.alpha = 255
 default_settings.text.red = 255
 default_settings.text.green = 255
 default_settings.text.blue = 255
+default_settings.text.stroke = {}
+default_settings.text.stroke.width = 0
+default_settings.text.stroke.red = 0
+default_settings.text.stroke.green = 0
+default_settings.text.stroke.blue = 0
 
 math.randomseed(os.clock())
 
@@ -81,6 +86,8 @@ apply_settings = function(_, t, settings)
     texts.right_justified(t, settings.flags.right_justified)
     texts.bottom_justified(t, settings.flags.bottom_justified)
     texts.visible(t, t._status.visible)
+    texts.stroke_width(t, settings.text.stroke.width)
+    texts.stroke_color(t, settings.text.stroke.red, settings.text.stroke.green, settings.text.stroke.blue)
 
     -- Trigger registered post-reload events
     for _, event in ipairs(t._events) do
@@ -465,6 +472,36 @@ function texts.bg_transparency(t, alpha)
     alpha = math.floor(255*(1-alpha))
     windower.text.set_bg_color(t._name, alpha, t._settings.bg.red, t._settings.bg.green, t._settings.bg.blue)
     t._settings.bg.alpha = alpha
+end
+
+function texts.stroke_width(t, size)
+    if not size then
+        return t._settings.stroke.width
+    end
+
+    windower.text.set_stroke_width(t._name, size)
+    t._settings.stroke.width = size
+end
+
+function texts.stroke_color(t, red, green, blue)
+    if not red then
+        return t._settings.text.stroke.red, t._settings.text.stroke.green, t._settings.text.stroke.blue
+    end
+
+    windower.text.set_stroke_color(t._name, t._settings.text.stroke.alpha, red, green, blue)
+    t._settings.text.stroke.red = red
+    t._settings.text.stroke.green = green
+    t._settings.text.stroke.blue = blue
+end
+
+function texts.stroke_transparency(t, alpha)
+    if not alpha then
+        return 1 - t._settings.stroke.alpha/255
+    end
+
+    alpha = math.floor(255 * (1 - alpha))
+    windower.text.set_stroke_color(t._name, alpha, t._settings.text.stroke.red, t._settings.text.stroke.green, t._settings.text.stroke.blue)
+    t._settings.text.stroke.alpha = alpha
 end
 
 -- Returns true if the coordinates are currently over the text object
