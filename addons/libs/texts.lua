@@ -48,7 +48,7 @@ default_settings.text.green = 255
 default_settings.text.blue = 255
 default_settings.text.stroke = {}
 default_settings.text.stroke.width = 0
-default_settings.text.stroke.alpha = 0
+default_settings.text.stroke.alpha = 255
 default_settings.text.stroke.red = 0
 default_settings.text.stroke.green = 0
 default_settings.text.stroke.blue = 0
@@ -89,6 +89,7 @@ apply_settings = function(_, t, settings)
     texts.visible(t, t._status.visible)
     texts.stroke_width(t, settings.text.stroke.width)
     texts.stroke_color(t, settings.text.stroke.red, settings.text.stroke.green, settings.text.stroke.blue)
+    texts.stroke_transparency(t, settings.text.stroke.alpha)
 
     -- Trigger registered post-reload events
     for _, event in ipairs(t._events) do
@@ -475,13 +476,14 @@ function texts.bg_transparency(t, alpha)
     t._settings.bg.alpha = alpha
 end
 
-function texts.stroke_width(t, size)
-    if not size then
+function texts.stroke_width(t, width)
+    if not width then
         return t._settings.stroke.width
     end
 
-    windower.text.set_stroke_width(t._name, size)
-    t._settings.text.stroke.width = size
+    print('Width: ' .. width)
+    windower.text.set_stroke_width(t._name, width)
+    t._settings.text.stroke.width = width
 end
 
 function texts.stroke_color(t, red, green, blue)
@@ -501,6 +503,7 @@ function texts.stroke_transparency(t, alpha)
     end
 
     alpha = math.floor(255 * (1 - alpha))
+    print('Alpha: ' .. alpha)
     windower.text.set_stroke_color(t._name, alpha, t._settings.text.stroke.red, t._settings.text.stroke.green, t._settings.text.stroke.blue)
     t._settings.text.stroke.alpha = alpha
 end
