@@ -48,6 +48,7 @@ default_settings.text.green = 255
 default_settings.text.blue = 255
 default_settings.text.stroke = {}
 default_settings.text.stroke.width = 0
+default_settings.text.stroke.alpha = 0
 default_settings.text.stroke.red = 0
 default_settings.text.stroke.green = 0
 default_settings.text.stroke.blue = 0
@@ -480,7 +481,7 @@ function texts.stroke_width(t, size)
     end
 
     windower.text.set_stroke_width(t._name, size)
-    t._settings.stroke.width = size
+    t._settings.text.stroke.width = size
 end
 
 function texts.stroke_color(t, red, green, blue)
