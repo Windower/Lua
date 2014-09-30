@@ -79,7 +79,7 @@ function expand_entry(entry)
     local augments,name,priority,bag
     if type(entry) == 'table' and entry == empty then
         name = empty
-    elseif type(entry) == 'table' and entry.name then
+    elseif type(entry) == 'table' and entry.name and type(entry.name) == 'string' then
         name = entry.name
         priority = entry.priority
         if entry.augments then
@@ -338,14 +338,10 @@ function equip_piece(eq_slot_id,bag_id,inv_slot_id)
     end
     
     if inv_slot_id ~= empty then
- --       windower.packets.inject_outgoing(0x50,string.char(0x50,0x04,0,0,inv_slot_id,eq_slot_id,bag_id,0))
-        
         items.equipment[toslotname(eq_slot_id)] = {slot=inv_slot_id,bag_id=bag_id}
         items[to_windower_api(res.bags[bag_id].english)][inv_slot_id].status = 5
         return string.char(inv_slot_id,eq_slot_id,bag_id,0)
     else
---        windower.packets.inject_outgoing(0x50,string.char(0x50,0x04,0,0,0,eq_slot_id,0,0))
-        
         items.equipment[toslotname(eq_slot_id)] = {slot=empty,bag_id=0}
         return string.char(0,eq_slot_id,0,0)
     end
