@@ -1076,7 +1076,7 @@ function priority_order(priority_list)
     return function ()
         local maximum,slot_id = -math.huge
         for i=0,15 do
-            if priority_list[i] and priority_list[i] > maximum then
+            if priority_list[i] and (priority_list[i] > maximum or (priority_list[i] == maximum and priority_list[i] == -math.huge)) then
                 maximum = priority_list[i]
                 slot_id = i
             end
