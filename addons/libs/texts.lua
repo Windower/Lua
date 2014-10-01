@@ -481,7 +481,6 @@ function texts.stroke_width(t, width)
         return t._settings.stroke.width
     end
 
-    print('Width: ' .. width)
     windower.text.set_stroke_width(t._name, width)
     t._settings.text.stroke.width = width
 end
@@ -503,7 +502,6 @@ function texts.stroke_transparency(t, alpha)
     end
 
     alpha = math.floor(255 * (1 - alpha))
-    print('Alpha: ' .. alpha)
     windower.text.set_stroke_color(t._name, alpha, t._settings.text.stroke.red, t._settings.text.stroke.green, t._settings.text.stroke.blue)
     t._settings.text.stroke.alpha = alpha
 end
