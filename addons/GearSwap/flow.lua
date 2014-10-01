@@ -424,6 +424,9 @@ windower.register_event('outgoing chunk',function(id,original,modified,injected,
         if res.jobs[newmain] and newmain ~= 0 and newmain ~= player.main_job_id then
             windower.debug('job change')
             
+            command_registry = {}
+            load_user_files(newmain)
+            
             table.clear(not_sent_out_equip)
             
             for id,name in pairs(default_slot_map) do
@@ -435,9 +438,6 @@ windower.register_event('outgoing chunk',function(id,original,modified,injected,
             end
             player.main_job_id = newmain
             update_job_names()
-            
-            command_registry = {}
-            load_user_files(player.main_job_id)
         end
     end
     
