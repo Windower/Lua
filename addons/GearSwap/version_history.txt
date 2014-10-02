@@ -1,4 +1,6 @@
 -------------------------------------------------
+GearSwap 0.892 - Proxied primitive and text commands.
+-------------------------------------------------
 GearSwap 0.891 - Fixed a few bugs with /item commands. Exposed the _addon table.
 -------------------------------------------------
 GearSwap 0.890 - Added support for enchanted items in Wardrobe. Added a filter for enchanted items/armors. Made resources tables static.
