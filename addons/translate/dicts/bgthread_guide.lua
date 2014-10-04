@@ -8,6 +8,7 @@ local dict = {
     {en="Normal Difficulty",ja="ふつう"},
     {en="Difficult",ja="むず"},
     {en="Very Difficult",ja="とてもむず"},
+    {en="GEO",ja="風"},
 }
 
 return dict
