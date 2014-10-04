@@ -57,10 +57,24 @@ end
 
 windower.text.delete = function (str)
     if __raw.text.registry[str] then
-        __raw.text.registry[str] = nil
-        __raw.text.delete(str)
+        print('in here!')
+        local deleted = false
+        if windower.text.saved_texts then
+            for i,v in pairs(windower.text.saved_texts) do
+                if v._name == str then
+                    __raw.text.registry[str] = nil
+                    windower.text.saved_texts[i]:destroy()
+                    deleted = true
+                    break
+                end
+            end
+        end
+        if not deleted then
+            __raw.text.registry[str] = nil
+            __raw.text.delete(str)
+        end
     else
-        windower.add_to_chat(123,'GearSwap: Text object cannot be deleted because it does not exist.')
+        __raw.text.delete(str)
     end
 end
 
@@ -78,7 +92,7 @@ windower.prim.delete = function (str)
         __raw.prim.registry[str] = nil
         __raw.prim.delete(str)
     else
-        windower.add_to_chat(123,'GearSwap: Primitive cannot be deleted because it does not exist.')
+        __raw.prim.delete(str)
     end
 end
 
