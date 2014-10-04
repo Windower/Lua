@@ -57,7 +57,6 @@ end
 
 windower.text.delete = function (str)
     if __raw.text.registry[str] then
-        print('in here!')
         local deleted = false
         if windower.text.saved_texts then
             for i,v in pairs(windower.text.saved_texts) do
