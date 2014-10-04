@@ -3,7 +3,7 @@
 ]]
 
 local texts = {}
-local saved_texts = {}
+windower.text.saved_texts = {}
 local dragged
 
 _libs = _libs or {}
@@ -179,7 +179,7 @@ function texts.new(str, settings, root_settings)
     end
 
     -- Cache for deletion
-    saved_texts[#saved_texts + 1] = t
+    windower.text.saved_texts[#windower.text.saved_texts + 1] = t
 
     return setmetatable(t, _meta.Text)
 end
@@ -514,7 +514,7 @@ function texts.hover(t, x, y)
 
     local pos_x, pos_y = windower.text.get_location(t._name)
     local off_x, off_y = windower.text.get_extents(t._name)
-
+    
     return (pos_x <= x and x <= pos_x + off_x
         or pos_x >= x and x >= pos_x + off_x)
     and (pos_y <= y and y <= pos_y + off_y
@@ -522,9 +522,10 @@ function texts.hover(t, x, y)
 end
 
 function texts.destroy(t)
-    for i, t_needle in ipairs(saved_texts) do
+    for i, t_needle in ipairs(windower.text.saved_texts) do
         if t == t_needle then
-            table.remove(t, i)
+            table.remove(windower.text.saved_texts, i)
+            break
         end
     end
     windower.text.delete(t._name)
@@ -545,7 +546,7 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
 
     -- Mouse left click
     elseif type == 1 then
-        for _, t in pairs(saved_texts) do
+        for _, t in pairs(windower.text.saved_texts) do
             if t._settings.flags.draggable and t:hover(x, y) then
                 local pos_x, pos_y = windower.text.get_location(t._name)
 
