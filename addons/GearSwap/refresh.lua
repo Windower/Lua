@@ -142,7 +142,7 @@ function load_user_files(job_id,user_file)
     local funct, err = loadfile(path)
     
     -- If the file cannot be loaded, print the error and load the default.
-    if funct == nil then 
+    if funct == nil then
         print('User file problem: '..err)
         current_job_file = nil
         gearswap_disabled = true
