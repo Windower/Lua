@@ -206,19 +206,14 @@ function texts.update(t, attr)
     return str
 end
 
--- Restores the original text object not counting updated settings
--- If second argument is true, will erase the original text as well and create a blank text object
-function texts.clear(t, erase)
+-- Restores the original text object not counting updated variables and added lines
+function texts.clear(t)
     t._texts = {}
     t._defaults = {}
     t._textorder = {}
     t._formats = {}
 
-    if not erase and t._base_str then
-        texts.append(t, t._base_str)
-    else
-        windower.text.set_text(t._name, '')
-    end
+    texts.append(t, t._base_str or '')
 end
 
 -- Appends new text tokens to be displayed
@@ -310,8 +305,8 @@ function texts.text(t, str)
         return t._status.text.content
     end
 
-    texts.clear(t, true)
-    texts.append(t, str)
+    t._base_str = str
+    texts.clear(t)
 end
 
 --[[
