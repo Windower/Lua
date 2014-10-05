@@ -183,7 +183,7 @@ windower.register_event('addon command',function (...)
             if pathsearch({f_name}) then
                 refresh_globals()
                 command_registry = {}
-                load_user_files(false,f_name)
+                load_user_files(false, true, f_name)
             else
                 windower.add_to_chat(123,'GearSwap: File not found.')
             end
