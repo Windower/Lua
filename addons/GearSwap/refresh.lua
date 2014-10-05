@@ -64,7 +64,9 @@ end
 function load_user_files(job_id,user_file)
     job_id = tonumber(job_id)
 
-    user_pcall('file_unload',res.jobs[job_id][language..'_short'])
+    if job_id and res.jobs[job_id] then
+        user_pcall('file_unload',res.jobs[job_id][language..'_short'])
+    end
     
     for i in pairs(registered_user_events) do
         unregister_event_user(i)
@@ -82,8 +84,10 @@ function load_user_files(job_id,user_file)
     --registered_user_events = {}
     include_user_path = nil
     
-    player.main_job_id = job_id
-    update_job_names()
+    if job_id and res.jobs[job_id] then
+        player.main_job_id = job_id
+        update_job_names()
+    end
     
     language = 'english' -- Reset language to english when changing job files.
     
