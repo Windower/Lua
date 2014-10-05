@@ -17,13 +17,13 @@ defaults.flags = {}
 defaults.flags.right = true
 
 settings = config.load(defaults)
-distance = texts.new(settings)
+distance = texts.new('${value||%.1f}', settings)
 
 debug.setmetatable(nil, {__index = {}, __call = functions.empty})
 
 windower.register_event('prerender', function()
     local t = windower.ffxi.get_mob_by_index(windower.ffxi.get_player().target_index or 0)
-    distance:text('%.1f':format(t.distance:sqrt() or 0))
+    distance.value = t.distance:sqrt()
     distance:visible(t ~= nil)
 end)
 
