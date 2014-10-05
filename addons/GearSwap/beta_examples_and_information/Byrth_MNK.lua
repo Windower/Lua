@@ -5,28 +5,28 @@ function get_sets()
     sets.precast.Counterstance = {feet="Melee Gaiters +2"}
     sets.precast.Dodge = {feet="Anchorite's Gaiters"}
     sets.precast.Mantra = {feet="Melee Gaiters +2"}
-    sets.precast.Waltz = {head="Anwig Salade",neck="Dualism Collar",ring1="Valseur's Ring",ring2="Veela Ring",
+    sets.precast.Waltz = {head="Anwig Salade",neck="Dualism Collar +1",ring1="Valseur's Ring",ring2="Carbuncle Ring +1",
         waist="Aristo Belt",legs="Desultor Tassets",feet="Dance Shoes"}
         
     sets.precast['Victory Smite'] = {main="Oatixur",ammo="Potestas Bomblet",head="Uk'uxkaj Cap",neck="Light Gorget",
         ear1="Moonshade Earring",ear2="Brutal Earring",body="Manibozho Jerkin",hands="Otronif Gloves",
-        ring1="Pyrosoul Ring",ring2="Epona's Ring",back="Rancorous Mantle",waist="Windbuffet Belt",legs="Manibozho Brais",
+        ring1="Ifrit Ring +1",ring2="Epona's Ring",back="Rancorous Mantle",waist="Windbuffet Belt +1",legs="Manibozho Brais",
         feet="Manibozho Boots"}
         
     sets.precast.WS = {main="Oatixur",ammo="Potestas Bomblet",head="Whirlpool Mask",neck="Justiciar's Torque",
         ear1="Steelflash Earring",ear2="Bladeborn Earring",body="Manibozho Jerkin",hands="Mel. Gloves +2",
-        ring1="Rajas Ring",ring2="Pyrosoul Ring",back="Atheling Mantle",waist="Black Belt",legs="Manibozho Brais",
+        ring1="Rajas Ring",ring2="Ifrit Ring +1",back="Atheling Mantle",waist="Black Belt",legs="Manibozho Brais",
         feet="Manibozho Boots"}
     
     sets.TP = {}
     sets.TP.DD = {main="Oatixur",ammo="Potestas Bomblet",head="Uk'uxkaj Cap",neck="Asperity Necklace",
         ear1="Steelflash Earring",ear2="Bladeborn Earring",body="Thaumas Coat",hands="Otronif Gloves",
-        ring1="Rajas Ring",ring2="Epona's Ring",back="Atheling Mantle",waist="Windbuffet Belt",legs="Quiahuiz Leggings",
+        ring1="Rajas Ring",ring2="Epona's Ring",back="Atheling Mantle",waist="Windbuffet Belt +1",legs="Quiahuiz Leggings",
         feet="Anchorite's Gaiters"}
 	
     sets.TP.Acc = {main="Oatixur",ammo="Potestas Bomblet",head="Whirlpool Mask",neck="Asperity Necklace",
         ear1="Steelflash Earring",ear2="Bladeborn Earring",body="Manibozho Jerkin",hands="Otronif Gloves",
-        ring1="Defending Ring",ring2="Epona's Ring",back="Letalis Mantle",waist="Windbuffet Belt",legs="Manibozho Brais",
+        ring1="Defending Ring",ring2="Epona's Ring",back="Letalis Mantle",waist="Windbuffet Belt +1",legs="Manibozho Brais",
         feet="Anchorite's Gaiters"}
         
     sets.TP.Solo = {main="Oatixur",ammo="Potestas Bomblet",head="Whirlpool Mask",neck="Twilight Torque",
@@ -41,8 +41,8 @@ function get_sets()
     sets.aftercast.TP = sets.TP.Acc
     
     sets.aftercast.Idle = {main="Oatixur",ammo="Potestas Bomblet",head="Oce. Headpiece +1",neck="Wiglen Gorget",
-        ear1="Novia Earring",ear2="Phawaylla Earring",body="Kheper Jacket",hands="Otronif Gloves",
-        ring1="Paguroidea Ring",ring2="Sheltered Ring",back="Boxer's Mantle",waist="Black Belt",legs="Nahtirah trousers",
+        ear1="Novia Earring",ear2="Phawaylla Earring",body="Khepri Jacket",hands="Otronif Gloves",
+        ring1="Paguroidea Ring",ring2="Sheltered Ring",back="Fugacity Mantle +1",waist="Black Belt",legs="Nahtirah trousers",
         feet="Hermes' Sandals"}
     send_command('input /macro book 15;wait .1;input /macro set 1')
 end
