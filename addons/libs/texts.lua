@@ -130,7 +130,7 @@ end
 --           -- it will update those with the respective values. The extra values are ignored.
 function texts.new(str, settings, root_settings)
     if type(str) ~= 'string' then
-        str, settings, root_settings = nil, str, settings
+        str, settings, root_settings = '', str, settings
     end
 
     -- Sets the settings table to the provided settings, if not separately provided and the settings are a valid settings table
