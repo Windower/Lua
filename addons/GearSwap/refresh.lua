@@ -61,10 +61,11 @@ end
 ---- user_env, a table of all of the player defined functions and their current
 ---- variables.
 -----------------------------------------------------------------------------------
-function load_user_files(job_id,user_file)
+function load_user_files(job_id, a, user_file)
     job_id = tonumber(job_id)
-
-    user_pcall('file_unload')
+	if a then
+		user_pcall('file_unload')
+    end
     
     for i in pairs(registered_user_events) do
         unregister_event_user(i)
@@ -569,7 +570,7 @@ function refresh_user_env(job_id)
     if not job_id then
         windower.send_command('@wait 1;lua i '.._addon.name..' refresh_user_env')
     else
-        load_user_files(job_id)
+        load_user_files(job_id, true)
         --windower.send_command('@wait 0.5;lua i '.._addon.name..' load_user_files '..job_id)
     end
 end
