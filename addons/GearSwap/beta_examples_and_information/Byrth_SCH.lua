@@ -7,8 +7,8 @@ function get_sets()
     sets.precast.JA['Tabula Rasa'] = {head="Argute Pants +2"}
         
     sets.precast.FastCast = {main="Ngqoqwanb",range=empty,ammo="Impatiens",head="Nahtirah Hat",neck="Orunmila's Torque",
-        ear2="Loquacious Earring",body="Anhur Robe",hands="Gendewitha Gages",lring="Prolix Ring",
-        back="Swith Cape +1",waist="Witful Belt",legs="Orvail Pants +1",feet="Academic's Loafers"}
+        ear2="Loquacious Earring",body="Anhur Robe",hands="Gendewitha Gages",lring="Prolix Ring",rring="Veneficium Ring",
+        back="Swith Cape +1",waist="Witful Belt",legs="Artsieq Hose",feet="Academic's Loafers"}
     
     sets.precast.EnhancingMagic = set_combine(sets.precast.FastCast,{waist="Siegel Sash"})
     
@@ -42,8 +42,8 @@ function get_sets()
     
     sets.midcast['Enfeebling Magic'] = {main="Ngqoqwanb",sub="Arbuda Grip",range="Aureole",ammo=empty,
         head="Nahtirah Hat",neck="Eddy Necklace",ear1="Psystorm Earring",ear2="Lifestorm Earring",
-        body="Seidr Cotehardie",hands="Lurid Mitts",ring1="Sangoma Ring",ring2="Omega Ring",
-        back="Refraction Cape",waist="Wanion Belt",legs="Orvail Pants +1",feet="Bokwus Boots"}
+        body="Seidr Cotehardie",hands="Hagondes Cuffs +1",ring1="Sangoma Ring",ring2="Omega Ring",
+        back="Refraction Cape",waist="Wanion Belt",legs="Artsieq Hose",feet="Bokwus Boots"}
     
     sets.midcast['Healing Magic'] = {}
     
@@ -68,21 +68,21 @@ function get_sets()
     ---  AFTERCAST SETS  ---
     sets.Idle = {}
     sets.Idle.noSub = {main="Terra's Staff",sub="Arbuda Grip",range=empty,ammo="Savant's Treatise",
-        head="Savant's bonnet +2",neck="Twilight Torque",ear1="Gifted earring",ear2="Loquacious Earring",
+        head="Spurrina Coif",neck="Twilight Torque",ear1="Gifted earring",ear2="Loquacious Earring",
         body="Academic's Gown",hands="Serpentes Cuffs",ring1="Defending Ring",ring2="Dark Ring",
         back="Umbra Cape",waist="Siegel Sash",legs="Nares Trews",feet="Herald's Gaiters"}
     
     sets.Idle.Sub = {main="Terra's Staff",sub="Arbuda Grip",range=empty,ammo="Mana ampulla",
-        head="Savant's bonnet +2",neck="Twilight Torque",ear1="Savant's earring",ear2="Loquacious Earring",
+        head="Spurrina Coif",neck="Twilight Torque",ear1="Savant's earring",ear2="Loquacious Earring",
         body="Academic's Gown",hands="Serpentes Cuffs",ring1="Defending Ring",ring2="Dark Ring",
         back="Umbra Cape",waist="Siegel Sash",legs="Nares Trews",feet="Herald's Gaiters"}
     
     sets.Idle.Current = sets.Idle.noSub
     
     sets.Resting = {main="Numen Staff",sub="Ariesian Grip",range=empty,ammo="Mana ampulla",
-        head="Hydra Beret",neck="Eidolon Pendant",ear1="Relaxing Earring",ear2="Antivenom Earring",
+        head="Spurrina Coif",neck="Eidolon Pendant",ear1="Relaxing Earring",ear2="Antivenom Earring",
         body="Academic's Gown",hands="Nares Cuffs",ring1="Celestial Ring",ring2="Angha Ring",
-        back="Vita Cape",waist="Austerity Belt",legs="Nares Trews",feet="Serpentes Sabots"}
+        back="Felicitas Cape +1",waist="Austerity Belt +1",legs="Nares Trews",feet="Serpentes Sabots"}
     
     
     
@@ -95,6 +95,9 @@ function get_sets()
     sets.obi.Lightning = {waist='Rairin Obi'}
     sets.obi.Light = {waist='Korin Obi'}
     sets.obi.Dark = {waist='Anrin Obi'}
+    sets.obi.Water = {waist='Suirin Obi'}
+    sets.obi.Earth = {waist='Dorin Obi'}
+    sets.obi.Fire = {waist='Karin Obi'}
     
     -- Generic gear for day/weather
     sets.weather = {back='Twilight Cape'}

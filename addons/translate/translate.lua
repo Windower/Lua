@@ -25,9 +25,9 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'Translate'
-_addon.version = '0.140914'
+_addon.version = '0.141005'
 _addon.author = 'Byrth'
-_addon.commands = {'trans'}
+_addon.commands = {'trans','translate'}
 
 
 language = 'english'
@@ -148,10 +148,10 @@ for dict_name in pairs(custom_dict_names) do
         for _,res_line in pairs(dict) do
             local jp = windower.to_shift_jis(res_line.ja or ''):escape()
             local jps = windower.to_shift_jis(res_line.jas or ''):escape()
-            if sanity_check(jp) and not trans_list[jp] and sanity_check(res_line.en) and jp~= res_line.en:escape() then
+            if sanity_check(jp) and sanity_check(res_line.en) and jp~= res_line.en:escape() then
                 trans_list[jp] = green_col..res_line.en..rcol
             end
-            if sanity_check(jps) and not trans_list[jps] and sanity_check(res_line.ens) and jps ~= res_line.ens:escape() then
+            if sanity_check(jps) and sanity_check(res_line.ens) and jps ~= res_line.ens:escape() then
                 trans_list[jps] = green_col..res_line.ens..rcol
             end
         end
@@ -191,6 +191,8 @@ windower.register_event('incoming chunk',function(id,orgi,modi,is_injected,is_bl
         end
         
         if not match_bool then return end
+        
+        if show_original then windower.add_to_chat(8,modi:sub(9,0x18):unpack('z',1)..'[Original]: '..out_text) end
         
         local order = {}
         for len,_ in pairs(matches) do
@@ -256,7 +258,20 @@ function get_boundary_length(str,limit)
 end
 
 windower.register_event('addon command', function(...)
-	assert(loadstring(table.concat({...}, ' ')))()
+    local commands = {...}
+    if not commands[1] then return end
+    if commands[1]:lower() == 'show' then
+        if commands[2] and commands[2]:lower() == 'original' then
+            show_original=not show_original
+            if show_original then
+                print('Translate: Showing the original text line.')
+            else
+                print('Translate: Hiding the original text line.')
+            end
+        end
+    elseif commands[1]:lower() == 'eval' then
+        assert(loadstring(table.concat({...}, ' ')))()
+    end
 end)
 
 

@@ -225,6 +225,13 @@
     <support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
+    <name>Nostrum</name>
+    <description>Creates a click-able on-screen macro to help avoid targeting problems while curing.</description>
+    <author>trv</author>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+  </addon>
+  <addon>
     <name>obiaway</name>
     <description>Automatically remove elemental obis based on day/weather/storm conditions.</description>
     <support>http://mibbit.com/#windower@irc.ffochat.com</support>

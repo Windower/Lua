@@ -2,8 +2,8 @@ function get_sets()
     -- Precast Sets
     sets.precast = {}
     
-    sets.precast.FC = {head="Nahtirah Hat",neck="Orunmila's Torque",ear1="Loquac. Earring",body="Marduk's Jubbah +1",
-        hands="Mdk. Dastanas +1",ring2="Prolix Ring",back="Swith Cape +1",waist="Siegel Sash",legs="Orvail Pants +1",
+    sets.precast.FC = {head="Nahtirah Hat",neck="Orunmila's Torque",ear1="Loquac. Earring",ear2="Enchanter Earring +1",body="Marduk's Jubbah +1",
+        hands="Hagondes Cuffs",ring1="Veneficium Ring",ring2="Prolix Ring",back="Swith Cape +1",waist="Siegel Sash",legs="Artsieq Hose",
         feet="Chelona Boots +1",Thunder={main='Apamajas I'},Fire={main='Atar I'}}
         
     sets.precast.Cur = {body="Heka's Kalasiris",legs="Nabu's Shalwar",back="Pahtli Cape"}
@@ -36,11 +36,11 @@ function get_sets()
     
     sets.pet_midcast.Phys_BP = set_combine(sets.BP_Base,{main="Soulscourge",head="Caller's horn +2",neck="Caller's Pendant",back="Samanisi Cape",waist="Mujin Obi"})
         
-    sets.pet_midcast.MAB_No_TP_BP = set_combine(sets.BP_Base,{neck="Eidolon Pendant",hands="Hagondes Cuffs",back="Samanisi Cape",waist="Caller's sash",legs="Hagondes Pants",feet="Hagondes Sabots"})
+    sets.pet_midcast.MAB_No_TP_BP = set_combine(sets.BP_Base,{neck="Eidolon Pendant",hands="Hagondes Cuffs +1",back="Samanisi Cape",waist="Caller's sash",legs="Hagondes Pants",feet="Hagondes Sabots"})
         
-    sets.pet_midcast.MAB_TP_BP = set_combine(sets.BP_Base,{neck="Eidolon Pendant",hands="Hagondes Cuffs",back="Samanisi Cape",waist="Caller's sash",legs="Caller's spats +2",feet="Hagondes Sabots"})
+    sets.pet_midcast.MAB_TP_BP = set_combine(sets.BP_Base,{neck="Eidolon Pendant",hands="Hagondes Cuffs +1",back="Samanisi Cape",waist="Caller's sash",legs="Caller's spats +2",feet="Hagondes Sabots"})
         
-    sets.pet_midcast.MAB_Spell = set_combine(sets.BP_Base,{neck="Eidolon Pendant",hands="Hagondes Cuffs",back="Samanisi Cape",waist="Caller's sash",legs="Hagondes Pants",feet="Hagondes Sabots"})
+    sets.pet_midcast.MAB_Spell = set_combine(sets.BP_Base,{neck="Eidolon Pendant",hands="Hagondes Cuffs +1",back="Samanisi Cape",waist="Caller's sash",legs="Hagondes Pants",feet="Hagondes Sabots"})
         
     sets.pet_midcast.MAcc_BP = set_combine(sets.BP_Base,{neck="Caller's Pendant",body="Anhur Robe",hands="Glyphic Bracers +1",back="Samanisi Cape",legs="Glyphic Spats +1",feet="Caller's Pgch. +2"})
     
@@ -82,7 +82,7 @@ function get_sets()
     sets.aftercast.Resting = {main="Numen Staff",sub="Ariesian Grip",ammo="Mana Ampulla",
         head="Caller's Horn +2",neck="Eidolon Pendant",ear1="Relaxing Earring",ear2="Antivenom Earring",
         body="Marduk's Jubbah +1",hands="Nares Cuffs",ring1="Celestial Ring",ring2="Angha Ring",
-        back="Vita cape",waist="Austerity belt",legs="Nares Trews",feet="Oracle's Pigaches"}
+        back="Felicitas Cape +1",waist="Austerity Belt +1",legs="Nares Trews",feet="Chelona Boots +1"}
     
     sets.aftercast.Idle = sets.aftercast_None    
     
@@ -98,7 +98,7 @@ function get_sets()
 end
 
 function pet_change(pet,gain)
-    idle()
+    idle(pet)
 end
 
 function precast(spell)
@@ -132,7 +132,7 @@ function midcast(spell)
     elseif sets.midcast[spell.english] then
         equip(sets.midcast[spell.english])
     else
-        idle()
+        idle(pet)
     end
 end
 
@@ -143,13 +143,13 @@ function aftercast(spell)
     if spell and (not spell.type or not string.find(spell.type,'BloodPact') and not AvatarList:contains(spell.name) or spell.interrupted) then -- and spell.name ~= 'Release'
         -- Don't want to swap away too quickly if I'm about to put BP damage gear on
         -- Need to wait 1 in order to allow pet information to update on Release.
-        idle()
+        idle(pet)
     end
 end
 
 function status_change(new,old)
     if new=='Idle' then
-        idle()
+        idle(pet)
     elseif new=='Resting' then
         equip(sets.aftercast.Resting)
     end
@@ -184,16 +184,16 @@ function pet_midcast(spell)
 end
 
 function pet_aftercast(spell)
-    idle()
+    idle(pet)
 end
 
 function self_command(command)
     if command == 'Idle' then
-        idle()
+        idle(pet)
     end
 end
 
-function idle()
+function idle(pet)
     equip(sets.aftercast.None)
     if pet.isvalid then
         if string.find(pet.name,'Spirit') then

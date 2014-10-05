@@ -381,7 +381,7 @@ function nest_xml(t, meta, indentlevel)
     local inlines = T{}
     local fragments = T{}
     local maxlength = 0        -- For proper comment indenting
-    keys = set.sort(table.keyset(t))
+    local keys = set.sort(table.keyset(t))
     local val
     for _, key in ipairs(keys) do
         val = rawget(t, key)

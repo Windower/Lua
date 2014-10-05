@@ -1,4 +1,4 @@
--- Copyright (c) 2013, Omnys of Valefor
+-- Copyright © 2013-2014, Omnys of Valefor
 -- All rights reserved.
 
 -- Redistribution and use in source and binary forms, with or without
@@ -115,6 +115,7 @@ gt.MoonPhase = ''
 defaults = {}
 defaults.saved = 0
 defaults.mode = 1
+defaults.zero = false
 defaults.time = {}
 defaults.time.pos = {}
 defaults.time.pos.x = 0 -- left
@@ -132,7 +133,6 @@ defaults.time.bg.red = 100
 defaults.time.bg.green = 100
 defaults.time.bg.blue = 100
 defaults.time.bg.visible = true
-
 
 defaults.days = {}
 defaults.days.pos = {}
@@ -230,10 +230,8 @@ Cycles.kazham.route[6] = "Arrives in Jeuno|14:49"
 Cycles.kazham.route[7] = "Arrives in Kazham|19:48"
 Cycles.kazham.route[8] = "Arrives in Jeuno|20:49"
 
-time_base_string = '${hours|XX}:${minutes|XX}'
-day_base_string = '${day|} ${MoonPhase|Unknown} (${MoonPct|-}%); ${WeekReport|}'
-gt.gtt = texts.new(time_base_string,settings.time)
-gt.gtd = texts.new(day_base_string,settings.days)
+gt.gtt = texts.new('', settings.time)
+gt.gtd = texts.new('', settings.days)
 
 config.register(settings, function()
 	if settings.days.axis == 'horizontal' then
@@ -241,6 +239,13 @@ config.register(settings, function()
 	else
 		gt.delimiter = '\n'
 	end
+
+    if settings.zero then
+        gtt:text('${hours|XX|%.2d}:${minutes|XX|%.2d}')
+    else
+        gtt:text('${hours|XX}:${minutes|XX|%.2d}')
+    end
+    gtd:text('${day|} ${MoonPhase|Unknown} (${MoonPct|-}%); ${WeekReport|}')
 
     local info = windower.ffxi.get_info()
     if info.logged_in then
@@ -272,8 +277,8 @@ function default_settings()
 end
 
 windower.register_event('time change', function(new, old)
-	gt.hours = (new / 60):floor()
-	gt.minutes = new % 60
+    gt.hours = (new / 60):floor()
+    gt.minutes = new % 60
 	gt.gtt:update(gt)
 end)
 
@@ -356,6 +361,7 @@ windower.register_event('addon command', function (...)
 		log('//gt mode 1-4 :: Fullday; Abbreviated; Element names; Compact')
 		log('//gt route :: Displays route names.')
 		log('//gt route [route name] :: Displays arrival time for route.')
+		log('//gt zero [on/off] :: Displays the time with leading zeros. 04:05 instead of 4:5')
 		-- log('Log Reporting -- Day and Moon Phase (Not Moon %) change') not implemented yet
 		-- log('//gt [days/moon] change [true/false]')
 		-- log('Positioning:')
@@ -472,8 +478,18 @@ windower.register_event('addon command', function (...)
 			log('mode updated')
 		end
 		day_change(windower.ffxi.get_info().day)
+	elseif args[1] == 'zero' then
+		if args[2] == 'on' then
+            settings.zero = true
+            config.save(settings)
+			log('zero padding enabled.')
+		elseif args[2] == 'off' then
+            settings.zero = false
+            config.save(settings)
+			log('zero padding disabled.')
+		end
 	elseif args[1] == 'save' then
-		settings:save('all')
+		config.save(settings, 'all')
 		log('Settings saved.')
 	end
 end)

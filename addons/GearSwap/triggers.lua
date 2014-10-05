@@ -111,8 +111,19 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
             if filter_pretarget(spell) then
                 if tonumber(splitline[splitline.n]) then
                     local ts = mk_command_registry_entry(spell,spell.target.id) -- find_command_registry_key('spell',spell) or
-
-                    command_registry[ts].proposed_packet = assemble_action_packet(spell.target.id,spell.target.index,outgoing_action_category_table[unify_prefix[spell.prefix]],spell.id)
+                    
+                    if spell.prefix == '/item' then
+                        -- Item use packet handling here
+                        if find_usable_item(spell.id,true) then
+                            --0x37 packet
+                            command_registry[ts].proposed_packet = assemble_use_item_packet(spell.target.id,spell.target.index,spell.id)
+                        else
+                            --0x36 packet
+                            command_registry[ts].proposed_packet = assemble_menu_item_packet(spell.target.id,spell.target.index,spell.id)
+                        end
+                    else
+                        command_registry[ts].proposed_packet = assemble_action_packet(spell.target.id,spell.target.index,outgoing_action_category_table[unify_prefix[spell.prefix]],spell.id)
+                    end
                     if command_registry[ts].proposed_packet then
                         equip_sets('precast',ts,spell)
                         return true

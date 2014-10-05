@@ -196,12 +196,11 @@ function equip_sets_exit(swap_type,ts,val1)
                 return true
             end
             
-            
             command_registry[ts].spell = val1
             if val1.target and val1.target.id and val1.target.index and val1.prefix and unify_prefix[val1.prefix] then
                 if val1.prefix == '/item' then
                     -- Item use packet handling here
-                    if val1.target.id == player.id then
+                    if find_usable_item(val1.id,true) then --val1.target.id == player.id then
                         --0x37 packet
                         command_registry[ts].proposed_packet = assemble_use_item_packet(val1.target.id,val1.target.index,val1.id)
                     else
@@ -425,6 +424,9 @@ windower.register_event('outgoing chunk',function(id,original,modified,injected,
         if res.jobs[newmain] and newmain ~= 0 and newmain ~= player.main_job_id then
             windower.debug('job change')
             
+            command_registry = {}
+            load_user_files(newmain)
+            
             table.clear(not_sent_out_equip)
             
             for id,name in pairs(default_slot_map) do
@@ -436,9 +438,6 @@ windower.register_event('outgoing chunk',function(id,original,modified,injected,
             end
             player.main_job_id = newmain
             update_job_names()
-            
-            command_registry = {}
-            load_user_files(player.main_job_id)
         end
     end
     

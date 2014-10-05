@@ -4,16 +4,20 @@ _addon.language = 'English'
 _addon.command = 'yush'
 
 require('luau')
+require('logger')
+texts = require('texts')
 
-_innerG = {_binds={}}
+_innerG = {}
 for k, v in pairs(_G) do
     rawset(_innerG, k, v)
 end
 _innerG._innerG = nil
 _innerG._G = _innerG
+_innerG._binds = {}
+_innerG._names = {}
 
 _innerG.include = function(path)
-    local full_path = windower.addon_path .. 'data/' .. path
+    local full_path = '%sdata/%s':format(windower.addon_path, path)
 
     local file = loadfile(full_path)
     if not file then
@@ -25,37 +29,66 @@ _innerG.include = function(path)
     file()
 end
 
-setmetatable(_innerG, {__index = function(g, k)
-    local t = rawget(rawget(g, '_binds'), k)
-    if not t then
-        t = {}
-        rawset(rawget(g, '_binds'), k, t)
-    end
-    return t
-end, __newindex = function(g, k, v)
-    local t = rawget(rawget(g, '_binds'), k)
-    if t and type(v) == 'table' then
-        for k, v in pairs(v) do
-            t[k] = v
+setmetatable(_innerG, {
+    __index = function(g, k)
+        local t = rawget(rawget(g, '_binds'), k)
+        if not t then
+            t = {}
+            rawset(rawget(g, '_binds'), k, t)
+            rawset(rawget(g, '_names'), t, k)
         end
-    else
-        rawset(rawget(g, '_binds'), k, v)
+        return t
+    end,
+    __newindex = function(g, k, v)
+        local t = rawget(rawget(g, '_binds'), k)
+        if t and type(v) == 'table' then
+            for k, v in pairs(v) do
+                t[k] = v
+            end
+        else
+            rawset(rawget(g, '_binds'), k, v)
+            if type(v) == 'table' then
+                rawset(rawget(g, '_names'), v, k)
+            end
+        end
     end
-end})
+})
 
 defaults = {}
 defaults.ResetKey = '`'
 defaults.BackKey = 'backspace'
+defaults.Verbose = false
+defaults.VerboseOutput = 'Text'
+defaults.Label = {}
 
 settings = config.load(defaults)
 
+label = texts.new(settings.Label, settings)
+
 binds = {}
+names = {}
 current = binds
 stack = L{binds}
 keys = S{}
 
+output = function()
+    if settings.Verbose then
+        names[current] = names[current] or 'Unnamed ' .. tostring(current):sub(8)
+
+        if settings.VerboseOutput == 'Text' then
+            label:text(names[current])
+        elseif settings.VerboseOutput == 'Chat' then
+            log('Changing into macro set %s.':format(names[current]))
+        elseif settings.VerboseOutput == 'Console' then
+            print('Changing into macro set %s.':format(names[current]))
+        end
+    end
+end
+
 reset = function()
     current = binds
+    stack = L{binds}
+    output()
 end
 
 back = function()
@@ -65,6 +98,7 @@ back = function()
         current = stack[stack:length() - 1]
         stack:remove()
     end
+    output()
 end
 
 check = function()
@@ -75,6 +109,7 @@ check = function()
             else
                 current = val
                 stack:append(current)
+                output()
             end
 
             return true
@@ -87,13 +122,15 @@ end
 parse_binds = function(fbinds, top)
     top = top or binds
 
+    rawset(names, top, rawget(_innerG._names, fbinds))
     for key, val in pairs(fbinds) do
         key = S(key:split('+')):map(string.lower)
         if type(val) == 'string' then
             rawset(top, key, val)
         else
-            rawset(top, key, {})
-            parse_binds(val, rawget(top, key))
+            local sub = {}
+            rawset(top, key, sub)
+            parse_binds(val, sub)
         end
     end
 end
@@ -119,14 +156,30 @@ windower.register_event('load', 'login', 'job change', 'logout', function()
 
     if not file then
         path = 'Binds'
-        file = loadfile(basepath .. 'binds.lua')
+        file = loadfile(basepath .. path)
     end
 
     if file then
+        _innerG._names = {}
+        _innerG._binds = {}
+        binds = {}
+        names = {}
+        keys = S{}
+
         setfenv(file, _innerG)
-        parse_binds(file())
+        local root = file()
+        if not root then
+            _innerG._names = {}
+            _innerG._binds = {}
+            error('Malformatted %s Lua file: no return value.':format(path))
+            return
+        end
+
+        _innerG._names[root] = _innerG._names[root] or 'Root'
+        parse_binds(root)
         reset()
-        print('Yush: Loaded ' .. path .. ' Lua file')
+
+        print('Yush: Loaded %s Lua file':format(path))
     elseif player then
         print('Yush: No matching file found for %s (%s%s)':format(player.name, player.main_job, player.sub_job and '/' .. player.sub_job or ''))
     end
@@ -262,8 +315,17 @@ windower.register_event('keyboard', function(dik, down)
     end
 end)
 
+windower.register_event('prerender', function()
+    if settings.Verbose and settings.VerboseOutput == 'Text' then
+        label:show()
+    else
+        label:hide()
+    end
+end)
+
 windower.register_event('addon command', function(command, ...)
     command = command and command:lower() or 'help'
+    local args = {...}
 
     if command == 'reset' then
         reset()
@@ -272,8 +334,74 @@ windower.register_event('addon command', function(command, ...)
         back()
 
     elseif command == 'press' then
-        keys = keys + S{...}:map(string.lower)
+        keys = keys + S(args):map(string.lower)
         check()
+
+    elseif command == 'set' then
+        if not args[1] then
+            error('Specify a settings category.')
+            return
+        end
+
+        local category = args[1]:lower()
+        local param = args[2] and args[2]:lower() or nil
+
+        if category == 'verbose' then
+            if param == 'true' then
+                settings.Verbose = true
+            elseif param == 'false' then
+                settings.Verbose = false
+            elseif param == 'toggle' then
+                settings.Verbose = not settings.Verbose
+            else
+                log('Verbose settings are %s.':format(settings.Verbose and 'on' or 'off'))
+                return
+            end
+
+        elseif category == 'backkey' then
+            if not param then
+                log('Current "Back" key: %s':format(settings.BackKey))
+                return
+            elseif not table.find(param) then
+                error('Key %s unknown.':format(param))
+                return
+            else
+                settings.BackKey = param
+            end
+
+        elseif category == 'resetkey' then
+            if not param then
+                log('Current "Reset" key: %s':format(settings.ResetKey))
+                return
+            elseif not table.find(param) then
+                error('Key %s unknown.':format(param))
+                return
+            else
+                settings.ResetKey = param
+            end
+
+        elseif category == 'verboseoutput' then
+            if not param then
+                log('Currently verbose mode outputs to %s.':format(
+                    settings.VerboseOutput == 'Text' and 'a text object'
+                    or settings.VerboseOutput == 'Chat' and 'the chat log'
+                    or settings.VerboseOutput == 'Console' and 'the console'
+                ))
+                return
+            elseif param == 'text' then
+                settings.VerboseOutput = 'Text'
+            elseif param == 'chat' then
+                settings.VerboseOutput = 'Chat'
+            elseif param == 'console' then
+                settings.VerboseOutput = 'Console'
+            end
+
+        end
+
+        config.save(settings)
+
+    elseif command == 'save' then
+        config.save(settings, 'all')
 
     end
 end)
