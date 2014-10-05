@@ -382,7 +382,7 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
                 multi_targs[status][1] = target
                 windower.send_command('@wait 0.5;lua i battlemod multi_packet '..status)
             elseif not (stat_ignore:contains(am.param_1)) then
-                multi_targs[status][#multi_targs[status]+1] = color_it(target.name,color_arr[target.owner or target.type])
+                multi_targs[status][#multi_targs[status]+1] = target
             else
             -- This handles the stat_ignore values, which are things like Utsusemi,
             -- Sneak, Invis, etc. that you don't want to see on a delay
@@ -494,7 +494,6 @@ end)
 
 function multi_packet(...)
     local ind = table.concat({...},' ')
---    windower.add_to_chat(8,tostring(multi_actor[ind].name)..' '..tostring(multi_targs[ind][1].name)..' '..tostring(multi_msg[ind]))
     local targets = assemble_targets(multi_actor[ind],multi_targs[ind],0,multi_msg[ind])
     local outstr = res.action_messages[multi_msg[ind]][language]
         :gsub('$\123target\125',targets)

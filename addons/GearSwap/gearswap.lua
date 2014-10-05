@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.891'
+_addon.version = '0.892'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -35,12 +35,66 @@ else
     debugging = {}
 end
 
+__raw = {lower = string.lower, upper = string.upper, debug=windower.debug,text={create=windower.text.create,
+    delete=windower.text.delete,registry = {}},prim={create=windower.prim.create,delete=windower.prim.delete,registry={}}}
+
+
 language = 'english'
 file = require 'files'
 require 'strings'
 require 'tables'
 require 'lists'
 require 'sets'
+
+windower.text.create = function (str)
+    if __raw.text.registry[str] then
+        windower.add_to_chat(123,'GearSwap: Text object cannot be created because it already exists.')
+    else
+        __raw.text.registry[str] = true
+        __raw.text.create(str)
+    end
+end
+
+windower.text.delete = function (str)
+    if __raw.text.registry[str] then
+        local deleted = false
+        if windower.text.saved_texts then
+            for i,v in pairs(windower.text.saved_texts) do
+                if v._name == str then
+                    __raw.text.registry[str] = nil
+                    windower.text.saved_texts[i]:destroy()
+                    deleted = true
+                    break
+                end
+            end
+        end
+        if not deleted then
+            __raw.text.registry[str] = nil
+            __raw.text.delete(str)
+        end
+    else
+        __raw.text.delete(str)
+    end
+end
+
+windower.prim.create = function (str)
+    if __raw.prim.registry[str] then
+        windower.add_to_chat(123,'GearSwap: Primitive cannot be created because it already exists.')
+    else
+        __raw.prim.registry[str] = true
+        __raw.prim.create(str)
+    end
+end
+
+windower.prim.delete = function (str)
+    if __raw.prim.registry[str] then
+        __raw.prim.registry[str] = nil
+        __raw.prim.delete(str)
+    else
+        __raw.prim.delete(str)
+    end
+end
+
 texts = require 'texts'
 require 'pack'
 bit = require 'bit'

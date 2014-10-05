@@ -66,12 +66,20 @@ function load_user_files(job_id,user_file)
 
     user_pcall('file_unload')
     
-    for i,v in pairs(registered_user_events) do
-        windower.unregister_event(i)
+    for i in pairs(registered_user_events) do
+        unregister_event_user(i)
+    end
+    
+    for i in pairs(__raw.text.registry) do
+        windower.text.delete(i)
+    end
+    
+    for i in pairs(__raw.prim.registry) do
+        windower.prim.delete(i)
     end
     
     user_env = nil
-    registered_user_events = {}
+    --registered_user_events = {}
     include_user_path = nil
 
     language = 'english' -- Reset language to english when changing job files.
