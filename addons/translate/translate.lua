@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'Translate'
-_addon.version = '0.141004'
+_addon.version = '0.141005'
 _addon.author = 'Byrth'
 _addon.commands = {'trans','translate'}
 
@@ -148,10 +148,10 @@ for dict_name in pairs(custom_dict_names) do
         for _,res_line in pairs(dict) do
             local jp = windower.to_shift_jis(res_line.ja or ''):escape()
             local jps = windower.to_shift_jis(res_line.jas or ''):escape()
-            if sanity_check(jp) and not trans_list[jp] and sanity_check(res_line.en) and jp~= res_line.en:escape() then
+            if sanity_check(jp) and sanity_check(res_line.en) and jp~= res_line.en:escape() then
                 trans_list[jp] = green_col..res_line.en..rcol
             end
-            if sanity_check(jps) and not trans_list[jps] and sanity_check(res_line.ens) and jps ~= res_line.ens:escape() then
+            if sanity_check(jps) and sanity_check(res_line.ens) and jps ~= res_line.ens:escape() then
                 trans_list[jps] = green_col..res_line.ens..rcol
             end
         end

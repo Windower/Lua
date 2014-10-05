@@ -1,4 +1,4 @@
-Last Updated: 04/10/14
+Last Updated: 05/10/14
 
 Description:
 Translate is an addon designed to automatically translate text from JP to EN. It creates a dictionary using the windower resources and custom-made dictionaries (../windower/addons/translate/dicts/), and replaces incoming chat lines with the matching translation in order of longest JP phrase to shortest.
