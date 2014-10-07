@@ -340,6 +340,10 @@ function texts.pos_y(t, y)
     t:pos(t._settings.pos.x, y)
 end
 
+function texts.extents(t)
+    return windower.text.get_extents(t._name)
+end
+
 function texts.font(t, ...)
     if not ... then
         return t._settings.text.font
