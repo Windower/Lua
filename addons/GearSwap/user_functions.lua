@@ -315,7 +315,7 @@ function user_midaction(bool)
 
     for i,v in pairs(command_registry) do
         if v.midaction then
-            return true
+            return true, v.spell
         end
     end
     
@@ -333,7 +333,7 @@ function user_pet_midaction(bool)
 
     for i,v in pairs(command_registry) do
         if v.pet_midaction then
-            return true
+            return true, v.spell
         end
     end
 
@@ -341,11 +341,20 @@ function user_pet_midaction(bool)
 end
 
 function add_to_chat_user(num,str)
-    if not num then num = 8 end
+    local backup_str
+    if type(num) == 'string' then
+        -- It was only pased one argument, a string.
+        backup_str = num
+        num = 8
+    elseif not num and str and type(str) == 'string' then
+        -- It only needs the number.
+        num=8
+    end
+    
     if language == 'japanese' then
-        windower.add_to_chat(num,windower.to_shift_jis(str))
+        windower.add_to_chat(num,windower.to_shift_jis(str or backup_str))
     else
-        windower.add_to_chat(num,str)
+        windower.add_to_chat(num,str or backup_str)
     end
 end
 

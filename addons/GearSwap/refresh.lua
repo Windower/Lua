@@ -64,7 +64,9 @@ end
 function load_user_files(job_id,user_file)
     job_id = tonumber(job_id)
 
-    user_pcall('file_unload')
+    if job_id and res.jobs[job_id] then
+        user_pcall('file_unload',res.jobs[job_id][language..'_short'])
+    end
     
     for i in pairs(registered_user_events) do
         unregister_event_user(i)
@@ -81,7 +83,12 @@ function load_user_files(job_id,user_file)
     user_env = nil
     --registered_user_events = {}
     include_user_path = nil
-
+    
+    if job_id and res.jobs[job_id] then
+        player.main_job_id = job_id
+        update_job_names()
+    end
+    
     language = 'english' -- Reset language to english when changing job files.
     
     local path
@@ -139,7 +146,7 @@ function load_user_files(job_id,user_file)
     local funct, err = loadfile(path)
     
     -- If the file cannot be loaded, print the error and load the default.
-    if funct == nil then 
+    if funct == nil then
         print('User file problem: '..err)
         current_job_file = nil
         gearswap_disabled = true
