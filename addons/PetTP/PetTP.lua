@@ -202,7 +202,7 @@ function printpettp(pet_idx_in,own_idx_in)
         else
             output = output..'\\cr\\cs(255,0,0)'
         end
-        output = output..' '..current_mp..'/'..max_mp..' ('..current_mp_percent..')'
+        output = output..' '..current_mp..'/'..max_mp..' ('..current_mp_percent..'%)'
         if settings.autocolor == true then output = output..'\\cr\\cs('..settings.text.red..','..settings.text.green..','..settings.text.blue..')' end    
     end
     output = output..'\\cr'
