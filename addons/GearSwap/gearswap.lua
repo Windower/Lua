@@ -470,6 +470,17 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
             refresh_globals()
             equip_sets('indi_change',nil,temp_indi,false)
         end
+
+        local subj_ind = data:unpack('H', 0x35) / 8
+        if subj_ind == 0 and pet.isvalid then
+            if not next_packet_events then next_packet_events = {sequence_id = data:unpack('H',3)} end
+            refresh_globals()
+            pet.isvalid = false
+            next_packet_events.pet_change = {pet = table.reassign({},pet)}
+        elseif subj_ind ~= 0 and not pet.isvalid then
+            if not next_packet_events then next_packet_events = {sequence_id = data:unpack('H',3)} end
+            next_packet_events.pet_change = {subj_ind = subj_ind}
+        end
     elseif id == 0x044 then
         -- No idea what this is doing
     elseif id == 0x050 then
@@ -531,25 +542,6 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
             if current_skill then
                 player.skills[to_windower_api(current_skill.english)] = skill
             end
-        end
-    elseif id == 0x067 then
-        local flag_1 = data:byte(5)
-        local flag_2 = data:byte(6)
-        local owner_ind = data:unpack('H',13)
-        local subj_ind = data:unpack('H',7)
-                
-        if flag_1 == 3 and flag_2 == 5 and windower.ffxi.get_player().index == owner_ind and not pet.isvalid then
-            if not next_packet_events then next_packet_events = {sequence_id = data:unpack('H',3)} end
-            next_packet_events.pet_change = {subj_ind = subj_ind}
-        elseif flag_1 == 4 and flag_2 == 5 and windower.ffxi.get_player().index == subj_ind then
-            if not next_packet_events then next_packet_events = {sequence_id = data:unpack('H',3)} end
-            refresh_globals()
-            pet.isvalid = false
-            next_packet_events.pet_change = {pet = table.reassign({},pet)}
-        elseif flag_2 == 7 and windower.ffxi.get_player().index == subj_ind and not pet.isvalid then
-            if not next_packet_events then next_packet_events = {sequence_id = data:unpack('H',3)} end
-            pet.isvalid = true
-            next_packet_events.pet_change = {subj_ind = owner_ind}
         end
     elseif id == 0x0DF then
         player.vitals.hp = data:unpack('I',9)
