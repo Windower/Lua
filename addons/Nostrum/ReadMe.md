@@ -35,15 +35,15 @@ Cure Palette | Prints the saved spell to the chat log.
 command(shortcut)
 
 #####Abbreviation: //nos
-1.help(h):
+1. help(h):
   -Prints a list of these commands in the console.
-2.refresh(r):
+2. refresh(r):
   -Compares the macro's current party structures to the party structure in memory. Adds new members and removes any old members (trusts). Only people nearby you will be added to the macro, and current party members who are not nearby will be removed.
-3.hide(h):
+3. hide(h):
   -Toggles the macro's visibility.
-4.cut(c):
+4. cut(c):
   -Trims the macro down to size, removing blank spaces.
-5.send(s) [name]: 
+5. send(s) [name]: 
   -Requires send addon. Sends commands to the character whose name was provided. If no name was provided, send will reset and commands will be sent to the character with Nostrum loaded.
 
         
