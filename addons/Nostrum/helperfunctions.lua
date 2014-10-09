@@ -297,7 +297,7 @@ function determine_response(x,region,w,y)
     else
         target = '<t>'
     end
-    windower.send_command('input /ma '..'"'..spell..'"'.. ' '..target) 
+    windower.send_command(send_string .. 'input /ma '..'"'..spell..'"'.. ' '..target) 
 end
 
 function new_members() -- snippet from invite, reused in c_a_t_m

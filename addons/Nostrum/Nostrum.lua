@@ -240,8 +240,6 @@ function build_macro()
             text_simple(options.na[i], settings.text.na, x_start-33*(block_num+1)-152, y_start-10, options.aliases[options.na[i]])
             misc_hold_for_up.texts:append(options.na[i])
             misc_hold_for_up.prims:extend({options.na[i]..'i','p' .. options.na[i]})
-            windower.text.set_bg_color(options.na[i], 50, 0, 0, 0)
-            windower.text.set_bg_visibility(options.na[i], true)
             block_num=block_num+1
             macro[1]:add(options.na[i])
             macro[1]:add(options.na[i]..'i')
@@ -268,8 +266,6 @@ function build_macro()
             text_simple(options.buffs[i], settings.text.buffs, x_start-33*(block_num+1)-152, y_start-11, options.aliases[options.buffs[i]])
             misc_hold_for_up.texts:append(options.buffs[i])
             misc_hold_for_up.prims:extend({options.buffs[i]..'i','p' .. options.buffs[i]})
-            windower.text.set_bg_color(options.buffs[i], 50, 0, 0, 0)
-            windower.text.set_bg_visibility(options.buffs[i], true)
             block_num=block_num+1
             macro[1]:add(options.buffs[i])
             macro[1]:add(options.buffs[i]..'i')
@@ -328,6 +324,7 @@ end
 
 windower.register_event('load', 'login', function()
     coroutine.sleep(2)
+    regions = 1
     alliance_keys = {'p5', 'p4', 'p3', 'p2', 'p1', 'p0', 'a15', 'a14', 'a13', 'a12', 'a11', 'a10', 'a25', 'a24', 'a23', 'a22', 'a21', 'a20'}
     party_from_memory = windower.ffxi.get_party()
     player_id = windower.ffxi.get_player().id
@@ -378,19 +375,28 @@ windower.register_event('logout', wrecking_ball)
 
 windower.register_event('addon command', function(...)
     local args = T{...}
-    if #args < 1 or args[1]:lower() == "help" then
+    if #args < 1 or args[1]:lower() == 'help' then
         print('help:Prints a list of these commands in the console.')
         print('refresh(r): Compares the macro\'s current party structures to the party structure in memory.')
         print('hide(h): Toggles the macro\'s visibility.')
         print('cut(c): Trims the macro down to size, removing blank spaces.')
-      elseif args[1]:lower() == "hide" or args[1]:lower() == 'h' then
+        print('send(s) <name>: Requires send addon. Sends commands to the character whose name was provided.')
+        print('If no name is provided, send will reset and commands will be sent to the character with Nostrum loaded.')
+        elseif args[1]:lower() == 'hide' or args[1]:lower() == 'h' then
         toggle_visibility()
-    elseif args[1]:lower() == "cut" or args[1]:lower() == 'c' then
+    elseif args[1]:lower() == 'cut' or args[1]:lower() == 'c' then
         trim_macro()
-    elseif args[1]:lower() == "refresh" or args[1]:lower() == 'r' then
+    elseif args[1]:lower() == 'refresh' or args[1]:lower() == 'r' then
         compare_alliance_to_memory()
+    elseif args[1]:lower() == 'send' or args[1]:lower() == 's' then
+        if args[2] then 
+            send_string = 'send ' .. tostring(args[2]) .. ' '
+            log('Commands will be sent to: ' .. args[2])
+        else
+            send_string = ''
+            log('Input contained no name. Send disabled.')
+        end
     end
-
 end)
 
 windower.register_event('keyboard', function(dik,flags,blocked)
@@ -447,7 +453,7 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
                 if x>l[i] and x<r[i] then
                     determine_response(x,i,30,y)
                 elseif x>l[i+5] and x<r[i+5] then
-                    windower.send_command('input /target' .. stat_table[party[i][math.ceil((y-b[i])/25)]].name)
+                    windower.send_command(send_string .. 'input /target ' .. stat_table[party[i][math.ceil((y-b[i])/25)]].name)
                 else
                     return
                 end
@@ -475,7 +481,7 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
         for i=1,regions do
             if y>b[i] and y<t[i] then
                 if x>l[i+5] and x<r[i+5] then
-                    windower.send_command('input /ma '..'"'..spell_default..'" '.. stat_table[party[i][math.ceil((y-b[i])/25)]].name)
+                    windower.send_command(send_string .. 'input /ma '..'"'..spell_default..'" '.. stat_table[party[i][math.ceil((y-b[i])/25)]].name)
                 else
                     log(spell_default)
                     return
@@ -488,7 +494,6 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
         elseif y>b[5] and y<t[5] and x>l[5] and x<r[5] then
             spell_default = xml_to_lua[macro_order[region_map[5]][math.ceil((x-l[5])/33)]]
         end
-
     end
 end)
 
