@@ -43,7 +43,7 @@ command(shortcut)
   - Toggles the macro's visibility.
 4. cut(c):
   - Trims the macro down to size, removing blank spaces.
-5. send(s) [name]: 
+5. send(s) <name>: 
   - Requires send addon. Sends commands to the character whose name was provided. If no name was provided, send will reset and commands will be sent to the character with Nostrum loaded.
 
         
