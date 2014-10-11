@@ -2064,18 +2064,16 @@ fields.incoming[0x065] = L{
 fields.incoming[0x067] = L{
 -- The length of this packet is 24, 28, 36 or 40 bytes, featuring a 0, 4, 8, 12, or 16 byte name field.
 
--- The Mask seem to be a bitpacked combination of a mask indicating which information is updated and
---    a field indicating the length of the name in the packet.
+-- The Mask is a bitpacked combination of a number indicating the type of information in the packet and
+--    a field indicating the length of the packet.
 
--- The information below should probably be re-verified, but:
--- 44 07 is used for pets with names that are 4-7 characters (8 character field). It updates pet TP but not Owner Index.
--- 84 07 is used for pets with names that are 8-11 characters (12 character field). It updates pet TP but not Owner Index.
--- C4 07 is used for pets with even longer names (>11 characters, 16 character field). It updates pet TP but not Owner Index.
--- 44 08 is used for pets with extremely long names. It updates pet TP but not Owner Index.
+-- The lower 6 bits of the Mask is the type of packet:
+-- 2 occurs often even with no pet, contains player index, id and main job level
+-- 3 identifies (potential) pets and who owns them
+-- 4 gives status information about your pet
 
--- 02 09 is sent regularly to update owner information (about yourself). This might contain information if you are charmed.
--- 03 05 is sent when summoning pets, Trust NPCs, etc.
--- 04 05 is sent when releasing pets (unknown for Trust NPCs)
+-- The upper 10 bits of the Mask is the length in bytes of the data excluding the header and any padding
+--    after the pet name.
 
     {ctype='unsigned short',    label='Mask'},                                  -- 04
     {ctype='unsigned short',    label='Pet Index',          fn=index},          -- 06
