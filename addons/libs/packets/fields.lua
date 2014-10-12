@@ -208,6 +208,7 @@ local enums = {
     ['itemstat'] = {
         [0x00] = 'None',
         [0x05] = 'Equipped',
+        [0x0F] = 'Synthing',
         [0x13] = 'Active linkshell',
         [0x19] = 'Bazaaring',
     },
@@ -1560,7 +1561,7 @@ fields.incoming[0x042] = L{
 -- subjob and has the Subjob flag flipped.
 fields.incoming._func[0x044] = {}
 fields.incoming[0x044] = function(data)
-    return fields.incoming._func[0x044].base + fields.incoming._func[0x044][data:sub(5,5):byte()]
+    return fields.incoming._func[0x044].base + (fields.incoming._func[0x044][data:sub(5,5):byte()] or L{})
 end
 
 -- Base, shared by all jobs
