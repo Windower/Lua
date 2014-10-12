@@ -39,10 +39,10 @@ text_box = texts.new(settings.display, settings)
 initialize = function(text, settings)
     local properties = L{}
     if settings.showfullid then
-        properties:append('ID:  ${full|-}')
+        properties:append('ID:  ${full|-|%08s}')
     end
     if settings.showhexid then
-        properties:append('Hex ID:   ${hex|-}')
+        properties:append('Hex ID:   ${hex|-|%.3X}')
     end
     if settings.showspeed then
         properties:append('Speed: ${speed|-}')
@@ -52,7 +52,7 @@ initialize = function(text, settings)
     text:append(properties:concat('\n'))
 end
 
-text_box:register_reload_event(initialize)
+text_box:register_event('reload', initialize)
 
 initialize(text_box, settings)
 
@@ -62,8 +62,8 @@ windower.register_event('prerender', function()
 	local mob = windower.ffxi.get_mob_by_target('t')
 	if mob and mob.id > 0 then
         local info = {}
-        info.hex = mob.id:hex():slice(-3)
-        info.full = mob.id:string():lpad(' ', 8)
+        info.hex = mob.id % 0x1000
+        info.full = mob.id
         local speed = (100 * (mob.movement_speed / 5 - 1)):round(2)
         info.speed = (
             speed > 0 and
