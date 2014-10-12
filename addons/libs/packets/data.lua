@@ -175,6 +175,7 @@ data.incoming[0x0F9] = {name='Reraise Activation',  description='Reassigns targe
 data.incoming[0x0FA] = {name='Furniture Interact',  description='Confirms furniture manipulation.'}
 data.incoming[0x105] = {name='Data Download 4',     description='The data that is sent to the client when it is "Downloading data...".'}
 data.incoming[0x106] = {name='Bazaar Seller Info',  description='Information on the purchase sent to the buyer when they attempt to buy something.'}
+data.incoming[0x107] = {name='Bazaar closed',       description='Tells you when a bazaar you are currently in has closed.'}
 data.incoming[0x108] = {name='Data Download 5',     description='The data that is sent to the client when it is "Downloading data...".'}
 data.incoming[0x109] = {name='Bazaar Purch. Info',  description='Information on the purchase sent to the buyer when the purchase is successful.'}
 data.incoming[0x10A] = {name='Bazaar Buyer Info',   description='Information on the purchase sent to the seller when a sale is successful.'}
