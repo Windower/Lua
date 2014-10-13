@@ -200,7 +200,7 @@ function texts.new(str, settings, root_settings)
     end
 
     -- Cache for deletion
-    windower.text.saved_texts[#windower.text.saved_texts + 1] = t
+    table.insert(windower.text.saved_texts, 1, t)
 
     return setmetatable(t, _meta.Text)
 end
