@@ -61,8 +61,40 @@ function resource_group(r, fn, attr)
     return setmetatable(res, resource_mt)
 end
 
+local resource_alt_fns = {}
+
+resource_alt_fns.it = function(t)
+    local key = nil
+    return function()
+        repeat
+            key = next(t, key)
+        until type(key) == 'number' or type(key) == 'nil'
+        return rawget(t, key), key
+    end
+end
+
+resource_alt_fns.map = function(t, fn)
+    local res = T{}
+
+    for val, key in t:it() do
+        res[key] = fn(val)
+    end
+
+    return res
+end
+
+resource_alt_fns.key_map = function(t, fn)
+    local res = T{}
+
+    for val, key in t:it() do
+        res[fn(key)] = val
+    end
+
+    return res
+end
+
 resource_mt.__index = function(t, k)
-    return slots[t]:contains(k) and resource_group:endapply(k) or list[k]
+    return slots[t]:contains(k) and resource_group:endapply(k) or resource_alt_fns[k] or table[k]
 end
 resource_mt.__class = 'Resource'
 resource_mt.__tostring = function(t)
@@ -105,8 +137,7 @@ local res_names = S(windower.get_dir(resources_path)):filter(string.endswith-{'.
 for res_name in res_names:it() do
     fns[res_name] = function()
         local res, slot_table = dofile(resources_path .. res_name .. '.lua')
-        res.n = #res
-        res = list.map(res, (setmetatable-{resource_entry_mt}):cond(functions.equals('table') .. type))
+        res = table.map(res, (setmetatable-{resource_entry_mt}):cond(functions.equals('table') .. type))
         slots[res] = S(slot_table)
         post_process(res)
         return res
