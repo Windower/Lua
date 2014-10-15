@@ -1243,12 +1243,11 @@ fields.incoming[0x026] = L{
 fields.incoming[0x027] = L{
     {ctype='unsigned int',      label='Player',             fn=id},             -- 04
     {ctype='unsigned short',    label='Player Index',       fn=index},          -- 08
-    {ctype='unsigned char',     label='Slot or Stat ID'},                       -- 0A   85 = DEX Down, 87 = AGI Down, 8A = CHR Down, 8B = HP Down, 7A = Head/Neck restriction, 7D = Leg/Foot Restriction
-    {ctype='unsigned char',     label='_unknown1'},                             -- 0B   9C
-    {ctype='unsigned int',      label='_unknown2'},                             -- 0C   04 00 00 00
-    {ctype='unsigned int',      label='_unknown3'},                             -- 10
-    {ctype='unsigned char',     label='_unknown4'},                             -- 14
-    {ctype='data[11]',          label='_unknown5'},                             -- 15
+    {ctype='unsigned short',    label='Message ID'},                            -- 0A   
+    {ctype='unsigned int',      label='_unknown1'},                             -- 0C  
+    {ctype='unsigned int',      label='Param 1'},                               -- 10
+    {ctype='unsigned char',     label='_unknown3'},                             -- 14
+    {ctype='data[11]',          label='_unknown4'},                             -- 15
     {ctype='char[16]',          label='Player Name'},                           -- 20
     {ctype='data[16]',          label='_unknown6'},                             -- 30
     {ctype='char[16]',          label='_dupePlayer Name'},                      -- 40
