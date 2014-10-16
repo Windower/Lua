@@ -1520,7 +1520,7 @@ fields.incoming[0x038] = L{
 -- Example without IDs: Runic Gate/Runic Portal
 -- Example with IDs: Diabolos floor tiles
 fields.incoming[0x039] = L{
-    {ctype='unsigned int',      label='ID'                  fn=id},             -- 04
+    {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
     {ctype='unsigned int',      label='_dupeID'},           fn=id},             -- 08
     {ctype='char[4]',           label='Type',               fn=e+{0x038}},      -- 0C   Four character animation name
     {ctype='unsigned short',    label='Index'},             fn=index},          -- 10
