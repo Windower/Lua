@@ -396,7 +396,12 @@ function list.format(l, trail, subs)
 
     local res = ''
     for i = 1, l.n do
-        res = res .. tostring(l[i])
+        if trail == 'csv' then
+            res = res .. tostring(l[i]):gsub(',', '\\,')
+        else
+            res = res .. tostring(l[i])
+        end
+
         if i < l.n - 1 then
             res = res .. ', '
         elseif i == l.n - 1 then

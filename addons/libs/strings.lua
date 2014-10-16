@@ -457,7 +457,12 @@ function table.format(t, trail, subs)
 
     local res = ''
     for k, v in pairs(t) do
-        res = res .. tostring(v)
+        if trail == 'csv' then
+            res = res .. tostring(v):gsub(',', '\\,')
+        else
+            res = res .. tostring(v)
+        end
+
         if next(t, k) then
             if next(t, next(t, k)) then
                 res = res .. ', '

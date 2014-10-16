@@ -8,6 +8,7 @@ _libs = _libs or {}
 _libs.config = config
 _libs.tables = _libs.tables or require('tables')
 _libs.sets = _libs.sets or require('sets')
+_libs.lists = _libs.lists or require('lists')
 _libs.strings = _libs.strings or require('strings')
 _libs.xml = _libs.xml or require('xml')
 _libs.files = _libs.files or require('files')
@@ -175,11 +176,27 @@ function merge(t, t_merge, path)
             elseif oldtype ~= type(val) then
                 if oldtype == 'table' then
                     if type(val) == 'string' then
-                        local res = table.map(val:split(','), string.trim)
-                        if class and class(oldval) == 'Set' then
-                            res = S(res)
-                        elseif class and class(oldval) == 'Table' then
-                            res = T(res)
+                        local tmp = val:split(',')
+                        local res = {}
+                        local key = 1
+                        local append = false
+                        for v, k in tmp:it() do
+                            res[key] = res[key] and res[key] .. v or v
+                            if not v:endswith('\\') then
+                                key = key + 1
+                            end
+                        end
+
+                        table.map(res, string.trim)
+
+                        if class then
+                            if class(oldval) == 'Set' then
+                                res = S(res)
+                            elseif class(oldval) == 'List' then
+                                res = L(res)
+                            elseif class(oldval) == 'Table' then
+                                res = T(res)
+                            end
                         end
                         t[key] = res
                     else
