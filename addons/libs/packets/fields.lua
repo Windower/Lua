@@ -1243,12 +1243,11 @@ fields.incoming[0x026] = L{
 fields.incoming[0x027] = L{
     {ctype='unsigned int',      label='Player',             fn=id},             -- 04
     {ctype='unsigned short',    label='Player Index',       fn=index},          -- 08
-    {ctype='unsigned char',     label='Slot or Stat ID'},                       -- 0A   85 = DEX Down, 87 = AGI Down, 8A = CHR Down, 8B = HP Down, 7A = Head/Neck restriction, 7D = Leg/Foot Restriction
-    {ctype='unsigned char',     label='_unknown1'},                             -- 0B   9C
-    {ctype='unsigned int',      label='_unknown2'},                             -- 0C   04 00 00 00
-    {ctype='unsigned int',      label='_unknown3'},                             -- 10
-    {ctype='unsigned char',     label='_unknown4'},                             -- 14
-    {ctype='data[11]',          label='_unknown5'},                             -- 15
+    {ctype='unsigned short',    label='Message ID'},                            -- 0A   
+    {ctype='unsigned int',      label='_unknown1'},                             -- 0C  
+    {ctype='unsigned int',      label='Param 1'},                               -- 10
+    {ctype='unsigned char',     label='_unknown3'},                             -- 14
+    {ctype='data[11]',          label='_unknown4'},                             -- 15
     {ctype='char[16]',          label='Player Name'},                           -- 20
     {ctype='data[16]',          label='_unknown6'},                             -- 30
     {ctype='char[16]',          label='_dupePlayer Name'},                      -- 40
@@ -1505,21 +1504,27 @@ fields.incoming[0x037] = L{
     {ctype='data[3]',           label='_unknown9'},                             -- 59
 }
 
--- Model DisAppear
+-- Entity Animation
+-- Most frequently used for spawning ("deru") and despawning ("kesu")
+-- Another example: "sp00" for Selh'teus making his spear of light appear
 fields.incoming[0x038] = L{
     {ctype='unsigned int',      label='Mob',                fn=id},             -- 04
     {ctype='unsigned int',      label='_dupeMob',           fn=id},             -- 08
-    {ctype='char[4]',           label='Type',               fn=e+{0x038}},      -- 0C   "kesu" for disappearing, "deru" for appearing, "deru" only seems to work, "ef96" -- These are all probably animation IDs
+    {ctype='char[4]',           label='Type',               fn=e+{0x038}},      -- 0C   Four character animation name
     {ctype='unsigned short',    label='Mob Index',          fn=index},          -- 10
     {ctype='unsigned short',    label='_dupeMob Index',     fn=index},          -- 12
 }
 
--- Env. Animation 2
+-- Env. Animation
+-- Animations without entities will have zeroes for ID and Index
+-- Example without IDs: Runic Gate/Runic Portal
+-- Example with IDs: Diabolos floor tiles
 fields.incoming[0x039] = L{
-    {ctype='unsigned int',      label='_unknown1'},                             -- 04   00 00 00 00 observed
-    {ctype='unsigned int',      label='_unknown2'},                             -- 08   00 00 00 00 observed
-    {ctype='char[4]',           label='Type',               fn=e+{0x038}},      -- 0C   "nbof" or "nbon" observed
-    {ctype='unsigned int',      label='_unknown3'},                             -- 10   00 00 00 00 observed
+    {ctype='unsigned int',      label='ID'                  fn=id},             -- 04
+    {ctype='unsigned int',      label='_dupeID'},           fn=id},             -- 08
+    {ctype='char[4]',           label='Type',               fn=e+{0x038}},      -- 0C   Four character animation name
+    {ctype='unsigned short',    label='Index'},             fn=index},          -- 10
+    {ctype='unsigned short',    label='_dupeIndex'},        fn=index},          -- 10
 }
 
 types.shop_item = L{
@@ -1543,6 +1548,18 @@ fields.incoming[0x03D] = L{
     {ctype='unsigned char',     label='Bag',                fn=bag},            -- 09
     {ctype='unsigned short',    label='_junk1'},                                -- 0A
     {ctype='unsigned int',      label='_unknown1',          const=1},           -- 0C
+}
+
+types.blacklist_entry = L{
+    {ctype='unsigned int',      label='ID'},                                    -- 00
+    {ctype='char[16]',          label='Name'},                                  -- 04
+}
+
+-- Blacklist
+fields.incoming[0x041] = L{
+    {ref=types.blacklist_entry, count=12},                                      -- 08
+    {ctype='unsigned char',     label='_unknown3',          const=3},           -- F4   Always 3
+    {ctype='unsigned char',     label='Size'},                                  -- F5   Blacklist entries
 }
 
 -- Blacklist (add/delete)
@@ -1833,7 +1850,8 @@ fields.incoming[0x05C] = L{
 -- Campaign/Besieged Map information
 
 -- Bitpacked Campaign Info:
--- First/Second Byte -- I could see no change when I FF'd these.
+-- First Byte: Influence ranking including Beastmen
+-- Second Byte: Influence ranking excluding Beastmen
 
 -- Third Byte (bitpacked xxww bbss -- First two bits are for beastmen)
     -- 0 = Minimal
@@ -1884,7 +1902,7 @@ fields.incoming[0x05C] = L{
 
 fields.incoming[0x05E] = L{
     {ctype='unsigned char',     label='Balance of Power'},                      -- 04   Bitpacked: xxww bbss  -- Unclear what the first two bits are for. Number stored is ranking (0-3)
-    {ctype='unsigned char',     label='Tie Indicator'},                         -- 05   Not really sure how this works, but it gives the ] that indicate a tie. It always gives them between position 2 and 3 for me.
+    {ctype='unsigned char',     label='Alliance Indicator'},                    -- 05   Indicates whether two nations are allied (always the bottom two).
     {ctype='data[20]',          label='_unknown1'},                             -- 06   All Zeros, and changed nothing when 0xFF'd.
     {ctype='unsigned int',      label='Bitpacked Ronfaure Info'},               -- 1A
     {ctype='unsigned int',      label='Bitpacked Zulkheim Info'},               -- 1E
@@ -1907,13 +1925,16 @@ fields.incoming[0x05E] = L{
     {ctype='unsigned int',      label='Bitpacked Tavnazian Archipelago Info'},  -- 62
     {ctype='data[32]',          label='_unknown2'},                             -- 66   All Zeros, and changed nothing when 0xFF'd.
     {ctype='unsigned char',     label="San d'Oria region bar"},                 -- 86   These indicate how full the current region's bar is (in percent).
-    {ctype='unsigned char',     label="Bastok region bar"},                     -- 87   The Beastmen are assigned all leftover percentage points.
+    {ctype='unsigned char',     label="Bastok region bar"},                     -- 87
     {ctype='unsigned char',     label="Windurst region bar"},                   -- 88
-    {ctype='data[3]',           label="_unknown3"},                             -- 89   Takes values, but altering them has no obvious impact
-    {ctype='unsigned char',     label="Days to talley"},                        -- 8C   Number of days to the next conquest talley
+    {ctype='unsigned char',     label="San d'Oria region bar without beastmen"},-- 86   Unsure of the purpose of the without beastman indicators
+    {ctype='unsigned char',     label="Bastok region bar without beastmen"},    -- 87
+    {ctype='unsigned char',     label="Windurst region bar without beastmen"},  -- 88
+    {ctype='unsigned char',     label="Days to tally"},                         -- 8C   Number of days to the next conquest tally
     {ctype='data[3]',           label="_unknown4"},                             -- 8D   All Zeros, and changed nothing when 0xFF'd.
     {ctype='int',               label='Conquest Points'},                       -- 90
-    {ctype='data[12]',          label="_unknown5"},                             -- 94   Mostly zeros and noticed no change when 0xFF'd.
+    {ctype='unsigned char',     label="Beastmen region bar"},                   -- 94   
+    {ctype='data[12]',          label="_unknown5"},                             -- 95   Mostly zeros and noticed no change when 0xFF'd.
 
 -- These bytes are for the overview summary on the map.
     -- The two least significant bits code for the owner of the Astral Candescence.
