@@ -9,6 +9,23 @@ local dict = {
     {en="Difficult",ja="むず"},
     {en="Very Difficult",ja="とてもむず"},
     {en="GEO",ja="風"},
+    {en="Hennetiel",ja="NTL"},
+    {en="Return to Delkfutt's Tower",ja="テルクフの塔再び "},
+    {en="Ceizak",ja="ケイザ"},
+    {en="Alluvion",ja="アルビオン"},
+    {en="Cirdas",ja="シルダス"},
+    {en="Levi",ja="リヴァ"},
+    {en="Difficult",ja="むず"},
+    {en="Leviathan",ja="リヴァイアサン"},
+    {en="Ra'Kaznar Skirmish",ja="スカカザ"},
+    {en="Ra'Kaznar Skirmish",ja="かざすか"},
+    {en="Job doesn't matter",ja="ジョブ不問"},
+    {en="Recruiting",ja="募集"},
+    {en="Check seacom for jobs",ja="サチコ参照ジョブを添えてテルください"},
+    {en="Menace",ja="メナス"},
+    {en="Morimar",ja="モリマ"},
+    {en="Kamihr",ja="カミール"},
+    {en="Marjami",ja="マリアミ"},
 }
 
 return dict
