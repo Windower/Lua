@@ -1,8 +1,5 @@
--- Default custom dictionary, taken from:
--- http://wipe.guildwork.com/forum/threads/5039eb67205cb26e261f6988-japaneseenglish-guide-ffxi
 
-local dict = {
-    -- Party Chat section
+katakana_to_romanji = {
     {en="a",ja="ア"},
     {en="i",ja="イ"},
     {en="u",ja="ウ"},
@@ -117,5 +114,3 @@ local dict = {
     {en="pyu",ja="ピュ"},
     {en="pyo",ja="ピョ"},
 }
-
-return dict
