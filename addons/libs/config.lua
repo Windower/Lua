@@ -53,7 +53,7 @@ function config.load(filename, confdict)
     meta.file = _libs.files.new()
     meta.original = T{global = T{}}
     meta.chars = S{}
-    meta.comments = T{}
+    meta.comments = {}
     meta.refresh = T{}
 
     settings_map[settings] = meta
@@ -425,7 +425,7 @@ function nest_xml(t, meta, indentlevel)
         val = t[key]
         if type(val) == 'table' and not (class(val) == 'List' or class(val) == 'Set') then
             fragments:append('%s<%s>':format(indent, key))
-            if meta.comments[key] ~= nil then
+            if meta.comments[key] then
                 local c = '<!-- %s -->':format(meta.comments[key]:trim()):split('\n')
                 local pre = ''
                 for cstr in c:it() do
