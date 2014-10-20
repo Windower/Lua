@@ -396,14 +396,19 @@ function list.format(l, trail, subs)
 
     local res = ''
     for i = 1, l.n do
-        if trail == 'csv' then
-            res = res .. tostring(l[i]):gsub(',', '\\,')
+        local add = tostring(l[i])
+        if trail == 'csv' and add:match('[,"]') then
+            res = res .. add:gsub('"', '""'):enclose('"')
         else
-            res = res .. tostring(l[i])
+            res = res .. add
         end
 
         if i < l.n - 1 then
-            res = res .. ', '
+            if trail == 'csv' then
+                res = res .. ','
+            else
+                res = res .. ', '
+            end
         elseif i == l.n - 1 then
             res = res .. last
         end
@@ -413,7 +418,7 @@ function list.format(l, trail, subs)
 end
 
 --[[
-Copyright (c) 2013, Windower
+Copyright © 2013-2014, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

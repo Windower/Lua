@@ -53,7 +53,7 @@ function config.load(filename, confdict)
     meta.file = _libs.files.new()
     meta.original = T{global = T{}}
     meta.chars = S{}
-    meta.comments = T{}
+    meta.comments = {}
     meta.refresh = T{}
 
     settings_map[settings] = meta
@@ -171,22 +171,39 @@ function merge(t, t_merge, path)
             local oldtype = type(oldval)
 
             if oldtype == 'table' and type(val) == 'table' then
-                t[key] = merge(oldval, val, path and path:copy()+key or nil)
+                t[key] = merge(oldval, val, path and path:copy() + key or nil)
 
             elseif oldtype ~= type(val) then
                 if oldtype == 'table' then
                     if type(val) == 'string' then
-                        local tmp = val:split(',')
+                        -- Single-line CSV parser, can possible refactor this to tables.lua
                         local res = {}
-                        local tmpkey = 1
-                        local append = false
-                        for v, k in tmp:it() do
-                            res[tmpkey] = res[tmpkey] and res[tmpkey] .. v or v
-                            if not v:endswith('\\') then
-                                tmpkey = tmpkey + 1
+                        local current = ''
+                        local quote = false
+                        local last
+                        for c in val:gmatch('.') do
+                            if c == ',' and not quote then
+                                res[#res + 1] = current
+                                current = ''
+                                last = nil
+                            elseif c == '"' then
+                                if last == '"' then
+                                    current = current .. c
+                                    last = nil
+                                else
+                                    last = '"'
+                                end
+
+                                quote = not quote
+                            else
+                                current = current .. c
+                                last = c
                             end
                         end
+                        res[#res + 1] = current
 
+                        -- TODO: Remove this after a while, not standard compliant
+                        -- Currently needed to not mess up existing settings
                         res = table.map(res, string.trim)
 
                         if class then
@@ -199,7 +216,7 @@ function merge(t, t_merge, path)
                             end
                         end
                         t[key] = res
-                        
+
                     else
                         err = true
 
@@ -408,7 +425,7 @@ function nest_xml(t, meta, indentlevel)
         val = t[key]
         if type(val) == 'table' and not (class(val) == 'List' or class(val) == 'Set') then
             fragments:append('%s<%s>':format(indent, key))
-            if meta.comments[key] ~= nil then
+            if meta.comments[key] then
                 local c = '<!-- %s -->':format(meta.comments[key]:trim()):split('\n')
                 local pre = ''
                 for cstr in c:it() do
@@ -472,7 +489,7 @@ end)
 return config
 
 --[[
-Copyright © 2013-2014, Windower
+Copyright Â© 2013-2014, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

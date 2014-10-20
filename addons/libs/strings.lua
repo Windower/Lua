@@ -448,7 +448,7 @@ function table.format(t, trail, subs)
     if trail == 'and' then
         last = ' and '
     elseif trail == 'csv' then
-        last = ', '
+        last = ','
     elseif trail == 'oxford' then
         last = ', and '
     else
@@ -457,15 +457,20 @@ function table.format(t, trail, subs)
 
     local res = ''
     for k, v in pairs(t) do
-        if trail == 'csv' then
-            res = res .. tostring(v):gsub(',', '\\,')
+        local add = tostring(v)
+        if trail == 'csv' and add:match('[,"]') then
+            res = res .. add:gsub('"', '""'):enclose('"')
         else
-            res = res .. tostring(v)
+            res = res .. add
         end
 
         if next(t, k) then
             if next(t, next(t, k)) then
-                res = res .. ', '
+                if trail == 'csv' then
+                    res = res .. ','
+                else
+                    res = res .. ', '
+                end
             else
                 res = res .. last
             end
@@ -476,7 +481,7 @@ function table.format(t, trail, subs)
 end
 
 --[[
-Copyright (c) 2013, Windower
+Copyright © 2013-2014, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
