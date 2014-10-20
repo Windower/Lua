@@ -35,14 +35,17 @@ Cure Palette | Prints the saved spell to the chat log.
 command(shortcut)
 
 #####Abbreviation: //nos
-1.help(h):
-  1. Prints a list of these commands in the console.
-2.refresh(r):
-  1. Compares the macro's current party structures to the party structure in memory. Adds new members and removes any old members (trusts). Only people nearby you will be added to the macro, and current party members who are not nearby will be removed.
-3.hide(h):
-  1. Toggles the macro's visibility.
-4.cut(c):
-  1. Trims the macro down to size, removing blank spaces.
+1. help(h):
+  - Prints a list of these commands in the console.
+2. refresh(r):
+  - Compares the macro's current party structures to the party structure in memory. Adds new members and removes any old members (trusts). Only people nearby you will be added to the macro, and current party members who are not nearby will be removed.
+3. hide(h):
+  - Toggles the macro's visibility.
+4. cut(c):
+  - Trims the macro down to size, removing blank spaces.
+5. send(s) &lt;name&gt;: 
+  - Requires send addon. Sends commands to the character whose name was provided. If no name was provided, send settings will reset and Nostrum will function normally.
 
+        
 ###Issues
 1.When a new member first joins a party, their name may be displayed as '???'. This should automatically update to the actual value unless you're soloing and summon a trust NPC. If you're standing nearby the person (or trust NPC), you may use the 'refresh' command to fix the problem.

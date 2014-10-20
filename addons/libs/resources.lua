@@ -42,31 +42,59 @@ local redict = {
 -- The metatable for a single resource item (an entry in a sub table of the root resource table)
 local resource_entry_mt = {__index = function()
     return function(t, k)
-        return rawget(redict, k)
-                and t[rawget(redict, k)]
-            or rawget(table, k)
+        return redict[k] and t[redict[k]] or table[k]
     end
 end()}
 
 function resource_group(r, fn, attr)
     fn = type(fn) == 'function' and fn or functions.equals(fn)
-    attr = rawget(redict, attr) or attr
+    attr = redict[attr] or attr
 
     local res = {}
     for index, item in pairs(r) do
         if fn(item[attr]) then
-            rawset(res, index, item)
+            res[index] = item
         end
     end
 
-    rawset(slots, res, rawget(slots, r))
+    slots[res] = slots[r]
     return setmetatable(res, resource_mt)
 end
 
+local resource_alt_fns = {}
+
+resource_alt_fns.it = function(t)
+    local key = nil
+    return function()
+        repeat
+            key = next(t, key)
+        until type(key) == 'number' or type(key) == 'nil'
+        return rawget(t, key), key
+    end
+end
+
+resource_alt_fns.map = function(t, fn)
+    local res = T{}
+
+    for val, key in t:it() do
+        res[key] = fn(val)
+    end
+
+    return res
+end
+
+resource_alt_fns.key_map = function(t, fn)
+    local res = T{}
+
+    for val, key in t:it() do
+        res[fn(key)] = val
+    end
+
+    return res
+end
+
 resource_mt.__index = function(t, k)
-    return rawget(slots, t):contains(k)
-            and resource_group:endapply(k)
-        or rawget(table, k)
+    return slots[t]:contains(k) and resource_group:endapply(k) or resource_alt_fns[k] or table[k]
 end
 resource_mt.__class = 'Resource'
 resource_mt.__tostring = function(t)
@@ -77,13 +105,11 @@ local resources_path = windower.windower_path .. 'res/'
 
 local flag_cache = {}
 local parse_flags = function(bits, lookup, values)
-    if not rawget(flag_cache, lookup) then
-        rawset(flag_cache, lookup, {})
-    end
+    flag_cache[lookup] = flag_cache[lookup] or {}
 
-    if values and not rawget(rawget(flag_cache, lookup), bits) and rawget(lookup, bits) then
-        rawset(rawget(flag_cache, lookup), bits, S{rawget(lookup, bits)})
-    elseif not rawget(rawget(flag_cache, lookup), bits) then
+    if values and not flag_cache[lookup][bits] and lookup[bits] then
+        flag_cache[lookup][bits] = S{lookup[bits]}
+    elseif not flag_cache[lookup][bits] then
         local res = S{}
 
         local rem
@@ -92,17 +118,15 @@ local parse_flags = function(bits, lookup, values)
         while num > 0 do
             num, rem = (num/2):modf()
             if rem > 0 then
-                -- Commented out due to current API returning numbers instead of objects
-                -- res:add(rawget(lookup, values and 2^count or count))
-                res:add(values and rawget(lookup, 2^count) or count)
+                res:add(values and lookup[2^count] or count)
             end
             count = count + 1
         end
 
-        rawset(rawget(flag_cache, lookup), bits, res)
+        flag_cache[lookup][bits] = res
     end
 
-    return rawget(rawget(flag_cache, lookup), bits)
+    return flag_cache[lookup][bits]
 end
 
 local language_strings = S{'english', 'japanese', 'german', 'french'}
@@ -113,7 +137,7 @@ local res_names = S(windower.get_dir(resources_path)):filter(string.endswith-{'.
 for res_name in res_names:it() do
     fns[res_name] = function()
         local res, slot_table = dofile(resources_path .. res_name .. '.lua')
-        res = table.map(res, (setmetatable-{resource_entry_mt}):cond(function(key) return type(key) == 'table' end))
+        res = table.map(res, (setmetatable-{resource_entry_mt}):cond(functions.equals('table') .. type))
         slots[res] = S(slot_table)
         post_process(res)
         return res
@@ -128,32 +152,31 @@ local flag_keys = S{
 local fn_cache = {}
 
 post_process = function(t)
-    local slot_set = rawget(slots, t)
+    local slot_set = slots[t]
     for key in slot_set:it() do
-        if rawget(lookup, key) then
+        if lookup[key] then
             if flag_keys:contains(key) then
-                rawset(fn_cache, key, function(flags)
-                    return parse_flags(flags, rawget(lookup, key), true)
-                end)
+                fn_cache[key] = function(flags)
+                    return parse_flags(flags, lookup[key], true)
+                end
             else
-                rawset(fn_cache, key, function(flags)
-                    return parse_flags(flags, rawget(lookup, key), false)
-                end)
+                fn_cache[key] = function(flags)
+                    return parse_flags(flags, lookup[key], false)
+                end
             end
 
-        elseif rawget(lookup, key .. 's') then
-            rawset(fn_cache, key, function(value)
---                return rawget(rawget(lookup, key .. 's'), value)
+        elseif lookup[key .. 's'] then
+            fn_cache[key] = function(value)
                 return value
-            end)
+            end
 
         end
     end
 
     for _, entry in pairs(t) do
         for key, fn in pairs(fn_cache) do
-            if rawget(entry, key) ~= nil then
-                rawset(entry, key, fn(rawget(entry, key)))
+            if entry[key] ~= nil then
+                entry[key] = fn(entry[key])
             end
         end
     end
@@ -205,7 +228,7 @@ lookup = {
 return resources
 
 --[[
-Copyright (c) 2013-2014, Windower
+Copyright © 2013-2014, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

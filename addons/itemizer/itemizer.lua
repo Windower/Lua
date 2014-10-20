@@ -145,15 +145,16 @@ function reschedule(text, ids, count, items)
 
     for id in L(ids):it() do
         if use_item(id, count, items) then
-            windower.send_command('wait ' .. settings.Delay:string() .. '; input ' .. text)
+            windower.send_command('wait %f; input %s':format(settings.Delay, text))
             return true
         end
     end
 end
 
+item_names = T{}
 windower.register_event('outgoing text', function(text)
     -- Ninjutsu
-    if settings.AutoNinjaTools and text:startswith('/ma') or text:startswith('/nin') then
+    if settings.AutoNinjaTools and (text:startswith('/ma ') or text:startswith('/nin ') or text:startswith('/magic ') or text:startswith('/ninjutsu ')) then
         local name
         for pattern in patterns:it() do
             local match = text:match(pattern)
@@ -170,13 +171,20 @@ windower.register_event('outgoing text', function(text)
         end
 
     -- Item usage
-    elseif settings.AutoItems and text:startswith('/item') then
+    elseif settings.AutoItems and text:startswith('/item ') then
         local items = windower.ffxi.get_items()
-        local item_names = T{}
+        local inventory_items = S{}
+        local wardrobe_items = S{}
         for bag in bag_names.all:it() do
             for _, item in ipairs(items[bag]) do
-                if item.id > 0 then
+                if item.id > 0 and not item_names[item.id] then
                     item_names[item.id] = res.items[item.id].name
+                end
+
+                if bag == 'inventory' then
+                    inventory_items:add(item.id)
+                elseif bag == 'wardrobe' then
+                    wardrobe_items:add(item.id)
                 end
             end
         end
@@ -186,7 +194,7 @@ windower.register_event('outgoing text', function(text)
         local mid_name = parsed_text:match('"(.+)"') or parsed_text:match('\'(.+)\'') or parsed_text:match('(.+) ')
         local full_name = parsed_text:match('(.+)')
         local id = item_names:find(string.imatch-{mid_name}) or item_names:find(string.imatch-{full_name})
-        if id then
+        if id and not inventory_items:contains(id) and not wardrobe_items:contains(id) then
             return reschedule(text, {id}, item_count and item_count:number() or 1, items)
         end
 
@@ -194,7 +202,7 @@ windower.register_event('outgoing text', function(text)
 end)
 
 --[[
-Copyright (c) 2013, Ihina
+Copyright © 2013-2014, Ihina
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

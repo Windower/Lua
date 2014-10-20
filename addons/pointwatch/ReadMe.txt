@@ -61,6 +61,7 @@ Here are the available values:
 
 
 Version History:
+0.101214 - Made pointwatch hide itself while zoning.
 0.062014 - Added lp.maximum_merits.
 0.050214 - Fixed the Dynamis clock. Added Abyssea lights.
 0.042314 - Addition of strings system

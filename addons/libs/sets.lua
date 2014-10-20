@@ -301,7 +301,12 @@ function set.format(s, trail, subs)
 
     local res = ''
     for v in pairs(s) do
-        res = res .. tostring(v)
+        if trail == 'csv' then
+            res = res .. tostring(v):gsub(',', '\\,')
+        else
+            res = res .. tostring(v)
+        end
+
         if next(s, v) then
             if next(s, next(s, v)) then
                 res = res .. ', '

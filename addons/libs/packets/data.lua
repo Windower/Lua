@@ -94,8 +94,8 @@ data.outgoing[0x112] = {name='RoE Log Request',     description='Sent when zonin
 
 -- Server packets (incoming)
 data.incoming[0x009] = {name='Standard Message',    description='A standardized message send from FFXI.'}
-data.incoming[0x00A] = {name='Data Download 1',     description='Info about character and zone around it.'}
-data.incoming[0x00B] = {name='Zone Response',       description='Response from the server confirming client can zone.'}
+data.incoming[0x00A] = {name='Zone In',             description='Info about character and zone around it.'}
+data.incoming[0x00B] = {name='Zone Out',            description='Packet contains IP and port of next zone to connect to.'}
 data.incoming[0x00D] = {name='PC Update',           description='Packet contains info about another PC (i.e. coordinates).'}
 data.incoming[0x00E] = {name='NPC Update',          description='Packet contains data about nearby targets (i.e. target\'s position, name).'}
 data.incoming[0x017] = {name='Incoming Chat',       description='Packet contains data about incoming chat messages.'}
@@ -110,7 +110,7 @@ data.incoming[0x022] = {name='Trade Action',        description='Sent whenever s
 data.incoming[0x023] = {name='Trade Item',          description='Sent when an item appears in the trade window.'}
 data.incoming[0x025] = {name='Item Accepted',       description='Sent when the server will allow you to trade an item.'}
 data.incoming[0x026] = {name='Count to 80',         description='It counts to 80 and does not have any obvious function. May have something to do with populating inventory.'}
-data.incoming[0x027] = {name='Encumbrance',         description='Occurs when you are released from Encumbrance, although that is unlikely to be its only purpose.'}
+data.incoming[0x027] = {name='String Message',      description='Message that includes a string as a parameter.'}
 data.incoming[0x028] = {name='Action',              description='Packet sent when an NPC is attacking.'}
 data.incoming[0x029] = {name='Action Message',      description='Packet sent for simple battle-related messages.'}
 data.incoming[0x02A] = {name='Resting Message',     description='Packet sent when you rest in Abyssea.'}
@@ -122,13 +122,13 @@ data.incoming[0x032] = {name='NPC Interaction 1',   description='Occurs before m
 data.incoming[0x034] = {name='NPC Interaction 2',   description='Occurs before menus and some cutscenes'}
 data.incoming[0x036] = {name='NPC Chat',            description='Dialog from NPC\'s.'}
 data.incoming[0x037] = {name='Update Char',         description='Updates a characters stats and animation.'}
-data.incoming[0x038] = {name='Model DisAppear',     description='Sent when a model should appear or disappear.'}
-data.incoming[0x039] = {name='Env. Animation 2',    description='Sent once per minute in Mog Gardens. Probably animating something.'}
+data.incoming[0x038] = {name='Entity Animation',    description='Sent when a model should play a specific animation.'}
+data.incoming[0x039] = {name='Env. Animation',      description='Sent to force animations to specific objects.'}
 data.incoming[0x03C] = {name='Shop',                description='Displays items in a vendors shop.'}
 data.incoming[0x03D] = {name='Value',               description='Returns the value of an item.'}
-data.incoming[0x041] = {name='Stupid Evil Packet',  description='This packet is stupid and evil. Required for emotes.'}
+data.incoming[0x041] = {name='Blacklist',           description='Contains player ID and name for blacklist.'}
 data.incoming[0x042] = {name='Blacklist Command',   description='Sent in response to /blacklist add or /blacklist delete.'}
-data.incoming[0x044] = {name='Pet Stat',            description='Contains information about Automaton stats and may be involved in Blue Magic.'}
+data.incoming[0x044] = {name='Job Info Extra',      description='Contains information about Automaton stats and set Blue Magic spells.'}
 data.incoming[0x04B] = {name='Logout Acknowledge',  description='Acknowledges a logout attempt.'}
 data.incoming[0x04B] = {name='Delivery Item',       description='Item in delivery box.'}
 data.incoming[0x04D] = {name='Servmes Resp',        description='Server response when someone requests it.'}
@@ -175,6 +175,7 @@ data.incoming[0x0F9] = {name='Reraise Activation',  description='Reassigns targe
 data.incoming[0x0FA] = {name='Furniture Interact',  description='Confirms furniture manipulation.'}
 data.incoming[0x105] = {name='Data Download 4',     description='The data that is sent to the client when it is "Downloading data...".'}
 data.incoming[0x106] = {name='Bazaar Seller Info',  description='Information on the purchase sent to the buyer when they attempt to buy something.'}
+data.incoming[0x107] = {name='Bazaar closed',       description='Tells you when a bazaar you are currently in has closed.'}
 data.incoming[0x108] = {name='Data Download 5',     description='The data that is sent to the client when it is "Downloading data...".'}
 data.incoming[0x109] = {name='Bazaar Purch. Info',  description='Information on the purchase sent to the buyer when the purchase is successful.'}
 data.incoming[0x10A] = {name='Bazaar Buyer Info',   description='Information on the purchase sent to the seller when a sale is successful.'}

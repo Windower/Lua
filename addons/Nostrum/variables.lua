@@ -27,6 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 w=29
 h=24
 spell_default=''
+send_string = ''
 to_update=L{}
 
 nos_saved_prims=S{}
@@ -53,6 +54,7 @@ region_map = {[1]='curagas',[2]='cures',[3]='cures',[4]='nas',[5]='buffs'}
 local dragged = false
 is_zoning = false
 is_hidden = false
+regions = 0
 
 font_widths={['I']=9,['II']=17,['III']=25,['IV']=24,['V']=16,['1']=10,['2']=11,['3']=11,['4']=11,['5']=11,['6']=12}
 xml_to_lua={--config library doesn't like spaces

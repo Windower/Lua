@@ -6,6 +6,20 @@ local texts = {}
 windower.text.saved_texts = {}
 local dragged
 
+local events = {
+    reload = true,
+    left_click = true,
+    double_left_click = true,
+    right_click = true,
+    double_right_click = true,
+    middle_click = true,
+    scroll_up = true,
+    scroll_down = true,
+    hover = true,
+    drag = true,
+    right_drag = true,
+}
+
 _libs = _libs or {}
 _libs.texts = texts
 
@@ -56,13 +70,11 @@ default_settings.text.stroke.blue = 0
 math.randomseed(os.clock())
 
 local amend
-local apply_settings
-
 amend = function(settings, text)
     for key, val in pairs(text) do
-        local sval = rawget(settings, key)
+        local sval = settings[key]
         if sval == nil then
-            rawset(settings, key, val)
+            settings[key] = val
         else
             if type(sval) == 'table' and type(val) == 'table' then
                 amend(sval, val)
@@ -71,7 +83,18 @@ amend = function(settings, text)
     end
 end
 
-apply_settings = function(_, t, settings)
+local call_events = function(t, event, ...)
+    if not t._events[event] then
+        return
+    end
+
+    -- Trigger registered post-reload events
+    for _, event in ipairs(t._events[event]) do
+        event(t, t._root_settings)
+    end
+end
+
+local apply_settings = function(_, t, settings)
     settings = settings or t._settings
     texts.pos(t, settings.pos.x, settings.pos.y)
     texts.bg_alpha(t, settings.bg.alpha)
@@ -91,10 +114,7 @@ apply_settings = function(_, t, settings)
     texts.stroke_color(t, settings.text.stroke.red, settings.text.stroke.green, settings.text.stroke.blue)
     texts.stroke_transparency(t, settings.text.stroke.alpha)
 
-    -- Trigger registered post-reload events
-    for _, event in ipairs(t._events) do
-        event(t, t._root_settings)
-    end
+    call_events(t, 'reload')
 end
 
 -- Returns a new text object.
@@ -152,6 +172,7 @@ function texts.new(str, settings, root_settings)
     t._status = t._status or {visible = false, text = {}}
     t._root_settings = root_settings
     t._base_str = str
+
     t._events = {}
 
     t._texts = {}
@@ -179,7 +200,7 @@ function texts.new(str, settings, root_settings)
     end
 
     -- Cache for deletion
-    windower.text.saved_texts[#windower.text.saved_texts + 1] = t
+    table.insert(windower.text.saved_texts, 1, t)
 
     return setmetatable(t, _meta.Text)
 end
@@ -190,7 +211,7 @@ function texts.update(t, attr)
     local str = ''
     for _, key in ipairs(t._textorder) do
         if attr[key] ~= nil then
-            t._texts[key] = t._formats[key]:format(attr[key])
+            t._texts[key] = t._formats[key] and t._formats[key]:format(attr[key]) or tostring(attr[key])
         end
 
         if t._texts[key] ~= nil then
@@ -236,7 +257,7 @@ function texts.append(t, str)
             match = str:sub(startpos + 2, endpos - 1)
             local key = match
             local default = ''
-            local format = '%s'
+            local format = nil
 
             -- Match the key
             local keystart, keyend = match:find('^.-|')
@@ -338,6 +359,10 @@ function texts.pos_y(t, y)
     end
 
     t:pos(t._settings.pos.x, y)
+end
+
+function texts.extents(t)
+    return windower.text.get_extents(t._name)
 end
 
 function texts.font(t, ...)
@@ -574,18 +599,28 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
 end)
 
 -- Can define functions to execute every time the settings are reloaded
-function texts.register_reload_event(t, fn)
-    t._events[#t._events + 1] = fn
-    return #t._events
+function texts.register_event(t, key, fn)
+    if not events[key] then
+        error('Event %s not available for text objects.':format(key))
+        return
+    end
+
+    t._events[key] = t._events[key] or {}
+    t._events[key][#t._events[key] + 1] = fn
+    return #t._events[key]
 end
 
-function texts.unregister_reload_event(t, fn)
+function texts.unregister_event(t, key, fn)
+    if not (events[key] and t._events[key]) then
+        return
+    end
+
     if type(fn) == 'number' then
-        table.remove(t._events, fn)
+        table.remove(t._events[key], fn)
     else
-        for index, event in ipairs(t._events) do
+        for index, event in ipairs(t._events[key]) do
             if event == fn then
-                table.remove(t._events, index)
+                table.remove(t._events[key], index)
                 return
             end
         end
