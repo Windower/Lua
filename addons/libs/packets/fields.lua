@@ -1666,6 +1666,7 @@ fields.incoming[0x04B] = function()
     local full = S{0x01, 0x04, 0x06, 0x08, 0x0A} -- This might not catch all packets with 'slot-info' (extra 68 bytes)
     return function(data)
         return full:contains(data:byte(5, 5)) and fields.incoming._func[0x04B].slot or fields.incoming._func[0x04B].base
+        end
 end()
 
 enums.delivery = {
