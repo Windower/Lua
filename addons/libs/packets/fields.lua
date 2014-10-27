@@ -426,7 +426,7 @@ fields.outgoing[0x04B] = L{
 
 -- Delivery Box
 fields.outgoing[0x04D] = L{
-    {ctype='unsigned char',     label='Manipulation Type'},                     -- 04
+    {ctype='unsigned char',     label='Type'},                                  -- 04
     --
 
     -- Removing an item from the d-box sends type 0x08
@@ -1663,9 +1663,15 @@ fields.incoming._func[0x044][0x17] = L{
 -- Delivery Item
 fields.incoming._func[0x04B] = {}
 fields.incoming[0x04B] = function()
-    local full = S{0x01, 0x06, 0x08, 0x0A}
+--    local full = S{0x01, 0x06, 0x08, 0x0A} -- This does not catch all FULL/long packets.
     return function(data)
-        return full:contains(data:byte(5, 5)) and fields.incoming._func[0x04B].slot or fields.incoming._func[0x04B].base
+        if (data:length() == 88) then
+            -- return the 88 byte chunk
+            return fields.incoming._func[0x04B].slot
+        end
+--        return full:contains(data:byte(5, 5)) and fields.incoming._func[0x04B].slot or fields.incoming._func[0x04B].base
+        -- return the 20 byte chunk
+        return fields.incoming._func[0x04B].base
     end
 end()
 
@@ -1711,31 +1717,33 @@ fields.incoming._func[0x04B].base = L{
     {ctype='unsigned char',     label='Type',               fn=e+{'delivery'}}, -- 04
     {ctype='unsigned char',     label='_unknown1'},                             -- 05   FF if Type is 05, otherwise 01
     {ctype='signed char',       label='Delivery Slot'},                         -- 06   This goes left to right and then drops down a row and left to right again. Value is 00 through 07
-    {ctype='signed char',       label='_unknown2'},                             -- 0C   01 if Type is 06, otherwise FF
-                                                                                -- 0C   06 Type always seems to come in a pair, this field is only 01 for the first packet
+    {ctype='signed char',       label='_unknown2'},                             -- 06?   01 if Type is 06, otherwise FF
+                                                                                -- 06?   06 Type always seems to come in a pair, this field is only 01 for the first packet
     {ctype='signed int',        label='_unknown3',          const=-1},          -- 07   Always FF FF FF FF?
-    {ctype='signed char',       label='_unknown4'},                             -- 0C   01 observed
+    {ctype='signed char',       label='_unknown4'},                             -- 0C   When in a 0x0D/0x0E type, 01 grants request to open inbox/outbox. With FA you get "Please try again later"
     {ctype='signed char',       label='Packet Number'},                         -- 0D   02 and 03 observed
     {ctype='signed char',       label='_unknown5'},                             -- 0E   FF FF observed
-    {ctype='signed char',       label='_unknown5'},                             -- 0E   FF FF observed
-    {ctype='unsigned int',      label='_unknown6'},                             -- 10   06 00 00 00 and 07 00 00 00 observed - (06 was for the first packet and 07 was for the second)
+    {ctype='signed char',       label='_unknown6'},                             -- 0F   FF FF observed
+    {ctype='unsigned int',      label='_unknown7'},                             -- 10   06 00 00 00 and 07 00 00 00 observed - (06 was for the first packet and 07 was for the second)
+                                                                                -- 10   00 00 00 00 also observed    
 }
 
--- If the type is 0x01, 0x06, 0x08 or 0x0A, these fields appear in the packet in addition to the base
+-- If the type is 0x01, 0x04, 0x06, 0x08 or 0x0A, these fields appear in the packet in addition to the base. Maybe more
 fields.incoming._func[0x04B].slot = L{
-    {ref=fields.incoming._func[0x04B].base},                                    -- 04
-    {ctype='char[16]',          label='Sender Name'},                           -- 14
-    {ctype='unsigned int',      label='_unknown7'},                             -- 24   46 32 00 00 and 42 32 00 00 observed - Possibly flags. Rare vs. Rare/Ex.?
+    {ref=fields.incoming._func[0x04B].base, count=1},                           -- 04
+    {ctype='char[16]',          label='Player Name'},                           -- 14 This is used for sender (in inbox) and recipient (in outbox)
+    {ctype='unsigned int',      label='_unknown8'},                             -- 24   46 32 00 00 and 42 32 00 00 observed - Possibly flags. Rare vs. Rare/Ex.?
     {ctype='unsigned int',      label='Timestamp',          fn=utime},          -- 28
-    {ctype='unsigned int',      label='_unknown8'},                             -- 2C   00 00 00 00 observed
+    {ctype='unsigned int',      label='_unknown9'},                             -- 2C   00 00 00 00 observed
     {ctype='unsigned short',    label='Item',               fn=item},           -- 30
-    {ctype='unsigned short',    label='_unknown9'},                             -- 32   Fiendish Tome: Chapter 11 had it, but Oneiros Pebble was just 00 00
+    {ctype='unsigned short',    label='_unknown10'},                            -- 32   Fiendish Tome: Chapter 11 had it, but Oneiros Pebble was just 00 00
                                                                                 -- 32   May well be junked, 38 38 observed
     {ctype='unsigned int',      label='Flags?'},                                -- 34   01/04 00 00 00 observed
     {ctype='unsigned short',    label='Count'},                                 -- 38
-    {ctype='unsigned short',    label='_unknown10'},                            -- 3A
-    {ctype='data[28]',          label='_unknown11'},                            -- 3C   All 00 observed, ext data? Doesn't seem to be the case, but same size
+    {ctype='unsigned short',    label='_unknown11'},                            -- 3A
+    {ctype='data[28]',          label='_unknown12'},                            -- 3C   All 00 observed, ext data? Doesn't seem to be the case, but same size
 }
+
 
 -- Auction house open
 -- The server sends this when the player clicks on an AH NPC, it starts the AH dialogue
