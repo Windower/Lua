@@ -1717,8 +1717,9 @@ fields.incoming._func[0x04B].base = L{
     {ctype='unsigned char',     label='Type',               fn=e+{'delivery'}}, -- 04
     {ctype='unsigned char',     label='_unknown1'},                             -- 05   FF if Type is 05, otherwise 01
     {ctype='signed char',       label='Delivery Slot'},                         -- 06   This goes left to right and then drops down a row and left to right again. Value is 00 through 07
-    {ctype='signed char',       label='_unknown2'},                             -- 06?   01 if Type is 06, otherwise FF
-                                                                                -- 06?   06 Type always seems to come in a pair, this field is only 01 for the first packet
+                                                                                --    01 if Type is 06, otherwise FF
+                                                                                --    06 Type always seems to come in a pair, this field is only 01 for the first packet
+    {ctype='signed char',       label='_unknown2'},                               
     {ctype='signed int',        label='_unknown3',          const=-1},          -- 07   Always FF FF FF FF?
     {ctype='signed char',       label='_unknown4'},                             -- 0C   When in a 0x0D/0x0E type, 01 grants request to open inbox/outbox. With FA you get "Please try again later"
     {ctype='signed char',       label='Packet Number'},                         -- 0D   02 and 03 observed
