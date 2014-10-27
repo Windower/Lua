@@ -1663,16 +1663,9 @@ fields.incoming._func[0x044][0x17] = L{
 -- Delivery Item
 fields.incoming._func[0x04B] = {}
 fields.incoming[0x04B] = function()
---    local full = S{0x01, 0x06, 0x08, 0x0A} -- This does not catch all FULL/long packets.
+    local full = S{0x01, 0x04, 0x06, 0x08, 0x0A} -- This might not catch all packets with 'slot-info' (extra 68 bytes)
     return function(data)
-        if (data:length() == 88) then
-            -- return the 88 byte chunk
-            return fields.incoming._func[0x04B].slot
-        end
---        return full:contains(data:byte(5, 5)) and fields.incoming._func[0x04B].slot or fields.incoming._func[0x04B].base
-        -- return the 20 byte chunk
-        return fields.incoming._func[0x04B].base
-    end
+        return full:contains(data:byte(5, 5)) and fields.incoming._func[0x04B].slot or fields.incoming._func[0x04B].base
 end()
 
 enums.delivery = {
