@@ -1719,14 +1719,13 @@ fields.incoming._func[0x04B].base = L{
     {ctype='signed char',       label='Delivery Slot'},                         -- 06   This goes left to right and then drops down a row and left to right again. Value is 00 through 07
                                                                                 --    01 if Type is 06, otherwise FF
                                                                                 --    06 Type always seems to come in a pair, this field is only 01 for the first packet
-    {ctype='signed char',       label='_unknown2'},                               
-    {ctype='signed int',        label='_unknown3',          const=-1},          -- 07   Always FF FF FF FF?
-    {ctype='signed char',       label='_unknown4'},                             -- 0C   When in a 0x0D/0x0E type, 01 grants request to open inbox/outbox. With FA you get "Please try again later"
-    {ctype='signed char',       label='Packet Number'},                         -- 0D   02 and 03 observed
-    {ctype='signed char',       label='_unknown5'},                             -- 0E   FF FF observed
-    {ctype='signed char',       label='_unknown6'},                             -- 0F   FF FF observed
-    {ctype='unsigned int',      label='_unknown7'},                             -- 10   06 00 00 00 and 07 00 00 00 observed - (06 was for the first packet and 07 was for the second)
-                                                                                -- 10   00 00 00 00 also observed    
+    {ctype='signed char',       label='_unknown2'},                             -- 07   Always FF FF FF FF?  
+    {ctype='signed int',        label='_unknown3',          const=-1},          -- 0C   When in a 0x0D/0x0E type, 01 grants request to open inbox/outbox. With FA you get "Please try again later"
+    {ctype='signed char',       label='_unknown4'},                             -- 0D   02 and 03 observed
+    {ctype='signed char',       label='Packet Number'},                         -- 0E   FF FF observed
+    {ctype='signed char',       label='_unknown5'},                             -- 0F   FF FF observed
+    {ctype='signed char',       label='_unknown6'},                             -- 10   06 00 00 00 and 07 00 00 00 observed - (06 was for the first packet and 07 was for the second)
+    {ctype='unsigned int',      label='_unknown7'},                             -- 10   00 00 00 00 also observed
 }
 
 -- If the type is 0x01, 0x04, 0x06, 0x08 or 0x0A, these fields appear in the packet in addition to the base. Maybe more
