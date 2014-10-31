@@ -202,7 +202,7 @@ proctype = {"ja","magic","ws","random","none"}
 StaggerCount = 0
 current_proc = "lolidk"
 currentime = 0
---goodzone = false
+goodzone = false
 timer = "off"
 tracker = "off"
 proc = "off"
@@ -244,8 +244,7 @@ windower.register_event('addon command',function (...)
    				print('dh tracker [on/off/reset/pos x y] : Tracks the amount of currency obtained.')
 				print('dh proc [on/off/pos x y] : Displays the current proc for the targeted mob.')
    				print('dh ll create : Creates and loads a light luggage profile that will automatically lot all currency.')
-   				print(goodzone)
-   				print(ProcZones)
+   				--print('DEBUG: '..goodzone..' | '..ProcZones)
 			elseif params[1]:lower() == "timer" then
    				if params[2]:lower() == "on" or params[2]:lower() == "off" then
     				timer = params[2]
@@ -370,7 +369,7 @@ function initializebox()
 end
 
 windower.register_event('target change', function(targ_id)
-	goodzone = ProcZones:contains(windower.ffxi.get_info().zone)
+	--goodzone = ProcZones:contains(windower.ffxi.get_info().zone)
 	if goodzone and proc == 'on' and targ_id ~= 0 then
         mob = windower.ffxi.get_mob_by_index(targ_id)['name']
         setproc()
