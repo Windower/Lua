@@ -244,8 +244,8 @@ windower.register_event('addon command',function (...)
    				print('dh tracker [on/off/reset/pos x y] : Tracks the amount of currency obtained.')
 				print('dh proc [on/off/pos x y] : Displays the current proc for the targeted mob.')
    				print('dh ll create : Creates and loads a light luggage profile that will automatically lot all currency.')
-   				print(goodzone)
-   				print(ProcZones)
+   				--print(goodzone)
+   				--print(ProcZones)
 			elseif params[1]:lower() == "timer" then
    				if params[2]:lower() == "on" or params[2]:lower() == "off" then
     				timer = params[2]
