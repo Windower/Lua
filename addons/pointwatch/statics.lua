@@ -99,6 +99,7 @@ function initialize()
     }
     
     lp = {
+        registry = xp.registry,
         current = 0,
         tnm = 10000,
         number_of_merits = 0,
