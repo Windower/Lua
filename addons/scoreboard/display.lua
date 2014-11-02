@@ -22,6 +22,8 @@ local valid_fields = T{
     'dps',
     'percent',
     'total',
+    'mavg', 'mrange', 'critavg', 'critrange',
+    'ravg', 'rrange', 'rcritavg', 'rcritrange',
     'acc',
     'racc',
     'crit',
@@ -283,13 +285,11 @@ function Display:report_summary (...)
                 wrap_elements(elements:slice(1, self.settings.numplayers), 'Dmg: '), self.settings.numplayers)
 end
 
+-- This is a table of the line aggregators and related utilities
+Display.stat_summaries = {}
 
--- This is a closure around a hash-based dispatcher. Some conveniences are
--- defined for the actual stat display functions.
-Display.show_stat = function()
-    local stat_display = {}
 
-    local function format_title(msg)
+Display.stat_summaries._format_title = function (msg)
         local line_length = 40
         local msg_length  = msg:len()
         local border_len = math.floor(line_length / 2 - msg_length / 2)
@@ -297,73 +297,43 @@ Display.show_stat = function()
         return ' ':rep(border_len) .. msg .. ' ':rep(border_len)
     end
 
-    stat_display['acc'] = function (stats, filters)
+    
+Display.stat_summaries['range'] = function (stats, filters, options)
+        
         local lines = T{}
-        for name, acc_pair in pairs(stats) do
-            lines:append('%-20s %.2f%% (%d sample%s)':format(name, 100 * acc_pair[1], acc_pair[2],
-                                                                  acc_pair[2] == 1 and '' or 's'))
+        for name, pair in pairs(stats) do
+            lines:append('%-20s %d min   %d max':format(name, pair[1], pair[2]))
         end
 
-        if #lines > 0 then
-            sb_output(format_title('-= Accuracy (' .. filters .. ') =-'))
+        if #lines > 0 and options and options.name then
+            sb_output(Display.stat_summaries._format_title('-= '..options.name..' (' .. filters .. ') =-'))
             sb_output(lines)
         end
     end
 
-    stat_display['racc'] = function (stats, filters)
+    
+Display.stat_summaries['average'] = function (stats, filters, options)
+        
         local lines = T{}
-        for name, racc_pair in pairs(stats) do
-            lines:append('%-20s %.2f%% (%d sample%s)':format(name, 100 * racc_pair[1], racc_pair[2],
-                                                                     racc_pair[2] == 1 and "" or "s"))
-        end
-
-        if #lines > 0 then
-            sb_output(format_title('-= Ranged Accuracy (' .. filters .. ') =-'))
-            sb_output(lines)
-        end
-    end
-
-    stat_display['crit'] = function (stats, filters)
-        local lines = T{}
-        for name, crit_pair in pairs(stats) do
-            lines:append('%-20s %.2f%% (%d sample%s)':format(name, 100 * crit_pair[1], crit_pair[2],
-                                                                     crit_pair[2] == 1 and '' or 's'))
-        end
-
-        if #lines > 0 then
-            sb_output(format_title('Melee Crit. Rate (' .. filters .. ')'))
-            sb_output(lines)
-        end
-    end
-
-    stat_display['rcrit'] = function (stats, filters)
-        local lines = T{}
-        for name, crit_pair in pairs(stats) do
-            lines:append('%-20s %.2f%% (%d sample%s)':format(name, 100 * crit_pair[1], crit_pair[2],
-                                                                     crit_pair[2] == 1 and '' or 's'))
-        end
-
-        if #lines > 0 then
-            sb_output(format_title('Ranged Crit. Rate (' .. filters .. ')'))
-            sb_output(lines)
-        end
-    end
-
-    stat_display['wsavg'] = function (stats, filters)
-        local lines = T{}
-
-        for name, stat_pair in pairs(stats) do
-            if stat_pair[2] > 0 then
-                lines:append('%-20s %d (%ds)':format(name, stat_pair[1], stat_pair[2]))
+        for name, pair in pairs(stats) do
+            if options and options.percent then
+                lines:append('%-20s %.2f%% (%d sample%s)':format(name, 100 * pair[1], pair[2],
+                                                                      pair[2] == 1 and '' or 's'))
+            else
+                lines:append('%-20s %d (%ds)':format(name, pair[1], pair[2]))
             end
         end
 
-        if #lines > 0 then
-            sb_output(format_title('WS Average (' .. filters .. ')'))
+        if #lines > 0 and options and options.name then
+            sb_output(Display.stat_summaries._format_title('-= '..options.name..' (' .. filters .. ') =-'))
             sb_output(lines)
         end
     end
 
+    
+-- This is a closure around a hash-based dispatcher. Some conveniences are
+-- defined for the actual stat display functions.
+Display.show_stat = function()
     return function (self, stat, player_filter)
         local stats = self.db:query_stat(stat, player_filter)
         local filters = self.db:get_filters()
@@ -374,17 +344,30 @@ Display.show_stat = function()
         else
             filter_str = filters:concat(', ')
         end
-
-        stat_display[stat](stats, filter_str)
+        
+        Display.stat_summaries[Display.stat_summaries._all_stats[stat].category](stats, filter_str, Display.stat_summaries._all_stats[stat])
     end
 end()
 
 
 -- TODO: This needs to be factored somehow to take better advantage of similar
 --       code already written for reporting and stat queries.
-local all_stats = S{'acc', 'racc', 'crit', 'rcrit', 'wsavg'}
+Display.stat_summaries._all_stats = T{
+    ['acc']        = {percent=true,  category="average", name='Accuracy'},
+    ['racc']       = {percent=true,  category="average", name='Ranged Accuracy'},
+    ['crit']       = {percent=true,  category="average", name='Melee Crit. Rate'},
+    ['rcrit']      = {percent=true,  category="average", name='Ranged Crit. Rate'},
+    ['wsavg']      = {percent=false, category="average", name='WS Average'}, 
+    ['mavg']       = {percent=false, category="average", name='Melee Non-Crit. Avg. Damage'},
+    ['mrange']     = {percent=false, category="range",   name='Melee Non-Crit. Range'},
+    ['critavg']    = {percent=false, category="average", name='Melee Crit. Avg. Damage'},
+    ['critrange']  = {percent=false, category="range",   name='Melee Crit. Range'},
+    ['ravg']       = {percent=false, category="average", name='Ranged Non-Crit. Avg. Damage'},
+    ['rrange']     = {percent=false, category="range",   name='Ranged Non-Crit. Range'},
+    ['rcritavg']   = {percent=false, category="average", name='Ranged Crit. Avg. Damage'},
+    ['rcritrange'] = {percent=false, category="range",   name='Ranged Crit. Range'},}
 function Display:report_stat(stat, args)
-    if all_stats:contains(stat) then
+    if Display.stat_summaries._all_stats:contains(stat) then
         local stats = self.db:query_stat(stat, args.player)
 
         local elements = T{}

@@ -1,5 +1,5 @@
 Author: Suji
-Version: 1.07
+Version: 1.08
 Addon to show alliance DPS and damage in real time.
 Abbreviation: //sb
 
@@ -42,7 +42,8 @@ Command list:
 * REPORTSTAT <stat> [<playerName>] [<target>]
   RS <stat> [<playerName>] [<target>]
   Reports the given stat. Supported stats are:
-      acc, racc, crit, rcrit, wsavg
+      mavg, mrange, acc, ravg, rrange, racc, critavg, critrange, crit,
+      rcritavg, rcritrange, rcrit, wsavg
   
   'playerName' may be the name of a player if you wish to see only one player.
   
