@@ -1,4 +1,9 @@
 --[[
+    The entire mergedplayer file exists to flatten individual stats in the db
+    into two numbers (per name). So normally the db is:
+    dps_db.dp[mob_name][player_name] = {stats}
+    Mergedplayer iterates over mob_name and returns a table that's just:
+    tab[player_name] = {CalculatedStatA,CalculatedStatB}
 ]]
 
 local MergedPlayer = {}
@@ -16,10 +21,6 @@ function MergedPlayer:new (o)
 end
 
 --[[
-    'mmin', 'mmax', 'mavg',
-    'critmin, 'critmax', 'critavg',
-    'rmin', 'rmax', 'ravg',
-    'rcritmin', 'rcritmax', 'rcritavg',
     'wsmin', 'wsmax', 'wsavg'
 ]]
 

@@ -36,7 +36,14 @@ function Player:new (o)
         r_crit_max = 0,         -- maximum ranged crit
         r_crit_avg = 0,         -- avg ranged crit
         jobabils = 0,           -- total damage from JAs
-        spells = 0              -- total damage from spells
+        spells = 0,             -- total damage from spells
+        
+        parries = 0,            -- total number of parries
+        blocks = 0,             -- total number of blocks/guards
+        nonblocks = 0,          -- total number of nonblocks
+        evades = 0,             -- total number of evades
+        damage_taken = 0,       -- total damage taken by this player
+        
     }
     attrs.name = o.name
     o = attrs

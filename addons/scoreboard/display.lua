@@ -22,8 +22,14 @@ local valid_fields = T{
     'dps',
     'percent',
     'total',
-    'mavg', 'mrange', 'critavg', 'critrange',
-    'ravg', 'rrange', 'rcritavg', 'rcritrange',
+    'mavg',
+    'mrange',
+    'critavg',
+    'critrange',
+    'ravg',
+    'rrange',
+    'rcritavg',
+    'rcritrange',
     'acc',
     'racc',
     'crit',
@@ -367,17 +373,17 @@ Display.stat_summaries._all_stats = T{
     ['rcritavg']   = {percent=false, category="average", name='Ranged Crit. Avg. Damage'},
     ['rcritrange'] = {percent=false, category="range",   name='Ranged Crit. Range'},}
 function Display:report_stat(stat, args)
-    if Display.stat_summaries._all_stats:contains(stat) then
+    if Display.stat_summaries._all_stats:containskey(stat) then
         local stats = self.db:query_stat(stat, args.player)
 
         local elements = T{}
         local header   = stat:ucfirst() .. ': '
         for name, stat_pair in pairs(stats) do
             if stat_pair[2] > 0 then
-                if stat == 'wsavg' then
-                    elements:append({stat_pair[1], ('%s %d (%ds)'):format(name, stat_pair[1], stat_pair[2])})
-                else
+                if Display.stat_summaries._all_stats[stat].percent then
                     elements:append({stat_pair[1], ('%s %.2f%% (%ds)'):format(name, stat_pair[1] * 100, stat_pair[2])})
+                else
+                    elements:append({stat_pair[1], ('%s %d (%ds)'):format(name, stat_pair[1], stat_pair[2])})
                 end
             end
         end
