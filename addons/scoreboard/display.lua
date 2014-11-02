@@ -377,10 +377,12 @@ function Display:report_stat(stat, args)
         local stats = self.db:query_stat(stat, args.player)
 
         local elements = T{}
-        local header   = stat:ucfirst() .. ': '
+        local header   = Display.stat_summaries._all_stats[stat].name .. ': '
         for name, stat_pair in pairs(stats) do
             if stat_pair[2] > 0 then
-                if Display.stat_summaries._all_stats[stat].percent then
+                if Display.stat_summaries._all_stats[stat].category == 'range' then
+                    elements:append({stat_pair[1], ('%s %d~%d'):format(name, stat_pair[1], stat_pair[2])})
+                elseif Display.stat_summaries._all_stats[stat].percent then
                     elements:append({stat_pair[1], ('%s %.2f%% (%ds)'):format(name, stat_pair[1] * 100, stat_pair[2])})
                 else
                     elements:append({stat_pair[1], ('%s %d (%ds)'):format(name, stat_pair[1], stat_pair[2])})
