@@ -55,7 +55,6 @@ handled_resources = S{
     'races',
     'regions',
     'skills',
-    'spell_recasts',
     'spells',
     'titles',
     'weapon_skills',
@@ -355,7 +354,7 @@ end
 
 
 function unescape(str)
-    return str:gsub('%%([%%%%^%$%*%(%)%.%+%?%-%]%[])','%1')
+    return (str:gsub('%%([%%%%^%$%*%(%)%.%+%?%-%]%[])','%1'))
 end
 
 
