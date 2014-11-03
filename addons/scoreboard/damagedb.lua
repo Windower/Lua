@@ -15,6 +15,8 @@ DamageDB.player_stat_fields = T{
 ]]
 
 DamageDB.player_stat_fields = T{
+    'mavg', 'mrange', 'critavg', 'critrange',
+    'ravg', 'rrange', 'rcritavg', 'rcritrange',
     'acc', 'racc', 'crit', 'rcrit',
     'wsavg'
 }

@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'Translate'
-_addon.version = '0.141020'
+_addon.version = '0.141026'
 _addon.author = 'Byrth'
 _addon.commands = {'trans','translate'}
 
@@ -75,6 +75,7 @@ function to_a_code(num)
     local first_byte,second_byte = math.floor(num/256),num%256
     if first_byte == 0 or second_byte == 0 then return nil end
     return string.char(0xFD,2,2,first_byte,second_byte,0xFD):escape()
+    -- 0xFD,2,2,8,37,0xFD :: 37 = %
 end
 
 function to_item_code(id)
@@ -233,7 +234,7 @@ windower.register_event('incoming chunk',function(id,orgi,modi,is_injected,is_bl
         
         for _,ind in ipairs(order) do
             for _,option in ipairs(matches[ind]) do
-                out_text = sjis_gsub(out_text,option,trans_list[option])
+                out_text = sjis_gsub(out_text,unescape(option),unescape(trans_list[option]))
             end
         end
         
@@ -311,12 +312,13 @@ windower.register_event('addon command', function(...)
                 print('Translate: Hiding the original text line.')
             end
         end
-    elseif commands[1]:lower() == 'eval' then
-        assert(loadstring(table.concat({...}, ' ')))()
+    elseif commands[1]:lower() == 'eval' and commands[2] then
+        table.remove(commands,1)
+        assert(loadstring(table.concat(commands, ' ')))()
     end
 end)
 
-
+    
 function print_set(set,title)
     if not set then
         if title then
@@ -349,6 +351,11 @@ function print_set(set,title)
         end
     end
     windower.add_to_chat(1,'----------------------------------------------------------------')
+end
+
+
+function unescape(str)
+    return str:gsub('%%([%%%%^%$%*%(%)%.%+%?%-%]%[])','%1')
 end
 
 

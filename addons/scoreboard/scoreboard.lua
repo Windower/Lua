@@ -2,7 +2,7 @@
 
 _addon.name = 'Scoreboard'
 _addon.author = 'Suji'
-_addon.version = '1.07'
+_addon.version = '1.08'
 _addon.commands = {'sb', 'scoreboard'}
 
 require('tables')
