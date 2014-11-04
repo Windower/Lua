@@ -53,7 +53,11 @@ function addText(name, abtype, abil, dMob, dangerous)
     if abtype == 'ws' then
         abil = tonumber(abil)
         doit = true
-        abilname = res.monster_abilities[abil].english
+        if abil <= 255 then
+            abilname = res.weapon_skills[abil].english
+        else
+            abilname = res.monster_abilities[abil].english
+        end
     elseif abtype == 'spell' then
         abil = tonumber(abil)
         doit = true
