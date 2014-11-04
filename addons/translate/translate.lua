@@ -123,7 +123,7 @@ end
 load_dict(katakana_to_romanji)
 
 for res_name in pairs(handled_resources) do
-    local resource = res[res_name]
+    local resource = res[res_name] or {}
     if res_name == 'auto_translates' then
         for autotranslate_code,res_line in pairs(resource) do
             local jp = windower.to_shift_jis(res_line.ja or ''):escape()
