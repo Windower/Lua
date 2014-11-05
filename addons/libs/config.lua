@@ -8,6 +8,7 @@ _libs = _libs or {}
 _libs.config = config
 _libs.tables = _libs.tables or require('tables')
 _libs.sets = _libs.sets or require('sets')
+_libs.lists = _libs.lists or require('lists')
 _libs.strings = _libs.strings or require('strings')
 _libs.xml = _libs.xml or require('xml')
 _libs.files = _libs.files or require('files')
@@ -52,7 +53,7 @@ function config.load(filename, confdict)
     meta.file = _libs.files.new()
     meta.original = T{global = T{}}
     meta.chars = S{}
-    meta.comments = T{}
+    meta.comments = {}
     meta.refresh = T{}
 
     settings_map[settings] = meta
@@ -156,7 +157,7 @@ function merge(t, t_merge, path)
     end
 
     for lkey, val in pairs(t_merge) do
-        local key = rawget(keys, lkey:lower())
+        local key = keys[lkey:lower()]
         if not key then
             if type(val) == 'table' then
                 t[lkey] = setmetatable(table.copy(val), getmetatable(val) or _meta.T)
@@ -170,20 +171,55 @@ function merge(t, t_merge, path)
             local oldtype = type(oldval)
 
             if oldtype == 'table' and type(val) == 'table' then
-                t[key] = merge(oldval, val, path and path:copy()+key or nil)
+                t[key] = merge(oldval, val, path and path:copy() + key or nil)
 
             elseif oldtype ~= type(val) then
                 if oldtype == 'table' then
                     if type(val) == 'string' then
-                        local res = table.map(val:split(','), string.trim)
-                        if class and class(oldval) == 'Set' then
-                            res = S(res)
-                        elseif class and class(oldval) == 'Table' then
-                            res = T(res)
+                        -- Single-line CSV parser, can possible refactor this to tables.lua
+                        local res = {}
+                        local current = ''
+                        local quote = false
+                        local last
+                        for c in val:gmatch('.') do
+                            if c == ',' and not quote then
+                                res[#res + 1] = current
+                                current = ''
+                                last = nil
+                            elseif c == '"' then
+                                if last == '"' then
+                                    current = current .. c
+                                    last = nil
+                                else
+                                    last = '"'
+                                end
+
+                                quote = not quote
+                            else
+                                current = current .. c
+                                last = c
+                            end
+                        end
+                        res[#res + 1] = current
+
+                        -- TODO: Remove this after a while, not standard compliant
+                        -- Currently needed to not mess up existing settings
+                        res = table.map(res, string.trim)
+
+                        if class then
+                            if class(oldval) == 'Set' then
+                                res = S(res)
+                            elseif class(oldval) == 'List' then
+                                res = L(res)
+                            elseif class(oldval) == 'Table' then
+                                res = T(res)
+                            end
                         end
                         t[key] = res
+
                     else
                         err = true
+
                     end
 
                 elseif oldtype == 'number' then
@@ -220,7 +256,7 @@ function merge(t, t_merge, path)
 
             if err then
                 if path then
-                    warning('Could not safely merge values for \''..path:concat('/')..'/'..key..'\', '..type(oldval)..' expected (default: '..tostring(oldval)..'), got '..type(val)..' ('..tostring(val)..').')
+                    warning('Could not safely merge values for \'%s/%s\', %s expected (default: %s), got %s (%s).':format(path:concat('/'), key, type(oldval), tostring(oldval), type(val), tostring(val)))
                 end
                 t[key] = val
             end
@@ -328,49 +364,51 @@ function table_diff(t, t_new)
                 if type(val) == 'table' then
                     if class(val) == 'Set' or class(val) == 'List' then
                         if not cmp:equals(val) then
-                            rawset(res, key, val)
+                            res[key] = val
                         end
                     elseif table.isarray(val) and table.isarray(cmp) then
                         if not table.equals(cmp, val) then
-                            rawset(res, key, val)
+                            res[key] = val
                         end
                     else
-                        rawset(res, key, table_diff(cmp, val))
+                        res[key] = table_diff(cmp, val)
                     end
                 elseif cmp ~= val then
-                    rawset(res, key, val)
+                    res[key] = val
                 end
             end
         end
     end
 
-    return (not table.empty(res) and res) or nil
+    return not table.empty(res) and res or nil
 end
 
 -- Converts a settings table to a XML representation.
 function settings_xml(meta)
-    local str = '<?xml version="1.1" ?>\n'
-    str = str..'<settings>\n'
+    local lines = L{}
+    lines:append('<?xml version="1.1" ?>')
+    lines:append('<settings>')
 
     local chars = (meta.original:keyset() - S{'global'}):sort()
     for char in (L{'global'} + chars):it() do
-        if char == 'global' and rawget(meta.comments, 'settings') ~= nil then
-            str = str..'\t<!--\n'
-            local comment_lines = rawget(meta.comments, 'settings'):split('\n')
+        if char == 'global' and meta.comments.settings then
+            lines:append('    <!--')
+            local comment_lines = meta.comments.settings:split('\n')
             for comment in comment_lines:it() do
-                str = str..'\t\t'..comment:trim()..'\n'
+                lines:append('        %s':format(comment:trim()))
             end
 
-            str = str..'\t-->\n'
+            lines:append('    -->')
         end
 
-        str = str..'\t<'..char..'>\n'
-        str = str..nest_xml(meta.original[char], meta)
-        str = str..'\t</'..char..'>\n'
+        lines:append('    <%s>':format(char))
+        lines:append(nest_xml(meta.original[char], meta))
+        lines:append('    </%s>':format(char))
     end
 
-    str = str..'</settings>\n'
-    return str
+    lines:append('</settings>')
+    lines:append('')
+    return lines:concat('\n')
 end
 
 -- Converts a table to XML without headers using appropriate indentation and comment spacing. Used in settings_xml.
@@ -384,19 +422,19 @@ function nest_xml(t, meta, indentlevel)
     local keys = set.sort(table.keyset(t))
     local val
     for _, key in ipairs(keys) do
-        val = rawget(t, key)
+        val = t[key]
         if type(val) == 'table' and not (class(val) == 'List' or class(val) == 'Set') then
-            fragments:append(indent..'<'..key..'>\n')
-            if rawget(meta.comments, key) ~= nil then
-                local c = ('<!-- '..rawget(meta.comments, key):trim()..' -->'):split('\n')
+            fragments:append('%s<%s>':format(indent, key))
+            if meta.comments[key] then
+                local c = '<!-- %s -->':format(meta.comments[key]:trim()):split('\n')
                 local pre = ''
                 for cstr in c:it() do
-                    fragments:append(indent..pre..cstr:trim()..'\n')
+                    fragments:append('%s%s%s':format(indent, pre, cstr:trim()))
                     pre = '\t '
                 end
             end
             fragments:append(nest_xml(val, meta, indentlevel + 1))
-            fragments:append(indent..'</'..key..'>\n')
+            fragments:append('%s</%s>':format(indent, key))
 
         else
             if class(val) == 'List' then
@@ -410,9 +448,9 @@ function nest_xml(t, meta, indentlevel)
             end
 
             if val == '' then
-                fragments:append(indent..'<'..key..' />')
+                fragments:append('%s<%s />':format(indent, key))
             else
-                fragments:append(indent..'<'..key..'>'..val:xml_escape()..'</'..key..'>')
+                fragments:append('%s<%s>%s</%s>':format(indent, key, val:xml_escape(), key))
             end
             local length = fragments:last():length() - indent:length()
             if length > maxlength then
@@ -423,14 +461,12 @@ function nest_xml(t, meta, indentlevel)
     end
 
     for frag_key, key in pairs(inlines) do
-        if rawget(meta.comments, key) ~= nil then
-            fragments[frag_key] = fragments[frag_key]..(' '):rep(maxlength - fragments[frag_key]:trim():length() + 1)..'<!-- '..meta.comments[key]..' -->'
+        if meta.comments[key] then
+            fragments[frag_key] = '%s%s<!-- %s -->':format(fragments[frag_key], ' ':rep(maxlength - fragments[frag_key]:trim():length() + 1), meta.comments[key])
         end
-
-        fragments[frag_key] = fragments[frag_key]..'\n'
     end
 
-    return fragments:concat()
+    return fragments:concat('\n')
 end
 
 function config.register(settings, fn, ...)
@@ -453,7 +489,7 @@ end)
 return config
 
 --[[
-Copyright © 2013-2014, Windower
+Copyright Â© 2013-2014, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

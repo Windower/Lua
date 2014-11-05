@@ -33,7 +33,7 @@
 local messages = {
     z15  = {
         name = 'Abyssea - Konschtat',
-        offset = 7280,
+        offset = 7284,
         pearl_ebon_gold_silvery = 0,
         azure_ruby_amber = 1,
         visitant_status_wears_off = 10,
@@ -49,7 +49,7 @@ local messages = {
     },
     z132 = {
         name = 'Abyssea - La Theine',
-        offset = 7280,
+        offset = 7284,
         pearl_ebon_gold_silvery = 0,
         azure_ruby_amber = 1,
         visitant_status_wears_off = 10,
@@ -65,7 +65,7 @@ local messages = {
     },
     z45  = {
         name = 'Abyssea - Tahrongi',
-        offset = 7280,
+        offset = 7284,
         pearl_ebon_gold_silvery = 0,
         azure_ruby_amber = 1,
         visitant_status_wears_off = 10,
@@ -81,7 +81,7 @@ local messages = {
     },
     z215 = {
         name = 'Abyssea - Attohwa',
-        offset = 7186,
+        offset = 7189,
         pearl_ebon_gold_silvery = 0,
         azure_ruby_amber = 1,
         visitant_status_wears_off = 10, -- Could also be 7194, the singular message. That is less than 10 minutes though, so shouldn't need to update for it.
@@ -97,7 +97,7 @@ local messages = {
     },
     z216 = {
         name = 'Abyssea - Misareaux',
-        offset = 7280,
+        offset = 7284,
         pearl_ebon_gold_silvery = 0,
         azure_ruby_amber = 1,
         visitant_status_wears_off = 10,
@@ -113,7 +113,7 @@ local messages = {
     },
     z217 = {
         name = 'Abyssea - Vunkerl',
-        offset = 7280,
+        offset = 7284,
         pearl_ebon_gold_silvery = 0,
         azure_ruby_amber = 1,
         visitant_status_wears_off = 10,
@@ -129,7 +129,7 @@ local messages = {
     },
     z218 = {
         name = 'Abyssea - Altepa',
-        offset = 7280,
+        offset = 7284,
         pearl_ebon_gold_silvery = 0,
         azure_ruby_amber = 1,
         visitant_status_wears_off = 10,
@@ -145,7 +145,7 @@ local messages = {
     },
     z254 = {
         name = 'Abyssea - Grauberg',
-        offset = 7280,
+        offset = 7284,
         pearl_ebon_gold_silvery = 0,
         azure_ruby_amber = 1,
         visitant_status_wears_off = 10,
@@ -161,7 +161,7 @@ local messages = {
     },
     z253 = {
         name = 'Abyssea - Uleguerand',
-        offset = 7186,
+        offset = 7189,
         pearl_ebon_gold_silvery = 0,
         azure_ruby_amber = 1,
         visitant_status_wears_off = 10,

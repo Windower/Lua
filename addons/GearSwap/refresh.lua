@@ -263,7 +263,7 @@ function refresh_player(dt,user_event_flag)
                 pet.element = res.elements[-1][language] -- Physical
             end
         else
-            table.reassign(pet, {isvalid=true})
+            table.reassign(pet, {isvalid=false})
         end
     else
         table.reassign(pet, {isvalid=false})

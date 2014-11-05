@@ -14,6 +14,9 @@ Text Box Commands:
 * bg_transparency <number> - Changes the background transparency. Number should be between 0 and 1
 ** pos_x, pos_y, pad, transparency, alpha, and bg_alpha are also valid commands and are documented in the texts library.
 
+Other Commands:
+* message_printing - See FIXING POINTWATCH.txt in this directory for a full explanation.
+
 
 
 Strings Options:  
@@ -61,6 +64,8 @@ Here are the available values:
 
 
 Version History:
+0.141101 - Reversed my versioning scheme, adjusted the limit point and experience point calculations slightly.
+0.101214 - Made pointwatch hide itself while zoning.
 0.062014 - Added lp.maximum_merits.
 0.050214 - Fixed the Dynamis clock. Added Abyssea lights.
 0.042314 - Addition of strings system

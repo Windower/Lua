@@ -34,7 +34,7 @@ require 'pack'
 
 _addon.name = 'PointWatch'
 _addon.author = 'Byrth'
-_addon.version = 0.062014
+_addon.version = 0.141101
 _addon.command = 'pw'
 
 settings = config.load('data\\settings.xml',default_settings)
@@ -112,6 +112,12 @@ windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blo
         cp.number_of_job_points = org:byte(offset+2)
     elseif id == 0x110 then
         sparks.current = org:unpack('H',5)
+    elseif id == 0xB and box:visible() then
+        zoning_bool = true
+        box:hide()
+    elseif id == 0xA and zoning_bool then
+        zoning_bool = nil
+        box:show()
     end
 end)
 
@@ -265,16 +271,25 @@ function exp_msg(val,msg)
     if msg == 718 or msg == 735 then
         cp.registry[t] = (cp.registry[t] or 0) + val
         cp.total = cp.total + val
-    elseif msg == 8 or msg == 105 or msg == 371 or msg == 372 then
+    elseif msg == 8 or msg == 105 then
         xp.registry[t] = (xp.registry[t] or 0) + val
         xp.total = xp.total + val
-        xp.current = xp.current + val
-        if xp.current > xp.tnl and xp.tnl ~= 56000 then
-            xp.current = xp.current - xp.tnl
+        xp.current = math.min(xp.current + val,55999)
+        -- 98 to 99 is 56000 XP, so 55999 is the most you can ever have
+        if xp.current > xp.tnl then
             -- I have capped all jobs, but I assume that a 0x61 packet is sent after you
-            --  level up, which will update the TNL and make this adjustment meaningless.
-        elseif xp.current > xp.tnl then
-            lp.current = lp.current + xp.current - xp.tnl + 1
+            -- level up, which will update the TNL and make this adjustment meaningless.
+            xp.current = xp.current - xp.tnl
+        end
+    elseif msg == 371 or msg == 372 then
+        lp.registry[t] = (lp.registry[t] or 0) + val
+        if lp.current + val >= lp.tnm and lp.number_of_merits ~= lp.maximum_merits then
+            -- Merit Point gained!
+            lp.current = lp.current + val - lp.tnm
+            lp.number_of_merits = lp.number_of_merits + 1
+        else
+            -- If a merit point was not gained, 
+            lp.current = math.min(lp.current+val,lp.tnm-1)
         end
     end
     update_box()

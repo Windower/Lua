@@ -241,11 +241,11 @@ config.register(settings, function()
 	end
 
     if settings.zero then
-        gtt:text('${hours|XX|%.2d}:${minutes|XX|%.2d}')
+        gt.gtt:text('${hours|XX|%.2d}:${minutes|XX|%.2d}')
     else
-        gtt:text('${hours|XX}:${minutes|XX|%.2d}')
+        gt.gtt:text('${hours|XX}:${minutes|XX|%.2d}')
     end
-    gtd:text('${day|} ${MoonPhase|Unknown} (${MoonPct|-}%); ${WeekReport|}')
+    gt.gtd:text('${day|} ${MoonPhase|Unknown} (${MoonPct|-}%); ${WeekReport|}')
 
     local info = windower.ffxi.get_info()
     if info.logged_in then
