@@ -306,8 +306,8 @@ function action:get_spell()
     
     local function fieldsearch(message_id)
         if not res.action_messages[message_id] then return false end
-        local fields = T{}
-        res.action_messages[message_id].english:gsub("{(.-)}", function(a) if a ~= '${actor}' and a ~= '${target}' then fields:append(a) end end)
+        local fields = {}
+        res.action_messages[message_id].english:gsub("${(.-)}", function(a) if a ~= 'actor' and a ~= 'target' and a ~= 'lb' then rawset(fields,a,true) end end)
         return fields
     end
     
@@ -407,7 +407,7 @@ function action:get_spell()
             }
         -- If there is a message, interpret the fields.
         resource = msgID_to_res_map[message_id] or fields.spell and 'spells' or
-            fields.weapon_skill and 'weapon_skills' or fields.job_ability and 'job_abilities' or
+            fields.weapon_skill and 'weapon_skills' or fields.ability and 'job_abilities' or
             fields.item and 'items' or rawget(cat_to_res_map,category)
         local msgID_to_value_map = {
             [240] = 43, -- Hide
