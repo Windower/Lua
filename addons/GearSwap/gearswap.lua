@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.892'
+_addon.version = '0.893'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -102,6 +102,7 @@ socket = require 'socket'
 res = require 'resources'
 extdata = require 'extdata'
 require 'helper_functions'
+require 'actions'
 
 -- Resources Checks
 if res.items and res.bags and res.slots and res.statuses and res.jobs and res.elements and res.skills and res.buffs and res.spells and res.job_abilities and res.weapon_skills and res.monster_abilities and res.action_messages and res.skills and res.monstrosity and res.weather and res.moon_phases and res.races then
@@ -358,75 +359,15 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         items[bag][slot].extdata = data:sub(0x12,0x29)
         -- Did not mess with linkshell stuff
     elseif id == 0x28 then
-        data = data:sub(5)
-        local act = {}
---        act.do_not_need = get_bit_packed(data,0,8)
-        act.actor_id = get_bit_packed(data,8,40)
-        act.target_count = get_bit_packed(data,40,50)
-        act.category = get_bit_packed(data,50,54)
-        act.param = get_bit_packed(data,54,70)
-        act.unknown = get_bit_packed(data,70,86)
-        act.recast = get_bit_packed(data,86,118)
-        act.targets = {}
-        local offset = 118
-        for i = 1,act.target_count do
-            act.targets[i] = {}
-            act.targets[i].id = get_bit_packed(data,offset,offset+32)
-            act.targets[i].action_count = get_bit_packed(data,offset+32,offset+36)
-            offset = offset + 36
-            act.targets[i].actions = {}
-            for n = 1,act.targets[i].action_count do
-                act.targets[i].actions[n] = {}
-                act.targets[i].actions[n].reaction = get_bit_packed(data,offset,offset+5)
-                act.targets[i].actions[n].animation = get_bit_packed(data,offset+5,offset+16)
-                act.targets[i].actions[n].effect = get_bit_packed(data,offset+16,offset+21)
-                act.targets[i].actions[n].stagger = get_bit_packed(data,offset+21,offset+27)
-                act.targets[i].actions[n].param = get_bit_packed(data,offset+27,offset+44)
-                act.targets[i].actions[n].message = get_bit_packed(data,offset+44,offset+54)
-                act.targets[i].actions[n].unknown = get_bit_packed(data,offset+54,offset+85)
-                act.targets[i].actions[n].has_add_effect = get_bit_packed(data,offset+85,offset+86)
-                offset = offset + 86
-                if act.targets[i].actions[n].has_add_effect == 1 then
-                    act.targets[i].actions[n].has_add_effect = true
-                    act.targets[i].actions[n].add_effect_animation = get_bit_packed(data,offset,offset+6)
-                    act.targets[i].actions[n].add_effect_effect = get_bit_packed(data,offset+6,offset+10)
-                    act.targets[i].actions[n].add_effect_param = get_bit_packed(data,offset+10,offset+27)
-                    act.targets[i].actions[n].add_effect_message = get_bit_packed(data,offset+27,offset+37)
-                    offset = offset + 37
-                else
-                    act.targets[i].actions[n].has_add_effect = false
-                    act.targets[i].actions[n].add_effect_animation = 0
-                    act.targets[i].actions[n].add_effect_effect = 0
-                    act.targets[i].actions[n].add_effect_param = 0
-                    act.targets[i].actions[n].add_effect_message = 0
-                end
-                act.targets[i].actions[n].has_spike_effect = get_bit_packed(data,offset,offset+1)
-                offset = offset +1
-                if act.targets[i].actions[n].has_spike_effect == 1 then
-                    act.targets[i].actions[n].has_spike_effect = true
-                    act.targets[i].actions[n].spike_effect_animation = get_bit_packed(data,offset,offset+6)
-                    act.targets[i].actions[n].spike_effect_effect = get_bit_packed(data,offset+6,offset+10)
-                    act.targets[i].actions[n].spike_effect_param = get_bit_packed(data,offset+10,offset+24)
-                    act.targets[i].actions[n].spike_effect_message = get_bit_packed(data,offset+24,offset+34)
-                    offset = offset + 34
-                else
-                    act.targets[i].actions[n].has_spike_effect = false
-                    act.targets[i].actions[n].spike_effect_animation = 0
-                    act.targets[i].actions[n].spike_effect_effect = 0
-                    act.targets[i].actions[n].spike_effect_param = 0
-                    act.targets[i].actions[n].spike_effect_message = 0
-                end
-            end
-        end
-        inc_action(act)
+        inc_action(windower.packets.parse_action(data))
     elseif id == 0x29 then
         if gearswap_disabled then return end
         local arr = {}
         arr.actor_id = data:unpack('I',0x05)
         arr.target_id = data:unpack('I',0x09)
         arr.param_1 = data:unpack('I',0x0D)
-        arr.param_2 = get_bit_packed(data,128,134) -- First 6 bits
-        arr.param_3 = get_bit_packed(data,134,160) -- Rest
+        arr.param_2 = data:unpack('I',0x11)%64 -- First 6 bits
+        arr.param_3 = math.floor(data:unpack('I',0x11)/64) -- Rest
         arr.actor_index = data:unpack('H',0x15)
         arr.target_index = data:unpack('H',0x17)
         arr.message_id = data:unpack('H',0x19)%32768

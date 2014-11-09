@@ -11,12 +11,12 @@ function event_action(act)
   action = Action(act) -- constructor
 
     -- print out all melee hits to the console
-    if action:get_category_string() == 'melee' then
-        for target in action:get_targets() do -- target iterator
-            for subaction in target:get_actions() do -- subaction iterator
-                if subaction.message == 1 then -- 1 is the code for messages
+    if actionpacket:get_category_string() == 'melee' then
+        for target in actionpacket:get_targets() do -- target iterator
+            for action in target:get_actions() do -- subaction iterator
+                if action.message == 1 then -- 1 is the code for messages
                     print(string.format("%s hit %s for %d damage",
-                          action:get_actor_name(), target:get_name(), subaction.param))
+                          actionpacket:get_actor_name(), target:get_name(), action.param))
                 end
             end
         end
@@ -75,113 +75,11 @@ function ActionPacket.open_listener(funct)
     if not funct or type(funct) ~= 'function' then return end
     local id = windower.register_event('incoming chunk',function(id, org, modi, is_injected, is_blocked)
         if id == 0x28 then
-            local act = ActionPacket.unpack_string(org)
+            local act = windower.packets.parse_action(org)
             funct(act,original)
         end
     end)
     return id
-end
-
-function ActionPacket.unpack_string(str)
-    -----------------------------------------------------------------------------------
-    --Name: get_bit_packed(dat_string,start,stop)
-    --Args:
-    ---- dat_string - string that is being bit-unpacked to a number
-    ---- start - first bit
-    ---- stop - last bit
-    -----------------------------------------------------------------------------------
-    --Returns:
-    ---- number from the indicated range of bits 
-    -----------------------------------------------------------------------------------
-    local function get_bit_packed(dat_string,start,stop)
-        local newval = 0
-        
-        local c_count = math.ceil(stop/8)
-        while c_count >= math.ceil((start+1)/8) do
-            -- Grabs the most significant byte first and works down towards the least significant.
-            local cur_val = dat_string:byte(c_count)
-            local scal = 256
-            
-            if c_count == math.ceil(stop/8) then -- Take the least significant bits of the most significant byte
-            -- Moduluses by 2^number of bits into the current byte. So 8 bits in would %256, 1 bit in would %2, etc.
-            -- Cuts off the top.
-                cur_val = cur_val%(2^((stop-1)%8+1)) -- -1 and +1 set the modulus result range from 1 to 8 instead of 0 to 7.
-            end
-            
-            if c_count == math.ceil((start+1)/8) then -- Take the most significant bits of the least significant byte
-            -- Divides by the significance of the final bit in the current byte. So 8 bits in would /128, 1 bit in would /1, etc.
-            -- Cuts off the bottom.
-                cur_val = math.floor(cur_val/(2^(start%8)))
-                scal = 2^(8-start%8)
-            end
-            
-            newval = newval*scal + cur_val -- Need to multiply by 2^number of bits in the next byte
-            c_count = c_count - 1
-        end
-        return newval
-    end
-    
-    data = str:sub(5)
-    local act = {}
---        act.do_not_need = get_bit_packed(data,0,8)
-    act.actor_id = get_bit_packed(data,8,40)
-    act.target_count = get_bit_packed(data,40,50)
-    act.category = get_bit_packed(data,50,54)
-    act.param = get_bit_packed(data,54,70)
-    act.unknown = get_bit_packed(data,70,86)
-    act.recast = get_bit_packed(data,86,118)
-    act.targets = {}
-    local offset = 118
-    for i = 1,act.target_count do
-        act.targets[i] = {}
-        act.targets[i].id = get_bit_packed(data,offset,offset+32)
-        act.targets[i].action_count = get_bit_packed(data,offset+32,offset+36)
-        offset = offset + 36
-        act.targets[i].actions = {}
-        for n = 1,act.targets[i].action_count do
-            act.targets[i].actions[n] = {}
-            act.targets[i].actions[n].reaction = get_bit_packed(data,offset,offset+5)
-            act.targets[i].actions[n].animation = get_bit_packed(data,offset+5,offset+16)
-            act.targets[i].actions[n].effect = get_bit_packed(data,offset+16,offset+21)
-            act.targets[i].actions[n].stagger = get_bit_packed(data,offset+21,offset+27)
-            act.targets[i].actions[n].param = get_bit_packed(data,offset+27,offset+44)
-            act.targets[i].actions[n].message = get_bit_packed(data,offset+44,offset+54)
-            act.targets[i].actions[n].unknown = get_bit_packed(data,offset+54,offset+85)
-            act.targets[i].actions[n].has_add_effect = get_bit_packed(data,offset+85,offset+86)
-            offset = offset + 86
-            if act.targets[i].actions[n].has_add_effect == 1 then
-                act.targets[i].actions[n].has_add_effect = true
-                act.targets[i].actions[n].add_effect_animation = get_bit_packed(data,offset,offset+6)
-                act.targets[i].actions[n].add_effect_effect = get_bit_packed(data,offset+6,offset+10)
-                act.targets[i].actions[n].add_effect_param = get_bit_packed(data,offset+10,offset+27)
-                act.targets[i].actions[n].add_effect_message = get_bit_packed(data,offset+27,offset+37)
-                offset = offset + 37
-            else
-                act.targets[i].actions[n].has_add_effect = false
-                act.targets[i].actions[n].add_effect_animation = 0
-                act.targets[i].actions[n].add_effect_effect = 0
-                act.targets[i].actions[n].add_effect_param = 0
-                act.targets[i].actions[n].add_effect_message = 0
-            end
-            act.targets[i].actions[n].has_spike_effect = get_bit_packed(data,offset,offset+1)
-            offset = offset +1
-            if act.targets[i].actions[n].has_spike_effect == 1 then
-                act.targets[i].actions[n].has_spike_effect = true
-                act.targets[i].actions[n].spike_effect_animation = get_bit_packed(data,offset,offset+6)
-                act.targets[i].actions[n].spike_effect_effect = get_bit_packed(data,offset+6,offset+10)
-                act.targets[i].actions[n].spike_effect_param = get_bit_packed(data,offset+10,offset+24)
-                act.targets[i].actions[n].spike_effect_message = get_bit_packed(data,offset+24,offset+34)
-                offset = offset + 34
-            else
-                act.targets[i].actions[n].has_spike_effect = false
-                act.targets[i].actions[n].spike_effect_animation = 0
-                act.targets[i].actions[n].spike_effect_effect = 0
-                act.targets[i].actions[n].spike_effect_param = 0
-                act.targets[i].actions[n].spike_effect_message = 0
-            end
-        end
-    end
-    return act
 end
 
 function ActionPacket.close_listener(id)
@@ -194,6 +92,18 @@ end
 
 function actionpacket:get_category_string()
     return category_strings[self.raw['category']]
+end
+
+function actionpacket:get_spell()
+    local info = self:get_targets()():get_actions()():get_basic_info()
+    if rawget(info,'resource') and rawget(info,'spell_id') and rawget(rawget(res,rawget(info,'resource')),rawget(info,'spell_id')) then
+        local copied_line = {}
+        for i,v in pairs(rawget(rawget(res,rawget(info,'resource')),rawget(info,'spell_id'))) do
+            rawset(copied_line,i,v)
+        end
+        setmetatable(copied_line,getmetatable(res[rawget(info,'resource')][rawget(info,'spell_id')]))
+        return copied_line
+    end
 end
 
 -- Returns the name of this actor if there is one
@@ -356,10 +266,10 @@ function Action(category,top_level_param,t)
     new_instance.raw.category = category_strings[category] or category
     new_instance.raw.top_level_param = top_level_param
 
-    return setmetatable(new_instance, {__index = function (t, k) if rawget(t, k) ~= nil then return t[k] else return rawget(rawget(t,'raw'),k) end end})
+    return setmetatable(new_instance, {__index = function (t, k) if rawget(t, k) ~= nil then return t[k] else return action[k] or rawget(rawget(t,'raw'),k) end end})
 end
 
-function action:get_basic_action()
+function action:get_basic_info()
     local reaction = self:get_reaction_string()
     local animation = self:get_animation_string()
     local effect = self:get_effect_string()
@@ -408,8 +318,8 @@ function action:get_spell()
     
     local function fieldsearch(message_id)
         if not res.action_messages[message_id] then return false end
-        local fields = T{}
-        res.action_messages[message_id].english:gsub("{(.-)}", function(a) if a ~= '${actor}' and a ~= '${target}' then fields:append(a) end end)
+        local fields = {}
+        res.action_messages[message_id].english:gsub("${(.-)}", function(a) if a ~= 'actor' and a ~= 'target' and a ~= 'lb' then rawset(fields,a,true) end end)
         return fields
     end
     
@@ -419,6 +329,7 @@ function action:get_spell()
     local spell_id = rawget(begin_categories, category) and rawget(rawget(self, 'raw'), 'param') or
         rawget(finish_categories, category) and rawget(rawget(self, 'raw'), 'top_level_param')
     local interruption = rawget(begin_categories, category) and rawget(rawget(self, 'raw'), 'top_level_param') == 28787
+    if interruption == nil then interruption = false end
     local message = rawget(rawget(self,'raw'),'message')
     
     local msg_id_to_unit_map = {
@@ -509,7 +420,7 @@ function action:get_spell()
             }
         -- If there is a message, interpret the fields.
         resource = msgID_to_res_map[message_id] or fields.spell and 'spells' or
-            fields.weapon_skill and 'weapon_skills' or fields.job_ability and 'job_abilities' or
+            fields.weapon_skill and 'weapon_skills' or fields.ability and 'job_abilities' or
             fields.item and 'items' or rawget(cat_to_res_map,category)
         local msgID_to_value_map = {
             [240] = 43, -- Hide
@@ -527,6 +438,11 @@ function action:get_spell()
     -- spell_id will either be false or a number
     -- interruption will be a boolean
     return value, resource, spell_id, interruption, action_type
+end
+
+function action:get_message_id()
+    local message_id = rawget(rawget(self,'raw'),'message')
+    return message_id or 0
 end
 
 function action:get_additional_effect()

@@ -8,18 +8,9 @@ _libs = _libs or {}
 _libs.files = files
 _libs.strings = _libs.strings or require('strings')
 
-local createfile = false
-
--- Create a new file object. Accepts a variable number of paths, which it will
+-- Create a new file object.
 function files.new(path, create)
-    create = create ~= false
-
-    local f = setmetatable({}, {__index = files})
-    if path then
-        f:set(path, create)
-    end
-
-    return f
+    return setmetatable({_create = create == true or nil, path = path}, {__index = files})
 end
 
 -- Creates a new file. Creates path, if necessary.
@@ -29,15 +20,7 @@ function files.create(f)
     fh:write('')
     fh:close()
 
-    return f
-end
-
--- Sets the file to a path value.
-function files.set(f, path, create)
-    create = create ~= false
-    createfile = create
-
-    f.path = path
+    f._create = nil
 
     return f
 end
@@ -49,14 +32,14 @@ function files.exists(f)
     if type(f) == 'string' then
         path = f
     else
-        if f.path == nil then
+        if not f.path then
             return nil, 'No file path set, cannot check file.'
         end
 
         path = f.path
     end
 
-    return windower.file_exists(windower.addon_path..path)
+    return windower.file_exists(windower.addon_path .. path)
 end
 
 -- Checks existance of a number of paths, returns the first that exists.
@@ -74,12 +57,12 @@ function files.read(f)
 
         path = f
     else
-        if f.path == nil then
+        if not f.path then
             return nil, 'No file path set, cannot write.'
         end
 
         if not f:exists() then
-            if createfile then
+            if f._create then
                 return ''
             else
                 return nil, 'File \'' .. f.path .. '\' not found, cannot read.'
@@ -94,8 +77,8 @@ function files.read(f)
     fh:close()
 
     -- Remove byte order mark for UTF-8, if present
-    if content:sub(1, 3) == (string.char(0xEF, 0xBB, 0xBF)) then
-        return content:sub(4)
+    if content:sub(1, 3) == string.char(0xEF, 0xBB, 0xBF) then
+        content = content:sub(4)
     end
 
     return content
@@ -107,7 +90,7 @@ function files.create_path(f)
     if type(f) == 'string' then
         path = f
     else
-        if f.path == nil then
+        if not f.path then
             return nil, 'No file path set, cannot create directories.'
         end
 
@@ -118,25 +101,23 @@ function files.create_path(f)
         end
     end
 
-    new_path = windower.addon_path
+    newpath = windower.addon_path
     for dir in path:psplit('[/\\]'):filter(-''):it() do
-        new_path = new_path .. '/' .. dir
+        newpath = newpath .. dir .. '/'
 
-        if not windower.dir_exists(new_path) then
-            local res, err = windower.create_dir(new_path)
+        if not windower.dir_exists(newpath) then
+            local res, err = windower.create_dir(newpath)
             if not res then
-                if err ~= nil then
-                    return nil, err .. ': ' .. new_path
+                if err then
+                    return nil, err .. ': ' .. newpath
                 end
 
-                return nil, 'Unknown error trying to create path ' .. new_path
+                return nil, 'Unknown error trying to create path ' .. newpath
             end
         end
-
-        return nil, 'Unknown error trying to create path ' .. new_path
     end
 
-    return new_path
+    return newpath
 end
 
 -- Read from file and return lines of the contents in a table.
@@ -154,12 +135,12 @@ function files.it(f)
 
         path = f
     else
-        if f.path == nil then
+        if not f.path then
             return nil, 'No file path set, cannot write.'
         end
 
         if not f:exists() then
-            if createfile then
+            if f._create then
                 return ''
             else
                 return nil, 'File \'' .. f.path .. '\' not found, cannot read.'
@@ -169,11 +150,7 @@ function files.it(f)
         path = f.path
     end
 
-    return coroutine.wrap(function()
-        for l in io.lines(windower.addon_path..path) do
-            coroutine.yield(l)
-        end
-    end)
+    return io.lines(windower.addon_path .. path)
 end
 
 -- Write to file. Overwrites everything within the file, if present.
@@ -186,12 +163,12 @@ function files.write(f, content, flush)
 
         path = f
     else
-        if f.path == nil then
+        if not f.path then
             return nil, 'No file path set, cannot write.'
         end
 
         if not f:exists() then
-            if createfile then
+            if f.path then
                 (_libs.logger and notice or print)('New file: ' .. f.path)
                 f:create()
             else
@@ -226,13 +203,13 @@ function files.append(f, content, flush)
 
         path = f
     else
-        if f.path == nil then
+        if not f.path then
             return nil, 'No file path set, cannot write.'
         end
 
         if not f:exists() then
-            if createfile then
-                notice('New file: ' .. f.path)
+            if f._create then
+                (_libs.logger and notice or print)('New file: ' .. f.path)
                 f:create()
             else
                 return nil, 'File \'' .. f.path .. '\' not found, cannot write.'
@@ -255,7 +232,7 @@ end
 return files
 
 --[[
-Copyright (c) 2013, Windower
+Copyright © 2013-2014, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

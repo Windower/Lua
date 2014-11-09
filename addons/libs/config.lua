@@ -68,7 +68,7 @@ function config.load(filename, confdict)
         return settings
     end
 
-    meta.file:set(filepath)
+    meta.file.path = filepath
 
     return parse(settings)
 end
