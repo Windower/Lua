@@ -154,6 +154,9 @@ end)
 function inc_action(act)
     if gearswap_disabled or act.category == 1 then return end
     
+    local spell_res = ActionPacket.new(act):get_spell()
+        
+    --print(((res[unpackedaction.resource] or {})[unpackedaction.spell_id] or {}).english,unpackedaction.type,unpackedaction.value,unpackedaction.interruption)
     local temp_player_mob_table,temp_pet,pet_id = windower.ffxi.get_mob_by_index(player.index)
     if temp_player_mob_table.pet_index then
         temp_pet = windower.ffxi.get_mob_by_index(temp_player_mob_table.pet_index)
@@ -173,6 +176,8 @@ function inc_action(act)
     end
     
     spell = get_spell(act)
+    if not spell_res or (spell.english ~= spell_res.english) then print('Did not match.',spell.english,spell_res) end
+    
     if spell then logit('\n\n'..tostring(os.clock)..'(178) Event Action: '..tostring(spell[language])..' '..tostring(act.category))
     else logit('\n\nNil spell detected') end
     

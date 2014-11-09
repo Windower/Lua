@@ -158,7 +158,7 @@ function search_bags_for_items_in_set(gear_table, filter, missing_items, stack)
         local aug = v.augments or v.augment
         
         if type(aug) == 'string' then aug = {aug} end
-        if type(name) == 'string' and name ~= '' and type(i) == 'string'then
+        if type(name) == 'string' and name ~= 'empty' and name ~= '' and type(i) == 'string'then
             if not slot_map[i] then
                 windower.add_to_chat(123,'GearSwap: '..windower.to_shift_jis(tostring(i))..' contains a "name" element but is not a valid slot.')
             elseif tryfilter(lowercase_name(name), filter) and not find_in_inv(items.inventory, name, aug) and not find_in_inv(items.wardrobe, name, aug) then
