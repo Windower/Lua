@@ -35,9 +35,9 @@ local nest_xml
 local table_diff
 
 -- Loads a specified file, or alternatively a file 'settings.xml' in the current addon/data folder.
-function config.load(filename, confdict)
-    if type(filename) ~= 'string' then
-        filename, confdict = 'data/settings.xml', filename
+function config.load(filepath, confdict)
+    if type(filepath) ~= 'string' then
+        filepath, confdict = 'data/settings.xml', filepath
     end
 
     local confdict_mt = getmetatable(confdict) or _meta.T
@@ -50,7 +50,7 @@ function config.load(filename, confdict)
     end})
     -- Settings member variables, in separate struct
     local meta = {}
-    meta.file = _libs.files.new()
+    meta.file = _libs.files.new(filepath, true)
     meta.original = T{global = T{}}
     meta.chars = S{}
     meta.comments = {}
@@ -59,16 +59,10 @@ function config.load(filename, confdict)
     settings_map[settings] = meta
 
     -- Load addon config file (Windower/addon/<addonname>/data/settings.xml).
-    local filepath = filename
-    if not _libs.files.exists(filepath) then
-        meta.file:set(filepath, true)
+    if not meta.file:exists() then
         meta.original.global = table.copy(settings)
         config.save(settings, 'all')
-
-        return settings
     end
-
-    meta.file.path = filepath
 
     return parse(settings)
 end
