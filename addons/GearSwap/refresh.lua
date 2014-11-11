@@ -84,18 +84,20 @@ function load_user_files(job_id,user_file)
     --registered_user_events = {}
     include_user_path = nil
     
+    language = 'english' -- Reset language to english when changing job files.
+    refresh_globals()
+    
     if job_id and res.jobs[job_id] then
         player.main_job_id = job_id
         update_job_names()
     end
     
-    language = 'english' -- Reset language to english when changing job files.
     
     local path
     path = pathsearch({user_file})
     if not path then
-        local long_job = res.jobs[job_id][language]
-        local short_job = res.jobs[job_id][language..'_short']
+        local long_job = res.jobs[job_id].english
+        local short_job = res.jobs[job_id].english_short
         local tab = {player.name..'_'..short_job..'.lua',player.name..'-'..short_job..'.lua',
             player.name..'_'..long_job..'.lua',player.name..'-'..long_job..'.lua',
             player.name..'.lua',short_job..'.lua',long_job..'.lua','default.lua'}

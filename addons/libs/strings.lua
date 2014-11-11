@@ -237,7 +237,7 @@ function string.mfind(str, full_pattern, ...)
     local patterns = full_pattern:split('|')
 
     local found = {}
-    for _,pattern in ipairs(patterns) do
+    for _, pattern in ipairs(patterns) do
         local new_found = {str:find(pattern, ...)}
         if not found[1] or new_found[1] and new_found[1] < found[1] then
             found = new_found
@@ -253,7 +253,7 @@ function string.mmatch(str, full_pattern, ...)
 
     local found = {}
     local index = nil
-    for _,pattern in ipairs(patterns) do
+    for _, pattern in ipairs(patterns) do
         local start = {str:find(pattern, ...)}
         if start and (not index or start < index) then
             found = {str:match(pattern, ...)}
@@ -268,7 +268,7 @@ end
 function string.mgsub(str, full_pattern, ...)
     local patterns = full_pattern:split('|')
 
-    for _,pattern in ipairs(patterns) do
+    for _, pattern in ipairs(patterns) do
         str = str:gsub(pattern, ...)
     end
 

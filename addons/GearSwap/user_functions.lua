@@ -35,6 +35,7 @@ function set_language(lang)
     end
     if lang and type(lang) == 'string' and (lang == 'english' or lang == 'japanese') then
         rawset(_G,'language',lang)
+        refresh_globals()
     else
         error('\nGearSwap: set_language() was passed an invalid value ('..tostring(lang)..'). (must be a string)', 2)
     end
