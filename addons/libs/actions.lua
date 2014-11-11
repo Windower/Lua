@@ -94,6 +94,18 @@ function actionpacket:get_category_string()
     return category_strings[self.raw['category']]
 end
 
+function actionpacket:get_spell()
+    local info = self:get_targets()():get_actions()():get_basic_info()
+    if rawget(info,'resource') and rawget(info,'spell_id') and rawget(rawget(res,rawget(info,'resource')),rawget(info,'spell_id')) then
+        local copied_line = {}
+        for i,v in pairs(rawget(rawget(res,rawget(info,'resource')),rawget(info,'spell_id'))) do
+            rawset(copied_line,i,v)
+        end
+        setmetatable(copied_line,getmetatable(res[rawget(info,'resource')][rawget(info,'spell_id')]))
+        return copied_line
+    end
+end
+
 -- Returns the name of this actor if there is one
 function actionpacket:get_actor_name()
     local mob = windower.ffxi.get_mob_by_id(self.raw['actor_id'])
@@ -306,8 +318,8 @@ function action:get_spell()
     
     local function fieldsearch(message_id)
         if not res.action_messages[message_id] then return false end
-        local fields = T{}
-        res.action_messages[message_id].english:gsub("{(.-)}", function(a) if a ~= '${actor}' and a ~= '${target}' then fields:append(a) end end)
+        local fields = {}
+        res.action_messages[message_id].english:gsub("${(.-)}", function(a) if a ~= 'actor' and a ~= 'target' and a ~= 'lb' then rawset(fields,a,true) end end)
         return fields
     end
     
@@ -317,6 +329,7 @@ function action:get_spell()
     local spell_id = rawget(begin_categories, category) and rawget(rawget(self, 'raw'), 'param') or
         rawget(finish_categories, category) and rawget(rawget(self, 'raw'), 'top_level_param')
     local interruption = rawget(begin_categories, category) and rawget(rawget(self, 'raw'), 'top_level_param') == 28787
+    if interruption == nil then interruption = false end
     local message = rawget(rawget(self,'raw'),'message')
     
     local msg_id_to_unit_map = {
@@ -407,7 +420,7 @@ function action:get_spell()
             }
         -- If there is a message, interpret the fields.
         resource = msgID_to_res_map[message_id] or fields.spell and 'spells' or
-            fields.weapon_skill and 'weapon_skills' or fields.job_ability and 'job_abilities' or
+            fields.weapon_skill and 'weapon_skills' or fields.ability and 'job_abilities' or
             fields.item and 'items' or rawget(cat_to_res_map,category)
         local msgID_to_value_map = {
             [240] = 43, -- Hide
