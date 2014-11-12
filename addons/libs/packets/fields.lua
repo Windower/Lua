@@ -587,26 +587,26 @@ fields.outgoing[0x083] = L{
 -- Also sent automatically when finalizing a sale, immediately preceeding packet 0x085
 fields.outgoing[0x084] = L{
     {ctype='unsigned int',      label='Count'},                                 -- 04
-    {ctype='unsigned short',    label='Item',                   fn=item},       -- 08
-    {ctype='unsigned char',     label='Inventory Index',        fn=inv+{0}},    -- 09   Inventory index of the same item
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 08
+    {ctype='unsigned char',     label='Inventory Index',    fn=inv+{0}},        -- 09   Inventory index of the same item
     {ctype='unsigned char',     label='_unknown3'},                             -- 0A   Always 0? Likely padding
 }
 
 -- NPC Sell confirm
 -- Sent when confirming a sell of an item to an NPC
 fields.outgoing[0x085] = L{
-    {ctype='unsigned int',      label='_unknown1',              const=1},       -- 04   Always 1? Possibly a type
+    {ctype='unsigned int',      label='_unknown1',          const=1},           -- 04   Always 1? Possibly a type
 }
 
 -- Synth
 fields.outgoing[0x096] = L{
     {ctype='unsigned char',     label='_unknown1'},                             -- 04   Crystal ID? Earth = 0x02, Wind-break = 0x19?, Wind no-break = 0x2D?
     {ctype='unsigned char',     label='_unknown2'},                             -- 05
-    {ctype='unsigned short',    label='Crystal',                fn=item},       -- 06
-    {ctype='unsigned char',     label='Crystal Index',          fn=inv+{0}},    -- 08
+    {ctype='unsigned short',    label='Crystal',            fn=item},           -- 06
+    {ctype='unsigned char',     label='Crystal Index',      fn=inv+{0}},        -- 08
     {ctype='unsigned char',     label='Ingredient count'},                      -- 09
-    {ctype='unsigned short[8]', label='Ingredient',             fn=item},       -- 0A
-    {ctype='unsigned char[8]',  label='Ingredient Index',       fn=inv+{0}},    -- 1A
+    {ctype='unsigned short[8]', label='Ingredient',         fn=item},           -- 0A
+    {ctype='unsigned char[8]',  label='Ingredient Index',   fn=inv+{0}},        -- 1A
     {ctype='unsigned short',    label='_junk1'},                                -- 22
 }
 
@@ -630,16 +630,16 @@ fields.outgoing[0x0A2] = L{
 
 -- Speech
 fields.outgoing[0x0B5] = L{
-    {ctype='unsigned char',     label='Mode'},                                  -- 04   05 for LS chat?
-    {ctype='unsigned char',     label='GM'},                                    -- 05   01 for GM
-    {ctype='char[255]',         label='Message'},                               -- 06   Message, occasionally terminated by spare 00 bytes.
+    {ctype='unsigned char',     label='Mode',               fn=chat},           -- 04
+    {ctype='unsigned char',     label='GM',                 fn=bool},           -- 05
+    {ctype='char*',             label='Message'},                               -- 06
 }
 
 -- Tell
 fields.outgoing[0x0B6] = L{
     {ctype='unsigned char',     label='_unknown1',          const=0x00},        -- 04   00 for a normal tell -- Varying this does nothing.
-    {ctype='char[15]',          label='Target Name'},                           -- 05   Name of the person to send a tell to
-    {ctype='char*',             label='Message'},                               -- 14   Message, occasionally terminated by spare 00 bytes.
+    {ctype='char[15]',          label='Target Name'},                           -- 05
+    {ctype='char*',             label='Message'},                               -- 14
 }
 
 -- Merit Point Increase
@@ -2492,7 +2492,7 @@ fields.incoming[0x112] = L{
     {ctype='unsigned int',      label='Order'},                                 -- 84   0,1,2,3
 }
 
---Currency Info
+--Currency Info (Currencies I)
 fields.incoming[0x113] = L{
     {ctype='signed int',        label='Conquest Points (San d\'Oria)'},         -- 04
     {ctype='signed int',        label='Conquest Points (Bastok)'},              -- 08
@@ -2528,12 +2528,12 @@ fields.incoming[0x113] = L{
     {ctype='unsigned short',    label='Chocobucks (San d\'Oria)'},              -- 58
     {ctype='unsigned short',    label='Chocobucks (Bastok)'},                   -- 5A
     {ctype='unsigned short',    label='Chocobucks (Windurst)'},                 -- 5C
-    {ctype='short',             label='_unknown1'},                             -- 5E
+    {ctype='unsigned short',    label='Daily Tally'},                           -- 5E
     {ctype='signed int',        label='Research Marks'},                        -- 60
     {ctype='unsigned char',     label='Wizened Tunnel Worms'},                  -- 64
     {ctype='unsigned char',     label='Wizened Morion Worms'},                  -- 65
     {ctype='unsigned char',     label='Wizened Phantom Worms'},                 -- 66
-    {ctype='char',              label='_unknown2'},                             -- 67
+    {ctype='char',              label='_unknown1'},                             -- 67   Currently holds no value
     {ctype='signed int',        label='Moblin Marbles'},                        -- 68
     {ctype='unsigned short',    label='Infamy'},                                -- 6C
     {ctype='unsigned short',    label='Prestige'},                              -- 6E
@@ -2551,31 +2551,23 @@ fields.incoming[0x113] = L{
     {ctype='signed int',        label='Jettons'},                               -- 9C
     {ctype='signed int',        label='Therion Ichor'},                         -- A0
     {ctype='signed int',        label='Allied Notes'},                          -- A4
-    {ctype='signed int',        label='Bayld'},                                 -- A8
-    {ctype='unsigned short',    label='Kinetic Units'},                         -- AC
-    {ctype='short',             label='_unknown3'},                             -- AE
-    {ctype='unsigned short',    label='Obsidian Fragments'},                    -- B0
-    {ctype='short',             label='_unknown4'},                             -- B2
-    {ctype='signed int',        label='Lebondopt Wings'},                       -- B4
-    {ctype='signed int',        label='Mweya Plasm Corpuscles'},                -- B8
-    {ctype='signed int',        label='Cruor'},                                 -- BC
-    {ctype='signed int',        label='Resistance Credits'},                    -- C0
-    {ctype='signed int',        label='Dominion Notes'},                        -- C4
-    {ctype='unsigned char',     label='5th Echelon Battle Trophies'},           -- C8
-    {ctype='unsigned char',     label='4th Echelon Battle Trophies'},           -- C9
-    {ctype='unsigned char',     label='3rd Echelon Battle Trophies'},           -- CA
-    {ctype='unsigned char',     label='2nd Echelon Battle Trophies'},           -- CB
-    {ctype='unsigned char',     label='1st Echelon Battle Trophies'},           -- CC
-    {ctype='unsigned char',     label='Cave Conservation Points'},              -- CD
-    {ctype='unsigned char',     label='Imperial Army ID Tags'},                 -- CE
-    {ctype='unsigned char',     label='Op Credits'},                            -- CF
-    {ctype='signed int',        label='Traverser Stones'},                      -- D0
-    {ctype='signed int',        label='Voidstones'},                            -- D4
-    {ctype='signed int',        label='Kupofried\'s Corundums'},                -- D8
-    {ctype='unsigned char',     label='Coalition Imprimaturs'},                 -- DC
-    {ctype='unsigned char',     label='Moblin Pheromone Sacks'},                -- DD
-    {ctype='short',             label='_unknown5'},                             -- DE
-    {ctype='int',               label='_unknown6'},                             -- F0
+    {ctype='unsigned short',    label='A.M.A.N. Vouchers Stored'},              -- A8
+    {ctype='unsigned short',    label='Unity Accolades'},                       -- AA
+    {ctype='signed int',        label='Cruor'},                                 -- AC
+    {ctype='signed int',        label='Resistance Credits'},                    -- B0
+    {ctype='signed int',        label='Dominion Notes'},                        -- B4
+    {ctype='unsigned char',     label='5th Echelon Battle Trophies'},           -- B8
+    {ctype='unsigned char',     label='4th Echelon Battle Trophies'},           -- B9
+    {ctype='unsigned char',     label='3rd Echelon Battle Trophies'},           -- BA
+    {ctype='unsigned char',     label='2nd Echelon Battle Trophies'},           -- BB
+    {ctype='unsigned char',     label='1st Echelon Battle Trophies'},           -- BC
+    {ctype='unsigned char',     label='Cave Conservation Points'},              -- BD
+    {ctype='unsigned char',     label='Imperial Army ID Tags'},                 -- BE
+    {ctype='unsigned char',     label='Op Credits'},                            -- BF
+    {ctype='signed int',        label='Traverser Stones'},                      -- C0
+    {ctype='signed int',        label='Voidstones'},                            -- C4
+    {ctype='signed int',        label='Kupofried\'s Corundums'},                -- C8
+    {ctype='unsigned char',     label='Moblin Pheromone Sacks'},                -- CC
 }
 
 -- Fish Bite Info
@@ -2612,6 +2604,52 @@ fields.incoming[0x117] = function(data)
         {ref=types.equipset,        lookup={res.slots, 0x00},   count=0x10},        -- 48
     }
 end
+
+-- Currency Info (Currencies2)
+fields.incoming[0x118] = L{
+    {ctype='signed int',        label='Bayld'},                                     -- 04
+    {ctype='unsigned short',    label='Kinetic Units'},                             -- 08
+    {ctype='unsigned char',     label='Coalition Imprimaturs'},                     -- 0A
+    {ctype='unsigned char',     label='_unknown1'},                                 -- 0B   Currently holds no value
+    {ctype='signed int',        label='Obsidian Fragments'},                        -- 0C
+    {ctype='unsigned short',    label='Lebondopt Wings Stored'},                    -- 10
+    {ctype='unsigned short',    label='Pulchridopt Wings Stored'},                  -- 12
+    {ctype='signed int',        label='Mweya Plasm Corpuscles'},                    -- 14
+    {ctype='unsigned char',     label='Ghastly Stones Stored'},                     -- 18
+    {ctype='unsigned char',     label='Ghastly Stones +1 Stored'},                  -- 19
+    {ctype='unsigned char',     label='Ghastly Stones +2 Stored'},                  -- 1A
+    {ctype='unsigned char',     label='Verdigris Stones Stored'},                   -- 1B
+    {ctype='unsigned char',     label='Verdigris Stones +1 Stored'},                -- 1C
+    {ctype='unsigned char',     label='Verdigris Stones +2 Stored'},                -- 1D
+    {ctype='unsigned char',     label='Wailing Stones Stored'},                     -- 1E
+    {ctype='unsigned char',     label='Wailing Stones +1 Stored'},                  -- 1F
+    {ctype='unsigned char',     label='Wailing Stones +2 Stored'},                  -- 20
+    {ctype='unsigned char',     label='Snowslit Stones Stored'},                    -- 21
+    {ctype='unsigned char',     label='Snowslit Stones +1 Stored'},                 -- 22
+    {ctype='unsigned char',     label='Snowslit Stones +2 Stored'},                 -- 23
+    {ctype='unsigned char',     label='Snowtip Stones Stored'},                     -- 24
+    {ctype='unsigned char',     label='Snowtip Stones +1 Stored'},                  -- 25
+    {ctype='unsigned char',     label='Snowtip Stones +2 Stored'},                  -- 26
+    {ctype='unsigned char',     label='Snowdim Stones Stored'},                     -- 27
+    {ctype='unsigned char',     label='Snowdim Stones +1 Stored'},                  -- 28
+    {ctype='unsigned char',     label='Snowdim Stones +2 Stored'},                  -- 29
+    {ctype='unsigned char',     label='Snoworb Stones Stored'},                     -- 2A
+    {ctype='unsigned char',     label='Snoworb Stones +1 Stored'},                  -- 2B
+    {ctype='unsigned char',     label='Snoworb Stones +2 Stored'},                  -- 2C
+    {ctype='unsigned char',     label='Leafslit Stones Stored'},                    -- 2D
+    {ctype='unsigned char',     label='Leafslit Stones +1 Stored'},                 -- 2E
+    {ctype='unsigned char',     label='Leafslit Stones +2 Stored'},                 -- 2F
+    {ctype='unsigned char',     label='Leaftip Stones Stored'},                     -- 30
+    {ctype='unsigned char',     label='Leaftip Stones +1 Stored'},                  -- 31
+    {ctype='unsigned char',     label='Leaftip Stones +2 Stored'},                  -- 32
+    {ctype='unsigned char',     label='Leafdim Stones Stored'},                     -- 33
+    {ctype='unsigned char',     label='Leafdim Stones +1 Stored'},                  -- 34
+    {ctype='unsigned char',     label='Leafdim Stones +2 Stored'},                  -- 35
+    {ctype='unsigned char',     label='Leaforb Stones Stored'},                     -- 36
+    {ctype='unsigned char',     label='Leaforb Stones +1 Stored'},                  -- 37
+    {ctype='unsigned char',     label='Leaforb Stones +2 Stored'},                  -- 38
+    {ctype='data[0x0F]',        label='_unknown2'},                                 -- 39   Room for future additions, currently holds no value
+}
 
 local sizes = {}
 sizes['bool'] = 1
