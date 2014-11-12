@@ -64,6 +64,7 @@ Here are the available values:
 
 
 Version History:
+0.141111 - Adjusted Pointwatch to account for a recent packet change.
 0.141101 - Reversed my versioning scheme, adjusted the limit point and experience point calculations slightly.
 0.101214 - Made pointwatch hide itself while zoning.
 0.062014 - Added lp.maximum_merits.
