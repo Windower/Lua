@@ -103,9 +103,9 @@ pass_through_targs = {['<t>']=true,['<me>']=true,['<ft>']=true,['<scan>']=true,[
     ['<stnpc>']=true,['<stal>']=true,['<stpc>']=true,['<stpt>']=true}
 
 avatar_element = {Ifrit=0,Titan=3,Leviathan=5,Garuda=2,Shiva=1,Ramuh=4,Carbuncle=6,
-    Diabolos=7,Fenrir=7,['Cait Sith']=6,['Fire Elemental']=0,['Earth Elemental']=3,['Water Elemental']=5,
-    ['Wind Elemental']=2,['Ice Elemental']=1,['Lightning Elemental']=4,['Light Elemental']=6,
-    ['Dark Elemental']=7}
+    Diabolos=7,Fenrir=7,['Cait Sith']=6,FireSpirit=0,EarthSpirit=3,WaterSpirit=5,
+    AirSpirit=2,IceSpirit=1,ThunderSpirit=4,LightSpirit=6,
+    DarkSpirit=7}
 
 encumbrance_map = {0x79,0x7F,0x7F,0x7A,0x7B,0x7C,0x7D,0x7D,0x7A,0x7E,0x80,0x80,0x80,0x80,0x7E}
 encumbrance_map[0] = 0x79 -- Slots mapped onto encumbrance byte values.
