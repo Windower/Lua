@@ -34,7 +34,7 @@ require 'pack'
 
 _addon.name = 'PointWatch'
 _addon.author = 'Byrth'
-_addon.version = 0.141101
+_addon.version = 0.141111
 _addon.command = 'pw'
 
 settings = config.load('data\\settings.xml',default_settings)
@@ -107,7 +107,7 @@ windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blo
         lp.number_of_merits = org:byte(11)%64
         lp.maximum_merits = org:byte(0x0D)%64
     elseif id == 0x63 and org:byte(5) == 5 then
-        local offset = windower.ffxi.get_player().main_job_id*4+13 -- So WAR (ID==1) starts at byte 17
+        local offset = windower.ffxi.get_player().main_job_id*6+13 -- So WAR (ID==1) starts at byte 19
         cp.current = org:unpack('H',offset)
         cp.number_of_job_points = org:byte(offset+2)
     elseif id == 0x110 then
