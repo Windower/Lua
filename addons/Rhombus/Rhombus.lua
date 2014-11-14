@@ -1,4 +1,4 @@
---[[Copyright © 2014, trv
+--[[Copyright Â© 2014, trv
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -24,7 +24,6 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
-
 _addon.name = 'Rhombus'
 _addon.author = 'trv'
 _addon.version = '1.0.0'
@@ -49,7 +48,7 @@ _defaults = config.load(defaults)
 x_offset = _defaults.x_offset
 y_offset = _defaults.y_offset
 
-aseqqqarzfd = texts.new('${menu_text}', {
+display_text = texts.new('${menu_text}', {
     pos = {
         x = 95 + x_offset,
         y = 0 + y_offset,
@@ -70,6 +69,7 @@ aseqqqarzfd = texts.new('${menu_text}', {
         blue = 255,
     },
 })
+
 menu_icon = texts.new('v', {
     pos = {
         x = -12 + x_offset,
@@ -366,7 +366,7 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
         if drag_and_drop then
             x_offset = x-drag_and_drop.x
             y_offset = y-drag_and_drop.y
-            aseqqqarzfd:pos(x_offset+95,y_offset)
+            display_text:pos(x_offset+95,y_offset)
             menu_icon:pos(x_offset-12,y_offset-22)
             selector_pos.x = x_offset+102
             windower.prim.set_position('menu_backdrop',selector_pos.x,y-drag_and_drop.y)
@@ -410,8 +410,8 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
                     end
                 end
             end
-        elseif is_menu_open and (x >= aseqqqarzfd:pos_x() and x <= aseqqqarzfd:pos_x() + 150) then
-            local _,_y = aseqqqarzfd:extents()
+        elseif is_menu_open and (x >= display_text:pos_x() and x <= display_text:pos_x() + 150) then
+            local _,_y = display_text:extents()
             if y <= y_offset or y >= y_offset + _y then return end
             local y_17 = math.ceil((y-y_offset)/font_height_est)
             if (y_17) ~= selector_pos.y then
@@ -449,8 +449,8 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
                 end
                 return true
             end
-        elseif is_menu_open and x >= aseqqqarzfd:pos_x() and x <= aseqqqarzfd:pos_x() + 150 then
-            local _,_y = aseqqqarzfd:extents()
+        elseif is_menu_open and x >= display_text:pos_x() and x <= display_text:pos_x() + 150 then
+            local _,_y = display_text:extents()
             if y <= y_offset or y >= y_offset + _y then return end
             
             local y_17 = math.ceil((y-y_offset)/font_height_est + menu_start - 1)
@@ -479,19 +479,19 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
         end
     elseif type == 10 then
         if is_menu_open and menu_list.n > 12
-            and x >= aseqqqarzfd:pos_x() and x<= aseqqqarzfd:pos_x() + 150
-            and y >= aseqqqarzfd:pos_y() and y <= aseqqqarzfd:pos_y() + 12 * font_height_est then
+            and x >= display_text:pos_x() and x<= display_text:pos_x() + 150
+            and y >= display_text:pos_y() and y <= display_text:pos_y() + 12 * font_height_est then
 
             menu_start = menu_start - delta
             if menu_start < 1 then menu_start = 1 end
             if menu_start + 11 > menu_list.n then menu_start = menu_list.n - 11 end
-            aseqqqarzfd.menu_text=menu_list:concat('\n',menu_start,menu_start+11)
+            display_text.menu_text=menu_list:concat('\n',menu_start,menu_start+11)
             windower.prim.set_position('scroll_bar',selector_pos.x + 150,y_offset + ((12 * font_height_est * (1 - 12 / menu_list.n)) / (menu_list.n - 12)) * (menu_start - 1))
             return true
         end
     elseif type == 4 then
-        if is_menu_open and x >= aseqqqarzfd:pos_x() and x <= aseqqqarzfd:pos_x() + 150 then
-            local _,_y = aseqqqarzfd:extents()
+        if is_menu_open and x >= display_text:pos_x() and x <= display_text:pos_x() + 150 then
+            local _,_y = display_text:extents()
             if y <= y_offset or y >= y_offset + font_height_est * 12 then return end
             if menu_layer_record.n == 0 then
                 close_a_menu()
@@ -614,12 +614,12 @@ function build_a_menu(t)
         else
             windower.prim.set_visibility('scroll_bar',false)
         end
-        aseqqqarzfd.menu_text=menu_list:concat('\n',1,12)
+        display_text.menu_text=menu_list:concat('\n',1,12)
         windower.prim.set_visibility('menu_backdrop',true)
         selector_pos.y = y_offset
         windower.prim.set_position('selector_rectangle',selector_pos.x,selector_pos.y)
         windower.prim.set_visibility('selector_rectangle',true)
-        aseqqqarzfd:show()
+        display_text:show()
     end
 end
 
@@ -629,7 +629,7 @@ function close_a_menu()
     windower.prim.set_visibility('scroll_bar',false)
     windower.prim.set_visibility('menu_backdrop',false)
     windower.prim.set_visibility('selector_rectangle',false)
-    aseqqqarzfd:hide()
+    display_text:hide()
 end
 
 function open_previous_menu()
