@@ -300,6 +300,13 @@
 	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
+    <name>Rhombus</name>
+    <description>Creates a highly customizable, click-able, on-screen menu.</description>
+    <author>trv</author>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
+    <bugtracker>https://github.com/trv6/Lua/issues</bugtracker>
+  </addon>
+  <addon>
     <name>RollTracker</name>
     <author>Balloon</author>
     <description>Simplifies Cor rolls, tells you the bonus they give, stops you from doubling up on lucky rolls and reports your chance to bust.</description>
