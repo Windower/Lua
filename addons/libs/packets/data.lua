@@ -91,6 +91,9 @@ data.outgoing[0x10F] = {name='Currency Menu',       description='Requests curren
 data.outgoing[0x110] = {name='Fishing Action',      description='Sent when casting, releasing a fish, catching a fish, and putting away your fishing rod.'}
 data.outgoing[0x111] = {name='Lockstyle',           description='Sent when using the lockstyle command to lock or unlock.'}
 data.outgoing[0x112] = {name='RoE Log Request',     description='Sent when zoning. Requests the ROE quest log.'}
+data.outgoing[0x116] = {name='Unity Menu',          description='Sent when opening the Status/Unity menu.'}
+data.outgoing[0x117] = {name='Unity Ranking Menu',  description='Sent when opening the Status/Unity/Unity Ranking menu.'}
+data.outgoing[0x118] = {name='Unity Chat Status',   description='Sent when changing unity chat status.'}
 
 -- Server packets (incoming)
 data.incoming[0x009] = {name='Standard Message',    description='A standardized message send from FFXI.'}
