@@ -162,7 +162,7 @@ local dict = {
     {en="What's next?",ja="つぎわなんですか"},
     {en="What's that called in Japanese?",ja="あれは日本語で何といいますか"},
     {en="What's your job?",ja="どんなジョブをしているの"},
-    {en="Where?"",ja="どこ"},
+    {en="Where?",ja="どこ"},
     {en="Where are you?",ja="どこにいますか"},
     {en="When?",ja="いつ"},
     {en="Which?",ja="どんな"},
