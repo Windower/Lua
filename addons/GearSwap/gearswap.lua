@@ -215,14 +215,16 @@ windower.register_event('addon command',function (...)
 end)
 
 function disenable(tab,funct,functname,pol)
+    local slot_name = ''
     if tab[2] and tab[2]:lower()=='all' then
         funct('main','sub','range','ammo','head','neck','lear','rear','body','hands','lring','rring','back','waist','legs','feet')
         print('GearSwap: All slots '..functname..'d.')
     elseif tab[2]  then
         for i=2,#tab do
-            if slot_map[tab[i]:gsub('[^%a_%d]',''):lower()] then
-                funct(tab[i]:gsub('[^%a_%d]',''):lower())
-                print('GearSwap: '..tab[i]:gsub('[^%a_%d]',''):lower()..' slot '..functname..'d.')
+            slot_name, _ = tab[i]:gsub('[^%a_%d]',''):lower()
+            if slot_map[slot_name] then
+                funct(slot_name)
+                print('GearSwap: '..slot_name..' slot '..functname..'d.')
             else
                 print('GearSwap: Unable to find slot '..tostring(tab[i])..'.')
             end
