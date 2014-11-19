@@ -221,7 +221,7 @@ function disenable(tab,funct,functname,pol)
         print('GearSwap: All slots '..functname..'d.')
     elseif tab[2]  then
         for i=2,#tab do
-            slot_name, _ = tab[i]:gsub('[^%a_%d]',''):lower()
+            slot_name = tab[i]:gsub('[^%a_%d]',''):lower()
             if slot_map[slot_name] then
                 funct(slot_name)
                 print('GearSwap: '..slot_name..' slot '..functname..'d.')
