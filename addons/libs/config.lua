@@ -306,7 +306,7 @@ function settings_table(node, settings, key, meta)
             else
                 childdict = settings
             end
-            t[child.name:lower()] = settings_table(child, childdict, key)
+            t[child.name:lower()] = settings_table(child, childdict, key, meta)
         end
     end
 
