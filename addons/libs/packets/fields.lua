@@ -873,6 +873,23 @@ fields.outgoing[0x112] = L{
     {ctype='int',               label='_unknown1'},                             -- 04
 }
 
+-- Open Unity Menu :: Two of these are sent whenever I open my unity menu. The first one has a bool of 0 and the second of 1.
+fields.outgoing[0x116] = L{
+    {ctype='bool',              label='_unknown1'},                             -- 04
+    {ctype='char[3]',           label='_unknown2'},                             -- 05   
+}
+
+-- Unity Ranking Results  :: Sent when I open my Unity Ranking Results menu. Triggers a Sparks Update packet and may trigger ranking packets that I could not record.
+fields.outgoing[0x117] = L{
+    {ctype='int',               label='_unknown2'},                             -- 04
+}
+
+-- Open Chat status
+fields.outgoing[0x118] = L{
+    {ctype='bool',              label='Chat Status'},                           -- 04   0 for Inactive and 1 for Active
+    {ctype='char[3]',           label='_unknown2'},                             -- 05   
+}
+
 types.job_level = L{
     {ctype='unsigned char',     label='Level'},                                 -- 00
 }
@@ -2470,6 +2487,9 @@ fields.incoming[0x10B] = L{
 fields.incoming[0x110] = L{
     {ctype='unsigned short',    label='Sparks Total'},                          -- 04
     {ctype='unsigned short',    label='_unknown1'},                             -- 06   Sparks are currently capped at 50,000
+    {ctype='unsigned char',     label='Unity (Shared) designator'},             -- 08   Unity (Shared) designator (0=A, 1=B, 2=C, etc.)
+    {ctype='unsigned char',     label='Unity (Person) designator '},            -- 09   The game does not distinguish these
+    {ctype='char[6]',           label='_unknown2'},                             -- 0A   Currently all 0xFF'd, never seen it change.
 }
 
 types.roe_quest = L{

@@ -1,4 +1,4 @@
---Copyright (c) 2013, Byrthnoth
+--Copyright (c) 2014, Byrthnoth
 --All rights reserved.
 
 --Redistribution and use in source and binary forms, with or without
@@ -163,4 +163,45 @@ function to_roman(num)
 	end
 	
 	return retstr
+end
+
+
+-----------------------------------------------------------------------------------
+--Name: check_usability()
+--Args:
+---- player (table): get_player() table
+---- resource (string): name of the resource to be examined
+---- id (num): ID of the spell/ability of interest
+-----------------------------------------------------------------------------------
+--Returns:
+---- boolean : true indicates that the spell/ability is known to you and false indicates that it is not.
+-----------------------------------------------------------------------------------
+function check_usability(player,resource,id)
+    if resource == 'spells' and ( (res.spells[id].levels[player.main_job_id] and res.spells[id].levels[player.main_job_id] <= player.main_job_level) or
+      (res.spells[id].levels[player.sub_job_id] and res.spells[id].levels[player.sub_job_id] <= player.sub_job_level) ) then -- Should check to see if you know the spell
+        return true
+    elseif L(windower.ffxi.get_abilities()[resource] or {}):contains(id) then
+        return true
+    elseif resource == 'monster_abilities' and player.main_job_id == 23 and (res.monstrosity[player.get_mjob_data().species].tp_moves[id] or 0) <= player.main_job_level then
+        return true
+    end
+end
+
+
+-----------------------------------------------------------------------------------
+--Name: debug_chat()
+--Args:
+---- str (string): string to be printed to the log
+-----------------------------------------------------------------------------------
+--Returns:
+---- None
+-----------------------------------------------------------------------------------
+function debug_chat(str)
+    if not debugging then return end
+    
+    if tostring(str) then
+        windower.add_to_chat(8,str)
+    else
+        error('Debug chat is not a string',2)
+    end
 end
