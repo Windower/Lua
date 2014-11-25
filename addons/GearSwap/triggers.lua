@@ -88,27 +88,27 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
                         
             if unified_prefix == '/ma' then
                 r_line = copy_entry(res.spells[validabils[language][unified_prefix][abil]])
-                storedcommand = command..' "'..r_line[language]..'" '
+                storedcommand = command..' "'..windower.to_shift_jis(r_line[language])..'" '
             elseif unified_prefix == '/ms' and find_monster_ability(abil) then
                 r_line = find_monster_ability(abil)
-                storedcommand = command..' "'..r_line[language]..'" '
+                storedcommand = command..' "'..windower.to_shift_jis(r_line[language])..'" '
             elseif unified_prefix == '/ws' then
                 r_line = copy_entry(res.weapon_skills[validabils[language][unified_prefix][abil]])
-                storedcommand = command..' "'..r_line[language]..'" '
+                storedcommand = command..' "'..windower.to_shift_jis(r_line[language])..'" '
             elseif unified_prefix == '/ja' then
                 r_line = copy_entry(res.job_abilities[validabils[language][unified_prefix][abil]])
-                storedcommand = command..' "'..r_line[language]..'" '
+                storedcommand = command..' "'..windower.to_shift_jis(r_line[language])..'" '
             elseif unified_prefix == '/item' then
                 r_line = copy_entry(res.items[validabils[language][unified_prefix][abil]])
                 r_line.prefix = '/item'
                 r_line.type = 'Item'
-                storedcommand = command..' "'..r_line[language]..'" '
+                storedcommand = command..' "'..windower.to_shift_jis(r_line[language])..'" '
             elseif unified_prefix == '/ra' then
                 r_line = copy_entry(resources_ranged_attack)
                 storedcommand = command..' '
             end
             
-            r_line.name = r_line[language]
+            r_line.name = windower.to_shift_jis(r_line[language])
             spell = spell_complete(r_line)
             spell.target = temp_mob_arr
             spell.action_type = action_type_map[command]
