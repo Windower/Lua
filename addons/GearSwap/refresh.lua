@@ -330,6 +330,12 @@ function refresh_player(dt,user_event_flag)
                     player.species[i] = v
                 end
             end
+            player.species.tp_moves = copy_entry(res.monstrosity[species_id].tp_moves)
+            for i,v in pairs(player.species.tp_moves) do
+                if v > player.main_job_level then
+                    player.species.tp_moves[i] = nil
+                end
+            end
         end
     else
         player.species = nil

@@ -633,7 +633,9 @@ function filter_pretarget(spell)
             debug_mode_chat("Unable to execute command. You do not have access to that ability ("..(res.job_abilities[spell.id][language] or spell.id)..")")
             return false
         end
-    elseif category == 25 and (not player.main_job_id == 23 or not player.species or not player.species.tp_moves[spell.id] or not (player.species.tp_moves[spell.id] <= player.main_job_level)) then
+    elseif category == 25 and (not player.main_job_id == 23 or not windower.ffxi.get_mjob_data().species or
+        not res.monstrosity[windower.ffxi.get_mjob_data().species] or not res.monstrosity[windower.ffxi.get_mjob_data().species].tp_moves[spell.id] or
+        not (res.monstrosity[windower.ffxi.get_mjob_data().species].tp_moves[spell.id] <= player.main_job_level)) then
         -- Monstrosity filtering
         debug_mode_chat("Unable to execute command. You do not have access to that monsterskill ("..(res.monster_abilities[spell.id][language] or spell.id)..")")
         return false
