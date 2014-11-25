@@ -382,7 +382,12 @@ function interp_text(splitline,offset,modified)
             targets.Party = true -- Pianissimo
         end
         
-        lastsent = r_line.prefix..' "'..r_line.english..'" '..(temptarg or target_make(targets))
+        local abil_name = r_line.english
+        while abil_name:sub(-1) == ' ' do
+            abil_name = abil_name:sub(1,-2)
+        end
+        
+        lastsent = r_line.prefix..' "'..abil_name..'" '..(temptarg or target_make(targets))
         if logging then
             logfile:write('\n\n',tostring(os.clock()),'Original: ',table.concat(splitline,' '),'\n(180) ',lastsent)
             logfile:flush()
