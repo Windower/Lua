@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.893'
+_addon.version = '0.894'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -264,18 +264,24 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
     if injected then
     elseif id == 0x00A then
         windower.debug('zone change')
-        player.name = data:unpack('z',0x85)
+        command_registry = {}
+        table.clear(not_sent_out_equip)
+        
         player.id = data:unpack('I',0x05)
         player.index = data:unpack('H',0x09)
-        player.main_job = data:byte(0xB5)
-        player.sub_job = data:byte(0xB8)
+        if player.main_job_id and player.main_job_id ~= data:byte(0xB5) and player.name and player.name == data:unpack('z',0x85) then
+            windower.debug('job change on zone')
+            load_user_files(data:byte(0xB5))
+        else
+            player.name = data:unpack('z',0x85)
+        end
+        player.main_job_id = data:byte(0xB5)
+        player.sub_job_id = data:byte(0xB8)
         player.vitals.max_hp = data:unpack('I',0xE9)
         player.vitals.max_mp = data:unpack('I',0xED)
         update_job_names()
         
         world.zone_id = data:unpack('H',0x31)
-        not_sent_out_equip = {}
-        command_registry = {}
         _ExtraData.world.conquest = false
         for i,v in pairs(region_to_zone_map) do
             if v:contains(world.zone_id) then

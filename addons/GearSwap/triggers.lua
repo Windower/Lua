@@ -68,42 +68,47 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
             st_flag = nil
             return true
         elseif temp_mob_arr then
-            logit('\n\n'..tostring(os.clock)..'(93) temp_mod: '..tostring(temp_mod))
             refresh_globals()
             
-            local r_line
+            local r_line, find_monster_ability
             
-            if unified_prefix == '/ma' then
-                r_line = copy_entry(res.spells[validabils[language][unified_prefix][abil]])
-                storedcommand = command..' "'..r_line[language]..'" '
-            elseif unified_prefix == '/ms' then
-                if player.species then
+            function find_monster_ability(abil)
+                local line = false
+                if player.species and player.species.tp_moves then
                     -- Iterates over currently available monster TP moves instead of using validabils
                     for i,v in pairs(player.species.tp_moves) do
                         if res.monster_abilities[i][language]:lower() == abil then
-                            r_line = copy_entry(res.monster_abilities[i])
+                            line = copy_entry(res.monster_abilities[i])
                             break
                         end
                     end
                 end
-                storedcommand = command..' "'..r_line[language]..'" '
+                return line
+            end
+                        
+            if unified_prefix == '/ma' then
+                r_line = copy_entry(res.spells[validabils[language][unified_prefix][abil]])
+                storedcommand = command..' "'..windower.to_shift_jis(r_line[language])..'" '
+            elseif unified_prefix == '/ms' and find_monster_ability(abil) then
+                r_line = find_monster_ability(abil)
+                storedcommand = command..' "'..windower.to_shift_jis(r_line[language])..'" '
             elseif unified_prefix == '/ws' then
                 r_line = copy_entry(res.weapon_skills[validabils[language][unified_prefix][abil]])
-                storedcommand = command..' "'..r_line[language]..'" '
+                storedcommand = command..' "'..windower.to_shift_jis(r_line[language])..'" '
             elseif unified_prefix == '/ja' then
                 r_line = copy_entry(res.job_abilities[validabils[language][unified_prefix][abil]])
-                storedcommand = command..' "'..r_line[language]..'" '
+                storedcommand = command..' "'..windower.to_shift_jis(r_line[language])..'" '
             elseif unified_prefix == '/item' then
                 r_line = copy_entry(res.items[validabils[language][unified_prefix][abil]])
                 r_line.prefix = '/item'
                 r_line.type = 'Item'
-                storedcommand = command..' "'..r_line[language]..'" '
+                storedcommand = command..' "'..windower.to_shift_jis(r_line[language])..'" '
             elseif unified_prefix == '/ra' then
                 r_line = copy_entry(resources_ranged_attack)
                 storedcommand = command..' '
             end
             
-            r_line.name = r_line[language]
+            r_line.name = windower.to_shift_jis(r_line[language])
             spell = spell_complete(r_line)
             spell.target = temp_mob_arr
             spell.action_type = action_type_map[command]

@@ -93,83 +93,81 @@ local dict = {
     {en="Yes, I'm coming",ja="はい行きます"},
     {en="Yes, that's right",ja="はいそうです"},
     
---[[Casual Chat:
-Brb, I'm Going to the Store || riseki, konbini de ikimasu || りせき、コンビニで行きます
-Dont Be Late || chikoku shinaide || ちこくしないで
-Don't Lie || uso tsukanaide || うそつかないで
-Don't Worry || goshinpai naku || ご心配なく
-Excuse Me || sumimasen || すみません！
-Good Night || oyasuminasai || おやすみなさい
-Have Fun || tanoshinde || たのしんで
-I Agree || mattakuda || まったくだ
-I Don't Know || shirimasen || 知りません
-I Don't Speak Japanese, but I'm Using an Online Translator || watashi wa nihongo o hanashimasen demo onrain yakusha o shiyo shiteimasu || 私は日本語を話しませんでもオンラ イン訳者を使用しています
-I Guess || souomoimasu || そうおもいます
-I'm Bored || taikutsushiteru || たいくつしてる
-I'm Confused || mayotteru, konnwakushiteru || まよってる、こんんわくしてる
-I'm Hungry || onakaga suita || おなかがすいた
-I'm Sleepy || nemutai || ねむたい
-I'm Sorry || gomennasai || ごめんなさい
-I'm Sorry (Sympathy) || zannen desu || ざんねんです
-I'm Sorry, I'm Still Studying JP || gomen, nihongo benkyou shimasu || ごめん、日本語勉強しますー
-I'm Sorry I Understand Now || gomen wakatta || ごめんわかった
-I Really Like It! || honto ni suki desu || ほんとに好きです
-It's Freezing || kogoesouni samui desu || こごえそうにさむいです
-It's Not Fair | fukouhei da || ふこうへいだ	
-Just Joking(jk) || jodandayo || 冗談だよ
-Laugh Out Loud(lol) || www || ｗｗｗ
-Leave Me Alone || hottoite || ほっといて
-Me Too || watashimo || 私も
-No Thanks || iie kekko desu || いいえけっこです
-Not Bad || maamaa || まあ々
-Okay || iiyo || いいよ
-Of Course || mochiron || もちろん
-Oh, I see || naru hondo || なるほんど
-One Moment Please || chotto matte kudasai || ちょっと待って下さい
-Probably || tabun || たぶん
-Sleeping || neteiru || ねている
-Wake Up || okite || おきて
-What's Up? || saikin dou desuka || 最近どうですか？
-Whoops || araara || あら々
-Yes || hai || はいー
-Your Welcome || douitashimashite || どういたしまして
+    {en="Brb, I'm going to the store",ja="りせき、コンビニで行きます"},
+    {en="Dont be late",ja="ちこくしないで"},
+    {en="Don't lie",ja="うそつかないで"},
+    {en="Don't worry",ja="ご心配なく"},
+    {en="Excuse me",ja="すみません"},
+    {en="Good night",ja="おやすみなさい"},
+    {en="Have fun",ja="たのしんで"},
+    {en="I agree",ja="まったくだ"},
+    {en="I don't know",ja="知りません"},
+    {en="I don't speak Japanese, but I'm using an online translator",ja="私は日本語を話しませんでもオンラ イン訳者を使用しています"},
+    {en="I guess",ja="そうおもいます"},
+    {en="I'm bored",ja="たいくつしてる"},
+    {en="I'm confused",ja="まよってる、こんんわくしてる"},
+    {en="I'm hungry",ja="おなかがすいた"},
+    {en="I'm sleepy",ja="ねむたい"},
+    {en="I'm sorry",ja="ごめんなさい"},
+    {en="I'm sorry (Sympathy)",ja="ざんねんです"},
+    {en="I'm sorry, I'm still studying Japanese",ja="ごめん、日本語勉強しますー"},
+    {en="I'm sorry I understand now",ja="ごめんわかった"},
+    {en="I really like it!",ja="ほんとに好きです"},
+    {en="It's freezing",ja="こごえそうにさむいです"},
+    {en="It's not fair",ja="ふこうへいだ"},
+    {en="Just kidding",ja="冗談だよ"},
+    {en="lol",ja="ｗｗｗ"},
+    {en="Leave me alone",ja="ほっといて"},
+    {en="Me too",ja="私も"},
+    {en="No thanks",ja="いいえけっこです"},
+    {en="Not bad",ja="まあ々"},
+    {en="Okay",ja="いいよ"},
+    {en="Of course",ja="もちろん"},
+    {en="Oh, I see",ja="なるほんど"},
+    {en="One moment please",ja="ちょっと待って下さい"},
+    {en="Probably",ja="たぶん"},
+    {en="Sleeping",ja="ねている"},
+    {en="Wake up",ja="おきて"},
+    {en="What's up?",ja="最近どうですか"},
+    {en="Whoops",ja="あら々"},
+    {en="Yes",ja="はいー"},
+    {en="You're welcome",ja="どういたしまして"},
 
-Other Misc/Questions:
-Any Ideas? || anata ga donna kangae o motte imasuka || あなたがどんな考えを持っていますか
-Are You Okay? | daijoubu desu ka? || 大丈夫ですか
-Can I Help You? || otetsudai shimashou ka? || お手伝いしましょうか？
-Can You Help Me? || tetsudatte kuremasu ka? || 手伝ってくれますか？
-Can You Say It Again? || mouichido itte kuremasu ka? || もういちど言ってくれますか？
-Can You Type Roman Letters? || romaji de utte moraemasu ka? || ロマジでうってもらえますか
-Do You Need It? || irimasenka || いりませんか
-Do You Understand? || wakarimasu ka? || わかりますか
-Do You Want to Party? || patei o kumimasen ka || パーティーをくみませんか
-Does Anyone Speak English? || dare ga eigo o hanashimasu ka || だれが英語を話しますか
-Don’t Be Surprised if Mistakes Are Made || machigai go attemo odorokanaide kudasai || まちがいごあってもおどろかないで下さい
-Give Me a Minute to Look That Up || douiu imi ka shiraberu kara chotto matte kudasai || どういういみかしらべるからちょっとまって下さい
-How || honoyouni || ほのように
-How Are You? || ogenki desuka || お元気ですか？
-How Do You Say ___ in JP || ___wa nihongo de nan to iimasuka || __ は日本語で何と言いますか？
-How Much is This || kore wa ikura desu ka || これはいくらですか？
-How Soon? || dono kurai suguni? || どのくらいすぐに
-I Don’t Understand JP Letters || nihongo no moji wa wakarimasen || 日本語のもじはわかりません
-I Need to Practice My Japanese || nihonngo o renshu suru hitsuyou ga arimasu || 日本語を練習する必要があります
-Linkshell || rinksheru || リンクシェル
-Look For a Replacement? || nuke tai node ho juu o sagashite kudasai? || ぬけたいのでほじゅうをさがして下さい
-My JP is Not Good || watashi no nihongo wa yokunai desu || 私の日本語はよくないです
-My Japanese is Bad || watashi no nihongo wa heta desu || 私の日本語はへたです
-Shall We Go? || ikimashou ka || 行きましょか
-What || nani || 何
-What is ___? || ___ wa nandesu ka? || ___はなんですか
-What's Next? || tsugi wa nandesu ka || つぎわなんですか
-What's That Called In Japanese? || arewa nihongo de nanto iimasu ka? || あれは日本語で何といいますか？
-What's Your Job? || donna shigoto o shiteiru no? || どんなジョブをしているの
-Where || doko || どこ
-Where Are You? || doko ni imasu ka? || どこにいますか
-When || itsu || いつ
-Which || donna || どんな
-Who || dare || だれ
-Why || naze || なぜ]]
+    {en="Any ideas?",ja="あなたがどんな考えを持っていますか"},
+    {en="Are you okay?",ja="大丈夫ですか"},
+    {en="Can I help you?",ja="お手伝いしましょうか"},
+    {en="Can you help me?",ja="手伝ってくれますか"},
+    {en="Can you say it again?",ja="もういちど言ってくれますか"},
+    {en="Can you type Roman letters?",ja="ロマジでうってもらえますか"},
+    {en="Do you need it?",ja="いりませんか"},
+    {en="Do you understand?",ja="わかりますか"},
+    {en="Do you want to party?",ja="パーティーをくみませんか"},
+    {en="Does anyone speak English?",ja="だれが英語を話しますか"},
+    {en="Don’t be surprised if mistakes are made",ja="まちがいごあってもおどろかないで下さい"},
+    {en="Give me a minute to look that up",ja="どういういみかしらべるからちょっとまって下さい"},
+    {en="How?",ja="ほのように"},
+    {en="How are you?",ja="お元気ですか"},
+--How Do You Say ___ in JP || ___wa nihongo de nan to iimasuka || __ は日本語で何と言いますか"},
+    {en="How much is this",ja="これはいくらですか"},
+    {en="How soon?",ja="どのくらいすぐに"},
+    {en="I don’t understand Japanese characters",ja="日本語のもじはわかりません"},
+    {en="I need to practice my Japanese",ja="日本語を練習する必要があります"},
+    {en="Linkshell",ja="リンクシェル"},
+    {en="Look For a replacement?",ja="ぬけたいのでほじゅうをさがして下さい"},
+    {en="My Japanese is not good",ja="私の日本語はよくないです"},
+    {en="My Japanese is bad",ja="私の日本語はへたです"},
+    {en="Shall we go?",ja="行きましょか"},
+    {en="What?",ja="何"},
+--    {en="What is ___? || ___ wa nandesu ka? || ___はなんですか"},
+    {en="What's next?",ja="つぎわなんですか"},
+    {en="What's that called in Japanese?",ja="あれは日本語で何といいますか"},
+    {en="What's your job?",ja="どんなジョブをしているの"},
+    {en="Where?",ja="どこ"},
+    {en="Where are you?",ja="どこにいますか"},
+    {en="When?",ja="いつ"},
+    {en="Which?",ja="どんな"},
+    {en="Who?",ja="だれ"},
+    {en="Why?",ja="なぜ"},
 
 --Common Areas/NMs & Events:
     {en="Promathia",ja="プロマシア"},

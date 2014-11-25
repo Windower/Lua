@@ -138,7 +138,7 @@ message_map[243] = T{278}
 message_map[2] = T{264}
 
 spike_effect_valid = {true,false,false,false,false,false,false,false,false,false,false,false,false,false,false}
-add_effect_valid = {true,true,true,true,false,false,false,false,false,false,true,false,false,false,false}
+add_effect_valid = {true,true,true,true,false,false,false,false,false,false,true,false,true,false,false}
 
 -- These are the debuffs that are expressed in their log form by battlemod
 log_form_debuffs = T{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,28,29,30,31,134,135,155,156,157,168,176,177,259,260,261,262,263,264,309,474}

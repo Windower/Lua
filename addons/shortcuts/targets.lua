@@ -1,4 +1,4 @@
---Copyright (c) 2013, Byrthnoth
+--Copyright (c) 2014, Byrthnoth
 --All rights reserved.
 
 --Redistribution and use in source and binary forms, with or without
@@ -54,7 +54,7 @@ function valid_target(targ,flag)
         local current_target = windower.ffxi.get_mob_by_target('t')
         local targar = {}
         for i,v in pairs(windower.ffxi.get_mob_array()) do
-            if string.find(v.name:lower(),san_targ:lower()) and (v.valid_target or v.id == windower.ffxi.get_player().id) then
+            if string.find(v.name:lower(),san_targ:lower()) and (v.valid_target or v.id == windower.ffxi.get_player().id) then -- Malformed pattern somehow
                 -- Handling for whether it's a monster or not
                 if v.is_npc and v.spawn_type ~= 14 and current_target then
                     if v.id == current_target.id then
