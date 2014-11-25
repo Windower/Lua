@@ -182,7 +182,7 @@ function check_usability(player,resource,id)
         return true
     elseif L(windower.ffxi.get_abilities()[resource] or {}):contains(id) then
         return true
-    elseif resource == 'monster_abilities' and player.main_job_id == 23 and (res.monstrosity[player.get_mjob_data().species].tp_moves[id] or 0) <= player.main_job_level then
+    elseif resource == 'monster_abilities' and player.main_job_id == 23 and (res.monstrosity[windower.ffxi.get_mjob_data().species].tp_moves[id] or 0) <= player.main_job_level then
         return true
     end
 end
