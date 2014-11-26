@@ -118,6 +118,7 @@ data.incoming[0x028] = {name='Action',              description='Packet sent whe
 data.incoming[0x029] = {name='Action Message',      description='Packet sent for simple battle-related messages.'}
 data.incoming[0x02A] = {name='Resting Message',     description='Packet sent when you rest in Abyssea.'}
 data.incoming[0x02D] = {name='Kill Message',        description='Packet sent when you gain XP/LP/CP/JP/MP, advance RoE objectives, etc. by defeating a mob.'}
+data.incoming[0x02E] = {name='Mog House Menu',		description='Sent when talking to moogle inside mog house.'}
 data.incoming[0x02F] = {name='Digging Animation',   description='Generates the chocobo digging animation'}
 data.incoming[0x030] = {name='Synth Animation',     description='Generates the synthesis animation'}
 data.incoming[0x031] = {name='Synth List',          description='List of recipes or materials needed for a recipe'}
@@ -134,6 +135,7 @@ data.incoming[0x042] = {name='Blacklist Command',   description='Sent in respons
 data.incoming[0x044] = {name='Job Info Extra',      description='Contains information about Automaton stats and set Blue Magic spells.'}
 data.incoming[0x04B] = {name='Logout Acknowledge',  description='Acknowledges a logout attempt.'}
 data.incoming[0x04B] = {name='Delivery Item',       description='Item in delivery box.'}
+data.incoming[0x04C] = {name='Auction House Menu',  description='Sent when visiting auction counter.'}
 data.incoming[0x04D] = {name='Servmes Resp',        description='Server response when someone requests it.'}
 data.incoming[0x04F] = {name='Data Download 2',     description='The data that is sent to the client when it is "Downloading data...".'}
 data.incoming[0x050] = {name='Equip',               description='Updates the characters equipment slots.'}
