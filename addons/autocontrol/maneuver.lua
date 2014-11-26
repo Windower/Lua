@@ -28,7 +28,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 local texts = require 'texts'
-threshItems = T{['16281']=5,['16282']=10,['11101']=40,['11201']=20,['14930']=5,['15030']=5}
+threshItems = T
+    {[16281]=5  -- Buffoon's Collar
+    ,[16282]=5  -- Buffoon's Collar +1
+    ,[11101]=40 -- Cirque Farsetto +2
+    ,[11201]=20 -- Cirque Farsetto +1
+    ,[14930]=5  -- Pup. Dastanas
+    ,[15030]=5  -- Pup. Dastanas +1
+    ,[27960]=5  -- Foire Dastanas
+    ,[27981]=5  -- Foire Dastanas +1
+    ,[28634]=5  -- Dispersal Mantle
+    }
 heat = T{}
 heat.Fire = 0
 heat.Ice = 0
@@ -83,7 +93,7 @@ windower.register_event("action", function(act)
         local player = T(windower.ffxi.get_player())
         local pet_index = windower.ffxi.get_mob_by_id(windower.ffxi.get_player()['id'])['pet_index']
         
-        if act['category'] == 6 and actor_id == player.id and S{136,139,141,142,143,144,145,146,147,148,309}:contains(abil_ID) then
+        if act['category'] == 6 and actor_id == player.id and S{136,139,141,142,143,144,145,146,147,148,309,310}:contains(abil_ID) then
             if S{141, 142, 143, 144, 145, 146, 147, 148}:contains(abil_ID) then
                 windower.send_command('timers c "Maneuver: '..maneuver..'" 60 down')
                 if maneuver > 2 then
@@ -119,7 +129,7 @@ windower.register_event("action", function(act)
             elseif abil_ID == 309 then
                 windower.send_command('@timers d Overloaded!')
                 heatupdate()
-            elseif abil_ID == 136 then
+            elseif abil_ID == 136 or abil_ID == 310 then -- Activate or Deus Ex Automata
                 Burden_tb:show()
                 decay = get_decay()
                 activate_burden()
@@ -225,22 +235,15 @@ function get_threshold()
     if mjob_id == 18 then
         local newthreshold = 0
         local basethreshold = 30
-        local equip = T(windower.ffxi.get_items()['equipment'])
-        local inv = T(windower.ffxi.get_items()['inventory'])
+        local items = windower.ffxi.get_items()
         local bonus = 0
-        if equip.hands ~= 0 then
-            if threshItems[tostring(inv[equip.hands].id)] ~= nil then
-                bonus = bonus + threshItems[tostring(inv[equip.hands].id)]
-            end
-        end
-        if equip.body ~= 0 then
-            if threshItems[tostring(inv[equip.body].id)] ~= nil then
-                bonus = bonus + threshItems[tostring(inv[equip.body].id)]
-            end
-        end
-        if equip.neck ~= 0 then
-            if threshItems[tostring(inv[equip.neck].id)] ~= nil then
-                bonus = bonus + threshItems[tostring(inv[equip.neck].id)]
+        local slots = {'hands', 'body', 'neck', 'back'}
+        for i, s in ipairs(slots) do
+            if items.equipment[s] ~= 0 then
+                local item = threshItems[items.inventory[items.equipment[s]].id] or threshItems[items.wardrobe[items.equipment[s]].id]
+                if item ~= nil then
+                    bonus = bonus + item
+                end
             end
         end
         newthreshold = basethreshold + bonus

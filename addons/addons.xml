@@ -74,6 +74,13 @@
     <support>http://www.ffxiah.com/player/Ragnarok/Ikonic</support>
   </addon>
   <addon>
+    <name>boxdestroyer</name>
+    <author>Seth VanHeulen (Acacia@Odin)</author>
+    <description>Tracks and displays info about possible combinations for treasure caskets.</description>
+    <bugtracker>https://github.com/svanheulen/boxdestroyer-windower-addon/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Odin/Acacia</support>
+  </addon>
+  <addon>
     <name>Cancel</name>
     <author>Byrth</author>
     <description>Mimics the cancel plugin, but also accepts buff names instead of just IDs.</description>
@@ -107,6 +114,13 @@
     <description>Displays tell, party, and linkshell chat to alternate character and optional textbox.  Also, allows you to reply from either character.</description>
     <bugtracker>https://github.com/Icinoki/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Ragnarok/Ikonic</support>
+  </addon>
+  <addon>
+    <name>digger</name>
+    <author>Seth VanHeulen (Acacia@Odin)</author>
+    <description>Displays Chocobo digging accuracy, fatigue and remaining greens after each dig. Also shows dig "recast" timer using the Timers plugin.</description>
+    <bugtracker>https://github.com/svanheulen/digger-windower-addon/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Odin/Acacia</support>
   </addon>
   <addon>
     <name>Distance</name>
@@ -211,6 +225,13 @@
     <support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
+    <name>Nostrum</name>
+    <description>Creates a click-able on-screen macro to help avoid targeting problems while curing.</description>
+    <author>trv</author>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
+    <bugtracker>https://github.com/trv6/Lua/issues</bugtracker>
+  </addon>
+  <addon>
     <name>obiaway</name>
     <description>Automatically remove elemental obis based on day/weather/storm conditions.</description>
     <support>http://mibbit.com/#windower@irc.ffochat.com</support>
@@ -279,6 +300,13 @@
 	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
+    <name>Rhombus</name>
+    <description>Creates a highly customizable, click-able, on-screen menu.</description>
+    <author>trv</author>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
+    <bugtracker>https://github.com/trv6/Lua/issues</bugtracker>
+  </addon>
+  <addon>
     <name>RollTracker</name>
     <author>Balloon</author>
     <description>Simplifies Cor rolls, tells you the bonus they give, stops you from doubling up on lucky rolls and reports your chance to bust.</description>
@@ -335,6 +363,13 @@
 	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
+    <name>SpeedChecker</name>
+    <author>Arcon</author>
+    <description>Displays a small box indicating your current movement speed modifier (+/- X%).</description>
+    <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
+  </addon>
+  <addon>
     <name>StaggerTrack</name>
     <author>Nitrous (Shiva)</author>
     <description>Catches voidwatch weakness messages and prints them to a textbox in case you miss them in the battle spam.</description>
@@ -370,6 +405,13 @@
     <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
   </addon>
   <addon>
+    <name>Treasury</name>
+    <author>Arcon</author>
+    <description>Lots or passes items based on configurable lists, drops unwanted items from the inventory and automatically stacks items when they drop.</description>
+    <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
+  </addon>
+  <addon>
     <name>thtracker</name>
     <author>Krizz</author>
     <description>Displays latest TH level from chat.</description>
@@ -382,6 +424,20 @@
     <description>Prefixes any chat message with a timestamp. Based on Timestamp plugin.</description>
     <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
+  </addon>
+  <addon>
+    <name>TParty</name>
+    <author>Arcon</author>
+    <description>Shows a target's HP percentage next to their health bar.</description>
+    <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
+  </addon>
+  <addon>
+    <name>translate</name>
+	<author>Byrth</author>
+    <description>Gives a rough JP->EN translation using the resources and custom dictionaries.</description>
+	<bugtracker>https://github.com/Byrth/Lua/issues</bugtracker>
+	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
     <name>Update</name>
@@ -417,5 +473,12 @@
     <description>Enhances the usage of the send addon by allowing a stal or stpc or st target to be sent as the spell recipient. This removes the need for multiple macros for the same spell.</description>
     <bugtracker>https://github.com/sebyg666/Lua/issues</bugtracker>
     <support>https://github.com/sebyg666/Lua/tree/4.1-dev/addons/SubTarget</support>
+  </addon>
+  <addon>
+    <name>pet_fix</name>
+    <author>Byrth</author>
+    <description>Temporary addon that fixes a null pointer animation error with pets that is causing crashes.</description>
+    <bugtracker>https://github.com/Byrth/Lua/issues</bugtracker>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
 </addons>

@@ -1,0 +1,27 @@
+messages = {}
+messages[2] = {ease=7341, fail=7266, full=7264, success=6382}
+messages[4] = {ease=7335, fail=7260, full=7258, success=6382}
+messages[51] = {ease=7120, fail=7045, full=7043, success=6382}
+messages[52] = {ease=7120, fail=7045, full=7043, success=6382}
+messages[100] = {ease=7293, fail=7218, full=7216, success=6396}
+messages[101] = {ease=7293, fail=7218, full=7216, success=6396}
+messages[102] = {ease=7283, fail=7208, full=7206, success=6382}
+messages[103] = {ease=7293, fail=7218, full=7216, success=6396}
+messages[104] = {ease=7767, fail=7692, full=7690, success=6396}
+messages[105] = {ease=7293, fail=7218, full=7216, success=6396}
+messages[106] = {ease=7293, fail=7218, full=7216, success=6555}
+messages[107] = {ease=7293, fail=7218, full=7216, success=6396}
+messages[108] = {ease=7283, fail=7208, full=7206, success=6382}
+messages[109] = {ease=7293, fail=7218, full=7216, success=6396}
+messages[110] = {ease=7293, fail=7218, full=7216, success=6396}
+messages[114] = {ease=7621, fail=7546, full=7544, success=6382}
+messages[115] = {ease=7120, fail=7045, full=7043, success=6382}
+messages[116] = {ease=7279, fail=7204, full=7202, success=6382}
+messages[117] = {ease=7293, fail=7218, full=7216, success=6555}
+messages[118] = {ease=7312, fail=7237, full=7235, success=6409}
+messages[119] = {ease=7293, fail=7218, full=7216, success=6396}
+messages[120] = {ease=7301, fail=7226, full=7224, success=6396}
+messages[121] = {ease=7621, fail=7546, full=7544, success=6382}
+messages[123] = {ease=7621, fail=7546, full=7544, success=6382}
+messages[124] = {ease=7621, fail=7546, full=7544, success=6382}
+messages[125] = {ease=7279, fail=7204, full=7202, success=6382}

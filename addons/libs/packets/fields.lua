@@ -7,11 +7,12 @@ require('functions')
 require('strings')
 require('maths')
 require('lists')
+require('sets')
 bit = require('bit')
 
 local fields = {}
-fields.outgoing = {_mult = {}}
-fields.incoming = {_mult = {}}
+fields.outgoing = {_func = {}}
+fields.incoming = {_func = {}}
 
 -- String decoding definitions
 local ls_name_msg = T('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ':split())
@@ -87,12 +88,12 @@ local dir = function()
     end
 end()
 
-local function cap(val, max)
+local function cap(max, val)
     return '%.1f':format(100*val/max)..'%'
 end
 
 local function zone(val)
-    return val > 0 and res.zones[val].name or '-'
+    return res.zones[val] and res.zones[val].name or '- (Unknown zone ID: %d)':format(val)
 end
 
 local function item(val)
@@ -145,6 +146,10 @@ local function srank(val)
     return res.synth_ranks[val].name
 end
 
+local function arecast(val)
+    return res.ability_recasts[val].name
+end
+
 local function inv(bag, val)
     if val == 0 or not res.bags[bag] then
         return '-'
@@ -167,37 +172,13 @@ local function hex(fill, val)
 end
 
 local function bin(fill, val)
-    return val:binary():zfill(8*fill):chunks(8):reverse():concat(' ')
-end
-
-local function cskill(val)
-    return  s(val, 1, 15):string() .. ', ' .. (s(val, 16, 16) == 1 and 'Capped' or 'Uncapped')
-end
-
-local function sskill(val)
-    return  s(val, 6, 15):string() .. ', ' .. (s(val, 16, 16) == 1 and 'Capped' or 'Uncapped') .. ', ' .. (res.synth_ranks[s(val, 1, 5)] and res.synth_ranks[s(val, 1, 5)].name or 'Unknown: ' .. s(val, 1, 5))
+    return type(val) == 'string' and val:binary(' ') or val:binary():zfill(8*fill):chunks(8):reverse():concat(' ')
 end
 
 --[[
     Custom types
 ]]
 local types = {}
-types.shop_item = L{
-    {ctype='unsigned int',      label='Price',              fn=gil},            -- 00
-    {ctype='unsigned short',    label='Item',               fn=item},           -- 04
-    {ctype='unsigned short',    label='Shop Slot'},                             -- 08
-}
-types.roe_quest = L{
-    {ctype='bit[12]',           label='RoE Quest ID'},                          -- 00:00
-    {ctype='bit[20]',           label='RoE Quest Progress'},                    -- 01:04
-}
-types.alliance_member = L{
-    {ctype='unsigned int',      label='ID',                 fn=id},             -- 00
-    {ctype='unsigned short',    label='Index',              fn=index},          -- 04
-    {ctype='unsigned short',    label='Flags',              fn=bin+{2}},        -- 06
-    {ctype='unsigned short',    label='Zone',               fn=zone},           -- 08
-    {ctype='unsigned short',    label='_unknown2'},                             -- 0A
-}
 
 local enums = {
     ['synth'] = {
@@ -227,6 +208,7 @@ local enums = {
     ['itemstat'] = {
         [0x00] = 'None',
         [0x05] = 'Equipped',
+        [0x0F] = 'Synthing',
         [0x13] = 'Active linkshell',
         [0x19] = 'Bazaaring',
     },
@@ -254,7 +236,7 @@ local enums = {
     },
 }
 
-local function e(t, val)
+local e = function(t, val)
     return enums[t][val] or 'Unknown value for \'%s\': %i':format(t, val)
 end
 
@@ -262,10 +244,16 @@ end
     Outgoing packets
 ]]
 
--- Packet sent on zoning. 12 bytes long, all content bytes are 00.
--- fields.outgoing[0x00C]
+-- Zone In 1
+-- Likely triggers specific incoming packets.
+-- Does not trigger any packets when randomly injected.
+fields.outgoing[0x00C] = L{
+    {ctype='int',               label='_unknown1'},                             -- 04   Always 00s?
+    {ctype='int',               label='_unknown2'},                             -- 04   Always 00s?
+}
 
 -- Client Leave
+-- Last packet sent when zoning. Disconnects from the zone server.
 fields.outgoing[0x00D] = L{
     {ctype='unsigned char',     label='_unknown1'},                             -- 04   Always 00?
     {ctype='unsigned char',     label='_unknown2'},                             -- 05   Always 00?
@@ -273,8 +261,19 @@ fields.outgoing[0x00D] = L{
     {ctype='unsigned char',     label='_unknown4'},                             -- 07   Always 00?
 }
 
--- Packet sent on zoning. 36 bytes long, all content bytes are 00.
--- fields.outgoing[0x00F]
+-- Zone In 2
+-- Likely triggers specific incoming packets.
+-- Does not trigger any packets when randomly injected.
+fields.outgoing[0x00F] = L{
+    {ctype='data[32]',          label='_unknown1'},                             -- 04   Always 00s?
+}
+
+-- Zone In 3
+-- Likely triggers specific incoming packets.
+-- Does not trigger any packets when randomly injected.
+fields.outgoing[0x011] = L{
+    {ctype='int',               label='_unknown1'},                             -- 04   Always 02 00 00 00?
+}
 
 -- Standard Client
 fields.outgoing[0x015] = L{
@@ -293,27 +292,39 @@ fields.outgoing[0x015] = L{
 -- Update Request
 fields.outgoing[0x016] = L{
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 04
-    {ctype='unsigned short',    label='_unknown1'},                             -- 06
+    {ctype='unsigned short',    label='_junk1'},                                -- 06
 }
 
 enums['action'] = {
+    [0x00] = 'NPC Interaction',
     [0x02] = 'Engage monster',
     [0x03] = 'Magic cast',
+    [0x04] = 'Disengage',
+    [0x05] = 'Call for Help',
     [0x07] = 'Weaponskill usage',
     [0x09] = 'Job ability usage',
+    [0x0C] = 'Assist',
     [0x0D] = 'Reraise dialogue',
+    [0x0E] = 'Cast Fishing Rod',
     [0x0F] = 'Switch target',
     [0x10] = 'Ranged attack',
+    [0x12] = 'Dismount Chocobo',
+    [0x14] = 'Zoning/Appear', -- I think, the resource for this is ambiguous.
     [0x19] = 'Monsterskill',
 }
 
 -- Action
 fields.outgoing[0x01A] = L{
-    {ctype='unsigned int',      label='Target ID',          fn=id},             -- 04
+    {ctype='unsigned int',      label='Target',             fn=id},             -- 04
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 08
     {ctype='unsigned short',    label='Category',           fn=e+{'action'}},   -- 0A
     {ctype='unsigned short',    label='Param'},                                 -- 0C
     {ctype='unsigned short',    label='_unknown1'},                             -- 0E
+}
+
+-- /volunteer
+fields.outgoing[0x01E] = L{
+    {ctype='char*',             label='Target Name'},                           -- 04  null terminated string. Length of name to the nearest 4 bytes.
 }
 
 -- Drop Item
@@ -330,7 +341,27 @@ fields.outgoing[0x029] = L{
     {ctype='unsigned char',     label='Bag',                fn=bag},            -- 08
     {ctype='unsigned char',     label='Target Bag',         fn=bag},            -- 09
     {ctype='unsigned char',     label='Inventory Index',    fn=invp+{0x08}},    -- 0A
-    {ctype='unsigned char',     label='_junk1'},                                -- 0B   Has taken the value 52. Unclear purpose.
+    {ctype='unsigned char',     label='_unknown1',          const=0x52},        -- 0B
+}
+
+-- Trade request
+fields.outgoing[0x032] = L{
+    {ctype='unsigned int',      label='Target',             fn=id},             -- 04
+    {ctype='unsigned short',    label='Target Index',       fn=index},          -- 08
+    {ctype='data[2]',           label='_junk1'}                                 -- 0A
+}
+
+enums[0x033] = {
+    [0] = 'Accept trade',
+    [1] = 'Cancel trade',
+    [2] = 'Confirm trade',
+}
+
+-- Trade confirm
+-- Sent when accepting, confirming or canceling a trade
+fields.outgoing[0x033] = L{
+    {ctype='unsigned int',      label='Type',               fn=e+{0x033}},      -- 04
+    {ctype='data[4]',           label='_unknown1'}                              -- 08
 }
 
 -- Menu Item
@@ -338,25 +369,9 @@ fields.outgoing[0x036] = L{
 -- Item order is Gil -> top row left-to-right -> bottom row left-to-right, but
 -- they slide up and fill empty slots
     {ctype='unsigned int',      label='Target',             fn=id},             -- 04
-    {ctype='unsigned int',      label='Item 1 Count'},                          -- 08
-    {ctype='unsigned int',      label='Item 2 Count'},                          -- 0C
-    {ctype='unsigned int',      label='Item 3 Count'},                          -- 10
-    {ctype='unsigned int',      label='Item 4 Count'},                          -- 14
-    {ctype='unsigned int',      label='Item 5 Count'},                          -- 18
-    {ctype='unsigned int',      label='Item 6 Count'},                          -- 1C
-    {ctype='unsigned int',      label='Item 7 Count'},                          -- 20
-    {ctype='unsigned int',      label='Item 8 Count'},                          -- 24
-    {ctype='unsigned int',      label='Item 9 Count'},                          -- 28
+    {ctype='unsigned int[9]',   label='Item Count'},                            -- 08
     {ctype='unsigned int',      label='_unknown1'},                             -- 2C
-    {ctype='unsigned char',     label='Item 1 Index',       fn=inv+{0}},        -- 30   Gil has an Inventory Index of 0
-    {ctype='unsigned char',     label='Item 2 Index',       fn=inv+{0}},        -- 31
-    {ctype='unsigned char',     label='Item 3 Index',       fn=inv+{0}},        -- 32
-    {ctype='unsigned char',     label='Item 4 Index',       fn=inv+{0}},        -- 33
-    {ctype='unsigned char',     label='Item 5 Index',       fn=inv+{0}},        -- 34
-    {ctype='unsigned char',     label='Item 6 Index',       fn=inv+{0}},        -- 35
-    {ctype='unsigned char',     label='Item 7 Index',       fn=inv+{0}},        -- 36
-    {ctype='unsigned char',     label='Item 8 Index',       fn=inv+{0}},        -- 37
-    {ctype='unsigned char',     label='Item 9 Index',       fn=inv+{0}},        -- 38
+    {ctype='unsigned char[9]',  label='Item Index',       fn=inv+{0}},          -- 30   Gil has an Inventory Index of 0
     {ctype='unsigned char',     label='_unknown2'},                             -- 39
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 3A
     {ctype='unsigned char',     label='Number of Items'},                       -- 3C
@@ -364,13 +379,13 @@ fields.outgoing[0x036] = L{
 
 -- Use Item
 fields.outgoing[0x037] = L{
-    {ctype='unsigned int',      label='Player ID',          fn=id},             -- 04
+    {ctype='unsigned int',      label='Player',             fn=id},             -- 04
     {ctype='unsigned int',      label='_unknown1'},                             -- 08   00 00 00 00 observed
     {ctype='unsigned short',    label='Player Index',       fn=index},          -- 0C
     {ctype='unsigned char',     label='Slot',               fn=inv+{0}},        -- 0E
     {ctype='unsigned char',     label='_unknown2'},                             -- 0F   Takes values
     {ctype='unsigned char',     label='Bag',                fn=bag},            -- 10
-    {ctype='char[3]',           label='_unknown2'}                              -- 11
+    {ctype='data[3]',           label='_unknown2'}                              -- 11
 }
 
 -- Sort Item
@@ -378,6 +393,14 @@ fields.outgoing[0x03A] = L{
     {ctype='unsigned char',     label='Bag',                fn=bag},            -- 04
     {ctype='unsigned char',     label='_unknown1'},                             -- 05
     {ctype='unsigned short',    label='_unknown2'},                             -- 06
+}
+
+-- Blacklist (add/delete)
+fields.outgoing[0x03D] = L{
+    {ctype='int',               label='_unknown1'},                             -- 04  Looks like a player ID, but does not match the sender or the receiver.
+    {ctype='char[16]',          label='Name'},                                  -- 08  Character name
+    {ctype='bool',              label='Add/Remove'},                            -- 18  0 = add, 1 = remove
+    {ctype='data[3]',           label='_unknown2'},                             -- 19  Values observed on adding but not deleting.
 }
 
 -- Lot item
@@ -390,24 +413,79 @@ fields.outgoing[0x042] = L{
     {ctype='unsigned char',     label='Slot'},                                  -- 04
 }
 
+-- Servmes
+-- First 4 bytes resemble the first 4 bytes of the incoming servmessage packet
+fields.outgoing[0x04B] = L{
+    {ctype='unsigned char',     label='_unknown1'},                             -- 04  Always 1?
+    {ctype='unsigned char',     label='_unknown2'},                             -- 05  Can be 1 or 0
+    {ctype='unsigned char',     label='_unknown3'},                             -- 06  Always 1?
+    {ctype='unsigned char',     label='_unknown4'},                             -- 07  Always 2?
+    {ctype='data[12]',          label='_unknown5'},                             -- 08  All 00s
+    {ctype='unsigned int',      label='_unknown5'},                             -- 14  EC 00 00 00 observed. May be junk.
+}
+
 -- Delivery Box
 fields.outgoing[0x04D] = L{
-    {ctype='unsigned char',     label='Manipulation Type'},                     -- 04
-	-- 
-	
-	-- Removing an item from the d-box sends type 0x08
-	-- It then responds to the server's 0x4B (id=0x08) with a 0x0A type packet.
-	-- Their assignment is the same, as far as I can see.
+    {ctype='unsigned char',     label='Type'},                                  -- 04
+    --
+
+    -- Removing an item from the d-box sends type 0x08
+    -- It then responds to the server's 0x4B (id=0x08) with a 0x0A type packet.
+    -- Their assignment is the same, as far as I can see.
     {ctype='unsigned char',     label='_unknown1'},                             -- 05   01 observed
     {ctype='unsigned char',     label='Slot'},                                  -- 06
-    {ctype='char[5]',           label='_unknown2'},                             -- 07   FF FF FF FF FF observed
-    {ctype='char[20]',          label='_unknown3'},                             -- 0C   All 00 observed
+    {ctype='data[5]',           label='_unknown2'},                             -- 07   FF FF FF FF FF observed
+    {ctype='data[20]',          label='_unknown3'},                             -- 0C   All 00 observed
 }
 
 -- Equip
 fields.outgoing[0x050] = L{
-    {ctype='unsigned char',     label='Item Index',         fn=inv+{0}},        -- 04
+    {ctype='unsigned char',     label='Item Index',         fn=invp+{0x06}},    -- 04
     {ctype='unsigned char',     label='Equip Slot',         fn=slot},           -- 05
+    {ctype='unsigned char',     label='Bag',                fn=bag},            -- 06
+    {ctype='data[1]',           label='_junk1'}                                 -- 07
+}
+
+types.equipset = L{
+    {ctype='unsigned char',     label='Inventory Index',    fn=invp+{0x0A}},    -- 00
+    {ctype='unsigned char',     label='Equipment Slot',     fn=slot},           -- 01
+    {ctype='unsigned char',     label='Bag',                fn=bag},            -- 02
+    {ctype='unsigned char',     label='_padding1'},                             -- 03
+}
+
+fields.outgoing._func[0x051] = {}
+fields.outgoing._func[0x051].base = L{
+    {ctype='unsigned char',     label='Count'},                                 -- 04
+    {ctype='unsigned char[3]',  label='_unknown1'},                             -- 05   Same as _unknown1 in outgoing 0x052
+}
+
+-- Equipset
+fields.outgoing[0x051] = function(data)
+    local count = data:byte(5, 5)
+
+    return fields.outgoing._func[0x051].base + L{
+        -- Only the number given in Count will be properly populated, the rest is junk
+        {ref=types.equipset,        count=count},                                   -- 08
+        {ctype='data[%u]':format((16 - count) * 4), label='_junk1'},                -- 08 + 4 * count
+    }
+end
+
+types.equipset_build = L{
+    {ctype='boolbit',           label='Active'},                                -- 00
+    {ctype='bit',               label='_unknown1'},                             -- 00
+    {ctype='bit[6]',            label='Bag',                fn=bag},            -- 00
+    {ctype='unsigned char',     label='Inventory Index'},                       -- 01
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 02
+}
+
+-- Equipset Build
+fields.outgoing[0x052] = L{
+    -- First 8 bytes are for the newly changed item
+    {ctype='unsigned char',     label='New Equipment Slot', fn=slot},           -- 04
+    {ctype='unsigned char[3]',  label='_unknown1'},                             -- 05
+    {ref=types.equipset_build,  count=1},                                       -- 08
+    -- The next 16 are the entire current equipset, excluding the newly changed item
+    {ref=types.equipset_build,  lookup={res.slots, 0x00},   count=0x10},        -- 0C
 }
 
 -- Conquest
@@ -416,25 +494,25 @@ fields.outgoing[0x05A] = L{
 
 -- Dialogue options
 fields.outgoing[0x05B] = L{
-    {ctype='unsigned int',      label='Target ID',          fn=id},             -- 04
-    {ctype='unsigned short',    label='Option index'},                          -- 08
+    {ctype='unsigned int',      label='Target',             fn=id},             -- 04
+    {ctype='unsigned short',    label='Option Index'},                          -- 08
     {ctype='unsigned short',    label='_unknown1'},                             -- 0A
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 0C
-    {ctype='bool',              label='Begin dialogue'},                        -- 0E   Seems to be 1 when initiating conversion, 0 otherwise, unsure
+    {ctype='bool',              label='Automated Message'},                     -- 0E   1 if the response packet is automatically generated, 0 if it was selected by you
+    {ctype='unsigned char',     label='_unknown2'},                             -- 0F
     {ctype='unsigned short',    label='Zone',               fn=zone},           -- 10
-    {ctype='unsigned char',     label='_unknown2'},                             -- 12   Might be a short, some parameter for the dialogue option, sometimes related to Index (Index + 0x5C0)
-    {ctype='unsigned char',     label='_unknown3'},                             -- 13
+    {ctype='unsigned short',    label='Menu ID'},                               -- 12
 }
 
 -- Zone request
 -- Sent when crossing a zone line.
 fields.outgoing[0x05E] = L{
-    {ctype='unsigned int',      label='Zone line'},                             -- 04   This seems to be a fourCC consisting of the following chars:
+    {ctype='unsigned int',      label='Zone Line'},                             -- 04   This seems to be a fourCC consisting of the following chars:
                                                                                 --      'z' (apparently constant)
                                                                                 --      Region-specific char ('6' for Jeuno, '3' for Qufim, etc.)
                                                                                 --      Zone-specific char ('u' for Port Jeuno, 't' for Lower Jeuno, 's' for Upper Jeuno, etc.)
                                                                                 --      Zone line identifier ('4' for Port Jeuno > Qufim Island, '2' for Port Jeuno > Lower Jeuno, etc.)
-    {ctype='char[12]',          label='_unknown1',          const=''},          -- 08
+    {ctype='data[12]',          label='_unknown1',          const=''},          -- 08
     {ctype='unsigned short',    label='_unknown2',          const=0},           -- 14
     {ctype='unsigned char',     label='_unknown3',          const=0x04},        -- 16   Seemed to never vary for me
     {ctype='unsigned char',     label='Type'},                                  -- 17   03 for leaving the MH, 00 otherwise
@@ -448,17 +526,17 @@ fields.outgoing[0x061] = L{
 -- This packet alone is responsible for generating the digging result, meaning that anyone that can inject
 -- this packet is capable of digging with 0 delay.
 fields.outgoing[0x063] = L{
-    {ctype='unsigned int',      label='Player ID',          fn=id},             -- 04
+    {ctype='unsigned int',      label='Player',             fn=id},             -- 04
     {ctype='unsigned int',      label='_unknown1'},                             -- 08
     {ctype='unsigned short',    label='Player Index',       fn=index},          -- 0C
-    {ctype='unsigned char',     label='Action ID?'},                            -- 0E   Changing it to anything other than 0x11 causes the packet to fail
+    {ctype='unsigned char',     label='Action?'},                               -- 0E   Changing it to anything other than 0x11 causes the packet to fail
     {ctype='unsigned char',     label='_junk1'},                                -- 0F   Likely junk. Has no effect on anything notable.
 }
 
 -- Party invite
 fields.outgoing[0x06E] = L{
-    {ctype='unsigned int',      label='Target ID',          fn=id},             -- 04   This is so weird. The client only knows IDs from searching for people or running into them. So if neither has happened, the manual invite will fail, as the ID cannot be retrieved.
-    {ctype='unsigned short',    label='Target index',       fn=index},          -- 08   00 if target not in zone
+    {ctype='unsigned int',      label='Target',             fn=id},             -- 04   This is so weird. The client only knows IDs from searching for people or running into them. So if neither has happened, the manual invite will fail, as the ID cannot be retrieved.
+    {ctype='unsigned short',    label='Target Index',       fn=index},          -- 08   00 if target not in zone
     {ctype='unsigned char',     label='Alliance'},                              -- 0A   02 for alliance, 00 for party or if invalid alliance target (the client somehow knows..)
     {ctype='unsigned char',     label='_const1',            const=0x041},       -- 0B
 }
@@ -466,19 +544,19 @@ fields.outgoing[0x06E] = L{
 -- Party leaving
 fields.outgoing[0x06F] = L{
     {ctype='unsigned char',     label='Alliance'},                              -- 04   02 for alliance, 00 for party
-    {ctype='char[3]',           label='_junk1'}                                 -- 05
+    {ctype='data[3]',           label='_junk1'}                                 -- 05
 }
 
 -- Party breakup
 fields.outgoing[0x070] = L{
     {ctype='unsigned char',     label='Alliance'},                              -- 04   02 for alliance, 00 for party
-    {ctype='char[3]',           label='_junk1'}                                 -- 05
+    {ctype='data[3]',           label='_junk1'}                                 -- 05
 }
 
 -- Party invite response
 fields.outgoing[0x074] = L{
     {ctype='bool',              label='Join',               fn=bool},           -- 04
-    {ctype='char[3]',           label='_junk1'}                                 -- 05
+    {ctype='data[3]',           label='_junk1'}                                 -- 05
 }
 
 -- Party change leader
@@ -488,11 +566,15 @@ fields.outgoing[0x077] = L{
     {ctype='unsigned short',    label='_unknown1'},                             -- 16
 }
 
+-- Party list request (4 byte packet)
+fields.outgoing[0x078] = L{
+}
+
 -- NPC buy
 -- Sent when buying an item from an NPC vendor
 fields.outgoing[0x083] = L{
     {ctype='unsigned char',     label='Count'},                                 -- 04
-    {ctype='char[3]',           label='_unknown1'},                             -- 05   Always 0? Possibly padding
+    {ctype='data[3]',           label='_unknown1'},                             -- 05   Always 0? Possibly padding
     {ctype='unsigned short',    label='_unknown2'},                             -- 08   Always 0?
     {ctype='unsigned char',     label='Shop Slot'},                             -- 0A   The same index sent in incoming packet 0x03C
     {ctype='unsigned char',     label='_unknown3'},                             -- 0B   Always 0? Possibly padding
@@ -502,66 +584,76 @@ fields.outgoing[0x083] = L{
 -- NPC Sell price query
 -- Sent when trying to sell an item to an NPC
 -- Clicking on the item the first time will determine the price
+-- Also sent automatically when finalizing a sale, immediately preceeding packet 0x085
 fields.outgoing[0x084] = L{
-    {ctype='unsigned char',     label='_unknown1'},                             -- 04   Always 1? Possibly a type
-    {ctype='char[3]',           label='_unknown2'},                             -- 05   Always 0? Possibly padding
-    {ctype='unsigned short',    label='Item ID',                fn=item},       -- 08   ID of the item to query the price for
-    {ctype='unsigned char',     label='Inventory Index',        fn=inv+{0}},    -- 09   Inventory index of the same item
+    {ctype='unsigned int',      label='Count'},                                 -- 04
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 08
+    {ctype='unsigned char',     label='Inventory Index',    fn=inv+{0}},        -- 09   Inventory index of the same item
     {ctype='unsigned char',     label='_unknown3'},                             -- 0A   Always 0? Likely padding
+}
+
+-- NPC Sell confirm
+-- Sent when confirming a sell of an item to an NPC
+fields.outgoing[0x085] = L{
+    {ctype='unsigned int',      label='_unknown1',          const=1},           -- 04   Always 1? Possibly a type
 }
 
 -- Synth
 fields.outgoing[0x096] = L{
     {ctype='unsigned char',     label='_unknown1'},                             -- 04   Crystal ID? Earth = 0x02, Wind-break = 0x19?, Wind no-break = 0x2D?
     {ctype='unsigned char',     label='_unknown2'},                             -- 05
-    {ctype='unsigned short',    label='Crystal',                fn=item},       -- 06
-    {ctype='unsigned char',     label='Crystal Index',          fn=inv+{0}},    -- 08
-    {ctype='unsigned char',     label='Number of Ingredients'},                 -- 09
-    {ctype='unsigned short',    label='Ingredient 1',           fn=item},       -- 0A
-    {ctype='unsigned short',    label='Ingredient 2',           fn=item},       -- 0C
-    {ctype='unsigned short',    label='Ingredient 3',           fn=item},       -- 0E
-    {ctype='unsigned short',    label='Ingredient 4',           fn=item},       -- 10
-    {ctype='unsigned short',    label='Ingredient 5',           fn=item},       -- 12
-    {ctype='unsigned short',    label='Ingredient 6',           fn=item},       -- 14
-    {ctype='unsigned short',    label='Ingredient 7',           fn=item},       -- 16
-    {ctype='unsigned short',    label='Ingredient 8',           fn=item},       -- 18
-    {ctype='unsigned char',     label='Ingredient 1 Index',     fn=inv+{0}},    -- 1A
-    {ctype='unsigned char',     label='Ingredient 2 Index',     fn=inv+{0}},    -- 1B
-    {ctype='unsigned char',     label='Ingredient 3 Index',     fn=inv+{0}},    -- 1C
-    {ctype='unsigned char',     label='Ingredient 4 Index',     fn=inv+{0}},    -- 1D
-    {ctype='unsigned char',     label='Ingredient 5 Index',     fn=inv+{0}},    -- 1E
-    {ctype='unsigned char',     label='Ingredient 6 Index',     fn=inv+{0}},    -- 1F
-    {ctype='unsigned char',     label='Ingredient 7 Index',     fn=inv+{0}},    -- 20
-    {ctype='unsigned char',     label='Ingredient 8 Index',     fn=inv+{0}},    -- 21
+    {ctype='unsigned short',    label='Crystal',            fn=item},           -- 06
+    {ctype='unsigned char',     label='Crystal Index',      fn=inv+{0}},        -- 08
+    {ctype='unsigned char',     label='Ingredient count'},                      -- 09
+    {ctype='unsigned short[8]', label='Ingredient',         fn=item},           -- 0A
+    {ctype='unsigned char[8]',  label='Ingredient Index',   fn=inv+{0}},        -- 1A
     {ctype='unsigned short',    label='_junk1'},                                -- 22
+}
+
+-- /nominate or /proposal
+fields.outgoing[0x0A0] = L{
+    {ctype='unsigned char',     label='Packet Type'},                           -- 04  Not typical mapping. 0=Open poll (say), 1 = Open poll (party), 3 = conclude poll
+    -- Just padding if the poll is being concluded.
+    {ctype='char*',             label='Proposal'},                              -- 05  Proposal exactly as written. Space delimited with quotes and all. Null terminated.
+}
+
+-- /vote
+fields.outgoing[0x0A1] = L{
+    {ctype='unsigned char',     label='Option'},                                -- 04  Voting option
+    {ctype='char*',             label='Character Name'},                        -- 05  Character name. Null terminated.
+}
+
+-- /random
+fields.outgoing[0x0A2] = L{
+    {ctype='int',               label='_unknown1'},                             -- 04  No clear purpose
 }
 
 -- Speech
 fields.outgoing[0x0B5] = L{
-    {ctype='unsigned char',     label='Mode'},                                  -- 04   05 for LS chat?
-    {ctype='unsigned char',     label='GM'},                                    -- 05   01 for GM
-    {ctype='char[255]',         label='Message'},                               -- 06   Message, occasionally terminated by spare 00 bytes.
+    {ctype='unsigned char',     label='Mode',               fn=chat},           -- 04
+    {ctype='unsigned char',     label='GM',                 fn=bool},           -- 05
+    {ctype='char*',             label='Message'},                               -- 06
 }
 
 -- Tell
 fields.outgoing[0x0B6] = L{
     {ctype='unsigned char',     label='_unknown1',          const=0x00},        -- 04   00 for a normal tell -- Varying this does nothing.
-    {ctype='char[15]',          label='Target Name'},                           -- 05   Name of the person to send a tell to
-    {ctype='char*',             label='Message'},                               -- 14   Message, occasionally terminated by spare 00 bytes.
+    {ctype='char[15]',          label='Target Name'},                           -- 05
+    {ctype='char*',             label='Message'},                               -- 14
 }
 
 -- Merit Point Increase
 fields.outgoing[0x0BE] = L{
     {ctype='unsigned char',     label='_unknown1',          const=0x03},        -- 04   No idea what it is, but it's always 0x03 for me
     {ctype='unsigned char',     label='Flag'},                                  -- 05   1 when you're increasing a merit point. 0 when you're decreasing it.
-    {ctype='unsigned short',    label='Merit Point Id'},                        -- 06   No known mapping, but unique to each merit point. Could be an int.
+    {ctype='unsigned short',    label='Merit Point'},                           -- 06   No known mapping, but unique to each merit point. Could be an int.
     {ctype='unsigned int',      label='_unknown2',          const=0x00000000},  -- 08
 }
 
 -- Job Point Increase
 -- This chunk was sent on three consecutive outgoing packets the only time I've used it
 fields.outgoing[0x0BF] = L{
-    {ctype='unsigned short',    label='Job Point ID'},                          -- 04   
+    {ctype='unsigned short',    label='Job Point'},                             -- 04
     {ctype='unsigned short',    label='_junk1',             const=0x0000},      -- 06   No values seen so far
 }
 
@@ -570,13 +662,32 @@ fields.outgoing[0x0BF] = L{
 fields.outgoing[0x0C0] = L{
 }
 
+-- /makelinkshell
+fields.outgoing[0x0C3] = L{
+    {ctype='unsigned int',      label='_junk1'},                                -- 04  No obvious purpose
+}
+
 -- Check
 fields.outgoing[0x0DD] = L{
-    {ctype='unsigned int',      label='Target ID',          fn=id},             -- 04
+    {ctype='unsigned int',      label='Target',             fn=id},             -- 04
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 08
     {ctype='unsigned short',    label='_unknown1'},                             -- 0A
     {ctype='unsigned char',     label='Check Type'},                            -- 0C   00 = Normal /check, 01 = /checkname, 02 = /checkparam
-    {ctype='char[3]',           label='_junk1'}                                 -- 0D
+    {ctype='data[3]',           label='_junk1'}                                 -- 0D
+}
+
+-- Search Comment
+fields.outgoing[0x0E0] = L{
+    {ctype='char[40]',          label='Line 1'},                                -- 04  Spaces (0x20) fill out any empty characters.
+    {ctype='char[40]',          label='Line 2'},                                -- 2C  Spaces (0x20) fill out any empty characters.
+    {ctype='char[40]',          label='Line 3'},                                -- 54  Spaces (0x20) fill out any empty characters.
+    {ctype='data[4]',           label='_unknown1'},                             -- 7C  20 20 20 00 observed.
+    {ctype='data[24]',          label='_unknown2'},                             -- 80  Likely contains information about the flags.
+}
+
+-- Get LS Message
+fields.outgoing[0x0E1] = L{
+    {ctype='data[136]',         label='_unknown1',          const=0x0},         -- 04
 }
 
 -- Set LS Message
@@ -622,54 +733,83 @@ fields.outgoing[0x0F5] = L{
     {ctype='unsigned short',    label='Index',                  fn=index},      -- 04 Setting an index of 0 stops tracking
 }
 
+-- Place/Move Furniture
+fields.outgoing[0x0FA] = L{
+    {ctype='unsigned short',    label='Item',                   fn=item},       -- 04  00 00 just gives the general update
+    {ctype='unsigned char',     label='Safe Index',             fn=inv+{1}},    -- 06
+    {ctype='unsigned char',     label='X Position'},                            -- 07  0 to 0x12
+    {ctype='unsigned char',     label='Z Position'},                            -- 08  0 to ?
+    {ctype='unsigned char',     label='Y Position'},                            -- 09  0 to 0x17
+    {ctype='unsigned short',    label='_junk1'},                                -- 0A  00 00 observed
+}
+
+-- Remove Furniture
+fields.outgoing[0x0FB] = L{
+    {ctype='unsigned short',    label='Item',                   fn=item},       -- 04
+    {ctype='unsigned char',     label='Safe Index',             fn=inv+{1}},    -- 06
+    {ctype='unsigned char',     label='_junk1'},                                -- 07
+}
+
+-- Plant Flowerpot
+fields.outgoing[0x0FC] = L{
+    {ctype='unsigned short',    label='Flowerpot Item',         fn=item},       -- 04
+    {ctype='unsigned short',    label='Seed Item',              fn=item},       -- 06
+    {ctype='unsigned char',     label='Flowerpot Safe Index',   fn=inv+{1}},    -- 08
+    {ctype='unsigned char',     label='Seed Safe Index',        fn=inv+{1}},    -- 09
+    {ctype='unsigned short',    label='_junk1'},                                -- 0A  00 00 observed
+}
+
+-- Examine Flowerpot
+fields.outgoing[0x0FD] = L{
+    {ctype='unsigned short',    label='Flowerpot Item ID'},                     -- 04
+    {ctype='unsigned char',     label='Flowerpot Safe Slot'},                   -- 06
+    {ctype='unsigned char',     label='_junk1'},                                -- 07
+}
+
+-- Uproot Flowerpot
+fields.outgoing[0x0FE] = L{
+    {ctype='unsigned short',    label='Flowerpot Item',         fn=item},       -- 04
+    {ctype='unsigned char',     label='Flowerpot Safe Index',   fn=inv+{1}},    -- 06
+    {ctype='unsigned char',     label='_unknown1'},                             -- 07  Value of 1 observed.
+}
+
 -- Job Change
 fields.outgoing[0x100] = L{
-    {ctype='unsigned char',     label='Main Job ID'},                           -- 04
-    {ctype='unsigned char',     label='Sub Job ID'},                            -- 05
+    {ctype='unsigned char',     label='Main Job'},                              -- 04
+    {ctype='unsigned char',     label='Sub Job'},                               -- 05
     {ctype='unsigned char',     label='_unknown1'},                             -- 06
     {ctype='unsigned char',     label='_unknown2'},                             -- 07
 }
 
 -- Untraditional Equip
 -- Currently only commented for changing instincts in Monstrosity. Refer to the doku wiki for information on Autos/BLUs.
--- http://dev.windower.net/doku.php?id=packets:outgoing:0x102_blue_magic_pup_attachment_equip
+-- https://gist.github.com/nitrous24/baf9980df69b3dc7d3cf
 fields.outgoing[0x102] = L{
     {ctype='unsigned short',    label='_unknown1'},                             -- 04  -- 00 00 for Monsters
     {ctype='unsigned short',    label='_unknown1'},                             -- 06  -- Varies by Monster family for the species change packet. Monsters that share the same tnl seem to have the same value. 00 00 for instinct changing.
     {ctype='unsigned char',     label='Main Job',           fn=job},            -- 08  -- 00x17 for Monsters
     {ctype='unsigned char',     label='Sub Job',            fn=job},            -- 09  -- 00x00 for Monsters
     {ctype='unsigned short',    label='Flag'},                                  -- 0A  -- 04 00 for Monsters changing instincts. 01 00 for changing Monsters
-    {ctype='unsigned short',    label='Species ID'},                            -- 0C  -- True both for species change and instinct change packets
+    {ctype='unsigned short',    label='Species'},                               -- 0C  -- True both for species change and instinct change packets
     {ctype='unsigned short',    label='_unknown2'},                             -- 0E  -- 00 00 for Monsters
-    {ctype='unsigned short',    label='Instinct ID 1'},                         -- 10
-    {ctype='unsigned short',    label='Instinct ID 2'},                         -- 12
-    {ctype='unsigned short',    label='Instinct ID 3'},                         -- 14
-    {ctype='unsigned short',    label='Instinct ID 4'},                         -- 16
-    {ctype='unsigned short',    label='Instinct ID 5'},                         -- 18
-    {ctype='unsigned short',    label='Instinct ID 6'},                         -- 1A
-    {ctype='unsigned short',    label='Instinct ID 7'},                         -- 1C
-    {ctype='unsigned short',    label='Instinct ID 8'},                         -- 1E
-    {ctype='unsigned short',    label='Instinct ID 9'},                         -- 20
-    {ctype='unsigned short',    label='Instinct ID 10'},                        -- 22
-    {ctype='unsigned short',    label='Instinct ID 11'},                        -- 24
-    {ctype='unsigned short',    label='Instinct ID 12'},                        -- 26
-    {ctype='unsigned char',     label='Name ID 1'},                             -- 28
-    {ctype='unsigned char',     label='Name ID 2'},                             -- 29
+    {ctype='unsigned short[12]',label='Instinct'},                              -- 10
+    {ctype='unsigned char',     label='Name 1'},                                -- 28
+    {ctype='unsigned char',     label='Name 2'},                                -- 29
     {ctype='char*',             label='_unknown'},                              -- 2A  -- All 00s for Monsters
 }
 
 -- Open Bazaar
 -- Sent when you open someone's bazaar from the /check window
 fields.outgoing[0x105] = L{
-    {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
-    {ctype='unsigned short',    label='Index',              fn=index},          -- 08
+    {ctype='unsigned int',      label='Target',             fn=id},             -- 04
+    {ctype='unsigned short',    label='Target Index',       fn=index},          -- 08
 }
 
 -- Bid Bazaar
 -- Sent when you bid on an item in someone's bazaar
 fields.outgoing[0x106] = L{
     {ctype='unsigned char',     label='Inventory Index'},                       -- 04   The seller's inventory index of the wanted item
-    {ctype='char[3]',           label='_junk1'},                                -- 05
+    {ctype='data[3]',           label='_junk1'},                                -- 05
     {ctype='unsigned int',      label='Count'},                                 -- 08
 }
 
@@ -682,7 +822,7 @@ fields.outgoing[0x109] = L{
 -- Sent when you set the price of an item in your bazaar
 fields.outgoing[0x10A] = L{
     {ctype='unsigned char',     label='Inventory Index',    fn=inv+{0}},        -- 04
-    {ctype='char[3]',           label='_junk1'},                                -- 05
+    {ctype='data[3]',           label='_junk1'},                                -- 05
     {ctype='unsigned int',      label='Price',              fn=gil},            -- 08
 }
 
@@ -714,7 +854,7 @@ enums['fishing'] = {
 
 -- Fishing Action
 fields.outgoing[0x110] = L{
-    {ctype='unsigned int',      label='Player ID',          fn=id},             -- 04
+    {ctype='unsigned int',      label='Player',             fn=id},             -- 04
     {ctype='unsigned int',      label='Fish HP'},                               -- 08   Always 200 when releasing, zero when casting and putting away rod
     {ctype='unsigned short',    label='Player Index',       fn=index},          -- 0C
     {ctype='unsigned char',     label='Action',             fn=e+{'fishing'}},  -- 0E
@@ -722,19 +862,51 @@ fields.outgoing[0x110] = L{
     {ctype='unsigned int',      label='Catch Key'},                             -- 10   When catching this matches the catch key from the 0x115 packet, otherwise zero
 }
 
+-- Lockstyle
+fields.outgoing[0x111] = L{
+    {ctype='bool',              label='Lock'},                                  -- 04   0 = unlock, 1 = lock
+    {ctype='data[3]',           label='_junk1'},                                -- 05
+}
+
+-- ROE quest log request
+fields.outgoing[0x112] = L{
+    {ctype='int',               label='_unknown1'},                             -- 04
+}
+
+-- Open Unity Menu :: Two of these are sent whenever I open my unity menu. The first one has a bool of 0 and the second of 1.
+fields.outgoing[0x116] = L{
+    {ctype='bool',              label='_unknown1'},                             -- 04
+    {ctype='char[3]',           label='_unknown2'},                             -- 05   
+}
+
+-- Unity Ranking Results  :: Sent when I open my Unity Ranking Results menu. Triggers a Sparks Update packet and may trigger ranking packets that I could not record.
+fields.outgoing[0x117] = L{
+    {ctype='int',               label='_unknown2'},                             -- 04
+}
+
+-- Open Chat status
+fields.outgoing[0x118] = L{
+    {ctype='bool',              label='Chat Status'},                           -- 04   0 for Inactive and 1 for Active
+    {ctype='char[3]',           label='_unknown2'},                             -- 05   
+}
+
+types.job_level = L{
+    {ctype='unsigned char',     label='Level'},                                 -- 00
+}
+
 -- Zone update
 fields.incoming[0x00A] = L{
-    {ctype='unsigned int',      label='Player ID',          fn=id},             -- 04
+    {ctype='unsigned int',      label='Player',             fn=id},             -- 04
     {ctype='unsigned short',    label='Player Index',       fn=index},          -- 08
-    {ctype='char[38]',          label='_unknown1'},                             -- 0A
+    {ctype='data[38]',          label='_unknown1'},                             -- 0A
     {ctype='unsigned short',    label='Zone',               fn=zone},           -- 30
-    {ctype='char[6]',           label='_unknown2'},                             -- 32
+    {ctype='data[6]',           label='_unknown2'},                             -- 32
     {ctype='unsigned int',      label='Timestamp 1',        fn=time},           -- 38
     {ctype='unsigned int',      label='Timestamp 2',        fn=time},           -- 3C
-    {ctype='unsigned short',    label='Zone MH',            fn=zone},           -- 40   Zone ID when zoning out of MH, otherwise 0
-    {ctype='unsigned short',    label='_dupeZone ID',       fn=zone},           -- 42
-    {ctype='unsigned char',     label='Race'},                                  -- 44
-    {ctype='unsigned char',     label='Face'},                                  -- 45
+    {ctype='unsigned short',    label='_unknown3'},                             -- 40
+    {ctype='unsigned short',    label='_dupeZone',          fn=zone},           -- 42
+    {ctype='unsigned char',     label='Face'},                                  -- 44
+    {ctype='unsigned char',     label='Race'},                                  -- 45
     {ctype='unsigned short',    label='Head'},                                  -- 46
     {ctype='unsigned short',    label='Body'},                                  -- 48
     {ctype='unsigned short',    label='Hands'},                                 -- 4A
@@ -743,35 +915,23 @@ fields.incoming[0x00A] = L{
     {ctype='unsigned short',    label='Main'},                                  -- 50
     {ctype='unsigned short',    label='Sub'},                                   -- 52
     {ctype='unsigned short',    label='Ranged'},                                -- 54
-    {ctype='char[18]',          label='_unknown3'},                             -- 56
-    {ctype='unsigned short',    label='Weather ID',         fn=weather},        -- 68
-    {ctype='unsigned short',    label='_unknown4',          fn=weather},        -- 6A
-    {ctype='char[24]',          label='_unknown5'},                             -- 6C
+    {ctype='data[18]',          label='_unknown4'},                             -- 56
+    {ctype='unsigned short',    label='Weather',            fn=weather},        -- 68
+    {ctype='unsigned short',    label='_unknown5'},                             -- 6A
+    {ctype='data[24]',          label='_unknown6'},                             -- 6C
     {ctype='char[16]',          label='Player Name'},                           -- 84
-    {ctype='char[12]',          label='_unknown6'},                             -- 94
+    {ctype='data[12]',          label='_unknown7'},                             -- 94
     {ctype='unsigned int',      label='Abyssea Timestamp',  fn=time},           -- A0
-    {ctype='char[16]',          label='_unknown7'},                             -- A4   0xAC is 2 for some zones, 0 for others
+    {ctype='unsigned int',      label='_unknown8',          const=0x0003A020},  -- A4
+    {ctype='data[2]',           label='_unknown9'},                             -- A8
+    {ctype='unsigned short',    label='Zone model'},                            -- AA
+    {ctype='data[8]',           label='_unknown10'},                            -- AC   0xAC is 2 for some zones, 0 for others
     {ctype='unsigned char',     label='Main Job',           fn=job},            -- B4
-    {ctype='unsigned char',     label='_unknown7'},                             -- B5
-    {ctype='unsigned char',     label='_unknown8'},                             -- B6
+    {ctype='unsigned char',     label='_unknown11'},                            -- B5
+    {ctype='unsigned char',     label='_unknown12'},                            -- B6
     {ctype='unsigned char',     label='Sub Job',            fn=job},            -- B7
-    {ctype='unsigned int',      label='_unknown9'},                             -- B8
-    {ctype='unsigned char',     label='(None) Level'},                          -- BC
-    {ctype='unsigned char',     label='WAR Level'},                             -- BD
-    {ctype='unsigned char',     label='MNK Level'},                             -- BE
-    {ctype='unsigned char',     label='WHM Level'},                             -- BF
-    {ctype='unsigned char',     label='BLM Level'},                             -- C0
-    {ctype='unsigned char',     label='RDM Level'},                             -- C1
-    {ctype='unsigned char',     label='THF Level'},                             -- C2
-    {ctype='unsigned char',     label='PLD Level'},                             -- C3
-    {ctype='unsigned char',     label='DRK Level'},                             -- C4
-    {ctype='unsigned char',     label='BST Level'},                             -- C5
-    {ctype='unsigned char',     label='BRD Level'},                             -- C6
-    {ctype='unsigned char',     label='RNG Level'},                             -- C7
-    {ctype='unsigned char',     label='SAM Level'},                             -- C8
-    {ctype='unsigned char',     label='NIN Level'},                             -- C9
-    {ctype='unsigned char',     label='DRG Level'},                             -- CA
-    {ctype='unsigned char',     label='SMN Level'},                             -- CB
+    {ctype='unsigned int',      label='_unknown13'},                            -- B8
+    {ref=types.job_level,       lookup={res.jobs, 0x00},    count=0x10},        -- BC
     {ctype='signed short',      label='STR'},                                   -- CC
     {ctype='signed short',      label='DEX'},                                   -- CE
     {ctype='signed short',      label='VIT'},                                   -- D0
@@ -788,7 +948,7 @@ fields.incoming[0x00A] = L{
     {ctype='signed short',      label='CHR Bonus'},                             -- E6
     {ctype='unsigned int',      label='Max HP'},                                -- E8
     {ctype='unsigned int',      label='Max MP'},                                -- EC
-    {ctype='char[20]',          label='_unknown10'},                            -- F0
+    {ctype='data[20]',          label='_unknown14'},                            -- F0
 }
 
 -- Zone Response
@@ -807,48 +967,58 @@ fields.incoming[0x00B] = L{
 
 -- PC Update
 fields.incoming[0x00D] = L{
-	-- The flags in this byte are complicated and may not strictly be flags. 
-	-- Byte 32: -- Mentor is somewhere in this byte
-	-- 01 = None
-	-- 02 = Deletes everyone
-	-- 04 = Deletes everyone
-	-- 08 = None
-	-- 16 = None
-	-- 32 = None
-	-- 64 = None
-	-- 128 = None
-	
-	
-	-- Byte 33:
-	-- 01 = None
-	-- 02 = None
-	-- 04 = None
-	-- 08 = LFG
-	-- 16 = Anon
-	-- 32 = Turns your name orange
-	-- 64 = Away
-	-- 128 = None
-	
-	-- Byte 34:
-	-- 01 = POL Icon, can target?
-	-- 02 = no notable effect
-	-- 04 = DCing
-	-- 08 = Untargettable
-	-- 16 = No linkshell
-	-- 32 = No Linkshell again
-	-- 64 = No linkshell again
-	-- 128 = No linkshell again
-	
-	-- Byte 35:
-	-- 01 = Trial Account
-	-- 02 = Trial Account
-	-- 04 = GM Mode
-	-- 08 = None
-	-- 16 = None
-	-- 32 = Invisible models
-	-- 64 = None
-	-- 128 = Bazaar
-    {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
+    -- The flags in this byte are complicated and may not strictly be flags.
+    -- Byte 32: -- Mentor is somewhere in this byte
+    -- 01 = None
+    -- 02 = Deletes everyone
+    -- 04 = Deletes everyone
+    -- 08 = None
+    -- 16 = None
+    -- 32 = None
+    -- 64 = None
+    -- 128 = None
+
+
+    -- Byte 33:
+    -- 01 = None
+    -- 02 = None
+    -- 04 = None
+    -- 08 = LFG
+    -- 16 = Anon
+    -- 32 = Turns your name orange
+    -- 64 = Away
+    -- 128 = None
+
+    -- Byte 34:
+    -- 01 = POL Icon, can target?
+    -- 02 = no notable effect
+    -- 04 = DCing
+    -- 08 = Untargettable
+    -- 16 = No linkshell
+    -- 32 = No Linkshell again
+    -- 64 = No linkshell again
+    -- 128 = No linkshell again
+
+    -- Byte 35:
+    -- 01 = Trial Account
+    -- 02 = Trial Account
+    -- 04 = GM Mode
+    -- 08 = None
+    -- 16 = None
+    -- 32 = Invisible models
+    -- 64 = None
+    -- 128 = Bazaar
+
+    ---- Mask bits, from antiquity:
+    -- 0x01: "Basic"
+    -- 0x02: "Bit 1"
+    -- 0x04: Status
+    -- 0x08: Name
+    -- 0x10: Gear
+    -- 0x20: Bit 5
+    -- 0x40: Bit 6
+    -- 0x80: Bit 7
+    {ctype='unsigned int',      label='Player',             fn=id},             -- 04
     {ctype='unsigned short',    label='Index',              fn=index},          -- 08
     {ctype='unsigned char',     label='Mask',               fn=bin+{1}},        -- 0A
     {ctype='unsigned char',     label='Body Rotation',      fn=dir},            -- 0B
@@ -861,8 +1031,9 @@ fields.incoming[0x00D] = L{
     {ctype='unsigned char',     label='Base Speed'},                            -- 1D
     {ctype='unsigned char',     label='HP %',               fn=percent},        -- 1E
     {ctype='unsigned char',     label='Animation'},                             -- 1F
-    {ctype='unsigned short',    label='Status'},                                -- 20
-    {ctype='unsigned short',    label='Flags'},                                 -- 22
+    {ctype='unsigned char',     label='Status'},                                -- 20
+    {ctype='unsigned char',     label='_unknown1'},                             -- 21
+    {ctype='unsigned short',    label='Flags',              fn=bin+{2}},        -- 22
     {ctype='unsigned char',     label='Linkshell Red'},                         -- 24
     {ctype='unsigned char',     label='Linkshell Green'},                       -- 25
     {ctype='unsigned char',     label='Linkshell Blue'},                        -- 26
@@ -892,18 +1063,33 @@ fields.incoming[0x00D] = L{
 -- The common fields seem to be the ID, Index, mask and _unknown3.
 -- The second one seems to have an int counter at 0x38 that increases by varying amounts every time byte 0x1F changes.
 -- Currently I don't know how to algorithmically distinguish when the packets are different.
+
+-- Mask values (from antiquity):
+-- 0x01: "Basic"
+-- 0x02: Status
+-- 0x04: HP
+-- 0x08: Name
+-- 0x10: "Bit 4"
+-- 0x20: "Bit 5"
+-- 0x40: "Bit 6"
+-- 0x80: "Bit 7"
+
+
+-- Status flags (from antiquity):
+-- 0b00100000 = CFH Bit
+-- 0b10000101 = "Normal_Status?"
 fields.incoming[0x00E] = L{
-    {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
+    {ctype='unsigned int',      label='NPC',                fn=id},             -- 04
     {ctype='unsigned short',    label='Index',              fn=index},          -- 08
     {ctype='unsigned char',     label='Mask',               fn=bin+{1}},        -- 0A   Bits that control which parts of the packet are actual updates (rest is zeroed). Model is always sent
                                                                                 -- 0A   Bit 0: Position, Rotation, Walk Count
                                                                                 -- 0A   Bit 1: Claimer ID
                                                                                 -- 0A   Bit 2: HP, Status
                                                                                 -- 0A   Bit 3: Name
-                                                                                -- 0A   Bit 4: 
+                                                                                -- 0A   Bit 4:
                                                                                 -- 0A   Bit 5: The client stops displaying the mob when this bit is set (dead, out of range, etc.)
-                                                                                -- 0A   Bit 6: 
-                                                                                -- 0A   Bit 7: 
+                                                                                -- 0A   Bit 6:
+                                                                                -- 0A   Bit 7:
     {ctype='unsigned char',     label='Rotation',           fn=dir},            -- 0B
     {ctype='float',             label='X Position'},                            -- 0C
     {ctype='float',             label='Z Position'},                            -- 10
@@ -911,11 +1097,11 @@ fields.incoming[0x00E] = L{
     {ctype='unsigned int',      label='Walk Count'},                            -- 18   Steadily increases until rotation changes. Does not reset while the mob isn't walking. Only goes until 0xFF1F.
     {ctype='unsigned short',    label='_unknown1',          fn=bin+{2}},        -- 1A
     {ctype='unsigned char',     label='HP %',               fn=percent},        -- 1E
-    {ctype='unsigned char',     label='Status',             fn=status},         -- 1F
+    {ctype='unsigned char',     label='Status',             fn=status},         -- 1F   Status used to be 0x20
     {ctype='unsigned int',      label='_unknown2',          fn=bin+{4}},        -- 20
     {ctype='unsigned int',      label='_unknown3',          fn=bin+{4}},        -- 24
     {ctype='unsigned int',      label='_unknown4',          fn=bin+{4}},        -- 28
-    {ctype='unsigned int',      label='Claimer ID',         fn=id},             -- 2C
+    {ctype='unsigned int',      label='Claimer',            fn=id},             -- 2C
     {ctype='unsigned short',    label='_unknown5'},                             -- 30
     {ctype='unsigned short',    label='Model'},                                 -- 32
     {ctype='char*',             label='Name'},                                  -- 34 -   *
@@ -923,11 +1109,11 @@ fields.incoming[0x00E] = L{
 
 -- Incoming Chat
 fields.incoming[0x017] = L{
-    {ctype='unsigned char',     label='Mode'},                                  -- 04   Chat mode.
-    {ctype='bool',              label='GM'},                                    -- 05   1 for GM or 0 for not
-    {ctype='unsigned short',    label='Zone ID',            fn=zone},           -- 06   Zone ID, used for Yell
-    {ctype='char[16]',          label='Sender Name'},                           -- 08   Name
-    {ctype='char*',             label='Message'},                               -- 17   Message, occasionally terminated by spare 00 bytes. Max of 150 characters.
+    {ctype='unsigned char',     label='Mode'},                                  -- 04
+    {ctype='bool',              label='GM'},                                    -- 05
+    {ctype='unsigned short',    label='Zone',               fn=zone},           -- 06   Set only for Yell
+    {ctype='char[16]',          label='Sender Name'},                           -- 08
+    {ctype='char*',             label='Message'},                               -- 18   Max of 150 characters
 }
 
 -- Job Info
@@ -939,21 +1125,7 @@ fields.incoming[0x01B] = L{
     {ctype='unsigned char',     label='Sub Job',            fn=job},            -- 0B
     {ctype='unsigned int',      label='_unknown2'},                             -- 0C   Flags -- FF FF FF 00 observed
     {ctype='unsigned char',     label='_unknown3'},                             -- 10   Flag or List Start
-    {ctype='unsigned char',     label='WAR Level'},                             -- 11
-    {ctype='unsigned char',     label='MNK Level'},                             -- 12
-    {ctype='unsigned char',     label='WHM Level'},                             -- 13
-    {ctype='unsigned char',     label='BLM Level'},                             -- 14
-    {ctype='unsigned char',     label='RDM Level'},                             -- 15
-    {ctype='unsigned char',     label='THF Level'},                             -- 16
-    {ctype='unsigned char',     label='PLD Level'},                             -- 17
-    {ctype='unsigned char',     label='DRK Level'},                             -- 18
-    {ctype='unsigned char',     label='BST Level'},                             -- 19
-    {ctype='unsigned char',     label='BRD Level'},                             -- 1A
-    {ctype='unsigned char',     label='RNG Level'},                             -- 1B
-    {ctype='unsigned char',     label='SAM Level'},                             -- 1C
-    {ctype='unsigned char',     label='NIN Level'},                             -- 1D
-    {ctype='unsigned char',     label='DRG Level'},                             -- 1E
-    {ctype='unsigned char',     label='SMN Level'},                             -- 1F
+    {ref=types.job_level,       lookup={res.jobs, 0x01},    count=0x0F},        -- 11
     {ctype='unsigned short',    label='Base STR'},                              -- 20  -- Altering these stat values has no impact on your equipment menu.
     {ctype='unsigned short',    label='Base DEX'},                              -- 22
     {ctype='unsigned short',    label='Base VIT'},                              -- 24
@@ -961,33 +1133,12 @@ fields.incoming[0x01B] = L{
     {ctype='unsigned short',    label='Base INT'},                              -- 28
     {ctype='unsigned short',    label='Base MND'},                              -- 2A
     {ctype='unsigned short',    label='Base CHR'},                              -- 2C
-    {ctype='char[14]',          label='_unknown4'},                             -- 2E   Flags and junk? Hard to say. All 0s observed.
+    {ctype='data[14]',          label='_unknown4'},                             -- 2E   Flags and junk? Hard to say. All 0s observed.
     {ctype='unsigned int',      label='Maximum HP'},                            -- 3C
     {ctype='unsigned int',      label='Maximum MP'},                            -- 40
     {ctype='unsigned int',      label='Flags'},                                 -- 44   Looks like a bunch of flags. Observed value if 01 00 00 00
     {ctype='unsigned char',     label='_unknown5'},                             -- 48   Potential flag to signal the list start. Observed value of 01
-    {ctype='unsigned char',     label='WAR Level'},                             -- 49
-    {ctype='unsigned char',     label='MNK Level'},                             -- 4A
-    {ctype='unsigned char',     label='WHM Level'},                             -- 4B
-    {ctype='unsigned char',     label='BLM Level'},                             -- 4C
-    {ctype='unsigned char',     label='RDM Level'},                             -- 4D
-    {ctype='unsigned char',     label='THF Level'},                             -- 4E
-    {ctype='unsigned char',     label='PLD Level'},                             -- 4F
-    {ctype='unsigned char',     label='DRK Level'},                             -- 50
-    {ctype='unsigned char',     label='BST Level'},                             -- 51
-    {ctype='unsigned char',     label='BRD Level'},                             -- 52
-    {ctype='unsigned char',     label='RNG Level'},                             -- 53
-    {ctype='unsigned char',     label='SAM Level'},                             -- 54
-    {ctype='unsigned char',     label='NIN Level'},                             -- 55
-    {ctype='unsigned char',     label='DRG Level'},                             -- 56
-    {ctype='unsigned char',     label='SMN Level'},                             -- 57
-    {ctype='unsigned char',     label='BLU Level'},                             -- 58
-    {ctype='unsigned char',     label='COR Level'},                             -- 59
-    {ctype='unsigned char',     label='PUP Level'},                             -- 5A
-    {ctype='unsigned char',     label='DNC Level'},                             -- 5B
-    {ctype='unsigned char',     label='SCH Level'},                             -- 5C
-    {ctype='unsigned char',     label='GEO Level'},                             -- 5D
-    {ctype='unsigned char',     label='RUN Level'},                             -- 5E
+    {ref=types.job_level,       lookup={res.jobs, 0x01},    count=0x16},        -- 49
     {ctype='unsigned char',     label='Current Monster Level'},                 -- 5F
     {ctype='unsigned int',      label='Encumbrance Flags'},                     -- 60   [legs, hands, body, head, ammo, range, sub, main,] [back, right_ring, left_ring, right_ear, left_ear, waist, neck, feet] [HP, CHR, MND, INT, AGI, VIT, DEX, STR,] [X X X X X X X MP]
 }
@@ -1008,21 +1159,24 @@ fields.incoming[0x01C] = L{
     {ctype='unsigned char',     label='Satchel Size'},                          -- 09
     {ctype='unsigned char',     label='Sack Size'},                             -- 0A
     {ctype='unsigned char',     label='Case Size'},                             -- 0B
-    {ctype='char[8]',           label='_padding1',          const=''},          -- 0C
+    {ctype='unsigned char',     label='Wardrobe Size'},                         -- 0C
+    {ctype='data[7]',           label='_padding1',          const=''},          -- 0D
     {ctype='unsigned short',    label='_dupeInventory Size'},                   -- 14
     {ctype='unsigned short',    label='_dupeSafe Size'},                        -- 16
-    {ctype='unsigned short',    label='_dupeStorage Size'},                     -- 1A   The accumulated storage from all items (uncapped) -1
-    {ctype='unsigned short',    label='_dupeTemporary Size'},                   -- 1C
-    {ctype='unsigned short',    label='_dupeLocker Size'},                      -- 1E
-    {ctype='unsigned short',    label='_dupeSatchel Size'},                     -- 20
-    {ctype='unsigned short',    label='_dupeSack Size'},                        -- 22
-    {ctype='unsigned short',    label='_dupeCase Size'},                        -- 24
-    {ctype='char[18]',          label='_padding2',          const=''},          -- 26
+    {ctype='unsigned short',    label='_dupeStorage Size'},                     -- 18   The accumulated storage from all items (uncapped) -1
+    {ctype='unsigned short',    label='_dupeTemporary Size'},                   -- 1A
+    {ctype='unsigned short',    label='_dupeLocker Size'},                      -- 1C
+    {ctype='unsigned short',    label='_dupeSatchel Size'},                     -- 2E
+    {ctype='unsigned short',    label='_dupeSack Size'},                        -- 20
+    {ctype='unsigned short',    label='_dupeCase Size'},                        -- 22
+    {ctype='unsigned short',    label='_dupeWardrobe Size'},                    -- 24
+    {ctype='data[14]',          label='_padding2',          const=''},          -- 26
 }
 
 -- Finish Inventory
 fields.incoming[0x01D] = L{
-    {ctype='unsigned int',      label='Flag',               const=0x01},        -- 04
+    {ctype='unsigned char',     label='Flag',               const=0x01},        -- 04
+    {ctype='data[3]',           label='_junk1'},                                -- 06
 }
 
 -- Modify Inventory
@@ -1036,7 +1190,7 @@ fields.incoming[0x01E] = L{
 -- Item Assign
 fields.incoming[0x01F] = L{
     {ctype='unsigned int',      label='Count'},                                 -- 04
-    {ctype='unsigned short',    label='ID',                 fn=item},           -- 08
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 08
     {ctype='unsigned char',     label='Bag',                fn=bag},            -- 0A
     {ctype='unsigned char',     label='Index',              fn=invp+{0x0A}},    -- 0B
     {ctype='unsigned char',     label='Status',             fn=e+{'itemstat'}}, -- 0C
@@ -1046,17 +1200,17 @@ fields.incoming[0x01F] = L{
 fields.incoming[0x020] = L{
     {ctype='unsigned int',      label='Count'},                                 -- 04
     {ctype='unsigned int',      label='Bazaar',             fn=gil},            -- 08
-    {ctype='unsigned short',    label='ID',                 fn=item},           -- 0C
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 0C
     {ctype='unsigned char',     label='Bag',                fn=bag},            -- 0E
     {ctype='unsigned char',     label='Index',              fn=invp+{0x0E}},    -- 0F
     {ctype='unsigned char',     label='Status',             fn=e+{'itemstat'}}, -- 10
-    {ctype='char[24]',          label='ExtData',            fn='...':fn()},     -- 11
-    {ctype='char[3]',           label='_junk1'},                                -- 29
+    {ctype='data[24]',          label='ExtData',            fn='...':fn()},     -- 11
+    {ctype='data[3]',           label='_junk1'},                                -- 29
 }
 
 -- Trade request received
 fields.incoming[0x021] = L{
-    {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
+    {ctype='unsigned int',      label='Player',             fn=id},             -- 04
     {ctype='unsigned short',    label='Index',              fn=index},          -- 08
     {ctype='unsigned short',    label='_junk1'},                                -- 0A
 }
@@ -1069,7 +1223,7 @@ enums['trade'] = {
     [9] = 'Trade successful',
 }
 fields.incoming[0x022] = L{
-    {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
+    {ctype='unsigned int',      label='Player',             fn=id},             -- 04
     {ctype='unsigned int',      label='Type',               fn=e+{'trade'}},    -- 08
     {ctype='unsigned short',    label='Index',              fn=index},          -- 0C
     {ctype='unsigned short',    label='_junk1'},                                -- 0E
@@ -1078,61 +1232,138 @@ fields.incoming[0x022] = L{
 -- Trade item, other party
 fields.incoming[0x023] = L{
     {ctype='unsigned int',      label='Count'},                                 -- 04
-    {ctype='unsigned short',    label='Trade count'},                           -- 08   Seems to increment every time packet 0x023 comes in, i.e. every trade action performed by the other party
-    {ctype='unsigned short',    label='ID',                 fn=item},           -- 0A   If the item is removed, gil is used with a count of zero
+    {ctype='unsigned short',    label='Trade Count'},                           -- 08   Seems to increment every time packet 0x023 comes in, i.e. every trade action performed by the other party
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 0A   If the item is removed, gil is used with a count of zero
     {ctype='unsigned char',     label='_unknown1',          const=0x05},        -- 0C   Possibly junk?
     {ctype='unsigned char',     label='Slot'},                                  -- 0D   Gil itself is in slot 0, whereas the other slots start at 1 and count up horizontally
-    {ctype='char[26]',          label='_unknown2'},                             -- 0E   ExtData related? 2 bytes short of full item ExtData size
-                                                                                -- 0E   Shows similar characteristics though, 0 on most items, non-zero on charged items
+    {ctype='data[24]',          label='ExtData'},                               -- 0E
+    {ctype='data[2]',           label='_junk1'},                                -- 26
 }
 
 -- Trade item, self
 fields.incoming[0x025] = L{
     {ctype='unsigned int',      label='Count'},                                 -- 04
-    {ctype='unsigned short',    label='ID',                 fn=item},           -- 08   If the item is removed, gil is used with a count of zero
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 08   If the item is removed, gil is used with a count of zero
     {ctype='unsigned char',     label='Slot'},                                  -- 0A   Gil itself is in slot 0, whereas the other slots start at 1 and count up horizontally
     {ctype='unsigned char',     label='Inventory Index',    fn=inv+{0}},        -- 0B
 }
 
 -- Count to 80
+-- Sent after Item Update chunks for active inventory (sometimes) when zoning.
 fields.incoming[0x026] = L{
-    {ctype='unsigned char',     label='_unknown1',          const=0x00},        -- 04
-    {ctype='unsigned char',     label='Counter'},                               -- 05   Varies sequentially between 0x01 and 0x50
-    {ctype='char[22]',          label='_unknown2',          const=0},           -- 06
+    {ctype='data[1]',           label='_unknown1',          const=0x00},        -- 04
+    {ctype='unsigned char',     label='Slot'},                                  -- 05   Corresponds to the slot IDs of the previous incoming packet's Item Update chunks for active Inventory.
+    {ctype='data[22]',          label='_unknown2',          const=0},           -- 06
 }
 
 -- Encumbrance Release
 fields.incoming[0x027] = L{
-    {ctype='unsigned int',      label='Player ID',          fn=id},             -- 04
+    {ctype='unsigned int',      label='Player',             fn=id},             -- 04
     {ctype='unsigned short',    label='Player Index',       fn=index},          -- 08
-    {ctype='unsigned char',     label='Slot or Stat ID'},                       -- 0A   85 = DEX Down, 87 = AGI Down, 8A = CHR Down, 8B = HP Down, 7A = Head/Neck restriction, 7D = Leg/Foot Restriction
-    {ctype='unsigned char',     label='_unknown1'},                             -- 0B   9C
-    {ctype='unsigned int',      label='_unknown2'},                             -- 0C   04 00 00 00
-    {ctype='unsigned int',      label='_unknown3'},                             -- 10
-    {ctype='unsigned char',     label='_unknown4'},                             -- 14
-    {ctype='char[11]',          label='_unknown5'},                             -- 15
+    {ctype='unsigned short',    label='Message ID'},                            -- 0A   
+    {ctype='unsigned int',      label='_unknown1'},                             -- 0C  
+    {ctype='unsigned int',      label='Param 1'},                               -- 10
+    {ctype='unsigned char',     label='_unknown3'},                             -- 14
+    {ctype='data[11]',          label='_unknown4'},                             -- 15
     {ctype='char[16]',          label='Player Name'},                           -- 20
-    {ctype='char[16]',          label='_unknown6'},                             -- 30
+    {ctype='data[16]',          label='_unknown6'},                             -- 30
     {ctype='char[16]',          label='_dupePlayer Name'},                      -- 40
-    {ctype='char[32]',          label='_unknown7'},                             -- 50
+    {ctype='data[32]',          label='_unknown7'},                             -- 50
+}
+
+-- Action
+fields.incoming._func[0x028] = {}
+fields.incoming[0x028] = function(data)
+    return fields.incoming._func[0x028].base
+end
+
+enums.action_in = {
+    [4] = 'Casting finish',
+    [6] = 'Job Ability use',
+    [8] = 'Casting start',
+}
+
+fields.incoming._func[0x028].base = L{
+    {ctype='unsigned char',     label='Size'},                                  -- 04
+    {ctype='unsigned int',      label='Actor',              fn=id},             -- 05
+    {ctype='bit[10]',           label='Target Count'},                          -- 09
+    {ctype='bit[4]',            label='Category',           fn=e+{'action_in'}},-- 0A
+    {ctype='bit[16]',           label='Param'},                                 -- 0C
+    {ctype='bit[16]',           label='_unknown1'},                             -- 0E
+    {ctype='bit[32]',           label='Recast'},                                -- 10
 }
 
 -- Action Message
 fields.incoming[0x029] = L{
-    {ctype='unsigned int',      label='Actor ID',           fn=id},             -- 04
-    {ctype='unsigned int',      label='Target ID',          fn=id},             -- 08
+    {ctype='unsigned int',      label='Actor',              fn=id},             -- 04
+    {ctype='unsigned int',      label='Target',             fn=id},             -- 08
     {ctype='unsigned int',      label='Param 1'},                               -- 0C
-    {ctype='bit[6]',            label='Param 2'},                               -- 10
-    {ctype='bit[26]',           label='Param 3'},                               -- 11
+    {ctype='unsigned int',      label='Param 2'},                               -- 10
     {ctype='unsigned short',    label='Actor Index',        fn=index},          -- 14
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 16
-    {ctype='unsigned short',    label='Message ID'},                            -- 18
+    {ctype='unsigned short',    label='Message'},                               -- 18
     {ctype='unsigned short',    label='_unknown1'},                             -- 1A
 }
 
+
+--[[ 0x2A can be triggered by knealing in the right areas while in the possession of a VWNM KI:
+    Field1 will be lights level:
+    0 = 'Tier 1', -- faintly/feebly depending on whether it's outside of inside Abyssea
+    1 = 'Tier 2', -- softly
+    2 = 'Tier 3', -- solidly. Highest Tier in Abyssea
+    3 = 'Tier 4', --- strongly
+    4 = 'Tier 5', -- very strongly.  Unused currently
+    5 = 'Tier 6', --- furiously.  Unused currently
+    - But if there are no mobs left in area, or no mobs nearby, field1 will be the KeyItem#
+    1253 = 'Clear Abyssite'
+	1254 = 'Colorful Abyssite'
+	1564 = 'Clear Demilune Abyssite'
+	etc.
+
+    Field2 will be direction:
+    0 = 'East'
+    1 = 'Southeast'
+    2 = 'South'
+    3 = 'Southwest'
+    4 = 'West'
+    5 = 'Northwest'
+    6 = 'North'
+    7 = 'Northeast'
+
+    Field3 will be distance. When there are no mobs, this value is set to 300000
+
+    Field4 will be KI# of the abyssite used. Ex:
+    1253 = 'Clear Abyssite'
+	1254 = 'Colorful Abyssite'
+	1564 = 'Clear Demilune Abyssite'
+	etc.
+]]
+
+--[[  0x2A can also be triggered by buying/disposing of a VWNM KI from an NPC:
+      Index/ID field will be those of the NPC
+      Field1 will be 1000 (gil) when acquiring in Jueno, 300 (cruor) when acquiring in Abyssea
+      Field2 will be the KI# acquired
+      Fields are used slighly different when dropping the KI using the NPC.
+]]
+
+--[[  0x2A can also be triggered by spending cruor by buying non-vwnm related items, or even activating/using Flux
+      Field1 will be the amount of cruor spent
+]]
+      
+     
+--[[ 0x2A can also be triggered by zoning into Abyssea:
+     Field1 will be set to your remaining time. 5 at first, then whatever new value when acquiring visiting status.
+     0x2A will likely be triggered as well when extending your time limit. Needs verification.
+]]
+
+
+--[[ 0x2A can be triggered sometimes when zoning into non-Abyssea:
+     Not sure what it means.
+]]
+
 -- Resting Message
 fields.incoming[0x02A] = L{
-    {ctype='unsigned int',      label='Player ID',          fn=id},             -- 04
+    {ctype='unsigned int',      label='Player',             fn=id},             -- 04
     {ctype='unsigned int',      label='Param 1'},                               -- 08
     {ctype='unsigned int',      label='Param 2'},                               -- 0C
     {ctype='unsigned int',      label='Param 3'},                               -- 10
@@ -1145,27 +1376,27 @@ fields.incoming[0x02A] = L{
 -- Kill Message
 -- Updates EXP gained, RoE messages, Limit Points, and Capacity Points
 fields.incoming[0x02D] = L{
-    {ctype='unsigned int',      label='Player ID',          fn=id},             -- 04
-    {ctype='unsigned int',      label='Target ID',          fn=id},             -- 08   Player ID in the case of RoE log updates
+    {ctype='unsigned int',      label='Player',             fn=id},             -- 04
+    {ctype='unsigned int',      label='Target',             fn=id},             -- 08   Player ID in the case of RoE log updates
     {ctype='unsigned short',    label='Player Index',       fn=index},          -- 0C
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 0E   Player Index in the case of RoE log updates
     {ctype='unsigned int',      label='Param 1'},                               -- 10   EXP gained, etc. Numerator for RoE objectives
     {ctype='unsigned int',      label='Param 2'},                               -- 14   Denominator for RoE objectives
-    {ctype='unsigned short',    label='Message ID'},                            -- 18
+    {ctype='unsigned short',    label='Message'},                               -- 18
     {ctype='unsigned short',    label='_flags1'},                               -- 1A   This could also be a third parameter, but I suspect it is flags because I have only ever seen one bit set.
 }
 
 -- Digging Animation
 fields.incoming[0x02F] = L{
-    {ctype='unsigned int',      label='Player ID',          fn=id},             -- 04
+    {ctype='unsigned int',      label='Player',             fn=id},             -- 04
     {ctype='unsigned short',    label='Player Index',       fn=index},          -- 08
-    {ctype='unsigned char',     label='Animation ID'},                          -- 0A   Changing it to anything other than 1 eliminates the animation
+    {ctype='unsigned char',     label='Animation'},                             -- 0A   Changing it to anything other than 1 eliminates the animation
     {ctype='unsigned char',     label='_junk1'},                                -- 0B   Likely junk. Has no effect on anything notable.
 }
 
 -- Synth Animation
 fields.incoming[0x030] = L{
-    {ctype='unsigned int',      label='Player ID',          fn=id},             -- 04
+    {ctype='unsigned int',      label='Player',             fn=id},             -- 04
     {ctype='unsigned short',    label='Player Index',       fn=index},          -- 08
     {ctype='unsigned short',    label='Effect'},                                -- 0A  -- 10 00 is water, 11 00 is wind, 12 00 is fire, 13 00 is earth, 14 00 is lightning, 15 00 is ice, 16 00 is light, 17 00 is dark
     {ctype='unsigned char',     label='Param'},                                 -- 0C  -- 00 is NQ, 01 is break, 02 is HQ
@@ -1173,27 +1404,93 @@ fields.incoming[0x030] = L{
     {ctype='unsigned char',     label='_unknown1',          const=0x00},        -- 0E  -- Appears to just be trash.
 }
 
+-- Synth List / Synth Recipe
+--[[ This packet is used for list of recipes, but also for details of a specific recipe.
+
+   If you ask the guild NPC that provides regular Image Suppor for recipes, 
+   s/he will give you a list of recipes, fields are as follows:
+   Field1-2: NPC ID
+   Field3: NPC Index
+   Field4-6: Unknown
+   Field7-22: Item ID of recipe
+   Field23: Unknown
+   Field24: Usually Item ID of the recipe on next page
+
+
+   If you ask a guild NPC for a specific recipe, fields are as follows:   
+   field1: item to make (item id)
+   field2,3,4: sub-crafts needed. Note that main craft will not be listed.
+      1 = woodworking
+      2 = smithing
+      3 = goldsmithing
+      4 = clothcraft	
+      5 = leatherworking
+      6 = bonecraft
+      7 = Alchemy
+      8 = Cooking
+   field5: crystal (item id)
+   field6: KeyItem needed, if any (in Big Endian)
+   field7-14: material required (item id)
+   field15-22: qty for each material above.
+   field23-24: Unknown   
+ ]]
+fields.incoming[0x031] = L{
+    {ctype='unsigned short[24]',    label='Field'},                             -- 04    
+}
+
 -- NPC Interaction Type 1
 fields.incoming[0x032] = L{
-    {ctype='unsigned int',      label='NPC ID',             fn=id},             -- 04
+    {ctype='unsigned int',      label='NPC',                fn=id},             -- 04
     {ctype='unsigned short',    label='NPC Index',          fn=index},          -- 08
     {ctype='unsigned short',    label='Zone',               fn=zone},           -- 0A
     {ctype='unsigned short',    label='Menu ID'},                               -- 0C   Seems to select between menus within a zone
     {ctype='unsigned short',    label='_unknown1'},                             -- 0E   00 for me
     {ctype='unsigned char',     label='_dupeZone',          fn=zone},           -- 10
-    {ctype='char[3]',           label='_junk1'},                                -- 11   Always 00s for me
+    {ctype='data[3]',           label='_junk1'},                                -- 11   Always 00s for me
 }
 
 -- NPC Interaction Type 2
 fields.incoming[0x034] = L{
-    {ctype='unsigned int',      label='NPC ID',             fn=id},             -- 04
-    {ctype='unsigned short[16]',label='Menu Parameter'},                        -- 08
+    {ctype='unsigned int',      label='NPC',                fn=id},             -- 04
+    {ctype='data[32]',          label='Menu Parameters'},                       -- 08   
     {ctype='unsigned short',    label='NPC Index',          fn=index},          -- 28
     {ctype='unsigned short',    label='Zone',               fn=zone},           -- 2A
     {ctype='unsigned short',    label='Menu ID'},                               -- 2C   Seems to select between menus within a zone
-    {ctype='unsigned short',    label='_unknown1',          const=0x08},        -- 2E   08 for me, but FFing did nothing
+    {ctype='unsigned char',     label='_unknown1',          const=0x08},        -- 2E   08 for me, but FFing did nothing
+    {ctype='unsigned char',     label='_unknown2'},                             -- 2F
     {ctype='unsigned short',    label='_dupeZone',          fn=zone},           -- 30
-    {ctype='char[2]',           label='_junk1'},                                -- 31   Always 00s for me
+    {ctype='data[2]',           label='_junk1'},                                -- 31   Always 00s for me
+}
+
+--- When messages are fishing related, the player is the Actor.
+--- For some areas, the most significant bit of the message ID is set sometimes.
+-- NPC Chat
+fields.incoming[0x036] = L{
+    {ctype='unsigned int',      label='Actor',                fn=id},             -- 04
+    {ctype='unsigned short',    label='Actor Index',          fn=index},          -- 08
+    {ctype='bit[15]',           label='Message ID'},                              -- 0A
+    {ctype='bit',               label='_unknown1'},                               -- 0B
+    {ctype='unsigned int',      label='_unknown2'},                               -- 0C  Probably junk
+}
+
+enums.indi = {
+    [0x5F] = 'Enemy Dark',
+    [0x5E] = 'Enemy Light',
+    [0x5D] = 'Enemy Water',
+    [0x5C] = 'Enemy Lightning',
+    [0x5B] = 'Enemy Earth',
+    [0x5A] = 'Enemy Wind',
+    [0x59] = 'Enemy Ice',
+    [0x58] = 'Enemy Fire',
+    [0x57] = 'Party Dark',
+    [0x56] = 'Party Light',
+    [0x55] = 'Party Water',
+    [0x54] = 'Party Lightning',
+    [0x53] = 'Party Earth',
+    [0x52] = 'Party Wind',
+    [0x51] = 'Party Ice',
+    [0x50] = 'Party Fire',
+    [0x00] = 'None',
 }
 
 -- Player update
@@ -1202,41 +1499,55 @@ fields.incoming[0x034] = L{
 -- represent how much to add to the value in the respective byte.
 fields.incoming[0x037] = L{
     {ctype='unsigned char[32]', label='Buff',               fn=buff},           -- 04
-    {ctype='unsigned int',      label='Player ID',          fn=id},             -- 24
-    {ctype='unsigned short',    label='_unknown1'},                             -- 28
+    {ctype='unsigned int',      label='Player',             fn=id},             -- 24
+    {ctype='unsigned short',    label='_unknown1'},                             -- 28   Called "Flags" on the old dev wiki
     {ctype='unsigned char',     label='HP %',               fn=percent},        -- 29
-    {ctype='unsigned char',     label='_unknown2'},                             -- 2A
-    {ctype='unsigned char',     label='_unknown3'},                             -- 2B
-    {ctype='unsigned char',     label='_unknown4'},                             -- 2C
-    {ctype='unsigned char',     label='_unknown5'},                             -- 2D
-    {ctype='unsigned char',     label='_unknown6'},                             -- 2E
+    {ctype='unsigned char',     label='_unknown2'},                             -- 2A   May somehow be tied to current animation (old dev wiki)
+    {ctype='unsigned char',     label='Flags'},                                 -- 2B   GM Flag, etc.
+    {ctype='unsigned char',     label='Movement Speed'},                        -- 2C   Player movement speed
+    {ctype='unsigned char',     label='_unknown3'},                             -- 2D
+    {ctype='unsigned char',     label='_unknown4'},                             -- 2E
     {ctype='unsigned char',     label='Status',             fn=status},         -- 30
     {ctype='unsigned char',     label='LS Color Red'},                          -- 31
     {ctype='unsigned char',     label='LS Color Green'},                        -- 32
     {ctype='unsigned char',     label='LS Color Blue'},                         -- 33
-    {ctype='char[8]',           label='_unknown7'},                             -- 34
-    {ctype='unsigned int',      label='_unknown8'},                             -- 3C
+    {ctype='data[8]',           label='_unknown5'},                             -- 34   Player's pet index * 8?
+    {ctype='unsigned int',      label='_unknown6'},                             -- 3C
     {ctype='unsigned int',      label='Timestamp',          fn=time},           -- 40
-    {ctype='char[8]',           label='_unknown9'},                             -- 44
-    {ctype='char[8]',           label='Bit Mask'},                              -- 4C
-    {ctype='char[8]',           label='_unknown10'},                            -- 54
+    {ctype='data[8]',           label='_unknown7'},                             -- 44
+    {ctype='data[8]',           label='Bit Mask'},                              -- 4C
+    {ctype='data[4]',           label='_unknown8'},                             -- 54
+    {ctype='unsigned char',     label='Indi Buff',          fn=e+{'indi'}},     -- 58
+    {ctype='data[3]',           label='_unknown9'},                             -- 59
 }
 
--- Model DisAppear
+-- Entity Animation
+-- Most frequently used for spawning ("deru") and despawning ("kesu")
+-- Another example: "sp00" for Selh'teus making his spear of light appear
 fields.incoming[0x038] = L{
-    {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
-    {ctype='unsigned int',      label='_dupeID',            fn=id},             -- 08
-    {ctype='char[4]',           label='Type',               fn=e+{0x038}},      -- 0C   "kesu" for disappearing, "deru" for appearing, "deru" only seems to work
-    {ctype='unsigned short',    label='Index',              fn=index},          -- 10
-    {ctype='unsigned short',    label='_dupeIndex',         fn=index},          -- 12
+    {ctype='unsigned int',      label='Mob',                fn=id},             -- 04
+    {ctype='unsigned int',      label='_dupeMob',           fn=id},             -- 08
+    {ctype='char[4]',           label='Type',               fn=e+{0x038}},      -- 0C   Four character animation name
+    {ctype='unsigned short',    label='Mob Index',          fn=index},          -- 10
+    {ctype='unsigned short',    label='_dupeMob Index',     fn=index},          -- 12
 }
 
--- Env. Animation 2
+-- Env. Animation
+-- Animations without entities will have zeroes for ID and Index
+-- Example without IDs: Runic Gate/Runic Portal
+-- Example with IDs: Diabolos floor tiles
 fields.incoming[0x039] = L{
-    {ctype='unsigned int',      label='_unknown1'},                             -- 04   00 00 00 00 observed
-    {ctype='unsigned int',      label='_unknown2'},                             -- 08   00 00 00 00 observed
-    {ctype='char[4]',           label='Type',               fn=e+{0x038}},      -- 0C   "nbof" or "nbon" observed
-    {ctype='unsigned int',      label='_unknown3'},                             -- 10   00 00 00 00 observed
+    {ctype='unsigned int',      label='ID',                fn=id},             -- 04
+    {ctype='unsigned int',      label='_dupeID',           fn=id},             -- 08
+    {ctype='char[4]',           label='Type',              fn=e+{0x038}},      -- 0C   Four character animation name
+    {ctype='unsigned short',    label='Index',             fn=index},          -- 10
+    {ctype='unsigned short',    label='_dupeIndex',        fn=index},          -- 10
+}
+
+types.shop_item = L{
+    {ctype='unsigned int',      label='Price',              fn=gil},            -- 00
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 04
+    {ctype='unsigned short',    label='Shop Slot'},                             -- 08
 }
 
 -- Shop
@@ -1246,26 +1557,56 @@ fields.incoming[0x03C] = L{
     {ref=types.shop_item,       label='Item',               count='*'},         -- 08 -   *
 }
 
+-- Price response
+-- Sent after an outgoing price request for an NPC vendor (0x085)
+fields.incoming[0x03D] = L{
+    {ctype='unsigned int',      label='Price',              fn=gil},            -- 04
+    {ctype='unsigned char',     label='Inventory Index',    fn=invp+{0x09}},    -- 08
+    {ctype='unsigned char',     label='Bag',                fn=bag},            -- 09
+    {ctype='unsigned short',    label='_junk1'},                                -- 0A
+    {ctype='unsigned int',      label='_unknown1',          const=1},           -- 0C
+}
+
+types.blacklist_entry = L{
+    {ctype='unsigned int',      label='ID'},                                    -- 00
+    {ctype='char[16]',          label='Name'},                                  -- 04
+}
+
+-- Blacklist
+fields.incoming[0x041] = L{
+    {ref=types.blacklist_entry, count=12},                                      -- 08
+    {ctype='unsigned char',     label='_unknown3',          const=3},           -- F4   Always 3
+    {ctype='unsigned char',     label='Size'},                                  -- F5   Blacklist entries
+}
+
+-- Blacklist (add/delete)
+fields.incoming[0x042] = L{
+    {ctype='int',               label='_unknown1'},                             -- 04  Looks like a player ID, but does not match the sender or the receiver.
+    {ctype='char[16]',          label='Name'},                                  -- 08  Character name
+    {ctype='bool',              label='Add/Remove'},                            -- 18  0 = add, 1 = remove
+    {ctype='data[3]',           label='_unknown2'},                             -- 19  Values observed on adding but not deleting.
+}
+
 -- Pet Stat
 -- This packet varies and is indexed by job ID (byte 4)
 -- Packet 0x044 is sent twice in sequence when stats could change. This can be caused by anything from
 -- using a Maneuver on PUP to changing job. The two packets are the same length. The first
 -- contains information about your main job. The second contains information about your
 -- subjob and has the Subjob flag flipped.
-fields.incoming._mult[0x044] = {}
+fields.incoming._func[0x044] = {}
 fields.incoming[0x044] = function(data)
-    return fields.incoming._mult[0x044].base + fields.incoming._mult[data:sub(5,5):byte()]
+    return fields.incoming._func[0x044].base + (fields.incoming._func[0x044][data:sub(5,5):byte()] or L{})
 end
 
 -- Base, shared by all jobs
-fields.incoming._mult[0x044].base = L{
+fields.incoming._func[0x044].base = L{
     {ctype='unsigned char',     label='Job'},                                   -- 04
     {ctype='bool',              label='Subjob'},                                -- 05
     {ctype='unsigned short',    label='_unknown1'},                             -- 06
 }
 
 -- PUP
-fields.incoming._mult[0x044][0x12] = L{
+fields.incoming._func[0x044][0x12] = L{
     {ctype='unsigned char',     label='Automaton Head'},                        -- 08   Harlequinn 1, Valoredge 2, Sharpshot 3, Stormwaker 4, Soulsoother 5, Spiritreaver 6
     {ctype='unsigned char',     label='Automaton Frame'},                       -- 09   Harlequinn 20, Valoredge 21, Sharpshot 22, Stormwaker 23
     {ctype='unsigned char',     label='Slot 1'},                                -- 0A   Attachment assignments are based off their position in the equipment list.
@@ -1328,20 +1669,20 @@ fields.incoming._mult[0x044][0x12] = L{
 -- For BLM, 0x29 to 0x43 appear to represent the black magic that you know
 
 -- MON
-fields.incoming._mult[0x044][0x17] = L{
+fields.incoming._func[0x044][0x17] = L{
     {ctype='unsigned short',    label='Species'},                               -- 08
     {ctype='unsigned short',    label='_unknown2'},                             -- 0A
     {ctype='unsigned short[12]',label='Instinct'},                              -- 0C   Instinct assignments are based off their position in the equipment list.
     {ctype='unsigned short',    label='_unknown3'},                             -- 24
-    {ctype='char[118]',         label='_unknown4'},                             -- 26   Zeroing everything beyond this point has no notable effect.
+    {ctype='data[118]',         label='_unknown4'},                             -- 26   Zeroing everything beyond this point has no notable effect.
 }
 
 -- Delivery Item
-fields.incoming._mult[0x04B] = {}
+fields.incoming._func[0x04B] = {}
 fields.incoming[0x04B] = function()
-    local full = S{0x01, 0x06, 0x08, 0x0A}
+    local full = S{0x01, 0x04, 0x06, 0x08, 0x0A} -- This might not catch all packets with 'slot-info' (extra 68 bytes)
     return function(data)
-        return full:contains(data:byte(5, 5)) and fields.incoming._mult[0x04B].slot or fields.incoming._mult[0x04B].base
+        return full:contains(data:byte(5, 5)) and fields.incoming._func[0x04B].slot or fields.incoming._func[0x04B].base
     end
 end()
 
@@ -1383,35 +1724,37 @@ enums.delivery = {
 }
 
 -- This is always sent for every packet of this ID
-fields.incoming._mult[0x04B].base = L{
+fields.incoming._func[0x04B].base = L{
     {ctype='unsigned char',     label='Type',               fn=e+{'delivery'}}, -- 04
     {ctype='unsigned char',     label='_unknown1'},                             -- 05   FF if Type is 05, otherwise 01
     {ctype='signed char',       label='Delivery Slot'},                         -- 06   This goes left to right and then drops down a row and left to right again. Value is 00 through 07
-    {ctype='signed char',       label='_unknown2'},                             -- 0C   01 if Type is 06, otherwise FF
-                                                                                -- 0C   06 Type always seems to come in a pair, this field is only 01 for the first packet
-    {ctype='signed int',        label='_unknown3',          const=-1},          -- 07   Always FF FF FF FF?
-    {ctype='signed char',       label='_unknown4'},                             -- 0C   01 observed
-    {ctype='signed char',       label='Packet Number'},                         -- 0D   02 and 03 observed
-    {ctype='signed char',       label='_unknown5'},                             -- 0E   FF FF observed
-    {ctype='signed char',       label='_unknown5'},                             -- 0E   FF FF observed
-    {ctype='unsigned int',      label='_unknown6'},                             -- 10   06 00 00 00 and 07 00 00 00 observed - (06 was for the first packet and 07 was for the second)
+                                                                                --    01 if Type is 06, otherwise FF
+                                                                                --    06 Type always seems to come in a pair, this field is only 01 for the first packet
+    {ctype='signed char',       label='_unknown2'},                             -- 07   Always FF FF FF FF?  
+    {ctype='signed int',        label='_unknown3',          const=-1},          -- 0C   When in a 0x0D/0x0E type, 01 grants request to open inbox/outbox. With FA you get "Please try again later"
+    {ctype='signed char',       label='_unknown4'},                             -- 0D   02 and 03 observed
+    {ctype='signed char',       label='Packet Number'},                         -- 0E   FF FF observed
+    {ctype='signed char',       label='_unknown5'},                             -- 0F   FF FF observed
+    {ctype='signed char',       label='_unknown6'},                             -- 10   06 00 00 00 and 07 00 00 00 observed - (06 was for the first packet and 07 was for the second)
+    {ctype='unsigned int',      label='_unknown7'},                             -- 10   00 00 00 00 also observed
 }
 
--- If the type is 0x01, 0x06, 0x08 or 0x0A, these fields appear in the packet in addition to the base
-fields.incoming._mult[0x04B].slot = L{
-    {ref=fields.incoming._mult[0x04B].base},                                    -- 04
-    {ctype='char[16]',          label='Sender Name'},                           -- 14
-    {ctype='unsigned int',      label='_unknown7'},                             -- 24   46 32 00 00 and 42 32 00 00 observed - Possibly flags. Rare vs. Rare/Ex.?
+-- If the type is 0x01, 0x04, 0x06, 0x08 or 0x0A, these fields appear in the packet in addition to the base. Maybe more
+fields.incoming._func[0x04B].slot = L{
+    {ref=fields.incoming._func[0x04B].base, count=1},                           -- 04
+    {ctype='char[16]',          label='Player Name'},                           -- 14 This is used for sender (in inbox) and recipient (in outbox)
+    {ctype='unsigned int',      label='_unknown8'},                             -- 24   46 32 00 00 and 42 32 00 00 observed - Possibly flags. Rare vs. Rare/Ex.?
     {ctype='unsigned int',      label='Timestamp',          fn=utime},          -- 28
-    {ctype='unsigned int',      label='_unknown8'},                             -- 2C   00 00 00 00 observed
-    {ctype='unsigned short',    label='Item ID',            fn=item},           -- 30
-    {ctype='unsigned short',    label='_unknown9'},                             -- 32   Fiendish Tome: Chapter 11 had it, but Oneiros Pebble was just 00 00
+    {ctype='unsigned int',      label='_unknown9'},                             -- 2C   00 00 00 00 observed
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 30
+    {ctype='unsigned short',    label='_unknown10'},                            -- 32   Fiendish Tome: Chapter 11 had it, but Oneiros Pebble was just 00 00
                                                                                 -- 32   May well be junked, 38 38 observed
     {ctype='unsigned int',      label='Flags?'},                                -- 34   01/04 00 00 00 observed
     {ctype='unsigned short',    label='Count'},                                 -- 38
-    {ctype='unsigned short',    label='_unknown10'},                            -- 3A
-    {ctype='char[28]',          label='_unknown11'},                            -- 3C   All 00 observed, ext data? Doesn't seem to be the case, but same size
+    {ctype='unsigned short',    label='_unknown11'},                            -- 3A
+    {ctype='data[28]',          label='_unknown12'},                            -- 3C   All 00 observed, ext data? Doesn't seem to be the case, but same size
 }
+
 
 -- Auction house open
 -- The server sends this when the player clicks on an AH NPC, it starts the AH dialogue
@@ -1421,14 +1764,30 @@ fields.incoming[0x04C] = L{
     {ctype='unsigned char',     label='Response'},                              --  Disambiguation when Type is 0x02. Everything but 0x01 seems to result in:
                                                                                 --  "Auction house is temporarily closed for trading."
     {ctype='unsigned char',     label='_unknown1',          const=0x00},        --  Possibly padding
-    {ctype='char[52',           label='_unknown2'},                             --
+    {ctype='data[52]',          label='_unknown2'},                             --
+}
+
+-- Servmes Resp
+-- Length of the packet may vary based on message length? Kind of hard to test.
+-- The server message appears to generate some kind of feedback to the server based on the flags?
+-- If you set the first byte to 0 in incoming chunk with eval and do /smes, the message will not display until you unload eval.
+fields.incoming[0x4D] = L{
+    {ctype='unsigned char',     label='_unknown1'},                             -- 04  01  Message does not appear without this
+    {ctype='unsigned char',     label='_unknown2'},                             -- 05  01  Nonessential to message appearance
+    {ctype='unsigned char',     label='_unknown3'},                             -- 06  01  Message does not appear without this
+    {ctype='unsigned char',     label='_unknown4'},                             -- 07  02  Message does not appear without this
+    {ctype='unsigned int',      label='Timestamp',          fn=time},           -- 08  UTC Timestamp
+    {ctype='unsigned int',      label='Message Length 1'},                      -- 0A  Number of characters in the message
+    {ctype='unsigned int',      label='_unknown2'},                             -- 10  00 00 00 00 observed
+    {ctype='unsigned int',      label='Message Length 2'},                      -- 14  Same as Message Length 1. Not sure why this needs to be an int or in here twice.
+    {ctype='char[148]',         label='Message'},                               -- 18  Currently prefixed with 0x81, 0xA1 - A custom shift-jis character that translates to a square.
 }
 
 -- Data Download 2
 fields.incoming[0x04F] = L{
 --   This packet's contents are nonessential. They are often leftovers from other outgoing
 --   packets. It is common to see things like inventory size, equipment information, and
---   character ID in this packet. They do not appear to be meaningful and the client functions 
+--   character ID in this packet. They do not appear to be meaningful and the client functions
 --   normally even if they are blocked.
 --   Tends to bookend model change packets (0x51), though blocking it, zeroing it, etc. affects nothing.
     {ctype='unsigned int',      label='_unknown1'},                             -- 04
@@ -1436,9 +1795,10 @@ fields.incoming[0x04F] = L{
 
 -- Equip
 fields.incoming[0x050] = L{
-    {ctype='unsigned char',     label='Inventory Index',    fn=inv+{0}},        -- 04
+    {ctype='unsigned char',     label='Inventory Index',    fn=invp+{0x06}},    -- 04
     {ctype='unsigned char',     label='Equipment Slot',     fn=slot},           -- 05
-	{ctype='unsigned short',    label='_junk1'}                                 -- 06
+    {ctype='unsigned char',     label='Inventory Bag',      fn=bag},            -- 06
+    {ctype='data[1]',           label='_junk1'}                                 -- 07
 }
 
 -- Model Change
@@ -1467,10 +1827,13 @@ fields.incoming[0x053] = L{
 }
 
 -- Key Item Log
---[[fields.incoming[0x055] = L{
-	-- There are 6 of these packets sent on zone, which likely corresponds to the 6 categories of key items.
-	-- FFing these packets between bytes 0x14 and 0x82 gives you access to all (or almost all) key items.
-}]]
+fields.incoming[0x055] = L{
+    -- There are 6 of these packets sent on zone, which likely corresponds to the 6 categories of key items.
+    -- FFing these packets between bytes 0x14 and 0x82 gives you access to all (or almost all) key items.
+    {ctype='data[0x40]',        label='Key item available', fn=hex},            -- 04
+    {ctype='data[0x40]',        label='Key item examined',  fn=hex},            -- 44   Bit field correlating to the previous, 1 if KI has been examined, 0 otherwise
+    {ctype='unsigned int',      label='Type'},                                  -- 84   Goes from 0 to 5, determines which KI are being sent
+}
 
 -- Weather Change
 fields.incoming[0x057] = L{
@@ -1480,16 +1843,136 @@ fields.incoming[0x057] = L{
     {ctype='unsigned short',    label='_unknown2'},                             -- 0A
 }
 
--- NPC Spawn
+enums.spawntype = {
+    [0x03] = 'Monster',
+    [0x00] = 'Casket or NPC',
+    [0x0A] = 'Self',
+}
+
+-- Spawn
 fields.incoming[0x05B] = L{
     {ctype='float',             label='X'},                                     -- 04
     {ctype='float',             label='Z'},                                     -- 08
     {ctype='float',             label='Y'},                                     -- 0C
     {ctype='unsigned int',      label='ID',                 fn=id},             -- 10
     {ctype='unsigned short',    label='Index',              fn=index},          -- 14
-    {ctype='unsigned char',     label='Type'},                                  -- 16   3 for regular Monsters, 0 for Treasure Caskets and NPCs
+    {ctype='unsigned char',     label='Type',               fn=e+{'spawntype'}},-- 16   3 for regular Monsters, 0 for Treasure Caskets and NPCs
     {ctype='unsigned char',     label='_unknown1'},                             -- 17   Always 0 if Type is 3, otherwise a seemingly random non-zero number
     {ctype='unsigned int',      label='_unknown2'},                             -- 18
+}
+
+-- Dialogue Information
+fields.incoming[0x05C] = L{
+    {ctype='data[32]',          label='Menu Parameters'},                       -- 04   How information is packed in this region depends on the particular dialogue exchange.
+}
+
+-- Campaign/Besieged Map information
+
+-- Bitpacked Campaign Info:
+-- First Byte: Influence ranking including Beastmen
+-- Second Byte: Influence ranking excluding Beastmen
+
+-- Third Byte (bitpacked xxww bbss -- First two bits are for beastmen)
+    -- 0 = Minimal
+    -- 1 = Minor
+    -- 2 = Major
+    -- 3 = Dominant
+
+-- Fourth Byte: Ownership (value)
+    -- 0 = Neutral
+    -- 1 = Sandy
+    -- 2 = Bastok
+    -- 3 = Windurst
+    -- 4 = Beastmen
+    -- 0xFF = Jeuno
+
+
+
+
+-- Bitpacked Besieged Info:
+
+-- Candescence Owners:
+    -- 0 = Whitegate
+    -- 1 = MMJ
+    -- 2 = Halvung
+    -- 3 = Arrapago
+
+-- Orders:
+    -- 0 = Defend Al Zahbi
+    -- 1 = Intercept Enemy
+    -- 2 = Invade Enemy Base
+    -- 3 = Recover the Orb
+
+-- Beastman Status
+    -- 0 = Training
+    -- 1 = Advancing
+    -- 2 = Attacking
+    -- 3 = Retreating
+    -- 4 = Defending
+    -- 5 = Preparing
+
+-- Bitpacked region int (for the actual locations on the map, not the overview)
+    -- 3 Least Significant Bits -- Beastman Status for that region
+    -- 8 following bits -- Number of Forces
+    -- 4 following bits -- Level
+    -- 4 following bits -- Number of Archaic Mirrors
+    -- 4 following bits -- Number of Prisoners
+    -- 9 following bits -- No clear purpose
+
+fields.incoming[0x05E] = L{
+    {ctype='unsigned char',     label='Balance of Power'},                      -- 04   Bitpacked: xxww bbss  -- Unclear what the first two bits are for. Number stored is ranking (0-3)
+    {ctype='unsigned char',     label='Alliance Indicator'},                    -- 05   Indicates whether two nations are allied (always the bottom two).
+    {ctype='data[20]',          label='_unknown1'},                             -- 06   All Zeros, and changed nothing when 0xFF'd.
+    {ctype='unsigned int',      label='Bitpacked Ronfaure Info'},               -- 1A
+    {ctype='unsigned int',      label='Bitpacked Zulkheim Info'},               -- 1E
+    {ctype='unsigned int',      label='Bitpacked Norvallen Info'},              -- 22
+    {ctype='unsigned int',      label='Bitpacked Gustaberg Info'},              -- 26
+    {ctype='unsigned int',      label='Bitpacked Derfland Info'},               -- 2A
+    {ctype='unsigned int',      label='Bitpacked Sarutabaruta Info'},           -- 2E
+    {ctype='unsigned int',      label='Bitpacked Kolshushu Info'},              -- 32
+    {ctype='unsigned int',      label='Bitpacked Aragoneu Info'},               -- 36
+    {ctype='unsigned int',      label='Bitpacked Fauregandi Info'},             -- 3A
+    {ctype='unsigned int',      label='Bitpacked Valdeaunia Info'},             -- 3E
+    {ctype='unsigned int',      label='Bitpacked Qufim Info'},                  -- 42
+    {ctype='unsigned int',      label="Bitpacked Li'Telor Info"},               -- 46
+    {ctype='unsigned int',      label='Bitpacked Kuzotz Info'},                 -- 4A
+    {ctype='unsigned int',      label='Bitpacked Vollbow Info'},                -- 4E
+    {ctype='unsigned int',      label='Bitpacked Elshimo Lowlands Info'},       -- 52
+    {ctype='unsigned int',      label="Bitpacked Elshimo Uplands Info"},        -- 56
+    {ctype='unsigned int',      label="Bitpacked Tu'Lia Info"},                 -- 5A
+    {ctype='unsigned int',      label='Bitpacked Movapolos Info'},              -- 5E
+    {ctype='unsigned int',      label='Bitpacked Tavnazian Archipelago Info'},  -- 62
+    {ctype='data[32]',          label='_unknown2'},                             -- 66   All Zeros, and changed nothing when 0xFF'd.
+    {ctype='unsigned char',     label="San d'Oria region bar"},                 -- 86   These indicate how full the current region's bar is (in percent).
+    {ctype='unsigned char',     label="Bastok region bar"},                     -- 87
+    {ctype='unsigned char',     label="Windurst region bar"},                   -- 88
+    {ctype='unsigned char',     label="San d'Oria region bar without beastmen"},-- 86   Unsure of the purpose of the without beastman indicators
+    {ctype='unsigned char',     label="Bastok region bar without beastmen"},    -- 87
+    {ctype='unsigned char',     label="Windurst region bar without beastmen"},  -- 88
+    {ctype='unsigned char',     label="Days to tally"},                         -- 8C   Number of days to the next conquest tally
+    {ctype='data[3]',           label="_unknown4"},                             -- 8D   All Zeros, and changed nothing when 0xFF'd.
+    {ctype='int',               label='Conquest Points'},                       -- 90
+    {ctype='unsigned char',     label="Beastmen region bar"},                   -- 94   
+    {ctype='data[12]',          label="_unknown5"},                             -- 95   Mostly zeros and noticed no change when 0xFF'd.
+
+-- These bytes are for the overview summary on the map.
+    -- The two least significant bits code for the owner of the Astral Candescence.
+    -- The next two bits indicate the current orders.
+    -- The four most significant bits indicate the MMJ level.
+    {ctype='unsigned char',     label="MMJ Level, Orders, and AC"},             -- A0
+
+    -- Halvung is the 4 least significant bits.
+    -- Arrapago is the 4 most significant bits.
+    {ctype='unsigned char',     label="Halvung and Arrapago Level"},            -- A1
+    {ctype='unsigned char',     label="Beastman Status (1) "},                  -- A2   The 3 LS bits are the MMJ Orders, next 3 bits are the Halvung Orders, top 2 bits are part of the Arrapago Orders
+    {ctype='unsigned char',     label="Beastman Status (2) "},                  -- A3   The Least Significant bit is the top bit of the Arrapago orders. Rest of the byte doesn't seem to do anything?
+
+-- These bytes are for the individual stronghold displays. See above!
+    {ctype='unsigned int',      label='Bitpacked MMJ Info'},                    -- A4
+    {ctype='unsigned int',      label='Bitpacked Halvung Info'},                -- A8
+    {ctype='unsigned int',      label='Bitpacked Arrapago Info'},               -- AC
+
+    {ctype='int',               label='Imperial Standing'},                     -- B0
 }
 
 -- Char Stats
@@ -1528,61 +2011,38 @@ fields.incoming[0x061] = L{
     {ctype='signed short',      label='Dark Resistance'},                       -- 42
     {ctype='unsigned short',    label='Title',           fn=title},             -- 44
     {ctype='unsigned short',    label='Nation rank'},                           -- 46
-    {ctype='unsigned short',    label='Rank points',        fn=cap-{0xFFF}},    -- 48
+    {ctype='unsigned short',    label='Rank points',        fn=cap+{0xFFF}},    -- 48
     {ctype='unsigned short',    label='Home point',         fn=zone},           -- 4A
     {ctype='unsigned short',    label='_unknown1'},                             -- 4C   0xFF-ing this last region has no notable effect.
     {ctype='unsigned short',    label='_unknown2'},                             -- 4E
-    {ctype='unsigned short',    label='_unknown3'},                             -- 50
+    {ctype='unsigned char',     label='Nation'},                                -- 50   0 = sandy, 1 = bastok, 2 = windy
+    {ctype='unsigned char',     label='_unknown3'},                             -- 51
     {ctype='unsigned short',    label='_unknown4'},                             -- 52   00 00 observed.
+}
+
+types.ability_recast = L{
+    {ctype='unsigned short',    label='Duration',           fn=div+{1}},        -- 00
+    {ctype='unsigned char',     label='_unknown1',          const=0x00},        -- 01
+    {ctype='unsigned char',     label='Recast',             fn=arecast},        -- 02
+}
+
+types.combat_skill = L{
+    {ctype='bit[15]',           label='Level'},                                 -- 00
+    {ctype='boolbit',           label='Capped'},                                -- 01
+}
+
+types.craft_skill = L{
+    {ctype='bit[5]',            label='Rank',               fn=srank},          -- 00
+    {ctype='bit[10]',           label='Level'},                                 -- 00
+    {ctype='boolbit',           label='Capped'},                                -- 01
 }
 
 -- Skills Update
 fields.incoming[0x062] = L{
-    {ctype='char[126]',         label='_unknown1'},                             -- 04
-    {ctype='unsigned short',    label='Hand-to-Hand',       fn=cskill},         -- 82
-    {ctype='unsigned short',    label='Dagger',             fn=cskill},         -- 84
-    {ctype='unsigned short',    label='Sword',              fn=cskill},         -- 86
-    {ctype='unsigned short',    label='Great Sword',        fn=cskill},         -- 88
-    {ctype='unsigned short',    label='Axe',                fn=cskill},         -- 8A
-    {ctype='unsigned short',    label='Great Axe',          fn=cskill},         -- 8C
-    {ctype='unsigned short',    label='Scythe',             fn=cskill},         -- 8E
-    {ctype='unsigned short',    label='Polearm',            fn=cskill},         -- 90
-    {ctype='unsigned short',    label='Katana',             fn=cskill},         -- 92
-    {ctype='unsigned short',    label='Great Katana',       fn=cskill},         -- 94
-    {ctype='unsigned short',    label='Club',               fn=cskill},         -- 96
-    {ctype='unsigned short',    label='Staff',              fn=cskill},         -- 98
-    {ctype='char[24]',          label='_dummy1'},                               -- 9A
-    {ctype='unsigned short',    label='Archery',            fn=cskill},         -- B2
-    {ctype='unsigned short',    label='Marksmanship',       fn=cskill},         -- B4
-    {ctype='unsigned short',    label='Throwing',           fn=cskill},         -- B6
-    {ctype='unsigned short',    label='Guarding',           fn=cskill},         -- B8
-    {ctype='unsigned short',    label='Evasion',            fn=cskill},         -- BA
-    {ctype='unsigned short',    label='Shield',             fn=cskill},         -- BC
-    {ctype='unsigned short',    label='Parrying',           fn=cskill},         -- BE
-    {ctype='unsigned short',    label='Divine Magic',       fn=cskill},         -- C0
-    {ctype='unsigned short',    label='Healing Magic',      fn=cskill},         -- C2
-    {ctype='unsigned short',    label='Enhancing Magic',    fn=cskill},         -- C4
-    {ctype='unsigned short',    label='Enfeebling Magic',   fn=cskill},         -- C6
-    {ctype='unsigned short',    label='Elemental Magic',    fn=cskill},         -- C8
-    {ctype='unsigned short',    label='DarkMagic',          fn=cskill},         -- CA
-    {ctype='unsigned short',    label='Summoning Magic',    fn=cskill},         -- CC
-    {ctype='unsigned short',    label='Ninjitsu',           fn=cskill},         -- CE
-    {ctype='unsigned short',    label='Singing',            fn=cskill},         -- D0
-    {ctype='unsigned short',    label='String Instrument',  fn=cskill},         -- D2
-    {ctype='unsigned short',    label='Wind Instrument',    fn=cskill},         -- D4
-    {ctype='unsigned short',    label='BlueMagic',          fn=cskill},         -- D6
-    {ctype='char[8]',           label='_dummy2'},                               -- D8
-    {ctype='unsigned short',    label='Fishing',            fn=sskill},         -- E0
-    {ctype='unsigned short',    label='Woodworking',        fn=sskill},         -- E2
-    {ctype='unsigned short',    label='Smithing',           fn=sskill},         -- E4
-    {ctype='unsigned short',    label='Goldsmithing',       fn=sskill},         -- E6
-    {ctype='unsigned short',    label='Clothcraft',         fn=sskill},         -- E8
-    {ctype='unsigned short',    label='Leathercraft',       fn=sskill},         -- EA
-    {ctype='unsigned short',    label='Bonecraft',          fn=sskill},         -- EC
-    {ctype='unsigned short',    label='Alchemy',            fn=sskill},         -- EE
-    {ctype='unsigned short',    label='Cooking',            fn=sskill},         -- F0
-    {ctype='unsigned short',    label='Synergy',            fn=sskill},         -- F2
-    {ctype='char*',             label='_padding',           const=0xFF},        -- F4
+    {ref=types.ability_recast,                              count=0x1F},        -- 04
+    {ref=types.combat_skill,    lookup={res.skills,0x00},   count=0x30},        -- 80
+    {ref=types.craft_skill,     lookup={res.skills,0x30},   count=0x0A},        -- E0
+    {ctype='unsigned short[6]', label='_junk1'},                                -- F4
 }
 
 -- Set Update
@@ -1590,68 +2050,79 @@ fields.incoming[0x062] = L{
 -- It also appears in three chunks, so it's double-varying.
 -- Packet was expanded in the March 2014 update and now includes a fourth packet, which contains CP values.
 
-fields.incoming._mult[0x063] = {}
+fields.incoming._func[0x063] = {}
 fields.incoming[0x063] = function(data)
-    return fields.incoming._mult[0x063][data:sub(5,5):byte()]
+    return fields.incoming._func[0x063].base + (fields.incoming._func[0x063][data:sub(5,5):byte()] or L{})
 end
 
-fields.incoming._mult[0x063][0x02] = L{
-	{ctype='unsigned short',    label='Order'},                                 -- 04
-	{ctype='unsigned int',      label='_flags1'},                               -- 06   
-	{ctype='unsigned int',      label='_flags2'},                               -- 08   The 3rd bit of the last byte is the flag that indicates whether or not you are xp capped (blue levels)
+fields.incoming._func[0x063].base = L{
+    {ctype='unsigned short',    label='Order'},                                 -- 04
 }
 
-fields.incoming._mult[0x063][0x03] = L{
-	{ctype='unsigned short',    label='Order'},                                 -- 04
-	{ctype='unsigned short',    label='_flags1'},                               -- 06   Consistently D8 for me
-	{ctype='unsigned short',    label='_flags2'},                               -- 08   Vary when I change species
-	{ctype='unsigned short',    label='_flags3'},                               -- 0A   Consistent across species
-	{ctype='unsigned char',     label='Mon. Rank'},                             -- 0C   00 = Mon, 01 = NM, 02 = HNM
-	{ctype='unsigned char',     label='_unknown1'},                             -- 0D   00
-	{ctype='unsigned short',    label='_unknown2'},                             -- 0E   00 00
-	{ctype='unsigned short',    label='_unknown3'},                             -- 10   76 00
-	{ctype='unsigned short',    label='Infamy'},                                -- 12
-	{ctype='unsigned int',      label='_unknown2'},                             -- 14   00s
-	{ctype='unsigned int',      label='_unknown3'},                             -- 18   00s
-	{ctype='char[64]',          label='Instinct Bitfield 1'},                   -- 1C   See below
-	-- Bitpacked 2-bit values. 0 = no instincts from that species, 1 == first instinct, 2 == first and second instinct, 3 == first, second, and third instinct.
-	{ctype='char[128]',         label='Monster Level Char field'},              -- 5C   Mapped onto the item ID for these creatures. (00 doesn't exist, 01 is rabbit, 02 is behemoth, etc.)
+fields.incoming._func[0x063][0x02] = L{
+    {ctype='data[7]',           label='_flags1',            fn=bin+{7}},        -- 06   The 3rd bit of the last byte is the flag that indicates whether or not you are xp capped (blue levels)
 }
 
-fields.incoming._mult[0x063][0x04] = L{
-	{ctype='unsigned short',    label='Order'},                                 -- 04
-	{ctype='unsigned short',    label='_unknown1'},                             -- 06   B0 00
-	{ctype='char[126]',         label='_unknown2'},                             -- 08   FF-ing has no effect.
-	{ctype='unsigned char',     label='Slime Level'},                           -- 86   
-	{ctype='unsigned char',     label='Spriggan Level'},                        -- 87   
-	{ctype='char[12]',          label='Instinct Bitfield 3'},                   -- 88   Contains job/race instincts from the 0x03 set. Has 8 unused bytes. This is a 1:1 mapping.
-	{ctype='char[32]',          label='Variants Bitfield'},                     -- 94   Does not show normal monsters, only variants. Bit is 1 if the variant is owned. Length is an estimation including the possible padding.
+fields.incoming._func[0x063][0x03] = L{
+    {ctype='unsigned short',    label='_flags1'},                               -- 06   Consistently D8 for me
+    {ctype='unsigned short',    label='_flags2'},                               -- 08   Vary when I change species
+    {ctype='unsigned short',    label='_flags3'},                               -- 0A   Consistent across species
+    {ctype='unsigned char',     label='Mon. Rank'},                             -- 0C   00 = Mon, 01 = NM, 02 = HNM
+    {ctype='unsigned char',     label='_unknown1'},                             -- 0D   00
+    {ctype='unsigned short',    label='_unknown2'},                             -- 0E   00 00
+    {ctype='unsigned short',    label='_unknown3'},                             -- 10   76 00
+    {ctype='unsigned short',    label='Infamy'},                                -- 12
+    {ctype='unsigned int',      label='_unknown2'},                             -- 14   00s
+    {ctype='unsigned int',      label='_unknown3'},                             -- 18   00s
+    {ctype='data[64]',          label='Instinct Bitfield 1'},                   -- 1C   See below
+    -- Bitpacked 2-bit values. 0 = no instincts from that species, 1 == first instinct, 2 == first and second instinct, 3 == first, second, and third instinct.
+    {ctype='data[128]',         label='Monster Level Char field'},              -- 5C   Mapped onto the item ID for these creatures. (00 doesn't exist, 01 is rabbit, 02 is behemoth, etc.)
+}
+
+fields.incoming._func[0x063][0x04] = L{
+    {ctype='unsigned short',    label='_unknown1'},                             -- 06   B0 00
+    {ctype='data[126]',         label='_unknown2'},                             -- 08   FF-ing has no effect.
+    {ctype='unsigned char',     label='Slime Level'},                           -- 86
+    {ctype='unsigned char',     label='Spriggan Level'},                        -- 87
+    {ctype='data[12]',          label='Instinct Bitfield 3'},                   -- 88   Contains job/race instincts from the 0x03 set. Has 8 unused bytes. This is a 1:1 mapping.
+    {ctype='data[32]',          label='Variants Bitfield'},                     -- 94   Does not show normal monsters, only variants. Bit is 1 if the variant is owned. Length is an estimation including the possible padding.
+}
+
+-- Repositioning
+fields.incoming[0x065] = L{
+-- This is identical to the spawn packet, but has 4 more unused bytes.
+    {ctype='float',             label='X'},                                     -- 04
+    {ctype='float',             label='Z'},                                     -- 08
+    {ctype='float',             label='Y'},                                     -- 0C
+    {ctype='unsigned int',      label='ID',                 fn=id},             -- 10
+    {ctype='unsigned short',    label='Index',              fn=index},          -- 14
+    {ctype='unsigned char',     label='_unknown1'},                             -- 16   1 observed. May indicate repositoning type.
+    {ctype='unsigned char',     label='_unknown2'},                             -- 17   Unknown, but matches the same byte of a matching spawn packet
+    {ctype='data[6]',           label='_unknown3'},                             -- 18   All zeros observed.
 }
 
 -- Pet Info
 fields.incoming[0x067] = L{
 -- The length of this packet is 24, 28, 36 or 40 bytes, featuring a 0, 4, 8, 12, or 16 byte name field.
 
--- The Mask seem to be a bitpacked combination of a mask indicating which information is updated and
---    a field indicating the length of the name in the packet.
+-- The Mask is a bitpacked combination of a number indicating the type of information in the packet and
+--    a field indicating the length of the packet.
 
--- The information below should probably be re-verified, but:
--- 44 07 is used for pets with names that are 4-7 characters (8 character field). It updates pet TP but not Owner Index.
--- 84 07 is used for pets with names that are 8-11 characters (12 character field). It updates pet TP but not Owner Index.
--- C4 07 is used for pets with even longer names (>11 characters, 16 character field). It updates pet TP but not Owner Index.
--- 44 08 is used for pets with extremely long names. It updates pet TP but not Owner Index.
+-- The lower 6 bits of the Mask is the type of packet:
+-- 2 occurs often even with no pet, contains player index, id and main job level
+-- 3 identifies (potential) pets and who owns them
+-- 4 gives status information about your pet
 
--- 02 09 is sent regularly to update owner information (about yourself). This might contain information if you are charmed.
--- 03 05 is sent when summoning pets, Trust NPCs, etc.
--- 04 05 is sent when releasing pets (unknown for Trust NPCs)
+-- The upper 10 bits of the Mask is the length in bytes of the data excluding the header and any padding
+--    after the pet name.
 
     {ctype='unsigned short',    label='Mask'},                                  -- 04
     {ctype='unsigned short',    label='Pet Index',          fn=index},          -- 06
     {ctype='unsigned int',      label='Pet ID',             fn=id},             -- 08
     {ctype='unsigned short',    label='Owner Index',        fn=index},          -- 0C
-    {ctype='unsigned char',     label='Current HP%'},                           -- 0E
-    {ctype='unsigned char',     label='Current MP%'},                           -- 0F
-    {ctype='unsigned short',    label='Pet TP%'},                               -- 10   Multiplied by 10
+    {ctype='unsigned char',     label='Current HP%',        fn=percent},        -- 0E
+    {ctype='unsigned char',     label='Current MP%',        fn=percent},        -- 0F
+    {ctype='unsigned short',    label='Pet TP%',            fn=percent},        -- 10   Multiplied by 10
     {ctype='unsigned short',    label='_unknown1'},                             -- 12
     {ctype='char*',             label='Pet Name'},                              -- 14   Packet expands to accommodate pet name length.
 }
@@ -1669,15 +2140,53 @@ fields.incoming[0x06F] = L{
     {ctype='unsigned short',    label='_junk2'},                                -- 22
 }
 
+-- Proposal
+fields.incoming[0x078] = L{
+    {ctype='unsigned int',      label='Proposer ID',        fn=id},             -- 04
+    {ctype='unsigned int',      label='_unknown1'},                             -- 08  Proposal ID?
+    {ctype='unsigned short',    label='Proposer Index'},                        -- 0C
+    {ctype='char[15]',          label='Proposer Name'},                         -- 0E
+    {ctype='unsigned char',     label='Chat mode'},                             -- 1D  Not typical chat mode mapping. 1 = Party
+    {ctype='char*',             label='Proposal'},                              -- 1E  Proposal text, complete with special characters
+}
+
+-- Proposal Update
+fields.incoming[0x079] = L{
+    {ctype='unsigned int',      label='_unknown1'},                             -- 04
+    {ctype='data[21]',          label='_unknown2'},                             -- 08  Likely contains information about the current chat mode and vote count
+    {ctype='char[16]',          label='Proposer Name'},                         -- 1D
+    {ctype='data[3]',           label='_junk1'},                                -- 1E  All 00s
+}
+
+types.merit_entry = L{
+    {ctype='unsigned short',    label='Merit'},                                 -- 00
+    {ctype='unsigned char',     label='Next Cost'},                             -- 02
+    {ctype='unsigned char',     label='Value'},                                 -- 03
+}
+
+-- Merits
+fields.incoming[0x08C] = function(data)
+    return L{
+        {ctype='unsigned char', label='Count'},                                 -- 04   Number of merits entries in this packet (possibly a short, although it wouldn't make sense)
+        {ctype='data[3]',       label='_unknown1'},                             -- 05   Always 00 0F 01?
+        {ref=types.merit_entry, count=data:byte(5, 5)},                         -- 08
+        {ctype='unsigned int',  label='_unknown2',          const=0x00000000},  ---04
+    }
+end
+
+types.job_point = L{
+    {ctype='unsigned short',    label='Job Point ID'},                          -- 00   32 potential values for every job, which means you could decompose this into a value bitpacked with job ID if you wanted
+    {ctype='bit[10]',           label='_unknown1'},                             -- 02   Always 1 in cases where the ID is set at the moment. Zeroing this has no effect.
+    {ctype='bit[6]',            label='Current Level'},                         -- 03   Current enhancement for this job point ID
+}
+
 -- Job Points
 -- These packets are currently not used by the client in any detectable way.
 -- The below pattern repeats itself for the entirety of the packet. There are 2 jobs per packet,
 -- and 11 of these packets are sent at the moment in response to the first 0x0C0 outgoing packet since zoning.
 -- This is how it works as of 3-19-14, and it is safe to assume that it will change in the future.
 fields.incoming[0x08D] = L{
-    {ctype='unsigned short',    label='Job Point ID'},                          -- 04   32 potential values for every job, which means you could decompose this into a value bitpacked with job ID if you wanted
-    {ctype='unsigned char',     label='_unknown1'},                             -- 06   Availability? Always 1 in cases where the ID is set at the moment.
-    {ctype='unsigned char',     label='Current Level'},                         -- 07   Current enhancement for this job point ID
+    {ref=types.job_point,       count='*'},                                     -- 04
 }
 
 -- Campaign Map Info
@@ -1687,22 +2196,66 @@ fields.incoming[0x08D] = L{
 -- Has a byte that seems to be either 02 or 03, but the packet is sent three times. There are two 02s.
 -- The second 02 packet contains different information after the ~48th content byte.
 
--- LS Message
-fields.incoming[0x0CC] = L{
-    {ctype='int',               label='_unknown1'},                             -- 04
-    {ctype='char[128]',         label='Message'},                               -- 08
-    {ctype='unsigned int',      label='Timestamp',          fn=time},           -- 88
-    {ctype='char[16]',          label='Player Name'},                           -- 8C
-    {ctype='unsigned int',      label='Permissions'},                           -- 98
-    {ctype='char[16]',          label='Linkshell Name',     enc=ls_name_msg},   -- 9C   6-bit packed
+types.alliance_member = L{
+    {ctype='unsigned int',      label='ID',                 fn=id},             -- 00
+    {ctype='unsigned short',    label='Index',              fn=index},          -- 04
+    {ctype='unsigned short',    label='Flags',              fn=bin+{2}},        -- 06
+    {ctype='unsigned short',    label='Zone',               fn=zone},           -- 08
+    {ctype='unsigned short',    label='_unknown2'},                             -- 0A	Always 0?
 }
 
 -- Alliance status update
 fields.incoming[0x0C8] = L{
     {ctype='unsigned char',     label='_unknown1'},                             -- 04
-    {ctype='char[3]',           label='_junk1'},                                -- 05
+    {ctype='data[3]',           label='_junk1'},                                -- 05
     {ref=types.alliance_member, count=18},                                      -- 08
-    {ctype='char[24]',          label='_unknown2',          const=''},          -- E0   Always 0?
+    {ctype='data[24]',          label='_unknown3',          const=''},          -- E0   Always 0?
+}
+
+types.check_item = L{
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 00
+    {ctype='unsigned char',     label='Slot',               fn=slot},           -- 02
+    {ctype='unsigned char',     label='_unknown1'},                             -- 03
+    {ctype='data[24]',          label='ExtData',            fn=hex+{24}},       -- 04
+}
+
+-- Check data
+fields.incoming._func[0x0C9] = {}
+fields.incoming[0x0C9] = function(data)
+    return fields.incoming._func[0x0C9].base + fields.incoming._func[0x0C9][data:byte(0x0B, 0x0B)]
+end
+
+enums[0x0C9] = {
+    [0x01] = 'Metadata',
+    [0x03] = 'Equipment',
+}
+
+-- Common to all messages
+fields.incoming._func[0x0C9].base = L{
+    {ctype='unsigned int',      label='Target ID',          fn=id},             -- 04
+    {ctype='unsigned short',    label='Target Index',       fn=index},          -- 08
+    {ctype='unsigned char',     label='Type',               fn=e+{0x0C9}},      -- 0A
+}
+
+-- Equipment listing
+fields.incoming._func[0x0C9][0x03] = L{
+    {ctype='unsigned char',     label='Count'},                                 -- 0B
+    {ref=types.check_item,      count_ref=0x0B},                                -- 0C
+}
+
+-- Metadata
+-- The title needs to be somewhere in here, but not sure where, maybe bit packed?
+fields.incoming._func[0x0C9][0x01] = L{
+    {ctype='data[3]',           label='_junk1'},                                -- 0B
+    {ctype='unsigned char',     label='_unknown2'},                             -- 0E
+    {ctype='unsigned char',     label='_unknown3'},                             -- 0F
+    {ctype='unsigned short',    label='_unknown4'},                             -- 10
+    {ctype='unsigned char',     label='Main Job',           fn=job},            -- 12
+    {ctype='unsigned char',     label='Sub Job',            fn=job},            -- 13
+    {ctype='char[15]',          label='Linkshell',          enc=ls_name_msg},   -- 14   6-bit packed
+    {ctype='unsigned char',     label='Main Job Level'},                        -- 23
+    {ctype='unsigned char',     label='Sub Job Level'},                         -- 24
+    {ctype='data[43]',          label='_unknown5'},                             -- 25   At least the first two bytes and the last twelve bytes are junk, possibly more
 }
 
 -- Bazaar Message
@@ -1711,39 +2264,51 @@ fields.incoming[0x0CA] = L{
     {ctype='unsigned short',    label='_unknown2'},                             -- 08   Could also be characters starting the line - 01 FD observed
     {ctype='char[118]',         label='Bazaar Message'},                        -- 0A   Terminated with a vertical tab
     {ctype='char[16]',          label='Player Name'},                           -- 80
-    {ctype='unsigned short',    label='_unknown3'},                             -- 90   C6 01 observed. Not player index.
+    {ctype='unsigned short',    label='_unknown3'},                             -- 90   C6 01 and 63 02 observed. Not player index.
     {ctype='unsigned short',    label='_unknown4'},                             -- 92   00 00 observed.
+}
+
+-- LS Message
+fields.incoming[0x0CC] = L{
+    {ctype='int',               label='_unknown1'},                             -- 04
+    {ctype='char[128]',         label='Message'},                               -- 08
+    {ctype='unsigned int',      label='Timestamp',          fn=time},           -- 88
+    {ctype='char[16]',          label='Player Name'},                           -- 8C
+    {ctype='unsigned int',      label='Permissions'},                           -- 98
+    {ctype='char[16]',          label='Linkshell',          enc=ls_name_msg},   -- 9C   6-bit packed
 }
 
 -- Found Item
 fields.incoming[0x0D2] = L{
     {ctype='unsigned int',      label='_unknown1'},                             -- 04   Could be characters starting the line - FD 02 02 18 observed
                                                                                 -- 04   Arcon: Only ever observed 0x00000001 for this
-    {ctype='unsigned int',      label='Dropper ID',         fn=id},             -- 08
+    {ctype='unsigned int',      label='Dropper',            fn=id},             -- 08
     {ctype='unsigned int',      label='Count'},                                 -- 0C   Takes values greater than 1 in the case of gil
     {ctype='unsigned short',    label='Item',               fn=item},           -- 10
     {ctype='unsigned short',    label='Dropper Index',      fn=index},          -- 12
-    {ctype='unsigned short',    label='Pool Index'},                            -- 14   This is the internal index in memory, not the one it appears in in the menu
+    {ctype='unsigned char',     label='Index'},                                 -- 14   This is the internal index in memory, not the one it appears in in the menu
+    {ctype='bool',              label='Old'},                                   -- 15   This is true if it's not a new drop, but appeared in the pool before you joined a party
     {ctype='unsigned char',     label='_unknown4',          const=0x00},        -- 16   Seems to always be 00
     {ctype='unsigned char',     label='_unknown5'},                             -- 17   Seemingly random, both 00 and FF observed, as well as many values in between
     {ctype='unsigned int',      label='Timestamp',          fn=utime},          -- 18
-    {ctype='char[28]',          label='_unknown6'},                             -- AC   Always 0 it seems?
+    {ctype='data[28]',          label='_unknown6'},                             -- AC   Always 0 it seems?
     {ctype='unsigned int',      label='_junk1'},                                -- 38
 }
 
 -- Item lot/drop
 fields.incoming[0x0D3] = L{
-    {ctype='unsigned int',      label='Highest Lot ID',     fn=id},             -- 04
-    {ctype='unsigned int',      label='Current Lot ID',     fn=id},             -- 08
-    {ctype='unsigned short',    label='Highest Lot Index',  fn=index},          -- 0C
+    {ctype='unsigned int',      label='Highest Lotter',     fn=id},             -- 04
+    {ctype='unsigned int',      label='Current Lotter',     fn=id},             -- 08
+    {ctype='unsigned short',    label='Highest Lotter Index',fn=index},         -- 0C
     {ctype='unsigned short',    label='Highest Lot'},                           -- 0E
-    {ctype='unsigned short',    label='Current Lot Index',  fn=index..s+{1,15}},-- 10   The highest bit is set
+    {ctype='bit[15]',           label='Current Lotter Index',fn=index},         -- 10
+    {ctype='bit[1]',            label='_unknown1'},                             -- 11   Always seems set
     {ctype='unsigned short',    label='Current Lot'},                           -- 12   0xFF FF if passing
-    {ctype='unsigned char',     label='Pool Index'},                            -- 14
+    {ctype='unsigned char',     label='Index'},                                 -- 14
     {ctype='unsigned char',     label='Drop'},                                  -- 15   0 if no drop, 1 if dropped to player, 3 if floored
-    {ctype='char[16]',          label='Highest Lot Name'},                      -- 16
-    {ctype='char[16]',          label='Current Lot Name'},                      -- 26
-    {ctype='char[6]',           label='_junk1'},                                -- 36
+    {ctype='char[16]',          label='Highest Lotter Name'},                   -- 16
+    {ctype='char[16]',          label='Current Lotter Name'},                   -- 26
+    {ctype='data[6]',           label='_junk1'},                                -- 36
 }
 
 -- Party member update
@@ -1761,7 +2326,11 @@ fields.incoming[0x0DD] = L{
     {ctype='unsigned char',     label='MP%',                fn=percent},        -- 1E
     {ctype='unsigned char',     label='_unknown4'},                             -- 1F
     {ctype='unsigned short',    label='Zone',               fn=zone},           -- 20
-    {ctype='char*',             label='Name'},                                  -- 22
+    {ctype='unsigned char',     label='Main job',           fn=job},            -- 22
+    {ctype='unsigned char',     label='Main job level'},                        -- 23
+    {ctype='unsigned char',     label='Sub job',            fn=job},            -- 24
+    {ctype='unsigned char',     label='Sub job level'},                         -- 25
+    {ctype='char*',             label='Name'},                                  -- 26
 }
 
 -- Char Update
@@ -1776,6 +2345,10 @@ fields.incoming[0x0DF] = L{
     {ctype='unsigned short',    label='_unknown1'},                             -- 18
     {ctype='unsigned short',    label='_unknown2'},                             -- 1A
     {ctype='unsigned int',      label='_unknown3'},                             -- 1C
+    {ctype='unsigned char',     label='Main job',           fn=job},            -- 20
+    {ctype='unsigned char',     label='Main job level'},                        -- 21
+    {ctype='unsigned char',     label='Sub job',            fn=job},            -- 22
+    {ctype='unsigned char',     label='Sub job level'},                         -- 23
 }
 
 -- Char Info
@@ -1808,7 +2381,7 @@ fields.incoming[0x0E8] = L{
 -- Widescan Mob
 fields.incoming[0x0F4] = L{
     {ctype='unsigned short',    label='Index',              fn=index},          -- 04
-    {ctype='unsigned char',     label='_unknown1'},                             -- 06
+    {ctype='unsigned char',     label='Level'},                                 -- 06
     {ctype='unsigned char',     label='Type',               fn=e+{'ws mob'}},   -- 07
     {ctype='short',             label='X Offset',           fn=pixel},          -- 08   Offset on the map
     {ctype='short',             label='Y Offset',           fn=pixel},          -- 0A
@@ -1837,6 +2410,14 @@ fields.incoming[0x0F9] = L{
     {ctype='unsigned short',    label='Index',              fn=index},          -- 08
     {ctype='unsigned char',     label='_unknown1'},                             -- 0A
     {ctype='unsigned char',     label='_unknown2'},                             -- 0B
+}
+
+-- Furniture Interaction
+fields.incoming[0x0FA] = L{
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 04
+    {ctype='data[6]',           label='_unknown1'},                             -- 06  Always 00s for me
+    {ctype='unsigned char',     label='Safe Slot'},                             -- 0C  Safe slot for the furniture being interacted with
+    {ctype='data[3]',           label='_unknown2'},                             -- 0D  Takes values, but doesn't look particularly meaningful
 }
 
 -- Bazaar item listing
@@ -1906,6 +2487,14 @@ fields.incoming[0x10B] = L{
 fields.incoming[0x110] = L{
     {ctype='unsigned short',    label='Sparks Total'},                          -- 04
     {ctype='unsigned short',    label='_unknown1'},                             -- 06   Sparks are currently capped at 50,000
+    {ctype='unsigned char',     label='Unity (Shared) designator'},             -- 08   Unity (Shared) designator (0=A, 1=B, 2=C, etc.)
+    {ctype='unsigned char',     label='Unity (Person) designator '},            -- 09   The game does not distinguish these
+    {ctype='char[6]',           label='_unknown2'},                             -- 0A   Currently all 0xFF'd, never seen it change.
+}
+
+types.roe_quest = L{
+    {ctype='bit[12]',           label='RoE Quest ID'},                          -- 00
+    {ctype='bit[20]',           label='RoE Quest Progress'},                    -- 01
 }
 
 -- Eminence Update
@@ -1915,15 +2504,15 @@ fields.incoming[0x111] = L{
 
 -- RoE Quest Log
 fields.incoming[0x112] = L{
-    {ctype='char[128]',         label='RoE Quest Bitfield'},                    -- 04   See next line
-	-- There's probably one bit to indicate that a quest can be undertaken and another
-	--  that indicates whether it has been completed once. The meaning of the individual
-	--  bits obviously varies with Order. RoE quests with storyline are in the Packet
-	--  with Order == 3. Most normal quests are in Order == 0
+    {ctype='data[128]',         label='RoE Quest Bitfield'},                    -- 04   See next line
+    -- There's probably one bit to indicate that a quest can be undertaken and another
+    --  that indicates whether it has been completed once. The meaning of the individual
+    --  bits obviously varies with Order. RoE quests with storyline are in the Packet
+    --  with Order == 3. Most normal quests are in Order == 0
     {ctype='unsigned int',      label='Order'},                                 -- 84   0,1,2,3
 }
 
---Currency Info
+--Currency Info (Currencies I)
 fields.incoming[0x113] = L{
     {ctype='signed int',        label='Conquest Points (San d\'Oria)'},         -- 04
     {ctype='signed int',        label='Conquest Points (Bastok)'},              -- 08
@@ -1959,12 +2548,12 @@ fields.incoming[0x113] = L{
     {ctype='unsigned short',    label='Chocobucks (San d\'Oria)'},              -- 58
     {ctype='unsigned short',    label='Chocobucks (Bastok)'},                   -- 5A
     {ctype='unsigned short',    label='Chocobucks (Windurst)'},                 -- 5C
-    {ctype='short',             label='_unknown1'},                             -- 5E
+    {ctype='unsigned short',    label='Daily Tally'},                           -- 5E
     {ctype='signed int',        label='Research Marks'},                        -- 60
     {ctype='unsigned char',     label='Wizened Tunnel Worms'},                  -- 64
     {ctype='unsigned char',     label='Wizened Morion Worms'},                  -- 65
     {ctype='unsigned char',     label='Wizened Phantom Worms'},                 -- 66
-    {ctype='char',              label='_unknown2'},                             -- 67
+    {ctype='char',              label='_unknown1'},                             -- 67   Currently holds no value
     {ctype='signed int',        label='Moblin Marbles'},                        -- 68
     {ctype='unsigned short',    label='Infamy'},                                -- 6C
     {ctype='unsigned short',    label='Prestige'},                              -- 6E
@@ -1982,31 +2571,23 @@ fields.incoming[0x113] = L{
     {ctype='signed int',        label='Jettons'},                               -- 9C
     {ctype='signed int',        label='Therion Ichor'},                         -- A0
     {ctype='signed int',        label='Allied Notes'},                          -- A4
-    {ctype='signed int',        label='Bayld'},                                 -- A8
-    {ctype='unsigned short',    label='Kinetic Units'},                         -- AC
-    {ctype='short',             label='_unknown3'},                             -- AE
-    {ctype='unsigned short',    label='Obsidian Fragments'},                    -- B0
-    {ctype='short',             label='_unknown4'},                             -- B2
-    {ctype='signed int',        label='Lebondopt Wings'},                       -- B4
-    {ctype='signed int',        label='Mweya Plasm Corpuscles'},                -- B8
-    {ctype='signed int',        label='Cruor'},                                 -- BC
-    {ctype='signed int',        label='Resistance Credits'},                    -- C0
-    {ctype='signed int',        label='Dominion Notes'},                        -- C4
-    {ctype='unsigned char',     label='5th Echelon Battle Trophies'},           -- C8
-    {ctype='unsigned char',     label='4th Echelon Battle Trophies'},           -- C9
-    {ctype='unsigned char',     label='3rd Echelon Battle Trophies'},           -- CA
-    {ctype='unsigned char',     label='2nd Echelon Battle Trophies'},           -- CB
-    {ctype='unsigned char',     label='1st Echelon Battle Trophies'},           -- CC
-    {ctype='unsigned char',     label='Cave Conservation Points'},              -- CD
-    {ctype='unsigned char',     label='Imperial Army ID Tags'},                 -- CE
-    {ctype='unsigned char',     label='Op Credits'},                            -- CF
-    {ctype='signed int',        label='Traverser Stones'},                      -- D0
-    {ctype='signed int',        label='Voidstones'},                            -- D4
-    {ctype='signed int',        label='Kupofried\'s Corundums'},                -- D8
-    {ctype='unsigned char',     label='Coalition Imprimaturs'},                 -- DC
-    {ctype='unsigned char',     label='Moblin Pheromone Sacks'},                -- DD
-    {ctype='short',             label='_unknown5'},                             -- DE
-    {ctype='int',               label='_unknown6'},                             -- F0
+    {ctype='unsigned short',    label='A.M.A.N. Vouchers Stored'},              -- A8
+    {ctype='unsigned short',    label='Unity Accolades'},                       -- AA
+    {ctype='signed int',        label='Cruor'},                                 -- AC
+    {ctype='signed int',        label='Resistance Credits'},                    -- B0
+    {ctype='signed int',        label='Dominion Notes'},                        -- B4
+    {ctype='unsigned char',     label='5th Echelon Battle Trophies'},           -- B8
+    {ctype='unsigned char',     label='4th Echelon Battle Trophies'},           -- B9
+    {ctype='unsigned char',     label='3rd Echelon Battle Trophies'},           -- BA
+    {ctype='unsigned char',     label='2nd Echelon Battle Trophies'},           -- BB
+    {ctype='unsigned char',     label='1st Echelon Battle Trophies'},           -- BC
+    {ctype='unsigned char',     label='Cave Conservation Points'},              -- BD
+    {ctype='unsigned char',     label='Imperial Army ID Tags'},                 -- BE
+    {ctype='unsigned char',     label='Op Credits'},                            -- BF
+    {ctype='signed int',        label='Traverser Stones'},                      -- C0
+    {ctype='signed int',        label='Voidstones'},                            -- C4
+    {ctype='signed int',        label='Kupofried\'s Corundums'},                -- C8
+    {ctype='unsigned char',     label='Moblin Pheromone Sacks'},                -- CC
 }
 
 -- Fish Bite Info
@@ -2021,51 +2602,147 @@ fields.incoming[0x115] = L{
     {ctype='unsigned int',      label='Catch Key'},                             -- 14   This value is used in the catch key of the 0x110 packet when catching a fish
 }
 
-local sizes = {}
-sizes.bool = 1
-sizes.char = 1
-sizes.short = 2
-sizes.int = 4
-sizes.long = 8
-sizes.float = 4
-sizes.double = 8
+-- Equipset Build Response
+fields.incoming[0x116] = L{
+    {ref=types.equipset_build,  lookup={res.slots, 0x00},   count=0x10},
+}
 
-local function parse(fs, data, max)
+fields.incoming._func[0x117] = {}
+fields.incoming._func[0x117].base = L{
+    {ctype='unsigned char',     label='Count'},                                 -- 04
+    {ctype='unsigned char[3]',  label='_unknown1'},                             -- 05
+}
+
+-- Equipset
+fields.incoming[0x117] = function(data)
+    local count = data:byte(5, 5)
+
+    return fields.incoming._func[0x117].base + L{
+        -- Only the number given in Count will be properly populated, the rest is junk
+        {ref=types.equipset,        count=count},                                   -- 08
+        {ctype='data[%u]':format((16 - count) * 4), label='_junk1'},                -- 08 + 4 * count
+        {ref=types.equipset,        lookup={res.slots, 0x00},   count=0x10},        -- 48
+    }
+end
+
+-- Currency Info (Currencies2)
+fields.incoming[0x118] = L{
+    {ctype='signed int',        label='Bayld'},                                     -- 04
+    {ctype='unsigned short',    label='Kinetic Units'},                             -- 08
+    {ctype='unsigned char',     label='Coalition Imprimaturs'},                     -- 0A
+    {ctype='unsigned char',     label='_unknown1'},                                 -- 0B   Currently holds no value
+    {ctype='signed int',        label='Obsidian Fragments'},                        -- 0C
+    {ctype='unsigned short',    label='Lebondopt Wings Stored'},                    -- 10
+    {ctype='unsigned short',    label='Pulchridopt Wings Stored'},                  -- 12
+    {ctype='signed int',        label='Mweya Plasm Corpuscles'},                    -- 14
+    {ctype='unsigned char',     label='Ghastly Stones Stored'},                     -- 18
+    {ctype='unsigned char',     label='Ghastly Stones +1 Stored'},                  -- 19
+    {ctype='unsigned char',     label='Ghastly Stones +2 Stored'},                  -- 1A
+    {ctype='unsigned char',     label='Verdigris Stones Stored'},                   -- 1B
+    {ctype='unsigned char',     label='Verdigris Stones +1 Stored'},                -- 1C
+    {ctype='unsigned char',     label='Verdigris Stones +2 Stored'},                -- 1D
+    {ctype='unsigned char',     label='Wailing Stones Stored'},                     -- 1E
+    {ctype='unsigned char',     label='Wailing Stones +1 Stored'},                  -- 1F
+    {ctype='unsigned char',     label='Wailing Stones +2 Stored'},                  -- 20
+    {ctype='unsigned char',     label='Snowslit Stones Stored'},                    -- 21
+    {ctype='unsigned char',     label='Snowslit Stones +1 Stored'},                 -- 22
+    {ctype='unsigned char',     label='Snowslit Stones +2 Stored'},                 -- 23
+    {ctype='unsigned char',     label='Snowtip Stones Stored'},                     -- 24
+    {ctype='unsigned char',     label='Snowtip Stones +1 Stored'},                  -- 25
+    {ctype='unsigned char',     label='Snowtip Stones +2 Stored'},                  -- 26
+    {ctype='unsigned char',     label='Snowdim Stones Stored'},                     -- 27
+    {ctype='unsigned char',     label='Snowdim Stones +1 Stored'},                  -- 28
+    {ctype='unsigned char',     label='Snowdim Stones +2 Stored'},                  -- 29
+    {ctype='unsigned char',     label='Snoworb Stones Stored'},                     -- 2A
+    {ctype='unsigned char',     label='Snoworb Stones +1 Stored'},                  -- 2B
+    {ctype='unsigned char',     label='Snoworb Stones +2 Stored'},                  -- 2C
+    {ctype='unsigned char',     label='Leafslit Stones Stored'},                    -- 2D
+    {ctype='unsigned char',     label='Leafslit Stones +1 Stored'},                 -- 2E
+    {ctype='unsigned char',     label='Leafslit Stones +2 Stored'},                 -- 2F
+    {ctype='unsigned char',     label='Leaftip Stones Stored'},                     -- 30
+    {ctype='unsigned char',     label='Leaftip Stones +1 Stored'},                  -- 31
+    {ctype='unsigned char',     label='Leaftip Stones +2 Stored'},                  -- 32
+    {ctype='unsigned char',     label='Leafdim Stones Stored'},                     -- 33
+    {ctype='unsigned char',     label='Leafdim Stones +1 Stored'},                  -- 34
+    {ctype='unsigned char',     label='Leafdim Stones +2 Stored'},                  -- 35
+    {ctype='unsigned char',     label='Leaforb Stones Stored'},                     -- 36
+    {ctype='unsigned char',     label='Leaforb Stones +1 Stored'},                  -- 37
+    {ctype='unsigned char',     label='Leaforb Stones +2 Stored'},                  -- 38
+    {ctype='data[0x0F]',        label='_unknown2'},                                 -- 39   Room for future additions, currently holds no value
+}
+
+local sizes = {}
+sizes['bool'] = 1
+sizes['char'] = 1
+sizes['unsigned char'] = 1
+sizes['signed char'] = 1
+sizes['short'] = 2
+sizes['unsigned short'] = 2
+sizes['signed short'] = 2
+sizes['int'] = 4
+sizes['unsigned int'] = 4
+sizes['signed int'] = 4
+sizes['long'] = 8
+sizes['unsigned long'] = 8
+sizes['signed long'] = 8
+sizes['float'] = 4
+sizes['double'] = 8
+sizes['data'] = 1
+
+local non_array_types = S{'char', 'bit', 'data'}
+
+local function parse(fs, data, index, max, lookup)
     max = max == '*' and 0 or max or 1
+    index = index or 4
 
     local res = L{}
-    local index = 0
     local count = 0
-    local bitoffset = 0
+    local bit_offset = 0
     while index < #data do
         count = count + 1
         for field in fs:it() do
             if field.ctype then
                 field = table.copy(field)
-                local ctype, count_str = field.ctype:match('(.*)%[(%d+)%]')
-                if count_str and ctype ~= 'char' and ctype ~= 'bit' then
+                local ctype, count_str = field.ctype:match('(.*)%[(.+)%]')
+                local count_num = count_str and count_str:number() or 1
+                ctype = ctype or field.ctype
+                if count_str and not non_array_types:contains(ctype) then
                     field.ctype = ctype
-                    local ext, size = parse(L{field}, data:sub(index + 1), count_str:number())
+                    local ext, new_index = parse(L{field}, data, index, count_num)
                     res = res + ext
-                    index = index + size
+                    index = new_index
                 else
                     if max ~= 1 then
-                        field.label = field.label .. ' ' .. count:string()
+                        if lookup then
+                            local resource = lookup[1][count + lookup[2] - 1]
+                            field.label = '%s %s':format(resource and resource.name or 'Unknown %d':format(count + lookup[2] - 1), field.label)
+                        else
+                            field.label = '%s %d':format(field.label, count)
+                        end
                     end
 
                     res:append(field)
-                    if ctype == 'bit' then
-                        local bits = count_str:number()
-                        bitoffset = (bitoffset + bits) % 8
-                        index = index + ((bitoffset + bits) / 8):floor()
+                    if ctype == 'bit' or ctype == 'boolbit' then
+                        index = index + ((bit_offset + count_num) / 8):floor()
+                        bit_offset = (bit_offset + count_num) % 8
+                    elseif ctype:endswith('*') then
+                        -- Finished, * can only be applied to the last field
+                        index = #data
                     else
-                        index = index + sizes[field.ctype:match('(%a+)[^%a]*$')]
+                        index = index + count_num * sizes[ctype]
                     end
                 end
             else
-                local ext, size = parse(field.ref, data:sub(index + 1), field.count)
+                local type_count = field.count
+                if not type_count then
+                    local byte_index = field.count_ref + 1
+                    type_count = data:byte(byte_index, byte_index)
+                end
+                if type_count == 10 then x = true end
+                local ext, new_index = parse(field.ref, data, index, type_count, field.lookup)
+                x = false
                 res = res + ext
-                index = index + size
+                index = new_index
             end
         end
 
@@ -2082,13 +2759,13 @@ function fields.get(dir, id, data)
     if type(f) == 'function' then
         f = f(data)
     end
-    return f and data and parse(f, data:sub(5)) or f
+    return f and data and parse(f, data) or f
 end
 
 return fields
 
 --[[
-Copyright (c) 2013, Windower
+Copyright © 2013-2014, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

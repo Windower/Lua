@@ -66,7 +66,7 @@ windower.register_event('addon command', function(command, ...)
         elseif command:lower() == 'colortest' then
             local counter = 0
             local line = ''
-            for n = 1, 509 do
+            for n = 1, 262 do
                 if not color_redundant:contains(n) and not black_colors:contains(n) then
                     if n <= 255 then
                         loc_col = string.char(0x1F, n)
@@ -76,8 +76,8 @@ windower.register_event('addon command', function(command, ...)
                     line = line..loc_col..string.format('%03d ', n)
                     counter = counter + 1
                 end
-                if counter == 16 or n == 509 then
-                    windower.add_to_chat(1, line)
+                if counter == 16 or n == 262 then
+                    windower.add_to_chat(6, line)
                     counter = 0
                     line = ''
                 end
@@ -199,10 +199,12 @@ function filterload(job)
     if file.exists('data\\filters\\filters-'..job..'.xml') then
         default_filt = false
         filter = config.load('data\\filters\\filters-'..job..'.xml',default_filter_table,false)
+        config.save(filter)
         windower.add_to_chat(4,'Loaded '..job..' Battlemod filters')
     elseif not default_filt then
         default_filt = true
         filter = config.load('data\\filters\\filters.xml',default_filter_table,false)
+        config.save(filter)
         windower.add_to_chat(4,'Loaded default Battlemod filters')
     end
     Current_job = job
@@ -214,8 +216,7 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
     local data = original:sub(5)
     
 -------------- ACTION PACKET ---------------
-    if id == 0x28 and original ~= last_28_packet then
-        last_28_packet = original
+    if id == 0x28 then
         local act = {}
         act.do_not_need = get_bit_packed(data,0,8)
         act.actor_id = get_bit_packed(data,8,40)
@@ -381,7 +382,7 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
                 multi_targs[status][1] = target
                 windower.send_command('@wait 0.5;lua i battlemod multi_packet '..status)
             elseif not (stat_ignore:contains(am.param_1)) then
-                multi_targs[status][#multi_targs[status]+1] = color_it(target.name,color_arr[target.owner or target.type])
+                multi_targs[status][#multi_targs[status]+1] = target
             else
             -- This handles the stat_ignore values, which are things like Utsusemi,
             -- Sneak, Invis, etc. that you don't want to see on a delay
@@ -487,13 +488,12 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
         
     ------------- JOB INFO ----------------
     elseif id == 0x01B then
-        filterload(res.jobs[data:byte(5)].short)
+        filterload(res.jobs[data:byte(5)][language..'_short'])
     end
 end)
 
 function multi_packet(...)
     local ind = table.concat({...},' ')
---    windower.add_to_chat(8,tostring(multi_actor[ind].name)..' '..tostring(multi_targs[ind][1].name)..' '..tostring(multi_msg[ind]))
     local targets = assemble_targets(multi_actor[ind],multi_targs[ind],0,multi_msg[ind])
     local outstr = res.action_messages[multi_msg[ind]][language]
         :gsub('$\123target\125',targets)

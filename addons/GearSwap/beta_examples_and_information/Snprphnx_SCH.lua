@@ -25,7 +25,7 @@ function get_sets()
 		body="Hagondes Coat",hands="Yaoyotl Gloves",ring1="Strendu Ring",ring2="Icesoul Ring",
 		back="Searing Cape",waist="Maniacus Sash",legs="Hagondes Pants",feet="Bokwus Boots"}
 	
-	sets.midcast_DarkMagic = {main="Chatoyant Staff",sub="Arbuda Grip",ammo="Hasty Pinion",
+	sets.midcast_DarkMagic = {main="Chatoyant Staff",sub="Arbuda Grip",ammo="Hasty Pinion +1",
 		head="Appetence Crown",neck="Aesir Torque",ear1="Hirudinea Earring",ear2="Loquacious Earring",
 		body="Hedera Cotehardie",hands="Ayao's Gages",ring1="Balrahn's Ring",ring2="Excelsis Ring",
 		back="Merciful Cape",waist="Goading Belt",legs="Auspex Slops",feet="Bokwus Boots"}

@@ -1,7 +1,7 @@
 --[[
-findAll v1.20131120
+findAll v1.20140904
 
-Copyright (c) 2013, Giuliano Riccio
+Copyright (c) 2013-2014, Giuliano Riccio
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name    = 'findAll'
 _addon.author  = 'Zohno'
-_addon.version = '1.20140328'
+_addon.version = '1.20140904'
 _addon.command = 'findAll'
 
 require('chat')
@@ -51,14 +51,10 @@ next_sequence_offset   = 0
 item_names             = T{}
 global_storages        = T{}
 storages_path          = 'data/storages.json'
-storages_order         = L{'temporary', 'inventory', 'safe', 'storage', 'locker', 'satchel', 'sack', 'case'}
-storage_slips_order    = L{'slip 01', 'slip 02', 'slip 03', 'slip 04', 'slip 05', 'slip 06', 'slip 07', 'slip 08', 'slip 09', 'slip 10', 'slip 11', 'slip 12', 'slip 13', 'slip 14', 'slip 15', 'slip 16', 'slip 17', 'slip 18'}
+storages_order         = L{'temporary', 'inventory', 'wardrobe', 'safe', 'storage', 'locker', 'satchel', 'sack', 'case'}
+storage_slips_order    = L{'slip 01', 'slip 02', 'slip 03', 'slip 04', 'slip 05', 'slip 06', 'slip 07', 'slip 08', 'slip 09', 'slip 10', 'slip 11', 'slip 12', 'slip 13', 'slip 14', 'slip 15', 'slip 16', 'slip 17', 'slip 18', 'slip 19'}
 merged_storages_orders = L{}:extend(storages_order):extend(storage_slips_order)
-resources              = {
-    ['armor']   = '../../plugins/resources/items_armor.xml',
-    ['weapons'] = '../../plugins/resources/items_weapons.xml',
-    ['general'] = '../../plugins/resources/items_general.xml'
-}
+resources              = require ('resources').items
 
 function search(query, export)
     update()
@@ -104,38 +100,13 @@ function search(query, export)
         end
     end
 
-    if new_item_ids:length() > 0 then
-        for kind, resource_path in pairs(resources) do
-            resource = io.open(windower.addon_path..resource_path, 'r')
-
-            if resource ~= nil then
-                while true do
-                    local line = resource:read()
-
-                    if line == nil then
-                        break
-                    end
-
-                    local id, long_name, name = line:match('id="(%d+)" enl="([^"]+)".+>([^<]+)<')
-
-                    if id ~= nil then
-                        id = tostring(id)
-
-                        if item_names[id] == nil
-                            and new_item_ids:contains(id)
-                        then
-                            item_names[id] = {
-                                ['name']      = name:gsub('♂', string.char(0x81, 0x89)):gsub('♀', string.char(0x81, 0x8A)),
-                                ['long_name'] = long_name:gsub('♂', string.char(0x81, 0x89)):gsub('♀', string.char(0x81, 0x8A))
-                            }
-                        end
-                    end
-                end
-            else
-                error(kind..' resource file not found.')
-            end
-
-            resource:close()
+    for i,_ in pairs(new_item_ids) do
+        local id = tonumber(i)
+	    if (resources[id]) then
+            item_names[i] = {
+                ['name'] = resources[id].name,
+                ['long_name'] = resources[id].name_log
+            }
         end
     end
 
@@ -177,6 +148,8 @@ function search(query, export)
         end
     end
 
+    local total_quantity = 0
+
     for _, character_name in ipairs(sorted_names) do
         if (character_set:length() == 0 or character_set:contains(character_name)) and not character_filter:contains(character_name) then
             local storages = global_storages[character_name]
@@ -188,6 +161,7 @@ function search(query, export)
                     for id, quantity in pairs(storages[storage_name]) do
                         if results_items:contains(id) then
                             if terms_pattern ~= '' then
+                                total_quantity = total_quantity + quantity
                                 results:append(
                                     (character_name..'/'..storage_name..':'):color(259)..' '..
                                     item_names[id].name:gsub('('..terms_pattern..')', ('%1'):color(258))..
@@ -217,6 +191,10 @@ function search(query, export)
                 end
             end
         end
+    end
+
+    if total_quantity > 0 then
+        log('Total: ' .. total_quantity)
     end
 
     if export_file ~= nil then
@@ -318,7 +296,7 @@ function update()
         for storage_name, storage in pairs(storages) do
             if storage_name == 'gil' then
                 storages_json:append('"'..storage_name..'":'..storage)
-            elseif storage_name ~= 'temporary' and not storage_name:match('^slip') then
+            elseif storage_name ~= 'temporary' then
                 local items_json = L{}
 
                 for id, quantity in pairs(storage) do
@@ -393,6 +371,11 @@ windower.register_event('addon command', function(...)
         local params = L{...}
         local query  = L{}
         local export = nil
+
+        -- convert command line params (SJIS) to UTF-8
+        for i, elm in ipairs(params) do
+            params[i] = windower.from_shift_jis(elm)
+        end
 
         while params:length() > 0 and params[1]:match('^[:!]%a+$') do
             query:append(params:remove(1))

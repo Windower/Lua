@@ -121,7 +121,9 @@ function list.extend(l1, l2)
     return l1
 end
 
-_meta.L.__add = list.extend
+_meta.L.__add = function(l1, l2)
+    return L{}:extend(l1):extend(l2)
+end
 
 function list.contains(l, el)
     for key = 1, l.n do
@@ -176,20 +178,6 @@ function list.with(l, attr, val)
         local el = rawget(l, i)
         if type(el) == 'table' and rawget(el, attr) == val then
             return el
-        end
-    end
-end
-
-function list.iwith(l, attr, val)
-    local cel
-    val = val:lower()
-    for i = 1, l.n do
-        local el = rawget(l, i)
-        if type(el) == 'table' then
-            cel = rawget(el, attr)
-            if type(cel) == 'string' and cel:lower() == val then
-                return el
-            end
         end
     end
 end
@@ -408,9 +396,19 @@ function list.format(l, trail, subs)
 
     local res = ''
     for i = 1, l.n do
-        res = res .. tostring(l[i])
+        local add = tostring(l[i])
+        if trail == 'csv' and add:match('[,"]') then
+            res = res .. add:gsub('"', '""'):enclose('"')
+        else
+            res = res .. add
+        end
+
         if i < l.n - 1 then
-            res = res .. ', '
+            if trail == 'csv' then
+                res = res .. ','
+            else
+                res = res .. ', '
+            end
         elseif i == l.n - 1 then
             res = res .. last
         end
@@ -420,7 +418,7 @@ function list.format(l, trail, subs)
 end
 
 --[[
-Copyright (c) 2013, Windower
+Copyright © 2013-2014, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

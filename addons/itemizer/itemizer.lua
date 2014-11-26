@@ -1,6 +1,6 @@
 _addon.name = 'Itemizer'
 _addon.author = 'Ihina'
-_addon.version = '2.0.0.0'
+_addon.version = '2.0.1.0'
 _addon.command = 'itemizer'
 
 require('luau')
@@ -20,30 +20,29 @@ windower.register_event('unhandled command', function(command, ...)
 		local item_name = param:concat(' ')
 		local search = command == 'get' and bag or 'inventory'
 
-		local id = res.items:name(windower.wc_match-{item_name})
-		if id:length() == 0 then
-			id = res.items:name_full(windower.wc_match-{item_name})
-			if id:length() == 0 then
-				log('Unknown item')
+		local item_ids = res.items:name(windower.wc_match-{item_name})
+		if item_ids:length() == 0 then
+			item_ids = res.items:name_log(windower.wc_match-{item_name})
+			if item_ids:length() == 0 then
+				error('Unknown item: %s':format(item_name))
 				return
 			end
 		end
 
-		local index = table.with[2](res.bags, 'english', string.imatch-{bag})
-		if not index then
-			error('Unknown bag: ' .. bag)
+		local bag_id = res.bags:with('english', string.imatch-{bag}).id
+		if not bag_id then
+			error('Unknown bag: %s':format(bag))
 			return
 		end
 
-        print(S(id:map(table.get-{'name'})), index, search)
 		for slot, item in pairs(windower.ffxi.get_items()[search]) do 
-			if id[item.id] then 
-				windower.ffxi[command .. '_item'](index, slot)
+			if item_ids[item.id] then 
+				windower.ffxi[command .. '_item'](bag_id, slot)
 				return
 			end 
 		end
 
-		log('Item not found')
+		log('Item "%s" not found in %s':format(item_name, command == 'get' and bag or 'inventory'))
 	end	
 end)
 
@@ -106,6 +105,7 @@ active = S{}
 -- Returning false doesn't resend the command and executes it
 function use_item(id, count, items)
     count = count or 1
+    items = items or windower.ffxi.get_items()
 
     local item = table.with(items.inventory, 'id', id)
     if item and item.count >= count then
@@ -146,15 +146,16 @@ function reschedule(text, ids, count, items)
 
     for id in L(ids):it() do
         if use_item(id, count, items) then
-            windower.send_command('wait ' .. settings.Delay:string() .. '; input ' .. text)
+            windower.send_command('wait %f; input %s':format(settings.Delay, text))
             return true
         end
     end
 end
 
+item_names = T{}
 windower.register_event('outgoing text', function(text)
     -- Ninjutsu
-    if settings.AutoNinjaTools and text:startswith('/ma') or text:startswith('/nin') then
+    if settings.AutoNinjaTools and (text:startswith('/ma ') or text:startswith('/nin ') or text:startswith('/magic ') or text:startswith('/ninjutsu ')) then
         local name
         for pattern in patterns:it() do
             local match = text:match(pattern)
@@ -171,13 +172,20 @@ windower.register_event('outgoing text', function(text)
         end
 
     -- Item usage
-    elseif settings.AutoItems and text:startswith('/item') then
+    elseif settings.AutoItems and text:startswith('/item ') then
         local items = windower.ffxi.get_items()
-        local item_names = T{}
+        local inventory_items = S{}
+        local wardrobe_items = S{}
         for bag in bag_names.all:it() do
             for _, item in ipairs(items[bag]) do
-                if item.id > 0 then
+                if item.id > 0 and not item_names[item.id] then
                     item_names[item.id] = res.items[item.id].name
+                end
+
+                if bag == 'inventory' then
+                    inventory_items:add(item.id)
+                elseif bag == 'wardrobe' then
+                    wardrobe_items:add(item.id)
                 end
             end
         end
@@ -188,14 +196,18 @@ windower.register_event('outgoing text', function(text)
         local full_name = parsed_text:match('(.+)')
         local id = item_names:find(string.imatch-{mid_name}) or item_names:find(string.imatch-{full_name})
         if id then
-            return reschedule(text, {id}, item_count and item_count:number() or 1, items)
+            if not inventory_items:contains(id) and not wardrobe_items:contains(id) then
+                return reschedule(text, {id}, item_count and item_count:number() or 1, items)
+            else
+                active:remove(id)
+            end
         end
 
     end
 end)
 
 --[[
-Copyright (c) 2013, Ihina
+Copyright © 2013-2014, Ihina
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

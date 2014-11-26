@@ -201,12 +201,12 @@ end
 
 -- Takes a padding character pad and pads the string str to the left of it, until len is reached. pad defaults to a space.
 function string.lpad(str, pad, len)
-    return (pad:rep(len)..str):sub(-(len > #str and len or #str))
+    return (pad:rep(len) .. str):sub(-(len > #str and len or #str))
 end
 
 -- Takes a padding character pad and pads the string str to the right of it, until len is reached. pad defaults to a space.
 function string.rpad(str, pad, len)
-    return (str..pad:rep(len)):sub(1, len > #str and len or #str)
+    return (str .. pad:rep(len)):sub(1, len > #str and len or #str)
 end
 
 -- Returns the string padded with zeroes until the length is len.
@@ -214,56 +214,9 @@ function string.zfill(str, len)
     return str:lpad('0', len)
 end
 
--- Converts a string in base base to a number.
-function string.todec(numstr, base)
-    -- Create a table of allowed values according to base and how much each is worth.
-    local digits = {}
-    local val = 0
-    for c in ('0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'):gmatch('.') do
-        digits[c] = val
-        val = val + 1
-        if val == base then
-            break
-        end
-    end
-
-    local index = base^(#numstr-1)
-    local acc = 0
-    for c in numstr:gmatch('.') do
-        acc = acc + digits[c]*index
-        index = index/base
-    end
-
-    return acc
-end
-
--- Checks if a string is in a table.
--- DEPRECATED: Use (table|list|set).contains instead
-function string.isin(str, t)
-    for _, arg in pairs(t) do
-        if arg == str then
-            return true
-        end
-    end
-
-    return false
-end
-
 -- Checks if a string is empty.
 function string.empty(str)
     return str == ''
-end
-
--- Returns a slug of a string.
-function string.slug(str)
-    return str
-        :gsub(' I$', '1')
-        :gsub(' II$', '2')
-        :gsub(' III$', '3')
-        :gsub(' IV$', '4')
-        :gsub(' V$', '5')
-        :gsub('[^%w]', '')
-        :lower()
 end
 
 -- Returns a string with Lua pattern characters escaped.
@@ -284,7 +237,7 @@ function string.mfind(str, full_pattern, ...)
     local patterns = full_pattern:split('|')
 
     local found = {}
-    for pattern in ipairs(patterns) do
+    for _, pattern in ipairs(patterns) do
         local new_found = {str:find(pattern, ...)}
         if not found[1] or new_found[1] and new_found[1] < found[1] then
             found = new_found
@@ -300,7 +253,7 @@ function string.mmatch(str, full_pattern, ...)
 
     local found = {}
     local index = nil
-    for pattern in ipairs(patterns) do
+    for _, pattern in ipairs(patterns) do
         local start = {str:find(pattern, ...)}
         if start and (not index or start < index) then
             found = {str:match(pattern, ...)}
@@ -315,7 +268,7 @@ end
 function string.mgsub(str, full_pattern, ...)
     local patterns = full_pattern:split('|')
 
-    for pattern in ipairs(patterns) do
+    for _, pattern in ipairs(patterns) do
         str = str:gsub(pattern, ...)
     end
 
@@ -446,12 +399,21 @@ function string.chunks(str, size)
 end
 
 -- Returns a string decoded given the appropriate information.
-function string.decode(str, bits, charset)
-    if type(charset) == 'string' then
-        charset = charset:split()
+string.decode = (function()
+    local chunk_size = function(t)
+        local e, f = math.frexp(#t)
+        return f + math.ceil(e - 1.5)
     end
-    return str:binary():chunks(bits):map(table.get+{charset}..tonumber-{2}):concat()
-end
+
+    return function(str, charset)
+        if type(charset) == 'string' then
+            local tmp = charset
+            charset = charset:sub(2):split()
+            charset[0] = charset:sub(1, 1)
+        end
+        return str:binary():chunks(chunk_size(charset)):map(table.get+{charset} .. tonumber-{2}):concat():gsub('%z+$', '')
+    end
+end)()
 
 -- Returns a plural version of a string, if the provided table contains more than one element.
 -- Defaults to appending an s, but accepts an option string as second argument which it will the string with.
@@ -486,7 +448,7 @@ function table.format(t, trail, subs)
     if trail == 'and' then
         last = ' and '
     elseif trail == 'csv' then
-        last = ', '
+        last = ','
     elseif trail == 'oxford' then
         last = ', and '
     else
@@ -495,10 +457,20 @@ function table.format(t, trail, subs)
 
     local res = ''
     for k, v in pairs(t) do
-        res = res .. tostring(v)
+        local add = tostring(v)
+        if trail == 'csv' and add:match('[,"]') then
+            res = res .. add:gsub('"', '""'):enclose('"')
+        else
+            res = res .. add
+        end
+
         if next(t, k) then
             if next(t, next(t, k)) then
-                res = res .. ', '
+                if trail == 'csv' then
+                    res = res .. ','
+                else
+                    res = res .. ', '
+                end
             else
                 res = res .. last
             end
@@ -509,7 +481,7 @@ function table.format(t, trail, subs)
 end
 
 --[[
-Copyright (c) 2013, Windower
+Copyright © 2013-2014, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

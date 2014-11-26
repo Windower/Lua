@@ -1,4 +1,4 @@
---Copyright (c) 2013, Byrthnoth
+--Copyright (c) 2014, Byrthnoth
 --All rights reserved.
 
 --Redistribution and use in source and binary forms, with or without
@@ -24,6 +24,12 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+_addon.version = '2.710'
+_addon.name = 'Shortcuts'
+_addon.author = 'Byrth'
+_addon.commands = {'shortcuts'}
+
+
 debugging = false
 logging = false
 if windower.dir_exists('../addons/shortcuts/data/') and logging then
@@ -39,21 +45,86 @@ if windower.file_exists(windower.addon_path..'resources.lua') then
     end
 end
 
+if not windower.dir_exists(windower.addon_path..'data') then
+    windower.create_dir(windower.addon_path..'data')
+end
+
 require 'sets'
+require 'lists'
 require 'helper_functions'
 require 'tables'
 require 'strings'
 res = require 'resources'
+config = require 'config'
+
+default_aliases = {
+    c1="Cure",
+    c2="Cure II",
+    c3="Cure III",
+    c4="Cure IV",
+    c5="Cure V",
+    c6="Cure VI",
+    r1="Raise",
+    r2="Raise II",
+    r3="Raise III",
+    pro1="Protectra",
+    pro2="Protectra II",
+    pro3="Protectra III",
+    pro4="Protectra IV",
+    pro5="Protectra V",
+    sh1="Shellra",
+    sh2="Shellra II",
+    sh3="Shellra III",
+    sh4="Shellra IV",
+    sh5="Shellra V",
+    she1="Shellra",
+    she2="Shellra II",
+    she3="Shellra III",
+    she4="Shellra IV",
+    she5="Shellra V",
+    bl="Blink",
+    ss="Stoneskin",
+    re1="Regen",
+    re2="Regen II",
+    re3="Regen III",
+    re4="Regen IV",
+    re5="Regen V",
+    holla="Teleport-Holla",
+    dem="Teleport-Dem",
+    mea="Teleport-Mea",
+    yhoat="Teleport-Yhoat",
+    altep="Teleport-Altep",
+    vahzl="Teleport-Vahzl",
+    jugner="Recall-Jugner",
+    pashh="Recall-Pashh",
+    meri="Recall-Meriph",
+    pash="Recall-Pashh",
+    meriph="Recall-Meriph",
+    ichi="Utsusemi: Ichi",
+    ni="Utsusemi: Ni",
+    utsu1="Utsusemi: Ichi",
+    utsu2="Utsusemi: Ni",
+    ds="Divine Seal",
+    es="Elemental Seal",
+    la="Light Arts",
+    da="Dark Arts",
+    pen="Penury",
+    cel="Celerity",
+    cw1="Curing Waltz",
+    cw2="Curing Waltz II",
+    cw3="Curing Waltz III",
+    cw4="Curing Waltz IV",
+    cw5="Curing Waltz V",
+    hw="Healing Waltz"
+}
+
+aliases = config.load('data\\aliases.xml',default_aliases)
+config.save(aliases)
+setmetatable(aliases,nil)
+
 
 require 'statics'
-require 'ambiguous_names'
 require 'targets'
-
-
-_addon.version = '2.000'
-_addon.name = 'Shortcuts'
-_addon.author = 'Byrth'
-_addon.commands = {'shortcuts'}
 
 -----------------------------------------------------------------------------------
 --Name: event_load()
@@ -65,7 +136,6 @@ _addon.commands = {'shortcuts'}
 ---- is loaded and treated as a script)
 -----------------------------------------------------------------------------------
 windower.register_event('load',function()
-    counter = 0
     lastsent = ''
 end)
 
@@ -94,11 +164,9 @@ end)
 windower.register_event('outgoing text',function(original,modified)
     local temp_org = windower.convert_auto_trans(modified)
     if modified:sub(1,1) ~= '/' then return modified end
-    if debugging then 
-        local tempst = windower.ffxi.get_mob_by_target('st')
-        windower.add_to_chat(8,modified..' '..tostring(tempst))
-    end
-    temp_org = temp_org:gsub(' <wait %d+>','')
+    debug_chat('outgoing_text: '..modified..' '..tostring(windower.ffxi.get_mob_by_target('st')))
+    temp_org = temp_org:gsub(' <wait %d+>',''):sub(2)
+    
     if logging then
         logfile:write('\n\n',tostring(os.clock()),'temp_org: ',temp_org,'\nModified: ',modified)
         logfile:flush()
@@ -109,7 +177,7 @@ windower.register_event('outgoing text',function(original,modified)
         lastsent = ''
         return modified
     end
-    
+
     -- Otherwise, dump the inputs into command_logic()
     return command_logic(temp_org,modified)
 end)
@@ -124,7 +192,11 @@ end)
 -----------------------------------------------------------------------------------
 windower.register_event('unhandled command',function(...)
     local combined = windower.convert_auto_trans(table.concat({...},' ')) -- concat it back together...
-    command_logic(combined,combined) -- and then dump it into command_logic()
+    local cmd,bool = command_logic(combined,combined) -- and then dump it into command_logic()
+    if cmd and bool and cmd ~= '' then
+        if cmd:sub(1,1) ~= '/' then cmd = '/'..cmd end
+        windower.send_command('@input '..cmd)
+    end
 end)
 
 
@@ -139,13 +211,16 @@ end)
 ---- string (sometimes '') depending what the logic says to do.
 -----------------------------------------------------------------------------------
 function command_logic(original,modified)
-    local splitline = string.split(original,' ')
+    local splitline = alias_replace(string.split(original,' '):filter(-''))
     local command = splitline[1] -- Treat the first word as a command.
-    local potential_targ = splitline[splitline.n]
+    local potential_targ = '/nope//'
+    if splitline.n ~= 1 then
+        potential_targ = splitline[splitline.n]
+    end
     local a,b,spell = string.find(original,'"(.-)"')
     
     if unhandled_list[command] then
-        return modified
+        return modified,true
     end
     
     if spell then
@@ -164,24 +239,25 @@ function command_logic(original,modified)
     
     if ignore_list[command] then -- If the command is legitimate and on the blacklist, return it unaltered.
         lastsent = ''
-        return modified
+        return modified,true
     elseif command2_list[command] and not valid_target(potential_targ,true) then
         -- If the command is legitimate and requires target completion but not ability interpretation
         
         if command2_list[command]==true then -- If there are not any excluded secondary commands
             local temptarg = valid_target(potential_targ) or target_make({['Player']=true,['Enemy']=true,['Party']=true,['Ally']=true,['NPC']=true,['Self']=true,['Corpse']=true}) -- Complete the target or make one.
             if temptarg ~= '<me>' then -- These commands, like emotes, check, etc., don't need to default to <me>
-                lastsent = command..' '..temptarg -- Push the command and target together and send it out.
+                lastsent = '/'..command..' '..temptarg -- Push the command and target together and send it out.
             else
-                lastsent = command
+                lastsent = '/'..command
             end
-            if debugging then windower.add_to_chat(8,tostring(counter)..' input '..lastsent) end
+
+            debug_chat('258: input '..lastsent)
             if logging then
                 logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\n(162) ',lastsent)     
                 logfile:flush()
             end
             windower.send_command('@input '..lastsent)
-            return ''
+            return '',false
         else -- If there are excluded secondary commands (like /pcmd add <name>)
             local tempcmd = command
             local passback
@@ -208,31 +284,23 @@ function command_logic(original,modified)
             elseif not temptarg then -- Make a target if the temptarget isn't valid
                 temptarg = target_make({['Player']=true,['Enemy']=true,['Party']=true,['Ally']=true,['NPC']=true,['Self']=true,['Corpse']=true})
             end
-            lastsent = tempcmd..' '..temptarg
-            if debugging then windower.add_to_chat(8,tostring(counter)..' input '..lastsent) end
+            lastsent = '/'..tempcmd..' '..temptarg
+            debug_chat('292: input '..lastsent)
             if logging then
                 logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\n(193) ',lastsent)
                 logfile:flush()
             end
             windower.send_command('@input '..lastsent)
-            return ''
+            return '',false
         end
-    elseif (command2_list[command] and valid_target(potential_targ,true)) then 
+    elseif command2_list[command] and valid_target(potential_targ,true) then
         -- If the submitted command does not require ability interpretation and is fine already, send it out.
         lastsent = ''
         if logging then
             logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\n(146) Legitimate command')
             logfile:flush()
         end
-        return modified
-    elseif command_list[command] and convert_spell(spell or '') and valid_target(potential_targ,true) then
-        -- If the submitted ability is already properly formatted, send it out. Fixes capitalization and minor differences.
-        lastsent = ''
-        if logging then
-            logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\n(146) Legitimate command')
-            logfile:flush()
-        end
-        return command..' "'..convert_spell(spell)..'" '..potential_targ
+        return modified,true
     elseif command_list[command] then
         -- If there is a valid command, then pass the text with an offset of 1 to the text interpretation function
         return interp_text(splitline,1,modified)
@@ -240,6 +308,24 @@ function command_logic(original,modified)
         -- If there is not a valid command, then pass the text with an offset of 0 to the text interpretation function
         return interp_text(splitline,0,modified)
     end
+end
+
+
+-----------------------------------------------------------------------------------
+--Name: alias_replace(tab)
+--Args:
+---- tab (table of strings): splitline
+-----------------------------------------------------------------------------------
+--Returns:
+---- tab (table of strings): with all the aliased values replaced
+-----------------------------------------------------------------------------------
+function alias_replace(tab)
+    for ind,key in ipairs(tab) do
+        if aliases[key:lower()] then
+            tab[ind] = aliases[key:lower()]
+        end
+    end
+    return tab
 end
 
 
@@ -257,16 +343,12 @@ end
 -----------------------------------------------------------------------------------
 function interp_text(splitline,offset,modified)
     local temptarg,abil
-    local no_targ_abil = strip(_raw.table.concat(splitline,' ',1+offset,splitline.n))
-    
+    local no_targ_abil = strip(table.concat(splitline,' ',1+offset,splitline.n))
+        
     if validabils[no_targ_abil] then
         abil = no_targ_abil
     elseif splitline.n > 1 then
-        local potential_targ = splitline[splitline.n]
-        if targ_reps[potential_targ] then
-            potential_targ = targ_reps[potential_targ]
-        end
-        temptarg = valid_target(potential_targ)
+        temptarg = valid_target(targ_reps[splitline[splitline.n]] or splitline[splitline.n])
     end
 
     if temptarg then abil = _raw.table.concat(splitline,' ',1+offset,splitline.n-1)
@@ -274,70 +356,52 @@ function interp_text(splitline,offset,modified)
 
     local strippedabil = strip(abil) -- Slug the ability
 
-    if strippedabil ~= '' and validabils[strippedabil] then -- If the ability exists, do this.
-        local r_line, s_type
-        
-        if validabils[strippedabil].typ == 'spells' then
-            if debugging then windower.add_to_chat(8,strippedabil..' is considered a spell.') end
-            r_line = res.spells[validabils[strippedabil].index]
-        elseif validabils[strippedabil].typ == 'abilities' then
-            if debugging then windower.add_to_chat(8,strippedabil..' is considered an ability.') end
-            r_line = res.abilities[validabils[strippedabil].index]
-        elseif validabils[strippedabil].typ == 'ambig_names' then
-            if debugging then windower.add_to_chat(8,strippedabil..' is considered ambiguous.') end
-            r_line, s_type = ambig(strippedabil)
-        end
-        
-        local targets = r_line.targets
-        
-        -- Handling for abilities that change potential targets.
-        if r_line.prefix == '/song' or r_line.prefix == '/so' and r_line.casttime == 8 then
-            local buffs = windower.ffxi.get_player().buffs
-            for i,v in pairs(buffs) do
-                if v == 409 then targets.Party = true end -- Pianissimo
+    if validabils[strippedabil] then
+        local options,nonoptions,num_opts, r_line = {},{},0
+        local player = windower.ffxi.get_player()
+        for v in validabils[strippedabil]:it() do
+            if check_usability(player,v.res,v.id) then
+                options[v.res] = v.id
+                num_opts = num_opts + 1
+            elseif v.res ~= nil then
+                nonoptions[v.res] = v.id
             end
         end
+        if num_opts > 0 then
+            -- If there are usable options then prioritize:
+            -- Prefix, if given -> Spells -> Job Abilities -> Weapon Skills -> Monster Skills
+            r_line = res[(offset == 1 and options[command_list[splitline[1]]] and command_list[splitline[1]]) or (options.spells and 'spells') or (options.job_abilities and 'job_abilities') or (options.weapon_skills and 'weapon_skills') or (options.monster_abilities and 'monster_abilities')][options[command_list[splitline[1]]] or options.spells or options.job_abilities or options.weapon_skills or options.monster_abilities]
+        elseif num_opts == 0 then
+            r_line = res[(offset == 1 and nonoptions[command_list[splitline[1]]] and command_list[splitline[1]]) or (nonoptions.spells and 'spells') or (nonoptions.weapon_skills and 'weapon_skills') or (nonoptions.job_abilities and 'job_abilities') or (nonoptions.monster_abilities and 'monster_abilities')][nonoptions[command_list[splitline[1]]] or nonoptions.spells or nonoptions.weapon_skills or nonoptions.job_abilities or nonoptions.monster_abilities]
+        end
         
-        lastsent = r_line.prefix..' "'..r_line.english..'" '..(temptarg or target_make(targets))
-        if debugging then windower.add_to_chat(8,tostring(counter)..' input '..lastsent) end
+        local targets = table.reassign({},r_line.targets)
+        
+        -- Handling for abilities that change potential targets.
+        if r_line.skill == 'Singing' and r_line.casttime == 8 and L(player.buffs):contains(409) then
+            targets.Party = true -- Pianissimo
+        end
+        
+        local abil_name = r_line.english
+        while abil_name:sub(-1) == ' ' do
+            abil_name = abil_name:sub(1,-2)
+        end
+        
+        lastsent = r_line.prefix..' "'..abil_name..'" '..(temptarg or target_make(targets))
         if logging then
             logfile:write('\n\n',tostring(os.clock()),'Original: ',table.concat(splitline,' '),'\n(180) ',lastsent)
             logfile:flush()
         end
-        windower.send_command('@input '..lastsent)
-        return ''
+        debug_chat('390 comp '..lastsent:sub(2):gsub('"([^ ]+)"', '%1'):lower()..'   ||    '..table.concat(splitline,' ',1,splitline.n):gsub('"([^ ]+)"', '%1'):lower())
+        if offset == 1 and in_game_res_commands[splitline[1]] and lastsent:gsub('"([^ ]+)"', '%1'):lower() == in_game_res_commands[splitline[1]]..' '..table.concat(splitline,' ',2,splitline.n):gsub('"([^ ]+)"', '%1'):lower() then
+            debug_chat('400 return '..lastsent)
+            return lastsent,true
+        else
+            debug_chat('403 input '..lastsent)
+            windower.send_command('@input '..lastsent)
+            return '',false
+        end
     end
     lastsent = ''
-    return modified
-end
-
-
------------------------------------------------------------------------------------
---Name: convert_spell()
---Args:
----- spell (string): Proposed spell
------------------------------------------------------------------------------------
---Returns:
----- Either false, or a corrected spell name.
------------------------------------------------------------------------------------
-function convert_spell(spell)
-    local name_line = validabils[(spell or ''):lower():gsub(' ',''):gsub('[^%w]','')]
-    
-    if name_line then
-        if name_line.typ == 'spells' then
-            r_line = res.spells[name_line.index]
-        elseif name_line.typ == 'abilities' then
-            r_line = res.abilities[name_line.index]
-        elseif name_line.typ == 'ambig_names' then
-            r_line, s_type = ambig(strip(spell))
-        end
-        
-        if r_line then
-            return r_line[language]
-        else
-            return false
-        end
-    else
-        return false
-    end
+    return modified,false
 end

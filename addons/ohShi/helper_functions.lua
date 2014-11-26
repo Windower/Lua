@@ -53,14 +53,18 @@ end
 --This function checks the string sent to it against your danger list
 --returns true if it's found and false if not.
 function dCheck(typ, sid)
+    --log('DEBUG TYP: '..typ..' ID: '..sid)
     sid = tonumber(sid)
     if typ == 'spell' then
-        if settings.dangerwords.spells:find(string.imatch-{spells[sid]['english']..'$'}) then
+        if settings.dangerwords.spells:find(string.imatch-{res.spells[sid].english .. '$'}) then
             return true
         end 
-    else
-        local list = res.monster_abilities[sid-256]['english']
-        if settings.dangerwords.weaponskills:find(string.imatch-{list..'$'}) then
+    elseif sid <= 255 then
+        if settings.dangerwords.weaponskills:find(string.imatch-{res.weapon_skills[sid].english .. '$'}) then
+            return true
+        end 
+    else   
+        if settings.dangerwords.weaponskills:find(string.imatch-{res.monster_abilities[sid].english .. '$'}) then
             return true
         end 
     end

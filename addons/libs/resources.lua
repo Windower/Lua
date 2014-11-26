@@ -15,7 +15,7 @@ local fns = {}
 local slots = {}
 
 local language_string = _addon and _addon.language and _addon.language:lower() or windower.ffxi.get_info().language:lower()
-local log_language_string = language_string .. '_log'
+local language_string_log = language_string .. '_log'
 
 -- The metatable for all sub tables of the root resource table
 local resource_mt = {}
@@ -28,17 +28,27 @@ local resources = setmetatable({}, {__index = function(t, k)
     end
 end})
 
+local redict = {
+    name = language_string,
+    name_log = language_string_log,
+    english = 'en',
+    japanese = 'ja',
+    english_log = 'enl',
+    japanese_log = 'ja',
+    english_short = 'ens',
+    japanese_short = 'jas',
+}
+
 -- The metatable for a single resource item (an entry in a sub table of the root resource table)
-local resource_entry_mt = {__index = function(t, k)
-    return k == 'name'
-            and t[language_string]
-        or k == 'log_name'
-            and t[log_language_string]
-        or table[k]
-end}
+local resource_entry_mt = {__index = function()
+    return function(t, k)
+        return redict[k] and t[redict[k]] or table[k]
+    end
+end()}
 
 function resource_group(r, fn, attr)
     fn = type(fn) == 'function' and fn or functions.equals(fn)
+    attr = redict[attr] or attr
 
     local res = {}
     for index, item in pairs(r) do
@@ -51,19 +61,55 @@ function resource_group(r, fn, attr)
     return setmetatable(res, resource_mt)
 end
 
+local resource_alt_fns = {}
+
+resource_alt_fns.it = function(t)
+    local key = nil
+    return function()
+        repeat
+            key = next(t, key)
+        until type(key) == 'number' or type(key) == 'nil'
+        return rawget(t, key), key
+    end
+end
+
+resource_alt_fns.map = function(t, fn)
+    local res = T{}
+
+    for val, key in t:it() do
+        res[key] = fn(val)
+    end
+
+    return res
+end
+
+resource_alt_fns.key_map = function(t, fn)
+    local res = T{}
+
+    for val, key in t:it() do
+        res[fn(key)] = val
+    end
+
+    return res
+end
+
 resource_mt.__index = function(t, k)
-    return (slots[t]:contains(k) or k == 'name')
-            and resource_group-{k}
-        or table[k]
+    return slots[t]:contains(k) and resource_group:endapply(k) or resource_alt_fns[k] or table[k]
 end
 resource_mt.__class = 'Resource'
+resource_mt.__tostring = function(t)
+    return '{' .. t:map(table.get:endapply('name')):concat(', ') .. '}'
+end
 
-local plugin_resources = windower.addon_path .. '../../plugins/resources/'
-local addon_resources = windower.addon_path .. '../libs/resources/'
+local resources_path = windower.windower_path .. 'res/'
 
 local flag_cache = {}
-resources.parse_flags = function(bits)
-    if not flag_cache[bits] then
+local parse_flags = function(bits, lookup, values)
+    flag_cache[lookup] = flag_cache[lookup] or {}
+
+    if values and not flag_cache[lookup][bits] and lookup[bits] then
+        flag_cache[lookup][bits] = S{lookup[bits]}
+    elseif not flag_cache[lookup][bits] then
         local res = S{}
 
         local rem
@@ -72,51 +118,117 @@ resources.parse_flags = function(bits)
         while num > 0 do
             num, rem = (num/2):modf()
             if rem > 0 then
-                res:add(count)
+                res:add(values and lookup[2^count] or count)
             end
             count = count + 1
         end
 
-        flag_cache[bits] = res
+        flag_cache[lookup][bits] = res
     end
 
-    return flag_cache[bits]
+    return flag_cache[lookup][bits]
 end
 
 local language_strings = S{'english', 'japanese', 'german', 'french'}
 
 -- Add resources from files
-local res_names = S{'jobs', 'races', 'weather', 'servers', 'chat', 'bags', 'slots', 'statuses', 'emotes', 'skills', 'titles', 'encumbrance', 'check_ratings', 'synth_ranks', 'days', 'moon_phases', 'elements', 'monster_abilities', 'action_messages', 'abilities', 'spells', 'buffs', 'zones'}
+local post_process
+local res_names = S(windower.get_dir(resources_path)):filter(string.endswith-{'.lua'}):map(string.sub-{1, -5})
 for res_name in res_names:it() do
     fns[res_name] = function()
-        local res, slot_table = dofile(addon_resources .. res_name .. '.lua')
-        res = table.map(res, (setmetatable-{resource_entry_mt}):cond(function(key) return type(key) == 'table' end))
-        slots[res] = S(slot_table) or language_strings + table.keyset(next[2](res))
+        local res, slot_table = dofile(resources_path .. res_name .. '.lua')
+        res = table.map(res, (setmetatable-{resource_entry_mt}):cond(functions.equals('table') .. type))
+        slots[res] = S(slot_table)
+        post_process(res)
         return res
     end
 end
 
--- Returns the items, indexed by ingame ID.
-function fns.items()
-    local res, slot_table = dofile(addon_resources .. 'items.lua')
-    res = table.map(res, (setmetatable-{resource_entry_mt}):cond(functions.equals('table') .. type))
-    slots[res] = language_strings + S(slot_table)
+local lookup = {}
+local flag_keys = S{
+    'flags',
+    'targets',
+}
+local fn_cache = {}
 
-    for i, v in pairs(res) do
-        if v.category ~= 'General' then
-            res[i].races = resources.parse_flags(v.races)
-            res[i].jobs = resources.parse_flags(v.jobs)
-            res[i].slots = resources.parse_flags(v.slots)
+post_process = function(t)
+    local slot_set = slots[t]
+    for key in slot_set:it() do
+        if lookup[key] then
+            if flag_keys:contains(key) then
+                fn_cache[key] = function(flags)
+                    return parse_flags(flags, lookup[key], true)
+                end
+            else
+                fn_cache[key] = function(flags)
+                    return parse_flags(flags, lookup[key], false)
+                end
+            end
+
+        elseif lookup[key .. 's'] then
+            fn_cache[key] = function(value)
+                return value
+            end
+
         end
     end
 
-    return res
+    for _, entry in pairs(t) do
+        for key, fn in pairs(fn_cache) do
+            if entry[key] ~= nil then
+                entry[key] = fn(entry[key])
+            end
+        end
+    end
+
+    for key in pairs(redict) do
+        slot_set:add(key)
+    end
 end
+
+lookup = {
+    elements = resources.elements,
+    jobs = resources.jobs,
+    slots = resources.slots,
+    races = resources.races,
+    skills = resources.skills,
+    targets = {
+        [0x01] = 'Self',
+        [0x02] = 'Player',
+        [0x04] = 'Party',
+        [0x08] = 'Ally',
+        [0x10] = 'NPC',
+        [0x20] = 'Enemy',
+
+        [0x60] = 'Object',
+        [0x9D] = 'Corpse',
+    },
+    flags = {
+        [0x0001] = 'Flag00',
+        [0x0002] = 'Flag01',
+        [0x0004] = 'Flag02',
+        [0x0008] = 'Flag03',
+        [0x0010] = 'Can Send POL',
+        [0x0020] = 'Inscribable',
+        [0x0040] = 'No Auction',
+        [0x0080] = 'Scroll',
+        [0x0100] = 'Linkshell',
+        [0x0200] = 'Usable',
+        [0x0400] = 'NPC Tradeable',
+        [0x0800] = 'Equippable',
+        [0x1000] = 'No NPC Sale',
+        [0x2000] = 'No Delivery',
+        [0x4000] = 'No PC Trade',
+        [0x8000] = 'Rare',
+
+        [0x6040] = 'Exclusive',
+    },
+}
 
 return resources
 
 --[[
-Copyright (c) 2013, Windower
+Copyright © 2013-2014, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

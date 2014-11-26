@@ -1,9 +1,8 @@
 -- Scoreboard addon for Windower4. See readme.md for a complete description.
 
-_addon = _addon or {}
 _addon.name = 'Scoreboard'
 _addon.author = 'Suji'
-_addon.version = '1.07'
+_addon.version = '1.08'
 _addon.commands = {'sb', 'scoreboard'}
 
 require('tables')
@@ -15,13 +14,11 @@ local file = require('files')
 config = require('config')
 
 local Display = require('display')
-local display = nil
+local display
 dps_clock = require('dpsclock'):new() -- global for now
 dps_db    = require('damagedb'):new() -- global for now
 
 -------------------------------------------------------
-
-local settings = nil -- holds a config instance
 
 -- Conventional settings layout
 local default_settings = {}
@@ -30,6 +27,7 @@ default_settings.sbcolor = 204
 default_settings.showallidps = true
 default_settings.resetfilters = true
 default_settings.visible = true
+default_settings.UpdateFrequency = 0.5
 
 default_settings.display = {}
 default_settings.display.pos = {}
@@ -51,6 +49,8 @@ default_settings.display.text.red = 255
 default_settings.display.text.green = 255
 default_settings.display.text.blue = 255
 
+settings = config.load(default_settings)
+
 -- Accepts msg as a string or a table
 function sb_output(msg)
     local prefix = 'SB: '
@@ -66,18 +66,19 @@ function sb_output(msg)
 end
 
 -- Handle addon args
-windower.register_event('addon command',function(...)
-    local params = {...};
-    
-    if #params < 1 then
-        return
-    end
+windower.register_event('addon command', function()
+    local chatmodes = S{'s', 'l', 'p', 't', 'say', 'linkshell', 'party', 'tell'}
 
-    local chatmodes = T{'s', 'l', 'p', 't', 'say', 'linkshell', 'party', 'tell'}
-    
-    if params[1] then
-        local param1 = params[1]:lower()
-        if param1 == "help" then
+    return function(command, ...)
+        if command == 'e' then
+            assert(loadstring(table.concat({...}, ' ')))()
+            return
+        end
+
+        command = command:lower() or 'help'
+        local params = {...}
+
+        if command == 'help' then
             sb_output('Scoreboard v' .. _addon.version .. '. Author: Suji')
             sb_output('sb help : Shows help message')
             sb_output('sb pos <x> <y> : Positions the scoreboard')
@@ -91,40 +92,43 @@ windower.register_event('addon command',function(...)
             sb_output('sb stat <stat> [<player>]: Shows specific damage stats. Respects filters. If player isn\'t specified, ' ..
                   'stats for everyone are displayed. Valid stats are:')
             sb_output(dps_db.player_stat_fields:tostring():stripchars('{}"'))
-        elseif param1 == "pos" then
-            if params[3] then
-                local posx, posy = tonumber(params[2]), tonumber(params[3])
+        elseif command == 'pos' then
+            if params[2] then
+                local posx, posy = tonumber(params[1]), tonumber(params[2])
+                settings.display.pos.x = posx
+                settings.display.pos.y = posy
+                config.save(settings)
                 display:set_position(posx, posy)
             end
-        elseif param1 == "set" then
-            local setting = params[2]
-            if not params[3] then
+        elseif command == 'set' then
+            if not params[2] then
                 return
             end
-            
+
+            local setting = params[1]
             if setting == 'numplayers' then
-                settings.numplayers = tonumber(params[3])
+                settings.numplayers = tonumber(params[2])
                 settings:save()
                 display:update()
                 sb_output("Setting 'numplayers' set to " .. settings.numplayers)
             elseif setting == 'bgtransparency' then
-                settings.display.bg.alpha  = tonumber(params[3])
+                settings.display.bg.alpha  = tonumber(params[2])
                 settings:save()
                 display:update()
                 sb_output("Setting 'bgtransparency' set to " .. settings.display.bg.alpha)
             elseif setting == 'font' then
-                settings.display.text.font = params[3]
+                settings.display.text.font = params[2]
                 settings:save()
                 display:update()
                 sb_output("Setting 'font' set to " .. settings.display.text.font)
             elseif setting == 'sbcolor' then
-                settings.sbcolor = tonumber(params[3])
+                settings.sbcolor = tonumber(params[2])
                 settings:save()
                 sb_output("Setting 'sbcolor' set to " .. settings.sbcolor)
             elseif setting == 'showallidps' then
-                if params[3] == 'true' then
+                if params[2] == 'true' then
                     settings.showallidps = true
-                elseif params[3] == 'false' then
+                elseif params[2] == 'false' then
                     settings.showallidps = false
                 else
                     error("Invalid value for 'showallidps'. Must be true or false.")
@@ -134,9 +138,9 @@ windower.register_event('addon command',function(...)
                 settings:save()
                 sb_output("Setting 'showalldps' set to " .. tostring(settings.showallidps))
             elseif setting == 'resetfilters' then
-                if params[3] == 'true' then
+                if params[2] == 'true' then
                     settings.resetfilters = true
-                elseif params[3] == 'false' then
+                elseif params[2] == 'false' then
                     settings.resetfilters = false
                 else
                     error("Invalid value for 'resetfilters'. Must be true or false.")
@@ -146,11 +150,11 @@ windower.register_event('addon command',function(...)
                 settings:save()
                 sb_output("Setting 'resetfilters' set to " .. tostring(settings.resetfilters))
             end
-        elseif param1 == "reset" then
+        elseif command == 'reset' then
             reset()
-        elseif param1 == "report" then
-            local arg = params[2]
-            local arg2 = params[3]
+        elseif command == 'report' then
+            local arg = params[1]
+            local arg2 = params[2]
 
             if arg then
                 if chatmodes:contains(arg) then
@@ -167,21 +171,21 @@ windower.register_event('addon command',function(...)
 
             display:report_summary(arg, arg2)
 
-        elseif param1 == "visible" then
-            display:toggle_visible()
-            settings.visible = not settings.visible
-            settings:save()
-        elseif param1 == 'filter' then
+        elseif command == 'visible' then
+            display:update()
+            display:visibility(not settings.visible)
+
+        elseif command == 'filter' then
             local subcmd
-            if params[2] then
-                subcmd = params[2]:lower()
+            if params[1] then
+                subcmd = params[1]:lower()
             else
                 error('Invalid option to //sb filter. See //sb help')
                 return
             end
             
             if subcmd == 'add' then
-                for i=3, #params do
+                for i=2, #params do
                     dps_db:add_filter(params[i])
                 end
                 display:update()
@@ -193,25 +197,25 @@ windower.register_event('addon command',function(...)
             else
                 error('Invalid argument to //sb filter')
             end
-        elseif param1 == 'stat' then
-            if not params[2] or not dps_db.player_stat_fields:contains(params[2]:lower()) then
+        elseif command == 'stat' then
+            if not params[1] or not dps_db.player_stat_fields:contains(params[1]:lower()) then
                 error('Must pass a stat specifier to //sb stat. Valid arguments: ' ..
                       dps_db.player_stat_fields:tostring():stripchars('{}"'))
             else
-                local stat = params[2]:lower()
-                local player = params[3]
+                local stat = params[1]:lower()
+                local player = params[2]
                 display:show_stat(stat, player)
             end
-        elseif param1 == 'reportstat' or param1 == 'rs' then
-            if not params[2] or not dps_db.player_stat_fields:contains(params[2]:lower()) then
+        elseif command == 'reportstat' or command == 'rs' then
+            if not params[1] or not dps_db.player_stat_fields:contains(params[1]:lower()) then
                 error('Must pass a stat specifier to //sb reportstat. Valid arguments: ' ..
                       dps_db.player_stat_fields:tostring():stripchars('{}"'))
                 return
             end
             
-            local stat = params[2]:lower()
-            local arg2 = params[3] -- either a player name or a chatmode
-            local arg3 = params[4] -- can only be a chatmode
+            local stat = params[1]:lower()
+            local arg2 = params[2] -- either a player name or a chatmode
+            local arg3 = params[3] -- can only be a chatmode
 
             -- The below logic is obviously bugged if there happens to be a player named "say",
             -- "party", "linkshell" etc but I don't care enough to account for those people!
@@ -233,40 +237,32 @@ windower.register_event('addon command',function(...)
                     return
                 end
                 
-                display:report_stat(stat, {player = arg2, chatmode = arg3, telltarget = params[5]})
+                display:report_stat(stat, {player = arg2, chatmode = arg3, telltarget = params[4]})
             end
-        elseif param1 == 'fields' then
-            do  error("Not implemented yet.") return end
-        elseif param1 == 'save' then
-            if false then -- dps_db:empty() then
-                error('Nothing to save.')
-                return
-            else
-                if params[2] then
-                    if not params2:match('^[a-ZA-Z0-9_-,.:]+$') then
-                        error("Invalid filename: " .. params[2])
-                        return
-                    end
-                    save(params[2])
-                else
-                    save()
+        elseif command == 'fields' then
+            error("Not implemented yet.")
+            return
+        elseif command == 'save' then
+            if params[1] then
+                if not params[1]:match('^[a-ZA-Z0-9_-,.:]+$') then
+                    error("Invalid filename: " .. params[1])
+                    return
                 end
+                save(params[1])
+            else
+                save()
             end
         else
             error('Unrecognized command. See //sb help')
         end
     end
-end)
+end())
 
 local months = {
     'jan', 'feb', 'mar', 'apr',
     'may', 'jun', 'jul', 'aug',
     'sep', 'oct', 'nov', 'dec'
 }
-
-local function fexists(fname)
-
-end
 
 
 function save(filename)
@@ -291,8 +287,10 @@ function save(filename)
         end
         parse = dup_path
     end
+
     parse:create()
 end
+
 
 -- Resets application state
 function reset()
@@ -302,45 +300,30 @@ function reset()
 end
 
 
+display = Display:new(settings, dps_db)
+
+
+-- Keep updates flowing
 local function update_dps_clock()
     local player = windower.ffxi.get_player()
-    if player and player.in_combat then
+    local pet
+    if player ~= nil then
+        local player_mob = windower.ffxi.get_mob_by_id(player.id)
+        if player_mob ~= nil then
+            local pet_index = player_mob.pet_index
+            if pet_index ~= nil then
+                pet = windower.ffxi.get_mob_by_index(pet_index)
+            end
+        end
+    end
+    if player and (player.in_combat or (pet ~= nil and pet.status == 1)) then
         dps_clock:advance()
     else
         dps_clock:pause()
     end
-end
 
-
--- Keep updates flowing
-windower.register_event('time change', 'status change', function()
-    update_dps_clock()
     display:update()
-end)
-
-
-windower.register_event('login', 'load', function()
-    -- Bail out until we are logged in properly.
-    local player = windower.ffxi.get_player()
-    if not player then
-        return
-    end
-
-    settings = config.load(default_settings)
-    windower.send_command('alias sb lua c scoreboard')
-    
-    if not display then
-        display = Display:new(settings, dps_db)
-        reset()
-    end
-end)
-
-
-windower.register_event('unload', function()
-    settings:save()
-    windower.send_command('unalias sb')
-    display:destroy()
-end)
+end
 
 
 -- Returns all mob IDs for anyone in your alliance, including their pets.
@@ -351,7 +334,7 @@ function get_ally_mob_ids()
     for _, member in pairs(party) do
         if member.mob then
             allies:append(member.mob.id)
-            if member.mob.pet_index and member.mob.pet_index> 0 then
+            if member.mob.pet_index and member.mob.pet_index> 0 and windower.ffxi.get_mob_by_index(member.mob.pet_index) then
                 allies:append(windower.ffxi.get_mob_by_index(member.mob.pet_index).id)
             end
         end
@@ -368,129 +351,176 @@ function mob_is_ally(mob_id)
 end
 
 
-windower.register_event('action', function(raw_action)
-    local action = Action(raw_action)
-    local category = action:get_category_string()
+function action_handler(raw_actionpacket)
+    local actionpacket = ActionPacket.new(raw_actionpacket)
+    local category = actionpacket:get_category_string()
 
     local player = windower.ffxi.get_player()
-    if not player or not windower.ffxi.get_player()['in_combat'] then
+    local pet
+    if player ~= nil then
+        local player_mob = windower.ffxi.get_mob_by_id(player.id)
+        if player_mob ~= nil then
+            local pet_index = player_mob.pet_index
+            if pet_index ~= nil then
+                pet = windower.ffxi.get_mob_by_index(pet_index)
+            end
+        end
+    end
+    if not player or not (windower.ffxi.get_player().in_combat or (pet ~= nil and pet.status == 1)) then
         -- nothing to do
         return
     end
     
-    if mob_is_ally(action.raw.actor_id) then
+    if mob_is_ally(actionpacket.raw.actor_id) then
         if category == 'melee' then
-            for target in action:get_targets() do
-                for subaction in target:get_actions() do
+            for target in actionpacket:get_targets() do
+                for subactionpacket in target:get_actions() do
                     -- hit, crit
-                    if subaction.message == 1 or subaction.message == 67 then
-                        if subaction.message == 67 then
-                            dps_db:add_m_crit(target:get_name(), action:get_actor_name(), subaction.param)
+                    if subactionpacket.message == 1 or subactionpacket.message == 67 then
+                        if subactionpacket.message == 67 then
+                            dps_db:add_m_crit(target:get_name(), create_mob_name(actionpacket), subactionpacket.param)
                         else
-                            dps_db:add_m_hit(target:get_name(), action:get_actor_name(), subaction.param)
+                            dps_db:add_m_hit(target:get_name(), create_mob_name(actionpacket), subactionpacket.param)
                         end
                         
                         -- enspells etc
-                        if subaction.has_add_effect and T{163, 229}:contains(subaction.add_effect_message) then
-                            dps_db:add_damage(target:get_name(), action:get_actor_name(), subaction.add_effect_param)
+                        if subactionpacket.has_add_effect and T{163, 229}:contains(subactionpacket.add_effect_message) then
+                            dps_db:add_damage(target:get_name(), create_mob_name(actionpacket), subactionpacket.add_effect_param)
                         end
-                    elseif subaction.message == 15 or subaction.message == 63 then
-                        dps_db:incr_misses(target:get_name(), action:get_actor_name())
+                    elseif subactionpacket.message == 15 or subactionpacket.message == 63 then
+                        dps_db:incr_misses(target:get_name(), create_mob_name(actionpacket))
                     end
                 end
             end
         elseif category == 'weaponskill_finish' then
             -- TODO: need to map whatever id into the actual ws name
         
-            for target in action:get_targets() do
-                for subaction in target:get_actions() do
-                    dps_db:add_ws_damage(target:get_name(), action:get_actor_name(), subaction.param, action.raw.param)
+            for target in actionpacket:get_targets() do
+                for subactionpacket in target:get_actions() do
+                    dps_db:add_ws_damage(target:get_name(), actionpacket:get_actor_name(), subactionpacket.param, actionpacket.raw.param)
 
                     -- skillchains
-                    if subaction.has_add_effect then
-                        local actor_name = action:get_actor_name()
+                    if subactionpacket.has_add_effect then
+                        local actor_name = actionpacket:get_actor_name()
                         local sc_name = string.format("Skillchain(%s%s)", actor_name:sub(1, 3),
                                                       actor_name:len() > 3 and '.' or '')
-                        dps_db:add_damage(target:get_name(), sc_name, subaction.add_effect_param)
+                        dps_db:add_damage(target:get_name(), sc_name, subactionpacket.add_effect_param)
                     end
                 end
             end
         elseif category == 'spell_finish' then
-            for target in action:get_targets() do
-                for subaction in target:get_actions() do
-                    if T{2, 252, 265, 650}:contains(subaction.message) then
-                        dps_db:add_damage(target:get_name(), action:get_actor_name(), subaction.param)
+            for target in actionpacket:get_targets() do
+                for subactionpacket in target:get_actions() do
+                    if T{2, 252, 264, 650}:contains(subactionpacket.message) then
+                        dps_db:add_damage(target:get_name(), create_mob_name(actionpacket), subactionpacket.param)
                     end
                 end
             end
         elseif category == 'ranged_finish' then
-            for target in action:get_targets() do
-                for subaction in target:get_actions() do
+            for target in actionpacket:get_targets() do
+                for subactionpacket in target:get_actions() do
                     -- barrage(157), ranged, crit, squarely, truestrike
-                    if T{157, 352, 353, 576, 577}:contains(subaction.message) then
-                        if subaction.message == 353 then
-                            dps_db:add_r_crit(target:get_name(), action:get_actor_name(), subaction.param)
+                    if T{157, 352, 353, 576, 577}:contains(subactionpacket.message) then
+                        if subactionpacket.message == 353 then
+                            dps_db:add_r_crit(target:get_name(), actionpacket:get_actor_name(), subactionpacket.param)
                         else
-                            dps_db:add_r_hit(target:get_name(), action:get_actor_name(), subaction.param)
+                            dps_db:add_r_hit(target:get_name(), actionpacket:get_actor_name(), subactionpacket.param)
                         end                    
                         
                         -- holy bolts etc
-                        if subaction.has_add_effect and T{163, 229}:contains(subaction.add_effect_message) then
-                            dps_db:add_damage(target:get_name(), action:get_actor_name(), subaction.add_effect_param)
+                        if subactionpacket.has_add_effect and T{163, 229}:contains(subactionpacket.add_effect_message) then
+                            dps_db:add_damage(target:get_name(), actionpacket:get_actor_name(), subactionpacket.add_effect_param)
                         end
-                    elseif subaction.message == 354 then
-                        dps_db:incr_r_misses(target:get_name(), action:get_actor_name())
+                    elseif subactionpacket.message == 354 then
+                        dps_db:incr_r_misses(target:get_name(), actionpacket:get_actor_name())
                     end
                 end
             end
         elseif category == 'job_ability' or category == 'job_ability_unblinkable' or category == 'job_ability_run' then
-            for target in action:get_targets() do
-                for subaction in target:get_actions() do
+            for target in actionpacket:get_targets() do
+                for subactionpacket in target:get_actions() do
                     -- sange(77), generic damage ja(110), other generic dmg ja (317), stun ja (522)
-                    if T{77, 110, 317, 522}:contains(subaction.message) then
-                        dps_db:add_damage(target:get_name(), action:get_actor_name(), subaction.param)
+                    if T{77, 110, 317, 522}:contains(subactionpacket.message) then
+                        dps_db:add_damage(target:get_name(), actionpacket:get_actor_name(), subactionpacket.param)
                     end
                 end
             end
         elseif category == 'avatar_tp_finish' then
-            for target in action:get_targets() do
-                for subaction in target:get_actions() do
-                    if subaction.message == 317 then
-                        dps_db:add_damage(target:get_name(), action:get_actor_name(), subaction.param)
+            for target in actionpacket:get_targets() do
+                for subactionpacket in target:get_actions() do
+                    if subactionpacket.message == 317 then
+                        dps_db:add_damage(target:get_name(), create_mob_name(actionpacket), subactionpacket.param)
                     end
                 end
             end
         elseif category == 'mob_tp_finish' then
-            for target in action:get_targets() do
-                for subaction in target:get_actions() do
-                    if subaction.message == 185 or subaction.message == 264 then
-                        dps_db:add_damage(target:get_name(), action:get_actor_name(), subaction.param)
+            for target in actionpacket:get_targets() do
+                for subactionpacket in target:get_actions() do
+                    if subactionpacket.message == 185 or subactionpacket.message == 264 then
+                        dps_db:add_damage(target:get_name(), create_mob_name(actionpacket), subactionpacket.param)
                     end
                 end
             end        
         end
     elseif category == 'melee' then
-        -- This is some non-ally action packet. We need to see if they are hitting someone
+        -- This is some non-ally actionpacket packet. We need to see if they are hitting someone
         -- in this alliance, and if so, accumulate any damage from spikes/counters/etc.
-        for target in action:get_targets() do
+        for target in actionpacket:get_targets() do
             if mob_is_ally(target.id) then
-                for subaction in target:get_actions() do
-                    if subaction.has_spike_effect then
-                        dps_db:add_damage(action:get_actor_name(), target:get_name(), subaction.spike_effect_param)
+                for subactionpacket in target:get_actions() do
+                    if subactionpacket.has_spike_effect then
+                        dps_db:add_damage(actionpacket:get_actor_name(), target:get_name(), subactionpacket.spike_effect_param)
                     end
                 end
             end
         end
     end
+end
+
+ActionPacket.open_listener(action_handler)
+
+function find_pet_owner_name(actionpacket)
+    local pet = windower.ffxi.get_mob_by_id(actionpacket:get_id())
+    local party = windower.ffxi.get_party()
     
-    display:update()
-    update_dps_clock()
+    local name = nil
+    
+    for _, member in pairs(party) do
+        if member.mob then
+            if member.mob.pet_index and member.mob.pet_index> 0 and pet.index == member.mob.pet_index then
+				name = member.mob.name
+                break
+            end
+        end
+    end
+    return name
+end
+
+function create_mob_name(actionpacket)
+    local actor = actionpacket:get_actor_name()
+    local result = ''
+    local owner = find_pet_owner_name(actionpacket)
+    if owner ~= nil then
+        if string.len(actor) > 8 then
+            result = string.sub(actor, 1, 7)..'.'
+        else
+            result = actor
+        end
+        result = result..' ('..string.sub(owner, 1, 3)..'.)'
+    else
+        return actor
+    end
+    return result
+end
+
+config.register(settings, function(settings)
+    update_dps_clock:loop(settings.UpdateFrequency)
+    display:visibility(windower.ffxi.get_info().logged_in)
 end)
---event_action = event_action_aux
 
 
 --[[
-Copyright (c) 2013, Jerry Hebert
+Copyright � 2013-2014, Jerry Hebert
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -516,4 +546,3 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
-

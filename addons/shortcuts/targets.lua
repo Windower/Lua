@@ -1,4 +1,4 @@
---Copyright (c) 2013, Byrthnoth
+--Copyright (c) 2014, Byrthnoth
 --All rights reserved.
 
 --Redistribution and use in source and binary forms, with or without
@@ -51,16 +51,16 @@ function valid_target(targ,flag)
         return targ
     elseif targ and windower.ffxi.get_player() then
     -- If the target exists, scan the mob array for it
-        local current_target = windower.ffxi.get_mob_by_target('<t>')
+        local current_target = windower.ffxi.get_mob_by_target('t')
         local targar = {}
         for i,v in pairs(windower.ffxi.get_mob_array()) do
-            if string.find(v.name:lower(),san_targ:lower()) and (v.valid_target or v.id == windower.ffxi.get_player().id) then
+            if string.find(v.name:lower(),san_targ:lower()) and (v.valid_target or v.id == windower.ffxi.get_player().id) then -- Malformed pattern somehow
                 -- Handling for whether it's a monster or not
-                if v.is_npc and current_target then
+                if v.is_npc and v.spawn_type ~= 14 and current_target then
                     if v.id == current_target.id then
                         targar['<t>'] = math.sqrt(v.distance)
                     end
-                elseif not v.is_npc then
+                elseif not v.is_npc or v.spawn_type == 14 then
                     targar[v.name] = math.sqrt(v.distance)
                 end
             end
@@ -73,14 +73,15 @@ function valid_target(targ,flag)
             spell_targ = false
         else
             -- If targ starts an element of the monster array, use it.
-            local min_dist = 50
+            local priority = 50
             for i,v in pairs(targar) do
-                if (i:lower()==san_targ:lower()) then-- or i:lower():find('^'..san_targ:lower())) then
-                    spell_targ = i
-                    break
+                if (i:lower()==san_targ:lower()) then
+                    v = 0
+                elseif i:lower():find('^'..san_targ:lower()) then
+                    v = v/50
                 end
-                if v < min_dist then -- Otherwise, just use the nearest (spatially) match.
-                    min_dist = v
+                if v < priority then -- Use the highest priority match, with a default priority hierarchy based on distance
+                    priority = v
                     spell_targ = i
                 end
             end

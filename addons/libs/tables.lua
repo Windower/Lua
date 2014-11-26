@@ -12,8 +12,7 @@ _libs.maths = _libs.maths or require('maths')
 _libs.functions = _libs.functions or require('functions')
 
 _raw = _raw or {}
-_raw.table = _raw.table or {}
-_raw.table = setmetatable(_raw.table, {__index=table})
+_raw.table = setmetatable(_raw.table or {}, {__index = table})
 
 --[[
     Signatures
@@ -65,9 +64,12 @@ function T(t)
     return setmetatable(res, _meta.T)
 end
 
-function N()
-    return setmetatable({}, _meta.N)
-end
+N = function()
+    local nt = setmetatable({}, _meta.N)
+    return function()
+        return nt
+    end
+end()
 
 function class(o)
     local mt = getmetatable(o)
@@ -219,9 +221,7 @@ end
 
 -- Searches elements of a table for an element. If, instead of an element, a function is provided, will search for the first element to satisfy that function.
 function table.find(t, fn)
-    if type(fn) ~= 'function' then
-        fn = functions.equals(fn)
-    end
+    fn = type(fn) ~= 'function' and functions.equals(fn) or fn
 
     for key, val in pairs(t) do
         if fn(val) then
@@ -408,26 +408,9 @@ function table.reverse(t)
     return setmetatable(res, getmetatable(t) or _meta.T)
 end
 
--- Returns an array removed of all duplicates.
--- DEPRECATED: Use S(t) or L(S(t)) instead.
-function table.set(t)
-    local seen = {}
-    local res = {}
-    local key = 1
-    for _, val in ipairs(t) do
-        if seen[val] == nil then
-            res[key] = val
-            key = key + 1
-            seen[val] = true
-        end
-    end
-
-    return setmetatable(res, getmetatable(t) or _meta.T)
-end
-
 -- Gets a list of arguments and creates a table with key: value pairs alternating the arguments.
 function table.dict(...)
-    local res = type(...) == 'table' and (...) or {}
+    local res = type(...) == 'table' and ... or {}
 
     local start = type(...) == 'table' and 2 or 1
     for k = start, select('#', ...), 2 do
@@ -449,27 +432,13 @@ function table.with(t, attr, val)
     return nil, nil
 end
 
--- Finds a table entry based on an attribute, case-insensitive.
-function table.iwith(t, attr, val)
-    local cel
-    val = val:lower()
-    for _, el in pairs(t) do
-        if type(el == 'table') then
-            cel = rawget(el, attr)
-            if type(cel == 'string') and cel:lower() == val then
-                return el
-            end
-        end
-    end
-end
-
 -- Backs up old table sorting function.
 _raw.table.sort = _raw.table.sort or table.sort
 
 -- Returns a sorted table.
 function table.sort(t, ...)
     _raw.table.sort(t, ...)
-    return setmetatable(t, getmetatable(t) or _meta.T)
+    return t
 end
 
 -- Returns an iterator over the table.
@@ -492,7 +461,7 @@ function table.rekey(t, key)
     return setmetatable(res, getmetatable(t) or _meta.T)
 end
 
--- Wrapper around unpack(t). Returns table elements as a list of values. Only works on arrays.
+-- Wrapper around unpack(t). Returns table elements as a list of values. Only works on array subsets of t.
 function table.unpack(t)
     return unpack(t)
 end
@@ -510,7 +479,7 @@ function table.extract(t)
     return table.unpack(res)
 end
 
--- Returns a deepcopy of the table, including metatable and recursed over nested tables.
+-- Returns a deep copy of the table, including metatable and recursed over nested tables.
 function table.copy(t)
     local res = {}
     for key, val in pairs(t) do
@@ -554,8 +523,8 @@ end
 _raw.table.concat = table.concat
 
 -- Concatenates all objects of a table. Converts to string, if not already so.
-function table.concat(t, str, from, to)
-    str = str or ''
+function table.concat(t, delim, from, to)
+    delim = delim or ''
     local res = ''
 
     if from or to then
@@ -563,16 +532,16 @@ function table.concat(t, str, from, to)
         to = to or #t
         for key = from, to do
             local val = rawget(t, key)
-            res = res..tostring(val)
+            res = res .. tostring(val)
             if key < to then
-                res = res..str
+                res = res .. delim
             end
         end
     else
         for key, val in pairs(t) do
-            res = res..tostring(val)
+            res = res .. tostring(val)
             if next(t, key) then
-                res = res..str
+                res = res .. delim
             end
         end
     end
@@ -626,7 +595,7 @@ function table.max(t)
 end
 
 --[[
-Copyright (c) 2013, Windower
+Copyright (c) 2013-2014, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

@@ -10,11 +10,21 @@ _libs.functions = true
 ]]
 
 functions = {}
+boolean = {}
 
 -- The empty function.
 function functions.empty() end
 
 debug.setmetatable(functions.empty, functions)
+debug.setmetatable(false, {__index = boolean})
+
+for _, t in pairs({'functions', 'boolean', 'math', 'string', 'table'}) do
+    _G[t].fn = function(val)
+        return function()
+            return val
+        end
+    end
+end
 
 -- The identity function.
 function functions.identity(fn)
@@ -133,6 +143,44 @@ function functions.it(fn, ...)
     end
 end
 
+-- Schedules the current function to run delayed by the provided time in seconds
+functions.schedule = coroutine.schedule
+
+-- Returns a function that, when called, will execute the underlying function delayed by the provided number of seconds
+function functions.delay(fn, time)
+    return function()
+        fn:schedule(time)
+    end
+end
+
+-- Returns a wrapper table representing the provided function with additional functions:
+function functions.loop(fn, interval, cond)
+    if interval <= 0 then
+        return
+    end
+
+    if type(cond) == 'number' then
+        cond = function()
+            local i = 0
+            local lim = cond
+            return function()
+                i = i + 1
+                return i <= lim
+            end
+        end()
+    end
+    cond = cond or true:fn()
+
+    return coroutine.schedule(function()
+        while cond() do
+            fn()
+            -- print('sleeping...', os.clock(), interval)
+            coroutine.sleep(interval)
+            -- print('awoke...', os.clock())
+        end
+    end, 0)
+end
+
 --[[
     Various built-in wrappers
 ]]
@@ -189,8 +237,6 @@ debug.setmetatable(functions.empty, {
     Logic functions
 Mainly used to pass as arguments.
 ]]
-
-boolean = {}
 
 -- Returns true if element is true.
 function boolean._true(val)
@@ -266,24 +312,36 @@ end
 ]]
 
 -- Returns an attribute of a table.
-function table.get(t, att)
-    return t[att]
+function table.get(t, ...)
+    local res = {}
+    for i = 1, select('#', ...) do
+        rawset(res, i, t[select(i, ...)])
+    end
+    return unpack(res)
 end
 
 -- Returns an attribute of a table without invoking metamethods.
-function table.rawget(t, att)
-    return rawget(t, att)
+function table.rawget(t, ...)
+    local res = {}
+    for i = 1, select('#', ...) do
+        rawset(res, i, rawget(t, select(i, ...)))
+    end
+    return unpack(res)
 end
 
 -- Sets an attribute of a table to a specified value.
-function table.set(t, att, val)
-    t[att] = val
+function table.set(t, ...)
+    for i = 1, select('#', ...), 2 do
+        t[select(i, ...)] = select(i + 1, ...)
+    end
     return t
 end
 
 -- Sets an attribute of a table to a specified value, without invoking metamethods.
-function table.rawset(t, att, val)
-    rawset(t, att, val)
+function table.rawset(t, ...)
+    for i = 1, select('#', ...), 2 do
+        rawset(t, select(i, ...), select(i + 1, ...))
+    end
     return t
 end
 
@@ -414,7 +472,7 @@ function string.map(str, fn)
 end
 
 --[[
-Copyright (c) 2013, Windower
+Copyright © 2013-2014, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

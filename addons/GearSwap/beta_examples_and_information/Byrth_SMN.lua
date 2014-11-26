@@ -2,8 +2,8 @@ function get_sets()
     -- Precast Sets
     sets.precast = {}
     
-    sets.precast.FC = {head="Nahtirah Hat",neck="Orunmila's Torque",ear1="Loquac. Earring",body="Marduk's Jubbah +1",
-        hands="Mdk. Dastanas +1",ring2="Prolix Ring",back="Swith Cape +1",waist="Siegel Sash",legs="Orvail Pants +1",
+    sets.precast.FC = {head="Nahtirah Hat",neck="Orunmila's Torque",ear1="Loquac. Earring",ear2="Enchanter Earring +1",body="Marduk's Jubbah +1",
+        hands="Hagondes Cuffs",ring1="Veneficium Ring",ring2="Prolix Ring",back="Swith Cape +1",waist="Siegel Sash",legs="Artsieq Hose",
         feet="Chelona Boots +1",Thunder={main='Apamajas I'},Fire={main='Atar I'}}
         
     sets.precast.Cur = {body="Heka's Kalasiris",legs="Nabu's Shalwar",back="Pahtli Cape"}
@@ -11,13 +11,13 @@ function get_sets()
     -- Midcast sets
     sets.midcast = {}
     
-    sets.midcast.BP = {ammo="Seraphicaller",hands="Glyptic Bracers",back="Tiresias' cape",legs="Glyptic Spats",feet="Glyptic Pigaches"}
+    sets.midcast.BP = {ammo="Seraphicaller",head="Glyphic Horn +1",body="Glyphic Doublet +1",hands="Glyphic Bracers +1",back="Samanisi Cape",legs="Glyphic Spats +1",feet="Glyphic Pigaches +1"}
     
     sets.midcast['Mana Cede'] = {hands="Call. Bracers +2"}
     
     sets.midcast['Elemental Siphon'] = {main="Soulscourge",sub="Vox Grip",
-        head="Marduk's Tiara +1",neck="Caller's Pendant",rear="Smn. Earring",
-        body="Call. Doublet +2",hands="Glyptic Bracers",lring="Evoker's Ring",rring="Fervor Ring",
+        head="Marduk's Tiara +1",neck="Caller's Pendant",rear="Smn. Earring",lear="Andoaa Earring",
+        body="Call. Doublet +2",hands="Glyphic Bracers +1",lring="Evoker's Ring",rring="Fervor Ring",
         back="Conveyance Cape",legs="Mdk. Shalwar +1",feet="Caller's Pgch. +2"}
                     
     sets.midcast.Cur = {main="Arka IV",head="Marduk's Tiara +1",ear2="Novia earring",
@@ -29,27 +29,27 @@ function get_sets()
     -- Pet Midcast Sets
     sets.pet_midcast = {}
     
-    sets.BP_Base = {main="Balsam Staff",sub="Vox grip",ammo="Seraphicaller",
-        head="Hagondes Hat",ear1="Gifted Earring",ear2="Smn. Earring",
+    sets.BP_Base = {main="Tumafyrig",sub="Vox grip",ammo="Seraphicaller",
+        head="Glyphic Horn +1",rear="Smn. Earring",lear="Andoaa Earring",
         body="Call. Doublet +2",hands="Spurrina Gages",ring1="Evoker's Ring",ring2="Fervor Ring",
-        legs="Ngen Seraweels",feet="Convoker's Pigaches"}
+        legs="Ngen Seraweels",feet="Convoker's Pigaches +1"}
     
-    sets.pet_midcast.Phys_BP = set_combine(sets.BP_Base,{main="Soulscourge",head="Caller's horn +2",neck="Sacrifice torque",back="Conveyance Cape",waist="Mujin Obi"})
+    sets.pet_midcast.Phys_BP = set_combine(sets.BP_Base,{main="Soulscourge",head="Caller's horn +2",neck="Caller's Pendant",back="Samanisi Cape",waist="Mujin Obi"})
         
-    sets.pet_midcast.MAB_No_TP_BP = set_combine(sets.BP_Base,{neck="Eidolon Pendant",hands="Hagondes Cuffs",back="Tiresias' Cape",waist="Caller's sash",legs="Hagondes Pants",feet="Hagondes Sabots"})
+    sets.pet_midcast.MAB_No_TP_BP = set_combine(sets.BP_Base,{neck="Eidolon Pendant",hands="Hagondes Cuffs +1",back="Samanisi Cape",waist="Caller's sash",legs="Hagondes Pants",feet="Hagondes Sabots"})
         
-    sets.pet_midcast.MAB_TP_BP = set_combine(sets.BP_Base,{neck="Eidolon Pendant",hands="Hagondes Cuffs",back="Tiresias' Cape",waist="Caller's sash",legs="Caller's spats +2",feet="Hagondes Sabots"})
+    sets.pet_midcast.MAB_TP_BP = set_combine(sets.BP_Base,{neck="Eidolon Pendant",hands="Hagondes Cuffs +1",back="Samanisi Cape",waist="Caller's sash",legs="Caller's spats +2",feet="Hagondes Sabots"})
         
-    sets.pet_midcast.MAB_Spell = set_combine(sets.BP_Base,{neck="Eidolon Pendant",hands="Hagondes Cuffs",back="Tiresias' Cape",waist="Caller's sash",legs="Hagondes Pants",feet="Hagondes Sabots"})
+    sets.pet_midcast.MAB_Spell = set_combine(sets.BP_Base,{neck="Eidolon Pendant",hands="Hagondes Cuffs +1",back="Samanisi Cape",waist="Caller's sash",legs="Hagondes Pants",feet="Hagondes Sabots"})
         
-    sets.pet_midcast.MAcc_BP = set_combine(sets.BP_Base,{main="Yaskomo's Pole",neck="Caller's Pendant",body="Anhur Robe",hands="Glyptic Bracers",back="Conveyance Cape",legs="Glyptic Spats",feet="Caller's Pgch. +2"})
+    sets.pet_midcast.MAcc_BP = set_combine(sets.BP_Base,{neck="Caller's Pendant",body="Anhur Robe",hands="Glyphic Bracers +1",back="Samanisi Cape",legs="Glyphic Spats +1",feet="Caller's Pgch. +2"})
     
-    sets.pet_midcast.Buff_BP = set_combine(sets.BP_Base,{main="Chatoyant Staff",head="Caller's Horn +2",neck="Caller's Pendant",hands="Glyptic Bracers",back="Conveyance Cape",legs="Nares Trews"})
+    sets.pet_midcast.Buff_BP = set_combine(sets.BP_Base,{main="Chatoyant Staff",head="Caller's Horn +2",neck="Caller's Pendant",hands="Glyphic Bracers +1",back="Conveyance Cape",legs="Nares Trews"})
     
     sets.pet_midcast['Shock Squall'] = {main="Soulscourge",sub="Vox Grip",
         head="Marduk's Tiara +1",neck="Caller's Pendant",rear="Smn. Earring",
-        body="Call. Doublet +2",hands="Glyptic Bracers",lring="Evoker's Ring",rring="Fervor Ring",
-        back="Tiresias' cape",legs="Glyptic Spats",feet="Glyptic Pigaches"}
+        body="Call. Doublet +2",hands="Glyphic Bracers +1",lring="Evoker's Ring",rring="Fervor Ring",
+        back="Samanisi Cape",legs="Glyphic Spats +1",feet="Glyphic Pigaches +1"}
     
     --Aftercast Sets
     sets.aftercast = {}
@@ -61,13 +61,13 @@ function get_sets()
     
     sets.aftercast.Favor = {main="Chatoyant Staff",sub="Vox grip",ammo="Seraphicaller",
         head="Caller's Horn +2",neck="Caller's Pendant",ear1="Loquac. Earring",ear2="Antivenom Earring",
-        body="Caller's Doublet +2",hands="Glyptic Bracers",ring1="Evoker's Ring",ring2="Fervor Ring",
+        body="Caller's Doublet +2",hands="Glyphic Bracers +1",ring1="Evoker's Ring",ring2="Fervor Ring",
         back="Conveyance Cape",waist="Hierarch belt",legs="Ngen Seraweels",feet="Rubeus Boots"}
     
     sets.aftercast.Perp_Base = {main="Chatoyant Staff",sub="Oneiros Grip",ammo="Seraphicaller",
         head="Caller's Horn +2",neck="Caller's Pendant",
-        body="Caller's Doublet +2",hands="Adhara Gages",ring1="Evoker's Ring",ring2="Defending Ring",
-        waist="Hierarch belt",legs="Nares Trews",feet="Caller's Pgch. +2"}
+        body="Glyphic Doublet +1",hands="Glyphic Bracers +1",ring1="Evoker's Ring",ring2="Defending Ring",
+        waist="Hierarch belt",legs="Nares Trews",feet="Convoker's Pigaches +1"}
     
     sets.aftercast.Avatar = {}
     sets.aftercast.Avatar.Carbuncle = {hands="Carbuncle Mitts"}
@@ -76,13 +76,13 @@ function get_sets()
     
     sets.aftercast.Avatar.Spirit = {main="Soulscourge",sub="Vox grip",ammo="Seraphicaller",
         head="Caller's Horn +2",neck="Caller's Pendant",ear2="Smn. Earring",
-        body="Caller's Doublet +2",hands="Glyptic Bracers",ring1="Evoker's Ring",ring2="Fervor Ring",
-        back="Conveyance Cape",legs="Glyptic Spats",feet="Rubeus Boots"}
+        body="Caller's Doublet +2",hands="Glyphic Bracers +1",ring1="Evoker's Ring",ring2="Fervor Ring",
+        back="Conveyance Cape",legs="Glyphic Spats +1",feet="Rubeus Boots"}
                 
     sets.aftercast.Resting = {main="Numen Staff",sub="Ariesian Grip",ammo="Mana Ampulla",
         head="Caller's Horn +2",neck="Eidolon Pendant",ear1="Relaxing Earring",ear2="Antivenom Earring",
         body="Marduk's Jubbah +1",hands="Nares Cuffs",ring1="Celestial Ring",ring2="Angha Ring",
-        back="Vita cape",waist="Austerity belt",legs="Nares Trews",feet="Oracle's Pigaches"}
+        back="Felicitas Cape +1",waist="Austerity Belt +1",legs="Nares Trews",feet="Chelona Boots +1"}
     
     sets.aftercast.Idle = sets.aftercast_None    
     
@@ -98,7 +98,7 @@ function get_sets()
 end
 
 function pet_change(pet,gain)
-    idle()
+    idle(pet)
 end
 
 function precast(spell)
@@ -132,7 +132,7 @@ function midcast(spell)
     elseif sets.midcast[spell.english] then
         equip(sets.midcast[spell.english])
     else
-        idle()
+        idle(pet)
     end
 end
 
@@ -143,13 +143,13 @@ function aftercast(spell)
     if spell and (not spell.type or not string.find(spell.type,'BloodPact') and not AvatarList:contains(spell.name) or spell.interrupted) then -- and spell.name ~= 'Release'
         -- Don't want to swap away too quickly if I'm about to put BP damage gear on
         -- Need to wait 1 in order to allow pet information to update on Release.
-        idle()
+        idle(pet)
     end
 end
 
 function status_change(new,old)
     if new=='Idle' then
-        idle()
+        idle(pet)
     elseif new=='Resting' then
         equip(sets.aftercast.Resting)
     end
@@ -184,16 +184,16 @@ function pet_midcast(spell)
 end
 
 function pet_aftercast(spell)
-    idle()
+    idle(pet)
 end
 
 function self_command(command)
     if command == 'Idle' then
-        idle()
+        idle(pet)
     end
 end
 
-function idle()
+function idle(pet)
     equip(sets.aftercast.None)
     if pet.isvalid then
         if string.find(pet.name,'Spirit') then

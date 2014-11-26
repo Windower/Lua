@@ -1,6 +1,7 @@
 function export_set(options)
-    local temp_items,item_list = windower.ffxi.get_items(),{}
-    local targinv,xml,all_sets
+    --local temp_items,item_list = windower.ffxi.get_items(),{}
+    local item_list = {}
+    local targinv,xml,all_sets,use_job_in_filename,use_subjob_in_filename,overwrite_existing
     if #options > 0 then
         for _,v in ipairs(options) do
             if v:lower() == 'inventory' then
@@ -13,6 +14,12 @@ function export_set(options)
                     windower.add_to_chat(123,'GearSwap: Cannot export the sets table of the current file because there is no file loaded.')
                     return
                 end
+            elseif v:lower() == 'mainjob' then
+                use_job_in_filename = true
+            elseif v:lower() == 'mainsubjob' then
+                use_subjob_in_filename = true
+            elseif v:lower() == 'overwrite' then
+                overwrite_existing = true
             end
         end
     end
@@ -30,13 +37,24 @@ function export_set(options)
     else
         buildmsg = buildmsg..' as a lua file.'
     end
+    
+    if use_job_in_filename then
+        buildmsg = buildmsg..' (Naming format: Character_JOB)'
+    elseif use_subjob_in_filename then
+        buildmsg = buildmsg..' (Naming format: Character_JOB_SUB)'
+    end
+    
+    if overwrite_existing then
+        buildmsg = buildmsg..' Will overwrite existing files with same name.'
+    end
+    
     windower.add_to_chat(123,buildmsg)
     
     if not windower.dir_exists(windower.addon_path..'data/export') then
         windower.create_dir(windower.addon_path..'data/export')
     end
     
-    local inv = temp_items.inventory
+    local inv = items.inventory
     if targinv then
         -- Load the entire inventory
         for _,v in pairs(inv) do
@@ -44,9 +62,21 @@ function export_set(options)
                 if res.items[v.id] then
                     item_list[#item_list+1] = {}
                     item_list[#item_list].name = res.items[v.id][language]
-                    local potslots = v.slots
-                    if potslots then potslots = res.slots[potslots:it()()].english:gsub(' ','_') end
-                    item_list[#item_list].slot = potslots or 'item'
+                    local potslots,slot = copy_entry(res.items[v.id].slots)
+                    if potslots then
+                        slot = res.slots[potslots:it()()].english:gsub(' ','_'):lower() -- Multi-lingual support requires that we add more languages to slots.lua
+                    end
+                    item_list[#item_list].slot = slot or 'item'
+                    if not xml then
+                        local augments = extdata.decode(v).augments or {}
+                        local aug_str = ''
+                        for aug_ind,augment in pairs(augments) do
+                            if augment ~= 'none' then aug_str = aug_str.."'"..augment.."'," end
+                        end
+                        if string.len(aug_str) > 0 then
+                            item_list[#item_list].augments = aug_str
+                        end
+                    end
                 else
                     windower.add_to_chat(123,'GearSwap: You possess an item that is not in the resources yet.')
                 end
@@ -55,28 +85,46 @@ function export_set(options)
     elseif all_sets then
         -- Iterate through user_env.sets and find all the gear.
         item_list,exported = unpack_names({},'L1',user_env.sets,{},{empty=true})
---        for i,v in pairs(exported) do
---            windower.add_to_chat(8,tostring(i))
---        end
     else
+------------------------------------------ CHECK WHETHER THIS STILL WORKS --------------------------------------------------
         -- Default to loading the currently worn gear.
-        local gear = temp_items.equipment
-        for i,v in pairs(gear) do
-            if v ~= 0 then
-                if res.items[inv[v].id] then
-                    item_list[slot_map[i]+1] = {}
-                    item_list[slot_map[i]+1].name = res.items[inv[v].id][language]
-                    item_list[slot_map[i]+1].slot = i --default_slot_map[inv[v].slot]
-                else
-                    windower.add_to_chat(123,'GearSwap: You are wearing an item that is not in the resources yet.')
-                end
-            end
-        end
-        for i = 1,16 do
+        local gear = table.reassign({},items.equipment)
+        local ward = items.wardrobe
+
+        for i = 1,16 do -- ipairs will be used on item_list
             if not item_list[i] then
                 item_list[i] = {}
                 item_list[i].name = empty
-                item_list[i].slot = default_slot_map[i-1]
+                item_list[i].slot = toslotname(i-1)
+            end
+        end
+        
+        for slot_name,gs_item_tab in pairs(gear) do
+            if gs_item_tab.slot ~= empty then
+                local item_tab
+                if gs_item_tab.bag_id == 0 and res.items[inv[gs_item_tab.slot].id] then
+                    item_tab = inv[gs_item_tab.slot]
+                elseif gs_item_tab.bag_id == 8 and res.items[ward[gs_item_tab.slot].id] then
+                    item_tab = ward[gs_item_tab.slot]
+                end
+                if res.items[item_tab.id] then
+                    item_list[slot_map[slot_name]+1] = {
+                        name = res.items[item_tab.id][language],
+                        slot = slot_name
+                        }
+                    if not xml then
+                        local augments = extdata.decode(item_tab).augments or {}
+                        local aug_str = ''
+                        for aug_ind,augment in pairs(augments) do
+                            if augment ~= 'none' then aug_str = aug_str.."'"..augment.."'," end
+                        end
+                        if string.len(aug_str) > 0 then
+                            item_list[slot_map[slot_name]+1].augments = aug_str
+                        end
+                    end
+                else
+                    windower.add_to_chat(123,'GearSwap: You are wearing an item that is not in the resources yet.')
+                end
             end
         end
     end
@@ -98,10 +146,23 @@ function export_set(options)
         end
     end
     
-    local path = windower.addon_path..'data/export/'..player.name..os.date(' %H %M %S%p  %y-%d-%m')
+    
+    if not windower.dir_exists(windower.addon_path..'data/export') then
+        windower.create_dir(windower.addon_path..'data/export')
+    end
+    
+    local path = windower.addon_path..'data/export/'..player.name
+    
+    if use_job_in_filename then
+        path = path..'_'..windower.ffxi.get_player().main_job
+    elseif use_subjob_in_filename then
+        path = path..'_'..windower.ffxi.get_player().main_job..'_'..windower.ffxi.get_player().sub_job
+    else
+        path = path..os.date(' %H %M %S%p  %y-%d-%m')
+    end
     if xml then
         -- Export in .xml
-        if windower.file_exists(path..'.xml') then
+        if (not overwrite_existing) and windower.file_exists(path..'.xml') then
             path = path..' '..os.clock()
         end
         local f = io.open(path..'.xml','w+')
@@ -117,14 +178,19 @@ function export_set(options)
         f:close()
     else
         -- Default to exporting in .lua
-        if windower.file_exists(path..'.lua') then
+        if (not overwrite_existing) and windower.file_exists(path..'.lua') then
             path = path..' '..os.clock()
         end
         local f = io.open(path..'.lua','w+')
         f:write('sets.exported={\n')
         for i,v in ipairs(item_list) do
             if v.name ~= empty then
-                f:write('    '..v.slot..'="'..v.name..'",\n')
+                if v.augments then
+                    --Advanced set table
+                    f:write('    '..v.slot..'={ name="'..v.name..'", augments={'..v.augments..'}},\n')
+                else
+                    f:write('    '..v.slot..'="'..v.name..'",\n')
+                end
             end
         end
         f:write('}')
@@ -141,7 +207,7 @@ function unpack_names(ret_tab,up,tab_level,unpacked_table,exported)
         elseif i=='name' then
             alt = up
             flag = true
-        elseif type(v) == 'string' and v~='augment' and v~= 'augments' and v~= 'order' then
+        elseif type(v) == 'string' and v~='augment' and v~= 'augments' and v~= 'priority' then
             alt = i
             flag = true
         end
@@ -164,9 +230,7 @@ function unlogify_unpacked_name(name)
     name = name:lower()
     for i,v in pairs(res.items) do
         if type(v) == 'table' then
-            if not v[language..'_log'] then
-                windower.add_to_chat(8,'v = '..tostring(v.english))
-            elseif v[language..'_log']:lower() == name then
+            if v[language..'_log']:lower() == name then
                 name = v[language]
                 local potslots = v.slots
                 if potslots then potslots = res.slots[potslots:it()()].english:gsub(' ','_') end

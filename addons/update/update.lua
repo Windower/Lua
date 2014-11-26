@@ -3,17 +3,15 @@ _addon.author = 'Arcon'
 _addon.version = '1.1.0.0'
 _addon.command = 'update'
 
-require('functions')
-require('strings')
-require('maths')
-require('logger')
-config = require('config')
+require('luau')
 
 defaults = {}
 defaults.AutoUpdate = false
 defaults.CheckInterval = 300
 
 settings = config.load(defaults)
+
+debug.setmetatable(nil, {__index = {}, __call = functions.empty})
 
 units = {[''] = 1}
 units.s = units['']
@@ -27,7 +25,7 @@ units.us = units.ms/1000
 units.ns = units.us/1000
 
 math.randomseed(os.time() + os.clock())
-handle = math.random(0x7FFFFFFF):hex():zfill(8)
+handle = (0x7FFFFFFF):random():hex():zfill(8)
 
 tick = function(msg)
     last = os.clock()
@@ -36,29 +34,23 @@ tick = function(msg)
     end
 end
 
-update = tick..windower.execute:prepare(windower.addon_path .. '../../Windower.exe', {'--update'})
+update = tick .. windower.execute:prepare(windower.windower_path .. 'Windower.exe', {'--update'})
 
 windower.register_event('ipc message', tick:cond(function(str)
     local args = str:split(' ')
     return args[1] == 'update' and args[2] ~= handle
 end))
-windower.register_event('time change', update:cond(function()
-    if not settings.AutoUpdate then
-        return false
-    end
 
-    local player = windower.ffxi.get_player()
-    return os.clock() - last > settings.CheckInterval and (not player or not player.in_combat)
+windower.register_event('time change', update:cond(function()
+    return settings.AutoUpdate and os.clock() - last > settings.CheckInterval and not windower.ffxi.get_player().in_combat
 end))
 
 windower.register_event('addon command', function(command, param, ...)
     command = command and command:lower() or nil
     param = param and param:lower() or nil
 
-    if command == 'help' then
-        print('Update v' .. _addon.version)
-        print('    auto [on|off] - Set automatic updates to on or off or toggle.')
-        print('    interval <time> - Set automatic update interval to the provided time (in seconds if no units provided).')
+    if not command then
+        update()
 
     elseif command == 'auto' then
         if not param then
@@ -95,9 +87,12 @@ windower.register_event('addon command', function(command, param, ...)
 
     elseif command == 'save' then
         config.save(settings, 'all')
-
+        
     else
-        update()
+        print(_addon.name .. ' v' .. _addon.version)
+        print('    auto [on|off] - Set automatic updates to on or off or toggle.')
+        print('    interval <time> - Set automatic update interval to the provided time (in seconds if no units provided).')
+        print('    save - Saves the current settings for all characters.')
 
     end
 end)

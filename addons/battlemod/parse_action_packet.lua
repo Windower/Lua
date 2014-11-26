@@ -19,13 +19,13 @@ function parse_action_packet(act)
                 if res.action_messages[m.add_effect_message] then m.add_effect_fields = fieldsearch(res.action_messages[m.add_effect_message][language]) end
                 if res.action_messages[m.spike_effect_message] then m.spike_effect_fields = fieldsearch(res.action_messages[m.spike_effect_message][language]) end
 
-                if res.buffs[m.param] and m.param ~= 0 then
+                if res.buffs[m.param] then --and m.param ~= 0 then
                     m.status = res.buffs[m.param][language]
                 end
-                if res.buffs[m.add_effect_param] and m.add_effect_param ~= 0 then
+                if res.buffs[m.add_effect_param] then -- and m.add_effect_param ~= 0 then
                     m.add_effect_status = res.buffs[m.add_effect_param][language]
                 end
-                if res.buffs[m.spike_effect_param] and m.spike_effect_param ~= 0 then
+                if res.buffs[m.spike_effect_param] then -- and m.spike_effect_param ~= 0 then
                     m.spike_effect_status = res.buffs[m.spike_effect_param][language]
                 end
                 m.number = 1
@@ -126,13 +126,13 @@ function parse_action_packet(act)
             if tempact.has_spike_effect then
                 tempact.spike_effect_number = 1
             end
-            if res.buffs[tempact.param] and tempact.param ~= 0 then
+            if res.buffs[tempact.param] then -- and tempact.param ~= 0 then
                 tempact.status = res.buffs[tempact.param][language]
             end
-            if res.buffs[tempact.add_effect_param] and tempact.add_effect_param ~= 0 then
+            if res.buffs[tempact.add_effect_param] then -- and tempact.add_effect_param ~= 0 then
                 tempact.add_effect_status = res.buffs[tempact.add_effect_param][language]
             end
-            if res.buffs[tempact.spike_effect_param] and tempact.spike_effect_param ~= 0 then
+            if res.buffs[tempact.spike_effect_param] then -- and tempact.spike_effect_param ~= 0 then
                 tempact.spike_effect_status = res.buffs[tempact.spike_effect_param][language]
             end
         end
@@ -154,7 +154,7 @@ function parse_action_packet(act)
     
     for i,v in pairs(act.targets) do
         for n,m in pairs(v.actions) do
-            if m.message ~= 0 then
+            if m.message ~= 0 and res.action_messages[m.message] ~= nil then
                 local targ = assemble_targets(act.actor,v.target,act.category,m.message)
                 local color = color_filt(res.action_messages[m.message].color,v.target[1].id==Self.id)
                 if m.reaction == 11 and act.category == 1 then m.simp_name = 'parried by'
@@ -182,6 +182,9 @@ function parse_action_packet(act)
                 elseif m.message == 437 or m.message == 438 then m.simp_name = act.action.name..' (JAs and TP)'
                 elseif m.message == 439 or m.message == 440 then m.simp_name = act.action.name..' (SPs, JAs, TP, and MP)'
                 elseif T{252,265,268,269,271,272,274,275}:contains(m.message) then m.simp_name = 'Magic Burst! '..act.action.name
+                elseif not act.action then 
+                   m.simp_name = ''
+                   act.action = {}
                 else m.simp_name = act.action.name or ''
                 end
 
@@ -201,7 +204,10 @@ function parse_action_packet(act)
                     m.status = color_it('Completely Resists',color_arr['statuscol'])
                 elseif m.message == 85 or m.message == 284 then
                     m.status = color_it('Resists',color_arr['statuscol'])
-                elseif T{75,156,189,248,283,312,323,336,355,408,422,423,425,659}:contains(m.message) then
+                elseif m.message == 351 then
+                    m.status = color_it('status ailments',color_arr['statscol'])
+                    m.simp_name = color_it('remedy',color_arr['itemcol'])
+                elseif T{75,114,156,189,248,283,312,323,336,355,408,422,423,425,659}:contains(m.message) then
                     m.status = color_it('No effect',color_arr['statuscol']) -- The status code for "No Effect" is 255, so it might actually work without this line
                 end
                 if m.message == 188 then
@@ -236,7 +242,7 @@ function parse_action_packet(act)
                     :gsub('${lb}','\7')
                     :gsub('${number}',act.action.number or m.param)
                     :gsub('${status}',m.status or 'ERROR 120')
-                    :gsub('${gil}',m.param)))
+                    :gsub('${gil}',m.param..' gil')))
                 m.message = 0
             end
             if m.has_add_effect and m.add_effect_message ~= 0 and add_effect_valid[act.category] then
@@ -322,8 +328,8 @@ function simplify_message(msg_ID)
     local msg = res.action_messages[msg_ID][language]
     local fields = fieldsearch(msg)
 
-    if simplify and not T{23,125,129,133,139,140,153,244,453,557,593,594,595,596,597,598,599,674}:contains(msg_ID) then
-        if T{93,273,522,653,654,655,656,85,284,75,156,189,248,283,312,323,336,355,408,422,423,425,659,158,245,324,658}:contains(msg_ID) then
+    if simplify and not T{23,64,125,129,133,139,140,153,204,244,350,442,453,531,557,565,582,593,594,595,596,597,598,599,674}:contains(msg_ID) then
+        if T{93,273,522,653,654,655,656,85,284,75,114,156,189,248,283,312,323,336,351,355,408,422,423,425,659,158,245,324,658}:contains(msg_ID) then
             fields.status = true
         end
         if msg_ID == 31 then
@@ -381,7 +387,7 @@ function assemble_targets(actor,targs,category,msg)
     
     for i,v in pairs(targets) do
         if i == 1 then
-            out_str = color_it(v.name,color_arr[v.owner or v.type])
+            out_str = out_str..color_it(v.name,color_arr[v.owner or v.type]) 
         else
             out_str = conjunctions(out_str,color_it(v.name,color_arr[v.owner or v.type]),#targets,i)
         end
@@ -432,6 +438,13 @@ function player_info(id)
                         end
                         owner = i
                         break
+                    elseif v.mob and v.mob.fellow_index and v.mob.fellow_index == player_table.index then
+                        if i == 'p0' then
+                            typ = 'my_fellow'
+                            filter = 'my_fellow'
+                        end
+                        owner = i
+                        break
                     end
                 end
             else
@@ -470,10 +483,10 @@ function get_spell(act)
         spell.french = spell.english
     elseif act.category == 2 and act.category == 12 then
         if msg_ID == 77 then
-            spell = res.abilities[171] -- Sange
+            spell = res.job_abilities[171] -- Sange
             spell.name = color_it(spell[language],color_arr.abilcol)
         elseif msg_ID == 157 then
-            spell = res.abilities[60] -- Barrage
+            spell = res.job_abilities[60] -- Barrage
             spell.name = color_it(spell[language],color_arr.abilcol)
         else
             spell.english = 'Ranged Attack'
@@ -485,8 +498,14 @@ function get_spell(act)
         if not res.action_messages[msg_ID] then
             if T{4,8}:contains(act['category']) then
                 spell = res.spells[abil_ID]
-            elseif T{3,6,7,13,14,15}:contains(act['category']) then
-                spell = res.abilities[abil_ID] -- May have to correct for charmed pets some day, but I'm not sure there are any monsters with TP moves that give no message.
+            elseif T{6,14,15}:contains(act['category']) or T{7,13}:contains(act['category']) and false then
+                spell = res.job_abilities[abil_ID] -- May have to correct for charmed pets some day, but I'm not sure there are any monsters with TP moves that give no message.
+            elseif T{3,7,11}:contains(act['category']) then
+                if abil_ID < 256 then
+                    spell = res.weapon_skills[abil_ID] -- May have to correct for charmed pets some day, but I'm not sure there are any monsters with TP moves that give no message.
+                else
+                    spell = res.monster_abilities[abil_ID]
+                end
             elseif T{5,9}:contains(act['category']) then
                 spell = res.items[abil_ID]
             else
@@ -502,38 +521,38 @@ function get_spell(act)
             spell.name = color_it(spell[language],color_arr.spellcol)
             spell.spell = color_it(spell[language],color_arr.spellcol)
         elseif fields.ability then
-            spell = res.abilities[abil_ID]
+            spell = res.job_abilities[abil_ID]
             spell.name = color_it(spell[language],color_arr.abilcol)
             spell.ability = color_it(spell[language],color_arr.abilcol)
         elseif fields.weapon_skill then
-            if abil_ID > 255 then -- WZ_RECOVER_ALL is used by chests in Limbus
-                spell = res.monster_abilities[abil_ID-256]
-                if spell.english == '.' then
-                    spell.english = 'Special Attack'
+            if abil_ID > 256 then -- WZ_RECOVER_ALL is used by chests in Limbus
+                spell = res.monster_abilities[abil_ID]
+                if not spell then
+                    spell = {english= 'Special Attack'}
                 end
-            elseif abil_ID < 256 then
-                spell = res.abilities[abil_ID+768]
+            elseif abil_ID <= 256 then
+                spell = res.weapon_skills[abil_ID]
             end
             spell.name = color_it(spell[language],color_arr.wscol)
             spell.weapon_skill = color_it(spell[language],color_arr.wscol)
         elseif msg_ID == 303 then
-            spell = res.abilities[74] -- Divine Seal
+            spell = res.job_abilities[74] -- Divine Seal
             spell.name = color_it(spell[language],color_arr.abilcol)
             spell.ability = color_it(spell[language],color_arr.abilcol)
         elseif msg_ID == 304 then
-            spell = res.abilities[75] -- 'Elemental Seal'
+            spell = res.job_abilities[75] -- 'Elemental Seal'
             spell.name = color_it(spell[language],color_arr.abilcol)
             spell.ability = color_it(spell[language],color_arr.abilcol)
         elseif msg_ID == 305 then
-            spell = res.abilities[76] -- 'Trick Attack'
+            spell = res.job_abilities[76] -- 'Trick Attack'
             spell.name = color_it(spell[language],color_arr.abilcol)
             spell.ability = color_it(spell[language],color_arr.abilcol)
         elseif msg_ID == 311 or msg_ID == 311 then
-            spell = res.abilities[79] -- 'Cover'
+            spell = res.job_abilities[79] -- 'Cover'
             spell.name = color_it(spell[language],color_arr.abilcol)
             spell.ability = color_it(spell[language],color_arr.abilcol)
         elseif msg_ID == 240 or msg_ID == 241 then
-            spell = res.abilities[43] -- 'Hide'
+            spell = res.job_abilities[43] -- 'Hide'
             spell.name = color_it(spell[language],color_arr.abilcol)
             spell.ability = color_it(spell[language],color_arr.abilcol)
         end

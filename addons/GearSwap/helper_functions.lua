@@ -24,6 +24,42 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+-----------------------------------------------------------------------------------
+--Name: string.lower()
+--Args:
+---- message (string): Message to be forced to lower case
+-----------------------------------------------------------------------------------
+--Returns:
+---- Lower case message (or not, if the language or message is invalid)
+-----------------------------------------------------------------------------------
+function string.lower(message)
+    if message and type(message) == 'string' and language == 'english' then
+        return __raw.lower(message)
+    elseif message and type(message) == 'string' then
+        return message:gsub('[A-Z]',function (letter) return string.char(letter:byte(1)+32) end)
+    else
+        return message
+    end
+end
+
+-----------------------------------------------------------------------------------
+--Name: string.upper()
+--Args:
+---- message (string): Message to be forced to upper case
+-----------------------------------------------------------------------------------
+--Returns:
+---- Upper case message (or not, if the language or message is invalid)
+-----------------------------------------------------------------------------------
+function string.upper(message)
+    if message and type(message) == 'string' and language == 'english' then
+        return __raw.upper(message)
+    elseif message and type(message) == 'string' then
+        return message:gsub('[a-z]',function (letter) return string.char(letter:byte(1)-32) end)
+    else
+        return message
+    end
+end
+
 
 -----------------------------------------------------------------------------------
 --Name: fieldsearch()
@@ -35,9 +71,9 @@
 ---- Seems to be trying to exclude ${actor} and ${target}, but not.
 -----------------------------------------------------------------------------------
 function fieldsearch(message)
-    fieldarr = {}
-    string.gsub(message,"{(.-)}", function(a) if a ~= '${actor}' and a ~= '${target}' then fieldarr[#fieldarr+1] = a end end)
-    return fieldarr
+    local fields = T{}
+    string.gsub(message,"{(.-)}", function(a) if a ~= '${actor}' and a ~= '${target}' then fields:append(a) end end)
+    return fields
 end
 
 
@@ -85,45 +121,6 @@ end
 
 
 -----------------------------------------------------------------------------------
---Name: get_bit_packed(dat_string,start,stop)
---Args:
----- dat_string - string that is being bit-unpacked to a number
----- start - first bit
----- stop - last bit
------------------------------------------------------------------------------------
---Returns:
----- number from the indicated range of bits 
------------------------------------------------------------------------------------
-function get_bit_packed(dat_string,start,stop)
-    local newval = 0
-    
-    local c_count = math.ceil(stop/8)
-    while c_count >= math.ceil((start+1)/8) do
-        -- Grabs the most significant byte first and works down towards the least significant.
-        local cur_val = dat_string:byte(c_count)
-        local scal = 256
-        
-        if c_count == math.ceil(stop/8) then -- Take the least significant bits of the most significant byte
-        -- Moduluses by 2^number of bits into the current byte. So 8 bits in would %256, 1 bit in would %2, etc.
-        -- Cuts off the top.
-            cur_val = cur_val%(2^((stop-1)%8+1)) -- -1 and +1 set the modulus result range from 1 to 8 instead of 0 to 7.
-        end
-        
-        if c_count == math.ceil((start+1)/8) then -- Take the most significant bits of the least significant byte
-        -- Divides by the significance of the final bit in the current byte. So 8 bits in would /128, 1 bit in would /1, etc.
-        -- Cuts off the bottom.
-            cur_val = math.floor(cur_val/(2^(start%8)))
-            scal = 2^(8-start%8)
-        end
-        
-        newval = newval*scal + cur_val -- Need to multiply by 2^number of bits in the next byte
-        c_count = c_count - 1
-    end
-    return newval
-end
-
-
------------------------------------------------------------------------------------
 ----Name: unify_slots(g)
 -- Filters the provided gear table to only known slots, and then runs a map
 -- on the table to make sure all keys are the accepted versions for each.
@@ -138,20 +135,107 @@ function unify_slots(g)
     return table.key_map(g1, get_default_slot)
 end
 
- 
+
 -----------------------------------------------------------------------------------
 ----Name: is_slot_key(k)
--- Checks to see if key 'k' is known in the slot_map array.
+-- Checks to see if key 'k' is known in the slot_map array, and that slot has not
+-- been disabled.
 ----Args:
 -- k - A key to a gear slot in a gear table.
 -----------------------------------------------------------------------------------
 ----Returns:
--- True if the key is recognized in the slot_map table; otherwise false.
+-- True if the key is recognized in the slot_map table, and that slot is enabled;
+-- otherwise false.
 -----------------------------------------------------------------------------------
 function is_slot_key(k)
     return slot_map[k]
 end
  
+ 
+-----------------------------------------------------------------------------------
+----Name: make_empty_item_table(slot)
+-- Make an empty item table with slot = slot
+----Args:
+-- slot - The index of the item table
+-----------------------------------------------------------------------------------
+----Returns:
+-- A zero'd table with slot = slot
+-----------------------------------------------------------------------------------
+function make_empty_item_table(slot)
+    return {id=0,
+    count = 0,
+    bazaar = 0,
+    extdata = string.char(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0),
+    status = 0,
+    slot = slot}
+end
+
+
+-----------------------------------------------------------------------------------
+----Name: make_inventory_table()
+-- Make a table of empty item tables
+----Args:
+-- none
+-----------------------------------------------------------------------------------
+----Returns:
+-- A table of 80 empty item tables indexed 1-80
+-----------------------------------------------------------------------------------
+function make_inventory_table()
+    local tab = {}
+    for i = 0,80 do
+        tab[i] = make_empty_item_table(i)
+    end
+    return tab
+end
+
+
+-----------------------------------------------------------------------------------
+----Name: to_windower_api(str)
+-- Takes strings and converts them to resources table key format
+----Args:
+-- str - String to be converted to the windower API version
+-----------------------------------------------------------------------------------
+----Returns:
+-- a lower case string with ' ' replaced with '_'
+-----------------------------------------------------------------------------------
+function to_windower_api(str)
+    return __raw.lower(str:gsub(' ','_'))
+end
+
+
+-----------------------------------------------------------------------------------
+----Name: get_job_names()
+-- Returns the short and long form of the job name
+----Args:
+-- id - Job ID
+-----------------------------------------------------------------------------------
+----Returns:
+-- short and long form of the job name
+-----------------------------------------------------------------------------------
+function get_job_names(id)
+    if res.jobs[id] then
+        return res.jobs[id][language..'_short'], res.jobs[id][language]
+    else
+        return 'NONE', 'None'
+    end
+end
+
+
+-----------------------------------------------------------------------------------
+----Name: update_job_names()
+-- Updates job names in the global player array
+----Args:
+-- none
+-----------------------------------------------------------------------------------
+----Returns:
+-- none
+-----------------------------------------------------------------------------------
+function update_job_names()
+    player.main_job,player.main_job_full = get_job_names(player.main_job_id)
+    player.sub_job, player.sub_job_full = get_job_names(player.sub_job_id)
+    player.job = player.main_job..'/'..player.sub_job
+end
+
  
 -----------------------------------------------------------------------------------
 ----Name: get_default_slot(k)
@@ -164,7 +248,7 @@ end
 -----------------------------------------------------------------------------------
 function get_default_slot(k)
     if slot_map[k] then
-        return default_slot_map[slot_map[k]]
+        return toslotname(slot_map[k])
     end
 end
 
@@ -192,11 +276,114 @@ function set_merge(baseSet, ...)
     -- only contain acceptable slot key entries.
     local cleanSetsList = table.map(combineSets, unify_slots)
 
-    -- Then reduce using a simple table.update function to generate a single set result.
-    local combinedSet = table.reduce(cleanSetsList, table.update, baseSet)
+    -- Combine the provided sets into combinedSet.  If anything is blocked by having
+    -- the slot disabled, assign the item to the not_sent_out_equip table.
+    for _,set in pairs(cleanSetsList) do
+        for slot,item in pairs(set) do
+            if disable_table[slot_map[slot]] then
+                not_sent_out_equip[slot] = item
+            else
+                baseSet[slot] = item
+            end
+        end
+    end
 
-    return combinedSet
+    return baseSet
 end
+
+
+-----------------------------------------------------------------------------------
+----Name: parse_set_to_keys(str)
+-- Function to parse a string representation of a table into a list of keys that
+-- that can be used to select that table.
+----Args:
+-- str - Input can be a string, or a table of strings (which will be concatenated
+-- into a single string with spaces as intervals).
+--
+-- Example:
+-- Input: sets.precast.WS["Rudra's Storm"]['Ltng. Threnody'].Acc
+-- Output: [sets, precast, WS, Rudra's Storm, Ltng. Threnody, Acc]
+-----------------------------------------------------------------------------------
+----Returns:
+-- Returns a list of keys parsed from the provided input.
+-----------------------------------------------------------------------------------
+function parse_set_to_keys(str)
+    if type(str) == 'table' then
+        str = table.concat(str, ' ')
+    end
+    
+    -- Parsing results get pushed into the result list.
+    local result = L{}
+
+    local remainder = str
+    local key
+    local stop
+    local sep = '.'
+    local count = 0
+    
+    -- Loop as long as remainder hasn't been nil'd or reduced to 0 characters, but only to a maximum of 30 tries.
+    while remainder and #remainder and count < 30 do
+        -- Try aaa.bbb set names first
+        while sep == '.' do
+            _,_,key,sep,remainder = remainder:find("^([^%.%[]*)(%.?%[?)(.*)")
+            result:append(key)
+        end
+        
+        -- Then try aaa['bbb'] set names.
+        -- Be sure to account for both single and double quote enclosures.
+        -- Ignore periods contained within quote strings.
+        while sep == '[' do
+            _,_,sep,remainder = remainder:find([=[^(%'?%"?)(.*)]=]) --' --block bad text highlighting
+            if sep == "'" then
+                _,_,key,stop,sep,remainder = remainder:find("^([^']+)('])(%.?%[?)(.*)")
+            elseif sep == '"' then
+                _,_,key,stop,sep,remainder = remainder:find('^([^"]+)("])(%.?%[?)(.*)')
+            elseif #sep == 0 then
+                -- If there is no single or double quote detected, attempt to treat the index as a number or boolean
+                local _,_,pot_key,pot_stop,pot_sep,pot_remainder = remainder:find('^([^%]]+)(])(%.?%[?)(.*)')
+                if tonumber(pot_key) then
+                    key,stop,sep,remainder = tonumber(pot_key),pot_stop,pot_sep,pot_remainder
+                elseif pot_key == 'true' then
+                    key,stop,sep,remainder = true,pot_stop,pot_sep,pot_remainder
+                elseif pot_key == 'false' then
+                    key,stop,sep,remainder = false,pot_stop,pot_sep,pot_remainder
+                end
+            end
+            result:append(key)
+        end
+        
+        count = count +1
+    end
+
+    return result
+end
+
+-----------------------------------------------------------------------------------
+----Name: get_set_from_keys(keys)
+-- Function to take a list of keys select the set they point to, if possible.
+----Args:
+-- keys - A List of strings intended to be keys in progressively nested tables.
+-- The list is presumed to be based on the 'sets' table, and will start from that
+-- point if it is not explicitly provided in the key list.
+-----------------------------------------------------------------------------------
+----Returns:
+-- Returns the set if found, or nil if not.
+-----------------------------------------------------------------------------------
+function get_set_from_keys(keys)
+    local set = keys[1] == 'sets' and _G or sets
+    for key in (keys.it or it)(keys) do
+        if key == nil then
+            return nil
+        end
+        set = set[key]
+        if not set then
+            return nil
+        end
+    end
+
+    return set
+end
+
 
 
 -----------------------------------------------------------------------------------
@@ -211,15 +398,11 @@ end
 --Returns:
 ---- string - An action packet. First four bytes are dummy bytes.
 -----------------------------------------------------------------------------------
-function assemble_action_packet(target_id,target_index,category,spell_id)    
+function assemble_action_packet(target_id,target_index,category,spell_id)
     local outstr = string.char(0x1A,0x08,0,0)
     outstr = outstr..string.char( (target_id%256), math.floor(target_id/256)%256, math.floor( (target_id/65536)%256) , math.floor( (target_id/16777216)%256) )
     outstr = outstr..string.char( (target_index%256), math.floor(target_index/256)%256)
     outstr = outstr..string.char( (category%256), math.floor(category/256)%256)
-    
-    if category == 7 or category == 25 then
-        spell_id = spell_id - 768
-    end
     
     if category == 16 then
         spell_id = 0
@@ -246,7 +429,7 @@ function assemble_use_item_packet(target_id,target_index,item_id)
     outstr = outstr..string.char( (target_id%256), math.floor(target_id/256)%256, math.floor( (target_id/65536)%256) , math.floor( (target_id/16777216)%256) )
     outstr = outstr..string.char(0,0,0,0)
     outstr = outstr..string.char( (target_index%256), math.floor(target_index/256)%256)
-    inventory_index,bag_id = find_usable_item(item_id)
+    inventory_index,bag_id = find_usable_item(item_id,true)
     if inventory_index then
         outstr = outstr..string.char(inventory_index%256)..string.char(0,bag_id,0,0,0)
     else
@@ -268,43 +451,68 @@ end
 --Returns:
 ---- string - A use item packet. First four bytes are dummy bytes.
 -----------------------------------------------------------------------------------
-function assemble_menu_item_packet(target_id,target_index,item_id)
+function assemble_menu_item_packet(target_id,target_index,...)
     local outstr = string.char(0x36,0x20,0,0)
+    -- Message is coming out too short by 12 characters
+    
     -- Target ID
-    outstr = outstr..string.char( (target_id%256), math.floor(target_id/256)%256, math.floor( (target_id/65536)%256) , math.floor( (target_id/16777216)%256) )
-    -- One unit traded
-    outstr = outstr..string.char(1,0,0,0,0,0,0,0)..string.char(0,0,0,0,0,0,0,0)..string.char(0,0,0,0,0,0,0,0)..
-        string.char(0,0,0,0,0,0,0,0)..string.char(0,0,0,0,0,0,0,0)
-    -- Inventory Index for the one unit
-    inventory_index,bag_id = find_usable_item(item_id)
-    if inventory_index then
-        outstr = outstr..string.char(inventory_index%256)
-    else
-        debug_mode_chat('Proposed item: '..(res.items[item_id][language] or item_id)..' not found in inventory.')
+    outstr = outstr.."I":pack(target_id)
+    local item_ids,counts,count = {...},{},0
+    for i,v in pairs(item_ids) do
+        if res.items[v] then
+            counts[v] = (counts[v] or 0) + 1
+            count = count + 1
+        end
+    end
+    if count > 9 then
+        debug_mode_chat('Too many items ('..count..') passed to the assemble_menu_item_packet function')
         return
     end
-    -- Nothing else being traded
-    outstr = outstr..string.char(0,0,0,0,0,0,0,0,0)
+    
+    local unique_items = 0
+    for i,v in pairs(counts) do
+        outstr = outstr.."I":pack(v)
+        unique_items = unique_items + 1
+    end
+    for i = 1,10-unique_items do
+        outstr = outstr..string.char(0,0,0,0)
+    end
+    
+    -- Inventory Index for the one unit
+    
+    for i,v in pairs(counts) do
+        inventory_index,bag_id = find_usable_item(i,false)
+        if inventory_index then
+            outstr = outstr..string.char(inventory_index%256)
+        else
+            debug_mode_chat('Proposed item: '..(res.items[i][language] or i)..' not found in inventory.')
+            return
+        end
+    end
+    for i = 1,10-unique_items do
+        outstr = outstr..string.char(0)
+    end
     -- Target Index
-    outstr = outstr..string.char( (target_index%256), math.floor(target_index/256)%256)
+    outstr = outstr.."H":pack(target_index)
     -- Only one item being traded
-    outstr = outstr..string.char(1,0,0,0)
+    outstr = outstr..string.char(unique_items,0,0,0)
     return outstr
 end
 
 
 -----------------------------------------------------------------------------------
---Name: find_usable_item(item_id)
+--Name: find_usable_item(item_id,bool)
 --Desc: Finds a usable item in temporary or normal inventory. Assumes items array
 --      is accurate already.
 --Args:
 ---- item_id - The resource line for the current item
+---- bool    - Indicates whether the item must show up in your control-I menu as usable
 -----------------------------------------------------------------------------------
 --Returns:
 ---- inventory_index - The item's use inventory index (if it exists)
 ---- bag_id - The item's bag ID (if it exists)
 -----------------------------------------------------------------------------------
-function find_usable_item(item_id)
+function find_usable_item(item_id,bool)
     local inventory_index,bag_id
     for i,v in pairs(items.temporary) do
         if v and v.id == item_id then
@@ -313,11 +521,22 @@ function find_usable_item(item_id)
             break
         end
     end
+    
+    -- Should I add some kind of filter for enchanted items?
     if not inventory_index then
         for i,v in pairs(items.inventory) do
-            if v and v.id == item_id then
+            if v and v.id == item_id and (not bool or is_usable_item(v)) then
                 inventory_index = i
                 bag_id = 0
+                break
+            end
+        end
+    end
+    if not inventory_index then
+        for i,v in pairs(items.wardrobe) do
+            if v and v.id == item_id and (not bool or is_usable_item(v)) then
+                inventory_index = i
+                bag_id = 8
                 break
             end
         end
@@ -325,6 +544,20 @@ function find_usable_item(item_id)
     return inventory_index,bag_id
 end
 
+-----------------------------------------------------------------------------------
+--Name: is_usable_item(i_tab)
+--Desc: Determines whether the item table belongs to a usable item.
+--Args:
+---- i_tab - current item table
+-----------------------------------------------------------------------------------
+--Returns:
+---- true or false to indicate whether the item is usable
+-----------------------------------------------------------------------------------
+function is_usable_item(i_tab)
+    local ext = extdata.decode(i_tab)
+    if res.items[i_tab.id].type == 7 or (ext.type == 'Enchanted Equipment' and ext.usable) or res.items[i_tab.id].category == 'Usable' then return true end
+    return false
+end
 
 -----------------------------------------------------------------------------------
 --Name: filter_pretarget(spell)
@@ -338,22 +571,25 @@ end
 -----------------------------------------------------------------------------------
 function filter_pretarget(spell)
     local category = outgoing_action_category_table[unify_prefix[spell.prefix]]
-    if category == 3 then
+    if world.in_mog_house then
+        debug_mode_chat("Unable to execute commands. Currently in a Mog House zone.")
+        return false
+    elseif category == 3 then
         local available_spells = windower.ffxi.get_spells()
-        local spell_jobs = res.spells[spell.id].jobs
+        local spell_jobs = copy_entry(res.spells[spell.id].levels)
         
         -- Filter for spells that you do not know. Exclude Impact.
         if not available_spells[spell.id] and not spell.id == 503 then
             debug_mode_chat("Unable to execute command. You do not know that spell ("..(res.spells[spell.id][language] or spell.id)..")")
         -- Filter for spells that you know, but do not currently have access to
-        elseif (not spell_jobs[player.main_job] or not (spell_jobs[player.main_job] <= player.main_job_level)) and
-            (not spell_jobs[player.sub_job] or not (spell_jobs[player.sub_job] < player.sub_job_level)) then
+        elseif (not spell_jobs[player.main_job_id] or not (spell_jobs[player.main_job_id] <= player.main_job_level)) and
+            (not spell_jobs[player.sub_job_id] or not (spell_jobs[player.sub_job_id] <= player.sub_job_level)) then
             debug_mode_chat("Unable to execute command. You do not have access to that spell ("..(res.spells[spell.id][language] or spell.id)..")")
             return false
         -- At this point, we know that it is technically castable by this job combination if the right conditions are met.
-        elseif player.main_job == 'SCH' and ((addendum_white[spell.id] and not buffactive['Addendum: White']) or
-            (addendum_black[spell.id] and not buffactive['Addendum: Black'])) and not (spell_jobs[player.sub_job]
-            and spell_jobs[player.sub_job] <= player.sub_job_level) then
+        elseif player.main_job_id == 20 and ((addendum_white[spell.id] and not buffactive[401] and not buffactive[416]) or
+            (addendum_black[spell.id] and not buffactive[402] and not buffactive[416])) and
+            not (spell_jobs[player.sub_job_id] and spell_jobs[player.sub_job_id] <= player.sub_job_level) then
             
             if addendum_white[spell.id] then
                 debug_mode_chat("Unable to execute command. Addendum: White required for that spell ("..(res.spells[spell.id][language] or spell.id)..")")
@@ -362,10 +598,10 @@ function filter_pretarget(spell)
                 debug_mode_chat("Unable to execute command. Addendum: Black required for that spell ("..(res.spells[spell.id][language] or spell.id)..")")
             end
             return false
-        elseif player.sub_job == 'SCH' and ((addendum_white[spell.id] and not buffactive['Addendum: White']) or
-            (addendum_black[spell.id] and not buffactive['Addendum: Black'])) and not (spell_jobs[player.main_job]
-            and spell_jobs[player.main_job] <= player.main_job_level) then
-            
+        elseif player.sub_job_id == 20 and ((addendum_white[spell.id] and not buffactive[401] and not buffactive[416]) or
+            (addendum_black[spell.id] and not buffactive[402] and not buffactive[416])) and
+            not (spell_jobs[player.main_job_id] and spell_jobs[player.main_job_id] <= player.main_job_level) then
+                        
             if addendum_white[spell.id] then
                 debug_mode_chat("Unable to execute command. Addendum: White required for that spell ("..(res.spells[spell.id][language] or spell.id)..")")
             end
@@ -373,29 +609,37 @@ function filter_pretarget(spell)
                 debug_mode_chat("Unable to execute command. Addendum: Black required for that spell ("..(res.spells[spell.id][language] or spell.id)..")")
             end
             return false
-        elseif spell.type == 'BlueMagic' and not (player.main_job == 'BLU' and table.contains(windower.ffxi.get_mjob_data().spells,spell.id)) and not
-            (player.sub_job == 'BLU' and table.contains(windower.ffxi.get_sjob_data().spells,spell.id)) then
+        elseif spell.type == 'BlueMagic' and not ((player.main_job_id == 16 and table.contains(windower.ffxi.get_mjob_data().spells,spell.id)) or
+            ((buffactive[485] or buffactive[505]) and unbridled_learning_set[spell.english])) and not
+            (player.sub_job_id == 16 and table.contains(windower.ffxi.get_sjob_data().spells,spell.id)) then
+            -- This code isn't hurting anything, but it doesn't need to be here either.
             debug_mode_chat("Unable to execute command. Blue magic must be set to cast that spell ("..(res.spells[spell.id][language] or spell.id)..")")
             return false
         elseif spell.type == 'Ninjutsu'  then
-            if player.main_job ~= 'NIN' and player.sub_job ~= 'NIN' then
+            if player.main_job_id ~= 13 and player.sub_job_id ~= 13 then
                 debug_mode_chat("Unable to make action packet. You do not have access to that spell ("..(spell[language] or spell.id)..")")
                 return false
-            elseif not player.inventory[tool_map[spell.english]] and not (player.main_job == 'NIN' and player.inventory[universal_tool_map[spell.english]]) then
+            elseif not player.inventory[tool_map[spell.english][language]] and not (player.main_job_id == 13 and player.inventory[universal_tool_map[spell.english][language]]) then
                 debug_mode_chat("Unable to make action packet. You do not have the proper tools.")
                 return false
             end
         end
-    elseif (category == 7 or category == 9) and not windower.ffxi.get_abilities()[spell.id] then
-        debug_mode_chat("Unable to execute command. You do not have access to that ability ("..(res.abilities[spell.id][language] or spell.id)..")")
-        return false
-    elseif category == 25 and (not player.main_job == 'MON' or not player.species or not player.species.tp_moves[spell.id-768] or not (player.species.tp_moves[spell.id-768] <= player.main_job_level)) then
+    elseif category == 7 or category == 9 then
+        local available = windower.ffxi.get_abilities()
+        if category == 7 and not S(available.weapon_skills)[spell.id] then
+            debug_mode_chat("Unable to execute command. You do not have access to that ability ("..(res.weapon_skills[spell.id][language] or spell.id)..")")
+            return false
+        elseif category == 9 and not S(available.job_abilities)[spell.id] then
+            debug_mode_chat("Unable to execute command. You do not have access to that ability ("..(res.job_abilities[spell.id][language] or spell.id)..")")
+            return false
+        end
+    elseif category == 25 and (not player.main_job_id == 23 or not windower.ffxi.get_mjob_data().species or
+        not res.monstrosity[windower.ffxi.get_mjob_data().species] or not res.monstrosity[windower.ffxi.get_mjob_data().species].tp_moves[spell.id] or
+        not (res.monstrosity[windower.ffxi.get_mjob_data().species].tp_moves[spell.id] <= player.main_job_level)) then
         -- Monstrosity filtering
-        debug_mode_chat("Unable to execute command. You do not have access to that monsterskill ("..(res.abilities[spell.id][language] or spell.id)..")")
+        debug_mode_chat("Unable to execute command. You do not have access to that monsterskill ("..(res.monster_abilities[spell.id][language] or spell.id)..")")
         return false
     end
-    
-    
     
     return true
 end
@@ -413,7 +657,7 @@ end
 -----------------------------------------------------------------------------------
 function filter_precast(spell)
     if not spell.target.id or not spell.target.index then
-        if debugging >= 1 then windower.add_to_chat(8,'No target id or index') end
+        if debugging.general then windower.add_to_chat(8,'No target id or index') end
         return false
     end
     return true
@@ -438,8 +682,9 @@ function mk_command_registry_entry(sp)
     command_registry[ts] = {}
     command_registry[ts].cast_delay = 0
     command_registry[ts].spell = sp
-    if debugging >= 2 then
-        windower.add_to_chat(8,'GearSwap (Debug Mode): Creating a new command_registry entry: '..tostring(ts)..' '..tostring(command_registry[ts]))
+    command_registry[ts].timestamp = ts
+    if debugging.command_registry then
+        windower.add_to_chat(8,'GearSwap (Debug Mode): Creating a new command_registry entry: '..windower.to_shift_jis(tostring(ts)..' '..tostring(command_registry[ts])))
     end
     return ts
 end
@@ -456,7 +701,13 @@ end
 -----------------------------------------------------------------------------------
 function remove_old_command_registry_entries(ts)
     for i,v in pairs(command_registry) do
-        if ts-i >= 20 then
+        local lim = 20 -- 20 second default limit (good for spells?)
+        if v.spell and v.spell.action_type then
+            if delay_map_to_action_type[v.spell.action_type] then
+                lim = delay_map_to_action_type[v.spell.action_type]
+            end
+        end
+        if ts-i >= lim then
             command_registry[i] = nil
         end
     end
@@ -485,8 +736,8 @@ function find_command_registry_key(typ,value)
                 potential_entries[i] = v.timestamp or 0
             elseif v.spell and v.spell.name == 'Double-Up' and value.type == 'CorsairRoll' then
                 -- Double Up ability uses will return action packets that match Corsair Rolls rather than Double Up
-				potential_entries[i] = v.timestamp or 0
-			end
+                potential_entries[i] = v.timestamp or 0
+            end
         end
         for i,v in pairs(potential_entries) do
             if not winner or (current_time - v < current_time - winner) then
@@ -528,7 +779,7 @@ function find_command_registry_by_time(target)
     -- possible that matches the target type.
     -- Call aftercast with this spell's information (interrupted) if one is found.
     for i,v in pairs(command_registry) do
-        if not time_stamp or (v.timestamp and ((time_now - v.timestamp) < (time_now - time_stamp))) then -- (target == 'player' and v.midaction or target=='pet' and v.pet_midaction) and v.timestamp and 
+        if not time_stamp or (v.timestamp and ((time_now - v.timestamp) < (time_now - time_stamp))) then
             time_stamp = v.timestamp
             ts = i
         end
@@ -564,6 +815,23 @@ end
 
 
 -----------------------------------------------------------------------------------
+--Name: copy_entry(tab)
+--Desc: Copies a table into a new table while preserving its metatable.
+--      Designed for copying resources entries.
+--Args:
+---- tab - Resources table.
+-----------------------------------------------------------------------------------
+--Returns:
+---- ret - New table that has the same metatable and content as the original table.
+-----------------------------------------------------------------------------------
+function copy_entry(tab)
+    if not tab then return nil end
+    local ret = setmetatable(table.reassign({},tab),getmetatable(tab))
+    return ret
+end
+
+
+-----------------------------------------------------------------------------------
 --Name: get_spell(act)
 --Desc: Takes an action table and returns a modified resource line
 --Args:
@@ -573,7 +841,7 @@ end
 ---- spell - Resource line of the current spell
 -----------------------------------------------------------------------------------
 function get_spell(act)
-    local spell, abil_ID, effect_val = {}
+    local spell, abil_ID, effect_val
     local msg_ID = act.targets[1].actions[1].message
     
     if T{7,8,9}:contains(act.category) then
@@ -581,75 +849,83 @@ function get_spell(act)
     elseif T{3,4,5,6,11,13,14,15}:contains(act.category) then
         abil_ID = act.param
         effect_val = act.targets[1].actions[1].param
-    elseif act.category == 12 or act.category == 2 then
-        abil_ID = 1
     end
     
     if act.category == 12 or act.category == 2 then
-        spell = res.abilities[abil_ID]
+        spell = copy_entry(resources_ranged_attack)
     else
-        if not res.action_messages[msg_ID] then
+        if not res.action_messages[msg_ID] or msg_ID == 31 then
             if act.category == 4 or act.category == 8 then
-                spell = res.spells[abil_ID]
+                spell = copy_entry(res.spells[abil_ID])
                 if act.category == 4 and spell then spell.recast = act.recast end
-            elseif T{2,3,6,7,12,13,14,15}:contains(act.category) then
-                spell = res.abilities[abil_ID] -- May have to correct for charmed pets some day, but I'm not sure there are any monsters with TP moves that give no message.
+            elseif T{6,13,14,15}:contains(act.category) then
+                spell = copy_entry(res.job_abilities[abil_ID]) -- May have to correct for charmed pets some day, but I'm not sure there are any monsters with TP moves that give no message.
+            elseif T{3,7}:contains(act.category) then
+                spell = copy_entry(res.weapon_skills[abil_ID])
             elseif T{5,9}:contains(act.category) then
-                spell = res.items[abil_ID]
+                spell = copy_entry(res.items[abil_ID])
             else
-                spell = {name=tostring(msg_ID)} -- Debugging
+                spell = {name=tostring(msg_ID)}
             end
             return spell
         end
         
         
-        local fields = fieldsearch(res.action_messages[msg_ID][language])
-
+        local fields = fieldsearch(res.action_messages[msg_ID].english) -- ENGLISH
+        
         if table.contains(fields,'spell') then
-            spell = res.spells[abil_ID]
+            spell = copy_entry(res.spells[abil_ID])
             if act.category == 4 then spell.recast = act.recast end
         elseif table.contains(fields,'ability') then
-            spell = res.abilities[abil_ID]
+            spell = copy_entry(res.job_abilities[abil_ID])
         elseif table.contains(fields,'weapon_skill') then
             if abil_ID > 255 then -- WZ_RECOVER_ALL is used by chests in Limbus
-                spell = res.monster_abilities[abil_ID-256]
-                if spell.english == '.' then
-                    spell.english = 'Special Attack'
+                spell = copy_entry(res.monster_abilities[abil_ID])
+                if not spell then
+                    spell = {id=abil_ID,english='Special Attack'}
                 end
             elseif abil_ID < 256 then
-                spell = res.abilities[abil_ID+768]
+                spell = copy_entry(res.weapon_skills[abil_ID])
             end
         elseif msg_ID == 303 then
-            spell = res.abilities[74] -- Divine Seal
+            spell = copy_entry(res.job_abilities[74]) -- Divine Seal
         elseif msg_ID == 304 then
-            spell = res.abilities[75] -- 'Elemental Seal'
+            spell = copy_entry(res.job_abilities[75]) -- 'Elemental Seal'
         elseif msg_ID == 305 then
-            spell = res.abilities[76] -- 'Trick Attack'
+            spell = copy_entry(res.job_abilities[76]) -- 'Trick Attack'
         elseif msg_ID == 311 or msg_ID == 311 then
-            spell = res.abilities[79] -- 'Cover'
+            spell = copy_entry(res.job_abilities[79]) -- 'Cover'
         elseif msg_ID == 240 or msg_ID == 241 then
-            spell = res.abilities[43] -- 'Hide'
+            spell = copy_entry(res.job_abilities[43]) -- 'Hide'
+        elseif msg_ID == 244 then
+            spell = copy_entry(res.job_abilities[act.param]) -- Mug failures
         elseif msg_ID == 328 then
-            spell = res.abilities[effect_val] -- BPs that are out of range
+            spell = copy_entry(res.job_abilities[effect_val]) -- BPs that are out of range
         end
         
         
         if table.contains(fields,'item') then
-            spell = res.items[abil_ID]
+            if spell then
+                spell.item = copy_entry(res.items[effect_val])
+            else
+                spell = copy_entry(res.items[abil_ID])
+            end
         else
-            spell = aftercast_cost(spell)
+            spell = spell_complete(spell)
         end
     end
-        
-    spell.name = spell[language]
-    spell.interrupted = false
+    
+    if spell then
+        spell.name = spell[language]
+        spell.interrupted = false
+    end
     
     return spell
 end
 
 
 -----------------------------------------------------------------------------------
---Name: aftercast_cost(rline)
+--Name: spell_complete(rline)
 --Desc: Takes a resource line and modifies it so it includes aftercast cost and
 --      a few other values
 --Args:
@@ -658,12 +934,24 @@ end
 --Returns:
 ---- rline - modified resource line
 -----------------------------------------------------------------------------------
-function aftercast_cost(rline)
+function spell_complete(rline)
     if rline == nil then
         return {tpaftercast = player.tp, mpaftercast = player.mp, mppaftercast = player.mpp}
     end
     if not rline.mp_cost or rline.mp_cost == -1 then rline.mp_cost = 0 end
-    if not rline.tp_cost or rline.tp_cost == -1 then rline.tp_cost = 0 end
+    if not rline.tp_cost and rline.type == 'WeaponSkill' then
+        rline.tp_cost = player.tp
+    elseif not rline.tp_cost or rline.tp_cost == -1 then
+        rline.tp_cost = 0
+    end
+    
+    if rline.skill and tonumber(rline.skill) then
+        rline.skill = res.skills[rline.skill][language]
+    end
+    
+    if rline.element and tonumber(rline.element) then
+        rline.element = res.elements[rline.element][language]
+    end
     
     if rline.tp_cost == 0 then rline.tpaftercast = player.tp else
     rline.tpaftercast = player.tp - rline.tp_cost end
@@ -691,7 +979,7 @@ end
 -----------------------------------------------------------------------------------
 function debug_mode_chat(message)
     if _settings.debug_mode then
-        windower.add_to_chat(8,"GearSwap (Debug Mode): "..message)
+        windower.add_to_chat(8,"GearSwap (Debug Mode): "..windower.to_shift_jis(tostring(message)))
     end
 end
 
@@ -705,7 +993,100 @@ end
 --Returns:
 ---- none
 -----------------------------------------------------------------------------------
-function logit(file,str)
-    file:write(str)
-    file:flush()
+function logit(str)
+    if logging then
+        logfile:write(str)
+        logfile:flush()
+    end
+end
+
+
+
+-----------------------------------------------------------------------------------
+--Name: prioritize()
+--Args:
+---- priority_list (table): Current list of slot priorities
+---- slot_id (number): Desired order of the piece of equipment
+---- priority (number): Name for the slot
+-----------------------------------------------------------------------------------
+--Returns:
+---- none
+-----------------------------------------------------------------------------------
+function prioritize(priority_list,slot_id,priority)
+    if priority and tonumber(priority) then -- Check that priority is number
+        rawset(priority_list,slot_id,priority)
+        return
+    elseif priority then
+        windower.add_to_chat(123,'GearSwap: Invalid priority ('..tostring(priority)..') given')
+    end
+    rawset(priority_list,slot_id,0)
+end
+
+
+
+-----------------------------------------------------------------------------------
+--Name: priority_order()
+--Args:
+---- priority_list (table): Current list of slot priorities
+-----------------------------------------------------------------------------------
+--Returns:
+---- slot_id : Number from 0~15
+-----------------------------------------------------------------------------------
+function priority_order(priority_list)
+    return function ()
+        local maximum,slot_id = -math.huge
+        for i=0,15 do
+            if priority_list[i] and (priority_list[i] > maximum or (priority_list[i] == maximum and priority_list[i] == -math.huge)) then
+                maximum = priority_list[i]
+                slot_id = i
+            end
+        end
+        if not slot_id then return end
+        priority_list[slot_id] = nil
+        return slot_id,maximum
+    end
+end
+
+
+
+-----------------------------------------------------------------------------------
+--Name: toslotname(slot_id)
+--Args:
+---- slot_id: Number from 0-15 representing the slot
+-----------------------------------------------------------------------------------
+--Returns:
+---- slot name (string)
+-----------------------------------------------------------------------------------
+function toslotname(slot_id)
+    return default_slot_map[slot_id]
+end
+
+
+
+-----------------------------------------------------------------------------------
+--Name: toslotid(slot_name)
+--Args:
+---- slot_name: proposed slot name
+-----------------------------------------------------------------------------------
+--Returns:
+---- slot id (whole number from 0-15)
+-----------------------------------------------------------------------------------
+function toslotid(slot_name)
+    return slot_map[slot_name]
+end
+
+
+
+-----------------------------------------------------------------------------------
+--Name: windower.debug(...)
+--Args:
+---- ...: Anything, to be passed to the real windower.debug if the windower_debugging
+---- flag is set.
+-----------------------------------------------------------------------------------
+--Returns:
+---- Nothing
+-----------------------------------------------------------------------------------
+windower.__raw = {debug = windower.debug}
+windower.debug = function(...)
+    if debugging.windower_debug then __raw.debug(...) end
 end

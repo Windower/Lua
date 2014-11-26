@@ -91,10 +91,15 @@ lead_byte_class = '['..lead_bytes:map(string.char):concat()..']'
 newline_regex = '(?<!'..lead_byte_class..')['..string.char(0x07, 0x0A)..']'
 
 defaults = {}
-defaults.color  = 508
+defaults.color  = 201
 defaults.format = '[${time}]'
 
 settings = config.load(defaults)
+-- Remove after a while
+if settings.color == 508 then
+    settings.color = 201
+    config.save(settings)
+end
 
 function make_timestamp(format)
     return os.date((format:gsub('%${([%l%d_]+)}', constants)))

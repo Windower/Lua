@@ -69,24 +69,13 @@ ohShi_tb = texts.new(settings)
 --create tables to be used throughout the addon
 tracking = T{}
 prims = S{}
-spells = {}
-jAbils = {}
-stats = {}
+--[[ keeping in case the function below doesn't work.
 trusts = S{'Kupipi','Excenmille','Naji','Ayame','Zeid','Curilla',
-            'Nanaamihgo','Trion','Shantotto','Volker','Ajidomarujido',
-            'Mihlialiapoh','Valaineral','Joachim','Lion','Prishe','Ulmia',
-            'Ironeater','Gadalar','Najasalaheem','Cherukiki','Nashmeira',
-            'Zazarg','Ingrid','Lhekohabhoka','Ovjang','Mnejing','Sakura',
-            'Luzaf','Najelith'}
-
-speFName = '../../plugins/resources/spells.xml'
-staFName = '../../plugins/resources/status.xml'
-jaFName = '../../plugins/resources/abils.xml'
-
-speFile = files.new(speFName)
-staFile = files.new(staFName)
-jaFile = files.new(jaFName)
-
---Save settings on load (in case this is first run)
-settings:save('all')
-
+            'NanaaMihgo','Trion','Shantotto','Volker','Ajido-Marujido',
+            'MihliAliapoh','Valaineral','Joachim','Lion','Prishe','Ulmia',
+            'Ironeater','Gadalar','NajaSalaheem','Cherukiki','Nashmeira',
+            'Zazarg','Ingrid','LhekoHabhoka','Ovjang','Mnejing','Sakura',
+            'Luzaf','Najelith', 'Maat','Gessho','Aldo','Moogle','Fablinix',
+            'D.Shantotto','Elvira','Noillurie','LhuMhakaracca','FerreousCoffin',
+            'StarSibyl','Mumor'}]]
+ trusts = S(res.spells:type('Trust'):map(string.gsub-{' ', ''} .. table.get-{'name'}))

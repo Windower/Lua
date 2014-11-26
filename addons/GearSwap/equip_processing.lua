@@ -24,41 +24,36 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+-----------------------------------------------------------------------------------
+--Name: check_wearable(item_id)
+--Args:
+---- item_id - Item ID to be examined
+-----------------------------------------------------------------------------------
+--Returns:
+---- boolean indicating whether the given piece of gear can be worn or not
+----    Checks for main job / level and race
+-----------------------------------------------------------------------------------
 function check_wearable(item_id)
     if not item_id or item_id == 0 then -- 0 codes for an empty slot, but Arcon will probably make it nil at some point
     elseif not res.items[item_id] then
-        debug_mode_chat("Item '..item_id..' has not been added to resources yet.")
+        debug_mode_chat("Item "..item_id.." has not been added to resources yet.")
     elseif not res.items[item_id].jobs then -- Make sure item can be equipped by specific jobs (unlike pearlsacks).
         --debug_mode_chat('GearSwap (Debug Mode): Item '..(res.items[item_id][language] or item_id)..' does not have a jobs field in the resources.')
     else
-        return (res.items[item_id].jobs[player.main_job_id]) and (res.items[item_id].level<=player.main_job_level) and (res.items[item_id].races[player.race_id])
+        return (res.items[item_id].jobs[player.main_job_id]) and (res.items[item_id].level<=player.jobs[res.jobs[player.main_job_id].ens]) and (res.items[item_id].races[player.race_id])
     end
     return false
 end
 
-function expand_entry(v)
-    if not v then
-        return
-    end
-    local extgoal_1,extgoal_2,name,order = {},{}
-    if type(v) == 'table' and v == empty then
-        name = empty
-    elseif type(v) == 'table' and v.name then
-        name = v.name
-        order = v.order
-        if v.augments then
-            for n,m in pairs(v.augments) do
-                extgoal_1[n],extgoal_2[n] = augment_to_extdata(m)
-            end
-        elseif v.augment then
-            extgoal_1[1],extgoal_2[1] = augment_to_extdata(v.augment)
-        end
-    elseif type(v) == 'string' and v ~= '' then
-        name = v
-    end
-    return name,order,extgoal_1,extgoal_2 -- nil, nil, {}, {} if they don't exist
-end
-
+-----------------------------------------------------------------------------------
+--Name: name_match(item_id,name)
+--Args:
+---- item_id - Item ID to be compared
+---- name - Name to be compared
+-----------------------------------------------------------------------------------
+--Returns:
+---- boolean indicating whether the name matches the resources entry for the itemID
+-----------------------------------------------------------------------------------
 function name_match(item_id,name)
     if res.items[item_id] then
         return (res.items[item_id][language..'_log']:lower() == name:lower() or res.items[item_id][language]:lower() == name:lower())
@@ -68,7 +63,42 @@ function name_match(item_id,name)
 end
 
 -----------------------------------------------------------------------------------
---Name: to_id_set(inventory,equip_list)
+--Name: expand_entry(v)
+--Args:
+---- entry - Table or string ostensibly from an equipment set
+-----------------------------------------------------------------------------------
+--Returns:
+---- name - Name of the current piece of equipment
+---- priority - Priority of the current piece as defined in the advanced table
+---- augments - Augments for the current piece as defined in the advanced table
+-----------------------------------------------------------------------------------
+function expand_entry(entry)
+    if not entry then
+        return
+    end
+    local augments,name,priority,bag
+    if type(entry) == 'table' and entry == empty then
+        name = empty
+    elseif type(entry) == 'table' and entry.name and type(entry.name) == 'string' then
+        name = entry.name
+        priority = entry.priority
+        if entry.augments then
+            augments = entry.augments
+        elseif entry.augment then
+            augments = {entry.augment}
+        end
+        if entry.bag and type(entry.bag) == 'string' then
+            local bag_list = {inventory = 0, wardrobe = 8}
+            bag = bag_list[entry.bag:lower()]
+        end
+    elseif type(entry) == 'string' and entry ~= '' then
+        name = entry
+    end
+    return name,priority,augments,bag -- all nil if they don't exist
+end
+
+-----------------------------------------------------------------------------------
+--Name: unpack_equip_list(inventory,equip_list)
 --Args:
 ---- inventory - Current inventory (potentially avoids a get_items() call)
 ---- equip_list - Keys are standard slot names, values are item names.
@@ -76,110 +106,87 @@ end
 --Returns:
 ---- Table with keys that are slot numbers with values that are inventory slot #s.
 -----------------------------------------------------------------------------------
-function to_id_set(inventory,equip_list)
+function unpack_equip_list(equip_list)
     local ret_list = {}
     local error_list = {}
-    for i,v in pairs(short_slot_map) do
-        local name,order,extgoal_1,extgoal_2 = expand_entry(equip_list[i])
-        if name == empty or name =='empty' then
-            ret_list[v] = 0
-            reorder(order,i)
-            equip_list[i] = nil
+    local priorities = setmetatable({},{__newindex=prioritize})
+    for slot_id,slot_name in pairs(default_slot_map) do
+        local name,priority,extgoal_1,extgoal_2 = expand_entry(equip_list[slot_name])
+        priorities[slot_id] = priority
+        if name == empty then
+            ret_list[slot_id] = {bag_id=0,slot=empty}
+            equip_list[slot_name] = nil
         end
     end
-    for n,m in pairs(inventory) do
-        if check_wearable(m.id) then
-            if m.status == 0 or m.status == 5 then -- Make sure the item is either equipped or not otherwise committed. eliminate_redundant will take care of the already-equipped gear.
-                for i,v in pairs(short_slot_map) do
-                    -- equip_list[i] can also be a table (that doesn't contain a "name" property) or a number, which are both cases that should not generate any kind of equipment changing.
-                    -- Hence the "and name" below.
-                    
-                    if not ret_list[v] and equip_list[i] then 
-                        local name,order,extgoal_1,extgoal_2 = expand_entry(equip_list[i])
+    
+    local inventories = {[0]=items.inventory,[8]=items.wardrobe}
+    
+    for bag_id,inventory in pairs(inventories) do
+        for _,item_tab in pairs(inventory) do
+            if check_wearable(item_tab.id) then
+                if item_tab.status == 0 or item_tab.status == 5 then -- Make sure the item is either equipped or not otherwise committed. eliminate_redundant will take care of the already-equipped gear.
+                    for slot_id,slot_name in pairs(default_slot_map) do
+                        -- equip_list[slot_name] can also be a table (that doesn't contain a "name" property) or a number, which are both cases that should not generate any kind of equipment changing.
+                        -- Hence the "and name" below.
                         
-                        if name and name_match(m.id,name) then
-                            if res.items[m.id].slots[v] then
-                                if #extgoal_1 ~= 0 or #extgoal_2 ~=0 then
-                                    local exttemp = m.extdata
-                                    local count = 0
-
-                                    for o,q in pairs(extgoal_1) do
-                                    --  It appears only the first five bits are used for augment value.
-                                    --    local first,second,third = string.char(m.extdata:byte(4)%32), string.char(m.extdata:byte(6)%32), string.char(m.extdata:byte(8)%32)
-                                    --    local exttemp = m.extdata:sub(1,3)..first..m.extdata:sub(5,5)..second..m.extdata:sub(7,7)..third..m.extdata:sub(9)
-                                        if exttemp:sub(3,4) == q or exttemp:sub(5,6) == q or exttemp:sub(7,8) == q then
-                                            count = count +1
-                                        end
-                                    end
-                                    if count == #extgoal_1 then
-                                        equip_list[i] = nil
-                                        ret_list[v] = m.slot
-                                        reorder(order,i)
-                                        break
-                                    elseif #extgoal_2 ~= 0 then
-                                        count = 0
-                                        for o,q in pairs(extgoal_2) do
-                                        --  It appears only the first five bits are used for augment value.
-                                        --    local first,second,third = string.char(m.extdata:byte(4)%32), string.char(m.extdata:byte(6)%32), string.char(m.extdata:byte(8)%32)
-                                        --    local exttemp = m.extdata:sub(1,3)..first..m.extdata:sub(5,5)..second..m.extdata:sub(7,7)..third..m.extdata:sub(9)
-                                            if exttemp:sub(7,8) == q or exttemp:sub(9,10) == q or exttemp:sub(11,12) == q then
-                                                count = count +1
-                                            end
-                                        end
-                                        if count == #extgoal_2 then
-                                            equip_list[i] = nil
-                                            ret_list[v] = m.slot
-                                            reorder(order,i)
+                        if not ret_list[slot_id] and equip_list[slot_name] then 
+                            local name,priority,augments,bag = expand_entry(equip_list[slot_name])
+                            
+                            if (not bag or bag == bag_id) and name and name_match(item_tab.id,name) then
+                                if res.items[item_tab.id].slots[slot_id] then
+                                    if augments and #augments ~=0 then
+                                        if compare_augments(augments,extdata.decode(item_tab).augments) then
+                                            equip_list[slot_name] = nil
+                                            ret_list[slot_id] = {bag_id=bag_id,slot=item_tab.slot}
                                             break
                                         end
+                                    else
+                                        equip_list[slot_name] = nil
+                                        ret_list[slot_id] = {bag_id=bag_id,slot=item_tab.slot}
+                                        break
                                     end
                                 else
-                                    equip_list[i] = nil
-                                    ret_list[v] = m.slot
-                                    reorder(order,i)
+                                    equip_list[slot_name] = nil
+                                    error_list[slot_name] = name..' (cannot be worn in this slot)'
                                     break
                                 end
-                            elseif not res.items[m.id].slots[v] then
-                                equip_list[i] = nil
-                                error_list[i] = name..' (cannot be worn in this slot)'
+                            end
+                        end
+                    end
+                elseif item_tab.status > 0 then
+                    for __,slot_name in pairs(default_slot_map) do
+                        local name = expand_entry(equip_list[slot_name])
+                        if name and name ~= empty then -- If "name" isn't a piece of gear, then it won't have a valid value at this point and should be ignored.
+                            if name_match(item_tab.id,name) then
+                                if item_tab.status == 5 then
+                                    error_list[slot_name] = name..' (equipped)'
+                                elseif item_tab.status == 25 then
+                                    error_list[slot_name] = name..' (bazaared)'
+                                else
+                                    error_list[slot_name] = name..' (status unknown: '..item_tab.status..' )'
+                                end
                                 break
                             end
                         end
                     end
                 end
-            elseif m.status > 0 then
-                for i,v in pairs(short_slot_map) do
-                    local name = expand_entry(equip_list[i])
-                    if name and name ~= empty then -- If "name" isn't a piece of gear, then it won't have a valid value at this point and should be ignored.
-                        if name_match(m.id,name) then
-                            if m.status == 5 then
-                                error_list[i] = name..' (equipped)'
-                            elseif m.status == 25 then
-                                error_list[i] = name..' (bazaared)'
-                            else
-                                error_list[i] = name..' (status unknown: '..m.status..' )'
-                            end
-                            break
+            else
+                for __,slot_name in pairs(default_slot_map) do
+                    local name = expand_entry(equip_list[slot_name])
+                    if name == empty then
+                    elseif name_match(item_id,name) then
+                        if not res.items[item_tab.id].jobs[player.main_job_id] then
+                            equip_list[slot_name] = nil
+                            error_list[slot_name] = name..' (cannot be worn by this job)'
+                        elseif not (res.items[item_tab.id].level<=player.jobs[player.main_job]) then
+                            equip_list[slot_name] = nil
+                            error_list[slot_name] = name..' (job level is too low)'
+                        elseif not res.items[item_tab.id].races[player.race_id] then
+                            equip_list[slot_name] = nil
+                            error_list[slot_name] = name..' (cannot be worn by your race)'
                         end
+                        break
                     end
-                end
-            end
-        else
-            for i,v in pairs(short_slot_map) do
-                local name = expand_entry(equip_list[i])
-                if name == empty then
-                elseif name_match(item_id,name) then
-                    if not res.items[m.id].jobs[player.main_job_id] then
-                        equip_list[i] = nil
-                        error_list[i] = name..' (cannot be worn by this job)'
-                    elseif not (res.items[m.id].level<=player.main_job_level) then
-                        equip_list[i] = nil
-                        error_list[i] = name..' (job level is too low)'
-                    elseif not res.items[m.id].races[player.race_id] then
-                        equip_list[i] = nil
-                        error_list[i] = name..' (cannot be worn by your race)'
-                    end
-                    break
                 end
             end
         end
@@ -192,32 +199,83 @@ function to_id_set(inventory,equip_list)
         print_set(equip_list,'Debug Mode (gear not equipped)')
     end
     
-    return ret_list
+    return ret_list,priorities
 end
 
-function reorder(order,i)
-    if order and order < 17 and order > 0 then
-        local temp_order
-        for o,q in pairs(equip_order) do
-            if q == slot_map[i] then
-                temp_order = o -- o is the current slot of the item being redefined.
-                break
+
+-----------------------------------------------------------------------------------
+--Name: compare_augments(goal,current)
+--Args:
+---- goal - First set of augments
+---- current - Second set of augments
+-----------------------------------------------------------------------------------
+--Returns:
+---- boolean indicating whether the goal augments are contained within the
+----    current augments. Will return false if there are excess goal augments
+----    or the goal augments do not match the current augments.
+-----------------------------------------------------------------------------------
+function compare_augments(goal,current)
+    if not current then return false end
+    local num_augments = 0
+    local aug_strip = function(str)
+        return str:lower():gsub('[^%-%w,]','')
+    end 
+    for aug_ind,augment in pairs(current) do
+        if augment == 'none' then
+            current[aug_ind] = nil
+        else
+            num_augments = num_augments + 1
+        end
+    end
+    if num_augments < #goal then
+        return false
+    else
+        local count = 0
+        for goal_ind,goal_aug in pairs(goal) do
+            local bool
+            for cur_ind,cur_aug in pairs(current) do
+                if aug_strip(goal_aug) == aug_strip(cur_aug) then
+                    bool = true
+                    count = count +1
+                    current[cur_ind] = nil
+                    break
+                end
+            end
+            if not bool then
+                return false
             end
         end
-        equip_order[temp_order] = equip_order[order]
-        equip_order[order] = slot_map[i]
-    elseif order then
-        windower.add_to_chat(123,'GearSwap: Invalid order given')
+        if count == #goal then
+            return true
+        else
+            return false
+        end
     end
 end
 
-function eliminate_redundant(current_gear,equip_next) -- Eliminates gear you already wear from the table
-    for i,v in pairs(current_gear) do
-        if v == empty and (equip_next[slot_map[i]] == 0 or equip_next[slot_map[i]] == empty) then
-            equip_next[slot_map[i]] = nil
+
+-----------------------------------------------------------------------------------
+--Name: eliminate_redundant(current_gear,equip_next)
+--Args:
+---- current_gear - Mapping of currently worn equipment
+---- equip_next   - Mapping of equipment that you want to equip
+-----------------------------------------------------------------------------------
+--Returns:
+---- Set with all duplicate entries eliminated.
+---- empty tables are processed separately, because an unlimited number can be equipped.
+-----------------------------------------------------------------------------------
+function eliminate_redundant(current_gear,equip_next)
+    for eq_slot,cur_item in pairs(current_gear) do
+        if cur_item.slot == empty then
+            if equip_next[slot_map[eq_slot]] and equip_next[slot_map[eq_slot]].slot == empty then
+                equip_next[slot_map[eq_slot]] = nil
+            end
         else
             for n,m in pairs(equip_next) do
-                if v==m and v ~= 0 then
+                if m.slot ~= empty and cur_item.bag_id == m.bag_id and cur_item.slot==m.slot then
+                    -- If it is already equipped somewhere else, eliminate it.
+                    -- Could add more complicated handling here to control the order of equipped
+                    -- gear and allow people to do things like swap fingers for rings.
                     equip_next[n] = nil
                 end
             end
@@ -226,50 +284,65 @@ function eliminate_redundant(current_gear,equip_next) -- Eliminates gear you alr
     return equip_next
 end
 
-function to_names_set(id_id,inventory)
+
+-----------------------------------------------------------------------------------
+--Name: to_names_set(equipment)
+--Args:
+---- equipment - Mapping of equipment slot ID or slot name to a table containing
+----   bag_id and inventory slot ID. If already indexed to a number, treat it as a slot index.
+----   Otherwise, damn the torpedoes and tostring it.
+-----------------------------------------------------------------------------------
+--Returns:
+---- Set with a mapping of slot name to equipment name.
+---- 'empty' is used as a replacement for the empty table.
+-----------------------------------------------------------------------------------
+function to_names_set(equipment)
     local equip_package = {}
-    for i,v in pairs(id_id) do
-        if v~=0 and v~=empty then
-            if inventory[v].id == 0 then
-                equip_package[i]=''
-            elseif type(i) ~= 'string' then
-                equip_package[default_slot_map[i]] = res.items[inventory[v].id][language]
-            else
-                equip_package[i]=res.items[inventory[v].id][language]
-            end
+    
+    for ind,cur_item in pairs(equipment) do
+        local name = 'empty'
+        if cur_item.slot ~= empty then
+            if items[to_windower_api(res.bags[cur_item.bag_id].english)][cur_item.slot].id == 0 then return {} end
+            -- refresh_player() can run after equip packets arrive but before the item array is fully loaded,
+            -- which results in the id still being the initialization value.
+            name = res.items[items[to_windower_api(res.bags[cur_item.bag_id].english)][cur_item.slot].id][language]
+        end
+        
+        if tonumber(ind) and ind >= 0 and ind <= 15 and math.floor(ind) == ind then
+            equip_package[toslotname(ind)] = name
         else
-            if type(i)~= 'string' then
-                equip_package[default_slot_map[i]] = 'empty'
-            else
-                equip_package[i]='empty'
-            end
+            equip_package[tostring(ind)] = name
         end
     end
-    
+
     return equip_package
 end
 
-function get_gs_gear(cur_equip,swap_type)
-    local temp_set = table.reassign({},cur_equip)
-    local sent_out_box = 'Going into '..swap_type..':\n' -- i = 'head', 'feet', etc.; v = inventory ID (0~80)
-    -- If the swap is not complete, overwrite the current equipment with the equipment that you are swapping to
---    local not_sent_ids = to_id_set(items.inventory,not_sent_out_equip)
 
-    for i,v in pairs(cur_equip) do
-        if limbo_equip[short_slot_map[i]] then
-            cur_equip[i] = limbo_equip[short_slot_map[i]]
-        elseif sent_out_equip[short_slot_map[i]] then
-            cur_equip[i] = sent_out_equip[short_slot_map[i]]
---        elseif not_sent_ids[short_slot_map[i]] then
---            cur_equip[i] = not_sent_ids[short_slot_map[i]]
-        end
-        if v == 0 or v == 'empty' then
-            cur_equip[i] = empty
-        end
-        if v and v ~= 0 and debugging > 0 and items.inventory[v] and res.items[items.inventory[v].id] then
-            sent_out_box = sent_out_box..tostring(i)..' '..tostring(res.items[items.inventory[v].id].english)..'\n'
-        end
+-----------------------------------------------------------------------------------
+--Name: equip_piece(eq_slot_id,bag_id,inv_slot_id)
+--Desc: Cleans up the global table and leaves equip_sets properly.
+--Args:
+---- eq_slot_id - Equipment Slot ID
+---- bag_id - Bag ID of the item to be equipped
+---- inv_slot_id - Inventory Slot ID of the item to be equipped
+-----------------------------------------------------------------------------------
+--Returns:
+---- none
+-----------------------------------------------------------------------------------
+function equip_piece(eq_slot_id,bag_id,inv_slot_id)
+    local cur_eq_tab = items.equipment[toslotname(eq_slot_id)]
+    
+    if cur_eq_tab.slot ~= empty then
+        items[to_windower_api(res.bags[cur_eq_tab.bag_id].english)][cur_eq_tab.slot].status = 0
     end
-    if debugging > 0 and type(swap_type) == 'string' then windower.text.set_text(swap_type,sent_out_box) end
-    return cur_equip
+    
+    if inv_slot_id ~= empty then
+        items.equipment[toslotname(eq_slot_id)] = {slot=inv_slot_id,bag_id=bag_id}
+        items[to_windower_api(res.bags[bag_id].english)][inv_slot_id].status = 5
+        return string.char(inv_slot_id,eq_slot_id,bag_id,0)
+    else
+        items.equipment[toslotname(eq_slot_id)] = {slot=empty,bag_id=0}
+        return string.char(0,eq_slot_id,0,0)
+    end
 end

@@ -1,5 +1,5 @@
 --[[
-plasmon v1.20131021
+plasmon v1.20140530
 
 Copyright (c) 2013, Giuliano Riccio
 All rights reserved.
@@ -28,15 +28,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-require 'chat'
-require 'logger'
-
-local config = require 'config'
-
+require('logger')
+config = require('config')
 
 _addon.name    = 'plasmon'
 _addon.author  = 'Zohno'
-_addon.version = '1.20131021'
+_addon.version = '1.20140530'
 _addon.command = 'plasmon'
 
 tb_name       = 'addon:gr:plasmon'
@@ -270,7 +267,7 @@ function initialize()
     windower.text.set_text(tb_name, '')
     windower.text.set_bg_visibility(tb_name, true)
 
-    if windower.ffxi.get_info().zone == 271 then
+    if windower.ffxi.get_info().zone == 271 or windower.ffxi.get_info().zone == 264 then
         recovery_mode = true
     end
 end
@@ -288,7 +285,7 @@ windower.register_event('login', initialize)
 
 windower.register_event('logout', 'unload', dispose)
 
-windower.register_event('zone change', stop_tracking:cond(function(id) return (id == 271) or (id == 264) and track end))
+windower.register_event('zone change', stop_tracking:cond(function(_,id) return (id == 271 or id == 264) and track end))
 
 windower.register_event('incoming text', function(original, modified, mode)
     local match
@@ -308,7 +305,7 @@ windower.register_event('incoming text', function(original, modified, mode)
                 stats.plasm     = stats.plasm + match
                 stats.tot_plasm = stats.tot_plasm + match
 
-                if match ~= 50 and match % 500 ~= 0 and match % 750 ~= 0 and match % 10000 ~= 0 then
+                if match % 50 == 0 and match % 500 ~= 0 and match % 750 ~= 0 and match % 10000 ~= 0 then
                     mobs = match / 50
                 else
                     mobs = 1
@@ -371,9 +368,18 @@ windower.register_event('incoming text', function(original, modified, mode)
                 return modified, mode
             end
         end
-    elseif mode == 148 or mode == 151 then
+    elseif mode > 20 then
+    --mode == 148 or mode == 151 then
+        --old zones
         match = original:match('Now permeating the mists surrounding the fracture%.')
+        if match then
+            start_tracking()
 
+            return modified, mode
+        end
+
+        --new zones
+        match = original:match('Now permeating the mists surrounding the obscured domain%.')
         if match then
             start_tracking()
 
@@ -395,18 +401,18 @@ windower.register_event('addon command', function(...)
     local cmd = args:remove(1):lower()
 
     if cmd == 'help' then
-        log(chat.chars.wsquare..' plasmon help -- shows the help text.')
-        log(chat.chars.wsquare..' plasmon test -- fills the chat log with some messages to show how the plugin will work.')
-        log(chat.chars.wsquare..' plasmon reset -- sets current gained plasm, monster kill count and dropped airlixirs to 0.')
-        log(chat.chars.wsquare..' plasmon full-reset --  sets both current and total gained plasm, monster kill count and dropped airlixirs to 0.')
-        log(chat.chars.wsquare..' plasmon show -- shows the tracking window.')
-        log(chat.chars.wsquare..' plasmon hide -- hides the tracking window.')
-        log(chat.chars.wsquare..' plasmon toggle -- toggles the tracking window\'s visibility.')
-        log(chat.chars.wsquare..' plasmon light [<enabled>] -- enables or disables light mode. When enabled, the addon will never show the window and just print a summary in the chat box at the end of the run. If the enabled parameter is not specified, the help text will be shown.')
-        log(chat.chars.wsquare..' plasmon timer [<enabled>] -- enables or disables the timer. When enabled, the addon will start a 45 minutes timer when entering a fracture. If the enabled parameter is not specified, the help text will be shown.')
-        log(chat.chars.wsquare..' plasmon position [[-h]|[-x <x>] [-y <y>]] -- sets the horizontal and vertical position of the window relative to the upper-left corner. If no parameter is specified, the help text will be shown.')
-        log(chat.chars.wsquare..' plasmon font [[-h]|[-f <font>] [-s <size>] [-a <alpha>] [-b [<bold>]] [-i [<italic>]]] -- sets the style of the font used in the window. If the no parameter is specified, the help text will be shown.')
-        log(chat.chars.wsquare..' plasmon color [[-h]|[-o <objects>] [-d] [-r <red>] [-g <green>] [-b <blue>] [-a <alpha>]] -- sets the colors of the various elements present in the addon\'s window. If no parameter is specified, the help text will be shown.')
+        log('    help -- shows the help text.')
+        log('    test -- fills the chat log with some messages to show how the plugin will work.')
+        log('    reset -- sets current gained plasm, monster kill count and dropped airlixirs to 0.')
+        log('    full-reset --  sets both current and total gained plasm, monster kill count and dropped airlixirs to 0.')
+        log('    show -- shows the tracking window.')
+        log('    hide -- hides the tracking window.')
+        log('    toggle -- toggles the tracking window\'s visibility.')
+        log('    light [<enabled>] -- enables or disables light mode. When enabled, the addon will never show the window and just print a summary in the chat box at the end of the run. If the enabled parameter is not specified, the help text will be shown.')
+        log('    timer [<enabled>] -- enables or disables the timer. When enabled, the addon will start a 45 minutes timer when entering a fracture. If the enabled parameter is not specified, the help text will be shown.')
+        log('    position [[-h]|[-x <x>] [-y <y>]] -- sets the horizontal and vertical position of the window relative to the upper-left corner. If no parameter is specified, the help text will be shown.')
+        log('    font [[-h]|[-f <font>] [-s <size>] [-a <alpha>] [-b [<bold>]] [-i [<italic>]]] -- sets the style of the font used in the window. If the no parameter is specified, the help text will be shown.')
+        log('    color [[-h]|[-o <objects>] [-d] [-r <red>] [-g <green>] [-b <blue>] [-a <alpha>]] -- sets the colors of the various elements present in the addon\'s window. If no parameter is specified, the help text will be shown.')
     elseif cmd == 'test' then
         test()
     elseif cmd == 'reset' then
@@ -424,7 +430,7 @@ windower.register_event('addon command', function(...)
             log('Enables or disables light mode. When enabled, the addon will never show the window and just print a summary in the chat box at the end of the run. If the enabled parameter is not specified, the help text will be shown.')
             log('Usage: plasmon light <enabled>')
             log('Positional arguments:')
-            log(chat.chars.wsquare..' <enabled>    specifies the status of the light mode. "default", "false" or "0" mean disabled. "true" or "1" mean enabled.')
+            log('    <enabled>    specifies the status of the light mode. "default", "false" or "0" mean disabled. "true" or "1" mean enabled.')
         else
             local light
 
@@ -458,7 +464,7 @@ windower.register_event('addon command', function(...)
             log('Enables or disables the timer. When enabled, the addon will start a 45 minutes timer when entering a fracture. If the enabled parameter is not specified, the help text will be shown.')
             log('Usage: plasmon timer <enabled>')
             log('Positional arguments:')
-            log(chat.chars.wsquare..' <enabled>    specifies the status of the timer. "false" or "0" mean disabled. "default", "true" or "1" mean enabled.')
+            log('    <enabled>    specifies the status of the timer. "false" or "0" mean disabled. "default", "true" or "1" mean enabled.')
         else
             local timer
 
@@ -495,9 +501,9 @@ windower.register_event('addon command', function(...)
                 log('Sets the horizontal and vertical position of the window relative to the upper-left corner. If the no parameter is specified, the help text will be shown.')
                 log('Usage: plasmon position [[-h]|[-x <x>] [-y <y>]]')
                 log('Optional arguments:')
-                log(chat.chars.wsquare..' -h       shows the help text.')
-                log(chat.chars.wsquare..' -x <x>   specifies the horizontal position of the window.')
-                log(chat.chars.wsquare..' -y <y>   specifies the vertical position of the window.')
+                log('    -h       shows the help text.')
+                log('    -x <x>   specifies the horizontal position of the window.')
+                log('    -y <y>   specifies the vertical position of the window.')
             elseif options:length() > 0 then
                 local x = settings.position.x
                 local y = settings.position.y
@@ -547,12 +553,12 @@ windower.register_event('addon command', function(...)
                 log('Sets the style of the font used in the window. If the no parameter is specified, the help text will be shown.')
                 log('Usage: plasmon font [[-h]|[-f <font>] [-s <size>] [-a <alpha>] [-b [<bold>]] [-i [<italic>]]]')
                 log('Optional arguments:')
-                log(chat.chars.wsquare..' -h               shows the help text.')
-                log(chat.chars.wsquare..' -f <font>        specifies the text\'s font.')
-                log(chat.chars.wsquare..' -s <size>        specifies the text\'s size.')
-                log(chat.chars.wsquare..' -a <alpha>       specifies the text\'s transparency. the value must be set between 0 (transparent) and 255 (opaque), inclusive.')
-                log(chat.chars.wsquare..' -b [<bold>]      specifies if the text should be rendered bold. "default", "false" or "0" mean disabled. "true", "1" or no value mean enabled.')
-                log(chat.chars.wsquare..' -i [<italic>]    specifies if the text should be rendered italic. "default", "false" or "0" mean disabled. "true", "1" or no value mean enabled.')
+                log('    -h               shows the help text.')
+                log('    -f <font>        specifies the text\'s font.')
+                log('    -s <size>        specifies the text\'s size.')
+                log('    -a <alpha>       specifies the text\'s transparency. the value must be set between 0 (transparent) and 255 (opaque), inclusive.')
+                log('    -b [<bold>]      specifies if the text should be rendered bold. "default", "false" or "0" mean disabled. "true", "1" or no value mean enabled.')
+                log('    -i [<italic>]    specifies if the text should be rendered italic. "default", "false" or "0" mean disabled. "true", "1" or no value mean enabled.')
             elseif options:length() > 0 then
                 local family = settings.font.family
                 local size   = settings.font.size
@@ -648,13 +654,13 @@ windower.register_event('addon command', function(...)
                 log('Sets the colors of the various elements present in the addon\'s window. If the no parameter is specified, the help text will be shown.')
                 log('Usage: plasmon color [[-h]|[-o <objects>] [-d] [-r <red>] [-g <green>] [-b <blue>] [-a <alpha>]]')
                 log('Optional arguments:')
-                log(chat.chars.wsquare..' -h             shows the help text.')
-                log(chat.chars.wsquare..' -o <objects>   specifies the item/s which will have its/their color changed. If this parameter is missing all the objects will be changed. The accepted values are: "'..validObjects:concat('", "')..'"')
-                log(chat.chars.wsquare..' -d             sets the red, green, blue and alpha values of the specified objects to their default values.')
-                log(chat.chars.wsquare..' -r <red>       specifies the intensity of the red color. The value must be set between 0 and 255, inclusive, where 0 is less intense and 255 is most intense.')
-                log(chat.chars.wsquare..' -g <green>     specifies the intensity of the greencolor. The value must be set between 0 and 255, inclusive, where 0 is less intense and 255 is most intense.')
-                log(chat.chars.wsquare..' -b <blue>      specifies the intensity of the blue color. The value must be set between 0 and 255, inclusive, where 0 is less intense and 255 is most intense.')
-                log(chat.chars.wsquare..' -a <alpha>     specifies the text\'s transparency. The value must be set between 0 (transparent) and 255 (opaque), inclusive.')
+                log('    -h             shows the help text.')
+                log('    -o <objects>   specifies the item/s which will have its/their color changed. If this parameter is missing all the objects will be changed. The accepted values are: "'..validObjects:concat('", "')..'"')
+                log('    -d             sets the red, green, blue and alpha values of the specified objects to their default values.')
+                log('    -r <red>       specifies the intensity of the red color. The value must be set between 0 and 255, inclusive, where 0 is less intense and 255 is most intense.')
+                log('    -g <green>     specifies the intensity of the greencolor. The value must be set between 0 and 255, inclusive, where 0 is less intense and 255 is most intense.')
+                log('    -b <blue>      specifies the intensity of the blue color. The value must be set between 0 and 255, inclusive, where 0 is less intense and 255 is most intense.')
+                log('    -a <alpha>     specifies the text\'s transparency. The value must be set between 0 (transparent) and 255 (opaque), inclusive.')
             elseif options:length() > 0 then
                 local r = -1
                 local g = -1

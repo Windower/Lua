@@ -1,4 +1,4 @@
--- Copyright (c) 2013, Omnys of Valefor
+-- Copyright © 2013-2014, Omnys of Valefor
 -- All rights reserved.
 
 -- Redistribution and use in source and binary forms, with or without
@@ -39,7 +39,6 @@ texts = require('texts')
 config = require('config')
 res = require('resources')
 
-tb_name	= 'addon:gr:gametime'
 visible = false
 
 local gt = {}
@@ -113,141 +112,149 @@ gt.MoonPct = ''
 gt.MoonPhase = ''
 
 
-local defaults = T{}
-	defaults.saved = 0
-	defaults.mode = 1
-	defaults.time = T{}
-	defaults.time.pos = {}
-	defaults.time.pos.x = 0 -- left
-	defaults.time.pos.y = 0 -- top
-	defaults.time.text = {}
-	defaults.time.text.alpha = 255
-	defaults.time.text.red = 255
-	defaults.time.text.green = 255
-	defaults.time.text.blue = 255
-	defaults.time.text.size = 12
-	defaults.time.text.font = 'Consolas'
-	defaults.time.bg = {}
-	defaults.time.bg.alpha = 25
-	defaults.time.bg.red = 100
-	defaults.time.bg.green = 100
-	defaults.time.bg.blue = 100
-	defaults.time.bg.visible = true
-	
-	
-	defaults.days = T{}
-	defaults.days.pos = {}
-	defaults.days.pos.x = 100
-	defaults.days.pos.y = 0 -- top
-	defaults.days.text = {}
-	defaults.days.text.alpha = 255
-	defaults.days.text.size = 12
-	defaults.days.text.font = 'Consolas'
-	defaults.days.bg = {}
-	defaults.days.bg.alpha = 100
-	defaults.days.bg.red = 0
-	defaults.days.bg.green = 0
-	defaults.days.bg.blue = 0
-	defaults.days.axis = 'horizontal'
-	defaults.days.change = true
-	defaults.moon = T{}
-	defaults.moon.change = true
-	settings = config.load(defaults)
+defaults = {}
+defaults.saved = 0
+defaults.mode = 1
+defaults.zero = false
+defaults.time = {}
+defaults.time.pos = {}
+defaults.time.pos.x = 0 -- left
+defaults.time.pos.y = 0 -- top
+defaults.time.text = {}
+defaults.time.text.alpha = 255
+defaults.time.text.red = 255
+defaults.time.text.green = 255
+defaults.time.text.blue = 255
+defaults.time.text.size = 12
+defaults.time.text.font = 'Consolas'
+defaults.time.bg = {}
+defaults.time.bg.alpha = 25
+defaults.time.bg.red = 100
+defaults.time.bg.green = 100
+defaults.time.bg.blue = 100
+defaults.time.bg.visible = true
 
-	
+defaults.days = {}
+defaults.days.pos = {}
+defaults.days.pos.x = 100
+defaults.days.pos.y = 0 -- top
+defaults.days.text = {}
+defaults.days.text.alpha = 255
+defaults.days.text.size = 12
+defaults.days.text.font = 'Consolas'
+defaults.days.bg = {}
+defaults.days.bg.alpha = 100
+defaults.days.bg.red = 0
+defaults.days.bg.green = 0
+defaults.days.bg.blue = 0
+defaults.days.axis = 'horizontal'
+defaults.days.change = true
+defaults.moon = {}
+defaults.moon.change = true
+settings = config.load(defaults)
 
-	Cycles = T{}
-	Cycles.selbina = T{}
-	Cycles.selbina.rname = "Ships between Mhaura and Selbina"
-	Cycles.selbina.route = T{}
-	Cycles.selbina.route[1] = "Arrives in Mhaura and Selbina|22:40"
-	Cycles.selbina.route[2] = "Arrives in Mhaura and Selbina|6:40"
-	Cycles.selbina.route[3] = "Arrives in Mhaura and Selbina|14:40"
 
-	Cycles.bibiki = T{}
-	Cycles.bibiki.rname = "Ship departing Bibiki Bay for Purgonorgo Isle"
-	Cycles.bibiki.route = T{}
-	Cycles.bibiki.route[1] = "Arrives in Bibiki|4:50"
-	Cycles.bibiki.route[2] = "Arrives in Bibiki|16:50"
+Cycles = T{}
+Cycles.selbina = T{}
+Cycles.selbina.rname = "Ships between Mhaura and Selbina"
+Cycles.selbina.route = T{}
+Cycles.selbina.route[1] = "Arrives in Mhaura and Selbina|22:40"
+Cycles.selbina.route[2] = "Arrives in Mhaura and Selbina|6:40"
+Cycles.selbina.route[3] = "Arrives in Mhaura and Selbina|14:40"
 
-	Cycles.nashmau = T{}
-	Cycles.nashmau.rname = "Aht Urhgan / Nashmau Ship"
-	Cycles.nashmau.route = T{}
-	Cycles.nashmau.route[1] = "Arrives in Whitegate and Nashmau|05:00"
-	Cycles.nashmau.route[2] = "Arrives in Whitegate and Nashmau|13:00"
-	Cycles.nashmau.route[3] = "Arrives in Whitegate and Nashmau|21:00"
-	
-	Cycles.whitegate = T{}
-	Cycles.whitegate.rname = "Aht Urhgan / whitegate Ship"
-	Cycles.whitegate.route = T{}
-	Cycles.whitegate.route[1] = "Arrives in Whitegate and Mhaura|10:40"
-	Cycles.whitegate.route[2] = "Arrives in Whitegate and Mhaura|18:40"
-	Cycles.whitegate.route[3] = "Arrives in Whitegate and Mhaura|2:40"
+Cycles.bibiki = T{}
+Cycles.bibiki.rname = "Ship departing Bibiki Bay for Purgonorgo Isle"
+Cycles.bibiki.route = T{}
+Cycles.bibiki.route[1] = "Arrives in Bibiki|4:50"
+Cycles.bibiki.route[2] = "Arrives in Bibiki|16:50"
 
-	Cycles.windurst = T{}
-	Cycles.windurst.rname = "Ship between Windurst and Jeuno"
-	Cycles.windurst.route = {T}
-	Cycles.windurst.route[1] = "Arrives in Windurst|4:47"
-	Cycles.windurst.route[2] = "Arrives in Jeuno|7:41"
-	Cycles.windurst.route[3] = "Arrives in Windurst|10:47"
-	Cycles.windurst.route[4] = "Arrives in Jeuno|13:41"
-	Cycles.windurst.route[5] = "Arrives in Windurst|16:47"
-	Cycles.windurst.route[6] = "Arrives in Jeuno|19:41"
-	Cycles.windurst.route[7] = "Arrives in Windurst|22:47"
-	Cycles.windurst.route[8] = "Arrives in Jeuno|1:41"
+Cycles.nashmau = T{}
+Cycles.nashmau.rname = "Aht Urhgan / Nashmau Ship"
+Cycles.nashmau.route = T{}
+Cycles.nashmau.route[1] = "Arrives in Whitegate and Nashmau|05:00"
+Cycles.nashmau.route[2] = "Arrives in Whitegate and Nashmau|13:00"
+Cycles.nashmau.route[3] = "Arrives in Whitegate and Nashmau|21:00"
 
-	Cycles.bastok = T{}
-	Cycles.bastok.rname = "Ship between Bastok and Jeuno"
-	Cycles.bastok.route = {T}
-	Cycles.bastok.route[1] = "Arrives in Bastok|0:13"
-	Cycles.bastok.route[2] = "Arrives in Jeuno|3:11"
-	Cycles.bastok.route[3] = "Arrives in Bastok|6:13"
-	Cycles.bastok.route[4] = "Arrives in Jeuno|9:11"
-	Cycles.bastok.route[5] = "Arrives in Bastok|12:13"
-	Cycles.bastok.route[6] = "Arrives in Jeuno|15:11"
-	Cycles.bastok.route[7] = "Arrives in Bastok|18:13"
-	Cycles.bastok.route[8] = "Arrives in Jeuno|21:41"
+Cycles.whitegate = T{}
+Cycles.whitegate.rname = "Aht Urhgan / whitegate Ship"
+Cycles.whitegate.route = T{}
+Cycles.whitegate.route[1] = "Arrives in Whitegate and Mhaura|10:40"
+Cycles.whitegate.route[2] = "Arrives in Whitegate and Mhaura|18:40"
+Cycles.whitegate.route[3] = "Arrives in Whitegate and Mhaura|2:40"
 
-	Cycles.sandy = T{}
-	Cycles.sandy.rname = "Ship between San d'Oria and Jeuno"
-	Cycles.sandy.route = {T}
-	Cycles.sandy.route[1] = "Arrives in San d'Oria|7:10"
-	Cycles.sandy.route[2] = "Arrives in Jeuno|6:11"
-	Cycles.sandy.route[3] = "Arrives in San d'Oria|9:10"
-	Cycles.sandy.route[4] = "Arrives in Jeuno|12:11"
-	Cycles.sandy.route[5] = "Arrives in San d'Oria|15:10"
-	Cycles.sandy.route[6] = "Arrives in Jeuno|18:11"
-	Cycles.sandy.route[7] = "Arrives in San d'Oria|21:10"
-	Cycles.sandy.route[8] = "Arrives in Jeuno|00:41"
-	
-	Cycles.kazham = T{}
-	Cycles.kazham.rname = "Ship between Kazham and Jeuno"
-	Cycles.kazham.route = {T}
-	Cycles.kazham.route[1] = "Arrives in Kazham|1:48"
-	Cycles.kazham.route[2] = "Arrives in Jeuno|4:49"
-	Cycles.kazham.route[3] = "Arrives in Kazham|7:48"
-	Cycles.kazham.route[4] = "Arrives in Jeuno|10:49"
-	Cycles.kazham.route[5] = "Arrives in Kazham|13:48"
-	Cycles.kazham.route[6] = "Arrives in Jeuno|14:49"
-	Cycles.kazham.route[7] = "Arrives in Kazham|19:48"
-	Cycles.kazham.route[8] = "Arrives in Jeuno|20:49"
+Cycles.windurst = T{}
+Cycles.windurst.rname = "Ship between Windurst and Jeuno"
+Cycles.windurst.route = {T}
+Cycles.windurst.route[1] = "Arrives in Windurst|4:47"
+Cycles.windurst.route[2] = "Arrives in Jeuno|7:41"
+Cycles.windurst.route[3] = "Arrives in Windurst|10:47"
+Cycles.windurst.route[4] = "Arrives in Jeuno|13:41"
+Cycles.windurst.route[5] = "Arrives in Windurst|16:47"
+Cycles.windurst.route[6] = "Arrives in Jeuno|19:41"
+Cycles.windurst.route[7] = "Arrives in Windurst|22:47"
+Cycles.windurst.route[8] = "Arrives in Jeuno|1:41"
 
-function initialize()
-	cb_time()
-	cb_day()
-	settings = config.load(defaults)
+Cycles.bastok = T{}
+Cycles.bastok.rname = "Ship between Bastok and Jeuno"
+Cycles.bastok.route = {T}
+Cycles.bastok.route[1] = "Arrives in Bastok|0:13"
+Cycles.bastok.route[2] = "Arrives in Jeuno|3:11"
+Cycles.bastok.route[3] = "Arrives in Bastok|6:13"
+Cycles.bastok.route[4] = "Arrives in Jeuno|9:11"
+Cycles.bastok.route[5] = "Arrives in Bastok|12:13"
+Cycles.bastok.route[6] = "Arrives in Jeuno|15:11"
+Cycles.bastok.route[7] = "Arrives in Bastok|18:13"
+Cycles.bastok.route[8] = "Arrives in Jeuno|21:41"
 
+Cycles.sandy = T{}
+Cycles.sandy.rname = "Ship between San d'Oria and Jeuno"
+Cycles.sandy.route = {T}
+Cycles.sandy.route[1] = "Arrives in San d'Oria|7:10"
+Cycles.sandy.route[2] = "Arrives in Jeuno|6:11"
+Cycles.sandy.route[3] = "Arrives in San d'Oria|9:10"
+Cycles.sandy.route[4] = "Arrives in Jeuno|12:11"
+Cycles.sandy.route[5] = "Arrives in San d'Oria|15:10"
+Cycles.sandy.route[6] = "Arrives in Jeuno|18:11"
+Cycles.sandy.route[7] = "Arrives in San d'Oria|21:10"
+Cycles.sandy.route[8] = "Arrives in Jeuno|00:41"
+
+Cycles.kazham = T{}
+Cycles.kazham.rname = "Ship between Kazham and Jeuno"
+Cycles.kazham.route = {T}
+Cycles.kazham.route[1] = "Arrives in Kazham|1:48"
+Cycles.kazham.route[2] = "Arrives in Jeuno|4:49"
+Cycles.kazham.route[3] = "Arrives in Kazham|7:48"
+Cycles.kazham.route[4] = "Arrives in Jeuno|10:49"
+Cycles.kazham.route[5] = "Arrives in Kazham|13:48"
+Cycles.kazham.route[6] = "Arrives in Jeuno|14:49"
+Cycles.kazham.route[7] = "Arrives in Kazham|19:48"
+Cycles.kazham.route[8] = "Arrives in Jeuno|20:49"
+
+gt.gtt = texts.new('', settings.time)
+gt.gtd = texts.new('', settings.days)
+
+config.register(settings, function()
 	if settings.days.axis == 'horizontal' then
 		gt.delimiter = ' '
 	else
 		gt.delimiter = '\n'
 	end
-	
-	gt.mode = settings.mode
-	day_change(windower.ffxi.get_info().day)
-end
-	
-windower.register_event('login','load',initialize)
+
+    if settings.zero then
+        gt.gtt:text('${hours|XX|%.2d}:${minutes|XX|%.2d}')
+    else
+        gt.gtt:text('${hours|XX}:${minutes|XX|%.2d}')
+    end
+    gt.gtd:text('${day|} ${MoonPhase|Unknown} (${MoonPct|-}%); ${WeekReport|}')
+
+    local info = windower.ffxi.get_info()
+    if info.logged_in then
+        day_change(info.day)
+
+        gt.gtt:show()
+        gt.gtd:show()
+    end
+end)
 
 function getroutes(route)
 	for ckey, cval in pairs(Cycles) do
@@ -265,25 +272,13 @@ function getroutes(route)
 	end
 end
 
-function cb_time()
-	time_base_string = '${hours|XX}:${minutes|XX}'
-	gt.gtt = texts.new(time_base_string,settings.time)
-	gt.gtt:show()
-end
-
-function cb_day()
-	day_base_string = '${day|} ${MoonPhase|Unknown} (${MoonPct|-}%); ${WeekReport|}'
-	gt.gtd = texts.new(day_base_string,settings.days)
-	gt.gtd:show()
-end
-
 function default_settings()
 	settings:save('all')
 end
 
 windower.register_event('time change', function(new, old)
-	gt.hours = (new / 60):floor()
-	gt.minutes = new % 60
+    gt.hours = (new / 60):floor()
+    gt.minutes = new % 60
 	gt.gtt:update(gt)
 end)
 
@@ -295,6 +290,16 @@ end
 function timeconvert2(basetime)
 	basetable = tostring(basetime):split('.')
 	return basetable[1]..':'..tostring(math.round(tostring(basetable[2]):slice(1,2) / (100/60))):zfill(2)
+end
+
+function moon_change()
+    local info = windower.ffxi.get_info()
+	gt.MoonPhase = res.moon_phases[info.moon_phase].english
+	gt.MoonPct = info.moon
+	gt.gtd:update(gt)
+	if settings.moon.change == true then
+		log('Day: '..gt.day..'; Moon: '..gt.MoonPhase..' ('..gt.MoonPct..'%);')
+	end
 end
 
 function day_change(day)
@@ -331,17 +336,7 @@ function day_change(day)
 	moon_change()
 end
 
-windower.register_event('day change', moon_change..day_change)
-
-function moon_change()
-    local info = windower.ffxi.get_info()
-	gt.MoonPhase = res.moon_phases[info.moon_phase].english
-	gt.MoonPct = info.moon
-	gt.gtd:update(gt)
-	if settings.moon.change == true then
-		log('Day: '..gt.day..'; Moon: '..gt.MoonPhase..' ('..gt.MoonPct..'%);')
-	end
-end
+windower.register_event('day change', moon_change .. day_change)
 
 windower.register_event('moon change', moon_change)
 
@@ -366,6 +361,7 @@ windower.register_event('addon command', function (...)
 		log('//gt mode 1-4 :: Fullday; Abbreviated; Element names; Compact')
 		log('//gt route :: Displays route names.')
 		log('//gt route [route name] :: Displays arrival time for route.')
+		log('//gt zero [on/off] :: Displays the time with leading zeros. 04:05 instead of 4:5')
 		-- log('Log Reporting -- Day and Moon Phase (Not Moon %) change') not implemented yet
 		-- log('//gt [days/moon] change [true/false]')
 		-- log('Positioning:')
@@ -482,8 +478,18 @@ windower.register_event('addon command', function (...)
 			log('mode updated')
 		end
 		day_change(windower.ffxi.get_info().day)
+	elseif args[1] == 'zero' then
+		if args[2] == 'on' then
+            settings.zero = true
+            config.save(settings)
+			log('zero padding enabled.')
+		elseif args[2] == 'off' then
+            settings.zero = false
+            config.save(settings)
+			log('zero padding disabled.')
+		end
 	elseif args[1] == 'save' then
-		settings:save('all')
+		config.save(settings, 'all')
 		log('Settings saved.')
 	end
 end)

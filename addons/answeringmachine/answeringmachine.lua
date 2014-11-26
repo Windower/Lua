@@ -1,7 +1,7 @@
 _addon.commands = {'answeringmachine','am'}
 _addon.name = 'AnsweringMachine'
 _addon.author = 'Byrth'
-_addon.version = '1.2'
+_addon.version = '1.3'
 
 
 recording = {}
@@ -21,8 +21,13 @@ windower.register_event('addon command',function (...)
                 windower.add_to_chat(5,'Cancel error: Could not find specified player in tell history')
             end
         elseif broken[1]:upper() == "LIST" then
+            local trig
             for i,v in pairs(recording) do
                 windower.add_to_chat(5,#v..' exchange'..pl(#v)..' with '..uc_first(i))
+                trig = true
+            end
+            if not trig then
+                windower.add_to_chat(5,'No exchanges recorded.')
             end
         elseif broken[1]:upper() == "PLAY" then
             if broken[2] then
@@ -69,8 +74,8 @@ end)
 
 windower.register_event('outgoing chunk',function(id,original,modified,injected,blocked)
     if not blocked and id == 0x0B6 then
-        local name = trim(original:sub(6,20))
-        local message = trim(original:sub(21))
+        local name = trim(original:sub(0x6,0x14))
+        local message = trim(original:sub(0x15))
         if recording[name:upper()] then
             recording[name:upper()][#recording[name:upper()]+1] = {message=message,outgoing=true,timestamp=os.time()}
         else
@@ -113,6 +118,7 @@ function trim(msg)
             return msg:sub(1,i-1)
         end
     end
+    return msg
 end
 
 function pl(num)
