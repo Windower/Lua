@@ -39,7 +39,7 @@ command_list = {['ja']='job_abilities',['jobability']='job_abilities',['so']='sp
 	['ra']='Ranged Attack',['range']='Ranged Attack',['throw']='Ranged Attack',['shoot']='Ranged Attack',['monsterskill']='monster_abilities',['ms']='monster_abilities',
 	['ws']='weapon_skills',['weaponskill']='weapon_skills',['item']='Ability',['pet']='job_abilities'}
     
-in_game_res_commands = {['ja']='/ja',['ja']='/ja',['pet']='/ja',
+in_game_res_commands = {['ja']='/ja',['jobability']='/ja',['pet']='/ja',
     ['so']='/ma',['song']='/ma',['ma']='/ma',['magic']='/ma',['nin']='/ma',['ninjutsu']='/ma',
     ['monsterskill']='/ms',['ms']='/ms',['ws']='/ws',['weaponskill']='/ws',
 	['ra']='/ra',['range']='/ra',['throw']='/ra',['shoot']='/ra'}
