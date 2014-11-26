@@ -16,6 +16,7 @@ local slots = {}
 
 local language_string = _addon and _addon.language and _addon.language:lower() or windower.ffxi.get_info().language:lower()
 local language_string_log = language_string .. '_log'
+local language_string_short = language_string .. '_short'
 
 -- The metatable for all sub tables of the root resource table
 local resource_mt = {}
@@ -31,6 +32,7 @@ end})
 local redict = {
     name = language_string,
     name_log = language_string_log,
+    name_short = language_string_short,
     english = 'en',
     japanese = 'ja',
     english_log = 'enl',
