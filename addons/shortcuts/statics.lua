@@ -39,10 +39,10 @@ command_list = {['ja']='job_abilities',['jobability']='job_abilities',['so']='sp
 	['ra']='Ranged Attack',['range']='Ranged Attack',['throw']='Ranged Attack',['shoot']='Ranged Attack',['monsterskill']='monster_abilities',['ms']='monster_abilities',
 	['ws']='weapon_skills',['weaponskill']='weapon_skills',['item']='Ability',['pet']='job_abilities'}
     
-in_game_res_commands = {['ja']='/jobability',['jobability']='/jobability',['pet']='/jobability',
-    ['so']='/magic',['song']='/magic',['ma']='/magic',['magic']='/magic',['nin']='/magic',['ninjutsu']='/magic',
-    ['monsterskill']='/monsterskill',['ms']='/monsterskill',['ws']='/weaponskill',['weaponskill']='/weaponskill',
-	['ra']='/range',['range']='/range',['throw']='/range',['shoot']='/range'}
+in_game_res_commands = {['ja']='/ja',['ja']='/ja',['pet']='/ja',
+    ['so']='/ma',['song']='/ma',['ma']='/ma',['magic']='/ma',['nin']='/ma',['ninjutsu']='/ma',
+    ['monsterskill']='/ms',['ms']='/ms',['ws']='/ws',['weaponskill']='/ws',
+	['ra']='/ra',['range']='/ra',['throw']='/ra',['shoot']='/ra'}
 
 -- List of other commands that might use name completion.
 command2_list = {['kick']=true,['assist']=true,['alliancecmd']=T{'kick','add','leader','breakup','leave','looter'},['partycmd']=T{'kick','add','leader','breakup','leave','looter'},
