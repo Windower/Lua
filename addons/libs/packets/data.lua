@@ -118,7 +118,7 @@ data.incoming[0x028] = {name='Action',              description='Packet sent whe
 data.incoming[0x029] = {name='Action Message',      description='Packet sent for simple battle-related messages.'}
 data.incoming[0x02A] = {name='Resting Message',     description='Packet sent when you rest in Abyssea.'}
 data.incoming[0x02D] = {name='Kill Message',        description='Packet sent when you gain XP/LP/CP/JP/MP, advance RoE objectives, etc. by defeating a mob.'}
-data.incoming[0x02E] = {name='Mog House Menu',		description='Sent when talking to moogle inside mog house.'}
+data.incoming[0x02E] = {name='Mog House Menu',      description='Sent when talking to moogle inside mog house.'}
 data.incoming[0x02F] = {name='Digging Animation',   description='Generates the chocobo digging animation'}
 data.incoming[0x030] = {name='Synth Animation',     description='Generates the synthesis animation'}
 data.incoming[0x031] = {name='Synth List',          description='List of recipes or materials needed for a recipe'}
