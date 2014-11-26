@@ -1386,6 +1386,9 @@ fields.incoming[0x02D] = L{
     {ctype='unsigned short',    label='_flags1'},                               -- 1A   This could also be a third parameter, but I suspect it is flags because I have only ever seen one bit set.
 }
 
+--Mog House Menu
+fields.incoming[0X02E] = L{} 							-- Seems to ontain no fields. Just needs to be sent to client to open.
+
 -- Digging Animation
 fields.incoming[0x02F] = L{
     {ctype='unsigned int',      label='Player',             fn=id},             -- 04
