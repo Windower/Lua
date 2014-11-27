@@ -147,6 +147,9 @@ windower.register_event('addon command',function (...)
     logit('\n\n'..tostring(os.clock)..table.concat({...},' '))
     local splitup = {...}
     if not splitup[1] then return end -- handles //gs
+    
+    for i,v in pairs(splitup) do splitup[i] = windower.from_shift_jis(v) end
+
     local cmd = splitup[1]:lower()
     
     if cmd == 'c' then
