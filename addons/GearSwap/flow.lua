@@ -115,7 +115,7 @@ function equip_sets(swap_type,ts,...)
                 debug_mode_chat(i..' slot was not equipped because you are encumbered.')
             end
         end
-        
+
         -- Translates the equip_list from the player (i=slot name, v=item name) into a table with i=slot id and v={bag_id=0 or 8, slot=inventory slot}.
         local equip_next,priorities = unpack_equip_list(equip_list)
         equip_next = eliminate_redundant(cur_equip,equip_next) -- Eliminate the equip commands for items that are already equipped
@@ -127,7 +127,6 @@ function equip_sets(swap_type,ts,...)
         
         
         if buffactive.charm or buffactive.KO then
-        
             local failure_reason
             if buffactive.charm then
                 failure_reason = 'Charmed'
