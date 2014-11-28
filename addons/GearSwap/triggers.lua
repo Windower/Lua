@@ -108,7 +108,7 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
                 storedcommand = command..' '
             end
             
-            r_line.name = windower.to_shift_jis(r_line[language])
+            r_line.name = r_line[language]
             spell = spell_complete(r_line)
             spell.target = temp_mob_arr
             spell.action_type = action_type_map[command]
