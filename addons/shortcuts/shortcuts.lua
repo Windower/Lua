@@ -24,7 +24,7 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-_addon.version = '2.710'
+_addon.version = '2.711'
 _addon.name = 'Shortcuts'
 _addon.author = 'Byrth'
 _addon.commands = {'shortcuts'}
@@ -382,18 +382,20 @@ function interp_text(splitline,offset,modified)
             targets.Party = true -- Pianissimo
         end
         
-        local abil_name = r_line.english
+        local abil_name = r_line.english -- Remove spaces at the end of the ability name.
         while abil_name:sub(-1) == ' ' do
             abil_name = abil_name:sub(1,-2)
         end
         
-        lastsent = r_line.prefix..' "'..abil_name..'" '..(temptarg or target_make(targets))
+        local out_tab = {prefix = in_game_res_commands[r_line.prefix:gsub("/","")], name = abil_name, target = temptarg or target_make(targets)}
+        lastsent = out_tab.prefix..' "'..out_tab.name..'" '..out_tab.target
         if logging then
             logfile:write('\n\n',tostring(os.clock()),'Original: ',table.concat(splitline,' '),'\n(180) ',lastsent)
             logfile:flush()
         end
         debug_chat('390 comp '..lastsent:sub(2):gsub('"([^ ]+)"', '%1'):lower()..'   ||    '..table.concat(splitline,' ',1,splitline.n):gsub('"([^ ]+)"', '%1'):lower())
-        if offset == 1 and in_game_res_commands[splitline[1]] and lastsent:gsub('"([^ ]+)"', '%1'):lower() == in_game_res_commands[splitline[1]]..' '..table.concat(splitline,' ',2,splitline.n):gsub('"([^ ]+)"', '%1'):lower() then
+        if offset == 1 and in_game_res_commands[splitline[1]] and in_game_res_commands[splitline[1]] == out_tab.prefix and
+            ('"'..out_tab.name..'" '..out_tab.target):gsub('"([^ ]+)"', '%1'):lower() == table.concat(splitline,' ',2,splitline.n):gsub('"([^ ]+)"', '%1'):lower() then
             debug_chat('400 return '..lastsent)
             return lastsent,true
         else

@@ -1387,7 +1387,7 @@ fields.incoming[0x02D] = L{
 }
 
 -- Mog House Menu
-fields.incoming[0X02E] = L{} 							-- Seems to contain no fields. Just needs to be sent to client to open.
+fields.incoming[0x02E] = L{}                                                    -- Seems to contain no fields. Just needs to be sent to client to open.
 
 -- Digging Animation
 fields.incoming[0x02F] = L{

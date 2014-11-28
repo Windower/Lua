@@ -287,7 +287,7 @@ function set_merge(baseSet, ...)
             end
         end
     end
-
+    
     return baseSet
 end
 
