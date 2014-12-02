@@ -109,7 +109,7 @@ end
 function unpack_equip_list(equip_list)
     local ret_list = {}
     local error_list = {}
-    local priorities = setmetatable({},{__newindex=prioritize})
+    local priorities = Priorities:new()
     for slot_id,slot_name in pairs(default_slot_map) do
         local name,priority,extgoal_1,extgoal_2 = expand_entry(equip_list[slot_name])
         priorities[slot_id] = priority

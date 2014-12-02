@@ -99,7 +99,7 @@ function equip_sets(swap_type,ts,...)
     
     
     if type(swap_type) == 'string' and (swap_type == 'pretarget' or swap_type == 'filtered_action') then -- Target may just have been changed, so make the ind now.
-        ts = mk_command_registry_entry(val1)
+        ts = command_registry:new_entry(val1)
     elseif type(swap_type) == 'string' and swap_type == 'precast' and not command_registry[ts] and debugging.command_registry then
         print_set(spell,'precast nil error')
     end
@@ -137,7 +137,7 @@ function equip_sets(swap_type,ts,...)
             logit('\n\n'..tostring(os.clock)..'(69) failure_reason: '..tostring(failure_reason))
         else
             local chunk_table = L{}
-            for eq_slot_id,_ in priority_order(priorities) do
+            for eq_slot_id,_ in priorities:it() do
                 if equip_next[eq_slot_id] and not encumbrance_table[eq_slot_id] and not _settings.demo_mode then
                     chunk_table:append(equip_piece(eq_slot_id,equip_next[eq_slot_id].bag_id,equip_next[eq_slot_id].slot))
                 end
@@ -423,7 +423,7 @@ windower.register_event('outgoing chunk',function(id,original,modified,injected,
         if res.jobs[newmain] and newmain ~= 0 and newmain ~= player.main_job_id then
             windower.debug('job change')
             
-            command_registry = {}
+            command_registry = Command_Registry.new()
             load_user_files(newmain)
             
             table.clear(not_sent_out_equip)
