@@ -1,4 +1,4 @@
---Copyright (c) 2013, Byrthnoth
+--Copyright (c) 2013-2014, Byrthnoth
 --All rights reserved.
 
 --Redistribution and use in source and binary forms, with or without
@@ -175,7 +175,7 @@ slot_map.back = 15
 
 gearswap_disabled = false
 not_sent_out_equip = {}
-command_registry = {}
+command_registry = Command_Registry.new()
 equip_list = {}
 world = make_user_table()
 buffactive = make_user_table()

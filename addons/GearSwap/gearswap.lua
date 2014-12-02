@@ -186,7 +186,7 @@ windower.register_event('addon command',function (...)
             local f_name = table.concat(splitup,' ',2)
             if pathsearch({f_name}) then
                 refresh_globals()
-                command_registry = {}
+                command_registry = Command_Registry.new()
                 load_user_files(false,f_name)
             else
                 windower.add_to_chat(123,'GearSwap: File not found.')
@@ -269,7 +269,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
     if injected then
     elseif id == 0x00A then
         windower.debug('zone change')
-        command_registry = {}
+        command_registry = Command_Registry.new()
         table.clear(not_sent_out_equip)
         
         player.id = data:unpack('I',0x05)
