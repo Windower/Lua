@@ -1071,7 +1071,7 @@ end
 ---- slot id (whole number from 0-15)
 -----------------------------------------------------------------------------------
 function toslotid(slot_name)
-    return rawget(slot_map,slot_name)
+    return slot_map[slot_name]
 end
 
 
