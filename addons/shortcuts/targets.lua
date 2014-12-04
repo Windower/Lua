@@ -43,9 +43,9 @@ function valid_target(targ,flag)
     -- If the target is whitelisted, pass it through.
     if pass_through_targs:contains(targ) then
         local cur_targ = windower.ffxi.get_mob_by_target('<t>')
-        if (targ == '<t>' or targ == 't') and cur_targ and cur_targ.id == windower.ffxi.get_player().id then
-            return '<me>'
-        end
+--        if (targ == '<t>' or targ == 't') and cur_targ and cur_targ.id == windower.ffxi.get_player().id then
+--            return '<me>'
+--        end
         return targ
     elseif st_targs:contains(targ) or (tonumber(targ) and windower.ffxi.get_mob_by_id(tonumber(targ))) then
         return targ
