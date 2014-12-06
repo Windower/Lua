@@ -5,6 +5,7 @@ config = require 'config'
 require 'strings'
 res = require 'resources'
 require 'actions'
+require 'pack'
 
 require 'generic_helpers'
 require 'parse_action_packet'
@@ -215,20 +216,18 @@ ActionPacket.open_listener(parse_action_packet)
 
 windower.register_event('incoming chunk',function (id,original,modified,is_injected,is_blocked)
     if debugging then windower.debug('incoming chunk '..id) end
-    local pref = original:sub(1,4)
-    local data = original:sub(5)
 
 ------- ACTION MESSAGE -------    
     if id == 0x29 then
         local am = {}
-        am.actor_id = get_bit_packed(data,0,32)
-        am.target_id = get_bit_packed(data,32,64)
-        am.param_1 = get_bit_packed(data,64,96)
-        am.param_2 = get_bit_packed(data,96,106) -- First 6 bits
-        am.param_3 = get_bit_packed(data,106,128) -- Rest
-        am.actor_index = get_bit_packed(data,128,144)
-        am.target_index = get_bit_packed(data,144,160)
-        am.message_id = get_bit_packed(data,160,175) -- Cut off the most significant bit, hopefully
+        am.actor_id = original:unpack("I",0x05)
+        am.target_id = original:unpack("I",0x09)
+        am.param_1 = original:unpack("I",0x0D)
+        am.param_2 = original:unpack("H",0x11)%2^7 -- First 6 bits
+        am.param_3 = math.floor(original:unpack("I",0x11)/2^6) -- Rest
+        am.actor_index = original:unpack("H",0x15)
+        am.target_index = original:unpack("H",0x17)
+        am.message_id = original:unpack("H",0x19)%2^15 -- Cut off the most significant bit
         
         local actor = player_info(am.actor_id)
         local target = player_info(am.target_id)
@@ -336,8 +335,8 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 
 ------------ SYNTHESIS ANIMATION --------------
     elseif id == 0x030 then
-        if windower.ffxi.get_player().id == (data:byte(3,3)*256*256 + data:byte(2,2)*256 + data:byte(1,1)) then
-            local result = data:byte(9,9)
+        if windower.ffxi.get_player().id == original:unpack("I",5) then
+            local result = original:byte(13,13)
             if result == 0 then
                 windower.add_to_chat(8,' ------------- NQ Synthesis -------------')
             elseif result == 1 then
@@ -350,8 +349,8 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
         end
         
     elseif id == 0x06F then
-        if data:byte(1) == 0 then
-            local result = data:byte(2)
+        if original:byte(5) == 0 then
+            local result = original:byte(7)
             if result == 1 then
                 windower.add_to_chat(8,' -------------- HQ Tier 1! --------------')
             elseif result == 2 then
@@ -363,7 +362,7 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
         
     ------------- JOB INFO ----------------
     elseif id == 0x01B then
-        filterload(res.jobs[data:byte(5)][language..'_short'])
+        filterload(res.jobs[original:byte(9)][language..'_short'])
     end
 end)
 
@@ -377,57 +376,4 @@ function multi_packet(...)
     multi_targs[ind] = nil
     multi_msg[ind] = nil
     multi_actor[ind] = nil
-end
-
-function get_bit_packed(dat_string,start,stop)
-    local newval = 0
-    
-    local c_count = math.ceil(stop/8)
-    while c_count >= math.ceil((start+1)/8) do
-        -- Grabs the most significant byte first and works down towards the least significant.
-        local cur_val = dat_string:byte(c_count)
-        local scal = 256
-        
-        if c_count == math.ceil(stop/8) then -- Take the least significant bits of the most significant byte
-        -- Moduluses by 2^number of bits into the current byte. So 8 bits in would %256, 1 bit in would %2, etc.
-        -- Cuts off the top.
-            cur_val = cur_val%(2^((stop-1)%8+1)) -- -1 and +1 set the modulus result range from 1 to 8 instead of 0 to 7.
-        end
-        
-        if c_count == math.ceil((start+1)/8) then -- Take the most significant bits of the least significant byte
-        -- Divides by the significance of the final bit in the current byte. So 8 bits in would /128, 1 bit in would /1, etc.
-        -- Cuts off the bottom.
-            cur_val = math.floor(cur_val/(2^(start%8)))
-            scal = 2^(8-start%8)
-        end
-        
-        newval = newval*scal + cur_val -- Need to multiply by 2^number of bits in the next byte
-        c_count = c_count - 1
-    end
-    return newval
-end
-
-function assemble_bit_packed(init,val,initial_length,final_length,debug_val)
-    if type(val) == 'boolean' then
-        if val then val = 1 else val = 0 end
-    end
-    local bits = initial_length%8
-    local byte_length = math.ceil(final_length/8)
-    
-    local out_val = 0
-    if bits > 0 then
-        out_val = init:byte(#init) -- Initialize out_val to the remainder in the active byte.
-        init = init:sub(1,#init-1) -- Take off the active byte
-    end
-    out_val = out_val + val*2^bits -- left-shift val by the appropriate amount and add it to the remainder (now the lsb-s in val)
-    if debug_val then print(out_val..' '..#init) end
-    
-    while out_val > 0 do
-        init = init..string.char(out_val%256)
-        out_val = math.floor(out_val/256)
-    end
-    while #init < byte_length do
-        init = init..string.char(0)
-    end
-    return init
 end
