@@ -4,6 +4,7 @@ file = require 'files'
 config = require 'config'
 require 'strings'
 res = require 'resources'
+require 'actions'
 
 require 'generic_helpers'
 require 'parse_action_packet'
@@ -210,141 +211,15 @@ function filterload(job)
     Current_job = job
 end
 
+ActionPacket.open_listener(parse_action_packet)
+
 windower.register_event('incoming chunk',function (id,original,modified,is_injected,is_blocked)
     if debugging then windower.debug('incoming chunk '..id) end
     local pref = original:sub(1,4)
     local data = original:sub(5)
-    
--------------- ACTION PACKET ---------------
-    if id == 0x28 then
-        local act = {}
-        act.do_not_need = get_bit_packed(data,0,8)
-        act.actor_id = get_bit_packed(data,8,40)
-        act.target_count = get_bit_packed(data,40,50)
-        act.category = get_bit_packed(data,50,54)
-        act.param = get_bit_packed(data,54,70)
-        act.unknown = get_bit_packed(data,70,86)
-        act.recast = get_bit_packed(data,86,118)
-        act.targets = {}
-        local offset = 118
-        for i = 1,act.target_count do
-            act.targets[i] = {}
-            act.targets[i].id = get_bit_packed(data,offset,offset+32)
-            act.targets[i].action_count = get_bit_packed(data,offset+32,offset+36)
-            offset = offset + 36
-            act.targets[i].actions = {}
-            for n = 1,act.targets[i].action_count do
-                act.targets[i].actions[n] = {}
-                act.targets[i].actions[n].reaction = get_bit_packed(data,offset,offset+5)
-                act.targets[i].actions[n].animation = get_bit_packed(data,offset+5,offset+16)
-                act.targets[i].actions[n].effect = get_bit_packed(data,offset+16,offset+21)
-                act.targets[i].actions[n].stagger = get_bit_packed(data,offset+21,offset+27)
-                if debugging then --act.targets[i].actions[n].stagger > 2  then
-                    -- Value 8 to 63 will knockback
-                    act.targets[i].actions[n].stagger = act.targets[i].actions[n].stagger%8
-                end
-                act.targets[i].actions[n].param = get_bit_packed(data,offset+27,offset+44)
-                act.targets[i].actions[n].message = get_bit_packed(data,offset+44,offset+54)
-                act.targets[i].actions[n].unknown = get_bit_packed(data,offset+54,offset+85)
-                act.targets[i].actions[n].has_add_effect = get_bit_packed(data,offset+85,offset+86)
-                offset = offset + 86
-                if act.targets[i].actions[n].has_add_effect == 1 then
-                    act.targets[i].actions[n].has_add_effect = true
-                    act.targets[i].actions[n].add_effect_animation = get_bit_packed(data,offset,offset+6)
-                    act.targets[i].actions[n].add_effect_effect = get_bit_packed(data,offset+6,offset+10)
-                    act.targets[i].actions[n].add_effect_param = get_bit_packed(data,offset+10,offset+27)
-                    act.targets[i].actions[n].add_effect_message = get_bit_packed(data,offset+27,offset+37)
-                    offset = offset + 37
-                else
-                    act.targets[i].actions[n].has_add_effect = false
-                    act.targets[i].actions[n].add_effect_animation = 0
-                    act.targets[i].actions[n].add_effect_effect = 0
-                    act.targets[i].actions[n].add_effect_param = 0
-                    act.targets[i].actions[n].add_effect_message = 0
-                end
-                act.targets[i].actions[n].has_spike_effect = get_bit_packed(data,offset,offset+1)
-                offset = offset +1
-                if act.targets[i].actions[n].has_spike_effect == 1 then
-                    act.targets[i].actions[n].has_spike_effect = true
-                    act.targets[i].actions[n].spike_effect_animation = get_bit_packed(data,offset,offset+6)
-                    act.targets[i].actions[n].spike_effect_effect = get_bit_packed(data,offset+6,offset+10)
-                    act.targets[i].actions[n].spike_effect_param = get_bit_packed(data,offset+10,offset+24)
-                    act.targets[i].actions[n].spike_effect_message = get_bit_packed(data,offset+24,offset+34)
-                    offset = offset + 34
-                else
-                    act.targets[i].actions[n].has_spike_effect = false
-                    act.targets[i].actions[n].spike_effect_animation = 0
-                    act.targets[i].actions[n].spike_effect_effect = 0
-                    act.targets[i].actions[n].spike_effect_param = 0
-                    act.targets[i].actions[n].spike_effect_message = 0
-                end
-            end
-        end
-        act = parse_action_packet(act)
 
-        local react = assemble_bit_packed('',act.do_not_need,0,8)
-        react = assemble_bit_packed(react,act.actor_id,8,40)
-        react = assemble_bit_packed(react,act.target_count,40,50)
-        react = assemble_bit_packed(react,act.category,50,54)
-        react = assemble_bit_packed(react,act.param,54,70)
-        react = assemble_bit_packed(react,act.unknown,70,86)
-        react = assemble_bit_packed(react,act.recast,86,118)
-        
-        local offset = 118
-        for i = 1,act.target_count do
-            react = assemble_bit_packed(react,act.targets[i].id,offset,offset+32)
-            react = assemble_bit_packed(react,act.targets[i].action_count,offset+32,offset+36)
-            offset = offset + 36
-            for n = 1,act.targets[i].action_count do
-                react = assemble_bit_packed(react,act.targets[i].actions[n].reaction,offset,offset+5)
-                react = assemble_bit_packed(react,act.targets[i].actions[n].animation,offset+5,offset+16)
-                react = assemble_bit_packed(react,act.targets[i].actions[n].effect,offset+16,offset+21)
-                react = assemble_bit_packed(react,act.targets[i].actions[n].stagger,offset+21,offset+27)
-                react = assemble_bit_packed(react,act.targets[i].actions[n].param,offset+27,offset+44)
-                react = assemble_bit_packed(react,act.targets[i].actions[n].message,offset+44,offset+54)
-                react = assemble_bit_packed(react,act.targets[i].actions[n].unknown,offset+54,offset+85)
-                
-                react = assemble_bit_packed(react,act.targets[i].actions[n].has_add_effect,offset+85,offset+86)
-                offset = offset + 86
-                if act.targets[i].actions[n].has_add_effect then
-                    react = assemble_bit_packed(react,act.targets[i].actions[n].add_effect_animation,offset,offset+6)
-                    react = assemble_bit_packed(react,act.targets[i].actions[n].add_effect_effect,offset+6,offset+10)
-                    react = assemble_bit_packed(react,act.targets[i].actions[n].add_effect_param,offset+10,offset+27)
-                    react = assemble_bit_packed(react,act.targets[i].actions[n].add_effect_message,offset+27,offset+37)
-                    offset = offset + 37
-                end
-                react = assemble_bit_packed(react,act.targets[i].actions[n].has_spike_effect,offset,offset+1)
-                offset = offset + 1
-                if act.targets[i].actions[n].has_spike_effect then
-                    react = assemble_bit_packed(react,act.targets[i].actions[n].spike_effect_animation,offset,offset+6)
-                    react = assemble_bit_packed(react,act.targets[i].actions[n].spike_effect_effect,offset+6,offset+10)
-                    react = assemble_bit_packed(react,act.targets[i].actions[n].spike_effect_param,offset+10,offset+24)
-                    react = assemble_bit_packed(react,act.targets[i].actions[n].spike_effect_message,offset+24,offset+34)
-                    offset = offset + 34
-                end
-            end
-        end
---        if react:sub(1) ~= data:sub(1,#react) then
---            print('REACT does not match up')
---        end
-        while #react < #data do
-            react = react..data:sub(#react+1,#react+1)
-        end
---        local first_error = true
---        for i=1,#data do
---            if data:byte(i) ~= react:byte(i) then
---                if first_error then
---                    first_error = nil
---                end
---                windower.add_to_chat(8,'Mismatch at byte '..i..'.')
---            end
---        end
-
-        return pref..react
-
-
------------ ACTION MESSAGE ------------        
-    elseif id == 0x29 then
+------- ACTION MESSAGE -------    
+    if id == 0x29 then
         local am = {}
         am.actor_id = get_bit_packed(data,0,32)
         am.target_id = get_bit_packed(data,32,64)
