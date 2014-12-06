@@ -69,11 +69,15 @@ function ActionPacket.new(a)
 end
 
 local function act_to_string(original,act)
-    if not act then return end
+    if type(act) ~= 'table' then return act end
     
     function assemble_bit_packed(init,val,initial_length,final_length)
+        if not init then return init end
+        
         if type(val) == 'boolean' then
             if val then val = 1 else val = 0 end
+        elseif type(val) ~= 'number' then
+            return false
         end
         local bits = initial_length%8
         local byte_length = math.ceil(final_length/8)
@@ -137,22 +141,30 @@ local function act_to_string(original,act)
             end
         end
     end
-    while #react < #original do
-        react = react..original:sub(#react+1,#react+1)
+    if react then
+        while #react < #original do
+            react = react..original:sub(#react+1,#react+1)
+        end
+    else
+        print('Action Library failure in '..(_addon.name or 'Unknown Addon')..': Invalid Act table returned.')
     end
     return react
 end
 
 
 -- Opens a listener event for the action packet at the incoming chunk level before modifications.
--- Passes in the documented act structure and the original action packet string.
+-- Passes in the documented act structures for the original and modified packets.
+-- If a table is returned, the library will treat it as a modified act table and recompose the packet string from it.
+-- If an invalid act table is passed, it will silently fail to be returned.
 function ActionPacket.open_listener(funct)
     if not funct or type(funct) ~= 'function' then return end
     local id = windower.register_event('incoming chunk',function(id, org, modi, is_injected, is_blocked)
         if id == 0x28 then
-            local act = windower.packets.parse_action(org)
-            act.size = org:byte(5)
-            return act_to_string(org,funct(act,org,modi))
+            local act_org = windower.packets.parse_action(org)
+            act_org.size = org:byte(5)
+            local act_mod = windower.packets.parse_action(modi)
+            act_mod.size = modi:byte(5)
+            return act_to_string(org,funct(act_org,act_mod))
         end
     end)
     return id
