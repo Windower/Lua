@@ -288,7 +288,7 @@ function parse_action_packet(act)
                 elseif m.spike_effect_message == 535 then
                     m.simp_spike_name = 'from retaliation'
                 else
-                    m.simp_spike_name = 'spikes'
+                    m.simp_spike_name = 'spikes' 
                 end
 
                 local msg = simplify_message(m.spike_effect_message)
