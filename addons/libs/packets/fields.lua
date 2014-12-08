@@ -730,6 +730,13 @@ fields.outgoing[0x0F1] = L{
     {ctype='unsigned char',     label='_unknown3'},                             -- 07
 }
 
+-- Unknown packet 0xF2
+--[[fields.outgoing[0x0F2] = L{
+    {ctype='unsigned char',     label='type'},                                  -- 04  Was always 01 for me
+    {ctype='unsigned char',     label='_unknown1'},                             -- 05  Was always 00 for me
+    {ctype='unsigned short',    label='Index',                  fn=index},      -- 07  Has always been the index of a synergy enthusiast or furnace for me
+}]]
+
 -- Widescan
 fields.outgoing[0x0F4] = L{
     {ctype='unsigned char',     label='Flags'},                                 -- 04   1 when requesting widescan information. No other values observed.
@@ -2154,7 +2161,7 @@ fields.incoming[0x067] = L{
     {ctype='char*',             label='Pet Name'},                              -- 14   Packet expands to accommodate pet name length.
 }
 
--- Synth Result
+-- Self Synth Result
 fields.incoming[0x06F] = L{
     {ctype='unsigned char',     label='Result',             fn=e+{'synth'}},    -- 04
     {ctype='signed char',       label='Quality'},                               -- 05
@@ -2165,6 +2172,18 @@ fields.incoming[0x06F] = L{
     {ctype='unsigned char[4]',  label='Skill',              fn=skill},          -- 1A
     {ctype='unsigned char[4]',  label='Skillup',            fn=div+{10}},       -- 1E
     {ctype='unsigned short',    label='_junk2'},                                -- 22
+}
+
+-- Others Synth Result
+fields.incoming[0x070] = L{
+    {ctype='unsigned char',     label='Result',             fn=e+{'synth'}},    -- 04
+    {ctype='signed char',       label='Quality'},                               -- 05
+    {ctype='unsigned char',     label='Count'},                                 -- 06
+    {ctype='unsigned char',     label='_junk1'},                                -- 07
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 08
+    {ctype='unsigned short[8]', label='Lost Item',          fn=item},           -- 0A
+    {ctype='unsigned char[4]',  label='Skill',              fn=skill},          -- 1A   Unsure about this
+    {ctype='char*',             label='Player Name'},                           -- 1E   Name of the player
 }
 
 -- Proposal
@@ -2383,6 +2402,8 @@ fields.incoming[0x0DF] = L{
     {ctype='unsigned char',     label='Sub job',            fn=job},            -- 22
     {ctype='unsigned char',     label='Sub job level'},                         -- 23
 }
+
+-- Unknown packet 0x0E0: I still can't make heads or tails of the content. The packet is always 8 bytes long.
 
 -- Char Info
 fields.incoming[0x0E2] = L{
