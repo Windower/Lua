@@ -132,6 +132,7 @@ data.incoming[0x038] = {name='Entity Animation',    description='Sent when a mod
 data.incoming[0x039] = {name='Env. Animation',      description='Sent to force animations to specific objects.'}
 data.incoming[0x03C] = {name='Shop',                description='Displays items in a vendors shop.'}
 data.incoming[0x03D] = {name='Value',               description='Returns the value of an item.'}
+data.incoming[0x03E] = {name='Open Buy/Sell',       description='Opens the buy/sell menu for vendors.'}
 data.incoming[0x041] = {name='Blacklist',           description='Contains player ID and name for blacklist.'}
 data.incoming[0x042] = {name='Blacklist Command',   description='Sent in response to /blacklist add or /blacklist delete.'}
 data.incoming[0x044] = {name='Job Info Extra',      description='Contains information about Automaton stats and set Blue Magic spells.'}

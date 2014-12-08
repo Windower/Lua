@@ -667,6 +667,9 @@ fields.outgoing[0x0C3] = L{
     {ctype='unsigned int',      label='_junk1'},                                -- 04  No obvious purpose
 }
 
+-- Unknown 0xC4 outgoing
+-- Occurs when changing linkshells. Is always 8 bytes with content: 0x73, 0x20, 0x00, 0x00 for me. Triggers two incoming 0xE0.
+
 -- Open Mog
 fields.outgoing[0x0CB] = L{
     {ctype='unsigned char',     label='type'},                                  -- 04  1 = open mog, 2 = close mog
@@ -1580,6 +1583,12 @@ fields.incoming[0x03D] = L{
     {ctype='unsigned int',      label='_unknown1',          const=1},           -- 0C
 }
 
+-- Open Buy/Sell
+fields.incoming[0x03E] = L{
+    {ctype='unsigned char',     label='type'},                                  -- 04  Only 0x04 observed so far
+    {ctype='data[3]',           label='_junk1'},                                -- 05
+}
+
 types.blacklist_entry = L{
     {ctype='unsigned int',      label='ID'},                                    -- 00
     {ctype='char[16]',          label='Name'},                                  -- 04
@@ -1689,6 +1698,11 @@ fields.incoming._func[0x044][0x17] = L{
     {ctype='unsigned short',    label='_unknown3'},                             -- 24
     {ctype='data[118]',         label='_unknown4'},                             -- 26   Zeroing everything beyond this point has no notable effect.
 }
+
+
+-- Unknown 0x048 incoming :: Sent when loading linkshell information from the Linkshell Concierge
+-- One per entry, 128 bytes long, mostly empty, does not contain name as far as I can see.
+-- Likely contributes to that information.
 
 -- Delivery Item
 fields.incoming._func[0x04B] = {}
