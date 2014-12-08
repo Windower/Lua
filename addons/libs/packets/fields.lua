@@ -879,6 +879,10 @@ fields.outgoing[0x112] = L{
     {ctype='int',               label='_unknown1'},                             -- 04
 }
 
+-- Homepoint Map Trigger :: 4 bytes, sent when entering a specific zone's homepoint list to cause maps to appear.
+fields.outgoing[0x114] = L{
+}
+
 -- Open Unity Menu :: Two of these are sent whenever I open my unity menu. The first one has a bool of 0 and the second of 1.
 fields.outgoing[0x116] = L{
     {ctype='bool',              label='_unknown1'},                             -- 04
