@@ -893,6 +893,10 @@ fields.outgoing[0x112] = L{
 fields.outgoing[0x114] = L{
 }
 
+-- Currency 2 Menu
+fields.outgoing[0x115] = L{
+}
+
 -- Open Unity Menu :: Two of these are sent whenever I open my unity menu. The first one has a bool of 0 and the second of 1.
 fields.outgoing[0x116] = L{
     {ctype='bool',              label='_unknown1'},                             -- 04

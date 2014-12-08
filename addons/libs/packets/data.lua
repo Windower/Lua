@@ -93,6 +93,7 @@ data.outgoing[0x110] = {name='Fishing Action',      description='Sent when casti
 data.outgoing[0x111] = {name='Lockstyle',           description='Sent when using the lockstyle command to lock or unlock.'}
 data.outgoing[0x112] = {name='RoE Log Request',     description='Sent when zoning. Requests the ROE quest log.'}
 data.outgoing[0x114] = {name='HP Map Trigger',      description='Sent when entering a homepoint list for a zone to trigger maps to appear.'}
+data.outgoing[0x115] = {name='Currency Menu 2',     description='Requests currency 2 information for the menu.'}
 data.outgoing[0x116] = {name='Unity Menu',          description='Sent when opening the Status/Unity menu.'}
 data.outgoing[0x117] = {name='Unity Ranking Menu',  description='Sent when opening the Status/Unity/Unity Ranking menu.'}
 data.outgoing[0x118] = {name='Unity Chat Status',   description='Sent when changing unity chat status.'}
@@ -195,6 +196,7 @@ data.incoming[0x113] = {name='Currency Info',       description='Contains all cu
 data.incoming[0x115] = {name='Fish Bite Info',      description='Contains information about the fish that you hooked.'}
 data.incoming[0x116] = {name='Equipset Build Response', description='Returned from the server when building a set.'}
 data.incoming[0x117] = {name='Equipset Response',   description='Returned from the server after the /equipset command.'}
+data.incoming[0x118] = {name='Currency 2 Info',     description='Contains all currencies to be displayed in the currency menu.'}
 
 return data
 
