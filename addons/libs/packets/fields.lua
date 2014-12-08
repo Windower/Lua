@@ -667,6 +667,12 @@ fields.outgoing[0x0C3] = L{
     {ctype='unsigned int',      label='_junk1'},                                -- 04  No obvious purpose
 }
 
+-- Open Mog
+fields.outgoing[0x0CB] = L{
+    {ctype='unsigned char',     label='type'},                                  -- 04  1 = open mog, 2 = close mog
+    {ctype='data[3]',           label='_junk1'}                                 -- 05
+}
+
 -- Check
 fields.outgoing[0x0DD] = L{
     {ctype='unsigned int',      label='Target',             fn=id},             -- 04
@@ -2335,6 +2341,12 @@ fields.incoming[0x0DD] = L{
     {ctype='unsigned char',     label='Sub job level'},                         -- 25
     {ctype='char*',             label='Name'},                                  -- 26
 }
+
+-- Unknown mog house related packet? - 8 bytes long, sent in response to opening/closing mog house. Injecting it has no obvious effect.
+--[[fields.incoming[0x0DE] = L{
+    {ctype='unsigned char',     label='type'},                                  -- 04  Was always 0x4 for opening/closing mog house
+    {ctype='data[3]',           label='_junk1'},                                -- 05  Looked like junk
+}]]
 
 -- Char Update
 fields.incoming[0x0DF] = L{
