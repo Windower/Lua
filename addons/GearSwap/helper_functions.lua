@@ -668,9 +668,18 @@ local cmd_reg = {}
 Command_Registry = {}
 
 function Command_Registry.new()
-    local new_instance = {}
+    local new_instance = {last_removed=os.clock()}
 
-    return setmetatable(new_instance, {__index = function(t, k) if rawget(t, k) ~= nil then return t[k] else return rawget(cmd_reg,k) end end})
+    return setmetatable(new_instance, {__index = function(t, k)
+            if os.clock() - rawget(t,'last_removed') > 0.04 then
+                rawset(t,'last_removed',remove_old_command_registry_entries(t))
+            end
+            if rawget(t, k) ~= nil then
+                return t[k]
+            else
+                return rawget(cmd_reg,k)
+            end
+        end})
 end
 
 
@@ -703,20 +712,18 @@ end
 ---- ts - The current time, as obtained from os.time()
 -----------------------------------------------------------------------------------
 --Returns:
----- none
+---- timestamp of the last time it was traversed.
 -----------------------------------------------------------------------------------
-function remove_old_command_registry_entries()
+function remove_old_command_registry_entries(command_registry)
     for i,v in pairs(command_registry) do
-        local lim = 20 -- 20 second default limit (good for spells?)
-        if v.spell and v.spell.action_type then
-            if delay_map_to_action_type[v.spell.action_type] then
-                lim = delay_map_to_action_type[v.spell.action_type]
-            end
-        end
-        if os.time()-i >= lim then
+        local lim = v.spell and v.spell.cast_time and v.spell.cast_time*1.1+1 or
+            v.spell and v.spell.action_type and delay_map_to_action_type[v.spell.action_type] or
+            1 -- Sets it to normal casting time + 10% +1 for anything with a defined cast_time, or 1 if there is no defined cast time.
+        if tonumber(i) and os.time()-i >= lim then
             command_registry[i] = nil
         end
     end
+    return os.clock()
 end
 
 
