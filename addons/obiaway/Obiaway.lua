@@ -28,9 +28,8 @@
 -- SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --
 -- Puts elemental obis away when they are no longer needed due
--- to day/weather/storm effect change. Uses itemizer.
--- Intended to be used in conjunection with spellcast xml that
--- moves needed obis from sack to inventory just in time. 
+-- to day/weather/storm effect change and gets elemental obi based
+-- on same conditions. Uses itemizer addon.
 -- 
 -- The advantage of this system compared to moving obis back during 
 -- aftercast is that it avoids excessive inventory movement,
@@ -38,21 +37,24 @@
 -- less likely, and timing issues with very fast spells (spell
 -- fires before obi is moved) occur at worst on the first spell
 -- not but subsequent ones.
+--
 -- Known bugs: 
+--
 -- 1. upon activation, it puts only the first unneeded
--- obi away. The function remove_unneeded_obis() tries to put all
+-- obi away. The function get_needed_obis() tries to put all
 -- of them away, but the calls to itemizer are all made instantly
 -- so only the first one is carried out. Usually, only one obi
 -- has to be removed per call, so this is not much of a problem.
+--
 -- 2. when weather changes due to zoning, get_obis_in_inventory()
--- is called before inventory has loaded and returns nothing. 
+-- is called before inventory has loaded and returns nothing.
 --
 -- 3. Obi is not moved when currently equipped.
 -- 
--- To Do: add function to turn the console_echo's on/off. 
+-- To Do: Use a loop to remove and retrieve obi for shorter code
 
 _addon.name = "Obiaway"
-_addon.author = "ReaperX"
+_addon.author = "ReaperX, onetime"
 _addon.version = "1.0.2"
 _addon.commands = {'obi', 'obiaway'}
 
@@ -117,7 +119,7 @@ function get_obis_in_inventory()
     inv = items.inventory
     if not inv then return end
     number = items.max_inventory
-    for i=1,number do 
+    for i=1,number do
         id = inv[i].id
         if ( id>=15435 and id<=15442) then
             obis["Fire"] = obis["Fire"] or (id == 15435)
