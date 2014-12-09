@@ -1,11 +1,14 @@
-Author: ReaperX
-Version: 0.1
-Addon to remove elemental obis based on day/weather/storm conditions. The
-addon is triggered whenever day or weather changes, or a storm effect wears
-off.
+Author: ReaperX, onetime
+Version: 1.0.2
 
-Abbreviation: //Obiaway
+Addon to automatically get and store elemental obis based on day/weather/storm 
+conditions. The addon is triggered whenever on day change, weather change, and
+scholar storm buff gain and loss.
 
-Use //Obiaway to manually move an unneeded elemental Obi to Sack. Usually,
-that won't be necessary.
- 
+Command listing:
+
+//obiaway or //obi
+  (h)elp   - display help information.
+  (g)et   - force obiaway to put away and get appropriate obis.
+  (n)otify [on|off]   - sets notifications on or off.
+  (l)ocation [sack|satchel|case|wardrobe]   - sets where to put obis away.
