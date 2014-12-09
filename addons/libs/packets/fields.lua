@@ -667,6 +667,15 @@ fields.outgoing[0x0C3] = L{
     {ctype='unsigned int',      label='_junk1'},                                -- 04  No obvious purpose
 }
 
+-- Unknown 0xC4 outgoing
+-- Occurs when changing linkshells. Is always 8 bytes with content: 0x73, 0x20, 0x00, 0x00 for me. Triggers two incoming 0xE0.
+
+-- Open Mog
+fields.outgoing[0x0CB] = L{
+    {ctype='unsigned char',     label='type'},                                  -- 04  1 = open mog, 2 = close mog
+    {ctype='data[3]',           label='_junk1'}                                 -- 05
+}
+
 -- Check
 fields.outgoing[0x0DD] = L{
     {ctype='unsigned int',      label='Target',             fn=id},             -- 04
@@ -720,6 +729,13 @@ fields.outgoing[0x0F1] = L{
     {ctype='unsigned char',     label='_unknown2'},                             -- 06
     {ctype='unsigned char',     label='_unknown3'},                             -- 07
 }
+
+-- Unknown packet 0xF2
+--[[fields.outgoing[0x0F2] = L{
+    {ctype='unsigned char',     label='type'},                                  -- 04  Was always 01 for me
+    {ctype='unsigned char',     label='_unknown1'},                             -- 05  Was always 00 for me
+    {ctype='unsigned short',    label='Index',                  fn=index},      -- 07  Has always been the index of a synergy enthusiast or furnace for me
+}]]
 
 -- Widescan
 fields.outgoing[0x0F4] = L{
@@ -871,6 +887,14 @@ fields.outgoing[0x111] = L{
 -- ROE quest log request
 fields.outgoing[0x112] = L{
     {ctype='int',               label='_unknown1'},                             -- 04
+}
+
+-- Homepoint Map Trigger :: 4 bytes, sent when entering a specific zone's homepoint list to cause maps to appear.
+fields.outgoing[0x114] = L{
+}
+
+-- Currency 2 Menu
+fields.outgoing[0x115] = L{
 }
 
 -- Open Unity Menu :: Two of these are sent whenever I open my unity menu. The first one has a bool of 0 and the second of 1.
@@ -1570,6 +1594,12 @@ fields.incoming[0x03D] = L{
     {ctype='unsigned int',      label='_unknown1',          const=1},           -- 0C
 }
 
+-- Open Buy/Sell
+fields.incoming[0x03E] = L{
+    {ctype='unsigned char',     label='type'},                                  -- 04  Only 0x04 observed so far
+    {ctype='data[3]',           label='_junk1'},                                -- 05
+}
+
 types.blacklist_entry = L{
     {ctype='unsigned int',      label='ID'},                                    -- 00
     {ctype='char[16]',          label='Name'},                                  -- 04
@@ -1679,6 +1709,11 @@ fields.incoming._func[0x044][0x17] = L{
     {ctype='unsigned short',    label='_unknown3'},                             -- 24
     {ctype='data[118]',         label='_unknown4'},                             -- 26   Zeroing everything beyond this point has no notable effect.
 }
+
+
+-- Unknown 0x048 incoming :: Sent when loading linkshell information from the Linkshell Concierge
+-- One per entry, 128 bytes long, mostly empty, does not contain name as far as I can see.
+-- Likely contributes to that information.
 
 -- Delivery Item
 fields.incoming._func[0x04B] = {}
@@ -2130,7 +2165,7 @@ fields.incoming[0x067] = L{
     {ctype='char*',             label='Pet Name'},                              -- 14   Packet expands to accommodate pet name length.
 }
 
--- Synth Result
+-- Self Synth Result
 fields.incoming[0x06F] = L{
     {ctype='unsigned char',     label='Result',             fn=e+{'synth'}},    -- 04
     {ctype='signed char',       label='Quality'},                               -- 05
@@ -2141,6 +2176,18 @@ fields.incoming[0x06F] = L{
     {ctype='unsigned char[4]',  label='Skill',              fn=skill},          -- 1A
     {ctype='unsigned char[4]',  label='Skillup',            fn=div+{10}},       -- 1E
     {ctype='unsigned short',    label='_junk2'},                                -- 22
+}
+
+-- Others Synth Result
+fields.incoming[0x070] = L{
+    {ctype='unsigned char',     label='Result',             fn=e+{'synth'}},    -- 04
+    {ctype='signed char',       label='Quality'},                               -- 05
+    {ctype='unsigned char',     label='Count'},                                 -- 06
+    {ctype='unsigned char',     label='_junk1'},                                -- 07
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 08
+    {ctype='unsigned short[8]', label='Lost Item',          fn=item},           -- 0A
+    {ctype='unsigned char[4]',  label='Skill',              fn=skill},          -- 1A   Unsure about this
+    {ctype='char*',             label='Player Name'},                           -- 1E   Name of the player
 }
 
 -- Proposal
@@ -2336,6 +2383,12 @@ fields.incoming[0x0DD] = L{
     {ctype='char*',             label='Name'},                                  -- 26
 }
 
+-- Unknown mog house related packet? - 8 bytes long, sent in response to opening/closing mog house. Injecting it has no obvious effect.
+--[[fields.incoming[0x0DE] = L{
+    {ctype='unsigned char',     label='type'},                                  -- 04  Was always 0x4 for opening/closing mog house
+    {ctype='data[3]',           label='_junk1'},                                -- 05  Looked like junk
+}]]
+
 -- Char Update
 fields.incoming[0x0DF] = L{
     {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
@@ -2353,6 +2406,8 @@ fields.incoming[0x0DF] = L{
     {ctype='unsigned char',     label='Sub job',            fn=job},            -- 22
     {ctype='unsigned char',     label='Sub job level'},                         -- 23
 }
+
+-- Unknown packet 0x0E0: I still can't make heads or tails of the content. The packet is always 8 bytes long.
 
 -- Char Info
 fields.incoming[0x0E2] = L{

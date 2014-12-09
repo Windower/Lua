@@ -60,6 +60,7 @@ data.outgoing[0x0BE] = {name='Merit Point Increase',description='Sent when you i
 data.outgoing[0x0BF] = {name='Job Point Increase',  description='Sent when you increase a job point ability.'}
 data.outgoing[0x0C0] = {name='Job Point Menu',      description='Sent when you open the Job Point menu and triggers Job Point Information packets.'}
 data.outgoing[0x0C3] = {name='Make Linkshell',      description='Sent in response to the /makelinkshell command.'}
+data.outgoing[0x0CB] = {name='Open Mog',            description='Sent when opening or closing your mog house.'}
 data.outgoing[0x0D3] = {name='GM Call',             description='Places a call to the GM queue.'}
 data.outgoing[0x0DC] = {name='Type Bitmask',        description='This command is sent when change your party-seek or /anon status.'}
 data.outgoing[0x0DD] = {name='Check',               description='Used to check other players.'}
@@ -91,6 +92,8 @@ data.outgoing[0x10F] = {name='Currency Menu',       description='Requests curren
 data.outgoing[0x110] = {name='Fishing Action',      description='Sent when casting, releasing a fish, catching a fish, and putting away your fishing rod.'}
 data.outgoing[0x111] = {name='Lockstyle',           description='Sent when using the lockstyle command to lock or unlock.'}
 data.outgoing[0x112] = {name='RoE Log Request',     description='Sent when zoning. Requests the ROE quest log.'}
+data.outgoing[0x114] = {name='HP Map Trigger',      description='Sent when entering a homepoint list for a zone to trigger maps to appear.'}
+data.outgoing[0x115] = {name='Currency Menu 2',     description='Requests currency 2 information for the menu.'}
 data.outgoing[0x116] = {name='Unity Menu',          description='Sent when opening the Status/Unity menu.'}
 data.outgoing[0x117] = {name='Unity Ranking Menu',  description='Sent when opening the Status/Unity/Unity Ranking menu.'}
 data.outgoing[0x118] = {name='Unity Chat Status',   description='Sent when changing unity chat status.'}
@@ -130,6 +133,7 @@ data.incoming[0x038] = {name='Entity Animation',    description='Sent when a mod
 data.incoming[0x039] = {name='Env. Animation',      description='Sent to force animations to specific objects.'}
 data.incoming[0x03C] = {name='Shop',                description='Displays items in a vendors shop.'}
 data.incoming[0x03D] = {name='Value',               description='Returns the value of an item.'}
+data.incoming[0x03E] = {name='Open Buy/Sell',       description='Opens the buy/sell menu for vendors.'}
 data.incoming[0x041] = {name='Blacklist',           description='Contains player ID and name for blacklist.'}
 data.incoming[0x042] = {name='Blacklist Command',   description='Sent in response to /blacklist add or /blacklist delete.'}
 data.incoming[0x044] = {name='Job Info Extra',      description='Contains information about Automaton stats and set Blue Magic spells.'}
@@ -155,7 +159,8 @@ data.incoming[0x062] = {name='Skills Update',       description='Packet that sho
 data.incoming[0x063] = {name='Set Update',          description='Frequently sent packet during battle that updates specific types of job information, like currently available/set automaton equipment and currently set BLU spells.'}
 data.incoming[0x065] = {name='Repositioning',       description='Moves your character. Seems to be functionally idential to the Spawn packet'}
 data.incoming[0x067] = {name='Pet Info',            description='Updates information about whether or not you have a pet and the TP, HP, etc. of the pet if appropriate.'}
-data.incoming[0x06F] = {name='Synth Result',        description='Results of an attempted synthesis process.'}
+data.incoming[0x06F] = {name='Self Synth Result',   description='Results of an attempted synthesis process by yourself.'}
+data.incoming[0x070] = {name='Others Synth Result', description='Results of an attempted synthesis process by others.'}
 data.incoming[0x071] = {name='Campaign Map Info',   description='Populates the Campaign map.'}
 data.incoming[0x078] = {name='Proposal',            description='Carries proposal information from a /propose or /nominate command.'}
 data.incoming[0x079] = {name='Proposal Update',     description='Proposal update following a /vote command.'}
@@ -191,6 +196,7 @@ data.incoming[0x113] = {name='Currency Info',       description='Contains all cu
 data.incoming[0x115] = {name='Fish Bite Info',      description='Contains information about the fish that you hooked.'}
 data.incoming[0x116] = {name='Equipset Build Response', description='Returned from the server when building a set.'}
 data.incoming[0x117] = {name='Equipset Response',   description='Returned from the server after the /equipset command.'}
+data.incoming[0x118] = {name='Currency 2 Info',     description='Contains all currencies to be displayed in the currency menu.'}
 
 return data
 

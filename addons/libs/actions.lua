@@ -68,15 +68,103 @@ function ActionPacket.new(a)
     return setmetatable(new_instance, {__index = function(t, k) if rawget(t, k) ~= nil then return t[k] else return actionpacket[k] end end})
 end
 
+local function act_to_string(original,act)
+    if type(act) ~= 'table' then return act end
+    
+    function assemble_bit_packed(init,val,initial_length,final_length)
+        if not init then return init end
+        
+        if type(val) == 'boolean' then
+            if val then val = 1 else val = 0 end
+        elseif type(val) ~= 'number' then
+            return false
+        end
+        local bits = initial_length%8
+        local byte_length = math.ceil(final_length/8)
+        
+        local out_val = 0
+        if bits > 0 then
+            out_val = init:byte(#init) -- Initialize out_val to the remainder in the active byte.
+            init = init:sub(1,#init-1) -- Take off the active byte
+        end
+        out_val = out_val + val*2^bits -- left-shift val by the appropriate amount and add it to the remainder (now the lsb-s in val)
+        
+        while out_val > 0 do
+            init = init..string.char(out_val%256)
+            out_val = math.floor(out_val/256)
+        end
+        while #init < byte_length do
+            init = init..string.char(0)
+        end
+        return init
+    end
+    
+    local react = assemble_bit_packed(original:sub(1,4),act.size,32,40)
+    react = assemble_bit_packed(react,act.actor_id,40,72)
+    react = assemble_bit_packed(react,act.target_count,72,82)
+    react = assemble_bit_packed(react,act.category,82,86)
+    react = assemble_bit_packed(react,act.param,86,102)
+    react = assemble_bit_packed(react,act.unknown,102,118)
+    react = assemble_bit_packed(react,act.recast,118,150)
+    
+    local offset = 150
+    for i = 1,act.target_count do
+        react = assemble_bit_packed(react,act.targets[i].id,offset,offset+32)
+        react = assemble_bit_packed(react,act.targets[i].action_count,offset+32,offset+36)
+        offset = offset + 36
+        for n = 1,act.targets[i].action_count do
+            react = assemble_bit_packed(react,act.targets[i].actions[n].reaction,offset,offset+5)
+            react = assemble_bit_packed(react,act.targets[i].actions[n].animation,offset+5,offset+16)
+            react = assemble_bit_packed(react,act.targets[i].actions[n].effect,offset+16,offset+21)
+            react = assemble_bit_packed(react,act.targets[i].actions[n].stagger,offset+21,offset+27)
+            react = assemble_bit_packed(react,act.targets[i].actions[n].param,offset+27,offset+44)
+            react = assemble_bit_packed(react,act.targets[i].actions[n].message,offset+44,offset+54)
+            react = assemble_bit_packed(react,act.targets[i].actions[n].unknown,offset+54,offset+85)
+            
+            react = assemble_bit_packed(react,act.targets[i].actions[n].has_add_effect,offset+85,offset+86)
+            offset = offset + 86
+            if act.targets[i].actions[n].has_add_effect then
+                react = assemble_bit_packed(react,act.targets[i].actions[n].add_effect_animation,offset,offset+6)
+                react = assemble_bit_packed(react,act.targets[i].actions[n].add_effect_effect,offset+6,offset+10)
+                react = assemble_bit_packed(react,act.targets[i].actions[n].add_effect_param,offset+10,offset+27)
+                react = assemble_bit_packed(react,act.targets[i].actions[n].add_effect_message,offset+27,offset+37)
+                offset = offset + 37
+            end
+            react = assemble_bit_packed(react,act.targets[i].actions[n].has_spike_effect,offset,offset+1)
+            offset = offset + 1
+            if act.targets[i].actions[n].has_spike_effect then
+                react = assemble_bit_packed(react,act.targets[i].actions[n].spike_effect_animation,offset,offset+6)
+                react = assemble_bit_packed(react,act.targets[i].actions[n].spike_effect_effect,offset+6,offset+10)
+                react = assemble_bit_packed(react,act.targets[i].actions[n].spike_effect_param,offset+10,offset+24)
+                react = assemble_bit_packed(react,act.targets[i].actions[n].spike_effect_message,offset+24,offset+34)
+                offset = offset + 34
+            end
+        end
+    end
+    if react then
+        while #react < #original do
+            react = react..original:sub(#react+1,#react+1)
+        end
+    else
+        print('Action Library failure in '..(_addon.name or 'Unknown Addon')..': Invalid Act table returned.')
+    end
+    return react
+end
+
 
 -- Opens a listener event for the action packet at the incoming chunk level before modifications.
--- Passes in the documented act structure and the original action packet string.
+-- Passes in the documented act structures for the original and modified packets.
+-- If a table is returned, the library will treat it as a modified act table and recompose the packet string from it.
+-- If an invalid act table is passed, it will silently fail to be returned.
 function ActionPacket.open_listener(funct)
     if not funct or type(funct) ~= 'function' then return end
     local id = windower.register_event('incoming chunk',function(id, org, modi, is_injected, is_blocked)
         if id == 0x28 then
-            local act = windower.packets.parse_action(org)
-            funct(act,original)
+            local act_org = windower.packets.parse_action(org)
+            act_org.size = org:byte(5)
+            local act_mod = windower.packets.parse_action(modi)
+            act_mod.size = modi:byte(5)
+            return act_to_string(org,funct(act_org,act_mod))
         end
     end)
     return id
@@ -88,8 +176,21 @@ function ActionPacket.close_listener(id)
 end
 
 
+local actor_animation_twoCC = {
+        wh='White Magic',
+        bk='Black Magic',
+        bl='Blue Magic',
+        sm='Summoning Magic',
+        te='TP Move',
+        ['k0']='Melee Attack',
+        ['lg']='Ranged Attack',
+    }
 
-
+function actionpacket:get_animation_string()
+    return actor_animation_twoCC[string.char(actor_animation_twoCC[self.raw['unknown']]%256,math.floor(actor_animation_twoCC[self.raw['unknown']]/256))]
+end
+    
+    
 function actionpacket:get_category_string()
     return category_strings[self.raw['category']]
 end
