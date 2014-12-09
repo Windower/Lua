@@ -54,7 +54,7 @@
 -- To Do: Use a loop to remove and retrieve obi for shorter code
 
 _addon.name = "Obiaway"
-_addon.author = "ReaperX, onetime"
+_addon.author = "ReaperX"
 _addon.version = "1.0.2"
 _addon.commands = {'obi', 'obiaway'}
 
