@@ -1,5 +1,5 @@
 -- 
--- Obiaway v0.1
+-- Obiaway v1.0.2
 -- 
 -- Copyright (c) 2013, ReaperX
 -- All rights reserved.
@@ -51,30 +51,65 @@
 -- 
 -- To Do: add function to turn the console_echo's on/off. 
 
+_addon.name = "Obiaway"
 _addon.author = "ReaperX"
-_addon.version = "1.0"
-_addon.command = "obiaway"
+_addon.version = "1.0.2"
+_addon.commands = {'obi', 'obiaway'}
 
 require('sets')
+require('logger')
 config = require('config')
 res = require('resources')
 
-defaults = {}
-defaults.location = 'sack'
+default_settings = {}
+default_settings.notify = 'on'
+default_settings.location = 'sack'
 
-settings = config.load(defaults)
+settings = config.load(default_settings)
 
-windower.register_event('addon command',function (...)
-    if args[1] == 'location' then
-        if S{'sack','case','satchel'}:contains(args[2]:lower()) then
-            settings.location = args[2]
-        else
-            print('Location can only be sack, satchel or case.')
-        end
-    else
-        remove_unneeded_obis()
-    end
-end)
+-- Accepts msg as a string or a table
+function obi_output(msg)
+        windower.add_to_chat(209, msg)
+end
+
+windower.register_event('addon command', function()
+
+	return function(command, ...)
+	    command = command:lower() or 'help'
+        local params = {...}
+
+		if command == 'help' or command == 'h' then
+			obi_output("Obiaway v".._addon.version..". Authors: ".._addon.author)
+			obi_output("//(obi)away [options]")
+			obi_output("   (h)elp :  Displays this help text.")
+			obi_output("   (g)et :  Command for manually getting and removing obis.")
+			obi_output("   (n)otify [on|off] :  Sets obiaway notifcations on or off.")
+			obi_output("   (l)ocation [sack|satchel|case|wardrobe] :  Sets inventory from which to get and put obis.")
+		elseif command == 'get' or command == 'g' then
+			get_needed_obis()
+			obi_output("Sorting obis...")
+		elseif command == 'notify' or command == 'n' then
+			if S{'on'}:contains(params[1]:lower()) then
+				settings.notify = params[1]
+				obi_output("Obiaway notifications are now on")
+			elseif S{'off'}:contains(params[1]:lower()) then
+				settings.notify = params[1]
+				obi_output("Obiaway notifications are now off.")
+			else
+				error("Invalid argument. Usage: //obiaway [on|off]")
+			end
+		elseif command == 'location' or command == 'l' then
+			if S{'sack','case','satchel','wardrobe'}:contains(params[1]:lower()) then
+				settings.location = params[1]
+				obi_output("Obiaway location set to: "..settings.location)
+			else
+				error("Invalid argument. Usage: //obiaway location [sack|satchel|case|wardrobe]")
+			end
+		else
+			error("Unrecognized command. See //obiaway help.")
+		end
+	end
+end())
 
 function get_obis_in_inventory()
     obis = {}
@@ -98,36 +133,192 @@ function get_obis_in_inventory()
     return obis
 end
 
-function remove_unneeded_obis()
+function get_needed_obis()
     elements = get_all_elements()
     obis = get_obis_in_inventory()
+	
+    areas = {}
+    areas.Cities = S{
+	"Ru'Lude Gardens",
+	"Upper Jeuno",
+	"Lower Jeuno",
+	"Port Jeuno",
+	"Port Windurst",
+	"Windurst Waters",
+	"Windurst Woods",
+	"Windurst Walls",
+	"Heavens Tower",
+	"Port San d'Oria",
+	"Northern San d'Oria",
+	"Southern San d'Oria",
+	"Port Bastok",
+	"Bastok Markets",
+	"Bastok Mines",
+	"Metalworks",
+	"Aht Urhgan Whitegate",
+	"Tavanazian Safehold",
+	"Nashmau",
+	"Selbina",
+	"Mhaura",
+	"Norg",
+	"Kazham",
+	"Eastern Adoulin",
+	"Western Adoulin",
+	"Leafallia",
+	"Celennia Memorial Library",
+	"Mog Garden"
+	}
+	
     local str = ''
-    if obis["Fire"] and elements["Fire"]==0 then
-        str = str.."input /put \"Karin Obi\" "..settings.location..";wait .5;"
-    end
-    if obis["Earth"] and elements["Earth"]==0 then
-        str = str.."input /put \"Dorin Obi\" "..settings.location..";wait .5;"
-    end
-    if obis["Water"] and elements["Water"]==0 then
-        str = str.."input /put \"Suirin Obi\" "..settings.location..";wait .5;"
-    end
-    if obis["Wind"] and elements["Wind"]==0 then
-        str = str.."input /put \"Furin Obi\" "..settings.location..";wait .5;"
-    end
-    if obis["Ice"] and elements["Ice"]==0 then
-        str = str.."input /put \"Hyorin Obi\" "..settings.location..";wait .5;"
-    end
-    if obis["Lightning"] and elements["Lightning"]==0 then
-        str = str.."input /put \"Rairin Obi\" "..settings.location..";wait .5;"
-    end
-    if obis["Light"] and elements["Light"]==0 then    
-        str = str.."input /put \"Korin Obi\" "..settings.location..";wait .5;"
-    end
-    if obis["Dark"] and elements["Dark"]==0 then    
-        str = str.."input /put \"Anrin Obi\" "..settings.location
-    end
-    windower.send_command(str)
-    print('Putting unneeded obis away in '..settings.location..'.')
+	if not areas.Cities:contains(res.zones[windower.ffxi.get_info().zone].english) then
+		if obis["Fire"] and elements["Fire"] == 0 then
+			str = str.."put \"Karin Obi\" "..settings.location..";wait .5;"
+			if settings.notify == 'on' then
+				obi_output("Putting Karin Obi away in "..settings.location..".")
+			end
+		end
+		if obis["Earth"] and elements["Earth"] == 0 then
+			str = str.."put \"Dorin Obi\" "..settings.location..";wait .5;"
+			if settings.notify == 'on' then
+				obi_output("Putting Dorin Obi away in "..settings.location..".")
+			end
+		end
+		if obis["Water"] and elements["Water"] == 0 then
+			str = str.."put \"Suirin Obi\" "..settings.location..";wait .5;"
+			if settings.notify == 'on' then
+				obi_output("Putting Suirin Obi away in "..settings.location..".")
+			end
+		end
+		if obis["Wind"] and elements["Wind"] == 0 then
+			str = str.."put \"Furin Obi\" "..settings.location..";wait .5;"
+			if settings.notify == 'on' then
+				obi_output("Putting Furin Obi away in "..settings.location..".")
+			end
+		end
+		if obis["Ice"] and elements["Ice"] == 0 then
+			str = str.."put \"Hyorin Obi\" "..settings.location..";wait .5;"
+			if settings.notify == 'on' then
+				obi_output("Putting Hyorin Obi away in "..settings.location..".")
+			end
+		end
+		if obis["Lightning"] and elements["Lightning"] == 0 then
+			str = str.."put \"Rairin Obi\" "..settings.location..";wait .5;"
+			if settings.notify == 'on' then
+				obi_output("Putting Rairin Obi away in "..settings.location..".")
+			end
+		end
+		if obis["Light"] and elements["Light"] == 0 then    
+			str = str.."put \"Korin Obi\" "..settings.location..";wait .5;"
+			if settings.notify == 'on' then
+				obi_output("Putting Korin Obi away in "..settings.location..".")
+			end
+		end
+		if obis["Dark"] and elements["Dark"] == 0 then    
+			str = str.."put \"Anrin Obi\" "..settings.location..";wait .5;"
+			if settings.notify == 'on' then
+				obi_output("Putting Anrin Obi away in "..settings.location..".")
+			end
+		end
+		if not obis["Fire"] and elements["Fire"] > 0 then
+			str = str.."get \"Karin Obi\" "..settings.location..";wait .5;"
+			if settings.notify == 'on' then
+				obi_output("Getting Karin Obi from "..settings.location..".")
+			end
+		end
+		if not obis["Earth"] and elements["Earth"] > 0 then
+			str = str.."get \"Dorin Obi\" "..settings.location..";wait .5;"
+			if settings.notify == 'on' then
+				obi_output("Getting Dorin Obi from "..settings.location..".")
+			end
+		end
+		if not obis["Water"] and elements["Water"] > 0 then
+			str = str.."get \"Suirin Obi\" "..settings.location..";wait .5;"
+			if settings.notify == 'on' then
+				obi_output("Getting Suirin Obi from "..settings.location..".")
+			end
+		end
+		if not obis["Wind"] and elements["Wind"] > 0 then
+			str = str.."get \"Furin Obi\" "..settings.location..";wait .5;"
+			if settings.notify == 'on' then
+				obi_output("Getting Furin Obi from "..settings.location..".")
+			end
+		end
+		if not obis["Ice"] and elements["Ice"] > 0 then
+			str = str.."get \"Hyorin Obi\" "..settings.location..";wait .5;"
+			if settings.notify == 'on' then
+				obi_output("Getting Hyorin Obi from "..settings.location..".")
+			end
+		end
+		if not obis["Lightning"] and elements["Lightning"] > 0 then
+			str = str.."get \"Rairin Obi\" "..settings.location..";wait .5;"
+			if settings.notify == 'on' then
+				obi_output("Getting Rairin Obi from "..settings.location..".")
+			end
+		end
+		if not obis["Light"] and elements["Light"] > 0 then    
+			str = str.."get \"Korin Obi\" "..settings.location..";wait .5;"
+			if settings.notify == 'on' then
+				obi_output("Getting Korin Obi from "..settings.location..".")
+			end
+		end
+		if not obis["Dark"] and elements["Dark"] > 0 then    
+			str = str.."get \"Anrin Obi\" "..settings.location..";wait .5;"
+			if settings.notify == 'on' then
+				obi_output("Getting Anrin Obi from "..settings.location..".")
+			end
+		end
+		windower.send_command(str)
+	else --in town: put away all obis.
+		if obis["Fire"] then
+			str = str.."put \"Karin Obi\" "..settings.location..";wait .5;"
+			if settings.notify == 'on' then
+				obi_output("Putting Karin Obi away in "..settings.location..".")
+			end
+		end
+		if obis["Earth"] then
+			str = str.."put \"Dorin Obi\" "..settings.location..";wait .5;"
+			if settings.notify == 'on' then
+				obi_output("Putting Dorin Obi away in "..settings.location..".")
+			end
+		end
+		if obis["Water"] then
+			str = str.."put \"Suirin Obi\" "..settings.location..";wait .5;"
+			if settings.notify == 'on' then
+				obi_output("Putting Suirin Obi away in "..settings.location..".")
+			end
+		end
+		if obis["Wind"] then
+			str = str.."put \"Furin Obi\" "..settings.location..";wait .5;"
+			if settings.notify == 'on' then
+				obi_output("Putting Furin Obi away in "..settings.location..".")
+			end
+		end
+		if obis["Ice"] then
+			str = str.."put \"Hyorin Obi\" "..settings.location..";wait .5;"
+			if settings.notify == 'on' then
+				obi_output("Putting Hyorin Obi away in "..settings.location..".")
+			end
+		end
+		if obis["Lightning"] then
+			str = str.."put \"Rairin Obi\" "..settings.location..";wait .5;"
+			if settings.notify == 'on' then
+				obi_output("Putting Rairin Obi away in "..settings.location..".")
+			end
+		end
+		if obis["Light"] then    
+			str = str.."put \"Korin Obi\" "..settings.location..";wait .5;"
+			if settings.notify == 'on' then
+				obi_output("Putting Korin Obi away in "..settings.location..".")
+			end
+		end
+		if obis["Dark"] then    
+			str = str.."put \"Anrin Obi\" "..settings.location..";wait .5;"
+			if settings.notify == 'on' then
+				obi_output("Putting Anrin Obi away in "..settings.location..".")
+			end
+		end
+		windower.send_command(str)
+	end
 end
 
 function inTable(tbl, item)
@@ -159,27 +350,25 @@ function get_all_elements()
     buffs = windower.ffxi.get_player().buffs
 
     if inTable(buffs, 178) then
-      elements["Fire"] = elements["Fire"] +1
+      elements["Fire"] = elements["Fire"] + 1
     elseif inTable(buffs, 183) then
-      elements["Water"] = elements["Water"] +1
+      elements["Water"] = elements["Water"] + 1
     elseif inTable(buffs, 181) then
-      elements["Earth"] = elements["Earth"] +1
+      elements["Earth"] = elements["Earth"] + 1
     elseif inTable(buffs, 180) then
-      elements["Wind"] = elements["Wind"] +1
+      elements["Wind"] = elements["Wind"] + 1
     elseif inTable(buffs, 179) then
-      elements["Ice"] = elements["Ice"] +1
+      elements["Ice"] = elements["Ice"] + 1
     elseif inTable(buffs, 182) then
-      elements["Lightning"] = elements["Lightning"] +1
+      elements["Lightning"] = elements["Lightning"] + 1
     elseif inTable(buffs, 184) then
-      elements["Light"] = elements["Light"] +1
+      elements["Light"] = elements["Light"] + 1
     elseif inTable(buffs, 185) then
-      elements["Dark"] = elements["Dark"] +1
+      elements["Dark"] = elements["Dark"] + 1
     end
     return elements
 end
 
-windower.register_event('lose buff', remove_unneeded_obis:cond(function(id) return id >= 178 and id <= 185 end))
-
-windower.register_event('day change', 'weather change', remove_unneeded_obis)
-
-
+windower.register_event('gain buff', get_needed_obis:cond(function(id) return id >= 178 and id <= 185 end))
+windower.register_event('lose buff', get_needed_obis:cond(function(id) return id >= 178 and id <= 185 end))
+windower.register_event('day change', 'weather change', get_needed_obis)
