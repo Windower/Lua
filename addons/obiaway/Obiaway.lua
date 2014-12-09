@@ -69,50 +69,50 @@ settings = config.load(default_settings)
 
 -- Accepts msg as a string or a table
 function obi_output(msg)
-	windower.add_to_chat(209, msg)
+    windower.add_to_chat(209, msg)
 end
 
 windower.register_event('addon command', function()
 
-	return function(command, ...)
-		command = command:lower() or 'help'
+    return function(command, ...)
+        command = command:lower() or 'help'
         local params = {...}
 
-		if command == 'help' or command == 'h' then
-			obi_output("Obiaway v".._addon.version..". Authors: ".._addon.author)
-			obi_output("//(obi)away [options]")
-			obi_output("   (h)elp :  Displays this help text.")
-			obi_output("   (g)et :  Command for manually getting and removing obis.")
-			obi_output("   (n)otify [on|off] :  Sets obiaway notifcations on or off.")
-			obi_output("   (l)ocation [sack|satchel|case|wardrobe] :  Sets inventory from which to get and put obis.")
-		elseif command == 'get' or command == 'g' then
-			get_needed_obis()
-			obi_output("Sorting obis...")
-		elseif command == 'notify' or command == 'n' then
-			if S{'on'}:contains(params[1]:lower()) then
-				settings.notify = params[1]
-				obi_output("Obiaway notifications are now on")
+        if command == 'help' or command == 'h' then
+            obi_output("Obiaway v".._addon.version..". Authors: ".._addon.author)
+            obi_output("//(obi)away [options]")
+            obi_output("   (h)elp :  Displays this help text.")
+            obi_output("   (g)et :  Command for manually getting and removing obis.")
+            obi_output("   (n)otify [on|off] :  Sets obiaway notifcations on or off.")
+            obi_output("   (l)ocation [sack|satchel|case|wardrobe] :  Sets inventory from which to get and put obis.")
+        elseif command == 'get' or command == 'g' then
+            get_needed_obis()
+            obi_output("Sorting obis...")
+        elseif command == 'notify' or command == 'n' then
+            if S{'on'}:contains(params[1]:lower()) then
+                settings.notify = params[1]
+                obi_output("Obiaway notifications are now on")
 			elseif S{'off'}:contains(params[1]:lower()) then
-				settings.notify = params[1]
-				obi_output("Obiaway notifications are now off.")
-			else
-				error("Invalid argument. Usage: //obiaway [on|off]")
-			end
-		elseif command == 'location' or command == 'l' then
-			if S{'sack','case','satchel','wardrobe'}:contains(params[1]:lower()) then
-				settings.location = params[1]
-				obi_output("Obiaway location set to: "..settings.location)
-			else
-				error("Invalid argument. Usage: //obiaway location [sack|satchel|case|wardrobe]")
-			end
-		else
-			error("Unrecognized command. See //obiaway help.")
-		end
-	end
+                settings.notify = params[1]
+                obi_output("Obiaway notifications are now off.")
+            else
+                error("Invalid argument. Usage: //obiaway [on|off]")
+            end
+        elseif command == 'location' or command == 'l' then
+            if S{'sack','case','satchel','wardrobe'}:contains(params[1]:lower()) then
+                settings.location = params[1]
+                obi_output("Obiaway location set to: "..settings.location)
+            else
+                error("Invalid argument. Usage: //obiaway location [sack|satchel|case|wardrobe]")
+            end
+        else
+            error("Unrecognized command. See //obiaway help.")
+        end
+    end
 end())
 
 function get_obis_in_inventory()
-	obis = {}
+    obis = {}
     items = windower.ffxi.get_items()
     inv = items.inventory
     if not inv then return end
@@ -139,38 +139,38 @@ function get_needed_obis()
 	
     areas = {}
     areas.Cities = S{
-	"Ru'Lude Gardens",
-	"Upper Jeuno",
-	"Lower Jeuno",
-	"Port Jeuno",
-	"Port Windurst",
-	"Windurst Waters",
-	"Windurst Woods",
-	"Windurst Walls",
-	"Heavens Tower",
-	"Port San d'Oria",
-	"Northern San d'Oria",
-	"Southern San d'Oria",
-	"Port Bastok",
-	"Bastok Markets",
-	"Bastok Mines",
-	"Metalworks",
-	"Aht Urhgan Whitegate",
-	"Tavanazian Safehold",
-	"Nashmau",
-	"Selbina",
-	"Mhaura",
-	"Norg",
-	"Kazham",
-	"Eastern Adoulin",
-	"Western Adoulin",
-	"Leafallia",
-	"Celennia Memorial Library",
-	"Mog Garden"
+        "Ru'Lude Gardens",
+        "Upper Jeuno",
+        "Lower Jeuno",
+        "Port Jeuno",
+        "Port Windurst",
+        "Windurst Waters",
+        "Windurst Woods",
+        "Windurst Walls",
+        "Heavens Tower",
+        "Port San d'Oria",
+        "Northern San d'Oria",
+        "Southern San d'Oria",
+        "Port Bastok",
+        "Bastok Markets",
+        "Bastok Mines",
+        "Metalworks",
+        "Aht Urhgan Whitegate",
+        "Tavanazian Safehold",
+        "Nashmau",
+        "Selbina",
+        "Mhaura",
+        "Norg",
+        "Kazham",
+        "Eastern Adoulin",
+        "Western Adoulin",
+        "Leafallia",
+        "Celennia Memorial Library",
+        "Mog Garden"
 	}
 	
     local str = ''
-	if not areas.Cities:contains(res.zones[windower.ffxi.get_info().zone].english) then
+    if not areas.Cities:contains(res.zones[windower.ffxi.get_info().zone].english) then
 		if obis["Fire"] and elements["Fire"] == 0 then
 			str = str.."put \"Karin Obi\" "..settings.location..";wait .5;"
 			if settings.notify == 'on' then
