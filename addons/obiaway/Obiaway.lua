@@ -69,13 +69,13 @@ settings = config.load(default_settings)
 
 -- Accepts msg as a string or a table
 function obi_output(msg)
-        windower.add_to_chat(209, msg)
+	windower.add_to_chat(209, msg)
 end
 
 windower.register_event('addon command', function()
 
 	return function(command, ...)
-	    command = command:lower() or 'help'
+		command = command:lower() or 'help'
         local params = {...}
 
 		if command == 'help' or command == 'h' then
@@ -112,7 +112,7 @@ windower.register_event('addon command', function()
 end())
 
 function get_obis_in_inventory()
-    obis = {}
+	obis = {}
     items = windower.ffxi.get_items()
     inv = items.inventory
     if not inv then return end
