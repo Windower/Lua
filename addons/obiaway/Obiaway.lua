@@ -50,6 +50,10 @@
 -- is called before inventory has loaded and returns nothing.
 --
 -- 3. Obi is not moved when currently equipped.
+--
+-- 4. When using the get all or put all command, obiaway will still
+-- autosort obi if you're not in town. On to-do.
+--
 
 _addon.name = "Obiaway"
 _addon.author = "ReaperX, onetime"
@@ -72,66 +76,63 @@ function obi_output(msg)
     windower.add_to_chat(209, msg)
 end
 
-windower.register_event('addon command', function()
-
-    return function(command, ...)
-        local command = command:lower() or 'help'
-        local params = L{...}:map(string.lower)
-
-        if command == 'help' or command == 'h' then
-            obi_output("Obiaway v".._addon.version..". Authors: ".._addon.author)
-            obi_output("//(ob)iaway [options]")
-            obi_output("   (h)elp :  Displays this help text.")
-            obi_output("   (s)ort :  Automatically sorts obi.")
-            obi_output("   (g)et [ (a)ll | (n)eeded ] :  Gets obi.")
-            obi_output("   (p)ut [ (a)ll | u(n)needed ] :  Puts obi.")
-            obi_output("   (n)otify [ on | off ] :  Sets obiaway notifcations on or off.")
-            obi_output("   (l)ocation [ sack | satchel | case | wardrobe ] :  Sets inventory from which to get and put obi.")
-        elseif command == 'sort' or command == 's' then
-            obi_output("Sorting obi...")
-            auto_sort_obi()
-        elseif command == 'get' or command == 'g' then
-            if params[1] == 'all' or params [1] == 'a' then
-                obi_output('Getting all obi from %s...':format(settings.location))
-                get_all_obi(true)
-            elseif params[1] == 'needed' or params [1] == 'n' then
-                obi_output('Getting needed obi from %s...':format(settings.location))
-                get_needed_obi(true)
-            else
-                error("Invalid argument. Usage: //obiaway get [ all | needed ]")
-            end
-        elseif command == 'put' or command == 'p' then
-            if params[1] == 'all' or params [1] == 'a' then
-                obi_output('Putting all obi into %s...':format(settings.location))
-                put_all_obi(true)
-            elseif params[1] == 'unneeded' or params[1] == 'needed' or params [1] == 'n' then
-                obi_output('Putting unneeded obi into %s...':format(settings.location))
-                put_unneeded_obi(true)
-            else
-                error("Invalid argument. Usage: //obiaway put [ all | needed ]")
-            end
-        elseif command == 'notify' or command == 'n' then
-            if params[1] == 'on' then
-                settings.notify = true
-                obi_output("Obiaway notifications are now on")
-            elseif params[1] == 'off' then
-                settings.notify = false
-                obi_output("Obiaway notifications are now off.")
-            else
-                error("Invalid argument. Usage: //obiaway notify [ on | off ]")
-            end
-        elseif command == 'location' or command == 'l' then
-            if S{'sack','case','satchel','wardrobe'}:contains(params[1]) then
-                settings.location = params[1]
-                obi_output("Obiaway location set to: %s":format(settings.location))
-            else
-                error("Invalid argument. Usage: //obiaway location [ sack | satchel | case | wardrobe ]")
-            end
+windower.register_event('addon command', function(command, ...)
+    local command = command:lower() or 'help'
+    local params = L{...}:map(string.lower)
+    
+    if command == 'help' or command == 'h' then
+        obi_output("Obiaway v".._addon.version..". Authors: ".._addon.author)
+        obi_output("//(ob)iaway [options]")
+        obi_output("   (h)elp :  Displays this help text.")
+        obi_output("   (s)ort :  Automatically sorts obi.")
+        obi_output("   (g)et [ (a)ll | (n)eeded ] :  Gets obi.")
+        obi_output("   (p)ut [ (a)ll | u(n)needed ] :  Puts obi.")
+        obi_output("   (n)otify [ on | off ] :  Sets obiaway notifcations on or off.")
+        obi_output("   (l)ocation [ sack | satchel | case | wardrobe ] :  Sets inventory from which to get and put obi.")
+    elseif command == 'sort' or command == 's' then
+        obi_output("Sorting obi...")
+        auto_sort_obi()
+    elseif command == 'get' or command == 'g' then
+        if params[1] == 'all' or params [1] == 'a' then
+            obi_output('Getting all obi from %s...':format(settings.location))
+            get_all_obi(true)
+        elseif params[1] == 'needed' or params [1] == 'n' then
+            obi_output('Getting needed obi from %s...':format(settings.location))
+            get_needed_obi(true)
         else
-            error("Unrecognized command. See //obiaway help.")
+            error("Invalid argument. Usage: //obiaway get [ all | needed ]")
         end
+    elseif command == 'put' or command == 'p' then
+        if params[1] == 'all' or params [1] == 'a' then
+            obi_output('Putting all obi into %s...':format(settings.location))
+            put_all_obi(true)
+        elseif params[1] == 'unneeded' or params[1] == 'needed' or params [1] == 'n' then
+            obi_output('Putting unneeded obi into %s...':format(settings.location))
+            put_unneeded_obi(true)
+        else
+            error("Invalid argument. Usage: //obiaway put [ all | needed ]")
+        end
+    elseif command == 'notify' or command == 'n' then
+        if params[1] == 'on' then
+            settings.notify = true
+            obi_output("Obiaway notifications are now on")
+        elseif params[1] == 'off' then
+            settings.notify = false
+            obi_output("Obiaway notifications are now off.")
+        else
+            error("Invalid argument. Usage: //obiaway notify [ on | off ]")
+        end
+    elseif command == 'location' or command == 'l' then
+        if S{'sack','case','satchel','wardrobe'}:contains(params[1]) then
+            settings.location = params[1]
+            obi_output("Obiaway location set to: %s":format(settings.location))
+        else
+            error("Invalid argument. Usage: //obiaway location [ sack | satchel | case | wardrobe ]")
+        end
+    else
+        error("Unrecognized command. See //obiaway help.")
     end
-end())
+end)
 
 function get_obi_in_inventory()
     local obi = {}
@@ -274,7 +275,7 @@ function put_all_obi(command)
     end
 end
     
-function auto_sort_obi()
+auto_sort_obi = function()
     local cities = S{
         "Ru'Lude Gardens",
         "Upper Jeuno",
@@ -305,16 +306,18 @@ function auto_sort_obi()
         "Celennia Memorial Library",
         "Mog Garden"
     }
-    local str = ''
-    if not cities:contains(res.zones[windower.ffxi.get_info().zone].english) then
-        str = str..put_unneeded_obi(false)
-        str = str..get_needed_obi(false)
-        windower.send_command(str)
-    else  -- in town. put away all obi.
-        str = str..put_all_obi(false)
-        windower.send_command(str)
+    return function()
+        local str = ''
+        if not cities:contains(res.zones[windower.ffxi.get_info().zone].english) then
+            str = str..put_unneeded_obi(false)
+            str = str..get_needed_obi(false)
+            windower.send_command(str)
+        else  -- in town. put away all obi.
+            str = str..put_all_obi(false)
+            windower.send_command(str)
+        end
     end
-end
+end()
 
 function inTable(tbl, item)
     for key, value in pairs(tbl) do
