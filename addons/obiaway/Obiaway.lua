@@ -93,20 +93,20 @@ windower.register_event('addon command', function()
         elseif command == 'get' or command == 'g' then
             if params[1] == 'all' or params [1] == 'a' then
                 obi_output('Getting all obi from %s...':format(settings.location))
-                get_all_obi()
+                get_all_obi(true)
             elseif params[1] == 'needed' or params [1] == 'n' then
                 obi_output('Getting needed obi from %s...':format(settings.location))
-                get_needed_obi()
+                get_needed_obi(true)
             else
                 error("Invalid argument. Usage: //obiaway get [ all | needed ]")
             end
         elseif command == 'put' or command == 'p' then
             if params[1] == 'all' or params [1] == 'a' then
                 obi_output('Putting all obi into %s...':format(settings.location))
-                put_all_obi()
+                put_all_obi(true)
             elseif params[1] == 'unneeded' or params[1] == 'needed' or params [1] == 'n' then
                 obi_output('Putting unneeded obi into %s...':format(settings.location))
-                put_unneeded_obi()
+                put_unneeded_obi(true)
             else
                 error("Invalid argument. Usage: //obiaway put [ all | needed ]")
             end
@@ -157,7 +157,7 @@ function get_obi_in_inventory()
     return obi
 end
 
-function get_needed_obi()
+function get_needed_obi(command)
     local elements = get_all_elements()
     local obi = get_obi_in_inventory()
     local str = ''
@@ -172,17 +172,21 @@ function get_needed_obi()
         Lightning = 'Rairin'
     }
     for name, element in obi_names:it() do
-        if obi[element] and elements[element] > 0 then    
-            str = str..'put "%s Obi" %s;wait .5;':format(name, settings.location)
+        if not obi[element] and elements[element] > 0 then
+            str = str..'get "%s Obi" %s;wait .5;':format(name, settings.location)
             if settings.notify then
                 obi_output('Getting %s Obi from %s.':format(name, settings.location))
             end
         end
     end
-    windower.send_command(str)
+    if command then
+        windower.send_command(str)
+    else
+        return str
+    end
 end
 
-function put_unneeded_obi()
+function put_unneeded_obi(command)
     local elements = get_all_elements()
     local obi = get_obi_in_inventory()
     local str = ''
@@ -196,6 +200,7 @@ function put_unneeded_obi()
         Ice = 'Hyorin',
         Lightning = 'Rairin'
     }
+
     for name, element in obi_names:it() do
         if obi[element] and elements[element] == 0 then    
             str = str..'put "%s Obi" %s;wait .5;':format(name, settings.location)
@@ -204,10 +209,14 @@ function put_unneeded_obi()
             end
         end
     end
-    windower.send_command(str)
+    if command then
+        windower.send_command(str)
+    else
+        return str
+    end
 end
 
-function get_all_obi()
+function get_all_obi(command)
     local elements = get_all_elements()
     local obi = get_obi_in_inventory()
     local str = ''
@@ -229,10 +238,14 @@ function get_all_obi()
             end
         end
     end
-    windower.send_command(str)
+    if command then
+        windower.send_command(str)
+    else
+        return str
+    end
 end
 
-function put_all_obi()
+function put_all_obi(command)
     local elements = get_all_elements()
     local obi = get_obi_in_inventory()
     local str = ''
@@ -254,7 +267,11 @@ function put_all_obi()
             end
         end
     end
-    windower.send_command(str)
+    if command then
+        windower.send_command(str)
+    else
+        return str
+    end
 end
     
 function auto_sort_obi()
@@ -288,12 +305,14 @@ function auto_sort_obi()
         "Celennia Memorial Library",
         "Mog Garden"
     }
-
+    local str = ''
     if not cities:contains(res.zones[windower.ffxi.get_info().zone].english) then
-        put_unneeded_obi()
-        get_needed_obi()
+        str = str..put_unneeded_obi(false)
+        str = str..get_needed_obi(false)
+        windower.send_command(str)
     else  -- in town. put away all obi.
-        put_all_obi()
+        str = str..put_all_obi(false)
+        windower.send_command(str)
     end
 end
 
