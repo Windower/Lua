@@ -85,7 +85,7 @@ windower.register_event('addon command', function()
             obi_output("   (s)ort :  Automatically sorts obi.")
             obi_output("   (g)et [ (a)ll | (n)eeded ] :  Gets obi.")
             obi_output("   (p)ut [ (a)ll | (n)eeded ] :  Puts obi.")
-            obi_output("   (n)otify [ on |off ] :  Sets obiaway notifcations on or off.")
+            obi_output("   (n)otify [ on | off ] :  Sets obiaway notifcations on or off.")
             obi_output("   (l)ocation [ sack | satchel | case | wardrobe ] :  Sets inventory from which to get and put obi.")
         elseif command == 'sort' or command == 's' then
             auto_sort_obi()
