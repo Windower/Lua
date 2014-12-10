@@ -62,7 +62,7 @@ config = require('config')
 res = require('resources')
 
 default_settings = {}
-default_settings.notify = trues
+default_settings.notify = true
 default_settings.location = 'sack'
 
 settings = config.load(default_settings)
