@@ -54,7 +54,7 @@
 _addon.name = "Obiaway"
 _addon.author = "ReaperX, onetime"
 _addon.version = "1.0.3"
-_addon.commands = {'obi', 'obiaway'}
+_addon.commands = {'ob', 'obiaway'}
 
 require('sets')
 require('logger')
@@ -80,33 +80,33 @@ windower.register_event('addon command', function()
 
         if command == 'help' or command == 'h' then
             obi_output("Obiaway v".._addon.version..". Authors: ".._addon.author)
-            obi_output("//(obi)away [options]")
+            obi_output("//(ob)iaway [options]")
             obi_output("   (h)elp :  Displays this help text.")
             obi_output("   (s)ort :  Automatically sorts obi.")
             obi_output("   (g)et [ (a)ll | (n)eeded ] :  Gets obi.")
-            obi_output("   (p)ut [ (a)ll | (n)eeded ] :  Puts obi.")
+            obi_output("   (p)ut [ (a)ll | u(n)needed ] :  Puts obi.")
             obi_output("   (n)otify [ on | off ] :  Sets obiaway notifcations on or off.")
             obi_output("   (l)ocation [ sack | satchel | case | wardrobe ] :  Sets inventory from which to get and put obi.")
         elseif command == 'sort' or command == 's' then
-            auto_sort_obi()
             obi_output("Sorting obi...")
+            auto_sort_obi()
         elseif command == 'get' or command == 'g' then
             if params[1] == 'all' or params [1] == 'a' then
-                get_all_obi()
                 obi_output('Getting all obi from %s...':format(settings.location))
+                get_all_obi()
             elseif params[1] == 'needed' or params [1] == 'n' then
-                get_needed_obi()
                 obi_output('Getting needed obi from %s...':format(settings.location))
+                get_needed_obi()
             else
                 error("Invalid argument. Usage: //obiaway get [ all | needed ]")
             end
         elseif command == 'put' or command == 'p' then
             if params[1] == 'all' or params [1] == 'a' then
-                put_all_obi()
                 obi_output('Putting all obi into %s...':format(settings.location))
-            elseif params[1] == 'needed' or params [1] == 'n' then
-                put_needed_obi()
-                obi_output('Putting uneeded obi into %s...':format(settings.location))
+                put_all_obi()
+            elseif params[1] == 'unneeded' or params[1] == 'needed' or params [1] == 'n' then
+                obi_output('Putting unneeded obi into %s...':format(settings.location))
+                put_unneeded_obi()
             else
                 error("Invalid argument. Usage: //obiaway put [ all | needed ]")
             end
