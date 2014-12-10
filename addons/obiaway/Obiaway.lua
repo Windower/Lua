@@ -83,10 +83,10 @@ windower.register_event('addon command', function()
             obi_output("//(obi)away [options]")
             obi_output("   (h)elp :  Displays this help text.")
             obi_output("   (s)ort :  Automatically sorts obi.")
-            obi_output("   (g)et [(a)ll|(n)eeded] :  Gets obi.")
-            obi_output("   (p)ut [(a)ll|(n)eeded] :  Puts obi.")
-            obi_output("   (n)otify [on|off] :  Sets obiaway notifcations on or off.")
-            obi_output("   (l)ocation [sack|satchel|case|wardrobe] :  Sets inventory from which to get and put obi.")
+            obi_output("   (g)et [ (a)ll | (n)eeded ] :  Gets obi.")
+            obi_output("   (p)ut [ (a)ll | (n)eeded ] :  Puts obi.")
+            obi_output("   (n)otify [ on |off ] :  Sets obiaway notifcations on or off.")
+            obi_output("   (l)ocation [ sack | satchel | case | wardrobe ] :  Sets inventory from which to get and put obi.")
         elseif command == 'sort' or command == 's' then
             auto_sort_obi()
             obi_output("Sorting obi...")
@@ -98,7 +98,7 @@ windower.register_event('addon command', function()
                 get_needed_obi()
                 obi_output('Getting needed obi from %s...':format(settings.location))
             else
-                error("Invalid argument. Usage: //obiaway get [all|needed]")
+                error("Invalid argument. Usage: //obiaway get [ all | needed ]")
             end
         elseif command == 'put' or command == 'p' then
             if params[1] == 'all' or params [1] == 'a' then
@@ -108,7 +108,7 @@ windower.register_event('addon command', function()
                 put_needed_obi()
                 obi_output('Putting uneeded obi into %s...':format(settings.location))
             else
-                error("Invalid argument. Usage: //obiaway put [all|needed]")
+                error("Invalid argument. Usage: //obiaway put [ all | needed ]")
             end
         elseif command == 'notify' or command == 'n' then
             if params[1] == 'on' then
@@ -118,14 +118,14 @@ windower.register_event('addon command', function()
                 settings.notify = false
                 obi_output("Obiaway notifications are now off.")
             else
-                error("Invalid argument. Usage: //obiaway notify [on|off]")
+                error("Invalid argument. Usage: //obiaway notify [ on | off ]")
             end
         elseif command == 'location' or command == 'l' then
             if S{'sack','case','satchel','wardrobe'}:contains(params[1]) then
                 settings.location = params[1]
                 obi_output("Obiaway location set to: %s":format(settings.location))
             else
-                error("Invalid argument. Usage: //obiaway location [sack|satchel|case|wardrobe]")
+                error("Invalid argument. Usage: //obiaway location [ sack | satchel | case | wardrobe ]")
             end
         else
             error("Unrecognized command. See //obiaway help.")
