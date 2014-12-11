@@ -188,7 +188,7 @@ function equip_sets_exit(swap_type,ts,val1)
             if command_registry[ts].cancel_spell then
                 debug_mode_chat("Action canceled ("..storedcommand..' '..spell.target.raw..")")
                 storedcommand = nil
-                command_registry[ts] = nil
+                command_registry:delete_entry(ts)
                 return true
             elseif not ts or not command_registry[ts] or not storedcommand then
                 debug_mode_chat('This case should not be hittable - 1')
@@ -207,13 +207,13 @@ function equip_sets_exit(swap_type,ts,val1)
                         command_registry[ts].proposed_packet = assemble_menu_item_packet(val1.target.id,val1.target.index,val1.id)
                     end
                     if not command_registry[ts].proposed_packet then
-                        command_registry[ts] = nil
+                        command_registry:delete_entry(ts)
                     end
                 elseif outgoing_action_category_table[unify_prefix[val1.prefix]] then
                     if filter_precast(val1) then
                         command_registry[ts].proposed_packet = assemble_action_packet(val1.target.id,val1.target.index,outgoing_action_category_table[unify_prefix[val1.prefix]],val1.id)
                         if not command_registry[ts].proposed_packet then
-                            command_registry[ts] = nil
+                            command_registry:delete_entry(ts)
                             
                             debug_mode_chat("Unable to create a packet for this command because the target is still invalid after pretarget ("..storedcommand..' '..val1.target.raw..")")
                             storedcommand = nil
@@ -231,7 +231,7 @@ function equip_sets_exit(swap_type,ts,val1)
                     st_flag = true
                 elseif not val1.target.name then
                 -- Spells with invalid pass_through_targs, like using <t> without a target
-                    command_registry[ts] = nil
+                    command_registry:delete_entry(ts)
                     debug_mode_chat("Change target was used to pick an invalid target ("..storedcommand..' '..spell.target.raw..")")
                     local ret = storedcommand..' '..spell.target.raw
                     storedcommand = nil
@@ -256,14 +256,14 @@ function equip_sets_exit(swap_type,ts,val1)
             return precast_send_check(ts)
         elseif swap_type == 'filtered_action' and command_registry[ts] and command_registry[ts].cancel_spell then
             storedcommand = nil
-            command_registry[ts] = nil
+            command_registry:delete_entry(ts)
             return true
         elseif swap_type == 'midcast' and _settings.demo_mode then
             command_registry[ts].midaction = false
             equip_sets('aftercast',ts,val1)
         elseif swap_type == 'aftercast' then
             if ts then
-                command_registry[ts] = nil
+                command_registry:delete_entry(ts)
 --                for i,v in pairs(command_registry) do
 --                    if v.midaction then
 --                        command_registry[i] = nil
@@ -272,7 +272,7 @@ function equip_sets_exit(swap_type,ts,val1)
             end
         elseif swap_type == 'pet_aftercast' then
             if ts then
-                command_registry[ts] = nil
+                command_registry:delete_entry(ts)
 --                for i,v in pairs(command_registry) do
 --                    if v.pet_midaction then
 --                        command_registry[i] = nil
@@ -340,7 +340,7 @@ end
 function precast_send_check(ts)
     if ts and command_registry[ts] then
         if command_registry[ts].cancel_spell then
-            command_registry[ts] = nil
+            command_registry:delete_entry(ts)
         else
             if command_registry[ts].cast_delay == 0 then
                 send_action(ts)

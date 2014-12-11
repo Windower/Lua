@@ -674,17 +674,17 @@ function Command_Registry.new()
             if os.clock() - rawget(t,'last_removed') > 0.04 then
                 rawset(t,'last_removed',remove_old_command_registry_entries(t))
             end
-            if rawget(t, k) ~= nil then
-                return t[k]
-            else
+            if rawget(cmd_reg, k) ~= nil then
                 return rawget(cmd_reg,k)
+            else
+                return rawget(t,k)
             end
         end})
 end
 
 
 -----------------------------------------------------------------------------------
---Name: mk_command_registry_entry(sp)
+--Name: cmd_reg:new_entry(sp)
 --Desc: Makes a new entry in command_registry.
 --Args:
 ---- sp - Resources line for the current spell
@@ -706,6 +706,29 @@ end
 
 
 -----------------------------------------------------------------------------------
+--Name: cmd_reg:delete_entry(ts)
+--Desc: Makes a new entry in command_registry.
+--Args:
+---- ts - timestamp of the command registry entry to be deleted
+-----------------------------------------------------------------------------------
+--Returns:
+---- bool - true indicates a successful deletion
+-----------------------------------------------------------------------------------
+function cmd_reg:delete_entry(ts)
+    if rawget(self,ts) then
+        if debugging.command_registry then
+            windower.add_to_chat(8,'GearSwap (Debug Mode): Deleting a command_registry entry: '..windower.to_shift_jis(tostring(ts)..' '..tostring(rawget(self,ts))))
+        end
+        rawset(self,ts,nil)
+        return true
+    elseif debugging.command_registry then
+        windower.add_to_chat(8,'GearSwap (Debug Mode): Attempted to delete a command_registry entry that did not exist: '..windower.to_shift_jis(tostring(ts) ))
+    end
+    return false
+end
+
+
+-----------------------------------------------------------------------------------
 --Name: remove_old_command_registry_entries(ts)
 --Desc: Removes all command_registry entries more than 20 seconds old.
 --Args:
@@ -717,10 +740,11 @@ end
 function remove_old_command_registry_entries(command_registry)
     for i,v in pairs(command_registry) do
         local lim = v.spell and v.spell.cast_time and v.spell.cast_time*1.1+1 or
+            v.spell and v.spell.prefix=='/pet' and 4 or
             v.spell and v.spell.action_type and delay_map_to_action_type[v.spell.action_type] or
             1 -- Sets it to normal casting time + 10% +1 for anything with a defined cast_time, or 1 if there is no defined cast time.
         if tonumber(i) and os.time()-i >= lim then
-            command_registry[i] = nil
+            cmd_reg.delete_entry(command_registry,i)
         end
     end
     return os.clock()
@@ -728,8 +752,8 @@ end
 
 
 -----------------------------------------------------------------------------------
---Name: find_command_registry_key(typ,value)
---Desc: Returns the proper unified prefix, or "Mosnter " in the case of a monster action
+--Name: cmd_reg:find_by_spell(value)
+--Desc: Returns the proper unified prefix, or "Monster" in the case of a monster action
 --Args:
 ---- typ - 'spell', 'timestamp', or 'id'
 ---- value - The spell, timestamp, or id
@@ -742,7 +766,7 @@ function cmd_reg:find_by_spell(value)
     -- Finds all entries of a given spell in the table.
     -- Returns the one with the most recent timestamp.
     -- Actions that do not have timestamps yet (have not hit midcast) are given lowest priority.
-    local potential_entries,current_time,winner,winning_ind = {},os.time()
+    local potential_entries,current_time,winner,ts = {},os.time()
     for i,v in pairs(self) do
         if v.spell and v.spell.prefix == value.prefix and v.spell.name == value.name then
             potential_entries[i] = v.timestamp or 0
@@ -754,21 +778,21 @@ function cmd_reg:find_by_spell(value)
     for i,v in pairs(potential_entries) do
         if not winner or (current_time - v < current_time - winner) then
             winner = v
-            winning_ind = i
+            ts = i
         end
     end
-    return winning_ind
+    return ts
 end
 
 
 -----------------------------------------------------------------------------------
---Name: find_command_registry_by_time()
+--Name: cmd_reg:find_by_time()
 --Desc: Finds the most recent command_registry entry
 --Args:
 ---- none
 -----------------------------------------------------------------------------------
 --Returns:
----- none
+---- ts,discovered entry
 -----------------------------------------------------------------------------------
 function cmd_reg:find_by_time()
     local time_stamp,ts
@@ -789,26 +813,26 @@ end
 
 
 -----------------------------------------------------------------------------------
---Name: delete_command_registry_by_id(id)
+--Name: cmd_reg:delete_by_id(id)
 --Desc: Deletes all command_registry entry based that match a given target ID.
 --Args:
 ---- id - ID of the target
 -----------------------------------------------------------------------------------
 --Returns:
----- none
+---- ts,last_entry for the deleted entry
 -----------------------------------------------------------------------------------
 function cmd_reg:delete_by_id(id)
-    local ts,last_tab
+    local ts,last_entry
     for i,v in pairs(self) do
         if v.spell and v.spell.target then
             if v.spell.target.id == id then
-                last_tab = table.reassign({},self[i])
+                last_entry = table.reassign({},self[i])
                 ts = i
                 self[i] = nil
             end
         end
     end
-    return ts,last_tab
+    return ts,last_entry
 end
 
 

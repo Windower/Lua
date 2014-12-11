@@ -188,7 +188,7 @@ function inc_action(act)
     
     if spell and spell[language] then
         spell.target = target_complete(windower.ffxi.get_mob_by_id(act.targets[1].id))
-        spell.action_type = action_type_map[unify_prefix[spell.prefix or 'Mon']]
+        spell.action_type = action_type_map[unify_prefix[spell.prefix or 'Monster']]
     elseif S{84,78}:contains(act.targets[1].actions[1].message) then -- "Paralyzed" and "too far away" respectively
         local ts,tab = command_registry:delete_by_id(act.targets[1].id)
         if tab and tab.spell and tab.spell.prefix == '/pet' then 
@@ -217,7 +217,6 @@ function inc_action(act)
     -- For some reason avatar Out of Range messages send two packets (Category 4 and Category 7)
     -- Category 4 contains real information, while Category 7 does not.
     -- I do not know if this will affect automatons being interrupted.
-    
     
     local ts = command_registry:find_by_spell(spell)
     if (jas[act.category] or uses[act.category]) then
