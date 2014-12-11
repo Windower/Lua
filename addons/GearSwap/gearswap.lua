@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.894'
+_addon.version = '0.896'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -536,9 +536,9 @@ windower.register_event('gain buff',function(buff_id)
     
     -- Need to figure out what I'm going to do with this:
     if T{'terror','sleep','stun','petrification','charm','weakness'}:contains(buff_name:lower()) then
-        for i,v in pairs(command_registry) do
+        for ts,v in pairs(command_registry) do
             if v.midaction then
-                command_registry[i] = nil
+                command_registry:delete_entry(ts)
             end
         end
     end
