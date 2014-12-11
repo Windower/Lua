@@ -223,8 +223,8 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
         am.actor_id = original:unpack("I",0x05)
         am.target_id = original:unpack("I",0x09)
         am.param_1 = original:unpack("I",0x0D)
-        am.param_2 = original:unpack("H",0x11)%2^7 -- First 6 bits
-        am.param_3 = math.floor(original:unpack("I",0x11)/2^6) -- Rest
+        am.param_2 = original:unpack("H",0x11)%2^8 -- First 7 bits
+        am.param_3 = math.floor(original:unpack("I",0x11)/2^7) -- Rest
         am.actor_index = original:unpack("H",0x15)
         am.target_index = original:unpack("H",0x17)
         am.message_id = original:unpack("H",0x19)%2^15 -- Cut off the most significant bit
