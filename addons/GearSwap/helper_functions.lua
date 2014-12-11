@@ -742,7 +742,7 @@ function remove_old_command_registry_entries(command_registry)
         local lim = v.spell and v.spell.cast_time and v.spell.cast_time*1.1+1 or
             v.spell and v.spell.prefix=='/pet' and 4 or
             v.spell and v.spell.action_type and delay_map_to_action_type[v.spell.action_type] or
-            2 -- Sets it to normal casting time + 10% +1 for anything with a defined cast_time, or 1 if there is no defined cast time.
+            3 -- Sets it to normal casting time + 10% +1 for anything with a defined cast_time, or 1 if there is no defined cast time.
         if tonumber(i) and os.time()-i >= lim then
             cmd_reg.delete_entry(command_registry,i)
         end
