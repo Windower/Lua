@@ -667,8 +667,13 @@ fields.outgoing[0x0C3] = L{
     {ctype='unsigned int',      label='_junk1'},                                -- 04  No obvious purpose
 }
 
--- Unknown 0xC4 outgoing
--- Occurs when changing linkshells. Is always 8 bytes with content: 0x73, 0x20, 0x00, 0x00 for me. Triggers two incoming 0xE0.
+-- Equip Linkshell
+fields.outgoing[0x0C4] = L{
+    {ctype='unsigned short',    label='_unknown1'},                             -- 04  0x00 0x0F for me
+    {ctype='unsigned char',     label='Inventory Slot ID'},                     -- 06  Inventory Slot that holds the linkshell
+    {ctype='unsigned char',     label='Linkshell Number'},                      -- 07  Inventory Slot that holds the linkshell
+    {ctype='data[16]',          label='String of unclear purpose'}              -- 08  Probably going to be used in the future system somehow. Currently "dummy"..string.char(0,0,0).."%s %s "..string.char(0,1)
+}
 
 -- Open Mog
 fields.outgoing[0x0CB] = L{
@@ -2054,8 +2059,32 @@ fields.incoming[0x061] = L{
     {ctype='unsigned short',    label='_unknown1'},                             -- 4C   0xFF-ing this last region has no notable effect.
     {ctype='unsigned short',    label='_unknown2'},                             -- 4E
     {ctype='unsigned char',     label='Nation'},                                -- 50   0 = sandy, 1 = bastok, 2 = windy
-    {ctype='unsigned char',     label='_unknown3'},                             -- 51
-    {ctype='unsigned short',    label='_unknown4'},                             -- 52   00 00 observed.
+    {ctype='unsigned char',     label='_unknown3'},                             -- 51   Possibly Unity ID (always 7 for me, I'm in Aldo's unity)
+    {ctype='unsigned char',     label='Su Level'},                              -- 52   
+    {ctype='unsigned char',     label='_unknown4'},                             -- 53   Always 00 for me
+    {ctype='unsigned char',     label='Maximum iLevel'},                        -- 54   
+    {ctype='unsigned char',     label='iLevel over 99'},                        -- 55   0x10 would be an iLevel of 115
+    {ctype='unsigned char',     label='Main Hand iLevel'},                      -- 56   
+    {ctype='unsigned char',     label='_unknown5'},                             -- 57   Always 00 for me
+    {ctype='unsigned int',      label='Unity Info'},                            -- 58   See Below
+    -- dddt tttt pppp ppdd pppp pppp pp?? ????
+    -- t = Trust ID
+    -- 0 = None
+    -- 1 = Pieuje
+    -- 2 = Ayame
+    -- 3 = Invincible Shield
+    -- 4 = Apururu
+    -- 5 = Maat
+    -- 6 = Aldo
+    -- 7 = Jakoh Wahcondalo
+    -- 8 = Naja Salaheem
+    -- 9 = Flavira
+    
+    -- d = Danger - I'm not sure what it does, but 00ing this section caused my client to crash.
+    
+    -- p = Unity Points
+    
+    {ctype='unsigned int',      label='_junk1'},                                -- 5B   
 }
 
 types.ability_recast = L{
@@ -2408,6 +2437,14 @@ fields.incoming[0x0DF] = L{
 }
 
 -- Unknown packet 0x0E0: I still can't make heads or tails of the content. The packet is always 8 bytes long.
+
+
+-- Linkshell Equip
+fields.incoming[0x0E0] = L{
+    {ctype='unsigned char',     label='Linkshell Number'},                      -- 04
+    {ctype='unsigned char',     label='Inventory Slot'},                        -- 05
+    {ctype='unsigned short',    label='_junk1'},                                -- 06
+}
 
 -- Char Info
 fields.incoming[0x0E2] = L{

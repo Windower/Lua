@@ -60,6 +60,7 @@ data.outgoing[0x0BE] = {name='Merit Point Increase',description='Sent when you i
 data.outgoing[0x0BF] = {name='Job Point Increase',  description='Sent when you increase a job point ability.'}
 data.outgoing[0x0C0] = {name='Job Point Menu',      description='Sent when you open the Job Point menu and triggers Job Point Information packets.'}
 data.outgoing[0x0C3] = {name='Make Linkshell',      description='Sent in response to the /makelinkshell command.'}
+data.outgoing[0x0C4] = {name='Equip Linkshell',     description='Sent to equip a linkshell.'}
 data.outgoing[0x0CB] = {name='Open Mog',            description='Sent when opening or closing your mog house.'}
 data.outgoing[0x0D3] = {name='GM Call',             description='Places a call to the GM queue.'}
 data.outgoing[0x0DC] = {name='Type Bitmask',        description='This command is sent when change your party-seek or /anon status.'}
@@ -177,6 +178,7 @@ data.incoming[0x0D2] = {name='Found Item',          description='This command sh
 data.incoming[0x0D3] = {name='Lot/drop item',       description='Sent when someone casts a lot on an item or when the item drops to someone.'}
 data.incoming[0x0DD] = {name='Party Member Update', description='Alliance/party member info - zone, HP%, HP% etc.'}
 data.incoming[0x0DF] = {name='Char Update',         description='A packet sent from server which updates character HP, MP and TP.'}
+data.incoming[0x0E0] = {name='Linkshell Equip',     description='Updates your linkshell menu with the current linkshell.'}
 data.incoming[0x0E2] = {name='Char Info',           description='Sends name, HP, HP%, etc.'}
 data.incoming[0x0F4] = {name='Widescan Mob',        description='Displays one monster.'}
 data.incoming[0x0F5] = {name='Widescan Track',      description='Updates information when tracking a monster.'}
