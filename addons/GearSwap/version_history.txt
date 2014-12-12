@@ -1,4 +1,6 @@
 -------------------------------------------------
+GearSwap 0.897 - Superior system support and filtering.
+-------------------------------------------------
 GearSwap 0.896 - Command_registry class addition.
 -------------------------------------------------
 GearSwap 0.894 - Various bugfixes (including Monstrosity loading).
