@@ -16,6 +16,7 @@ data.outgoing[0x00F] = {name='Zone In 2',           description='Likely triggers
 data.outgoing[0x011] = {name='Zone In 3',           description='Likely triggers certain packets to be sent from the server.'}
 data.outgoing[0x015] = {name='Standard Client',     description='Packet contains data that is sent almost every time (i.e your character\'s position).'}
 data.outgoing[0x016] = {name='Update Request',      description='Packet that requests a PC/NPC update packet.'}
+data.outgoing[0x017] = {name='NPC Race Error',      description='Packet sent in response to impossible incoming NPC packets (like trying to put equipment on a race 0 monster).'}
 data.outgoing[0x01A] = {name='Action',              description='An action being done on a target (i.e. an attack or spell).'}
 data.outgoing[0x01E] = {name='Volunteer',           description='Sent in response to a /volunteer command.'}
 data.outgoing[0x028] = {name='Drop Item',           description='Drops an item.'}
@@ -44,8 +45,9 @@ data.outgoing[0x063] = {name='Digging Finished',    description='This packet is 
 data.outgoing[0x06E] = {name='Party invite',        description='Sent when inviting another player to either party or alliance.'}
 data.outgoing[0x06F] = {name='Party leave',         description='Sent when leaving the party or alliance.'}
 data.outgoing[0x070] = {name='Party breakup',       description='Sent when disbanding the entire party or alliance.'}
+data.outgoing[0x071] = {name='Break linkshell',     description='Sent when you break a linkshell.'}
 data.outgoing[0x074] = {name='Party response',      description='Sent when responding to a party or alliance invite.'}
-data.outgoing[0x077] = {name='Party change leader', description='Sent when giving party or alliance leader to another player.'}
+data.outgoing[0x077] = {name='Change permissions',  description='Sent when giving party or alliance leader to another player or elevating/decreasing linkshell permissions.'}
 data.outgoing[0x078] = {name='Party list request',  description='Sent when checking the party list.'}
 data.outgoing[0x083] = {name='Buy Item',            description='Buy an item.'}
 data.outgoing[0x084] = {name='Appraise',            description='Ask server for selling price.'}

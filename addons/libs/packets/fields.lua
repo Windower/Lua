@@ -295,6 +295,16 @@ fields.outgoing[0x016] = L{
     {ctype='unsigned short',    label='_junk1'},                                -- 06
 }
 
+-- NPC Race Error
+fields.outgoing[0x017] = L{
+    {ctype='unsigned short',    label='NPC Index',          fn=index},          -- 04
+    {ctype='unsigned short',    label='_unknown1'},                             -- 06
+    {ctype='unsigned int',      label='NPC ID',                fn=id},          -- 08
+    {ctype='data[6]',           label='_unknown2'},                             -- 0C
+    {ctype='unsigned char',     label='Reported NPC type'},                     -- 12
+    {ctype='unsigned char',     label='_unknown3'},                             -- 13
+}
+
 enums['action'] = {
     [0x00] = 'NPC Interaction',
     [0x02] = 'Engage monster',
@@ -537,13 +547,13 @@ fields.outgoing[0x063] = L{
 fields.outgoing[0x06E] = L{
     {ctype='unsigned int',      label='Target',             fn=id},             -- 04   This is so weird. The client only knows IDs from searching for people or running into them. So if neither has happened, the manual invite will fail, as the ID cannot be retrieved.
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 08   00 if target not in zone
-    {ctype='unsigned char',     label='Alliance'},                              -- 0A   02 for alliance, 00 for party or if invalid alliance target (the client somehow knows..)
+    {ctype='unsigned char',     label='Alliance'},                              -- 0A   05 for alliance, 00 for party or if invalid alliance target (the client somehow knows..)
     {ctype='unsigned char',     label='_const1',            const=0x041},       -- 0B
 }
 
 -- Party leaving
 fields.outgoing[0x06F] = L{
-    {ctype='unsigned char',     label='Alliance'},                              -- 04   02 for alliance, 00 for party
+    {ctype='unsigned char',     label='Alliance'},                              -- 04   05 for alliance, 00 for party
     {ctype='data[3]',           label='_junk1'}                                 -- 05
 }
 
@@ -553,16 +563,25 @@ fields.outgoing[0x070] = L{
     {ctype='data[3]',           label='_junk1'}                                 -- 05
 }
 
+-- Break Linkshell
+fields.outgoing[0x071] = L{
+    {ctype='data[6]',           label='_unknown1'},                             -- 04   02 for alliance, 00 for party
+    {ctype='unsigned char',     label='Linkshell Number'},                      -- 0A
+    {ctype='unsigned char',     label='_unknown2'},                             -- 0B
+    {ctype='data[16]',          label='Member Name'}                            -- 0C   Null terminated string
+}
+
 -- Party invite response
 fields.outgoing[0x074] = L{
     {ctype='bool',              label='Join',               fn=bool},           -- 04
     {ctype='data[3]',           label='_junk1'}                                 -- 05
 }
 
--- Party change leader
+-- Change Permissions
 fields.outgoing[0x077] = L{
     {ctype='char[16]',          label='Target Name'},                           -- 04   Name of the person to give leader to
-    {ctype='unsigned short',    label='Alliance'},                              -- 14   02 01 for alliance, 00 00 for party
+    {ctype='unsigned char',     label='Party Type'},                            -- 14   00 = party, 01 = linkshell, 02 = alliance
+    {ctype='unsigned short',    label='Permissions'},                           -- 15   01 for alliance leader, 00 for party leader, 03 for linkshell "to sack", 02 for linkshell "to pearl"
     {ctype='unsigned short',    label='_unknown1'},                             -- 16
 }
 
@@ -664,7 +683,9 @@ fields.outgoing[0x0C0] = L{
 
 -- /makelinkshell
 fields.outgoing[0x0C3] = L{
-    {ctype='unsigned int',      label='_junk1'},                                -- 04  No obvious purpose
+    {ctype='unsigned char',     label='_unknown1'},                             -- 04  
+    {ctype='unsigned char',     label='Linkshell Numbger'},                     -- 05  
+    {ctype='data[2]',           label='_junk1'}                                 -- 05
 }
 
 -- Equip Linkshell
@@ -2066,24 +2087,10 @@ fields.incoming[0x061] = L{
     {ctype='unsigned char',     label='iLevel over 99'},                        -- 55   0x10 would be an iLevel of 115
     {ctype='unsigned char',     label='Main Hand iLevel'},                      -- 56   
     {ctype='unsigned char',     label='_unknown5'},                             -- 57   Always 00 for me
-    {ctype='unsigned int',      label='Unity Info'},                            -- 58   See Below
-    -- dddt tttt pppp ppdd pppp pppp pp?? ????
-    -- t = Trust ID
-    -- 0 = None
-    -- 1 = Pieuje
-    -- 2 = Ayame
-    -- 3 = Invincible Shield
-    -- 4 = Apururu
-    -- 5 = Maat
-    -- 6 = Aldo
-    -- 7 = Jakoh Wahcondalo
-    -- 8 = Naja Salaheem
-    -- 9 = Flavira
-    
-    -- d = Danger - I'm not sure what it does, but 00ing this section caused my client to crash.
-    
-    -- p = Unity Points
-    
+    {ctype='bit[5]',            label='Unity ID'},                              -- 58   0=None, 1=Pieuje, 2=Ayame, 3=Invincible Shield, 4=Apururu, 5=Maat, 6=Aldo, 7=Jakoh Wahcondalo, 8=Naja Salaheem, 9=Flavira
+    {ctype='bit[5]',            label='_unknown5'},                             -- 58   Danger, 00ing caused my client to crash
+    {ctype='bit[16]',           label='Unity Points'},                          -- 59   
+    {ctype='bit[6]',            label='_unknown6'},                             -- 5A   No obvious function
     {ctype='unsigned int',      label='_junk1'},                                -- 5B   
 }
 
