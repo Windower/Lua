@@ -9,8 +9,11 @@ Command listing:
 
 //obiaway or //obi
   (h)elp   - display help information.
+   settings   - display current settings
   (s)ort   - force obiaway to put away and get appropriate obis.
   (g)et [ (a)ll | (n)eeded ]   - get obi
   (p)ut [ (a)ll| u(n)needed ]   - put obi
+   lock   - lock obi sorting
+   unlock   - unloack obi sorting
   (n)otify [ on | off ]   - sets notifications on or off.
   (l)ocation [ sack | satchel | case | wardrobe]   - sets where to put obis away.
