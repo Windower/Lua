@@ -160,6 +160,7 @@ end)()
 
 stack_ids = S{0x01F, 0x020}
 last_stack_time = 0
+last_check_time = 0
 windower.register_event('incoming chunk', function(id, data)
     if id == 0x0D2 then
         local treasure = packets.parse('incoming', data)
@@ -179,6 +180,9 @@ windower.register_event('incoming chunk', function(id, data)
             -- Don't need to stack in the other case, as a new inventory packet will come in after the drop anyway
             stack()
         end
+    elseif (os.clock() - last_check_time) > 10 and settings.AutoDrop then
+        force_check()
+        last_check_time =  os.clock()
     end
 end)
 
@@ -268,6 +272,9 @@ windower.register_event('addon command', function(command1, command2, ...)
 
         config.save(settings)
         log('AutoDrop ' .. (settings.AutoDrop and 'enabled' or 'disabled'))
+
+    elseif command1 == 'forcecheck' then
+        force_check()
 
     elseif command1 == 'help' then
         print(_addon.name .. ' v' .. _addon.version)
