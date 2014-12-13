@@ -41,7 +41,7 @@ function check_wearable(item_id)
         --debug_mode_chat('GearSwap (Debug Mode): Item '..(res.items[item_id][language] or item_id)..' does not have a jobs field in the resources.')
     else
         return (res.items[item_id].jobs[player.main_job_id]) and (res.items[item_id].level<=player.jobs[res.jobs[player.main_job_id].ens]) and (res.items[item_id].races[player.race_id]) and
-            ((player.superior_level or 0) >= (res.items[items_id].superior_level or 0))
+            ((player.superior_level or 0) >= (res.items[item_id].superior_level or 0))
     end
     return false
 end
