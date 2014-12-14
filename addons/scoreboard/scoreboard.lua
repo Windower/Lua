@@ -396,25 +396,25 @@ function action_handler(raw_actionpacket)
                 elseif main.resource and main.resource == 'weapon_skills' and main.conclusion then
                     dps_db:add_ws_damage(target:get_name(), actionpacket:get_actor_name(), main.param, main.spell_id)
                 elseif main.conclusion then
-                    if main.conclusion.subject == 'target' and T(main.conclusion.objects):contains('HP') then
+                    if main.conclusion.subject == 'target' and T(main.conclusion.objects):contains('HP') and main.param ~= 0 then
                         dps_db:add_damage(target:get_name(), create_mob_name(actionpacket), (main.conclusion.verb == 'gains' and -1 or 1)*main.param)
                     end
                 end
                 
                 if add and add.conclusion then
-                    if add.conclusion.subject == 'target' and T(add.conclusion.objects):contains('HP') then
+                    if add.conclusion.subject == 'target' and T(add.conclusion.objects):contains('HP') and add.param ~= 0 then
                         dps_db:add_damage(target:get_name(), create_mob_name(actionpacket), (add.conclusion.verb == 'gains' and -1 or 1)*add.param)
                     end
                 end
                 if spike and spike.conclusion then
-                    if spike.conclusion.subject == 'target' and T(spike.conclusion.objects):contains('HP') then
+                    if spike.conclusion.subject == 'target' and T(spike.conclusion.objects):contains('HP') and spike.param ~= 0 then
                         dps_db:add_damage(target:get_name(), create_mob_name(actionpacket), (spike.conclusion.verb == 'gains' and -1 or 1)*spike.param)
                     end
                 end
             elseif (mob_is_ally(target.raw.id) and not mob_is_ally(actionpacket.raw.actor_id)) then
                 local spike = subactionpacket:get_spike_effect()
                 if spike and spike.conclusion then
-                    if spike.conclusion.subject == 'actor' and T(spike.conclusion.objects):contains('HP') then
+                    if spike.conclusion.subject == 'actor' and T(spike.conclusion.objects):contains('HP') and spike.param ~= 0 then
                         dps_db:add_damage(target:get_name(), create_mob_name(actionpacket), (spike.conclusion.verb == 'gains' and 1 or -1)*spike.param)
                     end
                 end
