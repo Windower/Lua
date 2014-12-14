@@ -34,7 +34,7 @@ action_type_map = {['/ja']='Ability',['/jobability']='Ability',['/so']='Magic',[
     ['/ra']='Ranged Attack',['/range']='Ranged Attack',['/throw']='Ranged Attack',['/shoot']='Ranged Attack',['/ms']='Ability',['/monsterskill']='Ability',
     ['/ws']='Ability',['/weaponskill']='Ability',['/item']='Item',['/pet']='Ability',['Monster']='Monster Move'}
     
-delay_map_to_action_type = {['Ability']=2,['Magic']=20,['Ranged Attack']=10,['Item']=10,['Monster Move']=10,['Interruption']=1}
+delay_map_to_action_type = {['Ability']=3,['Magic']=20,['Ranged Attack']=10,['Item']=10,['Monster Move']=10,['Interruption']=3}
     
 validabils = {}
 validabils['english'] = {['/ma'] = {}, ['/ja'] = {}, ['/ws'] = {}, ['/item'] = {}, ['/ra'] = {}, ['/ms'] = {}, ['/pet'] = {}, ['/trig'] = {}, ['/echo'] = {}}
@@ -194,7 +194,8 @@ last_refresh = 0
 
 
 _global = make_user_table()
-_global.cast_delay = 0
+_global.pretarget_cast_delay = 0
+_global.precast_cast_delay = 0
 _global.cancel_spell = false
 _global.current_event = 'None'
 

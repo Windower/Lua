@@ -171,7 +171,8 @@ function load_user_files(job_id,user_file)
         return nil
     end
     
-    _global.cast_delay = 0
+    _global.pretarget_cast_delay = 0
+    _global.precast_cast_delay = 0
     _global.cancel_spell = false
     _global.current_event = 'get_sets'
     user_pcall('get_sets')

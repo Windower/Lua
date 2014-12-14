@@ -295,6 +295,16 @@ fields.outgoing[0x016] = L{
     {ctype='unsigned short',    label='_junk1'},                                -- 06
 }
 
+-- NPC Race Error
+fields.outgoing[0x017] = L{
+    {ctype='unsigned short',    label='NPC Index',          fn=index},          -- 04
+    {ctype='unsigned short',    label='_unknown1'},                             -- 06
+    {ctype='unsigned int',      label='NPC ID',                fn=id},          -- 08
+    {ctype='data[6]',           label='_unknown2'},                             -- 0C
+    {ctype='unsigned char',     label='Reported NPC type'},                     -- 12
+    {ctype='unsigned char',     label='_unknown3'},                             -- 13
+}
+
 enums['action'] = {
     [0x00] = 'NPC Interaction',
     [0x02] = 'Engage monster',
@@ -533,17 +543,24 @@ fields.outgoing[0x063] = L{
     {ctype='unsigned char',     label='_junk1'},                                -- 0F   Likely junk. Has no effect on anything notable.
 }
 
+--"New" Key Item examination packet
+fields.outgoing[0x064] = L{
+    {ctype='unsigned int',      label='Player',             fn=id},             -- 04
+    {ctype='byte[0x40]',        label='flags'},                                 -- 08  These correspond to a particular section of the 0x55 incoming packet
+    {ctype='unsigned int',      label='_unknown1'},                             -- 48  This field somehow denotes which half-0x55-packet the flags corresponds to
+}
+
 -- Party invite
 fields.outgoing[0x06E] = L{
     {ctype='unsigned int',      label='Target',             fn=id},             -- 04   This is so weird. The client only knows IDs from searching for people or running into them. So if neither has happened, the manual invite will fail, as the ID cannot be retrieved.
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 08   00 if target not in zone
-    {ctype='unsigned char',     label='Alliance'},                              -- 0A   02 for alliance, 00 for party or if invalid alliance target (the client somehow knows..)
+    {ctype='unsigned char',     label='Alliance'},                              -- 0A   05 for alliance, 00 for party or if invalid alliance target (the client somehow knows..)
     {ctype='unsigned char',     label='_const1',            const=0x041},       -- 0B
 }
 
 -- Party leaving
 fields.outgoing[0x06F] = L{
-    {ctype='unsigned char',     label='Alliance'},                              -- 04   02 for alliance, 00 for party
+    {ctype='unsigned char',     label='Alliance'},                              -- 04   05 for alliance, 00 for party
     {ctype='data[3]',           label='_junk1'}                                 -- 05
 }
 
@@ -553,16 +570,25 @@ fields.outgoing[0x070] = L{
     {ctype='data[3]',           label='_junk1'}                                 -- 05
 }
 
+-- Kick
+fields.outgoing[0x071] = L{
+    {ctype='data[6]',           label='_unknown1'},                             -- 04  
+    {ctype='unsigned char',     label='Kick Type'},                             -- 0A   0 for party, 1 for linkshell, 2 for alliance (maybe)
+    {ctype='unsigned char',     label='_unknown2'},                             -- 0B
+    {ctype='data[16]',          label='Member Name'}                            -- 0C   Null terminated string
+}
+
 -- Party invite response
 fields.outgoing[0x074] = L{
     {ctype='bool',              label='Join',               fn=bool},           -- 04
     {ctype='data[3]',           label='_junk1'}                                 -- 05
 }
 
--- Party change leader
+-- Change Permissions
 fields.outgoing[0x077] = L{
     {ctype='char[16]',          label='Target Name'},                           -- 04   Name of the person to give leader to
-    {ctype='unsigned short',    label='Alliance'},                              -- 14   02 01 for alliance, 00 00 for party
+    {ctype='unsigned char',     label='Party Type'},                            -- 14   00 = party, 01 = linkshell, 02 = alliance
+    {ctype='unsigned short',    label='Permissions'},                           -- 15   01 for alliance leader, 00 for party leader, 03 for linkshell "to sack", 02 for linkshell "to pearl"
     {ctype='unsigned short',    label='_unknown1'},                             -- 16
 }
 
@@ -664,11 +690,18 @@ fields.outgoing[0x0C0] = L{
 
 -- /makelinkshell
 fields.outgoing[0x0C3] = L{
-    {ctype='unsigned int',      label='_junk1'},                                -- 04  No obvious purpose
+    {ctype='unsigned char',     label='_unknown1'},                             -- 04  
+    {ctype='unsigned char',     label='Linkshell Numbger'},                     -- 05  
+    {ctype='data[2]',           label='_junk1'}                                 -- 05
 }
 
--- Unknown 0xC4 outgoing
--- Occurs when changing linkshells. Is always 8 bytes with content: 0x73, 0x20, 0x00, 0x00 for me. Triggers two incoming 0xE0.
+-- Equip Linkshell
+fields.outgoing[0x0C4] = L{
+    {ctype='unsigned short',    label='_unknown1'},                             -- 04  0x00 0x0F for me
+    {ctype='unsigned char',     label='Inventory Slot ID'},                     -- 06  Inventory Slot that holds the linkshell
+    {ctype='unsigned char',     label='Linkshell Number'},                      -- 07  Inventory Slot that holds the linkshell
+    {ctype='data[16]',          label='String of unclear purpose'}              -- 08  Probably going to be used in the future system somehow. Currently "dummy"..string.char(0,0,0).."%s %s "..string.char(0,1)
+}
 
 -- Open Mog
 fields.outgoing[0x0CB] = L{
@@ -2054,8 +2087,18 @@ fields.incoming[0x061] = L{
     {ctype='unsigned short',    label='_unknown1'},                             -- 4C   0xFF-ing this last region has no notable effect.
     {ctype='unsigned short',    label='_unknown2'},                             -- 4E
     {ctype='unsigned char',     label='Nation'},                                -- 50   0 = sandy, 1 = bastok, 2 = windy
-    {ctype='unsigned char',     label='_unknown3'},                             -- 51
-    {ctype='unsigned short',    label='_unknown4'},                             -- 52   00 00 observed.
+    {ctype='unsigned char',     label='_unknown3'},                             -- 51   Possibly Unity ID (always 7 for me, I'm in Aldo's unity)
+    {ctype='unsigned char',     label='Su Level'},                              -- 52   
+    {ctype='unsigned char',     label='_unknown4'},                             -- 53   Always 00 for me
+    {ctype='unsigned char',     label='Maximum iLevel'},                        -- 54   
+    {ctype='unsigned char',     label='iLevel over 99'},                        -- 55   0x10 would be an iLevel of 115
+    {ctype='unsigned char',     label='Main Hand iLevel'},                      -- 56   
+    {ctype='unsigned char',     label='_unknown5'},                             -- 57   Always 00 for me
+    {ctype='bit[5]',            label='Unity ID'},                              -- 58   0=None, 1=Pieuje, 2=Ayame, 3=Invincible Shield, 4=Apururu, 5=Maat, 6=Aldo, 7=Jakoh Wahcondalo, 8=Naja Salaheem, 9=Flavira
+    {ctype='bit[5]',            label='_unknown5'},                             -- 58   Danger, 00ing caused my client to crash
+    {ctype='bit[16]',           label='Unity Points'},                          -- 59   
+    {ctype='bit[6]',            label='_unknown6'},                             -- 5A   No obvious function
+    {ctype='unsigned int',      label='_junk1'},                                -- 5B   
 }
 
 types.ability_recast = L{
@@ -2297,24 +2340,25 @@ fields.incoming._func[0x0C9][0x03] = L{
 -- The title needs to be somewhere in here, but not sure where, maybe bit packed?
 fields.incoming._func[0x0C9][0x01] = L{
     {ctype='data[3]',           label='_junk1'},                                -- 0B
-    {ctype='unsigned char',     label='_unknown2'},                             -- 0E
-    {ctype='unsigned char',     label='_unknown3'},                             -- 0F
-    {ctype='unsigned short',    label='_unknown4'},                             -- 10
+    {ctype='unsigned char',     label='Icon Set Subtype'},                      -- 0E   0 = Unopened Linkshell?, 1 = Linkshell, 2 = Pearlsack, 3 = Linkpearl, 4 = Ripped Pearlsack (I think), 5 = Broken Linkpearl?
+    {ctype='unsigned char',     label='Icon Set ID'},                           -- 0F   This identifies the icon set, always 2 for linkshells.
+    {ctype='bit[4]',            label='Linkshell Red'},                         -- 10   0xGR, 0x-B
+    {ctype='bit[4]',            label='Linkshell Green'},                       -- 10   
+    {ctype='bit[4]',            label='Linkshell Blue'},                        -- 11   
+    {ctype='bit[4]',            label='_junk1'},                                -- 11   
     {ctype='unsigned char',     label='Main Job',           fn=job},            -- 12
     {ctype='unsigned char',     label='Sub Job',            fn=job},            -- 13
-    {ctype='char[15]',          label='Linkshell',          enc=ls_name_msg},   -- 14   6-bit packed
-    {ctype='unsigned char',     label='Main Job Level'},                        -- 23
-    {ctype='unsigned char',     label='Sub Job Level'},                         -- 24
-    {ctype='data[43]',          label='_unknown5'},                             -- 25   At least the first two bytes and the last twelve bytes are junk, possibly more
+    {ctype='char[16]',          label='Linkshell',          enc=ls_name_msg},   -- 14   6-bit packed
+    {ctype='unsigned char',     label='Main Job Level'},                        -- 24
+    {ctype='unsigned char',     label='Sub Job Level'},                         -- 25
+    {ctype='data[42]',          label='_unknown5'},                             -- 26   At least the first two bytes and the last twelve bytes are junk, possibly more
 }
 
 -- Bazaar Message
 fields.incoming[0x0CA] = L{
-    {ctype='int',               label='_unknown1'},                             -- 04   Could be characters starting the line - FD 02 02 18 observed
-    {ctype='unsigned short',    label='_unknown2'},                             -- 08   Could also be characters starting the line - 01 FD observed
-    {ctype='char[118]',         label='Bazaar Message'},                        -- 0A   Terminated with a vertical tab
+    {ctype='char[124]',         label='Bazaar Message'},                        -- 04   Terminated with a vertical tab
     {ctype='char[16]',          label='Player Name'},                           -- 80
-    {ctype='unsigned short',    label='_unknown3'},                             -- 90   C6 01 and 63 02 observed. Not player index.
+    {ctype='unsigned short',    label='Player Title ID'},                       -- 90   
     {ctype='unsigned short',    label='_unknown4'},                             -- 92   00 00 observed.
 }
 
@@ -2408,6 +2452,14 @@ fields.incoming[0x0DF] = L{
 }
 
 -- Unknown packet 0x0E0: I still can't make heads or tails of the content. The packet is always 8 bytes long.
+
+
+-- Linkshell Equip
+fields.incoming[0x0E0] = L{
+    {ctype='unsigned char',     label='Linkshell Number'},                      -- 04
+    {ctype='unsigned char',     label='Inventory Slot'},                        -- 05
+    {ctype='unsigned short',    label='_junk1'},                                -- 06
+}
 
 -- Char Info
 fields.incoming[0x0E2] = L{
