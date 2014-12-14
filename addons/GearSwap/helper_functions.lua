@@ -326,19 +326,24 @@ function parse_set_to_keys(str)
         -- Try aaa.bbb set names first
         while sep == '.' do
             _,_,key,sep,remainder = remainder:find("^([^%.%[]*)(%.?%[?)(.*)")
+            -- "key" is everything that is not . or [ 0 or more times.
+            -- "sep" is the next divider, which is necessarily . or [
+            -- "remainder" is everything after that
             result:append(key)
         end
         
         -- Then try aaa['bbb'] set names.
         -- Be sure to account for both single and double quote enclosures.
         -- Ignore periods contained within quote strings.
-        while sep == '[' do
+        while sep == '[' do 
             _,_,sep,remainder = remainder:find([=[^(%'?%"?)(.*)]=]) --' --block bad text highlighting
+            -- "sep" is the first ' or " found (or nil)
+            -- remainder is everything after that (or nil)
             if sep == "'" then
                 _,_,key,stop,sep,remainder = remainder:find("^([^']+)('])(%.?%[?)(.*)")
             elseif sep == '"' then
                 _,_,key,stop,sep,remainder = remainder:find('^([^"]+)("])(%.?%[?)(.*)')
-            elseif #sep == 0 then
+            elseif not sep or #sep == 0 then
                 -- If there is no single or double quote detected, attempt to treat the index as a number or boolean
                 local _,_,pot_key,pot_stop,pot_sep,pot_remainder = remainder:find('^([^%]]+)(])(%.?%[?)(.*)')
                 if tonumber(pot_key) then
