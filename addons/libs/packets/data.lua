@@ -46,7 +46,7 @@ data.outgoing[0x064] = {name='New KI examination',  description='Sent when you e
 data.outgoing[0x06E] = {name='Party invite',        description='Sent when inviting another player to either party or alliance.'}
 data.outgoing[0x06F] = {name='Party leave',         description='Sent when leaving the party or alliance.'}
 data.outgoing[0x070] = {name='Party breakup',       description='Sent when disbanding the entire party or alliance.'}
-data.outgoing[0x071] = {name='Break linkshell',     description='Sent when you break a linkshell.'}
+data.outgoing[0x071] = {name='Kick',                description='Sent when you kick someone from linkshell or party.'}
 data.outgoing[0x074] = {name='Party response',      description='Sent when responding to a party or alliance invite.'}
 data.outgoing[0x077] = {name='Change permissions',  description='Sent when giving party or alliance leader to another player or elevating/decreasing linkshell permissions.'}
 data.outgoing[0x078] = {name='Party list request',  description='Sent when checking the party list.'}
