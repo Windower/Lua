@@ -194,7 +194,8 @@ last_refresh = 0
 
 
 _global = make_user_table()
-_global.cast_delay = 0
+_global.pretarget_cast_delay = 0
+_global.precast_cast_delay = 0
 _global.cancel_spell = false
 _global.current_event = 'None'
 

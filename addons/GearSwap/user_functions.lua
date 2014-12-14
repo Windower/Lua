@@ -94,7 +94,7 @@ function cast_delay(delay)
         return
     end
     if tonumber(delay) then
-        _global.cast_delay = tonumber(delay)
+        _global[_global.current_event.."_cast_delay"] = tonumber(delay)
     else
         error('\nGearSwap: cast_delay() was passed an invalid value ('..tostring(delay)..'). (cast delay must be a number of seconds)', 2)
     end

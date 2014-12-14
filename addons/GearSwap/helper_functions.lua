@@ -669,10 +669,24 @@ Command_Registry = {}
 
 function Command_Registry.new()
     local new_instance = {last_removed=os.clock()}
+    local function remove_old_entries (t)
+        -- Removes old command registry entries.
+        for i,v in pairs(t) do
+            local lim = (v.spell and v.spell.cast_time and v.spell.cast_time*1.1+1 or
+                v.spell and v.spell.prefix=='/pet' and 4 or
+                v.spell and v.spell.action_type and delay_map_to_action_type[v.spell.action_type] or
+                3) + (v.pretarget_cast_delay or 0) + (v.precast_cast_delay or 0)
+                -- Sets it to normal casting time + 10% +1 for anything with a defined cast_time, or 1 if there is no defined cast time.
+            if tonumber(i) and os.time()-i >= lim then
+                cmd_reg.delete_entry(t,i)
+            end
+        end
+        return os.clock()
+    end
 
     return setmetatable(new_instance, {__index = function(t, k)
             if os.clock() - rawget(t,'last_removed') > 0.04 then
-                rawset(t,'last_removed',remove_old_command_registry_entries(t))
+                rawset(t,'last_removed', remove_old_entries(t))
             end
             if rawget(cmd_reg, k) ~= nil then
                 return rawget(cmd_reg,k)
@@ -697,7 +711,7 @@ function cmd_reg:new_entry(sp)
     while rawget(self,ts) do
         ts = ts+0.001
     end
-    rawset(self,ts,{cast_delay=0, spell=sp, timestamp=ts})
+    rawset(self,ts,{pretarget_cast_delay=0, precast_cast_delay=0, spell=sp, timestamp=ts})
     if debugging.command_registry then
         windower.add_to_chat(8,'GearSwap (Debug Mode): Creating a new command_registry entry: '..windower.to_shift_jis(tostring(ts)..' '..tostring(self[ts])))
     end
@@ -725,29 +739,6 @@ function cmd_reg:delete_entry(ts)
         windower.add_to_chat(8,'GearSwap (Debug Mode): Attempted to delete a command_registry entry that did not exist: '..windower.to_shift_jis(tostring(ts) ))
     end
     return false
-end
-
-
------------------------------------------------------------------------------------
---Name: remove_old_command_registry_entries(ts)
---Desc: Removes all command_registry entries more than 20 seconds old.
---Args:
----- ts - The current time, as obtained from os.time()
------------------------------------------------------------------------------------
---Returns:
----- timestamp of the last time it was traversed.
------------------------------------------------------------------------------------
-function remove_old_command_registry_entries(command_registry)
-    for i,v in pairs(command_registry) do
-        local lim = v.spell and v.spell.cast_time and v.spell.cast_time*1.1+1 or
-            v.spell and v.spell.prefix=='/pet' and 4 or
-            v.spell and v.spell.action_type and delay_map_to_action_type[v.spell.action_type] or
-            3 -- Sets it to normal casting time + 10% +1 for anything with a defined cast_time, or 1 if there is no defined cast time.
-        if tonumber(i) and os.time()-i >= lim then
-            cmd_reg.delete_entry(command_registry,i)
-        end
-    end
-    return os.clock()
 end
 
 

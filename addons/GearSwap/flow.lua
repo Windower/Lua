@@ -45,7 +45,7 @@ function equip_sets(swap_type,ts,...)
     local var_inps = {...}
     local val1 = var_inps[1]
     local val2 = var_inps[2]
-    table.reassign(_global,command_registry[ts] or {cast_delay = 0,cancel_spell = false})
+    table.reassign(_global,command_registry[ts] or {pretarget_cast_delay = 0,precast_cast_delay=0,cancel_spell = false})
     _global.current_event = tostring(swap_type)
     
     windower.debug(tostring(swap_type)..' enter')
@@ -195,6 +195,7 @@ function equip_sets_exit(swap_type,ts,val1)
                 return true
             end
             
+            -- Compose a proposed packet for the given action (this should be possible after precast)
             command_registry[ts].spell = val1
             if val1.target and val1.target.id and val1.target.index and val1.prefix and unify_prefix[val1.prefix] then
                 if val1.prefix == '/item' then
@@ -239,11 +240,10 @@ function equip_sets_exit(swap_type,ts,val1)
                 else
                 -- Spells with complete target information
                 -- command_registry[ts] is deleted for cancelled spells
-                    if command_registry[ts].cast_delay == 0 then
+                    if command_registry[ts].pretarget_cast_delay == 0 then
                         equip_sets('precast',ts,val1)
                     else
-                        windower.send_command('@wait '..command_registry[ts].cast_delay..';lua i '.._addon.name..' pretarget_delayed_cast '..ts)
-                        command_registry[ts].cast_delay = 0
+                        windower.send_command('@wait '..command_registry[ts].pretarget_cast_delay..';lua i '.._addon.name..' pretarget_delayed_cast '..ts)
                     end
                     return true
                 end
@@ -329,7 +329,7 @@ end
 --Name: precast_send_check(ts)
 --Desc: Determines whether or not to send the current packet.
 --      Cancels if _global.cancel_spell is true
---          If command_registry[ts].cast_delay is not 0, cues precast_delayed_cast with the proper
+--          If command_registry[ts].precast_cast_delay is not 0, cues precast_delayed_cast with the proper
 --          delay instead of sending immediately.
 --Args:
 ---- ts - key of command_registry
@@ -342,11 +342,11 @@ function precast_send_check(ts)
         if command_registry[ts].cancel_spell then
             command_registry:delete_entry(ts)
         else
-            if command_registry[ts].cast_delay == 0 then
+            if command_registry[ts].precast_cast_delay == 0 then
                 send_action(ts)
                 return
             else
-                windower.send_command('@wait '..command_registry[ts].cast_delay..';lua i '.._addon.name..' precast_delayed_cast '..ts)
+                windower.send_command('@wait '..command_registry[ts].precast_cast_delay..';lua i '.._addon.name..' precast_delayed_cast '..ts)
             end
         end
     end
