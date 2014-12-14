@@ -402,8 +402,17 @@ function action_handler(raw_actionpacket)
                 end
                 
                 if add and add.conclusion then
+                    local actor_name = create_mob_name(actionpacket)
+                    if T{196,223,288,289,290,291,292,
+                        293,294,295,296,297,298,299,
+                        300,301,302,385,386,387,388,
+                        389,390,391,392,393,394,395,
+                        396,397,398,732}:contains(add.message_id) then
+                        actor_name = string.format("Skillchain(%s%s)", actor_name:sub(1, 3),
+                                                      actor_name:len() > 3 and '.' or '')
+                    end
                     if add.conclusion.subject == 'target' and T(add.conclusion.objects):contains('HP') and add.param ~= 0 then
-                        dps_db:add_damage(target:get_name(), create_mob_name(actionpacket), (add.conclusion.verb == 'gains' and -1 or 1)*add.param)
+                        dps_db:add_damage(target:get_name(), actor_name, (add.conclusion.verb == 'gains' and -1 or 1)*add.param)
                     end
                 end
                 if spike and spike.conclusion then
