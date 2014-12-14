@@ -415,7 +415,7 @@ function action_handler(raw_actionpacket)
                 local spike = subactionpacket:get_spike_effect()
                 if spike and spike.conclusion then
                     if spike.conclusion.subject == 'actor' and T(spike.conclusion.objects):contains('HP') and spike.param ~= 0 then
-                        dps_db:add_damage(target:get_name(), create_mob_name(actionpacket), (spike.conclusion.verb == 'gains' and 1 or -1)*spike.param)
+                        dps_db:add_damage(create_mob_name(actionpacket), target:get_name(), (spike.conclusion.verb == 'gains' and 1 or -1)*spike.param)
                     end
                 end
             end
