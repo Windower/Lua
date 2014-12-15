@@ -1,5 +1,5 @@
 -- 
--- Obiaway v1.0.3
+-- Obiaway v1.0.6
 -- 
 -- Copyright ©2013-2014, ReaperX, onetime
 -- All rights reserved.
@@ -50,28 +50,70 @@
 --
 -- 3. Obi is not moved when currently equipped.
 --
--- To-do: Rework get_obi_in_inventory() to only pull data from
--- the inventory and location specified in settings.location.
--- Add inventory count checking for settings.location.
+-- 4. Notification messages are not in sync with when items are actually
+-- moved.
+--
+-- To-do:
+--   - Add support for other languages.
+--   - Time obiaway get and put messages to match up with when they are moved
+--   - Add location option to put all command. Ex: put all satchel
+--      Command should also change settings.location accordingly.
+--
+--
 
 _addon.name = "Obiaway"
 _addon.author = "ReaperX, onetime"
-_addon.version = "1.0.3"
-_addon.commands = {'ob', 'obi', 'obiaway'}
+_addon.version = "1.0.6"
+_addon.commands = {'oa', 'ob', 'obi', 'obiaway'}
+_addon.language = 'english'
 
 require('sets')
 require('logger')
 config = require('config')
 res = require('resources')
 
+-- settings
 default_settings = {}
 default_settings.notify = true
 default_settings.location = 'sack'
 default_settings.lock = false
-
 settings = config.load(default_settings)
 
-lockwarned = false
+-- tokens
+lock_warned = false
+inv_full_warned = false
+
+-- lists
+cities = S{
+    "Ru'Lude Gardens",
+    "Upper Jeuno",
+    "Lower Jeuno",
+    "Port Jeuno",
+    "Port Windurst",
+    "Windurst Waters",
+    "Windurst Woods",
+    "Windurst Walls",
+    "Heavens Tower",
+    "Port San d'Oria",
+    "Northern San d'Oria",
+    "Southern San d'Oria",
+    "Port Bastok",
+    "Bastok Markets",
+    "Bastok Mines",
+    "Metalworks",
+    "Aht Urhgan Whitegate",
+    "Tavnazian Safehold",
+    "Nashmau",
+    "Selbina",
+    "Mhaura",
+    "Norg",
+    "Kazham",
+    "Eastern Adoulin",
+    "Western Adoulin",
+    "Leafallia",
+    "Celennia Memorial Library",
+    "Mog Garden"
+}
 
 -- Accepts msg as a string or a table
 function obi_output(msg)
@@ -96,34 +138,34 @@ end
 windower.register_event('addon command', function(command, ...)
     local command = command:lower() or 'help'
     local params = L{...}:map(string.lower)
-    
-    
+
+
     if command == 'help' or command == 'h' then
         obi_output("Obiaway v".._addon.version..". Authors: ".._addon.author)
-        obi_output("//(ob)iaway [options]")
-        obi_output("   (h)elp :  Displays this help text.")
-        obi_output("   settings :  Displays current settings.")
-        obi_output("   (s)ort :  Automatically sorts obi.")
-        obi_output("   (g)et [ (a)ll | (n)eeded ] :  Gets obi.")
-        obi_output("   (p)ut [ (a)ll | u(n)needed ] :  Puts obi.")
-        obi_output("    lock:  Locks obi.")
-        obi_output("    unlock:  Unocks obi.")
-        obi_output("   (n)otify [ on | off ] :  Sets obiaway notifcations on or off.")
-        obi_output("   (l)ocation [ sack | satchel | case | wardrobe ] :  Sets inventory from which to get and put obi.")
-    elseif command == 'settings' or command == 'setting' then
-        obi_output("Obiaway settings:")
-        obi_output("    location:  %s":format(settings.location))
-        obi_output("    notifications:  %s":format(booltostr(settings.notify)))
-        obi_output("    lock:  %s":format(booltostr(settings.lock)))
+        obi_output("//obiaway [options]")
+        obi_output("   help :  Displays this help text.")
+        obi_output("   sort :  Automatically sorts obi.")
+        obi_output("   get [ all | needed ]")
+        obi_output("       Gets obi from bag.")
+        obi_output("   put [ all | unneeded ]")
+        obi_output("       Puts obi away into.")
+        obi_output("   lock [ on | off ]    (%s)":format(booltostr(settings.lock)))
+        obi_output("       Locks obi to current location.")
+        obi_output("   notify [ on | off ]    (%s)":format(booltostr(settings.notify)))
+        obi_output("       Sets obiaway notifcations on or off.")
+        obi_output("   location [ sack | satchel | case | wardrobe ]    (%s)":format(settings.location))
+        obi_output("       Sets inventory from which to get and put obi.")
     elseif command == 'sort' or command == 's' then
-        if not settings.lock then
-            obi_output("Sorting obi...")
+        if settings.lock then lock_obi(false) end
+        if settings.notify then
+            obi_output('Sorting obi...')
         end
-        auto_sort_obi()
+        auto_sort_obi(true)
     elseif command == 'get' or command == 'g' then
         if params[1] == 'all' or params [1] == 'a' then
             obi_output('Getting all obi from %s...':format(settings.location))
             get_all_obi(true)
+            lock_obi(true)
         elseif params[1] == 'needed' or params [1] == 'n' then
             obi_output('Getting needed obi from %s...':format(settings.location))
             get_needed_obi(true)
@@ -134,20 +176,21 @@ windower.register_event('addon command', function(command, ...)
         if params[1] == 'all' or params [1] == 'a' then
             obi_output('Putting all obi into %s...':format(settings.location))
             put_all_obi(true)
+            lock_obi(true)
         elseif params[1] == 'unneeded' or params[1] == 'needed' or params [1] == 'n' then
             obi_output('Putting unneeded obi into %s...':format(settings.location))
             put_unneeded_obi(true)
         else
             error("Invalid argument. Usage: //obiaway put [ all | needed ]")
         end
-    elseif command == 'lock' or command == 'lo' then
-        settings.lock = true
-        lockwarned = true
-        obi_output("Locking obi...")
-    elseif command == 'unlock' or command == 'lo' then
-        settings.lock = false
-        lockwarned = false
-        obi_output("Unlocking obi...")
+    elseif command == 'lock' or command == 'l' then
+        if params[1] == 'on' then
+            lock_obi(true)
+        elseif params[1] == 'off' then
+            lock_obi(false)
+        else
+            error("Invalid argument. Usage: //obiaway lock [ on | off ]")
+        end
     elseif command == 'notify' or command == 'n' then
         if params[1] == 'on' then
             settings.notify = true
@@ -158,7 +201,7 @@ windower.register_event('addon command', function(command, ...)
         else
             error("Invalid argument. Usage: //obiaway notify [ on | off ]")
         end
-    elseif command == 'location' or command == 'l' then
+    elseif command == 'location' or command == 'loc' then
         if S{'sack','case','satchel','wardrobe'}:contains(params[1]) then
             settings.location = params[1]
             obi_output("Obiaway location set to: %s":format(settings.location))
@@ -170,23 +213,57 @@ windower.register_event('addon command', function(command, ...)
     end
 end)
 
+-- converts name of a bag (str) to an id number. returns 0 (inventory) when no argument passed.
+function inv_str_to_id(str)
+    if not str then return 0 end
+    if str == 'inventory' then
+        return 0
+    elseif str == 'safe' then
+        return 1
+    elseif str == 'storage' then
+        return 2
+    elseif str == 'locker' then
+        return 3
+    elseif str == 'satchel' then
+        return 5
+    elseif str == 'sack' then
+        return 6
+    elseif str == 'case' then
+        return 7
+    elseif str == 'wardrobe' then
+        return 8
+    end
+end
+
+-- check's if an inventory is full. returns true if full. if no location argument is passed checks main inventory.
+function inventory_full(command, location)
+    local id = inv_str_to_id(location)
+    if id == 0 then location = 'inventory' end
+
+    local items = windower.ffxi.get_items(id)
+    if items.count == items.max then
+        if command then
+            obi_output('%s is full.':format(string.ucfirst(location)))
+        elseif not inv_full_warned then
+            inv_full_warned = true
+            obi_output('%s is full.':format(string.ucfirst(location)))
+        end
+        return true
+    elseif items.count < items.max then
+        inv_full_warned = false
+        return false
+    end
+    
+    print('obiaway: inventory check unknown error.')
+end
+
+-- returns list of obi in inventory
 function get_obi_in_inventory()
     local obi = {}
-    local items = windower.ffxi.get_items()
-    if items.count_inventory == items.max_inventory then
-        if not lockwarned then
-            obi_output("Inventory is full..")
-            lockwarned = true
-        end
-        return
-    else
-        lockwarned = false
-    end
-    local inv = items.inventory
+    local inv = windower.ffxi.get_items(0)
     if not inv then return end
-    local number = items.max_inventory
 
-    for i=1,number do
+    for i=1,inv.max do
         id = inv[i].id
         if ( id>=15435 and id<=15442) then
             obi["Fire"] = obi["Fire"] or (id == 15435)
@@ -204,6 +281,10 @@ function get_obi_in_inventory()
 end
 
 function get_needed_obi(command)
+    if inventory_full(command) then
+        return
+    end
+
     local elements = get_all_elements()
     local obi = get_obi_in_inventory()
     local str = ''
@@ -233,6 +314,10 @@ function get_needed_obi(command)
 end
 
 function put_unneeded_obi(command)
+    if inventory_full(command, settings.location) then
+        return
+    end
+
     local elements = get_all_elements()
     local obi = get_obi_in_inventory()
     local str = ''
@@ -246,7 +331,6 @@ function put_unneeded_obi(command)
         Ice = 'Hyorin',
         Lightning = 'Rairin'
     }
-
     for name, element in obi_names:it() do
         if obi[element] and elements[element] == 0 then    
             str = str..'put "%s Obi" %s;wait .5;':format(name, settings.location)
@@ -263,6 +347,10 @@ function put_unneeded_obi(command)
 end
 
 function get_all_obi(command)
+    if inventory_full(command) then
+        return
+    end
+
     local elements = get_all_elements()
     local obi = get_obi_in_inventory()
     local str = ''
@@ -286,17 +374,16 @@ function get_all_obi(command)
     end
     if command then
         windower.send_command(str)
-        settings.lock = true
-        lockwarned = true
-        if settings.notify then
-            obi_output('Locking obi...')
-        end
     else
         return str
     end
 end
 
 function put_all_obi(command)
+    if inventory_full(command, settings.location) then
+        return
+    end
+
     local elements = get_all_elements()
     local obi = get_obi_in_inventory()
     local str = ''
@@ -320,64 +407,41 @@ function put_all_obi(command)
     end
     if command then
         windower.send_command(str)
-        settings.lock = true
-        lockwarned = true
-        if settings.notify then
-            obi_output('Locking obi...')
-        end
     else
         return str
     end
 end
 
-auto_sort_obi = function()
-    local cities = S{
-        "Ru'Lude Gardens",
-        "Upper Jeuno",
-        "Lower Jeuno",
-        "Port Jeuno",
-        "Port Windurst",
-        "Windurst Waters",
-        "Windurst Woods",
-        "Windurst Walls",
-        "Heavens Tower",
-        "Port San d'Oria",
-        "Northern San d'Oria",
-        "Southern San d'Oria",
-        "Port Bastok",
-        "Bastok Markets",
-        "Bastok Mines",
-        "Metalworks",
-        "Aht Urhgan Whitegate",
-        "Tavanazian Safehold",
-        "Nashmau",
-        "Selbina",
-        "Mhaura",
-        "Norg",
-        "Kazham",
-        "Eastern Adoulin",
-        "Western Adoulin",
-        "Leafallia",
-        "Celennia Memorial Library",
-        "Mog Garden"
-    }
-    return function()
-        local str = ''
-        if not settings.lock then
-            if not cities:contains(res.zones[windower.ffxi.get_info().zone].english) then
-                str = str..put_unneeded_obi(false)
-                str = str..get_needed_obi(false)
-                windower.send_command(str)
-            else  -- in town. put away all obi.
-                str = str..put_all_obi(false)
-                windower.send_command(str)
-            end
-        elseif not lockwarned then
-            obi_output("Locked.")
-            lockwarned = true
+function lock_obi(toggle)
+    if toggle then
+        settings.lock = true
+        lock_warned = true
+        if settings.notify then
+            obi_output('Obi locked.')
+        end
+    elseif not toggle then
+        settings.lock = false
+        lock_warned = false
+        if settings.notify then
+            obi_output('Unlocking obi...')
         end
     end
-end()
+end
+
+-- function called on events. sorts obi based on location.
+function auto_sort_obi()
+    local str = ''
+    if not settings.lock then
+        if not cities:contains(res.zones[windower.ffxi.get_info().zone].english) then
+            str = str..put_unneeded_obi(false)
+            str = str..get_needed_obi(false)
+            windower.send_command(str)
+        else  -- in town. put away all obi.
+            str = str..put_all_obi(false)
+            windower.send_command(str)
+        end
+    end
+end
 
 function inTable(tbl, item)
     for key, value in pairs(tbl) do
