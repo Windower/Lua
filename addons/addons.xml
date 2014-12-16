@@ -482,3 +482,10 @@
     <support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
 </addons>
+<addon>
+    <name>latentchecker</name>
+    <author>byrth,smd111</author>
+    <description>Checks weapon skill points of weapon skill tiral weapons and mythic weapons</description>
+    <bugtracker>https://github.com/smd111/LatentChecker/issues</bugtracker>
+    <support>https://github.com/smd111/LatentChecker/issues</support>
+</addon>
