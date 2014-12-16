@@ -335,6 +335,13 @@
     <support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
+    <name>setbgm</name>
+    <author>Seth VanHeulen (Acacia@Odin)</author>
+    <description>Like Orchestrion... except all of the music.</description>
+    <bugtracker>https://github.com/svanheulen/setbgm-windower-addon/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Odin/Acacia</support>
+  </addon>
+  <addon>
     <name>Shortcuts</name>
     <author>Byrth</author>
     <description>Applys spellcast-like command completion (interpretation and target completion) to commands. Includes emotes, /check, and /pcmd.</description>
