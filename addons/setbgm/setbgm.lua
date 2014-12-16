@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --]]
 
 _addon.name = 'setbgm'
-_addon.version = '1.0.0'
+_addon.version = '1.0.1'
 _addon.command = 'setbgm'
 _addon.author = 'Seth VanHeulen (Acacia@Odin)'
 
@@ -62,7 +62,8 @@ bgm = {
 }
 
 function setbgm_command(...)
-    if not windower.ffxi.get_info().mog_house or windower.ffxi.get_info().zone == 280 then
+    local info = windower.ffxi.get_info()
+    if not info.mog_house or info.zone == 280 then
         windower.add_to_chat(207, 'Background music can only be set inside you Mog House.')
     elseif #arg == 1 and arg[1]:lower() == 'list' then
         windower.add_to_chat(207, 'Available music:')
