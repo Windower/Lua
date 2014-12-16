@@ -1,7 +1,7 @@
 LatentChecker
 =============
 
-checks weapon skill points of weapon skill tiral weapons and mythic weapons 
+checks weapon skill points of weapon skill trial weapons and mythic weapons 
 
 use latentchecker run or lc run to check the weapon skill points of your weapon
 
