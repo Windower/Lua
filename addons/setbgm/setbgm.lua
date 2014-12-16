@@ -1,5 +1,5 @@
 --[[
-Copyright (c) 2014, Seth VanHeulen
+Copyright © 2014, Seth VanHeulen
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -62,6 +62,7 @@ bgm = {
 }
 
 function setbgm_command(...)
+    local arg = {...}
     local info = windower.ffxi.get_info()
     if not info.mog_house or info.zone == 280 then
         windower.add_to_chat(207, 'Background music can only be set inside you Mog House.')
