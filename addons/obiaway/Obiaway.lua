@@ -50,14 +50,9 @@
 --
 -- 3. Obi is not moved when currently equipped.
 --
--- 4. Notification messages are not in sync with when items are actually
--- moved.
 --
 -- To-do:
 --   - Add support for other languages.
---   - Time obiaway get and put messages to match up with when they are moved
---   - Add location option to put all command. Ex: put all satchel
---      Command should also change settings.location accordingly.
 --
 --
 
@@ -82,8 +77,10 @@ default_settings.lock = false
 settings = config.load(default_settings)
 
 -- tokens
-lock_warned = false
-inv_full_warned = false
+tokens = {}
+tokens.lock_warned = false
+tokens.inv_full_warned = false
+tokens.bag_full_warned = false
 
 -- lists
 obi_cities = S{
@@ -126,7 +123,7 @@ obi_names = T{
     Wind = 'Furin',
     Ice = 'Hyorin',
     Lightning = 'Rairin'
-    }
+}
 
 
 ----------------------------------------
@@ -137,6 +134,12 @@ obi_names = T{
 function obi_output(msg)
     prefix = 'Obi: '
     windower.add_to_chat(209, prefix..msg)
+end
+
+-- Pause function. Accepts a number of seconds to pause.
+function wait(seconds)
+  local start = os.time()
+  repeat until os.time() > start + seconds
 end
 
 -- Accepts a boolean value and returns an appropriate string value. i.e. true -> 'on'
@@ -183,28 +186,45 @@ function inv_str_to_id(str)
     end
 end
 
+-- Function which counts how many slots remain in a bag. if no location is passed, checks inventory.
+function free_space(location)
+    local id = inv_str_to_id(location)
+
+    local inv = windower.ffxi.get_items(id)
+    n = inv.max - inv.count
+    return n
+end
+
 -- check's if an inventory is full. returns true if full. if no location argument is passed checks main inventory.
+-- also handle's an inventory full warning. requires two tokens which keep track of whether or not an inventory
+-- full warning was already given. one for the main inventory and a separate for a bag. this is to prevent
+-- "Inventory full." spam in the chat log.
 function inventory_full(command, location)
     local id = inv_str_to_id(location)
     if id == 0 then location = 'inventory' end
 
     local items = windower.ffxi.get_items(id)
-    if items.count == items.max then
+    if free_space(location) == 0 then
         if command then
+            print('fiskity fuck')
             obi_output('%s is full.':format(string.ucfirst(location)))
-        elseif not inv_full_warned then
-            inv_full_warned = true
+        elseif not tokens.inv_full_warned and id == 0 then
+            print('fuskity fook')
+            tokens.inv_full_warned = true
+            obi_output('%s is full.':format(string.ucfirst(location)))
+        elseif not tokens.bag_full_warned then
+            print('frickity frack')
+            tokens.bag_full_warned = true
             obi_output('%s is full.':format(string.ucfirst(location)))
         end
         return true
-    elseif items.count < items.max then
-        inv_full_warned = false
+    elseif free_space(location) > 0 then -- resets the tokens when space is free
+        if id == 0 then tokens.inv_full_warned = false else tokens.bag_full_warned = false end
         return false
     end
     
-    print('obiaway: inventory check unknown error.')
+    print('obiaway: inventory count check. unknown error.')
 end
-
 
 
 ----------------------------------------
@@ -215,20 +235,20 @@ end
 function lock_obi(toggle)
     if toggle then
         settings.lock = true
-        lock_warned = true
+        tokens.lock_warned = true
         if settings.notify then
             obi_output('Obi locked.')
         end
     elseif not toggle then
         settings.lock = false
-        lock_warned = false
+        tokens.lock_warned = false
         if settings.notify then
             obi_output('Unlocking obi...')
         end
     end
 end
 
--- Builds a table of boolean values that indicate which obi are in inventory
+-- Builds a table of boolean values that indicate which obi are in inventory and how many.
 -- Ex:
 --          obi = {
 --              "Fire" = false
@@ -239,12 +259,14 @@ end
 --              "Water" = false
 --              "Light" = false
 --              "Dark" = true
+--              n = 3
 --          }
 --
 -- function designer: ReaperX
-function get_obi_in_inventory()
+function get_obi_in_inventory(location)
+	id = inv_str_to_id(location)
     local obi = {}
-    local inv = windower.ffxi.get_items(0)
+    local inv = windower.ffxi.get_items(id)
     if not inv then return end
 
     for i=1,inv.max do
@@ -260,7 +282,10 @@ function get_obi_in_inventory()
             obi["Dark"] = obi["Dark"] or (id == 15442)
         end
     end
-
+    
+    -- count obi in invetory
+    obi["n"] = table.count(obi, true)
+    
     return obi
 end
 
@@ -325,104 +350,111 @@ end
 ----------------------------------------
 
 function get_needed_obi(command)
-    if inventory_full(command) then return end
+    if inventory_full(command) then return 0 end
+    local obi = get_obi_in_inventory()
+    local obi_bag = get_obi_in_inventory(settings.location)
+    if free_space() < obi_bag["n"] then
+        obi_output('Not enough space in inventory...')
+        return 0
+    end
 
     local elements = get_all_elements()
-    local obi = get_obi_in_inventory()
-    local str = ''
 
     for name, element in obi_names:it() do
         if not obi[element] and elements[element] > 0 then
-            str = str..'get "%s Obi" %s;wait .5;':format(name, settings.location)
+            windower.send_command('get "%s Obi" %s;':format(name, settings.location))
             if settings.notify then
                 obi_output('Getting %s Obi from %s.':format(name, settings.location))
             end
+			wait(.5)
         end
     end
-    if command then
-        windower.send_command(str)
-    else
-        return str
-    end
+
+    return 1
 end
 
 function put_unneeded_obi(command)
-    if inventory_full(command, settings.location) then return end
+    if inventory_full(command, settings.location) then return 0 end
+    local obi = get_obi_in_inventory()
+    if free_space(settings.location) < obi["n"] then
+        obi_output('Not enough space in %s...':format(settings.location))
+        return 0
+    end
 
     local elements = get_all_elements()
-    local obi = get_obi_in_inventory()
-    local str = ''
 
     for name, element in obi_names:it() do
         if obi[element] and elements[element] == 0 then    
-            str = str..'put "%s Obi" %s;wait .5;':format(name, settings.location)
+            windower.send_command('put "%s Obi" %s;':format(name, settings.location))
             if settings.notify then
                 obi_output('Putting %s Obi away into %s.':format(name, settings.location))
             end
+			wait(.5)
         end
     end
-    if command then
-        windower.send_command(str)
-    else
-        return str
-    end
+
+    return 1
 end
 
 function get_all_obi(command)
-    if inventory_full(command) then return end
+    if inventory_full(command) then return 0 end
+    local obi = get_obi_in_inventory()
+    local obi_bag = get_obi_in_inventory(settings.location)
+    if free_space() < obi_bag["n"] then
+        obi_output('Not enough space in inventory...')
+        return 0
+    end
 
     local elements = get_all_elements()
     local obi = get_obi_in_inventory()
-    local str = ''
 
     for name, element in obi_names:it() do
         if not obi[element] then
-            str = str..'get "%s Obi" %s;wait .5;':format(name, settings.location)
+            windower.send_command('get "%s Obi" %s;':format(name, settings.location))
             if settings.notify then
                 obi_output('Getting %s Obi from %s.':format(name, settings.location))
             end
+			wait(.5)
         end
     end
-    if command then
-        windower.send_command(str)
-    else
-        return str
-    end
+	
+	return 1
 end
 
 function put_all_obi(command)
-    if inventory_full(command, settings.location) then return end
+    if inventory_full(command, settings.location) then return 0 end
+    local obi = get_obi_in_inventory()
+    if free_space(settings.location) < obi["n"] then
+        obi_output('Not enough space in %s...':format(settings.location))
+        return 0
+    end
 
     local elements = get_all_elements()
-    local obi = get_obi_in_inventory()
-    local str = ''
 
     for name, element in obi_names:it() do
         if obi[element] then
-            str = str..'put "%s Obi" %s;wait .5;':format(name, settings.location)
+            windower.send_command('put "%s Obi" %s;':format(name, settings.location))
             if settings.notify then
                 obi_output('Putting %s Obi away into %s.':format(name, settings.location))
             end
+			wait(.5)
         end
     end
-    if command then
-        windower.send_command(str)
-    else
-        return str
-    end
+
+	return 1
 end
 
 -- function called on automatic events. sorts obi based on location.
 function auto_sort_obi()
-    local str = ''
-    if not settings.lock then
-        if not obi_cities:contains(res.zones[windower.ffxi.get_info().zone].english) then
-            str = str..put_unneeded_obi(false)
-            str = str..get_needed_obi(false)
-            windower.send_command(str)
-        else
-            str = str..put_all_obi(false)
-            windower.send_command(str)
+    -- if inventory and obi bag are full at the same time, do nothing. 'cause we can't.
+    if inventory_full(false) and inventory_full(false, settings.location) then return end
+
+    if not settings.lock then -- if sorting lock is not on, then do this stuff:
+        if not obi_cities:contains(res.zones[windower.ffxi.get_info().zone].english) then -- In a city:
+            put_unneeded_obi(false)
+            get_needed_obi(false)
+        else-- Not in a city:
+            put_all_obi(false)
         end
     end
 end
@@ -458,13 +490,14 @@ windower.register_event('addon command', function(command, ...)
         if settings.lock then lock_obi(false) end
         if settings.notify then
             obi_output('Sorting obi...')
+            wait(0.5)
         end
         auto_sort_obi(true)
     elseif command == 'get' or command == 'g' then
         if params[1] == 'all' or params [1] == 'a' then
             obi_output('Getting all obi from %s...':format(settings.location))
             get_all_obi(true)
-            lock_obi(true)
+            wait(1)
         elseif params[1] == 'needed' or params [1] == 'n' then
             obi_output('Getting needed obi from %s...':format(settings.location))
             get_needed_obi(true)
@@ -473,20 +506,21 @@ windower.register_event('addon command', function(command, ...)
         end
     elseif command == 'put' or command == 'p' then
         if params[1] == 'all' or params [1] == 'a' then
-			if S{'sack','case','satchel','wardrobe'}:contains(params[2]) then
-				settings.location = params[2]
-				obi_output("Obiaway location set to: %s":format(settings.location))
-			end
+            if S{'sack','case','satchel','wardrobe'}:contains(params[2]) then
+                settings.location = params[2]
+                obi_output("Obiaway location set to: %s":format(settings.location))
+            end
             obi_output('Putting all obi into %s...':format(settings.location))
             put_all_obi(true)
-            lock_obi(true)
+            wait(1)
         elseif params[1] == 'unneeded' or params[1] == 'needed' or params [1] == 'n' then
-			if S{'sack','case','satchel','wardrobe'}:contains(params[2]) then
-				settings.location = params[2]
-				obi_output("Obiaway location set to: %s":format(settings.location))
+            if S{'sack','case','satchel','wardrobe'}:contains(params[2]) then
+                settings.location = params[2]
+                obi_output("Obiaway location set to: %s":format(settings.location))
+            else
+				obi_output('Putting unneeded obi into %s...':format(settings.location))
+				put_unneeded_obi(true)
 			end
-            obi_output('Putting unneeded obi into %s...':format(settings.location))
-            put_unneeded_obi(true)
         else
             error("Invalid argument. Usage: //obiaway put [ all | needed ] [ sack | satchel | case | wardrobe ]")
         end
@@ -498,6 +532,8 @@ windower.register_event('addon command', function(command, ...)
         else
             error("Invalid argument. Usage: //obiaway lock [ on | off ]")
         end
+    elseif command == 'unlock' then
+        lock_obi(false)
     elseif command == 'notify' or command == 'n' then
         if params[1] == 'on' then
             settings.notify = true
