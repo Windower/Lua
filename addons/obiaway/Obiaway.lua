@@ -1,5 +1,5 @@
 -- 
--- Obiaway v1.0.7
+-- Obiaway v1.0.6
 -- 
 -- Copyright ©2013-2014, ReaperX, onetime
 -- All rights reserved.
@@ -206,11 +206,14 @@ function inventory_full(command, location)
     local items = windower.ffxi.get_items(id)
     if free_space(location) == 0 then
         if command then
+            print('fiskity fuck')
             obi_output('%s is full.':format(string.ucfirst(location)))
         elseif not tokens.inv_full_warned and id == 0 then
+            print('fuskity fook')
             tokens.inv_full_warned = true
             obi_output('%s is full.':format(string.ucfirst(location)))
         elseif not tokens.bag_full_warned then
+            print('frickity frack')
             tokens.bag_full_warned = true
             obi_output('%s is full.':format(string.ucfirst(location)))
         end
@@ -261,7 +264,7 @@ end
 --
 -- function designer: ReaperX
 function get_obi_in_inventory(location)
-	id = inv_str_to_id(location)
+    id = inv_str_to_id(location)
     local obi = {}
     local inv = windower.ffxi.get_items(id)
     if not inv then return end
@@ -349,11 +352,6 @@ end
 function get_needed_obi(command)
     if inventory_full(command) then return 0 end
     local obi = get_obi_in_inventory()
-    local obi_bag = get_obi_in_inventory(settings.location)
-    if free_space() < obi_bag["n"] then
-        obi_output('Not enough space in inventory...')
-        return 0
-    end
 
     local elements = get_all_elements()
 
@@ -363,7 +361,7 @@ function get_needed_obi(command)
             if settings.notify then
                 obi_output('Getting %s Obi from %s.':format(name, settings.location))
             end
-			wait(.5)
+            wait(.5)
         end
     end
 
@@ -373,10 +371,6 @@ end
 function put_unneeded_obi(command)
     if inventory_full(command, settings.location) then return 0 end
     local obi = get_obi_in_inventory()
-    if free_space(settings.location) < obi["n"] then
-        obi_output('Not enough space in %s...':format(settings.location))
-        return 0
-    end
 
     local elements = get_all_elements()
 
@@ -386,7 +380,7 @@ function put_unneeded_obi(command)
             if settings.notify then
                 obi_output('Putting %s Obi away into %s.':format(name, settings.location))
             end
-			wait(.5)
+            wait(.5)
         end
     end
 
@@ -411,11 +405,11 @@ function get_all_obi(command)
             if settings.notify then
                 obi_output('Getting %s Obi from %s.':format(name, settings.location))
             end
-			wait(.5)
+            wait(.5)
         end
     end
-	
-	return 1
+    
+    return 1
 end
 
 function put_all_obi(command)
@@ -434,11 +428,11 @@ function put_all_obi(command)
             if settings.notify then
                 obi_output('Putting %s Obi away into %s.':format(name, settings.location))
             end
-			wait(.5)
+            wait(.5)
         end
     end
 
-	return 1
+    return 1
 end
 
 -- function called on automatic events. sorts obi based on location.
@@ -515,9 +509,9 @@ windower.register_event('addon command', function(command, ...)
                 settings.location = params[2]
                 obi_output("Obiaway location set to: %s":format(settings.location))
             else
-				obi_output('Putting unneeded obi into %s...':format(settings.location))
-				put_unneeded_obi(true)
-			end
+                obi_output('Putting unneeded obi into %s...':format(settings.location))
+                put_unneeded_obi(true)
+            end
         else
             error("Invalid argument. Usage: //obiaway put [ all | needed ] [ sack | satchel | case | wardrobe ]")
         end
