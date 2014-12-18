@@ -1,7 +1,7 @@
 --[[
 chars v1.20131102
 
-Copyright (c) 2013, Giuliano Riccio
+Copyright © 2013-2014, Giuliano Riccio
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,9 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
+require('lists')
 require('logger')
+require('strings')
 
 _addon.name     = 'chars'
 _addon.version  = '1.20131102'
@@ -38,32 +40,24 @@ chars = require('chat.chars')
 
 windower.register_event('addon command', function(...)
     for code, char in pairs(chars) do
-        log('<'..code..'>: '..char)
+        log('<%s>: %s':format(code, char))
     end
 
     log('Using the pattern <j:text> any alphanumeric character will be replaced with its japanese version')
 end)
 
-windower.register_event('outgoing text', function(original, modified)
-    for str in modified:gmatch('<j:([^>]+)>') do
-        local jString = {}
-
-        for char in str:gmatch('.') do
-            if type(chars['j'..char]) ~= 'nil' then
-                jString[#jString + 1] = chars['j'..char]
+windower.register_event('outgoing text', function(_, modified)
+    return modified:psplit('<[^>]+>', nil, true):map(function(token)
+        if token:match('^<.*>$') then
+            if token:startswith('<j:') then
+                return token:sub(4, -2):map(function(char)
+                    return chars['j' .. char] or char
+                end)
             else
-                jString[#jString + 1] = char
+                return chars[token:sub(2, -2)] or char
             end
+        else
+            return token
         end
-
-        modified = modified:gsub('<j:'..str:escape()..'>', table.concat(jString), 1)
-    end
-
-    for char in modified:gmatch('<([%w]+)>') do
-        if type(chars[char]) ~= 'nil' then
-            modified = modified:gsub('<'..char:escape()..'>', chars[char], 1)
-        end
-    end
-
-    return modified
+    end):concat()
 end)
