@@ -206,14 +206,11 @@ function inventory_full(command, location)
     local items = windower.ffxi.get_items(id)
     if free_space(location) == 0 then
         if command then
-            print('fiskity fuck')
             obi_output('%s is full.':format(string.ucfirst(location)))
         elseif not tokens.inv_full_warned and id == 0 then
-            print('fuskity fook')
             tokens.inv_full_warned = true
             obi_output('%s is full.':format(string.ucfirst(location)))
         elseif not tokens.bag_full_warned then
-            print('frickity frack')
             tokens.bag_full_warned = true
             obi_output('%s is full.':format(string.ucfirst(location)))
         end
