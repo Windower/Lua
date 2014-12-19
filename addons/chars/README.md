@@ -15,6 +15,9 @@ Shows the available characters.
 
 ## Changelog ##
 
+### v1.20141219 ###
+* **fix:** Target-related tags were removed incorrectly
+
 ### v1.20141218 ###
 * **fix:** Adjusted to Windower's new Lua libs API
 

@@ -1,6 +1,4 @@
 --[[
-chars v1.20131102
-
 Copyright © 2013-2014, Giuliano Riccio
 All rights reserved.
 
@@ -33,7 +31,7 @@ require('logger')
 require('strings')
 
 _addon.name     = 'chars'
-_addon.version  = '1.20131102'
+_addon.version  = '1.20141219'
 _addon.command  = 'chars'
 
 chars = require('chat.chars')
@@ -43,7 +41,7 @@ windower.register_event('addon command', function(...)
         log('<%s>: %s':format(code, char))
     end
 
-    log('Using the pattern <j:text> any alphanumeric character will be replaced with its japanese version')
+    log('Using the pattern <j:text> any alphanumeric character will be replaced with its full-width ("japanese style") version')
 end)
 
 windower.register_event('outgoing text', function(_, modified)
@@ -54,7 +52,7 @@ windower.register_event('outgoing text', function(_, modified)
                     return chars['j' .. char] or char
                 end)
             else
-                return chars[token:sub(2, -2)] or char
+                return chars[token:sub(2, -2)] or token
             end
         else
             return token
