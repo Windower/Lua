@@ -93,12 +93,8 @@ function parse(settings)
     elseif meta.file.path:endswith('.xml') then
         parsed, err = _libs.xml.read(meta.file)
 
-        if parsed == nil then
-            if err ~= nil then
-                error(err)
-            else
-                error('XML error: Unkown error.')
-            end
+        if not parsed then
+            error(err or 'XML error: Unknown error.')
             return settings
         end
 
@@ -327,16 +323,17 @@ function config.save(t, char)
         char = 'global'
     elseif char ~= 'global' and not meta.chars:contains(char) then
         meta.chars:add(char)
-        meta.original[char] = setmetatable({}, _meta.T)
+        meta.original[char] = T{}
     end
 
     meta.original[char]:update(t)
 	
     if char == 'global' then
-        meta.original = meta.original:key_filter('global')
+        meta.original = T{global = meta.original.global}
+        meta.chars = S{}
     else
         meta.original.global:amend(meta.original[char], true)
-        meta.original[char] = table_diff(meta.original.global, meta.original[char]) or setmetatable({}, _meta.T)
+        meta.original[char] = table_diff(meta.original.global, meta.original[char]) or T{}
 
         if meta.original[char]:empty(true) then
             meta.original[char] = nil
@@ -349,7 +346,7 @@ end
 
 -- Returns the table containing only elements from t_new that are different from t and not nil.
 function table_diff(t, t_new)
-    local res = setmetatable({}, _meta.T)
+    local res = T{}
     local cmp
 
     for key, val in pairs(t_new) do

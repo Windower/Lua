@@ -1,0 +1,11 @@
+This script is an addon to be used with Windower for Final Fantasy XI 
+that allows you to set the background music in your Mog House.
+
+You can report issues, get the latest version, and view the source at:
+    https://github.com/svanheulen/setbgm-windower-addon
+
+The available commands are:
+    setbgm list
+        Lists all of the available music in the game.
+    setbgm <music id>
+        Sets the background music given by the ID.
