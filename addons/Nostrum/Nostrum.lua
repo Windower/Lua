@@ -107,18 +107,18 @@ local defaults={
     window={x_offset=0,y_offset=0,},
     profiles={
         default={
-    ["Cure"]=true,["CureII"]=true,["CureIII"]=true,["CureIV"]=true,["CureV"]=true,["CureVI"]=true,
-    ["Curaga"]=true,["CuragaII"]=true,["CuragaIII"]=true,["CuragaIV"]=true,["CuragaV"]=true,
-    ["Sacrifice"]=false,["Erase"]=true,["Paralyna"]=true,["Silena"]=true,["Blindna"]=true,
-    ["Poisona"]=true,["Viruna"]=true,["Stona"]=true,["Cursna"]=true,
-    ["Haste"]=true,["HasteII"]=false,["Flurry"]=false,["FlurryII"]=false,["Protect"]=false,["Shell"]=false,["ProtectII"]=false,["ShellII"]=false,
-    ["ProtectIII"]=false,["ShellIII"]=false,["ProtectIV"]=false,["ShellIV"]=false,["ProtectV"]=true,["ShellV"]=true,
-    ["Refresh"]=false,["RefreshII"]=false,["Regen"]=false,["RegenII"]=false,["RegenIII"]=false,
-    ["RegenIV"]=true,["RegenV"]=false,["PhalanxII"]=false,["Adloquium"]=false,["AnimusAugeo"]=false,["AnimusMinuo"]=false,["Embrava"]=false,
+            ["Cure"]=true,["CureII"]=true,["CureIII"]=true,["CureIV"]=true,["CureV"]=true,["CureVI"]=true,
+            ["Curaga"]=true,["CuragaII"]=true,["CuragaIII"]=true,["CuragaIV"]=true,["CuragaV"]=true,
+            ["Sacrifice"]=false,["Erase"]=true,["Paralyna"]=true,["Silena"]=true,["Blindna"]=true,
+            ["Poisona"]=true,["Viruna"]=true,["Stona"]=true,["Cursna"]=true,
+            ["Haste"]=true,["HasteII"]=false,["Flurry"]=false,["FlurryII"]=false,["Protect"]=false,["Shell"]=false,["ProtectII"]=false,["ShellII"]=false,
+            ["ProtectIII"]=false,["ShellIII"]=false,["ProtectIV"]=false,["ShellIV"]=false,["ProtectV"]=true,["ShellV"]=true,
+            ["Refresh"]=false,["RefreshII"]=false,["Regen"]=false,["RegenII"]=false,["RegenIII"]=false,
+            ["RegenIV"]=true,["RegenV"]=false,["PhalanxII"]=false,["Adloquium"]=false,["AnimusAugeo"]=false,["AnimusMinuo"]=false,["Embrava"]=false,
         },
     },
 }
-_defaults = config.load(defaults)
+local _defaults = config.load(defaults)
 settings.text.buttons.color=_defaults.text.buttons.color
 settings.text.buttons.visible=_defaults.text.buttons.visible
 settings.text.name.color=_defaults.text.name.color
@@ -323,8 +323,8 @@ function build_macro()
 end
 
 windower.register_event('load', 'login', function()
-    coroutine.sleep(2)
-    regions = 1
+
+    regions = 0
     alliance_keys = {'p5', 'p4', 'p3', 'p2', 'p1', 'p0', 'a15', 'a14', 'a13', 'a12', 'a11', 'a10', 'a25', 'a24', 'a23', 'a22', 'a21', 'a20'}
     party_from_memory = windower.ffxi.get_party()
     player_id = windower.ffxi.get_player().id
@@ -332,6 +332,8 @@ windower.register_event('load', 'login', function()
     position_lookup = {}
     stat_table = {}
     party = {[1]=L{},[2]=L{},[3]=L{}}
+
+    coroutine.sleep(2)
 
     for i=1,18 do
         local pkey = alliance_keys[i]
@@ -345,7 +347,7 @@ windower.register_event('load', 'login', function()
                 hpp = party_from_memory[pkey].hpp,
                 tp = party_from_memory[pkey].tp,
                 name = party_from_memory[pkey].name,
-                }
+            }
         end
     end
 
@@ -401,7 +403,7 @@ end)
 
 windower.register_event('keyboard', function(dik,flags,blocked)
     if blocked == 32 then return end
-    if dik == 15 or dik == 210 or dik == 28 then
+    if tab_keys:contains(dik) then
         if flags then
             coroutine.sleep(.02)
             local target = windower.ffxi.get_mob_by_target('t')
