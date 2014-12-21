@@ -38,6 +38,7 @@ data.outgoing[0x051] = {name='Equipset',            description='This packet is 
 data.outgoing[0x052] = {name='Equipset Build',      description='This packet is sent when building an equipset.'}
 data.outgoing[0x05A] = {name='Conquest',            description='This command asks the server for data pertaining to conquest/besieged status.'}
 data.outgoing[0x05B] = {name='Dialog choice',       description='Chooses a dialog option.'}
+data.outgoing[0x05C] = {name='Warp Request',        description='Request a warp. Used by teleporters and the like.'}
 data.outgoing[0x05D] = {name='Emote',               description='This command is used in emotes.'}
 data.outgoing[0x05E] = {name='Request Zone',        description='Request from the client to zone.'}
 data.outgoing[0x061] = {name='Equipment Screen',    description='This command is used when you open your equipment screen.'}
@@ -77,6 +78,8 @@ data.outgoing[0x0E7] = {name='Logout',              description='A request to lo
 data.outgoing[0x0E8] = {name='Toggle Heal',         description='This command is used to both heal and cancel healing.'}
 data.outgoing[0x0F1] = {name='Cancel',              description='Sent when canceling a buff.'}
 data.outgoing[0x0F4] = {name='Widescan',            description='This command asks the server for a widescan.'}
+data.outgoing[0x0F5] = {name='Widescan Track',      description='Sent when you choose to track something on widescan.'}
+data.outgoing[0x0F6] = {name='Widescan Cancel',     description='Sent when you choose to stop track something on widescan.'}
 data.outgoing[0x0FA] = {name='Place/Move Furniture',description='Sends new position for your furniture.'}
 data.outgoing[0x0FB] = {name='Remove Furniture',    description='Informs the server you have removed some furniture.'}
 data.outgoing[0x0FC] = {name='Plant Flowerpot',     description='Plants a seed in a flowerpot.'}
@@ -135,6 +138,7 @@ data.incoming[0x036] = {name='NPC Chat',            description='Dialog from NPC
 data.incoming[0x037] = {name='Update Char',         description='Updates a characters stats and animation.'}
 data.incoming[0x038] = {name='Entity Animation',    description='Sent when a model should play a specific animation.'}
 data.incoming[0x039] = {name='Env. Animation',      description='Sent to force animations to specific objects.'}
+data.incoming[0x03A] = {name='Independ. Animation', description='Used for arbitrary battle animations that are unaccompanied by an action packet.'}
 data.incoming[0x03C] = {name='Shop',                description='Displays items in a vendors shop.'}
 data.incoming[0x03D] = {name='Value',               description='Returns the value of an item.'}
 data.incoming[0x03E] = {name='Open Buy/Sell',       description='Opens the buy/sell menu for vendors.'}
@@ -158,6 +162,7 @@ data.incoming[0x05A] = {name='Server Emote',        description='This packet is 
 data.incoming[0x05B] = {name='Spawn',               description='Server packet sent when a new mob spawns in area.'}
 data.incoming[0x05C] = {name='Dialogue Information',description='Used when all the information required for a menu cannot be fit in an NPC Interaction packet.'}
 data.incoming[0x05E] = {name='Camp./Besieged Map',  description='Contains information about Campaign and Besieged status.'}
+data.incoming[0x05F] = {name='Music Change',        description='Changes the current music.'}
 data.incoming[0x061] = {name='Char Stats',          description='Packet contains a lot of data about your character\'s stats.'}
 data.incoming[0x062] = {name='Skills Update',       description='Packet that shows your weapon and magic skill stats.'}
 data.incoming[0x063] = {name='Set Update',          description='Frequently sent packet during battle that updates specific types of job information, like currently available/set automaton equipment and currently set BLU spells.'}

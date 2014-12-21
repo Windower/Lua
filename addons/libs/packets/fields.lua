@@ -514,6 +514,18 @@ fields.outgoing[0x05B] = L{
     {ctype='unsigned short',    label='Menu ID'},                               -- 12
 }
 
+-- Warp Request
+fields.outgoing[0x05C] = L{
+    {ctype='float',             label='X Position'},                            -- 04
+    {ctype='float',             label='Z Position'},                            -- 08
+    {ctype='float',             label='Y Position'},                            -- 0C
+    {ctype='unsigned int',      label='Target ID',          fn=id},             -- 10   NPC that you are requesting a warp from
+    {ctype='unsigned int',      label='_unknown1'},                             -- 14   01 00 00 00 observed
+    {ctype='unsigned int',      label='_unknown2'},                             -- 18   Likely contains information about the particular warp being requested, like menu ID
+    {ctype='unsigned short',    label='Target Index',       fn=index},          -- 1C
+    {ctype='unsigned short',    label='_unknown3'},                             -- 1E   Not zone ID
+}
+
 -- Zone request
 -- Sent when crossing a zone line.
 fields.outgoing[0x05E] = L{
@@ -583,6 +595,13 @@ fields.outgoing[0x074] = L{
     {ctype='bool',              label='Join',               fn=bool},           -- 04
     {ctype='data[3]',           label='_junk1'}                                 -- 05
 }
+
+--[[ -- Unnamed 0x76
+-- Observed when zoning (sometimes). Probably triggers some information to be sent (perhaps about linkshells?)
+fields.outgoing[0x076] = L{
+    {ctype='unsigned char',     label='flag'},                                  -- 04   Only 01 observed
+    {ctype='data[3]',           label='_junk1'},                                -- 05   Only 00 00 00 observed.
+}]]
 
 -- Change Permissions
 fields.outgoing[0x077] = L{
@@ -780,6 +799,12 @@ fields.outgoing[0x0F4] = L{
 -- Widescan Track
 fields.outgoing[0x0F5] = L{
     {ctype='unsigned short',    label='Index',                  fn=index},      -- 04 Setting an index of 0 stops tracking
+    {ctype='unsigned short',    label='_junk1'},                                -- 06
+}
+
+-- Widescan Cancel
+fields.outgoing[0x0F6] = L{
+    {ctype='unsigned int',      label='_junk1'},                                -- 04 Always observed as 00 00 00 00
 }
 
 -- Place/Move Furniture
@@ -1604,6 +1629,18 @@ fields.incoming[0x039] = L{
     {ctype='unsigned short',    label='_dupeIndex',        fn=index},          -- 10
 }
 
+-- Independent Animation
+-- This is sometimes sent along with an Action Message packet, to provide an animation for an action message.
+fields.incoming[0x03A] = L{
+    {ctype='unsigned int',      label='Actor ID',          fn=id},             -- 04
+    {ctype='unsigned int',      label='Target ID',         fn=id},             -- 08
+    {ctype='unsigned short',    label='Actor Index',       fn=index},          -- 0C
+    {ctype='unsigned short',    label='Target Index',      fn=index},          -- 0E
+    {ctype='unsigned short',    label='Animation ID'},                         -- 10
+    {ctype='unsigned char',     label='Animation type'},                       -- 12   0 = magic, 1 = item, 2 = JA, 3 = environmental animations, etc.
+    {ctype='unsigned char',     label='_junk1'},                               -- 13   Deleting this has no effect
+}
+
 types.shop_item = L{
     {ctype='unsigned int',      label='Price',              fn=gil},            -- 00
     {ctype='unsigned short',    label='Item',               fn=item},           -- 04
@@ -2046,6 +2083,12 @@ fields.incoming[0x05E] = L{
     {ctype='int',               label='Imperial Standing'},                     -- B0
 }
 
+-- Music Change
+fields.incoming[0x05F] = L{
+    {ctype='unsigned short',    label='Counter'},                               -- 04   Music layer
+    {ctype='unsigned short',    label='Song ID'},                               -- 06   See the setBGM addon for more information
+}
+
 -- Char Stats
 fields.incoming[0x061] = L{
     {ctype='unsigned int',      label='Maximum HP'},                            -- 04
@@ -2427,7 +2470,9 @@ fields.incoming[0x0DD] = L{
     {ctype='char*',             label='Name'},                                  -- 26
 }
 
--- Unknown mog house related packet? - 8 bytes long, sent in response to opening/closing mog house. Injecting it has no obvious effect.
+-- Unnamed 0xDE packet
+-- 8 bytes long, sent in response to opening/closing mog house. Occasionally sent when zoning.
+-- Injecting it with different values has no obvious effect.
 --[[fields.incoming[0x0DE] = L{
     {ctype='unsigned char',     label='type'},                                  -- 04  Was always 0x4 for opening/closing mog house
     {ctype='data[3]',           label='_junk1'},                                -- 05  Looked like junk
