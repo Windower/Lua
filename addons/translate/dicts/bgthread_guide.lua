@@ -46,6 +46,10 @@ local dict = {
     
     {en="BRD",ja="吟"},
     {en="GEO",ja="風"},
+    
+    {en="Wanted (Battle)",ja="ウォテッド"},
+    {en="Dragonfly",ja="トンボ"},
+    {en="Cost",ja="コスト"},
 }
 
 return dict

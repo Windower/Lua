@@ -1,4 +1,4 @@
---Copyright (c) 2013, Byrthnoth
+--Copyright (c) 2014, Byrthnoth
 --All rights reserved.
 
 --Redistribution and use in source and binary forms, with or without
@@ -24,7 +24,7 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-_addon.version = '2.600'
+_addon.version = '2.711'
 _addon.name = 'Shortcuts'
 _addon.author = 'Byrth'
 _addon.commands = {'shortcuts'}
@@ -50,6 +50,7 @@ if not windower.dir_exists(windower.addon_path..'data') then
 end
 
 require 'sets'
+require 'lists'
 require 'helper_functions'
 require 'tables'
 require 'strings'
@@ -123,7 +124,6 @@ setmetatable(aliases,nil)
 
 
 require 'statics'
-require 'ambiguous_names'
 require 'targets'
 
 -----------------------------------------------------------------------------------
@@ -136,7 +136,6 @@ require 'targets'
 ---- is loaded and treated as a script)
 -----------------------------------------------------------------------------------
 windower.register_event('load',function()
-    counter = 0
     lastsent = ''
 end)
 
@@ -165,9 +164,7 @@ end)
 windower.register_event('outgoing text',function(original,modified)
     local temp_org = windower.convert_auto_trans(modified)
     if modified:sub(1,1) ~= '/' then return modified end
-    if debugging then 
-        windower.add_to_chat(8,modified..' '..tostring(windower.ffxi.get_mob_by_target('st')))
-    end
+    debug_chat('outgoing_text: '..modified..' '..tostring(windower.ffxi.get_mob_by_target('st')))
     temp_org = temp_org:gsub(' <wait %d+>',''):sub(2)
     
     if logging then
@@ -254,7 +251,7 @@ function command_logic(original,modified)
                 lastsent = '/'..command
             end
 
-            if debugging then windower.add_to_chat(8,tostring(counter)..' input '..lastsent) end
+            debug_chat('258: input '..lastsent)
             if logging then
                 logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\n(162) ',lastsent)     
                 logfile:flush()
@@ -288,7 +285,7 @@ function command_logic(original,modified)
                 temptarg = target_make({['Player']=true,['Enemy']=true,['Party']=true,['Ally']=true,['NPC']=true,['Self']=true,['Corpse']=true})
             end
             lastsent = '/'..tempcmd..' '..temptarg
-            if debugging then windower.add_to_chat(8,tostring(counter)..' input '..lastsent) end
+            debug_chat('292: input '..lastsent)
             if logging then
                 logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\n(193) ',lastsent)
                 logfile:flush()
@@ -304,14 +301,6 @@ function command_logic(original,modified)
             logfile:flush()
         end
         return modified,true
-    elseif command_list[command] and convert_spell(spell) and valid_target(potential_targ,true) then
-        -- If the submitted ability is already properly formatted, send it out. Fixes capitalization and minor differences.
-        lastsent = ''
-        if logging then
-            logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\n(146) Legitimate command')
-            logfile:flush()
-        end
-        return "/"..command..' "'..convert_spell(spell)..'" '..potential_targ,true
     elseif command_list[command] then
         -- If there is a valid command, then pass the text with an offset of 1 to the text interpretation function
         return interp_text(splitline,1,modified)
@@ -355,9 +344,7 @@ end
 function interp_text(splitline,offset,modified)
     local temptarg,abil
     local no_targ_abil = strip(table.concat(splitline,' ',1+offset,splitline.n))
-    
-    local commands = get_available_commands()
-    
+        
     if validabils[no_targ_abil] then
         abil = no_targ_abil
     elseif splitline.n > 1 then
@@ -368,103 +355,55 @@ function interp_text(splitline,offset,modified)
     elseif not abil then abil = _raw.table.concat(splitline,' ',1+offset,splitline.n) end
 
     local strippedabil = strip(abil) -- Slug the ability
-    local slugged_commands = make_slugged_command_list(commands)
 
-    if strippedabil ~= '' and slugged_commands[strippedabil] then -- If you can use the ability, do this.
-        local r_line
-        
-        
-        if slugged_commands[strippedabil].type == 'Ambiguous' then
-            if debugging then windower.add_to_chat(8,strippedabil..' is considered ambiguous.') end
-            
-            local abil_type
-            
-            if ambig_names[strippedabil] then
-                if offset == 0 then 
-                    -- It's ambiguous, so run the associated function and pass the known information.
-                    r_line = get_ambig_r_line(strippedabil)
-                    --abil_type=ambig_names[strippedabil].funct(windower.ffxi.get_player(),ambig_names[strippedabil].IDs,ambig_names[strippedabil].info,ambig_names[strippedabil].monster_abilities)
-                    --r_line= commands[abil_type][ambig_names[strippedabil].IDs[abil_type]]
-                else
-                    -- A prefix is specified
-                    abil_type = command_list[splitline[1]]
-                    r_line= commands[abil_type][ambig_names[strippedabil].IDs[abil_type]]
-                end
-            else
-                print('Shortcuts: Resources problem detected!')
-                return false,false
+    if validabils[strippedabil] then
+        local options,nonoptions,num_opts, r_line = {},{},0
+        local player = windower.ffxi.get_player()
+        for v in validabils[strippedabil]:it() do
+            if check_usability(player,v.res,v.id) then
+                options[v.res] = v.id
+                num_opts = num_opts + 1
+            elseif v.res ~= nil then
+                nonoptions[v.res] = v.id
             end
-            
-        elseif commands[slugged_commands[strippedabil].type][slugged_commands[strippedabil].id] then
-            if debugging then windower.add_to_chat(8,strippedabil..' is considered a '..slugged_commands[strippedabil].type..'.') end
-            r_line = commands[slugged_commands[strippedabil].type][slugged_commands[strippedabil].id]
+        end
+        if num_opts > 0 then
+            -- If there are usable options then prioritize:
+            -- Prefix, if given -> Spells -> Job Abilities -> Weapon Skills -> Monster Skills
+            r_line = res[(offset == 1 and options[command_list[splitline[1]]] and command_list[splitline[1]]) or (options.spells and 'spells') or (options.job_abilities and 'job_abilities') or (options.weapon_skills and 'weapon_skills') or (options.monster_abilities and 'monster_abilities')][options[command_list[splitline[1]]] or options.spells or options.job_abilities or options.weapon_skills or options.monster_abilities]
+        elseif num_opts == 0 then
+            r_line = res[(offset == 1 and nonoptions[command_list[splitline[1]]] and command_list[splitline[1]]) or (nonoptions.spells and 'spells') or (nonoptions.weapon_skills and 'weapon_skills') or (nonoptions.job_abilities and 'job_abilities') or (nonoptions.monster_abilities and 'monster_abilities')][nonoptions[command_list[splitline[1]]] or nonoptions.spells or nonoptions.weapon_skills or nonoptions.job_abilities or nonoptions.monster_abilities]
         end
         
-        local targets = r_line.targets
+        local targets = table.reassign({},r_line.targets)
         
         -- Handling for abilities that change potential targets.
-        if r_line.prefix == '/song' or r_line.prefix == '/so' and r_line.casttime == 8 then
-            local buffs = windower.ffxi.get_player().buffs
-            for i,v in pairs(buffs) do
-                if v == 409 then targets.Party = true end -- Pianissimo
-            end
+        if r_line.skill == 'Singing' and r_line.casttime == 8 and L(player.buffs):contains(409) then
+            targets.Party = true -- Pianissimo
         end
         
-        lastsent = r_line.prefix..' "'..r_line.english..'" '..(temptarg or target_make(targets))
-        if debugging then windower.add_to_chat(8,tostring(counter)..' input '..lastsent) end
+        local abil_name = r_line.english -- Remove spaces at the end of the ability name.
+        while abil_name:sub(-1) == ' ' do
+            abil_name = abil_name:sub(1,-2)
+        end
+        
+        local out_tab = {prefix = in_game_res_commands[r_line.prefix:gsub("/","")], name = abil_name, target = temptarg or target_make(targets)}
+        lastsent = out_tab.prefix..' "'..out_tab.name..'" '..out_tab.target
         if logging then
             logfile:write('\n\n',tostring(os.clock()),'Original: ',table.concat(splitline,' '),'\n(180) ',lastsent)
             logfile:flush()
         end
-        windower.send_command('@input '..lastsent)
-        return '',false
-    elseif strippedabil ~= '' and validabils[strippedabil] then -- If you can't use the ability, but it does exist, do this
-        local r_line,abil_type
-        if validabils[strippedabil].typ == 'Ambiguous' then
-            r_line = get_ambig_r_line(strippedabil)
-            --abil_type=ambig_names[strippedabil].funct(windower.ffxi.get_player(),ambig_names[strippedabil].IDs,ambig_names[strippedabil].info,ambig_names[strippedabil].monster_abilities)
-            --r_line= res[abil_type][ambig_names[strippedabil].IDs[abil_type]]
+        debug_chat('390 comp '..lastsent:sub(2):gsub('"([^ ]+)"', '%1'):lower()..'   ||    '..table.concat(splitline,' ',1,splitline.n):gsub('"([^ ]+)"', '%1'):lower())
+        if offset == 1 and in_game_res_commands[splitline[1]] and in_game_res_commands[splitline[1]] == out_tab.prefix and
+            ('"'..out_tab.name..'" '..out_tab.target):gsub('"([^ ]+)"', '%1'):lower() == table.concat(splitline,' ',2,splitline.n):gsub('"([^ ]+)"', '%1'):lower() then
+            debug_chat('400 return '..lastsent)
+            return lastsent,true
         else
-            r_line = res[validabils[strippedabil].typ][validabils[strippedabil].index]
+            debug_chat('403 input '..lastsent)
+            windower.send_command('@input '..lastsent)
+            return '',false
         end
-        
-        lastsent = r_line.prefix..' "'..r_line.english..'" '..(temptarg or target_make(r_line.targets))
-        if debugging then windower.add_to_chat(8,tostring(counter)..' input '..lastsent) end
-        if logging then
-            logfile:write('\n\n',tostring(os.clock()),'Original: ',table.concat(splitline,' '),'\n(180) ',lastsent)
-            logfile:flush()
-        end
-        windower.send_command('@input '..lastsent)
-        return '',false
     end
     lastsent = ''
     return modified,false
-end
-
-
------------------------------------------------------------------------------------
---Name: convert_spell()
---Args:
----- spell (string): Proposed spell
------------------------------------------------------------------------------------
---Returns:
----- Either false, or a corrected spell name.
------------------------------------------------------------------------------------
-function convert_spell(spell)
-    local r_line
-    local strippedabil = (spell or ''):lower():gsub(' ',''):gsub('[^%w]','')
-    local name_line = validabils[strippedabil]
-    
-    if name_line then
-        if name_line.typ == 'Ambiguous' then
-            --local abil_type = ambig_names[strippedabil].funct(windower.ffxi.get_player(),ambig_names[strippedabil].IDs,ambig_names[strippedabil].info,ambig_names[strippedabil].monster_abilities)
-            --r_line = res[abil_type][ambig_names[strippedabil].IDs[abil_type]]
-            r_line = get_ambig_r_line(strippedabil)
-        elseif res[name_line.typ][name_line.index] then
-            r_line = res[name_line.typ][name_line.index]
-        end
-        
-        return r_line[language] or false
-    end
-    return false
 end

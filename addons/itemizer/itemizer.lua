@@ -168,7 +168,7 @@ windower.register_event('outgoing text', function(text)
         end
 
         if name then
-            return reschedule(text, {spec_tools[name], gen_tools[name]})
+            return reschedule(text, {spec_tools[name], (windower.ffxi.get_player().main_job == 'NIN' and gen_tools[name])})
         end
 
     -- Item usage

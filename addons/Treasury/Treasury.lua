@@ -1,8 +1,7 @@
 _addon.name = 'Treasury'
 _addon.author = 'Ihina'
-_addon.version = '1.0.0.0'
+_addon.version = '1.2.0.0'
 _addon.commands = {'treasury', 'tr'}
-_addon.language = 'English'
 
 res = require('resources')
 config = require('config')
@@ -12,8 +11,11 @@ require('logger')
 defaults = {}
 defaults.Pass = S{}
 defaults.Lot = S{}
+defaults.Drop = S{}
 defaults.AutoDrop = false
+defaults.AutoStack = true
 defaults.Delay = 0
+defaults.Verbose = false
 
 settings = config.load(defaults)
 
@@ -23,29 +25,33 @@ for item in res.items:it() do
     ids[item.name_log:lower()] = item.id 
 end
 
-s = S{'pass', 'lot'}
+s = S{'pass', 'lot', 'drop'}
 code = {}
 code.pass = S{}
 code.lot = S{}
+code.drop = S{}
 
 config.register(settings, function(settings_table)
     code.pass = settings_table.Pass:map(table.get+{ids} .. string.lower)
     code.lot = settings_table.Lot:map(table.get+{ids} .. string.lower)
+    code.drop = settings_table.Drop:map(table.get+{ids} .. string.lower)
 end)
 
-lotpass_commands = T{
+lotpassdrop_commands = T{
     lot = 'Lot',
-    pass = 'Pass',
     l = 'Lot',
+    pass = 'Pass',
     p = 'Pass',
+    drop = 'Drop',
+    d = 'Drop',
 }
 
 addremove_commands = T{
     add = 'add',
-    remove = 'remove',
     a = 'add',
-    r = 'remove',
     ['+'] = 'add',
+    remove = 'remove',
+    r = 'remove',
     ['-'] = 'remove',
 }
 
@@ -60,7 +66,7 @@ bool_values = T{
 
 inventory_id = res.bags:with('english', 'Inventory').id
 
-function passlot(command1, command2, ids)
+function lotpassdrop(command1, command2, ids)
     local action = command1:lower()
     names = ids:map(table.get-{'name'} .. table.get+{res.items})
     if command2 == 'add' then
@@ -74,16 +80,19 @@ function passlot(command1, command2, ids)
     end
 
     settings:save()
-    force_check()
+    force_check(command1 == 'Drop')
 end
 
-function act(action, ...)
+function act(action, output, id, ...)
+    if settings.Verbose then
+        log('%s %s':format(output, res.items[id].name:color(258)))
+    end
     windower.ffxi[action]:prepare(...):schedule((math.random() + 1) / 2 * settings.Delay)
 end
 
-pass = act+{'pass_item'}
-lot = act+{'lot_item'}
-drop = act+{'drop_item'}
+pass = act+{'pass_item', 'Passing'}
+lot = act+{'lot_item', 'Lotting'}
+drop = act+{'drop_item', 'Dropping'}
 
 function force_check()
     local items = windower.ffxi.get_items()
@@ -96,20 +105,20 @@ function force_check()
     -- Check inventory for unwanted items
     if settings.AutoDrop then
         for index, item in pairs(items.inventory) do
-            if code.pass:contains(item.id) then
-                drop(index, item.count)
+            if code.drop:contains(item.id) then
+                drop(item.id, index, item.count)
             end
         end
     end
 end
 
 function check(slot_index, item_id)
-    if code.pass:contains(item_id) then
-        pass(slot_index)
+    if (code.drop:contains(item_id) or code.pass:contains(item_id)) and not code.lot:contains(item_id) then
+        pass(item_id, slot_index)
     elseif code.lot:contains(item_id) then
         local inventory = windower.ffxi.get_items(inventory_id)
         if inventory.max - inventory.count > 1 then
-            lot(slot_index)
+            lot(item_id, slot_index)
         end
     end
 end
@@ -143,7 +152,7 @@ function pool_ids()
     return S(T(windower.ffxi.get_items().treasure):map(table.get-{'item_id'}))
 end
 
-stack = (function()
+stack = function()
     local wait_time = 0
 
     return function()
@@ -153,10 +162,12 @@ stack = (function()
             wait_time = 0
         elseif os.clock() - last_stack_time > wait_time then
             wait_time = wait_time + 0.45
-            windower.send_command('@wait 0.5; lua i treasury stack')
+            stack:schedule(0.5)
         end
-    end
-end)()
+    end:cond(function()
+        return settings.AutoStack
+    end)
+end()
 
 stack_ids = S{0x01F, 0x020}
 last_stack_time = 0
@@ -173,8 +184,8 @@ windower.register_event('incoming chunk', function(id, data)
             return
         end
 
-        if id == 0x020 and settings.AutoDrop and chunk.Bag == inventory_id and code.pass:contains(chunk.Item) then
-            windower.ffxi.drop_item(chunk.Index, chunk.Count)
+        if id == 0x020 and settings.AutoDrop and code.drop:contains(chunk.Item) then
+            drop(chunk.Item, chunk.Index, chunk.Count)
         else
             -- Don't need to stack in the other case, as a new inventory packet will come in after the drop anyway
             stack()
@@ -187,7 +198,7 @@ windower.register_event('ipc message', function(msg)
     if args:remove(1) == 'treasury' then
         command1 = args:remove(1)
         command2 = args:remove(1)
-        passlot(command1, command2, S(args):map(tonumber))
+        lotpassdrop(command1, command2, S(args):map(tonumber))
     end
 end)
 
@@ -206,26 +217,21 @@ windower.register_event('addon command', function(command1, command2, ...)
     command2 = command2 and command2:lower() or nil
 
     local name = args:concat(' ')
-    if lotpass_commands:containskey(command1) then
-        command1 = lotpass_commands[command1]
+    if lotpassdrop_commands:containskey(command1) then
+        command1 = lotpassdrop_commands[command1]
 
         if addremove_commands:containskey(command2) then
             command2 = addremove_commands[command2]
 
             local ids = find_id(name)
             if ids:empty() then
-                error('Item does not exist.')
+                error('No items found that match: %s':format(name))
                 return
             end
-            passlot(command1, command2, ids)            
+            lotpassdrop(command1, command2, ids)            
 
             if global then
-                str = ''
-                for item in ids:it() do
-                    str = str .. ' '  .. item
-                end
-                send = 'treasury ' .. command1 .. ' ' .. command2 .. str
-                windower.send_ipc_message(send)
+                windower.send_ipc_message('treasury %s %s %s':format(command1, command2, ids:concat(' ')))
             end
 
         elseif command2 == 'clear' then
@@ -267,10 +273,42 @@ windower.register_event('addon command', function(command1, command2, ...)
         end
 
         config.save(settings)
-        log('AutoDrop ' .. (settings.AutoDrop and 'enabled' or 'disabled'))
+        log('AutoDrop %s':format(settings.AutoDrop and 'enabled' or 'disabled'))
+
+    elseif command1 == 'autostack' then
+        if command2 then
+            settings.AutoStack = bool_values[command2:lower()]
+        else
+            settings.AutoStack = not settings.AutoStack
+        end
+
+        config.save(settings)
+        log('AutoStack %s':format(settings.AutoStack and 'enabled' or 'disabled'))
+
+    elseif command1 == 'delay' then
+        if not (command2 and tonumber(command2)) then
+            error('Please specify a value in seconds for the new delay')
+            return
+        end
+
+        settings.Delay = tonumber(command2)
+        log('Delay set to %f seconds':format(settings.Delay))
+
+    elseif command1 == 'verbose' then
+        if command2 then
+            settings.Verbose = bool_values[command2:lower()]
+        else
+            settings.Verbose = not settings.Verbose
+        end
+
+        config.save(settings)
+        log('Verbose output %s':format(settings.Verbose and 'enabled' or 'disabled'))
+
+    elseif command1 == 'save' then
+        config.save(settings, 'all')
 
     elseif command1 == 'help' then
-        print(_addon.name .. ' v' .. _addon.version)
+        print('%s v%s':format(_addon.name, _addon.version))
         print('    \\cs(255,255,255)lot|pass add|remove <name>\\cr - Adds are removes all items matching <name> to the specified list')
         print('    \\cs(255,255,255)lot|pass clear\\cr - Clears the specified list for the current character')
         print('    \\cs(255,255,255)lot|pass list\\cr - Lists all items on the specified list for the current character')
@@ -280,3 +318,16 @@ windower.register_event('addon command', function(command1, command2, ...)
 
     end
 end)
+
+--[[
+Copyright © 2014, Windower
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+    * Neither the name of Windower nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL Windower BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+]]

@@ -1,4 +1,12 @@
 -------------------------------------------------
+GearSwap 0.898 - Fixed a bug with using cast_delay in the pretarget function.
+-------------------------------------------------
+GearSwap 0.897 - Superior system support and filtering.
+-------------------------------------------------
+GearSwap 0.896 - Command_registry class addition.
+-------------------------------------------------
+GearSwap 0.894 - Various bugfixes (including Monstrosity loading).
+-------------------------------------------------
 GearSwap 0.892 - Proxied primitive and text commands.
 -------------------------------------------------
 GearSwap 0.891 - Fixed a few bugs with /item commands. Exposed the _addon table.

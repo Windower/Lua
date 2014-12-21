@@ -1,4 +1,4 @@
---Copyright (c) 2013, Byrthnoth
+--Copyright (c) 2013-2014, Byrthnoth
 --All rights reserved.
 
 --Redistribution and use in source and binary forms, with or without
@@ -28,13 +28,13 @@
 
 unify_prefix = {['/ma'] = '/ma', ['/magic']='/ma',['/jobability'] = '/ja',['/ja']='/ja',['/item']='/item',['/song']='/ma',
     ['/so']='/ma',['/ninjutsu']='/ma',['/weaponskill']='/ws',['/ws']='/ws',['/ra']='/ra',['/rangedattack']='/ra',['/nin']='/ma',
-    ['/throw']='/ra',['/range']='/ra',['/shoot']='/ra',['/monsterskill']='/ms',['/ms']='/ms',['/pet']='/ja',['Mon']='Monster '}
+    ['/throw']='/ra',['/range']='/ra',['/shoot']='/ra',['/monsterskill']='/ms',['/ms']='/ms',['/pet']='/ja',['Monster']='Monster'}
 
 action_type_map = {['/ja']='Ability',['/jobability']='Ability',['/so']='Magic',['/song']='Magic',['/ma']='Magic',['/magic']='Magic',['/nin']='Magic',['/ninjutsu']='Magic',
     ['/ra']='Ranged Attack',['/range']='Ranged Attack',['/throw']='Ranged Attack',['/shoot']='Ranged Attack',['/ms']='Ability',['/monsterskill']='Ability',
     ['/ws']='Ability',['/weaponskill']='Ability',['/item']='Item',['/pet']='Ability',['Monster']='Monster Move'}
     
-delay_map_to_action_type = {['Ability']=2,['Magic']=20,['Ranged Attack']=10,['Item']=10,['Monster Move']=10}
+delay_map_to_action_type = {['Ability']=3,['Magic']=20,['Ranged Attack']=10,['Item']=10,['Monster Move']=10,['Interruption']=3}
     
 validabils = {}
 validabils['english'] = {['/ma'] = {}, ['/ja'] = {}, ['/ws'] = {}, ['/item'] = {}, ['/ra'] = {}, ['/ms'] = {}, ['/pet'] = {}, ['/trig'] = {}, ['/echo'] = {}}
@@ -103,9 +103,9 @@ pass_through_targs = {['<t>']=true,['<me>']=true,['<ft>']=true,['<scan>']=true,[
     ['<stnpc>']=true,['<stal>']=true,['<stpc>']=true,['<stpt>']=true}
 
 avatar_element = {Ifrit=0,Titan=3,Leviathan=5,Garuda=2,Shiva=1,Ramuh=4,Carbuncle=6,
-    Diabolos=7,Fenrir=7,['Cait Sith']=6,['Fire Elemental']=0,['Earth Elemental']=3,['Water Elemental']=5,
-    ['Wind Elemental']=2,['Ice Elemental']=1,['Lightning Elemental']=4,['Light Elemental']=6,
-    ['Dark Elemental']=7}
+    Diabolos=7,Fenrir=7,['Cait Sith']=6,FireSpirit=0,EarthSpirit=3,WaterSpirit=5,
+    AirSpirit=2,IceSpirit=1,ThunderSpirit=4,LightSpirit=6,
+    DarkSpirit=7}
 
 encumbrance_map = {0x79,0x7F,0x7F,0x7A,0x7B,0x7C,0x7D,0x7D,0x7A,0x7E,0x80,0x80,0x80,0x80,0x7E}
 encumbrance_map[0] = 0x79 -- Slots mapped onto encumbrance byte values.
@@ -175,7 +175,7 @@ slot_map.back = 15
 
 gearswap_disabled = false
 not_sent_out_equip = {}
-command_registry = {}
+command_registry = Command_Registry.new()
 equip_list = {}
 world = make_user_table()
 buffactive = make_user_table()
@@ -194,7 +194,8 @@ last_refresh = 0
 
 
 _global = make_user_table()
-_global.cast_delay = 0
+_global.pretarget_cast_delay = 0
+_global.precast_cast_delay = 0
 _global.cancel_spell = false
 _global.current_event = 'None'
 

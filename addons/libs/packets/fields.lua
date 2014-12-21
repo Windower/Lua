@@ -295,6 +295,16 @@ fields.outgoing[0x016] = L{
     {ctype='unsigned short',    label='_junk1'},                                -- 06
 }
 
+-- NPC Race Error
+fields.outgoing[0x017] = L{
+    {ctype='unsigned short',    label='NPC Index',          fn=index},          -- 04
+    {ctype='unsigned short',    label='_unknown1'},                             -- 06
+    {ctype='unsigned int',      label='NPC ID',                fn=id},          -- 08
+    {ctype='data[6]',           label='_unknown2'},                             -- 0C
+    {ctype='unsigned char',     label='Reported NPC type'},                     -- 12
+    {ctype='unsigned char',     label='_unknown3'},                             -- 13
+}
+
 enums['action'] = {
     [0x00] = 'NPC Interaction',
     [0x02] = 'Engage monster',
@@ -533,17 +543,24 @@ fields.outgoing[0x063] = L{
     {ctype='unsigned char',     label='_junk1'},                                -- 0F   Likely junk. Has no effect on anything notable.
 }
 
+--"New" Key Item examination packet
+fields.outgoing[0x064] = L{
+    {ctype='unsigned int',      label='Player',             fn=id},             -- 04
+    {ctype='byte[0x40]',        label='flags'},                                 -- 08  These correspond to a particular section of the 0x55 incoming packet
+    {ctype='unsigned int',      label='_unknown1'},                             -- 48  This field somehow denotes which half-0x55-packet the flags corresponds to
+}
+
 -- Party invite
 fields.outgoing[0x06E] = L{
     {ctype='unsigned int',      label='Target',             fn=id},             -- 04   This is so weird. The client only knows IDs from searching for people or running into them. So if neither has happened, the manual invite will fail, as the ID cannot be retrieved.
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 08   00 if target not in zone
-    {ctype='unsigned char',     label='Alliance'},                              -- 0A   02 for alliance, 00 for party or if invalid alliance target (the client somehow knows..)
+    {ctype='unsigned char',     label='Alliance'},                              -- 0A   05 for alliance, 00 for party or if invalid alliance target (the client somehow knows..)
     {ctype='unsigned char',     label='_const1',            const=0x041},       -- 0B
 }
 
 -- Party leaving
 fields.outgoing[0x06F] = L{
-    {ctype='unsigned char',     label='Alliance'},                              -- 04   02 for alliance, 00 for party
+    {ctype='unsigned char',     label='Alliance'},                              -- 04   05 for alliance, 00 for party
     {ctype='data[3]',           label='_junk1'}                                 -- 05
 }
 
@@ -553,16 +570,25 @@ fields.outgoing[0x070] = L{
     {ctype='data[3]',           label='_junk1'}                                 -- 05
 }
 
+-- Kick
+fields.outgoing[0x071] = L{
+    {ctype='data[6]',           label='_unknown1'},                             -- 04  
+    {ctype='unsigned char',     label='Kick Type'},                             -- 0A   0 for party, 1 for linkshell, 2 for alliance (maybe)
+    {ctype='unsigned char',     label='_unknown2'},                             -- 0B
+    {ctype='data[16]',          label='Member Name'}                            -- 0C   Null terminated string
+}
+
 -- Party invite response
 fields.outgoing[0x074] = L{
     {ctype='bool',              label='Join',               fn=bool},           -- 04
     {ctype='data[3]',           label='_junk1'}                                 -- 05
 }
 
--- Party change leader
+-- Change Permissions
 fields.outgoing[0x077] = L{
     {ctype='char[16]',          label='Target Name'},                           -- 04   Name of the person to give leader to
-    {ctype='unsigned short',    label='Alliance'},                              -- 14   02 01 for alliance, 00 00 for party
+    {ctype='unsigned char',     label='Party Type'},                            -- 14   00 = party, 01 = linkshell, 02 = alliance
+    {ctype='unsigned short',    label='Permissions'},                           -- 15   01 for alliance leader, 00 for party leader, 03 for linkshell "to sack", 02 for linkshell "to pearl"
     {ctype='unsigned short',    label='_unknown1'},                             -- 16
 }
 
@@ -664,7 +690,23 @@ fields.outgoing[0x0C0] = L{
 
 -- /makelinkshell
 fields.outgoing[0x0C3] = L{
-    {ctype='unsigned int',      label='_junk1'},                                -- 04  No obvious purpose
+    {ctype='unsigned char',     label='_unknown1'},                             -- 04  
+    {ctype='unsigned char',     label='Linkshell Numbger'},                     -- 05  
+    {ctype='data[2]',           label='_junk1'}                                 -- 05
+}
+
+-- Equip Linkshell
+fields.outgoing[0x0C4] = L{
+    {ctype='unsigned short',    label='_unknown1'},                             -- 04  0x00 0x0F for me
+    {ctype='unsigned char',     label='Inventory Slot ID'},                     -- 06  Inventory Slot that holds the linkshell
+    {ctype='unsigned char',     label='Linkshell Number'},                      -- 07  Inventory Slot that holds the linkshell
+    {ctype='data[16]',          label='String of unclear purpose'}              -- 08  Probably going to be used in the future system somehow. Currently "dummy"..string.char(0,0,0).."%s %s "..string.char(0,1)
+}
+
+-- Open Mog
+fields.outgoing[0x0CB] = L{
+    {ctype='unsigned char',     label='type'},                                  -- 04  1 = open mog, 2 = close mog
+    {ctype='data[3]',           label='_junk1'}                                 -- 05
 }
 
 -- Check
@@ -720,6 +762,13 @@ fields.outgoing[0x0F1] = L{
     {ctype='unsigned char',     label='_unknown2'},                             -- 06
     {ctype='unsigned char',     label='_unknown3'},                             -- 07
 }
+
+-- Unknown packet 0xF2
+--[[fields.outgoing[0x0F2] = L{
+    {ctype='unsigned char',     label='type'},                                  -- 04  Was always 01 for me
+    {ctype='unsigned char',     label='_unknown1'},                             -- 05  Was always 00 for me
+    {ctype='unsigned short',    label='Index',                  fn=index},      -- 07  Has always been the index of a synergy enthusiast or furnace for me
+}]]
 
 -- Widescan
 fields.outgoing[0x0F4] = L{
@@ -871,6 +920,31 @@ fields.outgoing[0x111] = L{
 -- ROE quest log request
 fields.outgoing[0x112] = L{
     {ctype='int',               label='_unknown1'},                             -- 04
+}
+
+-- Homepoint Map Trigger :: 4 bytes, sent when entering a specific zone's homepoint list to cause maps to appear.
+fields.outgoing[0x114] = L{
+}
+
+-- Currency 2 Menu
+fields.outgoing[0x115] = L{
+}
+
+-- Open Unity Menu :: Two of these are sent whenever I open my unity menu. The first one has a bool of 0 and the second of 1.
+fields.outgoing[0x116] = L{
+    {ctype='bool',              label='_unknown1'},                             -- 04
+    {ctype='char[3]',           label='_unknown2'},                             -- 05   
+}
+
+-- Unity Ranking Results  :: Sent when I open my Unity Ranking Results menu. Triggers a Sparks Update packet and may trigger ranking packets that I could not record.
+fields.outgoing[0x117] = L{
+    {ctype='int',               label='_unknown2'},                             -- 04
+}
+
+-- Open Chat status
+fields.outgoing[0x118] = L{
+    {ctype='bool',              label='Chat Status'},                           -- 04   0 for Inactive and 1 for Active
+    {ctype='char[3]',           label='_unknown2'},                             -- 05   
 }
 
 types.job_level = L{
@@ -1369,6 +1443,9 @@ fields.incoming[0x02D] = L{
     {ctype='unsigned short',    label='_flags1'},                               -- 1A   This could also be a third parameter, but I suspect it is flags because I have only ever seen one bit set.
 }
 
+-- Mog House Menu
+fields.incoming[0x02E] = L{}                                                    -- Seems to contain no fields. Just needs to be sent to client to open.
+
 -- Digging Animation
 fields.incoming[0x02F] = L{
     {ctype='unsigned int',      label='Player',             fn=id},             -- 04
@@ -1550,6 +1627,12 @@ fields.incoming[0x03D] = L{
     {ctype='unsigned int',      label='_unknown1',          const=1},           -- 0C
 }
 
+-- Open Buy/Sell
+fields.incoming[0x03E] = L{
+    {ctype='unsigned char',     label='type'},                                  -- 04  Only 0x04 observed so far
+    {ctype='data[3]',           label='_junk1'},                                -- 05
+}
+
 types.blacklist_entry = L{
     {ctype='unsigned int',      label='ID'},                                    -- 00
     {ctype='char[16]',          label='Name'},                                  -- 04
@@ -1659,6 +1742,11 @@ fields.incoming._func[0x044][0x17] = L{
     {ctype='unsigned short',    label='_unknown3'},                             -- 24
     {ctype='data[118]',         label='_unknown4'},                             -- 26   Zeroing everything beyond this point has no notable effect.
 }
+
+
+-- Unknown 0x048 incoming :: Sent when loading linkshell information from the Linkshell Concierge
+-- One per entry, 128 bytes long, mostly empty, does not contain name as far as I can see.
+-- Likely contributes to that information.
 
 -- Delivery Item
 fields.incoming._func[0x04B] = {}
@@ -1999,8 +2087,18 @@ fields.incoming[0x061] = L{
     {ctype='unsigned short',    label='_unknown1'},                             -- 4C   0xFF-ing this last region has no notable effect.
     {ctype='unsigned short',    label='_unknown2'},                             -- 4E
     {ctype='unsigned char',     label='Nation'},                                -- 50   0 = sandy, 1 = bastok, 2 = windy
-    {ctype='unsigned char',     label='_unknown3'},                             -- 51
-    {ctype='unsigned short',    label='_unknown4'},                             -- 52   00 00 observed.
+    {ctype='unsigned char',     label='_unknown3'},                             -- 51   Possibly Unity ID (always 7 for me, I'm in Aldo's unity)
+    {ctype='unsigned char',     label='Su Level'},                              -- 52   
+    {ctype='unsigned char',     label='_unknown4'},                             -- 53   Always 00 for me
+    {ctype='unsigned char',     label='Maximum iLevel'},                        -- 54   
+    {ctype='unsigned char',     label='iLevel over 99'},                        -- 55   0x10 would be an iLevel of 115
+    {ctype='unsigned char',     label='Main Hand iLevel'},                      -- 56   
+    {ctype='unsigned char',     label='_unknown5'},                             -- 57   Always 00 for me
+    {ctype='bit[5]',            label='Unity ID'},                              -- 58   0=None, 1=Pieuje, 2=Ayame, 3=Invincible Shield, 4=Apururu, 5=Maat, 6=Aldo, 7=Jakoh Wahcondalo, 8=Naja Salaheem, 9=Flavira
+    {ctype='bit[5]',            label='_unknown5'},                             -- 58   Danger, 00ing caused my client to crash
+    {ctype='bit[16]',           label='Unity Points'},                          -- 59   
+    {ctype='bit[6]',            label='_unknown6'},                             -- 5A   No obvious function
+    {ctype='unsigned int',      label='_junk1'},                                -- 5B   
 }
 
 types.ability_recast = L{
@@ -2110,7 +2208,7 @@ fields.incoming[0x067] = L{
     {ctype='char*',             label='Pet Name'},                              -- 14   Packet expands to accommodate pet name length.
 }
 
--- Synth Result
+-- Self Synth Result
 fields.incoming[0x06F] = L{
     {ctype='unsigned char',     label='Result',             fn=e+{'synth'}},    -- 04
     {ctype='signed char',       label='Quality'},                               -- 05
@@ -2121,6 +2219,18 @@ fields.incoming[0x06F] = L{
     {ctype='unsigned char[4]',  label='Skill',              fn=skill},          -- 1A
     {ctype='unsigned char[4]',  label='Skillup',            fn=div+{10}},       -- 1E
     {ctype='unsigned short',    label='_junk2'},                                -- 22
+}
+
+-- Others Synth Result
+fields.incoming[0x070] = L{
+    {ctype='unsigned char',     label='Result',             fn=e+{'synth'}},    -- 04
+    {ctype='signed char',       label='Quality'},                               -- 05
+    {ctype='unsigned char',     label='Count'},                                 -- 06
+    {ctype='unsigned char',     label='_junk1'},                                -- 07
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 08
+    {ctype='unsigned short[8]', label='Lost Item',          fn=item},           -- 0A
+    {ctype='unsigned char[4]',  label='Skill',              fn=skill},          -- 1A   Unsure about this
+    {ctype='char*',             label='Player Name'},                           -- 1E   Name of the player
 }
 
 -- Proposal
@@ -2230,24 +2340,25 @@ fields.incoming._func[0x0C9][0x03] = L{
 -- The title needs to be somewhere in here, but not sure where, maybe bit packed?
 fields.incoming._func[0x0C9][0x01] = L{
     {ctype='data[3]',           label='_junk1'},                                -- 0B
-    {ctype='unsigned char',     label='_unknown2'},                             -- 0E
-    {ctype='unsigned char',     label='_unknown3'},                             -- 0F
-    {ctype='unsigned short',    label='_unknown4'},                             -- 10
+    {ctype='unsigned char',     label='Icon Set Subtype'},                      -- 0E   0 = Unopened Linkshell?, 1 = Linkshell, 2 = Pearlsack, 3 = Linkpearl, 4 = Ripped Pearlsack (I think), 5 = Broken Linkpearl?
+    {ctype='unsigned char',     label='Icon Set ID'},                           -- 0F   This identifies the icon set, always 2 for linkshells.
+    {ctype='bit[4]',            label='Linkshell Red'},                         -- 10   0xGR, 0x-B
+    {ctype='bit[4]',            label='Linkshell Green'},                       -- 10   
+    {ctype='bit[4]',            label='Linkshell Blue'},                        -- 11   
+    {ctype='bit[4]',            label='_junk1'},                                -- 11   
     {ctype='unsigned char',     label='Main Job',           fn=job},            -- 12
     {ctype='unsigned char',     label='Sub Job',            fn=job},            -- 13
-    {ctype='char[15]',          label='Linkshell',          enc=ls_name_msg},   -- 14   6-bit packed
-    {ctype='unsigned char',     label='Main Job Level'},                        -- 23
-    {ctype='unsigned char',     label='Sub Job Level'},                         -- 24
-    {ctype='data[43]',          label='_unknown5'},                             -- 25   At least the first two bytes and the last twelve bytes are junk, possibly more
+    {ctype='char[16]',          label='Linkshell',          enc=ls_name_msg},   -- 14   6-bit packed
+    {ctype='unsigned char',     label='Main Job Level'},                        -- 24
+    {ctype='unsigned char',     label='Sub Job Level'},                         -- 25
+    {ctype='data[42]',          label='_unknown5'},                             -- 26   At least the first two bytes and the last twelve bytes are junk, possibly more
 }
 
 -- Bazaar Message
 fields.incoming[0x0CA] = L{
-    {ctype='int',               label='_unknown1'},                             -- 04   Could be characters starting the line - FD 02 02 18 observed
-    {ctype='unsigned short',    label='_unknown2'},                             -- 08   Could also be characters starting the line - 01 FD observed
-    {ctype='char[118]',         label='Bazaar Message'},                        -- 0A   Terminated with a vertical tab
+    {ctype='char[124]',         label='Bazaar Message'},                        -- 04   Terminated with a vertical tab
     {ctype='char[16]',          label='Player Name'},                           -- 80
-    {ctype='unsigned short',    label='_unknown3'},                             -- 90   C6 01 and 63 02 observed. Not player index.
+    {ctype='unsigned short',    label='Player Title ID'},                       -- 90   
     {ctype='unsigned short',    label='_unknown4'},                             -- 92   00 00 observed.
 }
 
@@ -2316,6 +2427,12 @@ fields.incoming[0x0DD] = L{
     {ctype='char*',             label='Name'},                                  -- 26
 }
 
+-- Unknown mog house related packet? - 8 bytes long, sent in response to opening/closing mog house. Injecting it has no obvious effect.
+--[[fields.incoming[0x0DE] = L{
+    {ctype='unsigned char',     label='type'},                                  -- 04  Was always 0x4 for opening/closing mog house
+    {ctype='data[3]',           label='_junk1'},                                -- 05  Looked like junk
+}]]
+
 -- Char Update
 fields.incoming[0x0DF] = L{
     {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
@@ -2332,6 +2449,16 @@ fields.incoming[0x0DF] = L{
     {ctype='unsigned char',     label='Main job level'},                        -- 21
     {ctype='unsigned char',     label='Sub job',            fn=job},            -- 22
     {ctype='unsigned char',     label='Sub job level'},                         -- 23
+}
+
+-- Unknown packet 0x0E0: I still can't make heads or tails of the content. The packet is always 8 bytes long.
+
+
+-- Linkshell Equip
+fields.incoming[0x0E0] = L{
+    {ctype='unsigned char',     label='Linkshell Number'},                      -- 04
+    {ctype='unsigned char',     label='Inventory Slot'},                        -- 05
+    {ctype='unsigned short',    label='_junk1'},                                -- 06
 }
 
 -- Char Info
@@ -2470,6 +2597,9 @@ fields.incoming[0x10B] = L{
 fields.incoming[0x110] = L{
     {ctype='unsigned short',    label='Sparks Total'},                          -- 04
     {ctype='unsigned short',    label='_unknown1'},                             -- 06   Sparks are currently capped at 50,000
+    {ctype='unsigned char',     label='Unity (Shared) designator'},             -- 08   Unity (Shared) designator (0=A, 1=B, 2=C, etc.)
+    {ctype='unsigned char',     label='Unity (Person) designator '},            -- 09   The game does not distinguish these
+    {ctype='char[6]',           label='_unknown2'},                             -- 0A   Currently all 0xFF'd, never seen it change.
 }
 
 types.roe_quest = L{

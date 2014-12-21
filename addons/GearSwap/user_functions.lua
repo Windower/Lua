@@ -42,7 +42,7 @@ function set_language(lang)
 end
 
 function debug_mode(boolean)
-    if boolean == true or boolean == false then _settings.debug_mode = boolean
+    if type(boolean) == "boolean" then _settings.debug_mode = boolean
     elseif boolean == nil then
         _settings.debug_mode = true
     else
@@ -51,7 +51,7 @@ function debug_mode(boolean)
 end
 
 function show_swaps(boolean)
-    if boolean == true or boolean == false then _settings.show_swaps = boolean
+    if type(boolean) == "boolean" then _settings.show_swaps = boolean
     elseif boolean == nil then
         _settings.show_swaps = true
     else
@@ -64,7 +64,7 @@ function cancel_spell(boolean)
         error('\nGearSwap: cancel_spell() is only valid in the precast, pretarget, or filtered_action functions', 2)
         return
     end
-    if boolean == true or boolean == false then _global.cancel_spell = boolean
+    if type(boolean) == "boolean" then _global.cancel_spell = boolean
     elseif boolean == nil then
         _global.cancel_spell = true
     else
@@ -94,7 +94,7 @@ function cast_delay(delay)
         return
     end
     if tonumber(delay) then
-        _global.cast_delay = tonumber(delay)
+        _global[_global.current_event.."_cast_delay"] = tonumber(delay)
     else
         error('\nGearSwap: cast_delay() was passed an invalid value ('..tostring(delay)..'). (cast delay must be a number of seconds)', 2)
     end

@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.893'
+_addon.version = '0.898'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -147,6 +147,9 @@ windower.register_event('addon command',function (...)
     logit('\n\n'..tostring(os.clock)..table.concat({...},' '))
     local splitup = {...}
     if not splitup[1] then return end -- handles //gs
+    
+    for i,v in pairs(splitup) do splitup[i] = windower.from_shift_jis(windower.convert_auto_trans(v)) end
+
     local cmd = splitup[1]:lower()
     
     if cmd == 'c' then
@@ -183,7 +186,7 @@ windower.register_event('addon command',function (...)
             local f_name = table.concat(splitup,' ',2)
             if pathsearch({f_name}) then
                 refresh_globals()
-                command_registry = {}
+                command_registry = Command_Registry.new()
                 load_user_files(false,f_name)
             else
                 windower.add_to_chat(123,'GearSwap: File not found.')
@@ -215,14 +218,16 @@ windower.register_event('addon command',function (...)
 end)
 
 function disenable(tab,funct,functname,pol)
+    local slot_name = ''
     if tab[2] and tab[2]:lower()=='all' then
         funct('main','sub','range','ammo','head','neck','lear','rear','body','hands','lring','rring','back','waist','legs','feet')
         print('GearSwap: All slots '..functname..'d.')
     elseif tab[2]  then
         for i=2,#tab do
-            if slot_map[tab[i]:gsub('[^%a_%d]',''):lower()] then
-                funct(tab[i]:gsub('[^%a_%d]',''):lower())
-                print('GearSwap: '..tab[i]:gsub('[^%a_%d]',''):lower()..' slot '..functname..'d.')
+            slot_name = tab[i]:gsub('[^%a_%d]',''):lower()
+            if slot_map[slot_name] then
+                funct(slot_name)
+                print('GearSwap: '..slot_name..' slot '..functname..'d.')
             else
                 print('GearSwap: Unable to find slot '..tostring(tab[i])..'.')
             end
@@ -264,18 +269,24 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
     if injected then
     elseif id == 0x00A then
         windower.debug('zone change')
-        player.name = data:unpack('z',0x85)
+        command_registry = Command_Registry.new()
+        table.clear(not_sent_out_equip)
+        
         player.id = data:unpack('I',0x05)
         player.index = data:unpack('H',0x09)
-        player.main_job = data:byte(0xB5)
-        player.sub_job = data:byte(0xB8)
+        if player.main_job_id and player.main_job_id ~= data:byte(0xB5) and player.name and player.name == data:unpack('z',0x85) then
+            windower.debug('job change on zone')
+            load_user_files(data:byte(0xB5))
+        else
+            player.name = data:unpack('z',0x85)
+        end
+        player.main_job_id = data:byte(0xB5)
+        player.sub_job_id = data:byte(0xB8)
         player.vitals.max_hp = data:unpack('I',0xE9)
         player.vitals.max_mp = data:unpack('I',0xED)
         update_job_names()
         
         world.zone_id = data:unpack('H',0x31)
-        not_sent_out_equip = {}
-        command_registry = {}
         _ExtraData.world.conquest = false
         for i,v in pairs(region_to_zone_map) do
             if v:contains(world.zone_id) then
@@ -525,9 +536,9 @@ windower.register_event('gain buff',function(buff_id)
     
     -- Need to figure out what I'm going to do with this:
     if T{'terror','sleep','stun','petrification','charm','weakness'}:contains(buff_name:lower()) then
-        for i,v in pairs(command_registry) do
+        for ts,v in pairs(command_registry) do
             if v.midaction then
-                command_registry[i] = nil
+                command_registry:delete_entry(ts)
             end
         end
     end

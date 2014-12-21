@@ -1,4 +1,4 @@
---Copyright (c) 2013, Byrthnoth
+--Copyright (c) 2014, Byrthnoth
 --All rights reserved.
 
 --Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,6 @@
 
 -- Convert the spells and job abilities into a referenceable list of aliases --
 validabils = {}
-ambig_names = {}
 
 --f = io.open('..addonsprdata'..tostring(os.clock())..'.log','w+')
 --for i,v in pairs(validabils) do
@@ -39,6 +38,11 @@ ambig_names = {}
 command_list = {['ja']='job_abilities',['jobability']='job_abilities',['so']='spells',['song']='spells',['ma']='spells',['magic']='spells',['nin']='spells',['ninjutsu']='spells',
 	['ra']='Ranged Attack',['range']='Ranged Attack',['throw']='Ranged Attack',['shoot']='Ranged Attack',['monsterskill']='monster_abilities',['ms']='monster_abilities',
 	['ws']='weapon_skills',['weaponskill']='weapon_skills',['item']='Ability',['pet']='job_abilities'}
+    
+in_game_res_commands = {['ja']='/ja',['jobability']='/ja',['pet']='/ja',
+    ['so']='/ma',['song']='/ma',['ma']='/ma',['magic']='/ma',['nin']='/ma',['ninjutsu']='/ma',
+    ['monsterskill']='/ms',['ms']='/ms',['ws']='/ws',['weaponskill']='/ws',
+	['ra']='/ra',['range']='/ra',['throw']='/ra',['shoot']='/ra'}
 
 -- List of other commands that might use name completion.
 command2_list = {['kick']=true,['assist']=true,['alliancecmd']=T{'kick','add','leader','breakup','leave','looter'},['partycmd']=T{'kick','add','leader','breakup','leave','looter'},
@@ -67,3 +71,34 @@ targ_reps = {t='<t>',me='<me>',ft='<ft>',scan='<scan>',bt='<bt>',lastst='<lastst
 	st='<st>',stpc='<stpc>',stal='<stal>',stnpc='<stnpc>',stpt='<stpt>'}
 	
 language = 'english' -- windower.ffxi.get_info()['language']:lower()
+
+
+-----------------------------------------------------------------------------------
+--Name: make_abil()
+--Args:
+---- ind (string): stripped ability name
+---- t (string): type of ability (Magic or Ability)
+---- i (number): index id
+-----------------------------------------------------------------------------------
+--Returns:
+---- Nothing, adds a new line to validabils or modifies it.
+-----------------------------------------------------------------------------------
+function make_abil(ind,res,id)
+    validabils[ind] = validabils[ind] or L{}
+    validabils[ind]:append({res=res,id=id})
+end
+
+-- Iterate through resources and make validabils.
+function validabils_it(resource)
+    for id,v in pairs(res[resource]) do
+        if (not v.monster_level and v.prefix) or (v.monster_level and v.monster_level ~= -1 and v.ja:sub(1,1) ~= '#' ) then
+        -- Monster Abilities contains a large number of player-usable moves (but not monstrosity-usable). This excludes them.
+            make_abil(strip(v.english),resource,id)
+        end
+    end
+end
+
+validabils_it('spells')
+validabils_it('job_abilities')
+validabils_it('weapon_skills')
+validabils_it('monster_abilities')

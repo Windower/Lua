@@ -171,7 +171,8 @@ function load_user_files(job_id,user_file)
         return nil
     end
     
-    _global.cast_delay = 0
+    _global.pretarget_cast_delay = 0
+    _global.precast_cast_delay = 0
     _global.cancel_spell = false
     _global.current_event = 'get_sets'
     user_pcall('get_sets')
@@ -328,6 +329,12 @@ function refresh_player(dt,user_event_flag)
             for i,v in pairs(res.monstrosity[species_id]) do
                 if i ~= 'id' then
                     player.species[i] = v
+                end
+            end
+            player.species.tp_moves = copy_entry(res.monstrosity[species_id].tp_moves)
+            for i,v in pairs(player.species.tp_moves) do
+                if v > player.main_job_level then
+                    player.species.tp_moves[i] = nil
                 end
             end
         end

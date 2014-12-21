@@ -1,4 +1,4 @@
---Copyright (c) 2013, Byrthnoth
+--Copyright (c) 2013-2014, Byrthnoth
 --All rights reserved.
 
 --Redistribution and use in source and binary forms, with or without
@@ -287,7 +287,7 @@ function set_merge(baseSet, ...)
             end
         end
     end
-
+    
     return baseSet
 end
 
@@ -326,19 +326,24 @@ function parse_set_to_keys(str)
         -- Try aaa.bbb set names first
         while sep == '.' do
             _,_,key,sep,remainder = remainder:find("^([^%.%[]*)(%.?%[?)(.*)")
+            -- "key" is everything that is not . or [ 0 or more times.
+            -- "sep" is the next divider, which is necessarily . or [
+            -- "remainder" is everything after that
             result:append(key)
         end
         
         -- Then try aaa['bbb'] set names.
         -- Be sure to account for both single and double quote enclosures.
         -- Ignore periods contained within quote strings.
-        while sep == '[' do
+        while sep == '[' do 
             _,_,sep,remainder = remainder:find([=[^(%'?%"?)(.*)]=]) --' --block bad text highlighting
+            -- "sep" is the first ' or " found (or nil)
+            -- remainder is everything after that (or nil)
             if sep == "'" then
                 _,_,key,stop,sep,remainder = remainder:find("^([^']+)('])(%.?%[?)(.*)")
             elseif sep == '"' then
                 _,_,key,stop,sep,remainder = remainder:find('^([^"]+)("])(%.?%[?)(.*)')
-            elseif #sep == 0 then
+            elseif not sep or #sep == 0 then
                 -- If there is no single or double quote detected, attempt to treat the index as a number or boolean
                 local _,_,pot_key,pot_stop,pot_sep,pot_remainder = remainder:find('^([^%]]+)(])(%.?%[?)(.*)')
                 if tonumber(pot_key) then
@@ -633,7 +638,9 @@ function filter_pretarget(spell)
             debug_mode_chat("Unable to execute command. You do not have access to that ability ("..(res.job_abilities[spell.id][language] or spell.id)..")")
             return false
         end
-    elseif category == 25 and (not player.main_job_id == 23 or not player.species or not player.species.tp_moves[spell.id] or not (player.species.tp_moves[spell.id] <= player.main_job_level)) then
+    elseif category == 25 and (not player.main_job_id == 23 or not windower.ffxi.get_mjob_data().species or
+        not res.monstrosity[windower.ffxi.get_mjob_data().species] or not res.monstrosity[windower.ffxi.get_mjob_data().species].tp_moves[spell.id] or
+        not (res.monstrosity[windower.ffxi.get_mjob_data().species].tp_moves[spell.id] <= player.main_job_level)) then
         -- Monstrosity filtering
         debug_mode_chat("Unable to execute command. You do not have access to that monsterskill ("..(res.monster_abilities[spell.id][language] or spell.id)..")")
         return false
@@ -662,8 +669,41 @@ function filter_precast(spell)
 end
 
 
+local cmd_reg = {}
+Command_Registry = {}
+
+function Command_Registry.new()
+    local new_instance = {last_removed=os.clock()}
+    local function remove_old_entries (t)
+        -- Removes old command registry entries.
+        for i,v in pairs(t) do
+            local lim = (v.spell and v.spell.cast_time and v.spell.cast_time*1.1+1 or
+                v.spell and v.spell.prefix=='/pet' and 4 or
+                v.spell and v.spell.action_type and delay_map_to_action_type[v.spell.action_type] or
+                3) + (v.pretarget_cast_delay or 0) + (v.precast_cast_delay or 0)
+                -- Sets it to normal casting time + 10% +1 for anything with a defined cast_time, or 1 if there is no defined cast time.
+            if tonumber(i) and os.time()-i >= lim then
+                cmd_reg.delete_entry(t,i)
+            end
+        end
+        return os.clock()
+    end
+
+    return setmetatable(new_instance, {__index = function(t, k)
+            if os.clock() - rawget(t,'last_removed') > 0.04 then
+                rawset(t,'last_removed', remove_old_entries(t))
+            end
+            if rawget(cmd_reg, k) ~= nil then
+                return rawget(cmd_reg,k)
+            else
+                return rawget(t,k)
+            end
+        end})
+end
+
+
 -----------------------------------------------------------------------------------
---Name: mk_command_registry_entry(sp)
+--Name: cmd_reg:new_entry(sp)
 --Desc: Makes a new entry in command_registry.
 --Args:
 ---- sp - Resources line for the current spell
@@ -671,50 +711,45 @@ end
 --Returns:
 ---- ts - index for command_registry
 -----------------------------------------------------------------------------------
-function mk_command_registry_entry(sp)
+function cmd_reg:new_entry(sp)
     local ts = os.time()
-    remove_old_command_registry_entries(ts)
-    while command_registry[ts] do
+    while rawget(self,ts) do
         ts = ts+0.001
     end
-    command_registry[ts] = {}
-    command_registry[ts].cast_delay = 0
-    command_registry[ts].spell = sp
-    command_registry[ts].timestamp = ts
+    rawset(self,ts,{pretarget_cast_delay=0, precast_cast_delay=0, spell=sp, timestamp=ts})
     if debugging.command_registry then
-        windower.add_to_chat(8,'GearSwap (Debug Mode): Creating a new command_registry entry: '..windower.to_shift_jis(tostring(ts)..' '..tostring(command_registry[ts])))
+        windower.add_to_chat(8,'GearSwap (Debug Mode): Creating a new command_registry entry: '..windower.to_shift_jis(tostring(ts)..' '..tostring(self[ts])))
     end
     return ts
 end
 
 
 -----------------------------------------------------------------------------------
---Name: remove_old_command_registry_entries(ts)
---Desc: Removes all command_registry entries more than 20 seconds old.
+--Name: cmd_reg:delete_entry(ts)
+--Desc: Makes a new entry in command_registry.
 --Args:
----- ts - The current time, as obtained from os.time()
+---- ts - timestamp of the command registry entry to be deleted
 -----------------------------------------------------------------------------------
 --Returns:
----- none
+---- bool - true indicates a successful deletion
 -----------------------------------------------------------------------------------
-function remove_old_command_registry_entries(ts)
-    for i,v in pairs(command_registry) do
-        local lim = 20 -- 20 second default limit (good for spells?)
-        if v.spell and v.spell.action_type then
-            if delay_map_to_action_type[v.spell.action_type] then
-                lim = delay_map_to_action_type[v.spell.action_type]
-            end
+function cmd_reg:delete_entry(ts)
+    if rawget(self,ts) then
+        if debugging.command_registry then
+            windower.add_to_chat(8,'GearSwap (Debug Mode): Deleting a command_registry entry: '..windower.to_shift_jis(tostring(ts)..' '..tostring(rawget(self,ts))))
         end
-        if ts-i >= lim then
-            command_registry[i] = nil
-        end
+        rawset(self,ts,nil)
+        return true
+    elseif debugging.command_registry then
+        windower.add_to_chat(8,'GearSwap (Debug Mode): Attempted to delete a command_registry entry that did not exist: '..windower.to_shift_jis(tostring(ts) ))
     end
+    return false
 end
 
 
 -----------------------------------------------------------------------------------
---Name: find_command_registry_key(typ,value)
---Desc: Returns the proper unified prefix, or "Mosnter " in the case of a monster action
+--Name: cmd_reg:find_by_spell(value)
+--Desc: Returns the proper unified prefix, or "Monster" in the case of a monster action
 --Args:
 ---- typ - 'spell', 'timestamp', or 'id'
 ---- value - The spell, timestamp, or id
@@ -723,92 +758,77 @@ end
 --Returns:
 ---- timestamp index of command_registry
 -----------------------------------------------------------------------------------
-function find_command_registry_key(typ,value)
-    if typ == 'spell' then
-        -- Finds all entries of a given spell in the table.
-        -- Returns the one with the most recent timestamp.
-        -- Actions that do not have timestamps yet (have not hit midcast) are given lowest priority.
-        local potential_entries,current_time,winner,winning_ind = {},os.time()
-        for i,v in pairs(command_registry) do
-            if v.spell and v.spell.prefix == value.prefix and v.spell.name == value.name then
-                potential_entries[i] = v.timestamp or 0
-            elseif v.spell and v.spell.name == 'Double-Up' and value.type == 'CorsairRoll' then
-                -- Double Up ability uses will return action packets that match Corsair Rolls rather than Double Up
-                potential_entries[i] = v.timestamp or 0
-            end
-        end
-        for i,v in pairs(potential_entries) do
-            if not winner or (current_time - v < current_time - winner) then
-                winner = v
-                winning_ind = i
-            end
-        end
-        return winning_ind
-    elseif typ == 'timestamp' then
-        for i,v in pairs(command_registry) do
-            if v.index_timestamp == value then
-                return i
-            end
-        end
-    elseif typ == 'id' then
-        for i,v in pairs(command_registry) do
-            if v.spell and v.spell.target and value == v.spell.target.id then
-                return i
-            end
+function cmd_reg:find_by_spell(value)
+    -- Finds all entries of a given spell in the table.
+    -- Returns the one with the most recent timestamp.
+    -- Actions that do not have timestamps yet (have not hit midcast) are given lowest priority.
+    local potential_entries,current_time,winner,ts = {},os.time()
+    for i,v in pairs(self) do
+        if v.spell and v.spell.prefix == value.prefix and v.spell.name == value.name then
+            potential_entries[i] = v.timestamp or 0
+        elseif v.spell and v.spell.name == 'Double-Up' and value.type == 'CorsairRoll' then
+            -- Double Up ability uses will return action packets that match Corsair Rolls rather than Double Up
+            potential_entries[i] = v.timestamp or 0
         end
     end
+    for i,v in pairs(potential_entries) do
+        if not winner or (current_time - v < current_time - winner) then
+            winner = v
+            ts = i
+        end
+    end
+    return ts
 end
 
 
 -----------------------------------------------------------------------------------
---Name: find_command_registry_by_time()
+--Name: cmd_reg:find_by_time()
 --Desc: Finds the most recent command_registry entry
 --Args:
----- target - 'player' or 'pet'
------------------------------------------------------------------------------------
---Returns:
 ---- none
 -----------------------------------------------------------------------------------
-function find_command_registry_by_time(target)
+--Returns:
+---- ts,discovered entry
+-----------------------------------------------------------------------------------
+function cmd_reg:find_by_time()
     local time_stamp,ts
     local time_now = os.time()
     
-    -- Iterate over command_registry looking for the spell with the closest timestamp
-    -- possible that matches the target type.
+    -- Iterate over command_registry looking for the spell with the closest timestamp.
     -- Call aftercast with this spell's information (interrupted) if one is found.
-    for i,v in pairs(command_registry) do
+    for i,v in pairs(self) do
         if not time_stamp or (v.timestamp and ((time_now - v.timestamp) < (time_now - time_stamp))) then
             time_stamp = v.timestamp
             ts = i
         end
     end
     if time_stamp then
-        return ts,table.reassign({},command_registry[ts])
+        return ts,table.reassign({},self[ts])
     end
 end
 
 
 -----------------------------------------------------------------------------------
---Name: delete_command_registry_by_id(id)
+--Name: cmd_reg:delete_by_id(id)
 --Desc: Deletes all command_registry entry based that match a given target ID.
 --Args:
 ---- id - ID of the target
 -----------------------------------------------------------------------------------
 --Returns:
----- none
+---- ts,last_entry for the deleted entry
 -----------------------------------------------------------------------------------
-function delete_command_registry_by_id(id)
-    local ts,last_tab
-    for i,v in pairs(command_registry) do
+function cmd_reg:delete_by_id(id)
+    local ts,last_entry
+    for i,v in pairs(self) do
         if v.spell and v.spell.target then
             if v.spell.target.id == id then
-                last_tab = table.reassign({},command_registry[i])
+                last_entry = table.reassign({},self[i])
                 ts = i
-                command_registry[i] = nil
+                self[i] = nil
             end
         end
     end
-    return ts,last_tab
+    return ts,last_entry
 end
 
 
@@ -998,7 +1018,7 @@ function logit(str)
     end
 end
 
-
+-- Set up the priority list structure
 
 -----------------------------------------------------------------------------------
 --Name: prioritize()
@@ -1010,37 +1030,45 @@ end
 --Returns:
 ---- none
 -----------------------------------------------------------------------------------
-function prioritize(priority_list,slot_id,priority)
+function prioritize(self,slot_id,priority)
     if priority and tonumber(priority) then -- Check that priority is number
-        rawset(priority_list,slot_id,priority)
+        rawset(self,slot_id,priority)
         return
     elseif priority then
         windower.add_to_chat(123,'GearSwap: Invalid priority ('..tostring(priority)..') given')
     end
-    rawset(priority_list,slot_id,0)
+    rawset(self,slot_id,0)
 end
 
 
+local priority_list = {}
+
+Priorities = {}
+function Priorities.new()
+    local new_instance = {}
+    return setmetatable(new_instance, { __index = function(t, k) if rawget(t, k) ~= nil then return rawget(t,k) else return rawget(priority_list,k) end end,
+        __newindex=prioritize})
+end
 
 -----------------------------------------------------------------------------------
---Name: priority_order()
+--Name: priority_list:it()
 --Args:
----- priority_list (table): Current list of slot priorities
+---- self (table): Current list of slot priorities
 -----------------------------------------------------------------------------------
 --Returns:
 ---- slot_id : Number from 0~15
 -----------------------------------------------------------------------------------
-function priority_order(priority_list)
+function priority_list:it()
     return function ()
         local maximum,slot_id = -math.huge
         for i=0,15 do
-            if priority_list[i] and (priority_list[i] > maximum or (priority_list[i] == maximum and priority_list[i] == -math.huge)) then
-                maximum = priority_list[i]
+            if self[i] and (self[i] > maximum or (self[i] == maximum and self[i] == -math.huge)) then
+                maximum = self[i]
                 slot_id = i
             end
         end
         if not slot_id then return end
-        priority_list[slot_id] = nil
+        self[slot_id] = nil
         return slot_id,maximum
     end
 end
@@ -1056,7 +1084,7 @@ end
 ---- slot name (string)
 -----------------------------------------------------------------------------------
 function toslotname(slot_id)
-    return default_slot_map[slot_id]
+    return rawget(default_slot_map,slot_id)
 end
 
 

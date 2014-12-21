@@ -40,7 +40,8 @@ function check_wearable(item_id)
     elseif not res.items[item_id].jobs then -- Make sure item can be equipped by specific jobs (unlike pearlsacks).
         --debug_mode_chat('GearSwap (Debug Mode): Item '..(res.items[item_id][language] or item_id)..' does not have a jobs field in the resources.')
     else
-        return (res.items[item_id].jobs[player.main_job_id]) and (res.items[item_id].level<=player.main_job_level) and (res.items[item_id].races[player.race_id])
+        return (res.items[item_id].jobs[player.main_job_id]) and (res.items[item_id].level<=player.jobs[res.jobs[player.main_job_id].ens]) and (res.items[item_id].races[player.race_id]) and
+            ((player.superior_level or 0) >= (res.items[item_id].superior_level or 0))
     end
     return false
 end
@@ -109,7 +110,7 @@ end
 function unpack_equip_list(equip_list)
     local ret_list = {}
     local error_list = {}
-    local priorities = setmetatable({},{__newindex=prioritize})
+    local priorities = Priorities:new()
     for slot_id,slot_name in pairs(default_slot_map) do
         local name,priority,extgoal_1,extgoal_2 = expand_entry(equip_list[slot_name])
         priorities[slot_id] = priority
@@ -178,7 +179,7 @@ function unpack_equip_list(equip_list)
                         if not res.items[item_tab.id].jobs[player.main_job_id] then
                             equip_list[slot_name] = nil
                             error_list[slot_name] = name..' (cannot be worn by this job)'
-                        elseif not (res.items[item_tab.id].level<=player.main_job_level) then
+                        elseif not (res.items[item_tab.id].level<=player.jobs[player.main_job]) then
                             equip_list[slot_name] = nil
                             error_list[slot_name] = name..' (job level is too low)'
                         elseif not res.items[item_tab.id].races[player.race_id] then

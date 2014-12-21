@@ -212,6 +212,13 @@ windower.register_event('incoming chunk',function (id, data)
 end
 )
 
+windower.register_event('outgoing chunk',function (id, data)
+    if id == 0x17 then
+        -- Block the NPC/armor mismatch error packet
+        return true
+    end
+end)
+
 windower.register_event('addon command', function (command,...)
     command = command and command:lower() or 'help'
     local args = T{...}:map(string.lower)
