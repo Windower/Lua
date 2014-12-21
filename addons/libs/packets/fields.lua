@@ -1604,6 +1604,18 @@ fields.incoming[0x039] = L{
     {ctype='unsigned short',    label='_dupeIndex',        fn=index},          -- 10
 }
 
+-- Independent Animation
+-- This is sometimes sent along with an Action Message packet, to provide an animation for an action message.
+fields.incoming[0x03A] = L{
+    {ctype='unsigned int',      label='Actor ID',          fn=id},             -- 04
+    {ctype='unsigned int',      label='Target ID',         fn=id},             -- 08
+    {ctype='unsigned short',    label='Actor Index',       fn=index},          -- 0C
+    {ctype='unsigned short',    label='Target Index',      fn=index},          -- 0E
+    {ctype='unsigned short',    label='Animation ID'},                         -- 10
+    {ctype='unsigned char',     label='Animation type'},                       -- 12   0 = magic, 1 = item, 2 = JA, 3 = environmental animations, etc.
+    {ctype='unsigned char',     label='_junk1'},                               -- 13   Deleting this has no effect
+}
+
 types.shop_item = L{
     {ctype='unsigned int',      label='Price',              fn=gil},            -- 00
     {ctype='unsigned short',    label='Item',               fn=item},           -- 04
