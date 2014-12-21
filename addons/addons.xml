@@ -344,7 +344,7 @@
   <addon>
     <name>setbgm</name>
     <author>Seth VanHeulen (Acacia@Odin)</author>
-    <description>Like Orchestrion... except all of the music.</description>
+    <description>Set your background/battle/other music to any music in the game.</description>
     <bugtracker>https://github.com/svanheulen/setbgm-windower-addon/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Odin/Acacia</support>
   </addon>
