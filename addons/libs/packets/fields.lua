@@ -728,6 +728,12 @@ fields.outgoing[0x0CB] = L{
     {ctype='data[3]',           label='_junk1'}                                 -- 05
 }
 
+-- Party Marker Request
+fields.outgoing[0x0D2] = L{
+    {ctype='unsigned short',    label='Zone',               fn=zone},           -- 04
+    {ctype='unsigned short',    label='_junk1'}                                 -- 06
+}
+
 -- Check
 fields.outgoing[0x0DD] = L{
     {ctype='unsigned int',      label='Target',             fn=id},             -- 04
@@ -1959,9 +1965,9 @@ enums.spawntype = {
 
 -- Spawn
 fields.incoming[0x05B] = L{
-    {ctype='float',             label='X'},                                     -- 04
-    {ctype='float',             label='Z'},                                     -- 08
-    {ctype='float',             label='Y'},                                     -- 0C
+    {ctype='float',             label='X Position'},                            -- 04
+    {ctype='float',             label='Z Position'},                            -- 08
+    {ctype='float',             label='Y Position'},                            -- 0C
     {ctype='unsigned int',      label='ID',                 fn=id},             -- 10
     {ctype='unsigned short',    label='Index',              fn=index},          -- 14
     {ctype='unsigned char',     label='Type',               fn=e+{'spawntype'}},-- 16   3 for regular Monsters, 0 for Treasure Caskets and NPCs
@@ -2215,9 +2221,9 @@ fields.incoming._func[0x063][0x04] = L{
 -- Repositioning
 fields.incoming[0x065] = L{
 -- This is identical to the spawn packet, but has 4 more unused bytes.
-    {ctype='float',             label='X'},                                     -- 04
-    {ctype='float',             label='Z'},                                     -- 08
-    {ctype='float',             label='Y'},                                     -- 0C
+    {ctype='float',             label='X Position'},                            -- 04
+    {ctype='float',             label='Z Position'},                            -- 08
+    {ctype='float',             label='Y Position'},                            -- 0C
     {ctype='unsigned int',      label='ID',                 fn=id},             -- 10
     {ctype='unsigned short',    label='Index',              fn=index},          -- 14
     {ctype='unsigned char',     label='_unknown1'},                             -- 16   1 observed. May indicate repositoning type.
@@ -2274,6 +2280,17 @@ fields.incoming[0x070] = L{
     {ctype='unsigned short[8]', label='Lost Item',          fn=item},           -- 0A
     {ctype='unsigned char[4]',  label='Skill',              fn=skill},          -- 1A   Unsure about this
     {ctype='char*',             label='Player Name'},                           -- 1E   Name of the player
+}
+
+-- Unity Start
+-- Only observed being used for Unity fights.
+fields.incoming[0x075] = L{
+    {ctype='unsigned int',      label='Fight Designation'},                     -- 04   Anything other than 0 makes a timer. 0 deletes the timer.
+    {ctype='unsigned int',      label='Timestamp Offset',   fn=time},           -- 08   Number of seconds since 15:00:00 GMT 31/12/2002 (0x3C307D70)
+    {ctype='unsigned int',      label='Fight Duration',     fn=time},           -- 0C
+    {ctype='byte[12]',          label='_unknown1'},                             -- 10   This packet clearly needs position information, but it's unclear how these bytes carry it
+    {ctype='unsigned int',      label='Battlefield Radius'},                    -- 1C   Yalms*1000, so a 50 yalm battlefield would have 50,000 for this field
+    {ctype='unsigned int',      label='Render Radius'},                         -- 20   Yalms*1000, so a fence that renders when you're 25 yalms away would have 25,000 for this field
 }
 
 -- Proposal
@@ -2338,6 +2355,17 @@ types.alliance_member = L{
     {ctype='unsigned short',    label='Flags',              fn=bin+{2}},        -- 06
     {ctype='unsigned short',    label='Zone',               fn=zone},           -- 08
     {ctype='unsigned short',    label='_unknown2'},                             -- 0A	Always 0?
+}
+
+-- Party Map Marker
+-- This packet is ignored if your party member is within 50' of you.
+fields.incoming[0x0A0] = L{
+    {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
+    {ctype='unsigned short',    label='Zone',               fn=zone},           -- 08
+    {ctype='unsigned short',    label='_unknown1'},                             -- 0A   Look like junk
+    {ctype='float',             label='X Position'},                            -- 0C
+    {ctype='float',             label='Z Position'},                            -- 10
+    {ctype='float',             label='Y Position'},                            -- 14
 }
 
 -- Alliance status update
@@ -2448,6 +2476,15 @@ fields.incoming[0x0D3] = L{
     {ctype='data[6]',           label='_junk1'},                                -- 36
 }
 
+-- Party Invite
+fields.incoming[0x0DC] = L{
+    {ctype='unsigned int',      label='Inviter ID',         fn=id},             -- 04
+    {ctype='unsigned int',      label='Flags'},                                 -- 08   This may also contain the type of invite (alliance vs. party)
+    {ctype='char[16]',          label='Inviter Name'},                          -- 0C
+    {ctype='unsigned short',    label='_unknown1'},                             -- 1C
+    {ctype='unsigned short',    label='_junk1'},                                -- 1E
+}
+
 -- Party member update
 fields.incoming[0x0DD] = L{
     {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
@@ -2548,7 +2585,7 @@ fields.incoming[0x0F5] = L{
     {ctype='float',             label='X Position'},                            -- 04
     {ctype='float',             label='Z Position'},                            -- 08
     {ctype='float',             label='Y Position'},                            -- 0C
-    {ctype='unsigned char',     label='_unknown1'},                             -- 10   Same value as _unknown1 of 0x0F4
+    {ctype='unsigned char',     label='Level'},                                 -- 10
     {ctype='unsigned char',     label='_padding1'},                             -- 11
     {ctype='unsigned short',    label='Index',              fn=index},          -- 12
     {ctype='unsigned int',      label='Status',             fn=e+{'ws track'}}, -- 14
