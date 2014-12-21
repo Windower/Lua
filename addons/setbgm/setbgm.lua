@@ -31,11 +31,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --]]
 
 _addon.name = 'setbgm'
-_addon.version = '1.0.1'
+_addon.version = '1.1.0'
 _addon.command = 'setbgm'
 _addon.author = 'Seth VanHeulen (Acacia@Odin)'
 
 require('pack')
+
+mtype = {
+    [0]='Idle (Day)',
+    [1]='Idle (Night)',
+    [2]='Battle (Solo)',
+    [3]='Battle (Party)',
+    [4]='Unknown',
+    [5]='Death',
+    [6]='Mog House',
+    [7]='Unknown'
+}
 
 bgm = {
     [40]='Cloister of Time and Souls', [41]='Royal Wanderlust', [42]='Snowdrift Waltz', [43]='Troubled Shadows', [44]='Where Lords Rule Not', [45]='Summers Lost', [46]='Goddess Divine', [47]='Echoes of Creation', [48]='Main Theme', [49]='Luck of the Mog',
@@ -52,7 +63,7 @@ bgm = {
     [170]='Buccaneers', [171]='Altepa Desert', [172]='Black Coffin', [173]='Illusions in the Mist', [174]='Whispers of the Gods', [175]="Bandits' Market", [176]='Circuit de Chocobo', [177]='Run Chocobo, Run!', [178]='Bustle of the Capital', [179]="Vana'diel March #4",
     [180]='Thunder of the March', [181]='Unknown', [182]='Stargazing', [183]="A Puppet's Slumber", [184]='Eternal Gravestone', [185]='Ever-Turning Wheels', [186]='Iron Colossus', [187]='Ragnarok', [188]='Choc-a-bye Baby', [189]='An Invisible Crown',
     [190]="The Sanctuary of Zi'Tah", [191]='Battle Theme #3', [192]='Battle in the Dungeon #3', [193]='Tough Battle #2', [194]='Bloody Promises', [195]='Belief', [196]='Fighters of the Crystal', [197]='To the Heavens', [198]="Eald'narche", [199]="Grav'iton",
-    [200]='Hidden Truths', [201]='End Theme', [202]='Moongate (Memoro de la Stono)', [203]='Unknown', [204]='Unknown', [205]='Unknown', [206]='Revenant Maiden', [207]="Ve'Lugannon Palace", [208]='Rabao', [209]='Norg',
+    [200]='Hidden Truths', [201]='End Theme', [202]='Moongate (Memoro de la Stono)', [203]='Ancient Verse of Uggalepih', [204]="Ancient Verse of Ro'Maeve", [205]='Ancient Verse of Altepa', [206]='Revenant Maiden', [207]="Ve'Lugannon Palace", [208]='Rabao', [209]='Norg',
     [210]="Tu'Lia", [211]="Ro'Maeve", [212]='Dash de Chocobo', [213]='Hall of the Gods', [214]='Eternal Oath', [215]='Clash of Standards', [216]='On this Blade', [217]='Kindred Cry', [218]='Depths of the Soul', [219]='Onslaught',
     [220]='Turmoil', [221]='Moblin Menagerie - Movalpolos', [222]='Faded Memories - Promyvion', [223]='Conflict: March of the Hero', [224]='Dusk and Dawn', [225]="Words Unspoken - Pso'Xja", [226]='Conflict: You Want to Live Forever?', [227]='Sunbreeze Shuffle', [228]="Gates of Paradise - The Garden of Ru'Hmet", [229]='Currents of Time',
     [230]='A New Horizon - Tavnazian Archipelago', [231]='Celestial Thunder', [232]='The Ruler of the Skies', [233]="The Celestial Capital - Al'Taieu", [234]='Happily Ever After', [235]='First Ode: Nocturne of the Gods', [236]='Fourth Ode: Clouded Dawn', [237]='Third Ode: Memoria de la Stona', [238]='A New Morning', [239]='Jeuno -Starlight Celebration-',
@@ -63,37 +74,53 @@ bgm = {
 
 function setbgm_command(...)
     local arg = {...}
-    local info = windower.ffxi.get_info()
-    if not info.mog_house or info.zone == 280 then
-        windower.add_to_chat(207, 'Background music can only be set inside you Mog House.')
-    elseif #arg == 1 and arg[1]:lower() == 'list' then
-        windower.add_to_chat(207, 'Available music:')
-        for id=40,900,5 do
-            local output = '  '
-            for i=0,4 do
-                if bgm[id+i] then
-                    output = output .. '  \31\204%d\30\1: %s':format(id+i, bgm[id+i])
+    if #arg == 1 or #arg == 2 then
+        if arg[1]:lower() == 'list' then
+            if #arg == 1 or arg[2]:lower() == 'music' then
+                windower.add_to_chat(207, 'Available background music:')
+                for id=40,900,5 do
+                    local output = '  '
+                    for i=0,4 do
+                        if bgm[id+i] then
+                            output = output .. '  \31\204%d\30\1: %s':format(id+i, bgm[id+i])
+                        end
+                    end
+                    if output ~= '  ' then
+                        windower.add_to_chat(207, output)
+                    end
+                end
+                return
+            elseif arg[2]:lower() == 'type' then
+                windower.add_to_chat(207, 'Available music types:')
+                local output = '  '
+                for id=0,7 do
+                    output = output .. '  \31\204%d\30\1: %s':format(id, mtype[id])
+                end
+                windower.add_to_chat(207, output)
+                return
+            end
+        end
+        local id = tonumber(arg[1])
+        if id and bgm[id] then
+            if #arg == 1 then
+                windower.add_to_chat(207, 'Setting background music: \31\200%s\30\1':format(bgm[id]))
+                windower.packets.inject_incoming(0x05F, 'IHH':pack(0x45F, 0, id))
+                windower.packets.inject_incoming(0x05F, 'IHH':pack(0x45F, 1, id))
+                windower.packets.inject_incoming(0x05F, 'IHH':pack(0x45F, 6, id))
+                return
+            else
+                local tid = tonumber(arg[2])
+                if tid and mtype[tid] then
+                    windower.add_to_chat(207, 'Setting %s music: \31\200%s\30\1':format(mtype[tid], bgm[id]))
+                    windower.packets.inject_incoming(0x05F, 'IHH':pack(0x45F, tid, id))
+                    return
                 end
             end
-            if output ~= '  ' then
-                windower.add_to_chat(207, output)
-            end
         end
-    elseif #arg == 1 then
-        local id = tonumber(arg[1])
-        if id then
-            if bgm[id] then
-                windower.add_to_chat(207, 'Setting background music: \31\200%s\30\1':format(bgm[id]))
-                windower.packets.inject_incoming(0x05F, 'IHH':pack(0x45F, 6, id))
-            else
-                windower.add_to_chat(207, 'Invalid music ID: \31\167%d\30\1':format(id))
-            end
-        else
-            windower.add_to_chat(207, 'Command usage: setbgm list|<music id>')
-        end
-    else
-        windower.add_to_chat(207, 'Command usage: setbgm list|<music id>')
     end
+    windower.add_to_chat(167, 'Command usage:')
+    windower.add_to_chat(167, '    setbgm list [music|type]')
+    windower.add_to_chat(167, '    setbgm <music id> [<type id>]')
 end
 
 windower.register_event('addon command', setbgm_command)
