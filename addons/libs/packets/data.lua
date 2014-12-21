@@ -162,6 +162,7 @@ data.incoming[0x05A] = {name='Server Emote',        description='This packet is 
 data.incoming[0x05B] = {name='Spawn',               description='Server packet sent when a new mob spawns in area.'}
 data.incoming[0x05C] = {name='Dialogue Information',description='Used when all the information required for a menu cannot be fit in an NPC Interaction packet.'}
 data.incoming[0x05E] = {name='Camp./Besieged Map',  description='Contains information about Campaign and Besieged status.'}
+data.incoming[0x05F] = {name='Music Change',        description='Changes the current music.'}
 data.incoming[0x061] = {name='Char Stats',          description='Packet contains a lot of data about your character\'s stats.'}
 data.incoming[0x062] = {name='Skills Update',       description='Packet that shows your weapon and magic skill stats.'}
 data.incoming[0x063] = {name='Set Update',          description='Frequently sent packet during battle that updates specific types of job information, like currently available/set automaton equipment and currently set BLU spells.'}

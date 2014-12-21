@@ -540,14 +540,6 @@ fields.outgoing[0x05E] = L{
     {ctype='unsigned char',     label='Type'},                                  -- 17   03 for leaving the MH, 00 otherwise
 }
 
---[[ -- Unnamed 0x5F
--- Observed when starting an instance.
-fields.outgoing[0x05F] = L{
-    {ctype='unsigned short',    label='Counter'},                               -- 04   I have observed values from 00 00 to 03 00
-    {ctype='unsigned char',     label='_unknown1'},                             -- 06   40 starting colonization reives and a mix of 49 and 39 when ending. BA for Odin. Not a monster or zone index.
-    {ctype='unsigned char',     label='_unknown2'},                             -- 07   Only 00 observed
-}]]
-
 -- Equipment Screen (0x02 length) -- Also observed when zoning
 fields.outgoing[0x061] = L{
 }
@@ -2089,6 +2081,12 @@ fields.incoming[0x05E] = L{
     {ctype='unsigned int',      label='Bitpacked Arrapago Info'},               -- AC
 
     {ctype='int',               label='Imperial Standing'},                     -- B0
+}
+
+-- Music Change
+fields.incoming[0x05F] = L{
+    {ctype='unsigned short',    label='Counter'},                               -- 04   Music layer
+    {ctype='unsigned short',    label='Song ID'},                               -- 06   See the setBGM addon for more information
 }
 
 -- Char Stats
