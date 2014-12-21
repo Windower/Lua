@@ -38,6 +38,7 @@ data.outgoing[0x051] = {name='Equipset',            description='This packet is 
 data.outgoing[0x052] = {name='Equipset Build',      description='This packet is sent when building an equipset.'}
 data.outgoing[0x05A] = {name='Conquest',            description='This command asks the server for data pertaining to conquest/besieged status.'}
 data.outgoing[0x05B] = {name='Dialog choice',       description='Chooses a dialog option.'}
+data.outgoing[0x05C] = {name='Warp Request',        description='Request a warp. Used by teleporters and the like.'}
 data.outgoing[0x05D] = {name='Emote',               description='This command is used in emotes.'}
 data.outgoing[0x05E] = {name='Request Zone',        description='Request from the client to zone.'}
 data.outgoing[0x061] = {name='Equipment Screen',    description='This command is used when you open your equipment screen.'}
@@ -77,6 +78,8 @@ data.outgoing[0x0E7] = {name='Logout',              description='A request to lo
 data.outgoing[0x0E8] = {name='Toggle Heal',         description='This command is used to both heal and cancel healing.'}
 data.outgoing[0x0F1] = {name='Cancel',              description='Sent when canceling a buff.'}
 data.outgoing[0x0F4] = {name='Widescan',            description='This command asks the server for a widescan.'}
+data.outgoing[0x0F5] = {name='Widescan Track',      description='Sent when you choose to track something on widescan.'}
+data.outgoing[0x0F6] = {name='Widescan Cancel',     description='Sent when you choose to stop track something on widescan.'}
 data.outgoing[0x0FA] = {name='Place/Move Furniture',description='Sends new position for your furniture.'}
 data.outgoing[0x0FB] = {name='Remove Furniture',    description='Informs the server you have removed some furniture.'}
 data.outgoing[0x0FC] = {name='Plant Flowerpot',     description='Plants a seed in a flowerpot.'}
