@@ -2085,7 +2085,7 @@ fields.incoming[0x05E] = L{
 
 -- Music Change
 fields.incoming[0x05F] = L{
-    {ctype='unsigned short',    label='Counter'},                               -- 04   Music layer
+    {ctype='unsigned short',    label='BGM Type'},                              -- 04   01 = idle music, 06 = mog house music. 00, 02, and 03 are fight musics and some other stuff.
     {ctype='unsigned short',    label='Song ID'},                               -- 06   See the setBGM addon for more information
 }
 
