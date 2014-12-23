@@ -277,9 +277,9 @@ fields.outgoing[0x011] = L{
 
 -- Standard Client
 fields.outgoing[0x015] = L{
-    {ctype='float',             label='X Position'},                            -- 04
-    {ctype='float',             label='Y Position'},                            -- 08
-    {ctype='float',             label='Z Position'},                            -- 0C
+    {ctype='float',             label='X'},                                     -- 04
+    {ctype='float',             label='Y'},                                     -- 08
+    {ctype='float',             label='Z'},                                     -- 0C
     {ctype='unsigned short',    label='_junk1'},                                -- 10
     {ctype='unsigned short',    label='Run Count'},                             -- 12   Counter that indicates how long you've been running?
     {ctype='unsigned char',     label='Rotation',           fn=dir},            -- 14
@@ -516,9 +516,9 @@ fields.outgoing[0x05B] = L{
 
 -- Warp Request
 fields.outgoing[0x05C] = L{
-    {ctype='float',             label='X Position'},                            -- 04
-    {ctype='float',             label='Z Position'},                            -- 08
-    {ctype='float',             label='Y Position'},                            -- 0C
+    {ctype='float',             label='X'},                                     -- 04
+    {ctype='float',             label='Z'},                                     -- 08
+    {ctype='float',             label='Y'},                                     -- 0C
     {ctype='unsigned int',      label='Target ID',          fn=id},             -- 10   NPC that you are requesting a warp from
     {ctype='unsigned int',      label='_unknown1'},                             -- 14   01 00 00 00 observed
     {ctype='unsigned int',      label='_unknown2'},                             -- 18   Likely contains information about the particular warp being requested, like menu ID
@@ -817,9 +817,9 @@ fields.outgoing[0x0F6] = L{
 fields.outgoing[0x0FA] = L{
     {ctype='unsigned short',    label='Item',                   fn=item},       -- 04  00 00 just gives the general update
     {ctype='unsigned char',     label='Safe Index',             fn=inv+{1}},    -- 06
-    {ctype='unsigned char',     label='X Position'},                            -- 07  0 to 0x12
-    {ctype='unsigned char',     label='Z Position'},                            -- 08  0 to ?
-    {ctype='unsigned char',     label='Y Position'},                            -- 09  0 to 0x17
+    {ctype='unsigned char',     label='X'},                                     -- 07  0 to 0x12
+    {ctype='unsigned char',     label='Z'},                                     -- 08  0 to ?
+    {ctype='unsigned char',     label='Y'},                                     -- 09  0 to 0x17
     {ctype='unsigned short',    label='_junk1'},                                -- 0A  00 00 observed
 }
 
@@ -1110,9 +1110,9 @@ fields.incoming[0x00D] = L{
     {ctype='unsigned short',    label='Index',              fn=index},          -- 08
     {ctype='unsigned char',     label='Mask',               fn=bin+{1}},        -- 0A
     {ctype='unsigned char',     label='Body Rotation',      fn=dir},            -- 0B
-    {ctype='float',             label='X Position'},                            -- 0C
-    {ctype='float',             label='Z Position'},                            -- 10
-    {ctype='float',             label='Y Position'},                            -- 14
+    {ctype='float',             label='X'},                                     -- 0C
+    {ctype='float',             label='Z'},                                     -- 10
+    {ctype='float',             label='Y'},                                     -- 14
     {ctype='unsigned short',    label='Head Rotation',      fn=dir},            -- 18
     {ctype='unsigned short',    label='Target Index *2',    fn=index..s+{2,15}},-- 1A
     {ctype='unsigned char',     label='Current Speed'},                         -- 1C
@@ -1179,9 +1179,9 @@ fields.incoming[0x00E] = L{
                                                                                 -- 0A   Bit 6:
                                                                                 -- 0A   Bit 7:
     {ctype='unsigned char',     label='Rotation',           fn=dir},            -- 0B
-    {ctype='float',             label='X Position'},                            -- 0C
-    {ctype='float',             label='Z Position'},                            -- 10
-    {ctype='float',             label='Y Position'},                            -- 14
+    {ctype='float',             label='X'},                                     -- 0C
+    {ctype='float',             label='Z'},                                     -- 10
+    {ctype='float',             label='Y'},                                     -- 14
     {ctype='unsigned int',      label='Walk Count'},                            -- 18   Steadily increases until rotation changes. Does not reset while the mob isn't walking. Only goes until 0xFF1F.
     {ctype='unsigned short',    label='_unknown1',          fn=bin+{2}},        -- 1A
     {ctype='unsigned char',     label='HP %',               fn=percent},        -- 1E
@@ -1965,9 +1965,9 @@ enums.spawntype = {
 
 -- Spawn
 fields.incoming[0x05B] = L{
-    {ctype='float',             label='X Position'},                            -- 04
-    {ctype='float',             label='Z Position'},                            -- 08
-    {ctype='float',             label='Y Position'},                            -- 0C
+    {ctype='float',             label='X'},                                     -- 04
+    {ctype='float',             label='Z'},                                     -- 08
+    {ctype='float',             label='Y'},                                     -- 0C
     {ctype='unsigned int',      label='ID',                 fn=id},             -- 10
     {ctype='unsigned short',    label='Index',              fn=index},          -- 14
     {ctype='unsigned char',     label='Type',               fn=e+{'spawntype'}},-- 16   3 for regular Monsters, 0 for Treasure Caskets and NPCs
@@ -2221,9 +2221,9 @@ fields.incoming._func[0x063][0x04] = L{
 -- Repositioning
 fields.incoming[0x065] = L{
 -- This is identical to the spawn packet, but has 4 more unused bytes.
-    {ctype='float',             label='X Position'},                            -- 04
-    {ctype='float',             label='Z Position'},                            -- 08
-    {ctype='float',             label='Y Position'},                            -- 0C
+    {ctype='float',             label='X'},                                     -- 04
+    {ctype='float',             label='Z'},                                     -- 08
+    {ctype='float',             label='Y'},                                     -- 0C
     {ctype='unsigned int',      label='ID',                 fn=id},             -- 10
     {ctype='unsigned short',    label='Index',              fn=index},          -- 14
     {ctype='unsigned char',     label='_unknown1'},                             -- 16   1 observed. May indicate repositoning type.
@@ -2363,9 +2363,9 @@ fields.incoming[0x0A0] = L{
     {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
     {ctype='unsigned short',    label='Zone',               fn=zone},           -- 08
     {ctype='unsigned short',    label='_unknown1'},                             -- 0A   Look like junk
-    {ctype='float',             label='X Position'},                            -- 0C
-    {ctype='float',             label='Z Position'},                            -- 10
-    {ctype='float',             label='Y Position'},                            -- 14
+    {ctype='float',             label='X'},                                     -- 0C
+    {ctype='float',             label='Z'},                                     -- 10
+    {ctype='float',             label='Y'},                                     -- 14
 }
 
 -- Alliance status update
@@ -2582,9 +2582,9 @@ fields.incoming[0x0F4] = L{
 
 -- Widescan Track
 fields.incoming[0x0F5] = L{
-    {ctype='float',             label='X Position'},                            -- 04
-    {ctype='float',             label='Z Position'},                            -- 08
-    {ctype='float',             label='Y Position'},                            -- 0C
+    {ctype='float',             label='X'},                                     -- 04
+    {ctype='float',             label='Z'},                                     -- 08
+    {ctype='float',             label='Y'},                                     -- 0C
     {ctype='unsigned char',     label='Level'},                                 -- 10
     {ctype='unsigned char',     label='_padding1'},                             -- 11
     {ctype='unsigned short',    label='Index',              fn=index},          -- 12
