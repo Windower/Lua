@@ -260,9 +260,10 @@ windower.register_event('addon command', function(command1, command2, ...)
     elseif command1 == 'clearall' then
         code.pass:clear()
         code.lot:clear()
+        code.drop:clear()
         settings.Pass:clear()
         settings.Lot:clear()
-
+        settings.Drop:clear()
         config.save(settings)
 
     elseif command1 == 'autodrop' then
@@ -313,11 +314,11 @@ windower.register_event('addon command', function(command1, command2, ...)
         print('    \\cs(255,255,255)lot|pass|drop clear\\cr - Clears the specified list for the current character')
         print('    \\cs(255,255,255)lot|pass list\\cr - Lists all items on the specified list for the current character')
         print('    \\cs(255,255,255)lotall|passall\\cr - Lots/Passes all items currently in the pool')
-        print('    \\cs(255,255,255)clearall\\cr - Removes lotting/passing (not dropping) settings for this character')
+        print('    \\cs(255,255,255)clearall\\cr - Removes lotting/passing/dropping settings for this character')
         print('    \\cs(255,255,255)autodrop [on|off]\\cr - Enables/disables (or toggles) the auto-drop setting')
-        --print('    \\cs(255,255,255)verbose [on|off]\\cr - Enables/disables (or toggles) the verbose setting')
-        --print('    \\cs(255,255,255)autostack [on|off]\\cr - Enables/disables (or toggles) the autostack feature')
-        --print('    \\cs(255,255,255)delay #\\cr - Allows you to change the delay of actions Default:0')
+        print('    \\cs(255,255,255)verbose [on|off]\\cr - Enables/disables (or toggles) the verbose setting')
+        print('    \\cs(255,255,255)autostack [on|off]\\cr - Enables/disables (or toggles) the autostack feature')
+        print('    \\cs(255,255,255)delay value\\cr - Allows you to change the delay of actions Default:0')
 
 
     end
