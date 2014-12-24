@@ -147,7 +147,7 @@ function update_pet(source,pet_idx_in,own_idx_in)
     if not pet_table['mpp'] == nil then
         current_mp_percent = pet_table['mpp']
     end
-    current_tp_percent = pet_table['tp']/10
+    current_tp_percent = pet_table['tp']
     if not petactive and current_hp_percent == 0 then  -- we're likely picking up a dead or despawning pet
         if superverbose == true then windower.add_to_chat(8, 'update_pet() : Picked up a likely dead pet') end
         make_invisible()
@@ -188,9 +188,9 @@ function printpettp(pet_idx_in,own_idx_in)
     end
     if settings.autocolor == true then output = output..'\\cr\\cs('..settings.text.red..','..settings.text.green..','..settings.text.blue..')' end    
     output = output..' ['
-    if settings.autocolor == true and current_tp_percent >= 100 then output = output..'\\cr\\cs(128,255,128)' end
-    output = output..string.format('%.1f',current_tp_percent)..'%'
-    if settings.autocolor == true and current_tp_percent >= 100 then output = output..'\\cr\\cs('..settings.text.red..','..settings.text.green..','..settings.text.blue..')' end    
+    if settings.autocolor == true and current_tp_percent >= 1000 then output = output..'\\cr\\cs(128,255,128)' end
+    output = output..current_tp_percent..'%'
+    if settings.autocolor == true and current_tp_percent >= 1000 then output = output..'\\cr\\cs('..settings.text.red..','..settings.text.green..','..settings.text.blue..')' end    
     output = output..']'
     if max_mp > 0 then
         if current_mp_percent > 75 then
@@ -318,7 +318,7 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
                     end
                 end
                 local new_hp_percent, new_mp_percent, new_tp_percent = original:unpack('CCH', 0x0F)
-                new_tp_percent = new_tp_percent/10
+                new_tp_percent = new_tp_percent
                 if newpet or (new_hp_percent ~= current_hp_percent) or (new_mp_percent ~= current_mp_percent) or (new_tp_percent ~= current_tp_percent) or petname == nil then
                     if (max_hp ~= 0) and (new_hp_percent ~= current_hp_percent) then
                         current_hp = math.floor(new_hp_percent * max_hp / 100)
