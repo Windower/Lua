@@ -298,7 +298,7 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
                        ..', own_idx: '..own_idx
                        ..', hp%: '..original:byte(0x0F)
                        ..', mp%: '..original:byte(0x10)
-                       ..', tp%: '..(original:byte(0x11)+original:byte(0x12)*256)/10
+                       ..', tp%: '..(original:byte(0x11)+original:byte(0x12)*256)
                        ..', name: '.. original:unpack('z', 0x15)
                     )
             end
