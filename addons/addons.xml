@@ -160,7 +160,7 @@
     <name>FFOColor</name>
     <author>Nitrous (Shiva)</author>
     <description>Allows you to show FFOChat text in one of the 5 game chat channels. As well as specify colors for the text</description>
-    <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>   
+    <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>
     <support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
@@ -263,7 +263,7 @@
     <description>Tracks pet vitals (HP/TP/MP)</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
     <support>http://mibbit.com/#windower@irc.ffochat.com</support>
-  </addon> 
+  </addon>
   <addon>
     <name>plasmon</name>
     <author>Giuliano Riccio (Zohno@Phoenix)</author>
@@ -496,3 +496,4 @@
     <support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
 </addons>
+
