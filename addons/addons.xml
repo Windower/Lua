@@ -199,6 +199,13 @@
     <support>http://www.bluegartr.com/members/34070-Cairthenn</support>
   </addon>
   <addon>
+    <name>latentchecker</name>
+    <author>byrth,smd111</author>
+    <description>Checks weapon skill points of weapon skill trial weapons and mythic weapons</description>
+    <bugtracker>https://github.com/smd111/LatentChecker/issues</bugtracker>
+    <support>https://github.com/smd111/LatentChecker/issues</support>
+  </addon>
+  <addon>
     <name>Linker</name>
     <author>Arcon</author>
     <description>Allows opening links to certain websites from within the game, with an optional search parameter.</description>
@@ -489,10 +496,3 @@
     <support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
 </addons>
-<addon>
-    <name>latentchecker</name>
-    <author>byrth,smd111</author>
-    <description>Checks weapon skill points of weapon skill trial weapons and mythic weapons</description>
-    <bugtracker>https://github.com/smd111/LatentChecker/issues</bugtracker>
-    <support>https://github.com/smd111/LatentChecker/issues</support>
-</addon>
