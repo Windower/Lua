@@ -1,4 +1,4 @@
---Copyright (c) 2013, Byrthnoth
+--Copyright (c) 2013-2014, Byrthnoth
 --All rights reserved.
 
 --Redistribution and use in source and binary forms, with or without
@@ -30,7 +30,7 @@ require 'tables'
 xml = require 'xml'
 
 
-_addon.version = '0.9'
+_addon.version = '1.0'
 _addon.author = 'Byrth'
 _addon.name = 'plugin_manager'
 _addon.commands = {}
@@ -38,9 +38,9 @@ _addon.commands = {}
 windower.register_event('addon command',function(...)
 	local cmd = {...}
 	if cmd[1] == 'load' then
-		load_plugins(make_name(cmd[2]))
+		load_plugins(cmd[2])
 	elseif cmd[1] == 'unload' then
-		unload_plugins(make_name(cmd[2]))
+		unload_plugins(cmd[2])
 	end
 end)
 
@@ -79,9 +79,9 @@ windower.register_event('load',function()
 	windower.send_command(firstrun)
 	if windower.ffxi.get_player() then
         coroutine.sleep(3) -- Wait for firstrun to finish
-        unload_plugins(make_name())
+        unload_plugins()
         coroutine.sleep(3) -- Wait for the unload command spam to finish
-        load_plugins(make_name())
+        load_plugins()
 	end
 end)
 
@@ -149,6 +149,7 @@ function load_settings()
 end
 
 function load_plugins(name)
+    name = make_name(name)
 	local working_array,commandstr = {},'@'
 	
 	for q,r in pairs(general_array) do
@@ -162,6 +163,7 @@ function load_plugins(name)
 end
 
 function unload_plugins(name)
+    name = make_name(name)
 	local commandstr = ''
 	for i,v in pairs(loader_array[name]) do
 		for n,m in pairs(v) do
