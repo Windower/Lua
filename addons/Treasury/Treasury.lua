@@ -318,7 +318,7 @@ windower.register_event('addon command', function(command1, command2, ...)
         print('    \\cs(255,255,255)autodrop [on|off]\\cr - Enables/disables (or toggles) the auto-drop setting')
         print('    \\cs(255,255,255)verbose [on|off]\\cr - Enables/disables (or toggles) the verbose setting')
         print('    \\cs(255,255,255)autostack [on|off]\\cr - Enables/disables (or toggles) the autostack feature')
-        print('    \\cs(255,255,255)delay value\\cr - Allows you to change the delay of actions Default:0')
+        print('    \\cs(255,255,255)delay <value>\\cr - Allows you to change the delay of actions (default: 0)')
 
 
     end
