@@ -69,7 +69,7 @@ windower.register_event('load',function()
 					end
 				end
 				if counter == length then
-					firstrun = firstrun..load_command[q]..n..';wait 0.1;'
+					firstrun = firstrun..load_command[q]..n..';'
 					general_array[q][n] = false
 				end
 			end
@@ -77,10 +77,11 @@ windower.register_event('load',function()
 	end
 	
 	windower.send_command(firstrun)
-
 	if windower.ffxi.get_player() then
-		windower.send_command('@wait 3;lua c plugin_manager unload')
-		windower.send_command('@wait 6;lua c plugin_manager load')
+        coroutine.sleep(3) -- Wait for firstrun to finish
+        unload_plugins(make_name())
+        coroutine.sleep(3) -- Wait for the unload command spam to finish
+        load_plugins(make_name())
 	end
 end)
 
@@ -116,10 +117,8 @@ function load_settings()
 			for child2 in child:it() do -- plugin
 				local blockload,name = false
 				for child3 in child2:it() do --name, autoload, description, etc.
-					if child3.name == 'autoload' then
-						if child3.children[1] == 'false' then
-							blockload = true
-						end
+					if child3.name == 'autoload' and child3.children[1] == 'false' then
+                        blockload = true
 					end
 					if child3.name:lower() == 'name' then
 						name = child3.children[1]:lower()
@@ -130,22 +129,35 @@ function load_settings()
 				end
 			end
 		end
+        
+		local blacklistadd = xml.read('../../updates/addons.xml'):undomify()
+		for child in blacklistadd:it() do -- plugins
+            local blockload,name = false
+            for child2 in child:it() do --name, autoload, description, etc.
+                if child2.name == 'autoload' and child2.children[1] == 'false' then
+                    blockload = true
+                end
+                if child2.name:lower() == 'name' then
+                    name = child2.children[1]:lower()
+                end
+                if blockload and name then
+                    general_array.addon[name:lower()] = nil
+                end
+            end
+		end
 	end
 end
 
 function load_plugins(name)
-	local working_array,commandstr = {},'@'--'wait 5;'
+	local working_array,commandstr = {},'@'
 	
 	for q,r in pairs(general_array) do
 		for i,v in pairs(loader_array[name][q]) do
 			if general_array[q][v] then
-				commandstr = commandstr..load_command[q]..v..';wait 0.1;'
+				commandstr = commandstr..load_command[q]..v..';'
 			end
 		end
 	end
---	for i,v in pairs(loader_array[name].addon) do
---		commandstr = commandstr..load_command['addon']..v..';wait 0.1;'
---	end
 	windower.send_command(commandstr)
 end
 
@@ -154,7 +166,7 @@ function unload_plugins(name)
 	for i,v in pairs(loader_array[name]) do
 		for n,m in pairs(v) do
 			if general_array[i][m] then
-				commandstr = commandstr..unload_command[i]..m..';wait 0.1;'
+				commandstr = commandstr..unload_command[i]..m..';'
 			end
 		end
 	end
@@ -162,11 +174,12 @@ function unload_plugins(name)
 end
 
 windower.register_event('login',function(name)
-	windower.send_command('@wait 3;lua c plugin_manager load '..name)
+    coroutine.sleep(3)
+    load_plugins(name)
 end)
 
 windower.register_event('logout',function(name)
-	windower.send_command('@lua c plugin_manager unload '..name)
+	unload_plugins(name)
 end)
 
 function make_name(name)
