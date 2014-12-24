@@ -384,17 +384,17 @@ function action_handler(raw_actionpacket)
                 elseif main.message_id == 67 then
                     dps_db:add_m_crit(target:get_name(), create_mob_name(actionpacket), main.param)
                 elseif main.message_id == 15 or main.message_id == 63 then
-                        dps_db:incr_misses(target:get_name(), create_mob_name(actionpacket))
+                    dps_db:incr_misses(target:get_name(), create_mob_name(actionpacket))
                 elseif main.message_id == 353 then
-                    dps_db:add_r_crit(target:get_name(), actionpacket:get_actor_name(), main.param)
+                    dps_db:add_r_crit(target:get_name(), create_mob_name(actionpacket), main.param)
                 elseif T{157, 352, 576, 577}:contains(main.message_id) then
-                    dps_db:add_r_hit(target:get_name(), actionpacket:get_actor_name(), main.param)
+                    dps_db:add_r_hit(target:get_name(), create_mob_name(actionpacket), main.param)
                 elseif main.message_id == 353 then
-                    dps_db:add_r_crit(target:get_name(), actionpacket:get_actor_name(), main.param)
+                    dps_db:add_r_crit(target:get_name(), create_mob_name(actionpacket), main.param)
                 elseif main.message_id == 354 then
-                    dps_db:incr_r_misses(target:get_name(), actionpacket:get_actor_name())
+                    dps_db:incr_r_misses(target:get_name(), create_mob_name(actionpacket))
                 elseif main.resource and main.resource == 'weapon_skills' and main.conclusion then
-                    dps_db:add_ws_damage(target:get_name(), actionpacket:get_actor_name(), main.param, main.spell_id)
+                    dps_db:add_ws_damage(target:get_name(), create_mob_name(actionpacket), main.param, main.spell_id)
                 elseif main.conclusion then
                     if main.conclusion.subject == 'target' and T(main.conclusion.objects):contains('HP') and main.param ~= 0 then
                         dps_db:add_damage(target:get_name(), create_mob_name(actionpacket), (main.conclusion.verb == 'gains' and -1 or 1)*main.param)

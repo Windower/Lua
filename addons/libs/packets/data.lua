@@ -66,6 +66,7 @@ data.outgoing[0x0C0] = {name='Job Point Menu',      description='Sent when you o
 data.outgoing[0x0C3] = {name='Make Linkshell',      description='Sent in response to the /makelinkshell command.'}
 data.outgoing[0x0C4] = {name='Equip Linkshell',     description='Sent to equip a linkshell.'}
 data.outgoing[0x0CB] = {name='Open Mog',            description='Sent when opening or closing your mog house.'}
+data.outgoing[0x0D2] = {name='Party Marker Request',description='Requests map markers for your party.'}
 data.outgoing[0x0D3] = {name='GM Call',             description='Places a call to the GM queue.'}
 data.outgoing[0x0DC] = {name='Type Bitmask',        description='This command is sent when change your party-seek or /anon status.'}
 data.outgoing[0x0DD] = {name='Check',               description='Used to check other players.'}
@@ -171,10 +172,12 @@ data.incoming[0x067] = {name='Pet Info',            description='Updates informa
 data.incoming[0x06F] = {name='Self Synth Result',   description='Results of an attempted synthesis process by yourself.'}
 data.incoming[0x070] = {name='Others Synth Result', description='Results of an attempted synthesis process by others.'}
 data.incoming[0x071] = {name='Campaign Map Info',   description='Populates the Campaign map.'}
+data.incoming[0x075] = {name='Unity Start',         description='Creates the timer and glowing fence that accompanies Unity fights.'}
 data.incoming[0x078] = {name='Proposal',            description='Carries proposal information from a /propose or /nominate command.'}
 data.incoming[0x079] = {name='Proposal Update',     description='Proposal update following a /vote command.'}
 data.incoming[0x08C] = {name='Merits',              description='Contains all merit information. 3 packets are sent.'}
 data.incoming[0x08D] = {name='Job Points',          description='Contains all job point information. 12 packets are sent.'}
+data.incoming[0x0A0] = {name='Party Map Marker',    description='Marks where players are on your map.'}
 data.incoming[0x0AA] = {name='Spell List',          description='Packet that shows the spells that you know.'}
 data.incoming[0x0AC] = {name='Ability List',        description='Packet that shows your current abilities and traits.'}
 data.incoming[0x0B4] = {name='Seek AnonResp',       description='Server response sent after you put up party or anon flag.'}
@@ -184,6 +187,7 @@ data.incoming[0x0CA] = {name='Bazaar Message',      description='Shows another p
 data.incoming[0x0CC] = {name='Linkshell Message',   description='/lsmes text and headers.'}
 data.incoming[0x0D2] = {name='Found Item',          description='This command shows an item found on defeated mob or from a Treasure Chest.'}
 data.incoming[0x0D3] = {name='Lot/drop item',       description='Sent when someone casts a lot on an item or when the item drops to someone.'}
+data.incoming[0x0DC] = {name='Party Invite',        description='Party Invite packet.'}
 data.incoming[0x0DD] = {name='Party Member Update', description='Alliance/party member info - zone, HP%, HP% etc.'}
 data.incoming[0x0DF] = {name='Char Update',         description='A packet sent from server which updates character HP, MP and TP.'}
 data.incoming[0x0E0] = {name='Linkshell Equip',     description='Updates your linkshell menu with the current linkshell.'}

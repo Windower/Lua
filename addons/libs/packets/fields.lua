@@ -277,9 +277,9 @@ fields.outgoing[0x011] = L{
 
 -- Standard Client
 fields.outgoing[0x015] = L{
-    {ctype='float',             label='X Position'},                            -- 04
-    {ctype='float',             label='Y Position'},                            -- 08
-    {ctype='float',             label='Z Position'},                            -- 0C
+    {ctype='float',             label='X'},                                     -- 04
+    {ctype='float',             label='Y'},                                     -- 08
+    {ctype='float',             label='Z'},                                     -- 0C
     {ctype='unsigned short',    label='_junk1'},                                -- 10
     {ctype='unsigned short',    label='Run Count'},                             -- 12   Counter that indicates how long you've been running?
     {ctype='unsigned char',     label='Rotation',           fn=dir},            -- 14
@@ -516,9 +516,9 @@ fields.outgoing[0x05B] = L{
 
 -- Warp Request
 fields.outgoing[0x05C] = L{
-    {ctype='float',             label='X Position'},                            -- 04
-    {ctype='float',             label='Z Position'},                            -- 08
-    {ctype='float',             label='Y Position'},                            -- 0C
+    {ctype='float',             label='X'},                                     -- 04
+    {ctype='float',             label='Z'},                                     -- 08
+    {ctype='float',             label='Y'},                                     -- 0C
     {ctype='unsigned int',      label='Target ID',          fn=id},             -- 10   NPC that you are requesting a warp from
     {ctype='unsigned int',      label='_unknown1'},                             -- 14   01 00 00 00 observed
     {ctype='unsigned int',      label='_unknown2'},                             -- 18   Likely contains information about the particular warp being requested, like menu ID
@@ -728,6 +728,12 @@ fields.outgoing[0x0CB] = L{
     {ctype='data[3]',           label='_junk1'}                                 -- 05
 }
 
+-- Party Marker Request
+fields.outgoing[0x0D2] = L{
+    {ctype='unsigned short',    label='Zone',               fn=zone},           -- 04
+    {ctype='unsigned short',    label='_junk1'}                                 -- 06
+}
+
 -- Check
 fields.outgoing[0x0DD] = L{
     {ctype='unsigned int',      label='Target',             fn=id},             -- 04
@@ -811,9 +817,9 @@ fields.outgoing[0x0F6] = L{
 fields.outgoing[0x0FA] = L{
     {ctype='unsigned short',    label='Item',                   fn=item},       -- 04  00 00 just gives the general update
     {ctype='unsigned char',     label='Safe Index',             fn=inv+{1}},    -- 06
-    {ctype='unsigned char',     label='X Position'},                            -- 07  0 to 0x12
-    {ctype='unsigned char',     label='Z Position'},                            -- 08  0 to ?
-    {ctype='unsigned char',     label='Y Position'},                            -- 09  0 to 0x17
+    {ctype='unsigned char',     label='X'},                                     -- 07  0 to 0x12
+    {ctype='unsigned char',     label='Z'},                                     -- 08  0 to ?
+    {ctype='unsigned char',     label='Y'},                                     -- 09  0 to 0x17
     {ctype='unsigned short',    label='_junk1'},                                -- 0A  00 00 observed
 }
 
@@ -1104,9 +1110,9 @@ fields.incoming[0x00D] = L{
     {ctype='unsigned short',    label='Index',              fn=index},          -- 08
     {ctype='unsigned char',     label='Mask',               fn=bin+{1}},        -- 0A
     {ctype='unsigned char',     label='Body Rotation',      fn=dir},            -- 0B
-    {ctype='float',             label='X Position'},                            -- 0C
-    {ctype='float',             label='Z Position'},                            -- 10
-    {ctype='float',             label='Y Position'},                            -- 14
+    {ctype='float',             label='X'},                                     -- 0C
+    {ctype='float',             label='Z'},                                     -- 10
+    {ctype='float',             label='Y'},                                     -- 14
     {ctype='unsigned short',    label='Head Rotation',      fn=dir},            -- 18
     {ctype='unsigned short',    label='Target Index *2',    fn=index..s+{2,15}},-- 1A
     {ctype='unsigned char',     label='Current Speed'},                         -- 1C
@@ -1173,9 +1179,9 @@ fields.incoming[0x00E] = L{
                                                                                 -- 0A   Bit 6:
                                                                                 -- 0A   Bit 7:
     {ctype='unsigned char',     label='Rotation',           fn=dir},            -- 0B
-    {ctype='float',             label='X Position'},                            -- 0C
-    {ctype='float',             label='Z Position'},                            -- 10
-    {ctype='float',             label='Y Position'},                            -- 14
+    {ctype='float',             label='X'},                                     -- 0C
+    {ctype='float',             label='Z'},                                     -- 10
+    {ctype='float',             label='Y'},                                     -- 14
     {ctype='unsigned int',      label='Walk Count'},                            -- 18   Steadily increases until rotation changes. Does not reset while the mob isn't walking. Only goes until 0xFF1F.
     {ctype='unsigned short',    label='_unknown1',          fn=bin+{2}},        -- 1A
     {ctype='unsigned char',     label='HP %',               fn=percent},        -- 1E
@@ -2085,7 +2091,7 @@ fields.incoming[0x05E] = L{
 
 -- Music Change
 fields.incoming[0x05F] = L{
-    {ctype='unsigned short',    label='Counter'},                               -- 04   Music layer
+    {ctype='unsigned short',    label='BGM Type'},                              -- 04   01 = idle music, 06 = mog house music. 00, 02, and 03 are fight musics and some other stuff.
     {ctype='unsigned short',    label='Song ID'},                               -- 06   See the setBGM addon for more information
 }
 
@@ -2276,6 +2282,17 @@ fields.incoming[0x070] = L{
     {ctype='char*',             label='Player Name'},                           -- 1E   Name of the player
 }
 
+-- Unity Start
+-- Only observed being used for Unity fights.
+fields.incoming[0x075] = L{
+    {ctype='unsigned int',      label='Fight Designation'},                     -- 04   Anything other than 0 makes a timer. 0 deletes the timer.
+    {ctype='unsigned int',      label='Timestamp Offset',   fn=time},           -- 08   Number of seconds since 15:00:00 GMT 31/12/2002 (0x3C307D70)
+    {ctype='unsigned int',      label='Fight Duration',     fn=time},           -- 0C
+    {ctype='byte[12]',          label='_unknown1'},                             -- 10   This packet clearly needs position information, but it's unclear how these bytes carry it
+    {ctype='unsigned int',      label='Battlefield Radius'},                    -- 1C   Yalms*1000, so a 50 yalm battlefield would have 50,000 for this field
+    {ctype='unsigned int',      label='Render Radius'},                         -- 20   Yalms*1000, so a fence that renders when you're 25 yalms away would have 25,000 for this field
+}
+
 -- Proposal
 fields.incoming[0x078] = L{
     {ctype='unsigned int',      label='Proposer ID',        fn=id},             -- 04
@@ -2338,6 +2355,17 @@ types.alliance_member = L{
     {ctype='unsigned short',    label='Flags',              fn=bin+{2}},        -- 06
     {ctype='unsigned short',    label='Zone',               fn=zone},           -- 08
     {ctype='unsigned short',    label='_unknown2'},                             -- 0A	Always 0?
+}
+
+-- Party Map Marker
+-- This packet is ignored if your party member is within 50' of you.
+fields.incoming[0x0A0] = L{
+    {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
+    {ctype='unsigned short',    label='Zone',               fn=zone},           -- 08
+    {ctype='unsigned short',    label='_unknown1'},                             -- 0A   Look like junk
+    {ctype='float',             label='X'},                                     -- 0C
+    {ctype='float',             label='Z'},                                     -- 10
+    {ctype='float',             label='Y'},                                     -- 14
 }
 
 -- Alliance status update
@@ -2448,6 +2476,15 @@ fields.incoming[0x0D3] = L{
     {ctype='data[6]',           label='_junk1'},                                -- 36
 }
 
+-- Party Invite
+fields.incoming[0x0DC] = L{
+    {ctype='unsigned int',      label='Inviter ID',         fn=id},             -- 04
+    {ctype='unsigned int',      label='Flags'},                                 -- 08   This may also contain the type of invite (alliance vs. party)
+    {ctype='char[16]',          label='Inviter Name'},                          -- 0C
+    {ctype='unsigned short',    label='_unknown1'},                             -- 1C
+    {ctype='unsigned short',    label='_junk1'},                                -- 1E
+}
+
 -- Party member update
 fields.incoming[0x0DD] = L{
     {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
@@ -2545,10 +2582,10 @@ fields.incoming[0x0F4] = L{
 
 -- Widescan Track
 fields.incoming[0x0F5] = L{
-    {ctype='float',             label='X Position'},                            -- 04
-    {ctype='float',             label='Z Position'},                            -- 08
-    {ctype='float',             label='Y Position'},                            -- 0C
-    {ctype='unsigned char',     label='_unknown1'},                             -- 10   Same value as _unknown1 of 0x0F4
+    {ctype='float',             label='X'},                                     -- 04
+    {ctype='float',             label='Z'},                                     -- 08
+    {ctype='float',             label='Y'},                                     -- 0C
+    {ctype='unsigned char',     label='Level'},                                 -- 10
     {ctype='unsigned char',     label='_padding1'},                             -- 11
     {ctype='unsigned short',    label='Index',              fn=index},          -- 12
     {ctype='unsigned int',      label='Status',             fn=e+{'ws track'}}, -- 14

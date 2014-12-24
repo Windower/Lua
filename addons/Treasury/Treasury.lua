@@ -1,6 +1,6 @@
 _addon.name = 'Treasury'
 _addon.author = 'Ihina'
-_addon.version = '1.2.0.0'
+_addon.version = '1.2.0.1'
 _addon.commands = {'treasury', 'tr'}
 
 res = require('resources')
@@ -260,9 +260,10 @@ windower.register_event('addon command', function(command1, command2, ...)
     elseif command1 == 'clearall' then
         code.pass:clear()
         code.lot:clear()
+        code.drop:clear()
         settings.Pass:clear()
         settings.Lot:clear()
-
+        settings.Drop:clear()
         config.save(settings)
 
     elseif command1 == 'autodrop' then
@@ -309,12 +310,16 @@ windower.register_event('addon command', function(command1, command2, ...)
 
     elseif command1 == 'help' then
         print('%s v%s':format(_addon.name, _addon.version))
-        print('    \\cs(255,255,255)lot|pass add|remove <name>\\cr - Adds are removes all items matching <name> to the specified list')
-        print('    \\cs(255,255,255)lot|pass clear\\cr - Clears the specified list for the current character')
+        print('    \\cs(255,255,255)lot|pass|drop add|remove <name>\\cr - Adds or removes all items matching <name> to the specified list')
+        print('    \\cs(255,255,255)lot|pass|drop clear\\cr - Clears the specified list for the current character')
         print('    \\cs(255,255,255)lot|pass list\\cr - Lists all items on the specified list for the current character')
         print('    \\cs(255,255,255)lotall|passall\\cr - Lots/Passes all items currently in the pool')
-        print('    \\cs(255,255,255)clearall\\cr - Removes lotting/passing settings for this character')
+        print('    \\cs(255,255,255)clearall\\cr - Removes lotting/passing/dropping settings for this character')
         print('    \\cs(255,255,255)autodrop [on|off]\\cr - Enables/disables (or toggles) the auto-drop setting')
+        print('    \\cs(255,255,255)verbose [on|off]\\cr - Enables/disables (or toggles) the verbose setting')
+        print('    \\cs(255,255,255)autostack [on|off]\\cr - Enables/disables (or toggles) the autostack feature')
+        print('    \\cs(255,255,255)delay <value>\\cr - Allows you to change the delay of actions (default: 0)')
+
 
     end
 end)
