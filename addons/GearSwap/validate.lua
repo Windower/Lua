@@ -220,7 +220,6 @@ function find_in_inv(bag, name, aug)
 end
 
 -- Utility function to compare items that may possibly be augmented.
--- compare_augments is defined in equip_processing.lua.
 function compare_item(item, name, aug, item_short_name, item_log_name)
     if item.id == 0 or not res.items[item.id] then
         return false
@@ -231,7 +230,7 @@ function compare_item(item, name, aug, item_short_name, item_log_name)
     item_log_name = lowercase_name(item_log_name or get_log_name_by_item_id(item.id))
 
     if item_short_name == name or item_log_name == name then
-        if not aug or compare_augments(aug, extdata.decode(item).augments) then
+        if not aug or extdata.compare_augments(aug, extdata.decode(item).augments) then
             return true
         end
     end

@@ -41,7 +41,7 @@ function check_wearable(item_id)
         --debug_mode_chat('GearSwap (Debug Mode): Item '..(res.items[item_id][language] or item_id)..' does not have a jobs field in the resources.')
     else
         return (res.items[item_id].jobs[player.main_job_id]) and (res.items[item_id].level<=player.jobs[res.jobs[player.main_job_id].ens]) and (res.items[item_id].races[player.race_id]) and
-            ((player.superior_level or 0) >= (res.items[item_id].superior_level or 0))
+            (player.superior_level >= (res.items[item_id].superior_level or 0))
     end
     return false
 end
@@ -136,7 +136,7 @@ function unpack_equip_list(equip_list)
                             if (not bag or bag == bag_id) and name and name_match(item_tab.id,name) then
                                 if res.items[item_tab.id].slots[slot_id] then
                                     if augments and #augments ~=0 then
-                                        if compare_augments(augments,extdata.decode(item_tab).augments) then
+                                        if extdata.compare_augments(augments,extdata.decode(item_tab).augments) then
                                             equip_list[slot_name] = nil
                                             ret_list[slot_id] = {bag_id=bag_id,slot=item_tab.slot}
                                             break
@@ -201,57 +201,6 @@ function unpack_equip_list(equip_list)
     end
     
     return ret_list,priorities
-end
-
-
------------------------------------------------------------------------------------
---Name: compare_augments(goal,current)
---Args:
----- goal - First set of augments
----- current - Second set of augments
------------------------------------------------------------------------------------
---Returns:
----- boolean indicating whether the goal augments are contained within the
-----    current augments. Will return false if there are excess goal augments
-----    or the goal augments do not match the current augments.
------------------------------------------------------------------------------------
-function compare_augments(goal,current)
-    if not current then return false end
-    local num_augments = 0
-    local aug_strip = function(str)
-        return str:lower():gsub('[^%-%w,]','')
-    end 
-    for aug_ind,augment in pairs(current) do
-        if augment == 'none' then
-            current[aug_ind] = nil
-        else
-            num_augments = num_augments + 1
-        end
-    end
-    if num_augments < #goal then
-        return false
-    else
-        local count = 0
-        for goal_ind,goal_aug in pairs(goal) do
-            local bool
-            for cur_ind,cur_aug in pairs(current) do
-                if aug_strip(goal_aug) == aug_strip(cur_aug) then
-                    bool = true
-                    count = count +1
-                    current[cur_ind] = nil
-                    break
-                end
-            end
-            if not bool then
-                return false
-            end
-        end
-        if count == #goal then
-            return true
-        else
-            return false
-        end
-    end
 end
 
 
