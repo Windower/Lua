@@ -1,6 +1,6 @@
 _addon.name = 'Itemizer'
 _addon.author = 'Ihina'
-_addon.version = '2.0.1.0'
+_addon.version = '3.0.0.0'
 _addon.command = 'itemizer'
 
 require('luau')
@@ -14,39 +14,108 @@ settings = config.load(defaults)
 
 bag_ids = res.bags:key_map(string.lower .. table.get-{'english'} .. table.get+{res.bags}):map(table.get-{'id'})
 
+find_items = function(ids, bag, limit)
+    local res = S{}
+    local found = 0
+
+    for bag_index, bag_name in bag_ids:filter(table.get-{'enabled'} .. windower.ffxi.get_bag_info):it() do
+        if not bag or bag_index == bag then
+            for _, item in ipairs(windower.ffxi.get_items(bag_index)) do
+                if ids:contains(item.id) then
+                    local count = limit and math.min(limit, item.count) or item.count
+                    found = found + count
+
+                    res:add({
+                        bag = bag_index,
+                        slot = item.slot,
+                        count = count,
+                    })
+
+                    if limit then
+                        limit = limit - count
+
+                        if limit == 0 then
+                            return res, found
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    return res, found
+end
+
 windower.register_event('unhandled command', function(command, ...)
     local args = L{...}:map(string.lower)
 
-    if command == 'get' or command == 'put' then
-        local bag = args:remove(#args)
-        local search = bag_ids[command == 'get' and bag or 'inventory']
-        if not search then
-            error('Unknown bag: %s':format(bag))
+    if command == 'get' or command == 'put' or command == 'gets' or command == 'puts' then
+        local count
+        if command == 'gets' or command == 'puts' then
+            command = command:sub(1, -2)
+        else
+            local last = args[#args]
+            if last == 'all' then
+                args:remove()
+            elseif tonumber(last) then
+                count = tonumber(last)
+                args:remove()
+            else
+                count = 1
+            end
+        end
+
+        local bag = args[#args]
+        local specified_bag = rawget(bag_ids, bag)
+        if specified_bag then
+            if not windower.ffxi.get_bag_info(specified_bag).enabled then
+                error('%s currently not enabled':format(res.bags[source_bag].name))
+                return
+            end
+
+            args:remove()
+        elseif command == 'put' and not specified_bag then
+            error('Specify a valid destination bag to put items in.')
             return
-        elseif not windower.ffxi.get_bag_info(search).enabled then
-            error('Bag %s currently not enabled':format(bag))
+        end
+
+        local source_bag
+        local destination_bag
+        if command == 'get' then
+            source_bag = specified_bag
+            destination_bag = bag_ids.inventory
+        else
+            destination_bag = specified_bag
+            source_bag = bag_ids.inventory
+        end
+        
+        local destination_bag_info = windower.ffxi.get_bag_info(destination_bag)
+        if destination_bag_info.max - destination_bag_info.count == 0 then
+            error('Not enough space in %s to move items.':format(res.bags[destination_bag].name))
             return
         end
 
         local item_name = args:concat(' ')
  
-        local item_ids = res.items:name(windower.wc_match-{item_name})
+        local item_ids = (S(res.items:name(windower.wc_match-{item_name})) + S(res.items:name_log(windower.wc_match-{item_name}))):map(table.get-{'id'})
         if item_ids:length() == 0 then
-            item_ids = res.items:name_log(windower.wc_match-{item_name})
-            if item_ids:length() == 0 then
-                error('Unknown item: %s':format(item_name))
-                return
-            end
+            error('Unknown item: %s':format(item_name))
+            return
         end
 
-        for slot, item in pairs(windower.ffxi.get_items(search)) do 
-            if item_ids[item.id] then 
-                windower.ffxi[command .. '_item'](bag_id, slot)
-                return
-            end 
+        local matches, results = find_items(item_ids, source_bag, count)
+        if results == 0 then
+            error('Item "%s" not found in %s.':format(item_name, source_bag and res.bags[source_bag].name or 'any accessible bags'))
+            return
         end
 
-        log('Item "%s" not found in %s':format(item_name, command == 'get' and bag or 'inventory'))
+        if count and results < count then
+            warning('Only %u "%s" found in %s.':format(results, item_name, source_bag and res.bags[source_bag].name or 'all accessible bags'))
+        end
+
+        for match in matches:it() do
+            windower.ffxi[command .. '_item'](command == 'get' and match.bag or destination_bag, match.slot, match.count)
+        end
     end	
 end)
 
@@ -97,8 +166,7 @@ active = S{}
 
 -- Returning true resends the command in settings.Delay seconds
 -- Returning false doesn't resend the command and executes it
-use_item = function(id, count, items)
-    count = count or 1
+collect_item = function(id, items)
     items = items or {inventory = windower.ffxi.get_items(bag_ids.inventory)}
 
     local item = T(inventory):with('id', id)
@@ -113,38 +181,21 @@ use_item = function(id, count, items)
     end
 
     -- Check for all items
-    local remaining = count - (item and item.count or 0)
-    local delay = false
-    for bag_index, bag_name in bag_ids:filter(table.get-{'enabled'} .. windower.ffxi.get_bag_info):it() do
-        for item in T(items[bag_name] or windower.ffxi.get_items(bag_name)):it() do
-            if item.id == id and item.count >= remaining then
-                -- Move it to the inventory
-                windower.ffxi.get_item(bag_index, item.slot, math.min(item.count, remaining))
-                remaining = remaining - item.count
+    local match = find_items(S{id}, nil, 1):it()()
 
-                -- Add currently processing ID to set of active IDs
-                active:add(id)
+    if match then
+        windower.ffxi.get_item(match.bag, match.slot, match.count)
 
-                if remaining <= 0 then
-                    return true
-                end
-
-                delay = true
-            end
-        end
+        -- Add currently processing ID to set of active IDs
+        active:add(id)
+    else
+        error('Item "%s" not found in any accessible bags':format(res.items[id].name))
     end
 
-    if not delay then
-        if remaining == count - (item and item.count or 0)
-            error('Item %s not found':format(res.items[id].name))
-        else
-            error('Not enough %s found in all accessible bags':format(res.items[id].name))
-        end
-    end
-    return delay
+    return match ~= nil
 end
 
-reschedule = function(text, ids, count, items)
+reschedule = function(text, ids, items)
     items = items or {inventory = windower.ffxi.get_items(bag_ids.inventory)}
 
     -- Inventory full?
@@ -153,7 +204,7 @@ reschedule = function(text, ids, count, items)
     end
 
     for id in L(ids):it() do
-        if use_item(id, count, items) then
+        if collect_item(id, items) then
             windower.send_command:prepare('input %s':format(text)):schedule(settings.Delay)
             return true
         end
@@ -200,14 +251,13 @@ windower.register_event('outgoing text', function()
                 end
             end
 
-            local item_count = text:match('%d+$')
             local parsed_text = item_count and text:match(' (.+) (%d+)$') or text:match(' (.+)')
             local mid_name = parsed_text:match('"(.+)"') or parsed_text:match('\'(.+)\'') or parsed_text:match('(.+) ')
             local full_name = parsed_text:match('(.+)')
             local id = item_names:find(string.imatch-{mid_name}) or item_names:find(string.imatch-{full_name})
             if id then
                 if not inventory_items:contains(id) and not wardrobe_items:contains(id) then
-                    return reschedule(text, {id}, item_count and item_count:number() or 1, items)
+                    return reschedule(text, {id}, items)
                 else
                     active:remove(id)
                 end
