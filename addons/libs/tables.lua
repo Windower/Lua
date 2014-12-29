@@ -446,7 +446,7 @@ function table.it(t)
     local key
     return function()
         key = next(t, key)
-        return t[key], key
+        return rawget(t, key), key
     end
 end
 
@@ -461,20 +461,9 @@ function table.rekey(t, key)
     return setmetatable(res, getmetatable(t) or _meta.T)
 end
 
--- Wrapper around unpack(t). Returns table elements as a list of values. Optionally takes a number of keys to unpack.
-function table.unpack(t, ...)
-    local count = select('#', ...);
-    if count == 0 then
-        return unpack(t)
-    end
-
-    local temp = {}
-    local args = {...}
-    for i = 1, count do
-        temp[i] = t[args[i]]
-    end
-
-    return unpack(temp)
+-- Wrapper around unpack(t). Returns table elements as a list of values. Only works on array subsets of t.
+function table.unpack(t)
+    return unpack(t)
 end
 
 -- Returns the values of the table, extracted into an argument list. Like unpack, but works on dictionaries as well.

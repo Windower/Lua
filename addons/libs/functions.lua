@@ -1,22 +1,25 @@
 --[[
-    Adds some tools for functional programming. Amends various other namespaces by functions used in a functional context, when they don't make sense on their own.
+Adds some tools for functional programming. Amends various other namespaces by functions used in a functional context, when they don't make sense on their own.
 ]]
 
 _libs = _libs or {}
 _libs.functions = true
 
+--[[
+    Purely functional
+]]
+
 functions = {}
 boolean = {}
 
 -- The empty function.
-functions.empty = function() end
+function functions.empty() end
 
-debug.setmetatable(false, {__index = function(_, k)
-    return boolean[k] or (_raw and _raw.error or error)('"%s" is not defined for booleans':format(tostring(k)), 2)
-end})
+debug.setmetatable(functions.empty, functions)
+debug.setmetatable(false, {__index = boolean})
 
-for _, t in pairs({functions, boolean, math, string, table}) do
-    t.fn = function(val)
+for _, t in pairs({'functions', 'boolean', 'math', 'string', 'table'}) do
+    _G[t].fn = function(val)
         return function()
             return val
         end
@@ -206,7 +209,7 @@ local function index(fn, key)
         end
     end
 
-    (_raw and _raw.error or error)('"%s" is not defined for functions':format(tostring(key)), 2)
+    return nil
 end
 
 local function add(fn, args)

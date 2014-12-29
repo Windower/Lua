@@ -8,13 +8,11 @@ _libs.functions = _libs.functions or require('functions')
 
 _meta = _meta or {}
 
-debug.setmetatable('', {
-    __index = function(str, k)
-        return string[k] or type(k) == 'number' and string.sub(str, k, k) or (_raw and _raw.error or error)('"%s" is not defined for strings':format(tostring(k)), 2)
-    end,
-    __unm = functions.negate .. functions.equals,
-    __unp = functions.equals,
-})
+debug.getmetatable('').__index = function(str, k)
+    return string[k] or type(k) == 'number' and string.sub(str, k, k) or nil
+end
+debug.getmetatable('').__unm = functions.negate .. functions.equals
+debug.getmetatable('').__unp = functions.equals
 
 -- Returns a function that returns the string when called.
 function string.fn(str)

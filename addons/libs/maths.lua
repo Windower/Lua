@@ -1,5 +1,5 @@
 --[[
-    A few math helper functions.
+A few math helper functions.
 ]]
 
 _libs = _libs or {}
@@ -9,11 +9,7 @@ _libs.functions = _libs.functions or require('functions')
 _raw = _raw or {}
 _raw.math = setmetatable(_raw.math or {}, {__index = math})
 
-debug.setmetatable(0, {
-    __index = function(_, k)
-        return math[k] or (_raw and _raw.error or error)('"%s" is not defined for numbers':format(tostring(k)), 2)
-    end
-})
+debug.setmetatable(0, {__index = math})
 
 -- Order of digits for higher base math
 local digitorder = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'}
@@ -22,6 +18,11 @@ local digitorder = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 
 math.e = 1:exp()
 math.tau = 2 * math.pi
 math.phi = (1 + 5:sqrt())/2
+
+-- Returns a function that returns the number when called.
+function math.fn(val)
+    return functions.const(val)
+end
 
 -- Rounds to prec decimal digits. Accepts negative numbers for precision.
 function math.round(num, prec)

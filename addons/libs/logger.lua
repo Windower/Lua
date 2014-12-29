@@ -7,8 +7,6 @@ _libs.logger = true
 _libs.strings = _libs.strings or require('strings')
 _libs.chat = _libs.chat or require('chat')
 
-_raw = _raw or {}
-
 local logger = {}
 logger.defaults = {}
 
@@ -72,7 +70,6 @@ function log(...)
     captionlog(nil, logger.settings.logcolor, ...)
 end
 
-_raw.error = error
 function error(...)
     captionlog('Error', logger.settings.errorcolor, ...)
 end
@@ -252,8 +249,6 @@ end
 local config = require('config')
 
 logger.settings = config.load('../libs/logger.xml', logger.defaults)
-
-return logger
 
 --[[
 Copyright © 2013-2014, Windower
