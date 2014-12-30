@@ -25,12 +25,12 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.898'
+_addon.version = '0.899'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
 if windower.file_exists(windower.addon_path..'data/bootstrap.lua') then
-    debugging = {windower_debug = true,command_registry = false,general=false}
+    debugging = {windower_debug = true,command_registry = false,general=false,logging=false}
 else
     debugging = {}
 end
@@ -122,12 +122,6 @@ require 'triggers'
 
 windower.register_event('load',function()
     windower.debug('load')
-    if windower.dir_exists('../addons/GearSwap/data/logs') then
-        logging = false
-        logfile = io.open('../addons/GearSwap/data/logs/NormalLog'..tostring(os.clock())..'.log','w+')
-        logit('GearSwap LOGGER HEADER\n')
-    end
-    
     refresh_globals()
     
     if world.logged_in then

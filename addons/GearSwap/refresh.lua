@@ -327,10 +327,9 @@ function refresh_player(dt,user_event_flag)
         if species_id then
             player.species = {}
             for i,v in pairs(res.monstrosity[species_id]) do
-                if i ~= 'id' then
-                    player.species[i] = v
-                end
+                player.species[i] = v
             end
+            player.species.name = player.species[language] 
             player.species.tp_moves = copy_entry(res.monstrosity[species_id].tp_moves)
             for i,v in pairs(player.species.tp_moves) do
                 if v > player.main_job_level then
