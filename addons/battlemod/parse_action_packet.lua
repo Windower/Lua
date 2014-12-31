@@ -405,7 +405,7 @@ end
 
 function player_info(id)
     local player_table = windower.ffxi.get_mob_by_id(id)
-    local typ,owner,filter
+    local typ,owner,filt
     
     if player_table == nil then
         return {name=nil,id=nil,is_npc=nil,type='debug',owner=nil,race=nil}
@@ -415,33 +415,33 @@ function player_info(id)
         if type(v) == 'table' and v.mob and v.mob.id == player_table.id then
             typ = i
             if i == 'p0' then
-                filter = 'me'
+                filt = 'me'
             elseif i:sub(1,1) == 'p' then
-                filter = 'party'
+                filt = 'party'
             else
-                filter = 'alliance'
+                filt = 'alliance'
             end
         end
     end
     
-    if not filter then
+    if not filt then
         if player_table.is_npc then
             if player_table.id%4096>2047 then
                 typ = 'other_pets'
-                filter = 'other_pets'
+                filt = 'other_pets'
                 owner = 'other'
                 for i,v in pairs(windower.ffxi.get_party()) do
                     if type(v) == 'table' and v.mob and v.mob.pet_index and v.mob.pet_index == player_table.index then
                         if i == 'p0' then
                             typ = 'my_pet'
-                            filter = 'my_pet'
+                            filt = 'my_pet'
                         end
                         owner = i
                         break
                     elseif type(v) == 'table' and v.mob and v.mob.fellow_index and v.mob.fellow_index == player_table.index then
                         if i == 'p0' then
                             typ = 'my_fellow'
-                            filter = 'my_fellow'
+                            filt = 'my_fellow'
                         end
                         owner = i
                         break
@@ -449,20 +449,20 @@ function player_info(id)
                 end
             else
                 typ = 'mob'
-                filter = 'monsters'
+                filt = 'monsters'
                 for i,v in pairs(windower.ffxi.get_party()) do
                     if type(v) == 'table' and nf(v.mob,'id') == player_table.claim_id and filter.enemies then
-                        filter = 'enemies'
+                        filt = 'enemies'
                     end
                 end
             end
         else
             typ = 'other'
-            filter = 'others'
+            filt = 'others'
         end
     end
     if not typ then typ = 'debug' end
-    return {name=player_table.name,id=id,is_npc = player_table.is_npc,type=typ,filter=filter,owner=(owner or nil),race = player_table.race}
+    return {name=player_table.name,id=id,is_npc = player_table.is_npc,type=typ,filter=filt,owner=(owner or nil),race = player_table.race}
 end
 
 function get_spell(act)
