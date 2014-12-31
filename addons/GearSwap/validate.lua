@@ -154,8 +154,8 @@ function search_bags_for_items_in_set(gear_table, filter, missing_items, stack)
     if missing_items == nil then missing_items = S{} end
     
     for i,v in pairs(gear_table) do
-        local name = v.name or v
-        local aug = v.augments or v.augment
+        local name = (type(v) == 'table' and v.name) or v
+        local aug = (type (v) == 'table' and (v.augments or v.augment))
         
         if type(aug) == 'string' then aug = {aug} end
         if type(name) == 'string' and name ~= 'empty' and name ~= '' and type(i) == 'string'then
@@ -186,8 +186,8 @@ function find_in_sets(item, tab, stack)
     local item_log_name = lowercase_name(get_log_name_by_item_id(item.id))
 
     for _,v in pairs(tab) do
-        local name = v.name or v
-        local aug = v.augments or v.augment
+        local name = (type(v) == 'table' and v.name) or v
+        local aug = (type(v) == 'table' and (v.augments or v.augment))
         if type(aug) == 'string' then aug = {aug} end
         if type(name) == 'string' then
             if compare_item(item, name, aug, item_short_name, item_log_name) then

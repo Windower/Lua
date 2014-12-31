@@ -1,4 +1,6 @@
 -------------------------------------------------
+GearSwap 0.899 - Adjusted GearSwap to be compatible with the new library behavior.
+-------------------------------------------------
 GearSwap 0.898 - Fixed a bug with using cast_delay in the pretarget function.
 -------------------------------------------------
 GearSwap 0.897 - Superior system support and filtering.

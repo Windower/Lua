@@ -315,7 +315,7 @@ function user_midaction(bool)
     end
 
     for i,v in pairs(command_registry) do
-        if v.midaction then
+        if type(v) == 'table' and v.midaction then
             return true, v.spell
         end
     end
