@@ -41,13 +41,7 @@ function valid_target(targ,flag)
     local spell_targ
     local san_targ = find_san(targ)
     -- If the target is whitelisted, pass it through.
-    if pass_through_targs:contains(targ) then
-        local cur_targ = windower.ffxi.get_mob_by_target('<t>')
---        if (targ == '<t>' or targ == 't') and cur_targ and cur_targ.id == windower.ffxi.get_player().id then
---            return '<me>'
---        end
-        return targ
-    elseif st_targs:contains(targ) or (tonumber(targ) and windower.ffxi.get_mob_by_id(tonumber(targ))) then
+    if pass_through_targs:contains(targ) or st_targs:contains(targ) or (tonumber(targ) and windower.ffxi.get_mob_by_id(tonumber(targ))) then
         return targ
     elseif targ and windower.ffxi.get_player() then
     -- If the target exists, scan the mob array for it
@@ -114,7 +108,7 @@ function target_make(targets)
         target_type = 'Ally'
         local party = windower.ffxi.get_party()
         for i,v in pairs(party) do
-            if v.name == target.name then
+            if type(v) == 'table' and v.name == target.name then
                 if i:sub(1,1) == 'p' then
                     if i:sub(1,2) == 'p0' then
                         target_type = 'Self'
