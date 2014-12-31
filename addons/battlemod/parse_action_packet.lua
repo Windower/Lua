@@ -412,7 +412,7 @@ function player_info(id)
     end
     
     for i,v in pairs(windower.ffxi.get_party()) do
-        if v.mob and v.mob.id == player_table.id then
+        if type(v) == 'table' and v.mob and v.mob.id == player_table.id then
             typ = i
             if i == 'p0' then
                 filter = 'me'
@@ -431,14 +431,14 @@ function player_info(id)
                 filter = 'other_pets'
                 owner = 'other'
                 for i,v in pairs(windower.ffxi.get_party()) do
-                    if v.mob and v.mob.pet_index and v.mob.pet_index == player_table.index then
+                    if type(v) == 'table' and v.mob and v.mob.pet_index and v.mob.pet_index == player_table.index then
                         if i == 'p0' then
                             typ = 'my_pet'
                             filter = 'my_pet'
                         end
                         owner = i
                         break
-                    elseif v.mob and v.mob.fellow_index and v.mob.fellow_index == player_table.index then
+                    elseif type(v) == 'table' and v.mob and v.mob.fellow_index and v.mob.fellow_index == player_table.index then
                         if i == 'p0' then
                             typ = 'my_fellow'
                             filter = 'my_fellow'
@@ -451,7 +451,7 @@ function player_info(id)
                 typ = 'mob'
                 filter = 'monsters'
                 for i,v in pairs(windower.ffxi.get_party()) do
-                    if nf(v.mob,'id') == player_table.claim_id and filter.enemies then
+                    if type(v) == 'table' and nf(v.mob,'id') == player_table.claim_id and filter.enemies then
                         filter = 'enemies'
                     end
                 end
