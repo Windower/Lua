@@ -456,7 +456,6 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
                     determine_response(x,i,30,y)
                 elseif x>l[i+5] and x<r[i+5] then
                     windower.send_command('%sinput /target %s':format(send_string,stat_table[party[i][math.ceil((y-b[i])/25)]].name))                else
-                    return
                 end
                 
                 dragged = true
