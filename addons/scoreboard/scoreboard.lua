@@ -441,7 +441,7 @@ function find_pet_owner_name(actionpacket)
     local name = nil
     
     for _, member in pairs(party) do
-        if member.mob then
+        if type('member') == 'table' and member.mob then
             if member.mob.pet_index and member.mob.pet_index> 0 and pet.index == member.mob.pet_index then
 				name = member.mob.name
                 break
