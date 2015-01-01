@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
 _addon.name = 'Nostrum'
 _addon.author = 'trv'
-_addon.version = '2.0.0'
+_addon.version = '2.0.1'
 _addon.commands = {'Nostrum','nos',}
 
 packets=require('packets')
