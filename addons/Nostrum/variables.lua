@@ -26,6 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
 w=29
 h=24
+tab_keys=S{16,18,82,203,205,210}
 spell_default=''
 send_string = ''
 to_update=L{}

@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
 _addon.name = 'Nostrum'
 _addon.author = 'trv'
-_addon.version = '2.0.0'
+_addon.version = '2.0.1'
 _addon.commands = {'Nostrum','nos',}
 
 packets=require('packets')
@@ -107,18 +107,18 @@ local defaults={
     window={x_offset=0,y_offset=0,},
     profiles={
         default={
-    ["Cure"]=true,["CureII"]=true,["CureIII"]=true,["CureIV"]=true,["CureV"]=true,["CureVI"]=true,
-    ["Curaga"]=true,["CuragaII"]=true,["CuragaIII"]=true,["CuragaIV"]=true,["CuragaV"]=true,
-    ["Sacrifice"]=false,["Erase"]=true,["Paralyna"]=true,["Silena"]=true,["Blindna"]=true,
-    ["Poisona"]=true,["Viruna"]=true,["Stona"]=true,["Cursna"]=true,
-    ["Haste"]=true,["HasteII"]=false,["Flurry"]=false,["FlurryII"]=false,["Protect"]=false,["Shell"]=false,["ProtectII"]=false,["ShellII"]=false,
-    ["ProtectIII"]=false,["ShellIII"]=false,["ProtectIV"]=false,["ShellIV"]=false,["ProtectV"]=true,["ShellV"]=true,
-    ["Refresh"]=false,["RefreshII"]=false,["Regen"]=false,["RegenII"]=false,["RegenIII"]=false,
-    ["RegenIV"]=true,["RegenV"]=false,["PhalanxII"]=false,["Adloquium"]=false,["AnimusAugeo"]=false,["AnimusMinuo"]=false,["Embrava"]=false,
+            ["Cure"]=true,["CureII"]=true,["CureIII"]=true,["CureIV"]=true,["CureV"]=true,["CureVI"]=true,
+            ["Curaga"]=true,["CuragaII"]=true,["CuragaIII"]=true,["CuragaIV"]=true,["CuragaV"]=true,
+            ["Sacrifice"]=false,["Erase"]=true,["Paralyna"]=true,["Silena"]=true,["Blindna"]=true,
+            ["Poisona"]=true,["Viruna"]=true,["Stona"]=true,["Cursna"]=true,
+            ["Haste"]=true,["HasteII"]=false,["Flurry"]=false,["FlurryII"]=false,["Protect"]=false,["Shell"]=false,["ProtectII"]=false,["ShellII"]=false,
+            ["ProtectIII"]=false,["ShellIII"]=false,["ProtectIV"]=false,["ShellIV"]=false,["ProtectV"]=true,["ShellV"]=true,
+            ["Refresh"]=false,["RefreshII"]=false,["Regen"]=false,["RegenII"]=false,["RegenIII"]=false,
+            ["RegenIV"]=true,["RegenV"]=false,["PhalanxII"]=false,["Adloquium"]=false,["AnimusAugeo"]=false,["AnimusMinuo"]=false,["Embrava"]=false,
         },
     },
 }
-_defaults = config.load(defaults)
+local _defaults = config.load(defaults)
 settings.text.buttons.color=_defaults.text.buttons.color
 settings.text.buttons.visible=_defaults.text.buttons.visible
 settings.text.name.color=_defaults.text.name.color
@@ -323,8 +323,8 @@ function build_macro()
 end
 
 windower.register_event('load', 'login', function()
-    coroutine.sleep(2)
-    regions = 1
+
+    regions = 0
     alliance_keys = {'p5', 'p4', 'p3', 'p2', 'p1', 'p0', 'a15', 'a14', 'a13', 'a12', 'a11', 'a10', 'a25', 'a24', 'a23', 'a22', 'a21', 'a20'}
     party_from_memory = windower.ffxi.get_party()
     player_id = windower.ffxi.get_player().id
@@ -332,6 +332,8 @@ windower.register_event('load', 'login', function()
     position_lookup = {}
     stat_table = {}
     party = {[1]=L{},[2]=L{},[3]=L{}}
+
+    coroutine.sleep(2)
 
     for i=1,18 do
         local pkey = alliance_keys[i]
@@ -345,7 +347,7 @@ windower.register_event('load', 'login', function()
                 hpp = party_from_memory[pkey].hpp,
                 tp = party_from_memory[pkey].tp,
                 name = party_from_memory[pkey].name,
-                }
+            }
         end
     end
 
@@ -401,7 +403,7 @@ end)
 
 windower.register_event('keyboard', function(dik,flags,blocked)
     if blocked == 32 then return end
-    if dik == 15 or dik == 210 or dik == 28 then
+    if tab_keys:contains(dik) then
         if flags then
             coroutine.sleep(.02)
             local target = windower.ffxi.get_mob_by_target('t')
@@ -453,9 +455,7 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
                 if x>l[i] and x<r[i] then
                     determine_response(x,i,30,y)
                 elseif x>l[i+5] and x<r[i+5] then
-                    windower.send_command(send_string .. 'input /target ' .. stat_table[party[i][math.ceil((y-b[i])/25)]].name)
-                else
-                    return
+                    windower.send_command('%sinput /target %s':format(send_string,stat_table[party[i][math.ceil((y-b[i])/25)]].name))                else
                 end
                 
                 dragged = true
@@ -477,22 +477,34 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
             dragged = false
             return true
         end
-    elseif type==4 then
+    elseif type == 4 then
         for i=1,regions do
             if y>b[i] and y<t[i] then
                 if x>l[i+5] and x<r[i+5] then
-                    windower.send_command(send_string .. 'input /ma '..'"'..spell_default..'" '.. stat_table[party[i][math.ceil((y-b[i])/25)]].name)
-                else
-                    log(spell_default)
-                    return
+                    windower.send_command('%sinput /ma "%s" %s':format(send_string, spell_default, stat_table[party[i][math.ceil((y-b[i])/25)]].name))
+                    dragged = true
+                    return true
                 end
             end
         end
     
         if y>b[4] and y<t[4] and x>l[4] and x<r[4] then
             spell_default = xml_to_lua[macro_order[region_map[4]][math.ceil((x-l[4])/33)]]
+            windower.text.set_text('menu', spell_default)
+            text_coordinates.x['menu'] = prim_coordinates.x['pmenu'] + 1 + (150 - 7.55 * #spell_default)/2
+            windower.text.set_location('menu',text_coordinates.x['menu'],text_coordinates.y['menu'])
+            dragged = true
+            return true
         elseif y>b[5] and y<t[5] and x>l[5] and x<r[5] then
             spell_default = xml_to_lua[macro_order[region_map[5]][math.ceil((x-l[5])/33)]]
+            windower.text.set_text('menu', spell_default)
+            dragged = true
+            return true
+        end
+    elseif type == 5 then
+        if dragged then
+            dragged = false
+            return true
         end
     end
 end)
@@ -518,10 +530,10 @@ windower.register_event('outgoing chunk', function(id,data)
         end
     elseif id == 0x00C then
         if not is_hidden then
-            for key in pairs(nos_saved_prims) do
+            for key in pairs(nos_saved_prims - (macro[1] + macro[2] + macro[3])) do
                 windower.prim.set_visibility(key,prim_coordinates.visible[key])
             end
-            for key in pairs(nos_saved_texts) do
+            for key in pairs(nos_saved_texts - (macro[1] + macro[2] + macro[3])) do
                 windower.text.set_visibility(key,text_coordinates.visible[key])
             end
         end
@@ -576,17 +588,20 @@ windower.register_event('incoming chunk', function(id, data)
         update_macro_data(id,to_update)
     elseif id == 0x0DD then
         local packet = packets.parse('incoming',data)
-        coroutine.yield()
-        local zone=packet['Zone']
         local id = packet['ID']
         if not position_lookup[id] then
             return
         end
-        if zone ~= 0 then
+        if packet['Zone'] ~= 0 then
             if not out_of_zone[id] then
                 zero_dark_party(position_lookup[id],0)
                 out_of_zone:add(id)
                 seeking_information:add(id)
+            end
+            if who_am_i[id] then
+                stat_table[id].name = packet['Name']
+                windower.text.set_text("name"..position_lookup[id],prepare_names(packet['Name']))
+                who_am_i:remove(id)
             end
         elseif is_zoning or seeking_information[packet['ID']] then
                 to_update:clear()
@@ -596,10 +611,8 @@ windower.register_event('incoming chunk', function(id, data)
                 to_update:append('mp')
                 stat_table[id].tp = packet['TP']
                 to_update:append('tp')
-                if math.floor(stat_table[id].hpp/25) ~= math.floor(packet['HP%']/25) then --windower doesn't have to set the color if the boolean is false
-                    local color=choose_color(packet['HP%'])
-                    windower.prim.set_color('phpp'..position_lookup[id],settings.primitives.hp_bar[color].a,settings.primitives.hp_bar[color].r,settings.primitives.hp_bar[color].g,settings.primitives.hp_bar[color].b)
-                end
+                local color=choose_color(packet['HP%'])
+                windower.prim.set_color('phpp'..position_lookup[id],settings.primitives.hp_bar[color].a,settings.primitives.hp_bar[color].r,settings.primitives.hp_bar[color].g,settings.primitives.hp_bar[color].b)
                 stat_table[id].hpp = packet['HP%']
                 to_update:append('hpp')
                 windower.prim.set_size('phpp'..position_lookup[id],150/100*stat_table[id]['hpp'],h)
@@ -609,13 +622,14 @@ windower.register_event('incoming chunk', function(id, data)
                 if who_am_i[id] then
                     stat_table[id].name = packet['Name']
                     windower.text.set_text("name"..position_lookup[id],prepare_names(packet['Name']))
+                    who_am_i:remove(id)
                 end
                 seeking_information:remove(id)
                 out_of_zone:remove(id)
         end
     elseif id == 0x0C8 then
         local packet = packets.parse('incoming', data)
-        coroutine.yield()
+        coroutine.yield() -- Note: Never delete this (?) Something causes the macro to deform without it.
         local packet_id_struc = {
             packet['ID 1'],
             packet['ID 2'],
