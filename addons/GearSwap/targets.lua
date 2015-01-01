@@ -69,7 +69,7 @@ function target_complete(mob_table)
         local j = windower.ffxi.get_party()
         
         for i,v in pairs(j) do
-            if v.mob then
+            if type(v) == 'table' and v.mob then
                 if v.mob.id == mob_table.id then
                     mob_table.isallymember = true
                     if i:sub(1,1) == 'p' then

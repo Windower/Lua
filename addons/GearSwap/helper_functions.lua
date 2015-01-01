@@ -673,14 +673,14 @@ local cmd_reg = {}
 Command_Registry = {}
 
 function Command_Registry.new()
-    local new_instance = {last_removed=os.clock()}
+    local new_instance = {_self={last_removed=os.clock()}}
     local function remove_old_entries (t)
         -- Removes old command registry entries.
         for i,v in pairs(t) do
-            local lim = (v.spell and v.spell.cast_time and v.spell.cast_time*1.1+1 or
+            local lim = (type(v) == 'table' and (v.spell and v.spell.cast_time and v.spell.cast_time*1.1+1 or
                 v.spell and v.spell.prefix=='/pet' and 4 or
                 v.spell and v.spell.action_type and delay_map_to_action_type[v.spell.action_type] or
-                3) + (v.pretarget_cast_delay or 0) + (v.precast_cast_delay or 0)
+                3) + (v.pretarget_cast_delay or 0) + (v.precast_cast_delay or 0))
                 -- Sets it to normal casting time + 10% +1 for anything with a defined cast_time, or 1 if there is no defined cast time.
             if tonumber(i) and os.time()-i >= lim then
                 cmd_reg.delete_entry(t,i)
@@ -690,8 +690,8 @@ function Command_Registry.new()
     end
 
     return setmetatable(new_instance, {__index = function(t, k)
-            if os.clock() - rawget(t,'last_removed') > 0.04 then
-                rawset(t,'last_removed', remove_old_entries(t))
+            if os.clock() - rawget(rawget(t,'_self'),'last_removed') > 0.04 then
+                rawset(rawget(t,'_self'),'last_removed', remove_old_entries(t))
             end
             if rawget(cmd_reg, k) ~= nil then
                 return rawget(cmd_reg,k)
@@ -764,9 +764,9 @@ function cmd_reg:find_by_spell(value)
     -- Actions that do not have timestamps yet (have not hit midcast) are given lowest priority.
     local potential_entries,current_time,winner,ts = {},os.time()
     for i,v in pairs(self) do
-        if v.spell and v.spell.prefix == value.prefix and v.spell.name == value.name then
+        if type(v) == 'table' and v.spell and v.spell.prefix == value.prefix and v.spell.name == value.name then
             potential_entries[i] = v.timestamp or 0
-        elseif v.spell and v.spell.name == 'Double-Up' and value.type == 'CorsairRoll' then
+        elseif type(v) == 'table' and v.spell and v.spell.name == 'Double-Up' and value.type == 'CorsairRoll' then
             -- Double Up ability uses will return action packets that match Corsair Rolls rather than Double Up
             potential_entries[i] = v.timestamp or 0
         end
@@ -797,7 +797,7 @@ function cmd_reg:find_by_time()
     -- Iterate over command_registry looking for the spell with the closest timestamp.
     -- Call aftercast with this spell's information (interrupted) if one is found.
     for i,v in pairs(self) do
-        if not time_stamp or (v.timestamp and ((time_now - v.timestamp) < (time_now - time_stamp))) then
+        if not time_stamp or (type(v) == 'table' and v.timestamp and ((time_now - v.timestamp) < (time_now - time_stamp))) then
             time_stamp = v.timestamp
             ts = i
         end
@@ -1012,7 +1012,11 @@ end
 ---- none
 -----------------------------------------------------------------------------------
 function logit(str)
-    if logging then
+    if debugging.logging then
+        if not logfile and windower.dir_exists('../addons/GearSwap/data/logs') then
+            logfile = io.open('../addons/GearSwap/data/logs/NormalLog'..tostring(os.clock())..'.log','w+')
+            logfile:write('GearSwap LOGGER HEADER\n')
+        end
         logfile:write(str)
         logfile:flush()
     end

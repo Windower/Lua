@@ -63,14 +63,19 @@ function equip_sets(swap_type,ts,...)
     
     logit('\n\n'..tostring(os.clock)..'(15) equip_sets: '..tostring(swap_type))
     if val1 then
-        if val1.english then
+        if type(val1) == 'table' and val1.english then
             logit(' : '..val1.english)
+        else
+            logit(' : Unknown type val1- '..tostring(val1))
         end
     else
         logit(' : nil-or-false')
     end
     if val2 then
-        if val2.type then logit(' : '..val2.type)end
+        if type(val2) == 'table' and val2.type then logit(' : '..val2.type)
+        else
+            logit(' : Unknown type val2- '..tostring(val2))
+        end
     else
         logit(' : nil-or-false')
     end
@@ -264,20 +269,10 @@ function equip_sets_exit(swap_type,ts,val1)
         elseif swap_type == 'aftercast' then
             if ts then
                 command_registry:delete_entry(ts)
---                for i,v in pairs(command_registry) do
---                    if v.midaction then
---                        command_registry[i] = nil
---                    end
---                end
             end
         elseif swap_type == 'pet_aftercast' then
             if ts then
                 command_registry:delete_entry(ts)
---                for i,v in pairs(command_registry) do
---                    if v.pet_midaction then
---                        command_registry[i] = nil
---                    end
---                end
             end
         end
     end

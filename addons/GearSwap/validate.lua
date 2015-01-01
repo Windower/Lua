@@ -154,8 +154,8 @@ function search_bags_for_items_in_set(gear_table, filter, missing_items, stack)
     if missing_items == nil then missing_items = S{} end
     
     for i,v in pairs(gear_table) do
-        local name = v.name or v
-        local aug = v.augments or v.augment
+        local name = (type(v) == 'table' and v.name) or v
+        local aug = (type (v) == 'table' and (v.augments or v.augment))
         
         if type(aug) == 'string' then aug = {aug} end
         if type(name) == 'string' and name ~= 'empty' and name ~= '' and type(i) == 'string'then
@@ -186,8 +186,8 @@ function find_in_sets(item, tab, stack)
     local item_log_name = lowercase_name(get_log_name_by_item_id(item.id))
 
     for _,v in pairs(tab) do
-        local name = v.name or v
-        local aug = v.augments or v.augment
+        local name = (type(v) == 'table' and v.name) or v
+        local aug = (type(v) == 'table' and (v.augments or v.augment))
         if type(aug) == 'string' then aug = {aug} end
         if type(name) == 'string' then
             if compare_item(item, name, aug, item_short_name, item_log_name) then
@@ -220,7 +220,6 @@ function find_in_inv(bag, name, aug)
 end
 
 -- Utility function to compare items that may possibly be augmented.
--- compare_augments is defined in equip_processing.lua.
 function compare_item(item, name, aug, item_short_name, item_log_name)
     if item.id == 0 or not res.items[item.id] then
         return false
@@ -231,7 +230,7 @@ function compare_item(item, name, aug, item_short_name, item_log_name)
     item_log_name = lowercase_name(item_log_name or get_log_name_by_item_id(item.id))
 
     if item_short_name == name or item_log_name == name then
-        if not aug or compare_augments(aug, extdata.decode(item).augments) then
+        if not aug or extdata.compare_augments(aug, extdata.decode(item).augments) then
             return true
         end
     end

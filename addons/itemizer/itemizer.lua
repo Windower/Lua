@@ -1,6 +1,6 @@
 _addon.name = 'Itemizer'
 _addon.author = 'Ihina'
-_addon.version = '2.0.1.0'
+_addon.version = '3.0.0.0'
 _addon.command = 'itemizer'
 
 require('luau')
@@ -12,38 +12,111 @@ defaults.Delay = 0.5
 
 settings = config.load(defaults)
 
-windower.register_event('unhandled command', function(command, ...) 
-	local param = L{...}
+bag_ids = res.bags:key_map(string.lower .. table.get-{'english'} .. table.get+{res.bags}):map(table.get-{'id'})
 
-	if command == 'get' or command == 'put' then
-		local bag = param:remove(#param)
-		local item_name = param:concat(' ')
-		local search = command == 'get' and bag or 'inventory'
+find_items = function(ids, bag, limit)
+    local res = S{}
+    local found = 0
 
-		local item_ids = res.items:name(windower.wc_match-{item_name})
-		if item_ids:length() == 0 then
-			item_ids = res.items:name_log(windower.wc_match-{item_name})
-			if item_ids:length() == 0 then
-				error('Unknown item: %s':format(item_name))
-				return
-			end
-		end
+    for bag_index, bag_name in bag_ids:filter(table.get-{'enabled'} .. windower.ffxi.get_bag_info):it() do
+        if not bag or bag_index == bag then
+            for _, item in ipairs(windower.ffxi.get_items(bag_index)) do
+                if ids:contains(item.id) then
+                    local count = limit and math.min(limit, item.count) or item.count
+                    found = found + count
 
-		local bag_id = res.bags:with('english', string.imatch-{bag}).id
-		if not bag_id then
-			error('Unknown bag: %s':format(bag))
-			return
-		end
+                    res:add({
+                        bag = bag_index,
+                        slot = item.slot,
+                        count = count,
+                    })
 
-		for slot, item in pairs(windower.ffxi.get_items()[search]) do 
-			if item_ids[item.id] then 
-				windower.ffxi[command .. '_item'](bag_id, slot)
-				return
-			end 
-		end
+                    if limit then
+                        limit = limit - count
 
-		log('Item "%s" not found in %s':format(item_name, command == 'get' and bag or 'inventory'))
-	end	
+                        if limit == 0 then
+                            return res, found
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    return res, found
+end
+
+windower.register_event('unhandled command', function(command, ...)
+    local args = L{...}:map(string.lower)
+
+    if command == 'get' or command == 'put' or command == 'gets' or command == 'puts' then
+        local count
+        if command == 'gets' or command == 'puts' then
+            command = command:sub(1, -2)
+        else
+            local last = args[#args]
+            if last == 'all' then
+                args:remove()
+            elseif tonumber(last) then
+                count = tonumber(last)
+                args:remove()
+            else
+                count = 1
+            end
+        end
+
+        local bag = args[#args]
+        local specified_bag = rawget(bag_ids, bag)
+        if specified_bag then
+            if not windower.ffxi.get_bag_info(specified_bag).enabled then
+                error('%s currently not enabled':format(res.bags[source_bag].name))
+                return
+            end
+
+            args:remove()
+        elseif command == 'put' and not specified_bag then
+            error('Specify a valid destination bag to put items in.')
+            return
+        end
+
+        local source_bag
+        local destination_bag
+        if command == 'get' then
+            source_bag = specified_bag
+            destination_bag = bag_ids.inventory
+        else
+            destination_bag = specified_bag
+            source_bag = bag_ids.inventory
+        end
+        
+        local destination_bag_info = windower.ffxi.get_bag_info(destination_bag)
+        if destination_bag_info.max - destination_bag_info.count == 0 then
+            error('Not enough space in %s to move items.':format(res.bags[destination_bag].name))
+            return
+        end
+
+        local item_name = args:concat(' ')
+ 
+        local item_ids = (S(res.items:name(windower.wc_match-{item_name})) + S(res.items:name_log(windower.wc_match-{item_name}))):map(table.get-{'id'})
+        if item_ids:length() == 0 then
+            error('Unknown item: %s':format(item_name))
+            return
+        end
+
+        local matches, results = find_items(item_ids, source_bag, count)
+        if results == 0 then
+            error('Item "%s" not found in %s.':format(item_name, source_bag and res.bags[source_bag].name or 'any accessible bags'))
+            return
+        end
+
+        if count and results < count then
+            warning('Only %u "%s" found in %s.':format(results, item_name, source_bag and res.bags[source_bag].name or 'all accessible bags'))
+        end
+
+        for match in matches:it() do
+            windower.ffxi[command .. '_item'](command == 'get' and match.bag or destination_bag, match.slot, match.count)
+        end
+    end	
 end)
 
 ninjutsu = res.spells:type('Ninjutsu')
@@ -89,25 +162,14 @@ gen_tools = T{
     Kakka       = 2972,
 }
 
-bag_names = {}
-bag_names.all = T(res.bags:map(string.lower .. table.get-{'english'}))
-bag_names.all.inventory = nil
-bag_names.all.safe = nil
-bag_names.all.storage = nil
-bag_names.all.locker = nil
-
-bag_names.nomad = T(res.bags:map(string.lower .. table.get-{'english'}))
-bag_names.nomad.inventory = nil
-
 active = S{}
 
 -- Returning true resends the command in settings.Delay seconds
 -- Returning false doesn't resend the command and executes it
-function use_item(id, count, items)
-    count = count or 1
-    items = items or windower.ffxi.get_items()
+collect_item = function(id, items)
+    items = items or {inventory = windower.ffxi.get_items(bag_ids.inventory)}
 
-    local item = table.with(items.inventory, 'id', id)
+    local item = T(inventory):with('id', id)
     if item and item.count >= count then
         active = active:remove(id)
         return false
@@ -119,92 +181,91 @@ function use_item(id, count, items)
     end
 
     -- Check for all items
-    for bag_name, bag_index in bag_names.all:it() do
-        local item = table.with(items[bag_name], 'id', id)
-        if item and item.count >= count then
-            -- Move it to the inventory
-            windower.ffxi.get_item(bag_index, item.slot, count)
+    local match = find_items(S{id}, nil, 1):it()()
 
-            -- Add currently processing ID to set of active IDs
-            active:add(id)
+    if match then
+        windower.ffxi.get_item(match.bag, match.slot, match.count)
 
-            -- Delay the action
-            return true
-        end
+        -- Add currently processing ID to set of active IDs
+        active:add(id)
+    else
+        error('Item "%s" not found in any accessible bags':format(res.items[id].name))
     end
 
-    return false
+    return match ~= nil
 end
 
-function reschedule(text, ids, count, items)
-    items = items or windower.ffxi.get_items()
+reschedule = function(text, ids, items)
+    items = items or {inventory = windower.ffxi.get_items(bag_ids.inventory)}
 
     -- Inventory full?
-    if items.max_inventory - table.count(items.inventory, function(item) return item.id > 0 end) == 0 then
+    if items.max_inventory - items.count_inventory == 0 then
         return false
     end
 
     for id in L(ids):it() do
-        if use_item(id, count, items) then
-            windower.send_command('wait %f; input %s':format(settings.Delay, text))
+        if collect_item(id, items) then
+            windower.send_command:prepare('input %s':format(text)):schedule(settings.Delay)
             return true
         end
     end
 end
 
-item_names = T{}
-windower.register_event('outgoing text', function(text)
-    -- Ninjutsu
-    if settings.AutoNinjaTools and (text:startswith('/ma ') or text:startswith('/nin ') or text:startswith('/magic ') or text:startswith('/ninjutsu ')) then
-        local name
-        for pattern in patterns:it() do
-            local match = text:match(pattern)
-            if match then
-                if ninjutsu:with('name', string.imatch-{match}) then
-                    name = match:lower():capitalize():match('%w+')
-                    break
+windower.register_event('outgoing text', function()
+    local item_names = T{}
+
+    return function(text)
+        -- Ninjutsu
+        if settings.AutoNinjaTools and (text:startswith('/ma ') or text:startswith('/nin ') or text:startswith('/magic ') or text:startswith('/ninjutsu ')) then
+            local name
+            for pattern in patterns:it() do
+                local match = text:match(pattern)
+                if match then
+                    if ninjutsu:with('name', string.imatch-{match}) then
+                        name = match:lower():capitalize():match('%w+')
+                        break
+                    end
                 end
             end
-        end
 
-        if name then
-            return reschedule(text, {spec_tools[name], (windower.ffxi.get_player().main_job == 'NIN' and gen_tools[name])})
-        end
+            if name then
+                return reschedule(text, {spec_tools[name], (windower.ffxi.get_player().main_job == 'NIN' and gen_tools[name])})
+            end
 
-    -- Item usage
-    elseif settings.AutoItems and text:startswith('/item ') then
-        local items = windower.ffxi.get_items()
-        local inventory_items = S{}
-        local wardrobe_items = S{}
-        for bag in bag_names.all:it() do
-            for _, item in ipairs(items[bag]) do
-                if item.id > 0 and not item_names[item.id] then
-                    item_names[item.id] = res.items[item.id].name
-                end
+        -- Item usage
+        elseif settings.AutoItems and text:startswith('/item ') then
+            local items = windower.ffxi.get_items()
+            local inventory_items = S{}
+            local wardrobe_items = S{}
+            for bag in bag_ids:keyset():it() do
+                for _, item in ipairs(items[bag]) do
+                    if item.id > 0 and not item_names[item.id] then
+                        item_names[item.id] = res.items[item.id].name
+                    end
 
-                if bag == 'inventory' then
-                    inventory_items:add(item.id)
-                elseif bag == 'wardrobe' then
-                    wardrobe_items:add(item.id)
+                    if bag == 'inventory' then
+                        inventory_items:add(item.id)
+                    elseif bag == 'wardrobe' then
+                        wardrobe_items:add(item.id)
+                    end
                 end
             end
-        end
 
-        local item_count = text:match('%d+$')
-        local parsed_text = item_count and text:match(' (.+) (%d+)$') or text:match(' (.+)')
-        local mid_name = parsed_text:match('"(.+)"') or parsed_text:match('\'(.+)\'') or parsed_text:match('(.+) ')
-        local full_name = parsed_text:match('(.+)')
-        local id = item_names:find(string.imatch-{mid_name}) or item_names:find(string.imatch-{full_name})
-        if id then
-            if not inventory_items:contains(id) and not wardrobe_items:contains(id) then
-                return reschedule(text, {id}, item_count and item_count:number() or 1, items)
-            else
-                active:remove(id)
+            local parsed_text = item_count and text:match(' (.+) (%d+)$') or text:match(' (.+)')
+            local mid_name = parsed_text:match('"(.+)"') or parsed_text:match('\'(.+)\'') or parsed_text:match('(.+) ')
+            local full_name = parsed_text:match('(.+)')
+            local id = item_names:find(string.imatch-{mid_name}) or item_names:find(string.imatch-{full_name})
+            if id then
+                if not inventory_items:contains(id) and not wardrobe_items:contains(id) then
+                    return reschedule(text, {id}, items)
+                else
+                    active:remove(id)
+                end
             end
-        end
 
+        end
     end
-end)
+end())
 
 --[[
 Copyright © 2013-2014, Ihina
@@ -234,4 +295,3 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 --Original plugin by Aureus
---and thank Arcon for practically writing half this code
