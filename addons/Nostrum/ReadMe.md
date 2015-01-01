@@ -28,7 +28,6 @@ Region | Action
 Status Removal Icons | Saves the corresponding spell to the right-click button
 Buff Icons | Saves the corresponding spell to the right-click button
 Party Lists | Casts the saved spell on the corresponding party member
-Cure Palette | Prints the saved spell to the chat log.
 
 ### Commands
 
