@@ -38,7 +38,7 @@ unbridled_learning_set = {['Thunderbolt']=true,['Harden Shell']=true,['Absolute 
     
 not_a_spell = S{
     'Stratagems', 'Blood Pact: Rage', 'Sambas', 'Waltzes', 'Steps', 'Flourishes I', 'Flourishes II', 'Blood Pact: Ward',
-    'Phantom Roll', 'Rune Enchantment', 'Maneuver', 'Jigs',
+    'Phantom Roll', 'Rune Enchantment', 'Jigs',
 }
 is_icon = {}
 is_icon.W = true
