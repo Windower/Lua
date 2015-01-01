@@ -168,16 +168,16 @@ function build_macro()
     for j=party[1].n,1,-1 do
         local s = tostring(position_lookup[party[1][j]])
         prim_simple("phpp" .. s,settings.primitives.hp_bar,x_start-151,y_start,150/100*stat_table[party[1][j]].hpp,h)
-        local color = choose_color(stat_table[party[1][j]].hpp)
-        windower.prim.set_color("phpp".. s,settings.primitives.hp_bar[color].a,settings.primitives.hp_bar[color].r,settings.primitives.hp_bar[color].g,settings.primitives.hp_bar[color].b)
+        local color = settings.primitives.hp_bar[choose_color(stat_table[party[1][j]].hpp)]
+        windower.prim.set_color("phpp".. s,color.a,color.r,color.g,color.b)
         prim_simple("pmpp" .. s,settings.primitives.mp_bar,x_start-151,y_start+19,150/100*stat_table[party[1][j]].mpp,5)
         text_simple("tp" .. s, settings.text.tp, x_start-151, y_start+11, stat_table[party[1][j]].tp)
         text_simple("name" .. s, settings.text.name, x_start-151, y_start-3, prepare_names(stat_table[party[1][j]].name))
         text_simple("hpp" .. s, settings.text.hpp, x_start, y_start-4, stat_table[party[1][j]].hpp)
         text_simple("hp" .. s, settings.text.hp, x_start-40, y_start-3, stat_table[party[1][j]].hp)
         text_simple("mp" .. s, settings.text.mp, x_start-40, y_start+11, stat_table[party[1][j]].mp)
-        prims_by_layer[position_lookup[party[1][j]]]:extend({"phpp" .. s,"pmpp" .. s})
-        texts_by_layer[position_lookup[party[1][j]]]:extend({"tp" .. s,"name" .. s,"hpp" .. s,"hp" .. s,"mp" .. s})
+        prims_by_layer[position_lookup[party[1][j]]]:extend(L{"phpp" .. s,"pmpp" .. s})
+        texts_by_layer[position_lookup[party[1][j]]]:extend(L{"tp" .. s,"name" .. s,"hpp" .. s,"hp" .. s,"mp" .. s})
         block_num=12
 
         for i=6,1,-1 do
@@ -215,8 +215,8 @@ function build_macro()
     windower.text.set_font_size("target_name11", 13)
     prim_simple("target",settings.primitives.hp_bar,x_start-151,prim_coordinates.y['info1']-50,150,30)
     text_simple("targethpp",settings.text.tp,  x_start-151, prim_coordinates.y['info1']-34, '0')
-    local color = choose_color(100)
-    windower.prim.set_color("target",settings.primitives.hp_bar[color].a,settings.primitives.hp_bar[color].r,settings.primitives.hp_bar[color].g,settings.primitives.hp_bar[color].b)
+    local color = settings.primitives.hp_bar[choose_color(100)]
+    windower.prim.set_color("target",color.a,color.r,color.g,color.b)
     misc_hold_for_up.prims:append("target_background")
     misc_hold_for_up.prims:append("target")
     misc_hold_for_up.texts:append("target_name")
@@ -288,16 +288,16 @@ function build_macro()
             local n = 6*k+1-j
             local s = tostring(n)
             prim_simple("phpp" .. s,settings.primitives.hp_bar,x_start-151,y_start,150/100*stat_table[party[k][j]].hpp,h)
-            local color = choose_color(stat_table[party[k][j]].hpp)
-            windower.prim.set_color("phpp" .. n,settings.primitives.hp_bar[color].a,settings.primitives.hp_bar[color].r,settings.primitives.hp_bar[color].g,settings.primitives.hp_bar[color].b)
+            local color = settings.primitives.hp_bar[choose_color(stat_table[party[k][j]].hpp)]
+            windower.prim.set_color("phpp" .. n,color.a,color.r,color.g,color.b)
             prim_simple("pmpp" .. s,settings.primitives.mp_bar,x_start-151,y_start+19,150/100*stat_table[party[k][j]].mpp,5)
             text_simple("tp" .. s, settings.text.tp, x_start-151, y_start+11,stat_table[party[k][j]].tp)
             text_simple("name" .. s, settings.text.name, x_start-151, y_start-3, prepare_names(stat_table[party[k][j]].name))
             text_simple("hpp" .. s, settings.text.hpp, x_start, y_start-4, stat_table[party[k][j]].hpp)
             text_simple("hp" .. s, settings.text.hp, x_start-40, y_start-3, stat_table[party[k][j]].hp)
             text_simple("mp" .. s, settings.text.mp, x_start-40, y_start+11,stat_table[party[k][j]].mp)
-            prims_by_layer[position_lookup[party[k][j]]]:extend({"phpp" .. s,"pmpp" .. s})
-            texts_by_layer[position_lookup[party[k][j]]]:extend({"tp" .. s,"name" .. s,"hpp" .. s,"hp" .. s,"mp" .. s})
+            prims_by_layer[position_lookup[party[k][j]]]:extend(L{"phpp" .. s,"pmpp" .. s})
+            texts_by_layer[position_lookup[party[k][j]]]:extend(L{"tp" .. s,"name" .. s,"hpp" .. s,"hp" .. s,"mp" .. s})
 
             block_num=7
 
@@ -382,10 +382,10 @@ windower.register_event('addon command', function(...)
     elseif args[1]:lower() == 'send' or args[1]:lower() == 's' then
         if args[2] then 
             send_string = 'send ' .. tostring(args[2]) .. ' '
-            log('Commands will be sent to: ' .. args[2])
+            print('Commands will be sent to: ' .. args[2])
         else
             send_string = ''
-            log('Input contained no name. Send disabled.')
+            print('Input contained no name. Send disabled.')
         end
     end
 end)
@@ -437,7 +437,6 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
                 end
             end
         end
-        
     elseif type == 1 then
         for i=1,regions do
             if y>b[i] and y<t[i] then
@@ -506,12 +505,12 @@ windower.register_event('outgoing chunk', function(id,data)
     elseif id == 0x00D then
         is_zoning = true
         if not is_hidden then
-            for key in pairs(nos_saved_prims) do
+            for key in pairs(saved_prims) do
                 if prim_coordinates.visible[key] then
                     windower.prim.set_visibility(key,false)
                 end
             end
-            for key in pairs(nos_saved_texts) do
+            for key in pairs(saved_texts) do
                 if text_coordinates.visible[key] then
                     windower.text.set_visibility(key,false)
                 end
@@ -519,10 +518,10 @@ windower.register_event('outgoing chunk', function(id,data)
         end
     elseif id == 0x00C then
         if not is_hidden then
-            for key in pairs(nos_saved_prims - (macro[1] + macro[2] + macro[3])) do
+            for key in pairs(saved_prims - (macro[1] + macro[2] + macro[3])) do
                 windower.prim.set_visibility(key,prim_coordinates.visible[key])
             end
-            for key in pairs(nos_saved_texts - (macro[1] + macro[2] + macro[3])) do
+            for key in pairs(saved_texts - (macro[1] + macro[2] + macro[3])) do
                 windower.text.set_visibility(key,text_coordinates.visible[key])
             end
         end
@@ -539,8 +538,8 @@ windower.register_event('incoming chunk', function(id, data)
             local hpp = packet['HP %']
             if last_hpp ~= hpp and hpp~=0 then windower.prim.set_size("target",150/100*hpp,30) end
                 if hpp~=0 and math.floor(hpp/25) ~= math.floor(last_hpp/25) then
-                    local color=choose_color(hpp)
-                    windower.prim.set_color("target",settings.primitives.hp_bar[color].a,settings.primitives.hp_bar[color].r,settings.primitives.hp_bar[color].g,settings.primitives.hp_bar[color].b)
+                    local color = settings.primitives.hp_bar[choose_color(hpp)]
+                    windower.prim.set_color("target",color.a,color.r,color.g,color.b)
                 end
         end
     elseif id == 0x0DF then
@@ -562,8 +561,8 @@ windower.register_event('incoming chunk', function(id, data)
         end
         if stat_table[id].hpp ~= packet['HPP'] then
             if math.floor(stat_table[id].hpp/25) ~= math.floor(packet['HPP']/25) then
-                local color=choose_color(packet['HPP'])
-                windower.prim.set_color('phpp'..position_lookup[id],settings.primitives.hp_bar[color].a,settings.primitives.hp_bar[color].r,settings.primitives.hp_bar[color].g,settings.primitives.hp_bar[color].b)
+                local color=settings.primitives.hp_bar[choose_color(packet['HPP'])]
+                windower.prim.set_color('phpp'..position_lookup[id],color.a,color.r,color.g,color.b)
             end
             stat_table[id].hpp = packet['HPP']
             to_update:append('hpp')
@@ -583,7 +582,7 @@ windower.register_event('incoming chunk', function(id, data)
         end
         if packet['Zone'] ~= 0 then
             if not out_of_zone[id] then
-                zero_dark_party(position_lookup[id],0)
+                remove_macro_information(position_lookup[id],0)
                 out_of_zone:add(id)
                 seeking_information:add(id)
             end
@@ -600,8 +599,8 @@ windower.register_event('incoming chunk', function(id, data)
                 to_update:append('mp')
                 stat_table[id].tp = packet['TP']
                 to_update:append('tp')
-                local color=choose_color(packet['HP%'])
-                windower.prim.set_color('phpp'..position_lookup[id],settings.primitives.hp_bar[color].a,settings.primitives.hp_bar[color].r,settings.primitives.hp_bar[color].g,settings.primitives.hp_bar[color].b)
+                local color=settings.primitives.hp_bar[choose_color(packet['HP%'])]
+                windower.prim.set_color('phpp'..position_lookup[id],color.a,color.r,color.g,color.b)
                 stat_table[id].hpp = packet['HP%']
                 to_update:append('hpp')
                 windower.prim.set_size('phpp'..position_lookup[id],150/100*stat_table[id]['hpp'],h)
