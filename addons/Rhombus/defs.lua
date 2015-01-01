@@ -35,7 +35,11 @@ unbridled_learning_set = {['Thunderbolt']=true,['Harden Shell']=true,['Absolute 
     ['Gates of Hades']=true,['Tourbillion']=true,['Pyric Bulwark']=true,['Bilgestorm']=true,
     ['Bloodrake']=true,['Droning Whirlwind']=true,['Carcharian Verve']=true,['Blistering Roar']=true,
     ['Uproot']=true,['Crashing Thunder']=true,['Polar Roar']=true}
-
+    
+not_a_spell = S{
+    'Stratagems', 'Blood Pact: Rage', 'Sambas', 'Waltzes', 'Steps', 'Flourishes I', 'Flourishes II', 'Blood Pact: Ward',
+    'Phantom Roll', 'Rune Enchantment', 'Maneuver', 'Jigs',
+}
 is_icon = {}
 is_icon.W = true
 is_icon.R = false

@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
 _addon.name = 'Rhombus'
 _addon.author = 'trv'
-_addon.version = '1.0.0'
+_addon.version = '1.0.1'
 
 config = require('config')
 texts = require('texts')
@@ -191,7 +191,11 @@ function menu_general_layout(t,t2,n)
                     last_menu_open = current_menu
                     last_menu_open.type = n
                     for i = 1,menu_layer_record.n do
-                        current_menu = current_menu[menu_layer_record[i]]
+                        if current_menu[menu_layer_record[i]] then
+                            current_menu = current_menu[menu_layer_record[i]]
+                        else
+                            break
+                        end
                     end
                     build_a_menu(current_menu)
                 else
@@ -219,7 +223,11 @@ function menu_general_layout(t,t2,n)
                 last_menu_open = current_menu
                 last_menu_open.type = n
                 for i = 1,menu_layer_record.n do
-                    current_menu = current_menu[menu_layer_record[i]]
+                    if current_menu[menu_layer_record[i]] then
+                        current_menu = current_menu[menu_layer_record[i]]
+                    else
+                        break
+                    end
                 end
                 build_a_menu(current_menu)
             else
@@ -559,9 +567,13 @@ mouse_func = {
                         last_menu_open = current_menu
                         last_menu_open.type = 1
                         for i = 1,menu_layer_record.n do
-                            current_menu = current_menu[menu_layer_record[i]]
+                            if current_menu[menu_layer_record[i]] then
+                                current_menu = current_menu[menu_layer_record[i]]
+                        else
+                                break
+                            end
                         end
-                        build_a_menu(current_menu)
+                        build_a_menu(current_menu) -- changes
                     else
                         current_menu = {}
                     end
@@ -580,15 +592,26 @@ mouse_func = {
             end
           end,
     [2] = function()
-        menu_general_layout(windower.ffxi.get_abilities().weapon_skills,ws_template,2)
+        menu_general_layout(remove_categories(windower.ffxi.get_abilities().weapon_skills),ws_template,2)
     end,
     [3] = function()
-        menu_general_layout(windower.ffxi.get_abilities().job_abilities,ja_template,3)
+        menu_general_layout(remove_categories(windower.ffxi.get_abilities().job_abilities),ja_template,3)
     end,
     [4] = function()
-        menu_general_layout(windower.ffxi.get_abilities().pet_commands,pet_command_template,4)
+        menu_general_layout(remove_categories(windower.ffxi.get_abilities().pet_commands),pet_command_template,4)
     end,
 }
+
+function remove_categories(t)
+    local u = {}
+    for i = 1,#t do
+        --log(t[i],not_a_spell:contains(t[i]))
+        if not not_a_spell:contains(res.job_abilities[t[i]].en) then
+            u[#u + 1] = t[i]
+        end
+    end
+    return u
+end
 
 function build_a_menu(t)
     menu_start = 1
