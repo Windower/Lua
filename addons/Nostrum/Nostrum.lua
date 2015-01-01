@@ -164,6 +164,7 @@ function build_macro()
     prim_simple("BG1",settings.primitives.background,x_start-(_cures+_curagas)*(w+1)-153,y_start-party[1].n*(h+1)+h,(_cures+_curagas)*(w+1)+1,party[1].n*(h+1)+1)
     prim_simple("info1",settings.primitives.hp_bar_background,x_start-152,y_start-party[1].n*(h+1)+h,152,party[1].n*(h+1)+1)
     macro[1]:add('BG1')
+    local block_num
     for j=party[1].n,1,-1 do
         local s = tostring(position_lookup[party[1][j]])
         prim_simple("phpp" .. s,settings.primitives.hp_bar,x_start-151,y_start,150/100*stat_table[party[1][j]].hpp,h)
@@ -204,7 +205,7 @@ function build_macro()
                 macro[1]:add(s)
             end
         end
-
+        
     y_start=y_start-(h+1)
 
     end
@@ -295,19 +296,19 @@ function build_macro()
             text_simple("hpp" .. s, settings.text.hpp, x_start, y_start-4, stat_table[party[k][j]].hpp)
             text_simple("hp" .. s, settings.text.hp, x_start-40, y_start-3, stat_table[party[k][j]].hp)
             text_simple("mp" .. s, settings.text.mp, x_start-40, y_start+11,stat_table[party[k][j]].mp)
-            prims_by_layer[position_lookup[party[2][j]]]:extend({"phpp" .. s,"pmpp" .. s})
-            texts_by_layer[position_lookup[party[2][j]]]:extend({"tp" .. s,"name" .. s,"hpp" .. s,"hp" .. s,"mp" .. s})
+            prims_by_layer[position_lookup[party[k][j]]]:extend({"phpp" .. s,"pmpp" .. s})
+            texts_by_layer[position_lookup[party[k][j]]]:extend({"tp" .. s,"name" .. s,"hpp" .. s,"hp" .. s,"mp" .. s})
 
-            block_num=12
+            block_num=7
 
-            for i=11,1,-1 do
+            for i=6,1,-1 do
                 if _settings[options.cures[i]] then 
                     local s = options.cures[i] .. s
                     block_num=block_num-1
-                    prim_simple('p' .. s,settings.primitives.buttons,x_start-(12-block_num)*(w+1)+1-153,y_start,w,h)
-                    text_simple(s, settings.text.buttons, x_start-(12-block_num)*(w+1)+1+((w-font_widths[options.aliases[options.cures[i]]])/2)-153, y_start, options.aliases[options.cures[i]])
-                    prims_by_layer[position_lookup[party[2][j]]]:append('p' .. s)
-                    texts_by_layer[position_lookup[party[2][j]]]:append(s)
+                    prim_simple('p' .. s,settings.primitives.buttons,x_start-(7-block_num)*(w+1)+1-153,y_start,w,h)
+                    text_simple(s, settings.text.buttons, x_start-(7-block_num)*(w+1)+1+((w-font_widths[options.aliases[options.cures[i]]])/2)-153, y_start, options.aliases[options.cures[i]])
+                    prims_by_layer[position_lookup[party[k][j]]]:append('p' .. s)
+                    texts_by_layer[position_lookup[party[k][j]]]:append(s)
                     macro[k]:add('p' .. s)
                     macro[k]:add(s)
                 end
@@ -326,12 +327,12 @@ windower.register_event('load', 'login', function()
 
     regions = 0
     alliance_keys = {'p5', 'p4', 'p3', 'p2', 'p1', 'p0', 'a15', 'a14', 'a13', 'a12', 'a11', 'a10', 'a25', 'a24', 'a23', 'a22', 'a21', 'a20'}
-    party_from_memory = windower.ffxi.get_party()
+    local party_from_memory = windower.ffxi.get_party()
     player_id = windower.ffxi.get_player().id
-    alliance = {}
+    local alliance = {}
     position_lookup = {}
     stat_table = {}
-    party = {[1]=L{},[2]=L{},[3]=L{}}
+    party = {L{},L{},L{}}
 
     coroutine.sleep(2)
 
@@ -350,22 +351,10 @@ windower.register_event('load', 'login', function()
             }
         end
     end
-
-    for i=6,1,-1 do
+    
+    for i=18,1,-1 do
         if alliance[i] then
-            party[1]:append(alliance[i])
-        end
-    end
-
-    for i=12,7,-1 do
-        if alliance[i] then
-            party[2]:append(alliance[i])
-        end
-    end
-
-    for i=18,13,-1 do
-        if alliance[i] then
-            party[3]:append(alliance[i])
+            party[math.ceil(i/6,1)]:append(alliance[i])
         end
     end
     build_macro()
@@ -672,13 +661,13 @@ windower.register_event('incoming chunk', function(id, data)
         }
         for i = 1,18 do
             if packet_id_struc[i]~=0 then
-                if bit_check(packet_flag_struc[i],7) then
-                    if bit_check(packet_flag_struc[i],8) then
+                if bit.band(packet_flag_struc[i],2) == 2 then
+                    if bit.band(packet_flag_struc[i],1) == 1 then
                         packet_pt_struc[3]:add(packet_id_struc[i])
                     else
                         packet_pt_struc[1]:add(packet_id_struc[i])
                     end
-                elseif bit_check(packet_flag_struc[i],8) then
+                elseif bit.band(packet_flag_struc[i],1) == 1 then
                     packet_pt_struc[2]:add(packet_id_struc[i])
                 else
                     packet_pt_struc[1]:add(packet_id_struc[i])

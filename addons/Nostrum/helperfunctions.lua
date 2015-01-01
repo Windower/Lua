@@ -316,16 +316,6 @@ function new_members() -- snippet from invite, reused in c_a_t_m
     define_active_regions()
 end
 
------------------------------------------------bit32--------------------------------------------------
---return true if the nth bit of dec, in binary form, is 1.
-function bit_check(dec,n)
-    local p
-    for i = 1,n do
-        p=dec
-        dec=dec%(256/(2^i))
-    end
-    return(dec~=p)
-end
 ---------------------------------------------invite---------------------------------------------------
 function invite(id,n)
     party[n]:append(id)
@@ -338,7 +328,7 @@ function invite(id,n)
         if n==1 then
             windower.prim.set_size('info1',152,party[1].n*(h+1)+1)
             windower.prim.set_size("BG1",(_cures+_curagas)*(w+1)+1,party[1].n*(h+1)+1)
-            block_num=12
+            local block_num=12
             for i=6,1,-1 do
                 if _settings[options.cures[i]] then 
                     local s = options.cures[i] .. tostring(position_lookup[id])
@@ -392,13 +382,13 @@ function invite(id,n)
                 windower.prim.set_size('info'..n,152,party[n].n*(h+1)+1)
                 windower.prim.set_size('BG'..n,(_cures)*(w+1)+1,party[n].n*(h+1)+1)
             end
-            block_num=12
-            for i=11,1,-1 do
+            local block_num=7
+            for i=6,1,-1 do
                 if _settings[options.cures[i]] then 
                     local s = options.cures[i] .. tostring(position_lookup[id])
                     block_num=block_num-1
-                    prim_simple('p' .. s,settings.primitives.buttons,x_start-(12-block_num)*(w+1)+1-153,prim_coordinates.y['BG'..n]+1+(h+1)*(party[n].n-1),w,h)
-                    text_simple(s, settings.text.buttons, x_start-(12-block_num)*(w+1)+1+((w-font_widths[options.aliases[options.cures[i]]])/2)-153, prim_coordinates.y['BG'..n]+1+(h+1)*(party[n].n-1), options.aliases[options.cures[i]])
+                    prim_simple('p' .. s,settings.primitives.buttons,x_start-(7-block_num)*(w+1)+1-153,prim_coordinates.y['BG'..n]+1+(h+1)*(party[n].n-1),w,h)
+                    text_simple(s, settings.text.buttons, x_start-(7-block_num)*(w+1)+1+((w-font_widths[options.aliases[options.cures[i]]])/2)-153, prim_coordinates.y['BG'..n]+1+(h+1)*(party[n].n-1), options.aliases[options.cures[i]])
                     prims_by_layer[position_lookup[id]]:append('p' .. s)
                     texts_by_layer[position_lookup[id]]:append(s)
                     macro[n]:add('p' .. s)
