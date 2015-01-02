@@ -254,167 +254,66 @@ options.images={
 settings={
     text={
         buttons={
-            color={a=255,r=255,g=255,b=255},
             bold=true,
             font="Times",
+            visible=true,
             font_size=15,
             position={x=0,y=0},
-            visible=true,
             right_justified=false
         },
         name={
-            color={a=255,r=255,g=255,b=255},
             bold=true,
             font="Consolas",
             font_size=10,
             position={x=0,y=0},
-            visible=true,
             right_justified=false
         },
         tp={
-            color={a=255,r=255,g=255,b=255},
             bold=true,
             font="Consolas",
             font_size=10,
             position={x=0,y=0},
-            visible=true,
             right_justified=false
         },
         hp={
-            color={a=255,r=255,g=255,b=255},
             bold=true,
             font="Consolas",
             font_size=10,
-            visible=true,
             right_justified=true
         },
         mp={
-            color={a=255,r=255,g=255,b=255},
             bold=true,
             font="Consolas",
             font_size=10,
-            visible=true,
             right_justified=true    
         },
         hpp={
-            color={a=255,r=255,g=255,b=255},
             bold=true,
             font="Times",
             font_size=20,
-            visible=true,
             right_justified=true
         },
         na={
-            color={a=255,r=255,g=255,b=255},
             bold=true,
             font="Times",
             font_size=10,
-            visible=false,
             right_justified=false
         },
         buffs={
-            color={a=255,r=255,g=255,b=255},
             bold=true,
             font="Times",
             font_size=9,
-            visible=false,
             right_justified=false,
         },
     },
     primitives={
-        buttons={
-            color={a=66, r=255, g=255, b=255},
-            visible=true
-        },
-        highlight={
-            color={a=100, r=255, g=255, b=255},
-        },
-        curaga_buttons={
-            color={a=35, r=255, g=213, b=0},
-            visible=true
-        },
-        background={
-            color={a=150, r=0, g=0, b=0},
-            visible=true
-        },
         hp_bar={
             color={a=176, r=176, g=176, b=176},
-            green={a=176, r=1, g=67, b=14},
-            yellow={a=176, r=184,g=191,b=0},
-            orange={a=176, r=249, g=125, b=1},
-            red={a=176, r=141, g=1, b=1},
-            visible=true
-        },
-        mp_bar={
-            color={a=100, r=149, g=212, b=243},
-            visible=true
-        },
-        hp_bar_background={
-            color={a=155, r=0, g=0, b=0},
-            visible=true
-        },
-        na_buttons={
-            color={a=66, r=255, g=255, b=255},
-            visible=true
-        },
-        buff_buttons={
-            color={a=66, r=255, g=255, b=255},
             visible=true
         },
     },
     window={
         x_res=windower.get_windower_settings().x_res,
         y_res=windower.get_windower_settings().y_res,
-    },
-    profiles={
-        default={
-            ["Cure"]=true,
-            ["CureII"]=true,
-            ["CureIII"]=true,
-            ["CureIV"]=true,
-            ["CureV"]=true,
-            ["CureVI"]=true,
-            ["Curaga"]=true,
-            ["CuragaII"]=true,
-            ["CuragaIII"]=true,
-            ["CuragaIV"]=true,
-            ["CuragaV"]=true,
-            ["Sacrifice"]=true,
-            ["Erase"]=true,
-            ["Paralyna"]=true,
-            ["Silena"]=true,
-            ["Blindna"]=true,
-            ["Poisona"]=true,
-            ["Viruna"]=true,
-            ["Stona"]=true,
-            ["Cursna"]=true,
-            ["Haste"]=true,
-            ["HasteII"]=false,
-            ["Flurry"]=false,
-            ["FlurryII"]=false,
-            ["Protect"]=false,
-            ["Shell"]=false,
-            ["ProtectII"]=false,
-            ["ShellII"]=false,
-            ["ProtectIII"]=false,
-            ["ShellIII"]=false,
-            ["ProtectIV"]=false,
-            ["ShellIV"]=false,
-            ["ProtectV"]=true,
-            ["ShellV"]=true,
-            ["Refresh"]=false,
-            ["RefreshII"]=false,
-            ["Regen"]=false,
-            ["RegenII"]=false,
-            ["RegenIII"]=false,
-            ["RegenIV"]=true,
-            ["RegenV"]=false,
-            ["PhalanxII"]=false,
-            ["Adloquium"]=false,
-            ["AnimusAugeo"]=false,
-            ["AnimusMinuo"]=false,
-            ["Embrava"]=false,
-
-        },
     },
 }
