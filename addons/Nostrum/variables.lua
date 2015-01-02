@@ -33,7 +33,6 @@ to_update=L{}
 
 saved_prims=S{}
 saved_texts=S{}
-saved_images=S{}
 prims_by_layer={L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{}}
 texts_by_layer={L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{}}
 misc_hold_for_up={texts=T{},prims=T{}}

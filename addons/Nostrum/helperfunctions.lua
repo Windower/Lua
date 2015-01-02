@@ -48,7 +48,6 @@ function img_simple(name,texture,pos_x,pos_y)
     windower.prim.set_fit_to_texture(name, true)
     windower.prim.set_texture(name, texture)
     saved_prims:add(name)
-    saved_images:add(name)
     prim_coordinates.x[name]=pos_x
     prim_coordinates.y[name]=pos_y
     prim_coordinates.visible[name]=true
@@ -181,10 +180,6 @@ function wrecking_ball()
     for key in pairs(saved_prims) do
         windower.prim.delete(key)
         saved_prims:remove(key)
-    end
-    for key in pairs(saved_images) do
-        windower.prim.delete(key)
-        saved_images:remove(key)
     end
 end
 

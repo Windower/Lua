@@ -166,7 +166,7 @@ defaults={
 _defaults = config.load(defaults)
 
 _settings=merge_user_file_and_settings(_defaults,settings)
-profile=_settings.profiles.default--settings.profiles.default
+profile=_settings.profiles.default
 count_cures(profile)
 count_buffs(profile)
 count_na(profile)
