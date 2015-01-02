@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
 _addon.name = 'Nostrum'
 _addon.author = 'trv'
-_addon.version = '2.0.3'
+_addon.version = '2.0.4'
 _addon.commands = {'Nostrum','nos',}
 
 packets=require('packets')
@@ -418,10 +418,9 @@ windower.register_event('keyboard', function(dik,flags,blocked)
 end)
 
 windower.register_event('mouse', function(type, x, y, delta, blocked)
-    if blocked or hide then
+    if blocked or is_hidden then
         return
     end
-    local hide_
     if type == 0 then
         for i=1,regions do
             if (y>b[i] and y<t[i]) and (x>l[i] and x<r[i]) then
