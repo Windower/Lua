@@ -1361,24 +1361,147 @@ fields.incoming[0x027] = L{
 
 -- Action
 fields.incoming._func[0x028] = {}
-fields.incoming[0x028] = function(data)
-    return fields.incoming._func[0x028].base
-end
+fields.incoming[0x028] = function()
+    local self = fields.incoming._func[0x028]
+
+    -- start and length are both in bits
+    local extract = function(data, start, length)
+        return data:unpack('b' .. length, (start / 8):floor() + 1, start % 8 + 1)
+    end
+
+    -- All values here are in bits
+    local add_effect_offset = 85
+    local add_effect_size = 37
+    local spike_effect_size = 34
+    local add_action = function(data, pos)
+        action = L{}
+        action:extend(self.action_base)
+
+        action:extend(self.add_effect_base)
+        pos = pos + add_effect_offset
+        local has_add_effect = extract(data, pos, 1) == 1
+        pos = pos + 1
+        if has_add_effect then
+            action:extend(self.add_effect_body)
+            pos = pos + add_effect_size
+        end
+
+        action:extend(self.spike_effect_base)
+        local has_spike_effect = extract(data, pos, 1) == 1
+        pos = pos + 1
+        if has_spike_effect then
+            action:extend(self.spike_effect_body)
+            pos = pos + spike_effect_size
+        end
+
+        return action, pos
+    end
+
+    local action_count_offset = 32;
+    local add_target = function(data, pos)
+        local target = L{}
+        target:extend(self.target_base:copy())
+
+        pos = pos + action_count_offset
+        local action_count = extract(data, pos, 4)
+        pos = pos + 4
+        for i = 1, action_count do
+            local action
+            action, pos = add_action(data, pos)
+
+            action = action:copy():map(function(field)
+                field.label = 'Action %u %s':format(i, field.label)
+                return field
+            end)
+            target:extend(action)
+        end
+
+        return target, pos
+    end
+
+    local target_count_offset = 72
+    local first_target_offset = 150
+    return function(data)
+        local fields = self.base:copy()
+        local target_count = extract(data, target_count_offset, 10)
+        pos = first_target_offset
+        for i = 1, target_count do
+            local target
+            target, pos = add_target(data, pos)
+
+            target = target:copy():map(function(field)
+                field.label = 'Target %u %s':format(i, field.label)
+                return field
+            end)
+            fields:extend(target)
+        end
+
+        return fields
+    end
+end()
 
 enums.action_in = {
+    [1] = 'Melee attack',
+    [2] = 'Ranged attack finish',
+    [3] = 'Weapon Skill finish',
     [4] = 'Casting finish',
-    [6] = 'Job Ability use',
+    [5] = 'Item finish',
+    [6] = 'Job Ability',
+    [7] = 'Weapon Skill start',
     [8] = 'Casting start',
+    [9] = 'Item start',
+    [11] = 'NPC TP finish',
+    [12] = 'Ranged attack start',
+    [13] = 'Avatar TP finish',
+    [14] = 'Job Ability DNC',
+    [15] = 'Job Ability RUN',
 }
 
 fields.incoming._func[0x028].base = L{
     {ctype='unsigned char',     label='Size'},                                  -- 04
     {ctype='unsigned int',      label='Actor',              fn=id},             -- 05
-    {ctype='bit[10]',           label='Target Count'},                          -- 09
-    {ctype='bit[4]',            label='Category',           fn=e+{'action_in'}},-- 0A
-    {ctype='bit[16]',           label='Param'},                                 -- 0C
-    {ctype='bit[16]',           label='_unknown1'},                             -- 0E
-    {ctype='bit[32]',           label='Recast'},                                -- 10
+    {ctype='bit[10]',           label='Target Count'},                          -- 09:0
+    {ctype='bit[4]',            label='Category',           fn=e+{'action_in'}},-- 0A:2
+    {ctype='bit[16]',           label='Param'},                                 -- 0C:6
+    {ctype='bit[16]',           label='_unknown1'},                             -- 0E:6
+    {ctype='bit[32]',           label='Recast'},                                -- 10:6
+}
+
+fields.incoming._func[0x028].target_base = L{
+    {ctype='bit[32]',           label='ID',                 fn=id},             -- 00:0
+    {ctype='bit[4]',            label='Action Count'},                          -- 04:0
+}
+
+fields.incoming._func[0x028].action_base = L{
+    {ctype='bit[5]',            label='Reaction'},                              -- 00:0
+    {ctype='bit[11]',           label='Animation'},                             -- 00:5
+    {ctype='bit[5]',            label='Effect'},                                -- 02:0
+    {ctype='bit[6]',            label='Stagger'},                               -- 02:5
+    {ctype='bit[17]',           label='Param'},                                 -- 03:3
+    {ctype='bit[10]',           label='Message'},                               -- 06:2
+    {ctype='bit[31]',           label='_unknown'},                              -- 07:4
+}
+
+fields.incoming._func[0x028].add_effect_base = L{
+    {ctype='boolbit',           label='Has Added Effect'},                      -- 00:0
+}
+
+fields.incoming._func[0x028].add_effect_body = L{
+    {ctype='bit[6]',            label='Added Effect Animation'},                -- 00:0
+    {ctype='bit[4]',            label='Added Effect Effect'},                   -- 00:6
+    {ctype='bit[17]',           label='Added Effect Param'},                    -- 01:2
+    {ctype='bit[10]',           label='Added Effect Message'},                  -- 04:1
+}
+
+fields.incoming._func[0x028].spike_effect_base = L{
+    {ctype='boolbit',           label='Has Spike Effect'},                      -- 00:0
+}
+
+fields.incoming._func[0x028].spike_effect_body = L{
+    {ctype='bit[6]',            label='Spike Effect Animation'},                -- 00:0
+    {ctype='bit[4]',            label='Spike Effect Effect'},                   -- 00:6
+    {ctype='bit[14]',           label='Spike Effect Param'},                    -- 01:2
+    {ctype='bit[10]',           label='Spike Effect Message'},                  -- 03:0
 }
 
 -- Action Message
@@ -2957,7 +3080,7 @@ end
 return fields
 
 --[[
-Copyright © 2013-2014, Windower
+Copyright © 2013-2015, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
