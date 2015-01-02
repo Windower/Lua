@@ -350,7 +350,7 @@ function interp_text(splitline,offset,modified)
     elseif splitline.n > 1 then
         temptarg = valid_target(targ_reps[splitline[splitline.n]] or splitline[splitline.n])
     end
-
+    
     if temptarg then abil = _raw.table.concat(splitline,' ',1+offset,splitline.n-1)
     elseif not abil then abil = _raw.table.concat(splitline,' ',1+offset,splitline.n) end
 
@@ -378,8 +378,10 @@ function interp_text(splitline,offset,modified)
         local targets = table.reassign({},r_line.targets)
         
         -- Handling for abilities that change potential targets.
-        if r_line.skill == 'Singing' and r_line.casttime == 8 and L(player.buffs):contains(409) then
-            targets.Party = true -- Pianissimo
+        if r_line.skill == 40 and r_line.cast_time == 8 and L(player.buffs):contains(409) then
+            targets.Party = true -- Pianissimo changes the target list of 
+        elseif r_line.skill == 44 and r_line.en:find('Indi-') and not L(player.buffs):contains(584) then
+            targets.Party = false -- Indi- spells default to castable on party for some reason
         end
         
         local abil_name = r_line.english -- Remove spaces at the end of the ability name.
@@ -388,6 +390,7 @@ function interp_text(splitline,offset,modified)
         end
         
         local out_tab = {prefix = in_game_res_commands[r_line.prefix:gsub("/","")], name = abil_name, target = temptarg or target_make(targets)}
+        if not out_tab.prefix then print('Could not find prefix',r_line.prefix) end
         lastsent = out_tab.prefix..' "'..out_tab.name..'" '..out_tab.target
         if logging then
             logfile:write('\n\n',tostring(os.clock()),'Original: ',table.concat(splitline,' '),'\n(180) ',lastsent)

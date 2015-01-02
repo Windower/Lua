@@ -448,7 +448,7 @@ function refresh_group_info(dt,user_event_flag)
     
     local j = windower.ffxi.get_party() or {}
     for i,v in pairs(j) do
-        if v.mob and v.mob.race then
+        if type(v) == 'table' and v.mob and v.mob.race then
             v.mob.race_id = v.mob.race
             v.mob.race = res.races[v.mob.race][language]
         end
