@@ -275,6 +275,7 @@ fields.outgoing[0x011] = L{
     {ctype='int',               label='_unknown1'},                             -- 04   Always 02 00 00 00?
 }
 
+
 -- Standard Client
 fields.outgoing[0x015] = L{
     {ctype='float',             label='X'},                                     -- 04
@@ -283,10 +284,10 @@ fields.outgoing[0x015] = L{
     {ctype='unsigned short',    label='_junk1'},                                -- 10
     {ctype='unsigned short',    label='Run Count'},                             -- 12   Counter that indicates how long you've been running?
     {ctype='unsigned char',     label='Rotation',           fn=dir},            -- 14
-    {ctype='unsigned char',     label='_unknown2'},                             -- 15
+    {ctype='unsigned char',     label='_flags1'},                               -- 15   Bit 0x04 indicates that maintenance mode is activated
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 16
     {ctype='unsigned int',      label='Timestamp',          fn=time_ms},        -- 18   Milliseconds
-    {ctype='unsigned int',      label='_unknown3'},                             -- 1A
+    {ctype='unsigned int',      label='_unknown3'},                             -- 1C
 }
 
 -- Update Request
