@@ -1711,28 +1711,96 @@ enums.indi = {
 -- Buff IDs go can over 0xFF, but in the packet each buff only takes up one byte.
 -- To address that there's a 8 byte bitmask starting at 0x4C where each 2 bits
 -- represent how much to add to the value in the respective byte.
+
+--[[ _flags1: The structure here looks similar to byte 0x33 of 0x00D, but left shifted by 1 bit
+    -- 0x0001 -- Despawns your character
+    -- 0x0002 -- Also despawns your character, and may trigger an outgoing packet to the server (which triggers an incoming 0x037 packet)
+    -- 0x0004 -- No obvious effect
+    -- 0x0008 -- No obvious effect
+    -- 0x0010 -- LFG flag
+    -- 0x0020 -- /anon flag - blue name
+    -- 0x0040 -- orange name?
+    -- 0x0080 -- Away flag
+    -- 0x0100 -- No obvious effect
+    -- 0x0200 -- No obvious effect
+    -- 0x0400 -- No obvious effect
+    -- 0x0800 -- No obvious effect
+    -- 0x1000 -- No obvious effect
+    -- 0x2000 -- No obvious effect
+    -- 0x4000 -- No obvious effect
+    -- 0x8000 -- No obvious effect
+    
+    _flags2:
+    -- 0x01 -- POL Icon
+    -- 0x02 -- No obvious effect
+    -- 0x04 -- Disconnection icon
+    -- 0x08 -- No linkshell
+    -- 0x10 -- No linkshell
+    -- 0x20 -- Trial account icon
+    -- 0x40 -- Trial account icon
+    -- 0x80 -- GM mode
+    
+    _flags3:
+    -- 0x10 -- No obvious effect
+    -- 0x20 -- Event mode? Can't activate the targeting cursor but can still spin the camera
+    -- 0x40 -- No obvious effect
+    -- 0x80 -- Invisible model
+    
+    _flags4:
+    -- 0x02 -- No obvious effect
+    -- 0x04 -- No obvious effect
+    -- 0x08 -- No obvious effect
+    -- 0x10 -- No obvious effect
+    -- 0x20 -- Bazaar icon
+    -- 0x40 -- Event status again? Can't activate the targeting cursor but can move the camera.
+    -- 0x80 -- No obvious effects
+    
+    _flags5:
+    -- 0x01 -- No obvious effect
+    -- 0x02 -- No obvious effect
+    -- 0x04 -- Autoinvite icon
+    
+    _flags6:
+    -- 0x08 -- Terror flag
+    -- 0x10 -- No obvious effect
+    
+    Ballista stuff:
+    -- 0x0020 -- No obvious effect
+    -- 0x0040 -- San d'Oria ballista flag
+    -- 0x0060 -- Bastok ballista flag
+    -- 0x0080 -- Windurst Ballista flag
+    -- 0x0100 -- Participation icon?
+    -- 0x0200 -- Has some effect
+    -- 0x0400 -- I don't know anything about ballista
+    -- 0x0800 -- and I still don't D:<
+    -- 0x1000 -- and I still don't D:<
+]]
 fields.incoming[0x037] = L{
     {ctype='unsigned char[32]', label='Buff',               fn=buff},           -- 04
     {ctype='unsigned int',      label='Player',             fn=id},             -- 24
-    {ctype='unsigned short',    label='_unknown1'},                             -- 28   Called "Flags" on the old dev wiki
-    {ctype='unsigned char',     label='HP %',               fn=percent},        -- 29
-    {ctype='unsigned char',     label='_unknown2'},                             -- 2A   May somehow be tied to current animation (old dev wiki)
-    {ctype='unsigned char',     label='Flags'},                                 -- 2B   GM Flag, etc.
-    {ctype='unsigned char',     label='Movement Speed'},                        -- 2C   Player movement speed
-    {ctype='unsigned char',     label='_unknown3'},                             -- 2D
-    {ctype='unsigned char',     label='_unknown4'},                             -- 2E
+    {ctype='unsigned short',    label='_flags1'},                               -- 28   Called "Flags" on the old dev wiki. Second byte might not be part of the flags, actually.
+    {ctype='unsigned char',     label='HP %',               fn=percent},        -- 2A   
+    {ctype='unsigned char',     label='_flags2'},                               -- 2B   
+    {ctype='bit[12]',           label='Movement Speed'},                        -- 2C   Player movement speed
+    {ctype='bit[4]',            label='_flags3'},                               -- 2D
+    {ctype='bit[9]',            label='Yalms per step'},                        -- 2E   Determines how quickly your animation walks
+    {ctype='bit[7]',            label='_flags4'},                               -- 2F
     {ctype='unsigned char',     label='Status',             fn=status},         -- 30
     {ctype='unsigned char',     label='LS Color Red'},                          -- 31
     {ctype='unsigned char',     label='LS Color Green'},                        -- 32
     {ctype='unsigned char',     label='LS Color Blue'},                         -- 33
-    {ctype='data[8]',           label='_unknown5'},                             -- 34   Player's pet index * 8?
-    {ctype='unsigned int',      label='_unknown6'},                             -- 3C
+    {ctype='bit[3]',            label='_flags5'},                               -- 34
+    {ctype='unsigned short',    label='Pet Index'},                             -- 34   From 0x08 of byte 0x34 to 0x04 of byte 0x36
+    {ctype='bit[2]',            label='_flags6'},                               -- 36    
+    {ctype='bit[9]',            label='Ballista Stuff'},                        -- 36   The first few bits seem to determine the icon, but the icon appears to be tied to the type of fight, so it's more than just an icon.
+    {ctype='bit[27]',           label='_unknown1'},                             -- 37   This is probably tied up in the Ballista stuff too
+    {ctype='unsigned int',      label='_unknown2'},                             -- 3C
     {ctype='unsigned int',      label='Timestamp',          fn=time},           -- 40
-    {ctype='data[8]',           label='_unknown7'},                             -- 44
+    {ctype='data[8]',           label='_unknown3'},                             -- 44
     {ctype='data[8]',           label='Bit Mask'},                              -- 4C
-    {ctype='data[4]',           label='_unknown8'},                             -- 54
+    {ctype='data[4]',           label='_unknown4'},                             -- 54
     {ctype='unsigned char',     label='Indi Buff',          fn=e+{'indi'}},     -- 58
-    {ctype='data[3]',           label='_unknown9'},                             -- 59
+    {ctype='data[3]',           label='_unknown5'},                             -- 59
 }
 
 -- Entity Animation
