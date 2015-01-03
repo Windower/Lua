@@ -278,8 +278,8 @@ fields.outgoing[0x011] = L{
 -- Standard Client
 fields.outgoing[0x015] = L{
     {ctype='float',             label='X Position'},                            -- 04
-    {ctype='float',             label='Y'},                            -- 08
-    {ctype='float',             label='Z'},                            -- 0C
+    {ctype='float',             label='Y Position'},                            -- 08
+    {ctype='float',             label='Z Position'},                            -- 0C
     {ctype='unsigned short',    label='_junk1'},                                -- 10
     {ctype='unsigned short',    label='Run Count'},                             -- 12   Counter that indicates how long you've been running?
     {ctype='unsigned char',     label='Rotation',           fn=dir},            -- 14
