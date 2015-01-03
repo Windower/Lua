@@ -1080,8 +1080,8 @@ fields.incoming[0x00D] = L{
     {ctype='unsigned char',     label='Mask',               fn=bin+{1}},        -- 0A
     {ctype='unsigned char',     label='Body Rotation',      fn=dir},            -- 0B
     {ctype='float',             label='X Position'},                            -- 0C
-    {ctype='float',             label='Z Position'},                            -- 10
-    {ctype='float',             label='Y Position'},                            -- 14
+    {ctype='float',             label='Y'},                            -- 10
+    {ctype='float',             label='Z'},                            -- 14
     {ctype='unsigned short',    label='Head Rotation',      fn=dir},            -- 18
     {ctype='unsigned short',    label='Target Index *2',    fn=index..s+{2,15}},-- 1A
     {ctype='unsigned char',     label='Current Speed'},                         -- 1C
