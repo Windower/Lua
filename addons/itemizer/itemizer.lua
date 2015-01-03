@@ -1,6 +1,6 @@
 _addon.name = 'Itemizer'
 _addon.author = 'Ihina'
-_addon.version = '3.0.0.0'
+_addon.version = '3.0.1.0'
 _addon.command = 'itemizer'
 
 require('luau')
@@ -169,8 +169,8 @@ active = S{}
 collect_item = function(id, items)
     items = items or {inventory = windower.ffxi.get_items(bag_ids.inventory)}
 
-    local item = T(inventory):with('id', id)
-    if item and item.count >= count then
+    local item = T(items.inventory):with('id', id)
+    if item then
         active = active:remove(id)
         return false
     end
@@ -196,7 +196,12 @@ collect_item = function(id, items)
 end
 
 reschedule = function(text, ids, items)
-    items = items or {inventory = windower.ffxi.get_items(bag_ids.inventory)}
+    if not items then
+        local info = windower.ffxi.get_bag_info(bag_ids.inventory)
+        items = {inventory = windower.ffxi.get_items(bag_ids.inventory)}
+        items.max_inventory = info.max
+        items.count_inventory = info.count
+    end
 
     -- Inventory full?
     if items.max_inventory - items.count_inventory == 0 then
@@ -229,7 +234,7 @@ windower.register_event('outgoing text', function()
             end
 
             if name then
-                return reschedule(text, {spec_tools[name], (windower.ffxi.get_player().main_job == 'NIN' and gen_tools[name])})
+                return reschedule(text, {spec_tools[name], windower.ffxi.get_player().main_job == 'NIN' and gen_tools[name] or nil})
             end
 
         -- Item usage
@@ -268,7 +273,7 @@ windower.register_event('outgoing text', function()
 end())
 
 --[[
-Copyright © 2013-2014, Ihina
+Copyright © 2013-2015, Ihina
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
