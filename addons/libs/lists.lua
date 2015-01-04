@@ -1,5 +1,5 @@
 --[[
-A library providing advanced list support and better optimizations for list-based operations.
+    A library providing advanced list support and better optimizations for list-based operations.
 ]]
 
 _libs = _libs or {}
@@ -16,22 +16,25 @@ _meta.L = {}
 _meta.L.__index = function(l, k)
     if type(k) == 'number' then
         k = k < 0 and l.n + k + 1 or k
+
         return rawget(l, k)
     end
-    return rawget(list, k) or rawget(table, k)
+
+    return list[k] or table[k]
 end
 _meta.L.__newindex = function(l, k, v)
     if type(k) == 'number' then
-        if k < 0 then
-            k = l.n + k + 1
-        end
+        k = k < 0 and l.n + k + 1 or k
+
         if k >= 1 and k <= l.n then
             rawset(l, k, v)
-        elseif warning then
-            warning('Trying to assign outside of list range ('..l.n..'):', k)
+        else
+            (warning or print)('Trying to assign outside of list range (%u/%u): %s':format(k, l.n, tostring(v)))
         end
-    elseif warning then
-        warning('Trying to assign to non-numerical list index:', k)
+
+    else
+        (warning or print)('Trying to assign to non-numerical list index:', k)
+
     end
 end
 _meta.L.__class = 'List'
@@ -296,6 +299,7 @@ end
 
 function list.splice(l1, from, to, l2)
     -- TODO
+    (_raw.error or error)('list.splice is not yet implemented.')
 end
 
 function list.clear(l)
@@ -307,11 +311,17 @@ function list.clear(l)
     return l
 end
 
-function list.copy(l)
+function list.copy(l, deep)
+    deep = deep or true
     local res = {}
 
     for key = 1, l.n do
-        rawset(res, key, rawget(l, key))
+        local value = rawget(l, key)
+        if deep and type(value) == 'table' then
+            res[key] = (not rawget(value, copy) and value.copy or table.copy)(value)
+        else
+            res[key] = value
+        end
     end
 
     res.n = l.n
@@ -418,7 +428,7 @@ function list.format(l, trail, subs)
 end
 
 --[[
-Copyright © 2013-2014, Windower
+Copyright © 2013-2015, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

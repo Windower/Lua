@@ -1,10 +1,11 @@
 --[[
-A few string helper functions.
+    A few string helper functions.
 ]]
 
 _libs = _libs or {}
 _libs.strings = true
 _libs.functions = _libs.functions or require('functions')
+_libs.math = _libs.math or require('maths')
 
 _meta = _meta or {}
 
@@ -108,26 +109,6 @@ function string.splice(str, from, to, str2)
     return str:sub(1, from - 1)..str2..str:sub(to + 1)
 end
 
--- Returns a monowidth hex representation of each character of a string, optionally with a separator between chars.
-function string.hex(str, sep, from, to)
-    return str:slice(from, to):split():map(string.zfill-{2}..math.hex..string.byte):concat(sep or '')
-end
-
--- Returns a monowidth binary representation of every char of the string, optionally with a separator between chars.
-function string.binary(str, sep, from, to)
-    return str:slice(from, to):split():map(string.zfill-{8}..math.binary..string.byte):concat(sep or '')
-end
-
--- Returns a string parsed from a hex-represented string.
-function string.parse_hex(str)
-    return (str:gsub('%s*0x', ''):gsub('[^%w]', ''):gsub('%w%w', string.char..tonumber-{16}))
-end
-
--- Returns a string parsed from a binary-represented string.
-function string.parse_binary(str)
-    return (str:gsub('%s*0b', ''):gsub('[^%w]', ''):gsub(('[01]'):rep(8), string.char..tonumber-{2}))
-end
-
 -- Returns an iterator, that goes over every character of the string.
 function string.it(str)
     return str:gmatch('.')
@@ -220,6 +201,43 @@ end
 function string.empty(str)
     return str == ''
 end
+
+(function()
+    -- Returns a monowidth hex representation of each character of a string, optionally with a separator between chars.
+    local hex = string.zfill-{2} .. math.hex .. string.byte
+    function string.hex(str, sep, from, to)
+        return str:slice(from, to):split():map(hex):concat(sep or '')
+    end
+
+    -- Returns a monowidth binary representation of every char of the string, optionally with a separator between chars.
+    local binary = string.zfill-{8} .. math.binary .. string.byte
+    function string.binary(str, sep, from, to)
+        return str:slice(from, to):split():map(binary):concat(sep or '')
+    end
+
+    -- Returns a string parsed from a hex-represented string.
+    local hex_r = string.char .. tonumber-{16}
+    function string.parse_hex(str)
+        local interpreted_string = str:gsub('0x', ''):gsub('[^%w]', '')
+        if #interpreted_string % 2 ~= 0  then
+            (_raw and _raw.error or error)('Invalid input string length', 2)
+        end
+
+        return (interpreted_string:gsub('%w%w', hex_r))
+    end
+
+    -- Returns a string parsed from a binary-represented string.
+    local binary_r = string.char .. tonumber-{2}
+    local binary_pattern = '[01]':rep(8)
+    function string.parse_binary(str)
+        local interpreted_string = str:gsub('0b', ''):gsub('[^01]', '')
+        if #interpreted_string % 8 ~= 0 then
+            (_raw and _raw.error or error)('Invalid input string length', 2)
+        end
+
+        return (interpreted_string:gsub(binary_pattern, binary_r))
+    end
+end)()
 
 -- Returns a string with Lua pattern characters escaped.
 function string.escape(str)
@@ -483,7 +501,7 @@ function table.format(t, trail, subs)
 end
 
 --[[
-Copyright © 2013-2014, Windower
+Copyright © 2013-2015, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

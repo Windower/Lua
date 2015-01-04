@@ -31,11 +31,10 @@ spell_default=''
 send_string = ''
 to_update=L{}
 
-nos_saved_prims=S{}
-nos_saved_texts=S{}
-saved_images=S{}
-prims_by_layer={[1]=T{},[2]=T{},[3]=T{},[4]=T{},[5]=T{},[6]=T{},[7]=T{},[8]=T{},[9]=T{},[10]=T{},[11]=T{},[12]=T{},[13]=T{},[14]=T{},[15]=T{},[16]=T{},[17]=T{},[18]=T{}}
-texts_by_layer={[1]=T{},[2]=T{},[3]=T{},[4]=T{},[5]=T{},[6]=T{},[7]=T{},[8]=T{},[9]=T{},[10]=T{},[11]=T{},[12]=T{},[13]=T{},[14]=T{},[15]=T{},[16]=T{},[17]=T{},[18]=T{}}
+saved_prims=S{}
+saved_texts=S{}
+prims_by_layer={L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{}}
+texts_by_layer={L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{}}
 misc_hold_for_up={texts=T{},prims=T{}}
 macro = {[1]=S{},[2]=S{},[3]=S{}}
 macro_visibility = {[1]=false,[2]=false,[3]=false}
@@ -46,7 +45,13 @@ party_two_keys = S{'a10', 'a11', 'a12', 'a13', 'a14', 'a15'}
 party_three_keys = S{'a20', 'a21', 'a22', 'a23', 'a24', 'a25'}
 seeking_information=S{}
 macro_order=T{cures=L{},curagas=L{},buffs=L{},nas=L{}}
+position = {
+    L{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    L{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    L{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+}
 out_of_zone=S{}
+out_of_range=S{}
 who_am_i=S{}
 packet_pt_struc = {[1]=S{},[2]=S{},[3]=S{}}
 
@@ -57,8 +62,11 @@ is_zoning = false
 is_hidden = false
 regions = 0
 
-font_widths={['I']=9,['II']=17,['III']=25,['IV']=24,['V']=16,['1']=10,['2']=11,['3']=11,['4']=11,['5']=11,['6']=12}
-xml_to_lua={--config library doesn't like spaces
+font_widths={
+    ['I']=9,['II']=17,['III']=25,['IV']=24,['V']=16,['1']=10,['2']=11,['3']=11,
+    ['4']=11,['5']=11,['6']=12
+    }
+xml_to_lua={
 	["Cure"]="Cure",
     ["CureII"]="Cure II",
     ["CureIII"]="Cure III",
@@ -249,169 +257,68 @@ options.images={
 }
 
 settings={
-text={
-    buttons={
-        color={a=255,r=255,g=255,b=255},
-        bold=true,
-        font="Times",
-        font_size=15,
-        position={x=0,y=0},
-        visible=true,
-        right_justified=false
+    text={
+        buttons={
+            bold=true,
+            font="Times",
+            visible=true,
+            font_size=15,
+            position={x=0,y=0},
+            right_justified=false
+        },
+        name={
+            bold=true,
+            font="Consolas",
+            font_size=10,
+            position={x=0,y=0},
+            right_justified=false
+        },
+        tp={
+            bold=true,
+            font="Consolas",
+            font_size=10,
+            position={x=0,y=0},
+            right_justified=false
+        },
+        hp={
+            bold=true,
+            font="Consolas",
+            font_size=10,
+            right_justified=true
+        },
+        mp={
+            bold=true,
+            font="Consolas",
+            font_size=10,
+            right_justified=true    
+        },
+        hpp={
+            bold=true,
+            font="Times",
+            font_size=20,
+            right_justified=true
+        },
+        na={
+            bold=true,
+            font="Times",
+            font_size=10,
+            right_justified=false
+        },
+        buffs={
+            bold=true,
+            font="Times",
+            font_size=9,
+            right_justified=false,
+        },
     },
-    name={
-        color={a=255,r=255,g=255,b=255},
-        bold=true,
-        font="Consolas",
-        font_size=10,
-        position={x=0,y=0},
-        visible=true,
-        right_justified=false
+    primitives={
+        hp_bar={
+            color={a=176, r=176, g=176, b=176},
+            visible=true
+        },
     },
-    tp={
-        color={a=255,r=255,g=255,b=255},
-        bold=true,
-        font="Consolas",
-        font_size=10,
-        position={x=0,y=0},
-        visible=true,
-        right_justified=false
+    window={
+        x_res=windower.get_windower_settings().x_res,
+        y_res=windower.get_windower_settings().y_res,
     },
-    hp={
-        color={a=255,r=255,g=255,b=255},
-        bold=true,
-        font="Consolas",
-        font_size=10,
-        visible=true,
-        right_justified=true
-    },
-    mp={
-        color={a=255,r=255,g=255,b=255},
-        bold=true,
-        font="Consolas",
-        font_size=10,
-        visible=true,
-        right_justified=true    
-    },
-    hpp={
-        color={a=255,r=255,g=255,b=255},
-        bold=true,
-        font="Times",
-        font_size=20,
-        visible=true,
-        right_justified=true
-    },
-    na={
-        color={a=255,r=255,g=255,b=255},
-        bold=true,
-        font="Times",
-        font_size=10,
-        visible=false,
-        right_justified=false
-    },
-    buffs={
-        color={a=255,r=255,g=255,b=255},
-        bold=true,
-        font="Times",
-        font_size=9,
-        visible=false,
-        right_justified=false,
-    },
-},
-primitives={
-    buttons={
-        color={a=66, r=255, g=255, b=255},
-        visible=true
-    },
-    highlight={
-        color={a=100, r=255, g=255, b=255},
-    },
-    curaga_buttons={
-        color={a=35, r=255, g=213, b=0},
-        visible=true
-    },
-    background={
-        color={a=150, r=0, g=0, b=0},
-        visible=true
-    },
-    hp_bar={
-        color={a=176, r=176, g=176, b=176},
-        green={a=176, r=1, g=67, b=14},
-        yellow={a=176, r=184,g=191,b=0},
-        orange={a=176, r=249, g=125, b=1},
-        red={a=176, r=141, g=1, b=1},
-        visible=true
-    },
-    mp_bar={
-        color={a=100, r=149, g=212, b=243},
-        visible=true
-    },
-    hp_bar_background={
-        color={a=155, r=0, g=0, b=0},
-        visible=true
-    },
-    na_buttons={
-        color={a=66, r=255, g=255, b=255},
-        visible=true
-    },
-    buff_buttons={
-        color={a=66, r=255, g=255, b=255},
-        visible=true
-    },
-},
-window={
-    x_res=windower.get_windower_settings().x_res,
-    y_res=windower.get_windower_settings().y_res,
-},
-profiles={
-    default={
-        ["Cure"]=true,
-        ["CureII"]=true,
-        ["CureIII"]=true,
-        ["CureIV"]=true,
-        ["CureV"]=true,
-        ["CureVI"]=true,
-        ["Curaga"]=true,
-        ["CuragaII"]=true,
-        ["CuragaIII"]=true,
-        ["CuragaIV"]=true,
-        ["CuragaV"]=true,
-        ["Sacrifice"]=true,
-        ["Erase"]=true,
-        ["Paralyna"]=true,
-        ["Silena"]=true,
-        ["Blindna"]=true,
-        ["Poisona"]=true,
-        ["Viruna"]=true,
-        ["Stona"]=true,
-        ["Cursna"]=true,
-        ["Haste"]=true,
-        ["HasteII"]=false,
-        ["Flurry"]=false,
-        ["FlurryII"]=false,
-        ["Protect"]=false,
-        ["Shell"]=false,
-        ["ProtectII"]=false,
-        ["ShellII"]=false,
-        ["ProtectIII"]=false,
-        ["ShellIII"]=false,
-        ["ProtectIV"]=false,
-        ["ShellIV"]=false,
-        ["ProtectV"]=true,
-        ["ShellV"]=true,
-        ["Refresh"]=false,
-        ["RefreshII"]=false,
-        ["Regen"]=false,
-        ["RegenII"]=false,
-        ["RegenIII"]=false,
-        ["RegenIV"]=true,
-        ["RegenV"]=false,
-        ["PhalanxII"]=false,
-        ["Adloquium"]=false,
-        ["AnimusAugeo"]=false,
-        ["AnimusMinuo"]=false,
-        ["Embrava"]=false,
-
-    },
-},
 }
