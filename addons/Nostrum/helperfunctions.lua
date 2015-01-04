@@ -48,7 +48,6 @@ function img_simple(name,texture,pos_x,pos_y)
     windower.prim.set_fit_to_texture(name, true)
     windower.prim.set_texture(name, texture)
     saved_prims:add(name)
-    saved_images:add(name)
     prim_coordinates.x[name]=pos_x
     prim_coordinates.y[name]=pos_y
     prim_coordinates.visible[name]=true
@@ -128,12 +127,16 @@ end
 function merge_user_file_and_settings(t,u)
     for k,v in pairs(t) do
         if u[k] then
-            u[k] = merge_user_file_and_settings(t[k],u[k])
+            if type(u[k]) == 'table' then
+                u[k] = merge_user_file_and_settings(t[k],u[k])
+            else
+                return u[k]
+            end
         else
             u[k] = v
         end
     end
-    return u 
+    return u
 end
 
 last_hover=''
@@ -152,8 +155,32 @@ function hover(p)
 
 end
 
-function remove_macro_information(n,num)
-    if num == 1 then
+function get_vector_norm(x,y,z)
+    return math.sqrt((position[1][6] - x)^2 + (position[2][6] - y)^2 + (position[3][6] - z)^2)
+end
+
+function color_name(x,y,z,n,bool)
+    if get_vector_norm(x, y, z) > 21 then
+        if not out_of_range:contains(n) then
+            out_of_range:add(n)
+            windower.text.set_color('name' .. n, 206, 175, 98, 177)
+        end
+    elseif bool then --Invisible conflict?
+        if not out_of_range:contains(n) then
+            out_of_range:add(n)
+            windower.text.set_color('name' .. n, 206, 175, 98, 177)
+        end
+        for i=1,3 do
+            position[i][n] = 0
+        end
+    elseif out_of_range:contains(n) then
+        out_of_range:remove(n)
+        windower.text.set_color('name' .. n, 255, 255, 255, 255)
+    end
+end
+
+function remove_macro_information(n,bool)
+    if bool then
         windower.text.set_text('name'..n,'')
         windower.text.set_text('hp'..n,'')
         windower.text.set_text('mp'..n,'')
@@ -181,10 +208,6 @@ function wrecking_ball()
     for key in pairs(saved_prims) do
         windower.prim.delete(key)
         saved_prims:remove(key)
-    end
-    for key in pairs(saved_images) do
-        windower.prim.delete(key)
-        saved_images:remove(key)
     end
 end
 
@@ -232,11 +255,10 @@ function toggle_macro_visibility(n)
     end
 end
 
-last_target=0
 last_hpp=0
 last_index=0
 function update_target(index)
-    if index == 0 or index == nil then
+    if not index or index == 0 then
         if prim_coordinates.visible['target'] then
             windower.prim.set_visibility("target_background",false)
             windower.prim.set_visibility("target",false)
@@ -586,8 +608,8 @@ function update_macro_data(id,t)
 end
 ----------------------------------------------kick----------------------------------------------------
 function kick(id,n)
-    party[n]:remove(6*n+1-position_lookup[id])
     local i = position_lookup[id]
+    party[n]:remove(6*n+1-i)
     local j = 1+6*(n-1)+5-party[n].n
     while i > j do
         local m = 6*n+1-i
@@ -601,7 +623,11 @@ function kick(id,n)
         windower.prim.set_size('pmpp'..position_lookup[m_id],150/100*stat_table[m_id]['mpp'],5)
         i = i - 1
     end
-    remove_macro_information(6*n-party[n].n,1)
+    for k = 1,3 do
+        position[k]:insert((n-1)*6+1,0)
+        position[k]:remove(i+1)
+    end
+    remove_macro_information(6*n-party[n].n,true)
     position_lookup[id] = nil
     stat_table[id] = nil
     define_active_regions()

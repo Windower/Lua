@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
 _addon.name = 'Nostrum'
 _addon.author = 'trv'
-_addon.version = '2.0.4'
+_addon.version = '2.0.6'
 _addon.commands = {'Nostrum','nos',}
 
 packets=require('packets')
@@ -166,7 +166,7 @@ defaults={
 _defaults = config.load(defaults)
 
 _settings=merge_user_file_and_settings(_defaults,settings)
-profile=_settings.profiles.default--settings.profiles.default
+profile=_settings.profiles.default
 count_cures(profile)
 count_buffs(profile)
 count_na(profile)
@@ -357,6 +357,9 @@ windower.register_event('load', 'login', function()
         if party_from_memory[pkey] and party_from_memory[pkey].mob then
             alliance[i] = party_from_memory[pkey].mob.id
             position_lookup[alliance[i]] = i
+            position[1][i] = party_from_memory[pkey].mob.x
+            position[2][i] = party_from_memory[pkey].mob.y
+            position[3][i] = party_from_memory[pkey].mob.z
             stat_table[alliance[i]]={
                 hp = party_from_memory[pkey].hp,
                 mp = party_from_memory[pkey].mp,
@@ -494,13 +497,15 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
         if y>b[4] and y<t[4] and x>l[4] and x<r[4] then
             spell_default = xml_to_lua[macro_order[region_map[4]][math.ceil((x-l[4])/33)]]
             windower.text.set_text('menu', spell_default)
-            text_coordinates.x['menu'] = prim_coordinates.x['pmenu'] + 1 + (150 - 7.55 * #spell_default)/2
+            text_coordinates.x['menu'] = prim_coordinates.x['pmenu'] + 1 + (150 - 7.55 * string.length(spell_default))/2
             windower.text.set_location('menu',text_coordinates.x['menu'],text_coordinates.y['menu'])
             dragged = true
             return true
         elseif y>b[5] and y<t[5] and x>l[5] and x<r[5] then
             spell_default = xml_to_lua[macro_order[region_map[5]][math.ceil((x-l[5])/33)]]
             windower.text.set_text('menu', spell_default)
+            text_coordinates.x['menu'] = prim_coordinates.x['pmenu'] + 1 + (150 - 7.55 * string.length(spell_default))/2
+            windower.text.set_location('menu',text_coordinates.x['menu'],text_coordinates.y['menu'])
             dragged = true
             return true
         end
@@ -517,6 +522,19 @@ windower.register_event('outgoing chunk', function(id,data)
         local packet = packets.parse('outgoing', data)
         local target = packet['Target Index']
         update_target(target)
+        position[1][6],position[2][6],position[3][6] = packet['X'],packet['Y'],packet['Z']
+        for i = 5,7-party[1].n,-1 do
+            if not out_of_zone:contains(party[1][7 - i]) then
+                color_name(position[1][i],position[2][i],position[3][i],i,false)
+            end
+        end
+        for j = 2,3 do
+            for i = j*6,j*6-party[j].n+1,-1 do
+                if not out_of_zone:contains(party[j][j*6-i+1]) then
+                    color_name(position[1][i],position[2][i],position[3][i],i,false)
+                end
+            end
+        end
     elseif id == 0x00D then
         is_zoning = true
         if not is_hidden then
@@ -546,16 +564,38 @@ windower.register_event('outgoing chunk', function(id,data)
 end)
 
 windower.register_event('incoming chunk', function(id, data)
-    if id == 0x00E then
+    if id == 0x00D then
         local packet = packets.parse('incoming', data)
-        local index = packet['Index']
-        if prim_coordinates.visible['target'] and last_index == index then
-            local hpp = packet['HP %']
-            if last_hpp ~= hpp and hpp~=0 then windower.prim.set_size("target",150/100*hpp,30) end
-                if hpp~=0 and math.floor(hpp/25) ~= math.floor(last_hpp/25) then
-                    local color = _settings.primitives.hp_bar[choose_color(hpp)]
-                    windower.prim.set_color("target",color.a,color.r,color.g,color.b)
-                end
+        if packet['Player'] == player_id then
+            return
+        elseif position_lookup[packet['Player']] then
+            if bit.band(packet['Mask'],1) == 1 then
+            local f = position_lookup[packet['Player']]
+                position[1][f] = packet['X']
+                position[2][f] = packet['Y']
+                position[3][f] = packet['Z']
+                color_name(position[1][f],position[2][f],position[3][f],f,packet['Mask'] == 32)
+            end
+        end
+    elseif id == 0x00E then
+        local packet = packets.parse('incoming', data)
+        local f = position_lookup[packet['NPC']]
+        if bit.band(packet['Mask'],4) == 4 and packet['Index'] == last_index then -- HP
+            if packet['HP %']~=last_hpp then
+                    windower.text.set_text("targethpp",packet['HP %'])
+                    windower.prim.set_size("target",150/100*packet['HP %'],30)
+                    if math.floor(packet['HP %']/25) ~= math.floor(last_hpp/25) then
+                        local color=_settings.primitives.hp_bar[choose_color(packet['HP %'])]
+                        windower.prim.set_color("target",color.a,color.r,color.g,color.b)
+                    end
+                last_hpp = packet['HP %']
+            end
+        end
+        if bit.band(packet['Mask'],1) == 1 and f then -- position
+            position[1][f] = packet['X']
+            position[2][f] = packet['Y']
+            position[3][f] = packet['Z']
+            color_name(position[1][f],position[2][f],position[3][f],f,false)
         end
     elseif id == 0x0DF then
         local packet = packets.parse('incoming', data)
@@ -597,7 +637,7 @@ windower.register_event('incoming chunk', function(id, data)
         end
         if packet['Zone'] ~= 0 then
             if not out_of_zone[id] then
-                remove_macro_information(position_lookup[id],0)
+                remove_macro_information(position_lookup[id],false)
                 out_of_zone:add(id)
                 seeking_information:add(id)
             end

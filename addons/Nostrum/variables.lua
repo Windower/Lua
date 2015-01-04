@@ -33,7 +33,6 @@ to_update=L{}
 
 saved_prims=S{}
 saved_texts=S{}
-saved_images=S{}
 prims_by_layer={L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{}}
 texts_by_layer={L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{}}
 misc_hold_for_up={texts=T{},prims=T{}}
@@ -46,7 +45,13 @@ party_two_keys = S{'a10', 'a11', 'a12', 'a13', 'a14', 'a15'}
 party_three_keys = S{'a20', 'a21', 'a22', 'a23', 'a24', 'a25'}
 seeking_information=S{}
 macro_order=T{cures=L{},curagas=L{},buffs=L{},nas=L{}}
+position = {
+    L{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    L{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    L{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+}
 out_of_zone=S{}
+out_of_range=S{}
 who_am_i=S{}
 packet_pt_struc = {[1]=S{},[2]=S{},[3]=S{}}
 
