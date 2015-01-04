@@ -677,7 +677,7 @@ function Command_Registry.new()
     local function remove_old_entries (t)
         -- Removes old command registry entries.
         for i,v in pairs(t) do
-            local lim = (type(v) == 'table' and (v.spell and v.spell.cast_time and v.spell.cast_time*1.1+1 or
+            local lim = (type(v) == 'table' and (v.spell and v.spell.cast_time and v.spell.cast_time*1.1+2 or
                 v.spell and v.spell.prefix=='/pet' and 5 or
                 v.spell and v.spell.action_type and delay_map_to_action_type[v.spell.action_type] or
                 3) + (v.pretarget_cast_delay or 0) + (v.precast_cast_delay or 0))
