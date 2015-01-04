@@ -569,8 +569,8 @@ windower.register_event('incoming chunk', function(id, data)
         if packet['Player'] == player_id then
             return
         elseif position_lookup[packet['Player']] then
-            if packet['X'] + packet['Y'] + packet['Z'] ~= 0 then
-                local f = position_lookup[packet['Player']]
+            if bit.band(packet['Mask'],1) == 1 then
+            local f = position_lookup[packet['Player']]
                 position[1][f] = packet['X']
                 position[2][f] = packet['Y']
                 position[3][f] = packet['Z']
@@ -579,14 +579,23 @@ windower.register_event('incoming chunk', function(id, data)
         end
     elseif id == 0x00E then
         local packet = packets.parse('incoming', data)
-        local index = packet['Index']
-        if prim_coordinates.visible['target'] and last_index == index then
-            local hpp = packet['HP %']
-            if last_hpp ~= hpp and hpp~=0 then windower.prim.set_size("target",150/100*hpp,30) end
-                if hpp~=0 and math.floor(hpp/25) ~= math.floor(last_hpp/25) then
-                    local color = _settings.primitives.hp_bar[choose_color(hpp)]
-                    windower.prim.set_color("target",color.a,color.r,color.g,color.b)
-                end
+        local f = position_lookup[packet['NPC']]
+        if bit.band(packet['Mask'],4) == 4 and packet['Index'] == last_index then -- HP
+            if packet['HP %']~=last_hpp then
+                    windower.text.set_text("targethpp",packet['HP %'])
+                    windower.prim.set_size("target",150/100*packet['HP %'],30)
+                    if math.floor(packet['HP %']/25) ~= math.floor(last_hpp/25) then
+                        local color=_settings.primitives.hp_bar[choose_color(packet['HP %'])]
+                        windower.prim.set_color("target",color.a,color.r,color.g,color.b)
+                    end
+                last_hpp = packet['HP %']
+            end
+        end
+        if bit.band(packet['Mask'],1) == 1 and f then -- position
+            position[1][f] = packet['X']
+            position[2][f] = packet['Y']
+            position[3][f] = packet['Z']
+            color_name(position[1][f],position[2][f],position[3][f],f,false)
         end
     elseif id == 0x0DF then
         local packet = packets.parse('incoming', data)

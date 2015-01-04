@@ -160,7 +160,7 @@ function get_vector_norm(x,y,z)
 end
 
 function color_name(x,y,z,n,bool)
-    if get_vector_norm(x, y, z) > 20 then
+    if get_vector_norm(x, y, z) > 21 then
         if not out_of_range:contains(n) then
             out_of_range:add(n)
             windower.text.set_color('name' .. n, 206, 175, 98, 177)
@@ -255,11 +255,10 @@ function toggle_macro_visibility(n)
     end
 end
 
-last_target=0
 last_hpp=0
 last_index=0
 function update_target(index)
-    if index == 0 or index == nil then
+    if not index or index == 0 then
         if prim_coordinates.visible['target'] then
             windower.prim.set_visibility("target_background",false)
             windower.prim.set_visibility("target",false)
