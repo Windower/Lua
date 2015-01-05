@@ -490,15 +490,18 @@ function table.extract(t)
     return table.unpack(res)
 end
 
--- Returns a deep copy of the table, including metatable and recursed over nested tables.
-function table.copy(t)
+-- Returns a copy of the table, including metatable and recursed over nested tables.
+-- The second argument indicates whether or not to perform a deep copy (defaults to true)
+function table.copy(t, deep)
+    deep = deep or true
     local res = {}
-    for key, val in pairs(t) do
+
+    for key, value in pairs(t) do
         -- If a value is a table, recursively copy that.
-        if type(val) == 'table' then
-            val = table.copy(val)
+        if type(value) == 'table' then
+            value = (not rawget(value, copy) and value.copy or table.copy)(value)
         end
-        res[key] = val
+        res[key] = value
     end
 
     return setmetatable(res, getmetatable(t))
@@ -606,7 +609,7 @@ function table.max(t)
 end
 
 --[[
-Copyright (c) 2013-2014, Windower
+Copyright © 2013-2015, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

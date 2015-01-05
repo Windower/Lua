@@ -217,11 +217,16 @@ function set.clear(s)
     return s
 end
 
-function set.copy(s)
+function set.copy(s, deep)
+    deep = deep or true
     local res = {}
 
     for el in pairs(s) do
-        res[el] = true
+        if deep and type(el) == 'table' then
+            res[(not rawget(el, 'copy') and el.copy or table.copy)(el)] = true
+        else
+            res[el] = true
+        end
     end
 
     return setmetatable(res, _meta.S)
@@ -325,7 +330,7 @@ function set.format(s, trail, subs)
 end
 
 --[[
-Copyright © 2013-2014, Windower
+Copyright © 2013-2015, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

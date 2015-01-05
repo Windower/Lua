@@ -358,7 +358,7 @@ end
 -- Applies function fn to all values of the table and returns the resulting table.
 function table.map(t, fn)
     local res = {}
-    for val, key in (t.it or it)(t) do
+    for val, key in (not rawget(t, 'it') and t.it or it)(t) do
         -- Evaluate fn with the element and store it.
         res[key] = fn(val)
     end
@@ -369,7 +369,7 @@ end
 -- Applies function fn to all keys of the table, and returns the resulting table.
 function table.key_map(t, fn)
     local res = {}
-    for val, key in (t.it or it)(t) do
+    for val, key in (not rawget(t, 'it') and t.it or it)(t) do
         res[fn(key)] = val
     end
 
@@ -383,7 +383,7 @@ function table.filter(t, fn)
     end
 
     local res = {}
-    for val, key in (t.it or it)(t) do
+    for val, key in (not rawget(t, 'it') and t.it or it)(t) do
         -- Only copy if fn(val) evaluates to true
         if fn(val) then
             res[key] = val
@@ -400,7 +400,7 @@ function table.key_filter(t, fn)
     end
 
     local res = {}
-    for val, key in (t.it or it)(t) do
+    for val, key in (not rawget(t, 'it') and t.it or it)(t) do
         -- Only copy if fn(key) evaluates to true
         if fn(key) then
             res[key] = val
@@ -415,7 +415,7 @@ end
 function table.reduce(t, fn, init)
     -- Set the accumulator variable to the init value (which can be nil as well)
     local acc = init
-    for val in (t.it or it)(t) do
+    for val in (not rawget(t, 'it') and t.it or it)(t) do
         if init then
             acc = fn(acc, val)
         else
@@ -429,7 +429,7 @@ end
 
 -- Return true if any element of t satisfies the condition fn.
 function table.any(t, fn)
-    for val in (t.it or it)(t) do
+    for val in (not rawget(t, 'it') and t.it or it)(t) do
         if fn(val) then
             return true
         end
@@ -440,7 +440,7 @@ end
 
 -- Return true if all elements of t satisfy the condition fn.
 function table.all(t, fn)
-    for val in (t.it or it)(t) do
+    for val in (not rawget(t, 'it') and t.it or it)(t) do
         if not fn(val) then
             return false
         end
@@ -469,7 +469,7 @@ function string.map(str, fn)
 end
 
 --[[
-Copyright © 2013-2014, Windower
+Copyright © 2013-2015, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

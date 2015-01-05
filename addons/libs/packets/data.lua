@@ -191,6 +191,7 @@ data.incoming[0x0DC] = {name='Party Invite',        description='Party Invite pa
 data.incoming[0x0DD] = {name='Party Member Update', description='Alliance/party member info - zone, HP%, HP% etc.'}
 data.incoming[0x0DF] = {name='Char Update',         description='A packet sent from server which updates character HP, MP and TP.'}
 data.incoming[0x0E0] = {name='Linkshell Equip',     description='Updates your linkshell menu with the current linkshell.'}
+data.incoming[0x0E1] = {name='Party Member List',   description='Sent when you look at the party member list.'}
 data.incoming[0x0E2] = {name='Char Info',           description='Sends name, HP, HP%, etc.'}
 data.incoming[0x0F4] = {name='Widescan Mob',        description='Displays one monster.'}
 data.incoming[0x0F5] = {name='Widescan Track',      description='Updates information when tracking a monster.'}

@@ -212,12 +212,14 @@ windower.register_event('incoming chunk',function (id, data)
 end
 )
 
-windower.register_event('outgoing chunk',function (id, data)
+--[[windower.register_event('outgoing chunk',function (id, data)
     if id == 0x17 then
         -- Block the NPC/armor mismatch error packet
         return true
     end
 end)
+-- It appear that blocking this packet might have been causing people to not show up occasionally.
+-- Rather than an unnatural error packet, it might be a normal part of client-server communication.]]
 
 windower.register_event('addon command', function (command,...)
     command = command and command:lower() or 'help'

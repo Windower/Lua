@@ -248,6 +248,7 @@ function Target(category,top_level_param,t)
     new_instance.raw = t
     new_instance.category = category
     new_instance.top_level_param = top_level_param
+    new_instance.id = t.id
 
     return setmetatable(new_instance, {__index = function (t, k) if rawget(t, k) ~= nil then return t[k] else return target[k] end end})
 end
