@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
 _addon.name = 'Nostrum'
 _addon.author = 'trv'
-_addon.version = '2.0.6'
+_addon.version = '2.0.8'
 _addon.commands = {'Nostrum','nos',}
 
 packets=require('packets')
@@ -339,66 +339,80 @@ function build_macro()
     end
 end
 
-windower.register_event('load', 'login', function()
+initialize = (function()
+    local initialized = false
+    return function(bool)
+        if bool ~= nil then initialized = bool return end
+        if initialized or not windower.ffxi.get_info().logged_in then return end
+        initialized = true
+        alliance_keys = {'p5', 'p4', 'p3', 'p2', 'p1', 'p0', 'a15', 'a14', 'a13', 'a12', 'a11', 'a10', 'a25', 'a24', 'a23', 'a22', 'a21', 'a20'}
+        local party_from_memory = windower.ffxi.get_party()
+        player_id = windower.ffxi.get_player().id
+        local alliance = {}
+        position_lookup = {}
+        stat_table = {}
+        party = {L{},L{},L{}}
 
-    regions = 0
-    alliance_keys = {'p5', 'p4', 'p3', 'p2', 'p1', 'p0', 'a15', 'a14', 'a13', 'a12', 'a11', 'a10', 'a25', 'a24', 'a23', 'a22', 'a21', 'a20'}
-    local party_from_memory = windower.ffxi.get_party()
-    player_id = windower.ffxi.get_player().id
-    local alliance = {}
-    position_lookup = {}
-    stat_table = {}
-    party = {L{},L{},L{}}
-
-    coroutine.sleep(2)
-
-    for i=1,18 do
-        local pkey = alliance_keys[i]
-        if party_from_memory[pkey] and party_from_memory[pkey].mob then
-            alliance[i] = party_from_memory[pkey].mob.id
-            position_lookup[alliance[i]] = i
-            position[1][i] = party_from_memory[pkey].mob.x
-            position[2][i] = party_from_memory[pkey].mob.y
-            position[3][i] = party_from_memory[pkey].mob.z
-            stat_table[alliance[i]]={
-                hp = party_from_memory[pkey].hp,
-                mp = party_from_memory[pkey].mp,
-                mpp = party_from_memory[pkey].mpp,
-                hpp = party_from_memory[pkey].hpp,
-                tp = party_from_memory[pkey].tp,
-                name = party_from_memory[pkey].name,
-            }
+        for i=1,18 do
+            local pkey = alliance_keys[i]
+            if party_from_memory[pkey] and party_from_memory[pkey].mob then
+                alliance[i] = party_from_memory[pkey].mob.id
+                position_lookup[alliance[i]] = i
+                position[1][i] = party_from_memory[pkey].mob.x
+                position[2][i] = party_from_memory[pkey].mob.y
+                position[3][i] = party_from_memory[pkey].mob.z
+                stat_table[alliance[i]]={
+                    hp = party_from_memory[pkey].hp,
+                    mp = party_from_memory[pkey].mp,
+                    mpp = party_from_memory[pkey].mpp,
+                    hpp = party_from_memory[pkey].hpp,
+                    tp = party_from_memory[pkey].tp,
+                    name = party_from_memory[pkey].name,
+                }
+            end
         end
-    end
-    
-    for i=18,1,-1 do
-        if alliance[i] then
-            party[math.ceil(i/6,1)]:append(alliance[i])
+        
+        for i=18,1,-1 do
+            if alliance[i] then
+                party[math.ceil(i/6,1)]:append(alliance[i])
+            end
         end
+        build_macro()
+        define_active_regions()
+        register_events(true)
     end
-    build_macro()
-    define_active_regions()
+end)()
 
+windower.register_event('load', initialize)
+
+windower.register_event('login', function()
+    coroutine.sleep(6)
+    initialize()
 end)
 
-windower.register_event('logout', wrecking_ball)
+windower.register_event('logout', function()
+    wrecking_ball()
+    initialize(false)
+    register_events(false)
+end)
 
 windower.register_event('addon command', function(...)
-    local args = T{...}
-    if #args < 1 or args[1]:lower() == 'help' then
+    local args=T{...}
+    local c = args[1] and args[1]:lower() or 'help'
+    if c == 'help' then
         print('help:Prints a list of these commands in the console.')
         print('refresh(r): Compares the macro\'s current party structures to the party structure in memory.')
         print('hide(h): Toggles the macro\'s visibility.')
         print('cut(c): Trims the macro down to size, removing blank spaces.')
         print('send(s) <name>: Requires send addon. Sends commands to the character whose name was provided.')
         print('If no name is provided, send will reset and commands will be sent to the character with Nostrum loaded.')
-        elseif args[1]:lower() == 'hide' or args[1]:lower() == 'h' then
+    elseif c == 'hide' or c == 'h' then
         toggle_visibility()
-    elseif args[1]:lower() == 'cut' or args[1]:lower() == 'c' then
+    elseif c == 'cut' or c == 'c' then
         trim_macro()
-    elseif args[1]:lower() == 'refresh' or args[1]:lower() == 'r' then
+    elseif c == 'refresh' or c == 'r' then
         compare_alliance_to_memory()
-    elseif args[1]:lower() == 'send' or args[1]:lower() == 's' then
+    elseif c == 'send' or c == 's' then
         if args[2] then 
             send_string = 'send ' .. tostring(args[2]) .. ' '
             print('Commands will be sent to: ' .. args[2])
@@ -406,338 +420,362 @@ windower.register_event('addon command', function(...)
             send_string = ''
             print('Input contained no name. Send disabled.')
         end
-    end
-end)
-
-windower.register_event('keyboard', function(dik,flags,blocked)
-    if bit.band(blocked,32) == 32 then return end
-    if tab_keys:contains(dik) then
-        if flags then
-            coroutine.sleep(.02)
-            local target = windower.ffxi.get_mob_by_target('t')
-            if target then update_target(target.index) end
+    elseif c == 'profile' or c == 'p' then
+        if args[2] == 'reload' or args[2] == 'r' then
+            config.reload(defaults)
+        elseif _settings.profiles[args[2]] then
+            profile = _settings.profiles[args[2]]
+            switch_profiles()
+        else
+            print('Profile ' .. args[2] .. ' not found.')
         end
     end
 end)
 
-windower.register_event('mouse', function(type, x, y, delta, blocked)
-    if blocked or is_hidden then
-        return
-    end
-    if type == 0 then
-        for i=1,regions do
-            if (y>b[i] and y<t[i]) and (x>l[i] and x<r[i]) then
-                if not macro_visibility[i] then
-                    toggle_macro_visibility(i)
+register_events = (function()
+    local incoming_chunk_event
+    local outgoing_chunk_event
+    local keyboard_event
+    local mouse_event
+    return function(bool)
+    if bool then
+        keyboard_event = windower.register_event('keyboard', function(dik,flags,blocked)
+            if bit.band(blocked,32) == 32 then return end
+            if tab_keys:contains(dik) then
+                if flags then
+                    coroutine.sleep(.02)
+                    local target = windower.ffxi.get_mob_by_target('t')
+                    if target then update_target(target.index) end
                 end
-                local p = 'p' .. macro_order[region_map[i]][math.ceil((x-l[i])/30)] .. tostring(6*i + 1 - math.ceil((y-b[i])/25))
-                hover(p)
-            else
-                if i == 1 then
-                    if y>b[4] and y<t[4]+2 and x>l[4] and x<r[4] then
-                        if not macro_visibility[1] then
-                            toggle_macro_visibility(1)
+            end
+        end)
+        
+        mouse_event = windower.register_event('mouse', function(type, x, y, delta, blocked)
+            if blocked or is_hidden then
+                return
+            end
+            if type == 0 then
+                for i=1,regions do
+                    if (y>b[i] and y<t[i]) and (x>l[i] and x<r[i]) then
+                        if not macro_visibility[i] then
+                            toggle_macro_visibility(i)
                         end
-                        local p = 'p' .. macro_order[region_map[4]][math.ceil((x-l[4])/33)]
+                        local p = 'p' .. macro_order[region_map[i]][math.ceil((x-l[i])/30)] .. tostring(6*i + 1 - math.ceil((y-b[i])/25))
                         hover(p)
-                        return
-                    elseif y>b[5] and y<t[5]+1 and x>l[5] and x<r[5] then
-                        if not macro_visibility[1] then
-                            toggle_macro_visibility(1)
+                    else
+                        if i == 1 then
+                            if y>b[4] and y<t[4]+2 and x>l[4] and x<r[4] then
+                                if not macro_visibility[1] then
+                                    toggle_macro_visibility(1)
+                                end
+                                local p = 'p' .. macro_order[region_map[4]][math.ceil((x-l[4])/33)]
+                                hover(p)
+                                return
+                            elseif y>b[5] and y<t[5]+1 and x>l[5] and x<r[5] then
+                                if not macro_visibility[1] then
+                                    toggle_macro_visibility(1)
+                                end
+                                local p = 'p' .. macro_order[region_map[5]][math.ceil((x-l[5])/33)]
+                                hover(p)
+                                return
+                            end
                         end
-                        local p = 'p' .. macro_order[region_map[5]][math.ceil((x-l[5])/33)]
-                        hover(p)
-                        return
+                        if macro_visibility[i] then
+                            toggle_macro_visibility(i)
+                        end
                     end
                 end
-                if macro_visibility[i] then
-                    toggle_macro_visibility(i)
-                end
-            end
-        end
-    elseif type == 1 then
-        for i=1,regions do
-            if y>b[i] and y<t[i] then
-                if x>l[i] and x<r[i] then
-                    determine_response(x,i,30,y)
-                elseif x>l[i+5] and x<r[i+5] then
-                    windower.send_command('%sinput /target %s':format(send_string,stat_table[party[i][math.ceil((y-b[i])/25)]].name))                else
+            elseif type == 1 then
+                for i=1,regions do
+                    if y>b[i] and y<t[i] then
+                        if x>l[i] and x<r[i] then
+                            determine_response(x,i,30,y)
+                        elseif x>l[i+5] and x<r[i+5] then
+                            windower.send_command('%sinput /target %s':format(send_string,stat_table[party[i][math.ceil((y-b[i])/25)]].name))                else
+                        end
+                        
+                        dragged = true
+                        return true
+                    end
                 end
                 
-                dragged = true
-                return true
-            end
-        end
-        
-        if y>b[4] and y<t[4] and x>l[4] and x<r[4] then
-            determine_response(x,4,33)
-            dragged = true
-            return true
-        elseif y>b[5] and y<t[5] and x>l[5] and x<r[5] then
-            determine_response(x,5,33)
-            dragged = true
-            return true
-        end
-    elseif type == 2 then 
-        if dragged then
-            dragged = false
-            return true
-        end
-    elseif type == 4 then
-        for i=1,regions do
-            if y>b[i] and y<t[i] then
-                if x>l[i+5] and x<r[i+5] then
-                    windower.send_command('%sinput /ma "%s" %s':format(send_string, spell_default, stat_table[party[i][math.ceil((y-b[i])/25)]].name))
+                if y>b[4] and y<t[4] and x>l[4] and x<r[4] then
+                    determine_response(x,4,33)
+                    dragged = true
+                    return true
+                elseif y>b[5] and y<t[5] and x>l[5] and x<r[5] then
+                    determine_response(x,5,33)
                     dragged = true
                     return true
                 end
-            end
-        end
-    
-        if y>b[4] and y<t[4] and x>l[4] and x<r[4] then
-            spell_default = xml_to_lua[macro_order[region_map[4]][math.ceil((x-l[4])/33)]]
-            windower.text.set_text('menu', spell_default)
-            text_coordinates.x['menu'] = prim_coordinates.x['pmenu'] + 1 + (150 - 7.55 * string.length(spell_default))/2
-            windower.text.set_location('menu',text_coordinates.x['menu'],text_coordinates.y['menu'])
-            dragged = true
-            return true
-        elseif y>b[5] and y<t[5] and x>l[5] and x<r[5] then
-            spell_default = xml_to_lua[macro_order[region_map[5]][math.ceil((x-l[5])/33)]]
-            windower.text.set_text('menu', spell_default)
-            text_coordinates.x['menu'] = prim_coordinates.x['pmenu'] + 1 + (150 - 7.55 * string.length(spell_default))/2
-            windower.text.set_location('menu',text_coordinates.x['menu'],text_coordinates.y['menu'])
-            dragged = true
-            return true
-        end
-    elseif type == 5 then
-        if dragged then
-            dragged = false
-            return true
-        end
-    end
-end)
-
-windower.register_event('outgoing chunk', function(id,data)
-    if id == 0x015 then
-        local packet = packets.parse('outgoing', data)
-        local target = packet['Target Index']
-        update_target(target)
-        position[1][6],position[2][6],position[3][6] = packet['X'],packet['Y'],packet['Z']
-        for i = 5,7-party[1].n,-1 do
-            if not out_of_zone:contains(party[1][7 - i]) then
-                color_name(position[1][i],position[2][i],position[3][i],i,false)
-            end
-        end
-        for j = 2,3 do
-            for i = j*6,j*6-party[j].n+1,-1 do
-                if not out_of_zone:contains(party[j][j*6-i+1]) then
-                    color_name(position[1][i],position[2][i],position[3][i],i,false)
+            elseif type == 2 then 
+                if dragged then
+                    dragged = false
+                    return true
                 end
-            end
-        end
-    elseif id == 0x00D then
-        is_zoning = true
-        if not is_hidden then
-            for key in pairs(saved_prims) do
-                if prim_coordinates.visible[key] then
-                    windower.prim.set_visibility(key,false)
-                end
-            end
-            for key in pairs(saved_texts) do
-                if text_coordinates.visible[key] then
-                    windower.text.set_visibility(key,false)
-                end
-            end
-        end
-    elseif id == 0x00C then
-        if not is_hidden then
-            for key in pairs(saved_prims - (macro[1] + macro[2] + macro[3])) do
-                windower.prim.set_visibility(key,prim_coordinates.visible[key])
-            end
-            for key in pairs(saved_texts - (macro[1] + macro[2] + macro[3])) do
-                windower.text.set_visibility(key,text_coordinates.visible[key])
-            end
-        end
-        coroutine.sleep(10)
-        is_zoning = false
-    end
-end)
-
-windower.register_event('incoming chunk', function(id, data)
-    if id == 0x00D then
-        local packet = packets.parse('incoming', data)
-        if packet['Player'] == player_id then
-            return
-        elseif position_lookup[packet['Player']] then
-            if bit.band(packet['Mask'],1) == 1 then
-            local f = position_lookup[packet['Player']]
-                position[1][f] = packet['X']
-                position[2][f] = packet['Y']
-                position[3][f] = packet['Z']
-                color_name(position[1][f],position[2][f],position[3][f],f,packet['Mask'] == 32)
-            end
-        end
-    elseif id == 0x00E then
-        local packet = packets.parse('incoming', data)
-        local f = position_lookup[packet['NPC']]
-        if bit.band(packet['Mask'],4) == 4 and packet['Index'] == last_index then -- HP
-            if packet['HP %']~=last_hpp then
-                    windower.text.set_text("targethpp",packet['HP %'])
-                    windower.prim.set_size("target",150/100*packet['HP %'],30)
-                    if math.floor(packet['HP %']/25) ~= math.floor(last_hpp/25) then
-                        local color=_settings.primitives.hp_bar[choose_color(packet['HP %'])]
-                        windower.prim.set_color("target",color.a,color.r,color.g,color.b)
+            elseif type == 4 then
+                for i=1,regions do
+                    if y>b[i] and y<t[i] then
+                        if x>l[i+5] and x<r[i+5] then
+                            windower.send_command('%sinput /ma "%s" %s':format(send_string, spell_default, stat_table[party[i][math.ceil((y-b[i])/25)]].name))
+                            dragged = true
+                            return true
+                        end
                     end
-                last_hpp = packet['HP %']
+                end
+            
+                if y>b[4] and y<t[4] and x>l[4] and x<r[4] then
+                    spell_default = xml_to_lua[macro_order[region_map[4]][math.ceil((x-l[4])/33)]]
+                    windower.text.set_text('menu', spell_default)
+                    text_coordinates.x['menu'] = prim_coordinates.x['pmenu'] + 1 + (150 - 7.55 * string.length(spell_default))/2
+                    windower.text.set_location('menu',text_coordinates.x['menu'],text_coordinates.y['menu'])
+                    dragged = true
+                    return true
+                elseif y>b[5] and y<t[5] and x>l[5] and x<r[5] then
+                    spell_default = xml_to_lua[macro_order[region_map[5]][math.ceil((x-l[5])/33)]]
+                    windower.text.set_text('menu', spell_default)
+                    text_coordinates.x['menu'] = prim_coordinates.x['pmenu'] + 1 + (150 - 7.55 * string.length(spell_default))/2
+                    windower.text.set_location('menu',text_coordinates.x['menu'],text_coordinates.y['menu'])
+                    dragged = true
+                    return true
+                end
+            elseif type == 5 then
+                if dragged then
+                    dragged = false
+                    return true
+                end
             end
-        end
-        if bit.band(packet['Mask'],1) == 1 and f then -- position
-            position[1][f] = packet['X']
-            position[2][f] = packet['Y']
-            position[3][f] = packet['Z']
-            color_name(position[1][f],position[2][f],position[3][f],f,false)
-        end
-    elseif id == 0x0DF then
-        local packet = packets.parse('incoming', data)
-        local id = packet['ID']
-        if not position_lookup[id] then return end
-        to_update:clear()
-        if stat_table[id].hp ~= packet['HP'] then
-            stat_table[id].hp = packet['HP']
-            to_update:append('hp')
-        end
-        if stat_table[id].mp ~= packet['MP'] then
-            stat_table[id].mp = packet['MP']
-            to_update:append('mp')
-        end
-        if stat_table[id].tp ~= packet['TP'] then
-            stat_table[id].tp = packet['TP']
-            to_update:append('tp')
-        end
-        if stat_table[id].hpp ~= packet['HPP'] then
-            if math.floor(stat_table[id].hpp/25) ~= math.floor(packet['HPP']/25) then
-                local color=_settings.primitives.hp_bar[choose_color(packet['HPP'])]
-                windower.prim.set_color('phpp'..position_lookup[id],color.a,color.r,color.g,color.b)
+        end)
+
+        outgoing_chunk_event = windower.register_event('outgoing chunk', function(id,data)
+            if id == 0x015 then
+                local packet = packets.parse('outgoing', data)
+                local target = packet['Target Index']
+                update_target(target)
+                position[1][6],position[2][6],position[3][6] = packet['X'],packet['Y'],packet['Z']
+                for i = 5,7-party[1].n,-1 do
+                    if not out_of_zone:contains(party[1][7 - i]) then
+                        color_name(position[1][i],position[2][i],position[3][i],i,false)
+                    end
+                end
+                for j = 2,3 do
+                    for i = j*6,j*6-party[j].n+1,-1 do
+                        if not out_of_zone:contains(party[j][j*6-i+1]) then
+                            color_name(position[1][i],position[2][i],position[3][i],i,false)
+                        end
+                    end
+                end
+            elseif id == 0x00D then
+                is_zoning = true
+                if not is_hidden then
+                    for key in pairs(saved_prims) do
+                        if prim_coordinates.visible[key] then
+                            windower.prim.set_visibility(key,false)
+                        end
+                    end
+                    for key in pairs(saved_texts) do
+                        if text_coordinates.visible[key] then
+                            windower.text.set_visibility(key,false)
+                        end
+                    end
+                end
+            elseif id == 0x00C then
+                if not is_hidden then
+                    for key in pairs(saved_prims - (macro[1] + macro[2] + macro[3])) do
+                        windower.prim.set_visibility(key,prim_coordinates.visible[key])
+                    end
+                    for key in pairs(saved_texts - (macro[1] + macro[2] + macro[3])) do
+                        windower.text.set_visibility(key,text_coordinates.visible[key])
+                    end
+                end
+                coroutine.sleep(10)
+                is_zoning = false
             end
-            stat_table[id].hpp = packet['HPP']
-            to_update:append('hpp')
-            windower.prim.set_size('phpp'..position_lookup[id],150/100*stat_table[id]['hpp'],h)
-        end
-        if stat_table[id].mpp ~= packet['MPP'] then
-            stat_table[id].mpp = packet['MPP']
-            windower.prim.set_size('pmpp'..position_lookup[id],150/100*stat_table[id]['mpp'],5)
-        end
-        
-        update_macro_data(id,to_update)
-    elseif id == 0x0DD then
-        local packet = packets.parse('incoming',data)
-        local id = packet['ID']
-        if not position_lookup[id] then
-            return
-        end
-        if packet['Zone'] ~= 0 then
-            if not out_of_zone[id] then
-                remove_macro_information(position_lookup[id],false)
-                out_of_zone:add(id)
-                seeking_information:add(id)
-            end
-            if who_am_i[id] then
-                stat_table[id].name = packet['Name']
-                windower.text.set_text("name"..position_lookup[id],prepare_names(packet['Name']))
-                who_am_i:remove(id)
-            end
-        elseif is_zoning or seeking_information[packet['ID']] then
+        end)
+
+        incoming_chunk_event = windower.register_event('incoming chunk', function(id, data)
+            if id == 0x00D then
+                local packet = packets.parse('incoming', data)
+                if packet['Player'] == player_id then
+                    return
+                elseif position_lookup[packet['Player']] then
+                    if bit.band(packet['Mask'],1) == 1 then
+                    local f = position_lookup[packet['Player']]
+                        position[1][f] = packet['X']
+                        position[2][f] = packet['Y']
+                        position[3][f] = packet['Z']
+                        color_name(position[1][f],position[2][f],position[3][f],f,packet['Mask'] == 32)
+                    end
+                end
+            elseif id == 0x00E then
+                local packet = packets.parse('incoming', data)
+                local f = position_lookup[packet['NPC']]
+                if bit.band(packet['Mask'],4) == 4 and packet['Index'] == last_index then -- HP
+                    if packet['HP %']~=last_hpp then
+                            windower.text.set_text("targethpp",packet['HP %'])
+                            windower.prim.set_size("target",150/100*packet['HP %'],30)
+                            if math.floor(packet['HP %']/25) ~= math.floor(last_hpp/25) then
+                                local color=_settings.primitives.hp_bar[choose_color(packet['HP %'])]
+                                windower.prim.set_color("target",color.a,color.r,color.g,color.b)
+                            end
+                        last_hpp = packet['HP %']
+                    end
+                end
+                if bit.band(packet['Mask'],1) == 1 and f then -- position
+                    position[1][f] = packet['X']
+                    position[2][f] = packet['Y']
+                    position[3][f] = packet['Z']
+                    color_name(position[1][f],position[2][f],position[3][f],f,false)
+                end
+            elseif id == 0x0DF then
+                local packet = packets.parse('incoming', data)
+                local id = packet['ID']
+                if not position_lookup[id] then return end
                 to_update:clear()
-                stat_table[id].hp = packet['HP']
-                to_update:append('hp')
-                stat_table[id].mp = packet['MP']
-                to_update:append('mp')
-                stat_table[id].tp = packet['TP']
-                to_update:append('tp')
-                local color=_settings.primitives.hp_bar[choose_color(packet['HP%'])]
-                windower.prim.set_color('phpp'..position_lookup[id],color.a,color.r,color.g,color.b)
-                stat_table[id].hpp = packet['HP%']
-                to_update:append('hpp')
-                windower.prim.set_size('phpp'..position_lookup[id],150/100*stat_table[id]['hpp'],h)
-                stat_table[id].mpp = packet['MP%']
-                windower.prim.set_size('pmpp'..position_lookup[id],150/100*stat_table[id]['mpp'],5)
-                update_macro_data(id,to_update)
-                if who_am_i[id] then
-                    stat_table[id].name = packet['Name']
-                    windower.text.set_text("name"..position_lookup[id],prepare_names(packet['Name']))
-                    who_am_i:remove(id)
+                if stat_table[id].hp ~= packet['HP'] then
+                    stat_table[id].hp = packet['HP']
+                    to_update:append('hp')
                 end
-                seeking_information:remove(id)
-                out_of_zone:remove(id)
-        end
-    elseif id == 0x0C8 then
-        local packet = packets.parse('incoming', data)
-        coroutine.yield() -- Note: Never delete this (?) Something causes the macro to deform without it.
-        local packet_id_struc = {
-            packet['ID 1'],
-            packet['ID 2'],
-            packet['ID 3'],
-            packet['ID 4'],
-            packet['ID 5'],
-            packet['ID 6'],
-            packet['ID 7'],
-            packet['ID 8'],
-            packet['ID 9'],
-            packet['ID 10'],
-            packet['ID 11'],
-            packet['ID 12'],
-            packet['ID 13'],
-            packet['ID 14'],
-            packet['ID 15'],
-            packet['ID 16'],
-            packet['ID 17'],
-            packet['ID 18']
-        }
-        local packet_flag_struc = {
-            packet['Flags 1'],
-            packet['Flags 2'],
-            packet['Flags 3'],
-            packet['Flags 4'],
-            packet['Flags 5'],
-            packet['Flags 6'],
-            packet['Flags 7'],
-            packet['Flags 8'],
-            packet['Flags 9'],
-            packet['Flags 10'],
-            packet['Flags 11'],
-            packet['Flags 12'],
-            packet['Flags 13'],
-            packet['Flags 14'],
-            packet['Flags 15'],
-            packet['Flags 16'],
-            packet['Flags 17'],
-            packet['Flags 18']
-        }
-        for i = 1,18 do
-            if packet_id_struc[i]~=0 then
-                if bit.band(packet_flag_struc[i],2) == 2 then
-                    if bit.band(packet_flag_struc[i],1) == 1 then
-                        packet_pt_struc[3]:add(packet_id_struc[i])
-                    else
-                        packet_pt_struc[1]:add(packet_id_struc[i])
+                if stat_table[id].mp ~= packet['MP'] then
+                    stat_table[id].mp = packet['MP']
+                    to_update:append('mp')
+                end
+                if stat_table[id].tp ~= packet['TP'] then
+                    stat_table[id].tp = packet['TP']
+                    to_update:append('tp')
+                end
+                if stat_table[id].hpp ~= packet['HPP'] then
+                    if math.floor(stat_table[id].hpp/25) ~= math.floor(packet['HPP']/25) then
+                        local color=_settings.primitives.hp_bar[choose_color(packet['HPP'])]
+                        windower.prim.set_color('phpp'..position_lookup[id],color.a,color.r,color.g,color.b)
                     end
-                elseif bit.band(packet_flag_struc[i],1) == 1 then
-                    packet_pt_struc[2]:add(packet_id_struc[i])
-                else
-                    packet_pt_struc[1]:add(packet_id_struc[i])
+                    stat_table[id].hpp = packet['HPP']
+                    to_update:append('hpp')
+                    windower.prim.set_size('phpp'..position_lookup[id],150/100*stat_table[id]['hpp'],h)
                 end
+                if stat_table[id].mpp ~= packet['MPP'] then
+                    stat_table[id].mpp = packet['MPP']
+                    windower.prim.set_size('pmpp'..position_lookup[id],150/100*stat_table[id]['mpp'],5)
+                end
+                
+                update_macro_data(id,to_update)
+            elseif id == 0x0DD then
+                local packet = packets.parse('incoming',data)
+                local id = packet['ID']
+                if not position_lookup[id] then
+                    return
+                end
+                if packet['Zone'] ~= 0 then
+                    if not out_of_zone[id] then
+                        remove_macro_information(position_lookup[id],false)
+                        out_of_zone:add(id)
+                        seeking_information:add(id)
+                    end
+                    if who_am_i[id] then
+                        stat_table[id].name = packet['Name']
+                        windower.text.set_text("name"..position_lookup[id],prepare_names(packet['Name']))
+                        who_am_i:remove(id)
+                    end
+                elseif is_zoning or seeking_information[packet['ID']] then
+                        to_update:clear()
+                        stat_table[id].hp = packet['HP']
+                        to_update:append('hp')
+                        stat_table[id].mp = packet['MP']
+                        to_update:append('mp')
+                        stat_table[id].tp = packet['TP']
+                        to_update:append('tp')
+                        local color=_settings.primitives.hp_bar[choose_color(packet['HP%'])]
+                        windower.prim.set_color('phpp'..position_lookup[id],color.a,color.r,color.g,color.b)
+                        stat_table[id].hpp = packet['HP%']
+                        to_update:append('hpp')
+                        windower.prim.set_size('phpp'..position_lookup[id],150/100*stat_table[id]['hpp'],h)
+                        stat_table[id].mpp = packet['MP%']
+                        windower.prim.set_size('pmpp'..position_lookup[id],150/100*stat_table[id]['mpp'],5)
+                        update_macro_data(id,to_update)
+                        if who_am_i[id] then
+                            stat_table[id].name = packet['Name']
+                            windower.text.set_text("name"..position_lookup[id],prepare_names(packet['Name']))
+                            who_am_i:remove(id)
+                        end
+                        seeking_information:remove(id)
+                        out_of_zone:remove(id)
+                end
+            elseif id == 0x0C8 then
+                local packet = packets.parse('incoming', data)
+                coroutine.yield() -- Note: Never delete this (?) Something causes the macro to deform without it.
+                local packet_id_struc = {
+                    packet['ID 1'],
+                    packet['ID 2'],
+                    packet['ID 3'],
+                    packet['ID 4'],
+                    packet['ID 5'],
+                    packet['ID 6'],
+                    packet['ID 7'],
+                    packet['ID 8'],
+                    packet['ID 9'],
+                    packet['ID 10'],
+                    packet['ID 11'],
+                    packet['ID 12'],
+                    packet['ID 13'],
+                    packet['ID 14'],
+                    packet['ID 15'],
+                    packet['ID 16'],
+                    packet['ID 17'],
+                    packet['ID 18']
+                }
+                local packet_flag_struc = {
+                    packet['Flags 1'],
+                    packet['Flags 2'],
+                    packet['Flags 3'],
+                    packet['Flags 4'],
+                    packet['Flags 5'],
+                    packet['Flags 6'],
+                    packet['Flags 7'],
+                    packet['Flags 8'],
+                    packet['Flags 9'],
+                    packet['Flags 10'],
+                    packet['Flags 11'],
+                    packet['Flags 12'],
+                    packet['Flags 13'],
+                    packet['Flags 14'],
+                    packet['Flags 15'],
+                    packet['Flags 16'],
+                    packet['Flags 17'],
+                    packet['Flags 18']
+                }
+                for i = 1,18 do
+                    if packet_id_struc[i]~=0 then
+                        if bit.band(packet_flag_struc[i],2) == 2 then
+                            if bit.band(packet_flag_struc[i],1) == 1 then
+                                packet_pt_struc[3]:add(packet_id_struc[i])
+                            else
+                                packet_pt_struc[1]:add(packet_id_struc[i])
+                            end
+                        elseif bit.band(packet_flag_struc[i],1) == 1 then
+                            packet_pt_struc[2]:add(packet_id_struc[i])
+                        else
+                            packet_pt_struc[1]:add(packet_id_struc[i])
+                        end
+                    end
+                end
+                
+                if packet_pt_struc[3]:contains(player_id) then
+                    packet_pt_struc[1],packet_pt_struc[3] = packet_pt_struc[3],packet_pt_struc[1]
+                elseif packet_pt_struc[2]:contains(player_id) then
+                    packet_pt_struc[1],packet_pt_struc[2] = packet_pt_struc[2],packet_pt_struc[1]
+                end
+                
+                if packet_pt_struc[2]:length() == 0 then
+                    packet_pt_struc[2],packet_pt_struc[3] = packet_pt_struc[3],packet_pt_struc[2]
+                end
+                new_members()
             end
-        end
-        
-        if packet_pt_struc[3]:contains(player_id) then
-            packet_pt_struc[1],packet_pt_struc[3] = packet_pt_struc[3],packet_pt_struc[1]
-        elseif packet_pt_struc[2]:contains(player_id) then
-            packet_pt_struc[1],packet_pt_struc[2] = packet_pt_struc[2],packet_pt_struc[1]
-        end
-        
-        if packet_pt_struc[2]:length() == 0 then
-            packet_pt_struc[2],packet_pt_struc[3] = packet_pt_struc[3],packet_pt_struc[2]
-        end
-        new_members()
+        end)
+    else
+        windower.unregister_event(keyboard_event)
+        windower.unregister_event(mouse_event)
+        windower.unregister_event(incoming_chunk_event)
+        windower.unregister_event(outgoing_chunk_event)
     end
-end)
+end
+end)()
