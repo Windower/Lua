@@ -1,5 +1,4 @@
 function export_set(options)
-    --local temp_items,item_list = windower.ffxi.get_items(),{}
     local item_list = {}
     local targinv,xml,all_sets,use_job_in_filename,use_subjob_in_filename,overwrite_existing
     if #options > 0 then

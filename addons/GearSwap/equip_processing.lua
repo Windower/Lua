@@ -124,7 +124,7 @@ function unpack_equip_list(equip_list)
     
     for bag_id,inventory in pairs(inventories) do
         for _,item_tab in pairs(inventory) do
-            if check_wearable(item_tab.id) then
+            if type(item_tab) == 'table' and check_wearable(item_tab.id) then
                 if item_tab.status == 0 or item_tab.status == 5 then -- Make sure the item is either equipped or not otherwise committed. eliminate_redundant will take care of the already-equipped gear.
                     for slot_id,slot_name in pairs(default_slot_map) do
                         -- equip_list[slot_name] can also be a table (that doesn't contain a "name" property) or a number, which are both cases that should not generate any kind of equipment changing.

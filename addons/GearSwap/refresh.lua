@@ -547,7 +547,7 @@ end
 function refresh_item_list(itemlist)
     retarr = make_user_table()
     for i,v in pairs(itemlist) do
-        if v.id and v.id ~= 0 then
+        if type(v) == 'table' and v.id and v.id ~= 0 then
             -- If we don't already have the primary item name in the table, add it.
             if res.items[v.id] and res.items[v.id][language] and not retarr[res.items[v.id][language]] then
                 -- We add the entry as a sub-table containing the id and count
@@ -585,7 +585,6 @@ function refresh_user_env(job_id)
         windower.send_command('@wait 1;lua i '.._addon.name..' refresh_user_env')
     else
         load_user_files(job_id)
-        --windower.send_command('@wait 0.5;lua i '.._addon.name..' load_user_files '..job_id)
     end
 end
 

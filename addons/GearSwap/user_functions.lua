@@ -129,7 +129,6 @@ function enable(...)
     if type(enable_tab[1]) == 'table' then
         enable_tab = enable_tab[1] -- Compensates for people passing a table instead of a series of strings.
     end
-    --items = windower.ffxi.get_items()
     local sending_table = {}
     for i,v in pairs(enable_tab) do
         local local_slot = get_default_slot(v)
