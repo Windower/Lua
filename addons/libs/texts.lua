@@ -176,6 +176,7 @@ function texts.new(str, settings, root_settings)
     m.status = m.status or {visible = false, text = {}}
     m.root_settings = root_settings
     m.base_str = str
+    m.keys = {}
 
     m.events = {}
 
@@ -238,6 +239,7 @@ function texts.clear(t)
     m.defaults = {}
     m.textorder = {}
     m.formats = {}
+    m.keys = {}
 
     texts.append(t, m.base_str or '')
 end
@@ -281,6 +283,7 @@ function texts.append(t, str)
             end
 
             m.textorder[index] = key
+            m.keys[key] = true
             m.texts[key] = default
             m.defaults[key] = default
             m.formats[key] = format
@@ -297,6 +300,16 @@ function texts.append(t, str)
     end
 
     texts.update(t)
+end
+
+-- Returns an iterator over all currently registered variables
+function texts.it(t)
+    local key
+
+    return function()
+        key = next(meta[t].keys, key)
+        return key
+    end
 end
 
 -- Appends new text tokens with a line break
