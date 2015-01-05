@@ -49,7 +49,7 @@ function find_item(target_item)
         check_space()
     end
     for i,v in pairs(windower.ffxi.get_items().inventory) do
-        if v.id and res.items[v.id] and (res.items[v.id].en:lower() == target_item:lower() or res.items[v.id].enl:lower() == target_item:lower()) then
+        if type(v) == 'table' and v.id and res.items[v.id] and (res.items[v.id].en:lower() == target_item:lower() or res.items[v.id].enl:lower() == target_item:lower()) then
             print('found weapon '..target_item)
             windower.packets.inject_outgoing(0x29,string.char(0x29,6,0,0,1,0,0,0,0,bag_id,i,0x52))
             coroutine.sleep(2)
@@ -66,7 +66,7 @@ function get_back_item(target_item)
         return
     end
     for i,v in pairs(windower.ffxi.get_items()[bag:lower()]) do
-        if v.id and res.items[v.id] and (res.items[v.id].en:lower() == target_item:lower() or res.items[v.id].enl:lower() == target_item:lower()) then
+        if type(v) =='table' and v.id and res.items[v.id] and (res.items[v.id].en:lower() == target_item:lower() or res.items[v.id].enl:lower() == target_item:lower()) then
             windower.packets.inject_outgoing(0x29,string.char(0x29,6,0,0,1,0,0,0,bag_id,0,i,0x52))
             break
         end
