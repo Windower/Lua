@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
 _addon.name = 'Rhombus'
 _addon.author = 'trv'
-_addon.version = '1.0.1'
+_addon.version = '1.0.2'
 
 config = require('config')
 texts = require('texts')
@@ -592,7 +592,7 @@ mouse_func = {
             end
           end,
     [2] = function()
-        menu_general_layout(remove_categories(windower.ffxi.get_abilities().weapon_skills),ws_template,2)
+        menu_general_layout(windower.ffxi.get_abilities().weapon_skills,ws_template,2)
     end,
     [3] = function()
         menu_general_layout(remove_categories(windower.ffxi.get_abilities().job_abilities),ja_template,3)
@@ -687,7 +687,7 @@ function format_response(n,p,bool)
         n,p = '/ma',res.spells[p].en
     elseif n == 2 then
         if bool then 
-            if not (res.spells[p].targets['Self'] or res.spells[p].targets['Corpse']) then
+            if not (res.weapon_skills[p].targets['Self'] or res.weapon_skills[p].targets['Corpse']) then
                 t = ' <stnpc>'
             else
                 t = ' <stpc>'
@@ -698,7 +698,7 @@ function format_response(n,p,bool)
         n,p = '/ws',res.weapon_skills[p].en
     else
         if bool then 
-            if not (res.spells[p].targets['Self'] or res.spells[p].targets['Corpse']) then
+            if not (res.job_abilities[p].targets['Self'] or res.job_abilities[p].targets['Corpse']) then
                 t = ' <stnpc>'
             else
                 t = ' <stpc>'
