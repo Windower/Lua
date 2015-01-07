@@ -1732,14 +1732,25 @@ enums.indi = {
     -- 0x8000 -- No obvious effect
     
     _flags2:
-    -- 0x01 -- POL Icon
+    -- 0x01 -- POL Icon :: Actually a flag, overrides everything else but does not affect name color
     -- 0x02 -- No obvious effect
-    -- 0x04 -- Disconnection icon
+    -- 0x04 -- Disconnection icon :: Actually a flag, overrides everything but POL Icon
     -- 0x08 -- No linkshell
+    -- 0x0A -- No obvious effect
+    
     -- 0x10 -- No linkshell
     -- 0x20 -- Trial account icon
     -- 0x40 -- Trial account icon
+    -- 0x60 -- POL Icon (lets you walk through NPCs/PCs)
     -- 0x80 -- GM mode
+    -- 0xA0 -- GM mode
+    -- 0xC0 -- GM mode
+    -- 0xE0 -- SGM mode
+    -- No statuses differentiate based on 0x10
+    -- Bit 0x20 + 0x40 makes 0x60, which is different.
+    -- Bit 0x80 overpowers those bits
+    -- Bit 0x80 combines with 0x04 and 0x02 to make SGM.
+    -- These are basically flags, but they can be combined to mean different things sometimes.
     
     _flags3:
     -- 0x10 -- No obvious effect
