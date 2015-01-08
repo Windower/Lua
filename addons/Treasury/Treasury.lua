@@ -1,6 +1,6 @@
 _addon.name = 'Treasury'
 _addon.author = 'Ihina'
-_addon.version = '1.2.0.1'
+_addon.version = '1.2.0.2'
 _addon.commands = {'treasury', 'tr'}
 
 res = require('resources')
@@ -105,7 +105,7 @@ function force_check()
     -- Check inventory for unwanted items
     if settings.AutoDrop then
         for index, item in pairs(items.inventory) do
-            if code.drop:contains(item.id) then
+            if type(item) == 'table' and code.drop:contains(item.id) then
                 drop(item.id, index, item.count)
             end
         end
@@ -202,7 +202,7 @@ windower.register_event('ipc message', function(msg)
     end
 end)
 
-windower.register_event('load', force_check)
+windower.register_event('load', force_check:cond(table.get-{'logged_in'} .. windower.ffxi.get_info))
 
 windower.register_event('addon command', function(command1, command2, ...)
     local args = L{...}
@@ -325,7 +325,7 @@ windower.register_event('addon command', function(command1, command2, ...)
 end)
 
 --[[
-Copyright © 2014, Windower
+Copyright © 2014-2015, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
