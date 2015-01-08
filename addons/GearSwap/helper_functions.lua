@@ -530,7 +530,7 @@ function find_usable_item(item_id,bool)
     -- Should I add some kind of filter for enchanted items?
     if not inventory_index then
         for i,v in pairs(items.inventory) do
-            if v and v.id == item_id and (not bool or is_usable_item(v)) then
+            if type(v) == 'table' and v.id == item_id and (not bool or is_usable_item(v)) then
                 inventory_index = i
                 bag_id = 0
                 break
@@ -539,7 +539,7 @@ function find_usable_item(item_id,bool)
     end
     if not inventory_index then
         for i,v in pairs(items.wardrobe) do
-            if v and v.id == item_id and (not bool or is_usable_item(v)) then
+            if type(v) == 'table' and v.id == item_id and (not bool or is_usable_item(v)) then
                 inventory_index = i
                 bag_id = 8
                 break
