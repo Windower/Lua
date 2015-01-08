@@ -1,5 +1,5 @@
 -- 
--- Obiaway v1.0.6
+-- Obiaway v1.0.7
 -- 
 -- Copyright ©2013-2014, ReaperX, onetime
 -- All rights reserved.
