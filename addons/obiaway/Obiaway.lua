@@ -41,9 +41,9 @@
 -- Known bugs: 
 --
 -- 1. Using the get, put, or sort commands too quickly can have
--- undesirable effects, often leaving obi behind or failing to get
--- an obi. This is due to limitations on how fast items can be moved
--- from one inventory to another.
+-- undesirable effects, often not moving obi at all. This is due to 
+-- limitations on how fast items can be moved from one inventory to 
+-- another.
 --
 -- 2. When weather changes due to zoning, get_obi_in_inventory()
 -- is called before inventory has loaded and returns nothing.
@@ -74,6 +74,7 @@ default_settings = {}
 default_settings.notify = true
 default_settings.location = 'sack'
 default_settings.lock = false
+default_settings.color = 209
 settings = config.load(default_settings)
 
 -- tokens
@@ -133,13 +134,7 @@ obi_names = T{
 -- Automatically formats output text for addon. Accepts msg as a string.
 function obi_output(msg)
     prefix = 'Obi: '
-    windower.add_to_chat(209, prefix..msg)
-end
-
--- Pause function. Accepts a number of seconds to pause.
-function wait(seconds)
-  local start = os.time()
-  repeat until os.time() > start + seconds
+    windower.add_to_chat(settings.color, prefix..msg)
 end
 
 -- Accepts a boolean value and returns an appropriate string value. i.e. true -> 'on'
@@ -183,6 +178,9 @@ function inv_str_to_id(str)
         return 7
     elseif str == 'wardrobe' then
         return 8
+	else
+		print('Obiaway: Function inv_str_to_id invalid argument')
+		return
     end
 end
 
@@ -190,7 +188,7 @@ end
 function free_space(location)
     local id = inv_str_to_id(location)
 
-    local inv = windower.ffxi.get_items(id)
+    local inv = windower.ffxi.get_bag_info(id)
     n = inv.max - inv.count
     return n
 end
@@ -202,8 +200,7 @@ end
 function inventory_full(command, location)
     local id = inv_str_to_id(location)
     if id == 0 then location = 'inventory' end
-
-    local items = windower.ffxi.get_items(id)
+	
     if free_space(location) == 0 then
         if command then
             obi_output('%s is full.':format(string.ucfirst(location)))
@@ -220,7 +217,7 @@ function inventory_full(command, location)
         return false
     end
     
-    print('obiaway: inventory count check. unknown error.')
+    print('Obiaway: Function inventory_full unknown error.')
 end
 
 
@@ -261,7 +258,7 @@ end
 --
 -- function designer: ReaperX
 function get_obi_in_inventory(location)
-    id = inv_str_to_id(location)
+    local id = inv_str_to_id(location)
     local obi = {}
     local inv = windower.ffxi.get_items(id)
     if not inv then return end
@@ -280,7 +277,7 @@ function get_obi_in_inventory(location)
         end
     end
     
-    -- count obi in invetory
+    -- count obi in inventory
     obi["n"] = table.count(obi, true)
     
     return obi
@@ -290,29 +287,29 @@ end
 -- Adds +1 to corresponding element variable for each effect active.
 -- Ex: If fire weather and earthsday are active will return:
 --          elements = {
---              "Fire" = 1
---              "Earth" = 1
---              "Water" = 0
---              "Wind" = 0
---              "Ice" = 0
---              "Lightning" = 0
---              "Light" = 0
---              "Dark" = 0
---              "None" = 0
+--              "Fire" = true
+--              "Earth" = true
+--              "Water" = false
+--              "Wind" = false
+--              "Ice" = false
+--              "Lightning" = false
+--              "Light" = false
+--              "Dark" = false
+--              "None" = false
 --          }
 --
 -- function designer: ReaperX
 function get_all_elements()
     local elements = {}           
-    elements["Fire"] = 0
-    elements["Earth"] = 0
-    elements["Water"] = 0
-    elements["Wind"] = 0
-    elements["Ice"] = 0
-    elements["Lightning"] = 0
-    elements["Light"] = 0
-    elements["Dark"] = 0
-    elements["None"] = 0
+    elements["Fire"] = false
+    elements["Earth"] = false
+    elements["Water"] = false
+    elements["Wind"] = false
+    elements["Ice"] = false
+    elements["Lightning"] = false
+    elements["Light"] = false
+    elements["Dark"] = false
+    elements["None"] = false
 
     local info = windower.ffxi.get_info()
 
@@ -323,21 +320,21 @@ function get_all_elements()
     local buffs = windower.ffxi.get_player().buffs
 
     if inTable(buffs, 178) then
-      elements["Fire"] = elements["Fire"] + 1
+      elements["Fire"] = true
     elseif inTable(buffs, 183) then
-      elements["Water"] = elements["Water"] + 1
+      elements["Water"] = true
     elseif inTable(buffs, 181) then
-      elements["Earth"] = elements["Earth"] + 1
+      elements["Earth"] = true
     elseif inTable(buffs, 180) then
-      elements["Wind"] = elements["Wind"] + 1
+      elements["Wind"] = true
     elseif inTable(buffs, 179) then
-      elements["Ice"] = elements["Ice"] + 1
+      elements["Ice"] = true
     elseif inTable(buffs, 182) then
-      elements["Lightning"] = elements["Lightning"] + 1
+      elements["Lightning"] = true
     elseif inTable(buffs, 184) then
-      elements["Light"] = elements["Light"] + 1
+      elements["Light"] = true
     elseif inTable(buffs, 185) then
-      elements["Dark"] = elements["Dark"] + 1
+      elements["Dark"] = true
     end
     return elements
 end
@@ -347,50 +344,48 @@ end
 ----------------------------------------
 
 function get_needed_obi(command)
-    if inventory_full(command) then return 0 end
+    if inventory_full(command) then return false end
     local obi = get_obi_in_inventory()
-
     local elements = get_all_elements()
 
     for name, element in obi_names:it() do
-        if not obi[element] and elements[element] > 0 then
+        if not obi[element] and elements[element] then
             windower.send_command('get "%s Obi" %s;':format(name, settings.location))
             if settings.notify then
                 obi_output('Getting %s Obi from %s.':format(name, settings.location))
             end
-            wait(.5)
+            coroutine.sleep(.5)
         end
     end
 
-    return 1
+    return true
 end
 
 function put_unneeded_obi(command)
-    if inventory_full(command, settings.location) then return 0 end
+    if inventory_full(command, settings.location) then return false end
     local obi = get_obi_in_inventory()
-
     local elements = get_all_elements()
 
     for name, element in obi_names:it() do
-        if obi[element] and elements[element] == 0 then    
+        if obi[element] and not elements[element] then    
             windower.send_command('put "%s Obi" %s;':format(name, settings.location))
             if settings.notify then
                 obi_output('Putting %s Obi away into %s.':format(name, settings.location))
             end
-            wait(.5)
+            coroutine.sleep(.5)
         end
     end
 
-    return 1
+    return true
 end
 
 function get_all_obi(command)
-    if inventory_full(command) then return 0 end
+    if inventory_full(command) then return false end
     local obi = get_obi_in_inventory()
     local obi_bag = get_obi_in_inventory(settings.location)
     if free_space() < obi_bag["n"] then
         obi_output('Not enough space in inventory...')
-        return 0
+        return false
     end
 
     local elements = get_all_elements()
@@ -402,19 +397,19 @@ function get_all_obi(command)
             if settings.notify then
                 obi_output('Getting %s Obi from %s.':format(name, settings.location))
             end
-            wait(.5)
+            coroutine.sleep(.5)
         end
     end
     
-    return 1
+    return true
 end
 
 function put_all_obi(command)
-    if inventory_full(command, settings.location) then return 0 end
+    if inventory_full(command, settings.location) then return false end
     local obi = get_obi_in_inventory()
     if free_space(settings.location) < obi["n"] then
         obi_output('Not enough space in %s...':format(settings.location))
-        return 0
+        return false
     end
 
     local elements = get_all_elements()
@@ -425,17 +420,17 @@ function put_all_obi(command)
             if settings.notify then
                 obi_output('Putting %s Obi away into %s.':format(name, settings.location))
             end
-            wait(.5)
+            coroutine.sleep(.5)
         end
     end
 
-    return 1
+    return true
 end
 
 -- function called on automatic events. sorts obi based on location.
 function auto_sort_obi()
     -- if inventory and obi bag are full at the same time, do nothing. 'cause we can't.
-    if inventory_full(false) and inventory_full(false, settings.location) then return end
+    if inventory_full(false) and inventory_full(false, settings.location) then return false end
 
     if not settings.lock then -- if sorting lock is not on, then do this stuff:
         if not obi_cities:contains(res.zones[windower.ffxi.get_info().zone].english) then -- In a city:
@@ -445,6 +440,8 @@ function auto_sort_obi()
             put_all_obi(false)
         end
     end
+	
+	return true
 end
 
 ----------------------------------------
@@ -455,8 +452,8 @@ windower.register_event('gain buff', auto_sort_obi:cond(function(id) return id >
 windower.register_event('lose buff', auto_sort_obi:cond(function(id) return id >= 178 and id <= 185 end))
 windower.register_event('day change', 'weather change', auto_sort_obi)
 windower.register_event('addon command', function(command, ...)
-    local command = command:lower() or 'help'
-    local params = L{...}:map(string.lower)
+    command = command and command:lower() or 'help'
+    params = L{...}:map(string.lower)
 
 
     if command == 'help' or command == 'h' then
@@ -478,14 +475,14 @@ windower.register_event('addon command', function(command, ...)
         if settings.lock then lock_obi(false) end
         if settings.notify then
             obi_output('Sorting obi...')
-            wait(0.5)
+            coroutine.sleep(0.5)
         end
         auto_sort_obi(true)
     elseif command == 'get' or command == 'g' then
         if params[1] == 'all' or params [1] == 'a' then
             obi_output('Getting all obi from %s...':format(settings.location))
             get_all_obi(true)
-            wait(1)
+            coroutine.sleep(1)
         elseif params[1] == 'needed' or params [1] == 'n' then
             obi_output('Getting needed obi from %s...':format(settings.location))
             get_needed_obi(true)
@@ -500,7 +497,7 @@ windower.register_event('addon command', function(command, ...)
             end
             obi_output('Putting all obi into %s...':format(settings.location))
             put_all_obi(true)
-            wait(1)
+            coroutine.sleep(1)
         elseif params[1] == 'unneeded' or params[1] == 'needed' or params [1] == 'n' then
             if S{'sack','case','satchel','wardrobe'}:contains(params[2]) then
                 settings.location = params[2]
