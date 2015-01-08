@@ -32,6 +32,8 @@ _addon.name    = 'findAll'
 _addon.author  = 'Zohno'
 _addon.version = '1.20140904'
 _addon.command = 'findAll'
+_addon.commands = {'fa', 'findall'}
+
 
 require('chat')
 require('lists')
