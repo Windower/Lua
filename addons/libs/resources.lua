@@ -1,5 +1,5 @@
 --[[
-A library to handle ingame resources, as provided by the Radsources XMLs. It will look for the files in Windower/plugins/resources.
+    A library to handle ingame resources, as provided by the Radsources XMLs. It will look for the files in Windower/plugins/resources.
 ]]
 
 _libs = _libs or {}
@@ -96,7 +96,7 @@ resource_alt_fns.key_map = function(t, fn)
 end
 
 resource_mt.__index = function(t, k)
-    return slots[t]:contains(k) and resource_group:endapply(k) or resource_alt_fns[k] or table[k]
+    return slots[t] and slots[t]:contains(k) and resource_group:endapply(k) or resource_alt_fns[k] or table[k]
 end
 resource_mt.__class = 'Resource'
 resource_mt.__tostring = function(t)
@@ -230,7 +230,7 @@ lookup = {
 return resources
 
 --[[
-Copyright © 2013-2014, Windower
+Copyright © 2013-2015, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
