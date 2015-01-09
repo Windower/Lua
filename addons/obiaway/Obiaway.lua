@@ -59,7 +59,7 @@
 -- addon info
 _addon.name = "Obiaway"
 _addon.author = "ReaperX, onetime"
-_addon.version = "1.0.6"
+_addon.version = "1.0.7"
 _addon.commands = {'oa', 'ob', 'obi', 'obiaway'}
 _addon.language = 'english'
 
