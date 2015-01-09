@@ -30,7 +30,8 @@ _meta.Text = _meta.Text or {}
 _meta.Text.__class = 'Text'
 _meta.Text.__index = texts
 _meta.Text.__newindex = function(t, k, v)
-    t:update({[k] = v})
+    meta[t].texts[k] = v
+    t:update()
 end
 
 --[[
@@ -71,8 +72,7 @@ default_settings.text.stroke.blue = 0
 
 math.randomseed(os.clock())
 
-local amend
-amend = function(settings, text)
+local amend = function(settings, text)
     for key, val in pairs(text) do
         local sval = settings[key]
         if sval == nil then
