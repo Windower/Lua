@@ -229,13 +229,15 @@ function get_storages()
         storages[storage_name] = T{}
 
         for _, data in ipairs(items[storage_name]) do
-            local id = tostring(data.id)
+            if type(data) == 'table' then
+                local id = tostring(data.id)
 
-            if id ~= "0" then
-                if storages[storage_name][id] == nil then
-                    storages[storage_name][id] = data.count
-                else
-                    storages[storage_name][id] = storages[storage_name][id] + data.count
+                if id ~= "0" then
+                    if storages[storage_name][id] == nil then
+                        storages[storage_name][id] = data.count
+                    else
+                        storages[storage_name][id] = storages[storage_name][id] + data.count
+                    end
                 end
             end
         end

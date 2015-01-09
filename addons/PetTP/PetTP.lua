@@ -189,7 +189,7 @@ function printpettp(pet_idx_in,own_idx_in)
     if settings.autocolor == true then output = output..'\\cr\\cs('..settings.text.red..','..settings.text.green..','..settings.text.blue..')' end    
     output = output..' ['
     if settings.autocolor == true and current_tp_percent >= 1000 then output = output..'\\cr\\cs(128,255,128)' end
-    output = output..current_tp_percent..'%'
+    output = output..current_tp_percent
     if settings.autocolor == true and current_tp_percent >= 1000 then output = output..'\\cr\\cs('..settings.text.red..','..settings.text.green..','..settings.text.blue..')' end    
     output = output..']'
     if max_mp > 0 then
