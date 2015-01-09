@@ -72,7 +72,8 @@ default_settings.text.stroke.blue = 0
 
 math.randomseed(os.clock())
 
-local amend = function(settings, text)
+local amend
+amend = function(settings, text)
     for key, val in pairs(text) do
         local sval = settings[key]
         if sval == nil then
