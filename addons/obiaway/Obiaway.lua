@@ -301,41 +301,43 @@ end
 -- function designer: ReaperX
 function get_all_elements()
     local elements = {}           
-    elements["Fire"] = false
-    elements["Earth"] = false
-    elements["Water"] = false
-    elements["Wind"] = false
-    elements["Ice"] = false
-    elements["Lightning"] = false
-    elements["Light"] = false
-    elements["Dark"] = false
-    elements["None"] = false
+    elements["Fire"] = 0
+    elements["Earth"] = 0
+    elements["Water"] = 0
+    elements["Wind"] = 0
+    elements["Ice"] = 0
+    elements["Lightning"] = 0
+    elements["Light"] = 0
+    elements["Dark"] = 0
+    elements["None"] = 0
 
+	-- check for active Day and Weather
     local info = windower.ffxi.get_info()
-
     local day_element = res.elements[res.days[info.day].element].english
     elements[day_element] = elements[day_element] + 1
     local weather_element = res.elements[res.weather[info.weather].element].english
     elements[weather_element] = elements[weather_element] + 1
+	
+	-- check for active SCH buffs
     local buffs = windower.ffxi.get_player().buffs
-
     if inTable(buffs, 178) then
-      elements["Fire"] = true
+      elements["Fire"] =  elements["Fire"] + 1
     elseif inTable(buffs, 183) then
-      elements["Water"] = true
+      elements["Water"] = elements["Water"] + 1
     elseif inTable(buffs, 181) then
-      elements["Earth"] = true
+      elements["Earth"] = elements["Earth"] + 1
     elseif inTable(buffs, 180) then
-      elements["Wind"] = true
+      elements["Wind"] = elements["Wind"] +1
     elseif inTable(buffs, 179) then
-      elements["Ice"] = true
+      elements["Ice"] = elements["Ice"] + 1
     elseif inTable(buffs, 182) then
-      elements["Lightning"] = true
+      elements["Lightning"] = elements["Lightning"] + 1
     elseif inTable(buffs, 184) then
-      elements["Light"] = true
+      elements["Light"] = elements["Light"] + 1
     elseif inTable(buffs, 185) then
-      elements["Dark"] = true
+      elements["Dark"] = elements["Dark"] + 1
     end
+	
     return elements
 end
 
@@ -349,7 +351,7 @@ function get_needed_obi(command)
     local elements = get_all_elements()
 
     for name, element in obi_names:it() do
-        if not obi[element] and elements[element] then
+        if not obi[element] and elements[element] > 0 then
             windower.send_command('get "%s Obi" %s;':format(name, settings.location))
             if settings.notify then
                 obi_output('Getting %s Obi from %s.':format(name, settings.location))
@@ -367,7 +369,7 @@ function put_unneeded_obi(command)
     local elements = get_all_elements()
 
     for name, element in obi_names:it() do
-        if obi[element] and not elements[element] then    
+        if obi[element] and elements[element] == 0 then    
             windower.send_command('put "%s Obi" %s;':format(name, settings.location))
             if settings.notify then
                 obi_output('Putting %s Obi away into %s.':format(name, settings.location))
