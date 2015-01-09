@@ -1,5 +1,5 @@
 Author: ReaperX, onetime
-Version: 1.0.6
+Version: 1.0.7
 
 Addon to automatically get and store elemental obis based on day/weather/storm 
 conditions. The addon is triggered on day change, weather change, and scholar
