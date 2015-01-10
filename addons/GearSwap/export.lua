@@ -57,7 +57,7 @@ function export_set(options)
     if targinv then
         -- Load the entire inventory
         for _,v in pairs(inv) do
-            if v.id ~= 0 then
+            if type(v) == 'table' and v.id ~= 0 then
                 if res.items[v.id] then
                     item_list[#item_list+1] = {}
                     item_list[#item_list].name = res.items[v.id][language]
