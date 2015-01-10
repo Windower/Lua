@@ -27,7 +27,7 @@
 require('tables')
 local res = require('resources')
 
-return = T{
+return T{
 
     name            = function() return windower.ffxi.get_player().name end,
     linkshell       = function() return windower.ffxi.get_player().linkshell end,
