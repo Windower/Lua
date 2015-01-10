@@ -33,7 +33,7 @@ _meta.Text.__index = texts
 local set_value = function(t, key, value)
     local m = meta[t]
     m.values[key] = value
-    m.texts[key] = value and (m.formats[key] and m.formats[key]:format(value) or tostring(value)) or m.defaults[key]
+    m.texts[key] = value ~= nil and (m.formats[key] and m.formats[key]:format(value) or tostring(value)) or m.defaults[key]
 end
 
 _meta.Text.__newindex = function(t, k, v)
@@ -231,7 +231,7 @@ function texts.update(t, attr)
 
     -- Update all text segments
     for key in pairs(m.keys) do
-        set_value(t, key, attr[key] or m.values[key])
+        set_value(t, key, attr[key] == nil and m.values[key] or attr[key])
     end
 
     -- Create the string
