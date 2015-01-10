@@ -923,6 +923,11 @@ fields.outgoing[0x10D] = L{
     {ctype='unsigned short',    label='RoE Quest'},                             -- 04   This field is likely actually 12 bits
 }
 
+-- Accept RoE Quest reward that was denied due to a full inventory
+fields.outgoing[0x10E] = L{
+    {ctype='unsigned short',    label='RoE Quest'},                             -- 04   This field is likely actually 12 bits
+}
+  
 -- Currency Menu
 fields.outgoing[0x10F] = L{
 }
