@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
 _addon.name = 'Rhombus'
 _addon.author = 'trv'
-_addon.version = '1.1.0'
+_addon.version = '1.1.1'
 
 config = require('config')
 texts = require('texts')
@@ -247,6 +247,9 @@ function menu_general_layout(t,t2,n)
                         if current_menu[menu_layer_record[i]] then
                             current_menu = current_menu[menu_layer_record[i]]
                         else
+                            for j = 1,menu_layer_record.n+1-i do
+                                menu_layer_record:remove()
+                            end
                             break
                         end
                     end
@@ -279,6 +282,9 @@ function menu_general_layout(t,t2,n)
                     if current_menu[menu_layer_record[i]] then
                         current_menu = current_menu[menu_layer_record[i]]
                     else
+                        for j = 1,menu_layer_record.n+1-i do
+                            menu_layer_record:remove()
+                        end
                         break
                     end
                 end
@@ -511,7 +517,14 @@ mouse_func = {
                             last_menu_open = current_menu
                             last_menu_open.type = 1
                             for i = 1,menu_layer_record.n do
-                                current_menu = current_menu[menu_layer_record[i]]
+                                if current_menu[menu_layer_record[i]] then
+                                    current_menu = current_menu[menu_layer_record[i]]
+                                else
+                                    for j = 1,menu_layer_record.n+1-i do
+                                        menu_layer_record:remove()
+                                    end
+                                    break
+                                end
                             end
                             build_a_menu(current_menu)
                         else
@@ -541,7 +554,10 @@ mouse_func = {
                         for i = 1,menu_layer_record.n do
                             if current_menu[menu_layer_record[i]] then
                                 current_menu = current_menu[menu_layer_record[i]]
-                        else
+                            else
+                                for j = 1,menu_layer_record.n+1-i do
+                                    menu_layer_record:remove()
+                                end
                                 break
                             end
                         end
