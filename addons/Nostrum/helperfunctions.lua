@@ -129,8 +129,6 @@ function merge_user_file_and_settings(t,u)
         if u[k] then
             if type(u[k]) == 'table' then
                 u[k] = merge_user_file_and_settings(t[k],u[k])
-            else
-                return u[k]
             end
         else
             u[k] = v
@@ -201,6 +199,15 @@ function remove_macro_information(n,bool)
 end
 
 function wrecking_ball()
+    for i = 1,18 do
+        prims_by_layer[i]:clear()
+        texts_by_layer[i]:clear()
+    end
+    misc_hold_for_up.texts:clear()
+    misc_hold_for_up.prims:clear()
+    for i = 1,3 do
+        macro[i]:clear()
+    end
     for key in pairs(saved_texts) do
         windower.text.delete(key)
         saved_texts:remove(key)
@@ -209,6 +216,10 @@ function wrecking_ball()
         windower.prim.delete(key)
         saved_prims:remove(key)
     end
+    macro_order.cures:clear()
+    macro_order.curagas:clear()
+    macro_order.buffs:clear()
+    macro_order.nas:clear()
 end
 
 function toggle_visibility()
@@ -253,6 +264,15 @@ function toggle_macro_visibility(n)
             end
         end
     end
+end
+
+function switch_profiles()
+    wrecking_ball()
+    count_cures(profile)
+    count_buffs(profile)
+    count_na(profile)
+    coroutine.sleep(1)
+    build_macro()
 end
 
 last_hpp=0
@@ -450,6 +470,13 @@ function invite(id,n)
         texts_by_layer[position_lookup[id]]:extend(L{"tp" .. position_lookup[id],"name" .. position_lookup[id],"hpp" .. position_lookup[id],"hp" .. position_lookup[id],"mp" .. position_lookup[id]})
     else
         windower.text.set_text('name'..position_lookup[id],stat_table[id].name)
+    end
+    local pos = windower.ffxi.get_mob_by_id(id)
+    if pos then
+        position[1][position_lookup[id]] = pos.x
+        position[2][position_lookup[id]] = pos.y
+        position[3][position_lookup[id]] = pos.z
+        color_name(pos.x,pos.y,pos.z,position_lookup[id],false)
     end
 end
 
