@@ -278,6 +278,8 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         player.sub_job_id = data:byte(0xB8)
         player.vitals.max_hp = data:unpack('I',0xE9)
         player.vitals.max_mp = data:unpack('I',0xED)
+        player.max_hp = data:unpack('I',0xE9)
+        player.max_mp = data:unpack('I',0xED)
         update_job_names()
         
         world.zone_id = data:unpack('H',0x31)
@@ -465,6 +467,8 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
     elseif id == 0x061 then
         player.vitals.max_hp = data:unpack('I',5)
         player.vitals.max_mp = data:unpack('I',9)
+        player.max_hp = data:unpack('I',5)
+        player.max_mp = data:unpack('I',9)
         player.main_job_id = data:byte(13)
         player.main_job_level = data:byte(14)
         
@@ -490,11 +494,30 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
             end
         end
     elseif id == 0x0DF then
+        print('here! 2',data:unpack('I',0x11))
         player.vitals.hp = data:unpack('I',9)
         player.vitals.mp = data:unpack('I',13)
         player.vitals.tp = data:unpack('I',0x11)
         player.vitals.hpp = data:byte(0x17)
         player.vitals.mpp = data:byte(0x18)
+        
+        player.hp = data:unpack('I',9)
+        player.mp = data:unpack('I',13)
+        player.tp = data:unpack('I',0x11)
+        player.hpp = data:byte(0x17)
+        player.mpp = data:byte(0x18)
+    elseif id == 0x0E2 and data:unpack('I',5)==player.id then
+        player.vitals.hp = data:unpack('I',9)
+        player.vitals.mp = data:unpack('I',0xB)
+        player.vitals.tp = data:unpack('I',0x11)
+        player.vitals.hpp = data:byte(0x1E)
+        player.vitals.mpp = data:byte(0x1F)
+        
+        player.hp = data:unpack('I',9)
+        player.mp = data:unpack('I',0xB)
+        player.tp = data:unpack('I',0x11)
+        player.hpp = data:byte(0x1E)
+        player.mpp = data:byte(0x1F)
     elseif id == 0x117 then
         for i=0x49,0x85,4 do
             local arr = data:sub(i,i+3)
