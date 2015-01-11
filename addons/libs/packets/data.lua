@@ -21,6 +21,7 @@ data.outgoing[0x01A] = {name='Action',              description='An action being
 data.outgoing[0x01E] = {name='Volunteer',           description='Sent in response to a /volunteer command.'}
 data.outgoing[0x028] = {name='Drop Item',           description='Drops an item.'}
 data.outgoing[0x029] = {name='Move Item',           description='Move item from one inventory to another.'}
+data.outgoing[0x02B] = {name='Translate Request',   description='Request that a phrase be translated.'}
 data.outgoing[0x032] = {name='Offer Trade',         description='This is sent when you offer to trade somebody.'}
 data.outgoing[0x033] = {name='Trade Tell',          description='This packet allows you to accept or cancel a trade request.'}
 data.outgoing[0x034] = {name='Trade Item',          description='Sends the item you want to trade to the server.'}
@@ -147,6 +148,7 @@ data.incoming[0x03E] = {name='Open Buy/Sell',       description='Opens the buy/s
 data.incoming[0x041] = {name='Blacklist',           description='Contains player ID and name for blacklist.'}
 data.incoming[0x042] = {name='Blacklist Command',   description='Sent in response to /blacklist add or /blacklist delete.'}
 data.incoming[0x044] = {name='Job Info Extra',      description='Contains information about Automaton stats and set Blue Magic spells.'}
+data.incoming[0x047] = {name='Translate Response',  description='Response to a translate request.'}
 data.incoming[0x04B] = {name='Logout Acknowledge',  description='Acknowledges a logout attempt.'}
 data.incoming[0x04B] = {name='Delivery Item',       description='Item in delivery box.'}
 data.incoming[0x04C] = {name='Auction House Menu',  description='Sent when visiting auction counter.'}
