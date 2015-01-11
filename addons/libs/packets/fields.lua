@@ -590,6 +590,14 @@ fields.outgoing[0x052] = L{
     {ref=types.equipset_build,  lookup={res.slots, 0x00},   count=0x10},        -- 0C
 }
 
+-- Crafting-related packet?
+-- This packet is sent after receiving a result when synthesizing.
+-- Observed when synthing cursed cuisses.
+--[[fields.outgoing[0x059] = L{
+    {ctype='unsigned int',      label='_unknown1'},                             -- 04   Always 00 00 00 00
+    {ctype='data[8]',           label='_junk1'}                                 -- 08   Likely junk from a non-zero'd buffer.
+}]]
+
 -- Conquest
 fields.outgoing[0x05A] = L{
 }
