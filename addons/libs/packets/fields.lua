@@ -2968,7 +2968,7 @@ fields.incoming[0x0DF] = L{
     {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
     {ctype='unsigned int',      label='HP'},                                    -- 08
     {ctype='unsigned int',      label='MP'},                                    -- 0C
-    {ctype='unsigned int',      label='TP',                 fn=percent},        -- 10   Truncated, does not include the decimal value.
+    {ctype='unsigned int',      label='TP',                 fn=percent},        -- 10
     {ctype='unsigned short',    label='Index',              fn=index},          -- 14
     {ctype='unsigned char',     label='HPP',                fn=percent},        -- 16
     {ctype='unsigned char',     label='MPP',                fn=percent},        -- 17
