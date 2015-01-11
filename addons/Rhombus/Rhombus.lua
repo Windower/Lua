@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
 _addon.name = 'Rhombus'
 _addon.author = 'trv'
-_addon.version = '1.1.1'
+_addon.version = '1.1.2'
 
 config = require('config')
 texts = require('texts')
@@ -118,6 +118,20 @@ windower.prim.set_position('scroll_bar',selector_pos.x + 150,0 + y_offset)
 windower.prim.set_color('scroll_bar',200,255,255,255)
 windower.prim.set_visibility('scroll_bar',false)
 windower.prim.set_size('scroll_bar',10,1)
+
+letter_to_n = {
+    'R',
+    'G',
+    'B',
+    'Y'
+}
+
+n_to_color = {
+    {255,111,111},
+    {111,255,111},
+    {111,111,255},
+    {255,255,111}
+}
 
 function colors_of_the_wind(s)
     for k,v in pairs(is_icon) do
@@ -401,7 +415,9 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
                     windower.prim.set_position('selector_rectangle',selector_pos.x,selector_pos.y + y_offset)
                 end
             else
-            
+                if not is_icon[letter_to_n[last_menu_open.type]] then
+                    menu_icon:color(unpack(n_to_color[last_menu_open.type]))
+                end
             end
         elseif not is_icon.W then
             menu_icon:color(255,255,255)
