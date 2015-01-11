@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
 _addon.name = 'Nostrum'
 _addon.author = 'trv'
-_addon.version = '2.0.8'
+_addon.version = '2.1.1'
 _addon.commands = {'Nostrum','nos',}
 
 packets=require('packets')
@@ -114,52 +114,60 @@ defaults={
     window={x_offset=0,y_offset=0,},
     profiles={
         default={
-            ["Cure"]=true,
-            ["CureII"]=true,
-            ["CureIII"]=true,
-            ["CureIV"]=true,
-            ["CureV"]=true,
-            ["CureVI"]=true,
-            ["Curaga"]=true,
-            ["CuragaII"]=true,
-            ["CuragaIII"]=true,
-            ["CuragaIV"]=true,
-            ["CuragaV"]=true,
-            ["Sacrifice"]=true,
-            ["Erase"]=true,
-            ["Paralyna"]=true,
-            ["Silena"]=true,
-            ["Blindna"]=true,
-            ["Poisona"]=true,
-            ["Viruna"]=true,
-            ["Stona"]=true,
-            ["Cursna"]=true,
-            ["Haste"]=true,
-            ["HasteII"]=false
-            ,["Flurry"]=false,
-            ["FlurryII"]=false,
-            ["Protect"]=false,
-            ["Shell"]=false,
-            ["ProtectII"]=false,
-            ["ShellII"]=false,
-            ["ProtectIII"]=false,
-            ["ShellIII"]=false,
-            ["ProtectIV"]=false,
-            ["ShellIV"]=false,
-            ["ProtectV"]=true,
-            ["ShellV"]=true,
-            ["Refresh"]=false,
-            ["RefreshII"]=false,
-            ["Regen"]=false,
-            ["RegenII"]=false,
-            ["RegenIII"]=false,
-            ["RegenIV"]=true,
-            ["RegenV"]=false,
-            ["PhalanxII"]=false,
-            ["Adloquium"]=false,
-            ["AnimusAugeo"]=false,
-            ["AnimusMinuo"]=false,
-            ["Embrava"]=false,
+            ["cure"]=true,
+            ["cureii"]=true,
+            ["cureiii"]=true,
+            ["cureiv"]=true,
+            ["curev"]=true,
+            ["curevi"]=true,
+            ["curaga"]=true,
+            ["curagaii"]=true,
+            ["curagaiii"]=true,
+            ["curagaiv"]=true,
+            ["curagav"]=true,
+            ["sacrifice"]=true,
+            ["erase"]=true,
+            ["paralyna"]=true,
+            ["silena"]=true,
+            ["blindna"]=true,
+            ["poisona"]=true,
+            ["viruna"]=true,
+            ["stona"]=true,
+            ["cursna"]=true,
+            ["haste"]=true,
+            ["hasteii"]=false,
+            ["flurry"]=false,
+            ["flurryii"]=false,
+            ["protect"]=false,
+            ["shell"]=false,
+            ["protectii"]=false,
+            ["shellii"]=false,
+            ["protectiii"]=false,
+            ["shelliii"]=false,
+            ["protectiv"]=false,
+            ["shelliv"]=false,
+            ["protectv"]=true,
+            ["shellv"]=true,
+            ["refresh"]=false,
+            ["refreshii"]=false,
+            ["regen"]=false,
+            ["regenii"]=false,
+            ["regeniii"]=false,
+            ["regeniv"]=true,
+            ["regenv"]=false,
+            ["phalanxii"]=false,
+            ["adloquium"]=false,
+            ["animusaugeo"]=false,
+            ["animusminuo"]=false,
+            ["embrava"]=false,
+            ["curingwaltz"]=false,
+            ["curingwaltzii"]=false,
+            ["curingwaltziii"]=false,
+            ["curingwaltziv"]=false,
+            ["curingwaltzv"]=false,
+            ["divinewaltz"]=false,
+            ["divinewaltzii"]=false,
+            ["healingwaltz"]=false,
         },
     },
 }
@@ -194,14 +202,14 @@ function build_macro()
         text_simple("mp" .. s, _settings.text.mp, x_start-40, y_start+11, stat_table[party[1][j]].mp)
         prims_by_layer[position_lookup[party[1][j]]]:extend(L{"phpp" .. s,"pmpp" .. s})
         texts_by_layer[position_lookup[party[1][j]]]:extend(L{"tp" .. s,"name" .. s,"hpp" .. s,"hp" .. s,"mp" .. s})
-        block_num=12
+        block_num=19
 
-        for i=6,1,-1 do
+        for i=11,1,-1 do
             if profile[options.cures[i]] then 
                 local s = options.cures[i] .. tostring(position_lookup[party[1][j]])
                 block_num=block_num-1
-                prim_simple('p' .. s,_settings.primitives.buttons,x_start-(12-block_num)*(w+1)+1-153,y_start,w,h)
-                text_simple(s,_settings.text.buttons, x_start-(12-block_num)*(w+1)+1+((w-font_widths[options.aliases[options.cures[i]]])/2)-153, y_start, options.aliases[options.cures[i]])
+                prim_simple('p' .. s,_settings.primitives.buttons,x_start-(19-block_num)*(w+1)+1-153,y_start,w,h)
+                text_simple(s,_settings.text.buttons, x_start-(19-block_num)*(w+1)+1+((w-font_widths[options.aliases[options.cures[i]]])/2)-153, y_start, options.aliases[options.cures[i]])
                 prims_by_layer[position_lookup[party[1][j]]]:append('p' .. s)
                 texts_by_layer[position_lookup[party[1][j]]]:append(s)
                 macro[1]:add('p' .. s)
@@ -209,12 +217,12 @@ function build_macro()
             end
         end
 
-        for i=11,7,-1 do
+        for i=18,12,-1 do
             if profile[options.curagas[i]] then
                 local s = options.curagas[i] .. tostring(position_lookup[party[1][j]])
                 block_num=block_num-1
-                prim_simple('p' .. s,_settings.primitives.curaga_buttons,x_start-(12-block_num)*(w+1)+1-153,y_start,w,h)
-                text_simple(s,_settings.text.buttons, x_start-(12-block_num)*(w+1)+1+((w-font_widths[options.aliases[options.curagas[i]]])/2)-153, y_start, options.aliases[options.curagas[i]])
+                prim_simple('p' .. s,_settings.primitives.curaga_buttons,x_start-(19-block_num)*(w+1)+1-153,y_start,w,h)
+                text_simple(s,_settings.text.buttons, x_start-(19-block_num)*(w+1)+1+((w-font_widths[options.aliases[options.curagas[i]]])/2)-153, y_start, options.aliases[options.curagas[i]])
                 prims_by_layer[position_lookup[party[1][j]]]:append('p' .. s)
                 texts_by_layer[position_lookup[party[1][j]]]:append(s)
                 macro[1]:add('p' .. s)
@@ -315,14 +323,14 @@ function build_macro()
             prims_by_layer[position_lookup[party[k][j]]]:extend(L{"phpp" .. s,"pmpp" .. s})
             texts_by_layer[position_lookup[party[k][j]]]:extend(L{"tp" .. s,"name" .. s,"hpp" .. s,"hp" .. s,"mp" .. s})
 
-            block_num=7
+            block_num=12
 
-            for i=6,1,-1 do
+            for i=11,1,-1 do
                 if profile[options.cures[i]] then 
                     local s = options.cures[i] .. s
                     block_num=block_num-1
-                    prim_simple('p' .. s,_settings.primitives.buttons,x_start-(7-block_num)*(w+1)+1-153,y_start,w,h)
-                    text_simple(s, _settings.text.buttons, x_start-(7-block_num)*(w+1)+1+((w-font_widths[options.aliases[options.cures[i]]])/2)-153, y_start, options.aliases[options.cures[i]])
+                    prim_simple('p' .. s,_settings.primitives.buttons,x_start-(12-block_num)*(w+1)+1-153,y_start,w,h)
+                    text_simple(s, _settings.text.buttons, x_start-(12-block_num)*(w+1)+1+((w-font_widths[options.aliases[options.cures[i]]])/2)-153, y_start, options.aliases[options.cures[i]])
                     prims_by_layer[position_lookup[party[k][j]]]:append('p' .. s)
                     texts_by_layer[position_lookup[party[k][j]]]:append(s)
                     macro[k]:add('p' .. s)
@@ -517,7 +525,7 @@ register_events = (function()
                 for i=1,regions do
                     if y>b[i] and y<t[i] then
                         if x>l[i+5] and x<r[i+5] then
-                            windower.send_command('%sinput /ma "%s" %s':format(send_string, spell_default, stat_table[party[i][math.ceil((y-b[i])/25)]].name))
+                            windower.send_command('%sinput %s "%s" %s':format(send_string, prefix[spell_default], spell_default, stat_table[party[i][math.ceil((y-b[i])/25)]].name))
                             dragged = true
                             return true
                         end
