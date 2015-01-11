@@ -72,13 +72,13 @@ end
 function count_cures(t)
     _cures=0
     _curagas=0
-    for i=1,6 do
+    for i=1,11 do
         if t[options.cures[i]] then 
             _cures=_cures+1 
             macro_order.cures:append(options.cures[i]) 
         end
     end
-    for i=7,11 do
+    for i=11,18 do
         if t[options.curagas[i]] then 
             _curagas=_curagas+1 
             macro_order.curagas:append(options.curagas[i]) 
@@ -273,6 +273,7 @@ function switch_profiles()
     count_na(profile)
     coroutine.sleep(1)
     build_macro()
+    define_active_regions()
 end
 
 last_hpp=0
@@ -355,11 +356,11 @@ function determine_response(x,region,w,y)
     else
         target = '<t>'
     end
-    windower.send_command('%sinput /ma "%s" %s':format(send_string, spell, target))
+    windower.send_command('%sinput %s "%s" %s':format(send_string, prefix[spell], spell, target))
 end
 
 function new_members() -- snippet from invite, reused in c_a_t_m
-    local p = {[1]=S(party[1]),[2]=S(party[2]),[3]=S(party[3])}
+    local p = {S(party[1]),S(party[2]),S(party[3])}
     local to_kick = p[1] + p[2] + p[3] - (packet_pt_struc[3] + packet_pt_struc[2] + packet_pt_struc[1])
     for k in pairs(to_kick) do
         kick(k,math.ceil(position_lookup[k]/6))
@@ -386,13 +387,13 @@ function invite(id,n)
         if n==1 then
             windower.prim.set_size('info1',152,party[1].n*(h+1)+1)
             windower.prim.set_size("BG1",(_cures+_curagas)*(w+1)+1,party[1].n*(h+1)+1)
-            local block_num=12
-            for i=6,1,-1 do
+            local block_num=19
+            for i=11,1,-1 do
                 if profile[options.cures[i]] then 
                     local s = options.cures[i] .. tostring(position_lookup[id])
                     block_num=block_num-1
-                    prim_simple('p' .. s,_settings.primitives.buttons,x_start-(12-block_num)*(w+1)+1-153,prim_coordinates.y['BG'..n]+1+(h+1)*(party[n].n-1),w,h)
-                    text_simple(s,_settings.text.buttons, x_start-(12-block_num)*(w+1)+1+((w-font_widths[options.aliases[options.cures[i]]])/2)-153, prim_coordinates.y['BG'..n]+1+(h+1)*(party[n].n-1), options.aliases[options.cures[i]])
+                    prim_simple('p' .. s,_settings.primitives.buttons,x_start-(19-block_num)*(w+1)+1-153,prim_coordinates.y['BG'..n]+1+(h+1)*(party[n].n-1),w,h)
+                    text_simple(s,_settings.text.buttons, x_start-(19-block_num)*(w+1)+1+((w-font_widths[options.aliases[options.cures[i]]])/2)-153, prim_coordinates.y['BG'..n]+1+(h+1)*(party[n].n-1), options.aliases[options.cures[i]])
                     prims_by_layer[position_lookup[id]]:append('p' .. s)
                     texts_by_layer[position_lookup[id]]:append(s)
                     macro[1]:add('p' .. s)
@@ -403,12 +404,12 @@ function invite(id,n)
                     end
                 end
             end
-            for i=11,7,-1 do
+            for i=18,12,-1 do
                 if profile[options.curagas[i]] then
                     local s = options.curagas[i] .. tostring(position_lookup[id])
                     block_num=block_num-1
-                    prim_simple('p' .. s,_settings.primitives.curaga_buttons,x_start-(12-block_num)*(w+1)+1-153,prim_coordinates.y['BG'..n]+1+(h+1)*(party[n].n-1),w,h)
-                    text_simple(s,_settings.text.buttons, x_start-(12-block_num)*(w+1)+1+((w-font_widths[options.aliases[options.curagas[i]]])/2)-153, prim_coordinates.y['BG'..n]+1+(h+1)*(party[n].n-1), options.aliases[options.curagas[i]])
+                    prim_simple('p' .. s,_settings.primitives.curaga_buttons,x_start-(19-block_num)*(w+1)+1-153,prim_coordinates.y['BG'..n]+1+(h+1)*(party[n].n-1),w,h)
+                    text_simple(s,_settings.text.buttons, x_start-(19-block_num)*(w+1)+1+((w-font_widths[options.aliases[options.curagas[i]]])/2)-153, prim_coordinates.y['BG'..n]+1+(h+1)*(party[n].n-1), options.aliases[options.curagas[i]])
                     prims_by_layer[position_lookup[id]]:append('p' .. s)
                     texts_by_layer[position_lookup[id]]:append(s)
                     macro[1]:add('p' .. s)
@@ -440,13 +441,13 @@ function invite(id,n)
                 windower.prim.set_size('info'..n,152,party[n].n*(h+1)+1)
                 windower.prim.set_size('BG'..n,(_cures)*(w+1)+1,party[n].n*(h+1)+1)
             end
-            local block_num=7
-            for i=6,1,-1 do
+            local block_num=12
+            for i=11,1,-1 do
                 if profile[options.cures[i]] then 
                     local s = options.cures[i] .. tostring(position_lookup[id])
                     block_num=block_num-1
-                    prim_simple('p' .. s,_settings.primitives.buttons,x_start-(7-block_num)*(w+1)+1-153,prim_coordinates.y['BG'..n]+1+(h+1)*(party[n].n-1),w,h)
-                    text_simple(s, _settings.text.buttons, x_start-(7-block_num)*(w+1)+1+((w-font_widths[options.aliases[options.cures[i]]])/2)-153, prim_coordinates.y['BG'..n]+1+(h+1)*(party[n].n-1), options.aliases[options.cures[i]])
+                    prim_simple('p' .. s,_settings.primitives.buttons,x_start-(12-block_num)*(w+1)+1-153,prim_coordinates.y['BG'..n]+1+(h+1)*(party[n].n-1),w,h)
+                    text_simple(s, _settings.text.buttons, x_start-(12-block_num)*(w+1)+1+((w-font_widths[options.aliases[options.cures[i]]])/2)-153, prim_coordinates.y['BG'..n]+1+(h+1)*(party[n].n-1), options.aliases[options.cures[i]])
                     prims_by_layer[position_lookup[id]]:append('p' .. s)
                     texts_by_layer[position_lookup[id]]:append(s)
                     macro[n]:add('p' .. s)
