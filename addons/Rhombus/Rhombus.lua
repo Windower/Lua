@@ -153,7 +153,6 @@ function get_templates()
     local sub = res.jobs[player_info.sub_job].en
     
     t_temp = L(res.spells:levels(function(t) return t[player_info.main_job] or t[player_info.sub_job] end):keyset())
-    t_temp.n = #t_temp
     spells_template = loadfile(windower.addon_path .. 'data/spells_template.lua')
     if not spells_template then
         error('No template for spells was found.')
@@ -164,7 +163,6 @@ function get_templates()
     end
 
     t_temp = L(res.weapon_skills:keyset())
-    t_temp.n = #t_temp
     ws_template = loadfile(windower.addon_path .. 'data/ws_template.lua')
     if not ws_template then
         error('No template for weapon skills was found.')
@@ -186,7 +184,6 @@ function get_templates()
     end
     
     t_temp = L(res.job_abilities:prefix('/jobability'):keyset())
-    t_temp.n = #t_temp
     ja_template = loadfile(windower.addon_path .. 'data/ja_template.lua')
     if not ja_template then
         error('No template for job abilities was found.')
@@ -208,7 +205,6 @@ function get_templates()
     end
     
     t_temp = L(res.job_abilities:prefix('/pet'):keyset())
-    t_temp.n = #t_temp
     pet_command_template = loadfile(windower.addon_path .. 'data/pet_command_template.lua')
     if not pet_command_template then
         error('No template for pet commands was found.')
