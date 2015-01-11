@@ -53,6 +53,10 @@ local function bool(val)
     return val ~= 0
 end
 
+local function invbool(val)
+    return val == 0
+end
+
 local function div(denom, val)
     return val/denom
 end
@@ -355,6 +359,15 @@ fields.outgoing[0x029] = L{
     {ctype='unsigned char',     label='_unknown1',          const=0x52},        -- 0B
 }
 
+-- Translate
+-- German and French translations appear to no longer be supported.
+fields.outgoing[0x02B] = L{
+    {ctype='unsigned char',     label='Starting Language'},                     -- 04   0 == JP, 1 == EN
+    {ctype='unsigned char',     label='Ending Language'},                       -- 05   0 == JP, 1 == EN
+    {ctype='unsigned short',    label='_unknown1',          const=0x0000},      -- 06   
+    {ctype='char[64]',          label='Phrase'},                                -- 08   Quotation marks are removed. Phrase is truncated at 64 characters.
+}
+
 -- Trade request
 fields.outgoing[0x032] = L{
     {ctype='unsigned int',      label='Target',             fn=id},             -- 04
@@ -449,6 +462,93 @@ fields.outgoing[0x04D] = L{
     {ctype='data[20]',          label='_unknown3'},                             -- 0C   All 00 observed
 }
 
+enums['ah otype'] = {
+    [0x04] = 'Sell item request',
+    [0x05] = 'Check sales',
+    [0x0A] = 'Open AH menu',
+    [0x0B] = 'Sell item confirmation',
+    [0x0C] = 'Stop sale',
+    [0x0D] = 'Sale status confirmation',
+    [0x0E] = 'Place bid',
+    [0x10] = 'Item sold',
+}
+
+fields.outgoing._func[0x04E] = {}
+fields.outgoing._func[0x04E].base = L{
+    {ctype='unsigned char',     label='Type',               fn=e+{'ah otype'}}, -- 04
+}
+
+-- Sent when putting an item up for auction (request)
+fields.outgoing._func[0x04E][0x04] = L{
+    {ctype='data[3]',           label='_unknown1'},                             -- 05
+    {ctype='unsigned int',      label='Price',              fn=gil},            -- 08
+    {ctype='unsigned short',    label='Inventory Index',    fn=inv+{0}},        -- 0C
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 0E
+    {ctype='unsigned char',     label='Stack',              fn=invbool},        -- 10
+    {ctype='char*',             label='_junk'},                                 -- 11
+}
+
+-- Sent when checking your sale status
+fields.outgoing._func[0x04E][0x05] = L{
+    {ctype='char*',             label='_junk'},                                 -- 05
+}
+
+-- Sent when initially opening the AH menu
+fields.outgoing._func[0x04E][0x0A] = L{
+    {ctype='unsigned char',     label='_unknown1',          const=0xFF},        -- 05
+    {ctype='char*',             label='_junk'},                                 -- 06
+}
+
+-- Sent when putting an item up for auction (confirmation)
+fields.outgoing._func[0x04E][0x0B] = L{
+    {ctype='unsigned char',     label='Slot'},                                  -- 05
+    {ctype='data[2]',           label='_unknown1'},                             -- 06
+    {ctype='unsigned int',      label='Price',              fn=gil},            -- 08
+    {ctype='unsigned short',    label='Inventory Index',    fn=inv+{0}},        -- 0C
+    {ctype='unsigned short',    label='_unknown2'},                             -- 0E
+    {ctype='unsigned char',     label='Stack',              fn=invbool},        -- 10
+    {ctype='char*',             label='_junk'},                                 -- 11
+}
+
+-- Sent when stopping an item from sale
+fields.outgoing._func[0x04E][0x0C] = L{
+    {ctype='unsigned char',     label='Slot'},                                  -- 05
+    {ctype='char*',             label='_junk'},                                 -- 06
+}
+
+-- Sent after receiving the sale status list for each item
+fields.outgoing._func[0x04E][0x0D] = L{
+    {ctype='unsigned char',     label='Slot'},                                  -- 05
+    {ctype='char*',             label='_junk'},                                 -- 06
+}
+
+-- Sent when bidding on an item
+fields.outgoing._func[0x04E][0x0E] = L{
+    {ctype='unsigned char',     label='Slot'},                                  -- 05
+    {ctype='unsigned short',    label='_unknown3'},                             -- 06
+    {ctype='unsigned int',      label='Price',              fn=gil},            -- 08
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 0C
+    {ctype='unsigned short',    label='_unknown4'},                             -- 0E
+    {ctype='bool',              label='Stack',              fn=invbool},        -- 10
+    {ctype='char*',             label='_junk'},                                 -- 11
+}
+
+-- Sent when taking a sold item from the list
+fields.outgoing._func[0x04E][0x10] = L{
+    {ctype='unsigned char',     label='Slot'},                                  -- 05
+    {ctype='char*',             label='_junk'},                                 -- 06
+}
+
+-- Auction Interaction
+fields.outgoing[0x04E] = function()
+    local self = fields.outgoing._func[0x04E]
+    local fields = self.base
+
+    return function(data)
+        return self.base + (self[data:byte(5)] or L{})
+    end
+end()
+
 -- Equip
 fields.outgoing[0x050] = L{
     {ctype='unsigned char',     label='Item Index',         fn=invp+{0x06}},    -- 04
@@ -497,6 +597,13 @@ fields.outgoing[0x052] = L{
     {ref=types.equipset_build,  count=1},                                       -- 08
     -- The next 16 are the entire current equipset, excluding the newly changed item
     {ref=types.equipset_build,  lookup={res.slots, 0x00},   count=0x10},        -- 0C
+}
+
+-- Crafting-related packet?
+-- This packet is sent after receiving a result when synthesizing.
+fields.outgoing[0x059] = L{
+    {ctype='unsigned int',      label='_unknown1'},                             -- 04   Often 00 00 00 00, but 01 00 00 00 observed.
+    {ctype='data[8]',           label='_junk1'}                                 -- 08   Likely junk from a non-zero'd buffer.
 }
 
 -- Conquest
@@ -923,6 +1030,11 @@ fields.outgoing[0x10D] = L{
     {ctype='unsigned short',    label='RoE Quest'},                             -- 04   This field is likely actually 12 bits
 }
 
+-- Accept RoE Quest reward that was denied due to a full inventory
+fields.outgoing[0x10E] = L{
+    {ctype='unsigned short',    label='RoE Quest'},                             -- 04   This field is likely actually 12 bits
+}
+  
 -- Currency Menu
 fields.outgoing[0x10F] = L{
 }
@@ -2001,6 +2113,15 @@ fields.incoming._func[0x044][0x17] = L{
     {ctype='data[118]',         label='_unknown4'},                             -- 26   Zeroing everything beyond this point has no notable effect.
 }
 
+-- Translate Response
+fields.incoming[0x047] = L{
+    {ctype='unsigned short',    label='Autotranslate Code'},                    -- 04   In a 6 byte autotranslate code, these are the 5th and 4 bytes respectively.
+    {ctype='unsigned char',     label='Starting Language'},                     -- 06   0 == JP, 1 == EN
+    {ctype='unsigned char',     label='Ending Language'},                       -- 07   0 == JP, 1 == EN
+    {ctype='char[64]',          label='Initial Phrase'},                        -- 08
+    {ctype='char[64]',          label='Translated Phrase'},                     -- 48   Will be 00'd if no match was found.
+}
+
 
 -- Unknown 0x048 incoming :: Sent when loading linkshell information from the Linkshell Concierge
 -- One per entry, 128 bytes long, mostly empty, does not contain name as far as I can see.
@@ -2084,17 +2205,129 @@ fields.incoming._func[0x04B].slot = L{
     {ctype='data[28]',          label='_unknown12'},                            -- 3C   All 00 observed, ext data? Doesn't seem to be the case, but same size
 }
 
-
--- Auction house open
--- The server sends this when the player clicks on an AH NPC, it starts the AH dialogue
-fields.incoming[0x04C] = L{
-    {ctype='unsigned char',     label='Type'},                                  --  0x02 for AH, 0x0A for... something, related to AH
-    {ctype='unsigned char',     label='Index?'},                                --  Counts up when Type is 0x0A
-    {ctype='unsigned char',     label='Response'},                              --  Disambiguation when Type is 0x02. Everything but 0x01 seems to result in:
-                                                                                --  "Auction house is temporarily closed for trading."
-    {ctype='unsigned char',     label='_unknown1',          const=0x00},        --  Possibly padding
-    {ctype='data[52]',          label='_unknown2'},                             --
+enums['ah itype'] = {
+    [0x02] = 'Open menu response',
+    [0x04] = 'Sell item confirmation',
+    [0x05] = 'Open sales status menu',
+    [0x0A] = 'Open menu confirmation',
+    [0x0B] = 'Sell item confirmation',
+    [0x0C] = '',
+    [0x0D] = 'Sales item status',
+    [0x10] = '',
 }
+
+fields.incoming._func[0x04C] = {}
+fields.incoming._func[0x04C].base = L{
+    {ctype='unsigned char',     label='Type',               fn=e+{'ah itype'}}, -- 04
+}
+
+fields.incoming._func[0x04C][0x02] = L{
+    {ctype='unsigned char',     label='_unknown1',          const=0xFF},        -- 05
+    {ctype='unsigned char',     label='Success',            fn=bool},           -- 06
+    {ctype='unsigned char',     label='_unknown2',          const=0x00},        -- 07
+    {ctype='char*',             label='_junk'},                                 -- 08
+}
+
+fields.outgoing._func[0x04E][0x04] = L{
+    {ctype='unsigned char',     label='_unknown1',          const=0xFF},        -- 05
+    {ctype='unsigned char',     label='Success',            fn=bool},           -- 06
+    {ctype='unsigned char',     label='_unknown2'},                             -- 07
+    {ctype='unsigned int',      label='Fee',                fn=gil},            -- 08
+    {ctype='unsigned short',    label='Inventory Index',    fn=inv+{0}},        -- 0C
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 0E
+    {ctype='unsigned char',     label='Stack',              fn=invbool},        -- 10
+    {ctype='char*',             label='_junk'},                                 -- 11
+}
+
+fields.incoming._func[0x04C][0x05] = L{
+    {ctype='unsigned char',     label='_unknown1',          const=0xFF},        -- 05
+    {ctype='unsigned char',     label='Success',            fn=bool},           -- 06
+    {ctype='unsigned char',     label='_unknown2',          const=0x00},        -- 07
+    {ctype='char*',             label='_junk'},                                 -- 08
+}
+
+enums['sale stat'] = {
+    [0x02] = 'Placing',
+    [0x03] = 'On auction',
+    [0x0A] = 'Sold',
+    [0x10] = 'Checking',
+}
+
+-- 0x0A, 0x0B and 0x0D could probably be combined, the fields seem the same.
+-- However, they're populated a bit differently. Both 0x0B and 0x0D are sent twice
+-- on action completion, the second seems to contain updated information.
+fields.incoming._func[0x04C][0x0A] = L{
+    {ctype='unsigned char',     label='Slot'},                                  -- 05
+    {ctype='unsigned char',     label='_unknown1',          const=0x01},        -- 06
+    {ctype='unsigned char',     label='_unknown2',          const=0x00},        -- 07
+    {ctype='data[12]',          label='_junk1'},                                -- 08
+    {ctype='unsigned char',     label='Sale status',        fn=e+{'sale stat'}},-- 14
+    {ctype='unsigned char',     label='_unknown3'},                             -- 15
+    {ctype='unsigned char',     label='Inventory Index'},                       -- 16   From when the item was put on auction
+    {ctype='unsigned char',     label='_unknown4',          const=0x00},        -- 17   Possibly padding
+    {ctype='char[16]',          label='Name'},                                  -- 18   Seems to always be the player's name
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 28
+    {ctype='unsigned char',     label='Count'},                                 -- 2A
+    {ctype='unsigned char',     label='AH Category'},                           -- 2B
+    {ctype='unsigned int',      label='Price',              fn=gil},            -- 2C
+    {ctype='unsigned int',      label='_unknown6'},                             -- 30
+    {ctype='unsigned int',      label='_unknown7'},                             -- 34
+    {ctype='unsigned int',      label='Timestamp',          fn=utime},          -- 38
+}
+
+fields.incoming._func[0x04C][0x0B] = L{
+    {ctype='unsigned char',     label='Slot'},                                  -- 05
+    {ctype='unsigned char',     label='_unknown1'},                             -- 06   This packet, like 0x0D, is sent twice, the first one always has 0x02 here, the second one 0x01
+    {ctype='unsigned char',     label='_unknown2',          const=0x00},        -- 07
+    {ctype='data[12]',          label='_junk1'},                                -- 08
+    {ctype='unsigned char',     label='Sale status',        fn=e+{'sale stat'}},-- 14
+    {ctype='unsigned char',     label='Inventory Index'},                       -- 16   From when the item was put on auction
+    {ctype='unsigned char',     label='_unknown4',          const=0x00},        -- 17   Possibly padding
+    {ctype='char[16]',          label='Name'},                                  -- 18   Seems to always be the player's name
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 28
+    {ctype='unsigned char',     label='Count'},                                 -- 2A
+    {ctype='unsigned char',     label='AH Category'},                           -- 2B
+    {ctype='unsigned int',      label='Price',              fn=gil},            -- 2C
+    {ctype='unsigned int',      label='_unknown6'},                             -- 30   Only populated in the second packet
+    {ctype='unsigned int',      label='_unknown7'},                             -- 34   Only populated in the second packet
+    {ctype='unsigned int',      label='Timestamp',          fn=utime},          -- 38
+}
+
+fields.incoming._func[0x04C][0x0D] = L{
+    {ctype='unsigned char',     label='Slot'},                                  -- 05
+    {ctype='unsigned char',     label='_unknown1'},                             -- 06   Some sort of type... the packet seems to always be sent twice, once with this value as 0x02, followed by 0x01
+    {ctype='unsigned char',     label='_unknown2'},                             -- 07   If 0x06 is 0x01 this seems to be 0x01 as well, otherwise 0x00
+    {ctype='data[12]',          label='_junk1'},                                -- 08
+    {ctype='unsigned short',    label='_unknown3'},                             -- 14
+    {ctype='unsigned char',     label='Inventory Index'},                       -- 16   From when the item was put on auction
+    {ctype='unsigned char',     label='_unknown4',          const=0x00},        -- 17   Possibly padding
+    {ctype='char[16]',          label='Name'},                                  -- 18   Seems to always be the player's name
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 28
+    {ctype='unsigned char',     label='Count'},                                 -- 2A
+    {ctype='unsigned char',     label='AH Category'},                           -- 2B
+    {ctype='unsigned int',      label='Price',              fn=gil},            -- 2C
+    {ctype='unsigned int',      label='_unknown6'},                             -- 30
+    {ctype='unsigned int',      label='_unknown7'},                             -- 34
+    {ctype='unsigned int',      label='Timestamp',          fn=utime},          -- 38
+}
+
+fields.incoming._func[0x04C][0x10] = L{
+    {ctype='unsigned char',     label='_unknown1',          const=0x00},        -- 05
+    {ctype='unsigned char',     label='Success',            fn=bool},           -- 06
+    {ctype='unsigned char',     label='_unknown2',          const=0x00},        -- 07
+    {ctype='char*',             label='_junk'},                                 -- 08
+}
+
+-- Auction Interaction
+-- All types in here are server responses to the equivalent type in 0x04E
+-- The only exception is type 0x02, which is sent to initiate the AH menu
+fields.incoming[0x04C] = function()
+    local fields = fields.incoming._func[0x04C]
+
+    return function(data)
+        return fields.base + (fields[data:byte(5)] or L{})
+    end
+end()
 
 -- Servmes Resp
 -- Length of the packet may vary based on message length? Kind of hard to test.
@@ -2109,7 +2342,7 @@ fields.incoming[0x4D] = L{
     {ctype='unsigned int',      label='Message Length 1'},                      -- 0A  Number of characters in the message
     {ctype='unsigned int',      label='_unknown2'},                             -- 10  00 00 00 00 observed
     {ctype='unsigned int',      label='Message Length 2'},                      -- 14  Same as Message Length 1. Not sure why this needs to be an int or in here twice.
-    {ctype='char[148]',         label='Message'},                               -- 18  Currently prefixed with 0x81, 0xA1 - A custom shift-jis character that translates to a square.
+    {ctype='char*',             label='Message'},                               -- 18  Currently prefixed with 0x81, 0xA1 - A custom shift-jis character that translates to a square.
 }
 
 -- Data Download 2
@@ -2735,7 +2968,7 @@ fields.incoming[0x0DF] = L{
     {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
     {ctype='unsigned int',      label='HP'},                                    -- 08
     {ctype='unsigned int',      label='MP'},                                    -- 0C
-    {ctype='unsigned int',      label='TP',                 fn=percent},        -- 10   Truncated, does not include the decimal value.
+    {ctype='unsigned int',      label='TP',                 fn=percent},        -- 10
     {ctype='unsigned short',    label='Index',              fn=index},          -- 14
     {ctype='unsigned char',     label='HPP',                fn=percent},        -- 16
     {ctype='unsigned char',     label='MPP',                fn=percent},        -- 17

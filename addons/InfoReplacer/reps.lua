@@ -1,6 +1,33 @@
+-- Copyright © 2014-2015, Cairthenn
+-- All rights reserved.
+
+-- Redistribution and use in source and binary forms, with or without
+-- modification, are permitted provided that the following conditions are met:
+
+    -- * Redistributions of source code must retain the above copyright
+      -- notice, this list of conditions and the following disclaimer.
+    -- * Redistributions in binary form must reproduce the above copyright
+      -- notice, this list of conditions and the following disclaimer in the
+      -- documentation and/or other materials provided with the distribution.
+    -- * Neither the name of InfoReplacer nor the
+      -- names of its contributors may be used to endorse or promote products
+      -- derived from this software without specific prior written permission.
+
+-- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+-- ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+-- WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+-- DISCLAIMED. IN NO EVENT SHALL Cairthenn BE LIABLE FOR ANY
+-- DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+-- (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+-- LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+-- ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+-- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+-- SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+require('tables')
 local res = require('resources')
 
-local _fns = T{
+return T{
 
     name            = function() return windower.ffxi.get_player().name end,
     linkshell       = function() return windower.ffxi.get_player().linkshell end,
@@ -157,22 +184,20 @@ local _fns = T{
 
     gil         = function() return windower.ffxi.get_items().gil end,
 
-    ammo        = function() return windower.ffxi.get_items().equipment.ammo > 0 and items[windower.ffxi.get_items().inventory[windower.ffxi.get_items().equipment.ammo].id].english end,
-    back        = function() return windower.ffxi.get_items().equipment.back > 0 and items[windower.ffxi.get_items().inventory[windower.ffxi.get_items().equipment.back].id].english end,
-    body        = function() return windower.ffxi.get_items().equipment.body > 0 and items[windower.ffxi.get_items().inventory[windower.ffxi.get_items().equipment.body].id].english end,
-    feet        = function() return windower.ffxi.get_items().equipment.feet > 0 and items[windower.ffxi.get_items().inventory[windower.ffxi.get_items().equipment.feet].id].english end,
-    hands       = function() return windower.ffxi.get_items().equipment.hands > 0 and items[windower.ffxi.get_items().inventory[windower.ffxi.get_items().equipment.hands].id].english end,
-    head        = function() return windower.ffxi.get_items().equipment.head > 0 and items[windower.ffxi.get_items().inventory[windower.ffxi.get_items().equipment.head].id].english end,
-    left_ear    = function() return windower.ffxi.get_items().equipment.left_ear > 0 and items[windower.ffxi.get_items().inventory[windower.ffxi.get_items().equipment.left_ear].id].english end,
-    legs        = function() return windower.ffxi.get_items().equipment.legs > 0 and items[windower.ffxi.get_items().inventory[windower.ffxi.get_items().equipment.legs].id].english end,
-    left_ring   = function() return windower.ffxi.get_items().equipment.left_ring > 0 and items[windower.ffxi.get_items().inventory[windower.ffxi.get_items().equipment.left_ring].id].english end,
-    main        = function() return windower.ffxi.get_items().equipment.main > 0 and items[windower.ffxi.get_items().inventory[windower.ffxi.get_items().equipment.main].id].english end,
-    neck        = function() return windower.ffxi.get_items().equipment.neck > 0 and items[windower.ffxi.get_items().inventory[windower.ffxi.get_items().equipment.neck].id].english end,
-    range       = function() return windower.ffxi.get_items().equipment.range > 0 and items[windower.ffxi.get_items().inventory[windower.ffxi.get_items().equipment.range].id].english end,
-    right_ear   = function() return windower.ffxi.get_items().equipment.right_ear > 0 and items[windower.ffxi.get_items().inventory[windower.ffxi.get_items().equipment.right_ear].id].english end,
-    right_ring  = function() return windower.ffxi.get_items().equipment.right_ring > 0 and items[windower.ffxi.get_items().inventory[windower.ffxi.get_items().equipment.right_ring].id].english end,
-    sub         = function() return windower.ffxi.get_items().equipment.sub > 0 and items[windower.ffxi.get_items().inventory[windower.ffxi.get_items().equipment.sub].id].english end,
-    waist       = function() return windower.ffxi.get_items().equipment.waist > 0 and items[windower.ffxi.get_items().inventory[windower.ffxi.get_items().equipment.waist].id].english end
+    ammo        = function() return windower.ffxi.get_items().equipment.ammo > 0 and res.items[windower.ffxi.get_items().inventory[windower.ffxi.get_items().equipment.ammo].id].english end,
+    back        = function() return windower.ffxi.get_items().equipment.back > 0 and res.items[windower.ffxi.get_items().inventory[windower.ffxi.get_items().equipment.back].id].english end,
+    body        = function() return windower.ffxi.get_items().equipment.body > 0 and res.items[windower.ffxi.get_items().inventory[windower.ffxi.get_items().equipment.body].id].english end,
+    feet        = function() return windower.ffxi.get_items().equipment.feet > 0 and res.items[windower.ffxi.get_items().inventory[windower.ffxi.get_items().equipment.feet].id].english end,
+    hands       = function() return windower.ffxi.get_items().equipment.hands > 0 and res.items[windower.ffxi.get_items().inventory[windower.ffxi.get_items().equipment.hands].id].english end,
+    head        = function() return windower.ffxi.get_items().equipment.head > 0 and res.items[windower.ffxi.get_items().inventory[windower.ffxi.get_items().equipment.head].id].english end,
+    left_ear    = function() return windower.ffxi.get_items().equipment.left_ear > 0 and res.items[windower.ffxi.get_items().inventory[windower.ffxi.get_items().equipment.left_ear].id].english end,
+    legs        = function() return windower.ffxi.get_items().equipment.legs > 0 and res.items[windower.ffxi.get_items().inventory[windower.ffxi.get_items().equipment.legs].id].english end,
+    left_ring   = function() return windower.ffxi.get_items().equipment.left_ring > 0 and res.items[windower.ffxi.get_items().inventory[windower.ffxi.get_items().equipment.left_ring].id].english end,
+    main        = function() return windower.ffxi.get_items().equipment.main > 0 and res.items[windower.ffxi.get_items().inventory[windower.ffxi.get_items().equipment.main].id].english end,
+    neck        = function() return windower.ffxi.get_items().equipment.neck > 0 and res.items[windower.ffxi.get_items().inventory[windower.ffxi.get_items().equipment.neck].id].english end,
+    range       = function() return windower.ffxi.get_items().equipment.range > 0 and res.items[windower.ffxi.get_items().inventory[windower.ffxi.get_items().equipment.range].id].english end,
+    right_ear   = function() return windower.ffxi.get_items().equipment.right_ear > 0 and res.items[windower.ffxi.get_items().inventory[windower.ffxi.get_items().equipment.right_ear].id].english end,
+    right_ring  = function() return windower.ffxi.get_items().equipment.right_ring > 0 and res.items[windower.ffxi.get_items().inventory[windower.ffxi.get_items().equipment.right_ring].id].english end,
+    sub         = function() return windower.ffxi.get_items().equipment.sub > 0 and res.items[windower.ffxi.get_items().inventory[windower.ffxi.get_items().equipment.sub].id].english end,
+    waist       = function() return windower.ffxi.get_items().equipment.waist > 0 and res.items[windower.ffxi.get_items().inventory[windower.ffxi.get_items().equipment.waist].id].english end
 }
-
-return _fns

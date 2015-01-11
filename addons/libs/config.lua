@@ -13,12 +13,10 @@ _libs.strings = _libs.strings or require('strings')
 _libs.xml = _libs.xml or require('xml')
 _libs.files = _libs.files or require('files')
 
-if not _libs.logger then
-    error = print
-    warning = print
-    notice = print
-    log = print
-end
+error = error or print+{'Error:'}
+warning = warning or print+{'Warning:'}
+notice = notice or print+{'Notice:'}
+log = log or print
 
 -- Map for different config loads.
 local settings_map = T{}
@@ -233,8 +231,12 @@ function merge(t, t_merge, path)
                     end
 
                 elseif oldtype == 'string' then
-                    t[key] = val
-                    err = true
+                    if type(val) == 'table' and not next(val) then
+                        t[key] = ''
+                    else
+                        t[key] = val
+                        err = true
+                    end
 
                 else
                     err = true
@@ -246,7 +248,7 @@ function merge(t, t_merge, path)
 
             if err then
                 if path then
-                    warning('Could not safely merge values for \'%s/%s\', %s expected (default: %s), got %s (%s).':format(path:concat('/'), key, type(oldval), tostring(oldval), type(val), tostring(val)))
+                    warning('Could not safely merge values for \'%s/%s\', %s expected (default: %s), got %s (%s).':format(path:concat('/'), key, class(oldval), tostring(oldval), class(val), tostring(val)))
                 end
                 t[key] = val
             end
@@ -483,7 +485,7 @@ end)
 return config
 
 --[[
-Copyright © 2013-2014, Windower
+Copyright © 2013-2015, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

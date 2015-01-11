@@ -29,8 +29,16 @@ _meta = _meta or {}
 _meta.Text = _meta.Text or {}
 _meta.Text.__class = 'Text'
 _meta.Text.__index = texts
+
+local set_value = function(t, key, value)
+    local m = meta[t]
+    m.values[key] = value
+    m.texts[key] = value ~= nil and (m.formats[key] and m.formats[key]:format(value) or tostring(value)) or m.defaults[key]
+end
+
 _meta.Text.__newindex = function(t, k, v)
-    t:update({[k] = v})
+    set_value(t, k, v)
+    t:update()
 end
 
 --[[
@@ -176,14 +184,15 @@ function texts.new(str, settings, root_settings)
     m.status = m.status or {visible = false, text = {}}
     m.root_settings = root_settings
     m.base_str = str
-    m.keys = {}
 
     m.events = {}
 
-    m.texts = {}
+    m.keys = {}
+    m.values = {}
+    m.textorder = {}
     m.defaults = {}
     m.formats = {}
-    m.textorder = {}
+    m.texts = {}
 
     windower.text.create(m.name)
 
@@ -213,21 +222,26 @@ end
 -- Sets string values based on the provided attributes.
 function texts.update(t, attr)
     attr = attr or {}
-    local str = ''
-    for _, key in ipairs(meta[t].textorder) do
-        if attr[key] ~= nil then
-            meta[t].texts[key] = meta[t].formats[key] and meta[t].formats[key]:format(attr[key]) or tostring(attr[key])
-        end
+    local m = meta[t]
 
-        if meta[t].texts[key] ~= nil then
-            str = str .. meta[t].texts[key]
-        else
-            str = str .. meta[t].defaults[key]
-        end
+    -- Add possibly new keys
+    for key, value in pairs(attr) do
+        m.keys[key] = true
     end
 
-    windower.text.set_text(meta[t].name, str)
-    meta[t].status.text.content = str
+    -- Update all text segments
+    for key in pairs(m.keys) do
+        set_value(t, key, attr[key] == nil and m.values[key] or attr[key])
+    end
+
+    -- Create the string
+    local str = ''
+    for _, key in ipairs(meta[t].textorder) do
+        str = str .. m.texts[key]
+    end
+
+    windower.text.set_text(m.name, str)
+    m.status.text.content = str
 
     return str
 end
@@ -235,11 +249,12 @@ end
 -- Restores the original text object not counting updated variables and added lines
 function texts.clear(t)
     local m = meta[t]
+    m.keys = {}
+    m.values = {}
+    m.textorder = {}
     m.texts = {}
     m.defaults = {}
-    m.textorder = {}
     m.formats = {}
-    m.keys = {}
 
     texts.append(t, m.base_str or '')
 end
@@ -247,6 +262,7 @@ end
 -- Appends new text tokens to be displayed
 function texts.append(t, str)
     local m = meta[t]
+
     local i = 1
     local index = #m.textorder + 1
     while i <= #str do
@@ -284,7 +300,6 @@ function texts.append(t, str)
 
             m.textorder[index] = key
             m.keys[key] = true
-            m.texts[key] = default
             m.defaults[key] = default
             m.formats[key] = format
 
@@ -305,10 +320,11 @@ end
 -- Returns an iterator over all currently registered variables
 function texts.it(t)
     local key
+    local m = meta[t]
 
     return function()
-        key = next(meta[t].keys, key)
-        return key
+        key = next(m.keys, key)
+        return key, m.values[key], m.defaults[key], m.formats[key], m.texts[key]
     end
 end
 
