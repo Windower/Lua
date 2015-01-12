@@ -1,6 +1,6 @@
 _addon.name = 'Clock'
 _addon.author = 'StarHawk'
-_addon.version = '0.0.0.0'
+_addon.version = '1.0.0.0'
 _addon.command = 'clock'
 
 require('tables')
