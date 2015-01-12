@@ -378,7 +378,7 @@ function table.map(t, fn)
     local res = {}
     for value, key in table.it(t) do
         -- Evaluate fn with the element and store it.
-        res[key] = fn(valye)
+        res[key] = fn(value)
     end
 
     return setmetatable(res, getmetatable(t))
