@@ -171,9 +171,7 @@ function functions.loop(fn, interval, cond)
     return coroutine.schedule(function()
         while cond() do
             fn()
-            -- print('sleeping...', os.clock(), interval)
             coroutine.sleep(interval)
-            -- print('awoke...', os.clock())
         end
     end, 0)
 end
