@@ -467,10 +467,16 @@ function table.format(t, trail, subs)
     local last
     if trail == 'and' then
         last = ' and '
+    elseif trail == 'or' then
+        last = ' or '
+    elseif trail == 'list' then
+        last = ', '
     elseif trail == 'csv' then
         last = ','
     elseif trail == 'oxford' then
         last = ', and '
+    elseif trail == 'oxford or' then
+        last = ', or '
     else
         warning('Invalid format for table.format: \''..trail..'\'.')
     end
