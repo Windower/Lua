@@ -397,7 +397,7 @@ function list.format(l, trail, subs)
     if trail == 'and' then
         last = ' and '
     elseif trail == 'csv' then
-        last = ', '
+        last = ','
     elseif trail == 'oxford' then
         last = ', and '
     else
