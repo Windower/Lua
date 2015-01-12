@@ -494,7 +494,6 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
             end
         end
     elseif id == 0x0DF then
-        print('here! 2',data:unpack('I',0x11))
         player.vitals.hp = data:unpack('I',9)
         player.vitals.mp = data:unpack('I',13)
         player.vitals.tp = data:unpack('I',0x11)
