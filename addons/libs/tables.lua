@@ -365,7 +365,7 @@ function table.slice(t, from, to)
         key = key + 1
     end
 
-    return setmetatable(res, getmetatable(t) or _meta.T)
+    return setmetatable(res, getmetatable(t))
 end
 
 -- Replaces t[from, to] with the contents of st and returns the table.
@@ -405,7 +405,7 @@ function table.reverse(t)
         rkey = rkey - 1
     end
 
-    return setmetatable(res, getmetatable(t) or _meta.T)
+    return setmetatable(res, getmetatable(t))
 end
 
 -- Gets a list of arguments and creates a table with key: value pairs alternating the arguments.
@@ -449,7 +449,7 @@ function table.rekey(t, key)
         res[value[key]] = value
     end
 
-    return setmetatable(res, getmetatable(t) or _meta.T)
+    return setmetatable(res, getmetatable(t))
 end
 
 -- Wrapper around unpack(t). Returns table elements as a list of values. Optionally takes a number of keys to unpack.
