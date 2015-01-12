@@ -13,10 +13,10 @@ _libs.strings = _libs.strings or require('strings')
 _libs.xml = _libs.xml or require('xml')
 _libs.files = _libs.files or require('files')
 
-error = error or print+{'Error:'}
-warning = warning or print+{'Warning:'}
-notice = notice or print+{'Notice:'}
-log = log or print
+local error = error or print+{'Error:'}
+local warning = warning or print+{'Warning:'}
+local notice = notice or print+{'Notice:'}
+local log = log or print
 
 -- Map for different config loads.
 local settings_map = T{}
