@@ -1,9 +1,11 @@
 _addon.name = 'Clock'
 _addon.author = 'StarHawk'
-_addon.version = '1.0.0.0'
+_addon.version = '1.0.1.0'
 _addon.command = 'clock'
 
 require('tables')
+require('lists')
+require('strings')
 require('logger')
 config = require('config')
 texts = require('texts')
@@ -21,16 +23,16 @@ end
 
 defaults = {}
 defaults.Format = '%H:%M:%S'
-defaults.TimeZones = L{'UTC', 'jst'}
+defaults.TimeZones = L{'UTC', 'JST'}
 defaults.Separator = '\\n'
-defaults.Sort = ''
+defaults.Sort = 'Time'
 defaults.Clock = {}
 
 settings = config.load(defaults)
 
 clock = texts.new('', settings.Clock, settings)
 
-sort = {
+sort = T{
     time = function(t1, t2)
         return time_zones[t1] < time_zones[t2]
     end,
@@ -40,7 +42,7 @@ sort = {
 }
 
 redraw = function()
-    local sorted = settings.Sort ~= '' and settings.TimeZones:sort(sort[settings.Sort:lower()]) or settings.TimeZones
+    local sorted = settings.Sort ~= 'None' and settings.TimeZones:sort(sort[settings.Sort:lower()]) or settings.TimeZones
     local width = settings.TimeZones:reduce(function(acc, tz)
         return math.max(acc, #tz)
     end, 0)
@@ -69,7 +71,7 @@ end)
 
 windower.register_event('addon command', function(command, ...)
     command = command and command:lower() or 'help'
-    local args = {...}
+    local args = L{...}
 
     if command == 'help' or command == 'h' then
         print(_addon.name .. ' v.' .. _addon.version)
@@ -79,52 +81,74 @@ windower.register_event('addon command', function(command, ...)
 
     elseif command == 'format' or command == 'f' then
         if args[1] then
-            settings.Format = args[1]
+            settings.Format = args:concat(' ')
             config.save(settings)
         end
 
-        log('Format: %s':format(settings.Format))
+        log('Format set to: %s':format(settings.Format))
 
     elseif command == 'add' or command == 'a' then
         if not args[1] then
-            error('Invalid syntax: //clock add <timezone>')
+            error('Invalid syntax: //clock add <timezones...>')
             return
         end
 
-        local tz = tz_format[args[1]]
-        if not tz then
-            error('Unknown time zone identifier: %s':format(args[1]))
-            return
+        while args[1] do
+            local tz = tz_format[args[1]]
+            if not tz then
+                error('Unknown time zone identifier: %s':format(args[1]))
+                return
+            end
+
+            if settings.TimeZones:contains(tz) then
+                notice('Time zone "%s" is already being displayed.':format(tz))
+                return
+            end
+
+            settings.TimeZones:append(tz)
+            args:remove(1)
         end
 
-        if settings.TimeZones:contains(tz) then
-            notice('Time zone "%s" is already being displayed.':format(tz))
-            return
-        end
-
-        settings.TimeZones:append(tz)
         config.save(settings)
         redraw()
 
     elseif command == 'remove' or command == 'r' then
         if not args[1] then
-            error('Invalid syntax: //clock add <timezone>')
+            error('Invalid syntax: //clock add <timezones...>')
             return
         end
 
-        local tz = tz_format[args[1]]
-        if not tz then
-            error('Unknown time zone identifier: %s':format(args[1]))
-            return
+        while args[1] do
+            local tz = tz_format[args[1]]
+            if not tz then
+                error('Unknown time zone identifier: %s':format(args[1]))
+                return
+            end
+
+            if not settings.TimeZones:contains(tz) then
+                notice('Time zone "%s" is not being displayed.':format(tz))
+                return
+            end
+
+            settings.TimeZones:remove(settings.TimeZones:find(tz))
+            args:remove(1)
         end
 
-        if not settings.TimeZones:contains(tz) then
-            notice('Time zone "%s" is not being displayed.':format(tz))
-            return
-        end
-
-        settings.TimeZones:remove(settings.TimeZones:find(tz))
         config.save(settings)
+        redraw()
+
+    elseif command == 'sort' or command == 's' then
+        if args[1] and not sort[args[1]:lower()] then
+            error('Invalid sorting specified. Choose one of: %s':format((L{'None'} + sort:keyset():sort()):map(string.capitalize):format('or')))
+            return
+        end
+
+        if args[1] then
+            settings.Sort = args[1]:capitalize()
+            config.save(settings)
+        end
+
+        log('Sorting set to: %s':format(settings.Sort:capitalize()))
         redraw()
 
     end
