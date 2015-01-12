@@ -24,8 +24,8 @@ for _, t in pairs({functions, boolean, math, string, table}) do
 end
 
 -- The identity function.
-function functions.identity(fn)
-    return fn
+function functions.identity(...)
+    return ...
 end
 
 -- Returns a function that returns a constant value.
@@ -130,7 +130,7 @@ function functions.select(fn, i)
     end
 end
 
--- Returns an iterator of the results of the function.
+-- Returns an iterator over the results of a function.
 function functions.it(fn, ...)
     local res = {fn(...)}
     local key = 0
@@ -347,20 +347,38 @@ function table.lookup(t, ref, key)
     return ref[t[key]]
 end
 
-local it = function(t)
-    local key
-    return function()
-        key = next(t, key)
-        return rawget(t, key), key
+table.it = function()
+    local it = function(t)
+        local key
+
+        return function()
+            key = next(t, key)
+            return t[key], key
+        end
     end
-end
+
+    return function(t)
+        local meta = getmetatable(t)
+        if not meta then
+            return it(t)
+        end
+
+        local index = meta.__index
+        if index == table then
+            return it(t)
+        end
+
+        local fn = type(index) == 'table' and index.it or index(t, 'it') or it
+        return (fn == table.it and it or fn)(t)
+    end
+end()
 
 -- Applies function fn to all values of the table and returns the resulting table.
 function table.map(t, fn)
     local res = {}
-    for val, key in (not rawget(t, 'it') and t.it or it)(t) do
+    for value, key in table.it(t) do
         -- Evaluate fn with the element and store it.
-        res[key] = fn(val)
+        res[key] = fn(valye)
     end
 
     return setmetatable(res, getmetatable(t))
@@ -369,8 +387,8 @@ end
 -- Applies function fn to all keys of the table, and returns the resulting table.
 function table.key_map(t, fn)
     local res = {}
-    for val, key in (not rawget(t, 'it') and t.it or it)(t) do
-        res[fn(key)] = val
+    for value, key in table.it(t) do
+        res[fn(key)] = value
     end
 
     return setmetatable(res, getmetatable(t))
@@ -383,10 +401,10 @@ function table.filter(t, fn)
     end
 
     local res = {}
-    for val, key in (not rawget(t, 'it') and t.it or it)(t) do
+    for value, key in table.it(t) do
         -- Only copy if fn(val) evaluates to true
-        if fn(val) then
-            res[key] = val
+        if fn(value) then
+            res[key] = value
         end
     end
 
@@ -400,10 +418,10 @@ function table.key_filter(t, fn)
     end
 
     local res = {}
-    for val, key in (not rawget(t, 'it') and t.it or it)(t) do
+    for value, key in table.it(t) do
         -- Only copy if fn(key) evaluates to true
         if fn(key) then
-            res[key] = val
+            res[key] = value
         end
     end
 
@@ -415,11 +433,11 @@ end
 function table.reduce(t, fn, init)
     -- Set the accumulator variable to the init value (which can be nil as well)
     local acc = init
-    for val in (not rawget(t, 'it') and t.it or it)(t) do
+    for value in table.it(t) do
         if init then
-            acc = fn(acc, val)
+            acc = fn(acc, value)
         else
-            acc = val
+            acc = value
             init = true
         end
     end
@@ -429,8 +447,8 @@ end
 
 -- Return true if any element of t satisfies the condition fn.
 function table.any(t, fn)
-    for val in (not rawget(t, 'it') and t.it or it)(t) do
-        if fn(val) then
+    for value in table.it(t) do
+        if fn(valye) then
             return true
         end
     end
@@ -440,8 +458,8 @@ end
 
 -- Return true if all elements of t satisfy the condition fn.
 function table.all(t, fn)
-    for val in (not rawget(t, 'it') and t.it or it)(t) do
-        if not fn(val) then
+    for value in table.it(t) do
+        if not fn(value) then
             return false
         end
     end
