@@ -75,7 +75,7 @@ end
 
 windower.register_event('addon command', function(command, ...)
     command = command
-    args = l{...}
+    args = L{...}
     local trial_weapons = {"axe of trials","gun of trials","sword of trials","knuckles of trials","spear of trials","scythe of trials","sapara of trials",
     "bow of trials","club of trials","pole of trials ","pick of trials","dagger of trials","tachi of trials","kodachi of trials","sturdy axe","burning fists",
     "werebuster","mage's staff","vorpal sword","swordbreaker","brave blade","death sickle","double axe","dancing dagger","killer bow","windslicer","sasuke katana",
