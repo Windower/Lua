@@ -205,7 +205,7 @@ function set.it(s)
     local key = nil
     return function()
         key = next(s, key)
-        return key, true
+        return key
     end
 end
 
