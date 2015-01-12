@@ -413,6 +413,7 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
             else
                 if not is_icon[letter_to_n[last_menu_open.type]] then
                     menu_icon:color(unpack(n_to_color[last_menu_open.type]))
+                    colors_of_the_wind(letter_to_n[last_menu_open.type])
                 end
             end
         elseif not is_icon.W then
