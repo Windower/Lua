@@ -52,6 +52,7 @@ function config.load(filepath, defaults)
     meta.chars = S{}
     meta.comments = {}
     meta.refresh = T{}
+    meta.cdata = S{}
 
     settings_map[settings] = meta
 
@@ -279,6 +280,11 @@ function settings_table(node, settings, key, meta)
     -- TODO: Type checking necessary? merge should take care of that.
     if #node.children == 1 and node.children[1].type == 'text' then
         local val = node.children[1].value
+        if node.children[1].cdata then
+            meta.cdata:add(key)
+            return val
+        end
+
         if val:lower() == 'false' then
             return false
         elseif val:lower() == 'true' then
@@ -439,6 +445,8 @@ function nest_xml(t, meta, indentlevel)
                 val = set.format(val, 'csv')
             elseif type(val) == 'table' then
                 val = table.format(val, 'csv')
+            elseif type(val) == 'string' and meta.cdata[key:lower()] then
+                val = '<![CDATA[%s]]>':format(val)
             else
                 val = tostring(val)
             end
@@ -446,7 +454,7 @@ function nest_xml(t, meta, indentlevel)
             if val == '' then
                 fragments:append('%s<%s />':format(indent, key))
             else
-                fragments:append('%s<%s>%s</%s>':format(indent, key, val:xml_escape(), key))
+                fragments:append('%s<%s>%s</%s>':format(indent, key, meta.cdata[key:lower()] and val or val:xml_escape(), key))
             end
             local length = fragments:last():length() - indent:length()
             if length > maxlength then
