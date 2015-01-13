@@ -1,7 +1,5 @@
 --[[
-findAll v1.20140904
-
-Copyright (c) 2013-2014, Giuliano Riccio
+Copyright © 2013-2015, Giuliano Riccio
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -30,8 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name    = 'findAll'
 _addon.author  = 'Zohno'
-_addon.version = '1.20140904'
-_addon.command = 'findAll'
+_addon.version = '1.20150105'
+_addon.commands = {'findAll', 'find'}
 
 require('chat')
 require('lists')
@@ -43,6 +41,125 @@ require('strings')
 json  = require('json')
 file  = require('files')
 slips = require('slips')
+config = require('config')
+texts = require('texts')
+res = require('resources')
+
+defaults = {}
+defaults.Track = ''
+defaults.Tracker = {}
+
+settings = config.load(defaults)
+
+tracker = texts.new(settings.Track, settings.Tracker, settings)
+
+;(function()
+    config.register(settings, function(settings)
+        tracker:text(settings.Track)
+        tracker:visible(settings.Track ~= '')
+    end)
+
+    local bag_ids = res.bags:rekey('english'):key_map(string.lower):map(table.get-{'id'})
+
+    local variable_cache = S{}
+    tracker:register_event('reload', function()
+        for variable in tracker:it() do
+            local bag_name, search = variable:match('(.*):(.*)')
+
+            local bag = bag_name == 'all' and 'all' or bag_ids[bag_name:lower()]
+            if not bag and bag_name ~= 'all' then
+                warning('Unknown bag: %s':format(bag_name))
+            else
+                if not S{'$freespace', '$usedspace', '$maxspace'}:contains(search:lower()) then
+                    local items = S(res.items:name(windower.wc_match-{search})) + S(res.items:name_log(windower.wc_match-{search}))
+                    if items:empty() then
+                        warning('No items matching "%s" found.':format(search))
+                    else
+                        variable_cache:add({
+                            name = variable,
+                            bag = bag,
+                            type = 'item',
+                            ids = items:map(table.get-{'id'}),
+                            search = search,
+                        })
+                    end
+                else
+                    variable_cache:add({
+                        name = variable,
+                        bag = bag,
+                        type = 'info',
+                        search = search,
+                    })
+                end
+            end
+        end
+    end)
+
+    windower.register_event('prerender', function()
+        local update = T{}
+
+        local search_bag = function(bag, ids)
+            return bag:filter(function(item)
+                return type(item) == 'table' and ids:contains(item.id)
+            end):reduce(function(acc, item)
+                return type(item) == 'table' and item.count + acc or acc
+            end, 0)
+        end
+
+        local last_check = 0
+        return function()
+            if os.clock() - last_check < 0.25 then
+                return
+            end
+            last_check = os.clock()
+
+            local items = T{}
+            for variable in variable_cache:it() do
+                if variable.type == 'info' then
+                    local info
+                    if variable.bag == 'all' then
+                        info = {
+                            max = 0,
+                            count = 0
+                        }
+                        for bag_info in T(windower.ffxi.get_bag_info()):it() do
+                            info.max = info.max + bag_info.max
+                            info.count = info.count + bag_info.count
+                        end
+                    else
+                        info = windower.ffxi.get_bag_info(variable.bag)
+                    end
+
+                    update[variable.name] =
+                        variable.search == '$freespace' and (info.max - info.count)
+                        or variable.search == '$usedspace' and info.count
+                        or variable.search == '$maxspace' and info.max
+                        or nil
+                elseif variable.type == 'item' then
+                    if variable.bag == 'all' then
+                        for id in bag_ids:it() do
+                            if not items[id] then
+                                items[id] = T(windower.ffxi.get_items(id))
+                            end
+                        end
+                    else
+                        if not items[variable.bag] then
+                            items[variable.bag] = T(windower.ffxi.get_items(variable.bag))
+                        end
+                    end
+
+                    update[variable.name] = variable.bag ~= 'all' and search_bag(items[variable.bag], variable.ids) or items:reduce(function(acc, bag)
+                        return acc + search_bag(bag, variable.ids)
+                    end, 0)
+                end
+            end
+
+            if not update:empty() then
+                tracker:update(update)
+            end
+        end
+    end())
+end)()
 
 zone_search            = true
 first_pass             = true
@@ -54,7 +171,6 @@ storages_path          = 'data/storages.json'
 storages_order         = L{'temporary', 'inventory', 'wardrobe', 'safe', 'storage', 'locker', 'satchel', 'sack', 'case'}
 storage_slips_order    = L{'slip 01', 'slip 02', 'slip 03', 'slip 04', 'slip 05', 'slip 06', 'slip 07', 'slip 08', 'slip 09', 'slip 10', 'slip 11', 'slip 12', 'slip 13', 'slip 14', 'slip 15', 'slip 16', 'slip 17', 'slip 18', 'slip 19'}
 merged_storages_orders = L{}:extend(storages_order):extend(storage_slips_order)
-resources              = require ('resources').items
 
 function search(query, export)
     update()
@@ -100,12 +216,12 @@ function search(query, export)
         end
     end
 
-    for i,_ in pairs(new_item_ids) do
-        local id = tonumber(i)
-	    if (resources[id]) then
+    for id,_ in pairs(new_item_ids) do
+        local item = res.items[tonumber(id)]
+	    if item then
             item_names[i] = {
-                ['name'] = resources[id].name,
-                ['long_name'] = resources[id].name_log
+                ['name'] = item.name,
+                ['long_name'] = item.name_log
             }
         end
     end
@@ -230,16 +346,12 @@ function get_storages()
 
         for _, data in ipairs(items[storage_name]) do
             if type(data) == 'table' then
-                local id = tostring(data.id)
+				if data.id ~= 0 then
+					local id = tostring(data.id)
 
-                if id ~= "0" then
-                    if storages[storage_name][id] == nil then
-                        storages[storage_name][id] = data.count
-                    else
-                        storages[storage_name][id] = storages[storage_name][id] + data.count
-                    end
-                end
-            end
+					storages[storage_name][id] = (storages[storage_name][id] or 0) + data.count
+				end
+			end
         end
     end
 
