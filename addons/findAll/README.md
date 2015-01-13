@@ -1,9 +1,8 @@
 # FindAll
 
-This addon searches items stored on all your characters. To build the initial list, you must login and logout (or input the `findall` command) at least once with each of them.  
-The list is stored on the machine on which the addon is executed, being updated everytime you look for an item or on logout, so this will not work the best if you use multiple PCs, at least until IPC will let them communicate over LAN or Internet (in development).  
-The addon has a deferral time of 20 seconds when it's loaded, you are logging in or zoning to give the game enough time to load all the items.  
-If you notice that this time is too short, please create an issue report in the bug tracker.
+This addon searches items stored on all your characters. To build the initial list, you must login and either receive any item-handling packet, logout, or input the `findall` command on any character at least once with each of them.  
+The list is stored on the machine on which the addon is executed, being updated everytime you look for an item, certain packets arrive, or you logout, so this will not work the best if you use multiple PCs, unless you store your Windower installation in Dropbox or somewhere.
+The addon will show a warning if your entire inventory has not re-loaded since zoning, but it should still be accurate because Windower's item handling API has moved to being packet based.
 
 It offers an on-screen tracker that keeps track of items you specify or of your used/free space in specified bags.
 
