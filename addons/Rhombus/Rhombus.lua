@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
 _addon.name = 'Rhombus'
 _addon.author = 'trv'
-_addon.version = '1.0.1'
+_addon.version = '1.1.2'
 
 config = require('config')
 texts = require('texts')
@@ -37,7 +37,6 @@ require('sets')
 require('logger')
 require('defs')
 packets = require('packets')
-bit = require('bit')
 
 local defaults={
     x_offset = 0,
@@ -120,6 +119,20 @@ windower.prim.set_color('scroll_bar',200,255,255,255)
 windower.prim.set_visibility('scroll_bar',false)
 windower.prim.set_size('scroll_bar',10,1)
 
+letter_to_n = {
+    'R',
+    'G',
+    'B',
+    'Y'
+}
+
+n_to_color = {
+    {255,111,111},
+    {111,255,111},
+    {111,111,255},
+    {255,255,111}
+}
+
 function colors_of_the_wind(s)
     for k,v in pairs(is_icon) do
         is_icon[k] = false
@@ -128,47 +141,97 @@ function colors_of_the_wind(s)
 end
 
 function get_templates()
+    if not windower.ffxi.get_info().logged_in then return end
     player_info.id = windower.ffxi.get_player().id
+    player_info.main_job = main_job_id or windower.ffxi.get_player().main_job_id
+    player_info.sub_job = sub_job_id or windower.ffxi.get_player().sub_job_id
+    player_info.main_job_level = main_job_level or windower.ffxi.get_player().main_job_level
+    player_info.sub_job_level = sub_job_level or windower.ffxi.get_player().sub_job_level
+    local t_temp
+    
+    local main = res.jobs[player_info.main_job].en
+    local sub = res.jobs[player_info.sub_job].en
+    
+    t_temp = L(res.spells:levels(function(t) return t[player_info.main_job] or t[player_info.sub_job] end):keyset())
     spells_template = loadfile(windower.addon_path .. 'data/spells_template.lua')
     if not spells_template then
         error('No template for spells was found.')
-        spells_template = L{}
-        local t = windower.ffxi.get_spells()
-        for k,v in pairs(t) do
-            if t[k] then
-                spells_template:append(k)
-            end
-        end
+        spells_template = t_temp
     else
         spells_template = spells_template()
+        count_table_elements(spells_template)
     end
+
+    t_temp = L(res.weapon_skills:keyset())
     ws_template = loadfile(windower.addon_path .. 'data/ws_template.lua')
     if not ws_template then
         error('No template for weapon skills was found.')
-        ws_template = L(windower.ffxi.get_abilities().weapon_skills)
+        ws_template = t_temp
     else
         ws_template = ws_template()
+        count_table_elements(ws_template)
+        if ws_template[main] then
+            if ws_template[sub] then
+                ws_template = recursively_merge_tables(ws_template[main], ws_template[sub])
+            else
+                ws_template = recursively_merge_tables(ws_template[main],t_temp)
+            end
+        elseif ws_template[sub] then
+            ws_template = recursively_merge_tables(ws_template[sub],t_temp)
+        else
+            ws_template = t_temp
+        end
     end
+    
+    t_temp = L(res.job_abilities:prefix('/jobability'):keyset())
     ja_template = loadfile(windower.addon_path .. 'data/ja_template.lua')
     if not ja_template then
         error('No template for job abilities was found.')
-        ja_template = L(windower.ffxi.get_abilities().job_abilities)
+        ja_template = t_temp
     else
         ja_template = ja_template()
+        count_table_elements(ja_template)
+        if ja_template[main] then
+            if ja_template[sub] then
+                ja_template = recursively_merge_tables(ja_template[main], ja_template[sub])
+            else
+                ja_template = recursively_merge_tables(ja_template[main],t_temp)
+            end
+        elseif ja_template[sub] then
+            ja_template = recursively_merge_tables(ja_template[sub],t_temp)
+        else
+            ja_template = t_temp
+        end
     end
+    
+    t_temp = L(res.job_abilities:prefix('/pet'):keyset())
     pet_command_template = loadfile(windower.addon_path .. 'data/pet_command_template.lua')
     if not pet_command_template then
         error('No template for pet commands was found.')
-        pet_command_template = L(windower.ffxi.get_abilities().job_abilities)
+        pet_command_template = t_temp
     else
         pet_command_template = pet_command_template()
+        count_table_elements(pet_command_template)
+        if pet_command_template[main] then
+            if pet_command_template[sub] then
+                pet_command_template = recursively_merge_tables(pet_command_template[main], pet_command_template[sub])
+            else
+                pet_command_template = recursively_merge_tables(pet_command_template[main],t_temp)
+            end
+        elseif pet_command_template[sub] then
+            pet_command_template = recursively_merge_tables(pet_command_template[sub],t_temp)
+        else
+            pet_command_template = t_temp
+        end
     end
+    
     spell_aliases = loadfile(windower.addon_path .. 'data/spell_aliases.lua')
     if not spell_aliases then
         spell_aliases = {}
     else
         spell_aliases = spell_aliases()
     end
+    
 end
 
 function menu_general_layout(t,t2,n)
@@ -186,7 +249,7 @@ function menu_general_layout(t,t2,n)
             if menu_history[n] then
                 last_menu_open.type = n
                 menu_layer_record = menu_history[n]
-                menu_general_logic_tree(t,t2,n)
+                current_menu = recursively_copy_spells(t2)
                 if current_menu then
                     last_menu_open = current_menu
                     last_menu_open.type = n
@@ -194,6 +257,9 @@ function menu_general_layout(t,t2,n)
                         if current_menu[menu_layer_record[i]] then
                             current_menu = current_menu[menu_layer_record[i]]
                         else
+                            for j = 1,menu_layer_record.n+1-i do
+                                menu_layer_record:remove()
+                            end
                             break
                         end
                     end
@@ -204,7 +270,7 @@ function menu_general_layout(t,t2,n)
             else
                 menu_layer_record:clear()
                 last_menu_open.type = n
-                menu_general_logic_tree(t,t2,n)
+                current_menu = recursively_copy_spells(t2)
                 if current_menu then
                     last_menu_open = current_menu
                     last_menu_open.type = n
@@ -218,7 +284,7 @@ function menu_general_layout(t,t2,n)
         if menu_history[n] then
             last_menu_open.type = n
             menu_layer_record = menu_history[n]
-            menu_general_logic_tree(t,t2,n)
+            current_menu = recursively_copy_spells(t2)
             if current_menu then
                 last_menu_open = current_menu
                 last_menu_open.type = n
@@ -226,6 +292,9 @@ function menu_general_layout(t,t2,n)
                     if current_menu[menu_layer_record[i]] then
                         current_menu = current_menu[menu_layer_record[i]]
                     else
+                        for j = 1,menu_layer_record.n+1-i do
+                            menu_layer_record:remove()
+                        end
                         break
                     end
                 end
@@ -236,7 +305,7 @@ function menu_general_layout(t,t2,n)
         else
             menu_layer_record:clear()
             last_menu_open.type = n
-            menu_general_logic_tree(t,t2,n)
+            current_menu = recursively_copy_spells(t2)
             if current_menu then
                 last_menu_open = current_menu
                 last_menu_open.type = n
@@ -248,95 +317,9 @@ function menu_general_layout(t,t2,n)
     end
 end
 
-menu_general_logic_tree = function(t,t2,n)
-    if t2[res.jobs[player_info.main_job].en] then
-        current_menu = recursively_copy_spells(t2[res.jobs[player_info.main_job].en])
-        local main_table_keys = S(current_menu)
-        if t2[res.jobs[player_info.sub_job].en] then
-            local sub_job_menu = recursively_copy_spells(t2[res.jobs[player_info.sub_job].en])
-            if sub_job_menu.sub_menus then
-                if current_menu.sub_menus then
-                    local main_table_sub_menus = S(current_menu.sub_menus)
-                    for i=1,sub_job_menu.sub_menus.n do
-                        if not main_table_sub_menus[sub_job_menu.sub_menus[i]] then
-                            current_menu.sub_menus[current_menu.sub_menus.n + i] = sub_job_menu.sub_menus[i]
-                            current_menu.sub_menus.n = current_menu.sub_menus.n + 1
-                            current_menu[sub_job_menu.sub_menus[i]] = sub_job_menu[sub_job_menu.sub_menus[i]]
-                        else
-                            current_menu[sub_job_menu.sub_job_menu[i]] = recursively_merge_tables(current_menu[sub_job_menu.sub_job_menu[i]],sub_job_menu[sub_job_menu.sub_job_menu[i]])
-                        end
-                    end
-                else
-                    current_menu.sub_menus = sub_job_menu.sub_menus
-                    for i=1,current_menu.sub_menus.n do
-                        current_menu[current_menu.sub_menus[i]] = sub_job_menu[sub_job_menu.sub_menus[i]]
-                    end
-                    for i=1,sub_job_menu.n do
-                        current_menu[current_menu.n + i] = sub_job_menu[i]
-                    end
-                    current_menu.n = #current_menu
-                end
-                sub_job_menu.sub_menus = nil
-            else
-                if current_menu.sub_menus then
-                    for i=1,sub_job_menu.n do
-                        current_menu[current_menu.n + i] = sub_job_menu[i]
-                    end
-                    current_menu.n = #current_menu
-                else
-                    for i=1,sub_job_menu.n do
-                        current_menu[current_menu.n + i] = sub_job_menu[i]
-                    end
-                    current_menu.n = #current_menu
-                end
-            end
-        else
-            if current_menu.sub_menus then
-                for i=1,#t do
-                    if not check_for_duplicates(current_menu,t[i]) then
-                        current_menu[current_menu.n + i] = t[i]
-                    end
-                    current_menu.n = #current_menu
-                end
-            else
-                for i=1,sub_job_menu.n do
-                    if not main_table_keys[sub_job_menu[i]] then
-                        current_menu[current_menu.n + i] = sub_job_menu[i]
-                    end
-                end
-                current_menu.n = #current_menu
-            end
-        end
-    else
-        current_menu = t
-        current_menu.n = #current_menu
-        if t2[res.jobs[player_info.sub_job].en] then
-            local sub_job_menu = recursively_copy_spells(t2[res.jobs[player_info.sub_job].en])
-            if sub_job_menu.sub_menus then
-                current_menu.sub_menus = sub_job_menu.sub_menus
-                for i=1,sub_job_menu.sub_menus.n do
-                    current_menu[sub_job_menu.sub_menus[i]] = sub_job_menu[sub_job_menu.sub_menus[i]]
-                end
-                for i=1,sub_job_menu.n do
-                    current_menu[current_menu.n + i] = sub_job_menu[i]
-                end
-                current_menu.n = #current_menu
-            else
-                for i=1,sub_job_menu.n do
-                    current_menu[current_menu.n + i] = sub_job_menu[i]
-                end
-                current_menu.n = #current_menu
-            end
-        else
-            current_menu = t
-            current_menu.n = #t
-        end
-    end
-end
-
 refresh_ja_when = S{211,212,298}
 refresh_4_when = S{30}
-refresh_ma_when = S{234,235}
+refresh_ma_when = S{211,212,234,235}
 
 windower.register_event('incoming chunk', function(id, data)
     if id == 0x028 then
@@ -363,7 +346,7 @@ windower.register_event('incoming chunk', function(id, data)
     end
 end)
 
-windower.register_event('load', 'login', get_templates)
+windower.register_event('load','login','job change',get_templates)
 
 windower.register_event('mouse', function(type, x, y, delta, blocked)
     if blocked then
@@ -418,13 +401,20 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
                     end
                 end
             end
-        elseif is_menu_open and (x >= display_text:pos_x() and x <= display_text:pos_x() + 150) then
-            local _,_y = display_text:extents()
-            if y <= y_offset or y >= y_offset + _y then return end
-            local y_17 = math.ceil((y-y_offset)/font_height_est)
-            if (y_17) ~= selector_pos.y then
-                selector_pos.y = (y_17 - 1) * font_height_est
-                windower.prim.set_position('selector_rectangle',selector_pos.x,selector_pos.y + y_offset)
+        elseif is_menu_open then
+            if (x >= display_text:pos_x() and x <= display_text:pos_x() + 150) then
+                local _,_y = display_text:extents()
+                if y <= y_offset or y >= y_offset + _y then return end
+                local y_17 = math.ceil((y-y_offset)/font_height_est)
+                if (y_17) ~= selector_pos.y then
+                    selector_pos.y = (y_17 - 1) * font_height_est
+                    windower.prim.set_position('selector_rectangle',selector_pos.x,selector_pos.y + y_offset)
+                end
+            else
+                if not is_icon[letter_to_n[last_menu_open.type]] then
+                    menu_icon:color(unpack(n_to_color[last_menu_open.type]))
+                    colors_of_the_wind(letter_to_n[last_menu_open.type])
+                end
             end
         elseif not is_icon.W then
             menu_icon:color(255,255,255)
@@ -451,6 +441,7 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
                     if tan <= -1 then
                         mouse_func[3]()
                     elseif tan >= -1 and tan <= 1 then
+                        mouse_func[4]()
                     elseif tan >= 1 then
                         mouse_func[2]()
                     end
@@ -539,7 +530,14 @@ mouse_func = {
                             last_menu_open = current_menu
                             last_menu_open.type = 1
                             for i = 1,menu_layer_record.n do
-                                current_menu = current_menu[menu_layer_record[i]]
+                                if current_menu[menu_layer_record[i]] then
+                                    current_menu = current_menu[menu_layer_record[i]]
+                                else
+                                    for j = 1,menu_layer_record.n+1-i do
+                                        menu_layer_record:remove()
+                                    end
+                                    break
+                                end
                             end
                             build_a_menu(current_menu)
                         else
@@ -569,7 +567,10 @@ mouse_func = {
                         for i = 1,menu_layer_record.n do
                             if current_menu[menu_layer_record[i]] then
                                 current_menu = current_menu[menu_layer_record[i]]
-                        else
+                            else
+                                for j = 1,menu_layer_record.n+1-i do
+                                    menu_layer_record:remove()
+                                end
                                 break
                             end
                         end
@@ -592,20 +593,19 @@ mouse_func = {
             end
           end,
     [2] = function()
-        menu_general_layout(remove_categories(windower.ffxi.get_abilities().weapon_skills),ws_template,2)
+        menu_general_layout(windower.ffxi.get_abilities().weapon_skills,ws_template,2)
     end,
     [3] = function()
         menu_general_layout(remove_categories(windower.ffxi.get_abilities().job_abilities),ja_template,3)
     end,
     [4] = function()
-        menu_general_layout(remove_categories(windower.ffxi.get_abilities().pet_commands),pet_command_template,4)
+        menu_general_layout(remove_categories(windower.ffxi.get_abilities().job_abilities),pet_command_template,4)
     end,
 }
 
 function remove_categories(t)
     local u = {}
     for i = 1,#t do
-        --log(t[i],not_a_spell:contains(t[i]))
         if not not_a_spell:contains(res.job_abilities[t[i]].en) then
             u[#u + 1] = t[i]
         end
@@ -687,7 +687,7 @@ function format_response(n,p,bool)
         n,p = '/ma',res.spells[p].en
     elseif n == 2 then
         if bool then 
-            if not (res.spells[p].targets['Self'] or res.spells[p].targets['Corpse']) then
+            if not (res.weapon_skills[p].targets['Self'] or res.weapon_skills[p].targets['Corpse']) then
                 t = ' <stnpc>'
             else
                 t = ' <stpc>'
@@ -698,7 +698,7 @@ function format_response(n,p,bool)
         n,p = '/ws',res.weapon_skills[p].en
     else
         if bool then 
-            if not (res.spells[p].targets['Self'] or res.spells[p].targets['Corpse']) then
+            if not (res.job_abilities[p].targets['Self'] or res.job_abilities[p].targets['Corpse']) then
                 t = ' <stnpc>'
             else
                 t = ' <stpc>'
@@ -719,7 +719,7 @@ function get_string_from_id(n)
         return (spell_aliases[n] or res.weapon_skills[n].en)
     elseif last_menu_open.type == 3 then
         return (spell_aliases[n] or res.job_abilities[n].en)
-    elseif last_menu_open == 4 then
+    elseif last_menu_open.type == 4 then
         return (spell_aliases[n] or res.job_abilities[n].en)
     end
 end
@@ -731,69 +731,78 @@ windower.register_event('keyboard', function(dik, flags, blocked)
     end
 end)
 
-windower.register_event('job change', function(main_job_id,main_job_level,sub_job_id,sub_job_level)
-    player_info.main_job = main_job_id
-    player_info.sub_job = sub_job_id
-    player_info.main_job_level = main_job_level
-    player_info.sub_job_level = sub_job_level
-end)
-
-function recursively_merge_tables(current_menu,sub_job_menu)
-    if sub_job_menu.sub_menus then
-        if current_menu.sub_menus then
-            local main_table_sub_menus = S(current_menu.sub_menus)
-            for i=1,sub_job_menu.sub_menus.n do
-                if not main_table_sub_menus[sub_job_menu.sub_menus[i]] then
-                    current_menu.sub_menus[current_menu.sub_menus.n + i] = sub_job_menu.sub_menus[i]
-                    current_menu.sub_menus.n = current_menu.sub_menus.n + 1
-                    current_menu[sub_job_menu.sub_menus[i]] = sub_job_menu[sub_job_menu.sub_menus[i]]
+function recursively_merge_tables(m_menu,s_menu)
+    local duplicates = flatten(m_menu)
+    if s_menu.sub_menus then
+        if m_menu.sub_menus then
+            local main_table_sub_menus = S(m_menu.sub_menus)
+            for i=1,s_menu.sub_menus.n do
+                if not main_table_sub_menus[s_menu.sub_menus[i]] then
+                    m_menu.sub_menus[m_menu.sub_menus.n + 1] = s_menu.sub_menus[i]
+                    m_menu.sub_menus.n = m_menu.sub_menus.n + 1
+                    m_menu[s_menu.sub_menus[i]] = s_menu[s_menu.sub_menus[i]]
                 else
-                    current_menu[sub_job_menu.sub_job_menu[i]] = recursively_merge_tables(current_menu[sub_job_menu.sub_job_menu[i]],sub_job_menu[sub_job_menu.sub_job_menu[i]])
+                    m_menu[s_menu.s_menu[i]] = recursively_merge_tables(m_menu[s_menu.s_menu[i]],s_menu[s_menu.s_menu[i]])
+                end
+            end
+            for i=1,s_menu.n do
+                if not duplicates:contains(s_menu[i]) then
+                    m_menu[m_menu.n + 1] = s_menu[i]
+                    m_menu.n = m_menu.n + 1
                 end
             end
         else
-            current_menu.sub_menus = sub_job_menu.sub_menus
-            for i=1,current_menu.sub_menus.n do
-                current_menu[current_menu.sub_menus[i]] = sub_job_menu[sub_job_menu.sub_menus[i]]
+            m_menu.sub_menus = s_menu.sub_menus
+            for i=1,m_menu.sub_menus.n do
+                m_menu[m_menu.sub_menus[i]] = s_menu[s_menu.sub_menus[i]]
             end
-            for i=1,sub_job_menu.n do
-                current_menu[current_menu.n + i] = sub_job_menu[i]
+            for i=1,s_menu.n do
+                if not duplicates:contains(s_menu[i]) then
+                    m_menu[m_menu.n + 1] = s_menu[i]
+                    m_menu.n = m_menu.n + 1
+                end
             end
-            current_menu.n = #current_menu
         end
-        sub_job_menu.sub_menus = nil
+        s_menu.sub_menus = nil
     else
-        if current_menu.sub_menus then
-            for i=1,sub_job_menu.n do
-                current_menu[current_menu.n + i] = sub_job_menu[i]
+        if m_menu.sub_menus then
+            for i=1,s_menu.n do
+                if not duplicates:contains(s_menu[i]) then
+                    m_menu[m_menu.n + 1] = s_menu[i]
+                    m_menu.n = m_menu.n + 1
+                end
             end
-            current_menu.n = #current_menu
         else
-            for i=1,sub_job_menu.n do
-                current_menu[current_menu.n + i] = sub_job_menu[i]
+            for i=1,s_menu.n do
+                if not duplicates:contains(s_menu[i]) then
+                    m_menu[m_menu.n + 1] = s_menu[i]
+                    m_menu.n = m_menu.n + 1
+                end
             end
-            current_menu.n = #current_menu
         end
     end
-    return current_menu
+    return m_menu
 end
 
-function check_for_duplicates(t,n)
-    local spy_glass
+function flatten(t)
+    local s = S{}
     if t.sub_menus then
         for i = 1,#t.sub_menus do
-            spy_glass = check_for_duplicates(t[t.sub_menus[i]],n)
-            if spy_glass then
-                return true
-            end
+            s = s + flatten(t[t.sub_menus[i]])
         end
     end
     for i = 1,#t do
-        if t[i] == n then
-            return true
-        end
+        s:add(t[i])
     end
+    return s
 end
+
+category_to_resources = {
+    'spells',
+    'weapon_skills',
+    'job_abilities',
+    'job_abilities',
+}
 
 function recursively_copy_spells(t)
     local _t = {}
@@ -807,7 +816,7 @@ function recursively_copy_spells(t)
         end
     end
     for i = 1,#t do
-        if determine_accessibility(res.spells[t[i]],last_menu_open.type) then
+        if determine_accessibility(res[category_to_resources[last_menu_open.type]][t[i]],last_menu_open.type) then
             _t[#_t+1] = t[i]
         end
     end
@@ -825,6 +834,15 @@ function recursively_copy_spells(t)
             return nil
         end
     end
+end
+
+function count_table_elements(t)
+    for k,v in pairs(t) do
+        if type(v) == 'table' then
+            count_table_elements(t[k])
+        end
+    end
+    t.n = #t
 end
 
 function determine_accessibility(spell,type) -- ability filter, slightly modified. Credit: Byrth
@@ -850,6 +868,6 @@ function determine_accessibility(spell,type) -- ability filter, slightly modifie
         end
         return true
     else
-        return available_category[spell.id]
+        return available_category:contains(spell.id)
     end
 end

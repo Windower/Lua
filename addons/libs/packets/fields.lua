@@ -359,6 +359,15 @@ fields.outgoing[0x029] = L{
     {ctype='unsigned char',     label='_unknown1',          const=0x52},        -- 0B
 }
 
+-- Translate
+-- German and French translations appear to no longer be supported.
+fields.outgoing[0x02B] = L{
+    {ctype='unsigned char',     label='Starting Language'},                     -- 04   0 == JP, 1 == EN
+    {ctype='unsigned char',     label='Ending Language'},                       -- 05   0 == JP, 1 == EN
+    {ctype='unsigned short',    label='_unknown1',          const=0x0000},      -- 06   
+    {ctype='char[64]',          label='Phrase'},                                -- 08   Quotation marks are removed. Phrase is truncated at 64 characters.
+}
+
 -- Trade request
 fields.outgoing[0x032] = L{
     {ctype='unsigned int',      label='Target',             fn=id},             -- 04
@@ -588,6 +597,13 @@ fields.outgoing[0x052] = L{
     {ref=types.equipset_build,  count=1},                                       -- 08
     -- The next 16 are the entire current equipset, excluding the newly changed item
     {ref=types.equipset_build,  lookup={res.slots, 0x00},   count=0x10},        -- 0C
+}
+
+-- Crafting-related packet?
+-- This packet is sent after receiving a result when synthesizing.
+fields.outgoing[0x059] = L{
+    {ctype='unsigned int',      label='_unknown1'},                             -- 04   Often 00 00 00 00, but 01 00 00 00 observed.
+    {ctype='data[8]',           label='_junk1'}                                 -- 08   Likely junk from a non-zero'd buffer.
 }
 
 -- Conquest
@@ -2097,6 +2113,15 @@ fields.incoming._func[0x044][0x17] = L{
     {ctype='data[118]',         label='_unknown4'},                             -- 26   Zeroing everything beyond this point has no notable effect.
 }
 
+-- Translate Response
+fields.incoming[0x047] = L{
+    {ctype='unsigned short',    label='Autotranslate Code'},                    -- 04   In a 6 byte autotranslate code, these are the 5th and 4 bytes respectively.
+    {ctype='unsigned char',     label='Starting Language'},                     -- 06   0 == JP, 1 == EN
+    {ctype='unsigned char',     label='Ending Language'},                       -- 07   0 == JP, 1 == EN
+    {ctype='char[64]',          label='Initial Phrase'},                        -- 08
+    {ctype='char[64]',          label='Translated Phrase'},                     -- 48   Will be 00'd if no match was found.
+}
+
 
 -- Unknown 0x048 incoming :: Sent when loading linkshell information from the Linkshell Concierge
 -- One per entry, 128 bytes long, mostly empty, does not contain name as far as I can see.
@@ -2943,7 +2968,7 @@ fields.incoming[0x0DF] = L{
     {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
     {ctype='unsigned int',      label='HP'},                                    -- 08
     {ctype='unsigned int',      label='MP'},                                    -- 0C
-    {ctype='unsigned int',      label='TP',                 fn=percent},        -- 10   Truncated, does not include the decimal value.
+    {ctype='unsigned int',      label='TP',                 fn=percent},        -- 10
     {ctype='unsigned short',    label='Index',              fn=index},          -- 14
     {ctype='unsigned char',     label='HPP',                fn=percent},        -- 16
     {ctype='unsigned char',     label='MPP',                fn=percent},        -- 17

@@ -281,6 +281,7 @@ end
 ---- none
 -----------------------------------------------------------------------------------
 function equip_piece(eq_slot_id,bag_id,inv_slot_id)
+    -- Many complicated, wow!
     local cur_eq_tab = items.equipment[toslotname(eq_slot_id)]
     
     if cur_eq_tab.slot ~= empty then
