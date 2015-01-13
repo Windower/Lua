@@ -18,7 +18,6 @@ local xml_error
 local pcdata
 local attribute
 local validate_headers
-local parse
 local tokenize
 local get_namespace
 local classify
@@ -80,7 +79,7 @@ function xml.read(file)
         return xml_error('File not found: '..file.path)
     end
 
-    return parse(file:read())
+    return xml.parse(file:read())
 end
 
 -- Returns nil as the parsed table and an additional error message with an optional line number.
@@ -106,7 +105,7 @@ function validate_headers(headers)
 end
 
 -- Parsing function. Gets a string representation of an XML object and outputs a Lua table or an error message.
-function parse(content)
+function xml.parse(content)
     local quote = nil
     local headers = T{xmlhead='', dtds=T{}}
     local tag = ''
@@ -292,7 +291,14 @@ end
 -- Definition of a DOM object.
 local dom = T{}
 function dom.new(t)
-    return T{type='', name='', namespace=nil, value=nil, children=L{}}:update(t)
+    return T{
+        type = '',
+        name = '',
+        namespace = nil,
+        value = nil,
+        children = L{},
+        cdata = nil
+    }:update(t)
 end
 
 -- Returns the name of the element and the namespace, if present.
@@ -321,7 +327,7 @@ function classify(tokens, var)
     for line, intokens in ipairs(tokens) do
         for _, token in ipairs(intokens) do
             if token:startswith('<![CDATA[') then
-                parsed:last().children:append(dom.new({type = 'text', value = token:sub(10, -4)}))
+                parsed:last().children:append(dom.new({type = 'text', value = token:sub(10, -4), cdata = true}))
 
             elseif token:startswith('<!--') then
                 parsed:last().children:append(dom.new({type = 'comment', value = token:sub(5, -4)}))
