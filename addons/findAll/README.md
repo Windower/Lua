@@ -64,11 +64,11 @@ That will correctly preserve any formatting you have inside the text.
 With that, you can even do something like this:
 ```xml
         <Track>
-<![CDATA[Inventory: ${inventory:$usedspace||%2i}/${inventory:$maxspace||%2i} ? ${inventory:$freespace||%2i}
-Satchel:   ${satchel:$usedspace||%2i}/${satchel:$maxspace||%2i} ? ${satchel:$freespace||%2i}
-Sack:      ${sack:$usedspace||%2i}/${sack:$maxspace||%2i} ? ${sack:$freespace||%2i}
-Case:      ${case:$usedspace||%2i}/${case:$maxspace||%2i} ? ${case:$freespace||%2i}
-Wardrobe:  ${wardrobe:$usedspace||%2i}/${wardrobe:$maxspace||%2i} ? ${wardrobe:$freespace||%2i}]]>
+<![CDATA[Inventory: ${inventory:$usedspace||%2i}/${inventory:$maxspace||%2i} → ${inventory:$freespace||%2i}
+Satchel:   ${satchel:$usedspace||%2i}/${satchel:$maxspace||%2i} → ${satchel:$freespace||%2i}
+Sack:      ${sack:$usedspace||%2i}/${sack:$maxspace||%2i} → ${sack:$freespace||%2i}
+Case:      ${case:$usedspace||%2i}/${case:$maxspace||%2i} → ${case:$freespace||%2i}
+Wardrobe:  ${wardrobe:$usedspace||%2i}/${wardrobe:$maxspace||%2i} → ${wardrobe:$freespace||%2i}]]>
         </Track>
 ```
 
