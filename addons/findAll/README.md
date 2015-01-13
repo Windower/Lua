@@ -1,6 +1,6 @@
 # FindAll
 
-This addon searches items stored on all your characters. To build the initial list, you must login and logout (or input the "findall" command) at least once with each of them.  
+This addon searches items stored on all your characters. To build the initial list, you must login and logout (or input the `findall` command) at least once with each of them.  
 The list is stored on the machine on which the addon is executed, being updated everytime you look for an item or on logout, so this will not work the best if you use multiple PCs, at least until IPC will let them communicate over LAN or Internet (in development).  
 The addon has a deferral time of 20 seconds when it's loaded, you are logging in or zoning to give the game enough time to load all the items.  
 If you notice that this time is too short, please create an issue report in the bug tracker.
@@ -63,14 +63,17 @@ Wardrobe:  ${wardrobe:$freespace}]]>
 That will correctly preserve any formatting you have inside the text.
 With that, you can even do something like this:
 ```xml
-        <Track><![CDATA[Inventory: ${inventory:$usedspace||%2i}/${inventory:$maxspace||%2i} ? ${inventory:$freespace||%2i}
+        <Track>
+<![CDATA[Inventory: ${inventory:$usedspace||%2i}/${inventory:$maxspace||%2i} ? ${inventory:$freespace||%2i}
 Satchel:   ${satchel:$usedspace||%2i}/${satchel:$maxspace||%2i} ? ${satchel:$freespace||%2i}
 Sack:      ${sack:$usedspace||%2i}/${sack:$maxspace||%2i} ? ${sack:$freespace||%2i}
 Case:      ${case:$usedspace||%2i}/${case:$maxspace||%2i} ? ${case:$freespace||%2i}
-Wardrobe:  ${wardrobe:$usedspace||%2i}/${wardrobe:$maxspace||%2i} ? ${wardrobe:$freespace||%2i}]]></Track>
+Wardrobe:  ${wardrobe:$usedspace||%2i}/${wardrobe:$maxspace||%2i} ? ${wardrobe:$freespace||%2i}]]>
+        </Track>
 ```
 
 And it will result in this:
+
 ![Tracker example](https://picster.at/img/8/f/9/8f93097ce393a03b4196ef2602186c27.png)
 
 ## Commands
@@ -88,9 +91,9 @@ Forces a list update
 ```
 findall [:<character1> [:...]] <query> [-e<filename>|--export=<filename>]
 ```
-* `_character1_:` the name of the characters to use for the search.
-* `...:` variable list of character names.
-* `_query_` the word you are looking for.
+* `character1`: the name of the characters to use for the search.
+* `...`: variable list of character names.
+* `query` the word you are looking for.
 * `-e<filename>` or `--export=<filename>` exports the results to a csv file. The file will be created in the data folder.
 
 Looks for any item whose name (long or short) contains the specified value on the specified characters.
