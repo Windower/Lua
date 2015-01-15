@@ -2207,13 +2207,12 @@ fields.incoming._func[0x04B].slot = L{
 
 enums['ah itype'] = {
     [0x02] = 'Open menu response',
+    [0x03] = 'Unknown Logout',
     [0x04] = 'Sell item confirmation',
     [0x05] = 'Open sales status menu',
     [0x0A] = 'Open menu confirmation',
     [0x0B] = 'Sell item confirmation',
-    [0x0C] = '',
     [0x0D] = 'Sales item status',
-    [0x10] = '',
 }
 
 fields.incoming._func[0x04C] = {}
@@ -2228,7 +2227,15 @@ fields.incoming._func[0x04C][0x02] = L{
     {ctype='char*',             label='_junk'},                                 -- 08
 }
 
-fields.outgoing._func[0x04E][0x04] = L{
+-- Sent when initating logout
+fields.incoming._func[0x04C][0x03] = L{
+    {ctype='unsigned char',     label='_unknown1',          const=0xFF},        -- 05
+    {ctype='unsigned char',     label='Success',            fn=bool},           -- 06
+    {ctype='unsigned char',     label='_unknown2',          const=0x00},        -- 07
+    {ctype='char*',             label='_junk'},                                 -- 08
+}
+
+fields.incoming._func[0x04C][0x04] = L{
     {ctype='unsigned char',     label='_unknown1',          const=0xFF},        -- 05
     {ctype='unsigned char',     label='Success',            fn=bool},           -- 06
     {ctype='unsigned char',     label='_unknown2'},                             -- 07
@@ -2247,9 +2254,11 @@ fields.incoming._func[0x04C][0x05] = L{
 }
 
 enums['sale stat'] = {
+    [0x00] = '-',
     [0x02] = 'Placing',
     [0x03] = 'On auction',
     [0x0A] = 'Sold',
+    [0x0B] = 'Not sold',
     [0x10] = 'Checking',
 }
 
@@ -2281,6 +2290,7 @@ fields.incoming._func[0x04C][0x0B] = L{
     {ctype='unsigned char',     label='_unknown2',          const=0x00},        -- 07
     {ctype='data[12]',          label='_junk1'},                                -- 08
     {ctype='unsigned char',     label='Sale status',        fn=e+{'sale stat'}},-- 14
+    {ctype='unsigned char',     label='_unknown3'},                             -- 15
     {ctype='unsigned char',     label='Inventory Index'},                       -- 16   From when the item was put on auction
     {ctype='unsigned char',     label='_unknown4',          const=0x00},        -- 17   Possibly padding
     {ctype='char[16]',          label='Name'},                                  -- 18   Seems to always be the player's name
@@ -2298,7 +2308,8 @@ fields.incoming._func[0x04C][0x0D] = L{
     {ctype='unsigned char',     label='_unknown1'},                             -- 06   Some sort of type... the packet seems to always be sent twice, once with this value as 0x02, followed by 0x01
     {ctype='unsigned char',     label='_unknown2'},                             -- 07   If 0x06 is 0x01 this seems to be 0x01 as well, otherwise 0x00
     {ctype='data[12]',          label='_junk1'},                                -- 08
-    {ctype='unsigned short',    label='_unknown3'},                             -- 14
+    {ctype='unsigned char',     label='Sale status',        fn=e+{'sale stat'}},-- 14
+    {ctype='unsigned char',     label='_unknown3'},                             -- 15
     {ctype='unsigned char',     label='Inventory Index'},                       -- 16   From when the item was put on auction
     {ctype='unsigned char',     label='_unknown4',          const=0x00},        -- 17   Possibly padding
     {ctype='char[16]',          label='Name'},                                  -- 18   Seems to always be the player's name

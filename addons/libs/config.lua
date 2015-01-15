@@ -445,7 +445,7 @@ function nest_xml(t, meta, indentlevel)
                 val = set.format(val, 'csv')
             elseif type(val) == 'table' then
                 val = table.format(val, 'csv')
-            elseif type(val) == 'string' and meta.cdata[key:lower()] then
+            elseif type(val) == 'string' and meta.cdata[tostring(key):lower()] then
                 val = '<![CDATA[%s]]>':format(val)
             else
                 val = tostring(val)
@@ -454,7 +454,7 @@ function nest_xml(t, meta, indentlevel)
             if val == '' then
                 fragments:append('%s<%s />':format(indent, key))
             else
-                fragments:append('%s<%s>%s</%s>':format(indent, key, meta.cdata[key:lower()] and val or val:xml_escape(), key))
+                fragments:append('%s<%s>%s</%s>':format(indent, key, meta.cdata[tostring(key):lower()] and val or val:xml_escape(), key))
             end
             local length = fragments:last():length() - indent:length()
             if length > maxlength then
