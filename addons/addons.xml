@@ -241,6 +241,13 @@
     <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
   </addon>
   <addon>
+    <name>Logger</name>
+    <author>Arcon</author>
+    <description>Logs the chat log to a file.</description>
+    <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
+  </addon>
+  <addon>
     <name>Lottery</name>
     <author>Arcon</author>
     <description>Automatically passes an item on all accounts if lotted by another.</description>
