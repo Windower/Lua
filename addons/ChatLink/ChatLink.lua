@@ -1,6 +1,6 @@
 _addon.name = 'ChatLink'
 _addon.author = 'Aureus'
-_addon.version = '1.0.0.0'
+_addon.version = '1.1.0.0'
 _addon.commands = {'chatlink', 'clink'}
 
 require('lists')
@@ -9,15 +9,28 @@ require('logger')
 urls = L{}
 ids = {}
 
-windower.register_event('incoming text', function(_, text)
-    return (text:gsub('', function(url)
-        if not ids[url] then
-            urls:append(url)
-            ids[url] = #urls
-        end
+pattern = L{
+    -- Matches domain names preceded by a scheme
+    '\\w+://[\\w%-]+(?:\\.[\\w%-]+)?\\.\\w{2,5}(?:\\:\\d+)?[^\\s$]*',
+    -- Matches IP, optionally preceded by a scheme
+    '(?<= )(?:\\w+://)\\d+(?:\\.\\d+){3}(?:\\:\\d+)?[^\\s$]*',
+    -- Matches domain names without scheme. Only a few select TLDs allowed to avoid false positives
+    '(?<= )[\\w%-]+(?:\\.[\\w%-]+)?\\.(?:com|net|org|jp|uk|de|fr|it|es|ru|be|io)[^\\s$]*',
+    -- Matches mail addresses
+    '[\\w.-]+@[\\w%-]+(?:\\.[\\w%-]+)?\\.\\w{2,5}(?=\\s$)',
+}:concat('|')
 
-        return '[%u]%s':format(ids[url], url)
-    end))
+replace = function(url)
+    if not ids[url] then
+        urls:append(url)
+        ids[url] = #urls
+    end
+
+    return '[%u]%s':format(ids[url], url)
+end
+
+windower.register_event('incoming text', function(_, text, color)
+    return windower.regex.replace(text, pattern, replace)
 end)
 
 windower.register_event('addon command', function(command, id)
