@@ -219,7 +219,7 @@ function search(query, export)
     for id,_ in pairs(new_item_ids) do
         local item = res.items[tonumber(id)]
 	    if item then
-            item_names[i] = {
+            item_names[id] = {
                 ['name'] = item.name,
                 ['long_name'] = item.name_log
             }
