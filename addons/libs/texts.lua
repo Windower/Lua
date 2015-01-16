@@ -117,8 +117,8 @@ local apply_settings = function(_, t, settings)
     texts.pad(t, settings.padding)
     texts.italic(t, settings.flags.italic)
     texts.bold(t, settings.flags.bold)
-    texts.right_justified(t, settings.flags.right_justified)
-    texts.bottom_justified(t, settings.flags.bottom_justified)
+    texts.right_justified(t, settings.flags.right)
+    texts.bottom_justified(t, settings.flags.bottom)
     texts.visible(t, meta[t].status.visible)
     texts.stroke_width(t, settings.text.stroke.width)
     texts.stroke_color(t, settings.text.stroke.red, settings.text.stroke.green, settings.text.stroke.blue)
@@ -370,14 +370,15 @@ end
 ]]
 
 function texts.pos(t, x, y)
+    local m = meta[t]
     if not x then
-        return meta[t].settings.pos.x, meta[t].settings.pos.y
+        return m.settings.pos.x, m.settings.pos.y
     end
 
     local settings = windower.get_windower_settings()
-    windower.text.set_location(meta[t].name, x + (meta[t].settings.flags.right and settings.ui_x_res or 0), y + (meta[t].settings.flags.bottom and settings.ui_y_res or 0))
-    meta[t].settings.pos.x = x
-    meta[t].settings.pos.y = y
+    windower.text.set_location(m.name, x + (m.settings.flags.right and settings.ui_x_res or 0), y + (m.settings.flags.bottom and settings.ui_y_res or 0))
+    m.settings.pos.x = x
+    m.settings.pos.y = y
 end
 
 function texts.pos_x(t, x)
@@ -459,36 +460,41 @@ function texts.transparency(t, alpha)
     meta[t].settings.text.alpha = alpha
 end
 
-function texts.right_justified(t, rj)
-    if not rj then
+function texts.right_justified(t, right)
+    if right == nil then
         return meta[t].settings.flags.right
     end
 
-    windower.text.set_right_justified(meta[t].name, rj)
+    windower.text.set_right_justified(meta[t].name, right)
+    meta[t].settings.flags.right = right
 end
 
-function texts.bottom_justified(t, bj)
-    if not bj then
+function texts.bottom_justified(t, bottom)
+    if bottom == nil then
         return meta[t].settings.flags.bottom
     end
 
-    windower.text.set_bottom_justified(meta[t].name, bj)
+    -- Enable this once LuaCore implements it
+    -- windower.text.set_bottom_justified(meta[t].name, bottom)
+    -- meta[t].settings.flags.bottom = bottom
 end
 
 function texts.italic(t, italic)
-    if not italic then
+    if italic == nil then
         return meta[t].settings.flags.italic
     end
 
     windower.text.set_italic(meta[t].name, italic)
+    meta[t].settings.flags.italic = italic
 end
 
 function texts.bold(t, bold)
-    if not bold then
+    if bold == nil then
         return meta[t].settings.flags.bold
     end
 
     windower.text.set_bold(meta[t].name, bold)
+    meta[t].settings.flags.bold = bold
 end
 
 function texts.bg_color(t, red, green, blue)
@@ -503,7 +509,7 @@ function texts.bg_color(t, red, green, blue)
 end
 
 function texts.bg_visible(t, visible)
-    if not visible then
+    if visible == nil then
         return meta[t].settings.bg.visible
     end
 
@@ -603,14 +609,16 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
     -- Mouse left click
     elseif type == 1 then
         for _, t in pairs(windower.text.saved_texts) do
-            if meta[t].settings.flags.draggable and t:hover(x, y) then
-                local pos_x, pos_y = windower.text.get_location(meta[t].name)
+            local m = meta[t]
+            if m.settings.flags.draggable and t:hover(x, y) then
+                local pos_x, pos_y = windower.text.get_location(m.name)
 
-                if meta[t].settings.flags.right or meta[t].settings.flags.bottom then
+                local flags = m.settings.flags
+                if flags.right or flags.bottom then
                     local info = windower.get_windower_settings()
-                    if meta[t].settings.flags.right then
+                    if flags.right then
                         pos_x = pos_x - info.ui_x_res
-                    else
+                    elseif flags.bottom then
                         pos_y = pos_y - info.ui_y_res
                     end
                 end
@@ -641,9 +649,10 @@ function texts.register_event(t, key, fn)
         return
     end
 
-    meta[t].events[key] = meta[t].events[key] or {}
-    meta[t].events[key][#meta[t].events[key] + 1] = fn
-    return #meta[t].events[key]
+    local m = meta[t]
+    m.events[key] = m.events[key] or {}
+    m.events[key][#m.events[key] + 1] = fn
+    return #m.events[key]
 end
 
 function texts.unregister_event(t, key, fn)
