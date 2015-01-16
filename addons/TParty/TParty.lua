@@ -95,10 +95,10 @@ windower.register_event('prerender', function()
         -- Adjust position for party member count
         hpp:pos_y(hpp_y_pos[party_info.party1_count])
         
-        if player_target.hpp < 100 then
-            hpp:pos_x(-120)
-        elseif player_target.hpp < 10 then
+        if player_target.hpp < 10 then
             hpp:pos_x(-112)
+        elseif player_target.hpp < 100 then
+            hpp:pos_x(-120)
         else
             hpp:pos_x(-128)
         end
