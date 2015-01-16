@@ -59,7 +59,7 @@
 -- addon info
 _addon.name = "Obiaway"
 _addon.author = "ReaperX, bangerang"
-_addon.version = "1.0.6"
+_addon.version = "1.0.7"
 _addon.commands = {'oa', 'ob', 'obi', 'obiaway'}
 _addon.language = 'english'
 
@@ -75,7 +75,7 @@ default_settings.notify = true
 default_settings.location = 'sack'
 default_settings.lock = false
 default_settings.color = 209
-default_settings.ignoreZones = S{
+default_settings.ignorezones = S{
     "Ru'Lude Gardens", "Upper Jeuno", "Lower Jeuno", "Port Jeuno", "Port Windurst", "Windurst Waters", "Windurst Woods", "Windurst Walls",
     "Heavens Tower", "Port San d'Oria", "Northern San d'Oria", "Southern San d'Oria", "Chateau d'Oraguille", "Port Bastok", "Bastok Markets",
     "Bastok Mines", "Metalworks", "Aht Urhgan Whitegate", "Tavnazian Safehold", "Nashmau", "Selbina", "Mhaura", "Norg", "Rabao", "Kazham",
@@ -113,16 +113,7 @@ end
 
 -- Accepts a boolean value and returns an appropriate string value. i.e. true -> 'on'
 function booltostr(bool)
-    local str = ''
-    if bool then
-        str = 'on'
-        return str
-    elseif not bool then
-        str = 'off'
-        return str
-    else
-        print('Boolean to string: unknown error.')
-    end
+    return bool and 'on' or 'off'
 end
 
 -- checks if a value is in a table and then returns its key. Ex: a table contains Key = Value. returns Key. returns false if no match.
@@ -152,9 +143,9 @@ function inv_str_to_id(str)
         return 7
     elseif str == 'wardrobe' then
         return 8
-	else
-		print('Obiaway: Function inv_str_to_id invalid argument')
-		return
+    else
+        print('Obiaway: Function inv_str_to_id invalid argument')
+        return
     end
 end
 
@@ -174,7 +165,7 @@ end
 function inventory_full(command, location)
     local id = inv_str_to_id(location)
     if id == 0 then location = 'inventory' end
-	
+    
     if free_space(location) == 0 then
         if command then
             obi_output('%s is full.':format(string.ucfirst(location)))
@@ -285,14 +276,14 @@ function get_all_elements()
     elements["Dark"] = 0
     elements["None"] = 0
 
-	-- check for active Day and Weather
+    -- check for active Day and Weather
     local info = windower.ffxi.get_info()
     local day_element = res.elements[res.days[info.day].element].english
     elements[day_element] = elements[day_element] + 1
     local weather_element = res.elements[res.weather[info.weather].element].english
     elements[weather_element] = elements[weather_element] + 1
-	
-	-- check for active SCH buffs
+    
+    -- check for active SCH buffs
     local buffs = windower.ffxi.get_player().buffs
     if inTable(buffs, 178) then
       elements["Fire"] =  elements["Fire"] + 1
@@ -311,7 +302,7 @@ function get_all_elements()
     elseif inTable(buffs, 185) then
       elements["Dark"] = elements["Dark"] + 1
     end
-	
+    
     return elements
 end
 
@@ -409,15 +400,15 @@ function auto_sort_obi()
     if inventory_full(false) and inventory_full(false, settings.location) then return false end
 
     if not settings.lock then -- if sorting lock is not on, then do this stuff:
-        if not settings.ignoreZones:contains(res.zones[windower.ffxi.get_info().zone].english) then -- Not in a city:
+        if not settings.ignorezones:contains(res.zones[windower.ffxi.get_info().zone].english) then -- Not in a city:
             put_unneeded_obi(false)
             get_needed_obi(false)
         else -- In a city:
             put_all_obi(false)
         end
     end
-	
-	return true
+    
+    return true
 end
 
 ----------------------------------------
