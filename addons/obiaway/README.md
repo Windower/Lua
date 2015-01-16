@@ -1,4 +1,4 @@
-Author: ReaperX, onetime
+Author: ReaperX, bangerang
 Version: 1.0.7
 
 Addon to automatically get and store elemental obis based on day/weather/storm 
