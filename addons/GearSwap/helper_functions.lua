@@ -520,7 +520,7 @@ end
 function find_usable_item(item_id,bool)
     local inventory_index,bag_id
     for i,v in pairs(items.temporary) do
-        if v and v.id == item_id then
+        if type(v) == 'table' and v.id == item_id then
             inventory_index = i
             bag_id = 3
             break
