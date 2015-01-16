@@ -1,6 +1,6 @@
 _addon.author = 'Balloon'
 _addon.name = 'Highlight'
-_addon.version = '1.0' 
+_addon.version = '1.0.0.1'
 _addon.command = 'highlight'
 
 file = require('files')
@@ -89,8 +89,8 @@ windower.register_event('addon command', function(command, ...)
     end
 end)
 
-windower.register_event('login','load', function()
-    if windower.ffxi.get_info()['logged_in'] == true then
+windower.register_event('login', 'load', function()
+    if windower.ffxi.get_info().logged_in then
         coroutine.sleep(1)
         initialize()
     end
@@ -98,7 +98,7 @@ end)
  
 function initialize()
     prevCount = 0
-    colour={}
+    colour = {}
  
     nicknames = config.load('/data/nicknames.xml')
     mules = config.load('/data/mules.xml')
@@ -118,7 +118,6 @@ function initialize()
     end
  
     player = windower.ffxi.get_player().name
-    print(player)
  
     get_party_members()
 end
@@ -177,12 +176,12 @@ function GetPartyCount(data)
     local count = 0
     local test = 0
     local offset = 0
-    while(offset < 216) do
-        local x = data:sub(offset, offset+11)
-        if(x ~= '\0\0\0\0\0\0\0\0\0\0\0\0') then
+    while offset < 216 do
+        local x = data:sub(offset, offset + 11)
+        if x ~= '\0\0\0\0\0\0\0\0\0\0\0\0' then
             count = count +1 
         end
-            offset = offset+12
+        offset = offset+12
     end
     return count
 end
@@ -195,7 +194,7 @@ function colconv(str, key)
     elseif strnum > 0 then
         return string.char(0x1F, strnum)
     elseif strnum ~= 0 then
-        print('You have an invalid color '..key)
+        print('You have an invalid color: ' .. key)
     end
     return chat.controls.reset
 end
@@ -204,19 +203,19 @@ function get_party_members()
     if settings.highlighting then
         local party = windower.ffxi.get_party()
         for member, mob in pairs(party) do
-            if not mulenames[mob['name']:lower()] then
-                members[member] = mob['name']
-                modmember[member] = colour[member]..mob['name']..chat.controls.reset
+            if type(mob) == 'table' and not mulenames[mob.name:lower()] then
+                members[member] = mob.name
+                modmember[member] = colour[member] .. mob.name .. chat.controls.reset
             end
         end
     else 
-        members['p0'] = player
-        modmember['p0'] = colour['p0']..player..chat.controls.reset
+        members.p0 = player
+        modmember.p0 = colour.p0 .. player .. chat.controls.reset
     end    
 end
  
 --[[
-Copyright (c) 2013-2014, Thomas Rogers
+Copyright © 2013-2015, Thomas Rogers
 All rights reserved.
  
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
