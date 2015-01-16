@@ -89,12 +89,21 @@ debug.setmetatable(nil, {__index = {}, __call = functions.empty})
 windower.register_event('prerender', function()
     -- HP % text
     if settings.ShowTargetHPPercent and windower.ffxi.get_player().target_index then
+        local player_target = windower.ffxi.get_mob_by_index(windower.ffxi.get_player().target_index);
         local party_info = windower.ffxi.get_party_info()
 
         -- Adjust position for party member count
         hpp:pos_y(hpp_y_pos[party_info.party1_count])
+        
+        if player_target.hpp < 10 then
+            hpp:pos_x(-112)
+        elseif player_target.hpp < 100 then
+            hpp:pos_x(-120)
+        else
+            hpp:pos_x(-128)
+        end
 
-        hpp:update(windower.ffxi.get_mob_by_target('t'))
+        hpp:update(player_target)
         hpp:show()
     else
         hpp:hide()
@@ -130,7 +139,7 @@ windower.register_event('prerender', function()
 end)
 
 --[[
-Copyright © 2014-2015, Windower
+Copyright Â© 2014-2015, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
