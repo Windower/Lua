@@ -1,23 +1,25 @@
 _addon.name = 'ChatLink'
 _addon.author = 'Aureus'
-_addon.version = '1.1.0.0'
+_addon.version = '1.2.0.0'
 _addon.commands = {'chatlink', 'clink'}
 
+require('pack')
 require('lists')
 require('logger')
+require('strings')
 
 urls = L{}
 ids = {}
 
 pattern = L{
-    -- Matches domain names preceded by a scheme
-    '\\w+://[\\w%-]+(?:\\.[\\w%-]+)?\\.\\w{2,5}(?:\\:\\d+)?[^\\s$]*',
-    -- Matches IP, optionally preceded by a scheme
-    '(?<= )(?:\\w+://)\\d+(?:\\.\\d+){3}(?:\\:\\d+)?[^\\s$]*',
-    -- Matches domain names without scheme. Only a few select TLDs allowed to avoid false positives
-    '(?<= )[\\w%-]+(?:\\.[\\w%-]+)?\\.(?:com|net|org|jp|uk|de|fr|it|es|ru|be|io)[^\\s$]*',
     -- Matches mail addresses
-    '[\\w.-]+@[\\w%-]+(?:\\.[\\w%-]+)?\\.\\w{2,5}(?=\\s$)',
+    '[\\w.-]+@[\\w.%-]+\\.[a-z]{2,5}\\b',
+    -- Matches domain names preceded by a scheme
+    '\\w+://[\\w%-]+(?:\\.[\\w%-]+)*\\.\\w{2,5}(?:\\:\\d{1,5}(?!\\d))?(?:/[^\\s]*)?',
+    -- Matches IPv4, optionally preceded by a scheme
+    '(?:\\w+://)?\\d{1,3}(?:\\.\\d{1,3}){3}(?:\\:\\d{1,5}(?!\\d))?(?:/[^\\s]*)?',
+    -- Matches domain names without scheme. Only a few select TLDs allowed to avoid false positives
+    '[\\w%-]+(?:\\.[\\w%-]+)*\\.(?:com|net|org|jp|uk|de|fr|it|es|ru|be|io)(?:\\:\\d{1,5}(?!\\d))?(?:/[^\\s]*)?',
 }:concat('|')
 
 replace = function(url)
@@ -29,8 +31,12 @@ replace = function(url)
     return '[%u]%s':format(ids[url], url)
 end
 
+identifier = ('ChatLink' .. 0x01:char()):map(function(char)
+    return 'h':pack(char:byte() * 0x100 + 0x1E)
+end)
+
 windower.register_event('incoming text', function(_, text, color)
-    return windower.regex.replace(text, pattern, replace)
+    return not text:match(identifier) and windower.regex.replace(text, pattern, replace) or nil
 end)
 
 windower.register_event('addon command', function(command, id)
@@ -50,13 +56,12 @@ windower.register_event('addon command', function(command, id)
 
     elseif command == 'list' or command == 'l' then
         if urls:empty() then
-            log('No URLs found.')
-            return
+            return log('No URLs found.')
         end
 
-        log('%u URLs found.':format(#urls))
+        log('%u %s found.':format(#urls, 'URL':plural(urls)))
         for url, key in urls:it() do
-            log('    %u: %s':format(key, url))
+            log('%s    [%u]: %s':format(identifier, key, url))
         end
 
     end
