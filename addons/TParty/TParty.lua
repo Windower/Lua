@@ -1,6 +1,6 @@
 _addon.name = 'TParty'
 _addon.author = 'Cliff'
-_addon.version = '2.0.0.0'
+_addon.version = '2.0.0.1'
 
 require('sets')
 require('functions')
@@ -15,7 +15,7 @@ settings = config.load(defaults)
 
 hpp = texts.new('${hpp}', {
     pos = {
-        x = -128,
+        x = -104,
     },
     bg = {
         visible = false,
@@ -37,33 +37,38 @@ hpp = texts.new('${hpp}', {
 })
 
 tp = T{}
-for i = 0, 17 do
-    local party = (i / 6):floor() + 1
-    local key = {'p%i', 'a1%i', 'a2%i'}[party]:format(i % 6)
-    local pos_base = {-34, -389, -288}
-    tp[key] = texts.new('${tp}', {
-        pos = {
-            x = -118,
-            y = pos_base[party] + 16 * (i % 6)
-        },
-        bg = {
-            visible = false,
-        },
-        flags = {
-            right = true,
-            bottom = true,
-            bold = true,
-            draggable = false,
-            italic = true,
-        },
-        text = {
-            size = i < 6 and 10 or 8,
-            alpha = 185,
-            red = 255,
-            green = 255,
-            blue = 255,
-        },
-    })
+
+do
+    local x_pos = windower.get_windower_settings().x_res - 118
+
+    for i = 0, 17 do
+        local party = (i / 6):floor() + 1
+        local key = {'p%i', 'a1%i', 'a2%i'}[party]:format(i % 6)
+        local pos_base = {-34, -389, -288}
+        tp[key] = texts.new('${tp}', {
+            pos = {
+                x = x_pos,
+                y = pos_base[party] + 16 * (i % 6)
+            },
+            bg = {
+                visible = false,
+            },
+            flags = {
+                right = false,
+                bottom = true,
+                bold = true,
+                draggable = false,
+                italic = true,
+            },
+            text = {
+                size = i < 6 and 10 or 8,
+                alpha = 185,
+                red = 255,
+                green = 255,
+                blue = 255,
+            },
+        })
+    end
 end
 
 hpp_y_pos = {}
@@ -84,17 +89,16 @@ for i = 1, 6 do
     tp_y_pos[i] = -34 - 20 * (6 - i)
 end
 
-debug.setmetatable(nil, {__index = {}, __call = functions.empty})
-
 windower.register_event('prerender', function()
     -- HP % text
     if settings.ShowTargetHPPercent and windower.ffxi.get_player().target_index then
+        local player_target = windower.ffxi.get_mob_by_index(windower.ffxi.get_player().target_index);
         local party_info = windower.ffxi.get_party_info()
 
         -- Adjust position for party member count
         hpp:pos_y(hpp_y_pos[party_info.party1_count])
-
-        hpp:update(windower.ffxi.get_mob_by_target('t'))
+        
+        hpp:update(player_target)
         hpp:show()
     else
         hpp:hide()
@@ -130,7 +134,7 @@ windower.register_event('prerender', function()
 end)
 
 --[[
-Copyright © 2014-2015, Windower
+Copyright Â© 2014-2015, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
