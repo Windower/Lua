@@ -11,10 +11,6 @@ windower.register_event('login', function(new_name)
     name = new_name
 end)
 
-windower.register_event('logout', function()
-    name = nil
-end)
-
 windower.register_event('incoming text', function(_, text)
     local date = os.date('*t')
 
