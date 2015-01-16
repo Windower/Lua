@@ -1,6 +1,6 @@
 _addon.name = 'TParty'
 _addon.author = 'Cliff'
-_addon.version = '2.0.0.1'
+_addon.version = '2.0.1.0'
 
 require('sets')
 require('functions')
@@ -92,13 +92,12 @@ end
 windower.register_event('prerender', function()
     -- HP % text
     if settings.ShowTargetHPPercent and windower.ffxi.get_player().target_index then
-        local player_target = windower.ffxi.get_mob_by_index(windower.ffxi.get_player().target_index);
         local party_info = windower.ffxi.get_party_info()
 
         -- Adjust position for party member count
         hpp:pos_y(hpp_y_pos[party_info.party1_count])
         
-        hpp:update(player_target)
+        hpp:update(windower.ffxi.get_mob_by_target('st') or windower.ffxi.get_mob_by_target('t'))
         hpp:show()
     else
         hpp:hide()
