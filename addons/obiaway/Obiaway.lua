@@ -1,7 +1,7 @@
 -- 
 -- Obiaway v1.0.7
 -- 
--- Copyright ©2013-2014, ReaperX, onetime
+-- Copyright ©2013-2015, ReaperX, bangerang
 -- All rights reserved.
 -- 
 -- Redistribution and use in source and binary forms, with or without
@@ -58,8 +58,8 @@
 
 -- addon info
 _addon.name = "Obiaway"
-_addon.author = "ReaperX, onetime"
-_addon.version = "1.0.7"
+_addon.author = "ReaperX, bangerang"
+_addon.version = "1.0.6"
 _addon.commands = {'oa', 'ob', 'obi', 'obiaway'}
 _addon.language = 'english'
 
@@ -75,6 +75,11 @@ default_settings.notify = true
 default_settings.location = 'sack'
 default_settings.lock = false
 default_settings.color = 209
+default_settings.ignoreZones = S{
+    "Ru'Lude Gardens", "Upper Jeuno", "Lower Jeuno", "Port Jeuno", "Port Windurst", "Windurst Waters", "Windurst Woods", "Windurst Walls",
+    "Heavens Tower", "Port San d'Oria", "Northern San d'Oria", "Southern San d'Oria", "Chateau d'Oraguille", "Port Bastok", "Bastok Markets",
+    "Bastok Mines", "Metalworks", "Aht Urhgan Whitegate", "Tavnazian Safehold", "Nashmau", "Selbina", "Mhaura", "Norg", "Rabao", "Kazham",
+    "Eastern Adoulin", "Western Adoulin", "Leafallia", "Celennia Memorial Library", "Mog Garden"}
 settings = config.load(default_settings)
 
 -- tokens
@@ -84,37 +89,6 @@ tokens.inv_full_warned = false
 tokens.bag_full_warned = false
 
 -- lists
-obi_cities = S{
-    "Ru'Lude Gardens",
-    "Upper Jeuno",
-    "Lower Jeuno",
-    "Port Jeuno",
-    "Port Windurst",
-    "Windurst Waters",
-    "Windurst Woods",
-    "Windurst Walls",
-    "Heavens Tower",
-    "Port San d'Oria",
-    "Northern San d'Oria",
-    "Southern San d'Oria",
-    "Port Bastok",
-    "Bastok Markets",
-    "Bastok Mines",
-    "Metalworks",
-    "Aht Urhgan Whitegate",
-    "Tavnazian Safehold",
-    "Nashmau",
-    "Selbina",
-    "Mhaura",
-    "Norg",
-    "Kazham",
-    "Eastern Adoulin",
-    "Western Adoulin",
-    "Leafallia",
-    "Celennia Memorial Library",
-    "Mog Garden"
-}
-
 obi_names = T{
     Light = 'Korin',
     Dark = 'Anrin',
@@ -435,10 +409,10 @@ function auto_sort_obi()
     if inventory_full(false) and inventory_full(false, settings.location) then return false end
 
     if not settings.lock then -- if sorting lock is not on, then do this stuff:
-        if not obi_cities:contains(res.zones[windower.ffxi.get_info().zone].english) then -- In a city:
+        if not settings.ignoreZones:contains(res.zones[windower.ffxi.get_info().zone].english) then -- Not in a city:
             put_unneeded_obi(false)
             get_needed_obi(false)
-        else-- Not in a city:
+        else -- In a city:
             put_all_obi(false)
         end
     end
