@@ -446,7 +446,7 @@ end
 -- Return true if any element of t satisfies the condition fn.
 function table.any(t, fn)
     for value in table.it(t) do
-        if fn(valye) then
+        if fn(value) then
             return true
         end
     end
