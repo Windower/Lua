@@ -81,6 +81,7 @@ function load_user_files(job_id,user_file)
     end
     
     user_env = nil
+    unhandled_command_events = {}
     --registered_user_events = {}
     include_user_path = nil
     
@@ -117,6 +118,7 @@ function load_user_files(job_id,user_file)
         send_command=send_cmd_user,windower=user_windower,include=include_user,
         midaction=user_midaction,pet_midaction=user_pet_midaction,set_language=set_language,
         show_swaps = show_swaps,debug_mode=debug_mode,include_path=user_include_path,
+        register_unhandled_command=user_unhandled_command,
         
         -- Library functions
         string=string,math=math,table=table,set=set,list=list,T=T,S=S,L=L,pack=pack,
