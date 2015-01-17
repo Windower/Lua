@@ -187,10 +187,10 @@ disable_table[0] = false
 outgoing_action_category_table = {['/ma']=3,['/ws']=7,['/ja']=9,['/ra']=16,['/ms']=25}
 encumbrance_table = table.reassign({},disable_table)
 registered_user_events = {}
+unhandled_command_events = {}
 empty = {name="empty"}
 --outgoing_packet_table = {}
 last_refresh = 0
-
 
 
 _global = make_user_table()

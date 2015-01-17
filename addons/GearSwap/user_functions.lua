@@ -258,6 +258,13 @@ function user_equip_sets(func)
         end,user_env)
 end
 
+function user_unhandled_command(func)
+    if type(func) ~= 'function' then
+        error('\nGearSwap: unhandled_command was passed an invalid value ('..tostring(func)..'). (must be a function)', 2)
+    end
+    unhandled_command_events[#unhandled_command_events+1] = setfenv(func,user_env)
+end
+
 function include_user(str, load_include_in_this_table)
     if not (type(str) == 'string') then
         error('\nGearSwap: include() was passed an invalid value ('..tostring(str)..'). (must be a string)', 2)

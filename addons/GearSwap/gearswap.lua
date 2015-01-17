@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.899'
+_addon.version = '0.900'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -207,7 +207,16 @@ windower.register_event('addon command',function (...)
         table.remove(splitup,1)
         assert(loadstring(table.concat(splitup,' ')))()
     else
-        print('GearSwap: Command not found')
+        local handled = false
+        if not gearswap_disabled then
+            for i,v in ipairs(unhandled_command_events) do
+                handled = equip_sets(v,nil,unpack(splitup))
+                if handled then break end
+            end
+        end
+        if not handled then
+            print('GearSwap: Command not found')
+        end
     end
 end)
 
