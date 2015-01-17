@@ -1,6 +1,6 @@
 _addon.name = 'TParty'
 _addon.author = 'Cliff'
-_addon.version = '2.0.1.1'
+_addon.version = '2.0.1.2'
 
 require('sets')
 require('functions')
@@ -39,7 +39,7 @@ hpp = texts.new('${hpp}', {
 tp = T{}
 
 do
-    local x_pos = windower.get_windower_settings().x_res - 118
+    local x_pos = windower.get_windower_settings().ui_x_res - 118
 
     for i = 0, 17 do
         local party = (i / 6):floor() + 1
