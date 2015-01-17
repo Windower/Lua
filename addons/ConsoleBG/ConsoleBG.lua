@@ -47,10 +47,12 @@ windower.register_event('addon command', function(command1, command2, command3)
         settings.pos.x = math.floor(command3)
         log('Position X set to %s':format(settings.pos.x))
 		config.save(settings)
+		config.reload(settings)
 		elseif command2 == 'y' then
 		settings.pos.y = math.floor(command3)
         log('Position Y set to %s':format(settings.pos.y))
 		config.save(settings)
+		config.reload(settings)
 		end
 
 	elseif command1 == 'bg' then
