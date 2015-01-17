@@ -15,6 +15,8 @@ local dict = {
     {en="Ra'Kaznar Skirmish",ja="スカカザ"},
     {en="Ra'Kaznar Skirmish",ja="かざすか"},
     
+    {en="Abyssea - Misareaux",ja="アビセア ミザレオ"},
+    
     {en="Recruiting",ja="募集"},
     {en="Check seacom for jobs",ja="サチコ参照ジョブを添えてテルください"},
     {en="Search Comment",ja="サチコ"},
@@ -41,15 +43,23 @@ local dict = {
     {en="Leviathan",ja="リヴァイアサン"},
     {en="Levi",ja="リヴァ"},
     
+    {en="Tenzen",ja="てんぜん"},
+    {en="Tenzen",ja="テンゼン"},
+    
     {en="Return to Delkfutt's Tower",ja="デルクフの塔 再び"},
     {en="Return to Delkfutt's Tower",ja="テルクフの塔再び"},
     
     {en="BRD",ja="吟"},
     {en="GEO",ja="風"},
     
-    {en="Wanted (Battle)",ja="ウォテッド"},
+    {en="Wanted (Battle)",ja="ウォンテッド"},
     {en="Dragonfly",ja="トンボ"},
     {en="Cost",ja="コスト"},
+    
+    {en="Incursion",ja="インカ"},
+    {en="Tryl",ja="トリル"},
+    
+    {en="*waves*",ja="ノシ"},
 }
 
 return dict
