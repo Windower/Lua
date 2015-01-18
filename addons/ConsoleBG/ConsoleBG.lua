@@ -23,102 +23,66 @@ settings = config.load(defaults)
 
 windower.prim.create('ConsoleBG')
 
+consolesetting_commands = T{
+    color = 'Color',
+    c = 'Color',
+    size = 'Size',
+    s = 'Size',
+}
+
 config.register(settings, function(settings)
     windower.prim.set_color('ConsoleBG', settings.bg.alpha, settings.bg.red, settings.bg.green, settings.bg.blue)
     windower.prim.set_position('ConsoleBG', settings.pos.x, settings.pos.y)
     windower.prim.set_size('ConsoleBG', settings.extents.x, settings.extents.y)
 end)
 
-windower.register_event('addon command', function(command1, command2, command3)
+function consolesettings(command1, ...)
+local values = L{...}
+local command1 = command1:lower()
+    if command1 == 'color' then
+        log('Colors changed! Alpha: ' .. math.floor(values[1]) .. ' Red: ' .. math.floor(values[2]) .. ' Green: ' .. math.floor(values[3]) .. ' Blue: ' .. math.floor(values[4]))
+        settings.bg.alpha = math.floor(tonumber(values[1]))
+        settings.bg.red = math.floor(tonumber(values[2]))
+        settings.bg.green = math.floor(tonumber(values[3]))
+        settings.bg.blue = math.floor(tonumber(values[4]))
+    elseif command1 == 'size' then
+        log('Size changed! Anchor X: ' .. math.floor(values[1]) .. ' Width: ' .. math.floor(values[2]) .. ' Anchor Y: ' .. math.floor(values[3]) .. ' Height: ' .. math.floor(values[4]))
+        settings.pos.x = math.floor(tonumber(values[1]))
+        settings.extents.x = math.floor(tonumber(values[2]))
+        settings.pos.y = math.floor(tonumber(values[3]))
+        settings.extents.y = math.floor(tonumber(values[4]))
+    end
+
+   config.save(settings)
+   config.reload(settings)
+end
+
+windower.register_event('addon command', function(command1, ...)
+local argcount = select('#', ...)
 
     command1 = command1 and command1:lower() or 'help'
-    command2 = command2 and command2:lower()
-    command3 = command3 and command3:lower() or nil
 
-    if command1 == 'pos' then
-        if not (command2 == 'x' or command2 == 'y') then
-            error('Please specify x or y.')
-        elseif not command3 then
-            error('Please specify a value.')
-            return
-        end
-
-        if command2 == 'x' then
-            settings.pos.x = math.floor(command3)
-            log('Position X set to %s':format(settings.pos.x))
-            config.save(settings)
-            config.reload(settings)
-
-        elseif command2 == 'y' then
-            settings.pos.y = math.floor(command3)
-            log('Position Y set to %s':format(settings.pos.y))
-            config.save(settings)
-            config.reload(settings)
-        end
-
-    elseif command1 == 'bg' then
-    local bgvalue = tonumber(command3)
-        if not (command2 == 'alpha' or command2 == 'red' or command2 == 'green' or command2 == 'blue') then
-            error('Please specify alpha, red, green or blue.')
-            return
-        elseif (not bgvalue) or ((0 > bgvalue) or (bgvalue > 255)) then
-            error('Please specify a value (0-255).')
-            return
-        end
-
-        if command2 == 'alpha' then
-            settings.bg.alpha = math.floor(command3)
-            log('Alpha set to %s':format(settings.bg.alpha))
-            config.save(settings)
-            config.reload(settings)
-            
-        elseif command2 == 'red' then
-            settings.bg.red = math.floor(command3)
-            log('Red set to %s':format(settings.bg.red))
-            config.save(settings)
-            config.reload(settings)
-
-        elseif command2 == 'green' then
-            settings.bg.green = math.floor(command3)
-            log('Green set to %s':format(settings.bg.green))
-            config.save(settings)
-            config.reload(settings)
-
-        elseif command2 == 'blue' then
-            settings.bg.blue = math.floor(command3)
-            log('Blue set to %s':format(settings.bg.blue))
-            config.save(settings)
-            config.reload(settings)
-        end
-
-    elseif command1 == 'extent' then
-        if not (command2 == 'x' or command2 == 'y') then
-            error('Please specify x or y.')
-        elseif not command3 then
-            error('Please specify a value.')
-            return
-        end
-
-        if command2 == 'x' then
-            settings.extents.x = math.floor(command3)
-            log('Extent X set to %s':format(settings.extents.x))
-            config.save(settings)
-            config.reload(settings)
-
-        elseif command2 == 'y' then
-            settings.extents.y = math.floor(command3)
-            log('Extent Y set to %s':format(settings.extents.y))
-            config.save(settings)
-            config.reload(settings)
+    if consolesetting_commands:containskey(command1) then
+        command1 = consolesetting_commands[command1]
+        if ((4 > argcount) or (argcount > 4)) then
+            log('Invalid syntax. Please check the "help" command.')
+        else
+            consolesettings(command1, ...)  
         end
 
     elseif command1 == 'help' then
         print('%s v%s':format(_addon.name, _addon.version))
-        print('    \\cs(255,255,255)bg alpha|blue|green|red <value>\\cr - Changes background color/transparency')
-        print('    \\cs(255,255,255)pos x|y <value>\\cr - Set anchor points')
-        print('    \\cs(255,255,255)extent x|y <value>\\cr - Set the width/height')
+        print('    \\cs(255,255,255)color  <values>\\cr - Changes background color and transparency Valid range: 0-255')
+        print('    \\crExample:\\cs(255,255,255) color 255 0 1 2\\cr - Alpha: 255 Red: 0 Green: 1 Blue: 2')
+        print('    \\cs(255,255,255)size <values>\\cr - Set anchor points and size')
+        print('    \\crExample:\\cs(255,255,255) size 1 700 25 310\\cr - X: 1 Width: 700 Y: 25 Height: 310')
+    
+    else
+    log("Unknown command! Please use the 'help' command for a list of commands.")
+    
     end
 end)
+
 
 windower.register_event('prerender', function()
     windower.prim.set_visibility('ConsoleBG', windower.console.visible())
