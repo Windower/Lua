@@ -295,15 +295,11 @@ end
 -- Resets application state
 function reset()
     if settings.resetfilters then
-        display:reset()
-        dps_clock:reset()
-        dps_db:reset()
         dps_db:clear_filters()
-    else
-        display:reset()
-        dps_clock:reset()
-        dps_db:reset()
     end
+    display:reset()
+    dps_clock:reset()
+    dps_db:reset()
 end
 
 
