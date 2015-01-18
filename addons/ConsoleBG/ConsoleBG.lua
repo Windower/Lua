@@ -28,6 +28,8 @@ consolesetting_commands = T{
     c = 'Color',
     size = 'Size',
     s = 'Size',
+    position = 'Position',
+    p = 'Position',
 }
 
 config.register(settings, function(settings)
@@ -40,17 +42,19 @@ function consolesettings(command1, ...)
 local values = L{...}
 local command1 = command1:lower()
     if command1 == 'color' then
-        log('Colors changed! Alpha: ' .. math.floor(values[1]) .. ' Red: ' .. math.floor(values[2]) .. ' Green: ' .. math.floor(values[3]) .. ' Blue: ' .. math.floor(values[4]))
-        settings.bg.alpha = math.floor(tonumber(values[1]))
-        settings.bg.red = math.floor(tonumber(values[2]))
-        settings.bg.green = math.floor(tonumber(values[3]))
-        settings.bg.blue = math.floor(tonumber(values[4]))
+        log('Colors changed! Alpha: ' .. values[1] .. ' Red: ' .. values[2] .. ' Green: ' .. values[3] .. ' Blue: ' .. values[4])
+        settings.bg.alpha = tonumber(values[1])
+        settings.bg.red = tonumber(values[2])
+        settings.bg.green = tonumber(values[3])
+        settings.bg.blue = tonumber(values[4])
+    elseif command1 == 'position' then
+        log('Position changed! X: ' .. values[1] .. ' Y: ' .. values[2])
+        settings.pos.x = tonumber(values[1])
+        settings.pos.y = tonumber(values[2])
     elseif command1 == 'size' then
-        log('Size changed! Anchor X: ' .. math.floor(values[1]) .. ' Width: ' .. math.floor(values[2]) .. ' Anchor Y: ' .. math.floor(values[3]) .. ' Height: ' .. math.floor(values[4]))
-        settings.pos.x = math.floor(tonumber(values[1]))
-        settings.extents.x = math.floor(tonumber(values[2]))
-        settings.pos.y = math.floor(tonumber(values[3]))
-        settings.extents.y = math.floor(tonumber(values[4]))
+        log('Size changed! Width: ' .. values[1] .. ' Height: ' .. values[2])
+        settings.extents.x = tonumber(values[1])
+        settings.extents.y = tonumber(values[2])
     end
 
    config.save(settings)
@@ -64,19 +68,30 @@ local argcount = select('#', ...)
 
     if consolesetting_commands:containskey(command1) then
         command1 = consolesetting_commands[command1]
-        if ((4 > argcount) or (argcount > 4)) then
-            log('Invalid syntax. Please check the "help" command.')
-        else
-            consolesettings(command1, ...)  
+        if command1 == 'Color' then
+            if ((4 > argcount) or (argcount > 4)) then
+                log('Invalid syntax. Please check the "help" command.')
+            else
+                consolesettings(command1, ...)
+            end
+        elseif (command1 == 'Position' or command1 == 'Size') then
+            if ((2 > argcount) or (argcount > 2)) then
+                log('Invalid syntax. Please check the "help" command.')        
+            else
+                consolesettings(command1, ...)
+            end
+      
         end
 
     elseif command1 == 'help' then
         print('%s v%s':format(_addon.name, _addon.version))
         print('    \\cs(255,255,255)color  <values>\\cr - Changes background color and transparency Valid range: 0-255')
         print('    \\crExample:\\cs(255,255,255) color 255 0 1 2\\cr - Alpha: 255 Red: 0 Green: 1 Blue: 2')
-        print('    \\cs(255,255,255)size <values>\\cr - Set anchor points and size')
-        print('    \\crExample:\\cs(255,255,255) size 1 700 25 310\\cr - X: 1 Width: 700 Y: 25 Height: 310')
-    
+        print('    \\cs(255,255,255)size <values>\\cr - Set anchor points')
+        print('    \\crExample:\\cs(255,255,255) position 1 25 \\cr - X: 1 Y: 25')
+        print('    \\cs(255,255,255)size <values>\\cr - Set size')
+        print('    \\crExample:\\cs(255,255,255) size 700 310\\cr - Width: 700 Height: 310')
+
     else
     log("Unknown command! Please use the 'help' command for a list of commands.")
     
