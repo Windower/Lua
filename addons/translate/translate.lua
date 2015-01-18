@@ -152,7 +152,7 @@ for res_name in pairs(handled_resources) do
             if sanity_check(jp) and sanity_check(res_line.en) and jp ~= res_line.en:escape() then
                 trans_list[jp] = green_col..res_line.en..rcol:escape()
             end
-            if sanity_check(jps) and sanity_check(res_line.ens) and jp ~= res_line.en:escape() and jps ~= res_line.ens:escape() then
+            if sanity_check(jps) and sanity_check(res_line.ens) and jp ~= res_line.en:escape() and jps ~= res_line.ens:escape() and res_line.ens ~= 'PUP' then
                 trans_list[jps] = green_col..res_line.ens..rcol:escape()
             end
         end
