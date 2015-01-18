@@ -39,8 +39,8 @@ config.register(settings, function(settings)
 end)
 
 function consolesettings(command1, ...)
-local values = L{...}
-local command1 = command1:lower()
+    local values = L{...}
+    local command1 = command1:lower()
     if command1 == 'color' then
         log('Colors changed! Alpha: ' .. values[1] .. ' Red: ' .. values[2] .. ' Green: ' .. values[3] .. ' Blue: ' .. values[4])
         settings.bg.alpha = tonumber(values[1])
@@ -62,7 +62,7 @@ local command1 = command1:lower()
 end
 
 windower.register_event('addon command', function(command1, ...)
-local argcount = select('#', ...)
+    local argcount = select('#', ...)
 
     command1 = command1 and command1:lower() or 'help'
 
@@ -70,13 +70,13 @@ local argcount = select('#', ...)
         command1 = consolesetting_commands[command1]
         if command1 == 'Color' then
             if ((4 > argcount) or (argcount > 4)) then
-                log('Invalid syntax. Please check the "help" command.')
+                log('Invalid syntax. Check the "help" command.')
             else
                 consolesettings(command1, ...)
             end
         elseif (command1 == 'Position' or command1 == 'Size') then
             if ((2 > argcount) or (argcount > 2)) then
-                log('Invalid syntax. Please check the "help" command.')        
+                log('Invalid syntax. Check the "help" command.')        
             else
                 consolesettings(command1, ...)
             end
@@ -93,7 +93,7 @@ local argcount = select('#', ...)
         print('    \\crExample:\\cs(255,255,255) size 700 310\\cr - Width: 700 Height: 310')
 
     else
-    log("Unknown command! Please use the 'help' command for a list of commands.")
+    error("Unknown command! Use the 'help' command for a list of commands.")
     
     end
 end)
