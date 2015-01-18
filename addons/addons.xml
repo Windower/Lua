@@ -282,7 +282,7 @@
   </addon>
   <addon>
     <name>obiaway</name>
-    <description>Automatically remove elemental obis based on day/weather/storm conditions.</description>
+    <description>Automatically collect and remove elemental obi based on day/weather/storm conditions.</description>
     <support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
