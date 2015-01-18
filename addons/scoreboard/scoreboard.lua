@@ -2,7 +2,7 @@
 
 _addon.name = 'Scoreboard'
 _addon.author = 'Suji'
-_addon.version = '1.09'
+_addon.version = '1.10'
 _addon.commands = {'sb', 'scoreboard'}
 
 require('tables')
@@ -294,9 +294,16 @@ end
 
 -- Resets application state
 function reset()
-    display:reset()
-    dps_clock:reset()
-    dps_db:reset()
+    if settings.resetfilters then
+        display:reset()
+        dps_clock:reset()
+        dps_db:reset()
+        dps_db:clear_filters()
+    else
+        display:reset()
+        dps_clock:reset()
+        dps_db:reset()
+    end
 end
 
 
