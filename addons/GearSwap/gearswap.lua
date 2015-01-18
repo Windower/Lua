@@ -25,12 +25,12 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.894'
+_addon.version = '0.900'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
 if windower.file_exists(windower.addon_path..'data/bootstrap.lua') then
-    debugging = {windower_debug = true,command_registry = false,general=false}
+    debugging = {windower_debug = true,command_registry = false,general=false,logging=false}
 else
     debugging = {}
 end
@@ -122,12 +122,6 @@ require 'triggers'
 
 windower.register_event('load',function()
     windower.debug('load')
-    if windower.dir_exists('../addons/GearSwap/data/logs') then
-        logging = false
-        logfile = io.open('../addons/GearSwap/data/logs/NormalLog'..tostring(os.clock())..'.log','w+')
-        logit('GearSwap LOGGER HEADER\n')
-    end
-    
     refresh_globals()
     
     if world.logged_in then
@@ -213,7 +207,16 @@ windower.register_event('addon command',function (...)
         table.remove(splitup,1)
         assert(loadstring(table.concat(splitup,' ')))()
     else
-        print('GearSwap: Command not found')
+        local handled = false
+        if not gearswap_disabled then
+            for i,v in ipairs(unhandled_command_events) do
+                handled = equip_sets(v,nil,unpack(splitup))
+                if handled then break end
+            end
+        end
+        if not handled then
+            print('GearSwap: Command not found')
+        end
     end
 end)
 
@@ -284,6 +287,8 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         player.sub_job_id = data:byte(0xB8)
         player.vitals.max_hp = data:unpack('I',0xE9)
         player.vitals.max_mp = data:unpack('I',0xED)
+        player.max_hp = data:unpack('I',0xE9)
+        player.max_mp = data:unpack('I',0xED)
         update_job_names()
         
         world.zone_id = data:unpack('H',0x31)
@@ -471,6 +476,8 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
     elseif id == 0x061 then
         player.vitals.max_hp = data:unpack('I',5)
         player.vitals.max_mp = data:unpack('I',9)
+        player.max_hp = data:unpack('I',5)
+        player.max_mp = data:unpack('I',9)
         player.main_job_id = data:byte(13)
         player.main_job_level = data:byte(14)
         
@@ -501,6 +508,24 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         player.vitals.tp = data:unpack('I',0x11)
         player.vitals.hpp = data:byte(0x17)
         player.vitals.mpp = data:byte(0x18)
+        
+        player.hp = data:unpack('I',9)
+        player.mp = data:unpack('I',13)
+        player.tp = data:unpack('I',0x11)
+        player.hpp = data:byte(0x17)
+        player.mpp = data:byte(0x18)
+    elseif id == 0x0E2 and data:unpack('I',5)==player.id then
+        player.vitals.hp = data:unpack('I',9)
+        player.vitals.mp = data:unpack('I',0xB)
+        player.vitals.tp = data:unpack('I',0x11)
+        player.vitals.hpp = data:byte(0x1E)
+        player.vitals.mpp = data:byte(0x1F)
+        
+        player.hp = data:unpack('I',9)
+        player.mp = data:unpack('I',0xB)
+        player.tp = data:unpack('I',0x11)
+        player.hpp = data:byte(0x1E)
+        player.mpp = data:byte(0x1F)
     elseif id == 0x117 then
         for i=0x49,0x85,4 do
             local arr = data:sub(i,i+3)
@@ -536,9 +561,9 @@ windower.register_event('gain buff',function(buff_id)
     
     -- Need to figure out what I'm going to do with this:
     if T{'terror','sleep','stun','petrification','charm','weakness'}:contains(buff_name:lower()) then
-        for i,v in pairs(command_registry) do
+        for ts,v in pairs(command_registry) do
             if v.midaction then
-                command_registry[i] = nil
+                command_registry:delete_entry(ts)
             end
         end
     end

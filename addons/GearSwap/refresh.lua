@@ -81,6 +81,7 @@ function load_user_files(job_id,user_file)
     end
     
     user_env = nil
+    unhandled_command_events = {}
     --registered_user_events = {}
     include_user_path = nil
     
@@ -117,6 +118,7 @@ function load_user_files(job_id,user_file)
         send_command=send_cmd_user,windower=user_windower,include=include_user,
         midaction=user_midaction,pet_midaction=user_pet_midaction,set_language=set_language,
         show_swaps = show_swaps,debug_mode=debug_mode,include_path=user_include_path,
+        register_unhandled_command=user_unhandled_command,
         
         -- Library functions
         string=string,math=math,table=table,set=set,list=list,T=T,S=S,L=L,pack=pack,
@@ -171,7 +173,8 @@ function load_user_files(job_id,user_file)
         return nil
     end
     
-    _global.cast_delay = 0
+    _global.pretarget_cast_delay = 0
+    _global.precast_cast_delay = 0
     _global.cancel_spell = false
     _global.current_event = 'get_sets'
     user_pcall('get_sets')
@@ -326,10 +329,9 @@ function refresh_player(dt,user_event_flag)
         if species_id then
             player.species = {}
             for i,v in pairs(res.monstrosity[species_id]) do
-                if i ~= 'id' then
-                    player.species[i] = v
-                end
+                player.species[i] = v
             end
+            player.species.name = player.species[language] 
             player.species.tp_moves = copy_entry(res.monstrosity[species_id].tp_moves)
             for i,v in pairs(player.species.tp_moves) do
                 if v > player.main_job_level then
@@ -448,7 +450,7 @@ function refresh_group_info(dt,user_event_flag)
     
     local j = windower.ffxi.get_party() or {}
     for i,v in pairs(j) do
-        if v.mob and v.mob.race then
+        if type(v) == 'table' and v.mob and v.mob.race then
             v.mob.race_id = v.mob.race
             v.mob.race = res.races[v.mob.race][language]
         end
@@ -547,7 +549,7 @@ end
 function refresh_item_list(itemlist)
     retarr = make_user_table()
     for i,v in pairs(itemlist) do
-        if v.id and v.id ~= 0 then
+        if type(v) == 'table' and v.id and v.id ~= 0 then
             -- If we don't already have the primary item name in the table, add it.
             if res.items[v.id] and res.items[v.id][language] and not retarr[res.items[v.id][language]] then
                 -- We add the entry as a sub-table containing the id and count
@@ -585,7 +587,6 @@ function refresh_user_env(job_id)
         windower.send_command('@wait 1;lua i '.._addon.name..' refresh_user_env')
     else
         load_user_files(job_id)
-        --windower.send_command('@wait 0.5;lua i '.._addon.name..' load_user_files '..job_id)
     end
 end
 
@@ -651,3 +652,4 @@ function pathsearch(files_list)
     return false
 end
 
+-- Much force update

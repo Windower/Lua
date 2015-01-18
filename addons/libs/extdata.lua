@@ -151,6 +151,7 @@ augment_values = {
         [0x077] = {{stat='Pet: "Mag.Def.Bns."', offset=1}},
         [0x078] = {{stat='Avatar: "Mag.Atk.Bns."', offset=1}},
         [0x079] = {{stat='Pet: Breath', offset=1}},
+        [0x07A] = {{stat='Pet: TP Bonus', offset=1, multiplier=20}},
 
         [0x080] = {{stat="Pet:",offset = 0}},
         --[0x081: Accuracy +1 Ranged Acc. +0 | value + 1
@@ -1010,7 +1011,8 @@ end
 function string_augment(sys,id,val)
     local augment
     local augment_table = augment_values[sys][id]
-    if augment_table.Secondary_Handling then
+    if not augment_table then print('Augments Lib: ',sys,id)
+    elseif augment_table.Secondary_Handling then
         -- This is handling for system 1's indices 0x390~0x392, which have their own static augment lookup table
         augment_table = sp_390_augments[ (id-0x390)*16 + 545 + val]
     end
@@ -1498,6 +1500,57 @@ function extdata.decode(tab)
     local decoded = func(tab.extdata)
     decoded.__raw = tab.extdata
     return decoded
+end
+
+
+-----------------------------------------------------------------------------------
+--Name: compare_augments(goal,current)
+--Args:
+---- goal - First set of augments
+---- current - Second set of augments
+-----------------------------------------------------------------------------------
+--Returns:
+---- boolean indicating whether the goal augments are contained within the
+----    current augments. Will return false if there are excess goal augments
+----    or the goal augments do not match the current augments.
+-----------------------------------------------------------------------------------
+function extdata.compare_augments(goal,current)
+    if not current then return false end
+    local num_augments = 0
+    local aug_strip = function(str)
+        return str:lower():gsub('[^%-%w,]','')
+    end 
+    for aug_ind,augment in pairs(current) do
+        if augment == 'none' then
+            current[aug_ind] = nil
+        else
+            num_augments = num_augments + 1
+        end
+    end
+    if num_augments < #goal then
+        return false
+    else
+        local count = 0
+        for goal_ind,goal_aug in pairs(goal) do
+            local bool
+            for cur_ind,cur_aug in pairs(current) do
+                if aug_strip(goal_aug) == aug_strip(cur_aug) then
+                    bool = true
+                    count = count +1
+                    current[cur_ind] = nil
+                    break
+                end
+            end
+            if not bool then
+                return false
+            end
+        end
+        if count == #goal then
+            return true
+        else
+            return false
+        end
+    end
 end
 
 -- Encode currently does nothing

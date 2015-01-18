@@ -212,7 +212,7 @@ windower.register_event('action', function(act)
             local allyroller = false
             local selfroll = false
             for pt,member in pairs(party) do
-                if member.name == actor.name then
+                if type(member) == 'table' and member.name == actor.name then
                     allyroller = true
                     break
                 end

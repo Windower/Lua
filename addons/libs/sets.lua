@@ -205,7 +205,7 @@ function set.it(s)
     local key = nil
     return function()
         key = next(s, key)
-        return key, true
+        return key
     end
 end
 
@@ -217,11 +217,16 @@ function set.clear(s)
     return s
 end
 
-function set.copy(s)
+function set.copy(s, deep)
+    deep = deep or true
     local res = {}
 
     for el in pairs(s) do
-        res[el] = true
+        if deep and type(el) == 'table' then
+            res[(not rawget(el, 'copy') and el.copy or table.copy)(el)] = true
+        else
+            res[el] = true
+        end
     end
 
     return setmetatable(res, _meta.S)
@@ -291,10 +296,16 @@ function set.format(s, trail, subs)
     local last
     if trail == 'and' then
         last = ' and '
+    elseif trail == 'or' then
+        last = ' or '
+    elseif trail == 'list' then
+        last = ', '
     elseif trail == 'csv' then
         last = ','
     elseif trail == 'oxford' then
         last = ', and '
+    elseif trail == 'oxford or' then
+        last = ', or '
     else
         warning('Invalid format for table.format: \''..trail..'\'.')
     end
@@ -325,7 +336,7 @@ function set.format(s, trail, subs)
 end
 
 --[[
-Copyright © 2013-2014, Windower
+Copyright © 2013-2015, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

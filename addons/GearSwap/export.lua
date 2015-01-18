@@ -1,14 +1,13 @@
 function export_set(options)
-    --local temp_items,item_list = windower.ffxi.get_items(),{}
     local item_list = {}
     local targinv,xml,all_sets,use_job_in_filename,use_subjob_in_filename,overwrite_existing
     if #options > 0 then
         for _,v in ipairs(options) do
-            if v:lower() == 'inventory' then
+            if S{'inventory','inv','i'}:contains(v:lower()) then
                 targinv = true
-            elseif v:lower() == 'xml' then
+            elseif S{'xml'}:contains(v:lower()) then
                 xml = true
-            elseif v:lower() == 'sets' then
+            elseif S{'sets','set','s'}:contains(v:lower()) then
                 all_sets = true
                 if not user_env or not user_env.sets then
                     windower.add_to_chat(123,'GearSwap: Cannot export the sets table of the current file because there is no file loaded.')
@@ -58,7 +57,7 @@ function export_set(options)
     if targinv then
         -- Load the entire inventory
         for _,v in pairs(inv) do
-            if v.id ~= 0 then
+            if type(v) == 'table' and v.id ~= 0 then
                 if res.items[v.id] then
                     item_list[#item_list+1] = {}
                     item_list[#item_list].name = res.items[v.id][language]

@@ -1,9 +1,9 @@
 --[[
-A few table helper functions, in addition to a new T-table interface, which enables method indexing on tables.
+    A few table helper functions, in addition to a new T-table interface, which enables method indexing on tables.
 
-To define a T-table with explicit values use T{...}, to convert an existing table t, use T(t). To access table methods of a T-table t, use t:methodname(args).
+    To define a T-table with explicit values use T{...}, to convert an existing table t, use T(t). To access table methods of a T-table t, use t:methodname(args).
 
-For lists, tables with sequential integral indices, use the lists library and the respective L{...} constructor. For sets, tables with unique elements and irrelevant order, use the sets library and the respective S{...} constructor.
+    For lists, tables with sequential integral indices, use the lists library and the respective L{...} constructor. For sets, tables with unique elements and irrelevant order, use the sets library and the respective S{...} constructor.
 ]]
 
 _libs = _libs or {}
@@ -365,7 +365,7 @@ function table.slice(t, from, to)
         key = key + 1
     end
 
-    return setmetatable(res, getmetatable(t) or _meta.T)
+    return setmetatable(res, getmetatable(t))
 end
 
 -- Replaces t[from, to] with the contents of st and returns the table.
@@ -405,7 +405,7 @@ function table.reverse(t)
         rkey = rkey - 1
     end
 
-    return setmetatable(res, getmetatable(t) or _meta.T)
+    return setmetatable(res, getmetatable(t))
 end
 
 -- Gets a list of arguments and creates a table with key: value pairs alternating the arguments.
@@ -441,29 +441,31 @@ function table.sort(t, ...)
     return t
 end
 
--- Returns an iterator over the table.
-function table.it(t)
-    local key
-    return function()
-        key = next(t, key)
-        return rawget(t, key), key
-    end
-end
-
 -- Returns a table keyed by a specified index of a subtable. Requires a table of tables, and key must be a valid key in every table. Only produces the correct result, if the key is unique.
 function table.rekey(t, key)
     local res = {}
 
-    for _, value in pairs(t) do
+    for value in table.it(t) do
         res[value[key]] = value
     end
 
-    return setmetatable(res, getmetatable(t) or _meta.T)
+    return setmetatable(res, getmetatable(t))
 end
 
--- Wrapper around unpack(t). Returns table elements as a list of values. Only works on array subsets of t.
-function table.unpack(t)
-    return unpack(t)
+-- Wrapper around unpack(t). Returns table elements as a list of values. Optionally takes a number of keys to unpack.
+function table.unpack(t, ...)
+    local count = select('#', ...);
+    if count == 0 then
+        return unpack(t)
+    end
+
+    local temp = {}
+    local args = {...}
+    for i = 1, count do
+        temp[i] = t[args[i]]
+    end
+
+    return unpack(temp)
 end
 
 -- Returns the values of the table, extracted into an argument list. Like unpack, but works on dictionaries as well.
@@ -471,23 +473,26 @@ function table.extract(t)
     local res = {}
     -- Convert a (possible) dictionary into an array.
     local i = 1
-    for key, val in pairs(t) do
-        res[i] = val
+    for value in table.it(t) do
+        res[i] = value
         i = i + 1
     end
 
     return table.unpack(res)
 end
 
--- Returns a deep copy of the table, including metatable and recursed over nested tables.
-function table.copy(t)
+-- Returns a copy of the table, including metatable and recursed over nested tables.
+-- The second argument indicates whether or not to perform a deep copy (defaults to true)
+function table.copy(t, deep)
+    deep = deep or true
     local res = {}
-    for key, val in pairs(t) do
+
+    for value, key in table.it(t) do
         -- If a value is a table, recursively copy that.
-        if type(val) == 'table' then
-            val = table.copy(val)
+        if type(value) == 'table' then
+            value = (not rawget(value, copy) and value.copy or table.copy)(value)
         end
-        res[key] = val
+        res[key] = value
     end
 
     return setmetatable(res, getmetatable(t))
@@ -538,8 +543,8 @@ function table.concat(t, delim, from, to)
             end
         end
     else
-        for key, val in pairs(t) do
-            res = res .. tostring(val)
+        for value, key in table.it(t) do
+            res = res .. tostring(value)
             if next(t, key) then
                 res = res .. delim
             end
@@ -595,7 +600,7 @@ function table.max(t)
 end
 
 --[[
-Copyright (c) 2013-2014, Windower
+Copyright © 2013-2015, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

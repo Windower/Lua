@@ -47,6 +47,13 @@
     <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
   </addon>
   <addon>
+    <name>autolock</name>
+    <author>Bangerang</author>
+    <description>Automatically uses lockstyle command upon zoning outside of town. Optionally, use a set defined in a gearswap lua.</description>
+    <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Asura/Bangerang</support>
+  </addon>
+  <addon>
     <name>AutoRA</name>
     <author>Banggugyangu</author>
     <description>Causes Ranged Attacks to behave the same as melee Auto-Attack.</description>
@@ -109,11 +116,32 @@
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
+    <name>ChatLink</name>
+    <author>Arcon</author>
+    <description>Allows opening links posted into the FFXI chat.</description>
+    <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
+  </addon>
+  <addon>
     <name>ChatPorter</name>
     <author>Ikonic</author>
     <description>Displays tell, party, and linkshell chat to alternate character and optional textbox.  Also, allows you to reply from either character.</description>
     <bugtracker>https://github.com/Icinoki/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Ragnarok/Ikonic</support>
+  </addon>
+  <addon>
+    <name>Clock</name>
+    <author>Arcon</author>
+    <description>Displays an on-screen clock in a custom format with options to display several different time zones.</description>
+    <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
+  </addon>
+  <addon>
+    <name>ConsoleBG</name>
+    <author>Arcon</author>
+    <description>Displays a dark (by default) background behind the Windower console to make it more readable.</description>
+    <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
   </addon>
   <addon>
     <name>digger</name>
@@ -160,13 +188,13 @@
     <name>FFOColor</name>
     <author>Nitrous (Shiva)</author>
     <description>Allows you to show FFOChat text in one of the 5 game chat channels. As well as specify colors for the text</description>
-    <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>   
+    <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>
     <support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
     <name>findAll</name>
     <author>Giuliano Riccio (Zohno@Phoenix)</author>
-    <description>Searches items stored on all your characters. Click "about" for more instructions.</description>
+    <description>Searches items stored on all your characters and allows live on-screen tracking of specified items.</description>
     <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
@@ -185,6 +213,13 @@
 	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
+    <name>Highlight</name>
+    <description>Highlights party members names when mentioned in the chatlog.</description>
+    <author>Balloon</author>
+	<bugtracker>https://github.com/Podginator/Lua/issues</bugtracker>
+	<support>Podginator@gmail.com</support>
+  </addon>
+  <addon>
     <name>Itemizer</name>
     <author>Ihina</author>
     <description>Use commands to move items and gear between bags</description>
@@ -199,9 +234,23 @@
     <support>http://www.bluegartr.com/members/34070-Cairthenn</support>
   </addon>
   <addon>
+    <name>latentchecker</name>
+    <author>byrth,smd111</author>
+    <description>Checks weapon skill points of weapon skill trial weapons and mythic weapons</description>
+    <bugtracker>https://github.com/smd111/LatentChecker/issues</bugtracker>
+    <support>https://github.com/smd111/LatentChecker/issues</support>
+  </addon>
+  <addon>
     <name>Linker</name>
     <author>Arcon</author>
     <description>Allows opening links to certain websites from within the game, with an optional search parameter.</description>
+    <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
+  </addon>
+  <addon>
+    <name>Logger</name>
+    <author>Arcon</author>
+    <description>Logs the chat log to a file.</description>
     <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
   </addon>
@@ -244,6 +293,13 @@
     <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>
   </addon>
   <addon>
+    <name>pet_fix</name>
+    <author>Byrth</author>
+    <description>Temporary addon that fixes a null pointer animation error with pets that is causing crashes.</description>
+    <bugtracker>https://github.com/Byrth/Lua/issues</bugtracker>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
+  </addon>
+  <addon>
     <name>PetSchool</name>
 	<author>Banggugyangu</author>
     <description>A helper addon for PUPs using spellcast, it informs spellcast of pet casting (healing or nuking).</description>
@@ -256,7 +312,7 @@
     <description>Tracks pet vitals (HP/TP/MP)</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
     <support>http://mibbit.com/#windower@irc.ffochat.com</support>
-  </addon> 
+  </addon>
   <addon>
     <name>plasmon</name>
     <author>Giuliano Riccio (Zohno@Phoenix)</author>
@@ -335,6 +391,13 @@
     <support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
+    <name>setbgm</name>
+    <author>Seth VanHeulen (Acacia@Odin)</author>
+    <description>Set your background/battle/other music to any music in the game.</description>
+    <bugtracker>https://github.com/svanheulen/setbgm-windower-addon/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Odin/Acacia</support>
+  </addon>
+  <addon>
     <name>Shortcuts</name>
     <author>Byrth</author>
     <description>Applys spellcast-like command completion (interpretation and target completion) to commands. Includes emotes, /check, and /pcmd.</description>
@@ -391,16 +454,23 @@
     <support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
-    <name>Highlight</name>
-    <description>Highlights party members names when mentioned in the chatlog.</description>
-    <author>Balloon</author>
-	<bugtracker>https://github.com/Podginator/Lua/issues</bugtracker>
-	<support>Podginator@gmail.com</support>
+    <name>subTarget</name>
+    <author>Sebyg666</author>
+    <description>Enhances the usage of the send addon by allowing a stal or stpc or st target to be sent as the spell recipient. This removes the need for multiple macros for the same spell.</description>
+    <bugtracker>https://github.com/sebyg666/Lua/issues</bugtracker>
+    <support>https://github.com/sebyg666/Lua/tree/4.1-dev/addons/SubTarget</support>
   </addon>
   <addon>
     <name>TargetInfo</name>
     <author>Arcon</author>
     <description>Displays information about your current target in memory.</description>
+    <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
+  </addon>
+  <addon>
+    <name>Text</name>
+    <author>Arcon</author>
+    <description>Allows creating and manipulating on-screen text objects through Windower commands.</description>
     <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
   </addon>
@@ -428,7 +498,7 @@
   <addon>
     <name>TParty</name>
     <author>Arcon</author>
-    <description>Shows a target's HP percentage next to their health bar.</description>
+    <description>Shows a target's HP percentage next to their health bar as well as party/alliance members's TP.</description>
     <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
   </addon>
@@ -467,18 +537,5 @@
     <bugtracker>https://github.com/Jayjs20/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Bismarck/Ihina</support>
   </addon>
-  <addon>
-    <name>subTarget</name>
-    <author>Sebyg666</author>
-    <description>Enhances the usage of the send addon by allowing a stal or stpc or st target to be sent as the spell recipient. This removes the need for multiple macros for the same spell.</description>
-    <bugtracker>https://github.com/sebyg666/Lua/issues</bugtracker>
-    <support>https://github.com/sebyg666/Lua/tree/4.1-dev/addons/SubTarget</support>
-  </addon>
-  <addon>
-    <name>pet_fix</name>
-    <author>Byrth</author>
-    <description>Temporary addon that fixes a null pointer animation error with pets that is causing crashes.</description>
-    <bugtracker>https://github.com/Byrth/Lua/issues</bugtracker>
-    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
-  </addon>
 </addons>
+

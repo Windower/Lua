@@ -1,25 +1,22 @@
 --[[
-Adds some tools for functional programming. Amends various other namespaces by functions used in a functional context, when they don't make sense on their own.
+    Adds some tools for functional programming. Amends various other namespaces by functions used in a functional context, when they don't make sense on their own.
 ]]
 
 _libs = _libs or {}
 _libs.functions = true
 
---[[
-    Purely functional
-]]
-
 functions = {}
 boolean = {}
 
 -- The empty function.
-function functions.empty() end
+functions.empty = function() end
 
-debug.setmetatable(functions.empty, functions)
-debug.setmetatable(false, {__index = boolean})
+debug.setmetatable(false, {__index = function(_, k)
+    return boolean[k] or (_raw and _raw.error or error)('"%s" is not defined for booleans':format(tostring(k)), 2)
+end})
 
-for _, t in pairs({'functions', 'boolean', 'math', 'string', 'table'}) do
-    _G[t].fn = function(val)
+for _, t in pairs({functions, boolean, math, string, table}) do
+    t.fn = function(val)
         return function()
             return val
         end
@@ -27,8 +24,8 @@ for _, t in pairs({'functions', 'boolean', 'math', 'string', 'table'}) do
 end
 
 -- The identity function.
-function functions.identity(fn)
-    return fn
+function functions.identity(...)
+    return ...
 end
 
 -- Returns a function that returns a constant value.
@@ -133,7 +130,7 @@ function functions.select(fn, i)
     end
 end
 
--- Returns an iterator of the results of the function.
+-- Returns an iterator over the results of a function.
 function functions.it(fn, ...)
     local res = {fn(...)}
     local key = 0
@@ -174,9 +171,7 @@ function functions.loop(fn, interval, cond)
     return coroutine.schedule(function()
         while cond() do
             fn()
-            -- print('sleeping...', os.clock(), interval)
             coroutine.sleep(interval)
-            -- print('awoke...', os.clock())
         end
     end, 0)
 end
@@ -209,7 +204,7 @@ local function index(fn, key)
         end
     end
 
-    return nil
+    (_raw and _raw.error or error)('"%s" is not defined for functions':format(tostring(key)), 2)
 end
 
 local function add(fn, args)
@@ -350,20 +345,38 @@ function table.lookup(t, ref, key)
     return ref[t[key]]
 end
 
-local it = function(t)
-    local key
-    return function()
-        key = next(t, key)
-        return rawget(t, key), key
+table.it = function()
+    local it = function(t)
+        local key
+
+        return function()
+            key = next(t, key)
+            return t[key], key
+        end
     end
-end
+
+    return function(t)
+        local meta = getmetatable(t)
+        if not meta then
+            return it(t)
+        end
+
+        local index = meta.__index
+        if index == table then
+            return it(t)
+        end
+
+        local fn = type(index) == 'table' and index.it or index(t, 'it') or it
+        return (fn == table.it and it or fn)(t)
+    end
+end()
 
 -- Applies function fn to all values of the table and returns the resulting table.
 function table.map(t, fn)
     local res = {}
-    for val, key in (t.it or it)(t) do
+    for value, key in table.it(t) do
         -- Evaluate fn with the element and store it.
-        res[key] = fn(val)
+        res[key] = fn(value)
     end
 
     return setmetatable(res, getmetatable(t))
@@ -372,8 +385,8 @@ end
 -- Applies function fn to all keys of the table, and returns the resulting table.
 function table.key_map(t, fn)
     local res = {}
-    for val, key in (t.it or it)(t) do
-        res[fn(key)] = val
+    for value, key in table.it(t) do
+        res[fn(key)] = value
     end
 
     return setmetatable(res, getmetatable(t))
@@ -386,10 +399,10 @@ function table.filter(t, fn)
     end
 
     local res = {}
-    for val, key in (t.it or it)(t) do
+    for value, key in table.it(t) do
         -- Only copy if fn(val) evaluates to true
-        if fn(val) then
-            res[key] = val
+        if fn(value) then
+            res[key] = value
         end
     end
 
@@ -403,10 +416,10 @@ function table.key_filter(t, fn)
     end
 
     local res = {}
-    for val, key in (t.it or it)(t) do
+    for value, key in table.it(t) do
         -- Only copy if fn(key) evaluates to true
         if fn(key) then
-            res[key] = val
+            res[key] = value
         end
     end
 
@@ -418,11 +431,11 @@ end
 function table.reduce(t, fn, init)
     -- Set the accumulator variable to the init value (which can be nil as well)
     local acc = init
-    for val in (t.it or it)(t) do
+    for value in table.it(t) do
         if init then
-            acc = fn(acc, val)
+            acc = fn(acc, value)
         else
-            acc = val
+            acc = value
             init = true
         end
     end
@@ -432,8 +445,8 @@ end
 
 -- Return true if any element of t satisfies the condition fn.
 function table.any(t, fn)
-    for val in (t.it or it)(t) do
-        if fn(val) then
+    for value in table.it(t) do
+        if fn(value) then
             return true
         end
     end
@@ -443,8 +456,8 @@ end
 
 -- Return true if all elements of t satisfy the condition fn.
 function table.all(t, fn)
-    for val in (t.it or it)(t) do
-        if not fn(val) then
+    for value in table.it(t) do
+        if not fn(value) then
             return false
         end
     end
@@ -472,7 +485,7 @@ function string.map(str, fn)
 end
 
 --[[
-Copyright © 2013-2014, Windower
+Copyright © 2013-2015, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

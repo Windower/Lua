@@ -13,12 +13,10 @@ _libs.strings = _libs.strings or require('strings')
 _libs.xml = _libs.xml or require('xml')
 _libs.files = _libs.files or require('files')
 
-if not _libs.logger then
-    error = print
-    warning = print
-    notice = print
-    log = print
-end
+local error = error or print+{'Error:'}
+local warning = warning or print+{'Warning:'}
+local notice = notice or print+{'Notice:'}
+local log = log or print
 
 -- Map for different config loads.
 local settings_map = T{}
@@ -54,6 +52,7 @@ function config.load(filepath, defaults)
     meta.chars = S{}
     meta.comments = {}
     meta.refresh = T{}
+    meta.cdata = S{}
 
     settings_map[settings] = meta
 
@@ -93,12 +92,8 @@ function parse(settings)
     elseif meta.file.path:endswith('.xml') then
         parsed, err = _libs.xml.read(meta.file)
 
-        if parsed == nil then
-            if err ~= nil then
-                error(err)
-            else
-                error('XML error: Unkown error.')
-            end
+        if not parsed then
+            error(err or 'XML error: Unknown error.')
             return settings
         end
 
@@ -237,8 +232,12 @@ function merge(t, t_merge, path)
                     end
 
                 elseif oldtype == 'string' then
-                    t[key] = val
-                    err = true
+                    if type(val) == 'table' and not next(val) then
+                        t[key] = ''
+                    else
+                        t[key] = val
+                        err = true
+                    end
 
                 else
                     err = true
@@ -250,7 +249,7 @@ function merge(t, t_merge, path)
 
             if err then
                 if path then
-                    warning('Could not safely merge values for \'%s/%s\', %s expected (default: %s), got %s (%s).':format(path:concat('/'), key, type(oldval), tostring(oldval), type(val), tostring(val)))
+                    warning('Could not safely merge values for \'%s/%s\', %s expected (default: %s), got %s (%s).':format(path:concat('/'), key, class(oldval), tostring(oldval), class(val), tostring(val)))
                 end
                 t[key] = val
             end
@@ -281,6 +280,11 @@ function settings_table(node, settings, key, meta)
     -- TODO: Type checking necessary? merge should take care of that.
     if #node.children == 1 and node.children[1].type == 'text' then
         local val = node.children[1].value
+        if node.children[1].cdata then
+            meta.cdata:add(key)
+            return val
+        end
+
         if val:lower() == 'false' then
             return false
         elseif val:lower() == 'true' then
@@ -327,16 +331,17 @@ function config.save(t, char)
         char = 'global'
     elseif char ~= 'global' and not meta.chars:contains(char) then
         meta.chars:add(char)
-        meta.original[char] = setmetatable({}, _meta.T)
+        meta.original[char] = T{}
     end
 
     meta.original[char]:update(t)
 	
     if char == 'global' then
-        meta.original = meta.original:key_filter('global')
+        meta.original = T{global = meta.original.global}
+        meta.chars = S{}
     else
         meta.original.global:amend(meta.original[char], true)
-        meta.original[char] = table_diff(meta.original.global, meta.original[char]) or setmetatable({}, _meta.T)
+        meta.original[char] = table_diff(meta.original.global, meta.original[char]) or T{}
 
         if meta.original[char]:empty(true) then
             meta.original[char] = nil
@@ -349,7 +354,7 @@ end
 
 -- Returns the table containing only elements from t_new that are different from t and not nil.
 function table_diff(t, t_new)
-    local res = setmetatable({}, _meta.T)
+    local res = T{}
     local cmp
 
     for key, val in pairs(t_new) do
@@ -440,6 +445,8 @@ function nest_xml(t, meta, indentlevel)
                 val = set.format(val, 'csv')
             elseif type(val) == 'table' then
                 val = table.format(val, 'csv')
+            elseif type(val) == 'string' and meta.cdata[tostring(key):lower()] then
+                val = '<![CDATA[%s]]>':format(val)
             else
                 val = tostring(val)
             end
@@ -447,7 +454,7 @@ function nest_xml(t, meta, indentlevel)
             if val == '' then
                 fragments:append('%s<%s />':format(indent, key))
             else
-                fragments:append('%s<%s>%s</%s>':format(indent, key, val:xml_escape(), key))
+                fragments:append('%s<%s>%s</%s>':format(indent, key, meta.cdata[tostring(key):lower()] and val or val:xml_escape(), key))
             end
             local length = fragments:last():length() - indent:length()
             if length > maxlength then
@@ -486,7 +493,7 @@ end)
 return config
 
 --[[
-Copyright © 2013-2014, Windower
+Copyright © 2013-2015, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

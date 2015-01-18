@@ -42,7 +42,7 @@ function set_language(lang)
 end
 
 function debug_mode(boolean)
-    if boolean == true or boolean == false then _settings.debug_mode = boolean
+    if type(boolean) == "boolean" then _settings.debug_mode = boolean
     elseif boolean == nil then
         _settings.debug_mode = true
     else
@@ -51,7 +51,7 @@ function debug_mode(boolean)
 end
 
 function show_swaps(boolean)
-    if boolean == true or boolean == false then _settings.show_swaps = boolean
+    if type(boolean) == "boolean" then _settings.show_swaps = boolean
     elseif boolean == nil then
         _settings.show_swaps = true
     else
@@ -64,7 +64,7 @@ function cancel_spell(boolean)
         error('\nGearSwap: cancel_spell() is only valid in the precast, pretarget, or filtered_action functions', 2)
         return
     end
-    if boolean == true or boolean == false then _global.cancel_spell = boolean
+    if type(boolean) == "boolean" then _global.cancel_spell = boolean
     elseif boolean == nil then
         _global.cancel_spell = true
     else
@@ -94,7 +94,7 @@ function cast_delay(delay)
         return
     end
     if tonumber(delay) then
-        _global.cast_delay = tonumber(delay)
+        _global[_global.current_event.."_cast_delay"] = tonumber(delay)
     else
         error('\nGearSwap: cast_delay() was passed an invalid value ('..tostring(delay)..'). (cast delay must be a number of seconds)', 2)
     end
@@ -129,7 +129,6 @@ function enable(...)
     if type(enable_tab[1]) == 'table' then
         enable_tab = enable_tab[1] -- Compensates for people passing a table instead of a series of strings.
     end
-    --items = windower.ffxi.get_items()
     local sending_table = {}
     for i,v in pairs(enable_tab) do
         local local_slot = get_default_slot(v)
@@ -259,6 +258,13 @@ function user_equip_sets(func)
         end,user_env)
 end
 
+function user_unhandled_command(func)
+    if type(func) ~= 'function' then
+        error('\nGearSwap: unhandled_command was passed an invalid value ('..tostring(func)..'). (must be a function)', 2)
+    end
+    unhandled_command_events[#unhandled_command_events+1] = setfenv(func,user_env)
+end
+
 function include_user(str, load_include_in_this_table)
     if not (type(str) == 'string') then
         error('\nGearSwap: include() was passed an invalid value ('..tostring(str)..'). (must be a string)', 2)
@@ -315,7 +321,7 @@ function user_midaction(bool)
     end
 
     for i,v in pairs(command_registry) do
-        if v.midaction then
+        if type(v) == 'table' and v.midaction then
             return true, v.spell
         end
     end

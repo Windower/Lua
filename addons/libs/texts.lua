@@ -3,6 +3,8 @@
 ]]
 
 local texts = {}
+local meta = {}
+
 windower.text.saved_texts = {}
 local dragged
 
@@ -27,8 +29,16 @@ _meta = _meta or {}
 _meta.Text = _meta.Text or {}
 _meta.Text.__class = 'Text'
 _meta.Text.__index = texts
+
+local set_value = function(t, key, value)
+    local m = meta[t]
+    m.values[key] = value
+    m.texts[key] = value ~= nil and (m.formats[key] and m.formats[key]:format(value) or tostring(value)) or m.defaults[key]
+end
+
 _meta.Text.__newindex = function(t, k, v)
-    t:update({[k] = v})
+    set_value(t, k, v)
+    t:update()
 end
 
 --[[
@@ -84,18 +94,18 @@ amend = function(settings, text)
 end
 
 local call_events = function(t, event, ...)
-    if not t._events[event] then
+    if not meta[t].events[event] then
         return
     end
 
     -- Trigger registered post-reload events
-    for _, event in ipairs(t._events[event]) do
-        event(t, t._root_settings)
+    for _, event in ipairs(meta[t].events[event]) do
+        event(t, meta[t].root_settings)
     end
 end
 
 local apply_settings = function(_, t, settings)
-    settings = settings or t._settings
+    settings = settings or meta[t].settings
     texts.pos(t, settings.pos.x, settings.pos.y)
     texts.bg_alpha(t, settings.bg.alpha)
     texts.bg_color(t, settings.bg.red, settings.bg.green, settings.bg.blue)
@@ -107,9 +117,9 @@ local apply_settings = function(_, t, settings)
     texts.pad(t, settings.padding)
     texts.italic(t, settings.flags.italic)
     texts.bold(t, settings.flags.bold)
-    texts.right_justified(t, settings.flags.right_justified)
-    texts.bottom_justified(t, settings.flags.bottom_justified)
-    texts.visible(t, t._status.visible)
+    texts.right_justified(t, settings.flags.right)
+    texts.bottom_justified(t, settings.flags.bottom)
+    texts.visible(t, meta[t].status.visible)
     texts.stroke_width(t, settings.text.stroke.width)
     texts.stroke_color(t, settings.text.stroke.red, settings.text.stroke.green, settings.text.stroke.blue)
     texts.stroke_transparency(t, settings.text.stroke.alpha)
@@ -167,28 +177,32 @@ function texts.new(str, settings, root_settings)
     end
 
     t = {}
-    t._name = (_addon and _addon.name or 'text') .. '_gensym_' .. tostring(t):sub(8) .. '_%.8X':format(16^8 * math.random()):sub(3)
-    t._settings = settings or {}
-    t._status = t._status or {visible = false, text = {}}
-    t._root_settings = root_settings
-    t._base_str = str
+    local m = {}
+    meta[t] = m
+    m.name = (_addon and _addon.name or 'text') .. '_gensym_' .. tostring(t):sub(8) .. '_%.8X':format(16^8 * math.random()):sub(3)
+    m.settings = settings or {}
+    m.status = m.status or {visible = false, text = {}}
+    m.root_settings = root_settings
+    m.base_str = str
 
-    t._events = {}
+    m.events = {}
 
-    t._texts = {}
-    t._defaults = {}
-    t._formats = {}
-    t._textorder = {}
+    m.keys = {}
+    m.values = {}
+    m.textorder = {}
+    m.defaults = {}
+    m.formats = {}
+    m.texts = {}
 
-    windower.text.create(t._name)
+    windower.text.create(m.name)
 
-    amend(t._settings, default_settings)
-    if t._root_settings then
-        config.save(t._root_settings)
+    amend(m.settings, default_settings)
+    if m.root_settings then
+        config.save(m.root_settings)
     end
 
-    if _libs.config and t._root_settings and settings then
-        _libs.config.register(t._root_settings, apply_settings, t, settings)
+    if _libs.config and m.root_settings and settings then
+        _libs.config.register(m.root_settings, apply_settings, t, settings)
     else
         apply_settings(_, t, settings)
     end
@@ -196,7 +210,7 @@ function texts.new(str, settings, root_settings)
     if str then
         texts.append(t, str)
     else
-        windower.text.set_text(t._name, '')
+        windower.text.set_text(m.name, '')
     end
 
     -- Cache for deletion
@@ -208,48 +222,58 @@ end
 -- Sets string values based on the provided attributes.
 function texts.update(t, attr)
     attr = attr or {}
-    local str = ''
-    for _, key in ipairs(t._textorder) do
-        if attr[key] ~= nil then
-            t._texts[key] = t._formats[key] and t._formats[key]:format(attr[key]) or tostring(attr[key])
-        end
+    local m = meta[t]
 
-        if t._texts[key] ~= nil then
-            str = str .. t._texts[key]
-        else
-            str = str .. t._defaults[key]
-        end
+    -- Add possibly new keys
+    for key, value in pairs(attr) do
+        m.keys[key] = true
     end
 
-    windower.text.set_text(t._name, str)
-    t._status.text.content = str
+    -- Update all text segments
+    for key in pairs(m.keys) do
+        set_value(t, key, attr[key] == nil and m.values[key] or attr[key])
+    end
+
+    -- Create the string
+    local str = ''
+    for _, key in ipairs(meta[t].textorder) do
+        str = str .. m.texts[key]
+    end
+
+    windower.text.set_text(m.name, str)
+    m.status.text.content = str
 
     return str
 end
 
 -- Restores the original text object not counting updated variables and added lines
 function texts.clear(t)
-    t._texts = {}
-    t._defaults = {}
-    t._textorder = {}
-    t._formats = {}
+    local m = meta[t]
+    m.keys = {}
+    m.values = {}
+    m.textorder = {}
+    m.texts = {}
+    m.defaults = {}
+    m.formats = {}
 
-    texts.append(t, t._base_str or '')
+    texts.append(t, m.base_str or '')
 end
 
 -- Appends new text tokens to be displayed
 function texts.append(t, str)
+    local m = meta[t]
+
     local i = 1
-    local index = #t._textorder + 1
+    local index = #m.textorder + 1
     while i <= #str do
         local startpos, endpos = str:find('%${.-}', i)
-        local rndname = '%s_%u':format(t._name, index)
+        local rndname = '%s_%u':format(m.name, index)
         if startpos then
             -- Match before the tag
             local match = str:sub(i, startpos - 1)
             if match ~= '' then
-                t._textorder[index] = rndname
-                t._texts[rndname] = match
+                m.textorder[index] = rndname
+                m.texts[rndname] = match
                 index = index + 1
             end
 
@@ -274,23 +298,34 @@ function texts.append(t, str)
                 format = match:sub(defaultend + 1)
             end
 
-            t._textorder[index] = key
-            t._texts[key] = default
-            t._defaults[key] = default
-            t._formats[key] = format
+            m.textorder[index] = key
+            m.keys[key] = true
+            m.defaults[key] = default
+            m.formats[key] = format
 
             index = index + 1
             i = endpos + 1
 
         else
-            t._textorder[index] = rndname
-            t._texts[rndname] = str:sub(i)
+            m.textorder[index] = rndname
+            m.texts[rndname] = str:sub(i)
             break
 
         end
     end
 
     texts.update(t)
+end
+
+-- Returns an iterator over all currently registered variables
+function texts.it(t)
+    local key
+    local m = meta[t]
+
+    return function()
+        key = next(m.keys, key)
+        return key, m.values[key], m.defaults[key], m.formats[key], m.texts[key]
+    end
 end
 
 -- Appends new text tokens with a line break
@@ -300,33 +335,33 @@ end
 
 -- Makes the primitive visible
 function texts.show(t)
-    windower.text.set_visibility(t._name, true)
-    t._status.visible = true
+    windower.text.set_visibility(meta[t].name, true)
+    meta[t].status.visible = true
 end
 
 -- Makes the primitive invisible
 function texts.hide(t)
-    windower.text.set_visibility(t._name, false)
-    t._status.visible = false
+    windower.text.set_visibility(meta[t].name, false)
+    meta[t].status.visible = false
 end
 
 -- Returns whether or not the text object is visible
 function texts.visible(t, visible)
     if visible == nil then
-        return t._status.visible
+        return meta[t].status.visible
     end
 
-    windower.text.set_visibility(t._name, visible)
-    t._status.visible = visible
+    windower.text.set_visibility(meta[t].name, visible)
+    meta[t].status.visible = visible
 end
 
 -- Sets a new text
 function texts.text(t, str)
     if not str then
-        return t._status.text.content
+        return meta[t].status.text.content
     end
 
-    t._base_str = str
+    meta[t].base_str = str
     texts.clear(t)
 end
 
@@ -335,195 +370,201 @@ end
 ]]
 
 function texts.pos(t, x, y)
+    local m = meta[t]
     if not x then
-        return t._settings.pos.x, t._settings.pos.y
+        return m.settings.pos.x, m.settings.pos.y
     end
 
     local settings = windower.get_windower_settings()
-    windower.text.set_location(t._name, x + (t._settings.flags.right and settings.ui_x_res or 0), y + (t._settings.flags.bottom and settings.ui_y_res or 0))
-    t._settings.pos.x = x
-    t._settings.pos.y = y
+    windower.text.set_location(m.name, x + (m.settings.flags.right and settings.ui_x_res or 0), y + (m.settings.flags.bottom and settings.ui_y_res or 0))
+    m.settings.pos.x = x
+    m.settings.pos.y = y
 end
 
 function texts.pos_x(t, x)
     if not x then
-        return t._settings.pos.x
+        return meta[t].settings.pos.x
     end
 
-    t:pos(x, t._settings.pos.y)
+    t:pos(x, meta[t].settings.pos.y)
 end
 
 function texts.pos_y(t, y)
     if not y then
-        return t._settings.pos.y
+        return meta[t].settings.pos.y
     end
 
-    t:pos(t._settings.pos.x, y)
+    t:pos(meta[t].settings.pos.x, y)
 end
 
 function texts.extents(t)
-    return windower.text.get_extents(t._name)
+    return windower.text.get_extents(meta[t].name)
 end
 
 function texts.font(t, ...)
     if not ... then
-        return t._settings.text.font
+        return meta[t].settings.text.font
     end
 
-    windower.text.set_font(t._name, ...)
-    t._settings.text.font = (...)
-    t._settings.text.fonts = {select(2, ...)}
+    windower.text.set_font(meta[t].name, ...)
+    meta[t].settings.text.font = (...)
+    meta[t].settings.text.fonts = {select(2, ...)}
 end
 
 function texts.size(t, size)
     if not size then
-        return t._settings.text.size
+        return meta[t].settings.text.size
     end
 
-    windower.text.set_font_size(t._name, size)
-    t._settings.text.size = size
+    windower.text.set_font_size(meta[t].name, size)
+    meta[t].settings.text.size = size
 end
 
 function texts.pad(t, padding)
     if not padding then
-        return t._settings.padding
+        return meta[t].settings.padding
     end
 
-    windower.text.set_bg_border_size(t._name, padding)
-    t._settings.padding = padding
+    windower.text.set_bg_border_size(meta[t].name, padding)
+    meta[t].settings.padding = padding
 end
 
 function texts.color(t, red, green, blue)
     if not red then
-        return t._settings.text.red, t._settings.text.green, t._settings.text.blue
+        return meta[t].settings.text.red, meta[t].settings.text.green, meta[t].settings.text.blue
     end
 
-    windower.text.set_color(t._name, t._settings.text.alpha, red, green, blue)
-    t._settings.text.red = red
-    t._settings.text.green = green
-    t._settings.text.blue = blue
+    windower.text.set_color(meta[t].name, meta[t].settings.text.alpha, red, green, blue)
+    meta[t].settings.text.red = red
+    meta[t].settings.text.green = green
+    meta[t].settings.text.blue = blue
 end
 
 function texts.alpha(t, alpha)
     if not alpha then
-        return t._settings.text.alpha
+        return meta[t].settings.text.alpha
     end
 
-    windower.text.set_color(t._name, alpha, t._settings.text.red, t._settings.text.green, t._settings.text.blue)
-    t._settings.text.alpha = alpha
+    windower.text.set_color(meta[t].name, alpha, meta[t].settings.text.red, meta[t].settings.text.green, meta[t].settings.text.blue)
+    meta[t].settings.text.alpha = alpha
 end
 
 -- Sets/returns text transparency. Based on percentage values, with 1 being fully transparent, while 0 is fully opaque.
 function texts.transparency(t, alpha)
     if not alpha then
-        return 1 - t._settings.text.alpha/255
+        return 1 - meta[t].settings.text.alpha/255
     end
 
     alpha = math.floor(255*(1-alpha))
-    windower.text.set_color(t._name, alpha, t._settings.text.red, t._settings.text.green, t._settings.text.blue)
-    t._settings.text.alpha = alpha
+    windower.text.set_color(meta[t].name, alpha, meta[t].settings.text.red, meta[t].settings.text.green, meta[t].settings.text.blue)
+    meta[t].settings.text.alpha = alpha
 end
 
-function texts.right_justified(t, rj)
-    if not rj then
-        return t._settings.flags.right
+function texts.right_justified(t, right)
+    if right == nil then
+        return meta[t].settings.flags.right
     end
 
-    windower.text.set_right_justified(t._name, rj)
+    windower.text.set_right_justified(meta[t].name, right)
+    meta[t].settings.flags.right = right
 end
 
-function texts.bottom_justified(t, bj)
-    if not bj then
-        return t._settings.flags.bottom
+function texts.bottom_justified(t, bottom)
+    if bottom == nil then
+        return meta[t].settings.flags.bottom
     end
 
-    windower.text.set_bottom_justified(t._name, bj)
+    -- Enable this once LuaCore implements it
+    -- windower.text.set_bottom_justified(meta[t].name, bottom)
+    -- meta[t].settings.flags.bottom = bottom
 end
 
 function texts.italic(t, italic)
-    if not italic then
-        return t._settings.flags.italic
+    if italic == nil then
+        return meta[t].settings.flags.italic
     end
 
-    windower.text.set_italic(t._name, italic)
+    windower.text.set_italic(meta[t].name, italic)
+    meta[t].settings.flags.italic = italic
 end
 
 function texts.bold(t, bold)
-    if not bold then
-        return t._settings.flags.bold
+    if bold == nil then
+        return meta[t].settings.flags.bold
     end
 
-    windower.text.set_bold(t._name, bold)
+    windower.text.set_bold(meta[t].name, bold)
+    meta[t].settings.flags.bold = bold
 end
 
 function texts.bg_color(t, red, green, blue)
     if not red then
-        return t._settings.bg.red, t._settings.bg.green, t._settings.bg.blue
+        return meta[t].settings.bg.red, meta[t].settings.bg.green, meta[t].settings.bg.blue
     end
 
-    windower.text.set_bg_color(t._name, t._settings.bg.alpha, red, green, blue)
-    t._settings.bg.red = red
-    t._settings.bg.green = green
-    t._settings.bg.blue = blue
+    windower.text.set_bg_color(meta[t].name, meta[t].settings.bg.alpha, red, green, blue)
+    meta[t].settings.bg.red = red
+    meta[t].settings.bg.green = green
+    meta[t].settings.bg.blue = blue
 end
 
 function texts.bg_visible(t, visible)
-    if not visible then
-        return t._settings.bg.visible
+    if visible == nil then
+        return meta[t].settings.bg.visible
     end
 
-    windower.text.set_bg_visibility(t._name, visible)
-    t._settings.bg.visible = visible
+    windower.text.set_bg_visibility(meta[t].name, visible)
+    meta[t].settings.bg.visible = visible
 end
 
 function texts.bg_alpha(t, alpha)
     if not alpha then
-        return t._settings.bg.alpha
+        return meta[t].settings.bg.alpha
     end
 
-    windower.text.set_bg_color(t._name, alpha, t._settings.bg.red, t._settings.bg.green, t._settings.bg.blue)
-    t._settings.bg.alpha = alpha
+    windower.text.set_bg_color(meta[t].name, alpha, meta[t].settings.bg.red, meta[t].settings.bg.green, meta[t].settings.bg.blue)
+    meta[t].settings.bg.alpha = alpha
 end
 
 -- Sets/returns background transparency. Based on percentage values, with 1 being fully transparent, while 0 is fully opaque.
 function texts.bg_transparency(t, alpha)
     if not alpha then
-        return 1 - t._settings.bg.alpha/255
+        return 1 - meta[t].settings.bg.alpha/255
     end
 
     alpha = math.floor(255*(1-alpha))
-    windower.text.set_bg_color(t._name, alpha, t._settings.bg.red, t._settings.bg.green, t._settings.bg.blue)
-    t._settings.bg.alpha = alpha
+    windower.text.set_bg_color(meta[t].name, alpha, meta[t].settings.bg.red, meta[t].settings.bg.green, meta[t].settings.bg.blue)
+    meta[t].settings.bg.alpha = alpha
 end
 
 function texts.stroke_width(t, width)
     if not width then
-        return t._settings.stroke.width
+        return meta[t].settings.stroke.width
     end
 
-    windower.text.set_stroke_width(t._name, width)
-    t._settings.text.stroke.width = width
+    windower.text.set_stroke_width(meta[t].name, width)
+    meta[t].settings.text.stroke.width = width
 end
 
 function texts.stroke_color(t, red, green, blue)
     if not red then
-        return t._settings.text.stroke.red, t._settings.text.stroke.green, t._settings.text.stroke.blue
+        return meta[t].settings.text.stroke.red, meta[t].settings.text.stroke.green, meta[t].settings.text.stroke.blue
     end
 
-    windower.text.set_stroke_color(t._name, t._settings.text.stroke.alpha, red, green, blue)
-    t._settings.text.stroke.red = red
-    t._settings.text.stroke.green = green
-    t._settings.text.stroke.blue = blue
+    windower.text.set_stroke_color(meta[t].name, meta[t].settings.text.stroke.alpha, red, green, blue)
+    meta[t].settings.text.stroke.red = red
+    meta[t].settings.text.stroke.green = green
+    meta[t].settings.text.stroke.blue = blue
 end
 
 function texts.stroke_transparency(t, alpha)
     if not alpha then
-        return 1 - t._settings.stroke.alpha/255
+        return 1 - meta[t].settings.stroke.alpha/255
     end
 
     alpha = math.floor(255 * (1 - alpha))
-    windower.text.set_stroke_color(t._name, alpha, t._settings.text.stroke.red, t._settings.text.stroke.green, t._settings.text.stroke.blue)
-    t._settings.text.stroke.alpha = alpha
+    windower.text.set_stroke_color(meta[t].name, alpha, meta[t].settings.text.stroke.red, meta[t].settings.text.stroke.green, meta[t].settings.text.stroke.blue)
+    meta[t].settings.text.stroke.alpha = alpha
 end
 
 -- Returns true if the coordinates are currently over the text object
@@ -532,8 +573,8 @@ function texts.hover(t, x, y)
         return false
     end
 
-    local pos_x, pos_y = windower.text.get_location(t._name)
-    local off_x, off_y = windower.text.get_extents(t._name)
+    local pos_x, pos_y = windower.text.get_location(meta[t].name)
+    local off_x, off_y = windower.text.get_extents(meta[t].name)
     
     return (pos_x <= x and x <= pos_x + off_x
         or pos_x >= x and x >= pos_x + off_x)
@@ -548,7 +589,8 @@ function texts.destroy(t)
             break
         end
     end
-    windower.text.delete(t._name)
+    windower.text.delete(meta[t].name)
+    meta[t] = nil
 end
 
 -- Handle drag and drop
@@ -567,14 +609,16 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
     -- Mouse left click
     elseif type == 1 then
         for _, t in pairs(windower.text.saved_texts) do
-            if t._settings.flags.draggable and t:hover(x, y) then
-                local pos_x, pos_y = windower.text.get_location(t._name)
+            local m = meta[t]
+            if m.settings.flags.draggable and t:hover(x, y) then
+                local pos_x, pos_y = windower.text.get_location(m.name)
 
-                if t._settings.flags.right or t._settings.flags.bottom then
+                local flags = m.settings.flags
+                if flags.right or flags.bottom then
                     local info = windower.get_windower_settings()
-                    if t._settings.flags.right then
+                    if flags.right then
                         pos_x = pos_x - info.ui_x_res
-                    else
+                    elseif flags.bottom then
                         pos_y = pos_y - info.ui_y_res
                     end
                 end
@@ -587,8 +631,8 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
     -- Mouse left release
     elseif type == 2 then
         if dragged then
-            if dragged.text._root_settings then
-                config.save(dragged.text._root_settings)
+            if meta[dragged.text].root_settings then
+                config.save(meta[dragged.text].root_settings)
             end
             dragged = nil
             return true
@@ -605,22 +649,23 @@ function texts.register_event(t, key, fn)
         return
     end
 
-    t._events[key] = t._events[key] or {}
-    t._events[key][#t._events[key] + 1] = fn
-    return #t._events[key]
+    local m = meta[t]
+    m.events[key] = m.events[key] or {}
+    m.events[key][#m.events[key] + 1] = fn
+    return #m.events[key]
 end
 
 function texts.unregister_event(t, key, fn)
-    if not (events[key] and t._events[key]) then
+    if not (events[key] and meta[t].events[key]) then
         return
     end
 
     if type(fn) == 'number' then
-        table.remove(t._events[key], fn)
+        table.remove(meta[t].events[key], fn)
     else
-        for index, event in ipairs(t._events[key]) do
+        for index, event in ipairs(meta[t].events[key]) do
             if event == fn then
-                table.remove(t._events[key], index)
+                table.remove(meta[t].events[key], index)
                 return
             end
         end
@@ -630,7 +675,7 @@ end
 return texts
 
 --[[
-Copyright © 2013-2014, Windower
+Copyright © 2013-2015, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
