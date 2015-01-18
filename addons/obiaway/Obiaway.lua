@@ -1,7 +1,7 @@
 -- 
--- Obiaway v1.0.7
+-- obiaway v1.0.7
 -- 
--- Copyright ©2013-2015, ReaperX, bangerang
+-- Copyright ©2013-2015, ReaperX, Bangerang
 -- All rights reserved.
 -- 
 -- Redistribution and use in source and binary forms, with or without
@@ -12,14 +12,14 @@
 -- * Redistributions in binary form must reproduce the above copyright
 --   notice, this list of conditions and the following disclaimer in the
 --   documentation and/or other materials provided with the distribution.
--- * Neither the name of Obiaway nor the
--- names of its contributors may be used to endorse or promote products
--- derived from this software without specific prior written permission.
+-- * Neither the name of obiaway nor the
+--   names of its contributors may be used to endorse or promote products
+--   derived from this software without specific prior written permission.
 
 -- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 -- ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 -- WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
--- DISCLAIMED. IN NO EVENT SHALL ReaperX BE LIABLE FOR ANY
+-- DISCLAIMED. IN NO EVENT SHALL ReaperX or Bangerang BE LIABLE FOR ANY
 -- DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 -- (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 -- LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
@@ -57,8 +57,8 @@
 --
 
 -- addon info
-_addon.name = "Obiaway"
-_addon.author = "ReaperX, bangerang"
+_addon.name = "obiaway"
+_addon.author = "ReaperX, Bangerang"
 _addon.version = "1.0.7"
 _addon.commands = {'oa', 'ob', 'obi', 'obiaway'}
 _addon.language = 'english'
@@ -75,7 +75,7 @@ default_settings.notify = true
 default_settings.location = 'sack'
 default_settings.lock = false
 default_settings.color = 209
-default_settings.ignorezones = S{
+default_settings.ignore_zones = S{
     "Ru'Lude Gardens", "Upper Jeuno", "Lower Jeuno", "Port Jeuno", "Port Windurst", "Windurst Waters", "Windurst Woods", "Windurst Walls",
     "Heavens Tower", "Port San d'Oria", "Northern San d'Oria", "Southern San d'Oria", "Chateau d'Oraguille", "Port Bastok", "Bastok Markets",
     "Bastok Mines", "Metalworks", "Aht Urhgan Whitegate", "Tavnazian Safehold", "Nashmau", "Selbina", "Mhaura", "Norg", "Rabao", "Kazham",
@@ -112,12 +112,12 @@ function obi_output(msg)
 end
 
 -- Accepts a boolean value and returns an appropriate string value. i.e. true -> 'on'
-function booltostr(bool)
+function bool_to_str(bool)
     return bool and 'on' or 'off'
 end
 
 -- checks if a value is in a table and then returns its key. Ex: a table contains Key = Value. returns Key. returns false if no match.
-function inTable(tbl, item)
+function in_table(tbl, item)
     for key, value in pairs(tbl) do
         if value == item then return key end
     end
@@ -285,21 +285,21 @@ function get_all_elements()
     
     -- check for active SCH buffs
     local buffs = windower.ffxi.get_player().buffs
-    if inTable(buffs, 178) then
+    if in_table(buffs, 178) then
       elements["Fire"] =  elements["Fire"] + 1
-    elseif inTable(buffs, 183) then
+    elseif in_table(buffs, 183) then
       elements["Water"] = elements["Water"] + 1
-    elseif inTable(buffs, 181) then
+    elseif in_table(buffs, 181) then
       elements["Earth"] = elements["Earth"] + 1
-    elseif inTable(buffs, 180) then
-      elements["Wind"] = elements["Wind"] +1
-    elseif inTable(buffs, 179) then
+    elseif in_table(buffs, 180) then
+      elements["Wind"] = elements["Wind"] + 1
+    elseif in_table(buffs, 179) then
       elements["Ice"] = elements["Ice"] + 1
-    elseif inTable(buffs, 182) then
+    elseif in_table(buffs, 182) then
       elements["Lightning"] = elements["Lightning"] + 1
-    elseif inTable(buffs, 184) then
+    elseif in_table(buffs, 184) then
       elements["Light"] = elements["Light"] + 1
-    elseif inTable(buffs, 185) then
+    elseif in_table(buffs, 185) then
       elements["Dark"] = elements["Dark"] + 1
     end
     
@@ -400,7 +400,7 @@ function auto_sort_obi()
     if inventory_full(false) and inventory_full(false, settings.location) then return false end
 
     if not settings.lock then -- if sorting lock is not on, then do this stuff:
-        if not settings.ignorezones:contains(res.zones[windower.ffxi.get_info().zone].english) then -- Not in a city:
+        if not settings.ignore_zones:contains(res.zones[windower.ffxi.get_info().zone].english) then -- Not in a city:
             put_unneeded_obi(false)
             get_needed_obi(false)
         else -- In a city:
@@ -424,7 +424,7 @@ windower.register_event('addon command', function(command, ...)
 
 
     if command == 'help' or command == 'h' then
-        obi_output("Obiaway v".._addon.version..". Authors: ".._addon.author)
+        obi_output("obiaway v".._addon.version..". Authors: ".._addon.author)
         obi_output("//obiaway [options]")
         obi_output("   help :  Displays this help text.")
         obi_output("   sort :  Automatically sorts obi.")
@@ -432,9 +432,9 @@ windower.register_event('addon command', function(command, ...)
         obi_output("       Gets obi from bag.")
         obi_output("   put [ all | unneeded ] [ sack | satchel | case | wardrobe ]")
         obi_output("       Puts obi away. Can optionally specify a location.")
-        obi_output("   lock [ on | off ]    (%s)":format(booltostr(settings.lock)))
+        obi_output("   lock [ on | off ]    (%s)":format(bool_to_str(settings.lock)))
         obi_output("       Locks obi to current location.")
-        obi_output("   notify [ on | off ]    (%s)":format(booltostr(settings.notify)))
+        obi_output("   notify [ on | off ]    (%s)":format(bool_to_str(settings.notify)))
         obi_output("       Sets obiaway notifcations on or off.")
         obi_output("   location [ sack | satchel | case | wardrobe ]    (%s)":format(settings.location))
         obi_output("       Sets inventory from which to get and put obi.")
