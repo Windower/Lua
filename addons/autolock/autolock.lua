@@ -1,7 +1,7 @@
 -- 
--- autolock v1.0
+-- autolock v1.0.1
 -- 
--- Copyright ©2015, bangerang
+-- Copyright ©2015, Bangerang
 -- All rights reserved.
 -- 
 -- Redistribution and use in source and binary forms, with or without
@@ -19,7 +19,7 @@
 -- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 -- ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 -- WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
--- DISCLAIMED. IN NO EVENT SHALL bangerang BE LIABLE FOR ANY
+-- DISCLAIMED. IN NO EVENT SHALL Bangerang BE LIABLE FOR ANY
 -- DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 -- (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 -- LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
@@ -28,10 +28,14 @@
 -- SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --
 --
--- Automatically equips a gear set and uses the /lockstyle command when leaving town.
--- This addon requires the Gearswap addon.
+-- Automatically equips a gear set and uses the /lockstyle command when changing zone.
+-- For full functionality, this addon requires the use of the Gearswap addon.
 --
--- To use this addon create a gear set titled sets.lockstyle in your job.lua file.
+-- To use a predefined lockstyle set, create a gear set titled sets.lockstyle 
+-- in your job.lua file. Alternatively, change the lock_set setting to the desired
+-- set. Be warned that this set name will be used across all job.lua files, as
+-- autolock does not currently support lockstyle sets on a per job basis.
+--
 -- Ex:
 --         sets.lockstyle = {
 --            head="Raider's Bonnet +2",
@@ -41,8 +45,8 @@
 --
     
 _addon.name = "autolock"
-_addon.author = "bangerang"
-_addon.version = "1.0"
+_addon.author = "Bangerang"
+_addon.version = "1.0.1"
 _addon.commands = {'al', 'autolock'}
 _addon.language = 'english'
 
@@ -50,11 +54,11 @@ require('luau')
 config = require('config')
 
 defaults = {}
-defaults.lockset = 'sets.lockstyle'
-defaults.zonedelay = 10
-defaults.keybind = '^x'
-defaults.autolock = true
-defaults.ignorezones = S{
+defaults.lock_set = 'sets.lockstyle'
+defaults.zone_delay = 10
+defaults.key_bind = '^x'
+defaults.auto_lock = true
+defaults.ignore_zones = S{
     "Ru'Lude Gardens", "Upper Jeuno", "Lower Jeuno", "Port Jeuno", "Port Windurst", "Windurst Waters", "Windurst Woods", "Windurst Walls",
     "Heavens Tower", "Port San d'Oria", "Northern San d'Oria", "Southern San d'Oria", "Chateau d'Oraguille", "Port Bastok", "Bastok Markets",
     "Bastok Mines", "Metalworks", "Aht Urhgan Whitegate", "Tavnazian Safehold", "Nashmau", "Selbina", "Mhaura", "Norg", "Rabao", "Kazham",
@@ -63,9 +67,9 @@ defaults.ignorezones = S{
 settings = config.load(defaults)
 
 tokens = {}
-tokens.lockstyle = false
+tokens.lock_style = false
 
-windower.send_command('bind %s al':format(settings.keybind))
+windower.send_command('bind %s al':format(settings.key_bind))
 windower.send_command('input /lockstyle off')
 
 function al_output(msg)
@@ -74,34 +78,34 @@ function al_output(msg)
 end
 
 -- Accepts a boolean value and returns an appropriate string value. i.e. true -> 'on'
-function booltostr(bool)
+function bool_to_str(bool)
     return bool and 'on' or 'off'
 end
 
 function command_lockstyle()
-    if tokens.lockstyle then
+    if tokens.lock_style then
         windower.send_command('input /lockstyle off')
         coroutine.sleep(1)
     end
-    windower.send_command('gs equip %s;wait 1.5;input /lockstyle on':format(settings.lockset))
-    tokens.lockstyle = true
+    windower.send_command('gs equip %s;wait 1.5;input /lockstyle on':format(settings.lock_set))
+    tokens.lock_style = true
     coroutine.sleep(3)
     windower.send_command('gs c update')
 end
 
 function auto_lockstyle()
-    if settings.ignorezones:contains(res.zones[windower.ffxi.get_info().zone].english) then
-        tokens.lockstyle = false
+    if settings.ignore_zones:contains(res.zones[windower.ffxi.get_info().zone].english) then
+        tokens.lock_style = false
         return false
     end
-    if settings.autolock then
-        coroutine.sleep(settings.zonedelay)
-        if tokens.lockstyle then
+    if settings.auto_lock then
+        coroutine.sleep(settings.zone_delay)
+        if tokens.lock_style then
             windower.send_command('input /lockstyle off')
             coroutine.sleep(1)
         end
-        windower.send_command('gs equip %s;wait 1.5;input /lockstyle on':format(settings.lockset))
-        tokens.lockstyle = true
+        windower.send_command('gs equip %s;wait 1.5;input /lockstyle on':format(settings.lock_set))
+        tokens.lock_style = true
         coroutine.sleep(3)
         windower.send_command('gs c update')
     end
@@ -116,37 +120,45 @@ windower.register_event('addon command', function(command, ...)
     if command == 'help' or command == 'h' then
         al_output(_addon.name..' v'.._addon.version..". Author: ".._addon.author)
         al_output('//al [options]')
-        al_output('   help : display this help text')
-        al_output('   autolock [ on | off ] : toggle auto lockstyle upon zone change')
-        al_output('   delay [seconds] : sets delay when zoning.')
-        al_output('   bind [keybind] : sets keybind for addon.')
-        al_output('     Examples: ^a is Ctrl+A, !f3 is Alt+F3, @= is Winkey+=')
-        al_output('        //al bind ^a, //al bind !f3, //al bind @=')
+        al_output('   help : display this help text.')
+        al_output('   autolock [ on | off ] : toggle auto lockstyle upon zone change.  (%s)':format(bool_to_str(settings.auto_lock)))
+        al_output('   lockset [gearset] : sets name of lockstyle gear set.  (%s)':format(settings.lock_set))
+        al_output('   delay [seconds] : sets delay when zoning.  (%.1fs)':format(settings.zone_delay))
+        al_output('   bind [keybind] : sets keybind.  (%s)':format(settings.key_bind))
+        al_output('     Examples: //al bind ^a, //al bind !f3, //al bind @=')
+        al_output('        ^a is Ctrl+A, !f3 is Alt+F3, @= is Winkey+=')
     elseif command == 'autolock' then
         if params[1] == 'on' then
             settings.autolock = true
-            al_output('autolock on zone is now %s.':format(booltostr(settings.autolock)))
+            al_output('Autolock on zone is now %s.':format(bool_to_str(settings.auto_lock)))
         elseif params[1] == 'off' then
             settings.autolock = false
-            al_output('autolock on zone is now %s.':format(booltostr(settings.autolock)))
+            al_output('Autolock on zone is now %s.':format(bool_to_str(settings.auto_lock)))
         else
-            al_output('Invalid argument. Usage: //al autolock [ on | off ]')
+            error('Invalid argument. Usage: //al autolock [ on | off ]')
         end
     elseif command == 'bind' then
         if params[1] then
-            windower.send_command('unbind %s':format(settings.keybind))
-            settings.keybind = params[1]
-            windower.send_command('bind %s al':format(settings.keybind))
-            al_output('Toggle keybind set to: %s':format(settings.keybind))
+            windower.send_command('unbind %s':format(settings.key_bind))
+            settings.key_bind = params[1]
+            windower.send_command('bind %s al':format(settings.key_bind))
+            al_output('Toggle key_bind set to: %s':format(settings.key_bind))
         else
-            al_output('Missing argument. Example: //al bind @= (^ for Ctrl,! for Alt, @ for Winkey)')
+            error('Missing argument. Example: //al bind @= (^ for Ctrl, ! for Alt, @ for Winkey)')
         end
     elseif command == 'delay' then
         if tonumber(params[1]) ~= nil then
-            settings.zonedelay = tonumber(params[1])
-            al_output('Zone delay set to %fs':format(settings.zonedelay))
+            settings.zone_delay = tonumber(params[1])
+            al_output('Zone delay set to %.1fs.':format(math.floor(settings.zone_delay)))
         else
-            al_output('Invalid argument: Number of seconds. Usage: //al delay 10')
+            error('Invalid argument: Number of seconds. Usage: //al delay 10')
+        end
+    elseif command == 'lockset' then
+        if params[1] then
+            settings.lock_set = params[1]
+            al_output('Lockstyle set is now: &s':format(settings.lock_set))
+        else
+            error('Missing argument. Example: //al lockset sets.lockstyle')
         end
     else
         command_lockstyle()
@@ -154,5 +166,5 @@ windower.register_event('addon command', function(command, ...)
 end)
 
 windower.register_event('unload', function()
-    windower.send_command('unbind %s':format(settings.keybind))
+    windower.send_command('unbind %s':format(settings.key_bind))
 end)
