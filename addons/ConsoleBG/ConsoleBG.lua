@@ -70,13 +70,13 @@ windower.register_event('addon command', function(command1, ...)
         command1 = consolesetting_commands[command1]
         if command1 == 'Color' then
             if ((4 > argcount) or (argcount > 4)) then
-                log('Invalid syntax. Check the "help" command.')
+                error('Invalid syntax. Check the "help" command.')
             else
                 consolesettings(command1, ...)
             end
         elseif (command1 == 'Position' or command1 == 'Size') then
             if ((2 > argcount) or (argcount > 2)) then
-                log('Invalid syntax. Check the "help" command.')        
+                error('Invalid syntax. Check the "help" command.')        
             else
                 consolesettings(command1, ...)
             end
@@ -93,7 +93,7 @@ windower.register_event('addon command', function(command1, ...)
         print('    \\crExample:\\cs(255,255,255) size 700 310\\cr - Width: 700 Height: 310')
 
     else
-        error("Unknown command! Use the 'help' command for a list of commands.")
+        error('Unknown command! Use the "help" command for a list of commands.')
     
     end
 end)
