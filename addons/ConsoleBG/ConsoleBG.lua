@@ -93,7 +93,7 @@ windower.register_event('addon command', function(command1, ...)
         print('    \\crExample:\\cs(255,255,255) size 700 310\\cr - Width: 700 Height: 310')
 
     else
-    error("Unknown command! Use the 'help' command for a list of commands.")
+        error("Unknown command! Use the 'help' command for a list of commands.")
     
     end
 end)
