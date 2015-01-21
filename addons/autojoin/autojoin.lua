@@ -6,7 +6,7 @@ packets = require('packets')
 _addon.name = 'AutoJoin'
 _addon.author = 'Arcon'
 _addon.commands = {'autojoin', 'aj'}
-_addon.version = '2.0.0.0'
+_addon.version = '2.0.0.1'
 
 defaults = {}
 defaults.mode = 'whitelist'
@@ -50,6 +50,8 @@ join = function()
         end
 
         packets.inject(join_packet)
+        coroutine.sleep(1)
+        windower.send_command('input /join')
     end
 end()
 

@@ -81,6 +81,7 @@ function load_user_files(job_id,user_file)
     end
     
     user_env = nil
+    unhandled_command_events = {}
     --registered_user_events = {}
     include_user_path = nil
     
@@ -117,6 +118,7 @@ function load_user_files(job_id,user_file)
         send_command=send_cmd_user,windower=user_windower,include=include_user,
         midaction=user_midaction,pet_midaction=user_pet_midaction,set_language=set_language,
         show_swaps = show_swaps,debug_mode=debug_mode,include_path=user_include_path,
+        register_unhandled_command=user_unhandled_command,
         
         -- Library functions
         string=string,math=math,table=table,set=set,list=list,T=T,S=S,L=L,pack=pack,
@@ -547,7 +549,7 @@ end
 function refresh_item_list(itemlist)
     retarr = make_user_table()
     for i,v in pairs(itemlist) do
-        if v.id and v.id ~= 0 then
+        if type(v) == 'table' and v.id and v.id ~= 0 then
             -- If we don't already have the primary item name in the table, add it.
             if res.items[v.id] and res.items[v.id][language] and not retarr[res.items[v.id][language]] then
                 -- We add the entry as a sub-table containing the id and count
@@ -585,7 +587,6 @@ function refresh_user_env(job_id)
         windower.send_command('@wait 1;lua i '.._addon.name..' refresh_user_env')
     else
         load_user_files(job_id)
-        --windower.send_command('@wait 0.5;lua i '.._addon.name..' load_user_files '..job_id)
     end
 end
 
@@ -651,3 +652,4 @@ function pathsearch(files_list)
     return false
 end
 
+-- Much force update

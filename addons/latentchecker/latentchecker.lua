@@ -49,7 +49,7 @@ function find_item(target_item)
         check_space()
     end
     for i,v in pairs(windower.ffxi.get_items().inventory) do
-        if v.id and res.items[v.id] and (res.items[v.id].en:lower() == target_item:lower() or res.items[v.id].enl:lower() == target_item:lower()) then
+        if type(v) == 'table' and v.id and res.items[v.id] and (res.items[v.id].en:lower() == target_item:lower() or res.items[v.id].enl:lower() == target_item:lower()) then
             print('found weapon '..target_item)
             windower.packets.inject_outgoing(0x29,string.char(0x29,6,0,0,1,0,0,0,0,bag_id,i,0x52))
             coroutine.sleep(2)
@@ -66,7 +66,7 @@ function get_back_item(target_item)
         return
     end
     for i,v in pairs(windower.ffxi.get_items()[bag:lower()]) do
-        if v.id and res.items[v.id] and (res.items[v.id].en:lower() == target_item:lower() or res.items[v.id].enl:lower() == target_item:lower()) then
+        if type(v) =='table' and v.id and res.items[v.id] and (res.items[v.id].en:lower() == target_item:lower() or res.items[v.id].enl:lower() == target_item:lower()) then
             windower.packets.inject_outgoing(0x29,string.char(0x29,6,0,0,1,0,0,0,bag_id,0,i,0x52))
             break
         end
@@ -75,7 +75,6 @@ end
 
 windower.register_event('addon command', function(command, ...)
     command = command
-    args = l{...}
     local trial_weapons = {"axe of trials","gun of trials","sword of trials","knuckles of trials","spear of trials","scythe of trials","sapara of trials",
     "bow of trials","club of trials","pole of trials ","pick of trials","dagger of trials","tachi of trials","kodachi of trials","sturdy axe","burning fists",
     "werebuster","mage's staff","vorpal sword","swordbreaker","brave blade","death sickle","double axe","dancing dagger","killer bow","windslicer","sasuke katana",

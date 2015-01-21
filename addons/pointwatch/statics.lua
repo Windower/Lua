@@ -67,6 +67,9 @@ default_settings = {
 
 -- Approved textbox commands:
 approved_commands = S{'show','hide','pos','pos_x','pos_y','font','size','pad','color','alpha','transparency','bg_color','bg_alpha','bg_transparency'}
+approved_commands = {show={n=0},hide={n=0},pos={n=2,t='number'},pos_x={n=1,t='number'},pos_y={n=1,t='number'},
+    font={n=2,t='string'},size={n=1,t='number'},pad={n=1,t='number'},color={n=3,t='number'},alpha={n=1,t='number'},
+    transparency={n=1,t='number'},bg_color={n=3,t='number'},bg_alpha={n=1,t='number'},bg_transparency={n=1,t='number'}}
 
 
 -- Dynamis TE lists:
@@ -139,7 +142,7 @@ function initialize()
         setfenv(cur_func,_G)
         dynamis.entry_time = os.clock()
         dynamis.zone = info.zone
-        error(123,'Loading PointWatch in Dynamis results in an inaccurate timer. Number of KIs is displayed.')
+        windower.add_to_chat(123,'Loading PointWatch in Dynamis results in an inaccurate timer. Number of KIs is displayed.')
     elseif info.logged_in then
         cur_func = loadstring("current_string = "..settings.strings.default)
         setfenv(cur_func,_G)

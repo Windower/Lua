@@ -46,8 +46,6 @@ box:show()
 
 initialize()
 
-
-
 windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blocked)
     if is_injected then return end
     if id == 0x29 then -- Action Message, used in Abyssea for xp
@@ -141,11 +139,15 @@ end)
 
 windower.register_event('addon command',function(...)
     local commands = {...}
-    local first_cmd = table.remove(commands,1)
-    if approved_commands[first_cmd] then
+    local first_cmd = table.remove(commands,1):lower()
+    if approved_commands[first_cmd] and #commands >= approved_commands[first_cmd].n then
         local tab = {}
-        for i,v in pairs(commands) do
+        for i,v in ipairs(commands) do
             tab[i] = tonumber(v) or v
+            if i <= approved_commands[first_cmd].n and type(tab[i]) ~= approved_commands[first_cmd].t then
+                print('Pointwatch: texts library command ('..first_cmd..') requires '..approved_commands[first_cmd].n..' '..approved_commands[first_cmd].t..'-type input'..(approved_commands[first_cmd].n > 1 and 's' or ''))
+                return
+            end
         end
         texts[first_cmd](box,unpack(tab))
         settings.text_box_settings = box._settings

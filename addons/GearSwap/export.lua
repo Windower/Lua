@@ -1,5 +1,4 @@
 function export_set(options)
-    --local temp_items,item_list = windower.ffxi.get_items(),{}
     local item_list = {}
     local targinv,xml,all_sets,use_job_in_filename,use_subjob_in_filename,overwrite_existing
     if #options > 0 then
@@ -58,7 +57,7 @@ function export_set(options)
     if targinv then
         -- Load the entire inventory
         for _,v in pairs(inv) do
-            if v.id ~= 0 then
+            if type(v) == 'table' and v.id ~= 0 then
                 if res.items[v.id] then
                     item_list[#item_list+1] = {}
                     item_list[#item_list].name = res.items[v.id][language]

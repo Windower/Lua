@@ -1,5 +1,5 @@
 --[[
-A library to handle ingame resources, as provided by the Radsources XMLs. It will look for the files in Windower/plugins/resources.
+    A library to handle ingame resources, as provided by the Radsources XMLs. It will look for the files in Windower/plugins/resources.
 ]]
 
 _libs = _libs or {}
@@ -53,9 +53,9 @@ function resource_group(r, fn, attr)
     attr = redict[attr] or attr
 
     local res = {}
-    for index, item in pairs(r) do
-        if fn(item[attr]) then
-            res[index] = item
+    for value, id in table.it(r) do
+        if fn(value[attr]) then
+            res[id] = value
         end
     end
 
@@ -63,40 +63,17 @@ function resource_group(r, fn, attr)
     return setmetatable(res, resource_mt)
 end
 
-local resource_alt_fns = {}
-
-resource_alt_fns.it = function(t)
-    local key = nil
-    return function()
-        repeat
-            key = next(t, key)
-        until type(key) == 'number' or type(key) == 'nil'
-        return rawget(t, key), key
-    end
-end
-
-resource_alt_fns.map = function(t, fn)
-    local res = T{}
-
-    for val, key in t:it() do
-        res[key] = fn(val)
-    end
-
-    return res
-end
-
-resource_alt_fns.key_map = function(t, fn)
-    local res = T{}
-
-    for val, key in t:it() do
-        res[fn(key)] = val
-    end
-
-    return res
-end
-
 resource_mt.__index = function(t, k)
-    return slots[t]:contains(k) and resource_group:endapply(k) or resource_alt_fns[k] or table[k]
+    local res = slots[t] and slots[t]:contains(k) and resource_group:endapply(k)
+
+    if not res then
+        res = table[k]
+        if class(res) == 'Resource' then
+            slots[res] = slots[t]
+        end
+    end
+
+    return res
 end
 resource_mt.__class = 'Resource'
 resource_mt.__tostring = function(t)
@@ -230,7 +207,7 @@ lookup = {
 return resources
 
 --[[
-Copyright © 2013-2014, Windower
+Copyright © 2013-2015, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

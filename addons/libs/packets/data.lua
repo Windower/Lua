@@ -21,6 +21,7 @@ data.outgoing[0x01A] = {name='Action',              description='An action being
 data.outgoing[0x01E] = {name='Volunteer',           description='Sent in response to a /volunteer command.'}
 data.outgoing[0x028] = {name='Drop Item',           description='Drops an item.'}
 data.outgoing[0x029] = {name='Move Item',           description='Move item from one inventory to another.'}
+data.outgoing[0x02B] = {name='Translate Request',   description='Request that a phrase be translated.'}
 data.outgoing[0x032] = {name='Offer Trade',         description='This is sent when you offer to trade somebody.'}
 data.outgoing[0x033] = {name='Trade Tell',          description='This packet allows you to accept or cancel a trade request.'}
 data.outgoing[0x034] = {name='Trade Item',          description='Sends the item you want to trade to the server.'}
@@ -96,6 +97,7 @@ data.outgoing[0x10A] = {name='Set Price',           description='Set the price o
 data.outgoing[0x10B] = {name='Open Bazaar',         description='Sent when opening your bazaar window to set prices.'}
 data.outgoing[0x10C] = {name='Start RoE Quest',     description='Sent to undertake a Records of Eminence Quest.'}
 data.outgoing[0x10D] = {name='Cancel RoE Quest',    description='Sent to cancel a Records of Eminence Quest.'}
+data.outgoing[0x10E] = {name='Accept RoE Reward',   description='Accept an RoE qust reward that was not given automatically due to inventory restrictions.'}
 data.outgoing[0x10F] = {name='Currency Menu',       description='Requests currency information for the menu.'}
 data.outgoing[0x110] = {name='Fishing Action',      description='Sent when casting, releasing a fish, catching a fish, and putting away your fishing rod.'}
 data.outgoing[0x111] = {name='Lockstyle',           description='Sent when using the lockstyle command to lock or unlock.'}
@@ -146,6 +148,7 @@ data.incoming[0x03E] = {name='Open Buy/Sell',       description='Opens the buy/s
 data.incoming[0x041] = {name='Blacklist',           description='Contains player ID and name for blacklist.'}
 data.incoming[0x042] = {name='Blacklist Command',   description='Sent in response to /blacklist add or /blacklist delete.'}
 data.incoming[0x044] = {name='Job Info Extra',      description='Contains information about Automaton stats and set Blue Magic spells.'}
+data.incoming[0x047] = {name='Translate Response',  description='Response to a translate request.'}
 data.incoming[0x04B] = {name='Logout Acknowledge',  description='Acknowledges a logout attempt.'}
 data.incoming[0x04B] = {name='Delivery Item',       description='Item in delivery box.'}
 data.incoming[0x04C] = {name='Auction House Menu',  description='Sent when visiting auction counter.'}

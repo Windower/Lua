@@ -129,7 +129,6 @@ function enable(...)
     if type(enable_tab[1]) == 'table' then
         enable_tab = enable_tab[1] -- Compensates for people passing a table instead of a series of strings.
     end
-    --items = windower.ffxi.get_items()
     local sending_table = {}
     for i,v in pairs(enable_tab) do
         local local_slot = get_default_slot(v)
@@ -257,6 +256,13 @@ function user_equip_sets(func)
                 return gearswap.equip_sets(func,nil,...)
             end
         end,user_env)
+end
+
+function user_unhandled_command(func)
+    if type(func) ~= 'function' then
+        error('\nGearSwap: unhandled_command was passed an invalid value ('..tostring(func)..'). (must be a function)', 2)
+    end
+    unhandled_command_events[#unhandled_command_events+1] = setfenv(func,user_env)
 end
 
 function include_user(str, load_include_in_this_table)

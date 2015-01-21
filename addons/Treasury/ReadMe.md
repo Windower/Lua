@@ -1,7 +1,7 @@
 # Treasury
 
 An addon that manages the treasure pool for you and keeps your inventory clean of unwanted items. It does three things:
-1. It lots/passes on items based on per-character rules as defined in the settings file
+1. It lots/passes on items in the treasure pool based on per-character rules as defined in the settings file
 2. It automatically stacks items in your inventory after it changes, if enabled
 3. If automatically drops unwanted items from your inventory, if enabled
 

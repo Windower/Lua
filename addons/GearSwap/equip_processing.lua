@@ -123,8 +123,8 @@ function unpack_equip_list(equip_list)
     local inventories = {[0]=items.inventory,[8]=items.wardrobe}
     
     for bag_id,inventory in pairs(inventories) do
-        for _,item_tab in pairs(inventory) do
-            if check_wearable(item_tab.id) then
+        for _,item_tab in ipairs(inventory) do
+            if type(item_tab) == 'table' and check_wearable(item_tab.id) then
                 if item_tab.status == 0 or item_tab.status == 5 then -- Make sure the item is either equipped or not otherwise committed. eliminate_redundant will take care of the already-equipped gear.
                     for slot_id,slot_name in pairs(default_slot_map) do
                         -- equip_list[slot_name] can also be a table (that doesn't contain a "name" property) or a number, which are both cases that should not generate any kind of equipment changing.
@@ -251,7 +251,7 @@ function to_names_set(equipment)
     
     for ind,cur_item in pairs(equipment) do
         local name = 'empty'
-        if cur_item.slot ~= empty then
+        if type(cur_item) == 'table' and cur_item.slot ~= empty then
             if items[to_windower_api(res.bags[cur_item.bag_id].english)][cur_item.slot].id == 0 then return {} end
             -- refresh_player() can run after equip packets arrive but before the item array is fully loaded,
             -- which results in the id still being the initialization value.
@@ -281,6 +281,7 @@ end
 ---- none
 -----------------------------------------------------------------------------------
 function equip_piece(eq_slot_id,bag_id,inv_slot_id)
+    -- Many complicated, wow!
     local cur_eq_tab = items.equipment[toslotname(eq_slot_id)]
     
     if cur_eq_tab.slot ~= empty then

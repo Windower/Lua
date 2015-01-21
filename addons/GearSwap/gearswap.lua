@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.899'
+_addon.version = '0.900'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -207,7 +207,16 @@ windower.register_event('addon command',function (...)
         table.remove(splitup,1)
         assert(loadstring(table.concat(splitup,' ')))()
     else
-        print('GearSwap: Command not found')
+        local handled = false
+        if not gearswap_disabled then
+            for i,v in ipairs(unhandled_command_events) do
+                handled = equip_sets(v,nil,unpack(splitup))
+                if handled then break end
+            end
+        end
+        if not handled then
+            print('GearSwap: Command not found')
+        end
     end
 end)
 
@@ -278,6 +287,8 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         player.sub_job_id = data:byte(0xB8)
         player.vitals.max_hp = data:unpack('I',0xE9)
         player.vitals.max_mp = data:unpack('I',0xED)
+        player.max_hp = data:unpack('I',0xE9)
+        player.max_mp = data:unpack('I',0xED)
         update_job_names()
         
         world.zone_id = data:unpack('H',0x31)
@@ -465,6 +476,8 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
     elseif id == 0x061 then
         player.vitals.max_hp = data:unpack('I',5)
         player.vitals.max_mp = data:unpack('I',9)
+        player.max_hp = data:unpack('I',5)
+        player.max_mp = data:unpack('I',9)
         player.main_job_id = data:byte(13)
         player.main_job_level = data:byte(14)
         
@@ -495,6 +508,24 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         player.vitals.tp = data:unpack('I',0x11)
         player.vitals.hpp = data:byte(0x17)
         player.vitals.mpp = data:byte(0x18)
+        
+        player.hp = data:unpack('I',9)
+        player.mp = data:unpack('I',13)
+        player.tp = data:unpack('I',0x11)
+        player.hpp = data:byte(0x17)
+        player.mpp = data:byte(0x18)
+    elseif id == 0x0E2 and data:unpack('I',5)==player.id then
+        player.vitals.hp = data:unpack('I',9)
+        player.vitals.mp = data:unpack('I',0xB)
+        player.vitals.tp = data:unpack('I',0x11)
+        player.vitals.hpp = data:byte(0x1E)
+        player.vitals.mpp = data:byte(0x1F)
+        
+        player.hp = data:unpack('I',9)
+        player.mp = data:unpack('I',0xB)
+        player.tp = data:unpack('I',0x11)
+        player.hpp = data:byte(0x1E)
+        player.mpp = data:byte(0x1F)
     elseif id == 0x117 then
         for i=0x49,0x85,4 do
             local arr = data:sub(i,i+3)
@@ -538,7 +569,7 @@ windower.register_event('gain buff',function(buff_id)
     end
     
     refresh_globals()
-    equip_sets('buff_change',nil,buff_name,true)
+    equip_sets('buff_change',nil,buff_name,true,copy_entry(res.buffs[buff_id]))
 end)
 
 windower.register_event('lose buff',function(buff_id)
@@ -549,7 +580,7 @@ windower.register_event('lose buff',function(buff_id)
     windower.debug('lose buff '..buff_name..' ('..tostring(buff_id)..')')
     if gearswap_disabled then return end
     refresh_globals()
-    equip_sets('buff_change',nil,buff_name,false)
+    equip_sets('buff_change',nil,buff_name,false,copy_entry(res.buffs[buff_id]))
 end)
 
 windower.register_event('login',function(name)
