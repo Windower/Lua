@@ -50,6 +50,8 @@ join = function()
         end
 
         packets.inject(join_packet)
+        coroutine.sleep(2)
+        packets.inject(join_packet)
     end
 end()
 
