@@ -121,7 +121,7 @@ function initialize()
         pearlescent = 0,
         ebon = 0,
         silvery = 0,
-        gold = 0,
+        golden = 0,
         time_remaining = 0,
     }
     
