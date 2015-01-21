@@ -244,7 +244,7 @@ zone_message_functions = {
         abyssea.silvery = math.min(abyssea.silvery + 5*(p1+1),200) -- faint = 5, mild = 10, strong = 15
     end,
     golden_light = function(p1,p2,p3,p4)
-        abyssea.golden = math.min(abyssea.golden + 5*(p1+1),200) -- faint = 5, mild = 10, strong = 15
+        abyssea.gold = math.min(abyssea.gold + 5*(p1+1),200) -- faint = 5, mild = 10, strong = 15
     end,
     pearl_ebon_gold_silvery = function(p1,p2,p3,p4)
         abyssea.pearlescent = p1
