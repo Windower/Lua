@@ -142,7 +142,7 @@ function initialize()
         setfenv(cur_func,_G)
         dynamis.entry_time = os.clock()
         dynamis.zone = info.zone
-        error(123,'Loading PointWatch in Dynamis results in an inaccurate timer. Number of KIs is displayed.')
+        windower.add_to_chat(123,'Loading PointWatch in Dynamis results in an inaccurate timer. Number of KIs is displayed.')
     elseif info.logged_in then
         cur_func = loadstring("current_string = "..settings.strings.default)
         setfenv(cur_func,_G)

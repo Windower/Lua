@@ -249,7 +249,7 @@ zone_message_functions = {
     pearl_ebon_gold_silvery = function(p1,p2,p3,p4)
         abyssea.pearlescent = p1
         abyssea.ebon = p2
-        abyssea.gold = p3
+        abyssea.golden = p3
         abyssea.silvery = p4
     end,
     azure_ruby_amber = function(p1,p2,p3,p4)

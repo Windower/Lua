@@ -1,6 +1,6 @@
 _addon.name = 'Logger'
-_addon.author = ''
-_addon.version = '1.0.0.0'
+_addon.author = 'Aikar'
+_addon.version = '1.0.1.0'
 
 require('chat')
 files = require('files')
@@ -11,7 +11,11 @@ windower.register_event('login', function(new_name)
     name = new_name
 end)
 
-windower.register_event('incoming text', function(_, text)
+windower.register_event('incoming text', function(_, text, _, _, blocked)
+    if blocked then
+        return
+    end
+
     local date = os.date('*t')
 
     local file = files.new('../../logs/%s_%.4u.%.2u.%.2u.log':format(name, date.year, date.month, date.day))

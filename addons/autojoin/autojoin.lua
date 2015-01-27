@@ -6,7 +6,7 @@ packets = require('packets')
 _addon.name = 'AutoJoin'
 _addon.author = 'Arcon'
 _addon.commands = {'autojoin', 'aj'}
-_addon.version = '2.0.0.0'
+_addon.version = '2.0.0.1'
 
 defaults = {}
 defaults.mode = 'whitelist'
@@ -34,9 +34,9 @@ rm_strs = S{'r', 'rm', 'remove', '-'}
 dec_strs = S{'decline', 'autodecline', 'auto-decline'}
 alias_strs = aliases:keyset()
 
-join = function()
+do
     local join_packet = packets.new('outgoing', 0x074, {Join = true})
-    return function()
+    join = function()
         local time = 0
         -- Wait until pool is empty...
         while not table.empty(windower.ffxi.get_items().treasure) do
@@ -50,15 +50,15 @@ join = function()
         end
 
         packets.inject(join_packet)
+        windower.send_command:schedule(1, 'input /join')
     end
-end()
 
-decline = function()
     local decline_packet = packets.new('outgoing', 0x074, {Join = false})
-    return function()
+    decline = function()
         packets.inject(decline_packet)
+        windower.send_command:schedule(1, 'input /decline')
     end
-end()
+end
 
 -- Invite handler
 windower.register_event('party invite', function(sender)
@@ -181,7 +181,7 @@ windower.register_event('addon command', function(command, ...)
 end)
 
 --[[
-Copyright © 2013-2014, Windower
+Copyright © 2013-2015, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

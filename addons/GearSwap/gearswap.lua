@@ -569,7 +569,7 @@ windower.register_event('gain buff',function(buff_id)
     end
     
     refresh_globals()
-    equip_sets('buff_change',nil,buff_name,true)
+    equip_sets('buff_change',nil,buff_name,true,copy_entry(res.buffs[buff_id]))
 end)
 
 windower.register_event('lose buff',function(buff_id)
@@ -580,7 +580,7 @@ windower.register_event('lose buff',function(buff_id)
     windower.debug('lose buff '..buff_name..' ('..tostring(buff_id)..')')
     if gearswap_disabled then return end
     refresh_globals()
-    equip_sets('buff_change',nil,buff_name,false)
+    equip_sets('buff_change',nil,buff_name,false,copy_entry(res.buffs[buff_id]))
 end)
 
 windower.register_event('login',function(name)

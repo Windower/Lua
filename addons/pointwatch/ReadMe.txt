@@ -54,7 +54,7 @@ Here are the available values:
 * abyssea.azure           = Azure light estimation
 * abyssea.ruby            = Ruby light estimation
 * abyssea.pearlescent     = Pearlescent light estimation
-* abyssea.gold            = Gold light estimation
+* abyssea.golden          = Gold light estimation
 * abyssea.silvery         = Silvery light estimation
 * abyssea.ebon            = Ebon light estimation
 * abyssea.last_time       = The last time you got a time message, in seconds.  -- Not implemented

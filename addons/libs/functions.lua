@@ -141,13 +141,17 @@ function functions.it(fn, ...)
 end
 
 -- Schedules the current function to run delayed by the provided time in seconds
-functions.schedule = coroutine.schedule
+function functions.schedule(fn, time, ...)
+    coroutine.schedule(fn:prepare(...), time)
+end
 
 -- Returns a function that, when called, will execute the underlying function delayed by the provided number of seconds
-function functions.delay(fn, time)
-    return function()
-        fn:schedule(time)
-    end
+function functions.delay(fn, time, ...)
+	local args = {...}
+
+	return function()
+		fn:schedule(time, unpack(args))
+	end
 end
 
 -- Returns a wrapper table representing the provided function with additional functions:

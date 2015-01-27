@@ -49,7 +49,7 @@
   <addon>
     <name>autolock</name>
     <author>Bangerang</author>
-    <description>Automatically uses lockstyle command upon zoning outside of town. Optionally, use a set defined in a gearswap lua.</description>
+    <description>Automatically uses lockstyle command upon zoning, excluding cities. Optionally, use a set defined in a gearswap lua.</description>
     <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Asura/Bangerang</support>
   </addon>
@@ -282,7 +282,7 @@
   </addon>
   <addon>
     <name>obiaway</name>
-    <description>Automatically remove elemental obis based on day/weather/storm conditions.</description>
+    <description>Automatically collect and remove elemental obi based on day/weather/storm conditions.</description>
     <support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
