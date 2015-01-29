@@ -202,6 +202,17 @@ function table.tovstring(t, keys, indentlevel)
 
     for i, key in pairs(kt) do
         val = t[key]
+        
+        local function sanitize(val)
+            local ret
+            if type(val) == 'string' then
+                ret = '"' .. val:escape() .. '"'
+            else
+                ret = tostring(val)
+            end
+            return ret
+        end
+        
         -- Check for nested tables
         if type(val) == 'table' then
             if val.tovstring then
@@ -209,23 +220,15 @@ function table.tovstring(t, keys, indentlevel)
             else
                 valstr = table.tovstring(val, keys, indentlevel + 1)
             end
-        end
-        
-        local function sanitize(val)
-            local valstr
-            if type(val) == 'string' then
-                valstr = '"' .. val .. '"'
-            else
-                valstr = tostring(val)
-            end
-            return valstr
+        else
+            valstr = sanitize(val)
         end
 
         -- Append one line with indent.
         if not keys and tonumber(key) then
-            tstr = tstr .. indent .. '    ' .. '[' .. sanitize(key) .. ']=' .. sanitize(val)
+            tstr = tstr .. indent .. '    ' .. '[' .. sanitize(key) .. ']=' .. valstr
         else
-            tstr = tstr .. indent .. '    ' .. '[' .. sanitize(key) .. ']=' .. sanitize(val)
+            tstr = tstr .. indent .. '    ' .. '[' .. sanitize(key) .. ']=' .. valstr
         end
 
         -- Add comma, unless it's the last value.
