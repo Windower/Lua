@@ -197,7 +197,7 @@ function table.tovstring(t, keys, indentlevel)
         kt[k] = key
     end
     table.sort(kt, function(x, y)
-        return type(x) ~= type(y) and type(x) == 'number' or x < y
+        return type(x) ~= type(y) and type(x) == 'number' or type(x) == 'number' and type(y) == 'number' and x < y
     end)
 
     for i, key in pairs(kt) do
@@ -209,19 +209,23 @@ function table.tovstring(t, keys, indentlevel)
             else
                 valstr = table.tovstring(val, keys, indentlevel + 1)
             end
-        else
+        end
+        
+        local function sanitize(val)
+            local valstr
             if type(val) == 'string' then
                 valstr = '"' .. val .. '"'
             else
                 valstr = tostring(val)
             end
+            return valstr
         end
 
         -- Append one line with indent.
         if not keys and tonumber(key) then
-            tstr = tstr .. indent .. '    ' .. valstr
+            tstr = tstr .. indent .. '    ' .. '[' .. sanitize(key) .. ']=' .. sanitize(val)
         else
-            tstr = tstr .. indent .. '    ' .. tostring(key) .. '=' .. valstr
+            tstr = tstr .. indent .. '    ' .. '[' .. sanitize(key) .. ']=' .. sanitize(val)
         end
 
         -- Add comma, unless it's the last value.
