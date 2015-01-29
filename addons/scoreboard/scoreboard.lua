@@ -473,7 +473,7 @@ end
 
 config.register(settings, function(settings)
     update_dps_clock:loop(settings.UpdateFrequency)
-    display:visibility(windower.ffxi.get_info().logged_in)
+    display:visibility(display.visible and windower.ffxi.get_info().logged_in)
 end)
 
 
