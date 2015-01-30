@@ -206,7 +206,7 @@ function table.tovstring(t, keys, indentlevel)
         local function sanitize(val)
             local ret
             if type(val) == 'string' then
-                ret = '"' .. val:escape() .. '"'
+                ret = '"' .. val:gsub('"','\\"') .. '"'
             else
                 ret = tostring(val)
             end
