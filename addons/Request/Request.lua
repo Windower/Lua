@@ -122,7 +122,6 @@ function request(message, player)
 	if request == nil then request = ' ' end
 	if target == nil then target = ' ' end
 
-
 	-- Check to see if valid player is issuing a command with your nick, and check it against the list of forbidden commands.
 	if settings.nicknames:contains(nick:ucfirst()) and not settings.forbidden:contains(request:ucfirst()) then
 		--Party commands to check.
@@ -148,7 +147,6 @@ function request(message, player)
 			windower.send_command(''..exactcommand..'')
 		--Anything else, mostly send on to shortcuts and user aliases, could potentially send short addon commands.
 		elseif settings.requestlock == "off" then
-
 			if request == "quit" or request == "stop" then windower.send_command('attackoff')
 			elseif target == "bt" or target == "it" or target == "this" or target == "t" then windower.send_command(''..request..' <bt>')
 			elseif target == "us" or target == "yourself" then windower.send_command(''..request..' <me>')
