@@ -12,6 +12,7 @@ Abbreviation: //rq, //request
 Commands:
 * <whitelist|blacklist> <add|remove> <player> - adds or removes a player from blacklist or whitelist.
 * <nickname> <add|remove> <word> - adds or removes a word from nickname list.
+* <forbidden> <add|remove> <word> - adds or removes a word from forbidden list.
 * mode <whitelist|blacklist> - changes to whitelist or blacklist, if no mode specified then it will print current mode.
 * Partylock <on|off> - turns party lock on or off, if no status specified then it will print current status.
 * Requestlock <on|off> - turns request lock on or off, if no status specified then it will print current status.
@@ -24,4 +25,5 @@ Be careful with exact lock, if off it will allow anyone on your whitelist or any
 input whatever they want as if they were at your console.
 
 Without the use of shortcuts, Request has little functionality outside of party management, I highly reccomend using it.
-With creative use of aliases, you can have Request do almost anything you want and still be relatively safe.
+With creative use of aliases and forbidden commands, you can have Request do almost anything you want and still be relatively safe.
+You may wish to add the names of the plugins or addons you use to the forbidden list to prevent people from using addonname unload, etc.

@@ -39,6 +39,7 @@ defaults.mode = 'whitelist'
 defaults.whitelist = S{}
 defaults.blacklist = S{}
 defaults.nicknames = S{}
+defaults.forbidden = S{}
 defaults.partylock = 'on'
 defaults.exactlock = 'on'
 defaults.requestlock = 'off'
@@ -73,6 +74,8 @@ aliases = T{
 	elock		 = 'exactlock',
 	xlock		 = 'exactlock',
 	xl			 = 'exactlock',
+	forbidden	 = 'forbidden',
+	forbid		 = 'forbidden',
 }
 
 -- Aliases to access the add and item_to_remove routines.
@@ -105,22 +108,24 @@ windower.register_event('chat message', function(message, player, mode, is_gm)
 
 end)
 
--- Attempts to send a request
+-- Attempts to send a request, Quick Debug Line: windower.send_command('input /echo '..nick..' '..request..' '..target..'')
 function request(message, player)
 
 	local nick
 	local request
 	local target
 
-	nick, request = string.match(message:lower(), '^%s*(%a+)%s*([:/%-%a*%d*]+)%s*')
-	target = string.match(message:lower(), '^%a+%s*[:/%-%a*%d*]+%s*(%a+)')
+	nick, request = string.match(message:lower(), '^%s*(%a+)%s+([:/%-%a*%d*]+)')
+	target = string.match(message:lower(), '^%s*%a+%s+[:/%-%a*%d*]+%s+(%a+)')
 	
-	if nick == nil then nick = 'none' end
-	if request == nil then request = 'none' end
-	if target == nil then target = 'none' end
-	
-	if settings.nicknames:contains(nick:ucfirst()) then
+	if nick == nil then nick = ' ' end
+	if request == nil then request = ' ' end
+	if target == nil then target = ' ' end
 
+
+	-- Check to see if valid player is issuing a command with your nick, and check it against the list of forbidden commands.
+	if settings.nicknames:contains(nick:ucfirst()) and not settings.forbidden:contains(request:ucfirst()) then
+		--Party commands to check.
 		if settings.partylock == "off" and request == "pass" and (target == "lead" or target == "leader") then
 			windower.send_command('input /pcmd leader '..player..'')
 	
@@ -131,20 +136,20 @@ function request(message, player)
 			windower.send_command('input /join')
 			
 		elseif settings.partylock == "off" and request == "invite" then
-			if target == "me" or target == "none" then windower.send_command('input /pcmd add '..player..'')
+			if target == "me" or target == " " then windower.send_command('input /pcmd add '..player..'')
 			else windower.send_command('input /pcmd add '..target..'')
 			end
 			
 		elseif settings.partylock == "off" and request == "kick" then
 			windower.send_command('input /pcmd kick '..target..'')
-
+		--Exact Command?
 		elseif request == "exact" and settings.exactlock == "off" then
 			exactcommand = string.match(message, '%a+ exact (.*)')
 			windower.send_command(''..exactcommand..'')
-		
+		--Anything else, mostly send on to shortcuts and user aliases, could potentially send short addon commands.
 		elseif settings.requestlock == "off" then
 
-			if request == "quit" then windower.send_command('attackoff')
+			if request == "quit" or request == "stop" then windower.send_command('attackoff')
 			elseif target == "bt" or target == "it" or target == "this" or target == "t" then windower.send_command(''..request..' <bt>')
 			elseif target == "us" or target == "yourself" then windower.send_command(''..request..' <me>')
 			elseif target == "me" or target == "now" or target == nil then windower.send_command(''..request..' '..player..'')
@@ -165,7 +170,9 @@ function add_item(mode, ...)
     if not doubles:empty() then
         if aliases[mode] == 'nicknames' then
             notice('nickname':plural(doubles)..' '..doubles:format()..' already on nickname list.')
-        else
+        elseif aliases[mode] == 'forbidden' then
+			notice('forbidden':plural(doubles)..' '..doubles:format()..' already on forbidden list.')
+		else
             notice('User':plural(doubles)..' '..doubles:format()..' already on '..aliases[mode]..'.')
         end
     end
@@ -183,7 +190,9 @@ function remove_item(mode, ...)
     if not dummy:empty() then
         if aliases[mode] == 'nicknames' then
             notice('nickname':plural(dummy)..' '..dummy:format()..' not found on nickname list.')
-        else
+        elseif aliases[mode] == 'forbidden' then
+			notice('forbidden':plural(dummy)..' '..dummy:format()..' not found on forbidden list.')
+		else
             notice('User':plural(dummy)..' '..dummy:format()..' not found on '..aliases[mode]..'.')
         end
     end
@@ -283,6 +292,7 @@ windower.register_event('addon command', function(command, ...)
         log('Whitelist:', settings.whitelist:empty() and '(empty)' or settings.whitelist:format('csv'))
         log('Blacklist:', settings.blacklist:empty() and '(empty)' or settings.blacklist:format('csv'))
 		log('Nicknames:', settings.nicknames:empty() and '(empty)' or settings.nicknames:format('csv'))
+		log('Forbidden Commands:', settings.forbidden:empty() and '(empty)' or settings.forbidden:format('csv'))
 		log('Party Lock:', settings.partylock)
 		log('Request Lock:', settings.requestlock)
 		log('Exact Lock:', settings.exactlock)
