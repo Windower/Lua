@@ -10,8 +10,4 @@
         <requestlock>off</requestlock>
         <whitelist />
     </global>
-    <selindrile>
-        <nicknames>Seli</nicknames>
-        <whitelist>Selindrile</whitelist>
-    </selindrile>
 </settings>
