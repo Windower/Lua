@@ -1,5 +1,5 @@
 --[[
-Copyright (c) 2013, Registry
+Copyright (c) 2015, Selindrile
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -17,7 +17,7 @@ modification, are permitted provided that the following conditions are met:
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL Registry BE LIABLE FOR ANY
+DISCLAIMED. IN NO EVENT SHALL Selindrile BE LIABLE FOR ANY
 DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
@@ -108,11 +108,16 @@ end)
 -- Attempts to send a request
 function request(message, player)
 
+	local nick
 	local request
 	local target
 
-	nick, request = string.match(message:lower(), '^(%a+)%s*([:/%-%a*%d*]+)%s*')
+	nick, request = string.match(message:lower(), '^%s*(%a+)%s*([:/%-%a*%d*]+)%s*')
 	target = string.match(message:lower(), '^%a+%s*[:/%-%a*%d*]+%s*(%a+)')
+	
+	if nick == nil then nick = 'none' end
+	if request == nil then request = 'none' end
+	if target == nil then target = 'none' end
 	
 	if settings.nicknames:contains(nick:ucfirst()) then
 
@@ -126,7 +131,7 @@ function request(message, player)
 			windower.send_command('input /join')
 			
 		elseif settings.partylock == "off" and request == "invite" then
-			if target == "me" or target == nil then windower.send_command('input /pcmd add '..player..'')
+			if target == "me" or target == "none" then windower.send_command('input /pcmd add '..player..'')
 			else windower.send_command('input /pcmd add '..target..'')
 			end
 			
