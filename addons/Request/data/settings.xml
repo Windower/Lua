@@ -3,7 +3,7 @@
     <global>
         <blacklist />
         <exactlock>on</exactlock>
-        <forbidden>Lua,U,Reload,Quit,Treasury,Unload,L,Exec,Load,S</forbidden>
+        <forbidden>Lua,U,Reload,Quit,Treasury,Unload,L,Exec,Load,S,P</forbidden>
         <mode>whitelist</mode>
         <nicknames />
         <partylock>on</partylock>
