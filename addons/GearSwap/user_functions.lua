@@ -195,17 +195,17 @@ function print_set(set,title)
     if #set == table.length(set) then
         for i,v in ipairs(set) do
             if type(v) == 'table' and v.name then
-                windower.add_to_chat(8,windower.to_shift_jis(tostring(i))..' '..windower.to_shift_jis(tostring(v.name))..' (Adv.)')
+                windower.add_to_chat(1,string.char(0x1F,0x08)..windower.to_shift_jis(tostring(i))..' '..windower.to_shift_jis(tostring(v.name))..' (Adv.)'..string.char(0x1E,0x01))
             else
-                windower.add_to_chat(8,windower.to_shift_jis(tostring(i))..' '..windower.to_shift_jis(tostring(v)))
+                windower.add_to_chat(1,string.char(0x1F,0x08)..windower.to_shift_jis(tostring(i))..' '..windower.to_shift_jis(tostring(v))..string.char(0x1E,0x01))
             end
         end
     else
         for i,v in pairs(set) do
             if type(v) == 'table' and v.name then
-                windower.add_to_chat(8,windower.to_shift_jis(tostring(i))..' '..windower.to_shift_jis(tostring(v.name))..' (Adv.)')
+                windower.add_to_chat(1,string.char(0x1F,0x08)..windower.to_shift_jis(tostring(i))..' '..windower.to_shift_jis(tostring(v.name))..' (Adv.)'..string.char(0x1E,0x01))
             else
-                windower.add_to_chat(8,windower.to_shift_jis(tostring(i))..' '..windower.to_shift_jis(tostring(v)))
+                windower.add_to_chat(1,string.char(0x1F,0x08)..windower.to_shift_jis(tostring(i))..' '..windower.to_shift_jis(tostring(v))..string.char(0x1E,0x01))
             end
         end
     end
