@@ -10,7 +10,7 @@ function export_set(options)
             elseif S{'sets','set','s'}:contains(v:lower()) then
                 all_sets = true
                 if not user_env or not user_env.sets then
-                    windower.add_to_chat(123,'GearSwap: Cannot export the sets table of the current file because there is no file loaded.')
+                    gs_add_to_chat(123,'Cannot export the sets table of the current file because there is no file loaded.')
                     return
                 end
             elseif v:lower() == 'mainjob' then
@@ -23,7 +23,7 @@ function export_set(options)
         end
     end
     
-    local buildmsg = 'GearSwap: Exporting '
+    local buildmsg = 'Exporting '
     if targinv then
         buildmsg = buildmsg..'your current inventory'
     elseif all_sets then
@@ -47,7 +47,7 @@ function export_set(options)
         buildmsg = buildmsg..' Will overwrite existing files with same name.'
     end
     
-    windower.add_to_chat(123,buildmsg)
+    gs_add_to_chat(123,buildmsg)
     
     if not windower.dir_exists(windower.addon_path..'data/export') then
         windower.create_dir(windower.addon_path..'data/export')
@@ -77,7 +77,7 @@ function export_set(options)
                         end
                     end
                 else
-                    windower.add_to_chat(123,'GearSwap: You possess an item that is not in the resources yet.')
+                    gs_add_to_chat(123,'You possess an item that is not in the resources yet.')
                 end
             end
         end
@@ -122,14 +122,14 @@ function export_set(options)
                         end
                     end
                 else
-                    windower.add_to_chat(123,'GearSwap: You are wearing an item that is not in the resources yet.')
+                    gs_add_to_chat(123,'You are wearing an item that is not in the resources yet.')
                 end
             end
         end
     end
     
     if #item_list == 0 then
-        windower.add_to_chat(123,'GearSwap: There is nothing to export.')
+        gs_add_to_chat(123,'There is nothing to export.')
         return
     else
         local not_empty
@@ -140,7 +140,7 @@ function export_set(options)
             end
         end
         if not not_empty then
-            windower.add_to_chat(123,'GearSwap: There is nothing to export.')
+            gs_add_to_chat(123,'There is nothing to export.')
             return
         end
     end
@@ -200,10 +200,10 @@ end
 function unpack_names(ret_tab,up,tab_level,unpacked_table,exported)
     for i,v in pairs(tab_level) do
         local flag,alt
-        if type(v)=='table' and not ret_tab[tostring(tab_level[i])] then
+        if type(v)=='table' and i ~= 'augments' and not ret_tab[tostring(tab_level[i])] then
             ret_tab[tostring(tab_level[i])] = true
             unpacked_table,exported = unpack_names(ret_tab,i,v,unpacked_table,exported)
-        elseif i=='name' then
+        elseif i=='name' and type(v) == 'string' then
             alt = up
             flag = true
         elseif type(v) == 'string' and v~='augment' and v~= 'augments' and v~= 'priority' then
@@ -216,6 +216,18 @@ function unpack_names(ret_tab,up,tab_level,unpacked_table,exported)
                 local tempname,tempslot = unlogify_unpacked_name(v)
                 unpacked_table[#unpacked_table].name = tempname
                 unpacked_table[#unpacked_table].slot = tempslot or alt
+                if tab_level.augments then
+                    local aug_str = ''
+                    for aug_ind,augment in pairs(tab_level.augments) do
+                        if augment ~= 'none' then aug_str = aug_str.."'"..augment.."'," end
+                    end
+                    if aug_str ~= '' then unpacked_table[#unpacked_table].augments = aug_str end
+                end
+                if tab_level.augment then
+                    local aug_str = unpacked_table[#unpacked_table].augments or ''
+                    if tab_level.augment ~= 'none' then aug_str = aug_str.."'"..augment.."'," end
+                    if aug_str ~= '' then unpacked_table[#unpacked_table].augments = aug_str end
+                end
                 exported[tempname:lower()] = true
                 exported[v:lower()] = true
             end
@@ -232,13 +244,13 @@ function unlogify_unpacked_name(name)
             if v[language..'_log']:lower() == name then
                 name = v[language]
                 local potslots = v.slots
-                if potslots then potslots = res.slots[potslots:it()()].english:gsub(' ','_') end
+                if potslots then potslots = to_windower_api(res.slots[potslots:it()()].english) end
                 slot = potslots or 'item'
                 break
             elseif v[language]:lower() == name then
                 name = v[language]
                 local potslots = v.slots
-                if potslots then potslots = res.slots[potslots:it()()].english:gsub(' ','_') end
+                if potslots then potslots = to_windower_api(res.slots[potslots:it()()].english) end
                 slot = potslots or 'item'
                 break
             end

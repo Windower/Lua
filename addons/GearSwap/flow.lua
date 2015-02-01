@@ -49,7 +49,7 @@ function equip_sets(swap_type,ts,...)
     _global.current_event = tostring(swap_type)
     
     windower.debug(tostring(swap_type)..' enter')
-    if showphase or debugging.general then windower.add_to_chat(8,windower.to_shift_jis(tostring(swap_type))..' enter') end
+    if showphase or debugging.general then debug_mode_chat(8,windower.to_shift_jis(tostring(swap_type))..' enter') end
     
     local cur_equip = table.reassign({},items.equipment)
         
@@ -88,7 +88,7 @@ function equip_sets(swap_type,ts,...)
     
     if not val1 then val1 = {}
         if debugging.general then
-            windower.add_to_chat(8,'val1 error')
+            debug_mode_chat(8,'val1 error')
         end
     end
 
@@ -227,7 +227,7 @@ function equip_sets_exit(swap_type,ts,val1)
                         end
                     end
                 else
-                    windower.add_to_chat(8,"GearSwap: Hark, what weird prefix through yonder window breaks? "..tostring(spell.prefix))
+                    gs_add_to_chat(8,"Hark, what weird prefix through yonder window breaks? "..tostring(spell.prefix))
                 end
             end
             
@@ -294,7 +294,7 @@ function user_pcall(str,...)
             bool,err = pcall(user_env[str],...)
             if not bool then error('\nGearSwap has detected an error in the user function '..str..':\n'..err) end
         elseif user_env[str] then
-            windower.add_to_chat(123,'GearSwap: '..windower.to_shift_jis(tostring(str))..'() exists but is not a function')
+            gs_add_to_chat(123,windower.to_shift_jis(tostring(str))..'() exists but is not a function')
         end
     end
 end

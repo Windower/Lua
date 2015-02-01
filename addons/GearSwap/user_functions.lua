@@ -350,7 +350,7 @@ end
 function add_to_chat_user(num,str)
     local backup_str
     if type(num) == 'string' then
-        -- It was only pased one argument, a string.
+        -- It was only passed one argument, a string.
         backup_str = num
         num = 8
     elseif not num and str and type(str) == 'string' then
@@ -359,9 +359,9 @@ function add_to_chat_user(num,str)
     end
     
     if language == 'japanese' then
-        windower.add_to_chat(num,windower.to_shift_jis(str or backup_str))
+        windower.add_to_chat(1,string.char(0x1F,num%256)..windower.to_shift_jis(str or backup_str)..string.char(0x1E,0x01))
     else
-        windower.add_to_chat(num,str or backup_str)
+        windower.add_to_chat(1,string.char(0x1F,num%256)..(str or backup_str)..string.char(0x1E,0x01))
     end
 end
 

@@ -662,7 +662,7 @@ end
 -----------------------------------------------------------------------------------
 function filter_precast(spell)
     if not spell.target.id or not spell.target.index then
-        if debugging.general then windower.add_to_chat(8,'No target id or index') end
+        if debugging.general then debug_mode_chat('No target id or index') end
         return false
     end
     return true
@@ -718,7 +718,7 @@ function cmd_reg:new_entry(sp)
     end
     rawset(self,ts,{pretarget_cast_delay=0, precast_cast_delay=0, spell=sp, timestamp=ts})
     if debugging.command_registry then
-        windower.add_to_chat(8,'GearSwap (Debug Mode): Creating a new command_registry entry: '..windower.to_shift_jis(tostring(ts)..' '..tostring(self[ts])))
+        gs_add_to_chat('Creating a new command_registry entry: '..windower.to_shift_jis(tostring(ts)..' '..tostring(self[ts])))
     end
     return ts
 end
@@ -736,12 +736,12 @@ end
 function cmd_reg:delete_entry(ts)
     if rawget(self,ts) then
         if debugging.command_registry then
-            windower.add_to_chat(8,'GearSwap (Debug Mode): Deleting a command_registry entry: '..windower.to_shift_jis(tostring(ts)..' '..tostring(rawget(self,ts))))
+            debug_mode_chat('Deleting a command_registry entry: '..windower.to_shift_jis(tostring(ts)..' '..tostring(rawget(self,ts))))
         end
         rawset(self,ts,nil)
         return true
     elseif debugging.command_registry then
-        windower.add_to_chat(8,'GearSwap (Debug Mode): Attempted to delete a command_registry entry that did not exist: '..windower.to_shift_jis(tostring(ts) ))
+        debug_mode_chat('Attempted to delete a command_registry entry that did not exist: '..windower.to_shift_jis(tostring(ts) ))
     end
     return false
 end
@@ -996,7 +996,7 @@ end
 ---- none
 -----------------------------------------------------------------------------------
 function debug_mode_chat(message)
-    if _settings.debug_mode then
+    if _settings.debug_mode or debugging.general or debugging.command_registry then
         windower.add_to_chat(8,"GearSwap (Debug Mode): "..windower.to_shift_jis(tostring(message)))
     end
 end
@@ -1022,6 +1022,19 @@ function logit(str)
     end
 end
 
+-----------------------------------------------------------------------------------
+--Name: gearswap_add_to_chat(col,str)
+--Args:
+---- col (num): Color to print out in (0x1F,col)
+---- str (string): String to be printed.
+-----------------------------------------------------------------------------------
+--Returns:
+---- none
+-----------------------------------------------------------------------------------
+function gs_add_to_chat(col,str)
+    windower.add_to_chat(1,string.char(0x1F,col%256)..'GearSwap: '..str..string.char(0x1E,0x01))
+end
+
 -- Set up the priority list structure
 
 -----------------------------------------------------------------------------------
@@ -1039,7 +1052,7 @@ function prioritize(self,slot_id,priority)
         rawset(self,slot_id,priority)
         return
     elseif priority then
-        windower.add_to_chat(123,'GearSwap: Invalid priority ('..tostring(priority)..') given')
+        gs_add_to_chat(123,'Invalid priority ('..tostring(priority)..') given')
     end
     rawset(self,slot_id,0)
 end
