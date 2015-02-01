@@ -10,7 +10,7 @@ function export_set(options)
             elseif S{'sets','set','s'}:contains(v:lower()) then
                 all_sets = true
                 if not user_env or not user_env.sets then
-                    gs_add_to_chat(123,'Cannot export the sets table of the current file because there is no file loaded.')
+                    msg.addon_msg(123,'Cannot export the sets table of the current file because there is no file loaded.')
                     return
                 end
             elseif v:lower() == 'mainjob' then
@@ -47,7 +47,7 @@ function export_set(options)
         buildmsg = buildmsg..' Will overwrite existing files with same name.'
     end
     
-    gs_add_to_chat(123,buildmsg)
+    msg.addon_msg(123,buildmsg)
     
     if not windower.dir_exists(windower.addon_path..'data/export') then
         windower.create_dir(windower.addon_path..'data/export')
@@ -77,7 +77,7 @@ function export_set(options)
                         end
                     end
                 else
-                    gs_add_to_chat(123,'You possess an item that is not in the resources yet.')
+                    msg.addon_msg(123,'You possess an item that is not in the resources yet.')
                 end
             end
         end
@@ -122,14 +122,14 @@ function export_set(options)
                         end
                     end
                 else
-                    gs_add_to_chat(123,'You are wearing an item that is not in the resources yet.')
+                    msg.addon_msg(123,'You are wearing an item that is not in the resources yet.')
                 end
             end
         end
     end
     
     if #item_list == 0 then
-        gs_add_to_chat(123,'There is nothing to export.')
+        msg.addon_msg(123,'There is nothing to export.')
         return
     else
         local not_empty
@@ -140,7 +140,7 @@ function export_set(options)
             end
         end
         if not not_empty then
-            gs_add_to_chat(123,'There is nothing to export.')
+            msg.addon_msg(123,'There is nothing to export.')
             return
         end
     end

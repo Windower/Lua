@@ -48,7 +48,7 @@ require 'sets'
 
 windower.text.create = function (str)
     if __raw.text.registry[str] then
-        gs_add_to_chat(123,'Text object cannot be created because it already exists.')
+        msg.addon_msg(123,'Text object cannot be created because it already exists.')
     else
         __raw.text.registry[str] = true
         __raw.text.create(str)
@@ -79,7 +79,7 @@ end
 
 windower.prim.create = function (str)
     if __raw.prim.registry[str] then
-        gs_add_to_chat(123,'Primitive cannot be created because it already exists.')
+        msg.addon_msg(123,'Primitive cannot be created because it already exists.')
     else
         __raw.prim.registry[str] = true
         __raw.prim.create(str)
@@ -152,7 +152,7 @@ windower.register_event('addon command',function (...)
             refresh_globals()
             equip_sets('self_command',nil,_raw.table.concat(splitup,' ',2,#splitup))
         else
-            gs_add_to_chat(123,'No self command passed.')
+            msg.addon_msg(123,'No self command passed.')
         end
     elseif cmd == 'equip' then
         if gearswap_disabled then return end
@@ -162,7 +162,7 @@ windower.register_event('addon command',function (...)
             refresh_globals()
             equip_sets('equip_command',nil,set)
         else
-            gs_add_to_chat(123,'Equip command cannot be completed. That set does not exist.')
+            msg.addon_msg(123,'Equip command cannot be completed. That set does not exist.')
         end
     elseif cmd == 'export' then
         table.remove(splitup,1)
@@ -173,7 +173,7 @@ windower.register_event('addon command',function (...)
             table.remove(splitup, 1)
             validate(splitup)
         else
-            gs_add_to_chat(123,'There is nothing to validate because there is no file loaded.')
+            msg.addon_msg(123,'There is nothing to validate because there is no file loaded.')
         end
     elseif cmd == 'l' or cmd == 'load' then
         if splitup[2] then
@@ -183,10 +183,10 @@ windower.register_event('addon command',function (...)
                 command_registry = Command_Registry.new()
                 load_user_files(false,f_name)
             else
-                gs_add_to_chat(123,'File not found.')
+                msg.addon_msg(123,'File not found.')
             end
         else
-            gs_add_to_chat(123,'No file name was provided.')
+            msg.addon_msg(123,'No file name was provided.')
         end
     elseif cmd == 'enable' then
         disenable(splitup,command_enable,'enable',false)
@@ -338,7 +338,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
                 not_sent_out_equip[slot_name] = nil
             end
             if encumbrance_table[slot_id] and not tf then
-                debug_mode_chat("Your "..slot_name.." slot is now unlocked.")
+                msg.debugging("Your "..slot_name.." slot is now unlocked.")
             end
             encumbrance_table[slot_id] = tf
         end

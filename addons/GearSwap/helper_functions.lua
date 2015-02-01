@@ -438,7 +438,7 @@ function assemble_use_item_packet(target_id,target_index,item_id)
     if inventory_index then
         outstr = outstr..string.char(inventory_index%256)..string.char(0,bag_id,0,0,0)
     else
-        debug_mode_chat('Proposed item: '..(res.items[item_id][language] or item_id)..' not found in inventory.')
+        msg.debugging('Proposed item: '..(res.items[item_id][language] or item_id)..' not found in inventory.')
         return
     end
     return outstr
@@ -470,7 +470,7 @@ function assemble_menu_item_packet(target_id,target_index,...)
         end
     end
     if count > 9 then
-        debug_mode_chat('Too many items ('..count..') passed to the assemble_menu_item_packet function')
+        msg.debugging('Too many items ('..count..') passed to the assemble_menu_item_packet function')
         return
     end
     
@@ -490,7 +490,7 @@ function assemble_menu_item_packet(target_id,target_index,...)
         if inventory_index then
             outstr = outstr..string.char(inventory_index%256)
         else
-            debug_mode_chat('Proposed item: '..(res.items[i][language] or i)..' not found in inventory.')
+            msg.debugging('Proposed item: '..(res.items[i][language] or i)..' not found in inventory.')
             return
         end
     end
@@ -577,7 +577,7 @@ end
 function filter_pretarget(spell)
     local category = outgoing_action_category_table[unify_prefix[spell.prefix]]
     if world.in_mog_house then
-        debug_mode_chat("Unable to execute commands. Currently in a Mog House zone.")
+        msg.debugging("Unable to execute commands. Currently in a Mog House zone.")
         return false
     elseif category == 3 then
         local available_spells = windower.ffxi.get_spells()
@@ -585,11 +585,11 @@ function filter_pretarget(spell)
         
         -- Filter for spells that you do not know. Exclude Impact.
         if not available_spells[spell.id] and not spell.id == 503 then
-            debug_mode_chat("Unable to execute command. You do not know that spell ("..(res.spells[spell.id][language] or spell.id)..")")
+            msg.debugging("Unable to execute command. You do not know that spell ("..(res.spells[spell.id][language] or spell.id)..")")
         -- Filter for spells that you know, but do not currently have access to
         elseif (not spell_jobs[player.main_job_id] or not (spell_jobs[player.main_job_id] <= player.main_job_level)) and
             (not spell_jobs[player.sub_job_id] or not (spell_jobs[player.sub_job_id] <= player.sub_job_level)) then
-            debug_mode_chat("Unable to execute command. You do not have access to that spell ("..(res.spells[spell.id][language] or spell.id)..")")
+            msg.debugging("Unable to execute command. You do not have access to that spell ("..(res.spells[spell.id][language] or spell.id)..")")
             return false
         -- At this point, we know that it is technically castable by this job combination if the right conditions are met.
         elseif player.main_job_id == 20 and ((addendum_white[spell.id] and not buffactive[401] and not buffactive[416]) or
@@ -597,10 +597,10 @@ function filter_pretarget(spell)
             not (spell_jobs[player.sub_job_id] and spell_jobs[player.sub_job_id] <= player.sub_job_level) then
             
             if addendum_white[spell.id] then
-                debug_mode_chat("Unable to execute command. Addendum: White required for that spell ("..(res.spells[spell.id][language] or spell.id)..")")
+                msg.debugging("Unable to execute command. Addendum: White required for that spell ("..(res.spells[spell.id][language] or spell.id)..")")
             end
             if addendum_black[spell.id] then
-                debug_mode_chat("Unable to execute command. Addendum: Black required for that spell ("..(res.spells[spell.id][language] or spell.id)..")")
+                msg.debugging("Unable to execute command. Addendum: Black required for that spell ("..(res.spells[spell.id][language] or spell.id)..")")
             end
             return false
         elseif player.sub_job_id == 20 and ((addendum_white[spell.id] and not buffactive[401] and not buffactive[416]) or
@@ -608,41 +608,41 @@ function filter_pretarget(spell)
             not (spell_jobs[player.main_job_id] and spell_jobs[player.main_job_id] <= player.main_job_level) then
                         
             if addendum_white[spell.id] then
-                debug_mode_chat("Unable to execute command. Addendum: White required for that spell ("..(res.spells[spell.id][language] or spell.id)..")")
+                msg.debugging("Unable to execute command. Addendum: White required for that spell ("..(res.spells[spell.id][language] or spell.id)..")")
             end
             if addendum_black[spell.id] then
-                debug_mode_chat("Unable to execute command. Addendum: Black required for that spell ("..(res.spells[spell.id][language] or spell.id)..")")
+                msg.debugging("Unable to execute command. Addendum: Black required for that spell ("..(res.spells[spell.id][language] or spell.id)..")")
             end
             return false
         elseif spell.type == 'BlueMagic' and not ((player.main_job_id == 16 and table.contains(windower.ffxi.get_mjob_data().spells,spell.id)) or
             ((buffactive[485] or buffactive[505]) and unbridled_learning_set[spell.english])) and not
             (player.sub_job_id == 16 and table.contains(windower.ffxi.get_sjob_data().spells,spell.id)) then
             -- This code isn't hurting anything, but it doesn't need to be here either.
-            debug_mode_chat("Unable to execute command. Blue magic must be set to cast that spell ("..(res.spells[spell.id][language] or spell.id)..")")
+            msg.debugging("Unable to execute command. Blue magic must be set to cast that spell ("..(res.spells[spell.id][language] or spell.id)..")")
             return false
         elseif spell.type == 'Ninjutsu'  then
             if player.main_job_id ~= 13 and player.sub_job_id ~= 13 then
-                debug_mode_chat("Unable to make action packet. You do not have access to that spell ("..(spell[language] or spell.id)..")")
+                msg.debugging("Unable to make action packet. You do not have access to that spell ("..(spell[language] or spell.id)..")")
                 return false
             elseif not player.inventory[tool_map[spell.english][language]] and not (player.main_job_id == 13 and player.inventory[universal_tool_map[spell.english][language]]) then
-                debug_mode_chat("Unable to make action packet. You do not have the proper tools.")
+                msg.debugging("Unable to make action packet. You do not have the proper tools.")
                 return false
             end
         end
     elseif category == 7 or category == 9 then
         local available = windower.ffxi.get_abilities()
         if category == 7 and not S(available.weapon_skills)[spell.id] then
-            debug_mode_chat("Unable to execute command. You do not have access to that ability ("..(res.weapon_skills[spell.id][language] or spell.id)..")")
+            msg.debugging("Unable to execute command. You do not have access to that ability ("..(res.weapon_skills[spell.id][language] or spell.id)..")")
             return false
         elseif category == 9 and not S(available.job_abilities)[spell.id] then
-            debug_mode_chat("Unable to execute command. You do not have access to that ability ("..(res.job_abilities[spell.id][language] or spell.id)..")")
+            msg.debugging("Unable to execute command. You do not have access to that ability ("..(res.job_abilities[spell.id][language] or spell.id)..")")
             return false
         end
     elseif category == 25 and (not player.main_job_id == 23 or not windower.ffxi.get_mjob_data().species or
         not res.monstrosity[windower.ffxi.get_mjob_data().species] or not res.monstrosity[windower.ffxi.get_mjob_data().species].tp_moves[spell.id] or
         not (res.monstrosity[windower.ffxi.get_mjob_data().species].tp_moves[spell.id] <= player.main_job_level)) then
         -- Monstrosity filtering
-        debug_mode_chat("Unable to execute command. You do not have access to that monsterskill ("..(res.monster_abilities[spell.id][language] or spell.id)..")")
+        msg.debugging("Unable to execute command. You do not have access to that monsterskill ("..(res.monster_abilities[spell.id][language] or spell.id)..")")
         return false
     end
     
@@ -662,7 +662,7 @@ end
 -----------------------------------------------------------------------------------
 function filter_precast(spell)
     if not spell.target.id or not spell.target.index then
-        if debugging.general then debug_mode_chat('No target id or index') end
+        if debugging.general then msg.debugging('No target id or index') end
         return false
     end
     return true
@@ -718,7 +718,7 @@ function cmd_reg:new_entry(sp)
     end
     rawset(self,ts,{pretarget_cast_delay=0, precast_cast_delay=0, spell=sp, timestamp=ts})
     if debugging.command_registry then
-        gs_add_to_chat('Creating a new command_registry entry: '..windower.to_shift_jis(tostring(ts)..' '..tostring(self[ts])))
+        msg.addon_msg('Creating a new command_registry entry: '..windower.to_shift_jis(tostring(ts)..' '..tostring(self[ts])))
     end
     return ts
 end
@@ -736,12 +736,12 @@ end
 function cmd_reg:delete_entry(ts)
     if rawget(self,ts) then
         if debugging.command_registry then
-            debug_mode_chat('Deleting a command_registry entry: '..windower.to_shift_jis(tostring(ts)..' '..tostring(rawget(self,ts))))
+            msg.debugging('Deleting a command_registry entry: '..windower.to_shift_jis(tostring(ts)..' '..tostring(rawget(self,ts))))
         end
         rawset(self,ts,nil)
         return true
     elseif debugging.command_registry then
-        debug_mode_chat('Attempted to delete a command_registry entry that did not exist: '..windower.to_shift_jis(tostring(ts) ))
+        msg.debugging('Attempted to delete a command_registry entry that did not exist: '..windower.to_shift_jis(tostring(ts) ))
     end
     return false
 end
@@ -985,23 +985,6 @@ function spell_complete(rline)
     return rline
 end
 
-
------------------------------------------------------------------------------------
---Name: debug_mode_chat(message)
---Desc: Checks _settings.debug_mode and outputs the message if necessary
---Args:
----- message - The debug message
------------------------------------------------------------------------------------
---Returns:
----- none
------------------------------------------------------------------------------------
-function debug_mode_chat(message)
-    if _settings.debug_mode or debugging.general or debugging.command_registry then
-        windower.add_to_chat(8,"GearSwap (Debug Mode): "..windower.to_shift_jis(tostring(message)))
-    end
-end
-
-
 -----------------------------------------------------------------------------------
 --Name: logit()
 --Args:
@@ -1022,8 +1005,10 @@ function logit(str)
     end
 end
 
+msg = {}
+
 -----------------------------------------------------------------------------------
---Name: gearswap_add_to_chat(col,str)
+--Name: msg.add_to_chat(col,str)
 --Args:
 ---- col (num): Color to print out in (0x1F,col)
 ---- str (string): String to be printed.
@@ -1031,8 +1016,40 @@ end
 --Returns:
 ---- none
 -----------------------------------------------------------------------------------
-function gs_add_to_chat(col,str)
-    windower.add_to_chat(1,string.char(0x1F,col%256)..'GearSwap: '..str..string.char(0x1E,0x01))
+function msg.add_to_chat(col,str)
+    if col == 1 then
+        windower.add_to_chat(1,str)
+    else
+        windower.add_to_chat(1,string.char(0x1F,col%256)..str..string.char(0x1E,0x01))
+    end
+end
+
+-----------------------------------------------------------------------------------
+--Name: msg.debugging(message)
+--Desc: Checks _settings.debug_mode and outputs the message if necessary
+--Args:
+---- message - The debug message
+-----------------------------------------------------------------------------------
+--Returns:
+---- none
+-----------------------------------------------------------------------------------
+function msg.debugging(message)
+    if _settings.debug_mode or debugging.general or debugging.command_registry then
+        msg.add_to_chat(8,"GearSwap (Debug Mode): "..windower.to_shift_jis(tostring(message)))
+    end
+end
+
+-----------------------------------------------------------------------------------
+--Name: msg.addon_msg(col,str)
+--Args:
+---- col (num): Color to print out in (0x1F,col)
+---- str (string): String to be printed.
+-----------------------------------------------------------------------------------
+--Returns:
+---- none
+-----------------------------------------------------------------------------------
+function msg.addon_msg(col,str)
+    msg.add_to_chat(col,'GearSwap: '..str)
 end
 
 -- Set up the priority list structure
@@ -1052,7 +1069,7 @@ function prioritize(self,slot_id,priority)
         rawset(self,slot_id,priority)
         return
     elseif priority then
-        gs_add_to_chat(123,'Invalid priority ('..tostring(priority)..') given')
+        msg.addon_msg(123,'Invalid priority ('..tostring(priority)..') given')
     end
     rawset(self,slot_id,0)
 end
