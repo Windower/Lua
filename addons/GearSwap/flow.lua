@@ -49,7 +49,7 @@ function equip_sets(swap_type,ts,...)
     _global.current_event = tostring(swap_type)
     
     windower.debug(tostring(swap_type)..' enter')
-    if showphase or debugging.general then windower.add_to_chat(8,windower.to_shift_jis(tostring(swap_type))..' enter') end
+    if showphase or debugging.general then msg.debugging(8,windower.to_shift_jis(tostring(swap_type))..' enter') end
     
     local cur_equip = table.reassign({},items.equipment)
         
@@ -81,14 +81,14 @@ function equip_sets(swap_type,ts,...)
     end
     
     if type(swap_type) == 'string' then
-        debug_mode_chat("Entering "..swap_type)
+        msg.debugging("Entering "..swap_type)
     else
-        debug_mode_chat("Entering User Event "..tostring(swap_type))
+        msg.debugging("Entering User Event "..tostring(swap_type))
     end
     
     if not val1 then val1 = {}
         if debugging.general then
-            windower.add_to_chat(8,'val1 error')
+            msg.debugging(8,'val1 error')
         end
     end
 
@@ -117,7 +117,7 @@ function equip_sets(swap_type,ts,...)
             if equip_list[i] and encumbrance_table[v] then
                 not_sent_out_equip[i] = equip_list[i]
                 equip_list[i] = nil
-                debug_mode_chat(i..' slot was not equipped because you are encumbered.')
+                msg.debugging(i..' slot was not equipped because you are encumbered.')
             end
         end
 
@@ -138,7 +138,7 @@ function equip_sets(swap_type,ts,...)
             elseif buffactive.KO then
                 failure_reason = 'KOed'
             end
-            debug_mode_chat("Cannot change gear right now: "..tostring(failure_reason))
+            msg.debugging("Cannot change gear right now: "..tostring(failure_reason))
             logit('\n\n'..tostring(os.clock)..'(69) failure_reason: '..tostring(failure_reason))
         else
             local chunk_table = L{}
@@ -191,12 +191,12 @@ function equip_sets_exit(swap_type,ts,val1)
         if swap_type == 'pretarget' then
             
             if command_registry[ts].cancel_spell then
-                debug_mode_chat("Action canceled ("..storedcommand..' '..spell.target.raw..")")
+                msg.debugging("Action canceled ("..storedcommand..' '..spell.target.raw..")")
                 storedcommand = nil
                 command_registry:delete_entry(ts)
                 return true
             elseif not ts or not command_registry[ts] or not storedcommand then
-                debug_mode_chat('This case should not be hittable - 1')
+                msg.debugging('This case should not be hittable - 1')
                 return true
             end
             
@@ -221,13 +221,13 @@ function equip_sets_exit(swap_type,ts,val1)
                         if not command_registry[ts].proposed_packet then
                             command_registry:delete_entry(ts)
                             
-                            debug_mode_chat("Unable to create a packet for this command because the target is still invalid after pretarget ("..storedcommand..' '..val1.target.raw..")")
+                            msg.debugging("Unable to create a packet for this command because the target is still invalid after pretarget ("..storedcommand..' '..val1.target.raw..")")
                             storedcommand = nil
                             return storedcommand..' '..val1.target.raw
                         end
                     end
                 else
-                    windower.add_to_chat(8,"GearSwap: Hark, what weird prefix through yonder window breaks? "..tostring(spell.prefix))
+                    msg.debugging(8,"Hark, what weird prefix through yonder window breaks? "..tostring(spell.prefix))
                 end
             end
             
@@ -238,7 +238,7 @@ function equip_sets_exit(swap_type,ts,val1)
                 elseif not val1.target.name then
                 -- Spells with invalid pass_through_targs, like using <t> without a target
                     command_registry:delete_entry(ts)
-                    debug_mode_chat("Change target was used to pick an invalid target ("..storedcommand..' '..spell.target.raw..")")
+                    msg.debugging("Change target was used to pick an invalid target ("..storedcommand..' '..spell.target.raw..")")
                     local ret = storedcommand..' '..spell.target.raw
                     storedcommand = nil
                     return ret
@@ -253,7 +253,7 @@ function equip_sets_exit(swap_type,ts,val1)
                     return true
                 end
             elseif not ts or not command_registry[ts] then
-                debug_mode_chat('This case should not be hittable - 2')
+                msg.debugging('This case should not be hittable - 2')
                 return true
             end
 
@@ -294,7 +294,7 @@ function user_pcall(str,...)
             bool,err = pcall(user_env[str],...)
             if not bool then error('\nGearSwap has detected an error in the user function '..str..':\n'..err) end
         elseif user_env[str] then
-            windower.add_to_chat(123,'GearSwap: '..windower.to_shift_jis(tostring(str))..'() exists but is not a function')
+            msg.addon_msg(123,windower.to_shift_jis(tostring(str))..'() exists but is not a function')
         end
     end
 end
@@ -314,7 +314,7 @@ function pretarget_delayed_cast(ts)
     if ts then
         equip_sets('precast',ts,command_registry[ts].spell)
     else
-        debug_mode_chat("Bad index passed to pretarget_delayed_cast")
+        msg.debugging("Bad index passed to pretarget_delayed_cast")
     end
 end
 
@@ -363,7 +363,7 @@ function precast_delayed_cast(ts)
     if ts then
         send_action(ts)
     else
-        debug_mode_chat("Bad index passed to precast_delayed_cast")
+        msg.debugging("Bad index passed to precast_delayed_cast")
     end
 end
 

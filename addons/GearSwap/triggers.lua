@@ -231,7 +231,7 @@ function inc_action(act)
             command_registry[ts].midaction = false
             equip_sets(prefix..'aftercast',ts,spell)
         elseif debugging.command_registry then
-            windower.add_to_chat(8,'GearSwap (Debug Mode): Hitting Aftercast without detecting an entry in command_registry')
+            msg.debugging('Hitting Aftercast without detecting an entry in command_registry')
         end
     elseif (readies[act.category] and act.param == 28787) then -- and not (act.category == 9 or (act.category == 7 and prefix == 'pet_'))) then
         spell.action_type = 'Interruption'
@@ -243,7 +243,7 @@ function inc_action(act)
             if command_registry[ts] then command_registry[ts].midaction = false end
             equip_sets(prefix..'aftercast',ts,spell)
         elseif debugging.command_registry then
-            windower.add_to_chat(8,'GearSwap (Debug Mode): Hitting Aftercast without detecting an entry in command_registry')
+            msg.debugging('Hitting Aftercast without detecting an entry in command_registry')
         end
     elseif readies[act.category] and prefix == 'pet_' and act.targets[1].actions[1].message ~= 0 then
         -- Entry for pet midcast. Excludes the second packet of "Out of range" BPs.
