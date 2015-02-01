@@ -114,6 +114,11 @@ function initialize()
         maximum = 50000,
     }
     
+    accolades = {
+        current = 0,
+        maximum = 50000,
+    }
+    
     abyssea = {
         amber = 0,
         azure = 0,

@@ -45,6 +45,9 @@ Here are the available values:
 * sparks.current          = Current number of RoE Sparks (number between 0 and 50,000)
 * sparks.maximum          = Maximum number of RoE Sparks (always 50,000)
 
+* accolades.current       = Current number of Unity Accolades (number between 0 and 50,000)
+* accolades.maximum       = Maximum number of Unity Accolades (always 50,000)
+
 * dynamis.KIs             = Series of Xs and Os indicating whether or not you have the 5 KIs.
 * dynamis.entry_time      = Your Dynamis entry time, in seconds. -- If the addon is loaded in dynamis, this will be the time of addon load.
 * dynamis.time_limit      = Your current Dynamis time limit, in seconds. -- If the addon is loaded in dynamis, you will need to gain a KI for this to be accurate.
@@ -64,6 +67,7 @@ Here are the available values:
 
 
 Version History:
+0.150201 - Added Unity Accolades.
 0.141111 - Adjusted Pointwatch to account for a recent packet change.
 0.141101 - Reversed my versioning scheme, adjusted the limit point and experience point calculations slightly.
 0.101214 - Made pointwatch hide itself while zoning.
