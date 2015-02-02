@@ -350,8 +350,8 @@ end
 function add_to_chat_user(num,str)
     local backup_str
     if type(num) == 'string' then
-        -- It was only passed one argument, a string.
-        backup_str = num
+        -- It was passed a string as the first argument.
+        str = not tonumber(str) and str or num
         num = 8
     elseif not num and str and type(str) == 'string' then
         -- It only needs the number.
@@ -359,9 +359,9 @@ function add_to_chat_user(num,str)
     end
     
     if language == 'japanese' then
-        msg.add_to_chat(num,windower.to_shift_jis(str or backup_str))
+        msg.add_to_chat(num,windower.to_shift_jis(str))
     else
-        msg.add_to_chat(num,str or backup_str)
+        msg.add_to_chat(num,str)
     end
 end
 
