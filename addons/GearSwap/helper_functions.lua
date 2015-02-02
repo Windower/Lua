@@ -1017,7 +1017,7 @@ msg = {}
 ---- none
 -----------------------------------------------------------------------------------
 function msg.add_to_chat(col,str)
-    if str = '' then return end
+    if str == '' then return end
     if col == 1 then
         windower.add_to_chat(1,str)
     else
