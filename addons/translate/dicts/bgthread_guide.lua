@@ -71,6 +71,9 @@ local dict = {
     {en="*waves*",ja="ノシ"},
     {en="Full Alliance",ja="フルアラ"},
     
+    {en="EIN",ja="エイン"},
+    {en="Ampuole",ja="アンプル"},
+    
     -- These are from wiki.ffo.jp:
     {en="Hugemaw Harold",ja="ひゅーじまうへらるど"},
     {en="Bouncing Bertha",ja="ばうんしんぐばーさ"},
