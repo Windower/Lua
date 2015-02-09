@@ -30,7 +30,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --]]
 
-_addon.name = 'visiblefavor'
+_addon.name = 'VisibleFavor'
 _addon.version = '1.0.0'
 _addon.command = 'visiblefavor'
 _addon.commands = {'vf'}
