@@ -517,7 +517,7 @@
     <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
   </addon>
   <addon>
-    <name>visiblefavor</name>
+    <name>VisibleFavor</name>
     <author>Seth VanHeulen (Acacia@Odin)</author>
     <description>Displays a GEO bubble around your avatar to visualize Favor/Ward ranges.</description>
     <bugtracker>https://github.com/svanheulen/visiblefavor-windower-addon/issues</bugtracker>
