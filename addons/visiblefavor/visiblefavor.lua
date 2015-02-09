@@ -58,8 +58,8 @@ favor_buff = false
 
 defaults = {}
 defaults.enabled = true
-defaults.display_mode = 'favor'
-defaults.effect_mode = 'debuff'
+defaults.display = 'favor'
+defaults.effect = 'debuff'
 
 settings = config.load(defaults)
 
@@ -67,10 +67,10 @@ function check_incoming_chunk(id, original, modified, injected, blocked)
     if id == 0x037 then
         refresh = true
     elseif settings.enabled and id == 0x00E then
-        if refresh and settings.display_mode ~= 'all' then
+        if refresh and settings.display ~= 'all' then
             local player = windower.ffxi.get_player()
             pet_index = windower.ffxi.get_mob_by_index(player.index).pet_index
-            if settings.display_mode == 'favor' then
+            if settings.display == 'favor' then
                 for _,buff_id in pairs(player.buffs) do
                     if buff_id == 431 then
                         favor_buff = true
@@ -81,11 +81,11 @@ function check_incoming_chunk(id, original, modified, injected, blocked)
             end
         end
         local npc_index = original:unpack('H', 9)
-        if settings.display_mode == 'all' or settings.display_mode == 'self' and pet_index == npc_index or settings.display_mode == 'favor' and favor_buff and pet_index == npc_index then
+        if settings.display == 'all' or settings.display == 'self' and pet_index == npc_index or settings.display == 'favor' and favor_buff and pet_index == npc_index then
             local npc_model = original:unpack('H', 0x33)
             if model_to_effect[npc_model] then
                 local effect = model_to_effect[npc_model]
-                if settings.effect_mode == 'debuff' then
+                if settings.effect == 'debuff' then
                     effect = effect + 8
                 end
                 return modified:sub(1, 38) .. string.char(effect) .. modified:sub(40)
@@ -96,22 +96,25 @@ end
 
 function visiblefavor_command(...)
     local arg = {...}
-    if #arg == 1 and arg[1]:lower() == 'toggle' then
+    for k,v in pairs(arg) do
+        arg[k] = arg[k]:lower()
+    end
+    if #arg == 1 and arg[1] == 'toggle' then
         settings.enabled = not settings.enabled
-    elseif #arg == 1 and arg[1]:lower() == 'on' then
+    elseif #arg == 1 and arg[1] == 'on' then
         settings.enabled = true
-    elseif #arg == 1 and arg[1]:lower() == 'off' then
+    elseif #arg == 1 and arg[1] == 'off' then
         settings.enabled = false
-    elseif #arg == 2 and arg[1]:lower() == 'display' and arg[2]:lower() == 'all' then
-        settings.display_mode = 'all'
-    elseif #arg == 2 and arg[1]:lower() == 'display' and arg[2]:lower() == 'self' then
-        settings.display_mode = 'self'
-    elseif #arg == 2 and arg[1]:lower() == 'display' and arg[2]:lower() == 'favor' then
-        settings.display_mode = 'favor'
-    elseif #arg == 2 and arg[1]:lower() == 'effect' and arg[2]:lower() == 'buff' then
-        settings.effect_mode = 'buff'
-    elseif #arg == 2 and arg[1]:lower() == 'effect' and arg[2]:lower() == 'debuff' then
-        settings.effect_mode = 'debuff'
+    elseif #arg == 2 and arg[1] == 'display' and arg[2] == 'all' then
+        settings.display = 'all'
+    elseif #arg == 2 and arg[1] == 'display' and arg[2] == 'self' then
+        settings.display = 'self'
+    elseif #arg == 2 and arg[1] == 'display' and arg[2] == 'favor' then
+        settings.display = 'favor'
+    elseif #arg == 2 and arg[1] == 'effect' and arg[2] == 'buff' then
+        settings.effect = 'buff'
+    elseif #arg == 2 and arg[1] == 'effect' and arg[2] == 'debuff' then
+        settings.effect = 'debuff'
     else
         windower.add_to_chat(167, 'Command usage:')
         windower.add_to_chat(167, '    vf toggle/on/off')
@@ -119,7 +122,7 @@ function visiblefavor_command(...)
         windower.add_to_chat(167, '    vf effect buff/debuff')
         return
     end
-    windower.add_to_chat(207, 'visiblefavor: enable = %s, display = \31\200%s\30\1, effect = \31\200%s\30\1':format(settings.enabled and '\31\204yes\30\1' or '\31\167no\30\1', settings.display_mode, settings.effect_mode))
+    windower.add_to_chat(207, 'VisibleFavor: enable = %s, display = \031\200%s\030\001, effect = \031\200%s\030\001':format(settings.enabled and '\031\204yes\030\001' or '\031\167no\030\001', settings.display, settings.effect))
     settings:save()
 end
 
