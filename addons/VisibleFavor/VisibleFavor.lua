@@ -37,6 +37,7 @@ _addon.commands = {'vf'}
 _addon.author = 'Seth VanHeulen (Acacia@Odin)'
 
 config = require('config')
+require('chat')
 require('pack')
 
 model_to_effect = {
@@ -122,7 +123,7 @@ function visiblefavor_command(...)
         windower.add_to_chat(167, '    vf effect buff/debuff')
         return
     end
-    windower.add_to_chat(207, 'VisibleFavor: enable = %s, display = \031\200%s\030\001, effect = \031\200%s\030\001':format(settings.enabled and '\031\204yes\030\001' or '\031\167no\030\001', settings.display, settings.effect))
+    windower.add_to_chat(207, 'VisibleFavor: enable = ' .. (settings.enabled and 'yes':color(204) or 'no':color(167)) .. ', display = ' .. settings.display:color(200) .. ', effect = ' .. settings.effect:color(200))
     settings:save()
 end
 
