@@ -517,6 +517,13 @@
     <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
   </addon>
   <addon>
+    <name>visiblefavor</name>
+    <author>Seth VanHeulen (Acacia@Odin)</author>
+    <description>Displays a GEO bubble around your avatar to visualize Favor/Ward ranges.</description>
+    <bugtracker>https://github.com/svanheulen/visiblefavor-windower-addon/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Odin/Acacia</support>
+  </addon>
+  <addon>
     <name>vwhl</name>
     <author>Giuliano Riccio (Zohno@Phoenix)</author>
     <description>Redirects the nm's weaknesses (VW or Abyssea) to the "tell" stream so that they can be held using the chat filters' function and highlights the important info.</description>
