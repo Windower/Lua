@@ -285,15 +285,15 @@ windower.register_event('addon command', function(command, ...)
         
     -- Print current settings status
     elseif command == 'status' then
-		log('~~~~~~~ Request Settings ~~~~~~~')
+	log('~~~~~~~ Request Settings ~~~~~~~')
         log('Mode:', settings.mode)
         log('Whitelist:', settings.whitelist:empty() and '(empty)' or settings.whitelist:format('csv'))
         log('Blacklist:', settings.blacklist:empty() and '(empty)' or settings.blacklist:format('csv'))
-		log('Nicknames:', settings.nicknames:empty() and '(empty)' or settings.nicknames:format('csv'))
-		log('Forbidden Commands:', settings.forbidden:empty() and '(empty)' or settings.forbidden:format('csv'))
-		log('Party Lock:', settings.partylock)
-		log('Request Lock:', settings.requestlock)
-		log('Exact Lock:', settings.exactlock)
+	log('Nicknames:', settings.nicknames:empty() and '(empty)' or settings.nicknames:format('csv'))
+	log('Forbidden Commands:', settings.forbidden:empty() and '(empty)' or settings.forbidden:format('csv'))
+	log('Party Lock:', settings.partylock)
+	log('Request Lock:', settings.requestlock)
+	log('Exact Lock:', settings.exactlock)
     
     -- Ignores (and prints a warning) if unknown command is passed.
     else
