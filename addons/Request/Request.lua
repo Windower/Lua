@@ -1,5 +1,5 @@
 --[[
-Copyright (c) 2015, Selindrile
+Copyright ｩ 2015, Selindrile
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -10,7 +10,7 @@ modification, are permitted provided that the following conditions are met:
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name of autoinvite nor the
+    * Neither the name of Request nor the
       names of its contributors may be used to endorse or promote products
       derived from this software without specific prior written permission.
 
@@ -29,9 +29,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 require('luau')
 
 _addon.name = 'Request'
-_addon.author = 'Selindrile, Supported by Booshack: Montaeg (LUA), Hrothgar & Terezka (Beta Testers)'
+_addon.author = 'Selindrile'
 _addon.commands = {'request','rq'}
-_addon.version = 1.0
+_addon.version = 1.1
 _addon.language = 'english'
 
 defaults = T{}
@@ -40,9 +40,9 @@ defaults.whitelist = S{}
 defaults.blacklist = S{}
 defaults.nicknames = S{}
 defaults.forbidden = S{}
-defaults.partylock = 'on'
-defaults.exactlock = 'on'
-defaults.requestlock = 'off'
+defaults.partylock = 'On'
+defaults.exactlock = 'On'
+defaults.requestlock = 'Off'
 
 -- Statuses that stop you from sending invites.
 statusblock = S{
@@ -57,25 +57,25 @@ aliases = T{
     blist        = 'blacklist',
     black        = 'blacklist',
     blacklist    = 'blacklist',
-	nick		 = 'nicknames',
-	nickname	 = 'nicknames',
-	nicknames    = 'nicknames',
-	partylock	 = 'partylock',
-	partyl		 = 'partylock',
-	plock		 = 'partylock',
-	pl			 = 'partylock',
-	requestlock  = 'requestlock',
-	requestl	 = 'requestlock',
-	rlock		 = 'requestlock',
-	rl			 = 'requestlock',
-	exactlock	 = 'exactlock',
-	exact		 = 'exactlock',
-	exactl		 = 'exactlock',
-	elock		 = 'exactlock',
-	xlock		 = 'exactlock',
-	xl			 = 'exactlock',
-	forbidden	 = 'forbidden',
-	forbid		 = 'forbidden',
+    nick		 = 'nicknames',
+    nickname	 = 'nicknames',
+    nicknames    = 'nicknames',
+    partylock	 = 'partylock',
+    partyl		 = 'partylock',
+    plock		 = 'partylock',
+    pl			 = 'partylock',
+    requestlock  = 'requestlock',
+    requestl	 = 'requestlock',
+    rlock		 = 'requestlock',
+    rl			 = 'requestlock',
+    exactlock	 = 'exactlock',
+    exact		 = 'exactlock',
+    exactl		 = 'exactlock',
+    elock		 = 'exactlock',
+    xlock		 = 'exactlock',
+    xl			 = 'exactlock',
+    forbidden	 = 'forbidden',
+    forbid		 = 'forbidden',
 }
 
 -- Aliases to access the add and item_to_remove routines.
@@ -125,28 +125,28 @@ function request(message, player)
 	-- Check to see if valid player is issuing a command with your nick, and check it against the list of forbidden commands.
 	if settings.nicknames:contains(nick:ucfirst()) and not settings.forbidden:contains(request:ucfirst()) then
 		--Party commands to check.
-		if settings.partylock == "off" and request == "pass" and (target == "lead" or target == "leader") then
+		if settings.partylock == "Off" and request == "pass" and (target == "lead" or target == "leader") then
 			windower.send_command('input /pcmd leader '..player..'')
 	
-		elseif settings.partylock == "off" and request == "disband" then
+		elseif settings.partylock == "Off" and request == "disband" then
 			windower.send_command('input /pcmd leave')
 			
-		elseif settings.partylock == "off" and request == "join" or request == "accept" then
+		elseif settings.partylock == "Off" and request == "join" or request == "accept" then
 			windower.send_command('input /join')
 			
-		elseif settings.partylock == "off" and request == "invite" then
+		elseif settings.partylock == "Off" and request == "invite" then
 			if target == "me" or target == " " then windower.send_command('input /pcmd add '..player..'')
 			else windower.send_command('input /pcmd add '..target..'')
 			end
 			
-		elseif settings.partylock == "off" and request == "kick" then
+		elseif settings.partylock == "Off" and request == "kick" then
 			windower.send_command('input /pcmd kick '..target..'')
 		--Exact Command?
-		elseif request == "exact" and settings.exactlock == "off" then
+		elseif request == "exact" and settings.exactlock == "Off" then
 			exactcommand = string.match(message, '%a+ exact (.*)')
 			windower.send_command(''..exactcommand..'')
 		--Anything else, mostly send on to shortcuts and user aliases, could potentially send short addon commands.
-		elseif settings.requestlock == "off" then
+		elseif settings.requestlock == "Off" then
 			if request == "quit" or request == "stop" then windower.send_command('attackoff')
 			elseif target == "bt" or target == "it" or target == "this" or target == "t" then windower.send_command(''..request..' <bt>')
 			elseif target == "us" or target == "yourself" then windower.send_command(''..request..' <me>')
@@ -167,9 +167,9 @@ function add_item(mode, ...)
     local doubles = names * settings[mode]
     if not doubles:empty() then
         if aliases[mode] == 'nicknames' then
-            notice('nickname':plural(doubles)..' '..doubles:format()..' already on nickname list.')
+            notice('User':plural(doubles)..' '..doubles:format()..' already on nickname list.')
         elseif aliases[mode] == 'forbidden' then
-			notice('forbidden':plural(doubles)..' '..doubles:format()..' already on forbidden list.')
+			notice('Command':plural(doubles)..' '..doubles:format()..' already on forbidden list.')
 		else
             notice('User':plural(doubles)..' '..doubles:format()..' already on '..aliases[mode]..'.')
         end
@@ -187,9 +187,9 @@ function remove_item(mode, ...)
     local dummy = names - settings[mode]
     if not dummy:empty() then
         if aliases[mode] == 'nicknames' then
-            notice('nickname':plural(dummy)..' '..dummy:format()..' not found on nickname list.')
+            notice('User':plural(dummy)..' '..dummy:format()..' not found on nickname list.')
         elseif aliases[mode] == 'forbidden' then
-			notice('forbidden':plural(dummy)..' '..dummy:format()..' not found on forbidden list.')
+			notice('Command':plural(dummy)..' '..dummy:format()..' not found on forbidden list.')
 		else
             notice('User':plural(dummy)..' '..dummy:format()..' not found on '..aliases[mode]..'.')
         end
@@ -222,10 +222,10 @@ windower.register_event('addon command', function(command, ...)
         status = args[1] or 'status'
         status = string.lower(status)
         if on:contains(status) then
-            settings.partylock = 'on'
+            settings.partylock = 'On'
             log('Party Lock turned on.')
         elseif off:contains(status) then
-            settings.partylock = 'off'
+            settings.partylock = 'Off'
             log('Party Lock turned off.')
         elseif status == 'status' then
             log('Party Lock currently '..settings.partylock..'.')
@@ -239,10 +239,10 @@ windower.register_event('addon command', function(command, ...)
         status = args[1] or 'status'
         status = string.lower(status)
         if on:contains(status) then
-            settings.requestlock = 'on'
+            settings.requestlock = 'On'
             log('Request Lock turned on.')
         elseif off:contains(status) then
-            settings.requestlock = 'off'
+            settings.requestlock = 'Off'
             log('Request Lock turned off.')
         elseif status == 'status' then
             log('Request Lock currently '..settings.requestlock..'.')
@@ -256,10 +256,10 @@ windower.register_event('addon command', function(command, ...)
         status = args[1] or 'status'
         status = string.lower(status)
         if on:contains(status) then
-            settings.exactlock = 'on'
+            settings.exactlock = 'On'
             log('Exact Lock turned on.')
         elseif off:contains(status) then
-            settings.exactlock = 'off'
+            settings.exactlock = 'Off'
             log('Exact Lock turned off.')
         elseif status == 'status' then
             log('Exact Lock currently '..settings.exactlock..'.')
