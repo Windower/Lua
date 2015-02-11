@@ -39,10 +39,10 @@ defaults.mode = 'whitelist'
 defaults.whitelist = S{}
 defaults.blacklist = S{}
 defaults.nicknames = S{}
-defaults.forbidden = S{}
-defaults.partylock = 'On'
-defaults.exactlock = 'On'
-defaults.requestlock = 'Off'
+defaults.forbidden = S{'Lua','U','Reload','Quit','Treasury','Unload','S','Say','Exec','Load','L','Linkshell','Sh','Shout'}
+defaults.PartyLock = true
+defaults.ExactLock = true
+defaults.RequestLock = false
 
 -- Statuses that stop you from sending invites.
 statusblock = S{
@@ -57,25 +57,25 @@ aliases = T{
     blist        = 'blacklist',
     black        = 'blacklist',
     blacklist    = 'blacklist',
-    nick	 = 'nicknames',
+    nick         = 'nicknames',
     nickname	 = 'nicknames',
     nicknames    = 'nicknames',
     partylock	 = 'partylock',
-    partyl	 = 'partylock',
-    plock	 = 'partylock',
-    pl		 = 'partylock',
+    partyl       = 'partylock',
+    plock        = 'partylock',
+    pl           = 'partylock',
     requestlock  = 'requestlock',
-    requestl	 = 'requestlock',
-    rlock	 = 'requestlock',
-    rl		 = 'requestlock',
-    exactlock	 = 'exactlock',
-    exact	 = 'exactlock',
-    exactl	 = 'exactlock',
-    elock	 = 'exactlock',
-    xlock	 = 'exactlock',
-    xl		 = 'exactlock',
-    forbidden	 = 'forbidden',
-    forbid	 = 'forbidden',
+    requestl     = 'requestlock',
+    rlock        = 'requestlock',
+    rl           = 'requestlock',
+    exactlock    = 'exactlock',
+    exact        = 'exactlock',
+    exactl       = 'exactlock',
+    elock        = 'exactlock',
+    xlock        = 'exactlock',
+    xl           = 'exactlock',
+    forbidden    = 'forbidden',
+    forbid       = 'forbidden',
 }
 
 -- Aliases to access the add and item_to_remove routines.
@@ -125,35 +125,34 @@ function request(message, player)
 	-- Check to see if valid player is issuing a command with your nick, and check it against the list of forbidden commands.
 	if settings.nicknames:contains(nick:ucfirst()) and not settings.forbidden:contains(request:ucfirst()) then
 		--Party commands to check.
-		if settings.partylock == "Off" and request == "pass" and (target == "lead" or target == "leader") then
+		if not settings.PartyLock and request == "pass" and (target == "lead" or target == "leader") then
 			windower.send_command('input /pcmd leader '..player..'')
-	
-		elseif settings.partylock == "Off" and request == "disband" then
+			
+		elseif not settings.PartyLock and request == "disband" then
 			windower.send_command('input /pcmd leave')
 			
-		elseif settings.partylock == "Off" and request == "join" or request == "accept" then
+		elseif not settings.PartyLock and request == "join" or request == "accept" then
 			windower.send_command('input /join')
 			
-		elseif settings.partylock == "Off" and request == "invite" then
+		elseif not settings.PartyLock and request == "invite" then
 			if target == "me" or target == " " then windower.send_command('input /pcmd add '..player..'')
 			else windower.send_command('input /pcmd add '..target..'')
 			end
 			
-		elseif settings.partylock == "Off" and request == "kick" then
+		elseif not settings.PartyLock and request == "kick" then
 			windower.send_command('input /pcmd kick '..target..'')
 		--Exact Command?
-		elseif request == "exact" and settings.exactlock == "Off" then
+		elseif request == "exact" and not settings.ExactLock then
 			exactcommand = string.match(message, '%a+ exact (.*)')
 			windower.send_command(''..exactcommand..'')
 		--Anything else, mostly send on to shortcuts and user aliases, could potentially send short addon commands.
-		elseif settings.requestlock == "Off" then
+		elseif not settings.RequestLock then
 			if request == "quit" or request == "stop" then windower.send_command('attackoff')
 			elseif target == "bt" or target == "it" or target == "this" or target == "t" then windower.send_command(''..request..' <bt>')
 			elseif target == "us" or target == "yourself" then windower.send_command(''..request..' <me>')
 			elseif target == "me" or target == "now" or target == nil then windower.send_command(''..request..' '..player..'')
 			else windower.send_command(''..request..' '..target..'')
 			end
-
 		end
 		
 	end
@@ -222,13 +221,13 @@ windower.register_event('addon command', function(command, ...)
         status = args[1] or 'status'
         status = string.lower(status)
         if on:contains(status) then
-            settings.partylock = 'On'
+            settings.PartyLock = true
             log('Party Lock turned on.')
         elseif off:contains(status) then
-            settings.partylock = 'Off'
+            settings.PartyLock = false
             log('Party Lock turned off.')
         elseif status == 'status' then
-            log('Party Lock currently '..settings.partylock..'.')
+            log('Party Lock currently '..display(settings.PartyLock)..'.')
         else
             error('Invalid status:', args[1])
             return
@@ -239,13 +238,13 @@ windower.register_event('addon command', function(command, ...)
         status = args[1] or 'status'
         status = string.lower(status)
         if on:contains(status) then
-            settings.requestlock = 'On'
+            settings.RequestLock = true
             log('Request Lock turned on.')
         elseif off:contains(status) then
-            settings.requestlock = 'Off'
+            settings.RequestLock = false
             log('Request Lock turned off.')
         elseif status == 'status' then
-            log('Request Lock currently '..settings.requestlock..'.')
+            log('Request Lock currently '..display(settings.RequestLock)..'.')
         else
             error('Invalid status:', args[1])
             return
@@ -256,13 +255,13 @@ windower.register_event('addon command', function(command, ...)
         status = args[1] or 'status'
         status = string.lower(status)
         if on:contains(status) then
-            settings.exactlock = 'On'
+            settings.ExactLock = true
             log('Exact Lock turned on.')
         elseif off:contains(status) then
-            settings.exactlock = 'Off'
+            settings.ExactLock = false
             log('Exact Lock turned off.')
         elseif status == 'status' then
-            log('Exact Lock currently '..settings.exactlock..'.')
+            log('Exact Lock currently '..display(settings.ExactLock)..'.')
         else
             error('Invalid status:', args[1])
             return
@@ -285,15 +284,15 @@ windower.register_event('addon command', function(command, ...)
         
     -- Print current settings status
     elseif command == 'status' then
-	log('~~~~~~~ Request Settings ~~~~~~~')
-        log('Mode:', settings.mode)
-        log('Whitelist:', settings.whitelist:empty() and '(empty)' or settings.whitelist:format('csv'))
-        log('Blacklist:', settings.blacklist:empty() and '(empty)' or settings.blacklist:format('csv'))
-	log('Nicknames:', settings.nicknames:empty() and '(empty)' or settings.nicknames:format('csv'))
-	log('Forbidden Commands:', settings.forbidden:empty() and '(empty)' or settings.forbidden:format('csv'))
-	log('Party Lock:', settings.partylock)
-	log('Request Lock:', settings.requestlock)
-	log('Exact Lock:', settings.exactlock)
+    log('~~~~~~~ Request Settings ~~~~~~~')
+    log('Mode:', settings.mode:ucfirst())
+    log('Whitelist:', settings.whitelist:empty() and '(empty)' or settings.whitelist:format('csv'))
+    log('Blacklist:', settings.blacklist:empty() and '(empty)' or settings.blacklist:format('csv'))
+    log('Nicknames:', settings.nicknames:empty() and '(empty)' or settings.nicknames:format('csv'))
+    log('Forbidden Commands:', settings.forbidden:empty() and '(empty)' or settings.forbidden:format('csv'))
+    log('Party Lock:', display(settings.PartyLock))
+    log('Request Lock:', display(settings.RequestLock))
+    log('Exact Lock:', display(settings.ExactLock))
     
     -- Ignores (and prints a warning) if unknown command is passed.
     else
@@ -303,3 +302,13 @@ windower.register_event('addon command', function(command, ...)
 
     config.save(settings)
 end)
+
+display = function(setting)
+    if class(setting) == 'Set' then
+        return setting:empty() and '(empty)' or setting:format('csv')
+    elseif class(setting) == 'boolean' then
+        return setting and 'On' or 'Off'
+    end
+
+    return tostring(setting)
+end
