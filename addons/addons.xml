@@ -461,13 +461,6 @@
     <support>https://github.com/sebyg666/Lua/tree/4.1-dev/addons/SubTarget</support>
   </addon>
   <addon>
-    <name>TargetClaim</name>
-    <author>Kenshi</author>
-    <description>Displays who has claim if your target is a mob or what is targeting your target if its a pc.</description>
-    <bugtracker>https://github.com/KenshiDRK/Lua/issues</bugtracker>
-    <support>http://http://www.ffxiah.com/player/Ragnarok/Kenshi</support>
-  </addon>
-  <addon>
     <name>TargetInfo</name>
     <author>Arcon</author>
     <description>Displays information about your current target in memory.</description>
