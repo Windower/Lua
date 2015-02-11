@@ -28,21 +28,21 @@ config = require ('config')
 
 _addon.name     = 'AdherentBuffs'
 _addon.author   = 'Mafai, Sechs'
-_addon.version  = '1.01'
+_addon.version  = '1.03'
 _addon.commands = {'adherentbuffs','ab'}
 
 defaults = T{}
 
---this can be say / party / linkshell / shout
+--this can be say / party / linkshell / linkshell 2 / shout / s / p / l / l2 / sh
 defaults.announcemode = 'party'
 
 settings = config.load(defaults)
 
 adherent_maps = {['Steadfast Adherent']="PLD, DEF+", ['Furtive Adherent']="WHM, MDB+", ['Occult Adherent']="WAR, EVA+",
 		['Fleet Adherent']="WAR, Haste+", ['Brawny Adherent']="DRK, ATK+", ['Martial Adherent']="DRK,Regain+",
-		['Honed Adherent']="RDM, Fast Cast+", ['Insidious Adherent']="RDM, MEVA+", ['Hexbreaking Adherent']="BLM, MAB+"}
+		['Honed Adherent']="RDM, Fast Cast+", ['Insidious Adherent']="RDM, MEVA+", ['Hexbreaking Adherent']="BLM, MAB+", ['Sechs']="Sechs is a sexy Galka"}
 
-chatmodes = S{'party','linkshell','shout','say'}
+chatmodes = S{'say','party','linkshell','linkshell2','shout','s','p','l','l2','sh'}
 		
 windower.register_event('addon command', function (command,...)
 	command = command and command:lower() or 'help'
@@ -51,17 +51,17 @@ windower.register_event('addon command', function (command,...)
 		windower.send_command('lua unload AdherentBuffs; lua load AdherentBuffs')
 	elseif command == 'unload' then
 		windower.send_command('lua unload AdherentBuffs')
-	elseif command == 'chatmode' then
-		if chatmodes:contains(args[1]) then
-			windower.add_to_chat(053,' ***** Chat Mode Changed to '..args[1]..' *****')
+	elseif command == 'chatmode' or command == 'cm' then
+		if chatmodes:contains(args[1]) and args[1] ~= nil then
+			windower.add_to_chat(053,' ***** Chat Mode Changed to "'..args[1]..'" *****')
 			settings.announcemode = args[1]
 			config.save(settings)
 		else
-			windower.add_to_chat(053,' ***** '..args[1]..' is not a valid chat mode *****')
+			windower.add_to_chat(053,' ***** That is not a valid chat mode *****')
 		end
-	elseif command == 'announce' then
-		local name = windower.ffxi.get_mob_by_target('t').name
-		if adherent_maps[name] then
+	elseif command == 'announce' or 'a' then
+		local mob = windower.ffxi.get_mob_by_target('t')
+		if mob ~= nil and adherent_maps[mob.name] then 
 			windower.send_command('input /'..settings.announcemode..' '..name..' buff is ==> '..adherent_maps[name]..'')
 		else
 			windower.add_to_chat(053,' ***** Target is not an Adherent *****')
