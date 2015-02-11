@@ -1,4 +1,4 @@
---Copyright (c) 2014, Byrthnoth
+--Copyright (c) 2014~2015, Byrthnoth
 --All rights reserved.
 
 --Redistribution and use in source and binary forms, with or without
@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'Translate'
-_addon.version = '0.141026'
+_addon.version = '0.150201'
 _addon.author = 'Byrth'
 _addon.commands = {'trans','translate'}
 
@@ -34,9 +34,11 @@ language = 'english'
 trans_list = {}
 res = require 'resources'
 require 'sets'
+require 'lists'
 require 'pack'
 require 'strings'
 require 'katakana_to_romanji'
+search_comment = {ts = 0, reg = L{}, translated = false}
 
 handled_resources = S{
     'ability_recasts',
@@ -195,67 +197,70 @@ trans_list['\.'] = nil
 windower.register_event('incoming chunk',function(id,orgi,modi,is_injected,is_blocked)
     if id == 0x17 and not is_injected and not is_blocked then
         local out_text = modi:unpack('z',0x19)
-        local matches,match_bool = {},false
-        local function make_matches(catch)
-            -- build a table of matches indexed by their length
-            local esc = catch:escape()
-            if not sanity_check(esc) then return end
-            
-            
-            
-            if not matches[#catch] then
-                matches[#catch] = {}
-            end
-            matches[#catch][#matches[#catch]+1] = esc
-            match_bool = true
-        end
-        for jp,en in pairs(trans_list) do
-            out_text:gsub(jp,make_matches)
-        end
         
-        if not match_bool then return end
+        out_text = translate_phrase(out_text)
+        
+        if not out_text then return end
         
         if show_original then windower.add_to_chat(8,modi:sub(9,0x18):unpack('z',1)..'[Original]: '..out_text) end
-        
-        local order = {}
-        for len,_ in pairs(matches) do
-            local c,found = 1,false
-            while c <= #order do
-                if len > order[c] then
-                    table.insert(order,c,len)
-                    found = true
-                    break
-                end
-                c = c + 1
-            end
-            if c > #order then order[c] = len end
-        end
-        
-        for _,ind in ipairs(order) do
-            for _,option in ipairs(matches[ind]) do
-                out_text = sjis_gsub(out_text,unescape(option),unescape(trans_list[option]))
-            end
-        end
-        
         while #out_text > 0 do
             local boundary = get_boundary_length(out_text,150)
             local len = math.ceil((boundary+1+24)/2) -- Make sure there is at least one nul after the string
             local out_pack = string.char(0x17,len)..modi:sub(3,0x18)..out_text:sub(1,boundary)
             
---[[            local aggtext = ''
-            for i=1,#out_text do
-                aggtext = aggtext..string.byte(out_text,i)..' '
-            end]]
             -- zero pad it
             while #out_pack < len*2 do
                 out_pack = out_pack..string.char(0)
             end
             windower.packets.inject_incoming(0x17,out_pack)
             out_text = out_text:sub(boundary+1)
-        end        
+        end
         return true
     end
 end)
+
+function translate_phrase(out_text)
+    local matches,match_bool = {},false
+    local function make_matches(catch)
+        -- build a table of matches indexed by their length
+        local esc = catch:escape()
+        if not sanity_check(esc) then return end
+        
+        
+        
+        if not matches[#catch] then
+            matches[#catch] = {}
+        end
+        matches[#catch][#matches[#catch]+1] = esc
+        match_bool = true
+    end
+    for jp,en in pairs(trans_list) do
+        out_text:gsub(jp,make_matches)
+    end
+    
+    if not match_bool then return end
+    
+    local order = {}
+    for len,_ in pairs(matches) do
+        local c,found = 1,false
+        while c <= #order do
+            if len > order[c] then
+                table.insert(order,c,len)
+                found = true
+                break
+            end
+            c = c + 1
+        end
+        if c > #order then order[c] = len end
+    end
+    
+    for _,ind in ipairs(order) do
+        for _,option in ipairs(matches[ind]) do
+            out_text = sjis_gsub(out_text,unescape(option),unescape(trans_list[option]))
+        end
+    end
+    return out_text
+end
 
 function get_boundary_length(str,limit)
     -- If it is already short enough, return it
@@ -314,6 +319,35 @@ windower.register_event('addon command', function(...)
     elseif commands[1]:lower() == 'eval' and commands[2] then
         table.remove(commands,1)
         assert(loadstring(table.concat(commands, ' ')))()
+    end
+end)
+
+windower.register_event('incoming text',function(org,mod,ocol,mcol,blk)
+    if not blk and ocol == 204 then
+        local ret = translate_phrase(org)
+        if os.clock()-search_comment.ts>0.4 then
+            search_comment = {ts = os.clock(), reg = L{}, translated = false}
+        end
+        if ret then
+            if not search_comment.reg:contains(ret) then
+                search_comment.translated = true
+                search_comment.reg:append(ret)
+                windower.add_to_chat(204,ret)
+                coroutine.yield(true)
+                if show_original then
+                    coroutine.sleep(0.3)
+                    if search_comment.translated then windower.add_to_chat(8,'[Original]: '..org) end
+                end
+            end
+        elseif not search_comment.reg:contains(org) then
+            search_comment.reg:append(org)
+            windower.add_to_chat(204,org)
+            coroutine.yield(true)
+            if show_original then
+                coroutine.sleep(0.3)
+                if search_comment.translated then windower.add_to_chat(8,'[Original]: '..org) end
+            end
+        end
     end
 end)
 

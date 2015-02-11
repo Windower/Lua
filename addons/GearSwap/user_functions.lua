@@ -180,36 +180,36 @@ function print_set(set,title)
         end
     elseif table.length(set) == 0 then
         if title then
-            windower.add_to_chat(1,'------------------'.. windower.to_shift_jis(tostring(title))..' -- Empty Table -----------------')
+            msg.add_to_chat(1,'------------------'.. windower.to_shift_jis(tostring(title))..' -- Empty Table -----------------')
         else
-            windower.add_to_chat(1,'-------------------------- Empty Table -------------------------')
+            msg.add_to_chat(1,'-------------------------- Empty Table -------------------------')
         end
         return
     end
     
     if title then
-        windower.add_to_chat(1,'------------------------- '..windower.to_shift_jis(tostring(title))..' -------------------------')
+        msg.add_to_chat(1,'------------------------- '..windower.to_shift_jis(tostring(title))..' -------------------------')
     else
-        windower.add_to_chat(1,'----------------------------------------------------------------')
+        msg.add_to_chat(1,'----------------------------------------------------------------')
     end
     if #set == table.length(set) then
         for i,v in ipairs(set) do
             if type(v) == 'table' and v.name then
-                windower.add_to_chat(8,windower.to_shift_jis(tostring(i))..' '..windower.to_shift_jis(tostring(v.name))..' (Adv.)')
+                msg.add_to_chat(8,windower.to_shift_jis(tostring(i))..' '..windower.to_shift_jis(tostring(v.name))..' (Adv.)')
             else
-                windower.add_to_chat(8,windower.to_shift_jis(tostring(i))..' '..windower.to_shift_jis(tostring(v)))
+                msg.add_to_chat(8,windower.to_shift_jis(tostring(i))..' '..windower.to_shift_jis(tostring(v)))
             end
         end
     else
         for i,v in pairs(set) do
             if type(v) == 'table' and v.name then
-                windower.add_to_chat(8,windower.to_shift_jis(tostring(i))..' '..windower.to_shift_jis(tostring(v.name))..' (Adv.)')
+                msg.add_to_chat(8,windower.to_shift_jis(tostring(i))..' '..windower.to_shift_jis(tostring(v.name))..' (Adv.)')
             else
-                windower.add_to_chat(8,windower.to_shift_jis(tostring(i))..' '..windower.to_shift_jis(tostring(v)))
+                msg.add_to_chat(8,windower.to_shift_jis(tostring(i))..' '..windower.to_shift_jis(tostring(v)))
             end
         end
     end
-    windower.add_to_chat(1,'----------------------------------------------------------------')
+    msg.add_to_chat(1,'----------------------------------------------------------------')
 end
 
 function send_cmd_user(command)
@@ -350,8 +350,8 @@ end
 function add_to_chat_user(num,str)
     local backup_str
     if type(num) == 'string' then
-        -- It was only pased one argument, a string.
-        backup_str = num
+        -- It was passed a string as the first argument.
+        str = not tonumber(str) and str or num
         num = 8
     elseif not num and str and type(str) == 'string' then
         -- It only needs the number.
@@ -359,9 +359,9 @@ function add_to_chat_user(num,str)
     end
     
     if language == 'japanese' then
-        windower.add_to_chat(num,windower.to_shift_jis(str or backup_str))
+        msg.add_to_chat(num,windower.to_shift_jis(str))
     else
-        windower.add_to_chat(num,str or backup_str)
+        msg.add_to_chat(num,str)
     end
 end
 

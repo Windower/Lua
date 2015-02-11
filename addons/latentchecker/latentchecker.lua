@@ -76,7 +76,7 @@ end
 windower.register_event('addon command', function(command, ...)
     command = command
     local trial_weapons = {"axe of trials","gun of trials","sword of trials","knuckles of trials","spear of trials","scythe of trials","sapara of trials",
-    "bow of trials","club of trials","pole of trials ","pick of trials","dagger of trials","tachi of trials","kodachi of trials","sturdy axe","burning fists",
+    "bow of trials","club of trials","pole of trials","pick of trials","dagger of trials","tachi of trials","kodachi of trials","sturdy axe","burning fists",
     "werebuster","mage's staff","vorpal sword","swordbreaker","brave blade","death sickle","double axe","dancing dagger","killer bow","windslicer","sasuke katana",
     "radiant lance","scepter staff","wightslayer","quicksilver","inferno claws","main gauche","elder staff"}
     if command == 'run' then

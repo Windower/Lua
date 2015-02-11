@@ -29,7 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 _addon.name    = 'findAll'
 _addon.author  = 'Zohno'
 _addon.version = '1.20150105'
-_addon.commands = {'findAll', 'find'}
+_addon.commands = {'findall'}
 
 require('chat')
 require('lists')
@@ -53,10 +53,10 @@ settings = config.load(defaults)
 
 tracker = texts.new(settings.Track, settings.Tracker, settings)
 
-;(function()
+do
     config.register(settings, function(settings)
         tracker:text(settings.Track)
-        tracker:visible(settings.Track ~= '')
+        tracker:visible(settings.Track ~= '' and windower.ffxi.get_info().logged_in)
     end)
 
     local bag_ids = res.bags:rekey('english'):key_map(string.lower):map(table.get-{'id'})
@@ -95,7 +95,7 @@ tracker = texts.new(settings.Track, settings.Tracker, settings)
         end
     end)
 
-    windower.register_event('prerender', function()
+    do
         local update = T{}
 
         local search_bag = function(bag, ids)
@@ -107,7 +107,8 @@ tracker = texts.new(settings.Track, settings.Tracker, settings)
         end
 
         local last_check = 0
-        return function()
+
+        windower.register_event('prerender', function()
             if os.clock() - last_check < 0.25 then
                 return
             end
@@ -157,9 +158,9 @@ tracker = texts.new(settings.Track, settings.Tracker, settings)
             if not update:empty() then
                 tracker:update(update)
             end
-        end
-    end())
-end)()
+        end)
+    end
+end
 
 zone_search            = true
 first_pass             = true
@@ -475,7 +476,7 @@ windower.register_event('ipc message', function(str)
     end
 end)
 
-windower.register_event('addon command', function(...)
+handle_command = function(...)
     if first_pass then
         first_pass = false
         windower.send_ipc_message('findAll update')
@@ -515,4 +516,17 @@ windower.register_event('addon command', function(...)
         
         search(query, export)
     end
+end
+
+windower.register_event('unhandled command', function(command, ...)
+    if command:lower() == 'find' then
+        local me = windower.ffxi.get_mob_by_target('me')
+        if me then
+            handle_command(':%s':format(me.name), ...)
+        else
+            handle_command(...)
+        end
+    end
 end)
+
+windower.register_event('addon command', handle_command)

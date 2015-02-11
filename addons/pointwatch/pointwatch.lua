@@ -34,7 +34,7 @@ require 'pack'
 
 _addon.name = 'PointWatch'
 _addon.author = 'Byrth'
-_addon.version = 0.141111
+_addon.version = 0.150201
 _addon.command = 'pw'
 
 settings = config.load('data\\settings.xml',default_settings)
@@ -100,6 +100,7 @@ windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blo
     elseif id == 0x61 then
         xp.current = org:unpack('H',0x11)
         xp.tnl = org:unpack('H',0x13)
+        accolades.current = math.floor(org:byte(0x5A)/4) + org:byte(0x5B)*2^6 + (org:byte(0x5C)%4)*2^14
     elseif id == 0x63 and org:byte(5) == 2 then
         lp.current = org:unpack('H',9)
         lp.number_of_merits = org:byte(11)%64
@@ -249,7 +250,7 @@ zone_message_functions = {
     pearl_ebon_gold_silvery = function(p1,p2,p3,p4)
         abyssea.pearlescent = p1
         abyssea.ebon = p2
-        abyssea.gold = p3
+        abyssea.golden = p3
         abyssea.silvery = p4
     end,
     azure_ruby_amber = function(p1,p2,p3,p4)

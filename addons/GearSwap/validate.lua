@@ -31,24 +31,24 @@ end
 
 -- Function for determining and displaying which items from a player's inventory are not in their gear sets.
 function validate_inventory(filter)
-    windower.add_to_chat(123,'GearSwap: Checking for items in inventory that are not used in your gear sets.')
+    msg.addon_msg(123,'Checking for items in inventory that are not used in your gear sets.')
     
     local extra_items = search_sets_for_items_in_bag(items.inventory, filter)
     
     local display_list = get_item_names(extra_items):sort(insensitive_sort)
-    display_list:map(function(item) windower.add_to_chat(120, (string.gsub(item, "^%l", string.upper))) end)
-    windower.add_to_chat(123,'GearSwap: Final count = '..tostring(display_list:length()))
+    display_list:map(function(item) msg.add_to_chat(120, (string.gsub(item, "^%l", string.upper)) ) end)
+    msg.addon_msg(123,'Final count = '..tostring(display_list:length()))
 end
 
 -- Function for determining and displaying which items of a player's gear sets are not in their inventory.
 function validate_sets(filter)
-    windower.add_to_chat(123,'GearSwap: Checking for items in gear sets that are not in your inventory.')
+    msg.addon_msg(123,'Checking for items in gear sets that are not in your inventory.')
     
     local missing_items = search_bags_for_items_in_set(sets, filter)
 
     local display_list = get_item_names(missing_items):sort(insensitive_sort)
-    display_list:map(function(item) windower.add_to_chat(120, (string.gsub(item, "^%l", string.upper))) end)
-    windower.add_to_chat(123,'GearSwap: Final count = '..tostring(display_list:length()))
+    display_list:map(function(item) msg.add_to_chat(120, (string.gsub(item, "^%l", string.upper)) ) end)
+    msg.addon_msg(123,'Final count = '..tostring(display_list:length()))
 end
 
 -------------------------------------------------------------------------------------------------------------------
@@ -160,7 +160,7 @@ function search_bags_for_items_in_set(gear_table, filter, missing_items, stack)
         if type(aug) == 'string' then aug = {aug} end
         if type(name) == 'string' and name ~= 'empty' and name ~= '' and type(i) == 'string'then
             if not slot_map[i] then
-                windower.add_to_chat(123,'GearSwap: '..windower.to_shift_jis(tostring(i))..' contains a "name" element but is not a valid slot.')
+                msg.addon_msg(123,windower.to_shift_jis(tostring(i))..' contains a "name" element but is not a valid slot.')
             elseif tryfilter(lowercase_name(name), filter) and not find_in_inv(items.inventory, name, aug) and not find_in_inv(items.wardrobe, name, aug) then
                 missing_items:add(lowercase_name(name))
             end
