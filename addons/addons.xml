@@ -17,6 +17,11 @@
     <bugtracker>https://github.com/nitrous24/Lua/issues?page=1</bugtracker>
   </addon>
   <addon>
+    <name>AnnounceTarget</name>
+    <author>Mafai, Sechs</author>
+    <description>Creates special manual or automatic chat messages conveying advanced information about some specific targets</description>
+  </addon>
+  <addon>
     <name>AnsweringMachine</name>
     <description>Stores tells that you receive for later recall.</description>
   </addon>
