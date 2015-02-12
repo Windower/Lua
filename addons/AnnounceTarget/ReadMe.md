@@ -1,4 +1,4 @@
-**Authors:** Mafai, Sechs  
+**Authors:** JoshK6656, Sechs  
 **Version:** 1.2  
 **Date:** 12/02/2015  
   
