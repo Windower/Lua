@@ -16,7 +16,7 @@
 -- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 -- ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 -- WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
--- DISCLAIMED. IN NO EVENT SHALL <your name> BE LIABLE FOR ANY
+-- DISCLAIMED. IN NO EVENT SHALL Mafai, Sechs BE LIABLE FOR ANY
 -- DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 -- (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 -- LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
@@ -26,10 +26,10 @@
  
 config = require ('config')
  
-_addon.name     = 'AdherentBuffs'
+_addon.name     = 'AnnounceTarget'
 _addon.author   = 'Mafai, Sechs'
-_addon.version  = '1.1'
-_addon.commands = {'adherentbuffs','ab'}
+_addon.version  = '1.2'
+_addon.commands = {'announcetarget','at'}
  
 defaults = T{}
  
@@ -43,15 +43,17 @@ adherent_maps = {['Steadfast Adherent']="PLD, DEF+", ['Furtive Adherent']="WHM, 
 		['Honed Adherent']="RDM, Fast Cast+", ['Insidious Adherent']="RDM, MEVA+", ['Hexbreaking Adherent']="BLM, MAB+"}
 chatmodes = S{'say','party','linkshell','linkshell2','shout','s','p','l','l2','sh'}
 automodes = S{'true','t','on','false','f','off'}
+false_values = S{'false','off','f','0'}
+true_values = S{'true','on','t','1'}
 moblist = S{}
 		
 windower.register_event('addon command', function (command,...)
-	command = command and command:lower()
+	command = command and command:lower() or 'help'
 	local args = T{...}
 	if command == 'reload' then
-		windower.send_command('lua unload AdherentBuffs; lua load AdherentBuffs')
+		windower.send_command('lua reload AnnounceTarget')
 	elseif command == 'unload' then
-		windower.send_command('lua unload AdherentBuffs')
+		windower.send_command('lua unload AnnounceTarget')
 	elseif command == 'chatmode' or command == 'cm' then
 		if args[1] ~= nil and chatmodes:contains(args[1]) then
 			windower.add_to_chat(038,' ***** Chat Mode changed to "'..args[1]..'" *****')
