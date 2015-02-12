@@ -34,7 +34,7 @@ _addon.commands = {'announcetarget','at'}
 defaults = T{}
  
 defaults.AnnounceMode = 'party' --this can be say/party/linkshell/linkshell2/shout/s/p/l/l2/sh
-defaults.AutoAnnounce = 'off' --this can be true/t/on/false/f/off
+defaults.AutoAnnounce = false
  
 settings = config.load(defaults)
  
@@ -42,7 +42,6 @@ adherent_maps = {['Steadfast Adherent']="PLD, DEF+", ['Furtive Adherent']="WHM, 
 		['Fleet Adherent']="WAR, Haste+", ['Brawny Adherent']="DRK, ATK+", ['Martial Adherent']="DRK,Regain+",
 		['Honed Adherent']="RDM, Fast Cast+", ['Insidious Adherent']="RDM, MEVA+", ['Hexbreaking Adherent']="BLM, MAB+"}
 chatmodes = S{'say','party','linkshell','linkshell2','shout','s','p','l','l2','sh'}
-automodes = S{'true','t','on','false','f','off'}
 false_values = S{'false','off','f','0'}
 true_values = S{'true','on','t','1'}
 moblist = S{}
@@ -65,23 +64,17 @@ windower.register_event('addon command', function (command,...)
 	elseif command == 'announce' or command == 'a' then
 		announce(1)
 	elseif command == 'autoannounce' or command == 'aa' then
-		if args[1] == nil then
-			if settings.AutoAnnounce == 'false' or settings.AutoAnnounce == 'f' or settings.AutoAnnounce == 'off' then
-				settings.AutoAnnounce = 'on'
-			else
-				settings.AutoAnnounce = 'off'
-			end
-		elseif args[1] == "true" or args[1] == "t" or args[1] == "on" then
-			settings.AutoAnnounce = 'on'
-		elseif automodes:contains(args[1]) then
-			settings.AutoAnnounce = 'off'
-		end
-		if args[1] == nil or automodes:contains(args[1]) then
-			windower.add_to_chat(038,' ***** AutoAnnounce changed to "'..settings.AutoAnnounce..'" *****')
-			config.save(settings)
+		local value = args[1] and args[1]:lower() or nil
+		if not value then
+			settings.AutoAnnounce = not settings.AutoAnnounce
+		elseif false_values:contains(value) or true_values:contains(value) then
+			settings.AutoAnnounce = not false_values:contains(args[1]:lower())
 		else
 			windower.add_to_chat(038,' ***** "'..args[1]..'" is not a valid setting for AutoAnnounce *****')
+			return
 		end
+		windower.add_to_chat(038,' ***** AutoAnnounce changed to "'..tostring(settings.AutoAnnounce)..'" *****')
+		config.save(settings)
 	elseif command == 'clear' or command == 'c' then
 		moblist:clear()
 	elseif command == 'help' then
@@ -90,7 +83,7 @@ windower.register_event('addon command', function (command,...)
 		windower.add_to_chat(038,' chatmode -> Changes chat output mode. Available settings: say/party/linkshell/linkshell2/shout')
 		windower.add_to_chat(038,' autoannounce -> Turns AutoAnnounce on or off. Available settings: on/true/false/off')
 		windower.add_to_chat(038,' announce -> Manually announces for the current target')
-		windower.add_to_chat(038,' clear -> Clears the list of announce mobs during AutoAnnounce mode on')
+		windower.add_to_chat(038,' clear -> Clears the list of announced mobs during AutoAnnounce mode on')
 	end
 end)
 
@@ -104,7 +97,7 @@ function announce(mode)
 end
  
 windower.register_event('target change',function(...)
-	if settings.AutoAnnounce == 'true' or settings.AutoAnnounce == 't' or settings.AutoAnnounce == 'on' then
+	if settings.AutoAnnounce == true then
 		local mob = windower.ffxi.get_mob_by_target('t')
 		if mob ~= nil and not moblist:contains(mob.id) then
 			announce(0)
