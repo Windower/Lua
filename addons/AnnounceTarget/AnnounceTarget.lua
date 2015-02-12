@@ -25,15 +25,16 @@
 -- SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  
 config = require ('config')
+require ('logger')
  
 _addon.name     = 'AnnounceTarget'
-_addon.author   = 'Mafai, Sechs'
+_addon.author   = 'JoshK6656, Sechs'
 _addon.version  = '1.2'
 _addon.commands = {'announcetarget','at'}
  
 defaults = T{}
  
-defaults.AnnounceMode = 'party' --this can be say/party/linkshell/linkshell2/shout/s/p/l/l2/sh
+defaults.AnnounceMode = 'party' --this can be say/party/linkshell/linkshell2/shout/echo/s/p/l/l2/sh
 defaults.AutoAnnounce = false
  
 settings = config.load(defaults)
@@ -41,7 +42,7 @@ settings = config.load(defaults)
 adherent_maps = {['Steadfast Adherent']="PLD, DEF+", ['Furtive Adherent']="WHM, MDB+", ['Occult Adherent']="WAR, EVA+",
 		['Fleet Adherent']="WAR, Haste+", ['Brawny Adherent']="DRK, ATK+", ['Martial Adherent']="DRK,Regain+",
 		['Honed Adherent']="RDM, Fast Cast+", ['Insidious Adherent']="RDM, MEVA+", ['Hexbreaking Adherent']="BLM, MAB+"}
-chatmodes = S{'say','party','linkshell','linkshell2','shout','s','p','l','l2','sh'}
+chatmodes = S{'say','party','linkshell','linkshell2','shout','echo','s','p','l','l2','sh'}
 false_values = S{'false','off','f','0'}
 true_values = S{'true','on','t','1'}
 moblist = S{}
@@ -80,8 +81,8 @@ windower.register_event('addon command', function (command,...)
 	elseif command == 'help' then
 		windower.add_to_chat(038,' *** '.._addon.name..' v'.._addon.version..' - Authors: '.._addon.author..' ***')
 		windower.add_to_chat(038,' help -> Displays this message')
-		windower.add_to_chat(038,' chatmode -> Changes chat output mode. Available settings: say/party/linkshell/linkshell2/shout')
-		windower.add_to_chat(038,' autoannounce -> Turns AutoAnnounce on or off. Available settings: on/true/false/off')
+		windower.add_to_chat(038,' chatmode -> Changes chat output mode. Available settings: say/party/linkshell/linkshell2/shout/echo')
+		windower.add_to_chat(038,' autoannounce -> Turns AutoAnnounce on or off. Accepted settings: on/true/false/off')
 		windower.add_to_chat(038,' announce -> Manually announces for the current target')
 		windower.add_to_chat(038,' clear -> Clears the list of announced mobs during AutoAnnounce mode on')
 	end
@@ -95,6 +96,14 @@ function announce(mode)
 		windower.add_to_chat(038,' ***** Target is not an Adherent *****')
 	end
 end
+
+function announce(name)
+    if adherent_maps[name] then
+        windower.send_command('input /'..settings.AnnounceMode..' '..mob.name..' buff is ==> '..adherent_maps[mob.name]..'')
+    else
+        windower.add_to_chat(038,' ***** Target is not an Adherent *****')
+    end
+end
  
 windower.register_event('target change',function(...)
 	if settings.AutoAnnounce == true then
@@ -104,4 +113,8 @@ windower.register_event('target change',function(...)
 			moblist:add(mob.id)
 		end
 	end
+end)
+
+windower.register_event('zone change',function(...)
+	moblist:clear()
 end)
