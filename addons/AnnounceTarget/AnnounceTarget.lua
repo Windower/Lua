@@ -9,14 +9,14 @@
 --     * Redistributions in binary form must reproduce the above copyright
 --       notice, this list of conditions and the following disclaimer in the
 --       documentation and/or other materials provided with the distribution.
---     * Neither the name of AdherentBuffs nor the
+--     * Neither the name of AnnounceTarget nor the
 --       names of its contributors may be used to endorse or promote products
 --       derived from this software without specific prior written permission.
 -- 
 -- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 -- ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 -- WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
--- DISCLAIMED. IN NO EVENT SHALL JoshK6656, Sechs BE LIABLE FOR ANY
+-- DISCLAIMED. IN NO EVENT SHALL Sechs BE LIABLE FOR ANY
 -- DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 -- (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 -- LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
@@ -78,7 +78,7 @@ windower.register_event('addon command', function (command,...)
         config.save(settings)
     elseif command == 'clear' or command == 'c' then
         moblist:clear()
-		log(' ***** Previously announced targets table cleared *****')
+        log(' ***** Previously announced targets table cleared *****')
     elseif command == 'help' then
         log(' *** '.._addon.name..' v'.._addon.version..' - Authors: '.._addon.author..' ***')
         log(' help -> Displays this message')
@@ -86,6 +86,8 @@ windower.register_event('addon command', function (command,...)
         log(' autoannounce -> Turns AutoAnnounce on or off. Accepted settings: on/true/false/off')
         log(' announce -> Manually announces for the current target')
         log(' clear -> Clears the list of announced mobs during AutoAnnounce mode on')
+    else
+        error(' ***** That is not a valid AnnounceTarget command. See //at help. *****')
     end
 end)
 
