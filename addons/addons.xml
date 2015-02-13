@@ -20,6 +20,8 @@
     <name>AnnounceTarget</name>
     <author>JoshK6656, Sechs</author>
     <description>Creates special manual or automatic chat messages conveying advanced information about some specific targets</description>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Asura/Sechs</support>
   </addon>
   <addon>
     <name>AnsweringMachine</name>
