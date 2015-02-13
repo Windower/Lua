@@ -60,7 +60,7 @@ initialize = function(text, settings)
         properties:append('Claim: ${claim_name||%16s}')
     end
     if settings.ShowClaimID and ClaimIsVisible then
-        properties:append('Claim ID: ${claim_id||%13s}')
+        properties:append('Claim ID:      ${claim_id||%08s}')
     end
     if settings.ShowTargetName and TargetIsVisible then
         properties:append('Target: ${target_name||%15s}')
@@ -99,24 +99,21 @@ windower.register_event('prerender', function()
             TargetIsVisible = true
             info.target_name = mob.name
             info.target_id = mob.id
-            initialize(text_box, settings)
         elseif mobclaim and mobclaim.id > 0 then
             ClaimIsVisible = true
             TargetIsVisible = false
             info.claim_name = mobclaim.name 
             info.claim_id = mobclaim.id
-            initialize(text_box, settings)
         elseif target and target.id > 0 then
             ClaimIsVisible = false
             TargetIsVisible = true
             info.target_name = target.name
             info.target_id = target.id
-            initialize(text_box, settings)
         else
             ClaimIsVisible = false
             TargetIsVisible = false
-            initialize(text_box, settings)
         end
+        initialize(text_box, settings)
         text_box:update(info)
         text_box:show()
     else
