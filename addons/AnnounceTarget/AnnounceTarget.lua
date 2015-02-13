@@ -74,10 +74,11 @@ windower.register_event('addon command', function (command,...)
             error(' ***** "'..args[1]..'" is not a valid setting for AutoAnnounce *****')
             return
         end
-        log(' ***** AutoAnnounce changed to "'..settings.AutoAnnounce..'" *****')
+        log(' ***** AutoAnnounce changed to "',settings.AutoAnnounce,'" *****')
         config.save(settings)
     elseif command == 'clear' or command == 'c' then
         moblist:clear()
+		log(' ***** Previously announced targets table cleared *****')
     elseif command == 'help' then
         log(' *** '.._addon.name..' v'.._addon.version..' - Authors: '.._addon.author..' ***')
         log(' help -> Displays this message')
@@ -89,8 +90,8 @@ windower.register_event('addon command', function (command,...)
 end)
 
 function announce(name)
-    if adherent_maps[name] then
-        windower.send_command('input /'..settings.AnnounceMode..' '..name..' buff is ==> '..adherent_maps[name])
+    if adherents_map[name] then
+        windower.send_command('input /'..settings.AnnounceMode..' '..name..' buff is ==> '..adherents_map[name])
     else
         log(' ***** Target is not an Adherent *****')
     end
@@ -99,7 +100,7 @@ end
 windower.register_event('target change',function(index)
     mob = windower.ffxi.get_mob_by_index(index)
     if settings.AutoAnnounce and index ~= 0 then
-        if adherent_maps[mob.name] and not moblist:contains(mob.id) then
+        if adherents_map[mob.name] and not moblist:contains(mob.id) then
             moblist:add(mob.id)
             announce(mob.name)
         end
