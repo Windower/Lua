@@ -97,14 +97,6 @@ function announce(mode)
 	end
 end
 
-function announce(name)
-    if adherent_maps[name] then
-        windower.send_command('input /'..settings.AnnounceMode..' '..mob.name..' buff is ==> '..adherent_maps[mob.name]..'')
-    else
-        windower.add_to_chat(038,' ***** Target is not an Adherent *****')
-    end
-end
- 
 windower.register_event('target change',function(...)
 	if settings.AutoAnnounce == true then
 		local mob = windower.ffxi.get_mob_by_target('t')
