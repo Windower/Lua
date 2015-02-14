@@ -9,9 +9,13 @@ texts = require('texts')
 -- Config
 
 defaults = {}
-defaults.showhexid = true
-defaults.showfullid = true
-defaults.showspeed = true
+defaults.ShowHexID = true
+defaults.ShowFullID = true
+defaults.ShowSpeed = true
+defaults.ShowClaimName = true
+defaults.ShowClaimID = true
+defaults.ShowTargetName = true
+defaults.ShowTargetID = true
 defaults.display = {}
 defaults.display.pos = {}
 defaults.display.pos.x = 0
@@ -34,18 +38,35 @@ settings:save()
 
 text_box = texts.new(settings.display, settings)
 
+-- Variables for lines visibility
+
+ClaimIsVisible = true
+TargetIsVisible = true
+
 -- Constructor
 
 initialize = function(text, settings)
     local properties = L{}
-    if settings.showfullid then
-        properties:append('ID:  ${full|-|%08s}')
+    if settings.ShowFullID then
+        properties:append('ID:            ${full|-|%08s}')
     end
-    if settings.showhexid then
-        properties:append('Hex ID:   ${hex|-|%.3X}')
+    if settings.ShowHexID then
+        properties:append('Hex ID:             ${hex|-|%.3X}')
     end
-    if settings.showspeed then
-        properties:append('Speed: ${speed|-}')
+    if settings.ShowSpeed then
+        properties:append('Speed:           ${speed|-}')
+    end
+    if settings.ShowClaimName and ClaimIsVisible then
+        properties:append('Claim: ${claim_name||%16s}')
+    end
+    if settings.ShowClaimID and ClaimIsVisible then
+        properties:append('Claim ID:      ${claim_id||%08s}')
+    end
+    if settings.ShowTargetName and TargetIsVisible then
+        properties:append('Target: ${target_name||%15s}')
+    end
+    if settings.ShowTargetID and TargetIsVisible then
+        properties:append('Target ID:     ${target_id||%08s}')
     end
 
     text:clear()
@@ -54,13 +75,14 @@ end
 
 text_box:register_event('reload', initialize)
 
-initialize(text_box, settings)
-
 -- Events
 
 windower.register_event('prerender', function()
-	local mob = windower.ffxi.get_mob_by_target('t')
-	if mob and mob.id > 0 then
+    local mob = windower.ffxi.get_mob_by_target('st') or windower.ffxi.get_mob_by_target('t')
+    local player = windower.ffxi.get_player()
+    if mob and mob.id > 0 then
+        local mobclaim = windower.ffxi.get_mob_by_id(mob.claim_id)
+        local target = windower.ffxi.get_mob_by_index(mob.target_index)
         local info = {}
         info.hex = mob.id % 0x1000
         info.full = mob.id
@@ -72,15 +94,35 @@ windower.register_event('prerender', function()
                 '\\cs(255,0,0)' .. speed:string():lpad(' ', 5)
             or
                 '\\cs(102,102,102)' .. ('+' .. speed):lpad(' ', 5)) .. '%\\cr'
+        if mob.id == player.id then
+            ClaimIsVisible = false
+            TargetIsVisible = true
+            info.target_name = mob.name
+            info.target_id = mob.id
+        elseif mobclaim and mobclaim.id > 0 then
+            ClaimIsVisible = true
+            TargetIsVisible = false
+            info.claim_name = mobclaim.name 
+            info.claim_id = mobclaim.id
+        elseif target and target.id > 0 then
+            ClaimIsVisible = false
+            TargetIsVisible = true
+            info.target_name = target.name
+            info.target_id = target.id
+        else
+            ClaimIsVisible = false
+            TargetIsVisible = false
+        end
+        initialize(text_box, settings)
         text_box:update(info)
         text_box:show()
-	else
-		text_box:hide()
-	end
+    else
+        text_box:hide()
+    end
 end)
 
 --[[
-Copyright (c) 2013-2014, Windower
+Copyright (c) 2013-2015, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
