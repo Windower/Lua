@@ -13,9 +13,7 @@ defaults.ShowHexID = true
 defaults.ShowFullID = true
 defaults.ShowSpeed = true
 defaults.ShowClaimName = true
-defaults.ShowClaimID = true
 defaults.ShowTargetName = true
-defaults.ShowTargetID = true
 defaults.display = {}
 defaults.display.pos = {}
 defaults.display.pos.x = 0
@@ -38,11 +36,6 @@ settings:save()
 
 text_box = texts.new(settings.display, settings)
 
--- Variables for lines visibility
-
-ClaimIsVisible = true
-TargetIsVisible = true
-
 -- Constructor
 
 initialize = function(text, settings)
@@ -56,17 +49,11 @@ initialize = function(text, settings)
     if settings.ShowSpeed then
         properties:append('Speed:           ${speed|-}')
     end
-    if settings.ShowClaimName and ClaimIsVisible then
+    if settings.ShowClaimName then
         properties:append('Claim: ${claim_name||%16s}')
     end
-    if settings.ShowClaimID and ClaimIsVisible then
-        properties:append('Claim ID:      ${claim_id||%08s}')
-    end
-    if settings.ShowTargetName and TargetIsVisible then
+    if settings.ShowTargetName then
         properties:append('Target: ${target_name||%15s}')
-    end
-    if settings.ShowTargetID and TargetIsVisible then
-        properties:append('Target ID:     ${target_id||%08s}')
     end
 
     text:clear()
@@ -78,6 +65,7 @@ text_box:register_event('reload', initialize)
 -- Events
 
 windower.register_event('prerender', function()
+    local remove = S{}
     local mob = windower.ffxi.get_mob_by_target('st') or windower.ffxi.get_mob_by_target('t')
     local player = windower.ffxi.get_player()
     if mob and mob.id > 0 then
@@ -95,27 +83,18 @@ windower.register_event('prerender', function()
             or
                 '\\cs(102,102,102)' .. ('+' .. speed):lpad(' ', 5)) .. '%\\cr'
         if mob.id == player.id then
-            ClaimIsVisible = false
-            TargetIsVisible = true
             info.target_name = mob.name
-            info.target_id = mob.id
         elseif mobclaim and mobclaim.id > 0 then
-            ClaimIsVisible = true
-            TargetIsVisible = false
-            info.claim_name = mobclaim.name 
-            info.claim_id = mobclaim.id
+            info.claim_name = mobclaim and mobclaim.name or nil
         elseif target and target.id > 0 then
-            ClaimIsVisible = false
-            TargetIsVisible = true
-            info.target_name = target.name
-            info.target_id = target.id
+            info.target_name = target and target.name or nil
         else
-            ClaimIsVisible = false
-            TargetIsVisible = false
+            remove:add('claim_name')
+            remove:add('target_name')
         end
-        initialize(text_box, settings)
         text_box:update(info)
         text_box:show()
+        for entry in remove:it() do text_box[entry] = nil end
     else
         text_box:hide()
     end
