@@ -1,6 +1,6 @@
 _addon.name = 'Itemizer'
 _addon.author = 'Ihina'
-_addon.version = '3.0.1.0'
+_addon.version = '3.0.1.1'
 _addon.command = 'itemizer'
 
 require('luau')
@@ -13,6 +13,8 @@ defaults.Delay = 0.5
 settings = config.load(defaults)
 
 bag_ids = res.bags:key_map(string.lower .. table.get-{'english'} .. table.get+{res.bags}):map(table.get-{'id'})
+-- Remove temporary bag, because items cannot be moved from/to there, as such it's irrelevant to Itemizer
+bag_ids.temporary = nil
 
 find_items = function(ids, bag, limit)
     local res = S{}
