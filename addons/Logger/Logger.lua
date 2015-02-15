@@ -1,9 +1,16 @@
 _addon.name = 'Logger'
 _addon.author = 'Aikar'
-_addon.version = '1.0.1.0'
+_addon.version = '1.0.1.1'
 
 require('chat')
 files = require('files')
+config = require('config')
+
+defaults = {}
+defaults.AddTimestamp = false
+defaults.TimestampFormat = '%H:%M:%S'
+
+settings = config.load(defaults)
 
 name = windower.ffxi.get_player() and windower.ffxi.get_player().name
 
@@ -12,7 +19,7 @@ windower.register_event('login', function(new_name)
 end)
 
 windower.register_event('incoming text', function(_, text, _, _, blocked)
-    if blocked then
+    if blocked or text == '' then
         return
     end
 
@@ -23,7 +30,7 @@ windower.register_event('incoming text', function(_, text, _, _, blocked)
         file:create()
     end
 
-    file:append('%s\n':format(text:strip_format()))
+    file:append('%s%s\n':format(settings.AddTimestamp and os.date(settings.TimestampFormat, os.time()) or '', text:strip_format()))
 end)
 
 --[[
