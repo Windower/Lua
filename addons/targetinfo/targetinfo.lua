@@ -12,8 +12,8 @@ defaults = {}
 defaults.ShowHexID = true
 defaults.ShowFullID = true
 defaults.ShowSpeed = true
-defaults.ShowClaimName = true
-defaults.ShowTargetName = true
+defaults.ShowClaimName = false
+defaults.ShowTargetName = false
 defaults.display = {}
 defaults.display.pos = {}
 defaults.display.pos.x = 0
@@ -94,14 +94,16 @@ windower.register_event('prerender', function()
         end
         text_box:update(info)
         text_box:show()
-        for entry in remove:it() do text_box[entry] = nil end
+        for entry in remove:it() do
+            text_box[entry] = nil
+        end
     else
         text_box:hide()
     end
 end)
 
 --[[
-Copyright (c) 2013-2015, Windower
+Copyright © 2013-2015, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
