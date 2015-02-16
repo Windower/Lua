@@ -1,6 +1,6 @@
 _addon.name = 'Clock'
 _addon.author = 'StarHawk'
-_addon.version = '1.0.1.0'
+_addon.version = '1.0.1.1'
 _addon.command = 'clock'
 
 require('tables')
@@ -24,8 +24,9 @@ end
 defaults = {}
 defaults.Format = '%H:%M:%S'
 defaults.TimeZones = L{'UTC', 'JST'}
+defaults.ShowTimeZones = true
 defaults.Separator = '\\n'
-defaults.Sort = 'Time'
+defaults.Sort = 'None'
 defaults.Clock = {}
 
 settings = config.load(defaults)
@@ -46,8 +47,9 @@ redraw = function()
     local width = settings.TimeZones:reduce(function(acc, tz)
         return math.max(acc, #tz)
     end, 0)
+    local format_string = settings.ShowTimeZones and '%s%s: ${%s}' or '${%s}'
     local strings = sorted:map(function(tz)
-        return '%s%s: ${%s}':format(' ':rep(width - #tz), tz_format[tz:lower()], tz:lower())
+        return format_string:format(' ':rep(width - #tz), tz_format[tz:lower()], tz:lower())
     end)
 
     -- Use loadstring to let Lua interpret things like \n for us
