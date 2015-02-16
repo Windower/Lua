@@ -458,7 +458,7 @@ register_events = function(bool)
         end)
         
         mouse_event = windower.register_event('mouse', function(type, x, y, delta, blocked)
-            if blocked or is_hidden or is_zoning then
+            if blocked or is_hidden then
                 return
             end
             if type == 0 then
