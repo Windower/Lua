@@ -64,8 +64,8 @@ regions = 0
 
 font_widths={
     ['I']=9,['II']=17,['III']=25,['IV']=24,['V']=16,['1']=10,['2']=11,['3']=11,
-    ['4']=11,['5']=11,['6']=12,['w1']=26,['w2']=26,['w3']=26,['w4']=26,['w5']=26,
-    ['D1']=26,['D2']=26
+    ['4']=11,['5']=11,['6']=12,['˹1˼']=25,['˹2˼']=25,['˹3˼']=25,['˹4˼']=25,['˹5˼']=25,
+    ['˹I˼']=23,['˹II˼']=31,
 }
 xml_to_lua={
 	["cure"]="Cure",
@@ -291,13 +291,13 @@ options.aliases={
     ["animusaugeo"]="Enm+",
     ["animusminuo"]="Enm-",
     ["embrava"]="Embr",
-    ["curingwaltz"]="w1",
-    ["curingwaltzii"]="w2",
-    ["curingwaltziii"]="w3",
-    ["curingwaltziv"]="w4",
-    ["curingwaltzv"]="w5",
-    ["divinewaltz"]="D1",
-    ["divinewaltzii"]="D2",
+    ["curingwaltz"]="˹1˼",
+    ["curingwaltzii"]="˹2˼",
+    ["curingwaltziii"]="˹3˼",
+    ["curingwaltziv"]="˹4˼",
+    ["curingwaltzv"]="˹5˼",
+    ["divinewaltz"]="˹I˼",
+    ["divinewaltzii"]="˹II˼",
     ["healingwaltz"]="HW",
 }
 options.images={
