@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
 _addon.name = 'Nostrum'
 _addon.author = 'trv'
-_addon.version = '2.1.1'
+_addon.version = '2.1.2'
 _addon.commands = {'Nostrum','nos',}
 
 packets=require('packets')
@@ -458,7 +458,7 @@ register_events = function(bool)
         end)
         
         mouse_event = windower.register_event('mouse', function(type, x, y, delta, blocked)
-            if blocked or is_hidden then
+            if blocked or is_hidden or is_zoning then
                 return
             end
             if type == 0 then
