@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
 _addon.name = 'Nostrum'
 _addon.author = 'trv'
-_addon.version = '2.1.1'
+_addon.version = '2.1.2'
 _addon.commands = {'Nostrum','nos',}
 
 packets=require('packets')
@@ -175,11 +175,6 @@ _defaults = config.load(defaults)
 
 _settings=merge_user_file_and_settings(_defaults,settings)
 profile=_settings.profiles.default
-count_cures(profile)
-count_buffs(profile)
-count_na(profile)
-
------------------------------------------------graphic-----------------------------------------------
 
 function build_macro()
     x_start=_settings.window.x_res-1-_defaults.window.x_offset
@@ -347,9 +342,9 @@ function build_macro()
     end
 end
 
-initialize = (function()
+do
     local initialized = false
-    return function(bool)
+    initialize = function(bool)
         if bool ~= nil then initialized = bool return end
         if initialized or not windower.ffxi.get_info().logged_in then return end
         initialized = true
@@ -360,6 +355,9 @@ initialize = (function()
         position_lookup = {}
         stat_table = {}
         party = {L{},L{},L{}}
+        count_cures(profile)
+        count_buffs(profile)
+        count_na(profile)
 
         for i=1,18 do
             local pkey = alliance_keys[i]
@@ -389,7 +387,7 @@ initialize = (function()
         define_active_regions()
         register_events(true)
     end
-end)()
+end
 
 windower.register_event('load', initialize)
 
@@ -440,19 +438,20 @@ windower.register_event('addon command', function(...)
     end
 end)
 
-register_events = (function()
+do
     local incoming_chunk_event
     local outgoing_chunk_event
     local keyboard_event
     local mouse_event
-    return function(bool)
+
+register_events = function(bool)
     if bool then
         keyboard_event = windower.register_event('keyboard', function(dik,flags,blocked)
             if bit.band(blocked,32) == 32 then return end
             if tab_keys:contains(dik) then
                 if flags then
                     coroutine.sleep(.02)
-                    local target = windower.ffxi.get_mob_by_target('t')
+                    local target = windower.ffxi.get_mob_by_target('st') or windower.ffxi.get_mob_by_target('t')
                     if target then update_target(target.index) end
                 end
             end
@@ -786,4 +785,4 @@ register_events = (function()
         windower.unregister_event(outgoing_chunk_event)
     end
 end
-end)()
+end
