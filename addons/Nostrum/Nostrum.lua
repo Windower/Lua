@@ -175,11 +175,6 @@ _defaults = config.load(defaults)
 
 _settings=merge_user_file_and_settings(_defaults,settings)
 profile=_settings.profiles.default
-count_cures(profile)
-count_buffs(profile)
-count_na(profile)
-
------------------------------------------------graphic-----------------------------------------------
 
 function build_macro()
     x_start=_settings.window.x_res-1-_defaults.window.x_offset
@@ -360,6 +355,9 @@ initialize = (function()
         position_lookup = {}
         stat_table = {}
         party = {L{},L{},L{}}
+        count_cures(profile)
+        count_buffs(profile)
+        count_na(profile)
 
         for i=1,18 do
             local pkey = alliance_keys[i]
@@ -452,7 +450,7 @@ register_events = (function()
             if tab_keys:contains(dik) then
                 if flags then
                     coroutine.sleep(.02)
-                    local target = windower.ffxi.get_mob_by_target('t')
+                    local target = windower.ffxi.get_mob_by_target('st') or windower.ffxi.get_mob_by_target('t')
                     if target then update_target(target.index) end
                 end
             end
