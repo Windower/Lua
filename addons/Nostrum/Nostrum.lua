@@ -342,9 +342,9 @@ function build_macro()
     end
 end
 
-initialize = (function()
+do
     local initialized = false
-    return function(bool)
+    initialize = function(bool)
         if bool ~= nil then initialized = bool return end
         if initialized or not windower.ffxi.get_info().logged_in then return end
         initialized = true
@@ -387,7 +387,7 @@ initialize = (function()
         define_active_regions()
         register_events(true)
     end
-end)()
+end
 
 windower.register_event('load', initialize)
 
@@ -438,12 +438,13 @@ windower.register_event('addon command', function(...)
     end
 end)
 
-register_events = (function()
+do
     local incoming_chunk_event
     local outgoing_chunk_event
     local keyboard_event
     local mouse_event
-    return function(bool)
+
+register_events = function(bool)
     if bool then
         keyboard_event = windower.register_event('keyboard', function(dik,flags,blocked)
             if bit.band(blocked,32) == 32 then return end
@@ -784,4 +785,4 @@ register_events = (function()
         windower.unregister_event(outgoing_chunk_event)
     end
 end
-end)()
+end
