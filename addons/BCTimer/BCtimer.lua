@@ -16,7 +16,7 @@ modification, are permitted provided that the following conditions are met:
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL KENSHI BE LIABLE FOR ANY
+DISCLAIMED. IN NO EVENT SHALL Kenshi BE LIABLE FOR ANY
 DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
@@ -44,14 +44,14 @@ time_box = texts.new(settings)
 start_time = os.time()
 
 windower.register_event('gain buff', function(buff)
-    if buff == 254 then
+    if buff == 254 or buff == 276 then
         start_time = os.time()
         time_box:visible(true)
     end
 end)
 
 windower.register_event('lose buff', function(buff)
-    if buff == 254 then
+    if buff == 254  or buff == 276 then
         time_box:visible(false)
     end
 end)
