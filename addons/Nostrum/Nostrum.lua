@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
 _addon.name = 'Nostrum'
 _addon.author = 'trv'
-_addon.version = '2.1.2'
+_addon.version = '2.1.3'
 _addon.commands = {'Nostrum','nos',}
 
 packets=require('packets')
@@ -256,7 +256,7 @@ function build_macro()
     for i=1,options.na['n'] do
         if profile[options.na[i]] then
             prim_simple('p' .. options.na[i],_settings.primitives.na_buttons,x_start-33*(block_num+1)-1-151,y_start-10,32,32)
-            img_simple(options.na[i]..'i',windower.windower_path.."\\plugins\\icons\\spells\\"..options.images[options.na[i]]..'.png',x_start-33*(block_num+1)-152,y_start-10)
+            img_simple(options.na[i]..'i',windower.windower_path.."/plugins/icons/"..options.images[options.na[i]],x_start-33*(block_num+1)-152,y_start-10)
             text_simple(options.na[i], _settings.text.na, x_start-33*(block_num+1)-152, y_start-10, options.aliases[options.na[i]])
             misc_hold_for_up.texts:append(options.na[i])
             misc_hold_for_up.prims:extend({options.na[i]..'i','p' .. options.na[i]})
@@ -282,7 +282,7 @@ function build_macro()
     for i=1,options.buffs['n'] do
         if profile[options.buffs[i]] then
             prim_simple('p' .. options.buffs[i],_settings.primitives.buff_buttons,x_start-33*(block_num+1)-152,y_start-10,32,32)
-            img_simple(options.buffs[i]..'i',windower.windower_path.."\\plugins\\icons\\spells\\"..options.images[options.buffs[i]]..'.png',x_start-33*(block_num+1)-152,y_start-10)
+            img_simple(options.buffs[i]..'i',windower.windower_path.."/plugins/icons/"..options.images[options.buffs[i]],x_start-33*(block_num+1)-152,y_start-10)
             text_simple(options.buffs[i], _settings.text.buffs, x_start-33*(block_num+1)-152, y_start-11, options.aliases[options.buffs[i]])
             misc_hold_for_up.texts:append(options.buffs[i])
             misc_hold_for_up.prims:extend({options.buffs[i]..'i','p' .. options.buffs[i]})
@@ -447,9 +447,10 @@ do
 register_events = function(bool)
     if bool then
         keyboard_event = windower.register_event('keyboard', function(dik,flags,blocked)
-            if bit.band(blocked,32) == 32 then return end
-            if tab_keys:contains(dik) then
-                if flags then
+            if tab_keys[dik] then
+                if bit.band(blocked,32) == 32 then
+                    return
+                elseif flags then
                     coroutine.sleep(.02)
                     local target = windower.ffxi.get_mob_by_target('st') or windower.ffxi.get_mob_by_target('t')
                     if target then update_target(target.index) end
@@ -497,15 +498,15 @@ register_events = function(bool)
                     if y>b[i] and y<t[i] then
                         if x>l[i] and x<r[i] then
                             determine_response(x,i,30,y)
+                            dragged = true
+                            return true
                         elseif x>l[i+5] and x<r[i+5] then
-                            windower.send_command('%sinput /target %s':format(send_string,stat_table[party[i][math.ceil((y-b[i])/25)]].name))                else
+                            windower.send_command('%sinput /target %s':format(send_string,stat_table[party[i][math.ceil((y-b[i])/25)]].name))
+                            dragged = true
+                            return true
                         end
-                        
-                        dragged = true
-                        return true
                     end
                 end
-                
                 if y>b[4] and y<t[4] and x>l[4] and x<r[4] then
                     determine_response(x,4,33)
                     dragged = true
@@ -524,7 +525,7 @@ register_events = function(bool)
                 for i=1,regions do
                     if y>b[i] and y<t[i] then
                         if x>l[i+5] and x<r[i+5] then
-                            windower.send_command('%sinput %s "%s" %s':format(send_string, prefix[spell_default], spell_default, stat_table[party[i][math.ceil((y-b[i])/25)]].name))
+                            windower.send_command('%sinput %s "%s" %s':format(send_string, prefix[spell_default] or '', spell_default, stat_table[party[i][math.ceil((y-b[i])/25)]].name))
                             dragged = true
                             return true
                         end
