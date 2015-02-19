@@ -355,8 +355,8 @@ fields.outgoing[0x029] = L{
     {ctype='unsigned int',      label='Count'},                                 -- 04
     {ctype='unsigned char',     label='Bag',                fn=bag},            -- 08
     {ctype='unsigned char',     label='Target Bag',         fn=bag},            -- 09
-    {ctype='unsigned char',     label='Inventory Index',    fn=invp+{0x08}},    -- 0A
-    {ctype='unsigned char',     label='_unknown1',          const=0x52},        -- 0B
+    {ctype='unsigned char',     label='Current Index',      fn=invp+{0x08}},    -- 0A
+    {ctype='unsigned char',     label='Target Index'},                          -- 0B  This byte is 0x52 when moving items between bags. It takes other values when manually sorting.
 }
 
 -- Translate
