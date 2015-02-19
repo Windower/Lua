@@ -44,7 +44,8 @@ command(shortcut)
   - Trims the macro down to size, removing blank spaces.
 5. send(s) &lt;name&gt;: 
   - Requires send addon. Sends commands to the character whose name was provided. If no name was provided, send settings will reset and Nostrum will function normally.
-
+6. profile(p) &lt;name&gt;:
+  - Loads a new profile from the settings file.
         
 ###Issues
-1.When a new member first joins a party, their name may be displayed as '???'. This should automatically update to the actual value unless you're soloing and summon a trust NPC. If you're standing nearby the person (or trust NPC), you may use the 'refresh' command to fix the problem.
+1.Loading profiles in a busy area may be a bad idea.

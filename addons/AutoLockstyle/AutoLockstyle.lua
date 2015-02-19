@@ -1,5 +1,5 @@
 -- 
--- autolock v1.0.1
+-- AutoLockstyle v1.0.1
 -- 
 -- Copyright ©2015, Bangerang
 -- All rights reserved.
@@ -44,10 +44,10 @@
 --
 --
     
-_addon.name = "autolock"
+_addon.name = "AutoLockstyle"
 _addon.author = "Bangerang"
 _addon.version = "1.0.1"
-_addon.commands = {'al', 'autolock'}
+_addon.commands = {'al', 'autolockstyle'}
 _addon.language = 'english'
 
 require('luau')
@@ -73,7 +73,7 @@ windower.send_command('bind %s al':format(settings.key_bind))
 windower.send_command('input /lockstyle off')
 
 function al_output(msg)
-    prefix = 'AutoLock: '
+    prefix = 'AutoLockstyle: '
     windower.add_to_chat(209, prefix..msg)
 end
 
@@ -121,13 +121,13 @@ windower.register_event('addon command', function(command, ...)
         al_output(_addon.name..' v'.._addon.version..". Author: ".._addon.author)
         al_output('//al [options]')
         al_output('   help : display this help text.')
-        al_output('   autolock [ on | off ] : toggle auto lockstyle upon zone change.  (%s)':format(bool_to_str(settings.auto_lock)))
+        al_output('   auto [ on | off ] : toggle auto lockstyle upon zone change.  (%s)':format(bool_to_str(settings.auto_lock)))
         al_output('   lockset [gearset] : sets name of lockstyle gear set.  (%s)':format(settings.lock_set))
         al_output('   delay [seconds] : sets delay when zoning.  (%.1fs)':format(settings.zone_delay))
         al_output('   bind [keybind] : sets keybind.  (%s)':format(settings.key_bind))
         al_output('     Examples: //al bind ^a, //al bind !f3, //al bind @=')
         al_output('        ^a is Ctrl+A, !f3 is Alt+F3, @= is Winkey+=')
-    elseif command == 'autolock' then
+    elseif command == 'auto' then
         if params[1] == 'on' then
             settings.autolock = true
             al_output('Autolock on zone is now %s.':format(bool_to_str(settings.auto_lock)))
@@ -135,7 +135,7 @@ windower.register_event('addon command', function(command, ...)
             settings.autolock = false
             al_output('Autolock on zone is now %s.':format(bool_to_str(settings.auto_lock)))
         else
-            error('Invalid argument. Usage: //al autolock [ on | off ]')
+            error('Invalid argument. Usage: //al auto [ on | off ]')
         end
     elseif command == 'bind' then
         if params[1] then

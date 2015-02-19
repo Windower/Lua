@@ -40,14 +40,13 @@ require('sets')
 
 config = require('config')
 
-function timezone()
+do
     local now  = os.time()
     local h, m = math.modf(os.difftime(now, os.time(os.date('!*t', now))) / 3600)
 
-    return '%+.4d':format(100 * h + 60 * m), '%+.2d:%.2d':format(h, 60 * m)
+    tz = '%+.4d':format(100 * h + 60 * m)
+    tz_sep = '%+.2d:%.2d':format(h, 60 * m)
 end
-
-tz, tz_sep = timezone()
 
 constants = {
     ['year']         = '%Y',
@@ -78,17 +77,17 @@ constants = {
     ['time']         = '%H:%M:%S',
     ['date']         = '%Y-%m-%d',
     ['datetime']     = '%Y:%m:%d %H:%M:%S',
-    ['iso8601']      = '%Y-%m-%dT%H:%M:%S'..tz_sep,
-    ['rfc2822']      = '%a, %d %b %Y %H:%M:%S '..tz,
-    ['rfc822']       = '%a, %d %b %y %H:%M:%S '..tz,
-    ['rfc1036']      = '%a, %d %b %y %H:%M:%S '..tz,
-    ['rfc1123']      = '%a, %d %b %Y %H:%M:%S '..tz,
-    ['rfc3339']      = '%Y-%m-%dT%H:%M:%S'..tz_sep,
+    ['iso8601']      = '%Y-%m-%dT%H:%M:%S' .. tz_sep,
+    ['rfc2822']      = '%a, %d %b %Y %H:%M:%S ' .. tz,
+    ['rfc822']       = '%a, %d %b %y %H:%M:%S ' .. tz,
+    ['rfc1036']      = '%a, %d %b %y %H:%M:%S ' .. tz,
+    ['rfc1123']      = '%a, %d %b %Y %H:%M:%S ' .. tz,
+    ['rfc3339']      = '%Y-%m-%dT%H:%M:%S' .. tz_sep,
 }
 
 lead_bytes = S{0x1E, 0x1F, 0xF7, 0xEF, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x7F}
-lead_byte_class = '['..lead_bytes:map(string.char):concat()..']'
-newline_regex = '(?<!'..lead_byte_class..')['..string.char(0x07, 0x0A)..']'
+lead_byte_class = '[' .. lead_bytes:map(string.char):concat() .. ']'
+newline_regex = '(?<!' .. lead_byte_class .. ')[' .. string.char(0x07, 0x0A) .. ']'
 
 defaults = {}
 defaults.color  = 201
