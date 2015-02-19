@@ -565,6 +565,25 @@ function is_usable_item(i_tab)
 end
 
 -----------------------------------------------------------------------------------
+--Name: number_of_jps(jp_tab)
+--Desc: Gives the total number of job points spent on that job
+--Args:
+---- jp_tab - One table from windower.ffxi.get_player().job_points[job]
+-----------------------------------------------------------------------------------
+--Returns:
+---- The total number of job points spent on that job.
+-----------------------------------------------------------------------------------
+function number_of_jps(jp_tab)
+    local count = 0
+    for _,v in pairs(jp_tab) do
+        for i=0,v do
+            count = count + i
+        end
+    end
+    return count
+end
+
+-----------------------------------------------------------------------------------
 --Name: filter_pretarget(spell)
 --Desc: Determines whether the current player is capable of using the proposed spell
 ----    at pretarget.
@@ -587,7 +606,8 @@ function filter_pretarget(spell)
         if not available_spells[spell.id] and not spell.id == 503 then
             msg.debugging("Unable to execute command. You do not know that spell ("..(res.spells[spell.id][language] or spell.id)..")")
         -- Filter for spells that you know, but do not currently have access to
-        elseif (not spell_jobs[player.main_job_id] or not (spell_jobs[player.main_job_id] <= player.main_job_level)) and
+        elseif (not spell_jobs[player.main_job_id] or not (spell_jobs[player.main_job_id] <= player.main_job_level or
+            (spell_jobs[player.main_job_id] == 100 and number_of_jps(player.job_points[__raw.lower(player.main_job)]) >= 100) ) ) and
             (not spell_jobs[player.sub_job_id] or not (spell_jobs[player.sub_job_id] <= player.sub_job_level)) then
             msg.debugging("Unable to execute command. You do not have access to that spell ("..(res.spells[spell.id][language] or spell.id)..")")
             return false

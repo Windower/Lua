@@ -99,6 +99,7 @@ texts = require 'texts'
 require 'pack'
 bit = require 'bit'
 socket = require 'socket'
+mime = require 'mime'
 res = require 'resources'
 extdata = require 'extdata'
 require 'helper_functions'
@@ -144,19 +145,19 @@ windower.register_event('addon command',function (...)
     
     for i,v in pairs(splitup) do splitup[i] = windower.from_shift_jis(windower.convert_auto_trans(v)) end
 
-    local cmd = splitup[1]:lower()
+    local cmd = table.remove(splitup,1):lower()
     
     if cmd == 'c' then
         if gearswap_disabled then return end
-        if splitup[2] then
+        if splitup[1] then
             refresh_globals()
-            equip_sets('self_command',nil,_raw.table.concat(splitup,' ',2,#splitup))
+            equip_sets('self_command',nil,_raw.table.concat(splitup,' '))
         else
             msg.addon_msg(123,'No self command passed.')
         end
     elseif cmd == 'equip' then
         if gearswap_disabled then return end
-        local key_list = parse_set_to_keys(table.slice(splitup, 2))
+        local key_list = parse_set_to_keys(splitup)
         local set = get_set_from_keys(key_list)
         if set then
             refresh_globals()
@@ -165,19 +166,17 @@ windower.register_event('addon command',function (...)
             msg.addon_msg(123,'Equip command cannot be completed. That set does not exist.')
         end
     elseif cmd == 'export' then
-        table.remove(splitup,1)
         export_set(splitup)
     elseif cmd == 'validate' then
         if user_env and user_env.sets then
             refresh_globals()
-            table.remove(splitup, 1)
             validate(splitup)
         else
             msg.addon_msg(123,'There is nothing to validate because there is no file loaded.')
         end
     elseif cmd == 'l' or cmd == 'load' then
-        if splitup[2] then
-            local f_name = table.concat(splitup,' ',2)
+        if splitup[1] then
+            local f_name = table.concat(splitup,' ')
             if pathsearch({f_name}) then
                 refresh_globals()
                 command_registry = Command_Registry.new()
@@ -204,13 +203,12 @@ windower.register_event('addon command',function (...)
         _settings.show_swaps = not _settings.show_swaps
         print('GearSwap: Show Swaps set to '..tostring(_settings.show_swaps)..'.')
     elseif _settings.debug_mode and strip(cmd) == 'eval' then
-        table.remove(splitup,1)
         assert(loadstring(table.concat(splitup,' ')))()
     else
         local handled = false
         if not gearswap_disabled then
             for i,v in ipairs(unhandled_command_events) do
-                handled = equip_sets(v,nil,unpack(splitup))
+                handled = equip_sets(v,nil,cmd,unpack(splitup))
                 if handled then break end
             end
         end
@@ -222,18 +220,29 @@ end)
 
 function disenable(tab,funct,functname,pol)
     local slot_name = ''
-    if tab[2] and tab[2]:lower()=='all' then
+    local ltab = L{}
+    for i,v in pairs(tab) do
+        ltab:append(v:gsub('[^%a_%d]',''):lower())
+    end
+    if ltab:contains('all') then
         funct('main','sub','range','ammo','head','neck','lear','rear','body','hands','lring','rring','back','waist','legs','feet')
         print('GearSwap: All slots '..functname..'d.')
-    elseif tab[2]  then
-        for i=2,#tab do
-            slot_name = tab[i]:gsub('[^%a_%d]',''):lower()
+    elseif ltab.n > 0  then
+        local found = L{}
+        local not_found = L{}
+        for slot_name in ltab:it() do
             if slot_map[slot_name] then
                 funct(slot_name)
-                print('GearSwap: '..slot_name..' slot '..functname..'d.')
+                found:append(slot_name)
             else
-                print('GearSwap: Unable to find slot '..tostring(tab[i])..'.')
+                not_found:append(slot_name)
             end
+        end
+        if found.n > 0 then
+            print('GearSwap: '..found:tostring()..' slot'..(found.n>1 and 's' or '')..' '..functname..'d.')
+        end
+        if not_found.n > 0 then
+            print('GearSwap: Unable to find slot'..(not_found.n>1 and 's' or '')..' '..not_found:tostring()..'.')
         end
     elseif gearswap_disabled ~= pol and not tab[2] then
         print('GearSwap: User file '..functname..'d')
