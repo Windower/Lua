@@ -2609,12 +2609,6 @@ fields.incoming[0x061] = L{
     {ctype='unsigned int',      label='_junk1'},                                -- 5B   
 }
 
-types.ability_recast = L{
-    {ctype='unsigned short',    label='Duration',           fn=div+{1}},        -- 00
-    {ctype='unsigned char',     label='_unknown1',          const=0x00},        -- 01
-    {ctype='unsigned char',     label='Recast',             fn=arecast},        -- 02
-}
-
 types.combat_skill = L{
     {ctype='bit[15]',           label='Level'},                                 -- 00
     {ctype='boolbit',           label='Capped'},                                -- 01
@@ -2628,10 +2622,10 @@ types.craft_skill = L{
 
 -- Skills Update
 fields.incoming[0x062] = L{
-    {ref=types.ability_recast,                              count=0x1F},        -- 04
+    {ctype='char[124]',         label='_junk1'},
     {ref=types.combat_skill,    lookup={res.skills,0x00},   count=0x30},        -- 80
     {ref=types.craft_skill,     lookup={res.skills,0x30},   count=0x0A},        -- E0
-    {ctype='unsigned short[6]', label='_junk1'},                                -- F4
+    {ctype='unsigned short[6]', label='_junk2'},                                -- F4
 }
 
 -- Set Update
@@ -3326,6 +3320,18 @@ fields.incoming[0x118] = L{
     {ctype='unsigned char',     label='Leaforb Stones +1 Stored'},                  -- 37
     {ctype='unsigned char',     label='Leaforb Stones +2 Stored'},                  -- 38
     {ctype='data[0x0F]',        label='_unknown2'},                                 -- 39   Room for future additions, currently holds no value
+}
+
+types.ability_recast = L{
+    {ctype='unsigned short',    label='Duration',           fn=div+{1}},        -- 00
+    {ctype='unsigned char',     label='_unknown1',          const=0x00},        -- 02
+    {ctype='unsigned char',     label='Recast',             fn=arecast},        -- 03
+    {ctype='unsigned int',      label='_unknown2'}                              -- 04
+}
+
+-- Ability timers
+fields.incoming[0x119] = L{
+    {ref=types.ability_recast,                              count=0x1F},        -- 04
 }
 
 local sizes = {}
