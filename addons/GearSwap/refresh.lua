@@ -418,6 +418,30 @@ function refresh_ffxi_info(dt,user_event_flag)
     elseif buffactive[185] then
         world.weather = res.weather[18][language]
         world.weather_element = res.elements[7][language]
+    elseif buffactive[589] then
+        world.weather = res.weather[5][language]
+        world.weather_element = res.elements[0][language]
+    elseif buffactive[590] then
+        world.weather = res.weather[13][language]
+        world.weather_element = res.elements[1][language]
+    elseif buffactive[591] then
+        world.weather = res.weather[11][language]
+        world.weather_element = res.elements[2][language]
+    elseif buffactive[592] then
+        world.weather = res.weather[9][language]
+        world.weather_element = res.elements[3][language]
+    elseif buffactive[593] then
+        world.weather = res.weather[15][language]
+        world.weather_element = res.elements[4][language]
+    elseif buffactive[594] then
+        world.weather = res.weather[7][language]
+        world.weather_element = res.elements[5][language]
+    elseif buffactive[595] then
+        world.weather = res.weather[17][language]
+        world.weather_element = res.elements[6][language]
+    elseif buffactive[596] then
+        world.weather = res.weather[19][language]
+        world.weather_element = res.elements[7][language]
     end
     
     for global_variable_name,extradatatable in pairs(_ExtraData) do
