@@ -6,10 +6,12 @@ You can report issues, get the latest version, and view the source at:
 
 The available commands are:
     setbgm list [music]
-        Lists all of the available music in the game.
+        Lists all of the available songs in the game.
     setbgm list type
         Lists the different types of music you can set.
-    setbgm <music id>
+    setbgm <song id>
         Sets the background music given by the ID.
-    setbgm <music id> <type id>
+    setbgm <song id> <music type id>
         Sets only a given type of music.
+    setbgm <song id> <song id> <song id> <song id> <song id> <song id> <song id> <song id>
+        Sets all types of music at once.
