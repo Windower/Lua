@@ -395,28 +395,56 @@ function refresh_ffxi_info(dt,user_event_flag)
     end
 
     if buffactive[178] then
-        world.weather = res.weather[4][language]
+        if world.weather == res.weather[4][language] then
+            world.weather = res.weather[5][language]
+        else
+            world.weather = res.weather[4][language]
+        end
         world.weather_element = res.elements[0][language]
     elseif buffactive[179] then
-        world.weather = res.weather[12][language]
+        if world.weather == res.weather[12][language] then
+            world.weather = res.weather[13][language]
+        else
+            world.weather = res.weather[12][language]
+        end
         world.weather_element = res.elements[1][language]
     elseif buffactive[180] then
-        world.weather = res.weather[10][language]
+        if world.weather == res.weather[10][language] then
+            world.weather = res.weather[11][language]
+        else
+            world.weather = res.weather[10][language]
+        end
         world.weather_element = res.elements[2][language]
     elseif buffactive[181] then
-        world.weather = res.weather[8][language]
+        if world.weather == res.weather[8][language] then
+            world.weather = res.weather[9][language]
+        else
+            world.weather = res.weather[8][language]
+        end
         world.weather_element = res.elements[3][language]
     elseif buffactive[182] then
-        world.weather = res.weather[14][language]
+        if world.weather == res.weather[14][language] then
+            world.weather = res.weather[15][language]
+        else
+            world.weather = res.weather[14][language]
+        end
         world.weather_element = res.elements[4][language]
     elseif buffactive[183] then
-        world.weather = res.weather[6][language]
+        if world.weather == res.weather[6][language] then
+            world.weather = res.weather[7][language]
+        else
+            world.weather = res.weather[6][language]
+        end
         world.weather_element = res.elements[5][language]
     elseif buffactive[184] then
         world.weather = res.weather[16][language]
         world.weather_element = res.elements[6][language]
     elseif buffactive[185] then
-        world.weather = res.weather[18][language]
+        if world.weather == res.weather[18][language] then
+            world.weather = res.weather[19][language]
+        else
+            world.weather = res.weather[18][language]
+        end
         world.weather_element = res.elements[7][language]
     elseif buffactive[589] then
         world.weather = res.weather[5][language]

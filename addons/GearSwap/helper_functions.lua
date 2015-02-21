@@ -625,7 +625,8 @@ function filter_pretarget(spell)
             return false
         elseif player.sub_job_id == 20 and ((addendum_white[spell.id] and not buffactive[401] and not buffactive[416]) or
             (addendum_black[spell.id] and not buffactive[402] and not buffactive[416])) and
-            not (spell_jobs[player.main_job_id] and spell_jobs[player.main_job_id] <= player.main_job_level) then
+            not (spell_jobs[player.main_job_id] and (spell_jobs[player.main_job_id] <= player.main_job_level or
+            (spell_jobs[player.main_job_id] == 100 and number_of_jps(player.job_points[__raw.lower(player.main_job)]) >= 100) ) ) then
                         
             if addendum_white[spell.id] then
                 msg.debugging("Unable to execute command. Addendum: White required for that spell ("..(res.spells[spell.id][language] or spell.id)..")")
