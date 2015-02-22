@@ -453,7 +453,7 @@ register_events = function(bool)
                 elseif flags then
                     coroutine.sleep(.02)
                     local target = windower.ffxi.get_mob_by_target('st') or windower.ffxi.get_mob_by_target('t')
-                    if target then update_target(target.index) end
+                    if target then update_target(target) end
                 end
             end
         end)
@@ -558,18 +558,22 @@ register_events = function(bool)
         outgoing_chunk_event = windower.register_event('outgoing chunk', function(id,data)
             if id == 0x015 then
                 local packet = packets.parse('outgoing', data)
-                local target = packet['Target Index']
-                update_target(target)
-                position[1][6],position[2][6],position[3][6] = packet['X'],packet['Y'],packet['Z']
-                for i = 5,7-party[1].n,-1 do
-                    if not out_of_zone:contains(party[1][7 - i]) then
-                        color_name(position[1][i],position[2][i],position[3][i],i,false)
-                    end
+                if packet['Target Index'] ~= last_index then 
+                    update_target(windower.ffxi.get_mob_by_index(packet['Target Index']))
                 end
-                for j = 2,3 do
-                    for i = j*6,j*6-party[j].n+1,-1 do
-                        if not out_of_zone:contains(party[j][j*6-i+1]) then
+                local position = position
+                if position[1][6] ~= packet['X'] or position[2][6] ~= packet['Y'] or position[3][6] ~= packet['Z'] then
+                    position[1][6],position[2][6],position[3][6] = packet['X'],packet['Y'],packet['Z']
+                    for i = 5,7-party[1].n,-1 do
+                        if not out_of_zone:contains(party[1][7 - i]) then
                             color_name(position[1][i],position[2][i],position[3][i],i,false)
+                        end
+                    end
+                    for j = 2,3 do
+                        for i = j*6,j*6-party[j].n+1,-1 do
+                            if not out_of_zone:contains(party[j][j*6-i+1]) then
+                                color_name(position[1][i],position[2][i],position[3][i],i,false)
+                            end
                         end
                     end
                 end
@@ -620,12 +624,12 @@ register_events = function(bool)
                 local f = position_lookup[packet['NPC']]
                 if bit.band(packet['Mask'],4) == 4 and packet['Index'] == last_index then -- HP
                     if packet['HP %']~=last_hpp then
-                            windower.text.set_text("targethpp",packet['HP %'])
-                            windower.prim.set_size("target",150/100*packet['HP %'],30)
-                            if math.floor(packet['HP %']/25) ~= math.floor(last_hpp/25) then
-                                local color=_settings.primitives.hp_bar[choose_color(packet['HP %'])]
-                                windower.prim.set_color("target",color.a,color.r,color.g,color.b)
-                            end
+                        windower.text.set_text("targethpp",packet['HP %'])
+                        windower.prim.set_size("target",150/100*packet['HP %'],30)
+                        if math.floor(packet['HP %']/25) ~= math.floor(last_hpp/25) then
+                            local color=_settings.primitives.hp_bar[choose_color(packet['HP %'])]
+                            windower.prim.set_color("target",color.a,color.r,color.g,color.b)
+                        end
                         last_hpp = packet['HP %']
                     end
                 end

@@ -277,9 +277,9 @@ function switch_profiles()
 end
 
 last_hpp=0
-last_index=0
-function update_target(index)
-    if not index or index == 0 then
+last_index=-1
+function update_target(mob)
+    if not mob or mob.index == 0 then
         if prim_coordinates.visible['target'] then
             windower.prim.set_visibility("target_background",false)
             windower.prim.set_visibility("target",false)
@@ -290,6 +290,7 @@ function update_target(index)
             prim_coordinates.visible["target_background"]=false
             prim_coordinates.visible["target"]=false
         end
+        last_index = 0
     else
         if not prim_coordinates.visible['target'] and not is_hidden then
             windower.prim.set_visibility("target_background",true)
@@ -301,21 +302,19 @@ function update_target(index)
             prim_coordinates.visible["target_background"]=_settings.primitives.hp_bar_background.visible
             prim_coordinates.visible["target"]=true
         end
-        local mob = windower.ffxi.get_mob_by_index(index)
         if index ~= last_index then
             windower.text.set_text("target_name",string.sub(mob.name,1,20))
         end
-        local hpp = mob.hpp
-        if hpp~=last_hpp then
-            windower.text.set_text("targethpp",hpp)
-            windower.prim.set_size("target",150/100*hpp,30)
-            if math.floor(hpp/25) ~= math.floor(last_hpp/25) then
-                local color=_settings.primitives.hp_bar[choose_color(hpp)]
+        if mob.hpp~=last_hpp then
+            windower.text.set_text("targethpp",tostring(mob.hpp))
+            windower.prim.set_size("target",150/100*mob.hpp,30)
+            if math.floor(mob.hpp/25) ~= math.floor(last_hpp/25) then
+                local color=_settings.primitives.hp_bar[choose_color(mob.hpp)]
                 windower.prim.set_color("target",color.a,color.r,color.g,color.b)
             end
         end            
-        last_index = index
-        last_hpp = hpp
+        last_index = mob.index
+        last_hpp = mob.hpp
     end
 end
 
