@@ -1011,7 +1011,7 @@ end
 function string_augment(sys,id,val)
     local augment
     local augment_table = augment_values[sys][id]
---    if not augment_table then print('Augments Lib: ',sys,id)
+    if not augment_table then --print('Augments Lib: ',sys,id)
     elseif augment_table.Secondary_Handling then
         -- This is handling for system 1's indices 0x390~0x392, which have their own static augment lookup table
         augment_table = sp_390_augments[ (id-0x390)*16 + 545 + val]
