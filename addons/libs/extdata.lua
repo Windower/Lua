@@ -1530,10 +1530,19 @@ function extdata.compare_augments(goal,current)
     if num_augments < #goal then
         return false
     else
+        local function recheck_lib(str)
+            local sys, id, val = string.match(str,'System: (%d+) ID: (%d+) Val: (%d+)')
+            if sys then
+                str = string_augment(sys,id,val)
+            end
+            return str
+        end
         local count = 0
         for goal_ind,goal_aug in pairs(goal) do
             local bool
             for cur_ind,cur_aug in pairs(current) do
+                goal_aug = recheck_lib(goal_aug)
+                cur_aug = recheck_lib(cur_aug)
                 if aug_strip(goal_aug) == aug_strip(cur_aug) then
                     bool = true
                     count = count +1
