@@ -52,6 +52,7 @@ position = {
 }
 out_of_zone=S{}
 out_of_range=S{}
+out_of_view=S{}
 who_am_i=S{}
 packet_pt_struc = {S{},S{},S{}}
 

@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
 _addon.name = 'Nostrum'
 _addon.author = 'trv'
-_addon.version = '2.1.3'
+_addon.version = '2.1.4'
 _addon.commands = {'Nostrum','nos',}
 
 packets=require('packets')
@@ -308,7 +308,7 @@ function build_macro()
             local s = tostring(n)
             prim_simple("phpp" .. s,_settings.primitives.hp_bar,x_start-151,y_start,150/100*stat_table[party[k][j]].hpp,h)
             local color = _settings.primitives.hp_bar[choose_color(stat_table[party[k][j]].hpp)]
-            windower.prim.set_color("phpp" .. n,color.a,color.r,color.g,color.b)
+            windower.prim.set_color("phpp" .. s,color.a,color.r,color.g,color.b)
             prim_simple("pmpp" .. s,_settings.primitives.mp_bar,x_start-151,y_start+19,150/100*stat_table[party[k][j]].mpp,5)
             text_simple("tp" .. s, _settings.text.tp, x_start-151, y_start+11,stat_table[party[k][j]].tp)
             text_simple("name" .. s, _settings.text.name, x_start-151, y_start-3, prepare_names(stat_table[party[k][j]].name))
@@ -564,14 +564,15 @@ register_events = function(bool)
                 local position = position
                 if position[1][6] ~= packet['X'] or position[2][6] ~= packet['Y'] or position[3][6] ~= packet['Z'] then
                     position[1][6],position[2][6],position[3][6] = packet['X'],packet['Y'],packet['Z']
+                    local party = party
                     for i = 5,7-party[1].n,-1 do
-                        if not out_of_zone:contains(party[1][7 - i]) then
+                        if not (out_of_zone:contains(party[1][7 - i]) or out_of_view:contains(party[1][7 - i])) then
                             color_name(position[1][i],position[2][i],position[3][i],i,false)
                         end
                     end
                     for j = 2,3 do
                         for i = j*6,j*6-party[j].n+1,-1 do
-                            if not out_of_zone:contains(party[j][j*6-i+1]) then
+                            if not (out_of_zone:contains(party[j][j*6-i+1]) or out_of_view:contains(party[j][j*6-i+1])) then
                                 color_name(position[1][i],position[2][i],position[3][i],i,false)
                             end
                         end
@@ -612,7 +613,7 @@ register_events = function(bool)
                     return
                 elseif position_lookup[packet['Player']] then
                     if bit.band(packet['Mask'],1) == 1 then
-                    local f = position_lookup[packet['Player']]
+                        local f = position_lookup[packet['Player']]
                         position[1][f] = packet['X']
                         position[2][f] = packet['Y']
                         position[3][f] = packet['Z']
