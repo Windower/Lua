@@ -1532,8 +1532,8 @@ function extdata.compare_augments(goal,current)
     else
         local function recheck_lib(str)
             local sys, id, val = string.match(str,'System: (%d+) ID: (%d+) Val: (%d+)')
-            if sys then
-                str = string_augment(sys,id,val)
+            if tonumber(sys) and tonumber(id) and tonumber(val) then
+                str = string_augment(tonumber(sys),tonumber(id),tonumber(val))
             end
             return str
         end
