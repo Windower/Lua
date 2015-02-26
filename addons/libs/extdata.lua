@@ -122,6 +122,8 @@ augment_values = {
         
         [0x04A] = {{stat="Cap. Point", offset=1,percent=true}},
         [0x04B] = {{stat="Cap. Point", offset=33,percent=true}},
+        [0x04C] = {{stat="DMG:", offset=33}},
+        [0x04D] = {{stat="Delay:", offset=33,multiplier=-1,percent=true}},
 
         
         -- Need to figure out how to handle this section. The Pet: prefix is only used once despite how many augments are used.
@@ -152,6 +154,7 @@ augment_values = {
         [0x078] = {{stat='Avatar: "Mag.Atk.Bns."', offset=1}},
         [0x079] = {{stat='Pet: Breath', offset=1}},
         [0x07A] = {{stat='Pet: TP Bonus', offset=1, multiplier=20}},
+        [0x07B] = {{stat='Pet: "Dbl. Atk."', offset=1}},
 
         [0x080] = {{stat="Pet:",offset = 0}},
         --[0x081: Accuracy +1 Ranged Acc. +0 | value + 1
@@ -189,6 +192,7 @@ augment_values = {
         [0x094] = {{stat='"Gilfinder"', offset=1}},
         
         [0x097] = {{stat='"Martial Arts"', offset=1}},
+        
         [0x099] = {{stat='"Shield Mastery"', offset=1}},
         
         [0x0B0] = {{stat='"Resist Sleep"', offset=1}},
@@ -214,6 +218,10 @@ augment_values = {
         [0x0D4] = {{stat='"Recycle"', offset=1}},
 
         [0x0D7] = {{stat='"Ninja tool expertise"', offset=1}},
+        
+        [0x0E9] = {{stat='"Blood Boon"', offset=1}},
+        
+        [0x0ED] = {{stat='"Occult Acumen"', offset=1}},
 
         [0x101] = {{stat="Hand-to-Hand skill ", offset=1}},
         [0x102] = {{stat="Dagger skill ", offset=1}},
@@ -305,7 +313,6 @@ augment_values = {
         [0x20B] = {{stat="INT", offset=1,multiplier=-1}},
         [0x20C] = {{stat="MND", offset=1,multiplier=-1}},
         [0x20D] = {{stat="CHR", offset=1,multiplier=-1}},
-        
         -- The below values aren't really right
         -- They need to be "Ceiling'd"
         [0x20E] = {{stat="STR", offset=1}, {stat="DEX", offset=1, multiplier=-0.5}, {stat="VIT", offset=1, multiplier=-0.5}},
@@ -332,7 +339,6 @@ augment_values = {
         [0x223] = {{stat="AGI", offset=1, multiplier=-0.5}, {stat="INT", offset=1, multiplier=-0.5}, {stat="CHR", offset=1}},
         [0x224] = {{stat="AGI", offset=1, multiplier=-0.5}, {stat="MND", offset=1, multiplier=-0.5}, {stat="CHR", offset=1}},
         [0x225] = {{stat="INT", offset=1, multiplier=-0.5}, {stat="MND", offset=1, multiplier=-0.5}, {stat="CHR", offset=1}},
-        
         [0x226] = {{stat="STR", offset=1}, {stat="DEX", offset=1}},
         [0x227] = {{stat="STR", offset=1}, {stat="VIT", offset=1}},
         [0x228] = {{stat="STR", offset=1}, {stat="AGI", offset=1}},
@@ -340,6 +346,9 @@ augment_values = {
         [0x22A] = {{stat="INT", offset=1}, {stat="MND", offset=1}},
         [0x22B] = {{stat="MND", offset=1}, {stat="CHR", offset=1}},
         [0x22C] = {{stat="INT", offset=1}, {stat="MND", offset=1}, {stat="CHR", offset=1}},
+        [0x22D] = {{stat="STR", offset=1}, {stat="CHR", offset=1}},
+        [0x22E] = {{stat="STR", offset=1}, {stat="INT", offset=1}},
+        [0x22F] = {{stat="STR", offset=1}, {stat="MND", offset=1}},
 
         [0x2E4] = {{stat="DMG:", offset=1}},
         [0x2E5] = {{stat="DMG:", offset=33}},
@@ -369,7 +378,6 @@ augment_values = {
         [0x2FD] = {{stat="Delay:", offset=33,multiplier=-1}},
         [0x2FE] = {{stat="Delay:", offset=65,multiplier=-1}},
         [0x2FF] = {{stat="Delay:", offset=97,multiplier=-1}},
-        
         [0x300] = {{stat="Fire resistance", offset=1}},
         [0x301] = {{stat="Ice resistance", offset=1}},
         [0x302] = {{stat="Wind resistance", offset=1}},
@@ -589,7 +597,6 @@ augment_values = {
         [0x4E2] = {{stat="Indi. eff. dur. ", offset=1}},
         
         [0x4F0] = {{stat="Meditate eff. dur. ", offset=1}},
-        
         
         [0x500] = {{stat='Enhances "Mighty Strikes" effect', offset=0,multiplier=0}},
         [0x501] = {{stat='Enhances "Hundred Fists" effect', offset=0,multiplier=0}},
