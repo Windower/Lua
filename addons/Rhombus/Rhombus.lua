@@ -36,94 +36,8 @@ require('lists')
 require('sets')
 require('logger')
 require('defs')
+require('helper_functions')
 packets = require('packets')
-
-display_text = texts.new('', {
-    pos = {
-        x = 95,
-        y = 0,
-    },
-    bg = {
-        visible = false,
-    },
-    flags = {
-        bold = true,
-        draggable = false,
-    },
-    text = {
-        font = 'Consolas',
-        size = 10,
-        alpha = 255,
-        red = 255,
-        green = 255,
-        blue = 255,
-    },
-})
-
-menu_icon = texts.new('v', {
-    pos = {
-        x = -12,
-        y = -22,
-    },
-    bg = {
-        visible = false,
-    },
-    flags = {
-        bold = true,
-        draggable = false,
-    },
-    text = {
-        font = 'Wingdings',
-        size = 100,
-        alpha = 100,
-        red = 255,
-        blue = 255,
-        green = 255,
-        stroke = {
-            width = 1,
-            red = 0,
-            blue = 0,
-            green = 0,
-            alpha = 255,
-        },
-    },
-})
-
-windower.prim.create('menu_backdrop')
-windower.prim.set_color('menu_backdrop',200,0,0,0)
-windower.prim.set_visibility('menu_backdrop',false)
-windower.prim.set_size('menu_backdrop',150,12 * font_height_est)
-
-windower.prim.create('selector_rectangle')
-windower.prim.set_color('selector_rectangle',100,255,255,255)
-windower.prim.set_visibility('selector_rectangle',false)
-windower.prim.set_size('selector_rectangle',150,font_height_est)
-
-windower.prim.create('scroll_bar')
-windower.prim.set_color('scroll_bar',200,255,255,255)
-windower.prim.set_visibility('scroll_bar',false)
-windower.prim.set_size('scroll_bar',10,1)
-
-letter_to_n = {
-    'R',
-    'G',
-    'B',
-    'Y'
-}
-
-n_to_color = {
-    {255,111,111},
-    {111,255,111},
-    {111,111,255},
-    {255,255,111}
-}
-
-function colors_of_the_wind(s)
-    for k,v in pairs(is_icon) do
-        is_icon[k] = false
-    end
-    is_icon[s] = true
-end
 
 function initialize()
     local defaults={
@@ -322,10 +236,6 @@ function menu_general_layout(t,t2,n)
         end
     end
 end
-
-refresh_ja_when = {[211]=true,[212]=true,[298]=true,}
-refresh_4_when = {[61]=true,[310]=true,[85]=true,[90]=true,[87]=true,[71]=true,[136]=true,[139]=true,}
-refresh_ma_when = {[211]=true,[212]=true,[235]=true,}
 
 windower.register_event('incoming chunk', function(id, data)
     if is_menu_open and id == 0x028 then
@@ -626,17 +536,6 @@ mouse_func = {
     end,
 }
 
-function remove_categories(t)
-    local u = {}
-    local res = res
-    for i = 1,#t do
-        if not not_a_spell:contains(res.job_abilities[t[i]].en) then
-            u[#u + 1] = t[i]
-        end
-    end
-    return u
-end
-
 function build_a_menu(t)
     menu_start = 1
     is_menu_open = true
@@ -736,146 +635,11 @@ function format_response(n,p,bool)
     windower.send_command('input %s %q%s':format(n,p,t))
 end
 
-function get_string_from_id(n)
-    if last_menu_open.type == 1 then
-        return (spell_aliases[n] or res.spells[n].en)
-    elseif last_menu_open.type == 2 then
-        return (spell_aliases[n] or res.weapon_skills[n].en)
-    elseif last_menu_open.type == 3 then
-        return (spell_aliases[n] or res.job_abilities[n].en)
-    elseif last_menu_open.type == 4 then
-        return (spell_aliases[n] or res.job_abilities[n].en)
-    end
-end
-
 windower.register_event('keyboard', function(dik, flags, blocked)
     if dik == 42 and not (bit.band(blocked,32) == 32) then
         is_shift_modified = flags
     end
 end)
-
-function recursively_merge_tables(m_menu,s_menu)
-    local duplicates = flatten(m_menu)
-    if s_menu.sub_menus then
-        if m_menu.sub_menus then
-            local main_table_sub_menus = S(m_menu.sub_menus)
-            for i=1,s_menu.sub_menus.n do
-                if not main_table_sub_menus[s_menu.sub_menus[i]] then
-                    m_menu.sub_menus[m_menu.sub_menus.n + 1] = s_menu.sub_menus[i]
-                    m_menu.sub_menus.n = m_menu.sub_menus.n + 1
-                    m_menu[s_menu.sub_menus[i]] = s_menu[s_menu.sub_menus[i]]
-                else
-                    m_menu[s_menu.s_menu[i]] = recursively_merge_tables(m_menu[s_menu.s_menu[i]],s_menu[s_menu.s_menu[i]])
-                end
-            end
-            for i=1,s_menu.n do
-                if not duplicates:contains(s_menu[i]) then
-                    m_menu[m_menu.n + 1] = s_menu[i]
-                    m_menu.n = m_menu.n + 1
-                end
-            end
-        else
-            m_menu.sub_menus = s_menu.sub_menus
-            for i=1,m_menu.sub_menus.n do
-                m_menu[m_menu.sub_menus[i]] = s_menu[s_menu.sub_menus[i]]
-            end
-            for i=1,s_menu.n do
-                if not duplicates:contains(s_menu[i]) then
-                    m_menu[m_menu.n + 1] = s_menu[i]
-                    m_menu.n = m_menu.n + 1
-                end
-            end
-        end
-        s_menu.sub_menus = nil
-    else
-        if m_menu.sub_menus then
-            for i=1,s_menu.n do
-                if not duplicates:contains(s_menu[i]) then
-                    m_menu[m_menu.n + 1] = s_menu[i]
-                    m_menu.n = m_menu.n + 1
-                end
-            end
-        else
-            for i=1,s_menu.n do
-                if not duplicates:contains(s_menu[i]) then
-                    m_menu[m_menu.n + 1] = s_menu[i]
-                    m_menu.n = m_menu.n + 1
-                end
-            end
-        end
-    end
-    return m_menu
-end
-
-function flatten(t)
-    local s = S{}
-    if t.sub_menus then
-        for i = 1,#t.sub_menus do
-            s = s + flatten(t[t.sub_menus[i]])
-        end
-    end
-    for i = 1,#t do
-        s:add(t[i])
-    end
-    return s
-end
-
-category_to_resources = {
-    'spells',
-    'weapon_skills',
-    'job_abilities',
-    'job_abilities',
-}
-
-function recursively_copy_spells(t)
-    local _t = {}
-    if t.sub_menus then
-        _t.sub_menus = L{}
-        for i = 1,#t.sub_menus do
-            _t[t.sub_menus[i]] = recursively_copy_spells(t[t.sub_menus[i]]) 
-            if _t[t.sub_menus[i]] then
-                _t.sub_menus:append(t.sub_menus[i])
-            end
-        end
-    end
-    for i = 1,#t do
-        if determine_accessibility(res[category_to_resources[last_menu_open.type]][t[i]],last_menu_open.type) then
-            _t[#_t+1] = t[i]
-        end
-    end
-    _t.n = #_t
-    if _t.sub_menus then
-        if not (_t.n == 0 and _t.sub_menus.n == 0) then
-            return _t
-        else
-            return nil
-        end
-    else
-        if not (_t.n == 0) then
-            return _t
-        else
-            return nil
-        end
-    end
-end
-
-function count_table_elements(t)
-    for k,v in pairs(t) do
-        if type(v) == 'table' then
-            count_table_elements(t[k])
-        end
-    end
-    
-    t.n = #t
-end
-
-function count_job_points()
-    local n = 0
-    for k,v in pairs(windower.ffxi.get_player().job_points[res.jobs[player_info.main_job].ens:lower()]) do
-        n = n + v*(v+1)
-    end 
-    return n/2
-end
 
 function determine_accessibility(spell,type) -- ability filter, slightly modified. Credit: Byrth
     if type == 1 then

@@ -1,0 +1,145 @@
+function colors_of_the_wind(s)
+    for k,v in pairs(is_icon) do
+        is_icon[k] = false
+    end
+    is_icon[s] = true
+end
+
+function remove_categories(t)
+    local u = {}
+    local res = res
+    for i = 1,#t do
+        if not not_a_spell:contains(res.job_abilities[t[i]].en) then
+            u[#u + 1] = t[i]
+        end
+    end
+    return u
+end
+
+function get_string_from_id(n)
+    if last_menu_open.type == 1 then
+        return (spell_aliases[n] or res.spells[n].en)
+    elseif last_menu_open.type == 2 then
+        return (spell_aliases[n] or res.weapon_skills[n].en)
+    elseif last_menu_open.type == 3 then
+        return (spell_aliases[n] or res.job_abilities[n].en)
+    elseif last_menu_open.type == 4 then
+        return (spell_aliases[n] or res.job_abilities[n].en)
+    end
+end
+
+function recursively_merge_tables(m_menu,s_menu)
+    local duplicates = flatten(m_menu)
+    if s_menu.sub_menus then
+        if m_menu.sub_menus then
+            local main_table_sub_menus = S(m_menu.sub_menus)
+            for i=1,s_menu.sub_menus.n do
+                if not main_table_sub_menus[s_menu.sub_menus[i]] then
+                    m_menu.sub_menus[m_menu.sub_menus.n + 1] = s_menu.sub_menus[i]
+                    m_menu.sub_menus.n = m_menu.sub_menus.n + 1
+                    m_menu[s_menu.sub_menus[i]] = s_menu[s_menu.sub_menus[i]]
+                else
+                    m_menu[s_menu.s_menu[i]] = recursively_merge_tables(m_menu[s_menu.s_menu[i]],s_menu[s_menu.s_menu[i]])
+                end
+            end
+            for i=1,s_menu.n do
+                if not duplicates:contains(s_menu[i]) then
+                    m_menu[m_menu.n + 1] = s_menu[i]
+                    m_menu.n = m_menu.n + 1
+                end
+            end
+        else
+            m_menu.sub_menus = s_menu.sub_menus
+            for i=1,m_menu.sub_menus.n do
+                m_menu[m_menu.sub_menus[i]] = s_menu[s_menu.sub_menus[i]]
+            end
+            for i=1,s_menu.n do
+                if not duplicates:contains(s_menu[i]) then
+                    m_menu[m_menu.n + 1] = s_menu[i]
+                    m_menu.n = m_menu.n + 1
+                end
+            end
+        end
+        s_menu.sub_menus = nil
+    else
+        if m_menu.sub_menus then
+            for i=1,s_menu.n do
+                if not duplicates:contains(s_menu[i]) then
+                    m_menu[m_menu.n + 1] = s_menu[i]
+                    m_menu.n = m_menu.n + 1
+                end
+            end
+        else
+            for i=1,s_menu.n do
+                if not duplicates:contains(s_menu[i]) then
+                    m_menu[m_menu.n + 1] = s_menu[i]
+                    m_menu.n = m_menu.n + 1
+                end
+            end
+        end
+    end
+    return m_menu
+end
+
+function flatten(t)
+    local s = S{}
+    if t.sub_menus then
+        for i = 1,#t.sub_menus do
+            s = s + flatten(t[t.sub_menus[i]])
+        end
+    end
+    for i = 1,#t do
+        s:add(t[i])
+    end
+    return s
+end
+
+function recursively_copy_spells(t)
+    local _t = {}
+    if t.sub_menus then
+        _t.sub_menus = L{}
+        for i = 1,#t.sub_menus do
+            _t[t.sub_menus[i]] = recursively_copy_spells(t[t.sub_menus[i]]) 
+            if _t[t.sub_menus[i]] then
+                _t.sub_menus:append(t.sub_menus[i])
+            end
+        end
+    end
+    for i = 1,#t do
+        if determine_accessibility(res[category_to_resources[last_menu_open.type]][t[i]],last_menu_open.type) then
+            _t[#_t+1] = t[i]
+        end
+    end
+    _t.n = #_t
+    if _t.sub_menus then
+        if not (_t.n == 0 and _t.sub_menus.n == 0) then
+            return _t
+        else
+            return nil
+        end
+    else
+        if not (_t.n == 0) then
+            return _t
+        else
+            return nil
+        end
+    end
+end
+
+function count_table_elements(t)
+    for k,v in pairs(t) do
+        if type(v) == 'table' then
+            count_table_elements(t[k])
+        end
+    end
+    
+    t.n = #t
+end
+
+function count_job_points()
+    local n = 0
+    for k,v in pairs(windower.ffxi.get_player().job_points[res.jobs[player_info.main_job].ens:lower()]) do
+        n = n + v*(v+1)
+    end 
+    return n/2
+end
