@@ -25,7 +25,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
 function colors_of_the_wind(s)
-    for k,v in pairs(is_icon) do
+    for k,_ in pairs(is_icon) do
         is_icon[k] = false
     end
     is_icon[s] = true
@@ -43,15 +43,7 @@ function remove_categories(t)
 end
 
 function get_string_from_id(n)
-    if last_menu_open.type == 1 then
-        return (spell_aliases[n] or res.spells[n].en)
-    elseif last_menu_open.type == 2 then
-        return (spell_aliases[n] or res.weapon_skills[n].en)
-    elseif last_menu_open.type == 3 then
-        return (spell_aliases[n] or res.job_abilities[n].en)
-    elseif last_menu_open.type == 4 then
-        return (spell_aliases[n] or res.job_abilities[n].en)
-    end
+    return (spell_aliases[n] or res[category_to_resources[last_menu_open.type]][n].en)
 end
 
 function recursively_merge_tables(m_menu,s_menu)
@@ -164,7 +156,7 @@ end
 
 function count_job_points()
     local n = 0
-    for k,v in pairs(windower.ffxi.get_player().job_points[res.jobs[player_info.main_job].ens:lower()]) do
+    for _,v in pairs(windower.ffxi.get_player().job_points[res.jobs[player_info.main_job].ens:lower()]) do
         n = n + v*(v+1)
     end 
     return n/2
