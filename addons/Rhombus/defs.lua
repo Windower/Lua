@@ -40,12 +40,13 @@ not_a_spell = S{
     'Stratagems', 'Blood Pact: Rage', 'Sambas', 'Waltzes', 'Steps', 'Flourishes I', 'Flourishes II', 'Blood Pact: Ward',
     'Phantom Roll', 'Rune Enchantment', 'Jigs',
 }
-is_icon = {}
-is_icon.W = true
-is_icon.R = false
-is_icon.G = false
-is_icon.B = false
-is_icon.Y = false
+is_icon = {
+    W = true,
+    R = false,
+    G = false,
+    B = false,
+    Y = false,
+}
 
 custom_menu_colors = {
     Fire = '255,133,133',
@@ -59,10 +60,6 @@ custom_menu_colors = {
 }
 
 player_info = {}
-player_info.main_job = windower.ffxi.get_player().main_job_id
-player_info.sub_job = windower.ffxi.get_player().sub_job_id
-player_info.main_job_level = windower.ffxi.get_player().main_job_level
-player_info.sub_job_level = windower.ffxi.get_player().sub_job_level
 menu_layer_record = L{}
 menu_history = {}
 menu_list = L{}

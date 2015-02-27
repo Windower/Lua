@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
 _addon.name = 'Rhombus'
 _addon.author = 'trv'
-_addon.version = '1.1.2'
+_addon.version = '1.1.4'
 
 config = require('config')
 texts = require('texts')
@@ -38,19 +38,10 @@ require('logger')
 require('defs')
 packets = require('packets')
 
-local defaults={
-    x_offset = 0,
-    y_offset = 0,
-}
-_defaults = config.load(defaults)
-
-x_offset = _defaults.x_offset
-y_offset = _defaults.y_offset
-
-display_text = texts.new('${menu_text}', {
+display_text = texts.new('', {
     pos = {
-        x = 95 + x_offset,
-        y = 0 + y_offset,
+        x = 95,
+        y = 0,
     },
     bg = {
         visible = false,
@@ -71,8 +62,8 @@ display_text = texts.new('${menu_text}', {
 
 menu_icon = texts.new('v', {
     pos = {
-        x = -12 + x_offset,
-        y = -22 + y_offset,
+        x = -12,
+        y = -22,
     },
     bg = {
         visible = false,
@@ -98,23 +89,17 @@ menu_icon = texts.new('v', {
     },
 })
 
-menu_icon:show()
-
-selector_pos.x = 102 + x_offset
 windower.prim.create('menu_backdrop')
-windower.prim.set_position('menu_backdrop',selector_pos.x,0 + y_offset)
 windower.prim.set_color('menu_backdrop',200,0,0,0)
 windower.prim.set_visibility('menu_backdrop',false)
 windower.prim.set_size('menu_backdrop',150,12 * font_height_est)
 
 windower.prim.create('selector_rectangle')
-windower.prim.set_position('selector_rectangle',selector_pos.x,0 + y_offset)
 windower.prim.set_color('selector_rectangle',100,255,255,255)
 windower.prim.set_visibility('selector_rectangle',false)
 windower.prim.set_size('selector_rectangle',150,font_height_est)
 
 windower.prim.create('scroll_bar')
-windower.prim.set_position('scroll_bar',selector_pos.x + 150,0 + y_offset)
 windower.prim.set_color('scroll_bar',200,255,255,255)
 windower.prim.set_visibility('scroll_bar',false)
 windower.prim.set_size('scroll_bar',10,1)
@@ -140,6 +125,28 @@ function colors_of_the_wind(s)
     is_icon[s] = true
 end
 
+function initialize()
+    local defaults={
+        x_offset = 0,
+        y_offset = 0,
+    }
+    _defaults = config.load(defaults)
+
+    x_offset = _defaults.x_offset
+    y_offset = _defaults.y_offset
+    selector_pos.x = 102 + x_offset
+        
+    windower.prim.set_position('menu_backdrop',selector_pos.x,y_offset)
+    windower.prim.set_position('selector_rectangle',selector_pos.x,y_offset)
+    windower.prim.set_position('scroll_bar',selector_pos.x + 150,y_offset)
+    
+    display_text:pos(95 + x_offset, y_offset)
+    
+    menu_icon:pos(-12 + x_offset, -22 + y_offset)
+    menu_icon:show()
+    
+end
+
 function get_templates()
     if not windower.ffxi.get_info().logged_in then return end
     player_info.id = windower.ffxi.get_player().id
@@ -147,12 +154,11 @@ function get_templates()
     player_info.sub_job = sub_job_id or windower.ffxi.get_player().sub_job_id
     player_info.main_job_level = main_job_level or windower.ffxi.get_player().main_job_level
     player_info.sub_job_level = sub_job_level or windower.ffxi.get_player().sub_job_level
-    local t_temp
     
     local main = res.jobs[player_info.main_job].en
     local sub = res.jobs[player_info.sub_job].en
     
-    t_temp = L(res.spells:levels(function(t) return t[player_info.main_job] or t[player_info.sub_job] end):keyset())
+    local t_temp = L(res.spells:levels(function(t) return t[player_info.main_job] or t[player_info.sub_job] end):keyset())
     spells_template = loadfile(windower.addon_path .. 'data/spells_template.lua')
     if not spells_template then
         error('No template for spells was found.')
@@ -317,26 +323,26 @@ function menu_general_layout(t,t2,n)
     end
 end
 
-refresh_ja_when = S{211,212,298}
-refresh_4_when = S{30}
-refresh_ma_when = S{211,212,234,235}
+refresh_ja_when = {[211]=true,[212]=true,[298]=true,}
+refresh_4_when = {[61]=true,[310]=true,[85]=true,[90]=true,[87]=true,[71]=true,[136]=true,[139]=true,}
+refresh_ma_when = {[211]=true,[212]=true,[235]=true,}
 
 windower.register_event('incoming chunk', function(id, data)
-    if id == 0x028 then
+    if is_menu_open and id == 0x028 then
         local packet = packets.parse('incoming', data)
         local param = packet['Param']
-        if ((packet['Actor'] == player_info.id) and is_menu_open and (packet['Category'] == 6)) then
-            if (refresh_ja_when:contains(param) and (last_menu_open.type == 3)) then
+        if ((packet['Actor'] == player_info.id) and (packet['Category'] == 6)) then
+            if (refresh_ja_when[param] and (last_menu_open.type == 3)) then
                 menu_history[3] = list.copy(menu_layer_record)
                 close_a_menu()
                 coroutine.sleep(.2)
                 mouse_func[3]()
-            elseif (refresh_ma_when:contains(param) and (last_menu_open.type == 1)) then
+            elseif (refresh_ma_when[param] and (last_menu_open.type == 1)) then
                 menu_history[1] = list.copy(menu_layer_record)
                 close_a_menu()
                 coroutine.sleep(1)
                 mouse_func[1]()
-            elseif (refresh_4_when:contains(param) and (last_menu_open.type == 4)) then
+            elseif (refresh_4_when[param] and (last_menu_open.type == 4)) then
                 menu_history[4] = list.copy(menu_layer_record)
                 close_a_menu()
                 coroutine.sleep(.2)
@@ -346,7 +352,23 @@ windower.register_event('incoming chunk', function(id, data)
     end
 end)
 
-windower.register_event('load','login','job change',get_templates)
+windower.register_event('job change',get_templates)
+
+windower.register_event('login', function()
+    initialize()
+    get_templates:schedule(10)
+end)
+
+windower.register_event('load', function()
+    initialize()
+    get_templates()  
+end)
+
+windower.register_event('logout', function()
+    close_a_menu()
+    display_text:hide()
+    menu_icon:hide()
+end)
 
 windower.register_event('mouse', function(type, x, y, delta, blocked)
     if blocked then
@@ -484,7 +506,7 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
             menu_start = menu_start - delta
             if menu_start < 1 then menu_start = 1 end
             if menu_start + 11 > menu_list.n then menu_start = menu_list.n - 11 end
-            display_text.menu_text=menu_list:concat('\n',menu_start,menu_start+11)
+            display_text:text(menu_list:concat('\n',menu_start,menu_start+11))
             windower.prim.set_position('scroll_bar',selector_pos.x + 150,y_offset + ((12 * font_height_est * (1 - 12 / menu_list.n)) / (menu_list.n - 12)) * (menu_start - 1))
             return true
         end
@@ -512,6 +534,7 @@ mouse_func = {
     [1] = function()
             available_category = windower.ffxi.get_spells()
             active_buffs = S(windower.ffxi.get_player().buffs)
+            number_of_jps = count_job_points()
             if is_menu_open then
                 if last_menu_open.type == 1 then
                     is_menu_open = false
@@ -605,6 +628,7 @@ mouse_func = {
 
 function remove_categories(t)
     local u = {}
+    local res = res
     for i = 1,#t do
         if not not_a_spell:contains(res.job_abilities[t[i]].en) then
             u[#u + 1] = t[i]
@@ -637,7 +661,7 @@ function build_a_menu(t)
         else
             windower.prim.set_visibility('scroll_bar',false)
         end
-        display_text.menu_text=menu_list:concat('\n',1,12)
+        display_text:text(menu_list:concat('\n',1,12))
         windower.prim.set_visibility('menu_backdrop',true)
         selector_pos.y = y_offset
         windower.prim.set_position('selector_rectangle',selector_pos.x,selector_pos.y)
@@ -725,8 +749,7 @@ function get_string_from_id(n)
 end
 
 windower.register_event('keyboard', function(dik, flags, blocked)
-    if bit.band(blocked,32)  == 32 then return end
-    if dik == 42 then
+    if dik == 42 and not (bit.band(blocked,32) == 32) then
         is_shift_modified = flags
     end
 end)
@@ -842,7 +865,16 @@ function count_table_elements(t)
             count_table_elements(t[k])
         end
     end
+    
     t.n = #t
+end
+
+function count_job_points()
+    local n = 0
+    for k,v in pairs(windower.ffxi.get_player().job_points[res.jobs[player_info.main_job].ens:lower()]) do
+        n = n + v*(v+1)
+    end 
+    return n/2
 end
 
 function determine_accessibility(spell,type) -- ability filter, slightly modified. Credit: Byrth
@@ -850,7 +882,8 @@ function determine_accessibility(spell,type) -- ability filter, slightly modifie
         local spell_jobs = spell.levels        
         if not available_category[spell.id] and not (spell.id == 503) then
             return false
-        elseif (not spell_jobs[player_info.main_job] or not (spell_jobs[player_info.main_job] <= player_info.main_job_level)) and
+        elseif (not spell_jobs[player_info.main_job] or not (spell_jobs[player_info.main_job] <= player_info.main_job_level or
+            (spell_jobs[player_info.main_job] == 100 and number_of_jps >= 100))) and
             (not spell_jobs[player_info.sub_job] or not (spell_jobs[player_info.sub_job] <= player_info.sub_job_level)) then
             return false
         elseif player_info.main_job == 20 and ((addendum_white[spell.id] and not active_buffs[401] and not active_buffs[416]) or
