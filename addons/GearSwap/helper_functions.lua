@@ -576,11 +576,9 @@ end
 function number_of_jps(jp_tab)
     local count = 0
     for _,v in pairs(jp_tab) do
-        for i=0,v do
-            count = count + i
-        end
+        count = count + v*(v+1)
     end
-    return count
+    return count/2
 end
 
 -----------------------------------------------------------------------------------
@@ -603,7 +601,7 @@ function filter_pretarget(spell)
         local spell_jobs = copy_entry(res.spells[spell.id].levels)
         
         -- Filter for spells that you do not know. Exclude Impact.
-        if not available_spells[spell.id] and not spell.id == 503 then
+        if not available_spells[spell.id] and not (spell.id == 503) then
             msg.debugging("Unable to execute command. You do not know that spell ("..(res.spells[spell.id][language] or spell.id)..")")
         -- Filter for spells that you know, but do not currently have access to
         elseif (not spell_jobs[player.main_job_id] or not (spell_jobs[player.main_job_id] <= player.main_job_level or
