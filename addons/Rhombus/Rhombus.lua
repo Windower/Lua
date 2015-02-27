@@ -295,7 +295,6 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
             windower.prim.set_position('menu_backdrop',selector_pos.x,y-drag_and_drop.y)
             windower.prim.set_position('selector_rectangle',selector_pos.x,y_offset+selector_pos.y)
             windower.prim.set_position('scroll_bar',selector_pos.x + 150,y_offset + ((12 * font_height_est * (1 - 12 / menu_list.n)) / (menu_list.n - 12)) * (menu_start - 1))
-
         elseif math.abs(_x) + math.abs(_y) <= 51 then
             local tan = (_y)/(_x)
             if _x > 0 then
@@ -421,8 +420,15 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
             return true
         end
     elseif type == 4 then
-        if is_menu_open and x >= display_text:pos_x() and x <= display_text:pos_x() + 150 then
-            local _,_y = display_text:extents()
+        local _x,_y = x-(51+x_offset),y-(51+y_offset)
+        if math.abs(_x) + math.abs(_y) <= 51 then
+            mouse_safety = true
+            if is_menu_open then
+                menu_history[last_menu_open.type] = list.copy(menu_layer_record)
+            end
+            close_a_menu()
+            return true
+        elseif is_menu_open and x >= display_text:pos_x() and x <= display_text:pos_x() + 150 then
             if y <= y_offset or y >= y_offset + font_height_est * 12 then return end
             if menu_layer_record.n == 0 then
                 close_a_menu()
@@ -442,54 +448,19 @@ end)
 
 mouse_func = {
     [1] = function()
-            available_category = windower.ffxi.get_spells()
-            active_buffs = S(windower.ffxi.get_player().buffs)
-            number_of_jps = count_job_points()
-            if is_menu_open then
-                if last_menu_open.type == 1 then
-                    is_menu_open = false
-                    menu_layer_record:clear()
-                    close_a_menu()
-                    last_menu_open = {}
-                    current_menu = {}
-                    menu_history[1] = false
-                else
-                    menu_history[last_menu_open.type] = list.copy(menu_layer_record)
-                    if menu_history[1] then
-                        last_menu_open.type = 1
-                        menu_layer_record = menu_history[1]
-                        current_menu = recursively_copy_spells(spells_template)
-                        if current_menu then
-                            last_menu_open = current_menu
-                            last_menu_open.type = 1
-                            for i = 1,menu_layer_record.n do
-                                if current_menu[menu_layer_record[i]] then
-                                    current_menu = current_menu[menu_layer_record[i]]
-                                else
-                                    for j = 1,menu_layer_record.n+1-i do
-                                        menu_layer_record:remove()
-                                    end
-                                    break
-                                end
-                            end
-                            build_a_menu(current_menu)
-                        else
-                            current_menu = {}
-                        end
-                    else
-                        menu_layer_record:clear()
-                        last_menu_open.type = 1
-                        current_menu = recursively_copy_spells(spells_template)
-                        if current_menu then
-                            last_menu_open = current_menu
-                            last_menu_open.type = 1
-                            build_a_menu(current_menu)
-                        else
-                            current_menu = {}
-                        end
-                    end
-                end
+        available_category = windower.ffxi.get_spells()
+        active_buffs = S(windower.ffxi.get_player().buffs)
+        number_of_jps = count_job_points()
+        if is_menu_open then
+            if last_menu_open.type == 1 then
+                is_menu_open = false
+                menu_layer_record:clear()
+                close_a_menu()
+                last_menu_open = {}
+                current_menu = {}
+                menu_history[1] = false
             else
+                menu_history[last_menu_open.type] = list.copy(menu_layer_record)
                 if menu_history[1] then
                     last_menu_open.type = 1
                     menu_layer_record = menu_history[1]
@@ -507,7 +478,7 @@ mouse_func = {
                                 break
                             end
                         end
-                        build_a_menu(current_menu) -- changes
+                        build_a_menu(current_menu)
                     else
                         current_menu = {}
                     end
@@ -524,7 +495,42 @@ mouse_func = {
                     end
                 end
             end
-          end,
+        else
+            if menu_history[1] then
+                last_menu_open.type = 1
+                menu_layer_record = menu_history[1]
+                current_menu = recursively_copy_spells(spells_template)
+                if current_menu then
+                    last_menu_open = current_menu
+                    last_menu_open.type = 1
+                    for i = 1,menu_layer_record.n do
+                        if current_menu[menu_layer_record[i]] then
+                            current_menu = current_menu[menu_layer_record[i]]
+                        else
+                            for j = 1,menu_layer_record.n+1-i do
+                                menu_layer_record:remove()
+                            end
+                            break
+                        end
+                    end
+                    build_a_menu(current_menu) -- changes
+                else
+                    current_menu = {}
+                end
+            else
+                menu_layer_record:clear()
+                last_menu_open.type = 1
+                current_menu = recursively_copy_spells(spells_template)
+                if current_menu then
+                    last_menu_open = current_menu
+                    last_menu_open.type = 1
+                    build_a_menu(current_menu)
+                else
+                    current_menu = {}
+                end
+            end
+        end
+    end,
     [2] = function()
         menu_general_layout(windower.ffxi.get_abilities().weapon_skills,ws_template,2)
     end,
