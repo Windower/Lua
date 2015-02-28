@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
 _addon.name = 'Rhombus'
 _addon.author = 'trv'
-_addon.version = '1.1.4'
+_addon.version = '1.1.5'
 
 config = require('config')
 texts = require('texts')
@@ -448,88 +448,9 @@ end)
 
 mouse_func = {
     [1] = function()
-        available_category = windower.ffxi.get_spells()
         active_buffs = S(windower.ffxi.get_player().buffs)
         number_of_jps = count_job_points()
-        if is_menu_open then
-            if last_menu_open.type == 1 then
-                is_menu_open = false
-                menu_layer_record:clear()
-                close_a_menu()
-                last_menu_open = {}
-                current_menu = {}
-                menu_history[1] = false
-            else
-                menu_history[last_menu_open.type] = list.copy(menu_layer_record)
-                if menu_history[1] then
-                    last_menu_open.type = 1
-                    menu_layer_record = menu_history[1]
-                    current_menu = recursively_copy_spells(spells_template)
-                    if current_menu then
-                        last_menu_open = current_menu
-                        last_menu_open.type = 1
-                        for i = 1,menu_layer_record.n do
-                            if current_menu[menu_layer_record[i]] then
-                                current_menu = current_menu[menu_layer_record[i]]
-                            else
-                                for j = 1,menu_layer_record.n+1-i do
-                                    menu_layer_record:remove()
-                                end
-                                break
-                            end
-                        end
-                        build_a_menu(current_menu)
-                    else
-                        current_menu = {}
-                    end
-                else
-                    menu_layer_record:clear()
-                    last_menu_open.type = 1
-                    current_menu = recursively_copy_spells(spells_template)
-                    if current_menu then
-                        last_menu_open = current_menu
-                        last_menu_open.type = 1
-                        build_a_menu(current_menu)
-                    else
-                        current_menu = {}
-                    end
-                end
-            end
-        else
-            if menu_history[1] then
-                last_menu_open.type = 1
-                menu_layer_record = menu_history[1]
-                current_menu = recursively_copy_spells(spells_template)
-                if current_menu then
-                    last_menu_open = current_menu
-                    last_menu_open.type = 1
-                    for i = 1,menu_layer_record.n do
-                        if current_menu[menu_layer_record[i]] then
-                            current_menu = current_menu[menu_layer_record[i]]
-                        else
-                            for j = 1,menu_layer_record.n+1-i do
-                                menu_layer_record:remove()
-                            end
-                            break
-                        end
-                    end
-                    build_a_menu(current_menu) -- changes
-                else
-                    current_menu = {}
-                end
-            else
-                menu_layer_record:clear()
-                last_menu_open.type = 1
-                current_menu = recursively_copy_spells(spells_template)
-                if current_menu then
-                    last_menu_open = current_menu
-                    last_menu_open.type = 1
-                    build_a_menu(current_menu)
-                else
-                    current_menu = {}
-                end
-            end
-        end
+        menu_general_layout(setmetatable(windower.ffxi.get_spells(), _meta.S),spells_template,1)
     end,
     [2] = function()
         menu_general_layout(windower.ffxi.get_abilities().weapon_skills,ws_template,2)
