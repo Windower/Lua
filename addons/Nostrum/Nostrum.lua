@@ -446,11 +446,11 @@ do
 
 register_events = function(bool)
     if bool then
-        keyboard_event = windower.register_event('keyboard', function(dik,flags,blocked)
+        keyboard_event = windower.register_event('keyboard', function(dik,down,flags,blocked)
             if tab_keys[dik] then
-                if bit.band(blocked,32) == 32 then
+                if bit.band(flags,32) == 32 then
                     return
-                elseif flags then
+                elseif down then
                     coroutine.sleep(.02)
                     local target = windower.ffxi.get_mob_by_target('st') or windower.ffxi.get_mob_by_target('t')
                     if target then update_target(target) end
