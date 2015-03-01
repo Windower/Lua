@@ -37,7 +37,7 @@ require('sets')
 require('logger')
 require('defs')
 require('helper_functions')
-packets = require('packets')
+bit = require('bit')
 
 config.register(_defaults, function(settings_table)
     x_offset = settings_table.x_offset
@@ -557,9 +557,9 @@ function format_response(n,p,bool)
     windower.send_command('input %s %q%s':format(n,p,t))
 end
 
-windower.register_event('keyboard', function(dik, flags, blocked)
-    if dik == 42 and not (bit.band(blocked,32) == 32) then
-        is_shift_modified = flags
+windower.register_event('keyboard', function(dik, down, flags, blocked)
+    if dik == 42 and not (bit.band(flags,32) == 32) then
+        is_shift_modified = down
     end
 end)
 
