@@ -41,4 +41,5 @@ menu will be saved. The next time the menu is opened, it will open to the saved 
 Left-clicking a menu item will input the ability or spell to the console, while left-clicking with the shift key held down will do the same but with the (hopefully) appropriate subtarget command appended.
 Note that in order for left-clicking to work properly, the shortcuts addon must also be loaded.
 Right-clicking on the menu will travel back one menu, or close the menu if the base menu is open.
+Right-clicking on the rhombus icon will close the currently opened menu, saving the position within the menu.
 Only 12 menu items can be displayed at a time. The rest may be scrolled to using the scroll-wheel of your mouse.
