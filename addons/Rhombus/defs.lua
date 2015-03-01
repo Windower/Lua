@@ -24,6 +24,13 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
+defaults={
+    x_offset = 0,
+    y_offset = 0,
+}
+
+_defaults = config.load(defaults)
+
 display_text = texts.new('', {
     pos = {
         x = 95,

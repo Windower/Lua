@@ -39,15 +39,9 @@ require('defs')
 require('helper_functions')
 packets = require('packets')
 
-function initialize()
-    local defaults={
-        x_offset = 0,
-        y_offset = 0,
-    }
-    _defaults = config.load(defaults)
-
-    x_offset = _defaults.x_offset
-    y_offset = _defaults.y_offset
+config.register(_defaults, function(settings_table)
+    x_offset = settings_table.x_offset
+    y_offset = settings_table.y_offset
     selector_pos.x = 102 + x_offset
         
     windower.prim.set_position('menu_backdrop',selector_pos.x,y_offset)
@@ -58,8 +52,7 @@ function initialize()
     
     menu_icon:pos(-12 + x_offset, -22 + y_offset)
     menu_icon:show()
-    
-end
+end)
 
 function get_templates()
     if not windower.ffxi.get_info().logged_in then return end
@@ -268,12 +261,10 @@ end)
 windower.register_event('job change',get_templates)
 
 windower.register_event('login', function()
-    initialize()
     get_templates:schedule(10)
 end)
 
 windower.register_event('load', function()
-    initialize()
     get_templates()  
 end)
 
