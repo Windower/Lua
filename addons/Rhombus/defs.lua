@@ -132,9 +132,12 @@ custom_menu_colors = {
     Darkness = '100,100,100',
 }
 
-refresh_ja_when = {[211]=true,[212]=true,[298]=true,}
-refresh_4_when = {[61]=true,[310]=true,[85]=true,[90]=true,[87]=true,[71]=true,[136]=true,[139]=true,}
-refresh_ma_when = {[211]=true,[212]=true,[235]=true,}
+--refresh_ja_when = {[211]=true,[212]=true,[298]=true,}
+refresh_ja_when = {[358]=true,[359]=true,}
+--refresh_4_when = {[61]=true,[310]=true,[85]=true,[90]=true,[87]=true,[71]=true,[136]=true,[139]=true,}
+refresh_4_when = {[55]=true,}
+--refresh_ma_when = {[211]=true,[212]=true,[235]=true,}
+refresh_ma_when = {[401]=true,[402]=true,[416]=true,[485]=true,}
 
 player_info = {}
 menu_layer_record = L{}
@@ -163,5 +166,3 @@ windower.prim.create('scroll_bar')
 windower.prim.set_color('scroll_bar',200,255,255,255)
 windower.prim.set_visibility('scroll_bar',false)
 windower.prim.set_size('scroll_bar',10,1)
-
-

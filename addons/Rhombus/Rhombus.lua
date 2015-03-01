@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
 _addon.name = 'Rhombus'
 _addon.author = 'trv'
-_addon.version = '1.1.5'
+_addon.version = '1.2.0'
 
 config = require('config')
 texts = require('texts')
@@ -238,27 +238,30 @@ function menu_general_layout(t,t2,n)
 end
 
 windower.register_event('incoming chunk', function(id, data)
-    if is_menu_open and id == 0x028 then
-        local packet = packets.parse('incoming', data)
-        local param = packet['Param']
-        if ((packet['Actor'] == player_info.id) and (packet['Category'] == 6)) then
-            if (refresh_ja_when[param] and (last_menu_open.type == 3)) then
-                menu_history[3] = list.copy(menu_layer_record)
-                close_a_menu()
-                coroutine.sleep(.2)
-                mouse_func[3]()
-            elseif (refresh_ma_when[param] and (last_menu_open.type == 1)) then
-                menu_history[1] = list.copy(menu_layer_record)
-                close_a_menu()
-                coroutine.sleep(1)
-                mouse_func[1]()
-            elseif (refresh_4_when[param] and (last_menu_open.type == 4)) then
-                menu_history[4] = list.copy(menu_layer_record)
-                close_a_menu()
-                coroutine.sleep(.2)
-                mouse_func[4]()
-            end
+    if is_menu_open and id == 0x0AC and last_menu_open.type ~= 1 then
+        if not S(windower.ffxi.get_abilities()[category_to_resources[last_menu_open.type]]):equals(available_category) then
+            available_category = S(windower.ffxi.get_abilities()[category_to_resources[last_menu_open.type]])
+            current_menu = recursively_copy_spells({spells_template,ws_template,ja_template,pet_command_template}[last_menu_open.type])
+            menu_building_snippet()
         end
+    end
+end)
+
+windower.register_event('gain buff', function(buff_id)
+    if is_menu_open and refresh_ma_when[buff_id] and last_menu_open.type == 1 then
+        active_buffs:add(buff_id)
+        number_of_jps = count_job_points()
+        current_menu = recursively_copy_spells(spells_template)
+        menu_building_snippet()
+    end
+end)
+
+windower.register_event('lose buff', function(buff_id)
+    if is_menu_open and refresh_ma_when[buff_id] and last_menu_open.type == 1 then
+        active_buffs:remove(buff_id)
+        number_of_jps = count_job_points()
+        current_menu = recursively_copy_spells(spells_template)
+        menu_building_snippet()
     end
 end)
 

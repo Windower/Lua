@@ -161,3 +161,23 @@ function count_job_points()
     end 
     return n/2
 end
+
+function menu_building_snippet()
+    current_menu.type = last_menu_open.type
+    if current_menu then
+        last_menu_open = current_menu
+        for i = 1,menu_layer_record.n do
+            if current_menu[menu_layer_record[i]] then
+                current_menu = current_menu[menu_layer_record[i]]
+            else
+                for j = 1,menu_layer_record.n+1-i do
+                    menu_layer_record:remove()
+                end
+                break
+            end
+        end
+        build_a_menu(current_menu)
+    else
+        current_menu = {}
+    end
+end
