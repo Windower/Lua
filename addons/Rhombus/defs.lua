@@ -1,4 +1,4 @@
---[[Copyright © 2014, trv
+--[[Copyright © 2014-2015, trv
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -132,11 +132,6 @@ custom_menu_colors = {
     Darkness = '100,100,100',
 }
 
---refresh_ja_when = {[211]=true,[212]=true,[298]=true,}
-refresh_ja_when = {[358]=true,[359]=true,}
---refresh_4_when = {[61]=true,[310]=true,[85]=true,[90]=true,[87]=true,[71]=true,[136]=true,[139]=true,}
-refresh_4_when = {[55]=true,}
---refresh_ma_when = {[211]=true,[212]=true,[235]=true,}
 refresh_ma_when = {[401]=true,[402]=true,[416]=true,[485]=true,}
 
 player_info = {}
