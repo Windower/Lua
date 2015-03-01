@@ -56,11 +56,12 @@ end)
 
 function get_templates()
     if not windower.ffxi.get_info().logged_in then return end
-    player_info.id = windower.ffxi.get_player().id
-    player_info.main_job = main_job_id or windower.ffxi.get_player().main_job_id
-    player_info.sub_job = sub_job_id or windower.ffxi.get_player().sub_job_id
-    player_info.main_job_level = main_job_level or windower.ffxi.get_player().main_job_level
-    player_info.sub_job_level = sub_job_level or windower.ffxi.get_player().sub_job_level
+    local player = windower.ffxi.get_player()
+    player_info.id = player.id
+    player_info.main_job = main_job_id or player.main_job_id
+    player_info.sub_job = sub_job_id or player.sub_job_id
+    player_info.main_job_level = main_job_level or player.main_job_level
+    player_info.sub_job_level = sub_job_level or player.sub_job_level
     
     local main = res.jobs[player_info.main_job].en
     local sub = res.jobs[player_info.sub_job].en
