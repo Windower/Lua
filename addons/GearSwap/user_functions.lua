@@ -270,7 +270,7 @@ function include_user(str, load_include_in_this_table)
         error('\nGearSwap: include() was passed an invalid value ('..tostring(str)..'). (must be a string)', 2)
     end
     
-    if T{'bit','socket'}:contains(str:lower()) then
+    if T{'bit','socket','mime'}:contains(str:lower()) then
         return _G[str:lower()]
     elseif T{'pack'}:contains(str:lower()) then
         return

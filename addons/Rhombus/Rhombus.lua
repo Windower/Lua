@@ -1,4 +1,4 @@
---[[Copyright © 2014, trv
+--[[Copyright © 2014-2015, trv
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
 _addon.name = 'Rhombus'
 _addon.author = 'trv'
-_addon.version = '1.1.2'
+_addon.version = '1.2.0'
 
 config = require('config')
 texts = require('texts')
@@ -36,123 +36,37 @@ require('lists')
 require('sets')
 require('logger')
 require('defs')
-packets = require('packets')
+require('helper_functions')
+bit = require('bit')
 
-local defaults={
-    x_offset = 0,
-    y_offset = 0,
-}
-_defaults = config.load(defaults)
-
-x_offset = _defaults.x_offset
-y_offset = _defaults.y_offset
-
-display_text = texts.new('${menu_text}', {
-    pos = {
-        x = 95 + x_offset,
-        y = 0 + y_offset,
-    },
-    bg = {
-        visible = false,
-    },
-    flags = {
-        bold = true,
-        draggable = false,
-    },
-    text = {
-        font = 'Consolas',
-        size = 10,
-        alpha = 255,
-        red = 255,
-        green = 255,
-        blue = 255,
-    },
-})
-
-menu_icon = texts.new('v', {
-    pos = {
-        x = -12 + x_offset,
-        y = -22 + y_offset,
-    },
-    bg = {
-        visible = false,
-    },
-    flags = {
-        bold = true,
-        draggable = false,
-    },
-    text = {
-        font = 'Wingdings',
-        size = 100,
-        alpha = 100,
-        red = 255,
-        blue = 255,
-        green = 255,
-        stroke = {
-            width = 1,
-            red = 0,
-            blue = 0,
-            green = 0,
-            alpha = 255,
-        },
-    },
-})
-
-menu_icon:show()
-
-selector_pos.x = 102 + x_offset
-windower.prim.create('menu_backdrop')
-windower.prim.set_position('menu_backdrop',selector_pos.x,0 + y_offset)
-windower.prim.set_color('menu_backdrop',200,0,0,0)
-windower.prim.set_visibility('menu_backdrop',false)
-windower.prim.set_size('menu_backdrop',150,12 * font_height_est)
-
-windower.prim.create('selector_rectangle')
-windower.prim.set_position('selector_rectangle',selector_pos.x,0 + y_offset)
-windower.prim.set_color('selector_rectangle',100,255,255,255)
-windower.prim.set_visibility('selector_rectangle',false)
-windower.prim.set_size('selector_rectangle',150,font_height_est)
-
-windower.prim.create('scroll_bar')
-windower.prim.set_position('scroll_bar',selector_pos.x + 150,0 + y_offset)
-windower.prim.set_color('scroll_bar',200,255,255,255)
-windower.prim.set_visibility('scroll_bar',false)
-windower.prim.set_size('scroll_bar',10,1)
-
-letter_to_n = {
-    'R',
-    'G',
-    'B',
-    'Y'
-}
-
-n_to_color = {
-    {255,111,111},
-    {111,255,111},
-    {111,111,255},
-    {255,255,111}
-}
-
-function colors_of_the_wind(s)
-    for k,v in pairs(is_icon) do
-        is_icon[k] = false
-    end
-    is_icon[s] = true
-end
+config.register(_defaults, function(settings_table)
+    x_offset = settings_table.x_offset
+    y_offset = settings_table.y_offset
+    selector_pos.x = 102 + x_offset
+        
+    windower.prim.set_position('menu_backdrop',selector_pos.x,y_offset)
+    windower.prim.set_position('selector_rectangle',selector_pos.x,y_offset)
+    windower.prim.set_position('scroll_bar',selector_pos.x + 150,y_offset)
+    
+    display_text:pos(95 + x_offset, y_offset)
+    
+    menu_icon:pos(-12 + x_offset, -22 + y_offset)
+    menu_icon:show()
+end)
 
 function get_templates()
     if not windower.ffxi.get_info().logged_in then return end
-    player_info.id = windower.ffxi.get_player().id
-    player_info.main_job = main_job_id or windower.ffxi.get_player().main_job_id
-    player_info.sub_job = sub_job_id or windower.ffxi.get_player().sub_job_id
-    player_info.main_job_level = main_job_level or windower.ffxi.get_player().main_job_level
-    player_info.sub_job_level = sub_job_level or windower.ffxi.get_player().sub_job_level
-    local t_temp
+    local player = windower.ffxi.get_player()
+    player_info.id = player.id
+    player_info.main_job = main_job_id or player.main_job_id
+    player_info.sub_job = sub_job_id or player.sub_job_id
+    player_info.main_job_level = main_job_level or player.main_job_level
+    player_info.sub_job_level = sub_job_level or player.sub_job_level
     
     local main = res.jobs[player_info.main_job].en
     local sub = res.jobs[player_info.sub_job].en
     
-    t_temp = L(res.spells:levels(function(t) return t[player_info.main_job] or t[player_info.sub_job] end):keyset())
+    local t_temp = L(res.spells:levels(function(t) return t[player_info.main_job] or t[player_info.sub_job] end):keyset())
     spells_template = loadfile(windower.addon_path .. 'data/spells_template.lua')
     if not spells_template then
         error('No template for spells was found.')
@@ -317,36 +231,49 @@ function menu_general_layout(t,t2,n)
     end
 end
 
-refresh_ja_when = S{211,212,298}
-refresh_4_when = S{30}
-refresh_ma_when = S{211,212,234,235}
-
 windower.register_event('incoming chunk', function(id, data)
-    if id == 0x028 then
-        local packet = packets.parse('incoming', data)
-        local param = packet['Param']
-        if ((packet['Actor'] == player_info.id) and is_menu_open and (packet['Category'] == 6)) then
-            if (refresh_ja_when:contains(param) and (last_menu_open.type == 3)) then
-                menu_history[3] = list.copy(menu_layer_record)
-                close_a_menu()
-                coroutine.sleep(.2)
-                mouse_func[3]()
-            elseif (refresh_ma_when:contains(param) and (last_menu_open.type == 1)) then
-                menu_history[1] = list.copy(menu_layer_record)
-                close_a_menu()
-                coroutine.sleep(1)
-                mouse_func[1]()
-            elseif (refresh_4_when:contains(param) and (last_menu_open.type == 4)) then
-                menu_history[4] = list.copy(menu_layer_record)
-                close_a_menu()
-                coroutine.sleep(.2)
-                mouse_func[4]()
-            end
+    if is_menu_open and id == 0x0AC and last_menu_open.type ~= 1 then
+        if not S(windower.ffxi.get_abilities()[category_to_resources[last_menu_open.type]]):equals(available_category) then
+            available_category = S(windower.ffxi.get_abilities()[category_to_resources[last_menu_open.type]])
+            current_menu = recursively_copy_spells({spells_template,ws_template,ja_template,pet_command_template}[last_menu_open.type])
+            menu_building_snippet()
         end
     end
 end)
 
-windower.register_event('load','login','job change',get_templates)
+windower.register_event('gain buff', function(buff_id)
+    if is_menu_open and refresh_ma_when[buff_id] and last_menu_open.type == 1 then
+        active_buffs:add(buff_id)
+        number_of_jps = count_job_points()
+        current_menu = recursively_copy_spells(spells_template)
+        menu_building_snippet()
+    end
+end)
+
+windower.register_event('lose buff', function(buff_id)
+    if is_menu_open and refresh_ma_when[buff_id] and last_menu_open.type == 1 then
+        active_buffs:remove(buff_id)
+        number_of_jps = count_job_points()
+        current_menu = recursively_copy_spells(spells_template)
+        menu_building_snippet()
+    end
+end)
+
+windower.register_event('job change',get_templates)
+
+windower.register_event('login', function()
+    get_templates:schedule(10)
+end)
+
+windower.register_event('load', function()
+    get_templates()  
+end)
+
+windower.register_event('logout', function()
+    close_a_menu()
+    display_text:hide()
+    menu_icon:hide()
+end)
 
 windower.register_event('mouse', function(type, x, y, delta, blocked)
     if blocked then
@@ -363,7 +290,6 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
             windower.prim.set_position('menu_backdrop',selector_pos.x,y-drag_and_drop.y)
             windower.prim.set_position('selector_rectangle',selector_pos.x,y_offset+selector_pos.y)
             windower.prim.set_position('scroll_bar',selector_pos.x + 150,y_offset + ((12 * font_height_est * (1 - 12 / menu_list.n)) / (menu_list.n - 12)) * (menu_start - 1))
-
         elseif math.abs(_x) + math.abs(_y) <= 51 then
             local tan = (_y)/(_x)
             if _x > 0 then
@@ -484,13 +410,20 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
             menu_start = menu_start - delta
             if menu_start < 1 then menu_start = 1 end
             if menu_start + 11 > menu_list.n then menu_start = menu_list.n - 11 end
-            display_text.menu_text=menu_list:concat('\n',menu_start,menu_start+11)
+            display_text:text(menu_list:concat('\n',menu_start,menu_start+11))
             windower.prim.set_position('scroll_bar',selector_pos.x + 150,y_offset + ((12 * font_height_est * (1 - 12 / menu_list.n)) / (menu_list.n - 12)) * (menu_start - 1))
             return true
         end
     elseif type == 4 then
-        if is_menu_open and x >= display_text:pos_x() and x <= display_text:pos_x() + 150 then
-            local _,_y = display_text:extents()
+        local _x,_y = x-(51+x_offset),y-(51+y_offset)
+        if math.abs(_x) + math.abs(_y) <= 51 then
+            mouse_safety = true
+            if is_menu_open then
+                menu_history[last_menu_open.type] = list.copy(menu_layer_record)
+            end
+            close_a_menu()
+            return true
+        elseif is_menu_open and x >= display_text:pos_x() and x <= display_text:pos_x() + 150 then
             if y <= y_offset or y >= y_offset + font_height_est * 12 then return end
             if menu_layer_record.n == 0 then
                 close_a_menu()
@@ -510,88 +443,10 @@ end)
 
 mouse_func = {
     [1] = function()
-            available_category = windower.ffxi.get_spells()
-            active_buffs = S(windower.ffxi.get_player().buffs)
-            if is_menu_open then
-                if last_menu_open.type == 1 then
-                    is_menu_open = false
-                    menu_layer_record:clear()
-                    close_a_menu()
-                    last_menu_open = {}
-                    current_menu = {}
-                    menu_history[1] = false
-                else
-                    menu_history[last_menu_open.type] = list.copy(menu_layer_record)
-                    if menu_history[1] then
-                        last_menu_open.type = 1
-                        menu_layer_record = menu_history[1]
-                        current_menu = recursively_copy_spells(spells_template)
-                        if current_menu then
-                            last_menu_open = current_menu
-                            last_menu_open.type = 1
-                            for i = 1,menu_layer_record.n do
-                                if current_menu[menu_layer_record[i]] then
-                                    current_menu = current_menu[menu_layer_record[i]]
-                                else
-                                    for j = 1,menu_layer_record.n+1-i do
-                                        menu_layer_record:remove()
-                                    end
-                                    break
-                                end
-                            end
-                            build_a_menu(current_menu)
-                        else
-                            current_menu = {}
-                        end
-                    else
-                        menu_layer_record:clear()
-                        last_menu_open.type = 1
-                        current_menu = recursively_copy_spells(spells_template)
-                        if current_menu then
-                            last_menu_open = current_menu
-                            last_menu_open.type = 1
-                            build_a_menu(current_menu)
-                        else
-                            current_menu = {}
-                        end
-                    end
-                end
-            else
-                if menu_history[1] then
-                    last_menu_open.type = 1
-                    menu_layer_record = menu_history[1]
-                    current_menu = recursively_copy_spells(spells_template)
-                    if current_menu then
-                        last_menu_open = current_menu
-                        last_menu_open.type = 1
-                        for i = 1,menu_layer_record.n do
-                            if current_menu[menu_layer_record[i]] then
-                                current_menu = current_menu[menu_layer_record[i]]
-                            else
-                                for j = 1,menu_layer_record.n+1-i do
-                                    menu_layer_record:remove()
-                                end
-                                break
-                            end
-                        end
-                        build_a_menu(current_menu) -- changes
-                    else
-                        current_menu = {}
-                    end
-                else
-                    menu_layer_record:clear()
-                    last_menu_open.type = 1
-                    current_menu = recursively_copy_spells(spells_template)
-                    if current_menu then
-                        last_menu_open = current_menu
-                        last_menu_open.type = 1
-                        build_a_menu(current_menu)
-                    else
-                        current_menu = {}
-                    end
-                end
-            end
-          end,
+        active_buffs = S(windower.ffxi.get_player().buffs)
+        number_of_jps = count_job_points()
+        menu_general_layout(setmetatable(windower.ffxi.get_spells(), _meta.S),spells_template,1)
+    end,
     [2] = function()
         menu_general_layout(windower.ffxi.get_abilities().weapon_skills,ws_template,2)
     end,
@@ -602,16 +457,6 @@ mouse_func = {
         menu_general_layout(remove_categories(windower.ffxi.get_abilities().job_abilities),pet_command_template,4)
     end,
 }
-
-function remove_categories(t)
-    local u = {}
-    for i = 1,#t do
-        if not not_a_spell:contains(res.job_abilities[t[i]].en) then
-            u[#u + 1] = t[i]
-        end
-    end
-    return u
-end
 
 function build_a_menu(t)
     menu_start = 1
@@ -637,7 +482,7 @@ function build_a_menu(t)
         else
             windower.prim.set_visibility('scroll_bar',false)
         end
-        display_text.menu_text=menu_list:concat('\n',1,12)
+        display_text:text(menu_list:concat('\n',1,12))
         windower.prim.set_visibility('menu_backdrop',true)
         selector_pos.y = y_offset
         windower.prim.set_position('selector_rectangle',selector_pos.x,selector_pos.y)
@@ -712,145 +557,19 @@ function format_response(n,p,bool)
     windower.send_command('input %s %q%s':format(n,p,t))
 end
 
-function get_string_from_id(n)
-    if last_menu_open.type == 1 then
-        return (spell_aliases[n] or res.spells[n].en)
-    elseif last_menu_open.type == 2 then
-        return (spell_aliases[n] or res.weapon_skills[n].en)
-    elseif last_menu_open.type == 3 then
-        return (spell_aliases[n] or res.job_abilities[n].en)
-    elseif last_menu_open.type == 4 then
-        return (spell_aliases[n] or res.job_abilities[n].en)
-    end
-end
-
-windower.register_event('keyboard', function(dik, flags, blocked)
-    if bit.band(blocked,32)  == 32 then return end
-    if dik == 42 then
-        is_shift_modified = flags
+windower.register_event('keyboard', function(dik, down, flags, blocked)
+    if dik == 42 and not (bit.band(flags,32) == 32) then
+        is_shift_modified = down
     end
 end)
-
-function recursively_merge_tables(m_menu,s_menu)
-    local duplicates = flatten(m_menu)
-    if s_menu.sub_menus then
-        if m_menu.sub_menus then
-            local main_table_sub_menus = S(m_menu.sub_menus)
-            for i=1,s_menu.sub_menus.n do
-                if not main_table_sub_menus[s_menu.sub_menus[i]] then
-                    m_menu.sub_menus[m_menu.sub_menus.n + 1] = s_menu.sub_menus[i]
-                    m_menu.sub_menus.n = m_menu.sub_menus.n + 1
-                    m_menu[s_menu.sub_menus[i]] = s_menu[s_menu.sub_menus[i]]
-                else
-                    m_menu[s_menu.s_menu[i]] = recursively_merge_tables(m_menu[s_menu.s_menu[i]],s_menu[s_menu.s_menu[i]])
-                end
-            end
-            for i=1,s_menu.n do
-                if not duplicates:contains(s_menu[i]) then
-                    m_menu[m_menu.n + 1] = s_menu[i]
-                    m_menu.n = m_menu.n + 1
-                end
-            end
-        else
-            m_menu.sub_menus = s_menu.sub_menus
-            for i=1,m_menu.sub_menus.n do
-                m_menu[m_menu.sub_menus[i]] = s_menu[s_menu.sub_menus[i]]
-            end
-            for i=1,s_menu.n do
-                if not duplicates:contains(s_menu[i]) then
-                    m_menu[m_menu.n + 1] = s_menu[i]
-                    m_menu.n = m_menu.n + 1
-                end
-            end
-        end
-        s_menu.sub_menus = nil
-    else
-        if m_menu.sub_menus then
-            for i=1,s_menu.n do
-                if not duplicates:contains(s_menu[i]) then
-                    m_menu[m_menu.n + 1] = s_menu[i]
-                    m_menu.n = m_menu.n + 1
-                end
-            end
-        else
-            for i=1,s_menu.n do
-                if not duplicates:contains(s_menu[i]) then
-                    m_menu[m_menu.n + 1] = s_menu[i]
-                    m_menu.n = m_menu.n + 1
-                end
-            end
-        end
-    end
-    return m_menu
-end
-
-function flatten(t)
-    local s = S{}
-    if t.sub_menus then
-        for i = 1,#t.sub_menus do
-            s = s + flatten(t[t.sub_menus[i]])
-        end
-    end
-    for i = 1,#t do
-        s:add(t[i])
-    end
-    return s
-end
-
-category_to_resources = {
-    'spells',
-    'weapon_skills',
-    'job_abilities',
-    'job_abilities',
-}
-
-function recursively_copy_spells(t)
-    local _t = {}
-    if t.sub_menus then
-        _t.sub_menus = L{}
-        for i = 1,#t.sub_menus do
-            _t[t.sub_menus[i]] = recursively_copy_spells(t[t.sub_menus[i]]) 
-            if _t[t.sub_menus[i]] then
-                _t.sub_menus:append(t.sub_menus[i])
-            end
-        end
-    end
-    for i = 1,#t do
-        if determine_accessibility(res[category_to_resources[last_menu_open.type]][t[i]],last_menu_open.type) then
-            _t[#_t+1] = t[i]
-        end
-    end
-    _t.n = #_t
-    if _t.sub_menus then
-        if not (_t.n == 0 and _t.sub_menus.n == 0) then
-            return _t
-        else
-            return nil
-        end
-    else
-        if not (_t.n == 0) then
-            return _t
-        else
-            return nil
-        end
-    end
-end
-
-function count_table_elements(t)
-    for k,v in pairs(t) do
-        if type(v) == 'table' then
-            count_table_elements(t[k])
-        end
-    end
-    t.n = #t
-end
 
 function determine_accessibility(spell,type) -- ability filter, slightly modified. Credit: Byrth
     if type == 1 then
         local spell_jobs = spell.levels        
         if not available_category[spell.id] and not (spell.id == 503) then
             return false
-        elseif (not spell_jobs[player_info.main_job] or not (spell_jobs[player_info.main_job] <= player_info.main_job_level)) and
+        elseif (not spell_jobs[player_info.main_job] or not (spell_jobs[player_info.main_job] <= player_info.main_job_level or
+            (spell_jobs[player_info.main_job] == 100 and number_of_jps >= 100))) and
             (not spell_jobs[player_info.sub_job] or not (spell_jobs[player_info.sub_job] <= player_info.sub_job_level)) then
             return false
         elseif player_info.main_job == 20 and ((addendum_white[spell.id] and not active_buffs[401] and not active_buffs[416]) or

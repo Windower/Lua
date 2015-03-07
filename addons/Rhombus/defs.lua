@@ -1,4 +1,4 @@
---[[Copyright © 2014, trv
+--[[Copyright © 2014-2015, trv
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -24,6 +24,64 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
+defaults={
+    x_offset = 0,
+    y_offset = 0,
+}
+
+_defaults = config.load(defaults)
+
+display_text = texts.new('', {
+    pos = {
+        x = 95,
+        y = 0,
+    },
+    bg = {
+        visible = false,
+    },
+    flags = {
+        bold = true,
+        draggable = false,
+    },
+    text = {
+        font = 'Consolas',
+        size = 10,
+        alpha = 255,
+        red = 255,
+        green = 255,
+        blue = 255,
+    },
+})
+
+menu_icon = texts.new('v', {
+    pos = {
+        x = -12,
+        y = -22,
+    },
+    bg = {
+        visible = false,
+    },
+    flags = {
+        bold = true,
+        draggable = false,
+    },
+    text = {
+        font = 'Wingdings',
+        size = 100,
+        alpha = 100,
+        red = 255,
+        blue = 255,
+        green = 255,
+        stroke = {
+            width = 1,
+            red = 0,
+            blue = 0,
+            green = 0,
+            alpha = 255,
+        },
+    },
+})
+
 addendum_white = {[14]="Poisona",[15]="Paralyna",[16]="Blindna",[17]="Silena",[18]="Stona",[19]="Viruna",[20]="Cursna",
     [143]="Erase",[13]="Raise II",[140]="Raise III",[141]="Reraise II",[142]="Reraise III",[135]="Reraise"}
     
@@ -40,12 +98,35 @@ not_a_spell = S{
     'Stratagems', 'Blood Pact: Rage', 'Sambas', 'Waltzes', 'Steps', 'Flourishes I', 'Flourishes II', 'Blood Pact: Ward',
     'Phantom Roll', 'Rune Enchantment', 'Jigs',
 }
-is_icon = {}
-is_icon.W = true
-is_icon.R = false
-is_icon.G = false
-is_icon.B = false
-is_icon.Y = false
+
+is_icon = {
+    W = true,
+    R = false,
+    G = false,
+    B = false,
+    Y = false,
+}
+
+letter_to_n = {
+    'R',
+    'G',
+    'B',
+    'Y'
+}
+
+n_to_color = {
+    {255,111,111},
+    {111,255,111},
+    {111,111,255},
+    {255,255,111}
+}
+
+category_to_resources = {
+    'spells',
+    'weapon_skills',
+    'job_abilities',
+    'job_abilities',
+}
 
 custom_menu_colors = {
     Fire = '255,133,133',
@@ -58,11 +139,9 @@ custom_menu_colors = {
     Darkness = '100,100,100',
 }
 
+refresh_ma_when = {[401]=true,[402]=true,[416]=true,[485]=true,}
+
 player_info = {}
-player_info.main_job = windower.ffxi.get_player().main_job_id
-player_info.sub_job = windower.ffxi.get_player().sub_job_id
-player_info.main_job_level = windower.ffxi.get_player().main_job_level
-player_info.sub_job_level = windower.ffxi.get_player().sub_job_level
 menu_layer_record = L{}
 menu_history = {}
 menu_list = L{}
@@ -74,3 +153,18 @@ selector_pos = {x=0,y=0}
 drag_and_drop = false
 mouse_safety = false
 is_shift_modified = false
+
+windower.prim.create('menu_backdrop')
+windower.prim.set_color('menu_backdrop',200,0,0,0)
+windower.prim.set_visibility('menu_backdrop',false)
+windower.prim.set_size('menu_backdrop',150,12 * font_height_est)
+
+windower.prim.create('selector_rectangle')
+windower.prim.set_color('selector_rectangle',100,255,255,255)
+windower.prim.set_visibility('selector_rectangle',false)
+windower.prim.set_size('selector_rectangle',150,font_height_est)
+
+windower.prim.create('scroll_bar')
+windower.prim.set_color('scroll_bar',200,255,255,255)
+windower.prim.set_visibility('scroll_bar',false)
+windower.prim.set_size('scroll_bar',10,1)

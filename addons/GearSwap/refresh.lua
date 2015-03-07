@@ -377,11 +377,7 @@ function refresh_ffxi_info(dt,user_event_flag)
             world.zone = res.zones[v][language]
             world.area = world.zone
         elseif i == 'weather' and res.weather[v] then
-            world.weather_id = v
-            world.weather = res.weather[v][language]
-            world.real_weather = world.weather
-            world.weather_element = res.elements[res.weather[v].element][language]
-            world.real_weather_element = world.weather_element
+            weather_update(v)
         elseif i == 'day' and res.days[v] then
             world.day = res.days[v][language]
             world.day_element = res.elements[res.days[v].element][language]
@@ -393,32 +389,6 @@ function refresh_ffxi_info(dt,user_event_flag)
             world[i] = v
         end
     end
-
-    if buffactive[178] then
-        world.weather = res.weather[4][language]
-        world.weather_element = res.elements[0][language]
-    elseif buffactive[179] then
-        world.weather = res.weather[12][language]
-        world.weather_element = res.elements[1][language]
-    elseif buffactive[180] then
-        world.weather = res.weather[10][language]
-        world.weather_element = res.elements[2][language]
-    elseif buffactive[181] then
-        world.weather = res.weather[8][language]
-        world.weather_element = res.elements[3][language]
-    elseif buffactive[182] then
-        world.weather = res.weather[14][language]
-        world.weather_element = res.elements[4][language]
-    elseif buffactive[183] then
-        world.weather = res.weather[6][language]
-        world.weather_element = res.elements[5][language]
-    elseif buffactive[184] then
-        world.weather = res.weather[16][language]
-        world.weather_element = res.elements[6][language]
-    elseif buffactive[185] then
-        world.weather = res.weather[18][language]
-        world.weather_element = res.elements[7][language]
-    end
     
     for global_variable_name,extradatatable in pairs(_ExtraData) do
         if _G[global_variable_name] then
@@ -427,6 +397,69 @@ function refresh_ffxi_info(dt,user_event_flag)
             end
         end
     end
+end
+
+
+-----------------------------------------------------------------------------------
+--Name: weather_update(id)
+--Args:
+---- id  Current weather ID
+-----------------------------------------------------------------------------------
+--Returns:
+---- None, updates the table.
+-----------------------------------------------------------------------------------
+function weather_update(id)
+    world.weather_id = id
+    world.real_weather_id = id
+    world.real_weather = res.weather[id][language]
+    world.real_weather_element = res.elements[res.weather[id].element][language]
+    local buff = false
+    if buffactive[178] then
+        buff = true
+        world.weather_id = 4
+    elseif buffactive[179] then
+        buff = true
+        world.weather_id = 12
+    elseif buffactive[180] then
+        buff = true
+        world.weather_id = 10
+    elseif buffactive[181] then
+        buff = true
+        world.weather_id = 8
+    elseif buffactive[182] then
+        buff = true
+        world.weather_id = 14
+    elseif buffactive[183] then
+        buff = true
+        world.weather_id = 6
+    elseif buffactive[184] then
+        buff = true
+        world.weather_id = 16
+    elseif buffactive[185] then
+        buff = true
+        world.weather_id = 18
+    elseif buffactive[589] then
+        world.weather_id = 5
+    elseif buffactive[590] then
+        world.weather_id = 13
+    elseif buffactive[591] then
+        world.weather_id = 11
+    elseif buffactive[592] then
+        world.weather_id = 9
+    elseif buffactive[593] then
+        world.weather_id = 15
+    elseif buffactive[594] then
+        world.weather_id = 7
+    elseif buffactive[595] then
+        world.weather_id = 17
+    elseif buffactive[596] then
+        world.weather_id = 19
+    end
+    if buff and world.weather_id == world.real_weather_id then
+        world.weather_id = world.weather_id + 1
+    end
+    world.weather = res.weather[world.weather_id][language]
+    world.weather_element = res.elements[res.weather[world.weather_id].element][language]
 end
 
 
