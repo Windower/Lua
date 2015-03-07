@@ -215,11 +215,12 @@ data.incoming[0x115] = {name='Fish Bite Info',      description='Contains inform
 data.incoming[0x116] = {name='Equipset Build Response', description='Returned from the server when building a set.'}
 data.incoming[0x117] = {name='Equipset Response',   description='Returned from the server after the /equipset command.'}
 data.incoming[0x118] = {name='Currency 2 Info',     description='Contains all currencies to be displayed in the currency menu.'}
+data.incoming[0x119] = {name='Ability Recasts',     description='Contains the currently available job abilities and their remaining recast times.'}
 
 return data
 
 --[[
-Copyright © 2013-2014, Windower
+Copyright © 2013-2015, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
