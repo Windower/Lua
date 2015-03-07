@@ -144,8 +144,15 @@ function hover(p)
     
     if last_hover~='' then
         windower.prim.set_color(last_hover,prim_coordinates.a[last_hover],prim_coordinates.r[last_hover],prim_coordinates.g[last_hover],prim_coordinates.b[last_hover])
-        windower.prim.set_visibility(last_hover,prim_coordinates.visible[last_hover])
+        windower.prim.set_visibility(last_hover,prim_coordinates.visible[last_hover] and
+            (   
+               (macro[1]:contains(last_hover) and macro_visibility[1])
+            or (macro[2]:contains(last_hover) and macro_visibility[2])
+            or (macro[3]:contains(last_hover) and macro_visibility[3])
+            )
+        )
     end
+    
     last_hover=p
 
     windower.prim.set_color(p,_settings.primitives.highlight.color.a,_settings.primitives.highlight.color.r,_settings.primitives.highlight.color.g,_settings.primitives.highlight.color.b)
@@ -377,7 +384,7 @@ function invite(id,n)
     who_am_i:add(id)
     local m = tostring(n)
     local pos_tostring = tostring(position_lookup[id])
-    if not saved_prims['phpp' .. pos_lu_s] then
+    if not saved_prims['phpp' .. pos_tostring] then
         lift_macro(n)
         if n==1 then
             windower.prim.set_size('info1',152,party[1].n*(h+1)+1)
