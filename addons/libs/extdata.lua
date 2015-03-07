@@ -4,7 +4,48 @@ require 'strings'
 res = require 'resources'
 require 'pack'
 
-local extdata = {}
+
+-- MASSIVE LOOKUP TABLES AND OTHER CONSTANTS
+
+local decode = {}
+
+-- In general, the function used to decode an item's extdata is determined by its type, which can be looked up using its item ID in the resources.
+local typ_mapping = {
+    [1] = decode.General, -- General
+    [2] = decode.General, -- Fight Entry Items
+    [3] = decode.Fish, -- Fish
+    [4] = decode.Equipment, -- Weapons
+    [5] = decode.Equipment, -- Armor
+    [6] = decode.Linkshell, -- Linkshells (but not broken linkshells)
+    [7] = decode.General, -- Usable Items
+    [8] = decode.General, -- Crystals
+    [10] = decode.Furniture, -- Furniture
+    [11] = decode.General, -- Seeds, reason for extdata unclear
+    [12] = decode.Flowerpot, -- Flowerpots
+    [14] = decode.Mannequin, -- Mannequins
+    [15] = decode.PvPReservation, -- Ballista Books
+    --[16] = decode.Chocobo, -- Chocobo paraphenelia (eggs, cards, slips, etc.)
+    --[17] = decode.ChocoboTicket, -- Chocobo Ticket and Completion Certificate
+    [18] = decode.SoulPlate, -- Soul Plates
+    [19] = decode.Reflector, -- Soul Reflectors
+    --[20] = decode.SalvageLog, -- Salvage Logs for the Mythic quest
+    [21] = decode.BonanzaMarble, -- Mog Bonanza Marbles
+    --[22] = decode.MazeTabulaM, -- MMM Maze Tabula M
+    --[23] = decode.MazeTabulaR, -- MMM Maze Tabula R
+    --[24] = decode.MazeVoucher, -- MMM Maze Vouchers
+    --[25] = decode.MazeRunes, -- MMM Maze Runes
+    --[26] = decode.Evoliths, -- Evoliths
+    --[27] = decode.StorageSlip, -- Storage Slips, already handled by slips.lua
+    [28] = decode.LegionPass, -- Legion Pass
+    --[29] = decode.MeeblesGrimore, -- Meebles Burrow Grimoires
+    }
+
+-- However, some items appear to have the function they use hardcoded based purely on their ID.
+local id_mapping = {
+    [0] = decode.EmptySlot,
+    [4237] = decode.Hourglass,
+    [5414] = decode.Lamp,
+    }
 
 potencies = {
         zeros = {[0]=0,[1]=0,[2]=0,[3]=0,[4]=0,[5]=0,[6]=0,[7]=0,[8]=0,[9]=0,[10]=0,[11]=0,[12]=0,[13]=0,[14]=0,[15]=0},
@@ -1004,413 +1045,7 @@ augment_values = {
     },
 }
 
-
-function unpack_augment(sys,short)
-    if sys == 1 then
-        return short:byte(1) + short:byte(2)%8*256,  math.floor(short:byte(2)/8)
-    elseif sys == 2 then
-        return short:byte(1), short:byte(2)
-    elseif sys == 3 then
-        return short:byte(1) + short:byte(2)%8*256,  math.floor(short:byte(2)%128/8)
-    end
-end
-
-function string_augment(sys,id,val)
-    local augment
-    local augment_table = augment_values[sys][id]
-    if not augment_table then --print('Augments Lib: ',sys,id)
-    elseif augment_table.Secondary_Handling then
-        -- This is handling for system 1's indices 0x390~0x392, which have their own static augment lookup table
-        augment_table = sp_390_augments[ (id-0x390)*16 + 545 + val]
-    end
-    if augment_table then
-        if sys == 3 then
-            augment = augment_table[1].stat
-            local pot = augment_table[1].potency[val]
-            if pot > 0 then
-                augment = augment..'+'
-            end
-            augment = augment..pot
-        else
-            for i,v in pairs(augment_table) do
-                if i > 1 then augment = augment..' ' end
-                augment = (augment or '')..v.stat
-                local potency = ((val+v.offset)*(v.multiplier or 1))
-                if potency > 0 then augment = augment..'+'..potency
-                elseif potency < 0 then  augment = augment..potency end
-                if v.percent then
-                    augment = augment..'%'
-                end
-            end
-        end
-    else
-        augment = 'System: '..tostring(sys)..' ID: '..tostring(id)..' Val: '..tostring(val)
-    end
-    return augment
-end
-
-function augments_to_table(sys,str)
-    local augments,ids,vals = {},{},{}
-    for i=1,#str,2 do
-        local id,val = unpack_augment(sys,str:sub(i,i+1))
-        augments[#augments+1] = string_augment(sys,id,val)
-    end
-    return augments
-end
-
-
-local server_timestamp_offset = 1009792800
-
-local decode = {}
-
-function decode.Enchanted(str)
-    local rettab = {type = 'Enchanted Equipment',
-        charges_remaining = str:byte(2),
-        usable = str:byte(4)%128/64>=1,
-        next_use_time = str:unpack('I',5) + server_timestamp_offset,
-        activation_time = str:unpack('I',9) + server_timestamp_offset,
-        }
-    return rettab
-end
-
-function decode.Augmented(str)
-    local flag_2 = str:byte(2)
-    local rettab = {type = 'Augmented Equipment'}
-    if flag_2%128/64>= 1 then
-        rettab.trial_number = (str:byte(12)%128)*256+str:byte(11)
-        rettab.trial_complete = str:byte(12)/128>=1
-    end
-    
-    if flag_2%64/32 >=1 then
-        rettab.augment_system = 2
-        local path_map = {[0] = 'A',[1] = 'B', [2] = 'C', [3] = 'D'}
-        local points_map = {[1] = 50, [2] = 80, [3] = 120, [4] = 170, [5] = 220, [6] = 280, [7] = 340, [8] = 410, [9] = 480, [10]=560, [11]=650, [12] = 750, [13] = 960, [14] = 980}
-        rettab.path = path_map[str:byte(3)%4]
-        rettab.rank = math.floor(str:byte(3)%128/4)
-        rettab.RP = math.max(points_map[rettab.rank] or 0 - str:byte(6)*256 - str:byte(5),0)
-        rettab.augments = augments_to_table(rettab.augment_system,str:sub(7,12))
-    elseif flag_2/128 >= 1 then -- Evolith
-        rettab.augment_system = 3
-        local slot_type_map = {[0] = 'None', [1] = 'Filled Upside-down Triangle', [2] = 'Filled Diamond', [3] = 'Filled Star', [4] = 'Empty Triangle', [5] = 'Empty Square', [6] = 'Empty Circle', [7] = 'Empty Upside-down Triangle', [8] = 'Empty Diamond', [9] = 'Empty Star', [10] = 'Filled Triangle', [11] = 'Filled Square', [12] = 'Filled Circle', [13] = 'Empty Circle', [14] = 'Fire', [15] = 'Ice'}
-        rettab.slots = {[1] = {type = slot_type_map[str:byte(9)%16], size = math.floor(str:byte(10)/16)+1, element = str:byte(12)%8},
-            [2] = {type = slot_type_map[math.floor(str:byte(9)/16)], size = str:byte(11)%16+1, element = math.floor(str:byte(12)/8)%8},
-            [3] = {type = slot_type_map[str:byte(10)%16], size = math.floor(str:byte(11)/16)+1, element = math.floor(str:byte(12)/64) + math.floor(str:byte(8)/128)},
-            }
-        rettab.augments = augments_to_table(rettab.augment_system,str:sub(3,8))
-    else
-        rettab.augment_system = 1
-        if rettab.trial_number then
-            rettab.augments = augments_to_table(rettab.augment_system,str:sub(3,10))
-        else
-            rettab.augments = augments_to_table(rettab.augment_system,str:sub(3,12))
-        end
-    end
-    return rettab
-end
-
-
------------------------------------------------------------------------------------
---Name: l_to_r_bit_packed(dat_string,start,stop)
---Args:
----- dat_string - string that is being bit-unpacked to a number
----- start - first bit
----- stop - last bit
------------------------------------------------------------------------------------
---Returns:
----- number from the indicated range of bits 
------------------------------------------------------------------------------------
-function l_to_r_bit_packed(dat_string,start,stop)
-    local newval = 0
-    
-    local c_count = math.ceil(stop/8)
-    while c_count >= math.ceil((start+1)/8) do
-        -- Grabs the most significant byte first and works down towards the least significant.
-        local cur_val = dat_string:byte(c_count)
-        local scal = 1
-        
-        if c_count == math.ceil(stop/8) then -- Take the least significant bits of the most significant byte
-        -- Moduluses by 2^number of bits into the current byte. So 8 bits in would %256, 1 bit in would %2, etc.
-        -- Cuts off the bottom.
-            cur_val = math.floor(cur_val/(2^(8-((stop-1)%8+1)))) -- -1 and +1 set the modulus result range from 1 to 8 instead of 0 to 7.
-        end
-        
-        if c_count == math.ceil((start+1)/8) then -- Take the most significant bits of the least significant byte
-        -- Divides by the significance of the final bit in the current byte. So 8 bits in would /128, 1 bit in would /1, etc.
-        -- Cuts off the top.
-            cur_val = cur_val%(2^(8-start%8))
-        end
-        
-        if c_count == math.ceil(stop/8)-1 then
-            scal = 2^(((stop-1)%8+1))
-        end
-        
-        newval = newval + cur_val*scal -- Need to multiply by 2^number of bits in the next byte
-        c_count = c_count - 1
-    end
-    return newval
-end
-
-
-function decode.Signature(str)
-    local sig_map = {[1]='0',[2]='1',[3]='2',[4]='3',[5]='4',[6]='5',[7]='6',[8]='7',[9]='8',[10]='9',
-        [11]='A',[12]='B',[13]='C',[14]='D',[15]='E',[16]='F',[17]='G',[18]='H',[19]='I',[20]='J',[21]='K',[22]='L',[23]='M',
-        [24]='N',[25]='O',[26]='P',[27]='Q',[28]='R',[29]='S',[30]='T',[31]='U',[32]='V',[33]='W',[34]='X',[35]='Y',[36]='Z',
-        [37]='a',[38]='b',[39]='c',[40]='d',[41]='e',[42]='f',[43]='g',[44]='h',[45]='i',[46]='j',[47]='k',[48]='l',[49]='m',
-        [50]='n',[51]='o',[52]='p',[53]='q',[54]='r',[55]='s',[56]='t',[57]='u',[58]='v',[59]='w',[60]='x',[61]='y',[62]='z',
-        [63]='{'
-        }
-    return decode.bit_string(6,str,sig_map)
-end
-
-function decode.bit_string(bits,str,map)
-    local i,sig = 0,''
-    while map[l_to_r_bit_packed(str,i,i+bits)] do
-        sig = sig..map[l_to_r_bit_packed(str,i,i+bits)]
-        i = i+bits
-    end
-    return sig
-end
-
-local flag_1_mapping = {
-    [1] = decode.Enchanted,
-    [2] = decode.Augmented,
-    }
-
-
-function decode.General(str)
-    decoded = {type = 'General'}
-    if str:byte(13) ~= 0 then
-        decoded.signature = decode.Signature(str:sub(13))
-    end
-    return decoded
-end
-
-function decode.Mannequin(str)
--- I can't test this.
-    local rettab = {type = 'Mannequin',
-        is_displayed = (str:byte(2)%128/64 >= 1)
-    }
-    if rettab.is_displayed then
-        rettab.grid_x = str:byte(7)
-        rettab.grid_z = str:byte(8)
-        rettab.grid_y = str:byte(9)
-        local storage = windower.ffxi.get_items(2)
-        local empty = {}
-        rettab.equipment = {main = storage[str:byte(11)] or empty, sub = storage[str:byte(12)] or empty,
-            ranged = storage[str:byte(13)] or empty, head = storage[str:byte(14)] or empty, body = storage[str:byte(15)] or empty,
-            hands = storage[str:byte(16)] or empty, legs = storage[str:byte(17)] or empty, feet = storage[str:byte(18)] or empty}
-        rettab.race_id = str:byte(19)
-        rettab.race = res.races[rettab.race_id]
-        rettab.pose_id = str:byte(20)
-    end
-    return rettab
-end
-
-function decode.Linkshell(str)
-    local status_map = {[0]='Unopened',[1]='Linkshell',[2]='Pearlsack',[3]='Linkpearl',[4]='Broken'}
-    local name_end = string.find(str,string.char(0),10)
-    local name_map = {[0]="'",[1]="a",[2]='b',[3]='c',[4]='d',[5]='e',[6]='f',[7]='g',[8]='h',[9]='i',[10]='j',
-        [11]='k',[12]='l',[13]='m',[14]='n',[15]='o',[16]='p',[17]='q',[18]='r',[19]='s',[20]='t',[21]='u',[22]='v',[23]='w',
-        [24]='x',[25]='yx',[26]='z',[27]='A',[28]='B',[29]='C',[30]='D',[31]='E',[32]='F',[33]='G',[34]='H',[35]='I',[36]='J',
-        [37]='K',[38]='L',[39]='M',[40]='N',[41]='O',[42]='P',[43]='Q',[44]='R',[45]='S',[46]='T',[47]='U',[48]='V',[49]='W',
-        [50]='X',[51]='Y',[52]='Z'
-        }
-    local rettab = {type = 'Linkshell',
-        linkshell_id = str:unpack('I'),
-        r  = 17*str:byte(7)%16,
-        g  = 17*math.floor(str:byte(7)/16),
-        b  = 17*str:byte(8)%16,
-        status_id = str:byte(9),
-        status = status_map[str:byte(9)],
-        name = decode.bit_string(6,str:sub(10,name_end),name_map)}
-    
-    return rettab
-end
-
-function decode.Furniture(str)
-    local rettab = {type = 'Furniture',
-        is_displayed = (str:byte(2)%128/64 >= 1)}
-    if rettab.is_displayed then
-        rettab.grid_x = str:byte(7)
-        rettab.grid_z = str:byte(8)
-        rettab.grid_y = str:byte(9)
-        rettab.rotation = str:byte(10)
-    end
-    return rettab
-end
-
-function decode.Flowerpot(str)
-    --[[ 0 = Empty pot, Plant seed menu
-        (1) 2-11 = Herb Seeds
-        (14?)15-24 = Grain Seeds
-        (27?)28-37 = Vegetable Seeds
-        (40?)41-50 = Cactus Stems
-        (53?)54-63 = Tree Cutting
-        (65?)66-76 = Tree Sapling
-        (79?)80-89 = Wildgrass Seed]]
-    local rettab = {type = 'Flowerpot',
-        is_displayed = (str:byte(2)%128/64 >= 1)}
-    if rettab.is_displayed then
-        rettab.grid_x = str:byte(7)
-        rettab.grid_z = str:byte(8)
-        rettab.grid_y = str:byte(9)
-        rettab.rotation = str:byte(10)
-        rettab.is_planted = str:byte(1)%13 > 0
-    end
-    if rettab.is_planted then
-        local plants = {[0] = 'Herb Seeds', [1] = 'Grain Seeds',[2] = 'Vegetable Seeds', [3] = 'Cactus Stems',
-            [4] = 'Tree Cuttings', [5] = 'Tree Saplings', [6] = 'Wildgrass Seeds'}
-        local stages = {[1] = 'Initial', [2] = 'First Sprouts', [3] = 'First Sprouts 2', [4] = 'First Sprouts - Crystal',
-            [5] = 'Second Sprouts', [6] = 'Second Sprouts 2', [7] = 'Second Sprouts - Crystal', [8] = 'Second Sprouts 3',
-            [9] = 'Third Sprouts', [10] = 'Mature Plant', [11] = 'Wilted'}
-        rettab.plant_id = math.floor((str:byte(1)-1)/13)
-        rettab.plant = plants[plant_id]
-        rettab.stage_id = str:byte(1)%13 -- Stages from 1 to 10 are valid
-        rettab.ts_1 = str:unpack('I',13) + server_timestamp_offset
-        rettab.ts_2 = str:unpack('I',17) + server_timestamp_offset
-        rettab.unknown = str:byte(5)+str:byte(6)*256
-    end
-    return rettab
-end
-
-function decode.Mannequin(str)
--- I can't test this.
-    local rettab = {type = 'Mannequin',
-        is_displayed = (str:byte(2)%128/64 >= 1)
-    }
-    if rettab.is_displayed then
-        rettab.grid_x = str:byte(7)
-        rettab.grid_z = str:byte(8)
-        rettab.grid_y = str:byte(9)
-        local storage = windower.ffxi.get_items(2)
-        local empty = {}
-        rettab.equipment = {main = storage[str:byte(11)] or empty, sub = storage[str:byte(12)] or empty,
-            ranged = storage[str:byte(13)] or empty, head = storage[str:byte(14)] or empty, body = storage[str:byte(15)] or empty,
-            hands = storage[str:byte(16)] or empty, legs = storage[str:byte(17)] or empty, feet = storage[str:byte(18)] or empty}
-        rettab.race_id = str:byte(19)
-        rettab.race = res.races[rettab.race_id]
-        rettab.pose_id = str:byte(20)
-    end
-    return rettab
-end
-
-function decode.Unknown(str)
-    return {type = 'Unknown',
-        value = str:hex()
-        }
-end
-
-function decode.Lamp(str)
-    local chambers = {[0x1E] = 'Rossweisse', [0x1F] = 'Grimgerde', [0x20] = 'Siegrune', [0x21] = 'Helmwige',
-        [0x22] = 'Schwertleite', [0x23] = 'Waltraute', [0x24] = 'Ortlinde', [0x25] = 'Gerhilde', [0x26] = 'Brunhilde',
-        [0x27] = 'Odin'}
-    local statuses = {[0] = 'Uninitialized', [1] = 'Active', [2] = 'Active', [3] = 'Spent'}
-    local rettab = {type='Lamp',
-        chamber = chambers[str:unpack('H')] or 'unknown',
-        exit_time = str:unpack('I',9),
-        entry_time = str:unpack('I',13),
-        zone_id = str:unpack('H',17),
-        status_id = str:byte(3)%4,
-        status = statuses[rettab.status_id],
-        _unknown1 = str:unpack('i',5)
-    }
-    
-    if res.zones[rettab.zone_id] then
-        rettab.zone = res.zones[rettab.zone_id].english
-    else
-        rettab.zone = 'unknown'
-    end
-    
-    return rettab
-end
-
-function decode.Hourglass(str)
-    local statuses = {[0] = 'Uninitialized', [1] = 'Active', [2] = 'Active', [3] = 'Spent'}
-    local rettab = {type='Hourglass',
-        exit_time = str:unpack('I',9),
---        entry_time = str:unpack('I',13),
-        zone_id = str:unpack('H',17),
-        status_id = str:byte(3)%4,
-        status = statuses[rettab.status_id],
-        _unknown1 = str:unpack('i',5)
-    }
-    
-    if res.zones[rettab.zone_id] then
-        rettab.zone = res.zones[rettab.zone_id].english
-    else
-        rettab.zone = 'unknown'
-    end
-    
-    return rettab
-end
-
-function decode.EmptySlot(str)
-    local rettab = {type='Empty Slot',
-        ws_points = str:unpack('I')
-    }
-    
-    return rettab
-end
-
-function decode.Fish(str)
-    local rettab = {
-        size = str:unpack('H'),
-        weight = str:unpack('H',3),
-        is_ranked = str:byte(5)%2 == 1
-    }
-    return rettab
-end
-
-function decode.Equipment(str)
-    local rettab
-    local flag_1 = str:byte(1)
-    if flag_1_mapping[flag_1] then
-        rettab = flag_1_mapping[flag_1](str:sub(1,12))
-    else
-        rettab= decode.Unknown(str:sub(1,12))
-        rettab.type = 'Equipment'
-    end
-    if str:byte(13) ~= 0 then
-        rettab.signature = decode.Signature(str:sub(13))
-    end
-    return rettab
-end
-
-function decode.PvPReservation(str)
-    local rettab = {type='PvP Reservation',
-        time = str:unpack('I') + server_timestamp_offset,
-        level = math.floor(str:byte(4)/32)*10
-    }
-    if rettab.level == 0 then rettab.level = 99 end
-    return rettab
-end
-
-function decode.Reflector(str)
-    local firstnames = {"Bloody", "Brutal", "Celestial", "Combat", "Cyclopean", "Dark", "Deadly",
-            "Drachen", "Giant", "Hostile", "Howling", "Hyper", "Invincible", "Merciless", "Mighty",
-            "Necro", "Nimble", "Poison", "Putrid", "Rabid", "Radiant", "Raging", "Relentless",
-            "Savage", "Silent", "Tenebrous", "The", "Triple", "Undead", "Writhing", "Serpentine",
-            "Aile", "Bete", "Croc", "Babine", "Carapace", "Colosse", "Corne", "Fauve",
-            "Flamme", "Griffe", "Machoire", "Mandibule", "Patte", "Rapace", "Tentacule", "Voyou",
-            "Zaubernder", "Brutaler", "Explosives", "Funkelnder", "Kraftvoller", "Moderndes", "Tosender", "Schwerer",
-            "Sprintender", "Starker", "Stinkender", "Taumelnder", "Tolles", "Verlornes", "Wendiger", "Wuchtiger"}
-        firstnames[0] = "Pit"
-    local lastnames = {"Beast", "Butcher", "Carnifex", "Critter", "Cyclone", "Dancer", "Darkness",
-            "Erudite", "Fang", "Fist", "Flayer", "Gladiator", "Heart", "Howl", "Hunter",
-            "Jack", "Machine", "Mountain", "Nemesis", "Raven", "Reaver", "Rock", "Stalker",
-            "T", "Tiger", "Tornado", "Vermin", "Vortex", "Whispers", "X", "Prime",
-            "Agile", "Brave", "Coriace", "Diabolique", "Espiegle", "Feroce", "Fidele", "Fourbe",
-            "Impitoyable", "Nuisible", "Robuste", "Sanguinaire", "Sauvage", "Stupide", "Tenace", "Tendre",
-            "Boesewicht", "Engel", "Flitzpiepe", "Gottkaiser", "Klotz", "Muelleimer", "Pechvogel", "Postbote",
-            "Prinzessin", "Raecherin", "Riesenbaby", "Hexer", "Teufel", "Vieh", "Vielfrass", "Fleischer"}
-        lastnames[0] = "Monster"
-    local rettab = {type='Reflector',
-        first_name = firstnames[str:byte(1)%64],
-        last_name = lastnames[math.floor(str:byte(1)/64) + (str:byte(2)%16)*4],
-        level = (math.floor(str:byte(7)/16) + (str:byte(8)%16)*16)%128
-    }
-    return rettab
-end
+server_timestamp_offset = 1009792800
 
 soul_plates = {
     [0x001] = "Main Job: Warrior",
@@ -1689,6 +1324,322 @@ soul_plates = {
 }
 
 
+
+
+
+
+-- TOOLS FOR HANDLING EXTDATA
+
+tools = {}
+tools.aug = {}
+
+function tools.aug.unpack_augment(sys,short)
+    if sys == 1 then
+        return short:byte(1) + short:byte(2)%8*256,  math.floor(short:byte(2)/8)
+    elseif sys == 2 then
+        return short:byte(1), short:byte(2)
+    elseif sys == 3 then
+        return short:byte(1) + short:byte(2)%8*256,  math.floor(short:byte(2)%128/8)
+    end
+end
+
+function tools.aug.string_augment(sys,id,val)
+    local augment
+    local augment_table = augment_values[sys][id]
+    if not augment_table then --print('Augments Lib: ',sys,id)
+    elseif augment_table.Secondary_Handling then
+        -- This is handling for system 1's indices 0x390~0x392, which have their own static augment lookup table
+        augment_table = sp_390_augments[ (id-0x390)*16 + 545 + val]
+    end
+    if augment_table then
+        if sys == 3 then
+            augment = augment_table[1].stat
+            local pot = augment_table[1].potency[val]
+            if pot > 0 then
+                augment = augment..'+'
+            end
+            augment = augment..pot
+        else
+            for i,v in pairs(augment_table) do
+                if i > 1 then augment = augment..' ' end
+                augment = (augment or '')..v.stat
+                local potency = ((val+v.offset)*(v.multiplier or 1))
+                if potency > 0 then augment = augment..'+'..potency
+                elseif potency < 0 then  augment = augment..potency end
+                if v.percent then
+                    augment = augment..'%'
+                end
+            end
+        end
+    else
+        augment = 'System: '..tostring(sys)..' ID: '..tostring(id)..' Val: '..tostring(val)
+    end
+    return augment
+end
+
+function tools.aug.augments_to_table(sys,str)
+    local augments,ids,vals = {},{},{}
+    for i=1,#str,2 do
+        local id,val = tools.aug.unpack_augment(sys,str:sub(i,i+1))
+        augments[#augments+1] = tools.aug.string_augment(sys,id,val)
+    end
+    return augments
+end
+
+function decode.Enchanted(str)
+    local rettab = {type = 'Enchanted Equipment',
+        charges_remaining = str:byte(2),
+        usable = str:byte(4)%128/64>=1,
+        next_use_time = str:unpack('I',5) + server_timestamp_offset,
+        activation_time = str:unpack('I',9) + server_timestamp_offset,
+        }
+    return rettab
+end
+
+function decode.Augmented(str)
+    local flag_2 = str:byte(2)
+    local rettab = {type = 'Augmented Equipment'}
+    if flag_2%128/64>= 1 then
+        rettab.trial_number = (str:byte(12)%128)*256+str:byte(11)
+        rettab.trial_complete = str:byte(12)/128>=1
+    end
+    
+    if flag_2%64/32 >=1 then
+        rettab.augment_system = 2
+        local path_map = {[0] = 'A',[1] = 'B', [2] = 'C', [3] = 'D'}
+        local points_map = {[1] = 50, [2] = 80, [3] = 120, [4] = 170, [5] = 220, [6] = 280, [7] = 340, [8] = 410, [9] = 480, [10]=560, [11]=650, [12] = 750, [13] = 960, [14] = 980}
+        rettab.path = path_map[str:byte(3)%4]
+        rettab.rank = math.floor(str:byte(3)%128/4)
+        rettab.RP = math.max(points_map[rettab.rank] or 0 - str:byte(6)*256 - str:byte(5),0)
+        rettab.augments = tools.aug.augments_to_table(rettab.augment_system,str:sub(7,12))
+    elseif flag_2/128 >= 1 then -- Evolith
+        rettab.augment_system = 3
+        local slot_type_map = {[0] = 'None', [1] = 'Filled Upside-down Triangle', [2] = 'Filled Diamond', [3] = 'Filled Star', [4] = 'Empty Triangle', [5] = 'Empty Square', [6] = 'Empty Circle', [7] = 'Empty Upside-down Triangle', [8] = 'Empty Diamond', [9] = 'Empty Star', [10] = 'Filled Triangle', [11] = 'Filled Square', [12] = 'Filled Circle', [13] = 'Empty Circle', [14] = 'Fire', [15] = 'Ice'}
+        rettab.slots = {[1] = {type = slot_type_map[str:byte(9)%16], size = math.floor(str:byte(10)/16)+1, element = str:byte(12)%8},
+            [2] = {type = slot_type_map[math.floor(str:byte(9)/16)], size = str:byte(11)%16+1, element = math.floor(str:byte(12)/8)%8},
+            [3] = {type = slot_type_map[str:byte(10)%16], size = math.floor(str:byte(11)/16)+1, element = math.floor(str:byte(12)/64) + math.floor(str:byte(8)/128)},
+            }
+        rettab.augments = tools.aug.augments_to_table(rettab.augment_system,str:sub(3,8))
+    else
+        rettab.augment_system = 1
+        if rettab.trial_number then
+            rettab.augments = tools.aug.augments_to_table(rettab.augment_system,str:sub(3,10))
+        else
+            rettab.augments = tools.aug.augments_to_table(rettab.augment_system,str:sub(3,12))
+        end
+    end
+    return rettab
+end
+
+tools.bit = {}
+-----------------------------------------------------------------------------------
+--Name: tools.bit.l_to_r_bit_packed(dat_string,start,stop)
+--Args:
+---- dat_string - string that is being bit-unpacked to a number
+---- start - first bit
+---- stop - last bit
+-----------------------------------------------------------------------------------
+--Returns:
+---- number from the indicated range of bits 
+-----------------------------------------------------------------------------------
+function tools.bit.l_to_r_bit_packed(dat_string,start,stop)
+    local newval = 0
+    
+    local c_count = math.ceil(stop/8)
+    while c_count >= math.ceil((start+1)/8) do
+        -- Grabs the most significant byte first and works down towards the least significant.
+        local cur_val = dat_string:byte(c_count)
+        local scal = 1
+        
+        if c_count == math.ceil(stop/8) then -- Take the least significant bits of the most significant byte
+        -- Moduluses by 2^number of bits into the current byte. So 8 bits in would %256, 1 bit in would %2, etc.
+        -- Cuts off the bottom.
+            cur_val = math.floor(cur_val/(2^(8-((stop-1)%8+1)))) -- -1 and +1 set the modulus result range from 1 to 8 instead of 0 to 7.
+        end
+        
+        if c_count == math.ceil((start+1)/8) then -- Take the most significant bits of the least significant byte
+        -- Divides by the significance of the final bit in the current byte. So 8 bits in would /128, 1 bit in would /1, etc.
+        -- Cuts off the top.
+            cur_val = cur_val%(2^(8-start%8))
+        end
+        
+        if c_count == math.ceil(stop/8)-1 then
+            scal = 2^(((stop-1)%8+1))
+        end
+        
+        newval = newval + cur_val*scal -- Need to multiply by 2^number of bits in the next byte
+        c_count = c_count - 1
+    end
+    return newval
+end
+
+
+function tools.bit.bit_string(bits,str,map)
+    local i,sig = 0,''
+    while map[tools.bit.l_to_r_bit_packed(str,i,i+bits)] do
+        sig = sig..map[tools.bit.l_to_r_bit_packed(str,i,i+bits)]
+        i = i+bits
+    end
+    return sig
+end
+
+tools.sig = {}
+function tools.sig.decode(str)
+    local sig_map = {[1]='0',[2]='1',[3]='2',[4]='3',[5]='4',[6]='5',[7]='6',[8]='7',[9]='8',[10]='9',
+        [11]='A',[12]='B',[13]='C',[14]='D',[15]='E',[16]='F',[17]='G',[18]='H',[19]='I',[20]='J',[21]='K',[22]='L',[23]='M',
+        [24]='N',[25]='O',[26]='P',[27]='Q',[28]='R',[29]='S',[30]='T',[31]='U',[32]='V',[33]='W',[34]='X',[35]='Y',[36]='Z',
+        [37]='a',[38]='b',[39]='c',[40]='d',[41]='e',[42]='f',[43]='g',[44]='h',[45]='i',[46]='j',[47]='k',[48]='l',[49]='m',
+        [50]='n',[51]='o',[52]='p',[53]='q',[54]='r',[55]='s',[56]='t',[57]='u',[58]='v',[59]='w',[60]='x',[61]='y',[62]='z',
+        [63]='{'
+        }
+    return tools.bit.bit_string(6,str,sig_map)
+end
+
+
+
+
+-- EXTDATA subgroups
+-- Which subgroup an item falls into depends on its type, which is pulled from the resources based on ites item ID.
+
+function decode.General(str)
+    decoded = {type = 'General'}
+    if str:byte(13) ~= 0 then
+        decoded.signature = tools.sig.decode(str:sub(13))
+    end
+    return decoded
+end
+
+function decode.Fish(str)
+    local rettab = {
+        size = str:unpack('H'),
+        weight = str:unpack('H',3),
+        is_ranked = str:byte(5)%2 == 1
+    }
+    return rettab
+end
+
+function decode.Equipment(str)
+    local rettab
+    local flag_1 = str:byte(1)
+    local flag_1_mapping = {
+        [1] = decode.Enchanted,
+        [2] = decode.Augmented,
+        }
+    if flag_1_mapping[flag_1] then
+        rettab = flag_1_mapping[flag_1](str:sub(1,12))
+    else
+        rettab= decode.Unknown(str:sub(1,12))
+        rettab.type = 'Equipment'
+    end
+    if str:byte(13) ~= 0 then
+        rettab.signature = tools.sig.decode(str:sub(13))
+    end
+    return rettab
+end
+
+function decode.Linkshell(str)
+    local status_map = {[0]='Unopened',[1]='Linkshell',[2]='Pearlsack',[3]='Linkpearl',[4]='Broken'}
+    local name_end = string.find(str,string.char(0),10)
+    local name_map = {[0]="'",[1]="a",[2]='b',[3]='c',[4]='d',[5]='e',[6]='f',[7]='g',[8]='h',[9]='i',[10]='j',
+        [11]='k',[12]='l',[13]='m',[14]='n',[15]='o',[16]='p',[17]='q',[18]='r',[19]='s',[20]='t',[21]='u',[22]='v',[23]='w',
+        [24]='x',[25]='yx',[26]='z',[27]='A',[28]='B',[29]='C',[30]='D',[31]='E',[32]='F',[33]='G',[34]='H',[35]='I',[36]='J',
+        [37]='K',[38]='L',[39]='M',[40]='N',[41]='O',[42]='P',[43]='Q',[44]='R',[45]='S',[46]='T',[47]='U',[48]='V',[49]='W',
+        [50]='X',[51]='Y',[52]='Z'
+        }
+    local rettab = {type = 'Linkshell',
+        linkshell_id = str:unpack('I'),
+        r  = 17*str:byte(7)%16,
+        g  = 17*math.floor(str:byte(7)/16),
+        b  = 17*str:byte(8)%16,
+        status_id = str:byte(9),
+        status = status_map[str:byte(9)],
+        name = tools.bit.bit_string(6,str:sub(10,name_end),name_map)}
+    
+    return rettab
+end
+
+function decode.Furniture(str)
+    local rettab = {type = 'Furniture',
+        is_displayed = (str:byte(2)%128/64 >= 1)}
+    if rettab.is_displayed then
+        rettab.grid_x = str:byte(7)
+        rettab.grid_z = str:byte(8)
+        rettab.grid_y = str:byte(9)
+        rettab.rotation = str:byte(10)
+    end
+    return rettab
+end
+
+function decode.Flowerpot(str)
+    --[[ 0 = Empty pot, Plant seed menu
+        (1) 2-11 = Herb Seeds
+        (14?)15-24 = Grain Seeds
+        (27?)28-37 = Vegetable Seeds
+        (40?)41-50 = Cactus Stems
+        (53?)54-63 = Tree Cutting
+        (65?)66-76 = Tree Sapling
+        (79?)80-89 = Wildgrass Seed]]
+    local rettab = {type = 'Flowerpot',
+        is_displayed = (str:byte(2)%128/64 >= 1)}
+    if rettab.is_displayed then
+        rettab.grid_x = str:byte(7)
+        rettab.grid_z = str:byte(8)
+        rettab.grid_y = str:byte(9)
+        rettab.rotation = str:byte(10)
+        rettab.is_planted = str:byte(1)%13 > 0
+    end
+    if rettab.is_planted then
+        local plants = {[0] = 'Herb Seeds', [1] = 'Grain Seeds',[2] = 'Vegetable Seeds', [3] = 'Cactus Stems',
+            [4] = 'Tree Cuttings', [5] = 'Tree Saplings', [6] = 'Wildgrass Seeds'}
+        local stages = {[1] = 'Initial', [2] = 'First Sprouts', [3] = 'First Sprouts 2', [4] = 'First Sprouts - Crystal',
+            [5] = 'Second Sprouts', [6] = 'Second Sprouts 2', [7] = 'Second Sprouts - Crystal', [8] = 'Second Sprouts 3',
+            [9] = 'Third Sprouts', [10] = 'Mature Plant', [11] = 'Wilted'}
+        rettab.plant_id = math.floor((str:byte(1)-1)/13)
+        rettab.plant = plants[plant_id]
+        rettab.stage_id = str:byte(1)%13 -- Stages from 1 to 10 are valid
+        rettab.ts_1 = str:unpack('I',13) + server_timestamp_offset
+        rettab.ts_2 = str:unpack('I',17) + server_timestamp_offset
+        rettab.unknown = str:byte(5)+str:byte(6)*256
+    end
+    return rettab
+end
+
+function decode.Mannequin(str)
+    local rettab = {type = 'Mannequin',
+        is_displayed = (str:byte(2)%128/64 >= 1)
+    }
+    if rettab.is_displayed then
+        local facing_map = {
+            [0] = 'West',
+            [1] = 'South',
+            [2] = 'East',
+            [3] = 'North',
+            }
+        rettab.grid_x = str:byte(7)
+        rettab.grid_z = str:byte(8)
+        rettab.grid_y = str:byte(9)
+        rettab.facing = facing_map[str:byte(10)]
+        local storage = windower.ffxi.get_items(2)
+        local empty = {}
+        rettab.equipment = {main = storage[str:byte(11)] or empty, sub = storage[str:byte(12)] or empty,
+            ranged = storage[str:byte(13)] or empty, head = storage[str:byte(14)] or empty, body = storage[str:byte(15)] or empty,
+            hands = storage[str:byte(16)] or empty, legs = storage[str:byte(17)] or empty, feet = storage[str:byte(18)] or empty}
+        rettab.race_id = str:byte(19)
+        rettab.race = res.races[rettab.race_id]
+        rettab.pose_id = str:byte(20)
+    end
+    return rettab
+end
+
+function decode.PvPReservation(str)
+    local rettab = {type='PvP Reservation',
+        time = str:unpack('I') + server_timestamp_offset,
+        level = math.floor(str:byte(4)/32)*10
+    }
+    if rettab.level == 0 then rettab.level = 99 end
+    return rettab
+end
+
 function decode.SoulPlate(str)
     local name_end = string.find(str,string.char(0),1)
     local name_map = {}
@@ -1697,71 +1648,166 @@ function decode.SoulPlate(str)
     end
     local rettab = {type = 'Soul Plate',
             skill_id = math.floor(str:byte(21)/128) + str:byte(22)*2 + str:byte(23)%8*(2^9), -- Index for whatever table I end up making, so table[skill_id] would be {name = "Breath Damage", multiplier = 1, percent=true}
---            skill = nil, -- "Breath damage +5%, etc."
+            skill = soul_plates[math.floor(str:byte(21)/128) + str:byte(22)*2 + str:byte(23)%8*(2^9)] or 'Unknown', -- "Breath damage +5%, etc."
             FP = math.floor(str:byte(23)/8) + str:byte(24)%4*16, -- Cost in FP
-            name = decode.bit_string(7,str:sub(1,name_end),name_map), -- Name of the monster
+            name = tools.bit.bit_string(7,str:sub(1,name_end),name_map), -- Name of the monster
 --            9D 87 AE C0 = 'Naul'
         }
     return rettab
 end
 
+function decode.Reflector(str)
+    local firstnames = {"Bloody", "Brutal", "Celestial", "Combat", "Cyclopean", "Dark", "Deadly",
+            "Drachen", "Giant", "Hostile", "Howling", "Hyper", "Invincible", "Merciless", "Mighty",
+            "Necro", "Nimble", "Poison", "Putrid", "Rabid", "Radiant", "Raging", "Relentless",
+            "Savage", "Silent", "Tenebrous", "The", "Triple", "Undead", "Writhing", "Serpentine",
+            "Aile", "Bete", "Croc", "Babine", "Carapace", "Colosse", "Corne", "Fauve",
+            "Flamme", "Griffe", "Machoire", "Mandibule", "Patte", "Rapace", "Tentacule", "Voyou",
+            "Zaubernder", "Brutaler", "Explosives", "Funkelnder", "Kraftvoller", "Moderndes", "Tosender", "Schwerer",
+            "Sprintender", "Starker", "Stinkender", "Taumelnder", "Tolles", "Verlornes", "Wendiger", "Wuchtiger"}
+        firstnames[0] = "Pit"
+    local lastnames = {"Beast", "Butcher", "Carnifex", "Critter", "Cyclone", "Dancer", "Darkness",
+            "Erudite", "Fang", "Fist", "Flayer", "Gladiator", "Heart", "Howl", "Hunter",
+            "Jack", "Machine", "Mountain", "Nemesis", "Raven", "Reaver", "Rock", "Stalker",
+            "T", "Tiger", "Tornado", "Vermin", "Vortex", "Whispers", "X", "Prime",
+            "Agile", "Brave", "Coriace", "Diabolique", "Espiegle", "Feroce", "Fidele", "Fourbe",
+            "Impitoyable", "Nuisible", "Robuste", "Sanguinaire", "Sauvage", "Stupide", "Tenace", "Tendre",
+            "Boesewicht", "Engel", "Flitzpiepe", "Gottkaiser", "Klotz", "Muelleimer", "Pechvogel", "Postbote",
+            "Prinzessin", "Raecherin", "Riesenbaby", "Hexer", "Teufel", "Vieh", "Vielfrass", "Fleischer"}
+        lastnames[0] = "Monster"
+    local rettab = {type='Reflector',
+        first_name = firstnames[str:byte(1)%64],
+        last_name = lastnames[math.floor(str:byte(1)/64) + (str:byte(2)%16)*4],
+        level = (math.floor(str:byte(7)/16) + (str:byte(8)%16)*16)%128
+    }
+    return rettab
+end
 
-local typ_mapping = {
---[[Types:
-    *1 = General
-    *2 = Fight entry items
-    *3 = Fish
-    *4 = Weapon
-    *5 = Armor
-    *6 = Linkshells (but not broken linkshells?)
-    *7 = Usable items
-    *8 = Crystals
-    *10 = Furniture
-    *11 = Seeds
-    *12 = Flowerpot
-    *14 = Mannequin
-    
-    *15 = Ballista books
-    16 = Chocobo Paraphenelia (Eggs, Cards, slips, etc.)
-    17 = Chocobo Ticket and Completion Certificate
-    18 = Soul Plates
-    *19 = Soul Reflectors
-    20 = Salvage logs
-    21 = Bonanza Marble
-    22 = Maze Tabula M
-    23 = Maze Tabula R
-    24 = Maze Voucher
-    25 = Maze Rune
-    26 = Evoliths
-    
-    27 = Storage Slip
-    
-    28 = Legion Pass
-    29 = Meebles Burrow Grimoires
-]]
-    [1] = decode.General,
-    [2] = decode.General, -- Unknown if used BCNM orbs contain information
-    [3] = decode.Fish,
-    [4] = decode.Equipment,
-    [5] = decode.Equipment,
-    [6] = decode.Linkshell,
-    [7] = decode.General,
-    [8] = decode.General,
-    [10] = decode.Furniture,
-    [11] = decode.General,
-    [12] = decode.Flowerpot,
-    [14] = decode.Mannequin,
-    [15] = decode.PvPReservation,
-    [18] = decode.SoulPlate,
-    [19] = decode.Reflector,
+function decode.BonanzaMarble(str)
+    local event_list = {
+        [0x00] = 'CS Event Race',
+        [0x01] = 'Race Type 1',
+        [0x02] = 'Race Type 2',
+        [0x03] = 'Race Type 3',
+        [0x04] = 'Race Type 4',
+        [0x05] = 'Race Type 5',
+        [0x06] = 'Race Type 6',
+        [0x07] = 'Race Type 7',
+        [0x08] = 'Race Type 8',
+        [0x09] = 'Race Type 9',
+        [0x0A] = 'Race Type 10',
+        [0x0B] = 'Altana Cup II',
+        [0x0C] = 'C1 Crystal Stakes',
+        [0x0D] = 'C2 Chocobo Race',
+        [0x0E] = 'C3 Chocobo Race',
+        [0x0F] = 'C4 Chocobo Race',
+        [0x3D] = 'Ohohohohoho!',
+        [0x3E] = 'Item Level:%d',
+        [0x3F] = 'Type:%c/Rank:%d/RP:%d',
+        [0x40] = '6th Anniversary Mog Bonanza',
+        [0x41] = '7th Anniversary Mog Bonanza',
+        [0x42] = 'Moggy New Year Bonanza',
+        [0x43] = '8th Anniversary Mog Bonanza',
+        [0x44] = 'Moggy New Year Bonanza',
+        [0x45] = '9th Anniversary Mog Bonanza',
+        [0x46] = 'Mog Bonanza Home Coming',
+        [0x47] = "11th Vana'versary Mog Bonanza",
+        [0x48] = 'I Dream of Mog Bonanza 2014',
+        [0x49] = '12th Anniversary Mog Bonanza',
+        [0x4A] = 'I Dream of Mog Bonanza 2015',
+    }
+    local rettab = {type = 'Bonanza Marble',
+        number = str:byte(3)*256*256 + str:unpack('H',1), -- Who uses 3 bytes? SE does!
+        event = typ_list[str:byte(4)] or (str:byte(4) < 0x4B and '.'),
+    }
+    return rettab
+end
+
+function decode.LegionPass(str)
+    local chamber_list = {
+        [0x2EF] = "Hall of An: 18 combatants",
+        [0x2F0] = "Hall of An: 36 combatants",
+        [0x2F1] = "Hall of Ki: 18 combatants",
+        [0x2F2] = "Hall of Ki: 36 combatants",
+        [0x2F3] = "Hall of Im: 18 combatants",
+        [0x2F4] = "Hall of Im: 36 combatants",
+        [0x2F5] = "Hall of Muru: 18 combatants",
+        [0x2F6] = "Hall of Muru: 36 combatants",
+        [0x2F7] = "Hall of Mul: 18 combatants",
+        [0x2F8] = "Hall of Mul: 36 combatants",}
+    local rettab = {type = 'Legion Pass',
+        entry_time = str:unpack('I',1) + server_timestamp_offset,
+        leader = tools.sig.decode(str:sub(13,24)),
+        chamber = chamber_list[str:unpack('H',5)] or 'Unknown',
+        }
+    return rettab
+end
+
+function decode.Unknown(str)
+    return {type = 'Unknown',
+        value = str:hex()
+        }
+end
+
+function decode.Lamp(str)
+    local chambers = {[0x1E] = 'Rossweisse', [0x1F] = 'Grimgerde', [0x20] = 'Siegrune', [0x21] = 'Helmwige',
+        [0x22] = 'Schwertleite', [0x23] = 'Waltraute', [0x24] = 'Ortlinde', [0x25] = 'Gerhilde', [0x26] = 'Brunhilde',
+        [0x27] = 'Odin'}
+    local statuses = {[0] = 'Uninitialized', [1] = 'Active', [2] = 'Active', [3] = 'Spent'}
+    local rettab = {type='Lamp',
+        chamber = chambers[str:unpack('H')] or 'unknown',
+        exit_time = str:unpack('I',9),
+        entry_time = str:unpack('I',13),
+        zone_id = str:unpack('H',17),
+        status_id = str:byte(3)%4,
+        status = statuses[rettab.status_id],
+        _unknown1 = str:unpack('i',5)
     }
     
-local id_mapping = {
-    [0] = decode.EmptySlot,
-    [4237] = decode.Hourglass,
-    [5414] = decode.Lamp,
-    }
+    if res.zones[rettab.zone_id] then
+        rettab.zone = res.zones[rettab.zone_id].english
+    else
+        rettab.zone = 'unknown'
+    end
+    
+    return rettab
+end
 
+function decode.Hourglass(str)
+    local statuses = {[0] = 'Uninitialized', [1] = 'Active', [2] = 'Active', [3] = 'Spent'}
+    local rettab = {type='Hourglass',
+        exit_time = str:unpack('I',9),
+--        entry_time = str:unpack('I',13),
+        zone_id = str:unpack('H',17),
+        status_id = str:byte(3)%4,
+        status = statuses[rettab.status_id],
+        _unknown1 = str:unpack('i',5)
+    }
+    
+    if res.zones[rettab.zone_id] then
+        rettab.zone = res.zones[rettab.zone_id].english
+    else
+        rettab.zone = 'unknown'
+    end
+    
+    return rettab
+end
+
+function decode.EmptySlot(str)
+    local rettab = {type='Empty Slot',
+        ws_points = str:unpack('I')
+    }
+    
+    return rettab
+end
+
+
+
+
+-- ACTUAL EXTDATA LIB FUNCTIONS
+    
+local extdata = {}
+    
 function extdata.decode(tab)
     if not tab then error('extdata.decode was passed a nil value') end
     if not tab.id or not tonumber(tab.id) then
@@ -1817,7 +1863,7 @@ function extdata.compare_augments(goal,current)
         local function recheck_lib(str)
             local sys, id, val = string.match(str,'System: (%d+) ID: (%d+) Val: (%d+)')
             if tonumber(sys) and tonumber(id) and tonumber(val) then
-                str = string_augment(tonumber(sys),tonumber(id),tonumber(val))
+                str = tools.aug.string_augment(tonumber(sys),tonumber(id),tonumber(val))
             end
             return str
         end
