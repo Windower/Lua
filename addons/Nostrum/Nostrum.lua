@@ -678,6 +678,7 @@ register_events = function(bool)
                 if not position_lookup[id] then
                     return
                 end
+                local pos_tostring = tostring(position_lookup[id])
                 if packet['Zone'] ~= 0 then
                     if not out_of_zone[id] then
                         remove_macro_information(position_lookup[id],false)
@@ -686,7 +687,7 @@ register_events = function(bool)
                     end
                     if who_am_i[id] then
                         stat_table[id].name = packet['Name']
-                        windower.text.set_text("name"..position_lookup[id],prepare_names(packet['Name']))
+                        windower.text.set_text("name"..pos_tostring,prepare_names(packet['Name']))
                         who_am_i:remove(id)
                     end
                 elseif is_zoning or seeking_information[packet['ID']] then
@@ -698,16 +699,16 @@ register_events = function(bool)
                         stat_table[id].tp = packet['TP']
                         to_update:append('tp')
                         local color=_settings.primitives.hp_bar[choose_color(packet['HP%'])]
-                        windower.prim.set_color('phpp'..position_lookup[id],color.a,color.r,color.g,color.b)
+                        windower.prim.set_color('phpp'..pos_tostring,color.a,color.r,color.g,color.b)
                         stat_table[id].hpp = packet['HP%']
                         to_update:append('hpp')
-                        windower.prim.set_size('phpp'..position_lookup[id],150/100*stat_table[id]['hpp'],h)
+                        windower.prim.set_size('phpp'..pos_tostring,150/100*stat_table[id]['hpp'],h)
                         stat_table[id].mpp = packet['MP%']
-                        windower.prim.set_size('pmpp'..position_lookup[id],150/100*stat_table[id]['mpp'],5)
+                        windower.prim.set_size('pmpp'..pos_tostring,150/100*stat_table[id]['mpp'],5)
                         update_macro_data(id,to_update)
                         if who_am_i[id] then
                             stat_table[id].name = packet['Name']
-                            windower.text.set_text("name"..position_lookup[id],prepare_names(packet['Name']))
+                            windower.text.set_text("name"..pos_tostring,prepare_names(packet['Name']))
                             who_am_i:remove(id)
                         end
                         seeking_information:remove(id)

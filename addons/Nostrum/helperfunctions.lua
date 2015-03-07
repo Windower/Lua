@@ -180,15 +180,16 @@ function color_name(x,y,z,n,bool)
 end
 
 function remove_macro_information(n,bool)
-        windower.text.set_text('hp'..tostring(n),'')
-        windower.text.set_text('mp'..tostring(n),'')
-        windower.text.set_text('tp'..tostring(n),'')
-        windower.text.set_text('hpp'..tostring(n),'')
-        windower.text.set_text('mpp'..tostring(n),'')
-        windower.prim.set_size('phpp'..tostring(n),0,h)
-        windower.prim.set_size('pmpp'..tostring(n),0,5)
+        n = tostring(n)
+        windower.text.set_text('hp'..n,'')
+        windower.text.set_text('mp'..n,'')
+        windower.text.set_text('tp'..n,'')
+        windower.text.set_text('hpp'..n,'')
+        windower.text.set_text('mpp'..n,'')
+        windower.prim.set_size('phpp'..n,0,h)
+        windower.prim.set_size('pmpp'..n,0,5)
     if bool then
-        windower.text.set_text('name'..tostring(n),'')
+        windower.text.set_text('name'..n,'')
     end
 end
 
@@ -374,7 +375,9 @@ function invite(id,n)
     stat_table[id]={hp=0,mp=0,mpp=0,hpp=0,name='???',tp=0,}
     seeking_information:add(id)
     who_am_i:add(id)
-    if not saved_prims['phpp' .. tostring(position_lookup[id])] then
+    local m = tostring(n)
+    local pos_tostring = tostring(position_lookup[id])
+    if not saved_prims['phpp' .. pos_lu_s] then
         lift_macro(n)
         if n==1 then
             windower.prim.set_size('info1',152,party[1].n*(h+1)+1)
@@ -382,10 +385,10 @@ function invite(id,n)
             local block_num=19
             for i=11,1,-1 do
                 if profile[options.cures[i]] then 
-                    local s = options.cures[i] .. tostring(position_lookup[id])
+                    local s = options.cures[i] .. pos_tostring
                     block_num=block_num-1
-                    prim_simple('p' .. s,_settings.primitives.buttons,x_start-(19-block_num)*(w+1)+1-153,prim_coordinates.y['BG'..tostring(n)]+1+(h+1)*(party[n].n-1),w,h)
-                    text_simple(s,_settings.text.buttons, x_start-(19-block_num)*(w+1)+1+((w-font_widths[options.aliases[options.cures[i]]])/2)-153, prim_coordinates.y['BG'..tostring(n)]+1+(h+1)*(party[n].n-1), options.aliases[options.cures[i]])
+                    prim_simple('p' .. s,_settings.primitives.buttons,x_start-(19-block_num)*(w+1)+1-153,prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1),w,h)
+                    text_simple(s,_settings.text.buttons, x_start-(19-block_num)*(w+1)+1+((w-font_widths[options.aliases[options.cures[i]]])/2)-153, prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1), options.aliases[options.cures[i]])
                     prims_by_layer[position_lookup[id]]:append('p' .. s)
                     texts_by_layer[position_lookup[id]]:append(s)
                     macro[1]:add('p' .. s)
@@ -398,10 +401,10 @@ function invite(id,n)
             end
             for i=18,12,-1 do
                 if profile[options.curagas[i]] then
-                    local s = options.curagas[i] .. tostring(position_lookup[id])
+                    local s = options.curagas[i] .. pos_tostring
                     block_num=block_num-1
-                    prim_simple('p' .. s,_settings.primitives.curaga_buttons,x_start-(19-block_num)*(w+1)+1-153,prim_coordinates.y['BG'..tostring(n)]+1+(h+1)*(party[n].n-1),w,h)
-                    text_simple(s,_settings.text.buttons, x_start-(19-block_num)*(w+1)+1+((w-font_widths[options.aliases[options.curagas[i]]])/2)-153, prim_coordinates.y['BG'..tostring(n)]+1+(h+1)*(party[n].n-1), options.aliases[options.curagas[i]])
+                    prim_simple('p' .. s,_settings.primitives.curaga_buttons,x_start-(19-block_num)*(w+1)+1-153,prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1),w,h)
+                    text_simple(s,_settings.text.buttons, x_start-(19-block_num)*(w+1)+1+((w-font_widths[options.aliases[options.curagas[i]]])/2)-153, prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1), options.aliases[options.curagas[i]])
                     prims_by_layer[position_lookup[id]]:append('p' .. s)
                     texts_by_layer[position_lookup[id]]:append(s)
                     macro[1]:add('p' .. s)
@@ -413,33 +416,33 @@ function invite(id,n)
                 end
             end
         else
-            if not saved_prims['BG'..tostring(n)] then
+            if not saved_prims['BG'..m] then
                 if n==2 then
                     prim_simple("BG2",_settings.primitives.background,x_start-(_cures)*(w+1)-153,prim_coordinates.y['BG1']-100-party[2].n*(h+1)+h,_cures*(w+1)+1,party[2].n*(h+1)+1)
-                    prim_simple("info2",_settings.primitives.hp_bar_background,x_start-153,prim_coordinates.y['BG1']-100-party[2].n*(h+1)+h,152,party[2].n*(h+1)+1)
+                    prim_simple("info2",_settings.primitives.hp_bar_background,x_start-152,prim_coordinates.y['BG1']-100-party[2].n*(h+1)+h,152,party[2].n*(h+1)+1)
                     macro[2]:add("BG2")
                     if not macro_visibility[2] then
                         windower.prim.set_visibility('BG2',false)
                     end
                 else
                     prim_simple("BG3",_settings.primitives.background,x_start-(_cures)*(w+1)-153,prim_coordinates.y['BG2']-10-party[3].n*(h+1)+h,_cures*(w+1)+1,party[2].n*(h+1)+1)
-                    prim_simple("info3",_settings.primitives.hp_bar_background,x_start-153,prim_coordinates.y['BG2']-10-party[3].n*(h+1)+h,152,party[3].n*(h+1)+1)--prim_coordinates.y['BG2']-10-party[3].n*(h+1)
+                    prim_simple("info3",_settings.primitives.hp_bar_background,x_start-152,prim_coordinates.y['BG2']-10-party[3].n*(h+1)+h,152,party[3].n*(h+1)+1)--prim_coordinates.y['BG2']-10-party[3].n*(h+1)
                     macro[3]:add("BG3")
                     if not macro_visibility[3] then
                         windower.prim.set_visibility('BG3',false)
                     end
                 end
             else
-                windower.prim.set_size('info'..tostring(n),152,party[n].n*(h+1)+1)
-                windower.prim.set_size('BG'..tostring(n),(_cures)*(w+1)+1,party[n].n*(h+1)+1)
+                windower.prim.set_size('info'..m,152,party[n].n*(h+1)+1)
+                windower.prim.set_size('BG'..m,(_cures)*(w+1)+1,party[n].n*(h+1)+1)
             end
             local block_num=12
             for i=11,1,-1 do
                 if profile[options.cures[i]] then 
-                    local s = options.cures[i] .. tostring(position_lookup[id])
+                    local s = options.cures[i] .. pos_tostring
                     block_num=block_num-1
-                    prim_simple('p' .. s,_settings.primitives.buttons,x_start-(12-block_num)*(w+1)+1-153,prim_coordinates.y['BG'..tostring(n)]+1+(h+1)*(party[n].n-1),w,h)
-                    text_simple(s, _settings.text.buttons, x_start-(12-block_num)*(w+1)+1+((w-font_widths[options.aliases[options.cures[i]]])/2)-153, prim_coordinates.y['BG'..tostring(n)]+1+(h+1)*(party[n].n-1), options.aliases[options.cures[i]])
+                    prim_simple('p' .. s,_settings.primitives.buttons,x_start-(12-block_num)*(w+1)+1-153,prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1),w,h)
+                    text_simple(s, _settings.text.buttons, x_start-(12-block_num)*(w+1)+1+((w-font_widths[options.aliases[options.cures[i]]])/2)-153, prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1), options.aliases[options.cures[i]])
                     prims_by_layer[position_lookup[id]]:append('p' .. s)
                     texts_by_layer[position_lookup[id]]:append(s)
                     macro[n]:add('p' .. s)
@@ -452,15 +455,15 @@ function invite(id,n)
             end
 
         end
-        prim_simple("phpp".. tostring(position_lookup[id]),_settings.primitives.hp_bar,x_start-151,prim_coordinates.y['BG'..tostring(n)]+1+(h+1)*(party[n].n-1),150,h)
-        prim_simple("pmpp".. tostring(position_lookup[id]),_settings.primitives.mp_bar,x_start-151,prim_coordinates.y['BG'..tostring(n)]+1+(h+1)*(party[n].n-1)+19,150,5)
-        text_simple("tp".. tostring(position_lookup[id]), _settings.text.tp, x_start-151, prim_coordinates.y['BG'..tostring(n)]+1+(h+1)*(party[n].n-1)+11, '')
-        text_simple("name".. tostring(position_lookup[id]), _settings.text.name, x_start-151, prim_coordinates.y['BG'..tostring(n)]+1+(h+1)*(party[n].n-1)-3, stat_table[id].name)
-        text_simple("hpp".. tostring(position_lookup[id]), _settings.text.hpp, x_start, prim_coordinates.y['BG'..tostring(n)]+1+(h+1)*(party[n].n-1)-4, '')
-        text_simple("hp".. tostring(position_lookup[id]), _settings.text.hp, x_start-40, prim_coordinates.y['BG'..tostring(n)]+1+(h+1)*(party[n].n-1)-3, '')
-        text_simple("mp".. tostring(position_lookup[id]), _settings.text.mp, x_start-40, prim_coordinates.y['BG'..tostring(n)]+1+(h+1)*(party[n].n-1)+11,'') 
-        prims_by_layer[position_lookup[id]]:extend(L{"phpp" .. tostring(position_lookup[id]),"pmpp" .. tostring(position_lookup[id])})
-        texts_by_layer[position_lookup[id]]:extend(L{"tp" .. tostring(position_lookup[id]),"name" .. tostring(position_lookup[id]),"hpp" .. tostring(position_lookup[id]),"hp" .. tostring(position_lookup[id]),"mp" .. tostring(position_lookup[id])})
+        prim_simple("phpp".. pos_tostring,_settings.primitives.hp_bar,x_start-151,prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1),150,h)
+        prim_simple("pmpp".. pos_tostring,_settings.primitives.mp_bar,x_start-151,prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1)+19,150,5)
+        text_simple("tp".. pos_tostring, _settings.text.tp, x_start-151, prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1)+11, '')
+        text_simple("name".. pos_tostring, _settings.text.name, x_start-151, prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1)-3, stat_table[id].name)
+        text_simple("hpp".. pos_tostring, _settings.text.hpp, x_start, prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1)-4, '')
+        text_simple("hp".. pos_tostring, _settings.text.hp, x_start-40, prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1)-3, '')
+        text_simple("mp".. pos_tostring, _settings.text.mp, x_start-40, prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1)+11,'') 
+        prims_by_layer[position_lookup[id]]:extend(L{"phpp" .. pos_tostring,"pmpp" .. pos_tostring})
+        texts_by_layer[position_lookup[id]]:extend(L{"tp" .. pos_tostring,"name" .. pos_tostring,"hpp" .. pos_tostring,"hp" .. pos_tostring,"mp" .. pos_tostring})
     else
         windower.text.set_text('name'..position_lookup[id],stat_table[id].name)
     end
@@ -623,7 +626,7 @@ end
 
 function update_macro_data(id,t)
     for i=1,t:length() do
-        windower.text.set_text(t[i]..position_lookup[id],stat_table[id][t[i]])
+        windower.text.set_text(t[i]..tostring(position_lookup[id]),tostring(stat_table[id][t[i]]))
     end
 end
 
@@ -634,13 +637,14 @@ function kick(id,n)
     while i > j do
         local m = 6*n+1-i
         local m_id = party[n][m]
+        local pos_tostring = tostring(m_id)
         position_lookup[m_id] = position_lookup[m_id] + 1
         update_macro_data(m_id,L{'tp','hp','mp','hpp','mpp'})
-        windower.text.set_text('name'..position_lookup[m_id],prepare_names(stat_table[m_id]['name']))--shouldn't send name to update_macro... since it won't truncate
+        windower.text.set_text('name'..pos_tostring,prepare_names(stat_table[m_id]['name']))--shouldn't send name to update_macro... since it won't truncate
         local color=_settings.primitives.hp_bar[choose_color(stat_table[m_id].hpp)]
-        windower.prim.set_color('phpp'..position_lookup[m_id],color.a,color.r,color.g,color.b)
-        windower.prim.set_size('phpp'..position_lookup[m_id],150/100*stat_table[m_id]['hpp'],h)
-        windower.prim.set_size('pmpp'..position_lookup[m_id],150/100*stat_table[m_id]['mpp'],5)
+        windower.prim.set_color('phpp'..pos_tostring,color.a,color.r,color.g,color.b)
+        windower.prim.set_size('phpp'..pos_tostring,150/100*stat_table[m_id]['hpp'],h)
+        windower.prim.set_size('pmpp'..pos_tostring,150/100*stat_table[m_id]['mpp'],5)
         i = i - 1
     end
     for k = 1,3 do
