@@ -9,44 +9,6 @@ require 'pack'
 
 local decode = {}
 
--- In general, the function used to decode an item's extdata is determined by its type, which can be looked up using its item ID in the resources.
-local typ_mapping = {
-    [1] = decode.General, -- General
-    [2] = decode.General, -- Fight Entry Items
-    [3] = decode.Fish, -- Fish
-    [4] = decode.Equipment, -- Weapons
-    [5] = decode.Equipment, -- Armor
-    [6] = decode.Linkshell, -- Linkshells (but not broken linkshells)
-    [7] = decode.General, -- Usable Items
-    [8] = decode.General, -- Crystals
-    [10] = decode.Furniture, -- Furniture
-    [11] = decode.General, -- Seeds, reason for extdata unclear
-    [12] = decode.Flowerpot, -- Flowerpots
-    [14] = decode.Mannequin, -- Mannequins
-    [15] = decode.PvPReservation, -- Ballista Books
-    --[16] = decode.Chocobo, -- Chocobo paraphenelia (eggs, cards, slips, etc.)
-    --[17] = decode.ChocoboTicket, -- Chocobo Ticket and Completion Certificate
-    [18] = decode.SoulPlate, -- Soul Plates
-    [19] = decode.Reflector, -- Soul Reflectors
-    --[20] = decode.SalvageLog, -- Salvage Logs for the Mythic quest
-    [21] = decode.BonanzaMarble, -- Mog Bonanza Marbles
-    --[22] = decode.MazeTabulaM, -- MMM Maze Tabula M
-    --[23] = decode.MazeTabulaR, -- MMM Maze Tabula R
-    --[24] = decode.MazeVoucher, -- MMM Maze Vouchers
-    --[25] = decode.MazeRunes, -- MMM Maze Runes
-    --[26] = decode.Evoliths, -- Evoliths
-    --[27] = decode.StorageSlip, -- Storage Slips, already handled by slips.lua
-    [28] = decode.LegionPass, -- Legion Pass
-    --[29] = decode.MeeblesGrimore, -- Meebles Burrow Grimoires
-    }
-
--- However, some items appear to have the function they use hardcoded based purely on their ID.
-local id_mapping = {
-    [0] = decode.EmptySlot,
-    [4237] = decode.Hourglass,
-    [5414] = decode.Lamp,
-    }
-
 potencies = {
         zeros = {[0]=0,[1]=0,[2]=0,[3]=0,[4]=0,[5]=0,[6]=0,[7]=0,[8]=0,[9]=0,[10]=0,[11]=0,[12]=0,[13]=0,[14]=0,[15]=0},
         family = {
@@ -1333,6 +1295,71 @@ soul_plates = {
 tools = {}
 tools.aug = {}
 
+tools.bit = {}
+-----------------------------------------------------------------------------------
+--Name: tools.bit.l_to_r_bit_packed(dat_string,start,stop)
+--Args:
+---- dat_string - string that is being bit-unpacked to a number
+---- start - first bit
+---- stop - last bit
+-----------------------------------------------------------------------------------
+--Returns:
+---- number from the indicated range of bits 
+-----------------------------------------------------------------------------------
+function tools.bit.l_to_r_bit_packed(dat_string,start,stop)
+    local newval = 0
+    
+    local c_count = math.ceil(stop/8)
+    while c_count >= math.ceil((start+1)/8) do
+        -- Grabs the most significant byte first and works down towards the least significant.
+        local cur_val = dat_string:byte(c_count)
+        local scal = 1
+        
+        if c_count == math.ceil(stop/8) then -- Take the least significant bits of the most significant byte
+        -- Moduluses by 2^number of bits into the current byte. So 8 bits in would %256, 1 bit in would %2, etc.
+        -- Cuts off the bottom.
+            cur_val = math.floor(cur_val/(2^(8-((stop-1)%8+1)))) -- -1 and +1 set the modulus result range from 1 to 8 instead of 0 to 7.
+        end
+        
+        if c_count == math.ceil((start+1)/8) then -- Take the most significant bits of the least significant byte
+        -- Divides by the significance of the final bit in the current byte. So 8 bits in would /128, 1 bit in would /1, etc.
+        -- Cuts off the top.
+            cur_val = cur_val%(2^(8-start%8))
+        end
+        
+        if c_count == math.ceil(stop/8)-1 then
+            scal = 2^(((stop-1)%8+1))
+        end
+        
+        newval = newval + cur_val*scal -- Need to multiply by 2^number of bits in the next byte
+        c_count = c_count - 1
+    end
+    return newval
+end
+
+
+function tools.bit.bit_string(bits,str,map)
+    local i,sig = 0,''
+    while map[tools.bit.l_to_r_bit_packed(str,i,i+bits)] do
+        sig = sig..map[tools.bit.l_to_r_bit_packed(str,i,i+bits)]
+        i = i+bits
+    end
+    return sig
+end
+
+tools.sig = {}
+function tools.sig.decode(str)
+    local sig_map = {[1]='0',[2]='1',[3]='2',[4]='3',[5]='4',[6]='5',[7]='6',[8]='7',[9]='8',[10]='9',
+        [11]='A',[12]='B',[13]='C',[14]='D',[15]='E',[16]='F',[17]='G',[18]='H',[19]='I',[20]='J',[21]='K',[22]='L',[23]='M',
+        [24]='N',[25]='O',[26]='P',[27]='Q',[28]='R',[29]='S',[30]='T',[31]='U',[32]='V',[33]='W',[34]='X',[35]='Y',[36]='Z',
+        [37]='a',[38]='b',[39]='c',[40]='d',[41]='e',[42]='f',[43]='g',[44]='h',[45]='i',[46]='j',[47]='k',[48]='l',[49]='m',
+        [50]='n',[51]='o',[52]='p',[53]='q',[54]='r',[55]='s',[56]='t',[57]='u',[58]='v',[59]='w',[60]='x',[61]='y',[62]='z',
+        [63]='{'
+        }
+    return tools.bit.bit_string(6,str,sig_map)
+end
+
+
 function tools.aug.unpack_augment(sys,short)
     if sys == 1 then
         return short:byte(1) + short:byte(2)%8*256,  math.floor(short:byte(2)/8)
@@ -1430,71 +1457,6 @@ function decode.Augmented(str)
     end
     return rettab
 end
-
-tools.bit = {}
------------------------------------------------------------------------------------
---Name: tools.bit.l_to_r_bit_packed(dat_string,start,stop)
---Args:
----- dat_string - string that is being bit-unpacked to a number
----- start - first bit
----- stop - last bit
------------------------------------------------------------------------------------
---Returns:
----- number from the indicated range of bits 
------------------------------------------------------------------------------------
-function tools.bit.l_to_r_bit_packed(dat_string,start,stop)
-    local newval = 0
-    
-    local c_count = math.ceil(stop/8)
-    while c_count >= math.ceil((start+1)/8) do
-        -- Grabs the most significant byte first and works down towards the least significant.
-        local cur_val = dat_string:byte(c_count)
-        local scal = 1
-        
-        if c_count == math.ceil(stop/8) then -- Take the least significant bits of the most significant byte
-        -- Moduluses by 2^number of bits into the current byte. So 8 bits in would %256, 1 bit in would %2, etc.
-        -- Cuts off the bottom.
-            cur_val = math.floor(cur_val/(2^(8-((stop-1)%8+1)))) -- -1 and +1 set the modulus result range from 1 to 8 instead of 0 to 7.
-        end
-        
-        if c_count == math.ceil((start+1)/8) then -- Take the most significant bits of the least significant byte
-        -- Divides by the significance of the final bit in the current byte. So 8 bits in would /128, 1 bit in would /1, etc.
-        -- Cuts off the top.
-            cur_val = cur_val%(2^(8-start%8))
-        end
-        
-        if c_count == math.ceil(stop/8)-1 then
-            scal = 2^(((stop-1)%8+1))
-        end
-        
-        newval = newval + cur_val*scal -- Need to multiply by 2^number of bits in the next byte
-        c_count = c_count - 1
-    end
-    return newval
-end
-
-
-function tools.bit.bit_string(bits,str,map)
-    local i,sig = 0,''
-    while map[tools.bit.l_to_r_bit_packed(str,i,i+bits)] do
-        sig = sig..map[tools.bit.l_to_r_bit_packed(str,i,i+bits)]
-        i = i+bits
-    end
-    return sig
-end
-
-tools.sig = {}
-function tools.sig.decode(str)
-    local sig_map = {[1]='0',[2]='1',[3]='2',[4]='3',[5]='4',[6]='5',[7]='6',[8]='7',[9]='8',[10]='9',
-        [11]='A',[12]='B',[13]='C',[14]='D',[15]='E',[16]='F',[17]='G',[18]='H',[19]='I',[20]='J',[21]='K',[22]='L',[23]='M',
-        [24]='N',[25]='O',[26]='P',[27]='Q',[28]='R',[29]='S',[30]='T',[31]='U',[32]='V',[33]='W',[34]='X',[35]='Y',[36]='Z',
-        [37]='a',[38]='b',[39]='c',[40]='d',[41]='e',[42]='f',[43]='g',[44]='h',[45]='i',[46]='j',[47]='k',[48]='l',[49]='m',
-        [50]='n',[51]='o',[52]='p',[53]='q',[54]='r',[55]='s',[56]='t',[57]='u',[58]='v',[59]='w',[60]='x',[61]='y',[62]='z',
-        [63]='{'
-        }
-    return tools.bit.bit_string(6,str,sig_map)
-end
-
 
 
 
@@ -1801,6 +1763,44 @@ function decode.EmptySlot(str)
     return rettab
 end
 
+
+-- In general, the function used to decode an item's extdata is determined by its type, which can be looked up using its item ID in the resources.
+typ_mapping = {
+    [1] = decode.General, -- General
+    [2] = decode.General, -- Fight Entry Items
+    [3] = decode.Fish, -- Fish
+    [4] = decode.Equipment, -- Weapons
+    [5] = decode.Equipment, -- Armor
+    [6] = decode.Linkshell, -- Linkshells (but not broken linkshells)
+    [7] = decode.General, -- Usable Items
+    [8] = decode.General, -- Crystals
+    [10] = decode.Furniture, -- Furniture
+    [11] = decode.General, -- Seeds, reason for extdata unclear
+    [12] = decode.Flowerpot, -- Flowerpots
+    [14] = decode.Mannequin, -- Mannequins
+    [15] = decode.PvPReservation, -- Ballista Books
+    --[16] = decode.Chocobo, -- Chocobo paraphenelia (eggs, cards, slips, etc.)
+    --[17] = decode.ChocoboTicket, -- Chocobo Ticket and Completion Certificate
+    [18] = decode.SoulPlate, -- Soul Plates
+    [19] = decode.Reflector, -- Soul Reflectors
+    --[20] = decode.SalvageLog, -- Salvage Logs for the Mythic quest
+    [21] = decode.BonanzaMarble, -- Mog Bonanza Marbles
+    --[22] = decode.MazeTabulaM, -- MMM Maze Tabula M
+    --[23] = decode.MazeTabulaR, -- MMM Maze Tabula R
+    --[24] = decode.MazeVoucher, -- MMM Maze Vouchers
+    --[25] = decode.MazeRunes, -- MMM Maze Runes
+    --[26] = decode.Evoliths, -- Evoliths
+    --[27] = decode.StorageSlip, -- Storage Slips, already handled by slips.lua
+    [28] = decode.LegionPass, -- Legion Pass
+    --[29] = decode.MeeblesGrimore, -- Meebles Burrow Grimoires
+    }
+
+-- However, some items appear to have the function they use hardcoded based purely on their ID.
+id_mapping = {
+    [0] = decode.EmptySlot,
+    [4237] = decode.Hourglass,
+    [5414] = decode.Lamp,
+    }
 
 
 
