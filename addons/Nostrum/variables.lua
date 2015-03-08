@@ -1,4 +1,4 @@
---[[Copyright © 2014-2015, trv
+--[[Copyright © 2014, trv
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -43,17 +43,25 @@ prim_coordinates={x=T{},y=T{},visible=T{},a=T{},r=T{},g=T{},b=T{}}
 party_keys = S{'p0', 'p1', 'p2', 'p3', 'p4', 'p5'}
 party_two_keys = S{'a10', 'a11', 'a12', 'a13', 'a14', 'a15'}
 party_three_keys = S{'a20', 'a21', 'a22', 'a23', 'a24', 'a25'}
-seeking_information=S{}
+seeking_information={}
 macro_order=T{cures=L{},curagas=L{},buffs=L{},nas=L{}}
 position = {
     L{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     L{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     L{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
 }
-out_of_zone=S{}
-out_of_range=S{}
-out_of_view=S{}
-who_am_i=S{}
+out_of_zone={}
+out_of_range={
+    false,false,false,false,false,false,
+    false,false,false,false,false,false,
+    false,false,false,false,false,false,
+}
+out_of_view={
+    false,false,false,false,false,false,
+    false,false,false,false,false,false,
+    false,false,false,false,false,false,
+}
+who_am_i={}
 packet_pt_struc = {S{},S{},S{}}
 
 l={} r={} t={} b={}
@@ -64,8 +72,9 @@ is_hidden = false
 regions = 0
 
 font_widths={
-    ['I']=9,['II']=17,['III']=25,['IV']=24,['V']=16,['1']=10,['2']=11,['3']=11,
-    ['4']=11,['5']=11,['6']=12,['˹1˼']=25,['˹2˼']=25,['˹3˼']=25,['˹4˼']=25,['˹5˼']=25,
+    ['I']=9,['II']=17,['III']=25,['IV']=24,['V']=16,
+    ['1']=10,['2']=11,['3']=11,['4']=11,['5']=11,['6']=12,
+    ['˹1˼']=25,['˹2˼']=25,['˹3˼']=25,['˹4˼']=25,['˹5˼']=25,
     ['˹I˼']=23,['˹II˼']=31,
 }
 xml_to_lua={

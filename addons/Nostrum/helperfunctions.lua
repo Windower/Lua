@@ -165,23 +165,24 @@ function get_vector_norm(x,y,z)
 end
 
 function color_name(x,y,z,n,bool)
-    if get_vector_norm(x, y, z) > 21 then
-        if not out_of_range:contains(n) then
-            out_of_range:add(n)
-            windower.text.set_color('name' .. tostring(n), 206, 175, 98, 177)
-        end
-    elseif bool then --Invisible conflict?
-        out_of_view:add(n)
-        if not out_of_range:contains(n) then
-            out_of_range:add(n)
+    if bool then --Invisible conflict?
+        out_of_view[n] = true
+        if not out_of_range[n] then
+            out_of_range[n] = true
             windower.text.set_color('name' .. tostring(n), 206, 175, 98, 177)
         end
         for i=1,3 do
             position[i][n] = 0
         end
-    elseif out_of_range:contains(n) then
-        out_of_view:remove(n)
-        out_of_range:remove(n)
+    elseif get_vector_norm(x, y, z) > 21 then
+        if not out_of_range[n] then
+            out_of_view[n] = false
+            out_of_range[n] = true
+            windower.text.set_color('name' .. tostring(n), 206, 175, 98, 177)
+        end
+    elseif out_of_range[n] then
+        out_of_view[n] = false
+        out_of_range[n] = false
         windower.text.set_color('name' .. tostring(n), 255, 255, 255, 255)
     end
 end
@@ -344,7 +345,7 @@ function compare_alliance_to_memory()
         if who_am_i[k] then
             windower.text.set_text('name'..position_lookup[k],prepare_names(v))
             stat_table[k].name = v
-            who_am_i:remove(k)
+            who_am_i[k] = nil
         end
     end
 end
@@ -380,8 +381,8 @@ function invite(id,n)
     party[n]:append(id)
     position_lookup[id] = 1 + 6 * n - party[n].n
     stat_table[id]={hp=0,mp=0,mpp=0,hpp=0,name='???',tp=0,}
-    seeking_information:add(id)
-    who_am_i:add(id)
+    seeking_information[id] = true
+    who_am_i[id] = true
     local m = tostring(n)
     local pos_tostring = tostring(position_lookup[id])
     if not saved_prims['phpp' .. pos_tostring] then
@@ -659,8 +660,12 @@ function kick(id,n)
         position[k]:remove(i+1)
     end
     remove_macro_information(6*n-party[n].n,true)
-    position_lookup[id] = nil
     stat_table[id] = nil
+    out_of_zone[id] = nil
+    out_of_range[i] = false
+    out_of_view[i] = false
+    who_am_i[id] = nil
+    position_lookup[id] = nil
     define_active_regions()
 end
 
