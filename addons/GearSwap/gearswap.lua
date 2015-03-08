@@ -311,7 +311,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
                 break
             end
         end
-        world.weather_id = data:byte(0x69)
+        weather_update(data:byte(0x69))
         world.logged_in = true
         
         _ExtraData.world.in_mog_house = data:byte(0x81) == 1
@@ -511,7 +511,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
                 player.skills[to_windower_api(current_skill.english)] = skill
             end
         end
-    elseif id == 0x0DF then
+    elseif id == 0x0DF and data:unpack('I',5) == player.id then
         player.vitals.hp = data:unpack('I',9)
         player.vitals.mp = data:unpack('I',13)
         player.vitals.tp = data:unpack('I',0x11)
