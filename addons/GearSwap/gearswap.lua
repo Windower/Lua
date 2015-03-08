@@ -323,7 +323,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         local oldstatus = pet.status
         local status_id = data:byte(32)
         -- Filter all statuses aside from Idle/Engaged/Dead/Engaged dead.
-        if status_id < 4 then
+        if status_id < 4 or status_id == 33 or status_id == 47 then
             local newstatus = copy_entry(res.statuses[status_id])
             if newstatus and newstatus[language] then
                 newstatus = newstatus[language]
