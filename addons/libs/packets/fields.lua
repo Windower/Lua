@@ -1776,6 +1776,20 @@ fields.incoming[0x032] = L{
     {ctype='data[3]',           label='_junk1'},                                -- 11   Always 00s for me
 }
 
+-- String NPC Interaction
+fields.incoming[0x033] = L{
+    {ctype='unsigned int',      label='NPC',                fn=id},             -- 04
+    {ctype='unsigned short',    label='NPC Index',          fn=index},          -- 08
+    {ctype='unsigned short',    label='Zone',               fn=zone},           -- 0A
+    {ctype='unsigned short',    label='Menu ID'},                               -- 0C   Seems to select between menus within a zone
+    {ctype='unsigned short',    label='_unknown1'},                             -- 0E   00 00 or 08 00 for me
+    {ctype='char[16]',          label='NPC Name'},                              -- 10
+    {ctype='char[16]',          label='_dupeNPC Name1'},                        -- 20
+    {ctype='char[16]',          label='_dupeNPC Name2'},                        -- 30
+    {ctype='char[16]',          label='_dupeNPC Name3'},                        -- 40
+    {ctype='char[32]',          label='Menu Parameters'},                       -- 50   The way this information is interpreted varies by menu.
+}
+
 -- NPC Interaction Type 2
 fields.incoming[0x034] = L{
     {ctype='unsigned int',      label='NPC',                fn=id},             -- 04
@@ -1783,8 +1797,7 @@ fields.incoming[0x034] = L{
     {ctype='unsigned short',    label='NPC Index',          fn=index},          -- 28
     {ctype='unsigned short',    label='Zone',               fn=zone},           -- 2A
     {ctype='unsigned short',    label='Menu ID'},                               -- 2C   Seems to select between menus within a zone
-    {ctype='unsigned char',     label='_unknown1',          const=0x08},        -- 2E   08 for me, but FFing did nothing
-    {ctype='unsigned char',     label='_unknown2'},                             -- 2F
+    {ctype='unsigned short',    label='_unknown1',          const=0x08},        -- 2E   08 00 for me, but FFing did nothing
     {ctype='unsigned short',    label='_dupeZone',          fn=zone},           -- 30
     {ctype='data[2]',           label='_junk1'},                                -- 31   Always 00s for me
 }

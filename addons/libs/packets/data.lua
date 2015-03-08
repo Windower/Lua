@@ -136,6 +136,7 @@ data.incoming[0x02F] = {name='Digging Animation',   description='Generates the c
 data.incoming[0x030] = {name='Synth Animation',     description='Generates the synthesis animation'}
 data.incoming[0x031] = {name='Synth List',          description='List of recipes or materials needed for a recipe'}
 data.incoming[0x032] = {name='NPC Interaction 1',   description='Occurs before menus and some cutscenes'}
+data.incoming[0x033] = {name='String NPC Interaction',description='Triggers a menu or cutscene to appear. Contains 4 strings.'}
 data.incoming[0x034] = {name='NPC Interaction 2',   description='Occurs before menus and some cutscenes'}
 data.incoming[0x036] = {name='NPC Chat',            description='Dialog from NPC\'s.'}
 data.incoming[0x037] = {name='Update Char',         description='Updates a characters stats and animation.'}
