@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
 _addon.name = 'Nostrum'
 _addon.author = 'trv'
-_addon.version = '2.1.4'
+_addon.version = '2.1.5'
 _addon.commands = {'Nostrum','nos',}
 
 packets=require('packets')
@@ -340,6 +340,11 @@ function build_macro()
         y_start=y_start-10
 
     end
+    
+    toggle_macro_visibility(1)
+    toggle_macro_visibility(2)
+    toggle_macro_visibility(3)
+
 end
 
 do
@@ -406,12 +411,13 @@ windower.register_event('addon command', function(...)
     local args=T{...}
     local c = args[1] and args[1]:lower() or 'help'
     if c == 'help' then
-        print('help:Prints a list of these commands in the console.')
-        print('refresh(r): Compares the macro\'s current party structures to the party structure in memory.')
+        print('help: Prints a list of these commands in the console.')
+        print('refresh(r): Compares the macro\'s current party structures to \nthe party structure in memory.')
         print('hide(h): Toggles the macro\'s visibility.')
         print('cut(c): Trims the macro down to size, removing blank spaces.')
-        print('send(s) <name>: Requires send addon. Sends commands to the character whose name was provided.')
-        print('If no name is provided, send will reset and commands will be sent to the character with Nostrum loaded.')
+        print('profile(p) <name>: Loads a new profile from the settings file.')
+        print('send(s) <name>: Requires send addon. Sends commands to the \ncharacter whose name was provided.'
+           .. ' If no name is provided, send \nwill reset and commands will be sent to the character with \nNostrum loaded.')
     elseif c == 'hide' or c == 'h' then
         toggle_visibility()
     elseif c == 'cut' or c == 'c' then
@@ -446,11 +452,11 @@ do
 
 register_events = function(bool)
     if bool then
-        keyboard_event = windower.register_event('keyboard', function(dik,flags,blocked)
+        keyboard_event = windower.register_event('keyboard', function(dik,down,flags,blocked)
             if tab_keys[dik] then
-                if bit.band(blocked,32) == 32 then
+                if bit.band(flags,32) == 32 then
                     return
-                elseif flags then
+                elseif down then
                     coroutine.sleep(.02)
                     local target = windower.ffxi.get_mob_by_target('st') or windower.ffxi.get_mob_by_target('t')
                     if target then update_target(target) end
@@ -566,13 +572,13 @@ register_events = function(bool)
                     position[1][6],position[2][6],position[3][6] = packet['X'],packet['Y'],packet['Z']
                     local party = party
                     for i = 5,7-party[1].n,-1 do
-                        if not (out_of_zone:contains(party[1][7 - i]) or out_of_view:contains(party[1][7 - i])) then
+                        if not (out_of_zone[party[1][7 - i]] or out_of_view[position_lookup[party[1][7 - i]]]) then
                             color_name(position[1][i],position[2][i],position[3][i],i,false)
                         end
                     end
                     for j = 2,3 do
                         for i = j*6,j*6-party[j].n+1,-1 do
-                            if not (out_of_zone:contains(party[j][j*6-i+1]) or out_of_view:contains(party[j][j*6-i+1])) then
+                            if not (out_of_zone[party[j][j*6-i+1]] or out_of_view[position_lookup[party[j][j*6-i+1]]]) then
                                 color_name(position[1][i],position[2][i],position[3][i],i,false)
                             end
                         end
@@ -678,16 +684,17 @@ register_events = function(bool)
                 if not position_lookup[id] then
                     return
                 end
+                local pos_tostring = tostring(position_lookup[id])
                 if packet['Zone'] ~= 0 then
                     if not out_of_zone[id] then
                         remove_macro_information(position_lookup[id],false)
-                        out_of_zone:add(id)
-                        seeking_information:add(id)
+                        out_of_zone[id] = true
+                        seeking_information[id] = true
                     end
                     if who_am_i[id] then
                         stat_table[id].name = packet['Name']
-                        windower.text.set_text("name"..position_lookup[id],prepare_names(packet['Name']))
-                        who_am_i:remove(id)
+                        windower.text.set_text("name"..pos_tostring,prepare_names(packet['Name']))
+                        who_am_i[id] = nil
                     end
                 elseif is_zoning or seeking_information[packet['ID']] then
                         to_update:clear()
@@ -698,20 +705,20 @@ register_events = function(bool)
                         stat_table[id].tp = packet['TP']
                         to_update:append('tp')
                         local color=_settings.primitives.hp_bar[choose_color(packet['HP%'])]
-                        windower.prim.set_color('phpp'..position_lookup[id],color.a,color.r,color.g,color.b)
+                        windower.prim.set_color('phpp'..pos_tostring,color.a,color.r,color.g,color.b)
                         stat_table[id].hpp = packet['HP%']
                         to_update:append('hpp')
-                        windower.prim.set_size('phpp'..position_lookup[id],150/100*stat_table[id]['hpp'],h)
+                        windower.prim.set_size('phpp'..pos_tostring,150/100*stat_table[id]['hpp'],h)
                         stat_table[id].mpp = packet['MP%']
-                        windower.prim.set_size('pmpp'..position_lookup[id],150/100*stat_table[id]['mpp'],5)
+                        windower.prim.set_size('pmpp'..pos_tostring,150/100*stat_table[id]['mpp'],5)
                         update_macro_data(id,to_update)
                         if who_am_i[id] then
                             stat_table[id].name = packet['Name']
-                            windower.text.set_text("name"..position_lookup[id],prepare_names(packet['Name']))
-                            who_am_i:remove(id)
+                            windower.text.set_text("name"..pos_tostring,prepare_names(packet['Name']))
+                            who_am_i[id] = nil
                         end
-                        seeking_information:remove(id)
-                        out_of_zone:remove(id)
+                        seeking_information[id] = nil
+                        out_of_zone[id] = nil
                 end
             elseif id == 0x0C8 then
                 local packet = packets.parse('incoming', data)
