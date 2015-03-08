@@ -340,6 +340,11 @@ function build_macro()
         y_start=y_start-10
 
     end
+    
+    toggle_macro_visibility(1)
+    toggle_macro_visibility(2)
+    toggle_macro_visibility(3)
+
 end
 
 do

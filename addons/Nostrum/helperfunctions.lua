@@ -137,21 +137,18 @@ function merge_user_file_and_settings(t,u)
     return u
 end
 
-last_hover=''
+last_hover='BG1'
 function hover(p)
-    if is_hidden then return end
-    if p==last_hover then return end
+    if is_hidden or p==last_hover then return end
     
-    if last_hover~='' then
-        windower.prim.set_color(last_hover,prim_coordinates.a[last_hover],prim_coordinates.r[last_hover],prim_coordinates.g[last_hover],prim_coordinates.b[last_hover])
-        windower.prim.set_visibility(last_hover,prim_coordinates.visible[last_hover] and
-            (   
-               (macro[1]:contains(last_hover) and macro_visibility[1])
-            or (macro[2]:contains(last_hover) and macro_visibility[2])
-            or (macro[3]:contains(last_hover) and macro_visibility[3])
-            )
+    windower.prim.set_color(last_hover,prim_coordinates.a[last_hover],prim_coordinates.r[last_hover],prim_coordinates.g[last_hover],prim_coordinates.b[last_hover])
+    windower.prim.set_visibility(last_hover,prim_coordinates.visible[last_hover] and
+        (   
+           (macro[1]:contains(last_hover) and macro_visibility[1])
+        or (macro[2]:contains(last_hover) and macro_visibility[2])
+        or (macro[3]:contains(last_hover) and macro_visibility[3])
         )
-    end
+    )
     
     last_hover=p
 
@@ -266,6 +263,8 @@ function toggle_macro_visibility(n)
                 windower.text.set_visibility(key,false)
             end
         end
+        windower.prim.set_color(last_hover,prim_coordinates.a[last_hover],prim_coordinates.r[last_hover],prim_coordinates.g[last_hover],prim_coordinates.b[last_hover])
+        last_hover='BG1'
     end
 end
 

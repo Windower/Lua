@@ -1,4 +1,4 @@
---[[Copyright © 2014, trv
+--[[Copyright © 2014-2015, trv
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -37,7 +37,7 @@ prims_by_layer={L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},
 texts_by_layer={L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{}}
 misc_hold_for_up={texts=T{},prims=T{}}
 macro = {[1]=S{},[2]=S{},[3]=S{}}
-macro_visibility = {[1]=false,[2]=false,[3]=false}
+macro_visibility = {[1]=true,[2]=true,[3]=true}
 text_coordinates={x=T{},y=T{},visible=T{}}
 prim_coordinates={x=T{},y=T{},visible=T{},a=T{},r=T{},g=T{},b=T{}}
 party_keys = S{'p0', 'p1', 'p2', 'p3', 'p4', 'p5'}
