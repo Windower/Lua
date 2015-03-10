@@ -29,7 +29,7 @@ If `order` is provided, will set that as the new sorting order. If omitted, will
 clock add <timezone>
 ```
 
-Appends a time zone to the list of currently displayed time zones. The `timezone` parameter needs to be one of [these abbreviations](https://github.com/Windower/Lua/tree/4.1-dev/Clock/reps.lua).
+Appends a time zone to the list of currently displayed time zones. The `timezone` parameter needs to be one of [these abbreviations](https://github.com/Windower/Lua/blob/4.1-dev/addons/Clock/time_zones.lua).
 
 #### Remove time zone
 
@@ -37,4 +37,4 @@ Appends a time zone to the list of currently displayed time zones. The `timezone
 clock remove <timezone>
 ```
 
-Removes a time zone from the list of currently displayed time zones. The `timezone` parameter needs to be one of [these abbreviations](https://github.com/Windower/Lua/tree/4.1-dev/Clock/reps.lua).
+Removes a time zone from the list of currently displayed time zones. The `timezone` parameter needs to be one of [these abbreviations](https://github.com/Windower/Lua/blob/4.1-dev/addons/Clock/time_zones.lua).
