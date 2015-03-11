@@ -29,14 +29,13 @@ h=24
 tab_keys={[15]=true,[16]=true,[18]=true,[28]=true,[82]=true,[203]=true,[205]=true,[210]=true,}
 spell_default=''
 send_string = ''
-to_update=L{}
 
 saved_prims=S{}
 saved_texts=S{}
 prims_by_layer={L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{}}
 texts_by_layer={L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{}}
 misc_hold_for_up={texts=T{},prims=T{}}
-macro = {[1]=S{},[2]=S{},[3]=S{}}
+macro = {S{},S{},S{}}
 macro_visibility = {[1]=true,[2]=true,[3]=true}
 text_coordinates={x=T{},y=T{},visible=T{}}
 prim_coordinates={x=T{},y=T{},visible=T{},a=T{},r=T{},g=T{},b=T{}}
@@ -45,10 +44,23 @@ party_two_keys = S{'a10', 'a11', 'a12', 'a13', 'a14', 'a15'}
 party_three_keys = S{'a20', 'a21', 'a22', 'a23', 'a24', 'a25'}
 seeking_information={}
 macro_order=T{cures=L{},curagas=L{},buffs=L{},nas=L{}}
+
+help_text = [[Nostrum command list.
+help: Prints a list of these commands in the console.
+refresh(r): Compares the macro's current party structures to
+ - the alliance structure in memory.
+hide(h): Toggles the macro's visibility.
+cut(c): Trims the macro down to size, removing blank spaces.
+profile(p) <name>: Loads a new profile from the settings file.
+send(s) <name>: Requires 'send' addon. Sends commands to the
+ - character whose name is provided. If no name is provided,
+ - send will reset and commands will be sent to the character
+ - with Nostrum loaded.]]
+
 position = {
-    L{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    L{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    L{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
 }
 out_of_zone={}
 out_of_range={
@@ -62,11 +74,10 @@ out_of_view={
     false,false,false,false,false,false,
 }
 who_am_i={}
-packet_pt_struc = {S{},S{},S{}}
 
 l={} r={} t={} b={}
 region_map = {[1]='curagas',[2]='cures',[3]='cures',[4]='nas',[5]='buffs'}
-local dragged = false
+dragged = false
 is_zoning = false
 is_hidden = false
 regions = 0
@@ -77,6 +88,7 @@ font_widths={
     ['˹1˼']=25,['˹2˼']=25,['˹3˼']=25,['˹4˼']=25,['˹5˼']=25,
     ['˹I˼']=23,['˹II˼']=31,
 }
+
 xml_to_lua={
 	["cure"]="Cure",
     ["cureii"]="Cure II",
