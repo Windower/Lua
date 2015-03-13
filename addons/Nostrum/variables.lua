@@ -60,7 +60,6 @@ send(s) <name>: Requires 'send' addon. Sends commands to the
 position = {
     {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
 }
 out_of_zone={}
 out_of_range={

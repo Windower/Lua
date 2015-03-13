@@ -356,6 +356,7 @@ do
         alliance_keys = {'p5', 'p4', 'p3', 'p2', 'p1', 'p0', 'a15', 'a14', 'a13', 'a12', 'a11', 'a10', 'a25', 'a24', 'a23', 'a22', 'a21', 'a20'}
         local party_from_memory = windower.ffxi.get_party()
         local player = windower.ffxi.get_player()
+        
         player_id = player.id
         local alliance = {}
         position_lookup = {}
@@ -372,7 +373,6 @@ do
                 position_lookup[alliance[i]] = i
                 position[1][i] = party_from_memory[pkey].mob.x
                 position[2][i] = party_from_memory[pkey].mob.y
-                position[3][i] = party_from_memory[pkey].mob.z
                 stat_table[alliance[i]]={
                     hp = party_from_memory[pkey].hp,
                     mp = party_from_memory[pkey].mp,
@@ -565,18 +565,18 @@ register_events = function(bool)
                 end
                 
                 local position = position
-                if position[1][6] ~= packet['X'] or position[2][6] ~= packet['Y'] or position[3][6] ~= packet['Z'] then
-                    position[1][6],position[2][6],position[3][6] = packet['X'],packet['Y'],packet['Z']
+                if position[1][6] ~= packet['X'] or position[2][6] ~= packet['Y'] then
+                    position[1][6],position[2][6] = packet['X'],packet['Y']
                     local party = party
                     for i = 5,7-party[1].n,-1 do
                         if not (out_of_zone[party[1][7 - i]] or out_of_view[i]) then
-                            color_name(false,i,position[1][i],position[2][i],position[3][i])
+                            indicate_distance(false,i,position[1][i],position[2][i])
                         end
                     end
                     for j = 2,3 do
                         for i = j*6,j*6-party[j].n+1,-1 do
                             if not (out_of_zone[party[j][j*6-i+1]] or out_of_view[i]) then
-                                color_name(false,i,position[1][i],position[2][i],position[3][i])
+                                indicate_distance(false,i,position[1][i],position[2][i])
                             end
                         end
                     end
@@ -606,6 +606,7 @@ register_events = function(bool)
                 end
                 coroutine.sleep(10)
                 is_zoning = false
+                stat_table[player_id].index = windower.ffxi.get_player().index
             end
         end)
 
@@ -621,10 +622,9 @@ register_events = function(bool)
                         local X,Z,Y = data:unpack('fff',0x0D)   --0b000001 position updated
                         position[1][f] = X                      --0b000100 hp updated
                         position[2][f] = Y                      --0b011111 model appear i.e. update all
-                        position[3][f] = Z                      --0b100000 model disappear
-                        color_name(false,f,X,Y,Z)               
+                        indicate_distance(false,f,X,Y)          --0b100000 model disappear
                     elseif bit.band(Mask,32) == 32 then         
-                        color_name(true,f)
+                        indicate_distance(true,f)
                     end
                 end
             elseif id == 0x0DF then

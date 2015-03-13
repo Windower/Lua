@@ -162,22 +162,18 @@ function hover(p)
 
 end
 
-function get_vector_norm(x,y,z)
-    return math.sqrt((position[1][6] - x)^2 + (position[2][6] - y)^2 + (position[3][6] - z)^2)
-end
-
-function color_name(bool,n,x,y,z)
+function indicate_distance(bool,n,x,y)
     if bool then --Invisible conflict?
         out_of_view[n] = true
         if not out_of_range[n] then
             out_of_range[n] = true
-            windower.text.set_color('name' .. tostring(n), 206, 175, 98, 177)
+            windower.text.set_color('name' .. tostring(n), 255, 175, 98, 177)
         end
-    elseif get_vector_norm(x, y, z) > 21 then
+    elseif ((position[1][6] - x)^2 + (position[2][6] - y)^2) > 441 then
         if not out_of_range[n] then
             out_of_view[n] = false
             out_of_range[n] = true
-            windower.text.set_color('name' .. tostring(n), 206, 175, 98, 177)
+            windower.text.set_color('name' .. tostring(n), 255, 175, 98, 177)
         end
     elseif out_of_range[n] then
         out_of_view[n] = false
@@ -487,10 +483,9 @@ function invite(id,n)
     if pos then
         position[1][pos_id] = pos.x
         position[2][pos_id] = pos.y
-        position[3][pos_id] = pos.z
-        color_name(false,pos_id,pos.x,pos.y,pos.z)
+        indicate_distance(false,pos_id,pos.x,pos.y)
     elseif not out_of_view[pos_id] then
-        color_name(true,pos_id)
+        indicate_distance(true,pos_id)
     end
 end
 
@@ -648,7 +643,8 @@ end
 function kick(id,n)
     local i = position_lookup[id]
     party[n]:remove(6*n+1-i)
-    local j = 1+6*(n-1)+5-party[n].n
+    local j = 6*(n)-party[n].n
+    
     while i > j do
         local m = 6*n+1-i
         local m_id = party[n][m]
@@ -660,20 +656,21 @@ function kick(id,n)
         windower.prim.set_color('phpp'..pos_tostring,color.a,color.r,color.g,color.b)
         windower.prim.set_size('phpp'..pos_tostring,150/100*stat_table[m_id]['hpp'],h)
         windower.prim.set_size('pmpp'..pos_tostring,150/100*stat_table[m_id]['mpp'],5)
+        if out_of_range[i] and not out_of_range[i-1] then
+            windower.text.set_color('name' .. tostring(i), 255, 255, 255, 255)
+        end
+        if out_of_range[i-1] and not out_of_range[i] then
+            windower.text.set_color('name' .. tostring(i), 255, 175, 98, 177)
+        end
+        out_of_range[i] = out_of_range[i-1]
+        out_of_view[i] = out_of_view[i-1]
+        position[1][i] = position[1][i-1]
+        position[2][i] = position[2][i-1]
+        
         i = i - 1
     end
     
-    local empty = 6*n-party[n].n
-
-    for j = i,empty+1,-1 do -- untested
-        out_of_range[j] = out_of_range[j-1]
-        out_of_view[j] = out_of_view[j-1]
-        for k = 1,3 do
-            position[k][j] = position[k][j-1]
-        end
-    end
-
-    remove_macro_information(tostring(empty),true)
+    remove_macro_information(tostring(i),true)
     stat_table[id] = nil
     out_of_zone[id] = nil
     who_am_i[id] = nil
