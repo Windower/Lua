@@ -136,6 +136,7 @@ data.incoming[0x02F] = {name='Digging Animation',   description='Generates the c
 data.incoming[0x030] = {name='Synth Animation',     description='Generates the synthesis animation'}
 data.incoming[0x031] = {name='Synth List',          description='List of recipes or materials needed for a recipe'}
 data.incoming[0x032] = {name='NPC Interaction 1',   description='Occurs before menus and some cutscenes'}
+data.incoming[0x033] = {name='String NPC Interaction',description='Triggers a menu or cutscene to appear. Contains 4 strings.'}
 data.incoming[0x034] = {name='NPC Interaction 2',   description='Occurs before menus and some cutscenes'}
 data.incoming[0x036] = {name='NPC Chat',            description='Dialog from NPC\'s.'}
 data.incoming[0x037] = {name='Update Char',         description='Updates a characters stats and animation.'}
@@ -215,11 +216,12 @@ data.incoming[0x115] = {name='Fish Bite Info',      description='Contains inform
 data.incoming[0x116] = {name='Equipset Build Response', description='Returned from the server when building a set.'}
 data.incoming[0x117] = {name='Equipset Response',   description='Returned from the server after the /equipset command.'}
 data.incoming[0x118] = {name='Currency 2 Info',     description='Contains all currencies to be displayed in the currency menu.'}
+data.incoming[0x119] = {name='Ability Recasts',     description='Contains the currently available job abilities and their remaining recast times.'}
 
 return data
 
 --[[
-Copyright © 2013-2014, Windower
+Copyright © 2013-2015, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

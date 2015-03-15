@@ -1,4 +1,4 @@
---[[Copyright © 2014, trv
+--[[Copyright © 2014-2015, trv
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
 _addon.name = 'Nostrum'
 _addon.author = 'trv'
-_addon.version = '2.1.2'
+_addon.version = '2.1.5'
 _addon.commands = {'Nostrum','nos',}
 
 packets=require('packets')
@@ -256,7 +256,7 @@ function build_macro()
     for i=1,options.na['n'] do
         if profile[options.na[i]] then
             prim_simple('p' .. options.na[i],_settings.primitives.na_buttons,x_start-33*(block_num+1)-1-151,y_start-10,32,32)
-            img_simple(options.na[i]..'i',windower.windower_path.."\\plugins\\icons\\spells\\"..options.images[options.na[i]]..'.png',x_start-33*(block_num+1)-152,y_start-10)
+            img_simple(options.na[i]..'i',windower.windower_path.."/plugins/icons/"..options.images[options.na[i]],x_start-33*(block_num+1)-152,y_start-10)
             text_simple(options.na[i], _settings.text.na, x_start-33*(block_num+1)-152, y_start-10, options.aliases[options.na[i]])
             misc_hold_for_up.texts:append(options.na[i])
             misc_hold_for_up.prims:extend({options.na[i]..'i','p' .. options.na[i]})
@@ -282,7 +282,7 @@ function build_macro()
     for i=1,options.buffs['n'] do
         if profile[options.buffs[i]] then
             prim_simple('p' .. options.buffs[i],_settings.primitives.buff_buttons,x_start-33*(block_num+1)-152,y_start-10,32,32)
-            img_simple(options.buffs[i]..'i',windower.windower_path.."\\plugins\\icons\\spells\\"..options.images[options.buffs[i]]..'.png',x_start-33*(block_num+1)-152,y_start-10)
+            img_simple(options.buffs[i]..'i',windower.windower_path.."/plugins/icons/"..options.images[options.buffs[i]],x_start-33*(block_num+1)-152,y_start-10)
             text_simple(options.buffs[i], _settings.text.buffs, x_start-33*(block_num+1)-152, y_start-11, options.aliases[options.buffs[i]])
             misc_hold_for_up.texts:append(options.buffs[i])
             misc_hold_for_up.prims:extend({options.buffs[i]..'i','p' .. options.buffs[i]})
@@ -308,7 +308,7 @@ function build_macro()
             local s = tostring(n)
             prim_simple("phpp" .. s,_settings.primitives.hp_bar,x_start-151,y_start,150/100*stat_table[party[k][j]].hpp,h)
             local color = _settings.primitives.hp_bar[choose_color(stat_table[party[k][j]].hpp)]
-            windower.prim.set_color("phpp" .. n,color.a,color.r,color.g,color.b)
+            windower.prim.set_color("phpp" .. s,color.a,color.r,color.g,color.b)
             prim_simple("pmpp" .. s,_settings.primitives.mp_bar,x_start-151,y_start+19,150/100*stat_table[party[k][j]].mpp,5)
             text_simple("tp" .. s, _settings.text.tp, x_start-151, y_start+11,stat_table[party[k][j]].tp)
             text_simple("name" .. s, _settings.text.name, x_start-151, y_start-3, prepare_names(stat_table[party[k][j]].name))
@@ -340,6 +340,11 @@ function build_macro()
         y_start=y_start-10
 
     end
+    
+    toggle_macro_visibility(1)
+    toggle_macro_visibility(2)
+    toggle_macro_visibility(3)
+
 end
 
 do
@@ -406,12 +411,13 @@ windower.register_event('addon command', function(...)
     local args=T{...}
     local c = args[1] and args[1]:lower() or 'help'
     if c == 'help' then
-        print('help:Prints a list of these commands in the console.')
-        print('refresh(r): Compares the macro\'s current party structures to the party structure in memory.')
+        print('help: Prints a list of these commands in the console.')
+        print('refresh(r): Compares the macro\'s current party structures to \nthe party structure in memory.')
         print('hide(h): Toggles the macro\'s visibility.')
         print('cut(c): Trims the macro down to size, removing blank spaces.')
-        print('send(s) <name>: Requires send addon. Sends commands to the character whose name was provided.')
-        print('If no name is provided, send will reset and commands will be sent to the character with Nostrum loaded.')
+        print('profile(p) <name>: Loads a new profile from the settings file.')
+        print('send(s) <name>: Requires send addon. Sends commands to the \ncharacter whose name was provided.'
+           .. ' If no name is provided, send \nwill reset and commands will be sent to the character with \nNostrum loaded.')
     elseif c == 'hide' or c == 'h' then
         toggle_visibility()
     elseif c == 'cut' or c == 'c' then
@@ -446,13 +452,14 @@ do
 
 register_events = function(bool)
     if bool then
-        keyboard_event = windower.register_event('keyboard', function(dik,flags,blocked)
-            if bit.band(blocked,32) == 32 then return end
-            if tab_keys:contains(dik) then
-                if flags then
+        keyboard_event = windower.register_event('keyboard', function(dik,down,flags,blocked)
+            if tab_keys[dik] then
+                if bit.band(flags,32) == 32 then
+                    return
+                elseif down then
                     coroutine.sleep(.02)
                     local target = windower.ffxi.get_mob_by_target('st') or windower.ffxi.get_mob_by_target('t')
-                    if target then update_target(target.index) end
+                    if target then update_target(target) end
                 end
             end
         end)
@@ -497,15 +504,15 @@ register_events = function(bool)
                     if y>b[i] and y<t[i] then
                         if x>l[i] and x<r[i] then
                             determine_response(x,i,30,y)
+                            dragged = true
+                            return true
                         elseif x>l[i+5] and x<r[i+5] then
-                            windower.send_command('%sinput /target %s':format(send_string,stat_table[party[i][math.ceil((y-b[i])/25)]].name))                else
+                            windower.send_command('%sinput /target %s':format(send_string,stat_table[party[i][math.ceil((y-b[i])/25)]].name))
+                            dragged = true
+                            return true
                         end
-                        
-                        dragged = true
-                        return true
                     end
                 end
-                
                 if y>b[4] and y<t[4] and x>l[4] and x<r[4] then
                     determine_response(x,4,33)
                     dragged = true
@@ -524,7 +531,7 @@ register_events = function(bool)
                 for i=1,regions do
                     if y>b[i] and y<t[i] then
                         if x>l[i+5] and x<r[i+5] then
-                            windower.send_command('%sinput %s "%s" %s':format(send_string, prefix[spell_default], spell_default, stat_table[party[i][math.ceil((y-b[i])/25)]].name))
+                            windower.send_command('%sinput %s "%s" %s':format(send_string, prefix[spell_default] or '', spell_default, stat_table[party[i][math.ceil((y-b[i])/25)]].name))
                             dragged = true
                             return true
                         end
@@ -557,18 +564,23 @@ register_events = function(bool)
         outgoing_chunk_event = windower.register_event('outgoing chunk', function(id,data)
             if id == 0x015 then
                 local packet = packets.parse('outgoing', data)
-                local target = packet['Target Index']
-                update_target(target)
-                position[1][6],position[2][6],position[3][6] = packet['X'],packet['Y'],packet['Z']
-                for i = 5,7-party[1].n,-1 do
-                    if not out_of_zone:contains(party[1][7 - i]) then
-                        color_name(position[1][i],position[2][i],position[3][i],i,false)
-                    end
+                if packet['Target Index'] ~= last_index then 
+                    update_target(windower.ffxi.get_mob_by_index(packet['Target Index']))
                 end
-                for j = 2,3 do
-                    for i = j*6,j*6-party[j].n+1,-1 do
-                        if not out_of_zone:contains(party[j][j*6-i+1]) then
+                local position = position
+                if position[1][6] ~= packet['X'] or position[2][6] ~= packet['Y'] or position[3][6] ~= packet['Z'] then
+                    position[1][6],position[2][6],position[3][6] = packet['X'],packet['Y'],packet['Z']
+                    local party = party
+                    for i = 5,7-party[1].n,-1 do
+                        if not (out_of_zone[party[1][7 - i]] or out_of_view[position_lookup[party[1][7 - i]]]) then
                             color_name(position[1][i],position[2][i],position[3][i],i,false)
+                        end
+                    end
+                    for j = 2,3 do
+                        for i = j*6,j*6-party[j].n+1,-1 do
+                            if not (out_of_zone[party[j][j*6-i+1]] or out_of_view[position_lookup[party[j][j*6-i+1]]]) then
+                                color_name(position[1][i],position[2][i],position[3][i],i,false)
+                            end
                         end
                     end
                 end
@@ -607,7 +619,7 @@ register_events = function(bool)
                     return
                 elseif position_lookup[packet['Player']] then
                     if bit.band(packet['Mask'],1) == 1 then
-                    local f = position_lookup[packet['Player']]
+                        local f = position_lookup[packet['Player']]
                         position[1][f] = packet['X']
                         position[2][f] = packet['Y']
                         position[3][f] = packet['Z']
@@ -619,12 +631,12 @@ register_events = function(bool)
                 local f = position_lookup[packet['NPC']]
                 if bit.band(packet['Mask'],4) == 4 and packet['Index'] == last_index then -- HP
                     if packet['HP %']~=last_hpp then
-                            windower.text.set_text("targethpp",packet['HP %'])
-                            windower.prim.set_size("target",150/100*packet['HP %'],30)
-                            if math.floor(packet['HP %']/25) ~= math.floor(last_hpp/25) then
-                                local color=_settings.primitives.hp_bar[choose_color(packet['HP %'])]
-                                windower.prim.set_color("target",color.a,color.r,color.g,color.b)
-                            end
+                        windower.text.set_text("targethpp",packet['HP %'])
+                        windower.prim.set_size("target",150/100*packet['HP %'],30)
+                        if math.floor(packet['HP %']/25) ~= math.floor(last_hpp/25) then
+                            local color=_settings.primitives.hp_bar[choose_color(packet['HP %'])]
+                            windower.prim.set_color("target",color.a,color.r,color.g,color.b)
+                        end
                         last_hpp = packet['HP %']
                     end
                 end
@@ -672,16 +684,17 @@ register_events = function(bool)
                 if not position_lookup[id] then
                     return
                 end
+                local pos_tostring = tostring(position_lookup[id])
                 if packet['Zone'] ~= 0 then
                     if not out_of_zone[id] then
                         remove_macro_information(position_lookup[id],false)
-                        out_of_zone:add(id)
-                        seeking_information:add(id)
+                        out_of_zone[id] = true
+                        seeking_information[id] = true
                     end
                     if who_am_i[id] then
                         stat_table[id].name = packet['Name']
-                        windower.text.set_text("name"..position_lookup[id],prepare_names(packet['Name']))
-                        who_am_i:remove(id)
+                        windower.text.set_text("name"..pos_tostring,prepare_names(packet['Name']))
+                        who_am_i[id] = nil
                     end
                 elseif is_zoning or seeking_information[packet['ID']] then
                         to_update:clear()
@@ -692,20 +705,20 @@ register_events = function(bool)
                         stat_table[id].tp = packet['TP']
                         to_update:append('tp')
                         local color=_settings.primitives.hp_bar[choose_color(packet['HP%'])]
-                        windower.prim.set_color('phpp'..position_lookup[id],color.a,color.r,color.g,color.b)
+                        windower.prim.set_color('phpp'..pos_tostring,color.a,color.r,color.g,color.b)
                         stat_table[id].hpp = packet['HP%']
                         to_update:append('hpp')
-                        windower.prim.set_size('phpp'..position_lookup[id],150/100*stat_table[id]['hpp'],h)
+                        windower.prim.set_size('phpp'..pos_tostring,150/100*stat_table[id]['hpp'],h)
                         stat_table[id].mpp = packet['MP%']
-                        windower.prim.set_size('pmpp'..position_lookup[id],150/100*stat_table[id]['mpp'],5)
+                        windower.prim.set_size('pmpp'..pos_tostring,150/100*stat_table[id]['mpp'],5)
                         update_macro_data(id,to_update)
                         if who_am_i[id] then
                             stat_table[id].name = packet['Name']
-                            windower.text.set_text("name"..position_lookup[id],prepare_names(packet['Name']))
-                            who_am_i:remove(id)
+                            windower.text.set_text("name"..pos_tostring,prepare_names(packet['Name']))
+                            who_am_i[id] = nil
                         end
-                        seeking_information:remove(id)
-                        out_of_zone:remove(id)
+                        seeking_information[id] = nil
+                        out_of_zone[id] = nil
                 end
             elseif id == 0x0C8 then
                 local packet = packets.parse('incoming', data)

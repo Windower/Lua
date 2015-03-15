@@ -181,7 +181,7 @@ function parse_action_packet(act)
                 elseif m.message == 435 or m.message == 436 then m.simp_name = act.action.name..' (JAs)'
                 elseif m.message == 437 or m.message == 438 then m.simp_name = act.action.name..' (JAs and TP)'
                 elseif m.message == 439 or m.message == 440 then m.simp_name = act.action.name..' (SPs, JAs, TP, and MP)'
-                elseif T{252,265,268,269,271,272,274,275}:contains(m.message) then m.simp_name = 'Magic Burst! '..act.action.name
+                elseif T{252,265,268,269,271,272,274,275,379,650}:contains(m.message) then m.simp_name = 'Magic Burst! '..act.action.name
                 elseif not act.action then 
                    m.simp_name = ''
                    act.action = {}
@@ -547,7 +547,7 @@ function get_spell(act)
             spell = res.job_abilities[76] -- 'Trick Attack'
             spell.name = color_it(spell[language],color_arr.abilcol)
             spell.ability = color_it(spell[language],color_arr.abilcol)
-        elseif msg_ID == 311 or msg_ID == 311 then
+        elseif msg_ID == 311 or msg_ID == 312 then
             spell = res.job_abilities[79] -- 'Cover'
             spell.name = color_it(spell[language],color_arr.abilcol)
             spell.ability = color_it(spell[language],color_arr.abilcol)

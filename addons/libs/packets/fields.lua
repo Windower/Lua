@@ -1324,7 +1324,7 @@ fields.incoming[0x01B] = L{
     {ctype='unsigned char',     label='Flag or Main Job Level?'},               -- 09
     {ctype='unsigned char',     label='Flag or Sub Job Level?'},                -- 0A
     {ctype='unsigned char',     label='Sub Job',            fn=job},            -- 0B
-    {ctype='unsigned int',      label='_unknown2'},                             -- 0C   Flags -- FF FF FF 00 observed
+    {ctype='bit[32]',           label='Sub/Job Unlock Flags'},                  -- 0C   Indicate whether subjob is unlocked and which jobs are unlocked. lsb of 0x0C indicates subjob unlock.
     {ctype='unsigned char',     label='_unknown3'},                             -- 10   Flag or List Start
     {ref=types.job_level,       lookup={res.jobs, 0x01},    count=0x0F},        -- 11
     {ctype='unsigned short',    label='Base STR'},                              -- 20  -- Altering these stat values has no impact on your equipment menu.
@@ -1776,6 +1776,20 @@ fields.incoming[0x032] = L{
     {ctype='data[3]',           label='_junk1'},                                -- 11   Always 00s for me
 }
 
+-- String NPC Interaction
+fields.incoming[0x033] = L{
+    {ctype='unsigned int',      label='NPC',                fn=id},             -- 04
+    {ctype='unsigned short',    label='NPC Index',          fn=index},          -- 08
+    {ctype='unsigned short',    label='Zone',               fn=zone},           -- 0A
+    {ctype='unsigned short',    label='Menu ID'},                               -- 0C   Seems to select between menus within a zone
+    {ctype='unsigned short',    label='_unknown1'},                             -- 0E   00 00 or 08 00 for me
+    {ctype='char[16]',          label='NPC Name'},                              -- 10
+    {ctype='char[16]',          label='_dupeNPC Name1'},                        -- 20
+    {ctype='char[16]',          label='_dupeNPC Name2'},                        -- 30
+    {ctype='char[16]',          label='_dupeNPC Name3'},                        -- 40
+    {ctype='char[32]',          label='Menu Parameters'},                       -- 50   The way this information is interpreted varies by menu.
+}
+
 -- NPC Interaction Type 2
 fields.incoming[0x034] = L{
     {ctype='unsigned int',      label='NPC',                fn=id},             -- 04
@@ -1783,8 +1797,7 @@ fields.incoming[0x034] = L{
     {ctype='unsigned short',    label='NPC Index',          fn=index},          -- 28
     {ctype='unsigned short',    label='Zone',               fn=zone},           -- 2A
     {ctype='unsigned short',    label='Menu ID'},                               -- 2C   Seems to select between menus within a zone
-    {ctype='unsigned char',     label='_unknown1',          const=0x08},        -- 2E   08 for me, but FFing did nothing
-    {ctype='unsigned char',     label='_unknown2'},                             -- 2F
+    {ctype='unsigned short',    label='_unknown1',          const=0x08},        -- 2E   08 00 for me, but FFing did nothing
     {ctype='unsigned short',    label='_dupeZone',          fn=zone},           -- 30
     {ctype='data[2]',           label='_junk1'},                                -- 31   Always 00s for me
 }
