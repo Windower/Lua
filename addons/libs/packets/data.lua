@@ -84,6 +84,7 @@ data.outgoing[0x0EA] = {name='Sit',                 description='A request to si
 data.outgoing[0x0E7] = {name='Logout',              description='A request to logout of the server.'}
 data.outgoing[0x0E8] = {name='Toggle Heal',         description='This command is used to both heal and cancel healing.'}
 data.outgoing[0x0F1] = {name='Cancel',              description='Sent when canceling a buff.'}
+data.outgoing[0x0F2] = {name='Declare Subregion',   description='Sent when moving to a new subregion of a zone (for instance, a different combination of open doors).'}
 data.outgoing[0x0F4] = {name='Widescan',            description='This command asks the server for a widescan.'}
 data.outgoing[0x0F5] = {name='Widescan Track',      description='Sent when you choose to track something on widescan.'}
 data.outgoing[0x0F6] = {name='Widescan Cancel',     description='Sent when you choose to stop track something on widescan.'}

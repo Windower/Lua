@@ -929,6 +929,13 @@ fields.outgoing[0x0F1] = L{
     {ctype='unsigned char',     label='_unknown3'},                             -- 07
 }
 
+-- Declare Subregion
+fields.outgoing[0x0F2] = L{
+    {ctype='unsigned char',     label='_unknown1',          const=0x01},        -- 04
+    {ctype='unsigned char',     label='_unknown2',          const=0x00},        -- 05
+    {ctype='unsigned short',    label='Subregion Index'},                       -- 06
+}
+
 -- Unknown packet 0xF2
 --[[fields.outgoing[0x0F2] = L{
     {ctype='unsigned char',     label='type'},                                  -- 04  Was always 01 for me
