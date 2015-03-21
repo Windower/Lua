@@ -37,6 +37,7 @@ data.outgoing[0x04E] = {name='Auction',             description='Used to bid on 
 data.outgoing[0x050] = {name='Equip',               description='This command is used to equip your character.'}
 data.outgoing[0x051] = {name='Equipset',            description='This packet is sent when using /equipset.'}
 data.outgoing[0x052] = {name='Equipset Build',      description='This packet is sent when building an equipset.'}
+data.outgoing[0x059] = {name='End Synth',           description='This packet is sent to end a synth.'}
 data.outgoing[0x05A] = {name='Conquest',            description='This command asks the server for data pertaining to conquest/besieged status.'}
 data.outgoing[0x05B] = {name='Dialog choice',       description='Chooses a dialog option.'}
 data.outgoing[0x05C] = {name='Warp Request',        description='Request a warp. Used by teleporters and the like.'}
@@ -52,13 +53,17 @@ data.outgoing[0x071] = {name='Kick',                description='Sent when you k
 data.outgoing[0x074] = {name='Party response',      description='Sent when responding to a party or alliance invite.'}
 data.outgoing[0x077] = {name='Change permissions',  description='Sent when giving party or alliance leader to another player or elevating/decreasing linkshell permissions.'}
 data.outgoing[0x078] = {name='Party list request',  description='Sent when checking the party list.'}
-data.outgoing[0x083] = {name='Buy Item',            description='Buy an item.'}
+data.outgoing[0x083] = {name='NPC Buy Item',        description='Buy an item from a generic NPC.'}
 data.outgoing[0x084] = {name='Appraise',            description='Ask server for selling price.'}
 data.outgoing[0x085] = {name='Sell Item',           description='Sell an item from your inventory.'}
 data.outgoing[0x096] = {name='Synth',               description='Packet sent containing all data of an attempted synth.'}
 data.outgoing[0x0A0] = {name='Nominate',            description='Sent in response to a /nominate command.'}
 data.outgoing[0x0A1] = {name='Vote',                description='Sent in response to a /vote command.'}
 data.outgoing[0x0A2] = {name='Random',              description='Sent in response to a /random command.'}
+data.outgoing[0x0AA] = {name='Guild Buy Item',      description='Buy an item from a guild.'}
+data.outgoing[0x0AB] = {name='Get Guild Inv List',  description='Gets the offerings of the guild.'}
+data.outgoing[0x0AC] = {name='Guild Sell Item',     description='Sell an item to the guild.'}
+data.outgoing[0x0AD] = {name='Get Guild Sale List', description='Gets the list of things the guild will buy.'}
 data.outgoing[0x0B5] = {name='Speech',              description='Packet contains normal speech.'}
 data.outgoing[0x0B6] = {name='Tell',                description='/tell\'s sent from client.'}
 data.outgoing[0x0BE] = {name='Merit Point Increase',description='Sent when you increase a merit point ability.'}
@@ -146,6 +151,7 @@ data.incoming[0x03A] = {name='Independ. Animation', description='Used for arbitr
 data.incoming[0x03C] = {name='Shop',                description='Displays items in a vendors shop.'}
 data.incoming[0x03D] = {name='Value',               description='Returns the value of an item.'}
 data.incoming[0x03E] = {name='Open Buy/Sell',       description='Opens the buy/sell menu for vendors.'}
+data.incoming[0x03F] = {name='Shop Buy Response',   description='Sent when you buy something from normal vendors.'}
 data.incoming[0x041] = {name='Blacklist',           description='Contains player ID and name for blacklist.'}
 data.incoming[0x042] = {name='Blacklist Command',   description='Sent in response to /blacklist add or /blacklist delete.'}
 data.incoming[0x044] = {name='Job Info Extra',      description='Contains information about Automaton stats and set Blue Magic spells.'}
@@ -179,6 +185,11 @@ data.incoming[0x071] = {name='Campaign Map Info',   description='Populates the C
 data.incoming[0x075] = {name='Unity Start',         description='Creates the timer and glowing fence that accompanies Unity fights.'}
 data.incoming[0x078] = {name='Proposal',            description='Carries proposal information from a /propose or /nominate command.'}
 data.incoming[0x079] = {name='Proposal Update',     description='Proposal update following a /vote command.'}
+data.incoming[0x082] = {name='Guild Buy Response',  description='Buy an item from a guild.'}
+data.incoming[0x083] = {name='Guild Inv List',      description='Provides the items, prices, and counts for guild inventories.'}
+data.incoming[0x084] = {name='Guild Sell Response', description='Sell an item to a guild.'}
+data.incoming[0x085] = {name='Guild Sale List',     description='Provides the items, prices, and counts for guild inventories.'}
+data.incoming[0x086] = {name='Guild Open',          description='Sent to update the current guild status or open the guild buy/sell menu.'}
 data.incoming[0x08C] = {name='Merits',              description='Contains all merit information. 3 packets are sent.'}
 data.incoming[0x08D] = {name='Job Points',          description='Contains all job point information. 12 packets are sent.'}
 data.incoming[0x0A0] = {name='Party Map Marker',    description='Marks where players are on your map.'}
