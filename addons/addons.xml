@@ -227,11 +227,11 @@
 	<support>Podginator@gmail.com</support>
   </addon>
   <addon>
-    <name>Itemizer</name>
-    <author>Ihina</author>
-    <description>Use commands to move items and gear between bags</description>
-    <bugtracker>https://github.com/Jayjs20/Lua/issues</bugtracker>
-    <support>http://www.ffxiah.com/player/Bismarck/Ihina</support>
+    <name>instaLS</name>
+    <author>Byrth</author>
+    <description>Enables instant linkshell chat after zoning.</description>
+    <bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
+    <support>https://github.com/Byrth/Lua-Byrth/issues</support>
   </addon>
   <addon>
 	<name>InfoReplacer</name>
@@ -239,6 +239,13 @@
 	<description>Replaces outgoing text prefixed by % with respective game information.</description>
     <bugtracker>https://github.com/cairface/Lua/issues</bugtracker>
     <support>http://www.bluegartr.com/members/34070-Cairthenn</support>
+  </addon>
+  <addon>
+    <name>Itemizer</name>
+    <author>Ihina</author>
+    <description>Use commands to move items and gear between bags.</description>
+    <bugtracker>https://github.com/Jayjs20/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Bismarck/Ihina</support>
   </addon>
   <addon>
     <name>latentchecker</name>
