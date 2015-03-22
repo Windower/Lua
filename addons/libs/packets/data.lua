@@ -74,6 +74,7 @@ data.outgoing[0x0C4] = {name='Equip Linkshell',     description='Sent to equip a
 data.outgoing[0x0CB] = {name='Open Mog',            description='Sent when opening or closing your mog house.'}
 data.outgoing[0x0D2] = {name='Party Marker Request',description='Requests map markers for your party.'}
 data.outgoing[0x0D3] = {name='GM Call',             description='Places a call to the GM queue.'}
+data.outgoing[0x0D4] = {name='Help Desk Menu',      description='Opens the Help Desk submenu.'}
 data.outgoing[0x0DC] = {name='Type Bitmask',        description='This command is sent when change your party-seek or /anon status.'}
 data.outgoing[0x0DD] = {name='Check',               description='Used to check other players.'}
 data.outgoing[0x0DE] = {name='Set Bazaar Message',  description='Sets your bazaar message.'}
@@ -197,6 +198,7 @@ data.incoming[0x0A0] = {name='Party Map Marker',    description='Marks where pla
 data.incoming[0x0AA] = {name='Spell List',          description='Packet that shows the spells that you know.'}
 data.incoming[0x0AC] = {name='Ability List',        description='Packet that shows your current abilities and traits.'}
 data.incoming[0x0B4] = {name='Seek AnonResp',       description='Server response sent after you put up party or anon flag.'}
+data.incoming[0x0B5] = {name='Help Desk Open',      description='Sent when you open the Help Desk submenu.'}
 data.incoming[0x0C8] = {name='Party Struct Update', description='Updates all party member info in one struct. No player vital data (HP/MP/TP) or names are sent here.'}
 data.incoming[0x0C9] = {name='Show Equip',          description='Shows another player your equipment after using the Check command.'}
 data.incoming[0x0CA] = {name='Bazaar Message',      description='Shows another players bazaar message after using the Check command or sets your own on zoning.'}

@@ -875,6 +875,11 @@ fields.outgoing[0x0D2] = L{
     {ctype='unsigned short',    label='_junk1'}                                 -- 06
 }
 
+-- Open Help Submenu
+fields.outgoing[0x0D4] = L{
+    {ctype='unsigned int',      label='Number of Opens'},                       -- 04  Number of times you've opened the submenu.
+}
+
 -- Check
 fields.outgoing[0x0DD] = L{
     {ctype='unsigned int',      label='Target',             fn=id},             -- 04
@@ -2920,6 +2925,13 @@ fields.incoming[0x0A0] = L{
     {ctype='float',             label='X'},                                     -- 0C
     {ctype='float',             label='Z'},                                     -- 10
     {ctype='float',             label='Y'},                                     -- 14
+}
+
+-- Help Desk submenu open
+fields.incoming[0x0B5] = L{
+    {ctype='data[20]',          label='_unknown1'},                             -- 04
+    {ctype='unsigned int',      label='Number of Opens'},                       -- 18
+    {ctype='unsigned int',      label='_unknown2'},                             -- 1C
 }
 
 -- Alliance status update
