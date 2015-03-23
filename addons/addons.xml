@@ -29,7 +29,7 @@
     <name>AnsweringMachine</name>
 	<author>Byrth</author>
     <description>Stores tells that you receive for later recall.</description>
-	<bugtracker>https://github.com/Byrth/Lua/issues</bugtracker>
+	<bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
 	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
@@ -77,7 +77,7 @@
     <name>BattleMod</name>
     <author>Byrth</author>
     <description>Customizes battle chat messages.</description>
-	<bugtracker>https://github.com/Byrth/Lua/issues</bugtracker>
+	<bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
 	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
@@ -98,7 +98,7 @@
     <name>Cancel</name>
     <author>Byrth</author>
     <description>Mimics the cancel plugin, but also accepts buff names instead of just IDs.</description>
-	<bugtracker>https://github.com/Byrth/Lua/issues</bugtracker>
+	<bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
 	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
@@ -216,8 +216,7 @@
     <name>GearSwap</name>
     <author>Byrth</author>
     <description>Changes gear in response to player actions. [[Uses Packets.]]</description>
-	<bugtracker>https://github.com/Byrth/Lua/issues</bugtracker>
-	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
+	<bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
   </addon>
   <addon>
     <name>Highlight</name>
@@ -231,7 +230,7 @@
     <author>Byrth</author>
     <description>Enables instant linkshell chat after zoning.</description>
     <bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
-    <support>https://github.com/Byrth/Lua-Byrth/issues</support>
+	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
 	<name>InfoReplacer</name>
@@ -307,10 +306,17 @@
     <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>
   </addon>
   <addon>
+    <name>Organizer</name>
+    <description>A multi-purpose inventory management solution. Similar to GearCollector.</description>
+    <author>Byrth, Rooks</author>
+	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
+    <bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
+  </addon>
+  <addon>
     <name>pet_fix</name>
     <author>Byrth</author>
     <description>Temporary addon that fixes a null pointer animation error with pets that is causing crashes.</description>
-    <bugtracker>https://github.com/Byrth/Lua/issues</bugtracker>
+    <bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
     <support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
@@ -338,14 +344,14 @@
     <name>plugin_manager</name>
     <author>Byrth</author>
     <description>Allows you to specify which plugins and addons will be used with which characters.</description>
-	<bugtracker>https://github.com/Byrth/Lua/issues</bugtracker>
+	<bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
 	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
     <name>PointWatch</name>
     <author>Byrth</author>
     <description>Allows you to monitor your XP/CP gains and keep track of the Dynamis time limit.</description>
-	<bugtracker>https://github.com/Byrth/Lua/issues</bugtracker>
+	<bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
 	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
@@ -366,7 +372,7 @@
     <name>Respond</name>
 	<author>Byrth</author>
     <description>Respond to tells and FFOchat PMs using //r.</description>
-	<bugtracker>https://github.com/Byrth/Lua/issues</bugtracker>
+	<bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
 	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
@@ -415,7 +421,7 @@
     <name>Shortcuts</name>
     <author>Byrth</author>
     <description>Applys spellcast-like command completion (interpretation and target completion) to commands. Includes emotes, /check, and /pcmd.</description>
-	<bugtracker>https://github.com/Byrth/Lua/issues</bugtracker>
+	<bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
 	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
@@ -520,7 +526,7 @@
     <name>translate</name>
 	<author>Byrth</author>
     <description>Gives a rough JP->EN translation using the resources and custom dictionaries.</description>
-	<bugtracker>https://github.com/Byrth/Lua/issues</bugtracker>
+	<bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
 	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>

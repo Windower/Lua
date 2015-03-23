@@ -25,17 +25,23 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'instaLS'
-_addon.version = 0.150221
+_addon.version = 0.150322
 _addon.author = 'Byrth'
 
-l_time = os.time()
+flag=false
 
 windower.register_event('zone change',function()
-    l_time = os.time()
+    flag=false
+end)
+
+windower.register_event('incoming chunk',function(id)
+    if id == 0x1D then
+        flag = true
+    end
 end)
 
 windower.register_event('outgoing text',function(org,mod,bool)
-    if bool or os.time() - l_time > 10 then return end
+    if bool or flag then return end
     local chatmode,message
     if mod:sub(1,3) == '/l ' then
         chatmode = 0x05
