@@ -71,10 +71,10 @@ _global = {
 }
 
 default_settings = {
-    dump_bags = {1,4,2},
-    bag_priority = {1,4,2,5,6,7,0,8},
+    dump_bags = {'Safe','Locker','Storage'},
+    bag_priority = {'Safe','Locker','Storage','Satchel','Sack','Case','Inventory','Wardrobe'},
     item_delay = 0,
-    auto_heal = 0,
+    auto_heal = false,
     default_file='default.lua',
 }
 
@@ -82,7 +82,13 @@ _debugging = {
     warnings = true, -- This mode gives warnings about impossible item movements.
 }
 
-
+function s_to_bag(str)
+    for i,v in pairs(res.bags) do
+        if v.en:lower() == str:lower() then
+            return v.id
+        end
+    end
+end
 
 windower.register_event('load',function()
     if debugging then windower.debug('load') end
@@ -133,11 +139,11 @@ windower.register_event('addon command',function(...)
     end
 
 
-    if (command == 'g' or command == 'get') and bag then
+    if (command == 'g' or command == 'get') then
         get(thaw(file_name, bag))
-    elseif (command == 't' or command == 'tidy') and bag then
+    elseif (command == 't' or command == 'tidy') then
         tidy(thaw(file_name, bag))
-    elseif (command == 'f' or command == 'freeze') and bag then
+    elseif (command == 'f' or command == 'freeze') then
 
         local items = Items.new(windower.ffxi.get_items(),true)
         items[3] = nil -- Don't export temporary items
@@ -148,13 +154,13 @@ windower.register_event('addon command',function(...)
                 freeze(file_name,res.bags[bag_id].english:lower(),items)
             end
         end
-    elseif (command == 'o' or command == 'organize') and bag then
+    elseif (command == 'o' or command == 'organize') then
         organize(thaw(file_name, bag))        
     elseif command == 'eval' then
         assert(loadstring(file_name))()
     end
 
-    if settings.auto_heal and settings.auto_heal > 0 then
+    if settings.auto_heal and tostring(settings.auto_heal):lower() ~= 'false' then
         windower.send_command('input /heal')
     end
 
@@ -228,8 +234,17 @@ end
 function organize(goal_items)
     org_verbose('Start Organizing!')
     local current_items = Items.new()
+    local dump_bags = {}
+    for i,v in pairs(settings.dump_bags) do
+        if s_to_bag(v) then
+            dump_bags[i] = s_to_bag(v)
+        else
+            org_error('The bag name ("'..tostring(v)..'") in dump_bags entry #'..tostring(i)..' in the ../addons/organizer/data/settings.xml file is not valid.\nValid options are '..tostring(res.bags))
+            return
+        end
+    end
     if current_items[0].n == 80 then
-        tidy(goal_items,current_items,settings.dump_bags)
+        tidy(goal_items,current_items,dump_bags)
     end
     if current_items[0].n == 80 then
         org_error('Unable to make space, aborting!')
@@ -241,7 +256,7 @@ function organize(goal_items)
         goal_items, current_items = get(goal_items,current_items)
         
         goal_items, current_items = clean_goal(goal_items,current_items)
-        goal_items, current_items = tidy(goal_items,current_items,settings.dump_bags)
+        goal_items, current_items = tidy(goal_items,current_items,dump_bags)
         remainder = incompletion_check(goal_items,remainder)
         org_verbose(tostring(remainder)..' '..current_items[0]._info.n,1)
     end

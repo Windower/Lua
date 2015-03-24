@@ -104,7 +104,10 @@ function items:it()
     return function ()
         while i < #settings.bag_priority do
             i = i + 1
-            local id = settings.bag_priority[i]
+            local id = s_to_bag(settings.bag_priority[i])
+            if not id then
+                org_error('The bag name ("'..tostring(settings.bag_priority[i])..'") in bag_priority entry #'..tostring(i)..' in the ../addons/organizer/data/settings.xml file is not valid.\nValid options are '..tostring(res.bags))
+            end
             if self[id] and validate_bag(res.bags[id]) then return id, self[id] end
         end
     end
