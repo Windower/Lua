@@ -253,7 +253,6 @@ function clean_goal(goal_items,current_items)
         for ind,item in inv:it() do
             local potential_ind = current_items[i]:contains(item)
             if potential_ind then
-                windower.add_to_chat(8,item.name..' annihilated.')
                 -- If it is already in the right spot, delete it from the goal items and annihilate it.
                 local count = math.min(goal_items[i][ind].count,current_items[i][potential_ind].count)
                 goal_items[i][ind]:annihilate(goal_items[i][ind].count)
