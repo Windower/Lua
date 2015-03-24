@@ -72,19 +72,20 @@ end
 function count_cures(t)
     _cures=0
     _curagas=0
-    for i=1,11 do
+    for i=options.cures.n,1,-1 do
         if t[options.cures[i]] then 
             _cures=_cures+1 
-            macro_order.cures:append(options.cures[i]) 
+            macro_order[2]:append(xml_to_lua[options.cures[i]])
         end
+        macro_order[3] = macro_order[2]
     end
-    for i=11,18 do
-        if t[options.curagas[i]] then 
+    macro_order[1] = macro_order[2]:copy(false)
+    for i=options.curagas.n,1,-1 do
+        if t[options.curagas[i]] then
             _curagas=_curagas+1 
-            macro_order.curagas:append(options.curagas[i]) 
+            macro_order[1]:append(xml_to_lua[options.curagas[i]]) 
         end
     end
-    macro_order.curagas:extend(macro_order.cures)
 end
 
 function count_na(t)
@@ -92,10 +93,10 @@ function count_na(t)
     for i=1,options.na['n'] do
         if t[options.na[i]] then 
             _na=_na+1 
-            macro_order.nas:append(options.na[i]) 
+            macro_order[4]:append(xml_to_lua[options.na[i]]) 
         end
     end
-    macro_order.nas = list.reverse(macro_order.nas)
+    --macro_order.nas = list.reverse(macro_order.nas)
 end
 
 function count_buffs(t)
@@ -103,10 +104,10 @@ function count_buffs(t)
     for i=1,options.buffs['n'] do
         if t[options.buffs[i]] then 
             _buffs=_buffs+1 
-            macro_order.buffs:append(options.buffs[i]) 
+            macro_order[5]:append(xml_to_lua[options.buffs[i]]) 
         end
     end
-    macro_order.buffs = list.reverse(macro_order.buffs)
+    --macro_order.buffs = list.reverse(macro_order.buffs)
 end
 
 function choose_color(hpp)
@@ -167,18 +168,18 @@ function indicate_distance(bool,n,x,y)
         out_of_view[n] = true
         if not out_of_range[n] then
             out_of_range[n] = true
-            windower.text.set_color('name' .. tostring(n), 255, 175, 98, 177)
+            windower.text.set_color('name'..tostring(n), 255, 175, 98, 177)
         end
     elseif ((position[1][6] - x)^2 + (position[2][6] - y)^2) > 441 then
         if not out_of_range[n] then
             out_of_view[n] = false
             out_of_range[n] = true
-            windower.text.set_color('name' .. tostring(n), 255, 175, 98, 177)
+            windower.text.set_color('name'..tostring(n), 255, 175, 98, 177)
         end
     elseif out_of_range[n] then
         out_of_view[n] = false
         out_of_range[n] = false
-        windower.text.set_color('name' .. tostring(n), 255, 255, 255, 255)
+        windower.text.set_color('name'..tostring(n), 255, 255, 255, 255)
     end
 end
 
@@ -213,10 +214,9 @@ function wrecking_ball()
         windower.prim.delete(key)
         saved_prims:remove(key)
     end
-    macro_order.cures:clear()
-    macro_order.curagas:clear()
-    macro_order.buffs:clear()
-    macro_order.nas:clear()
+    for i=1,5 do
+        macro_order[i]:clear()
+    end
 end
 
 function toggle_visibility()
@@ -274,6 +274,45 @@ function switch_profiles()
     build_macro()
     define_active_regions()
     last_index=-1
+end
+
+function image_row(t,x_start,y_start)
+    local s
+    for i = 1,t.n do
+        s = t[i]
+        prim_simple('p' .. s,_settings.primitives.buff_buttons,x_start-33*i-152,y_start,32,32)
+        img_simple(s..'i',windower.windower_path.."/plugins/icons/"..options.images[s],x_start-33*i-152,y_start)
+        text_simple(s, _settings.text.buffs, x_start-33*i-152, y_start, options.aliases[s])
+        misc_hold_for_up.texts:append(s)
+        misc_hold_for_up.prims:extend({s..'i','p' .. s})
+        macro[1]:add(s)
+        macro[1]:add(s..'i')
+        macro[1]:add('p' .. s)
+        windower.text.set_stroke_color(s, 255, 0, 0, 0)
+        windower.text.set_stroke_width(s, 1)
+    end
+end
+
+function prim_rose(t,pos,x_start,y_start,n) --Pun!
+    local spell
+    local s
+    local prim = _settings.primitives.buttons
+    local text = _settings.text.buttons
+    
+    for i = 1,t.n do
+        spell = t[i]
+        s = spell .. tostring(pos)
+        prim_simple('p' .. s,prim,x_start-(i)*(w+1)+1-153,y_start,w,h)
+        text_simple(s, text, x_start-(i)*(w+1)+1+((w-font_widths[options.aliases[spell]])/2)-153, y_start, options.aliases[spell])
+        prims_by_layer[pos]:append('p' .. s)
+        texts_by_layer[pos]:append(s)
+        macro[n]:add('p' .. s)
+        macro[n]:add(s)
+        if not macro_visibility[n] then
+            windower.prim.set_visibility('p' .. s,false)
+            windower.text.set_visibility(s,false)
+        end
+    end
 end
 
 last_hpp=0
@@ -356,7 +395,7 @@ end
 
 function determine_response(x,region,w,y)
     local target
-    local spell=xml_to_lua[macro_order[region_map[region]][math.ceil((x-l[region])/w)]]
+    local spell=macro_order[region][math.ceil((x-l[region])/w)]
     if y then 
         target = stat_table[party[region][math.ceil((y-b[region])/25)]].name
     else
@@ -381,8 +420,12 @@ function new_members(packet_pt_struc) -- snippet from invite, reused in c_a_t_m
 end
 
 function invite(id,n)
+    local prim = _settings.primitives
+    local text = _settings.text
+    local x_start=_settings.window.x_res-1-_defaults.window.x_offset
     party[n]:append(id)
-    position_lookup[id] = 1 + 6 * n - party[n].n
+    local ptn = party[n].n
+    position_lookup[id] = 1 + 6 * n - ptn
     local pos_id = position_lookup[id]
     stat_table[id]={hp=0,mp=0,mpp=0,hpp=0,name='???',tp=0,}
     seeking_information[id] = true
@@ -391,91 +434,29 @@ function invite(id,n)
     local pos_tostring = tostring(pos_id)
     if not saved_prims:contains('phpp' .. pos_tostring) then
         lift_macro(n)
-        if n==1 then
-            windower.prim.set_size('info1',152,party[1].n*(h+1)+1)
-            windower.prim.set_size("BG1",(_cures+_curagas)*(w+1)+1,party[1].n*(h+1)+1)
-            local block_num=19
-            for i=11,1,-1 do
-                if profile[options.cures[i]] then 
-                    local s = options.cures[i] .. pos_tostring
-                    block_num=block_num-1
-                    prim_simple('p' .. s,_settings.primitives.buttons,x_start-(19-block_num)*(w+1)+1-153,prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1),w,h)
-                    text_simple(s,_settings.text.buttons, x_start-(19-block_num)*(w+1)+1+((w-font_widths[options.aliases[options.cures[i]]])/2)-153, prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1), options.aliases[options.cures[i]])
-                    prims_by_layer[pos_id]:append('p' .. s)
-                    texts_by_layer[pos_id]:append(s)
-                    macro[1]:add('p' .. s)
-                    macro[1]:add(s)
-                    if not macro_visibility[1] then
-                        windower.prim.set_visibility('p' .. s,false)
-                        windower.text.set_visibility(s,false)
-                    end
-                end
-            end
-            for i=18,12,-1 do
-                if profile[options.curagas[i]] then
-                    local s = options.curagas[i] .. pos_tostring
-                    block_num=block_num-1
-                    prim_simple('p' .. s,_settings.primitives.curaga_buttons,x_start-(19-block_num)*(w+1)+1-153,prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1),w,h)
-                    text_simple(s,_settings.text.buttons, x_start-(19-block_num)*(w+1)+1+((w-font_widths[options.aliases[options.curagas[i]]])/2)-153, prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1), options.aliases[options.curagas[i]])
-                    prims_by_layer[pos_id]:append('p' .. s)
-                    texts_by_layer[pos_id]:append(s)
-                    macro[1]:add('p' .. s)
-                    macro[1]:add(s)
-                    if not macro_visibility[1] then
-                        windower.prim.set_visibility('p' .. s,false)
-                        windower.text.set_visibility(s,false)
-                    end
-                end
+        if not saved_prims:contains('BG'..m) then
+            local y_start = prim_coordinates.y['BG'..tostring(n-1)]-(175-75*(n-1))-ptn*(h+1)
+            prim_simple('BG'..m,prim.background,x_start-macro_order[n].n*(w+1)-153,y_start,macro_order[n].n*(w+1)+1,ptn*(h+1)+1)
+            prim_simple("info"..m,prim.hp_bar_background,x_start-152,y_start,152,ptn*(h+1)+1)
+            macro[n]:add('BG'..m)
+            if not macro_visibility[n] then
+                windower.prim.set_visibility('BG'..m,false)
             end
         else
-            if not saved_prims:contains('BG'..m) then
-                if n==2 then
-                    prim_simple("BG2",_settings.primitives.background,x_start-(_cures)*(w+1)-153,prim_coordinates.y['BG1']-100-party[2].n*(h+1)+h,_cures*(w+1)+1,party[2].n*(h+1)+1)
-                    prim_simple("info2",_settings.primitives.hp_bar_background,x_start-152,prim_coordinates.y['BG1']-100-party[2].n*(h+1)+h,152,party[2].n*(h+1)+1)
-                    macro[2]:add("BG2")
-                    if not macro_visibility[2] then
-                        windower.prim.set_visibility('BG2',false)
-                    end
-                else
-                    prim_simple("BG3",_settings.primitives.background,x_start-(_cures)*(w+1)-153,prim_coordinates.y['BG2']-10-party[3].n*(h+1)+h,_cures*(w+1)+1,party[2].n*(h+1)+1)
-                    prim_simple("info3",_settings.primitives.hp_bar_background,x_start-152,prim_coordinates.y['BG2']-10-party[3].n*(h+1)+h,152,party[3].n*(h+1)+1)--prim_coordinates.y['BG2']-10-party[3].n*(h+1)
-                    macro[3]:add("BG3")
-                    if not macro_visibility[3] then
-                        windower.prim.set_visibility('BG3',false)
-                    end
-                end
-            else
-                windower.prim.set_size('info'..m,152,party[n].n*(h+1)+1)
-                windower.prim.set_size('BG'..m,(_cures)*(w+1)+1,party[n].n*(h+1)+1)
-            end
-            local block_num=12
-            for i=11,1,-1 do
-                if profile[options.cures[i]] then 
-                    local s = options.cures[i] .. pos_tostring
-                    block_num=block_num-1
-                    prim_simple('p' .. s,_settings.primitives.buttons,x_start-(12-block_num)*(w+1)+1-153,prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1),w,h)
-                    text_simple(s, _settings.text.buttons, x_start-(12-block_num)*(w+1)+1+((w-font_widths[options.aliases[options.cures[i]]])/2)-153, prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1), options.aliases[options.cures[i]])
-                    prims_by_layer[pos_id]:append('p' .. s)
-                    texts_by_layer[pos_id]:append(s)
-                    macro[n]:add('p' .. s)
-                    macro[n]:add(s)
-                    if not macro_visibility[n] then
-                        windower.prim.set_visibility('p' .. s,false)
-                        windower.text.set_visibility(s,false)
-                    end
-                end
-            end
-
+            windower.prim.set_size('info'..m,152,ptn*(h+1)+1)
+            windower.prim.set_size('BG'..m,macro_order[n].n*(w+1)+1,ptn*(h+1)+1)
         end
-        prim_simple("phpp".. pos_tostring,_settings.primitives.hp_bar,x_start-151,prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1),150,h)
-        prim_simple("pmpp".. pos_tostring,_settings.primitives.mp_bar,x_start-151,prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1)+19,150,5)
-        text_simple("tp".. pos_tostring, _settings.text.tp, x_start-151, prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1)+11, '')
-        text_simple("name".. pos_tostring, _settings.text.name, x_start-151, prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1)-3, stat_table[id].name)
-        text_simple("hpp".. pos_tostring, _settings.text.hpp, x_start, prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1)-4, '')
-        text_simple("hp".. pos_tostring, _settings.text.hp, x_start-40, prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1)-3, '')
-        text_simple("mp".. pos_tostring, _settings.text.mp, x_start-40, prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1)+11,'') 
-        prims_by_layer[pos_id]:extend(L{"phpp" .. pos_tostring,"pmpp" .. pos_tostring})
-        texts_by_layer[pos_id]:extend(L{"tp" .. pos_tostring,"name" .. pos_tostring,"hpp" .. pos_tostring,"hp" .. pos_tostring,"mp" .. pos_tostring})
+        local y_start = prim_coordinates.y['BG'..m]+1+(h+1)*(ptn-1)
+        prim_rose(macro_order[n],pos_id,x_start,y_start,n)
+        prim_simple("phpp"..pos_tostring,prim.hp_bar,x_start-151,y_start,150,h)
+        prim_simple("pmpp"..pos_tostring,prim.mp_bar,x_start-151,y_start+19,150,5)
+        text_simple("tp"..pos_tostring, text.tp, x_start-151, y_start+11, '')
+        text_simple("name"..pos_tostring, text.name, x_start-151, y_start-3, stat_table[id].name)
+        text_simple("hpp"..pos_tostring, text.hpp, x_start, y_start-4, '')
+        text_simple("hp"..pos_tostring, text.hp, x_start-40, y_start-3, '')
+        text_simple("mp"..pos_tostring, text.mp, x_start-40, y_start+11,'') 
+        prims_by_layer[pos_id]:extend(L{"phpp" ..pos_tostring,"pmpp" ..pos_tostring})
+        texts_by_layer[pos_id]:extend(L{"tp" ..pos_tostring,"name" ..pos_tostring,"hpp" ..pos_tostring,"hp" ..pos_tostring,"mp" ..pos_tostring})
     else
         windower.text.set_text('name'..pos_id,stat_table[id].name)
     end
@@ -487,6 +468,7 @@ function invite(id,n)
     elseif not out_of_view[pos_id] then
         indicate_distance(true,pos_id)
     end
+
 end
 
 function lift_macro(n)

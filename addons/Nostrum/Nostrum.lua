@@ -177,168 +177,73 @@ _settings=merge_user_file_and_settings(_defaults,settings)
 profile=_settings.profiles.default
 
 function build_macro()
-    x_start=_settings.window.x_res-1-_defaults.window.x_offset
-    y_start=_settings.window.y_res-h-1-_defaults.window.y_offset
+    local x_start=_settings.window.x_res-1-_defaults.window.x_offset
+    local y_start=_settings.window.y_res-h-1-_defaults.window.y_offset
+    local prim = _settings.primitives
+    local text = _settings.text
 
-    prim_simple("BG1",_settings.primitives.background,x_start-(_cures+_curagas)*(w+1)-153,y_start-party[1].n*(h+1)+h,(_cures+_curagas)*(w+1)+1,party[1].n*(h+1)+1)
-    prim_simple("info1",_settings.primitives.hp_bar_background,x_start-152,y_start-party[1].n*(h+1)+h,152,party[1].n*(h+1)+1)
-    macro[1]:add('BG1')
-    local block_num
-    for j=party[1].n,1,-1 do
-        local s = tostring(position_lookup[party[1][j]])
-        prim_simple("phpp" .. s,_settings.primitives.hp_bar,x_start-151,y_start,150/100*stat_table[party[1][j]].hpp,h)
-        local color = _settings.primitives.hp_bar[choose_color(stat_table[party[1][j]].hpp)]
-        windower.prim.set_color("phpp".. s,color.a,color.r,color.g,color.b)
-        prim_simple("pmpp" .. s,_settings.primitives.mp_bar,x_start-151,y_start+19,150/100*stat_table[party[1][j]].mpp,5)
-        text_simple("tp" .. s, _settings.text.tp, x_start-151, y_start+11, stat_table[party[1][j]].tp)
-        text_simple("name" .. s, _settings.text.name, x_start-151, y_start-3, prepare_names(stat_table[party[1][j]].name))
-        text_simple("hpp" .. s, _settings.text.hpp, x_start, y_start-4, stat_table[party[1][j]].hpp)
-        text_simple("hp" .. s, _settings.text.hp, x_start-40, y_start-3, stat_table[party[1][j]].hp)
-        text_simple("mp" .. s, _settings.text.mp, x_start-40, y_start+11, stat_table[party[1][j]].mp)
-        prims_by_layer[position_lookup[party[1][j]]]:extend(L{"phpp" .. s,"pmpp" .. s})
-        texts_by_layer[position_lookup[party[1][j]]]:extend(L{"tp" .. s,"name" .. s,"hpp" .. s,"hp" .. s,"mp" .. s})
-        block_num=19
+    for k=1,3 do
+        local pt = party[k]
+        if pt.n ~= 0 then
+            prim_simple("BG"..tostring(k),prim.background,x_start-(macro_order[k].n)*(w+1)-153,y_start-pt.n*(h+1)+h,macro_order[k].n*(w+1)+1,pt.n*(h+1)+1)
+            prim_simple("info"..tostring(k),prim.hp_bar_background,x_start-152,y_start-pt.n*(h+1)+h,152,pt.n*(h+1)+1)
+            macro[k]:add("BG"..tostring(k))
+        end
+        for j=pt.n,1,-1 do
+            local stats = stat_table[pt[j]]
+            local n = position_lookup[pt[j]]
+            local s = tostring(n)
+            prim_simple("phpp" .. s,prim.hp_bar,x_start-151,y_start,150/100*stats.hpp,h)
+            local color = prim.hp_bar[choose_color(stats.hpp)]
+            windower.prim.set_color("phpp" .. s,color.a,color.r,color.g,color.b)
+            prim_simple("pmpp" .. s,prim.mp_bar,x_start-151,y_start+19,150/100*stats.mpp,5)
+            text_simple("tp" .. s, text.tp, x_start-151, y_start+11,stats.tp)
+            text_simple("name" .. s, text.name, x_start-151, y_start-3, prepare_names(stats.name))
+            text_simple("hpp" .. s, text.hpp, x_start, y_start-4, stats.hpp)
+            text_simple("hp" .. s, text.hp, x_start-40, y_start-3, stats.hp)
+            text_simple("mp" .. s, text.mp, x_start-40, y_start+11,stats.mp)
+            prims_by_layer[n]:extend(L{"phpp" .. s,"pmpp" .. s})
+            texts_by_layer[n]:extend(L{"tp" .. s,"name" .. s,"hpp" .. s,"hp" .. s,"mp" .. s})
+            
+            prim_rose(macro_order[k],n,x_start,y_start,k)
+            y_start=y_start-(h+1)
 
-        for i=11,1,-1 do
-            if profile[options.cures[i]] then 
-                local s = options.cures[i] .. tostring(position_lookup[party[1][j]])
-                block_num=block_num-1
-                prim_simple('p' .. s,_settings.primitives.buttons,x_start-(19-block_num)*(w+1)+1-153,y_start,w,h)
-                text_simple(s,_settings.text.buttons, x_start-(19-block_num)*(w+1)+1+((w-font_widths[options.aliases[options.cures[i]]])/2)-153, y_start, options.aliases[options.cures[i]])
-                prims_by_layer[position_lookup[party[1][j]]]:append('p' .. s)
-                texts_by_layer[position_lookup[party[1][j]]]:append(s)
-                macro[1]:add('p' .. s)
-                macro[1]:add(s)
-            end
         end
 
-        for i=18,12,-1 do
-            if profile[options.curagas[i]] then
-                local s = options.curagas[i] .. tostring(position_lookup[party[1][j]])
-                block_num=block_num-1
-                prim_simple('p' .. s,_settings.primitives.curaga_buttons,x_start-(19-block_num)*(w+1)+1-153,y_start,w,h)
-                text_simple(s,_settings.text.buttons, x_start-(19-block_num)*(w+1)+1+((w-font_widths[options.aliases[options.curagas[i]]])/2)-153, y_start, options.aliases[options.curagas[i]])
-                prims_by_layer[position_lookup[party[1][j]]]:append('p' .. s)
-                texts_by_layer[position_lookup[party[1][j]]]:append(s)
-                macro[1]:add('p' .. s)
-                macro[1]:add(s)
-            end
-        end
-        
-        y_start=y_start-(h+1)
+        y_start=y_start-(175-75*k)
 
     end
     
-    prim_simple("target_background",_settings.primitives.hp_bar_background,x_start-152,prim_coordinates.y['info1']-52,152,32)
-    text_simple("target_name", _settings.text.name, x_start-151, prim_coordinates.y['info1']-50,'')
+    prim_simple("target_background",prim.hp_bar_background,x_start-152,prim_coordinates.y['info1']-52,152,32)
+    text_simple("target_name", text.name, x_start-151, prim_coordinates.y['info1']-50,'')
     windower.text.set_font_size("target_name11", 13)
-    prim_simple("target",_settings.primitives.hp_bar,x_start-151,prim_coordinates.y['info1']-50,150,30)
-    text_simple("targethpp",_settings.text.tp,  x_start-151, prim_coordinates.y['info1']-34, '0')
-    local color = _settings.primitives.hp_bar[choose_color(100)]
+    prim_simple("target",prim.hp_bar,x_start-151,prim_coordinates.y['info1']-50,150,30)
+    text_simple("targethpp",text.tp,  x_start-151, prim_coordinates.y['info1']-34, '0')
+    local color = prim.hp_bar[choose_color(100)]
     windower.prim.set_color("target",color.a,color.r,color.g,color.b)
     misc_hold_for_up.prims:append("target_background")
     misc_hold_for_up.prims:append("target")
     misc_hold_for_up.texts:append("target_name")
     misc_hold_for_up.texts:append("targethpp")
-    prim_simple("pmenu",_settings.primitives.hp_bar_background,x_start-152,prim_coordinates.y['info1']-20,152,20)
-    text_simple("menu",_settings.text.name, x_start-94, prim_coordinates.y['info1']-18, 'menu')
+    prim_simple("pmenu",prim.hp_bar_background,x_start-152,prim_coordinates.y['info1']-20,152,20)
+    text_simple("menu",text.name, x_start-94, prim_coordinates.y['info1']-18, 'menu')
     misc_hold_for_up.prims:append("pmenu")
     misc_hold_for_up.texts:append("menu")
 
+    y_start=prim_coordinates.y['BG1']-35
     if _na~=0 then
-        prim_simple("BGna",_settings.primitives.background,x_start-33*_na-153,y_start-11,(_na)*(33)+1,34)
+        prim_simple("BGna",prim.background,x_start-33*_na-153,y_start,(_na)*(33)+1,34)
         misc_hold_for_up.prims:append("BGna")
         macro[1]:add("BGna")
+        image_row(macro_order[4],x_start,y_start+1)
+        y_start=y_start-35
     end
-
-    block_num=0
-
-    for i=1,options.na['n'] do
-        if profile[options.na[i]] then
-            prim_simple('p' .. options.na[i],_settings.primitives.na_buttons,x_start-33*(block_num+1)-1-151,y_start-10,32,32)
-            img_simple(options.na[i]..'i',windower.windower_path.."/plugins/icons/"..options.images[options.na[i]],x_start-33*(block_num+1)-152,y_start-10)
-            text_simple(options.na[i], _settings.text.na, x_start-33*(block_num+1)-152, y_start-10, options.aliases[options.na[i]])
-            misc_hold_for_up.texts:append(options.na[i])
-            misc_hold_for_up.prims:extend({options.na[i]..'i','p' .. options.na[i]})
-            block_num=block_num+1
-            macro[1]:add(options.na[i])
-            macro[1]:add(options.na[i]..'i')
-            macro[1]:add('p' .. options.na[i])
-            windower.text.set_stroke_color(options.na[i], 255, 0, 0, 0)
-            windower.text.set_stroke_width(options.na[i], 1)
-        end
-    end
-
-    y_start=y_start-34
 
     if _buffs~=0 then
-        prim_simple("BGbuffs",_settings.primitives.background,x_start-33*_buffs-153,y_start-11,(_buffs)*(33)+1,34)
+        prim_simple("BGbuffs",prim.background,x_start-33*_buffs-153,y_start,(_buffs)*(33)+1,34)
         misc_hold_for_up.prims:append("BGbuffs")
         macro[1]:add("BGbuffs")
-    end
-
-    block_num=0
-
-    for i=1,options.buffs['n'] do
-        if profile[options.buffs[i]] then
-            prim_simple('p' .. options.buffs[i],_settings.primitives.buff_buttons,x_start-33*(block_num+1)-152,y_start-10,32,32)
-            img_simple(options.buffs[i]..'i',windower.windower_path.."/plugins/icons/"..options.images[options.buffs[i]],x_start-33*(block_num+1)-152,y_start-10)
-            text_simple(options.buffs[i], _settings.text.buffs, x_start-33*(block_num+1)-152, y_start-11, options.aliases[options.buffs[i]])
-            misc_hold_for_up.texts:append(options.buffs[i])
-            misc_hold_for_up.prims:extend({options.buffs[i]..'i','p' .. options.buffs[i]})
-            block_num=block_num+1
-            macro[1]:add(options.buffs[i])
-            macro[1]:add(options.buffs[i]..'i')
-            macro[1]:add('p' .. options.buffs[i])
-            windower.text.set_stroke_color(options.buffs[i], 255, 0, 0, 0)
-            windower.text.set_stroke_width(options.buffs[i], 1)
-        end
-    end
-
-    y_start=prim_coordinates.y['BG1']-100
-
-    for k=2,3 do
-        if party[k].n ~= 0 then
-            prim_simple("BG"..tostring(k),_settings.primitives.background,x_start-(_cures)*(w+1)-153,y_start-party[k].n*(h+1)+h,_cures*(w+1)+1,party[k].n*(h+1)+1)
-            prim_simple("info"..tostring(k),_settings.primitives.hp_bar_background,x_start-152,y_start-party[k].n*(h+1)+h,152,party[k].n*(h+1)+1)
-            macro[k]:add("BG"..tostring(k))
-        end
-        for j=party[k].n,1,-1 do
-            local n = 6*k+1-j
-            local s = tostring(n)
-            prim_simple("phpp" .. s,_settings.primitives.hp_bar,x_start-151,y_start,150/100*stat_table[party[k][j]].hpp,h)
-            local color = _settings.primitives.hp_bar[choose_color(stat_table[party[k][j]].hpp)]
-            windower.prim.set_color("phpp" .. s,color.a,color.r,color.g,color.b)
-            prim_simple("pmpp" .. s,_settings.primitives.mp_bar,x_start-151,y_start+19,150/100*stat_table[party[k][j]].mpp,5)
-            text_simple("tp" .. s, _settings.text.tp, x_start-151, y_start+11,stat_table[party[k][j]].tp)
-            text_simple("name" .. s, _settings.text.name, x_start-151, y_start-3, prepare_names(stat_table[party[k][j]].name))
-            text_simple("hpp" .. s, _settings.text.hpp, x_start, y_start-4, stat_table[party[k][j]].hpp)
-            text_simple("hp" .. s, _settings.text.hp, x_start-40, y_start-3, stat_table[party[k][j]].hp)
-            text_simple("mp" .. s, _settings.text.mp, x_start-40, y_start+11,stat_table[party[k][j]].mp)
-            prims_by_layer[position_lookup[party[k][j]]]:extend(L{"phpp" .. s,"pmpp" .. s})
-            texts_by_layer[position_lookup[party[k][j]]]:extend(L{"tp" .. s,"name" .. s,"hpp" .. s,"hp" .. s,"mp" .. s})
-
-            block_num=12
-
-            for i=11,1,-1 do
-                if profile[options.cures[i]] then 
-                    local s = options.cures[i] .. s
-                    block_num=block_num-1
-                    prim_simple('p' .. s,_settings.primitives.buttons,x_start-(12-block_num)*(w+1)+1-153,y_start,w,h)
-                    text_simple(s, _settings.text.buttons, x_start-(12-block_num)*(w+1)+1+((w-font_widths[options.aliases[options.cures[i]]])/2)-153, y_start, options.aliases[options.cures[i]])
-                    prims_by_layer[position_lookup[party[k][j]]]:append('p' .. s)
-                    texts_by_layer[position_lookup[party[k][j]]]:append(s)
-                    macro[k]:add('p' .. s)
-                    macro[k]:add(s)
-                end
-            end
-            
-            y_start=y_start-(h+1)
-
-        end
-
-        y_start=y_start-10
-
+        image_row(macro_order[5],x_start,y_start+1)
     end
     
     toggle_macro_visibility(1)
@@ -386,7 +291,7 @@ do
         
         for i=18,1,-1 do
             if alliance[i] then
-                party[math.ceil(i/6,1)]:append(alliance[i])
+                party[math.ceil(i/6)]:append(alliance[i])
             end
         end
         build_macro()
@@ -470,7 +375,7 @@ register_events = function(bool)
                         if not macro_visibility[i] then
                             toggle_macro_visibility(i)
                         end
-                        local p = 'p' .. macro_order[region_map[i]][math.ceil((x-l[i])/30)] .. tostring(6*i + 1 - math.ceil((y-b[i])/25))
+                        local p = 'p' .. macro_order[i][math.ceil((x-l[i])/30)] .. tostring(6*i + 1 - math.ceil((y-b[i])/25))
                         hover(p)
                     else
                         if i == 1 then
@@ -478,14 +383,14 @@ register_events = function(bool)
                                 if not macro_visibility[1] then
                                     toggle_macro_visibility(1)
                                 end
-                                local p = 'p' .. macro_order[region_map[4]][math.ceil((x-l[4])/33)]
+                                local p = 'p' .. macro_order[4][math.ceil((x-l[4])/33)]
                                 hover(p)
                                 return
                             elseif y>b[5] and y<t[5]+1 and x>l[5] and x<r[5] then
                                 if not macro_visibility[1] then
                                     toggle_macro_visibility(1)
                                 end
-                                local p = 'p' .. macro_order[region_map[5]][math.ceil((x-l[5])/33)]
+                                local p = 'p' .. macro_order[5][math.ceil((x-l[5])/33)]
                                 hover(p)
                                 return
                             end
@@ -535,14 +440,14 @@ register_events = function(bool)
                 end
             
                 if y>b[4] and y<t[4] and x>l[4] and x<r[4] then
-                    spell_default = xml_to_lua[macro_order[region_map[4]][math.ceil((x-l[4])/33)]]
+                    spell_default = macro_order[4][math.ceil((x-l[4])/33)]
                     windower.text.set_text('menu', spell_default)
                     text_coordinates.x['menu'] = prim_coordinates.x['pmenu'] + 1 + (150 - 7.55 * string.length(spell_default))/2
                     windower.text.set_location('menu',text_coordinates.x['menu'],text_coordinates.y['menu'])
                     dragged = true
                     return true
                 elseif y>b[5] and y<t[5] and x>l[5] and x<r[5] then
-                    spell_default = xml_to_lua[macro_order[region_map[5]][math.ceil((x-l[5])/33)]]
+                    spell_default = macro_order[5][math.ceil((x-l[5])/33)]
                     windower.text.set_text('menu', spell_default)
                     text_coordinates.x['menu'] = prim_coordinates.x['pmenu'] + 1 + (150 - 7.55 * string.length(spell_default))/2
                     windower.text.set_location('menu',text_coordinates.x['menu'],text_coordinates.y['menu'])
@@ -606,7 +511,9 @@ register_events = function(bool)
                 end
                 coroutine.sleep(10)
                 is_zoning = false
-                stat_table[player_id].index = windower.ffxi.get_player().index
+                if windower.ffxi.get_info().logged_in then
+                    stat_table[player_id].index = windower.ffxi.get_player().index
+                end
             end
         end)
 
