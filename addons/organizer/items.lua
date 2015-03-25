@@ -53,7 +53,7 @@ function Items.new(loc_items,bool)
             local cur_inv = new_instance:new(bag_id)
             for inventory_index,item_table in pairs(loc_items[bag_id] or loc_items[bag_table.english:lower()]) do
                 if type(item_table) == 'table' and validate_id(item_table.id) then
-                    cur_inv:new(item_table.id,item_table.count,item_table.extdata,item_table.status,inventory_index)
+                    cur_inv:new(item_table.id,item_table.count,item_table.extdata,item_table.augments,item_table.status,inventory_index)
                 end
             end
         end
@@ -113,14 +113,16 @@ function items:it()
     end
 end
 
-function bags:new(id,count,extdata,status,index)
+function bags:new(id,count,ext,augments,status,index)
     if self._info.n >= 80 then org_warning('Attempting to add another item to a bag with 80 items') return end
     if index and table.with(self,'index',index) then org_warning('Cannot assign the same index twice') return end
     self._info.n = self._info.n + 1
     index = index or self:first_empty()
     status = status or 0
-    self[index] = setmetatable({_parent=self,id=id,count=count,extdata=extdata,index=index,status=status,
-        name=res.items[id][_global.language]:lower(),log_name=res.items[id][_global.language..'_log']:lower()},
+    augments = augments or extdata.decode({id=id,extdata=ext}).augments
+    if augments then augments = table.filter(augments,-functions.equals('none')) end
+    self[index] = setmetatable({_parent=self,id=id,count=count,extdata=ext,index=index,status=status,
+        name=res.items[id][_global.language]:lower(),log_name=res.items[id][_global.language..'_log']:lower(),augments=augments},
         {__index = function (t, k) 
             if not t or not k then print('table index is nil error',t,k) end
             if rawget(t,k) then
@@ -158,7 +160,7 @@ function bags:find_all_instances(item,bool)
     local instances = L{}
     for i,v in self:it() do
         if (bool or not v:annihilated()) and v.id == item.id then -- and v.count >= item.count then
-            if item.augments and v.augments and extdata.compare_augments(item.augments,v.augments) or not item.augments then
+            if item.augments and v.augments and extdata.compare_augments(item.augments,v.augments) or not item.augments or table.length(item.augments) == 0 then
                 -- May have to do a higher level comparison here for extdata.
                 -- If someone exports an enchanted item when the timer is
                 -- counting down then this function will return false for it.
@@ -228,7 +230,7 @@ function item_tab:move(dest_bag,dest_slot,count)
         self:free() then
         windower.packets.inject_outgoing(0x29,string.char(0x29,6,0,0)..'I':pack(count)..string.char(parent._info.bag_id,dest_bag,self.index,dest_slot))
         org_warning('Moving item! ('..res.items[self.id].english..') from '..res.bags[parent._info.bag_id].en..' '..parent._info.n..' to '..res.bags[dest_bag].en..' '..targ_inv._info.n..')')
-        local new_index = targ_inv:new(self.id, count, self.extdata)
+        local new_index = targ_inv:new(self.id, count, self.extdata, self.augments)
         --print(parent._info.bag_id,dest_bag,self.index,new_index)
         parent:remove(self.index)
         return new_index

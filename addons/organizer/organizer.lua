@@ -38,7 +38,7 @@ config = require 'config'
 _addon.name = 'Organizer'
 _addon.author = 'Byrth, maintainer: Rooks'
 _addon.version = 0.150324
-_addon.command = 'org'
+_addon.commands = {'organizer','org'}
 
 _static = {
     bag_ids = {
@@ -76,10 +76,11 @@ default_settings = {
     item_delay = 0,
     auto_heal = false,
     default_file='default.lua',
+    verbose=false,
 }
 
 _debugging = {
-    warnings = true, -- This mode gives warnings about impossible item movements.
+    warnings = false, -- This mode gives warnings about impossible item movements.
 }
 
 function s_to_bag(str)
@@ -187,7 +188,7 @@ function get(goal_items,current_items)
                         end
                     else
                         -- Need to adapt this for stacking items somehow.
-                        org_warning(res.items[item.id].english..' not found')
+                        org_warning(res.items[item.id].english..' not found.')
                     end
                     simulate_item_delay()
                 end
@@ -232,7 +233,7 @@ function tidy(goal_items,current_items,usable_bags)
 end
 
 function organize(goal_items)
-    org_verbose('Start Organizing!')
+    org_message('Starting...')
     local current_items = Items.new()
     local dump_bags = {}
     for i,v in pairs(settings.dump_bags) do
@@ -261,6 +262,24 @@ function organize(goal_items)
         org_verbose(tostring(remainder)..' '..current_items[0]._info.n,1)
     end
     goal_items, current_items = tidy(goal_items,current_items)
+    
+    local count,failures = 0,T{}
+    for bag_id,bag in goal_items:it() do
+        for ind,item in bag:it() do
+            if item:annihilated() then
+                count = count + 1
+            else
+                item.bag_id = bag_id
+                failures:append(item)
+            end
+        end
+    end
+    org_message('Done! - '..count..' items matched and '..table.length(failures)..' items missing!')
+    if table.length(failures) > 0 then
+        for i,v in failures:it() do
+            org_verbose('Item Missing: '..i.name..' '..(i.augments and tostring(T(i.augments)) or ''))
+        end
+    end
 end
 
 function clean_goal(goal_items,current_items)
@@ -331,6 +350,10 @@ function thaw(file_name,bag)
     return Items.new(inv_structure)
 end
 
+function org_message(msg,col)
+    windower.add_to_chat(col or 8,'Organizer: '..msg)
+end
+
 function org_warning(msg)
     if _debugging.warnings then
         windower.add_to_chat(123,'Organizer: '..msg)
@@ -342,7 +365,9 @@ function org_error(msg)
 end
 
 function org_verbose(msg,col)
-    windower.add_to_chat(col or 8,'Organizer: '..msg)
+    if tostring(settings.verbose):lower() ~= 'false' then
+        windower.add_to_chat(col or 8,'Organizer: '..msg)
+    end
 end
 
 function default_file_name()

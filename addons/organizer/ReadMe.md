@@ -1,4 +1,4 @@
-# Organizer
+# Organizer (//org)
 
 A multi-purpose inventory management solution. Similar to GearCollector; uses packets.
 
