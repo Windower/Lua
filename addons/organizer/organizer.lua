@@ -37,8 +37,8 @@ config = require 'config'
 
 _addon.name = 'Organizer'
 _addon.author = 'Byrth, maintainer: Rooks'
-_addon.version = 0.150322
-_addon.command = 'org'
+_addon.version = 0.150324
+_addon.commands = {'organizer','org'}
 
 _static = {
     bag_ids = {
@@ -71,18 +71,25 @@ _global = {
 }
 
 default_settings = {
-    dump_bags = {1,4,2},
-    bag_priority = {1,4,2,5,6,7,0,8},
+    dump_bags = {'Safe','Locker','Storage'},
+    bag_priority = {'Safe','Locker','Storage','Satchel','Sack','Case','Inventory','Wardrobe'},
     item_delay = 0,
-    auto_heal = 0,
+    auto_heal = false,
     default_file='default.lua',
+    verbose=false,
 }
 
 _debugging = {
-    warnings = true, -- This mode gives warnings about impossible item movements.
+    warnings = false, -- This mode gives warnings about impossible item movements.
 }
 
-
+function s_to_bag(str)
+    for i,v in pairs(res.bags) do
+        if v.en:lower() == str:lower() then
+            return v.id
+        end
+    end
+end
 
 windower.register_event('load',function()
     if debugging then windower.debug('load') end
@@ -117,6 +124,10 @@ windower.register_event('addon command',function(...)
     -- tidy (t) = Take the passed file and move everything that isn't in it out of my active inventory.
     -- organize (o) = get followed by tidy.
     local command = table.remove(inp,1):lower()
+    if command == 'eval' then
+        assert(loadstring(table.concat(inp,' ')))()
+        return
+    end
 
     local bag = 'all'
     if inp[1] and (_static.bag_ids[inp[1]:lower()] or inp[1]:lower() == 'all') then
@@ -133,11 +144,11 @@ windower.register_event('addon command',function(...)
     end
 
 
-    if (command == 'g' or command == 'get') and bag then
+    if (command == 'g' or command == 'get') then
         get(thaw(file_name, bag))
-    elseif (command == 't' or command == 'tidy') and bag then
+    elseif (command == 't' or command == 'tidy') then
         tidy(thaw(file_name, bag))
-    elseif (command == 'f' or command == 'freeze') and bag then
+    elseif (command == 'f' or command == 'freeze') then
 
         local items = Items.new(windower.ffxi.get_items(),true)
         items[3] = nil -- Don't export temporary items
@@ -148,13 +159,11 @@ windower.register_event('addon command',function(...)
                 freeze(file_name,res.bags[bag_id].english:lower(),items)
             end
         end
-    elseif (command == 'o' or command == 'organize') and bag then
+    elseif (command == 'o' or command == 'organize') then
         organize(thaw(file_name, bag))        
-    elseif command == 'eval' then
-        assert(loadstring(file_name))()
     end
 
-    if settings.auto_heal and settings.auto_heal > 0 then
+    if settings.auto_heal and tostring(settings.auto_heal):lower() ~= 'false' then
         windower.send_command('input /heal')
     end
 
@@ -167,7 +176,7 @@ function get(goal_items,current_items)
         failed = 0
         current_items = current_items or Items.new()
         goal_items, current_items = clean_goal(goal_items,current_items)
-        for bag_id,inv in goal_items:it() do -- Should really be using #res.bags +1 for this instead of 9
+        for bag_id,inv in goal_items:it() do
             for ind,item in inv:it() do
                 if not item:annihilated() then
                     local start_bag, start_ind = current_items:find(item)
@@ -181,7 +190,7 @@ function get(goal_items,current_items)
                         end
                     else
                         -- Need to adapt this for stacking items somehow.
-                        org_warning(res.items[item.id].english..' not found')
+                        org_warning(res.items[item.id].english..' not found.')
                     end
                     simulate_item_delay()
                 end
@@ -226,10 +235,19 @@ function tidy(goal_items,current_items,usable_bags)
 end
 
 function organize(goal_items)
-    org_verbose('Start Organizing!')
+    org_message('Starting...')
     local current_items = Items.new()
+    local dump_bags = {}
+    for i,v in pairs(settings.dump_bags) do
+        if s_to_bag(v) then
+            dump_bags[i] = s_to_bag(v)
+        else
+            org_error('The bag name ("'..tostring(v)..'") in dump_bags entry #'..tostring(i)..' in the ../addons/organizer/data/settings.xml file is not valid.\nValid options are '..tostring(res.bags))
+            return
+        end
+    end
     if current_items[0].n == 80 then
-        tidy(goal_items,current_items,settings.dump_bags)
+        tidy(goal_items,current_items,dump_bags)
     end
     if current_items[0].n == 80 then
         org_error('Unable to make space, aborting!')
@@ -241,11 +259,29 @@ function organize(goal_items)
         goal_items, current_items = get(goal_items,current_items)
         
         goal_items, current_items = clean_goal(goal_items,current_items)
-        goal_items, current_items = tidy(goal_items,current_items,settings.dump_bags)
+        goal_items, current_items = tidy(goal_items,current_items,dump_bags)
         remainder = incompletion_check(goal_items,remainder)
         org_verbose(tostring(remainder)..' '..current_items[0]._info.n,1)
     end
     goal_items, current_items = tidy(goal_items,current_items)
+    
+    local count,failures = 0,T{}
+    for bag_id,bag in goal_items:it() do
+        for ind,item in bag:it() do
+            if item:annihilated() then
+                count = count + 1
+            else
+                item.bag_id = bag_id
+                failures:append(item)
+            end
+        end
+    end
+    org_message('Done! - '..count..' items matched and '..table.length(failures)..' items missing!')
+    if table.length(failures) > 0 then
+        for i,v in failures:it() do
+            org_verbose('Item Missing: '..i.name..' '..(i.augments and tostring(T(i.augments)) or ''))
+        end
+    end
 end
 
 function clean_goal(goal_items,current_items)
@@ -288,7 +324,7 @@ function thaw(file_name,bag)
         settings.default_file = settings.default_file..'.lua'
     end
     for i,v in pairs(_static.bag_ids) do
-        bags[i] = bags[i] and file_name and windower.file_exists(windower.addon_path..'data/'..bags[i]..'/'..file_name) or settings.default_file
+        bags[i] = bags[i] and windower.file_exists(windower.addon_path..'data/'..i..'/'..file_name) and file_name or settings.default_file
     end
     bags.temporary = nil
     local inv_structure = {}
@@ -316,6 +352,10 @@ function thaw(file_name,bag)
     return Items.new(inv_structure)
 end
 
+function org_message(msg,col)
+    windower.add_to_chat(col or 8,'Organizer: '..msg)
+end
+
 function org_warning(msg)
     if _debugging.warnings then
         windower.add_to_chat(123,'Organizer: '..msg)
@@ -327,7 +367,9 @@ function org_error(msg)
 end
 
 function org_verbose(msg,col)
-    windower.add_to_chat(col or 8,'Organizer: '..msg)
+    if tostring(settings.verbose):lower() ~= 'false' then
+        windower.add_to_chat(col or 8,'Organizer: '..msg)
+    end
 end
 
 function default_file_name()
