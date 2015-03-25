@@ -77,8 +77,7 @@ function org.export_set()
     end
     
     -- Scan wardrobe, eliminate items from your table that are in wardrobe
-    -- Scan inventory
-    
+    -- Scan inventory    
     
     local ts = os.clock()
     local fi = file.new('../organizer/data/inventory/'..ts..'.lua')
@@ -128,9 +127,22 @@ function org.simplify_entry(tab)
 end
 
 function org.identify_items(tab)
+    local name_to_id_map = {}
+    local items = windower.ffxi.get_items()
+    for id,inv in pairs(items) do
+        if type(inv) == 'table' then
+            for ind,item in ipairs(inv) do
+                if type(item) == 'table' and item.id and item.id ~= 0 then
+                    name_to_id_map[gearswap.res.items[item.id][gearswap.language]:lower()] = item.id
+                    name_to_id_map[gearswap.res.items[item.id][gearswap.language..'_log']:lower()] = item.id
+                end
+            end
+        end
+    end
+    print(name_to_id_map['umuthi gloves'])
     local trans = T{}
     for i,v in pairs(tab) do
-        local item = org.identify_unpacked_name(i)
+        local item = name_to_id_map[i:lower()] and table.reassign({},gearswap.res.items[name_to_id_map[i:lower()]]) --and org.identify_unpacked_name(i,name_to_id_map)
         if item then
             local n = gearswap.res.items[item.id][gearswap.language]:lower()
             local ln = gearswap.res.items[item.id][gearswap.language..'_log']:lower()
@@ -187,20 +199,4 @@ function org.string_augments(tab)
         if tab.augment ~= 'none' then aug_str = aug_str.."'"..augment.."'," end
     end
     if aug_str ~= '' then return '{\n'..aug_str..'}' end
-end
-
-function org.identify_unpacked_name(name)
-    local tab
-    name = name:lower()
-    local loglang = gearswap.language..'_log'
-    local lang = gearswap.language
-    for i,v in pairs(gearswap.res.items) do
-        -- This comparison is going to fail for items that have multiple instances with the same name.
-        -- For instance, every RME.
-        if type(v) == 'table' and (v[loglang]:lower() == name or v[lang]:lower() == name) then
-            tab = table.reassign({},v)
-            break
-        end
-    end
-    return tab
 end
