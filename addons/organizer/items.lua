@@ -119,7 +119,7 @@ function bags:new(id,count,ext,augments,status,index)
     self._info.n = self._info.n + 1
     index = index or self:first_empty()
     status = status or 0
-    augments = augments or extdata.decode({id=id,extdata=ext}).augments
+    augments = augments or ext and id and extdata.decode({id=id,extdata=ext}).augments
     if augments then augments = table.filter(augments,-functions.equals('none')) end
     self[index] = setmetatable({_parent=self,id=id,count=count,extdata=ext,index=index,status=status,
         name=res.items[id][_global.language]:lower(),log_name=res.items[id][_global.language..'_log']:lower(),augments=augments},
@@ -160,7 +160,7 @@ function bags:find_all_instances(item,bool)
     local instances = L{}
     for i,v in self:it() do
         if (bool or not v:annihilated()) and v.id == item.id then -- and v.count >= item.count then
-            if item.augments and v.augments and extdata.compare_augments(item.augments,v.augments) or not item.augments or table.length(item.augments) == 0 then
+            if not item.augments or table.length(item.augments) == 0 or v.augments and extdata.compare_augments(item.augments,v.augments) then
                 -- May have to do a higher level comparison here for extdata.
                 -- If someone exports an enchanted item when the timer is
                 -- counting down then this function will return false for it.

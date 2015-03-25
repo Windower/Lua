@@ -124,6 +124,10 @@ windower.register_event('addon command',function(...)
     -- tidy (t) = Take the passed file and move everything that isn't in it out of my active inventory.
     -- organize (o) = get followed by tidy.
     local command = table.remove(inp,1):lower()
+    if command == 'eval' then
+        assert(loadstring(table.concat(inp,' ')))()
+        return
+    end
 
     local bag = 'all'
     if inp[1] and (_static.bag_ids[inp[1]:lower()] or inp[1]:lower() == 'all') then
@@ -157,8 +161,6 @@ windower.register_event('addon command',function(...)
         end
     elseif (command == 'o' or command == 'organize') then
         organize(thaw(file_name, bag))        
-    elseif command == 'eval' then
-        assert(loadstring(file_name))()
     end
 
     if settings.auto_heal and tostring(settings.auto_heal):lower() ~= 'false' then
