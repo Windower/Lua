@@ -43,8 +43,13 @@ language = 'english'
 file = require 'files'
 require 'strings'
 require 'tables'
+require 'logger'
+-- Restore the normal error function (logger changes it)
+error = _raw.error
+
 require 'lists'
 require 'sets'
+
 
 windower.text.create = function (str)
     if __raw.text.registry[str] then
