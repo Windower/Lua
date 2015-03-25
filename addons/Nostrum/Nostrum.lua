@@ -348,6 +348,7 @@ end)
 do
     local incoming_chunk_event
     local outgoing_chunk_event
+    local zone_change_event
     local keyboard_event
     local mouse_event
 
@@ -499,20 +500,6 @@ register_events = function(bool)
                             windower.text.set_visibility(key,false)
                         end
                     end
-                end
-            elseif id == 0x00C then
-                if not is_hidden then
-                    for key in pairs(saved_prims - (macro[1] + macro[2] + macro[3])) do
-                        windower.prim.set_visibility(key,prim_coordinates.visible[key])
-                    end
-                    for key in pairs(saved_texts - (macro[1] + macro[2] + macro[3])) do
-                        windower.text.set_visibility(key,text_coordinates.visible[key])
-                    end
-                end
-                coroutine.sleep(10)
-                is_zoning = false
-                if windower.ffxi.get_info().logged_in then
-                    stat_table[player_id].index = windower.ffxi.get_player().index
                 end
             end
         end)
@@ -680,11 +667,26 @@ register_events = function(bool)
                 new_members(packet_pt_struc)
             end
         end)
+        zone_change_event = windower.register_event('zone change', function()
+            if not is_hidden then
+                for key in pairs(saved_prims - (macro[1] + macro[2] + macro[3])) do
+                    windower.prim.set_visibility(key,prim_coordinates.visible[key])
+                end
+                for key in pairs(saved_texts - (macro[1] + macro[2] + macro[3])) do
+                    windower.text.set_visibility(key,text_coordinates.visible[key])
+                end
+            end
+            is_zoning = false
+            if windower.ffxi.get_info().logged_in then
+                stat_table[player_id].index = windower.ffxi.get_player().index
+            end
+        end)
     else
         windower.unregister_event(keyboard_event)
         windower.unregister_event(mouse_event)
         windower.unregister_event(incoming_chunk_event)
         windower.unregister_event(outgoing_chunk_event)
+        windower.unregister_event(zone_change_event)
     end
 end
 end
