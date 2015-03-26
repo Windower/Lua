@@ -218,7 +218,7 @@ function set.clear(s)
 end
 
 function set.copy(s, deep)
-    deep = deep or true
+    deep = deep ~= false and true
     local res = {}
 
     for el in pairs(s) do

@@ -312,11 +312,9 @@ function list.clear(l)
 end
 
 function list.copy(l, deep)
-    if deep == nil then 
-        deep = true
-    end
+    deep = deep ~= false and true
     local res = {}
-    
+
     for key = 1, l.n do
         local value = rawget(l, key)
         if deep and type(value) == 'table' then
