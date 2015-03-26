@@ -32,12 +32,15 @@ _addon.version = '2.02'
 _addon.author = 'Nitrous (Shiva)'
 _addon.command = 'aecho'
 
-require 'tablehelper'
-require 'stringhelper'
-require 'logger'
-require 'sets'
-config = require 'config'
-defaults = T{}
+require('tables')
+require('strings')
+require('logger')
+require('sets')
+config = require('config')
+chat = require('chat')
+res = require('resources')
+
+defaults = {}
 defaults.buffs = S{	"light arts","addendum: white","penury","celerity","accession","perpetuance","rapture",
                     "dark arts","addendum: black","parsimony","alacrity","manifestation","ebullience","immanence",
                     "stun","petrified","silence","stun","sleep","slow","paralyze"
@@ -45,25 +48,12 @@ defaults.buffs = S{	"light arts","addendum: white","penury","celerity","accessio
 defaults.alttrack = true
 defaults.sitrack = true
 
+settings = config.load(defaults)
 
+autoecho = true
 
-function initialize()
-    settings = config.load(defaults)
-    settings:save()
-    autoecho = true
-end
-
-windower.register_event('load', function()
-    if windower.ffxi.get_info()['logged_in'] then
-        initialize()
-    end
-end)
-
-windower.register_event('login', function()
-    initialize()
-end)
-
-windower.register_event('gain buff', function(name,id)
+windower.register_event('gain buff', function(id)
+    local name = res.buffs[id].english
     for key,val in pairs(settings.buffs) do
         if key:lower() == name:lower() then
             if name:lower() == 'silence' and autoecho then
@@ -99,7 +89,7 @@ windower.register_event('addon command', function(...)
  5. aecho list --lists buffs being tracked
  6. aecho toggle --Toggles off automatic echo drop usage (in case you need this off. does not remain off across loads.)]]
             for _, line in ipairs(helptext:split('\n')) do
-                windower.add_to_chat(207, line..chat.colorcontrols.reset)
+                windower.add_to_chat(207, line..chat.controls.reset)
             end
         elseif S{'watch','trackalt','unwatch','sitrack'}:contains(comm) then
             local list = ''

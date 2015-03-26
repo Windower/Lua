@@ -28,33 +28,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 _addon.name = 'OhShi'
-_addon.version = '2.521'
+_addon.version = '2.54'
 _addon.author = 'Nitrous (Shiva)'
 _addon.command = 'ohshi'
 
 --Requiring libraries used in this addon
 --These should be saved in addons/libs
-require 'logger'
-require 'tablehelper'
-require 'stringhelper'
-require 'sets'
-config = require 'config'
-files = require 'filehelper'
-chat = require 'chat'
-texts = require 'texts'
-require 'default_settings'
-require 'text_handling'
-require 'helper_functions'
+require('logger')
+require('tables')
+require('strings')
+require('sets')
+config = require('config')
+files = require('files')
+chat = require('chat')
+texts = require('texts')
+res = require('resources')
+require('default_settings')
+require('text_handling')
+require('helper_functions')
 
 --This function is called when the addon loads. Defines aliases and 
 --registers functions, as well as filling the resource tables.
-windower.register_event('load',function()
-    spells = parse_resources(speFile:readlines())
-    stats = parse_resources(staFile:readlines())
-    jAbils = parse_resources(jaFile:readlines())
-    mAbils = parse_resources(maFile:readlines())
-    windower.send_command('@lua i ohshi initText')
-end)
+windower.register_event('load', initText)
 
 --Used when the addon is unloaded to save settings.
 windower.register_event('unload',function()
@@ -86,6 +81,9 @@ windower.register_event('addon command', function(...)
             print('OhShi Showrolls:', settings.showrolls)
             print('OhShi Selfrolls:', settings.selfrolls)
             settings:save('all')
+        elseif comm == "staggeronly" then
+            settings.staggeronly = not settings.sstaggeronly
+            print('OhShi Stagger Only mode:', settings.staggeronly)
         elseif comm == 'duration' then
             if tonumber(args[1]) then
                 settings.duration = tonumber(args[1])
@@ -146,6 +144,9 @@ windower.register_event('addon command', function(...)
             settings.text.content = nil
             settings.visible = nil
             saveSettings()
+        elseif comm == 'clear' then
+            tracking:clear()
+            textUpdate()
         elseif S{'show','hide','settings'}:contains(comm) then
             if comm == 'show' then 
                 ohShi_tb:text('ohShi showing for settings')
@@ -175,6 +176,7 @@ windower.register_event('addon command', function(...)
   4. track(on/off) [abyssea/dangerous/legion/meebles/other/voidwatch] <name> 
      - Begin or stop tracking <type (default: other)> of mob named <name>.
   5. spell/ws(on/off) <name> - Start or stop watching for <name> spell|ws.
+  6. clear - Clears the textbox and the tracking table (use if textbox locks up)
   The following all correspond to the tracker:
     fonttype <name> | fontsize <size> | pos <x> <y> - can also click/drag
     bgcolor <r> <g> <b> | txtcolor <r> <g> <b>
@@ -182,7 +184,7 @@ windower.register_event('addon command', function(...)
     settings - shows current textbox settings
     show/hide - toggles visibility of the tracker so you can make changes.]]
             for _, line in ipairs(helptext:split('\n')) do
-                windower.add_to_chat(207, line..chat.colorcontrols.reset)
+                windower.add_to_chat(207, line..chat.controls.reset)
             end
         end
     end
@@ -194,7 +196,7 @@ windower.register_event('action', function(act)
     local actor = T{}
     actor.id = curact.actor_id
     if windower.ffxi.get_mob_by_id(actor.id) then
-        actor.name = windower.ffxi.get_mob_by_id(actor.id)['name']
+        actor.name = windower.ffxi.get_mob_by_id(actor.id).name
     else
         return
     end
@@ -206,11 +208,11 @@ windower.register_event('action', function(act)
     local player = T(windower.ffxi.get_player())
     
     if not settings.staggeronly then
-        if settings.showrolls and curact.category == 6 and jAbils[extparam]['type'] == 'CorsairRoll' then
+        if settings.showrolls and curact.category == 6 and res.job_abilities[extparam].type == 'CorsairRoll' then
             local allyroller = false
             local selfroll = false
             for pt,member in pairs(party) do
-                if member.name == actor.name then
+                if type(member) == 'table' and member.name == actor.name then
                     allyroller = true
                     break
                 end
@@ -218,14 +220,14 @@ windower.register_event('action', function(act)
             if allyroller or selfroll then
                 if actor.id == player.id then selfroll = true end
                 if settings.selfrolls and not selfroll then return end
-                addText(actor.name,'roll',extparam,targets[1].actions[1].param)
+                addText(actor.name, 'roll', extparam, targets[1].actions[1].param)
             end
         elseif isMob(actor.id) and S{7,8}:contains(curact.category) and extparam ~= 28787 then
             local inact = targets[1].actions[1]
             if curact.category == 8 then typ = 'spell'
             else typ = 'ws' end
             if (mCheck(actor.name) or dCheck(typ,inact.param)) and inact.message ~= 0 then
-                addText(actor.name,typ,inact.param,mDanger(actor.name),dCheck(typ,inact.param))
+                addText(actor.name, typ, inact.param, mDanger(actor.name), dCheck(typ,inact.param))
             end
         end
     end
@@ -241,11 +243,11 @@ windower.register_event('action message',function(actor_id, target_id, actor_ind
             if actor.id == player.id then
                 if mCheck(target.name) then
                     if message_id == 204 then
-                        addText(target.name..' is no longer '..stats[param_1]['enLog'])
+                        addText(target.name .. ' is no longer ' .. res.buffs[param_1].english_log)
                     elseif message_id == 205 then
-                        addText(target.name..' gains the effect of '..stats[param_1]['enLog'])
+                        addText(target.name .. ' gains the effect of ' .. res.buffs[param_1].english_log)
                     else
-                        addText(target.name..' '..stats[param_1]['enLog']..' effect wears off.')
+                        addText(target.name .. ' ' .. res.buffs[param_1].english_log .. ' effect wears off.')
                     end
                 end
             end

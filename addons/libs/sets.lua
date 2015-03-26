@@ -4,18 +4,22 @@ A library providing sets as a data structure.
 
 _libs = _libs or {}
 _libs.sets = true
-_libs.tablehelper = _libs.tablehelper or require('tablehelper')
-_libs.functools = _libs.functools or require('functools')
+_libs.tables = _libs.tables or require('tables')
+_libs.functions = _libs.functions or require('functions')
 
 set = {}
 
 _meta = _meta or {}
 _meta.S = {}
-_meta.S.__index = function(s, x) if set[x] ~= nil then return set[x] else return table[x] end end
+_meta.S.__index = function(s, k) return rawget(set, k) or rawget(table, k) end
 _meta.S.__class = 'Set'
 
 function S(t)
     t = t or {}
+    if class(t) == 'Set' then
+        return t
+    end
+
     local s = {}
 
     if class(t) == 'List' then
@@ -135,13 +139,51 @@ end
 
 _meta.S.__pow = set.sdiff
 
+function set.subset(s1, s2)
+    for el in pairs(s1) do
+        if not rawget(s2, el) then
+            return false
+        end
+    end
+
+    return true
+end
+
+_meta.S.__le = set.subset
+
+function set.ssubset(s1, s2)
+    return s1 <= s2 and s1 ~= s2
+end
+
+_meta.S.__lt = set.ssubset
+
+function set.map(s, fn)
+    local res = {}
+    for el in pairs(s) do
+        rawset(res, fn(el), true)
+    end
+
+    return setmetatable(res, _meta.S)
+end
+
+function set.filter(s, fn)
+    local res = {}
+    for el in pairs(s) do
+        if fn(el) then
+            rawset(res, el, true)
+        end
+    end
+
+    return setmetatable(res, _meta.S)
+end
+
 function set.contains(s, el)
     return rawget(s, el) == true
 end
 
 function set.find(s, fn)
     if type(fn) ~= 'function' then
-        fn = functools.equals(fn)
+        fn = functions.equals(fn)
     end
     
     for el in pairs(s) do
@@ -175,11 +217,16 @@ function set.clear(s)
     return s
 end
 
-function set.copy(s)
+function set.copy(s, deep)
+    deep = deep or true
     local res = {}
 
     for el in pairs(s) do
-        res[el] = true
+        if deep and type(el) == 'table' then
+            res[(not rawget(el, 'copy') and el.copy or table.copy)(el)] = true
+        else
+            res[el] = true
+        end
     end
 
     return setmetatable(res, _meta.S)
@@ -224,44 +271,12 @@ function set.sort(s, ...)
     return T(s):sort(...)
 end
 
-function set.map(s, fn)
-    local res = {}
-
-    for el in pairs(s) do
-        res[fn(el)] = true
-    end
-
-    return setmetatable(res, _meta.S)
-end
-
-function set.filter(s, fn)
-    local res = {}
-    for el in pairs(s) do
-        res[el] = fn(el) == true or nil
-    end
-
-    return setmetatable(res, _meta.S)
-end
-
-function set.reduce(s, fn, init)
-    local acc = init
-    for el in pairs(s) do
-        if acc == nil then
-            acc = el
-        else
-            acc = fn(acc, el)
-        end
-    end
-
-    return acc
-end
-
 function set.concat(s, str)
     str = str or ''
     local res = ''
 
     for el in pairs(s) do
-        res = res..tostring(s)
+        res = res..tostring(el)
         if next(s, el) then
             res = res..str
         end
@@ -271,15 +286,9 @@ function set.concat(s, str)
 end
 
 function set.format(s, trail, subs)
-    local l
-    if s:empty() then
+    local first = next(s)
+    if not first then
         return subs or ''
-    elseif #s == 1 then
-        return '{'..tostring(next(s))..'}'
-    elseif _libs.lists then
-        l = L(s)
-    else
-        l = T(s)
     end
 
     trail = trail or 'and'
@@ -287,19 +296,47 @@ function set.format(s, trail, subs)
     local last
     if trail == 'and' then
         last = ' and '
-    elseif trail == 'csv' then
+    elseif trail == 'or' then
+        last = ' or '
+    elseif trail == 'list' then
         last = ', '
+    elseif trail == 'csv' then
+        last = ','
     elseif trail == 'oxford' then
         last = ', and '
+    elseif trail == 'oxford or' then
+        last = ', or '
     else
         warning('Invalid format for table.format: \''..trail..'\'.')
     end
 
-    return l:slice(1, -2):concat(', ')..last..l:last()
+    local res = ''
+    for v in pairs(s) do
+        local add = tostring(v)
+        if trail == 'csv' and add:match('[,"]') then
+            res = res .. add:gsub('"', '""'):enclose('"')
+        else
+            res = res .. add
+        end
+
+        if next(s, v) then
+            if next(s, next(s, v)) then
+                if trail == 'csv' then
+                    res = res .. ','
+                else
+                    res = res .. ', '
+                end
+            else
+                res = res .. last
+            end
+        end
+    end
+
+    return res
 end
 
 --[[
-Copyright (c) 2013, Windower
+Copyright © 2013-2015, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

@@ -6,11 +6,11 @@ local xml = {}
 
 _libs = _libs or {}
 _libs.xml = xml
-_libs.tablehelper = _libs.tablehelper or require('tablehelper')
+_libs.tables = _libs.tables or require('tables')
 _libs.lists = _libs.lists or require('lists')
 _libs.sets = _libs.sets or require('sets')
-_libs.stringhelper = _libs.stringhelper or require('stringhelper')
-_libs.filehelper = _libs.filehelper or require('filehelper')
+_libs.strings = _libs.strings or require('strings')
+_libs.files = _libs.files or require('files')
 
 -- Local functions
 local entity_unescape
@@ -18,7 +18,6 @@ local xml_error
 local pcdata
 local attribute
 local validate_headers
-local parse
 local tokenize
 local get_namespace
 local classify
@@ -47,9 +46,9 @@ local spaces = S{' ', '\n', '\t', '\r'}
 -- Only used internally to index the unescapes table.
 function entity_unescape(_, entity)
     if entity:startswith('#x') then
-        return string.char(tonumber(entity:sub(3), 16))
+        return entity:sub(3):number(16):char()
     elseif entity:startswith('#') then
-        return string.char(tonumber(entity:sub(2)))
+        return entity:sub(2):number():char()
     else
         return entity
     end
@@ -73,14 +72,14 @@ end
 -- Takes a filename and tries to parse the XML in it, after a validity check.
 function xml.read(file)
     if type(file) == 'string' then
-        file = _libs.filehelper.new(file)
+        file = _libs.files.new(file)
     end
 
     if not file:exists() then
         return xml_error('File not found: '..file.path)
     end
 
-    return parse(file:read())
+    return xml.parse(file:read())
 end
 
 -- Returns nil as the parsed table and an additional error message with an optional line number.
@@ -106,7 +105,7 @@ function validate_headers(headers)
 end
 
 -- Parsing function. Gets a string representation of an XML object and outputs a Lua table or an error message.
-function parse(content)
+function xml.parse(content)
     local quote = nil
     local headers = T{xmlhead='', dtds=T{}}
     local tag = ''
@@ -144,10 +143,10 @@ function parse(content)
                 quote = c
                 mode = 'quote'
             elseif c == '>' then
-                if tag:at(2) == '?' then
+                if tag[2] == '?' then
                     headers['xmlhead'] = tag
                     tag = ''
-                elseif tag:at(2) == '!' then
+                elseif tag[2] == '!' then
                     headers['dtds']:append(tag)
                     tag = ''
                 else
@@ -181,9 +180,9 @@ end
 -- * .*(?!\]\]>)    CDATA
 function tokenize(content, line)
     local current = ''
-    local tokens = T{}
+    local tokens = L{}
     for i = 1, line do
-        tokens:append(T{})
+        tokens:append(L{})
     end
 
     local quote = nil
@@ -191,7 +190,7 @@ function tokenize(content, line)
     for c in content:it() do
         -- Only useful for a line count, to produce more accurate debug messages.
         if c == '\n' then
-            tokens:append(T{})
+            tokens:append(L{})
         end
 
         if mode == 'quote' then
@@ -283,7 +282,7 @@ function tokenize(content, line)
     end
 
     for array, line in tokens:it() do
-        tokens[line] = table.filter(array, -'')
+        tokens[line] = array:filter(-'')
     end
 
     return tokens
@@ -292,7 +291,14 @@ end
 -- Definition of a DOM object.
 local dom = T{}
 function dom.new(t)
-    return T{type='', name='', namespace=nil, value=nil, children=L{}}:update(t)
+    return T{
+        type = '',
+        name = '',
+        namespace = nil,
+        value = nil,
+        children = L{},
+        cdata = nil
+    }:update(t)
 end
 
 -- Returns the name of the element and the namespace, if present.
@@ -316,12 +322,12 @@ function classify(tokens, var)
     local headers = var
 
     local mode = 'inner'
-    local parsed = T{dom.new()}
+    local parsed = L{dom.new()}
     local name = nil
     for line, intokens in ipairs(tokens) do
         for _, token in ipairs(intokens) do
             if token:startswith('<![CDATA[') then
-                parsed:last().children:append(dom.new({type = 'text', value = token:sub(10, -4)}))
+                parsed:last().children:append(dom.new({type = 'text', value = token:sub(10, -4), cdata = true}))
 
             elseif token:startswith('<!--') then
                 parsed:last().children:append(dom.new({type = 'comment', value = token:sub(5, -4)}))

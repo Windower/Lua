@@ -8,7 +8,7 @@ Licensing
 We require that all submissions to the Windower/Lua repository be licensed under the BSD license, reproduced below. To do this, simply place the license text in a comment at the top of each of your source files, and replace `<year>`, `<addon name>` and both instances of `<your name>` with appropriate values.
 
 ```
-Copyright (c) <year>, <your name>
+Copyright © <year>, <your name>
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

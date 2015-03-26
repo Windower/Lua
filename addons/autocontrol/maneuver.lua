@@ -28,7 +28,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 local texts = require 'texts'
-threshItems = T{['16281']=5,['16282']=10,['11101']=40,['11201']=20,['14930']=5,['15030']=5}
+threshItems = T
+    {[16281]=5  -- Buffoon's Collar
+    ,[16282]=5  -- Buffoon's Collar +1
+    ,[11101]=40 -- Cirque Farsetto +2
+    ,[11201]=20 -- Cirque Farsetto +1
+    ,[14930]=5  -- Pup. Dastanas
+    ,[15030]=5  -- Pup. Dastanas +1
+    ,[27960]=5  -- Foire Dastanas
+    ,[27981]=5  -- Foire Dastanas +1
+    ,[28634]=5  -- Dispersal Mantle
+    }
 heat = T{}
 heat.Fire = 0
 heat.Ice = 0
@@ -74,9 +84,7 @@ str = str..'\nWater:    \\cs(${colWater|255,255,255})${Water|0}\\cr - ${timeWate
 str = str..'\nLight:    \\cs(${colLight|255,255,255})${Light|0}\\cr - ${timeLight|0}s - ${olLight|0}%'
 str = str..'\nDark:     \\cs(${colDark|255,255,255})${Dark|0}\\cr - ${timeDark|0}s - ${olDark|0}%'
 
-Burden_tb = texts.new(str,settings)
-
-
+Burden_tb = texts.new(str, settings)
 
 windower.register_event("action", function(act)
     if mjob_id == 18 then
@@ -85,7 +93,7 @@ windower.register_event("action", function(act)
         local player = T(windower.ffxi.get_player())
         local pet_index = windower.ffxi.get_mob_by_id(windower.ffxi.get_player()['id'])['pet_index']
         
-        if act['category'] == 6 and actor_id == player.id and S{136,139,141,142,143,144,145,146,147,148,309}:contains(abil_ID) then
+        if act['category'] == 6 and actor_id == player.id and S{136,139,141,142,143,144,145,146,147,148,309,310}:contains(abil_ID) then
             if S{141, 142, 143, 144, 145, 146, 147, 148}:contains(abil_ID) then
                 windower.send_command('timers c "Maneuver: '..maneuver..'" 60 down')
                 if maneuver > 2 then
@@ -121,7 +129,7 @@ windower.register_event("action", function(act)
             elseif abil_ID == 309 then
                 windower.send_command('@timers d Overloaded!')
                 heatupdate()
-            elseif abil_ID == 136 then
+            elseif abil_ID == 136 or abil_ID == 310 then -- Activate or Deus Ex Automata
                 Burden_tb:show()
                 decay = get_decay()
                 activate_burden()
@@ -179,9 +187,9 @@ end
 function get_decay()
     if mjob_id == 18 then
         local newdecay
-        if T(windower.ffxi.get_mjob_data()['attachments']):contains(8610-8448) then
+        if T(windower.ffxi.get_mjob_data().attachments):contains(8610) then
             local mans = 0
-            local buffs = windower.ffxi.get_player()['buffs']
+            local buffs = windower.ffxi.get_player().buffs
             for z = 1, #buffs do
                 if buffs[z] == 305 then
                     mans = mans + 1
@@ -204,7 +212,7 @@ function get_jaheat()
         local baseheat = 20
         local updatedheat = 0
         local bonusheat = 0
-        if T(windower.ffxi.get_mjob_data()['attachments']):contains(8485-8448) then
+        if T(windower.ffxi.get_mjob_data()['attachments']):contains(8485) then
             local mans = 0
             local buffs = windower.ffxi.get_player()['buffs']
             for z = 1, #buffs do
@@ -227,22 +235,15 @@ function get_threshold()
     if mjob_id == 18 then
         local newthreshold = 0
         local basethreshold = 30
-        local equip = T(windower.ffxi.get_items()['equipment'])
-        local inv = T(windower.ffxi.get_items()['inventory'])
+        local items = windower.ffxi.get_items()
         local bonus = 0
-        if equip.hands ~= 0 then
-            if threshItems[tostring(inv[equip.hands].id)] ~= nil then
-                bonus = bonus + threshItems[tostring(inv[equip.hands].id)]
-            end
-        end
-        if equip.body ~= 0 then
-            if threshItems[tostring(inv[equip.body].id)] ~= nil then
-                bonus = bonus + threshItems[tostring(inv[equip.body].id)]
-            end
-        end
-        if equip.neck ~= 0 then
-            if threshItems[tostring(inv[equip.neck].id)] ~= nil then
-                bonus = bonus + threshItems[tostring(inv[equip.neck].id)]
+        local slots = {'hands', 'body', 'neck', 'back'}
+        for i, s in ipairs(slots) do
+            if items.equipment[s] ~= 0 then
+                local item = threshItems[items.inventory[items.equipment[s]].id] or threshItems[items.wardrobe[items.equipment[s]].id]
+                if item ~= nil then
+                    bonus = bonus + item
+                end
             end
         end
         newthreshold = basethreshold + bonus
@@ -306,7 +307,7 @@ end
 
 function text_update_loop(str)
     if mjob_id == 18 then
-        if str == 'start' and running == 1 and not petlessZones:contains(windower.ffxi.get_info()['zone_id']) then
+        if str == 'start' and running == 1 and not petlessZones:contains(windower.ffxi.get_info().zone) then
             for key, _ in pairs(heat) do
                 timer[key] = timer[key] - 1
                 if timer[key] < 1 then timer[key] = 0 end
@@ -335,7 +336,7 @@ function text_update_loop(str)
     end
 end
 
-windower.register_event("gain buff", function(name,id)
+windower.register_event('gain buff', function(id)
     if mjob_id == 18 then
         if id == 305 then 
             decay = get_decay()
@@ -346,7 +347,7 @@ windower.register_event("gain buff", function(name,id)
     end
 end)
 
-windower.register_event("lose buff",function(name,id)
+windower.register_event('lose buff', function(id)
     if mjob_id == 18 then
         if id == 305 then 
             decay = get_decay()
@@ -363,9 +364,9 @@ function timer_start(ele)
     end
 end
 
-windower.register_event('job change', function(mj, mjid, mjl, sj, sjid, sjl)
-    mjob_id = mjid
-    if mjob_id ~= 18 or petlessZones:contains(windower.ffxi.get_info()['zone_id']) then 
+windower.register_event('job change', function(mj)
+    mjob_id = mj
+    if mjob_id ~= 18 or petlessZones:contains(windower.ffxi.get_info().zone) then 
         Burden_tb:hide()
         text_update_loop('stop')
     end
@@ -381,31 +382,32 @@ function zero_all()
     end
 end
 
-function zone_check(to, tid, fr, fid)
+function zone_check(to)
+    to = tonumber(to)
     if mjob_id == 18 then
-        if petlessZones:contains(tid) then 
+        if petlessZones:contains(to) then 
             text_update_loop('stop')
             zero_all()
             Burden_tb:hide()
             return
         else
-            local player_mob = windower.ffxi.get_mob_by_id(windower.ffxi.get_player()['id'])
+            local player_mob = windower.ffxi.get_mob_by_target('me')
             if player_mob then
-                if player_mob['pet_index']
-                   and player_mob['pet_index'] ~= 0 then 
+                if player_mob.pet_index
+                   and player_mob.pet_index ~= 0 then 
                     Burden_tb:show()
                     activate_burden()
                 end
             else
-                windower.send_command('@wait 10;lua i autocontrol zone_check "'..to..'" '..tid)
+                windower.send_command('@wait 10;lua i autocontrol zone_check ' .. to)
             end
         end
     end
 end
 
-windower.register_event("zone change", zone_check)
+windower.register_event('zone change', zone_check)
     
-windower.register_event("time change",function(...)
+windower.register_event('time change', function()
     if mjob_id == 18 then
         decay = get_decay()
     end

@@ -1,13 +1,13 @@
-file = require 'filehelper'
-chat = require 'chat'
-require 'tablehelper'
-require 'stringhelper'
- 
-
 _addon.author = 'Balloon'
 _addon.name = 'Highlight'
-_addon.version = '1.0' 
+_addon.version = '1.0.0.1'
 _addon.command = 'highlight'
+
+file = require('files')
+chat = require('chat')
+chars = require('chat.chars')
+require('tables')
+require('strings')
  
 members={}
 mulenames={}
@@ -17,7 +17,7 @@ color={}
 mulecolor={}
 previousmentions={}
  
-config = require 'config'
+config = require('config')
  
 defaults = {}
 defaults.p0 = 501
@@ -38,6 +38,7 @@ defaults.a22 = 200
 defaults.a23 = 481
 defaults.a24 = 483
 defaults.a25 = 208
+
  
 settingdefaults = {}
 settingdefaults.highlighting = true
@@ -49,6 +50,8 @@ if file.exists('../battlemod/data/colors.xml') then
 else
     color = config.load('/data/colors.xml', defaults)
 end
+
+
  
 windower.register_event('addon command', function(command, ...)
     command = command and command:lower() or 'help'
@@ -85,17 +88,22 @@ windower.register_event('addon command', function(command, ...)
         print('To view your last mentions type //highlight view <last number>')
     end
 end)
- 
-windower.register_event('load', 'login', windower.send_command+{'wait 2; lua i highlight initialize'})
+
+windower.register_event('login', 'load', function()
+    if windower.ffxi.get_info().logged_in then
+        coroutine.sleep(1)
+        initialize()
+    end
+end)
  
 function initialize()
-    send_count = 0 
-    called_count = 0
+    prevCount = 0
+    colour = {}
  
     nicknames = config.load('/data/nicknames.xml')
     mules = config.load('/data/mules.xml')
     settings = config.load(settingdefaults)
- 
+
     for i, v in pairs(nicknames) do
         nicknames[i] = string.split(v, ',')
     end
@@ -103,7 +111,7 @@ function initialize()
         mulenames[mule] = name
     end
     for i, v in pairs(color) do
-        color[i] = colconv(v,i)
+        colour[i] = colconv(v,i)
     end
     for i, v in pairs(mules) do
         mulecolor[i] = colconv(v,i)
@@ -115,7 +123,7 @@ function initialize()
 end
  
 windower.register_event('incoming text', function(original, modified, color, newcolor)
-    if not original:match('%[.*%] .* '..string.char(129, 168)..'.*') and not original:match('.* '..chat.chars['implies']..'.*') then
+    if not original:match('%[.*%] .* '..string.char(129, 168)..'.*') and not original:match('.* '..chars['implies']..'.*') then
         for names in modified:gmatch('%w+') do
             for name in pairs(members) do
                 modified = modified:igsub(members[name], modmember[name])
@@ -126,7 +134,7 @@ windower.register_event('incoming text', function(original, modified, color, new
                 end
             end
             for mule, color in pairs(mulenames) do
-                modified = modified:igsub(mule, mulecolor[mule]..mule:capitalize()..chat.colorcontrols.reset)
+                modified = modified:igsub(mule, mulecolor[mule]..mule:capitalize()..chat.controls.reset)
             end
             if not settings.highlighting then
                 modified = modified:gsub('%(['..string.char(0x1e, 0x1f)..'].(%w+)'..'['..string.char(0x1e, 0x1f)..'].%)(.*)', function(name, rest) return '('..name..')'..rest end)            
@@ -136,7 +144,7 @@ windower.register_event('incoming text', function(original, modified, color, new
  
     end
         --Not rolltracker and not battlemod
-        if not original:match('.* '..string.char(129, 168)..'.*') and not original:match('.* '..chat.chars['implies']..'.*') and color ~= 4 then
+        if not original:match('.* '..string.char(129, 168)..'.*') and not original:match('.* '..chars['implies']..'.*') and color ~= 4 then
             --Chat modes not empty
             if original:match('^%(.*%)') or original:match('^<.*>') or original:match('^%[%d:#%w+%]%w+(%[?%w-%]?):') then
                 --Not myself
@@ -153,12 +161,31 @@ end)
  
 windower.register_event('incoming chunk', function(id, data)
     if id == 0x0C8 then
-        modmember = {}
-        members = {}
-        windower.send_command('@wait 0.1; lua i highlight get_party_members')
+        prevCount = count
+        count = GetPartyCount(data:sub(0x09, 0xE0))
+        if(prevCount ~= count) then
+            modmember = {}
+            members = {}
+            coroutine.sleep(0.1)
+            get_party_members()
+        end
     end
 end)
- 
+
+function GetPartyCount(data)
+    local count = 0
+    local test = 0
+    local offset = 0
+    while offset < 216 do
+        local x = data:sub(offset, offset + 11)
+        if x ~= '\0\0\0\0\0\0\0\0\0\0\0\0' then
+            count = count +1 
+        end
+        offset = offset+12
+    end
+    return count
+end
+
 function colconv(str, key)
     -- Taken from Battlemod
     strnum = tonumber(str)
@@ -167,27 +194,28 @@ function colconv(str, key)
     elseif strnum > 0 then
         return string.char(0x1F, strnum)
     elseif strnum ~= 0 then
-        print('You have an invalid color '..key)
+        print('You have an invalid color: ' .. key)
     end
-    return chat.colorcontrols.reset
+    return chat.controls.reset
 end
  
 function get_party_members()
     if settings.highlighting then
-        for member, mob in pairs(windower.ffxi.get_party()) do
-            if not mulenames[mob['name']:lower()] then
-                members[member] = mob['name']
-                modmember[member] = color[member]..mob['name']..chat.colorcontrols.reset
+        local party = windower.ffxi.get_party()
+        for member, mob in pairs(party) do
+            if type(mob) == 'table' and not mulenames[mob.name:lower()] then
+                members[member] = mob.name
+                modmember[member] = colour[member] .. mob.name .. chat.controls.reset
             end
         end
     else 
-        members['p0'] = player
-        modmember['p0'] = color['p0']..player..chat.colorcontrols.reset
+        members.p0 = player
+        modmember.p0 = colour.p0 .. player .. chat.controls.reset
     end    
 end
  
 --[[
-Copyright (c) 2013, Thomas Rogers
+Copyright © 2013-2015, Thomas Rogers
 All rights reserved.
  
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

@@ -1,0 +1,24 @@
+This script is a Avatar's Favor display addon to be used with Windower
+for Final Fantasy XI.
+
+You can report issues, get the latest version, and view the source at:
+    https://github.com/svanheulen/visibleffavor-windower-addon
+
+The addon will display a Geomancy bubble around your avatar so that it's
+possible to see the area of effect of your Avatar's Favor and Blood
+Pact: Wards. Unfortunately the Geomancy bubble visuals a slightly
+smaller then Favor/Ward ranges (9 yalms vs 10 yalms) but it's close
+enough to still be helpful.
+
+The available commands are:
+    vf toggle/on/off
+        Toggles, enabled or disables the effects.
+    vf display all/self/favor
+        Sets the conditions in which the bubbles will be displayed.
+        all = Display for all player's avatars, all the time.
+        self = Display only for your avatar, all the time.
+        favor = Display only for your avatar, when Avatar's Favor is active.
+    vf effect buff/debuff
+        Sets the type of Geomancy bubble visual to use.
+        buff = Use the visual effect of enhancing Geomancy.
+        debuff = Use the visual effect of enfeebling Geomancy.

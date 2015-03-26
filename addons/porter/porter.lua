@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 require 'chat'
 require 'logger'
 require 'sets'
-require 'stringhelper'
+require 'strings'
 
 slips = require 'slips'
 

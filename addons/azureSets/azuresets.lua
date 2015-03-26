@@ -32,15 +32,17 @@ _addon.version = '1.22'
 _addon.author = 'Nitrous (Shiva)'
 _addon.commands = {'aset','azuresets','asets'}
 
-require 'tablehelper'
-require 'stringhelper'
-require 'logger'
-config = require 'config'
-files = require 'filehelper'
-res = require 'resources'
-defaults = T{}
-defaults.spellsets = T{}
-defaults.spellsets.default = T{ }
+require('tables')
+require('strings')
+require('logger')
+config = require('config')
+files = require('files')
+res = require('resources')
+chat = require('chat')
+
+defaults = {}
+defaults.spellsets = {}
+defaults.spellsets.default = T{}
 defaults.spellsets.vw1 = T{slot01='Firespit', slot02='Heat Breath', slot03='Thermal Pulse', slot04='Blastbomb',
 slot05='Infrasonics', slot06='Frost Breath', slot07='Ice Break', slot08='Cold Wave',
 slot09='Sandspin', slot10='Magnetite Cloud', slot11='Cimicine Discharge', slot12='Bad Breath', 
@@ -53,27 +55,18 @@ slot09='Blank Gaze', slot10='Radiant Breath', slot11='Light of Penance', slot12=
 slot13='Death Ray', slot14='Eyes On Me', slot15='Sandspray'
 }
 
+settings = config.load(defaults)
+
 function initialize()
     spells = res.spells:type('BlueMagic')
-    settings = config.load(defaults)
     get_current_spellset()
 end
 
-windower.register_event('load', function()
-    if windower.ffxi.get_info()['logged_in'] then
-        initialize()
-    end
-end)
+windower.register_event('load', initialize:cond(function() return windower.ffxi.get_info().logged_in end))
 
-windower.register_event('login', function()
-    initialize()
-end)
+windower.register_event('login', initialize)
 
-windower.register_event('job change', function(mj, mjob_id, mjob_lvl, sj, sjob_id, sjob_lvl)
-    if mjob_id == 16 then
-        initialize()
-    end
-end)
+windower.register_event('job change', initialize:cond(function(job) return job == 16 end))
 
 function set_spells(spellset)
     if windower.ffxi.get_player()['main_job_id'] ~= 16 --[[and windower.ffxi.get_player()['sub_job_id'] ~= 16]] then return nil end
@@ -97,7 +90,7 @@ function set_spells_from_spellset(spellset,slot)
     if tempname ~= nil then
         for spell in spells:it() do
                 if spell['english']:lower() == tempname:lower() then
-                    windower.ffxi.set_blue_magic_spell(spell['index'], tonumber(slot))
+                    windower.ffxi.set_blue_magic_spell(spell['id'], tonumber(slot))
                     break
                 end
         end
@@ -126,8 +119,8 @@ function set_single_spell(setspell,slot)
         for spell in spells:it() do
             if spell['english']:lower() == setspell then
                 --This is where single spell setting code goes.
-                --Need to set by spell index rather than name.
-                windower.ffxi.set_blue_magic_spell(spell['index'], tonumber(slot))
+                --Need to set by spell id rather than name.
+                windower.ffxi.set_blue_magic_spell(spell['id'], tonumber(slot))
                 windower.send_command('@timers c "Blue Magic Cooldown" 60 up')
                 tmpTable['slot'..slot] = setspell
             end
@@ -146,7 +139,7 @@ function get_current_spellset()
             local t = ''
             if tonumber(tmpTable[i]) ~= 512 then
                 for spell in spells:it() do
-                    if tonumber(tmpTable[i]) == tonumber(spell['index']) then
+                    if tonumber(tmpTable[i]) == tonumber(spell['id']) then
                         if i < 10 then t = '0' end
                         spellTable['slot'..t..i] = spell['english']:lower()
                         break
@@ -236,7 +229,7 @@ windower.register_event('addon command', function(...)
   7. spelllist <setname> -- List spells in (setname)
   8. help --Shows this menu.]]
             for _, line in ipairs(helptext:split('\n')) do
-                windower.add_to_chat(207, line..chat.colorcontrols.reset)
+                windower.add_to_chat(207, line..chat.controls.reset)
                 
             end
         end

@@ -32,32 +32,21 @@ _addon.version = '2.02'
 _addon.author = 'Nitrous (Shiva)'
 _addon.command = 'ffocolor'
 
-require 'tablehelper'
-require 'stringhelper'
-require 'logger'
-require 'lists'
-config = require 'config'
-files = require 'filehelper'
-chat = require 'chat'
-defaults = T{}
+require('tables')
+require('strings')
+require('logger')
+require('lists')
+config = require('config')
+files = require('files')
+chat = require('chat')
+defaults = {}
+
 defaults.chatTab = 'say'
 defaults.chatColor = 207
 
-function initialize()
-    settings = config.load(defaults)
-    settings:save()
-    chatColors = T{say=1,shout=2,tell=4,party=5,linkshell=6,none=74}
-end
+settings = config.load(defaults)
 
-windower.register_event('load', function()
-    if windower.ffxi.get_info()['logged_in'] then
-        initialize()
-    end
-end)
-
-windower.register_event('login', function()
-    initialize()
-end)
+chatColors = T{say=1,shout=2,tell=4,party=5,linkshell=6,none=74}
 
 windower.register_event('addon command', function(...)
     local args = {...}
@@ -114,7 +103,7 @@ windower.register_event('addon command', function(...)
  3. ffocolor getcolors -- Show a list of color codes.
  4. ffocolor help --Shows this menu.]]
             for _, line in ipairs(helptext:split('\n')) do
-                windower.add_to_chat(207, line..chat.colorcontrols.reset)
+                windower.add_to_chat(207, line..chat.controls.reset)
             end
         end
     end
