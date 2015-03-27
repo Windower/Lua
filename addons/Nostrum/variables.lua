@@ -76,11 +76,9 @@ out_of_view={
 }
 who_am_i={}
 
-l={} r={} t={} b={}
 dragged = false
 is_zoning = false
 is_hidden = false
-regions = 0
 
 font_widths={
     ['I']=9,['II']=17,['III']=25,['IV']=24,['V']=16,

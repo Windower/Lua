@@ -70,11 +70,8 @@ function text_simple(name, settings_table, pos_x, pos_y, text)
 end
 
 function count_cures(t)
-    _cures=0
-    _curagas=0
     for i=options.cures.n,1,-1 do
         if t[options.cures[i]] then 
-            _cures=_cures+1 
             macro_order[2]:append(xml_to_lua[options.cures[i]])
         end
         macro_order[3] = macro_order[2]
@@ -82,38 +79,31 @@ function count_cures(t)
     macro_order[1] = macro_order[2]:copy(false)
     for i=options.curagas.n,1,-1 do
         if t[options.curagas[i]] then
-            _curagas=_curagas+1 
             macro_order[1]:append(xml_to_lua[options.curagas[i]]) 
         end
     end
 end
 
 function count_na(t)
-    _na=0
     for i=1,options.na['n'] do
         if t[options.na[i]] then 
-            _na=_na+1 
             macro_order[4]:append(xml_to_lua[options.na[i]]) 
         end
     end
     if macro_order[4].n ~= 0 then
         mouse_map2:append(T(macro_order[4]))
     end
-    --macro_order.nas = list.reverse(macro_order.nas)
 end
 
 function count_buffs(t)
-    _buffs=0
     for i=1,options.buffs['n'] do
         if t[options.buffs[i]] then 
-            _buffs=_buffs+1 
             macro_order[5]:append(xml_to_lua[options.buffs[i]]) 
         end
     end
     if macro_order[5].n ~= 0 then
         mouse_map2:append(T(macro_order[5]))
     end
-    --macro_order.buffs = list.reverse(macro_order.buffs)
 end
 
 function choose_color(hpp)
@@ -374,6 +364,7 @@ function compare_alliance_to_memory()
             windower.text.set_text('name'..position_lookup[k],prepare_names(v))
             stat_table[k].name = v
             who_am_i[k] = nil
+            update_name_map(k,v)
         end
     end
 end
@@ -582,7 +573,7 @@ function trim_macro()
                 misc_hold_for_up.prims:delete(s1)
                 misc_hold_for_up.prims:delete(s2)
             else
-                windower.prim.set_size(s1,j == 1 and (_curagas+_cures)*(w+1)+1 or _cures*(w+1)+1,party[j].n*(h+1)+1)
+                windower.prim.set_size(s1,macro_order[j].n*(w+1)+1,party[j].n*(h+1)+1)
                 windower.prim.set_size(s2,152,party[j].n*(h+1)+1)
             end
         end
@@ -634,6 +625,17 @@ function kick(id,n)
     who_am_i[id] = nil
     seeking_information[id] = nil
     position_lookup[id] = nil
+end
+
+function update_name_map(id,name)
+    local pos_id = position_lookup[id]
+    if pos_id < 7 then
+        region_to_name_map[pos_id-(6-(party[1].n+vacancies[1]))] = name
+    elseif pos_id < 13 then
+        region_to_name_map[party[1].n+vacancies[1]+pos_id-6-(6-(party[2].n+vacancies[2]))+4] = name
+    elseif pos_id < 19 then
+        region_to_name_map[party[1].n+vacancies[1]+party[2].n+vacancies[2]+pos_id-12-(6-(party[3].n+vacancies[3]))+5] = name
+    end
 end
 
 function define_active_regions()

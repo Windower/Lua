@@ -231,16 +231,16 @@ function build_macro()
     misc_hold_for_up.texts:append("menu")
 
     y_start=prim_coordinates.y['BG1']-35
-    if _na~=0 then
-        prim_simple("BGna",prim.background,x_start-33*_na-153,y_start,(_na)*(33)+1,34)
+    if macro_order[4].n~=0 then
+        prim_simple("BGna",prim.background,x_start-33*macro_order[4].n-153,y_start,(macro_order[4].n)*(33)+1,34)
         misc_hold_for_up.prims:append("BGna")
         macro[1]:add("BGna")
         image_row(macro_order[4],x_start,y_start+1)
         y_start=y_start-35
     end
 
-    if _buffs~=0 then
-        prim_simple("BGbuffs",prim.background,x_start-33*_buffs-153,y_start,(_buffs)*(33)+1,34)
+    if macro_order[5].n~=0 then
+        prim_simple("BGbuffs",prim.background,x_start-33*macro_order[5].n-153,y_start,(macro_order[5].n)*(33)+1,34)
         misc_hold_for_up.prims:append("BGbuffs")
         macro[1]:add("BGbuffs")
         image_row(macro_order[5],x_start,y_start+1)
@@ -248,6 +248,9 @@ function build_macro()
     
     prim_simple("hover24",table.set(_defaults.primitives.highlight,'visible',false),0,0,29,24)
     prim_simple("hover32",table.set(_defaults.primitives.highlight,'visible',false),0,0,32,32)
+    misc_hold_for_up.prims:append("hover24")
+    misc_hold_for_up.prims:append("hover32")
+
 
     toggle_macro_visibility(1)
     toggle_macro_visibility(2)
@@ -356,6 +359,7 @@ do
     local mouse_event
     local last_x,last_y = 0,0
     local last_x32,last_y32 = 0,0
+    local prim_coordinates = prim_coordinates
     local x_offset = _defaults.window.x_offset
     local y_offset = _defaults.window.y_offset
     local x_res = settings.window.x_res
@@ -391,7 +395,9 @@ register_events = function(bool)
                         prim_coordinates.visible['hover24'] = true
                     end
                     if _x ~= last_x or _y ~= last_y then
-                        windower.prim.set_position("hover24",x_res-153-x_offset-_x*30,y_res-y_offset-25*_y)
+                        prim_coordinates.x['hover24'] = x_res-153-x_offset-_x*30
+                        prim_coordinates.y['hover24'] = y_res-y_offset-25*_y
+                        windower.prim.set_position("hover24",prim_coordinates.x['hover24'],prim_coordinates.y['hover24'])
                         last_x = _x
                         last_y = _y
                     end
@@ -410,7 +416,9 @@ register_events = function(bool)
                         prim_coordinates.visible['hover24'] = false
                     end
                     if _x ~= last_x32 or _y ~= last_y32 then
-                        windower.prim.set_position("hover32",x_res-153-x_offset-_x*33,y_res-y_offset-33*_y-25*(party[1].n+vacancies[1])-2*_y)
+                        prim_coordinates.x['hover32'] = x_res-153-x_offset-_x*33
+                        prim_coordinates.y['hover32'] = y_res-y_offset-33*_y-25*(party[1].n+vacancies[1])-2*_y
+                        windower.prim.set_position("hover32",prim_coordinates.x['hover32'],prim_coordinates.y['hover32'])
                         last_x32 = _x
                         last_y32 = _y
                     end
@@ -446,7 +454,7 @@ register_events = function(bool)
                         dragged = true
                         return true
                     end
-                    _y = math.ceil((y_res-y-y_offset-25*party[1].n)/35)
+                    _y = math.ceil((y_res-y-y_offset-25*(party[1].n+vacancies[1]))/35)
                     _x = math.ceil((x_res-x-x_offset-152)/33)
                     if mouse_map2[_y] and mouse_map2[_y][_x] then
                         local spell = mouse_map2[_y][_x]
@@ -470,7 +478,7 @@ register_events = function(bool)
                         return true
                     end
                 else
-                    _y = math.ceil((y_res-y-y_offset-25*party[1].n)/35)
+                    _y = math.ceil((y_res-y-y_offset-25*(party[1].n+vacancies[1]))/35)
                     _x = math.ceil((_x-152)/33)
                     if mouse_map2[_y] and mouse_map2[_y][_x] then
                         spell_default = mouse_map2[_y][_x]
@@ -594,6 +602,7 @@ register_events = function(bool)
                         stat_table[id].name = packet['Name']
                         windower.text.set_text("name"..pos_tostring,prepare_names(packet['Name']))
                         who_am_i[id] = nil
+                        update_name_map(id,packet['Name'])
                     end
                 elseif is_zoning or seeking_information[packet['ID']] then
                     local to_update = L{}
@@ -616,6 +625,7 @@ register_events = function(bool)
                         stats.name = packet['Name']
                         windower.text.set_text("name"..pos_tostring,prepare_names(packet['Name']))
                         who_am_i[id] = false
+                        update_name_map(id,packet['Name'])
                     end
                     seeking_information[id] = false
                     out_of_zone[id] = false
