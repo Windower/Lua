@@ -44,6 +44,8 @@ party_two_keys = S{'a10', 'a11', 'a12', 'a13', 'a14', 'a15'}
 party_three_keys = S{'a20', 'a21', 'a22', 'a23', 'a24', 'a25'}
 seeking_information={}
 macro_order=T{nil,L{},nil,L{},L{}}
+mouse_map2=T{}
+vacancies={0,0,0}
 
 help_text = [[Nostrum command list.
 help: Prints a list of these commands in the console.
@@ -199,6 +201,7 @@ prefix={
     ["Flurry"]='/ma',
     ["Regen III"]='/ma',
     ["Shell V"]='/ma',
+    [""]='/echo No spell selected: ',
 }
 
 options={

@@ -246,6 +246,9 @@ function build_macro()
         image_row(macro_order[5],x_start,y_start+1)
     end
     
+    prim_simple("hover24",table.set(_defaults.primitives.highlight,'visible',false),0,0,29,24)
+    prim_simple("hover32",table.set(_defaults.primitives.highlight,'visible',false),0,0,32,32)
+
     toggle_macro_visibility(1)
     toggle_macro_visibility(2)
     toggle_macro_visibility(3)
@@ -268,8 +271,8 @@ do
         stat_table = {}
         party = {L{},L{},L{}}
         count_cures(profile)
-        count_buffs(profile)
         count_na(profile)
+        count_buffs(profile)
 
         for i=1,18 do
             local pkey = alliance_keys[i]
@@ -351,6 +354,12 @@ do
     local zone_change_event
     local keyboard_event
     local mouse_event
+    local last_x,last_y = 0,0
+    local last_x32,last_y32 = 0,0
+    local x_offset = _defaults.window.x_offset
+    local y_offset = _defaults.window.y_offset
+    local x_res = settings.window.x_res
+    local y_res = settings.window.y_res
 
 register_events = function(bool)
     if bool then
@@ -367,93 +376,110 @@ register_events = function(bool)
         end)
         
         mouse_event = windower.register_event('mouse', function(type, x, y, delta, blocked)
-            if is_hidden then
-                return
-            end
+            if is_hidden then return end
             if type == 0 then
-                for i=1,regions do
-                    if (y>b[i] and y<t[i]) and (x>l[i] and x<r[i]) then
-                        if not macro_visibility[i] then
-                            toggle_macro_visibility(i)
-                        end
-                        local p = 'p' .. macro_order[i][math.ceil((x-l[i])/30)] .. tostring(6*i + 1 - math.ceil((y-b[i])/25))
-                        hover(p)
-                    else
-                        if i == 1 then
-                            if y>b[4] and y<t[4]+2 and x>l[4] and x<r[4] then
-                                if not macro_visibility[1] then
-                                    toggle_macro_visibility(1)
-                                end
-                                local p = 'p' .. macro_order[4][math.ceil((x-l[4])/33)]
-                                hover(p)
-                                return
-                            elseif y>b[5] and y<t[5]+1 and x>l[5] and x<r[5] then
-                                if not macro_visibility[1] then
-                                    toggle_macro_visibility(1)
-                                end
-                                local p = 'p' .. macro_order[5][math.ceil((x-l[5])/33)]
-                                hover(p)
-                                return
-                            end
-                        end
-                        if macro_visibility[i] then
-                            toggle_macro_visibility(i)
-                        end
+                local _x = math.ceil((x_res-x-x_offset-152)/30)
+                local _y = math.ceil((y_res-y-y_offset)/25)
+                if mouse_map[_y] and mouse_map[_y][_x] then
+                    if not macro_visibility[position_to_region_map[_y]] then
+                        toggle_macro_visibility(position_to_region_map[_y])
                     end
+                    if not prim_coordinates.visible['hover24'] then
+                        windower.prim.set_visibility("hover24",true)
+                        windower.prim.set_visibility("hover32",false)
+                        prim_coordinates.visible['hover32'] = false
+                        prim_coordinates.visible['hover24'] = true
+                    end
+                    if _x ~= last_x or _y ~= last_y then
+                        windower.prim.set_position("hover24",x_res-153-x_offset-_x*30,y_res-y_offset-25*_y)
+                        last_x = _x
+                        last_y = _y
+                    end
+                    return
+                end
+                _y = math.ceil((y_res-y-y_offset-25*(party[1].n+vacancies[1]))/35)
+                _x = math.ceil((x_res-x-x_offset-152)/33)
+                if mouse_map2[_y] and mouse_map2[_y][_x] then
+                    if not macro_visibility[1] then
+                        toggle_macro_visibility(1)
+                    end
+                    if not prim_coordinates.visible['hover32'] then
+                        windower.prim.set_visibility("hover32",true)
+                        windower.prim.set_visibility("hover24",false)
+                        prim_coordinates.visible['hover32'] = true
+                        prim_coordinates.visible['hover24'] = false
+                    end
+                    if _x ~= last_x32 or _y ~= last_y32 then
+                        windower.prim.set_position("hover32",x_res-153-x_offset-_x*33,y_res-y_offset-33*_y-25*(party[1].n+vacancies[1])-2*_y)
+                        last_x32 = _x
+                        last_y32 = _y
+                    end
+                    return
+                end
+                for i = 1,3 do
+                    if macro_visibility[i] then
+                        toggle_macro_visibility(i)
+                    end
+                end
+                if prim_coordinates.visible['hover32'] then
+                    windower.prim.set_visibility("hover32",false)
+                    prim_coordinates.visible['hover32'] = false
+                end
+                if prim_coordinates.visible['hover24'] then
+                    windower.prim.set_visibility("hover24",false)
+                    prim_coordinates.visible['hover24'] = false
                 end
             elseif type == 1 then
-                for i=1,regions do
-                    if y>b[i] and y<t[i] then
-                        if x>l[i] and x<r[i] then
-                            determine_response(x,i,30,y)
-                            dragged = true
-                            return true
-                        elseif x>l[i+5] and x<r[i+5] then
-                            windower.send_command('%sinput /target %s':format(send_string,stat_table[party[i][math.ceil((y-b[i])/25)]].name))
-                            dragged = true
-                            return true
-                        end
+                local _x = (x_res-x-x_offset)
+                local _y = math.ceil((y_res-y-y_offset)/25)
+                if _x < 153 then
+                    if region_to_name_map[_y] then
+                        windower.send_command('%sinput /target %s':format(send_string,region_to_name_map[_y]))
+                        dragged = true
+                        return true
+                    end
+                else
+                    _x = math.ceil((_x-152)/30)
+                    if mouse_map[_y] and mouse_map[_y][_x] then
+                        local spell = mouse_map[_y][_x]
+                        windower.send_command('%sinput %s "%s" %s':format(send_string, prefix[spell], spell, region_to_name_map[_y]))
+                        dragged = true
+                        return true
+                    end
+                    _y = math.ceil((y_res-y-y_offset-25*party[1].n)/35)
+                    _x = math.ceil((x_res-x-x_offset-152)/33)
+                    if mouse_map2[_y] and mouse_map2[_y][_x] then
+                        local spell = mouse_map2[_y][_x]
+                        windower.send_command('%sinput %s "%s" %s':format(send_string, prefix[spell], spell, '<t>'))
+                        dragged = true
+                        return true
                     end
                 end
-                if y>b[4] and y<t[4] and x>l[4] and x<r[4] then
-                    determine_response(x,4,33)
-                    dragged = true
-                    return true
-                elseif y>b[5] and y<t[5] and x>l[5] and x<r[5] then
-                    determine_response(x,5,33)
-                    dragged = true
-                    return true
-                end
-            elseif type == 2 then 
+            elseif type == 2 then
                 if dragged then
                     dragged = false
                     return true
                 end
             elseif type == 4 then
-                for i=1,regions do
-                    if y>b[i] and y<t[i] then
-                        if x>l[i+5] and x<r[i+5] then
-                            windower.send_command('%sinput %s "%s" %s':format(send_string, prefix[spell_default] or '', spell_default, stat_table[party[i][math.ceil((y-b[i])/25)]].name))
-                            dragged = true
-                            return true
-                        end
+                local _x = (x_res-x-x_offset)
+                local _y = math.ceil((y_res-y-y_offset)/25)
+                if _x < 153 then
+                    if region_to_name_map[_y] then
+                        windower.send_command('%sinput %s "%s" %s':format(send_string, prefix[spell_default] or '', spell_default, region_to_name_map[_y]))
+                        dragged = true
+                        return true
                     end
-                end
-            
-                if y>b[4] and y<t[4] and x>l[4] and x<r[4] then
-                    spell_default = macro_order[4][math.ceil((x-l[4])/33)]
-                    windower.text.set_text('menu', spell_default)
-                    text_coordinates.x['menu'] = prim_coordinates.x['pmenu'] + 1 + (150 - 7.55 * string.length(spell_default))/2
-                    windower.text.set_location('menu',text_coordinates.x['menu'],text_coordinates.y['menu'])
-                    dragged = true
-                    return true
-                elseif y>b[5] and y<t[5] and x>l[5] and x<r[5] then
-                    spell_default = macro_order[5][math.ceil((x-l[5])/33)]
-                    windower.text.set_text('menu', spell_default)
-                    text_coordinates.x['menu'] = prim_coordinates.x['pmenu'] + 1 + (150 - 7.55 * string.length(spell_default))/2
-                    windower.text.set_location('menu',text_coordinates.x['menu'],text_coordinates.y['menu'])
-                    dragged = true
-                    return true
+                else
+                    _y = math.ceil((y_res-y-y_offset-25*party[1].n)/35)
+                    _x = math.ceil((_x-152)/33)
+                    if mouse_map2[_y] and mouse_map2[_y][_x] then
+                        spell_default = mouse_map2[_y][_x]
+                        windower.text.set_text('menu', spell_default)
+                        text_coordinates.x['menu'] = prim_coordinates.x['pmenu'] + 1 + (150 - 7.55 * string.length(spell_default))/2
+                        windower.text.set_location('menu',text_coordinates.x['menu'],text_coordinates.y['menu'])
+                        dragged = true
+                        return true
+                    end
                 end
             elseif type == 5 then
                 if dragged then
@@ -469,7 +495,6 @@ register_events = function(bool)
                 if packet['Target Index'] ~= last_index or last_index == stat_table[player_id].index then
                     update_target(windower.ffxi.get_mob_by_index(packet['Target Index']))
                 end
-                
                 local position = position
                 if position[1][6] ~= packet['X'] or position[2][6] ~= packet['Y'] then
                     position[1][6],position[2][6] = packet['X'],packet['Y']

@@ -96,6 +96,9 @@ function count_na(t)
             macro_order[4]:append(xml_to_lua[options.na[i]]) 
         end
     end
+    if macro_order[4].n ~= 0 then
+        mouse_map2:append(T(macro_order[4]))
+    end
     --macro_order.nas = list.reverse(macro_order.nas)
 end
 
@@ -106,6 +109,9 @@ function count_buffs(t)
             _buffs=_buffs+1 
             macro_order[5]:append(xml_to_lua[options.buffs[i]]) 
         end
+    end
+    if macro_order[5].n ~= 0 then
+        mouse_map2:append(T(macro_order[5]))
     end
     --macro_order.buffs = list.reverse(macro_order.buffs)
 end
@@ -141,26 +147,6 @@ function merge_user_file_and_settings(t,u)
         end
     end
     return u
-end
-
-last_hover='BG1'
-function hover(p)
-    if is_hidden or p==last_hover then return end
-    
-    windower.prim.set_color(last_hover,prim_coordinates.a[last_hover],prim_coordinates.r[last_hover],prim_coordinates.g[last_hover],prim_coordinates.b[last_hover])
-    windower.prim.set_visibility(last_hover,prim_coordinates.visible[last_hover] and
-        (   
-           (macro[1]:contains(last_hover) and macro_visibility[1])
-        or (macro[2]:contains(last_hover) and macro_visibility[2])
-        or (macro[3]:contains(last_hover) and macro_visibility[3])
-        )
-    )
-    
-    last_hover=p
-
-    windower.prim.set_color(p,_settings.primitives.highlight.color.a,_settings.primitives.highlight.color.r,_settings.primitives.highlight.color.g,_settings.primitives.highlight.color.b)
-    windower.prim.set_visibility(p,true)
-
 end
 
 function indicate_distance(bool,n,x,y)
@@ -217,6 +203,7 @@ function wrecking_ball()
     for i=1,5 do
         macro_order[i]:clear()
     end
+    mouse_map2:clear()
 end
 
 function toggle_visibility()
@@ -260,16 +247,14 @@ function toggle_macro_visibility(n)
                 windower.text.set_visibility(key,false)
             end
         end
-        windower.prim.set_color(last_hover,prim_coordinates.a[last_hover],prim_coordinates.r[last_hover],prim_coordinates.g[last_hover],prim_coordinates.b[last_hover])
-        last_hover='BG1'
     end
 end
 
 function switch_profiles()
     wrecking_ball()
     count_cures(profile)
-    count_buffs(profile)
     count_na(profile)
+    count_buffs(profile)
     coroutine.sleep(1)
     build_macro()
     define_active_regions()
@@ -364,7 +349,7 @@ function update_target_hp(hpp)
 end
 
 function compare_alliance_to_memory()
-    alliance_clone = windower.ffxi.get_party()
+    local alliance_clone = windower.ffxi.get_party()
     local ally_id=(table.keyset(alliance_clone))
     local party1 = (party_keys * ally_id)
     local party2 = (party_two_keys * ally_id)
@@ -391,17 +376,6 @@ function compare_alliance_to_memory()
             who_am_i[k] = nil
         end
     end
-end
-
-function determine_response(x,region,w,y)
-    local target
-    local spell=macro_order[region][math.ceil((x-l[region])/w)]
-    if y then 
-        target = stat_table[party[region][math.ceil((y-b[region])/25)]].name
-    else
-        target = '<t>'
-    end
-    windower.send_command('%sinput %s "%s" %s':format(send_string, prefix[spell], spell, target))
 end
 
 function new_members(packet_pt_struc) -- snippet from invite, reused in c_a_t_m
@@ -432,7 +406,7 @@ function invite(id,n)
     who_am_i[id] = true
     local m = tostring(n)
     local pos_tostring = tostring(pos_id)
-    if not saved_prims:contains('phpp' .. pos_tostring) then
+    if vacancies[n] == 0 then
         lift_macro(n)
         if not saved_prims:contains('BG'..m) then
             local y_start = prim_coordinates.y['BG'..tostring(n-1)]-(175-75*(n-1))-ptn*(h+1)
@@ -458,6 +432,7 @@ function invite(id,n)
         prims_by_layer[pos_id]:extend(L{"phpp" ..pos_tostring,"pmpp" ..pos_tostring})
         texts_by_layer[pos_id]:extend(L{"tp" ..pos_tostring,"name" ..pos_tostring,"hpp" ..pos_tostring,"hp" ..pos_tostring,"mp" ..pos_tostring})
     else
+        vacancies[n] = vacancies[n]-1
         windower.text.set_text('name'..pos_id,stat_table[id].name)
     end
     local pos = windower.ffxi.get_mob_by_id(id)
@@ -468,7 +443,6 @@ function invite(id,n)
     elseif not out_of_view[pos_id] then
         indicate_distance(true,pos_id)
     end
-
 end
 
 function lift_macro(n)
@@ -613,6 +587,7 @@ function trim_macro()
             end
         end
     end
+    vacancies={0,0,0}
     define_active_regions()
 end
 
@@ -626,6 +601,7 @@ function kick(id,n)
     local i = position_lookup[id]
     party[n]:remove(6*n+1-i)
     local j = 6*(n)-party[n].n
+    vacancies[n] = vacancies[n] + 1
     
     while i > j do
         local m = 6*n+1-i
@@ -658,83 +634,54 @@ function kick(id,n)
     who_am_i[id] = nil
     seeking_information[id] = nil
     position_lookup[id] = nil
-    define_active_regions()
 end
 
 function define_active_regions()
-    regions = 1
-    l[1] = prim_coordinates.x['BG1']
-    r[1] = prim_coordinates.x['info1']
-    t[1] = prim_coordinates.y['BG1'] + party[1].n*(h+1)
-    b[1] = prim_coordinates.y['BG1']
-    l[6] = prim_coordinates.x['info1']
-    r[6] = prim_coordinates.x['info1']+152
-    t[6] = prim_coordinates.y['info1'] + party[1].n*(h+1)
-    b[6] = prim_coordinates.y['info1']
-    if party[2].n ~= 0 then
-        regions = regions + 1
-        l[2] = prim_coordinates.x['BG2']
-        r[2] = prim_coordinates.x['info2']
-        t[2] = prim_coordinates.y['BG2'] + party[2].n*(h+1)
-        b[2] = prim_coordinates.y['BG2']
-        l[7] = prim_coordinates.x['info2']
-        r[7] = prim_coordinates.x['info2']+152
-        t[7] = prim_coordinates.y['info2'] + party[2].n*(h+1)
-        b[7] = prim_coordinates.y['info2']
-    else
-        l[2] = 0
-        r[2] = 0
-        t[2] = 0
-        b[2] = 0
-        l[7] = 0
-        r[7] = 0
-        t[7] = 0
-        b[7] = 0
+    mouse_map=T{}
+    region_to_name_map=T{}
+    position_to_region_map=T{}
+    local copy={{},{},{}} -- lists accept negative indices
+    for j = 1,3 do
+        for i = 1,macro_order[j].n do
+            copy[j][i] = macro_order[j][i]
+        end
     end
-    
-    if party[3].n ~= 0 then
-        regions = regions + 1
-        l[3] = prim_coordinates.x['BG3']
-        r[3] = prim_coordinates.x['info3']
-        t[3] = prim_coordinates.y['BG3'] + party[3].n*(h+1)
-        b[3] = prim_coordinates.y['BG3']
-        l[8] = prim_coordinates.x['info3']
-        r[8] = prim_coordinates.x['info3']+152
-        t[8] = prim_coordinates.y['info3'] + party[3].n*(h+1)
-        b[8] = prim_coordinates.y['info3']
-    else
-        l[3] = 0
-        r[3] = 0
-        t[3] = 0
-        b[3] = 0
-        l[8] = 0
-        r[8] = 0
-        t[8] = 0
-        b[8] = 0
+    for i = 1,vacancies[1] do
+        mouse_map:append(false)
+        region_to_name_map:append(false)
+        position_to_region_map:append(false)
     end
-    
-    if _na ~= 0 then
-        l[4] = prim_coordinates.x['BGna']
-        r[4] = prim_coordinates.x['info1']
-        t[4] = prim_coordinates.y['BGna']+34
-        b[4] = prim_coordinates.y['BGna']
-    else
-        l[4] = 0
-        r[4] = 0
-        t[4] = 0
-        b[4] = 0
+    for i = 1,party[1].n do
+        mouse_map:append(copy[1])
+        region_to_name_map:append(stat_table[party[1][party[1].n-i+1]].name)
+        position_to_region_map:append(1)
     end
-    
-    if _buffs ~= 0 then
-        l[5] = prim_coordinates.x['BGbuffs']
-        r[5] = prim_coordinates.x['info1']
-        t[5] = prim_coordinates.y['BGbuffs']+34
-        b[5] = prim_coordinates.y['BGbuffs']
-    else
-        l[5] = 0
-        r[5] = 0
-        t[5] = 0
-        b[5] = 0
+    for i = 1,4 do
+        mouse_map:append(false)
+        region_to_name_map:append(false)
+        position_to_region_map:append(false)
     end
-    
+    for i = 1,vacancies[2] do
+        mouse_map:append(false)
+        region_to_name_map:append(false)
+        position_to_region_map:append(false)
+    end
+    for i = 1,party[2].n do
+        mouse_map:append(copy[2])
+        region_to_name_map:append(stat_table[party[2][party[2].n-i+1]].name)
+        position_to_region_map:append(2)
+    end
+    mouse_map:append(false)
+    region_to_name_map:append(false)
+    position_to_region_map:append(false)
+    for i = 1,vacancies[3] do
+        mouse_map:append(false)
+        region_to_name_map:append(false)
+        position_to_region_map:append(false)
+    end
+    for i = 1,party[3].n do
+        mouse_map:append(copy[3])
+        region_to_name_map:append(stat_table[party[3][party[3].n-i+1]].name)
+        position_to_region_map:append(3)
+    end
 end
