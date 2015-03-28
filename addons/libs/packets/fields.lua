@@ -609,16 +609,14 @@ types.lockstyleset = L{
 }
 
 -- lockstyleset
-fields.outgoing[0x53] = function(data)
-    local count = data:byte(5,5)
-    return L{
+fields.outgoing[0x53] = L{
         -- First 4 bytes are a header for the set
-        {ctype='unsigned char',     label='Count',              const=count},       -- 04
-        {ctype='unsigned char[3]',  label='_unknown1'},                             -- 05   Only the value 03 00 00 observed for me. Purpose unclear.
-        {ref=types.lockstyleset,  count=count},                                     -- 08
-        {ctype='unsigned int['..(16-count)..']',  label='_padding1',   const=0x00}, -- 0?
+        {ctype='unsigned char',     label='Count'},                             -- 04
+        {ctype='unsigned char',     label='Type'},                              -- 05   0 = "Stop locking style", 1 = "Continue locking style", 3 = "Lock style in this way". Might be flags?
+        {ctype='unsigned short',    label='_unknown1',      const=0x0000},      -- 06
+        {ref=types.lockstyleset,    count=16},                                  -- 08
     }
-end
+
 
 -- End Synth
 -- This packet is sent after receiving a result when synthesizing.
