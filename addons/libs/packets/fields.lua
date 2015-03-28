@@ -599,6 +599,27 @@ fields.outgoing[0x052] = L{
     {ref=types.equipset_build,  lookup={res.slots, 0x00},   count=0x10},        -- 0C
 }
 
+types.lockstyleset = L{
+    {ctype='unsigned char',     label='Inventory Index'},                       -- 00
+    {ctype='unsigned char',     label='Equipment Slot',     fn=slot},           -- 01
+    {ctype='unsigned char',     label='Bag',                fn=bag},            -- 02
+    {ctype='unsigned char',     label='_unknown2',          const=0x00},        -- 03
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 04
+    {ctype='unsigned short',    label='_unknown3',          const=0x0000},      -- 06
+}
+
+-- lockstyleset
+fields.outgoing[0x53] = function(data)
+    local count = data:byte(5,5)
+    return L{
+        -- First 4 bytes are a header for the set
+        {ctype='unsigned char',     label='Count',              const=count},       -- 04
+        {ctype='unsigned char[3]',  label='_unknown1'},                             -- 05   Only the value 03 00 00 observed for me. Purpose unclear.
+        {ref=types.lockstyleset,  count=count},                                     -- 08
+        {ctype='unsigned int['..(16-count)..']',  label='_padding1',   const=0x00}, -- 0?
+    }
+end
+
 -- End Synth
 -- This packet is sent after receiving a result when synthesizing.
 fields.outgoing[0x059] = L{
