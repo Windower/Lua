@@ -130,6 +130,7 @@ windower.register_event('addon command', function(command, ...)
     elseif command == 'auto' then
         if params[1] == 'on' then
             settings.autolock = true
+            config.save(settings)
             al_output('Autolock on zone is now %s.':format(bool_to_str(settings.auto_lock)))
         elseif params[1] == 'off' then
             settings.autolock = false
@@ -141,6 +142,7 @@ windower.register_event('addon command', function(command, ...)
         if params[1] then
             windower.send_command('unbind %s':format(settings.key_bind))
             settings.key_bind = params[1]
+            config.save(settings)
             windower.send_command('bind %s al':format(settings.key_bind))
             al_output('Toggle key_bind set to: %s':format(settings.key_bind))
         else
@@ -149,6 +151,7 @@ windower.register_event('addon command', function(command, ...)
     elseif command == 'delay' then
         if tonumber(params[1]) ~= nil then
             settings.zone_delay = tonumber(params[1])
+            config.save(settings)
             al_output('Zone delay set to %.1fs.':format(math.floor(settings.zone_delay)))
         else
             error('Invalid argument: Number of seconds. Usage: //al delay 10')
@@ -156,6 +159,7 @@ windower.register_event('addon command', function(command, ...)
     elseif command == 'lockset' then
         if params[1] then
             settings.lock_set = params[1]
+            config.save(settings)
             al_output('Lockstyle set is now: &s':format(settings.lock_set))
         else
             error('Missing argument. Example: //al lockset sets.lockstyle')

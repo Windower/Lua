@@ -599,6 +599,25 @@ fields.outgoing[0x052] = L{
     {ref=types.equipset_build,  lookup={res.slots, 0x00},   count=0x10},        -- 0C
 }
 
+types.lockstyleset = L{
+    {ctype='unsigned char',     label='Inventory Index'},                       -- 00
+    {ctype='unsigned char',     label='Equipment Slot',     fn=slot},           -- 01
+    {ctype='unsigned char',     label='Bag',                fn=bag},            -- 02
+    {ctype='unsigned char',     label='_unknown2',          const=0x00},        -- 03
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 04
+    {ctype='unsigned short',    label='_unknown3',          const=0x0000},      -- 06
+}
+
+-- lockstyleset
+fields.outgoing[0x53] = L{
+        -- First 4 bytes are a header for the set
+        {ctype='unsigned char',     label='Count'},                             -- 04
+        {ctype='unsigned char',     label='Type'},                              -- 05   0 = "Stop locking style", 1 = "Continue locking style", 3 = "Lock style in this way". Might be flags?
+        {ctype='unsigned short',    label='_unknown1',      const=0x0000},      -- 06
+        {ref=types.lockstyleset,    count=16},                                  -- 08
+    }
+
+
 -- End Synth
 -- This packet is sent after receiving a result when synthesizing.
 fields.outgoing[0x059] = L{

@@ -37,6 +37,7 @@ data.outgoing[0x04E] = {name='Auction',             description='Used to bid on 
 data.outgoing[0x050] = {name='Equip',               description='This command is used to equip your character.'}
 data.outgoing[0x051] = {name='Equipset',            description='This packet is sent when using /equipset.'}
 data.outgoing[0x052] = {name='Equipset Build',      description='This packet is sent when building an equipset.'}
+data.outgoing[0x053] = {name='Lockstyleset',        description='This packet is sent when locking to an equipset.'}
 data.outgoing[0x059] = {name='End Synth',           description='This packet is sent to end a synth.'}
 data.outgoing[0x05A] = {name='Conquest',            description='This command asks the server for data pertaining to conquest/besieged status.'}
 data.outgoing[0x05B] = {name='Dialog choice',       description='Chooses a dialog option.'}
