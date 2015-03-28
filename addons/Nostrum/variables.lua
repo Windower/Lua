@@ -1,4 +1,4 @@
---[[Copyright © 2014, trv
+--[[Copyright © 2014-2015, trv
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -26,47 +26,67 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
 w=29
 h=24
-tab_keys=S{16,18,82,203,205,210}
+tab_keys={[15]=true,[16]=true,[18]=true,[28]=true,[82]=true,[203]=true,[205]=true,[210]=true,}
 spell_default=''
 send_string = ''
-to_update=L{}
 
 saved_prims=S{}
 saved_texts=S{}
 prims_by_layer={L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{}}
 texts_by_layer={L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{},L{}}
 misc_hold_for_up={texts=T{},prims=T{}}
-macro = {[1]=S{},[2]=S{},[3]=S{}}
-macro_visibility = {[1]=false,[2]=false,[3]=false}
+macro = {S{},S{},S{}}
+macro_visibility = {[1]=true,[2]=true,[3]=true}
 text_coordinates={x=T{},y=T{},visible=T{}}
 prim_coordinates={x=T{},y=T{},visible=T{},a=T{},r=T{},g=T{},b=T{}}
 party_keys = S{'p0', 'p1', 'p2', 'p3', 'p4', 'p5'}
 party_two_keys = S{'a10', 'a11', 'a12', 'a13', 'a14', 'a15'}
 party_three_keys = S{'a20', 'a21', 'a22', 'a23', 'a24', 'a25'}
-seeking_information=S{}
-macro_order=T{cures=L{},curagas=L{},buffs=L{},nas=L{}}
-position = {
-    L{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    L{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-    L{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
-}
-out_of_zone=S{}
-out_of_range=S{}
-who_am_i=S{}
-packet_pt_struc = {S{},S{},S{}}
+seeking_information={}
+macro_order=T{nil,L{},nil,L{},L{}}
+mouse_map2=T{}
+vacancies={0,0,0}
 
-l={} r={} t={} b={}
-region_map = {[1]='curagas',[2]='cures',[3]='cures',[4]='nas',[5]='buffs'}
-local dragged = false
+help_text = [[Nostrum command list.
+help: Prints a list of these commands in the console.
+refresh(r): Compares the macro's current party structures to
+ - the alliance structure in memory.
+hide(h): Toggles the macro's visibility.
+cut(c): Trims the macro down to size, removing blank spaces.
+profile(p) <name>: Loads a new profile from the settings file.
+send(s) <name>: Requires 'send' addon. Sends commands to the
+ - character whose name is provided. If no name is provided,
+ - send will reset and commands will be sent to the character
+ - with Nostrum loaded.]]
+
+position = {
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+}
+out_of_zone={}
+out_of_range={
+    false,false,false,false,false,false,
+    false,false,false,false,false,false,
+    false,false,false,false,false,false,
+}
+out_of_view={
+    false,false,false,false,false,false,
+    false,false,false,false,false,false,
+    false,false,false,false,false,false,
+}
+who_am_i={}
+
+dragged = false
 is_zoning = false
 is_hidden = false
-regions = 0
 
 font_widths={
-    ['I']=9,['II']=17,['III']=25,['IV']=24,['V']=16,['1']=10,['2']=11,['3']=11,
-    ['4']=11,['5']=11,['6']=12,['˹1˼']=25,['˹2˼']=25,['˹3˼']=25,['˹4˼']=25,['˹5˼']=25,
+    ['I']=9,['II']=17,['III']=25,['IV']=24,['V']=16,
+    ['1']=10,['2']=11,['3']=11,['4']=11,['5']=11,['6']=12,
+    ['˹1˼']=25,['˹2˼']=25,['˹3˼']=25,['˹4˼']=25,['˹5˼']=25,
     ['˹I˼']=23,['˹II˼']=31,
 }
+
 xml_to_lua={
 	["cure"]="Cure",
     ["cureii"]="Cure II",
@@ -179,164 +199,166 @@ prefix={
     ["Flurry"]='/ma',
     ["Regen III"]='/ma',
     ["Shell V"]='/ma',
+    [""]='/echo No spell selected: ',
 }
 
-options={}
-options.cures={
-    [1]="cure",
-    [2]="cureii",
-    [3]="cureiii",
-    [4]="cureiv",
-    [5]="curev",
-    [6]="curevi",
-    [7]="curingwaltz",
-    [8]="curingwaltzii",
-    [9]="curingwaltziii",
-    [10]="curingwaltziv",
-    [11]="curingwaltzv",
-}
-options.curagas={
-    [12]="curaga",
-    [13]="curagaii",
-    [14]="curagaiii",
-    [15]="curagaiv",
-    [16]="curagav",
-    [17]="divinewaltz",
-    [18]="divinewaltzii",
-}
-options.buffs=L{
-    "haste",
-    "hasteii",
-    "flurry",
-    "flurryii",
-    "protect",
-    "shell",
-    "protectii",
-    "shellii",
-    "protectiii",
-    "shelliii",
-    "protectiv",
-    "shelliv",
-    "protectv",
-    "shellv",
-    "refresh",
-    "refreshii",
-    "regen",
-    "regenii",
-    "regeniii",
-    "regeniv",
-    "regenv",
-    "phalanxii",
-    "adloquium",
-    "animusminuo",
-    "animusaugeo",
-    "embrava"
-}
-options.na=L{
-    "erase",
-    "paralyna",
-    "silena",
-    "blindna",
-    "poisona",
-    "viruna",
-    "stona",
-    "cursna",
-    "sacrifice",
-    "healingwaltz",
-}
-options.aliases={
-    ["cure"]="1",
-    ["cureii"]="2",
-    ["cureiii"]="3",
-    ["cureiv"]="4",
-    ["curev"]="5",
-    ["curevi"]="6",
-    ["curaga"]="I",
-    ["curagaii"]="II",
-    ["curagaiii"]="III",
-    ["curagaiv"]="IV",
-    ["curagav"]="V",
-    ["sacrifice"]="Sac",
-    ["erase"]="Eras",
-    ["paralyna"]="Para",
-    ["silena"]="Slna",
-    ["blindna"]="Blnd",
-    ["poisona"]="Psna",
-    ["viruna"]="Viru",
-    ["stona"]="Stna",
-    ["cursna"]="Curs",
-    ["haste"]="Haste",
-    ["hasteii"]="Haste",
-    ["flurry"]="Flry",
-    ["flurryii"]="Flry",
-    ["protect"]="Pro",
-    ["shell"]="Shl",
-    ["protectii"]="Pro",
-    ["shellii"]="Shl",
-    ["protectiii"]="Pro",
-    ["shelliii"]="Shl",
-    ["protectiv"]="Pro",
-    ["shelliv"]="Shl",
-    ["protectv"]="Pro",
-    ["shellv"]="Shl",
-    ["refresh"]="Ref",
-    ["refreshii"]="Ref",
-    ["regen"]="Reg",
-    ["regenii"]="Reg",
-    ["regeniii"]="Reg",
-    ["regeniv"]="Reg",
-    ["regenv"]="Reg",
-    ["phalanxii"]="Phlx",
-    ["adloquium"]="TP+",
-    ["animusaugeo"]="Enm+",
-    ["animusminuo"]="Enm-",
-    ["embrava"]="Embr",
-    ["curingwaltz"]="˹1˼",
-    ["curingwaltzii"]="˹2˼",
-    ["curingwaltziii"]="˹3˼",
-    ["curingwaltziv"]="˹4˼",
-    ["curingwaltzv"]="˹5˼",
-    ["divinewaltz"]="˹I˼",
-    ["divinewaltzii"]="˹II˼",
-    ["healingwaltz"]="HW",
-}
-options.images={
-    ["sacrifice"]="00294",--"00094",
-    ["erase"]="00294",--="00143",
-    ["paralyna"]="00289",--="00015",
-    ["silena"]="00290",--="00017",
-    ["blindna"]="00295",--="00016",
-    ["poisona"]="00293",--="00014",
-    ["viruna"]="00288",--="00019",
-    ["stona"]="00291",--="00018",
-    ["cursna"]="00292",--"00020",
-    ["haste"]="00057",
-    ["hasteii"]="00358",
-    ["flurry"]="00056",
-    ["flurryii"]="00357",
-    ["protect"]="00043",
-    ["protectii"]="00044",
-    ["protectiii"]="00045",
-    ["protectiv"]="00046",
-    ["protectv"]="00047",
-    ["shell"]="00048",
-    ["shellii"]="00049",
-    ["shelliii"]="00050",
-    ["shelliv"]="00051",
-    ["shellv"]="00052",
-    ["refresh"]="00109",
-    ["refreshii"]="00473",
-    ["regen"]="00108",
-    ["regenii"]="00110",
-    ["regeniii"]="00111",
-    ["regeniv"]="00477",
-    ["regenv"]="00504",
-    ["phalanxii"]="00107",
-    ["adloquium"]="00495",
-    ["animusaugeo"]="00308",
-    ["animusminuo"]="00309",
-    ["embrava"]="00478",
-    ["healingwaltz"]="00143",
+options={
+    cures=L{
+        "cure",
+        "cureii",
+        "cureiii",
+        "cureiv",
+        "curev",
+        "curevi",
+        "curingwaltz",
+        "curingwaltzii",
+        "curingwaltziii",
+        "curingwaltziv",
+        "curingwaltzv",
+    },
+    curagas=L{
+        "curaga",
+        "curagaii",
+        "curagaiii",
+        "curagaiv",
+        "curagav",
+        "divinewaltz",
+        "divinewaltzii",
+    },
+    buffs=L{
+        "haste",
+        "hasteii",
+        "flurry",
+        "flurryii",
+        "protect",
+        "shell",
+        "protectii",
+        "shellii",
+        "protectiii",
+        "shelliii",
+        "protectiv",
+        "shelliv",
+        "protectv",
+        "shellv",
+        "refresh",
+        "refreshii",
+        "regen",
+        "regenii",
+        "regeniii",
+        "regeniv",
+        "regenv",
+        "phalanxii",
+        "adloquium",
+        "animusminuo",
+        "animusaugeo",
+        "embrava"
+    },
+    na=L{
+        "erase",
+        "paralyna",
+        "silena",
+        "blindna",
+        "poisona",
+        "viruna",
+        "stona",
+        "cursna",
+        "sacrifice",
+        "healingwaltz",
+    },
+    aliases={
+        ["Cure"]="1",
+        ["Cure II"]="2",
+        ["Cure III"]="3",
+        ["Cure IV"]="4",
+        ["Cure V"]="5",
+        ["Cure VI"]="6",
+        ["Curaga"]="I",
+        ["Curaga II"]="II",
+        ["Curaga III"]="III",
+        ["Curaga IV"]="IV",
+        ["Curaga V"]="V",
+        ["Sacrifice"]="Sac",
+        ["Erase"]="Eras",
+        ["Paralyna"]="Para",
+        ["Silena"]="Slna",
+        ["Blindna"]="Blnd",
+        ["Poisona"]="Psna",
+        ["Viruna"]="Viru",
+        ["Stona"]="Stna",
+        ["Cursna"]="Curs",
+        ["Haste"]="Haste",
+        ["Haste II"]="Haste",
+        ["Flurry"]="Flry",
+        ["Flurry II"]="Flry",
+        ["Protect"]="Pro",
+        ["Protect II"]="Pro",
+        ["Protect III"]="Pro",
+        ["Protect IV"]="Pro",
+        ["Protect V"]="Pro",
+        ["Shell"]="Shl",
+        ["Shell II"]="Shl",
+        ["Shell III"]="Shl",
+        ["Shell IV"]="Shl",
+        ["Shell V"]="Shl",
+        ["Refresh"]="Ref",
+        ["Refresh II"]="Ref",
+        ["Regen"]="Reg",
+        ["Regen II"]="Reg",
+        ["Regen III"]="Reg",
+        ["Regen IV"]="Reg",
+        ["Regen V"]="Reg",
+        ["Phalanx II"]="Phlx",
+        ["Adloquium"]="TP+",
+        ["Animus Augeo"]="Enm+",
+        ["Animus Minuo"]="Enm-",
+        ["Embrava"]="Embr",
+        ["Curing Waltz"]="˹1˼",
+        ["Curing Waltz II"]="˹2˼",
+        ["Curing Waltz III"]="˹3˼",
+        ["Curing Waltz IV"]="˹4˼",
+        ["Curing Waltz V"]="˹5˼",
+        ["Divine Waltz"]="˹I˼",
+        ["Divine Waltz II"]="˹II˼",
+        ["Healing Waltz"]="HW",
+    },
+    images={
+        ["Sacrifice"]="spells\\00294.png",
+        ["Erase"]="spells\\00294.png",
+        ["Paralyna"]="spells\\00289.png",
+        ["Silena"]="spells\\00290.png",
+        ["Blindna"]="spells\\00295.png",
+        ["Poisona"]="spells\\00293.png",
+        ["Viruna"]="spells\\00288.png",
+        ["Stona"]="spells\\00291.png",
+        ["Cursna"]="spells\\00292.png",
+        ["Haste"]="spells\\00057.png",
+        ["Hasteii"]="spells\\00358.png",
+        ["Flurry"]="spells\\00056.png",
+        ["Flurry II"]="spells\\00357.png",
+        ["Protect"]="spells\\00043.png",
+        ["Protect II"]="spells\\00044.png",
+        ["Protect III"]="spells\\00045.png",
+        ["Protect IV"]="spells\\00046.png",
+        ["Protect V"]="spells\\00047.png",
+        ["Shell"]="spells\\00048.png",
+        ["Shell II"]="spells\\00049.png",
+        ["Shell III"]="spells\\00050.png",
+        ["Shell IV"]="spells\\00051.png",
+        ["Shell V"]="spells\\00052.png",
+        ["Refresh"]="spells\\00109.png",
+        ["Refresh II"]="spells\\00473.png",
+        ["Regen"]="spells\\00108.png",
+        ["Regen II"]="spells\\00110.png",
+        ["Regen III"]="spells\\00111.png",
+        ["Regen IV"]="spells\\00477.png",
+        ["Regen V"]="spells\\00504.png",
+        ["Phalanx II"]="spells\\00107.png",
+        ["Adloquium"]="spells\\00495.png",
+        ["Animus Augeo"]="spells\\00308.png",
+        ["Animus Minuo"]="spells\\00309.png",
+        ["Embrava"]="spells\\00478.png",
+        ["Healing Waltz"]="abilities\\00215.png",
+    },
 }
 
 settings={
