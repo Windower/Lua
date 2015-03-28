@@ -312,7 +312,7 @@ function list.clear(l)
 end
 
 function list.copy(l, deep)
-    deep = deep or true
+    deep = deep ~= false and true
     local res = {}
 
     for key = 1, l.n do
