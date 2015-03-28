@@ -182,3 +182,7 @@ function menu_building_snippet()
         current_menu = {}
     end
 end
+
+function bit.is_set(val, pos) -- Credit: Arcon
+    return bit.band(val, 2^(pos - 1)) > 0
+end

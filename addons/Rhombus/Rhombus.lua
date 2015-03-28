@@ -31,6 +31,7 @@ _addon.version = '1.2.1'
 config = require('config')
 texts = require('texts')
 res = require('resources')
+bit = require('bit')
 require 'tables'
 require('lists')
 require('sets')
@@ -561,7 +562,7 @@ function format_response(n,p,bool)
 end
 
 windower.register_event('keyboard', function(dik, down, flags, blocked)
-    if dik == 42 and flags < 32 then
+    if dik == 42 and not bit.is_set(flags, 6) then
         is_shift_modified = down
     end
 end)
