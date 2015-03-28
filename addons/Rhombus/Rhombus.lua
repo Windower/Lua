@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
 _addon.name = 'Rhombus'
 _addon.author = 'trv'
-_addon.version = '1.2.0'
+_addon.version = '1.2.1'
 
 config = require('config')
 texts = require('texts')
@@ -37,7 +37,6 @@ require('sets')
 require('logger')
 require('defs')
 require('helper_functions')
-bit = require('bit')
 
 config.register(_defaults, function(settings_table)
     x_offset = settings_table.x_offset
@@ -149,7 +148,7 @@ function get_templates()
 end
 
 function menu_general_layout(t,t2,n)
-    available_category = S(t)
+    available_category = t
     if is_menu_open then
         if last_menu_open.type == n then
             is_menu_open = false
@@ -179,6 +178,7 @@ function menu_general_layout(t,t2,n)
                     end
                     build_a_menu(current_menu)
                 else
+                    close_a_menu()
                     current_menu = {}
                 end
             else
@@ -190,6 +190,7 @@ function menu_general_layout(t,t2,n)
                     last_menu_open.type = n
                     build_a_menu(current_menu)
                 else
+                    close_a_menu()
                     current_menu = {}
                 end
             end
@@ -214,6 +215,7 @@ function menu_general_layout(t,t2,n)
                 end
                 build_a_menu(current_menu)
             else
+                close_a_menu()
                 current_menu = {}
             end
         else
@@ -225,6 +227,7 @@ function menu_general_layout(t,t2,n)
                 last_menu_open.type = n
                 build_a_menu(current_menu)
             else
+                close_a_menu()
                 current_menu = {}
             end
         end
@@ -445,16 +448,16 @@ mouse_func = {
     [1] = function()
         active_buffs = S(windower.ffxi.get_player().buffs)
         number_of_jps = count_job_points()
-        menu_general_layout(setmetatable(windower.ffxi.get_spells(), _meta.S),spells_template,1)
+        menu_general_layout(windower.ffxi.get_spells(),spells_template,1)
     end,
     [2] = function()
-        menu_general_layout(windower.ffxi.get_abilities().weapon_skills,ws_template,2)
+        menu_general_layout(S(windower.ffxi.get_abilities().weapon_skills),ws_template,2)
     end,
     [3] = function()
-        menu_general_layout(remove_categories(windower.ffxi.get_abilities().job_abilities),ja_template,3)
+        menu_general_layout(S(remove_categories(windower.ffxi.get_abilities().job_abilities)),ja_template,3)
     end,
     [4] = function()
-        menu_general_layout(remove_categories(windower.ffxi.get_abilities().job_abilities),pet_command_template,4)
+        menu_general_layout(S(remove_categories(windower.ffxi.get_abilities().job_abilities)),pet_command_template,4)
     end,
 }
 
@@ -558,7 +561,7 @@ function format_response(n,p,bool)
 end
 
 windower.register_event('keyboard', function(dik, down, flags, blocked)
-    if dik == 42 and not (bit.band(flags,32) == 32) then
+    if dik == 42 and flags < 32 then
         is_shift_modified = down
     end
 end)

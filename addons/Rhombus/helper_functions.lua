@@ -163,8 +163,8 @@ function count_job_points()
 end
 
 function menu_building_snippet()
-    current_menu.type = last_menu_open.type
     if current_menu then
+        current_menu.type = last_menu_open.type
         last_menu_open = current_menu
         for i = 1,menu_layer_record.n do
             if current_menu[menu_layer_record[i]] then
@@ -178,6 +178,7 @@ function menu_building_snippet()
         end
         build_a_menu(current_menu)
     else
+        close_a_menu()
         current_menu = {}
     end
 end
