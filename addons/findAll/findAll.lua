@@ -170,7 +170,7 @@ item_names             = T{}
 global_storages        = T{}
 storages_path          = 'data/storages.json'
 storages_order         = L{'temporary', 'inventory', 'wardrobe', 'safe', 'storage', 'locker', 'satchel', 'sack', 'case'}
-storage_slips_order    = L{'slip 01', 'slip 02', 'slip 03', 'slip 04', 'slip 05', 'slip 06', 'slip 07', 'slip 08', 'slip 09', 'slip 10', 'slip 11', 'slip 12', 'slip 13', 'slip 14', 'slip 15', 'slip 16', 'slip 17', 'slip 18', 'slip 19'}
+storage_slips_order    = L{'slip 01', 'slip 02', 'slip 03', 'slip 04', 'slip 05', 'slip 06', 'slip 07', 'slip 08', 'slip 09', 'slip 10', 'slip 11', 'slip 12', 'slip 13', 'slip 14', 'slip 15', 'slip 16', 'slip 17', 'slip 18', 'slip 19', 'slip 20', 'slip 21'}
 merged_storages_orders = L{}:extend(storages_order):extend(storage_slips_order)
 
 function search(query, export)
@@ -243,7 +243,7 @@ function search(query, export)
     end
 
     log('Searching: '..query:concat(' '))
-    
+
     local no_results   = true
     local sorted_names = global_storages:keyset():sort()
                                                  :reverse()
@@ -393,7 +393,7 @@ function update()
     if global_storages == nil then
         global_storages = T{}
     end
-	
+
 	local temp_storages = get_storages()
 
 	if temp_storages then
@@ -443,14 +443,14 @@ windower.register_event('incoming chunk', function(id,original,modified,injected
         time_out = nil
         sequence_offset = 0
 	end
-	
+
 	if id == 0x00A then -- First packet of a new zone
 		zone_search = false
         time_out = seq+33
         if time_out < time_out%0x100 then
             time_out_offset = 256
         end
-        
+
 --	elseif id == 0x01D then
 	-- This packet indicates that the temporary item structure should be copied over to
 	-- the real item structure, accessed with get_items(). Thus we wait one packet and
@@ -513,7 +513,7 @@ handle_command = function(...)
 
             query:append(params:concat(' '))
         end
-        
+
         search(query, export)
     end
 end
