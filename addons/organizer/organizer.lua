@@ -71,8 +71,8 @@ _global = {
 }
 
 default_settings = {
-    dump_bags = {'Safe','Locker','Storage'},
-    bag_priority = {'Safe','Locker','Storage','Satchel','Sack','Case','Inventory','Wardrobe'},
+    dump_bags = {['Safe']=1,['Locker']=2,['Storage']=3},
+    bag_priority = {['Safe']=1,['Locker']=2,['Storage']=3,['Satchel']=4,['Sack']=5,['Case']=6,['Inventory']=7,['Wardrobe']=8},
     item_delay = 0,
     auto_heal = false,
     default_file='default.lua',
@@ -239,10 +239,10 @@ function organize(goal_items)
     local current_items = Items.new()
     local dump_bags = {}
     for i,v in pairs(settings.dump_bags) do
-        if s_to_bag(v) then
-            dump_bags[i] = s_to_bag(v)
+        if s_to_bag(i) then
+            dump_bags[tonumber(v)] = s_to_bag(i)
         else
-            org_error('The bag name ("'..tostring(v)..'") in dump_bags entry #'..tostring(i)..' in the ../addons/organizer/data/settings.xml file is not valid.\nValid options are '..tostring(res.bags))
+            org_error('The bag name ("'..tostring(i)..'") in dump_bags entry #'..tostring(v)..' in the ../addons/organizer/data/settings.xml file is not valid.\nValid options are '..tostring(res.bags))
             return
         end
     end
@@ -310,12 +310,7 @@ function incompletion_check(goal_items,remainder)
             end
         end
     end
-    if remaining < remainder and remaining ~= 0 then
-        -- Still making progress
-        return remaining
-    else
-        return false
-    end
+    return remaining ~= 0 and remaining < remainder and remaining
 end
 
 function thaw(file_name,bag)
