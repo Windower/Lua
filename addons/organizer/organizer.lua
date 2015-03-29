@@ -84,6 +84,7 @@ _debugging = {
 }
 
 function s_to_bag(str)
+    if not str and tostring(str) then return end
     for i,v in pairs(res.bags) do
         if v.en:lower() == str:lower() then
             return v.id
@@ -239,9 +240,9 @@ function organize(goal_items)
     local current_items = Items.new()
     local dump_bags = {}
     for i,v in pairs(settings.dump_bags) do
-        if s_to_bag(i) then
+        if i and s_to_bag(i) then
             dump_bags[tonumber(v)] = s_to_bag(i)
-        else
+        elseif i then
             org_error('The bag name ("'..tostring(i)..'") in dump_bags entry #'..tostring(v)..' in the ../addons/organizer/data/settings.xml file is not valid.\nValid options are '..tostring(res.bags))
             return
         end
