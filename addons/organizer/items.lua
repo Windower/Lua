@@ -78,25 +78,26 @@ end
 
 function items:route(start_bag,start_ind,end_bag,count)
     count = count or self[start_bag][start_ind].count
-    local failure = false
+    local success = true
     local initial_ind = start_ind
     if start_bag ~= 0 and self[0]._info.n < 80 then
         start_ind = self[start_bag][start_ind]:move(0,0x52,count)
     elseif start_bag ~= 0 and self[0]._info.n >= 80 then
-        failure = true
+        success = false
         org_warning('Cannot move more than 80 items into inventory')
+        return success
     end
         
     if start_ind and end_bag ~= 0 and self[end_bag]._info.n < 80 then
         self[0][start_ind]:transfer(end_bag,count)
     elseif not start_ind then
-        failure = true
+        success = false
         org_warning('Initial movement of the route failed. ('..tostring(start_bag)..' '..tostring(initial_ind)..' '..tostring(start_ind)..' '..tostring(end_bag)..')')
     elseif self[end_bag]._info.n >= 80 then
-        failure = true
+        success = false
         org_warning('Cannot move more than 80 items into that inventory ('..end_bag..')')
     end
-    return not failure
+    return success
 end
 
 function items:it()
