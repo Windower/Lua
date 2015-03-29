@@ -687,3 +687,7 @@ function define_active_regions()
         position_to_region_map:append(3)
     end
 end
+
+function bit.is_set(val, pos) -- Credit: Arcon
+    return bit.band(val, 2^(pos - 1)) > 0
+end

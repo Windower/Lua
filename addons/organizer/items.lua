@@ -42,7 +42,7 @@ local function validate_id(id)
 end
 
 local function wardrobecheck(bag_id,id)
-    return bag_id~=8 or (bag_id == 8 and res.items[self.id] and (res.items[self.id].type == 4 or res.items[self.id].type == 5) )
+    return bag_id~=8 or (bag_id == 8 and res.items[id] and (res.items[id].type == 4 or res.items[id].type == 5) )
 end
 
 function Items.new(loc_items,bool)
