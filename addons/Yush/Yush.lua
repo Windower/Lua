@@ -101,9 +101,10 @@ back = function()
     output()
 end
 
-check = function()
+check = function(keyset)
+    keyset = keyset or keys
     for key, val in pairs(current) do
-        if key <= keys then
+        if key <= keyset then
             if type(val) == 'string' then
                 windower.send_command(val)
             else
@@ -334,8 +335,7 @@ windower.register_event('addon command', function(command, ...)
         back()
 
     elseif command == 'press' then
-        keys = keys + S(args):map(string.lower)
-        check()
+        check(S(args):map(string.lower))
 
     elseif command == 'set' then
         if not args[1] then
