@@ -599,11 +599,30 @@ fields.outgoing[0x052] = L{
     {ref=types.equipset_build,  lookup={res.slots, 0x00},   count=0x10},        -- 0C
 }
 
--- Crafting-related packet?
+types.lockstyleset = L{
+    {ctype='unsigned char',     label='Inventory Index'},                       -- 00
+    {ctype='unsigned char',     label='Equipment Slot',     fn=slot},           -- 01
+    {ctype='unsigned char',     label='Bag',                fn=bag},            -- 02
+    {ctype='unsigned char',     label='_unknown2',          const=0x00},        -- 03
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 04
+    {ctype='unsigned short',    label='_unknown3',          const=0x0000},      -- 06
+}
+
+-- lockstyleset
+fields.outgoing[0x53] = L{
+        -- First 4 bytes are a header for the set
+        {ctype='unsigned char',     label='Count'},                             -- 04
+        {ctype='unsigned char',     label='Type'},                              -- 05   0 = "Stop locking style", 1 = "Continue locking style", 3 = "Lock style in this way". Might be flags?
+        {ctype='unsigned short',    label='_unknown1',      const=0x0000},      -- 06
+        {ref=types.lockstyleset,    count=16},                                  -- 08
+    }
+
+
+-- End Synth
 -- This packet is sent after receiving a result when synthesizing.
 fields.outgoing[0x059] = L{
     {ctype='unsigned int',      label='_unknown1'},                             -- 04   Often 00 00 00 00, but 01 00 00 00 observed.
-    {ctype='data[8]',           label='_junk1'}                                 -- 08   Likely junk from a non-zero'd buffer.
+    {ctype='data[8]',           label='_junk1'}                                 -- 08   Often 00 00 00 00, likely junk from a non-zero'd buffer.
 }
 
 -- Conquest
@@ -723,12 +742,19 @@ fields.outgoing[0x077] = L{
 fields.outgoing[0x078] = L{
 }
 
--- NPC buy
--- Sent when buying an item from an NPC vendor
+-- Guild NPC Buy
+-- Sent when buying an item from a guild NPC
+fields.outgoing[0x082] = L{
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 08   
+    {ctype='unsigned char',     label='_unknown1',          const=0x00},        -- 0A   
+    {ctype='unsigned char',     label='Count'},                                 -- 0B   Number you are buying
+}
+
+-- NPC Buy Item
+-- Sent when buying an item from a generic NPC vendor
 fields.outgoing[0x083] = L{
-    {ctype='unsigned char',     label='Count'},                                 -- 04
-    {ctype='data[3]',           label='_unknown1'},                             -- 05   Always 0? Possibly padding
-    {ctype='unsigned short',    label='_unknown2'},                             -- 08   Always 0?
+    {ctype='unsigned int',      label='Count'},                                 -- 04
+    {ctype='unsigned short',    label='_unknown2'},                             -- 08   Redirection Index? When buying from a guild helper, this was the index of the real guild NPC.
     {ctype='unsigned char',     label='Shop Slot'},                             -- 0A   The same index sent in incoming packet 0x03C
     {ctype='unsigned char',     label='_unknown3'},                             -- 0B   Always 0? Possibly padding
     {ctype='unsigned int',      label='_unknown4'},                             -- 0C   Always 0?
@@ -779,6 +805,32 @@ fields.outgoing[0x0A1] = L{
 -- /random
 fields.outgoing[0x0A2] = L{
     {ctype='int',               label='_unknown1'},                             -- 04  No clear purpose
+}
+
+-- Guild Buy Item
+-- Sent when buying an item from a guild NPC
+fields.outgoing[0x0AA] = L{
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 04   
+    {ctype='unsigned char',     label='_unknown1',          const=0x00},        -- 06   
+    {ctype='unsigned char',     label='Count'},                                 -- 07   Number you are buying
+}
+
+-- Get Guild Inv List
+-- It's unclear how the server figures out which guild you're asking about, but this triggers 0x83 Incoming.
+fields.outgoing[0x0AB] = L{
+}
+
+-- Guild Sell Item
+-- Sent when selling an item to a guild NPC
+fields.outgoing[0x0AC] = L{
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 04  
+    {ctype='unsigned char',     label='_unknown1'},                             -- 06   
+    {ctype='unsigned char',     label='Count'},                                 -- 07   Number you are selling
+}
+
+-- Get Guild Sale List
+-- It's unclear how the server figures out which guild you're asking about, but this triggers 0x85 Incoming.
+fields.outgoing[0x0AD] = L{
 }
 
 -- Speech
@@ -842,6 +894,11 @@ fields.outgoing[0x0D2] = L{
     {ctype='unsigned short',    label='_junk1'}                                 -- 06
 }
 
+-- Open Help Submenu
+fields.outgoing[0x0D4] = L{
+    {ctype='unsigned int',      label='Number of Opens'},                       -- 04  Number of times you've opened the submenu.
+}
+
 -- Check
 fields.outgoing[0x0DD] = L{
     {ctype='unsigned int',      label='Target',             fn=id},             -- 04
@@ -894,6 +951,13 @@ fields.outgoing[0x0F1] = L{
     {ctype='unsigned char',     label='_unknown1'},                             -- 05
     {ctype='unsigned char',     label='_unknown2'},                             -- 06
     {ctype='unsigned char',     label='_unknown3'},                             -- 07
+}
+
+-- Declare Subregion
+fields.outgoing[0x0F2] = L{
+    {ctype='unsigned char',     label='_unknown1',          const=0x01},        -- 04
+    {ctype='unsigned char',     label='_unknown2',          const=0x00},        -- 05
+    {ctype='unsigned short',    label='Subregion Index'},                       -- 06
 }
 
 -- Unknown packet 0xF2
@@ -2021,6 +2085,13 @@ types.blacklist_entry = L{
     {ctype='char[16]',          label='Name'},                                  -- 04
 }
 
+-- Shop Buy Response
+fields.incoming[0x03F] = L{
+    {ctype='unsigned short',    label='Shop Slot'},                             -- 04
+    {ctype='unsigned short',    label='_unknown1'},                             -- 06   First byte always seems to be 1, second byte varies between 0 and 1? Unclear correlation to anything.
+    {ctype='unsigned int',      label='Count'},                                 -- 08
+}
+
 -- Blacklist
 fields.incoming[0x041] = L{
     {ref=types.blacklist_entry, count=12},                                      -- 08
@@ -2777,6 +2848,47 @@ fields.incoming[0x079] = L{
     {ctype='data[3]',           label='_junk1'},                                -- 1E  All 00s
 }
 
+-- Guild Buy Response
+-- Sent when buying an item from a guild NPC
+fields.incoming[0x082] = L{
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 08   
+    {ctype='unsigned char',     label='_junk1'},                                -- 0A   No obvious purpose
+    {ctype='unsigned char',     label='Count'},                                 -- 0B   Number you bought
+}
+
+types.guild_entry = L{
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 00
+    {ctype='unsigned char',     label='Current Stock'},                         -- 02   Number in stock
+    {ctype='unsigned char',     label='Max Stock'},                             -- 03   Max stock can hold
+    {ctype='unsigned int',      label='Price'},                                 -- 04
+}
+-- Guild Inv List
+fields.incoming[0x083] = L{
+    {ref=types.guild_entry,     label='Item',               count='*'},         -- 04
+}
+
+-- Guild Sell Response
+-- Sent when selling an item to a guild NPC
+fields.incoming[0x084] = L{
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 08   
+    {ctype='unsigned char',     label='_junk1'},                                -- 0A   No obvious purpose
+    {ctype='unsigned char',     label='Count'},                                 -- 0B   Number you bought. If 0, the transaction failed.
+}
+
+-- Guild Sale List
+fields.incoming[0x085] = L{
+    {ref=types.guild_entry,     label='Item',               count='*'},         -- 04
+}
+-- Guild Open
+-- Sent to update guild status or open the guild menu.
+fields.incoming[0x086] = L{
+    {ctype='unsigned char',     label='Open Menu'},                             -- 04   0x00 = Open guild menu, 0x01 = Guild is closed, 0x03 = nothing, so this is treated as an unsigned char
+    {ctype='data[3]',           label='_junk1'},                                -- 05   Does not seem to matter in any permutation of this packet
+    {ctype='data[3]',           label='Guild Hours'},                           -- 08   First 1 indicates the opening hour. First 0 after that indicates the closing hour. In the event that there are no 0s, 91022244 is used.
+    {ctype='unsigned char',     label='_flags1'},                               -- 0B   Most significant bit (0x80) indicates whether the "close guild" message should be displayed.
+}
+
+
 types.merit_entry = L{
     {ctype='unsigned short',    label='Merit'},                                 -- 00
     {ctype='unsigned char',     label='Next Cost'},                             -- 02
@@ -2832,6 +2944,13 @@ fields.incoming[0x0A0] = L{
     {ctype='float',             label='X'},                                     -- 0C
     {ctype='float',             label='Z'},                                     -- 10
     {ctype='float',             label='Y'},                                     -- 14
+}
+
+-- Help Desk submenu open
+fields.incoming[0x0B5] = L{
+    {ctype='data[20]',          label='_unknown1'},                             -- 04
+    {ctype='unsigned int',      label='Number of Opens'},                       -- 18
+    {ctype='unsigned int',      label='_unknown2'},                             -- 1C
 }
 
 -- Alliance status update

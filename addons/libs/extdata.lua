@@ -1,7 +1,11 @@
 -- Extdata lib first pass
 
-require 'strings'
-res = require 'resources'
+_libs = _libs or {}
+_libs.actions = true
+_libs.tables = _libs.tables or require 'tables'
+local res = require 'resources'
+_libs.strings = _libs.strings or require 'strings'
+_libs.functions = _libs.functions or require 'functions'
 require 'pack'
 
 
@@ -1844,15 +1848,23 @@ end
 ----    current augments. Will return false if there are excess goal augments
 ----    or the goal augments do not match the current augments.
 -----------------------------------------------------------------------------------
-function extdata.compare_augments(goal,current)
+function extdata.compare_augments(goal_augs,current)
     if not current then return false end
+    local cur = T{}
+    for i,v in pairs(table.filter(current,-functions.equals('none'))) do
+        cur:append(v)
+    end
+    local goal = T{}
+    for i,v in pairs(table.filter(goal_augs,-functions.equals('none'))) do
+        goal:append(v)
+    end
     local num_augments = 0
     local aug_strip = function(str)
         return str:lower():gsub('[^%-%w,]','')
     end 
-    for aug_ind,augment in pairs(current) do
+    for aug_ind,augment in pairs(cur) do
         if augment == 'none' then
-            current[aug_ind] = nil
+            cur[aug_ind] = nil
         else
             num_augments = num_augments + 1
         end
@@ -1870,13 +1882,13 @@ function extdata.compare_augments(goal,current)
         local count = 0
         for goal_ind,goal_aug in pairs(goal) do
             local bool
-            for cur_ind,cur_aug in pairs(current) do
+            for cur_ind,cur_aug in pairs(cur) do
                 goal_aug = recheck_lib(goal_aug)
                 cur_aug = recheck_lib(cur_aug)
                 if aug_strip(goal_aug) == aug_strip(cur_aug) then
                     bool = true
                     count = count +1
-                    current[cur_ind] = nil
+                    cur[cur_ind] = nil
                     break
                 end
             end

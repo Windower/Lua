@@ -148,6 +148,13 @@ local dict = {
     {en="Diabolos",ja="でぃあぼろす"},
     {en="Cait Sith",ja="けっとしー"},
     {en="Atomos",ja="あともす"},
+    
+    
+    {en="Vagary",ja="ベガリ"},
+    {en="Vagary",ja="ベガリーインスペクター"},
+    {en="Balamor",ja="バラモア"},
+    {en="Dhokmak",ja="ドクマク"},
+    {en="Ashrakk",ja="アシュラック"},
 }
 
 return dict
