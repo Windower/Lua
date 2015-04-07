@@ -317,7 +317,7 @@ local function update_dps_clock()
     local fighting = false
     for id,_ in pairs(enemies) do
         local mob = windower.ffxi.get_mob_by_id(id)
-        if (mob ~= nil) and (mob.hpp > 0) then
+        if (mob ~= nil) and (mob.hpp > 0) and (mob.status == 1) then
             fighting = true
         else
             enemies[id] = nil
