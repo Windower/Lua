@@ -81,6 +81,13 @@
 	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
+    <name>BCTimer</name>
+    <author>Kenshi</author>
+    <description>Creates a timer when you enter a BC.</description>
+    <bugtracker>https://github.com/KenshiDRK/Lua/issues</bugtracker>
+    <support>https://www.ffxiah.com/player/Ragnarok/Kenshi</support>
+  </addon>
+  <addon>
     <name>Blist</name>
     <author>Ikonic</author>
     <description>More detailed blist with tiered display options.  Allows for blist to be active on any or all of several chat types.</description>
