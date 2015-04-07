@@ -2,7 +2,7 @@
 
 _addon.name = 'Scoreboard'
 _addon.author = 'Suji'
-_addon.version = '1.10'
+_addon.version = '1.11'
 _addon.commands = {'sb', 'scoreboard'}
 
 require('tables')
@@ -92,6 +92,7 @@ windower.register_event('addon command', function()
             sb_output('sb filter add <mob1> <mob2> ... : Add mob patterns to the filter (substrings ok)')
             sb_output('sb filter clear : Clears mob filter')
             sb_output('sb visible : Toggles scoreboard visibility')
+            sb_output('sb requireEngaged [<bool>]: Toggles or sets requiring a party member to be engaged to record damage/DPS')
             sb_output('sb stat <stat> [<player>]: Shows specific damage stats. Respects filters. If player isn\'t specified, ' ..
                   'stats for everyone are displayed. Valid stats are:')
             sb_output(dps_db.player_stat_fields:tostring():stripchars('{}"'))
