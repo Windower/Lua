@@ -201,7 +201,10 @@ do
     local pi = math.pi
     local last45angle = 10
     local last16angle
-    local direction = {[0]=' N ', ' N ', 'NNE', 'N E', 'ENE', ' E ', 'ESE', 'S E', 'SSE', ' S ', [-7]='SSW', [-6]='S W', [-5]='WSW', [-4]=' W ', [-3]='WNW', [-2]='N W', [-1]='NNW',}
+    local direction = {
+        [0]=' N ', ' N ', 'NNE', 'N E', 'ENE', ' E ', 'ESE', 'S E', 'SSE', ' S ', 'SSW', 'S W', 'WSW', 
+        ' W ', 'WNW', 'N W', 'NNW', [-7]='SSW', [-6]='S W', [-5]='WSW', [-4]=' W ', [-3]='WNW', [-2]='N W', [-1]='NNW',
+    }
     local arrow_map = {[0]=e,e,ne,n,nw,w,sw,s,se,e,sas}
     
     windower.register_event('prerender', function()
@@ -242,4 +245,3 @@ do
         end
     end)
 end
-
