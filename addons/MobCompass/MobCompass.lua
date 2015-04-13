@@ -1,5 +1,5 @@
 --[[
-Copyright (c) 2013, Sebastien Gomez
+Copyright © 2013-2015, Sebastien Gomez
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -10,14 +10,14 @@ modification, are permitted provided that the following conditions are met:
     * Redistributions in binary form must reproduce the above copyright
     notice, this list of conditions and the following disclaimer in the
     documentation and/or other materials provided with the distribution.
-    * Neither the name of <addon name> nor the
+    * Neither the name of MobCompass nor the
     names of its contributors may be used to endorse or promote products
     derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL <your name> BE LIABLE FOR ANY
+DISCLAIMED. IN NO EVENT SHALL Sebastien Gomez BE LIABLE FOR ANY
 DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
@@ -29,8 +29,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 _addon.name = 'MobCompass'
 _addon.version = '2.0'
 
-do
+texts = require('texts')
+config = require('config')
 
+do
     local s_arrows={
         pos = {},
         bg = {visible=false},
@@ -38,15 +40,12 @@ do
         text = {size=33,font='Wingdings'}
     }
 
-    texts = require('texts')
-    config = require('config')
-
     circle = texts.new('l',s_arrows)
     circle2 = texts.new('l',s_arrows)
 
     n = texts.new('Ù',s_arrows)
     s = texts.new('Ú',s_arrows)
-    w= texts.new('×',s_arrows)
+    w = texts.new('×',s_arrows)
     e = texts.new('Ø',s_arrows)
 
     s_arrows.text.size = 20
@@ -121,28 +120,6 @@ do
 end
 
 do
-
-    local is_labels_visible = false
-    windower.register_event('job change', function(main_job_id,_,sub_job_id)
-        is_labels_visible = main_job_id == 21 or sub_job_id == 21
-        labels:visible(is_labels_visible and w:visible())
-    end)
-    
-    local player_index
-    if windower.ffxi.get_info().logged_in then
-        local player = windower.ffxi.get_player()
-        player_index = player.index
-        is_labels_visible = player.main_job_id == 21 or player.sub_job_id == 21
-    end
-    
-    windower.register_event('zone change', function()
-        player_index = windower.ffxi.get_player().index
-    end)
-    
-    windower.register_event('login', function()
-        player_index = windower.ffxi.get_player().index
-    end)
-    
     local drag_and_drop
     
     windower.register_event('mouse', function(type, x, y, delta, blocked)
@@ -179,6 +156,31 @@ do
             end
         end
     end)
+end
+
+do
+    local is_labels_visible = false
+    
+    windower.register_event('job change', function(main_job_id,_,sub_job_id)
+        is_labels_visible = main_job_id == 21 or sub_job_id == 21
+        labels:visible(is_labels_visible and w:visible())
+    end)
+    
+    local player_index
+    
+    if windower.ffxi.get_info().logged_in then
+        local player = windower.ffxi.get_player()
+        player_index = player.index
+        is_labels_visible = player.main_job_id == 21 or player.sub_job_id == 21
+    end
+    
+    windower.register_event('zone change', function()
+        player_index = windower.ffxi.get_player().index
+    end)
+    
+    windower.register_event('login', function()
+        player_index = windower.ffxi.get_player().index
+    end)
     
     local target = 0
         
@@ -197,7 +199,6 @@ do
     end)
     
     local atan = math.atan
-    local deg = math.deg
     local pi = math.pi
     local last45angle = 10
     local last16angle
@@ -226,7 +227,7 @@ do
             if next45angle ~= last45angle then
                 arrow_map[last45angle]:color(255,255,255)
                 arrow_map[next45angle]:color(255,0,0)
-                last45angle=next45angle
+                last45angle = next45angle
             end
             local heading = mob.facing
             if heading < 0 then
@@ -240,7 +241,7 @@ do
             local next16angle = math.ceil((heading+pi/16)/(pi/8))
             if next16angle ~= last16angle then
                 sas:text(direction[next16angle])
-                last16angle=next16angle
+                last16angle = next16angle
             end
         end
     end)
