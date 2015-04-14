@@ -2159,16 +2159,16 @@ fields.incoming._func[0x044][0x12] = L{
     {ctype='unsigned int',      label='Light Attachments'},                     -- 50   Flags for the available Light Attachments (Position corresponds to Item ID)
     {ctype='unsigned int',      label='Dark Attachments'},                      -- 54   Flags for the available Dark Attachments (Position corresponds to Item ID)
     {ctype='char[16]',          label='Pet Name'},                              -- 58
-    {ctype='unsigned short',    label='Max or Current HP'},                     -- 68   The next two are max or current HP. My PUP sucks too much to fight things, so idk which.
-    {ctype='unsigned short',    label='Max or Current HP'},                     -- 6A   The next two are max or current HP. My PUP sucks too much to fight things, so idk which.
-    {ctype='unsigned short',    label='Max or Current MP'},                     -- 6C   Likely max or current MP
-    {ctype='unsigned short',    label='Max or Current MP'},                     -- 6E   Likely max or current MP
-    {ctype='unsigned short',    label='Max or Current Melee Skill'},            -- 70
-    {ctype='unsigned short',    label='Max or Current Melee Skill'},            -- 72
-    {ctype='unsigned short',    label='Max or Current Ranged Skill'},           -- 74
-    {ctype='unsigned short',    label='Max or Current Ranged Skill'},           -- 76
-    {ctype='unsigned short',    label='Max or Current Magic Skill'},            -- 78
-    {ctype='unsigned short',    label='Max or Current Magic Skill'},            -- 7A
+    {ctype='unsigned short',    label='Current HP'},                            -- 68
+    {ctype='unsigned short',    label='Max HP'},                                -- 6A
+    {ctype='unsigned short',    label='Current MP'},                            -- 6C
+    {ctype='unsigned short',    label='Max MP'},                                -- 6E
+    {ctype='unsigned short',    label='Current Melee Skill'},                   -- 70
+    {ctype='unsigned short',    label='Max Melee Skill'},                       -- 72
+    {ctype='unsigned short',    label='Current Ranged Skill'},                  -- 74
+    {ctype='unsigned short',    label='Max Ranged Skill'},                      -- 76
+    {ctype='unsigned short',    label='Current Magic Skill'},                   -- 78
+    {ctype='unsigned short',    label='Max Magic Skill'},                       -- 7A
     {ctype='unsigned int',      label='_unknown9'},                             -- 7C
     {ctype='unsigned short',    label='Base STR'},                              -- 80
     {ctype='unsigned short',    label='Additional STR'},                        -- 82
