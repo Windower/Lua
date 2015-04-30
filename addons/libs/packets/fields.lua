@@ -3484,11 +3484,43 @@ sizes['float'] = 4
 sizes['double'] = 8
 sizes['data'] = 1
 
+local size
+size = function(fs)
+    if fs.ctype then
+        local ctype, count_str = fs.ctype:match('(.*)%[(.+)%]')
+        local count_num = count_str and count_str:number() or 1
+        ctype = ctype or fs.ctype
+
+        if ctype == 'bit' or ctype == 'boolbit' then
+            return 0, count_num
+        end
+
+        return count_num * sizes[ctype]
+    end
+
+    local acc = 0
+    local offset = 0
+    for f in (fs.ref or fs):it() do
+        local bytes, bits = size(f)
+        offset = offset + (bits or 0)
+        acc = acc + bytes + (offset / 8):floor()
+        offset = offset % 8
+    end
+
+    return (fs.ref or fs):map(size):sum(), offset
+end
+
 local non_array_types = S{'char', 'bit', 'data'}
 
-local function parse(fs, data, index, max, lookup)
+local parse
+parse = function(fs, data, index, max, lookup)
     max = max == '*' and 0 or max or 1
     index = index or 4
+
+    if not data then
+        local bytes, bits = size(fs)
+        data = 0:char():rep(4 + 4 * (bytes + ((bits or 0) / 8):ceil() / 4):floor())
+    end
 
     local res = L{}
     local count = 0
@@ -3549,12 +3581,12 @@ local function parse(fs, data, index, max, lookup)
     return res, index
 end
 
-function fields.get(dir, id, data)
+fields.get = function(dir, id, data)
     local f = fields[dir][id]
     if type(f) == 'function' then
         f = f(data)
     end
-    return f and data and parse(f, data) or f
+    return f and parse(f, data) or nil
 end
 
 return fields
