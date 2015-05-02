@@ -1,82 +1,119 @@
---[[	BSD License Disclaimer
-		Copyright © 2015, Morath86
-		All rights reserved.
+--[[    BSD License Disclaimer
+        Copyright © 2015, Morath86
+        All rights reserved.
 
-		Redistribution and use in source and binary forms, with or without
-		modification, are permitted provided that the following conditions are met:
+        Redistribution and use in source and binary forms, with or without
+        modification, are permitted provided that the following conditions are met:
 
-			* Redistributions of source code must retain the above copyright
-			  notice, this list of conditions and the following disclaimer.
-			* Redistributions in binary form must reproduce the above copyright
-			  notice, this list of conditions and the following disclaimer in the
-			  documentation and/or other materials provided with the distribution.
-			* Neither the name of BarFiller nor the
-			  names of its contributors may be used to endorse or promote products
-			  derived from this software without specific prior written permission.
+            * Redistributions of source code must retain the above copyright
+              notice, this list of conditions and the following disclaimer.
+            * Redistributions in binary form must reproduce the above copyright
+              notice, this list of conditions and the following disclaimer in the
+              documentation and/or other materials provided with the distribution.
+            * Neither the name of BarFiller nor the
+              names of its contributors may be used to endorse or promote products
+              derived from this software without specific prior written permission.
 
-		THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-		ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-		WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-		DISCLAIMED. IN NO EVENT SHALL Morath86 BE LIABLE FOR ANY
-		DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-		(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-		LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-		ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-		(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-		SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+        THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+        ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+        WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+        DISCLAIMED. IN NO EVENT SHALL Morath86 BE LIABLE FOR ANY
+        DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+        (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+        LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+        ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+        (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+        SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
 -- Default settings file
-default_settings = {
-	bar_settings = {
-		background = { -- image: Must be the EXACT path to your Windower\Addon folder
-			image = 'C:\\Program Files (x86)\\Windower4\\addons\\barfiller\\data\\bar_bg.png',
-			pos = {
-				x = 164,
-				y = 6
-			},
-			size = {
-				height = 5,
-				width = 472
-			}
-		},
-		foreground = { -- image: Must be the EXACT path to your Windower\Addon folder
-			image = 'C:\\Program Files (x86)\\Windower4\\addons\\barfiller\\data\\bar_fg.png',
-			pos = {
-				x = 166,
-				y = 6
-			},
-			size = {
-				height = 5,
-				width = 1
-			}
-		}
-	}
+DefaultSettings = {
+    bars = {
+        background = {
+            image = windower.windower_path..'addons\\barfiller\\data\\bar_bg.png',
+            pos = {
+                x = 164,
+                y = 6
+            },
+            size = {
+                height = 5,
+                width = 472
+            }
+        },
+        foreground = {
+            image = windower.windower_path..'addons\\barfiller\\data\\bar_fg.png',
+            pos = {
+                x = 166,
+                y = 6
+            },
+            size = {
+                height = 5,
+                width = 1
+            }
+        }
+    }
 }
 
 -- Current Game Resolution
-windowerResX = windower.get_windower_settings().x_res
-windowerResY = windower.get_windower_settings().y_res
+windower_res_x = windower.get_windower_settings().x_res
+windower_res_y = windower.get_windower_settings().y_res
 
 -- Approved console commands
 -- Thanks to Byrth & SnickySnacks' BattleMod addon
 approved_commands = S{
-	'clear','c',
-	'reload','r',
-	'unload','u',
-	'help','h'
+    'clear','c',
+    'reload','r',
+    'unload','u',
+    'help','h'
 }
 
 approved_commands = {
-	clear={n=0},c={n=0},
-	reload={n=0},r={n=0},
-	unload={n=0},u={n=0},
-	help={n=0},h={n=0}
+    clear={n=0},c={n=0},
+    reload={n=0},r={n=0},
+    unload={n=0},u={n=0},
+    help={n=0},h={n=0}
 }
+
+function create_bars()
+    -- Background Bar
+    bg_image = settings_table.bars.background.image
+    bg_pos_x = settings_table.bars.background.pos.x
+    bg_pos_y = settings_table.bars.background.pos.y
+    bg_bar_height = settings_table.bars.background.size.height
+    bg_bar_width = settings_table.bars.background.size.width
+
+    -- Foreground Bar
+    fg_image = settings_table.bars.foreground.image
+    fg_pos_x = settings_table.bars.foreground.pos.x
+    fg_pos_y = settings_table.bars.foreground.pos.y
+    fg_bar_height = settings_table.bars.foreground.size.height
+    fg_bar_width = settings_table.bars.foreground.size.width
+
+    -- Background Bar Style
+    windower.prim.create('background_bar')
+    windower.prim.set_position('background_bar', get_background_pos_x(), get_background_pos_y())
+    windower.prim.set_size('background_bar', get_background_width(), get_background_height())
+    windower.prim.set_texture('background_bar', bg_image)
+    windower.prim.set_fit_to_texture('background_bar', false)
+    windower.prim.set_repeat('background_bar', 1, 1)
+    windower.prim.set_visibility('background_bar', true)
+
+    -- Foreground Bar Style
+    windower.prim.create('foreground_bar')
+    windower.prim.set_position('foreground_bar', get_foreground_pos_x(), get_foreground_pos_y())
+    windower.prim.set_size('foreground_bar', get_foreground_width(), get_foreground_height())
+    windower.prim.set_texture('foreground_bar', fg_image)
+    windower.prim.set_fit_to_texture('foreground_bar', false)
+    windower.prim.set_repeat('foreground_bar', 1, 1)
+    windower.prim.set_visibility('foreground_bar', true)
+    
+    position_bars()
+end
 
 -- Reset XP Info
 -- Thanks to Byrth's PointWatch addon
 function initialize()
+    create_bars()
     xp = {
         registry = {},
         total = 0,
@@ -84,89 +121,89 @@ function initialize()
         current = 0,
         tnl = 0,
     }
-    positionBars()
+    calc_exp_bar()
 end
 
 -- Getters
-function getBackgroundPosX()
-	return bgPosX
+function get_background_pos_x()
+    return bg_pos_x
 end
 
-function getBackgroundPosY()
-	return bgPosY
+function get_background_pos_y()
+    return bg_pos_y
 end
 
-function getForegroundPosX()
-	return fgPosX
+function get_foreground_pos_x()
+    return fg_pos_x
 end
 
-function getForegroundPosY()
-	return fgPosY
+function get_foreground_pos_y()
+    return fg_pos_y
 end
 
-function getBackgroundHeight()
-	return bgBarHeight
+function get_background_height()
+    return bg_bar_height
 end
 
-function getBackgroundWidth()
-	return bgBarWidth
+function get_background_width()
+    return bg_bar_width
 end
 
-function getForegroundHeight()
-	return fgBarHeight
+function get_foreground_height()
+    return fg_bar_height
 end
 
-function getForegroundWidth()
-	return fgBarWidth
+function get_foreground_width()
+    return fg_bar_width
 end
 
 -- Setters
-function setBackgroundPosX(new_pos_x)
-	bgPosX = new_pos_x
-	windower.prim.set_position('backgroundBar', new_pos_x, getBackgroundPosY())
+function set_background_pos_x(new_pos_x)
+    bg_pos_x = new_pos_x
+    windower.prim.set_position('background_bar', new_pos_x, get_background_pos_y())
 end
 
-function setBackgroundPosY(new_pos_y)
-	bgPosY = new_pos_y
-	windower.prim.set_position('backgroundBar', getBackgroundPosX(), new_pos_y)
+function set_background_pos_y(new_pos_y)
+    bg_pos_y = new_pos_y
+    windower.prim.set_position('background_bar', get_background_pos_x(), new_pos_y)
 end
 
-function setForegroundPosX(new_pos_x)
-	fgPosX = new_pos_x
-	windower.prim.set_position('foregroundBar', new_pos_x, getForegroundPosY())
+function set_foreground_pos_x(new_pos_x)
+    fg_pos_x = new_pos_x
+    windower.prim.set_position('foreground_bar', new_pos_x, get_foreground_pos_y())
 end
 
-function setForegroundPosY(new_pos_y)
-	fgPosY = new_pos_y
-	windower.prim.set_position('foregroundBar', getForegroundPosX(), new_pos_y)
+function set_foreground_pos_y(new_pos_y)
+    fg_pos_y = new_pos_y
+    windower.prim.set_position('foreground_bar', get_foreground_pos_x(), new_pos_y)
 end
 
-function setBackgroundHeight(new_height)
-	bgBarHeight = new_height
-	windower.prim.set_size('backgroundBar', getBackgroundWidth(), new_height)
+function set_background_height(new_height)
+    bg_bar_height = new_height
+    windower.prim.set_size('background_bar', get_background_width(), new_height)
 end
 
-function setBackgroundWidth(new_width)
-	bgBarWidth = new_width
-	windower.prim.set_size('backgroundBar', new_width, getBackgroundHeight())
+function set_background_width(new_width)
+    bg_bar_width = new_width
+    windower.prim.set_size('background_bar', new_width, get_background_height())
 end
 
-function setForegroundHeight(new_height)
-	fgBarHeight = new_height
-	windower.prim.set_size('foregroundBar', getForegroundWidth(), new_height)
+function set_foreground_height(new_height)
+    fg_bar_height = new_height
+    windower.prim.set_size('foreground_bar', get_foreground_width(), new_height)
 end
 
-function setForegroundWidth(new_width)
-	fgBarWidth = new_width
-	windower.prim.set_size('foregroundBar', new_width, getForegroundHeight())
+function set_foreground_width(new_width)
+    fg_bar_width = new_width
+    windower.prim.set_size('foreground_bar', new_width, get_foreground_height())
 end
 
 -- Display helpful information
 function help()
-	print(_addon.name..' v'.._addon.version..': Command Listing')
-	print('   (c)lear - Resets EXP counter')
-	print('   (u)nload - Disables BarFiller')
-	print('   (r)eload - Reloads BarFiller')
+    windower.add_to_chat(8,_addon.name..' v'.._addon.version..': Command Listing')
+    windower.add_to_chat(8,'   (c)lear - Resets EXP counter')
+    windower.add_to_chat(8,'   (u)nload - Disables BarFiller')
+    windower.add_to_chat(8,'   (r)eload - Reloads BarFiller')
 end
 
 -- Thanks to Byrthnoth's PointWatch addon
@@ -178,18 +215,18 @@ function exp_msg(val,msg)
         if xp.current > xp.tnl then
             xp.current = xp.current - xp.tnl
         end
-        calcExpBarPerc()
+        calc_exp_bar()
     end
 end
 
 -- Calculate XP Bar Width
-function calcExpBarPerc()
-	local calc = math.floor((xp.current / xp.total) * 468)
-	setForegroundWidth(calc)
+function calc_exp_bar()
+    local calc = math.floor((xp.current / xp.total) * 468)
+    set_foreground_width(calc)
 end
 
 -- Center the Bar on Screen
-function positionBars()
-	setBackgroundPosX(((windowerResX/2) - (getBackgroundWidth()/2)))
-	setForegroundPosX((((windowerResX/2) - (getBackgroundWidth()/2))+2))
+function position_bars()
+    set_background_pos_x(((windower_res_x/2) - (get_background_width()/2)))
+    set_foreground_pos_x(get_background_pos_x()+2)
 end
