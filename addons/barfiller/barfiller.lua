@@ -28,7 +28,7 @@
 
 _addon.name = 'BarFiller'
 _addon.author = 'Morath'
-_addon.version = '0.1.7'
+_addon.version = '0.1.8'
 _addon.commands = {'bf','barfiller'}
 _addon.language = 'english'
 
@@ -36,24 +36,23 @@ _addon.language = 'english'
 config = require('config')
 file = require('files')
 packets = require('packets')
-math = require('math')
+--math = require('maths')
 
 --BarFiller Libs
 require('statics')
 
 -- Generate Settings Files
 -- Thanks to Byrth & SnickySnacks' BattleMod addon
-settings_file = file.new('data\\settings.xml',true)
-settings_table = config.load('data\\settings.xml',DefaultSettings)
+settings_table = config.load(defaults)
 config.save(settings_table)
 
 initialize()
 
 -- Addon commands
 -- Thanks to Byrth & SnickySnacks' BattleMod addon
-windower.register_event('addon command',function(...)
+windower.register_event('addon command',function(command, ...)
     local commands = {...}
-    local first_cmd = table.remove(commands,1):lower()
+    local first_cmd = (command or 'help'):lower()
     if approved_commands[first_cmd] and #commands >= approved_commands[first_cmd].n then
         if first_cmd == 'clear' or first_cmd == 'c' then        -- Reset EXP bar to 0
             initialize()

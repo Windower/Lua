@@ -26,29 +26,29 @@
         SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
--- Default settings file
-DefaultSettings = {
-    bars = {
-        background = {
-            image = windower.windower_path..'addons\\barfiller\\data\\bar_bg.png',
-            pos = {
-                x = 164,
-                y = 6
+-- Default settings
+defaults = {
+    Bars = {
+        Background = {
+            Image = windower.windower_path..'addons\\barfiller\\data\\bar_bg.png',
+            Pos = {
+                X = 164,
+                Y = 6
             },
-            size = {
-                height = 5,
-                width = 472
+            Size = {
+                Height = 5,
+                Width = 472
             }
         },
-        foreground = {
-            image = windower.windower_path..'addons\\barfiller\\data\\bar_fg.png',
-            pos = {
-                x = 166,
-                y = 6
+        Foreground = {
+            Image = windower.windower_path..'addons\\barfiller\\data\\bar_fg.png',
+            Pos = {
+                X = 166,
+                Y = 6
             },
-            size = {
-                height = 5,
-                width = 1
+            Size = {
+                Height = 5,
+                Width = 1
             }
         }
     }
@@ -76,18 +76,18 @@ approved_commands = {
 
 function create_bars()
     -- Background Bar
-    bg_image = settings_table.bars.background.image
-    bg_pos_x = settings_table.bars.background.pos.x
-    bg_pos_y = settings_table.bars.background.pos.y
-    bg_bar_height = settings_table.bars.background.size.height
-    bg_bar_width = settings_table.bars.background.size.width
+    bg_image = settings_table.Bars.Background.Image
+    bg_pos_x = settings_table.Bars.Background.Pos.X
+    bg_pos_y = settings_table.Bars.Background.Pos.Y
+    bg_bar_height = settings_table.Bars.Background.Size.Height
+    bg_bar_width = settings_table.Bars.Background.Size.Width
 
     -- Foreground Bar
-    fg_image = settings_table.bars.foreground.image
-    fg_pos_x = settings_table.bars.foreground.pos.x
-    fg_pos_y = settings_table.bars.foreground.pos.y
-    fg_bar_height = settings_table.bars.foreground.size.height
-    fg_bar_width = settings_table.bars.foreground.size.width
+    fg_image = settings_table.Bars.Foreground.Image
+    fg_pos_x = settings_table.Bars.Foreground.Pos.X
+    fg_pos_y = settings_table.Bars.Foreground.Pos.Y
+    fg_bar_height = settings_table.Bars.Foreground.Size.Height
+    fg_bar_width = settings_table.Bars.Foreground.Size.Width
 
     -- Background Bar Style
     windower.prim.create('background_bar')
@@ -121,6 +121,7 @@ function initialize()
         current = 0,
         tnl = 0,
     }
+    frame_count = 0
     calc_exp_bar()
 end
 
@@ -230,3 +231,8 @@ function position_bars()
     set_background_pos_x(((windower_res_x/2) - (get_background_width()/2)))
     set_foreground_pos_x(get_background_pos_x()+2)
 end
+
+-- Animate Experience Bar Changes
+windower.register_event('prerender',function()
+    -- todo
+end)
