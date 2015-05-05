@@ -51,6 +51,51 @@ defaults = {
                 Width = 1
             }
         }
+    },
+    TextBox = {
+        Pos = {
+            X = 159,
+            Y = 13
+        },
+        Background = {
+            Border = 0,
+            Alpha = 0,
+            Red = 0,
+            Green = 0,
+            Blue = 0,
+            Visible = true
+        },
+        Flags = {
+            Right = false,
+            Bottom = false,
+            Bold = false,
+            Italic = false
+        },
+        Padding = 0,
+        Text = {
+            Size = 10,
+            Font = 'Arial',
+            Fonts = {},
+            Alpha = 255,
+            Red = 253,
+            Green = 252,
+            Blue = 250
+        },
+        Stroke = {
+            Alpha = 127,
+            Red = 136,
+            Green = 97,
+            Blue = 18,
+            Width = 1
+        }
+    },
+    RestedBonus = {
+        Image = windower.windower_path..'addons\\barfiller\\data\\moon.png',
+        Pos = {
+            X = 636,
+            Y = 0
+        },
+        Visible = false
     }
 }
 
@@ -94,7 +139,7 @@ function create_bars()
     windower.prim.set_position('background_bar', get_background_pos_x(), get_background_pos_y())
     windower.prim.set_size('background_bar', get_background_width(), get_background_height())
     windower.prim.set_texture('background_bar', bg_image)
-    windower.prim.set_fit_to_texture('background_bar', false)
+    windower.prim.set_fit_to_texture('background_bar', true)
     windower.prim.set_repeat('background_bar', 1, 1)
     windower.prim.set_visibility('background_bar', true)
 
@@ -103,17 +148,66 @@ function create_bars()
     windower.prim.set_position('foreground_bar', get_foreground_pos_x(), get_foreground_pos_y())
     windower.prim.set_size('foreground_bar', get_foreground_width(), get_foreground_height())
     windower.prim.set_texture('foreground_bar', fg_image)
-    windower.prim.set_fit_to_texture('foreground_bar', false)
+    windower.prim.set_fit_to_texture('foreground_bar', true)
     windower.prim.set_repeat('foreground_bar', 1, 1)
     windower.prim.set_visibility('foreground_bar', true)
-    
+
     position_bars()
+    update_strings()
+
+    -- Text Box Style and Options
+    box_pos_x = settings_table.TextBox.Pos.X
+    box_pos_y = settings_table.TextBox.Pos.Y
+    box_alpha = settings_table.TextBox.Background.Alpha
+    box_red = settings_table.TextBox.Background.Red
+    box_green = settings_table.TextBox.Background.Green
+    box_blue = settings_table.TextBox.Background.Blue
+    box_visible = settings_table.TextBox.Background.Visible
+    font_alpha = settings_table.TextBox.Text.Alpha
+    font_red = settings_table.TextBox.Text.Red
+    font_green = settings_table.TextBox.Text.Green
+    font_blue = settings_table.TextBox.Text.Blue
+    stroke_alpha = settings_table.TextBox.Stroke.Alpha
+    stroke_red = settings_table.TextBox.Stroke.Red
+    stroke_green = settings_table.TextBox.Stroke.Green
+    stroke_blue = settings_table.TextBox.Stroke.Blue
+    stroke_width = settings_table.TextBox.Stroke.Width
+
+    -- Create Text Box
+    windower.text.create('box')
+    windower.text.set_location('box', box_pos_x, box_pos_y)
+    windower.text.set_visibility('box', box_visible)
+    windower.text.set_bg_color('box', box_alpha, box_red, box_green, box_blue)
+    windower.text.set_bg_visibility('box', box_visible)
+    windower.text.set_font('box', 'Montserrat', 'Michroma', 'Ubuntu Mono', 'Arial')
+    windower.text.set_font_size('box', 10)
+    windower.text.set_color('box', font_alpha, font_red, font_green, font_blue)
+    windower.text.set_stroke_color('box', stroke_alpha, stroke_red, stroke_green, stroke_blue)
+    windower.text.set_stroke_width('box', 1)
+    windower.text.set_text('box', str_job..' '..str_lvl..'  '..str_exp..' '..str_tnl..' '..str_pct)
+
+    -- Position the Text Box below the Experience Bar
+    position_text()
+
+    -- Rested Bonus Icon
+    bonus_image = settings_table.RestedBonus.Image
+    bonus_pos_x = get_background_pos_x() + get_background_width()   -- Right edge of Experience Bar
+    bonus_pos_y = get_background_pos_y() - 6                        -- Top edge of the Experience Bar
+
+    windower.prim.create('rested_bonus_icon')
+    windower.prim.set_position('rested_bonus_icon', bonus_pos_x, bonus_pos_y)
+    windower.prim.set_texture('rested_bonus_icon', bonus_image)
+    windower.prim.set_fit_to_texture('rested_bonus_icon', true)
+    windower.prim.set_repeat('rested_bonus_icon', 1, 1)
+    windower.prim.set_visibility('rested_bonus_icon', false)
+    -- FALSE until I can figure out how to detect EXP Bonus Status
 end
 
 -- Reset XP Info
 -- Thanks to Byrth's PointWatch addon
 function initialize()
-    create_bars()
+    info = windower.ffxi.get_player()
+    frame_count = 0
     xp = {
         registry = {},
         total = 0,
@@ -121,8 +215,22 @@ function initialize()
         current = 0,
         tnl = 0,
     }
-    frame_count = 0
+    create_bars()
     calc_exp_bar()
+end
+
+function update_strings()
+    str_job = string.upper(info.main_job)
+    str_sub = string.upper(info.sub_job)
+    str_lvl = 'Lv'..info.main_job_level
+    str_exp = 'EXP '..xp.current..'/'..xp.total
+    str_tnl = '('..xp.tnl..')'
+    if xp.current > 0 then
+        str_pct = math.floor((xp.current / xp.total) * 100)..'%'
+    else
+        str_pct = '0%'
+    end
+    windower.text.set_text('box', str_job..' '..str_lvl..'  '..str_exp..' '..str_tnl..' '..str_pct)
 end
 
 -- Getters
@@ -156,6 +264,14 @@ end
 
 function get_foreground_width()
     return fg_bar_width
+end
+
+function get_box_pos_x()
+    return box_pos_x
+end
+
+function get_box_pos_y()
+    return box_pos_y
 end
 
 -- Setters
@@ -197,6 +313,17 @@ end
 function set_foreground_width(new_width)
     fg_bar_width = new_width
     windower.prim.set_size('foreground_bar', new_width, get_foreground_height())
+    update_strings()
+end
+
+function set_box_pos_x(new_pos_x) -- 
+    box_pos_x = new_pos_x
+    windower.text.set_location('box', new_pos_x, get_box_pos_y())
+end
+
+function set_box_pos_y(new_pos_y)
+    box_pos_y = new_pos_y
+    windower.text.set_location('box', get_box_pos_x(), new_pos_y)
 end
 
 -- Display helpful information
@@ -216,7 +343,6 @@ function exp_msg(val,msg)
         if xp.current > xp.tnl then
             xp.current = xp.current - xp.tnl
         end
-        calc_exp_bar()
     end
 end
 
@@ -224,15 +350,16 @@ end
 function calc_exp_bar()
     local calc = math.floor((xp.current / xp.total) * 468)
     set_foreground_width(calc)
+    update_strings()
 end
 
--- Center the Bar on Screen
+-- Center the Bar & Text on Screen
 function position_bars()
-    set_background_pos_x(((windower_res_x/2) - (get_background_width()/2)))
-    set_foreground_pos_x(get_background_pos_x()+2)
+    set_background_pos_x(((windower_res_x / 2) - (get_background_width() / 2)))
+    set_foreground_pos_x(get_background_pos_x() + 2)
 end
 
--- Animate Experience Bar Changes
-windower.register_event('prerender',function()
-    -- todo
-end)
+function position_text()
+    set_box_pos_x(get_background_pos_x() - 6)
+    set_box_pos_y(get_background_pos_y() + 4)
+end
