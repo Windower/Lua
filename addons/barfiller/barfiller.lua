@@ -28,7 +28,7 @@
 
 _addon.name = 'BarFiller'
 _addon.author = 'Morath'
-_addon.version = '0.1.8'
+_addon.version = '0.1.9'
 _addon.commands = {'bf','barfiller'}
 _addon.language = 'english'
 
@@ -36,7 +36,7 @@ _addon.language = 'english'
 config = require('config')
 file = require('files')
 packets = require('packets')
---math = require('maths')
+texts = require('texts')
 
 --BarFiller Libs
 require('statics')
@@ -83,5 +83,11 @@ windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blo
         xp.total = packet_table['Required EXP']
         xp.tnl = xp.total - xp.current
     end
-    calc_exp_bar()
+end)
+
+windower.register_event('prerender',function()
+    if frame_count%30 == 0 then
+        calc_exp_bar()
+    end
+    frame_count = frame_count + 1
 end)
