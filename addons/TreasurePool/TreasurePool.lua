@@ -71,8 +71,6 @@ lot = {}
 
 windower.register_event('incoming chunk', function(id, data)
 
-    local remove = S{}
-
     if id == 0x0D2 then
  
     local packet = packets.parse('incoming', data)
