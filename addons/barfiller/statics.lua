@@ -153,8 +153,9 @@ function create_bars()
     windower.prim.set_visibility('foreground_bar', true)
 
     position_bars()
-    update_strings()
+end
 
+function create_text_box()
     -- Text Box Style and Options
     box_pos_x = settings_table.TextBox.Pos.X
     box_pos_y = settings_table.TextBox.Pos.Y
@@ -163,6 +164,8 @@ function create_bars()
     box_green = settings_table.TextBox.Background.Green
     box_blue = settings_table.TextBox.Background.Blue
     box_visible = settings_table.TextBox.Background.Visible
+    font_table = settings_table.TextBox.Text.Fonts
+    font_size = settings_table.TextBox.Text.Size
     font_alpha = settings_table.TextBox.Text.Alpha
     font_red = settings_table.TextBox.Text.Red
     font_green = settings_table.TextBox.Text.Green
@@ -172,19 +175,18 @@ function create_bars()
     stroke_green = settings_table.TextBox.Stroke.Green
     stroke_blue = settings_table.TextBox.Stroke.Blue
     stroke_width = settings_table.TextBox.Stroke.Width
-
+    
     -- Create Text Box
     windower.text.create('box')
-    windower.text.set_location('box', box_pos_x, box_pos_y)
-    windower.text.set_visibility('box', box_visible)
+    windower.text.set_location('box', get_box_pos_x(), get_box_pos_y())
+    windower.text.set_visibility('box', true)
     windower.text.set_bg_color('box', box_alpha, box_red, box_green, box_blue)
-    windower.text.set_bg_visibility('box', box_visible)
-    windower.text.set_font('box', 'Montserrat', 'Michroma', 'Ubuntu Mono', 'Arial')
+    windower.text.set_bg_visibility('box', get_box_visible())
+    windower.text.set_font('box', 'Montserrat', 'Ubuntu Mono', 'Arial')
     windower.text.set_font_size('box', 10)
     windower.text.set_color('box', font_alpha, font_red, font_green, font_blue)
     windower.text.set_stroke_color('box', stroke_alpha, stroke_red, stroke_green, stroke_blue)
     windower.text.set_stroke_width('box', 1)
-    windower.text.set_text('box', str_job..' '..str_lvl..'  '..str_exp..' '..str_tnl..' '..str_pct)
 
     -- Position the Text Box below the Experience Bar
     position_text()
@@ -193,13 +195,14 @@ function create_bars()
     bonus_image = settings_table.RestedBonus.Image
     bonus_pos_x = get_background_pos_x() + get_background_width()   -- Right edge of Experience Bar
     bonus_pos_y = get_background_pos_y() - 6                        -- Top edge of the Experience Bar
+    bonus_visible = false
 
     windower.prim.create('rested_bonus_icon')
-    windower.prim.set_position('rested_bonus_icon', bonus_pos_x, bonus_pos_y)
+    windower.prim.set_position('rested_bonus_icon', get_rested_bonus_pos_x(), get_rested_bonus_pos_y())
     windower.prim.set_texture('rested_bonus_icon', bonus_image)
     windower.prim.set_fit_to_texture('rested_bonus_icon', true)
     windower.prim.set_repeat('rested_bonus_icon', 1, 1)
-    windower.prim.set_visibility('rested_bonus_icon', false)
+    windower.prim.set_visibility('rested_bonus_icon', get_rested_bonus_visible())
     -- FALSE until I can figure out how to detect EXP Bonus Status
 end
 
@@ -215,22 +218,105 @@ function initialize()
         current = 0,
         tnl = 0,
     }
+    player = {
+        job = string.upper(info.main_job),
+        sub = string.upper(info.sub_job),
+        lvl = 'Lv1',
+        exp = 'EXP '..xp.current..'/'..xp.total,
+        tnl = '('..xp.tnl..')',
+        phr = 'EXP/hr 0.0k',
+        pct = '0%'
+    }
     create_bars()
+    create_text_box()
     calc_exp_bar()
+    ready = true
 end
 
 function update_strings()
-    str_job = string.upper(info.main_job)
-    str_sub = string.upper(info.sub_job)
-    str_lvl = 'Lv'..info.main_job_level
-    str_exp = 'EXP '..xp.current..'/'..xp.total
-    str_tnl = '('..xp.tnl..')'
-    if xp.current > 0 then
-        str_pct = math.floor((xp.current / xp.total) * 100)..'%'
+    player.job = string.upper(info.main_job)
+    player.sub = string.upper(info.sub_job)
+    player.lvl = 'Lv'..info.main_job_level
+    player.exp = 'EXP '..xp.current..'/'..xp.total
+    player.tnl = '('..xp.tnl..')'
+    player.phr = 'EXP/hr '..string.format('%.1f',math.floor(xp.rate/100)/10)..'k'
+    if xp.current > 0 and xp.total > 0 then
+        player.pct = math.floor((xp.current / xp.total) * 100)..'%'
     else
-        str_pct = '0%'
+        player.pct = '0%'
     end
-    windower.text.set_text('box', str_job..' '..str_lvl..'  '..str_exp..' '..str_tnl..' '..str_pct)
+    windower.text.set_text('box', player.job..' '..player.lvl..'  '..player.exp..' '..player.tnl..' '..player.pct..' '..player.phr)
+end
+
+-- Display helpful information
+function help()
+    windower.add_to_chat(8,_addon.name..' v'.._addon.version..': Command Listing')
+    windower.add_to_chat(8,'   (c)lear - Resets EXP counter')
+    windower.add_to_chat(8,'   (u)nload - Disables BarFiller')
+    windower.add_to_chat(8,'   (r)eload - Reloads BarFiller')
+end
+
+-- Corrects EXP Bar's position on Level Up
+-- Thanks to Byrth's PointWatch addon
+function exp_msg(val,msg)
+    local t = os.clock()
+    if msg == 8 or msg == 105 then
+        xp.registry[t] = (xp.registry[t] or 0) + val
+        xp.current = math.min(xp.current + val,55999)
+        if xp.current > xp.tnl then
+            xp.current = xp.current - xp.tnl
+        end
+        chunk_update = true
+    end
+end
+
+-- Calculate EXP earned per hour
+-- Thanks to Byrth's PointWatch addon
+function analyze_points_table(tab)
+    local t = os.clock()
+    local running_total = 0
+    local maximum_timestamp = 29
+    for ts,points in pairs(tab) do
+        local time_diff = t - ts
+        if t - ts > 600 then
+            tab[ts] = nil
+        else
+            running_total = running_total + points
+            if time_diff > maximum_timestamp then
+                maximum_timestamp = time_diff
+            end
+        end
+    end
+    
+    local rate
+    if maximum_timestamp == 29 then
+        rate = 0
+    else
+        rate = math.floor((running_total/maximum_timestamp)*3600)
+    end
+    
+    return rate
+end
+
+-- Calculate XP Bar Width
+function calc_exp_bar()
+    if xp.current > 0 and xp.total > 0 then
+        local calc = math.floor((xp.current / xp.total) * 468)
+        set_foreground_width(calc)
+        xp.rate = analyze_points_table(xp.registry)
+    end
+    update_strings()
+end
+
+-- Center the Bar & Text on Screen
+function position_bars()
+    set_background_pos_x(((windower_res_x / 2) - (get_background_width() / 2)))
+    set_foreground_pos_x(get_background_pos_x() + 2)
+end
+
+function position_text()
+    set_box_pos_x(get_background_pos_x() - 6)
+    set_box_pos_y(get_background_pos_y() + 4)
 end
 
 -- Getters
@@ -272,6 +358,26 @@ end
 
 function get_box_pos_y()
     return box_pos_y
+end
+
+function get_box_visible()
+    return box_visible
+end
+
+function get_box_font_size()
+    return font_size
+end
+
+function get_rested_bonus_pos_x()
+    return bonus_pos_x
+end
+
+function get_rested_bonus_pos_y()
+    return bonus_pos_y
+end
+
+function get_rested_bonus_visible()
+    return bonus_visible
 end
 
 -- Setters
@@ -316,7 +422,7 @@ function set_foreground_width(new_width)
     update_strings()
 end
 
-function set_box_pos_x(new_pos_x) -- 
+function set_box_pos_x(new_pos_x)
     box_pos_x = new_pos_x
     windower.text.set_location('box', new_pos_x, get_box_pos_y())
 end
@@ -324,42 +430,4 @@ end
 function set_box_pos_y(new_pos_y)
     box_pos_y = new_pos_y
     windower.text.set_location('box', get_box_pos_x(), new_pos_y)
-end
-
--- Display helpful information
-function help()
-    windower.add_to_chat(8,_addon.name..' v'.._addon.version..': Command Listing')
-    windower.add_to_chat(8,'   (c)lear - Resets EXP counter')
-    windower.add_to_chat(8,'   (u)nload - Disables BarFiller')
-    windower.add_to_chat(8,'   (r)eload - Reloads BarFiller')
-end
-
--- Thanks to Byrthnoth's PointWatch addon
-function exp_msg(val,msg)
-    local t = os.clock()
-    if msg == 8 or msg == 105 then
-        xp.registry[t] = (xp.registry[t] or 0) + val
-        xp.current = math.min(xp.current + val,55999)
-        if xp.current > xp.tnl then
-            xp.current = xp.current - xp.tnl
-        end
-    end
-end
-
--- Calculate XP Bar Width
-function calc_exp_bar()
-    local calc = math.floor((xp.current / xp.total) * 468)
-    set_foreground_width(calc)
-    update_strings()
-end
-
--- Center the Bar & Text on Screen
-function position_bars()
-    set_background_pos_x(((windower_res_x / 2) - (get_background_width() / 2)))
-    set_foreground_pos_x(get_background_pos_x() + 2)
-end
-
-function position_text()
-    set_box_pos_x(get_background_pos_x() - 6)
-    set_box_pos_y(get_background_pos_y() + 4)
 end
