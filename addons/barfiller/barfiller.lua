@@ -28,7 +28,7 @@
 
 _addon.name = 'BarFiller'
 _addon.author = 'Morath'
-_addon.version = '0.1.9'
+_addon.version = '0.2.0'
 _addon.commands = {'bf','barfiller'}
 _addon.language = 'english'
 
@@ -46,7 +46,25 @@ require('statics')
 settings_table = config.load(defaults)
 config.save(settings_table)
 
-initialize()
+ready = false
+chunk_update = false
+
+-- Make sure character is logged in, and loaded before initializing
+windower.register_event('load',function()
+    if windower.ffxi.get_info().logged_in and windower.ffxi.get_player() then
+        initialize() -- Populate character details
+    end
+end)
+
+-- Delay initialize() for 10 seconds to allow game to download chunks
+windower.register_event('login',function()
+    windower.send_command('wait 10;barfiller clear;')
+end)
+
+-- If you're switching characters this will clear the addon from memory
+windower.register_event('logout',function()
+    windower.send_command('lua r barfiller')
+end)
 
 -- Addon commands
 -- Thanks to Byrth & SnickySnacks' BattleMod addon
@@ -56,7 +74,6 @@ windower.register_event('addon command',function(command, ...)
     if approved_commands[first_cmd] and #commands >= approved_commands[first_cmd].n then
         if first_cmd == 'clear' or first_cmd == 'c' then        -- Reset EXP bar to 0
             initialize()
-            windower.add_to_chat(8,'BarFiller successfully reset the experience counter.')
         elseif first_cmd == 'reload' or first_cmd == 'r' then   -- Reloads BarFiller
             windower.add_to_chat(8,'BarFiller successfully reloaded.')
             windower.send_command('lua r barfiller;')
@@ -75,19 +92,26 @@ end)
 -- Thanks to smd111 for Packet parsing
 windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blocked)
     if is_injected then return end
-    local packet_table = packets.parse('incoming', org)
-    if id == 0x2D then
-        exp_msg(packet_table['Param 1'],packet_table['Message'])
-    elseif id == 0x61 then
-        xp.current = packet_table['Current EXP']
-        xp.total = packet_table['Required EXP']
-        xp.tnl = xp.total - xp.current
+    if ready then
+        local packet_table = packets.parse('incoming', org)
+        if id == 0x2D then
+            exp_msg(packet_table['Param 1'],packet_table['Message'])
+        elseif id == 0x61 then
+            xp.current = packet_table['Current EXP']
+            xp.total = packet_table['Required EXP']
+            xp.tnl = xp.total - xp.current
+            chunk_update = true
+        end
     end
 end)
 
+-- Updates the 
 windower.register_event('prerender',function()
-    if frame_count%30 == 0 then
-        calc_exp_bar()
+    if ready then
+        if frame_count%30 == 0 and chunk_update then
+            calc_exp_bar()
+            chunk_update = false
+        end
+        frame_count = frame_count + 1
     end
-    frame_count = frame_count + 1
 end)
