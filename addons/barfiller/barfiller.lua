@@ -105,7 +105,6 @@ windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blo
     end
 end)
 
--- Updates the 
 windower.register_event('prerender',function()
     if ready then
         if frame_count%30 == 0 and chunk_update then
