@@ -30,7 +30,7 @@
 defaults = {
     Bars = {
         Background = {
-            Image = windower.windower_path..'addons\\barfiller\\data\\bar_bg.png',
+            Image = windower.addon_path..'bar_bg.png',
             Pos = {
                 X = 164,
                 Y = 6
@@ -41,7 +41,7 @@ defaults = {
             }
         },
         Foreground = {
-            Image = windower.windower_path..'addons\\barfiller\\data\\bar_fg.png',
+            Image = windower.addon_path..'bar_fg.png',
             Pos = {
                 X = 166,
                 Y = 6
@@ -90,7 +90,7 @@ defaults = {
         }
     },
     RestedBonus = {
-        Image = windower.windower_path..'addons\\barfiller\\data\\moon.png',
+        Image = windower.addon_path..'moon.png',
         Pos = {
             X = 636,
             Y = 0
@@ -317,6 +317,14 @@ end
 function position_text()
     set_box_pos_x(get_background_pos_x() - 6)
     set_box_pos_y(get_background_pos_y() + 4)
+end
+
+-- When logging out, hides the player stats
+function hide()
+    windower.prim.set_visibility('background_bar', false)
+    windower.prim.set_visibility('foreground_bar', false)
+    windower.text.set_visibility('box', false)
+    ready = false
 end
 
 -- Getters

@@ -51,19 +51,19 @@ chunk_update = false
 
 -- Make sure character is logged in, and loaded before initializing
 windower.register_event('load',function()
-    if windower.ffxi.get_info().logged_in and windower.ffxi.get_player() then
+    if windower.ffxi.get_info().logged_in then
         initialize() -- Populate character details
     end
 end)
 
 -- Delay initialize() for 10 seconds to allow game to download chunks
 windower.register_event('login',function()
-    windower.send_command('wait 10;barfiller clear;')
+    initialize:schedule(10)
 end)
 
--- If you're switching characters this will clear the addon from memory
+-- If you're switching characters this will clear the previous characters stats
 windower.register_event('logout',function()
-    windower.send_command('lua r barfiller')
+    hide()
 end)
 
 -- Addon commands
