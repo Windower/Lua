@@ -2159,16 +2159,16 @@ fields.incoming._func[0x044][0x12] = L{
     {ctype='unsigned int',      label='Light Attachments'},                     -- 50   Flags for the available Light Attachments (Position corresponds to Item ID)
     {ctype='unsigned int',      label='Dark Attachments'},                      -- 54   Flags for the available Dark Attachments (Position corresponds to Item ID)
     {ctype='char[16]',          label='Pet Name'},                              -- 58
-    {ctype='unsigned short',    label='Max or Current HP'},                     -- 68   The next two are max or current HP. My PUP sucks too much to fight things, so idk which.
-    {ctype='unsigned short',    label='Max or Current HP'},                     -- 6A   The next two are max or current HP. My PUP sucks too much to fight things, so idk which.
-    {ctype='unsigned short',    label='Max or Current MP'},                     -- 6C   Likely max or current MP
-    {ctype='unsigned short',    label='Max or Current MP'},                     -- 6E   Likely max or current MP
-    {ctype='unsigned short',    label='Max or Current Melee Skill'},            -- 70
-    {ctype='unsigned short',    label='Max or Current Melee Skill'},            -- 72
-    {ctype='unsigned short',    label='Max or Current Ranged Skill'},           -- 74
-    {ctype='unsigned short',    label='Max or Current Ranged Skill'},           -- 76
-    {ctype='unsigned short',    label='Max or Current Magic Skill'},            -- 78
-    {ctype='unsigned short',    label='Max or Current Magic Skill'},            -- 7A
+    {ctype='unsigned short',    label='Current HP'},                            -- 68
+    {ctype='unsigned short',    label='Max HP'},                                -- 6A
+    {ctype='unsigned short',    label='Current MP'},                            -- 6C
+    {ctype='unsigned short',    label='Max MP'},                                -- 6E
+    {ctype='unsigned short',    label='Current Melee Skill'},                   -- 70
+    {ctype='unsigned short',    label='Max Melee Skill'},                       -- 72
+    {ctype='unsigned short',    label='Current Ranged Skill'},                  -- 74
+    {ctype='unsigned short',    label='Max Ranged Skill'},                      -- 76
+    {ctype='unsigned short',    label='Current Magic Skill'},                   -- 78
+    {ctype='unsigned short',    label='Max Magic Skill'},                       -- 7A
     {ctype='unsigned int',      label='_unknown9'},                             -- 7C
     {ctype='unsigned short',    label='Base STR'},                              -- 80
     {ctype='unsigned short',    label='Additional STR'},                        -- 82
@@ -3484,11 +3484,43 @@ sizes['float'] = 4
 sizes['double'] = 8
 sizes['data'] = 1
 
+local size
+size = function(fs)
+    if fs.ctype then
+        local ctype, count_str = fs.ctype:match('(.*)%[(.+)%]')
+        local count_num = count_str and count_str:number() or 1
+        ctype = ctype or fs.ctype
+
+        if ctype == 'bit' or ctype == 'boolbit' then
+            return 0, count_num
+        end
+
+        return count_num * sizes[ctype]
+    end
+
+    local acc = 0
+    local offset = 0
+    for f in (fs.ref or fs):it() do
+        local bytes, bits = size(f)
+        offset = offset + (bits or 0)
+        acc = acc + bytes + (offset / 8):floor()
+        offset = offset % 8
+    end
+
+    return (fs.ref or fs):map(size):sum(), offset
+end
+
 local non_array_types = S{'char', 'bit', 'data'}
 
-local function parse(fs, data, index, max, lookup)
+local parse
+parse = function(fs, data, index, max, lookup)
     max = max == '*' and 0 or max or 1
     index = index or 4
+
+    if not data then
+        local bytes, bits = size(fs)
+        data = 0:char():rep(4 + 4 * (bytes + ((bits or 0) / 8):ceil() / 4):floor())
+    end
 
     local res = L{}
     local count = 0
@@ -3549,12 +3581,12 @@ local function parse(fs, data, index, max, lookup)
     return res, index
 end
 
-function fields.get(dir, id, data)
+fields.get = function(dir, id, data)
     local f = fields[dir][id]
     if type(f) == 'function' then
         f = f(data)
     end
-    return f and data and parse(f, data) or f
+    return f and parse(f, data) or nil
 end
 
 return fields
