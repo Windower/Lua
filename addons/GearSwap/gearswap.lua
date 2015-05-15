@@ -379,7 +379,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         items[bag][slot].count = data:unpack('I',5)
         items[bag][slot].status = data:byte(0x0D)
     elseif id == 0x020 then
-        local bag = to_windower_api(res.bags[data:byte(0x0F)].english)
+        local bag = to_windower_api(res.bags[data:byte(0x0F)].english):gsub('_','')
         local slot = data:byte(0x10)
         if not items[bag][slot] then items[bag][slot] = make_empty_item_table(slot) end
         items[bag][slot].id = data:unpack('H',0x0D)
