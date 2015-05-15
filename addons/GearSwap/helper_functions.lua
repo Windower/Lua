@@ -202,6 +202,18 @@ function to_windower_api(str)
     return __raw.lower(str:gsub(' ','_'))
 end
 
+-----------------------------------------------------------------------------------
+----Name: to_windower_compact(str)
+-- Takes strings and converts them to a compact version of the resource table key
+----Args:
+-- str - String to be converted to the windower API version
+-----------------------------------------------------------------------------------
+----Returns:
+-- a lower case string with ' ' replaced with ''
+-----------------------------------------------------------------------------------
+function to_windower_compact(str)
+    return __raw.lower(str:gsub(' ',''))
+end
 
 -----------------------------------------------------------------------------------
 ----Name: get_job_names()
