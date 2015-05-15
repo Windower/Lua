@@ -370,6 +370,7 @@ function initialize_globals()
                 locker = make_inventory_table(),
                 case = make_inventory_table(),
                 wardrobe = make_inventory_table(),
+                safe2 = make_inventory_table(),
                 equipment = {},
             }
         for id,name in pairs(default_slot_map) do
@@ -394,6 +395,8 @@ function initialize_globals()
             items.case[0] = make_empty_item_table(0) end
         if not items.wardrobe then items.wardrobe = make_inventory_table()  else
             items.wardrobe[0] = make_empty_item_table(0) end
+        if not items.safe2 then items.safe2 = make_inventory_table()  else
+            items.safe2[0] = make_empty_item_table(0) end
         if not items.equipment then
             items.equipment = {}
             for id,name in pairs(default_slot_map) do
