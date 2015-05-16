@@ -33,9 +33,9 @@ end
 
 function remove_categories(t)
     local u = {}
-    local res = res
+    local res = res.job_abilities
     for i = 1,#t do
-        if not not_a_spell:contains(res.job_abilities[t[i]].en) then
+        if not not_a_spell:contains(res[t[i]].en) then
             u[#u + 1] = t[i]
         end
     end
@@ -163,8 +163,8 @@ function count_job_points()
 end
 
 function menu_building_snippet()
-    current_menu.type = last_menu_open.type
     if current_menu then
+        current_menu.type = last_menu_open.type
         last_menu_open = current_menu
         for i = 1,menu_layer_record.n do
             if current_menu[menu_layer_record[i]] then
@@ -178,6 +178,11 @@ function menu_building_snippet()
         end
         build_a_menu(current_menu)
     else
+        close_a_menu()
         current_menu = {}
     end
+end
+
+function bit.is_set(val, pos) -- Credit: Arcon
+    return bit.band(val, 2^(pos - 1)) > 0
 end
