@@ -210,6 +210,13 @@ function item_tab:transfer(dest_bag,count)
     count = count or self.count
     local parent = self._parent
     local targ_inv = parent._parent[dest_bag]
+
+    -- respect the ignore list
+    if(_ignore_list[res.items[self.id].english] and (parent._info.bag_id == 0)) then
+        org_verbose('Skipping item: ('..res.items[self.id].english..') ')
+        return false
+    end
+
     if not (targ_inv._info.bag_id == 0 or parent._info.bag_id == 0) then
         org_warning('Cannot move between two bags that are not inventory bags.')
     else
