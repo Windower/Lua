@@ -49,9 +49,12 @@ function Items.new(loc_items,bool)
     loc_items = loc_items or windower.ffxi.get_items()
     new_instance = setmetatable({}, {__index = function (t, k) if rawget(t,k) then return rawget(t,k) else return rawget(items,k) end end})
     for bag_id,bag_table in pairs(res.bags) do
-        if (bool or validate_bag(bag_table)) and (loc_items[bag_id] or loc_items[bag_table.english:lower()]) then
+        org_debug("Items.new::bag_id: "..bag_id)
+        bag_name = bag_table.english:lower():gsub(' ', '')
+        org_debug("Items.new::bag_name: "..bag_name)
+        if (bool or validate_bag(bag_table)) and (loc_items[bag_id] or loc_items[bag_name]) then
             local cur_inv = new_instance:new(bag_id)
-            for inventory_index,item_table in pairs(loc_items[bag_id] or loc_items[bag_table.english:lower()]) do
+            for inventory_index,item_table in pairs(loc_items[bag_id] or loc_items[bag_name]) do
                 if type(item_table) == 'table' and validate_id(item_table.id) then
                     cur_inv:new(item_table.id,item_table.count,item_table.extdata,item_table.augments,item_table.status,inventory_index)
                 end
@@ -115,6 +118,7 @@ function items:it()
             if self[id] and validate_bag(res.bags[id]) then return id, self[id] end
         end
     end
+
 end
 
 function bags:new(id,count,ext,augments,status,index)
@@ -255,10 +259,12 @@ function item_tab:move(dest_bag,dest_slot,count)
 end
 
 function item_tab:put_away(usable_bags)
+    org_debug("Putting away")
     local current_items = self._parent._parent
-    usable_bags = usable_bags or {1,4,2,5,6,7,8}
+    usable_bags = usable_bags or {1,4,2,5,6,7,8,9}
     local bag_free
     for _,v in ipairs(usable_bags) do
+        org_debug("V in put_away is "..v)
         if current_items[v]._info.n < 80 and wardrobecheck(v,self.id) then
             bag_free = v
             break

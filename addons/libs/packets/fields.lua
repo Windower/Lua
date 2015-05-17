@@ -2783,7 +2783,8 @@ fields.incoming[0x067] = L{
 -- The upper 10 bits of the Mask is the length in bytes of the data excluding the header and any padding
 --    after the pet name.
 
-    {ctype='unsigned short',    label='Mask'},                                  -- 04
+    {ctype='bit[6]',            label='Message Type'},                          -- 04
+    {ctype='bit[10]',           label='Message Length'},                        -- 05
     {ctype='unsigned short',    label='Pet Index',          fn=index},          -- 06
     {ctype='unsigned int',      label='Pet ID',             fn=id},             -- 08
     {ctype='unsigned short',    label='Owner Index',        fn=index},          -- 0C
@@ -2791,7 +2792,9 @@ fields.incoming[0x067] = L{
     {ctype='unsigned char',     label='Current MP%',        fn=percent},        -- 0F
     {ctype='unsigned short',    label='Pet TP%',            fn=percent},        -- 10   Multiplied by 10
     {ctype='unsigned short',    label='_unknown1'},                             -- 12
-    {ctype='char*',             label='Pet Name'},                              -- 14   Packet expands to accommodate pet name length.
+    {ctype='unsigned short',    label='_unknown2'},                             -- 14
+    {ctype='unsigned short',    label='_unknown3'},                             -- 16
+    {ctype='char*',             label='Pet Name'},                              -- 18   Packet expands to accommodate pet name length.
 }
 
 -- Self Synth Result

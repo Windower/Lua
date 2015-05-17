@@ -95,8 +95,8 @@ unbridled_learning_set = {['Thunderbolt']=true,['Harden Shell']=true,['Absolute 
     ['Uproot']=true,['Crashing Thunder']=true,['Polar Roar']=true}
     
 not_a_spell = S{
-    'Stratagems', 'Blood Pact: Rage', 'Sambas', 'Waltzes', 'Steps', 'Flourishes I', 'Flourishes II', 'Blood Pact: Ward',
-    'Phantom Roll', 'Rune Enchantment', 'Jigs',
+    'Stratagems', 'Blood Pact: Rage', 'Sambas', 'Waltzes', 'Steps', 'Flourishes I', 'Flourishes II', 'Flourishes III',
+    'Blood Pact: Ward', 'Phantom Roll', 'Rune Enchantment', 'Jigs', 'Ready'
 }
 
 is_icon = {
