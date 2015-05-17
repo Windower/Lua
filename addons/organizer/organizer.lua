@@ -298,7 +298,7 @@ function organize(goal_items)
         goal_items, current_items = clean_goal(goal_items,current_items)
         goal_items, current_items = tidy(goal_items,current_items,dump_bags)
         remainder = incompletion_check(goal_items,remainder)
-        org_verbose(tostring(remainder)..' '..current_items[0]._info.n,1)
+        org_verbose("Remainder: "..tostring(remainder)..' Current: '..current_items[0]._info.n,1)
     end
     goal_items, current_items = tidy(goal_items,current_items)
     
