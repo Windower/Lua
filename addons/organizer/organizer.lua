@@ -60,11 +60,14 @@ _global = {
     language_log = 'english_log',
 }
 
+_ignore_list = {}
+
 default_settings = {
     custom = 0,
     dump_bags = {['Safe']=1,['Safe2']=2,['Locker']=3,['Storage']=4},
     bag_priority = {['Safe']=1,['Safe2']=2,['Locker']=3,['Storage']=4,['Satchel']=5,['Sack']=6,['Case']=7,['Inventory']=8,['Wardrobe']=9},
     item_delay = 0,
+    ignore = { "Warp Ring" },
     auto_heal = false,
     default_file='default.lua',
     verbose=false,
@@ -113,6 +116,12 @@ function options_load( )
     if not settings.custom then
         org_debug("Using default configuration")
         settings = config.load(default_settings)
+    end
+
+    -- Build the ignore list
+    for i,v in pairs(settings.ignore) do
+        org_debug("Adding "..v.." to the ignore list")
+        _ignore_list[v] = 1
     end
 end
 
