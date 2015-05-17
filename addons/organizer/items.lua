@@ -71,7 +71,7 @@ function items:new(key)
 end
 
 function items:find(item)
-    for bag_id,bag_table in pairs(res.bags) do
+    for bag_name,bag_id in pairs(settings.bag_priority) do
         if self[bag_id] and self[bag_id]:contains(item) then
             return bag_id, self[bag_id]:contains(item)
         end
@@ -237,7 +237,7 @@ function item_tab:move(dest_bag,dest_slot,count)
         wardrobecheck(targ_inv._info.bag_id,self.id) and
         self:free() then
         windower.packets.inject_outgoing(0x29,string.char(0x29,6,0,0)..'I':pack(count)..string.char(parent._info.bag_id,dest_bag,self.index,dest_slot))
-        org_warning('Moving item! ('..res.items[self.id].english..') from '..res.bags[parent._info.bag_id].en..' '..parent._info.n..' to '..res.bags[dest_bag].en..' '..targ_inv._info.n..')')
+        org_verbose('Moving item! ('..res.items[self.id].english..') from '..res.bags[parent._info.bag_id].slot..' '..parent._info.n..' to '..res.bags[dest_bag].slot..' '..targ_inv._info.n..')')
         local new_index = targ_inv:new(self.id, count, self.extdata, self.augments)
         --print(parent._info.bag_id,dest_bag,self.index,new_index)
         parent:remove(self.index)
