@@ -71,7 +71,7 @@ function items:new(key)
 end
 
 function items:find(item)
-    for bag_id,bag_table in pairs(res.bags) do
+    for bag_name,bag_id in pairs(settings.bag_priority) do
         if self[bag_id] and self[bag_id]:contains(item) then
             return bag_id, self[bag_id]:contains(item)
         end
@@ -210,7 +210,11 @@ function item_tab:transfer(dest_bag,count)
     count = count or self.count
     local parent = self._parent
     local targ_inv = parent._parent[dest_bag]
-    if not (targ_inv._info.bag_id == 0 or parent._info.bag_id == 0) then
+
+    local parent_bag_id = parent._info.bag_id
+    local target_bag_id = targ_inv._info.bag_id
+
+    if not (target_bag_id == 0 or parent_bag_id == 0) then
         org_warning('Cannot move between two bags that are not inventory bags.')
     else
         while parent[self.index] and targ_inv:find_unfinished_stack(parent[self.index]) do
@@ -230,6 +234,28 @@ function item_tab:move(dest_bag,dest_slot,count)
     local parent = self._parent
     local targ_inv = parent._parent[dest_bag]
     dest_slot = dest_slot or 0x52
+
+    local parent_bag_id = parent._info.bag_id
+    local target_bag_id = targ_inv._info.bag_id
+
+    -- respect the ignore list
+    if(_ignore_list[res.items[self.id].english] and (parent_bag_id == 0)) then
+        org_verbose('Skipping item: ('..res.items[self.id].english..') ')
+        return false
+    end
+
+    -- Make sure the source can be pulled from
+    if not _valid_pull[parent_bag_id] then
+        org_verbose('Skipping item: ('..res.items[self.id].english..') - can not be pulled from '..res.bags[parent_bag_id].en..') ')
+        return false
+    end
+
+    -- Make sure the target can be pushed to
+    if not _valid_dump[target_bag_id] then
+        org_verbose('Skipping item: ('..res.items[self.id].english..') - can not be pushed to '..res.bags[target_bag_id].en..') ')
+        return false
+    end
+
     
     if not self:annihilated() and
         (not dest_slot or not targ_inv[dest_slot] or (targ_inv[dest_slot] and res.items[targ_inv[dest_slot].id].stack < targ_inv[dest_slot].count + count)) and
@@ -237,7 +263,7 @@ function item_tab:move(dest_bag,dest_slot,count)
         wardrobecheck(targ_inv._info.bag_id,self.id) and
         self:free() then
         windower.packets.inject_outgoing(0x29,string.char(0x29,6,0,0)..'I':pack(count)..string.char(parent._info.bag_id,dest_bag,self.index,dest_slot))
-        org_warning('Moving item! ('..res.items[self.id].english..') from '..res.bags[parent._info.bag_id].en..' '..parent._info.n..' to '..res.bags[dest_bag].en..' '..targ_inv._info.n..')')
+        org_verbose('Moving item! ('..res.items[self.id].english..') from '..res.bags[parent._info.bag_id].en..' '..parent._info.n..' to '..res.bags[dest_bag].en..' '..targ_inv._info.n..')')
         local new_index = targ_inv:new(self.id, count, self.extdata, self.augments)
         --print(parent._info.bag_id,dest_bag,self.index,new_index)
         parent:remove(self.index)

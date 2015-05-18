@@ -37,7 +37,7 @@ config = require 'config'
 
 _addon.name = 'Organizer'
 _addon.author = 'Byrth, maintainer: Rooks'
-_addon.version = 0.150324
+_addon.version = 0.150325
 _addon.commands = {'organizer','org'}
 
 _static = {
@@ -60,11 +60,16 @@ _global = {
     language_log = 'english_log',
 }
 
+_ignore_list = {}
+_valid_pull = {}
+_valid_dump = {}
+
 default_settings = {
     custom = 0,
     dump_bags = {['Safe']=1,['Safe2']=2,['Locker']=3,['Storage']=4},
     bag_priority = {['Safe']=1,['Safe2']=2,['Locker']=3,['Storage']=4,['Satchel']=5,['Sack']=6,['Case']=7,['Inventory']=8,['Wardrobe']=9},
     item_delay = 0,
+    ignore = {['satchel'] = { "Warp Ring" } },
     auto_heal = false,
     default_file='default.lua',
     verbose=false,
@@ -114,6 +119,30 @@ function options_load( )
         org_debug("Using default configuration")
         settings = config.load(default_settings)
     end
+
+    -- Build the ignore list
+    if(settings.ignore) then
+        for bag_name,i_list in pairs(settings.ignore) do
+            _ignore_list[bag_name] = {}
+            for _,ignore_name in pairs(i_list) do
+                org_verbose("Adding "..ignore_name.." in the "..bag_name.." to the ignore list")
+                _ignore_list[bag_name][ignore_name] = 1
+            end
+        end
+    end
+
+    -- Build a hard-wired pull list
+    for bag_name,_ in pairs(settings.bag_priority) do
+         org_verbose("Adding "..bag_name.." to the pull list")
+        _valid_pull[s_to_bag(bag_name)] = 1
+    end
+
+    -- Build a hard-wired dump list
+    for bag_name,_ in pairs(settings.dump_bags) do
+         org_verbose("Adding "..bag_name.." to the push list")
+        _valid_dump[s_to_bag(bag_name)] = 1
+    end
+
 end
 
 
@@ -298,7 +327,7 @@ function organize(goal_items)
         goal_items, current_items = clean_goal(goal_items,current_items)
         goal_items, current_items = tidy(goal_items,current_items,dump_bags)
         remainder = incompletion_check(goal_items,remainder)
-        org_verbose(tostring(remainder)..' '..current_items[0]._info.n,1)
+        org_verbose("Remainder: "..tostring(remainder)..' Current: '..current_items[0]._info.n,1)
     end
     goal_items, current_items = tidy(goal_items,current_items)
     
