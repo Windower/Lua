@@ -143,6 +143,10 @@ function options_load( )
         _valid_dump[s_to_bag(bag_name)] = 1
     end
 
+    -- Always allow inventory, obviously
+    _valid_dump[0] = 1
+    _valid_pull[0] = 1
+
 end
 
 
