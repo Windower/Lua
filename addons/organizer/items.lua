@@ -53,9 +53,11 @@ function Items.new(loc_items,bool)
         bag_name = bag_table.english:lower():gsub(' ', '')
         org_debug("Items.new::bag_name: "..bag_name)
         if (bool or validate_bag(bag_table)) and (loc_items[bag_id] or loc_items[bag_name]) then
+            org_debug("Items.new: new_instance for ID#"..bag_id)
             local cur_inv = new_instance:new(bag_id)
             for inventory_index,item_table in pairs(loc_items[bag_id] or loc_items[bag_name]) do
                 if type(item_table) == 'table' and validate_id(item_table.id) then
+                    org_debug("Items.new: inventory_index="..inventory_index.." item_table.id="..item_table.id.." ("..res.items[item_table.id].english..")")
                     cur_inv:new(item_table.id,item_table.count,item_table.extdata,item_table.augments,item_table.status,inventory_index)
                 end
             end
@@ -65,6 +67,7 @@ function Items.new(loc_items,bool)
 end
 
 function items:new(key)
+    org_debug("New items instance with key "..key)
     local new_instance = setmetatable({_parent = self,_info={n=0,bag_id=key}}, {__index = function (t, k) if rawget(t,k) then return rawget(t,k) else return rawget(bags,k) end end})
     self[key] = new_instance
     return new_instance
@@ -72,10 +75,16 @@ end
 
 function items:find(item)
     for bag_name,bag_id in pairs(settings.bag_priority) do
-        if self[bag_id] and self[bag_id]:contains(item) then
-            return bag_id, self[bag_id]:contains(item)
+        real_bag_id = s_to_bag(bag_name)
+        org_debug("Searching "..bag_name.." for "..res.items[item.id].english..".")
+        if self[bag_id] and self[real_bag_id]:contains(item) then
+            org_debug("Found "..res.items[item.id].english.." in "..bag_name..".")
+            return real_bag_id, self[real_bag_id]:contains(item)
+        else
+            org_debug("Didn't find "..res.items[item.id].english.." in "..bag_name..".")    
         end
     end
+    org_debug("Didn't find "..res.items[item.id].english.." in any bags.")    
     return false
 end
 
@@ -115,7 +124,9 @@ function items:it()
             if not id then
                 org_error('The bag name ("'..tostring(bag_priority_list[i])..'") with priority '..tostring(i)..' in the ../addons/organizer/data/settings.xml file is not valid.\nValid options are '..tostring(res.bags))
             end
-            if self[id] and validate_bag(res.bags[id]) then return id, self[id] end
+            if self[id] and validate_bag(res.bags[id]) then
+                return id, self[id]
+            end
         end
     end
 
@@ -130,7 +141,7 @@ function bags:new(id,count,ext,augments,status,index)
     augments = augments or ext and id and extdata.decode({id=id,extdata=ext}).augments
     if augments then augments = table.filter(augments,-functions.equals('none')) end
     self[index] = setmetatable({_parent=self,id=id,count=count,extdata=ext,index=index,status=status,
-        name=res.items[id][_global.language]:lower(),log_name=res.items[id][_global.language..'_log']:lower(),augments=augments},
+        name=res.items[id][_global.language]:lower(),log_name=res.items[id][_global.language_log]:lower(),augments=augments},
         {__index = function (t, k) 
             if not t or not k then print('table index is nil error',t,k) end
             if rawget(t,k) then
@@ -167,6 +178,7 @@ end
 function bags:find_all_instances(item,bool)
     local instances = L{}
     for i,v in self:it() do
+        org_debug("find_all_instances: slot="..i.." v="..res.items[v.id].english.." item="..res.items[item.id].english.." ")
         if (bool or not v:annihilated()) and v.id == item.id then -- and v.count >= item.count then
             if not item.augments or table.length(item.augments) == 0 or v.augments and extdata.compare_augments(item.augments,v.augments) then
                 -- May have to do a higher level comparison here for extdata.
@@ -185,6 +197,7 @@ end
 
 function bags:contains(item,bool)
     bool = bool or false -- Default to only looking at unannihilated items
+    org_debug("contains: searching for "..res.items[item.id].english.." in "..self._info.bag_id)
     local instances = self:find_all_instances(item,bool)
     if instances then
         return instances:it()()
@@ -238,6 +251,10 @@ function item_tab:move(dest_bag,dest_slot,count)
     local parent_bag_id = parent._info.bag_id
     local target_bag_id = targ_inv._info.bag_id
 
+    org_debug("move(): Item: "..res.items[self.id].english)
+    org_debug("move(): Parent bag: "..parent_bag_id)
+    org_debug("move(): Target bag: "..target_bag_id)
+
     -- respect the ignore list
     if(_ignore_list[res.items[self.id].english] and (parent_bag_id == 0)) then
         org_verbose('Skipping item: ('..res.items[self.id].english..') ')
@@ -256,7 +273,6 @@ function item_tab:move(dest_bag,dest_slot,count)
         return false
     end
 
-    
     if not self:annihilated() and
         (not dest_slot or not targ_inv[dest_slot] or (targ_inv[dest_slot] and res.items[targ_inv[dest_slot].id].stack < targ_inv[dest_slot].count + count)) and
         (targ_inv._info.bag_id == 0 or parent._info.bag_id == 0) and
@@ -287,10 +303,9 @@ end
 function item_tab:put_away(usable_bags)
     org_debug("Putting away")
     local current_items = self._parent._parent
-    usable_bags = usable_bags or {1,4,2,5,6,7,8,9}
+    usable_bags = usable_bags or {1,9,4,2,5,6,7,8}
     local bag_free
     for _,v in ipairs(usable_bags) do
-        org_debug("V in put_away is "..v)
         if current_items[v]._info.n < 80 and wardrobecheck(v,self.id) then
             bag_free = v
             break
