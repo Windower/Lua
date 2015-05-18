@@ -251,7 +251,7 @@ function item_tab:move(dest_bag,dest_slot,count)
     end
 
     -- Make sure the target can be pushed to
-    if not _valid_pull[target_bag_id] then
+    if not _valid_dump[target_bag_id] then
         org_verbose('Skipping item: ('..res.items[self.id].english..') - can not be pushed to '..res.bags[target_bag_id].en..') ')
         return false
     end
