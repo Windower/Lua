@@ -69,7 +69,7 @@ default_settings = {
     dump_bags = {['Safe']=1,['Safe2']=2,['Locker']=3,['Storage']=4},
     bag_priority = {['Safe']=1,['Safe2']=2,['Locker']=3,['Storage']=4,['Satchel']=5,['Sack']=6,['Case']=7,['Inventory']=8,['Wardrobe']=9},
     item_delay = 0,
-    ignore = {['satchel'] = { "Warp Ring" } },
+    ignore = {},
     auto_heal = false,
     default_file='default.lua',
     verbose=false,
@@ -142,6 +142,10 @@ function options_load( )
          org_verbose("Adding "..bag_name.." to the push list")
         _valid_dump[s_to_bag(bag_name)] = 1
     end
+
+    -- Always allow inventory, obviously
+    _valid_dump[0] = 1
+    _valid_pull[0] = 1
 
 end
 
@@ -425,7 +429,7 @@ end
 
 function org_debug(msg)
     if _debugging.debug then
-        windower.add_to_chat(123,'Organizer: '..msg)
+        windower.add_to_chat(123,'Organizer [DEBUG]: '..msg)
     end
 end
 
