@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 -- Convert the spells and job abilities into a referenceable list of aliases --
-
+ 
 unify_prefix = {['/ma'] = '/ma', ['/magic']='/ma',['/jobability'] = '/ja',['/ja']='/ja',['/item']='/item',['/song']='/ma',
     ['/so']='/ma',['/ninjutsu']='/ma',['/weaponskill']='/ws',['/ws']='/ws',['/ra']='/ra',['/rangedattack']='/ra',['/nin']='/ma',
     ['/throw']='/ra',['/range']='/ra',['/shoot']='/ra',['/monsterskill']='/ms',['/ms']='/ms',['/pet']='/ja',['Monster']='Monster'}
@@ -384,6 +384,7 @@ function initialize_globals()
             end
         end
     end
+    for i in pairs(windower.ffxi.get_bag_info()) do
         if not items[i] then items[i] = make_inventory_table()
         else items[i][0] = make_empty_item_table(0) end
     end
