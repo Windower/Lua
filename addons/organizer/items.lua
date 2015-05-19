@@ -77,7 +77,7 @@ function items:find(item)
     for bag_name,bag_id in pairs(settings.bag_priority) do
         real_bag_id = s_to_bag(bag_name)
         org_debug("Searching "..bag_name.." for "..res.items[item.id].english..".")
-        if self[bag_id] and self[real_bag_id]:contains(item) then
+        if self[real_bag_id] and self[real_bag_id]:contains(item) then
             org_debug("Found "..res.items[item.id].english.." in "..bag_name..".")
             return real_bag_id, self[real_bag_id]:contains(item)
         else

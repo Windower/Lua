@@ -37,7 +37,7 @@ config = require 'config'
 
 _addon.name = 'Organizer'
 _addon.author = 'Byrth, maintainer: Rooks'
-_addon.version = 0.150325
+_addon.version = 0.150326
 _addon.commands = {'organizer','org'}
 
 _static = {
