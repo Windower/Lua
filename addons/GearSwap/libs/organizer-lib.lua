@@ -45,10 +45,10 @@ function org.export_set()
     end
 
     -- See if we have any non-equipment items to drag along
-    if organizer_extra then
-        local extra_item_list = org.unpack_names({}, 'L1', organizer_extra, {})
+    if organizer_items then
+        local organizer_item_list = org.unpack_names({}, 'L1', organizer_items, {})
 
-        for _,tab in pairs(org.identify_items(extra_item_list)) do
+        for _,tab in pairs(org.identify_items(organizer_item_list)) do
             count = gearswap.res.items[tab.id].stack
             flattab:append({id=tab.id,name=tab.name,log_name=tab.log_name,count=count})
         end
