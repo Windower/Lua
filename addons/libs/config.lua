@@ -61,9 +61,7 @@ function config.load(filepath, defaults)
         config.save(settings, 'all')
     end
 
-    local res = parse(settings)
-    config.save(settings)
-    return res
+    return parse(settings)
 end
 
 -- Reloads the settings for the provided table. Needs to be the same table that was assigned to with config.load.
