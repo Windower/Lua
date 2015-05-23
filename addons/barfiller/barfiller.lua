@@ -28,23 +28,38 @@
 
 _addon.name = 'BarFiller'
 _addon.author = 'Morath'
-_addon.version = '0.2.0'
+_addon.version = '0.2.1'
 _addon.commands = {'bf','barfiller'}
 _addon.language = 'english'
 
---Windower Libs
+-- Windower Libs
 config = require('config')
 file = require('files')
 packets = require('packets')
 texts = require('texts')
 
---BarFiller Libs
+-- Experimental Image Library
+images = require('images')
+
+-- BarFiller Libs
 require('statics')
 
 -- Generate Settings Files
 -- Thanks to Byrth & SnickySnacks' BattleMod addon
-settings_table = config.load(defaults)
-config.save(settings_table)
+settings = config.load(default_settings)
+config.save(settings)
+
+background_bar = images.new(settings.Images.Background)
+background_bar:show()
+
+foreground_bar = images.new(settings.Images.Foreground)
+foreground_bar:show()
+
+rested_bonus = images.new(settings.Images.RestedBonus)
+rested_bonus:hide()
+
+box = texts.new(settings.TextBox)
+box:show()
 
 ready = false
 chunk_update = false
@@ -106,11 +121,8 @@ windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blo
 end)
 
 windower.register_event('prerender',function()
-    if ready then
-        if frame_count%30 == 0 and chunk_update then
-            calc_exp_bar()
-            chunk_update = false
-        end
-        frame_count = frame_count + 1
+    if ready and chunk_update then
+        calc_exp_bar()
+        chunk_update = false
     end
 end)
