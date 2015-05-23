@@ -22,7 +22,7 @@ function org.export_set()
         return
     end
     
-    -- Makes a big table keyed to item resource tables, iwth values that are 1-based
+    -- Makes a big table keyed to item resource tables, with values that are 1-based
     -- numerically indexed tables of different entries for each of the items from the sets table.
     local item_list = org.unpack_names({},'L1',sets,{})
     
@@ -31,8 +31,7 @@ function org.export_set()
     for i,v in pairs(trans_item_list) do
         trans_item_list[i] = org.simplify_entry(v)
     end
-    
-    
+
     if trans_item_list:length() == 0 then
         windower.add_to_chat(123,'Organizer Library: Your sets table is empty.')
         return
@@ -42,6 +41,16 @@ function org.export_set()
     for name,tab in pairs(trans_item_list) do
         for _,info in ipairs(tab) do
             flattab:append({id=tab.id,name=tab.name,log_name=tab.log_name,augments=info.augments,count=info.count})
+        end
+    end
+
+    -- See if we have any non-equipment items to drag along
+    if organizer_items then
+        local organizer_item_list = org.unpack_names({}, 'L1', organizer_items, {})
+
+        for _,tab in pairs(org.identify_items(organizer_item_list)) do
+            count = gearswap.res.items[tab.id].stack
+            flattab:append({id=tab.id,name=tab.name,log_name=tab.log_name,count=count})
         end
     end
     
