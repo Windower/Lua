@@ -198,6 +198,7 @@ function load_images()
     background_bar:fit(get_bg_fit())
     background_bar:size(get_bg_width(), get_bg_height())
     background_bar:repeat_xy(get_bg_repeat_x(), get_bg_repeat_y())
+    background_bar:show()
 
     -- Foreground Bar
     fg_pos_x    = settings.Images.Foreground.Pos.X
@@ -222,6 +223,7 @@ function load_images()
     foreground_bar:fit(get_fg_fit())
     foreground_bar:size(get_fg_width(), get_fg_height())
     foreground_bar:repeat_xy(get_fg_repeat_x(), get_fg_repeat_y())
+    foreground_bar:show()
 
     -- Rested Bonus Icon
     rb_pos_x    = settings.Images.RestedBonus.Pos.X
@@ -246,6 +248,7 @@ function load_images()
     rested_bonus:fit(get_rb_fit())
     rested_bonus:size(get_rb_width(), get_rb_height())
     rested_bonus:repeat_xy(get_rb_repeat_x(), get_rb_repeat_y())
+    rested_bonus:hide()
 
     position_images()
 end
@@ -296,6 +299,8 @@ function create_text_box()
     tnl_visible        = settings.Strings.Tnl
     percent_visible    = settings.Strings.Percent
     rate_visible       = settings.Strings.Rate
+
+    box:show()
 end
 
 -- Reset XP Info
@@ -321,6 +326,7 @@ function initialize()
     load_images()
     create_text_box()
     calc_exp_bar()
+    update_strings()
     ready = true
 end
 
@@ -406,10 +412,9 @@ end
 function calc_exp_bar()
     if xp.current > 0 and xp.total > 0 then
         local calc = math.floor((xp.current / xp.total) * 468)
-        set_fg_width(calc)
         xp.rate = analyze_points_table(xp.registry)
+        return calc
     end
-    update_strings()
 end
 
 -- Center the Bar & Text on Screen
