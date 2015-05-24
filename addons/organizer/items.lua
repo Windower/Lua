@@ -249,6 +249,8 @@ function item_tab:move(dest_bag,dest_slot,count)
     dest_slot = dest_slot or 0x52
 
     local parent_bag_id = parent._info.bag_id
+    local parent_bag_name = res.bags[parent_bag_id].en
+
     local target_bag_id = targ_inv._info.bag_id
 
     org_debug(3, "move(): Item: "..res.items[self.id].english)
@@ -269,8 +271,14 @@ function item_tab:move(dest_bag,dest_slot,count)
         end
     end
 
+    -- check the 'retain' lists
+    if((parent_bag_id == 0) and _retain[self.id]) then
+        org_verbose('Skipping item: ('..res.items[self.id].english..') because it is set to be retained ('.._retain[self.id]..')')
+        return false
+    end
+
     -- respect the ignore list
-    if(_ignore_list[res.items[self.id].english] and (parent_bag_id == 0)) then
+    if(_ignore_list[parent_bag_name] and _ignore_list[parent_bag_name][res.items[self.id].english]) then
         org_verbose('Skipping item: ('..res.items[self.id].english..') because it is on the ignore list')
         return false
     end
