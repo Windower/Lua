@@ -61,6 +61,7 @@ _global = {
 }
 
 _ignore_list = {}
+_retain = {}
 _valid_pull = {}
 _valid_dump = {}
 
@@ -69,6 +70,10 @@ default_settings = {
     bag_priority = {['Safe']=1,['Safe2']=2,['Locker']=3,['Storage']=4,['Satchel']=5,['Sack']=6,['Case']=7,['Inventory']=8,['Wardrobe']=9},
     item_delay = 0,
     ignore = {},
+    retain = {
+        ["moogle_slip_gear"]=false,
+        ["seals"]=false
+    },
     auto_heal = false,
     default_file='default.lua',
     verbose=false,
@@ -141,6 +146,25 @@ function options_load( )
     for bag_name,_ in pairs(settings.dump_bags) do
          org_verbose("Adding "..bag_name.." to the push list")
         _valid_dump[s_to_bag(bag_name)] = 1
+    end
+
+    -- Build the retain lists
+    if(settings.retain.moogle_slip_gear == true) then
+        slip_lists = require('slips')
+        for slip_id,slip_list in pairs(slip_lists.items) do
+            for item_id in slip_list:it() do
+                _retain[item_id] = "moogle slip"
+                org_debug(3, "Adding ("..res.items[item_id].english..') to slip retain list')
+            end
+        end
+    end
+
+    if(settings.retain.seals == true) then
+        seals = {1126,1127,2955,2956,2957}
+        for _,seal_id in pairs(seals) do
+            _retain[seal_id] = "seal"
+            org_debug(3, "Adding ("..res.items[seal_id].english..') to slip retain list')
+        end
     end
 
     -- Always allow inventory, obviously
