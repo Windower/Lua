@@ -248,7 +248,7 @@ function load_images()
     rested_bonus:fit(get_rb_fit())
     rested_bonus:size(get_rb_width(), get_rb_height())
     rested_bonus:repeat_xy(get_rb_repeat_x(), get_rb_repeat_y())
-    rested_bonus:hide()
+    mog_house()
 
     position_images()
 end
@@ -437,6 +437,11 @@ function hide()
     rested_bonus:hide()
     box:clear()
     ready = false
+end
+
+function mog_house()
+    local mh = windower.ffxi.get_info().mog_house
+    if mh then rested_bonus:show() else rested_bonus:hide() end
 end
 
 -- Background Bar Getters
