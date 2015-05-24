@@ -28,7 +28,7 @@
 
 _addon.name = 'BarFiller'
 _addon.author = 'Morath'
-_addon.version = '0.2.1'
+_addon.version = '0.2.2'
 _addon.commands = {'bf','barfiller'}
 _addon.language = 'english'
 
@@ -50,16 +50,10 @@ settings = config.load(default_settings)
 config.save(settings)
 
 background_bar = images.new(settings.Images.Background)
-background_bar:show()
-
 foreground_bar = images.new(settings.Images.Foreground)
-foreground_bar:show()
-
-rested_bonus = images.new(settings.Images.RestedBonus)
-rested_bonus:hide()
+rested_bonus   = images.new(settings.Images.RestedBonus)
 
 box = texts.new(settings.TextBox)
-box:show()
 
 ready = false
 chunk_update = false
@@ -120,9 +114,19 @@ windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blo
     end
 end)
 
+-- Update the XP bar size
+-- Thanks to Iryoku for the logic on smooth animations
 windower.register_event('prerender',function()
     if ready and chunk_update then
-        calc_exp_bar()
-        chunk_update = false
+        local old_width = get_fg_width()
+        local new_width = calc_exp_bar()
+        if new_width > 0 then
+            if old_width < new_width then
+                set_fg_width(old_width + ((new_width - old_width) * 0.1))
+            elseif old_width > new_width then
+                set_fg_width(new_width)
+                chunk_update = false
+            end
+        end
     end
 end)
