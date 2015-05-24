@@ -37,8 +37,6 @@ config = require('config')
 file = require('files')
 packets = require('packets')
 texts = require('texts')
-
--- Experimental Image Library
 images = require('images')
 
 -- BarFiller Libs
@@ -120,7 +118,7 @@ windower.register_event('prerender',function()
     if ready and chunk_update then
         local old_width = get_fg_width()
         local new_width = calc_exp_bar()
-        if new_width > 0 then
+        if new_width ~= nil and new_width > 0 then
             if old_width < new_width then
                 set_fg_width(old_width + ((new_width - old_width) * 0.1))
             elseif old_width > new_width then
@@ -129,4 +127,8 @@ windower.register_event('prerender',function()
             end
         end
     end
+end)
+
+windower.register_event('zone change', function(new_id,old_id)
+    mog_house()
 end)
