@@ -149,21 +149,23 @@ function options_load( )
     end
 
     -- Build the retain lists
-    if(settings.retain.moogle_slip_gear == true) then
-        slip_lists = require('slips')
-        for slip_id,slip_list in pairs(slip_lists.items) do
-            for item_id in slip_list:it() do
-                _retain[item_id] = "moogle slip"
-                org_debug(3, "Adding ("..res.items[item_id].english..') to slip retain list')
+    if(settings.retain) then
+        if(settings.retain.moogle_slip_gear == true) then
+            slip_lists = require('slips')
+            for slip_id,slip_list in pairs(slip_lists.items) do
+                for item_id in slip_list:it() do
+                    _retain[item_id] = "moogle slip"
+                    org_debug(3, "Adding ("..res.items[item_id].english..') to slip retain list')
+                end
             end
         end
-    end
 
-    if(settings.retain.seals == true) then
-        seals = {1126,1127,2955,2956,2957}
-        for _,seal_id in pairs(seals) do
-            _retain[seal_id] = "seal"
-            org_debug(3, "Adding ("..res.items[seal_id].english..') to slip retain list')
+        if(settings.retain.seals == true) then
+            seals = {1126,1127,2955,2956,2957}
+            for _,seal_id in pairs(seals) do
+                _retain[seal_id] = "seal"
+                org_debug(3, "Adding ("..res.items[seal_id].english..') to slip retain list')
+            end
         end
     end
 
