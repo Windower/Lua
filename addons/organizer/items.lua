@@ -313,7 +313,7 @@ function item_tab:move(dest_bag,dest_slot,count)
     elseif (targ_inv._info.bag_id ~= 0 and parent._info.bag_id ~= 0) then
         org_warning('Cannot move the item ('..res.items[self.id].english..'). Attempting to move from a non-inventory to a non-inventory bag ('..res.bags[parent._info.bag_id].en..' '..res.bags[dest_bag].en..')')
     elseif self:annihilated() then
-        org_warning('Cannot move the item ('..res.items[self.id].english..'). It has already been annihilated.')
+        org_warning('Cannot move the item ('..res.items[self.id].english..'). It has already been moved.')
     elseif not wardrobecheck(targ_inv._info.bag_id,self.id) then
         org_warning('Cannot move the item ('..res.items[self.id].english..') to the wardrobe. Wardrobe cannot hold an item of its type ('..tostring(res.items[self.id].type)..').')
     elseif not self:free() then
