@@ -306,7 +306,7 @@ end
 -- Reset XP Info
 -- Thanks to Byrth's PointWatch addon
 function initialize()
-    info = windower.ffxi.get_player()
+    frame_count = 0
     xp = {
         registry = {},
         total = 0,
@@ -315,13 +315,13 @@ function initialize()
         tnl = 0
     }
     player = {
-        job = string.upper(info.main_job),
-        sub = string.lower(info.sub_job),
-        lvl = 'Lv'..info.main_job_level..'  ',
-        exp = 'EXP '..xp.current..'/'..xp.total,
-        tnl = '('..xp.tnl..')',
-        phr = 'EXP/hr 0.0k',
-        pct = '0%'
+        job = '',
+        sub = '',
+        lvl = '',
+        exp = '',
+        tnl = '',
+        phr = '',
+        pct = ''
     }
     load_images()
     create_text_box()
@@ -331,6 +331,7 @@ function initialize()
 end
 
 function update_strings()
+    info = windower.ffxi.get_player()
     player.job = string.upper(info.main_job)
     player.sub = '('..string.lower(info.sub_job)..') '
     player.lvl = 'Lv'..info.main_job_level..'  '
@@ -747,7 +748,7 @@ end
 function set_fg_width(new_width)
     fg_width = new_width
     foreground_bar:size(new_width, get_fg_height())
-    update_strings()
+    if frame_count%30 == 0 then update_strings() end
 end
 
 function set_fg_height(new_height)
