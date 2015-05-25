@@ -28,7 +28,7 @@
 
 _addon.name = 'BarFiller'
 _addon.author = 'Morath'
-_addon.version = '0.2.2'
+_addon.version = '0.2.3'
 _addon.commands = {'bf','barfiller'}
 _addon.language = 'english'
 
@@ -65,7 +65,7 @@ end)
 
 -- Delay initialize() for 10 seconds to allow game to download chunks
 windower.register_event('login',function()
-    initialize:schedule(10)
+    initialize()
 end)
 
 -- If you're switching characters this will clear the previous characters stats
@@ -127,6 +127,7 @@ windower.register_event('prerender',function()
             end
         end
     end
+    frame_count = frame_count + 1
 end)
 
 windower.register_event('zone change', function(new_id,old_id)
