@@ -748,7 +748,7 @@ end
 function set_fg_width(new_width)
     fg_width = new_width
     foreground_bar:size(new_width, get_fg_height())
-    if frame_count%30 == 0 then update_strings() end
+    if frame_count%15 == 0 then update_strings() end
 end
 
 function set_fg_height(new_height)

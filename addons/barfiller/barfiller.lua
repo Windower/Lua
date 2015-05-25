@@ -115,19 +115,29 @@ end)
 -- Update the XP bar size
 -- Thanks to Iryoku for the logic on smooth animations
 windower.register_event('prerender',function()
-    if ready and chunk_update then
-        local old_width = get_fg_width()
-        local new_width = calc_exp_bar()
-        if new_width ~= nil and new_width > 0 then
-            if old_width < new_width then
-                set_fg_width(old_width + ((new_width - old_width) * 0.1))
-            elseif old_width > new_width then
-                set_fg_width(new_width)
-                chunk_update = false
+    if ready then
+        frame_count = frame_count + 1
+        if chunk_update then
+            local old_width = get_fg_width()
+            local new_width = calc_exp_bar()
+            if new_width ~= nil and new_width > 0 then
+                if old_width < new_width then
+                    set_fg_width(old_width + ((new_width - old_width) * 0.1))
+                elseif old_width > new_width then
+                    set_fg_width(new_width)
+                    chunk_update = false
+                end
             end
         end
     end
-    frame_count = frame_count + 1
+end)
+
+windower.register_event('level up', function(level)
+    update_strings()
+end)
+
+windower.register_event('level down', function(level)
+    update_strings()
 end)
 
 windower.register_event('zone change', function(new_id,old_id)
