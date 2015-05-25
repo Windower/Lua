@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name    = 'findAll'
 _addon.author  = 'Zohno'
-_addon.version = '1.20150105'
+_addon.version = '1.20150521'
 _addon.commands = {'findall'}
 
 require('chat')
@@ -169,9 +169,28 @@ next_sequence_offset   = 0
 item_names             = T{}
 global_storages        = T{}
 storages_path          = 'data/storages.json'
-storages_order         = L{'temporary', 'inventory', 'wardrobe', 'safe', 'storage', 'locker', 'satchel', 'sack', 'case'}
+storages_order_tokens  = L{'temporary', 'inventory', 'wardrobe', 'safe', 'storage', 'locker', 'satchel', 'sack', 'case'}
+-- This is to maintain sorting order. I don't know why this was done, but omitting this will sort the bags arbitrarily, which (I guess) was not intended
+storages_order         = S(res.bags:map(string.gsub-{' ', ''} .. string.lower .. table.get-{'english'})):sort(function(name1, name2)
+    local index1 = storages_order_tokens:find(name1)
+    local index2 = storages_order_tokens:find(name2)
+
+    if not index1 and not index2 then
+        return name1 < name2
+    end
+
+    if not index1 then
+        return false
+    end
+
+    if not index2 then
+        return true
+    end
+
+    return index1 < index2
+end)
 storage_slips_order    = L{'slip 01', 'slip 02', 'slip 03', 'slip 04', 'slip 05', 'slip 06', 'slip 07', 'slip 08', 'slip 09', 'slip 10', 'slip 11', 'slip 12', 'slip 13', 'slip 14', 'slip 15', 'slip 16', 'slip 17', 'slip 18', 'slip 19', 'slip 20', 'slip 21'}
-merged_storages_orders = L{}:extend(storages_order):extend(storage_slips_order)
+merged_storages_orders = storages_order + storage_slips_order
 
 function search(query, export)
     update()
