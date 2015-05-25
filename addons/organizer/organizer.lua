@@ -81,7 +81,7 @@ default_settings = {
 
 _debugging = {
     debug = 0,        -- Copious output, 3 is EVERYTHING
-    warnings = true, -- This mode gives warnings about impossible item movements and crash conditions.
+    warnings = false, -- This mode gives warnings about impossible item movements and crash conditions.
 }
 
 function s_to_bag(str)
@@ -271,11 +271,11 @@ function get(goal_items,current_items)
                         else
                             count = count + 1
                         end
+                        simulate_item_delay()
                     else
                         -- Need to adapt this for stacking items somehow.
                         org_warning(res.items[item.id].english..' not found.')
                     end
-                    simulate_item_delay()
                 end
             end
         end
@@ -325,8 +325,8 @@ function tidy(goal_items,current_items,usable_bags)
             if not goal_items[0]:contains(item,true) then
                 org_debug(1, "Putting away "..item.log_name)
                 current_items[0][index]:put_away(usable_bags)
+                simulate_item_delay()
             end
-            simulate_item_delay()
         end
     end
     return goal_items, current_items
