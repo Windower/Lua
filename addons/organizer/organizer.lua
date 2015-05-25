@@ -81,7 +81,7 @@ default_settings = {
 
 _debugging = {
     debug = 0,        -- Copious output, 3 is EVERYTHING
-    warnings = true, -- This mode gives warnings about impossible item movements and crash conditions.
+    warnings = false, -- This mode gives warnings about impossible item movements and crash conditions.
 }
 
 function s_to_bag(str)
@@ -149,21 +149,23 @@ function options_load( )
     end
 
     -- Build the retain lists
-    if(settings.retain.moogle_slip_gear == true) then
-        slip_lists = require('slips')
-        for slip_id,slip_list in pairs(slip_lists.items) do
-            for item_id in slip_list:it() do
-                _retain[item_id] = "moogle slip"
-                org_debug(3, "Adding ("..res.items[item_id].english..') to slip retain list')
+    if(settings.retain) then
+        if(settings.retain.moogle_slip_gear == true) then
+            slip_lists = require('slips')
+            for slip_id,slip_list in pairs(slip_lists.items) do
+                for item_id in slip_list:it() do
+                    _retain[item_id] = "moogle slip"
+                    org_debug(3, "Adding ("..res.items[item_id].english..') to slip retain list')
+                end
             end
         end
-    end
 
-    if(settings.retain.seals == true) then
-        seals = {1126,1127,2955,2956,2957}
-        for _,seal_id in pairs(seals) do
-            _retain[seal_id] = "seal"
-            org_debug(3, "Adding ("..res.items[seal_id].english..') to slip retain list')
+        if(settings.retain.seals == true) then
+            seals = {1126,1127,2955,2956,2957}
+            for _,seal_id in pairs(seals) do
+                _retain[seal_id] = "seal"
+                org_debug(3, "Adding ("..res.items[seal_id].english..') to slip retain list')
+            end
         end
     end
 
@@ -269,11 +271,11 @@ function get(goal_items,current_items)
                         else
                             count = count + 1
                         end
+                        simulate_item_delay()
                     else
                         -- Need to adapt this for stacking items somehow.
                         org_warning(res.items[item.id].english..' not found.')
                     end
-                    simulate_item_delay()
                 end
             end
         end
@@ -323,8 +325,8 @@ function tidy(goal_items,current_items,usable_bags)
             if not goal_items[0]:contains(item,true) then
                 org_debug(1, "Putting away "..item.log_name)
                 current_items[0][index]:put_away(usable_bags)
+                simulate_item_delay()
             end
-            simulate_item_delay()
         end
     end
     return goal_items, current_items
