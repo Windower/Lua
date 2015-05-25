@@ -1684,7 +1684,7 @@ function decode.BonanzaMarble(str)
     }
     local rettab = {type = 'Bonanza Marble',
         number = str:byte(3)*256*256 + str:unpack('H',1), -- Who uses 3 bytes? SE does!
-        event = typ_list[str:byte(4)] or (str:byte(4) < 0x4B and '.'),
+        event = event_list[str:byte(4)] or (str:byte(4) < 0x4B and '.'),
     }
     return rettab
 end

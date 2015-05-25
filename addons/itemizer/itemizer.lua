@@ -12,7 +12,7 @@ defaults.Delay = 0.5
 
 settings = config.load(defaults)
 
-bag_ids = res.bags:key_map(string.lower .. table.get-{'english'} .. table.get+{res.bags}):map(table.get-{'id'})
+bag_ids = res.bags:key_map(string.gsub-{' ', ''} .. string.lower .. table.get-{'english'} .. table.get+{res.bags}):map(table.get-{'id'})
 -- Remove temporary bag, because items cannot be moved from/to there, as such it's irrelevant to Itemizer
 bag_ids.temporary = nil
 

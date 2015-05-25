@@ -361,7 +361,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
             equip_sets('equip_command',nil,tab)
         end
     elseif id == 0x01E then
-        local bag = to_windower_api(res.bags[data:byte(0x09)].english)
+        local bag = to_windower_compact(res.bags[data:byte(0x09)].english)
         local slot = data:byte(0x0A)
         local count = data:unpack('I',5)
         if not items[bag][slot] then items[bag][slot] = make_empty_item_table(slot) end
@@ -372,14 +372,14 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
             items[bag][slot].status = 0
         end
     elseif id == 0x01F then
-        local bag = to_windower_api(res.bags[data:byte(0x0B)].english)
+        local bag = to_windower_compact(res.bags[data:byte(0x0B)].english)
         local slot = data:byte(0x0C)
         if not items[bag][slot] then items[bag][slot] = make_empty_item_table(slot) end
         items[bag][slot].id = data:unpack('H',9)
         items[bag][slot].count = data:unpack('I',5)
         items[bag][slot].status = data:byte(0x0D)
     elseif id == 0x020 then
-        local bag = to_windower_api(res.bags[data:byte(0x0F)].english)
+        local bag = to_windower_compact(res.bags[data:byte(0x0F)].english)
         local slot = data:byte(0x10)
         if not items[bag][slot] then items[bag][slot] = make_empty_item_table(slot) end
         items[bag][slot].id = data:unpack('H',0x0D)
@@ -455,15 +455,15 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
     elseif id == 0x044 then
         -- No idea what this is doing
     elseif id == 0x050 then
-        local inv = items[to_windower_api(res.bags[data:byte(7)].english)]
+        local inv = items[to_windower_compact(res.bags[data:byte(7)].english)]
         if data:byte(5) ~= 0 then
             items.equipment[toslotname(data:byte(6))] = {slot=data:byte(5),bag_id = data:byte(7)}
             if not inv[data:byte(5)] then inv[data:byte(5)] = make_empty_item_table(data:byte(5)) end
-            items[to_windower_api(res.bags[data:byte(7)].english)][data:byte(5)].status = 5 -- Set the status to "equipped"
+            items[to_windower_compact(res.bags[data:byte(7)].english)][data:byte(5)].status = 5 -- Set the status to "equipped"
         else
             items.equipment[toslotname(data:byte(6))] = {slot=empty,bag_id=0}
             if not inv[data:byte(5)] then inv[data:byte(5)] = make_empty_item_table(data:byte(5)) end
-            items[to_windower_api(res.bags[data:byte(7)].english)][data:byte(5)].status = 0 -- Set the status to "unequipped"
+            items[to_windower_compact(res.bags[data:byte(7)].english)][data:byte(5)].status = 0 -- Set the status to "unequipped"
         end
     elseif id == 0x05E then -- Conquest ID
         if _ExtraData.world.conquest then
@@ -543,15 +543,15 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
     elseif id == 0x117 then
         for i=0x49,0x85,4 do
             local arr = data:sub(i,i+3)
-            local inv = items[to_windower_api(res.bags[arr:byte(3)].english)]
+            local inv = items[to_windower_compact(res.bags[arr:byte(3)].english)]
             if arr:byte(1) ~= 0 then
                 items.equipment[toslotname(arr:byte(2))] = {slot=arr:byte(1),bag_id = arr:byte(3)}
                 if not inv[arr:byte(1)] then inv[arr:byte(1)] = make_empty_item_table(arr:byte(1)) end
-                items[to_windower_api(res.bags[arr:byte(3)].english)][arr:byte(1)].status = 5 -- Set the status to "equipped"
+                items[to_windower_compact(res.bags[arr:byte(3)].english)][arr:byte(1)].status = 5 -- Set the status to "equipped"
             else
                 items.equipment[toslotname(arr:byte(2))] = {slot=empty,bag_id=0}
                 if not inv[arr:byte(1)] then inv[arr:byte(1)] = make_empty_item_table(arr:byte(1)) end
-                items[to_windower_api(res.bags[arr:byte(3)].english)][arr:byte(1)].status = 0 -- Set the status to "unequipped"
+                items[to_windower_compact(res.bags[arr:byte(3)].english)][arr:byte(1)].status = 0 -- Set the status to "unequipped"
             end
         end
     end

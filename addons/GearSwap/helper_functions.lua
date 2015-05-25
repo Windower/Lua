@@ -202,6 +202,18 @@ function to_windower_api(str)
     return __raw.lower(str:gsub(' ','_'))
 end
 
+-----------------------------------------------------------------------------------
+----Name: to_windower_compact(str)
+-- Takes strings and converts them to a compact version of the resource table key
+----Args:
+-- str - String to be converted to the windower API version
+-----------------------------------------------------------------------------------
+----Returns:
+-- a lower case string with ' ' replaced with ''
+-----------------------------------------------------------------------------------
+function to_windower_compact(str)
+    return __raw.lower(str:gsub(' ',''))
+end
 
 -----------------------------------------------------------------------------------
 ----Name: get_job_names()
@@ -605,7 +617,7 @@ function filter_pretarget(spell)
             msg.debugging("Unable to execute command. You do not know that spell ("..(res.spells[spell.id][language] or spell.id)..")")
         -- Filter for spells that you know, but do not currently have access to
         elseif (not spell_jobs[player.main_job_id] or not (spell_jobs[player.main_job_id] <= player.main_job_level or
-            (spell_jobs[player.main_job_id] == 100 and number_of_jps(player.job_points[__raw.lower(player.main_job)]) >= 100) ) ) and
+            (spell_jobs[player.main_job_id] >= 100 and number_of_jps(player.job_points[__raw.lower(player.main_job)]) >= spell_jobs[player.main_job_id]) ) ) and
             (not spell_jobs[player.sub_job_id] or not (spell_jobs[player.sub_job_id] <= player.sub_job_level)) then
             msg.debugging("Unable to execute command. You do not have access to that spell ("..(res.spells[spell.id][language] or spell.id)..")")
             return false
@@ -624,7 +636,7 @@ function filter_pretarget(spell)
         elseif player.sub_job_id == 20 and ((addendum_white[spell.id] and not buffactive[401] and not buffactive[416]) or
             (addendum_black[spell.id] and not buffactive[402] and not buffactive[416])) and
             not (spell_jobs[player.main_job_id] and (spell_jobs[player.main_job_id] <= player.main_job_level or
-            (spell_jobs[player.main_job_id] == 100 and number_of_jps(player.job_points[__raw.lower(player.main_job)]) >= 100) ) ) then
+            (spell_jobs[player.main_job_id] >= 100 and number_of_jps(player.job_points[__raw.lower(player.main_job)]) >= spell_jobs[player.main_job_id]) ) ) then
                         
             if addendum_white[spell.id] then
                 msg.debugging("Unable to execute command. Addendum: White required for that spell ("..(res.spells[spell.id][language] or spell.id)..")")
