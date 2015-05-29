@@ -37,7 +37,7 @@ config = require 'config'
 
 _addon.name = 'Organizer'
 _addon.author = 'Byrth, maintainer: Rooks'
-_addon.version = 0.150326
+_addon.version = 0.20150526
 _addon.commands = {'organizer','org'}
 
 _static = {
@@ -117,13 +117,7 @@ function options_load( )
         end
     end
 
-    if windower.file_exists(windower.addon_path..'data\\settings.xml') then
-        org_debug(1, "Loading settings from file")
-        settings = config.load('data\\settings.xml')
-    else
-        org_debug(1, "Saving default settings to file")
-        settings = config.load('data\\settings.xml', default_settings)
-    end
+    settings = config.load('data\\settings.xml', default_settings)
 
     -- Build the ignore list
     if(settings.ignore) then
@@ -169,9 +163,11 @@ function options_load( )
         end
     end
 
-    -- Always allow inventory, obviously
+    -- Always allow inventory and wardrobe, obviously
     _valid_dump[0] = 1
     _valid_pull[0] = 1
+    _valid_dump[8] = 1
+    _valid_pull[8] = 1
 
 end
 
@@ -241,6 +237,17 @@ windower.register_event('addon command',function(...)
         org_debug(1, "Calling dump command")
         full_bag_list = T{windower.ffxi.get_items()}
         full_bag_list:vprint()
+    elseif (command == 'baginfo') then
+        org_debug(1, "Calling baginfo command")
+        full_bag_info = T{windower.ffxi.get_bag_info()}
+        full_bag_info:vprint()
+
+        inventory_max = windower.ffxi.get_bag_info(0).max
+        org_message("max inventory is "..inventory_max)
+    elseif (command == 'gameinfo') then
+        org_debug(1, "Calling dump command")
+        infoo = T{windower.ffxi.get_info()}
+        infoo:vprint()
     end
 
     if settings.auto_heal and tostring(settings.auto_heal):lower() ~= 'false' then
@@ -317,6 +324,7 @@ end
 
 function tidy(goal_items,current_items,usable_bags)
     org_debug(1, "Entering tidy()")
+    usable_bags = usable_bags or get_dump_bags()
     -- Move everything out of items[0] and into other inventories (defined by the passed table)
     if goal_items and goal_items[0] and goal_items[0]._info.n > 0 then
         current_items = current_items or Items.new()
@@ -335,19 +343,13 @@ end
 function organize(goal_items)
     org_message('Starting...')
     local current_items = Items.new()
-    local dump_bags = {}
-    for i,v in pairs(settings.dump_bags) do
-        if i and s_to_bag(i) then
-            dump_bags[tonumber(v)] = s_to_bag(i)
-        elseif i then
-            org_error('The bag name ("'..tostring(i)..'") in dump_bags entry #'..tostring(v)..' in the ../addons/organizer/data/settings.xml file is not valid.\nValid options are '..tostring(res.bags))
-            return
-        end
-    end
-    if current_items[0].n == 80 then
+    local dump_bags = get_dump_bags()
+
+    local inventory_max = windower.ffxi.get_bag_info(0).max
+    if current_items[0].n == inventory_max then
         tidy(goal_items,current_items,dump_bags)
     end
-    if current_items[0].n == 80 then
+    if current_items[0].n == inventory_max then
         org_error('Unable to make space, aborting!')
         return
     end
@@ -365,7 +367,7 @@ function organize(goal_items)
             org_verbose("No remainder, so we found everything we were looking for!")
         end
     end
-    goal_items, current_items = tidy(goal_items,current_items)
+    goal_items, current_items = tidy(goal_items,current_items,dump_bags)
     
     local count,failures = 0,T{}
     for bag_id,bag in goal_items:it() do
@@ -421,7 +423,7 @@ function thaw(file_name,bag)
         settings.default_file = settings.default_file..'.lua'
     end
     for i,v in pairs(_static.bag_ids) do
-        bags[i] = bags[i] and windower.file_exists(windower.addon_path..'data/'..i..'/'..file_name) and file_name or settings.default_file
+        bags[i] = bags[i] and windower.file_exists(windower.addon_path..'data/'..i..'/'..file_name) and file_name or default_file_name()
     end
     bags.temporary = nil
     local inv_structure = {}
@@ -486,4 +488,17 @@ function simulate_item_delay()
     if settings.item_delay and settings.item_delay > 0 then
         coroutine.sleep(settings.item_delay)
     end
+end
+
+function get_dump_bags()
+    local dump_bags = {}
+    for i,v in pairs(settings.dump_bags) do
+        if i and s_to_bag(i) then
+            dump_bags[tonumber(v)] = s_to_bag(i)
+        elseif i then
+            org_error('The bag name ("'..tostring(i)..'") in dump_bags entry #'..tostring(v)..' in the ../addons/organizer/data/settings.xml file is not valid.\nValid options are '..tostring(res.bags))
+            return
+        end
+    end
+    return dump_bags
 end
