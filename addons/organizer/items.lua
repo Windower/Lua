@@ -92,21 +92,28 @@ function items:route(start_bag,start_ind,end_bag,count)
     count = count or self[start_bag][start_ind].count
     local success = true
     local initial_ind = start_ind
-    if start_bag ~= 0 and self[0]._info.n < 80 then
+    local inventory_max = windower.ffxi.get_bag_info(0).max
+    if start_bag ~= 0 and self[0]._info.n < inventory_max then
         start_ind = self[start_bag][start_ind]:move(0,0x52,count)
-    elseif start_bag ~= 0 and self[0]._info.n >= 80 then
+    elseif start_bag ~= 0 and self[0]._info.n >= inventory_max then
         success = false
-        org_warning('Cannot move more than 80 items into inventory')
+        org_warning('Cannot move more than '..inventory_max..' items into inventory')
     end
-        
-    if start_ind and end_bag ~= 0 and self[end_bag]._info.n < 80 then
+
+    local destination_enabled = windower.ffxi.get_bag_info(end_bag).enabled
+    local destination_max = windower.ffxi.get_bag_info(end_bag).max
+
+    if not destination_enabled then
+        success = false
+        org_warning('Cannot move to '..tostring(end_bag)..' because it is disabled')
+    elseif start_ind and end_bag ~= 0 and self[end_bag]._info.n < destination_max then
         self[0][start_ind]:transfer(end_bag,count)
     elseif not start_ind then
         success = false
         org_warning('Initial movement of the route failed. ('..tostring(start_bag)..' '..tostring(initial_ind)..' '..tostring(start_ind)..' '..tostring(end_bag)..')')
-    elseif self[end_bag]._info.n >= 80 then
+    elseif self[end_bag]._info.n >= destination_max then
         success = false
-        org_warning('Cannot move more than 80 items into that inventory ('..end_bag..')')
+        org_warning('Cannot move more than '..destination_max..' items into that inventory ('..end_bag..')')
     end
     return success
 end
@@ -133,7 +140,8 @@ function items:it()
 end
 
 function bags:new(id,count,ext,augments,status,index)
-    if self._info.n >= 80 then org_warning('Attempting to add another item to a bag with 80 items') return end
+    local max_size = windower.ffxi.get_bag_info(self._info.bag_id).max
+    if self._info.n >= max_size then org_warning('Attempting to add another item to a full bag') return end
     if index and table.with(self,'index',index) then org_warning('Cannot assign the same index twice') return end
     self._info.n = self._info.n + 1
     index = index or self:first_empty()
@@ -154,9 +162,10 @@ function bags:new(id,count,ext,augments,status,index)
 end
 
 function bags:it()
+    local max = windower.ffxi.get_bag_info(self._info.bag_id).max
     local i = 0
     return function ()
-        while i < 80 do
+        while i < max do
             i = i + 1
             if self[i] then return i, self[i] end
         end
@@ -164,7 +173,8 @@ function bags:it()
 end
 
 function bags:first_empty()
-    for i=1,80 do
+    local max = windower.ffxi.get_bag_info(self._info.bag_id).max
+    for i=1,max do
         if not self[i] then return i end
     end
 end
@@ -328,7 +338,8 @@ function item_tab:put_away(usable_bags)
     usable_bags = usable_bags or {1,9,4,2,5,6,7,8}
     local bag_free
     for _,v in ipairs(usable_bags) do
-        if current_items[v]._info.n < 80 and wardrobecheck(v,self.id) then
+        local bag_max = windower.ffxi.get_bag_info(v).max
+        if current_items[v]._info.n < bag_max and wardrobecheck(v,self.id) then
             bag_free = v
             break
         end
