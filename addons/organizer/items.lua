@@ -49,15 +49,15 @@ function Items.new(loc_items,bool)
     loc_items = loc_items or windower.ffxi.get_items()
     new_instance = setmetatable({}, {__index = function (t, k) if rawget(t,k) then return rawget(t,k) else return rawget(items,k) end end})
     for bag_id,bag_table in pairs(res.bags) do
-        org_debug(3, "Items.new::bag_id: "..bag_id)
+        org_debug("items", "Items.new::bag_id: "..bag_id)
         bag_name = bag_table.english:lower():gsub(' ', '')
-        org_debug(3, "Items.new::bag_name: "..bag_name)
+        org_debug("items", "Items.new::bag_name: "..bag_name)
         if (bool or validate_bag(bag_table)) and (loc_items[bag_id] or loc_items[bag_name]) then
-            org_debug(3, "Items.new: new_instance for ID#"..bag_id)
+            org_debug("items", "Items.new: new_instance for ID#"..bag_id)
             local cur_inv = new_instance:new(bag_id)
             for inventory_index,item_table in pairs(loc_items[bag_id] or loc_items[bag_name]) do
                 if type(item_table) == 'table' and validate_id(item_table.id) then
-                    org_debug(3, "Items.new: inventory_index="..inventory_index.." item_table.id="..item_table.id.." ("..res.items[item_table.id].english..")")
+                    org_debug("items", "Items.new: inventory_index="..inventory_index.." item_table.id="..item_table.id.." ("..res.items[item_table.id].english..")")
                     cur_inv:new(item_table.id,item_table.count,item_table.extdata,item_table.augments,item_table.status,inventory_index)
                 end
             end
@@ -67,7 +67,7 @@ function Items.new(loc_items,bool)
 end
 
 function items:new(key)
-    org_debug(2, "New items instance with key "..key)
+    org_debug("items", "New items instance with key "..key)
     local new_instance = setmetatable({_parent = self,_info={n=0,bag_id=key}}, {__index = function (t, k) if rawget(t,k) then return rawget(t,k) else return rawget(bags,k) end end})
     self[key] = new_instance
     return new_instance
@@ -76,15 +76,15 @@ end
 function items:find(item)
     for bag_name,bag_id in pairs(settings.bag_priority) do
         real_bag_id = s_to_bag(bag_name)
-        org_debug(2, "Searching "..bag_name.." for "..res.items[item.id].english..".")
+        org_debug("find", "Searching "..bag_name.." for "..res.items[item.id].english..".")
         if self[real_bag_id] and self[real_bag_id]:contains(item) then
-            org_debug(2, "Found "..res.items[item.id].english.." in "..bag_name..".")
+            org_debug("find", "Found "..res.items[item.id].english.." in "..bag_name..".")
             return real_bag_id, self[real_bag_id]:contains(item)
         else
-            org_debug(2, "Didn't find "..res.items[item.id].english.." in "..bag_name..".")    
+            org_debug("find", "Didn't find "..res.items[item.id].english.." in "..bag_name..".")
         end
     end
-    org_debug(2, "Didn't find "..res.items[item.id].english.." in any bags.")    
+    org_debug("find", "Didn't find "..res.items[item.id].english.." in any bags.")
     return false
 end
 
@@ -188,7 +188,7 @@ end
 function bags:find_all_instances(item,bool)
     local instances = L{}
     for i,v in self:it() do
-        org_debug(3, "find_all_instances: slot="..i.." v="..res.items[v.id].english.." item="..res.items[item.id].english.." ")
+        org_debug("find_all", "find_all_instances: slot="..i.." v="..res.items[v.id].english.." item="..res.items[item.id].english.." ")
         if (bool or not v:annihilated()) and v.id == item.id then -- and v.count >= item.count then
             if not item.augments or table.length(item.augments) == 0 or v.augments and extdata.compare_augments(item.augments,v.augments) then
                 -- May have to do a higher level comparison here for extdata.
@@ -207,7 +207,7 @@ end
 
 function bags:contains(item,bool)
     bool = bool or false -- Default to only looking at unannihilated items
-    org_debug(2, "contains: searching for "..res.items[item.id].english.." in "..self._info.bag_id)
+    org_debug("contains", "contains: searching for "..res.items[item.id].english.." in "..self._info.bag_id)
     local instances = self:find_all_instances(item,bool)
     if instances then
         return instances:it()()
@@ -241,7 +241,12 @@ function item_tab:transfer(dest_bag,count)
         org_warning('Cannot move between two bags that are not inventory bags.')
     else
         while parent[self.index] and targ_inv:find_unfinished_stack(parent[self.index]) do
-            parent[self.index]:move(dest_bag,targ_inv:find_unfinished_stack(parent[self.index]),count)
+            org_debug("stacks", "Moving ("..res.items[self.id].english..') from '..res.bags[parent_bag_id].en..' to '..res.bags[target_bag_id].en..'')
+            local rv = parent[self.index]:move(dest_bag,targ_inv:find_unfinished_stack(parent[self.index]),count)
+            if not rv then
+                org_debug("stacks", "FAILED moving ("..res.items[self.id].english..') from '..res.bags[parent_bag_id].en..' to '..res.bags[target_bag_id].en..'')
+                break
+            end
         end
         if parent[self.index] then
             parent[self.index]:move(dest_bag)
@@ -263,9 +268,9 @@ function item_tab:move(dest_bag,dest_slot,count)
 
     local target_bag_id = targ_inv._info.bag_id
 
-    org_debug(3, "move(): Item: "..res.items[self.id].english)
-    org_debug(3, "move(): Parent bag: "..parent_bag_id)
-    org_debug(3, "move(): Target bag: "..target_bag_id)
+    org_debug("move", "move(): Item: "..res.items[self.id].english)
+    org_debug("move", "move(): Parent bag: "..parent_bag_id)
+    org_debug("move", "move(): Target bag: "..target_bag_id)
 
     -- issues with bazaared items makes me think we shouldn't screw with status'd items at all
     if(self.status > 0) then
@@ -333,7 +338,7 @@ function item_tab:move(dest_bag,dest_slot,count)
 end
 
 function item_tab:put_away(usable_bags)
-    org_debug(1, "Putting away "..res.items[self.id].english)
+    org_debug("move", "Putting away "..res.items[self.id].english)
     local current_items = self._parent._parent
     usable_bags = usable_bags or {1,9,4,2,5,6,7,8}
     local bag_free
@@ -371,7 +376,7 @@ function item_tab:annihilate(count)
     count = count or rawget(item_tab,'count')
     local a_count = (rawget(item_tab,'a_count') or 0) + count
     if a_count >count then
-        org_warning('Annihilating more of an item ('..item_tab.id..' : '..a_count..') than possible ('..count..'.')
+        org_warning('Moving more of an item ('..item_tab.id..' : '..a_count..') than possible ('..count..'.')
     end
     rawset(self,'a_count',a_count)
 end

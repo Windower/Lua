@@ -80,9 +80,21 @@ default_settings = {
 }
 
 _debugging = {
-    debug = 0,        -- Copious output, 3 is EVERYTHING
+    debug = {
+        ['contains']=true,
+        ['command']=true,
+        ['find']=true,
+        ['find_all']=true,
+        ['items']=true,
+        ['move']=true,
+        ['settings']=true,
+        ['stacks']=true
+    },
+    debug_log = 'data\\organizer-debug.log',
     warnings = false, -- This mode gives warnings about impossible item movements and crash conditions.
 }
+
+debug_log = files.new(_debugging.debug_log)
 
 function s_to_bag(str)
     if not str and tostring(str) then return end
@@ -94,13 +106,15 @@ function s_to_bag(str)
 end
 
 windower.register_event('load',function()
+    debug_log:write('Organizer loaded at '..os.date()..'\n')
+
     if debugging then windower.debug('load') end
     options_load()
 end)
 
 function options_load( )
     if not windower.dir_exists(windower.addon_path..'data\\') then
-        org_debug(1, "Creating data directory")
+        org_debug("settings", "Creating data directory")
         windower.create_dir(windower.addon_path..'data\\')
         if not windower.dir_exists(windower.addon_path..'data\\') then
             org_error("unable to create data directory!")
@@ -109,7 +123,7 @@ function options_load( )
 
     for bag_name, bag_id in pairs(_static.bag_ids) do
         if not windower.dir_exists(windower.addon_path..'data\\'..bag_name) then
-            org_debug(1, "Creating data directory for "..bag_name)
+            org_debug("settings", "Creating data directory for "..bag_name)
             windower.create_dir(windower.addon_path..'data\\'..bag_name)
             if not windower.dir_exists(windower.addon_path..'data\\'..bag_name) then
                 org_error("unable to create"..bag_name.."directory!")
@@ -117,7 +131,20 @@ function options_load( )
         end
     end
 
-    settings = config.load('data\\settings.xml', default_settings)
+    -- We can't just do a:
+    --
+    -- settings = config.load('data\\settings.xml', default_settings)
+    --
+    -- because the config library will try to merge them, and it will
+    -- add back anything a user has removed (like items in bag_priority)
+
+    if windower.file_exists(windower.addon_path..'data\\settings.xml') then
+        org_debug("settings", "Loading settings from file")
+        settings = config.load('data\\settings.xml')
+    else
+        org_debug("settings", "Saving default settings to file")
+        settings = config.load('data\\settings.xml', default_settings)
+    end
 
     -- Build the ignore list
     if(settings.ignore) then
@@ -149,7 +176,7 @@ function options_load( )
             for slip_id,slip_list in pairs(slip_lists.items) do
                 for item_id in slip_list:it() do
                     _retain[item_id] = "moogle slip"
-                    org_debug(3, "Adding ("..res.items[item_id].english..') to slip retain list')
+                    org_debug("settings", "Adding ("..res.items[item_id].english..') to slip retain list')
                 end
             end
         end
@@ -158,7 +185,7 @@ function options_load( )
             seals = {1126,1127,2955,2956,2957}
             for _,seal_id in pairs(seals) do
                 _retain[seal_id] = "seal"
-                org_debug(3, "Adding ("..res.items[seal_id].english..') to slip retain list')
+                org_debug("settings", "Adding ("..res.items[seal_id].english..') to slip retain list')
             end
         end
     end
@@ -189,7 +216,7 @@ windower.register_event('addon command',function(...)
         bag = table.remove(inp,1):lower()
     end
 
-    org_debug(1, "Using '"..bag.."' as the bag target")
+    org_debug("command", "Using '"..bag.."' as the bag target")
 
 
     file_name = table.concat(inp,' ')
@@ -200,27 +227,27 @@ windower.register_event('addon command',function(...)
     if file_name:sub(-4) ~= '.lua' then
         file_name = file_name..'.lua'
     end
-    org_debug(1, "Using '"..file_name.."' as the file name")
+    org_debug("command", "Using '"..file_name.."' as the file name")
 
 
     if (command == 'g' or command == 'get') then
-        org_debug(1, "Calling get with file_name '"..file_name.."' and bag '"..bag.."'")
+        org_debug("command", "Calling get with file_name '"..file_name.."' and bag '"..bag.."'")
         get(thaw(file_name, bag))
     elseif (command == 't' or command == 'tidy') then
-        org_debug(1, "Calling tidy with file_name '"..file_name.."' and bag '"..bag.."'")
+        org_debug("command", "Calling tidy with file_name '"..file_name.."' and bag '"..bag.."'")
         tidy(thaw(file_name, bag))
     elseif (command == 'f' or command == 'freeze') then
 
-        org_debug(1, "Calling freeze command")
+        org_debug("command", "Calling freeze command")
         local items = Items.new(windower.ffxi.get_items(),true)
         local frozen = {}
         items[3] = nil -- Don't export temporary items
         if _static.bag_ids[bag] then
-            org_debug(1, "Bag: "..bag)
+            org_debug("command", "Bag: "..bag)
             freeze(file_name,bag,items)
         else
             for bag_id,item_list in items:it() do
-                org_debug(2, "Bag ID: "..bag_id)
+                org_debug("command", "Bag ID: "..bag_id)
                 -- infinite loop protection
                 if(frozen[bag_id]) then
                     org_warning("Tried to freeze ID #"..bag_id.." twice, aborting")
@@ -231,31 +258,31 @@ windower.register_event('addon command',function(...)
             end
         end
     elseif (command == 'o' or command == 'organize') then
-        org_debug(1, "Calling organize command")
+        org_debug("command", "Calling organize command")
         organize(thaw(file_name, bag))
     elseif (command == 'dump') then
-        org_debug(1, "Calling dump command")
+        org_debug("command", "Calling dump command")
         full_bag_list = T{windower.ffxi.get_items()}
         full_bag_list:vprint()
     elseif (command == 'baginfo') then
-        org_debug(1, "Calling baginfo command")
+        org_debug("command", "Calling baginfo command")
         full_bag_info = T{windower.ffxi.get_bag_info()}
         full_bag_info:vprint()
 
         inventory_max = windower.ffxi.get_bag_info(0).max
         org_message("max inventory is "..inventory_max)
     elseif (command == 'gameinfo') then
-        org_debug(1, "Calling dump command")
+        org_debug("command", "Calling dump command")
         infoo = T{windower.ffxi.get_info()}
         infoo:vprint()
     end
 
     if settings.auto_heal and tostring(settings.auto_heal):lower() ~= 'false' then
-        org_debug(1, "Automatically healing")
+        org_debug("command", "Automatically healing")
         windower.send_command('input /heal')
     end
 
-    org_debug(1, "Organizer complete")
+    org_debug("command", "Organizer complete")
 
 end)
 
@@ -292,7 +319,7 @@ function get(goal_items,current_items)
 end
 
 function freeze(file_name,bag,items)
-    org_debug(1, "Entering freeze function with bag '"..bag.."'")
+    org_debug("command", "Entering freeze function with bag '"..bag.."'")
     local lua_export = T{}
     local counter = 0
     for _,item_table in items[_static.bag_ids[bag]]:it() do
@@ -301,12 +328,12 @@ function freeze(file_name,bag,items)
             org_warning("We hit an infinite loop in freeze()! ABORT.")
             return
         end
-        org_debug(2, "In freeze loop for bag '"..bag.."'")
-        org_debug(2, "Processing '"..item_table.log_name.."'")
+        org_debug("command", "In freeze loop for bag '"..bag.."'")
+        org_debug("command", "Processing '"..item_table.log_name.."'")
 
         local temp_ext,augments = extdata.decode(item_table)
         if temp_ext.augments then
-            org_debug(2, "Got augments for '"..item_table.log_name.."'")
+            org_debug("command", "Got augments for '"..item_table.log_name.."'")
             augments = table.filter(temp_ext.augments,-functions.equals('none'))
         end
         lua_export:append({name = item_table.name,log_name=item_table.log_name,
@@ -318,12 +345,12 @@ function freeze(file_name,bag,items)
         local export_file = files.new('/data/'..bag..'/'..file_name,true)
         export_file:write('return '..lua_export:tovstring({'augments','log_name','name','id','count','extdata'}))
     else
-        org_debug(1, "Got nothing, skipping '"..bag.."'")
+        org_debug("command", "Got nothing, skipping '"..bag.."'")
     end
 end
 
 function tidy(goal_items,current_items,usable_bags)
-    org_debug(1, "Entering tidy()")
+    org_debug("command", "Entering tidy()")
     usable_bags = usable_bags or get_dump_bags()
     -- Move everything out of items[0] and into other inventories (defined by the passed table)
     if goal_items and goal_items[0] and goal_items[0]._info.n > 0 then
@@ -331,7 +358,7 @@ function tidy(goal_items,current_items,usable_bags)
         goal_items, current_items = clean_goal(goal_items,current_items)
         for index,item in current_items[0]:it() do
             if not goal_items[0]:contains(item,true) then
-                org_debug(1, "Putting away "..item.log_name)
+                org_debug("command", "Putting away "..item.log_name)
                 current_items[0][index]:put_away(usable_bags)
                 simulate_item_delay()
             end
@@ -453,29 +480,33 @@ end
 
 function org_message(msg,col)
     windower.add_to_chat(col or 8,'Organizer: '..msg)
+    flog(_debugging.debug_log, 'Organizer [MSG] '..msg)
 end
 
 function org_warning(msg)
     if _debugging.warnings then
         windower.add_to_chat(123,'Organizer: '..msg)
     end
+    flog(_debugging.debug_log, 'Organizer [WARN] '..msg)
 end
 
 function org_debug(level, msg)
-    if (_debugging.debug > 0) and (_debugging.debug >= level) then
-        windower.add_to_chat(123,'Organizer [DEBUG]: '..msg)
+    if (_debugging.debug[level]) then
+        flog(_debugging.debug_log, 'Organizer [DEBUG] ['..level..']: '..msg)
     end
 end
 
 
 function org_error(msg)
     error('Organizer: '..msg)
+    flog(_debugging.debug_log, 'Organizer [ERROR] '..msg)
 end
 
 function org_verbose(msg,col)
     if tostring(settings.verbose):lower() ~= 'false' then
         windower.add_to_chat(col or 8,'Organizer: '..msg)
     end
+    flog(_debugging.debug_log, 'Organizer [VERBOSE] '..msg)
 end
 
 function default_file_name()
