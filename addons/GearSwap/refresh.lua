@@ -584,7 +584,7 @@ function refresh_item_list(itemlist)
             -- If we don't already have the primary item name in the table, add it.
             if res.items[v.id] and res.items[v.id][language] and not retarr[res.items[v.id][language]] then
                 -- We add the entry as a sub-table containing the id and count
-                retarr[res.items[v.id][language]] = {id=v.id, count=v.count, shortname=res.items[v.id][language]:lower()}
+                retarr[res.items[v.id][language]] = {id=v.id, count=v.count, extdata = extdata.decode(v), shortname=res.items[v.id][language]:lower()}
                 -- If a long version of the name exists, and is different from the short version,
                 -- add the long name to the info table and point the long name's key at that table.
                 if res.items[v.id][language..'_log'] and res.items[v.id][language..'_log']:lower() ~= res.items[v.id][language]:lower() then
