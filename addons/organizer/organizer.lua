@@ -37,7 +37,7 @@ config = require 'config'
 
 _addon.name = 'Organizer'
 _addon.author = 'Byrth, maintainer: Rooks'
-_addon.version = 0.20150530
+_addon.version = 0.20150531
 _addon.commands = {'organizer','org'}
 
 _static = {
@@ -91,6 +91,7 @@ _debugging = {
         ['stacks']=true
     },
     debug_log = 'data\\organizer-debug.log',
+    enabled = false,
     warnings = false, -- This mode gives warnings about impossible item movements and crash conditions.
 }
 
@@ -477,8 +478,10 @@ function org_warning(msg)
 end
 
 function org_debug(level, msg)
-    if (_debugging.debug[level]) then
-        flog(_debugging.debug_log, 'Organizer [DEBUG] ['..level..']: '..msg)
+    if(_debugging.enabled) then
+        if (_debugging.debug[level]) then
+            flog(_debugging.debug_log, 'Organizer [DEBUG] ['..level..']: '..msg)
+        end
     end
 end
 
