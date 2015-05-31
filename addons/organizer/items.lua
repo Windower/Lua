@@ -185,7 +185,7 @@ function bags:remove(index)
     rawset(self,index,nil)
 end
 
-function bags:find_all_instances(item,bool)
+function bags:find_all_instances(item,bool,first)
     local instances = L{}
     for i,v in self:it() do
         org_debug("find_all", "find_all_instances: slot="..i.." v="..res.items[v.id].english.." item="..res.items[item.id].english.." ")
@@ -195,6 +195,9 @@ function bags:find_all_instances(item,bool)
                 -- If someone exports an enchanted item when the timer is
                 -- counting down then this function will return false for it.
                 instances:append(i)
+                if first then
+                    return instances
+                end
             end
         end
     end
@@ -208,7 +211,7 @@ end
 function bags:contains(item,bool)
     bool = bool or false -- Default to only looking at unannihilated items
     org_debug("contains", "contains: searching for "..res.items[item.id].english.." in "..self._info.bag_id)
-    local instances = self:find_all_instances(item,bool)
+    local instances = self:find_all_instances(item,bool,true)
     if instances then
         return instances:it()()
     end
@@ -216,7 +219,7 @@ function bags:contains(item,bool)
 end
 
 function bags:find_unfinished_stack(item,bool)
-    local tab = self:find_all_instances(item,bool)
+    local tab = self:find_all_instances(item,bool,false)
     if tab then
         for i in tab:it() do
             if res.items[self[i].id] and res.items[self[i].id].stack > self[i].count then
@@ -264,7 +267,7 @@ function item_tab:move(dest_bag,dest_slot,count)
     dest_slot = dest_slot or 0x52
 
     local parent_bag_id = parent._info.bag_id
-    local parent_bag_name = res.bags[parent_bag_id].en
+    local parent_bag_name = res.bags[parent_bag_id].en:lower()
 
     local target_bag_id = targ_inv._info.bag_id
 

@@ -148,7 +148,8 @@ function options_load( )
 
     -- Build the ignore list
     if(settings.ignore) then
-        for bag_name,i_list in pairs(settings.ignore) do
+        for bn,i_list in pairs(settings.ignore) do
+            bag_name = bn:lower()
             _ignore_list[bag_name] = {}
             for _,ignore_name in pairs(i_list) do
                 org_verbose("Adding "..ignore_name.." in the "..bag_name.." to the ignore list")
@@ -260,21 +261,6 @@ windower.register_event('addon command',function(...)
     elseif (command == 'o' or command == 'organize') then
         org_debug("command", "Calling organize command")
         organize(thaw(file_name, bag))
-    elseif (command == 'dump') then
-        org_debug("command", "Calling dump command")
-        full_bag_list = T{windower.ffxi.get_items()}
-        full_bag_list:vprint()
-    elseif (command == 'baginfo') then
-        org_debug("command", "Calling baginfo command")
-        full_bag_info = T{windower.ffxi.get_bag_info()}
-        full_bag_info:vprint()
-
-        inventory_max = windower.ffxi.get_bag_info(0).max
-        org_message("max inventory is "..inventory_max)
-    elseif (command == 'gameinfo') then
-        org_debug("command", "Calling dump command")
-        infoo = T{windower.ffxi.get_info()}
-        infoo:vprint()
     end
 
     if settings.auto_heal and tostring(settings.auto_heal):lower() ~= 'false' then
