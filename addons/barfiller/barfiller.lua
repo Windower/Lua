@@ -28,7 +28,7 @@
 
 _addon.name = 'BarFiller'
 _addon.author = 'Morath'
-_addon.version = '0.2.3'
+_addon.version = '0.2.4'
 _addon.commands = {'bf','barfiller'}
 _addon.language = 'english'
 
@@ -42,7 +42,7 @@ images = require('images')
 -- BarFiller Libs
 require('statics')
 
--- Generate Settings Files
+-- Generate Settings Fi]les
 -- Thanks to Byrth & SnickySnacks' BattleMod addon
 settings = config.load(default_settings)
 config.save(settings)
@@ -51,8 +51,9 @@ background_bar = images.new(settings.Images.Background)
 foreground_bar = images.new(settings.Images.Foreground)
 rested_bonus   = images.new(settings.Images.RestedBonus)
 
-box = texts.new(settings.TextBox)
+box = texts.new(settings.ExpText)
 
+debug = false
 ready = false
 chunk_update = false
 
@@ -63,7 +64,6 @@ windower.register_event('load',function()
     end
 end)
 
--- Delay initialize() for 10 seconds to allow game to download chunks
 windower.register_event('login',function()
     initialize()
 end)
@@ -116,16 +116,26 @@ end)
 -- Thanks to Iryoku for the logic on smooth animations
 windower.register_event('prerender',function()
     if ready then
-        frame_count = frame_count + 1
         if chunk_update then
-            local old_width = get_fg_width()
-            local new_width = calc_exp_bar()
+            local old_width = foreground_bar:width()
+            local new_width = calc_new_width()
+
             if new_width ~= nil and new_width > 0 then
                 if old_width < new_width then
-                    set_fg_width(old_width + ((new_width - old_width) * 0.1))
-                elseif old_width > new_width then
-                    set_fg_width(new_width)
+                    local last_update = 0
+                    local x = old_width + math.ceil(((new_width - old_width) * 0.1))
+                    if debug then print(old_width, x, new_width) end -- Debug statement
+                    foreground_bar:size(x, fg_height)
+
+                    local now = os.clock()
+                    if now - last_update > 0.5 then
+                        update_strings()
+                        last_update = now
+                    end
+                elseif old_width >= new_width then
+                    foreground_bar:size(new_width, fg_height)
                     chunk_update = false
+                    if debug then print(chunk_update) end -- Debug statement
                 end
             end
         end
