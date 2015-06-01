@@ -52,7 +52,8 @@ default_settings = {
             Repeatable = {
                 X = 1,
                 Y = 1
-            }
+            },
+            Draggable = false
         },
         Foreground = {
             Pos = {
@@ -77,7 +78,8 @@ default_settings = {
             Repeatable = {
                 X = 1,
                 Y = 1
-            }
+            },
+            Draggable = false
         },
         RestedBonus = {
             Pos = {
@@ -102,10 +104,11 @@ default_settings = {
             Repeatable = {
                 X = 1,
                 Y = 1
-            }
+            },
+            Draggable = false
         }
     },
-    TextBox = {
+    ExpText = {
         Pos = {
             X = 159,
             Y = 13
@@ -132,20 +135,19 @@ default_settings = {
             Alpha = 255,
             Red = 253,
             Green = 252,
-            Blue = 250
-        },
-        Stroke = {
-            Width = 1,
-            Alpha = 127,
-            Red = 136,
-            Green = 97,
-            Blue = 18
-        },
-        Draggable = false
+            Blue = 250,
+            Stroke = {
+                Width = 1,
+                Alpha = 127,
+                Red = 136,
+                Green = 97,
+                Blue = 18
+            }
+        }
     },
     Strings = {
         MainJob = true,
-        SubJob = false,
+        SubJob = true,
         Level = true,
         Exp = true,
         Tnl = true,
@@ -153,10 +155,6 @@ default_settings = {
         Rate = true
     }
 }
-
--- Current Game Resolution
-windower_res_x = windower.get_windower_settings().x_res
-windower_res_y = windower.get_windower_settings().y_res
 
 -- Approved console commands
 -- Thanks to Byrth & SnickySnacks' BattleMod addon
@@ -176,120 +174,129 @@ approved_commands = {
 
 function load_images()
     -- Background Bar
-    bg_pos_x    = settings.Images.Background.Pos.X
-    bg_pos_y    = settings.Images.Background.Pos.Y
-    bg_visible  = settings.Images.Background.Visible
-    bg_alpha    = settings.Images.Background.Color.Alpha
-    bg_red      = settings.Images.Background.Color.Red
-    bg_green    = settings.Images.Background.Color.Green
-    bg_blue     = settings.Images.Background.Color.Blue
-    bg_image    = settings.Images.Background.Texture.Path
-    bg_fit      = settings.Images.Background.Texture.Fit
-    bg_width    = settings.Images.Background.Size.Width
-    bg_height   = settings.Images.Background.Size.Height
-    bg_repeat_x = settings.Images.Background.Repeatable.X
-    bg_repeat_y = settings.Images.Background.Repeatable.Y
+    bg_pos_x     = settings.Images.Background.Pos.X
+    bg_pos_y     = settings.Images.Background.Pos.Y
+    bg_visible   = settings.Images.Background.Visible
+    bg_alpha     = settings.Images.Background.Color.Alpha
+    bg_red       = settings.Images.Background.Color.Red
+    bg_green     = settings.Images.Background.Color.Green
+    bg_blue      = settings.Images.Background.Color.Blue
+    bg_image     = settings.Images.Background.Texture.Path
+    bg_fit       = settings.Images.Background.Texture.Fit
+    bg_width     = settings.Images.Background.Size.Width
+    bg_height    = settings.Images.Background.Size.Height
+    bg_repeat_x  = settings.Images.Background.Repeatable.X
+    bg_repeat_y  = settings.Images.Background.Repeatable.Y
+    bg_draggable = settings.Images.Background.Draggable
 
-    background_bar:pos(get_bg_pos_x(), get_bg_pos_y())
-    background_bar:visible(get_bg_visible())
-    background_bar:alpha(get_bg_alpha())
-    background_bar:color(get_bg_red(), get_bg_green(), get_bg_blue())
-    background_bar:path(get_bg_image())
-    background_bar:fit(get_bg_fit())
-    background_bar:size(get_bg_width(), get_bg_height())
-    background_bar:repeat_xy(get_bg_repeat_x(), get_bg_repeat_y())
+    background_bar:pos(bg_pos_x, bg_pos_y)
+    background_bar:visible(bg_visible)
+    background_bar:alpha(bg_alpha)
+    background_bar:color(bg_red, bg_green, bg_blue)
+    background_bar:path(bg_image)
+    background_bar:fit(bg_fit)
+    background_bar:size(bg_width, bg_height)
+    background_bar:repeat_xy(bg_repeat_x, bg_repeat_y)
     background_bar:show()
 
     -- Foreground Bar
-    fg_pos_x    = settings.Images.Foreground.Pos.X
-    fg_pos_y    = settings.Images.Foreground.Pos.Y
-    fg_visible  = settings.Images.Foreground.Visible
-    fg_alpha    = settings.Images.Foreground.Color.Alpha
-    fg_red      = settings.Images.Foreground.Color.Red
-    fg_green    = settings.Images.Foreground.Color.Green
-    fg_blue     = settings.Images.Foreground.Color.Blue
-    fg_image    = settings.Images.Foreground.Texture.Path
-    fg_fit      = settings.Images.Foreground.Texture.Fit
-    fg_width    = settings.Images.Foreground.Size.Width
-    fg_height   = settings.Images.Foreground.Size.Height
-    fg_repeat_x = settings.Images.Foreground.Repeatable.X
-    fg_repeat_y = settings.Images.Foreground.Repeatable.Y
+    fg_pos_x     = settings.Images.Foreground.Pos.X
+    fg_pos_y     = settings.Images.Foreground.Pos.Y
+    fg_visible   = settings.Images.Foreground.Visible
+    fg_alpha     = settings.Images.Foreground.Color.Alpha
+    fg_red       = settings.Images.Foreground.Color.Red
+    fg_green     = settings.Images.Foreground.Color.Green
+    fg_blue      = settings.Images.Foreground.Color.Blue
+    fg_image     = settings.Images.Foreground.Texture.Path
+    fg_fit       = settings.Images.Foreground.Texture.Fit
+    fg_width     = settings.Images.Foreground.Size.Width
+    fg_height    = settings.Images.Foreground.Size.Height
+    fg_repeat_x  = settings.Images.Foreground.Repeatable.X
+    fg_repeat_y  = settings.Images.Foreground.Repeatable.Y
+    fg_draggable = settings.Images.Foreground.Draggable
 
-    foreground_bar:pos(get_fg_pos_x(), get_fg_pos_y() )
-    foreground_bar:visible(get_fg_visible())
-    foreground_bar:alpha(get_fg_alpha())
-    foreground_bar:color(get_fg_red(), get_fg_green(), get_fg_blue())
-    foreground_bar:path(get_fg_image())
-    foreground_bar:fit(get_fg_fit())
-    foreground_bar:size(get_fg_width(), get_fg_height())
-    foreground_bar:repeat_xy(get_fg_repeat_x(), get_fg_repeat_y())
+    foreground_bar:pos(fg_pos_x, fg_pos_y)
+    foreground_bar:visible(fg_visible)
+    foreground_bar:alpha(fg_alpha)
+    foreground_bar:color(fg_red, fg_green, fg_blue)
+    foreground_bar:path(fg_image)
+    foreground_bar:fit(fg_fit)
+    foreground_bar:size(fg_width, fg_height)
+    foreground_bar:repeat_xy(fg_repeat_x, fg_repeat_y)
     foreground_bar:show()
 
     -- Rested Bonus Icon
-    rb_pos_x    = settings.Images.RestedBonus.Pos.X
-    rb_pos_y    = settings.Images.RestedBonus.Pos.Y
-    rb_visible  = settings.Images.RestedBonus.Visible
-    rb_alpha    = settings.Images.RestedBonus.Color.Alpha
-    rb_red      = settings.Images.RestedBonus.Color.Red
-    rb_green    = settings.Images.RestedBonus.Color.Green
-    rb_blue     = settings.Images.RestedBonus.Color.Blue
-    rb_image    = settings.Images.RestedBonus.Texture.Path
-    rb_fit      = settings.Images.RestedBonus.Texture.Fit
-    rb_width    = settings.Images.RestedBonus.Size.Width
-    rb_height   = settings.Images.RestedBonus.Size.Height
-    rb_repeat_x = settings.Images.RestedBonus.Repeatable.X
-    rb_repeat_y = settings.Images.RestedBonus.Repeatable.Y
+    rb_pos_x     = settings.Images.RestedBonus.Pos.X
+    rb_pos_y     = settings.Images.RestedBonus.Pos.Y
+    rb_visible   = settings.Images.RestedBonus.Visible
+    rb_alpha     = settings.Images.RestedBonus.Color.Alpha
+    rb_red       = settings.Images.RestedBonus.Color.Red
+    rb_green     = settings.Images.RestedBonus.Color.Green
+    rb_blue      = settings.Images.RestedBonus.Color.Blue
+    rb_image     = settings.Images.RestedBonus.Texture.Path
+    rb_fit       = settings.Images.RestedBonus.Texture.Fit
+    rb_width     = settings.Images.RestedBonus.Size.Width
+    rb_height    = settings.Images.RestedBonus.Size.Height
+    rb_repeat_x  = settings.Images.RestedBonus.Repeatable.X
+    rb_repeat_y  = settings.Images.RestedBonus.Repeatable.Y
+    rb_draggable = settings.Images.RestedBonus.Draggable
 
-    rested_bonus:pos(get_rb_pos_x(), get_rb_pos_y())
-    rested_bonus:visible(false)
-    rested_bonus:alpha(get_rb_alpha())
-    rested_bonus:color(get_rb_red(), get_rb_green(), get_rb_blue())
-    rested_bonus:path(get_rb_image())
-    rested_bonus:fit(get_rb_fit())
-    rested_bonus:size(get_rb_width(), get_rb_height())
-    rested_bonus:repeat_xy(get_rb_repeat_x(), get_rb_repeat_y())
+    rested_bonus:pos(rb_pos_x, rb_pos_y)
+    rested_bonus:visible(rb_visible)
+    rested_bonus:alpha(rb_alpha)
+    rested_bonus:color(rb_red, rb_green, rb_blue)
+    rested_bonus:path(rb_image)
+    rested_bonus:fit(rb_fit)
+    rested_bonus:size(rb_width, rb_height)
+    rested_bonus:repeat_xy(rb_repeat_x, rb_repeat_y)
     mog_house()
 
     position_images()
 end
 
-function create_text_box()
+function load_text_box()
     -- Text Box Style and Options
-    box_pos_x    = settings.TextBox.Pos.X
-    box_pos_y    = settings.TextBox.Pos.Y
-    box_alpha    = settings.TextBox.Background.Alpha
-    box_red      = settings.TextBox.Background.Red
-    box_green    = settings.TextBox.Background.Green
-    box_blue     = settings.TextBox.Background.Blue
-    box_visible  = settings.TextBox.Background.Visible
-    font_font    = settings.TextBox.Text.Font
-    font_size    = settings.TextBox.Text.Size
-    font_alpha   = settings.TextBox.Text.Alpha
-    font_red     = settings.TextBox.Text.Red
-    font_green   = settings.TextBox.Text.Green
-    font_blue    = settings.TextBox.Text.Blue
-    padding      = settings.TextBox.Padding
-    stroke_alpha = settings.TextBox.Stroke.Alpha
-    stroke_red   = settings.TextBox.Stroke.Red
-    stroke_green = settings.TextBox.Stroke.Green
-    stroke_blue  = settings.TextBox.Stroke.Blue
-    stroke_width = settings.TextBox.Stroke.Width
+    box_pos_x             = settings.ExpText.Pos.X
+    box_pos_y             = settings.ExpText.Pos.Y
+    box_bg_alpha          = settings.ExpText.Background.Alpha
+    box_bg_red            = settings.ExpText.Background.Red
+    box_bg_green          = settings.ExpText.Background.Green
+    box_bg_blue           = settings.ExpText.Background.Blue
+    box_bg_visible        = settings.ExpText.Background.Visible
+    box_flags_right       = settings.ExpText.Flags.Right
+    box_flags_bottom      = settings.ExpText.Flags.Bottom
+    box_flags_bold        = settings.ExpText.Flags.Bold
+    box_flags_draggable   = settings.ExpText.Flags.Draggable
+    box_flags_italic      = settings.ExpText.Flags.Italic
+    box_padding           = settings.ExpText.Padding
+    box_font              = settings.ExpText.Text.Font
+    box_font_size         = settings.ExpText.Text.Size
+    box_font_alpha        = settings.ExpText.Text.Alpha
+    box_font_red          = settings.ExpText.Text.Red
+    box_font_green        = settings.ExpText.Text.Green
+    box_font_blue         = settings.ExpText.Text.Blue
+    box_font_stroke_alpha = settings.ExpText.Text.Stroke.Alpha
+    box_font_stroke_red   = settings.ExpText.Text.Stroke.Red
+    box_font_stroke_green = settings.ExpText.Text.Stroke.Green
+    box_font_stroke_blue  = settings.ExpText.Text.Stroke.Blue
+    box_font_stroke_width = settings.ExpText.Text.Stroke.Width
 
-    -- Textbox Global Settings
-    box:pos(get_box_pos_x(), get_box_pos_y())
-    box:bg_color(box_red, box_green, box_blue)
-    box:bg_alpha(box_alpha)
-    
-    -- Textbox Font Settings
-    box:font(font_font)
-    box:size(font_size)
-    box:color(font_red, font_green, font_blue)
-    box:alpha(font_alpha)
-
-    -- Textbox Stroke Settings
-    box:stroke_width(stroke_width)
-    box:stroke_color(stroke_red, stroke_green, stroke_blue)
-    box:stroke_transparency(stroke_alpha)
+    box:pos(box_pos_x, box_pos_y)
+    box:bg_color(box_bg_red, box_bg_green, box_bg_blue)
+    box:bg_alpha(box_bg_alpha)
+    box:bg_visible(box_bg_visible)
+    box:right_justified(box_flags_right)
+    box:bottom_justified(box_flags_bottom)
+    box:bold(box_flags_bold)
+    box:italic(box_flags_italic)
+    box:pad(box_padding)
+    box:font(box_font)
+    box:size(box_font_size)
+    box:alpha(box_font_alpha)
+    box:color(box_font_red, box_font_green, box_font_blue)
+    box:stroke_transparency(box_font_stroke_alpha)
+    box:stroke_color(box_font_stroke_red, box_font_stroke_green, box_font_stroke_blue)
+    box:stroke_width(box_font_stroke_width)
 
     -- String Toggles
     main_job_visible   = settings.Strings.MainJob
@@ -306,7 +313,6 @@ end
 -- Reset XP Info
 -- Thanks to Byrth's PointWatch addon
 function initialize()
-    frame_count = 0
     xp = {
         registry = {},
         total = 0,
@@ -324,8 +330,8 @@ function initialize()
         pct = ''
     }
     load_images()
-    create_text_box()
-    calc_exp_bar()
+    load_text_box()
+    calc_new_width()
     update_strings()
     ready = true
 end
@@ -333,16 +339,12 @@ end
 function update_strings()
     info = windower.ffxi.get_player()
     player.job = string.upper(info.main_job)
-    player.sub = '('..string.lower(info.sub_job)..') '
+    player.sub = (info.sub_job and '('..string.lower(info.sub_job)..') ' or '(---) ')
     player.lvl = 'Lv'..info.main_job_level..'  '
     player.exp = 'EXP '..xp.current..'/'..xp.total..' '
     player.tnl = '('..xp.tnl..') '
+    player.pct = (xp.total > 0 and math.floor((xp.current / xp.total) * 100)..'% ' or '0% ')
     player.phr = 'EXP/hr '..string.format('%.1f',math.floor(xp.rate/100)/10)..'k'
-    if xp.current > 0 and xp.total > 0 then
-        player.pct = math.floor((xp.current / xp.total) * 100)..'% '
-    else
-        player.pct = '0% '
-    end
 
     box:clear()
 
@@ -410,7 +412,7 @@ function analyze_points_table(tab)
 end
 
 -- Calculate XP Bar Width
-function calc_exp_bar()
+function calc_new_width()
     if xp.current > 0 and xp.total > 0 then
         local calc = math.floor((xp.current / xp.total) * 468)
         xp.rate = analyze_points_table(xp.registry)
@@ -420,15 +422,16 @@ end
 
 -- Center the Bar & Text on Screen
 function position_images()
-    set_bg_pos_x(((windower_res_x / 2) - (get_bg_width() / 2)))
-    set_fg_pos_x(get_bg_pos_x() + 2)
-    set_rb_pos_x(get_bg_pos_x() + get_bg_width())
-    set_rb_pos_y(get_bg_pos_y() - 6)
+    local width = bg_width
+    local x = windower.get_windower_settings().x_res / 2 - width / 2
+    
+    background_bar:pos(x, bg_pos_y)
+    foreground_bar:pos(x + 2, fg_pos_y)
+    rested_bonus:pos(x + width, bg_pos_y - 6)
 end
 
 function position_text()
-    set_box_pos_x(get_bg_pos_x() - 6)
-    set_box_pos_y(get_bg_pos_y() + 4)
+    box:pos((background_bar:pos_x() - 6), (background_bar:pos_y() + 4))
 end
 
 -- When logging out, hides the player stats
@@ -437,408 +440,10 @@ function hide()
     foreground_bar:hide()
     rested_bonus:hide()
     box:clear()
+    box:hide()
     ready = false
 end
 
 function mog_house()
-    local mh = windower.ffxi.get_info().mog_house
-    if mh then rested_bonus:show() else rested_bonus:hide() end
-end
-
--- Background Bar Getters
-function get_bg_pos_x()
-    return bg_pos_x
-end
-
-function get_bg_pos_y()
-    return bg_pos_y
-end
-
-function get_bg_visible()
-    return bg_visible
-end
-
-function get_bg_alpha()
-    return bg_alpha
-end
-
-function get_bg_red()
-    return bg_red
-end
-
-function get_bg_green()
-    return bg_green
-end
-
-function get_bg_blue()
-    return bg_blue
-end
-
-function get_bg_image()
-    return bg_image
-end
-
-function get_bg_fit()
-    return bg_fit
-end
-
-function get_bg_width()
-    return bg_width
-end
-
-function get_bg_height()
-    return bg_height
-end
-
-function get_bg_repeat_x()
-    return bg_repeat_x
-end
-
-function get_bg_repeat_y()
-    return bg_repeat_y
-end
-
--- Foreground Bar Getters
-function get_fg_pos_x()
-    return fg_pos_x
-end
-
-function get_fg_pos_y()
-    return fg_pos_y
-end
-
-function get_fg_visible()
-    return fg_visible
-end
-
-function get_fg_alpha()
-    return fg_alpha
-end
-
-function get_fg_red()
-    return fg_red
-end
-
-function get_fg_green()
-    return fg_green
-end
-
-function get_fg_blue()
-    return fg_blue
-end
-
-function get_fg_image()
-    return fg_image
-end
-
-function get_fg_fit()
-    return fg_fit
-end
-
-function get_fg_width()
-    return fg_width
-end
-
-function get_fg_height()
-    return fg_height
-end
-
-function get_fg_repeat_x()
-    return fg_repeat_x
-end
-
-function get_fg_repeat_y()
-    return fg_repeat_y
-end
-
--- Rested Bonus Getters
-function get_rb_pos_x()
-    return rb_pos_x
-end
-
-function get_rb_pos_y()
-    return rb_pos_y
-end
-
-function get_rb_visible()
-    return rb_visible
-end
-
-function get_rb_alpha()
-    return rb_alpha
-end
-
-function get_rb_red()
-    return rb_red
-end
-
-function get_rb_green()
-    return rb_green
-end
-
-function get_rb_blue()
-    return rb_blue
-end
-
-function get_rb_image()
-    return rb_image
-end
-
-function get_rb_fit()
-    return rb_fit
-end
-
-function get_rb_width()
-    return rb_width
-end
-
-function get_rb_height()
-    return rb_height
-end
-
-function get_rb_repeat_x()
-    return rb_repeat_x
-end
-
-function get_rb_repeat_y()
-    return rb_repeat_y
-end
-
--- TextBox Getters
-function get_box_pos_x()
-    return box_pos_x
-end
-
-function get_box_pos_y()
-    return box_pos_y
-end
-
-function get_box_visible()
-    return box_visible
-end
-
-function get_box_font_size()
-    return font_size
-end
-
-function get_rested_bonus_pos_x()
-    return bonus_pos_x
-end
-
-function get_rested_bonus_pos_y()
-    return bonus_pos_y
-end
-
-function get_rested_bonus_visible()
-    return bonus_visible
-end
-
--- Background Bar Setters
-function set_bg_pos_x(new_pos_x)
-    bg_pos_x = new_pos_x
-    background_bar:pos(new_pos_x, get_bg_pos_y())
-end
-
-function set_bg_pos_y(new_pos_y)
-    bg_pos_y = new_pos_y
-    background_bar:pos(get_bg_pos_x(), new_pos_y)
-end
-
-function set_bg_visible(new_visible_state)
-    bg_visible = new_visible_state
-    background_bar:visible(new_visible_state)
-end
-
-function set_bg_alpha(new_alpha)
-    bg_alpha = new_alpha
-    background_bar:alpha(new_alpha)
-end
-
-function set_bg_red(new_red)
-    bg_red = new_red
-    background_bar:color(new_red, get_bg_green(), get_bg_blue())
-end
-
-function set_bg_green(new_green)
-    bg_green = new_green
-    background_bar:color(get_bg_red(), new_green, get_bg_blue())
-end
-
-function set_bg_blue(new_blue)
-    bg_blue = new_blue
-    background_bar:color(get_bg_red(), get_bg_green(), new_blue)
-end
-
-function set_bg_image(new_path)
-    bg_image = new_path
-    background_bar:path(new_path)
-end
-
-function set_bg_fit(new_fit)
-    bg_fit = new_fit
-    background_bar:fit(new_fit)
-end
-
-function set_bg_width(new_width)
-    bg_width = new_width
-    background_bar:size(new_width, get_bg_height())
-end
-
-function set_bg_height(new_height)
-    bg_height = new_height
-    background_bar:size(get_bg_width(), new_height)
-end
-
-function set_bg_repeat_x(new_repeat_x)
-    bg_repeat_x = new_repeat_x
-    background_bar:repeat_xy(new_repeat_x, get_bg_repeat_y())
-end
-
-function set_bg_repeat_y(new_repeat_y)
-    bg_repeat_y = new_repeat_y
-    background_bar:repeat_xy(get_bg_repeat_x(), new_repeat_y)
-end
-
--- Foreground Bar Setters
-function set_fg_pos_x(new_pos_x)
-    fg_pos_x = new_pos_x
-    foreground_bar:pos(new_pos_x, get_fg_pos_y())
-end
-
-function set_fg_pos_y(new_pos_y)
-    fg_pos_y = new_pos_y
-    foreground_bar:pos(get_fg_pos_x(), new_pos_y)
-end
-
-function set_fg_visible(new_visible_state)
-    fg_visible = new_visible_state
-    foreground_bar:visible(new_visible_state)
-end
-
-function set_fg_alpha(new_alpha)
-    fg_alpha = new_alpha
-    foreground_bar:alpha(new_alpha)
-end
-
-function set_fg_red(new_red)
-    fg_red = new_red
-    foreground_bar:color(new_red, get_fg_green(), get_fg_blue())
-end
-
-function set_fg_green(new_green)
-    fg_green = new_green
-    foreground_bar:color(get_fg_red(), new_green, get_fg_blue())
-end
-
-function set_fg_blue(new_blue)
-    fg_blue = new_blue
-    foreground_bar:color(get_fg_red(), get_fg_green(), new_blue)
-end
-
-function set_fg_image(new_path)
-    fg_image = new_path
-    foreground_bar:path(new_path)
-end
-
-function set_fg_fit(new_fit)
-    fg_fit = new_fit
-    foreground_bar:fit(new_fit)
-end
-
-function set_fg_width(new_width)
-    fg_width = new_width
-    foreground_bar:size(new_width, get_fg_height())
-    if frame_count%15 == 0 then update_strings() end
-end
-
-function set_fg_height(new_height)
-    fg_height = new_height
-    foreground_bar:size(get_fg_width(), new_height)
-end
-
-function set_fg_repeat_x(new_repeat_x)
-    fg_repeat_x = new_repeat_x
-    foreground_bar:repeat_xy(new_repeat_x, get_fg_repeat_y())
-end
-
-function set_fg_repeat_y(new_repeat_y)
-    fg_repeat_y = new_repeat_y
-    foreground_bar:repeat_xy(get_fg_repeat_x(), new_repeat_y)
-end
-
--- Rested Bonus Setters
-function set_rb_pos_x(new_pos_x)
-    rb_pos_x = new_pos_x
-    rested_bonus:pos(new_pos_x, get_rb_pos_y())
-end
-
-function set_rb_pos_y(new_pos_y)
-    rb_pos_y = new_pos_y
-    rested_bonus:pos(get_rb_pos_x(), new_pos_y)
-end
-
-function set_rb_visible(new_visible_state)
-    rb_visible = new_visible_state
-    rested_bonus:visible(new_visible_state)
-end
-
-function set_rb_alpha(new_alpha)
-    rb_alpha = new_alpha
-    rested_bonus:alpha(new_alpha)
-end
-
-function set_rb_red(new_red)
-    rb_red = new_red
-    rested_bonus:color(new_red, get_rb_green(), get_rb_blue())
-end
-
-function set_rb_green(new_green)
-    rb_green = new_green
-    rested_bonus:color(get_rb_red(), new_green, get_rb_blue())
-end
-
-function set_rb_blue(new_blue)
-    rb_blue = new_blue
-    rested_bonus:color(get_rb_red(), get_rb_green(), new_blue)
-end
-
-function set_rb_image(new_path)
-    rb_image = new_path
-    rested_bonus:path(new_path)
-end
-
-function set_rb_fit(new_fit)
-    rb_fit = new_fit
-    rested_bonus:fit(new_fit)
-end
-
-function set_rb_width(new_width)
-    rb_width = new_width
-    rested_bonus:size(new_width, get_rb_height())
-end
-
-function set_rb_height(new_height)
-    rb_height = new_height
-    rested_bonus:size(get_rb_width(), new_height)
-end
-
-function set_rb_repeat_x(new_repeat_x)
-    rb_repeat_x = new_repeat_x
-    rested_bonus:repeat_xy(new_repeat_x, get_rb_repeat_y())
-end
-
-function set_rb_repeat_y(new_repeat_y)
-    rb_repeat_y = new_repeat_y
-    rested_bonus:repeat_xy(get_rb_repeat_x(), new_repeat_y)
-end
-
--- TextBox Setters
-function set_box_pos_x(new_pos_x)
-    box_pos_x = new_pos_x
-    windower.text.set_location('box', new_pos_x, get_box_pos_y())
-end
-
-function set_box_pos_y(new_pos_y)
-    box_pos_y = new_pos_y
-    windower.text.set_location('box', get_box_pos_x(), new_pos_y)
+    return (windower.ffxi.get_info().mog_house and rested_bonus:show() or rested_bonus:hide())
 end
