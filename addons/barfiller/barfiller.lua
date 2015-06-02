@@ -28,7 +28,7 @@
 
 _addon.name = 'BarFiller'
 _addon.author = 'Morath'
-_addon.version = '0.2.4'
+_addon.version = '0.2.5'
 _addon.commands = {'bf','barfiller'}
 _addon.language = 'english'
 
@@ -42,25 +42,22 @@ images = require('images')
 -- BarFiller Libs
 require('statics')
 
--- Generate Settings Fi]les
--- Thanks to Byrth & SnickySnacks' BattleMod addon
-settings = config.load(default_settings)
+settings = config.load(defaults)
 config.save(settings)
 
-background_bar = images.new(settings.Images.Background)
-foreground_bar = images.new(settings.Images.Foreground)
-rested_bonus   = images.new(settings.Images.RestedBonus)
+background_image   = images.new(settings.Images.Background)
+foreground_image   = images.new(settings.Images.Foreground)
+rested_bonus_image = images.new(settings.Images.RestedBonus)
 
-box = texts.new(settings.ExpText)
+exp_text = texts.new(settings.Texts.Exp)
 
 debug = false
 ready = false
 chunk_update = false
 
--- Make sure character is logged in, and loaded before initializing
 windower.register_event('load',function()
     if windower.ffxi.get_info().logged_in then
-        initialize() -- Populate character details
+        initialize()
     end
 end)
 
@@ -68,38 +65,36 @@ windower.register_event('login',function()
     initialize()
 end)
 
--- If you're switching characters this will clear the previous characters stats
 windower.register_event('logout',function()
     hide()
 end)
 
--- Addon commands
--- Thanks to Byrth & SnickySnacks' BattleMod addon
 windower.register_event('addon command',function(command, ...)
     local commands = {...}
     local first_cmd = (command or 'help'):lower()
     if approved_commands[first_cmd] and #commands >= approved_commands[first_cmd].n then
-        if first_cmd == 'clear' or first_cmd == 'c' then        -- Reset EXP bar to 0
+        if first_cmd == 'clear' or first_cmd == 'c' then
             initialize()
-        elseif first_cmd == 'reload' or first_cmd == 'r' then   -- Reloads BarFiller
+        elseif first_cmd == 'visible' or first_cmd == 'v' then
+            if ready then hide() else show() end
+        elseif first_cmd == 'reload' or first_cmd == 'r' then
             windower.add_to_chat(8,'BarFiller successfully reloaded.')
             windower.send_command('lua r barfiller;')
-        elseif first_cmd == 'unload' or first_cmd == 'u' then   -- Unloads BarFiller
+        elseif first_cmd == 'unload' or first_cmd == 'u' then
             windower.send_command('lua u barfiller;')
             windower.add_to_chat(8,'BarFiller successfully unloaded.')
-        elseif first_cmd == 'help' or first_cmd == 'h' then     -- Display helpful information
-            help()
+        elseif first_cmd == 'help' or first_cmd == 'h' then
+            display_help()
         end
     else
-        help()
+        display_help()
     end
 end)
 
--- Capture XP Values
--- Thanks to smd111 for Packet parsing
 windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blocked)
     if is_injected then return end
     if ready then
+        -- Thanks to smd111 for Packet parsing
         local packet_table = packets.parse('incoming', org)
         if id == 0x2D then
             exp_msg(packet_table['Param 1'],packet_table['Message'])
@@ -112,31 +107,28 @@ windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blo
     end
 end)
 
--- Update the XP bar size
--- Thanks to Iryoku for the logic on smooth animations
 windower.register_event('prerender',function()
-    if ready then
-        if chunk_update then
-            local old_width = foreground_bar:width()
-            local new_width = calc_new_width()
+    if ready and chunk_update then
+        local old_width = foreground_image:width()
+        local new_width = calc_new_width()
 
-            if new_width ~= nil and new_width > 0 then
-                if old_width < new_width then
-                    local last_update = 0
-                    local x = old_width + math.ceil(((new_width - old_width) * 0.1))
-                    if debug then print(old_width, x, new_width) end -- Debug statement
-                    foreground_bar:size(x, fg_height)
+        -- Thanks to Iryoku for the logic on smooth animations
+        if new_width ~= nil and new_width > 0 then
+            if old_width < new_width then
+                local last_update = 0
+                local x = old_width + math.ceil(((new_width - old_width) * 0.1))
+                foreground_image:size(x, settings.Images.Foreground.Size.Height)
+                if debug then print(old_width, x, new_width) end
 
-                    local now = os.clock()
-                    if now - last_update > 0.5 then
-                        update_strings()
-                        last_update = now
-                    end
-                elseif old_width >= new_width then
-                    foreground_bar:size(new_width, fg_height)
-                    chunk_update = false
-                    if debug then print(chunk_update) end -- Debug statement
+                local now = os.clock()
+                if now - last_update > 0.5 then
+                    update_strings()
+                    last_update = now
                 end
+            elseif old_width >= new_width then
+                foreground_image:size(new_width, settings.Images.Foreground.Size.Height)
+                chunk_update = false
+                if debug then print(chunk_update) end
             end
         end
     end
