@@ -26,140 +26,112 @@
         SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
--- Default settings
-default_settings = {
-    Images = {
-        Background = {
-            Pos = {
-                X = 164,
-                Y = 6
-            },
-            Visible = true,
-            Texture = {
-                Path =  windower.addon_path..'bar_bg.png',
-                Fit = true
-            },
-            Color = {
-                Alpha = 255,
-                Red = 255,
-                Green = 255,
-                Blue = 255
-            },
-            Size = {
-                Height = 5,
-                Width = 472
-            },
-            Repeatable = {
-                X = 1,
-                Y = 1
-            },
-            Draggable = false
-        },
-        Foreground = {
-            Pos = {
-                X = 166,
-                Y = 6
-            },
-            Visible = true,
-            Texture = {
-                Path =  windower.addon_path..'bar_fg.png',
-                Fit = false
-            },
-            Color = {
-                Alpha = 255,
-                Red = 255,
-                Green = 255,
-                Blue = 255
-            },
-            Size = {
-                Height = 5,
-                Width = 1
-            },
-            Repeatable = {
-                X = 1,
-                Y = 1
-            },
-            Draggable = false
-        },
-        RestedBonus = {
-            Pos = {
-                X = 636,
-                Y = 6
-            },
-            Visible = false,
-            Texture = {
-                Path =  windower.addon_path..'moon.png',
-                Fit = true
-            },
-            Color = {
-                Alpha = 255,
-                Red = 255,
-                Green = 255,
-                Blue = 255
-            },
-            Size = {
-                Height = 32,
-                Width = 32
-            },
-            Repeatable = {
-                X = 1,
-                Y = 1
-            },
-            Draggable = false
-        }
-    },
-    ExpText = {
-        Pos = {
-            X = 159,
-            Y = 13
-        },
-        Background = {
-            Alpha = 0,
-            Red = 0,
-            Green = 0,
-            Blue = 0,
-            Visible = true
-        },
-        Flags = {
-            Right = false,
-            Bottom = false,
-            Bold = false,
-            Draggable = false,
-            Italic = false
-        },
-        Padding = 0,
-        Text = {
-            Size = 10,
-            Font = 'Montserrat',
-            Fonts = {'Montserrat', 'Ubuntu Mono', 'Arial'},
-            Alpha = 255,
-            Red = 253,
-            Green = 252,
-            Blue = 250,
-            Stroke = {
-                Width = 1,
-                Alpha = 127,
-                Red = 136,
-                Green = 97,
-                Blue = 18
-            }
-        }
-    },
-    Strings = {
-        MainJob = true,
-        SubJob = true,
-        Level = true,
-        Exp = true,
-        Tnl = true,
-        Percent = true,
-        Rate = true
-    }
-}
+defaults = {}
+defaults.Images = {}
+defaults.Images.Background = {}
+defaults.Images.Background.Pos = {}
+defaults.Images.Background.Pos.X = 164
+defaults.Images.Background.Pos.Y = 6
+defaults.Images.Background.Visible = true
+defaults.Images.Background.Texture = {}
+defaults.Images.Background.Texture.Path = windower.addon_path..'bar_bg.png'
+defaults.Images.Background.Texture.Fit = true
+defaults.Images.Background.Color = {}
+defaults.Images.Background.Color.Alpha = 255
+defaults.Images.Background.Color.Red = 255
+defaults.Images.Background.Color.Green = 255
+defaults.Images.Background.Color.Blue = 255
+defaults.Images.Background.Size = {}
+defaults.Images.Background.Size.Height = 5
+defaults.Images.Background.Size.Width = 472
+defaults.Images.Background.Repeatable = {}
+defaults.Images.Background.Repeatable.X = 1
+defaults.Images.Background.Repeatable.Y = 1
+defaults.Images.Background.Draggable = false
+defaults.Images.Foreground = {}
+defaults.Images.Foreground.Pos = {}
+defaults.Images.Foreground.Pos.X = 166
+defaults.Images.Foreground.Pos.Y = 6
+defaults.Images.Foreground.Visible = true
+defaults.Images.Foreground.Texture = {}
+defaults.Images.Foreground.Texture.Path = windower.addon_path..'bar_fg.png'
+defaults.Images.Foreground.Texture.Fit = false
+defaults.Images.Foreground.Color = {}
+defaults.Images.Foreground.Color.Alpha = 255
+defaults.Images.Foreground.Color.Red = 255
+defaults.Images.Foreground.Color.Green = 255
+defaults.Images.Foreground.Color.Blue = 255
+defaults.Images.Foreground.Size = {}
+defaults.Images.Foreground.Size.Height = 5
+defaults.Images.Foreground.Size.Width = 1
+defaults.Images.Foreground.Repeatable = {}
+defaults.Images.Foreground.Repeatable.X = 1
+defaults.Images.Foreground.Repeatable.Y = 1
+defaults.Images.Foreground.Draggable = false
+defaults.Images.RestedBonus = {}
+defaults.Images.RestedBonus.Pos = {}
+defaults.Images.RestedBonus.Pos.X = 636
+defaults.Images.RestedBonus.Pos.Y = 6
+defaults.Images.RestedBonus.Visible = true
+defaults.Images.RestedBonus.Texture = {}
+defaults.Images.RestedBonus.Texture.Path = windower.addon_path..'moon.png'
+defaults.Images.RestedBonus.Texture.Fit = true
+defaults.Images.RestedBonus.Color = {}
+defaults.Images.RestedBonus.Color.Alpha = 255
+defaults.Images.RestedBonus.Color.Red = 255
+defaults.Images.RestedBonus.Color.Green = 255
+defaults.Images.RestedBonus.Color.Blue = 255
+defaults.Images.RestedBonus.Size = {}
+defaults.Images.RestedBonus.Size.Height = 32
+defaults.Images.RestedBonus.Size.Width = 32
+defaults.Images.RestedBonus.Repeatable = {}
+defaults.Images.RestedBonus.Repeatable.X = 1
+defaults.Images.RestedBonus.Repeatable.Y = 1
+defaults.Images.RestedBonus.Draggable = false
+defaults.Texts = {}
+defaults.Texts.Exp = {}
+defaults.Texts.Exp.Pos = {}
+defaults.Texts.Exp.Pos.X = 159
+defaults.Texts.Exp.Pos.Y = 13
+defaults.Texts.Exp.Background = {}
+defaults.Texts.Exp.Background.Alpha = 0
+defaults.Texts.Exp.Background.Red = 0
+defaults.Texts.Exp.Background.Green = 0
+defaults.Texts.Exp.Background.Blue = 0
+defaults.Texts.Exp.Background.Visible = false
+defaults.Texts.Exp.Flags = {}
+defaults.Texts.Exp.Flags.Right = false
+defaults.Texts.Exp.Flags.Bottom = false
+defaults.Texts.Exp.Flags.Bold = false
+defaults.Texts.Exp.Flags.Draggable = false
+defaults.Texts.Exp.Flags.Italic = false
+defaults.Texts.Exp.Padding = 0
+defaults.Texts.Exp.Text = {}
+defaults.Texts.Exp.Text.Size = 10
+defaults.Texts.Exp.Text.Font = 'Montserrat'
+defaults.Texts.Exp.Text.Fonts = {'Montserrat', 'Ubuntu Mono', 'Arial'}
+defaults.Texts.Exp.Text.Alpha = 255
+defaults.Texts.Exp.Text.Red = 253
+defaults.Texts.Exp.Text.Green = 252
+defaults.Texts.Exp.Text.Blue = 250
+defaults.Texts.Exp.Text.Stroke = {}
+defaults.Texts.Exp.Text.Stroke.Width = 1
+defaults.Texts.Exp.Text.Stroke.Alpha = 127
+defaults.Texts.Exp.Text.Stroke.Red = 136
+defaults.Texts.Exp.Text.Stroke.Green = 97
+defaults.Texts.Exp.Text.Stroke.Blue = 18
+defaults.ShowDetails = {}
+defaults.ShowDetails.MainJob = true
+defaults.ShowDetails.SubJob = true
+defaults.ShowDetails.Level = true
+defaults.ShowDetails.ExperiencePoints = true
+defaults.ShowDetails.ToNextLevel = true
+defaults.ShowDetails.Percent = true
+defaults.ShowDetails.Rate = true
 
--- Approved console commands
--- Thanks to Byrth & SnickySnacks' BattleMod addon
 approved_commands = S{
     'clear','c',
+    'visible','v',
     'reload','r',
     'unload','u',
     'help','h'
@@ -167,151 +139,49 @@ approved_commands = S{
 
 approved_commands = {
     clear={n=0},c={n=0},
+    visible={n=0},v={n=0},
     reload={n=0},r={n=0},
     unload={n=0},u={n=0},
     help={n=0},h={n=0}
 }
 
 function load_images()
-    -- Background Bar
-    bg_pos_x     = settings.Images.Background.Pos.X
-    bg_pos_y     = settings.Images.Background.Pos.Y
-    bg_visible   = settings.Images.Background.Visible
-    bg_alpha     = settings.Images.Background.Color.Alpha
-    bg_red       = settings.Images.Background.Color.Red
-    bg_green     = settings.Images.Background.Color.Green
-    bg_blue      = settings.Images.Background.Color.Blue
-    bg_image     = settings.Images.Background.Texture.Path
-    bg_fit       = settings.Images.Background.Texture.Fit
-    bg_width     = settings.Images.Background.Size.Width
-    bg_height    = settings.Images.Background.Size.Height
-    bg_repeat_x  = settings.Images.Background.Repeatable.X
-    bg_repeat_y  = settings.Images.Background.Repeatable.Y
-    bg_draggable = settings.Images.Background.Draggable
+    background_image:pos(settings.Images.Background.Pos.X, settings.Images.Background.Pos.Y)
+    background_image:path(settings.Images.Background.Texture.Path)
+    background_image:repeat_xy(settings.Images.Background.Repeatable.X, settings.Images.Background.Repeatable.Y)
+    background_image:draggable(settings.Images.Background.Draggable)
+    background_image:show()
 
-    background_bar:pos(bg_pos_x, bg_pos_y)
-    background_bar:visible(bg_visible)
-    background_bar:alpha(bg_alpha)
-    background_bar:color(bg_red, bg_green, bg_blue)
-    background_bar:path(bg_image)
-    background_bar:fit(bg_fit)
-    background_bar:size(bg_width, bg_height)
-    background_bar:repeat_xy(bg_repeat_x, bg_repeat_y)
-    background_bar:show()
+    foreground_image:pos(settings.Images.Foreground.Pos.X, settings.Images.Foreground.Pos.Y)
+    foreground_image:path(settings.Images.Foreground.Texture.Path)
+    foreground_image:fit(settings.Images.Foreground.Texture.Fit)
+    foreground_image:draggable(settings.Images.Foreground.Draggable)
+    foreground_image:show()
 
-    -- Foreground Bar
-    fg_pos_x     = settings.Images.Foreground.Pos.X
-    fg_pos_y     = settings.Images.Foreground.Pos.Y
-    fg_visible   = settings.Images.Foreground.Visible
-    fg_alpha     = settings.Images.Foreground.Color.Alpha
-    fg_red       = settings.Images.Foreground.Color.Red
-    fg_green     = settings.Images.Foreground.Color.Green
-    fg_blue      = settings.Images.Foreground.Color.Blue
-    fg_image     = settings.Images.Foreground.Texture.Path
-    fg_fit       = settings.Images.Foreground.Texture.Fit
-    fg_width     = settings.Images.Foreground.Size.Width
-    fg_height    = settings.Images.Foreground.Size.Height
-    fg_repeat_x  = settings.Images.Foreground.Repeatable.X
-    fg_repeat_y  = settings.Images.Foreground.Repeatable.Y
-    fg_draggable = settings.Images.Foreground.Draggable
-
-    foreground_bar:pos(fg_pos_x, fg_pos_y)
-    foreground_bar:visible(fg_visible)
-    foreground_bar:alpha(fg_alpha)
-    foreground_bar:color(fg_red, fg_green, fg_blue)
-    foreground_bar:path(fg_image)
-    foreground_bar:fit(fg_fit)
-    foreground_bar:size(fg_width, fg_height)
-    foreground_bar:repeat_xy(fg_repeat_x, fg_repeat_y)
-    foreground_bar:show()
-
-    -- Rested Bonus Icon
-    rb_pos_x     = settings.Images.RestedBonus.Pos.X
-    rb_pos_y     = settings.Images.RestedBonus.Pos.Y
-    rb_visible   = settings.Images.RestedBonus.Visible
-    rb_alpha     = settings.Images.RestedBonus.Color.Alpha
-    rb_red       = settings.Images.RestedBonus.Color.Red
-    rb_green     = settings.Images.RestedBonus.Color.Green
-    rb_blue      = settings.Images.RestedBonus.Color.Blue
-    rb_image     = settings.Images.RestedBonus.Texture.Path
-    rb_fit       = settings.Images.RestedBonus.Texture.Fit
-    rb_width     = settings.Images.RestedBonus.Size.Width
-    rb_height    = settings.Images.RestedBonus.Size.Height
-    rb_repeat_x  = settings.Images.RestedBonus.Repeatable.X
-    rb_repeat_y  = settings.Images.RestedBonus.Repeatable.Y
-    rb_draggable = settings.Images.RestedBonus.Draggable
-
-    rested_bonus:pos(rb_pos_x, rb_pos_y)
-    rested_bonus:visible(rb_visible)
-    rested_bonus:alpha(rb_alpha)
-    rested_bonus:color(rb_red, rb_green, rb_blue)
-    rested_bonus:path(rb_image)
-    rested_bonus:fit(rb_fit)
-    rested_bonus:size(rb_width, rb_height)
-    rested_bonus:repeat_xy(rb_repeat_x, rb_repeat_y)
+    rested_bonus_image:pos(settings.Images.RestedBonus.Pos.X, settings.Images.RestedBonus.Pos.Y)
+    rested_bonus_image:visible(settings.Images.RestedBonus.Visible)
+    rested_bonus_image:path(settings.Images.RestedBonus.Texture.Path)
+    rested_bonus_image:draggable(settings.Images.RestedBonus.Draggable)
     mog_house()
 
     position_images()
 end
 
 function load_text_box()
-    -- Text Box Style and Options
-    box_pos_x             = settings.ExpText.Pos.X
-    box_pos_y             = settings.ExpText.Pos.Y
-    box_bg_alpha          = settings.ExpText.Background.Alpha
-    box_bg_red            = settings.ExpText.Background.Red
-    box_bg_green          = settings.ExpText.Background.Green
-    box_bg_blue           = settings.ExpText.Background.Blue
-    box_bg_visible        = settings.ExpText.Background.Visible
-    box_flags_right       = settings.ExpText.Flags.Right
-    box_flags_bottom      = settings.ExpText.Flags.Bottom
-    box_flags_bold        = settings.ExpText.Flags.Bold
-    box_flags_draggable   = settings.ExpText.Flags.Draggable
-    box_flags_italic      = settings.ExpText.Flags.Italic
-    box_padding           = settings.ExpText.Padding
-    box_font              = settings.ExpText.Text.Font
-    box_font_size         = settings.ExpText.Text.Size
-    box_font_alpha        = settings.ExpText.Text.Alpha
-    box_font_red          = settings.ExpText.Text.Red
-    box_font_green        = settings.ExpText.Text.Green
-    box_font_blue         = settings.ExpText.Text.Blue
-    box_font_stroke_alpha = settings.ExpText.Text.Stroke.Alpha
-    box_font_stroke_red   = settings.ExpText.Text.Stroke.Red
-    box_font_stroke_green = settings.ExpText.Text.Stroke.Green
-    box_font_stroke_blue  = settings.ExpText.Text.Stroke.Blue
-    box_font_stroke_width = settings.ExpText.Text.Stroke.Width
+    exp_text:pos(settings.Texts.Exp.Pos.X, settings.Texts.Exp.Pos.Y)
+    exp_text:bg_alpha(settings.Texts.Exp.Background.Alpha)
+    exp_text:bg_visible(settings.Texts.Exp.Background.Visible)
+    exp_text:font(settings.Texts.Exp.Text.Font)
+    exp_text:size(settings.Texts.Exp.Text.Size)
+    exp_text:color(settings.Texts.Exp.Text.Red, settings.Texts.Exp.Text.Green, settings.Texts.Exp.Text.Blue)
+    exp_text:stroke_transparency(settings.Texts.Exp.Text.Stroke.Alpha)
+    exp_text:stroke_color(settings.Texts.Exp.Text.Stroke.Red, settings.Texts.Exp.Text.Stroke.Green,
+        settings.Texts.Exp.Text.Stroke.Blue)
+    exp_text:stroke_width(settings.Texts.Exp.Text.Stroke.Width)
 
-    box:pos(box_pos_x, box_pos_y)
-    box:bg_color(box_bg_red, box_bg_green, box_bg_blue)
-    box:bg_alpha(box_bg_alpha)
-    box:bg_visible(box_bg_visible)
-    box:right_justified(box_flags_right)
-    box:bottom_justified(box_flags_bottom)
-    box:bold(box_flags_bold)
-    box:italic(box_flags_italic)
-    box:pad(box_padding)
-    box:font(box_font)
-    box:size(box_font_size)
-    box:alpha(box_font_alpha)
-    box:color(box_font_red, box_font_green, box_font_blue)
-    box:stroke_transparency(box_font_stroke_alpha)
-    box:stroke_color(box_font_stroke_red, box_font_stroke_green, box_font_stroke_blue)
-    box:stroke_width(box_font_stroke_width)
-
-    -- String Toggles
-    main_job_visible   = settings.Strings.MainJob
-    sub_job_visible    = settings.Strings.SubJob
-    main_level_visible = settings.Strings.Level
-    exp_visible        = settings.Strings.Exp
-    tnl_visible        = settings.Strings.Tnl
-    percent_visible    = settings.Strings.Percent
-    rate_visible       = settings.Strings.Rate
-
-    box:show()
+    exp_text:show()
 end
 
--- Reset XP Info
--- Thanks to Byrth's PointWatch addon
 function initialize()
     xp = {
         registry = {},
@@ -345,32 +215,24 @@ function update_strings()
     player.tnl = '('..xp.tnl..') '
     player.pct = (xp.total > 0 and math.floor((xp.current / xp.total) * 100)..'% ' or '0% ')
     player.phr = 'EXP/hr '..string.format('%.1f',math.floor(xp.rate/100)/10)..'k'
-
-    box:clear()
-
-    if not sub_job_visible then
-        box:append(player.job..' ')                       -- JOB
-    else
-        box:append(player.job..player.sub)                -- JOB(sub)
-    end
-
-    if main_level_visible then box:append(player.lvl) end -- Lv##
-    if exp_visible        then box:append(player.exp) end -- EXP 59,999/60,000
-    if tnl_visible        then box:append(player.tnl) end -- (exp to next level)
-    if percent_visible    then box:append(player.pct) end -- ##%
-    if rate_visible       then box:append(player.phr) end -- EXP/hr #.#k
+    exp_text:clear()
+    if settings.ShowDetails.MainJob          then exp_text:append(player.job) end
+    if settings.ShowDetails.SubJob           then exp_text:append(player.sub) else exp_text:append(' ') end
+    if settings.ShowDetails.Level            then exp_text:append(player.lvl) end
+    if settings.ShowDetails.ExperiencePoints then exp_text:append(player.exp) end
+    if settings.ShowDetails.ToNextLevel      then exp_text:append(player.tnl) end
+    if settings.ShowDetails.Percent          then exp_text:append(player.pct) end
+    if settings.ShowDetails.Rate             then exp_text:append(player.phr) end
 end
 
--- Display helpful information
-function help()
+function display_help()
     windower.add_to_chat(8,_addon.name..' v'.._addon.version..': Command Listing')
     windower.add_to_chat(8,'   (c)lear - Resets EXP counter')
+    windower.add_to_chat(8,'   (v)isible - Toggles visibility')
     windower.add_to_chat(8,'   (u)nload - Disables BarFiller')
     windower.add_to_chat(8,'   (r)eload - Reloads BarFiller')
 end
 
--- Corrects EXP Bar's position on Level Up
--- Thanks to Byrth's PointWatch addon
 function exp_msg(val,msg)
     local t = os.clock()
     if msg == 8 or msg == 105 then
@@ -383,8 +245,6 @@ function exp_msg(val,msg)
     end
 end
 
--- Calculate EXP earned per hour
--- Thanks to Byrth's PointWatch addon
 function analyze_points_table(tab)
     local t = os.clock()
     local running_total = 0
@@ -411,7 +271,6 @@ function analyze_points_table(tab)
     return rate
 end
 
--- Calculate XP Bar Width
 function calc_new_width()
     if xp.current > 0 and xp.total > 0 then
         local calc = math.floor((xp.current / xp.total) * 468)
@@ -420,30 +279,34 @@ function calc_new_width()
     end
 end
 
--- Center the Bar & Text on Screen
 function position_images()
-    local width = bg_width
-    local x = windower.get_windower_settings().x_res / 2 - width / 2
+    local x = windower.get_windower_settings().x_res / 2 - settings.Images.Background.Size.Width / 2
     
-    background_bar:pos(x, bg_pos_y)
-    foreground_bar:pos(x + 2, fg_pos_y)
-    rested_bonus:pos(x + width, bg_pos_y - 6)
+    background_image:pos(x, settings.Images.Background.Pos.Y)
+    foreground_image:pos(x + 2, settings.Images.Foreground.Pos.Y)
+    rested_bonus_image:pos(x + settings.Images.Background.Size.Width, settings.Images.Background.Pos.Y - 6)
 end
 
 function position_text()
-    box:pos((background_bar:pos_x() - 6), (background_bar:pos_y() + 4))
+    exp_text:pos((background_image:pos_x() - 6), (background_image:pos_y() + 4))
 end
 
--- When logging out, hides the player stats
 function hide()
-    background_bar:hide()
-    foreground_bar:hide()
-    rested_bonus:hide()
-    box:clear()
-    box:hide()
+    background_image:hide()
+    foreground_image:hide()
+    rested_bonus_image:hide()
+    exp_text:hide()
     ready = false
 end
 
+function show()
+    background_image:show()
+    foreground_image:show()
+    mog_house()
+    exp_text:show()
+    ready = true
+end
+
 function mog_house()
-    return (windower.ffxi.get_info().mog_house and rested_bonus:show() or rested_bonus:hide())
+    return (windower.ffxi.get_info().mog_house and rested_bonus_image:show() or rested_bonus_image:hide())
 end
