@@ -69,17 +69,16 @@ default_settings.draggable = true
 math.randomseed(os.clock())
 
 local amend
-amend = function(settings, image)
-    for key, val in pairs(image) do
-        local sval = settings[key]
-        if sval == nil then
+amend = function(settings, defaults)
+    for key, val in pairs(defaults) do
+        if type(val) == 'table' then
+            settings[key] = amend(settings[key] or {}, val)
+        elseif settings[key] == nil then
             settings[key] = val
-        else
-            if type(sval) == 'table' and type(val) == 'table' then
-                amend(sval, val)
-            end
         end
     end
+
+    return settings
 end
 
 local call_events = function(t, event, ...)
