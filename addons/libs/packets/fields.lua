@@ -388,6 +388,14 @@ fields.outgoing[0x033] = L{
     {ctype='data[4]',           label='_unknown1'}                              -- 08
 }
 
+-- Trade offer
+fields.outgoing[0x034] = L{
+    {ctype='unsigned int',      label='Count'},                                 -- 04
+    {ctype='unsigned short',    label='Item',               fn=item},           -- 08
+    {ctype='unsigned char',     label='Inventory Index',    fn=inv+{0}},        -- 0A
+    {ctype='unsigned char',     label='Slot'},                                  -- 0F
+}
+
 -- Menu Item
 fields.outgoing[0x036] = L{
 -- Item order is Gil -> top row left-to-right -> bottom row left-to-right, but
