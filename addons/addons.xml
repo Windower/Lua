@@ -74,6 +74,13 @@
     <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>
   </addon>
   <addon>
+    <name>BarFiller</name>
+    <description>Displays an experience bar above the Help Window.</description>
+    <autor>Morath</author>
+    <support>http://forums.windower.net/index.php?/topic/807-barfiller/</support>
+    <bugtracker>https://github.com/Morath86/Issues</bugtracker>
+  </addon>
+  <addon>
     <name>BattleMod</name>
     <author>Byrth</author>
     <description>Customizes battle chat messages.</description>
