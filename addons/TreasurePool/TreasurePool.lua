@@ -44,20 +44,14 @@ defaults.display.bg.red = 0
 defaults.display.bg.green = 0
 defaults.display.bg.blue = 0
 defaults.display.bg.alpha = 102
-defaults.display.bg.visible = false
+defaults.display.bg.visible = true
 defaults.display.text = {}
 defaults.display.text.font = 'Consolas'
 defaults.display.text.red = 255
 defaults.display.text.green = 255
 defaults.display.text.blue = 255
 defaults.display.text.alpha = 255
-defaults.display.text.size = 10
-defaults.display.text.stroke = {}
-defaults.display.text.stroke.width = 2
-defaults.display.text.stroke.alpha = 255
-defaults.display.text.stroke.red = 0
-defaults.display.text.stroke.green = 0
-defaults.display.text.stroke.blue = 0
+defaults.display.text.size = 12
 
 settings = config.load(defaults)
 settings:save()
@@ -163,3 +157,4 @@ windower.register_event('prerender', function()
         treasure_text[entry] = nil
     end
 end)
+
