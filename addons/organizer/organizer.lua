@@ -72,7 +72,8 @@ default_settings = {
     ignore = {},
     retain = {
         ["moogle_slip_gear"]=false,
-        ["seals"]=false
+        ["seals"]=false,
+        ["items"]=false
     },
     auto_heal = false,
     default_file='default.lua',
@@ -174,6 +175,7 @@ function options_load( )
     -- Build the retain lists
     if(settings.retain) then
         if(settings.retain.moogle_slip_gear == true) then
+            org_verbose("Moogle slip gear set to retain")
             slip_lists = require('slips')
             for slip_id,slip_list in pairs(slip_lists.items) do
                 for item_id in slip_list:it() do
@@ -184,12 +186,18 @@ function options_load( )
         end
 
         if(settings.retain.seals == true) then
+            org_verbose("Seals set to retain")
             seals = {1126,1127,2955,2956,2957}
             for _,seal_id in pairs(seals) do
                 _retain[seal_id] = "seal"
                 org_debug("settings", "Adding ("..res.items[seal_id].english..') to slip retain list')
             end
         end
+
+        if(settings.retain.items == true) then
+            org_verbose("Non-equipment items set to retain")
+        end
+
     end
 
     -- Always allow inventory and wardrobe, obviously
