@@ -255,6 +255,11 @@ function disenable(tab,funct,functname,pol)
     end
 end
 
+
+function to_windower_compact(str)
+    return __raw.lower(str:gsub(' ',''))
+end
+
 windower.register_event('incoming chunk',function(id,data,modified,injected,blocked)
     windower.debug('incoming chunk '..id)
     
@@ -356,7 +361,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
             end
             encumbrance_table[slot_id] = tf
         end
-        if table.length(tab) > 0 then
+        if tab and table.length(tab) > 0 then
             refresh_globals()
             equip_sets('equip_command',nil,tab)
         end
