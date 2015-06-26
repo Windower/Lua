@@ -1,4 +1,6 @@
 -------------------------------------------------
+GearSwap 0.902 - Changed action packet length.
+-------------------------------------------------
 GearSwap 0.901 - Modified add_to_chat handling throughout GearSwap so it would show up in a consistent log (the same one as mode 1)
 -------------------------------------------------
 GearSwap 0.900 - Adjusted GearSwap to be compatible with the new library behavior.
