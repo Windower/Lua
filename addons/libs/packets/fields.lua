@@ -334,7 +334,8 @@ fields.outgoing[0x01A] = L{
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 08
     {ctype='unsigned short',    label='Category',           fn=e+{'action'}},   -- 0A
     {ctype='unsigned short',    label='Param'},                                 -- 0C
-    {ctype='unsigned short',    label='_unknown1'},                             -- 0E
+    {ctype='unsigned short',    label='_unknown1',          const=0},           -- 0E
+    {ctype='data[12]',          label='_unknown2',          const=0},           -- 10
 }
 
 -- /volunteer
