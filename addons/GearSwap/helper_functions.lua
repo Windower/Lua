@@ -426,7 +426,7 @@ function assemble_action_packet(target_id,target_index,category,spell_id)
     end
     
     outstr = outstr..string.char( (spell_id%256), math.floor(spell_id/256)%256)
-    return outstr..string.char(0,0)
+    return outstr..(string.char(0):rep(14))
 end
 
 

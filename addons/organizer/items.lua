@@ -295,6 +295,14 @@ function item_tab:move(dest_bag,dest_slot,count)
         return false
     end
 
+    if((parent_bag_id == 0) and settings.retain and settings.retain.items) then
+        local cat = res.items[self.id].category
+        if(cat ~= 'Weapon' and cat ~= 'Armor') then
+            org_verbose('Skipping item: ('..res.items[self.id].english..') because non-equipment is set be retained')
+            return false
+        end
+    end
+
     -- respect the ignore list
     if(_ignore_list[parent_bag_name] and _ignore_list[parent_bag_name][res.items[self.id].english]) then
         org_verbose('Skipping item: ('..res.items[self.id].english..') because it is on the ignore list')
