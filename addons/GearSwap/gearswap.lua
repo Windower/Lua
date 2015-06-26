@@ -128,6 +128,8 @@ require 'triggers'
 
 windower.register_event('load',function()
     windower.debug('load')
+    print('GearSwap: The action packet structure changed and this addon is probably currently unsafe to use.\nWe are working on it!')
+    windower.send_command('lua u gearswap')
     refresh_globals()
     
     if world.logged_in then
