@@ -406,11 +406,9 @@ end
 windower.register_event('outgoing chunk',function(id,original,modified,injected,blocked)
     windower.debug('outgoing chunk '..id)
     if id == 0x1A then
-        cued_packet = nil
-        if not injected then
-            if original:unpack('H',0xB) == 12 and cued_packet and original:unpack('H',0x9) == player.index then
-                return true
-            end
+        if not injected and original:unpack('H',0xB) == 12 and cued_packet and original:unpack('H',0x9) == player.index then
+            cued_packet = nil
+            return true -- Blocks all /assist <me> commands that follow an action attempt through GearSwap
         end
     elseif id == 0x100 then
     -- Scrub the equipment array if a valid outgoing job change packet is sent.
