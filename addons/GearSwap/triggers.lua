@@ -52,7 +52,7 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
 
     local command = splitline[1]
     local unified_prefix = unify_prefix[command]
-    local abil,temptarg, temp_mob_arr
+    local abil, temptarg, temp_mob_arr
     if splitline[2] then
         abil = splitline[2]:gsub(string.char(7),' '):lower()
     end
