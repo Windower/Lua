@@ -76,8 +76,8 @@
   <addon>
     <name>BarFiller</name>
     <description>Displays an experience bar above the Help Window.</description>
-    <autor>Morath</author>
-    <support>http://forums.windower.net/index.php?/topic/807-barfiller/</support>
+    <author>Morath</author>
+    <support>http://forums.windower.net/index.php?/topic/807-barfiller</support>
     <bugtracker>https://github.com/Morath86/Issues</bugtracker>
   </addon>
   <addon>
