@@ -9,9 +9,11 @@ texts = require('texts')
 -- Config
 
 defaults = {}
-defaults.showhexid = true
-defaults.showfullid = true
-defaults.showspeed = true
+defaults.ShowHexID = true
+defaults.ShowFullID = true
+defaults.ShowSpeed = true
+defaults.ShowClaimName = false
+defaults.ShowTargetName = false
 defaults.display = {}
 defaults.display.pos = {}
 defaults.display.pos.x = 0
@@ -38,14 +40,20 @@ text_box = texts.new(settings.display, settings)
 
 initialize = function(text, settings)
     local properties = L{}
-    if settings.showfullid then
-        properties:append('ID:  ${full|-|%08s}')
+    if settings.ShowFullID then
+        properties:append('ID:            ${full|-|%08s}')
     end
-    if settings.showhexid then
-        properties:append('Hex ID:   ${hex|-|%.3X}')
+    if settings.ShowHexID then
+        properties:append('Hex ID:             ${hex|-|%.3X}')
     end
-    if settings.showspeed then
-        properties:append('Speed: ${speed|-}')
+    if settings.ShowSpeed then
+        properties:append('Speed:           ${speed|-}')
+    end
+    if settings.ShowClaimName then
+        properties:append('Claim: ${claim_name||%16s}')
+    end
+    if settings.ShowTargetName then
+        properties:append('Target: ${target_name||%15s}')
     end
 
     text:clear()
@@ -54,13 +62,15 @@ end
 
 text_box:register_event('reload', initialize)
 
-initialize(text_box, settings)
-
 -- Events
 
 windower.register_event('prerender', function()
-	local mob = windower.ffxi.get_mob_by_target('t')
-	if mob and mob.id > 0 then
+    local remove = S{}
+    local mob = windower.ffxi.get_mob_by_target('st') or windower.ffxi.get_mob_by_target('t')
+    local player = windower.ffxi.get_player()
+    if mob and mob.id > 0 then
+        local mobclaim = windower.ffxi.get_mob_by_id(mob.claim_id)
+        local target = windower.ffxi.get_mob_by_index(mob.target_index)
         local info = {}
         info.hex = mob.id % 0x1000
         info.full = mob.id
@@ -72,15 +82,28 @@ windower.register_event('prerender', function()
                 '\\cs(255,0,0)' .. speed:string():lpad(' ', 5)
             or
                 '\\cs(102,102,102)' .. ('+' .. speed):lpad(' ', 5)) .. '%\\cr'
+        if mob.id == player.id then
+            info.target_name = mob.name
+        elseif mobclaim and mobclaim.id > 0 then
+            info.claim_name = mobclaim and mobclaim.name or nil
+        elseif target and target.id > 0 then
+            info.target_name = target and target.name or nil
+        else
+            remove:add('claim_name')
+            remove:add('target_name')
+        end
         text_box:update(info)
         text_box:show()
-	else
-		text_box:hide()
-	end
+        for entry in remove:it() do
+            text_box[entry] = nil
+        end
+    else
+        text_box:hide()
+    end
 end)
 
 --[[
-Copyright (c) 2013-2014, Windower
+Copyright © 2013-2015, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
