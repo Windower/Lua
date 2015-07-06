@@ -342,6 +342,12 @@ function get_ally_mob_ids()
             end
         end
     end
+
+    -- add adventuring fellow
+    local fellow = windower.ffxi.get_mob_by_target("ft")
+    if fellow ~= nil then
+        allies:append(fellow.id)
+    end
     
     return allies
 end
