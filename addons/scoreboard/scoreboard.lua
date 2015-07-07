@@ -27,6 +27,7 @@ default_settings.sbcolor = 204
 default_settings.showallidps = true
 default_settings.resetfilters = true
 default_settings.visible = true
+default_settings.showfellow = true
 default_settings.UpdateFrequency = 0.5
 
 default_settings.display = {}
@@ -149,6 +150,18 @@ windower.register_event('addon command', function()
                 
                 settings:save()
                 sb_output("Setting 'resetfilters' set to " .. tostring(settings.resetfilters))
+            elseif setting == 'showfellow' then
+                if params[2] == 'true' then
+                    settings.showfellow = true
+                elseif params[2] == 'false' then
+                    settings.showfellow = false
+                else
+                    error("Invalid value for 'showfellow'. Must be true or false.")
+                    return
+                end
+                
+                settings:save()
+                sb_output("Setting 'showfellow' set to " .. tostring(settings.showfellow))
             end
         elseif command == 'reset' then
             reset()
@@ -340,6 +353,13 @@ function get_ally_mob_ids()
             if member.mob.pet_index and member.mob.pet_index> 0 and windower.ffxi.get_mob_by_index(member.mob.pet_index) then
                 allies:append(windower.ffxi.get_mob_by_index(member.mob.pet_index).id)
             end
+        end
+    end
+
+    if settings.showfellow then
+        local fellow = windower.ffxi.get_mob_by_target("ft")
+        if fellow ~= nil then
+            allies:append(fellow.id)
         end
     end
     
