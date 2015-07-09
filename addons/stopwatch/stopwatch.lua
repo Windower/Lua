@@ -31,31 +31,31 @@ windower.register_event('prerender', function()
 
     seconds = cumulativeSeconds
     if isActive == true then
-		seconds = seconds + os.time() - startTime
-	end
-	times:text(os.date('!%H:%M:%S', seconds))
-	times:visible(true)
+        seconds = seconds + os.time() - startTime
+    end
+    times:text(os.date('!%H:%M:%S', seconds))
+    times:visible(true)
 end)
 
 windower.register_event('addon command', function(...)
-	local param = L{...}
-	local command = param[1]
-	command = command:lower() or 'help'
+    local param = L{...}
+    local command = param[1]
+    command = command:lower() or 'help'
 
-	if command == 'start' then
-		isActive = true
-		startTime = os.time()
-	elseif command == 'stop' then
-		isActive = false
-		cumulativeSeconds = cumulativeSeconds + os.time() - startTime
-	elseif command == 'reset' then
-		cumulativeSeconds = 0
-		startTime = os.time()
-	else
-		log("'sw start' to start the stopwatch" )
-		log("'sw stop' to stop the stopwatch")
-		log("'sw reset' to reset the stopwatch cumulative time to 0")
-	end
+    if command == 'start' then
+        isActive = true
+        startTime = os.time()
+    elseif command == 'stop' then
+        isActive = false
+        cumulativeSeconds = cumulativeSeconds + os.time() - startTime
+    elseif command == 'reset' then
+        cumulativeSeconds = 0
+        startTime = os.time()
+    else
+        log("'sw start' to start the stopwatch" )
+        log("'sw stop' to stop the stopwatch")
+        log("'sw reset' to reset the stopwatch cumulative time to 0")
+    end
 end)
 
 --[[
