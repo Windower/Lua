@@ -6,6 +6,7 @@ _addon.commands = {'sw', 'stopwatch'}
 require('logger')
 config = require('config')
 texts = require('texts')
+timeit = require('timeit')
  
 defaults = {}
 defaults.pos = {}
@@ -17,10 +18,9 @@ defaults.text.size = 12
  
 settings = config.load(defaults)
 times = texts.new(settings)
-startTime = os.time()
-isActive = false
-cumulativeSeconds = 0
-
+is_active = false
+cumulative_time = 0
+timer = timeit.new()
 
 windower.register_event('prerender', function()
     local info = windower.ffxi.get_info()
@@ -29,28 +29,30 @@ windower.register_event('prerender', function()
         return
     end
 
-    seconds = cumulativeSeconds
-    if isActive == true then
-        seconds = seconds + os.time() - startTime
+    total_time = cumulative_time
+    if is_active == true then
+        total_time = total_time + timer:check()
     end
-    times:text(os.date('!%H:%M:%S', seconds))
+    times:text(string.format('%0.2d:%0.2d:%0.2d', math.floor(total_time / 3600) % 100, math.floor(total_time / 60) % 60, math.floor(total_time) % 60))
     times:visible(true)
 end)
 
-windower.register_event('addon command', function(...)
-    local param = L{...}
-    local command = param[1]
-    command = command:lower() or 'help'
+windower.register_event('addon command', function(command)
+    command = command:lower()
 
     if command == 'start' then
-        isActive = true
-        startTime = os.time()
+        if is_active == false then
+            is_active = true
+            timer:start()
+        end
     elseif command == 'stop' then
-        isActive = false
-        cumulativeSeconds = cumulativeSeconds + os.time() - startTime
+        if is_active == true then
+            is_active = false
+            cumulative_time = cumulative_time + timer:stop()
+        end
     elseif command == 'reset' then
-        cumulativeSeconds = 0
-        startTime = os.time()
+        cumulative_time = 0
+        timer:next()
     else
         log("'sw start' to start the stopwatch" )
         log("'sw stop' to stop the stopwatch")
@@ -59,7 +61,7 @@ windower.register_event('addon command', function(...)
 end)
 
 --[[
-Copyright (c) 2015, Patrick Finnigan
+Copyright © 2015, Patrick Finnigan
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -70,14 +72,14 @@ modification, are permitted provided that the following conditions are met:
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name of zonetimer nor the
+    * Neither the name of stopwatch nor the
       names of its contributors may be used to endorse or promote products
       derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL IHINA BE LIABLE FOR ANY
+DISCLAIMED. IN NO EVENT SHALL Patrick Finnigan BE LIABLE FOR ANY
 DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
