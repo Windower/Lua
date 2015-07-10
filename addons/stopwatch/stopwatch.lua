@@ -7,7 +7,7 @@ require('logger')
 config = require('config')
 texts = require('texts')
 timeit = require('timeit')
- 
+
 defaults = {}
 defaults.pos = {}
 defaults.pos.x = 450
@@ -15,7 +15,7 @@ defaults.pos.y = 0
 defaults.text = {}
 defaults.text.font = 'Arial'
 defaults.text.size = 12
- 
+
 settings = config.load(defaults)
 times = texts.new(settings)
 is_active = false
@@ -33,7 +33,7 @@ windower.register_event('prerender', function()
     if is_active == true then
         total_time = total_time + timer:check()
     end
-    times:text(string.format('%0.2d:%0.2d:%0.2d', math.floor(total_time / 3600) % 100, math.floor(total_time / 60) % 60, math.floor(total_time) % 60))
+    times:text(string.format('%0.2d:%0.2d:%0.2d', math.floor(total_time / 3600), math.floor(total_time / 60) % 60, math.floor(total_time) % 60))
     times:visible(true)
 end)
 
