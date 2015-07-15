@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
 _addon.name = 'Nostrum'
 _addon.author = 'trv'
-_addon.version = '2.1.6'
+_addon.version = '2.1.7'
 _addon.commands = {'Nostrum','nos',}
 
 packets=require('packets')
@@ -230,24 +230,24 @@ function build_macro()
     misc_hold_for_up.prims:append("pmenu")
     misc_hold_for_up.texts:append("menu")
 
-    y_start=prim_coordinates.y['BG1']-35
+    y_start=prim_coordinates.y['BG1']-27
     if macro_order[4].n~=0 then
-        prim_simple("BGna",prim.background,x_start-33*macro_order[4].n-153,y_start,(macro_order[4].n)*(33)+1,34)
+        prim_simple("BGna",prim.background,x_start-33*macro_order[4].n-153,y_start,(macro_order[4].n)*(33)+1,27)
         misc_hold_for_up.prims:append("BGna")
         macro[1]:add("BGna")
         image_row(macro_order[4],x_start,y_start+1)
-        y_start=y_start-35
+        y_start=y_start-27
     end
 
     if macro_order[5].n~=0 then
-        prim_simple("BGbuffs",prim.background,x_start-33*macro_order[5].n-153,y_start,(macro_order[5].n)*(33)+1,34)
+        prim_simple("BGbuffs",prim.background,x_start-33*macro_order[5].n-153,y_start,(macro_order[5].n)*(33)+1,27)
         misc_hold_for_up.prims:append("BGbuffs")
         macro[1]:add("BGbuffs")
         image_row(macro_order[5],x_start,y_start+1)
     end
     
     prim_simple("hover24",table.set(_defaults.primitives.highlight,'visible',false),0,0,29,24)
-    prim_simple("hover32",table.set(_defaults.primitives.highlight,'visible',false),0,0,32,32)
+    prim_simple("hover32",table.set(_defaults.primitives.highlight,'visible',false),0,0,25,25)
     misc_hold_for_up.prims:append("hover24")
     misc_hold_for_up.prims:append("hover32")
 
@@ -399,8 +399,8 @@ register_events = function(bool)
                     end
                     return
                 end
-                _y = math.ceil((y_res-y-y_offset-25*(party[1].n+vacancies[1]))/35)
-                _x = math.ceil((x_res-x-x_offset-152)/33)
+                _y = math.ceil((y_res-y-y_offset-25*(party[1].n+vacancies[1]))/28)
+                _x = math.ceil((x_res-x-x_offset-152)/26)
                 if mouse_map2[_y] and mouse_map2[_y][_x] then
                     if not macro_visibility[1] then
                         toggle_macro_visibility(1)
@@ -412,8 +412,8 @@ register_events = function(bool)
                         prim_coordinates.visible['hover24'] = false
                     end
                     if _x ~= last_x32 or _y ~= last_y32 then
-                        prim_coordinates.x['hover32'] = x_res-153-x_offset-_x*33
-                        prim_coordinates.y['hover32'] = y_res-y_offset-33*_y-25*(party[1].n+vacancies[1])-2*_y
+                        prim_coordinates.x['hover32'] = x_res-153-x_offset-_x*26
+                        prim_coordinates.y['hover32'] = y_res-y_offset-25*_y-25*(party[1].n+vacancies[1])-2*_y
                         windower.prim.set_position("hover32",prim_coordinates.x['hover32'],prim_coordinates.y['hover32'])
                         last_x32 = _x
                         last_y32 = _y
@@ -450,8 +450,8 @@ register_events = function(bool)
                         dragged = true
                         return true
                     end
-                    _y = math.ceil((y_res-y-y_offset-25*(party[1].n+vacancies[1]))/35)
-                    _x = math.ceil((x_res-x-x_offset-152)/33)
+                    _y = math.ceil((y_res-y-y_offset-25*(party[1].n+vacancies[1]))/28)
+                    _x = math.ceil((x_res-x-x_offset-152)/26)
                     if mouse_map2[_y] and mouse_map2[_y][_x] then
                         local spell = mouse_map2[_y][_x]
                         windower.send_command('%sinput %s "%s" %s':format(send_string, prefix[spell], spell, '<t>'))
@@ -474,8 +474,8 @@ register_events = function(bool)
                         return true
                     end
                 else
-                    _y = math.ceil((y_res-y-y_offset-25*(party[1].n+vacancies[1]))/35)
-                    _x = math.ceil((_x-152)/33)
+                    _y = math.ceil((y_res-y-y_offset-25*(party[1].n+vacancies[1]))/28)
+                    _x = math.ceil((_x-152)/26)
                     if mouse_map2[_y] and mouse_map2[_y][_x] then
                         spell_default = mouse_map2[_y][_x]
                         windower.text.set_text('menu', spell_default)
