@@ -110,6 +110,9 @@ end
 windower.register_event('load',function()
     debug_log:write('Organizer loaded at '..os.date()..'\n')
 
+    print('Organizer: The action packet structure may have changed and this addon might be unsafe to use.\nWe are working on it!')
+    windower.send_command('lua unload organizer')
+
     if debugging then windower.debug('load') end
     options_load()
 end)
