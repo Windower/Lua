@@ -335,7 +335,9 @@ fields.outgoing[0x01A] = L{
     {ctype='unsigned short',    label='Category',           fn=e+{'action'}},   -- 0A
     {ctype='unsigned short',    label='Param'},                                 -- 0C
     {ctype='unsigned short',    label='_unknown1',          const=0},           -- 0E
-    {ctype='data[12]',          label='_unknown2',          const=0},           -- 10
+    {ctype='float',             label='X Offset'},                              -- 10 -- non-zero values only observed for geo spells cast using a repositioned subtarget
+    {ctype='float',             label='Z Offset'},                              -- 14
+    {ctype='float',             label='Y Offset'},                              -- 18
 }
 
 -- /volunteer
