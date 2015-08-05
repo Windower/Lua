@@ -573,7 +573,7 @@ function determine_accessibility(spell,type) -- ability filter, slightly modifie
         if not available_category[spell.id] and not (spell.id == 503) then
             return false
         elseif (not spell_jobs[player_info.main_job] or not (spell_jobs[player_info.main_job] <= player_info.main_job_level or
-            (spell_jobs[player_info.main_job] == 100 and number_of_jps >= 100))) and
+            (spell_jobs[player_info.main_job] > 99 and number_of_jps >= spell_jobs[player_info.main_job]))) and
             (not spell_jobs[player_info.sub_job] or not (spell_jobs[player_info.sub_job] <= player_info.sub_job_level)) then
             return false
         elseif player_info.main_job == 20 and ((addendum_white[spell.id] and not active_buffs[401] and not active_buffs[416]) or

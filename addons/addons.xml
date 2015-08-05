@@ -27,10 +27,10 @@
   </addon>
   <addon>
     <name>AnsweringMachine</name>
-	<author>Byrth</author>
+    <author>Byrth</author>
     <description>Stores tells that you receive for later recall.</description>
-	<bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
-	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
+    <bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
     <name>AutoControl</name>
@@ -84,8 +84,8 @@
     <name>BattleMod</name>
     <author>Byrth</author>
     <description>Customizes battle chat messages.</description>
-	<bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
-	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
+    <bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
     <name>Blist</name>
@@ -105,8 +105,8 @@
     <name>Cancel</name>
     <author>Byrth</author>
     <description>Mimics the cancel plugin, but also accepts buff names instead of just IDs.</description>
-	<bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
-	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
+    <bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
     <name>cBlock</name>
@@ -119,8 +119,8 @@
     <name>CellHelp</name>
     <author>Krizz and Balloon</author>
     <description>Tracks cells that are needed, displays your position in the lot order, and creates the appropriate LL profiles.</description>
-	<bugtracker>https://github.com/tehkrizz/Lua/issues</bugtracker>
-	<support>http://www.ffxiah.com/player/Bahamut/Krizz</support>
+    <bugtracker>https://github.com/tehkrizz/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Bahamut/Krizz</support>
   </addon>
   <addon>
     <name>chars</name>
@@ -181,8 +181,8 @@
   <addon>
     <name>DynamisHelper</name>
     <description>Displays a timer when a mob is procced, tracks currency obtained, and can create a LL to lot all currency.</description>
-	<bugtracker>https://github.com/tehkrizz/Lua/issues</bugtracker>
-	<support>http://www.ffxiah.com/player/Bahamut/Krizz</support>
+    <bugtracker>https://github.com/tehkrizz/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Bahamut/Krizz</support>
   </addon>
   <addon>
     <author>Giuliano Riccio (Zohno@Phoenix)</author>
@@ -223,26 +223,26 @@
     <name>GearSwap</name>
     <author>Byrth</author>
     <description>Changes gear in response to player actions. [[Uses Packets.]]</description>
-	<bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
+    <bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
   </addon>
   <addon>
     <name>Highlight</name>
     <description>Highlights party members names when mentioned in the chatlog.</description>
     <author>Balloon</author>
-	<bugtracker>https://github.com/Podginator/Lua/issues</bugtracker>
-	<support>Podginator@gmail.com</support>
+    <bugtracker>https://github.com/Podginator/Lua/issues</bugtracker>
+    <support>Podginator@gmail.com</support>
   </addon>
   <addon>
     <name>instaLS</name>
     <author>Byrth</author>
     <description>Enables instant linkshell chat after zoning.</description>
     <bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
-	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
-	<name>InfoReplacer</name>
-	<author>Cairthenn</author>
-	<description>Replaces outgoing text prefixed by % with respective game information.</description>
+    <name>InfoReplacer</name>
+    <author>Cairthenn</author>
+    <description>Replaces outgoing text prefixed by % with respective game information.</description>
     <bugtracker>https://github.com/cairface/Lua/issues</bugtracker>
     <support>http://www.bluegartr.com/members/34070-Cairthenn</support>
   </addon>
@@ -316,7 +316,7 @@
     <name>Organizer</name>
     <description>A multi-purpose inventory management solution. Similar to GearCollector.</description>
     <author>Byrth, Rooks</author>
-	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
     <bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
   </addon>
   <addon>
@@ -328,12 +328,12 @@
   </addon>
   <addon>
     <name>PetSchool</name>
-	<author>Banggugyangu</author>
+    <author>Banggugyangu</author>
     <description>A helper addon for PUPs using spellcast, it informs spellcast of pet casting (healing or nuking).</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
     <support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
- <addon>
+  <addon>
     <name>PetTP</name>
     <author>SnickySnacks</author>
     <description>Tracks pet vitals (HP/TP/MP)</description>
@@ -351,15 +351,15 @@
     <name>plugin_manager</name>
     <author>Byrth</author>
     <description>Allows you to specify which plugins and addons will be used with which characters.</description>
-	<bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
-	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
-  </addon>
+    <bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
+    </addon>
   <addon>
     <name>PointWatch</name>
     <author>Byrth</author>
     <description>Allows you to monitor your XP/CP gains and keep track of the Dynamis time limit.</description>
-	<bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
-	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
+    <bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
     <name>porter</name>
@@ -377,10 +377,10 @@
   </addon>
   <addon>
     <name>Respond</name>
-	<author>Byrth</author>
+    <author>Byrth</author>
     <description>Respond to tells and FFOchat PMs using //r.</description>
-	<bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
-	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
+    <bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
     <name>Rhombus</name>
@@ -393,15 +393,15 @@
     <name>RollTracker</name>
     <author>Balloon</author>
     <description>Simplifies Cor rolls, tells you the bonus they give, stops you from doubling up on lucky rolls and reports your chance to bust.</description>
-	<bugtracker>https://github.com/Podginator/Lua/issues</bugtracker>
-	<support>Podginator@gmail.com</support>
+    <bugtracker>https://github.com/Podginator/Lua/issues</bugtracker>
+    <support>Podginator@gmail.com</support>
   </addon>
   <addon>
     <name>salvage2</name>
     <author>Krizz</author>
     <description>Displays pathos that have not been removed in Salvage 2. Displays zone timer.</description>
-	<bugtracker>https://github.com/tehkrizz/Lua/issues</bugtracker>
-	<support>http://www.ffxiah.com/player/Bahamut/Krizz</support>
+    <bugtracker>https://github.com/tehkrizz/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Bahamut/Krizz</support>
   </addon>
   <addon>
     <name>SATACast</name>
@@ -428,8 +428,8 @@
     <name>Shortcuts</name>
     <author>Byrth</author>
     <description>Applys spellcast-like command completion (interpretation and target completion) to commands. Includes emotes, /check, and /pcmd.</description>
-	<bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
-	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
+    <bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
     <name>Silence</name>
@@ -439,18 +439,18 @@
     <support>http://www.ffxiah.com/player/Bismarck/Ihina</support>
   </addon>
   <addon>
-  	<name>ShoutHelper</name>
-  	<author>Jandel</author>
-  	<description>Help managing party job in an alliance shout. Displays a in-game editable list (initially empty) in which one can set job and players</description>
-  	<bugtracker>https://github.com/Jandella/Lua/issues</bugtracker>
-  	<support>http://www.ffxiah.com/player/Ragnarok/Jandel</support>
+    <name>ShoutHelper</name>
+    <author>Jandel</author>
+    <description>Help managing party job in an alliance shout. Displays a in-game editable list (initially empty) in which one can set job and players</description>
+    <bugtracker>https://github.com/Jandella/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Ragnarok/Jandel</support>
   </addon>
   <addon>
     <name>Send</name>
     <author>Byrth</author>
     <description>Sends commands between windower instances using IPC.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
     <name>SpeedChecker</name>
@@ -472,6 +472,13 @@
     <description>One-button status removal for dual boxing.</description>
     <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>
     <support>http://mibbit.com/#windower@irc.ffochat.com</support>
+  </addon>
+  <addon>
+    <name>stopwatch</name>
+    <author>Patrick Finnigan (Puhfyn@Ragnarok)</author>
+    <description>Timer that counts up and allows you to track time since events e.g. spawns.</description>
+    <bugtracker>https://github.com/finnigantime/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Ragnarok/Puhfyn</support>
   </addon>
   <addon>
     <name>StratHelper</name>
@@ -512,7 +519,7 @@
     <name>thtracker</name>
     <author>Krizz</author>
     <description>Displays latest TH level from chat.</description>
-	<bugtracker>https://github.com/tehkrizz/Lua/issues</bugtracker>
+    <bugtracker>https://github.com/tehkrizz/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Bahamut/Krizz</support>
   </addon>
   <addon>
@@ -531,10 +538,10 @@
   </addon>
   <addon>
     <name>translate</name>
-	<author>Byrth</author>
+    <author>Byrth</author>
     <description>Gives a rough JP->EN translation using the resources and custom dictionaries.</description>
-	<bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
-	<support>http://mibbit.com/#windower@irc.ffochat.com</support>
+    <bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
     <name>Update</name>
@@ -572,4 +579,3 @@
     <support>http://www.ffxiah.com/player/Bismarck/Ihina</support>
   </addon>
 </addons>
-

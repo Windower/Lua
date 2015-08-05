@@ -284,10 +284,16 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
             end
             
             if fields.spell then
+                if not res.spells[am.param_1] then
+                    return false
+                end
                 spell = nf(res.spells[am.param_1],language)
             end
             
             if fields.item then
+                if not res.items[am.param_1] then
+                    return false
+                end
                 item = nf(res.items[am.param_1],'english_log')
             end
             

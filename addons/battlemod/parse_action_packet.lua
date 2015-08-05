@@ -10,6 +10,9 @@ function parse_action_packet(act)
     end
     act.actor = player_info(act.actor_id)
     act.action = get_spell(act) -- Pulls the resources line for the action
+    if not act.action then
+        return act
+    end
     for i,v in ipairs(act.targets) do
         v.target = {}
         v.target[1] = player_info(v.id)
@@ -468,7 +471,7 @@ end
 function get_spell(act)
     local spell, abil_ID, effect_val = {}
     local msg_ID = act.targets[1].actions[1].message
-    
+
     if T{7,8,9}:contains(act['category']) then
         abil_ID = act.targets[1].actions[1].param
     elseif T{3,4,5,6,11,13,14,15}:contains(act.category) then
@@ -556,14 +559,16 @@ function get_spell(act)
             spell.name = color_it(spell[language],color_arr.abilcol)
             spell.ability = color_it(spell[language],color_arr.abilcol)
         end
-        
+
         if fields.item then
             if T{125,593,594,595,596,597,598,599}:contains(msg_ID) then
                 spell.item = color_it(res.items[effect_val]['english_log'], color_arr.itemcol)
             else
                 spell = res.items[abil_ID]
-                spell.name = color_it(spell['english_log'],color_arr.itemcol)
-                spell.item = color_it(spell['english_log'],color_arr.itemcol)
+                if spell then
+                    spell.name = color_it(spell['english_log'],color_arr.itemcol)
+                    spell.item = color_it(spell['english_log'],color_arr.itemcol)
+                end
             end
         end
         
@@ -576,7 +581,7 @@ function get_spell(act)
         end
     end
     
-    if not spell.name then spell.name = spell[language] end
+    if spell and not spell.name then spell.name = spell[language] end
     return spell
 end
 
