@@ -358,6 +358,7 @@ function initialize_globals()
     pet.isvalid = false
     fellow = make_user_table()
     fellow.isvalid = false
+    partybuffs = {}
 
     items = windower.ffxi.get_items()
     if not items then
