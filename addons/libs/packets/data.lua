@@ -186,6 +186,7 @@ data.incoming[0x06F] = {name='Self Synth Result',   description='Results of an a
 data.incoming[0x070] = {name='Others Synth Result', description='Results of an attempted synthesis process by others.'}
 data.incoming[0x071] = {name='Campaign Map Info',   description='Populates the Campaign map.'}
 data.incoming[0x075] = {name='Unity Start',         description='Creates the timer and glowing fence that accompanies Unity fights.'}
+data.incoming[0x076] = {name='Party Buffs',         description='Packet updated every time a party member\'s buffs change.'}
 data.incoming[0x078] = {name='Proposal',            description='Carries proposal information from a /propose or /nominate command.'}
 data.incoming[0x079] = {name='Proposal Update',     description='Proposal update following a /vote command.'}
 data.incoming[0x082] = {name='Guild Buy Response',  description='Buy an item from a guild.'}

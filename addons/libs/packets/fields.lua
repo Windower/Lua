@@ -335,7 +335,9 @@ fields.outgoing[0x01A] = L{
     {ctype='unsigned short',    label='Category',           fn=e+{'action'}},   -- 0A
     {ctype='unsigned short',    label='Param'},                                 -- 0C
     {ctype='unsigned short',    label='_unknown1',          const=0},           -- 0E
-    {ctype='data[12]',          label='_unknown2',          const=0},           -- 10
+    {ctype='float',             label='X Offset'},                              -- 10 -- non-zero values only observed for geo spells cast using a repositioned subtarget
+    {ctype='float',             label='Z Offset'},                              -- 14
+    {ctype='float',             label='Y Offset'},                              -- 18
 }
 
 -- /volunteer
@@ -2840,6 +2842,22 @@ fields.incoming[0x075] = L{
     {ctype='byte[12]',          label='_unknown1'},                             -- 10   This packet clearly needs position information, but it's unclear how these bytes carry it
     {ctype='unsigned int',      label='Battlefield Radius'},                    -- 1C   Yalms*1000, so a 50 yalm battlefield would have 50,000 for this field
     {ctype='unsigned int',      label='Render Radius'},                         -- 20   Yalms*1000, so a fence that renders when you're 25 yalms away would have 25,000 for this field
+}
+
+-- Party status icon update
+-- Buff IDs go can over 0xFF, but in the packet each buff only takes up one byte.
+-- To address that there's a 8 byte bitmask starting at 0x4C where each 2 bits
+-- represent how much to add to the value in the respective byte.
+types.party_buff_entry = L{
+    {ctype='unsigned int',      label='ID',                 fn=id},             -- 00
+    {ctype='unsigned short',    label='Index',              fn=index},          -- 04
+    {ctype='unsigned short',    label='_unknown1'},                             -- 06
+    {ctype='data[8]',           label='Bit Mask'},                              -- 08
+    {ctype='data[32]',          label='Buffs'},                                 -- 10
+}
+
+fields.incoming[0x076] = L{
+    {ref=types.party_buff_entry,label='Party Buffs',        count='5'},         -- 04  This is 00'd out for absent party members.
 }
 
 -- Proposal
