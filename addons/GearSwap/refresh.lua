@@ -501,10 +501,10 @@ function refresh_group_info(dt,user_event_flag)
         end
         
         if allyIndex and partyIndex then
-            local index = windower.ffxi.get_mob_by_name(v.name).index
-            if index and partybuffs[index] then
-                v.buffs = convert_buff_list(partybuffs[index].buffs)
-            elseif index and index == player.index then
+            local mob = windower.ffxi.get_mob_by_name(v.name)
+            if mob and partybuffs[mob.index] then
+                v.buffs = convert_buff_list(partybuffs[mob.index].buffs)
+            elseif mob and mob.index == player.index then
                 v.buffs = buffactive
             end
             alliance[allyIndex][partyIndex] = v
