@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.903'
+_addon.version = '0.904'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -522,14 +522,14 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
             if data:unpack('I',i*48+5) == 0 then
                 break
             else
-                local name = windower.ffxi.get_mob_by_index(data:unpack('H',i*48+5+4)).name
-                partybuffs[name] = {
+                local index = data:unpack('H',i*48+5+4)
+                partybuffs[index] = {
                     id = data:unpack('I',i*48+5+0),
                     index = data:unpack('H',i*48+5+4),
                     buffs = {}
                 }
                 for n=1,32 do
-                    partybuffs[name].buffs[n] = data:byte(i*48+5+16+n-1) + 256*( math.floor( data:byte(i*48+5+8+ math.floor((n-1)/4)) / 4^((n-1)%4) )%4)
+                    partybuffs[index].buffs[n] = data:byte(i*48+5+16+n-1) + 256*( math.floor( data:byte(i*48+5+8+ math.floor((n-1)/4)) / 4^((n-1)%4) )%4)
                 end
             end
         end
