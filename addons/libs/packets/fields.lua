@@ -2766,6 +2766,12 @@ fields.incoming._func[0x063][0x04] = L{
     {ctype='data[32]',          label='Variants Bitfield'},                     -- 94   Does not show normal monsters, only variants. Bit is 1 if the variant is owned. Length is an estimation including the possible padding.
 }
 
+-- fields.incoming._func[0x063][0x05] :: Has 8 content bytes of header, followed by 6 bytes per job, in the order they appear in the resources.
+-- The first 2 bytes of each subfield is the current CP collected on the job (out of 30,000).
+-- The next two bytes are the current number of job points collected on the job.
+-- The last two bytes were unused the last time I checked.
+-- Pointwatch extracts this information if you need an example.
+
 -- Repositioning
 fields.incoming[0x065] = L{
 -- This is identical to the spawn packet, but has 4 more unused bytes.

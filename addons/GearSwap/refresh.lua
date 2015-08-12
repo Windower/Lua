@@ -349,7 +349,7 @@ function refresh_player(dt,user_event_flag)
         fellow.isvalid=false
     end
     
-    refresh_buff_active(player.buffs)
+    table.reassign(buffactive,convert_buff_list(player.buffs))
     
     for global_variable_name,extradatatable in pairs(_ExtraData) do
         if _G[global_variable_name] then
@@ -501,6 +501,12 @@ function refresh_group_info(dt,user_event_flag)
         end
         
         if allyIndex and partyIndex then
+            local mob = windower.ffxi.get_mob_by_name(v.name)
+            if mob and partybuffs[mob.index] then
+                v.buffs = convert_buff_list(partybuffs[mob.index].buffs)
+            elseif mob and mob.index == player.index then
+                v.buffs = buffactive
+            end
             alliance[allyIndex][partyIndex] = v
             alliance[allyIndex].count = alliance[allyIndex].count + 1
             alliance.count = alliance.count + 1
@@ -528,7 +534,7 @@ function clean_alliance()
 end
 
 -----------------------------------------------------------------------------------
---Name: refresh_buff_active(bufflist)
+--Name: convert_buff_list(bufflist)
 --Args:
 ---- bufflist (table): List of buffs from windower.ffxi.get_player()['buffs']
 -----------------------------------------------------------------------------------
@@ -538,8 +544,8 @@ end
 ---- of that string present in the buff array. So two marches would give
 ---- buffarr.march==2.
 -----------------------------------------------------------------------------------
-function refresh_buff_active(bufflist)
-    buffarr = {}
+function convert_buff_list(bufflist)
+    local buffarr = {}
     for i,v in pairs(bufflist) do
         if res.buffs[v] then -- For some reason we always have buff 255 active, which doesn't have an entry.
             local buff = res.buffs[v][language]:lower()
@@ -556,7 +562,7 @@ function refresh_buff_active(bufflist)
             end
         end
     end
-    table.reassign(buffactive,buffarr)
+    return buffarr
 end
 
 -----------------------------------------------------------------------------------
