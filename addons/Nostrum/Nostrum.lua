@@ -591,8 +591,6 @@ register_events = function(bool)
                     if id == 0 then
                         break
                     else
-                        local buffs = stat_table[id].buffs
-                        local debuffs = stat_table[id].debuffs
                         local packet_buffs = L{}
                         local packet_debuffs = L{}
                         local buff
@@ -612,8 +610,8 @@ register_events = function(bool)
                         draw_buff_display(packet_buffs, id, 1)
                         draw_buff_display(packet_debuffs, id, 2)
                         
-                        stat_table[id].buffs = packet_buffs
-                        stat_table[id].debuffs = packet_debuffs
+                        stat_table[id].buffs[1] = packet_buffs
+                        stat_table[id].buffs[2] = packet_debuffs
                     end
                 end
             elseif id == 0x0DD then
