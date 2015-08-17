@@ -329,11 +329,6 @@ windower.register_event('addon command', function(...)
         print(help_text)
     elseif c == 'hide' or c == 'h' then
         toggle_visibility()
-    elseif c == 'test' then
-        draw_buff_display({42,234,211,200,n=4}, 249709, 1)
-        draw_buff_display({567,13,149,2,n=4}, 249709, 2)    
-        stat_table[249709].buffs[1] = {42,234,211,200,n=4}
-        stat_table[249709].buffs[2] = {567,13,149,2,n=4}
     elseif c == 'cut' or c == 'c' then
         trim_macro()
     elseif c == 'refresh' or c == 'r' then
