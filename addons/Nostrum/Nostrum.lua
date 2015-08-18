@@ -38,6 +38,7 @@ require('helperfunctions')
 require('sets')
 require('lists')
 config = require('config')
+prims = require('prims')
 
 defaults={
     text={
@@ -291,6 +292,7 @@ do
                     hpp = party_from_memory[pkey].hpp,
                     tp = party_from_memory[pkey].tp,
                     name = party_from_memory[pkey].name,
+                    buffs = {{n=0},{n=0}}
                 }
             end
         end
@@ -536,17 +538,17 @@ register_events = function(bool)
         incoming_chunk_event = windower.register_event('incoming chunk', function(id, data)
             if id == 0x00D or id == 0x00E then -- kind of weird
                 local Mask = data:unpack('C',0x0B)
-                if data:unpack('H',9) == last_index and bit.band(Mask,4) == 4 then
+                if data:unpack('H',9) == last_index and bit.band(Mask,4) > 0 then
                     update_target_hp(data:unpack('C',0x1F))
                 end
                 local f = position_lookup[data:unpack('I',5)]
                 if f and f ~= 6 then
-                    if bit.band(Mask,1) == 1 then               --Mask
+                    if bit.band(Mask,1) > 0 then               --Mask
                         local X,Z,Y = data:unpack('fff',0x0D)   --0b000001 position updated
                         position[1][f] = X                      --0b000100 hp updated
                         position[2][f] = Y                      --0b011111 model appear i.e. update all
                         indicate_distance(false,f,X,Y)          --0b100000 model disappear
-                    elseif bit.band(Mask,32) == 32 then         
+                    elseif bit.band(Mask,32) > 0 then         
                         indicate_distance(true,f)
                     end
                 end
@@ -583,6 +585,35 @@ register_events = function(bool)
                 end
                 
                 update_macro_data(id,to_update)
+            elseif id == 0x076 then
+                for i = 0,4 do
+                    local id = data:unpack('I', i*48+5)
+                    if id == 0 then
+                        break
+                    else
+                        local packet_buffs = L{}
+                        local packet_debuffs = L{}
+                        local buff
+                        
+                        for j = 1,32 do
+                            buff = data:byte(i*48+5+16+j-1) + 256*( math.floor( data:byte(i*48+5+8+ math.floor((j-1)/4)) / 4^((j-1)%4) )%4) -- Credit: Byrth, GearSwap
+                            
+                            if buff == 255 then
+                                break
+                            elseif tracked_buffs[buff] then
+                                packet_buffs:append(buff)
+                            elseif tracked_debuffs[buff] then
+                                packet_debuffs:append(buff)
+                            end
+                        end
+                        
+                        draw_buff_display(packet_buffs, id, 1)
+                        draw_buff_display(packet_debuffs, id, 2)
+                        
+                        stat_table[id].buffs[1] = packet_buffs
+                        stat_table[id].buffs[2] = packet_debuffs
+                    end
+                end
             elseif id == 0x0DD then
                 local packet = packets.parse('incoming',data)
                 local id = packet['ID']
