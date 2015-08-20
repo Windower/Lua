@@ -46,7 +46,7 @@ function prims.new(settings)
     settings = settings or {}
     settings.pos = settings.pos or {0, 0}
     local m = {
-        color = settings.color or {255, 255, 255, 255},
+        color = settings.color and {unpack(settings.color)} or {255, 255, 255, 255},
         width = settings.w or 0,
         height = settings.h or 0,
         visible = settings.visible or false,
