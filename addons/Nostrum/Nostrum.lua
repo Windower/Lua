@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
 _addon.name = 'Nostrum'
 _addon.author = 'trv'
-_addon.version = '2.1.7'
+_addon.version = '2.2.0'
 _addon.commands = {'Nostrum','nos',}
 
 packets=require('packets')
@@ -265,12 +265,11 @@ do
         if bool ~= nil then initialized = bool return end
         if initialized or not windower.ffxi.get_info().logged_in then return end
         initialized = true
-        alliance_keys = {'p5', 'p4', 'p3', 'p2', 'p1', 'p0', 'a15', 'a14', 'a13', 'a12', 'a11', 'a10', 'a25', 'a24', 'a23', 'a22', 'a21', 'a20'}
+        local alliance_keys = {'p0', 'p1', 'p2', 'p3', 'p4', 'p5', 'a10', 'a11', 'a12', 'a13', 'a14', 'a15', 'a20', 'a21', 'a22', 'a23', 'a24', 'a25'}
         local party_from_memory = windower.ffxi.get_party()
         local player = windower.ffxi.get_player()
         
         player_id = player.id
-        local alliance = {}
         position_lookup = {}
         stat_table = {}
         party = {L{},L{},L{}}
@@ -279,29 +278,32 @@ do
         count_buffs(profile)
 
         for i=1,18 do
-            local pkey = alliance_keys[i]
-            if party_from_memory[pkey] and party_from_memory[pkey].mob then
-                alliance[i] = party_from_memory[pkey].mob.id
-                position_lookup[alliance[i]] = i
-                position[1][i] = party_from_memory[pkey].mob.x
-                position[2][i] = party_from_memory[pkey].mob.y
-                stat_table[alliance[i]]={
-                    hp = party_from_memory[pkey].hp,
-                    mp = party_from_memory[pkey].mp,
-                    mpp = party_from_memory[pkey].mpp,
-                    hpp = party_from_memory[pkey].hpp,
-                    tp = party_from_memory[pkey].tp,
-                    name = party_from_memory[pkey].name,
+            local party_member_from_memory = party_from_memory[alliance_keys[i]]
+
+            if party_member_from_memory and party_member_from_memory.mob then
+                local id = party_member_from_memory.mob.id
+                local n = math.ceil(i/6)
+                
+                party[n]:append(id)
+                
+                local m = 6*n + 1 - party[n].n
+                
+                position_lookup[id] = m
+                
+                position[1][m] = party_member_from_memory.mob.x
+                position[2][m] = party_member_from_memory.mob.y
+                stat_table[id]={
+                    hp = party_member_from_memory.hp,
+                    mp = party_member_from_memory.mp,
+                    mpp = party_member_from_memory.mpp,
+                    hpp = party_member_from_memory.hpp,
+                    tp = party_member_from_memory.tp,
+                    name = party_member_from_memory.name,
                     buffs = {{n=0},{n=0}}
                 }
             end
         end
         
-        for i=18,1,-1 do
-            if alliance[i] then
-                party[math.ceil(i/6)]:append(alliance[i])
-            end
-        end
         build_macro()
         define_active_regions()
         register_events(true)
@@ -494,22 +496,28 @@ register_events = function(bool)
                 end
             end
         end)
-
+        
         outgoing_chunk_event = windower.register_event('outgoing chunk', function(id,data)
             if id == 0x015 then
                 local packet = packets.parse('outgoing', data)
+                
                 if packet['Target Index'] ~= last_index or last_index == stat_table[player_id].index then
                     update_target(windower.ffxi.get_mob_by_index(packet['Target Index']))
                 end
+                
                 local position = position
+                
                 if position[1][6] ~= packet['X'] or position[2][6] ~= packet['Y'] then
                     position[1][6],position[2][6] = packet['X'],packet['Y']
+
                     local party = party
+                    
                     for i = 5,7-party[1].n,-1 do
                         if not (out_of_zone[party[1][7 - i]] or out_of_view[i]) then
                             indicate_distance(false,i,position[1][i],position[2][i])
                         end
                     end
+                    
                     for j = 2,3 do
                         for i = j*6,j*6-party[j].n+1,-1 do
                             if not (out_of_zone[party[j][j*6-i+1]] or out_of_view[i]) then
@@ -530,6 +538,12 @@ register_events = function(bool)
                         if text_coordinates.visible[key] then
                             windower.text.set_visibility(key,false)
                         end
+                    end
+                    
+                    toggle_buff_visibility(false)
+                    
+                    for i = 1,party[1].n do
+                        stat_table[party[1][i]].buffs={{n = 0},{n = 0}} -- wipe buffs on zone
                     end
                 end
             end
@@ -588,9 +602,10 @@ register_events = function(bool)
             elseif id == 0x076 then
                 for i = 0,4 do
                     local id = data:unpack('I', i*48+5)
+                    
                     if id == 0 then
                         break
-                    else
+                    elseif position_lookup[id] then
                         local packet_buffs = L{}
                         local packet_debuffs = L{}
                         local buff
@@ -600,9 +615,9 @@ register_events = function(bool)
                             
                             if buff == 255 then
                                 break
-                            elseif tracked_buffs[buff] then
+                            elseif tracked_buffs[1][buff] then
                                 packet_buffs:append(buff)
-                            elseif tracked_debuffs[buff] then
+                            elseif tracked_buffs[2][buff] then
                                 packet_debuffs:append(buff)
                             end
                         end
@@ -659,7 +674,7 @@ register_events = function(bool)
                 end
             elseif id == 0x0C8 then
                 local packet = packets.parse('incoming', data)
-                coroutine.yield() -- Note: Never delete this (?) Something causes the macro to deform without it.
+
                 local packet_id_struc = {
                     packet['ID 1'],
                     packet['ID 2'],

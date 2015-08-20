@@ -147,8 +147,8 @@ function indicate_distance(bool,n,x,y)
             windower.text.set_color('name'..tostring(n), 255, 175, 98, 177)
         end
     elseif ((position[1][6] - x)^2 + (position[2][6] - y)^2) > 441 then
+        out_of_view[n] = false
         if not out_of_range[n] then
-            out_of_view[n] = false
             out_of_range[n] = true
             windower.text.set_color('name'..tostring(n), 255, 175, 98, 177)
         end
@@ -217,6 +217,24 @@ function toggle_visibility()
             windower.text.set_visibility(key,text_coordinates.visible[key])
         end
     end
+    toggle_buff_visibility(not is_hidden)
+end
+
+function toggle_buff_visibility(b)
+    local party = party[1]
+    for i = 1, party.n do
+        local id = party[i]
+        local buffs = stat_table[id].buffs[1]
+        local debuffs = stat_table[id].buffs[2]
+        local prims = buff_map[position_lookup[id]]
+
+        for j = 1, buffs.n do
+            prims[1][j]:visible(b)
+        end
+        for j = 1, debuffs.n do
+            prims[2][j]:visible(b)
+        end
+    end
 end
 
 function toggle_macro_visibility(n)
@@ -239,17 +257,7 @@ function toggle_macro_visibility(n)
         end
     end
     if n == 1 then
-        local party = party[1]
-        for i = 1, party.n do
-            local buffs = stat_table[party[i]].buffs[1]
-            local debuffs = stat_table[party[i]].buffs[2]
-            for j = 1, buffs.n do
-                buff_map[7-i][1][j]:visible(not macro_visibility[1])
-            end
-            for j = 1, debuffs.n do
-                buff_map[7-i][2][j]:visible(not macro_visibility[1])
-            end
-        end
+        toggle_buff_visibility(not macro_visibility[1])
     end
 end
 
@@ -352,6 +360,7 @@ function update_target_hp(hpp)
 end
 
 function compare_alliance_to_memory()
+    local alliance_keys = {'p5', 'p4', 'p3', 'p2', 'p1', 'p0', 'a15', 'a14', 'a13', 'a12', 'a11', 'a10', 'a25', 'a24', 'a23', 'a22', 'a21', 'a20'}
     local alliance_clone = windower.ffxi.get_party()
     local ally_id=(table.keyset(alliance_clone))
     local party1 = (party_keys * ally_id)
@@ -674,29 +683,32 @@ end
 function draw_buff_display(t, id, type)
     local p_id = position_lookup[id]
     local buffs = stat_table[id].buffs[type]
-    
+
     for i = 1, t.n do
         if t[i] ~= buffs[i] then
-            local n = t.n + 1 - i
             local prim = buff_map[p_id][type]
             
-            if not prim[n] then
+            if not prim[i] then
                 local hpp_string = 'phpp'..tostring(p_id)
-                prim[n] = prims.new({
-                    pos = {prim_coordinates.x[hpp_string] - 12 * i, prim_coordinates.y[hpp_string] + (type == 2 and 12 or 0)},
+                prim[i] = prims.new({
+                    pos = {prim_coordinates.x[hpp_string] - 1 - 12 * i, prim_coordinates.y[hpp_string] + (type == 2 and 12 or 0)},
                     w = 12,
                     color = color_over_texture[t[i]],
                     h = 12,
-                    visible = not macro_visibility[1],
+                    visible = not is_hidden and not macro_visibility[1],
                     set_texture = true,
                     texture = tracked_buffs[type][t[i]],
                     fit_texture = false,
                 })
-                prims_by_layer[p_id]:append(prim[n])
+                prims_by_layer[p_id]:append(prim[i])
             else
-                prim[n]:texture(tracked_buffs[type][t[i]])
-                prim[n]:visible(not macro_visibility[1])
-                prim[n]:argb(color_over_texture[t[i]] or {255, 255, 255, 255})
+                prim[i]:texture(tracked_buffs[type][t[i]])
+                if color_over_texture[t[i]] then
+                    prim[i]:argb(unpack(color_over_texture[t[i]]))
+                else
+                    prim[i]:argb(255, 255, 255, 255)
+                end
+                prim[i]:visible(not macro_visibility[1])
             end
         end
     end
