@@ -30,10 +30,9 @@ tbg_cap_l = images.new()
 tbg_cap_r = images.new()
 tbg_body = images.new()
 tfg_body = images.new()
+t_text = texts.new()
 
-txtTarget = texts.new()
-
-init_targetImages = function(...)
+init_target_images = function(...)
 	tbg_cap_l:pos(settings.global.X - 1, settings.global.Y)
 	tbg_cap_l:path(settings.global.bg_cap_path)
 	tbg_cap_l:color(255, 255, 255, 255)
@@ -60,28 +59,28 @@ init_targetImages = function(...)
 	tfg_body:size(settings.global.targetBarWidth, settings.global.targetBarHeight)
 	tfg_body:repeat_xy(1, 1)
 	
-	txtTarget:pos(settings.global.X, settings.global.Y)
-	txtTarget:font(settings.global.font)
-	txtTarget:size(settings.global.size)
-	txtTarget:bold(true)
-	txtTarget:text('Enemy Name')
+	t_text:pos(settings.global.X, settings.global.Y)
+	t_text:font(settings.global.font)
+	t_text:size(settings.global.textSize)
+	t_text:bold(true)
+	t_text:text('Enemy Name')
 	
-	txtTarget:bg_visible(false)
-	txtTarget:color(255, 255, 255)
-	txtTarget:alpha(255)
+	t_text:bg_visible(false)
+	t_text:color(255, 255, 255)
+	t_text:alpha(255)
 	
-	txtTarget:stroke_width(settings.global.strkSize)
-	txtTarget:stroke_color(50, 50, 50)
-	txtTarget:stroke_transparency(127)
+	t_text:stroke_width(settings.global.strokeSize)
+	t_text:stroke_color(50, 50, 50)
+	t_text:stroke_transparency(127)
 end
 
-renderTargetBar = function (...)
+render_target_bar = function (...)
 	if settings.global.visible == true then
 		tbg_cap_l:show()
 		tbg_cap_r:show()
 		tbg_body:show()
 		tfg_body:show()
-		txtTarget:show()
+		t_text:show()
 		
 		local target = windower.ffxi.get_mob_by_target('t')
 		local player = windower.ffxi.get_player()
@@ -114,20 +113,20 @@ renderTargetBar = function (...)
 			
 			tbg_body:size(598, 12)
 			--Update the Text
-			txtTarget:text('  ' .. target.name .. ' - HP ' .. target.hpp .. '%')
+			t_text:text('  ' .. target.name .. ' - HP ' .. target.hpp .. '%')
 			if player.in_combat == true then
-				txtTarget:color(255, 80, 80)
+				t_text:color(255, 80, 80)
 			else
 				if target.is_npc == false then
-					txtTarget:color(255, 255, 255)
+					t_text:color(255, 255, 255)
 				else
 					if target.claim_id == 0 then
-						txtTarget:color(230, 230, 138)
+						t_text:color(230, 230, 138)
 					else 
 						if target.hpp == 0 then
-							txtTarget:color(155, 155, 155)
+							t_text:color(155, 155, 155)
 						else
-							txtTarget:color(153, 102, 255)
+							t_text:color(153, 102, 255)
 						end
 					end
 				end
@@ -139,6 +138,6 @@ renderTargetBar = function (...)
 		tbg_cap_r:hide()
 		tbg_body:hide()
 		tfg_body:hide()
-		txtTarget:hide()
+		t_text:hide()
 	end
 end

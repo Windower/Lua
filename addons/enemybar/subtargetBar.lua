@@ -30,9 +30,9 @@ stbg_cap_l = images.new()
 stbg_cap_r = images.new()
 stbg_body = images.new()
 stfg_body = images.new()
-txtSubTarget = texts.new()
+st_text = texts.new()
 
-init_subTargetImages = function(...)
+init_subtarget_images = function(...)
 	stbg_cap_l:pos(settings.global.X + 399, settings.global.Y + 15)
 	stbg_cap_l:path(settings.global.bg_cap_path)
 	stbg_cap_l:color(255, 255, 255, 255)
@@ -59,22 +59,22 @@ init_subTargetImages = function(...)
 	stfg_body:size(settings.global.subtargetBarWidth, settings.global.subtargetBarHeight)
 	stfg_body:repeat_xy(1, 1)
 	
-	txtSubTarget:pos(settings.global.X + 400, settings.global.Y + 15)
-	txtSubTarget:font(settings.global.font)
-	txtSubTarget:size(settings.global.size)
-	txtSubTarget:bold(true)
-	txtSubTarget:text('Sub Name')
+	st_text:pos(settings.global.X + 400, settings.global.Y + 15)
+	st_text:font(settings.global.font)
+	st_text:size(settings.global.textSize)
+	st_text:bold(true)
+	st_text:text('Sub Name')
 	
-	txtSubTarget:bg_visible(false)
-	txtSubTarget:color(255, 255, 255)
-	txtSubTarget:alpha(255)
+	st_text:bg_visible(false)
+	st_text:color(255, 255, 255)
+	st_text:alpha(255)
 	
-	txtSubTarget:stroke_width(settings.global.strkSize)
-	txtSubTarget:stroke_color(50, 50, 50)
-	txtSubTarget:stroke_transparency(127)
+	st_text:stroke_width(settings.global.strokeSize)
+	st_text:stroke_color(50, 50, 50)
+	st_text:stroke_transparency(127)
 end
 
-renderSubTargetBar = function(...)
+render_subtarget_bar = function(...)
 	if settings.global.visible == true then
 		local subtarget = windower.ffxi.get_mob_by_target('st')
 		
@@ -83,7 +83,7 @@ renderSubTargetBar = function(...)
 			stbg_cap_r:show()
 			stbg_body:show()
 			stfg_body:show()
-			txtSubTarget:show()
+			st_text:show()
 			
 			local old_width = stfg_body:width()
 			local i = subtarget.hpp / 100
@@ -109,13 +109,13 @@ renderSubTargetBar = function(...)
 			end
 						
 			stbg_body:size(198, 12)
-			txtSubTarget:text('  ' .. subtarget.name)
+			st_text:text('  ' .. subtarget.name)
 		else
 			stbg_cap_l:hide()
 			stbg_cap_r:hide()
 			stbg_body:hide()
 			stfg_body:hide()
-			txtSubTarget:hide()
+			st_text:hide()
 		end
 	end
 end

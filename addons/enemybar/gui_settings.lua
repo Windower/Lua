@@ -51,19 +51,19 @@ defaults.global.stfg_body_path = windower.addon_path.. 'stfg_body.png'
 
 defaults.global.visible = false
 defaults.global.font = 'Arial'
-defaults.global.txtSize = 14
-defaults.global.strkSize = 1
+defaults.global.textSize = 14
+defaults.global.strokeSize = 1
 defaults.global.style = 0
 
 settings = config.load(defaults)
 config.save(settings)
 
 function init_images()
-	init_targetImages()
-	init_subTargetImages()		
+	init_target_images()
+	init_subtarget_images()		
 end
 
-targetChange = function(index)
+target_change = function(index)
 	if index == 0 then
 		settings.global.visible = false
 	else

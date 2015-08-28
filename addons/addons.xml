@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <addons>
   <addon>
     <name>Example</name>
@@ -183,6 +183,12 @@
     <description>Displays a timer when a mob is procced, tracks currency obtained, and can create a LL to lot all currency.</description>
     <bugtracker>https://github.com/tehkrizz/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Bahamut/Krizz</support>
+  </addon>
+  <addon>
+    <name>Enemybar</name>
+    <description>This is an addon for Windower4 for FFXI. It creates a big health bar for the target to make it easy to see.</description>
+    <bugtracker>https://github.com/mjmckee/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Ragnarok/Pesche</support>
   </addon>
   <addon>
     <author>Giuliano Riccio (Zohno@Phoenix)</author>
