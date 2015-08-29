@@ -186,6 +186,7 @@
   </addon>
   <addon>
     <name>Enemybar</name>
+    <author>mmckee</author>
     <description>This is an addon for Windower4 for FFXI. It creates a big health bar for the target to make it easy to see.</description>
     <bugtracker>https://github.com/mjmckee/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Ragnarok/Pesche</support>

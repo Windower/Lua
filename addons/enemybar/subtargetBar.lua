@@ -1,10 +1,8 @@
 --[[
 Copyright © 2015, Mike McKee
 All rights reserved.
-
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
-
     * Redistributions of source code must retain the above copyright
       notice, this list of conditions and the following disclaimer.
     * Redistributions in binary form must reproduce the above copyright
@@ -13,7 +11,6 @@ modification, are permitted provided that the following conditions are met:
     * Neither the name of enemybar nor the
       names of its contributors may be used to endorse or promote products
       derived from this software without specific prior written permission.
-
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -33,35 +30,35 @@ stfg_body = images.new()
 st_text = texts.new()
 
 init_subtarget_images = function(...)
-	stbg_cap_l:pos(settings.global.X + 399, settings.global.Y + 15)
-	stbg_cap_l:path(settings.global.bg_cap_path)
+	stbg_cap_l:pos(settings.X + 399, settings.Y + 15)
+	stbg_cap_l:path(bg_cap_path)
 	stbg_cap_l:color(255, 255, 255, 255)
 	stbg_cap_l:fit(true)
-	stbg_cap_l:size(settings.global.subtargetBarWidth, settings.global.subtargetBarHeight)
+	stbg_cap_l:size(settings.subtargetBarWidth, settings.subtargetBarHeight)
 	stbg_cap_l:repeat_xy(1, 1)
 	
-	stbg_cap_r:pos(settings.global.X + settings.global.subtargetBarWidth + 400, settings.global.Y + 15)
-	stbg_cap_r:path(settings.global.bg_cap_path)
+	stbg_cap_r:pos(settings.X + settings.subtargetBarWidth + 400, settings.Y + 15)
+	stbg_cap_r:path(bg_cap_path)
 	stbg_cap_r:color(255, 255, 255, 255)
 	stbg_cap_r:fit(true)
-	stbg_cap_r:size(settings.global.subtargetBarWidth, settings.global.subtargetBarHeight)
+	stbg_cap_r:size(settings.subtargetBarWidth, settings.subtargetBarHeight)
 	stbg_cap_r:repeat_xy(1, 1)
 
-	stbg_body:pos(settings.global.X + 400, settings.global.Y + 15)
-	stbg_body:path(settings.global.stbg_body_path)
+	stbg_body:pos(settings.X + 400, settings.Y + 15)
+	stbg_body:path(stbg_body_path)
 	stbg_body:fit(true)
-	stbg_body:size(settings.global.subtargetBarWidth, settings.global.subtargetBarHeight)
+	stbg_body:size(settings.subtargetBarWidth, settings.subtargetBarHeight)
 	stbg_body:repeat_xy(1, 1)
 	
-    stfg_body:pos(settings.global.X + 400, settings.global.Y + 15)
-	stfg_body:path(settings.global.stfg_body_path)
+    stfg_body:pos(settings.X + 400, settings.Y + 15)
+	stfg_body:path(stfg_body_path)
 	stfg_body:fit(true)
-	stfg_body:size(settings.global.subtargetBarWidth, settings.global.subtargetBarHeight)
+	stfg_body:size(settings.subtargetBarWidth, settings.subtargetBarHeight)
 	stfg_body:repeat_xy(1, 1)
 	
-	st_text:pos(settings.global.X + 400, settings.global.Y + 15)
-	st_text:font(settings.global.font)
-	st_text:size(settings.global.textSize)
+	st_text:pos(settings.X + 400, settings.Y + 15)
+	st_text:font(settings.font)
+	st_text:size(settings.textSize)
 	st_text:bold(true)
 	st_text:text('Sub Name')
 	
@@ -69,14 +66,15 @@ init_subtarget_images = function(...)
 	st_text:color(255, 255, 255)
 	st_text:alpha(255)
 	
-	st_text:stroke_width(settings.global.strokeSize)
+	st_text:stroke_width(settings.strokeSize)
 	st_text:stroke_color(50, 50, 50)
 	st_text:stroke_transparency(127)
 end
 
 render_subtarget_bar = function(...)
-	if settings.global.visible == true then
+	if visible == true then
 		local subtarget = windower.ffxi.get_mob_by_target('st')
+		local player = windower.ffxi.get_player()
 		
 		if subtarget ~= nil then
 			stbg_cap_l:show()
@@ -89,7 +87,7 @@ render_subtarget_bar = function(...)
 			local i = subtarget.hpp / 100
 			local new_width = math.floor(198 * i)	
 			
-			if settings.global.style == 1 then
+			if settings.style == 1 then
 				if new_width ~= nil and new_width > 0 then
 					if old_width > new_width then
 						local last_update = 0
@@ -110,6 +108,20 @@ render_subtarget_bar = function(...)
 						
 			stbg_body:size(198, 12)
 			st_text:text('  ' .. subtarget.name)
+			
+			if check_claim(subtarget.claim_id) then
+				st_text:color(255, 80, 80)
+			elseif subtarget.in_party == true and subtarget.id ~= player.id then
+				st_text:color(102, 255, 255)
+			elseif subtarget.is_npc == false then
+				st_text:color(255, 255, 255)
+			elseif subtarget.claim_id == 0 then
+				st_text:color(230, 230, 138) 
+			elseif subtarget.hpp == 0 then
+				st_text:color(155, 155, 155)
+			elseif subtarget.claim_id ~= 0 then
+				st_text:color(153, 102, 255)
+			end
 		else
 			stbg_cap_l:hide()
 			stbg_cap_r:hide()
