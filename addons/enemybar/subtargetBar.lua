@@ -23,27 +23,11 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --]]
 
-stbg_cap_l = images.new(stbg_cap_settings)
-stbg_cap_r = images.new(stbg_cap_settings)
-stbg_body = images.new(stbg_body_settings)
-stfg_body = images.new(stfg_body_settings)
-st_text = texts.new(' ${name|(Name)}', settings.textSettings, settings)
-
-init_subtarget_images = function(...)
-    stbg_cap_l:pos(settings.pos.x + 399, settings.pos.y + 15)
-    stbg_cap_r:pos(settings.pos.x + settings.subtargetBarWidth + 400, settings.pos.y + 15)
-    stbg_body:pos(settings.pos.x + 400, settings.pos.y + 15)
-    stfg_body:pos(settings.pos.x + 400, settings.pos.y + 15)
-    st_text:pos(settings.pos.x + 400, settings.pos.y + 15)
-end
-
 render_subtarget_bar = function(...)
     if visible == true then
-        local target = windower.ffxi.get_mob_by_target('t')
         local subtarget = windower.ffxi.get_mob_by_target('st')
-        local player = windower.ffxi.get_player()
-
-        if subtarget ~= nil and subtarget.id ~= target.id then
+        
+        if subtarget ~= nil and target ~= nil and subtarget.id ~= target.id then
             stbg_cap_l:show()
             stbg_cap_r:show()
             stbg_body:show()
@@ -51,16 +35,16 @@ render_subtarget_bar = function(...)
             st_text:show()
 
             local i = subtarget.hpp / 100
-            local new_width = math.floor(198 * i)	
-            stfg_body:size(new_width, 12)		
-            stbg_body:size(198, 12)
+            local new_width = math.floor(subtargetBarWidth * i)	
+            stfg_body:width(new_width)		
+            stbg_body:width(subtargetBarWidth)
 
             st_text.name = subtarget.name
             if subtarget.hpp == 0 then
                 st_text:color(155, 155, 155)
             elseif check_claim(subtarget.claim_id) then
                 st_text:color(255, 204, 204)
-            elseif subtarget.in_party == true and subtarget.id ~= player.id then
+            elseif subtarget.in_party == true and subtarget.id ~= player_id then
                 st_text:color(102, 255, 255)
             elseif subtarget.is_npc == false then
                 st_text:color(255, 255, 255)

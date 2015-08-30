@@ -25,14 +25,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'enemybar'
 _addon.author = 'mmckee'
-_addon.version = '1.0'
+_addon.version = '1.0.1'
 _addon.language = 'English'
 
+config = require('config')
+images = require('images')
+texts = require('texts')
 require('gui_settings')
+require('targetBar')
+require('subtargetBar')
+
+player_id = 0
+debug_string = ''
 
 windower.register_event('load', function()
     if windower.ffxi.get_info().logged_in then
-        init_images()
+        player_id = windower.ffxi.get_player().id
     end
 end)
 
