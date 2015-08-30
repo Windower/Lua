@@ -23,111 +23,71 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --]]
 
-tbg_cap_l = images.new()
-tbg_cap_r = images.new()
-tbg_body = images.new()
-tfg_body = images.new()
-t_text = texts.new()
-
-
+tbg_cap_l = images.new(tbg_cap_settings)
+tbg_cap_r = images.new(tbg_cap_settings)
+tbg_body = images.new(tbg_body_settings)
+tfgg_body = images.new(tfgg_body_settings)
+tfg_body = images.new(tfg_body_settings)
+t_text = texts.new('  ${name|(Name)} - HP: ${hpp|(100)}% ${debug|}', settings.textSettings, settings)
 
 init_target_images = function(...)
-	tbg_cap_l:pos(settings.X - 1, settings.Y)
-	tbg_cap_l:path(bg_cap_path)
-	tbg_cap_l:color(255, 255, 255, 255)
-	tbg_cap_l:fit(true)
-	tbg_cap_l:size(settings.targetBarWidth, settings.targetBarHeight)
-	tbg_cap_l:repeat_xy(1, 1)
-	
-	tbg_cap_r:pos(settings.X + settings.targetBarWidth, settings.Y)
-	tbg_cap_r:path(bg_cap_path)
-	tbg_cap_r:color(255, 255, 255, 255)
-	tbg_cap_r:fit(true)
-	tbg_cap_r:size(settings.targetBarWidth, settings.targetBarHeight)
-	tbg_cap_r:repeat_xy(1, 1)
-
-	tbg_body:pos(settings.X, settings.Y)
-	tbg_body:path(tbg_body_path)
-	tbg_body:fit(true)
-	tbg_body:size(598, 12)
-	tbg_body:repeat_xy(1, 1)
-		
-	tfg_body:pos(settings.X, settings.Y)
-	tfg_body:path(tfg_body_path)
-	tfg_body:fit(true)
-	tfg_body:size(settings.targetBarWidth, settings.targetBarHeight)
-	tfg_body:repeat_xy(1, 1)
-	
-	t_text:pos(settings.X, settings.Y)
-	t_text:font(settings.font)
-	t_text:size(settings.textSize)
-	t_text:bold(true)
-	t_text:text('Enemy Name')
-	
-	t_text:bg_visible(false)
-	t_text:color(255, 255, 255)
-	t_text:alpha(255)
-	
-	t_text:stroke_width(settings.strokeSize)
-	t_text:stroke_color(50, 50, 50)
-	t_text:stroke_transparency(127)
+	tbg_cap_l:pos(settings.pos.x - 1, settings.pos.y)
+	tbg_cap_r:pos(settings.pos.x + settings.targetBarWidth, settings.pos.y)
 end
 
+timer = 0
+
 render_target_bar = function (...)
-	if visible == true then
+	if visible == true then		
 		tbg_cap_l:show()
 		tbg_cap_r:show()
 		tbg_body:show()
 		tfg_body:show()
+		tfgg_body:show()
 		t_text:show()
 		
 		local target = windower.ffxi.get_mob_by_target('t')
 		local player = windower.ffxi.get_player()
 		local party = windower.ffxi.get_party()
-		
+				
 		if target ~= nil then
-			local old_width = tfg_body:width()
 			local i = target.hpp / 100
 			local new_width = math.floor(settings.targetBarWidth * i)
+			local old_width = tfgg_body:width()
 			
-			if settings.style == 1 then
-				--Animated Style 'borrowed' from Morath's barfiller
-				if new_width ~= nil and new_width > 0 then
-					if old_width > new_width then
-						local last_update = 0
-						local x = old_width + math.ceil(((new_width - old_width) * 0.1))
-						tfg_body:size(x, 12)
-			
-						local now = os.clock()
-						if now - last_update > 0.5 then
-							last_update = now
-						end
-					elseif old_width <= new_width then
-						tfg_body:size(new_width, 12)
-					end
-				end
-			else
-				--Classic Style
-				tfg_body:size(new_width, 12)
+			tfgg_body:size(0, 12)
+						
+			local now = os.clock()
+			if new_width ~= nil and new_width > 0 then
+				if new_width < old_width and player.in_combat then
+					local x = old_width + math.floor(((new_width - old_width) * 0.1))
+					tfgg_body:size(x, 12)
+				elseif new_width >= old_width or not player.in_combat then
+					tfgg_body:size(new_width, 12)
+				end			
 			end
-			
+					
+			tfg_body:size(new_width ,12)	
 			tbg_body:size(598, 12)
-			t_text:text('  ' .. target.name .. ' - HP ' .. target.hpp .. '%')
 			
-			--Check claim_id with player and party_id 
-			if check_claim(target.claim_id) then
-				t_text:color(255, 80, 80)
+			t_text.name = target.name
+			t_text.hpp = target.hpp
+			--t_text.debug = tfgg_body:width()..new_width
+			
+			--Check claim_id with player and party_id
+			if target.hpp == 0 then
+				t_text:color(155, 155, 155)
+			elseif check_claim(target.claim_id) then
+				t_text:color(255, 204, 204)
 			elseif target.in_party == true and target.id ~= player.id then
 				t_text:color(102, 255, 255)
 			elseif target.is_npc == false then
 				t_text:color(255, 255, 255)
 			elseif target.claim_id == 0 then
 				t_text:color(230, 230, 138) 
-			elseif target.hpp == 0 then
-				t_text:color(155, 155, 155)
 			elseif target.claim_id ~= 0 then
 				t_text:color(153, 102, 255)
-			end
+			end			
 		end
 		
 	else
@@ -135,6 +95,8 @@ render_target_bar = function (...)
 		tbg_cap_r:hide()
 		tbg_body:hide()
 		tfg_body:hide()
+		tfgg_body:hide()
+		tfgg_body:size(0, 12)
 		t_text:hide()
 	end
 end

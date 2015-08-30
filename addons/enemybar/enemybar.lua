@@ -25,7 +25,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'enemybar'
 _addon.author = 'mmckee'
-_addon.version = '0.3.2'
+_addon.version = '1.0'
 _addon.language = 'English'
 
 require('gui_settings')
