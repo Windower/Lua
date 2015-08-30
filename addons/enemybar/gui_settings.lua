@@ -218,8 +218,8 @@ require('targetBar')
 require('subtargetBar')
 
 init_images = function()
-	init_target_images()
-	init_subtarget_images()		
+    init_target_images()
+    init_subtarget_images()		
 end
 
 check_claim = function(claim_id)
@@ -242,10 +242,10 @@ check_claim = function(claim_id)
 end
 
 target_change = function(index)
-	if index == 0 then
-		visible = false
-	else
+    if index == 0 then
+        visible = false
+    else
         timer = os.clock()
-		visible = true
+        visible = true
 	end
 end

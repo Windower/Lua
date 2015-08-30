@@ -31,72 +31,72 @@ tfg_body = images.new(tfg_body_settings)
 t_text = texts.new('  ${name|(Name)} - HP: ${hpp|(100)}% ${debug|}', settings.textSettings, settings)
 
 init_target_images = function(...)
-	tbg_cap_l:pos(settings.pos.x - 1, settings.pos.y)
-	tbg_cap_r:pos(settings.pos.x + settings.targetBarWidth, settings.pos.y)
+    tbg_cap_l:pos(settings.pos.x - 1, settings.pos.y)
+    tbg_cap_r:pos(settings.pos.x + settings.targetBarWidth, settings.pos.y)
 end
 
 timer = 0
 
 render_target_bar = function (...)
-	if visible == true then		
-		tbg_cap_l:show()
-		tbg_cap_r:show()
-		tbg_body:show()
-		tfg_body:show()
-		tfgg_body:show()
-		t_text:show()
-		
-		local target = windower.ffxi.get_mob_by_target('t')
-		local player = windower.ffxi.get_player()
-		local party = windower.ffxi.get_party()
-				
-		if target ~= nil then
-			local i = target.hpp / 100
-			local new_width = math.floor(settings.targetBarWidth * i)
-			local old_width = tfgg_body:width()
-			
-			tfgg_body:size(0, 12)
-						
-			local now = os.clock()
-			if new_width ~= nil and new_width > 0 then
-				if new_width < old_width and player.in_combat then
-					local x = old_width + math.floor(((new_width - old_width) * 0.1))
-					tfgg_body:size(x, 12)
-				elseif new_width >= old_width or not player.in_combat then
-					tfgg_body:size(new_width, 12)
-				end			
-			end
-					
-			tfg_body:size(new_width ,12)	
-			tbg_body:size(598, 12)
-			
-			t_text.name = target.name
-			t_text.hpp = target.hpp
-			--t_text.debug = tfgg_body:width()..new_width
-			
-			--Check claim_id with player and party_id
-			if target.hpp == 0 then
-				t_text:color(155, 155, 155)
-			elseif check_claim(target.claim_id) then
-				t_text:color(255, 204, 204)
-			elseif target.in_party == true and target.id ~= player.id then
-				t_text:color(102, 255, 255)
-			elseif target.is_npc == false then
-				t_text:color(255, 255, 255)
-			elseif target.claim_id == 0 then
-				t_text:color(230, 230, 138) 
-			elseif target.claim_id ~= 0 then
-				t_text:color(153, 102, 255)
-			end			
-		end
-		
-	else
-		tbg_cap_l:hide()
-		tbg_cap_r:hide()
-		tbg_body:hide()
-		tfg_body:hide()
-		tfgg_body:hide()
-		tfgg_body:size(0, 12)
-		t_text:hide()
-	end
+    if visible == true then		
+        tbg_cap_l:show()
+        tbg_cap_r:show()
+        tbg_body:show()
+        tfg_body:show()
+        tfgg_body:show()
+        t_text:show()
+        
+        local target = windower.ffxi.get_mob_by_target('t')
+        local player = windower.ffxi.get_player()
+        local party = windower.ffxi.get_party()
+
+        if target ~= nil then
+            local i = target.hpp / 100
+            local new_width = math.floor(settings.targetBarWidth * i)
+            local old_width = tfgg_body:width()
+
+            tfgg_body:size(0, 12)
+ 
+            local now = os.clock()
+            if new_width ~= nil and new_width > 0 then
+                if new_width < old_width and player.in_combat then
+                    local x = old_width + math.floor(((new_width - old_width) * 0.1))
+                    tfgg_body:size(x, 12)
+                elseif new_width >= old_width or not player.in_combat then
+                    tfgg_body:size(new_width, 12)
+                end			
+            end
+
+            tfg_body:size(new_width ,12)	
+            tbg_body:size(598, 12)
+
+            t_text.name = target.name
+            t_text.hpp = target.hpp
+            --t_text.debug = tfgg_body:width()..new_width
+
+            --Check claim_id with player and party_id
+            if target.hpp == 0 then
+                t_text:color(155, 155, 155)
+            elseif check_claim(target.claim_id) then
+                t_text:color(255, 204, 204)
+            elseif target.in_party == true and target.id ~= player.id then
+                t_text:color(102, 255, 255)
+            elseif target.is_npc == false then
+                t_text:color(255, 255, 255)
+            elseif target.claim_id == 0 then
+                t_text:color(230, 230, 138) 
+            elseif target.claim_id ~= 0 then
+                t_text:color(153, 102, 255)
+            end			
+        end
+        
+    else
+        tbg_cap_l:hide()
+        tbg_cap_r:hide()
+        tbg_body:hide()
+        tfg_body:hide()
+        tfgg_body:hide()
+        tfgg_body:size(0, 12)
+        t_text:hide()
+    end
 end

@@ -30,51 +30,51 @@ stfg_body = images.new(stfg_body_settings)
 st_text = texts.new(' ${name|(Name)}', settings.textSettings, settings)
 
 init_subtarget_images = function(...)
-	stbg_cap_l:pos(settings.pos.x + 399, settings.pos.y + 15)
-	stbg_cap_r:pos(settings.pos.x + settings.subtargetBarWidth + 400, settings.pos.y + 15)
-	stbg_body:pos(settings.pos.x + 400, settings.pos.y + 15)
+    stbg_cap_l:pos(settings.pos.x + 399, settings.pos.y + 15)
+    stbg_cap_r:pos(settings.pos.x + settings.subtargetBarWidth + 400, settings.pos.y + 15)
+    stbg_body:pos(settings.pos.x + 400, settings.pos.y + 15)
     stfg_body:pos(settings.pos.x + 400, settings.pos.y + 15)
-	st_text:pos(settings.pos.x + 400, settings.pos.y + 15)
+    st_text:pos(settings.pos.x + 400, settings.pos.y + 15)
 end
 
 render_subtarget_bar = function(...)
-	if visible == true then
-		local target = windower.ffxi.get_mob_by_target('t')
-		local subtarget = windower.ffxi.get_mob_by_target('st')
-		local player = windower.ffxi.get_player()
-		
-		if subtarget ~= nil and subtarget.id ~= target.id then
-			stbg_cap_l:show()
-			stbg_cap_r:show()
-			stbg_body:show()
-			stfg_body:show()
-			st_text:show()
-			
-			local i = subtarget.hpp / 100
-			local new_width = math.floor(198 * i)	
-			stfg_body:size(new_width, 12)		
-			stbg_body:size(198, 12)
-			
-			st_text.name = subtarget.name
-			if subtarget.hpp == 0 then
-				st_text:color(155, 155, 155)
-			elseif check_claim(subtarget.claim_id) then
-				st_text:color(255, 204, 204)
-			elseif subtarget.in_party == true and subtarget.id ~= player.id then
-				st_text:color(102, 255, 255)
-			elseif subtarget.is_npc == false then
-				st_text:color(255, 255, 255)
-			elseif subtarget.claim_id == 0 then
-				st_text:color(230, 230, 138)
-			elseif subtarget.claim_id ~= 0 then
-				st_text:color(153, 102, 255)
-			end
-		else
-			stbg_cap_l:hide()
-			stbg_cap_r:hide()
-			stbg_body:hide()
-			stfg_body:hide()
-			st_text:hide()
-		end
-	end
+    if visible == true then
+        local target = windower.ffxi.get_mob_by_target('t')
+        local subtarget = windower.ffxi.get_mob_by_target('st')
+        local player = windower.ffxi.get_player()
+
+        if subtarget ~= nil and subtarget.id ~= target.id then
+            stbg_cap_l:show()
+            stbg_cap_r:show()
+            stbg_body:show()
+            stfg_body:show()
+            st_text:show()
+
+            local i = subtarget.hpp / 100
+            local new_width = math.floor(198 * i)	
+            stfg_body:size(new_width, 12)		
+            stbg_body:size(198, 12)
+
+            st_text.name = subtarget.name
+            if subtarget.hpp == 0 then
+                st_text:color(155, 155, 155)
+            elseif check_claim(subtarget.claim_id) then
+                st_text:color(255, 204, 204)
+            elseif subtarget.in_party == true and subtarget.id ~= player.id then
+                st_text:color(102, 255, 255)
+            elseif subtarget.is_npc == false then
+                st_text:color(255, 255, 255)
+            elseif subtarget.claim_id == 0 then
+                st_text:color(230, 230, 138)
+            elseif subtarget.claim_id ~= 0 then
+                st_text:color(153, 102, 255)
+            end
+        else
+            stbg_cap_l:hide()
+            stbg_cap_r:hide()
+            stbg_body:hide()
+            stfg_body:hide()
+            st_text:hide()
+        end
+    end
 end

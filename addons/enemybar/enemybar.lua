@@ -32,8 +32,8 @@ require('gui_settings')
 
 windower.register_event('load', function()
     if windower.ffxi.get_info().logged_in then
-		init_images()
-	end
+        init_images()
+    end
 end)
 
 windower.register_event('prerender', render_target_bar)
