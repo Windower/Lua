@@ -1,8 +1,8 @@
 LatentChecker
 =============
 
-checks weapon skill points of weapon skill trial weapons and mythic weapons 
+Description: Checks weapon skill points of valid weapons.
 
-use latentchecker run or lc run to check the weapon skill points of your weapon
+Instructions: Use "//latentchecker run" or "//lc run" to check the weapon skill points of all valid weapons in your inventory.
 
-use ls unequip to toggle on and off auto unequip main hand(default is off)
+Warning: Using it will unequip your main/sub/ranged weapons, and it takes about 5 seconds to check each weapon in your inventory.
