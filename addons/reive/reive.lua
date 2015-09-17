@@ -30,14 +30,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 require 'chat'
 require 'logger'
-require 'stringhelper'
+require 'strings'
 
 local config = require 'config'
 
 
 _addon.name    = 'reive'
 _addon.author  = 'Zohno'
-_addon.version = '1.20131021'
+_addon.version = '1.20131221'
 _addon.command = 'reive'
 
 tb_name = 'addon:gr:reive'
@@ -315,17 +315,8 @@ windower.register_event('unload', function()
     windower.text.delete(tb_name)
 end)
 
-windower.register_event('gain buff', function(id)
-    if id == 511 then
-        start_tracking()
-    end
-end)
-
-windower.register_event('lose buff', function(id)
-    if id == 511 then
-        stop_tracking()
-    end
-end)
+windower.register_event('gain buff', start_tracking:cond(function(id) return id == 511 end))
+windower.register_event('lose buff', stop_tracking:cond(function(id) return id == 511 end))
 
 windower.register_event('incoming text', function(original, modified, mode)
     local match

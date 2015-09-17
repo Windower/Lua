@@ -24,390 +24,276 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
-function equip_sets(swap_type,val1,val2)
-	refresh_globals()
-	local cur_equip = items.equipment -- i = 'head', 'feet', etc.; v = inventory ID (0~80)
-	-- If the swap is not complete, overwrite the current equipment with the equipment that you are swapping to
-	for i,v in pairs(cur_equip) do
-		if sent_out_equip[slot_map[i]] then
-			v = sent_out_equip[slot_map[i]]
-		end
-		if not_sent_out_equip[slot_map[i]] then
-			v = not_sent_out_equip[slot_map[i]]
-		end
-		if v == 0 then
-			v = empty
-		end
-	end
-	
-	table.reassign(equip_order,default_equip_order)
-	table.reassign(equip_list,player.equipment)
-	
-	if debugging >= 2 then windower.add_to_chat(8,swap_type) end
-	if logging then
-		logit(logfile,'\n\n'..tostring(os.clock)..'(15) equip_sets: '..tostring(swap_type))
-		if val1 then
-			if val1.english then
-				logit(logfile,' : '..val1.english)
-			end
-		else
-			logit(logfile,' : nil-or-false')
-		end
-		if val2 then
-			if val2.type then	logit(logfile,' : '..val2.type)	end
-		else
-			logit(logfile,' : nil-or-false')
-		end
-	end
-
-	if swap_type == 'precast' then
-		if _global.debug_mode then windower.add_to_chat(8,'Gearswap (Debug Mode): Precast '..tostring(val1.name)) end
-		val1.target = spelltarget
-		if type(user_env.precast) == 'function' then user_env.precast(val1,val2) -- User defined function to determine the precast set
-		elseif user_env.precast then windower.add_to_chat(123,'GearSwap: precast() exists but is not a function') end
-		if _global.verify_equip and not force_flag then
-			force_flag = true
-			windower.send_command('@wait 1;lua invoke gearswap sender')
-		end
-	elseif swap_type == 'midcast' then
-		if _global.debug_mode then windower.add_to_chat(8,'Gearswap (Debug Mode): Midcast '..tostring(val1.name)) end
-		val1.target = spelltarget
-		user_env.midcast(val1,val2) -- User defined function to determine the midcast set
-	elseif swap_type == 'aftercast' then
-		if _global.debug_mode then windower.add_to_chat(8,'Gearswap (Debug Mode): Aftercast '..tostring(val1.name)) end
-		if not val1 then val1 = {}
-			if debugging >= 2 then
-				windower.add_to_chat(8,'val1 error')
-			end
-		end
-		val1.target = spelltarget
-		midaction = false
-		spelltarget = nil
-		user_env.aftercast(val1,val2) -- User defined function to determine the aftercast set
-	elseif swap_type == 'pet_midcast' then
-		if _global.debug_mode then windower.add_to_chat(8,'Gearswap (Debug Mode): Pet Midcast '..tostring(val1.name)) end
-		val1.target = spelltarget
-		user_env.pet_midcast(val1,val2) -- User defined function to determine the midcast set
-	elseif swap_type == 'pet_aftercast' then
-		if _global.debug_mode then windower.add_to_chat(8,'Gearswap (Debug Mode): Pet Aftercast '..tostring(val1.name)) end
-		val1.target = spelltarget
-		user_env.pet_aftercast(val1,val2) -- User defined function to determine the aftercast set
-	elseif swap_type == 'status_change' then
-		if _global.debug_mode then windower.add_to_chat(8,'Gearswap (Debug Mode): Status Change '..tostring(val1)..' '..tostring(val2))
-			for i=1,#val2 do
-				windower.add_to_chat(8,'Gearswap (Debug Mode): '..i..' '..string.byte(val2[i]))
-			end
-		end
-		if type(user_env.status_change) == 'function' then user_env.status_change(val1,val2) -- User defined function to determine if sets should change following status change
-		elseif user_env.status_change then windower.add_to_chat(123,'GearSwap: status_change() exists but is not a function') end
-	elseif swap_type == 'buff_change' then
-		if _global.debug_mode then windower.add_to_chat(8,'Gearswap (Debug Mode): Buff Change '..tostring(val1)..' '..tostring(val2)) end
-		if type(user_env.buff_change) == 'function' then user_env.buff_change(val1,val2) -- User defined function to determine if sets should change following buff change
-		elseif user_env.buff_change then windower.add_to_chat(123,'GearSwap: buff_change() exists but is not a function') end
-	elseif swap_type == 'equip_command' then
-		equip(val1)
-	elseif swap_type == 'self_command' then
-		if _global.debug_mode then windower.add_to_chat(8,'Gearswap (Debug Mode): Self Command '..tostring(val1)) end
-		if type(user_env.self_command) == 'function' then user_env.self_command(val1)
-		elseif user_env.self_command then windower.add_to_chat(123,'GearSwap: self_command() exists but is not a function') end
-	elseif swap_type == 'delayed' then
-		equip(stored_equip_list)
-	end
-	
-	if player.race == 'Precomposed NPC' then
-		-- Short circuit the routine and get out if there's no swapping to be done because the user is a monster.
-		send_check(true)
-		return
-	end
-	
---	print_set(equip_list,'Debugging')
-
-	for i,v in pairs(equip_list) do
-		if not slot_map[i] then
-			if debugmode then
-				windower.add_to_chat(8,'GearSwap (Debug Mode): Attempting to equip an item in an unrecognized slot ('..tostring(i)..')')
-			end
-			equip_list[i] = nil
-		end
-	end
-	
-	local equip_next = {}
-	-- Need to make sure the item isn't being traded or synthesized.
-	equip_next = to_id_set(items.inventory,equip_list) -- Translates the equip_list from the player (i=slot name, v=item name) into a table with i=slot id and v=inventory id.
-	equip_next = eliminate_redundant(cur_equip,equip_next) -- Eliminate the equip commands for items that are already equipped
-	
-	if _global.show_swaps and table.length(equip_next)>0 then
-		local tempset = to_names_set(equip_next,items.inventory)
-		print_set(tempset,swap_type)
-	end
-	
-	local failure_reason
-	for i,v in pairs(player.buffs) do
-		if v==14 or v == 17 then
-			failure_reason = 'Charmed'
-		elseif v == 0 then
-			failure_reason = 'KOed'
-		end
-		if _global.debug_mode and failure_reason then
-			windower.add_to_chat(8,'Gearswap (Debug Mode): Cannot change gear right now: '..failure_reason)
-		end
-	end
-	
-	
-	if not failure_reason then
-		for _,i in ipairs(equip_order) do
-			if debugging >= 2 and equip_next[i] then
-				local out_str = 'Order: '..tostring(_)..'  Slot ID: '..tostring(i)
-				if equip_next[i] ~= 0 then
-					out_str = out_str..'  Item: '..tostring(r_items[items.inventory[equip_next[i]].id][language..'_log'])
-				else
-					out_str = out_str..'  Emptying slot'
-				end
-				windower.add_to_chat(8,'Gearswap (Debugging): '..out_str)
-			elseif equip_next[i] and not disable_table[i] and not encumbrance_table[i] then
-				windower.ffxi.set_equip(equip_next[i],i)
-				sent_out_equip[i] = equip_next[i] -- re-make the equip_next table with the name sent_out_equip as the equipment is sent out.
-			elseif equip_next[i] then --and not disable_table[i] then
-				not_sent_out_equip[i] = equip_next[i]
-			end
-		end
-	elseif logging then
-		logit(logfile,'\n\n'..tostring(os.clock)..'(69) failure_reason: '..tostring(failure_reason))
-	end
-	if swap_type == 'precast' then send_check(_global.force_send) end
+-----------------------------------------------------------------------------------
+--Name: check_wearable(item_id)
+--Args:
+---- item_id - Item ID to be examined
+-----------------------------------------------------------------------------------
+--Returns:
+---- boolean indicating whether the given piece of gear can be worn or not
+----    Checks for main job / level and race
+-----------------------------------------------------------------------------------
+function check_wearable(item_id)
+    if not item_id or item_id == 0 then -- 0 codes for an empty slot, but Arcon will probably make it nil at some point
+    elseif not res.items[item_id] then
+        msg.debugging("Item "..item_id.." has not been added to resources yet.")
+    elseif not res.items[item_id].jobs then -- Make sure item can be equipped by specific jobs (unlike pearlsacks).
+        --msg.debugging('GearSwap (Debug Mode): Item '..(res.items[item_id][language] or item_id)..' does not have a jobs field in the resources.')
+    else
+        return (res.items[item_id].jobs[player.main_job_id]) and (res.items[item_id].level<=player.jobs[res.jobs[player.main_job_id].ens]) and (res.items[item_id].races[player.race_id]) and
+            (player.superior_level >= (res.items[item_id].superior_level or 0))
+    end
+    return false
 end
 
-function to_id_set(inventory,equip_list)
-	local ret_list = {}
-	
-	for n,m in pairs(inventory) do
-		if m.id and m.id ~= 0 then -- 0 codes for an empty slot, but Arcon will probably make it nil at some point
-			if (m.flags == 0 or m.flags == 5) and r_items[m.id].jobs then -- Make sure the item isn't being bazaared, isn't already equipped, and can be equipped by specific jobs (unlike pearlsacks).
-				if get_wearable(jobs[player.main_job],r_items[m.id].jobs) and (r_items[m.id].level<=player.main_job_level) and get_wearable(dat_races[player.race],r_items[m.id].races) then
-					for i,v in pairs(equip_list) do
-						local name,order
-						local extgoal = {}
-						if type(v) == 'table' and v == empty then
-							name = empty
-						elseif type(v) == 'table' and v.name then
-								name = v.name
-								if v.augments then
-									for n,m in pairs(v.augments) do
-										extgoal[n] = augment_to_extdata(m)
-									end
-								end
-								order = v.order
-						elseif type(v) == 'string' then
-							name = v
-						end
-						-- v can also be a table (that doesn't contain a "name" property) or a number, which are both cases that should not generate any kind of equipment changing.
-						-- Hence the "and name" below.
-						if not ret_list[slot_map[i]] and name then
-							if type(name) == 'table' and name == empty then
-								ret_list[slot_map[i]] = 0
-								reorder(order,i)
-							elseif (r_items[m['id']][language..'_log']:lower() == name:lower() or r_items[m['id']][language]:lower() == name:lower()) and get_wearable(dat_slots[slot_map[i]],r_items[m.id].slots) then
-								if extgoal[1] then
-									local count = 0
-									for o,q in pairs(extgoal) do
-										if m.extdata:sub(3,4) == q or m.extdata:sub(5,6) == q or m.extdata:sub(7,8) == q then
-											count = count +1
-										end
-									end
-									if count == #extgoal then
-										equip_list[i] = ''
-										ret_list[slot_map[i]] = m.slot_id
-										reorder(order,i)
-										break
-									end
-								else
-									equip_list[i] = ''
-									ret_list[slot_map[i]] = m.slot_id
-										reorder(order,i)
-									break
-								end
-							elseif (r_items[m.id][language..'_log']:lower() == name:lower() or r_items[m.id][language]:lower() == name:lower()) and not get_wearable(dat_slots[slot_map[i]],r_items[m.id].slots) then
-								equip_list[i] = name..' (cannot be worn in this slot)'
-							end
-						end
-					end
-				else
-					for i,v in pairs(equip_list) do
-						local name
-						if type(v) == 'table' and v~=empty then
-							name = v.name
-						elseif type(v) == 'string' then
-							name = v
-						end
-						if v == empty then
-						elseif not name then
-							windower.add_to_chat(123,'Gearswap: Invalid name found. ('..tostring(v)..')')
-						elseif r_items[m['id']][language..'_log']:lower() == name:lower() or r_items[m['id']][language]:lower() == name:lower() then
-							if not get_wearable(jobs[player.main_job],tonumber('0x'..r_items[m.id].jobs)) then
-								equip_list[i] = name..' (cannot be worn by this job)'
-							elseif not (tonumber(r_items[m.id].level)<=player.main_job_level) then
-								equip_list[i] = name..' (job level is too low)'
-							elseif not get_wearable(dat_races[player.race],tonumber('0x'..r_items[m.id].races)) then
-								equip_list[i] = name..' (cannot be worn by your race)'
-							elseif not get_wearable(slot_map[i],tonumber('0x'..r_items[m.id].slots)) then
-								equip_list[i] = name..' (cannot be worn in this slot)'
-							end
-							break
-						end
-					end
-				end
-			elseif m.flags > 0 then
-				for i,v in pairs(equip_list) do
-					local name
-					if type(v) == 'table' then
-						name = v.name
-					elseif type(v) == 'string' then
-						name = v
-					end
-					if name then -- If "name" isn't a piece of gear, then it won't have a valid value at this point and should be ignored.
-						if r_items[m.id][language..'_log']:lower() == name:lower() or r_items[m.id][language]:lower() == name:lower() then
-							if m.flags == 5 then
-								equip_list[i] = ''
-							elseif m.flags == 25 then
-								equip_list[i] = name..' (bazaared)'
-							end
-							break
-						end
-					end
-				end
-			end
-		end
-	end
-	
-	if _global.debug_mode then
-		for i,v in pairs(equip_list) do
-			if type(v) == 'string' and v ~= 'empty' and v~='' then
-				windower.add_to_chat(8,'GearSwap (Debug Mode): Unhandled slot '..i..' - '..v)
-			end
-		end
-	end
-	
-	return ret_list
+-----------------------------------------------------------------------------------
+--Name: name_match(item_id,name)
+--Args:
+---- item_id - Item ID to be compared
+---- name - Name to be compared
+-----------------------------------------------------------------------------------
+--Returns:
+---- boolean indicating whether the name matches the resources entry for the itemID
+-----------------------------------------------------------------------------------
+function name_match(item_id,name)
+    if res.items[item_id] then
+        return (res.items[item_id][language..'_log']:lower() == name:lower() or res.items[item_id][language]:lower() == name:lower())
+    else
+        return false
+    end
 end
 
-function reorder(order,i)
-	if order and order < 17 and order > 0 then
-		local temp_order
-		for o,q in pairs(equip_order) do
-			if q == slot_map[i] then
-				temp_order = o -- o is the current slot of the item being redefined.
-				break
-			end
-		end
-		equip_order[temp_order] = equip_order[order]
-		equip_order[order] = slot_map[i]
-	elseif order then
-		windower.add_to_chat(123,'Gearswap: Invalid order given')
-	end
+-----------------------------------------------------------------------------------
+--Name: expand_entry(v)
+--Args:
+---- entry - Table or string ostensibly from an equipment set
+-----------------------------------------------------------------------------------
+--Returns:
+---- name - Name of the current piece of equipment
+---- priority - Priority of the current piece as defined in the advanced table
+---- augments - Augments for the current piece as defined in the advanced table
+-----------------------------------------------------------------------------------
+function expand_entry(entry)
+    if not entry then
+        return
+    end
+    local augments,name,priority,bag
+    if type(entry) == 'table' and entry == empty then
+        name = empty
+    elseif type(entry) == 'table' and entry.name and type(entry.name) == 'string' then
+        name = entry.name
+        priority = entry.priority
+        if entry.augments then
+            augments = entry.augments
+        elseif entry.augment then
+            augments = {entry.augment}
+        end
+        if entry.bag and type(entry.bag) == 'string' then
+            local bag_list = {inventory = 0, wardrobe = 8}
+            bag = bag_list[entry.bag:lower()]
+        end
+    elseif type(entry) == 'string' and entry ~= '' then
+        name = entry
+    end
+    return name,priority,augments,bag -- all nil if they don't exist
 end
 
-function eliminate_redundant(current_gear,equip_next) -- Eliminates gear you already wear from the table
-	for i,v in pairs(current_gear) do
-		if v == 0 and equip_next[slot_map[i]] == 0 then
-			equip_next[slot_map[i]] = nil
-		else
-			for n,m in pairs(equip_next) do
-				if v==m and v~=0 then
-					equip_next[n] = nil
-				end
-			end
-		end
-	end
-	return equip_next
-end
-
-function to_names_set(id_id,inventory)
-	local equip_package = {}
-	for i,v in pairs(id_id) do
-		if v~=0 then
-			if inventory[v].id == 0 then
-				equip_package[i]=''
-			elseif type(i) ~= 'string' then
-				equip_package[default_slot_map[i]] = r_items[inventory[v].id][language]
-			else
-				equip_package[i]=r_items[inventory[v].id][language]
-			end
-		else
-			equip_package[i]='empty'
-		end
-	end
-	
-	return equip_package
-end
-
-function send_check(val)
-	if not _global.cancel_spell then
---		print('arg1: '..tostring(val and storedcommand)..'  arg2: '..tostring(storedcommand)..' '..tostring(table.length(sent_out_equip))..'  arg3: '..tostring(storedcommand and not _global.verify_equip))
-		if (val and storedcommand) or (storedcommand and table.length(sent_out_equip) == 0) or (storedcommand and not _global.verify_equip) then
-			local assemblecommand
-			if not _global.cast_delay or _global.cast_delay == 0 then
-				assemblecommand = '@input /raw '..storedcommand.._global.storedtarget
-				if debugging>=2 then windower.add_to_chat(5,'Undelayed: '..assemblecommand) end
-			else
-				assemblecommand = '@wait '.._global.cast_delay..';input /raw '..storedcommand.._global.storedtarget
-				if debugging>=2 then windower.add_to_chat(5,'Delayed: '..assemblecommand) end
-				_global.cast_delay = nil
-				user_env._global.cast_delay = nil
-			end
-			user_env.storedcommand = nil
-			user_env._global.storedtarget = nil
-			user_env._global.verify_equip = false
-			user_env._global.force_send = false
-			storedcommand = nil
-			_global.storedtarget = nil
-			_global.verify_equip = false
-			_global.force_send = false
-			action_sent = true
-			if logging then logit(logfile,'Command Sent: '..assemblecommand..'\n') end
-			windower.send_command(assemblecommand)
-		end
-	elseif _global.cancel_spell then
-		if debugging>=2 then windower.add_to_chat(5,'Canceled.') end
-		user_env.storedcommand = nil
-		user_env._global.storedtarget = nil
-		user_env._global.cast_delay = nil
-		user_env._global.verify_equip = false
-		user_env._global.force_send = false
-		user_env._global.cancel_spell = false
-		_global.cancel_spell = false
-		storedcommand = nil
-		_global.storedtarget = nil
-		_global.verify_equip = false
-		_global.cast_delay = nil
-		_global.force_send = false
-		action_sent = true
-	end
-end
-
-function unify_slots(equipment)
-	local unified = {}
-	for i,v in pairs(equipment) do
-		if slot_map[i] == 11 then
-			unified['left_ear'] = v
-		elseif slot_map[i] == 12 then
-			unified['right_ear'] = v
-		elseif slot_map[i] == 13 then
-			unified['left_ring'] = v
-		elseif slot_map[i] == 14 then
-			unified['right_ring'] = v
-		else
-			unified[i] = v
-		end
-	end
-	return unified
+-----------------------------------------------------------------------------------
+--Name: unpack_equip_list(inventory,equip_list)
+--Args:
+---- inventory - Current inventory (potentially avoids a get_items() call)
+---- equip_list - Keys are standard slot names, values are item names.
+-----------------------------------------------------------------------------------
+--Returns:
+---- Table with keys that are slot numbers with values that are inventory slot #s.
+-----------------------------------------------------------------------------------
+function unpack_equip_list(equip_list)
+    local ret_list = {}
+    local error_list = {}
+    local priorities = Priorities:new()
+    for slot_id,slot_name in pairs(default_slot_map) do
+        local name,priority,extgoal_1,extgoal_2 = expand_entry(equip_list[slot_name])
+        priorities[slot_id] = priority
+        if name == empty then
+            ret_list[slot_id] = {bag_id=0,slot=empty}
+            equip_list[slot_name] = nil
+        end
+    end
+    
+    local inventories = {[0]=items.inventory,[8]=items.wardrobe}
+    
+    for bag_id,inventory in pairs(inventories) do
+        for _,item_tab in ipairs(inventory) do
+            if type(item_tab) == 'table' and check_wearable(item_tab.id) then
+                if item_tab.status == 0 or item_tab.status == 5 then -- Make sure the item is either equipped or not otherwise committed. eliminate_redundant will take care of the already-equipped gear.
+                    for slot_id,slot_name in pairs(default_slot_map) do
+                        -- equip_list[slot_name] can also be a table (that doesn't contain a "name" property) or a number, which are both cases that should not generate any kind of equipment changing.
+                        -- Hence the "and name" below.
+                        
+                        if not ret_list[slot_id] and equip_list[slot_name] then 
+                            local name,priority,augments,bag = expand_entry(equip_list[slot_name])
+                            
+                            if (not bag or bag == bag_id) and name and name_match(item_tab.id,name) then
+                                if res.items[item_tab.id].slots[slot_id] then
+                                    if augments and #augments ~=0 then
+                                        if extdata.compare_augments(augments,extdata.decode(item_tab).augments) then
+                                            equip_list[slot_name] = nil
+                                            ret_list[slot_id] = {bag_id=bag_id,slot=item_tab.slot}
+                                            break
+                                        end
+                                    else
+                                        equip_list[slot_name] = nil
+                                        ret_list[slot_id] = {bag_id=bag_id,slot=item_tab.slot}
+                                        break
+                                    end
+                                else
+                                    equip_list[slot_name] = nil
+                                    error_list[slot_name] = name..' (cannot be worn in this slot)'
+                                    break
+                                end
+                            end
+                        end
+                    end
+                elseif item_tab.status > 0 then
+                    for __,slot_name in pairs(default_slot_map) do
+                        local name = expand_entry(equip_list[slot_name])
+                        if name and name ~= empty then -- If "name" isn't a piece of gear, then it won't have a valid value at this point and should be ignored.
+                            if name_match(item_tab.id,name) then
+                                if item_tab.status == 5 then
+                                    error_list[slot_name] = name..' (equipped)'
+                                elseif item_tab.status == 25 then
+                                    error_list[slot_name] = name..' (bazaared)'
+                                else
+                                    error_list[slot_name] = name..' (status unknown: '..item_tab.status..' )'
+                                end
+                                break
+                            end
+                        end
+                    end
+                end
+            else
+                for __,slot_name in pairs(default_slot_map) do
+                    local name = expand_entry(equip_list[slot_name])
+                    if name == empty then
+                    elseif name_match(item_id,name) then
+                        if not res.items[item_tab.id].jobs[player.main_job_id] then
+                            equip_list[slot_name] = nil
+                            error_list[slot_name] = name..' (cannot be worn by this job)'
+                        elseif not (res.items[item_tab.id].level<=player.jobs[player.main_job]) then
+                            equip_list[slot_name] = nil
+                            error_list[slot_name] = name..' (job level is too low)'
+                        elseif not res.items[item_tab.id].races[player.race_id] then
+                            equip_list[slot_name] = nil
+                            error_list[slot_name] = name..' (cannot be worn by your race)'
+                        end
+                        break
+                    end
+                end
+            end
+        end
+    end
+    
+    if _settings.debug_mode and table.length(error_list) > 0 then
+        print_set(error_list,'Debug Mode (error list)')
+    end
+    if _settings.debug_mode and table.length(equip_list) > 0 then
+        print_set(equip_list,'Debug Mode (gear not equipped)')
+    end
+    
+    return ret_list,priorities
 end
 
 
-function get_wearable(player_val,val)
-	if player_val then
-		return ((val%(player_val*2))/player_val >= 1) -- Cut off the bits above it with modulus, then cut off the bits below it with division and >= 1
-	else
-		return false -- In cases where the provided playervalue is nil, just return false.
-	end
+-----------------------------------------------------------------------------------
+--Name: eliminate_redundant(current_gear,equip_next)
+--Args:
+---- current_gear - Mapping of currently worn equipment
+---- equip_next   - Mapping of equipment that you want to equip
+-----------------------------------------------------------------------------------
+--Returns:
+---- Set with all duplicate entries eliminated.
+---- empty tables are processed separately, because an unlimited number can be equipped.
+-----------------------------------------------------------------------------------
+function eliminate_redundant(current_gear,equip_next)
+    for eq_slot,cur_item in pairs(current_gear) do
+        if cur_item.slot == empty then
+            if equip_next[slot_map[eq_slot]] and equip_next[slot_map[eq_slot]].slot == empty then
+                equip_next[slot_map[eq_slot]] = nil
+            end
+        else
+            for n,m in pairs(equip_next) do
+                if m.slot ~= empty and cur_item.bag_id == m.bag_id and cur_item.slot==m.slot then
+                    -- If it is already equipped somewhere else, eliminate it.
+                    -- Could add more complicated handling here to control the order of equipped
+                    -- gear and allow people to do things like swap fingers for rings.
+                    equip_next[n] = nil
+                end
+            end
+        end
+    end
+    return equip_next
+end
+
+
+-----------------------------------------------------------------------------------
+--Name: to_names_set(equipment)
+--Args:
+---- equipment - Mapping of equipment slot ID or slot name to a table containing
+----   bag_id and inventory slot ID. If already indexed to a number, treat it as a slot index.
+----   Otherwise, damn the torpedoes and tostring it.
+-----------------------------------------------------------------------------------
+--Returns:
+---- Set with a mapping of slot name to equipment name.
+---- 'empty' is used as a replacement for the empty table.
+-----------------------------------------------------------------------------------
+function to_names_set(equipment)
+    local equip_package = {}
+    
+    for ind,cur_item in pairs(equipment) do
+        local name = 'empty'
+        if type(cur_item) == 'table' and cur_item.slot ~= empty then
+            if items[to_windower_api(res.bags[cur_item.bag_id].english)][cur_item.slot].id == 0 then return {} end
+            -- refresh_player() can run after equip packets arrive but before the item array is fully loaded,
+            -- which results in the id still being the initialization value.
+            name = res.items[items[to_windower_api(res.bags[cur_item.bag_id].english)][cur_item.slot].id][language]
+        end
+        
+        if tonumber(ind) and ind >= 0 and ind <= 15 and math.floor(ind) == ind then
+            equip_package[toslotname(ind)] = name
+        else
+            equip_package[tostring(ind)] = name
+        end
+    end
+
+    return equip_package
+end
+
+
+-----------------------------------------------------------------------------------
+--Name: equip_piece(eq_slot_id,bag_id,inv_slot_id)
+--Desc: Cleans up the global table and leaves equip_sets properly.
+--Args:
+---- eq_slot_id - Equipment Slot ID
+---- bag_id - Bag ID of the item to be equipped
+---- inv_slot_id - Inventory Slot ID of the item to be equipped
+-----------------------------------------------------------------------------------
+--Returns:
+---- none
+-----------------------------------------------------------------------------------
+function equip_piece(eq_slot_id,bag_id,inv_slot_id)
+    -- Many complicated, wow!
+    local cur_eq_tab = items.equipment[toslotname(eq_slot_id)]
+    
+    if cur_eq_tab.slot ~= empty then
+        items[to_windower_api(res.bags[cur_eq_tab.bag_id].english)][cur_eq_tab.slot].status = 0
+    end
+    
+    if inv_slot_id ~= empty then
+        items.equipment[toslotname(eq_slot_id)] = {slot=inv_slot_id,bag_id=bag_id}
+        items[to_windower_api(res.bags[bag_id].english)][inv_slot_id].status = 5
+        return string.char(inv_slot_id,eq_slot_id,bag_id,0)
+    else
+        items.equipment[toslotname(eq_slot_id)] = {slot=empty,bag_id=0}
+        return string.char(0,eq_slot_id,0,0)
+    end
 end

@@ -28,74 +28,122 @@
 -- Target Processing --
 
 function valid_target(targ)
-	if not spelltarget then spelltarget = {} end
-	
-	local spell_targ
-	if st_targs:contains(targ) then
-		st_flag = true
-		spell_targ = nil
-	elseif st_flag then
-		st_flag = false
-		spell_targ = nil
-	elseif pass_through_targs:contains(targ) then
-		local j = windower.ffxi.get_mob_by_target(targ)
-		
-		if j == nil then
-			table.reassign(spelltarget,target)
-		else
-			table.reassign(spelltarget,target_type(j))
-		end
-		spelltarget.raw = targ
-		return targ
-	elseif targ then
-		local mob_array = windower.ffxi.get_mob_array()
-		local lower_targ = targ:lower()
-		for i,v in pairs(mob_array) do
-			if v['name']:lower()==lower_targ and not v['is_npc'] then
-				spell_targ = targ
-				table.reassign(spelltarget,target_type(v))
-				spelltarget.raw = targ
-			elseif tonumber(targ) == v['id'] then
-				spell_targ = '<lastst>'
-				table.reassign(spelltarget,target_type(v))
-				spelltarget.raw = '<lastst>'
-			end
-		end
-	end
-	return spell_targ
+    local spelltarget = {}
+    
+    local spell_targ
+    if pass_through_targs[targ] then
+        local j = windower.ffxi.get_mob_by_target(targ)
+        
+        if j then spelltarget = target_complete(j) end
+        
+        spelltarget.raw = targ
+        return targ, spelltarget
+    elseif targ and tonumber(targ) and tonumber(targ) > 255 then
+        local j = windower.ffxi.get_mob_by_id(tonumber(targ))
+        
+        if j then spelltarget = target_complete(j) end
+        
+        spelltarget.raw = targ
+        return targ, spelltarget
+    elseif targ and not tonumber(targ) and targ ~= '' then
+        local mob_array = windower.ffxi.get_mob_array()
+        for i,v in pairs(mob_array) do
+            if v.name:lower()==targ:lower() and (not v.is_npc or v.spawn_type == 14) then
+                spelltarget = target_complete(v)
+                spelltarget.raw = targ
+                return targ, spelltarget
+            end
+        end
+    end
+    return false, false
 end
 
-function target_type(mob_table)
-	if mob_table == nil then return end
-	
-	
-	------------------------------- Should consider moving the partycount part of this code to refresh_player() ----------------------------------
-	mob_table.isallymember = false
-	if not mob_table.id then
-		mob_table.type = 'NONE'
-	else
-		local j = windower.ffxi.get_party()
-		
-		for i,v in pairs(j) do
-			if v['mob'] then
-				if v['mob']['id'] == mob_table['id'] then
-					mob_table.isallymember = true
-				end
-			end
-		end
-	------------------------------------------------------------------------------------------------------------------------------------
-		
-		if player['id'] == mob_table['id'] then
-			mob_table.type = 'SELF'
-		elseif mob_table['is_npc'] then
-			if mob_table['id']%4096>2047 then
-				mob_table.type = 'NPC'
-			else
-				mob_table.type = 'MONSTER'
-			end
-		else
-			mob_table.type = 'PLAYER'
-		end
-	end
-	return mob_table
+function target_complete(mob_table)
+    if mob_table == nil then return {type = 'NONE'} end
+    
+    ------------------------------- Should consider moving the partycount part of this code to refresh_player() ----------------------------------
+    mob_table.isallymember = false
+    if not mob_table.id then
+        mob_table.type = 'NONE'
+    else
+        local j = windower.ffxi.get_party()
+        
+        for i,v in pairs(j) do
+            if type(v) == 'table' and v.mob then
+                if v.mob.id == mob_table.id then
+                    mob_table.isallymember = true
+                    if i:sub(1,1) == 'p' then
+                        mob_table.ispartymember = true
+                    end
+                end
+            end
+        end
+    ------------------------------------------------------------------------------------------------------------------------------------
+        
+        if player.id == mob_table.id then
+            mob_table.type = 'SELF'
+        elseif mob_table.is_npc then
+            if mob_table.id%4096>2047 then
+                mob_table.type = 'NPC'
+            else
+                mob_table.type = 'MONSTER'
+            end
+        else
+            mob_table.type = 'PLAYER'
+        end
+    end
+    
+    if mob_table.race then 
+        mob_table.race_id = mob_table.race
+        if res.races[mob_table.race] then
+            mob_table.race = res.races[mob_table.race][language]
+        else
+            mob_table.race = 'Unknown'
+        end
+    end
+    if mob_table.status then
+        mob_table.status_id = mob_table.status
+        if res.statuses[mob_table.status] then
+            mob_table.status = res.statuses[mob_table.status].english
+        else
+            mob_table.status = 'Unknown'
+        end
+    end
+    if mob_table.distance then
+        mob_table.distance = math.sqrt(mob_table.distance)
+    end
+    return mob_table
+end
+
+function target_type_check(spell)
+    --[[ Spawn type mapping:
+        1 = Other players
+        2 = Town NPCs, AH counters, Logging Points, etc.
+        Bit 1 = 1 PC
+        Bit 2 = 2 NPC (not attackable)
+        Bit 3 = 4 Party Member
+        Bit 4 = 8 Ally
+        Bit 5 = 16 Enemy
+        Bit 6 = 32 Door (Environment)
+        13 = Self
+        14 = Trust NPC in party
+        16 = Monsters
+        34 = Some doors
+    ]]
+    
+    local temptype = spell.target.type
+    if temptype ~= 'NPC' then
+        temptype = temptype:lower():ucfirst()
+    end
+    
+    if temptype == 'Player' and spell.target.hpp == 0 then
+        temptype = 'Corpse'
+    elseif temptype == 'Player' and spell.target.ispartymember then
+        temptype = 'Party'
+    elseif temptype == 'Player' and spell.target.isallymember then
+        temptype = 'Ally'
+    end
+    
+    if spell.targets[temptype] then return true end
+    return false
 end

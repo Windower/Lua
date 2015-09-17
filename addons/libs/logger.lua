@@ -4,9 +4,10 @@ This library provides a set of functions to aid in debugging.
 
 _libs = _libs or {}
 _libs.logger = true
-_libs.stringhelper = _libs.stringhelper or require('stringhelper')
-chat = require('chat')
-_libs.chat = _libs.chat or (chat ~= nil)
+_libs.strings = _libs.strings or require('strings')
+_libs.chat = _libs.chat or require('chat')
+
+_raw = _raw or {}
 
 local logger = {}
 logger.defaults = {}
@@ -32,12 +33,14 @@ local captionlog
 function arrstring(...)
     local str = ''
     local args = {...}
+
     for i = 1, select('#', ...) do
         if i > 1 then
             str = str..' '
         end
-        str = str..tostring(args[i])
+        str = str .. tostring(args[i])
     end
+
     return str
 end
 
@@ -46,11 +49,11 @@ function captionlog(msg, msgcolor, ...)
     local caption = table.concat({_addon and _addon.name, msg}, ' ')
 
     if #caption > 0 then
-        if logger.settings.logtofile == true then
-            flog(nil, caption..':', ...)
+        if logger.settings.logtofile then
+            flog(nil, caption .. ':', ...)
             return
         end
-        caption = (caption..':'):color(msgcolor)..' '
+        caption = (caption .. ':'):color(msgcolor) .. ' '
     end
 
     local str = ''
@@ -61,7 +64,7 @@ function captionlog(msg, msgcolor, ...)
     end
 
     for _, line in ipairs(str:split('\n')) do
-        windower.add_to_chat(logger.settings.logcolor, caption..line..chat.colorcontrols.reset)
+        windower.add_to_chat(logger.settings.logcolor, caption .. windower.to_shift_jis(line) .. _libs.chat.controls.reset)
     end
 end
 
@@ -69,6 +72,7 @@ function log(...)
     captionlog(nil, logger.settings.logcolor, ...)
 end
 
+_raw.error = error
 function error(...)
     captionlog('Error', logger.settings.errorcolor, ...)
 end
@@ -94,7 +98,7 @@ function flog(filename, ...)
             error('File error:', 'Unknown error.')
         end
     else
-        fh:write(os.date('%Y-%m-%d %H:%M:%S')..'| '..arrstring(...)..'\n')
+        fh:write(os.date('%Y-%m-%d %H:%M:%S') .. '| ' .. arrstring(...) .. '\n')
         fh:close()
     end
 end
@@ -136,7 +140,7 @@ function table.tostring(t)
             end
         else
             if type(val) == 'string' then
-                valstr = '"'..val..'"'
+                valstr = '"' .. val .. '"'
             else
                 valstr = tostring(val)
             end
@@ -144,19 +148,19 @@ function table.tostring(t)
 
         -- Append to the string.
         if tonumber(key) then
-            tstr = tstr..valstr
+            tstr = tstr .. valstr
         else
-            tstr = tstr..tostring(key)..'='..valstr
+            tstr = tstr .. tostring(key) .. '=' .. valstr
         end
 
         -- Add comma, unless it's the last value.
         if next(kt, i) ~= nil then
-            tstr = tstr..', '
+            tstr = tstr .. ', '
         end
     end
 
     -- Output the result, enclosed in braces.
-    return '{'..tstr..'}'
+    return '{' .. tstr .. '}'
 end
 
 _meta = _meta or {}
@@ -193,11 +197,22 @@ function table.tovstring(t, keys, indentlevel)
         kt[k] = key
     end
     table.sort(kt, function(x, y)
-        return type(x) ~= type(y) and type(x) == 'number' or x < y
+        return type(x) ~= type(y) and type(x) == 'number' or type(x) == 'number' and type(y) == 'number' and x < y
     end)
 
     for i, key in pairs(kt) do
         val = t[key]
+        
+        local function sanitize(val)
+            local ret
+            if type(val) == 'string' then
+                ret = '"' .. val:gsub('"','\\"') .. '"'
+            else
+                ret = tostring(val)
+            end
+            return ret
+        end
+        
         -- Check for nested tables
         if type(val) == 'table' then
             if val.tovstring then
@@ -206,28 +221,24 @@ function table.tovstring(t, keys, indentlevel)
                 valstr = table.tovstring(val, keys, indentlevel + 1)
             end
         else
-            if type(val) == 'string' then
-                valstr = '"'..val..'"'
-            else
-                valstr = tostring(val)
-            end
+            valstr = sanitize(val)
         end
 
         -- Append one line with indent.
         if not keys and tonumber(key) then
-            tstr = tstr..indent..'    '..valstr
+            tstr = tstr .. indent .. '    ' .. '[' .. sanitize(key) .. ']=' .. valstr
         else
-            tstr = tstr..indent..'    '..tostring(key)..'='..valstr
+            tstr = tstr .. indent .. '    ' .. '[' .. sanitize(key) .. ']=' .. valstr
         end
 
         -- Add comma, unless it's the last value.
         if next(kt, i) ~= nil then
-            tstr = tstr..', '
+            tstr = tstr .. ', '
         end
 
-        tstr = tstr..'\n'
+        tstr = tstr .. '\n'
     end
-    tstr = tstr..indent..'}'
+    tstr = tstr .. indent .. '}'
 
     return tstr
 end
@@ -249,8 +260,10 @@ local config = require('config')
 
 logger.settings = config.load('../libs/logger.xml', logger.defaults)
 
+return logger
+
 --[[
-Copyright (c) 2013, Windower
+Copyright © 2013-2014, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

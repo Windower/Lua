@@ -24,674 +24,598 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+_addon.name = 'GearSwap'
+_addon.version = '0.904'
+_addon.author = 'Byrth'
+_addon.commands = {'gs','gearswap'}
+
+if windower.file_exists(windower.addon_path..'data/bootstrap.lua') then
+    debugging = {windower_debug = true,command_registry = false,general=false,logging=false}
+else
+    debugging = {}
+end
+
+__raw = {lower = string.lower, upper = string.upper, debug=windower.debug,text={create=windower.text.create,
+    delete=windower.text.delete,registry = {}},prim={create=windower.prim.create,delete=windower.prim.delete,registry={}}}
+
 
 language = 'english'
-file = require 'filehelper'
-require 'stringhelper'
+file = require 'files'
+require 'strings'
+require 'tables'
+require 'logger'
+-- Restore the normal error function (logger changes it)
+error = _raw.error
+
+require 'lists'
+require 'sets'
+
+
+windower.text.create = function (str)
+    if __raw.text.registry[str] then
+        msg.addon_msg(123,'Text object cannot be created because it already exists.')
+    else
+        __raw.text.registry[str] = true
+        __raw.text.create(str)
+    end
+end
+
+windower.text.delete = function (str)
+    if __raw.text.registry[str] then
+        local deleted = false
+        if windower.text.saved_texts then
+            for i,v in pairs(windower.text.saved_texts) do
+                if v._name == str then
+                    __raw.text.registry[str] = nil
+                    windower.text.saved_texts[i]:destroy()
+                    deleted = true
+                    break
+                end
+            end
+        end
+        if not deleted then
+            __raw.text.registry[str] = nil
+            __raw.text.delete(str)
+        end
+    else
+        __raw.text.delete(str)
+    end
+end
+
+windower.prim.create = function (str)
+    if __raw.prim.registry[str] then
+        msg.addon_msg(123,'Primitive cannot be created because it already exists.')
+    else
+        __raw.prim.registry[str] = true
+        __raw.prim.create(str)
+    end
+end
+
+windower.prim.delete = function (str)
+    if __raw.prim.registry[str] then
+        __raw.prim.registry[str] = nil
+        __raw.prim.delete(str)
+    else
+        __raw.prim.delete(str)
+    end
+end
+
+texts = require 'texts'
+require 'pack'
+bit = require 'bit'
+socket = require 'socket'
+mime = require 'mime'
+res = require 'resources'
+extdata = require 'extdata'
 require 'helper_functions'
-require 'tablehelper'
+require 'actions'
+
+-- Resources Checks
+if res.items and res.bags and res.slots and res.statuses and res.jobs and res.elements and res.skills and res.buffs and res.spells and res.job_abilities and res.weapon_skills and res.monster_abilities and res.action_messages and res.skills and res.monstrosity and res.weather and res.moon_phases and res.races then
+else
+    error('Missing resources!')
+end
 
 require 'statics'
 require 'equip_processing'
 require 'targets'
 require 'user_functions'
 require 'refresh'
-require 'parse_augments'
 require 'export'
 require 'validate'
-if windower.file_exists(windower.addon_path..'resources.lua') then
-    os.remove(windower.addon_path..'resources.lua',windower.addon_path..'res_bak - can delete.lua')
-end
-res = require 'resources'
-
-
-_addon.name = 'GearSwap'
-_addon.version = '0.720'
-_addon.author = 'Byrth'
-_addon.commands = {'gs','gearswap'}
+require 'flow'
+require 'triggers'
 
 windower.register_event('load',function()
-	debugging = 0
-	if debugging >= 1 then windower.debug('load') end
-	if windower.dir_exists('../addons/GearSwap/data/logs') then
-		logging = false
-		logfile = io.open('../addons/GearSwap/data/logs/NormalLog'..tostring(os.clock())..'.log','w+')
-		logit(logfile,'GearSwap LOGGER HEADER\n')
-	end
-	
-	refresh_globals()
-	_global.force_send = false
-	
-	if world.logged_in then
-		refresh_user_env()
-		if debugging >= 1 then windower.send_command('@unload spellcast;') end
-	end
+    windower.debug('load')
+    refresh_globals()
+    
+    if world.logged_in then
+        refresh_user_env()
+        if debugging.general then windower.send_command('@unload spellcast;') end
+    end
 end)
 
 windower.register_event('unload',function ()
-	if debugging >= 1 then windower.debug('unload') end
-	if logging then	logfile:close() end
+    windower.debug('unload')
+    user_pcall('file_unload')
+    if logging then    logfile:close() end
 end)
 
 windower.register_event('addon command',function (...)
-	if debugging >= 1 then windower.debug('addon command') end
-	local command = table.concat({...},' ')
-	if logging then	logit(logfile,'\n\n'..tostring(os.clock)..command) end
-	local splitup = split(command,' ')
-	if splitup[1]:lower() == 'c' then
-		if gearswap_disabled then return end
-		if splitup[2] then equip_sets('self_command',_raw.table.concat(splitup,' ',2,#splitup))
-		else
-			windower.add_to_chat(123,'GearSwap: No self command passed.')
-		end
-	elseif splitup[1]:lower() == 'equip' and not midaction then
-		if gearswap_disabled then return end
-		local set_split = split(_raw.table.concat(splitup,' ',2,#splitup):gsub('%[','%.'):gsub('[%]\']',''),'%.')
-		local n = 1
-		local tempset
-		if set_split[1] == 'sets' then tempset = user_env
-		else tempset = user_env.sets end
-		while n <= #set_split do
-			if tempset[set_split[n]] or tempset[tonumber(set_split[n])] then
-				tempset = tempset[set_split[n]] or tempset[tonumber(set_split[n])]
-				if n == #set_split then
-					equip_sets('equip_command',tempset)
-					break
-				else
-					n = n+1
-				end
-			else
-				windower.add_to_chat(123,'GearSwap: Equip command cannot be completed. That set does not exist.')
-				break
-			end
-		end
-	elseif splitup[1]:lower() == 'export' then
-		table.remove(splitup,1)
-		export_set(splitup)
-	elseif splitup[1]:lower() == 'validate' then
-		validate()
-	elseif splitup[1]:lower() == 'enable' then
-		if splitup[2] and splitup[2]:lower()=='all' then
-			enable('main','sub','range','ammo','head','neck','lear','rear','body','hands','lring','rring','back','waist','legs','feet')
-			print('Gearswap: All slots enabled.')
-		elseif splitup[2] and slot_map[splitup[2]:gsub('[^%a]',''):lower()] then
-			enable(splitup[2])
-			print('Gearswap: '..splitup[2]..' enabled.')
-		elseif gearswap_disabled then
-			gearswap_disabled = false
-			print('GearSwap: Enabled')
-		end
-	elseif splitup[1]:lower() == 'disable' then
-		if splitup[2] and splitup[2]:lower()=='all' then
-			disable('main','sub','range','ammo','head','neck','lear','rear','body','hands','lring','rring','back','waist','legs','feet')
-			print('Gearswap: All slots disabled.')
-		elseif splitup[2] and slot_map[splitup[2]:gsub('[^%a]',''):lower()] then
-			disable(splitup[2])
-			print('Gearswap: '..splitup[2]..' disabled.')
-		elseif not gearswap_disabled and not splitup[2] then
-			print('GearSwap: Disabled')
-			gearswap_disabled = true
-		end
-	elseif splitup[1]:lower() == 'reload' then
-		refresh_user_env()
-	elseif strip(splitup[1]) == 'debugmode' then
-		_global.debug_mode = not _global.debug_mode
-		print('Debug Mode set to '..tostring(_global.debug_mode)..'.')
-	elseif strip(splitup[1]) == 'showswaps' then
-		_global.show_swaps = not _global.show_swaps
-		print('Show Swaps set to '..tostring(_global.show_swaps)..'.')
-	else
-		print('command not found')
-	end
+    windower.debug('addon command')
+    logit('\n\n'..tostring(os.clock)..table.concat({...},' '))
+    local splitup = {...}
+    if not splitup[1] then return end -- handles //gs
+    
+    for i,v in pairs(splitup) do splitup[i] = windower.from_shift_jis(windower.convert_auto_trans(v)) end
+
+    local cmd = table.remove(splitup,1):lower()
+    
+    if cmd == 'c' then
+        if gearswap_disabled then return end
+        if splitup[1] then
+            refresh_globals()
+            equip_sets('self_command',nil,_raw.table.concat(splitup,' '))
+        else
+            msg.addon_msg(123,'No self command passed.')
+        end
+    elseif cmd == 'equip' then
+        if gearswap_disabled then return end
+        local key_list = parse_set_to_keys(splitup)
+        local set = get_set_from_keys(key_list)
+        if set then
+            refresh_globals()
+            equip_sets('equip_command',nil,set)
+        else
+            msg.addon_msg(123,'Equip command cannot be completed. That set does not exist.')
+        end
+    elseif cmd == 'export' then
+        export_set(splitup)
+    elseif cmd == 'validate' then
+        if user_env and user_env.sets then
+            refresh_globals()
+            validate(splitup)
+        else
+            msg.addon_msg(123,'There is nothing to validate because there is no file loaded.')
+        end
+    elseif cmd == 'l' or cmd == 'load' then
+        if splitup[1] then
+            local f_name = table.concat(splitup,' ')
+            if pathsearch({f_name}) then
+                refresh_globals()
+                command_registry = Command_Registry.new()
+                load_user_files(false,f_name)
+            else
+                msg.addon_msg(123,'File not found.')
+            end
+        else
+            msg.addon_msg(123,'No file name was provided.')
+        end
+    elseif cmd == 'enable' then
+        disenable(splitup,command_enable,'enable',false)
+    elseif cmd == 'disable' then
+        disenable(splitup,disable,'disable',true)
+    elseif cmd == 'reload' or cmd == 'r' then
+        refresh_user_env()
+    elseif strip(cmd) == 'debugmode' then
+        _settings.debug_mode = not _settings.debug_mode
+        print('GearSwap: Debug Mode set to '..tostring(_settings.debug_mode)..'.')
+    elseif strip(cmd) == 'demomode' then
+        _settings.demo_mode = not _settings.demo_mode
+        print('GearSwap: Demo Mode set to '..tostring(_settings.demo_mode)..'.')
+    elseif strip(cmd) == 'showswaps' then
+        _settings.show_swaps = not _settings.show_swaps
+        print('GearSwap: Show Swaps set to '..tostring(_settings.show_swaps)..'.')
+    elseif _settings.debug_mode and strip(cmd) == 'eval' then
+        assert(loadstring(table.concat(splitup,' ')))()
+    else
+        local handled = false
+        if not gearswap_disabled then
+            for i,v in ipairs(unhandled_command_events) do
+                handled = equip_sets(v,nil,cmd,unpack(splitup))
+                if handled then break end
+            end
+        end
+        if not handled then
+            print('GearSwap: Command not found')
+        end
+    end
 end)
 
-function sender()
-	if not action_sent then
-		print('Forcing Send')
-		if debugging >= 1 then windower.add_to_chat(123,'GearSwap: Had to force the command to send.') end
-		send_check(true)
-	end
-	force_flag = false
-	action_sent = false
+function disenable(tab,funct,functname,pol)
+    local slot_name = ''
+    local ltab = L{}
+    for i,v in pairs(tab) do
+        ltab:append(v:gsub('[^%a_%d]',''):lower())
+    end
+    if ltab:contains('all') then
+        funct('main','sub','range','ammo','head','neck','lear','rear','body','hands','lring','rring','back','waist','legs','feet')
+        print('GearSwap: All slots '..functname..'d.')
+    elseif ltab.n > 0  then
+        local found = L{}
+        local not_found = L{}
+        for slot_name in ltab:it() do
+            if slot_map[slot_name] then
+                funct(slot_name)
+                found:append(slot_name)
+            else
+                not_found:append(slot_name)
+            end
+        end
+        if found.n > 0 then
+            print('GearSwap: '..found:tostring()..' slot'..(found.n>1 and 's' or '')..' '..functname..'d.')
+        end
+        if not_found.n > 0 then
+            print('GearSwap: Unable to find slot'..(not_found.n>1 and 's' or '')..' '..not_found:tostring()..'.')
+        end
+    elseif gearswap_disabled ~= pol and not tab[2] then
+        print('GearSwap: User file '..functname..'d')
+        gearswap_disabled = pol
+    end
 end
-
-windower.register_event('outgoing text',function(original,modified)
-	if debugging >= 1 then windower.debug('outgoing text') end
-	if gearswap_disabled then return modified end
-	
-	local temp_mod = windower.convert_auto_trans(modified)
-	local splitline = split(temp_mod,' ')
-	local command = splitline[1]
-
-	local a,b,abil = string.find(temp_mod,'"(.-)"')
-	if abil then
-		abil = abil:lower()
-	elseif #splitline == 3 then
-		abil = splitline[2]:lower()
-	end
-	
-	local temptarg = valid_target(splitline[#splitline])
-	
-	if command == '/raw' then
-		return _raw.table.concat(splitline,' ',2,#splitline)
-	elseif command_list[command] and temptarg and validabils[language][abil] and not midaction then
-		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) temp_mod: '..temp_mod) end
-		
-		local r_line, s_type
-			
-		if command_list[command] == 'Magic' then
-			r_line = r_spells[validabils[language][abil:lower()]['Magic']]
-			r_line.name = r_line[language]
-			if r_line.type == 'BardSong' and r_line.casttime == 8 then
-				refresh_buff_active(windower.ffxi.get_player().buffs)
-				if buffactive.pianissimo then
-				-- Handling for the casting time reduction of Pianissimo.
-				-- Note, does not work unless the buff list has been updated.
-					r_line.casttime=4
-				end
-			elseif r_line.type == 'SummonerPact' and buffactive['astral conduit'] then
-				r_line.recast=0
-			elseif buffactive.hasso or buffactive.seigan then
-				r_line.recast=r_line.recast*1.5
-				r_line.casttime = r_line.casttime*1.5
-			end
-			s_type = 'Magic' -- command_list[r_spells[validabils[language][abil:lower()]['Magic']]['prefix']]
-		elseif command_list[command] == 'Ability' then
-			r_line = r_abilities[validabils[language][abil:lower()]['Ability']]
-			r_line.name = r_line[language]
-			s_type = 'Ability' -- command_list[r_abilities[validabils[language][abil:lower()]['Ability']]['prefix']]
-		elseif command_list[command] == 'Item' then
-			r_line = r_items[validabils[language][abil:lower()]['Item']]
-			r_line.name = r_line[language]
-			r_line.prefix = '/item'
-			r_line.type = 'Item'
-			s_type = 'Item'
-		elseif debugging then
-			print('this case should never be hit '..command)
-		end
-		
-		_global.storedtarget = temptarg
-		
-		r_line = aftercast_cost(r_line)
-		
-		storedcommand = command..' "'..r_line[language]..'" '
-		equip_sets('precast',r_line,{type=s_type})
-
-		return ''
-	elseif command_list[command] == 'Ranged Attack' and temptarg and not midaction then
-		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(93) temp_mod: '..temp_mod) end
-
-		rline = ranged_line
-		
-		_global.storedtarget = temptarg
-		
-		r_line = aftercast_cost(rline)
-			
-		storedcommand = r_line['prefix']..' '
-		equip_sets('precast',r_line,{type="Ranged Attack"})
-
-		return ''
-	elseif midaction and validabils[language][tostring(abil):lower()] then
-		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(122) Canceled: '..temp_mod) end
-		return ''
-	end
-	return modified
-end)
-
-windower.register_event('incoming text',function(original,modified,color,modifiedcolor)
-	if debugging >= 1 then windower.debug('incoming text') end
-	if gearswap_disabled then return modified, color end
-	if original == '...A command error occurred.' or original == 'You can only use that command during battle.' or original == 'You cannot use that command here.' then
-		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(130) Client canceled command detected: '..color..' '..original) end
-		if type(user_env.aftercast)=='function' then
-			equip_sets('aftercast',{name='Invalid Spell'},{type='Recast'})
-		elseif user_env.aftercast then
-			windower.add_to_chat(123,'GearSwap: aftercast() exists but is not a function')
-		end
-	end
-	return modified,modifiedcolor
-end)
 
 windower.register_event('incoming chunk',function(id,data,modified,injected,blocked)
-	if debugging >= 1 then windower.debug('incoming chunk '..id) end
+    windower.debug('incoming chunk '..id)
+    
+    if next_packet_events and next_packet_events.sequence_id ~= data:unpack('H',3) then
+        if not next_packet_events.globals_update or next_packet_events.globals_update ~= data:unpack('H',3) then
+            refresh_globals()
+            next_packet_events.globals_update = data:unpack('H',3)
+        end
+        if next_packet_events.pet_status_change then
+            if pet.isvalid then
+                equip_sets('pet_status_change',nil,next_packet_events.pet_status_change.newstatus,next_packet_events.pet_status_change.oldstatus)
+            end
+            next_packet_events.pet_status_change = nil
+        end
+        if next_packet_events.pet_change then
+            if next_packet_events.pet_change.pet then -- Losing a pet
+                equip_sets('pet_change',nil,next_packet_events.pet_change.pet,false)
+                next_packet_events.pet_change = nil
+            elseif pet.isvalid then -- Gaining a pet
+                equip_sets('pet_change',nil,pet,true)
+                next_packet_events.pet_change = nil
+            end
+        end
+        if not next_packet_events.pet_status_change and not next_packet_events.pet_change then
+            next_packet_events = nil
+        end
+    end
+    
+    if injected then
+    elseif id == 0x00A then
+        windower.debug('zone change')
+        command_registry = Command_Registry.new()
+        table.clear(not_sent_out_equip)
+        
+        player.id = data:unpack('I',0x05)
+        player.index = data:unpack('H',0x09)
+        if player.main_job_id and player.main_job_id ~= data:byte(0xB5) and player.name and player.name == data:unpack('z',0x85) then
+            windower.debug('job change on zone')
+            load_user_files(data:byte(0xB5))
+        else
+            player.name = data:unpack('z',0x85)
+        end
+        player.main_job_id = data:byte(0xB5)
+        player.sub_job_id = data:byte(0xB8)
+        player.vitals.max_hp = data:unpack('I',0xE9)
+        player.vitals.max_mp = data:unpack('I',0xED)
+        player.max_hp = data:unpack('I',0xE9)
+        player.max_mp = data:unpack('I',0xED)
+        update_job_names()
+        
+        world.zone_id = data:unpack('H',0x31)
+        _ExtraData.world.conquest = false
+        for i,v in pairs(region_to_zone_map) do
+            if v:contains(world.zone_id) then
+                _ExtraData.world.conquest = {
+                    region_id = i,
+                    region_name = res.regions[i][language],
+                    }
+                break
+            end
+        end
+        weather_update(data:byte(0x69))
+        world.logged_in = true
+        
+        _ExtraData.world.in_mog_house = data:byte(0x81) == 1
+        refresh_ffxi_info()
+    elseif id == 0x00B then
+        -- Blank temporary items when zoning.
+        items.temporary = make_inventory_table()
+    elseif id == 0x0E and pet.index and pet.index == data:unpack('H',9) and math.floor((data:byte(11)%8)/4)== 1 then
+        local oldstatus = pet.status
+        local status_id = data:byte(32)
+        -- Filter all statuses aside from Idle/Engaged/Dead/Engaged dead.
+        if status_id < 4 or status_id == 33 or status_id == 47 then
+            local newstatus = copy_entry(res.statuses[status_id])
+            if newstatus and newstatus[language] then
+                newstatus = newstatus[language]
+                if oldstatus ~= newstatus then
+                    if not next_packet_events then next_packet_events = {sequence_id = data:byte(4)*256+data:byte(3)} end
+                    next_packet_events.pet_status_change = {newstatus=newstatus,oldstatus=oldstatus}
+                end
+            end
+        end
+    elseif id == 0x01B then
+        for job_id = 1,23 do
+            player.jobs[to_windower_api(res.jobs[job_id].english)] = data:byte(job_id + 72)
+        end
+        
+        local enc = data:unpack('H',0x61)
+        local tab = {}
+        for slot_id,slot_name in pairs(default_slot_map) do
+            local tf = (((enc%(2^(slot_id+1))) / 2^slot_id) >= 1)
+            if encumbrance_table[slot_id] and not tf and not_sent_out_equip[slot_name] and not disable_table[i] then
+                tab[slot_name] = not_sent_out_equip[slot_name]
+                not_sent_out_equip[slot_name] = nil
+            end
+            if encumbrance_table[slot_id] and not tf then
+                msg.debugging("Your "..slot_name.." slot is now unlocked.")
+            end
+            encumbrance_table[slot_id] = tf
+        end
+        if table.length(tab) > 0 then
+            refresh_globals()
+            equip_sets('equip_command',nil,tab)
+        end
+    elseif id == 0x01E then
+        local bag = to_windower_compact(res.bags[data:byte(0x09)].english)
+        local slot = data:byte(0x0A)
+        local count = data:unpack('I',5)
+        if not items[bag][slot] then items[bag][slot] = make_empty_item_table(slot) end
+        items[bag][slot].count = count
+        if count == 0 then
+            items[bag][slot].id = 0
+            items[bag][slot].bazaar = 0
+            items[bag][slot].status = 0
+        end
+    elseif id == 0x01F then
+        local bag = to_windower_compact(res.bags[data:byte(0x0B)].english)
+        local slot = data:byte(0x0C)
+        if not items[bag][slot] then items[bag][slot] = make_empty_item_table(slot) end
+        items[bag][slot].id = data:unpack('H',9)
+        items[bag][slot].count = data:unpack('I',5)
+        items[bag][slot].status = data:byte(0x0D)
+    elseif id == 0x020 then
+        local bag = to_windower_compact(res.bags[data:byte(0x0F)].english)
+        local slot = data:byte(0x10)
+        if not items[bag][slot] then items[bag][slot] = make_empty_item_table(slot) end
+        items[bag][slot].id = data:unpack('H',0x0D)
+        items[bag][slot].count = data:unpack('I',5)
+        items[bag][slot].bazaar = data:unpack('I',9)
+        items[bag][slot].status = data:byte(0x11)
+        items[bag][slot].extdata = data:sub(0x12,0x29)
+        -- Did not mess with linkshell stuff
+    elseif id == 0x28 then
+        inc_action(windower.packets.parse_action(data))
+    elseif id == 0x29 then
+        if gearswap_disabled then return end
+        local arr = {}
+        arr.actor_id = data:unpack('I',0x05)
+        arr.target_id = data:unpack('I',0x09)
+        arr.param_1 = data:unpack('I',0x0D)
+        arr.param_2 = data:unpack('I',0x11)%64 -- First 6 bits
+        arr.param_3 = math.floor(data:unpack('I',0x11)/64) -- Rest
+        arr.actor_index = data:unpack('H',0x15)
+        arr.target_index = data:unpack('H',0x17)
+        arr.message_id = data:unpack('H',0x19)%32768
 
-	if id == 0x28 then
-		data = data:sub(5)
-		local act = {}
-		act.do_not_need = get_bit_packed(data,0,8)
-		act.actor_id = get_bit_packed(data,8,40)
-		act.target_count = get_bit_packed(data,40,50)
-		act.category = get_bit_packed(data,50,54)
-		act.param = get_bit_packed(data,54,70)
-		act.unknown = get_bit_packed(data,70,86)
-		act.recast = get_bit_packed(data,86,118)
-		act.targets = {}
-		local offset = 118
-		for i = 1,act.target_count do
-			act.targets[i] = {}
-			act.targets[i].id = get_bit_packed(data,offset,offset+32)
-			act.targets[i].action_count = get_bit_packed(data,offset+32,offset+36)
-			offset = offset + 36
-			act.targets[i].actions = {}
-			for n = 1,act.targets[i].action_count do
-				act.targets[i].actions[n] = {}
-				act.targets[i].actions[n].reaction = get_bit_packed(data,offset,offset+5)
-				act.targets[i].actions[n].animation = get_bit_packed(data,offset+5,offset+16)
-				act.targets[i].actions[n].effect = get_bit_packed(data,offset+16,offset+21)
-				act.targets[i].actions[n].stagger = get_bit_packed(data,offset+21,offset+27)
-				act.targets[i].actions[n].param = get_bit_packed(data,offset+27,offset+44)
-				act.targets[i].actions[n].message = get_bit_packed(data,offset+44,offset+54)
-				act.targets[i].actions[n].unknown = get_bit_packed(data,offset+54,offset+85)
-				act.targets[i].actions[n].has_add_effect = get_bit_packed(data,offset+85,offset+86)
-				offset = offset + 86
-				if act.targets[i].actions[n].has_add_effect == 1 then
-					act.targets[i].actions[n].has_add_effect = true
-					act.targets[i].actions[n].add_effect_animation = get_bit_packed(data,offset,offset+6)
-					act.targets[i].actions[n].add_effect_effect = get_bit_packed(data,offset+6,offset+10)
-					act.targets[i].actions[n].add_effect_param = get_bit_packed(data,offset+10,offset+27)
-					act.targets[i].actions[n].add_effect_message = get_bit_packed(data,offset+27,offset+37)
-					offset = offset + 37
-				else
-					act.targets[i].actions[n].has_add_effect = false
-					act.targets[i].actions[n].add_effect_animation = 0
-					act.targets[i].actions[n].add_effect_effect = 0
-					act.targets[i].actions[n].add_effect_param = 0
-					act.targets[i].actions[n].add_effect_message = 0
-				end
-				act.targets[i].actions[n].has_spike_effect = get_bit_packed(data,offset,offset+1)
-				offset = offset +1
-				if act.targets[i].actions[n].has_spike_effect == 1 then
-					act.targets[i].actions[n].has_spike_effect = true
-					act.targets[i].actions[n].spike_effect_animation = get_bit_packed(data,offset,offset+6)
-					act.targets[i].actions[n].spike_effect_effect = get_bit_packed(data,offset+6,offset+10)
-					act.targets[i].actions[n].spike_effect_param = get_bit_packed(data,offset+10,offset+24)
-					act.targets[i].actions[n].spike_effect_message = get_bit_packed(data,offset+24,offset+34)
-					offset = offset + 34
-				else
-					act.targets[i].actions[n].has_spike_effect = false
-					act.targets[i].actions[n].spike_effect_animation = 0
-					act.targets[i].actions[n].spike_effect_effect = 0
-					act.targets[i].actions[n].spike_effect_param = 0
-					act.targets[i].actions[n].spike_effect_message = 0
-				end
-			end
-		end
-		action(act)
-	elseif id == 0x29 then
-		if gearswap_disabled then return end
-		data = data:sub(5)
-		local actor_id = get_bit_packed(data,0,32)
-		local target_id = get_bit_packed(data,32,64)
-		local param_1 = get_bit_packed(data,64,96)
-		local param_2 = get_bit_packed(data,96,102) -- First 6 bits
-		local param_3 = get_bit_packed(data,102,128) -- Rest
-		local actor_index = get_bit_packed(data,128,144)
-		local target_index = get_bit_packed(data,144,160)
-		local message_id = get_bit_packed(data,160,175) -- Cut off the most significant bit, hopefully
-		
-		action_message(actor_id,target_id,param_1,param_2,param_3,actor_index,target_index,message_id)
-	elseif id == 0x01B then
---		'Job Info Packet'
-		local enc = data:byte(97) + data:byte(98)*256
-		for i=0,15 do
-			local tf = (math.floor( (enc%(2^(i+1))) / 2^i ) == 1) -- Could include the binary library some day if necessary
-			if encumbrance_table[i] ~= tf then
-				if not tf and not_sent_out_equip[i] and not disable_table[i] then
-					local eq = windower.ffxi.get_items().equipment
-					if not_sent_out_equip[i] ~= eq[default_slot_map[i]] then
-						windower.ffxi.set_equip(not_sent_out_equip[i],i)
-					end
-					sent_out_equip[i] = not_sent_out_equip[i]
-					not_sent_out_equip[i] = nil
-					if _global.debug_mode then windower.add_to_chat(8,"Gearswap (Debug Mode): Your "..default_slot_map[i]..' are now unlocked.') end
-				end
-				encumbrance_table[i] = tf
-			end
-		end
-	elseif gearswap_disabled then
-		return
-	elseif id == 0x050 then
---		'Equipment packet'
-		if sent_out_equip[data:byte(6)] == data:byte(5) then
-			sent_out_equip[data:byte(6)] = nil
-			send_check()
-		end
-	end
+        inc_action_message(arr)
+    elseif id == 0x037 then
+        player.status_id = data:byte(0x31)
+        local bitmask = data:sub(0x4D,0x54)
+        for i = 1,32 do
+            local bitmask_position = 2*((i-1)%4)
+            player.buffs[i] = data:byte(4+i) + 256*math.floor(bitmask:byte(1+math.floor((i-1)/4))%(2^(bitmask_position+2))/(2^bitmask_position))
+        end
+        
+        local indi_byte = data:byte(0x59)
+        if indi_byte%128/64 >= 1 then
+            local temp_indi = _ExtraData.player.indi
+            _ExtraData.player.indi = {
+                    element = res.elements[indi_byte%8][language],
+                    element_id = indi_byte%8,
+                    size = math.floor((indi_byte%64)/16) + 1, -- Size range of 1~4
+                }
+            if (indi_byte%16)/8 >= 1 then
+                _ExtraData.player.indi.target = 'Enemy'
+            else
+                _ExtraData.player.indi.target = 'Ally'
+            end
+            if not temp_indi then
+                -- There was not an indi spell up
+                refresh_globals()
+                equip_sets('indi_change',nil,_ExtraData.player.indi,true)
+            elseif temp_indi.element_id ~= _ExtraData.player.indi.element_id or temp_indi.target ~= _ExtraData.player.indi.target or temp_indi.size ~= _ExtraData.player.indi.size then
+                -- There was already an indi spell up, so check if it changed
+                refresh_globals()
+                equip_sets('indi_change',nil,temp_indi,false)
+                equip_sets('indi_change',nil,_ExtraData.player.indi,true)
+            end
+        elseif _ExtraData.player.indi then
+            -- An indi effect has been lost.
+            local temp_indi = _ExtraData.player.indi
+            _ExtraData.player.indi = nil
+            refresh_globals()
+            equip_sets('indi_change',nil,temp_indi,false)
+        end
+
+        local subj_ind = data:unpack('H', 0x35) / 8
+        if subj_ind == 0 and pet.isvalid then
+            if not next_packet_events then next_packet_events = {sequence_id = data:unpack('H',3)} end
+            refresh_globals()
+            pet.isvalid = false
+            next_packet_events.pet_change = {pet = table.reassign({},pet)}
+        elseif subj_ind ~= 0 and not pet.isvalid then
+            if not next_packet_events then next_packet_events = {sequence_id = data:unpack('H',3)} end
+            next_packet_events.pet_change = {subj_ind = subj_ind}
+        end
+    elseif id == 0x044 then
+        -- No idea what this is doing
+    elseif id == 0x050 then
+        local inv = items[to_windower_compact(res.bags[data:byte(7)].english)]
+        if data:byte(5) ~= 0 then
+            items.equipment[toslotname(data:byte(6))] = {slot=data:byte(5),bag_id = data:byte(7)}
+            if not inv[data:byte(5)] then inv[data:byte(5)] = make_empty_item_table(data:byte(5)) end
+            items[to_windower_compact(res.bags[data:byte(7)].english)][data:byte(5)].status = 5 -- Set the status to "equipped"
+        else
+            items.equipment[toslotname(data:byte(6))] = {slot=empty,bag_id=0}
+            if not inv[data:byte(5)] then inv[data:byte(5)] = make_empty_item_table(data:byte(5)) end
+            items[to_windower_compact(res.bags[data:byte(7)].english)][data:byte(5)].status = 0 -- Set the status to "unequipped"
+        end
+    elseif id == 0x05E then -- Conquest ID
+        if _ExtraData.world.conquest then
+            local offset = _ExtraData.world.conquest.region_id*4 + 11
+            if offset == 99 then
+                offset = 95
+            elseif offset == 107 then
+                offset = 99
+            end
+            local strength_map = {[0]='Minimal',[1]='Minor',[2]='Major',[3]='Dominant'}
+            local nation_map = {[0]={english='Neutral',japanese='Neutral'},[1]=res.regions[0],[2]=res.regions[1],
+                [3]=res.regions[2],[4]={english='Beastman',japanese='Beastman'},[0xFF]=res.regions[3]}
+            _ExtraData.world.conquest.strengths = {
+                sandoria=strength_map[data:byte(offset+2)%4],
+                bastok=strength_map[math.floor(data:byte(offset+2)%16/4)],
+                windurst=strength_map[math.floor(data:byte(offset+2)%64/16)],
+                beastmen=strength_map[math.floor(data:byte(offset+2)/64)],}
+            _ExtraData.world.conquest.nation = nation_map[data:byte(offset+3)][language]
+            _ExtraData.world.conquest.sandoria = data:byte(0x87)
+            _ExtraData.world.conquest.bastok = data:byte(0x88)
+            _ExtraData.world.conquest.windurst = data:byte(0x89)
+            _ExtraData.world.conquest.beastmen = 100-data:byte(0x87)-data:byte(0x88)-data:byte(0x89)
+        end
+    elseif id == 0x061 then
+        player.vitals.max_hp = data:unpack('I',5)
+        player.vitals.max_mp = data:unpack('I',9)
+        player.max_hp = data:unpack('I',5)
+        player.max_mp = data:unpack('I',9)
+        player.main_job_id = data:byte(13)
+        player.main_job_level = data:byte(14)
+        
+        _ExtraData.player.nation_id = data:byte(0x51)
+        _ExtraData.player.nation = res.regions[_ExtraData.player.nation_id][language] or 'None'
+                
+        if player.sub_job_id ~= data:byte(15) then
+            -- Subjob change event
+            local temp_sub = player.sub_job
+            player.sub_job_id = data:byte(15)
+            player.sub_job_level = data:byte(16)
+            update_job_names()
+            refresh_globals()
+            equip_sets('sub_job_change',nil,player.sub_job,temp_sub)
+        end
+        update_job_names()
+    elseif id == 0x062 then
+        for i = 1,0x71,2 do
+            local skill = data:unpack('H',i + 0x82)%32768
+            local current_skill = res.skills[math.floor(i/2)+1]
+            if current_skill then
+                player.skills[to_windower_api(current_skill.english)] = skill
+            end
+        end
+    elseif id == 0x076 then
+        partybuffs = {}
+        for i = 0,4 do
+            if data:unpack('I',i*48+5) == 0 then
+                break
+            else
+                local index = data:unpack('H',i*48+5+4)
+                partybuffs[index] = {
+                    id = data:unpack('I',i*48+5+0),
+                    index = data:unpack('H',i*48+5+4),
+                    buffs = {}
+                }
+                for n=1,32 do
+                    partybuffs[index].buffs[n] = data:byte(i*48+5+16+n-1) + 256*( math.floor( data:byte(i*48+5+8+ math.floor((n-1)/4)) / 4^((n-1)%4) )%4)
+                end
+            end
+        end
+    elseif id == 0x0DF and data:unpack('I',5) == player.id then
+        player.vitals.hp = data:unpack('I',9)
+        player.vitals.mp = data:unpack('I',13)
+        player.vitals.tp = data:unpack('I',0x11)
+        player.vitals.hpp = data:byte(0x17)
+        player.vitals.mpp = data:byte(0x18)
+        
+        player.hp = data:unpack('I',9)
+        player.mp = data:unpack('I',13)
+        player.tp = data:unpack('I',0x11)
+        player.hpp = data:byte(0x17)
+        player.mpp = data:byte(0x18)
+    elseif id == 0x0E2 and data:unpack('I',5)==player.id then
+        player.vitals.hp = data:unpack('I',9)
+        player.vitals.mp = data:unpack('I',0xB)
+        player.vitals.tp = data:unpack('I',0x11)
+        player.vitals.hpp = data:byte(0x1E)
+        player.vitals.mpp = data:byte(0x1F)
+        
+        player.hp = data:unpack('I',9)
+        player.mp = data:unpack('I',0xB)
+        player.tp = data:unpack('I',0x11)
+        player.hpp = data:byte(0x1E)
+        player.mpp = data:byte(0x1F)
+    elseif id == 0x117 then
+        for i=0x49,0x85,4 do
+            local arr = data:sub(i,i+3)
+            local inv = items[to_windower_compact(res.bags[arr:byte(3)].english)]
+            if arr:byte(1) ~= 0 then
+                items.equipment[toslotname(arr:byte(2))] = {slot=arr:byte(1),bag_id = arr:byte(3)}
+                if not inv[arr:byte(1)] then inv[arr:byte(1)] = make_empty_item_table(arr:byte(1)) end
+                items[to_windower_compact(res.bags[arr:byte(3)].english)][arr:byte(1)].status = 5 -- Set the status to "equipped"
+            else
+                items.equipment[toslotname(arr:byte(2))] = {slot=empty,bag_id=0}
+                if not inv[arr:byte(1)] then inv[arr:byte(1)] = make_empty_item_table(arr:byte(1)) end
+                items[to_windower_compact(res.bags[arr:byte(3)].english)][arr:byte(1)].status = 0 -- Set the status to "unequipped"
+            end
+        end
+    end
 end)
-
-function get_bit_packed(dat_string,start,stop)
-	local newval = 0
-	
-	local c_count = math.ceil(stop/8)
-	while c_count >= math.ceil((start+1)/8) do
-		-- Grabs the most significant byte first and works down towards the least significant.
-		local cur_val = dat_string:byte(c_count)
-		local scal = 256
-		
-		if c_count == math.ceil(stop/8) then -- Take the least significant bits of the most significant byte
-		-- Moduluses by 2^number of bits into the current byte. So 8 bits in would %256, 1 bit in would %2, etc.
-		-- Cuts off the top.
-			cur_val = cur_val%(2^((stop-1)%8+1)) -- -1 and +1 set the modulus result range from 1 to 8 instead of 0 to 7.
-		end
-		
-		if c_count == math.ceil((start+1)/8) then -- Take the most significant bits of the least significant byte
-		-- Divides by the significance of the final bit in the current byte. So 8 bits in would /128, 1 bit in would /1, etc.
-		-- Cuts off the bottom.
-			cur_val = math.floor(cur_val/(2^(start%8)))
-			scal = 2^(8-start%8)
-		end
-		
-		newval = newval*scal + cur_val -- Need to multiply by 2^number of bits in the next byte
-		c_count = c_count - 1
-	end
-	return newval
-end
-
-windower.register_event('zone change',function(new_zone,new_zone_id,old_zone,old_zone_id)
-	if debugging >= 1 then windower.debug('zone change') end
-	midaction = false
-	--sent_out_equip = {}
-end)
-
-windower.register_event('outgoing chunk',function(id,data,modified,injected,blocked)
-	if debugging >= 1 then windower.debug('outgoing chunk '..id) end
-	if id == 0x015 then
-		lastbyte = data:byte(7,8)
-	end
-	if id == 0x01A then -- Action packet
-		local abil_name
-		actor_id = data:byte(8,8)*256^3+data:byte(7,7)*256^2+data:byte(6,6)*256+data:byte(5,5)
-		index = data:byte(10,10)*256+data:byte(9,9)
-		category = data:byte(12,12)*256+data:byte(11,11)
-		param = data:byte(14,14)*256+data:byte(13,13)
-		_unknown1 = data:byte(16,16)*256+data:byte(15,15)
-		local actor_name = windower.ffxi.get_mob_by_id(actor_id)['name']
-		local target_name = windower.ffxi.get_mob_by_index(index)['name']
-		if category == 3 and not buffactive.silence and not buffactive.mute then -- 3 = Magic
-			abil_name = r_spells[param][language]
-		elseif (category == 7 or category == 25) and not buffactive.amnesia then -- 7 = WS, 25 = Monster skill
-			abil_name = r_abilities[param+768][language]
-		elseif category == 9 and not buffactive.amnesia then -- 9 = Ability
-			abil_name = r_abilities[param][language]
-		elseif category == 16 then -- 16 = . . . ranged attack
-			abil_name = 'Ranged Attack'
-		end
-		if logging then logit(logfile,'\n\nActor: '..tostring(actor_name)..'  Target: '..tostring(target_name)..'  Category: '..tostring(category)..'  param: '..tostring(abil_name or param)) end
-		if abil_name and not (buffactive.terror or buffactive.sleep or buffactive.stun or buffactive.petrification or buffactive.charm) then
-			midaction = true
-			windower.send_command('@wait 1;lua i gearswap midact')
-		elseif user_env and not T{0,2,4,5,11,12,13,14,15,18,20}:contains(category) then -- 0 = interacting with an NPC, 2 = engaging, 4 = disengaging from menu, 5 = CFH, 11 = Homepointing, 12= assist, 13 = getting up from reraise, 14 = fishing, 15 = changing target, 18 = dismounting chocobo, 20 = zoning
-			if not T{3,7,9,16,25}:contains(category) then windower.add_to_chat(8,'Tell Byrth how you triggered this and this number: '..category) end
-			if type(user_env.aftercast) == 'function' then
-				equip_sets('aftercast',{name='Interrupt',type='Interrupt'},{type='Recast'})
-			elseif user_env.aftercast then
-				midaction = false
-				spelltarget = nil
-				windower.add_to_chat(123,'GearSwap: aftercast() exists but is not a function')
-			else
-				midaction = false
-				spelltarget = nil
-			end
-		end
-	end
-end)
-
-function midact()
-	midaction = false
-end
-
-function action(act)
-	if debugging >= 1 then windower.debug('action') end
-	if gearswap_disabled or act.category == 1 then return end
-	
-	local temp_player = windower.ffxi.get_player()
-	local temp_player_mob_table = windower.ffxi.get_mob_by_index(temp_player.index)
-	local player_id = temp_player['id']
-	-- Update player info for aftercast costs.
-	player.tp = temp_player.vitals.tp
-	player.mp = temp_player.vitals.mp
-	player.mpp = temp_player.vitals.mpp
-	
-	local temp_pet,pet_id
-	if temp_player_mob_table.pet_index then
-		temp_pet = windower.ffxi.get_mob_by_index(temp_player_mob_table.pet_index)
-		if temp_pet then
-			pet_id = temp_pet.id
-		end
-	end
-
-	if act.actor_id ~= player_id and act.actor_id ~= pet_id then
-		return -- If the action is not being used by the player, the pet, or is a melee attack then abort processing.
-	end
-	
-	local prefix = ''
-	
-	if act['actor_id'] == pet_id then 
-		prefix = 'pet_'
-	end
-	
-	local spell = get_spell(act)
-	local category = act.category
-	if logging then	
-		if spell then logit(logfile,'\n\n'..tostring(os.clock)..'(178) Event Action: '..tostring(spell.english)..' '..tostring(act['category']))
-		else logit(logfile,'\n\nNil spell detected') end
-	end
-	
-	if jas[category] or uses[category] or (readies[category] and act.param == 28787 and not (category == 9)) then
-		local action_type = get_action_type(category)
-		if readies[category] and act.param == 28787 and not (category == 9) then
-			action_type = 'Failure'
-		end
-		
-		if type(user_env[prefix..'aftercast']) == 'function' then
-			equip_sets(prefix..'aftercast',spell,{type=action_type})
-		elseif user_env[prefix..'aftercast'] then
-			midaction = false
-			spelltarget = nil
-			windower.add_to_chat(123,'GearSwap: '..prefix..'aftercast() exists but is not a function')
-		else
-			midaction = false
-			spelltarget = nil
-		end
-	elseif readies[category] and act.param ~= 28787 then
-		if type(user_env[prefix..'midcast']) == 'function' then
-			equip_sets(prefix..'midcast',spell,{type=get_action_type(category)})
-		elseif user_env[prefix..'midcast'] then
-			windower.add_to_chat(123,'GearSwap: '..prefix..'midcast() exists but is not a function')
-		end
-	end
-end
-
-function action_message(actor_id,target_id,param_1,param_2,param_3,actor_index,target_index,message_id)
-	if spelltarget and T{6,20,113,406,605,646}:contains(message_id) and spelltarget.id == target_id then
-		-- If your current spell's target is defeated or falls to the ground
-		midaction = false
-		spelltarget = nil
-	end
-	
-	local tempplay = windower.ffxi.get_player()
-	if actor_id ~= tempplay.id then
-		if tempplay.pet_index then
-			if actor_id ~= windower.ffxi.get_mob_by_index(tempplay.pet_index)['id'] then
-				return
-			end
-		else
-			return
-		end
-	end
-	
-	if message_id == 62 then
-		if type(user_env.aftercast) == 'function' then
-			equip_sets('aftercast',r_items[param_1],{type='Failure'})
-		elseif user_env.aftercast then
-			midaction = false
-			spelltarget = nil
-			windower.add_to_chat(123,'GearSwap: aftercast() exists but is not a function')
-		else
-			midaction = false
-			spelltarget = nil
-		end
-	elseif unable_to_use:contains(message_id) and midaction then
-		if logging then	logit(logfile,'\n\n'..tostring(os.clock)..'(195) Event Action Message: '..tostring(message_id)..' Interrupt') end
-		if type(user_env.aftercast) == 'function' then
-			equip_sets('aftercast',{name='Interrupt',type='Interrupt'},{type='Recast'})
-		elseif user_env.aftercast then
-			midaction = false
-			spelltarget = nil
-			windower.add_to_chat(123,'GearSwap: aftercast() exists but is not a function')
-		else
-			midaction = false
-			spelltarget = nil
-		end
-	end
-end
 
 windower.register_event('status change',function(new,old)
-	if debugging >= 1 then windower.debug('status change '..new) end
-	if gearswap_disabled or T{2,3,4}:contains(old) or T{2,3,4}:contains(new) then return end
-	equip_sets('status_change',res.statuses[new].english,res.statuses[old].english)
+    windower.debug('status change '..new)
+    if gearswap_disabled or T{2,3,4}:contains(old) or T{2,3,4}:contains(new) then return end
+    
+    refresh_globals()
+    equip_sets('status_change',nil,res.statuses[new].english,res.statuses[old].english)
 end)
 
-windower.register_event('gain buff',function(name,id)
-	if debugging >= 1 then windower.debug('gain buff '..name) end
-	if gearswap_disabled then return end
-	if midaction and T{'terror','sleep','stun','petrification','charm','weakness'}:contains(name:lower()) then midaction = false end
-	equip_sets('buff_change',name,'gain')
+windower.register_event('gain buff',function(buff_id)
+    if not res.buffs[buff_id] then
+        error('GearSwap: No known status for buff id #'..tostring(buff_id))
+    end
+    local buff_name = res.buffs[buff_id][language]
+    windower.debug('gain buff '..buff_name..' ('..tostring(buff_id)..')')
+    if gearswap_disabled then return end
+    
+    -- Need to figure out what I'm going to do with this:
+    if T{'terror','sleep','stun','petrification','charm','weakness'}:contains(buff_name:lower()) then
+        for ts,v in pairs(command_registry) do
+            if v.midaction then
+                command_registry:delete_entry(ts)
+            end
+        end
+    end
+    
+    refresh_globals()
+    equip_sets('buff_change',nil,buff_name,true,copy_entry(res.buffs[buff_id]))
 end)
 
-windower.register_event('lose buff',function(name,id)
-	if debugging >= 1 then windower.debug('lose buff '..name) end
-	if gearswap_disabled then return end
-	equip_sets('buff_change',name,'loss')
-end)
-
-windower.register_event('job change',function(mjob, mjob_id, mjob_lvl, sjob, sjob_id, sjob_lvl)
-	if debugging >= 1 then windower.debug('job change') end
-	if mjob ~= current_job_file then
-		refresh_user_env()
-	end
+windower.register_event('lose buff',function(buff_id)
+    if not res.buffs[buff_id] then
+        error('GearSwap: No known status for buff id #'..tostring(buff_id))
+    end
+    local buff_name = res.buffs[buff_id][language]
+    windower.debug('lose buff '..buff_name..' ('..tostring(buff_id)..')')
+    if gearswap_disabled then return end
+    refresh_globals()
+    equip_sets('buff_change',nil,buff_name,false,copy_entry(res.buffs[buff_id]))
 end)
 
 windower.register_event('login',function(name)
-	if debugging >= 1 then windower.debug('login '..name) end
-	windower.send_command('@wait 2;lua i gearswap refresh_user_env;')
+    windower.debug('login '..name)
+    initialize_globals()
+    windower.send_command('@wait 2;lua i gearswap refresh_user_env;')
 end)
-
-windower.register_event('day change',function(new,old)
-	if debugging >= 1 then windower.debug('day change') end
-	windower.send_command('@wait 0.5;lua invoke gearswap refresh_ffxi_info')
-end)
-
-windower.register_event('weather change',function(new_weather, new_weather_id, old_weather, old_weather_id)
-	if debugging >= 1 then windower.debug('weather change') end
-	refresh_ffxi_info()
-end)
-
-
-
-function get_spell(act)
-	local spell, abil_ID, effect_val = {}
-	local msg_ID = act['targets'][1]['actions'][1]['message']
-	
-	if T{7,8,9}:contains(act['category']) then
-		abil_ID = act['targets'][1]['actions'][1]['param']
-	elseif T{3,4,5,6,11,13,14,15}:contains(act['category']) then
-		abil_ID = act['param']
-		effect_val = act['targets'][1]['actions'][1]['param']
-	end
-	
-	if act.category == 12 and act.category == 2 then
-		spell.english = 'Ranged Attack'
-		spell.german = 'Ranged Attack'
-		spell.japanese = 'Ranged Attack'
-		spell.french = 'Ranged Attack'
-	else
-		if not dialog[msg_ID] then
-			if T{4,8}:contains(act['category']) then
-				spell = r_spells[abil_ID]
-				if act.category == 4 then spell.recast = act.recast end
-			elseif T{3,6,7,13,14,15}:contains(act['category']) then
-				spell = r_abilities[abil_ID] -- May have to correct for charmed pets some day, but I'm not sure there are any monsters with TP moves that give no message.
-			elseif T{5,9}:contains(act['category']) then
-				spell = r_items[abil_ID]
-			else
-				spell = {none=tostring(msg_ID)} -- Debugging
-			end
-			return spell
-		end
-		
-		
-		local fields = fieldsearch(dialog[msg_ID][language])
-		
-		if table.contains(fields,'spell') then
-			spell = r_spells[abil_ID]
-			if act.category == 4 then spell.recast = act.recast end
-		elseif table.contains(fields,'ability') then
-			spell = r_abilities[abil_ID]
-		elseif table.contains(fields,'weapon_skill') then
---			if abil_ID > 255 then -- WZ_RECOVER_ALL is used by chests in Limbus
---				spell = r_mabils[abil_ID-256]
---				if spell.english == '.' then
---					spell.english = 'Special Attack'
---				end
---			elseif abil_ID < 256 then
-				spell = r_abilities[abil_ID+768]
---			end
-		elseif msg_ID == 303 then
-			spell = r_abilities[74] -- Divine Seal
-		elseif msg_ID == 304 then
-			spell = r_abilities[75] -- 'Elemental Seal'
-		elseif msg_ID == 305 then
-			spell = r_abilities[76] -- 'Trick Attack'
-		elseif msg_ID == 311 or msg_ID == 311 then
-			spell = r_abilities[79] -- 'Cover'
-		elseif msg_ID == 240 or msg_ID == 241 then
-			spell = r_abilities[43] -- 'Hide'
-		end
-		
-		
-		if table.contains(fields,'item') then
-			spell = r_items[abil_ID]
-		else
-			spell = aftercast_cost(spell)
-		end
-	end
-	
-	if spell.type == 'BardSong' and spell.casttime == 8 and buffactive.pianissimo then -- Handling for the casting time reduction of Pianissimo
-		spell.casttime=4
-	end
-	
-	spell.name = spell[language]
-	return spell
-end
-
-function aftercast_cost(rline)
-	if rline == nil then
-		return {tpaftercast = player.tp, mpaftercast = player.mp, mppaftercast = player.mpp}
-	end
-	if not rline.mpcost then rline.mpcost = 0 end
-	if not rline.tpcost then rline.tpcost = 0 end
-	
-	if rline.tpcost == 0 then rline.tpaftercast = player.tp else
-	rline.tpaftercast = player.tp - rline.tpcost end
-	
-	if rline.mpcost == 0 then
-		rline.mpaftercast = player.mp
-		rline.mppaftercast = player.mpp
-	else
-		rline.mpaftercast = player.mp - rline.mpcost
-		rline.mppaftercast = (player.mp - rline.mpcost)/player.max_mp
-	end
-	
-	return rline
-end
-
-function get_action_type(category)
-	local action_type
-	if category == 3 and not midaction then -- Try to filter for Job Abilities that come back as WSs.
-		action_type = 'Job Ability'
-	else
-		action_type = category_map[category]
-	end
-	return action_type
-end

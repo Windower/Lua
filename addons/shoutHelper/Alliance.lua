@@ -36,7 +36,7 @@ if there's "add war" and only DD slots are left, it has to put the war in the DD
 local Alliance = {}
 
 require 'logger'
-local files = require 'filehelper'
+local files = require 'files'
 
 local JobList = T{
     'blm',

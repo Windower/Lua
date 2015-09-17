@@ -1,5 +1,5 @@
 Author: Suji
-Version: 1.04
+Version: 1.09
 Addon to show alliance DPS and damage in real time.
 Abbreviation: //sb
 
@@ -42,7 +42,8 @@ Command list:
 * REPORTSTAT <stat> [<playerName>] [<target>]
   RS <stat> [<playerName>] [<target>]
   Reports the given stat. Supported stats are:
-      acc, racc, crit, rcrit, wsavg
+      mavg, mrange, acc, ravg, rrange, racc, critavg, critrange, crit,
+      rcritavg, rcritrange, rcrit, wsavg
   
   'playerName' may be the name of a player if you wish to see only one player.
   
@@ -97,6 +98,7 @@ additional configuration options:
 * sbcolor - Color of scoreboard's chat log output
 * showallidps - Set to true to display the alliance DPS, false otherwise.
 * resetfilters - Set to true if you want filters reset when you "//sb reset", false otherwise.
+* showfellow - Set to true to display your adventuring fellow's DPS, false otherwise.
  
 Caveats:
 * DPS is an approximation, although I tested it manually and found it to

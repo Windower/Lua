@@ -1,5 +1,5 @@
 **Author:**  Cairthenn<br>
-**Version:**  0.9<br>
+**Version:**  1.0<br>
 **Date:** Oct. 27, 2013<br>
 
 # DressUp #
@@ -29,6 +29,11 @@
 5. blinking [self/others/party/follow/all] [always/target/combat/all] [on/off]
 	- Changes blinking settings. Toggles if nothing is specified.
 	- Also accepts "bmn" and "blinkmenot" as command prefix.
+6. autoupdate
+	- Your character's appearance will update as you type commands if this setting is on.
+7. load/save/delete <profile name>
+	- Creates a profile to be used for your own characters appearance.
+	- Profiles named JOB or NAME_JOB will be checked for on job changes.
 	
 --
 
@@ -36,7 +41,4 @@
 * Add weapons, ranged weapons, and shield models.
 * Allow for monster models.
  * While this is currently possible, others seem to lose their animations if transformed into a monster. 
- 
---
-
-#### Change Log ####
+* Refine profile system

@@ -1,4 +1,4 @@
-#Shortcuts v1.6
+#Shortcuts v2.7
 ####written by Byrth  
 
 Completes and properly formats commands (prefixed by at least one '/'),
@@ -9,6 +9,17 @@ spellcast" project, and represents the interpretation part of spellcast.
 None  
 
 ####Changelog:  
+v2.7 - 11/15/14 - Totally gutted and reworked the ambiguous spell handling system. It is much simpler now.
+v2.6 -  9/27/14 - Fixed an error with absolute remapping of ambiguous spells
+v2.5 -  8/30/14 - Expanded shortcuts to include single-slash commands. Expanded command prefixes to include double-slash commands.
+v2.4 -  8/30/14 - Changed ambiguous case handling to respect specified prefixes.
+v2.3 -  6/20/14 - Added new monstrosity skill disambiguation.
+v2.2 -  5/19/14 - Accommodated new Resources changes.
+v2.1 -  4/18/14 - Added custom aliases to Shortcuts.
+v2.0 -  4/ 7/14 - Made Shortcuts calculate available spells/abilities in the case of ambiguous abilities. Moving towards an automated ambiguity-handling framework.
+v1.9 -  3/20/14 - Changed Shortcuts over to use the resources library.
+v1.8 -  1/ 6/14 - Fix target selection. Interpret the outgoing text as an ability first (instead of combination of ability and target).
+v1.7 - 12/31/13 - Fixed st targets for shortcuts.
 v1.6 - 12/12/13 - Fixed "target is nil" bug.
 v1.5 - 12/7/13  - Various bugfixes and more complete support for pattern matching.
 v1.4 - 11/17/13 - Improved ambiguous name handling using windower.ffxi.get_abilities().

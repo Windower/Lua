@@ -4,8 +4,8 @@ Vectors for operations in a d-dimensional space.
 
 _libs = _libs or {}
 _libs.vectors = true
-_libs.tablehelper = _libs.tablehelper or require('tablehelper')
-_libs.mathhelper = _libs.mathhelper or require('mathhelper')
+_libs.tables = _libs.tables or require('tables')
+_libs.maths = _libs.maths or require('maths')
 
 vector = {}
 
@@ -134,6 +134,16 @@ end
 
 _meta.V.__sub = vector.subtract
 
+-- Returns the angle described by two vectors (in radians)
+function vector.angle(v1, v2)
+    return ((v1 * v2) / (v1:length() * v2:length())):acos()
+end
+
+-- Returns a 2D vector from a radian value
+function vector.from_radian(r)
+    return V{r:cos(), -r:sin()}
+end
+
 -- Returns the vector in string format: (...)
 function vector.tostring(v)
     local str = '('
@@ -149,26 +159,8 @@ end
 
 _meta.V.__tostring = vector.tostring
 
-function vector.tovstring(v)
-    local str = ''
-    for i, val in ipairs(v) do
-        if i > 1 then
-            str = str..'\n'
-        end
-        str = str..tostring(val)
-    end
-
-    return str
-end
-
-function vector.vprint(v)
-    if log then
-        log(v:tovstring())
-    end
-end
-
 --[[
-Copyright (c) 2013, Windower
+Copyright © 2013-2014, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

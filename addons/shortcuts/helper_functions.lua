@@ -1,4 +1,4 @@
---Copyright (c) 2013, Byrthnoth
+--Copyright (c) 2014, Byrthnoth
 --All rights reserved.
 
 --Redistribution and use in source and binary forms, with or without
@@ -26,141 +26,57 @@
 
 
 -----------------------------------------------------------------------------------
---Name: parse_resources()
---Args:
----- lines_file (table of strings) - Table loaded with readlines() from an opened file
------------------------------------------------------------------------------------
---Returns:
----- Table of subtables indexed by their id (or index).
----- Subtables contain the child text nodes/attributes of each resources line.
-----
----- Child text nodes are given the key "english".
----- Attributes keyed by the attribute name, for example:
----- <a id="1500" a="1" b="5" c="10">15</a>
----- turns into:
----- completed_table[1500]['a']==1
----- completed_table[1500]['b']==5
----- completed_table[1500]['c']==10
----- completed_table[1500]['english']==15
-----
----- There is also currently a field blacklist (ignore_fields) for the sake of memory bloat.
------------------------------------------------------------------------------------
-function parse_resources(lines_file)
-	local ignore_fields = {german=true,french=true,japanese=true,fr=true,frl=true,de=true,del=true,jp=true,jpl=true}
-	local completed_table = {}
-	for i in ipairs(lines_file) do
-		local str = tostring(lines_file[i])
-		local g,h,typ,key = string.find(str,'<(%w+) id="(%d+)" ')
-		if typ == 's' then -- Packets and .dats refer to the spell index instead of ID
-			g,h,key = string.find(str,'index="(%d+)" ')
-		end
-		if key ~=nil then
-			completed_table[tonumber(key)]={}
-			local q = 1
-			while q <= str:len() do
-				local a,b,ind,val = string.find(str,'(%w+)="([^"]+)"',q)
-				if ind~=nil then
-					if not ignore_fields[ind] then
-						if val == "true" or val == "false" then
-							completed_table[tonumber(key)][ind] = str2bool(val)
-						elseif tonumber(val) then
-							completed_table[tonumber(key)][ind] = tonumber(val)
-						else
-							completed_table[tonumber(key)][ind] = val:gsub('&quot;','\42'):gsub('&apos;','\39')
-						end
-					end
-					q = b+1
-				else
-					q = str:len()+1
-				end
-			end
-			local k,v,english = string.find(str,'>([^<]+)</') -- Look for a Child Text Node
-			if english~=nil then -- key it to 'english' if it exists
-				completed_table[tonumber(key)]['english']=english
-			end
-		end
-	end
-
-	return completed_table
-end
-
------------------------------------------------------------------------------------
---Name: str2bool()
---Args:
----- input (string) - Value that might be true or false
------------------------------------------------------------------------------------
---Returns:
----- boolean or nil. Defaults to nil if input is not true or false.
------------------------------------------------------------------------------------
-function str2bool(input)
-	-- Used in the options_load() function
-	if input:lower() == 'true' then
-		return true
-	elseif input:lower() == 'false' then
-		return false
-	else
-		return nil
-	end
-end
-
------------------------------------------------------------------------------------
 --Name: find_san()
 --Args:
----- input (string) - Value that might be true or false
+---- str (string) - string to be sanitized
 -----------------------------------------------------------------------------------
 --Returns:
----- boolean or nil. Defaults to nil if input is not true or false.
+---- sanitized string
 -----------------------------------------------------------------------------------
 function find_san(str)
 	if #str == 0 then return str end
-	local op,cl,opadd,last = 0,0,1
-	for i=1,#str do
-		local ch = str:byte(i)
-		if ch == 0x5B then
-			op = op +1
-			opadd = i
-		elseif ch == 0x5D then
-			cl = cl + 1
-		end
+	
+	str = bracket_closer(str,0x28,0x29)
+	str = bracket_closer(str,0x5B,0x5D)
+	
+	-- strip precentages
+	local hanging_percent,num = 0,num
+	while str:byte(#str-hanging_percent) == 37 do
+		hanging_percent = hanging_percent + 1
 	end
-	if op > cl then
-		if opadd~= #str then
-			str = str..string.char(0x5D)
-		else
-			str = str..str.char(0x7,0x5D)
-		end		-- Close captures
-	end
+	str = str:sub(1,#str-hanging_percent%2)
 	return str
 end
 
 -----------------------------------------------------------------------------------
---Name: split()
+--Name: bracket_closer()
 --Args:
----- msg (string): message to be subdivided
----- match (string/char): marker for subdivision
+---- str (string) - string to have its brackets closed
+---- opener (number) - opening character's ASCII code
+---- closer (number) - closing character's ASCII code
 -----------------------------------------------------------------------------------
 --Returns:
----- Table containing string(s)
+---- string with its opened brackets closed
 -----------------------------------------------------------------------------------
-function split(msg, match)
-	local length = msg:len()
-	local splitarr = T{}
-	local u = 1
-	while u <= length do
-		local nextanch = msg:find(match,u)
-		if nextanch ~= nil then
-			splitarr[#splitarr+1] = msg:sub(u,nextanch-1)
-			if nextanch~=length then
-				u = nextanch+match:len()
-			else
-				u = length+1
-			end
-		else
-			splitarr[#splitarr+1] = msg:sub(u,length)
-			u = length+1
+function bracket_closer(str,opener,closer)
+	op,cl,opadd = 0,0,1
+	for i=1,#str do
+		local ch = str:byte(i)
+		if ch == opener then
+			op = op +1
+			opadd = i
+		elseif ch == closer then
+			cl = cl + 1
 		end
 	end
-	return splitarr
+	if op > cl then
+		if opadd ~= #str then
+			str = str..string.char(closer)
+		else
+			str = str..str.char(0x7,closer)
+		end		-- Close captures
+	end
+	return str
 end
 
 -----------------------------------------------------------------------------------
@@ -249,19 +165,43 @@ function to_roman(num)
 	return retstr
 end
 
+
 -----------------------------------------------------------------------------------
---Name: percent_strip()
+--Name: check_usability()
 --Args:
----- line (string): string to be checked for % signs and stripped
+---- player (table): get_player() table
+---- resource (string): name of the resource to be examined
+---- id (num): ID of the spell/ability of interest
 -----------------------------------------------------------------------------------
 --Returns:
----- line, without any trailing %s.
+---- boolean : true indicates that the spell/ability is known to you and false indicates that it is not.
 -----------------------------------------------------------------------------------
-function percent_strip(line)
-	local line_len = #line
-	while line:byte(line_len) == 37 do
-		line = line:sub(1,line_len-1)
-		line_len = line_len -1
-	end
-	return line
+function check_usability(player,resource,id)
+    if resource == 'spells' and ( (res.spells[id].levels[player.main_job_id] and res.spells[id].levels[player.main_job_id] <= player.main_job_level) or
+      (res.spells[id].levels[player.sub_job_id] and res.spells[id].levels[player.sub_job_id] <= player.sub_job_level) ) then -- Should check to see if you know the spell
+        return true
+    elseif L(windower.ffxi.get_abilities()[resource] or {}):contains(id) then
+        return true
+    elseif resource == 'monster_abilities' and player.main_job_id == 23 and (res.monstrosity[windower.ffxi.get_mjob_data().species].tp_moves[id] or 0) <= player.main_job_level then
+        return true
+    end
+end
+
+
+-----------------------------------------------------------------------------------
+--Name: debug_chat()
+--Args:
+---- str (string): string to be printed to the log
+-----------------------------------------------------------------------------------
+--Returns:
+---- None
+-----------------------------------------------------------------------------------
+function debug_chat(str)
+    if not debugging then return end
+    
+    if tostring(str) then
+        windower.add_to_chat(8,str)
+    else
+        error('Debug chat is not a string',2)
+    end
 end

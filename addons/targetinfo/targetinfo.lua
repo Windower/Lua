@@ -1,9 +1,10 @@
 _addon.name = 'TargetInfo'
 _addon.author = 'Arcon'
-_addon.version = '1.0.0.2'
+_addon.version = '1.0.1.0'
+_addon.language = 'English'
 
-require 'luau'
-texts = require 'texts'
+require('luau')
+texts = require('texts')
 
 -- Config
 
@@ -33,22 +34,44 @@ settings:save()
 
 text_box = texts.new(settings.display, settings)
 
+-- Constructor
+
+initialize = function(text, settings)
+    local properties = L{}
+    if settings.showfullid then
+        properties:append('ID:  ${full|-|%08s}')
+    end
+    if settings.showhexid then
+        properties:append('Hex ID:   ${hex|-|%.3X}')
+    end
+    if settings.showspeed then
+        properties:append('Speed: ${speed|-}')
+    end
+
+    text:clear()
+    text:append(properties:concat('\n'))
+end
+
+text_box:register_event('reload', initialize)
+
+initialize(text_box, settings)
+
 -- Events
 
 windower.register_event('prerender', function()
 	local mob = windower.ffxi.get_mob_by_target('t')
 	if mob and mob.id > 0 then
         local info = {}
-        info.hex = mob.id:hex():slice(-3)
-        info.full = tostring(mob.id):lpad(' ', 8)
-        local speed = math.round(100*(mob.speed/4 - 1), 2)
+        info.hex = mob.id % 0x1000
+        info.full = mob.id
+        local speed = (100 * (mob.movement_speed / 5 - 1)):round(2)
         info.speed = (
             speed > 0 and
-                '\\cs(0,255,0)'..('+'..speed):lpad(' ', 4)
+                '\\cs(0,255,0)' .. ('+' .. speed):lpad(' ', 5)
             or speed < 0 and
-                '\\cs(255,0,0)'..tostring(speed):lpad(' ', 4)
+                '\\cs(255,0,0)' .. speed:string():lpad(' ', 5)
             or
-                '\\cs(102,102,102)'..('+'..speed):lpad(' ', 5))..'%\\cr'
+                '\\cs(102,102,102)' .. ('+' .. speed):lpad(' ', 5)) .. '%\\cr'
         text_box:update(info)
         text_box:show()
 	else
@@ -56,28 +79,8 @@ windower.register_event('prerender', function()
 	end
 end)
 
--- Constructor
-
-function initialize(t, settings)
-    local properties = L{}
-    if settings.showfullid then
-        properties:append('ID:  ${full|-}')
-    end
-    if settings.showhexid then
-        properties:append('Hex ID:   ${hex|-}')
-    end
-    if settings.showspeed then
-        properties:append('Speed: ${speed|-}')
-    end
-    text_box:clear()
-    text_box:append(properties:concat('\n'))
-end
-initialize(text_box, settings)
-
-text_box:register_reload_event(initialize)
-
 --[[
-Copyright (c) 2013, Windower
+Copyright (c) 2013-2014, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

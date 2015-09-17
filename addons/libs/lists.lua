@@ -1,10 +1,10 @@
 --[[
-A library providing advanced list support and better optimizations for list-based operations.
+    A library providing advanced list support and better optimizations for list-based operations.
 ]]
 
 _libs = _libs or {}
 _libs.lists = true
-_libs.tablehelper = _libs.tablehelper or require('tablehelper')
+_libs.tables = _libs.tables or require('tables')
 
 _raw = _raw or {}
 _raw.table = _raw.table or {}
@@ -14,28 +14,27 @@ list = {}
 _meta = _meta or {}
 _meta.L = {}
 _meta.L.__index = function(l, k)
-    if type(k) == 'number' and k < 0 then
-        k = l.n + k + 1
-        return rawget(l[k])
+    if type(k) == 'number' then
+        k = k < 0 and l.n + k + 1 or k
+
+        return rawget(l, k)
     end
-    if list[k] ~= nil then
-        return list[k]
-    else
-        return T(l)[k]
-    end
+
+    return list[k] or table[k]
 end
 _meta.L.__newindex = function(l, k, v)
     if type(k) == 'number' then
-        if k < 0 then
-            k = l.n + k + 1
-        end
+        k = k < 0 and l.n + k + 1 or k
+
         if k >= 1 and k <= l.n then
             rawset(l, k, v)
-        elseif warning then
-            warning('Trying to assign outside of list range ('..l.n..'):', k)
+        else
+            (warning or print)('Trying to assign outside of list range (%u/%u): %s':format(k, l.n, tostring(v)))
         end
-    elseif warning then
-        warning('Trying to assign to non-numerical list index:', k)
+
+    else
+        (warning or print)('Trying to assign to non-numerical list index:', k)
+
     end
 end
 _meta.L.__class = 'List'
@@ -125,7 +124,9 @@ function list.extend(l1, l2)
     return l1
 end
 
-_meta.L.__add = list.extend
+_meta.L.__add = function(l1, l2)
+    return L{}:extend(l1):extend(l2)
+end
 
 function list.contains(l, el)
     for key = 1, l.n do
@@ -175,15 +176,6 @@ function list.concat(l, str, from, to)
     return res
 end
 
-function list.clear(l)
-    for i = 1, l.n do
-        rawset(l, key, nil)
-    end
-
-    l.n = 0
-    return l
-end
-
 function list.with(l, attr, val)
     for i = 1, l.n do
         local el = rawget(l, i)
@@ -193,25 +185,11 @@ function list.with(l, attr, val)
     end
 end
 
-function list.iwith(l, attr, val)
-    local cel
-    val = val:lower()
-    for i = 1, l.n do
-        local el = rawget(l, i)
-        if type(el) == 'table' then
-            cel = rawget(el, attr)
-            if type(cel) == 'string' and cel:lower() == val then
-                return el
-            end
-        end
-    end
-end
-
 function list.map(l, fn)
     local res = {}
 
     for key = 1, l.n do
-        rawset(res, key, fn(rawget(l, key)))
+        res[key] = fn(rawget(l, key))
     end
 
     res.n = l.n
@@ -233,20 +211,6 @@ function list.filter(l, fn)
 
     res.n = key
     return setmetatable(res, _meta.L)
-end
-
-function list.reduce(l, fn, init)
-    local acc = init
-    for key = 1, l.n do
-        local val = rawget(l, key)
-        if acc == nil then
-            acc = val
-        else
-            acc = fn(acc, val)
-        end
-    end
-
-    return acc
 end
 
 function list.flatten(l, rec)
@@ -335,6 +299,7 @@ end
 
 function list.splice(l1, from, to, l2)
     -- TODO
+    (_raw.error or error)('list.splice is not yet implemented.')
 end
 
 function list.clear(l)
@@ -346,11 +311,17 @@ function list.clear(l)
     return l
 end
 
-function list.copy(l)
+function list.copy(l, deep)
+    deep = deep ~= false and true
     local res = {}
 
     for key = 1, l.n do
-        rawset(res, key, rawget(l, key))
+        local value = rawget(l, key)
+        if deep and type(value) == 'table' then
+            res[key] = (not rawget(value, copy) and value.copy or table.copy)(value)
+        else
+            res[key] = value
+        end
     end
 
     res.n = l.n
@@ -373,7 +344,7 @@ _raw.table.sort = _raw.table.sort or table.sort
 function list.sort(l, ...)
     _raw.table.sort(l, ...)
     return l
-end 
+end
 
 function list.reverse(l)
     local res = {}
@@ -400,26 +371,6 @@ function list.range(n, init)
     return setmetatable(res, _meta.L)
 end
 
-function list.any(l, fn)
-    for key = 1, l.n do
-        if fn(rawget(l, key)) == true then
-            return true
-        end
-    end
-
-    return false
-end
-
-function list.all(l, fn)
-    for key = 1, l.n do
-        if fn(rawget(l, key)) ~= true then
-            return false
-        end
-    end
-
-    return true
-end
-
 function list.tostring(l)
     local str = '['
 
@@ -435,8 +386,55 @@ end
 
 _meta.L.__tostring = list.tostring
 
+function list.format(l, trail, subs)
+    if l.n == 0 then
+        return subs or ''
+    end
+
+    trail = trail or 'and'
+
+    local last
+    if trail == 'and' then
+        last = ' and '
+    elseif trail == 'or' then
+        last = ' or '
+    elseif trail == 'list' then
+        last = ', '
+    elseif trail == 'csv' then
+        last = ','
+    elseif trail == 'oxford' then
+        last = ', and '
+    elseif trail == 'oxford or' then
+        last = ', or '
+    else
+        warning('Invalid format for table.format: \''..trail..'\'.')
+    end
+
+    local res = ''
+    for i = 1, l.n do
+        local add = tostring(l[i])
+        if trail == 'csv' and add:match('[,"]') then
+            res = res .. add:gsub('"', '""'):enclose('"')
+        else
+            res = res .. add
+        end
+
+        if i < l.n - 1 then
+            if trail == 'csv' then
+                res = res .. ','
+            else
+                res = res .. ', '
+            end
+        elseif i == l.n - 1 then
+            res = res .. last
+        end
+    end
+
+    return res
+end
+
 --[[
-Copyright (c) 2013, Windower
+Copyright © 2013-2015, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

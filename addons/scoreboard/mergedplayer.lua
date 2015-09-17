@@ -1,4 +1,9 @@
 --[[
+    The entire mergedplayer file exists to flatten individual stats in the db
+    into two numbers (per name). So normally the db is:
+    dps_db.dp[mob_name][player_name] = {stats}
+    Mergedplayer iterates over mob_name and returns a table that's just:
+    tab[player_name] = {CalculatedStatA,CalculatedStatB}
 ]]
 
 local MergedPlayer = {}
@@ -16,10 +21,120 @@ function MergedPlayer:new (o)
 end
 
 --[[
-    'mmin', 'mmax', 'mavg',
-    'rmin', 'rmax', 'ravg',
     'wsmin', 'wsmax', 'wsavg'
 ]]
+
+function MergedPlayer:mavg()
+    local hits, hit_dmg = 0, 0
+    
+    for _, p in ipairs(self.players) do
+        hits    = hits + p.m_hits
+        hit_dmg = hit_dmg + p.m_hits*p.m_avg
+    end
+    
+    if hits > 0 then
+        return { hit_dmg / hits, hits}
+    else
+        return {0, 0}
+    end
+end
+
+
+function MergedPlayer:mrange()
+    local m_min, m_max = math.huge, 0
+    
+    for _, p in ipairs(self.players) do
+        m_min = math.min(m_min, p.m_min)
+        m_max = math.max(m_max, p.m_max)
+    end
+
+    return {m_min~=math.huge and m_min or m_max, m_max}
+end
+
+
+function MergedPlayer:critavg()
+    local crits, crit_dmg = 0, 0
+    
+    for _, p in ipairs(self.players) do
+        crits    = crits + p.m_crits
+        crit_dmg = crit_dmg + p.m_crits*p.m_crit_avg
+    end
+    
+    if crits > 0 then
+        return { crit_dmg / crits, crits}
+    else
+        return {0, 0}
+    end
+end
+
+
+function MergedPlayer:critrange()
+    local m_crit_min, m_crit_max = math.huge, 0
+    
+    for _, p in ipairs(self.players) do
+        m_crit_min = math.min(m_crit_min, p.m_crit_min)
+        m_crit_max = math.max(m_crit_max, p.m_crit_max)
+    end
+    
+    return {m_crit_min~=math.huge and m_crit_min or m_crit_max, m_crit_max}
+end
+
+
+function MergedPlayer:ravg()
+    local r_hits, r_hit_dmg = 0, 0
+    
+    for _, p in ipairs(self.players) do
+        r_hits    = r_hits + p.r_hits
+        r_hit_dmg = r_hit_dmg + p.r_hits*p.r_avg
+    end
+    
+    if r_hits > 0 then
+        return { r_hit_dmg / r_hits, r_hits}
+    else
+        return {0, 0}
+    end
+end
+
+
+function MergedPlayer:rrange()
+    local r_min, r_max = math.huge, 0
+    
+    for _, p in ipairs(self.players) do
+        r_min = math.min(r_min, p.r_min)
+        r_max = math.max(r_max, p.r_max)
+    end
+    
+    return {r_min~=math.huge and r_min or r_max, r_max}
+end
+
+
+function MergedPlayer:rcritavg()
+    local r_crits, r_crit_dmg = 0, 0
+    
+    for _, p in ipairs(self.players) do
+        r_crits    = r_crits + p.r_crits
+        r_crit_dmg = r_crit_dmg + p.r_crits*p.r_crit_avg
+    end
+    
+    if r_crits > 0 then
+        return { r_crit_dmg / r_crits, r_crits}
+    else
+        return {0, 0}
+    end
+end
+
+
+function MergedPlayer:rcritrange()
+    local r_crit_min, r_crit_max = math.huge, 0
+    
+    for _, p in ipairs(self.players) do
+        r_crit_min = math.min(r_crit_min, p.r_crit_min)
+        r_crit_max = math.max(r_crit_max, p.r_crit_max)
+    end
+    
+    return {r_crit_min~=math.huge and r_crit_min or r_crit_max, r_crit_max}
+end
+
 
 function MergedPlayer:acc()
     local hits, crits, misses = 0, 0, 0
@@ -73,6 +188,7 @@ function MergedPlayer:crit()
     end
 end
 
+
 function MergedPlayer:rcrit()
     local hits, crits = 0, 0
     
@@ -88,6 +204,7 @@ function MergedPlayer:rcrit()
         return {0, 0}
     end
 end
+
 
 function MergedPlayer:wsavg()
     local wsdmg   = 0
@@ -116,6 +233,10 @@ function MergedPlayer:wsavg()
         return {0, 0}
     end
 end
+
+
+
+
 -- Unused atm
 function MergedPlayer:merge(other)
     self.damage = self.damage + other.damage

@@ -1,9 +1,7 @@
-
-
 _addon.version = '1.0'
 _addon.name = 'Send'
 _addon.command = 'send'
-_addon.author = 'Arcon'
+_addon.author = 'Byrth'
 
 windower.register_event('addon command',function (...)
     local term = table.concat({...}, ' ')
@@ -18,15 +16,20 @@ windower.register_event('addon command',function (...)
 		if broken_init ~= nil then
 			relevant_msg(table.concat(broken_init,' '))
 		end
-		windower.send_ipc_message(term)
+		windower.send_ipc_message('send ' .. term)
 	else
-		windower.send_ipc_message(term)
+		windower.send_ipc_message('send ' .. term)
 	end
 end)
 
 windower.register_event('ipc message',function (msg)
 	local broken = split(msg, ' ')
-	
+
+    local command = table.remove(broken, 1)
+    if command ~= 'send' then
+        return
+    end
+
 	if #broken < 2 then return end
 	
 	local qual = table.remove(broken,1)
@@ -76,10 +79,6 @@ end
 
 function relevant_msg(msg)
 	local player = windower.ffxi.get_player()
-    local st,en,item,tar = string.find(msg,'/item ([%w%s]+) <(%w+)>')
-    if item ~= nil then
-        msg = '/item "'..item..'" <'..tar..'>'
-    end
 	
 	msg:gsub("<me>", tostring(player.name))
 	msg:gsub("<hp>", tostring(player.vitals.hp))

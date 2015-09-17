@@ -39,8 +39,8 @@ end
 
 -- Returns the normalized time in seconds it took to perform the provided functions rep number of times, with the specified arguments.
 function timeit.benchmark(rep, ...)
-    _libs.functools = _libs.functools or require 'functools'
-    _libs.tablehelper = _libs.tablehelper or require 'tablehelper'
+    _libs.functions = _libs.functions or require 'functions'
+    _libs.tables = _libs.tables or require 'tables'
     _libs.logger = _libs.logger or require 'logger'
 
     local args = T{...}
@@ -55,7 +55,7 @@ function timeit.benchmark(rep, ...)
         if i ~= nil then
             fns = args:slice(1, i - 1)
             local fnargs = args:slice(i)
-            fns = fns:map(functools.apply-{fnargs})
+            fns = fns:map(functions.apply-{fnargs})
         else
             fns = args
         end
