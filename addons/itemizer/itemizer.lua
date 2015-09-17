@@ -29,6 +29,8 @@ defaults.UseUniversalTools.Yurin       = false
 defaults.UseUniversalTools.Myoshu      = false
 defaults.UseUniversalTools.Migawari    = false
 defaults.UseUniversalTools.Kakka       = false
+defaults.UseUniversalTools.Gekka       = false
+defaults.UseUniversalTools.Yain        = false
 
 settings = config.load(defaults)
 settings:save --Added to auto save new values can be removed in future versions.
@@ -200,6 +202,8 @@ spec_tools = T{
     Myoshu      = 2642,
     Migawari    = 2970,
     Kakka       = 2644,
+    Gekka       = 8803,
+    Yain        = 8804
 }
 gen_tools = T{
     Katon       = 2971,
@@ -220,6 +224,8 @@ gen_tools = T{
     Myoshu      = 2972,
     Migawari    = 2972,
     Kakka       = 2972,
+    Gekka       = 2972,
+    Yain        = 2972
 }
 
 active = S{}
