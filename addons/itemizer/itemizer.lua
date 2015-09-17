@@ -1,6 +1,6 @@
 _addon.name = 'Itemizer'
 _addon.author = 'Ihina'
-_addon.version = '3.0.1.1'
+_addon.version = '3.0.1.2'
 _addon.command = 'itemizer'
 
 require('luau')
@@ -9,9 +9,29 @@ defaults = {}
 defaults.AutoNinjaTools = true
 defaults.AutoItems = true
 defaults.Delay = 0.5
+defaults.UseUniversalTools = {}
+
+defaults.UseUniversalTools.Katon       = false
+defaults.UseUniversalTools.Hyoton      = false
+defaults.UseUniversalTools.Huton       = false
+defaults.UseUniversalTools.Doton       = false
+defaults.UseUniversalTools.Raiton      = false
+defaults.UseUniversalTools.Suiton      = false
+defaults.UseUniversalTools.Utsusemi    = false
+defaults.UseUniversalTools.Jubaku      = false
+defaults.UseUniversalTools.Hojo        = false
+defaults.UseUniversalTools.Kurayami    = false
+defaults.UseUniversalTools.Dokumori    = false
+defaults.UseUniversalTools.Tonko       = false
+defaults.UseUniversalTools.Monomi      = false
+defaults.UseUniversalTools.Aisha       = false
+defaults.UseUniversalTools.Yurin       = false
+defaults.UseUniversalTools.Myoshu      = false
+defaults.UseUniversalTools.Migawari    = false
+defaults.UseUniversalTools.Kakka       = false
 
 settings = config.load(defaults)
-
+settings:save --Added to auto save new values can be removed in future versions.
 bag_ids = res.bags:key_map(string.gsub-{' ', ''} .. string.lower .. table.get-{'english'} .. table.get+{res.bags}):map(table.get-{'id'})
 -- Remove temporary bag, because items cannot be moved from/to there, as such it's irrelevant to Itemizer
 bag_ids.temporary = nil
@@ -47,6 +67,44 @@ find_items = function(ids, bag, limit)
 
     return res, found
 end
+
+windower.register_event("addon command", function(command, arg2, ...)
+    if command == 'help' then
+        local helptext = [[Itemizer - Command List:')
+  1. Delay <delay> - Sets the time delay.
+  2. Autoninjatools - toggles Automatically getting ninja tools (Shortened ant)
+  3. Autoitems - Toggles automatically getting items from bags (shortened ai)
+  4. Useuniversaltool <spell> - toggles using universal ninja tools for <spell> (shortened uut)
+     i.e. uut katon  - will toggle katon either true or false depending on your setting
+     all defaulted false.
+  5. help --Shows this menu.]]
+        for _, line in ipairs(helptext:split('\n')) do
+            windower.add_to_chat(207, line)
+        end
+    elseif command:lower() == "delay" and arg2 ~= nil then
+        if type(arg2) == 'number' then
+            settings.delay = arg2
+            settings:save()
+        else
+            error('The delay must be a number')
+        end
+    elseif T{'autoninjatools','ant'}:contains(command:lower()) then
+        settings.AutoNinjaTools = not settings.AutoNinjaTools
+        settings:save()
+    elseif T{'autoitems','ai'}:contains(command:lower()) then
+        settings.AutoItems = not settings.AutoItems
+        settings:save()
+    elseif T{'useuniversaltool','uut'}:contains(command:lower()) then
+        if settings.UseUniversalTools[arg2:ucfirst()] ~= nil then
+            settings.UseUniversalTools[arg2:ucfirst()] = not settings.UseUniversalTools[arg2:ucfirst()]
+            settings:save()
+        else
+            error('Argument 2 must be a ninjutsu spell (sans :ichi or :ni) i.e. uut katon')
+            print(arg2:ucfirst())
+        end
+    end
+end)
+        
 
 windower.register_event('unhandled command', function(command, ...)
     local args = L{...}:map(string.lower)
@@ -236,7 +294,11 @@ windower.register_event('outgoing text', function()
             end
 
             if name then
-                return reschedule(text, {spec_tools[name], windower.ffxi.get_player().main_job == 'NIN' and gen_tools[name] or nil})
+                if settings.UseUniversalTools[name] == false or windower.ffxi.get_player().main_job ~= 'NIN' then
+                    return reschedule(text, {spec_tools[name], windower.ffxi.get_player().main_job == 'NIN' and gen_tools[name] or nil})
+                else
+                    return reschedule(text, {windower.ffxi.get_player().main_job == 'NIN' and gen_tools[name] or nil})
+                end
             end
 
         -- Item usage
