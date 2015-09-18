@@ -9,6 +9,7 @@ defaults = {}
 defaults.AutoNinjaTools = true
 defaults.AutoItems = true
 defaults.Delay = 0.5
+defaults.version                       = "3.0.1.1"
 defaults.UseUniversalTools = {}
 
 defaults.UseUniversalTools.Katon       = false
@@ -33,10 +34,18 @@ defaults.UseUniversalTools.Gekka       = false
 defaults.UseUniversalTools.Yain        = false
 
 settings = config.load(defaults)
-settings:save() --Added to auto save new values can be removed in future versions.
 bag_ids = res.bags:key_map(string.gsub-{' ', ''} .. string.lower .. table.get-{'english'} .. table.get+{res.bags}):map(table.get-{'id'})
 -- Remove temporary bag, because items cannot be moved from/to there, as such it's irrelevant to Itemizer
 bag_ids.temporary = nil
+
+--Added this function for first load on new version. Because of the newly added features that weren't there before.
+windower.register_event("load", function()
+    if settings.version == "3.0.1.1" then
+        windower.add_to_chat(207,"New features added. (use //itemizer help to find out about them")
+        settings.version = "3.0.1.2"
+        settings:save() 
+    end
+end)
 
 find_items = function(ids, bag, limit)
     local res = S{}
@@ -102,7 +111,6 @@ windower.register_event("addon command", function(command, arg2, ...)
             settings:save()
         else
             error('Argument 2 must be a ninjutsu spell (sans :ichi or :ni) i.e. uut katon')
-            print(arg2:ucfirst())
         end
     end
 end)
