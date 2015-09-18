@@ -41,7 +41,7 @@ bag_ids.temporary = nil
 --Added this function for first load on new version. Because of the newly added features that weren't there before.
 windower.register_event("load", function()
     if settings.version == "3.0.1.1" then
-        windower.add_to_chat(207,"New features added. (use //itemizer help to find out about them")
+        windower.add_to_chat(207,"Itemizer v3.0.1.2: New features added. (use //itemizer help to find out about them)")
         settings.version = "3.0.1.2"
         settings:save() 
     end
