@@ -267,5 +267,7 @@ windower.register_event('incoming text', function(old,new,color,newcolor)
         addText('red',string.find(old,'Red: (%d+)'))
     elseif string.find(old,'The fiend appears(.*)vulnerable to ([%w%s]+)!') then
         addText('vulnerable',string.find(old,'The fiend appears(.*)vulnerable to ([%w%s]+)!'))
+    elseif string.find(old,'(%w+) is the key to victory!') then
+        addText('victory',string.find(old,'(%w+) is the key to victory')
     end
 end) 
