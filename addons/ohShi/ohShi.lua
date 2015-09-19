@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 _addon.name = 'OhShi'
-_addon.version = '2.54'
+_addon.version = '2.55'
 _addon.author = 'Nitrous (Shiva)'
 _addon.command = 'ohshi'
 
