@@ -1313,25 +1313,21 @@ fields.incoming[0x00D] = L{
     {ctype='unsigned char',     label='Linkshell Red'},                         -- 24
     {ctype='unsigned char',     label='Linkshell Green'},                       -- 25
     {ctype='unsigned char',     label='Linkshell Blue'},                        -- 26
-    {ctype='unsigned int',      label='_unknown3'},                             -- 27
-    {ctype='unsigned int',      label='_unknown4'},                             -- 2B   Flags again
-    {ctype='unsigned int',      label='_unknown5'},                             -- 2F
-    {ctype='unsigned int',      label='_unknown6'},                             -- 33   DSP notes that the 6th bit of byte 54 is the Ballista flag
-    {ctype='unsigned int',      label='_unknown7'},                             -- 37
-    {ctype='unsigned int',      label='_unknown8'},                             -- 3B
-    {ctype='unsigned int',      label='_unknown9'},                             -- 3F
+    {ctype='unsigned char',     label='_unknown2'},                             -- 27   Probably junk from the LS color dword
+    {ctype='data[0x1B]',        label='_unknown3'},                             -- 28   DSP notes that the 6th bit of byte 54 is the Ballista flag
     {ctype='unsigned char',     label='Face Flags'},                            -- 43   0, 3, 4, or 8
-    {ctype='unsigned char',     label='Face'},                                  -- 44
-    {ctype='unsigned char',     label='Race'},                                  -- 45
-    {ctype='unsigned short',    label='Head'},                                  -- 46
-    {ctype='unsigned short',    label='Body'},                                  -- 48
-    {ctype='unsigned short',    label='Hands'},                                 -- 4A
-    {ctype='unsigned short',    label='Legs'},                                  -- 4C
-    {ctype='unsigned short',    label='Feet'},                                  -- 4E
-    {ctype='unsigned short',    label='Main'},                                  -- 50
-    {ctype='unsigned short',    label='Sub'},                                   -- 52
-    {ctype='unsigned short',    label='Ranged'},                                -- 54
-    {ctype='char*',             label='Character Name'},                        -- 56 -   *
+    {ctype='data[4]',           label='_unknown4'},                             -- 44
+    {ctype='unsigned char',     label='Face'},                                  -- 48
+    {ctype='unsigned char',     label='Race'},                                  -- 49
+    {ctype='unsigned short',    label='Head'},                                  -- 4A
+    {ctype='unsigned short',    label='Body'},                                  -- 4C
+    {ctype='unsigned short',    label='Hands'},                                 -- 4E
+    {ctype='unsigned short',    label='Legs'},                                  -- 50
+    {ctype='unsigned short',    label='Feet'},                                  -- 52
+    {ctype='unsigned short',    label='Main'},                                  -- 54
+    {ctype='unsigned short',    label='Sub'},                                   -- 56
+    {ctype='unsigned short',    label='Ranged'},                                -- 58
+    {ctype='char*',             label='Character Name'},                        -- 5A -   *
 }
 
 -- NPC Update
@@ -2766,11 +2762,18 @@ fields.incoming._func[0x063][0x04] = L{
     {ctype='data[32]',          label='Variants Bitfield'},                     -- 94   Does not show normal monsters, only variants. Bit is 1 if the variant is owned. Length is an estimation including the possible padding.
 }
 
--- fields.incoming._func[0x063][0x05] :: Has 8 content bytes of header, followed by 6 bytes per job, in the order they appear in the resources.
--- The first 2 bytes of each subfield is the current CP collected on the job (out of 30,000).
--- The next two bytes are the current number of job points collected on the job.
--- The last two bytes were unused the last time I checked.
--- Pointwatch extracts this information if you need an example.
+types.job_point_info = L{
+    {ctype='unsigned short',    label='Capacity Points'},                       -- 00
+    {ctype='unsigned short',    label='Job Points'},                            -- 02
+    {ctype='unsigned short',    label='Spent Job Points'},                      -- 04
+}
+
+fields.incoming._func[0x063][0x05] = L{
+    {ctype='unsigned short',    label='_unknown1',          const=0x0098},      -- 06
+    {ctype='unsigned short',    label='_unknown2'},                             -- 08   Lowest bit of this might indicate JP availability
+    {ctype='unsigned short',    label='_unknown3'},                             -- 0A
+    {ref=types.job_point_info,  lookup={res.jobs, 0x00},    count=24},          -- 0C
+}
 
 -- Repositioning
 fields.incoming[0x065] = L{
@@ -3520,7 +3523,7 @@ sizes['float'] = 4
 sizes['double'] = 8
 sizes['data'] = 1
 
-local size
+--local size
 size = function(fs)
     if fs.ctype then
         local ctype, count_str = fs.ctype:match('(.*)%[(.+)%]')
@@ -3528,10 +3531,10 @@ size = function(fs)
         ctype = ctype or fs.ctype
 
         if ctype == 'bit' or ctype == 'boolbit' then
-            return 0, count_num
+            return (count_num / 8):floor(), count_num % 8
         end
 
-        return count_num * sizes[ctype]
+        return count_num * sizes[ctype], 0
     end
 
     local acc = 0
@@ -3601,9 +3604,8 @@ parse = function(fs, data, index, max, lookup)
                     local byte_index = field.count_ref + 1
                     type_count = data:byte(byte_index, byte_index)
                 end
-                if type_count == 10 then x = true end
+
                 local ext, new_index = parse(field.ref, data, index, type_count, field.lookup)
-                x = false
                 res = res + ext
                 index = new_index
             end
