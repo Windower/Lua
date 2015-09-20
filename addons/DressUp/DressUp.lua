@@ -31,6 +31,7 @@ _addon.commands = {'DressUp','du'}
 
 --Libs
 require('luau')
+packets = require('packets')
 
 --DressUp files
 
@@ -68,24 +69,17 @@ windower.register_event('job change',function(job)
     end
 end)
 
+model_names = S{"Face","Race","Head","Body","Hands","Legs","Feet","Main","Sub","Ranged"}
+
 windower.register_event('incoming chunk',function (id, data)
     if id == 0x0a then
         if not _char then return end
         local _ignore = data:sub(1,68)
-        local self = T{ Face = data:byte(69), Race = data:byte(70), 
-                        Head = data:byte(71) + 256*data:byte(72),
-                        Body = data:byte(73) + 256*data:byte(74),
-                        Hands = data:byte(75) + 256*data:byte(76),
-                        Legs = data:byte(77) + 256*data:byte(78),
-                        Feet = data:byte(79) + 256*data:byte(80),
-                        Main = data:byte(81) + 256*data:byte(82),
-                        Sub = data:byte(83) + 256*data:byte(84),
-                        Ranged = data:byte(85) + 256*data:byte(86),
-                        }
+        local self = packets.parse('incoming', data)
         local _end = data:sub(87)
         
         for k,v in pairs(self) do
-            if S{"Face","Race","Head","Body","Hands","Legs","Feet","Main","Sub","Ranged"}:contains(k) and v ~= 0 then
+            if model_names:contains(k) and v ~= 0 then
                 if settings[_char][k:lower()] then
                     self[k] = Int2LE(settings[_char][k:lower()],k)
                 elseif table.containskey(settings.replacements[k:lower()],tostring(v)) then
@@ -103,20 +97,11 @@ windower.register_event('incoming chunk',function (id, data)
         if not _char then return end
         
         local _ignore = data:sub(1,4)
-        local self = T{ Face = data:byte(5), Race = data:byte(6), 
-                        Head = data:byte(7) + 256*data:byte(8),
-                        Body = data:byte(9) + 256*data:byte(10),
-                        Hands = data:byte(11) + 256*data:byte(12),
-                        Legs = data:byte(13) + 256*data:byte(14),
-                        Feet = data:byte(15) + 256*data:byte(16),
-                        Main = data:byte(17) + 256*data:byte(18),
-                        Sub = data:byte(19) + 256*data:byte(20),
-                        Ranged = data:byte(21) + 256*data:byte(22),
-                        }
+        local self = packets.parse('incoming', data)
         local _end = data:sub(23)
         
         for k,v in pairs(self) do
-            if S{"Face","Race","Head","Body","Hands","Legs","Feet","Main","Sub","Ranged"}:contains(k) and v ~= 0 then
+            if model_names:contains(k) and v ~= 0 then
                 if settings[_char][k:lower()] then
                     self[k] = Int2LE(settings[_char][k:lower()],k)
                 elseif table.containskey(settings.replacements[k:lower()],tostring(v)) then
@@ -138,16 +123,7 @@ windower.register_event('incoming chunk',function (id, data)
     elseif id == 0x00d then
                        
             local _ignore = data:sub(1,68)
-            local pc = T{   Face = data:byte(69), Race = data:byte(70), 
-                            Head = data:byte(71) + 256*data:byte(72),
-                            Body = data:byte(73) + 256*data:byte(74),
-                            Hands = data:byte(75) + 256*data:byte(76),
-                            Legs = data:byte(77) + 256*data:byte(78),
-                            Feet = data:byte(79) + 256*data:byte(80),
-                            Main = data:byte(81) + 256*data:byte(82),
-                            Sub = data:byte(83) + 256*data:byte(84),
-                            Ranged = data:byte(85) + 256*data:byte(86),
-                            }
+            local pc = packets.parse('incoming', data)
             local _end = data:sub(87)
             
             local _Index = data:byte(9) + 256*data:byte(10)
@@ -209,8 +185,7 @@ windower.register_event('incoming chunk',function (id, data)
                        pc["Legs"]..pc["Feet"]..pc["Main"]..pc["Sub"]..pc["Ranged"].._end
             end
     end
-end
-)
+end)
 
 --[[windower.register_event('outgoing chunk',function (id, data)
     if id == 0x17 then
