@@ -1331,7 +1331,8 @@ fields.incoming[0x00D] = L{
     {ctype='unsigned short',    label='Main'},                                  -- 50
     {ctype='unsigned short',    label='Sub'},                                   -- 52
     {ctype='unsigned short',    label='Ranged'},                                -- 54
-    {ctype='char*',             label='Character Name'},                        -- 56 -   *
+    {ctype='data[4]',           label='_unknown10'},                            -- 56
+    {ctype='char*',             label='Character Name'},                        -- 5A -   *
 }
 
 -- NPC Update
@@ -2771,6 +2772,16 @@ fields.incoming._func[0x063][0x04] = L{
 -- The next two bytes are the current number of job points collected on the job.
 -- The last two bytes were unused the last time I checked.
 -- Pointwatch extracts this information if you need an example.
+
+types.timers_entry = L{
+    {ctype='unsigned int',      label='Date'},                                  --  This is the time at which the buff will wear off. The time is given in 60ths of a second and is currently relative to August 11th, 2015 at noon-ish, but will roll-over shortly. Not always constant between packets.
+}
+
+fields.incoming._func[0x063][0x09] = L{
+    {ctype='data[2]',           label='_unknown1',          const='\196\0'},    -- 06
+    {ctype='unsigned short[32]',label='Buff',               fn=buff},           -- 08
+    {ref=types.timers_entry,    label='Expiration Dates',   count=32},          -- 48
+}
 
 -- Repositioning
 fields.incoming[0x065] = L{
