@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.904'
+_addon.version = '0.906'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -465,6 +465,16 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
             if not inv[data:byte(5)] then inv[data:byte(5)] = make_empty_item_table(data:byte(5)) end
             items[to_windower_compact(res.bags[data:byte(7)].english)][data:byte(5)].status = 0 -- Set the status to "unequipped"
         end
+    elseif id == 0x053 then
+        if data:unpack('H',0xD) == 0x12D and player then
+            -- You're unable to use trust magic if you're not the party leader or solo
+            local ts,tab = command_registry:find_by_time()
+            if tab and tab.spell and tab.spell.prefix ~= '/pet' then
+                tab.spell.action_type = 'Interruption'
+                tab.spell.interrupted = true
+                equip_sets('aftercast',nil,tab.spell)
+            end
+        end
     elseif id == 0x05E then -- Conquest ID
         if _ExtraData.world.conquest then
             local offset = _ExtraData.world.conquest.region_id*4 + 11
@@ -531,6 +541,46 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
                 for n=1,32 do
                     partybuffs[index].buffs[n] = data:byte(i*48+5+16+n-1) + 256*( math.floor( data:byte(i*48+5+8+ math.floor((n-1)/4)) / 4^((n-1)%4) )%4)
                 end
+                
+                
+                if alliance[1] then
+                    local cur_player
+                    for n,m in pairs(alliance[1]) do
+                        if type(m) == 'table' and m.mob and m.mob.index == index then
+                            cur_player = m
+                            break
+                        end
+                    end
+                    local new_buffs = convert_buff_list(partybuffs[index].buffs)
+                    if cur_player and cur_player.buffactive then
+                        local old_buffs = cur_player.buffactive
+                    -- Make sure the character existed before (with a buffactive list) - Avoids zoning.
+                        for n,m in pairs(new_buffs) do
+                            if type(n) == 'number' and m ~= old_buffs[n] then
+                                if not old_buffs[n] or m > old_buffs[n] then -- gaining buff
+                                    equip_sets('party_buff_change',nil,cur_player,res.buffs[n][language],true,copy_entry(res.buffs[n]))
+                                    old_buffs[n] = nil
+                                else -- losing buff
+                                    equip_sets('party_buff_change',nil,cur_player,res.buffs[n][language],false,copy_entry(res.buffs[n]))
+                                    old_buffs[n] = nil
+                                end
+                            elseif type(n) ~= 'number' then
+                                -- Clear out the string entries so we don't have to iterate over them in the second loop
+                                old_buffs[n] = nil
+                            end
+                        end
+                        
+                        for n,m in pairs(old_buffs) do
+                            if type(n) == 'number' and m ~= new_buffs[n] then-- losing buff
+                                equip_sets('party_buff_change',nil,cur_player,res.buffs[n][language],false,copy_entry(res.buffs[n]))
+                            end
+                        end
+                    end
+                    if cur_player then
+                        cur_player.buffactive = new_buffs
+                    end
+                end
+                
             end
         end
     elseif id == 0x0DF and data:unpack('I',5) == player.id then
