@@ -83,7 +83,7 @@ windower.register_event('incoming chunk',function (id, data)
     local character
 
     -- Preprocessing based on packet
-    if id == 0x00A or id == 0x00D then
+    if id == 0x00A or id == 0x051 then
         if not _char then
             return
         end
@@ -132,7 +132,7 @@ windower.register_event('incoming chunk',function (id, data)
         return packets.build(packet)
 
     elseif id == 0x51 then
-        blink_type = windower.ffxi.get_player().autorun and "follow" or "packet"
+        blink_type = windower.ffxi.get_player().autorun and "follow" or "self"
         local block = blink_logic(blink_type, windower.ffxi.get_player().index)
 
         -- Model ID 0xFFFF in ranged slot signifies a monster. This prevents undesired results.
