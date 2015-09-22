@@ -61,27 +61,31 @@ local function div(denom, val)
     return val/denom
 end
 
-local time = function()
+local time
+local utime
+do
     local now = os.time()
     local h, m = (os.difftime(now, os.time(os.date('!*t', now))) / 3600):modf()
 
     local timezone = '%+.2d:%.2d':format(h, 60 * m)
-    now, h, m = nil, nil, nil
-    return function(ts)
-        return os.date('%Y-%m-%dT%H:%M:%S' .. timezone, os.time() - ts)
-    end
-end()
 
-local utime = function()
-    local now = os.time()
-    local h, m = (os.difftime(now, os.time(os.date('!*t', now))) / 3600):modf()
-
-    local timezone = '%+.2d:%.2d':format(h, 60 * m)
-    now, h, m = nil, nil, nil
-    return function(ts)
+    local fn = function(ts)
         return os.date('%Y-%m-%dT%H:%M:%S' .. timezone, ts)
     end
-end()
+
+    time = function(ts)
+        return fn(os.time() - ts)
+    end
+
+    utime = function(ts)
+        return fn(ts)
+    end
+
+    bufftime = function(ts)
+        -- Todo...
+        return fn(ts)
+    end
+end
 
 local time_ms = time .. function(val) return val/1000 end
 
@@ -112,6 +116,10 @@ end
 
 local function weather(val)
     return res.weather[val].name
+end
+
+local function buff(val)
+    return val ~= 0xFF and res.buffs[val].name or '-'
 end
 
 local function chat(val)
@@ -2775,6 +2783,12 @@ fields.incoming._func[0x063][0x05] = L{
     {ref=types.job_point_info,  lookup={res.jobs, 0x00},    count=24},          -- 0C
 }
 
+fields.incoming._func[0x063][0x09] = L{
+    {ctype='unsigned short',    label='_unknown1',          const=0x00C4},      -- 06
+    {ctype='unsigned short[32]',label='Buffs',              fn=buff},           -- 08
+    {ctype='unsigned int[32]',  label='Time',               fn=bufftime},       -- 48
+}
+
 -- Repositioning
 fields.incoming[0x065] = L{
 -- This is identical to the spawn packet, but has 4 more unused bytes.
@@ -3572,6 +3586,7 @@ parse = function(fs, data, index, max, lookup)
                 local ctype, count_str = field.ctype:match('(.*)%[(.+)%]')
                 local count_num = count_str and count_str:number() or 1
                 ctype = ctype or field.ctype
+
                 if count_str and not non_array_types:contains(ctype) then
                     field.ctype = ctype
                     local ext, new_index = parse(L{field}, data, index, count_num)
@@ -3621,9 +3636,11 @@ end
 
 fields.get = function(dir, id, data)
     local f = fields[dir][id]
+
     if type(f) == 'function' then
         f = f(data)
     end
+
     return f and parse(f, data) or nil
 end
 
