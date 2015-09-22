@@ -821,14 +821,14 @@ end
 --Returns:
 ---- ts,discovered entry
 -----------------------------------------------------------------------------------
-function cmd_reg:find_by_time()
+function cmd_reg:find_by_time(target_time)
     local time_stamp,ts
-    local time_now = os.time()
+    target_time = target_time or os.time()
     
     -- Iterate over command_registry looking for the spell with the closest timestamp.
     -- Call aftercast with this spell's information (interrupted) if one is found.
     for i,v in pairs(self) do
-        if not time_stamp or (type(v) == 'table' and v.timestamp and ((time_now - v.timestamp) < (time_now - time_stamp))) then
+        if not time_stamp or (type(v) == 'table' and v.timestamp and ((target_time - v.timestamp) < (target_time - time_stamp))) then
             time_stamp = v.timestamp
             ts = i
         end

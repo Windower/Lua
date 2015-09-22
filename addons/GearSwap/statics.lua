@@ -91,7 +91,7 @@ uses = {false,true,true,true,true,false,false,false,false,false,true,false,true,
 unable_to_use = T{17,18,55,56,87,88,89,90,104,191,308,313,325,410,428,561,574,579,580,581,661,665,
     12,16,34,35,40,47,48,49,71,72,76,78,84,91,92,95,96,106,111,128,154,155,190,192,193,198,
     199,215,216,217,218,219,220,233,246,247,307,315,316,328,337,338,346,347,348,349,356,411,443,444,
-    445,446,514,516,517,518,523,524,525,547,568,569,575,649,660,662,666,700,701,62} -- Probably don't need some of these (event action) 
+    445,446,514,516,517,518,523,524,525,547,568,569,575,649,660,662,666,700,701,62,717} -- Probably don't need some of these (event action) 
     -- 94 removed - "You must wait longer to perform that action." -- I think this is only sent in response to engage packets.
 
 -- 192 : param_1 = Ability ID
@@ -214,7 +214,8 @@ _ExtraData = {
 unbridled_learning_set = {['Thunderbolt']=true,['Harden Shell']=true,['Absolute Terror']=true,
     ['Gates of Hades']=true,['Tourbillion']=true,['Pyric Bulwark']=true,['Bilgestorm']=true,
     ['Bloodrake']=true,['Droning Whirlwind']=true,['Carcharian Verve']=true,['Blistering Roar']=true,
-    ['Uproot']=true,['Crashing Thunder']=true,['Polar Roar']=true}
+    ['Uproot']=true,['Crashing Thunder']=true,['Polar Roar']=true,['Mighty Guard']=true,['Cruel Joke']=true,
+    ['Cesspool']=true,['Tearing Gust']=true}
 
 tool_map = {
         ['Katon: Ichi'] = res.items[1161],

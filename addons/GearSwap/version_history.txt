@@ -1,4 +1,6 @@
 -------------------------------------------------
+GearSwap 0.906 - Added BLU magic spells and handled one aftercast that uses the 0x053 incoming packet.
+-------------------------------------------------
 GearSwap 0.904 - Adjusted party buff information to run off indices instead of names.
 -------------------------------------------------
 GearSwap 0.903 - Added buff information to the alliance/party structure.

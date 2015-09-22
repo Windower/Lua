@@ -11,7 +11,7 @@ require 'generic_helpers'
 require 'parse_action_packet'
 require 'statics'
 
-_addon.version = '3.20'
+_addon.version = '3.21'
 _addon.name = 'BattleMod'
 _addon.author = 'Byrth, maintainer: SnickySnacks'
 _addon.commands = {'bm','battlemod'}
@@ -341,14 +341,15 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 
 ------------ SYNTHESIS ANIMATION --------------
     elseif id == 0x030 then
-        if windower.ffxi.get_player().id == original:unpack("I",5) then
+        if windower.ffxi.get_player().id == original:unpack("I",5) or windower.ffxi.get_mob_by_target('t') and windower.ffxi.get_mob_by_target('t').id == original:unpack("I",5) then
+            local crafter_name = (windower.ffxi.get_player().id == original:unpack("I",5) and windower.ffxi.get_player().name) or windower.ffxi.get_mob_by_target('t').name
             local result = original:byte(13,13)
             if result == 0 then
-                windower.add_to_chat(8,' ------------- NQ Synthesis -------------')
+                windower.add_to_chat(8,' ------------- NQ Synthesis ('..crafter_name..') -------------')
             elseif result == 1 then
-                windower.add_to_chat(8,' ---------------- Break -----------------')
+                windower.add_to_chat(8,' ---------------- Break ('..crafter_name..') -----------------')
             elseif result == 2 then
-                windower.add_to_chat(8,' ------------- HQ Synthesis -------------')
+                windower.add_to_chat(8,' ------------- HQ Synthesis ('..crafter_name..') -------------')
             else
                 windower.add_to_chat(8,'Craftmod: Unhandled result '..tostring(result))
             end

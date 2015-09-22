@@ -478,7 +478,11 @@ end
 ---- to the individual subtables (total number of people in each party.
 -----------------------------------------------------------------------------------
 function refresh_group_info(dt,user_event_flag)
-    clean_alliance()
+    if not alliance or #alliance == 0 then
+        alliance = make_alliance()
+    end
+    
+    local c_alliance = make_alliance()
     
     local j = windower.ffxi.get_party() or {}
     for i,v in pairs(j) do
@@ -503,34 +507,47 @@ function refresh_group_info(dt,user_event_flag)
         if allyIndex and partyIndex then
             local mob = windower.ffxi.get_mob_by_name(v.name)
             if mob and partybuffs[mob.index] then
-                v.buffs = convert_buff_list(partybuffs[mob.index].buffs)
+                v.buffactive = convert_buff_list(partybuffs[mob.index].buffs)
             elseif mob and mob.index == player.index then
-                v.buffs = buffactive
+                v.buffactive = buffactive
             end
-            alliance[allyIndex][partyIndex] = v
-            alliance[allyIndex].count = alliance[allyIndex].count + 1
-            alliance.count = alliance.count + 1
+            c_alliance[allyIndex][partyIndex] = v
+            c_alliance[allyIndex].count = c_alliance[allyIndex].count + 1
+            c_alliance.count = c_alliance.count + 1
         end
     end
+        
+    -- Clear the old structure while maintaining the party references:
+    for ally_party = 1,3 do
+        for i,v in pairs(alliance[ally_party]) do
+            alliance[ally_party][i] = nil
+        end
+        alliance[ally_party].count = 0
+    end
+    alliance.count = 0
+    
+    -- Reassign to the new structure
+    alliance[1] = c_alliance[1]
+    alliance[2] = c_alliance[2]
+    alliance[3] = c_alliance[3]
+    alliance.count = c_alliance.count
 end
 
--- Cleans the current alliance array while keeping the subtable pointers intact.
-function clean_alliance()
-    if not alliance or #alliance == 0 then
-        alliance = make_user_table()
-        alliance[1]={count=0}
-        alliance[2]={count=0}
-        alliance[3]={count=0}
-        alliance.count=0
-    else
-        for ally_party = 1,3 do
-            for i,v in pairs(alliance[ally_party]) do
-                alliance[ally_party][i] = nil
-            end
-            alliance[ally_party].count = 0
-        end
-        alliance.count = 0
-    end
+-----------------------------------------------------------------------------------
+--Name: make_alliance()
+--Args:
+---- none
+-----------------------------------------------------------------------------------
+--Returns:
+---- one blank alliance structure
+-----------------------------------------------------------------------------------
+function make_alliance()
+    local all = make_user_table()
+    all[1]={count=0}
+    all[2]={count=0}
+    all[3]={count=0}
+    all.count=0
+    return all
 end
 
 -----------------------------------------------------------------------------------
@@ -689,5 +706,3 @@ function pathsearch(files_list)
     
     return false
 end
-
--- Much force update
